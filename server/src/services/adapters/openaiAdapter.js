@@ -84,6 +84,30 @@ async function health() {
   }
 }
 
+// ==================== Embedding ====================
+
+export async function getEmbedding(text, modelId = 'text-embedding-3-small') {
+  if (!API_KEY) throw new Error('OPENAI_API_KEY not configured');
+
+  const input = Array.isArray(text) ? text : [text];
+
+  const res = await fetch(`${BASE_URL}/embeddings`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${API_KEY}` },
+    body: JSON.stringify({ model: modelId, input }),
+    signal: AbortSignal.timeout(30000),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(`Embedding API ${res.status}: ${err.error?.message || res.statusText}`);
+  }
+
+  const data = await res.json();
+  const vectors = data.data.map(d => d.embedding);
+  return Array.isArray(text) ? vectors : vectors[0];
+}
+
 // ==================== 模型能力映射 ====================
 
 const MODEL_CAPABILITIES = {
