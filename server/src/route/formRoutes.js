@@ -42,17 +42,25 @@ const upsertFieldsSchema = z.object({
   })).min(1),
 });
 
+const updateFormSchema = createFormSchema.partial().omit({ formCode: true });
+
+const updateSubmissionSchema = z.object({
+  status: z.enum(['pending', 'approved', 'rejected', 'spam']).optional(),
+  data_status: z.enum(['valid', 'invalid', 'duplicate']).optional(),
+  remark: z.string().max(500).optional(),
+});
+
 // ── 管理端 ──
 router.get('/admin', authMiddleware, adminAuth, asyncHandler(formController.listForms));
 router.get('/admin/:id', authMiddleware, adminAuth, asyncHandler(formController.getFormById));
 router.post('/admin', authMiddleware, adminAuth, validate(createFormSchema), asyncHandler(formController.createForm));
-router.put('/admin/:id', authMiddleware, adminAuth, asyncHandler(formController.updateForm));
+router.put('/admin/:id', authMiddleware, adminAuth, validate(updateFormSchema), asyncHandler(formController.updateForm));
 router.delete('/admin/:id', authMiddleware, adminAuth, asyncHandler(formController.deleteForm));
 
 // 提交记录
 router.get('/admin/:id/submissions', authMiddleware, adminAuth, asyncHandler(formController.listSubmissions));
 router.get('/admin/:id/submissions/export', authMiddleware, adminAuth, asyncHandler(formController.exportSubmissions));
-router.put('/admin/submissions/:subId', authMiddleware, adminAuth, asyncHandler(formController.updateSubmission));
+router.put('/admin/submissions/:subId', authMiddleware, adminAuth, validate(updateSubmissionSchema), asyncHandler(formController.updateSubmission));
 
 // 字段管理
 router.get('/admin/:id/fields', authMiddleware, adminAuth, asyncHandler(formController.listFields));

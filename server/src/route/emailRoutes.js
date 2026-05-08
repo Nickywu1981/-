@@ -19,9 +19,21 @@ router.post('/send-code', codeLimiter, validate(sendCodeSchema), asyncHandler(se
 router.post('/verify-code', codeLimiter, validate(verifyCodeSchema), asyncHandler(verifyCode));
 
 // 管理后台 — 模板管理
+const createTemplateSchema = z.object({
+  template_code: z.string().min(1, '模板代码不能为空').max(50).regex(/^[a-z][a-z0-9_]*$/, '仅允许小写字母数字下划线，以字母开头'),
+  name: z.string().min(1, '模板名称不能为空').max(100),
+  subject: z.string().max(200).optional(),
+  content: z.string().min(1, '模板内容不能为空').max(10000),
+  provider_template_id: z.string().max(100).optional(),
+  provider: z.string().max(50).optional(),
+  status: z.coerce.number().int().min(0).max(1).optional(),
+  remark: z.string().max(500).optional(),
+});
+const updateTemplateSchema = createTemplateSchema.partial().omit({ template_code: true });
+
 router.get('/templates', authMiddleware, adminAuth, asyncHandler(listTemplates));
-router.post('/templates', authMiddleware, adminAuth, asyncHandler(createTemplate));
-router.put('/templates/:id', authMiddleware, adminAuth, asyncHandler(updateTemplate));
+router.post('/templates', authMiddleware, adminAuth, validate(createTemplateSchema), asyncHandler(createTemplate));
+router.put('/templates/:id', authMiddleware, adminAuth, validate(updateTemplateSchema), asyncHandler(updateTemplate));
 router.delete('/templates/:id', authMiddleware, adminAuth, asyncHandler(deleteTemplate));
 
 export default router;
