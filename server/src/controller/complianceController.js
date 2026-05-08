@@ -19,5 +19,3 @@ export async function getRules(req, res) {
   if (!rules) return res.status(404).json({ code: 404, msg: '未找到合规规则', data: null });
   res.json({ code: 200, msg: 'success', data: rules });
 }
-
-export default { listTargets, check, getRules };

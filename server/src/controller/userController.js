@@ -1,5 +1,5 @@
 import * as userService from '../services/userService.js';
-import { success as sendSuccess, error as sendError, listResult as sendList } from '../utils/response.js';
+import { success as sendSuccess, error as sendError } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
 export async function register(req, res, next) {
@@ -46,15 +46,6 @@ export async function profile(req, res, next) {
     if (err.statusCode) {
       return sendError(res, err.statusCode, err.message);
     }
-    next(err);
-  }
-}
-
-export async function listUsers(req, res, next) {
-  try {
-    const data = await userService.listUsers({ query: req.query, opts: { allowedSortFields: ['id', 'username', 'create_time'] } });
-    return sendList(res, data);
-  } catch (err) {
     next(err);
   }
 }

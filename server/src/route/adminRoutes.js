@@ -8,16 +8,10 @@ import { z } from 'zod';
 
 const router = Router();
 
-const _userStatusSchema = z.object({
-  userId: idSchema,
-  status: z.union([z.literal(0), z.literal(1)]),
-});
 const batchUserStatusSchema = z.object({
   ids: z.array(idSchema).min(1).max(500),
   status: z.union([z.literal(0), z.literal(1)]),
 });
-const _taskIdSchema = z.object({ taskId: idSchema });
-const _planIdSchema = z.object({ planId: idSchema });
 const planSchema = z.object({
   planId: idSchema,
   name: z.string().min(1).max(100).optional(),

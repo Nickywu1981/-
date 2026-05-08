@@ -22,5 +22,3 @@ export async function buildPrompt(req, res) {
     res.json({ code: 200, msg: 'success', data: result });
   } catch (err) { res.status(500).json({ code: 500, msg: err.message, data: null }); }
 }
-
-export default { getLanguages, getScriptTypes, buildPrompt };

@@ -141,13 +141,6 @@ export async function resetPassword(token, newPassword) {
   return { success: true };
 }
 
-export async function listUsers({ query, opts }) {
-  const keyword = query.keyword || '';
-  guardSQL(keyword, 'keyword');
-  const { paginatedQuery } = await import('../utils/pagination.js');
-  return paginatedQuery({ query, opts }, () => userDao.countUsers(keyword), (pager) => userDao.listUsers(pager, keyword));
-}
-
 export async function getUserStats(userId, _tenantId = 0) {
   const stats = await userDao.getUserStats(userId);
   return {
