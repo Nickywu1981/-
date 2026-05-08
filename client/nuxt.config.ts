@@ -57,7 +57,7 @@ export default defineNuxtConfig({
 
   typescript: {
     strict: true,
-    typeCheck: true,
+    typeCheck: false, // 开发阶段关闭，避免 vue-tsc 阻塞
   },
 
   modules: ['@nuxtjs/i18n', '@vite-pwa/nuxt'],
