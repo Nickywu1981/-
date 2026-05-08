@@ -14,12 +14,14 @@ const sendSchema = z.object({
   content: z.string().min(1).max(2000),
 });
 
+const adminListQuerySchema = z.object({ userId: z.coerce.number().int().positive().optional(), type: z.string().max(50).optional() });
+
 router.get('/', authMiddleware, asyncHandler(listNotifications));
 router.get('/unread-count', authMiddleware, asyncHandler(getUnreadCount));
 router.put('/:id/read', authMiddleware, asyncHandler(markOneRead));
 router.put('/read-all', authMiddleware, asyncHandler(markAllRead));
 router.post('/send', authMiddleware, adminAuth, validate(sendSchema), asyncHandler(sendNotification));
 router.delete('/:id', authMiddleware, adminAuth, asyncHandler(deleteNotification));
-router.get('/admin/all', authMiddleware, adminAuth, asyncHandler(listAllNotifications));
+router.get('/admin/all', authMiddleware, adminAuth, validate(adminListQuerySchema, 'query'), asyncHandler(listAllNotifications));
 
 export default router;

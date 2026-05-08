@@ -38,6 +38,8 @@ const translateSchema = z.object({
   model: z.string().max(50).optional(),
 });
 
+const historyQuerySchema = z.object({ type: z.string().max(50).optional() });
+
 router.use(authMiddleware);
 
 // 生成
@@ -50,7 +52,7 @@ router.get('/platforms', asyncHandler(listPlatforms));
 router.get('/languages', asyncHandler(listLanguages));
 
 // 历史
-router.get('/history', asyncHandler(listHistory));
+router.get('/history', validate(historyQuerySchema, 'query'), asyncHandler(listHistory));
 router.delete('/history/:id', asyncHandler(deleteHistory));
 
 export default router;

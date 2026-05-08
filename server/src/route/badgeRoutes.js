@@ -8,6 +8,8 @@ import { validate, idSchema } from '../utils/validate.js';
 
 const router = Router();
 
+const badgeQuerySchema = z.object({ category: z.string().max(50).optional() });
+
 const badgeSchema = z.object({
   name: z.string().min(1, '标签名称不能为空').max(20),
   type: z.enum(['promo', 'hot', 'new', 'free_shipping', 'limited']),
@@ -18,11 +20,11 @@ const badgeSchema = z.object({
 });
 
 // 用户端：可用的标签列表（缓存 5 分钟）
-router.get('/', authMiddleware, cacheMiddleware(300), asyncHandler(listBadges));
+router.get('/', authMiddleware, cacheMiddleware(300), validate(badgeQuerySchema, 'query'), asyncHandler(listBadges));
 router.get('/:id', authMiddleware, asyncHandler(getBadge));
 
 // 管理端：CRUD
-router.get('/admin/all', authMiddleware, adminAuth, asyncHandler(listAllBadges));
+router.get('/admin/all', authMiddleware, adminAuth, validate(badgeQuerySchema, 'query'), asyncHandler(listAllBadges));
 router.post('/admin', authMiddleware, adminAuth, validate(badgeSchema), asyncHandler(createBadge));
 router.put('/admin/:id', authMiddleware, adminAuth, validate(badgeSchema.partial()), asyncHandler(updateBadge));
 router.delete('/admin/:id', authMiddleware, adminAuth, validate(idSchema, 'params'), asyncHandler(deleteBadge));

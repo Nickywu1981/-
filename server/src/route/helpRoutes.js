@@ -14,7 +14,9 @@ const faqSchema = z.object({
   sortOrder: z.coerce.number().int().min(0).optional(),
 });
 
-router.get('/', asyncHandler(getFaqs));
+const faqQuerySchema = z.object({ keyword: z.string().max(200).optional() });
+
+router.get('/', validate(faqQuerySchema, 'query'), asyncHandler(getFaqs));
 router.get('/:id', asyncHandler(getFaqById));
 router.post('/', authMiddleware, adminAuth, validate(faqSchema), asyncHandler(createFaq));
 router.put('/:id', authMiddleware, adminAuth, validate(faqSchema.partial()), asyncHandler(updateFaq));
