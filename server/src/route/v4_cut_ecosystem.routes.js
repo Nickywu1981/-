@@ -38,13 +38,21 @@ const listSchema = z.object({
 // 剪映/CapCut 导出
 // ============================================================
 router.post('/export/jianying', _validate(exportSchema), async (req, res) => {
-  const result = await cutEcosystemService.exportJianyingDraft(req.user.id, req.validated);
-  success(res, result);
+  try {
+    const result = await cutEcosystemService.exportJianyingDraft(req.user.id, req.validated);
+    success(res, result);
+  } catch (err) {
+    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '导出剪映失败', err.status || 500);
+  }
 });
 
 router.post('/export/capcut', _validate(exportSchema), async (req, res) => {
-  const result = await cutEcosystemService.exportCapCutDraft(req.user.id, req.validated);
-  success(res, result);
+  try {
+    const result = await cutEcosystemService.exportCapCutDraft(req.user.id, req.validated);
+    success(res, result);
+  } catch (err) {
+    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '导出CapCut失败', err.status || 500);
+  }
 });
 
 // ============================================================
@@ -58,12 +66,16 @@ router.get('/ratios', (_req, res) => {
 // 可导出作品列表
 // ============================================================
 router.get('/works', async (req, res) => {
-  const query = listSchema.safeParse(req.query);
-  if (!query.success) {
-    return error(res, ERROR_CODE.VALIDATION_ERROR, query.error.errors.map(e => e.message).join('; '));
+  try {
+    const query = listSchema.safeParse(req.query);
+    if (!query.success) {
+      return error(res, ERROR_CODE.VALIDATION_ERROR, query.error.errors.map(e => e.message).join('; '));
+    }
+    const result = await cutEcosystemService.getUserExportableWorks(req.user.id, query.data);
+    success(res, result);
+  } catch (err) {
+    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '查询作品失败', err.status || 500);
   }
-  const result = await cutEcosystemService.getUserExportableWorks(req.user.id, query.data);
-  success(res, result);
 });
 
 export default router;
