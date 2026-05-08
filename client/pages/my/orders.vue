@@ -57,8 +57,9 @@ const fetchAll = async () => {
   loading.value = false
 }
 
+const toast = useToast()
 const viewDetail = (item: any) => {
-  (window as any).__toast?.info(`订单详情：${item.order_no || item.id}\n金额：¥${item.amount || item.price}\n状态：${statusLabel(item.status)}`)
+  toast.info(`订单详情：${item.order_no || item.id}\n金额：¥${item.amount || item.price}\n状态：${statusLabel(item.status)}`)
 }
 
 const formatTime = (t: string) => t ? new Date(t).toLocaleString('zh-CN') : ''

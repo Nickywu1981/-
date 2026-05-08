@@ -115,7 +115,8 @@ async function confirmDelete(o: any) {
     await $fetch(`/api/admin/orders/${o.id}`, { method: 'DELETE' })
     list.value = list.value.filter(item => item.id !== o.id)
     total.value--
-  } catch (e: any) { (window as any).__toast?.error('删除失败') }
+const toast = useToast()
+  } catch (e: any) { toast.error('删除失败') }
 }
 
 onMounted(fetch)
