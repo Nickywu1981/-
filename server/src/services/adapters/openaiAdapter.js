@@ -12,6 +12,10 @@ const BASE_URL = (process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1').re
 
 function makeTextInfer(modelId, maxTokens = 2000, timeout = 60000) {
   return async function infer(input, onProgress) {
+    // 兼容字符串输入：自动包装为 { prompt }
+    if (typeof input === 'string') {
+      input = { prompt: input };
+    }
     const { prompt, systemPrompt, temperature = 0.7, maxTokens: mt = maxTokens, responseFormat } = input;
 
     onProgress?.(20);
