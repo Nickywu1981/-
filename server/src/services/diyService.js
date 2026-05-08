@@ -1,8 +1,41 @@
 /**
  * DIY 页面服务（增强版）
- * 完整状态机 / 双端配置 / 自动+手动版本 / Redis缓存 / 克隆 / 批量操作
+ * 完整状态机 / 双端配置 / 自动+手动版本 / Redis缓存 / 克隆 / 批量操作 / 发布校验
  */
 import diyDao from '../dao/diyDao.js';
+
+// 发布前校验规则
+function validateBeforePublish(page) {
+  const issues = [];
+  const mobileConfig = page.mobile_config || {};
+  const pcConfig = page.pc_config || {};
+  const sections = mobileConfig.sections || [];
+  const pcSections = pcConfig.sections || [];
+
+  // 1. 标题非空
+  if (!page.title || !page.title.trim()) issues.push('页面标题不能为空');
+  // 2. 至少一端有内容
+  if (sections.length === 0 && pcSections.length === 0) issues.push('页面至少需要添加一个组件区块');
+  // 3. 检查图片链接有效性（非 empty string）
+  for (const s of sections) {
+    if (s.props?.images && s.props.images.some(img => !img)) issues.push(`"${s.type}"组件存在空图片链接`);
+    if (s.props?.bgImage && !s.props.bgImage.trim()) issues.push(`"${s.type}"组件背景图为空`);
+  }
+  // 4. CTA按钮文案非空
+  for (const s of sections) {
+    if (s.type === 'ctaButton' && (!s.props?.text || !s.props.text.trim())) issues.push('CTA按钮文案不能为空');
+    if (s.type === 'form' && (!s.props?.submitText || !s.props.submitText.trim())) issues.push('表单提交按钮文案不能为空');
+  }
+  // 5. 表单字段至少一个
+  for (const s of sections) {
+    if (s.type === 'form' && (!s.props?.fields || s.props.fields.length === 0)) issues.push('表单组件至少需要一个字段');
+  }
+  // 6. 倒计时组件需设置结束时间
+  for (const s of sections) {
+    if (s.type === 'countdownTimer' && !s.props?.endTime) issues.push('倒计时组件需设置结束时间');
+  }
+  return issues;
+}
 
 // 状态流转规则：哪些状态可以转到哪些状态
 const STATE_MACHINE = {
@@ -64,6 +97,9 @@ export default {
     const page = await diyDao.getPageById(id, tenantId);
     if (!page) throw Object.assign(new Error('页面不存在'), { statusCode: 404 });
     const msg = checkStateTransition(page.status, 1);
+    // 发布前自动校验
+    const issues = validateBeforePublish(page);
+    if (issues.length) throw Object.assign(new Error(`发布校验未通过: ${issues.join('; ')}`), { statusCode: 400, issues });
     await diyDao.updatePage(id, tenantId, { status: 1, publish_time: new Date() });
     await diyDao.saveVersion(id, page.mobile_config, page.pc_config, { remark: '发布' });
     // 缓存已发布页面

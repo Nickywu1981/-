@@ -65,13 +65,20 @@
         <div v-if="dragOverIdx >= 0" class="drop-indicator" :style="{ order: dragOverIdx }"></div>
       </div>
 
-      <!-- 右侧：属性面板 -->
-      <div class="right-panel" v-if="selectedIdx >= 0 && sections[selectedIdx]">
-        <h3>属性配置</h3>
-        <div class="prop-group">
-          <label>组件类型</label>
-          <span class="prop-static">{{ getCompName(sections[selectedIdx].component) }}</span>
+      <!-- 右侧：属性面板 + 图层面板 -->
+      <div class="right-panel">
+        <div class="panel-tabs">
+          <button :class="{ active: rightTab === 'props' }" @click="rightTab = 'props'">属性</button>
+          <button :class="{ active: rightTab === 'layers' }" @click="rightTab = 'layers'">图层 ({{ sections.length }})</button>
         </div>
+
+        <!-- 属性 Tab -->
+        <div v-if="rightTab === 'props' && selectedIdx >= 0 && sections[selectedIdx]">
+          <h3>属性配置</h3>
+          <div class="prop-group">
+            <label>组件类型</label>
+            <span class="prop-static">{{ getCompName(sections[selectedIdx].component) }}</span>
+          </div>
 
         <!-- 通用属性 -->
         <div class="prop-group" v-if="hasProp('title')">
@@ -138,9 +145,33 @@
           <label>显示价格</label>
           <input type="checkbox" v-model="sections[selectedIdx].config.showPrice" @change="markDirty" />
         </div>
-      </div>
-      <div v-else class="right-panel empty-hint">
-        <p>点击画布中的组件查看属性</p>
+        </div>
+
+        <!-- 图层 Tab -->
+        <div v-if="rightTab === 'layers'" class="layers-panel">
+          <div v-if="!sections.length" class="empty-hint">暂无图层，从左侧拖入组件</div>
+          <div v-for="(sec, idx) in sections" :key="sec.id"
+               class="layer-item"
+               :class="{ selected: idx === selectedIdx, hidden: !sec.visible }"
+               @click="selectSection(idx)"
+               draggable="true"
+               @dragstart="onLayerDragStart($event, idx)"
+               @dragover.prevent="onLayerDragOver($event, idx)"
+               @drop.stop="onLayerDrop($event, idx)">
+            <div class="layer-handle">⋮⋮</div>
+            <span class="layer-icon">{{ getCompIcon(sec.component) }}</span>
+            <span class="layer-name">{{ getCompName(sec.component) || sec.component }}</span>
+            <button class="layer-visibility" @click.stop="sec.visible = !sec.visible" :title="sec.visible ? '隐藏' : '显示'">
+              {{ sec.visible ? '👁' : '👁‍🗨' }}
+            </button>
+            <button class="layer-delete" @click.stop="removeSection(idx)" title="删除">✕</button>
+          </div>
+        </div>
+
+        <!-- 无选中提示 -->
+        <div v-if="rightTab === 'props' && (selectedIdx < 0 || !sections[selectedIdx])" class="empty-hint">
+          <p>点击画布或图层面板中的组件查看属性</p>
+        </div>
       </div>
     </div>
   </div>
@@ -154,6 +185,7 @@ const sections = ref([])
 const components = ref([])
 const selectedIdx = ref(-1)
 const dragOverIdx = ref(-1)
+const rightTab = ref('props')
 const dirty = ref(false)
 const publishing = ref(false)
 
@@ -168,6 +200,10 @@ const componentCats = [
 
 function componentsByCat(cat) { return components.value.filter(c => c.category === cat) }
 function getCompName(code) { return components.value.find(c => c.component_code === code)?.name || code }
+function getCompIcon(code) {
+  const icons = { banner_slider:'🖼', text_block:'📝', title_bar:'📌', product_list:'📦', image_showcase:'🖼️', video_player:'▶️', countdown:'⏰', coupon_card:'🎫', button_group:'🔘', nav_bar:'📍', form_container:'📋', hotzone_image:'🗺️' }
+  return icons[code] || '◆'
+}
 function hasProp(key) { return selectedIdx.value >= 0 && sections.value[selectedIdx.value]?.config && key in sections.value[selectedIdx.value].config }
 function markDirty() { dirty.value = true }
 
@@ -213,6 +249,18 @@ function onSectionDrop(e, idx) {
     dirty.value = true
   }
   dragOverIdx.value = -1
+}
+
+// 图层面板拖拽排序
+function onLayerDragStart(e, idx) { e.dataTransfer.setData('layerIdx', String(idx)); e.dataTransfer.effectAllowed = 'move' }
+function onLayerDragOver(e, idx) { e.dataTransfer.dropEffect = 'move' }
+function onLayerDrop(e, targetIdx) {
+  const fromIdx = parseInt(e.dataTransfer.getData('layerIdx'))
+  if (isNaN(fromIdx) || fromIdx === targetIdx) return
+  const [moved] = sections.value.splice(fromIdx, 1)
+  sections.value.splice(targetIdx, 0, moved)
+  if (selectedIdx.value === fromIdx) selectedIdx.value = targetIdx
+  dirty.value = true
 }
 
 async function loadComponents() {
@@ -295,7 +343,23 @@ onMounted(async () => { await loadComponents(); await loadPage() })
 .right-panel { width: 260px; background: var(--bg-card); border-left: 1px solid var(--border-light); overflow-y: auto; padding: 16px; flex-shrink: 0; }
 .right-panel h3 { font-size: 14px; margin-bottom: 14px; color: var(--text-secondary); }
 .right-panel.empty-hint { display: flex; align-items: center; justify-content: center; }
-.right-panel.empty-hint p { color: var(--text-muted); font-size: 13px; text-align: center; }
+.right-panel .empty-hint p { color: var(--text-muted); font-size: 13px; text-align: center; }
+
+.panel-tabs { display: flex; gap: 0; margin-bottom: 14px; border-bottom: 1px solid var(--border-light); }
+.panel-tabs button { flex: 1; padding: 8px 0; border: none; background: none; font-size: 13px; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; }
+.panel-tabs button.active { color: var(--brand); border-bottom-color: var(--brand); font-weight: 600; }
+
+.layers-panel { max-height: calc(100vh - 200px); overflow-y: auto; }
+.layer-item { display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 6px; cursor: pointer; margin-bottom: 4px; border: 1px solid transparent; }
+.layer-item:hover { background: var(--bg-hover); }
+.layer-item.selected { background: var(--brand-light, #e6f7ff); border-color: var(--brand); }
+.layer-item.hidden { opacity: .4; }
+.layer-handle { cursor: grab; color: var(--text-muted); font-size: 12px; user-select: none; }
+.layer-icon { font-size: 14px; }
+.layer-name { flex: 1; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.layer-visibility, .layer-delete { border: none; background: none; cursor: pointer; font-size: 14px; padding: 2px 4px; opacity: .6; }
+.layer-visibility:hover, .layer-delete:hover { opacity: 1; }
+.layer-delete:hover { color: #ff4d4f; }
 .prop-group { margin-bottom: 14px; }
 .prop-group label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
 .prop-group input, .prop-group select, .prop-group textarea { width: 100%; padding: 6px 10px; border: 1px solid var(--border-light); border-radius: 6px; font-size: 13px; }
