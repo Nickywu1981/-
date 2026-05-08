@@ -1,13 +1,15 @@
 import * as proxyService from '../services/proxyService.js';
 import { success, error } from '../utils/response.js';
+import { parsePagination } from '../utils/pagination.js';
 import { BusinessError } from '../utils/businessError.js';
 
 // ==================== 配置 CRUD ====================
 
 export async function listConfigs(req, res) {
   try {
-    const { page = 1, pageSize = 20, status } = req.query;
-    const rows = await proxyService.listConfigs(req.tenantId, { page: +page, pageSize: +pageSize, status });
+    const { page, pageSize } = parsePagination(req.query);
+    const { status } = req.query;
+    const rows = await proxyService.listConfigs(req.tenantId, { page, pageSize, status });
     success(res, rows);
   } catch (e) { error(res, e.statusCode || 500, e.message); }
 }
@@ -106,8 +108,9 @@ export async function getCircuitStatus(req, res) {
 
 export async function listLogs(req, res) {
   try {
-    const { page = 1, pageSize = 20, proxyId, status } = req.query;
-    const rows = await proxyService.listLogs(req.tenantId, { page: +page, pageSize: +pageSize, proxyId, status });
+    const { page, pageSize } = parsePagination(req.query);
+    const { proxyId, status } = req.query;
+    const rows = await proxyService.listLogs(req.tenantId, { page, pageSize, proxyId, status });
     success(res, rows);
   } catch (e) { error(res, 500, e.message); }
 }

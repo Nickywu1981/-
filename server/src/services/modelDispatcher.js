@@ -210,16 +210,35 @@ export async function autoMode(taskType, input, options = {}) {
 
   // 简单任务: 单模型即可
   if (!analysis.needsMultiModel && analysis.complexity === 'normal') {
-    const result = await infer(ranking.best.modelId, input, {
-      onProgress: options.onProgress,
-      skipCache: options.skipCache,
-    });
-    return {
-      mode: 'auto',
-      matchLog: ranking.matchLog,
-      selected: ranking.best.modelId,
-      result,
-    };
+    try {
+      const result = await infer(ranking.best.modelId, input, {
+        onProgress: options.onProgress,
+        skipCache: options.skipCache,
+      });
+      return {
+        mode: 'auto',
+        matchLog: ranking.matchLog,
+        selected: ranking.best.modelId,
+        result,
+      };
+    } catch (err) {
+      options.degradationLog?.push({ modelId: ranking.best.modelId, error: err.message, stage: 'primary' });
+      // 降级到下一个候选
+      if (ranking.ranked[1]) {
+        const fallbackResult = await infer(ranking.ranked[1].modelId, input, {
+          onProgress: options.onProgress,
+          skipCache: true,
+        });
+        return {
+          mode: 'auto',
+          matchLog: ranking.matchLog,
+          selected: ranking.ranked[1].modelId,
+          degradedFrom: ranking.best.modelId,
+          result: fallbackResult,
+        };
+      }
+      throw err;
+    }
   }
 
   // 复杂任务: 主模型 + 辅助模型
@@ -280,7 +299,11 @@ export async function customMode(taskType, input, customConfig = {}, options = {
         });
         results.push(r);
       } catch (err) {
-        if (fallback === 'fail') throw err;
+        if (fallback === 'fail') {
+          options.degradationLog?.push({ modelId: m.id, error: err.message, stage: 'serial' });
+          throw err;
+        }
+        options.degradationLog?.push({ modelId: m.id, error: err.message, stage: 'serial' });
         console.warn(`[ModelDispatcher] custom 模式 ${m.id} 失败, 跳过:`, err.message);
       }
     }
@@ -332,21 +355,35 @@ export async function dispatch(req, options = {}) {
   const { mode = 'auto', taskType, input, modelId, customConfig } = req;
 
   const startTime = Date.now();
+  const degradationLog = [];
 
-  switch (mode) {
-    case 'single': {
-      if (!modelId) throw new BusinessError(400, 'single 模式需要 modelId');
-      const result = await singleMode(modelId, input, options);
-      result.elapsed = Date.now() - startTime;
-      return result;
+  try {
+    let result;
+    switch (mode) {
+      case 'single': {
+        if (!modelId) throw new BusinessError(400, 'single 模式需要 modelId');
+        result = await singleMode(modelId, input, options);
+        break;
+      }
+      case 'custom':
+        result = await customMode(taskType, input, customConfig, { ...options, degradationLog });
+        break;
+      case 'auto':
+      default:
+        result = await autoMode(taskType, input, { ...options, degradationLog });
+        break;
     }
-
-    case 'custom':
-      return customMode(taskType, input, customConfig, options);
-
-    case 'auto':
-    default:
-      return autoMode(taskType, input, options);
+    result.elapsed = Date.now() - startTime;
+    if (degradationLog.length > 0) result.degradationLog = degradationLog;
+    return result;
+  } catch (err) {
+    // 全模型耗尽 — 附加降级链信息
+    if (degradationLog.length > 0) {
+      const attempted = degradationLog.map(d => d.modelId).filter(Boolean);
+      const reasons = degradationLog.map(d => `${d.modelId || '?'}: ${d.error || 'unknown'}`);
+      err.message = `全部 ${attempted.length} 个模型调用失败. 降级链: ${reasons.join(' | ')}`;
+    }
+    throw err;
   }
 }
 

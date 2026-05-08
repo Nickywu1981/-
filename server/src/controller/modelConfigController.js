@@ -4,6 +4,7 @@
  */
 import * as modelConfigDao from '../dao/modelConfigDao.js';
 import { success, error } from '../utils/response.js';
+import { parsePagination } from '../utils/pagination.js';
 import { encrypt, decrypt } from '../utils/crypto.js';
 import { BusinessError } from '../utils/businessError.js';
 
@@ -90,14 +91,15 @@ export async function toggle(req, res) {
 
 export async function callLogs(req, res) {
   try {
-    const { userId, modelKey, status, days, offset, limit } = req.query;
+    const { userId, modelKey, status, days } = req.query;
+    const pager = parsePagination(req.query, { defaultPageSize: 50, maxPageSize: 200, defaultSort: 'created_at' });
     const result = await modelConfigDao.queryCallLogs({
       userId: userId ? parseInt(userId) : undefined,
       modelKey,
       status,
       days: days ? parseInt(days) : 7,
-      offset: offset ? parseInt(offset) : 0,
-      limit: limit ? parseInt(limit) : 50,
+      offset: pager.offset,
+      limit: pager.pageSize,
     });
     return success(res, result);
   } catch (e) {
