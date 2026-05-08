@@ -2,8 +2,7 @@
  * Open API Controller — 请求/响应处理层
  * G5 后端开发 | G-03 修复
  */
-import { success, error } from '../utils/response.js';
-import { ERROR_CODE } from '../constants/errorCode.js';
+import { success } from '../utils/response.js';
 import * as openApiService from '../services/openApiService.js';
 
 export async function ping(req, res) {

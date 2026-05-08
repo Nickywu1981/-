@@ -122,7 +122,7 @@ export async function getTaskResult(taskId, userId) {
 
 // ==================== 队列 Worker 单张处理 ====================
 
-export async function processSingle({ userId, taskId, imageUrl, taskType, params, onProgress }) {
+export async function processSingle({ _userId, taskId, imageUrl, taskType, params, onProgress }) {
   onProgress?.(5);
   const model = MODEL_MAP[taskType] || 'stable-diffusion-img2img';
   const result = await infer(model, { imageUrl, task: taskType, ...params }, { onProgress: (p) => onProgress?.(Math.round(5 + p * 0.9)) });

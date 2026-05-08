@@ -6,7 +6,6 @@ import { BusinessError } from '../utils/businessError.js';
  * 图像生成 / 主图复刻 / 批量生图 / 批量改图 / 批量替换
  * 通过模型调度中台调用通义万象
  */
-import { routeModel } from './model-router.service.js';
 import { submitJob } from './job-queue.service.js';
 import * as moderationService from './moderation.service.js';
 import db from '../dao/db.js';

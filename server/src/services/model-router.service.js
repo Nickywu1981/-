@@ -70,7 +70,7 @@ async function singleMode(modelKey, params) {
   if (!model || !model.endpoint) throw new BusinessError(400, `模型 ${modelKey} 不可用`);
 
   const start = Date.now();
-  let status = 'success', errorMsg = '';
+  let status = 'success';
   let tokensIn = 0, tokensOut = 0;
   try {
     const result = await aiCaller.call(model.endpoint, model.apiKey, params, {
@@ -83,7 +83,7 @@ async function singleMode(modelKey, params) {
     tokensIn = result?.usage?.input_tokens || 0;
     return result;
   } catch (e) {
-    status = 'error'; errorMsg = e.message;
+    status = 'error';
     throw e;
   } finally {
     await modelConfigDao.incrementUsage(modelKey, {

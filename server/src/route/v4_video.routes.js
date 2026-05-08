@@ -13,7 +13,7 @@ import * as actionMigrateService from '../services/action-migrate.service.js';
 import * as viralVideoService from '../services/viral-video.service.js';
 import * as digitalHumanService from '../services/digital-human.service.js';
 import * as liveClipService from '../services/live-clip.service.js';
-import * as promptEnhance from '../services/prompt-enhance.service.js';
+import * as _promptEnhance from '../services/prompt-enhance.service.js';
 
 const router = Router();
 

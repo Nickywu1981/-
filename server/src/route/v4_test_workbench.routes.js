@@ -74,7 +74,7 @@ function _validate(schema) {
 // ---- 可用模型分类视图 ----
 const CATEGORY_LABELS = { text: '文本', image: '图片', video: '视频' };
 
-function _categoryFor(key) {
+function __categoryFor(key) {
   const m = MODEL_REGISTRY_CACHE[key];
   return m ? m.category : 'unknown';
 }

@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { getMembership, freezeCredit, confirmCredit, rollbackCredit, listRecords, listAllRecords, adminRefund, checkIn, checkInStatus, shareReward, creditHistory, creditBalance } from '../controller/creditController.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
-import { validate, idSchema, paginationSchema } from '../utils/validate.js';
+import { validate, idSchema } from '../utils/validate.js';
 import { z } from 'zod';
 
 const router = Router();

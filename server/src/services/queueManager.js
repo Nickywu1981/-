@@ -12,7 +12,7 @@
  *   Worker → process job → updateTaskStatus → WebSocket push 进度
  */
 
-let Queue, Worker, QueueScheduler, QueueEvents;
+let Queue, Worker;
 let bullmqAvailable = false;
 let redisAvailable = false;
 
@@ -22,8 +22,6 @@ async function ensureBullMQ() {
     const m = await import('bullmq');
     Queue = m.Queue;
     Worker = m.Worker;
-    QueueScheduler = m.QueueScheduler;
-    QueueEvents = m.QueueEvents;
     bullmqAvailable = true;
   } catch {
     console.warn('[BullMQ] bullmq 未安装 — 队列功能降级为同步直通模式');

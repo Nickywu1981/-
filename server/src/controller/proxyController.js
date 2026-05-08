@@ -1,7 +1,6 @@
 import * as proxyService from '../services/proxyService.js';
 import { success, error } from '../utils/response.js';
 import { parsePagination } from '../utils/pagination.js';
-import { BusinessError } from '../utils/businessError.js';
 
 // ==================== 配置 CRUD ====================
 

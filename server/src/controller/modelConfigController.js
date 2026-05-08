@@ -5,8 +5,7 @@
 import * as modelConfigDao from '../dao/modelConfigDao.js';
 import { success, error } from '../utils/response.js';
 import { parsePagination } from '../utils/pagination.js';
-import { encrypt, decrypt } from '../utils/crypto.js';
-import { BusinessError } from '../utils/businessError.js';
+import { encrypt } from '../utils/crypto.js';
 
 function _maskApiKey(row) {
   if (!row) return row;

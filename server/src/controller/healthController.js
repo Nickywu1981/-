@@ -3,8 +3,6 @@
  * GET /api/health → { uptime, db, redis, memory }
  */
 export function healthCheck(req, res) {
-  const _db = req.app.get('db') || { status: 'unknown' };
-  const _redis = req.app.get('redis') || { status: 'unknown' };
 
   res.json({
     code: 200,

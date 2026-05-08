@@ -4,7 +4,6 @@ import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
 import { z } from 'zod';
 import * as proxyController from '../controller/proxyController.js';
-import { BusinessError } from '../utils/businessError.js';
 
 const router = Router();
 

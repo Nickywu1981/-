@@ -1,6 +1,5 @@
 import proxyDao from '../dao/proxyDao.js';
 import { encrypt, decrypt } from '../utils/crypto.js';
-import { BusinessError } from '../utils/businessError.js';
 
 const ERROR_CODES = {
   WHITELIST_DENIED: 'PROXY_WHITELIST_DENIED',
@@ -243,7 +242,7 @@ function buildHeaders(proxy) {
   return headers;
 }
 
-async function handleUpstreamFailure(proxy, tenantId, status, _body) {
+async function handleUpstreamFailure(proxy, _tenantId, _status, _body) {
   const failCount = (proxy.circuit_fail_count || 0) + 1;
   const threshold = proxy.circuit_break_count || 5;
   if (failCount >= threshold) {

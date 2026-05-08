@@ -1,6 +1,5 @@
 import pool from './db.js';
 
-const _table = 'tenant';
 
 export default {
   async findById(id) {

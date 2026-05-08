@@ -79,7 +79,6 @@ import tenantContext from './middleware/tenantContext.js';
 import { metricsMiddleware, metricsEndpoint } from './middleware/metrics.js';
 import { setCsrfCookie, csrfProtection } from './middleware/csrf.js';
 import cspMiddleware from './middleware/csp.js';
-import paramFilter from './middleware/paramFilter.js';
 import openApiRoutes from './route/openApiRoutes.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));

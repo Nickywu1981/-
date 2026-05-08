@@ -97,7 +97,7 @@ router.delete('/bind/:id', async (req, res) => {
 // POST /api/platforms/publish — 发布内容到平台
 router.post('/publish', _validate(publishSchema), async (req, res) => {
   try {
-    const { work_id, platform, content_url } = req.validated;
+    const { _work_id, platform, content_url } = req.validated;
 
     // TODO: 实际对接各平台发布API (W4 MVP先记录)
     return success(res, { published_url: content_url, platform, status: 'submitted' }, '已提交发布任务');

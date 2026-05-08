@@ -16,7 +16,7 @@ const VIDEO_TYPES = [
  * 查询用户作品列表（支持按大类筛选）
  */
 export async function listMyWorks(userId, query) {
-  const { page, pageSize, offset, sort, _order } = parsePagination(query, { defaultSort: 'create_time' });
+  const { page, pageSize, _offset, _sort, _order } = parsePagination(query, { defaultSort: 'create_time' });
 
   const filters = {};
   if (query.type === 'image') filters.type = IMAGE_TYPES;

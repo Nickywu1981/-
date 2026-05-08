@@ -4,7 +4,6 @@
  * 通联支付聚合收银台：创建订单 → 返回 H5 支付链接 → 回调通知 → 开通会员
  */
 import * as allinpayService from '../services/allinpayService.js';
-import * as creditDao from '../dao/creditDao.js';
 import pool from '../dao/db.js';
 import allinpayConfig from '../config/allinpay.js';
 import logger from '../utils/logger.js';

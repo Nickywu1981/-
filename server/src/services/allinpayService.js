@@ -7,7 +7,6 @@
 import crypto from 'crypto';
 import allinpayDao from '../dao/allinpayDao.js';
 import * as allinpaySDK from '../utils/allinpaySDK.js';
-import allinpayConfig from '../config/allinpay.js';
 import membershipDao from '../dao/membershipDao.js';
 import rechargeDao from '../dao/rechargeDao.js';
 import logger from '../utils/logger.js';

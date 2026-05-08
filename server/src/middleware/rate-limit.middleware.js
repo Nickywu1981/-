@@ -4,7 +4,6 @@
  * 免费用户 60次/分钟, 付费用户 300次/分钟
  */
 import rateLimit from 'express-rate-limit';
-import { getConfig } from '../services/config.service.js';
 
 // 动态限流——从配置表读取，缓存5分钟
 let rateLimiters = null;

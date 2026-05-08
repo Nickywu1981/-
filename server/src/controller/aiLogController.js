@@ -1,7 +1,6 @@
 import * as aiLogService from '../services/aiLogService.js';
-import { success, listResult, error } from '../utils/response.js';
+import { success, listResult } from '../utils/response.js';
 import { parsePagination } from '../utils/pagination.js';
-import { ERROR_CODE } from '../constants/errorCode.js';
 
 export async function listAiLogs(req, res, next) {
   try {

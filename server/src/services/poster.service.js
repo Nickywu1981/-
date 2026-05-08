@@ -5,7 +5,6 @@ import { BusinessError } from '../utils/businessError.js';
  * G5 后端开发 | Phase 2
  * 产品营销海报 / 节日海报 / 活动海报 / 私域海报 / 小红书封面 / 公众号封面
  */
-import { routeModel } from './model-router.service.js';
 import { submitJob } from './job-queue.service.js';
 import * as moderationService from './moderation.service.js';
 import db from '../dao/db.js';

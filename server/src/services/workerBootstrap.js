@@ -36,7 +36,7 @@ export async function bootstrapWorkers() {
 
     // 视频生成 Worker
     registerWorker('video-generation', async (job) => {
-      const { userId, taskId } = job.data;
+      const { _userId, taskId } = job.data;
       await job.updateProgress(10);
       logger.info(`[Worker] 视频任务 ${taskId} 开始`);
       // 模拟分步进度
@@ -50,7 +50,7 @@ export async function bootstrapWorkers() {
 
     // 批量任务 Worker
     registerWorker('batch-tasks', async (job) => {
-      const { userId, taskId, imageUrls, _operation } = job.data;
+      const { _userId, taskId, imageUrls, _operation } = job.data;
       await job.updateProgress(5);
       const total = imageUrls?.length || 1;
       const results = [];

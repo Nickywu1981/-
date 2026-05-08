@@ -7,7 +7,7 @@
 import '../utils/env.js'; // 确保环境变量已加载
 import * as jobQueueService from '../services/job-queue.service.js';
 import * as aiCaller from '../utils/ai-caller.js';
-import * as circuitBreaker from '../utils/circuit-breaker.js';
+import * as _circuitBreaker from '../utils/circuit-breaker.js';
 
 const POLL_INTERVAL = 2000; // 2秒轮询
 const BATCH_SIZE = 3;       // 每次拉取任务数

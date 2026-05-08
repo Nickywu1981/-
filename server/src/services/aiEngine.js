@@ -259,7 +259,7 @@ export async function healthCheck() {
 
 const usageStats = { total: 0, byModel: {}, byType: {} };
 
-export function trackUsage(modelId, elapsed, _success) {
+export function trackUsage(modelId, _elapsed, _success) {
   usageStats.total++;
   usageStats.byModel[modelId] = (usageStats.byModel[modelId] || 0) + 1;
 

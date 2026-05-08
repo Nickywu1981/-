@@ -164,7 +164,7 @@ export async function getPublicForm(code, tenantId, { device = 'pc' } = {}) {
   return {
     title: form.title,
     description: form.description,
-    fields: deviceFields.map(({ validation_rules, linkage_conditions, masking_rule, masking_pattern, ...rest }) => rest),
+    fields: deviceFields.map(({ _validation_rules, _linkage_conditions, _masking_rule, _masking_pattern, ...rest }) => rest),
     config: device === 'mobile' ? form.mobile_config : form.pc_config,
     successMsg: form.success_msg,
     redirectUrl: form.redirect_url,

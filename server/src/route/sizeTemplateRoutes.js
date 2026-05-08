@@ -6,7 +6,7 @@ import {
 import { authMiddleware } from '../middleware/auth.js';
 import { cacheMiddleware } from '../middleware/cache.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
-import { validate, idSchema } from '../utils/validate.js';
+import { validate } from '../utils/validate.js';
 import { z } from 'zod';
 
 const router = Router();

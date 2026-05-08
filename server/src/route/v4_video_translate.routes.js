@@ -91,7 +91,7 @@ router.get('/works', async (req, res) => {
     const { type, page, limit } = req.query;
     const rows = await translateService.getUserTranslateHistory(req.userId, { type, page: +page || 1, limit: +limit || 20 });
     return success(res, rows);
-  } catch (_) {
+  } catch (__) {
     return error(res, ERROR_CODE.INTERNAL_ERROR, '获取翻译历史失败');
   }
 });

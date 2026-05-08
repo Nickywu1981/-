@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
-import { validate, idSchema } from '../utils/validate.js';
+import { validate } from '../utils/validate.js';
 import { z } from 'zod';
 import * as rechargeController from '../controller/rechargeController.js';
 

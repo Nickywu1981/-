@@ -5,7 +5,6 @@
  * 采集: HTTP QPS、响应耗时、状态码分布、队列积压
  */
 import { success } from '../utils/response.js';
-import { ERROR_CODE } from '../constants/errorCode.js';
 
 // ========================= 指标存储 =========================
 
