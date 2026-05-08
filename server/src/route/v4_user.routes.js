@@ -47,7 +47,7 @@ router.get('/profile', async (req, res) => {
     const conn = await db.getConnection();
     try {
       const [users] = await conn.query(
-        'SELECT id, nickname, phone, email, avatar_url, role, invite_code, created_at FROM `user` WHERE id = ?',
+        'SELECT id, nickname, phone, email, avatar, role, create_time FROM `user` WHERE id = ?',
         [req.user.id],
       );
       if (users.length === 0) return error(res, 404, '用户不存在');

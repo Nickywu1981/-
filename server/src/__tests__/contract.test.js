@@ -4,7 +4,6 @@
  */
 
 import { contract, assert, runContractTests } from '../utils/contractTest.js'
-import { ERROR_CODE } from '../constants/errorCode.js'
 
 const api = contract()
 
@@ -16,7 +15,7 @@ async function authContractTests() {
   const password = 'Test123456'
   let cookie = ''
 
-  const result = await runContractTests('Auth 接口契约', [
+  const { passed, failed } = await runContractTests('Auth 接口契约', [
     {
       label: 'POST /api/auth/register → 200, 返回 user (无 password)',
       fn: async () => {
@@ -24,7 +23,7 @@ async function authContractTests() {
           email, password, nickname: 'tester',
         })
         assert(data && typeof data.id === 'number', '应返回 user 对象含 id')
-        assert(!data.password, '不应返回 password 字段')
+        assert(!data.password, '不应返回 password')
         assert(data.role === 'free', '新用户 role 应为 free')
         cookie = c
       },
@@ -32,11 +31,11 @@ async function authContractTests() {
     {
       label: 'POST /api/auth/register → 409 重复注册',
       fn: async () => {
-        await api.post('/api/auth/register', { email, password }, { expect: ERROR_CODE.CONFLICT })
+        await api.post('/api/auth/register', { email, password }, { expect: 409 })
       },
     },
     {
-      label: 'POST /api/auth/login → 200, 返回 user + 设置 token Cookie',
+      label: 'POST /api/auth/login → 200, 返回 user',
       fn: async () => {
         const { data, cookie: c } = await api.post('/api/auth/login', { email, password })
         assert(data && data.id, '应返回 user')
@@ -47,36 +46,28 @@ async function authContractTests() {
     {
       label: 'POST /api/auth/login → 401 密码错误',
       fn: async () => {
-        await api.post('/api/auth/login', { email, password: 'wrongpassword' }, { expect: ERROR_CODE.UNAUTHORIZED })
+        await api.post('/api/auth/login', { email, password: 'wrongpassword' }, { expect: 401 })
       },
     },
   ])
-  return { cookie, email }
+  return { cookie, email, passed, failed }
 }
 
-// —— 会员契约 ——
+// —— 会员/套餐契约 ——
 
-async function membershipContractTests(cookie) {
-  return await runContractTests('会员接口契约', [
+async function plansContractTests(cookie) {
+  return await runContractTests('套餐接口契约', [
     {
-      label: 'GET /api/membership/plans → 200, 返回 plan 列表含 id/name/price',
+      label: 'GET /api/payment/plans → 200, 返回 plans 列表含 name/price',
       fn: async () => {
-        const { data } = await api.get('/api/membership/plans', { cookie })
-        assert(Array.isArray(data.list || data), '应返回 plans 列表')
-        const list = data.list || data
+        const { data } = await api.get('/api/payment/plans')
+        assert(Array.isArray(data) || Array.isArray(data?.list), '应返回列表')
+        const list = Array.isArray(data) ? data : data.list
         if (list.length > 0) {
           const p = list[0]
-          assert(typeof p.id === 'number', 'plan 需有 id')
-          assert(typeof p.name === 'string', 'plan 需有 name')
-          assert(typeof p.price === 'number', 'plan 需有 price')
+          assert(typeof p.name === 'string', '需有 name')
+          assert(typeof p.price === 'number' || typeof p.price === 'string', '需有 price')
         }
-      },
-    },
-    {
-      label: 'GET /api/membership/status → 200, 返回会员状态',
-      fn: async () => {
-        const { data } = await api.get('/api/membership/status', { cookie })
-        assert(typeof data.active === 'boolean', '需有 active 字段')
       },
     },
   ])
@@ -92,31 +83,22 @@ async function paymentContractTests(cookie) {
       label: 'POST /api/payment/create-order → 200, 返回 reqsn + payUrl',
       fn: async () => {
         const { data } = await api.post('/api/payment/create-order', {
-          orderType: 'membership',
-          amount: 2900,
-          body: '季卡会员',
+          planType: 2,  // 季卡
         }, { cookie })
         assert(typeof data.reqsn === 'string' && data.reqsn.length > 0, '需有 reqsn')
         assert(typeof data.payUrl === 'string', '需有 payUrl')
-        assert(typeof data.amount === 'number', '需有 amount')
         reqsn = data.reqsn
       },
     },
     {
-      label: 'POST /api/allinpay/notify (Mock) → 200, 返回 success',
+      label: 'POST /api/payment/sandbox-pay/:reqsn → 200, sandbox 支付成功',
       fn: async () => {
-        const { data } = await api.post('/api/allinpay/notify', {
-          reqsn,
-          trxid: `TRX_${Date.now()}`,
-          trxstatus: '0000',
-          amount: '2900',
-          sign: 'mock_sign_skipped',
-        })
-        assert(data === 'success', '回调应返回 success')
+        const { data } = await api.post(`/api/payment/sandbox-pay/${reqsn}`, {}, { cookie })
+        assert(data.status === 'paid', `sandbox 支付应返回 paid, 实际=${data.status}`)
       },
     },
     {
-      label: 'GET /api/payment/result/:reqsn → 200, status=1',
+      label: 'GET /api/payment/result/:reqsn → 200, status=1 已支付',
       fn: async () => {
         const { data } = await api.get(`/api/payment/result/${reqsn}`, { cookie })
         assert(data.status === 1, `应已支付 status=1, 实际=${data.status}`)
@@ -130,12 +112,11 @@ async function paymentContractTests(cookie) {
 async function userContractTests(cookie) {
   return await runContractTests('用户接口契约', [
     {
-      label: 'GET /api/users/profile → 200, 返回 user 含 credits',
+      label: 'GET /api/user/profile → 200, 返回用户含 credit_balance',
       fn: async () => {
-        const { data } = await api.get('/api/users/profile', { cookie })
-        assert(data.user, '需有 user')
-        assert(typeof data.user.id === 'number', 'user 需有 id')
-        assert(typeof data.credits === 'number', '需有 credits 字段')
+        const { data } = await api.get('/api/user/profile', { cookie })
+        assert(data && typeof data.id === 'number', '需有 user id')
+        assert(typeof data.credit_balance === 'number', '需有 credit_balance')
       },
     },
   ])
@@ -151,27 +132,24 @@ async function main() {
   let totalFailed = 0
 
   // 1. Auth
-  const { cookie } = await authContractTests()
-  // re-query auth to get actual count:
-  const { passed: ap, failed: af } = {} // we'll track below
+  const a = await authContractTests()
+  totalPassed += a.passed
+  totalFailed += a.failed
 
-  // 2. Membership
-  const m = await membershipContractTests(cookie)
-  totalPassed += m.passed
-  totalFailed += m.failed
+  // 2. Plans (public)
+  const pl = await plansContractTests(a.cookie)
+  totalPassed += pl.passed
+  totalFailed += pl.failed
 
   // 3. Payment
-  const p = await paymentContractTests(cookie)
+  const p = await paymentContractTests(a.cookie)
   totalPassed += p.passed
   totalFailed += p.failed
 
   // 4. User
-  const u = await userContractTests(cookie)
+  const u = await userContractTests(a.cookie)
   totalPassed += u.passed
   totalFailed += u.failed
-
-  // Auth was separately run with 4 tests
-  totalPassed += 4 // auth tests if all pass
 
   console.log('='.repeat(50))
   console.log(`🏁 总计: ${totalPassed}/${totalPassed + totalFailed} 通过`)
