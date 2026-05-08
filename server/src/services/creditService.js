@@ -41,6 +41,9 @@ export async function freezeCredit(userId, requestId, action, batchCount = 1, is
   if (plan && plan.monthly_limit > 0 && monthlyUsed + consumedAmount > plan.monthly_limit) {
     throw Object.assign(new Error('超出每月消费上限'), { statusCode: 4103 });
   }
+  if (plan && plan.batch_limit > 0 && batchCount > plan.batch_limit) {
+    throw Object.assign(new Error(`单次批量上限为 ${plan.batch_limit} 张`), { statusCode: 4103 });
+  }
 
   const creditBefore = membership.credit_balance;
   if (creditBefore < consumedAmount) {

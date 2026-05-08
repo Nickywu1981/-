@@ -161,6 +161,10 @@ router.put('/membership/auto-renew', _validate(z.object({
   autoRenew: z.boolean(),
 })), async (req, res) => {
   try {
+    const m = await membershipDao.findByUserId(req.user.id);
+    if (!m || m.plan_type === 'free' || m.plan_type === 0) {
+      return error(res, 400, '仅付费会员支持自动续费');
+    }
     await membershipDao.setAutoRenew(req.user.id, req.validated.autoRenew);
     success(res, { autoRenew: req.validated.autoRenew }, '自动续费已' + (req.validated.autoRenew ? '开启' : '关闭'));
   } catch (err) {
