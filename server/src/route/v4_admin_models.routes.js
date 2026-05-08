@@ -14,7 +14,6 @@
  */
 import { Router } from 'express';
 import { z } from 'zod';
-import { encrypt } from '../utils/crypto.js';
 import { success, error } from '../utils/response.js';
 import { requireRole } from '../middleware/rbac.js';
 import * as modelRouterService from '../services/model-router.service.js';
@@ -90,12 +89,10 @@ router.get('/config', requireRole('admin'), (req, res) => modelConfigCtrl.list(r
 router.get('/config/:modelKey', requireRole('admin'), (req, res) => modelConfigCtrl.getOne(req, res));
 
 router.post('/config', requireRole('admin'), _validate(modelConfigSchema), (req, res) => {
-  req.validated.api_key = encrypt(req.validated.api_key);
   return modelConfigCtrl.create(req, res);
 });
 
 router.put('/config/:modelKey', requireRole('admin'), _validate(modelUpdateSchema), (req, res) => {
-  if (req.validated.api_key) req.validated.api_key = encrypt(req.validated.api_key);
   return modelConfigCtrl.update(req, res);
 });
 
