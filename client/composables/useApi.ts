@@ -98,3 +98,8 @@ export const adminApi = {
 
 export type { ApiResponse, PaginatedData };
 export default api;
+
+/** Composable wrapper for pages that import { useApi } */
+export function useApi() {
+  return api;
+}

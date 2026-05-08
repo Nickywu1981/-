@@ -218,8 +218,8 @@ function toast(msg, type = 'success') {
 
 async function loadPlatforms() {
   try {
-    const res = await api.get('/api/publish/platforms');
-    platforms.value = res.data || [];
+    const res = await api.get('/publish/platforms');
+    platforms.value = res || [];
   } catch { /* ignore */ }
 }
 
@@ -228,8 +228,8 @@ async function loadWorks() {
   try {
     const params = { pageSize: 50, status: 'completed' };
     if (filterType.value) params.type = filterType.value;
-    const res = await api.get('/api/assets', params);
-    works.value = res.data?.list || [];
+    const res = await api.get('/assets', params);
+    works.value = res?.list || [];
   } catch { /* ignore */ }
   finally { loadingWorks.value = false; }
 }
@@ -240,12 +240,12 @@ async function loadHistory() {
     const params = { page: historyPage.value, pageSize: historyPageSize.value };
     if (historyStatus.value) params.status = historyStatus.value;
     const [histRes, statsRes] = await Promise.all([
-      api.get('/api/publish/history', params),
-      api.get('/api/publish/stats'),
+      api.get('/publish/history', params),
+      api.get('/publish/stats'),
     ]);
-    historyList.value = histRes.data?.list || [];
-    historyTotal.value = histRes.data?.total || 0;
-    stats.value = statsRes.data;
+    historyList.value = histRes?.list || [];
+    historyTotal.value = histRes?.total || 0;
+    stats.value = statsRes;
   } catch { /* ignore */ }
   finally { loadingHistory.value = false; }
 }
@@ -255,7 +255,7 @@ async function submitPublish() {
   submitting.value = true;
   try {
     const tags = form.tagsStr ? form.tagsStr.split(',').map(s => s.trim()).filter(Boolean) : [];
-    await api.post('/api/publish/submit', {
+    await api.post('/publish/submit', {
       workId: selectedWorkId.value,
       platforms: selectedPlatforms.value,
       title: form.title,
@@ -279,7 +279,7 @@ async function submitPublish() {
 
 async function retryPublish(recordId) {
   try {
-    await api.post(`/api/publish/retry/${recordId}`);
+    await api.post(`/publish/retry/${recordId}`);
     toast('已重新提交分发');
     await loadHistory();
   } catch (err) {

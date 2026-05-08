@@ -173,8 +173,8 @@ onMounted(async () => {
 
 async function loadRatios() {
   try {
-    const res = await api.get('/api/cut-ecosystem/ratios')
-    if (res?.code === 200) ratios.value = res.data
+    const res = await api.get('/cut-ecosystem/ratios')
+    ratios.value = res
   } catch { /* noop */ }
 }
 
@@ -183,11 +183,9 @@ async function loadWorks() {
   try {
     const params = { page: page.value, pageSize }
     if (filterType.value) params.type = filterType.value
-    const res = await api.get('/api/cut-ecosystem/works', { params })
-    if (res?.code === 200) {
-      works.value = res.data.list || []
-      totalPages.value = Math.max(1, Math.ceil((res.data.total || 0) / pageSize))
-    }
+    const res = await api.get('/cut-ecosystem/works', { params })
+    works.value = res.list || []
+    totalPages.value = Math.max(1, Math.ceil((res.total || 0) / pageSize))
   } catch (e) {
     toast.error('加载作品失败')
   } finally {
@@ -215,12 +213,12 @@ async function exportDraft(platform) {
       projectName: projectName.value || undefined,
       ratio: selectedRatio.value,
     }
-    const res = await api.post('/api/cut-ecosystem/export/' + platform, body)
-    if (res?.code === 200) {
-      draftResult.value = res.data
+    const res = await api.post('/cut-ecosystem/export/' + platform, body)
+    if (res) {
+      draftResult.value = res
       toast.success(`已生成${platform === 'jianying' ? '剪映' : 'CapCut'}项目文件`)
     } else {
-      toast.error(res?.message || '导出失败')
+      toast.error('导出失败')
     }
   } catch (e) {
     toast.error('导出请求失败')

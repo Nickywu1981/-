@@ -31,7 +31,7 @@ export default defineNuxtPlugin((nuxtApp) => {
           }
           return res
         } catch (err: any) {
-          if (err?.response?.status === 401) return null // auth handled separately
+          if (err?.response?.status === 401) throw err // let caller handle (useApi onResponseError redirects)
           if (err?.response?.status === 429) {
             toast?.warn?.('请求过于频繁，请稍后再试')
             return null
