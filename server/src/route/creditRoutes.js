@@ -13,8 +13,12 @@ const freezeSchema = z.object({
   batchCount: z.coerce.number().int().min(1).optional(),
   isNight: z.coerce.boolean().optional(),
 });
-const confirmSchema = z.object({ taskId: idSchema });
-const rollbackSchema = z.object({ taskId: idSchema, reason: z.string().max(500).optional() });
+const confirmSchema = z.object({ requestId: z.string().min(1, 'requestId 不能为空') });
+const rollbackSchema = z.object({
+  requestId: z.string().optional(),
+  recordId: idSchema.optional(),
+  remark: z.string().max(500).optional(),
+});
 const adminRefundSchema = z.object({
   recordId: idSchema,
   remark: z.string().max(500).optional(),

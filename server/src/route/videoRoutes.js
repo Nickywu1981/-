@@ -29,9 +29,18 @@ const packagingSchema = z.object({
   bgm: z.string().optional(),
   stickers: z.array(z.string()).optional(),
 });
-const transferSchema = z.object({ videoUrl: z.string().min(1), style: z.string().min(1) });
-const replaceSchema = z.object({ videoUrl: z.string().min(1), personImage: imageUrlSchema });
-const digitalHumanSchema = z.object({ script: z.string().min(1, '脚本不能为空'), voice: z.string().optional(), avatar: z.string().optional() });
+const transferSchema = z.object({
+  sourceImageUrl: z.string().url('请提供有效的源图片URL'),
+  actionVideoUrl: z.string().url('请提供有效的动作视频URL'),
+  targetAction: z.string().optional(),
+});
+const replaceSchema = z.object({
+  sourceImageUrl: z.string().url('请提供有效的商品图片URL'),
+  targetPersonUrl: z.string().url('请提供有效的目标人物图片URL'),
+});
+const digitalHumanSchema = z.object({
+  script: z.string().min(1, '脚本不能为空'), voice: z.string().optional(), avatar: z.string().optional(), background: z.string().optional(),
+});
 
 // 视频生成
 router.post('/img2video', authMiddleware, heavyLimiter, validate(img2VideoSchema), asyncHandler(submitImg2Video));

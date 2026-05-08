@@ -27,16 +27,17 @@ const sceneImageSchema = z.object({
   customBgUrl: z.string().url().optional().or(z.literal('')),
 });
 const detailH5Schema = z.object({
-  productName: z.string().min(1, '产品名称不能为空').max(200),
-  images: z.array(z.string().url()).min(1, '至少需要一张产品图'),
-  platform: platformSchema,
+  imageUrl: imageUrlSchema,
+  category: z.string().min(1, '请选择商品类目'),
+  templateId: z.coerce.number().int().optional(),
+  platform: platformSchema.optional(),
   skuCount: z.coerce.number().int().min(1).optional(),
 });
 const batchTaskSchema = z.object({
   imageUrls: z.array(z.string().url()).min(1, '至少需要一张图片').max(500, '单次最多500张'),
-  taskType: z.enum(['remove-bg', 'white-bg', 'main-image', 'scene', 'retouch']),
+  operation: z.string().min(1, '请选择操作类型'),
   platform: platformSchema.optional(),
-  sceneCategory: z.string().optional(),
+  style: z.string().optional(),
 });
 const singleImageSchema = z.object({ imageUrl: imageUrlSchema });
 

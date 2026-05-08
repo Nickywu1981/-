@@ -13,7 +13,7 @@ const _userStatusSchema = z.object({
   status: z.union([z.literal(0), z.literal(1)]),
 });
 const batchUserStatusSchema = z.object({
-  userIds: z.array(idSchema).min(1).max(500),
+  ids: z.array(idSchema).min(1).max(500),
   status: z.union([z.literal(0), z.literal(1)]),
 });
 const _taskIdSchema = z.object({ taskId: idSchema });

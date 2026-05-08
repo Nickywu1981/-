@@ -13,8 +13,10 @@ const router = Router();
 
 const submitSchema = z.object({
   imageUrls: z.array(z.string().url()).min(1, '至少需要1张图片').max(100, '最多100张图片'),
-  actionType: z.enum(['remove_bg', 'white_bg', 'scene_gen', 'retouch', 'video_gen']),
-  options: z.object({}).passthrough().optional(),
+  operation: z.string().min(1, '请选择操作类型'),
+  platform: z.string().optional(),
+  style: z.string().optional(),
+  nightMode: z.coerce.boolean().optional(),
 });
 
 const redoSchema = z.object({
