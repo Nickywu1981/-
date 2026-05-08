@@ -71,12 +71,12 @@ export class PlatformAdapter {
   }
 
   /** 子类应覆盖：实际推送到平台 API */
-  async publish(adaptedContent, auth) {
+  async publish(_adaptedContent, _auth) {
     throw new BusinessError(501, `${this.name} 平台发布接口待实现`);
   }
 
   /** 查询分发状态 */
-  async getStatus(publishId, auth) {
+  async getStatus(_publishId, _auth) {
     throw new BusinessError(501, `${this.name} 平台状态查询待实现`);
   }
 

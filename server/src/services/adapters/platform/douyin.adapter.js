@@ -47,7 +47,7 @@ export class DouyinAdapter extends PlatformAdapter {
     return { platform: 'douyin', status: 'pending', publishId: `dy_${Date.now()}`, adaptedContent };
   }
 
-  async getStatus(publishId, auth) {
+  async getStatus(publishId, _auth) {
     return { platform: 'douyin', publishId, status: 'unknown' };
   }
 }

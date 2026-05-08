@@ -43,7 +43,7 @@ export class ShopeeAdapter extends PlatformAdapter {
     return { platform: 'shopee', status: 'pending', publishId: `sp_${Date.now()}`, adaptedContent };
   }
 
-  async getStatus(publishId, auth) {
+  async getStatus(publishId, _auth) {
     return { platform: 'shopee', publishId, status: 'unknown' };
   }
 }

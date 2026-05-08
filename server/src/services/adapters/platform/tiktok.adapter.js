@@ -25,7 +25,7 @@ export class TikTokShopAdapter extends PlatformAdapter {
     return { platform: 'tiktokshop', status: 'pending', publishId: `tts_${Date.now()}`, adaptedContent };
   }
 
-  async getStatus(publishId, auth) {
+  async getStatus(publishId, _auth) {
     return { platform: 'tiktokshop', publishId, status: 'unknown' };
   }
 }

@@ -43,7 +43,7 @@ export class XiaohongshuAdapter extends PlatformAdapter {
     return { platform: 'xiaohongshu', status: 'pending', publishId: `xhs_${Date.now()}`, adaptedContent };
   }
 
-  async getStatus(publishId, auth) {
+  async getStatus(publishId, _auth) {
     return { platform: 'xiaohongshu', publishId, status: 'unknown' };
   }
 }

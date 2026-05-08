@@ -47,7 +47,7 @@ export class TaobaoAdapter extends PlatformAdapter {
     return { platform: 'taobao', status: 'pending', publishId: `tb_${Date.now()}`, adaptedContent };
   }
 
-  async getStatus(publishId, auth) {
+  async getStatus(publishId, _auth) {
     return { platform: 'taobao', publishId, status: 'unknown' };
   }
 }
