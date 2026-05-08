@@ -1,0 +1,46 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npx eslint *)",
+      "Bash(npm ls *)",
+      "Bash(node server/scripts/audit-rules.js *)",
+      "WebFetch(domain:prodoc.allinpay.com)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node server/scripts/kb-snapshot.js 2>&1 >/dev/null && node server/scripts/audit-rules.js 2>/dev/null || true"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node server/scripts/kb-snapshot.js 2>&1 >/dev/null && node server/scripts/audit-rules.js 2>/dev/null || true"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node server/scripts/kb-snapshot.js 2>&1 >/dev/null && node server/scripts/audit-rules.js 2>/dev/null || true"
+          }
+        ]
+      }
+    ]
+  }
+}

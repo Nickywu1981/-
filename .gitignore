@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.output/
+.nuxt/
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+uploads/*
+!uploads/.gitkeep
+server/certs/*.pem
+coverage/
+__screenshots__/

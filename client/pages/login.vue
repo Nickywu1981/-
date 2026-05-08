@@ -1,0 +1,230 @@
+<template>
+  <div class="login-page">
+    <div class="login-card">
+      <div class="login-header">
+        <span class="login-logo">◆</span>
+        <h2>欢迎回来</h2>
+        <p>登录你的 Movio AI 账号</p>
+      </div>
+
+      <div class="mode-tabs">
+        <button :class="{ active: mode === 'password' }" @click="mode = 'password'">密码登录</button>
+        <button :class="{ active: mode === 'sms' }" @click="mode = 'sms'">短信登录</button>
+        <button :class="{ active: mode === 'email' }" @click="mode = 'email'">邮箱登录</button>
+      </div>
+
+      <form v-if="mode === 'password'" @submit.prevent="handlePasswordLogin">
+        <div class="input-group">
+          <span class="input-icon">👤</span>
+          <input v-model="username" type="text" placeholder="用户名" required />
+        </div>
+        <div class="input-group">
+          <span class="input-icon">🔒</span>
+          <input v-model="password" type="password" placeholder="密码" required />
+        </div>
+        <button type="submit" class="login-btn" :disabled="loading">
+          <span v-if="loading" class="spinner-sm" />
+          <span v-else>登录</span>
+        </button>
+      </form>
+
+      <form v-if="mode === 'sms'" @submit.prevent="handleSmsLogin">
+        <div class="input-group">
+          <span class="input-icon">📱</span>
+          <input v-model="smsPhone" type="tel" placeholder="手机号" required />
+        </div>
+        <div class="sms-row">
+          <input v-model="smsCode" type="text" placeholder="验证码" required maxlength="6" />
+          <button type="button" class="code-btn" :disabled="smsCountdown > 0" @click="sendSmsCode('login')">
+            {{ smsCountdown > 0 ? `${smsCountdown}秒` : '获取验证码' }}
+          </button>
+        </div>
+        <button type="submit" class="login-btn" :disabled="loading">
+          <span v-if="loading" class="spinner-sm" />
+          <span v-else>短信登录</span>
+        </button>
+      </form>
+
+      <form v-if="mode === 'email'" @submit.prevent="handleEmailLogin">
+        <div class="input-group">
+          <span class="input-icon">📧</span>
+          <input v-model="emailAddr" type="email" placeholder="邮箱地址" required />
+        </div>
+        <div class="sms-row">
+          <input v-model="emailCode" type="text" placeholder="验证码" required maxlength="6" />
+          <button type="button" class="code-btn" :disabled="emailCountdown > 0" @click="sendEmailCode('login')">
+            {{ emailCountdown > 0 ? `${emailCountdown}秒` : '获取验证码' }}
+          </button>
+        </div>
+        <button type="submit" class="login-btn" :disabled="loading">
+          <span v-if="loading" class="spinner-sm" />
+          <span v-else>邮箱登录</span>
+        </button>
+      </form>
+
+      <p class="msg" :class="{ error: msgErr }" v-if="msg">{{ msg }}</p>
+      <p class="link">
+        还没有账号？<NuxtLink to="/register">免费注册</NuxtLink>
+      </p>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+const mode = ref('password');
+const username = ref('');
+const password = ref('');
+const smsPhone = ref('');
+const smsCode = ref('');
+const smsCountdown = ref(0);
+const emailAddr = ref('');
+const emailCode = ref('');
+const emailCountdown = ref(0);
+const loading = ref(false);
+const msg = ref('');
+const msgErr = ref(false);
+
+async function handlePasswordLogin() {
+  loading.value = true; msg.value = '';
+  try {
+    const isEmail = username.value.includes('@')
+    const body = isEmail ? { email: username.value, password: password.value }
+                         : { phone: username.value, password: password.value }
+    await $fetch('/api/auth/login', { method: 'POST', body, credentials: 'include' })
+    navigateTo('/workspace')
+  } catch (e: any) { msg.value = e.data?.msg || '登录失败'; msgErr.value = true; }
+  loading.value = false;
+}
+
+async function handleSmsLogin() {
+  if (!smsPhone.value || !smsCode.value) { msg.value = '请输入手机号和验证码'; msgErr.value = true; return; }
+  loading.value = true; msg.value = '';
+  try {
+    await $fetch('/api/sms/verify-code', { method: 'POST', body: { phone: smsPhone.value, scene: 'login', code: smsCode.value } });
+    await $fetch('/api/auth/login-by-code', {
+      method: 'POST',
+      body: { phone: smsPhone.value },
+      credentials: 'include',
+    });
+    navigateTo('/workspace');
+  } catch (e: any) { msg.value = e.data?.msg || '登录失败'; msgErr.value = true; }
+  loading.value = false;
+}
+
+async function sendSmsCode(scene: string) {
+  if (!smsPhone.value) { msg.value = '请输入手机号'; msgErr.value = true; return; }
+  msg.value = '';
+  try {
+    await $fetch('/api/sms/send-code', { method: 'POST', body: { phone: smsPhone.value, scene } });
+    smsCountdown.value = 60;
+    const timer = setInterval(() => { smsCountdown.value--; if (smsCountdown.value <= 0) clearInterval(timer); }, 1000);
+    msg.value = '验证码已发送'; msgErr.value = false;
+  } catch (e: any) { msg.value = e.data?.msg || '发送失败'; msgErr.value = true; }
+}
+
+async function handleEmailLogin() {
+  if (!emailAddr.value || !emailCode.value) { msg.value = '请输入邮箱和验证码'; msgErr.value = true; return; }
+  loading.value = true; msg.value = '';
+  try {
+    await $fetch('/api/email/verify-code', { method: 'POST', body: { email: emailAddr.value, code: emailCode.value } });
+    await $fetch('/api/auth/login-by-code', {
+      method: 'POST',
+      body: { email: emailAddr.value },
+      credentials: 'include',
+    });
+    navigateTo('/workspace');
+  } catch (e: any) { msg.value = e.data?.msg || '登录失败'; msgErr.value = true; }
+  loading.value = false;
+}
+
+async function sendEmailCode(scene: string) {
+  if (!emailAddr.value) { msg.value = '请输入邮箱'; msgErr.value = true; return; }
+  msg.value = '';
+  try {
+    await $fetch('/api/email/send-code', { method: 'POST', body: { email: emailAddr.value, scene } });
+    emailCountdown.value = 60;
+    const timer = setInterval(() => { emailCountdown.value--; if (emailCountdown.value <= 0) clearInterval(timer); }, 1000);
+    msg.value = '验证码已发送'; msgErr.value = false;
+  } catch (e: any) { msg.value = e.data?.msg || '发送失败'; msgErr.value = true; }
+}
+</script>
+
+<style scoped>
+.login-page {
+  min-height: calc(100vh - 200px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 48px 16px;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 40%, rgba(124,58,237,0.04) 0%, transparent 60%);
+}
+.login-card {
+  background: var(--bg-card); border: 1px solid var(--border-card);
+  border-radius: var(--radius-xl); padding: 40px; width: 100%; max-width: 420px;
+  box-shadow: var(--shadow-card);
+  animation: modal-enter var(--transition-slow);
+}
+.login-header { text-align: center; margin-bottom: 28px; }
+.login-logo { font-size: 32px; color: var(--brand); }
+.login-header h2 { font-size: 22px; font-weight: 700; color: var(--text-primary); margin: 12px 0 6px; }
+.login-header p { font-size: 13px; color: var(--text-muted); }
+
+.mode-tabs {
+  display: flex; gap: 0; margin-bottom: 24px;
+  border: 1px solid var(--border-light); border-radius: var(--radius-md); overflow: hidden;
+}
+.mode-tabs button {
+  flex: 1; padding: 10px; border: none; background: var(--bg-card);
+  font-size: 13px; font-weight: 500; cursor: pointer; color: var(--text-secondary);
+  transition: all var(--transition-fast);
+}
+.mode-tabs button:hover { color: var(--brand); }
+.mode-tabs button.active { background: var(--brand); color: #fff; font-weight: 600; }
+
+form { display: flex; flex-direction: column; gap: 14px; }
+.input-group { position: relative; }
+.input-icon {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  font-size: 15px; opacity: 0.6; pointer-events: none;
+}
+.input-group input { padding-left: 40px; }
+
+input {
+  padding: 11px 14px; border: 1px solid var(--border-light); border-radius: var(--radius-md);
+  font-size: 14px; outline: none; background: var(--bg-input); color: var(--text-primary);
+  width: 100%; box-sizing: border-box; transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+input:focus { border-color: var(--brand); box-shadow: var(--focus-ring); }
+input::placeholder { color: var(--input-placeholder); }
+
+.sms-row { display: flex; gap: 8px; }
+.sms-row input { flex: 1; }
+.code-btn {
+  padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--brand);
+  color: var(--brand); border-radius: var(--radius-md); font-size: 13px; font-weight: 500;
+  cursor: pointer; white-space: nowrap; transition: all var(--transition-fast);
+}
+.code-btn:hover { background: var(--brand-light); }
+.code-btn:disabled { opacity: 0.4; cursor: not-allowed; background: var(--bg-hover); border-color: var(--border-light); color: var(--text-muted); }
+
+.login-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 12px; background: var(--brand-gradient); color: #fff; border: none;
+  border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer;
+  transition: all var(--transition-fast); box-shadow: 0 4px 16px rgba(124,58,237,0.2);
+}
+.login-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(124,58,237,0.3); }
+.login-btn:active { transform: scale(0.98); }
+.login-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.spinner-sm {
+  width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: var(--white); border-radius: 50%; animation: spin 0.6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.msg { margin-top: 12px; font-size: 13px; text-align: center; color: var(--success); }
+.msg.error { color: var(--danger); }
+.link { text-align: center; margin-top: 18px; font-size: 13px; color: var(--text-muted); }
+.link a { color: var(--text-link); font-weight: 500; text-decoration: none; }
+.link a:hover { text-decoration: underline; }
+</style>

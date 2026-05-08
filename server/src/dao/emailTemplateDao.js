@@ -1,0 +1,42 @@
+import pool from './db.js';
+
+export async function listTemplates() {
+  const [rows] = await pool.execute(
+    'SELECT id, template_code, name, subject, content, provider_template_id, provider, status, remark, create_time FROM email_template ORDER BY id',
+  );
+  return rows;
+}
+
+export async function findByCode(templateCode) {
+  const [rows] = await pool.execute(
+    'SELECT * FROM email_template WHERE template_code = ? AND status = 1 LIMIT 1',
+    [templateCode],
+  );
+  return rows[0] || null;
+}
+
+export async function updateTemplate(id, fields) {
+  const sets = [];
+  const params = [];
+  const allowed = ['name', 'subject', 'content', 'provider_template_id', 'provider', 'status', 'remark'];
+  for (const [k, v] of Object.entries(fields)) {
+    if (allowed.includes(k) && v !== undefined) { sets.push(`${k} = ?`); params.push(v); }
+  }
+  if (sets.length === 0) return null;
+  params.push(id);
+  await pool.execute(`UPDATE email_template SET ${sets.join(', ')} WHERE id = ?`, params);
+  const [rows] = await pool.execute('SELECT * FROM email_template WHERE id = ?', [id]);
+  return rows[0];
+}
+
+export async function insertTemplate(fields) {
+  const [result] = await pool.execute(
+    'INSERT INTO email_template (template_code, name, subject, content, provider_template_id, provider, status, remark) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+    [fields.template_code, fields.name, fields.subject || '', fields.content, fields.provider_template_id || '', fields.provider || 'mock', fields.status ?? 1, fields.remark || ''],
+  );
+  return result.insertId;
+}
+
+export async function deleteTemplate(id) {
+  await pool.execute('DELETE FROM email_template WHERE id = ?', [id]);
+}

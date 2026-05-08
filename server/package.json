@@ -1,0 +1,58 @@
+{
+  "name": "ai-saas-server",
+  "version": "1.0.0",
+  "description": "电商AI SaaS工具 - 后端服务",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "set NODE_ENV=development && node --watch src/index.js",
+    "start": "node src/index.js",
+    "lint": "npx eslint src/",
+    "lint:fix": "npx eslint src/ --fix",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "kb:snapshot": "node scripts/kb-snapshot.js",
+    "db:migrate": "node src/dao/migrate.js up",
+    "db:migrate:down": "node src/dao/migrate.js down",
+    "db:migrate:status": "node src/dao/migrate.js pending",
+    "db:migrate:history": "node src/dao/migrate.js executed"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1043.0",
+    "@aws-sdk/lib-storage": "^3.1043.0",
+    "bcrypt": "^5.1.1",
+    "bcryptjs": "^3.0.3",
+    "bullmq": "^5.76.6",
+    "compression": "^1.8.1",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "express-rate-limit": "^7.5.1",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.1.1",
+    "mysql2": "^3.11.0",
+    "redis": "^4.7.0",
+    "sharp": "^0.34.5",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "umzug": "^3.8.3",
+    "uuid": "^14.0.0",
+    "winston": "^3.19.0",
+    "ws": "^8.20.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/compression": "^1.8.1",
+    "@vitest/coverage-v8": "^4.1.5",
+    "eslint": "^10.3.0",
+    "prettier": "^3.8.3",
+    "vitest": "^4.1.5"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

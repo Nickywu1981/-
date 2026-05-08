@@ -1,0 +1,2831 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Movio AI API v4.1",
+    "version": "4.1.0",
+    "description": "电商AI SaaS系统接口文档 — 图片/视频/批量/商业化/管理后台 — v4.1 重构版"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3001",
+      "description": "开发环境"
+    },
+    {
+      "url": "https://api.movio.ai",
+      "description": "生产环境"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "example": 200
+          },
+          "msg": {
+            "type": "string",
+            "example": "success"
+          },
+          "data": {
+            "type": "object"
+          }
+        }
+      },
+      "PaginatedList": {
+        "type": "object",
+        "properties": {
+          "list": {
+            "type": "array",
+            "items": {}
+          },
+          "total": {
+            "type": "integer"
+          },
+          "page": {
+            "type": "integer"
+          },
+          "pageSize": {
+            "type": "integer"
+          }
+        }
+      },
+      "JobSubmission": {
+        "type": "object",
+        "required": [
+          "task_type"
+        ],
+        "properties": {
+          "task_type": {
+            "type": "string",
+            "description": "任务类型"
+          },
+          "task_params": {
+            "type": "object",
+            "description": "任务参数"
+          }
+        }
+      },
+      "JobStatus": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "task_type": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "queued",
+              "processing",
+              "completed",
+              "failed"
+            ]
+          },
+          "progress": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "result_data": {
+            "type": "object"
+          },
+          "error_message": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Auth v4",
+      "description": "v4.1 用户认证 — 注册/登录/密码重置"
+    },
+    {
+      "name": "User v4",
+      "description": "v4.1 用户信息 — 个人资料/用量统计"
+    },
+    {
+      "name": "Config v4",
+      "description": "v4.1 配置中心 — 页面配置/字典/SSE推送"
+    },
+    {
+      "name": "Upload v4",
+      "description": "v4.1 分片上传 — 初始化/分片/合并/断点续传"
+    },
+    {
+      "name": "Image v4",
+      "description": "v4.1 AI图片 — 生成/复刻/批量/提示词增强"
+    },
+    {
+      "name": "Video v4",
+      "description": "v4.1 AI视频 — 生成/动作迁移/爆款/数字人/精剪"
+    },
+    {
+      "name": "Job v4",
+      "description": "v4.1 通用任务 — 提交任务/轮询状态"
+    },
+    {
+      "name": "Points v4",
+      "description": "v4.1 积分系统 — 账户/流水/兑换"
+    },
+    {
+      "name": "Distribution v4",
+      "description": "v4.1 分销系统 — 邀请码/团队/佣金/提现"
+    },
+    {
+      "name": "Assets v4",
+      "description": "v4.1 素材库 — 作品聚合查询"
+    },
+    {
+      "name": "Platform v4",
+      "description": "v4.1 平台绑定 — 绑定/解绑/发布"
+    },
+    {
+      "name": "Admin Models v4",
+      "description": "v4.1 模型监控 — 状态查询/熔断器重置"
+    },
+    {
+      "name": "Admin Config v4",
+      "description": "v4.1 配置管理 — CRUD/回滚/日志/Seed校验"
+    },
+    {
+      "name": "Auth",
+      "description": "[Legacy] 用户认证"
+    },
+    {
+      "name": "Users",
+      "description": "[Legacy] 用户管理"
+    },
+    {
+      "name": "Templates",
+      "description": "[Legacy] 尺寸模板"
+    },
+    {
+      "name": "Images",
+      "description": "[Legacy] AI图片处理"
+    },
+    {
+      "name": "Payment",
+      "description": "[Legacy] 支付与订单"
+    },
+    {
+      "name": "Admin",
+      "description": "[Legacy] 管理后台"
+    },
+    {
+      "name": "Notifications",
+      "description": "[Legacy] 通知消息"
+    },
+    {
+      "name": "Badges",
+      "description": "[Legacy] 营销标签"
+    },
+    {
+      "name": "Platforms",
+      "description": "[Legacy] 平台详情"
+    },
+    {
+      "name": "Multilingual",
+      "description": "[Legacy] 多语言"
+    },
+    {
+      "name": "Compliance",
+      "description": "[Legacy] 合规检查"
+    }
+  ],
+  "paths": {
+    "/api/health": {
+      "get": {
+        "tags": [
+          "Auth v4"
+        ],
+        "summary": "健康检查",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "服务正常"
+          },
+          "503": {
+            "description": "服务降级"
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "tags": [
+          "Auth v4"
+        ],
+        "summary": "用户注册",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "password"
+                ],
+                "properties": {
+                  "phone": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 8
+                  },
+                  "nickname": {
+                    "type": "string"
+                  },
+                  "invite_code": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "注册成功，设置httpOnly cookie"
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "Auth v4"
+        ],
+        "summary": "用户登录",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "password"
+                ],
+                "properties": {
+                  "phone": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "登录成功，设置httpOnly cookie"
+          }
+        }
+      }
+    },
+    "/api/auth/reset-password": {
+      "post": {
+        "tags": [
+          "Auth v4"
+        ],
+        "summary": "密码重置",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "new_password"
+                ],
+                "properties": {
+                  "phone": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "new_password": {
+                    "type": "string",
+                    "minLength": 8
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "密码重置成功"
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": [
+          "Auth v4"
+        ],
+        "summary": "退出登录",
+        "responses": {
+          "200": {
+            "description": "已退出，清除cookie"
+          }
+        }
+      }
+    },
+    "/api/user/profile": {
+      "get": {
+        "tags": [
+          "User v4"
+        ],
+        "summary": "获取个人资料+会员状态",
+        "responses": {
+          "200": {
+            "description": "用户信息含plan_type/credit_balance/points_balance"
+          }
+        }
+      }
+    },
+    "/api/user/stats": {
+      "get": {
+        "tags": [
+          "User v4"
+        ],
+        "summary": "用量统计",
+        "responses": {
+          "200": {
+            "description": "todayTasks/totalTasks/thisMonthConsumed"
+          }
+        }
+      }
+    },
+    "/api/config/{group}": {
+      "get": {
+        "tags": [
+          "Config v4"
+        ],
+        "summary": "获取配置组",
+        "parameters": [
+          {
+            "name": "group",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "如 page.video.header"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "配置键值对"
+          }
+        }
+      }
+    },
+    "/api/config/dict/{dictKey}": {
+      "get": {
+        "tags": [
+          "Config v4"
+        ],
+        "summary": "获取字典",
+        "parameters": [
+          {
+            "name": "dictKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "如 image_ratio"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "字典项列表"
+          }
+        }
+      }
+    },
+    "/api/config/version/stream": {
+      "get": {
+        "tags": [
+          "Config v4"
+        ],
+        "summary": "SSE配置版本推送",
+        "description": "Server-Sent Events 实时推送配置变更版本号",
+        "responses": {
+          "200": {
+            "description": "text/event-stream"
+          }
+        }
+      }
+    },
+    "/api/upload/init": {
+      "post": {
+        "tags": [
+          "Upload v4"
+        ],
+        "summary": "初始化分片上传",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file_name",
+                  "file_size",
+                  "file_type"
+                ],
+                "properties": {
+                  "file_name": {
+                    "type": "string"
+                  },
+                  "file_size": {
+                    "type": "integer"
+                  },
+                  "file_type": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "返回upload_id"
+          }
+        }
+      }
+    },
+    "/api/upload/chunk": {
+      "post": {
+        "tags": [
+          "Upload v4"
+        ],
+        "summary": "上传分片",
+        "description": "raw body为分片二进制数据",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "upload_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chunk_index",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "分片接收成功"
+          }
+        }
+      }
+    },
+    "/api/upload/chunks/{uploadId}": {
+      "get": {
+        "tags": [
+          "Upload v4"
+        ],
+        "summary": "查询已上传分片(断点续传)",
+        "parameters": [
+          {
+            "name": "uploadId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "已上传分片索引列表"
+          }
+        }
+      }
+    },
+    "/api/upload/complete": {
+      "post": {
+        "tags": [
+          "Upload v4"
+        ],
+        "summary": "合并分片完成上传",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "upload_id"
+                ],
+                "properties": {
+                  "upload_id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "返回完整文件URL"
+          }
+        }
+      }
+    },
+    "/api/images/generate": {
+      "post": {
+        "tags": [
+          "Image v4"
+        ],
+        "summary": "AI图片生成",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "prompt"
+                ],
+                "properties": {
+                  "prompt": {
+                    "type": "string"
+                  },
+                  "ratio": {
+                    "type": "string"
+                  },
+                  "style": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "任务已提交，返回jobId"
+          }
+        }
+      }
+    },
+    "/api/images/replicate": {
+      "post": {
+        "tags": [
+          "Image v4"
+        ],
+        "summary": "主图复刻",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "reference_image_url",
+                  "product_name"
+                ],
+                "properties": {
+                  "reference_image_url": {
+                    "type": "string"
+                  },
+                  "product_name": {
+                    "type": "string"
+                  },
+                  "style": {
+                    "type": "string"
+                  },
+                  "ratio": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "任务已提交"
+          }
+        }
+      }
+    },
+    "/api/images/batch-generate": {
+      "post": {
+        "tags": [
+          "Image v4"
+        ],
+        "summary": "批量图片生成 (含tierGuard)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "prompts"
+                ],
+                "properties": {
+                  "prompts": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "ratio": {
+                    "type": "string"
+                  },
+                  "style": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "返回子任务数量"
+          }
+        }
+      }
+    },
+    "/api/images/batch-edit": {
+      "post": {
+        "tags": [
+          "Image v4"
+        ],
+        "summary": "批量图片编辑 (含tierGuard)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "images",
+                  "operations"
+                ],
+                "properties": {
+                  "images": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "operations": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "任务已提交"
+          }
+        }
+      }
+    },
+    "/api/images/batch-replace": {
+      "post": {
+        "tags": [
+          "Image v4"
+        ],
+        "summary": "批量背景/场景替换 (含tierGuard)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "images"
+                ],
+                "properties": {
+                  "images": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "new_background": {
+                    "type": "string"
+                  },
+                  "new_scene": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "任务已提交"
+          }
+        }
+      }
+    },
+    "/api/images/works": {
+      "get": {
+        "tags": [
+          "Image v4"
+        ],
+        "summary": "图片作品列表",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "分页作品列表"
+          }
+        }
+      }
+    },
+    "/api/ai/enhance-prompt": {
+      "post": {
+        "tags": [
+          "Image v4"
+        ],
+        "summary": "AI提示词增强",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "prompt"
+                ],
+                "properties": {
+                  "prompt": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "image",
+                      "video"
+                    ],
+                    "default": "image"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "增强后的提示词"
+          }
+        }
+      }
+    },
+    "/api/videos/generate": {
+      "post": {
+        "tags": [
+          "Video v4"
+        ],
+        "summary": "AI视频生成 (含tierGuard)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "prompt"
+                ],
+                "properties": {
+                  "prompt": {
+                    "type": "string"
+                  },
+                  "duration": {
+                    "type": "string"
+                  },
+                  "ratio": {
+                    "type": "string"
+                  },
+                  "enhanced_prompt": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "任务已提交"
+          }
+        }
+      }
+    },
+    "/api/videos/image-to-video": {
+      "post": {
+        "tags": [
+          "Video v4"
+        ],
+        "summary": "图生视频 (含tierGuard)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "image_url"
+                ],
+                "properties": {
+                  "image_url": {
+                    "type": "string"
+                  },
+                  "prompt": {
+                    "type": "string"
+                  },
+                  "duration": {
+                    "type": "string"
+                  },
+                  "ratio": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "任务已提交"
+          }
+        }
+      }
+    },
+    "/api/videos/multi-image-to-video": {
+      "post": {
+        "tags": [
+          "Video v4"
+        ],
+        "summary": "多图合成视频 (含tierGuard)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "images"
+                ],
+                "properties": {
+                  "images": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "prompt": {
+                    "type": "string"
+                  },
+                  "duration": {
+                    "type": "string"
+                  },
+                  "ratio": {
+                    "type": "string"
+                  },
+                  "transition": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "任务已提交"
+          }
+        }
+      }
+    },
+    "/api/videos/package": {
+      "post": {
+        "tags": [
+          "Video v4"
+        ],
+        "summary": "视频自动包装",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "video_url"
+                ],
+                "properties": {
+                  "video_url": {
+                    "type": "string"
+                  },
+                  "options": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "任务已提交"
+          }
+        }
+      }
+    },
+    "/api/videos/replace-character": {
+      "post": {
+        "tags": [
+          "Video v4"
+        ],
+        "summary": "角色替换 (含tierGuard)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "video_url",
+                  "target_person_image"
+                ],
+                "properties": {
+                  "video_url": {
+                    "type": "string"
+                  },
+                  "target_person_image": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "任务已提交"
+          }
+        }
+      }
+    },
+    "/api/videos/product-ad": {
+      "post": {
+        "tags": [
+          "Video v4"
+        ],
+        "summary": "一键成片 (含tierGuard)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "product_name",
+                  "product_images"
+                ],
+                "properties": {
+                  "product_name": {
+                    "type": "string"
+                  },
+                  "product_images": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "highlights": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "style": {
+                    "type": "string"
+                  },
+                  "duration": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "任务已提交"
+          }
+        }
+      }
+    },
+    "/api/videos/storyboard": {
+      "post": {
+        "tags": [
+          "Video v4"
+        ],
+        "summary": "分镜生成",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "prompt"
+                ],
+                "properties": {
+                  "prompt": {
+                    "type": "string"
+                  },
+                  "scene_count": {
+                    "type": "integer",
+                    "default": 5
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "任务已提交"
+          }
+        }
+      }
+    },
+    "/api/videos/action-migrate": {
+      "post": {
+        "tags": [
+          "Video v4"
+        ],
+        "summary": "动作迁移 (杀手功能, 含tierGuard)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "source_video_url",
+                  "target_person_image"
+                ],
+                "properties": {
+                  "source_video_url": {
+                    "type": "string"
+                  },
+                  "target_person_image": {
+                    "type": "string"
+                  },
+                  "options": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "任务已提交"
+          }
+        }
+      }
+    },
+    "/api/videos/action-migrate/batch": {
+      "post": {
+        "tags": [
+          "Video v4"
+        ],
+        "summary": "批量动作迁移 (含tierGuard)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "source_video_urls",
+                  "target_person_images"
+                ],
+                "properties": {
+                  "source_video_urls": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "target_person_images": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "options": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "返回total_jobs"
+          }
+        }
+      }
+    },
+    "/api/videos/action-migrate/batch/{id}/progress": {
+      "get": {
+        "tags": [
+          "Video v4"
+        ],
+        "summary": "批量动作迁移进度",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "批量进度详情"
+          }
+        }
+      }
+    },
+    "/api/videos/viral/analyze": {
+      "post": {
+        "tags": [
+          "Video v4"
+        ],
+        "summary": "爆款视频分析",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "video_url"
+                ],
+                "properties": {
+                  "video_url": {
+                    "type": "string"
+                  },
+                  "platform": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "分析任务已提交，返回结构/转场/BGM/文案"
+          }
+        }
+      }
+    },
+    "/api/videos/viral/replicate": {
+      "post": {
+        "tags": [
+          "Video v4"
+        ],
+        "summary": "爆款视频复刻 (含tierGuard)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "analysis_job_id",
+                  "product_name"
+                ],
+                "properties": {
+                  "analysis_job_id": {
+                    "type": "integer"
+                  },
+                  "product_name": {
+                    "type": "string"
+                  },
+                  "product_images": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "custom_prompt": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "复刻任务已提交"
+          }
+        }
+      }
+    },
+    "/api/videos/digital-human": {
+      "post": {
+        "tags": [
+          "Video v4"
+        ],
+        "summary": "数字人视频生成 (含tierGuard)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "text"
+                ],
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  },
+                  "audio_url": {
+                    "type": "string"
+                  },
+                  "avatar_style": {
+                    "type": "string"
+                  },
+                  "background": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "任务已提交"
+          }
+        }
+      }
+    },
+    "/api/videos/smart-clip": {
+      "post": {
+        "tags": [
+          "Video v4"
+        ],
+        "summary": "长视频智能精剪 (含tierGuard)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "video_url"
+                ],
+                "properties": {
+                  "video_url": {
+                    "type": "string"
+                  },
+                  "duration": {
+                    "type": "string"
+                  },
+                  "clip_count": {
+                    "type": "integer"
+                  },
+                  "style": {
+                    "type": "string"
+                  },
+                  "clip_regions": {
+                    "type": "array"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "精剪任务已提交"
+          }
+        }
+      }
+    },
+    "/api/videos/remove-redundant": {
+      "post": {
+        "tags": [
+          "Video v4"
+        ],
+        "summary": "去冗余片段 (含tierGuard)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "video_url"
+                ],
+                "properties": {
+                  "video_url": {
+                    "type": "string"
+                  },
+                  "threshold": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "任务已提交"
+          }
+        }
+      }
+    },
+    "/api/videos/optimize-audio": {
+      "post": {
+        "tags": [
+          "Video v4"
+        ],
+        "summary": "杂音优化 (含tierGuard)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "video_url"
+                ],
+                "properties": {
+                  "video_url": {
+                    "type": "string"
+                  },
+                  "level": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "任务已提交"
+          }
+        }
+      }
+    },
+    "/api/videos/subtitle-fix": {
+      "post": {
+        "tags": [
+          "Video v4"
+        ],
+        "summary": "字幕校对",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "video_url"
+                ],
+                "properties": {
+                  "video_url": {
+                    "type": "string"
+                  },
+                  "source_language": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "任务已提交"
+          }
+        }
+      }
+    },
+    "/api/videos/works": {
+      "get": {
+        "tags": [
+          "Video v4"
+        ],
+        "summary": "视频作品列表",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "task_type",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "分页作品列表"
+          }
+        }
+      }
+    },
+    "/api/videos/job/{id}": {
+      "get": {
+        "tags": [
+          "Video v4"
+        ],
+        "summary": "视频任务状态查询",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "任务详情"
+          }
+        }
+      }
+    },
+    "/api/jobs": {
+      "post": {
+        "tags": [
+          "Job v4"
+        ],
+        "summary": "提交通用任务",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JobSubmission"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "返回jobId"
+          }
+        }
+      }
+    },
+    "/api/job/{id}": {
+      "get": {
+        "tags": [
+          "Job v4"
+        ],
+        "summary": "轮询任务状态",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "任务状态+进度+结果",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/points/account": {
+      "get": {
+        "tags": [
+          "Points v4"
+        ],
+        "summary": "积分账户",
+        "responses": {
+          "200": {
+            "description": "积分余额/累计积分/冻结积分"
+          }
+        }
+      }
+    },
+    "/api/points/transactions": {
+      "get": {
+        "tags": [
+          "Points v4"
+        ],
+        "summary": "积分流水",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "分页流水列表"
+          }
+        }
+      }
+    },
+    "/api/points/redeem": {
+      "post": {
+        "tags": [
+          "Points v4"
+        ],
+        "summary": "积分兑换点数",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "points"
+                ],
+                "properties": {
+                  "points": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "兑换成功，返回redeemed_credits"
+          }
+        }
+      }
+    },
+    "/api/points/earn": {
+      "post": {
+        "tags": [
+          "Points v4"
+        ],
+        "summary": "管理后台手动发放积分",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "user_id",
+                  "amount"
+                ],
+                "properties": {
+                  "user_id": {
+                    "type": "integer"
+                  },
+                  "amount": {
+                    "type": "integer"
+                  },
+                  "remark": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "积分发放成功"
+          }
+        }
+      }
+    },
+    "/api/distribution/invite-code": {
+      "get": {
+        "tags": [
+          "Distribution v4"
+        ],
+        "summary": "我的邀请码",
+        "responses": {
+          "200": {
+            "description": "邀请码+推广链接"
+          }
+        }
+      }
+    },
+    "/api/distribution/team": {
+      "get": {
+        "tags": [
+          "Distribution v4"
+        ],
+        "summary": "我的团队",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "团队成员列表"
+          }
+        }
+      }
+    },
+    "/api/distribution/balance": {
+      "get": {
+        "tags": [
+          "Distribution v4"
+        ],
+        "summary": "佣金余额",
+        "responses": {
+          "200": {
+            "description": "可提现/已结算/待结算"
+          }
+        }
+      }
+    },
+    "/api/distribution/withdraw": {
+      "post": {
+        "tags": [
+          "Distribution v4"
+        ],
+        "summary": "佣金提现",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "amount"
+                ],
+                "properties": {
+                  "amount": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "提现成功，返回withdrawn金额"
+          }
+        }
+      }
+    },
+    "/api/distribution/history": {
+      "get": {
+        "tags": [
+          "Distribution v4"
+        ],
+        "summary": "佣金流水",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "分页佣金记录"
+          }
+        }
+      }
+    },
+    "/api/assets/list": {
+      "get": {
+        "tags": [
+          "Assets v4"
+        ],
+        "summary": "素材库-聚合用户作品",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 24
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "image",
+                "video"
+              ]
+            },
+            "description": "不传则全部"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "作品列表含type/task_type/url/meta"
+          }
+        }
+      }
+    },
+    "/api/platforms/bindings": {
+      "get": {
+        "tags": [
+          "Platform v4"
+        ],
+        "summary": "已绑定平台列表",
+        "responses": {
+          "200": {
+            "description": "用户已绑定的平台账号"
+          }
+        }
+      }
+    },
+    "/api/platforms/bind": {
+      "post": {
+        "tags": [
+          "Platform v4"
+        ],
+        "summary": "绑定新平台",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "platform",
+                  "account_id"
+                ],
+                "properties": {
+                  "platform": {
+                    "type": "string"
+                  },
+                  "bind_type": {
+                    "type": "string",
+                    "default": "shop"
+                  },
+                  "account_id": {
+                    "type": "string"
+                  },
+                  "account_name": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "绑定成功(UPSERT)"
+          }
+        }
+      }
+    },
+    "/api/platforms/bind/{id}": {
+      "delete": {
+        "tags": [
+          "Platform v4"
+        ],
+        "summary": "解绑平台(软删除)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "解绑成功"
+          }
+        }
+      }
+    },
+    "/api/platforms/publish": {
+      "post": {
+        "tags": [
+          "Platform v4"
+        ],
+        "summary": "发布内容到平台(待实现)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "work_id",
+                  "platform"
+                ],
+                "properties": {
+                  "work_id": {
+                    "type": "integer"
+                  },
+                  "platform": {
+                    "type": "string"
+                  },
+                  "content_url": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "已提交发布"
+          }
+        }
+      }
+    },
+    "/api/admin/models/status": {
+      "get": {
+        "tags": [
+          "Admin Models v4"
+        ],
+        "summary": "模型状态+熔断器监控 [admin/super_admin]",
+        "responses": {
+          "200": {
+            "description": "所有模型的状态/熔断器/失败计数"
+          }
+        }
+      }
+    },
+    "/api/admin/models/reset-breaker": {
+      "post": {
+        "tags": [
+          "Admin Models v4"
+        ],
+        "summary": "重置熔断器 [admin/super_admin]",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "model_id"
+                ],
+                "properties": {
+                  "model_id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "熔断器已重置为half-open"
+          }
+        }
+      }
+    },
+    "/api/admin/config/groups": {
+      "get": {
+        "tags": [
+          "Admin Config v4"
+        ],
+        "summary": "所有配置分组 [admin/super_admin]",
+        "responses": {
+          "200": {
+            "description": "分组树列表"
+          }
+        }
+      }
+    },
+    "/api/admin/config/items/{groupKey}": {
+      "get": {
+        "tags": [
+          "Admin Config v4"
+        ],
+        "summary": "分组下所有配置项 [admin/super_admin]",
+        "parameters": [
+          {
+            "name": "groupKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "配置项列表含元数据"
+          }
+        }
+      }
+    },
+    "/api/admin/config": {
+      "post": {
+        "tags": [
+          "Admin Config v4"
+        ],
+        "summary": "写入配置 [admin/super_admin]",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "group_key",
+                  "item_key",
+                  "item_value"
+                ],
+                "properties": {
+                  "group_key": {
+                    "type": "string"
+                  },
+                  "item_key": {
+                    "type": "string"
+                  },
+                  "item_value": {}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "配置已更新，返回change_log"
+          }
+        }
+      }
+    },
+    "/api/admin/config/rollback": {
+      "post": {
+        "tags": [
+          "Admin Config v4"
+        ],
+        "summary": "回滚配置 [admin/super_admin]",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "log_id"
+                ],
+                "properties": {
+                  "log_id": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "配置已回滚"
+          }
+        }
+      }
+    },
+    "/api/admin/config/logs/{group}": {
+      "get": {
+        "tags": [
+          "Admin Config v4"
+        ],
+        "summary": "配置变更日志 [admin/super_admin]",
+        "parameters": [
+          {
+            "name": "group",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "变更日志列表"
+          }
+        }
+      }
+    },
+    "/api/admin/config/seed/verify": {
+      "get": {
+        "tags": [
+          "Admin Config v4"
+        ],
+        "summary": "校验Seed数据完整性 [admin/super_admin]",
+        "responses": {
+          "200": {
+            "description": "校验结果"
+          }
+        }
+      }
+    },
+    "/api/users/register": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "[Legacy] 用户注册",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "username",
+                  "email",
+                  "password"
+                ],
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 30
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 6,
+                    "maxLength": 32
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "注册成功"
+          }
+        }
+      }
+    },
+    "/api/users/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "[Legacy] 用户登录",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "password"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "登录成功"
+          }
+        }
+      }
+    },
+    "/api/users/profile": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "[Legacy] 获取个人资料",
+        "responses": {
+          "200": {
+            "description": "用户信息"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "[Legacy] 更新个人资料",
+        "responses": {
+          "200": {
+            "description": "更新成功"
+          }
+        }
+      }
+    },
+    "/api/templates/platforms": {
+      "get": {
+        "tags": [
+          "Templates"
+        ],
+        "summary": "平台尺寸列表",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "尺寸列表"
+          }
+        }
+      }
+    },
+    "/api/templates/platforms/list": {
+      "get": {
+        "tags": [
+          "Templates"
+        ],
+        "summary": "平台名称列表",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "名称列表"
+          }
+        }
+      }
+    },
+    "/api/templates/platforms/{platform}": {
+      "get": {
+        "tags": [
+          "Templates"
+        ],
+        "summary": "指定平台尺寸",
+        "security": [],
+        "parameters": [
+          {
+            "name": "platform",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "平台尺寸详情"
+          }
+        }
+      }
+    },
+    "/api/templates/my": {
+      "get": {
+        "tags": [
+          "Templates"
+        ],
+        "summary": "我的模板",
+        "responses": {
+          "200": {
+            "description": "模板列表"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Templates"
+        ],
+        "summary": "创建模板",
+        "responses": {
+          "200": {
+            "description": "创建成功"
+          }
+        }
+      }
+    },
+    "/api/templates/my/{id}": {
+      "put": {
+        "tags": [
+          "Templates"
+        ],
+        "summary": "更新模板",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "更新成功"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Templates"
+        ],
+        "summary": "删除模板",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "删除成功"
+          }
+        }
+      }
+    },
+    "/api/images/upload": {
+      "post": {
+        "tags": [
+          "Images"
+        ],
+        "summary": "[Legacy] 上传图片",
+        "responses": {
+          "200": {
+            "description": "上传成功"
+          }
+        }
+      }
+    },
+    "/api/payment/plans": {
+      "get": {
+        "tags": [
+          "Payment"
+        ],
+        "summary": "套餐列表",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "套餐列表"
+          }
+        }
+      }
+    },
+    "/api/payment/create-order": {
+      "post": {
+        "tags": [
+          "Payment"
+        ],
+        "summary": "创建订单",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "planId"
+                ],
+                "properties": {
+                  "planId": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "订单创建成功"
+          }
+        }
+      }
+    },
+    "/api/payment/order/{orderId}": {
+      "get": {
+        "tags": [
+          "Payment"
+        ],
+        "summary": "查询订单",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "订单详情"
+          }
+        }
+      }
+    },
+    "/api/payment/sandbox-pay/{orderId}": {
+      "post": {
+        "tags": [
+          "Payment"
+        ],
+        "summary": "沙箱支付",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "支付成功"
+          }
+        }
+      }
+    },
+    "/api/payment/billing": {
+      "get": {
+        "tags": [
+          "Payment"
+        ],
+        "summary": "账单历史",
+        "responses": {
+          "200": {
+            "description": "账单列表"
+          }
+        }
+      }
+    },
+    "/api/badges": {
+      "get": {
+        "tags": [
+          "Badges"
+        ],
+        "summary": "标签列表",
+        "responses": {
+          "200": {
+            "description": "标签列表"
+          }
+        }
+      }
+    },
+    "/api/badges/{id}": {
+      "get": {
+        "tags": [
+          "Badges"
+        ],
+        "summary": "标签详情",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "详情"
+          }
+        }
+      }
+    },
+    "/api/badges/admin/all": {
+      "get": {
+        "tags": [
+          "Badges"
+        ],
+        "summary": "管理端-所有标签",
+        "responses": {
+          "200": {
+            "description": "全部标签"
+          }
+        }
+      }
+    },
+    "/api/badges/admin": {
+      "post": {
+        "tags": [
+          "Badges"
+        ],
+        "summary": "管理端-创建标签",
+        "responses": {
+          "200": {
+            "description": "创建成功"
+          }
+        }
+      }
+    },
+    "/api/badges/admin/{id}": {
+      "put": {
+        "tags": [
+          "Badges"
+        ],
+        "summary": "管理端-更新标签",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "更新成功"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Badges"
+        ],
+        "summary": "管理端-删除标签",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "删除成功"
+          }
+        }
+      }
+    },
+    "/api/multilingual/languages": {
+      "get": {
+        "tags": [
+          "Multilingual"
+        ],
+        "summary": "语言列表",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "9种语言"
+          }
+        }
+      }
+    },
+    "/api/multilingual/script-types": {
+      "get": {
+        "tags": [
+          "Multilingual"
+        ],
+        "summary": "脚本类型",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "3种脚本类型"
+          }
+        }
+      }
+    },
+    "/api/multilingual/prompt": {
+      "post": {
+        "tags": [
+          "Multilingual"
+        ],
+        "summary": "构建多语言提示词",
+        "responses": {
+          "200": {
+            "description": "生成的提示词"
+          }
+        }
+      }
+    },
+    "/api/compliance/check": {
+      "post": {
+        "tags": [
+          "Compliance"
+        ],
+        "summary": "合规检查",
+        "responses": {
+          "200": {
+            "description": "检查结果"
+          }
+        }
+      }
+    },
+    "/api/compliance/rules": {
+      "get": {
+        "tags": [
+          "Compliance"
+        ],
+        "summary": "合规规则列表",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "规则列表"
+          }
+        }
+      }
+    },
+    "/api/admin/stats": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "[Legacy] 管理端-统计",
+        "responses": {
+          "200": {
+            "description": "平台统计"
+          }
+        }
+      }
+    },
+    "/api/admin/tasks": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "[Legacy] 管理端-任务",
+        "responses": {
+          "200": {
+            "description": "任务列表"
+          }
+        }
+      }
+    },
+    "/api/admin/abuse": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "[Legacy] 管理端-滥用记录",
+        "responses": {
+          "200": {
+            "description": "滥用记录"
+          }
+        }
+      }
+    },
+    "/api/notifications": {
+      "get": {
+        "tags": [
+          "Notifications"
+        ],
+        "summary": "通知列表",
+        "responses": {
+          "200": {
+            "description": "通知列表"
+          }
+        }
+      }
+    },
+    "/api/platforms": {
+      "get": {
+        "tags": [
+          "Platforms"
+        ],
+        "summary": "[Legacy] 全部平台配置",
+        "responses": {
+          "200": {
+            "description": "平台配置"
+          }
+        }
+      }
+    },
+    "/api/platforms/region": {
+      "get": {
+        "tags": [
+          "Platforms"
+        ],
+        "summary": "[Legacy] 按区域获取平台",
+        "responses": {
+          "200": {
+            "description": "分区域列表"
+          }
+        }
+      }
+    },
+    "/api/platforms/{code}": {
+      "get": {
+        "tags": [
+          "Platforms"
+        ],
+        "summary": "[Legacy] 平台详情",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "平台详情"
+          }
+        }
+      }
+    }
+  }
+}

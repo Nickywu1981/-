@@ -1,0 +1,107 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ============ Server Tests ============
+  server-tests:
+    name: Server Tests (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20, 22]
+    defaults:
+      run:
+        working-directory: ./server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: server/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npx eslint src/ --max-warnings 0
+        continue-on-error: true
+
+  # ============ Client Tests ============
+  client-tests:
+    name: Client Tests (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20, 22]
+    defaults:
+      run:
+        working-directory: ./client
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+      - run: npm ci
+      - run: npm test
+        continue-on-error: true
+      - run: npx eslint . --max-warnings 0
+        continue-on-error: true
+
+  # ============ Build Check ============
+  build-check:
+    name: Build Check
+    runs-on: ubuntu-latest
+    needs: [server-tests, client-tests]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build server (syntax check)
+        working-directory: ./server
+        run: npm ci && node -e "import('./src/app.js').then(() => console.log('Server module OK'))"
+      - name: Type check client
+        working-directory: ./client
+        run: npm ci && npx vue-tsc --noEmit
+        continue-on-error: true
+
+  # ============ E2E Tests ============
+  e2e-tests:
+    name: E2E Tests (Playwright)
+    runs-on: ubuntu-latest
+    needs: [server-tests, client-tests]
+    defaults:
+      run:
+        working-directory: ./client
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: client/playwright-report/
+
+  # ============ Docker Build ============
+  docker-build:
+    name: Docker Build
+    runs-on: ubuntu-latest
+    needs: [server-tests, client-tests]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build server image
+        run: docker build -t movio-api ./server
+      - name: Build client image
+        run: docker build -t movio-nuxt ./client

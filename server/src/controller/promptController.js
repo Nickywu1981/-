@@ -1,0 +1,89 @@
+import * as promptService from '../services/promptService.js';
+import { success, error, listResult } from '../utils/response.js';
+import { parsePagination } from '../utils/pagination.js';
+
+// ==================== 模板 ====================
+export async function listTemplates(req, res) {
+  try {
+    const { category, keyword } = req.query;
+    const { page, pageSize } = parsePagination(req.query);
+    const result = await promptService.listAvailable(req.user.id, { category, keyword, page, pageSize });
+    listResult(res, result);
+  } catch (e) { error(res, e.message, 500); }
+}
+
+export async function getTemplateDetail(req, res) {
+  try {
+    const t = await promptService.useTemplate(req.user.id, +req.params.id);
+    if (!t) return error(res, '模板不存在', 404);
+    success(res, t);
+  } catch (e) { error(res, e.message, 500); }
+}
+
+export async function createTemplate(req, res) {
+  try {
+    const id = await promptService.createTemplate(req.user.id, req.body);
+    success(res, { id }, '创建成功');
+  } catch (e) { error(res, e.message, 500); }
+}
+
+export async function submitForReview(req, res) {
+  try {
+    await promptService.submitForReview(req.user.id, +req.params.id);
+    success(res, null, '已提交审核');
+  } catch (e) { error(res, e.message, 500); }
+}
+
+export async function fillAndPreview(req, res) {
+  try {
+    const data = await promptService.fillAndPreview(req.user.id, +req.params.id, req.body.values || {});
+    success(res, data);
+  } catch (e) { error(res, e.message, e.statusCode || 500); }
+}
+
+// ==================== 收藏 ====================
+export async function listFavorites(req, res) {
+  try {
+    const { groupId } = req.query;
+    const { page, pageSize } = parsePagination(req.query);
+    const result = await promptService.listFavorites(req.user.id, { groupId: groupId ? +groupId : undefined, page, pageSize });
+    listResult(res, result);
+  } catch (e) { error(res, e.message, 500); }
+}
+
+export async function toggleFavorite(req, res) {
+  try {
+    const { templateId, groupId } = req.body;
+    const result = await promptService.toggleFavorite(req.user.id, templateId, groupId);
+    success(res, result, result.favorited ? '已收藏' : '已取消');
+  } catch (e) { error(res, e.message, 500); }
+}
+
+// ==================== 分组 ====================
+export async function listGroups(req, res) {
+  try {
+    const groups = await promptService.listGroups(req.user.id);
+    success(res, groups);
+  } catch (e) { error(res, e.message, 500); }
+}
+
+export async function createGroup(req, res) {
+  try {
+    const id = await promptService.createGroup(req.user.id, req.body.name);
+    success(res, { id }, '分组创建成功');
+  } catch (e) { error(res, e.message, 500); }
+}
+
+export async function renameGroup(req, res) {
+  try {
+    await promptService.renameGroup(req.user.id, +req.params.id, req.body.name);
+    success(res, null, '已重命名');
+  } catch (e) { error(res, e.message, 500); }
+}
+
+export async function deleteGroup(req, res) {
+  try {
+    await promptService.removeGroup(req.user.id, +req.params.id);
+    success(res, null, '已删除');
+  } catch (e) { error(res, e.message, 500); }
+}

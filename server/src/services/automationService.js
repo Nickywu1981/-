@@ -1,0 +1,67 @@
+import automationDao from '../dao/automationDao.js';
+
+const TASK_TYPES = ['product_on', 'product_off', 'ship_order', 'reply_review', 'stock_check'];
+const TASK_LABELS = { product_on: '商品上架完成', product_off: '商品下架完成', ship_order: '发货完成', reply_review: '评价回复完成', stock_check: '库存检查完成' };
+
+export async function listTasks(userId, tenantId) {
+  return automationDao.listTasks(userId, tenantId);
+}
+
+export async function createTask(userId, tenantId, { accountId, taskType, taskConfig }) {
+  if (!TASK_TYPES.includes(taskType)) throw Object.assign(new Error('无效的任务类型'), { statusCode: 400 });
+  const id = await automationDao.createTask({
+    tenantId, userId, accountId, taskType,
+    taskConfig: taskConfig ? JSON.stringify(taskConfig) : null,
+  });
+  return { id };
+}
+
+export async function cancelTask(id, userId) {
+  const ok = await automationDao.cancelTask(id, userId);
+  if (!ok) throw Object.assign(new Error('任务不存在或不可取消'), { statusCode: 400 });
+  return true;
+}
+
+export async function executeTask(taskId) {
+  const task = await automationDao.getTaskById(taskId);
+  if (!task) throw Object.assign(new Error('任务不存在'), { statusCode: 404 });
+
+  await automationDao.updateTaskStatus(taskId, 1, { startTime: true });
+
+  // Async mock execution — real env would use Playwright
+  setTimeout(async () => {
+    try {
+      await automationDao.updateTaskStatus(taskId, 2, {
+        endTime: true,
+        resultJson: JSON.stringify({ message: TASK_LABELS[task.task_type] || '执行完成' }),
+        screenshotUrl: `/uploads/screenshots/task_${taskId}.png`,
+      });
+    } catch (e) {
+      await automationDao.updateTaskStatus(taskId, 3, { errorMsg: e.message });
+    }
+  }, 2000);
+
+  return { taskId, status: 1 };
+}
+
+// Account management
+export async function listAccounts(userId, tenantId) {
+  return automationDao.listAccounts(userId, tenantId);
+}
+
+export async function createAccount(userId, tenantId, { platform, storeName, username, password }) {
+  if (!platform || !username || !password) throw Object.assign(new Error('平台、用户名和密码不能为空'), { statusCode: 400 });
+  const encrypted = Buffer.from(password).toString('base64');
+  const id = await automationDao.createAccount({ tenantId, userId, platform, storeName, username, encryptedPassword: encrypted });
+  return { id };
+}
+
+export async function deleteAccount(id, userId) {
+  await automationDao.deleteAccount(id, userId);
+  return true;
+}
+
+// Admin
+export async function listAllTasks() {
+  return automationDao.listAllTasks();
+}

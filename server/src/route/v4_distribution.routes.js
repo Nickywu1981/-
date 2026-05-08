@@ -1,0 +1,138 @@
+/**
+ * Movio AI v4.1 — Distribution Routes (分销系统)
+ * G5 后端开发 | W4
+ * GET  /api/distribution/invite-code  — 我的邀请码
+ * GET  /api/distribution/team          — 我的团队
+ * GET  /api/distribution/balance       — 佣金余额
+ * POST /api/distribution/withdraw      — 提现
+ * GET  /api/distribution/history       — 佣金流水
+ */
+import { Router } from 'express';
+import { z } from 'zod';
+import { success, error } from '../utils/response.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
+import * as distributionService from '../services/distribution.service.js';
+
+const router = Router();
+
+function _validate(schema) {
+  return (req, res, next) => {
+    const r = schema.safeParse(req.body);
+    if (!r.success) {
+      return error(res, ERROR_CODE.VALIDATION_ERROR, r.error.errors.map(e => e.message).join('; '));
+    }
+    req.validated = r.data;
+    next();
+  };
+}
+
+const withdrawSchema = z.object({
+  amount: z.number().positive('提现金额必须大于0').max(100000),
+});
+
+// GET /api/distribution/invite-code
+router.get('/invite-code', async (req, res) => {
+  try {
+    const result = await distributionService.getMyInviteCode(req.user.id);
+    return success(res, result);
+  } catch (err) {
+    return error(res, err.status || 500, err.message, err.status || 500);
+  }
+});
+
+// GET /api/distribution/team
+router.get('/team', async (req, res) => {
+  try {
+    const result = await distributionService.getMyTeam(req.user.id, {
+      page: parseInt(req.query.page) || 1,
+      pageSize: parseInt(req.query.pageSize) || 20,
+    });
+    return success(res, result);
+  } catch (err) {
+    return error(res, err.status || 500, err.message, err.status || 500);
+  }
+});
+
+// GET /api/distribution/balance
+router.get('/balance', async (req, res) => {
+  try {
+    const result = await distributionService.getCommissionBalance(req.user.id);
+    return success(res, result);
+  } catch (err) {
+    return error(res, err.status || 500, err.message, err.status || 500);
+  }
+});
+
+// POST /api/distribution/withdraw
+router.post('/withdraw', _validate(withdrawSchema), async (req, res) => {
+  try {
+    const { amount } = req.validated;
+    const result = await distributionService.withdrawCommission(req.user.id, amount);
+    return success(res, result, `成功提现 ${result.withdrawn} 元`);
+  } catch (err) {
+    return error(res, err.status || 500, err.message, err.status || 500);
+  }
+});
+
+// GET /api/distribution/history
+router.get('/history', async (req, res) => {
+  try {
+    const result = await distributionService.getCommissionHistory(req.user.id, {
+      page: parseInt(req.query.page) || 1,
+      pageSize: parseInt(req.query.pageSize) || 20,
+    });
+    return success(res, result);
+  } catch (err) {
+    return error(res, err.status || 500, err.message, err.status || 500);
+  }
+});
+
+// ── Phase 2: 分销等级 ──
+router.get('/tier', async (req, res) => {
+  try {
+    const result = await distributionService.getUserTier(req.user.id);
+    return success(res, result);
+  } catch (err) {
+    return error(res, err.status || 500, err.message);
+  }
+});
+
+// GET /api/distribution/tiers — 所有等级定义
+router.get('/tiers', (_req, res) => {
+  return success(res, { tiers: distributionService.getDistributionTiers() });
+});
+
+// GET /api/distribution/performance — 团队业绩明细
+router.get('/performance', async (req, res) => {
+  try {
+    const result = await distributionService.getTeamPerformance(req.user.id, {
+      page: parseInt(req.query.page) || 1,
+      pageSize: parseInt(req.query.pageSize) || 20,
+    });
+    return success(res, result);
+  } catch (err) {
+    return error(res, err.status || 500, err.message);
+  }
+});
+
+// GET /api/distribution/promo — 推广素材+邀请链接
+router.get('/promo', async (req, res) => {
+  try {
+    const result = await distributionService.getMyPromoLink(req.user.id);
+    return success(res, result);
+  } catch (err) {
+    return error(res, err.status || 500, err.message);
+  }
+});
+
+// GET /api/distribution/campaigns — 裂变活动列表+进度
+router.get('/campaigns', async (req, res) => {
+  try {
+    const result = await distributionService.getMyCampaignProgress(req.user.id);
+    return success(res, result);
+  } catch (err) {
+    return error(res, err.status || 500, err.message);
+  }
+});
+
+export default router;

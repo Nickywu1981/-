@@ -1,0 +1,56 @@
+import pool from './db.js';
+
+export default {
+  async create(data) {
+    const [r] = await pool.query(
+      `INSERT INTO allinpay_order (reqsn, order_type, business_id, user_id, amount, trxamt, pay_channel, expire_time)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [data.reqsn, data.orderType, data.businessId, data.userId, data.amount, data.trxamt, data.payChannel, data.expireTime],
+    );
+    return r.insertId;
+  },
+
+  async getByReqsn(reqsn) {
+    const [rows] = await pool.query('SELECT * FROM allinpay_order WHERE reqsn = ?', [reqsn]);
+    return rows[0] || null;
+  },
+
+  async markPaid(reqsn, trxid, notifyRaw) {
+    const [r] = await pool.query(
+      `UPDATE allinpay_order SET status = 1, trxid = ?, pay_time = NOW(), notify_raw = ?, update_time = NOW()
+       WHERE reqsn = ? AND status = 0`,
+      [trxid || '', JSON.stringify(notifyRaw || {}), reqsn],
+    );
+    return r.affectedRows;
+  },
+
+  async markFailed(reqsn) {
+    await pool.query(
+      'UPDATE allinpay_order SET status = 2, update_time = NOW() WHERE reqsn = ?',
+      [reqsn],
+    );
+  },
+
+  async markClosed(reqsn) {
+    await pool.query(
+      'UPDATE allinpay_order SET status = 3, update_time = NOW() WHERE reqsn = ? AND status = 0',
+      [reqsn],
+    );
+  },
+
+  async logNotify(data) {
+    await pool.query(
+      `INSERT INTO allinpay_notify_log (reqsn, trxid, notify_body, sign_verified, process_status, process_msg)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [data.reqsn, data.trxid || '', data.notifyBody, data.signVerified, data.processStatus, data.processMsg || ''],
+    );
+  },
+
+  async isCallbackProcessed(reqsn, trxid) {
+    const [rows] = await pool.query(
+      'SELECT COUNT(*) AS cnt FROM allinpay_notify_log WHERE reqsn = ? AND trxid = ? AND process_status = 1',
+      [reqsn, trxid || ''],
+    );
+    return rows[0].cnt > 0;
+  },
+};

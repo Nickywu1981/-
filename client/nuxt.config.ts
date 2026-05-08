@@ -1,0 +1,159 @@
+export default defineNuxtConfig({
+  ssr: true,
+  devtools: { enabled: process.env.NODE_ENV !== 'production' },
+
+  css: ['vant/lib/index.css'],
+
+  app: {
+    head: {
+      title: 'Movio AI — AI电商视觉创作平台',
+      meta: [
+        { charset: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
+        { name: 'description', content: 'Movio AI — 电商AI SaaS，抠图/场景/主图/视频/详情页/虚拟模特，一个工具搞定电商全部图文视频素材' },
+        { name: 'theme-color', content: '#7C3AED' },
+        { 'http-equiv': 'X-UA-Compatible', content: 'IE=edge' },
+        // Content Security Policy (CSP)
+        { 'http-equiv': 'Content-Security-Policy', content: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' wss: ws: http://localhost:3001; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" },
+        // XSS 防护
+        { 'http-equiv': 'X-XSS-Protection', content: '1; mode=block' },
+        // 仅允许同源框架
+        { 'http-equiv': 'X-Frame-Options', content: 'SAMEORIGIN' },
+        // 禁止 MIME 嗅探
+        { 'http-equiv': 'X-Content-Type-Options', content: 'nosniff' },
+        // Referrer 策略
+        { name: 'referrer', content: 'strict-origin-when-cross-origin' },
+        // Apple 移动端 Web App
+        { name: 'apple-mobile-web-app-capable', content: 'yes' },
+        { name: 'apple-mobile-web-app-title', content: 'Movio AI' },
+        { name: 'apple-mobile-web-app-status-bar-style', content: 'default' },
+      ],
+      link: [
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+        { rel: 'manifest', href: '/manifest.json' },
+        // 预连接外部 CDN / API
+        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+        { rel: 'dns-prefetch', href: '//cdn.jsdelivr.net' },
+      ],
+      script: [
+        // 内联暗黑模式防闪烁脚本
+        {
+          innerHTML: '(function(){var t=localStorage.getItem("theme");if(t==="dark"||(!t&&window.matchMedia("(prefers-color-scheme:dark)").matches)){document.documentElement.setAttribute("data-theme","dark")}})()',
+          type: 'text/javascript',
+        },
+      ],
+    },
+  },
+
+  // 实验性功能
+  experimental: {
+    // 组件懒加载水合 — 非视口组件延迟水合
+    asyncContext: true,
+    // 客户端组件按需加载
+    componentIslands: true,
+    // 页面仅客户端渲染按需
+    crossOriginPrefetch: true,
+  },
+
+  typescript: {
+    strict: true,
+    typeCheck: true,
+  },
+
+  modules: ['@nuxtjs/i18n', '@vite-pwa/nuxt'],
+
+  // i18n 多语言配置
+  i18n: {
+    vueI18n: './i18n.config.ts',
+    defaultLocale: 'zh',
+    strategy: 'prefix_except_default',
+  },
+
+  // PWA 渐进式应用配置
+  pwa: {
+    registerType: 'autoUpdate',
+    manifest: {
+      name: 'Movio AI — 电商AI视觉创作平台',
+      short_name: 'Movio AI',
+      description: '电商图片+视频AI一体化创作平台，抠图/场景/主图/视频/详情页/虚拟模特',
+      theme_color: '#7C3AED',
+      background_color: '#ffffff',
+      display: 'standalone',
+      start_url: '/',
+      icons: [
+        { src: '/favicon.svg', sizes: 'any', type: 'image/svg+xml' },
+      ],
+      categories: ['productivity', 'utilities'],
+      lang: 'zh-CN',
+    },
+    workbox: {
+      globPatterns: ['**/*.{js,css,html,png,svg,ico,woff2}'],
+      runtimeCaching: [
+        {
+          urlPattern: '/api/**',
+          handler: 'NetworkFirst',
+          method: 'GET',
+          options: {
+            cacheName: 'api-cache',
+            expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 },
+          },
+        },
+      ],
+    },
+    client: {
+      installPrompt: true,
+    },
+  },
+
+  runtimeConfig: {
+    public: {
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:3001/api',
+      appName: process.env.NUXT_PUBLIC_APP_NAME || 'Movio AI',
+      env: process.env.NUXT_PUBLIC_ENV || 'development',
+    },
+  },
+
+  nitro: {
+    devProxy: {
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+      },
+    },
+    // 生产构建优化
+    compressPublicAssets: true,
+    minify: true,
+    // 静态资源缓存头
+    routeRules: {
+      '/_nuxt/**': { headers: { 'cache-control': 'public, max-age=31536000, immutable' } },
+      '/favicon.svg': { headers: { 'cache-control': 'public, max-age=604800' } },
+      '/manifest.json': { headers: { 'cache-control': 'public, max-age=86400' } },
+    },
+  },
+
+  vite: {
+    css: {
+      preprocessorOptions: {
+        scss: { additionalData: '' },
+      },
+    },
+    build: {
+      // 大依赖拆分，避免单一超大 chunk
+      rollupOptions: {
+        output: {
+          manualChunks(id: string) {
+            if (id.includes('element-plus')) return 'element-plus'
+            if (id.includes('vant')) return 'vant'
+            if (id.includes('chart.js')) return 'chartjs'
+            if (id.includes('vue') || id.includes('pinia')) return 'vue-core'
+          },
+        },
+      },
+    },
+  },
+
+  // Vant UI SSR 兼容
+  build: {
+    transpile: ['vant'],
+  },
+});

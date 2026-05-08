@@ -1,0 +1,46 @@
+{
+  "name": "ai-saas-client",
+  "version": "1.0.0",
+  "description": "电商AI SaaS工具 - Nuxt3前端",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
+  },
+  "dependencies": {
+    "@nuxtjs/i18n": "^10.3.0",
+    "@vite-pwa/nuxt": "^1.1.1",
+    "@vueuse/core": "^14.3.0",
+    "dayjs": "^1.11.20",
+    "echarts": "^6.0.0",
+    "element-plus": "^2.13.7",
+    "js-cookie": "^3.0.5",
+    "nuxt": "^3.15.0",
+    "pinia": "^2.2.0",
+    "qs": "^6.15.1",
+    "vant": "^4.9.24",
+    "vue-echarts": "^8.0.1",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.59.1",
+    "@types/js-cookie": "^3.0.6",
+    "@types/node": "^25.6.0",
+    "@types/qs": "^6.15.1",
+    "@vitest/coverage-v8": "^4.1.5",
+    "@vue/test-utils": "^2.4.10",
+    "happy-dom": "^20.9.0",
+    "jsdom": "^29.1.1",
+    "typescript": "^5.7.0",
+    "vitest": "^4.1.5",
+    "vue-tsc": "^3.2.8"
+  }
+}
