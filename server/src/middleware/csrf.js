@@ -49,6 +49,7 @@ export function csrfProtection(req, res, next) {
 
   // 公开端点无需 CSRF：登录/注册/验证码/密码重置/支付回调
   const publicPaths = ['/api/users/login', '/api/users/register', '/api/users/forgot-password',
+    '/api/auth/login', '/api/auth/register', '/api/auth/forgot-password',
     '/api/sms/send', '/api/email/send', '/api/site-config/public', '/api/health', '/api/metrics',
     '/api/ai-dispatch'];
   if (publicPaths.some(p => req.path.startsWith(p))) {

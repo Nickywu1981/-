@@ -175,7 +175,7 @@ app.use('/api/cut-ecosystem', cutEcosystemRoutesV4);
 app.use('/api/platforms', platformBindRoutesV4);
 app.use('/api/publish', publishRoutesV4);
 app.use('/api/user', userRoutesV4);
-app.use('/api/upload', uploadRoutesV4);  // v4.1 分片上传 (must precede legacy)
+app.use('/api/upload', uploadLimiter, uploadRoutesV4);  // v4.1 分片上传 (must precede legacy)
 
 // Swagger 文档（仅开发环境）
 if (process.env.NODE_ENV !== 'production') {
@@ -195,12 +195,13 @@ app.use('/api/plans', paymentRoutes); // 公开别名
 app.use('/api/admin', adminRoutes);
 app.use('/api/admin/models', adminModelsRoutesV4);
 app.use('/api/test', testWorkbenchRoutesV4);
-app.use('/api/posters', posterRoutesV4);
-app.use('/api/video-translate', videoTranslateRoutesV4);
+app.use('/api/posters', heavyLimiter, posterRoutesV4);
+app.use('/api/video-translate', heavyLimiter, videoTranslateRoutesV4);
+app.use('/api/cut-ecosystem', heavyLimiter, cutEcosystemRoutesV4);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/sms', codeLimiter, smsRoutes);
 app.use('/api/email', emailRoutes);
-app.use('/api/upload', uploadRoutes);
+app.use('/api/upload', uploadLimiter, uploadRoutes);
 app.use('/api/prompts', promptRoutes);
 app.use('/api/credits', creditRoutes);
 app.use('/api/tenants', tenantRoutes);
@@ -224,7 +225,7 @@ app.use('/api/multilingual', multilingualRoutes);
 app.use('/api/compliance', complianceRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/platform-specs', platformSpecRoutes);
-app.use('/api/ai-dispatch', aiDispatchRoutes);  // 多模型统一调度: dispatch/categories/health/stats/cache
+app.use('/api/ai-dispatch', heavyLimiter, aiDispatchRoutes);  // 多模型统一调度: dispatch/categories/health/stats/cache
 
 // 404
 app.use((_req, res) => {
