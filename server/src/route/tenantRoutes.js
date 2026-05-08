@@ -12,12 +12,13 @@ const tenantSchema = z.object({
   domain: z.string().max(200).optional(),
   settings: z.record(z.unknown()).optional(),
 });
+const tenantUpdateSchema = tenantSchema.partial();
 
 router.get('/', authMiddleware, adminAuth, asyncHandler(listTenants));
 router.get('/me', authMiddleware, asyncHandler(getMyTenant));
 router.get('/:id', authMiddleware, adminAuth, asyncHandler(getTenant));
 router.post('/', authMiddleware, adminAuth, validate(tenantSchema), asyncHandler(createTenant));
-router.put('/:id', authMiddleware, adminAuth, validate(tenantSchema), asyncHandler(updateTenant));
+router.put('/:id', authMiddleware, adminAuth, validate(tenantUpdateSchema), asyncHandler(updateTenant));
 router.delete('/:id', authMiddleware, adminAuth, asyncHandler(deleteTenant));
 
 export default router;

@@ -11,6 +11,7 @@ import membershipDao from '../dao/membershipDao.js';
 import rechargeDao from '../dao/rechargeDao.js';
 import * as creditDao from '../dao/creditDao.js';
 import logger from '../utils/logger.js';
+import { BusinessError } from '../utils/businessError.js';
 
 const PLANS = {
   1: { name: '月卡', price: 29, days: 30, credits: 100 },
@@ -68,7 +69,7 @@ export async function handleNotify(body) {
   const verified = allinpaySDK.verifyNotify(body);
   if (!verified) {
     await allinpayDao.logNotify({ reqsn, trxid, notifyBody: JSON.stringify(body), signVerified: 2, processStatus: 2, processMsg: '签名验证失败' });
-    throw new Error('签名验证失败');
+    throw new BusinessError(400, '签名验证失败');
   }
 
   // 3. 幂等检查

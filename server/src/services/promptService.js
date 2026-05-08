@@ -1,3 +1,4 @@
+import { BusinessError } from '../utils/businessError.js';
 import * as promptDao from '../dao/promptDao.js';
 
 // ==================== 变量解析引擎 ====================
@@ -67,7 +68,7 @@ export async function createTemplate(userId, data) {
 
 export async function submitForReview(userId, id) {
   const t = await promptDao.getTemplateById(id);
-  if (!t || t.creator_id !== userId) throw new Error('模板不存在');
+  if (!t || t.creator_id !== userId) throw new BusinessError(404, '模板不存在');
   await promptDao.updateStatus(id, 1, null, '');  // 0→1 待审核
 }
 

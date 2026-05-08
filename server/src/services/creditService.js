@@ -1,4 +1,5 @@
 import * as creditDao from '../dao/creditDao.js';
+import { BusinessError } from '../utils/businessError.js';
 
 // 操作消耗点数额
 const CONSUMPTION_RULES = {
@@ -242,7 +243,7 @@ export async function shareReward(userId) {
   if (record) return { alreadyClaimed: true };
 
   const membership = await creditDao.getMembership(userId);
-  if (!membership) throw new Error('会员不存在');
+  if (!membership) throw new BusinessError(404, '会员不存在');
 
   const creditBefore = membership.credit_balance;
   await creditDao.updateCreditBalance(userId, SHARE_REWARD);

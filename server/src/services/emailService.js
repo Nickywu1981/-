@@ -3,6 +3,8 @@
  * 支持: mock / smtp(QQ/Gmail/163) / sendgrid
  */
 import config from '../config/index.js';
+import { BusinessError } from '../utils/businessError.js';
+import logger from '../utils/logger.js';
 import * as emailTemplateDao from '../dao/emailTemplateDao.js';
 
 const CODE_CACHE = new Map(); // key: email, value: { code, expires, attempts }
@@ -18,7 +20,7 @@ function renderTemplate(templateContent, params) {
 const providers = {
   mock: {
     async send({ email, subject, content }) {
-      console.log(`[Email Mock] → ${email} | ${subject} | code: ${content.match(/\d{6}/)?.[0] || 'N/A'}`);
+      logger.info(`[Email Mock] → ${email} | ${subject} | code: ${content.match(/\d{6}/)?.[0] || 'N/A'}`);
       return { success: true, messageId: `mock_${Date.now()}` };
     },
   },
@@ -26,7 +28,7 @@ const providers = {
   smtp: {
     async send({ email, subject, content }) {
       const cfg = config.email?.smtp || {};
-      if (!cfg.host) throw new Error('SMTP 未配置');
+      if (!cfg.host) throw new BusinessError(503, 'SMTP 未配置');
       // 动态导入 nodemailer（生产按需安装）
       try {
         const nodemailer = await import('nodemailer');
@@ -44,14 +46,14 @@ const providers = {
         });
         return { success: true, messageId: info.messageId };
       } catch (e) {
-        throw new Error(`SMTP 发送失败: ${e.message}`);
+        throw new BusinessError(502, `SMTP 发送失败: ${e.message}`);
       }
     },
   },
 
   sendgrid: {
     async send(_payload) {
-      throw new Error('SendGrid 密钥未配置');
+      throw new BusinessError(503, 'SendGrid 密钥未配置');
     },
   },
 };
@@ -110,7 +112,7 @@ export async function sendVerificationCode(email, scene = 'login') {
       subject = renderTemplate(template.subject, { code });
       html = renderTemplate(template.content, { code });
     } else {
-      throw new Error('模板未找到');
+      throw new BusinessError(404, '模板未找到');
     }
   } catch {
     // 降级内置模板

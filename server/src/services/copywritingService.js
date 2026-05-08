@@ -1,5 +1,6 @@
 import { copywriting, SUPPORTED_LANGUAGES } from './prompts/copywriting.js';
 import { infer } from './aiEngine.js';
+import { BusinessError } from '../utils/businessError.js';
 import * as copywritingDao from '../dao/copywritingDao.js';
 
 // 平台规则配置
@@ -107,7 +108,7 @@ export async function getHistory(userId, { type, page = 1, pageSize = 20 }) {
 
 export async function deleteRecord(id, userId) {
   const ok = await copywritingDao.deleteHistory(id, userId);
-  if (!ok) throw new Error('记录不存在或无权删除');
+  if (!ok) throw new BusinessError(404, '记录不存在或无权删除');
 }
 
 export function getPlatforms() {

@@ -12,8 +12,9 @@ const brandSchema = z.object({
   logo: z.string().optional(),
   description: z.string().optional(),
 });
+const brandUpdateSchema = brandSchema.partial();
 
 router.get('/', authMiddleware, asyncHandler(getBrand));
-router.put('/', authMiddleware, adminAuth, validate(brandSchema), asyncHandler(saveBrand));
+router.put('/', authMiddleware, adminAuth, validate(brandUpdateSchema), asyncHandler(saveBrand));
 
 export default router;

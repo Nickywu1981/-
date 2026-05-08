@@ -6,6 +6,7 @@
 import * as creditDao from '../dao/creditDao.js';
 import * as commerceDao from '../dao/commerceDao.js';
 import { mockEnabled } from '../config/index.js';
+import { BusinessError } from '../utils/businessError.js';
 
 // ==================== 套餐列表 ====================
 
@@ -202,8 +203,8 @@ export async function listAllOrders({ page = 1, pageSize = 20, userId, planType 
 // ==================== 批量操作 ====================
 
 export async function batchUpdateUserStatus(ids, status) {
-  if (!Array.isArray(ids) || ids.length === 0) throw new Error('请选择用户');
-  if (![0, 1].includes(status)) throw new Error('状态值无效（0启用/1禁用）');
+  if (!Array.isArray(ids) || ids.length === 0) throw new BusinessError(400, '请选择用户');
+  if (![0, 1].includes(status)) throw new BusinessError(400, '状态值无效（0启用/1禁用）');
   const affected = await commerceDao.batchUpdateUserStatus(ids, status);
   return { affected };
 }
