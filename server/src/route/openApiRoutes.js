@@ -1,15 +1,13 @@
 /**
  * Open API 路由 — 第三方开发者接入端点
+ * 调用链: Routes → Controller → Service → DAO
  */
 import { Router } from 'express';
 import { openApiAuth, openApiRateLimit } from '../middleware/openApi.js';
-import { success, error } from '../utils/response.js';
-import { ERROR_CODE } from '../constants/errorCode.js';
 import { validate } from '../utils/validate.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { z } from 'zod';
-import * as imageService from '../services/imageService.js';
-import * as videoService from '../services/videoService.js';
+import * as openApiController from '../controller/openApiController.js';
 
 const router = Router();
 
@@ -27,41 +25,16 @@ const videoGenSchema = z.object({
 router.use(openApiAuth);
 router.use(openApiRateLimit);
 
-router.get('/v1/ping', (req, res) => {
-  success(res, { version: '1.0.0', tenantId: req.tenantId });
-});
+router.get('/v1/ping', asyncHandler(openApiController.ping));
 
-router.post('/v1/image/remove-bg', validate(imageUrlSchema), asyncHandler(async (req, res) => {
-  const { imageUrl } = req.body;
-  const result = await imageService.removeBackground(req.tenantId, imageUrl);
-  success(res, result);
-}));
+router.post('/v1/image/remove-bg', validate(imageUrlSchema), asyncHandler(openApiController.removeBackground));
 
-router.post('/v1/image/scene', validate(sceneSchema), asyncHandler(async (req, res) => {
-  const { imageUrl, sceneType } = req.body;
-  const result = await imageService.generateScene(req.tenantId, imageUrl, sceneType);
-  success(res, result);
-}));
+router.post('/v1/image/scene', validate(sceneSchema), asyncHandler(openApiController.generateScene));
 
-router.post('/v1/image/retouch', validate(imageUrlSchema), asyncHandler(async (req, res) => {
-  const { imageUrl } = req.body;
-  const result = await imageService.retouchImage(req.tenantId, imageUrl);
-  success(res, result);
-}));
+router.post('/v1/image/retouch', validate(imageUrlSchema), asyncHandler(openApiController.retouchImage));
 
-router.post('/v1/video/generate', validate(videoGenSchema), asyncHandler(async (req, res) => {
-  const { imageUrls, effect, duration } = req.body;
-  const result = await videoService.generateVideo(req.tenantId, imageUrls, { effect, duration });
-  success(res, result);
-}));
+router.post('/v1/video/generate', validate(videoGenSchema), asyncHandler(openApiController.generateVideo));
 
-router.get('/v1/usage', asyncHandler(async (req, res) => {
-  success(res, {
-    tenantId: req.tenantId,
-    dailyUsed: req.apiKeyRecord && req.apiKeyRecord.daily_used || 0,
-    dailyLimit: req.apiKeyRecord && req.apiKeyRecord.daily_limit || 1000,
-    rateLimit: req.apiKeyRecord && req.apiKeyRecord.rate_limit || 60,
-  });
-}));
+router.get('/v1/usage', asyncHandler(openApiController.getUsage));
 
 export default router;

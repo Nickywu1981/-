@@ -34,13 +34,13 @@ export async function getGroupConfig(groupKey, userId, userRole) {
   try {
     const cached = await redis.get(CACHE_PREFIX + groupKey);
     if (cached) return JSON.parse(cached);
-  } catch {}
+  } catch { /* noop */ }
 
   const items = await configDao.getItemsByGroup(groupKey);
   const result = {};
   for (const item of items) result[item.item_key] = item.item_value ?? item.default_val;
 
-  try { await redis.setex(CACHE_PREFIX + groupKey, CACHE_TTL, JSON.stringify(result)); } catch {}
+  try { await redis.setex(CACHE_PREFIX + groupKey, CACHE_TTL, JSON.stringify(result)); } catch { /* noop */ }
   return result;
 }
 
@@ -48,9 +48,9 @@ export async function getDict(dictKey) {
   try {
     const cached = await redis.get(CACHE_PREFIX + 'dict:' + dictKey);
     if (cached) return JSON.parse(cached);
-  } catch {}
+  } catch { /* noop */ }
   const items = await configDao.getDictItems(dictKey);
-  try { await redis.setex(CACHE_PREFIX + 'dict:' + dictKey, CACHE_TTL, JSON.stringify(items)); } catch {}
+  try { await redis.setex(CACHE_PREFIX + 'dict:' + dictKey, CACHE_TTL, JSON.stringify(items)); } catch { /* noop */ }
   return items;
 }
 
@@ -59,7 +59,7 @@ export async function setConfig(groupKey, itemKey, itemValue, changedBy) {
   if (oldValue === null) throw new BusinessError(404, '配置项不存在');
   await configDao.updateItemValue(groupKey, itemKey, itemValue);
   await configDao.insertLog({ group_key: groupKey, item_key: itemKey, old_value: oldValue, new_value: itemValue, changed_by: changedBy });
-  try { await redis.del(CACHE_PREFIX + groupKey); await broadcastVersion(); } catch {}
+  try { await redis.del(CACHE_PREFIX + groupKey); await broadcastVersion(); } catch { /* noop */ }
   return { group_key: groupKey, item_key: itemKey, old_value: oldValue, new_value: itemValue };
 }
 
@@ -68,7 +68,7 @@ export async function rollbackConfig(logId, changedBy) {
   if (!log) throw new BusinessError(404, '变更记录不存在');
   await configDao.updateItemValue(log.group_key, log.item_key, log.old_value);
   await configDao.insertLog({ group_key: log.group_key, item_key: log.item_key, old_value: log.new_value, new_value: log.old_value, changed_by: changedBy });
-  try { await redis.del(CACHE_PREFIX + log.group_key); await broadcastVersion(); } catch {}
+  try { await redis.del(CACHE_PREFIX + log.group_key); await broadcastVersion(); } catch { /* noop */ }
   return { message: '回滚成功', group_key: log.group_key, item_key: log.item_key };
 }
 
