@@ -39,7 +39,7 @@ const configDao = {
 
   async listLogs({ limit = 20, offset = 0 } = {}) {
     const [rows] = await pool.query(
-      'SELECT cl.*, u.nickname FROM sys_config_log cl LEFT JOIN users u ON cl.changed_by = u.id ORDER BY cl.id DESC LIMIT ? OFFSET ?',
+      'SELECT cl.*, u.nickname FROM sys_config_log cl LEFT JOIN user u ON cl.changed_by = u.id ORDER BY cl.id DESC LIMIT ? OFFSET ?',
       [Number(limit), Number(offset)],
     );
     const [cnt] = await pool.execute('SELECT COUNT(*) as total FROM sys_config_log');
