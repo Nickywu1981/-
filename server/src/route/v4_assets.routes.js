@@ -4,16 +4,22 @@
  * GET /api/assets/list — 聚合用户所有作品(图片+视频)
  */
 import { Router } from 'express';
+import z from 'zod';
 import { success, error } from '../utils/response.js';
+import { validate } from '../utils/validate.js';
 import db from '../dao/db.js';
 
 const router = Router();
 
-router.get('/list', async (req, res) => {
+const listQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).optional().default(1),
+  pageSize: z.coerce.number().int().min(1).max(100).optional().default(24),
+  type: z.enum(['image', 'video']).optional(),
+});
+
+router.get('/list', validate(listQuerySchema, 'query'), async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const pageSize = parseInt(req.query.pageSize) || 24;
-    const type = req.query.type; // image | video
+    const { page, pageSize, type } = req.query;
 
     const conn = await db.getConnection();
     try {
