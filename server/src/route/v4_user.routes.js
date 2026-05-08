@@ -8,7 +8,7 @@
  */
 import { Router } from 'express';
 import { z } from 'zod';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { success, error } from '../utils/response.js';
 import { authMiddleware } from '../middleware/auth.js';
 import db from '../dao/db.js';
