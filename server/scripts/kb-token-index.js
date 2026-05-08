@@ -304,27 +304,52 @@ writeFileSync(outPath, JSON.stringify(index, null, 2), 'utf8');
 
 const queryArg = process.argv.find(a => a.startsWith('--query='));
 if (queryArg) {
-  const query = queryArg.replace('--query=', '').trim();
-  const results = index.tokens[query];
-  if (results) {
-    console.error(`\n🔍 "${query}" → ${results.length} 处匹配:\n`);
-    for (const r of results) {
-      console.error(`  [${r.type}] ${r.file}:${r.line}`);
+  const rawQuery = queryArg.replace('--query=', '').trim();
+
+  function search(query) {
+    // 1) 精确匹配
+    if (index.tokens[query]) return { mode: 'exact', results: index.tokens[query], matchedKey: query };
+
+    // 2) ClassName.method 格式 → 提取 method 名 + 按文件过滤
+    const dotIdx = query.lastIndexOf('.');
+    if (dotIdx > 0) {
+      const className = query.slice(0, dotIdx);
+      const methodName = query.slice(dotIdx + 1);
+      if (index.tokens[methodName]) {
+        const filtered = index.tokens[methodName].filter(r =>
+          r.file.toLowerCase().includes(className.toLowerCase())
+        );
+        if (filtered.length > 0) return { mode: 'scoped', results: filtered, matchedKey: methodName };
+        return { mode: 'exact', results: index.tokens[methodName], matchedKey: methodName };
+      }
     }
-  } else {
-    // 模糊搜索
+
+    // 3) 子串模糊
     const fuzzy = Object.keys(index.tokens)
       .filter(k => k.toLowerCase().includes(query.toLowerCase()))
       .slice(0, 20);
-    if (fuzzy.length > 0) {
-      console.error(`\n🔍 "${query}" → 精确匹配 0，模糊匹配 ${fuzzy.length} 个:\n`);
-      for (const f of fuzzy) {
+    if (fuzzy.length > 0) return { mode: 'fuzzy', fuzzy, matchedKey: null };
+
+    return null;
+  }
+
+  const result = search(rawQuery);
+  if (result) {
+    if (result.mode === 'fuzzy') {
+      console.error(`\n🔍 "${rawQuery}" → 精确匹配 0，模糊匹配 ${result.fuzzy.length} 个:\n`);
+      for (const f of result.fuzzy) {
         const locs = index.tokens[f];
         console.error(`  ${f} → ${locs.map(l => `[${l.type}] ${l.file}:${l.line}`).join(', ')}`);
       }
     } else {
-      console.error(`\n🔍 "${query}" → 未找到任何匹配\n`);
+      const tag = result.mode === 'scoped' ? ` (${result.mode}: ${result.matchedKey} + 文件过滤)` : ` (${result.mode})`;
+      console.error(`\n🔍 "${rawQuery}" → ${result.results.length} 处匹配${tag}:\n`);
+      for (const r of result.results) {
+        console.error(`  [${r.type}] ${r.file}:${r.line}`);
+      }
     }
+  } else {
+    console.error(`\n🔍 "${rawQuery}" → 未找到任何匹配\n`);
   }
 } else {
   // 标准输出 JSON

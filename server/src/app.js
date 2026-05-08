@@ -5,7 +5,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
-import { apiLimiter, authLimiter, codeLimiter, heavyLimiter, uploadLimiter, aiConcurrencyGuard } from './middleware/rateLimiter.js';
+import { apiLimiter, authLimiter, codeLimiter, heavyLimiter, uploadLimiter } from './middleware/rateLimiter.js';
 import { sqlGuardMiddleware } from './utils/sqlGuard.js';
 import { requestLogger } from './utils/logger.js';
 import { error as sendError } from './utils/response.js';
@@ -122,21 +122,24 @@ app.use(authMiddleware);
 app.use(tenantContext);
 app.use(auditLogMiddleware);
 
-// 健康检查 — DB 必须在线，Redis 离线仅标记 degraded 不阻塞探活
+// 健康检查 — DB 必须在线，Redis 离线仅标记 degraded，同步检测 AI 模型状态
 app.get('/api/health', async (_req, res) => {
   const status = {
     status: 'ok',
     uptime: Math.floor(process.uptime()),
     memory: Math.round(process.memoryUsage().rss / 1024 / 1024),
     node: process.version,
-    checks: { db: false, redis: false },
+    checks: { db: false, redis: false, ai: {} },
   };
   try { const db = await import('./dao/db.js'); const conn = await db.default.getConnection(); conn.release(); status.checks.db = true; } catch { /* ignore */ }
   try { const redis = await import('./dao/redis.js'); await redis.default.ping(); status.checks.redis = true; } catch { /* ignore */ }
-  status.degraded = !status.checks.redis;
+  try { const { listModels } = await import('./services/aiEngine.js'); for (const m of listModels()) { status.checks.ai[m.id] = m.health ? (await m.health()).status : 'unknown'; } } catch { /* ignore */ }
+  const aiOnline = Object.values(status.checks.ai).filter((s) => s === 'ok').length;
+  const aiTotal = Object.keys(status.checks.ai).length;
+  status.degraded = !status.checks.redis || (aiTotal > 0 && aiOnline === 0);
   res.status(status.checks.db ? 200 : 503).json({
     code: status.checks.db ? 200 : 503,
-    msg: status.checks.db ? (status.checks.redis ? 'ok' : 'degraded') : 'db_down',
+    msg: status.checks.db ? (status.degraded ? 'degraded' : 'ok') : 'db_down',
     data: status,
   });
 });
