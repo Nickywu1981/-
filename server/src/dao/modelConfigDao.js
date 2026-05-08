@@ -101,7 +101,8 @@ export async function queryCallLogs({ userId, modelKey, status, days = 7, offset
   if (userId) { conditions.push('user_id = ?'); params.push(userId); }
   if (modelKey) { conditions.push('model_key = ?'); params.push(modelKey); }
   if (status) { conditions.push('status = ?'); params.push(status); }
-  conditions.push(`created_at >= DATE_SUB(NOW(), INTERVAL ${parseInt(days)} DAY)`);
+  conditions.push('created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)');
+  params.push(parseInt(days) || 7);
   const [rows] = await _db().query(
     `SELECT * FROM ai_call_log WHERE ${conditions.join(' AND ')} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
     [...params, parseInt(limit), parseInt(offset)],
