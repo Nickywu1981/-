@@ -11,51 +11,65 @@
         <div class="stat-card"><span class="stat-val">&yen;{{ fmtNum(stats.totalRevenue) }}</span><span class="stat-lbl">总收入</span></div>
       </div>
       <div class="chart-grid">
-        <div class="chart-box"><h3>任务趋势 (7天)</h3><canvas id="chartTasks" height="200"></canvas></div>
-        <div class="chart-box"><h3>用户增长 (7天)</h3><canvas id="chartUsers" height="200"></canvas></div>
-        <div class="chart-box"><h3>收入趋势 (7天)</h3><canvas id="chartRevenue" height="200"></canvas></div>
+        <div class="chart-box"><h3>任务趋势 (7天)</h3><VChart v-if="taskOption" :option="taskOption" autoresize /></div>
+        <div class="chart-box"><h3>用户增长 (7天)</h3><VChart v-if="userOption" :option="userOption" autoresize /></div>
+        <div class="chart-box"><h3>收入趋势 (7天)</h3><VChart v-if="revenueOption" :option="revenueOption" autoresize /></div>
       </div>
     </template>
     <div v-else class="empty">加载统计数据失败</div>
   </AdminLayout>
 </template>
+
 <script setup lang="ts">
+import VChart from 'vue-echarts'
+import { use } from 'echarts/core'
+import { BarChart } from 'echarts/charts'
+import { GridComponent, TooltipComponent } from 'echarts/components'
+import { CanvasRenderer } from 'echarts/renderers'
+
+use([BarChart, GridComponent, TooltipComponent, CanvasRenderer])
+
 definePageMeta({ middleware: 'auth' })
 const loading = ref(true), stats = ref<any>(null)
+const toast = useToast()
 
 function fmtNum(n: number) { return n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(n || 0) }
-const toast = useToast()
 
 onMounted(async () => {
   try {
     const data: any = await $fetch('/api/admin/stats', { credentials: 'include' })
     if (data?.code === 200) stats.value = data.data
-  } catch(e: any) { toast.error(e.data?.msg || '加载失败') }
+  } catch (e: any) { toast.error(e.data?.msg || '加载失败') }
   loading.value = false
 })
 
-watch(stats, (val) => {
-  if (!val?.trends) return
-  nextTick(() => {
-    const colors = { tasks: '#7C3AED', users: '#3B82F6', revenue: '#10B981' }
-    ;[['chartTasks', val.trends.tasks, colors.tasks], ['chartUsers', val.trends.users, colors.users], ['chartRevenue', val.trends.revenue, colors.revenue]].forEach(([id, data, color]) => {
-      const canvas = document.getElementById(id as string)
-      if (!canvas || !data) return
-      const labels = data.map((d: any) => d.date?.slice(5) || '')
-      const values = data.map((d: any) => d.value || 0)
-      new (window as any).Chart(canvas, {
-        type: 'bar',
-        data: { labels, datasets: [{ data: values, backgroundColor: color, borderRadius: 4 }] },
-        options: {
-          responsive: true, maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: { y: { beginAtZero: true, grid: { color: '#f3f4f6' } }, x: { grid: { display: false } } },
-        },
-      })
-    })
-  })
-})
+function makeOption(data: any[], color: string) {
+  if (!data?.length) return null
+  return {
+    grid: { top: 8, right: 8, bottom: 24, left: 36 },
+    tooltip: { trigger: 'axis' as const },
+    xAxis: {
+      type: 'category' as const,
+      data: data.map((d: any) => d.date?.slice(5) || ''),
+      axisLine: { lineStyle: { color: '#e5e7eb' } },
+    },
+    yAxis: {
+      type: 'value' as const,
+      splitLine: { lineStyle: { color: '#f3f4f6' } },
+    },
+    series: [{
+      type: 'bar',
+      data: data.map((d: any) => d.value || 0),
+      itemStyle: { color, borderRadius: [4, 4, 0, 0] },
+    }],
+  }
+}
+
+const taskOption = computed(() => stats.value?.trends?.tasks ? makeOption(stats.value.trends.tasks, '#7C3AED') : null)
+const userOption = computed(() => stats.value?.trends?.users ? makeOption(stats.value.trends.users, '#3B82F6') : null)
+const revenueOption = computed(() => stats.value?.trends?.revenue ? makeOption(stats.value.trends.revenue, '#10B981') : null)
 </script>
+
 <style scoped>
 h2 { font-size: 22px; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; }
 .stats-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
@@ -63,7 +77,7 @@ h2 { font-size: 22px; font-weight: 700; color: var(--text-primary); margin-botto
 .stat-val { font-size: 24px; font-weight: 700; color: var(--brand); }
 .stat-lbl { font-size: 13px; color: var(--text-muted); }
 .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.chart-box { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 20px; }
+.chart-box { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 20px; min-height: 260px; }
 .chart-box h3 { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px; }
 .empty { text-align: center; color: var(--text-muted); padding: 60px; }
 @media (max-width: 768px) {
