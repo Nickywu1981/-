@@ -5,7 +5,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
-import rateLimit from 'express-rate-limit';
+import { apiLimiter, authLimiter, codeLimiter, heavyLimiter, uploadLimiter, aiConcurrencyGuard } from './middleware/rateLimiter.js';
 import { sqlGuardMiddleware } from './utils/sqlGuard.js';
 import { requestLogger } from './utils/logger.js';
 import { error as sendError } from './utils/response.js';
@@ -96,14 +96,8 @@ app.use(compression());
 // Prometheus 指标采集
 app.use(metricsMiddleware);
 
-// 请求限流（读取环境变量配置）
-app.use(rateLimit({
-  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 60000,
-  max: parseInt(process.env.RATE_LIMIT_MAX, 10) || 200,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { code: 429, msg: '请求过于频繁，请稍后再试', data: null },
-}));
+// 请求限流（全局限流 + 按需在各路由叠加严格限流）
+app.use(apiLimiter);
 
 // 解析
 app.use(express.json({ limit: '10mb' }));
@@ -164,11 +158,12 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads'), {
 
 // 路由注册
 // v4.1 路由 (2026-05-08)
-app.use('/api/auth', authRoutes);
+// v4.1 路由 (2026-05-08) — 认证限流 10次/分钟
+app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/config', configPublicRouter);
 app.use('/api/admin/config', configAdminRouter);
-app.use('/api/images', imageRoutesV4);
-app.use('/api/ai', imageRoutesV4);  // /api/ai/enhance-prompt 也在 v4_image.routes 中
+app.use('/api/images', heavyLimiter, imageRoutesV4);
+app.use('/api/ai', heavyLimiter, imageRoutesV4);  // /api/ai/enhance-prompt 也在 v4_image.routes 中
 app.use('/api/detail', detailRoutesV4);
 app.use('/api/videos', videoRoutesV4);
 app.use('/api/jobs', jobRoutesV4);
