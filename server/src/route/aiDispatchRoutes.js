@@ -12,6 +12,8 @@ import { dispatch, getCategories, getModelsByCategory, getUsageStats, healthChec
 import { authMiddleware } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
+import { success, error } from '../utils/response.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 const router = Router();
 
@@ -38,29 +40,32 @@ const dispatchSchema = z.object({
 // ==================== POST /api/ai/dispatch ====================
 
 router.post('/dispatch', authMiddleware, heavyLimiter, asyncHandler(async (req, res) => {
-  const parsed = dispatchSchema.parse(req.body);
-  const { mode, taskType, input, modelId, customConfig, skipCache } = parsed;
+  const parsed = dispatchSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return error(res, ERROR_CODE.VALIDATION_ERROR, parsed.error.errors.map(e => e.message).join('; '));
+  }
+  const { mode, taskType, input, modelId, customConfig, skipCache } = parsed.data;
 
   const result = await dispatch(
     { mode, taskType, input, modelId, customConfig },
     { skipCache, userId: req.user?.id },
   );
 
-  res.json({ success: true, data: result });
+  return success(res, result);
 }));
 
 // ==================== GET /api/ai/categories ====================
 
 router.get('/categories', asyncHandler(async (_req, res) => {
   const categories = getCategories();
-  res.json({ success: true, data: categories });
+  return success(res, categories);
 }));
 
 // ==================== GET /api/ai/categories/:category ====================
 
 router.get('/categories/:category', asyncHandler(async (req, res) => {
   const models = getModelsByCategory(req.params.category);
-  res.json({ success: true, data: { category: req.params.category, models: models.map((m) => m.id) } });
+  return success(res, { category: req.params.category, models: models.map((m) => m.id) });
 }));
 
 // ==================== GET /api/ai/health ====================
@@ -72,21 +77,21 @@ router.get('/health', asyncHandler(async (_req, res) => {
     acc[k] = extensionHooks[k] ? 'registered' : 'available';
     return acc;
   }, {});
-  res.json({ success: true, data: { health, stats, extensions } });
+  return success(res, { health, stats, extensions });
 }));
 
 // ==================== GET /api/ai/stats ====================
 
 router.get('/stats', authMiddleware, asyncHandler(async (_req, res) => {
   const stats = getUsageStats();
-  res.json({ success: true, data: stats });
+  return success(res, stats);
 }));
 
 // ==================== POST /api/ai/cache/clear ====================
 
 router.post('/cache/clear', authMiddleware, asyncHandler(async (_req, res) => {
   clearCache();
-  res.json({ success: true, message: 'AI 推理缓存已清除' });
+  return success(res, {}, 'AI 推理缓存已清除');
 }));
 
 export default router;
