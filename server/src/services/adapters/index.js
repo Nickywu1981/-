@@ -10,6 +10,7 @@
 import { registerOpenAI } from './openaiAdapter.js';
 import { registerClaude } from './claudeAdapter.js';
 import { registerSD } from './sdAdapter.js';
+import logger from '../../utils/logger.js';
 
 export async function registerAllAdapters() {
   console.log('[AI] ========== 注册 AI 模型适配器 ==========');
@@ -23,7 +24,7 @@ export async function registerAllAdapters() {
 
   results.forEach((r, i) => {
     const name = ['OpenAI', 'Claude', 'SD'][i];
-    if (r.status === 'rejected') console.error(`[AI] ${name} 注册失败:`, r.reason.message);
+    if (r.status === 'rejected') logger.error(`[AI] ${name} 注册失败: ${r.reason.message}`);
   });
 
   const { listModels } = await import('../aiEngine.js');

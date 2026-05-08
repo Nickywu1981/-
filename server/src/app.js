@@ -8,6 +8,7 @@ import cookieParser from 'cookie-parser';
 import { apiLimiter, authLimiter, codeLimiter, heavyLimiter, uploadLimiter } from './middleware/rateLimiter.js';
 import { sqlGuardMiddleware } from './utils/sqlGuard.js';
 import { requestLogger } from './utils/logger.js';
+import logger from './utils/logger.js';
 import { error as sendError } from './utils/response.js';
 import { ERROR_CODE } from './constants/errorCode.js';
 import swaggerUi from 'swagger-ui-express';
@@ -275,7 +276,7 @@ app.use((_req, res) => {
 
 // 全局异常捕获
 app.use((err, _req, res, _next) => {
-  console.error('[Server Error]', err);
+  logger.error('[Server Error]', { message: err.message, stack: err.stack });
   sendError(res, ERROR_CODE.INTERNAL_ERROR, '服务器内部错误');
 });
 

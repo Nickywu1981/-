@@ -3,6 +3,7 @@
  * 追踪关键转化事件：注册/首次上传/首次生成/付费
  */
 import pool from '../dao/db.js';
+import logger from '../utils/logger.js';
 
 // 事件类型常量
 export const EVENT = {
@@ -37,7 +38,7 @@ export async function trackEvent(userId, event, metadata = {}) {
     );
   } catch (err) {
     // 埋点失败不阻塞业务
-    console.error('[Analytics] trackEvent error:', err.message);
+    logger.warn(`[Analytics] trackEvent error: ${err.message}`);
   }
 }
 

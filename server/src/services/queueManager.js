@@ -12,6 +12,8 @@
  *   Worker → process job → updateTaskStatus → WebSocket push 进度
  */
 
+import logger from '../utils/logger.js';
+
 let Queue, Worker;
 let bullmqAvailable = false;
 let redisAvailable = false;
@@ -24,7 +26,7 @@ async function ensureBullMQ() {
     Worker = m.Worker;
     bullmqAvailable = true;
   } catch {
-    console.warn('[BullMQ] bullmq 未安装 — 队列功能降级为同步直通模式');
+    logger.warn('[BullMQ] bullmq 未安装 — 队列功能降级为同步直通模式');
     bullmqAvailable = false;
   }
 }
@@ -92,11 +94,11 @@ export function registerWorker(name, processor) {
   });
 
   worker.on('completed', (job) => {
-    console.log(`[BullMQ] ${name} #${job.id} 完成`);
+    logger.info(`[BullMQ] ${name} #${job.id} 完成`);
   });
 
   worker.on('failed', (job, err) => {
-    console.error(`[BullMQ] ${name} #${job?.id} 失败:`, err.message);
+    logger.error(`[BullMQ] ${name} #${job?.id} 失败: ${err.message}`);
   });
 
   workerInstances.set(name, worker);

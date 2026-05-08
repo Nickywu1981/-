@@ -8,6 +8,8 @@
  * 每个模型实现 { id, type, infer(input) → output, health() → status }
  */
 
+import logger from '../utils/logger.js';
+
 // ==================== 模型注册中心 ====================
 
 const registry = new Map();
@@ -17,7 +19,7 @@ export function registerModel(model) {
     throw new Error('AI模型注册失败: 缺少 id/type/infer 字段');
   }
   registry.set(model.id, model);
-  console.log(`[AI] 模型已注册: ${model.id} (${model.type})`);
+  logger.info(`[AI] 模型已注册: ${model.id} (${model.type})`);
 }
 
 export function getModel(id) {
@@ -161,7 +163,7 @@ export async function infer(modelId, input, options = {}) {
       return output;
     } catch (err) {
       lastError = err;
-      console.error(`[AI] 调用失败 (${currentModelId}, attempt ${attempt + 1}/${maxRetries + 1}):`, err.message);
+      logger.error(`[AI] 调用失败 (${currentModelId}, attempt ${attempt + 1}/${maxRetries + 1}): ${err.message}`);
 
       if (attempt < maxRetries) {
         await new Promise((r) => setTimeout(r, INFER_CONFIG.retryDelayMs * (attempt + 1)));

@@ -1,4 +1,5 @@
 import tierService from '../services/tierService.js';
+import logger from '../utils/logger.js';
 
 /**
  * 会员等级限制中间件
@@ -20,7 +21,7 @@ export function tierGuard(type = 'image') {
       next();
     } catch (err) {
       // 限额检查失败不影响主流程，放行
-      console.error('[TierGuard]', err);
+      logger.warn('[TierGuard]', { message: err.message });
       next();
     }
   };

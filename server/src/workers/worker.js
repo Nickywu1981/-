@@ -5,6 +5,7 @@
  * 用法: node server/src/workers/worker.js
  */
 import '../utils/env.js'; // 确保环境变量已加载
+import logger from '../utils/logger.js';
 import * as jobQueueService from '../services/job-queue.service.js';
 import * as aiCaller from '../utils/ai-caller.js';
 import * as _circuitBreaker from '../utils/circuit-breaker.js';
@@ -68,9 +69,9 @@ async function processJob(job) {
       completed_at: new Date().toISOString(),
     });
 
-    console.log(`[Worker] Job #${job.id} (${job.task_type}) completed`);
+    logger.info(`[Worker] Job #${job.id} (${job.task_type}) completed`);
   } catch (err) {
-    console.error(`[Worker] Job #${job.id} failed:`, err.message);
+    logger.error(`[Worker] Job #${job.id} failed: ${err.message}`);
     await jobQueueService.failJob(job.id, err.message);
   } finally {
     activeJobs--;
@@ -89,15 +90,15 @@ async function poll() {
         }
       }
     } catch (err) {
-      console.error('[Worker] Poll error:', err.message);
+      logger.error(`[Worker] Poll error: ${err.message}`);
     }
     await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL));
   }
 }
 
 // 优雅退出
-process.on('SIGTERM', () => { running = false; console.log('[Worker] SIGTERM received, shutting down...'); });
-process.on('SIGINT', () => { running = false; console.log('[Worker] SIGINT received, shutting down...'); });
+process.on('SIGTERM', () => { running = false; logger.info('[Worker] SIGTERM received, shutting down...'); });
+process.on('SIGINT', () => { running = false; logger.info('[Worker] SIGINT received, shutting down...'); });
 
-console.log('[Worker] Job queue worker started');
+logger.info('[Worker] Job queue worker started');
 poll();

@@ -1,6 +1,7 @@
 import sharp from 'sharp';
 import fs from 'fs/promises';
 import path from 'path';
+import logger from './logger.js';
 
 /**
  * 图片 WebP 格式转换工具
@@ -40,7 +41,7 @@ export async function convertToWebP(filePath) {
 
     return webpPath;
   } catch (err) {
-    console.error(`[WebP] 转换失败: ${filePath}`, err.message);
+    logger.error(`[WebP] 转换失败: ${filePath} - ${err.message}`);
     return filePath;
   }
 }

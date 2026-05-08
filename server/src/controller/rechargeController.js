@@ -1,6 +1,7 @@
 import * as rechargeService from '../services/rechargeService.js';
 import * as allinpayService from '../services/allinpayService.js';
 import { success, error } from '../utils/response.js';
+import logger from '../utils/logger.js';
 
 export async function getRates(req, res) {
   success(res, rechargeService.getRates());
@@ -18,7 +19,7 @@ export async function handleCallback(req, res) {
   try {
     await rechargeService.handleCallback(req.params.channel, req.body);
     res.send('success');
-  } catch (e) { console.error('[Callback Error]', e); res.send('fail'); }
+  } catch (e) { logger.error('[Callback Error]', { message: e.message }); res.send('fail'); }
 }
 
 export async function checkPaymentResult(req, res) {
