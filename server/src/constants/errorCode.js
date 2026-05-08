@@ -31,6 +31,7 @@ export const ERROR_CODE = {
   // 业务 - 参数
   PARAM_MISSING: 4201,
   PARAM_INVALID: 4202,
+  PARAM_ERROR: 4203,
 
   // 业务 - 支付
   PAY_ORDER_NOT_FOUND: 4301,
@@ -39,6 +40,12 @@ export const ERROR_CODE = {
   PAY_CHANNEL_ERROR: 4304,
   PAY_AMOUNT_MISMATCH: 4305,
   PAY_NOTIFY_FAILED: 4306,
+
+  // 业务 - 内容审核
+  CONTENT_MODERATION: 4401,
+
+  // 业务 - 发布校验
+  PUBLISH_VALIDATION: 4402,
 };
 
 export const ERROR_MSG = {
@@ -64,6 +71,7 @@ export const ERROR_MSG = {
 
   [ERROR_CODE.PARAM_MISSING]: '缺少必要参数',
   [ERROR_CODE.PARAM_INVALID]: '参数格式错误',
+  [ERROR_CODE.PARAM_ERROR]: '参数错误',
 
   [ERROR_CODE.PAY_ORDER_NOT_FOUND]: '支付订单不存在',
   [ERROR_CODE.PAY_ORDER_EXPIRED]: '支付订单已过期',
