@@ -32,6 +32,7 @@ export const ERROR_CODE = {
   PARAM_MISSING: 4201,
   PARAM_INVALID: 4202,
   PARAM_ERROR: 4203,
+  VALIDATION_ERROR: 4901, // Zod schema 校验失败
 
   // 业务 - 支付
   PAY_ORDER_NOT_FOUND: 4301,
