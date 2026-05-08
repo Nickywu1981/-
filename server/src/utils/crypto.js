@@ -5,7 +5,7 @@
 import crypto from 'crypto';
 
 const ALGORITHM = 'aes-256-gcm';
-const SECRET_KEY = Buffer.from(process.env.ENCRYPTION_KEY || 'movio-dev-key-32-chars-long!!', 'utf8');
+const SECRET_KEY = Buffer.from(process.env.ENCRYPTION_KEY || 'movio-dev-encryption-key-32bytes', 'utf8');
 
 export function encrypt(text) {
   if (!text) return '';
