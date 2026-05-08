@@ -92,6 +92,7 @@ async function handleSmsRegister() {
       body: { phone: smsPhone.value, password: `sms_${smsPhone.value}`, nickname: smsNickname.value || smsPhone.value },
       credentials: 'include',
     });
+    await useAuthStore().fetchUser();
     navigateTo('/workspace');
   } catch (e: any) { msg.value = e.data?.msg || '注册失败'; msgErr.value = true; }
   loading.value = false;
@@ -118,6 +119,7 @@ async function handleEmailRegister() {
       body: { email: emailAddr.value, password: `email_${emailAddr.value}`, nickname: emailNickname.value || emailAddr.value },
       credentials: 'include',
     });
+    await useAuthStore().fetchUser();
     navigateTo('/workspace');
   } catch (e: any) { msg.value = e.data?.msg || '注册失败'; msgErr.value = true; }
   loading.value = false;

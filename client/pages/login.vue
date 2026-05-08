@@ -106,6 +106,7 @@ async function handleSmsLogin() {
       body: { phone: smsPhone.value },
       credentials: 'include',
     });
+    await useAuthStore().fetchUser();
     navigateTo('/workspace');
   } catch (e: any) { msg.value = e.data?.msg || '登录失败'; msgErr.value = true; }
   loading.value = false;
@@ -132,6 +133,7 @@ async function handleEmailLogin() {
       body: { email: emailAddr.value },
       credentials: 'include',
     });
+    await useAuthStore().fetchUser();
     navigateTo('/workspace');
   } catch (e: any) { msg.value = e.data?.msg || '登录失败'; msgErr.value = true; }
   loading.value = false;
