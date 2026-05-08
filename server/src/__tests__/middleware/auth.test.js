@@ -50,7 +50,8 @@ describe('authMiddleware', () => {
     req.headers.authorization = 'Bearer valid_token';
     jwt.verify.mockReturnValue({ userId: 1, username: 'test' });
     await authMiddleware(req, res, next);
-    expect(req.user).toEqual({ userId: 1, username: 'test' });
+    expect(req.user).toMatchObject({ id: 1 });
+    expect(req.user.role).toBeDefined();
     expect(next).toHaveBeenCalled();
   });
 
