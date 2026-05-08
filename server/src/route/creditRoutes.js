@@ -8,16 +8,16 @@ import { z } from 'zod';
 const router = Router();
 
 const freezeSchema = z.object({
-  taskId: idSchema,
-  credits: z.coerce.number().int().min(1, '算力至少为1'),
-  remark: z.string().max(500).optional(),
+  requestId: z.string().min(1, 'requestId 不能为空'),
+  action: z.string().min(1, 'action 不能为空'),
+  batchCount: z.coerce.number().int().min(1).optional(),
+  isNight: z.coerce.boolean().optional(),
 });
 const confirmSchema = z.object({ taskId: idSchema });
 const rollbackSchema = z.object({ taskId: idSchema, reason: z.string().max(500).optional() });
 const adminRefundSchema = z.object({
-  userId: idSchema,
-  credits: z.coerce.number().int().min(1, '退还算力至少为1'),
-  reason: z.string().max(500).optional(),
+  recordId: idSchema,
+  remark: z.string().max(500).optional(),
 });
 
 router.get('/membership', authMiddleware, asyncHandler(getMembership));
