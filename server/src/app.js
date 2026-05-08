@@ -54,6 +54,7 @@ import platformSpecRoutes from './route/platformSpecRoutes.js';
 import aiDispatchRoutes from './route/aiDispatchRoutes.js';
 import posterRoutesV4 from './route/v4_poster.routes.js';
 import videoTranslateRoutesV4 from './route/v4_video_translate.routes.js';
+import copywritingRoutes from './route/copywritingRoutes.js';
 
 // =====================================================
 // v4.1 中间件 + 路由 (2026-05-08 引入)
@@ -186,6 +187,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 app.use('/api/users', userRoutes);
 app.use('/api/open', openApiRoutes);
+app.use('/api/copywriting', copywritingRoutes);
 app.use('/api/templates', sizeTemplateRoutes);
 app.use('/api/brand', brandRoutes);
 app.use('/api/images', heavyLimiter, imageRoutes);
