@@ -9,15 +9,12 @@ import { z } from 'zod';
 const router = Router();
 
 const createSchema = z.object({
-  platformCode: z.string().min(2).max(20),
-  specType: z.enum(['mainImage', 'detailImage', 'video', 'carousel', 'skuImage', 'logo', 'banner']),
-  label: z.string().min(1).max(50),
+  platform: z.string().min(2).max(30),
+  category: z.string().min(1).max(50),
+  label: z.string().min(1).max(80),
   width: z.number().int().positive(),
   height: z.number().int().positive(),
-  format: z.enum(['jpg', 'png', 'webp', 'mp4', 'mov']).default('jpg'),
-  maxSizeKB: z.number().int().positive().optional(),
-  bgMustWhite: z.boolean().default(false),
-  notes: z.string().max(500).optional(),
+  sortOrder: z.number().int().optional(),
 });
 
 const updateSchema = createSchema.partial();
