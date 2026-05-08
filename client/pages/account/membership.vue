@@ -118,8 +118,8 @@ async function loadMembership() {
   try {
     const res: any = await $fetch('/api/user/profile', { credentials: 'include' });
     if (res?.code === 200) {
-      currentPlan.value = res.data?.membership || {};
-      autoRenew.value = res.data?.membership?.auto_renew === 1;
+      currentPlan.value = res.data || {};
+      autoRenew.value = res.data?.auto_renew === 1;
     }
   } catch { /* fallback */ }
 }

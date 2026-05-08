@@ -54,7 +54,7 @@ router.get('/profile', async (req, res) => {
       if (users.length === 0) return error(res, 404, '用户不存在');
 
       const [membership] = await conn.query(
-        'SELECT plan_type, credit_balance, start_time, end_time FROM user_membership WHERE user_id = ? AND is_deleted = 0',
+        'SELECT plan_type, credit_balance, start_time, end_time, auto_renew FROM user_membership WHERE user_id = ? AND is_deleted = 0',
         [req.user.id],
       );
 
@@ -64,6 +64,7 @@ router.get('/profile', async (req, res) => {
         credit_balance: membership[0]?.credit_balance || 0,
         start_time: membership[0]?.start_time,
         end_time: membership[0]?.end_time,
+        auto_renew: membership[0]?.auto_renew || 0,
         role: req.user.role,
       });
     } finally {
