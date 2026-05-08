@@ -1,3 +1,5 @@
+import { BusinessError } from '../utils/businessError.js';
+
 /**
  * Movio AI v4.1 — Image Service
  * G5 后端开发 | W2
@@ -18,7 +20,7 @@ export async function generateImage(userId, { prompt, ratio = '1:1', style = 're
   // 内容审核 (输入)
   const auditResult = await moderationService.moderateText(finalPrompt, userId, { stage: 'input' });
   if (auditResult.action === 'block') {
-    throw { status: 422, message: '提示词包含违规内容，请修改后重试' };
+    throw new BusinessError(422, '提示词包含违规内容，请修改后重试');
   }
 
   // 提交异步任务
@@ -37,7 +39,7 @@ export async function replicateMainImage(userId, { referenceImageUrl, productNam
   // 内容审核
   const auditResult = await moderationService.moderateText(productName, userId, { stage: 'input' });
   if (auditResult.action === 'block') {
-    throw { status: 422, message: '内容包含违规信息' };
+    throw new BusinessError(422, '内容包含违规信息');
   }
 
   return submitJob(userId, 'image_replicate', {
@@ -52,14 +54,14 @@ export async function replicateMainImage(userId, { referenceImageUrl, productNam
  * 批量生图
  */
 export async function batchGenerateImage(userId, { prompts, ratio = '1:1', style = 'realistic' }) {
-  if (!prompts || prompts.length === 0) throw { status: 400, message: '请提供至少一个提示词' };
-  if (prompts.length > 50) throw { status: 400, message: '单次批量最多50个' };
+  if (!prompts || prompts.length === 0) throw new BusinessError(400, '请提供至少一个提示词');
+  if (prompts.length > 50) throw new BusinessError(400, '单次批量最多50个');
 
   // 逐条审核
   for (const p of prompts) {
     const auditResult = await moderationService.moderateText(p, userId, { stage: 'input' });
     if (auditResult.action === 'block') {
-      throw { status: 422, message: `提示词"${p.substring(0, 20)}..."包含违规内容` };
+      throw new BusinessError(422, `提示词"${p.substring(0, 20)}..."包含违规内容`);
     }
   }
 
@@ -75,8 +77,8 @@ export async function batchGenerateImage(userId, { prompts, ratio = '1:1', style
  * 批量改图
  */
 export async function batchEditImage(userId, { images, operations }) {
-  if (!images || images.length === 0) throw { status: 400, message: '请提供至少一张图片' };
-  if (images.length > 30) throw { status: 400, message: '单次批量最多30张' };
+  if (!images || images.length === 0) throw new BusinessError(400, '请提供至少一张图片');
+  if (images.length > 30) throw new BusinessError(400, '单次批量最多30张');
 
   return submitJob(userId, 'batch_image_edit', {
     images,           // [{ url, ... }]
@@ -89,8 +91,8 @@ export async function batchEditImage(userId, { images, operations }) {
  * 批量图片替换 (如换背景/换场景)
  */
 export async function batchReplaceImage(userId, { images, newBackground, newScene }) {
-  if (!images || images.length === 0) throw { status: 400, message: '请提供至少一张图片' };
-  if (images.length > 30) throw { status: 400, message: '单次批量最多30张' };
+  if (!images || images.length === 0) throw new BusinessError(400, '请提供至少一张图片');
+  if (images.length > 30) throw new BusinessError(400, '单次批量最多30张');
 
   return submitJob(userId, 'batch_image_replace', {
     images,

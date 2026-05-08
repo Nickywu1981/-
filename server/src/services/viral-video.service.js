@@ -1,3 +1,5 @@
+import { BusinessError } from '../utils/businessError.js';
+
 /**
  * Movio AI v4.1 — Viral Video Service (爆款视频分析 + 复刻)
  * G5 后端开发 | W3
@@ -38,7 +40,7 @@ export async function getViralAnalysis(jobId, userId) {
       'SELECT id, status, progress, result_data, created_at FROM job_queue WHERE id = ? AND user_id = ? AND task_type = ?',
       [jobId, userId, 'viral_analysis'],
     );
-    if (rows.length === 0) throw { status: 404, message: '分析任务不存在' };
+    if (rows.length === 0) throw new BusinessError(404, '分析任务不存在');
     return rows[0];
   } finally {
     conn.release();

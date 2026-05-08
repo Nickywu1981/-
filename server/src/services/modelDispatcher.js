@@ -1,3 +1,5 @@
+import { BusinessError } from '../utils/businessError.js';
+
 /**
  * ModelDispatcher — 多模型统一调度层 (v5.0)
  * G1 Architect | 整合 aiEngine + model-router 双系统
@@ -118,16 +120,10 @@ const MATCH_WEIGHTS = {
 };
 
 const MODEL_CAPABILITIES = {
-  'gpt-4o': { capability: 90, cost: 60, latency: 70, accuracy: 90 },
-  'gpt-4o-mini': { capability: 70, cost: 90, latency: 85, accuracy: 75 },
-  'claude-sonnet-4-6': { capability: 88, cost: 55, latency: 65, accuracy: 92 },
-  'claude-haiku-4-5': { capability: 60, cost: 85, latency: 80, accuracy: 68 },
-  'seedance-2.0': { capability: 85, cost: 50, latency: 40, accuracy: 85 },
-  'pixeldance': { capability: 80, cost: 55, latency: 45, accuracy: 82 },
-  'rmbg-2.0': { capability: 75, cost: 80, latency: 90, accuracy: 88 },
-  'iclight-v2': { capability: 78, cost: 70, latency: 75, accuracy: 82 },
-  'tongyi_qwen': { capability: 82, cost: 65, latency: 70, accuracy: 84 },
-  'tongyi_wanxiang': { capability: 78, cost: 60, latency: 65, accuracy: 80 },
+  'gpt-5.5': { capability: 95, cost: 55, latency: 65, accuracy: 93 },
+  'claude-opus-4-7': { capability: 92, cost: 50, latency: 60, accuracy: 94 },
+  'deepseek-v4-pro': { capability: 82, cost: 70, latency: 70, accuracy: 84 },
+  'deepseek-v4-flash': { capability: 60, cost: 90, latency: 85, accuracy: 68 },
 };
 
 export function scoreModel(modelId, taskCategory, healthData = {}) {
@@ -209,7 +205,7 @@ export async function autoMode(taskType, input, options = {}) {
   const ranking = rankModels(analysis.candidates, analysis.category, healthData);
 
   if (!ranking.best) {
-    throw { status: 503, message: `类别 ${analysis.category} 下无可用模型`, category: analysis.category };
+    throw new BusinessError(503, `类别 ${analysis.category} 下无可用模型`);
   }
 
   // 简单任务: 单模型即可
@@ -291,7 +287,7 @@ export async function customMode(taskType, input, customConfig = {}, options = {
   }
 
   if (results.length === 0) {
-    throw { status: 503, message: '自定义组合全部执行失败', degraded: true };
+    throw new BusinessError(503, '自定义组合全部执行失败');
   }
 
   const aggregated = aggregateResults(results, taskType);
@@ -339,7 +335,7 @@ export async function dispatch(req, options = {}) {
 
   switch (mode) {
     case 'single': {
-      if (!modelId) throw { status: 400, message: 'single 模式需要 modelId' };
+      if (!modelId) throw new BusinessError(400, 'single 模式需要 modelId');
       const result = await singleMode(modelId, input, options);
       result.elapsed = Date.now() - startTime;
       return result;

@@ -1,3 +1,5 @@
+import { BusinessError } from './businessError.js';
+
 /**
  * Movio AI v4.1 — File Upload Service
  * G5 后端开发 | T-G5-004
@@ -30,7 +32,7 @@ export function initUpload({ fileName, fileSize, fileType }) {
   const allowedTypes = (process.env.ALLOWED_UPLOAD_TYPES || 'jpg,jpeg,png,webp,mp4,mov,avi,webm').split(',');
   const fileExt = ext.replace('.', '').toLowerCase();
   if (!allowedTypes.includes(fileExt)) {
-    throw { status: 400, message: `不支持的文件格式: ${fileExt}` };
+    throw new BusinessError(400, `不支持的文件格式: ${fileExt}`);
   }
 
   // 记录上传元信息
@@ -51,7 +53,7 @@ export function initUpload({ fileName, fileSize, fileType }) {
 export function receiveChunk(uploadId, chunkIndex, chunkBuffer) {
   const metaPath = path.join(CHUNK_DIR, `${uploadId}.json`);
   if (!fs.existsSync(metaPath)) {
-    throw { status: 404, message: '上传会话不存在或已过期' };
+    throw new BusinessError(404, '上传会话不存在或已过期');
   }
 
   const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
@@ -86,12 +88,12 @@ export function getReceivedChunks(uploadId) {
 export function completeUpload(uploadId) {
   const metaPath = path.join(CHUNK_DIR, `${uploadId}.json`);
   if (!fs.existsSync(metaPath)) {
-    throw { status: 404, message: '上传会话不存在' };
+    throw new BusinessError(404, '上传会话不存在');
   }
 
   const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
   if (meta.receivedChunks.length < meta.totalChunks) {
-    throw { status: 400, message: `分片不完整 (${meta.receivedChunks.length}/${meta.totalChunks})` };
+    throw new BusinessError(400, `分片不完整 (${meta.receivedChunks.length}/${meta.totalChunks})`);
   }
 
   // 合并分片

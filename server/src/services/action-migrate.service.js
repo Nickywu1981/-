@@ -1,3 +1,5 @@
+import { BusinessError } from '../utils/businessError.js';
+
 /**
  * Movio AI v4.1 — Action Migrate Service (动作迁移 — 全球独家杀手功能)
  * G5 后端开发 | W3
@@ -13,7 +15,7 @@ import db from '../dao/db.js';
 export async function migrateAction(userId, { sourceVideoUrl, targetPersonImage, options = {} }) {
   // 内容审核 (视频)
   const auditResult = await moderationService.moderateVideo(sourceVideoUrl, userId, { stage: 'input' });
-  if (auditResult.action === 'block') throw { status: 422, message: '源视频包含违规内容' };
+  if (auditResult.action === 'block') throw new BusinessError(422, '源视频包含违规内容');
 
   return submitJob(userId, 'action_migrate', {
     source_video_url: sourceVideoUrl,
@@ -26,18 +28,18 @@ export async function migrateAction(userId, { sourceVideoUrl, targetPersonImage,
  * 批量动作迁移 — 全球独家
  */
 export async function batchMigrateAction(userId, { sourceVideoUrls, targetPersonImages, options = {} }) {
-  if (!sourceVideoUrls || sourceVideoUrls.length === 0) throw { status: 400, message: '请提供至少1个源视频' };
-  if (!targetPersonImages || targetPersonImages.length === 0) throw { status: 400, message: '请提供至少1张目标人物图' };
-  if (sourceVideoUrls.length > 10) throw { status: 400, message: '最多10个源视频' };
-  if (targetPersonImages.length > 20) throw { status: 400, message: '最多20张目标人物图' };
+  if (!sourceVideoUrls || sourceVideoUrls.length === 0) throw new BusinessError(400, '请提供至少1个源视频');
+  if (!targetPersonImages || targetPersonImages.length === 0) throw new BusinessError(400, '请提供至少1张目标人物图');
+  if (sourceVideoUrls.length > 10) throw new BusinessError(400, '最多10个源视频');
+  if (targetPersonImages.length > 20) throw new BusinessError(400, '最多20张目标人物图');
 
   const totalJobs = sourceVideoUrls.length * targetPersonImages.length;
-  if (totalJobs > 100) throw { status: 400, message: `批量上限100个任务，当前${totalJobs}个` };
+  if (totalJobs > 100) throw new BusinessError(400, `批量上限100个任务，当前${totalJobs}个`);
 
   // 逐视频审核
   for (const url of sourceVideoUrls) {
     const auditResult = await moderationService.moderateVideo(url, userId, { stage: 'input' });
-    if (auditResult.action === 'block') throw { status: 422, message: '源视频包含违规内容' };
+    if (auditResult.action === 'block') throw new BusinessError(422, '源视频包含违规内容');
   }
 
   return submitJob(userId, 'batch_action_migrate', {
@@ -58,7 +60,7 @@ export async function getBatchMigrateProgress(jobId, userId) {
       'SELECT id, status, progress, result_data FROM job_queue WHERE id = ? AND user_id = ?',
       [jobId, userId],
     );
-    if (parent.length === 0) throw { status: 404, message: '任务不存在' };
+    if (parent.length === 0) throw new BusinessError(404, '任务不存在');
 
     // 查询子任务进度
     const [children] = await conn.query(

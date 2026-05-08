@@ -1,3 +1,5 @@
+import { BusinessError } from '../utils/businessError.js';
+
 /**
  * Movio AI v4.1 — Video Service
  * G5 后端开发 | W3
@@ -15,7 +17,7 @@ export async function generateVideo(userId, { prompt, duration = 15, ratio = '9:
 
   const auditResult = await moderationService.moderateText(finalPrompt, userId, { stage: 'input' });
   if (auditResult.action === 'block') {
-    throw { status: 422, message: '提示词包含违规内容' };
+    throw new BusinessError(422, '提示词包含违规内容');
   }
 
   return submitJob(userId, 'video_gen', {
@@ -31,7 +33,7 @@ export async function generateVideo(userId, { prompt, duration = 15, ratio = '9:
 // ============================================================
 export async function imageToVideo(userId, { imageUrl, prompt, duration = 15, ratio = '9:16' }) {
   const auditResult = await moderationService.moderateText(prompt || '', userId, { stage: 'input' });
-  if (auditResult.action === 'block') throw { status: 422, message: '内容包含违规信息' };
+  if (auditResult.action === 'block') throw new BusinessError(422, '内容包含违规信息');
 
   return submitJob(userId, 'image_to_video', {
     image_url: imageUrl,
@@ -45,8 +47,8 @@ export async function imageToVideo(userId, { imageUrl, prompt, duration = 15, ra
 // 多图合成视频
 // ============================================================
 export async function multiImageToVideo(userId, { images, prompt, duration = 30, ratio = '9:16', transition = 'fade' }) {
-  if (!images || images.length < 2) throw { status: 400, message: '至少需要2张图片' };
-  if (images.length > 20) throw { status: 400, message: '最多20张图片' };
+  if (!images || images.length < 2) throw new BusinessError(400, '至少需要2张图片');
+  if (images.length > 20) throw new BusinessError(400, '最多20张图片');
 
   return submitJob(userId, 'multi_image_to_video', {
     images,           // [{ url }]
@@ -107,7 +109,7 @@ export async function productAdVideo(userId, { productName, productImages, highl
 // ============================================================
 export async function generateStoryboard(userId, { prompt, sceneCount = 5 }) {
   const auditResult = await moderationService.moderateText(prompt, userId, { stage: 'input' });
-  if (auditResult.action === 'block') throw { status: 422, message: '内容包含违规信息' };
+  if (auditResult.action === 'block') throw new BusinessError(422, '内容包含违规信息');
 
   return submitJob(userId, 'storyboard_gen', {
     prompt,
@@ -125,7 +127,7 @@ export async function getVideoJobStatus(jobId, userId) {
       'SELECT id, user_id, task_type, status, progress, result_data, error_message, retry_count, created_at, started_at, completed_at FROM job_queue WHERE id = ? AND user_id = ?',
       [jobId, userId],
     );
-    if (rows.length === 0) throw { status: 404, message: '任务不存在' };
+    if (rows.length === 0) throw new BusinessError(404, '任务不存在');
     return rows[0];
   } finally {
     conn.release();

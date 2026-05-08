@@ -1,3 +1,5 @@
+import { BusinessError } from '../utils/businessError.js';
+
 /**
  * Movio AI v4.1 — Auth Service
  * G5 后端开发 | T-G5-001
@@ -35,12 +37,12 @@ export async function register({ phone, email, password, nickname, inviteCode })
     if (phone) {
       const encPhone = encrypt(phone);
       const [existing] = await conn.query('SELECT id FROM users WHERE phone = ?', [encPhone]);
-      if (existing.length > 0) throw { status: 409, message: '该手机号已注册' };
+      if (existing.length > 0) throw new BusinessError(409, '该手机号已注册');
     }
     if (email) {
       const encEmail = encrypt(email);
       const [existing] = await conn.query('SELECT id FROM users WHERE email = ?', [encEmail]);
-      if (existing.length > 0) throw { status: 409, message: '该邮箱已注册' };
+      if (existing.length > 0) throw new BusinessError(409, '该邮箱已注册');
     }
 
     // 生成邀请码
@@ -138,13 +140,13 @@ export async function login({ phone, email, password }) {
       );
     }
 
-    if (!user || user.length === 0) throw { status: 401, message: '账号或密码错误' };
+    if (!user || user.length === 0) throw new BusinessError(401, '账号或密码错误');
     user = user[0];
 
-    if (user.status !== 'active') throw { status: 403, message: '账号已被禁用' };
+    if (user.status !== 'active') throw new BusinessError(403, '账号已被禁用');
 
     const validPassword = await bcrypt.compare(password, user.password_hash);
-    if (!validPassword) throw { status: 401, message: '账号或密码错误' };
+    if (!validPassword) throw new BusinessError(401, '账号或密码错误');
 
     // 更新最后登录时间
     await conn.query('UPDATE users SET last_login_at = NOW() WHERE id = ?', [user.id]);
@@ -163,11 +165,11 @@ export async function login({ phone, email, password }) {
 export async function loginByCode({ phone, email }) {
   // 验证码登录：先检查验证标记，通过后签发 JWT
   if (phone) {
-    if (!smsVerified(phone)) throw { status: 401, message: '验证已过期，请重新验证' };
+    if (!smsVerified(phone)) throw new BusinessError(401, '验证已过期，请重新验证');
   } else if (email) {
-    if (!emailVerified(email)) throw { status: 401, message: '验证已过期，请重新验证' };
+    if (!emailVerified(email)) throw new BusinessError(401, '验证已过期，请重新验证');
   } else {
-    throw { status: 400, message: '请提供手机号或邮箱' };
+    throw new BusinessError(400, '请提供手机号或邮箱');
   }
 
   const conn = await db.getConnection();
@@ -187,10 +189,10 @@ export async function loginByCode({ phone, email }) {
       );
     }
 
-    if (!user || user.length === 0) throw { status: 401, message: '账号不存在，请先注册' };
+    if (!user || user.length === 0) throw new BusinessError(401, '账号不存在，请先注册');
     user = user[0];
 
-    if (user.status !== 'active') throw { status: 403, message: '账号已被禁用' };
+    if (user.status !== 'active') throw new BusinessError(403, '账号已被禁用');
 
     await conn.query('UPDATE users SET last_login_at = NOW() WHERE id = ?', [user.id]);
 
@@ -208,11 +210,11 @@ export async function loginByCode({ phone, email }) {
 export async function resetPassword({ phone, email, newPassword }) {
   // 必须通过短信/邮箱验证后才能重置密码
   if (phone) {
-    if (!smsVerified(phone)) throw { status: 401, message: '验证已过期，请重新验证' };
+    if (!smsVerified(phone)) throw new BusinessError(401, '验证已过期，请重新验证');
   } else if (email) {
-    if (!emailVerified(email)) throw { status: 401, message: '验证已过期，请重新验证' };
+    if (!emailVerified(email)) throw new BusinessError(401, '验证已过期，请重新验证');
   } else {
-    throw { status: 400, message: '请提供手机号或邮箱' };
+    throw new BusinessError(400, '请提供手机号或邮箱');
   }
 
   const conn = await db.getConnection();
@@ -220,7 +222,7 @@ export async function resetPassword({ phone, email, newPassword }) {
     let field, encValue;
     if (phone) { field = 'phone'; encValue = encrypt(phone); }
     else if (email) { field = 'email'; encValue = encrypt(email); }
-    else throw { status: 400, message: '请提供手机号或邮箱' };
+    else throw new BusinessError(400, '请提供手机号或邮箱');
 
     const passwordHash = await bcrypt.hash(newPassword, 12);
     const [result] = await conn.query(
@@ -228,7 +230,7 @@ export async function resetPassword({ phone, email, newPassword }) {
       [passwordHash, encValue],
     );
 
-    if (result.affectedRows === 0) throw { status: 404, message: '账号不存在' };
+    if (result.affectedRows === 0) throw new BusinessError(404, '账号不存在');
     return { message: '密码重置成功' };
   } finally {
     conn.release();
@@ -242,7 +244,7 @@ export async function getUserProfile(userId) {
       'SELECT id, phone, email, nickname, avatar_url, role, status, invite_code, points_balance, invited_by, created_at, last_login_at FROM users WHERE id = ?',
       [userId],
     );
-    if (rows.length === 0) throw { status: 404, message: '用户不存在' };
+    if (rows.length === 0) throw new BusinessError(404, '用户不存在');
 
     const user = rows[0];
     // 解密敏感字段

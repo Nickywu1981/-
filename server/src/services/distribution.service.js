@@ -1,3 +1,5 @@
+import { BusinessError } from '../utils/businessError.js';
+
 /**
  * Movio AI v4.1 — Distribution Service (分销系统)
  * G5 后端开发 | W4
@@ -18,7 +20,7 @@ export async function getMyInviteCode(userId) {
   const conn = await db.getConnection();
   try {
     const [rows] = await conn.query('SELECT invite_code, nickname FROM users WHERE id = ?', [userId]);
-    if (rows.length === 0) throw { status: 404, message: '用户不存在' };
+    if (rows.length === 0) throw new BusinessError(404, '用户不存在');
     return { invite_code: rows[0].invite_code, nickname: rows[0].nickname };
   } finally {
     conn.release();
@@ -147,7 +149,7 @@ export async function getCommissionBalance(userId) {
 // 佣金提现
 // ============================================================
 export async function withdrawCommission(userId, amount) {
-  if (amount <= 0) throw { status: 400, message: '提现金额必须大于0' };
+  if (amount <= 0) throw new BusinessError(400, '提现金额必须大于0');
 
   const conn = await db.getConnection();
   try {
@@ -160,7 +162,7 @@ export async function withdrawCommission(userId, amount) {
       [userId],
     );
 
-    if (balance.available < amount) throw { status: 400, message: `可提现余额不足，当前可用 ${balance.available}` };
+    if (balance.available < amount) throw new BusinessError(400, `可提现余额不足，当前可用 ${balance.available}`);
 
     // 逐笔扣减
     let remaining = amount;
@@ -279,7 +281,7 @@ export function getPromoAssets() { return PROMO_ASSETS; }
 
 export async function getMyPromoLink(userId) {
   const [[user]] = await db.query('SELECT invite_code FROM users WHERE id = ?', [userId]);
-  if (!user) throw { status: 404, message: '用户不存在' };
+  if (!user) throw new BusinessError(404, '用户不存在');
   const baseUrl = process.env.APP_URL || 'https://movio.ai';
   const inviteUrl = `${baseUrl}/register?ref=${user.invite_code}`;
   return { invite_code: user.invite_code, invite_url: inviteUrl, assets: PROMO_ASSETS };

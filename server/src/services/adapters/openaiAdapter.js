@@ -1,122 +1,73 @@
 /**
- * OpenAI GPT Adapter
- * 支持: GPT-4o / GPT-4o-mini / DALL-E 3
- * 用途: 文案生成、脚本创作、标题优化、内容分析、翻译
+ * OpenAI-compatible Adapter（通用 OpenAI 协议适配器）
+ * 对接任意 OpenAI 兼容代理，自动拉取可用模型列表并按需注册
  */
 
 import { registerModel } from '../aiEngine.js';
 
 const API_KEY = process.env.OPENAI_API_KEY || '';
-const BASE_URL = process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1';
+const BASE_URL = (process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1').replace(/\/+$/, '');
 
-// ==================== GPT-4o 文本生成 ====================
+// ==================== 通用文本推断工厂 ====================
 
-async function gpt4oInfer(input, onProgress) {
-  const { prompt, systemPrompt, temperature = 0.7, maxTokens = 2000, responseFormat } = input;
+function makeTextInfer(modelId, maxTokens = 2000, timeout = 60000) {
+  return async function infer(input, onProgress) {
+    const { prompt, systemPrompt, temperature = 0.7, maxTokens: mt = maxTokens, responseFormat } = input;
 
-  onProgress?.(20);
+    onProgress?.(20);
 
-  const messages = [];
-  if (systemPrompt) messages.push({ role: 'system', content: systemPrompt });
-  messages.push({ role: 'user', content: prompt });
+    const messages = [];
+    if (systemPrompt) messages.push({ role: 'system', content: systemPrompt });
+    messages.push({ role: 'user', content: prompt });
 
-  const body = {
-    model: 'gpt-4o',
-    messages,
-    temperature,
-    max_tokens: maxTokens,
+    const body = { model: modelId, messages, temperature, max_tokens: mt, stream: false };
+    if (responseFormat === 'json') body.response_format = { type: 'json_object' };
+
+    onProgress?.(40);
+
+    const res = await fetch(`${BASE_URL}/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${API_KEY}` },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(timeout),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(`HTTP ${res.status}: ${err.error?.message || res.statusText}`);
+    }
+
+    onProgress?.(80);
+
+    const data = await res.json();
+    const content = data.choices?.[0]?.message?.content || '';
+
+    onProgress?.(100);
+
+    return {
+      text: content,
+      model: data.model || modelId,
+      usage: data.usage
+        ? { promptTokens: data.usage.prompt_tokens, completionTokens: data.usage.completion_tokens, totalTokens: data.usage.total_tokens }
+        : null,
+    };
   };
-  if (responseFormat === 'json') body.response_format = { type: 'json_object' };
+}
 
-  onProgress?.(40);
+// ==================== 远程模型列表拉取 ====================
 
-  const res = await fetch(`${BASE_URL}/chat/completions`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${API_KEY}` },
-    body: JSON.stringify(body),
-    signal: AbortSignal.timeout(60000),
-  });
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(`OpenAI API 错误 ${res.status}: ${err.error?.message || res.statusText}`);
+async function fetchRemoteModels() {
+  try {
+    const res = await fetch(`${BASE_URL}/models`, {
+      headers: { Authorization: `Bearer ${API_KEY}` },
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!res.ok) return [];
+    const json = await res.json();
+    return json.data || [];
+  } catch {
+    return [];
   }
-
-  onProgress?.(80);
-
-  const data = await res.json();
-  const content = data.choices?.[0]?.message?.content || '';
-
-  onProgress?.(100);
-
-  return {
-    text: content,
-    model: data.model,
-    usage: data.usage ? { promptTokens: data.usage.prompt_tokens, completionTokens: data.usage.completion_tokens, totalTokens: data.usage.total_tokens } : null,
-  };
-}
-
-// ==================== GPT-4o-mini 文本生成 ====================
-
-async function gpt4oMiniInfer(input, onProgress) {
-  onProgress?.(20);
-
-  const { prompt, systemPrompt, temperature = 0.7, maxTokens = 1000 } = input;
-  const messages = [];
-  if (systemPrompt) messages.push({ role: 'system', content: systemPrompt });
-  messages.push({ role: 'user', content: prompt });
-
-  onProgress?.(40);
-
-  const res = await fetch(`${BASE_URL}/chat/completions`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${API_KEY}` },
-    body: JSON.stringify({ model: 'gpt-4o-mini', messages, temperature, max_tokens: maxTokens }),
-    signal: AbortSignal.timeout(30000),
-  });
-
-  if (!res.ok) throw new Error(`OpenAI API 错误 ${res.status}`);
-
-  onProgress?.(80);
-
-  const data = await res.json();
-
-  onProgress?.(100);
-
-  return {
-    text: data.choices?.[0]?.message?.content || '',
-    model: data.model,
-    usage: data.usage ? { totalTokens: data.usage.total_tokens } : null,
-  };
-}
-
-// ==================== DALL-E 3 图片生成 ====================
-
-async function dalle3Infer(input, onProgress) {
-  const { prompt, size = '1024x1024', quality = 'standard', style = 'vivid' } = input;
-
-  onProgress?.(30);
-
-  const res = await fetch(`${BASE_URL}/images/generations`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${API_KEY}` },
-    body: JSON.stringify({ model: 'dall-e-3', prompt, n: 1, size, quality, style }),
-    signal: AbortSignal.timeout(120000),
-  });
-
-  if (!res.ok) throw new Error(`DALL-E API 错误 ${res.status}`);
-
-  onProgress?.(70);
-
-  const data = await res.json();
-
-  onProgress?.(100);
-
-  return {
-    imageUrl: data.data?.[0]?.url || '',
-    revisedPrompt: data.data?.[0]?.revised_prompt || prompt,
-    model: 'dall-e-3',
-  };
 }
 
 // ==================== 健康检查 ====================
@@ -133,16 +84,59 @@ async function health() {
   }
 }
 
-// ==================== 注册模型 ====================
+// ==================== 模型能力映射 ====================
 
-export function registerOpenAI() {
+const MODEL_CAPABILITIES = {
+  // 文本大模型 — 最长上下文 + 最高质量
+  'gpt-5.5': { maxTokens: 8000, timeout: 120000 },
+  'claude-opus-4-7': { maxTokens: 8000, timeout: 120000 },
+  'deepseek-v4-pro': { maxTokens: 4000, timeout: 90000 },
+  'deepseek-v4-flash': { maxTokens: 2000, timeout: 30000 },
+};
+
+// ==================== 注册 ====================
+
+export async function registerOpenAI() {
   if (!API_KEY) {
-    console.warn('[AI] OPENAI_API_KEY 未配置，OpenAI 模型将使用降级模式');
+    console.warn('[AI] OPENAI_API_KEY 未配置，模型将使用降级模式');
+    return;
   }
 
-  registerModel({ id: 'gpt-4o', type: 'text', infer: gpt4oInfer, health, provider: 'openai' });
-  registerModel({ id: 'gpt-4o-mini', type: 'text', infer: gpt4oMiniInfer, health, provider: 'openai' });
-  registerModel({ id: 'dall-e-3', type: 'image', infer: dalle3Infer, health, provider: 'openai' });
+  console.log('[AI] 拉取远程模型列表...');
+  const remoteModels = await fetchRemoteModels();
+  const remoteIds = new Set(remoteModels.map((m) => m.id));
 
-  console.log('[AI] OpenAI 模型已注册: gpt-4o, gpt-4o-mini, dall-e-3');
+  if (remoteIds.size === 0) {
+    // 代理不可达 → 回退用静态配置
+    console.warn('[AI] 无法拉取远程模型列表，使用静态配置');
+    for (const [id, cap] of Object.entries(MODEL_CAPABILITIES)) {
+      registerModel({
+        id,
+        type: 'text',
+        infer: makeTextInfer(id, cap.maxTokens, cap.timeout),
+        health,
+        provider: 'openai',
+      });
+      console.log(`[AI] 模型已注册: ${id} (text, static)`);
+    }
+    return;
+  }
+
+  let count = 0;
+  for (const rm of remoteModels) {
+    const id = rm.id;
+    const cap = MODEL_CAPABILITIES[id] || { maxTokens: 2000, timeout: 60000 };
+
+    registerModel({
+      id,
+      type: 'text',
+      infer: makeTextInfer(id, cap.maxTokens, cap.timeout),
+      health,
+      provider: 'openai',
+    });
+    console.log(`[AI] 模型已注册: ${id} (text)`);
+    count++;
+  }
+
+  console.log(`[AI] OpenAI 模型已注册: ${count} 个`);
 }

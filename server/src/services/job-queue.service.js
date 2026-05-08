@@ -1,3 +1,5 @@
+import { BusinessError } from '../utils/businessError.js';
+
 /**
  * Movio AI v4.1 — Job Queue Service
  * G5 后端开发 | T-G5-009
@@ -33,7 +35,7 @@ export async function getJobStatus(jobId, userId) {
       'SELECT id, user_id, task_type, status, progress, result_data, error_message, retry_count, created_at, started_at, completed_at FROM job_queue WHERE id = ? AND user_id = ?',
       [jobId, userId],
     );
-    if (rows.length === 0) throw { status: 404, message: '任务不存在' };
+    if (rows.length === 0) throw new BusinessError(404, '任务不存在');
     return rows[0];
   } finally {
     conn.release();

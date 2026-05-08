@@ -1,3 +1,5 @@
+import { BusinessError } from '../utils/businessError.js';
+
 /**
  * Movio AI v4.1 — Live Clip Service (长视频录播智能精剪)
  * G5 后端开发 | W3
@@ -22,7 +24,7 @@ export async function smartClipLiveVideo(userId, { videoUrl, duration = 60, clip
  * 长视频智能精剪 — 手动指定剪切点
  */
 export async function smartClipWithRegions(userId, { videoUrl, clipRegions }) {
-  if (!clipRegions || clipRegions.length === 0) throw { status: 400, message: '请指定至少一个剪切区间' };
+  if (!clipRegions || clipRegions.length === 0) throw new BusinessError(400, '请指定至少一个剪切区间');
   return submitJob(userId, 'live_clip', {
     video_url: videoUrl,
     clip_regions: clipRegions, // [{ start: 125.0, end: 180.0 }, ...]

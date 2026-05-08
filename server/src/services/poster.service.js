@@ -1,3 +1,5 @@
+import { BusinessError } from '../utils/businessError.js';
+
 /**
  * Movio AI v4.1 — Poster & Social Cover Service
  * G5 后端开发 | Phase 2
@@ -35,7 +37,7 @@ export async function generatePoster(userId, { posterType, prompt, enhancedPromp
 
   const auditResult = await moderationService.moderateText(finalPrompt, userId, { stage: 'input' });
   if (auditResult.action === 'block') {
-    throw { status: 422, message: '提示词包含违规内容，请修改后重试' };
+    throw new BusinessError(422, '提示词包含违规内容，请修改后重试');
   }
 
   return submitJob(userId, `poster_${posterType}`, {

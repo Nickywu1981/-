@@ -1,3 +1,5 @@
+import { BusinessError } from '../utils/businessError.js';
+
 /**
  * Movio AI v4.1 — Video Translation Service
  * G5 后端开发 | Phase 2
@@ -20,7 +22,7 @@ export async function translateVoice(userId, {
     `voice_translate:${sourceLang}→${targetLang}`, userId, { stage: 'input' },
   );
   if (audit.action === 'block') {
-    throw { status: 422, message: '翻译请求包含违规参数' };
+    throw new BusinessError(422, '翻译请求包含违规参数');
   }
 
   return submitJob(userId, 'video_voice_translate', {
@@ -61,7 +63,7 @@ export async function translateFace(userId, {
     `face_translate:${sourceLang}→${targetLang}`, userId, { stage: 'input' },
   );
   if (audit.action === 'block') {
-    throw { status: 422, message: '面容翻译请求包含违规参数' };
+    throw new BusinessError(422, '面容翻译请求包含违规参数');
   }
 
   return submitJob(userId, 'video_face_translate', {

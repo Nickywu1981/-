@@ -1,20 +1,12 @@
 /**
- * Movio AI v4.1 — Model Router Service (模型调度中台)
- * G5 后端开发 | T-G5-008
- * 单一/混合/自定义三种调度模式 + 负载均衡 + 熔断器 + 超时重试降级
+ * Movio AI v4.2 — Model Router Service (模型调度中台)
+ * DB驱动注册表 + 三种调度模式 + 负载均衡 + 熔断器 + 超时重试降级
  */
 import { CircuitBreaker } from '../utils/circuit-breaker.js';
 import { aiCaller } from '../utils/ai-caller.js';
+import { BusinessError } from '../utils/businessError.js';
+import * as modelConfigDao from '../dao/modelConfigDao.js';
 
-// 模型注册表——添加新模型只需在此注册 + 后台配置
-const MODEL_REGISTRY = {
-  seedance: { name: 'Seedance', category: 'video', endpoint: process.env.SEEDANCE_ENDPOINT, apiKey: process.env.SEEDANCE_API_KEY },
-  tongyi_wanxiang: { name: '通义万象', category: 'image', endpoint: process.env.TONGYI_WANXIANG_ENDPOINT, apiKey: process.env.TONGYI_API_KEY },
-  tongyi_qwen: { name: '千问', category: 'text', endpoint: process.env.QWEN_ENDPOINT, apiKey: process.env.QWEN_API_KEY },
-  custom: { name: '自定义模型', category: 'custom', endpoint: '', apiKey: '' },
-};
-
-// 模型实例缓存 (含熔断器)
 const modelInstances = {};
 const TASK_MODEL_MAP = {
   video_gen: ['seedance'],
@@ -25,113 +17,137 @@ const TASK_MODEL_MAP = {
   live_clip: ['seedance'],
 };
 
-function getModelInstance(modelKey) {
+let registryCache = null;
+let cacheExpiry = 0;
+const CACHE_TTL_MS = 60000;
+
+async function loadRegistry() {
+  if (registryCache && Date.now() < cacheExpiry) return registryCache;
+  const rows = await modelConfigDao.listAll(true);
+  registryCache = {};
+  for (const r of rows) {
+    registryCache[r.model_key] = {
+      name: r.display_name,
+      category: r.category,
+      endpoint: r.endpoint,
+      apiKey: r.api_key_enc,
+      modelId: r.model_id,
+      maxTokens: r.max_tokens,
+      rateLimitRpm: r.rate_limit_rpm,
+      concurrencyMax: r.concurrency_max,
+      breakerThreshold: r.breaker_threshold,
+      breakerCooldownS: r.breaker_cooldown_s,
+      moderationEnabled: r.moderation_enabled,
+      moderationAction: r.moderation_action,
+      blockedWords: r.blocked_words,
+      enabled: r.enabled,
+    };
+  }
+  cacheExpiry = Date.now() + CACHE_TTL_MS;
+  return registryCache;
+}
+
+export function invalidateCache() { registryCache = null; cacheExpiry = 0; }
+
+function getModelInstance(modelKey, registry) {
   if (!modelInstances[modelKey]) {
-    const config = MODEL_REGISTRY[modelKey];
-    if (!config) return null;
+    const config = registry[modelKey];
+    if (!config || !config.enabled) return null;
     modelInstances[modelKey] = {
       ...config,
-      breaker: new CircuitBreaker({ failureThreshold: 5, cooldownMs: 60000 }),
+      breaker: new CircuitBreaker({
+        failureThreshold: config.breakerThreshold || 5,
+        cooldownMs: (config.breakerCooldownS || 60) * 1000,
+      }),
     };
   }
   return modelInstances[modelKey];
 }
 
-/**
- * 单一模式: 指定某模型直接调用
- */
 async function singleMode(modelKey, params) {
-  const model = getModelInstance(modelKey);
-  if (!model || !model.endpoint) throw { status: 400, message: `模型 ${modelKey} 不可用` };
+  const registry = await loadRegistry();
+  const model = getModelInstance(modelKey, registry);
+  if (!model || !model.endpoint) throw new BusinessError(400, `模型 ${modelKey} 不可用`);
 
-  return aiCaller.call(model.endpoint, model.apiKey, params, {
-    timeoutMs: 120000,
-    maxRetries: 3,
-    breaker: model.breaker,
-    modelName: model.name,
-  });
+  const start = Date.now();
+  let status = 'success', errorMsg = '';
+  let tokensIn = 0, tokensOut = 0;
+  try {
+    const result = await aiCaller.call(model.endpoint, model.apiKey, params, {
+      timeoutMs: 120000,
+      maxRetries: 3,
+      breaker: model.breaker,
+      modelName: model.name,
+    });
+    tokensOut = result?.usage?.output_tokens || 0;
+    tokensIn = result?.usage?.input_tokens || 0;
+    return result;
+  } catch (e) {
+    status = 'error'; errorMsg = e.message;
+    throw e;
+  } finally {
+    await modelConfigDao.incrementUsage(modelKey, {
+      latencyMs: Date.now() - start,
+      tokensIn, tokensOut,
+      isError: status === 'error',
+    });
+  }
 }
 
-/**
- * 混合模式: 按 task_type 自动选择最优模型
- */
 async function mixedMode(taskType, params) {
-  const candidates = TASK_MODEL_MAP[taskType] || [];
-  const healthy = candidates.filter(k => {
-    const m = getModelInstance(k);
-    return m && m.breaker.isAvailable();
-  });
+  const registry = await loadRegistry();
+  const candidates = (TASK_MODEL_MAP[taskType] || [])
+    .filter(k => { const m = getModelInstance(k, registry); return m && m.breaker.isAvailable(); });
 
-  if (healthy.length === 0) {
-    throw { status: 503, message: '所有可用模型暂不可用，请稍后重试', degraded: true };
+  if (candidates.length === 0) {
+    throw new BusinessError(503, '所有可用模型暂不可用，请稍后重试');
   }
 
-  // 负载均衡: 选当前负载最低的
-  const selected = healthy[0]; // MVP: 简单选取第一个可用; 后续按并发数选最少
-  return singleMode(selected, params);
+  return singleMode(candidates[0], params);
 }
 
-/**
- * 自定义模式: 从后台配置读取用户指定的模型列表
- */
 async function customMode(customModels, taskType, params) {
-  if (!customModels || customModels.length === 0) {
-    // 降级到混合模式
-    return mixedMode(taskType, params);
-  }
+  if (!customModels || customModels.length === 0) return mixedMode(taskType, params);
 
+  const registry = await loadRegistry();
   const healthy = customModels.filter(k => {
-    const m = getModelInstance(k);
+    const m = getModelInstance(k, registry);
     return m && m.breaker.isAvailable();
   });
 
-  if (healthy.length === 0) {
-    return mixedMode(taskType, params); // 降级
-  }
-
+  if (healthy.length === 0) return mixedMode(taskType, params);
   return singleMode(healthy[0], params);
 }
 
-/**
- * 主调度入口
- */
 export async function routeModel({ mode = 'mixed', taskType, modelKey, customModels, params }) {
   switch (mode) {
-    case 'single':
-      return singleMode(modelKey || 'tongyi_qwen', params);
-    case 'mixed':
-      return mixedMode(taskType, params);
-    case 'custom':
-      return customMode(customModels, taskType, params);
-    default:
-      return mixedMode(taskType, params);
+    case 'single': return singleMode(modelKey || 'tongyi_qwen', params);
+    case 'mixed': return mixedMode(taskType, params);
+    case 'custom': return customMode(customModels, taskType, params);
+    default: return mixedMode(taskType, params);
   }
 }
 
-/**
- * 重置指定模型的熔断器为半开状态
- */
 export function resetBreaker(modelKey) {
-  const instance = getModelInstance(modelKey);
-  if (!instance) throw { status: 404, message: `模型 ${modelKey} 不存在` };
+  const instance = modelInstances[modelKey];
+  if (!instance) throw new BusinessError(404, `模型 ${modelKey} 不存在`);
   instance.breaker.state = 'half-open';
   instance.breaker.failureCount = 0;
-  return { modelKey, newState: 'half-open', message: '熔断器已重置为半开状态，下次请求将试探恢复' };
+  return { modelKey, newState: 'half-open', message: '熔断器已重置为半开状态' };
 }
 
-/**
- * 获取模型运行状态
- */
-export function getModelStatus() {
+export async function getModelStatus() {
+  const registry = await loadRegistry();
   const status = {};
-  for (const [key, config] of Object.entries(MODEL_REGISTRY)) {
-    const instance = getModelInstance(key);
+  for (const [key, config] of Object.entries(registry)) {
+    const instance = getModelInstance(key, registry);
     status[key] = {
       name: config.name,
       category: config.category,
+      enabled: config.enabled,
       available: instance ? instance.breaker.isAvailable() : false,
       failedCount: instance ? instance.breaker.failureCount : 0,
-      state: instance ? instance.breaker.getState() : 'unknown',
+      state: instance ? instance.breaker.getState() : 'disabled',
     };
   }
   return status;

@@ -14,9 +14,10 @@ import { registerSD } from './sdAdapter.js';
 export async function registerAllAdapters() {
   console.log('[AI] ========== 注册 AI 模型适配器 ==========');
 
-  try { registerOpenAI(); } catch (err) { console.error('[AI] OpenAI 注册失败:', err.message); }
-  try { registerClaude(); } catch (err) { console.error('[AI] Claude 注册失败:', err.message); }
-  try { registerSD(); } catch (err) { console.error('[AI] SD 注册失败:', err.message); }
+  try { await registerOpenAI(); } catch (err) { console.error('[AI] OpenAI 注册失败:', err.message); }
+  // Claude/SD 适配器：代理无对应模型，跳过（保留注册函数供后续扩展）
+  // try { registerClaude(); } catch (err) { ... }
+  // try { registerSD(); } catch (err) { ... }
 
   const { listModels } = await import('../aiEngine.js');
   const models = listModels();

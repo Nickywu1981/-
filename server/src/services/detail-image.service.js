@@ -1,3 +1,5 @@
+import { BusinessError } from '../utils/businessError.js';
+
 /**
  * Movio AI v4.1 — Detail Image Service
  * G5 后端开发 | W2
@@ -11,12 +13,12 @@ import db from '../dao/db.js';
  * 详情图套图一键生成
  */
 export async function generateDetailSet(userId, { productName, productImages, highlights, template = 'standard' }) {
-  if (!productName) throw { status: 400, message: '请提供商品名称' };
-  if (!productImages || productImages.length === 0) throw { status: 400, message: '请提供至少一张商品图' };
+  if (!productName) throw new BusinessError(400, '请提供商品名称');
+  if (!productImages || productImages.length === 0) throw new BusinessError(400, '请提供至少一张商品图');
 
   const auditResult = await moderationService.moderateText(productName, userId, { stage: 'input' });
   if (auditResult.action === 'block') {
-    throw { status: 422, message: '内容包含违规信息' };
+    throw new BusinessError(422, '内容包含违规信息');
   }
 
   return submitJob(userId, 'detail_set_gen', {

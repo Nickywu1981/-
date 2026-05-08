@@ -51,21 +51,21 @@ router.post('/dispatch', authMiddleware, heavyLimiter, asyncHandler(async (req, 
 
 // ==================== GET /api/ai/categories ====================
 
-router.get('/categories', authMiddleware, asyncHandler(async (_req, res) => {
+router.get('/categories', asyncHandler(async (_req, res) => {
   const categories = getCategories();
   res.json({ success: true, data: categories });
 }));
 
 // ==================== GET /api/ai/categories/:category ====================
 
-router.get('/categories/:category', authMiddleware, asyncHandler(async (req, res) => {
+router.get('/categories/:category', asyncHandler(async (req, res) => {
   const models = getModelsByCategory(req.params.category);
   res.json({ success: true, data: { category: req.params.category, models: models.map((m) => m.id) } });
 }));
 
 // ==================== GET /api/ai/health ====================
 
-router.get('/health', authMiddleware, asyncHandler(async (_req, res) => {
+router.get('/health', asyncHandler(async (_req, res) => {
   const health = await healthCheck();
   const stats = getUsageStats();
   const extensions = Object.keys(extensionHooks).reduce((acc, k) => {
