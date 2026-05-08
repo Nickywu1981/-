@@ -8,9 +8,9 @@ import jwt from 'jsonwebtoken';
 import { error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { isTokenBlacklisted } from '../utils/jwtToken.js';
+import { jwtSecret as JWT_SECRET } from '../config/index.js';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'movio-jwt-secret-dev';
-const JWT_REFRESH_WINDOW = 7 * 24 * 60 * 60;
+const JWT_REFRESH_WINDOW = 7 * 24 * 60 * 60; // seconds — cookie maxAge needs numeric
 const RENEW_WINDOW = 24 * 60 * 60;
 
 export async function authMiddleware(req, res, next) {
