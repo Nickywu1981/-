@@ -4,26 +4,26 @@
    1. 基础主题色（亮色）
    ================================================ */
 :root {
-  /* 背景 */
-  --bg-page: #f8f9fa;
-  --bg-card: #ffffff;
+  /* 背景 — QiantingAI Apple-style warm gray base */
+  --bg-page: #f5f5f6;
+  --bg-card: #fcfcfd;
   --bg-header: #ffffff;
   --white: #ffffff;
   --text-on-brand: #ffffff;
-  --bg-footer: #f9fafb;
+  --bg-footer: #f8f8f9;
   --bg-input: #ffffff;
-  --bg-hover: #f3f4f6;
+  --bg-hover: #f0f0f2;
   --bg-overlay: rgba(0, 0, 0, 0.5);
 
-  /* 文字 */
-  --text-primary: #111827;
-  --text-secondary: #555555;
-  --text-muted: #9ca3af;
+  /* 文字 — QiantingAI high-contrast near-black */
+  --text-primary: #0a0a0a;
+  --text-secondary: #86868b;
+  --text-muted: #aeaeb2;
   --text-link: #7C3AED;
 
-  /* 边框 */
-  --border-light: #e5e7eb;
-  --border-card: #eeeeee;
+  /* 边框 — QiantingAI invisible-border style */
+  --border-light: #e5e5ea;
+  --border-card: #eaeaed;
 
   /* 品牌色（高级紫） */
   --brand: #7C3AED;
@@ -57,10 +57,10 @@
   --warning-border: #fef3c7;
   --danger-light: #fef2f2;
 
-  /* 阴影 */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.06);
-  --shadow-dropdown: 0 8px 24px rgba(0, 0, 0, 0.12);
+  /* 阴影 — 极淡层叠薄雾感 (QiantingAI风格) */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+  --shadow-dropdown: 0 4px 16px rgba(0, 0, 0, 0.08);
 
   /* 标签/徽章背景 */
   --tag-bg: #f3f4f6;
@@ -357,24 +357,24 @@ body {
 .slide-up-leave-to { opacity: 0; transform: translateY(-8px); }
 
 /* ================================================
-   12. 工作台紫色主题 Token
+   12. 工作台紫色主题 Token (QiantingAI/Accio极简风融合)
    ================================================ */
 :root {
   --ws-accent: #7C3AED;
   --ws-accent-hover: #6D28D9;
-  --ws-accent-light: #F5F3FF;
-  --ws-accent-gradient: linear-gradient(135deg, #7C3AED 0%, #A78BFA 50%, #C4B5FD 100%);
-  --ws-bg: #F8F7FF;
-  --ws-card: #FFFFFF;
-  --ws-card-hover-shadow: 0 8px 30px rgba(124, 58, 237, 0.12);
-  --ws-dot-color: rgba(124, 58, 237, 0.04);
-  --ws-sidebar-bg: #FFFFFF;
-  --ws-sidebar-hover: #F5F3FF;
+  --ws-accent-light: #F7F5FF;
+  --ws-accent-gradient: linear-gradient(135deg, #7C3AED 0%, #9D6FF5 100%);
+  --ws-bg: #f5f5f6;
+  --ws-card: #fcfcfd;
+  --ws-card-hover-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --ws-dot-color: rgba(124, 58, 237, 0.03);
+  --ws-sidebar-bg: #fafafa;
+  --ws-sidebar-hover: #f3f3f5;
   --ws-sidebar-active: #EDE9FE;
   --ws-sidebar-width: 260px;
-  --ws-tab-active-bg: linear-gradient(135deg, #7C3AED, #8B5CF6);
-  --ws-tab-hover-bg: #F5F3FF;
-  --ws-input-focus-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+  --ws-tab-active-bg: linear-gradient(135deg, #7C3AED, #9D6FF5);
+  --ws-tab-hover-bg: #F7F5FF;
+  --ws-input-focus-shadow: 0 0 0 3px rgba(124, 58, 237, 0.08);
   --ws-header-height: 64px;
   --ws-sidebar-width: 260px;
 }

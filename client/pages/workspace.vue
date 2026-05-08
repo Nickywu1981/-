@@ -1192,14 +1192,14 @@ function onResize() {
 .ws-input-card {
   background: var(--ws-card);
   border: 1px solid var(--border-light);
-  border-radius: 20px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  border-radius: 18px;
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
   transition: all var(--transition-base);
 }
 .ws-input-card:focus-within {
-  border-color: var(--brand);
-  box-shadow: 0 0 0 3px var(--brand-alpha-20), 0 8px 32px rgba(0,0,0,0.08);
+  border-color: var(--brand-alpha-20);
+  box-shadow: 0 0 0 3px var(--brand-alpha-08), 0 2px 8px rgba(0,0,0,0.04);
 }
 
 .ws-input-body {
@@ -1259,7 +1259,7 @@ function onResize() {
   border-radius: 14px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 16px var(--brand-alpha-25);
+  box-shadow: 0 2px 12px var(--brand-alpha-15);
   flex-shrink: 0;
   align-self: center;
 }
@@ -1367,12 +1367,12 @@ function onResize() {
   border-radius: 16px;
   padding: 18px 22px;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .ws-quick-card:hover {
-  border-color: var(--brand-soft);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
-  transform: translateY(-3px);
+  border-color: var(--brand-alpha-20);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+  transform: translateY(-2px);
 }
 .ws-qc-left { display: flex; align-items: center; gap: 14px; }
 .ws-qc-icon { font-size: 28px; flex-shrink: 0; }
@@ -1440,13 +1440,13 @@ function onResize() {
   border-radius: 16px;
   padding: 20px 18px 18px;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
 }
 .ws-tool-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0,0,0,0.08), 0 0 0 1px var(--brand-alpha-15);
-  border-color: var(--brand-soft);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  border-color: var(--brand-alpha-15);
 }
 .ws-tool-card:active { transform: translateY(-2px) scale(0.98); }
 
@@ -1489,11 +1489,11 @@ function onResize() {
   border-radius: 14px;
   overflow: hidden;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .ws-recent-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 28px rgba(0,0,0,0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
   border-color: var(--brand-alpha-15);
 }
 .ws-recent-preview {
