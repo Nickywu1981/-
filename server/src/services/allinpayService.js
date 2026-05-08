@@ -9,6 +9,7 @@ import allinpayDao from '../dao/allinpayDao.js';
 import * as allinpaySDK from '../utils/allinpaySDK.js';
 import membershipDao from '../dao/membershipDao.js';
 import rechargeDao from '../dao/rechargeDao.js';
+import * as creditDao from '../dao/creditDao.js';
 import logger from '../utils/logger.js';
 
 const PLANS = {
@@ -136,6 +137,18 @@ async function fulfillMembership(order) {
 
   await membershipDao.upsert(order.user_id, { plan_type: planType, credit_balance: creditBefore + credits, end_time: endTime, start_time: now });
 
+  await creditDao.insertConsumptionLog({
+    userId: order.user_id,
+    type: 3,
+    action: `purchase_plan_${planType}`,
+    creditBefore,
+    creditAfter: creditBefore + credits,
+    consumed: plan.price,
+    remark: `${plan.name} — 通联支付 ${order.reqsn}`,
+    requestId: order.reqsn,
+    status: 1,
+  });
+
   logger.info('[Allinpay] 会员履约完成', {
     userId: order.user_id, planType, days, credits, creditAfter: creditBefore + credits, endTime,
   });
@@ -152,6 +165,18 @@ async function fulfillRecharge(order) {
 
   await rechargeDao.markPaid(order.business_id, order.trxid || order.reqsn);
   await membershipDao.upsert(order.user_id, { credit_balance: creditBefore + rechargeOrder.coin_amount });
+
+  await creditDao.insertConsumptionLog({
+    userId: order.user_id,
+    type: 3,
+    action: 'recharge_coins',
+    creditBefore,
+    creditAfter: creditBefore + rechargeOrder.coin_amount,
+    consumed: Number(rechargeOrder.amount),
+    remark: `虾币充值 ${rechargeOrder.coin_amount}个 — 通联支付 ${order.reqsn}`,
+    requestId: order.reqsn,
+    status: 1,
+  });
 
   logger.info('[Allinpay] 充值履约完成', {
     userId: order.user_id, amount: rechargeOrder.amount, credits: rechargeOrder.coin_amount,
