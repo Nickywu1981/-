@@ -23,12 +23,12 @@ const PLANS = {
 
 export async function createUnifiedOrder({ userId, orderType, businessId, amount, payChannel, body, remark }) {
   if (!userId || !amount || !payChannel) {
-    throw Object.assign(new Error('缺少必要参数'), { statusCode: 400 });
+    throw new BusinessError(400, '缺少必要参数');
   }
 
   const validChannels = ['wechat', 'alipay', 'unionpay'];
   if (!validChannels.includes(payChannel)) {
-    throw Object.assign(new Error('支付渠道无效'), { statusCode: 400 });
+    throw new BusinessError(400, '支付渠道无效');
   }
 
   const reqsn = `MOV${Date.now()}${crypto.randomBytes(4).toString('hex').toUpperCase()}`;

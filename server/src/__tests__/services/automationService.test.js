@@ -50,7 +50,7 @@ describe('automationService', () => {
     it('throws 400 for invalid taskType', async () => {
       await expect(
         createTask('u1', 't1', { taskType: 'bad_type' }),
-      ).rejects.toMatchObject({ message: '无效的任务类型', statusCode: 400 });
+      ).rejects.toMatchObject({ message: '无效的任务类型', status: 400 });
     });
 
     it('accepts all 5 valid taskTypes', async () => {
@@ -72,7 +72,7 @@ describe('automationService', () => {
     it('throws 400 when cancel returns falsy', async () => {
       mockDao.cancelTask.mockResolvedValue(false);
       await expect(cancelTask(99, 'u1')).rejects.toMatchObject({
-        message: '任务不存在或不可取消', statusCode: 400,
+        message: '任务不存在或不可取消', status: 400,
       });
     });
   });
@@ -82,7 +82,7 @@ describe('automationService', () => {
     it('throws 404 when task not found', async () => {
       mockDao.getTaskById.mockResolvedValue(null);
       await expect(executeTask(999)).rejects.toMatchObject({
-        message: '任务不存在', statusCode: 404,
+        message: '任务不存在', status: 404,
       });
     });
 
@@ -137,19 +137,19 @@ describe('automationService', () => {
     it('throws 400 when platform is missing', async () => {
       await expect(
         createAccount('u1', 't1', { username: 'u', password: 'p' }),
-      ).rejects.toMatchObject({ message: '平台、用户名和密码不能为空', statusCode: 400 });
+      ).rejects.toMatchObject({ message: '平台、用户名和密码不能为空', status: 400 });
     });
 
     it('throws 400 when username is missing', async () => {
       await expect(
         createAccount('u1', 't1', { platform: 'taobao', password: 'p' }),
-      ).rejects.toMatchObject({ message: '平台、用户名和密码不能为空', statusCode: 400 });
+      ).rejects.toMatchObject({ message: '平台、用户名和密码不能为空', status: 400 });
     });
 
     it('throws 400 when password is missing', async () => {
       await expect(
         createAccount('u1', 't1', { platform: 'taobao', username: 'u' }),
-      ).rejects.toMatchObject({ message: '平台、用户名和密码不能为空', statusCode: 400 });
+      ).rejects.toMatchObject({ message: '平台、用户名和密码不能为空', status: 400 });
     });
 
     it('base64-encodes password before DAO call', async () => {

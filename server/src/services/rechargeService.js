@@ -1,6 +1,7 @@
 import rechargeDao from '../dao/rechargeDao.js';
 import * as allinpayService from '../services/allinpayService.js';
 import crypto from 'crypto';
+import { BusinessError } from '../utils/businessError.js';
 
 export function getRates() {
   return [
@@ -14,8 +15,8 @@ export function getRates() {
 
 export async function createOrder(userId, tenantId, clientIp, { amount, payChannel }) {
   const rates = rechargeDao.COIN_RATES;
-  if (!amount || !rates[String(amount)]) throw Object.assign(new Error('无效的充值金额'), { statusCode: 400 });
-  if (!['wechat', 'alipay', 'unionpay'].includes(payChannel)) throw Object.assign(new Error('支付方式无效'), { statusCode: 400 });
+  if (!amount || !rates[String(amount)]) throw new BusinessError(400, '无效的充值金额');
+  if (!['wechat', 'alipay', 'unionpay'].includes(payChannel)) throw new BusinessError(400, '支付方式无效');
 
   const orderNo = 'RC' + Date.now() + crypto.randomBytes(4).toString('hex');
   const coinAmount = rates[String(amount)];
@@ -48,7 +49,7 @@ export async function listAllOrders() {
 
 export async function refundOrder(orderNo) {
   const order = await rechargeDao.getByOrderNo(orderNo);
-  if (!order || order.pay_status !== 1) throw Object.assign(new Error('订单不存在或未支付'), { statusCode: 404 });
+  if (!order || order.pay_status !== 1) throw new BusinessError(404, '订单不存在或未支付');
   await rechargeDao.markRefunded(orderNo);
   return true;
 }

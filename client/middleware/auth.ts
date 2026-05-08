@@ -7,7 +7,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   if (typeof window === 'undefined') return // skip SSR
 
   // 检查是否有 cookie（服务端登录时会设置 token cookie）
-  const hasCookie = document.cookie.includes('token')
+  const hasCookie = document.cookie.split(';').some(c => c.trim().startsWith('token='))
   if (hasCookie) return // 有 cookie，放行
 
   // 无 cookie，尝试调用 /api/user/profile 验证

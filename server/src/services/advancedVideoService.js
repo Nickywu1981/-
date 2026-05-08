@@ -6,11 +6,12 @@
 import { infer, pipeline } from './aiEngine.js';
 import { createTask, updateTaskStatus, completeTask, getTask, listUserTasks, countUserTasks } from '../dao/taskDao.js';
 import * as creditService from './creditService.js';
+import { BusinessError } from '../utils/businessError.js';
 
 // ==================== AI 语音生成 (TTS) ====================
 
 export async function submitVoiceGen(userId, { text, voiceType = 'sweet-female', speed = 1.0, lang = 'zh' }) {
-  if (!text?.trim()) throw Object.assign(new Error('请输入配音文案'), { statusCode: 400 });
+  if (!text?.trim()) throw new BusinessError(400, '请输入配音文案');
   await creditService.consumeCredit(userId, 'digital_human');
   const taskId = await createTask({ userId, type: 'voice_gen', title: `TTS — ${voiceType}`, inputParams: { text: text.slice(0, 200), voiceType, speed, lang, fullLength: text.length }, priority: 1 });
   setImmediate(() => processVoiceGen(taskId, userId, { text, voiceType, speed }));
@@ -35,7 +36,7 @@ async function processVoiceGen(taskId, userId, params) {
 // ==================== 声音克隆 ====================
 
 export async function submitVoiceClone(userId, { audioSampleUrl, text, presetVoice = '' }) {
-  if (!audioSampleUrl) throw Object.assign(new Error('请上传音频样本'), { statusCode: 400 });
+  if (!audioSampleUrl) throw new BusinessError(400, '请上传音频样本');
   await creditService.consumeCredit(userId, 'digital_human');
   const taskId = await createTask({ userId, type: 'voice_clone', title: '声音克隆', inputParams: { audioSampleUrl, text: text?.slice(0, 200), presetVoice }, priority: 2 });
   setImmediate(() => processVoiceClone(taskId, userId, { audioSampleUrl, text, presetVoice }));
@@ -154,7 +155,7 @@ async function processViralClone(taskId, userId, params) {
 
 export async function submitActionBatch(userId, { actionVideoUrl, productImageUrls, targetAction = '' }) {
   const count = productImageUrls?.length || 0;
-  if (count === 0) throw Object.assign(new Error('请上传至少一张产品图'), { statusCode: 400 });
+  if (count === 0) throw new BusinessError(400, '请上传至少一张产品图');
   await creditService.consumeCredit(userId, 'action_transfer', count);
   const taskId = await createTask({ userId, type: 'action_batch', title: `批量动作迁移 × ${count}张`, inputParams: { actionVideoUrl, productImageUrls, targetAction, count }, priority: 3 });
   setImmediate(() => processActionBatch(taskId, userId, { actionVideoUrl, productImageUrls }));
@@ -199,7 +200,7 @@ async function processVideoBeautify(taskId, userId, { videoUrl, options }) {
 // ==================== 爆款视频分析 ====================
 
 export async function submitViralAnalyze(userId, { url }) {
-  if (!url) throw Object.assign(new Error('请输入爆款视频链接'), { statusCode: 400 });
+  if (!url) throw new BusinessError(400, '请输入爆款视频链接');
   await creditService.consumeCredit(userId, 'viral_analyze');
   const taskId = await createTask({ userId, type: 'viral_analyze', title: '爆款视频分析', inputParams: { url }, priority: 1 });
   setImmediate(() => processViralAnalyze(taskId, userId, { url }));
@@ -219,7 +220,7 @@ async function processViralAnalyze(taskId, userId, params) {
 // ==================== 爆款复刻生成 ====================
 
 export async function submitViralReplicate(userId, { analysisResult, productImageUrl, productName }) {
-  if (!productImageUrl) throw Object.assign(new Error('请上传产品图'), { statusCode: 400 });
+  if (!productImageUrl) throw new BusinessError(400, '请上传产品图');
   await creditService.consumeCredit(userId, 'viral_replicate');
   const taskId = await createTask({ userId, type: 'viral_replicate', title: `爆款复刻 — ${productName || '产品'}`, inputParams: { analysisResult, productImageUrl, productName }, priority: 2 });
   setImmediate(() => processViralReplicate(taskId, userId, { analysisResult, productImageUrl }));
@@ -240,7 +241,7 @@ async function processViralReplicate(taskId, userId, params) {
 
 export async function getTaskResult(taskId, userId) {
   const task = await getTask(taskId, userId);
-  if (!task) throw Object.assign(new Error('任务不存在'), { statusCode: 404 });
+  if (!task) throw new BusinessError(404, '任务不存在');
   return task;
 }
 

@@ -1,3 +1,4 @@
+import { BusinessError } from '../utils/businessError.js';
 /**
  * P2 增强表单服务 — 校验引擎 + 联动解析 + 脱敏 + 双端适配
  */
@@ -87,12 +88,12 @@ export async function listForms(tenantId, { page = 1, pageSize = 20, keyword, st
 
 export async function getFormById(id, tenantId) {
   const form = await formDao.getFormById(id, tenantId);
-  if (!form) throw Object.assign(new Error('表单不存在'), { statusCode: 404 });
+  if (!form) throw new BusinessError(404, '表单不存在');
   return form;
 }
 
 export async function createForm(tenantId, data) {
-  if (!data.title || !data.formCode) throw Object.assign(new Error('标题和编码不能为空'), { statusCode: 400 });
+  if (!data.title || !data.formCode) throw new BusinessError(400, '标题和编码不能为空');
 
   // 规范化字段结构
   const fields = (data.fields || []).map((f, i) => ({
@@ -127,7 +128,7 @@ export async function createForm(tenantId, data) {
 
 export async function updateForm(id, tenantId, data) {
   const existing = await formDao.getFormById(id, tenantId);
-  if (!existing) throw Object.assign(new Error('表单不存在'), { statusCode: 404 });
+  if (!existing) throw new BusinessError(404, '表单不存在');
 
   if (data.fields) {
     data.fields = data.fields.map((f, i) => ({
@@ -144,7 +145,7 @@ export async function updateForm(id, tenantId, data) {
 
 export async function deleteForm(id, tenantId) {
   const existing = await formDao.getFormById(id, tenantId);
-  if (!existing) throw Object.assign(new Error('表单不存在'), { statusCode: 404 });
+  if (!existing) throw new BusinessError(404, '表单不存在');
   await formDao.deleteForm(id, tenantId);
   return true;
 }
@@ -152,11 +153,11 @@ export async function deleteForm(id, tenantId) {
 // ── 公开表单(双端感知) ──
 export async function getPublicForm(code, tenantId, { device = 'pc' } = {}) {
   const form = await formDao.getFormByCode(code, tenantId);
-  if (!form) throw Object.assign(new Error('表单不存在或已关闭'), { statusCode: 404 });
-  if (form.access_type !== 1) throw Object.assign(new Error('此表单不公开'), { statusCode: 403 });
-  if (form.start_time && new Date(form.start_time) > new Date()) throw Object.assign(new Error('表单尚未开放'), { statusCode: 400 });
-  if (form.end_time && new Date(form.end_time) < new Date()) throw Object.assign(new Error('表单已结束'), { statusCode: 400 });
-  if (form.submit_limit > 0 && form.submit_count >= form.submit_limit) throw Object.assign(new Error('已达提交上限'), { statusCode: 400 });
+  if (!form) throw new BusinessError(404, '表单不存在或已关闭');
+  if (form.access_type !== 1) throw new BusinessError(403, '此表单不公开');
+  if (form.start_time && new Date(form.start_time) > new Date()) throw new BusinessError(400, '表单尚未开放');
+  if (form.end_time && new Date(form.end_time) < new Date()) throw new BusinessError(400, '表单已结束');
+  if (form.submit_limit > 0 && form.submit_count >= form.submit_limit) throw new BusinessError(400, '已达提交上限');
 
   const fields = typeof form.fields_json === 'string' ? JSON.parse(form.fields_json) : form.fields_json;
   const deviceFields = filterFieldsByDevice(fields, device);
@@ -176,16 +177,16 @@ export async function getPublicForm(code, tenantId, { device = 'pc' } = {}) {
 // ── 表单提交(完整校验+联动+脱敏) ──
 export async function submitForm(code, tenantId, userId, rawData, ip, userAgent, deviceType) {
   const form = await formDao.getFormByCode(code, tenantId);
-  if (!form) throw Object.assign(new Error('表单不存在或已关闭'), { statusCode: 404 });
-  if (form.access_type !== 1) throw Object.assign(new Error('此表单不公开'), { statusCode: 403 });
-  if (form.start_time && new Date(form.start_time) > new Date()) throw Object.assign(new Error('表单尚未开放'), { statusCode: 400 });
-  if (form.end_time && new Date(form.end_time) < new Date()) throw Object.assign(new Error('表单已结束'), { statusCode: 400 });
-  if (form.submit_limit > 0 && form.submit_count >= form.submit_limit) throw Object.assign(new Error('已达提交上限'), { statusCode: 400 });
+  if (!form) throw new BusinessError(404, '表单不存在或已关闭');
+  if (form.access_type !== 1) throw new BusinessError(403, '此表单不公开');
+  if (form.start_time && new Date(form.start_time) > new Date()) throw new BusinessError(400, '表单尚未开放');
+  if (form.end_time && new Date(form.end_time) < new Date()) throw new BusinessError(400, '表单已结束');
+  if (form.submit_limit > 0 && form.submit_count >= form.submit_limit) throw new BusinessError(400, '已达提交上限');
 
   // 每用户提交上限
   if (form.max_submissions_per_user > 0 && userId) {
     const userCount = await formDao.getUserSubmissionCount(form.id, userId);
-    if (userCount >= form.max_submissions_per_user) throw Object.assign(new Error('您已达个人提交上限'), { statusCode: 400 });
+    if (userCount >= form.max_submissions_per_user) throw new BusinessError(400, '您已达个人提交上限');
   }
 
   const fields = typeof form.fields_json === 'string' ? JSON.parse(form.fields_json) : form.fields_json;
@@ -208,7 +209,7 @@ export async function submitForm(code, tenantId, userId, rawData, ip, userAgent,
       if (errMsg) errors.push(`${f.field_label || f.label}: ${errMsg}`);
     }
   }
-  if (errors.length) throw Object.assign(new Error(errors.join('; ')), { statusCode: 400 });
+  if (errors.length) throw new BusinessError(400, errors.join('; '));
 
   // 3️⃣ 数据脱敏存储
   const maskedData = {};

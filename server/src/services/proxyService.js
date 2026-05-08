@@ -1,3 +1,4 @@
+import { BusinessError } from '../utils/businessError.js';
 import proxyDao from '../dao/proxyDao.js';
 import { encrypt, decrypt } from '../utils/crypto.js';
 
@@ -19,16 +20,16 @@ export async function listConfigs(tenantId, { page = 1, pageSize = 20, status } 
 
 export async function getConfig(id, tenantId) {
   const cfg = await proxyDao.getById(id, tenantId);
-  if (!cfg) throw Object.assign(new Error('代理配置不存在'), { statusCode: 404, errorCode: ERROR_CODES.NOT_FOUND });
+  if (!cfg) throw new BusinessError(404, '代理配置不存在');
   return maskSensitive(cfg);
 }
 
 export async function createConfig(tenantId, data) {
   if (!data.name || !data.proxyCode || !data.upstreamUrl) {
-    throw Object.assign(new Error('名称、编码和上游URL不能为空'), { statusCode: 400 });
+    throw new BusinessError(400, '名称、编码和上游URL不能为空');
   }
   const existing = await proxyDao.getByCode(data.proxyCode, tenantId);
-  if (existing) throw Object.assign(new Error('编码已存在'), { statusCode: 409 });
+  if (existing) throw new BusinessError(409, '编码已存在');
 
   // AES 加密鉴权凭证
   const processed = { ...data };
@@ -48,7 +49,7 @@ export async function createConfig(tenantId, data) {
 
 export async function updateConfig(id, tenantId, data) {
   const cfg = await proxyDao.getById(id, tenantId);
-  if (!cfg) throw Object.assign(new Error('代理配置不存在'), { statusCode: 404, errorCode: ERROR_CODES.NOT_FOUND });
+  if (!cfg) throw new BusinessError(404, '代理配置不存在');
 
   if (data.authConfig) {
     data.authConfig = data.encryptAuth !== 0
@@ -63,7 +64,7 @@ export async function updateConfig(id, tenantId, data) {
 
 export async function deleteConfig(id, tenantId) {
   const cfg = await proxyDao.getById(id, tenantId);
-  if (!cfg) throw Object.assign(new Error('代理配置不存在'), { statusCode: 404, errorCode: ERROR_CODES.NOT_FOUND });
+  if (!cfg) throw new BusinessError(404, '代理配置不存在');
   await proxyDao.remove(id, tenantId);
   return true;
 }
@@ -72,15 +73,13 @@ export async function deleteConfig(id, tenantId) {
 
 export async function callProxy(code, tenantId, { method, body, userId, clientIp } = {}) {
   const proxy = await proxyDao.getByCode(code, tenantId);
-  if (!proxy) throw Object.assign(new Error('代理不存在'), { statusCode: 404, errorCode: ERROR_CODES.NOT_FOUND });
+  if (!proxy) throw new BusinessError(404, '代理不存在');
 
   // 1. 白名单校验
   if (proxy.whitelist_enabled !== 0) {
     const allowed = await proxyDao.checkWhitelist(tenantId, proxy.upstream_url);
     if (!allowed) {
-      throw Object.assign(new Error(`上游域名不在白名单: ${proxy.upstream_url}`), {
-        statusCode: 403, errorCode: ERROR_CODES.WHITELIST_DENIED,
-      });
+      throw new BusinessError(403, `上游域名不在白名单: ${proxy.upstream_url}`);
     }
   }
 
@@ -88,24 +87,18 @@ export async function callProxy(code, tenantId, { method, body, userId, clientIp
   if (proxy.rate_limit_rpm > 0) {
     const rpm = await proxyDao.checkRateLimit(proxy.id);
     if (rpm >= proxy.rate_limit_rpm) {
-      throw Object.assign(new Error(`限流: ${proxy.rate_limit_rpm}/min`), {
-        statusCode: 429, errorCode: ERROR_CODES.RATE_LIMITED,
-      });
+      throw new BusinessError(429, `限流: ${proxy.rate_limit_rpm}/min`);
     }
   }
 
   // 3. 熔断检查
   if (proxy.circuit_status === 1) {
-    throw Object.assign(new Error('上游已熔断，请稍后重试'), {
-      statusCode: 503, errorCode: ERROR_CODES.CIRCUIT_OPEN,
-    });
+    throw new BusinessError(503, '上游已熔断，请稍后重试');
   }
 
   // 4. 请求体大小校验
   if (body && proxy.body_max_bytes > 0 && Buffer.byteLength(body) > proxy.body_max_bytes) {
-    throw Object.assign(new Error(`请求体超过上限 ${proxy.body_max_bytes} 字节`), {
-      statusCode: 413, errorCode: ERROR_CODES.BODY_TOO_LARGE,
-    });
+    throw new BusinessError(413, `请求体超过上限 ${proxy.body_max_bytes} 字节`);
   }
 
   // 5. 构建请求
@@ -165,9 +158,7 @@ export async function callProxy(code, tenantId, { method, body, userId, clientIp
 
   // 7. 全部重试失败 → 记录
   await handleUpstreamFailure(proxy, tenantId, 0, lastError?.message);
-  throw Object.assign(new Error('代理请求失败: ' + (lastError?.message || '未知错误')), {
-    statusCode: 502, errorCode: ERROR_CODES.UPSTREAM_FAILED,
-  });
+  throw new BusinessError(502, '代理请求失败: ' + (lastError?.message || '未知错误'));
 }
 
 // ==================== 白名单管理 ====================
@@ -177,7 +168,7 @@ export async function listWhitelist(tenantId) {
 }
 
 export async function addWhitelist(tenantId, data) {
-  if (!data.domainPattern) throw Object.assign(new Error('域名模式不能为空'), { statusCode: 400 });
+  if (!data.domainPattern) throw new BusinessError(400, '域名模式不能为空');
   return proxyDao.addWhitelist({ ...data, tenantId });
 }
 

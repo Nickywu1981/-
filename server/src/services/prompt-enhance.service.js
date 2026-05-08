@@ -7,6 +7,7 @@
  *   底层共用通义千问 LLM, 不同场景仅 System Prompt 不同
  */
 import { routeModel } from './model-router.service.js';
+import logger from '../utils/logger.js';
 
 const PROMPT_STRATEGIES = {
   image: {
@@ -65,7 +66,7 @@ export async function enhancePrompt(prompt, type = 'image') {
     };
   } catch (err) {
     // 降级: 返回原提示词
-    console.warn('[PromptEnhance] 增强失败，降级返回原始提示词', err.message);
+    logger.warn('[PromptEnhance] 增强失败，降级返回原始提示词', err.message);
     return {
       original_prompt: prompt,
       enhanced_prompt: prompt,

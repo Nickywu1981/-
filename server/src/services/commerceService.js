@@ -178,7 +178,7 @@ export async function getAllPlans() {
 
 export async function updatePlan(planId, data) {
   const updated = await commerceDao.updatePlan(planId, data);
-  if (!updated) throw Object.assign(new Error('没有可更新的字段'), { statusCode: 400 });
+  if (!updated) throw new BusinessError(400, '没有可更新的字段');
   return updated;
 }
 

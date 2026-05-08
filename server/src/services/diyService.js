@@ -1,3 +1,4 @@
+import { BusinessError } from '../utils/businessError.js';
 /**
  * DIY 页面服务（增强版）
  * 完整状态机 / 双端配置 / 自动+手动版本 / Redis缓存 / 克隆 / 批量操作 / 发布校验
@@ -61,7 +62,7 @@ function checkStateTransition(currentStatus, targetStatus) {
   const rule = STATE_MACHINE[currentStatus];
   if (!rule || !rule.allow.includes(targetStatus)) {
     const statusNames = { 0: '草稿', 1: '已发布', 2: '已下线', 3: '回收站' };
-    throw Object.assign(new Error(`页面状态为「${statusNames[currentStatus] || currentStatus}」，不允许此操作`), { statusCode: 400 });
+    throw new BusinessError(400, `页面状态为「${statusNames[currentStatus] || currentStatus}」，不允许此操作`);
   }
   return rule.msg[targetStatus];
 }
@@ -78,7 +79,7 @@ export default {
   },
 
   async createPage(tenantId, ownerId, { title, slug, pageType, accessType, mobileConfig, pcConfig, metaJson }) {
-    if (!title?.trim() || !slug?.trim()) throw Object.assign(new Error('标题和标识不能为空'), { statusCode: 400 });
+    if (!title?.trim() || !slug?.trim()) throw new BusinessError(400, '标题和标识不能为空');
     const id = await diyDao.createPage({ tenantId, ownerId, title, slug, pageType: pageType || 'mobile', accessType: accessType || 'public', mobileConfig, pcConfig, metaJson });
     await diyDao.saveVersion(id, mobileConfig || { sections: [] }, pcConfig || { sections: [] }, { remark: '初始版本', autoSave: false });
     return diyDao.getPageById(id, tenantId);
@@ -86,7 +87,7 @@ export default {
 
   async updatePage(id, tenantId, fields) {
     const exist = await diyDao.getPageById(id, tenantId);
-    if (!exist) throw Object.assign(new Error('页面不存在'), { statusCode: 404 });
+    if (!exist) throw new BusinessError(404, '页面不存在');
     await diyDao.updatePage(id, tenantId, fields);
     return diyDao.getPageById(id, tenantId);
   },
@@ -95,11 +96,11 @@ export default {
 
   async publishPage(id, tenantId) {
     const page = await diyDao.getPageById(id, tenantId);
-    if (!page) throw Object.assign(new Error('页面不存在'), { statusCode: 404 });
+    if (!page) throw new BusinessError(404, '页面不存在');
     const msg = checkStateTransition(page.status, 1);
     // 发布前自动校验
     const issues = validateBeforePublish(page);
-    if (issues.length) throw Object.assign(new Error(`发布校验未通过: ${issues.join('; ')}`), { statusCode: 400, issues });
+    if (issues.length) throw new BusinessError(400, `发布校验未通过: ${issues.join('; ')}`);
     await diyDao.updatePage(id, tenantId, { status: 1, publish_time: new Date() });
     await diyDao.saveVersion(id, page.mobile_config, page.pc_config, { remark: '发布' });
     // 缓存已发布页面
@@ -114,7 +115,7 @@ export default {
 
   async unpublishPage(id, tenantId) {
     const page = await diyDao.getPageById(id, tenantId);
-    if (!page) throw Object.assign(new Error('页面不存在'), { statusCode: 404 });
+    if (!page) throw new BusinessError(404, '页面不存在');
     const msg = checkStateTransition(page.status, 2);
     await diyDao.unpublishPage(id, tenantId);
     await diyDao.clearPageCache(page.slug);
@@ -123,7 +124,7 @@ export default {
 
   async republishPage(id, tenantId) {
     const page = await diyDao.getPageById(id, tenantId);
-    if (!page) throw Object.assign(new Error('页面不存在'), { statusCode: 404 });
+    if (!page) throw new BusinessError(404, '页面不存在');
     const msg = checkStateTransition(page.status, 1);
     await diyDao.republishPage(id, tenantId);
     const published = await diyDao.getPageById(id, tenantId);
@@ -137,7 +138,7 @@ export default {
 
   async softDeletePage(id, tenantId) {
     const page = await diyDao.getPageById(id, tenantId);
-    if (!page) throw Object.assign(new Error('页面不存在'), { statusCode: 404 });
+    if (!page) throw new BusinessError(404, '页面不存在');
     checkStateTransition(page.status, 3);
     if (page.status === 1) await diyDao.clearPageCache(page.slug);
     await diyDao.softDeletePage(id, tenantId);
@@ -146,16 +147,16 @@ export default {
 
   async restorePage(id, tenantId) {
     const page = await diyDao.getPageById(id, tenantId);
-    if (!page) throw Object.assign(new Error('页面不存在'), { statusCode: 404 });
-    if (page.status !== 3) throw Object.assign(new Error('仅回收站中的页面可恢复'), { statusCode: 400 });
+    if (!page) throw new BusinessError(404, '页面不存在');
+    if (page.status !== 3) throw new BusinessError(400, '仅回收站中的页面可恢复');
     await diyDao.restorePage(id, tenantId);
     return { msg: '已恢复至草稿状态' };
   },
 
   async hardDeletePage(id, tenantId) {
     const page = await diyDao.getPageById(id, tenantId);
-    if (!page) throw Object.assign(new Error('页面不存在'), { statusCode: 404 });
-    if (page.status !== 3) throw Object.assign(new Error('仅回收站中的页面可彻底删除'), { statusCode: 400 });
+    if (!page) throw new BusinessError(404, '页面不存在');
+    if (page.status !== 3) throw new BusinessError(400, '仅回收站中的页面可彻底删除');
     if (page.status === 1) await diyDao.clearPageCache(page.slug);
     await diyDao.hardDeletePage(id, tenantId);
     return { msg: '页面已彻底删除，不可恢复' };
@@ -165,7 +166,7 @@ export default {
 
   async clonePage(id, tenantId) {
     const src = await diyDao.getPageById(id, tenantId);
-    if (!src) throw Object.assign(new Error('源页面不存在'), { statusCode: 404 });
+    if (!src) throw new BusinessError(404, '源页面不存在');
     const slug = `${src.slug}-clone-${Date.now().toString(36)}`;
     const title = `${src.title}（克隆版）`;
     const newId = await diyDao.createPage({
@@ -181,28 +182,28 @@ export default {
 
   async saveVersion(pageId, tenantId, mobileConfig, pcConfig, remark, { autoSave = false } = {}) {
     const page = await diyDao.getPageById(pageId, tenantId);
-    if (!page) throw Object.assign(new Error('页面不存在'), { statusCode: 404 });
+    if (!page) throw new BusinessError(404, '页面不存在');
     const v = await diyDao.saveVersion(pageId, mobileConfig, pcConfig, { remark: remark || (autoSave ? '自动保存' : '手动保存'), autoSave });
     return { version: v };
   },
 
   async listVersions(pageId, tenantId, { includeAuto = false } = {}) {
     const page = await diyDao.getPageById(pageId, tenantId);
-    if (!page) throw Object.assign(new Error('页面不存在'), { statusCode: 404 });
+    if (!page) throw new BusinessError(404, '页面不存在');
     return diyDao.listVersions(pageId, { includeAuto });
   },
 
   async getVersion(pageId, version, tenantId) {
     const page = await diyDao.getPageById(pageId, tenantId);
-    if (!page) throw Object.assign(new Error('页面不存在'), { statusCode: 404 });
+    if (!page) throw new BusinessError(404, '页面不存在');
     return diyDao.getVersion(pageId, version);
   },
 
   async rollbackVersion(pageId, version, tenantId) {
     const page = await diyDao.getPageById(pageId, tenantId);
-    if (!page) throw Object.assign(new Error('页面不存在'), { statusCode: 404 });
+    if (!page) throw new BusinessError(404, '页面不存在');
     const src = await diyDao.getVersion(pageId, version);
-    if (!src) throw Object.assign(new Error('版本不存在'), { statusCode: 404 });
+    if (!src) throw new BusinessError(404, '版本不存在');
     // 写入当前配置，保存回滚源
     const v = await diyDao.saveVersion(pageId, src.mobile_config, src.pc_config, { remark: `回滚自版本 v${version}`, autoSave: false, rollbackFrom: version });
     await diyDao.updatePage(pageId, tenantId, { mobile_config: src.mobile_config, pc_config: src.pc_config });
@@ -211,7 +212,7 @@ export default {
 
   async getLatestAutoVersion(pageId, tenantId) {
     const page = await diyDao.getPageById(pageId, tenantId);
-    if (!page) throw Object.assign(new Error('页面不存在'), { statusCode: 404 });
+    if (!page) throw new BusinessError(404, '页面不存在');
     return diyDao.getLatestAutoVersion(pageId);
   },
 

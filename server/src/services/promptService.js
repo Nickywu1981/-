@@ -79,7 +79,7 @@ export async function useTemplate(userId, id) {
 
 export async function fillAndPreview(userId, templateId, values = {}) {
   const t = await useTemplate(userId, templateId);
-  if (!t) throw Object.assign(new Error('模板不存在'), { statusCode: 404 });
+  if (!t) throw new BusinessError(404, '模板不存在');
   let variables = t.variables;
   if (typeof variables === 'string') {
     try { variables = JSON.parse(variables); }
@@ -207,7 +207,7 @@ export async function getRecommendations(userId, { limit = 12 }) {
 // ==================== 评分 ====================
 
 export async function rateTemplate(userId, templateId, score) {
-  if (score < 1 || score > 5) throw Object.assign(new Error('评分需在1-5之间'), { statusCode: 400 });
+  if (score < 1 || score > 5) throw new BusinessError(400, '评分需在1-5之间');
   await promptDao.upsertRating(userId, templateId, score);
   const rating = await promptDao.getAverageRating(templateId);
   return { score, avgScore: Math.round(rating.avg_score * 10) / 10, ratingCount: rating.rating_count };

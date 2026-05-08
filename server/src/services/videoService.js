@@ -5,6 +5,7 @@
 import { infer, pipeline } from './aiEngine.js';
 import { createTask, updateTaskStatus, completeTask, getTask, listUserTasks, countUserTasks } from '../dao/taskDao.js';
 import * as creditService from './creditService.js';
+import { BusinessError } from '../utils/businessError.js';
 
 // ==================== 单图生视频 ====================
 
@@ -40,7 +41,7 @@ async function processImg2Video(taskId, userId, params) {
 
 export async function submitMulti2Video(userId, { imageUrls, style = 'fast', duration = 15, sellPoints = [] }) {
   const count = imageUrls?.length || 0;
-  if (count < 2) throw Object.assign(new Error('至少需要2张图片'), { statusCode: 400 });
+  if (count < 2) throw new BusinessError(400, '至少需要2张图片');
   await creditService.consumeCredit(userId, 'multi2video');
   const taskId = await createTask({
     userId, type: 'multi2video', title: `多图合成 — ${style} ${duration}s × ${count}张`,
@@ -206,7 +207,7 @@ async function processDigitalHuman(taskId, userId, params) {
 
 export async function getTaskResult(taskId, userId) {
   const task = await getTask(taskId, userId);
-  if (!task) throw Object.assign(new Error('任务不存在'), { statusCode: 404 });
+  if (!task) throw new BusinessError(404, '任务不存在');
   return task;
 }
 

@@ -29,7 +29,7 @@ export async function freezeCredit(userId, requestId, action, batchCount = 1, is
   }
 
   const membership = await creditDao.getMembership(userId);
-  if (!membership) throw Object.assign(new Error('会员信息不存在'), { statusCode: 403 });
+  if (!membership) throw new BusinessError(403, '会员信息不存在');
 
   const plan = await creditDao.getPlanByType(membership.plan_type);
 
@@ -37,22 +37,22 @@ export async function freezeCredit(userId, requestId, action, batchCount = 1, is
   const dailyUsed = await creditDao.getDailyUsedCredits(userId);
   const monthlyUsed = await creditDao.getMonthlyUsedCredits(userId);
   if (plan && plan.daily_limit > 0 && dailyUsed + consumedAmount > plan.daily_limit) {
-    throw Object.assign(new Error('超出每日消费上限'), { statusCode: 4103 });
+    throw new BusinessError(4103, '超出每日消费上限');
   }
   if (plan && plan.monthly_limit > 0 && monthlyUsed + consumedAmount > plan.monthly_limit) {
-    throw Object.assign(new Error('超出每月消费上限'), { statusCode: 4103 });
+    throw new BusinessError(4103, '超出每月消费上限');
   }
   if (plan && plan.batch_limit > 0 && batchCount > plan.batch_limit) {
-    throw Object.assign(new Error(`单次批量上限为 ${plan.batch_limit} 张`), { statusCode: 4103 });
+    throw new BusinessError(4103, `单次批量上限为 ${plan.batch_limit} 张`);
   }
 
   const creditBefore = membership.credit_balance;
   if (creditBefore < consumedAmount) {
-    throw Object.assign(new Error('点数不足，请升级会员'), { statusCode: 4103, creditBefore, creditNeeded: consumedAmount });
+    throw new BusinessError(4103, '点数不足，请升级会员');
   }
 
   const ok = await creditDao.updateCreditBalance(userId, -consumedAmount);
-  if (!ok) throw Object.assign(new Error('扣费失败'), { statusCode: 500 });
+  if (!ok) throw new BusinessError(500, '扣费失败');
 
   const creditAfter = creditBefore - consumedAmount;
 
@@ -73,7 +73,7 @@ export async function freezeCredit(userId, requestId, action, batchCount = 1, is
 
 export async function confirmCharge(requestId) {
   const record = await creditDao.getConsumptionByRequestId(requestId);
-  if (!record) throw Object.assign(new Error('预扣记录不存在'), { statusCode: 404 });
+  if (!record) throw new BusinessError(404, '预扣记录不存在');
   if (record.status === 1) return { alreadyConfirmed: true };
 
   await creditDao.confirmConsumption(record.id, record.credit_before - record.consumed);
@@ -88,7 +88,7 @@ export async function confirmCharge(requestId) {
 
 export async function rollbackCharge(requestId, remark = '') {
   const record = await creditDao.getConsumptionByRequestId(requestId);
-  if (!record) throw Object.assign(new Error('预扣记录不存在'), { statusCode: 404 });
+  if (!record) throw new BusinessError(404, '预扣记录不存在');
   if (record.status === 2) return { alreadyRolledBack: true };
 
   await creditDao.updateCreditBalance(record.user_id, record.consumed);
@@ -105,7 +105,7 @@ export async function rollbackCharge(requestId, remark = '') {
 
 export async function consumeCredit(userId, action, batchCount = 1) {
   const membership = await creditDao.getMembership(userId);
-  if (!membership) throw Object.assign(new Error('会员信息不存在'), { statusCode: 403 });
+  if (!membership) throw new BusinessError(403, '会员信息不存在');
 
   const plan = await creditDao.getPlanByType(membership.plan_type);
   const consumed = calcConsumed(action, batchCount);
@@ -113,29 +113,29 @@ export async function consumeCredit(userId, action, batchCount = 1) {
   // daily_limit / monthly_limit / batch_limit 检查（对齐 freezeCredit）
   if (plan) {
     if (plan.batch_limit > 0 && batchCount > plan.batch_limit) {
-      throw Object.assign(new Error(`单次批量上限为 ${plan.batch_limit} 张`), { statusCode: 4103 });
+      throw new BusinessError(4103, `单次批量上限为 ${plan.batch_limit} 张`);
     }
     if (plan.daily_limit > 0) {
       const dailyUsed = await creditDao.getDailyUsedCredits(userId);
       if (dailyUsed + consumed > plan.daily_limit) {
-        throw Object.assign(new Error('超出每日消费上限'), { statusCode: 4103 });
+        throw new BusinessError(4103, '超出每日消费上限');
       }
     }
     if (plan.monthly_limit > 0) {
       const monthlyUsed = await creditDao.getMonthlyUsedCredits(userId);
       if (monthlyUsed + consumed > plan.monthly_limit) {
-        throw Object.assign(new Error('超出每月消费上限'), { statusCode: 4103 });
+        throw new BusinessError(4103, '超出每月消费上限');
       }
     }
   }
 
   const creditBefore = membership.credit_balance;
   if (creditBefore < consumed) {
-    throw Object.assign(new Error('点数不足'), { statusCode: 4103, creditBefore, creditNeeded: consumed });
+    throw new BusinessError(4103, '点数不足');
   }
 
   const ok = await creditDao.updateCreditBalance(userId, -consumed);
-  if (!ok) throw Object.assign(new Error('扣费失败'), { statusCode: 500 });
+  if (!ok) throw new BusinessError(500, '扣费失败');
 
   const creditAfter = creditBefore - consumed;
   await creditDao.insertConsumptionLog({
@@ -185,7 +185,7 @@ export async function checkIn(userId) {
 
   const todayRow = await creditDao.getCheckInByDate(userId, today);
   if (todayRow) {
-    throw Object.assign(new Error('今日已签到'), { statusCode: 409, streak: todayRow.streak });
+    throw new BusinessError(409, '今日已签到');
   }
 
   const prevRow = await creditDao.getLastCheckIn(userId);

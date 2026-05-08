@@ -5,6 +5,7 @@
 import { infer, pipeline } from './aiEngine.js';
 import { createTask, updateTaskStatus, completeTask, getTask, listUserTasks, countUserTasks } from '../dao/taskDao.js';
 import * as creditService from './creditService.js';
+import { BusinessError } from '../utils/businessError.js';
 
 // ==================== 虚拟模特上身 ====================
 
@@ -190,7 +191,7 @@ async function processImageTranslate(taskId, userId, params) {
 // ==================== AI 模特生成 ====================
 
 export async function submitModelGenerate(userId, { imageUrl, modelType = 'asian-female' }) {
-  if (!imageUrl) throw Object.assign(new Error('请上传商品图片'), { statusCode: 400 });
+  if (!imageUrl) throw new BusinessError(400, '请上传商品图片');
   await creditService.consumeCredit(userId, 'model_tryon');
   const taskId = await createTask({ userId, type: 'model_generate', title: `AI模特 — ${modelType}`, inputParams: { imageUrl, modelType }, priority: 2 });
   setImmediate(() => processModelGenerate(taskId, userId, { imageUrl, modelType }));
@@ -214,7 +215,7 @@ async function processModelGenerate(taskId, userId, params) {
 // ==================== 全景拍摄 ====================
 
 export async function submitShotPanorama(userId, { imageUrl, mode = '360' }) {
-  if (!imageUrl) throw Object.assign(new Error('请上传商品图片'), { statusCode: 400 });
+  if (!imageUrl) throw new BusinessError(400, '请上传商品图片');
   await creditService.consumeCredit(userId, 'enhance');
   const taskId = await createTask({ userId, type: 'shot_panorama', title: `全景 — ${mode}°`, inputParams: { imageUrl, mode }, priority: 2 });
   setImmediate(() => processShotPanorama(taskId, userId, { imageUrl, mode }));
@@ -240,7 +241,7 @@ async function processShotPanorama(taskId, userId, params) {
 // ==================== AI 换脸 ====================
 
 export async function submitSwapFace(userId, { baseUrl, faceUrl }) {
-  if (!baseUrl || !faceUrl) throw Object.assign(new Error('请上传底图和面部图片'), { statusCode: 400 });
+  if (!baseUrl || !faceUrl) throw new BusinessError(400, '请上传底图和面部图片');
   await creditService.consumeCredit(userId, 'model_tryon');
   const taskId = await createTask({ userId, type: 'swap_face', title: 'AI换脸', inputParams: { baseUrl, faceUrl }, priority: 2 });
   setImmediate(() => processSwapFace(taskId, userId, { baseUrl, faceUrl }));
@@ -263,7 +264,7 @@ async function processSwapFace(taskId, userId, params) {
 // ==================== AI 文字特效 ====================
 
 export async function submitTextEffect(userId, { text, effect = 'neon' }) {
-  if (!text) throw Object.assign(new Error('请输入文字内容'), { statusCode: 400 });
+  if (!text) throw new BusinessError(400, '请输入文字内容');
   await creditService.consumeCredit(userId, 'enhance');
   const taskId = await createTask({ userId, type: 'text_effect', title: `文字特效 — ${effect}`, inputParams: { text, effect }, priority: 1 });
   setImmediate(() => processTextEffect(taskId, userId, { text, effect }));
@@ -285,7 +286,7 @@ async function processTextEffect(taskId, userId, params) {
 
 export async function getTaskResult(taskId, userId) {
   const task = await getTask(taskId, userId);
-  if (!task) throw Object.assign(new Error('任务不存在'), { statusCode: 404 });
+  if (!task) throw new BusinessError(404, '任务不存在');
   return task;
 }
 

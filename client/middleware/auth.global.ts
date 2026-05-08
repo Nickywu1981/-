@@ -16,7 +16,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   let userRole = ''
 
   try {
-    if (process.server) {
+    if (import.meta.server) {
       // SSR: 直连 Express 后端，绕过 Nuxt Nitro 避免死循环
       const apiBase = useRuntimeConfig().public.apiBase
       const data: any = await $fetch(`${apiBase}/user/profile`, {

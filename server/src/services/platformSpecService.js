@@ -1,4 +1,5 @@
 import dao from '../dao/platformSpecDao.js';
+import { BusinessError } from '../utils/businessError.js';
 
 export async function listAll(req) {
   return dao.listAll(req);
@@ -56,17 +57,17 @@ export async function getAdaptSpec(platformCode, req) {
 
 export async function adaptImage(inputPath, platformCode, outputDir) {
   if (!inputPath || !platformCode || !outputDir) {
-    throw Object.assign(new Error('inputPath, platformCode, outputDir 均为必填'), { statusCode: 400 });
+    throw new BusinessError(400, 'inputPath, platformCode, outputDir 均为必填');
   }
 
   const fs = await import('fs');
   if (!fs.existsSync(inputPath)) {
-    throw Object.assign(new Error(`输入文件不存在: ${inputPath}`), { statusCode: 404 });
+    throw new BusinessError(404, `输入文件不存在: ${inputPath}`);
   }
 
   const specData = await getAdaptSpec(platformCode, {});
   if (!specData || !specData.specs || Object.keys(specData.specs).length === 0) {
-    throw Object.assign(new Error(`未找到平台规格: ${platformCode}`), { statusCode: 404 });
+    throw new BusinessError(404, `未找到平台规格: ${platformCode}`);
   }
 
   // 取第一个规格进行适配
@@ -90,7 +91,7 @@ export async function adaptImage(inputPath, platformCode, outputDir) {
       .toFormat(ext)
       .toFile(outputPath);
   } catch (sharpErr) {
-    throw Object.assign(new Error(`图片处理失败: ${sharpErr.message}`), { statusCode: 500 });
+    throw new BusinessError(500, `图片处理失败: ${sharpErr.message}`);
   }
 
   const stats = fs.statSync(outputPath);
