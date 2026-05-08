@@ -4,6 +4,7 @@
  */
 import { Router } from 'express';
 import { z } from 'zod';
+import jwt from 'jsonwebtoken';
 import { success, error } from '../utils/response.js';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
@@ -12,6 +13,17 @@ import * as authService from '../services/auth.service.js';
 const router = Router();
 
 const _phoneRegex = /^1[3-9]\d{9}$/;
+
+function _setTokenCookie(res, token) {
+  const payload = jwt.decode(token);
+  const maxAge = payload?.exp ? (payload.exp * 1000) - Date.now() : 7 * 24 * 60 * 60 * 1000;
+  res.cookie('token', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge,
+  });
+}
 
 const registerSchema = z.object({
   phone: z.string().regex(_phoneRegex, '手机号格式不正确').optional().nullable(),
@@ -24,13 +36,15 @@ const registerSchema = z.object({
 const loginSchema = z.object({
   phone: z.string().regex(_phoneRegex).optional().nullable(),
   email: z.string().email().optional().nullable(),
+  username: z.string().min(1).max(100).optional().nullable(),
   password: z.string().min(1, '请填写密码'),
-}).refine(d => d.phone || d.email, { message: '请填写手机号或邮箱' });
+}).refine(d => d.phone || d.email || d.username, { message: '请填写手机号、邮箱或用户名' });
 
 const loginByCodeSchema = z.object({
   phone: z.string().regex(_phoneRegex).optional().nullable(),
   email: z.string().email().optional().nullable(),
-}).refine(d => d.phone || d.email, { message: '请提供手机号或邮箱' });
+  username: z.string().min(1).max(100).optional().nullable(),
+}).refine(d => d.phone || d.email || d.username, { message: '请提供手机号、邮箱或用户名' });
 
 const resetPasswordSchema = z.object({
   phone: z.string().regex(_phoneRegex).optional().nullable(),
@@ -48,12 +62,7 @@ router.post('/register', _validate(registerSchema), async (req, res) => {
     });
 
     // 设置 cookie
-    res.cookie('token', result.token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: result.token_expires_in * 1000,
-    });
+    _setTokenCookie(res, result.token);
 
     return success(res, result.user, '注册成功');
   } catch (err) {
@@ -64,16 +73,11 @@ router.post('/register', _validate(registerSchema), async (req, res) => {
 // POST /api/auth/login
 router.post('/login', _validate(loginSchema), async (req, res) => {
   try {
-    const { phone, email, password } = req.validated;
+    const { phone, email, username, password } = req.validated;
 
-    const result = await authService.login({ phone, email, password });
+    const result = await authService.login({ phone, email, username, password });
 
-    res.cookie('token', result.token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: result.token_expires_in * 1000,
-    });
+    _setTokenCookie(res, result.token);
 
     return success(res, result.user, '登录成功');
   } catch (err) {
@@ -84,19 +88,14 @@ router.post('/login', _validate(loginSchema), async (req, res) => {
 // POST /api/auth/login-by-code — 短信/邮箱验证码登录
 router.post('/login-by-code', _validate(loginByCodeSchema), async (req, res) => {
   try {
-    const { phone, email } = req.validated;
-    if (!phone && !email) {
-      return error(res, ERROR_CODE.VALIDATION_ERROR, '请提供手机号或邮箱');
+    const { phone, email, username } = req.validated;
+    if (!phone && !email && !username) {
+      return error(res, ERROR_CODE.VALIDATION_ERROR, '请提供手机号、邮箱或用户名');
     }
 
-    const result = await authService.loginByCode({ phone, email });
+    const result = await authService.loginByCode({ phone, email, username });
 
-    res.cookie('token', result.token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: result.token_expires_in * 1000,
-    });
+    _setTokenCookie(res, result.token);
 
     return success(res, result.user, '登录成功');
   } catch (err) {

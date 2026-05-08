@@ -50,15 +50,15 @@ export async function register({ phone, email, password, nickname, inviteCode: _
   }
 }
 
-export async function login({ phone, email, password }) {
+export async function login({ phone, email, username, password }) {
   const conn = await db.getConnection();
   try {
-    const username = phone || email || '';
-    if (!username) throw new BusinessError(400, '请提供手机号或邮箱');
+    const identifier = username || phone || email || '';
+    if (!identifier) throw new BusinessError(400, '请提供手机号、邮箱或用户名');
 
     const [users] = await conn.query(
       'SELECT id, tenant_id, password, role, nickname, status FROM `user` WHERE username = ?',
-      [username],
+      [identifier],
     );
 
     if (!users || users.length === 0) throw new BusinessError(401, '账号或密码错误');
@@ -82,15 +82,15 @@ export async function login({ phone, email, password }) {
   }
 }
 
-export async function loginByCode({ phone, email }) {
+export async function loginByCode({ phone, email, username }) {
   const conn = await db.getConnection();
   try {
-    const username = phone || email || '';
-    if (!username) throw new BusinessError(400, '请提供手机号或邮箱');
+    const identifier = username || phone || email || '';
+    if (!identifier) throw new BusinessError(400, '请提供手机号、邮箱或用户名');
 
     const [users] = await conn.query(
       'SELECT id, tenant_id, role, nickname, status FROM `user` WHERE username = ?',
-      [username],
+      [identifier],
     );
 
     if (!users || users.length === 0) throw new BusinessError(401, '账号不存在，请先注册');
