@@ -1,319 +1,255 @@
 <template>
   <div class="ws-app">
-    <!-- ==================== HEADER ==================== -->
+    <!-- HEADER -->
     <header class="ws-header">
       <div class="ws-header-inner">
-        <!-- Left: Logo -->
-        <div class="ws-header-left">
-          <div class="ws-header-logo" @click="navigateTo('/')">
-            <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-              <rect width="32" height="32" rx="8" fill="url(#ws-header-logo-grad)"/>
-              <path d="M8 16L13 21L23 10" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-              <defs><linearGradient id="ws-header-logo-grad" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#7C3AED"/><stop offset="1" stop-color="#A78BFA"/></linearGradient></defs>
-            </svg>
-            <span class="ws-header-brand">Movio AI</span>
-          </div>
+        <!-- Logo -->
+        <div class="ws-hdr-logo" @click="navigateTo('/')">
+          <span class="ws-hdr-dot"></span>
+          <span class="ws-hdr-brand">Movio AI</span>
         </div>
 
-        <!-- Center: Tab Navigation -->
-        <nav class="ws-header-tabs">
+        <!-- Center tabs -->
+        <nav class="ws-hdr-tabs">
           <button
             v-for="tab in displayTabs"
             :key="tab.id"
-            class="ws-header-tab"
-            :class="{ active: activeTab === tab.id }"
+            class="ws-hdr-tab"
+            :class="{ sel: activeTab === tab.id }"
             @click="activeTab = tab.id"
-          >
-            <span class="ws-header-tab-icon">{{ tab.icon }}</span>
-            <span class="ws-header-tab-label">{{ tab.label }}</span>
-          </button>
+          >{{ tab.label }}</button>
         </nav>
 
-        <!-- Right: Actions -->
-        <div class="ws-header-right">
-          <!-- Search -->
-          <button class="ws-header-icon-btn" @click="searchOpen = !searchOpen" title="搜索 (Ctrl+K)">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <!-- Spacer -->
+        <div class="ws-hdr-spacer"></div>
+
+        <!-- Right actions -->
+        <div class="ws-hdr-actions">
+          <button class="ws-hdr-icon" @click="searchOpen = !searchOpen" title="搜索">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </button>
+          <button class="ws-hdr-icon" @click="toggleTheme" :title="theme === 'dark' ? '亮色' : '暗色'">
+            <svg v-if="theme === 'dark'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <svg v-else width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </button>
+          <button class="ws-hdr-icon" @click="navigateTo('/notifications')" title="通知" style="position:relative">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span v-if="unreadCount" class="ws-notif-dot">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
           </button>
 
-          <!-- Theme Toggle -->
-          <button class="ws-header-icon-btn" @click="toggleTheme" :title="theme === 'dark' ? '切换亮色' : '切换暗色'">
-            <svg v-if="theme === 'dark'" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-            <svg v-else width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-          </button>
-
-          <!-- Notifications -->
-          <button class="ws-header-icon-btn notif-btn" @click="navigateTo('/notifications')" title="通知">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-            <span v-if="unreadCount" class="notif-badge">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
-          </button>
-
-          <!-- User Menu -->
+          <!-- User -->
           <template v-if="user">
-            <div class="ws-header-user" @click="menuOpen = !menuOpen">
-              <span class="ws-header-avatar">{{ user.nickname?.[0] || 'U' }}</span>
-              <span class="ws-header-uname">{{ user.nickname }}</span>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            <div class="ws-hdr-user" @click="menuOpen = !menuOpen">
+              <span class="ws-hdr-av">{{ user.nickname?.[0] || 'U' }}</span>
+              <span class="ws-hdr-name">{{ user.nickname }}</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
             </div>
-            <div v-if="menuOpen" class="ws-header-dropdown" @click.stop>
+            <div v-if="menuOpen" class="ws-hdr-menu" @click.stop>
               <button @click="navigateTo('/account/settings'); menuOpen = false">个人设置</button>
               <button @click="navigateTo('/account/membership'); menuOpen = false">我的会员</button>
               <button @click="navigateTo('/account/billing'); menuOpen = false">消费账单</button>
-              <button v-if="user?.role === 'admin'" @click="navigateTo('/admin/dashboard'); menuOpen = false" class="admin-link">管理后台</button>
+              <button v-if="user?.role === 'admin'" @click="navigateTo('/admin/dashboard'); menuOpen = false" class="ws-admin-link">管理后台</button>
               <hr />
               <button @click="doLogout">退出登录</button>
             </div>
           </template>
           <template v-else>
-            <button class="ws-header-login-btn" @click="navigateTo('/login')">登录</button>
-            <button class="ws-header-register-btn" @click="navigateTo('/register')">免费注册</button>
+            <button class="ws-hdr-login" @click="navigateTo('/login')">登录</button>
+            <button class="ws-hdr-signup" @click="navigateTo('/register')">免费注册</button>
           </template>
 
-          <!-- Mobile menu toggle -->
-          <button class="ws-header-hamburger" @click="mobileMenuOpen = !mobileMenuOpen">
-            <svg v-if="!mobileMenuOpen" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
-            </svg>
-            <svg v-else width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-            </svg>
+          <button class="ws-hdr-burger" @click="mobileMenuOpen = !mobileMenuOpen">
+            <svg v-if="!mobileMenuOpen" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            <svg v-else width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
         </div>
       </div>
 
-      <!-- Search panel -->
-      <div v-if="searchOpen" class="ws-search-panel">
-        <input v-model="searchQuery" ref="searchInput" type="text" placeholder="搜索功能..." class="ws-search-input" @keydown.esc="searchOpen = false; searchQuery = ''" @keydown.enter="doSearch" />
-        <div v-if="searchQuery && searchResults.length" class="ws-search-results">
-          <button v-for="r in searchResults" :key="r.path" class="ws-search-item" @click="closeSearch(); navigateTo(r.path)">
+      <!-- Search -->
+      <div v-if="searchOpen" class="ws-search">
+        <input v-model="searchQuery" ref="searchInput" type="text" placeholder="搜索功能..." class="ws-search-inp" @keydown.esc="searchOpen = false; searchQuery = ''" @keydown.enter="doSearch" />
+        <div v-if="searchQuery && searchResults.length" class="ws-search-list">
+          <button v-for="r in searchResults" :key="r.path" class="ws-search-it" @click="closeSearch(); navigateTo(r.path)">
             <span>{{ r.icon }}</span><span>{{ r.name }}</span><span class="ws-search-tag">{{ r.tag }}</span>
           </button>
         </div>
       </div>
     </header>
 
-    <!-- ==================== BODY ==================== -->
+    <!-- BODY -->
     <div class="ws-body">
-      <!-- ===== SIDEBAR ===== -->
-      <aside v-if="sidebarVisible" class="ws-sidebar" :class="{ open: sidebarOpen }">
-        <!-- Sidebar Logo -->
+      <!-- SIDEBAR -->
+      <aside v-if="sidebarVisible" class="ws-side" :class="{ open: sidebarOpen }">
         <div class="ws-side-logo" @click="navigateTo('/')">
-          <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-            <rect width="32" height="32" rx="8" fill="url(#ws-side-logo-grad)"/>
-            <path d="M8 16L13 21L23 10" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <defs><linearGradient id="ws-side-logo-grad" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#7C3AED"/><stop offset="1" stop-color="#A78BFA"/></linearGradient></defs>
-          </svg>
+          <span class="ws-side-dot"></span>
           <span class="ws-side-brand">Movio AI</span>
         </div>
 
-        <!-- Nav -->
         <nav class="ws-side-nav">
-          <button v-for="item in displayNavItems" :key="item.id" class="ws-nav-btn" :class="{ active: activeNav === item.id }" @click="activeNav = item.id">
-            <span class="ws-nav-icon">{{ item.icon }}</span>
-            <span class="ws-nav-label">{{ item.label }}</span>
+          <button v-for="item in displayNavItems" :key="item.id" class="ws-side-btn" :class="{ sel: activeNav === item.id }" @click="activeNav = item.id">
+            <span class="ws-side-dot-sm"></span>
+            <span>{{ item.label }}</span>
           </button>
         </nav>
 
         <!-- Stats -->
-        <div class="ws-stats">
-          <div class="ws-stat-item">
-            <span class="ws-stat-value">{{ userStats.todayTasks }}</span>
-            <span class="ws-stat-label">今日任务</span>
+        <div class="ws-side-stats">
+          <div class="ws-side-stat">
+            <b>{{ userStats.todayTasks }}</b>
+            <span>今日任务</span>
           </div>
-          <div class="ws-stat-item">
-            <span class="ws-stat-value">{{ userStats.credits }}</span>
-            <span class="ws-stat-label">剩余积分</span>
+          <div class="ws-side-stat">
+            <b>{{ userStats.credits }}</b>
+            <span>剩余积分</span>
           </div>
-          <div class="ws-stat-item">
-            <span class="ws-stat-value">{{ userStats.totalWorks }}</span>
-            <span class="ws-stat-label">累计作品</span>
+          <div class="ws-side-stat">
+            <b>{{ userStats.totalWorks }}</b>
+            <span>累计作品</span>
           </div>
         </div>
 
-        <!-- Recent Tasks -->
-        <div class="ws-recent-tasks">
-          <h4 class="ws-panel-title">最近任务</h4>
-          <div class="ws-task-list">
-            <div v-for="t in recentTasks" :key="t.id" class="ws-task-item" @click="navigateTo(t.route)">
-              <span class="ws-task-icon">{{ t.icon }}</span>
-              <div class="ws-task-info">
-                <span class="ws-task-name">{{ t.title }}</span>
-                <span class="ws-task-time">{{ t.time }}</span>
+        <!-- Recent tasks -->
+        <div class="ws-side-tasks">
+          <span class="ws-side-sec">最近任务</span>
+          <div class="ws-side-task-list">
+            <div v-for="t in recentTasks" :key="t.id" class="ws-side-task" @click="navigateTo(t.route)">
+              <span class="ws-side-task-dot" :class="t.status"></span>
+              <div class="ws-side-task-info">
+                <span class="ws-side-task-name">{{ t.title }}</span>
+                <span class="ws-side-task-time">{{ t.time }}</span>
               </div>
-              <span class="ws-task-status" :class="t.status">{{ t.statusText }}</span>
+              <span class="ws-side-task-st" :class="t.status">{{ t.statusText }}</span>
             </div>
           </div>
         </div>
 
-        <!-- Upgrade CTA -->
-        <div class="ws-upgrade-card" v-if="user && user.role !== 'admin'">
-          <div class="ws-upgrade-glow"></div>
-          <span class="ws-upgrade-icon">⚡</span>
+        <!-- Upgrade -->
+        <div v-if="user && user.role !== 'admin'" class="ws-side-upgrade" @click="navigateTo('/account/membership')">
+          <span class="ws-side-up-icon">⚡</span>
           <strong>升级专业版</strong>
-          <p>解锁全部 AI 功能，无限生成次数</p>
-          <button class="ws-upgrade-btn" @click="navigateTo('/account/membership')">立即升级</button>
+          <span>无限生成</span>
         </div>
 
         <!-- Bottom -->
         <div class="ws-side-bottom">
-          <button class="ws-nav-btn" @click="navigateTo('/my/works')">
-            <span class="ws-nav-icon">🗂</span><span class="ws-nav-label">素材库</span>
-          </button>
-          <button class="ws-nav-btn" @click="navigateTo('/account/settings')">
-            <span class="ws-nav-icon">⚙</span><span class="ws-nav-label">设置</span>
-          </button>
+          <button class="ws-side-btn" @click="navigateTo('/my/works')"><span class="ws-side-dot-sm"></span>素材库</button>
+          <button class="ws-side-btn" @click="navigateTo('/account/settings')"><span class="ws-side-dot-sm"></span>设置</button>
         </div>
       </aside>
 
-      <div v-if="sidebarVisible && sidebarOpen" class="ws-sidebar-overlay" @click="sidebarOpen = false" />
+      <div v-if="sidebarVisible && sidebarOpen" class="ws-side-overlay" @click="sidebarOpen = false" />
 
-      <!-- ===== MAIN CONTENT ===== -->
-      <div class="ws-main">
-        <div class="ws-main-inner">
-          <!-- Sidebar toggle + Title -->
-          <div class="ws-main-header">
-            <button class="ws-sidebar-toggle" @click="sidebarOpen = !sidebarOpen" :title="sidebarOpen ? '关闭侧栏' : '打开侧栏'">
-              <span class="toggle-bar" :class="{ open: sidebarOpen }" />
-              <span class="toggle-bar" :class="{ open: sidebarOpen }" />
-              <span class="toggle-bar" :class="{ open: sidebarOpen }" />
+      <!-- MAIN -->
+      <main class="ws-main">
+        <div class="ws-main-ct">
+          <!-- Title -->
+          <div class="ws-ttl-row">
+            <button class="ws-side-tog" @click="sidebarOpen = !sidebarOpen">
+              <span class="ws-side-tog-bar" :class="{ a: sidebarOpen }" />
+              <span class="ws-side-tog-bar" :class="{ a: sidebarOpen }" />
+              <span class="ws-side-tog-bar" :class="{ a: sidebarOpen }" />
             </button>
-            <h1 class="ws-page-title">AI 创作工作台</h1>
+            <h1 class="ws-ttl">AI 创作工作台</h1>
           </div>
 
-          <!-- ===== CORE INPUT CARD ===== -->
-          <div class="ws-input-card">
-            <div class="ws-input-body">
-              <!-- Upload reference button (left) -->
-              <button class="ws-upload-btn" @click="triggerUpload" title="上传参考图">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
-                </svg>
+          <!-- INPUT CARD -->
+          <div class="ws-inp-card">
+            <div class="ws-inp-row">
+              <button class="ws-inp-upload" @click="triggerUpload">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                 <span>参考图</span>
               </button>
-
-              <!-- Textarea -->
-              <textarea
-                v-model="taskPrompt"
-                :placeholder="currentPlaceholder"
-                rows="3"
-                class="ws-textarea"
-                @keydown.enter.ctrl="submitPrompt"
-              ></textarea>
-
-              <!-- Send button (right) -->
-              <button class="ws-submit-btn" :disabled="!taskPrompt.trim()" @click="submitPrompt" title="开始生成">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>
-                </svg>
+              <textarea v-model="taskPrompt" :placeholder="currentPlaceholder" rows="3" class="ws-inp-ta" @keydown.enter.ctrl="submitPrompt"></textarea>
+              <button class="ws-inp-send" :disabled="!taskPrompt.trim()" @click="submitPrompt">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
               </button>
             </div>
 
-            <!-- AI Intent Hint -->
-            <div v-if="intentHint" class="ws-intent-hint">
-              <span class="intent-icon">🤖</span>
-              <span class="intent-text">检测意图：<strong>{{ intentHint.tool }}</strong></span>
-              <span class="intent-conf" v-if="intentHint.confidence >= 30">{{ intentHint.confidence }}% 匹配</span>
-              <span class="intent-platform" v-if="intentHint.platform">{{ intentHint.platform }}</span>
+            <!-- Intent -->
+            <div v-if="intentHint" class="ws-inp-hint">
+              <span>🤖</span>
+              <span>检测意图：<strong>{{ intentHint.tool }}</strong></span>
+              <span v-if="intentHint.confidence >= 30" class="ws-inp-hint-tag">{{ intentHint.confidence }}% 匹配</span>
+              <span v-if="intentHint.platform" class="ws-inp-hint-plat">{{ intentHint.platform }}</span>
             </div>
 
-            <!-- Parameter Buttons Row -->
-            <div class="ws-params-row">
-              <div class="ws-param-group">
-                <span class="ws-param-label">尺寸</span>
-                <button v-for="r in ['1:1','3:4','4:3','9:16','16:9']" :key="r" class="ws-param-chip" :class="{ active: selectedRatio === r }" @click="selectedRatio = r">{{ r }}</button>
+            <!-- Params -->
+            <div class="ws-inp-params">
+              <div class="ws-inp-pg">
+                <span class="ws-inp-pl">尺寸</span>
+                <button v-for="r in ['1:1','3:4','4:3','9:16','16:9']" :key="r" class="ws-inp-chip" :class="{ a: selectedRatio === r }" @click="selectedRatio = r">{{ r }}</button>
               </div>
-              <div class="ws-param-divider"></div>
-              <div class="ws-param-group">
-                <span class="ws-param-label">风格</span>
-                <button v-for="s in ['原图','简约','科技','自然','复古']" :key="s" class="ws-param-chip" :class="{ active: selectedStyle === s }" @click="selectedStyle = s">{{ s }}</button>
+              <span class="ws-inp-div"></span>
+              <div class="ws-inp-pg">
+                <span class="ws-inp-pl">风格</span>
+                <button v-for="s in ['原图','简约','科技','自然','复古']" :key="s" class="ws-inp-chip" :class="{ a: selectedStyle === s }" @click="selectedStyle = s">{{ s }}</button>
               </div>
-              <div class="ws-param-divider"></div>
-              <div class="ws-param-group">
-                <span class="ws-param-label">数量</span>
-                <button v-for="n in [1,2,3,4]" :key="n" class="ws-param-chip" :class="{ active: selectedCount === n }" @click="selectedCount = n">{{ n }}张</button>
+              <span class="ws-inp-div"></span>
+              <div class="ws-inp-pg">
+                <span class="ws-inp-pl">数量</span>
+                <button v-for="n in [1,2,3,4]" :key="n" class="ws-inp-chip" :class="{ a: selectedCount === n }" @click="selectedCount = n">{{ n }}张</button>
               </div>
             </div>
           </div>
 
-          <!-- Quick Tags -->
-          <div class="ws-quick-tags">
-            <span class="ws-tags-label">试试：</span>
-            <button v-for="tag in currentQuickTags" :key="tag" class="ws-tag-chip" @click="taskPrompt = tag">{{ tag }}</button>
+          <!-- Quick tags -->
+          <div class="ws-tags">
+            <span class="ws-tags-lbl">试试：</span>
+            <button v-for="tag in currentQuickTags" :key="tag" class="ws-tag" @click="taskPrompt = tag">{{ tag }}</button>
           </div>
 
-          <!-- ===== QUICK FUNCTION CARDS ===== -->
-          <div class="ws-quick-cards-row">
-            <div class="ws-quick-card" @click="navigateTo('/work/script-gen')">
-              <div class="ws-qc-left">
-                <span class="ws-qc-icon">✨</span>
-                <div class="ws-qc-content">
-                  <strong>提示词润色</strong>
-                  <p>AI 帮你优化提示词，让生成效果更精准</p>
-                </div>
+          <!-- Quick function cards -->
+          <div class="ws-qf-row">
+            <div class="ws-qf-card" @click="navigateTo('/work/script-gen')">
+              <div class="ws-qf-l">
+                <span class="ws-qf-icon">✨</span>
+                <div><strong>提示词润色</strong><p>AI 帮你优化提示词，让生成效果更精准</p></div>
               </div>
-              <svg class="ws-qc-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </div>
-            <div class="ws-quick-card" @click="navigateTo('/work/viral-clone')">
-              <div class="ws-qc-left">
-                <span class="ws-qc-icon">🔥</span>
-                <div class="ws-qc-content">
-                  <strong>爆款复刻</strong>
-                  <p>分析爆款视频结构，一键复刻热门模板</p>
-                </div>
+            <div class="ws-qf-card" @click="navigateTo('/work/viral-clone')">
+              <div class="ws-qf-l">
+                <span class="ws-qf-icon">🔥</span>
+                <div><strong>爆款复刻</strong><p>分析爆款视频结构，一键复刻热门模板</p></div>
               </div>
-              <svg class="ws-qc-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </div>
           </div>
 
-          <!-- ===== TOOL CARDS GRID ===== -->
-          <div class="ws-cards-section">
-            <div class="ws-section-header">
-              <h2 class="ws-section-title">
-                <span class="ws-section-dot"></span>
-                {{ activeTabLabel }}工具
-              </h2>
-              <NuxtLink to="/compare" class="ws-section-more">查看全部 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></NuxtLink>
+          <!-- Tool cards -->
+          <div class="ws-sec">
+            <div class="ws-sec-hd">
+              <h2 class="ws-sec-ttl">{{ activeTabLabel }}工具</h2>
+              <NuxtLink to="/compare" class="ws-sec-more">查看全部 →</NuxtLink>
             </div>
-            <div class="ws-cards-grid">
-              <div v-for="card in displayCurrentCards" :key="card.id" class="ws-tool-card" @click="navigateTo(card.route)">
-                <span class="ws-card-badge" v-if="card.hot">热门</span>
-                <div class="ws-card-icon-wrap" :style="{ background: card.bgColor }">
-                  <span class="ws-card-icon">{{ card.icon }}</span>
-                </div>
-                <div class="ws-card-body">
-                  <h3 class="ws-card-title">{{ card.title }}</h3>
-                  <p class="ws-card-desc">{{ card.desc }}</p>
-                </div>
+            <div class="ws-grid">
+              <div v-for="card in displayCurrentCards" :key="card.id" class="ws-card" @click="navigateTo(card.route)">
+                <span v-if="card.hot" class="ws-card-badge">热门</span>
+                <div class="ws-card-ico" :style="{ background: card.bgColor }">{{ card.icon }}</div>
+                <h3 class="ws-card-t">{{ card.title }}</h3>
+                <p class="ws-card-d">{{ card.desc }}</p>
               </div>
             </div>
           </div>
 
-          <!-- ===== RECENT WORKS ===== -->
-          <div class="ws-recent-section">
-            <div class="ws-section-header">
-              <h2 class="ws-section-title">
-                <span class="ws-section-dot"></span>
-                最近产出
-              </h2>
-              <NuxtLink to="/my/works" class="ws-section-more">素材库 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></NuxtLink>
+          <!-- Recent -->
+          <div class="ws-sec">
+            <div class="ws-sec-hd">
+              <h2 class="ws-sec-ttl">最近产出</h2>
+              <NuxtLink to="/my/works" class="ws-sec-more">素材库 →</NuxtLink>
             </div>
-            <div class="ws-recent-grid">
-              <div v-for="item in recentResults" :key="item.id" class="ws-recent-card" @click="navigateTo('/my/works')">
-                <div class="ws-recent-preview" :style="{ background: item.bgColor }">
-                  <span class="ws-recent-placeholder">{{ item.icon }}</span>
-                  <div class="ws-recent-overlay">
-                    <span class="ws-recent-action">查看详情</span>
-                  </div>
-                </div>
-                <div class="ws-recent-info">
-                  <span class="ws-recent-title">{{ item.title }}</span>
-                  <span class="ws-recent-meta">{{ item.type }} · {{ item.time }}</span>
+            <div class="ws-grid">
+              <div v-for="item in recentResults" :key="item.id" class="ws-rec" @click="navigateTo('/my/works')">
+                <div class="ws-rec-pv" :style="{ background: item.bgColor }">{{ item.icon }}</div>
+                <div class="ws-rec-info">
+                  <span class="ws-rec-t">{{ item.title }}</span>
+                  <span class="ws-rec-m">{{ item.type }} · {{ item.time }}</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   </div>
 </template>
