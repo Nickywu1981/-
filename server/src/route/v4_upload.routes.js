@@ -31,7 +31,7 @@ const initUploadSchema = z.object({
 });
 
 const completeUploadSchema = z.object({
-  upload_id: z.string().min(1, '请提供upload_id').max(50),
+  upload_id: z.string().regex(/^[a-f0-9]{32}$/, 'upload_id 格式不正确'),
 });
 
 // Multer error wrapper
@@ -69,12 +69,14 @@ router.post('/init', _validate(initUploadSchema), (req, res) => {
   }
 });
 
+const UPLOAD_ID_REGEX = /^[a-f0-9]{32}$/;
+
 // POST /api/upload/chunk — 接收分片 (multipart: upload_id, chunk_index, chunk)
 router.post('/chunk', _upload.fields([{ name: 'chunk', maxCount: 1 }]), (req, res) => {
   try {
     const upload_id = req.body.upload_id;
     const chunk_index = parseInt(req.body.chunk_index, 10);
-    if (!upload_id || isNaN(chunk_index)) {
+    if (!upload_id || !UPLOAD_ID_REGEX.test(upload_id) || isNaN(chunk_index)) {
       return error(res, ERROR_CODE.VALIDATION_ERROR, 'upload_id 和 chunk_index 必填');
     }
     if (!req.files?.chunk?.[0]) {
@@ -90,6 +92,9 @@ router.post('/chunk', _upload.fields([{ name: 'chunk', maxCount: 1 }]), (req, re
 // GET /api/upload/chunks/:uploadId — 获取已上传分片 (断点续传)
 router.get('/chunks/:uploadId', (req, res) => {
   try {
+    if (!UPLOAD_ID_REGEX.test(req.params.uploadId)) {
+      return error(res, ERROR_CODE.VALIDATION_ERROR, 'uploadId 格式不正确');
+    }
     const result = uploadService.getReceivedChunks(req.params.uploadId);
     return success(res, result);
   } catch (err) {
