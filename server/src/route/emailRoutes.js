@@ -11,7 +11,7 @@ import { z } from 'zod';
 
 const router = Router();
 
-const sendCodeSchema = z.object({ email: emailSchema });
+const sendCodeSchema = z.object({ email: emailSchema, scene: z.enum(['register', 'login', 'reset_password', 'bind']) });
 const verifyCodeSchema = z.object({ email: emailSchema, code: codeSchema });
 
 // 公开 — 验证码收发
