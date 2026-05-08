@@ -1,5 +1,5 @@
 export default defineNuxtConfig({
-  ssr: true,
+  ssr: false, // 开发环境禁用SSR避免OOM，生产通过nginx+PM2开启
   devtools: { enabled: process.env.NODE_ENV !== 'production' },
 
   css: ['vant/lib/index.css'],

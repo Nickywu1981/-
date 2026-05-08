@@ -126,7 +126,7 @@ function startPoll() {
 }
 
 function goHome() {
-  router.push('/membership')
+  router.push('/member')
 }
 </script>
 

@@ -17,11 +17,10 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   try {
     if (process.server) {
-      // SSR: useRequestFetch 绕过 Vue Router, 直连 Nitro devProxy → Express
-      const headers: Record<string, string> = {}
-      const cookie = useRequestHeaders(['cookie']).cookie
-      if (cookie) headers.cookie = cookie
-      const data: any = await useRequestFetch()('/api/user/profile', { headers })
+      // SSR: 直连 Express 后端，绕过 Nuxt Nitro 避免死循环
+      const data: any = await $fetch('http://localhost:3001/api/user/profile', {
+        headers: useRequestHeaders(['cookie']) as Record<string, string>,
+      })
       isAuthenticated = data?.code === 200
       userRole = data?.data?.role || ''
     } else {

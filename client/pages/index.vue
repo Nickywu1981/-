@@ -93,6 +93,21 @@
         </div>
         <div class="mockup-glow" />
       </div>
+      <!-- Mobile Hero Visual -->
+      <div class="hero-mobile-visual">
+        <div class="mobile-card">
+          <div class="mobile-card-header">
+            <span class="mobile-dot" /><span class="mobile-dot" /><span class="mobile-dot" />
+          </div>
+          <div class="mobile-card-body">
+            <div class="mobile-tabs"><span class="active">智能主图</span><span>场景</span><span>视频</span></div>
+            <div class="mobile-upload-zone">+ 上传图片</div>
+            <div class="mobile-grid">
+              <div class="mobile-grid-item" v-for="i in 3" :key="i"><div class="mobile-grid-img" /></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- ========== PLATFORMS ========== -->
@@ -491,7 +506,34 @@ const faqs = [
 
 /* Hero Mockup */
 .hero-mockup { position: relative; flex-shrink: 0; width: 500px; height: 440px; display: none; }
-@media (min-width: 1024px) { .hero-mockup { display: block; } }
+@media (min-width: 1024px) { .hero-mockup { display: block; } .hero-mobile-visual { display: none; } }
+
+/* Mobile Hero Visual — 替代桌面端 Mockup */
+.hero-mobile-visual { display: flex; justify-content: center; margin-top: 32px; }
+.mobile-card {
+  width: 280px; background: var(--bg-card); border: 1px solid var(--border-card);
+  border-radius: 12px; overflow: hidden; box-shadow: 0 12px 40px rgba(0,0,0,0.06);
+}
+.mobile-card-header { display: flex; gap: 5px; padding: 10px 14px; border-bottom: 1px solid var(--border-light); }
+.mobile-dot { width: 8px; height: 8px; border-radius: 50%; background: #ddd; }
+.mobile-dot:nth-child(1) { background: #FF5F56; }
+.mobile-dot:nth-child(2) { background: #FFBD2E; }
+.mobile-dot:nth-child(3) { background: #27C93F; }
+.mobile-card-body { padding: 12px 14px; }
+.mobile-tabs { display: flex; gap: 6px; margin-bottom: 10px; }
+.mobile-tabs span {
+  font-size: 10px; padding: 4px 10px; border-radius: 999px;
+  background: var(--bg-hover); color: var(--text-muted); font-weight: 500;
+}
+.mobile-tabs span.active { background: var(--brand-gradient); color: #fff; }
+.mobile-upload-zone {
+  border: 2px dashed var(--border-light); border-radius: 8px;
+  height: 56px; display: flex; align-items: center; justify-content: center;
+  font-size: 12px; color: var(--text-muted); margin-bottom: 10px;
+}
+.mobile-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.mobile-grid-item { border-radius: 6px; overflow: hidden; background: var(--bg-card); border: 1px solid var(--border-light); }
+.mobile-grid-img { height: 48px; background: linear-gradient(135deg, var(--brand-light-alt), var(--brand-light)); }
 .mockup-frame {
   position: relative; z-index: 1;
   background: var(--bg-card); border: 1px solid var(--border-card);
