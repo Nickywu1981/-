@@ -29,7 +29,7 @@ async function getOrCreateAccount(conn, userId) {
   if (rows.length > 0) return rows[0];
   await conn.query(
     'INSERT INTO points_account (user_id, balance, total_earned, total_spent, frozen) VALUES (?, 0, 0, 0, 0)',
-    [userId]
+    [userId],
   );
   return { user_id: userId, balance: 0, total_earned: 0, total_spent: 0, frozen: 0, version: 1 };
 }
@@ -50,7 +50,7 @@ export async function earnPoints(userId, { amount, businessType, businessId, rem
     const [result] = await conn.query(
       `UPDATE points_account SET balance = balance + ?, total_earned = total_earned + ?, version = version + 1
        WHERE user_id = ? AND version = ?`,
-      [amount, amount, userId, account.version]
+      [amount, amount, userId, account.version],
     );
     if (result.affectedRows === 0) throw { status: 409, message: '积分更新冲突，请重试' };
 
@@ -60,7 +60,7 @@ export async function earnPoints(userId, { amount, businessType, businessId, rem
     await conn.query(
       `INSERT INTO points_transaction (user_id, trans_type, amount, balance_after, business_type, business_id, remark)
        VALUES (?, 'earn', ?, ?, ?, ?, ?)`,
-      [userId, amount, newBalance, businessType, businessId || null, remark]
+      [userId, amount, newBalance, businessType, businessId || null, remark],
     );
 
     await conn.commit();
@@ -89,7 +89,7 @@ export async function spendPoints(userId, { amount, businessType, businessId, re
     const [result] = await conn.query(
       `UPDATE points_account SET balance = balance - ?, total_spent = total_spent + ?, version = version + 1
        WHERE user_id = ? AND version = ? AND balance >= ?`,
-      [amount, amount, userId, account.version, amount]
+      [amount, amount, userId, account.version, amount],
     );
     if (result.affectedRows === 0) throw { status: 409, message: '积分更新冲突或余额不足，请重试' };
 
@@ -98,7 +98,7 @@ export async function spendPoints(userId, { amount, businessType, businessId, re
     await conn.query(
       `INSERT INTO points_transaction (user_id, trans_type, amount, balance_after, business_type, business_id, remark)
        VALUES (?, 'spend', ?, ?, ?, ?, ?)`,
-      [userId, -amount, newBalance, businessType, businessId || null, remark]
+      [userId, -amount, newBalance, businessType, businessId || null, remark],
     );
 
     await conn.commit();
@@ -130,7 +130,7 @@ export async function redeemPointsForCredits(userId, pointsAmount) {
     const [result] = await conn.query(
       `UPDATE points_account SET balance = balance - ?, total_spent = total_spent + ?, version = version + 1
        WHERE user_id = ? AND version = ? AND balance >= ?`,
-      [pointsAmount, pointsAmount, userId, account.version, pointsAmount]
+      [pointsAmount, pointsAmount, userId, account.version, pointsAmount],
     );
     if (result.affectedRows === 0) throw { status: 409, message: '兑换失败，请重试' };
 
@@ -139,13 +139,13 @@ export async function redeemPointsForCredits(userId, pointsAmount) {
     await conn.query(
       `INSERT INTO points_transaction (user_id, trans_type, amount, balance_after, business_type, remark)
        VALUES (?, 'spend', ?, ?, 'redeem_credits', ?)`,
-      [userId, -pointsAmount, newBalance, `兑换${creditAmount}点数`]
+      [userId, -pointsAmount, newBalance, `兑换${creditAmount}点数`],
     );
 
     // 加点数到会员账户
     const [membership] = await conn.query(
       'UPDATE user_membership SET credit_balance = credit_balance + ? WHERE user_id = ?',
-      [creditAmount, userId]
+      [creditAmount, userId],
     );
     if (membership.affectedRows === 0) {
       await conn.rollback();
@@ -184,7 +184,7 @@ export async function getPointsTransactions(userId, { page = 1, pageSize = 20 } 
     const [[{ total }]] = await conn.query('SELECT COUNT(*) as total FROM points_transaction WHERE user_id = ?', [userId]);
     const [rows] = await conn.query(
       'SELECT id, trans_type, amount, balance_after, business_type, remark, created_at FROM points_transaction WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?',
-      [userId, pageSize, (page - 1) * pageSize]
+      [userId, pageSize, (page - 1) * pageSize],
     );
     return { list: rows, total, page, pageSize };
   } finally {
@@ -204,7 +204,7 @@ export async function awardPointsForTask(userId, taskType, taskId) {
   try {
     const [existing] = await conn.query(
       'SELECT id FROM points_transaction WHERE user_id = ? AND business_type = ? AND business_id = ?',
-      [userId, taskType, taskId]
+      [userId, taskType, taskId],
     );
     if (existing.length > 0) return null; // 已奖励
   } finally {

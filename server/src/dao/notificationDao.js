@@ -10,7 +10,7 @@ export async function insertNotification({ userId, type, title, content }) {
 
 export async function listByUser(userId, { page = 1, pageSize = 20 }) {
   const [rows] = await pool.query(
-    `SELECT id, type, title, content, is_read, create_time FROM user_notification WHERE user_id = ? ORDER BY create_time DESC LIMIT ?, ?`,
+    'SELECT id, type, title, content, is_read, create_time FROM user_notification WHERE user_id = ? ORDER BY create_time DESC LIMIT ?, ?',
     [userId, parseInt((page - 1) * pageSize, 10), parseInt(pageSize, 10)],
   );
   return rows;

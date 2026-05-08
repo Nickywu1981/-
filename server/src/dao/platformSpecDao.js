@@ -5,7 +5,7 @@ const TABLE = 'platform_image_spec';
 export async function listAll(req) {
   const db = getDB(req);
   const [rows] = await db.query(
-    `SELECT * FROM ${TABLE} ORDER BY platform_code, spec_type`
+    `SELECT * FROM ${TABLE} ORDER BY platform_code, spec_type`,
   );
   return rows;
 }
@@ -13,7 +13,7 @@ export async function listAll(req) {
 export async function getById(id, req) {
   const db = getDB(req);
   const [rows] = await db.execute(
-    `SELECT * FROM ${TABLE} WHERE id = ?`, [id]
+    `SELECT * FROM ${TABLE} WHERE id = ?`, [id],
   );
   return rows[0] || null;
 }
@@ -21,7 +21,7 @@ export async function getById(id, req) {
 export async function listByPlatform(platformCode, req) {
   const db = getDB(req);
   const [rows] = await db.execute(
-    `SELECT * FROM ${TABLE} WHERE platform_code = ? ORDER BY spec_type`, [platformCode]
+    `SELECT * FROM ${TABLE} WHERE platform_code = ? ORDER BY spec_type`, [platformCode],
   );
   return rows;
 }
@@ -32,7 +32,7 @@ export async function create(data, req) {
   const placeholders = fields.map(() => '?').join(',');
   const values = fields.map(f => data[f] ?? null);
   const [result] = await db.execute(
-    `INSERT INTO ${TABLE} (${fields.join(',')}) VALUES (${placeholders})`, values
+    `INSERT INTO ${TABLE} (${fields.join(',')}) VALUES (${placeholders})`, values,
   );
   return result.insertId;
 }
@@ -50,7 +50,7 @@ export async function update(id, data, req) {
   if (setters.length === 0) return 0;
   params.push(id);
   const [result] = await db.execute(
-    `UPDATE ${TABLE} SET ${setters.join(', ')} WHERE id = ?`, params
+    `UPDATE ${TABLE} SET ${setters.join(', ')} WHERE id = ?`, params,
   );
   return result.affectedRows;
 }
@@ -58,7 +58,7 @@ export async function update(id, data, req) {
 export async function remove(id, req) {
   const db = getDB(req);
   const [result] = await db.execute(
-    `DELETE FROM ${TABLE} WHERE id = ?`, [id]
+    `DELETE FROM ${TABLE} WHERE id = ?`, [id],
   );
   return result.affectedRows;
 }
@@ -66,7 +66,7 @@ export async function remove(id, req) {
 export async function getAdaptSpec(platformCode, req) {
   const db = getDB(req);
   const [rows] = await db.execute(
-    `SELECT * FROM ${TABLE} WHERE platform_code = ? ORDER BY spec_type`, [platformCode]
+    `SELECT * FROM ${TABLE} WHERE platform_code = ? ORDER BY spec_type`, [platformCode],
   );
   return rows;
 }

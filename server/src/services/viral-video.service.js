@@ -36,7 +36,7 @@ export async function getViralAnalysis(jobId, userId) {
   try {
     const [rows] = await conn.query(
       'SELECT id, status, progress, result_data, created_at FROM job_queue WHERE id = ? AND user_id = ? AND task_type = ?',
-      [jobId, userId, 'viral_analysis']
+      [jobId, userId, 'viral_analysis'],
     );
     if (rows.length === 0) throw { status: 404, message: '分析任务不存在' };
     return rows[0];

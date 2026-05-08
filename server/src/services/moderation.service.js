@@ -17,7 +17,7 @@ export async function moderateText(text, userId, options = {}) {
   const BLOCKED_PATTERNS = []; // W1 empty, prod fills from admin config
 
   let riskLevel = 'safe';
-  let riskTags = [];
+  const riskTags = [];
   let action = 'pass';
 
   for (const pattern of BLOCKED_PATTERNS) {
@@ -35,7 +35,7 @@ export async function moderateText(text, userId, options = {}) {
     await conn.query(
       `INSERT INTO content_audit_log (user_id, job_id, audit_stage, content_type, original_text, risk_level, risk_tags, action)
        VALUES (?, ?, ?, 'text', ?, ?, ?, ?)`,
-      [userId, jobId, stage, text.substring(0, 2000), riskLevel, JSON.stringify(riskTags), action]
+      [userId, jobId, stage, text.substring(0, 2000), riskLevel, JSON.stringify(riskTags), action],
     );
   } finally {
     conn.release();
@@ -56,7 +56,7 @@ export async function moderateImage(imageUrl, userId, options = {}) {
     await conn.query(
       `INSERT INTO content_audit_log (user_id, job_id, audit_stage, content_type, original_text, risk_level, action)
        VALUES (?, ?, ?, 'image', ?, 'safe', 'pass')`,
-      [userId, jobId, stage, imageUrl]
+      [userId, jobId, stage, imageUrl],
     );
   } finally {
     conn.release();
@@ -77,7 +77,7 @@ export async function moderateVideo(videoUrl, userId, options = {}) {
     await conn.query(
       `INSERT INTO content_audit_log (user_id, job_id, audit_stage, content_type, original_text, risk_level, action)
        VALUES (?, ?, ?, 'video', ?, 'safe', 'pass')`,
-      [userId, jobId, stage, videoUrl]
+      [userId, jobId, stage, videoUrl],
     );
   } finally {
     conn.release();

@@ -15,7 +15,7 @@ export async function submitJob(userId, taskType, taskParams, options = {}) {
     const [result] = await conn.query(
       `INSERT INTO job_queue (user_id, task_type, task_params, status, priority, scheduled_at)
        VALUES (?, ?, ?, 'queued', ?, ?)`,
-      [userId, taskType, JSON.stringify(taskParams), options.priority || 5, options.scheduledAt || null]
+      [userId, taskType, JSON.stringify(taskParams), options.priority || 5, options.scheduledAt || null],
     );
     return { job_id: result.insertId, status: 'queued' };
   } finally {
@@ -31,7 +31,7 @@ export async function getJobStatus(jobId, userId) {
   try {
     const [rows] = await conn.query(
       'SELECT id, user_id, task_type, status, progress, result_data, error_message, retry_count, created_at, started_at, completed_at FROM job_queue WHERE id = ? AND user_id = ?',
-      [jobId, userId]
+      [jobId, userId],
     );
     if (rows.length === 0) throw { status: 404, message: '任务不存在' };
     return rows[0];
@@ -60,7 +60,7 @@ export async function getUserJobs(userId, { status, page = 1, pageSize = 20 } = 
     const [rows] = await conn.query(
       `SELECT id, task_type, status, progress, result_data, error_message, created_at, completed_at
        FROM job_queue ${where} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
-      [...params, pageSize, (page - 1) * pageSize]
+      [...params, pageSize, (page - 1) * pageSize],
     );
 
     return { list: rows, total, page, pageSize };
@@ -81,14 +81,14 @@ export async function fetchPending(limit = 5) {
       `SELECT id, user_id, task_type, task_params, retry_count, max_retries
        FROM job_queue WHERE status = 'queued' AND (scheduled_at IS NULL OR scheduled_at <= NOW())
        ORDER BY priority ASC, created_at ASC LIMIT ? FOR UPDATE`,
-      [limit]
+      [limit],
     );
 
     if (rows.length > 0) {
       const ids = rows.map(r => r.id);
       await conn.query(
-        `UPDATE job_queue SET status = 'processing', started_at = NOW() WHERE id IN (?)`,
-        [ids]
+        'UPDATE job_queue SET status = \'processing\', started_at = NOW() WHERE id IN (?)',
+        [ids],
       );
     }
 
@@ -122,7 +122,7 @@ export async function completeJob(jobId, resultData) {
   try {
     await conn.query(
       'UPDATE job_queue SET status = ?, progress = 100, result_data = ?, completed_at = NOW() WHERE id = ?',
-      ['completed', JSON.stringify(resultData), jobId]
+      ['completed', JSON.stringify(resultData), jobId],
     );
   } finally {
     conn.release();
@@ -143,13 +143,13 @@ export async function failJob(jobId, errorMessage) {
       // 重新排队重试
       await conn.query(
         'UPDATE job_queue SET status = ?, retry_count = retry_count + 1, error_message = ? WHERE id = ?',
-        ['queued', errorMessage, jobId]
+        ['queued', errorMessage, jobId],
       );
     } else {
       // 彻底失败
       await conn.query(
         'UPDATE job_queue SET status = ?, error_message = ?, completed_at = NOW() WHERE id = ?',
-        ['failed', errorMessage, jobId]
+        ['failed', errorMessage, jobId],
       );
     }
   } finally {

@@ -40,7 +40,7 @@ router.get('/:group', async (req, res) => {
     const config = await configService.getGroupConfig(
       req.params.group,
       req.user?.id || null,
-      req.user?.role || null
+      req.user?.role || null,
     );
     return success(res, config);
   } catch (err) {

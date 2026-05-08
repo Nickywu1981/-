@@ -32,7 +32,7 @@ router.get('/list', async (req, res) => {
       const [[{ total }]] = await conn.query(
         `SELECT COUNT(*) as total FROM job_queue
          WHERE user_id = ? AND status = 'completed' AND task_type IN (${placeholders})`,
-        [req.user.id, ...taskTypes]
+        [req.user.id, ...taskTypes],
       );
 
       const [rows] = await conn.query(
@@ -40,7 +40,7 @@ router.get('/list', async (req, res) => {
          FROM job_queue
          WHERE user_id = ? AND status = 'completed' AND task_type IN (${placeholders})
          ORDER BY completed_at DESC LIMIT ? OFFSET ?`,
-        [req.user.id, ...taskTypes, pageSize, (page - 1) * pageSize]
+        [req.user.id, ...taskTypes, pageSize, (page - 1) * pageSize],
       );
 
       const list = rows.map(r => {

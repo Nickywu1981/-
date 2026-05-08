@@ -21,7 +21,7 @@ const membershipDao = {
     }
     await pool.execute(
       'INSERT INTO user_membership (user_id, plan_type, credit_balance, expire_at) VALUES (?, ?, ?, ?)',
-      [userId, data.plan_type || 'free', data.credit_balance || 0, data.expire_at || null]
+      [userId, data.plan_type || 'free', data.credit_balance || 0, data.expire_at || null],
     );
     return this.findByUserId(userId);
   },
@@ -35,7 +35,7 @@ const membershipDao = {
     const params = planType ? [planType, Number(limit), Number(offset)] : [Number(limit), Number(offset)];
     const [rows] = await pool.execute(
       `SELECT um.*, u.nickname, u.phone FROM user_membership um LEFT JOIN users u ON u.id = um.user_id ${where} ORDER BY um.created_at DESC LIMIT ? OFFSET ?`,
-      params
+      params,
     );
     const [cnt] = await pool.execute(`SELECT COUNT(*) as total FROM user_membership ${where}`, planType ? [planType] : []);
     return { rows, total: cnt[0].total };

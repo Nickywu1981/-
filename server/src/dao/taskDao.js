@@ -1,9 +1,13 @@
 import { v4 as uuidv4 } from 'uuid';
-import pool from '../dao/db.js';
+import { tenantPool } from './tenantPool.js';
+
+function pool() {
+  return tenantPool();
+}
 
 export async function createTask({ userId, type, title, inputParams, priority = 1 }) {
   const id = uuidv4();
-  await pool.execute(
+  await pool().execute(
     `INSERT INTO task (id, user_id, type, title, status, priority, input_params, progress, progress_msg)
      VALUES (?, ?, ?, ?, 0, ?, ?, 0, '排队中...')`,
     [id, userId, type, title, priority, JSON.stringify(inputParams)],
@@ -12,7 +16,7 @@ export async function createTask({ userId, type, title, inputParams, priority = 
 }
 
 export async function getTask(taskId, userId) {
-  const [rows] = await pool.execute(
+  const [rows] = await pool().execute(
     'SELECT * FROM task WHERE id = ? AND user_id = ? LIMIT 1',
     [taskId, userId],
   );
@@ -39,10 +43,12 @@ export async function listUserTasks(userId, { status, type, page = 1, pageSize =
     params.push(type);
   }
 
-  params.push((page - 1) * pageSize, pageSize);
-  sql += ' ORDER BY create_time DESC LIMIT ?, ?';
+  // mysql2 prepared statements don't support LIMIT placeholders — interpolate
+  const offset = Number((page - 1) * pageSize);
+  const limit = Number(pageSize);
+  sql += ` ORDER BY create_time DESC LIMIT ${offset}, ${limit}`;
 
-  const [rows] = await pool.execute(sql, params);
+  const [rows] = await pool().execute(sql, params);
   return rows;
 }
 
@@ -60,7 +66,7 @@ export async function countUserTasks(userId, { status, type } = {}) {
     sql += ' AND type = ?';
     params.push(type);
   }
-  const [rows] = await pool.execute(sql, params);
+  const [rows] = await pool().execute(sql, params);
   return rows[0].total;
 }
 
@@ -78,25 +84,19 @@ export async function updateTaskStatus(taskId, userId, { status, progress, progr
   }
   if (fields.length === 0) return;
   params.push(taskId, userId);
-  await pool.execute(`UPDATE task SET ${fields.join(', ')} WHERE id = ? AND user_id = ?`, params);
+  await pool().execute(`UPDATE task SET ${fields.join(', ')} WHERE id = ? AND user_id = ?`, params);
 }
 
 export async function getPendingTasks(limit = 5) {
-  const [rows] = await pool.execute(
-    'SELECT * FROM task WHERE status = 0 ORDER BY priority DESC, create_time ASC LIMIT ?',
-    [String(limit)],
+  const [rows] = await pool().execute(
+    `SELECT * FROM task WHERE status = 0 ORDER BY priority DESC, create_time ASC LIMIT ${Number(limit)}`,
   );
   return rows.map((r) => ({ ...r, input_params: safeJson(r.input_params) }));
 }
 
-/**
- * 任务完成快捷方法 — 更新状态 + 自动触发通知
- * 所有 Service 的 process* 函数在完成时调用此方法替代 updateTaskStatus
- */
 export async function completeTask(taskId, userId, { progressMsg = '完成', outputResult = {} }) {
   await updateTaskStatus(taskId, userId, { status: 2, progress: 100, progressMsg, outputResult });
 
-  // 延迟加载避免循环依赖
   const task = await getTask(taskId, userId);
   if (task) {
     const { notifyComplete } = await import('../services/taskNotifier.js');

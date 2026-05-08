@@ -22,7 +22,7 @@ const pointsDao = {
   async insertTransaction(data) {
     const [r] = await pool.execute(
       'INSERT INTO points_transaction (user_id, type, amount, balance_after, description, ref_id) VALUES (?, ?, ?, ?, ?, ?)',
-      [data.user_id, data.type, data.amount, data.balance_after, data.description || '', data.ref_id || '']
+      [data.user_id, data.type, data.amount, data.balance_after, data.description || '', data.ref_id || ''],
     );
     return r.insertId;
   },
@@ -30,7 +30,7 @@ const pointsDao = {
   async listTransactions(userId, { limit = 20, offset = 0 } = {}) {
     const [rows] = await pool.execute(
       'SELECT * FROM points_transaction WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?',
-      [userId, Number(limit), Number(offset)]
+      [userId, Number(limit), Number(offset)],
     );
     const [cnt] = await pool.execute('SELECT COUNT(*) as total FROM points_transaction WHERE user_id = ?', [userId]);
     return { rows, total: cnt[0].total };
@@ -39,7 +39,7 @@ const pointsDao = {
   async listAccounts({ limit = 20, offset = 0 } = {}) {
     const [rows] = await pool.execute(
       'SELECT pa.*, u.nickname FROM points_account pa LEFT JOIN users u ON u.id = pa.user_id ORDER BY pa.balance DESC LIMIT ? OFFSET ?',
-      [Number(limit), Number(offset)]
+      [Number(limit), Number(offset)],
     );
     const [cnt] = await pool.execute('SELECT COUNT(*) as total FROM points_account');
     return { rows, total: cnt[0].total };

@@ -78,13 +78,13 @@ export async function saveGeneratedVideo({ userId, taskId, type, platform, origi
 }
 
 export async function listGeneratedImages(userId, { page = 1, pageSize = 20 }) {
-  const [rows] = await pool.query(`SELECT * FROM generated_image WHERE user_id = ? ORDER BY create_time DESC LIMIT ?, ?`, [userId, (page - 1) * pageSize, pageSize]);
+  const [rows] = await pool.query('SELECT * FROM generated_image WHERE user_id = ? ORDER BY create_time DESC LIMIT ?, ?', [userId, (page - 1) * pageSize, pageSize]);
   const [[{ total }]] = await pool.execute('SELECT COUNT(*) AS total FROM generated_image WHERE user_id = ?', [userId]);
   return { list: rows, total };
 }
 
 export async function listGeneratedVideos(userId, { page = 1, pageSize = 20 }) {
-  const [rows] = await pool.query(`SELECT * FROM generated_video WHERE user_id = ? ORDER BY create_time DESC LIMIT ?, ?`, [userId, (page - 1) * pageSize, pageSize]);
+  const [rows] = await pool.query('SELECT * FROM generated_video WHERE user_id = ? ORDER BY create_time DESC LIMIT ?, ?', [userId, (page - 1) * pageSize, pageSize]);
   const [[{ total }]] = await pool.execute('SELECT COUNT(*) AS total FROM generated_video WHERE user_id = ?', [userId]);
   return { list: rows, total };
 }

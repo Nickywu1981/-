@@ -47,7 +47,7 @@ export async function getDetailWorks(userId, { page = 1, pageSize = 20 } = {}) {
   try {
     const [countRows] = await conn.query(
       "SELECT COUNT(*) as total FROM job_queue WHERE user_id = ? AND task_type IN ('detail_set_gen','detail_replicate')",
-      [userId]
+      [userId],
     );
     const total = countRows[0].total;
 
@@ -55,7 +55,7 @@ export async function getDetailWorks(userId, { page = 1, pageSize = 20 } = {}) {
       `SELECT id, task_type, status, progress, result_data, created_at, completed_at
        FROM job_queue WHERE user_id = ? AND task_type IN ('detail_set_gen','detail_replicate')
        ORDER BY created_at DESC LIMIT ? OFFSET ?`,
-      [userId, pageSize, (page - 1) * pageSize]
+      [userId, pageSize, (page - 1) * pageSize],
     );
 
     return { list: rows, total, page, pageSize };

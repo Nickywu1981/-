@@ -63,7 +63,7 @@ export async function authMiddleware(req, res, next) {
       const newToken = jwt.sign(
         { id: payload.id, role: payload.role, nickname: payload.nickname, tenantId: payload.tenantId },
         JWT_SECRET,
-        { expiresIn: JWT_REFRESH_WINDOW }
+        { expiresIn: JWT_REFRESH_WINDOW },
       );
       res.cookie('token', newToken, {
         httpOnly: true,

@@ -17,7 +17,7 @@ export async function translateVoice(userId, {
   voiceType = 'natural',
 }) {
   const audit = await moderationService.moderateText(
-    `voice_translate:${sourceLang}→${targetLang}`, userId, { stage: 'input' }
+    `voice_translate:${sourceLang}→${targetLang}`, userId, { stage: 'input' },
   );
   if (audit.action === 'block') {
     throw { status: 422, message: '翻译请求包含违规参数' };
@@ -58,7 +58,7 @@ export async function translateFace(userId, {
   avatarStyle = 'original',
 }) {
   const audit = await moderationService.moderateText(
-    `face_translate:${sourceLang}→${targetLang}`, userId, { stage: 'input' }
+    `face_translate:${sourceLang}→${targetLang}`, userId, { stage: 'input' },
   );
   if (audit.action === 'block') {
     throw { status: 422, message: '面容翻译请求包含违规参数' };
@@ -80,7 +80,7 @@ export async function getUserTranslateHistory(userId, { type, page = 1, limit = 
   const prefix = type ? `video_${type}_translate` : 'video_%_translate';
   const [rows] = await db.query(
     'SELECT * FROM user_works WHERE user_id = ? AND task_category LIKE ? ORDER BY create_time DESC LIMIT ? OFFSET ?',
-    [userId, prefix, limit, offset]
+    [userId, prefix, limit, offset],
   );
   return rows;
 }

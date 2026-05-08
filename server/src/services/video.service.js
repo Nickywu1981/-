@@ -123,7 +123,7 @@ export async function getVideoJobStatus(jobId, userId) {
   try {
     const [rows] = await conn.query(
       'SELECT id, user_id, task_type, status, progress, result_data, error_message, retry_count, created_at, started_at, completed_at FROM job_queue WHERE id = ? AND user_id = ?',
-      [jobId, userId]
+      [jobId, userId],
     );
     if (rows.length === 0) throw { status: 404, message: '任务不存在' };
     return rows[0];
@@ -158,7 +158,7 @@ export async function getVideoWorks(userId, { page = 1, pageSize = 20, status, t
     const [rows] = await conn.query(
       `SELECT id, task_type, status, progress, result_data, error_message, created_at, completed_at
        FROM job_queue ${where} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
-      [...params, pageSize, (page - 1) * pageSize]
+      [...params, pageSize, (page - 1) * pageSize],
     );
 
     return { list: rows, total, page, pageSize };

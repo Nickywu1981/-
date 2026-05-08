@@ -75,7 +75,7 @@ export async function validateSeed(pool) {
   for (const [groupKey, keys] of Object.entries(requiredKeys)) {
     const [existing] = await pool.query(
       'SELECT item_key FROM sys_config_item WHERE group_key = ? AND item_key IN (?)',
-      [groupKey, keys]
+      [groupKey, keys],
     );
     const existingKeys = existing.map((r) => r.item_key);
     for (const key of keys) {

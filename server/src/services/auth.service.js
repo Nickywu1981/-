@@ -18,7 +18,7 @@ function generateToken(user) {
   return jwt.sign(
     { id: user.id, role: user.role, nickname: user.nickname },
     JWT_SECRET,
-    { expiresIn: JWT_EXPIRES }
+    { expiresIn: JWT_EXPIRES },
   );
 }
 
@@ -66,18 +66,18 @@ export async function register({ phone, email, password, nickname, inviteCode })
         nickname || '',
         myInviteCode,
         freePoints,
-      ]
+      ],
     );
     const userId = result.insertId;
 
     // 积分账户初始化
     await conn.query(
       'INSERT INTO points_account (user_id, balance, total_earned) VALUES (?, ?, ?)',
-      [userId, freePoints, freePoints]
+      [userId, freePoints, freePoints],
     );
     await conn.query(
       'INSERT INTO points_transaction (user_id, trans_type, amount, balance_after, business_type, remark) VALUES (?, ?, ?, ?, ?, ?)',
-      [userId, 'earn', freePoints, freePoints, 'register_gift', '注册赠送积分']
+      [userId, 'earn', freePoints, freePoints, 'register_gift', '注册赠送积分'],
     );
 
     // 邀请码绑定分销关系
@@ -87,7 +87,7 @@ export async function register({ phone, email, password, nickname, inviteCode })
         const parentId = inviter[0].id;
         await conn.query(
           'INSERT INTO distributor_relation (user_id, parent_id, level, invite_code) VALUES (?, ?, 1, ?)',
-          [userId, parentId, inviteCode]
+          [userId, parentId, inviteCode],
         );
         // 更新用户 invited_by
         await conn.query('UPDATE users SET invited_by = ? WHERE id = ?', [parentId, userId]);
@@ -96,7 +96,7 @@ export async function register({ phone, email, password, nickname, inviteCode })
         if (grandparent.length > 0) {
           await conn.query(
             'INSERT INTO distributor_relation (user_id, parent_id, grandparent_id, level, invite_code) VALUES (?, ?, ?, 2, ?)',
-            [userId, grandparent[0].parent_id, parentId, inviteCode]
+            [userId, grandparent[0].parent_id, parentId, inviteCode],
           );
         }
       }
@@ -128,13 +128,13 @@ export async function login({ phone, email, password }) {
       const encPhone = encrypt(phone);
       [user] = await conn.query(
         'SELECT id, password_hash, role, nickname, status FROM users WHERE phone = ?',
-        [encPhone]
+        [encPhone],
       );
     } else if (email) {
       const encEmail = encrypt(email);
       [user] = await conn.query(
         'SELECT id, password_hash, role, nickname, status FROM users WHERE email = ?',
-        [encEmail]
+        [encEmail],
       );
     }
 
@@ -177,13 +177,13 @@ export async function loginByCode({ phone, email }) {
       const encPhone = encrypt(phone);
       [user] = await conn.query(
         'SELECT id, role, nickname, status FROM users WHERE phone = ?',
-        [encPhone]
+        [encPhone],
       );
     } else {
       const encEmail = encrypt(email);
       [user] = await conn.query(
         'SELECT id, role, nickname, status FROM users WHERE email = ?',
-        [encEmail]
+        [encEmail],
       );
     }
 
@@ -225,7 +225,7 @@ export async function resetPassword({ phone, email, newPassword }) {
     const passwordHash = await bcrypt.hash(newPassword, 12);
     const [result] = await conn.query(
       `UPDATE users SET password_hash = ? WHERE ${field} = ?`,
-      [passwordHash, encValue]
+      [passwordHash, encValue],
     );
 
     if (result.affectedRows === 0) throw { status: 404, message: '账号不存在' };
@@ -240,7 +240,7 @@ export async function getUserProfile(userId) {
   try {
     const [rows] = await conn.query(
       'SELECT id, phone, email, nickname, avatar_url, role, status, invite_code, points_balance, invited_by, created_at, last_login_at FROM users WHERE id = ?',
-      [userId]
+      [userId],
     );
     if (rows.length === 0) throw { status: 404, message: '用户不存在' };
 

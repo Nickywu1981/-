@@ -68,7 +68,7 @@ export function getPosterStyles() {
  */
 export async function getUserPosters(userId, { type, page = 1, limit = 20 } = {}) {
   const offset = (page - 1) * limit;
-  let sql = 'SELECT * FROM user_works WHERE user_id = ? AND task_category LIKE ? ORDER BY create_time DESC LIMIT ? OFFSET ?';
+  const sql = 'SELECT * FROM user_works WHERE user_id = ? AND task_category LIKE ? ORDER BY create_time DESC LIMIT ? OFFSET ?';
   const prefix = type ? `poster_${type}` : 'poster_%';
   const [rows] = await db.query(sql, [userId, prefix, limit, offset]);
   return rows;

@@ -88,6 +88,8 @@ const PUBLIC_PREFIXES = [
   '/api/multilingual',
   '/api/size-templates',
   '/api/open',
+  '/api/ai-dispatch/health',
+  '/api/ai-dispatch/categories',
   '/uploads',
 ];
 

@@ -56,14 +56,14 @@ export async function getBatchMigrateProgress(jobId, userId) {
   try {
     const [parent] = await conn.query(
       'SELECT id, status, progress, result_data FROM job_queue WHERE id = ? AND user_id = ?',
-      [jobId, userId]
+      [jobId, userId],
     );
     if (parent.length === 0) throw { status: 404, message: '任务不存在' };
 
     // 查询子任务进度
     const [children] = await conn.query(
       "SELECT id, status, progress, result_data FROM job_queue WHERE task_type = 'action_migrate' AND JSON_EXTRACT(task_params, '$.batch_id') = ?",
-      [String(jobId)]
+      [String(jobId)],
     );
 
     return {

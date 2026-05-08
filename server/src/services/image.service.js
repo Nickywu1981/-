@@ -117,7 +117,7 @@ export async function getImageWorks(userId, { page = 1, pageSize = 20, status } 
     const [rows] = await conn.query(
       `SELECT id, task_type, status, progress, result_data, error_message, created_at, completed_at
        FROM job_queue ${where} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
-      [...params, pageSize, (page - 1) * pageSize]
+      [...params, pageSize, (page - 1) * pageSize],
     );
 
     return { list: rows, total, page, pageSize };

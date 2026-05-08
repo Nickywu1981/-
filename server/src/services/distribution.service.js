@@ -34,7 +34,7 @@ export async function getMyTeam(userId, { page = 1, pageSize = 20 } = {}) {
     // 统计直推+间推人数
     const [[{ total }]] = await conn.query(
       'SELECT COUNT(*) as total FROM distributor_relation WHERE parent_id = ? OR grandparent_id = ?',
-      [userId, userId]
+      [userId, userId],
     );
 
     // 分页查询
@@ -44,17 +44,17 @@ export async function getMyTeam(userId, { page = 1, pageSize = 20 } = {}) {
        JOIN users u ON u.id = dr.user_id
        WHERE dr.parent_id = ? OR dr.grandparent_id = ?
        ORDER BY dr.bound_at DESC LIMIT ? OFFSET ?`,
-      [userId, userId, pageSize, (page - 1) * pageSize]
+      [userId, userId, pageSize, (page - 1) * pageSize],
     );
 
     // 统计直推/间推数量
     const [[{ level1_count }]] = await conn.query(
       'SELECT COUNT(*) as level1_count FROM distributor_relation WHERE parent_id = ?',
-      [userId]
+      [userId],
     );
     const [[{ level2_count }]] = await conn.query(
       'SELECT COUNT(*) as level2_count FROM distributor_relation WHERE grandparent_id = ?',
-      [userId]
+      [userId],
     );
 
     return {
@@ -79,8 +79,8 @@ export async function settleCommission(consumerId, orderId, orderAmount) {
 
     // 查找分销关系
     const [relations] = await conn.query(
-      `SELECT parent_id, grandparent_id, level FROM distributor_relation WHERE user_id = ? LIMIT 1`,
-      [consumerId]
+      'SELECT parent_id, grandparent_id, level FROM distributor_relation WHERE user_id = ? LIMIT 1',
+      [consumerId],
     );
 
     const commissions = [];
@@ -95,7 +95,7 @@ export async function settleCommission(consumerId, orderId, orderAmount) {
         await conn.query(
           `INSERT INTO distributor_commission (distributor_id, consumer_id, order_id, order_amount, commission_rate, commission, level, status)
            VALUES (?, ?, ?, ?, ?, ?, 1, 'settled')`,
-          [parent_id, consumerId, orderId, orderAmount, rate, amount]
+          [parent_id, consumerId, orderId, orderAmount, rate, amount],
         );
         commissions.push({ level: 1, distributor_id: parent_id, amount });
       }
@@ -107,7 +107,7 @@ export async function settleCommission(consumerId, orderId, orderAmount) {
         await conn.query(
           `INSERT INTO distributor_commission (distributor_id, consumer_id, order_id, order_amount, commission_rate, commission, level, status)
            VALUES (?, ?, ?, ?, ?, ?, 2, 'settled')`,
-          [grandparent_id, consumerId, orderId, orderAmount, rate, amount]
+          [grandparent_id, consumerId, orderId, orderAmount, rate, amount],
         );
         commissions.push({ level: 2, distributor_id: grandparent_id, amount });
       }
@@ -135,7 +135,7 @@ export async function getCommissionBalance(userId) {
          COALESCE(SUM(CASE WHEN status = 'withdrawn' THEN commission ELSE 0 END), 0) as withdrawn,
          COALESCE(SUM(commission), 0) as total
        FROM distributor_commission WHERE distributor_id = ?`,
-      [userId]
+      [userId],
     );
     return result;
   } finally {
@@ -157,7 +157,7 @@ export async function withdrawCommission(userId, amount) {
     const [[balance]] = await conn.query(
       `SELECT COALESCE(SUM(commission), 0) as available
        FROM distributor_commission WHERE distributor_id = ? AND status = 'settled'`,
-      [userId]
+      [userId],
     );
 
     if (balance.available < amount) throw { status: 400, message: `可提现余额不足，当前可用 ${balance.available}` };
@@ -167,15 +167,15 @@ export async function withdrawCommission(userId, amount) {
     const [pendingCommissions] = await conn.query(
       `SELECT id, commission FROM distributor_commission
        WHERE distributor_id = ? AND status = 'settled' ORDER BY id ASC`,
-      [userId]
+      [userId],
     );
 
     for (const row of pendingCommissions) {
       if (remaining <= 0) break;
       if (row.commission <= remaining) {
         await conn.query(
-          `UPDATE distributor_commission SET status = 'withdrawn', settled_at = NOW() WHERE id = ?`,
-          [row.id]
+          'UPDATE distributor_commission SET status = \'withdrawn\', settled_at = NOW() WHERE id = ?',
+          [row.id],
         );
         remaining -= row.commission;
       }
@@ -199,7 +199,7 @@ export async function getCommissionHistory(userId, { page = 1, pageSize = 20 } =
   try {
     const [[{ total }]] = await conn.query(
       'SELECT COUNT(*) as total FROM distributor_commission WHERE distributor_id = ?',
-      [userId]
+      [userId],
     );
     const [rows] = await conn.query(
       `SELECT dc.id, dc.consumer_id, dc.order_amount, dc.commission_rate, dc.commission, dc.level, dc.status, dc.created_at, dc.settled_at,
@@ -208,7 +208,7 @@ export async function getCommissionHistory(userId, { page = 1, pageSize = 20 } =
        LEFT JOIN users u ON u.id = dc.consumer_id
        WHERE dc.distributor_id = ?
        ORDER BY dc.created_at DESC LIMIT ? OFFSET ?`,
-      [userId, pageSize, (page - 1) * pageSize]
+      [userId, pageSize, (page - 1) * pageSize],
     );
     return { list: rows, total, page, pageSize };
   } finally {
@@ -245,7 +245,7 @@ export async function getUserTier(userId) {
   try {
     const [[{ totalSales }]] = await conn.query(
       'SELECT COALESCE(SUM(commission), 0) as totalSales FROM distributor_commission WHERE distributor_id = ? AND status IN (?,?)',
-      [userId, 'settled', 'withdrawn']
+      [userId, 'settled', 'withdrawn'],
     );
     let tierKey = 'bronze';
     for (const [key, tier] of Object.entries(DISTRIBUTION_TIERS)) {
@@ -265,11 +265,11 @@ export async function getTeamPerformance(userId, { page = 1, pageSize = 20 } = {
        WHERE dr.parent_id = ? OR dr.grandparent_id = ?
        GROUP BY u.id, u.nickname, dr.level, dr.bound_at
        ORDER BY contributed DESC LIMIT ? OFFSET ?`,
-      [userId, userId, pageSize, (page - 1) * pageSize]
+      [userId, userId, pageSize, (page - 1) * pageSize],
     );
     const [[agg]] = await conn.query(
       'SELECT COUNT(*) as totalMembers, COALESCE(SUM(dc.commission), 0) as totalContribution FROM distributor_relation dr LEFT JOIN distributor_commission dc ON dc.consumer_id = dr.user_id WHERE dr.parent_id = ? OR dr.grandparent_id = ?',
-      [userId, userId]
+      [userId, userId],
     );
     return { members, totalMembers: agg.totalMembers, totalContribution: agg.totalContribution, page, pageSize };
   } finally { conn.release(); }
@@ -292,7 +292,7 @@ export async function getMyCampaignProgress(userId) {
   try {
     const [[{ monthlyInvites }]] = await conn.query(
       'SELECT COUNT(*) as monthlyInvites FROM distributor_relation WHERE parent_id = ? AND bound_at >= DATE_FORMAT(NOW(), ?)',
-      [userId, '%Y-%m-01']
+      [userId, '%Y-%m-01'],
     );
     return { campaigns: VIRAL_CAMPAIGNS, progress: { monthlyInvites, targetForVIP: 3 } };
   } finally { conn.release(); }

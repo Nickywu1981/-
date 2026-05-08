@@ -134,7 +134,7 @@ class TenantPool {
  * @returns {TenantPool}
  */
 export function tenantPool(req) {
-  const tenantId = req.tenantId || 0;
+  const tenantId = req?.tenantId || 0;
   return new TenantPool(tenantId);
 }
 

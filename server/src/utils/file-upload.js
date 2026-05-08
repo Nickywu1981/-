@@ -41,7 +41,7 @@ export function initUpload({ fileName, fileSize, fileType }) {
     upload_id: uploadId,
     chunk_size: CHUNK_SIZE,
     total_chunks: totalChunks,
-    upload_url: `/api/upload/chunk`,
+    upload_url: '/api/upload/chunk',
   };
 }
 

@@ -49,18 +49,18 @@ router.get('/profile', async (req, res) => {
     try {
       const [users] = await conn.query(
         'SELECT id, nickname, phone, email, avatar_url, role, invite_code, created_at FROM users WHERE id = ?',
-        [req.user.id]
+        [req.user.id],
       );
       if (users.length === 0) return error(res, 404, '用户不存在');
 
       const [membership] = await conn.query(
         'SELECT plan_type, credit_balance, start_time, end_time FROM user_membership WHERE user_id = ?',
-        [req.user.id]
+        [req.user.id],
       );
 
       const [points] = await conn.query(
         'SELECT balance as points_balance FROM points_account WHERE user_id = ?',
-        [req.user.id]
+        [req.user.id],
       );
 
       return success(res, {
@@ -85,17 +85,17 @@ router.get('/stats', async (req, res) => {
     const conn = await db.getConnection();
     try {
       const [[{ todayTasks }]] = await conn.query(
-        "SELECT COUNT(*) as todayTasks FROM job_queue WHERE user_id = ? AND DATE(created_at) = CURDATE()",
-        [req.user.id]
+        'SELECT COUNT(*) as todayTasks FROM job_queue WHERE user_id = ? AND DATE(created_at) = CURDATE()',
+        [req.user.id],
       );
       const [[{ totalTasks }]] = await conn.query(
         'SELECT COUNT(*) as totalTasks FROM job_queue WHERE user_id = ?',
-        [req.user.id]
+        [req.user.id],
       );
       const [[{ thisMonthConsumed }]] = await conn.query(
         `SELECT COALESCE(SUM(consumed), 0) as thisMonthConsumed FROM consumption_record
          WHERE user_id = ? AND DATE_FORMAT(create_time, '%Y-%m') = DATE_FORMAT(CURDATE(), '%Y-%m')`,
-        [req.user.id]
+        [req.user.id],
       );
 
       return success(res, { todayTasks, totalTasks, thisMonthConsumed });
@@ -124,7 +124,7 @@ router.put('/profile', _validate(updateProfileSchema), async (req, res) => {
     try {
       await conn.query(
         `UPDATE users SET ${updates.join(', ')} WHERE id = ?`,
-        [...params, req.user.id]
+        [...params, req.user.id],
       );
       return success(res, {}, '资料已更新');
     } finally {
@@ -144,7 +144,7 @@ router.put('/change-password', _validate(changePasswordSchema), async (req, res)
     try {
       const [users] = await conn.query(
         'SELECT password_hash FROM users WHERE id = ?',
-        [req.user.id]
+        [req.user.id],
       );
       if (users.length === 0) return error(res, 404, '用户不存在');
 

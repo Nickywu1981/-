@@ -56,7 +56,7 @@ const jobQueueDao = {
     const newStatus = retryCount >= 3 ? 'failed' : 'pending';
     await pool.execute(
       'UPDATE job_queue SET status = ?, retry_count = retry_count + 1, error_message = ? WHERE id = ?',
-      [newStatus, error, id]
+      [newStatus, error, id],
     );
   },
 };

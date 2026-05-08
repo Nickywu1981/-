@@ -44,7 +44,7 @@ router.post('/voice',
       if (e.status) return error(res, e.status, e.message);
       return error(res, ERROR_CODE.INTERNAL_ERROR, '语音翻译失败');
     }
-  }
+  },
 );
 
 // ─── POST /api/video-translate/subtitles ──────────────────────
@@ -60,7 +60,7 @@ router.post('/subtitles',
       if (e.status) return error(res, e.status, e.message);
       return error(res, ERROR_CODE.INTERNAL_ERROR, '字幕翻译失败');
     }
-  }
+  },
 );
 
 // ─── POST /api/video-translate/face ───────────────────────────
@@ -77,7 +77,7 @@ router.post('/face',
       if (e.status) return error(res, e.status, e.message);
       return error(res, ERROR_CODE.INTERNAL_ERROR, '面容翻译失败');
     }
-  }
+  },
 );
 
 // ─── GET /api/video-translate/langs ────────────────────────────

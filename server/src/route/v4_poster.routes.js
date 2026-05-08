@@ -44,7 +44,7 @@ router.post('/generate',
       if (e.status) return error(res, e.status, e.message);
       return error(res, ERROR_CODE.INTERNAL_ERROR, '海报生成失败');
     }
-  }
+  },
 );
 
 // ─── POST /api/posters/enhance-prompt ─────────────────────────
