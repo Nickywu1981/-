@@ -118,4 +118,35 @@ export async function getDailyTrend(days = 30) {
   return rows;
 }
 
-export default { trackEvent, getFunnelMetrics, getActiveUsers, getTopTools, getDailyTrend, EVENT };
+/**
+ * 转化漏斗：落地→注册→激活→付费→留存
+ */
+export async function getConversionFunnel(days = 30) {
+  const [[row]] = await pool.execute(
+    `SELECT
+      COUNT(DISTINCT CASE WHEN action = 'page_view' THEN user_id END) as landing,
+      COUNT(DISTINCT CASE WHEN action = 'register' THEN user_id END) as registered,
+      COUNT(DISTINCT CASE WHEN action = 'first_generate' THEN user_id END) as activated,
+      COUNT(DISTINCT CASE WHEN action = 'payment_success' THEN user_id END) as paid,
+      COUNT(DISTINCT CASE WHEN action = 'repeat_use' AND create_time >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) THEN user_id END) as retained
+     FROM operation_log
+     WHERE create_time >= DATE_SUB(CURDATE(), INTERVAL ? DAY)`,
+    [days],
+  );
+  const landing = Number(row.landing) || 0;
+  const reg = Number(row.registered) || 0;
+  const act = Number(row.activated) || 0;
+  const paid = Number(row.paid) || 0;
+  const ret = Number(row.retained) || 0;
+  return {
+    steps: [
+      { name: '访问落地', count: landing, rate: '100%' },
+      { name: '注册', count: reg, rate: landing ? (reg / landing * 100).toFixed(1) + '%' : '0%' },
+      { name: '激活(首次生成)', count: act, rate: reg ? (act / reg * 100).toFixed(1) + '%' : '0%' },
+      { name: '付费转化', count: paid, rate: act ? (paid / act * 100).toFixed(1) + '%' : '0%' },
+      { name: '7日留存', count: ret, rate: act ? (ret / act * 100).toFixed(1) + '%' : '0%' },
+    ],
+  };
+}
+
+export default { trackEvent, getFunnelMetrics, getActiveUsers, getTopTools, getDailyTrend, getConversionFunnel, EVENT };

@@ -44,3 +44,11 @@ export async function trend(req, res) {
     success(res, data);
   } catch (err) { error(res, 500, err.message); }
 }
+
+export async function conversionFunnel(req, res) {
+  try {
+    const days = parseInt(req.query.days) || 30;
+    const data = await analyticsService.getConversionFunnel(days);
+    success(res, data);
+  } catch (err) { error(res, 500, err.message); }
+}

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { track, funnel, active, topTools, trend } from '../controller/analyticsController.js';
+import { track, funnel, active, topTools, trend, conversionFunnel } from '../controller/analyticsController.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
@@ -21,5 +21,6 @@ router.get('/funnel', authMiddleware, adminAuth, asyncHandler(funnel));
 router.get('/active', authMiddleware, adminAuth, asyncHandler(active));
 router.get('/top-tools', authMiddleware, adminAuth, asyncHandler(topTools));
 router.get('/trend', authMiddleware, adminAuth, asyncHandler(trend));
+router.get('/conversion', authMiddleware, adminAuth, asyncHandler(conversionFunnel));
 
 export default router;
