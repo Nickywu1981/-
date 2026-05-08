@@ -15,22 +15,12 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { success, error } from '../utils/response.js';
+import { validateV4 as _validate } from '../utils/validate.js';
 import { requireRole } from '../middleware/rbac.js';
 import * as modelRouterService from '../services/model-router.service.js';
 import * as modelConfigCtrl from '../controller/modelConfigController.js';
 
 const router = Router();
-
-function _validate(schema) {
-  return (req, res, next) => {
-    const r = schema.safeParse(req.body);
-    if (!r.success) {
-      return error(res, 400, r.error.errors.map(e => e.message).join('; '));
-    }
-    req.validated = r.data;
-    next();
-  };
-}
 
 const resetBreakerSchema = z.object({
   model_id: z.string().min(1, '请提供模型ID').max(50),

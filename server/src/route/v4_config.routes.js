@@ -5,6 +5,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { success, error } from '../utils/response.js';
+import { validateV4 as _validate } from '../utils/validate.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import * as configService from '../services/config.service.js';
 import { sseMiddleware } from '../services/config-version.service.js';
@@ -12,17 +13,6 @@ import { requireRole } from '../middleware/rbac.js';
 
 const router = Router();
 const adminRouter = Router();
-
-function _validate(schema) {
-  return (req, res, next) => {
-    const r = schema.safeParse(req.body);
-    if (!r.success) {
-      return error(res, ERROR_CODE.VALIDATION_ERROR, r.error.errors.map(e => e.message).join('; '));
-    }
-    req.validated = r.data;
-    next();
-  };
-}
 
 const setConfigSchema = z.object({
   group_key: z.string().min(1, '请提供配置分组').max(50),

@@ -5,6 +5,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { success, error } from '../utils/response.js';
+import { validateV4 as _validate } from '../utils/validate.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import * as authService from '../services/auth.service.js';
 
@@ -36,18 +37,6 @@ const resetPasswordSchema = z.object({
   email: z.string().email().optional().nullable(),
   new_password: z.string().min(8, '新密码至少8位').max(64),
 }).refine(d => d.phone || d.email, { message: '手机号或邮箱至少填一项' });
-
-function _validate(schema) {
-  return (req, res, next) => {
-    const r = schema.safeParse(req.body);
-    if (!r.success) {
-      const msg = r.error.errors.map(e => e.message).join('; ');
-      return error(res, ERROR_CODE.VALIDATION_ERROR, msg);
-    }
-    req.validated = r.data;
-    next();
-  };
-}
 
 // POST /api/auth/register
 router.post('/register', _validate(registerSchema), async (req, res) => {

@@ -8,20 +8,10 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { success, error } from '../utils/response.js';
+import { validateV4 as _validate } from '../utils/validate.js';
 import db from '../dao/db.js';
 
 const router = Router();
-
-function _validate(schema) {
-  return (req, res, next) => {
-    const r = schema.safeParse(req.body);
-    if (!r.success) {
-      return error(res, 400, r.error.errors.map(e => e.message).join('; '));
-    }
-    req.validated = r.data;
-    next();
-  };
-}
 
 const bindSchema = z.object({
   platform: z.string().min(1, '请提供平台标识').max(50),

@@ -6,6 +6,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { success, error } from '../utils/response.js';
+import { validateV4 as _validate } from '../utils/validate.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { tierGuard } from '../middleware/tierGuard.js';
 import * as videoService from '../services/video.service.js';
@@ -15,17 +16,6 @@ import * as digitalHumanService from '../services/digital-human.service.js';
 import * as liveClipService from '../services/live-clip.service.js';
 
 const router = Router();
-
-function _validate(schema) {
-  return (req, res, next) => {
-    const r = schema.safeParse(req.body);
-    if (!r.success) {
-      return error(res, ERROR_CODE.VALIDATION_ERROR, r.error.errors.map(e => e.message).join('; '));
-    }
-    req.validated = r.data;
-    next();
-  };
-}
 
 const urlField = z.string().url('URL格式不正确');
 const optUrl = z.string().url().optional();

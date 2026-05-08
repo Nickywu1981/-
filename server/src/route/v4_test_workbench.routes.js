@@ -15,6 +15,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { success, error } from '../utils/response.js';
+import { validateV4 as _validate } from '../utils/validate.js';
 import { requireRole } from '../middleware/rbac.js';
 import * as modelRouter from '../services/model-router.service.js';
 
@@ -59,17 +60,6 @@ const compareTestSchema = z.object({
   model_keys: z.array(z.string().min(1)).min(2, '对比至少需要2个模型'),
   params: z.record(z.unknown()).optional().default({}),
 });
-
-function _validate(schema) {
-  return (req, res, next) => {
-    const r = schema.safeParse(req.body);
-    if (!r.success) {
-      return error(res, 400, r.error.errors.map(e => e.message).join('; '));
-    }
-    req.validated = r.data;
-    next();
-  };
-}
 
 // ---- 可用模型分类视图 ----
 const CATEGORY_LABELS = { text: '文本', image: '图片', video: '视频' };

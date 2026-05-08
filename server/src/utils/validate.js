@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { error } from './response.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 /**
  * 通用 Zod 校验中间件工厂
@@ -17,6 +19,21 @@ export function validate(schema, source = 'body') {
       return res.status(400).json({ code: 400, msg: '参数校验失败', data: { errors } });
     }
     req[source] = result.data;
+    next();
+  };
+}
+
+/**
+ * v4 校验中间件 — 结果存入 req.validated，不覆盖 req.body
+ * 用于 v4 路由的统一 safeParse + 标准化错误响应
+ */
+export function validateV4(schema) {
+  return (req, res, next) => {
+    const result = schema.safeParse(req.body);
+    if (!result.success) {
+      return error(res, ERROR_CODE.VALIDATION_ERROR, result.error.errors.map(e => e.message).join('; '));
+    }
+    req.validated = result.data;
     next();
   };
 }

@@ -5,6 +5,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { success, error } from '../utils/response.js';
+import { validateV4 as _validate } from '../utils/validate.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import * as uploadService from '../utils/file-upload.js';
 import multer from 'multer';
@@ -12,17 +13,6 @@ import multer from 'multer';
 const router = Router();
 const _storage = multer.memoryStorage();
 const _upload = multer({ storage: _storage, limits: { fileSize: 50 * 1024 * 1024 } });
-
-function _validate(schema) {
-  return (req, res, next) => {
-    const r = schema.safeParse(req.body);
-    if (!r.success) {
-      return error(res, ERROR_CODE.VALIDATION_ERROR, r.error.errors.map(e => e.message).join('; '));
-    }
-    req.validated = r.data;
-    next();
-  };
-}
 
 const initUploadSchema = z.object({
   file_name: z.string().min(1, '请提供文件名').max(255),
