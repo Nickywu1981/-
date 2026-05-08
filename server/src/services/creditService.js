@@ -1,4 +1,5 @@
 import * as creditDao from '../dao/creditDao.js';
+import { getBatchLimit } from './memberBenefit.js';
 
 // 操作消耗点数额
 const CONSUMPTION_RULES = {
@@ -107,6 +108,13 @@ export async function consumeCredit(userId, action, batchCount = 1) {
   if (!membership) throw Object.assign(new Error('会员信息不存在'), { statusCode: 403 });
 
   const consumed = calcConsumed(action, batchCount);
+
+  // batch_limit 检查（对齐 freezeCredit）
+  const limit = await getBatchLimit(userId);
+  if (limit > 0 && batchCount > limit) {
+    throw Object.assign(new Error(`单次批量上限为 ${limit} 张`), { statusCode: 4103 });
+  }
+
   const creditBefore = membership.credit_balance;
   if (creditBefore < consumed) {
     throw Object.assign(new Error('点数不足'), { statusCode: 4103, creditBefore, creditNeeded: consumed });

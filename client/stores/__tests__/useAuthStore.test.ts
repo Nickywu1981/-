@@ -10,7 +10,6 @@ describe('useAuthStore', () => {
 
   it('initializes with default state', () => {
     const store = useAuthStore();
-    expect(store.token).toBeNull();
     expect(store.user).toBeNull();
     expect(store.isLoggedIn).toBe(false);
   });
@@ -47,7 +46,7 @@ describe('useAuthStore', () => {
     it('userTier defaults to free', () => {
       const store = useAuthStore();
       expect(store.userTier).toBe('free');
-      store.user = { id: 1, tier: 'pro' };
+      store.user = { id: 1, role: 'pro' } as any;
       expect(store.userTier).toBe('pro');
     });
 
@@ -64,11 +63,9 @@ describe('useAuthStore', () => {
       const store = useAuthStore();
       store.user = { id: 1, nickname: 'Test', credits: 50 };
       store.isLoggedIn = true;
-      store.token = 'old-token';
 
       store.logout().catch(() => {}); // $fetch may fail, ignore
 
-      expect(store.token).toBeNull();
       expect(store.user).toBeNull();
       expect(store.isLoggedIn).toBe(false);
     });

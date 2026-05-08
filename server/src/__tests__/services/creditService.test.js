@@ -1,6 +1,11 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 vi.mock('../../dao/creditDao.js');
+vi.mock('../../services/memberBenefit.js', () => ({
+  getBatchLimit: vi.fn().mockResolvedValue(50),
+  getSaveDays: vi.fn().mockResolvedValue(30),
+  hasFeature: vi.fn().mockResolvedValue(true),
+}));
 
 const mockExecute = vi.hoisted(() => vi.fn());
 const mockQuery = vi.hoisted(() => vi.fn());

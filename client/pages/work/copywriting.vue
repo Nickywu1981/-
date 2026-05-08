@@ -214,10 +214,7 @@
 import { ref, reactive, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
 import { MagicStick } from '@element-plus/icons-vue';
-import { useFetch } from '#app';
-
 const activeTab = ref('title');
-const $fetch = useFetch();
 
 // 平台 & 语言
 const platforms = ref({});

@@ -71,6 +71,8 @@
 </template>
 
 <script setup lang="ts">
+import { useAuthStore } from '~/stores/useAuthStore'
+
 const mode = ref('password');
 const username = ref('');
 const password = ref('');
