@@ -33,4 +33,15 @@ export async function deleteSpec(req, res) {
   res.json({ code: 200, msg: '删除成功', data: null });
 }
 
-export default { listPlatforms, getSpec, getSpecsByPlatform, createSpec, updateSpec, deleteSpec };
+export async function adaptImage(req, res) {
+  try {
+    const { inputPath, platformCode, outputDir } = req.body;
+    const result = await svc.adaptImage(inputPath, platformCode, outputDir || './uploads/adapted');
+    res.json({ code: 200, msg: '图片适配成功', data: result });
+  } catch (e) {
+    const status = e.statusCode || 500;
+    res.status(status).json({ code: status, msg: e.message, data: null });
+  }
+}
+
+export default { listPlatforms, getSpec, getSpecsByPlatform, createSpec, updateSpec, deleteSpec, adaptImage };
