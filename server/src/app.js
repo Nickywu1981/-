@@ -63,6 +63,7 @@ import { auditLogMiddleware } from './middleware/audit-log.middleware.js';
 import authRoutes from './route/v4_auth.routes.js';
 import { configPublicRouter, configAdminRouter } from './route/v4_config.routes.js';
 import imageRoutesV4 from './route/v4_image.routes.js';
+import detailRoutesV4 from './route/v4_detail.routes.js';
 import videoRoutesV4 from './route/v4_video.routes.js';
 import jobRoutesV4 from './route/v4_job.routes.js';
 import pointsRoutesV4 from './route/v4_points.routes.js';
@@ -164,6 +165,7 @@ app.use('/api/config', configPublicRouter);
 app.use('/api/admin/config', configAdminRouter);
 app.use('/api/images', imageRoutesV4);
 app.use('/api/ai', imageRoutesV4);  // /api/ai/enhance-prompt 也在 v4_image.routes 中
+app.use('/api/detail', detailRoutesV4);
 app.use('/api/videos', videoRoutesV4);
 app.use('/api/jobs', jobRoutesV4);
 app.use('/api/job', jobRoutesV4);   // 别名: useTaskPolling 轮询 /api/job/:id
