@@ -208,4 +208,11 @@ export default {
 
   async listComponents(tenantId, category) { return diyDao.listComponents(tenantId, category); },
   async createComponent(tenantId, data) { return diyDao.createComponent({ ...data, tenantId }); },
+
+  // ========== 模板库 ==========
+
+  async listTemplates(params) { return diyDao.listTemplates(params); },
+  async getTemplateById(id) { return diyDao.getTemplateById(id); },
+  async incrementTemplateUse(id) { return diyDao.incrementTemplateUse(id); },
+  async listTemplateIndustries() { return diyDao.listTemplateIndustries(); },
 };
