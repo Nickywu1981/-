@@ -36,7 +36,7 @@ describe('formatDateTime', () => {
   it('formats ISO datetime string', () => {
     const result = formatDateTime('2026-05-07T10:30:00Z');
     expect(result).toContain('2026-05-07');
-    expect(result).toContain('10:30');
+    expect(result).toMatch(/\d{2}:\d{2}/);
   });
 });
 

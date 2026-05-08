@@ -1,5 +1,25 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
+
+// mock browser APIs for Node environment
+const storage = {} as Record<string, string>;
+vi.stubGlobal('window', {
+  localStorage: {
+    getItem: (k: string) => storage[k] ?? null,
+    setItem: (k: string, v: string) => { storage[k] = v; },
+    removeItem: (k: string) => { delete storage[k]; },
+    clear: () => { Object.keys(storage).forEach((k) => delete storage[k]); },
+  },
+  matchMedia: () => ({ matches: false }),
+  location: { href: '/' },
+});
+vi.stubGlobal('document', {
+  documentElement: { setAttribute: () => {} },
+});
+// persist() accesses localStorage as a global, not window.localStorage
+vi.stubGlobal('localStorage', window.localStorage);
+const localStorage = (window as any).localStorage;
+
 import { useAppStore } from '../../stores/useAppStore';
 
 describe('useAppStore', () => {
