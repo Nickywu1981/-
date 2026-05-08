@@ -4,7 +4,7 @@ import pool from './db.js';
 
 export async function updateMembership(userId, planType, credits, endTime) {
   await pool.execute(
-    'UPDATE user_membership SET plan_type = ?, credits = credits + ?, start_time = COALESCE(start_time, NOW()), end_time = ?, update_time = NOW() WHERE user_id = ?',
+    'UPDATE user_membership SET plan_type = ?, credit_balance = credit_balance + ?, start_time = COALESCE(start_time, NOW()), end_time = ?, update_time = NOW() WHERE user_id = ?',
     [planType, credits, endTime, userId],
   );
 }
