@@ -64,9 +64,9 @@ onMounted(async () => {
     $fetch('/api/payment/plans').catch(() => []),
     $fetch('/api/payment/billing?page=1&pageSize=20', { credentials: 'include' }).catch(() => ({ list: [] })),
   ])
-  profile.value = p?.data
-  plans.value = Array.isArray(pl?.data) ? pl.data : (Array.isArray(pl) ? pl : [])
-  bills.value = b?.data?.list || b?.list || []
+  profile.value = (p as any)?.data
+  plans.value = Array.isArray((pl as any)?.data) ? (pl as any).data : (Array.isArray(pl) ? pl : [])
+  bills.value = (b as any)?.data?.list || (b as any)?.list || []
 })
 
 async function subscribe(planType: number) {

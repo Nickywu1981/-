@@ -16,8 +16,10 @@ export function stringifyQuery(obj: Record<string, unknown>) {
 /** Cookie 操作快捷方法 */
 export const cookie = {
   get: (key: string) => Cookies.get(key),
-  set: (key: string, value: string, opts?: Cookies.CookieAttributes) => Cookies.set(key, value, { expires: 7, path: '/', ...opts }),
-  remove: (key: string, opts?: Cookies.CookieAttributes) => Cookies.remove(key, { path: '/', ...opts }),
-};
+  set: (key: string, value: string, opts?: Record<string, unknown>) =>
+    Cookies.set(key, value, { expires: 7, path: '/', ...opts } as Record<string, unknown>),
+  remove: (key: string, _opts?: Record<string, unknown>) =>
+    Cookies.remove(key),
+} as const;
 
 export default { parseQuery, stringifyQuery, cookie };
