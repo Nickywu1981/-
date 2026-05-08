@@ -15,7 +15,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node server/scripts/kb-snapshot.js 2>&1 >/dev/null && node server/scripts/audit-rules.js 2>/dev/null || true"
+            "command": "node server/scripts/kb-snapshot.js 2>&1 >/dev/null && node server/scripts/memory-sync.js 2>&1 >/dev/null && node server/scripts/audit-rules.js 2>/dev/null || true"
           }
         ]
       }
@@ -26,7 +26,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node server/scripts/kb-snapshot.js 2>&1 >/dev/null && node server/scripts/audit-rules.js 2>/dev/null || true"
+            "command": "node server/scripts/kb-snapshot.js 2>&1 >/dev/null && node server/scripts/memory-sync.js 2>&1 >/dev/null && node server/scripts/audit-rules.js 2>/dev/null || true"
           }
         ]
       }
@@ -37,7 +37,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node server/scripts/kb-snapshot.js 2>&1 >/dev/null && node server/scripts/audit-rules.js 2>/dev/null || true"
+            "command": "node server/scripts/kb-snapshot.js 2>&1 >/dev/null && node server/scripts/memory-sync.js 2>&1 >/dev/null && node server/scripts/audit-rules.js 2>/dev/null || true"
           }
         ]
       }
