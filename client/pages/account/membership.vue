@@ -10,6 +10,11 @@
       </span>
       <span v-if="currentPlan.plan_type > 0" class="expire">到期：{{ currentPlan.end_time?.slice(0, 10) || '-' }}</span>
       <span class="balance">余额：{{ currentPlan.credit_balance || 0 }} 点</span>
+      <!-- 自动续费开关 -->
+      <label v-if="currentPlan.plan_type > 0" class="auto-renew">
+        <input type="checkbox" :checked="autoRenew" @change="toggleAutoRenew" />
+        自动续费
+      </label>
     </div>
 
     <!-- 套餐卡 -->
@@ -93,6 +98,7 @@
 definePageMeta({ middleware: 'auth' })
 
 const currentPlan = ref<any>(null);
+const autoRenew = ref(false);
 const buying = ref(false);
 const paying = ref(false);
 const showPayModal = ref(false);
@@ -111,8 +117,24 @@ const displayPlans = ref<PlanItem[]>([
 async function loadMembership() {
   try {
     const res: any = await $fetch('/api/user/profile', { credentials: 'include' });
-    if (res?.code === 200) currentPlan.value = res.data?.membership || {};
+    if (res?.code === 200) {
+      currentPlan.value = res.data?.membership || {};
+      autoRenew.value = res.data?.membership?.auto_renew === 1;
+    }
   } catch { /* fallback */ }
+}
+
+async function toggleAutoRenew() {
+  autoRenew.value = !autoRenew.value;
+  try {
+    await $fetch('/api/user/membership/auto-renew', {
+      method: 'PUT',
+      credentials: 'include',
+      body: { autoRenew: autoRenew.value },
+    });
+  } catch {
+    autoRenew.value = !autoRenew.value; // revert on error
+  }
 }
 
 onMounted(() => { loadMembership(); });
@@ -168,6 +190,8 @@ h2 { font-size: 24px; font-weight: 700; color: var(--text-primary); margin-botto
 .badge.free { background: var(--bg-hover); color: var(--text-secondary); }
 .badge.paid { background: var(--brand-light); color: var(--brand); }
 .expire, .balance { font-size: 13px; color: var(--text-secondary); }
+.auto-renew { font-size: 13px; color: var(--text-secondary); margin-left: auto; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.auto-renew input { accent-color: var(--brand); }
 
 .plan-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
 .plan-card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 12px; padding: 28px 24px; position: relative; }
