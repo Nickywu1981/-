@@ -196,3 +196,36 @@ export async function createComponent(req, res) {
     return success(res, { id }, '组件创建成功');
   } catch (err) { return error(res, ERROR_CODE.INTERNAL_ERROR, err.message); }
 }
+
+// ==================== 模板库 ====================
+
+export async function listTemplates(req, res) {
+  try {
+    const { industry, pageType, keyword } = req.query;
+    const { page, pageSize } = parsePagination(req.query);
+    const result = await diyService.listTemplates({ industry, pageType, keyword, page, pageSize });
+    return success(res, result);
+  } catch (err) { return error(res, ERROR_CODE.INTERNAL_ERROR, err.message); }
+}
+
+export async function getTemplate(req, res) {
+  try {
+    const t = await diyService.getTemplateById(req.params.id);
+    if (!t) return error(res, ERROR_CODE.NOT_FOUND, '模板不存在');
+    return success(res, t);
+  } catch (err) { return error(res, ERROR_CODE.INTERNAL_ERROR, err.message); }
+}
+
+export async function useTemplate(req, res) {
+  try {
+    await diyService.incrementTemplateUse(req.params.id);
+    return success(res, null, 'ok');
+  } catch (err) { return error(res, ERROR_CODE.INTERNAL_ERROR, err.message); }
+}
+
+export async function listTemplateIndustries(req, res) {
+  try {
+    const industries = await diyService.listTemplateIndustries();
+    return success(res, industries);
+  } catch (err) { return error(res, ERROR_CODE.INTERNAL_ERROR, err.message); }
+}
