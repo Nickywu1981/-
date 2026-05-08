@@ -16,19 +16,19 @@ const router = Router();
 const imageUrlSchema = z.string().url('请提供有效的图片URL');
 const img2VideoSchema = z.object({
   imageUrl: imageUrlSchema,
+  style: z.string().optional(),
   duration: z.coerce.number().int().min(10).max(60).optional(),
   platform: z.string().optional(),
 });
 const multi2VideoSchema = z.object({
   imageUrls: z.array(imageUrlSchema).min(1, '至少需要一张图片').max(100),
-  platform: z.string().optional(),
-  bgm: z.string().optional(),
+  style: z.string().optional(),
+  duration: z.coerce.number().int().min(10).max(300).optional(),
+  sellPoints: z.array(z.string()).optional(),
 });
 const packagingSchema = z.object({
   videoUrl: z.string().min(1, '请提供视频URL'),
-  subtitle: z.boolean().optional(),
-  bgm: z.string().optional(),
-  stickers: z.array(z.string()).optional(),
+  options: z.object({}).passthrough().optional(),
 });
 const transferSchema = z.object({
   sourceImageUrl: z.string().url('请提供有效的源图片URL'),

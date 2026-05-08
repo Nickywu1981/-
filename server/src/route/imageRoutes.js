@@ -39,16 +39,28 @@ const batchTaskSchema = z.object({
   platform: platformSchema.optional(),
   style: z.string().optional(),
 });
-const singleImageSchema = z.object({ imageUrl: imageUrlSchema });
+const retouchSchema = z.object({
+  imageUrl: imageUrlSchema,
+  level: z.enum(['standard', 'high', 'ultra']).optional(),
+  features: z.array(z.string()).optional(),
+});
+const removeBgSchema = z.object({
+  imageUrl: imageUrlSchema,
+  format: z.enum(['png', 'webp', 'jpg']).optional(),
+});
+const whiteBgSchema = z.object({
+  imageUrl: imageUrlSchema,
+  bgColor: z.string().optional(),
+});
 
 // 所有图片任务需要登录
 router.post('/main-image', authMiddleware, tierGuard('image'), heavyLimiter, validate(mainImageSchema), asyncHandler(submitMainImage));
 router.post('/scene', authMiddleware, tierGuard('image'), heavyLimiter, validate(sceneImageSchema), asyncHandler(submitSceneImage));
 router.post('/detail-h5', authMiddleware, tierGuard('image'), heavyLimiter, validate(detailH5Schema), asyncHandler(submitDetailH5));
 router.post('/batch', authMiddleware, tierGuard('image'), heavyLimiter, validate(batchTaskSchema), asyncHandler(submitBatchTask));
-router.post('/retouch', authMiddleware, tierGuard('image'), heavyLimiter, validate(singleImageSchema), asyncHandler(submitRetouch));
-router.post('/remove-bg', authMiddleware, tierGuard('image'), heavyLimiter, validate(singleImageSchema), asyncHandler(submitRemoveBg));
-router.post('/white-bg', authMiddleware, tierGuard('image'), heavyLimiter, validate(singleImageSchema), asyncHandler(submitWhiteBg));
+router.post('/retouch', authMiddleware, tierGuard('image'), heavyLimiter, validate(retouchSchema), asyncHandler(submitRetouch));
+router.post('/remove-bg', authMiddleware, tierGuard('image'), heavyLimiter, validate(removeBgSchema), asyncHandler(submitRemoveBg));
+router.post('/white-bg', authMiddleware, tierGuard('image'), heavyLimiter, validate(whiteBgSchema), asyncHandler(submitWhiteBg));
 
 // 任务查询
 router.get('/tasks', authMiddleware, validate(paginationSchema, 'query'), asyncHandler(listMyTasks));

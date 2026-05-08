@@ -26,7 +26,11 @@ const redoSchema = z.object({
 
 const templateSchema = z.object({
   name: z.string().min(1, '模板名称不能为空').max(60),
-  settings: z.object({}).passthrough(),
+  operation: z.string().min(1, '请选择操作类型'),
+  platform: z.string().optional(),
+  style: z.string().optional(),
+  nightMode: z.coerce.boolean().optional(),
+  imageCount: z.coerce.number().int().positive().optional(),
 });
 
 // 批量任务
