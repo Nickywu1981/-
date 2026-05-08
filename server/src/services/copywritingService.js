@@ -81,7 +81,7 @@ export async function generateDescription(userId, params) {
   }
 }
 
-export async function translateProduct(userId, { productName, description, features, sourceLang = 'zh-CN', targetLang = 'en', model: modelId = 'claude-sonnet-4-6' }) {
+export async function translateProduct(userId, { productName, description, features, sourceLang = 'zh-CN', targetLang = 'en', model: modelId = 'deepseek-v4-flash' }) {
   const prompt = copywriting.translate.template
     .replace('{productName}', productName)
     .replace('{description}', description || '')
@@ -90,10 +90,11 @@ export async function translateProduct(userId, { productName, description, featu
     .replace('{targetLang}', targetLang);
   const startTime = Date.now();
   try {
-    const result = await infer(modelId, prompt, { temperature: 0.3, maxTokens: 2048 });
-    const tokenUsed = result.usage?.totalTokens || 0;
-    await copywritingDao.insertHistory({ userId, type: 'translate', inputs: { sourceLang, targetLang, productName }, outputs: result.text, modelId, tokenUsed });
-    return { translation: result.text, tokenUsed, model: modelId, latency: Date.now() - startTime };
+    const wrapped = await infer(modelId, { prompt, temperature: 0.3, maxTokens: 2048 });
+    const out = wrapped.output;
+    const tokenUsed = out.usage?.totalTokens || 0;
+    await copywritingDao.insertHistory({ userId, type: 'translate', inputs: { sourceLang, targetLang, productName }, outputs: out.text, modelId, tokenUsed });
+    return { translation: out.text, tokenUsed, model: wrapped.modelId, latency: Date.now() - startTime };
   } catch (err) {
     await copywritingDao.insertHistory({ userId, type: 'translate', inputs: { sourceLang, targetLang, productName }, outputs: null, modelId, tokenUsed: 0, status: 'failed', errorMsg: err.message });
     throw err;
