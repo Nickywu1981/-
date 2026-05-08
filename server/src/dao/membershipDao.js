@@ -31,6 +31,18 @@ const membershipDao = {
     await pool.execute('UPDATE user_membership SET credit_balance = credit_balance + ? WHERE user_id = ?', [amount, userId]);
   },
 
+  async setAutoRenew(userId, autoRenew) {
+    await pool.execute('UPDATE user_membership SET auto_renew = ? WHERE user_id = ?', [autoRenew ? 1 : 0, userId]);
+  },
+
+  async findExpiring(daysWithin = 7) {
+    const [rows] = await pool.execute(
+      'SELECT * FROM user_membership WHERE auto_renew = 1 AND plan_type != \'free\' AND end_time BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL ? DAY)',
+      [daysWithin],
+    );
+    return rows;
+  },
+
   async listByPlanType(planType, { limit = 20, offset = 0 } = {}) {
     const where = planType ? 'WHERE plan_type = ?' : '';
     const params = planType ? [planType, Number(limit), Number(offset)] : [Number(limit), Number(offset)];

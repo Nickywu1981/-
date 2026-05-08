@@ -12,6 +12,7 @@ import bcrypt from 'bcryptjs';
 import { success, error } from '../utils/response.js';
 import { authMiddleware } from '../middleware/auth.js';
 import db from '../dao/db.js';
+import membershipDao from '../dao/membershipDao.js';
 
 const router = Router();
 
@@ -152,6 +153,18 @@ router.put('/change-password', _validate(changePasswordSchema), async (req, res)
     }
   } catch (err) {
     return error(res, 500, err.message);
+  }
+});
+
+// PUT /api/user/membership/auto-renew — 自动续费开关
+router.put('/membership/auto-renew', _validate(z.object({
+  autoRenew: z.boolean(),
+})), async (req, res) => {
+  try {
+    await membershipDao.setAutoRenew(req.user.id, req.validated.autoRenew);
+    success(res, { autoRenew: req.validated.autoRenew }, '自动续费已' + (req.validated.autoRenew ? '开启' : '关闭'));
+  } catch (err) {
+    error(res, 500, err.message);
   }
 });
 
