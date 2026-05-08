@@ -9,6 +9,7 @@
  */
 
 import logger from '../utils/logger.js';
+import { BusinessError } from '../utils/businessError.js';
 
 // ==================== 模型注册中心 ====================
 
@@ -16,7 +17,7 @@ const registry = new Map();
 
 export function registerModel(model) {
   if (!model.id || !model.type || !model.infer) {
-    throw new Error('AI模型注册失败: 缺少 id/type/infer 字段');
+    throw new BusinessError(500, 'AI模型注册失败: 缺少 id/type/infer 字段');
   }
   registry.set(model.id, model);
   logger.info(`[AI] 模型已注册: ${model.id} (${model.type})`);
@@ -24,7 +25,7 @@ export function registerModel(model) {
 
 export function getModel(id) {
   const model = registry.get(id);
-  if (!model) throw new Error(`AI模型未注册: ${id}`);
+  if (!model) throw new BusinessError(500, `AI模型未注册: ${id}`);
   return model;
 }
 
@@ -129,7 +130,7 @@ export async function infer(modelId, input, options = {}) {
 
     if (attempt > 0 && currentModelId !== triedModels[triedModels.length - 1]) {
       triedModels.push(currentModelId);
-      console.log(`[AI] 降级: ${triedModels[attempt - 1]} → ${currentModelId}`);
+      logger.info(`[AI] 降级: ${triedModels[attempt - 1]} → ${currentModelId}`);
     }
 
     try {
@@ -139,7 +140,7 @@ export async function infer(modelId, input, options = {}) {
       const result = await Promise.race([
         model.infer(input, (sub) => onProgress?.(Math.min(99, sub))),
         new Promise((_, reject) =>
-          setTimeout(() => reject(new Error(`AI调用超时: ${currentModelId}`)), INFER_CONFIG.timeoutMs),
+          setTimeout(() => reject(new BusinessError(504, `AI调用超时: ${currentModelId}`)), INFER_CONFIG.timeoutMs),
         ),
       ]);
 
@@ -173,7 +174,7 @@ export async function infer(modelId, input, options = {}) {
 
   // 全部失败 → 优雅降级
   if (INFER_CONFIG.enableDegradation) {
-    console.warn(`[AI] 全部模型失败 (${triedModels.join(' → ')}), 返回默认响应`);
+    logger.warn(`[AI] 全部模型失败 (${triedModels.join(' → ')}), 返回默认响应`);
     const fallback = getDefaultResponse(modelId, input, lastError?.message);
     return {
       modelId: 'fallback',

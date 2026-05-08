@@ -13,6 +13,7 @@
  */
 
 import logger from '../utils/logger.js';
+import { BusinessError } from '../utils/businessError.js';
 
 let Queue, Worker;
 let bullmqAvailable = false;
@@ -60,8 +61,8 @@ const workerInstances = new Map();
 // ==================== 队列初始化 ====================
 
 export function getQueue(name) {
-  if (!QUEUES[name]) throw new Error(`未定义的队列: ${name}`);
-  if (!redisAvailable) throw new Error(`Redis 不可用: ${name}`);
+  if (!QUEUES[name]) throw new BusinessError(500, `未定义的队列: ${name}`);
+  if (!redisAvailable) throw new BusinessError(503, `Redis 不可用: ${name}`);
 
   if (!queueInstances.has(name)) {
     queueInstances.set(name, new Queue(name, {
@@ -73,7 +74,7 @@ export function getQueue(name) {
         removeOnFail: 500,
       },
     }));
-    console.log(`[BullMQ] 队列已创建: ${name}`);
+    logger.info(`[BullMQ] 队列已创建: ${name}`);
   }
   return queueInstances.get(name);
 }
@@ -84,7 +85,7 @@ export function registerWorker(name, processor) {
   if (!redisAvailable) {
     return null;
   }
-  if (!QUEUES[name]) throw new Error(`未定义的队列: ${name}`);
+  if (!QUEUES[name]) throw new BusinessError(500, `未定义的队列: ${name}`);
   if (workerInstances.has(name)) return workerInstances.get(name);
 
   const worker = new Worker(name, processor, {
@@ -102,7 +103,7 @@ export function registerWorker(name, processor) {
   });
 
   workerInstances.set(name, worker);
-  console.log(`[BullMQ] Worker 已注册: ${name} (concurrency=${QUEUES[name].concurrency})`);
+  logger.info(`[BullMQ] Worker 已注册: ${name} (concurrency=${QUEUES[name].concurrency})`);
   return worker;
 }
 
@@ -111,7 +112,7 @@ export function registerWorker(name, processor) {
 export async function addJob(queueName, data, options = {}) {
   await ensureBullMQ();
   if (!bullmqAvailable) {
-    console.warn(`[BullMQ] 降级: 跳过任务 ${queueName}/${data.taskType}`);
+    logger.warn(`[BullMQ] 降级: 跳过任务 ${queueName}/${data.taskType}`);
     return { jobId: `direct-${Date.now()}`, queueName };
   }
   const queue = getQueue(queueName);
@@ -171,7 +172,7 @@ export async function cleanQueue(queueName, graceSeconds = 3600) {
 export async function closeAll() {
   for (const worker of workerInstances.values()) await worker.close();
   for (const queue of queueInstances.values()) await queue.close();
-  console.log('[BullMQ] 所有队列已关闭');
+  logger.info('[BullMQ] 所有队列已关闭');
 }
 
 // ==================== 内置处理器 ====================
@@ -203,8 +204,8 @@ export async function createImageWorker() {
 
 // 预加载
 ensureBullMQ().then(() => checkRedis()).then((ok) => {
-  if (ok) console.log('[BullMQ] Redis 已连接，队列功能可用');
-  else console.warn('[BullMQ] Redis 未运行 — 队列降级为同步模式，启动后自动恢复');
+  if (ok) logger.info('[BullMQ] Redis 已连接，队列功能可用');
+  else logger.warn('[BullMQ] Redis 未运行 — 队列降级为同步模式，启动后自动恢复');
 });
 
 export default {

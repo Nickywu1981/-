@@ -1,4 +1,5 @@
 import { BusinessError } from '../utils/businessError.js';
+import logger from '../utils/logger.js';
 
 /**
  * ModelDispatcher — 多模型统一调度层 (v5.0)
@@ -27,7 +28,7 @@ async function ensureModels() {
     const { registerAllAdapters } = await import('./adapters/index.js');
     registerAllAdapters();
   } catch (e) {
-    console.warn('[ModelDispatcher] 无法自动注册 Adapter:', e.message);
+    logger.warn('[ModelDispatcher] 无法自动注册 Adapter:', e.message);
   }
   _modelsReady = true;
 }
@@ -304,7 +305,7 @@ export async function customMode(taskType, input, customConfig = {}, options = {
           throw err;
         }
         options.degradationLog?.push({ modelId: m.id, error: err.message, stage: 'serial' });
-        console.warn(`[ModelDispatcher] custom 模式 ${m.id} 失败, 跳过:`, err.message);
+        logger.warn(`[ModelDispatcher] custom 模式 ${m.id} 失败, 跳过:`, err.message);
       }
     }
   }
@@ -405,9 +406,9 @@ export const extensionHooks = {
 export function registerExtension(name, handler) {
   if (extensionHooks.hasOwnProperty(name)) {
     extensionHooks[name] = handler;
-    console.log(`[ModelDispatcher] Phase 3 扩展 ${name} 已注册`);
+    logger.info(`[ModelDispatcher] Phase 3 扩展 ${name} 已注册`);
   } else {
-    throw new Error(`未知扩展: ${name}. 可用: ${Object.keys(extensionHooks).join(', ')}`);
+    throw new BusinessError(400, `未知扩展: ${name}. 可用: ${Object.keys(extensionHooks).join(', ')}`);
   }
 }
 
