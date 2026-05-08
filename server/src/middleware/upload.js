@@ -21,7 +21,7 @@ const MAGIC_SIGNATURES = {
   'video/quicktime': null,
 };
 
-const MAX_MAGIC_BYTES = 12;
+const _MAX_MAGIC_BYTES = 12;
 
 /** 检测文件头是否匹配声明类型 */
 function checkMagicNumber(filePath, mimeType) {

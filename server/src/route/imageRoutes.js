@@ -8,7 +8,7 @@ import { authMiddleware } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { tierGuard } from '../middleware/tierGuard.js';
-import { validate, idSchema, paginationSchema } from '../utils/validate.js';
+import { validate, paginationSchema } from '../utils/validate.js';
 import { z } from 'zod';
 
 const router = Router();

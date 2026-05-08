@@ -148,7 +148,7 @@ export async function listUsers({ query, opts }) {
   return paginatedQuery({ query, opts }, () => userDao.countUsers(keyword), (pager) => userDao.listUsers(pager, keyword));
 }
 
-export async function getUserStats(userId, tenantId = 0) {
+export async function getUserStats(userId, _tenantId = 0) {
   const stats = await userDao.getUserStats(userId);
   return {
     todayTaskCount: stats.todayTotal,

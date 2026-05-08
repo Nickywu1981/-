@@ -5,7 +5,7 @@ import { BusinessError } from '../utils/businessError.js';
  * G5 后端开发 | W3
  */
 import { submitJob } from './job-queue.service.js';
-import * as moderationService from './moderation.service.js';
+import * as moderation from './moderation.service.js';
 import db from '../dao/db.js';
 
 /**

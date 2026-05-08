@@ -59,7 +59,7 @@ router.post('/enhance-prompt', _validate(enhanceSchema), async (req, res) => {
     const promptType = ['xhs', 'wechat'].includes(req.validated.posterType) ? 'social' : 'poster';
     const result = await promptEnhanceService.enhancePrompt(req.validated.prompt, promptType);
     return success(res, result);
-  } catch (e) {
+  } catch (_) {
     return error(res, ERROR_CODE.INTERNAL_ERROR, '提示词增强失败');
   }
 });
@@ -78,7 +78,7 @@ router.get('/works', async (req, res) => {
     const { type, page, limit } = req.query;
     const rows = await posterService.getUserPosters(req.userId, { type, page: +page || 1, limit: +limit || 20 });
     return success(res, rows);
-  } catch (e) {
+  } catch (_) {
     return error(res, ERROR_CODE.INTERNAL_ERROR, '获取作品列表失败');
   }
 });

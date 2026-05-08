@@ -3,7 +3,7 @@ import { getPlans, createOrder, getOrderStatus, sandboxPay, checkPaymentResult, 
 import { authMiddleware } from '../middleware/auth.js';
 import { cacheMiddleware } from '../middleware/cache.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
-import { validate, idSchema, paginationSchema } from '../utils/validate.js';
+import { validate, paginationSchema } from '../utils/validate.js';
 import { z } from 'zod';
 
 const router = Router();

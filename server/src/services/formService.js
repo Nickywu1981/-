@@ -70,7 +70,7 @@ function maskValue(value, rule, pattern) {
 }
 
 // ── 字段过滤(双端适配) ──
-function filterFieldsByDevice(fields, device) {
+function filterFieldsByDevice(fields, _device) {
   if (!fields) return [];
   return fields
     .filter(f => f.is_visible !== false)
@@ -245,7 +245,7 @@ export async function updateSubmission(subId, data) {
   return true;
 }
 
-export async function exportSubmissions(formId, format = 'csv') {
+export async function exportSubmissions(formId, _format = 'csv') {
   const rows = await formDao.getAllSubmissions(formId);
   // TODO: EasyExcel 格式导出
   return rows;

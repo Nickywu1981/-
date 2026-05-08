@@ -42,7 +42,7 @@ export default {
       try {
         const cached = await redis.get(`${REDIS_KEY_PREFIX}${slug}`);
         if (cached) return JSON.parse(cached);
-      } catch (_) { /* fallback to DB */ }
+      } catch (__) { /* fallback to DB */ }
     }
     const [rows] = await pool.query(
       'SELECT id, owner_id, title, slug, page_type, mobile_config, pc_config, meta_json, publish_time, latest_published_version FROM diy_page WHERE slug = ? AND status = 1 LIMIT 1', [slug],
@@ -196,5 +196,5 @@ export default {
 function parseJson(val) {
   if (!val) return null;
   if (typeof val === 'object') return val;
-  try { return JSON.parse(val); } catch (_) { return null; }
+  try { return JSON.parse(val); } catch (__) { return null; }
 }

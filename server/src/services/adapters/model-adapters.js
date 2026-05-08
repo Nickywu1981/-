@@ -49,7 +49,7 @@ export const TongyiWanxiangAdapter = {
     };
   },
 
-  async replicateImage({ referenceImageUrl, productName, ratio = '1:1' }) {
+  async replicateImage({ referenceImageUrl, productName, _ratio = '1:1' }) {
     const prompt = `复刻参考图的构图和风格，商品: ${productName}`;
     // 通义万象支持图生图
     const result = await routeModel({

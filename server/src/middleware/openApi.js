@@ -13,7 +13,7 @@ import { ERROR_CODE } from '../constants/errorCode.js';
 
 // ========================= API Key 生成 =========================
 
-export function generateApiKey(tenantId, description = '') {
+export function generateApiKey(tenantId, _description = '') {
   const prefix = 'movio_';
   const raw = `${tenantId}_${Date.now()}_${crypto.randomBytes(18).toString('hex')}`;
   const hash = crypto.createHash('sha256').update(raw).digest('hex');

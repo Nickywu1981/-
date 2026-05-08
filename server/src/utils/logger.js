@@ -11,7 +11,7 @@ const isDev = process.env.NODE_ENV !== 'production';
 
 const LOG_SAMPLE_RATE = parseFloat(process.env.LOG_SAMPLE_RATE || (isDev ? '1.0' : '0.1'));
 const SLOW_QUERY_THRESHOLD_MS = parseInt(process.env.SLOW_QUERY_MS || '500', 10);
-const requestCounters = new Map();
+const _requestCounters = new Map();
 
 /** 判断是否应该记录此请求（采样） */
 function shouldSample(path, statusCode) {

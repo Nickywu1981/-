@@ -205,7 +205,7 @@ export async function cleanLogs(tenantId, days = 30) {
 
 // ==================== 熔断管理 ====================
 
-export async function resetCircuit(id, tenantId) {
+export async function resetCircuit(id, _tenantId) {
   await proxyDao.resetCircuit(id);
   return { circuit: 'closed' };
 }
@@ -243,7 +243,7 @@ function buildHeaders(proxy) {
   return headers;
 }
 
-async function handleUpstreamFailure(proxy, tenantId, status, body) {
+async function handleUpstreamFailure(proxy, tenantId, status, _body) {
   const failCount = (proxy.circuit_fail_count || 0) + 1;
   const threshold = proxy.circuit_break_count || 5;
   if (failCount >= threshold) {

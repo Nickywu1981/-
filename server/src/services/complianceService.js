@@ -93,7 +93,7 @@ export function getRegionCompliance(regionCode) {
 }
 
 /** 综合合规检查（平台+区域） */
-export function checkCompliance({ platform, region, category }) {
+export function checkCompliance({ platform, region, _category }) {
   const results = [];
   const platformRules = COMPLIANCE_RULES[platform];
   const regionRules = COMPLIANCE_RULES[region];

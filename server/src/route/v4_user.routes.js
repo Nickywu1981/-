@@ -27,7 +27,7 @@ function _validate(schema) {
 }
 
 const _phoneRegex = /^1[3-9]\d{9}$/;
-const _emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const __emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const updateProfileSchema = z.object({
   nickname: z.string().max(30).optional(),

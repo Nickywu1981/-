@@ -11,7 +11,7 @@ import * as authService from '../services/auth.service.js';
 const router = Router();
 
 const _phoneRegex = /^1[3-9]\d{9}$/;
-const _emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const __emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const registerSchema = z.object({
   phone: z.string().regex(_phoneRegex, '手机号格式不正确').optional().nullable(),

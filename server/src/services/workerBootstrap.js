@@ -50,7 +50,7 @@ export async function bootstrapWorkers() {
 
     // 批量任务 Worker
     registerWorker('batch-tasks', async (job) => {
-      const { userId, taskId, imageUrls, operation } = job.data;
+      const { userId, taskId, imageUrls, _operation } = job.data;
       await job.updateProgress(5);
       const total = imageUrls?.length || 1;
       const results = [];
@@ -65,7 +65,7 @@ export async function bootstrapWorkers() {
 
     // 通知 Worker
     registerWorker('notifications', async (job) => {
-      const { userId, title, body } = job.data;
+      const { userId, title, _body } = job.data;
       logger.info(`[Worker] 通知: ${title} → user ${userId}`);
       return { sent: true, userId, title };
     });

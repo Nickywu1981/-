@@ -25,7 +25,7 @@ export async function submitMainImage(userId, { imageUrl, platform, style = 'sim
 
 async function processMainImage(taskId, userId, params) {
   try {
-    const onProgress = (p) => updateTaskStatus(taskId, userId, { progress: Math.round(p * 0.9), progressMsg: 'AI 处理中...' });
+    const _onProgress = (p) => updateTaskStatus(taskId, userId, { progress: Math.round(p * 0.9), progressMsg: 'AI 处理中...' });
 
     const stages = [
       { name: '抠图',    model: 'stable-diffusion-img2img' },
