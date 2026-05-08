@@ -3,7 +3,7 @@
   "info": {
     "title": "Movio AI API v4.1",
     "version": "4.1.0",
-    "description": "电商AI SaaS系统接口文档 — 图片/视频/批量/商业化/管理后台 — v4.1 重构版"
+    "description": "电商AI SaaS系统接口文档 — 图片/视频/文案/DIY页面/拖拽编辑器/表单/API代理/模型管理/提示词系统 — v4.1 正式版"
   },
   "servers": [
     {
