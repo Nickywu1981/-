@@ -159,3 +159,61 @@ export async function adminReviewTemplate(id, { status, reviewRemark }, reviewer
 export async function adminDeleteTemplate(id) {
   await promptDao.deleteTemplate(id);
 }
+
+// ==================== 使用历史 ====================
+
+export async function recordUsage(userId, templateId, filledContent, modelType) {
+  await promptDao.incrUsageCount(templateId);
+  await promptDao.insertUsageHistory(userId, templateId, filledContent, modelType);
+}
+
+export async function listUsageHistory(userId, { page, pageSize }) {
+  return promptDao.listUsageHistory(userId, { page, pageSize });
+}
+
+// ==================== 智能推荐引擎 ====================
+
+/** 混合推荐：协同过滤 + 内容推荐 + 热门兜底 */
+export async function getRecommendations(userId, { limit = 12 }) {
+  const history = await promptDao.listUsageHistory(userId, { page: 1, pageSize: 50 });
+  const usedIds = history.list.map(h => h.template_id);
+
+  // 1. 协同过滤推荐
+  if (history.list.length > 0) {
+    const collab = await promptDao.recommendCollaborative(userId, { limit: Math.ceil(limit / 2) });
+    if (collab.length >= 3) {
+      const remaining = limit - collab.length;
+      if (remaining <= 0) return collab.slice(0, limit);
+      // 补充热门
+      const excludeIds = [...usedIds, ...collab.map(c => c.id)];
+      const hot = await promptDao.getHotTemplates({ excludeIds, limit: remaining });
+      return [...collab, ...hot];
+    }
+  }
+
+  // 2. 按用户偏好分类推荐
+  const prefs = await promptDao.getCategoryPreference(userId);
+  if (prefs.length > 0) {
+    const cats = prefs.map(p => p.category);
+    const byCat = await promptDao.recommendByCategory(cats, { excludeIds: usedIds, limit });
+    if (byCat.length >= 3) return byCat;
+  }
+
+  // 3. 热门兜底
+  return promptDao.getHotTemplates({ excludeIds: usedIds, limit });
+}
+
+// ==================== 评分 ====================
+
+export async function rateTemplate(userId, templateId, score) {
+  if (score < 1 || score > 5) throw Object.assign(new Error('评分需在1-5之间'), { statusCode: 400 });
+  await promptDao.upsertRating(userId, templateId, score);
+  const rating = await promptDao.getAverageRating(templateId);
+  return { score, avgScore: Math.round(rating.avg_score * 10) / 10, ratingCount: rating.rating_count };
+}
+
+export async function getRating(userId, templateId) {
+  const avg = await promptDao.getAverageRating(templateId);
+  const my = await promptDao.getUserRating(userId, templateId);
+  return { avgScore: Math.round(avg.avg_score * 10) / 10, ratingCount: avg.rating_count, myScore: my };
+}
