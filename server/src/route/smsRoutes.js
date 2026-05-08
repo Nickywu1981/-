@@ -11,11 +11,19 @@ import { z } from 'zod';
 
 const router = Router();
 
-const sendCodeSchema = z.object({ phone: phoneSchema });
-const verifyCodeSchema = z.object({ phone: phoneSchema, code: codeSchema });
+const sendCodeSchema = z.object({
+  phone: phoneSchema,
+  scene: z.enum(['register', 'login', 'reset_password', 'bind']),
+});
+const verifyCodeSchema = z.object({
+  phone: phoneSchema,
+  scene: z.enum(['register', 'login', 'reset_password', 'bind']),
+  code: codeSchema,
+});
 const sendNotificationSchema = z.object({
   phone: phoneSchema,
-  templateCode: z.string().min(1, '模板编码不能为空'),
+  scene: z.string().optional(),
+  templateCode: z.string().optional(),
   params: z.record(z.string()).optional(),
 });
 

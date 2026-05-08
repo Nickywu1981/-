@@ -8,10 +8,10 @@ import { z } from 'zod';
 const router = Router();
 
 const sendSchema = z.object({
+  userId: z.number().int().positive(),
+  type: z.string().max(50).optional(),
   title: z.string().min(1).max(200),
-  body: z.string().min(1).max(2000),
-  userIds: z.array(z.number().int().positive()).min(1).max(1000).optional(),
-  type: z.enum(['system', 'marketing', 'alert']).optional(),
+  content: z.string().min(1).max(2000),
 });
 
 router.get('/', authMiddleware, asyncHandler(listNotifications));

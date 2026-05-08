@@ -28,9 +28,10 @@ const pageSchema = z.object({
 });
 const componentSchema = z.object({
   name: z.string().min(1, '组件名不能为空').max(100),
-  category: z.string().max(50).optional(),
-  configJson: z.object({}).passthrough(),
-  thumbnail: z.string().optional(),
+  componentCode: z.string().min(1, '组件编码不能为空').max(100),
+  category: z.string().min(1, '分类不能为空').max(50),
+  icon: z.string().optional(),
+  defaultConfig: z.object({}).passthrough().optional(),
 });
 const idsSchema = z.object({ ids: z.array(z.number().or(z.string())).min(1, '至少选择一项') });
 

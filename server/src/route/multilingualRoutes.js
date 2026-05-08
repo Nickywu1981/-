@@ -8,13 +8,14 @@ import { z } from 'zod';
 const router = Router();
 
 const buildPromptSchema = z.object({
-  language: z.string().min(2).max(10),
-  scriptType: z.enum(['product-desc', 'ad-copy', 'live-script', 'social-post', 'email']),
-  productInfo: z.object({
+  product: z.object({
     name: z.string().min(1).max(200),
     features: z.string().max(2000).optional(),
     targetAudience: z.string().max(500).optional(),
-  }),
+  }).passthrough(),
+  language: z.string().min(2).max(10),
+  scriptType: z.enum(['product-desc', 'ad-copy', 'live-script', 'social-post', 'email']),
+  platform: z.string().optional(),
   tone: z.enum(['professional', 'casual', 'urgent', 'luxury', 'friendly']).optional(),
 });
 

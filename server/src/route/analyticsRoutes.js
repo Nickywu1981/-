@@ -9,8 +9,7 @@ const router = Router();
 
 const trackSchema = z.object({
   event: z.string().min(1).max(100),
-  page: z.string().max(200).optional(),
-  data: z.record(z.unknown()).optional(),
+  metadata: z.record(z.unknown()).optional(),
 });
 
 // 埋点上报（需登录）

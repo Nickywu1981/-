@@ -13,34 +13,48 @@ import { z } from 'zod';
 const router = Router();
 
 const scriptGenSchema = z.object({
-  productName: z.string().min(1, '产品名称不能为空').max(200),
-  platform: z.string().min(1, '平台不能为空'),
-  language: z.string().optional(),
-  tone: z.string().optional(),
+  productInfo: z.string().min(1, '请输入产品卖点信息').max(5000),
+  scriptType: z.string().optional(),
+  lang: z.string().optional(),
+  length: z.coerce.number().int().positive().optional(),
 });
 const shotPlanSchema = z.object({
-  productSellingPoints: z.string().min(1, '卖点不能为空'),
-  platform: z.string().optional(),
+  productInfo: z.string().min(1, '请输入产品信息').max(5000),
+  videoStyle: z.string().optional(),
+  totalDuration: z.coerce.number().int().positive().optional(),
 });
 const viralCloneSchema = z.object({
-  videoUrl: z.string().url('请提供有效的视频URL'),
+  referenceVideoUrl: z.string().url('请提供爆款视频URL'),
+  productImageUrl: z.string().url('请提供产品图URL'),
+  matchStrength: z.coerce.number().min(0).max(1).optional(),
 });
 const viralAnalyzeSchema = z.object({
-  videoUrl: z.string().url('请提供有效的视频URL'),
+  url: z.string().url('请提供有效的视频URL'),
 });
 const viralReplicateSchema = z.object({
-  videoUrl: z.string().url('请提供有效的视频URL'),
-  productImages: z.array(z.string().url()).min(1, '至少需要一张产品图'),
+  analysisResult: z.string().optional(),
+  productImageUrl: z.string().url('请提供产品图URL'),
+  productName: z.string().max(200).optional(),
 });
-const videoBeautifySchema = z.object({ videoUrl: z.string().url('请提供有效的视频URL') });
+const actionBatchSchema = z.object({
+  actionVideoUrl: z.string().url('请提供动作视频URL'),
+  productImageUrls: z.array(z.string().url()).min(1, '至少需要一张产品图'),
+  targetAction: z.string().optional(),
+});
+const videoBeautifySchema = z.object({
+  videoUrl: z.string().url('请提供有效的视频URL'),
+  options: z.object({}).passthrough().optional(),
+});
 const voiceGenSchema = z.object({
-  script: z.string().min(1, '脚本不能为空').max(5000),
-  voice: z.string().optional(),
-  language: z.string().optional(),
+  text: z.string().min(1, '文案不能为空').max(5000),
+  voiceType: z.string().optional(),
+  speed: z.coerce.number().min(0.5).max(2).optional(),
+  lang: z.string().optional(),
 });
 const voiceCloneSchema = z.object({
-  audioUrl: z.string().url('请提供音频样本URL'),
-  script: z.string().min(1, '要合成的文本不能为空'),
+  audioSampleUrl: z.string().url('请提供音频样本URL'),
+  text: z.string().optional(),
+  presetVoice: z.string().optional(),
 });
 
 router.post('/script-gen', authMiddleware, heavyLimiter, validate(scriptGenSchema), asyncHandler(submitScriptGen));
@@ -48,8 +62,7 @@ router.post('/shot-plan', authMiddleware, heavyLimiter, validate(shotPlanSchema)
 router.post('/viral-clone', authMiddleware, heavyLimiter, validate(viralCloneSchema), asyncHandler(submitViralClone));
 router.post('/viral-analyze', authMiddleware, heavyLimiter, validate(viralAnalyzeSchema), asyncHandler(submitViralAnalyze));
 router.post('/viral-replicate', authMiddleware, heavyLimiter, validate(viralReplicateSchema), asyncHandler(submitViralReplicate));
-router.get('/viral-replicate/:taskId', authMiddleware, asyncHandler(getTaskResult));
-router.post('/action-batch', authMiddleware, heavyLimiter, asyncHandler(submitActionBatch));
+router.post('/action-batch', authMiddleware, heavyLimiter, validate(actionBatchSchema), asyncHandler(submitActionBatch));
 router.post('/beautify', authMiddleware, heavyLimiter, validate(videoBeautifySchema), asyncHandler(submitVideoBeautify));
 router.post('/voice-gen', authMiddleware, heavyLimiter, validate(voiceGenSchema), asyncHandler(submitVoiceGen));
 router.post('/voice-clone', authMiddleware, heavyLimiter, validate(voiceCloneSchema), asyncHandler(submitVoiceClone));

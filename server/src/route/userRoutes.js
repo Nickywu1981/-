@@ -4,15 +4,15 @@ import { authMiddleware, refreshTokenMiddleware } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { authLimiter } from '../middleware/rateLimiter.js';
 import { setCsrfCookie } from '../middleware/csrf.js';
-import { validate, emailSchema, passwordSchema, phoneSchema } from '../utils/validate.js';
+import { validate, passwordSchema, phoneSchema } from '../utils/validate.js';
 import { z } from 'zod';
 
 const router = Router();
 
 const registerSchema = z.object({
   username: z.string().min(2, '用户名至少2个字符').max(30),
-  email: emailSchema,
   password: passwordSchema,
+  nickname: z.string().max(50).optional(),
 });
 
 const loginSchema = z.object({
@@ -28,7 +28,7 @@ const changePasswordSchema = z.object({
 });
 
 const forgotPasswordSchema = z.object({
-  email: emailSchema,
+  username: z.string().min(1, '请输入用户名'),
 });
 
 const resetPasswordSchema = z.object({
@@ -37,8 +37,9 @@ const resetPasswordSchema = z.object({
 });
 
 const updateProfileSchema = z.object({
-  username: z.string().min(2).max(30).optional(),
+  nickname: z.string().min(2).max(30).optional(),
   phone: phoneSchema.optional().or(z.literal('')),
+  email: z.string().email().max(200).optional(),
   avatar: z.string().optional(),
 });
 

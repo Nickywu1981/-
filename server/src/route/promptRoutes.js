@@ -16,7 +16,7 @@ const createTemplateSchema = z.object({
 });
 
 const fillSchema = z.object({
-  variables: z.record(z.string()).optional(),
+  values: z.record(z.string()).optional(),
 });
 
 const groupSchema = z.object({

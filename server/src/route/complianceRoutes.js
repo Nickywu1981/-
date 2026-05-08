@@ -8,9 +8,9 @@ import { z } from 'zod';
 const router = Router();
 
 const checkSchema = z.object({
-  content: z.string().min(1).max(10000),
-  platform: z.enum(['taobao', 'jd', 'pdd', 'douyin', 'kuaishou', 'xiaohongshu', 'shopee', 'lazada', 'amazon', 'ebay', 'general']),
-  language: z.string().max(10).optional(),
+  platform: z.string().min(1, '平台不能为空'),
+  region: z.string().optional(),
+  category: z.string().optional(),
 });
 
 router.use(authMiddleware);
