@@ -7,6 +7,7 @@ import {
 import { authMiddleware } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
+import { tierGuard } from '../middleware/tierGuard.js';
 import { validate, paginationSchema } from '../utils/validate.js';
 import { z } from 'zod';
 
@@ -43,14 +44,14 @@ const digitalHumanSchema = z.object({
 });
 
 // 视频生成
-router.post('/img2video', authMiddleware, heavyLimiter, validate(img2VideoSchema), asyncHandler(submitImg2Video));
-router.post('/multi2video', authMiddleware, heavyLimiter, validate(multi2VideoSchema), asyncHandler(submitMulti2Video));
-router.post('/packaging', authMiddleware, heavyLimiter, validate(packagingSchema), asyncHandler(submitVideoPackaging));
+router.post('/img2video', authMiddleware, heavyLimiter, tierGuard('video'), validate(img2VideoSchema), asyncHandler(submitImg2Video));
+router.post('/multi2video', authMiddleware, heavyLimiter, tierGuard('video'), validate(multi2VideoSchema), asyncHandler(submitMulti2Video));
+router.post('/packaging', authMiddleware, heavyLimiter, tierGuard('video'), validate(packagingSchema), asyncHandler(submitVideoPackaging));
 
 // 视频进阶
-router.post('/action-transfer', authMiddleware, heavyLimiter, validate(transferSchema), asyncHandler(submitActionTransfer));
-router.post('/person-replace', authMiddleware, heavyLimiter, validate(replaceSchema), asyncHandler(submitPersonReplace));
-router.post('/digital-human', authMiddleware, heavyLimiter, validate(digitalHumanSchema), asyncHandler(submitDigitalHuman));
+router.post('/action-transfer', authMiddleware, heavyLimiter, tierGuard('video'), validate(transferSchema), asyncHandler(submitActionTransfer));
+router.post('/person-replace', authMiddleware, heavyLimiter, tierGuard('video'), validate(replaceSchema), asyncHandler(submitPersonReplace));
+router.post('/digital-human', authMiddleware, heavyLimiter, tierGuard('video'), validate(digitalHumanSchema), asyncHandler(submitDigitalHuman));
 
 // 任务查询
 router.get('/tasks', authMiddleware, validate(paginationSchema, 'query'), asyncHandler(listMyVideoTasks));

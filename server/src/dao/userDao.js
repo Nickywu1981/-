@@ -41,7 +41,9 @@ export async function listUsers(pager, keyword = '') {
     sql += ' AND (username LIKE ? OR nickname LIKE ?)';
     params.push(`%${keyword}%`, `%${keyword}%`);
   }
-  sql += ` ${paginationSQL(pager)}`;
+  const { sql: pageSQL, params: pageParams } = paginationSQL(pager);
+  sql += ` ${pageSQL}`;
+  params.push(...pageParams);
   const [rows] = await pool.execute(sql, params);
   return rows;
 }

@@ -7,6 +7,7 @@ import {
 import { authMiddleware } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
+import { tierGuard } from '../middleware/tierGuard.js';
 import { validate, idSchema, paginationSchema } from '../utils/validate.js';
 
 const router = Router();
@@ -29,8 +30,8 @@ const templateSchema = z.object({
 });
 
 // 批量任务
-router.post('/submit', authMiddleware, heavyLimiter, validate(submitSchema), asyncHandler(submitBatchTask));
-router.post('/redo', authMiddleware, heavyLimiter, validate(redoSchema), asyncHandler(redoBatchTask));
+router.post('/submit', authMiddleware, heavyLimiter, tierGuard('image'), validate(submitSchema), asyncHandler(submitBatchTask));
+router.post('/redo', authMiddleware, heavyLimiter, tierGuard('image'), validate(redoSchema), asyncHandler(redoBatchTask));
 router.get('/history', authMiddleware, validate(paginationSchema, 'query'), asyncHandler(listBatchHistory));
 router.get('/tasks/:taskId', authMiddleware, asyncHandler(getTaskResult));
 router.get('/:taskId/download', authMiddleware, asyncHandler(getBatchZipUrl));

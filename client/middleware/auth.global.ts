@@ -18,7 +18,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
   try {
     if (process.server) {
       // SSR: 直连 Express 后端，绕过 Nuxt Nitro 避免死循环
-      const data: any = await $fetch('http://localhost:3001/api/user/profile', {
+      const apiBase = useRuntimeConfig().public.apiBase
+      const data: any = await $fetch(`${apiBase}/user/profile`, {
         headers: useRequestHeaders(['cookie']) as Record<string, string>,
       })
       isAuthenticated = data?.code === 200
