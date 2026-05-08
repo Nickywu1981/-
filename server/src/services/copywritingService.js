@@ -51,13 +51,14 @@ function buildDescriptionPrompt({ productName, features, specs, platform = 'taob
 
 export async function generateTitles(userId, params) {
   const prompt = buildTitlePrompt(params);
-  const modelId = params.model || 'claude-sonnet-4-6';
+  const modelId = params.model || 'deepseek-v4-flash';
   const startTime = Date.now();
   try {
-    const result = await infer(modelId, prompt, { temperature: 0.7, maxTokens: 1024 });
-    const tokenUsed = result.usage?.totalTokens || 0;
-    await copywritingDao.insertHistory({ userId, type: 'title', inputs: params, outputs: result.text, modelId, tokenUsed });
-    return { titles: parseTitleList(result.text), tokenUsed, model: modelId, latency: Date.now() - startTime };
+    const wrapped = await infer(modelId, { prompt, temperature: 0.7, maxTokens: 1024 });
+    const out = wrapped.output;
+    const tokenUsed = out.usage?.totalTokens || 0;
+    await copywritingDao.insertHistory({ userId, type: 'title', inputs: params, outputs: out.text, modelId, tokenUsed });
+    return { titles: parseTitleList(out.text), tokenUsed, model: wrapped.modelId, latency: Date.now() - startTime };
   } catch (err) {
     await copywritingDao.insertHistory({ userId, type: 'title', inputs: params, outputs: null, modelId, tokenUsed: 0, status: 'failed', errorMsg: err.message });
     throw err;
@@ -66,13 +67,14 @@ export async function generateTitles(userId, params) {
 
 export async function generateDescription(userId, params) {
   const prompt = buildDescriptionPrompt(params);
-  const modelId = params.model || 'claude-sonnet-4-6';
+  const modelId = params.model || 'deepseek-v4-flash';
   const startTime = Date.now();
   try {
-    const result = await infer(modelId, prompt, { temperature: 0.7, maxTokens: 2048 });
-    const tokenUsed = result.usage?.totalTokens || 0;
-    await copywritingDao.insertHistory({ userId, type: 'description', inputs: params, outputs: result.text, modelId, tokenUsed });
-    return { description: result.text, tokenUsed, model: modelId, latency: Date.now() - startTime };
+    const wrapped = await infer(modelId, { prompt, temperature: 0.7, maxTokens: 2048 });
+    const out = wrapped.output;
+    const tokenUsed = out.usage?.totalTokens || 0;
+    await copywritingDao.insertHistory({ userId, type: 'description', inputs: params, outputs: out.text, modelId, tokenUsed });
+    return { description: out.text, tokenUsed, model: wrapped.modelId, latency: Date.now() - startTime };
   } catch (err) {
     await copywritingDao.insertHistory({ userId, type: 'description', inputs: params, outputs: null, modelId, tokenUsed: 0, status: 'failed', errorMsg: err.message });
     throw err;
