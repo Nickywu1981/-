@@ -2,9 +2,75 @@ import { BusinessError } from './businessError.js';
 
 /**
  * Movio AI v4.1 — File Upload Service
- * G5 后端开发 | T-G5-004
- * 分片上传: 初始化 → 分片接收(5MB/片) → 合并 → CDN
  */
+
+// ============= 魔数检测（防伪造文件扩展名） =============
+
+const MAGIC_SIGNATURES = {
+  // 图片
+  jpg:  [0xFF, 0xD8, 0xFF],
+  jpeg: [0xFF, 0xD8, 0xFF],
+  png:  [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A],
+  webp: [[0x52, 0x49, 0x46, 0x46, null, null, null, null, 0x57, 0x45, 0x42, 0x50],
+         'RIFF....WEBP'],
+  gif:  [0x47, 0x49, 0x46, 0x38],
+  bmp:  [0x42, 0x4D],
+  // 视频
+  mp4:  [[0x00, 0x00, 0x00, null, 0x66, 0x74, 0x79, 0x70],           // '....ftyp'
+         [0x00, 0x00, 0x00, 0x1C, 0x66, 0x74, 0x79, 0x70]],         // ISOM
+  mov:  [[0x00, 0x00, 0x00, 0x14, 0x66, 0x74, 0x79, 0x70, 0x71, 0x74], // '....ftypqt'
+         [0x00, 0x00, 0x00, null, 0x6D, 0x6F, 0x6F, 0x76]],         // '....moov'
+  avi:  [0x52, 0x49, 0x46, 0x46],                                     // 'RIFF'
+  webm: [0x1A, 0x45, 0xDF, 0xA3],
+  // 文档
+  pdf:  [0x25, 0x50, 0x44, 0x46],                                     // '%PDF'
+};
+
+/**
+ * 校验文件魔数是否匹配声明的扩展名
+ * @param {Buffer} buffer - 文件前若干字节
+ * @param {string} ext - 不带点的扩展名
+ * @returns {boolean}
+ */
+function matchMagic(buffer, ext) {
+  const sig = MAGIC_SIGNATURES[ext.toLowerCase()];
+  if (!sig) return true; // 未定义签名，放行
+
+  // 单一签名
+  if (Array.isArray(sig) && sig.length > 0 && typeof sig[0] === 'number') {
+    return sig.every((b, i) => buffer[i] === b);
+  }
+  // 多签名数组
+  if (Array.isArray(sig) && Array.isArray(sig[0])) {
+    return sig.some(s => {
+      if (typeof s[0] !== 'number') return false;
+      return s.every((b, i) => b === null || buffer[i] === b);
+    });
+  }
+  return true;
+}
+
+export function validateFileMagic(filePath, ext) {
+  const fd = fs.openSync(filePath, 'r');
+  const buf = Buffer.alloc(16);
+  fs.readSync(fd, buf, 0, 16, 0);
+  fs.closeSync(fd);
+
+  if (!matchMagic(buf, ext)) {
+    fs.unlinkSync(filePath); // 删除可疑文件
+    throw new BusinessError(400, `文件内容与声明的类型 (${ext}) 不匹配`);
+  }
+}
+
+// 内存版本（用于 multer buffer）
+export function validateBufferMagic(buffer, ext) {
+  if (!matchMagic(buffer, ext)) {
+    throw new BusinessError(400, `文件内容与声明的类型 (${ext}) 不匹配`);
+  }
+}
+
+// ============= 分片上传 =============
+
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
@@ -115,6 +181,10 @@ export function completeUpload(uploadId) {
   fs.rmSync(chunkDir, { recursive: true, force: true });
   fs.unlinkSync(metaPath);
 
+  // 魔数检测 — 合并后验证
+  const extClean = ext.replace('.', '').toLowerCase();
+  validateFileMagic(finalPath, extClean);
+
   const fileUrl = `/uploads/${finalName}`;
   return {
     file_url: fileUrl,
@@ -132,8 +202,12 @@ export function completeUpload(uploadId) {
 export function saveSimpleFile(file) {
   const timestamp = Date.now();
   const ext = path.extname(file.originalname);
+  const extClean = ext.replace('.', '').toLowerCase();
   const finalName = `${timestamp}_${crypto.randomBytes(8).toString('hex')}${ext}`;
   const finalPath = path.join(UPLOAD_DIR, finalName);
+
+  // 魔数检测 — 写入前验证
+  validateBufferMagic(file.buffer, extClean);
 
   fs.writeFileSync(finalPath, file.buffer);
 

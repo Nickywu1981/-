@@ -43,10 +43,9 @@ export async function listUserTasks(userId, { status, type, page = 1, pageSize =
     params.push(type);
   }
 
-  // mysql2 prepared statements don't support LIMIT placeholders — interpolate
-  const offset = Number((page - 1) * pageSize);
-  const limit = Number(pageSize);
-  sql += ` ORDER BY create_time DESC LIMIT ${offset}, ${limit}`;
+  const offset = (page - 1) * pageSize;
+  sql += ' ORDER BY create_time DESC LIMIT ? OFFSET ?';
+  params.push(Number(offset), Number(pageSize));
 
   const [rows] = await pool().execute(sql, params);
   return rows;
@@ -89,7 +88,8 @@ export async function updateTaskStatus(taskId, userId, { status, progress, progr
 
 export async function getPendingTasks(limit = 5) {
   const [rows] = await pool().execute(
-    `SELECT * FROM task WHERE status = 0 ORDER BY priority DESC, create_time ASC LIMIT ${Number(limit)}`,
+    'SELECT * FROM task WHERE status = 0 ORDER BY priority DESC, create_time ASC LIMIT ?',
+    [Number(limit)],
   );
   return rows.map((r) => ({ ...r, input_params: safeJson(r.input_params) }));
 }
