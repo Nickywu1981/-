@@ -191,6 +191,37 @@ export default {
     const placeholders = ids.map(() => '?').join(',');
     await pool.query(`UPDATE diy_page SET status = ? WHERE id IN (${placeholders}) AND tenant_id = ?`, [status, ...ids, tenantId]);
   },
+
+  // ==================== 模板库 ====================
+
+  async listTemplates({ industry, pageType, keyword, page = 1, pageSize = 20 }) {
+    let sql = 'SELECT id, title, industry, page_type, thumbnail, description, tags, use_count, is_official, create_time FROM diy_template WHERE status = 1';
+    const params = [];
+    if (industry) { sql += ' AND industry = ?'; params.push(industry); }
+    if (pageType) { sql += ' AND page_type = ?'; params.push(pageType); }
+    if (keyword) { sql += ' AND (title LIKE ? OR description LIKE ? OR tags LIKE ?)'; params.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`); }
+    const [{ total }] = await pool.query(`SELECT COUNT(*) as total FROM (${sql}) t`, params);
+    sql += ' ORDER BY use_count DESC, id ASC LIMIT ?, ?';
+    params.push((page - 1) * pageSize, pageSize);
+    const [rows] = await pool.query(sql, params);
+    return { list: rows, total, page, pageSize };
+  },
+
+  async getTemplateById(id) {
+    const [rows] = await pool.query('SELECT * FROM diy_template WHERE id = ? AND status = 1', [id]);
+    if (!rows[0]) return null;
+    const t = rows[0];
+    return { ...t, mobile_config: parseJson(t.mobile_config), pc_config: parseJson(t.pc_config) };
+  },
+
+  async incrementTemplateUse(id) {
+    await pool.query('UPDATE diy_template SET use_count = use_count + 1 WHERE id = ?', [id]);
+  },
+
+  async listTemplateIndustries() {
+    const [rows] = await pool.query('SELECT DISTINCT industry FROM diy_template WHERE status = 1 ORDER BY industry');
+    return rows.map(r => r.industry);
+  },
 };
 
 function parseJson(val) {
