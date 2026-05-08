@@ -33,3 +33,4 @@
 | [018](./2026-05-09_018_compliance_module.md) | 00:52 | 合规检查模块 — content moderation + platform rules | 🛡️ 合规级 |
 | [019](./2026-05-09_019_embedding_support.md) | 02:25 | OpenAI 适配器新增 Embedding + 语义搜索升级 | 🧠 技术级 |
 | [020](./2026-05-09_020_deployment_ready.md) | 01:41 | 生产就绪 — 一键部署脚本 + PM2 集群 + Schema 对齐 | 🚀 里程碑级 |
+| [021](./2026-05-09_021_dual_path_architecture.md) | 02:40 | 双路径架构确认 — Token Index(100%) + Semantic Search(50-90%) | 🧠 架构级 |
