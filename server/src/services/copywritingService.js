@@ -1,6 +1,5 @@
-import { fillPrompt } from './prompts/index.js';
 import { copywriting, SUPPORTED_LANGUAGES } from './prompts/copywriting.js';
-import { infer, getModel } from './aiEngine.js';
+import { infer } from './aiEngine.js';
 import * as copywritingDao from '../dao/copywritingDao.js';
 
 // 平台规则配置

@@ -1,5 +1,6 @@
 import { Router } from 'express';
-import { authMiddleware, optionalAuth, adminAuth } from '../middleware/auth.js';
+import { authMiddleware, optionalAuth } from '../middleware/auth.js';
+import { adminOnly, editorOrAbove } from '../middleware/rbac.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
 import { z } from 'zod';
@@ -40,33 +41,33 @@ router.get('/published/:slug', optionalAuth, asyncHandler(getPublishedPage));
 router.get('/', authMiddleware, asyncHandler(listPages));
 router.get('/components', authMiddleware, asyncHandler(listComponents));
 router.get('/:id', authMiddleware, asyncHandler(getPage));
-router.post('/', authMiddleware, adminAuth, validate(pageSchema), asyncHandler(createPage));
-router.put('/:id', authMiddleware, adminAuth, validate(pageSchema.partial()), asyncHandler(updatePage));
+router.post('/', authMiddleware, editorOrAbove, validate(pageSchema), asyncHandler(createPage));
+router.put('/:id', authMiddleware, editorOrAbove, validate(pageSchema.partial()), asyncHandler(updatePage));
 
-// ==================== 状态机路由 ====================
-router.post('/:id/publish', authMiddleware, adminAuth, asyncHandler(publishPage));
-router.post('/:id/unpublish', authMiddleware, adminAuth, asyncHandler(unpublishPage));
-router.post('/:id/republish', authMiddleware, adminAuth, asyncHandler(republishPage));
-router.post('/:id/soft-delete', authMiddleware, adminAuth, asyncHandler(softDeletePage));
-router.post('/:id/restore', authMiddleware, adminAuth, asyncHandler(restorePage));
-router.delete('/:id/hard-delete', authMiddleware, adminAuth, asyncHandler(hardDeletePage));
-router.post('/:id/clone', authMiddleware, adminAuth, asyncHandler(clonePage));
+// ==================== 状态机路由（发布=adminOnly, 编辑=editorOrAbove） ====================
+router.post('/:id/publish', authMiddleware, adminOnly, asyncHandler(publishPage));
+router.post('/:id/unpublish', authMiddleware, adminOnly, asyncHandler(unpublishPage));
+router.post('/:id/republish', authMiddleware, adminOnly, asyncHandler(republishPage));
+router.post('/:id/soft-delete', authMiddleware, adminOnly, asyncHandler(softDeletePage));
+router.post('/:id/restore', authMiddleware, editorOrAbove, asyncHandler(restorePage));
+router.delete('/:id/hard-delete', authMiddleware, adminOnly, asyncHandler(hardDeletePage));
+router.post('/:id/clone', authMiddleware, editorOrAbove, asyncHandler(clonePage));
 
 // ==================== 版本管理 ====================
 router.get('/:id/versions', authMiddleware, asyncHandler(listVersions));
 router.get('/:id/versions/latest-auto', authMiddleware, asyncHandler(getLatestAutoVersion));
 router.get('/:id/versions/:version', authMiddleware, asyncHandler(getVersion));
-router.post('/:id/versions', authMiddleware, adminAuth, asyncHandler(saveVersion));
-router.post('/:id/versions/auto-save', authMiddleware, adminAuth, asyncHandler(autoSaveVersion));
-router.post('/:id/versions/:version/rollback', authMiddleware, adminAuth, asyncHandler(rollbackVersion));
+router.post('/:id/versions', authMiddleware, editorOrAbove, asyncHandler(saveVersion));
+router.post('/:id/versions/auto-save', authMiddleware, editorOrAbove, asyncHandler(autoSaveVersion));
+router.post('/:id/versions/:version/rollback', authMiddleware, editorOrAbove, asyncHandler(rollbackVersion));
 
 // ==================== 批量操作 ====================
-router.post('/batch/publish', authMiddleware, adminAuth, validate(idsSchema), asyncHandler(batchPublish));
-router.post('/batch/unpublish', authMiddleware, adminAuth, validate(idsSchema), asyncHandler(batchUnpublish));
-router.post('/batch/delete', authMiddleware, adminAuth, validate(idsSchema), asyncHandler(batchDelete));
+router.post('/batch/publish', authMiddleware, adminOnly, validate(idsSchema), asyncHandler(batchPublish));
+router.post('/batch/unpublish', authMiddleware, adminOnly, validate(idsSchema), asyncHandler(batchUnpublish));
+router.post('/batch/delete', authMiddleware, adminOnly, validate(idsSchema), asyncHandler(batchDelete));
 
 // ==================== 组件库 ====================
-router.post('/components', authMiddleware, adminAuth, validate(componentSchema), asyncHandler(createComponent));
+router.post('/components', authMiddleware, editorOrAbove, validate(componentSchema), asyncHandler(createComponent));
 
 // ==================== 模板库 ====================
 router.get('/templates/industries', authMiddleware, asyncHandler(listTemplateIndustries));
