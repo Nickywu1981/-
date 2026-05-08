@@ -7,6 +7,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
+import { validateV4 as _validate } from '../utils/validate.js';
 import * as complianceService from '../services/complianceService.js';
 
 const router = Router();
@@ -28,14 +29,9 @@ const checkSchema = z.object({
   category: z.string().optional(),
 });
 
-router.post('/check', (req, res) => {
-  const r = checkSchema.safeParse(req.body);
-  if (!r.success) {
-    return error(res, ERROR_CODE.VALIDATION_ERROR,
-      r.error.errors.map(e => e.message).join('; '));
-  }
+router.post('/check', _validate(checkSchema), (req, res) => {
   try {
-    const result = complianceService.checkCompliance(r.data);
+    const result = complianceService.checkCompliance(req.validated);
     return success(res, result);
   } catch (e) {
     return error(res, ERROR_CODE.INTERNAL_ERROR, e.message);
