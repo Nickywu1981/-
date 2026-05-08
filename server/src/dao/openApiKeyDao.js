@@ -3,9 +3,14 @@
  * G5 后端 | G6 数据库 | 阶段4
  */
 import pool from './db.js';
-import { removeUndefined } from '../utils/objectHelpers.js';
 
 const TABLE = 'open_api_key';
+
+function clean(obj) {
+  const out = {};
+  for (const [k, v] of Object.entries(obj)) { if (v !== undefined) out[k] = v; }
+  return out;
+}
 
 export async function listByTenant(tenantId, opts = {}) {
   const { page = 1, pageSize = 20 } = opts;
@@ -39,14 +44,14 @@ export async function getByApiKey(apiKey) {
 }
 
 export async function create(data) {
-  const [result] = await pool.query(`INSERT INTO ${TABLE} SET ?`, removeUndefined(data));
+  const [result] = await pool.query(`INSERT INTO ${TABLE} SET ?`, clean(data));
   return result.insertId;
 }
 
 export async function update(id, tenantId, data) {
   const [result] = await pool.query(
     `UPDATE ${TABLE} SET ? WHERE id = ? AND tenant_id = ? AND is_deleted = 0`,
-    [removeUndefined(data), id, tenantId],
+    [clean(data), id, tenantId],
   );
   return result.affectedRows > 0;
 }

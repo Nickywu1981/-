@@ -90,6 +90,8 @@ fetch('/api/open/v1/image/remove-bg', {
 </template>
 
 <script setup lang="ts">
+import { api } from '@/composables/useApi'
+
 const keys = ref<any[]>([])
 const loading = ref(false)
 const showCreate = ref(false)
@@ -99,26 +101,10 @@ const msg = ref('')
 const msgErr = ref(false)
 const form = reactive({ description: '', rateLimit: 100, dailyLimit: 10000 })
 
-function useApi() {
-  const config = useRuntimeConfig()
-  const baseURL = config.public?.apiBase || ''
-  return async function (path: string, opts: any = {}) {
-    const { data, error } = await useFetch(baseURL + path, {
-      credentials: 'include',
-      ...opts,
-      headers: { 'Content-Type': 'application/json', ...opts.headers },
-    })
-    if (error.value) throw error.value
-    return (data.value as any)?.data
-  }
-}
-
-const api = useApi()
-
 async function loadKeys() {
   loading.value = true
   try {
-    keys.value = (await api('/api/open/keys'))?.items || []
+    keys.value = (await api.get('/open/keys'))?.items || []
   } catch { /* empty */ }
   loading.value = false
 }
@@ -126,16 +112,13 @@ async function loadKeys() {
 async function createKey() {
   creating.value = true
   try {
-    const result = await api('/api/open/keys', {
-      method: 'POST',
-      body: { description: form.description, rateLimit: form.rateLimit, dailyLimit: form.dailyLimit },
-    })
+    const result = await api.post('/open/keys', { description: form.description, rateLimit: form.rateLimit, dailyLimit: form.dailyLimit })
     newKey.value = result
     showCreate.value = false
     form.description = ''
     await loadKeys()
   } catch (e: any) {
-    msg.value = e.data?.msg || '创建失败'
+    msg.value = e.data?.msg || e.message || '创建失败'
     msgErr.value = true
   }
   creating.value = false
@@ -143,10 +126,10 @@ async function createKey() {
 
 async function toggleKey(k: any) {
   try {
-    await api(`/api/open/keys/${k.id}/toggle`, { method: 'PUT', body: { status: k.status === 1 ? 0 : 1 } })
+    await api.put(`/open/keys/${k.id}/toggle`, { status: k.status === 1 ? 0 : 1 })
     await loadKeys()
   } catch (e: any) {
-    msg.value = e.data?.msg || '操作失败'
+    msg.value = e.data?.msg || e.message || '操作失败'
     msgErr.value = true
   }
 }
@@ -154,10 +137,10 @@ async function toggleKey(k: any) {
 async function deleteKey(k: any) {
   if (!confirm('确定删除该密钥？')) return
   try {
-    await api(`/api/open/keys/${k.id}`, { method: 'DELETE' })
+    await api.delete(`/open/keys/${k.id}`)
     await loadKeys()
   } catch (e: any) {
-    msg.value = e.data?.msg || '删除失败'
+    msg.value = e.data?.msg || e.message || '删除失败'
     msgErr.value = true
   }
 }

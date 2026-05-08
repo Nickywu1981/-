@@ -189,193 +189,111 @@ function cosineSimilarity(a, b) {
 // ============================================================
 
 const KNOWLEDGE_GRAPH = {
-  // 数据库/SQL
+  // 数据库/SQL — 精确词
   '数据库': ['DB_Movio_AI_数据库与接口设计'],
   '表结构': ['DB_Movio_AI_数据库与接口设计'],
   'schema': ['DB_Movio_AI_数据库与接口设计'],
   'mysql': ['DB_Movio_AI_数据库与接口设计'],
-  'sql': ['DB_Movio_AI_数据库与接口设计'],
   '建表': ['DB_Movio_AI_数据库与接口设计'],
-  '索引': ['DB_Movio_AI_数据库与接口设计'],
 
-  // AI/模型
-  'AI模型': ['ARCH_Movio_AI_多模型架构方案'],
+  // AI/模型 — 精确词
   '模型调度': ['ARCH_Movio_AI_多模型架构方案'],
   '多模型': ['ARCH_Movio_AI_多模型架构方案'],
-  'model': ['ARCH_Movio_AI_多模型架构方案'],
-  'adapter': ['ARCH_Movio_AI_多模型架构方案'],
   '适配器': ['ARCH_Movio_AI_多模型架构方案'],
-  'infer': ['ARCH_Movio_AI_多模型架构方案'],
   'dispatch': ['ARCH_Movio_AI_多模型架构方案'],
 
-  // 架构
-  '架构': ['ARCH_Movio_AI_多模型架构方案', 'project_tech_stack'],
+  // 架构（不使用泛词"架构"避免噪音）
   'architecture': ['ARCH_Movio_AI_多模型架构方案'],
-  '三层': ['ARCH_Movio_AI_多模型架构方案', 'feedback_dev_rules'],
+  '三层架构': ['ARCH_Movio_AI_多模型架构方案', 'feedback_dev_rules'],
   '中间件': ['ARCH_Movio_AI_多模型架构方案'],
   'middleware': ['ARCH_Movio_AI_多模型架构方案'],
-  'nuxt': ['project_tech_stack'],
-  'express': ['project_tech_stack'],
-  '单体': ['project_tech_stack'],
-  'service': ['feedback_dev_rules'],
-
-  // 认证
-  '登录': ['feedback_data_api_specs', 'feedback_dev_rules'],
-  '注册': ['feedback_data_api_specs'],
-  '认证': ['feedback_data_api_specs', 'feedback_dev_rules'],
-  'auth': ['feedback_data_api_specs', 'feedback_dev_rules'],
-  'jwt': ['feedback_data_api_specs'],
-  'token': ['feedback_data_api_specs'],
-  '用户': ['feedback_data_api_specs', 'feedback_dev_rules'],
-
-  // 管理后台
-  'admin': ['feedback_dev_rules', 'project_pending_tasks'],
-  '管理后台': ['feedback_dev_rules', 'project_pending_tasks'],
-  'dashboard': ['project_pending_tasks'],
 
   // 编码规范
   '命名规范': ['coding_conventions'],
   '编码规范': ['coding_conventions'],
-  '代码规范': ['coding_conventions'],
   'convention': ['coding_conventions'],
-  'coding': ['coding_conventions'],
   'eslint': ['coding_conventions'],
-  '格式': ['coding_conventions'],
 
   // Git
   'git': ['feedback_git_commit_rule', 'feedback_proactive_commit'],
   '提交': ['feedback_git_commit_rule', 'feedback_proactive_commit'],
   'commit': ['feedback_git_commit_rule', 'feedback_proactive_commit'],
-  '版本': ['feedback_git_commit_rule'],
 
   // 权限/安全
-  '权限': ['feedback_dev_rules'],
-  '角色': ['feedback_dev_rules'],
   'rbac': ['feedback_dev_rules'],
   '访问控制': ['feedback_dev_rules'],
-  '安全': ['feedback_data_api_specs', 'feedback_quality_gates'],
   'security': ['feedback_data_api_specs'],
   'xss': ['feedback_data_api_specs'],
   'csrf': ['feedback_data_api_specs'],
-  '注入': ['feedback_data_api_specs'],
-  '防护': ['feedback_data_api_specs'],
+  '防注入': ['feedback_data_api_specs'],
   '限流': ['feedback_data_api_specs'],
-  'rate': ['feedback_data_api_specs'],
-  '恶意': ['feedback_data_api_specs'],
-  '刷接口': ['feedback_data_api_specs'],
 
   // 前端/UI
-  '前端': ['ui_capability_matrix', 'coding_conventions'],
   '组件': ['ui_capability_matrix', 'coding_conventions'],
   'component': ['ui_capability_matrix', 'coding_conventions'],
-  'ui': ['ui_capability_matrix'],
   '响应式': ['ui_capability_matrix'],
-  '布局': ['ui_capability_matrix'],
 
-  // 上传/文件
-  '上传': ['feedback_data_api_specs', 'ui_capability_matrix'],
-  'upload': ['feedback_data_api_specs', 'ui_capability_matrix'],
-  '图片': ['ui_capability_matrix', 'project_tech_stack'],
-  'image': ['ui_capability_matrix', 'project_tech_stack'],
-  '视频': ['project_tech_stack', 'ARCH_Movio_AI_多模型架构方案'],
-  'video': ['ARCH_Movio_AI_多模型架构方案'],
-
-  // 平台适配
-  'spec': ['feedback_data_api_specs', 'feedback_six_categories'],
-  '平台': ['feedback_data_api_specs', 'project_tech_stack'],
-  '尺寸': ['ui_capability_matrix'],
-  '适配': ['ui_capability_matrix', 'feedback_six_categories'],
-
-  // 文案生成
-  '文案': ['project_tech_stack', 'project_pending_tasks'],
-  'copywriting': ['project_tech_stack', 'project_pending_tasks'],
-  '提示词': ['project_tech_stack', 'project_pending_tasks'],
-  'prompt': ['project_tech_stack', 'project_pending_tasks'],
-  '生成': ['project_tech_stack'],
-  '模板': ['project_tech_stack', 'coding_conventions'],
-
-  // DIY
-  'diy': ['project_tech_stack', 'feedback_dev_rules'],
-  '自定义': ['project_tech_stack'],
+  // 上传
+  '上传': ['feedback_data_api_specs'],
+  'upload': ['feedback_data_api_specs'],
 
   // 支付
   '支付': ['project_tech_stack', 'feedback_data_api_specs'],
   'payment': ['project_tech_stack', 'feedback_data_api_specs'],
 
-  // 电商
-  '电商': ['project_tech_stack'],
-
   // Mock
   'mock': ['project_mock_data_requirement'],
-
-  // 任务
-  '任务': ['project_pending_tasks'],
-  '进度': ['project_pending_tasks'],
 
   // 测试/质量
   '测试': ['feedback_quality_gates'],
   'test': ['feedback_quality_gates'],
-  '质量': ['feedback_quality_gates'],
   '验收': ['feedback_quality_gates'],
-  '清单': ['feedback_quality_gates', 'project_pending_tasks'],
 
-  // 规范/规则
-  '规范': ['feedback_six_categories', 'coding_conventions', 'feedback_dev_rules'],
-  '规则': ['feedback_dev_rules', 'feedback_quality_gates'],
-  '标准': ['feedback_six_categories', 'coding_conventions'],
+  // 认证
+  '认证': ['feedback_data_api_specs', 'feedback_dev_rules'],
+  'auth': ['feedback_data_api_specs', 'feedback_dev_rules'],
+  '登录': ['feedback_data_api_specs', 'feedback_dev_rules'],
+  'jwt': ['feedback_data_api_specs'],
+
+  // API/数据格式
   'api': ['feedback_data_api_specs'],
   '数据格式': ['feedback_data_api_specs'],
   'response': ['feedback_data_api_specs'],
-  '接口': ['feedback_data_api_specs', 'feedback_dev_rules'],
 
-  // 错误处理
-  '错误': ['feedback_dev_rules', 'feedback_quality_gates'],
-  'error': ['feedback_dev_rules', 'feedback_quality_gates'],
-  '异常': ['feedback_dev_rules'],
+  // 部署/运维
+  'pm2': ['project_tech_stack'],
+  'redis': ['project_tech_stack'],
+  'docker': ['project_tech_stack'],
+  'compose': ['project_tech_stack'],
+  '部署': ['project_tech_stack'],
 
   // 多租户
-  '租户': ['project_tech_stack'],
   'tenant': ['project_tech_stack'],
-  '隔离': ['project_tech_stack'],
+  '多租户': ['project_tech_stack'],
 
   // Zod
   'zod': ['feedback_dev_rules', 'feedback_six_categories'],
-  '校验': ['feedback_dev_rules', 'feedback_six_categories'],
   'validation': ['feedback_dev_rules'],
 
-  // 运维/部署
-  'pm2': ['project_tech_stack'],
-  '进程': ['project_tech_stack'],
-  'redis': ['project_tech_stack'],
-  '缓存': ['project_tech_stack'],
-  'docker': ['project_tech_stack'],
-  'compose': ['project_tech_stack'],
-  'gpu': ['project_tech_stack'],
-  '部署': ['project_tech_stack'],
-  '环境': ['project_tech_stack'],
-
   // SEO
-  'seo': ['project_tech_stack', 'ui_capability_matrix'],
+  'seo': ['project_tech_stack'],
 
   // WebSocket
-  'websocket': ['project_tech_stack', 'ARCH_Movio_AI_多模型架构方案'],
-  '实时': ['project_tech_stack', 'ARCH_Movio_AI_多模型架构方案'],
-  '推送': ['project_tech_stack'],
+  'websocket': ['project_tech_stack'],
 
   // 日志
-  '日志': ['project_tech_stack', 'feedback_data_api_specs'],
   'log': ['project_tech_stack', 'feedback_data_api_specs'],
-  '审计': ['feedback_data_api_specs'],
+  '日志': ['project_tech_stack', 'feedback_data_api_specs'],
 
   // 合规
-  '合规': ['project_tech_stack'],
   'compliance': ['project_tech_stack'],
-  '审核': ['feedback_quality_gates'],
+  '合规': ['project_tech_stack'],
 
-  // 配置
-  '配置': ['project_tech_stack', 'feedback_six_categories'],
-  'config': ['project_tech_stack'],
-  'env': ['project_tech_stack'],
+  // 错误
+  'error': ['feedback_dev_rules', 'feedback_quality_gates'],
+
+  // Nuxt
+  'nuxt': ['project_tech_stack'],
 };
 
 function knowledgeScore(query, source) {
