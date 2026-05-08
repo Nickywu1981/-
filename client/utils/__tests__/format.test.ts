@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatFileSize, formatCurrency, formatDate, formatDateTime, formatDuration, isToday, truncate } from '../format';
+import { formatFileSize, formatCurrency, formatDate, formatDateTime, formatDuration, isToday, isThisWeek, truncate, formatPlatformName, isValidImageFile, formatRelative } from '../format';
 
 describe('formatFileSize', () => {
   it('returns 0 B for zero/negative', () => {

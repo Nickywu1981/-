@@ -13,7 +13,7 @@ const membershipDao = {
       const params = [];
       if (data.plan_type !== undefined) { sets.push('plan_type = ?'); params.push(data.plan_type); }
       if (data.credit_balance !== undefined) { sets.push('credit_balance = ?'); params.push(data.credit_balance); }
-      if (data.expire_at) { sets.push('end_time = ?'); params.push(data.expire_at); }
+      if (data.end_time) { sets.push('end_time = ?'); params.push(data.end_time); }
       if (data.start_time) { sets.push('start_time = ?'); params.push(data.start_time); }
       if (sets.length === 0) return existing;
       params.push(userId);
@@ -22,7 +22,7 @@ const membershipDao = {
     }
     await pool.execute(
       'INSERT INTO user_membership (user_id, plan_type, credit_balance, start_time, end_time) VALUES (?, ?, ?, NOW(), ?)',
-      [userId, data.plan_type || 'free', data.credit_balance || 0, data.expire_at || null],
+      [userId, data.plan_type || 'free', data.credit_balance || 0, data.end_time || null],
     );
     return this.findByUserId(userId);
   },

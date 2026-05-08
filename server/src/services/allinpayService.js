@@ -134,7 +134,7 @@ async function fulfillMembership(order) {
     if (currentEnd > now) endTime.setTime(currentEnd.getTime() + days * 86400000);
   }
 
-  await membershipDao.upsert(order.user_id, { plan_type: planType, credit_balance: creditBefore + credits, expire_at: endTime });
+  await membershipDao.upsert(order.user_id, { plan_type: planType, credit_balance: creditBefore + credits, end_time: endTime, start_time: now });
 
   logger.info('[Allinpay] 会员履约完成', {
     userId: order.user_id, planType, days, credits, creditAfter: creditBefore + credits, endTime,
