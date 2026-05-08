@@ -1,5 +1,4 @@
-import { useFetch, useRuntimeConfig, navigateTo } from '#app';
-import type { $Fetch } from 'nitropack';
+import { useRuntimeConfig, navigateTo } from '#app';
 
 interface ApiResponse<T = any> {
   code: number;
