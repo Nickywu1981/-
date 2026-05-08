@@ -4,7 +4,7 @@ export async function insertHistory({ userId, type, inputs, outputs, modelId, to
   const [r] = await pool.execute(
     `INSERT INTO copywriting_history (user_id, type, inputs, outputs, model_id, token_used, status, error_msg)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    [userId, type, JSON.stringify(inputs), JSON.stringify(outputs), modelId, tokenUsed, status, errorMsg],
+    [userId, type, JSON.stringify(inputs ?? {}), outputs != null ? JSON.stringify(outputs) : null, modelId ?? '', tokenUsed ?? 0, status ?? 'success', errorMsg ?? null],
   );
   return r.insertId;
 }
