@@ -42,7 +42,7 @@
           </span>
         </div>
         <div v-if="open === i" class="faq-a">
-          <div class="a-content" v-html="item.answer"></div>
+          <div class="a-content">{{ item.answer }}</div>
           <div class="a-footer">
             <span class="a-cat">{{ catLabel(item.category) }}</span>
             <span class="a-helpful">有帮助吗？
@@ -172,7 +172,7 @@ onMounted(() => fetchFaqs())
 .arrow { color: var(--text-tertiary); transition: transform var(--transition-fast); flex-shrink: 0; }
 .faq-item.open .arrow { transform: rotate(180deg); color: var(--brand); }
 .faq-a { padding: 0 18px 16px; }
-.a-content { font-size: 14px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 12px; }
+.a-content { font-size: 14px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 12px; white-space: pre-wrap; }
 .a-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid var(--border-light); }
 .a-cat { font-size: 11px; padding: 2px 8px; background: var(--brand-alpha); color: var(--brand); border-radius: 10px; }
 .a-helpful { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }

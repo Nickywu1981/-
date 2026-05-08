@@ -112,10 +112,10 @@
           </el-form-item>
         </el-form>
 
-        <div v-if="descResult" class="results-section">
+        <div v-if="descResultRaw" class="results-section">
           <h3>生成结果 <el-tag size="small">{{ descMeta.model }}</el-tag></h3>
           <el-card shadow="hover" class="desc-result-card">
-            <div class="desc-content" v-html="descResult"></div>
+            <div class="desc-content">{{ descResultRaw }}</div>
             <div class="desc-actions">
               <el-button type="primary" size="small" @click="copyText(descResultRaw)">复制全文</el-button>
             </div>
@@ -251,7 +251,6 @@ async function doGenerateTitles() {
 
 // ===== 卖点文案 =====
 const descGenning = ref(false);
-const descResult = ref('');
 const descResultRaw = ref('');
 const descMeta = ref({});
 const descForm = reactive({ productName: '', features: '', specs: '', platform: 'taobao', language: 'zh-CN' });
@@ -261,7 +260,6 @@ async function doGenerateDesc() {
   try {
     const r = await $fetch('/api/copywriting/description', { method: 'POST', body: descForm });
     descResultRaw.value = r?.data?.description || '';
-    descResult.value = (r?.data?.description || '').replace(/\n/g, '<br>');
     descMeta.value = { model: r?.data?.model };
   } catch (e) { ElMessage.error(e?.data?.msg || '生成失败'); }
   finally { descGenning.value = false; }

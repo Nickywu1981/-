@@ -1,5 +1,4 @@
 import * as creditDao from '../dao/creditDao.js';
-import { getBatchLimit } from './memberBenefit.js';
 
 // 操作消耗点数额
 const CONSUMPTION_RULES = {
@@ -107,12 +106,26 @@ export async function consumeCredit(userId, action, batchCount = 1) {
   const membership = await creditDao.getMembership(userId);
   if (!membership) throw Object.assign(new Error('会员信息不存在'), { statusCode: 403 });
 
+  const plan = await creditDao.getPlanByType(membership.plan_type);
   const consumed = calcConsumed(action, batchCount);
 
-  // batch_limit 检查（对齐 freezeCredit）
-  const limit = await getBatchLimit(userId);
-  if (limit > 0 && batchCount > limit) {
-    throw Object.assign(new Error(`单次批量上限为 ${limit} 张`), { statusCode: 4103 });
+  // daily_limit / monthly_limit / batch_limit 检查（对齐 freezeCredit）
+  if (plan) {
+    if (plan.batch_limit > 0 && batchCount > plan.batch_limit) {
+      throw Object.assign(new Error(`单次批量上限为 ${plan.batch_limit} 张`), { statusCode: 4103 });
+    }
+    if (plan.daily_limit > 0) {
+      const dailyUsed = await creditDao.getDailyUsedCredits(userId);
+      if (dailyUsed + consumed > plan.daily_limit) {
+        throw Object.assign(new Error('超出每日消费上限'), { statusCode: 4103 });
+      }
+    }
+    if (plan.monthly_limit > 0) {
+      const monthlyUsed = await creditDao.getMonthlyUsedCredits(userId);
+      if (monthlyUsed + consumed > plan.monthly_limit) {
+        throw Object.assign(new Error('超出每月消费上限'), { statusCode: 4103 });
+      }
+    }
   }
 
   const creditBefore = membership.credit_balance;

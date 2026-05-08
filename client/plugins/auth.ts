@@ -6,11 +6,19 @@ export default defineNuxtPlugin(() => {
   const router = useRouter()
 
   // Ensure all $fetch calls send credentials (httpOnly cookie) cross-origin
+  // and redirect to /login on 401
   const originalFetch = globalThis.$fetch
   // @ts-expect-error - wrapper type is compatible at runtime
   globalThis.$fetch = function (url: string, opts: any = {}): any {
     if (typeof window !== 'undefined') {
       opts.credentials = opts.credentials || 'include'
+      const prev = opts.onResponseError
+      opts.onResponseError = function (ctx: any) {
+        if (ctx.response?.status === 401) {
+          router.push('/login')
+        }
+        if (prev) return prev(ctx)
+      }
     }
     return (originalFetch as any).call(globalThis, url, opts)
   }
