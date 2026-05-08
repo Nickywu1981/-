@@ -57,14 +57,18 @@ export async function getFunnelMetrics(days = 30) {
     [days],
   );
   const r = rows[0];
+  const regs = Number(r.registrations) || 0;
+  const ups = Number(r.first_uploads) || 0;
+  const gens = Number(r.first_generates) || 0;
+  const pays = Number(r.payments) || 0;
   return {
-    registrations: Number(r.registrations) || 0,
-    firstUploads: Number(r.first_uploads) || 0,
-    firstGenerates: Number(r.first_generates) || 0,
-    payments: Number(r.payments) || 0,
-    uploadRate: r.registrations > 0 ? ((r.first_uploads / r.registrations) * 100).toFixed(1) : '0',
-    generateRate: r.registrations > 0 ? ((r.first_generates / r.registrations) * 100).toFixed(1) : '0',
-    payRate: r.registrations > 0 ? ((r.payments / r.registrations) * 100).toFixed(1) : '0',
+    registrations: regs,
+    firstUploads: ups,
+    firstGenerates: gens,
+    payments: pays,
+    uploadRate: regs > 0 ? ((ups / regs) * 100).toFixed(1) : '0',
+    generateRate: regs > 0 ? ((gens / regs) * 100).toFixed(1) : '0',
+    payRate: regs > 0 ? ((pays / regs) * 100).toFixed(1) : '0',
   };
 }
 
