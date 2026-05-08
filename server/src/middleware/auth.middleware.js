@@ -27,6 +27,7 @@ export async function authMiddleware(req, res, next) {
     '/api/email/send-code', '/api/email/verify-code',
     '/api/payment/notify', '/api/allinpay/notify',
     '/api/ai-dispatch/health', '/api/ai-dispatch/categories',
+    '/api/internal/embed',
   ];
 
   if (publicPaths.some(p => req.path.startsWith(p))) {
@@ -55,14 +56,14 @@ export async function authMiddleware(req, res, next) {
 
   try {
     const payload = jwt.verify(token, JWT_SECRET);
-    req.user = { id: payload.id, role: payload.role, nickname: payload.nickname };
+    req.user = { id: payload.userId || payload.id, role: payload.role, nickname: payload.nickname };
     // P0-1 修复：从 JWT payload 注入 tenantId，多租户数据隔离
     req.tenantId = payload.tenantId || 0;
 
     const timeToExpire = payload.exp - Math.floor(Date.now() / 1000);
     if (timeToExpire > 0 && timeToExpire < RENEW_WINDOW) {
       const newToken = jwt.sign(
-        { id: payload.id, role: payload.role, nickname: payload.nickname, tenantId: payload.tenantId },
+        { userId: payload.userId || payload.id, role: payload.role, nickname: payload.nickname, tenantId: payload.tenantId },
         JWT_SECRET,
         { expiresIn: JWT_REFRESH_WINDOW },
       );

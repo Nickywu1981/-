@@ -8,7 +8,7 @@ const JWT_EXPIRES = 7 * 24 * 60 * 60;
 
 function generateToken(user) {
   return jwt.sign(
-    { id: user.id, role: user.role, nickname: user.nickname },
+    { userId: user.id, role: user.role, nickname: user.nickname, tenantId: user.tenantId || 0 },
     JWT_SECRET,
     { expiresIn: JWT_EXPIRES },
   );
@@ -36,7 +36,7 @@ export async function register({ phone, email, password, nickname, inviteCode: _
 
     await conn.commit();
 
-    const user = { id: userId, role: 'free', nickname: nickname || '' };
+    const user = { id: userId, role: 'free', nickname: nickname || '', tenantId: 0 };
     const token = generateToken(user);
 
     return {
@@ -59,7 +59,7 @@ export async function login({ phone, email, password }) {
     if (!username) throw new BusinessError(400, '请提供手机号或邮箱');
 
     const [users] = await conn.query(
-      'SELECT id, password, role, nickname, status FROM `user` WHERE username = ?',
+      'SELECT id, tenant_id, password, role, nickname, status FROM `user` WHERE username = ?',
       [username],
     );
 
@@ -91,7 +91,7 @@ export async function loginByCode({ phone, email }) {
     if (!username) throw new BusinessError(400, '请提供手机号或邮箱');
 
     const [users] = await conn.query(
-      'SELECT id, role, nickname, status FROM `user` WHERE username = ?',
+      'SELECT id, tenant_id, role, nickname, status FROM `user` WHERE username = ?',
       [username],
     );
 

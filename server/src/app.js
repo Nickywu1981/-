@@ -151,6 +151,36 @@ app.get('/api/health', async (_req, res) => {
 // Prometheus 指标端点
 app.get('/api/metrics', metricsEndpoint);
 
+// 内部 Embedding 端点（仅 localhost，脚本调用）
+app.post('/api/internal/embed', async (req, res) => {
+  try {
+    const { texts } = req.body;
+    if (!texts || !Array.isArray(texts) || texts.length === 0) {
+      return res.status(400).json({ code: 400, msg: 'texts 数组必填' });
+    }
+    const apiKey = process.env.OPENAI_API_KEY || '';
+    const baseUrl = (process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1').replace(/\/+$/, '');
+    if (!apiKey) return res.status(500).json({ code: 500, msg: 'API key not configured' });
+
+    const fetchRes = await fetch(`${baseUrl}/embeddings`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: 'text-embedding-3-small', input: texts }),
+      signal: AbortSignal.timeout(60000),
+    });
+
+    if (!fetchRes.ok) {
+      const err = await fetchRes.json().catch(() => ({}));
+      return res.status(fetchRes.status).json({ code: fetchRes.status, msg: err.error?.message || 'upstream error' });
+    }
+
+    const data = await fetchRes.json();
+    res.json({ code: 200, msg: 'ok', data: { vectors: data.data.map(d => d.embedding), model: data.model } });
+  } catch (e) {
+    res.status(500).json({ code: 500, msg: e.message });
+  }
+});
+
 // 静态文件服务（上传目录），带缓存
 app.use('/uploads', express.static(path.join(__dirname, '../uploads'), {
   maxAge: '7d',

@@ -90,6 +90,7 @@ const PUBLIC_PREFIXES = [
   '/api/open',
   '/api/ai-dispatch/health',
   '/api/ai-dispatch/categories',
+  '/api/internal/',
   '/uploads',
 ];
 
@@ -104,7 +105,17 @@ export async function authMiddleware(req, res, next) {
   // 如果全局 v4.1 认证中间件已鉴权，直接放行（兼容 cookie 认证）
   if (req.user) return next();
 
-  const { payload, expired } = await parseToken(req.headers.authorization);
+  // 先尝试从 Cookie 中提取 token
+  const tokenFromCookie = req.cookies?.token;
+  let { payload, expired } = tokenFromCookie
+    ? await parseToken(`Bearer ${tokenFromCookie}`)
+    : { payload: null, expired: false };
+
+  // Cookie 中无有效 token，尝试 Authorization header
+  if (!payload) {
+    ({ payload, expired } = await parseToken(req.headers.authorization));
+  }
+
   if (!payload) {
     if (expired) {
       return sendError(res, ERROR_CODE.EC_AUTH_002, 'Access Token 已过期，请刷新');
@@ -112,8 +123,13 @@ export async function authMiddleware(req, res, next) {
     return sendError(res, ERROR_CODE.UNAUTHORIZED, '未提供有效认证令牌');
   }
 
-  req.user = payload;
-  req.tenantId = payload.tenantId || 0;
+  req.user = {
+    id: payload.userId || payload.id,
+    role: payload.role || 'user',
+    nickname: payload.nickname || '',
+    tenantId: payload.tenantId || 0,
+  };
+  req.tenantId = req.user.tenantId;
   next();
 }
 

@@ -52,7 +52,7 @@ export function csrfProtection(req, res, next) {
     '/api/auth/login', '/api/auth/register', '/api/auth/forgot-password',
     '/api/sms/send', '/api/email/send', '/api/site-config/public', '/api/health', '/api/metrics',
     '/api/ai-dispatch'];
-  if (publicPaths.some(p => req.path.startsWith(p))) {
+  if (publicPaths.some(p => req.path.startsWith(p)) || req.path.startsWith('/api/internal/')) {
     return next();
   }
 
