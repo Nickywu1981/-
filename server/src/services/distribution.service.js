@@ -19,7 +19,7 @@ const COMMISSION_RATES = {
 export async function getMyInviteCode(userId) {
   const conn = await db.getConnection();
   try {
-    const [rows] = await conn.query('SELECT invite_code, nickname FROM users WHERE id = ?', [userId]);
+    const [rows] = await conn.query('SELECT invite_code, nickname FROM `user` WHERE id = ?', [userId]);
     if (rows.length === 0) throw new BusinessError(404, '用户不存在');
     return { invite_code: rows[0].invite_code, nickname: rows[0].nickname };
   } finally {
@@ -280,7 +280,7 @@ export async function getTeamPerformance(userId, { page = 1, pageSize = 20 } = {
 export function getPromoAssets() { return PROMO_ASSETS; }
 
 export async function getMyPromoLink(userId) {
-  const [[user]] = await db.query('SELECT invite_code FROM users WHERE id = ?', [userId]);
+  const [[user]] = await db.query('SELECT invite_code FROM `user` WHERE id = ?', [userId]);
   if (!user) throw new BusinessError(404, '用户不存在');
   const baseUrl = process.env.APP_URL || 'https://movio.ai';
   const inviteUrl = `${baseUrl}/register?ref=${user.invite_code}`;

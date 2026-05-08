@@ -33,7 +33,7 @@ export async function listAbuseRecords({ page = 1, pageSize = 20, userId } = {})
   const [countResult] = await pool.execute(`SELECT COUNT(*) AS total FROM ${table} ${where}`, params);
   const total = countResult[0].total;
   const offset = (page - 1) * pageSize;
-  const [rows] = await pool.execute(
+  const [rows] = await pool.query(
     `SELECT * FROM ${table} ${where} ORDER BY id DESC LIMIT ? OFFSET ?`,
     [...params, pageSize, offset],
   );

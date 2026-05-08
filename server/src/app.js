@@ -70,6 +70,7 @@ import pointsRoutesV4 from './route/v4_points.routes.js';
 import distributionRoutesV4 from './route/v4_distribution.routes.js';
 import assetsRoutesV4 from './route/v4_assets.routes.js';
 import platformBindRoutesV4 from './route/v4_platform_bind.routes.js';
+import publishRoutesV4 from './route/v4_publish.routes.js';
 import userRoutesV4 from './route/v4_user.routes.js';
 import uploadRoutesV4 from './route/v4_upload.routes.js';
 import cutEcosystemRoutesV4 from './route/v4_cut_ecosystem.routes.js';
@@ -175,6 +176,7 @@ app.use('/api/distribution', distributionRoutesV4);
 app.use('/api/assets', assetsRoutesV4);
 app.use('/api/cut-ecosystem', cutEcosystemRoutesV4);
 app.use('/api/platforms', platformBindRoutesV4);
+app.use('/api/publish', publishRoutesV4);
 app.use('/api/user', userRoutesV4);
 app.use('/api/upload', uploadRoutesV4);  // v4.1 分片上传 (must precede legacy)
 

@@ -237,7 +237,7 @@ export async function updateUser(req, res, next) {
   try {
     const conn = await db.getConnection();
     try {
-      const [users] = await conn.query('SELECT id FROM users WHERE id = ?', [+req.params.id]);
+      const [users] = await conn.query('SELECT id FROM `user` WHERE id = ?', [+req.params.id]);
       if (users.length === 0) return error(res, 404, '用户不存在');
 
       const { nickname, email, role } = req.body;
@@ -248,7 +248,7 @@ export async function updateUser(req, res, next) {
       if (role !== undefined) { updates.push('role = ?'); params.push(role); }
       if (updates.length === 0) return error(res, 400, '无更新字段');
 
-      await conn.query(`UPDATE users SET ${updates.join(', ')} WHERE id = ?`, [...params, +req.params.id]);
+      await conn.query(`UPDATE \`user\` SET ${updates.join(', ')} WHERE id = ?`, [...params, +req.params.id]);
       return success(res, {}, '用户已更新');
     } finally { conn.release(); }
   } catch (err) { next(err); }

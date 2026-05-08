@@ -44,8 +44,7 @@ export async function listUserTasks(userId, { status, type, page = 1, pageSize =
   }
 
   const offset = (page - 1) * pageSize;
-  sql += ' ORDER BY create_time DESC LIMIT ? OFFSET ?';
-  params.push(Number(offset), Number(pageSize));
+  sql += ` ORDER BY create_time DESC LIMIT ${Number(pageSize)} OFFSET ${Number(offset)}`;
 
   const [rows] = await pool().execute(sql, params);
   return rows;

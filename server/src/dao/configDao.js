@@ -38,7 +38,7 @@ const configDao = {
   },
 
   async listLogs({ limit = 20, offset = 0 } = {}) {
-    const [rows] = await pool.execute(
+    const [rows] = await pool.query(
       'SELECT cl.*, u.nickname FROM sys_config_log cl LEFT JOIN users u ON cl.changed_by = u.id ORDER BY cl.id DESC LIMIT ? OFFSET ?',
       [Number(limit), Number(offset)],
     );

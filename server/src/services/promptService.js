@@ -80,7 +80,10 @@ export async function fillAndPreview(userId, templateId, values = {}) {
   const t = await useTemplate(userId, templateId);
   if (!t) throw Object.assign(new Error('模板不存在'), { statusCode: 404 });
   let variables = t.variables;
-  if (typeof variables === 'string') variables = JSON.parse(variables);
+  if (typeof variables === 'string') {
+    try { variables = JSON.parse(variables); }
+    catch { variables = []; }
+  }
   variables = buildVariableDefs(t.content, variables);
   const filled = fillTemplate(t.content, values);
   return { ...t, variables, filled_content: filled };

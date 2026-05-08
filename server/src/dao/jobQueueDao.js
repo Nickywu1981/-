@@ -22,7 +22,7 @@ const jobQueueDao = {
     if (jobType) { where.push('job_type = ?'); params.push(jobType); }
     const sql = `SELECT * FROM job_queue WHERE ${where.join(' AND ')} ORDER BY created_at DESC LIMIT ? OFFSET ?`;
     params.push(Number(limit), Number(offset));
-    const [rows] = await pool.execute(sql, params);
+    const [rows] = await pool.query(sql, params);
     const [countResult] = await pool.execute(`SELECT COUNT(*) as total FROM job_queue WHERE ${where.join(' AND ')}`, params);
     return { rows, total: countResult[0].total };
   },

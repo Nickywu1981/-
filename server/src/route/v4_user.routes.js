@@ -48,7 +48,7 @@ router.get('/profile', async (req, res) => {
     const conn = await db.getConnection();
     try {
       const [users] = await conn.query(
-        'SELECT id, nickname, phone, email, avatar_url, role, invite_code, created_at FROM users WHERE id = ?',
+        'SELECT id, nickname, phone, email, avatar_url, role, invite_code, created_at FROM `user` WHERE id = ?',
         [req.user.id],
       );
       if (users.length === 0) return error(res, 404, '用户不存在');
@@ -123,7 +123,7 @@ router.put('/profile', _validate(updateProfileSchema), async (req, res) => {
     const conn = await db.getConnection();
     try {
       await conn.query(
-        `UPDATE users SET ${updates.join(', ')} WHERE id = ?`,
+        `UPDATE \`user\` SET ${updates.join(', ')} WHERE id = ?`,
         [...params, req.user.id],
       );
       return success(res, {}, '资料已更新');
@@ -143,7 +143,7 @@ router.put('/change-password', _validate(changePasswordSchema), async (req, res)
     const conn = await db.getConnection();
     try {
       const [users] = await conn.query(
-        'SELECT password_hash FROM users WHERE id = ?',
+        'SELECT password_hash FROM `user` WHERE id = ?',
         [req.user.id],
       );
       if (users.length === 0) return error(res, 404, '用户不存在');
@@ -152,7 +152,7 @@ router.put('/change-password', _validate(changePasswordSchema), async (req, res)
       if (!valid) return error(res, 403, '原密码不正确');
 
       const hash = await bcrypt.hash(newPassword, 12);
-      await conn.query('UPDATE users SET password_hash = ? WHERE id = ?', [hash, req.user.id]);
+      await conn.query('UPDATE `user` SET password_hash = ? WHERE id = ?', [hash, req.user.id]);
       return success(res, {}, '密码已修改');
     } finally {
       conn.release();

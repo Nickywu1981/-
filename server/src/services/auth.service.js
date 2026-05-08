@@ -36,12 +36,12 @@ export async function register({ phone, email, password, nickname, inviteCode })
     // 校验唯一性
     if (phone) {
       const encPhone = encrypt(phone);
-      const [existing] = await conn.query('SELECT id FROM users WHERE phone = ?', [encPhone]);
+      const [existing] = await conn.query('SELECT id FROM `user` WHERE phone = ?', [encPhone]);
       if (existing.length > 0) throw new BusinessError(409, '该手机号已注册');
     }
     if (email) {
       const encEmail = encrypt(email);
-      const [existing] = await conn.query('SELECT id FROM users WHERE email = ?', [encEmail]);
+      const [existing] = await conn.query('SELECT id FROM `user` WHERE email = ?', [encEmail]);
       if (existing.length > 0) throw new BusinessError(409, '该邮箱已注册');
     }
 
@@ -50,7 +50,7 @@ export async function register({ phone, email, password, nickname, inviteCode })
     let attempts = 0;
     do {
       myInviteCode = generateInviteCode();
-      const [dup] = await conn.query('SELECT id FROM users WHERE invite_code = ?', [myInviteCode]);
+      const [dup] = await conn.query('SELECT id FROM `user` WHERE invite_code = ?', [myInviteCode]);
       if (dup.length === 0) break;
       attempts++;
     } while (attempts < 10);
@@ -59,7 +59,7 @@ export async function register({ phone, email, password, nickname, inviteCode })
     const passwordHash = await bcrypt.hash(password, 12);
     const freePoints = 50; // 注册赠送积分 (从 biz.free_trial 配置读取)
     const [result] = await conn.query(
-      `INSERT INTO users (phone, email, password_hash, nickname, role, invite_code, points_balance, free_trial_used)
+      `INSERT INTO \`user\` (phone, email, password_hash, nickname, role, invite_code, points_balance, free_trial_used)
        VALUES (?, ?, ?, ?, 'free', ?, ?, 1)`,
       [
         phone ? encrypt(phone) : '',
@@ -84,7 +84,7 @@ export async function register({ phone, email, password, nickname, inviteCode })
 
     // 邀请码绑定分销关系
     if (inviteCode) {
-      const [inviter] = await conn.query('SELECT id FROM users WHERE invite_code = ?', [inviteCode]);
+      const [inviter] = await conn.query('SELECT id FROM `user` WHERE invite_code = ?', [inviteCode]);
       if (inviter.length > 0) {
         const parentId = inviter[0].id;
         await conn.query(
@@ -92,7 +92,7 @@ export async function register({ phone, email, password, nickname, inviteCode })
           [userId, parentId, inviteCode],
         );
         // 更新用户 invited_by
-        await conn.query('UPDATE users SET invited_by = ? WHERE id = ?', [parentId, userId]);
+        await conn.query('UPDATE `user` SET invited_by = ? WHERE id = ?', [parentId, userId]);
         // 检查上上级 (间推)
         const [grandparent] = await conn.query('SELECT parent_id FROM distributor_relation WHERE user_id = ? AND level = 1', [parentId]);
         if (grandparent.length > 0) {
@@ -129,13 +129,13 @@ export async function login({ phone, email, password }) {
     if (phone) {
       const encPhone = encrypt(phone);
       [user] = await conn.query(
-        'SELECT id, password_hash, role, nickname, status FROM users WHERE phone = ?',
+        'SELECT id, password_hash, role, nickname, status FROM `user` WHERE phone = ?',
         [encPhone],
       );
     } else if (email) {
       const encEmail = encrypt(email);
       [user] = await conn.query(
-        'SELECT id, password_hash, role, nickname, status FROM users WHERE email = ?',
+        'SELECT id, password_hash, role, nickname, status FROM `user` WHERE email = ?',
         [encEmail],
       );
     }
@@ -149,7 +149,7 @@ export async function login({ phone, email, password }) {
     if (!validPassword) throw new BusinessError(401, '账号或密码错误');
 
     // 更新最后登录时间
-    await conn.query('UPDATE users SET last_login_at = NOW() WHERE id = ?', [user.id]);
+    await conn.query('UPDATE `user` SET last_login_at = NOW() WHERE id = ?', [user.id]);
 
     const token = generateToken(user);
     return {
@@ -178,13 +178,13 @@ export async function loginByCode({ phone, email }) {
     if (phone) {
       const encPhone = encrypt(phone);
       [user] = await conn.query(
-        'SELECT id, role, nickname, status FROM users WHERE phone = ?',
+        'SELECT id, role, nickname, status FROM `user` WHERE phone = ?',
         [encPhone],
       );
     } else {
       const encEmail = encrypt(email);
       [user] = await conn.query(
-        'SELECT id, role, nickname, status FROM users WHERE email = ?',
+        'SELECT id, role, nickname, status FROM `user` WHERE email = ?',
         [encEmail],
       );
     }
@@ -194,7 +194,7 @@ export async function loginByCode({ phone, email }) {
 
     if (user.status !== 'active') throw new BusinessError(403, '账号已被禁用');
 
-    await conn.query('UPDATE users SET last_login_at = NOW() WHERE id = ?', [user.id]);
+    await conn.query('UPDATE `user` SET last_login_at = NOW() WHERE id = ?', [user.id]);
 
     const token = generateToken(user);
     return {
@@ -226,7 +226,7 @@ export async function resetPassword({ phone, email, newPassword }) {
 
     const passwordHash = await bcrypt.hash(newPassword, 12);
     const [result] = await conn.query(
-      `UPDATE users SET password_hash = ? WHERE ${field} = ?`,
+      `UPDATE \`user\` SET password_hash = ? WHERE ${field} = ?`,
       [passwordHash, encValue],
     );
 
@@ -241,7 +241,7 @@ export async function getUserProfile(userId) {
   const conn = await db.getConnection();
   try {
     const [rows] = await conn.query(
-      'SELECT id, phone, email, nickname, avatar_url, role, status, invite_code, points_balance, invited_by, created_at, last_login_at FROM users WHERE id = ?',
+      'SELECT id, phone, email, nickname, avatar_url, role, status, invite_code, points_balance, invited_by, created_at, last_login_at FROM `user` WHERE id = ?',
       [userId],
     );
     if (rows.length === 0) throw new BusinessError(404, '用户不存在');

@@ -28,7 +28,7 @@ const pointsDao = {
   },
 
   async listTransactions(userId, { limit = 20, offset = 0 } = {}) {
-    const [rows] = await pool.execute(
+    const [rows] = await pool.query(
       'SELECT * FROM points_transaction WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?',
       [userId, Number(limit), Number(offset)],
     );
@@ -37,7 +37,7 @@ const pointsDao = {
   },
 
   async listAccounts({ limit = 20, offset = 0 } = {}) {
-    const [rows] = await pool.execute(
+    const [rows] = await pool.query(
       'SELECT pa.*, u.nickname FROM points_account pa LEFT JOIN users u ON u.id = pa.user_id ORDER BY pa.balance DESC LIMIT ? OFFSET ?',
       [Number(limit), Number(offset)],
     );

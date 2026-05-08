@@ -48,10 +48,10 @@ async function checkRedis() {
 // ==================== 队列定义 ====================
 
 const QUEUES = {
-  'image-processing': { concurrency: 3, attempts: 3, backoff: { type: 'exponential', delay: 2000 }, timeout: 300000   /* 5min */ },
-  'video-generation': { concurrency: 2, attempts: 3, backoff: { type: 'exponential', delay: 5000 }, timeout: 1800000  /* 30min */ },
-  'batch-tasks':      { concurrency: 5, attempts: 2, backoff: { type: 'fixed', delay: 1000 },      timeout: 3600000  /* 60min */ },
-  'notifications':    { concurrency: 10, attempts: 1,                                             timeout: 60000    /* 1min */ },
+  'image-processing': { concurrency: parseInt(process.env.BULL_IMAGE_CONCURRENCY || '3', 10), attempts: 3, backoff: { type: 'exponential', delay: 2000 }, timeout: 300000 },
+  'video-generation': { concurrency: parseInt(process.env.BULL_VIDEO_CONCURRENCY || '2', 10), attempts: 3, backoff: { type: 'exponential', delay: 5000 }, timeout: 1800000 },
+  'batch-tasks':      { concurrency: parseInt(process.env.BULL_BATCH_CONCURRENCY || '5', 10), attempts: 2, backoff: { type: 'fixed', delay: 1000 },      timeout: 3600000 },
+  'notifications':    { concurrency: parseInt(process.env.BULL_NOTIFY_CONCURRENCY || '10', 10), attempts: 1,                                          timeout: 60000 },
 };
 
 const queueInstances = new Map();
