@@ -26,6 +26,7 @@ export async function authMiddleware(req, res, next) {
     '/api/sms/send-code', '/api/sms/verify-code',
     '/api/email/send-code', '/api/email/verify-code',
     '/api/payment/notify', '/api/allinpay/notify',
+    '/api/ai-dispatch/health', '/api/ai-dispatch/categories',
   ];
 
   if (publicPaths.some(p => req.path.startsWith(p))) {
