@@ -73,9 +73,10 @@ async function handleRegister() {
     const isEmail = username.value.includes('@')
     const body = isEmail ? { email: username.value, password: password.value, nickname: nickname.value }
                          : { phone: username.value, password: password.value, nickname: nickname.value }
-    await $fetch('/api/auth/register', { method: 'POST', body, credentials: 'include' })
+    const authStore = useAuthStore()
+    await authStore.register(body)
     navigateTo('/workspace')
-  } catch (e: any) { msg.value = e.data?.msg || '注册失败'; msgErr.value = true; }
+  } catch (e: any) { msg.value = e.message || '注册失败'; msgErr.value = true; }
   loading.value = false;
 }
 

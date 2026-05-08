@@ -25,6 +25,8 @@
 </template>
 
 <script setup lang="ts">
+import { api } from '@/composables/useApi'
+
 definePageMeta({ middleware: 'auth' })
 
 const toast = useToast()
@@ -34,12 +36,12 @@ const plans = ref<any[]>([])
 
 onMounted(async () => {
   try {
-    const [pRes, cRes]: any[] = await Promise.all([
-      $fetch('/api/payment/plans'),
-      $fetch('/api/user/profile')
+    const [planData, userData]: any[] = await Promise.all([
+      api.get('/payment/plans'),
+      api.get('/user/profile')
     ])
-    plans.value = pRes.data || []
-    currentPlan.value = cRes.data?.plan || null
+    plans.value = planData?.list || planData || []
+    currentPlan.value = userData?.plan || null
   } catch {
     plans.value = [
       { id: 1, name: '免费版', price: 0, features: ['每日 5 次生成', '基础模板', '720P 导出'] },
@@ -53,15 +55,15 @@ async function upgrade(plan: any) {
   if (currentPlan.value?.id === plan.id) return
 
   try {
-    const res: any = await $fetch('/api/payment/create-order', {
-      method: 'POST',
-      body: { planType: plan.id, payChannel: 'wechat' },
+    const data: any = await api.post('/payment/create-order', {
+      planType: plan.id,
+      payChannel: 'wechat',
     })
-    if (res.data?.payUrl) {
-      window.location.href = res.data.payUrl
+    if (data?.payUrl) {
+      window.location.href = data.payUrl
     }
   } catch (e: any) {
-    toast.error(e.data?.msg || '创建订单失败，请稍后重试')
+    toast.error(e.message || '创建订单失败，请稍后重试')
   }
 }
 </script>

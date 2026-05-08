@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { api } from '@/composables/useApi'
 
 interface UserInfo {
   id: number
@@ -6,22 +7,17 @@ interface UserInfo {
   username?: string
   email?: string
   avatar?: string
-  avatar_url?: string
   role?: string
-  tier?: string
   credits?: number
-  points_balance?: number
 }
 
 interface AuthState {
-  token: string | null  // kept for compatibility, unused with httpOnly cookies
   user: UserInfo | null
   isLoggedIn: boolean
 }
 
 export const useAuthStore = defineStore('auth', {
   state: (): AuthState => ({
-    token: null,
     user: null,
     isLoggedIn: false,
   }),
@@ -29,7 +25,7 @@ export const useAuthStore = defineStore('auth', {
   getters: {
     userId: (state) => state.user?.id ?? null,
     userName: (state) => state.user?.nickname || state.user?.username || '',
-    userTier: (state) => state.user?.tier ?? 'free',
+    userTier: (state) => (state.user as any)?.tier ?? 'free',
     userCredits: (state) => state.user?.credits ?? 0,
   },
 
@@ -41,35 +37,29 @@ export const useAuthStore = defineStore('auth', {
 
     async login(account: string, password: string) {
       const isEmail = account.includes('@')
-      const body = isEmail ? { email: account, password } : { phone: account, password }
-      const res: any = await $fetch('/api/auth/login', {
-        method: 'POST',
-        body,
-      })
-      if (res.code === 200) {
-        this.user = res.data
+      const body = isEmail ? { email: account, password } : { username: account, password }
+      const data: any = await api.post('/auth/login', body)
+      if (data) {
+        this.user = data
         this.isLoggedIn = true
       }
-      return res
+      return data
     },
 
-    async register(params: { phone?: string; email?: string; password: string; nickname?: string; invite_code?: string }) {
-      const res: any = await $fetch('/api/auth/register', {
-        method: 'POST',
-        body: params,
-      })
-      if (res.code === 200) {
-        this.user = res.data
+    async register(params: { phone?: string; email?: string; password: string; nickname?: string }) {
+      const data: any = await api.post('/auth/register', params)
+      if (data) {
+        this.user = data
         this.isLoggedIn = true
       }
-      return res
+      return data
     },
 
     async fetchUser() {
       try {
-        const res: any = await $fetch('/api/user/profile')
-        if (res.code === 200) {
-          this.user = res.data
+        const data: any = await api.get('/user/profile')
+        if (data) {
+          this.user = data
           this.isLoggedIn = true
         }
       } catch {
@@ -79,9 +69,8 @@ export const useAuthStore = defineStore('auth', {
 
     async logout() {
       try {
-        await $fetch('/api/auth/logout', { method: 'POST' })
+        await api.post('/auth/logout')
       } catch { /* best-effort */ }
-      this.token = null
       this.user = null
       this.isLoggedIn = false
       if (typeof window !== 'undefined') {

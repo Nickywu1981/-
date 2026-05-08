@@ -87,12 +87,10 @@ const msgErr = ref(false);
 async function handlePasswordLogin() {
   loading.value = true; msg.value = '';
   try {
-    const isEmail = username.value.includes('@')
-    const body = isEmail ? { email: username.value, password: password.value }
-                         : { phone: username.value, password: password.value }
-    await $fetch('/api/auth/login', { method: 'POST', body, credentials: 'include' })
+    const authStore = useAuthStore()
+    await authStore.login(username.value, password.value)
     navigateTo('/workspace')
-  } catch (e: any) { msg.value = e.data?.msg || '登录失败'; msgErr.value = true; }
+  } catch (e: any) { msg.value = e.message || '登录失败'; msgErr.value = true; }
   loading.value = false;
 }
 
