@@ -850,18 +850,24 @@ function onResize() {
   max-width: calc(100vw - 32px);
   background: var(--bg-card);
   border: 1px solid var(--border-light);
-  border-radius: 12px;
-  box-shadow: var(--shadow-dropdown);
+  border-radius: 14px;
+  box-shadow: var(--shadow-dropdown), 0 0 40px rgba(79,92,246,0.04);
   padding: 12px;
   z-index: 200;
-  animation: modal-enter var(--transition-base) ease-out;
+  animation: modal-enter 0.2s cubic-bezier(0.4,0,0.2,1);
 }
 .ws-search-input {
   width: 100%;
   padding: 10px 14px;
   border: 1px solid var(--border-light);
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 14px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  outline: none;
+  transition: all 0.15s ease;
+}
+.ws-search-input:focus { border-color: var(--brand-soft); box-shadow: var(--ws-input-focus-shadow); }
   outline: none;
   background: var(--bg-input);
   color: var(--text-primary);
