@@ -165,7 +165,7 @@ app.use('/api/admin/config', configAdminRouter);
 app.use('/api/images', heavyLimiter, imageRoutesV4);
 app.use('/api/ai', heavyLimiter, imageRoutesV4);  // /api/ai/enhance-prompt 也在 v4_image.routes 中
 app.use('/api/detail', detailRoutesV4);
-app.use('/api/videos', videoRoutesV4);
+app.use('/api/videos', heavyLimiter, videoRoutesV4);
 app.use('/api/jobs', jobRoutesV4);
 app.use('/api/job', jobRoutesV4);   // 别名: useTaskPolling 轮询 /api/job/:id
 app.use('/api/points', pointsRoutesV4);
@@ -185,8 +185,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/open', openApiRoutes);
 app.use('/api/templates', sizeTemplateRoutes);
 app.use('/api/brand', brandRoutes);
-app.use('/api/images', imageRoutes);
-app.use('/api/videos', videoRoutes);
+app.use('/api/images', heavyLimiter, imageRoutes);
+app.use('/api/videos', heavyLimiter, videoRoutes);
 app.use('/api/batch', batchRoutes);
 app.use('/api/advanced', advancedImageRoutes);
 app.use('/api/adv-video', advancedVideoRoutes);
