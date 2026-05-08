@@ -82,6 +82,7 @@ import { metricsMiddleware, metricsEndpoint } from './middleware/metrics.js';
 import { setCsrfCookie, csrfProtection } from './middleware/csrf.js';
 import cspMiddleware from './middleware/csp.js';
 import openApiRoutes from './route/openApiRoutes.js';
+import openApiKeyRoutes from './route/openApiKeyRoutes.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -221,6 +222,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 app.use('/api/users', userRoutes);
 app.use('/api/open', openApiRoutes);
+app.use('/api/open', openApiKeyRoutes);
 app.use('/api/copywriting', copywritingRoutes);
 app.use('/api/templates', sizeTemplateRoutes);
 app.use('/api/brand', brandRoutes);
