@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { listTemplates, getTemplateDetail, createTemplate, submitForReview, fillAndPreview, listFavorites, toggleFavorite, listGroups, createGroup, renameGroup, deleteGroup } from '../controller/promptController.js';
+import { listTemplates, getTemplateDetail, createTemplate, submitForReview, fillAndPreview, listFavorites, toggleFavorite, listGroups, createGroup, renameGroup, deleteGroup, getRecommendations, recordUsage, usageHistory, rateTemplate, getTemplateRating } from '../controller/promptController.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
@@ -42,5 +42,16 @@ router.get('/groups', asyncHandler(listGroups));
 router.post('/groups', validate(groupSchema), asyncHandler(createGroup));
 router.put('/groups/:id', validate(groupSchema), asyncHandler(renameGroup));
 router.delete('/groups/:id', asyncHandler(deleteGroup));
+
+// 智能推荐
+router.get('/recommendations', asyncHandler(getRecommendations));
+
+// 使用历史
+router.get('/usage-history', asyncHandler(usageHistory));
+router.post('/:id/use', asyncHandler(recordUsage));
+
+// 评分
+router.post('/:id/rate', asyncHandler(rateTemplate));
+router.get('/:id/rating', asyncHandler(getTemplateRating));
 
 export default router;

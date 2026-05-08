@@ -87,3 +87,43 @@ export async function deleteGroup(req, res) {
     success(res, null, '已删除');
   } catch (e) { error(res, e.message, 500); }
 }
+
+// ==================== 智能推荐 ====================
+export async function getRecommendations(req, res) {
+  try {
+    const limit = Math.min(parseInt(req.query.limit) || 12, 30);
+    const list = await promptService.getRecommendations(req.user.id, { limit });
+    success(res, { list });
+  } catch (e) { error(res, e.message, 500); }
+}
+
+// ==================== 使用历史 ====================
+export async function recordUsage(req, res) {
+  try {
+    await promptService.recordUsage(req.user.id, +req.params.id, req.body.filledContent, req.body.modelType);
+    success(res, null, '已记录');
+  } catch (e) { error(res, e.message, 500); }
+}
+
+export async function usageHistory(req, res) {
+  try {
+    const { page, pageSize } = parsePagination(req.query);
+    const result = await promptService.listUsageHistory(req.user.id, { page, pageSize });
+    listResult(res, result);
+  } catch (e) { error(res, e.message, 500); }
+}
+
+// ==================== 评分 ====================
+export async function rateTemplate(req, res) {
+  try {
+    const result = await promptService.rateTemplate(req.user.id, +req.params.id, req.body.score);
+    success(res, result, '评分成功');
+  } catch (e) { error(res, e.statusCode || 500, e.message); }
+}
+
+export async function getTemplateRating(req, res) {
+  try {
+    const rating = await promptService.getRating(req.user.id, +req.params.id);
+    success(res, rating);
+  } catch (e) { error(res, e.message, 500); }
+}
