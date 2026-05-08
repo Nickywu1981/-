@@ -9,32 +9,52 @@
 import { realPool } from './db.js';
 
 /**
+ * 有 tenant_id 列的表白名单
+ * 只对这些表注入 tenant_id，其余表跳过
+ */
+const TENANT_TABLES = new Set([
+  'diy_page', 'diy_component', 'diy_page_version',
+  'custom_form', 'custom_form_submission',
+  'api_proxy_config', 'recharge_order',
+  'automation_account', 'automation_task',
+  'prompt_template', 'prompt_group', 'prompt_favorite',
+  'sensitive_word', 'credit_request_log', 'ai_call_log',
+]);
+
+/** 从 SQL 里提取表名 */
+function extractTable(sql) {
+  const m = sql.match(/(?:FROM|INTO|UPDATE)\s+`?(\w+)`?/i);
+  return m ? m[1].toLowerCase() : null;
+}
+
+/** 判断是否需要对当前 SQL 注入 tenant_id */
+function shouldInject(sql) {
+  const table = extractTable(sql);
+  if (!table) return false;
+  return TENANT_TABLES.has(table);
+}
+
+/**
  * 自动为 SELECT/UPDATE/DELETE SQL 的 WHERE 子句注入 tenant_id 过滤
- * @param {string} sql - 原始 SQL
- * @param {Array} params - 原始参数
- * @param {number} tenantId - 租户 ID
- * @returns {{ sql: string, params: Array }}
+ * 仅对 TENANT_TABLES 白名单中的表生效
  */
 function injectTenant(sql, params, tenantId) {
+  if (!shouldInject(sql)) return { sql, params };
+
   const trimmed = sql.trim().toUpperCase();
   const hasWhere = /WHERE\s/i.test(sql);
 
-  // SELECT / UPDATE / DELETE — 注入 AND tenant_id = ?
   if (/^(SELECT|UPDATE|DELETE)\b/i.test(trimmed) && !trimmed.startsWith('SELECT COUNT')) {
     if (hasWhere) {
-      // 已有 WHERE — 插入 AND tenant_id = ?
       const idx = sql.indexOf(sql.match(/WHERE\s/i)[0]) + sql.match(/WHERE\s/i)[0].length;
-      const before = sql.slice(0, idx);
-      const after = sql.slice(idx);
       return {
-        sql: `${before}tenant_id = ? AND ${after}`,
+        sql: `${sql.slice(0, idx)}tenant_id = ? AND ${sql.slice(idx)}`,
         params: [tenantId, ...params],
       };
     } else {
-      // 无 WHERE — 按 SQL 结构插入
-      const insertAfterMatch = sql.match(/FROM\s+\S+\s*(?:AS\s+\S+\s*)?/i);
-      if (insertAfterMatch) {
-        const idx = sql.indexOf(insertAfterMatch[0]) + insertAfterMatch[0].length;
+      const m = sql.match(/FROM\s+\S+\s*(?:AS\s+\S+\s*)?/i);
+      if (m) {
+        const idx = sql.indexOf(m[0]) + m[0].length;
         return {
           sql: `${sql.slice(0, idx)}WHERE tenant_id = ? ${sql.slice(idx)}`,
           params: [tenantId, ...params],
@@ -43,7 +63,6 @@ function injectTenant(sql, params, tenantId) {
     }
   }
 
-  // COUNT — 同样注入
   if (trimmed.startsWith('SELECT COUNT')) {
     if (hasWhere) {
       const idx = sql.indexOf(sql.match(/WHERE\s/i)[0]) + sql.match(/WHERE\s/i)[0].length;
@@ -54,25 +73,11 @@ function injectTenant(sql, params, tenantId) {
     }
   }
 
-  // INSERT — 自动添加 tenant_id 字段
   if (trimmed.startsWith('INSERT')) {
     const valuesIdx = sql.indexOf('VALUES');
     const beforeValues = sql.slice(0, valuesIdx);
-    const afterValues = sql.slice(valuesIdx);
-
-    if (beforeValues.includes('tenant_id')) {
-      return { sql, params };
-    }
-
+    if (beforeValues.includes('tenant_id')) return { sql, params };
     const parenIdx = beforeValues.lastIndexOf(')');
-    const newSql = `${beforeValues.slice(0, parenIdx)}, tenant_id)${afterValues}`;
-
-    // 找到 VALUES 后的第一个 ( 位置
-    const valParenIdx = afterValues.indexOf('(') + 1;
-    const newParams = [...params, tenantId];
-
-    // 需要重新插入参数 — 直接修改 SQL 的占位符数量
-    // INSERT INTO t (a, b) VALUES (?, ?) → INSERT INTO t (a, b, tenant_id) VALUES (?, ?, ?)
     return {
       sql: `${beforeValues.slice(0, parenIdx)}, tenant_id) VALUES (${params.map(() => '?').join(', ')}, ?)`,
       params: [...params, tenantId],
