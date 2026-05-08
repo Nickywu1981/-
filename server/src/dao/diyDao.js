@@ -52,7 +52,7 @@ export default {
     const result = { id: p.id, ownerId: p.owner_id, title: p.title, slug: p.slug, page_type: p.page_type, mobileConfig: parseJson(p.mobile_config), pcConfig: parseJson(p.pc_config), meta: parseJson(p.meta_json), publishTime: p.publish_time, version: p.latest_published_version };
     // 写入 Redis 缓存
     if (redis) {
-      try { await redis.setex(`${REDIS_KEY_PREFIX}${slug}`, REDIS_TTL, JSON.stringify(result)); } catch (_) {}
+      try { await redis.setex(`${REDIS_KEY_PREFIX}${slug}`, REDIS_TTL, JSON.stringify(result)); } catch { /* noop */ }
     }
     return result;
   },
@@ -174,14 +174,14 @@ export default {
   async cachePublishedPage(slug, data) {
     const redis = getRedis();
     if (redis) {
-      try { await redis.setex(`${REDIS_KEY_PREFIX}${slug}`, REDIS_TTL, JSON.stringify(data)); } catch (_) {}
+      try { await redis.setex(`${REDIS_KEY_PREFIX}${slug}`, REDIS_TTL, JSON.stringify(data)); } catch { /* noop */ }
     }
   },
 
   async clearPageCache(slug) {
     const redis = getRedis();
     if (redis) {
-      try { await redis.del(`${REDIS_KEY_PREFIX}${slug}`); } catch (_) {}
+      try { await redis.del(`${REDIS_KEY_PREFIX}${slug}`); } catch { /* noop */ }
     }
   },
 

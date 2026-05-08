@@ -58,7 +58,7 @@ export function metricsEndpoint(req, res) {
         metrics.db_pool_size = pool._allConnections.length;
       }
     }).catch(() => {});
-  } catch {}
+  } catch { /* noop */ }
 
   // 序列化为 Prometheus 格式
   const lines = ['# HELP http_requests_total Total HTTP requests', '# TYPE http_requests_total counter'];
