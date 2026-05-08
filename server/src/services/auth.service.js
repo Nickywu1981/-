@@ -14,7 +14,7 @@ function generateToken(user) {
   );
 }
 
-export async function register({ phone, email, password, nickname, inviteCode }) {
+export async function register({ phone, email, password, nickname, inviteCode: _inviteCode }) {
   const conn = await db.getConnection();
   try {
     await conn.beginTransaction();

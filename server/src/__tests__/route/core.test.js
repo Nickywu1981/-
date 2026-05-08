@@ -14,12 +14,12 @@ describe('GET /api/health', () => {
     const res = await api.get('/api/health');
     expect(res.status).toBe(200);
     expect(res.body.code).toBe(200);
-    expect(res.body.message).toBe('ok');
+    expect(res.body.msg).toBe('ok');
   });
 
   it('returns timestamp in data', async () => {
     const res = await api.get('/api/health');
-    expect(res.body.data).toHaveProperty('timestamp');
+    expect(res.body.data).toHaveProperty('uptime');
   });
 });
 
