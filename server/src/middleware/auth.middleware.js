@@ -22,7 +22,7 @@ export async function authMiddleware(req, res, next) {
     '/api/site-config/public', '/api/config/version/stream',
     '/api/templates/platforms', '/api/payment/plans',
     '/api/multilingual/languages', '/api/multilingual/script-types',
-    '/api/compliance/rules', '/api/badges',
+    '/api/compliance/rules', '/api/compliance/targets', '/api/badges',
     '/api/sms/send-code', '/api/sms/verify-code',
     '/api/email/send-code', '/api/email/verify-code',
     '/api/payment/notify', '/api/allinpay/notify',
