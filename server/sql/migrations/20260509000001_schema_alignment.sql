@@ -180,8 +180,8 @@ CREATE TABLE IF NOT EXISTS sys_config_log (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   group_key VARCHAR(64) NOT NULL,
   item_key VARCHAR(64) NOT NULL,
-  old_value TEXT DEFAULT '',
-  new_value TEXT DEFAULT '',
+  old_value TEXT,
+  new_value TEXT,
   changed_by INT DEFAULT NULL COMMENT '操作人 user.id',
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   INDEX idx_group_item (group_key, item_key)
