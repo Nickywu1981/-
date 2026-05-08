@@ -1,13 +1,13 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 vi.mock('../../dao/userDao.js');
-vi.mock('../../dao/db.js', () => ({ default: { execute: vi.fn() } }));
+vi.mock('../../dao/db.js', () => ({ default: { execute: vi.fn(), query: vi.fn() } }));
 vi.mock('bcrypt', () => ({ default: { hash: vi.fn().mockResolvedValue('hashed'), compare: vi.fn().mockResolvedValue(true) } }));
 vi.mock('jsonwebtoken', () => ({ default: { sign: vi.fn().mockReturnValue('fake-token'), verify: vi.fn() } }));
-vi.mock('../../config/index.js', () => ({ jwtSecret: 'test-secret', jwtExpiresIn: '7d' }));
+vi.mock('../../config/index.js', () => ({ jwtSecret: 'test-secret', jwtExpiresIn: '7d', jwtConfig: { secret: 'test-secret' } }));
 vi.mock('../../utils/sqlGuard.js', () => ({ guardSQL: vi.fn() }));
 
-import * as userService from '../../service/userService.js';
+import * as userService from '../../services/userService.js';
 import * as userDao from '../../dao/userDao.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -53,12 +53,12 @@ describe('userService', () => {
     });
 
     it('登录成功返回 token 和用户', async () => {
-      userDao.findByUsername.mockResolvedValue({ id: 1, username: 'u1', password: 'hash', status: 1, nickname: 'n1', phone: null, email: null, avatar: null });
+      userDao.findByUsername.mockResolvedValue({ id: 1, username: 'u1', password: 'hash', status: 1, nickname: 'n1', phone: null, email: null, avatar: null, role: 'user', tenant_id: 0 });
       bcrypt.compare.mockResolvedValue(true);
       userDao.updateLastLogin.mockResolvedValue(undefined);
       jwt.sign.mockReturnValue('fake-token');
       const r = await userService.login({ username: 'u1', password: 'p1' });
-      expect(r.token).toBe('fake-token');
+      expect(r.accessToken).toBe('fake-token');
       expect(r.user.username).toBe('u1');
       expect(userDao.updateLastLogin).toHaveBeenCalledWith(1);
     });

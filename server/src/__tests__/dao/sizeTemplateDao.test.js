@@ -1,8 +1,9 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 const mockExecute = vi.hoisted(() => vi.fn());
+const mockQuery = vi.hoisted(() => vi.fn());
 
-vi.mock('../../dao/db.js', () => ({ default: { execute: mockExecute } }));
+vi.mock('../../dao/db.js', () => ({ default: { execute: mockExecute, query: mockQuery } }));
 
 import * as sizeTemplateDao from '../../dao/sizeTemplateDao.js';
 

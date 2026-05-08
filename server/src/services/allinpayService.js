@@ -12,6 +12,12 @@ import membershipDao from '../dao/membershipDao.js';
 import rechargeDao from '../dao/rechargeDao.js';
 import logger from '../utils/logger.js';
 
+const PLANS = {
+  1: { name: '月卡', price: 29, days: 30, credits: 100 },
+  2: { name: '季卡', price: 69, days: 90, credits: 200 },
+  3: { name: '年卡', price: 199, days: 365, credits: 500 },
+};
+
 // ==================== 创建统一下单 ====================
 
 export async function createUnifiedOrder({ userId, orderType, businessId, amount, payChannel, body, remark }) {

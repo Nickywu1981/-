@@ -1,8 +1,9 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 const mockExecute = vi.hoisted(() => vi.fn());
+const mockQuery = vi.hoisted(() => vi.fn());
 
-vi.mock('../../dao/db.js', () => ({ default: { execute: mockExecute } }));
+vi.mock('../../dao/db.js', () => ({ default: { execute: mockExecute, query: mockQuery } }));
 vi.mock('uuid', () => ({ v4: vi.fn(() => 'mock-uuid-123') }));
 
 import * as taskDao from '../../dao/taskDao.js';

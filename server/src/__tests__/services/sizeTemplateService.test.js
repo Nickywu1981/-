@@ -2,7 +2,7 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 vi.mock('../../dao/sizeTemplateDao.js');
 
-import * as sizeTemplateService from '../../service/sizeTemplateService.js';
+import * as sizeTemplateService from '../../services/sizeTemplateService.js';
 import * as sizeTemplateDao from '../../dao/sizeTemplateDao.js';
 
 describe('sizeTemplateService', () => {

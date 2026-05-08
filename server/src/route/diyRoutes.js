@@ -3,7 +3,15 @@ import { authMiddleware, optionalAuth, adminAuth } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
 import { z } from 'zod';
-import { listPages, getPage, createPage, updatePage, publishPage, deletePage, getPublishedPage, saveVersion, listVersions, getVersion, listComponents, createComponent } from '../controller/diyController.js';
+import {
+  listPages, getPage, createPage, updatePage,
+  publishPage, unpublishPage, republishPage,
+  softDeletePage, restorePage, hardDeletePage,
+  clonePage, getPublishedPage,
+  saveVersion, autoSaveVersion, listVersions, getVersion, rollbackVersion, getLatestAutoVersion,
+  batchPublish, batchUnpublish, batchDelete,
+  listComponents, createComponent,
+} from '../controller/diyController.js';
 
 const router = Router();
 
@@ -11,7 +19,9 @@ const pageSchema = z.object({
   title: z.string().min(1, '标题不能为空').max(200),
   slug: z.string().min(1, '标识不能为空').max(100).regex(/^[a-z0-9_-]+$/, '标识仅允许小写字母、数字、下划线、连字符'),
   pageType: z.enum(['mobile', 'desktop', 'responsive']).optional(),
-  configJson: z.object({ sections: z.array(z.any()) }).optional(),
+  accessType: z.enum(['public', 'private']).optional(),
+  mobileConfig: z.object({ sections: z.array(z.any()) }).optional(),
+  pcConfig: z.object({ sections: z.array(z.any()) }).optional(),
   metaJson: z.object({}).passthrough().optional(),
 });
 const componentSchema = z.object({
@@ -20,25 +30,41 @@ const componentSchema = z.object({
   configJson: z.object({}).passthrough(),
   thumbnail: z.string().optional(),
 });
+const idsSchema = z.object({ ids: z.array(z.number().or(z.string())).min(1, '至少选择一项') });
 
-// 公开路由 - 访问已发布的DIY页面
+// ==================== 公开路由 ====================
 router.get('/published/:slug', optionalAuth, asyncHandler(getPublishedPage));
 
-// 需要认证
+// ==================== 认证路由 — CRUD ====================
 router.get('/', authMiddleware, asyncHandler(listPages));
 router.get('/components', authMiddleware, asyncHandler(listComponents));
 router.get('/:id', authMiddleware, asyncHandler(getPage));
 router.post('/', authMiddleware, adminAuth, validate(pageSchema), asyncHandler(createPage));
 router.put('/:id', authMiddleware, adminAuth, validate(pageSchema.partial()), asyncHandler(updatePage));
-router.post('/:id/publish', authMiddleware, adminAuth, asyncHandler(publishPage));
-router.delete('/:id', authMiddleware, adminAuth, asyncHandler(deletePage));
 
-// 版本管理
+// ==================== 状态机路由 ====================
+router.post('/:id/publish', authMiddleware, adminAuth, asyncHandler(publishPage));
+router.post('/:id/unpublish', authMiddleware, adminAuth, asyncHandler(unpublishPage));
+router.post('/:id/republish', authMiddleware, adminAuth, asyncHandler(republishPage));
+router.post('/:id/soft-delete', authMiddleware, adminAuth, asyncHandler(softDeletePage));
+router.post('/:id/restore', authMiddleware, adminAuth, asyncHandler(restorePage));
+router.delete('/:id/hard-delete', authMiddleware, adminAuth, asyncHandler(hardDeletePage));
+router.post('/:id/clone', authMiddleware, adminAuth, asyncHandler(clonePage));
+
+// ==================== 版本管理 ====================
 router.get('/:id/versions', authMiddleware, asyncHandler(listVersions));
+router.get('/:id/versions/latest-auto', authMiddleware, asyncHandler(getLatestAutoVersion));
 router.get('/:id/versions/:version', authMiddleware, asyncHandler(getVersion));
 router.post('/:id/versions', authMiddleware, adminAuth, asyncHandler(saveVersion));
+router.post('/:id/versions/auto-save', authMiddleware, adminAuth, asyncHandler(autoSaveVersion));
+router.post('/:id/versions/:version/rollback', authMiddleware, adminAuth, asyncHandler(rollbackVersion));
 
-// 组件库管理
+// ==================== 批量操作 ====================
+router.post('/batch/publish', authMiddleware, adminAuth, validate(idsSchema), asyncHandler(batchPublish));
+router.post('/batch/unpublish', authMiddleware, adminAuth, validate(idsSchema), asyncHandler(batchUnpublish));
+router.post('/batch/delete', authMiddleware, adminAuth, validate(idsSchema), asyncHandler(batchDelete));
+
+// ==================== 组件库 ====================
 router.post('/components', authMiddleware, adminAuth, validate(componentSchema), asyncHandler(createComponent));
 
 export default router;

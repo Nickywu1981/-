@@ -10,7 +10,10 @@ const { mockGet, mockSet, mockConnect, mockClient } = vi.hoisted(() => {
 });
 
 vi.mock('redis', () => ({ createClient: vi.fn(() => mockClient) }));
-vi.mock('../../config/index.js', () => ({ redis: { host: 'localhost', port: 6379, password: '' } }));
+vi.mock('../../config/index.js', () => ({
+  default: { redis: { host: 'localhost', port: 6379, password: '' }, port: 3001, env: 'test' },
+  redis: { host: 'localhost', port: 6379, password: '' },
+}));
 
 import * as redisDao from '../../dao/redis.js';
 

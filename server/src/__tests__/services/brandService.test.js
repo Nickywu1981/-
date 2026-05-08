@@ -9,7 +9,7 @@ vi.mock('../../dao/brandDao.js', () => ({
   upsertBrand: mockUpsertBrand,
 }));
 
-import * as brandService from '../../service/brandService.js';
+import * as brandService from '../../services/brandService.js';
 
 describe('brandService', () => {
   beforeEach(() => { vi.clearAllMocks(); });

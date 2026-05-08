@@ -1,8 +1,9 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 const mockExecute = vi.hoisted(() => vi.fn());
+const mockQuery = vi.hoisted(() => vi.fn());
 
-vi.mock('../../dao/db.js', () => ({ default: { execute: mockExecute } }));
+vi.mock('../../dao/db.js', () => ({ default: { execute: mockExecute, query: mockQuery } }));
 
 import * as userDao from '../../dao/userDao.js';
 
@@ -15,7 +16,7 @@ describe('userDao', () => {
     expect(id).toBe(99);
     expect(mockExecute).toHaveBeenCalledWith(
       expect.stringContaining('INSERT INTO user'),
-      ['u1', 'p1', 'n1'],
+      ['u1', 'p1', 'n1', 0],
     );
   });
 

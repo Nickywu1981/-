@@ -1,9 +1,10 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 const mockExecute = vi.hoisted(() => vi.fn());
+const mockQuery = vi.hoisted(() => vi.fn());
 
 // batchTemplateDao.js imports pool from '../dao/db.js', same path from test perspective
-vi.mock('../../dao/db.js', () => ({ default: { execute: mockExecute } }));
+vi.mock('../../dao/db.js', () => ({ default: { execute: mockExecute, query: mockQuery } }));
 
 import * as batchTemplateDao from '../../dao/batchTemplateDao.js';
 

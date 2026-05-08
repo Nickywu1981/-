@@ -2,7 +2,26 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import jwt from 'jsonwebtoken';
 
 vi.mock('jsonwebtoken', () => ({ default: { verify: vi.fn(), sign: vi.fn() } }));
-vi.mock('../../config/index.js', () => ({ jwtSecret: 'test-secret' }));
+vi.mock('../../config/index.js', () => ({
+  jwtSecret: 'test-secret',
+  jwtConfig: { secret: 'test-secret' },
+}));
+vi.mock('../../utils/jwtToken.js', () => ({
+  isTokenBlacklisted: vi.fn().mockResolvedValue(false),
+  generateTokens: vi.fn(),
+  refreshAccessToken: vi.fn(),
+  revokeAccessToken: vi.fn(),
+  revokeAllUserTokens: vi.fn(),
+}));
+vi.mock('../../utils/response.js', () => ({
+  error: vi.fn((res, code, msg) => {
+    res.status(code);
+    return res.json({ code, msg, data: null });
+  }),
+}));
+vi.mock('../../constants/errorCode.js', () => ({
+  ERROR_CODE: { UNAUTHORIZED: 401, EC_AUTH_002: 401, FORBIDDEN: 403 },
+}));
 
 import { authMiddleware, optionalAuth } from '../../middleware/auth.js';
 
@@ -10,36 +29,52 @@ describe('authMiddleware', () => {
   let req, res, next;
 
   beforeEach(() => {
-    req = { headers: {} };
+    req = { headers: {}, path: '/api/some-protected-route' };
     res = mockRes();
     next = vi.fn();
     vi.clearAllMocks();
   });
 
-  it('无 header 返回 401', () => {
-    authMiddleware(req, res, next);
+  it('无 header 返回 401', async () => {
+    await authMiddleware(req, res, next);
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 401 }));
   });
 
-  it('非 Bearer header 返回 401', () => {
+  it('非 Bearer header 返回 401', async () => {
     req.headers.authorization = 'Basic xxx';
-    authMiddleware(req, res, next);
+    await authMiddleware(req, res, next);
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 401 }));
   });
 
-  it('有效 token 设置 req.user', () => {
+  it('有效 token 设置 req.user', async () => {
     req.headers.authorization = 'Bearer valid_token';
     jwt.verify.mockReturnValue({ userId: 1, username: 'test' });
-    authMiddleware(req, res, next);
+    await authMiddleware(req, res, next);
     expect(req.user).toEqual({ userId: 1, username: 'test' });
     expect(next).toHaveBeenCalled();
   });
 
-  it('过期/无效 token 返回 401', () => {
+  it('过期/无效 token 返回 401', async () => {
     req.headers.authorization = 'Bearer bad_token';
     jwt.verify.mockImplementation(() => { throw new Error('jwt expired'); });
-    authMiddleware(req, res, next);
+    await authMiddleware(req, res, next);
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 401 }));
+  });
+});
+
+// 公开路径 — 直接放行
+describe('authMiddleware — public paths', () => {
+  let req, res, next;
+
+  beforeEach(() => {
+    res = mockRes();
+    next = vi.fn();
+  });
+
+  it('/api/auth/login 跳过认证', async () => {
+    req = { headers: {}, path: '/api/auth/login' };
+    await authMiddleware(req, res, next);
+    expect(next).toHaveBeenCalled();
   });
 });
 
@@ -59,24 +94,24 @@ describe('optionalAuth', () => {
     vi.clearAllMocks();
   });
 
-  it('无 header 继续执行不设 user', () => {
-    optionalAuth(req, undefined, next);
+  it('无 header 继续执行不设 user', async () => {
+    await optionalAuth(req, undefined, next);
     expect(req.user).toBeUndefined();
     expect(next).toHaveBeenCalled();
   });
 
-  it('有效 token 附加 user', () => {
+  it('有效 token 附加 user', async () => {
     req.headers.authorization = 'Bearer valid_token';
     jwt.verify.mockReturnValue({ userId: 2 });
-    optionalAuth(req, undefined, next);
+    await optionalAuth(req, undefined, next);
     expect(req.user).toEqual({ userId: 2 });
     expect(next).toHaveBeenCalled();
   });
 
-  it('无效 token 不阻塞', () => {
+  it('无效 token 不阻塞', async () => {
     req.headers.authorization = 'Bearer bad';
     jwt.verify.mockImplementation(() => { throw new Error('bad'); });
-    optionalAuth(req, undefined, next);
+    await optionalAuth(req, undefined, next);
     expect(req.user).toBeUndefined();
     expect(next).toHaveBeenCalled();
   });

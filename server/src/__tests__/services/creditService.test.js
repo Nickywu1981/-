@@ -3,9 +3,10 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 vi.mock('../../dao/creditDao.js');
 
 const mockExecute = vi.hoisted(() => vi.fn());
-vi.mock('../../dao/db.js', () => ({ default: { execute: mockExecute } }));
+const mockQuery = vi.hoisted(() => vi.fn());
+vi.mock('../../dao/db.js', () => ({ default: { execute: mockExecute, query: mockQuery } }));
 
-import * as creditService from '../../service/creditService.js';
+import * as creditService from '../../services/creditService.js';
 import * as creditDao from '../../dao/creditDao.js';
 
 describe('creditService', () => {

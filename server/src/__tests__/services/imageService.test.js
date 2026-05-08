@@ -1,11 +1,11 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 vi.mock('../../dao/taskDao.js');
-vi.mock('../../service/creditService.js');
+vi.mock('../../services/creditService.js');
 
 import * as imageService from '../../services/imageService.js';
 import * as taskDao from '../../dao/taskDao.js';
-import * as creditService from '../../service/creditService.js';
+import * as creditService from '../../services/creditService.js';
 
 describe('imageService', () => {
   beforeEach(() => { vi.clearAllMocks(); });

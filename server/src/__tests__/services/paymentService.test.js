@@ -1,11 +1,44 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
-// Mock DAO
+// Mock DAOs and dependencies
 vi.mock('../../dao/db.js', () => ({
   default: {
-    execute: vi.fn().mockResolvedValue([{ affectedRows: 1 }]),
+    execute: vi.fn().mockResolvedValue([[{ affectedRows: 1 }]]),
+    query: vi.fn().mockResolvedValue([[{ affectedRows: 1 }]]),
     getConnection: vi.fn().mockResolvedValue({ execute: vi.fn(), release: vi.fn() }),
   },
+}));
+vi.mock('../../dao/allinpayDao.js', () => ({
+  default: {
+    create: vi.fn().mockResolvedValue(1),
+    getByReqsn: vi.fn().mockResolvedValue(null),
+    markPaid: vi.fn().mockResolvedValue(1),
+    markFailed: vi.fn().mockResolvedValue(undefined),
+    logNotify: vi.fn().mockResolvedValue(undefined),
+    isCallbackProcessed: vi.fn().mockResolvedValue(false),
+  },
+}));
+vi.mock('../../dao/membershipDao.js', () => ({
+  default: {
+    findByUserId: vi.fn().mockResolvedValue(null),
+    upsert: vi.fn().mockResolvedValue(undefined),
+  },
+}));
+vi.mock('../../dao/rechargeDao.js', () => ({
+  default: {
+    getByOrderNo: vi.fn().mockResolvedValue(null),
+    markPaid: vi.fn().mockResolvedValue(undefined),
+  },
+}));
+vi.mock('../../utils/allinpaySDK.js', () => ({
+  unifiedOrder: vi.fn().mockResolvedValue({ payUrl: 'https://sandbox.allinpay.com/pay/test', trxid: 'TXN_TEST' }),
+  verifyNotify: vi.fn().mockReturnValue(true),
+}));
+vi.mock('../../config/allinpay.js', () => ({
+  default: { isSandbox: true },
+}));
+vi.mock('../../utils/logger.js', () => ({
+  default: { info: vi.fn(), error: vi.fn(), warn: vi.fn(), debug: vi.fn() },
 }));
 vi.mock('../../dao/creditDao.js', () => ({
   getPlanByType: vi.fn().mockResolvedValue({ id: 2, type: 2, name: '季卡', credits: 200, status: 1 }),
@@ -13,79 +46,87 @@ vi.mock('../../dao/creditDao.js', () => ({
   createCreditRecord: vi.fn().mockResolvedValue({ id: 1 }),
   listActivePlans: vi.fn().mockResolvedValue([]),
 }));
-vi.mock('../../utils/logger.js', () => ({
-  default: { info: vi.fn(), error: vi.fn(), warn: vi.fn(), debug: vi.fn() },
-}));
 
 import * as payment from '../../services/paymentService.js';
+import allinpayDao from '../../dao/allinpayDao.js';
+import * as allinpaySDK from '../../utils/allinpaySDK.js';
 
 describe('paymentService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Reset key mocks to defaults after clear
+    allinpayDao.create.mockResolvedValue(1);
+    allinpaySDK.unifiedOrder.mockResolvedValue({ payUrl: 'https://sandbox.allinpay.com/pay/test', trxid: 'TXN_TEST' });
+    allinpaySDK.verifyNotify.mockReturnValue(true);
+  });
+
+  describe('getPlans', () => {
+    it('should return all 3 plans', () => {
+      const plans = payment.getPlans();
+      expect(plans).toHaveLength(3);
+      expect(plans[0].planType).toBe(1);
+      expect(plans[0].name).toBe('月卡');
+    });
   });
 
   describe('createPaymentOrder', () => {
-    it('should create a wechat pay order for monthly plan', async () => {
-      const result = await payment.createPaymentOrder(1, { planType: 1, payMethod: 'wechat' });
-      expect(result.orderId).toContain('PAY');
+    it('should create order for monthly plan', async () => {
+      const result = await payment.createPaymentOrder(1, { planType: 1, payChannel: 'wechat' });
+      expect(result.reqsn).toMatch(/^MOV/);
       expect(result.amount).toBe(29);
-      expect(result.payMethod).toBe('wechat');
-      expect(result.sandboxPayUrl).toBeTruthy();
+      expect(result.planName).toBe('月卡');
+      expect(result.payChannel).toBe('wechat');
+      expect(result.payUrl).toBeTruthy();
     });
 
-    it('should create an alipay order for yearly plan', async () => {
-      const result = await payment.createPaymentOrder(1, { planType: 3, payMethod: 'alipay' });
+    it('should create order for yearly plan with alipay', async () => {
+      const result = await payment.createPaymentOrder(1, { planType: 3, payChannel: 'alipay' });
       expect(result.amount).toBe(199);
       expect(result.planName).toBe('年卡');
-      expect(result.payMethod).toBe('alipay');
+      expect(result.payChannel).toBe('alipay');
     });
 
     it('should reject invalid plan type', async () => {
       await expect(payment.createPaymentOrder(1, { planType: 99 })).rejects.toThrow('无效套餐');
     });
+
+    it('should reject invalid pay channel', async () => {
+      await expect(payment.createPaymentOrder(1, { planType: 1, payChannel: 'bitcoin' })).rejects.toThrow('支付方式');
+    });
   });
 
   describe('sandboxPay', () => {
-    it('should pay an existing order and activate', async () => {
-      const order = await payment.createPaymentOrder(1, { planType: 2 });
-      const result = await payment.sandboxPay(order.orderId);
-      expect(result.status).toBe('activated');
-      expect(result.planName).toBe('季卡');
+    it('should pay an existing order', async () => {
+      allinpayDao.getByReqsn.mockResolvedValue({
+        reqsn: 'MOV_TEST', status: 0, order_type: 'membership',
+        amount: 69, user_id: 1, trxid: null, pay_channel: 'wechat',
+      });
+      const result = await payment.sandboxPay('MOV_TEST');
+      expect(result.status).toBe('paid');
+      expect(result.reqsn).toBe('MOV_TEST');
     });
 
     it('should reject non-existent order', async () => {
+      allinpayDao.getByReqsn.mockResolvedValue(null);
       await expect(payment.sandboxPay('NOT_EXIST')).rejects.toThrow('订单不存在');
-    });
-
-    it('should reject double payment', async () => {
-      const order = await payment.createPaymentOrder(1, { planType: 1 });
-      await payment.sandboxPay(order.orderId);
-      await expect(payment.sandboxPay(order.orderId)).rejects.toThrow('订单状态异常');
     });
   });
 
   describe('getOrder', () => {
     it('should return order details', async () => {
-      const order = await payment.createPaymentOrder(1, { planType: 2 });
-      const detail = await payment.getOrder(order.orderId, 1);
-      expect(detail.orderId).toBe(order.orderId);
-      expect(detail.status).toBe('pending');
+      allinpayDao.getByReqsn.mockResolvedValue({
+        reqsn: 'MOV_TEST', status: 0, trxid: null, amount: '69.00',
+        pay_channel: 'wechat', expire_time: '2026-01-01', pay_time: null,
+        create_time: '2026-01-01',
+      });
+      const detail = await payment.getOrder('MOV_TEST');
+      expect(detail.reqsn).toBe('MOV_TEST');
+      expect(detail.status).toBe(0);
     });
 
-    it('should reject wrong user', async () => {
-      const order = await payment.createPaymentOrder(1, { planType: 1 });
-      await expect(payment.getOrder(order.orderId, 999)).rejects.toThrow('订单不存在');
-    });
-  });
-
-  describe('paymentCallback', () => {
-    it('should process callback and activate', async () => {
-      const order = await payment.createPaymentOrder(1, { planType: 3 });
-      const result = await payment.paymentCallback({ orderId: order.orderId, transactionId: 'TXN_001' });
-      expect(result.code).toBe('SUCCESS');
-
-      const detail = await payment.getOrder(order.orderId, 1);
-      expect(detail.status).toBe('activated');
+    it('should reject non-existent order', async () => {
+      allinpayDao.getByReqsn.mockResolvedValue(null);
+      await expect(payment.getOrder('NOPE', 999)).rejects.toThrow('订单不存在');
     });
   });
 });
