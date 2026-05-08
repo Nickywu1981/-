@@ -23,6 +23,18 @@ const groupSchema = z.object({
   name: z.string().min(1).max(100),
 });
 
+const toggleFavoriteSchema = z.object({
+  templateId: z.coerce.number().int().positive('模板ID无效'),
+  groupId: z.coerce.number().int().positive().optional(),
+});
+const recordUsageSchema = z.object({
+  filledContent: z.string().max(10000).optional(),
+  modelType: z.string().max(50).optional(),
+});
+const rateSchema = z.object({
+  score: z.coerce.number().int().min(1, '最低1分').max(5, '最高5分'),
+});
+
 router.use(authMiddleware);
 
 // 模板（支持 /api/prompts 和 /api/prompts/templates）
@@ -35,7 +47,7 @@ router.post('/templates/:id/fill', validate(fillSchema), asyncHandler(fillAndPre
 
 // 收藏
 router.get('/favorites', asyncHandler(listFavorites));
-router.post('/favorites/toggle', asyncHandler(toggleFavorite));
+router.post('/favorites/toggle', validate(toggleFavoriteSchema), asyncHandler(toggleFavorite));
 
 // 分组
 router.get('/groups', asyncHandler(listGroups));
@@ -48,10 +60,10 @@ router.get('/recommendations', asyncHandler(getRecommendations));
 
 // 使用历史
 router.get('/usage-history', asyncHandler(usageHistory));
-router.post('/:id/use', asyncHandler(recordUsage));
+router.post('/:id/use', validate(recordUsageSchema), asyncHandler(recordUsage));
 
 // 评分
-router.post('/:id/rate', asyncHandler(rateTemplate));
+router.post('/:id/rate', validate(rateSchema), asyncHandler(rateTemplate));
 router.get('/:id/rating', asyncHandler(getTemplateRating));
 
 export default router;

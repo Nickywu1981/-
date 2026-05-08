@@ -27,6 +27,8 @@ const sendNotificationSchema = z.object({
   params: z.record(z.string()).optional(),
 });
 
+const smsTemplateSchema = z.object({}).passthrough();
+
 // 公开 — 验证码收发
 router.post('/send-code', codeLimiter, validate(sendCodeSchema), asyncHandler(sendVerificationCode));
 router.post('/verify-code', codeLimiter, validate(verifyCodeSchema), asyncHandler(verifyCode));
@@ -36,8 +38,8 @@ router.post('/send', authMiddleware, validate(sendNotificationSchema), asyncHand
 
 // 管理后台 — 模板管理 + 日志
 router.get('/templates', authMiddleware, adminAuth, asyncHandler(listTemplates));
-router.post('/templates', authMiddleware, adminAuth, asyncHandler(createTemplate));
-router.put('/templates/:id', authMiddleware, adminAuth, asyncHandler(updateTemplate));
+router.post('/templates', authMiddleware, adminAuth, validate(smsTemplateSchema), asyncHandler(createTemplate));
+router.put('/templates/:id', authMiddleware, adminAuth, validate(smsTemplateSchema), asyncHandler(updateTemplate));
 router.delete('/templates/:id', authMiddleware, adminAuth, asyncHandler(deleteTemplate));
 router.get('/logs', authMiddleware, adminAuth, asyncHandler(listLogs));
 

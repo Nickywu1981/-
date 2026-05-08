@@ -35,6 +35,16 @@ const componentSchema = z.object({
 });
 const idsSchema = z.object({ ids: z.array(z.number().or(z.string())).min(1, '至少选择一项') });
 
+const versionSaveSchema = z.object({
+  mobileConfig: z.any().optional(),
+  pcConfig: z.any().optional(),
+  remark: z.string().max(500).optional(),
+});
+const autoSaveSchema = z.object({
+  mobileConfig: z.any().optional(),
+  pcConfig: z.any().optional(),
+});
+
 // ==================== 公开路由 ====================
 router.get('/published/:slug', optionalAuth, asyncHandler(getPublishedPage));
 
@@ -65,8 +75,8 @@ router.post('/:id/clone', authMiddleware, editorOrAbove, asyncHandler(clonePage)
 router.get('/:id/versions', authMiddleware, asyncHandler(listVersions));
 router.get('/:id/versions/latest-auto', authMiddleware, asyncHandler(getLatestAutoVersion));
 router.get('/:id/versions/:version', authMiddleware, asyncHandler(getVersion));
-router.post('/:id/versions', authMiddleware, editorOrAbove, asyncHandler(saveVersion));
-router.post('/:id/versions/auto-save', authMiddleware, editorOrAbove, asyncHandler(autoSaveVersion));
+router.post('/:id/versions', authMiddleware, editorOrAbove, validate(versionSaveSchema), asyncHandler(saveVersion));
+router.post('/:id/versions/auto-save', authMiddleware, editorOrAbove, validate(autoSaveSchema), asyncHandler(autoSaveVersion));
 router.post('/:id/versions/:version/rollback', authMiddleware, editorOrAbove, asyncHandler(rollbackVersion));
 
 // ==================== 批量操作 ====================

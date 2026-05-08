@@ -57,6 +57,8 @@ const voiceCloneSchema = z.object({
   presetVoice: z.string().optional(),
 });
 
+const videoEditSchema = z.object({}).passthrough();
+
 router.post('/script-gen', authMiddleware, heavyLimiter, validate(scriptGenSchema), asyncHandler(submitScriptGen));
 router.post('/shot-plan', authMiddleware, heavyLimiter, validate(shotPlanSchema), asyncHandler(submitShotPlan));
 router.post('/viral-clone', authMiddleware, heavyLimiter, validate(viralCloneSchema), asyncHandler(submitViralClone));
@@ -66,7 +68,7 @@ router.post('/action-batch', authMiddleware, heavyLimiter, validate(actionBatchS
 router.post('/beautify', authMiddleware, heavyLimiter, validate(videoBeautifySchema), asyncHandler(submitVideoBeautify));
 router.post('/voice-gen', authMiddleware, heavyLimiter, validate(voiceGenSchema), asyncHandler(submitVoiceGen));
 router.post('/voice-clone', authMiddleware, heavyLimiter, validate(voiceCloneSchema), asyncHandler(submitVoiceClone));
-router.post('/video-edit', authMiddleware, heavyLimiter, asyncHandler(submitVideoEdit));
+router.post('/video-edit', authMiddleware, heavyLimiter, validate(videoEditSchema), asyncHandler(submitVideoEdit));
 
 router.get('/tasks', authMiddleware, asyncHandler(listMyTasks));
 router.get('/tasks/:taskId', authMiddleware, asyncHandler(getTaskResult));

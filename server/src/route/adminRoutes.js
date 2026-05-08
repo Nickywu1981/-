@@ -48,6 +48,14 @@ const sendNotificationSchema = z.object({
   title: z.string().min(1, '标题不能为空').max(200),
   content: z.string().min(1, '内容不能为空'),
 });
+const userStatusSchema = z.object({
+  status: z.union([z.literal(0), z.literal(1)]),
+});
+const promptReviewSchema = z.object({
+  status: z.coerce.number().int(),
+  reviewRemark: z.string().max(500).optional(),
+});
+const adminPromptSchema = z.object({}).passthrough();
 
 // 看板
 router.get('/stats', authMiddleware, adminAuth, asyncHandler(getDashboardStats));
@@ -55,7 +63,7 @@ router.get('/dashboard', authMiddleware, adminAuth, asyncHandler(getDashboardSta
 // 用户
 router.get('/users', authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(listAllUsers));
 router.put('/users/:id', authMiddleware, adminAuth, validate(updateUserSchema), asyncHandler(updateUser));
-router.put('/users/:userId/status', authMiddleware, adminAuth, asyncHandler(updateUserStatus));
+router.put('/users/:userId/status', authMiddleware, adminAuth, validate(userStatusSchema), asyncHandler(updateUserStatus));
 router.put('/users/batch-status', authMiddleware, adminAuth, validate(batchUserStatusSchema), asyncHandler(batchUpdateUserStatus));
 // 任务
 router.get('/tasks', authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(listAllTasks));
@@ -81,8 +89,8 @@ router.post('/sensitive-words', authMiddleware, adminAuth, validate(sensitiveWor
 router.delete('/sensitive-words/:id', authMiddleware, adminAuth, asyncHandler(deleteSensitiveWord));
 // 提示词
 router.get('/prompts', authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(adminListTemplates));
-router.post('/prompts', authMiddleware, adminAuth, asyncHandler(adminSaveTemplate));
-router.put('/prompts/:id/review', authMiddleware, adminAuth, asyncHandler(adminReviewTemplate));
+router.post('/prompts', authMiddleware, adminAuth, validate(adminPromptSchema), asyncHandler(adminSaveTemplate));
+router.put('/prompts/:id/review', authMiddleware, adminAuth, validate(promptReviewSchema), asyncHandler(adminReviewTemplate));
 router.delete('/prompts/:id', authMiddleware, adminAuth, asyncHandler(adminDeleteTemplate));
 // 积分
 router.get('/credits', authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(listCreditRecords));
