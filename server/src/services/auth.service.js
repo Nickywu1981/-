@@ -2,9 +2,7 @@ import { BusinessError } from '../utils/businessError.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import db from '../dao/db.js';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'movio-jwt-secret-dev-32bytes!!';
-const JWT_EXPIRES = 7 * 24 * 60 * 60;
+import { jwtSecret as JWT_SECRET, jwtExpiresIn as JWT_EXPIRES } from '../config/index.js';
 
 function generateToken(user) {
   return jwt.sign(
