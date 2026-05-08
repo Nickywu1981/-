@@ -11,6 +11,7 @@ import {
   saveVersion, autoSaveVersion, listVersions, getVersion, rollbackVersion, getLatestAutoVersion,
   batchPublish, batchUnpublish, batchDelete,
   listComponents, createComponent,
+  listTemplates, getTemplate, useTemplate, listTemplateIndustries,
 } from '../controller/diyController.js';
 
 const router = Router();
@@ -66,5 +67,11 @@ router.post('/batch/delete', authMiddleware, adminAuth, validate(idsSchema), asy
 
 // ==================== 组件库 ====================
 router.post('/components', authMiddleware, adminAuth, validate(componentSchema), asyncHandler(createComponent));
+
+// ==================== 模板库 ====================
+router.get('/templates/industries', authMiddleware, asyncHandler(listTemplateIndustries));
+router.get('/templates', authMiddleware, asyncHandler(listTemplates));
+router.get('/templates/:id', authMiddleware, asyncHandler(getTemplate));
+router.post('/templates/:id/use', authMiddleware, asyncHandler(useTemplate));
 
 export default router;
