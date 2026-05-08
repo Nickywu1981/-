@@ -128,6 +128,7 @@ export default defineNuxtConfig({
       '/_nuxt/**': { headers: { 'cache-control': 'public, max-age=31536000, immutable' } },
       '/favicon.svg': { headers: { 'cache-control': 'public, max-age=604800' } },
       '/manifest.json': { headers: { 'cache-control': 'public, max-age=86400' } },
+      '/auth/login': { redirect: '/login' },
     },
   },
 

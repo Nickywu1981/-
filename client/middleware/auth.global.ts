@@ -5,7 +5,7 @@
 export default defineNuxtRouteMiddleware(async (to) => {
   // 公开路由
   const publicPaths = [
-    '/', '/login', '/register', '/auth/login', '/auth/register',
+    '/', '/login', '/register', '/auth/register',
     '/auth/reset-password', '/help', '/compare', '/legal/terms', '/legal/privacy',
     '/forgot-password',
   ]

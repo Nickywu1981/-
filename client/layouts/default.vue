@@ -124,7 +124,7 @@
     <!-- 全局搜索面板 (Ctrl+K) -->
     <CommandPalette />
     <!-- 新手引导（首次访问自动弹出） -->
-    <StepWizard />
+    <OnboardingGuide />
     <!-- 全局 Toast 通知 -->
     <Toast />
   </div>

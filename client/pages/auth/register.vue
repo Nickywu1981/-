@@ -43,7 +43,7 @@
       </form>
 
       <div class="auth-footer">
-        <NuxtLink to="/auth/login">
+        <NuxtLink to="/login">
           {{ config.btn_to_login || '已有账号？去登录' }}
         </NuxtLink>
       </div>

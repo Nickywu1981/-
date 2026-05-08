@@ -77,7 +77,7 @@ import cutEcosystemRoutesV4 from './route/v4_cut_ecosystem.routes.js';
 import { adminRouter as siteConfigAdminRouter, publicRouter as siteConfigPublicRouter } from './route/siteConfigRoutes.js';
 import tenantContext from './middleware/tenantContext.js';
 import { metricsMiddleware, metricsEndpoint } from './middleware/metrics.js';
-import { csrfProtection } from './middleware/csrf.js';
+import { setCsrfCookie, csrfProtection } from './middleware/csrf.js';
 import cspMiddleware from './middleware/csp.js';
 import paramFilter from './middleware/paramFilter.js';
 import openApiRoutes from './route/openApiRoutes.js';
@@ -116,6 +116,9 @@ app.use(sqlGuardMiddleware);
 
 // 请求日志
 app.use(requestLogger);
+
+// CSRF Token 生成 (所有请求) — 必须在 csrfProtection 之前
+app.use(setCsrfCookie);
 
 // CSRF 双重提交 Cookie 防护 (POST/PUT/PATCH/DELETE)
 app.use(csrfProtection);

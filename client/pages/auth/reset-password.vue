@@ -46,7 +46,7 @@
       </form>
 
       <div class="auth-footer">
-        <NuxtLink to="/auth/login">返回登录</NuxtLink>
+        <NuxtLink to="/login">返回登录</NuxtLink>
       </div>
     </div>
   </div>
@@ -114,7 +114,7 @@ async function handleReset() {
     const res: any = await $fetch('/api/auth/reset-password', { method: 'POST', body, credentials: 'include' })
     if (res.code === 200) {
       successMsg.value = '密码重置成功，3秒后跳转登录'
-      setTimeout(() => navigateTo('/auth/login'), 3000)
+      setTimeout(() => navigateTo('/login'), 3000)
     } else {
       errorMsg.value = res.msg || '重置失败'
     }
