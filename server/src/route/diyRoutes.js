@@ -40,6 +40,13 @@ router.get('/published/:slug', optionalAuth, asyncHandler(getPublishedPage));
 // ==================== 认证路由 — CRUD ====================
 router.get('/', authMiddleware, asyncHandler(listPages));
 router.get('/components', authMiddleware, asyncHandler(listComponents));
+
+// ==================== 模板库 — 必须在 /:id 之前注册 ====================
+router.get('/templates/industries', authMiddleware, asyncHandler(listTemplateIndustries));
+router.get('/templates', authMiddleware, asyncHandler(listTemplates));
+router.get('/templates/:id', authMiddleware, asyncHandler(getTemplate));
+router.post('/templates/:id/use', authMiddleware, asyncHandler(useTemplate));
+
 router.get('/:id', authMiddleware, asyncHandler(getPage));
 router.post('/', authMiddleware, editorOrAbove, validate(pageSchema), asyncHandler(createPage));
 router.put('/:id', authMiddleware, editorOrAbove, validate(pageSchema.partial()), asyncHandler(updatePage));
@@ -68,11 +75,5 @@ router.post('/batch/delete', authMiddleware, adminOnly, validate(idsSchema), asy
 
 // ==================== 组件库 ====================
 router.post('/components', authMiddleware, editorOrAbove, validate(componentSchema), asyncHandler(createComponent));
-
-// ==================== 模板库 ====================
-router.get('/templates/industries', authMiddleware, asyncHandler(listTemplateIndustries));
-router.get('/templates', authMiddleware, asyncHandler(listTemplates));
-router.get('/templates/:id', authMiddleware, asyncHandler(getTemplate));
-router.post('/templates/:id/use', authMiddleware, asyncHandler(useTemplate));
 
 export default router;
