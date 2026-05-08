@@ -71,17 +71,13 @@ function generateCode(len = 6) {
 
 export async function sendVerificationCode(email, scene = 'login') {
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    const err = new Error('请输入有效邮箱地址');
-    err.statusCode = 400;
-    throw err;
+    throw new BusinessError(400, '请输入有效邮箱地址');
   }
 
   // 频率控制：60秒内不可重复发送
   const cached = CODE_CACHE.get(email);
   if (cached && Date.now() - cached.lastSent < 60000) {
-    const err = new Error('发送过于频繁，请60秒后再试');
-    err.statusCode = 429;
-    throw err;
+    throw new BusinessError(429, '发送过于频繁，请60秒后再试');
   }
 
   const code = generateCode(6);
@@ -99,9 +95,7 @@ export async function sendVerificationCode(email, scene = 'login') {
 
   const templateCode = templateCodeMap[scene];
   if (!templateCode) {
-    const err = new Error('不支持的邮件场景');
-    err.statusCode = 400;
-    throw err;
+    throw new BusinessError(400, '不支持的邮件场景');
   }
 
   // 从数据库读取模板，失败则降级为内置模板
@@ -150,31 +144,23 @@ export async function sendVerificationCode(email, scene = 'login') {
 export function verifyCode(email, code) {
   const cached = CODE_CACHE.get(email);
   if (!cached) {
-    const err = new Error('请先获取验证码');
-    err.statusCode = 400;
-    throw err;
+    throw new BusinessError(400, '请先获取验证码');
   }
 
   // 防爆破：最多5次错误
   if (cached.attempts >= 5) {
     CODE_CACHE.delete(email);
-    const err = new Error('验证码错误次数过多，请重新获取');
-    err.statusCode = 429;
-    throw err;
+    throw new BusinessError(429, '验证码错误次数过多，请重新获取');
   }
 
   if (Date.now() > cached.expires) {
     CODE_CACHE.delete(email);
-    const err = new Error('验证码已过期，请重新获取');
-    err.statusCode = 400;
-    throw err;
+    throw new BusinessError(400, '验证码已过期，请重新获取');
   }
 
   if (cached.code !== String(code)) {
     cached.attempts++;
-    const err = new Error('验证码错误');
-    err.statusCode = 400;
-    throw err;
+    throw new BusinessError(400, '验证码错误');
   }
 
   // 验证通过后删除缓存 + 设置已验证标记

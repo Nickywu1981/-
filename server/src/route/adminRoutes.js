@@ -55,7 +55,20 @@ const promptReviewSchema = z.object({
   status: z.coerce.number().int(),
   reviewRemark: z.string().max(500).optional(),
 });
-const adminPromptSchema = z.object({}).passthrough();
+const adminPromptSchema = z.object({
+  id: z.coerce.number().int().positive().optional(),
+  templateCode: z.string().max(100).optional(),
+  category: z.string().min(1, '类别不能为空').max(50),
+  title: z.string().min(1, '标题不能为空').max(200),
+  description: z.string().max(500).optional(),
+  content: z.string().min(1, '内容不能为空').max(5000),
+  variables: z.array(z.string()).optional(),
+  modelType: z.enum(['text', 'image', 'video', 'multimodal']).optional(),
+  icon: z.string().max(50).optional(),
+  sortOrder: z.coerce.number().int().min(0).optional(),
+  isPublic: z.coerce.number().int().min(0).max(1).optional(),
+  status: z.coerce.number().int().min(0).max(2).optional(),
+});
 
 // 看板
 router.get('/stats', authMiddleware, adminAuth, asyncHandler(getDashboardStats));
@@ -71,7 +84,7 @@ router.post('/tasks/:taskId/approve', authMiddleware, adminAuth, asyncHandler(ap
 router.post('/tasks/:taskId/reject', authMiddleware, adminAuth, asyncHandler(rejectTask));
 router.post('/tasks/:taskId/retry', authMiddleware, adminAuth, asyncHandler(retryTask));
 router.post('/tasks/:taskId/pause', authMiddleware, adminAuth, asyncHandler(pauseTask));
-router.post('/tasks/:taskId/cancel', authMiddleware, adminAuth, asyncHandler(pauseTask));
+router.post('/tasks/:taskId/cancel', authMiddleware, adminAuth, asyncHandler(pauseTask)); // TODO: implement dedicated cancelTask
 router.post('/tasks/:taskId/resume', authMiddleware, adminAuth, asyncHandler(resumeTask));
 // 套餐
 router.get('/plans', authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(listAllPlans));

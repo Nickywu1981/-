@@ -8,6 +8,8 @@
 import * as smsLogDao from '../dao/smsLogDao.js';
 import * as smsTemplateDao from '../dao/smsTemplateDao.js';
 import config from '../config/index.js';
+import { BusinessError } from '../utils/businessError.js';
+import logger from '../utils/logger.js';
 
 const CODE_CACHE = new Map();
 
@@ -16,20 +18,20 @@ const CODE_CACHE = new Map();
 const providers = {
   mock: {
     async send({ phone, content, templateCode }) {
-      console.log(`[SMS Mock] → ${phone} | ${templateCode} | ${content}`);
+      logger.info(`[SMS Mock] → ${phone} | ${templateCode} | ${content}`);
       return { success: true, raw: { code: 'OK', messageId: `mock_${Date.now()}` } };
     },
   },
 
   aliyun: {
     async send(_payload) {
-      throw new Error('阿里云短信密钥未配置');
+      throw new BusinessError(503, '阿里云短信密钥未配置');
     },
   },
 
   tencent: {
     async send(_payload) {
-      throw new Error('腾讯云短信密钥未配置');
+      throw new BusinessError(503, '腾讯云短信密钥未配置');
     },
   },
 };
@@ -138,7 +140,7 @@ export async function sendVerificationCode({ phone, scene }) {
 
     return { success: true, msg: '验证码已发送', expire: 300 };
   } catch (e) {
-    console.error('[SMS] sendVerificationCode failed:', e);
+    logger.error('[SMS] sendVerificationCode failed:', e);
     await smsLogDao.insertLog({
       templateCode,
       phone,
@@ -176,7 +178,7 @@ export async function sendNotification(phone, { scene, templateCode, params }) {
     });
     return { success: true, msg: '发送成功' };
   } catch (e) {
-    console.error('[SMS] sendNotification failed:', e);
+    logger.error('[SMS] sendNotification failed:', e);
     await smsLogDao.insertLog({
       templateCode: template.template_code, phone, params,
       content, result: false, provider: config.sms?.provider || 'mock',

@@ -26,7 +26,16 @@ const sendNotificationSchema = z.object({
   params: z.record(z.string()).optional(),
 });
 
-const smsTemplateSchema = z.object({}).passthrough();
+const smsTemplateSchema = z.object({
+  template_code: z.string().min(1, '模板代码不能为空').max(50).regex(/^[a-z][a-z0-9_]*$/, '仅允许小写字母数字下划线'),
+  name: z.string().min(1, '模板名称不能为空').max(100),
+  content: z.string().min(1, '模板内容不能为空').max(500),
+  provider_template_id: z.string().max(100).optional(),
+  provider: z.string().max(50).optional(),
+  status: z.coerce.number().int().min(0).max(1).optional(),
+  remark: z.string().max(500).optional(),
+});
+const smsTemplateUpdateSchema = smsTemplateSchema.partial().omit({ template_code: true });
 
 // 公开 — 验证码收发
 router.post('/send-code', validate(sendCodeSchema), asyncHandler(sendVerificationCode));
@@ -38,7 +47,7 @@ router.post('/send', authMiddleware, validate(sendNotificationSchema), asyncHand
 // 管理后台 — 模板管理 + 日志
 router.get('/templates', authMiddleware, adminAuth, asyncHandler(listTemplates));
 router.post('/templates', authMiddleware, adminAuth, validate(smsTemplateSchema), asyncHandler(createTemplate));
-router.put('/templates/:id', authMiddleware, adminAuth, validate(smsTemplateSchema), asyncHandler(updateTemplate));
+router.put('/templates/:id', authMiddleware, adminAuth, validate(smsTemplateUpdateSchema), asyncHandler(updateTemplate));
 router.delete('/templates/:id', authMiddleware, adminAuth, asyncHandler(deleteTemplate));
 router.get('/logs', authMiddleware, adminAuth, asyncHandler(listLogs));
 
