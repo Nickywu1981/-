@@ -165,6 +165,7 @@ const doRate = async (score: number) => {
   } catch { /* silent */ }
 }
 
+const toast = useToast()
 const doFill = async () => {
   if (!detail.value) return
   try {
@@ -172,9 +173,9 @@ const doFill = async () => {
       method: 'POST',
       body: { variables: fillValues.value },
     })
-    alert((r as any).filled || '生成成功')
+    toast.success((r as any).filled || '生成成功')
     detail.value = null
-  } catch (e: any) { alert(e.message || '生成失败') }
+  } catch (e: any) { toast.error(e.message || '生成失败') }
 }
 
 onMounted(fetchAll)

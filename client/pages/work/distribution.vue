@@ -109,8 +109,10 @@ const onFiles = (e: Event) => {
   if (files) form.files = Array.from(files)
 }
 
+const toast = useToast()
+
 const publish = async () => {
-  if (!form.title) return alert('请输入标题')
+  if (!form.title) return toast.warn('请输入标题')
   submitting.value = true
   try {
     const fd = new FormData()
@@ -120,10 +122,10 @@ const publish = async () => {
     if (form.scheduledAt) fd.append('scheduledAt', form.scheduledAt)
     form.files.forEach(f => fd.append('files', f))
     await $fetch('/api/distribution/publish', { method: 'POST', body: fd })
-    alert('发布成功！')
+    toast.success('发布成功！')
     fetchHistory()
   } catch (e: any) {
-    alert(e.message || '发布失败')
+    toast.error(e.message || '发布失败')
   } finally {
     submitting.value = false
   }
@@ -135,7 +137,7 @@ const saveDraft = async () => {
       method: 'POST',
       body: { title: form.title, description: form.description, platforms: selected.value },
     })
-    alert('草稿已保存')
+    toast.success('草稿已保存')
   } catch { /* silent */ }
 }
 

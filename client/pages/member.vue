@@ -75,7 +75,7 @@ async function subscribe(planType: number) {
   try {
     const res: any = await $fetch('/api/payment/orders', { method: 'POST', body: { planType, payChannel: 'wechat' }, credentials: 'include' })
     if (res.data?.payUrl) window.open(res.data.payUrl, '_blank')
-  } catch (e: any) { alert(e?.message || '创建订单失败') }
+  } catch (e: any) { useToast().error(e?.message || '创建订单失败') }
   finally { subscribing.value = false }
 }
 
