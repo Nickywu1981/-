@@ -1,36 +1,62 @@
 import badgeService from '../services/badgeService.js';
+import { success, error } from '../utils/response.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 export async function listBadges(req, res) {
-  const { category } = req.query;
-  const rows = await badgeService.listBadges({ category, status: 1 });
-  res.json({ code: 200, msg: 'success', data: rows });
+  try {
+    const { category } = req.query;
+    const rows = await badgeService.listBadges({ category, status: 1 });
+    return success(res, rows);
+  } catch (err) {
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
+  }
 }
 
 export async function getBadge(req, res) {
-  const badge = await badgeService.getBadgeById(req.params.id);
-  if (!badge) return res.status(404).json({ code: 404, msg: '标签不存在', data: null });
-  res.json({ code: 200, msg: 'success', data: badge });
+  try {
+    const badge = await badgeService.getBadgeById(req.params.id);
+    if (!badge) return error(res, ERROR_CODE.NOT_FOUND, '标签不存在');
+    return success(res, badge);
+  } catch (err) {
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
+  }
 }
 
 export async function listAllBadges(req, res) {
-  const { category } = req.query;
-  const rows = await badgeService.listBadges({ category, status: undefined });
-  res.json({ code: 200, msg: 'success', data: rows });
+  try {
+    const { category } = req.query;
+    const rows = await badgeService.listBadges({ category, status: undefined });
+    return success(res, rows);
+  } catch (err) {
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
+  }
 }
 
 export async function createBadge(req, res) {
-  const id = await badgeService.createBadge(req.body);
-  res.json({ code: 200, msg: '创建成功', data: { id } });
+  try {
+    const id = await badgeService.createBadge(req.body);
+    return success(res, { id }, '创建成功');
+  } catch (err) {
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
+  }
 }
 
 export async function updateBadge(req, res) {
-  await badgeService.updateBadge(req.params.id, req.body);
-  res.json({ code: 200, msg: '更新成功', data: null });
+  try {
+    await badgeService.updateBadge(req.params.id, req.body);
+    return success(res, null, '更新成功');
+  } catch (err) {
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
+  }
 }
 
 export async function deleteBadge(req, res) {
-  await badgeService.deleteBadge(req.params.id);
-  res.json({ code: 200, msg: '删除成功', data: null });
+  try {
+    await badgeService.deleteBadge(req.params.id);
+    return success(res, null, '删除成功');
+  } catch (err) {
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
+  }
 }
 
 export default { listBadges, getBadge, listAllBadges, createBadge, updateBadge, deleteBadge };
