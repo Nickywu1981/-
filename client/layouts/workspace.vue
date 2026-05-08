@@ -74,7 +74,7 @@ const userName = ref('')
 const userPoints = ref(0)
 const isAdmin = ref(false)
 
-const openGroups = reactive(new Set(['video', 'image']))
+const openGroups = reactive(new Set(['video', 'image', 'tools', 'my']))
 
 function toggleGroup(key: string) {
   if (openGroups.has(key)) { openGroups.delete(key) } else { openGroups.add(key) }
@@ -146,6 +146,11 @@ const navGroups = ref([
   {
     key: 'tools', label: '🧰 工具与服务',
     items: [
+      { path: '/work/prompt-hub', icon: '💡', label: '提示词工坊' },
+      { path: '/work/publish', icon: '📤', label: '多平台分发' },
+      { path: '/work/distribution', icon: '📡', label: '分发管理' },
+      { path: '/work/cut-ecosystem', icon: '✂', label: '裁剪生态' },
+      { path: '/work/usage', icon: '📊', label: '用量仪表盘' },
       { path: '/work/model-generate', icon: '🧊', label: '3D 模型生成' },
       { path: '/work/product-render', icon: '🎬', label: '商品渲染' },
       { path: '/work/size-templates', icon: '📏', label: '尺寸模板' },
@@ -164,6 +169,18 @@ const navGroups = ref([
       { path: '/distribution', icon: '📤', label: '分发管理' },
       { path: '/assets', icon: '🗂', label: '素材库' },
       { path: '/member', icon: '💎', label: '会员中心' },
+    ]
+  },
+  {
+    key: 'my', label: '👤 我的',
+    items: [
+      { path: '/my/favorites', icon: '⭐', label: '我的收藏' },
+      { path: '/my/collections', icon: '📁', label: '我的合集' },
+      { path: '/my/templates', icon: '📋', label: '我的模板' },
+      { path: '/my/works', icon: '🎬', label: '我的作品' },
+      { path: '/my/orders', icon: '🧾', label: '我的订单' },
+      { path: '/my/credits', icon: '💎', label: '积分明细' },
+      { path: '/my/settings', icon: '⚙', label: '个人设置' },
     ]
   },
 ])

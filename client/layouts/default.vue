@@ -178,6 +178,12 @@ const searchIndex = [
   { name: '个人设置', path: '/my/settings', icon: '⚙', tag: '用户', kw: ['资料', '密码', '手机'] },
   { name: '竞品对比', path: '/compare', icon: '📊', tag: '其他', kw: ['对比', 'PK', '分析'] },
   { name: '帮助中心', path: '/help', icon: '❓', tag: '其他', kw: ['FAQ', '教程', '使用'] },
+  { name: '提示词工坊', path: '/work/prompt-hub', icon: '💡', tag: '工具', kw: ['提示词', '模板', '推荐', '评分'] },
+  { name: '多平台分发', path: '/work/publish', icon: '📤', tag: '工具', kw: ['分发', '抖音', '快手', '平台', '发布'] },
+  { name: '分发管理', path: '/work/distribution', icon: '📡', tag: '工具', kw: ['分发', '多平台', '推送'] },
+  { name: '裁剪生态', path: '/work/cut-ecosystem', icon: '✂', tag: '工具', kw: ['裁剪', '尺寸', '平台适配', '画幅'] },
+  { name: '用量仪表盘', path: '/work/usage', icon: '📊', tag: '工具', kw: ['用量', '统计', '配额', '仪表盘'] },
+  { name: '我的收藏', path: '/my/favorites', icon: '⭐', tag: '管理', kw: ['收藏', '书签', '星标'] },
 ];
 
 const searchResults = computed(() => {

@@ -41,6 +41,12 @@ export const toolIndex = [
   { id: 'viral-clone', name: '爆款克隆', keywords: ['爆款', '克隆', '仿爆款', 'viral', '爆品'], route: '/work/viral-clone', icon: 'trend-charts', category: 'special', description: '分析爆款风格，生成相似素材' },
   { id: 'viral-replicate', name: '爆款复刻', keywords: ['复刻', '爆款复刻', '复制爆款', 'viral replicate'], route: '/work/viral-replicate', icon: 'copy-document', category: 'special', description: '爆款商品图风格一键复刻' },
   { id: 'compliance-check', name: '合规检测', keywords: ['合规', '审核', '广告法', '违禁词', 'compliance'], route: '/work/compliance-check', icon: 'checked', category: 'special', description: '电商广告合规检测，避免违规' },
+  { id: 'prompt-hub', name: '提示词工坊', keywords: ['提示词', '模板', '推荐', '评分', 'prompt', 'AI推荐'], route: '/work/prompt-hub', icon: 'magic-stick', category: 'special', description: 'AI智能推荐提示词，150+模板，评分历史' },
+  { id: 'publish', name: '多平台分发', keywords: ['分发', '发布', '多平台', '抖音', '快手', 'publish', '一键发布'], route: '/work/publish', icon: 'promotion', category: 'special', description: '一键分发作品到多个电商/社媒平台' },
+  { id: 'distribution', name: '分发管理', keywords: ['分发', '分发管理', '推送', 'distribution', '发布记录'], route: '/work/distribution', icon: 'connection', category: 'special', description: '管理多平台分发记录和发布状态' },
+  { id: 'cut-ecosystem', name: '裁剪生态', keywords: ['裁剪', '尺寸', '画幅', '适配', 'cut', '裁切'], route: '/work/cut-ecosystem', icon: 'scissor', category: 'special', description: '多平台画幅适配，智能裁剪导出' },
+  { id: 'usage', name: '用量仪表盘', keywords: ['用量', '统计', '配额', '仪表盘', 'usage', 'dashboard'], route: '/work/usage', icon: 'data-line', category: 'special', description: '查看API用量、积分消耗和配额使用情况' },
+  { id: 'favorites', name: '我的收藏', keywords: ['收藏', '书签', '星标', 'favorites', '我的'], route: '/my/favorites', icon: 'star-filled', category: 'special', description: '查看和管理收藏的作品和模板' },
 ];
 
 export const categoryLabels = {
