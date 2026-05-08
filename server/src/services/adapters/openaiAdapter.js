@@ -4,6 +4,8 @@
  */
 
 import { registerModel } from '../aiEngine.js';
+import { BusinessError } from '../../utils/businessError.js';
+import logger from '../../utils/logger.js';
 
 const API_KEY = process.env.OPENAI_API_KEY || '';
 const BASE_URL = (process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1').replace(/\/+$/, '');
@@ -38,7 +40,7 @@ function makeTextInfer(modelId, maxTokens = 2000, timeout = 60000) {
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new Error(`HTTP ${res.status}: ${err.error?.message || res.statusText}`);
+      throw new BusinessError(502, `HTTP ${res.status}: ${err.error?.message || res.statusText}`);
     }
 
     onProgress?.(80);
@@ -91,7 +93,7 @@ async function health() {
 // ==================== Embedding ====================
 
 export async function getEmbedding(text, modelId = 'text-embedding-3-small') {
-  if (!API_KEY) throw new Error('OPENAI_API_KEY not configured');
+  if (!API_KEY) throw new BusinessError(503, 'OPENAI_API_KEY not configured');
 
   const input = Array.isArray(text) ? text : [text];
 
@@ -104,7 +106,7 @@ export async function getEmbedding(text, modelId = 'text-embedding-3-small') {
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(`Embedding API ${res.status}: ${err.error?.message || res.statusText}`);
+    throw new BusinessError(502, `Embedding API ${res.status}: ${err.error?.message || res.statusText}`);
   }
 
   const data = await res.json();
@@ -126,17 +128,17 @@ const MODEL_CAPABILITIES = {
 
 export async function registerOpenAI() {
   if (!API_KEY) {
-    console.warn('[AI] OPENAI_API_KEY 未配置，模型将使用降级模式');
+    logger.warn('[AI] OPENAI_API_KEY 未配置，模型将使用降级模式');
     return;
   }
 
-  console.log('[AI] 拉取远程模型列表...');
+  logger.info('[AI] 拉取远程模型列表...');
   const remoteModels = await fetchRemoteModels();
   const remoteIds = new Set(remoteModels.map((m) => m.id));
 
   if (remoteIds.size === 0) {
     // 代理不可达 → 回退用静态配置
-    console.warn('[AI] 无法拉取远程模型列表，使用静态配置');
+    logger.warn('[AI] 无法拉取远程模型列表，使用静态配置');
     for (const [id, cap] of Object.entries(MODEL_CAPABILITIES)) {
       registerModel({
         id,
@@ -145,7 +147,7 @@ export async function registerOpenAI() {
         health,
         provider: 'openai',
       });
-      console.log(`[AI] 模型已注册: ${id} (text, static)`);
+      logger.info(`[AI] 模型已注册: ${id} (text, static)`);
     }
     return;
   }
@@ -162,9 +164,9 @@ export async function registerOpenAI() {
       health,
       provider: 'openai',
     });
-    console.log(`[AI] 模型已注册: ${id} (text)`);
+    logger.info(`[AI] 模型已注册: ${id} (text)`);
     count++;
   }
 
-  console.log(`[AI] OpenAI 模型已注册: ${count} 个`);
+  logger.info(`[AI] OpenAI 模型已注册: ${count} 个`);
 }

@@ -5,6 +5,8 @@
  */
 
 import { registerModel } from '../aiEngine.js';
+import { BusinessError } from '../../utils/businessError.js';
+import logger from '../../utils/logger.js';
 
 const API_KEY = process.env.CLAUDE_API_KEY || '';
 const BASE_URL = process.env.CLAUDE_BASE_URL || 'https://api.anthropic.com/v1';
@@ -40,7 +42,7 @@ async function claudeSonnetInfer(input, onProgress) {
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(`Claude API 错误 ${res.status}: ${err.error?.message || res.statusText}`);
+    throw new BusinessError(502, `Claude API 错误 ${res.status}: ${err.error?.message || res.statusText}`);
   }
 
   onProgress?.(80);
@@ -84,7 +86,7 @@ async function claudeHaikuInfer(input, onProgress) {
     signal: AbortSignal.timeout(30000),
   });
 
-  if (!res.ok) throw new Error(`Claude API 错误 ${res.status}`);
+  if (!res.ok) throw new BusinessError(502, `Claude API 错误 ${res.status}`);
 
   onProgress?.(80);
 
@@ -118,11 +120,11 @@ async function health() {
 
 export function registerClaude() {
   if (!API_KEY) {
-    console.warn('[AI] CLAUDE_API_KEY 未配置，Claude 模型将使用降级模式');
+    logger.warn('[AI] CLAUDE_API_KEY 未配置，Claude 模型将使用降级模式');
   }
 
   registerModel({ id: 'claude-sonnet-4-6', type: 'text', infer: claudeSonnetInfer, health, provider: 'anthropic' });
   registerModel({ id: 'claude-haiku-4-5', type: 'text', infer: claudeHaikuInfer, health, provider: 'anthropic' });
 
-  console.log('[AI] Claude 模型已注册: claude-sonnet-4-6, claude-haiku-4-5');
+  logger.info('[AI] Claude 模型已注册: claude-sonnet-4-6, claude-haiku-4-5');
 }

@@ -13,7 +13,7 @@ import { registerSD } from './sdAdapter.js';
 import logger from '../../utils/logger.js';
 
 export async function registerAllAdapters() {
-  console.log('[AI] ========== 注册 AI 模型适配器 ==========');
+  logger.info('[AI] ========== 注册 AI 模型适配器 ==========');
 
   // 并行注册全部适配器（无 API-Key 时静默跳过核心逻辑，仅 health 返回 unavailable）
   const results = await Promise.allSettled([
@@ -37,10 +37,10 @@ export async function registerAllAdapters() {
   const online = healthResults.filter((r) => r.status === 'fulfilled' && r.value?.status === 'ok');
   const offline = healthResults.filter((r) => r.status === 'rejected' || r.value?.status !== 'ok');
 
-  console.log(`[AI] 共注册 ${models.length} 个模型`);
-  if (online.length) console.log(`[AI]   ✅ 可用 (${online.length}): ${online.map((r) => r.value?.id).join(', ')}`);
-  if (offline.length) console.log(`[AI]   ⚠️  不可用 (${offline.length}): ${offline.map((r) => r.value?.id || r.reason?.message).join(', ')}`);
-  console.log('[AI] =========================================');
+  logger.info(`[AI] 共注册 ${models.length} 个模型`);
+  if (online.length) logger.info(`[AI]   ✅ 可用 (${online.length}): ${online.map((r) => r.value?.id).join(', ')}`);
+  if (offline.length) logger.info(`[AI]   ⚠️  不可用 (${offline.length}): ${offline.map((r) => r.value?.id || r.reason?.message).join(', ')}`);
+  logger.info('[AI] =========================================');
 }
 
 export { registerOpenAI, registerClaude, registerSD };

@@ -5,6 +5,8 @@
  */
 
 import { registerModel } from '../aiEngine.js';
+import { BusinessError } from '../../utils/businessError.js';
+import logger from '../../utils/logger.js';
 
 const SD_API_URL = process.env.SD_API_URL || 'http://localhost:7860';
 const REPLICATE_API_KEY = process.env.REPLICATE_API_KEY || '';
@@ -30,7 +32,7 @@ async function sdTxt2Img(input, onProgress) {
     signal: AbortSignal.timeout(180000),
   });
 
-  if (!res.ok) throw new Error(`SD API 错误 ${res.status}`);
+  if (!res.ok) throw new BusinessError(502, `SD API 错误 ${res.status}`);
 
   onProgress?.(60);
 
@@ -63,7 +65,7 @@ async function sdImg2Img(input, onProgress) {
     signal: AbortSignal.timeout(180000),
   });
 
-  if (!res.ok) throw new Error(`SD img2img API 错误 ${res.status}`);
+  if (!res.ok) throw new BusinessError(502, `SD img2img API 错误 ${res.status}`);
 
   onProgress?.(60);
 
@@ -80,7 +82,7 @@ async function sdImg2Img(input, onProgress) {
 // ==================== Replicate 降级方案 ====================
 
 async function replicateInfer(input, onProgress) {
-  if (!REPLICATE_API_KEY) throw new Error('REPLICATE_API_KEY 未配置');
+  if (!REPLICATE_API_KEY) throw new BusinessError(503, 'REPLICATE_API_KEY 未配置');
 
   const { prompt, model = 'stability-ai/sdxl', negativePrompt = '', width = 1024, height = 1024 } = input;
 
@@ -96,7 +98,7 @@ async function replicateInfer(input, onProgress) {
     }),
   });
 
-  if (!createRes.ok) throw new Error(`Replicate API 错误 ${createRes.status}`);
+  if (!createRes.ok) throw new BusinessError(502, `Replicate API 错误 ${createRes.status}`);
 
   const prediction = await createRes.json();
   const pollUrl = prediction.urls?.get || prediction.urls?.cancel;
@@ -116,11 +118,11 @@ async function replicateInfer(input, onProgress) {
       return { imageUrl: pollData.output?.[0] || '', provider: 'replicate' };
     }
     if (pollData.status === 'failed') {
-      throw new Error('Replicate 生成失败: ' + (pollData.error || 'unknown'));
+      throw new BusinessError(502, 'Replicate 生成失败: ' + (pollData.error || 'unknown'));
     }
   }
 
-  throw new Error('Replicate 生成超时');
+  throw new BusinessError(504, 'Replicate 生成超时');
 }
 
 // ==================== 健康检查 ====================
@@ -144,7 +146,7 @@ async function health() {
 
 export function registerSD() {
   if (!SD_API_URL && !REPLICATE_API_KEY) {
-    console.warn('[AI] SD_API_URL 和 REPLICATE_API_KEY 均未配置，SD 模型将使用降级模式');
+    logger.warn('[AI] SD_API_URL 和 REPLICATE_API_KEY 均未配置，SD 模型将使用降级模式');
   }
 
   registerModel({ id: 'stable-diffusion-xl', type: 'image', infer: sdTxt2Img, health, provider: 'sd-webui' });
@@ -154,5 +156,5 @@ export function registerSD() {
     registerModel({ id: 'replicate-sdxl', type: 'image', infer: replicateInfer, health, provider: 'replicate' });
   }
 
-  console.log('[AI] Stable Diffusion 模型已注册: stable-diffusion-xl, stable-diffusion-img2img' + (REPLICATE_API_KEY ? ', replicate-sdxl' : ''));
+  logger.info('[AI] Stable Diffusion 模型已注册: stable-diffusion-xl, stable-diffusion-img2img' + (REPLICATE_API_KEY ? ', replicate-sdxl' : ''));
 }
