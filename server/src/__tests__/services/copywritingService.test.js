@@ -31,7 +31,7 @@ describe('PLATFORM_RULES', () => {
   });
 
   it('每个平台包含 name/maxTitleLen/keywordSep/minKeywords/maxKeywords', () => {
-    for (const [key, rule] of Object.entries(PLATFORM_RULES)) {
+    for (const [, rule] of Object.entries(PLATFORM_RULES)) {
       expect(rule).toHaveProperty('name');
       expect(rule).toHaveProperty('maxTitleLen');
       expect(rule).toHaveProperty('keywordSep');

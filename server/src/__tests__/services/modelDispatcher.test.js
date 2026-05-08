@@ -164,7 +164,7 @@ describe('MODEL_CAPABILITIES', () => {
   });
 
   it('每个模型含 capability/cost/latency/accuracy', () => {
-    for (const [id, caps] of Object.entries(MODEL_CAPABILITIES)) {
+    for (const [, caps] of Object.entries(MODEL_CAPABILITIES)) {
       expect(caps).toHaveProperty('capability');
       expect(caps).toHaveProperty('cost');
       expect(caps).toHaveProperty('latency');

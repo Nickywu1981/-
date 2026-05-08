@@ -55,7 +55,7 @@ async function authContractTests() {
 
 // —— 会员/套餐契约 ——
 
-async function plansContractTests(cookie) {
+async function plansContractTests(_cookie) {
   return await runContractTests('套餐接口契约', [
     {
       label: 'GET /api/payment/plans → 200, 返回 plans 列表含 name/price',
@@ -156,14 +156,13 @@ async function main() {
 
   if (totalFailed > 0) {
     console.log('❌ 契约测试存在失败，请修复后重试');
-    process.exit(1);
+    throw new Error('契约测试存在失败，请修复后重试');
   } else {
     console.log('✅ 全部契约测试通过');
-    process.exit(0);
   }
 }
 
 main().catch(err => {
   console.error('💥 测试套件异常:', err.message);
-  process.exit(1);
+  throw err;
 });

@@ -23,7 +23,7 @@ describe('ROLES', () => {
   });
 
   it('每种角色含 name 与 level', () => {
-    for (const [key, role] of Object.entries(ROLES)) {
+    for (const [, role] of Object.entries(ROLES)) {
       expect(role).toHaveProperty('name');
       expect(role).toHaveProperty('level');
       expect(typeof role.name).toBe('string');

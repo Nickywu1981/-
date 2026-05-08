@@ -24,7 +24,7 @@ describe('PLATFORM_PUBLISH_SPECS', () => {
   });
 
   it('每个平台包含完整规格字段', () => {
-    for (const [key, spec] of Object.entries(PLATFORM_PUBLISH_SPECS)) {
+    for (const [, spec] of Object.entries(PLATFORM_PUBLISH_SPECS)) {
       expect(spec).toHaveProperty('name');
       expect(spec).toHaveProperty('maxSizeMB');
       expect(spec).toHaveProperty('formats');
