@@ -10,11 +10,12 @@ export async function getBrand(userId) {
 
 export async function upsertBrand(userId, data) {
   const exist = await getBrand(userId);
+  const allowed = ['logo_url', 'brand_name', 'primary_color', 'watermark_enabled', 'watermark_opacity', 'watermark_position'];
   if (exist) {
     const fields = [];
     const params = [];
     for (const [k, v] of Object.entries(data)) {
-      if (v !== undefined) { fields.push(`${k} = ?`); params.push(v); }
+      if (v !== undefined && allowed.includes(k)) { fields.push(`${k} = ?`); params.push(v); }
     }
     if (fields.length === 0) return exist;
     params.push(userId);

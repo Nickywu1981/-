@@ -4,6 +4,7 @@
  */
 import { Router } from 'express';
 import { authMiddleware } from '../middleware/auth.middleware.js';
+import { adminAuth } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
 import { z } from 'zod';
@@ -24,10 +25,10 @@ const updateSchema = z.object({
   dailyLimit: z.number().int().min(1).max(100000).optional(),
 });
 
-router.get('/keys', asyncHandler(ctl.listKeys));
-router.post('/keys', validate(createSchema), asyncHandler(ctl.createKey));
-router.put('/keys/:id/toggle', validate(toggleSchema), asyncHandler(ctl.toggleKey));
-router.put('/keys/:id', validate(updateSchema), asyncHandler(ctl.updateKey));
-router.delete('/keys/:id', asyncHandler(ctl.deleteKey));
+router.get('/keys', adminAuth, asyncHandler(ctl.listKeys));
+router.post('/keys', adminAuth, validate(createSchema), asyncHandler(ctl.createKey));
+router.put('/keys/:id/toggle', adminAuth, validate(toggleSchema), asyncHandler(ctl.toggleKey));
+router.put('/keys/:id', adminAuth, validate(updateSchema), asyncHandler(ctl.updateKey));
+router.delete('/keys/:id', adminAuth, asyncHandler(ctl.deleteKey));
 
 export default router;

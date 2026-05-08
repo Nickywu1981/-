@@ -11,12 +11,13 @@ export async function insertHistory({ userId, type, inputs, outputs, modelId, to
 
 export async function listHistory({ userId, type, page = 1, pageSize = 20 }) {
   const offset = Math.max(0, (Number(page) - 1) * Number(pageSize));
+  const limit = Number(pageSize);
   const hasType = type && type !== 'undefined';
   const where = hasType ? 'AND type = ?' : '';
   const bind = hasType ? [userId, type] : [userId];
   const [rows] = await pool.execute(
-    `SELECT id, type, inputs, outputs, model_id, token_used, status, created_at FROM copywriting_history WHERE user_id = ? ${where} ORDER BY created_at DESC LIMIT ${Number(pageSize)} OFFSET ${offset}`,
-    bind,
+    `SELECT id, type, inputs, outputs, model_id, token_used, status, created_at FROM copywriting_history WHERE user_id = ? ${where} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+    [...bind, limit, offset],
   );
   const [[{ total }]] = await pool.execute(
     `SELECT COUNT(*) AS total FROM copywriting_history WHERE user_id = ? ${where}`,

@@ -22,9 +22,10 @@ export async function create(data) {
 }
 
 export async function update(id, data) {
+  const allowed = ['name', 'description', 'cover_url', 'is_public', 'sort_order'];
   const fields = []; const values = [];
   for (const [k, v] of Object.entries(data)) {
-    if (v !== undefined) { fields.push(`${k} = ?`); values.push(v); }
+    if (v !== undefined && allowed.includes(k)) { fields.push(`${k} = ?`); values.push(v); }
   }
   if (!fields.length) return false;
   values.push(id);

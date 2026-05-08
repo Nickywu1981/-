@@ -90,7 +90,7 @@
         <video v-if="activeTab === 'voice' || activeTab === 'face'" :src="resultUrl" controls style="max-width:100%"></video>
         <div v-else class="subtitle-preview">
           <p>字幕翻译完成</p>
-          <a :href="resultUrl" target="_blank" class="btn btn-secondary btn-sm">下载字幕文件</a>
+          <a :href="resultUrl" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">下载字幕文件</a>
         </div>
         <div class="result-actions">
           <button class="btn btn-secondary" @click="downloadResult">下载</button>

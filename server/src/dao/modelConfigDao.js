@@ -42,10 +42,11 @@ export async function create(data) {
 }
 
 export async function update(modelKey, data) {
+  const allowed = ['model_name', 'provider', 'api_endpoint', 'api_key', 'max_tokens', 'temperature', 'is_active', 'sort_order', 'config_json'];
   const fields = [];
   const params = [];
   for (const [k, v] of Object.entries(data)) {
-    if (v !== undefined) { fields.push(`${k} = ?`); params.push(v); }
+    if (v !== undefined && allowed.includes(k)) { fields.push(`${k} = ?`); params.push(v); }
   }
   if (fields.length === 0) return null;
   params.push(modelKey);

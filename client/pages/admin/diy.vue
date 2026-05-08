@@ -41,8 +41,8 @@
               <td><span :class="p.status===1?'badge-ok':'badge-draft'">{{ p.status===1?'已发布':'草稿' }}</span></td>
               <td>{{ p.update_time }}</td>
               <td class="actions">
-                <a :href="`/diy/editor?id=${p.id}`" class="btn-sm" target="_blank">编辑</a>
-                <a :href="`/diy/preview?slug=${p.slug}`" class="btn-sm" target="_blank">预览</a>
+                <a :href="`/diy/editor?id=${p.id}`" class="btn-sm" target="_blank" rel="noopener noreferrer">编辑</a>
+                <a :href="`/diy/preview?slug=${p.slug}`" class="btn-sm" target="_blank" rel="noopener noreferrer">预览</a>
                 <button class="btn-sm" @click="togglePublish(p)">{{ p.status===1?'下架':'发布' }}</button>
                 <button class="btn-sm danger" @click="delPage(p.id)">删除</button>
               </td>

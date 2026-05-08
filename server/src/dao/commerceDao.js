@@ -227,11 +227,14 @@ export async function listAllTasks({ offset, pageSize, userId, status, type, typ
 }
 
 export async function updateTaskStatusDirect(taskId, fields) {
+  const allowed = ['status', 'progress', 'progress_msg', 'error_msg', 'output_result', 'worker_id'];
   const sets = [];
   const params = [];
   for (const [k, v] of Object.entries(fields)) {
-    sets.push(`${k} = ?`);
-    params.push(v);
+    if (allowed.includes(k) && v !== undefined) {
+      sets.push(`${k} = ?`);
+      params.push(v);
+    }
   }
   if (sets.length === 0) return;
   params.push(taskId);

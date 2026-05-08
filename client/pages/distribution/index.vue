@@ -67,7 +67,7 @@
         <div v-for="h in publishHistory" :key="h.id" class="history-row">
           <span class="h-platform">{{ h.platform }}</span>
           <span class="h-status" :class="h.status">{{ h.status === 'success' ? '成功' : h.status === 'failed' ? '失败' : '处理中' }}</span>
-          <span v-if="h.published_url" class="h-link"><a :href="h.published_url" target="_blank">查看 →</a></span>
+          <span v-if="h.published_url" class="h-link"><a :href="h.published_url" target="_blank" rel="noopener noreferrer">查看 →</a></span>
           <span class="h-time">{{ formatDate(h.created_at) }}</span>
         </div>
       </div>

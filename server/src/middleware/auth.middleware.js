@@ -57,6 +57,7 @@ export async function authMiddleware(req, res, next) {
   try {
     const payload = jwt.verify(token, JWT_SECRET);
     req.user = { id: payload.userId || payload.id, role: payload.role, nickname: payload.nickname };
+    req.userId = payload.userId || payload.id;  // 兼容旧代码直接引用 req.userId
     // P0-1 修复：从 JWT payload 注入 tenantId，多租户数据隔离
     req.tenantId = payload.tenantId || 0;
 

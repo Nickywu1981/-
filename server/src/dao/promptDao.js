@@ -42,10 +42,11 @@ export async function insertTemplate({ templateCode, category, title, descriptio
 }
 
 export async function updateTemplate(id, fields) {
+  const allowed = ['title', 'content', 'category', 'tags', 'variables', 'is_public', 'status', 'reviewer_id', 'review_remark'];
   const sets = [];
   const params = [];
   for (const [k, v] of Object.entries(fields)) {
-    if (v !== undefined) {
+    if (v !== undefined && allowed.includes(k)) {
       const col = k.replace(/[A-Z]/g, m => '_' + m.toLowerCase());
       sets.push(`${col} = ?`);
       params.push(k === 'variables' ? JSON.stringify(v) : v);
@@ -106,10 +107,11 @@ export async function insertGroup(userId, name) {
 }
 
 export async function updateGroup(id, userId, fields) {
+  const allowed = ['name'];
   const sets = [];
   const params = [];
   for (const [k, v] of Object.entries(fields)) {
-    if (v !== undefined) { sets.push(`${k} = ?`); params.push(v); }
+    if (v !== undefined && allowed.includes(k)) { sets.push(`${k} = ?`); params.push(v); }
   }
   if (!sets.length) return;
   params.push(id, userId);
