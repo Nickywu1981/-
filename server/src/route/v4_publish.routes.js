@@ -1,0 +1,106 @@
+/**
+ * Movio AI v4.1 — Publish Routes (多平台内容分发)
+ * M06 独家王牌功能
+ *
+ * GET    /api/publish/platforms     — 获取可选分发平台列表
+ * POST   /api/publish/submit        — 提交一键分发
+ * GET    /api/publish/batch/:id     — 查看分发批次详情
+ * POST   /api/publish/retry/:id     — 重发失败平台
+ * GET    /api/publish/history       — 分发历史分页
+ * GET    /api/publish/stats         — 分发概览统计
+ */
+import { Router } from 'express';
+import { z } from 'zod';
+import { success, error } from '../utils/response.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
+import * as publishService from '../services/publishService.js';
+
+const router = Router();
+
+function _validate(schema) {
+  return (req, res, next) => {
+    const r = schema.safeParse(req.body);
+    if (!r.success) {
+      return error(res, ERROR_CODE.VALIDATION_ERROR, r.error.errors.map(e => e.message).join('; '));
+    }
+    req.validated = r.data;
+    next();
+  };
+}
+
+const submitSchema = z.object({
+  workId: z.number().int().positive(),
+  platforms: z.array(z.string().min(1)).min(1, '请至少选择一个目标平台'),
+  title: z.string().max(200).optional(),
+  description: z.string().max(2000).optional(),
+  tags: z.array(z.string()).max(20).optional(),
+  scheduleAt: z.string().datetime().optional(),
+});
+
+// GET /api/publish/platforms
+router.get('/platforms', (_req, res) => {
+  try {
+    return success(res, publishService.getPublishPlatforms());
+  } catch (err) {
+    return error(res, err.status || 500, err.message);
+  }
+});
+
+// POST /api/publish/submit
+router.post('/submit', _validate(submitSchema), async (req, res) => {
+  try {
+    const { workId, platforms, title, description, tags, scheduleAt } = req.validated;
+    const result = await publishService.submitPublish(
+      req.user.id, workId, platforms,
+      { title, description, tags, scheduleAt },
+    );
+    return success(res, result, '分发任务已提交');
+  } catch (err) {
+    return error(res, err.status || 500, err.message);
+  }
+});
+
+// GET /api/publish/batch/:id
+router.get('/batch/:id', async (req, res) => {
+  try {
+    const result = await publishService.getPublishBatch(req.params.id, req.user.id);
+    return success(res, result);
+  } catch (err) {
+    return error(res, err.status || 500, err.message);
+  }
+});
+
+// POST /api/publish/retry/:id
+router.post('/retry/:id', async (req, res) => {
+  try {
+    const result = await publishService.retryPublish(Number(req.params.id), req.user.id);
+    return success(res, result, '已重新提交分发');
+  } catch (err) {
+    return error(res, err.status || 500, err.message);
+  }
+});
+
+// GET /api/publish/history
+router.get('/history', async (req, res) => {
+  try {
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const pageSize = Math.min(50, Math.max(1, parseInt(req.query.pageSize, 10) || 20));
+    const { status, platform } = req.query;
+    const result = await publishService.listPublishHistory(req.user.id, { page, pageSize, status, platform });
+    return success(res, result);
+  } catch (err) {
+    return error(res, err.status || 500, err.message);
+  }
+});
+
+// GET /api/publish/stats
+router.get('/stats', async (req, res) => {
+  try {
+    const result = await publishService.getPublishStats(req.user.id);
+    return success(res, result);
+  } catch (err) {
+    return error(res, err.status || 500, err.message);
+  }
+});
+
+export default router;
