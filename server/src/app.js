@@ -72,6 +72,7 @@ import assetsRoutesV4 from './route/v4_assets.routes.js';
 import platformBindRoutesV4 from './route/v4_platform_bind.routes.js';
 import userRoutesV4 from './route/v4_user.routes.js';
 import uploadRoutesV4 from './route/v4_upload.routes.js';
+import cutEcosystemRoutesV4 from './route/v4_cut_ecosystem.routes.js';
 import { adminRouter as siteConfigAdminRouter, publicRouter as siteConfigPublicRouter } from './route/siteConfigRoutes.js';
 import tenantContext from './middleware/tenantContext.js';
 import { metricsMiddleware, metricsEndpoint } from './middleware/metrics.js';
@@ -172,6 +173,7 @@ app.use('/api/job', jobRoutesV4);   // 别名: useTaskPolling 轮询 /api/job/:i
 app.use('/api/points', pointsRoutesV4);
 app.use('/api/distribution', distributionRoutesV4);
 app.use('/api/assets', assetsRoutesV4);
+app.use('/api/cut-ecosystem', cutEcosystemRoutesV4);
 app.use('/api/platforms', platformBindRoutesV4);
 app.use('/api/user', userRoutesV4);
 app.use('/api/upload', uploadRoutesV4);  // v4.1 分片上传 (must precede legacy)
