@@ -192,7 +192,6 @@ const pageSEOMap: Record<string, { title: string; description: string; keywords?
   '/login': { title: '登录', description: '登录 Movio AI，开始AI电商创作之旅', keywords: '登录,AI电商,账号登录' },
   '/register': { title: '免费注册', description: '注册 Movio AI，免费体验AI抠图/场景/视频生成', keywords: '注册,免费注册,AI工具注册,电商工具' },
   '/forgot-password': { title: '找回密码', description: '找回 Movio AI 账号密码', keywords: '找回密码,重置密码' },
-  '/membership': { title: '会员套餐', description: 'Movio AI 会员套餐对比，选择最适合你的方案', keywords: '会员,套餐,付费方案,AI会员' },
   '/notifications': { title: '通知中心', description: '查看系统通知和任务进度', keywords: '通知,消息,任务通知' },
   '/compare': { title: '竞品对比', description: 'Movio AI vs 其他电商AI工具功能对比', keywords: '竞品对比,工具对比,AI工具PK,电商工具比较' },
   '/help': { title: '帮助中心', description: 'Movio AI 使用教程、常见问题与帮助文档', keywords: '帮助,教程,FAQ,使用指南,帮助文档' },
