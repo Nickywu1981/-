@@ -96,6 +96,7 @@ async function main() {
   } catch (err) {
     console.error(`  数据库连接失败: ${err.message}`);
     console.error('  请确认 MySQL 已启动，且 .env 中 DB_* 配置正确');
+    // eslint-disable-next-line no-process-exit
     process.exit(1);
   }
 
@@ -148,6 +149,7 @@ async function main() {
   } catch (err) {
     console.error(`\n  ✗ 迁移失败: ${err.message}`);
     if (process.env.NODE_ENV === 'development') console.error(err.stack);
+    // eslint-disable-next-line no-process-exit
     process.exit(1);
   } finally {
     if (conn) await conn.end();

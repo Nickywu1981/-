@@ -55,12 +55,14 @@ function gracefulShutdown(signal) {
       logger.info('Redis 已关闭');
     } catch { /* Redis may not be connected */ }
 
+    // eslint-disable-next-line no-process-exit
     process.exit(0);
   });
 
   // 10秒强制退出
   setTimeout(() => {
     logger.error('强制退出');
+    // eslint-disable-next-line no-process-exit
     process.exit(1);
   }, 10000);
 }
