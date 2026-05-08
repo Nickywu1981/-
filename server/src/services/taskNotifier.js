@@ -6,6 +6,7 @@
 import * as notificationService from './notificationService.js';
 import * as smsService from './smsService.js';
 import pool from '../dao/db.js';
+import logger from '../utils/logger.js';
 
 /**
  * 任务完成时调用 — 发送通知 + 短信
@@ -36,7 +37,7 @@ export async function notifyComplete(taskId, userId, { type, title, result: _res
     trySendSms(userId, typeLabel);
   } catch (_err) {
     // 通知失败不应阻塞主流程
-    console.error('[TaskNotifier] 通知发送失败:', _err);
+    logger.error('[TaskNotifier] 通知发送失败:', _err);
   }
 }
 

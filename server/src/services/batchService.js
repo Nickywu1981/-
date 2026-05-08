@@ -7,6 +7,8 @@ import { createTask, updateTaskStatus, completeTask, getTask, getPendingTasks, l
 import * as batchTemplateDao from '../dao/batchTemplateDao.js';
 import * as creditService from './creditService.js';
 import wsManager from './wsManager.js';
+import { BusinessError } from '../utils/businessError.js';
+import logger from '../utils/logger.js';
 
 const MODEL_MAP = { cutout: 'stable-diffusion-img2img', main_image: 'stable-diffusion-img2img', scene: 'stable-diffusion-xl', enhance: 'stable-diffusion-img2img', white_bg: 'stable-diffusion-img2img', img2video: 'stable-diffusion-xl' };
 
@@ -14,7 +16,7 @@ const MODEL_MAP = { cutout: 'stable-diffusion-img2img', main_image: 'stable-diff
 
 export async function submitBatchTask(userId, { imageUrls, operation, platform, style, nightMode = false }) {
   const batchSize = imageUrls?.length || 0;
-  if (batchSize === 0) throw Object.assign(new Error('请上传至少一张图片'), { statusCode: 400 });
+  if (batchSize === 0) throw new BusinessError(400, '请上传至少一张图片');
 
   const creditMap = { cutout: 'cutout', main_image: 'enhance', scene: 'scene', img2video: 'img2video' };
   const action = creditMap[operation] || operation;
@@ -68,7 +70,7 @@ async function processBatch(taskId, userId) {
 export async function processNightBatchJobs() {
   const tasks = await getPendingTasks(50);
   const nightTasks = tasks.filter((t) => t.input_params?.nightMode);
-  console.log(`[NightBatch] 触发夜间批量: ${nightTasks.length} 个任务`);
+  logger.info(`[NightBatch] 触发夜间批量: ${nightTasks.length} 个任务`);
   for (const task of nightTasks) setImmediate(() => processBatch(task.id, task.user_id));
   return { processed: nightTasks.length };
 }
@@ -76,7 +78,7 @@ export async function processNightBatchJobs() {
 // ==================== 批量模板 ====================
 
 export async function saveBatchTemplate(userId, { name, operation, platform, style, nightMode, imageCount }) {
-  if (!name || !operation) throw Object.assign(new Error('模板名称和操作类型为必填'), { statusCode: 400 });
+  if (!name || !operation) throw new BusinessError(400, '模板名称和操作类型为必填');
   return batchTemplateDao.insertTemplate(userId, { name, operation, platform, style, nightMode, imageCount });
 }
 
@@ -84,7 +86,7 @@ export async function listBatchTemplates(userId) { return batchTemplateDao.listT
 
 export async function deleteBatchTemplate(userId, templateId) {
   const t = await batchTemplateDao.getTemplate(templateId, userId);
-  if (!t) throw Object.assign(new Error('模板不存在'), { statusCode: 404 });
+  if (!t) throw new BusinessError(404, '模板不存在');
   await batchTemplateDao.deleteTemplate(templateId, userId);
 }
 
@@ -92,7 +94,7 @@ export async function deleteBatchTemplate(userId, templateId) {
 
 export async function redoBatchTask(userId, sourceTaskId) {
   const source = await getTask(sourceTaskId, userId);
-  if (!source) throw Object.assign(new Error('源任务不存在'), { statusCode: 404 });
+  if (!source) throw new BusinessError(404, '源任务不存在');
   const { imageUrls, operation, platform, style, nightMode } = source.input_params || {};
   return submitBatchTask(userId, { imageUrls, operation, platform, style, nightMode });
 }
@@ -107,8 +109,8 @@ export async function listBatchHistory(userId, { page = 1, pageSize = 10 }) {
 
 export async function getBatchZipUrl(taskId, userId) {
   const task = await getTask(taskId, userId);
-  if (!task || task.type !== 'batch') throw Object.assign(new Error('任务不存在或非批量任务'), { statusCode: 404 });
-  if (task.status !== 2) throw Object.assign(new Error('任务未完成，无法下载'), { statusCode: 400 });
+  if (!task || task.type !== 'batch') throw new BusinessError(404, '任务不存在或非批量任务');
+  if (task.status !== 2) throw new BusinessError(400, '任务未完成，无法下载');
   return { zipUrl: `/api/batch/${taskId}/download`, total: task.output_result?.total || 0, estimatedSize: `${Math.round((task.output_result?.total || 0) * 0.5)}MB` };
 }
 
@@ -116,7 +118,7 @@ export async function getBatchZipUrl(taskId, userId) {
 
 export async function getTaskResult(taskId, userId) {
   const task = await getTask(taskId, userId);
-  if (!task) throw Object.assign(new Error('任务不存在'), { statusCode: 404 });
+  if (!task) throw new BusinessError(404, '任务不存在');
   return task;
 }
 

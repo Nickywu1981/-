@@ -1,5 +1,6 @@
 import { createClient } from 'redis';
 import config from '../config/index.js';
+import { BusinessError } from '../utils/businessError.js';
 const redisConfig = config.redis;
 
 // 内存 fallback（开发/无 Redis 环境）
@@ -63,10 +64,10 @@ export async function cacheDel(key) {
 export async function ping() {
   try {
     const r = await getRedis();
-    if (!r) throw new Error('Redis not available');
+    if (!r) throw new BusinessError(503, 'Redis not available');
     await r.ping();
     return true;
-  } catch { throw new Error('Redis ping failed'); }
+  } catch { throw new BusinessError(503, 'Redis ping failed'); }
 }
 
 export async function quit() {

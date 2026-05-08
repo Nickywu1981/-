@@ -2,6 +2,7 @@ import mysql from 'mysql2/promise';
 import { db as dbConfig, mockEnabled } from '../config/index.js';
 import { tenantPool, adminPool } from './tenantPool.js';
 import { getContextDB } from './context.js';
+import logger from '../utils/logger.js';
 
 let mockStore = null;
 async function loadMockStore() {
@@ -166,7 +167,7 @@ const realPoolProxy = new Proxy(realPool, {
         return result;
       } catch (err) {
         if (err.code === 'ECONNREFUSED' || err.code === 'ER_BAD_DB_ERROR' || err.code === 'ENOTFOUND') {
-          console.log(`[Mock] DB unavailable (${err.code}), using mock data for: ${args[0]?.substring(0, 80)}`);
+          logger.info(`[Mock] DB unavailable (${err.code}), using mock data for: ${args[0]?.substring(0, 80)}`);
           return mockExecute(args[0], args[1]);
         }
         throw err;

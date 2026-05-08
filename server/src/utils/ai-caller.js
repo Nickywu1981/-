@@ -4,6 +4,7 @@
  * 统一 AI 模型调用: 超时控制 + 重试 + 熔断器集成
  */
 import { CircuitBreaker } from './circuit-breaker.js';
+import { BusinessError } from './businessError.js';
 
 const DEFAULT_TIMEOUT = 120000;
 const DEFAULT_RETRIES = 3;
@@ -37,7 +38,7 @@ export async function call(endpoint, apiKey, params, options = {}) {
 
       if (!response.ok) {
         const errorBody = await response.text();
-        throw new Error(`[${modelName || 'AI'}] HTTP ${response.status}: ${errorBody}`);
+        throw new BusinessError(502, `[${modelName || 'AI'}] HTTP ${response.status}: ${errorBody}`);
       }
 
       const result = await response.json();

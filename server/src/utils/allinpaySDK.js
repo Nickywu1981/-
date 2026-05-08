@@ -8,6 +8,7 @@ import crypto from 'crypto';
 import { readFileSync } from 'fs';
 import allinpayConfig from '../config/allinpay.js';
 import logger from './logger.js';
+import { BusinessError } from './businessError.js';
 
 // ==================== 密钥缓存 ====================
 
@@ -57,7 +58,7 @@ export function buildSignString(params) {
 
 export function rsaSign(signStr) {
   const privateKey = getPrivateKey();
-  if (!privateKey) throw new Error('商户私钥未配置');
+  if (!privateKey) throw new BusinessError(503, '商户私钥未配置');
   const sign = crypto.createSign('RSA-SHA1');
   sign.update(signStr, 'utf-8');
   return sign.sign(privateKey, 'base64');
@@ -67,7 +68,7 @@ export function rsaSign(signStr) {
 
 export function rsaVerify(signStr, signature) {
   const publicKey = getPublicKey();
-  if (!publicKey) throw new Error('通联公钥未配置');
+  if (!publicKey) throw new BusinessError(503, '通联公钥未配置');
   const verify = crypto.createVerify('RSA-SHA1');
   verify.update(signStr, 'utf-8');
   return verify.verify(publicKey, signature, 'base64');
@@ -128,7 +129,7 @@ export async function unifiedOrder(params) {
     });
   } catch (err) {
     logger.error('[Allinpay] 统一下单网络错误', err);
-    throw new Error('支付网关连接失败，请稍后重试');
+    throw new BusinessError(502, '支付网关连接失败，请稍后重试');
   }
 
   const raw = await res.text();
@@ -137,13 +138,13 @@ export async function unifiedOrder(params) {
     result = JSON.parse(raw);
   } catch {
     logger.error('[Allinpay] 统一下单响应解析失败', { raw });
-    throw new Error('支付网关响应异常');
+    throw new BusinessError(502, '支付网关响应异常');
   }
 
   logger.info('[Allinpay] 统一下单响应', result);
 
   if (result.retcode !== 'SUCCESS') {
-    throw new Error(result.retmsg || '支付下单失败');
+    throw new BusinessError(502, result.retmsg || '支付下单失败');
   }
 
   const respSign = result.sign;

@@ -2,6 +2,7 @@
  * 会员权益门控 — 检查用户当前套餐的 feature flag
  */
 import pool from '../dao/db.js';
+import { BusinessError } from '../utils/businessError.js';
 
 const ALLOWED_FEATURES = new Set(['watermark_free', 'hd_export', 'brand_kit', 'priority_queue']);
 
@@ -28,7 +29,7 @@ async function getUserPlan(userId) {
  */
 export async function hasFeature(userId, feature) {
   if (!ALLOWED_FEATURES.has(feature)) {
-    throw new Error(`非法的权益字段: ${feature}`);
+    throw new BusinessError(400, `非法的权益字段: ${feature}`);
   }
   const plan = await getUserPlan(userId);
   return plan?.[feature] === 1;
