@@ -44,6 +44,7 @@ vi.mock('../../dao/creditDao.js', () => ({
   getPlanByType: vi.fn().mockResolvedValue({ id: 2, type: 2, name: '季卡', credits: 200, status: 1 }),
   getMembership: vi.fn().mockResolvedValue({ plan_type: 0, end_time: null }),
   createCreditRecord: vi.fn().mockResolvedValue({ id: 1 }),
+  insertConsumptionLog: vi.fn().mockResolvedValue({ id: 1 }),
   listActivePlans: vi.fn().mockResolvedValue([]),
 }));
 

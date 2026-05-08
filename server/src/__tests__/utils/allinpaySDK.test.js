@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 
 vi.mock('../../config/allinpay.js', () => ({
-  default: { isSandbox: true, cusid: '', privateKeyPath: '', publicKeyPath: '', appid: '', baseUrl: '', returnUrl: '', notifyUrl: '', signType: 'RSA-SHA1' }
+  default: { isSandbox: true, cusid: '', privateKeyPath: '', publicKeyPath: '', appid: '', baseUrl: '', returnUrl: '', notifyUrl: '', signType: 'RSA-SHA1' },
 }));
 vi.mock('../../utils/logger.js', () => ({ default: { info: () => {}, warn: () => {}, error: () => {} } }));
 
