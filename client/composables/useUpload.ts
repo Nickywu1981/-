@@ -19,10 +19,10 @@ export function useUpload(options?: { maxFiles?: number; acceptVideo?: boolean }
 
   async function uploadFile(file: File): Promise<string> {
     const config = useRuntimeConfig();
-    const apiBase = config.public.apiBase || '';
+    const apiBase = config.public.apiBase || '/api';
     const formData = new FormData();
     formData.append('file', file);
-    const res: any = await $fetch(`${apiBase}/api/upload/image`, {
+    const res: any = await $fetch(`${apiBase}/upload/image`, {
       method: 'POST',
       body: formData,
       credentials: 'include',
