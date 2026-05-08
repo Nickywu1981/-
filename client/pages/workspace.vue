@@ -587,33 +587,45 @@ function onResize() {
 
 <style scoped>
 /* ================================================
-   WORKSPACE APP SHELL
+   WORKSPACE — Movio AI 电商科技风 v3
+   靛蓝渐变 + 玻璃态 + 微光效 + 点阵纹理
    ================================================ */
 .ws-app {
   display: flex;
   flex-direction: column;
   height: 100vh;
   background: var(--ws-bg);
+  background-image:
+    radial-gradient(ellipse 80% 60% at 20% 15%, rgba(79,92,246,0.03) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 70% at 80% 85%, rgba(124,58,237,0.02) 0%, transparent 50%);
   overflow: hidden;
 }
 
 /* ================================================
-   HEADER — 60px, full-width, glass-morphism
+   HEADER — 玻璃态 + 渐变底边
    ================================================ */
 .ws-header {
   height: 60px;
-  background: rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.78);
   border-bottom: 1px solid var(--border-light);
   display: flex;
   align-items: center;
   flex-shrink: 0;
   z-index: 100;
   position: relative;
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+.ws-header::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(79,92,246,0.25), rgba(124,58,237,0.15), transparent);
+  opacity: 0.6;
 }
 [data-theme="dark"] .ws-header {
-  background: rgba(15,17,23,0.82);
+  background: rgba(13,15,24,0.84);
 }
 
 .ws-header-inner {
@@ -640,6 +652,10 @@ function onResize() {
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.3px;
+  background: var(--brand-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* Header Center — Pill Tab Navigation */
@@ -667,20 +683,21 @@ function onResize() {
   font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
   letter-spacing: 0.01em;
 }
 
-.ws-header-tab:hover { color: var(--text-primary); background: rgba(0,0,0,0.03); }
-[data-theme="dark"] .ws-header-tab:hover { background: rgba(255,255,255,0.04); }
+.ws-header-tab:hover { color: var(--text-primary); background: rgba(79,92,246,0.04); }
+[data-theme="dark"] .ws-header-tab:hover { background: rgba(139,149,255,0.06); }
 .ws-header-tab.active {
   background: #fff;
-  color: var(--text-primary);
+  color: var(--brand);
   font-weight: 600;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.03);
+  box-shadow: 0 1px 3px rgba(15,18,30,0.06), 0 1px 2px rgba(15,18,30,0.03);
 }
 [data-theme="dark"] .ws-header-tab.active {
-  background: #1e2130;
+  background: #1a1d35;
+  color: var(--ws-accent);
   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 .ws-header-tab-icon { font-size: 15px; line-height: 1; }
@@ -704,23 +721,25 @@ function onResize() {
   background: transparent;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.15s cubic-bezier(0.4,0,0.2,1);
 }
-.ws-header-icon-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+.ws-header-icon-btn:hover { background: var(--bg-hover); color: var(--brand); }
 
 .notif-btn { position: relative; }
 .notif-badge {
   position: absolute;
   top: 2px; right: 2px;
-  width: 16px; height: 16px;
-  background: var(--brand);
+  min-width: 16px; height: 16px;
+  background: var(--brand-gradient);
   color: #fff;
   font-size: 10px;
   font-weight: 600;
-  border-radius: 50%;
+  border-radius: 100px;
+  padding: 0 4px;
   display: flex;
   align-items: center;
   justify-content: center;
+  animation: glow-pulse 3s ease-in-out infinite;
 }
 
 /* User */
@@ -795,13 +814,19 @@ function onResize() {
   border: none;
   border-radius: 8px;
   background: var(--brand-gradient);
+  background-size: 200% 200%;
+  animation: gradient-shift 4s ease infinite;
   color: #fff;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+  box-shadow: 0 2px 8px rgba(79,92,246,0.25);
 }
-.ws-header-register-btn:hover { box-shadow: 0 2px 12px var(--brand-alpha-30); }
+.ws-header-register-btn:hover {
+  box-shadow: 0 4px 16px rgba(79,92,246,0.35);
+  transform: translateY(-1px);
+}
 
 .ws-header-hamburger {
   display: none;

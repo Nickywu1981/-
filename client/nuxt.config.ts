@@ -2,7 +2,7 @@ export default defineNuxtConfig({
   ssr: false, // 开发环境禁用SSR避免OOM，生产通过nginx+PM2开启
   devtools: { enabled: process.env.NODE_ENV !== 'production' },
 
-  css: ['vant/lib/index.css'],
+  css: ['vant/lib/index.css', '@/assets/css/design-tokens.css'],
 
   app: {
     head: {
@@ -11,7 +11,7 @@ export default defineNuxtConfig({
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
         { name: 'description', content: 'Movio AI — 电商AI SaaS，抠图/场景/主图/视频/详情页/虚拟模特，一个工具搞定电商全部图文视频素材' },
-        { name: 'theme-color', content: '#7C3AED' },
+        { name: 'theme-color', content: '#4F46E5' },
         { 'http-equiv': 'X-UA-Compatible', content: 'IE=edge' },
         // Content Security Policy (CSP)
         { 'http-equiv': 'Content-Security-Policy', content: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' wss: ws: http://localhost:3001; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" },
@@ -136,6 +136,11 @@ export default defineNuxtConfig({
     css: {
       preprocessorOptions: {
         scss: { additionalData: '' },
+      },
+    },
+    resolve: {
+      alias: {
+        '@shared': '../shared',
       },
     },
     build: {

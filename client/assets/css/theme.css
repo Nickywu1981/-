@@ -1,55 +1,56 @@
-/* Movio AI — 全局主题变量 (极简黑白灰现代风) */
+/* Movio AI — 全局主题变量 (电商AI科技风 v3) */
 
 /* ================================================
    1. 基础主题色（亮色）
    ================================================ */
 :root {
   /* 背景 */
-  --bg-page: #fafafa;
+  --bg-page: #f8f9fb;
   --bg-card: #ffffff;
-  --bg-header: #ffffff;
+  --bg-header: rgba(255,255,255,0.85);
   --white: #ffffff;
   --text-on-brand: #ffffff;
-  --bg-footer: #fafafa;
-  --bg-input: #fafafa;
-  --bg-hover: #f5f5f5;
-  --bg-overlay: rgba(0, 0, 0, 0.45);
+  --bg-footer: #f8f9fb;
+  --bg-input: #f8f9fb;
+  --bg-hover: #f1f3f8;
+  --bg-overlay: rgba(15, 18, 30, 0.5);
 
   /* 文字 */
-  --text-primary: #1a1a1a;
-  --text-secondary: #6b7280;
-  --text-muted: #9ca3af;
-  --text-link: #1a1a1a;
+  --text-primary: #0f121e;
+  --text-secondary: #5b6178;
+  --text-muted: #949ab0;
+  --text-link: #4f5cf6;
 
   /* 边框 */
-  --border-light: #f3f4f6;
-  --border-card: #f3f4f6;
+  --border-light: #eaecf2;
+  --border-card: #eaecf2;
 
-  /* 品牌色（黑灰为主） */
-  --brand: #1a1a1a;
-  --brand-hover: #374151;
-  --brand-soft: #9ca3af;
-  --brand-light: #f5f5f5;
-  --brand-lightest: #fafafa;
-  --brand-light-alt: #f3f4f6;
-  --brand-darkest: #0a0a0a;
-  --brand-gradient: linear-gradient(135deg, #1a1a1a 0%, #374151 100%);
-  --brand-alpha-08: rgba(26, 26, 26, 0.08);
-  --brand-alpha-10: rgba(26, 26, 26, 0.10);
-  --brand-alpha-12: rgba(26, 26, 26, 0.12);
-  --brand-alpha-15: rgba(26, 26, 26, 0.15);
-  --brand-alpha-20: rgba(26, 26, 26, 0.20);
-  --brand-alpha-25: rgba(26, 26, 26, 0.25);
-  --brand-alpha-30: rgba(26, 26, 26, 0.30);
-  --brand-alpha-35: rgba(26, 26, 26, 0.35);
+  /* 品牌色 — 靛蓝科技紫 */
+  --brand: #4f5cf6;
+  --brand-hover: #3d48d9;
+  --brand-soft: #a5acff;
+  --brand-light: #f0f1ff;
+  --brand-lightest: #f8f9ff;
+  --brand-light-alt: #e8e9ff;
+  --brand-darkest: #2d1fb8;
+  --brand-gradient: linear-gradient(135deg, #4f5cf6 0%, #7c3aed 50%, #a855f7 100%);
+  --brand-glow: 0 0 20px rgba(79, 92, 246, 0.25);
+  --brand-alpha-08: rgba(79, 92, 246, 0.08);
+  --brand-alpha-10: rgba(79, 92, 246, 0.10);
+  --brand-alpha-12: rgba(79, 92, 246, 0.12);
+  --brand-alpha-15: rgba(79, 92, 246, 0.15);
+  --brand-alpha-20: rgba(79, 92, 246, 0.20);
+  --brand-alpha-25: rgba(79, 92, 246, 0.25);
+  --brand-alpha-30: rgba(79, 92, 246, 0.30);
+  --brand-alpha-35: rgba(79, 92, 246, 0.35);
 
   /* 边框补充 */
-  --border-muted: #f3f4f6;
+  --border-muted: #eaecf2;
 
   /* 状态 */
-  --success: #059669;
-  --warning: #d97706;
-  --danger: #dc2626;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
 
   /* 状态背景 */
   --success-light: #ecfdf5;
@@ -57,62 +58,63 @@
   --warning-border: #fef3c7;
   --danger-light: #fef2f2;
 
-  /* 阴影 — 极淡 */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04);
-  --shadow-dropdown: 0 4px 16px rgba(0, 0, 0, 0.06);
+  /* 阴影 */
+  --shadow-sm: 0 1px 2px rgba(15, 18, 30, 0.04);
+  --shadow-card: 0 1px 3px rgba(15, 18, 30, 0.05), 0 1px 2px rgba(15, 18, 30, 0.03);
+  --shadow-dropdown: 0 8px 24px rgba(15, 18, 30, 0.08);
+  --shadow-glow: 0 0 24px rgba(79, 92, 246, 0.12);
 
-  /* 标签/徽章背景 */
-  --tag-bg: #f5f5f5;
-  --badge-bg: #f5f5f5;
+  /* 标签/徽章 */
+  --tag-bg: #f1f3f8;
+  --badge-bg: #f1f3f8;
 
   /* ================================================
      2. 布局与间距
      ================================================ */
   --sidebar-width: 240px;
   --sidebar-bg: #ffffff;
-  --sidebar-text: #6b7280;
-  --sidebar-text-active: #1a1a1a;
-  --sidebar-hover-bg: #f5f5f5;
-  --sidebar-active-bg: #f3f4f6;
+  --sidebar-text: #5b6178;
+  --sidebar-text-active: #4f5cf6;
+  --sidebar-hover-bg: #f8f9ff;
+  --sidebar-active-bg: #f0f1ff;
   --content-padding: 28px;
   --section-gap: 24px;
   --card-padding: 24px;
 
   /* ================================================
-     3. 统一圆角尺寸
+     3. 统一圆角
      ================================================ */
   --radius-xs: 4px;
   --radius-sm: 6px;
   --radius-md: 8px;
-  --radius-lg: 10px;
-  --radius-xl: 12px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
   --radius-full: 9999px;
 
   /* ================================================
      4. 交互状态
      ================================================ */
-  --focus-ring: 0 0 0 2px rgba(26, 26, 26, 0.15);
-  --input-focus-border: #d1d5db;
-  --transition-fast: 0.12s ease;
-  --transition-base: 0.15s ease;
-  --transition-slow: 0.2s ease;
+  --focus-ring: 0 0 0 3px rgba(79, 92, 246, 0.18);
+  --input-focus-border: #a5acff;
+  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   /* ================================================
      5. 组件 Token
      ================================================ */
-  --table-header-bg: #fafafa;
-  --table-row-hover: #f5f5f5;
-  --table-border: #f3f4f6;
-  --input-border: #f3f4f6;
-  --input-placeholder: #d1d5db;
-  --input-radius: 8px;
-  --btn-radius: 8px;
+  --table-header-bg: #f8f9fb;
+  --table-row-hover: #f1f3f8;
+  --table-border: #eaecf2;
+  --input-border: #eaecf2;
+  --input-placeholder: #949ab0;
+  --input-radius: 10px;
+  --btn-radius: 10px;
   --btn-padding: 8px 20px;
   --btn-font-size: 13px;
-  --modal-overlay: rgba(0, 0, 0, 0.45);
-  --modal-radius: 12px;
-  --modal-shadow: 0 16px 48px rgba(0, 0, 0, 0.08);
+  --modal-overlay: rgba(15, 18, 30, 0.5);
+  --modal-radius: 16px;
+  --modal-shadow: 0 20px 60px rgba(15, 18, 30, 0.12);
   --modal-padding: 28px;
   --badge-radius: 4px;
   --badge-font-size: 11px;
@@ -134,10 +136,10 @@
   --status-active-text: #059669;
   --status-banned-bg: #fef2f2;
   --status-banned-text: #dc2626;
-  --status-draft-bg: #f5f5f5;
-  --status-draft-text: #6b7280;
-  --status-refund-bg: #f5f5f5;
-  --status-refund-text: #6b7280;
+  --status-draft-bg: #f1f3f8;
+  --status-draft-text: #5b6178;
+  --status-refund-bg: #f1f3f8;
+  --status-refund-text: #5b6178;
   --status-approved-bg: #ecfdf5;
   --status-approved-text: #059669;
   --status-rejected-bg: #fef2f2;
@@ -146,38 +148,38 @@
   /* ================================================
      7. 骨架屏 / 图表
      ================================================ */
-  --skeleton-bg: #f3f4f6;
-  --skeleton-shimmer-1: #f5f5f5;
-  --skeleton-shimmer-2: #f3f4f6;
-  --chart-grid: #f3f4f6;
-  --chart-text: #9ca3af;
+  --skeleton-bg: #eaecf2;
+  --skeleton-shimmer-1: #f1f3f8;
+  --skeleton-shimmer-2: #eaecf2;
+  --chart-grid: #eaecf2;
+  --chart-text: #949ab0;
 
-  --hero-cta-bg: linear-gradient(135deg, #1a1a1a 0%, #374151 100%);
+  --hero-cta-bg: linear-gradient(135deg, #4f5cf6 0%, #7c3aed 100%);
   --text-on-dark: #ffffff;
 
   /* 通用补充 */
   --bg-elevated: #ffffff;
-  --bg-primary: #fafafa;
-  --bg-secondary: #f5f5f5;
-  --bg-subtle: #fafafa;
-  --bg-tertiary: #fafafa;
-  --border: #f3f4f6;
+  --bg-primary: #f8f9fb;
+  --bg-secondary: #f1f3f8;
+  --bg-subtle: #f8f9fb;
+  --bg-tertiary: #f8f9fb;
+  --border: #eaecf2;
   --card-bg: #ffffff;
-  --brand-alpha: rgba(26, 26, 26, 0.06);
-  --brand-bg: #f5f5f5;
-  --brand-border: rgba(26, 26, 26, 0.08);
+  --brand-alpha: rgba(79, 92, 246, 0.08);
+  --brand-bg: #f0f1ff;
+  --brand-border: rgba(79, 92, 246, 0.12);
   --danger-bg: #fef2f2;
   --info: #3b82f6;
   --info-bg: #eff6ff;
   --success-bg: #ecfdf5;
-  --text-tertiary: #9ca3af;
+  --text-tertiary: #949ab0;
   --warning-bg: #fffbeb;
-  --radius: 8px;
-  --shadow: 0 1px 3px rgba(0,0,0,0.04);
-  --shadow-brand: 0 2px 8px rgba(26, 26, 26, 0.08);
-  --shadow-lg: 0 8px 24px rgba(0,0,0,0.06);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.04);
-  --shadow-xl: 0 16px 32px rgba(0,0,0,0.06);
+  --radius: 10px;
+  --shadow: 0 1px 3px rgba(15, 18, 30, 0.05);
+  --shadow-brand: 0 4px 16px rgba(79, 92, 246, 0.12);
+  --shadow-lg: 0 12px 32px rgba(15, 18, 30, 0.08);
+  --shadow-md: 0 6px 16px rgba(15, 18, 30, 0.06);
+  --shadow-xl: 0 20px 48px rgba(15, 18, 30, 0.10);
   --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;
@@ -186,57 +188,57 @@
 }
 
 /* ================================================
-   8. 暗色主题覆盖
+   8. 暗色主题
    ================================================ */
 [data-theme="dark"] {
-  --bg-page: #0d0d0d;
-  --bg-card: #1a1a1a;
-  --bg-header: #141414;
-  --bg-footer: #111111;
-  --bg-input: #1a1a1a;
-  --bg-hover: #222222;
-  --bg-overlay: rgba(0, 0, 0, 0.75);
+  --bg-page: #0a0c14;
+  --bg-card: #141724;
+  --bg-header: rgba(20, 23, 36, 0.88);
+  --bg-footer: #0d0f18;
+  --bg-input: #141724;
+  --bg-hover: #1a1d2e;
+  --bg-overlay: rgba(0, 0, 0, 0.7);
   --white: #ffffff;
   --text-on-brand: #ffffff;
 
-  --text-primary: #e5e5e5;
-  --text-secondary: #9ca3af;
-  --text-muted: #6b7280;
-  --text-link: #e5e5e5;
+  --text-primary: #e8eaf0;
+  --text-secondary: #8b90a5;
+  --text-muted: #5d6380;
+  --text-link: #8b95ff;
 
-  --border-light: #2a2a2a;
-  --border-card: #2a2a2a;
+  --border-light: #1e2235;
+  --border-card: #1e2235;
 
-  --brand: #e5e5e5;
-  --brand-soft: #9ca3af;
-  --brand-light: #1a1a1a;
-  --brand-light-alt: #222222;
-  --brand-hover: #ffffff;
+  --brand: #8b95ff;
+  --brand-soft: #5d65c8;
+  --brand-light: #1a1d35;
+  --brand-light-alt: #1e2240;
+  --brand-hover: #a5acff;
+  --brand-gradient: linear-gradient(135deg, #6b78ff 0%, #9b5cff 50%, #c084fc 100%);
+  --brand-glow: 0 0 28px rgba(107, 120, 255, 0.3);
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-dropdown: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --shadow-dropdown: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 28px rgba(107, 120, 255, 0.15);
 
-  --tag-bg: #1a1a1a;
-  --badge-bg: #1a1a1a;
+  --tag-bg: #1a1d35;
+  --badge-bg: #1a1d35;
 
-  /* 布局暗色 */
-  --sidebar-bg: #141414;
-  --sidebar-text: #6b7280;
-  --sidebar-text-active: #e5e5e5;
-  --sidebar-hover-bg: #1a1a1a;
-  --sidebar-active-bg: #1a1a1a;
+  --sidebar-bg: #0d0f18;
+  --sidebar-text: #5d6380;
+  --sidebar-text-active: #8b95ff;
+  --sidebar-hover-bg: #141724;
+  --sidebar-active-bg: #1a1d35;
 
-  /* 组件暗色 */
-  --table-header-bg: #1a1a1a;
-  --table-row-hover: #1a1a1a;
-  --table-border: #2a2a2a;
-  --input-border: #2a2a2a;
-  --input-placeholder: #6b7280;
+  --table-header-bg: #141724;
+  --table-row-hover: #1a1d35;
+  --table-border: #1e2235;
+  --input-border: #1e2235;
+  --input-placeholder: #5d6380;
   --modal-overlay: rgba(0, 0, 0, 0.7);
-  --modal-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+  --modal-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
 
-  /* 状态语义色暗色 */
   --status-pending-bg: #3d2e00;
   --status-pending-text: #fbbf24;
   --status-processing-bg: #1a2e4a;
@@ -249,52 +251,50 @@
   --status-active-text: #4ade80;
   --status-banned-bg: #450a0a;
   --status-banned-text: #f87171;
-  --status-draft-bg: #1a1a1a;
-  --status-draft-text: #6b7280;
-  --status-refund-bg: #1a1a1a;
-  --status-refund-text: #6b7280;
+  --status-draft-bg: #1a1d35;
+  --status-draft-text: #5d6380;
+  --status-refund-bg: #1a1d35;
+  --status-refund-text: #5d6380;
   --status-approved-bg: #052e16;
   --status-approved-text: #4ade80;
   --status-rejected-bg: #450a0a;
   --status-rejected-text: #f87171;
 
-  /* 骨架屏 / 图表暗色 */
-  --skeleton-bg: #1a1a1a;
-  --skeleton-shimmer-1: #1a1a1a;
-  --skeleton-shimmer-2: #222222;
-  --chart-grid: #2a2a2a;
-  --chart-text: #6b7280;
+  --skeleton-bg: #1a1d35;
+  --skeleton-shimmer-1: #1e2240;
+  --skeleton-shimmer-2: #1a1d35;
+  --chart-grid: #1e2235;
+  --chart-text: #5d6380;
 
-  --hero-cta-bg: linear-gradient(135deg, #e5e5e5 0%, #9ca3af 100%);
-  --text-on-dark: #0a0a0a;
+  --hero-cta-bg: linear-gradient(135deg, #6b78ff 0%, #9b5cff 100%);
+  --text-on-dark: #0a0c14;
 
-  /* 通用补充暗色 */
-  --bg-elevated: #1a1a1a;
-  --bg-primary: #141414;
-  --bg-secondary: #1a1a1a;
-  --bg-subtle: #111111;
-  --bg-tertiary: #1a1a1a;
-  --border: #2a2a2a;
-  --card-bg: #1a1a1a;
-  --brand-alpha-10: rgba(255, 255, 255, 0.06);
-  --brand-alpha-15: rgba(255, 255, 255, 0.08);
-  --brand-alpha-35: rgba(255, 255, 255, 0.12);
-  --brand-alpha: rgba(255, 255, 255, 0.06);
-  --brand-bg: rgba(255, 255, 255, 0.04);
-  --brand-border: rgba(255, 255, 255, 0.08);
-  --border-muted: #2a2a2a;
-  --danger-bg: rgba(220, 38, 38, 0.1);
+  --bg-elevated: #141724;
+  --bg-primary: #0d0f18;
+  --bg-secondary: #141724;
+  --bg-subtle: #0a0c14;
+  --bg-tertiary: #141724;
+  --border: #1e2235;
+  --card-bg: #141724;
+  --brand-alpha-10: rgba(107, 120, 255, 0.08);
+  --brand-alpha-15: rgba(107, 120, 255, 0.10);
+  --brand-alpha-35: rgba(107, 120, 255, 0.15);
+  --brand-alpha: rgba(107, 120, 255, 0.08);
+  --brand-bg: rgba(107, 120, 255, 0.06);
+  --brand-border: rgba(107, 120, 255, 0.10);
+  --border-muted: #1e2235;
+  --danger-bg: rgba(239, 68, 68, 0.1);
   --info: #60a5fa;
   --info-bg: rgba(59, 130, 246, 0.1);
-  --success-bg: rgba(5, 150, 105, 0.1);
-  --text-tertiary: #6b7280;
-  --warning-bg: rgba(217, 119, 6, 0.1);
-  --radius: 8px;
-  --shadow: 0 1px 3px rgba(0,0,0,0.4);
-  --shadow-brand: 0 2px 8px rgba(255, 255, 255, 0.04);
-  --shadow-lg: 0 8px 24px rgba(0,0,0,0.4);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.3);
-  --shadow-xl: 0 16px 32px rgba(0,0,0,0.5);
+  --success-bg: rgba(16, 185, 129, 0.1);
+  --text-tertiary: #5d6380;
+  --warning-bg: rgba(245, 158, 11, 0.1);
+  --radius: 10px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-brand: 0 4px 16px rgba(107, 120, 255, 0.1);
+  --shadow-lg: 0 12px 32px rgba(0,0,0,0.4);
+  --shadow-md: 0 6px 16px rgba(0,0,0,0.3);
+  --shadow-xl: 0 20px 48px rgba(0,0,0,0.5);
   --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;
@@ -314,7 +314,7 @@ body {
 }
 
 /* ================================================
-   10. 弹窗动画
+   10. 动效关键帧
    ================================================ */
 @keyframes modal-enter {
   from { opacity: 0; transform: scale(0.97) translateY(4px); }
@@ -333,8 +333,65 @@ body {
   to { opacity: 0; }
 }
 
+/* 渐变呼吸 */
+@keyframes breathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* 光晕脉冲 */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 12px rgba(79, 92, 246, 0.15); }
+  50% { box-shadow: 0 0 28px rgba(79, 92, 246, 0.35); }
+}
+
+/* 渐变流动 */
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* 卡片上浮 */
+@keyframes float-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 光点扫描 */
+@keyframes scan-line {
+  0% { top: -2px; }
+  100% { top: 100%; }
+}
+
+/* 点阵旋转 */
+@keyframes dot-drift {
+  0% { background-position: 0 0; }
+  100% { background-position: 40px 40px; }
+}
+
 /* ================================================
-   11. 过渡工具类
+   11. 背景纹理
+   ================================================ */
+.dot-pattern {
+  background-image: radial-gradient(circle, var(--border-light) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.dot-pattern-subtle {
+  background-image: radial-gradient(circle, rgba(79, 92, 246, 0.06) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.gradient-mesh {
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 20%, rgba(79, 92, 246, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 80% at 80% 80%, rgba(124, 58, 237, 0.03) 0%, transparent 50%),
+    var(--bg-page);
+}
+
+/* ================================================
+   12. 过渡工具类
    ================================================ */
 .fade-enter-active { transition: opacity var(--transition-base); }
 .fade-leave-active { transition: opacity var(--transition-fast); }
@@ -346,40 +403,42 @@ body {
 .slide-up-leave-to { opacity: 0; transform: translateY(-6px); }
 
 /* ================================================
-   12. 工作台主题 Token (极简黑白灰)
+   13. 工作台主题 Token (电商AI科技风)
    ================================================ */
 :root {
-  --ws-accent: #1a1a1a;
-  --ws-accent-hover: #374151;
-  --ws-accent-light: #f5f5f5;
-  --ws-accent-gradient: linear-gradient(135deg, #1a1a1a 0%, #374151 100%);
-  --ws-bg: #fafafa;
+  --ws-accent: #4f5cf6;
+  --ws-accent-hover: #3d48d9;
+  --ws-accent-light: #f0f1ff;
+  --ws-accent-gradient: linear-gradient(135deg, #4f5cf6 0%, #7c3aed 50%, #a855f7 100%);
+  --ws-accent-glow: 0 0 20px rgba(79, 92, 246, 0.2);
+  --ws-bg: #f8f9fb;
   --ws-card: #ffffff;
-  --ws-card-hover-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  --ws-dot-color: rgba(0, 0, 0, 0.02);
+  --ws-card-hover-shadow: 0 8px 24px rgba(15, 18, 30, 0.08);
+  --ws-dot-color: rgba(79, 92, 246, 0.04);
   --ws-sidebar-bg: #ffffff;
-  --ws-sidebar-hover: #f5f5f5;
-  --ws-sidebar-active: #f3f4f6;
+  --ws-sidebar-hover: #f8f9ff;
+  --ws-sidebar-active: #f0f1ff;
   --ws-sidebar-width: 200px;
-  --ws-tab-active-bg: #f3f4f6;
-  --ws-tab-hover-bg: #f5f5f5;
-  --ws-input-focus-shadow: 0 0 0 3px rgba(0, 0, 0, 0.04);
+  --ws-tab-active-bg: #f0f1ff;
+  --ws-tab-hover-bg: #f1f3f8;
+  --ws-input-focus-shadow: 0 0 0 3px rgba(79, 92, 246, 0.1), 0 0 24px rgba(79, 92, 246, 0.06);
   --ws-header-height: 56px;
 }
 
 [data-theme="dark"] {
-  --ws-accent: #e5e5e5;
-  --ws-accent-hover: #ffffff;
-  --ws-accent-light: #1a1a1a;
-  --ws-accent-gradient: linear-gradient(135deg, #e5e5e5 0%, #9ca3af 100%);
-  --ws-bg: #0d0d0d;
-  --ws-card: #1a1a1a;
-  --ws-card-hover-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-  --ws-dot-color: rgba(255, 255, 255, 0.02);
-  --ws-sidebar-bg: #141414;
-  --ws-sidebar-hover: #1a1a1a;
-  --ws-sidebar-active: #1a1a1a;
-  --ws-tab-hover-bg: #1a1a1a;
-  --ws-input-focus-shadow: 0 0 0 3px rgba(255, 255, 255, 0.04);
+  --ws-accent: #8b95ff;
+  --ws-accent-hover: #a5acff;
+  --ws-accent-light: #1a1d35;
+  --ws-accent-gradient: linear-gradient(135deg, #6b78ff 0%, #9b5cff 50%, #c084fc 100%);
+  --ws-accent-glow: 0 0 28px rgba(107, 120, 255, 0.25);
+  --ws-bg: #0a0c14;
+  --ws-card: #141724;
+  --ws-card-hover-shadow: 0 8px 28px rgba(0, 0, 0, 0.3), 0 0 24px rgba(107, 120, 255, 0.06);
+  --ws-dot-color: rgba(107, 120, 255, 0.04);
+  --ws-sidebar-bg: #0d0f18;
+  --ws-sidebar-hover: #141724;
+  --ws-sidebar-active: #1a1d35;
+  --ws-tab-hover-bg: #141724;
+  --ws-input-focus-shadow: 0 0 0 3px rgba(107, 120, 255, 0.12), 0 0 28px rgba(107, 120, 255, 0.08);
   --ws-header-height: 56px;
 }
