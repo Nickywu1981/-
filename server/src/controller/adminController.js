@@ -150,6 +150,13 @@ export async function resumeTask(req, res, next) {
   } catch (err) { next(err); }
 }
 
+export async function cancelTask(req, res, next) {
+  try {
+    await commerce.cancelTask(req.params.taskId);
+    return success(res, {}, '已取消');
+  } catch (err) { next(err); }
+}
+
 // ==================== 任务审核 ====================
 
 export async function approveTask(req, res, next) {

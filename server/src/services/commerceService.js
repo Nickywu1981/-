@@ -213,10 +213,10 @@ export async function batchUpdateUserStatus(ids, status) {
 
 export async function retryTask(taskId) {
   const task = await commerceDao.getTaskById(taskId);
-  if (!task) throw Object.assign(new Error('任务不存在'), { statusCode: 404 });
-  if (![3, 4].includes(task.status)) throw Object.assign(new Error('只有失败/异常任务才能重试'), { statusCode: 400 });
+  if (!task) throw new BusinessError(404, '任务不存在');
+  if (![3, 4].includes(task.status)) throw new BusinessError(400, '只有失败/异常任务才能重试');
   const maxRetries = 3;
-  if (task.retry_count >= maxRetries) throw Object.assign(new Error('已达最大重试次数'), { statusCode: 400 });
+  if (task.retry_count >= maxRetries) throw new BusinessError(400, '已达最大重试次数');
   await commerceDao.updateTaskStatusDirect(taskId, {
     status: 6, progress: 0,
     progress_msg: `重试中(${task.retry_count + 1}/3)`,
@@ -225,14 +225,21 @@ export async function retryTask(taskId) {
 
 export async function pauseTask(taskId) {
   const task = await commerceDao.getTaskById(taskId);
-  if (!task) throw Object.assign(new Error('任务不存在'), { statusCode: 404 });
-  if (![1].includes(task.status)) throw Object.assign(new Error('只能暂停处理中的任务'), { statusCode: 400 });
+  if (!task) throw new BusinessError(404, '任务不存在');
+  if (![1].includes(task.status)) throw new BusinessError(400, '只能暂停处理中的任务');
   await commerceDao.updateTaskStatusDirect(taskId, { status: 5 });
 }
 
 export async function resumeTask(taskId) {
   const task = await commerceDao.getTaskById(taskId);
-  if (!task) throw Object.assign(new Error('任务不存在'), { statusCode: 404 });
-  if (![5].includes(task.status)) throw Object.assign(new Error('只能恢复已暂停的任务'), { statusCode: 400 });
+  if (!task) throw new BusinessError(404, '任务不存在');
+  if (![5].includes(task.status)) throw new BusinessError(400, '只能恢复已暂停的任务');
   await commerceDao.updateTaskStatusDirect(taskId, { status: 1 });
+}
+
+export async function cancelTask(taskId) {
+  const task = await commerceDao.getTaskById(taskId);
+  if (!task) throw new BusinessError(404, '任务不存在');
+  if (![0, 1, 5].includes(task.status)) throw new BusinessError(400, '只能取消待处理/处理中/已暂停的任务');
+  await commerceDao.updateTaskStatusDirect(taskId, { status: 4, progress_msg: '已取消' });
 }

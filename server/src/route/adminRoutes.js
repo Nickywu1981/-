@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getDashboardStats, listAllUsers, updateUserStatus, batchUpdateUserStatus, listAllTasks, listAllPlans, updatePlan, createPlan, deletePlan, getOperationLogs, checkContentRisk, approveTask, rejectTask, listAllOrders, deleteOrder, listCreditRecords, refundCredit, listAiCallLogs, getAiCallStats, listSensitiveWords, addSensitiveWord, deleteSensitiveWord, retryTask, pauseTask, resumeTask, listAllNotifications, sendNotification, deleteNotification, updateUser } from '../controller/adminController.js';
+import { getDashboardStats, listAllUsers, updateUserStatus, batchUpdateUserStatus, listAllTasks, listAllPlans, updatePlan, createPlan, deletePlan, getOperationLogs, checkContentRisk, approveTask, rejectTask, listAllOrders, deleteOrder, listCreditRecords, refundCredit, listAiCallLogs, getAiCallStats, listSensitiveWords, addSensitiveWord, deleteSensitiveWord, retryTask, pauseTask, resumeTask, cancelTask, listAllNotifications, sendNotification, deleteNotification, updateUser } from '../controller/adminController.js';
 import { adminListTemplates, adminSaveTemplate, adminReviewTemplate, adminDeleteTemplate } from '../controller/adminPromptController.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
@@ -84,7 +84,7 @@ router.post('/tasks/:taskId/approve', authMiddleware, adminAuth, asyncHandler(ap
 router.post('/tasks/:taskId/reject', authMiddleware, adminAuth, asyncHandler(rejectTask));
 router.post('/tasks/:taskId/retry', authMiddleware, adminAuth, asyncHandler(retryTask));
 router.post('/tasks/:taskId/pause', authMiddleware, adminAuth, asyncHandler(pauseTask));
-router.post('/tasks/:taskId/cancel', authMiddleware, adminAuth, asyncHandler(pauseTask)); // TODO: implement dedicated cancelTask
+router.post('/tasks/:taskId/cancel', authMiddleware, adminAuth, asyncHandler(cancelTask));
 router.post('/tasks/:taskId/resume', authMiddleware, adminAuth, asyncHandler(resumeTask));
 // 套餐
 router.get('/plans', authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(listAllPlans));

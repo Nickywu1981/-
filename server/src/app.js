@@ -210,7 +210,6 @@ app.use('/api/job', jobRoutesV4);   // 别名: useTaskPolling 轮询 /api/job/:i
 app.use('/api/points', pointsRoutesV4);
 app.use('/api/distribution', distributionRoutesV4);
 app.use('/api/assets', assetsRoutesV4);
-app.use('/api/cut-ecosystem', cutEcosystemRoutesV4);
 app.use('/api/compliance', complianceRoutesV4);
 app.use('/api/platforms', platformBindRoutesV4);
 app.use('/api/publish', publishRoutesV4);
