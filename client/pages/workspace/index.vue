@@ -7,8 +7,18 @@
       <p class="wh-sub">电商全链路AI自动化工作台</p>
     </div>
 
+    <!-- 加载骨架 -->
+    <div v-if="loading" class="wh-skeleton">
+      <div v-for="n in 3" :key="n" class="wh-sk-card">
+        <div class="wh-sk-line wh-sk-line--lg"></div>
+        <div class="wh-sk-grid">
+          <div v-for="m in 4" :key="m" class="wh-sk-item"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- 快捷入口卡片 -->
-    <div v-for="(group, cat) in cardGroups" :key="cat" class="wh-section">
+    <div v-else v-for="(group, cat) in cardGroups" :key="cat" class="wh-section">
       <div class="wh-sec-hd">
         <h3 class="wh-sec-title">{{ cat }}</h3>
       </div>
@@ -59,6 +69,7 @@ function go(path: string) { router.push(path) }
 
 type Card = { id: string; category: string; icon: string; title: string; desc: string; route: string; order: number; visible: boolean }
 
+const loading = ref(true)
 const cardGroups = ref<Record<string, Card[]>>({})
 
 const defaultCards: Card[] = [
@@ -109,6 +120,8 @@ onMounted(async () => {
       { icon: '📄', name: '面膜详情页设计', time: '昨天', path: '/workspace/creation' },
       { icon: '📰', name: '618活动海报', time: '2天前', path: '/workspace/creation' },
     ]
+  } finally {
+    loading.value = false
   }
 })
 </script>
@@ -153,6 +166,15 @@ onMounted(async () => {
 .wh-recent-time { font-size: 11px; color: var(--tx3, #9d9da3); }
 .wh-recent-arrow { font-size: 13px; color: var(--tx3, #9d9da3); }
 .wh-recent-empty { text-align: center; padding: 32px; color: var(--tx3, #9d9da3); font-size: 13px; }
+
+/* skeleton */
+.wh-skeleton { display: flex; flex-direction: column; gap: 24px; }
+.wh-sk-card { background: #fff; border-radius: 10px; border: 1px solid var(--brd, #ebebea); padding: 20px; }
+.wh-sk-line { height: 16px; background: #f0f0f0; border-radius: 4px; animation: wh-shimmer 1.5s infinite; }
+.wh-sk-line--lg { width: 120px; margin-bottom: 16px; }
+.wh-sk-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.wh-sk-item { height: 52px; background: #f0f0f0; border-radius: 8px; animation: wh-shimmer 1.5s infinite; }
+@keyframes wh-shimmer { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
 @media (max-width: 900px) {
   .wh-quick { grid-template-columns: repeat(3, 1fr); }
