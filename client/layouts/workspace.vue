@@ -47,7 +47,10 @@
 
     <div class="main-area">
       <header class="topbar">
-        <h2 class="topbar-title">{{ pageTitle }}</h2>
+        <div class="topbar-title-group">
+          <h2 class="topbar-title">{{ pageTitle }}</h2>
+          <span v-if="pageCategory" class="topbar-category">{{ pageCategory }}</span>
+        </div>
         <div class="topbar-actions">
           <span class="points-badge">积分: {{ userPoints }}</span>
           <NuxtLink v-if="isAdmin" to="/admin" class="btn btn-ghost btn-sm">管理后台</NuxtLink>
@@ -68,7 +71,22 @@ const toast = useToast()
 
 const route = useRoute()
 const currentPath = computed(() => route.path)
-const pageTitle = computed(() => '工作台')
+
+// 从导航数据中动态查找当前页面标题和所属分类
+const pageTitle = computed(() => {
+  for (const group of navGroups.value) {
+    const item = group.items.find(i => currentPath.value.startsWith(i.path))
+    if (item) return item.label
+  }
+  return '工作台'
+})
+const pageCategory = computed(() => {
+  for (const group of navGroups.value) {
+    const item = group.items.find(i => currentPath.value.startsWith(i.path))
+    if (item && group.label) return group.label
+  }
+  return ''
+})
 
 const sidebarCollapsed = ref(false)
 const userInitial = ref('U')
@@ -292,6 +310,8 @@ async function handleLogout() {
   background: var(--cfg-bg-primary); position: sticky; top: 0; z-index: 80;
 }
 .topbar-title { font-size: var(--cfg-font-size-md); font-weight: var(--cfg-font-weight-semibold); color: var(--cfg-text-primary); margin: 0; }
+.topbar-title-group { display: flex; align-items: baseline; gap: 12px; }
+.topbar-category { font-size: var(--cfg-font-size-xs); color: var(--cfg-text-muted); }
 .topbar-actions { display: flex; align-items: center; gap: 12px; }
 .points-badge { font-size: var(--cfg-font-size-sm); color: var(--cfg-primary); font-weight: var(--cfg-font-weight-medium); }
 
