@@ -68,7 +68,7 @@
           <span class="member-level" :class="member.level === 1 ? 'level1' : 'level2'">
             {{ member.level === 1 ? '直推' : '间推' }}
           </span>
-          <span class="member-date">{{ formatDate(member.bound_at) }}</span>
+          <span class="member-date">{{ formatDateTime(member.bound_at) }}</span>
         </div>
       </div>
       <div v-else class="empty-state">还没有推广成员，快去邀请好友吧</div>
@@ -89,7 +89,7 @@
           <div class="comm-meta">
             <span class="comm-order">订单 ¥{{ c.order_amount }} · {{ c.consumer_name || '用户' + c.consumer_id }}</span>
             <span class="comm-status" :class="c.status">{{ statusLabel(c.status) }}</span>
-            <span class="comm-time">{{ formatDate(c.created_at) }}</span>
+            <span class="comm-time">{{ formatDateTime(c.created_at) }}</span>
           </div>
         </div>
       </div>
@@ -103,8 +103,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useAppPage } from '~/composables/useAppPage'
-import { formatDate as _fmt, copyToClipboard } from '@/utils/format'
-const formatDate = (d: string) => d ? _fmt(d, 'MM-DD HH:mm') : ''
+import { formatDateTime, copyToClipboard } from '@/utils/format'
 
 
 

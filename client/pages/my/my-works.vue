@@ -36,7 +36,7 @@
             <h4 class="card-title">{{ item.title || '未命名作品' }}</h4>
             <div class="card-meta">
               <span class="meta-type">{{ typeLabel(item.type) }}</span>
-              <span class="meta-date">{{ formatDate(item.create_time) }}</span>
+              <span class="meta-date">{{ formatDateTime(item.create_time) }}</span>
             </div>
           </div>
         </div>
@@ -61,7 +61,7 @@
 
 <script setup lang="ts">
 import { formatDateTime } from '@/utils/format';
-const formatDate = (d: string) => d ? formatDateTime(d) : '';
+
 
 
 const filterType = ref('')

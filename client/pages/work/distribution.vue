@@ -67,7 +67,7 @@
             <td>{{ h.title }}</td>
             <td>{{ h.platforms?.join(', ') || '-' }}</td>
             <td><span class="status-tag" :class="h.status">{{ statusLabel(h.status) }}</span></td>
-            <td>{{ formatDate(h.createdAt) }}</td>
+            <td>{{ formatDateTime(h.createdAt) }}</td>
             <td><button v-if="h.status === 'failed'" class="btn-sm" @click="retry(h.id)">重试</button></td>
           </tr>
         </tbody>
@@ -77,6 +77,8 @@
 </template>
 
 <script setup lang="ts">
+import { formatDateTime } from '@/utils/format'
+
 const platforms = [
   { id: 'taobao', name: '淘宝', icon: '🛒', connected: true },
   { id: 'jd', name: '京东', icon: '🐶', connected: true },
@@ -101,8 +103,6 @@ const form = reactive({ title: '', description: '', scheduledAt: '', files: [] a
 
 const statusLabel = (s: string) =>
   ({ pending: '等待中', processing: '发布中', success: '已发布', failed: '失败' }[s] || s)
-
-const formatDate = (d: string) => d ? new Date(d).toLocaleString('zh-CN') : ''
 
 const onFiles = (e: Event) => {
   const files = (e.target as HTMLInputElement).files

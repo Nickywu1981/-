@@ -121,7 +121,7 @@ const filtered = computed(() => {
   return templates.value.filter((t: any) => t.category === activeCat.value)
 })
 
-const formatDate = (d: string) => d ? new Date(d).toLocaleDateString('zh-CN') : ''
+import { formatDate } from '@/utils/format'
 
 const fetchAll = async () => {
   loading.value = true

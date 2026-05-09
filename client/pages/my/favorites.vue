@@ -51,6 +51,8 @@
 </template>
 
 <script setup lang="ts">
+import { formatDate } from '@/utils/format'
+
 const activeTab = ref('all')
 const page = ref(1)
 const pageSize = 12
@@ -66,21 +68,8 @@ const filtered = computed(() => {
 
 const typeLabel = (t: string) => ({ image: '图片', video: '视频', prompt: '提示词' }[t] || t)
 
-const formatDate = (d: string) => {
-  if (!d) return ''
-  return new Date(d).toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' })
-}
-
-const onImgError = (e: Event) => { (e.target as HTMLImageElement).style.display = 'none' }
-
 const fetchFavorites = async () => {
-  loading.value = true
-  error.value = ''
   try {
-    const { data } = await useFetch('/api/collections', { params: { page: page.value, pageSize } })
-    items.value = (data.value as any)?.list || (data.value as any)?.data || []
-    total.value = (data.value as any)?.total || items.value.length
-  } catch (e: any) {
     error.value = e.message || '加载失败'
   } finally {
     loading.value = false

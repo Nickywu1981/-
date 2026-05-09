@@ -15,7 +15,7 @@
         </div>
         <div class="work-info">
           <span class="work-type">{{ w.task_type_name || w.task_type }}</span>
-          <span class="work-date">{{ formatDate(w.create_time || w.created_at) }}</span>
+          <span class="work-date">{{ formatDateTime(w.create_time || w.created_at) }}</span>
         </div>
       </div>
     </div>
@@ -30,7 +30,7 @@
           <img v-if="preview.output_url" :src="preview.output_url" :alt="preview.task_type" />
           <div class="preview-meta">
             <span>{{ typeLabel(preview.task_type) }}</span>
-            <span>{{ formatDate(preview.create_time || preview.created_at) }}</span>
+            <span>{{ formatDateTime(preview.create_time || preview.created_at) }}</span>
           </div>
         </div>
       </div>
@@ -40,7 +40,7 @@
 
 <script setup lang="ts">
 import { formatDateTime } from '@/utils/format';
-const formatDate = (d: string) => d ? formatDateTime(d) : '-';
+
 
 const works = ref<any[]>([])
 const loading = ref(true)

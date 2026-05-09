@@ -35,7 +35,7 @@
         <img v-else :src="item.url" :alt="item.task_type" class="asset-media" @error="($event.target as HTMLImageElement).style.display='none'" />
         <div class="asset-info">
           <span class="asset-type">{{ typeLabel(item.task_type) }}</span>
-          <span class="asset-date">{{ formatDate(item.created_at) }}</span>
+          <span class="asset-date">{{ formatDate(item.created_at, 'MM-DD') }}</span>
         </div>
       </div>
     </div>
@@ -63,8 +63,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { formatDate as _fmt, copyToClipboard } from '@/utils/format';
-const formatDate = (d: string) => d ? _fmt(d, 'MM-DD') : '';
+import { formatDate, copyToClipboard } from '@/utils/format';
+
 const copyLink = copyToClipboard;
 
 const toast = useToast()
