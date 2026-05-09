@@ -76,7 +76,7 @@ const userName = ref('')
 const userPoints = ref(0)
 const isAdmin = ref(false)
 
-const openGroups = reactive(new Set(['video', 'image', 'tools', 'my']))
+const openGroups = reactive(new Set(['create-image', 'ai-writing', 'my']))
 
 function toggleGroup(key: string) {
   if (openGroups.has(key)) { openGroups.delete(key) } else { openGroups.add(key) }
@@ -85,31 +85,27 @@ function toggleGroup(key: string) {
 const navGroups = ref([
   {
     key: 'home', label: '', items: [
-      { path: '/workspace', icon: '🏠', label: '工作台' },
+      { path: '/workspace', icon: '🏠', label: '工作台首页' },
     ]
   },
+  // ==================== 1. 创作 ====================
   {
-    key: 'video', label: '🎬 视频创作',
+    key: 'create-video', label: '🎬 创作 · 视频',
     items: [
       { path: '/work/video', icon: '▶', label: '视频生成' },
       { path: '/work/video-edit', icon: '✂', label: '视频编辑包装' },
       { path: '/work/digital-human', icon: '🧑', label: 'AI 数字人' },
-      { path: '/work/viral-replicate', icon: '🔥', label: '爆款视频分析' },
-      { path: '/work/viral-clone', icon: '📋', label: '爆款视频复刻' },
       { path: '/work/storyboard', icon: '🎞', label: '视频分镜生成' },
       { path: '/work/shot-plan', icon: '📐', label: '分镜全景规划' },
       { path: '/work/product-render', icon: '🛒', label: '商品广告成片' },
       { path: '/work/person-replace', icon: '🔄', label: '角色人物替换' },
       { path: '/work/action-transfer', icon: '🕺', label: '动作迁移' },
-      { path: '/work/script-gen', icon: '📝', label: '带货脚本' },
-      { path: '/work/voice-gen', icon: '🔊', label: '语音生成' },
-      { path: '/work/voice-clone', icon: '🎙', label: '语音克隆' },
-      { path: '/work/video-translate', icon: '🌐', label: '视频翻译' },
-      { path: '/work/output', icon: '📁', label: '作品管理' },
+      { path: '/work/viral-replicate', icon: '🔥', label: '爆款视频分析' },
+      { path: '/work/viral-clone', icon: '📋', label: '爆款视频复刻' },
     ]
   },
   {
-    key: 'image', label: '🖼 图片创作',
+    key: 'create-image', label: '🖼 创作 · 图片',
     items: [
       { path: '/work/image', icon: '▶', label: '图像生成' },
       { path: '/work/main-image', icon: '🖼', label: '电商主图复刻' },
@@ -132,47 +128,75 @@ const navGroups = ref([
     ]
   },
   {
-    key: 'detail', label: '📄 电商详情图',
+    key: 'create-detail', label: '📄 创作 · 详情与海报',
     items: [
       { path: '/work/detail', icon: '▶', label: '详情图生成' },
       { path: '/work/detail-h5', icon: '📱', label: 'H5 详情页' },
-    ]
-  },
-  {
-    key: 'poster', label: '🎨 海报与社媒',
-    items: [
       { path: '/work/poster', icon: '🖼', label: '海报生成' },
       { path: '/work/social', icon: '📱', label: '社媒封面' },
+      { path: '/work/output', icon: '📁', label: '作品管理' },
+    ]
+  },
+  // ==================== 2. AI 助手 ====================
+  {
+    key: 'ai-writing', label: '📝 AI 助手 · 文案与脚本',
+    items: [
+      { path: '/work/copywriting', icon: '✍', label: '智能文案生成' },
+      { path: '/work/script-gen', icon: '📝', label: '带货脚本' },
     ]
   },
   {
-    key: 'tools', label: '🧰 工具与服务',
+    key: 'ai-translate', label: '🌐 AI 助手 · 多语言翻译',
+    items: [
+      { path: '/work/video-translate', icon: '🌐', label: '视频翻译' },
+      { path: '/work/image-translate', icon: '🌐', label: '图片翻译' },
+    ]
+  },
+  {
+    key: 'ai-voice', label: '🔊 AI 助手 · 语音合成',
+    items: [
+      { path: '/work/voice-gen', icon: '🔊', label: '语音生成' },
+      { path: '/work/voice-clone', icon: '🎙', label: '语音克隆' },
+    ]
+  },
+  {
+    key: 'ai-tools', label: '🧠 AI 助手 · 智能工具',
     items: [
       { path: '/work/prompt-hub', icon: '💡', label: '提示词工坊' },
-      { path: '/work/publish', icon: '📤', label: '多平台分发' },
-      { path: '/work/distribution', icon: '📡', label: '分发管理' },
-      { path: '/work/cut-ecosystem', icon: '✂', label: '裁剪生态' },
-      { path: '/work/usage', icon: '📊', label: '用量仪表盘' },
+      { path: '/work/compliance-check', icon: '🛡', label: '合规检测' },
       { path: '/work/model-generate', icon: '🧊', label: '3D 模型生成' },
-      { path: '/work/product-render', icon: '🎬', label: '商品渲染' },
+      { path: '/work/platform-detail', icon: '📋', label: '平台详情' },
+    ]
+  },
+  // ==================== 3. 工作流 ====================
+  {
+    key: 'flow-publish', label: '📡 工作流 · 分发与发布',
+    items: [
+      { path: '/work/distribution', icon: '📡', label: '分发管理' },
+      { path: '/work/publish', icon: '📤', label: '多平台分发' },
+      { path: '/work/cut-ecosystem', icon: '✂', label: '裁剪生态' },
+    ]
+  },
+  {
+    key: 'flow-ops', label: '🛠 工作流 · 运营管理',
+    items: [
+      { path: '/work/usage', icon: '📊', label: '用量仪表盘' },
       { path: '/work/size-templates', icon: '📏', label: '尺寸模板' },
       { path: '/work/diy-pages', icon: '🛠', label: 'DIY 页面' },
       { path: '/work/brand-settings', icon: '🏷', label: '品牌设置' },
       { path: '/work/marketplace', icon: '🏪', label: '模板市场' },
-      { path: '/work/compliance-check', icon: '🛡', label: '合规检测' },
-      { path: '/work/platform-detail', icon: '📋', label: '平台详情' },
       { path: '/work/shot-panorama', icon: '🔄', label: '全景展示' },
-      { path: '/work/image-translate', icon: '🌐', label: '图片翻译' },
-      { path: '/work/outpainting', icon: '⬛', label: '扩图高级' },
     ]
   },
+  // ==================== 快捷入口 ====================
   {
-    key: 'other', label: '', items: [
-      { path: '/distribution', icon: '📤', label: '分发管理' },
+    key: 'quick', label: '⚡ 快捷入口',
+    items: [
       { path: '/assets', icon: '🗂', label: '素材库' },
       { path: '/member', icon: '💎', label: '会员中心' },
     ]
   },
+  // ==================== 我的 ====================
   {
     key: 'my', label: '👤 我的',
     items: [
