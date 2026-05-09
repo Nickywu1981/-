@@ -106,7 +106,7 @@ router.post('/localize/script', authMiddleware, async (req, res) => {
 
 router.post('/localize/translate', authMiddleware, async (req, res) => {
   try {
-    const result = await memfocus.localize.translate({ userId: req.user.id, ...req.body });
+    const result = await memfocus.localize.translate({ userId: (req.user?.userId || req.user?.id), ...req.body });
     success(res, result);
   } catch (err) { error(res, err); }
 });
@@ -114,35 +114,35 @@ router.post('/localize/translate', authMiddleware, async (req, res) => {
 // ═══════════════════ 写作力 ═══════════════════
 router.post('/content/titles', authMiddleware, async (req, res) => {
   try {
-    const result = await memfocus.content.generateTitles(req.user.id, req.body);
+    const result = await memfocus.content.generateTitles((req.user?.userId || req.user?.id), req.body);
     success(res, result);
   } catch (err) { error(res, err); }
 });
 
 router.post('/content/selling-points', authMiddleware, async (req, res) => {
   try {
-    const result = await memfocus.content.generateSellingPoints(req.user.id, req.body);
+    const result = await memfocus.content.generateSellingPoints((req.user?.userId || req.user?.id), req.body);
     success(res, result);
   } catch (err) { error(res, err); }
 });
 
 router.post('/content/description', authMiddleware, async (req, res) => {
   try {
-    const result = await memfocus.content.generateDescription(req.user.id, req.body);
+    const result = await memfocus.content.generateDescription((req.user?.userId || req.user?.id), req.body);
     success(res, result);
   } catch (err) { error(res, err); }
 });
 
 router.post('/content/seeding', authMiddleware, async (req, res) => {
   try {
-    const result = await memfocus.content.generateSeeding(req.user.id, req.body);
+    const result = await memfocus.content.generateSeeding((req.user?.userId || req.user?.id), req.body);
     success(res, result);
   } catch (err) { error(res, err); }
 });
 
 router.post('/content/script', authMiddleware, async (req, res) => {
   try {
-    const result = await memfocus.content.generateScript(req.user.id, req.body);
+    const result = await memfocus.content.generateScript((req.user?.userId || req.user?.id), req.body);
     success(res, result);
   } catch (err) { error(res, err); }
 });
@@ -176,42 +176,42 @@ router.post('/guard/audit', authMiddleware, async (req, res) => {
 // ═══════════════════ 视觉力 ═══════════════════
 router.post('/visual/video', authMiddleware, async (req, res) => {
   try {
-    const result = await memfocus.visual.submitVideo(req.user.id, req.body);
+    const result = await memfocus.visual.submitVideo((req.user?.userId || req.user?.id), req.body);
     success(res, result);
   } catch (err) { error(res, err); }
 });
 
 router.post('/visual/batch', authMiddleware, async (req, res) => {
   try {
-    const result = await memfocus.visual.submitBatch(req.user.id, req.body);
+    const result = await memfocus.visual.submitBatch((req.user?.userId || req.user?.id), req.body);
     success(res, result);
   } catch (err) { error(res, err); }
 });
 
 router.get('/visual/task/:taskId', authMiddleware, async (req, res) => {
   try {
-    const result = await memfocus.visual.getTaskStatus(req.params.taskId, req.user.id);
+    const result = await memfocus.visual.getTaskStatus(req.params.taskId, (req.user?.userId || req.user?.id));
     success(res, result);
   } catch (err) { error(res, err); }
 });
 
 router.get('/visual/tasks', authMiddleware, async (req, res) => {
   try {
-    const result = await memfocus.visual.listTasks(req.user.id, req.query);
+    const result = await memfocus.visual.listTasks((req.user?.userId || req.user?.id), req.query);
     success(res, result);
   } catch (err) { error(res, err); }
 });
 
 router.post('/visual/task/:taskId/cancel', authMiddleware, async (req, res) => {
   try {
-    const result = await memfocus.visual.cancelTask(req.params.taskId, req.user.id);
+    const result = await memfocus.visual.cancelTask(req.params.taskId, (req.user?.userId || req.user?.id));
     success(res, result);
   } catch (err) { error(res, err); }
 });
 
 router.post('/visual/image', authMiddleware, async (req, res) => {
   try {
-    const result = await memfocus.visual.processImage(req.user.id, req.body);
+    const result = await memfocus.visual.processImage((req.user?.userId || req.user?.id), req.body);
     success(res, result);
   } catch (err) { error(res, err); }
 });
