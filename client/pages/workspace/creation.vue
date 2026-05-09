@@ -54,7 +54,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'workspace' })
 const router = useRouter()
 const toast = useToast()
 
