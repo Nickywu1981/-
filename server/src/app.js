@@ -10,6 +10,7 @@ import { sqlGuardMiddleware } from './utils/sqlGuard.js';
 import { requestLogger } from './utils/logger.js';
 import logger from './utils/logger.js';
 import { error as sendError } from './utils/response.js';
+import { z } from 'zod';
 import { ERROR_CODE } from './constants/errorCode.js';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './config/swagger.js';
@@ -154,12 +155,12 @@ app.get('/api/health', async (_req, res) => {
 app.get('/api/metrics', metricsEndpoint);
 
 // 内部 Embedding 端点（仅 localhost，脚本调用）
+const embedSchema = z.object({ texts: z.array(z.string().min(1).max(8000)).min(1).max(100) });
 app.post('/api/internal/embed', async (req, res) => {
   try {
-    const { texts } = req.body;
-    if (!texts || !Array.isArray(texts) || texts.length === 0) {
-      return sendError(res, 400, 'texts 数组必填');
-    }
+    const parsed = embedSchema.safeParse(req.body);
+    if (!parsed.success) return sendError(res, 400, parsed.error.errors[0]?.message || '参数校验失败');
+    const { texts } = parsed.data;
     const apiKey = process.env.OPENAI_API_KEY || '';
     const baseUrl = (process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1').replace(/\/+$/, '');
     if (!apiKey) return sendError(res, 500, 'API key not configured');
