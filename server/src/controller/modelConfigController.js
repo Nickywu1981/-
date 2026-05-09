@@ -25,7 +25,7 @@ export async function list(req, res) {
     const rows = await modelConfigDao.listAll(includeDisabled);
     return success(res, _maskApiKeys(rows));
   } catch (e) {
-    return error(res, 500, e.message);
+    return error(res, e.status || 500, e.message);
   }
 }
 
@@ -35,7 +35,7 @@ export async function getOne(req, res) {
     if (!row) return error(res, 404, '模型不存在');
     return success(res, _maskApiKey(row));
   } catch (e) {
-    return error(res, 500, e.message);
+    return error(res, e.status || 500, e.message);
   }
 }
 
@@ -48,7 +48,7 @@ export async function create(req, res) {
     const result = await modelConfigDao.create(data);
     return success(res, _maskApiKey(result), '模型注册成功');
   } catch (e) {
-    return error(res, 500, e.message);
+    return error(res, e.status || 500, e.message);
   }
 }
 
@@ -61,7 +61,7 @@ export async function update(req, res) {
     if (!result) return error(res, 404, '模型不存在');
     return success(res, _maskApiKey(result), '模型更新成功');
   } catch (e) {
-    return error(res, 500, e.message);
+    return error(res, e.status || 500, e.message);
   }
 }
 
@@ -71,7 +71,7 @@ export async function remove(req, res) {
     if (!ok) return error(res, 404, '模型不存在');
     return success(res, null, '模型已删除');
   } catch (e) {
-    return error(res, 500, e.message);
+    return error(res, e.status || 500, e.message);
   }
 }
 
@@ -82,7 +82,7 @@ export async function toggle(req, res) {
     if (!ok) return error(res, 404, '模型不存在');
     return success(res, { model_key: req.params.modelKey, enabled }, enabled ? '已启用' : '已禁用');
   } catch (e) {
-    return error(res, 500, e.message);
+    return error(res, e.status || 500, e.message);
   }
 }
 
@@ -102,7 +102,7 @@ export async function callLogs(req, res) {
     });
     return success(res, result);
   } catch (e) {
-    return error(res, 500, e.message);
+    return error(res, e.status || 500, e.message);
   }
 }
 
@@ -113,6 +113,6 @@ export async function callStats(req, res) {
     const stats = await modelConfigDao.getCallStats(modelKey, days ? parseInt(days) : 7);
     return success(res, stats);
   } catch (e) {
-    return error(res, 500, e.message);
+    return error(res, e.status || 500, e.message);
   }
 }

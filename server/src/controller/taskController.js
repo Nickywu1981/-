@@ -6,6 +6,6 @@ export async function listMyWorks(req, res) {
     const data = await taskService.listMyWorks(req.user.id, req.query);
     return success(res, data);
   } catch (err) {
-    return error(res, 500, err.message);
+    return error(res, err.status || 500, err.message);
   }
 }

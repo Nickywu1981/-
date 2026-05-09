@@ -8,7 +8,7 @@ export async function listAllRecords(req, res) {
     const { userId } = req.query;
     const data = await abuseService.listAbuseRecords({ page, pageSize, userId });
     success(res, data);
-  } catch (err) { error(res, 500, err.message); }
+  } catch (err) { error(res, err.status || 500, err.message); }
 }
 
 export async function checkAbuse(req, res) {
@@ -16,7 +16,7 @@ export async function checkAbuse(req, res) {
     const { userId } = req.params;
     const isAbusing = await abuseService.checkHighFrequency(+userId);
     success(res, { abusing: isAbusing });
-  } catch (err) { error(res, 500, err.message); }
+  } catch (err) { error(res, err.status || 500, err.message); }
 }
 
 export default { listAllRecords, checkAbuse };
