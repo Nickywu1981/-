@@ -81,6 +81,8 @@
     <!-- Step 2: 检查结果 -->
     <div v-else class="result-section">
       <h3>合规检查结果</h3>
+      <div v-if="checking" class="progress-box"><div class="spinner" /><p>正在检查合规性...</p></div>
+      <template v-else>
       <div class="check-summary">
         <div class="summary-card" :class="checkResult?.isCompliant ? 'pass' : 'fail'">
           <span class="summary-icon">{{ checkResult?.isCompliant ? '✅' : '⚠️' }}</span>
@@ -108,6 +110,7 @@
       <div class="actions">
         <button class="btn-outline" @click="handleRedo">重新检查</button>
       </div>
+      </template>
     </div>
   </WorkLayout>
 </template>
@@ -123,6 +126,7 @@ const targets = ref<any[]>([]);
 const previews = ref<PreviewItem[]>([]);
 const textToCheck = ref('');
 const checkResult = ref<any>(null);
+const checking = ref(false);
 const previewRules = ref<any[]>([]);
 
 function removeImage(i: number) { previews.value.splice(i, 1); }
@@ -167,6 +171,7 @@ function handleDrop(e: DragEvent) {
 
 async function runCheck() {
   step.value = 2;
+  checking.value = true;
   try {
     const res = await $fetch('/api/compliance/check', {
       method: 'POST',
@@ -175,6 +180,7 @@ async function runCheck() {
     });
     checkResult.value = (res as any).data;
   } catch { checkResult.value = { isCompliant: false, results: [], totalRules: 0, criticalCount: 0 }; }
+  finally { checking.value = false; }
 }
 
 function severityLabel(s: string) {

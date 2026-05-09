@@ -17,7 +17,7 @@
     </template>
     <template #processing><div v-if="task.status===1" class="progress-box"><div class="spinner"/><p>正在保存品牌配置...</p></div></template>
     <template #output><div v-if="task.status===2" class="result-box"><h3>✅ 品牌配置已保存</h3><div class="preview-box" style="position:relative;display:inline-block"><img :src="previewUrl" style="max-width:400px;border-radius:12px" /><span v-if="form.watermarkType==='text'" style="position:absolute;bottom:16px;right:16px;color:white;opacity:0.7;background:rgba(0,0,0,0.5);padding:4px 12px;border-radius:4px;font-size:13px">{{ form.watermarkText }}</span></div></div></template>
-    <template #actions><button class="btn-primary" @click="saveSettings" :disabled="task.status===1">保存品牌配置</button></template>
+    <template #actions><button class="btn-primary" @click="saveSettings" :disabled="task.status===1">保存品牌配置</button><p v-if="errorMsg" class="error-msg">{{ errorMsg }}</p></template>
   </WorkLayout>
 </template>
 <script setup>
