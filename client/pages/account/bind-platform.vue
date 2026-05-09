@@ -105,7 +105,7 @@ function platformIcon(p: string) { return platformIcons[p] || '🔗' }
 async function fetchBindings() {
   loading.value = true
   try {
-    const res: any = await $fetch(`${apiBase}/platforms/bindings`).catch(() => null)
+    const res: any = await $fetch(`${apiBase}/platforms/bindings`, { credentials: 'include' }).catch(() => null)
     if (res?.code === 200) boundList.value = res.data?.list || []
   } catch { toast.error('加载平台绑定失败') } finally { loading.value = false }
 
@@ -121,6 +121,7 @@ async function doBind(platform: any) {
         bind_type: bindType.value,
         account_id: bindAccountId.value,
       },
+      credentials: 'include',
     }).catch(() => null)
     if (res?.code === 200) {
       bindTarget.value = null
@@ -138,7 +139,7 @@ async function doBind(platform: any) {
 async function doUnbind(item: any) {
   if (!confirm(`确定解绑 ${item.platform_name || item.platform} 的${item.bind_type === 'shop' ? '店铺' : '账号'}？`)) return
   try {
-    await $fetch(`${apiBase}/platforms/bind/${item.id}`, { method: 'DELETE' })
+    await $fetch(`${apiBase}/platforms/bind/${item.id}`, { method: 'DELETE', credentials: 'include' })
     fetchBindings()
   } catch { toast.error('解绑失败') }
 }

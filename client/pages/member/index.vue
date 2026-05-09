@@ -99,9 +99,9 @@ const stats = ref<any>(null)
 onMounted(async () => {
   try {
     const [profileRes, pointsRes, statsRes] = await Promise.all([
-      $fetch(`${apiBase}/user/profile`),
-      $fetch(`${apiBase}/points/account`),
-      $fetch(`${apiBase}/user/stats`).catch(() => null),
+      $fetch(`${apiBase}/user/profile`, { credentials: 'include' }),
+      $fetch(`${apiBase}/points/account`, { credentials: 'include' }),
+      $fetch(`${apiBase}/user/stats`, { credentials: 'include' }).catch(() => null),
     ])
 
     if ((profileRes as any).code === 200) profile.value = (profileRes as any).data

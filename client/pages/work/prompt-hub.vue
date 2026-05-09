@@ -127,9 +127,9 @@ const fetchAll = async () => {
   loading.value = true
   try {
     const [rec, temps, hist] = await Promise.all([
-      $fetch('/api/prompts/recommendations').catch(() => ({ list: [] })),
-      $fetch('/api/prompts?page=1&pageSize=60').catch(() => ({ list: [] })),
-      $fetch('/api/prompts/usage-history?page=1&pageSize=10').catch(() => ({ list: [] })),
+      $fetch('/api/prompts/recommendations', { credentials: 'include' }).catch(() => ({ list: [] })),
+      $fetch('/api/prompts?page=1&pageSize=60', { credentials: 'include' }).catch(() => ({ list: [] })),
+      $fetch('/api/prompts/usage-history?page=1&pageSize=10', { credentials: 'include' }).catch(() => ({ list: [] })),
     ])
     recommendations.value = (rec as any).list || []
     templates.value = (temps as any).list || []
@@ -144,7 +144,7 @@ const openDetail = (t: any) => {
   myRating.value = 0
   fillValues.value = {}
   // Fetch current rating
-  $fetch(`/api/prompts/${t.id}/rating`).then((r: any) => {
+  $fetch(`/api/prompts/${t.id}/rating`, { credentials: 'include' }).then((r: any) => {
     if (r.myScore) myRating.value = r.myScore
     detail.value.avg_score = r.avgScore
     detail.value.rating_count = r.ratingCount
@@ -152,14 +152,14 @@ const openDetail = (t: any) => {
 }
 
 const useTemplate = (t: any) => {
-  $fetch(`/api/prompts/${t.id}/use`, { method: 'POST', body: { modelType: 'text' } }).catch(() => toast.error('加载失败'))
+  $fetch(`/api/prompts/${t.id}/use`, { method: 'POST', body: { modelType: 'text' }, credentials: 'include' }).catch(() => toast.error('加载失败'))
   openDetail(t)
 }
 
 const doRate = async (score: number) => {
   if (!detail.value) return
   try {
-    await $fetch(`/api/prompts/${detail.value.id}/rate`, { method: 'POST', body: { score } })
+    await $fetch(`/api/prompts/${detail.value.id}/rate`, { method: 'POST', body: { score }, credentials: 'include' })
     myRating.value = score
     fetchAll()
   } catch { /* silent */ }

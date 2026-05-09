@@ -56,7 +56,7 @@ router.post('/run/:agentName', validate(runSchema), async (req, res) => {
   };
 
   const agent = agentMap[agentName];
-  if (!agent) return error(res, 404, `Unknown agent: ${agentName}`);
+  if (!agent) return error(res, ERROR_CODE.NOT_FOUND, `Unknown agent: ${agentName}`);
 
   try {
     const runner = new Runner({ agent, sessionService: sessionStore });
