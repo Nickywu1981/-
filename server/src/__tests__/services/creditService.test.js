@@ -9,13 +9,34 @@ vi.mock('../../services/memberBenefit.js', () => ({
 
 const mockExecute = vi.hoisted(() => vi.fn());
 const mockQuery = vi.hoisted(() => vi.fn());
-vi.mock('../../dao/db.js', () => ({ default: { execute: mockExecute, query: mockQuery } }));
+const mockGetConnection = vi.hoisted(() => vi.fn());
+vi.mock('../../dao/db.js', () => ({
+  default: {
+    execute: mockExecute,
+    query: mockQuery,
+    getConnection: mockGetConnection,
+  },
+}));
 
 import * as creditService from '../../services/creditService.js';
 import * as creditDao from '../../dao/creditDao.js';
 
+function mockConn() {
+  return {
+    execute: mockExecute,
+    query: mockQuery,
+    beginTransaction: vi.fn().mockResolvedValue(undefined),
+    commit: vi.fn().mockResolvedValue(undefined),
+    rollback: vi.fn().mockResolvedValue(undefined),
+    release: vi.fn(),
+  };
+}
+
 describe('creditService', () => {
-  beforeEach(() => { vi.clearAllMocks(); });
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetConnection.mockResolvedValue(mockConn());
+  });
 
   describe('initFreeMembership', () => {
     it('使用套餐默认配额', async () => {
@@ -36,17 +57,19 @@ describe('creditService', () => {
 
   describe('consumeCredit', () => {
     it('会员信息不存在抛出 403', async () => {
-      creditDao.getMembership.mockResolvedValue(null);
+      creditDao.getMembershipForUpdate.mockResolvedValue(null);
       await expect(creditService.consumeCredit(1, 'cutout')).rejects.toThrow('会员信息不存在');
     });
 
     it('点数不足抛出错误', async () => {
-      creditDao.getMembership.mockResolvedValue({ credit_balance: 0, trial_used: 0, trial_quota: 10 });
+      creditDao.getMembershipForUpdate.mockResolvedValue({ credit_balance: 0, plan_type: 0 });
+      creditDao.getPlanByType.mockResolvedValue(null);
       await expect(creditService.consumeCredit(1, 'cutout')).rejects.toThrow('点数不足');
     });
 
     it('成功扣减点数并记录日志', async () => {
-      creditDao.getMembership.mockResolvedValue({ credit_balance: 10, trial_used: 5, trial_quota: 10 });
+      creditDao.getMembershipForUpdate.mockResolvedValue({ credit_balance: 10, plan_type: 0 });
+      creditDao.getPlanByType.mockResolvedValue(null);
       creditDao.updateCreditBalance.mockResolvedValue(true);
       creditDao.insertConsumptionLog.mockResolvedValue(undefined);
       const r = await creditService.consumeCredit(1, 'cutout');
@@ -56,7 +79,8 @@ describe('creditService', () => {
     });
 
     it('批量计算折扣', async () => {
-      creditDao.getMembership.mockResolvedValue({ credit_balance: 50, trial_used: 5, trial_quota: 10 });
+      creditDao.getMembershipForUpdate.mockResolvedValue({ credit_balance: 50, plan_type: 0 });
+      creditDao.getPlanByType.mockResolvedValue(null);
       creditDao.updateCreditBalance.mockResolvedValue(true);
       creditDao.insertConsumptionLog.mockResolvedValue(undefined);
       const r = await creditService.consumeCredit(1, 'cutout', 10);

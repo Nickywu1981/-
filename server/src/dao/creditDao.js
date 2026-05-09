@@ -8,6 +8,14 @@ export async function getMembership(userId) {
   return rows[0] || null;
 }
 
+export async function getMembershipForUpdate(conn, userId) {
+  const [rows] = await conn.execute(
+    'SELECT id, user_id, plan_type, status, trial_quota, trial_used, credit_balance, start_time, end_time, auto_renew FROM user_membership WHERE user_id = ? AND status = 1 AND is_deleted = 0 ORDER BY id DESC LIMIT 1 FOR UPDATE',
+    [userId],
+  );
+  return rows[0] || null;
+}
+
 export async function updateCreditBalance(userId, delta) {
   const [result] = await pool.execute(
     'UPDATE user_membership SET credit_balance = credit_balance + ? WHERE user_id = ? AND status = 1 AND is_deleted = 0 AND credit_balance + ? >= 0',

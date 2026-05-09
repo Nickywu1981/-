@@ -45,12 +45,14 @@ const loginByCodeSchema = z.object({
   phone: z.string().regex(_phoneRegex).optional().nullable(),
   email: z.string().email().optional().nullable(),
   username: z.string().min(1).max(100).optional().nullable(),
+  code: z.string().length(6, '验证码为6位数字'),
 }).refine(d => d.phone || d.email || d.username, { message: '请提供手机号、邮箱或用户名' });
 
 const resetPasswordSchema = z.object({
   phone: z.string().regex(_phoneRegex).optional().nullable(),
   email: z.string().email().optional().nullable(),
   new_password: z.string().min(8, '新密码至少8位').max(64),
+  code: z.string().length(6, '验证码为6位数字'),
 }).refine(d => d.phone || d.email, { message: '手机号或邮箱至少填一项' });
 
 // POST /api/auth/register
@@ -89,12 +91,12 @@ router.post('/login', _validate(loginSchema), async (req, res) => {
 // POST /api/auth/login-by-code — 短信/邮箱验证码登录
 router.post('/login-by-code', _validate(loginByCodeSchema), async (req, res) => {
   try {
-    const { phone, email, username } = req.validated;
+    const { phone, email, username, code } = req.validated;
     if (!phone && !email && !username) {
       return error(res, ERROR_CODE.VALIDATION_ERROR, '请提供手机号、邮箱或用户名');
     }
 
-    const result = await authService.loginByCode({ phone, email, username });
+    const result = await authService.loginByCode({ phone, email, username, code });
 
     _setTokenCookie(res, result.token);
 
@@ -107,9 +109,9 @@ router.post('/login-by-code', _validate(loginByCodeSchema), async (req, res) => 
 // POST /api/auth/reset-password
 router.post('/reset-password', _validate(resetPasswordSchema), async (req, res) => {
   try {
-    const { phone, email, new_password } = req.validated;
+    const { phone, email, new_password, code } = req.validated;
 
-    const result = await authService.resetPassword({ phone, email, newPassword: new_password });
+    const result = await authService.resetPassword({ phone, email, newPassword: new_password, code });
     return success(res, result, '密码重置成功');
   } catch (err) {
     return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '重置失败', err.status || ERROR_CODE.INTERNAL_ERROR);
