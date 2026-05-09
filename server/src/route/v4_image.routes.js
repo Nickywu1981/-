@@ -8,7 +8,6 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { success, error } from '../utils/response.js';
 import { validateV4 as _validate } from '../utils/validate.js';
-import { ERROR_CODE } from '../constants/errorCode.js';
 import { contentModerationMiddleware } from '../middleware/content-moderation.middleware.js';
 import { tierGuard } from '../middleware/tierGuard.js';
 import * as imageService from '../services/image.service.js';

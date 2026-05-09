@@ -3,16 +3,6 @@ import { PROXY_FLAG, CIRCUIT_STATUS } from '../constants/domainStatus.js';
 import proxyDao from '../dao/proxyDao.js';
 import { encrypt, decrypt } from '../utils/crypto.js';
 
-const ERROR_CODES = {
-  WHITELIST_DENIED: 'PROXY_WHITELIST_DENIED',
-  RATE_LIMITED: 'PROXY_RATE_LIMITED',
-  CIRCUIT_OPEN: 'PROXY_CIRCUIT_OPEN',
-  UPSTREAM_FAILED: 'PROXY_UPSTREAM_FAILED',
-  BODY_TOO_LARGE: 'PROXY_BODY_TOO_LARGE',
-  NOT_FOUND: 'PROXY_NOT_FOUND',
-  AUTH_REQUIRED: 'PROXY_AUTH_REQUIRED',
-};
-
 // ==================== 配置管理 ====================
 
 export async function listConfigs(tenantId, { page = 1, pageSize = 20, status } = {}) {
