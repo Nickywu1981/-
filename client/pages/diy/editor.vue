@@ -8,9 +8,9 @@
         <span class="page-type">({{ pageInfo.page_type }})</span>
       </div>
       <div class="toolbar-right">
-        <button class="btn btn-icon-btn" :disabled="undoStack.length === 0" @click="editor.undo(); dirty=true" title="撤销">↩</button>
-        <button class="btn btn-icon-btn" :disabled="redoStack.length === 0" @click="editor.redo(); dirty=true" title="重做">↪</button>
-        <button class="btn btn-outline btn-sm" @click="previewMode = previewMode === 'mobile' ? 'pc' : 'mobile'" :title="previewMode === 'mobile' ? '切换到PC预览' : '切换到移动端预览'">
+        <button class="btn btn-icon-btn" :disabled="undoStack.length === 0" @click="editor.undo(); dirty=true" title="撤销" aria-label="撤销 Ctrl+Z">↩</button>
+        <button class="btn btn-icon-btn" :disabled="redoStack.length === 0" @click="editor.redo(); dirty=true" title="重做" aria-label="重做 Ctrl+Y">↪</button>
+        <button class="btn btn-outline btn-sm" @click="previewMode = previewMode === 'mobile' ? 'pc' : 'mobile'" :title="previewMode === 'mobile' ? '切换到PC预览' : '切换到移动端预览'" :aria-label="previewMode === 'mobile' ? '切换到PC预览' : '切换到移动端预览'">
           {{ previewMode === 'mobile' ? '📱' : '🖥' }}
         </button>
         <button class="btn btn-outline" :disabled="saving" @click="saveVersion">{{ saving ? '保存中...' : '保存版本' }}</button>
@@ -27,7 +27,7 @@
         <div class="component-list">
           <div v-for="cat in componentCats" :key="cat.key" class="comp-category">
             <h4>{{ cat.label }}</h4>
-            <div v-for="comp in componentsByCat(cat.key)" :key="comp.component_code" class="comp-item" draggable="true" @dragstart="onDragStart($event, comp)" @dragend="dragOverIdx = -1">
+            <div v-for="comp in componentsByCat[cat.key]" :key="comp.component_code" class="comp-item" draggable="true" @dragstart="onDragStart($event, comp)" @dragend="dragOverIdx = -1">
               <span class="comp-icon">{{ comp.icon || '◆' }}</span>
               <span>{{ comp.name }}</span>
             </div>
@@ -44,9 +44,9 @@
           <div class="section-toolbar">
             <span class="section-label">{{ getCompName(sec.component) }}</span>
             <div>
-              <button class="btn-icon" @click.stop="moveSection(idx, -1)" :disabled="idx===0">↑</button>
-              <button class="btn-icon" @click.stop="moveSection(idx, 1)" :disabled="idx===sections.length-1">↓</button>
-              <button class="btn-icon btn-danger" @click.stop="removeSection(idx)">✕</button>
+              <button class="btn-icon" @click.stop="moveSection(idx, -1)" :disabled="idx===0" aria-label="上移区块">↑</button>
+              <button class="btn-icon" @click.stop="moveSection(idx, 1)" :disabled="idx===sections.length-1" aria-label="下移区块">↓</button>
+              <button class="btn-icon btn-danger" @click.stop="removeSection(idx)" aria-label="删除区块">✕</button>
             </div>
           </div>
           <div class="section-preview">
@@ -191,7 +191,13 @@ const selectedVersions = ref<number[]>([])
 const diffResult = ref<any[] | null>(null)
 
 const componentCats = DIY_COMPONENTS.categories
-function componentsByCat(cat: string) { return DIY_COMPONENTS.components.filter(c => c.category === cat) }
+const componentsByCat = computed(() => {
+  const map: Record<string, typeof DIY_COMPONENTS.components> = {}
+  for (const cat of componentCats) {
+    map[cat.key] = DIY_COMPONENTS.components.filter(c => c.category === cat.key)
+  }
+  return map
+})
 function getCompName(code: string) { return getComponentByCode(code)?.name || code }
 function getCompIcon(code: string) { return getComponentByCode(code)?.icon || '◆' }
 const currentProps = computed(() => {
@@ -344,8 +350,13 @@ onMounted(async () => {
 
   const recovered = await autoSave.checkRecovery()
   if (recovered) {
-    editor.loadFromConfig(recovered.mobile_config || recovered.pc_config)
-    toast.info('检测到未保存的更改，已自动恢复')
+    try {
+      editor.loadFromConfig(recovered.mobile_config || recovered.pc_config)
+      toast.info('检测到未保存的更改，已自动恢复')
+    } catch {
+      toast.warn('恢复数据格式异常，已加载最新服务端版本')
+      await loadPage()
+    }
     return
   }
   await loadPage()

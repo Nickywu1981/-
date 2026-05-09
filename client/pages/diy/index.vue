@@ -3,8 +3,8 @@
     <div class="page-header">
       <h1>页面管理</h1>
       <div class="header-actions">
-        <button class="btn btn-outline" @click="navigateTo('/work/diy-pages')">从模板创建</button>
-        <button class="btn btn-primary" @click="showCreate = true">+ 新建页面</button>
+        <button class="btn btn-outline" @click="navigateTo('/work/diy-pages')" aria-label="从模板创建页面">从模板创建</button>
+        <button class="btn btn-primary" @click="showCreate = true" aria-label="新建页面">+ 新建页面</button>
       </div>
     </div>
 
@@ -21,12 +21,21 @@
         <option value="0">草稿</option>
         <option value="1">已发布</option>
       </select>
-      <input v-model="filter.keyword" placeholder="搜索页面..." @keyup.enter="loadPages" />
+      <input v-model="filter.keyword" placeholder="搜索页面..." @input="onKeywordInput" />
       <button class="btn btn-outline" @click="loadPages">搜索</button>
     </div>
 
     <!-- 页面列表 -->
-    <div v-if="loading" class="loading">加载中...</div>
+    <div v-if="loading" class="loading-skeleton">
+      <div v-for="n in 6" :key="n" class="skeleton-card">
+        <div class="skeleton-preview"></div>
+        <div class="skeleton-body">
+          <div class="skeleton-line w-60"></div>
+          <div class="skeleton-line w-40"></div>
+          <div class="skeleton-line w-30"></div>
+        </div>
+      </div>
+    </div>
     <div v-else-if="!pages.length" class="empty">暂无页面，点击上方按钮创建</div>
     <div v-else class="page-grid">
       <div v-for="p in pages" :key="p.id" class="page-card">
@@ -40,9 +49,9 @@
           <p class="time">{{ p.update_time }}</p>
         </div>
         <div class="card-actions">
-          <NuxtLink :to="`/diy/editor?id=${p.id}`" class="btn btn-sm btn-outline">编辑</NuxtLink>
-          <button v-if="p.status !== 1" class="btn btn-sm btn-primary" @click="publishPage(p.id)">发布</button>
-          <button class="btn btn-sm btn-danger" @click="deletePage(p.id)">删除</button>
+          <NuxtLink :to="`/diy/editor?id=${p.id}`" class="btn btn-sm btn-outline" aria-label="编辑页面">编辑</NuxtLink>
+          <button v-if="p.status !== 1" class="btn btn-sm btn-primary" @click="publishPage(p.id)" aria-label="发布页面">发布</button>
+          <button class="btn btn-sm btn-danger" @click="deletePage(p.id)" aria-label="删除页面">删除</button>
         </div>
       </div>
     </div>
@@ -85,6 +94,12 @@ const loading = ref(true)
 const showCreate = ref(false)
 const filter = reactive({ pageType: '', status: '', keyword: '' })
 const form = reactive({ title: '', slug: '', pageType: 'mobile' })
+let keywordTimer: ReturnType<typeof setTimeout> | null = null
+
+function onKeywordInput() {
+  if (keywordTimer) clearTimeout(keywordTimer)
+  keywordTimer = setTimeout(loadPages, 300)
+}
 
 async function loadPages() {
   loading.value = true
@@ -144,6 +159,15 @@ onMounted(loadPages)
 .card-body .time { font-size: 11px; color: var(--text-muted); }
 .card-actions { padding: 12px 16px; display: flex; gap: 8px; border-top: 1px solid var(--border-light); }
 .empty, .loading { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+.loading-skeleton { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.skeleton-card { border: 1px solid var(--border-light); border-radius: 10px; overflow: hidden; }
+.skeleton-preview { height: 140px; background: var(--bg-hover); animation: shimmer 1.5s infinite; }
+.skeleton-body { padding: 12px 16px; }
+.skeleton-line { height: 12px; background: var(--bg-hover); border-radius: 4px; margin-bottom: 8px; animation: shimmer 1.5s infinite; }
+.skeleton-line.w-60 { width: 60%; }
+.skeleton-line.w-40 { width: 40%; }
+.skeleton-line.w-30 { width: 30%; }
+@keyframes shimmer { 0% { opacity: .5; } 50% { opacity: 1; } 100% { opacity: .5; } }
 .modal-overlay { position: fixed; inset: 0; background: var(--bg-overlay); display: flex; align-items: center; justify-content: center; z-index: 1000; }
 .modal { background: var(--bg-card); border-radius: 12px; padding: 24px; width: 440px; max-width: 90vw; }
 .modal h2 { margin-bottom: 16px; }

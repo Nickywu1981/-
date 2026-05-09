@@ -1,13 +1,20 @@
 <template>
   <div class="diy-preview-page">
-    <div v-if="loading" class="loading">加载中...</div>
-    <div v-else-if="error" class="error-state">{{ error }}</div>
+    <div v-if="loading" class="loading-skeleton">
+      <div class="skeleton-bar w-60"></div>
+      <div class="skeleton-block"></div>
+      <div class="skeleton-block h-200"></div>
+    </div>
+    <div v-else-if="error" class="error-state">
+      <p>{{ error }}</p>
+      <button class="btn btn-outline" @click="retry">重试</button>
+    </div>
     <div v-else class="preview-container" :class="pageType">
       <div class="page-title-bar">
         <span>{{ page?.title || '预览' }}</span>
         <div class="device-switch">
-          <button :class="{ active: viewMode === 'mobile' }" @click="viewMode = 'mobile'">📱</button>
-          <button :class="{ active: viewMode === 'pc' }" @click="viewMode = 'pc'">🖥️</button>
+          <button :class="{ active: viewMode === 'mobile' }" @click="viewMode = 'mobile'" aria-label="移动端预览">📱</button>
+          <button :class="{ active: viewMode === 'pc' }" @click="viewMode = 'pc'" aria-label="PC端预览">🖥️</button>
         </div>
       </div>
       <div class="canvas-frame" :class="viewMode">
@@ -15,11 +22,11 @@
           <!-- Banner/Slider -->
           <div v-if="section.component === 'banner_slider'" class="sec-banner">
             <div class="banner-slide" v-for="(slide, i) in section.config.slides" :key="i">
-              <img :src="slide.img || '/placeholder.svg'" :alt="'slide '+i" />
+              <img :src="slide.img || '/placeholder.svg'" :alt="'slide '+i" loading="lazy" />
             </div>
           </div>
           <!-- Text -->
-          <div v-else-if="section.component === 'text_block'" class="sec-text" :style="{ textAlign: section.config.align, fontSize: section.config.fontSize+'px', color: section.config.color }">
+          <div v-else-if="section.component === 'text_block'" class="sec-text" :style="textBlockStyle(section.config)">
             {{ section.config.content || '文本内容' }}
           </div>
           <!-- Title -->
@@ -29,9 +36,9 @@
           </div>
           <!-- Product Grid -->
           <div v-else-if="section.component === 'product_list'" class="sec-products">
-            <div class="product-grid" :style="{ gridTemplateColumns: `repeat(${section.config.columns||2}, 1fr)` }">
+            <div class="product-grid" :style="gridStyle(section.config.columns || 2, 0)">
               <div v-for="item in (section.config.items?.length ? section.config.items : [{name:'示例商品',price:'¥99',img:''}])" :key="item.name" class="product-card">
-                <img :src="item.img || '/placeholder.svg'" :alt="item.name" />
+                <img :src="item.img || '/placeholder.svg'" :alt="item.name" loading="lazy" />
                 <span class="p-name">{{ item.name }}</span>
                 <span v-if="section.config.showPrice" class="p-price">{{ item.price }}</span>
               </div>
@@ -39,13 +46,13 @@
           </div>
           <!-- Image Showcase -->
           <div v-else-if="section.component === 'image_showcase'" class="sec-gallery">
-            <div class="gallery-grid" :style="{ gridTemplateColumns: `repeat(${section.config.columns||3}, 1fr)`, gap: (section.config.gap||8)+'px' }">
-              <img v-for="(img, i) in (section.config.images?.length ? section.config.images : ['/placeholder.svg'])" :key="i" :src="img" :style="{ borderRadius: (section.config.radius||8)+'px' }" />
+            <div class="gallery-grid" :style="gridStyle(section.config.columns || 3, section.config.gap || 8)">
+              <img v-for="(img, i) in (section.config.images?.length ? section.config.images : ['/placeholder.svg'])" :key="i" :src="img" :style="{ borderRadius: (section.config.radius||8)+'px' }" loading="lazy" />
             </div>
           </div>
           <!-- Video -->
           <div v-else-if="section.component === 'video_player'" class="sec-video">
-            <video :src="section.config.src" :poster="section.config.poster" :autoplay="section.config.autoplay" :controls="section.config.controls !== false" style="width:100%"></video>
+            <video :src="section.config.src" :poster="section.config.poster" :autoplay="section.config.autoplay" :controls="section.config.controls !== false" preload="none" class="w-full"></video>
           </div>
           <!-- Countdown -->
           <div v-else-if="section.component === 'countdown'" class="sec-countdown" :style="{ color: section.config.color }">
@@ -77,7 +84,7 @@ const loading = ref(true)
 const viewMode = ref('mobile')
 const pageType = computed(() => viewMode.value)
 
-function countdownText(endTime) {
+function countdownText(endTime: string) {
   if (!endTime) return ''
   const diff = new Date(endTime).getTime() - Date.now()
   if (diff <= 0) return '已结束'
@@ -87,22 +94,49 @@ function countdownText(endTime) {
   return `${d}天 ${h}时 ${m}分`
 }
 
-onMounted(async () => {
+function textBlockStyle(c: Record<string, any>) {
+  const s: Record<string, string> = {}
+  if (c.align) s.textAlign = c.align
+  if (c.fontSize) s.fontSize = c.fontSize + 'px'
+  if (c.color) s.color = c.color
+  return s
+}
+
+function gridStyle(cols: number, gap: number) {
+  const s: Record<string, string> = { gridTemplateColumns: `repeat(${cols}, 1fr)` }
+  if (gap) s.gap = gap + 'px'
+  return s
+}
+
+async function loadPage() {
+  loading.value = true
+  error.value = ''
   try {
     const slug = route.query.slug || 'product-detail-demo'
     const res = await $fetch(`/api/diy/published/${slug}`)
     page.value = res.data
     const config = typeof res.data?.config_json === 'string' ? JSON.parse(res.data.config_json) : res.data?.config_json
     sections.value = config?.sections || []
-  } catch (e) {
+  } catch (e: any) {
     error.value = '页面加载失败: ' + (e.data?.msg || e.message)
   } finally { loading.value = false }
-})
+}
+
+function retry() { loadPage() }
+
+onMounted(loadPage)
 </script>
 
 <style scoped>
 .diy-preview-page { max-width: 100%; margin: 0 auto; }
-.loading, .error-state { text-align: center; padding: 80px 20px; color: var(--text-muted); }
+.loading-skeleton { max-width: 414px; margin: 40px auto; padding: 20px; }
+.skeleton-bar { height: 16px; background: var(--bg-hover); border-radius: 4px; margin-bottom: 16px; animation: shimmer 1.5s infinite; }
+.skeleton-bar.w-60 { width: 60%; }
+.skeleton-block { height: 100px; background: var(--bg-hover); border-radius: 8px; margin-bottom: 12px; animation: shimmer 1.5s infinite; }
+.skeleton-block.h-200 { height: 200px; }
+@keyframes shimmer { 0% { opacity: .5; } 50% { opacity: 1; } 100% { opacity: .5; } }
+.error-state { text-align: center; padding: 80px 20px; color: var(--text-muted); }
+.error-state .btn { margin-top: 16px; }
 .page-title-bar { display: flex; justify-content: space-between; align-items: center; padding: 12px 24px; background: var(--bg-card); border-bottom: 1px solid var(--border-light); }
 .device-switch button { padding: 6px 12px; border: 1px solid var(--border-light); background: var(--bg-card); cursor: pointer; border-radius: 4px; margin-left: 6px; }
 .device-switch button.active { background: var(--brand); border-color: var(--brand); }
@@ -123,6 +157,7 @@ onMounted(async () => {
 .gallery-grid { display: grid; }
 .gallery-grid img { width: 100%; object-fit: cover; background: var(--bg-hover); }
 .sec-video { padding: 0; }
+.w-full { width: 100%; }
 .sec-countdown { text-align: center; padding: 20px; font-size: 16px; }
 .sec-countdown strong { display: block; font-size: 24px; margin-top: 4px; }
 .sec-coupon { padding: 16px; }
@@ -130,4 +165,6 @@ onMounted(async () => {
 .coupon-item { padding: 10px; background: var(--danger-light, #fff5f5); border: 1px dashed var(--danger); border-radius: 8px; margin-bottom: 8px; }
 .sec-buttons { display: flex; justify-content: center; padding: 16px; }
 .diy-btn { display: inline-block; padding: 10px 28px; color: #fff; border-radius: 20px; text-decoration: none; font-weight: 600; background: var(--brand-gradient); }
+.btn { padding: 8px 16px; border-radius: 6px; font-size: 14px; cursor: pointer; border: none; }
+.btn-outline { background: var(--bg-card); border: 1px solid var(--border-light); color: var(--text-primary); }
 </style>
