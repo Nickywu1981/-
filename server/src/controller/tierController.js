@@ -1,15 +1,16 @@
 import tierService from '../services/tierService.js';
+import { success } from '../utils/response.js';
 
 export async function getMyTier(req, res) {
   const tier = await tierService.getUserTier(req.userId);
   const limits = tierService.getTierLimits(tier);
-  res.json({ code: 200, msg: 'success', data: { tier, limits } });
+  return success(res, { tier, limits });
 }
 
 export async function checkLimit(req, res) {
   const { type = 'image' } = req.query;
   const result = await tierService.checkDailyLimit(req.userId, type);
-  res.json({ code: 200, msg: 'success', data: result });
+  return success(res, result);
 }
 
 export async function getExportPermission(req, res) {
@@ -17,7 +18,7 @@ export async function getExportPermission(req, res) {
     tierService.canExportHd(req.userId),
     tierService.canExportWithoutWatermark(req.userId),
   ]);
-  res.json({ code: 200, msg: 'success', data: { exportHd: hd, noWatermark } });
+  return success(res, { exportHd: hd, noWatermark });
 }
 
 export default { getMyTier, checkLimit, getExportPermission };
