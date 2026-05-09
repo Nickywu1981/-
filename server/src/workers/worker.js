@@ -6,6 +6,7 @@
  */
 import '../utils/env.js'; // 确保环境变量已加载
 import logger from '../utils/logger.js';
+import config from '../config/index.js';
 import * as jobQueueService from '../services/job-queue.service.js';
 import * as aiCaller from '../utils/ai-caller.js';
 import * as _circuitBreaker from '../utils/circuit-breaker.js';
@@ -41,13 +42,13 @@ const TASK_MODEL_MAP = {
 
 // 模型 → 端点映射 (NewAPI 兼容)
 function getEndpoint(model) {
-  const BASE = process.env.OPENAI_BASE_URL || 'https://ouoi.me/v1';
+  const BASE = config.ai.baseUrl;
   if (model === 'gpt-image-2') return BASE.replace(/\/v1$/, '') + '/v1/images/generations';
   return BASE + '/chat/completions';
 }
 
 function getApiKey() {
-  return process.env.OPENAI_API_KEY || '';
+  return config.ai.apiKey;
 }
 
 async function processJob(job) {

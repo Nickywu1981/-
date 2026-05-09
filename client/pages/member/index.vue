@@ -13,8 +13,8 @@
     <!-- 会员状态 -->
     <div class="member-status-card">
       <div class="status-left">
-        <span class="plan-badge" :class="profile?.plan_type > 0 ? 'paid' : 'free'">
-          {{ profile?.plan_type > 0 ? '付费会员' : '免费用户' }}
+        <span class="plan-badge" :class="(profile?.plan_type ?? 0) > 0 ? 'paid' : 'free'">
+          {{ (profile?.plan_type ?? 0) > 0 ? '付费会员' : '免费用户' }}
         </span>
         <span v-if="profile?.plan_type > 0" class="expire-text">到期：{{ profile?.end_time?.slice(0, 10) || '-' }}</span>
       </div>

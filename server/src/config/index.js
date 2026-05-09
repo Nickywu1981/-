@@ -28,6 +28,11 @@ const config = {
     expiresIn: process.env.JWT_EXPIRES_IN || '7d',
   },
 
+  ai: {
+    baseUrl: process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1',
+    apiKey: process.env.OPENAI_API_KEY || '',
+  },
+
   mockEnabled: process.env.MOCK_ENABLED !== 'false',
 
   sms: {

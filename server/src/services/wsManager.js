@@ -1,8 +1,9 @@
 import { WebSocketServer } from 'ws';
 import { parse } from 'url';
 import jwt from 'jsonwebtoken';
+import config from '../config/index.js';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'movio-jwt-secret-dev';
+const JWT_SECRET = config.jwt.secret;
 
 function parseCookies(cookieHeader) {
   if (!cookieHeader) return {};
