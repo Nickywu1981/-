@@ -70,7 +70,7 @@ import { ref, computed } from 'vue'
 import { useAppPage } from '~/composables/useAppPage'
 import { useTaskPolling } from '~/composables/useTaskPolling'
 
-definePageMeta({ layout: 'workspace', middleware: 'auth' })
+definePageMeta({ layout: 'workspace' })
 
 const { configs } = useAppPage({ configs: ['page.digital_human.header'] })
 const headerCfg = computed(() => configs.value['page.digital_human.header'] || {})

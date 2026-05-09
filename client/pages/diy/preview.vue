@@ -68,7 +68,7 @@
 </template>
 
 <script setup>
-definePageMeta({ middleware: 'auth' })
+
 const route = useRoute()
 const page = ref(null)
 const sections = ref([])

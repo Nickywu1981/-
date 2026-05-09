@@ -24,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 
 const list = ref<any[]>([])
 const loading = ref(true)

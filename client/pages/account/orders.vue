@@ -24,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 const orders = ref<any[]>([])
 const loading = ref(true)
 const error = ref('')

@@ -26,7 +26,7 @@
   </AdminLayout>
 </template>
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 const languages = ref<any[]>([])
 const scriptTypes = ref<any[]>([])
 const toast = useToast()

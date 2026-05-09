@@ -62,7 +62,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 const step = ref(0)
 const previewUrl = ref(''); const uploadedUrl = ref(''); const uploading = ref(false)
 const facePreviewUrl = ref(''); const faceUploadedUrl = ref('')

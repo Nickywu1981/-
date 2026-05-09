@@ -71,7 +71,7 @@ import { useAppPage } from '~/composables/useAppPage'
 import { useTaskPolling } from '~/composables/useTaskPolling'
 import { useAppDict } from '~/composables/useAppDict'
 
-definePageMeta({ layout: 'workspace', middleware: 'auth' })
+definePageMeta({ layout: 'workspace' })
 
 const { configs } = useAppPage({ configs: ['page.detail.header'] })
 const { options: templateOptions } = useAppDict('detail_template')

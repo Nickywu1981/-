@@ -78,7 +78,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 
-definePageMeta({ layout: 'workspace', middleware: 'auth' })
+definePageMeta({ layout: 'workspace' })
 
 const apiBase = useRuntimeConfig().public.apiBase || '/api'
 

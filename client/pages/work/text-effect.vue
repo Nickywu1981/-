@@ -43,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 const step = ref(0); const text = ref(''); const selectedEffect = ref('neon')
 const processing = ref(false); const resultUrl = ref('')
 const effects = [

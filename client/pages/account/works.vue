@@ -39,7 +39,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 const works = ref<any[]>([])
 const loading = ref(true)
 const error = ref('')

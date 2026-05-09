@@ -38,7 +38,7 @@
   </AdminLayout>
 </template>
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 const toast = useToast()
 const list = ref<any[]>([]), total = ref(0), page = ref(1), pageSize = 20, loading = ref(true)
 const keyword = ref(''), filterCategory = ref('')

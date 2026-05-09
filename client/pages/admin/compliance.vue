@@ -40,7 +40,7 @@
   </AdminLayout>
 </template>
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 const targets = ref<any[]>([])
 const checkContent = ref('')
 const checkPlatform = ref('')

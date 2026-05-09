@@ -129,7 +129,7 @@ import { ref, computed } from 'vue'
 import { useAppPage } from '~/composables/useAppPage'
 import { useTaskPolling } from '~/composables/useTaskPolling'
 
-definePageMeta({ layout: 'workspace', middleware: 'auth' })
+definePageMeta({ layout: 'workspace' })
 
 const { configs } = useAppPage({ configs: ['page.video_edit.header'] })
 const headerCfg = computed(() => configs.value['page.video_edit.header'] || {})

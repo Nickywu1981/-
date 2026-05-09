@@ -123,7 +123,7 @@ import { useSiteConfig } from '~/composables/useSiteConfig.ts'
 const { config: headerCfg } = useSiteConfig('page.social')
 const toast = useToast()
 
-definePageMeta({ middleware: 'auth' })
+
 
 const types = [
   { key: 'xhs', icon: '📕', label: '小红书封面', desc: '生活方式美学', sizeText: '1080×1440', ratio: '3:4', placeholder: '描述封面主题、氛围和想传达的感觉...' },

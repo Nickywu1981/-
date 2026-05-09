@@ -161,7 +161,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 
-definePageMeta({ layout: 'workspace', middleware: 'auth' })
+definePageMeta({ layout: 'workspace' })
 
 const apiBase = '/api'
 

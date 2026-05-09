@@ -29,7 +29,7 @@ import { CanvasRenderer } from 'echarts/renderers'
 
 use([BarChart, GridComponent, TooltipComponent, CanvasRenderer])
 
-definePageMeta({ middleware: 'auth' })
+
 const loading = ref(true), stats = ref<any>(null)
 const toast = useToast()
 

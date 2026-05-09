@@ -55,7 +55,7 @@
 <script setup lang="ts">
 import * as echarts from 'echarts'
 
-definePageMeta({ middleware: 'auth' })
+
 
 const loading = ref(false); const error = ref('')
 const modelChartRef = ref<HTMLDivElement>(); const typeChartRef = ref<HTMLDivElement>()

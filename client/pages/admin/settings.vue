@@ -26,7 +26,7 @@
   </AdminLayout>
 </template>
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 const toast = useToast()
 const loading = ref(true), saving = ref(false), savedMsg = ref('')
 const otherConfigs = ref<any[]>([])

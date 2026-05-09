@@ -74,7 +74,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 
 const tab = ref('profile');
 const form = reactive({ nickname: '', phone: '', email: '' });

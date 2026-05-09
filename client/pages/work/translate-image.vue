@@ -70,7 +70,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 const toast = useToast()
 const fileInput = ref<HTMLInputElement>()
 const previewUrl = ref('')

@@ -81,7 +81,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 import AdminLayout from '~/components/AdminLayout.vue'
 
 const list = ref<any[]>([])

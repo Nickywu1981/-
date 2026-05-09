@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 
 const showForm = ref(false);
 const templates = ref<any[]>([]);

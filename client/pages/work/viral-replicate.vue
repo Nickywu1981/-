@@ -89,7 +89,7 @@ import { ref, computed } from 'vue'
 import { useAppPage } from '~/composables/useAppPage'
 import { useTaskPolling } from '~/composables/useTaskPolling'
 
-definePageMeta({ layout: 'workspace', middleware: 'auth' })
+definePageMeta({ layout: 'workspace' })
 
 const { configs } = useAppPage({ configs: ['page.viral_replicate.header'] })
 const headerCfg = computed(() => configs.value['page.viral_replicate.header'] || {})

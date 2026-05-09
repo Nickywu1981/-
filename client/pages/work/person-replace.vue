@@ -91,7 +91,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 const steps = ['上传素材', '设置参数', '生成结果']
 const currentStep = ref(0)
 const sourceUrl = ref('')

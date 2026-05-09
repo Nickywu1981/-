@@ -47,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 const currentStep = ref(0)
 const steps = ['输入脚本', '选择风格', '生成分镜']
 

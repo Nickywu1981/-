@@ -76,7 +76,7 @@
 </template>
 
 <script setup>
-definePageMeta({ middleware: 'auth' })
+
 const { $api } = useNuxtApp()
 const pages = ref([])
 const loading = ref(true)

@@ -47,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 const steps = ['输入文案', '选择音色', '生成语音']
 const currentStep = ref(0)
 const text = ref('')

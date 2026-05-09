@@ -27,7 +27,7 @@
   </AdminLayout>
 </template>
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 const toast = useToast()
 const loading = ref(true), saving = ref(false), savedMsg = ref('')
 const form = reactive({ brand_name: '', logo_url: '', primary_color: '#7C3AED', watermark_enabled: false, watermark_opacity: 30, watermark_position: 'br' })

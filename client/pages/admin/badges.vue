@@ -94,7 +94,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 const toast = useToast()
 const list = ref<any[]>([]);
 const loading = ref(false);

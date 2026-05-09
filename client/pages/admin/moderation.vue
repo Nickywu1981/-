@@ -67,7 +67,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 
 const filter = reactive({ status: '', type: '' as string });
 const list = ref<any[]>([]);

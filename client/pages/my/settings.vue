@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 
 const toast = useToast()
 const saving = ref(false)

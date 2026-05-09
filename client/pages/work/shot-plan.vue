@@ -66,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 const step = ref(0);
 const productInfo = ref('');
 const selectedStyle = ref('带货');

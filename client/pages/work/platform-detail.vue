@@ -101,7 +101,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 interface PreviewItem { url: string; uploadedUrl: string; role: string; uploaded: boolean }
 
 const step = ref(0);

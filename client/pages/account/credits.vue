@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 const records = ref<any[]>([])
 const balance = ref(0)
 const totalIn = ref(0)

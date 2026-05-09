@@ -114,7 +114,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 
 const mode = ref<'side' | 'slider' | 'grid'>('side')
 const modes = [

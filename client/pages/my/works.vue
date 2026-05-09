@@ -54,7 +54,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 
 import ImageLightbox from '@/components/shared/ImageLightbox.vue';
 const activeTab = ref('all');

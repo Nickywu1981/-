@@ -32,7 +32,7 @@
   </AdminLayout>
 </template>
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 const toast = useToast()
 const list = ref<any[]>([]), loading = ref(true), filterType = ref('')
 const showModal = ref(false), editing = ref<any>(null), saving = ref(false)

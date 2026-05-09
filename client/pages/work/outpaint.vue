@@ -68,7 +68,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 const steps = ['上传图片', '扩图设置', '查看结果']
 const currentStep = ref(0)
 const previewUrl = ref('')

@@ -64,7 +64,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 const configs = ref<any[]>([]);
 const editingId = ref<number | null>(null);
 const editValue = ref('');

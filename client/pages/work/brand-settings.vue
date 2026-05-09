@@ -21,7 +21,7 @@
   </WorkLayout>
 </template>
 <script setup>
-definePageMeta({ middleware: 'auth' })
+
 const steps = ['品牌信息','水印设置','角标设置','确认保存'], currentStep = ref(0)
 const form = reactive({ brandName:'', logoUrl:'', watermarkType:'text', watermarkText:'', watermarkPosition:'bottomRight', watermarkOpacity:30, badges:[] })
 const badgeOptions = [{value:'hot',label:'🔥 爆款'},{value:'new',label:'🆕 新品'},{value:'sale',label:'🏷️ 特惠'},{value:'free_shipping',label:'📦 包邮'},{value:'limited',label:'⏰ 限时'}]

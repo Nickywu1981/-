@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 
 const showForm = ref(false);
 const loading = ref(true);

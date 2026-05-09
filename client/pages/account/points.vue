@@ -88,7 +88,7 @@
 import { ref, onMounted } from 'vue'
 import { useAppPage } from '~/composables/useAppPage'
 
-definePageMeta({ middleware: 'auth' })
+
 
 const toast = useToast()
 

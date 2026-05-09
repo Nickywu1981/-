@@ -92,7 +92,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 import AdminLayout from '~/components/AdminLayout.vue';
 import LoadingSkeleton from '~/components/LoadingSkeleton.vue';
 

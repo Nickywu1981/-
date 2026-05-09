@@ -101,7 +101,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 const list = ref<any[]>([])
 const total = ref(0)
 const page = ref(1)

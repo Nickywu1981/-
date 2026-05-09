@@ -172,7 +172,7 @@ import { useAppPage } from '~/composables/useAppPage'
 import { useTaskPolling, usePromptEnhance } from '~/composables/useTaskPolling'
 import { useAppDict } from '~/composables/useAppDict'
 
-definePageMeta({ layout: 'workspace', middleware: 'auth' })
+definePageMeta({ layout: 'workspace' })
 
 const { configs } = useAppPage({ configs: ['page.video.header'] })
 const { options: ratioOptions } = useAppDict('video_ratio')

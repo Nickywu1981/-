@@ -44,7 +44,7 @@
 </template>
 
 <script lang="ts" setup>
-definePageMeta({ middleware: 'auth' })
+
 
 const notifications = ref<any[]>([])
 const loading = ref(true)

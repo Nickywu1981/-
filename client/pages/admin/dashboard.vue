@@ -100,7 +100,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 
 import * as echarts from 'echarts/core';
 import { LineChart, PieChart, BarChart } from 'echarts/charts';

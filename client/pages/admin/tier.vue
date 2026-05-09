@@ -45,7 +45,7 @@
   </AdminLayout>
 </template>
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 const loading = ref(true), tierData = ref<any>(null), exportPerms = ref<any>(null)
 const checkType = ref('image'), limitResult = ref<any>(null)
 

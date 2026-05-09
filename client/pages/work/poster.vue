@@ -145,7 +145,7 @@
 <script setup>
 import { useSiteConfig } from '~/composables/useSiteConfig';
 
-definePageMeta({ middleware: 'auth' });
+;
 
 const { config } = useSiteConfig('page.poster');
 

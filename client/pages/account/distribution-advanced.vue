@@ -103,7 +103,7 @@
 </template>
 
 <script setup>
-definePageMeta({ middleware: 'auth' });
+;
 const toast = useToast();
 
 const subTabs = [

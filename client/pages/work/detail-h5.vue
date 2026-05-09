@@ -121,7 +121,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+
 
 const toast = useToast()
 interface SkuItem {
