@@ -9,7 +9,7 @@ import { apiLimiter, authLimiter, codeLimiter, heavyLimiter, uploadLimiter } fro
 import { sqlGuardMiddleware } from './utils/sqlGuard.js';
 import { requestLogger } from './utils/logger.js';
 import logger from './utils/logger.js';
-import { error as sendError } from './utils/response.js';
+import { success, error as sendError } from './utils/response.js';
 import { BusinessError } from './utils/businessError.js';
 import { z } from 'zod';
 import { ERROR_CODE } from './constants/errorCode.js';
@@ -145,11 +145,10 @@ app.get('/api/health', async (_req, res) => {
   const aiTotal = Object.keys(status.checks.ai).length;
   status.schema_version = schemaVersion;
   status.degraded = !status.checks.redis || (aiTotal > 0 && aiOnline === 0);
-  res.status(status.checks.db ? 200 : 503).json({
-    code: status.checks.db ? 200 : 503,
-    msg: status.checks.db ? (status.degraded ? 'degraded' : 'ok') : 'db_down',
-    data: status,
-  });
+  if (status.checks.db) {
+    return success(res, status, status.degraded ? 'degraded' : 'ok');
+  }
+  return sendError(res, 503, 'db_down', status);
 });
 
 // Prometheus 指标端点
@@ -160,11 +159,11 @@ const embedSchema = z.object({ texts: z.array(z.string().min(1).max(8000)).min(1
 app.post('/api/internal/embed', async (req, res) => {
   try {
     const parsed = embedSchema.safeParse(req.body);
-    if (!parsed.success) return sendError(res, 400, parsed.error.errors[0]?.message || '参数校验失败');
+    if (!parsed.success) return sendError(res, ERROR_CODE.BAD_REQUEST, parsed.error.errors[0]?.message || '参数校验失败');
     const { texts } = parsed.data;
     const apiKey = process.env.OPENAI_API_KEY || '';
     const baseUrl = (process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1').replace(/\/+$/, '');
-    if (!apiKey) return sendError(res, 500, 'API key not configured');
+    if (!apiKey) return sendError(res, ERROR_CODE.INTERNAL_ERROR, 'API key not configured');
 
     const fetchRes = await fetch(`${baseUrl}/embeddings`, {
       method: 'POST',
@@ -179,9 +178,9 @@ app.post('/api/internal/embed', async (req, res) => {
     }
 
     const data = await fetchRes.json();
-    res.json({ code: 200, msg: 'ok', data: { vectors: data.data.map(d => d.embedding), model: data.model } });
+    return success(res, { vectors: data.data.map(d => d.embedding), model: data.model }, 'ok');
   } catch (e) {
-    sendError(res, 500, e.message);
+    sendError(res, ERROR_CODE.INTERNAL_ERROR, e.message);
   }
 });
 

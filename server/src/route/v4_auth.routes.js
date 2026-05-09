@@ -81,7 +81,7 @@ router.post('/login', _validate(loginSchema), async (req, res) => {
 
     return success(res, result.user, '登录成功');
   } catch (err) {
-    return error(res, err.status || ERROR_CODE.UNAUTHORIZED, err.message || '登录失败', err.status || 401);
+    return error(res, err.status || ERROR_CODE.UNAUTHORIZED, err.message || '登录失败', err.status || ERROR_CODE.UNAUTHORIZED);
   }
 });
 
@@ -99,7 +99,7 @@ router.post('/login-by-code', _validate(loginByCodeSchema), async (req, res) => 
 
     return success(res, result.user, '登录成功');
   } catch (err) {
-    return error(res, err.status || ERROR_CODE.UNAUTHORIZED, err.message || '登录失败', err.status || 401);
+    return error(res, err.status || ERROR_CODE.UNAUTHORIZED, err.message || '登录失败', err.status || ERROR_CODE.UNAUTHORIZED);
   }
 });
 
