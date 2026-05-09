@@ -28,6 +28,7 @@ const TOOL_PATTERNS: { tool: string; route: string; keywords: string[]; weight: 
   { tool: '图片翻译', route: '/work/translate-image', keywords: ['翻译', 'translate', '图片翻译', '文字翻译', '多语言'], weight: 7 },
   { tool: '文字特效', route: '/work/text-effect', keywords: ['文字特效', '字体', 'text effect', '艺术字', '标题设计', 'typography'], weight: 7 },
   { tool: '产品渲染', route: '/work/product-render', keywords: ['渲染', '3D渲染', 'render', '产品渲染', '建模'], weight: 7 },
+  { tool: '3D 预览', route: '/work/3d-preview', keywords: ['3D', '3d', '三维', '模型', '立体', 'GLB', '360'], weight: 7 },
   { tool: '模板市场', route: '/work/marketplace', keywords: ['模板', 'template', '预设', '市场'], weight: 6 },
   { tool: '运动转移', route: '/work/shot-panorama', keywords: ['运动转移', '动作', 'motion', '动态'], weight: 7 },
 ]

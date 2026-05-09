@@ -29,6 +29,7 @@ export const toolIndex = [
   { id: 'shot-plan', name: '智能分镜', keywords: ['分镜', '脚本', 'storyboard', '镜头', '导演'], route: '/work/shot-plan', icon: 'film', category: 'video', description: 'AI 智能分镜脚本生成' },
   { id: 'storyboard', name: '分镜脚本', keywords: ['分镜脚本', '镜头脚本', '视频脚本', '短视频脚本'], route: '/work/storyboard', icon: 'collection', category: 'video', description: '短视频拍摄分镜脚本一键生成' },
   { id: 'shot-panorama', name: '全景视频', keywords: ['全景', '360', '全景视频', 'panorama', 'VR'], route: '/work/shot-panorama', icon: 'view', category: 'video', description: '商品全景展示视频制作' },
+  { id: '3d-preview', name: '3D 预览', keywords: ['3D', '3d', '三维', '模型', 'GLB', 'GLTF', '立体', '360旋转'], route: '/work/3d-preview', icon: 'box', category: 'image', description: '上传 3D 模型文件，360° 交互预览' },
   { id: 'voice-gen', name: 'AI 配音', keywords: ['配音', '语音', '旁白', 'voice', '语音生成', 'TTS'], route: '/work/voice-gen', icon: 'microphone', category: 'video', description: 'AI 语音合成，多语种多音色' },
   { id: 'voice-clone', name: '声音克隆', keywords: ['声音', '克隆', 'voice clone', '声音复制', '音色'], route: '/work/voice-clone', icon: 'microphone', category: 'video', description: '一键克隆你的声音，专属配音' },
   { id: 'script-gen', name: '脚本生成', keywords: ['脚本', '文案', '视频文案', 'script', '口播'], route: '/work/script-gen', icon: 'document', category: 'video', description: 'AI 生成短视频脚本，支持9语种' },
