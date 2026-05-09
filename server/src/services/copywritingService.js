@@ -51,6 +51,7 @@ function buildDescriptionPrompt({ productName, features, specs, platform = 'taob
 }
 
 export async function generateTitles(userId, params) {
+  if (!params.productName) throw new BusinessError(400, '商品名称不能为空');
   const prompt = buildTitlePrompt(params);
   const modelId = params.model || 'deepseek-v4-flash';
   const startTime = Date.now();
@@ -67,6 +68,7 @@ export async function generateTitles(userId, params) {
 }
 
 export async function generateDescription(userId, params) {
+  if (!params.productName) throw new BusinessError(400, '商品名称不能为空');
   const prompt = buildDescriptionPrompt(params);
   const modelId = params.model || 'deepseek-v4-flash';
   const startTime = Date.now();
@@ -83,6 +85,7 @@ export async function generateDescription(userId, params) {
 }
 
 export async function translateProduct(userId, { productName, description, features, sourceLang = 'zh-CN', targetLang = 'en', model: modelId = 'deepseek-v4-flash' }) {
+  if (!productName) throw new BusinessError(400, '商品名称不能为空');
   const prompt = copywriting.translate.template
     .replace('{productName}', productName)
     .replace('{description}', description || '')

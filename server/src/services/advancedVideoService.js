@@ -60,6 +60,7 @@ async function processVoiceClone(taskId, userId, params) {
 // ==================== 视频后期编辑 ====================
 
 export async function submitVideoEdit(userId, { videoUrl, edits = [], bgm = '', subtitle = false }) {
+  if (!videoUrl) throw new BusinessError(400, '请提供视频URL');
   await creditService.consumeCredit(userId, 'video_edit');
   const taskId = await createTask({ userId, type: 'video_edit', title: '视频编辑', inputParams: { videoUrl, edits, bgm, subtitle }, priority: 1 });
   setImmediate(() => processVideoEdit(taskId, userId, { videoUrl, edits, bgm, subtitle }));
