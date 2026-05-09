@@ -282,13 +282,14 @@ async function fetchAll() {
   } finally { loading.value = false }
 }
 
+const handleResize = () => charts.forEach(c => c.resize());
 onMounted(() => {
   fetchAll()
-  window.addEventListener('resize', () => charts.forEach(c => c.resize()))
+  window.addEventListener('resize', handleResize)
 })
 
 onUnmounted(() => {
-  window.removeEventListener('resize', () => charts.forEach(c => c.resize()))
+  window.removeEventListener('resize', handleResize)
   disposeCharts()
 })
 </script>

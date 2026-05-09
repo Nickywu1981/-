@@ -1,5 +1,7 @@
 import pool from './db.js';
 
+// WARNING: `table` is a module-level constant — safe here, but DO NOT copy this pattern
+// with runtime variables. Always use parameterized queries for dynamic identifiers.
 const table = 'marketing_badges';
 
 export async function listBadges({ category, status } = {}) {

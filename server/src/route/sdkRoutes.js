@@ -9,6 +9,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { memfocus } from '../sdk/memfocus-sdk.js';
 import { success, error } from '../utils/response.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 import { validate } from '../utils/validate.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
 
@@ -112,21 +113,30 @@ router.post('/memory/search', authMiddleware, validate(memorySearchSchema), asyn
   try {
     const result = await memfocus.memory.search(req.body.query);
     success(res, result);
-  } catch (err) { error(res, err); }
+  } catch (err) {
+    console.error('[sdk]', err);
+    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
+  }
 });
 
 router.post('/memory/embed', authMiddleware, validate(memoryEmbedSchema), async (req, res) => {
   try {
     const result = await memfocus.memory.embed(req.body);
     success(res, result);
-  } catch (err) { error(res, err); }
+  } catch (err) {
+    console.error('[sdk]', err);
+    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
+  }
 });
 
 router.get('/memory/list/:userId', authMiddleware, async (req, res) => {
   try {
     const result = await memfocus.memory.list(req.params.userId, req.query);
     success(res, result);
-  } catch (err) { error(res, err); }
+  } catch (err) {
+    console.error('[sdk]', err);
+    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
+  }
 });
 
 // ═══════════════════ 判断力 ═══════════════════
@@ -134,14 +144,20 @@ router.post('/attention/classify', authMiddleware, validate(attentionClassifySch
   try {
     const result = await memfocus.attention.classify(req.body);
     success(res, result);
-  } catch (err) { error(res, err); }
+  } catch (err) {
+    console.error('[sdk]', err);
+    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
+  }
 });
 
 router.post('/attention/rank', authMiddleware, validate(attentionRankSchema), async (req, res) => {
   try {
     const result = await memfocus.attention.rank(req.body.queries || []);
     success(res, result);
-  } catch (err) { error(res, err); }
+  } catch (err) {
+    console.error('[sdk]', err);
+    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
+  }
 });
 
 // ═══════════════════ 理解力 ═══════════════════
@@ -149,14 +165,20 @@ router.post('/context/disambiguate', authMiddleware, validate(contextDisambiguat
   try {
     const result = await memfocus.context.disambiguate(req.body);
     success(res, result);
-  } catch (err) { error(res, err); }
+  } catch (err) {
+    console.error('[sdk]', err);
+    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
+  }
 });
 
 router.post('/context/summarize', authMiddleware, validate(contextSummarizeSchema), async (req, res) => {
   try {
     const result = await memfocus.context.summarize(req.body.history || []);
     success(res, { summary: result });
-  } catch (err) { error(res, err); }
+  } catch (err) {
+    console.error('[sdk]', err);
+    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
+  }
 });
 
 // ═══════════════════ 多语言 ═══════════════════
@@ -176,14 +198,20 @@ router.post('/localize/script', authMiddleware, validate(localizeScriptSchema), 
   try {
     const result = await memfocus.localize.generateScript(req.body);
     success(res, result);
-  } catch (err) { error(res, err); }
+  } catch (err) {
+    console.error('[sdk]', err);
+    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
+  }
 });
 
 router.post('/localize/translate', authMiddleware, validate(localizeTranslateSchema), async (req, res) => {
   try {
     const result = await memfocus.localize.translate({ userId: (req.user?.userId || req.user?.id), ...req.body });
     success(res, result);
-  } catch (err) { error(res, err); }
+  } catch (err) {
+    console.error('[sdk]', err);
+    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
+  }
 });
 
 // ═══════════════════ 写作力 ═══════════════════
@@ -191,35 +219,50 @@ router.post('/content/titles', authMiddleware, validate(contentGenerateSchema), 
   try {
     const result = await memfocus.content.generateTitles((req.user?.userId || req.user?.id), req.body);
     success(res, result);
-  } catch (err) { error(res, err); }
+  } catch (err) {
+    console.error('[sdk]', err);
+    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
+  }
 });
 
 router.post('/content/selling-points', authMiddleware, validate(contentGenerateSchema), async (req, res) => {
   try {
     const result = await memfocus.content.generateSellingPoints((req.user?.userId || req.user?.id), req.body);
     success(res, result);
-  } catch (err) { error(res, err); }
+  } catch (err) {
+    console.error('[sdk]', err);
+    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
+  }
 });
 
 router.post('/content/description', authMiddleware, validate(contentGenerateSchema), async (req, res) => {
   try {
     const result = await memfocus.content.generateDescription((req.user?.userId || req.user?.id), req.body);
     success(res, result);
-  } catch (err) { error(res, err); }
+  } catch (err) {
+    console.error('[sdk]', err);
+    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
+  }
 });
 
 router.post('/content/seeding', authMiddleware, validate(contentGenerateSchema), async (req, res) => {
   try {
     const result = await memfocus.content.generateSeeding((req.user?.userId || req.user?.id), req.body);
     success(res, result);
-  } catch (err) { error(res, err); }
+  } catch (err) {
+    console.error('[sdk]', err);
+    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
+  }
 });
 
 router.post('/content/script', authMiddleware, validate(contentGenerateSchema), async (req, res) => {
   try {
     const result = await memfocus.content.generateScript((req.user?.userId || req.user?.id), req.body);
     success(res, result);
-  } catch (err) { error(res, err); }
+  } catch (err) {
+    console.error('[sdk]', err);
+    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
+  }
 });
 
 router.get('/content/platform-rules', (_req, res) => {
@@ -231,21 +274,30 @@ router.post('/guard/check-text', authMiddleware, validate(guardCheckTextSchema),
   try {
     const result = await memfocus.guard.checkText(req.body.text, req.body.options || {});
     success(res, result);
-  } catch (err) { error(res, err); }
+  } catch (err) {
+    console.error('[sdk]', err);
+    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
+  }
 });
 
 router.post('/guard/check-image', authMiddleware, validate(guardCheckImageSchema), async (req, res) => {
   try {
     const result = await memfocus.guard.checkImage(req.body.imageUrl, req.body.options || {});
     success(res, result);
-  } catch (err) { error(res, err); }
+  } catch (err) {
+    console.error('[sdk]', err);
+    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
+  }
 });
 
 router.post('/guard/audit', authMiddleware, validate(guardAuditSchema), async (req, res) => {
   try {
     const result = await memfocus.guard.fullAudit(req.body);
     success(res, result);
-  } catch (err) { error(res, err); }
+  } catch (err) {
+    console.error('[sdk]', err);
+    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
+  }
 });
 
 // ═══════════════════ 视觉力 ═══════════════════
@@ -253,42 +305,60 @@ router.post('/visual/video', authMiddleware, validate(visualSubmitSchema), async
   try {
     const result = await memfocus.visual.submitVideo((req.user?.userId || req.user?.id), req.body);
     success(res, result);
-  } catch (err) { error(res, err); }
+  } catch (err) {
+    console.error('[sdk]', err);
+    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
+  }
 });
 
 router.post('/visual/batch', authMiddleware, validate(visualBatchSchema), async (req, res) => {
   try {
     const result = await memfocus.visual.submitBatch((req.user?.userId || req.user?.id), req.body);
     success(res, result);
-  } catch (err) { error(res, err); }
+  } catch (err) {
+    console.error('[sdk]', err);
+    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
+  }
 });
 
 router.get('/visual/task/:taskId', authMiddleware, async (req, res) => {
   try {
     const result = await memfocus.visual.getTaskStatus(req.params.taskId, (req.user?.userId || req.user?.id));
     success(res, result);
-  } catch (err) { error(res, err); }
+  } catch (err) {
+    console.error('[sdk]', err);
+    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
+  }
 });
 
 router.get('/visual/tasks', authMiddleware, async (req, res) => {
   try {
     const result = await memfocus.visual.listTasks((req.user?.userId || req.user?.id), req.query);
     success(res, result);
-  } catch (err) { error(res, err); }
+  } catch (err) {
+    console.error('[sdk]', err);
+    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
+  }
 });
 
 router.post('/visual/task/:taskId/cancel', authMiddleware, validate(paramsWithTaskId, 'params'), async (req, res) => {
   try {
     const result = await memfocus.visual.cancelTask(req.params.taskId, (req.user?.userId || req.user?.id));
     success(res, result);
-  } catch (err) { error(res, err); }
+  } catch (err) {
+    console.error('[sdk]', err);
+    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
+  }
 });
 
 router.post('/visual/image', authMiddleware, validate(visualImageSchema), async (req, res) => {
   try {
     const result = await memfocus.visual.processImage((req.user?.userId || req.user?.id), req.body);
     success(res, result);
-  } catch (err) { error(res, err); }
+  } catch (err) {
+    console.error('[sdk]', err);
+    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
+  }
 });
 
 export default router;

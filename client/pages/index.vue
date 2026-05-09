@@ -304,10 +304,12 @@ function scrollTo(id: string) {
 }
 const faqOpen = ref(-1);
 
+const handleScroll = () => { scrolled.value = window.scrollY > 50; };
 onMounted(() => {
-  window.addEventListener('scroll', () => { scrolled.value = window.scrollY > 50; });
+  window.addEventListener('scroll', handleScroll, { passive: true });
   checkAuth();
 });
+onUnmounted(() => { window.removeEventListener('scroll', handleScroll); });
 
 const tabs = [
   { key: 'all', label: '全部', icon: '✦' },
