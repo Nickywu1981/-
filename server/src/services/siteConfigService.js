@@ -36,7 +36,7 @@ export const getPublicConfigMap = async () => {
 
 export const getConfigByKey = async (key) => getByKey(key);
 
-export const saveConfig = async (key, value, type, description) => {
+export const saveConfig = async (key, value, type, description, userId) => {
   const old = await getByKey(key);
   const oldValue = old?.config_value ?? null;
   await upsert(key, value, type, description);
@@ -45,12 +45,12 @@ export const saveConfig = async (key, value, type, description) => {
       configKey: key,
       oldValue,
       newValue: value,
-      changedBy: null, // will be set by controller with actual user
+      changedBy: userId || null,
     });
   } catch (err) { logger.warn('[SiteConfig] audit log insert failed', { key, error: err.message }); }
 };
 
-export const deleteConfig = async (id) => {
+export const deleteConfig = async (id, userId) => {
   const row = await getByKey(id);
   const result = await remove(id);
   if (result && row) {
@@ -59,19 +59,19 @@ export const deleteConfig = async (id) => {
         configKey: typeof row === 'object' ? row.config_key : id,
         oldValue: typeof row === 'object' ? row.config_value : null,
         newValue: null,
-        changedBy: null,
+        changedBy: userId || null,
       });
     } catch (err) { logger.warn('[SiteConfig] audit log insert failed', { id, error: err.message }); }
   }
   return result;
 };
 
-export const deleteConfigByKey = async (key) => {
+export const deleteConfigByKey = async (key, userId) => {
   const old = await getByKey(key);
   const result = await removeByKey(key);
   if (result && old) {
     try {
-      await insertLog({ configKey: key, oldValue: old.config_value, newValue: null, changedBy: null });
+      await insertLog({ configKey: key, oldValue: old.config_value, newValue: null, changedBy: userId || null });
     } catch (err) { logger.warn('[SiteConfig] audit log insert failed', { key, error: err.message }); }
   }
   return result;

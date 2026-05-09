@@ -4,8 +4,9 @@ import logger from '../utils/logger.js';
 /**
  * DIY 页面服务（增强版）
  * 完整状态机 / 双端配置 / 自动+手动版本 / Redis缓存 / 克隆 / 批量操作 / 发布校验
+ * v7: 事务保护 + N+1批量查询优化
  */
-import diyDao from '../dao/diyDao.js';
+import diyDao, { withTransaction } from '../dao/diyDao.js';
 
 // 发布前校验规则
 function validateBeforePublish(page) {
@@ -15,49 +16,30 @@ function validateBeforePublish(page) {
   const sections = mobileConfig.sections || [];
   const pcSections = pcConfig.sections || [];
 
-  // 1. 标题非空
   if (!page.title || !page.title.trim()) issues.push('页面标题不能为空');
-  // 2. 至少一端有内容
   if (sections.length === 0 && pcSections.length === 0) issues.push('页面至少需要添加一个组件区块');
-  // 3. 检查图片链接有效性（非 empty string）
   for (const s of sections) {
     if (s.props?.images && s.props.images.some(img => !img)) issues.push(`"${s.type}"组件存在空图片链接`);
     if (s.props?.bgImage && !s.props.bgImage.trim()) issues.push(`"${s.type}"组件背景图为空`);
   }
-  // 4. CTA按钮文案非空
   for (const s of sections) {
     if (s.type === 'ctaButton' && (!s.props?.text || !s.props.text.trim())) issues.push('CTA按钮文案不能为空');
     if (s.type === 'form' && (!s.props?.submitText || !s.props.submitText.trim())) issues.push('表单提交按钮文案不能为空');
   }
-  // 5. 表单字段至少一个
   for (const s of sections) {
     if (s.type === 'form' && (!s.props?.fields || s.props.fields.length === 0)) issues.push('表单组件至少需要一个字段');
   }
-  // 6. 倒计时组件需设置结束时间
   for (const s of sections) {
     if (s.type === 'countdownTimer' && !s.props?.endTime) issues.push('倒计时组件需设置结束时间');
   }
   return issues;
 }
 
-// 状态流转规则：哪些状态可以转到哪些状态
 const STATE_MACHINE = {
-  0: { // 草稿 → 发布、回收站
-    allow: [1, 3],
-    msg: { 1: '发布成功', 3: '已移入回收站' },
-  },
-  1: { // 已发布 → 下线
-    allow: [2],
-    msg: { 2: '已下线' },
-  },
-  2: { // 已下线 → 重新发布、草稿、回收站
-    allow: [0, 1, 3],
-    msg: { 0: '已退回草稿', 1: '重新发布成功', 3: '已移入回收站' },
-  },
-  3: { // 回收站 → 恢复（回到草稿状态）、彻底删除
-    allow: [0],
-    msg: { 0: '已恢复至草稿' },
-  },
+  0: { allow: [1, 3], msg: { 1: '发布成功', 3: '已移入回收站' } },
+  1: { allow: [2], msg: { 2: '已下线' } },
+  2: { allow: [0, 1, 3], msg: { 0: '已退回草稿', 1: '重新发布成功', 3: '已移入回收站' } },
+  3: { allow: [0], msg: { 0: '已恢复至草稿' } },
 };
 
 function checkStateTransition(currentStatus, targetStatus) {
@@ -82,9 +64,20 @@ export default {
 
   async createPage(tenantId, ownerId, { title, slug, pageType, accessType, mobileConfig, pcConfig, metaJson }) {
     if (!title?.trim() || !slug?.trim()) throw new BusinessError(400, '标题和标识不能为空');
-    const id = await diyDao.createPage({ tenantId, ownerId, title, slug, pageType: pageType || 'mobile', accessType: accessType || 'public', mobileConfig, pcConfig, metaJson });
-    await diyDao.saveVersion(id, mobileConfig || { sections: [] }, pcConfig || { sections: [] }, { remark: '初始版本', autoSave: false });
-    return diyDao.getPageById(id, tenantId);
+    return withTransaction(async (conn) => {
+      const [r] = await conn.query(
+        'INSERT INTO diy_page (tenant_id, owner_id, title, slug, page_type, access_type, mobile_config, pc_config, meta_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [tenantId, ownerId || 0, title, slug, pageType || 'mobile', accessType || 'public', JSON.stringify(mobileConfig || { sections: [] }), JSON.stringify(pcConfig || { sections: [] }), metaJson ? JSON.stringify(metaJson) : null],
+      );
+      const id = r.insertId;
+      const [[{ v }]] = await conn.query('SELECT COALESCE(MAX(version),0)+1 as v FROM diy_page_version WHERE page_id = ?', [id]);
+      await conn.query(
+        'INSERT INTO diy_page_version (page_id, version, mobile_config, pc_config, remark, auto_save) VALUES (?, ?, ?, ?, ?, ?)',
+        [id, v, JSON.stringify(mobileConfig || { sections: [] }), JSON.stringify(pcConfig || { sections: [] }), '初始版本', 0],
+      );
+      const [[page]] = await conn.query('SELECT * FROM diy_page WHERE id = ?', [id]);
+      return { ...page, mobile_config: mobileConfig || { sections: [] }, pc_config: pcConfig || { sections: [] }, meta_json: metaJson || null };
+    });
   },
 
   async updatePage(id, tenantId, fields) {
@@ -100,12 +93,17 @@ export default {
     const page = await diyDao.getPageById(id, tenantId);
     if (!page) throw new BusinessError(404, '页面不存在');
     const msg = checkStateTransition(page.status, 1);
-    // 发布前自动校验
     const issues = validateBeforePublish(page);
     if (issues.length) throw new BusinessError(400, `发布校验未通过: ${issues.join('; ')}`);
-    await diyDao.updatePage(id, tenantId, { status: 1, publish_time: new Date() });
-    await diyDao.saveVersion(id, page.mobile_config, page.pc_config, { remark: '发布' });
-    // 缓存已发布页面
+    // 事务保护：状态更新 + 版本保存原子执行
+    await withTransaction(async (conn) => {
+      await conn.query('UPDATE diy_page SET status = 1, publish_time = NOW() WHERE id = ? AND tenant_id = ?', [id, tenantId]);
+      const [[{ v }]] = await conn.query('SELECT COALESCE(MAX(version),0)+1 as v FROM diy_page_version WHERE page_id = ?', [id]);
+      await conn.query(
+        'INSERT INTO diy_page_version (page_id, version, mobile_config, pc_config, remark, auto_save) VALUES (?, ?, ?, ?, ?, 0)',
+        [id, v, JSON.stringify(page.mobile_config), JSON.stringify(page.pc_config), '发布'],
+      );
+    });
     const published = await diyDao.getPageById(id, tenantId);
     await diyDao.cachePublishedPage(page.slug, {
       id: published.id, title: published.title, slug: published.slug, page_type: published.page_type,
@@ -160,7 +158,7 @@ export default {
     if (!page) throw new BusinessError(404, '页面不存在');
     if (page.status !== DIY_PAGE_STATUS.TRASH) throw new BusinessError(400, '仅回收站中的页面可彻底删除');
     if (page.status === 1) await diyDao.clearPageCache(page.slug);
-    await diyDao.hardDeletePage(id, tenantId);
+    await diyDao.hardDeletePage(id, tenantId); // 内部已用 withTransaction 保护
     return { msg: '页面已彻底删除，不可恢复' };
   },
 
@@ -171,13 +169,20 @@ export default {
     if (!src) throw new BusinessError(404, '源页面不存在');
     const slug = `${src.slug}-clone-${Date.now().toString(36)}`;
     const title = `${src.title}（克隆版）`;
-    const newId = await diyDao.createPage({
-      tenantId, ownerId: src.owner_id, title, slug,
-      pageType: src.page_type, accessType: src.access_type,
-      mobileConfig: src.mobile_config, pcConfig: src.pc_config, metaJson: src.meta_json,
+    return withTransaction(async (conn) => {
+      const [r] = await conn.query(
+        'INSERT INTO diy_page (tenant_id, owner_id, title, slug, page_type, access_type, mobile_config, pc_config, meta_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [tenantId, src.owner_id, title, slug, src.page_type, src.access_type, JSON.stringify(src.mobile_config), JSON.stringify(src.pc_config), src.meta_json ? JSON.stringify(src.meta_json) : null],
+      );
+      const newId = r.insertId;
+      const [[{ v }]] = await conn.query('SELECT COALESCE(MAX(version),0)+1 as v FROM diy_page_version WHERE page_id = ?', [newId]);
+      await conn.query(
+        'INSERT INTO diy_page_version (page_id, version, mobile_config, pc_config, remark, auto_save) VALUES (?, ?, ?, ?, ?, 0)',
+        [newId, v, JSON.stringify(src.mobile_config), JSON.stringify(src.pc_config), `克隆自页面 #${id}`],
+      );
+      const [[page]] = await conn.query('SELECT * FROM diy_page WHERE id = ?', [newId]);
+      return { ...page, mobile_config: src.mobile_config, pc_config: src.pc_config, meta_json: src.meta_json };
     });
-    await diyDao.saveVersion(newId, src.mobile_config, src.pc_config, { remark: `克隆自页面 #${id}` });
-    return diyDao.getPageById(newId, tenantId);
   },
 
   // ========== 版本管理 ==========
@@ -206,10 +211,17 @@ export default {
     if (!page) throw new BusinessError(404, '页面不存在');
     const src = await diyDao.getVersion(pageId, version);
     if (!src) throw new BusinessError(404, '版本不存在');
-    // 写入当前配置，保存回滚源
-    const v = await diyDao.saveVersion(pageId, src.mobile_config, src.pc_config, { remark: `回滚自版本 v${version}`, autoSave: false, rollbackFrom: version });
-    await diyDao.updatePage(pageId, tenantId, { mobile_config: src.mobile_config, pc_config: src.pc_config });
-    return { version: v, msg: `已回滚至版本 v${version}` };
+    // 事务保护：保存新版本 + 更新页面配置原子执行
+    return withTransaction(async (conn) => {
+      const [[{ v }]] = await conn.query('SELECT COALESCE(MAX(version),0)+1 as v FROM diy_page_version WHERE page_id = ?', [pageId]);
+      await conn.query(
+        'INSERT INTO diy_page_version (page_id, version, mobile_config, pc_config, remark, auto_save, rollback_from) VALUES (?, ?, ?, ?, ?, 0, ?)',
+        [pageId, v, JSON.stringify(src.mobile_config), JSON.stringify(src.pc_config), `回滚自版本 v${version}`, version],
+      );
+      await conn.query('UPDATE diy_page SET mobile_config = ?, pc_config = ? WHERE id = ? AND tenant_id = ?',
+        [JSON.stringify(src.mobile_config), JSON.stringify(src.pc_config), pageId, tenantId]);
+      return { version: v, msg: `已回滚至版本 v${version}` };
+    });
   },
 
   async getLatestAutoVersion(pageId, tenantId) {
@@ -235,9 +247,12 @@ export default {
   },
 
   async batchDelete(ids, tenantId) {
-    const pages = await Promise.all(ids.map(id => diyDao.getPageById(id, tenantId).catch(() => null)));
+    // 批量查询替代 N+1 逐条查询
+    const pages = await diyDao.getPagesByIds(ids, tenantId);
     for (const p of pages) {
-      if (p && p.status === DIY_PAGE_STATUS.PUBLISHED) await diyDao.clearPageCache(p.slug).catch((e) => { logger.warn('清除页面缓存失败:', e.message); });
+      if (p && p.status === DIY_PAGE_STATUS.PUBLISHED) {
+        await diyDao.clearPageCache(p.slug).catch((e) => { logger.warn('清除页面缓存失败:', e.message); });
+      }
     }
     await diyDao.batchUpdateStatus(ids.filter(Number), tenantId, 3);
     return { count: ids.length };

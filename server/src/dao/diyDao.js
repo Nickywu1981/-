@@ -4,6 +4,22 @@ import { getRedis } from './redis.js';
 const REDIS_KEY_PREFIX = 'diy:page:';
 const REDIS_TTL = 86400; // 24h
 
+// 事务工具：获取连接 → 执行 → 提交/回滚
+export async function withTransaction(fn) {
+  const conn = await pool.getConnection();
+  await conn.beginTransaction();
+  try {
+    const result = await fn(conn);
+    await conn.commit();
+    return result;
+  } catch (e) {
+    await conn.rollback();
+    throw e;
+  } finally {
+    conn.release();
+  }
+}
+
 // ==================== 页面 CRUD（增强版） ====================
 
 export default {
@@ -28,6 +44,13 @@ export default {
     if (!rows[0]) return null;
     const p = rows[0];
     return { ...p, mobile_config: parseJson(p.mobile_config), pc_config: parseJson(p.pc_config), meta_json: parseJson(p.meta_json) };
+  },
+
+  async getPagesByIds(ids, tenantId) {
+    if (!ids || !ids.length) return [];
+    const placeholders = ids.map(() => '?').join(',');
+    const [rows] = await pool.query(`SELECT * FROM diy_page WHERE id IN (${placeholders}) AND tenant_id = ?`, [...ids, tenantId]);
+    return rows.map(p => ({ ...p, mobile_config: parseJson(p.mobile_config), pc_config: parseJson(p.pc_config), meta_json: parseJson(p.meta_json) }));
   },
 
   async getPageBySlug(slug, tenantId) {
@@ -97,8 +120,10 @@ export default {
   },
 
   async hardDeletePage(id, tenantId) {
-    await pool.query('DELETE FROM diy_page WHERE id = ? AND tenant_id = ? AND status = 3', [id, tenantId]);
-    await pool.query('DELETE FROM diy_page_version WHERE page_id = ?', [id]);
+    return withTransaction(async (conn) => {
+      await conn.query('DELETE FROM diy_page_version WHERE page_id = ?', [id]);
+      await conn.query('DELETE FROM diy_page WHERE id = ? AND tenant_id = ? AND status = 3', [id, tenantId]);
+    });
   },
 
   async unpublishPage(id, tenantId) {
