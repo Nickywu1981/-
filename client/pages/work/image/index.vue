@@ -27,6 +27,7 @@
           placeholder="例如: 一款白色运动鞋放在木质地板上，自然光从左侧照射，45度俯拍角度，简约风格..."
         ></textarea>
         <div class="prompt-actions">
+          <PromptEnhancer v-model="prompt" type="image" @enhanced="onPromptEnhanced" />
           <button class="btn btn-ghost btn-sm" :disabled="enhancing" @click="doEnhance">
             {{ enhancing ? '优化中...' : '✨ AI 优化提示词' }}
           </button>
@@ -120,6 +121,7 @@ import { useAppPage } from '~/composables/useAppPage'
 import { useTaskPolling, usePromptEnhance } from '~/composables/useTaskPolling'
 import { useAppDict } from '~/composables/useAppDict'
 import { copyToClipboard } from '@/utils/format'
+import PromptEnhancer from '~/components/PromptEnhancer.vue'
 
 definePageMeta({ layout: 'workspace' })
 
@@ -148,6 +150,9 @@ const resultUrl = computed(() => result.value?.image_url || result.value?.file_u
 async function doEnhance() {
   if (!prompt.value.trim()) return
   enhancedPrompt.value = await enhance(prompt.value, 'image')
+}
+function onPromptEnhanced({ enhanced: val }: { original: string; enhanced: string }) {
+  enhancedPrompt.value = val
 }
 
 async function doGenerate() {

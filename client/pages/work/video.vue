@@ -25,6 +25,7 @@
         <label>提示词（描述想要的视频效果）</label>
         <textarea v-model="prompt" class="input prompt-input" rows="3" placeholder="例如: 产品旋转展示，柔和灯光，快节奏转场..."></textarea>
         <div class="prompt-actions">
+          <PromptEnhancer v-model="prompt" type="video" @enhanced="onPromptEnhanced" />
           <button class="btn btn-ghost btn-sm" :disabled="enhancing" @click="doEnhance">
             {{ enhancing ? '优化中...' : '✨ AI 优化提示词' }}
           </button>
@@ -172,6 +173,7 @@ import { useAppPage } from '~/composables/useAppPage'
 import { useTaskPolling, usePromptEnhance } from '~/composables/useTaskPolling'
 import { useAppDict } from '~/composables/useAppDict'
 import { copyToClipboard } from '@/utils/format'
+import PromptEnhancer from '~/components/PromptEnhancer.vue'
 
 definePageMeta({ layout: 'workspace' })
 
@@ -202,6 +204,9 @@ function onImagesUploaded(files: any[]) { images.value = files }
 async function doEnhance() {
   if (!prompt.value.trim()) return
   enhancedPrompt.value = await enhance(prompt.value, 'video')
+}
+function onPromptEnhanced({ enhanced: val }: { original: string; enhanced: string }) {
+  enhancedPrompt.value = val
 }
 async function doGenerate() {
   const finalPrompt = enhancedPrompt.value || prompt.value
