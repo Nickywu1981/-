@@ -107,8 +107,8 @@ async function fetchBindings() {
   try {
     const res: any = await $fetch(`${apiBase}/platforms/bindings`).catch(() => null)
     if (res?.code === 200) boundList.value = res.data?.list || []
-  } catch { toast.error('加载平台绑定失败') }
-  loading.value = false
+  } catch { toast.error('加载平台绑定失败') } finally { loading.value = false }
+
 }
 
 async function doBind(platform: any) {

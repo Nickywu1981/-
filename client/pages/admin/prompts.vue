@@ -138,8 +138,8 @@ async function fetchData() {
     const res = await $fetch(`/api/admin/prompts?${params}`, { credentials: 'include' });
     list.value = (res as any).data?.list || [];
     total.value = (res as any).data?.total || 0;
-  } catch (e: any) { toast.error('加载失败: ' + (e.message || '网络错误')); }
-  loading.value = false;
+  } catch (e: any) { toast.error('加载失败: ' + (e.message || '网络错误')); } finally { loading.value = false; }
+
 }
 
 function onPageChange(p: number) { page.value = p; fetchData(); }

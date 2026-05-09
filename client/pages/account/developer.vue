@@ -108,8 +108,8 @@ async function loadKeys() {
   loading.value = true
   try {
     keys.value = (await api.get('/open/keys'))?.items || []
-  } catch { /* empty */ }
-  loading.value = false
+  } catch { toast.error('加载API Key失败') }
+  finally { loading.value = false }
 }
 
 async function createKey() {

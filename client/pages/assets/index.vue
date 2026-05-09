@@ -102,8 +102,8 @@ async function fetchAssets() {
       items.value = res.data.list || []
       total.value = res.data.total || 0
     }
-  } catch { toast.error('加载资源列表失败') }
-  loading.value = false
+  } catch { toast.error('加载资源列表失败') } finally { loading.value = false }
+
 }
 
 function switchFilter(key: string) {
