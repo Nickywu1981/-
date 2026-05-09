@@ -29,7 +29,7 @@
               <td><span class="tag">{{ typeLabel(item.type) }}</span></td>
               <td class="ellipsis" :title="item.title">{{ item.title }}</td>
               <td><span :class="['status', reviewLabel(item.review_status)]">{{ reviewText(item.review_status) }}</span></td>
-              <td>{{ formatTime(item.create_time) }}</td>
+              <td>{{ formatDateTime(item.create_time) }}</td>
               <td class="actions">
                 <button v-if="item.review_status === 0" class="btn-sm btn-ok" @click="approve(item)">通过</button>
                 <button v-if="item.review_status === 0" class="btn-sm btn-no" @click="reject(item)">拒绝</button>
@@ -68,8 +68,6 @@
 
 <script setup lang="ts">
 import { formatDateTime } from '@/utils/format'
-
-const formatTime = formatDateTime
 
 const filter = reactive({ status: '', type: '' as string });
 const list = ref<any[]>([]);

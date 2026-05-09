@@ -73,7 +73,7 @@
           </div>
           <div class="tx-meta">
             <span class="tx-balance">余额 {{ tx.balance_after }}</span>
-            <span class="tx-time">{{ formatTime(tx.created_at) }}</span>
+            <span class="tx-time">{{ formatDateTime(tx.created_at) }}</span>
           </div>
         </div>
       </div>
@@ -88,10 +88,6 @@
 import { ref, onMounted } from 'vue'
 import { useAppPage } from '~/composables/useAppPage'
 import { formatDateTime } from '@/utils/format'
-
-const formatTime = formatDateTime
-
-
 
 const toast = useToast()
 

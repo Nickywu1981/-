@@ -32,7 +32,7 @@
           <div class="notif-body">
             <p class="notif-title">{{ item.title }}</p>
             <p class="notif-content">{{ item.content }}</p>
-            <span class="notif-time">{{ formatTime(item.created_at) }}</span>
+            <span class="notif-time">{{ formatDateTime(item.created_at) }}</span>
           </div>
           <div v-if="!item.is_read" class="notif-dot" />
         </div>
@@ -45,8 +45,6 @@
 
 <script lang="ts" setup>
 import { formatDateTime } from '@/utils/format'
-
-const formatTime = formatDateTime
 
 const notifications = ref<any[]>([])
 const loading = ref(true)

@@ -14,7 +14,7 @@
           <td>{{ o.plan_name || '-' }}</td>
           <td class="amount">&yen;{{ o.amount }}</td>
           <td><span :class="['badge', statusClass(o.status)]">{{ statusLabel(o.status) }}</span></td>
-          <td>{{ formatDate(o.created_at) }}</td>
+          <td>{{ formatDateTime(o.created_at) }}</td>
         </tr>
       </tbody>
     </table>
@@ -25,8 +25,6 @@
 
 <script setup lang="ts">
 import { formatDateTime } from '@/utils/format'
-
-const formatDate = formatDateTime
 
 const orders = ref<any[]>([])
 const loading = ref(true)

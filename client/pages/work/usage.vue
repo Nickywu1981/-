@@ -38,7 +38,7 @@
             <tbody>
               <tr v-if="recent.length===0"><td colspan="5" class="empty">暂无使用记录</td></tr>
               <tr v-for="item in recent" :key="item.id">
-                <td class="time">{{ formatTime(item.timestamp) }}</td>
+                <td class="time">{{ formatDateTime(item.timestamp) }}</td>
                 <td class="mono">{{ item.model }}</td>
                 <td>{{ item.taskType }}</td>
                 <td><span class="badge" :class="item.status">{{ item.status }}</span></td>
@@ -55,10 +55,6 @@
 <script setup lang="ts">
 import * as echarts from 'echarts'
 import { formatDateTime } from '@/utils/format'
-
-const formatTime = formatDateTime
-
-
 
 const loading = ref(false); const error = ref('')
 const modelChartRef = ref<HTMLDivElement>(); const typeChartRef = ref<HTMLDivElement>()

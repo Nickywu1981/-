@@ -27,7 +27,7 @@
           </div>
           <div class="card-info">
             <span class="card-type tag" :class="item.type">{{ typeLabel(item.type) }}</span>
-            <span class="card-date">{{ formatTime(item.create_time) }}</span>
+            <span class="card-date">{{ formatDateTime(item.create_time) }}</span>
           </div>
           <div class="card-title">{{ item.title }}</div>
           <div class="card-actions">
@@ -55,10 +55,6 @@
 
 <script setup lang="ts">
 import { formatDateTime } from '@/utils/format'
-
-const formatTime = formatDateTime
-
-
 import ImageLightbox from '@/components/shared/ImageLightbox.vue';
 const activeTab = ref('all');
 const page = ref(1);

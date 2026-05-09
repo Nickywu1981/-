@@ -117,7 +117,7 @@
           </div>
           <div class="history-meta">
             <span class="meta-status" :class="h.status">{{ h.status }}</span>
-            <span class="meta-time">{{ formatTime(h.create_time) }}</span>
+            <span class="meta-time">{{ formatDateTime(h.create_time) }}</span>
           </div>
           <button v-if="h.result_url" class="btn btn-sm btn-secondary" @click="download(h.result_url)">下载</button>
         </div>
@@ -134,8 +134,6 @@
 <script setup lang="ts">
 import { useSiteConfig } from '#composables/useSiteConfig';
 import { formatDateTime } from '@/utils/format'
-const formatTime = formatDateTime
-
 const { config: headerCfg } = useSiteConfig('page.video_translate');
 
 const tabs = [

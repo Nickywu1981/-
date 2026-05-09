@@ -131,7 +131,7 @@
           >
             <div class="batch-header">
               <span class="batch-id">{{ (batch.batchId || '').slice(0, 20) }}</span>
-              <span class="batch-time">{{ formatDate(batch.created_at) }}</span>
+              <span class="batch-time">{{ formatDateTime(batch.created_at) }}</span>
             </div>
             <div class="batch-platforms">
               <span
@@ -164,8 +164,6 @@
 import { ref, reactive, onMounted } from 'vue';
 import { useApi } from '~/composables/useApi';
 import { formatDateTime } from '@/utils/format';
-const formatDate = formatDateTime;
-
 const api = useApi();
 
 const platforms = ref([]);

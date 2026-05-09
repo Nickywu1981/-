@@ -34,7 +34,7 @@
             <td>{{ o.credit_after }}</td>
             <td class="earn">+{{ Math.abs(o.consumed) }} 点</td>
             <td class="remark-cell" :title="o.remark">{{ o.remark || '-' }}</td>
-            <td class="time">{{ formatTime(o.create_time) }}</td>
+            <td class="time">{{ formatDateTime(o.create_time) }}</td>
             <td class="actions">
               <button class="btn-sm" @click="openDetail(o)">详情</button>
               <button class="btn-sm danger" @click="confirmDelete(o)">删除</button>
@@ -64,7 +64,7 @@
               <div class="detail-item"><span class="dl">变动后积分</span><span class="dv">{{ detail.credit_after }}</span></div>
               <div class="detail-item"><span class="dl">获增点数</span><span class="dv earn">+{{ Math.abs(detail.consumed) }} 点</span></div>
               <div class="detail-item"><span class="dl">备注</span><span class="dv">{{ detail.remark || '-' }}</span></div>
-              <div class="detail-item"><span class="dl">购买时间</span><span class="dv">{{ formatTime(detail.create_time) }}</span></div>
+              <div class="detail-item"><span class="dl">购买时间</span><span class="dv">{{ formatDateTime(detail.create_time) }}</span></div>
             </div>
           </div>
         </div>
@@ -75,8 +75,6 @@
 
 <script setup lang="ts">
 import { formatDateTime } from '@/utils/format'
-
-const formatTime = formatDateTime
 
 const list = ref<any[]>([])
 const total = ref(0)

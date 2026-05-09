@@ -33,7 +33,7 @@
           </div>
           <div class="detail-item">
             <span class="label">注册时间</span>
-            <span class="value">{{ formatTime(profile.create_time) }}</span>
+            <span class="value">{{ formatDateTime(profile.create_time) }}</span>
           </div>
           <div class="detail-item">
             <span class="label">会员等级</span>
@@ -82,8 +82,6 @@
 
 <script setup lang="ts">
 import { formatDateTime } from '@/utils/format'
-
-const formatTime = formatDateTime
 
 const profile = ref<any>(null);
 const loading = ref(true);

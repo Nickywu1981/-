@@ -49,7 +49,7 @@
             <code class="key-display">{{ k.apiKey }}</code>
             <span class="key-desc">{{ k.description || '未命名密钥' }}</span>
             <span class="key-meta">
-              {{ k.rateLimit }}/min · {{ k.dailyLimit }}/day · {{ formatTime(k.createTime) }}
+              {{ k.rateLimit }}/min · {{ k.dailyLimit }}/day · {{ formatDateTime(k.createTime) }}
             </span>
           </div>
           <div class="key-actions">
@@ -92,8 +92,6 @@ fetch('/api/open/v1/image/remove-bg', {
 <script setup lang="ts">
 import { api } from '@/composables/useApi'
 import { formatDateTime } from '@/utils/format'
-
-const formatTime = formatDateTime
 
 const keys = ref<any[]>([])
 const loading = ref(false)

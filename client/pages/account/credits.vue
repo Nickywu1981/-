@@ -12,7 +12,7 @@
       <thead><tr><th>时间</th><th>类型</th><th>金额</th><th>余额</th><th>备注</th></tr></thead>
       <tbody>
         <tr v-for="r in records" :key="r.id">
-          <td>{{ formatDate(r.created_at) }}</td>
+          <td>{{ formatDateTime(r.created_at) }}</td>
           <td><span :class="['badge', r.type === 'earn' ? 'badge-in' : 'badge-out']">{{ r.type === 'earn' ? '获得' : '消耗' }}</span></td>
           <td :class="r.type === 'earn' ? 'text-in' : 'text-out'">{{ r.type === 'earn' ? '+' : '-' }}{{ r.amount }}</td>
           <td>{{ r.balance }}</td>
@@ -27,8 +27,6 @@
 
 <script setup lang="ts">
 import { formatDateTime } from '@/utils/format'
-
-const formatDate = formatDateTime
 
 const records = ref<any[]>([])
 const balance = ref(0)

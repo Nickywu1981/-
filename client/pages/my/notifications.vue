@@ -14,7 +14,7 @@
           <div class="notif-body">
             <div class="notif-title">{{ item.title }}</div>
             <div class="notif-content">{{ item.content }}</div>
-            <div class="notif-time">{{ formatTime(item.created_at) }}</div>
+            <div class="notif-time">{{ formatDateTime(item.created_at) }}</div>
           </div>
           <button v-if="!item.is_read" class="read-btn" @click="markRead(item.id)">标为已读</button>
         </div>
@@ -25,8 +25,6 @@
 
 <script setup lang="ts">
 import { formatDateTime } from '@/utils/format'
-
-const formatTime = formatDateTime
 
 const list = ref<any[]>([])
 const loading = ref(true)

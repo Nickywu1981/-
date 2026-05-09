@@ -11,9 +11,9 @@ import * as jobQueueService from '../services/job-queue.service.js';
 import * as aiCaller from '../utils/ai-caller.js';
 import * as _circuitBreaker from '../utils/circuit-breaker.js';
 
-const POLL_INTERVAL = 2000; // 2秒轮询
-const BATCH_SIZE = 3;       // 每次拉取任务数
-const MAX_CONCURRENT = 5;   // 最大并发处理
+const POLL_INTERVAL = parseInt(process.env.WORKER_POLL_INTERVAL, 10) || 2000;
+const BATCH_SIZE = parseInt(process.env.WORKER_BATCH_SIZE, 10) || 3;
+const MAX_CONCURRENT = parseInt(process.env.WORKER_MAX_CONCURRENT, 10) || 5;
 
 let running = true;
 let activeJobs = 0;
