@@ -146,6 +146,7 @@ function onSearch() {
 function onFilter() { page.value = 1; fetchData() }
 
 onMounted(() => fetchData())
+onBeforeUnmount(() => { if (searchTimer) clearTimeout(searchTimer) })
 </script>
 
 <style scoped>

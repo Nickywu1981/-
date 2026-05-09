@@ -92,6 +92,7 @@ const pwMsg = ref('');
 const pwMsgErr = ref(false);
 const phoneMsg = ref('');
 const phoneMsgErr = ref(false);
+let codeTimer: ReturnType<typeof setInterval> | null = null;
 
 onMounted(async () => {
   try {
@@ -130,7 +131,7 @@ async function sendBindCode() {
     await $fetch('/api/sms/send-code', { method: 'POST', body: { phone: phoneForm.phone, scene: 'bind_phone' } });
     phoneMsg.value = '验证码已发送'; phoneMsgErr.value = false;
     codeCooldown.value = 60;
-    const timer = setInterval(() => { codeCooldown.value--; if (codeCooldown.value <= 0) clearInterval(timer); }, 1000);
+    codeTimer = setInterval(() => { codeCooldown.value--; if (codeCooldown.value <= 0) { clearInterval(codeTimer!); codeTimer = null; } }, 1000);
   } catch (e: any) { phoneMsg.value = e.data?.msg || '发送失败'; phoneMsgErr.value = true; }
 }
 
@@ -158,6 +159,10 @@ async function unbindPhone() {
   } catch (e: any) { phoneMsg.value = e.data?.msg || '解绑失败'; phoneMsgErr.value = true; }
   phoneSaving.value = false;
 }
+
+onBeforeUnmount(() => {
+  if (codeTimer) { clearInterval(codeTimer); codeTimer = null; }
+});
 </script>
 
 <style scoped>

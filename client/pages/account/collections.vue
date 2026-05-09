@@ -189,6 +189,7 @@ function onSearch() {
 }
 
 onMounted(() => fetchData())
+onBeforeUnmount(() => { if (searchTimer) clearTimeout(searchTimer) })
 </script>
 
 <style scoped>

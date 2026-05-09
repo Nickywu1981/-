@@ -68,6 +68,8 @@ const emailCountdown = ref(0);
 const loading = ref(false);
 const msg = ref('');
 const msgErr = ref(false);
+let smsTimer: ReturnType<typeof setInterval> | null = null;
+let emailTimer: ReturnType<typeof setInterval> | null = null;
 
 function randomPassword() {
   const arr = new Uint8Array(12);
@@ -110,7 +112,7 @@ async function sendSmsCode(scene: string) {
   try {
     await $fetch('/api/sms/send-code', { method: 'POST', body: { phone: smsPhone.value, scene } });
     smsCountdown.value = 60;
-    const timer = setInterval(() => { smsCountdown.value--; if (smsCountdown.value <= 0) clearInterval(timer); }, 1000);
+    smsTimer = setInterval(() => { smsCountdown.value--; if (smsCountdown.value <= 0) { clearInterval(smsTimer!); smsTimer = null; } }, 1000);
     msg.value = '验证码已发送'; msgErr.value = false;
   } catch (e: any) { msg.value = e.data?.msg || '发送失败'; msgErr.value = true; }
 }
@@ -137,10 +139,15 @@ async function sendEmailCode(scene: string) {
   try {
     await $fetch('/api/email/send-code', { method: 'POST', body: { email: emailAddr.value, scene } });
     emailCountdown.value = 60;
-    const timer = setInterval(() => { emailCountdown.value--; if (emailCountdown.value <= 0) clearInterval(timer); }, 1000);
+    emailTimer = setInterval(() => { emailCountdown.value--; if (emailCountdown.value <= 0) { clearInterval(emailTimer!); emailTimer = null; } }, 1000);
     msg.value = '验证码已发送'; msgErr.value = false;
   } catch (e: any) { msg.value = e.data?.msg || '发送失败'; msgErr.value = true; }
 }
+
+onBeforeUnmount(() => {
+  if (smsTimer) { clearInterval(smsTimer); smsTimer = null; }
+  if (emailTimer) { clearInterval(emailTimer); emailTimer = null; }
+});
 </script>
 
 <style scoped>
