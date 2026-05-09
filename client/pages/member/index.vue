@@ -77,6 +77,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 
+const toast = useToast()
 definePageMeta({ layout: 'workspace' })
 
 const apiBase = useRuntimeConfig().public.apiBase || '/api'
@@ -107,7 +108,7 @@ onMounted(async () => {
     if ((pointsRes as any).code === 200) pointsBalance.value = (pointsRes as any).data?.balance || 0
     if ((statsRes as any)?.code === 200) stats.value = (statsRes as any).data
     else stats.value = { todayTasks: '-', totalTasks: '-', thisMonthConsumed: '-' }
-  } catch {}
+  } catch { toast.error('加载会员信息失败') }
 })
 </script>
 

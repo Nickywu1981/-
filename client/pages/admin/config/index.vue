@@ -163,6 +163,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 
 definePageMeta({ layout: 'workspace' })
 
+const toast = useToast()
 const apiBase = '/api'
 
 // 分组
@@ -200,7 +201,7 @@ async function loadGroups() {
   try {
     const res: any = await $fetch(`${apiBase}/admin/config/groups`)
     if (res.code === 200) groups.value = res.data || []
-  } catch {}
+  } catch { toast.error('加载配置分组失败') }
 }
 
 // 选择分组
@@ -232,7 +233,7 @@ async function selectGroup(groupKey: string) {
       editValues.value = vals
       originalValues.value = orig
     }
-  } catch {}
+  } catch { toast.error('加载配置失败') }
 }
 
 // 加载变更日志
@@ -240,7 +241,7 @@ async function loadLogs() {
   try {
     const res: any = await $fetch(`${apiBase}/admin/config/logs/${activeGroup.value}`)
     if (res.code === 200) changeLogs.value = res.data || []
-  } catch {}
+  } catch { toast.error('加载变更日志失败') }
 }
 
 watch(showLogs, (v) => { if (v) loadLogs() })
@@ -287,7 +288,7 @@ async function rollback(logId: number) {
       await selectGroup(activeGroup.value)
       await loadLogs()
     }
-  } catch {}
+  } catch { toast.error('回滚配置失败') }
 }
 
 onMounted(loadGroups)

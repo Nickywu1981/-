@@ -64,6 +64,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, reactive } from 'vue'
 
+const toast = useToast()
+
 const route = useRoute()
 const currentPath = computed(() => route.path)
 const pageTitle = computed(() => '工作台')
@@ -195,7 +197,7 @@ onMounted(async () => {
       userPoints.value = u.points_balance || 0
       isAdmin.value = ['admin', 'super_admin'].includes(u.role)
     }
-  } catch {}
+  } catch { toast.error('加载用户信息失败') }
 })
 
 async function handleLogout() {

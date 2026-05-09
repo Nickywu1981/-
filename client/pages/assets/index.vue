@@ -64,6 +64,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 
+const toast = useToast()
 definePageMeta({ layout: 'workspace' })
 
 const apiBase = useRuntimeConfig().public.apiBase || '/api'
@@ -98,7 +99,7 @@ async function fetchAssets() {
       items.value = res.data.list || []
       total.value = res.data.total || 0
     }
-  } catch {}
+  } catch { toast.error('加载资源列表失败') }
   loading.value = false
 }
 

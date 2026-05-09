@@ -257,6 +257,7 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'landing' });
 
+const toast = useToast()
 const activeNav = ref('all');
 const activeTab = ref('image');
 const taskPrompt = ref('');
@@ -421,7 +422,7 @@ async function loadUserData() {
     loadRecentTasks();
     loadRecentWorks();
     loadUnread();
-  } catch { user.value = null; }
+  } catch { user.value = null; toast.error('加载用户数据失败') }
 }
 
 async function loadRecentTasks() {
