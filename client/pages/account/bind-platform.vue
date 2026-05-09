@@ -68,22 +68,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, onMounted } from 'vue'
-
-
-
-const toast = useToast()
-
-const apiBase = useRuntimeConfig().public.apiBase || '/api'
-
-const boundList = ref<any[]>([])
-const loading = ref(false)
-const binding = ref(false)
-const bindTarget = ref<any>(null)
-const bindType = ref('shop')
-const bindAccountId = ref('')
-
+<script lang="ts">
 const availablePlatforms = [
   { code: 'taobao', name: '淘宝', icon: '🛒', desc: '绑定淘宝/天猫店铺' },
   { code: 'douyin', name: '抖音', icon: '🎵', desc: '绑定抖音账号/小店' },
@@ -96,9 +81,24 @@ const availablePlatforms = [
 ]
 
 const platformIcons: Record<string, string> = {
-  douyin: '🎵', taobao: '🛒', kuaishou: '📱', xiaohongshu: '📕',
-  tiktok: '🎬', shopee: '🛍', pdd: '📦', amazon: '📊',
+  taobao: '🛒', douyin: '🎵', pdd: '📦', kuaishou: '📱',
+  xiaohongshu: '📕', tiktok: '🎬', shopee: '🛍', amazon: '📊',
 }
+</script>
+
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+
+const toast = useToast()
+
+const apiBase = useRuntimeConfig().public.apiBase || '/api'
+
+const boundList = ref<any[]>([])
+const loading = ref(false)
+const binding = ref(false)
+const bindTarget = ref<any>(null)
+const bindType = ref('shop')
+const bindAccountId = ref('')
 
 function platformIcon(p: string) { return platformIcons[p] || '🔗' }
 

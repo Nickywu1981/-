@@ -53,20 +53,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
-definePageMeta({ layout: 'workspace' })
-const router = useRouter()
-const toast = useToast()
-
-const prompt = ref('')
-const activeTab = ref('')
-
-type Card = { id: string; category: string; icon: string; title: string; desc: string; route: string; order: number; visible: boolean }
-
-const tabs = ref<{ key: string; label: string }[]>([])
-const cardData = ref<Record<string, Card[]>>({})
-
-// ═══ 默认 fallback 数据 ═══
+<script lang="ts">
 const defaultTabs = [
   { key: 'video', label: '视频生成' },
   { key: 'image', label: '图片生成' },
@@ -74,6 +61,8 @@ const defaultTabs = [
   { key: 'copywrite', label: '文案工具' },
   { key: 'digital', label: '数字人' },
 ]
+
+type Card = { id: string; category: string; icon: string; title: string; desc: string; route: string; order: number; visible: boolean }
 
 const defaultCardData: Record<string, Card[]> = {
   video: [
@@ -124,6 +113,18 @@ const defaultCardData: Record<string, Card[]> = {
     { id:'face_swap', category:'digital', icon:'🔄', title:'换脸', desc:'AI 人脸替换/数字人换脸', route:'/work/face-swap', order:6, visible:true },
   ],
 }
+</script>
+
+<script setup lang="ts">
+definePageMeta({ layout: 'workspace' })
+const router = useRouter()
+const toast = useToast()
+
+const prompt = ref('')
+const activeTab = ref('')
+
+const tabs = ref<{ key: string; label: string }[]>([])
+const cardData = ref<Record<string, Card[]>>({})
 
 onMounted(async () => {
   try {
