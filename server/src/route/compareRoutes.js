@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { authMiddleware } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../middleware/validate.js';
-import { success, error } from '../utils/response.js';
+import { success } from '../utils/response.js';
 import { z } from 'zod';
 
 const router = Router();

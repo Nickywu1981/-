@@ -1,7 +1,7 @@
 import platformPublishDao from '../dao/platformPublishDao.js';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
-import { encrypt, decrypt } from '../utils/crypto.js';
+import { encrypt } from '../utils/crypto.js';
 
 export default {
   async getPlatforms(_req, res) {

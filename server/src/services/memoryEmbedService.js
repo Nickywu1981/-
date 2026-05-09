@@ -128,7 +128,7 @@ export function semanticSearch(query, topK = 5) {
     if (!emb || Object.keys(emb).length === 0) {
       return { source: chunk.source, content: chunk.content, score: 0, idx: i };
     }
-    let score = cosineSimilarity(queryVec, emb);
+    const score = cosineSimilarity(queryVec, emb);
     return { source: chunk.source, content: chunk.content, score, idx: i };
   });
 

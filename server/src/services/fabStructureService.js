@@ -84,8 +84,8 @@ export async function generateFAB({ productName, features, category, style = 'st
   }
 
   // 结构完整性评分
-  const avgAdvantageLen = fab.reduce((s, f) => s + f.advantage.length, 0) / Math.max(fab.length, 1);
-  const avgBenefitLen = fab.reduce((s, f) => s + f.benefit.length, 0) / Math.max(fab.length, 1);
+  const _avgAdvantageLen = fab.reduce((s, f) => s + f.advantage.length, 0) / Math.max(fab.length, 1);
+  const _avgBenefitLen = fab.reduce((s, f) => s + f.benefit.length, 0) / Math.max(fab.length, 1);
   const score = Math.min(
     100,
     // 结构完整: 每条都有 F/A/B
@@ -111,16 +111,16 @@ export async function generateFAB({ productName, features, category, style = 'st
 function deriveAdvantage(feature, category) {
   // 已知模式匹配
   if (/大$/.test(feature)) return `${feature}空间充足不怕装不下`;
-  if (/快$/.test(feature)) return `响应速度远超同类`;
-  if (/轻$/.test(feature)) return `重量减半携带无感`;
-  if (/薄$/.test(feature)) return `超薄设计节省空间`;
-  if (/厚$/.test(feature)) return `用料实在品质扎实`;
+  if (/快$/.test(feature)) return '响应速度远超同类';
+  if (/轻$/.test(feature)) return '重量减半携带无感';
+  if (/薄$/.test(feature)) return '超薄设计节省空间';
+  if (/厚$/.test(feature)) return '用料实在品质扎实';
   if (/防/.test(feature)) return `${feature}能力全面`;
   if (/高/.test(feature)) return `${feature}表现突出`;
-  if (/强/.test(feature)) return `性能强劲远超预期`;
-  if (/全/.test(feature)) return `功能全面一机搞定`;
-  if (/精/.test(feature)) return `精工细作品质保证`;
-  if (/多/.test(feature)) return `多功能一体化设计`;
+  if (/强/.test(feature)) return '性能强劲远超预期';
+  if (/全/.test(feature)) return '功能全面一机搞定';
+  if (/精/.test(feature)) return '精工细作品质保证';
+  if (/多/.test(feature)) return '多功能一体化设计';
   // 品类特化
   if (category === '女装' || category === '服装') return `版型考究${feature}更显优势`;
   if (category === '数码') return `${feature}配置性能出众`;
@@ -147,13 +147,13 @@ function pickBenefit(feature, advantage, style) {
  */
 export function formatFAB(fabData) {
   const lines = fabData.fab.map(f =>
-    `【${f.feature}】${f.advantage}，${f.benefit}`
+    `【${f.feature}】${f.advantage}，${f.benefit}`,
   );
   return {
     structured: lines,
     paragraph: lines.join('；'),
     bulletPoints: fabData.fab.map(f =>
-      `▸ ${f.feature}: ${f.advantage} → ${f.benefit}`
+      `▸ ${f.feature}: ${f.advantage} → ${f.benefit}`,
     ),
   };
 }

@@ -4,7 +4,7 @@ import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
 import { z } from 'zod';
 import auditLogDao from '../dao/auditLogDao.js';
-import { success, listResult, error } from '../utils/response.js';
+import { listResult, error } from '../utils/response.js';
 import { parsePagination } from '../utils/pagination.js';
 
 const router = Router();

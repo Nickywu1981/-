@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest';
 import { getTierLimits } from '../../services/tierService.js';
 
 // for comparison, use getTierLimits('free') as reference
