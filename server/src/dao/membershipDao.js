@@ -47,7 +47,7 @@ const membershipDao = {
     const where = planType ? 'WHERE plan_type = ?' : '';
     const params = planType ? [planType, Number(limit), Number(offset)] : [Number(limit), Number(offset)];
     const [rows] = await pool.query(
-      `SELECT um.*, u.nickname, u.phone FROM user_membership um LEFT JOIN users u ON u.id = um.user_id ${where} ORDER BY um.created_at DESC LIMIT ? OFFSET ?`,
+      `SELECT um.*, u.nickname, u.phone FROM user_membership um LEFT JOIN user u ON u.id = um.user_id ${where} ORDER BY um.created_at DESC LIMIT ? OFFSET ?`,
       params,
     );
     const [cnt] = await pool.execute(`SELECT COUNT(*) as total FROM user_membership ${where}`, planType ? [planType] : []);

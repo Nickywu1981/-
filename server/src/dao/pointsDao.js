@@ -38,7 +38,7 @@ const pointsDao = {
 
   async listAccounts({ limit = 20, offset = 0 } = {}) {
     const [rows] = await pool.query(
-      'SELECT pa.*, u.nickname FROM points_account pa LEFT JOIN users u ON u.id = pa.user_id ORDER BY pa.balance DESC LIMIT ? OFFSET ?',
+      'SELECT pa.*, u.nickname FROM points_account pa LEFT JOIN user u ON u.id = pa.user_id ORDER BY pa.balance DESC LIMIT ? OFFSET ?',
       [Number(limit), Number(offset)],
     );
     const [cnt] = await pool.execute('SELECT COUNT(*) as total FROM points_account');

@@ -150,7 +150,7 @@ async function doEnhance() {
   if (!prompt.value) return
   enhancing.value = true
   try {
-    const res = await $fetch('/api/image/prompt-enhance', {
+    const res = await $fetch('/api/ai/enhance-prompt', {
       method: 'POST',
       body: { prompt: prompt.value, type: 'social' },
       credentials: 'include',
@@ -175,7 +175,7 @@ function doSubmit() {
   let i = 0
   loadingTimer = setInterval(() => { i = (i + 1) % loadingTexts.length; loadingText.value = loadingTexts[i] }, 2500)
 
-  $fetch('/api/poster/generate', {
+  $fetch('/api/posters/generate', {
     method: 'POST',
     body: {
       posterType: activeType.value,
@@ -206,7 +206,7 @@ function loadHistory(item) { result.value = item; activeType.value = item.poster
 
 onMounted(async () => {
   try {
-    const res = await $fetch('/api/poster/history', { query: { page: 1, pageSize: 20 }, credentials: 'include' })
+    const res = await $fetch('/api/posters/works', { query: { page: 1, pageSize: 20 }, credentials: 'include' })
     history.value = (res.list || res.data || []).filter(h => h.posterType === 'xhs' || h.posterType === 'wechat')
   } catch { /* silent */ }
 })

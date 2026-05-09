@@ -61,6 +61,11 @@
   </div>
 </template>
 
+<script setup lang="ts">
+definePageMeta({ layout: 'landing' })
+useHead({ title: '隐私政策 - Movio AI' })
+</script>
+
 <style scoped>
 .page { max-width: 720px; margin: 0 auto; padding: 40px 16px; line-height: 1.8; color: var(--text-primary); }
 h1 { font-size: 28px; margin-bottom: 8px; }

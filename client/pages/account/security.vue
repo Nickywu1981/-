@@ -30,7 +30,7 @@ async function changePwd() {
   if (form.value.newPwd !== form.value.confirmPwd) { msg.value = '两次密码不一致'; msgErr.value = true; return }
   saving.value = true
   try {
-    await $fetch('/api/user/password', { method: 'PUT', credentials: 'include', body: { oldPassword: form.value.currentPwd, newPassword: form.value.newPwd } })
+    await $fetch('/api/user/change-password', { method: 'PUT', credentials: 'include', body: { oldPassword: form.value.currentPwd, newPassword: form.value.newPwd } })
     msg.value = '密码修改成功'; msgErr.value = false
     form.value = { currentPwd: '', newPwd: '', confirmPwd: '' }
   } catch(e: any) { msg.value = e.data?.msg || '修改失败'; msgErr.value = true }

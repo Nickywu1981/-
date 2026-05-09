@@ -121,7 +121,7 @@ const publish = async () => {
     fd.append('platforms', JSON.stringify(selected.value))
     if (form.scheduledAt) fd.append('scheduledAt', form.scheduledAt)
     form.files.forEach(f => fd.append('files', f))
-    await $fetch('/api/distribution/publish', { method: 'POST', body: fd })
+    await $fetch('/api/publish/submit', { method: 'POST', body: fd })
     toast.success('发布成功！')
     fetchHistory()
   } catch (e: any) {
@@ -133,7 +133,7 @@ const publish = async () => {
 
 const saveDraft = async () => {
   try {
-    await $fetch('/api/distribution/drafts', {
+    await $fetch('/api/publish/drafts', {
       method: 'POST',
       body: { title: form.title, description: form.description, platforms: selected.value },
     })
@@ -142,7 +142,7 @@ const saveDraft = async () => {
 }
 
 const retry = async (id: number) => {
-  try { await $fetch(`/api/distribution/retry/${id}`, { method: 'POST' }); fetchHistory() } catch { /* */ }
+  try { await $fetch(`/api/publish/retry/${id}`, { method: 'POST' }); fetchHistory() } catch { /* */ }
 }
 
 const fetchHistory = async () => {

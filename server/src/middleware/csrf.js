@@ -51,7 +51,7 @@ export function csrfProtection(req, res, next) {
   const publicPaths = ['/api/users/login', '/api/users/register', '/api/users/forgot-password',
     '/api/auth/login', '/api/auth/register', '/api/auth/forgot-password', '/api/auth/login-by-code', '/api/auth/reset-password',
     '/api/sms/', '/api/email/', '/api/site-config/public', '/api/health', '/api/metrics',
-    '/api/ai-dispatch', '/api/recharge/', '/api/payment/notify'];
+    '/api/ai-dispatch/health', '/api/ai-dispatch/categories', '/api/recharge/callback', '/api/payment/notify'];
   if (publicPaths.some(p => req.path.startsWith(p)) || req.path.startsWith('/api/internal/')) {
     return next();
   }
