@@ -114,7 +114,7 @@
 </template>
 
 <script setup lang="ts">
-
+import ImageSlot from '~/components/ImageSlot.vue'
 
 const mode = ref<'side' | 'slider' | 'grid'>('side')
 const modes = [
@@ -250,29 +250,6 @@ function downloadBoth() {
   })
 }
 </script>
-
-<!-- ===== ImageSlot 行内组件 ===== -->
-<script lang="ts">
-import { defineComponent, h, computed, ref } from 'vue'
-export const ImageSlot = defineComponent({
-  props: { src: String, alt: String, title: String, emptyText: { type: String, default: '暂无图片' }, size: { type: String, default: 'md' } },
-  emits: ['click'],
-  setup(props, { emit }) {
-    const loaded = ref(false)
-    const sizeClass = computed(() => props.size === 'sm' ? 'slot-sm' : '')
-    return () => h('div', {
-      class: `image-slot ${sizeClass.value}`,
-      onClick: () => emit('click'),
-    }, [
-      props.src
-        ? h('img', { src: props.src, alt: props.alt, class: 'slot-img', onLoad: () => { loaded.value = true }, style: { opacity: loaded.value ? 1 : 0.5, transition: 'opacity 0.3s' } })
-        : h('div', { class: 'slot-empty' }, [h('span', props.emptyText)]),
-      props.title ? h('div', { class: 'slot-title' }, props.title) : null,
-    ])
-  },
-})
-</script>
-
 <style scoped>
 .compare-tool { max-width: 1200px; margin: 0 auto; padding: 24px; }
 .compare-header { text-align: center; margin-bottom: 24px; }
@@ -284,19 +261,6 @@ export const ImageSlot = defineComponent({
 .mode-btn { padding: 8px 20px; border: 1px solid var(--border-light); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-secondary); cursor: pointer; font-size: 14px; transition: all 0.15s; }
 .mode-btn:hover { border-color: var(--brand); color: var(--brand); }
 .mode-btn.active { background: var(--brand); color: #fff; border-color: var(--brand); }
-
-/* ImageSlot component styles */
-:deep(.image-slot) {
-  width: 100%; aspect-ratio: 1; border-radius: var(--radius-lg); overflow: hidden;
-  background: var(--bg-hover); border: 2px dashed var(--border-light);
-  display: flex; align-items: center; justify-content: center; cursor: pointer;
-  position: relative; transition: border-color 0.15s;
-}
-:deep(.image-slot:hover) { border-color: var(--brand); }
-:deep(.image-slot.slot-sm) { aspect-ratio: 4/3; }
-:deep(.slot-img) { width: 100%; height: 100%; object-fit: contain; }
-:deep(.slot-empty) { color: var(--text-muted); font-size: 14px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-:deep(.slot-title) { position: absolute; bottom: 0; left: 0; right: 0; padding: 6px 10px; background: rgba(0,0,0,0.6); color: #fff; font-size: 12px; text-align: center; }
 
 /* Side-by-side */
 .compare-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
