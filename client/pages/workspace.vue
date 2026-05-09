@@ -1,1166 +1,353 @@
+<!--
+  Movio AI v5.0 — 工作台首页
+  三大固定类目总览：创作(全额) | AI助手(预留) | 工作流(预留)
+-->
 <template>
-  <div class="ws-app">
-    <!-- HEADER -->
-    <header class="ws-header">
-      <div class="ws-header-inner">
-        <!-- Logo -->
-        <div class="ws-hdr-logo" @click="navigateTo('/')">
-          <span class="ws-hdr-dot"></span>
-          <span class="ws-hdr-brand">Movio AI</span>
-        </div>
-
-        <!-- Center tabs -->
-        <nav class="ws-hdr-tabs">
-          <button
-            v-for="tab in displayTabs"
-            :key="tab.id"
-            class="ws-hdr-tab"
-            :class="{ sel: activeTab === tab.id }"
-            @click="activeTab = tab.id"
-          >{{ tab.label }}</button>
-        </nav>
-
-        <!-- Spacer -->
-        <div class="ws-hdr-spacer"></div>
-
-        <!-- Right actions -->
-        <div class="ws-hdr-actions">
-          <button class="ws-hdr-icon" @click="searchOpen = !searchOpen" title="搜索">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          </button>
-          <button class="ws-hdr-icon" @click="toggleTheme" :title="theme === 'dark' ? '亮色' : '暗色'">
-            <svg v-if="theme === 'dark'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-            <svg v-else width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-          </button>
-          <button class="ws-hdr-icon" @click="navigateTo('/notifications')" title="通知" style="position:relative">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-            <span v-if="unreadCount" class="ws-notif-dot">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
-          </button>
-
-          <!-- User -->
-          <template v-if="user">
-            <div class="ws-hdr-user" @click="menuOpen = !menuOpen">
-              <span class="ws-hdr-av">{{ user.nickname?.[0] || 'U' }}</span>
-              <span class="ws-hdr-name">{{ user.nickname }}</span>
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-            </div>
-            <div v-if="menuOpen" class="ws-hdr-menu" @click.stop>
-              <button @click="navigateTo('/account/settings'); menuOpen = false">个人设置</button>
-              <button @click="navigateTo('/account/membership'); menuOpen = false">我的会员</button>
-              <button @click="navigateTo('/account/billing'); menuOpen = false">消费账单</button>
-              <button v-if="user?.role === 'admin'" @click="navigateTo('/admin/dashboard'); menuOpen = false" class="ws-admin-link">管理后台</button>
-              <hr />
-              <button @click="doLogout">退出登录</button>
-            </div>
-          </template>
-          <template v-else>
-            <button class="ws-hdr-login" @click="navigateTo('/login')">登录</button>
-            <button class="ws-hdr-signup" @click="navigateTo('/register')">免费注册</button>
-          </template>
-
-          <button class="ws-hdr-burger" @click="mobileMenuOpen = !mobileMenuOpen">
-            <svg v-if="!mobileMenuOpen" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-            <svg v-else width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          </button>
-        </div>
-      </div>
-
-      <!-- Search -->
-      <div v-if="searchOpen" class="ws-search">
-        <input v-model="searchQuery" ref="searchInput" type="text" placeholder="搜索功能..." class="ws-search-inp" @keydown.esc="searchOpen = false; searchQuery = ''" @keydown.enter="doSearch" />
-        <div v-if="searchQuery && searchResults.length" class="ws-search-list">
-          <button v-for="r in searchResults" :key="r.path" class="ws-search-it" @click="closeSearch(); navigateTo(r.path)">
-            <span>{{ r.icon }}</span><span>{{ r.name }}</span><span class="ws-search-tag">{{ r.tag }}</span>
-          </button>
-        </div>
-      </div>
-    </header>
-
-    <!-- BODY -->
-    <div class="ws-body">
-      <!-- SIDEBAR -->
-      <aside v-if="sidebarVisible" class="ws-side" :class="{ open: sidebarOpen }">
-        <div class="ws-side-logo" @click="navigateTo('/')">
-          <span class="ws-side-dot"></span>
-          <span class="ws-side-brand">Movio AI</span>
-        </div>
-
-        <nav class="ws-side-nav">
-          <button v-for="item in displayNavItems" :key="item.id" class="ws-side-btn" :class="{ sel: activeNav === item.id }" @click="activeNav = item.id">
-            <span class="ws-side-dot-sm"></span>
-            <span>{{ item.label }}</span>
-          </button>
-        </nav>
-
-        <!-- Stats -->
-        <div class="ws-side-stats">
-          <div class="ws-side-stat">
-            <b>{{ userStats.todayTasks }}</b>
-            <span>今日任务</span>
-          </div>
-          <div class="ws-side-stat">
-            <b>{{ userStats.credits }}</b>
-            <span>剩余积分</span>
-          </div>
-          <div class="ws-side-stat">
-            <b>{{ userStats.totalWorks }}</b>
-            <span>累计作品</span>
-          </div>
-        </div>
-
-        <!-- Recent tasks -->
-        <div class="ws-side-tasks">
-          <span class="ws-side-sec">最近任务</span>
-          <div class="ws-side-task-list">
-            <div v-for="t in recentTasks" :key="t.id" class="ws-side-task" @click="navigateTo(t.route)">
-              <span class="ws-side-task-dot" :class="t.status"></span>
-              <div class="ws-side-task-info">
-                <span class="ws-side-task-name">{{ t.title }}</span>
-                <span class="ws-side-task-time">{{ t.time }}</span>
-              </div>
-              <span class="ws-side-task-st" :class="t.status">{{ t.statusText }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Upgrade -->
-        <div v-if="user && user.role !== 'admin'" class="ws-side-upgrade" @click="navigateTo('/account/membership')">
-          <span class="ws-side-up-icon">⚡</span>
-          <strong>升级专业版</strong>
-          <span>无限生成</span>
-        </div>
-
-        <!-- Bottom -->
-        <div class="ws-side-bottom">
-          <button class="ws-side-btn" @click="navigateTo('/my/works')"><span class="ws-side-dot-sm"></span>素材库</button>
-          <button class="ws-side-btn" @click="navigateTo('/account/settings')"><span class="ws-side-dot-sm"></span>设置</button>
-        </div>
-      </aside>
-
-      <div v-if="sidebarVisible && sidebarOpen" class="ws-side-overlay" @click="sidebarOpen = false" />
-
-      <!-- MAIN -->
-      <main class="ws-main">
-        <div class="ws-main-ct">
-          <!-- Title -->
-          <div class="ws-ttl-row">
-            <button class="ws-side-tog" @click="sidebarOpen = !sidebarOpen">
-              <span class="ws-side-tog-bar" :class="{ a: sidebarOpen }" />
-              <span class="ws-side-tog-bar" :class="{ a: sidebarOpen }" />
-              <span class="ws-side-tog-bar" :class="{ a: sidebarOpen }" />
-            </button>
-            <h1 class="ws-ttl">AI 创作工作台</h1>
-          </div>
-
-          <!-- INPUT CARD -->
-          <div class="ws-inp-card">
-            <div class="ws-inp-row">
-              <button class="ws-inp-upload" @click="triggerUpload">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                <span>参考图</span>
-              </button>
-              <textarea v-model="taskPrompt" :placeholder="currentPlaceholder" rows="3" class="ws-inp-ta" @keydown.enter.ctrl="submitPrompt"></textarea>
-              <button class="ws-inp-send" :disabled="!taskPrompt.trim()" @click="submitPrompt">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
-              </button>
-            </div>
-
-            <!-- Intent -->
-            <div v-if="intentHint" class="ws-inp-hint">
-              <span>🤖</span>
-              <span>检测意图：<strong>{{ intentHint.tool }}</strong></span>
-              <span v-if="intentHint.confidence >= 30" class="ws-inp-hint-tag">{{ intentHint.confidence }}% 匹配</span>
-              <span v-if="intentHint.platform" class="ws-inp-hint-plat">{{ intentHint.platform }}</span>
-            </div>
-
-            <!-- Params -->
-            <div class="ws-inp-params">
-              <div class="ws-inp-pg">
-                <span class="ws-inp-pl">尺寸</span>
-                <button v-for="r in ['1:1','3:4','4:3','9:16','16:9']" :key="r" class="ws-inp-chip" :class="{ a: selectedRatio === r }" @click="selectedRatio = r">{{ r }}</button>
-              </div>
-              <span class="ws-inp-div"></span>
-              <div class="ws-inp-pg">
-                <span class="ws-inp-pl">风格</span>
-                <button v-for="s in ['原图','简约','科技','自然','复古']" :key="s" class="ws-inp-chip" :class="{ a: selectedStyle === s }" @click="selectedStyle = s">{{ s }}</button>
-              </div>
-              <span class="ws-inp-div"></span>
-              <div class="ws-inp-pg">
-                <span class="ws-inp-pl">数量</span>
-                <button v-for="n in [1,2,3,4]" :key="n" class="ws-inp-chip" :class="{ a: selectedCount === n }" @click="selectedCount = n">{{ n }}张</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Quick tags -->
-          <div class="ws-tags">
-            <span class="ws-tags-lbl">试试：</span>
-            <button v-for="tag in currentQuickTags" :key="tag" class="ws-tag" @click="taskPrompt = tag">{{ tag }}</button>
-          </div>
-
-          <!-- Quick function cards -->
-          <div class="ws-qf-row">
-            <div class="ws-qf-card" @click="navigateTo('/work/script-gen')">
-              <div class="ws-qf-l">
-                <span class="ws-qf-icon">✨</span>
-                <div><strong>提示词润色</strong><p>AI 帮你优化提示词，让生成效果更精准</p></div>
-              </div>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </div>
-            <div class="ws-qf-card" @click="navigateTo('/work/viral-clone')">
-              <div class="ws-qf-l">
-                <span class="ws-qf-icon">🔥</span>
-                <div><strong>爆款复刻</strong><p>分析爆款视频结构，一键复刻热门模板</p></div>
-              </div>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </div>
-          </div>
-
-          <!-- Tool cards -->
-          <div class="ws-sec">
-            <div class="ws-sec-hd">
-              <h2 class="ws-sec-ttl">{{ activeTabLabel }}工具</h2>
-              <NuxtLink to="/compare" class="ws-sec-more">查看全部 →</NuxtLink>
-            </div>
-            <div class="ws-grid">
-              <div v-for="card in displayCurrentCards" :key="card.id" class="ws-card" @click="navigateTo(card.route)">
-                <span v-if="card.hot" class="ws-card-badge">热门</span>
-                <div class="ws-card-ico" :style="{ background: card.bgColor }">{{ card.icon }}</div>
-                <h3 class="ws-card-t">{{ card.title }}</h3>
-                <p class="ws-card-d">{{ card.desc }}</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Recent -->
-          <div class="ws-sec">
-            <div class="ws-sec-hd">
-              <h2 class="ws-sec-ttl">最近产出</h2>
-              <NuxtLink to="/my/works" class="ws-sec-more">素材库 →</NuxtLink>
-            </div>
-            <div class="ws-grid">
-              <div v-for="item in recentResults" :key="item.id" class="ws-rec" @click="navigateTo('/my/works')">
-                <div class="ws-rec-pv" :style="{ background: item.bgColor }">{{ item.icon }}</div>
-                <div class="ws-rec-info">
-                  <span class="ws-rec-t">{{ item.title }}</span>
-                  <span class="ws-rec-m">{{ item.type }} · {{ item.time }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
+  <div class="ws-home">
+    <!-- 页面标题 -->
+    <div class="ws-hero">
+      <h1 class="ws-hero-title">Movio AI 工作台</h1>
+      <p class="ws-hero-sub">电商全店内容创作中心 — 图片 · 视频 · 数字人 · 配音 · 文案 · 营销素材</p>
     </div>
+
+    <!-- ==================== 一、创作类 ==================== -->
+    <section class="ws-category ws-category-primary">
+      <div class="ws-cat-header">
+        <h2 class="ws-cat-title">📷 创作类</h2>
+        <span class="ws-cat-badge active">全力开发中</span>
+      </div>
+      <p class="ws-cat-desc">电商全店图片、视频、数字人、配音、文案、营销素材一站式内容创作。所有模块内置提示词润色。</p>
+
+      <!-- 1. 图片工具 -->
+      <div class="ws-sub-group">
+        <h3 class="ws-sub-title">🖼 图片工具 <span class="ws-tag">含提示词润色</span></h3>
+        <div class="ws-card-grid">
+          <div v-for="card in imageCards" :key="card.path" class="ws-card" @click="navigateTo(card.path)">
+            <span class="ws-card-icon">{{ card.icon }}</span>
+            <div class="ws-card-body">
+              <h4 class="ws-card-name">{{ card.name }}</h4>
+              <p class="ws-card-use">场景: {{ card.scene }}</p>
+              <p class="ws-card-solve">解决: {{ card.solve }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. 视频工具 -->
+      <div class="ws-sub-group">
+        <h3 class="ws-sub-title">🎬 视频工具 <span class="ws-tag">含提示词润色</span></h3>
+        <div class="ws-card-grid">
+          <div v-for="card in videoCards" :key="card.path" class="ws-card" @click="navigateTo(card.path)">
+            <span class="ws-card-icon">{{ card.icon }}</span>
+            <div class="ws-card-body">
+              <h4 class="ws-card-name">{{ card.name }}</h4>
+              <p class="ws-card-use">场景: {{ card.scene }}</p>
+              <p class="ws-card-solve">解决: {{ card.solve }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. AI换脸/数字人 -->
+      <div class="ws-sub-group">
+        <h3 class="ws-sub-title">🧑 AI 换脸 / 数字人</h3>
+        <div class="ws-card-grid">
+          <div v-for="card in faceCards" :key="card.path" class="ws-card" @click="navigateTo(card.path)">
+            <span class="ws-card-icon">{{ card.icon }}</span>
+            <div class="ws-card-body">
+              <h4 class="ws-card-name">{{ card.name }}</h4>
+              <p class="ws-card-use">场景: {{ card.scene }}</p>
+              <p class="ws-card-solve">解决: {{ card.solve }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. 声音工具 -->
+      <div class="ws-sub-group">
+        <h3 class="ws-sub-title">🔊 声音工具</h3>
+        <div class="ws-card-grid">
+          <div v-for="card in voiceCards" :key="card.path" class="ws-card" @click="navigateTo(card.path)">
+            <span class="ws-card-icon">{{ card.icon }}</span>
+            <div class="ws-card-body">
+              <h4 class="ws-card-name">{{ card.name }}</h4>
+              <p class="ws-card-use">场景: {{ card.scene }}</p>
+              <p class="ws-card-solve">解决: {{ card.solve }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. 文案工具 -->
+      <div class="ws-sub-group">
+        <h3 class="ws-sub-title">📝 文案工具 <span class="ws-tag">含提示词润色</span></h3>
+        <div class="ws-card-grid">
+          <div v-for="card in copyCards" :key="card.path" class="ws-card" @click="navigateTo(card.path)">
+            <span class="ws-card-icon">{{ card.icon }}</span>
+            <div class="ws-card-body">
+              <h4 class="ws-card-name">{{ card.name }}</h4>
+              <p class="ws-card-use">场景: {{ card.scene }}</p>
+              <p class="ws-card-solve">解决: {{ card.solve }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. 平台适配 -->
+      <div class="ws-sub-group">
+        <h3 class="ws-sub-title">📐 平台适配</h3>
+        <div class="ws-card-grid">
+          <div v-for="card in platformCards" :key="card.path" class="ws-card" @click="navigateTo(card.path)">
+            <span class="ws-card-icon">{{ card.icon }}</span>
+            <div class="ws-card-body">
+              <h4 class="ws-card-name">{{ card.name }}</h4>
+              <p class="ws-card-use">场景: {{ card.scene }}</p>
+              <p class="ws-card-solve">解决: {{ card.solve }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. 社媒/营销内容工具 -->
+      <div class="ws-sub-group">
+        <h3 class="ws-sub-title">📱 社媒 / 营销内容工具</h3>
+        <div class="ws-card-grid">
+          <div v-for="card in socialCards" :key="card.path" class="ws-card" @click="navigateTo(card.path)">
+            <span class="ws-card-icon">{{ card.icon }}</span>
+            <div class="ws-card-body">
+              <h4 class="ws-card-name">{{ card.name }}</h4>
+              <p class="ws-card-use">场景: {{ card.scene }}</p>
+              <p class="ws-card-solve">解决: {{ card.solve }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8. 效率工具 -->
+      <div class="ws-sub-group">
+        <h3 class="ws-sub-title">⚡ 效率工具</h3>
+        <div class="ws-card-grid">
+          <div v-for="card in efficiencyCards" :key="card.path" class="ws-card" @click="navigateTo(card.path)">
+            <span class="ws-card-icon">{{ card.icon }}</span>
+            <div class="ws-card-body">
+              <h4 class="ws-card-name">{{ card.name }}</h4>
+              <p class="ws-card-use">场景: {{ card.scene }}</p>
+              <p class="ws-card-solve">解决: {{ card.solve }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 9. 生态/分发 -->
+      <div class="ws-sub-group">
+        <h3 class="ws-sub-title">🌍 生态 / 分发</h3>
+        <div class="ws-card-grid">
+          <div v-for="card in ecoCards" :key="card.path" class="ws-card" @click="navigateTo(card.path)">
+            <span class="ws-card-icon">{{ card.icon }}</span>
+            <div class="ws-card-body">
+              <h4 class="ws-card-name">{{ card.name }}</h4>
+              <p class="ws-card-use">场景: {{ card.scene }}</p>
+              <p class="ws-card-solve">解决: {{ card.solve }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 二、AI 助手类（预留） ==================== -->
+    <section class="ws-category ws-category-placeholder">
+      <div class="ws-cat-header">
+        <h2 class="ws-cat-title">🤖 AI 助手类</h2>
+        <span class="ws-cat-badge coming">即将上线</span>
+      </div>
+      <p class="ws-cat-desc">电商各类角色智能体，后期替代人工做售前售后、店铺巡检、商品优化、选品、竞品分析、自动管评价、合规避雷、数据复盘、直播值守，全岗位 AI 化。</p>
+      <div class="ws-placeholder-grid">
+        <div v-for="agent in aiAgents" :key="agent.name" class="ws-ph-card">
+          <span class="ws-ph-icon">{{ agent.icon }}</span>
+          <span class="ws-ph-name">{{ agent.name }}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 三、工作流类（预留） ==================== -->
+    <section class="ws-category ws-category-placeholder">
+      <div class="ws-cat-header">
+        <h2 class="ws-cat-title">⚙ 工作流类</h2>
+        <span class="ws-cat-badge coming">即将上线</span>
+      </div>
+      <p class="ws-cat-desc">把零散功能串成标准化自动化流程。后期一键完成上新、做内容、发视频、管评价、做复盘，全程自动化。</p>
+      <div class="ws-placeholder-grid">
+        <div v-for="wf in workflows" :key="wf.name" class="ws-ph-card">
+          <span class="ws-ph-icon">{{ wf.icon }}</span>
+          <span class="ws-ph-name">{{ wf.name }}</span>
+        </div>
+      </div>
+    </section>
   </div>
 </template>
 
 <script setup lang="ts">
-definePageMeta({ layout: 'landing' });
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+const router = useRouter()
+function navigateTo(path: string) { router.push(path) }
 
-const toast = useToast()
-const activeNav = ref('all');
-const activeTab = ref('image');
-const taskPrompt = ref('');
-const selectedRatio = ref('1:1');
-const selectedStyle = ref('原图');
-const selectedCount = ref(1);
-const showRatioMenu = ref(false);
-const showStyleMenu = ref(false);
-const sidebarOpen = ref(false);
-const sidebarVisible = ref(true);
-const menuOpen = ref(false);
-const mobileMenuOpen = ref(false);
-const searchOpen = ref(false);
-const searchQuery = ref('');
-const searchInput = ref<HTMLInputElement | null>(null);
-const user = ref<any>(null);
-const unreadCount = ref(0);
-const userStats = reactive({ todayTasks: 0, credits: 0, totalWorks: 0 });
+// ============================================================
+// 一、创作类 — 全部功能卡片（场景+解决问题）
+// ============================================================
 
-const { theme, toggle: toggleTheme } = useTheme();
+const imageCards = [
+  { path:'/work/image',         icon:'🏠', name:'图片工具首页',  scene:'统一入口，浏览所有图片工具', solve:'不用记住每个工具位置，一个入口搞定所有图片需求' },
+  { path:'/work/main-image',    icon:'🖼', name:'主图生成',      scene:'淘宝/京东/拼多多/跨境等平台商品主图制作', solve:'不会PS也能做出各平台合规的高点击率商品主图，省去专业美工' },
+  { path:'/work/scene',         icon:'🏞', name:'场景图生成',    scene:'商品摆在客厅/海滩/办公桌等场景里展示', solve:'不用租场地拍场景图，AI 自动把商品融入生活场景' },
+  { path:'/work/poster',        icon:'📰', name:'海报生成',      scene:'促销海报/活动海报/新品首发海报', solve:'不会设计也能一键生成电商营销海报，0 设计基础出片' },
+  { path:'/work/detail',        icon:'📋', name:'海报详情编辑',  scene:'编辑海报文字/调整排版/替换素材', solve:'修改海报不用从头再来，直接编辑已有模板快速迭代' },
+  { path:'/work/remove-bg',     icon:'✂', name:'智能去背景',    scene:'商品拍照后去掉杂乱背景', solve:'手机随便拍，AI 3秒去掉背景，省去抠图时间和PS费用' },
+  { path:'/work/white-bg',      icon:'⬜', name:'白底图生成',    scene:'平台要求纯白底商品图', solve:'一键生成符合淘宝/Amazon等平台规范的白底图，通过审核' },
+  { path:'/work/color-swap',    icon:'🎯', name:'商品换色',      scene:'同一款衣服展示红/蓝/黑多种颜色', solve:'不用每色都拍照，AI 换色省去重复拍摄和多 SKU 拍摄成本' },
+  { path:'/work/color-change',  icon:'🎨', name:'颜色替换',      scene:'指定区域替换颜色（如把红扣子改成黑扣子）', solve:'局部颜色调整不用重新拍照，指定区域精准替换' },
+  { path:'/work/style-transfer',icon:'🖌', name:'风格迁移',      scene:'把实拍图变成油画/水彩/卡通/3D渲染风格', solve:'一键变风格，满足不同平台审美和营销活动差异化' },
+  { path:'/work/text-effect',   icon:'🔤', name:'文字特效',      scene:'海报标题/促销文字加立体/金属/霓虹等特效', solve:'不会做特效字也能出高级感标题，套模板一键生成' },
+  { path:'/work/outpaint',      icon:'↔', name:'智能外扩',      scene:'照片拍太小/构图不好，需要往外扩展画面', solve:'照片构图失败不用重拍，AI 智能扩展画面边缘补全场景' },
+  { path:'/work/outpainting',   icon:'↕', name:'外扩入口',      scene:'需要更多外扩选项和精细控制', solve:'控制外扩方向和程度，满足精细化构图需求' },
+  { path:'/work/retouch',       icon:'✨', name:'AI 精修',       scene:'商品图质感不够，需要调色/锐化/优化光影', solve:'一键提升商品图质感，不用学 Lightroom 和后期处理' },
+  { path:'/work/wrinkle-remove',icon:'🧹', name:'去皱美颜',     scene:'服装类商品有褶皱，看起来不值钱', solve:'AI 自动去褶皱，平整衣服纹理，提升商品溢价感' },
+  { path:'/work/ghost-mannequin',icon:'👤', name:'幽灵模特',    scene:'没人台没模特，需要展示上身效果', solve:'不用请模特、不用买人台，AI 自动生成隐形模特展示上身效果' },
+  { path:'/work/translate-image',icon:'🌐', name:'图片翻译',    scene:'跨境商品图上的中文需要翻译成当地语言', solve:'一键翻译图片上的文字，省去多语种重新设计的成本' },
+]
 
-const navItems = [
-  { id: 'all', icon: '🏠', label: '全部工具' },
-  { id: 'image', icon: '🖼', label: '图片工具' },
-  { id: 'video', icon: '🎬', label: '视频工具' },
-  { id: 'batch', icon: '📦', label: '批量处理' },
-];
+const videoCards = [
+  { path:'/work/video',           icon:'🎥', name:'视频生成',     scene:'用几张商品图自动生成带货短视频', solve:'不会剪辑也能生成带货视频，降低短视频门槛至0' },
+  { path:'/work/video-edit',      icon:'✂', name:'视频编辑',     scene:'已有视频需要剪辑/加字幕/加音乐/调色', solve:'在线剪辑不用装PR/剪映，AI 辅助自动剪辑' },
+  { path:'/work/video-translate', icon:'🌐', name:'视频翻译',     scene:'跨境视频需要翻译语音/字幕/面容', solve:'一个视频多语种输出，语音字幕面容三合一翻译，跨境不再重拍' },
+]
 
-const tabs = [
-  { id: 'image', icon: '🖼', label: '图片生成' },
-  { id: 'video', icon: '🎬', label: '视频生成' },
-  { id: 'batch', icon: '📦', label: '批量处理' },
-  { id: 'edit', icon: '✂', label: '图片编辑' },
-];
+const faceCards = [
+  { path:'/work/swap-face',       icon:'😊', name:'AI 换脸',      scene:'用指定人脸替换视频/图片中的人脸', solve:'不用真人出镜就能做出"本人推荐"内容，保护隐私同时提升信任' },
+  { path:'/work/person-replace',  icon:'🔄', name:'人物替换',     scene:'把模特换成亚洲/欧美/中东不同人种', solve:'一套素材全球复用，换不同人种模特适配各市场审美' },
+  { path:'/work/virtual-tryon',   icon:'👗', name:'虚拟试穿',     scene:'买家在网上看衣服上身效果', solve:'不用去实体店也能看衣服穿在身上的效果，提高转化率' },
+  { path:'/work/digital-human',   icon:'🤖', name:'数字人带货',   scene:'用数字人口播介绍商品', solve:'不用请主播/KOL，数字人24小时带货，大幅降低直播和口播成本' },
+  { path:'/work/model-generate',  icon:'🧍', name:'AI 模特生成',  scene:'没有模特资源，需要展示穿着效果', solve:'AI 生成各种体型肤色模特，不用签约模特公司' },
+]
 
-const activeTabLabel = computed(() => {
-  const t = displayTabs.value.find((t: any) => t.id === activeTab.value);
-  return t ? t.label : '';
-});
+const voiceCards = [
+  { path:'/work/voice-gen',       icon:'🔊', name:'AI 语音生成',  scene:'给视频/数字人配专业旁白/口播声音', solve:'不用自己录音、不用找配音员，AI 生成自然专业人声' },
+  { path:'/work/voice-clone',     icon:'🎙', name:'声音克隆',     scene:'克隆店主/主播自己的声音', solve:'店铺所有视频统一配音风格，建立品牌声音 IP' },
+]
 
-const currentPlaceholder = computed(() => {
-  const map: Record<string, string> = {
-    image: '例如：帮我生成一件红色连衣裙的淘宝白底主图，简约干净风格，高清光影...',
-    video: '例如：把这张连衣裙主图做成15秒带货短视频，配上节奏感BGM和卖点文案...',
-    batch: '例如：把文件夹里的50张商品图全部抠成白底图，统一800x800尺寸...',
-    edit: '例如：把这张图的背景换成阳光明媚的咖啡厅，保留产品不变...',
-  };
-  return map[activeTab.value] || map.image;
-});
+const copyCards = [
+  { path:'/work/copywriting',     icon:'✍', name:'智能文案',      scene:'写商品标题/卖点/种草文案/跨境翻译', solve:'不会写文案也能一键生成转化率高的电商标题和话术' },
+  { path:'/work/script-gen',      icon:'📝', name:'短视频脚本生成',scene:'抖音/视频号/TikTok 带货视频口播脚本', solve:'不知道怎么拍带货视频，AI 写好口播+镜头提示直接开拍' },
+]
 
-const currentQuickTags = computed(() => {
-  const map: Record<string, string[]> = {
-    image: ['帮我做一张白底主图', '生成连衣裙的淘宝详情页', '把这张图换成蓝色背景'],
-    video: ['把主图做成带货短视频', '生成15秒抖音商品视频', '制作产品展示动画'],
-    batch: ['批量抠50张商品图', '批量生成多色SKU图', '批量添加水印'],
-    edit: ['去掉背景换成白色', '给模特换件红色外套', '把产品图做成3D效果'],
-  };
-  return map[activeTab.value] || map.image;
-});
+const platformCards = [
+  { path:'/work/size-templates',  icon:'📏', name:'平台尺寸模板库',scene:'淘宝/京东/Amazon/Shopee等13平台不同尺寸要求', solve:'不用手动查各平台尺寸规范，一键匹配省时不出错' },
+  { path:'/work/platform-detail', icon:'📋', name:'平台详情页',    scene:'多平台商品详情页内容差异化管理', solve:'同一商品多平台详情页自动适配，不用逐个平台重新做' },
+  { path:'/work/product-render',  icon:'🛒', name:'产品渲染',      scene:'3D 展示商品旋转/细节/使用场景', solve:'无需实物拍摄，3D渲染出高质量商品展示素材' },
+  { path:'/work/detail-h5',       icon:'📱', name:'详情页 H5',    scene:'需要一个分享到微信/朋友圈的商品详情页', solve:'一键生成 H5 分享页，不用开发不用设计直接可用' },
+]
 
-const currentCards = computed(() => {
-  const allCards: Record<string, any[]> = {
-    image: [
-      { id: 'main', icon: '📷', title: '智能做主图', desc: 'AI抠图+白底+精修一键生成电商主图', hot: true, bgColor: '#F5F3FF', route: '/work/main-image' },
-      { id: 'scene', icon: '🖼', title: '智能做场景', desc: '产品融入AI生成的营销场景图', hot: true, bgColor: '#EDE9FE', route: '/work/scene' },
-      { id: 'detail', icon: '📄', title: '智能做详情', desc: 'AI自动排版生成详情页长图', hot: false, bgColor: '#F3E8FF', route: '/work/detail-h5' },
-      { id: 'tryon', icon: '👗', title: '虚拟模特', desc: '服装AI上身效果，真人模特试穿', hot: true, bgColor: '#F5F3FF', route: '/work/virtual-tryon' },
-      { id: 'color', icon: '🎨', title: '一键换色', desc: '商品换色，批量生成多色SKU图', hot: false, bgColor: '#EDE9FE', route: '/work/color-swap' },
-      { id: 'style', icon: '🖌', title: '风格迁移', desc: '图片转3D/水彩/油画等多种风格', hot: false, bgColor: '#F3E8FF', route: '/work/style-transfer' },
-      { id: 'ghost', icon: '👻', title: '幽灵模特', desc: '假模→立体展示，告别拍摄成本', hot: false, bgColor: '#F5F3FF', route: '/work/ghost-mannequin' },
-      { id: 'wrinkle', icon: '👔', title: '去褶皱', desc: '服装面料自动平整处理', hot: false, bgColor: '#EDE9FE', route: '/work/wrinkle-remove' },
-    ],
-    video: [
-      { id: 'vid', icon: '🎬', title: '智能做视频', desc: '图片一键生成带货短视频', hot: true, bgColor: '#F5F3FF', route: '/work/video' },
-      { id: 'action', icon: '🕺', title: '动作迁移', desc: '1个动作视频+N张图=批量视频', hot: true, bgColor: '#EDE9FE', route: '/work/action-transfer' },
-      { id: 'digital', icon: '🎙', title: '口播数字人', desc: 'AI数字人口播讲解商品卖点', hot: true, bgColor: '#F3E8FF', route: '/work/digital-human' },
-      { id: 'script', icon: '📝', title: '带货脚本', desc: 'AI生成直播带货话术脚本', hot: false, bgColor: '#F5F3FF', route: '/work/script-gen' },
-      { id: 'storyboard', icon: '🎞', title: '智能分镜', desc: 'AI自动拆解场景生成分镜计划', hot: false, bgColor: '#EDE9FE', route: '/work/shot-plan' },
-      { id: 'viral', icon: '🔥', title: '爆款复刻', desc: '分析爆款视频结构一键复刻', hot: false, bgColor: '#F3E8FF', route: '/work/viral-clone' },
-      { id: 'edit', icon: '✂', title: '视频编辑', desc: '智能剪辑+字幕+转场+BGM', hot: false, bgColor: '#F5F3FF', route: '/work/video-edit' },
-      { id: 'voice', icon: '🔊', title: '语音生成', desc: 'AI配音，多语种多音色可选', hot: false, bgColor: '#EDE9FE', route: '/work/voice-gen' },
-      { id: 'voice-clone', icon: '🎙', title: '声音克隆', desc: '上传音频样本克隆专属音色', hot: false, bgColor: '#F3E8FF', route: '/work/voice-clone' },
-    ],
-    batch: [
-      { id: 'b-main', icon: '📷', title: '批量做主图', desc: '批量抠图+白底+精修', hot: true, bgColor: '#F5F3FF', route: '/work/batch' },
-      { id: 'b-scene', icon: '🖼', title: '批量做场景', desc: '批量产品场景图生成', hot: false, bgColor: '#EDE9FE', route: '/work/batch' },
-      { id: 'b-video', icon: '🎬', title: '批量做视频', desc: '批量生成带货短视频', hot: false, bgColor: '#F3E8FF', route: '/work/batch' },
-      { id: 'b-color', icon: '🎨', title: '批量换色', desc: '批量生成多色SKU图', hot: false, bgColor: '#F5F3FF', route: '/work/color-swap' },
-    ],
-    edit: [
-      { id: 'e-bg', icon: '🖼', title: '去背景', desc: 'AI精准抠图去背景', hot: true, bgColor: '#F5F3FF', route: '/work/remove-bg' },
-      { id: 'e-white', icon: '⬜', title: '白底图', desc: '生成纯白底商品图', hot: true, bgColor: '#EDE9FE', route: '/work/white-bg' },
-      { id: 'e-retouch', icon: '✨', title: '图片精修', desc: 'AI自动美化、调色、增强', hot: false, bgColor: '#F3E8FF', route: '/work/retouch' },
-      { id: 'e-outpaint', icon: '↔', title: '智能扩图', desc: 'AI扩展图片边缘构图', hot: false, bgColor: '#F5F3FF', route: '/work/outpaint' },
-      { id: 'e-translate', icon: '🌐', title: '图片翻译', desc: '图片文字翻译+排版适配', hot: false, bgColor: '#EDE9FE', route: '/work/image-translate' },
-      { id: 'e-replace', icon: '🧑', title: '人物替换', desc: 'AI替换模特/人物保留服装', hot: false, bgColor: '#F3E8FF', route: '/work/person-replace' },
-      { id: 'e-main', icon: '📷', title: '做主图', desc: '完整主图流程：抠图→修图→水印', hot: false, bgColor: '#F5F3FF', route: '/work/main-image' },
-    ],
-  };
-  return allCards[activeTab.value] || allCards.image;
-});
+const socialCards = [
+  { path:'/work/social',          icon:'📱', name:'社媒封面生成',  scene:'小红书/抖音/Ins/Facebook 封面图统一输出', solve:'各社媒封面尺寸/风格不同，一键适配全部平台' },
+  { path:'/work/action-transfer', icon:'🕺', name:'动作迁移',      scene:'让静态模特做出走路/转身/挥手等动态效果', solve:'不用拍视频也能产出动态素材，丰富社媒内容形式' },
+  { path:'/work/compliance-check',icon:'🛡', name:'合规检测',      scene:'检查文案/图片是否违反广告法或平台规则', solve:'自动扫描禁用词/违规内容，发布前避坑不扣分不罚款' },
+  { path:'/work/viral-clone',     icon:'📋', name:'爆款克隆',      scene:'看到同行爆款素材想快速做一个类似的', solve:'参考爆款结构快速产出类似素材，跟着爆款节奏起量' },
+  { path:'/work/viral-replicate', icon:'🔥', name:'爆款复刻',      scene:'分析爆款视频/图文的数据和结构', solve:'用AI解构爆款规律，指导内容方向少走弯路' },
+  { path:'/work/compare',         icon:'🔍', name:'图片对比',      scene:'对比两个版本素材哪张效果更好', solve:'并排/滑动/叠图三种模式直观对比，选最优方案上线' },
+  { path:'/work/shot-plan',       icon:'📐', name:'分镜计划',      scene:'规划视频分镜/镜头顺序/时长分配', solve:'拍视频前做好分镜规划，避免拍摄时不知道拍什么' },
+  { path:'/work/shot-panorama',   icon:'🔄', name:'全景拍摄',      scene:'360°展示商品各个角度', solve:'不用拍多角度照片，AI 生成全景展示提升买家信任感' },
+  { path:'/work/storyboard',      icon:'🎞', name:'故事板',        scene:'视频创意的可视化故事板预览', solve:'开拍前预览成片效果，减少返工和无效拍摄' },
+]
 
-const recentTasks = [
-  { id: 'rt1', icon: '📷', title: '夏季连衣裙主图', time: '10分钟前', status: 'done', statusText: '已完成', route: '/my/works' },
-  { id: 'rt2', icon: '🎬', title: '连衣裙带货视频', time: '2小时前', status: 'done', statusText: '已完成', route: '/my/works' },
-  { id: 'rt3', icon: '📦', title: '批量生成-20件', time: '昨天', status: 'done', statusText: '已完成', route: '/my/works' },
-  { id: 'rt4', icon: '🕺', title: '模特动作迁移', time: '昨天', status: 'running', statusText: '处理中', route: '/my/works' },
-];
+const efficiencyCards = [
+  { path:'/work/batch',           icon:'📦', name:'批量处理',      scene:'一次处理50张商品图统一抠图+白底+尺寸', solve:'批量操作代替逐张处理，50张图10分钟搞定效率提升10倍' },
+  { path:'/work/publish',         icon:'📤', name:'一键发布',      scene:'生成好的素材一键发布到多个平台', solve:'不用逐个平台登录上传，一键搞定多平台分发' },
+  { path:'/work/output',          icon:'📁', name:'导出设置',      scene:'设置导出格式/尺寸/水印/命名规则', solve:'统一导出规范，减少手动调整格式的重复劳动' },
+  { path:'/work/usage',           icon:'📊', name:'用量统计',      scene:'查看每天生成了多少素材/用了多少额度', solve:'用量可视化，合理规划每月生成预算' },
+  { path:'/work/brand-settings',  icon:'🏷', name:'品牌设置',      scene:'统一设置品牌Logo/颜色/字体', solve:'所有素材自动应用品牌规范，保持视觉一致性' },
+  { path:'/work/prompt-hub',      icon:'💡', name:'提示词市场',    scene:'查找/分享优质作图的提示词模板', solve:'不会写提示词直接用别人的优质模板，社区共享降低创作门槛' },
+]
 
-const recentResults = [
-  { id: 'rr1', icon: '🖼', title: '连衣裙-白底主图', type: '做主图', time: '刚刚', bgColor: '#F5F3FF' },
-  { id: 'rr2', icon: '🎬', title: '夏季新品带货', type: '做视频', time: '1小时前', bgColor: '#EDE9FE' },
-  { id: 'rr3', icon: '📄', title: 'T恤详情页', type: '做详情', time: '3小时前', bgColor: '#F3E8FF' },
-  { id: 'rr4', icon: '🖼', title: '咖啡馆场景', type: '做场景', time: '昨天', bgColor: '#F5F3FF' },
-];
+const ecoCards = [
+  { path:'/work/diy-pages',       icon:'🛠', name:'DIY 页面',      scene:'拖拽式搭建店铺自定义营销页面', solve:'不用开发不用设计，拖拽组件自由搭建店铺页面' },
+  { path:'/work/distribution',    icon:'📡', name:'分销推广',      scene:'设置分销佣金/招募分销员/裂变推广', solve:'搭建分销体系，让更多人帮你卖货不用付固定工资' },
+  { path:'/work/cut-ecosystem',   icon:'✂', name:'剪映生态',      scene:'与剪映工具打通/素材导入导出', solve:'在剪映生态里直接使用 Movio 生成的素材' },
+  { path:'/work/marketplace',     icon:'🏪', name:'场景模板市场',  scene:'浏览/购买/下载行业现成创作模板', solve:'不用从零创作，套用行业模板快速出片' },
+]
 
-const intentHint = computed(() => {
-  if (!taskPrompt.value || taskPrompt.value.trim().length < 2) return null
-  const intent = parseIntent(taskPrompt.value)
-  if (!intent.matched) return null
-  return { tool: intent.tool, confidence: intent.confidence, platform: intent.detectedPlatform }
-})
+// ============================================================
+// 二、AI 助手类 — 只预留名称，不开发
+// ============================================================
+const aiAgents = [
+  { icon:'💬', name:'店铺客服智能体' },
+  { icon:'🏪', name:'店铺运营智能体' },
+  { icon:'📢', name:'营销推广智能体' },
+  { icon:'🛒', name:'商品优化智能体' },
+  { icon:'🔥', name:'选品爆款智能体' },
+  { icon:'🔎', name:'竞品分析智能体' },
+  { icon:'⭐', name:'评价管理智能体' },
+  { icon:'🛡', name:'违规风控智能体' },
+  { icon:'🎓', name:'行业专家智能体' },
+  { icon:'📊', name:'数据分析智能体' },
+  { icon:'📺', name:'直播专属智能体' },
+]
 
-function submitPrompt() {
-  if (!taskPrompt.value.trim()) return
-  const intent = parseIntent(taskPrompt.value)
-  if (intent.matched && intent.confidence >= 15) {
-    const enhanced = enhancePrompt(taskPrompt.value, {
-      platform: intent.detectedPlatform || undefined,
-      category: intent.tool.includes('视频') ? undefined : 'ecommerce',
-    })
-    sessionStorage.setItem('movio_prompt', enhanced.enhanced)
-    sessionStorage.setItem('movio_intent_tool', intent.tool)
-    navigateTo(intent.route)
-  } else if (intent.suggestions.length > 0) {
-    navigateTo(intent.suggestions[0].route)
-  } else {
-    navigateTo('/work/main-image')
-  }
-}
-
-function triggerUpload() {
-  taskPrompt.value = taskPrompt.value || '请参考上传的图片，';
-}
-
-async function loadUserData() {
-  try {
-    const res: any = await $fetch('/api/user/profile');
-    if (res.code === 200) {
-      user.value = res.data;
-      userStats.credits = res.data.points_balance || 0;
-    }
-    // 加载统计数据
-    try {
-      const statsRes: any = await $fetch('/api/user/stats');
-      if (statsRes.code === 200) {
-        userStats.todayTasks = statsRes.data.todayTasks || 0;
-        userStats.totalWorks = statsRes.data.totalTasks || 0;
-      }
-    } catch { /* defaults */ }
-    // 加载最近任务
-    loadRecentTasks();
-    loadRecentWorks();
-    loadUnread();
-  } catch { user.value = null; toast.error('加载用户数据失败') }
-}
-
-async function loadRecentTasks() {
-  try {
-    const res: any = await $fetch('/api/job/0', { params: {} }).catch(() => null);
-    // 使用 /api/assets/list 获取最近的已完成任务作为"最近任务"
-    const assetsRes: any = await $fetch('/api/assets/list', { params: { page: 1, pageSize: 4 } }).catch(() => null);
-    if (assetsRes?.code === 200 && assetsRes.data?.list?.length > 0) {
-      recentTasks.length = 0;
-      assetsRes.data.list.forEach((item: any, i: number) => {
-        const typeMap: Record<string, { icon: string; name: string }> = {
-          image_gen: { icon: '📷', name: 'AI生图' },
-          image_replicate: { icon: '📷', name: '主图复刻' },
-          video_gen: { icon: '🎬', name: 'AI视频' },
-          action_migrate: { icon: '🕺', name: '动作迁移' },
-          digital_human: { icon: '🎙', name: '数字人' },
-        };
-        const info = typeMap[item.task_type] || { icon: '📦', name: item.task_type };
-        const now = new Date();
-        const created = new Date(item.created_at);
-        const diff = Math.floor((now.getTime() - created.getTime()) / 60000);
-        const timeStr = diff < 60 ? `${diff}分钟前` : diff < 1440 ? `${Math.floor(diff/60)}小时前` : '昨天';
-        recentTasks.push({
-          id: `rt${i}`, icon: info.icon, title: info.name,
-          time: timeStr, status: 'done', statusText: '已完成', route: '/assets',
-        });
-      });
-    }
-  } catch { toast.error('加载最近任务失败') }
-}
-
-async function loadRecentWorks() {
-  try {
-    const res: any = await $fetch('/api/assets/list', { params: { page: 1, pageSize: 4 } }).catch(() => null);
-    if (res?.code === 200 && res.data?.list?.length > 0) {
-      recentResults.length = 0;
-      const colors = ['#F5F3FF', '#EDE9FE', '#F3E8FF', '#DBEAFE'];
-      const typeLabels: Record<string, string> = {
-        image_gen: '生图', image_replicate: '复刻', video_gen: '视频',
-        action_migrate: '动作迁移', digital_human: '数字人', viral_replicate: '爆款复刻',
-      };
-      res.data.list.forEach((item: any, i: number) => {
-        recentResults.push({
-          id: `rr${i}`, icon: item.type === 'video' ? '🎬' : '🖼',
-          title: typeLabels[item.task_type] || item.task_type,
-          type: item.type === 'video' ? '做视频' : '做图片',
-          time: '刚刚', bgColor: colors[i % colors.length],
-        });
-      });
-    }
-  } catch { toast.error('加载最近作品失败') }
-}
-
-async function loadUnread() {
-  try {
-    const res: any = await $fetch('/api/notifications/unread-count');
-    unreadCount.value = res.data?.count || 0;
-  } catch { /* noop */ }
-}
-
-async function doLogout() {
-  menuOpen.value = false;
-  mobileMenuOpen.value = false;
-  await $fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }).catch(() => {})
-  user.value = null;
-  navigateTo('/login');
-}
-
-const { data: siteConfig } = await useAsyncData('site-config-workspace', () =>
-  $fetch<any>(`${useRuntimeConfig().public.apiBase}/site-config/public`).catch(() => ({}))
-);
-
-const workspaceTools = computed(() => {
-  const cfg: any = siteConfig.value;
-  if (cfg && Array.isArray(cfg.workspace_tools) && cfg.workspace_tools.length)
-    return cfg.workspace_tools;
-  return null;
-});
-
-const displayNavItems = computed(() => {
-  if (workspaceTools.value) {
-    const items = [{ id: 'all', icon: '🏠', label: '全部工具' }];
-    workspaceTools.value.forEach((g: any) => items.push({ id: g.id, icon: g.icon, label: g.name }));
-    return items;
-  }
-  return navItems;
-});
-
-const displayTabs = computed(() => {
-  if (workspaceTools.value) {
-    return workspaceTools.value.map((g: any) => ({ id: g.id, icon: g.icon, label: g.name }));
-  }
-  return tabs;
-});
-
-const displayCards = computed(() => {
-  if (workspaceTools.value) {
-    const map: Record<string, any[]> = {};
-    const colors = ['#F5F3FF', '#EDE9FE', '#F3E8FF', '#DBEAFE', '#D1FAE5', '#FEF3C7', '#FCE7F3', '#FFF7ED'];
-    workspaceTools.value.forEach((g: any, gi: number) => {
-      map[g.id] = (g.children || []).map((c: any, ci: number) => ({
-        id: `${g.id}-${ci}`,
-        icon: c.icon || '📷',
-        title: c.name,
-        desc: c.desc || '',
-        hot: ci < 3,
-        bgColor: colors[(gi * g.children.length + ci) % colors.length],
-        route: c.route || '/work/main-image'
-      }));
-    });
-    return map;
-  }
-  return null;
-});
-
-const displayCurrentCards = computed(() => {
-  if (displayCards.value) {
-    return displayCards.value[activeTab.value] || displayCards.value[Object.keys(displayCards.value)[0]] || [];
-  }
-  return currentCards.value;
-});
-
-const searchIndex = [
-  { name: '做主图', path: '/work/main-image', icon: '📷', tag: '图片', kw: ['主图'] },
-  { name: '做场景', path: '/work/scene', icon: '🖼', tag: '图片', kw: ['场景'] },
-  { name: '做详情', path: '/work/detail-h5', icon: '📄', tag: '图片', kw: ['详情页'] },
-  { name: '做视频', path: '/work/video', icon: '🎬', tag: '视频', kw: ['短视频'] },
-  { name: '批量处理', path: '/work/batch', icon: '📦', tag: '批量', kw: ['批量'] },
-  { name: '素材库', path: '/my/works', icon: '🗂', tag: '管理', kw: ['作品'] },
-  { name: '虚拟模特', path: '/work/virtual-tryon', icon: '👗', tag: '图片', kw: ['试穿'] },
-  { name: '一键换色', path: '/work/color-swap', icon: '🎨', tag: '图片', kw: ['换色'] },
-  { name: '去背景', path: '/work/remove-bg', icon: '🖼', tag: '图片', kw: ['抠图'] },
-  { name: '白底图', path: '/work/white-bg', icon: '⬜', tag: '图片', kw: ['白底'] },
-  { name: '爆款复刻', path: '/work/viral-clone', icon: '🔥', tag: '视频', kw: ['爆款'] },
-  { name: '数字人', path: '/work/digital-human', icon: '🎙', tag: '视频', kw: ['口播'] },
-];
-
-const searchResults = computed(() => {
-  const q = searchQuery.value.trim().toLowerCase();
-  if (!q) return [];
-  return searchIndex.filter(item =>
-    item.name.toLowerCase().includes(q) || item.tag.toLowerCase().includes(q) || item.kw.some((k: string) => k.toLowerCase().includes(q))
-  ).slice(0, 8);
-});
-
-function doSearch() { if (searchResults.value.length > 0) { closeSearch(); navigateTo(searchResults.value[0].path); } }
-function closeSearch() { searchOpen.value = false; searchQuery.value = ''; }
-
-watch(searchOpen, v => { if (v) nextTick(() => searchInput.value?.focus()); });
-watch(() => useRoute().path, () => { menuOpen.value = false; mobileMenuOpen.value = false; });
-
-onMounted(() => {
-  loadUserData();
-  onResize();
-  window.addEventListener('resize', onResize);
-});
-onUnmounted(() => window.removeEventListener('resize', onResize));
-function onResize() {
-  sidebarVisible.value = window.innerWidth > 480;
-  if (window.innerWidth > 768) sidebarOpen.value = false;
-}
+// ============================================================
+// 三、工作流类 — 只预留名称，不开发
+// ============================================================
+const workflows = [
+  { icon:'🏪', name:'店铺日常运营工作流' },
+  { icon:'🆕', name:'商品上新全流程工作流' },
+  { icon:'🔥', name:'爆款内容批量生产工作流' },
+  { icon:'⭐', name:'评价 & 问大家自动维护' },
+  { icon:'🎉', name:'大促活动营销工作流' },
+  { icon:'📊', name:'每日数据自动复盘工作流' },
+  { icon:'🛡', name:'违规自查风控工作流' },
+  { icon:'📱', name:'私域引流转化工作流' },
+]
 </script>
 
 <style scoped>
-/* ================================================
-   WORKSPACE — Movio AI 电商科技风
-   所有 class 对齐模板 ws-* 命名
-   使用 theme.css 设计令牌
-   ================================================ */
+.ws-home { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
 
-/* ---- Layout ------------------------------------------------------------ */
-.ws-app {
-  display: flex; flex-direction: column;
-  min-height: 100vh;
-  background: var(--ws-bg);
-}
-.ws-body {
-  display: flex; flex: 1;
-}
+.ws-hero { margin-bottom: 40px; }
+.ws-hero-title { font-size: 28px; font-weight: 700; color: var(--cfg-text-primary); margin: 0 0 8px; }
+.ws-hero-sub { font-size: 14px; color: var(--cfg-text-muted); margin: 0; }
 
-/* ---- HEADER ------------------------------------------------------------ */
-.ws-header {
-  position: sticky; top: 0; z-index: 50;
-  background: var(--bg-header);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border-light);
-}
-.ws-header-inner {
-  display: flex; align-items: center;
-  height: var(--ws-header-height);
-  padding: 0 20px; gap: 16px;
-  max-width: 100%;
-}
+/* Category section */
+.ws-category { margin-bottom: 48px; }
+.ws-category-placeholder { opacity: 0.65; }
+.ws-cat-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.ws-cat-title { font-size: 22px; font-weight: 700; color: var(--cfg-text-primary); margin: 0; }
+.ws-cat-badge { font-size: 12px; padding: 2px 10px; border-radius: 10px; font-weight: 600; }
+.ws-cat-badge.active { background: #e8f5e9; color: #2e7d32; }
+.ws-cat-badge.coming { background: #fff3e0; color: #e65100; }
+.ws-cat-desc { font-size: 14px; color: var(--cfg-text-muted); margin: 0 0 16px; line-height: 1.6; }
 
-/* Logo */
-.ws-hdr-logo {
-  display: flex; align-items: center; gap: 8px;
-  cursor: pointer; flex-shrink: 0;
-}
-.ws-hdr-dot {
-  width: 8px; height: 8px; border-radius: 50%;
-  background: var(--brand-gradient);
-}
-.ws-hdr-brand {
-  font-size: 15px; font-weight: 600;
-  color: var(--text-primary);
-  letter-spacing: -0.03em;
-}
+/* Sub group */
+.ws-sub-group { margin-bottom: 28px; }
+.ws-sub-title { font-size: 16px; font-weight: 600; color: var(--cfg-text-primary); margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
+.ws-tag { font-size: 11px; padding: 1px 8px; border-radius: 6px; background: #e3f2fd; color: #1565c0; font-weight: 500; }
 
-/* Tabs */
-.ws-hdr-tabs {
-  display: flex; align-items: center; gap: 2px;
-  flex: 1; justify-content: center;
-}
-.ws-hdr-tab {
-  padding: 6px 14px; border-radius: var(--radius-md);
-  font-size: 13px; color: var(--text-secondary);
-  background: none; border: none; cursor: pointer;
-  transition: all var(--transition-fast);
-  white-space: nowrap;
-}
-.ws-hdr-tab:hover { color: var(--text-primary); background: var(--ws-tab-hover-bg); }
-.ws-hdr-tab.sel {
-  color: var(--brand); background: var(--ws-tab-active-bg);
-  font-weight: 500;
-}
-
-/* Spacer + Actions */
-.ws-hdr-spacer { flex: 1; }
-.ws-hdr-actions {
-  display: flex; align-items: center; gap: 6px;
-}
-
-/* Icon buttons */
-.ws-hdr-icon {
-  width: 34px; height: 34px;
-  display: flex; align-items: center; justify-content: center;
-  border-radius: var(--radius-md); border: none;
-  background: none; color: var(--text-secondary);
-  cursor: pointer; transition: all var(--transition-fast);
-}
-.ws-hdr-icon:hover { background: var(--bg-hover); color: var(--text-primary); }
-
-/* Notification dot */
-.ws-notif-dot {
-  position: absolute; top: 2px; right: 2px;
-  min-width: 16px; height: 16px; padding: 0 4px;
-  border-radius: 10px; font-size: 10px; font-weight: 600;
-  background: var(--danger); color: #fff;
-  display: flex; align-items: center; justify-content: center;
-  line-height: 1;
-}
-
-/* User */
-.ws-hdr-user {
-  display: flex; align-items: center; gap: 6px;
-  padding: 4px 10px 4px 4px; border-radius: var(--radius-lg);
-  cursor: pointer; transition: background var(--transition-fast);
-}
-.ws-hdr-user:hover { background: var(--bg-hover); }
-.ws-hdr-av {
-  width: 28px; height: 28px; border-radius: 50%;
-  background: var(--brand-gradient); color: #fff;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 600; flex-shrink: 0;
-}
-.ws-hdr-name {
-  font-size: 13px; color: var(--text-primary); max-width: 80px;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-
-/* Dropdown */
-.ws-hdr-menu {
-  position: absolute; top: 52px; right: 16px; z-index: 60;
-  min-width: 180px; padding: 8px;
-  background: var(--bg-card); border: 1px solid var(--border-light);
-  border-radius: var(--radius-lg); box-shadow: var(--shadow-dropdown);
-  animation: float-up var(--transition-base) ease-out;
-}
-.ws-hdr-menu button {
-  display: block; width: 100%; text-align: left;
-  padding: 8px 12px; border-radius: var(--radius-sm);
-  border: none; background: none;
-  font-size: 13px; color: var(--text-primary);
-  cursor: pointer; transition: background var(--transition-fast);
-}
-.ws-hdr-menu button:hover { background: var(--bg-hover); }
-.ws-hdr-menu hr {
-  margin: 6px 0; border: none; border-top: 1px solid var(--border-light);
-}
-.ws-admin-link { color: var(--brand) !important; font-weight: 500; }
-
-/* Login / Signup */
-.ws-hdr-login {
-  padding: 6px 14px; border-radius: var(--btn-radius);
-  border: 1px solid var(--border-light); background: none;
-  font-size: 13px; color: var(--text-primary); cursor: pointer;
-  transition: all var(--transition-fast);
-}
-.ws-hdr-login:hover { background: var(--bg-hover); }
-.ws-hdr-signup {
-  padding: 6px 14px; border-radius: var(--btn-radius);
-  border: none; background: var(--brand);
-  font-size: 13px; color: #fff; cursor: pointer;
-  transition: all var(--transition-fast);
-}
-.ws-hdr-signup:hover { background: var(--brand-hover); }
-
-/* Burger */
-.ws-hdr-burger {
-  display: none; width: 34px; height: 34px;
-  align-items: center; justify-content: center;
-  border-radius: var(--radius-md); border: none;
-  background: none; color: var(--text-secondary); cursor: pointer;
-}
-
-/* Search overlay */
-.ws-search {
-  position: absolute; top: 100%; left: 0; right: 0; z-index: 55;
-  padding: 12px 20px 16px;
-  background: var(--bg-card); border-bottom: 1px solid var(--border-light);
-  box-shadow: var(--shadow-dropdown);
-  animation: float-up var(--transition-base) ease-out;
-}
-.ws-search-inp {
-  width: 100%; padding: 10px 14px;
-  border-radius: var(--input-radius); border: 1px solid var(--input-border);
-  background: var(--bg-input); font-size: 14px; color: var(--text-primary);
-  outline: none; transition: border var(--transition-fast);
-}
-.ws-search-inp:focus { border-color: var(--brand); }
-.ws-search-list {
-  margin-top: 8px; display: flex; flex-direction: column; gap: 2px;
-}
-.ws-search-it {
-  display: flex; align-items: center; gap: 8px;
-  padding: 8px 12px; border-radius: var(--radius-sm);
-  border: none; background: none; font-size: 13px;
-  color: var(--text-primary); cursor: pointer;
-  transition: background var(--transition-fast);
-}
-.ws-search-it:hover { background: var(--bg-hover); }
-.ws-search-tag {
-  margin-left: auto; padding: 2px 8px; border-radius: 4px;
-  background: var(--tag-bg); font-size: 11px; color: var(--text-muted);
-}
-
-/* ---- SIDEBAR ----------------------------------------------------------- */
-.ws-side {
-  position: sticky; top: var(--ws-header-height);
-  width: var(--ws-sidebar-width); min-width: var(--ws-sidebar-width);
-  height: calc(100vh - var(--ws-header-height));
-  overflow-y: auto;
-  background: var(--ws-sidebar-bg);
-  border-right: 1px solid var(--border-light);
-  display: flex; flex-direction: column; padding: 16px 10px; gap: 6px;
-  transition: transform var(--transition-slow);
-}
-
-/* Sidebar logo */
-.ws-side-logo {
-  display: flex; align-items: center; gap: 8px; cursor: pointer;
-  padding: 4px 10px 14px;
-}
-.ws-side-dot {
-  width: 7px; height: 7px; border-radius: 50%;
-  background: var(--brand-gradient);
-}
-.ws-side-brand {
-  font-size: 14px; font-weight: 600;
-  color: var(--text-primary); letter-spacing: -0.02em;
-}
-
-/* Nav items */
-.ws-side-nav {
-  display: flex; flex-direction: column; gap: 1px;
-}
-.ws-side-btn {
-  display: flex; align-items: center; gap: 8px; flex-shrink: 0;
-  padding: 8px 10px; border-radius: var(--radius-md);
-  border: none; background: none;
-  font-size: 13px; color: var(--sidebar-text);
-  cursor: pointer; transition: all var(--transition-fast);
-  width: 100%; text-align: left;
-}
-.ws-side-btn:hover { background: var(--ws-sidebar-hover); color: var(--text-primary); }
-.ws-side-btn.sel {
-  background: var(--ws-sidebar-active); color: var(--sidebar-text-active);
-  font-weight: 500;
-}
-.ws-side-dot-sm {
-  width: 5px; height: 5px; border-radius: 50%;
-  background: var(--text-muted); flex-shrink: 0;
-  transition: background var(--transition-fast);
-}
-.ws-side-btn.sel .ws-side-dot-sm { background: var(--brand); }
-
-/* Stats */
-.ws-side-stats {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
-  padding: 10px; margin: 4px 0;
-  background: var(--bg-subtle); border-radius: var(--radius-lg);
-}
-.ws-side-stat {
-  text-align: center;
-  b { display: block; font-size: 15px; color: var(--text-primary); font-weight: 600; }
-  span { font-size: 10px; color: var(--text-muted); }
-}
-
-/* Recent tasks */
-.ws-side-tasks {
-  flex: 1; overflow-y: auto; padding: 4px 0;
-}
-.ws-side-sec {
-  font-size: 10px; font-weight: 600; color: var(--text-muted);
-  text-transform: uppercase; letter-spacing: 0.05em;
-  padding: 8px 10px 4px; display: block;
-}
-.ws-side-task-list {
-  display: flex; flex-direction: column; gap: 2px;
-}
-.ws-side-task {
-  display: flex; align-items: center; gap: 8px;
-  padding: 6px 10px; border-radius: var(--radius-sm);
-  cursor: pointer; transition: background var(--transition-fast);
-}
-.ws-side-task:hover { background: var(--bg-hover); }
-.ws-side-task-dot {
-  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
-  background: var(--text-muted);
-}
-.ws-side-task-dot.done { background: var(--success); }
-.ws-side-task-dot.running { background: var(--brand); animation: breathe 2s ease-in-out infinite; }
-.ws-side-task-info {
-  flex: 1; min-width: 0;
-  display: flex; flex-direction: column;
-}
-.ws-side-task-name {
-  font-size: 12px; color: var(--text-primary);
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-.ws-side-task-time {
-  font-size: 10px; color: var(--text-muted);
-}
-.ws-side-task-st {
-  font-size: 10px; padding: 1px 6px; border-radius: 4px; flex-shrink: 0;
-}
-.ws-side-task-st.done { background: var(--success-light); color: var(--success); }
-.ws-side-task-st.running { background: var(--info-bg); color: var(--info); }
-
-/* Upgrade card */
-.ws-side-upgrade {
-  display: flex; align-items: center; gap: 8px;
-  padding: 10px; margin-top: auto;
-  border-radius: var(--radius-lg);
-  background: linear-gradient(135deg, var(--brand-light), var(--brand-light-alt));
-  cursor: pointer; transition: all var(--transition-fast);
-}
-.ws-side-upgrade:hover { transform: translateY(-1px); box-shadow: var(--shadow-brand); }
-.ws-side-up-icon { font-size: 18px; }
-.ws-side-upgrade strong {
-  font-size: 12px; color: var(--brand); flex: 1;
-}
-.ws-side-upgrade span { font-size: 10px; color: var(--text-muted); }
-
-/* Bottom */
-.ws-side-bottom {
-  border-top: 1px solid var(--border-light);
-  padding-top: 6px; display: flex; flex-direction: column; gap: 1px;
-}
-
-/* Sidebar overlay */
-.ws-side-overlay {
-  display: none; position: fixed; inset: 0; z-index: 40;
-  background: var(--bg-overlay);
-}
-
-/* Sidebar toggle button */
-.ws-side-tog {
-  display: flex; flex-direction: column; gap: 3px;
-  width: 24px; height: 24px; align-items: center; justify-content: center;
-  border: none; background: none; cursor: pointer; padding: 0;
-}
-.ws-side-tog-bar {
-  width: 14px; height: 2px; border-radius: 2px;
-  background: var(--text-muted); transition: all var(--transition-fast);
-}
-.ws-side-tog-bar.a:nth-child(2) { opacity: 0; }
-.ws-side-tog-bar.a:nth-child(1) { transform: rotate(45deg) translate(3px, 3px); }
-.ws-side-tog-bar.a:nth-child(3) { transform: rotate(-45deg) translate(3px, -3px); }
-
-/* ---- MAIN -------------------------------------------------------------- */
-.ws-main {
-  flex: 1; min-width: 0;
-  overflow-y: auto;
-  background: var(--ws-bg);
-}
-.ws-main-ct {
-  max-width: 1060px; margin: 0 auto;
-  padding: var(--content-padding); padding-top: 28px;
-}
-
-/* Title */
-.ws-ttl-row {
-  display: flex; align-items: center; gap: 12px; margin-bottom: 24px;
-}
-.ws-ttl {
-  font-size: 20px; font-weight: 700;
-  color: var(--text-primary); letter-spacing: -0.03em; margin: 0;
-}
-
-/* ---- INPUT CARD -------------------------------------------------------- */
-.ws-inp-card {
-  background: var(--ws-card); border: 1px solid var(--border-light);
-  border-radius: var(--radius-xl); padding: 20px;
-  box-shadow: var(--shadow-card);
-  transition: border-color var(--transition-base), box-shadow var(--transition-base);
-}
-.ws-inp-card:focus-within {
-  border-color: var(--brand-alpha-20);
-  box-shadow: var(--ws-input-focus-shadow);
-}
-
-.ws-inp-row {
-  display: flex; align-items: flex-start; gap: 12px;
-}
-.ws-inp-upload {
-  display: flex; flex-direction: column; align-items: center; gap: 4px;
-  padding: 10px 12px; border-radius: var(--radius-lg);
-  border: 1px dashed var(--border-light); background: var(--bg-subtle);
-  font-size: 11px; color: var(--text-secondary); cursor: pointer;
-  transition: all var(--transition-fast); flex-shrink: 0;
-}
-.ws-inp-upload:hover { border-color: var(--brand); color: var(--brand); background: var(--brand-light); }
-
-.ws-inp-ta {
-  flex: 1; border: none; background: none; resize: none;
-  font-size: 15px; color: var(--text-primary); outline: none;
-  line-height: 1.6; min-height: 60px;
-  font-family: inherit;
-}
-.ws-inp-ta::placeholder { color: var(--input-placeholder); }
-
-.ws-inp-send {
-  width: 42px; height: 42px; border-radius: var(--radius-md);
-  border: none; background: var(--brand); color: #fff;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; transition: all var(--transition-fast);
-  flex-shrink: 0; align-self: flex-end;
-}
-.ws-inp-send:hover:not(:disabled) {
-  background: var(--brand-hover); transform: scale(1.05);
-}
-.ws-inp-send:disabled { opacity: 0.4; cursor: not-allowed; }
-
-/* Intent hint */
-.ws-inp-hint {
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-  margin-top: 12px; padding: 8px 14px;
-  background: var(--brand-alpha-08); border-radius: var(--radius-md);
-  font-size: 12px; color: var(--brand);
-}
-.ws-inp-hint-tag {
-  padding: 1px 8px; border-radius: 4px;
-  background: var(--brand-alpha-15); font-size: 11px; font-weight: 500;
-}
-.ws-inp-hint-plat {
-  padding: 1px 8px; border-radius: 4px;
-  background: var(--warning-light); color: var(--warning); font-size: 11px;
-}
-
-/* Params */
-.ws-inp-params {
-  display: flex; align-items: center; gap: 12px;
-  margin-top: 14px; padding-top: 14px;
-  border-top: 1px solid var(--border-light);
-}
-.ws-inp-pg {
-  display: flex; align-items: center; gap: 6px;
-}
-.ws-inp-pl {
-  font-size: 12px; color: var(--text-muted); flex-shrink: 0;
-}
-.ws-inp-chip {
-  padding: 4px 10px; border-radius: 6px;
-  border: 1px solid var(--border-light); background: none;
-  font-size: 12px; color: var(--text-secondary); cursor: pointer;
-  transition: all var(--transition-fast);
-}
-.ws-inp-chip:hover { border-color: var(--brand-alpha-20); color: var(--brand); }
-.ws-inp-chip.a {
-  background: var(--brand-light); border-color: var(--brand-alpha-20);
-  color: var(--brand); font-weight: 500;
-}
-.ws-inp-div {
-  width: 1px; height: 20px; background: var(--border-light); flex-shrink: 0;
-}
-
-/* ---- Tags -------------------------------------------------------------- */
-.ws-tags {
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-  margin-top: 16px;
-}
-.ws-tags-lbl {
-  font-size: 12px; color: var(--text-muted); flex-shrink: 0;
-}
-.ws-tag {
-  padding: 5px 12px; border-radius: var(--radius-full);
-  border: 1px solid var(--border-light); background: none;
-  font-size: 12px; color: var(--text-secondary); cursor: pointer;
-  transition: all var(--transition-fast);
-}
-.ws-tag:hover { border-color: var(--brand-alpha-20); color: var(--brand); background: var(--brand-alpha-08); }
-
-/* ---- Quick Function Cards ---------------------------------------------- */
-.ws-qf-row {
-  display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
-  margin-top: 28px;
-}
-.ws-qf-card {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 16px 20px; border-radius: var(--radius-lg);
-  background: var(--ws-card); border: 1px solid var(--border-light);
-  cursor: pointer; transition: all var(--transition-base);
-}
-.ws-qf-card:hover {
-  border-color: var(--brand-alpha-20);
-  box-shadow: var(--shadow-card);
-  transform: translateY(-1px);
-}
-.ws-qf-l {
-  display: flex; align-items: center; gap: 12px;
-}
-.ws-qf-icon {
-  width: 40px; height: 40px; border-radius: var(--radius-md);
-  background: var(--brand-light); display: flex;
-  align-items: center; justify-content: center; font-size: 18px;
-  flex-shrink: 0;
-}
-.ws-qf-l strong { font-size: 14px; color: var(--text-primary); display: block; }
-.ws-qf-l p { font-size: 12px; color: var(--text-muted); margin: 2px 0 0; }
-
-/* ---- Section ----------------------------------------------------------- */
-.ws-sec { margin-top: 36px; }
-.ws-sec-hd {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 16px;
-}
-.ws-sec-ttl {
-  font-size: 16px; font-weight: 600;
-  color: var(--text-primary); letter-spacing: -0.02em; margin: 0;
-}
-.ws-sec-more {
-  font-size: 13px; color: var(--text-muted);
-  text-decoration: none; transition: color var(--transition-fast);
-}
-.ws-sec-more:hover { color: var(--brand); }
-
-/* ---- Card Grid --------------------------------------------------------- */
-.ws-grid {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
-}
-
+/* Card grid */
+.ws-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
 .ws-card {
-  position: relative; padding: 18px; border-radius: var(--radius-lg);
-  background: var(--ws-card); border: 1px solid var(--border-light);
-  cursor: pointer; transition: all var(--transition-base);
-  overflow: hidden;
+  display: flex; gap: 12px; padding: 16px; border-radius: 10px;
+  background: var(--cfg-bg-primary); border: 1px solid var(--cfg-border);
+  cursor: pointer; transition: all 0.15s;
 }
-.ws-card:hover {
-  border-color: var(--brand-alpha-20);
-  box-shadow: var(--ws-card-hover-shadow);
-  transform: translateY(-2px);
-}
-.ws-card-badge {
-  position: absolute; top: 10px; right: 10px;
-  padding: 2px 8px; border-radius: 4px;
-  background: var(--danger); color: #fff; font-size: 10px; font-weight: 600;
-}
-.ws-card-ico {
-  width: 44px; height: 44px; border-radius: var(--radius-md);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 20px; margin-bottom: 10px;
-}
-.ws-card-t {
-  font-size: 14px; font-weight: 600; color: var(--text-primary);
-  margin: 0 0 5px;
-}
-.ws-card-d {
-  font-size: 12px; color: var(--text-muted); margin: 0;
-  line-height: 1.5;
-}
+.ws-card:hover { border-color: var(--cfg-primary); box-shadow: 0 2px 12px rgba(0,0,0,0.06); transform: translateY(-1px); }
+.ws-card-icon { font-size: 24px; flex-shrink: 0; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--cfg-bg-secondary); border-radius: 8px; }
+.ws-card-body { flex: 1; min-width: 0; }
+.ws-card-name { font-size: 14px; font-weight: 600; color: var(--cfg-text-primary); margin: 0 0 4px; }
+.ws-card-use { font-size: 12px; color: var(--cfg-primary); margin: 0 0 2px; line-height: 1.4; }
+.ws-card-solve { font-size: 12px; color: var(--cfg-text-muted); margin: 0; line-height: 1.4; }
 
-/* ---- Recent Outputs ---------------------------------------------------- */
-.ws-rec {
-  display: flex; align-items: center; gap: 12px;
-  padding: 14px; border-radius: var(--radius-lg);
-  background: var(--ws-card); border: 1px solid var(--border-light);
-  cursor: pointer; transition: all var(--transition-base);
+/* Placeholder grid */
+.ws-placeholder-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-top: 12px; }
+.ws-ph-card {
+  display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-radius: 8px;
+  background: var(--cfg-bg-primary); border: 1px dashed var(--cfg-border);
 }
-.ws-rec:hover {
-  border-color: var(--brand-alpha-20);
-  box-shadow: var(--shadow-card);
-}
-.ws-rec-pv {
-  width: 44px; height: 44px; border-radius: var(--radius-md);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px; flex-shrink: 0;
-}
-.ws-rec-info {
-  display: flex; flex-direction: column; gap: 2px;
-}
-.ws-rec-t {
-  font-size: 13px; font-weight: 500; color: var(--text-primary);
-}
-.ws-rec-m {
-  font-size: 11px; color: var(--text-muted);
-}
-
-/* ---- RESPONSIVE -------------------------------------------------------- */
-@media (max-width: 1100px) {
-  .ws-grid { grid-template-columns: repeat(3, 1fr); }
-  .ws-side { width: 180px; min-width: 180px; }
-}
-@media (max-width: 840px) {
-  .ws-grid { grid-template-columns: repeat(2, 1fr); }
-  .ws-qf-row { grid-template-columns: 1fr; }
-  .ws-side { display: none; }
-  .ws-hdr-tab { font-size: 12px; padding: 5px 10px; }
-}
-@media (max-width: 600px) {
-  .ws-grid { grid-template-columns: 1fr; }
-  .ws-ttl { font-size: 17px; }
-  .ws-inp-card { padding: 14px; }
-  .ws-inp-params { flex-direction: column; align-items: flex-start; gap: 8px; }
-  .ws-inp-div { display: none; }
-  .ws-hdr-burger { display: flex; }
-  .ws-hdr-tabs { display: none; }
-  .ws-main-ct { padding: 16px; }
-}
+.ws-ph-icon { font-size: 20px; }
+.ws-ph-name { font-size: 13px; color: var(--cfg-text-muted); }
 </style>
