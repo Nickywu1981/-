@@ -55,7 +55,7 @@ router.post('/submit', _validate(submitSchema), async (req, res) => {
 });
 
 // GET /api/publish/batch/:id
-router.get('/batch/:id', async (req, res) => {
+router.get('/batch/:id', validate(retryParamsSchema, 'params'), async (req, res) => {
   try {
     const result = await publishService.getPublishBatch(req.params.id, req.user.id);
     return success(res, result);
@@ -74,12 +74,17 @@ router.post('/retry/:id', validate(retryParamsSchema, 'params'), async (req, res
   }
 });
 
+const historyQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).optional().default(1),
+  pageSize: z.coerce.number().int().min(1).max(50).optional().default(20),
+  status: z.string().optional(),
+  platform: z.string().optional(),
+});
+
 // GET /api/publish/history
-router.get('/history', async (req, res) => {
+router.get('/history', _validate(historyQuerySchema, 'query'), async (req, res) => {
   try {
-    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
-    const pageSize = Math.min(50, Math.max(1, parseInt(req.query.pageSize, 10) || 20));
-    const { status, platform } = req.query;
+    const { page, pageSize, status, platform } = req.validated;
     const result = await publishService.listPublishHistory(req.user.id, { page, pageSize, status, platform });
     return success(res, result);
   } catch (err) {

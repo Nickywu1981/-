@@ -55,13 +55,9 @@ router.get('/ratios', (_req, res) => {
 // ============================================================
 // 可导出作品列表
 // ============================================================
-router.get('/works', async (req, res) => {
+router.get('/works', _validate(listSchema, 'query'), async (req, res) => {
   try {
-    const query = listSchema.safeParse(req.query);
-    if (!query.success) {
-      return error(res, ERROR_CODE.VALIDATION_ERROR, query.error.errors.map(e => e.message).join('; '));
-    }
-    const result = await cutEcosystemService.getUserExportableWorks(req.user.id, query.data);
+    const result = await cutEcosystemService.getUserExportableWorks(req.user.id, req.validated);
     success(res, result);
   } catch (err) {
     error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '查询作品失败', err.status || ERROR_CODE.INTERNAL_ERROR);

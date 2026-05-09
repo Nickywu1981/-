@@ -5,6 +5,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { success } from '../utils/response.js';
+import { validateV4 as _validate } from '../utils/validate.js';
 import { infer } from '../services/aiEngine.js';
 
 const router = Router();
@@ -17,10 +18,9 @@ const renderSchema = z.object({
   format: z.enum(['png', 'jpg', 'webp']).optional(),
 });
 
-router.post('/product', async (req, res, next) => {
+router.post('/product', _validate(renderSchema), async (req, res, next) => {
   try {
-    const input = renderSchema.parse(req.body);
-    const result = await infer({ modelId: 'product-render', input });
+    const result = await infer({ modelId: 'product-render', input: req.validated });
     return success(res, result, '渲染成功');
   } catch (e) { next(e); }
 });

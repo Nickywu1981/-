@@ -5,6 +5,7 @@
  * GET  /api/3d/demo/:key — 获取示例模型
  */
 import { Router } from 'express';
+import { z } from 'zod';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
@@ -12,6 +13,7 @@ import { fileURLToPath } from 'url';
 import { authMiddleware } from '../middleware/auth.js';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
+import { validateV4 as _validate } from '../utils/validate.js';
 import logger from '../utils/logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -55,8 +57,13 @@ router.post('/upload', authMiddleware, upload.single('model'), (req, res, next) 
   } catch (e) { next(e); }
 });
 
+const modelsQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).optional().default(1),
+  pageSize: z.coerce.number().int().min(1).max(100).optional().default(20),
+});
+
 // GET /api/3d/models
-router.get('/models', authMiddleware, async (_req, res, next) => {
+router.get('/models', authMiddleware, _validate(modelsQuerySchema, 'query'), async (req, res, next) => {
   try {
     const files = fs.readdirSync(uploadDir)
       .filter((f) => ['.glb', '.gltf', '.fbx', '.obj', '.stl'].includes(path.extname(f).toLowerCase()))
@@ -79,9 +86,13 @@ const DEMO_MODELS = {
   bottle: 'bottle.glb',
 };
 
-router.get('/demo/:key', (req, res, next) => {
+const demoParamsSchema = z.object({
+  key: z.enum(['shoe', 'watch', 'bag', 'bottle']),
+});
+
+router.get('/demo/:key', _validate(demoParamsSchema, 'params'), (req, res, next) => {
   try {
-    const file = DEMO_MODELS[req.params.key];
+    const file = DEMO_MODELS[req.validated.key];
     if (!file) return error(res, ERROR_CODE.NOT_FOUND, '示例模型不存在');
     const filePath = path.join(uploadDir, 'demo', file);
     if (!fs.existsSync(filePath)) return error(res, ERROR_CODE.NOT_FOUND, '示例模型文件不存在');
