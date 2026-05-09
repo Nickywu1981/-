@@ -228,14 +228,9 @@ app.use('/api/assets', assetsRoutesV4);
 app.use('/api/compliance', complianceRoutesV4);
 app.use('/api/platforms', platformBindRoutesV4);
 app.use('/api/publish', publishRoutesV4);
+app.use('/api/users', userRoutes);  // must precede /api/user to avoid prefix match
 app.use('/api/user', userRoutesV4);
-app.use('/api/upload', uploadLimiter, uploadRoutesV4);  // v4.1 分片上传 (must precede legacy)
-
-// Swagger 文档（仅开发环境）
-if (process.env.NODE_ENV !== 'production') {
-  app.use('/api/docs', swaggerUi.serve, swaggerUi.setup({ ...swaggerDoc, paths: { ...swaggerDoc.paths, ...swaggerSpec.paths } }));
-}
-app.use('/api/users', userRoutes);
+app.use('/api/upload', uploadLimiter, uploadRoutesV4);
 app.use('/api/open', openApiRoutes);
 app.use('/api/open', openApiKeyRoutes);
 app.use('/api/copywriting', copywritingRoutes);
