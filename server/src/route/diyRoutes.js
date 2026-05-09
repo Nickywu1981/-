@@ -139,8 +139,8 @@ function compareConfigs(a, b) {
 
 router.post('/:id/versions/diff', validateParams(idParamSchema), authMiddleware, validate(diffSchema), asyncHandler(async (req, res) => {
   const { versionA, versionB } = req.body;
-  const va = await diyService.getVersion(req.params.id, req.tenantId, versionA);
-  const vb = await diyService.getVersion(req.params.id, req.tenantId, versionB);
+  const va = await diyService.getVersion(req.params.id, versionA, req.tenantId);
+  const vb = await diyService.getVersion(req.params.id, versionB, req.tenantId);
   if (!va || !vb) return error(res, ERROR_CODE.NOT_FOUND, '版本不存在');
   const diff = compareConfigs(va.mobile_config, vb.mobile_config);
   success(res, { versionA: va, versionB: vb, diff });

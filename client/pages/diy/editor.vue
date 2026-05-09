@@ -254,14 +254,14 @@ async function loadPage() {
   try {
     const res = await $fetch(`/api/diy/${id}`)
     pageInfo.value = res.data
-    editor.loadFromConfig(res.data.config_json)
+    editor.loadFromConfig(res.data.mobile_config || res.data.pc_config)
   } catch { toast.error('加载页面失败') }
 }
 
 async function savePage() {
   saving.value = true
   try {
-    const body = { config_json: editor.toConfigJson() }
+    const body = { mobileConfig: editor.toConfigJson() }
     await $fetch(`/api/diy/${pageInfo.value.id}`, { method: 'PUT', body })
     dirty.value = false
     toast.success('保存成功')
@@ -344,7 +344,7 @@ onMounted(async () => {
 
   const recovered = await autoSave.checkRecovery()
   if (recovered) {
-    editor.loadFromConfig(recovered.config_json)
+    editor.loadFromConfig(recovered.mobile_config || recovered.pc_config)
     toast.info('检测到未保存的更改，已自动恢复')
     return
   }

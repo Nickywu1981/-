@@ -79,7 +79,8 @@
 <script setup lang="ts">
 
 const { $api } = useNuxtApp()
-const pages = ref([])
+const toast = useToast()
+const pages = ref<DiyPage[]>([])
 const loading = ref(true)
 const showCreate = ref(false)
 const filter = reactive({ pageType: '', status: '', keyword: '' })
@@ -114,7 +115,7 @@ async function publishPage(id) {
 
 async function deletePage(id) {
   if (!confirm('确认删除？')) return
-  try { await $fetch(`/api/diy/${id}`, { method: 'DELETE' }); loadPages() }
+  try { await $fetch(`/api/diy/${id}/soft-delete`, { method: 'POST' }); loadPages() }
   catch (e) { toast.error('删除失败') }
 }
 
