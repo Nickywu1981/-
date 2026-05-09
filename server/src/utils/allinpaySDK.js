@@ -80,12 +80,22 @@ function isMockMode() {
   return allinpayConfig.isSandbox && (!allinpayConfig.cusid || !getPrivateKey());
 }
 
+// ==================== 支付渠道映射 ====================
+
+/** 通联 paytype 代码映射 */
+const PAYTYPE_MAP = {
+  wechat: 'W02',    // 微信JS支付
+  alipay: 'A02',    // 支付宝JS支付
+  unionpay: 'U02',  // 云闪付JS支付
+};
+
 // ==================== 统一下单 ====================
 
 /**
  * 调用通联聚合收银台统一下单接口
  * Mock 模式：无真实商户号/密钥时，返回本地模拟 H5 支付页 URL
- * @param {Object} params - { trxamt, reqsn, body, remark, validtime, acct }
+ * 对齐官方文档: https://prodoc.allinpay.com/project-32/doc-2615/
+ * @param {Object} params - { trxamt, reqsn, payChannel, body, remark, validtime, notifyUrl, frontUrl }
  * @returns {Promise<{payUrl: string, reqsn: string, trxid: string}>}
  */
 export async function unifiedOrder(params) {
@@ -99,26 +109,40 @@ export async function unifiedOrder(params) {
     };
   }
 
-  // ---- 真实模式 ----
+  // ---- 真实模式：聚-合-收银台 4.12 统一下单 ----
+  const paytype = PAYTYPE_MAP[params.payChannel] || 'W02';
+  const now = new Date();
+  // expiretime 格式: yyyyMMddHHmmss
+  const expireMinutes = parseInt(params.validtime, 10) || 30;
+  const expireTime = params.validtime
+    ? new Date(now.getTime() + expireMinutes * 60000).toISOString().replace(/[-:T.]/g, '').slice(0, 14)
+    : '';
+
   const postData = {
     cusid: allinpayConfig.cusid,
     appid: allinpayConfig.appid,
+    version: '12',
+    charset: 'UTF-8',
+    randomstr: crypto.randomBytes(4).toString('hex'),
     trxamt: String(params.trxamt),
     reqsn: params.reqsn,
-    notify_url: allinpayConfig.notifyUrl,
+    paytype,
     body: params.body || 'Movio会员充值',
     remark: params.remark || '',
-    validtime: params.validtime || '30',
-    acct: params.acct || '',
-    sign_type: allinpayConfig.signType,
+    notify_url: params.notifyUrl || allinpayConfig.notifyUrl,
+    front_url: params.frontUrl || allinpayConfig.frontUrl || '',
+    expiretime: expireTime,
+    signtype: allinpayConfig.signType,
   };
 
   const signStr = buildSignString(postData);
   postData.sign = rsaSign(signStr);
 
-  logger.info('[Allinpay] 统一下单请求', { reqsn: postData.reqsn, trxamt: postData.trxamt });
+  logger.info('[Allinpay] 统一下单请求', { reqsn: postData.reqsn, trxamt: postData.trxamt, paytype });
 
-  const bodyStr = new URLSearchParams(postData).toString();
+  const bodyStr = new URLSearchParams(
+    Object.fromEntries(Object.entries(postData).filter(([, v]) => v !== ''))
+  ).toString();
 
   let res;
   try {

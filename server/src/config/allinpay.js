@@ -16,6 +16,7 @@ const allinpayConfig = {
   publicKeyPath: process.env.ALLINPAY_PUBLIC_KEY_PATH || './certs/allinpay_public.pem',
   notifyUrl: process.env.ALLINPAY_NOTIFY_URL || '',
   returnUrl: process.env.ALLINPAY_RETURN_URL || '',
+  frontUrl: process.env.ALLINPAY_FRONT_URL || '',
   signType: process.env.ALLINPAY_SIGN_TYPE || 'RSA',
 
   get baseUrl() {

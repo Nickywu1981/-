@@ -41,9 +41,10 @@ export async function createUnifiedOrder({ userId, orderType, businessId, amount
     reqsn, orderType, businessId: businessId || reqsn, userId, amount, trxamt, payChannel, expireTime,
   });
 
-  // 2. 调用通联统一下单
+  // 2. 调用通联统一下单（含 payChannel 映射 paytype）
   const result = await allinpaySDK.unifiedOrder({
     trxamt, reqsn,
+    payChannel,
     body: body || (orderType === 'membership' ? 'Movio会员购买' : 'Movio虾币充值'),
     remark: remark || '',
   });

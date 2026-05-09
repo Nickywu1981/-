@@ -18,10 +18,11 @@ let running = true;
 let activeJobs = 0;
 
 // 任务类型 → AI模型映射
+// { model, action, endpoint?, apiKey? } — endpoint/apiKey 优先于默认 NewAPI 路由
 const TASK_MODEL_MAP = {
-  image_gen: { model: 'tongyi-wanxiang', action: 'generate' },
-  image_replicate: { model: 'tongyi-wanxiang', action: 'replicate' },
-  batch_image_gen: { model: 'tongyi-wanxiang', action: 'generate' },
+  image_gen: { model: 'gpt-image-2', action: 'generate' },
+  image_replicate: { model: 'gpt-image-2', action: 'replicate' },
+  batch_image_gen: { model: 'gpt-image-2', action: 'generate' },
   video_gen: { model: 'seedance', action: 'generate' },
   action_migrate: { model: 'seedance', action: 'action_migrate' },
   digital_human: { model: 'seedance', action: 'digital_human' },
@@ -37,6 +38,17 @@ const TASK_MODEL_MAP = {
   multi_image_to_video: { model: 'seedance', action: 'generate' },
   batch_action_migrate: { model: 'seedance', action: 'batch_migrate' },
 };
+
+// 模型 → 端点映射 (NewAPI 兼容)
+function getEndpoint(model) {
+  const BASE = process.env.OPENAI_BASE_URL || 'https://ouoi.me/v1';
+  if (model === 'gpt-image-2') return BASE.replace(/\/v1$/, '') + '/v1/images/generations';
+  return BASE + '/chat/completions';
+}
+
+function getApiKey() {
+  return process.env.OPENAI_API_KEY || '';
+}
 
 async function processJob(job) {
   activeJobs++;
@@ -58,7 +70,14 @@ async function processJob(job) {
     await jobQueueService.updateProgress(job.id, 30);
 
     // 调用AI模型
-    const result = await aiCaller.aiCaller.call(mapping.model, mapping.action, params);
+    const endpoint = getEndpoint(mapping.model);
+    const apiKey = getApiKey();
+    const aiParams = {
+      model: mapping.model,
+      prompt: params.prompt,
+      ...(mapping.model === 'gpt-image-2' ? { n: 1, size: params.size || '1024x1024' } : {}),
+    };
+    const result = await aiCaller.aiCaller.call(endpoint, apiKey, aiParams, { modelName: mapping.model });
 
     await jobQueueService.updateProgress(job.id, 90);
 
