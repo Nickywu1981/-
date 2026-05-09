@@ -14,11 +14,11 @@ const JWT_REFRESH_WINDOW = 7 * 24 * 60 * 60; // seconds — cookie maxAge needs 
 const RENEW_WINDOW = 24 * 60 * 60;
 
 export async function authMiddleware(req, res, next) {
-  // 公开路由白名单
+  // 公开路由白名单（精确匹配）
   const publicPaths = [
-    '/api/health', '/api/docs', '/api/metrics',
-    '/api/auth/register', '/api/auth/login', '/api/auth/reset-password',
-    '/api/users/register', '/api/users/login',
+    '/api/health', '/api/metrics',
+    '/api/auth/register', '/api/auth/login', '/api/auth/login-by-code', '/api/auth/reset-password',
+    '/api/users/register', '/api/users/login', '/api/users/forgot-password', '/api/users/reset-password',
     '/api/site-config/public', '/api/config/version/stream',
     '/api/templates/platforms', '/api/payment/plans',
     '/api/multilingual/languages', '/api/multilingual/script-types',
@@ -28,13 +28,20 @@ export async function authMiddleware(req, res, next) {
     '/api/payment/notify', '/api/allinpay/notify',
     '/api/ai-dispatch/health', '/api/ai-dispatch/categories',
     '/api/internal/embed',
+    '/api/diy/published',
   ];
 
-  if (publicPaths.some(p => req.path.startsWith(p))) {
+  // 文档路径前缀匹配 (Swagger UI 子资源)
+  if (req.path.startsWith('/api/docs')) return next();
+
+  if (publicPaths.includes(req.path)) return next();
+
+  if (req.method === 'GET' && req.path.startsWith('/api/config/') && !req.path.startsWith('/api/admin/config')) {
     return next();
   }
 
-  if (req.method === 'GET' && req.path.startsWith('/api/config/') && !req.path.startsWith('/api/admin/config')) {
+  // DIY published pages are public (GET /api/diy/published/:slug)
+  if (req.method === 'GET' && req.path.startsWith('/api/diy/published/')) {
     return next();
   }
 

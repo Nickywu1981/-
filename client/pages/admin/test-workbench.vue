@@ -601,8 +601,6 @@ function formatDuration(ms: number) {
   return (ms / 1000).toFixed(2) + 's'
 }
 
-}
-
 function formatResult(r: any) {
   if (typeof r === 'string') return r
   return JSON.stringify(r, null, 2)

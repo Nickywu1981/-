@@ -93,8 +93,9 @@ async function handlePasswordLogin() {
   try {
     const authStore = useAuthStore()
     await authStore.login(username.value, password.value)
+    await authStore.fetchUser()
     navigateTo('/workspace')
-  } catch (e: any) { msg.value = e.message || '登录失败'; msgErr.value = true; }
+  } catch (e: any) { msg.value = e.data?.msg || e.message || '登录失败'; msgErr.value = true; }
   loading.value = false;
 }
 
@@ -103,11 +104,7 @@ async function handleSmsLogin() {
   loading.value = true; msg.value = '';
   try {
     await $fetch('/api/sms/verify-code', { method: 'POST', body: { phone: smsPhone.value, scene: 'login', code: smsCode.value } });
-    await $fetch('/api/auth/login-by-code', {
-      method: 'POST',
-      body: { phone: smsPhone.value },
-      credentials: 'include',
-    });
+    await api.post('/auth/login-by-code', { phone: smsPhone.value });
     await useAuthStore().fetchUser();
     navigateTo('/workspace');
   } catch (e: any) { msg.value = e.data?.msg || '登录失败'; msgErr.value = true; }
@@ -130,11 +127,7 @@ async function handleEmailLogin() {
   loading.value = true; msg.value = '';
   try {
     await $fetch('/api/email/verify-code', { method: 'POST', body: { email: emailAddr.value, code: emailCode.value } });
-    await $fetch('/api/auth/login-by-code', {
-      method: 'POST',
-      body: { email: emailAddr.value },
-      credentials: 'include',
-    });
+    await api.post('/auth/login-by-code', { email: emailAddr.value });
     await useAuthStore().fetchUser();
     navigateTo('/workspace');
   } catch (e: any) { msg.value = e.data?.msg || '登录失败'; msgErr.value = true; }

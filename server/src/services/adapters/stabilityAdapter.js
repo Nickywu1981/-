@@ -1,3 +1,4 @@
+/* global FormData, Blob, atob */
 /**
  * Stability AI Adapter（云图片生成）
  * 支持: SDXL / SD3 / 图生图

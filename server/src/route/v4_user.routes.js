@@ -129,16 +129,16 @@ router.put('/change-password', _validate(changePasswordSchema), async (req, res)
     const conn = await db.getConnection();
     try {
       const [users] = await conn.query(
-        'SELECT password_hash FROM `user` WHERE id = ?',
+        'SELECT password FROM `user` WHERE id = ?',
         [req.user.id],
       );
       if (users.length === 0) return error(res, ERROR_CODE.NOT_FOUND, '用户不存在');
 
-      const valid = await bcrypt.compare(oldPassword, users[0].password_hash);
+      const valid = await bcrypt.compare(oldPassword, users[0].password);
       if (!valid) return error(res, ERROR_CODE.FORBIDDEN, '原密码不正确');
 
       const hash = await bcrypt.hash(newPassword, 12);
-      await conn.query('UPDATE `user` SET password_hash = ? WHERE id = ?', [hash, req.user.id]);
+      await conn.query('UPDATE `user` SET password = ? WHERE id = ?', [hash, req.user.id]);
       return success(res, {}, '密码已修改');
     } finally {
       conn.release();
