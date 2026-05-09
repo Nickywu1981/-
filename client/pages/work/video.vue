@@ -171,6 +171,7 @@ import { ref, computed } from 'vue'
 import { useAppPage } from '~/composables/useAppPage'
 import { useTaskPolling, usePromptEnhance } from '~/composables/useTaskPolling'
 import { useAppDict } from '~/composables/useAppDict'
+import { copyToClipboard } from '@/utils/format'
 
 definePageMeta({ layout: 'workspace' })
 
@@ -268,7 +269,6 @@ async function doPackage() {
 
 // ---- 工具 ----
 function downloadResult() { if (resultUrl.value) window.open(resultUrl.value, '_blank') }
-function copyToClipboard(text: string) { navigator.clipboard.writeText(text) }
 </script>
 
 <style scoped>

@@ -103,7 +103,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useAppPage } from '~/composables/useAppPage'
-import { formatDate as _fmt } from '@/utils/format'
+import { formatDate as _fmt, copyToClipboard } from '@/utils/format'
 const formatDate = (d: string) => d ? _fmt(d, 'MM-DD HH:mm') : ''
 
 
@@ -187,17 +187,17 @@ async function doWithdraw() {
   withdrawing.value = false
 }
 
-function copyInviteCode() {
+async function copyInviteCode() {
   if (inviteData.value?.invite_code) {
-    navigator.clipboard.writeText(inviteData.value.invite_code)
-    toast.success('邀请码已复制')
+    const ok = await copyToClipboard(inviteData.value.invite_code)
+    if (ok) toast.success('邀请码已复制')
   }
 }
 
-function copyInviteLink() {
+async function copyInviteLink() {
   if (inviteUrl.value) {
-    navigator.clipboard.writeText(inviteUrl.value)
-    toast.success('邀请链接已复制')
+    const ok = await copyToClipboard(inviteUrl.value)
+    if (ok) toast.success('邀请链接已复制')
   }
 }
 

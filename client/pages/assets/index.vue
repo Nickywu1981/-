@@ -63,8 +63,9 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { formatDate as _fmt } from '@/utils/format';
+import { formatDate as _fmt, copyToClipboard } from '@/utils/format';
 const formatDate = (d: string) => d ? _fmt(d, 'MM-DD') : '';
+const copyLink = copyToClipboard;
 
 const toast = useToast()
 definePageMeta({ layout: 'workspace' })
@@ -118,7 +119,6 @@ function loadMore() {
 }
 
 function downloadItem(item: any) { if (item.url) window.open(item.url, '_blank') }
-function copyLink(url: string) { navigator.clipboard.writeText(url) }
 
 onMounted(() => fetchAssets())
 </script>

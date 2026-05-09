@@ -104,7 +104,7 @@
 
 <script setup>
 ;
-import { formatDate } from '@/utils/format'
+import { formatDate, copyToClipboard } from '@/utils/format'
 
 const toast = useToast();
 
@@ -191,8 +191,9 @@ watch(activeSub, (val) => {
   else if (val === 'campaigns') loadCampaigns();
 });
 
-async function copyText(text) {
-  try { await navigator.clipboard.writeText(text); toast.success('已复制'); } catch { toast.error('复制失败'); }
+const copyText = async (text: string) => {
+  const ok = await copyToClipboard(text);
+  if (ok) toast.success('已复制'); else toast.error('复制失败');
 }
 
 onMounted(() => { loadTier(); loadPerformance(); });

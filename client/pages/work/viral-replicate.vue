@@ -88,6 +88,7 @@
 import { ref, computed } from 'vue'
 import { useAppPage } from '~/composables/useAppPage'
 import { useTaskPolling } from '~/composables/useTaskPolling'
+import { copyToClipboard } from '@/utils/format'
 
 definePageMeta({ layout: 'workspace' })
 
@@ -144,7 +145,6 @@ async function doReplicate() {
 }
 
 function downloadResult() { if (replicateResultUrl.value) window.open(replicateResultUrl.value, '_blank') }
-function copyToClipboard(text: string) { navigator.clipboard.writeText(text) }
 </script>
 
 <style scoped>

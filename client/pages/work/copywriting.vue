@@ -214,6 +214,7 @@
 import { ref, reactive, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
 import { MagicStick } from '@element-plus/icons-vue';
+import { copyToClipboard } from '@/utils/format';
 const activeTab = ref('title');
 
 // 平台 & 语言
@@ -305,8 +306,9 @@ async function deleteRecord(id) {
 }
 
 // 工具
-function copyText(text) {
-  navigator.clipboard.writeText(text).then(() => ElMessage.success('已复制'));
+const copyText = async (text: string) => {
+  const ok = await copyToClipboard(text);
+  if (ok) ElMessage.success('已复制');
 }
 </script>
 

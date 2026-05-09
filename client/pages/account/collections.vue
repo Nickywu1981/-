@@ -89,6 +89,7 @@
 </template>
 
 <script setup lang="ts">
+import { copyToClipboard } from '@/utils/format';
 
 
 const toast = useToast()
@@ -174,10 +175,10 @@ function viewCollection(item: any) {
 
 async function shareCollection(item: any) {
   const url = `${window.location.origin}/my/collections?id=${item.id}`
-  try {
-    await navigator.clipboard.writeText(url)
+  const ok = await copyToClipboard(url)
+  if (ok) {
     toast.success('链接已复制到剪贴板')
-  } catch {
+  } else {
     prompt('复制此链接分享合集:', url)
   }
 }

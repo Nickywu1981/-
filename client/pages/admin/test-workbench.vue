@@ -319,7 +319,7 @@
 </template>
 
 <script setup lang="ts">
-import { formatDateTime } from '@/utils/format';
+import { formatDateTime, copyToClipboard } from '@/utils/format';
 const formatTime = (iso: string) => iso ? formatDateTime(iso, 'HH:mm:ss') : '';
 const toast = useToast()
 
@@ -587,11 +587,11 @@ function viewHistory(h: any) {
   window.scrollTo({ top: 300, behavior: 'smooth' })
 }
 
-function copyResult() {
+async function copyResult() {
   if (!lastResult.value) return
   const text = JSON.stringify(lastResult.value, null, 2)
-  navigator.clipboard.writeText(text).then(() => toast.success('已复制'))
-    .catch(() => toast.error('复制失败'))
+  const ok = await copyToClipboard(text)
+  if (ok) toast.success('已复制'); else toast.error('复制失败')
 }
 
 // ---- Formatting ----

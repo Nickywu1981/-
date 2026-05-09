@@ -80,3 +80,12 @@ export function truncate(str: string, maxLen: number): string {
   if (!str) return '';
   return str.length > maxLen ? str.slice(0, maxLen) + '...' : str;
 }
+
+export async function copyToClipboard(text: string): Promise<boolean> {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    return false;
+  }
+}
