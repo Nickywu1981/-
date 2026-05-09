@@ -51,7 +51,7 @@ router.get('/list', validate(listQuerySchema, 'query'), async (req, res) => {
 
       const list = rows.map(r => {
         let data = {};
-        try { data = typeof r.result_data === 'string' ? JSON.parse(r.result_data) : (r.result_data || {}); } catch { /* noop */ }
+        try { data = typeof r.result_data === 'string' ? JSON.parse(r.result_data) : (r.result_data || {}); } catch { data = {}; }
         const url = data.file_url || data.video_url || data.image_url || '';
         const isVideo = ['video_gen', 'action_migrate', 'digital_human', 'viral_replicate', 'live_clip'].includes(r.task_type);
         return {
