@@ -10,7 +10,7 @@
           <button class="btn-outline" @click="(fileInput as HTMLInputElement)?.click()">选择图片</button>
         </div>
         <div v-if="previewUrl" class="preview-box">
-          <img :src="previewUrl" alt="预览" />
+          <img loading="lazy" :src="previewUrl" alt="预览" />
           <button class="preview-remove" @click="clearImage">✕</button>
         </div>
         <p v-if="uploadErr" class="msg msg-error">{{ uploadErr }}</p>
@@ -47,12 +47,12 @@
         <div class="compare-row">
           <div class="compare-card">
             <span class="compare-label">原图</span>
-            <img :src="uploadedUrl" class="compare-img" alt="原图" />
+            <img loading="lazy" :src="uploadedUrl" class="compare-img" alt="原图" />
           </div>
           <span class="compare-arrow">→</span>
           <div class="compare-card">
             <span class="compare-label">去背景后</span>
-            <img :src="resultUrl" class="compare-img" alt="结果" />
+            <img loading="lazy" :src="resultUrl" class="compare-img" alt="结果" />
           </div>
         </div>
         <div class="actions">

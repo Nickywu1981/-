@@ -21,7 +21,7 @@
       </button>
       <div class="result-area" v-if="resultUrl">
         <h3>扩展结果</h3>
-        <img :src="resultUrl" class="result-img" />
+        <img loading="lazy" :src="resultUrl" class="result-img" />
       </div>
       <div v-else class="result-area"><p>画面扩展结果将在此显示</p></div>
       <p v-if="errorMsg" class="error-msg">{{ errorMsg }}</p>

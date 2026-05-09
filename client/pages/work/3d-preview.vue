@@ -52,7 +52,7 @@
       <div v-if="screenshotUrl" class="screenshot-modal" @click="screenshotUrl = ''">
         <div class="screenshot-content" @click.stop>
           <h3>截图预览</h3>
-          <img :src="screenshotUrl" class="screenshot-img" />
+          <img loading="lazy" :src="screenshotUrl" class="screenshot-img" />
           <div class="screenshot-actions">
             <a :href="screenshotUrl" download="3d-screenshot.png" class="btn-download">下载图片</a>
             <button class="btn-close" @click="screenshotUrl = ''">关闭</button>

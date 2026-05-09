@@ -69,7 +69,7 @@
       />
 
       <div v-if="resultUrl" class="result-preview">
-        <img :src="resultUrl" alt="生成结果" class="result-image" />
+        <img loading="lazy" :src="resultUrl" alt="生成结果" class="result-image" />
         <div class="result-actions">
           <button class="btn btn-primary btn-sm" @click="downloadResult">下载</button>
           <button class="btn btn-secondary btn-sm" @click="copyToClipboard(resultUrl)">复制链接</button>

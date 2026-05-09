@@ -8,7 +8,7 @@
         <input ref="fileInput" type="file" accept="image/*" hidden @change="handleFile" />
         <button class="btn-outline" @click="($refs.fileInput as HTMLInputElement)?.click()">选择图片</button>
       </div>
-      <div v-if="previewUrl" class="preview-box"><img :src="previewUrl" /></div>
+      <div v-if="previewUrl" class="preview-box"><img loading="lazy" :src="previewUrl" /></div>
       <p v-if="uploading" class="hint uploading">⏳ 上传中...</p>
       <p v-else-if="uploadedUrl" class="hint uploaded">✓ 已上传</p>
       <button v-if="previewUrl" class="btn" @click="step = 1">下一步：选风格</button>

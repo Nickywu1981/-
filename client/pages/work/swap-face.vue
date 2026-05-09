@@ -11,7 +11,7 @@
           <input ref="fileInput" type="file" accept="image/*" hidden @change="handleFile" />
           <button class="btn-outline-sm" @click="($refs.fileInput as HTMLInputElement)?.click()">选择底图</button>
         </template>
-        <img v-else :src="previewUrl" alt="preview" class="preview-img" />
+        <img loading="lazy" v-else :src="previewUrl" alt="preview" class="preview-img" />
       </div>
       <p v-if="uploading" class="upload-status"><span class="spinner-sm" /> 上传中...</p>
       <button v-if="uploadedUrl" class="btn-primary" @click="step = 1">下一步：上传目标人脸 →</button>
@@ -28,7 +28,7 @@
           <input ref="faceInput" type="file" accept="image/*" hidden @change="handleFaceFile" />
           <button class="btn-outline-sm" @click="($refs.faceInput as HTMLInputElement)?.click()">选择人脸</button>
         </template>
-        <img v-else :src="facePreviewUrl" alt="face" class="preview-img" />
+        <img loading="lazy" v-else :src="facePreviewUrl" alt="face" class="preview-img" />
       </div>
       <div class="cost-badge"><span class="cost-icon">⚡</span> 成本：8 积分/次</div>
       <div class="actions">
@@ -46,11 +46,11 @@
       </div>
       <div v-if="resultUrl && !processing" class="result-display">
         <div class="compare-row">
-          <div class="compare-item"><p class="compare-label">原底图</p><img :src="previewUrl" alt="original" /></div>
+          <div class="compare-item"><p class="compare-label">原底图</p><img loading="lazy" :src="previewUrl" alt="original" /></div>
           <span class="compare-arrow">+</span>
-          <div class="compare-item"><p class="compare-label">目标人脸</p><img :src="facePreviewUrl" alt="face" /></div>
+          <div class="compare-item"><p class="compare-label">目标人脸</p><img loading="lazy" :src="facePreviewUrl" alt="face" /></div>
           <span class="compare-arrow">→</span>
-          <div class="compare-item"><p class="compare-label">换脸结果</p><img :src="resultUrl" alt="result" /></div>
+          <div class="compare-item"><p class="compare-label">换脸结果</p><img loading="lazy" :src="resultUrl" alt="result" /></div>
         </div>
         <div class="result-actions">
           <button class="btn-primary" @click="downloadImage">下载图片</button>

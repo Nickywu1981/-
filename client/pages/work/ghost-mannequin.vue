@@ -10,7 +10,7 @@
             <div class="ws-upload-area__text">点击上传或拖拽假模服装图</div>
             <div class="ws-upload-area__hint">支持 JPG / PNG / WebP，最大 20MB</div>
           </div>
-          <img v-else :src="previewUrl" class="ws-upload-area__preview" />
+          <img loading="lazy" v-else :src="previewUrl" class="ws-upload-area__preview" />
           <input ref="fileInput" type="file" accept="image/*" hidden @change="handleFile" />
         </div>
         <div v-if="uploading" class="ws-uploading">⏳ 上传中...</div>
@@ -47,7 +47,7 @@
         <div v-else-if="task.status.value === 2" class="result-compare">
           <div class="result-compare__item">
             <div class="result-compare__label">处理前（假模）</div>
-            <img v-if="uploadedUrl" :src="uploadedUrl" class="result-compare__img before" />
+            <img loading="lazy" v-if="uploadedUrl" :src="uploadedUrl" class="result-compare__img before" />
             <div v-else class="result-compare__img before" />
           </div>
           <div class="result-compare__divider">
@@ -56,7 +56,7 @@
           </div>
           <div class="result-compare__item">
             <div class="result-compare__label">处理后（立体展示）</div>
-            <img v-if="task.result.value" :src="task.result.value" class="result-compare__img after" />
+            <img loading="lazy" v-if="task.result.value" :src="task.result.value" class="result-compare__img after" />
             <div v-else class="result-compare__img after" />
           </div>
         </div>

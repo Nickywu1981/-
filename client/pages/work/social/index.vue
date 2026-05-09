@@ -86,7 +86,7 @@
         </div>
         <div v-else-if="result" class="result-view">
           <div class="result-image" :style="{ aspectRatio: activeTypeCfg?.ratio || '3:4' }">
-            <img v-if="result.imageUrl" :src="result.imageUrl" alt="生成封面" />
+            <img loading="lazy" v-if="result.imageUrl" :src="result.imageUrl" alt="生成封面" />
             <div v-else class="placeholder-img">图片生成中...</div>
           </div>
           <div class="result-meta">
@@ -109,7 +109,7 @@
           class="history-card"
           @click="loadHistory(item)"
         >
-          <img v-if="item.imageUrl" :src="item.imageUrl" alt="" />
+          <img loading="lazy" v-if="item.imageUrl" :src="item.imageUrl" alt="" />
           <span v-else class="placeholder-img" />
           <span class="history-label">{{ item.posterType === 'xhs' ? '小红书' : '公众号' }}</span>
         </button>

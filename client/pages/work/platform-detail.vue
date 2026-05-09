@@ -63,7 +63,7 @@
 
       <div v-if="previews.length" class="preview-grid">
         <div v-for="(p, i) in previews" :key="i" class="preview-item">
-          <img :src="p.url" class="preview-thumb" />
+          <img loading="lazy" :src="p.url" class="preview-thumb" />
           <select v-model="p.role" class="role-select">
             <option value="main">主图</option><option value="detail">细节图</option>
             <option value="scene">场景图</option><option value="size">尺寸图</option>

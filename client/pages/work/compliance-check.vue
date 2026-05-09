@@ -62,7 +62,7 @@
 
       <div v-if="previews.length" class="preview-grid">
         <div v-for="(p, i) in previews" :key="i" class="preview-item">
-          <img :src="p.url" class="preview-thumb" />
+          <img loading="lazy" :src="p.url" class="preview-thumb" />
           <button class="remove-btn" @click="removeImage(i)">✕</button>
         </div>
       </div>

@@ -19,7 +19,7 @@
           <h4>自家产品图</h4>
           <div class="dropzone" @dragover.prevent @drop.prevent="(e) => handleDrop(e, 'product')">
             <p v-if="!productImageUrl" class="dz-icon">📷</p>
-            <img v-else :src="productImageUrl" class="preview-media" />
+            <img loading="lazy" v-else :src="productImageUrl" class="preview-media" />
             <p>{{ productImageUrl ? '点击更换' : '上传产品图' }}</p>
             <input ref="imgInput" type="file" accept="image/*" hidden @change="(e) => handleFile(e, 'product')" />
             <button class="btn-outline" @click="($refs.imgInput as HTMLInputElement)?.click()">选择图片</button>

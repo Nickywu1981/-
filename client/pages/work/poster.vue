@@ -123,7 +123,7 @@
             class="result-card"
             :style="{ aspectRatio: currentSize.ratio.replace(':', '/') }"
           >
-            <img v-if="item.url" :src="item.url" :alt="`海报结果 ${idx + 1}`" class="result-img" />
+            <img loading="lazy" v-if="item.url" :src="item.url" :alt="`海报结果 ${idx + 1}`" class="result-img" />
             <div v-else class="result-placeholder">生成中...</div>
             <div class="result-actions">
               <button class="btn-icon" title="下载" @click="downloadImage(item.url)">⬇</button>

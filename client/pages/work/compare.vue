@@ -35,8 +35,8 @@
     <!-- 滑动覆盖对比模式 -->
     <div v-else-if="mode === 'slider'" class="slider-panel">
       <div class="slider-compare" ref="sliderRef" @mousemove="onSliderMove" @touchmove.prevent="onSliderTouch" @mouseleave="sliding = false" @mouseup="sliding = false">
-        <img v-if="variant.src" :src="variant.src" class="slider-bg" alt="生成图" />
-        <img v-if="original.src" :src="original.src" class="slider-fg" alt="原图" :style="{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }" />
+        <img loading="lazy" v-if="variant.src" :src="variant.src" class="slider-bg" alt="生成图" />
+        <img loading="lazy" v-if="original.src" :src="original.src" class="slider-fg" alt="原图" :style="{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }" />
         <div v-if="original.src && variant.src" class="slider-line" :style="{ left: sliderPos + '%' }">
           <div class="slider-handle">⟷</div>
         </div>
@@ -87,7 +87,7 @@
             <div v-else-if="!works.length" class="empty">暂无作品</div>
             <div v-else class="works-grid">
               <div v-for="w in works" :key="w.id" class="work-card" :class="{ selected: pickerSelected === w.id }" @click="pickerSelected = w.id">
-                <img :src="w.result_url || w.output_result?.images?.[0]?.url" :alt="w.task_code || `#${w.id}`" />
+                <img loading="lazy" :src="w.result_url || w.output_result?.images?.[0]?.url" :alt="w.task_code || `#${w.id}`" />
                 <span class="work-label">{{ w.task_code || `任务 #${w.id}` }}</span>
               </div>
             </div>
@@ -97,7 +97,7 @@
               <p>拖拽图片或点击上传</p>
               <input ref="uploadInput" type="file" accept="image/*" hidden @change="handleUploadFile" />
             </div>
-            <img v-if="uploadPreview" :src="uploadPreview" class="upload-preview" alt="预览" />
+            <img loading="lazy" v-if="uploadPreview" :src="uploadPreview" class="upload-preview" alt="预览" />
             <p v-if="uploadingMsg" class="hint">{{ uploadingMsg }}</p>
           </div>
           <div class="picker-footer">

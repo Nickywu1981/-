@@ -78,7 +78,7 @@
         @failed="onFailed"
       />
       <div v-if="resultUrl" class="result-preview">
-        <img :src="resultUrl" :alt="activeTypeCfg?.label" />
+        <img loading="lazy" :src="resultUrl" :alt="activeTypeCfg?.label" />
         <div class="result-actions">
           <button class="btn btn-secondary" @click="downloadResult">下载</button>
           <button class="btn btn-ghost" @click="reset">重新生成</button>
