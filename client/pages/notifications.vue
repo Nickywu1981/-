@@ -7,6 +7,11 @@
 
     <div v-if="loading" class="loading">加载中...</div>
 
+    <div v-else-if="error" class="error-state">
+      <p>{{ error }}</p>
+      <button class="btn-retry" @click="fetch()">重试</button>
+    </div>
+
     <div v-else-if="list.length === 0" class="empty">
       <p>暂无通知</p>
     </div>
@@ -45,6 +50,7 @@ const page = ref(1);
 const pageSize = ref(20);
 const unreadCount = ref(0);
 const loading = ref(true);
+const error = ref('');
 
 function typeIcon(type: string) {
   const map: Record<string, string> = { system: '📢', task: '✅', promotion: '🎁' };
@@ -52,28 +58,32 @@ function typeIcon(type: string) {
 }
 
 async function fetch() {
-  loading.value = true;
-  const res: any = await $fetch('/api/notifications', { params: { page: page.value, pageSize: pageSize.value } });
-  list.value = res.data?.list || [];
-  total.value = res.data?.total || 0;
-  loading.value = false;
+  loading.value = true; error.value = '';
+  try {
+    const res: any = await $fetch('/api/notifications', { params: { page: page.value, pageSize: pageSize.value } });
+    list.value = res.data?.list || [];
+    total.value = res.data?.total || 0;
+  } catch (e: any) { error.value = e.message || '加载失败'; }
+  finally { loading.value = false; }
 }
 
 async function fetchUnread() {
-  const res: any = await $fetch('/api/notifications/unread-count');
-  unreadCount.value = res.data?.count || 0;
+  try {
+    const res: any = await $fetch('/api/notifications/unread-count');
+    unreadCount.value = res.data?.count || 0;
+  } catch { /* silent */ }
 }
 
 async function readOne(item: any) {
-  await $fetch(`/api/notifications/${item.id}/read`, { method: 'PUT' });
   item.is_read = 1;
   unreadCount.value = Math.max(0, unreadCount.value - 1);
+  try { await $fetch(`/api/notifications/${item.id}/read`, { method: 'PUT' }); } catch { /* optimistic */ }
 }
 
 async function markAllRead() {
-  await $fetch('/api/notifications/read-all', { method: 'PUT' });
   list.value.forEach((n: any) => (n.is_read = 1));
   unreadCount.value = 0;
+  try { await $fetch('/api/notifications/read-all', { method: 'PUT' }); } catch { /* optimistic */ }
 }
 
 onMounted(() => { fetch(); fetchUnread(); });
@@ -84,7 +94,10 @@ onMounted(() => { fetch(); fetchUnread(); });
 .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
 .header-bar h2 { font-size: 20px; font-weight: 700; }
 .btn-text { background: none; border: none; color: var(--text-link); font-size: 14px; cursor: pointer; }
-.loading, .empty { text-align: center; padding: 60px; color: var(--text-tertiary); }
+.loading, .empty, .error-state { text-align: center; padding: 60px; color: var(--text-tertiary); }
+.error-state p { margin-bottom: 12px; }
+.btn-retry { padding: 6px 16px; border: 1px solid var(--border-light); border-radius: 6px; background: var(--bg-card); cursor: pointer; font-size: 13px; color: var(--text-primary); }
+.btn-retry:hover { border-color: var(--brand); }
 .list { display: flex; flex-direction: column; gap: 8px; }
 .notif-item { display: flex; align-items: flex-start; gap: 12px; padding: 16px; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 10px; cursor: pointer; position: relative; }
 .notif-item.unread { background: var(--brand-light); border-color: var(--brand); }

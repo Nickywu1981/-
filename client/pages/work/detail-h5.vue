@@ -213,20 +213,22 @@ async function addFiles(files: File[]) {
 async function submitTask() {
   if (!skuList.value.every(s => s.uploaded)) { toast.error('请等待所有图片上传完成'); return; }
   step.value = 3;
-  const res = await $fetch('/api/images/detail-h5', {
-    method: 'POST',
-    credentials: 'include',
-    body: {
-      skus: skuList.value.map(s => ({
-        imageUrl: s.uploadedUrl, name: s.name, spec: s.spec,
-        price: s.price, color: s.color,
-      })),
-      category: selectedCategory.value,
-      templateId: selectedTemplate.value,
-      platform: selectedPlatform.value,
-    },
-  });
-  task.pollTask((res as any).data.taskId);
+  try {
+    const res = await $fetch('/api/images/detail-h5', {
+      method: 'POST',
+      credentials: 'include',
+      body: {
+        skus: skuList.value.map(s => ({
+          imageUrl: s.uploadedUrl, name: s.name, spec: s.spec,
+          price: s.price, color: s.color,
+        })),
+        category: selectedCategory.value,
+        templateId: selectedTemplate.value,
+        platform: selectedPlatform.value,
+      },
+    });
+    task.pollTask((res as any).data.taskId);
+  } catch (e: any) { toast.error(e.data?.msg || '提交失败，请重试'); step.value = 2; }
 }
 
 function handleRedo() { task.reset(); step.value = 0; skuList.value = []; }

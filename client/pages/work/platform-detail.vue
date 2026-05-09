@@ -111,6 +111,7 @@ const activeRegion = ref('all');
 const platforms = ref<any[]>([]);
 const previews = ref<PreviewItem[]>([]);
 const task = useTask();
+const toast = useToast();
 
 const regions = [
   { code: 'all', label: '全部' }, { code: 'cn', label: '🇨🇳 国内' },
@@ -173,16 +174,18 @@ async function handleDrop(e: DragEvent) {
 
 async function submitTask() {
   step.value = 3;
-  const res = await $fetch('/api/images/detail-h5', {
-    method: 'POST',
-    credentials: 'include',
-    body: {
-      images: previews.value.map(p => ({ url: p.uploadedUrl, role: p.role })),
-      platform: selectedPlatform.value,
-      templateId: selectedTemplate.value,
-    },
-  });
-  task.pollTask((res as any).data.taskId);
+  try {
+    const res = await $fetch('/api/images/detail-h5', {
+      method: 'POST',
+      credentials: 'include',
+      body: {
+        images: previews.value.map(p => ({ url: p.uploadedUrl, role: p.role })),
+        platform: selectedPlatform.value,
+        templateId: selectedTemplate.value,
+      },
+    });
+    task.pollTask((res as any).data.taskId);
+  } catch (e: any) { toast.error(e.data?.msg || '提交失败，请重试'); step.value = 2; }
 }
 
 function handleRedo() { task.reset(); step.value = 0; previews.value = []; selectedPlatform.value = ''; selectedTemplate.value = ''; }
