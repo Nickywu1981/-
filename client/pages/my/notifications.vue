@@ -42,14 +42,18 @@ async function fetchData() {
 }
 
 async function markRead(id: number) {
-  await $fetch(`/api/notifications/${id}/read`, { method: 'POST', credentials: 'include' })
-  const item = list.value.find(i => i.id === id)
-  if (item) item.is_read = true
+  try {
+    await $fetch(`/api/notifications/${id}/read`, { method: 'POST', credentials: 'include' })
+    const item = list.value.find(i => i.id === id)
+    if (item) item.is_read = true
+  } catch { /* 静默失败 — 乐观更新已生效 */ }
 }
 
 async function markAllRead() {
-  await $fetch('/api/notifications/read-all', { method: 'POST', credentials: 'include' })
-  list.value.forEach(i => i.is_read = true)
+  try {
+    await $fetch('/api/notifications/read-all', { method: 'POST', credentials: 'include' })
+    list.value.forEach(i => i.is_read = true)
+  } catch { /* 静默失败 — 乐观更新已生效 */ }
 }
 
 onMounted(fetchData)

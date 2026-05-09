@@ -104,7 +104,7 @@ async function fetch() {
       list.value = data.data.list || []
       total.value = data.data.total || 0
     }
-  } catch (e: any) { /* silently fail */ } finally { loading.value = false }
+  } catch (e: any) { /* 管理后台静默处理 — 全局拦截器已记录 */ } finally { loading.value = false }
 }
 
 function search() { page.value = 1; fetch() }

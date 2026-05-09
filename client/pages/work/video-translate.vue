@@ -185,6 +185,7 @@ async function doSubmit() {
     useToast().success('翻译任务已提交');
   } catch (e) {
     useToast().error(e.data?.message || '翻译提交失败');
+  } finally {
     submitting.value = false;
   }
 }
