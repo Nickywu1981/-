@@ -140,12 +140,16 @@ export async function infer(modelId, input, options = {}) {
       const model = getModel(currentModelId);
 
       // 超时控制
+      let timeoutId;
+      const timeoutPromise = new Promise((_, reject) => {
+        timeoutId = setTimeout(() => reject(new BusinessError(504, `AI调用超时: ${currentModelId}`)), INFER_CONFIG.timeoutMs);
+      });
+
       const result = await Promise.race([
         model.infer(input, (sub) => onProgress?.(Math.min(99, sub))),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new BusinessError(504, `AI调用超时: ${currentModelId}`)), INFER_CONFIG.timeoutMs),
-        ),
+        timeoutPromise,
       ]);
+      clearTimeout(timeoutId);
 
       onProgress?.(100);
 

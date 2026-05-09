@@ -4,6 +4,8 @@ import { BusinessError } from '../utils/businessError.js';
 const TASK_TYPES = ['product_on', 'product_off', 'ship_order', 'reply_review', 'stock_check'];
 const TASK_LABELS = { product_on: '商品上架完成', product_off: '商品下架完成', ship_order: '发货完成', reply_review: '评价回复完成', stock_check: '库存检查完成' };
 
+const runningTimers = new Map();
+
 export async function listTasks(userId, tenantId) {
   return automationDao.listTasks(userId, tenantId);
 }
@@ -18,6 +20,8 @@ export async function createTask(userId, tenantId, { accountId, taskType, taskCo
 }
 
 export async function cancelTask(id, userId) {
+  const timer = runningTimers.get(id);
+  if (timer) { clearTimeout(timer); runningTimers.delete(id); }
   const ok = await automationDao.cancelTask(id, userId);
   if (!ok) throw new BusinessError(400, '任务不存在或不可取消');
   return true;
@@ -29,8 +33,8 @@ export async function executeTask(taskId) {
 
   await automationDao.updateTaskStatus(taskId, 1, { startTime: true });
 
-  // Async mock execution — real env would use Playwright
-  setTimeout(async () => {
+  const timer = setTimeout(async () => {
+    runningTimers.delete(taskId);
     try {
       await automationDao.updateTaskStatus(taskId, 2, {
         endTime: true,
@@ -41,6 +45,7 @@ export async function executeTask(taskId) {
       await automationDao.updateTaskStatus(taskId, 3, { errorMsg: e.message });
     }
   }, 2000);
+  runningTimers.set(taskId, timer);
 
   return { taskId, status: 1 };
 }
