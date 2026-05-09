@@ -5,6 +5,7 @@
  */
 import { Event } from './event.js';
 import { InvocationContext } from './invocationContext.js';
+import logger from '../../utils/logger.js';
 
 // ======================== BaseAgent ========================
 export class BaseAgent {
@@ -132,8 +133,8 @@ export class LlmAgent extends BaseAgent {
         });
         return result.text || result.content || result;
       }
-    } catch {
-      // fallback 到 modelDispatcher
+    } catch (err) {
+      logger.warn(`[ADK] Primary model "${this.model}" call failed: ${err.message}, falling back to modelDispatcher`);
       try {
         const { dispatch } = await import('../../services/modelDispatcher.js');
         if (dispatch) {
@@ -143,7 +144,9 @@ export class LlmAgent extends BaseAgent {
           return result?.data?.choices?.[0]?.message?.content
             || result?.text || result?.content || result;
         }
-      } catch { /* 最后降级 */ }
+      } catch (fallbackErr) {
+        logger.error(`[ADK] Fallback modelDispatcher also failed: ${fallbackErr.message}`);
+      }
     }
     throw new Error(`Model "${this.model}" not available`);
   }
