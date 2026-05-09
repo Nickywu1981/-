@@ -70,6 +70,8 @@ const tabs = [
   { key: 'batch', label: '批量处理' },
   { key: 'edit', label: '图片编辑' },
   { key: 'removebg', label: '背景移除' },
+  { key: 'copywrite', label: '文案生成' },
+  { key: 'digital-human', label: '数字人' },
 ]
 
 const activeTabLabel = computed(() => tabs.find(t => t.key === activeTab.value)?.label || '')
@@ -80,6 +82,8 @@ const activeTabPlaceholder = computed(() => {
     batch: '批量处理模式，上传多张图片统一操作...',
     edit: '描述要编辑的图片效果，例如：调亮肤色、去除褶皱...',
     removebg: '上传图片，AI 自动识别主体并移除背景...',
+    copywrite: '描述你的文案需求，例如：618 大促女装促销标题...',
+    'digital-human': '描述数字人需求，例如：女装带货数字人，甜美风格...',
   }
   return map[activeTab.value] || '描述你的创作需求...'
 })
@@ -90,6 +94,8 @@ const activeTabHint = computed(() => {
     batch: '支持批量抠图 / 批量白底 / 批量尺寸调整',
     edit: '支持精修 / 换色 / 去皱 / 风格迁移 / 文字特效',
     removebg: '3秒智能抠图，支持手动微调边缘',
+    copywrite: '支持电商标题 / 详情文案 / 口播脚本 / 营销文案',
+    'digital-human': '支持带货视频 / 虚拟直播 / 形象定制 / AI 主播',
   }
   return map[activeTab.value] || ''
 })
@@ -134,6 +140,21 @@ const cardData: Record<string, { path: string; icon: string; name: string; desc:
     { path:'/work/virtual-tryon', icon:'👗', name:'虚拟试穿',    desc:'买家在线看衣服上身效果' },
     { path:'/work/product-render', icon:'🛒', name:'产品渲染',  desc:'3D展示商品旋转/细节' },
   ],
+    copywrite: [
+      { path:'/work/title-gen',     icon:'📋', name:'电商标题',   desc:'SEO优化标题/卖点标题批量生成' },
+      { path:'/work/detail-copy',   icon:'📝', name:'详情文案',   desc:'商品详情页长文案智能撰写' },
+      { path:'/work/script-gen',    icon:'🎙', name:'口播脚本',   desc:'带货短视频口播脚本自动生成' },
+      { path:'/work/campaign-copy', icon:'📢', name:'营销文案',   desc:'大促/活动/促销文案生成' },
+      { path:'/work/email-copy',    icon:'📧', name:'邮件文案',   desc:'EDM营销邮件/短信文案' },
+      { path:'/work/social-copy',   icon:'📱', name:'社媒文案',   desc:'小红书/抖音/TikTok文案' },
+    ],
+    'digital-human': [
+      { path:'/work/digital-human', icon:'🤖', name:'数字人带货', desc:'数字人24小时自动带货视频' },
+      { path:'/work/digital-live',  icon:'📡', name:'数字人直播', desc:'虚拟直播间自动讲解商品' },
+      { path:'/work/avatar-custom', icon:'🧬', name:'形象定制',   desc:'自定义数字人外观/声音/动作' },
+      { path:'/work/ai-host',       icon:'🎤', name:'AI 主播',    desc:'智能语音播报商品卖点' },
+      { path:'/work/virtual-model', icon:'👤', name:'虚拟模特',   desc:'AI生成虚拟模特穿衣展示' },
+    ],
 }
 
 const activeCards = computed(() => cardData[activeTab.value] || cardData.image)

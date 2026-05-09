@@ -76,8 +76,7 @@ const navItems = [
   { path: '/workspace',            icon: '🏠', label: '首页',    disabled: false },
   { path: '/workspace/creation',   icon: '🎨', label: '创作',    disabled: false },
   { path: '/workspace/assistant',  icon: '🤖', label: 'AI 助手', disabled: false },
-  { path: '/workspace/workflow',   icon: '⚙', label: '工作流',  disabled: false },
-]
+  { path: '/workspace/workflow',   icon: '⚙', label: '工作流',  disabled: false }]
 
 function isActive(item: { path: string }) {
   if (item.path === '/workspace') return currentPath.value === '/workspace'
