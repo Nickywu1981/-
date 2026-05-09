@@ -264,6 +264,19 @@ export async function listAllPlans() {
   return rows;
 }
 
+export async function createPlan(data) {
+  const { name, price, credits, duration_days, plan_type, description, status } = data;
+  const [result] = await pool.execute(
+    'INSERT INTO membership_plan (name, price, credits, duration_days, plan_type, description, status) VALUES (?, ?, ?, ?, ?, ?, ?)',
+    [name, price || 0, credits || 0, duration_days || 30, plan_type || 1, description || null, status ?? 1],
+  );
+  return result.insertId;
+}
+
+export async function deletePlan(planId) {
+  await pool.execute('DELETE FROM membership_plan WHERE id = ?', [planId]);
+}
+
 export async function updatePlan(planId, data) {
   const sets = [];
   const params = [];
@@ -314,4 +327,8 @@ export async function listAllOrders({ offset, pageSize, userId, planType }) {
   const [[{ total }]] = await pool.execute(countSql, countParams);
 
   return { list: rows, total };
+}
+
+export async function deletePaymentOrder(orderId) {
+  await pool.execute('DELETE FROM payment_order WHERE id = ?', [orderId]);
 }

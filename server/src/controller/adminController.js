@@ -3,10 +3,10 @@ import * as creditService from '../services/creditService.js';
 import * as logService from '../services/logService.js';
 import * as notificationService from '../services/notificationService.js';
 import * as sensitiveWordService from '../services/sensitiveWordService.js';
+import * as userService from '../services/userService.js';
 import { success, listResult, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { parsePagination } from '../utils/pagination.js';
-import db from '../dao/db.js';
 
 // ==================== 数据看板 ====================
 
@@ -242,22 +242,8 @@ export async function deleteNotification(req, res, next) {
 
 export async function updateUser(req, res, next) {
   try {
-    const conn = await db.getConnection();
-    try {
-      const [users] = await conn.query('SELECT id FROM `user` WHERE id = ?', [+req.params.id]);
-      if (users.length === 0) return error(res, 404, '用户不存在');
-
-      const { nickname, email, role } = req.body;
-      const updates = [];
-      const params = [];
-      if (nickname !== undefined) { updates.push('nickname = ?'); params.push(nickname); }
-      if (email !== undefined) { updates.push('email = ?'); params.push(email); }
-      if (role !== undefined) { updates.push('role = ?'); params.push(role); }
-      if (updates.length === 0) return error(res, 400, '无更新字段');
-
-      await conn.query(`UPDATE \`user\` SET ${updates.join(', ')} WHERE id = ?`, [...params, +req.params.id]);
-      return success(res, {}, '用户已更新');
-    } finally { conn.release(); }
+    const user = await userService.adminUpdateUser(+req.params.id, req.body);
+    return success(res, user, '用户已更新');
   } catch (err) { next(err); }
 }
 
@@ -265,25 +251,15 @@ export async function updateUser(req, res, next) {
 
 export async function createPlan(req, res, next) {
   try {
-    const { name, price, credits, duration_days, plan_type } = req.body;
-    const conn = await db.getConnection();
-    try {
-      const [result] = await conn.query(
-        'INSERT INTO payment_plan (name, price, credits, duration_days, plan_type) VALUES (?, ?, ?, ?, ?)',
-        [name, price || 0, credits || 0, duration_days || 30, plan_type || 1],
-      );
-      return success(res, { id: result.insertId }, '套餐已创建');
-    } finally { conn.release(); }
+    const data = await commerce.createPlan(req.body);
+    return success(res, data, '套餐已创建');
   } catch (err) { next(err); }
 }
 
 export async function deletePlan(req, res, next) {
   try {
-    const conn = await db.getConnection();
-    try {
-      await conn.query('DELETE FROM payment_plan WHERE id = ?', [+req.params.planId]);
-      return success(res, {}, '套餐已删除');
-    } finally { conn.release(); }
+    await commerce.deletePlan(+req.params.planId);
+    return success(res, {}, '套餐已删除');
   } catch (err) { next(err); }
 }
 
@@ -291,10 +267,7 @@ export async function deletePlan(req, res, next) {
 
 export async function deleteOrder(req, res, next) {
   try {
-    const conn = await db.getConnection();
-    try {
-      await conn.query('DELETE FROM payment_order WHERE id = ?', [+req.params.orderId]);
-      return success(res, {}, '订单已删除');
-    } finally { conn.release(); }
+    await commerce.deleteOrder(+req.params.orderId);
+    return success(res, {}, '订单已删除');
   } catch (err) { next(err); }
 }

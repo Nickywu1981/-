@@ -56,7 +56,7 @@ export async function updateUser(id, fields) {
   const sets = [];
   const params = [];
   for (const [k, v] of Object.entries(fields)) {
-    if (['nickname', 'phone', 'email', 'avatar'].includes(k)) {
+    if (['nickname', 'phone', 'email', 'avatar', 'role'].includes(k)) {
       sets.push(`${k} = ?`);
       params.push(v);
     }

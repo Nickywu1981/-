@@ -179,6 +179,21 @@ export async function updatePlan(planId, data) {
   return updated;
 }
 
+export async function createPlan(data) {
+  const { name, price, credits, duration_days, plan_type } = data;
+  if (!name) throw new BusinessError(400, '套餐名称不能为空');
+  const id = await commerceDao.createPlan({ name, price, credits, duration_days, plan_type, description: data.description, status: data.status });
+  return { id };
+}
+
+export async function deletePlan(planId) {
+  await commerceDao.deletePlan(planId);
+}
+
+export async function deleteOrder(orderId) {
+  await commerceDao.deletePaymentOrder(orderId);
+}
+
 // ==================== 内容审核 ====================
 
 export async function approveTask(taskId) {

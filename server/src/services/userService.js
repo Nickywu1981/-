@@ -120,6 +120,22 @@ export async function getUserStats(userId, _tenantId = 0) {
   };
 }
 
+// ==================== 管理员操作 ====================
+
+export async function adminUpdateUser(userId, fields) {
+  const user = await userDao.findById(userId);
+  if (!user) throw new BusinessError(404, '用户不存在');
+
+  const allowed = {};
+  if (fields.nickname !== undefined) allowed.nickname = fields.nickname;
+  if (fields.email !== undefined) allowed.email = fields.email;
+  if (fields.role !== undefined) allowed.role = fields.role;
+
+  if (Object.keys(allowed).length === 0) throw new BusinessError(400, '无更新字段');
+  await userDao.updateUser(userId, allowed);
+  return userDao.findById(userId);
+}
+
 // ========================= JWT 双令牌 Service =========================
 
 export { refreshTokenUtil as refreshAccessToken };
