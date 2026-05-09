@@ -201,7 +201,7 @@ async function loadHistory() {
     const data = await $fetch<{ data?: { rows?: unknown[]; total?: number } }>(`/api/video-translate/works?${params}`, { credentials: 'include' });
     history.value = data.data?.rows || data.data || [];
     totalHistory.value = data.data?.total || 0;
-  } catch (_) { useToast().error('加载历史记录失败') } finally { loadingHistory.value = false; }
+  } catch (e: any) { useToast().error(e?.data?.msg || e?.message || '加载历史记录失败') } finally { loadingHistory.value = false; }
 }
 
 function download(url: string) { const a = document.createElement('a'); a.href = url; a.download = ''; a.click(); }
@@ -210,7 +210,8 @@ onMounted(async () => {
   try {
     const data = await $fetch<{ data?: { langs?: { code: string; name: string }[] } }>('/api/video-translate/langs', { credentials: 'include' });
     langs.value = data.data?.langs || [{ code: 'zh', name: '中文' }, { code: 'en', name: 'English' }, { code: 'ja', name: '日本語' }, { code: 'ko', name: '한국어' }];
-  } catch (_) {
+  } catch (_: any) {
+    // 失败时降级为默认语言列表
     langs.value = [{ code: 'zh', name: '中文' }, { code: 'en', name: 'English' }, { code: 'ja', name: '日本語' }, { code: 'ko', name: '한국어' }];
   }
   loadHistory();

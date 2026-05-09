@@ -246,7 +246,7 @@ async function doGenerateTitles() {
     const r = await $fetch('/api/copywriting/titles', { method: 'POST', body: titleForm });
     titleResults.value = r?.data?.titles || [];
     titleMeta.value = { model: r?.data?.model, latency: r?.data?.latency };
-  } catch (e) { ElMessage.error(e?.data?.msg || '生成失败'); }
+  } catch (e: any) { ElMessage.error(e?.data?.msg || e?.message || '生成失败'); }
   finally { titleGenning.value = false; }
 }
 
@@ -262,7 +262,7 @@ async function doGenerateDesc() {
     const r = await $fetch('/api/copywriting/description', { method: 'POST', body: descForm });
     descResultRaw.value = r?.data?.description || '';
     descMeta.value = { model: r?.data?.model };
-  } catch (e) { ElMessage.error(e?.data?.msg || '生成失败'); }
+  } catch (e: any) { ElMessage.error(e?.data?.msg || e?.message || '生成失败'); }
   finally { descGenning.value = false; }
 }
 

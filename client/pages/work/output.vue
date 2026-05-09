@@ -38,7 +38,7 @@ onMounted(async () => {
     const data: any = await $fetch('/api/tasks/my-works', { credentials: 'include' })
     items.value = data?.data?.list || data?.data || []
     if (!Array.isArray(items.value)) items.value = []
-  } catch(e) { toast.error('加载失败') }
+  } catch(e: any) { toast.error(e?.data?.msg || e?.message || '加载失败') }
   loading.value = false
 })
 

@@ -82,17 +82,24 @@ const targetLang = ref('en')
 
 async function uploadFile(file: File) {
   const fd = new FormData(); fd.append('file', file)
-  const res: any = await $fetch('/api/upload', { method: 'POST', body: fd })
-  return res.data?.url || ''
+  try {
+    const res: any = await $fetch('/api/upload', { method: 'POST', body: fd })
+    return res.data?.url || ''
+  } catch (e: any) {
+    toast.error(e?.data?.msg || e?.message || '上传失败')
+    throw e
+  }
 }
 
 async function onFileChange(e: Event) {
   const file = (e.target as HTMLInputElement).files?.[0]
   if (!file) return
   if (file.size > 10 * 1024 * 1024) { toast.error('图片不能超过10MB'); return }
-  const url = await uploadFile(file)
-  previewUrl.value = url
-  resultUrl.value = ''
+  try {
+    const url = await uploadFile(file)
+    previewUrl.value = url
+    resultUrl.value = ''
+  } catch { /* toast already shown in uploadFile */ }
 }
 
 function onDrop(e: DragEvent) {

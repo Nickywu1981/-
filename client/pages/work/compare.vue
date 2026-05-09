@@ -114,7 +114,10 @@
 </template>
 
 <script setup lang="ts">
+import { useToast } from '#imports'
 import ImageSlot from '~/components/ImageSlot.vue'
+
+const toast = useToast()
 
 const mode = ref<'side' | 'slider' | 'grid'>('side')
 const modes = [
@@ -240,7 +243,7 @@ function handleUploadDrop(e: DragEvent) {
   const fd = new FormData(); fd.append('file', f)
   $fetch('/api/upload/image', { method: 'POST', credentials: 'include', body: fd })
     .then((res: any) => { uploadedUrl.value = res.data.url; uploadingMsg.value = '上传完成 ✓'; pickerSelected.value = '' })
-    .catch(() => { uploadingMsg.value = '上传失败' })
+    .catch((e: any) => { uploadingMsg.value = '上传失败'; toast.error(e?.data?.msg || '上传失败') })
 }
 
 function downloadBoth() {
