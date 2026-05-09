@@ -51,6 +51,7 @@ const sendNotificationSchema = z.object({
 const userStatusSchema = z.object({
   status: z.union([z.literal(0), z.literal(1)]),
 });
+const taskActionParamsSchema = z.object({ taskId: z.coerce.number().int().positive('taskId 必须为正整数') });
 const promptReviewSchema = z.object({
   status: z.coerce.number().int(),
   reviewRemark: z.string().max(500).optional(),
@@ -80,12 +81,12 @@ router.put('/users/:userId/status', authMiddleware, adminAuth, validate(userStat
 router.put('/users/batch-status', authMiddleware, adminAuth, validate(batchUserStatusSchema), asyncHandler(batchUpdateUserStatus));
 // 任务
 router.get('/tasks', authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(listAllTasks));
-router.post('/tasks/:taskId/approve', authMiddleware, adminAuth, asyncHandler(approveTask));
-router.post('/tasks/:taskId/reject', authMiddleware, adminAuth, asyncHandler(rejectTask));
-router.post('/tasks/:taskId/retry', authMiddleware, adminAuth, asyncHandler(retryTask));
-router.post('/tasks/:taskId/pause', authMiddleware, adminAuth, asyncHandler(pauseTask));
-router.post('/tasks/:taskId/cancel', authMiddleware, adminAuth, asyncHandler(cancelTask));
-router.post('/tasks/:taskId/resume', authMiddleware, adminAuth, asyncHandler(resumeTask));
+router.post('/tasks/:taskId/approve', authMiddleware, adminAuth, validate(taskActionParamsSchema, 'params'), asyncHandler(approveTask));
+router.post('/tasks/:taskId/reject', authMiddleware, adminAuth, validate(taskActionParamsSchema, 'params'), asyncHandler(rejectTask));
+router.post('/tasks/:taskId/retry', authMiddleware, adminAuth, validate(taskActionParamsSchema, 'params'), asyncHandler(retryTask));
+router.post('/tasks/:taskId/pause', authMiddleware, adminAuth, validate(taskActionParamsSchema, 'params'), asyncHandler(pauseTask));
+router.post('/tasks/:taskId/cancel', authMiddleware, adminAuth, validate(taskActionParamsSchema, 'params'), asyncHandler(cancelTask));
+router.post('/tasks/:taskId/resume', authMiddleware, adminAuth, validate(taskActionParamsSchema, 'params'), asyncHandler(resumeTask));
 // 套餐
 router.get('/plans', authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(listAllPlans));
 router.post('/plans', authMiddleware, adminAuth, validate(createPlanSchema), asyncHandler(createPlan));
