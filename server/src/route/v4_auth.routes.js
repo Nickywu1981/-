@@ -37,8 +37,9 @@ const loginSchema = z.object({
   phone: z.string().regex(_phoneRegex).optional().nullable(),
   email: z.string().email().optional().nullable(),
   username: z.string().min(1).max(100).optional().nullable(),
+  account: z.string().min(1).max(100).optional().nullable(),
   password: z.string().min(1, '请填写密码'),
-}).refine(d => d.phone || d.email || d.username, { message: '请填写手机号、邮箱或用户名' });
+}).refine(d => d.phone || d.email || d.username || d.account, { message: '请填写手机号、邮箱或用户名' });
 
 const loginByCodeSchema = z.object({
   phone: z.string().regex(_phoneRegex).optional().nullable(),
@@ -73,9 +74,9 @@ router.post('/register', _validate(registerSchema), async (req, res) => {
 // POST /api/auth/login
 router.post('/login', _validate(loginSchema), async (req, res) => {
   try {
-    const { phone, email, username, password } = req.validated;
+    const { phone, email, username, account, password } = req.validated;
 
-    const result = await authService.login({ phone, email, username, password });
+    const result = await authService.login({ phone, email, username: username || account, password });
 
     _setTokenCookie(res, result.token);
 

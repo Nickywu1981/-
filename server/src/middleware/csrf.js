@@ -48,21 +48,30 @@ export function csrfProtection(req, res, next) {
   }
 
   // 公开端点无需 CSRF：登录/注册/验证码/密码重置/支付回调
+  // 同时覆盖 /api/ 前缀路径（前端直连）和去前缀路径（Nuxt devProxy 转发）
   const publicPaths = ['/api/users/login', '/api/users/register', '/api/users/forgot-password',
     '/api/auth/login', '/api/auth/register', '/api/auth/forgot-password', '/api/auth/login-by-code', '/api/auth/reset-password',
-    '/api/sms/', '/api/email/', '/api/site-config/public', '/api/health', '/api/metrics',
-    '/api/ai-dispatch/health', '/api/ai-dispatch/categories', '/api/recharge/callback', '/api/payment/notify'];
-  if (publicPaths.some(p => req.path.startsWith(p)) || req.path.startsWith('/api/internal/')) {
+    '/auth/login', '/auth/register', '/auth/forgot-password', '/auth/login-by-code', '/auth/reset-password',
+    '/users/login', '/users/register', '/users/forgot-password',
+    '/api/sms/', '/api/email/', '/sms/', '/email/',
+    '/api/site-config/public', '/site-config/public',
+    '/api/health', '/api/metrics', '/health', '/metrics',
+    '/api/ai-dispatch/health', '/api/ai-dispatch/categories',
+    '/api/recharge/callback', '/api/payment/notify', '/recharge/callback', '/payment/notify'];
+  const isPublic = publicPaths.some(p => req.path.startsWith(p))
+    || req.path.startsWith('/api/internal/')
+    || req.path.startsWith('/internal/');
+  if (isPublic) {
     return next();
   }
 
-  // Open API 端点跳过 (用签名认证)
-  if (req.path.startsWith('/api/open/')) {
+  // Open API 端点跳过 (用签名认证) — 兼容有/无 /api 前缀
+  if (req.path.startsWith('/api/open/') || req.path.startsWith('/open/')) {
     return next();
   }
 
   // 通联支付回调跳过 (由支付平台服务器调用)
-  if (req.path.startsWith('/api/allinpay/')) {
+  if (req.path.startsWith('/api/allinpay/') || req.path.startsWith('/allinpay/')) {
     return next();
   }
 

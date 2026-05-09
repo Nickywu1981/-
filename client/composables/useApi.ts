@@ -19,7 +19,7 @@ async function request<T = any>(
   options: { method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'; body?: any; params?: Record<string, any> } = {},
 ): Promise<T> {
   const config = useRuntimeConfig();
-  const base = config.public.apiBase || '/api';
+  const base = config.public.apiBase as string;
   const fullUrl = url.startsWith('http') ? url : `${base}${url}`;
 
   const headers: Record<string, string> = {};

@@ -31,7 +31,7 @@ export function validateV4(schema) {
   return (req, res, next) => {
     const result = schema.safeParse(req.body);
     if (!result.success) {
-      return error(res, ERROR_CODE.VALIDATION_ERROR, result.error.errors.map(e => e.message).join('; '));
+      return error(res, ERROR_CODE.VALIDATION_ERROR, result.error.issues.map(e => e.message).join('; '));
     }
     req.validated = result.data;
     next();

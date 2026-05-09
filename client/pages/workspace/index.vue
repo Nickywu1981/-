@@ -83,12 +83,13 @@ onMounted(async () => {
 
 .wh-quick { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 32px; }
 .wh-qcard {
-  display: flex; align-items: center; gap: 8px; padding: 14px 12px; background: #fff;
+  display: flex; align-items: center; gap: 10px; padding: 16px 16px; background: #fff;
   border-radius: 10px; border: 1px solid var(--brd, #ebebea); cursor: pointer; transition: all 0.15s;
+  min-height: 52px;
 }
-.wh-qcard:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
-.wh-qicon { font-size: 18px; flex-shrink: 0; }
-.wh-qname { font-size: 13px; font-weight: 500; color: var(--tx, #171717); white-space: nowrap; }
+.wh-qcard:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.06); border-color: #c4c4c8; }
+.wh-qicon { font-size: 18px; line-height: 1; flex-shrink: 0; }
+.wh-qname { font-size: 13px; font-weight: 500; color: var(--tx, #171717); white-space: nowrap; line-height: 1; }
 
 /* 最近项目 */
 .wh-recent { }
