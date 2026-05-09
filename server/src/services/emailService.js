@@ -179,3 +179,27 @@ export function checkVerified(email) {
   CODE_CACHE.delete(key);
   return true;
 }
+
+// ==================== 模板管理（后台） ====================
+
+export async function listTemplates() {
+  return emailTemplateDao.listTemplates();
+}
+
+export async function updateTemplate(id, fields) {
+  const data = await emailTemplateDao.updateTemplate(id, fields);
+  if (!data) throw new BusinessError(400, '没有可更新的字段');
+  return data;
+}
+
+export async function createTemplate(fields) {
+  if (!fields.template_code || !fields.name || !fields.content) {
+    throw new BusinessError(400, '模板编码、名称和内容不能为空');
+  }
+  const id = await emailTemplateDao.insertTemplate(fields);
+  return { id };
+}
+
+export async function deleteTemplate(id) {
+  await emailTemplateDao.deleteTemplate(id);
+}

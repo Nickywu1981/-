@@ -1,5 +1,4 @@
 import * as emailService from '../services/emailService.js';
-import * as emailTemplateDao from '../dao/emailTemplateDao.js';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
@@ -28,28 +27,28 @@ export async function verifyCode(req, res, next) {
 
 export async function listTemplates(_req, res, next) {
   try {
-    const data = await emailTemplateDao.listTemplates();
+    const data = await emailService.listTemplates();
     return success(res, data);
   } catch (err) { next(err); }
 }
 
 export async function updateTemplate(req, res, next) {
   try {
-    const data = await emailTemplateDao.updateTemplate(req.params.id, req.body);
+    const data = await emailService.updateTemplate(req.params.id, req.body);
     return success(res, data, '邮件模板已更新');
   } catch (err) { next(err); }
 }
 
 export async function createTemplate(req, res, next) {
   try {
-    const id = await emailTemplateDao.insertTemplate(req.body);
+    const { id } = await emailService.createTemplate(req.body);
     return success(res, { id }, '邮件模板已创建');
   } catch (err) { next(err); }
 }
 
 export async function deleteTemplate(req, res, next) {
   try {
-    await emailTemplateDao.deleteTemplate(req.params.id);
+    await emailService.deleteTemplate(req.params.id);
     return success(res, {}, '邮件模板已删除');
   } catch (err) { next(err); }
 }
