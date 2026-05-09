@@ -26,6 +26,14 @@ export async function translateProduct(req, res) {
   } catch (e) { error(res, e.status || 500, e.message); }
 }
 
+// 短视频脚本生成
+export async function generateScript(req, res) {
+  try {
+    const result = await copywritingService.generateScript(req.user.id, req.body);
+    success(res, result, '脚本生成成功');
+  } catch (e) { error(res, e.status || 500, e.message); }
+}
+
 // 平台列表
 export async function listPlatforms(_req, res) {
   try {

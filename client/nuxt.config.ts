@@ -1,5 +1,5 @@
 export default defineNuxtConfig({
-  ssr: false, // 开发环境禁用SSR避免OOM，生产通过nginx+PM2开启
+  ssr: true, // 启用 SSR 确保页面正常渲染
   devtools: { enabled: process.env.NODE_ENV !== 'production' },
 
   css: ['vant/lib/index.css', '@/assets/css/design-tokens.css'],
@@ -67,6 +67,20 @@ export default defineNuxtConfig({
     vueI18n: './i18n.config.ts',
     defaultLocale: 'zh',
     strategy: 'prefix_except_default',
+    // 浏览器语言自动检测 + IP 回退
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: 'movio_lang',
+      cookieCrossOrigin: false,
+      cookieSecure: false,
+      redirectOn: 'root',
+      alwaysRedirect: false,
+      fallbackLocale: 'zh',
+    },
+    // 根据 Accept-Language 自动匹配
+    experimental: {
+      localeDetector: './locales/locale-detector.ts',
+    },
   },
 
   // PWA 渐进式应用配置
@@ -133,6 +147,12 @@ export default defineNuxtConfig({
   },
 
   vite: {
+    server: {
+      fs: {
+        strict: false,
+        allow: ['..'],
+      },
+    },
     css: {
       preprocessorOptions: {
         scss: { additionalData: '' },

@@ -2,7 +2,7 @@ import { Router } from 'express';
 import {
   submitMainImage, submitSceneImage, submitDetailH5,
   submitBatchTask, submitRetouch, submitRemoveBg, submitWhiteBg,
-  getTaskResult, listMyTasks,
+  getTaskResult, listMyTasks, cancelTask, retryTask,
 } from '../controller/imageController.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
@@ -65,5 +65,7 @@ router.post('/white-bg', authMiddleware, tierGuard('image'), heavyLimiter, valid
 // 任务查询
 router.get('/tasks', authMiddleware, validate(paginationSchema, 'query'), asyncHandler(listMyTasks));
 router.get('/tasks/:taskId', authMiddleware, asyncHandler(getTaskResult));
+router.post('/tasks/:taskId/cancel', authMiddleware, asyncHandler(cancelTask));
+router.post('/tasks/:taskId/retry', authMiddleware, asyncHandler(retryTask));
 
 export default router;

@@ -86,6 +86,8 @@ import { setCsrfCookie, csrfProtection } from './middleware/csrf.js';
 import cspMiddleware from './middleware/csp.js';
 import openApiRoutes from './route/openApiRoutes.js';
 import openApiKeyRoutes from './route/openApiKeyRoutes.js';
+import auditLogRoutes from './route/auditLogRoutes.js';
+import compareRoutes from './route/compareRoutes.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -254,6 +256,7 @@ app.use('/api/recharge', rechargeRoutes);
 app.use('/api/allinpay', allinpayRoutes);
 app.use('/api/automation', automationRoutes);
 app.use('/api/admin/ai-logs', aiLogRoutes);
+app.use('/api/admin/audit-logs', auditLogRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/help', helpRoutes);
 app.use('/api/collections', collectionRoutes);
@@ -268,6 +271,7 @@ app.use('/api/compliance', complianceRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/platform-specs', platformSpecRoutes);
 app.use('/api/ai-dispatch', heavyLimiter, aiDispatchRoutes);  // 多模型统一调度: dispatch/categories/health/stats/cache
+app.use('/api/compare', compareRoutes);
 
 // 404
 app.use((_req, res) => {

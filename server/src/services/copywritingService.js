@@ -14,6 +14,10 @@ const PLATFORM_RULES = {
   lazada:   { name: 'Lazada', maxTitleLen: 120, keywordSep: ' ', minKeywords: 3, maxKeywords: 10 },
   amazon:   { name: 'Amazon', maxTitleLen: 200, keywordSep: ' ', minKeywords: 5, maxKeywords: 15 },
   tiktok:   { name: 'TikTok Shop', maxTitleLen: 60, keywordSep: ' ', minKeywords: 2, maxKeywords: 6 },
+  xiaohongshu: { name: '小红书', maxTitleLen: 20, keywordSep: ' ', minKeywords: 1, maxKeywords: 3 },
+  kuaishou: { name: '快手', maxTitleLen: 30, keywordSep: '#', minKeywords: 2, maxKeywords: 5 },
+  alibaba_intl: { name: '阿里巴巴国际站', maxTitleLen: 128, keywordSep: ' ', minKeywords: 3, maxKeywords: 12 },
+  wish: { name: 'Wish', maxTitleLen: 200, keywordSep: ' ', minKeywords: 3, maxKeywords: 10 },
 };
 
 export { SUPPORTED_LANGUAGES, PLATFORM_RULES };
@@ -107,6 +111,38 @@ export async function translateProduct(userId, { productName, description, featu
 
 export async function getHistory(userId, { type, page = 1, pageSize = 20 }) {
   return copywritingDao.listHistory({ userId, type, page, pageSize });
+}
+
+function buildScriptPrompt({ productName, platform = 'douyin', duration = 30, style = 'trending', language = 'zh-CN', hookStyle = 'question' }) {
+  const rule = PLATFORM_RULES[platform] || PLATFORM_RULES.douyin;
+  const solutionEnd = Math.floor(duration * 0.7);
+  const demoEnd = Math.floor(duration * 0.9);
+  return copywriting.scriptGen.template
+    .replace('{productName}', productName)
+    .replace('{platform}', rule.name)
+    .replace('{duration}', String(duration))
+    .replace('{style}', style)
+    .replace('{language}', language)
+    .replace('{hookStyle}', hookStyle)
+    .replace('{solutionEnd}', String(solutionEnd))
+    .replace('{demoEnd}', String(demoEnd));
+}
+
+export async function generateScript(userId, params) {
+  if (!params.productName) throw new BusinessError(400, '商品名称不能为空');
+  const prompt = buildScriptPrompt(params);
+  const modelId = params.model || 'deepseek-v4-flash';
+  const startTime = Date.now();
+  try {
+    const wrapped = await infer(modelId, { prompt, temperature: 0.8, maxTokens: 2048 });
+    const out = wrapped.output;
+    const tokenUsed = out.usage?.totalTokens || 0;
+    await copywritingDao.insertHistory({ userId, type: 'script', inputs: params, outputs: out.text, modelId, tokenUsed });
+    return { script: out.text, tokenUsed, model: wrapped.modelId, latency: Date.now() - startTime };
+  } catch (err) {
+    await copywritingDao.insertHistory({ userId, type: 'script', inputs: params, outputs: null, modelId, tokenUsed: 0, status: 'failed', errorMsg: err.message });
+    throw err;
+  }
 }
 
 export async function deleteRecord(id, userId) {

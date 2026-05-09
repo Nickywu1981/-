@@ -95,9 +95,9 @@
     </header>
 
     <main class="main">
-      <ErrorBoundary>
+      <SharedErrorBoundary>
         <slot />
-      </ErrorBoundary>
+      </SharedErrorBoundary>
     </main>
 
     <footer class="footer">
@@ -122,7 +122,7 @@
     </footer>
 
     <!-- 全局搜索面板 (Ctrl+K) -->
-    <CommandPalette />
+    <SearchCommandPalette />
     <!-- 新手引导（首次访问自动弹出） -->
     <OnboardingGuide />
     <!-- 全局 Toast 通知 -->

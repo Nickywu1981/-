@@ -132,6 +132,54 @@ export async function completeJob(jobId, resultData) {
 }
 
 /**
+ * 取消任务 (仅 queued / processing 状态可取消)
+ */
+export async function cancelJob(jobId, userId) {
+  const conn = await db.getConnection();
+  try {
+    const [rows] = await conn.query(
+      'SELECT id, status FROM job_queue WHERE id = ? AND user_id = ?',
+      [jobId, userId],
+    );
+    if (rows.length === 0) throw new BusinessError(404, '任务不存在');
+    if (!['queued', 'processing'].includes(rows[0].status)) {
+      throw new BusinessError(400, `当前状态 ${rows[0].status} 不可取消`);
+    }
+    await conn.query(
+      "UPDATE job_queue SET status = 'cancelled', completed_at = NOW() WHERE id = ?",
+      [jobId],
+    );
+    return { job_id: jobId, status: 'cancelled' };
+  } finally {
+    conn.release();
+  }
+}
+
+/**
+ * 手动重试失败任务
+ */
+export async function retryJob(jobId, userId) {
+  const conn = await db.getConnection();
+  try {
+    const [rows] = await conn.query(
+      'SELECT id, status FROM job_queue WHERE id = ? AND user_id = ?',
+      [jobId, userId],
+    );
+    if (rows.length === 0) throw new BusinessError(404, '任务不存在');
+    if (!['failed', 'cancelled'].includes(rows[0].status)) {
+      throw new BusinessError(400, `当前状态 ${rows[0].status} 不可重试`);
+    }
+    await conn.query(
+      "UPDATE job_queue SET status = 'queued', retry_count = 0, error_message = NULL, completed_at = NULL WHERE id = ?",
+      [jobId],
+    );
+    return { job_id: jobId, status: 'queued' };
+  } finally {
+    conn.release();
+  }
+}
+
+/**
  * 任务失败 (含重试逻辑)
  */
 export async function failJob(jobId, errorMessage) {

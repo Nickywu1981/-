@@ -21,9 +21,9 @@ function parseTitleList(text) {
 // PLATFORM_RULES — 9 大电商平台规则
 // ============================================================
 describe('PLATFORM_RULES', () => {
-  it('包含 9 个平台', () => {
+  it('包含 13 个平台', () => {
     const keys = Object.keys(PLATFORM_RULES);
-    expect(keys).toHaveLength(9);
+    expect(keys).toHaveLength(13);
     expect(keys).toContain('taobao');
     expect(keys).toContain('jd');
     expect(keys).toContain('douyin');

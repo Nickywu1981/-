@@ -1,5 +1,6 @@
 <template>
-  <div class="error-boundary" :class="{ fullpage }">
+  <slot v-if="!hasError" />
+  <div v-else class="error-boundary" :class="{ fullpage }">
     <span class="eb-icon">{{ icon }}</span>
     <h3 class="eb-title">{{ title }}</h3>
     <p v-if="message" class="eb-message">{{ message }}</p>
@@ -23,6 +24,8 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+
 const router = useRouter()
 
 const props = withDefaults(defineProps<{
@@ -43,6 +46,8 @@ const props = withDefaults(defineProps<{
 })
 
 defineEmits<{ retry: []; back: [] }>()
+
+const hasError = computed(() => !!(props.message || props.errorCode || props.detail))
 
 function goHome() {
   router.push('/')

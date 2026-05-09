@@ -4,6 +4,8 @@ import { adminOnly, editorOrAbove } from '../middleware/rbac.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
 import { z } from 'zod';
+import { success, error } from '../utils/response.js';
+import * as diyService from '../services/diyService.js';
 import {
   listPages, getPage, createPage, updatePage,
   publishPage, unpublishPage, republishPage,
@@ -83,6 +85,47 @@ router.post('/:id/versions/:version/rollback', authMiddleware, editorOrAbove, as
 router.post('/batch/publish', authMiddleware, adminOnly, validate(idsSchema), asyncHandler(batchPublish));
 router.post('/batch/unpublish', authMiddleware, adminOnly, validate(idsSchema), asyncHandler(batchUnpublish));
 router.post('/batch/delete', authMiddleware, adminOnly, validate(idsSchema), asyncHandler(batchDelete));
+
+// ==================== 版本差异对比 ====================
+function compareConfigs(a, b) {
+  if (!a && !b) return [];
+  if (!a) return [{ path: 'root', type: 'added', b: JSON.stringify(b) }];
+  if (!b) return [{ path: 'root', type: 'removed', a: JSON.stringify(a) }];
+  const diffs = [];
+  const aSections = a?.sections || [];
+  const bSections = b?.sections || [];
+  const max = Math.max(aSections.length, bSections.length);
+  for (let i = 0; i < max; i++) {
+    if (!aSections[i]) { diffs.push({ path: `sections[${i}]`, type: 'added', b: bSections[i]?.type }); }
+    else if (!bSections[i]) { diffs.push({ path: `sections[${i}]`, type: 'removed', a: aSections[i]?.type }); }
+    else if (JSON.stringify(aSections[i]) !== JSON.stringify(bSections[i])) {
+      diffs.push({ path: `sections[${i}]`, type: 'modified', aType: aSections[i]?.type, bType: bSections[i]?.type });
+    }
+  }
+  return diffs;
+}
+
+router.post('/:id/versions/diff', authMiddleware, asyncHandler(async (req, res) => {
+  const { versionA, versionB } = req.body;
+  if (!versionA || !versionB) return error(res, 400, '需要两个版本号');
+  const va = await diyService.getVersion(req.params.id, req.tenantId, versionA);
+  const vb = await diyService.getVersion(req.params.id, req.tenantId, versionB);
+  if (!va || !vb) return error(res, 404, '版本不存在');
+  const diff = compareConfigs(va.mobile_config, vb.mobile_config);
+  success(res, { versionA: va, versionB: vb, diff });
+}));
+
+// ==================== 页面访问统计 ====================
+router.get('/:id/stats', authMiddleware, asyncHandler(async (req, res) => {
+  const page = await diyService.getPageById(req.params.id, req.tenantId);
+  if (!page) return error(res, 404, '页面不存在');
+  success(res, {
+    accessCount: page.access_count || 0,
+    status: { 0: '草稿', 1: '已发布', 2: '已下线', 3: '回收站' }[page.status] || '未知',
+    publishTime: page.publish_time,
+    latestVersion: page.latest_published_version,
+  });
+}));
 
 // ==================== 组件库 ====================
 router.post('/components', authMiddleware, editorOrAbove, validate(componentSchema), asyncHandler(createComponent));

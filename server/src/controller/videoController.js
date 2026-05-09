@@ -1,4 +1,5 @@
 import * as videoService from '../services/videoService.js';
+import { cancelJob, retryJob } from '../services/job-queue.service.js';
 import { success, error, listResult } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { parsePagination } from '../utils/pagination.js';
@@ -104,6 +105,26 @@ export async function listMyVideoTasks(req, res, next) {
     const data = await videoService.listMyTasks(req.user.id, { status, type, page, pageSize });
     return listResult(res, data);
   } catch (err) {
+    next(err);
+  }
+}
+
+export async function cancelVideoTask(req, res, next) {
+  try {
+    const data = await cancelJob(req.params.taskId, req.user.id);
+    return success(res, data, '任务已取消');
+  } catch (err) {
+    if (err.status) return error(res, err.status, err.message);
+    next(err);
+  }
+}
+
+export async function retryVideoTask(req, res, next) {
+  try {
+    const data = await retryJob(req.params.taskId, req.user.id);
+    return success(res, data, '任务已重新排队');
+  } catch (err) {
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }

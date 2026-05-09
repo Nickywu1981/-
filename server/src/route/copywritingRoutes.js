@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { generateTitles, generateDescription, translateProduct, listPlatforms, listLanguages, listHistory, deleteHistory } from '../controller/copywritingController.js';
+import { generateTitles, generateDescription, generateScript, translateProduct, listPlatforms, listLanguages, listHistory, deleteHistory } from '../controller/copywritingController.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
@@ -38,6 +38,16 @@ const translateSchema = z.object({
   model: z.string().max(50).optional(),
 });
 
+const scriptSchema = z.object({
+  productName: z.string().min(1).max(200),
+  platform: z.enum(['taobao','tmall','jd','pinduoduo','douyin','shopee','lazada','amazon','tiktok','xiaohongshu','kuaishou','alibaba_intl','wish']).optional(),
+  duration: z.number().int().min(15).max(180).optional(),
+  style: z.enum(['trending','storytelling','tutorial','unboxing','review']).optional(),
+  language: z.string().max(10).optional(),
+  hookStyle: z.enum(['question','shock','curiosity','problem']).optional(),
+  model: z.string().max(50).optional(),
+});
+
 const historyQuerySchema = z.object({ type: z.string().max(50).optional() });
 
 router.use(authMiddleware);
@@ -45,6 +55,7 @@ router.use(authMiddleware);
 // 生成
 router.post('/titles', validate(titleGenSchema), asyncHandler(generateTitles));
 router.post('/description', validate(descriptionSchema), asyncHandler(generateDescription));
+router.post('/script', validate(scriptSchema), asyncHandler(generateScript));
 router.post('/translate', validate(translateSchema), asyncHandler(translateProduct));
 
 // 参考数据

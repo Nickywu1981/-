@@ -2,7 +2,7 @@ import { Router } from 'express';
 import {
   submitImg2Video, submitMulti2Video, submitVideoPackaging,
   submitActionTransfer, submitPersonReplace, submitDigitalHuman,
-  getVideoTaskResult, listMyVideoTasks,
+  getVideoTaskResult, listMyVideoTasks, cancelVideoTask, retryVideoTask,
 } from '../controller/videoController.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
@@ -56,5 +56,7 @@ router.post('/digital-human', authMiddleware, heavyLimiter, tierGuard('video'), 
 // 任务查询
 router.get('/tasks', authMiddleware, validate(paginationSchema, 'query'), asyncHandler(listMyVideoTasks));
 router.get('/tasks/:taskId', authMiddleware, asyncHandler(getVideoTaskResult));
+router.post('/tasks/:taskId/cancel', authMiddleware, asyncHandler(cancelVideoTask));
+router.post('/tasks/:taskId/retry', authMiddleware, asyncHandler(retryVideoTask));
 
 export default router;
