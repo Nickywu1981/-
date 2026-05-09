@@ -2,7 +2,7 @@
 <template>
   <div class="wp">
     <div class="wp-card">
-      <div class="wp-icon">⚙</div>
+      <div class="wp-icon">🏭</div>
       <h2>功能即将上线，敬请期待</h2>
       <p>一站串联电商业态全流程 — 选品调研、内容创作、上新发布、客服接待、评价管理、数据复盘、竞品监控、违规风控</p>
       <p class="wp-detail">我们正在为您打造电商全链路自动化能力，上线后将支持客服、运营、数据复盘等全岗位AI自动化</p>
