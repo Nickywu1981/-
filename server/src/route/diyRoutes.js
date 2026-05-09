@@ -5,7 +5,7 @@ import { editorOrAbove } from '../middleware/rbac.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
 import { z } from 'zod';
-import { ERROR_CODE } from '../constants/errorCodes.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 import { DIY_PAGE_STATUS_LABEL } from '../constants/domainStatus.js';
 import { success, error } from '../utils/response.js';
 import * as diyService from '../services/diyService.js';

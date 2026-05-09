@@ -6,7 +6,7 @@
 import { Event } from './event.js';
 import { InvocationContext } from './invocationContext.js';
 import logger from '../../utils/logger.js';
-import { BusinessError } from '../../utils/errors.js';
+import { BusinessError } from '../../utils/businessError.js';
 import { ERROR_CODE } from '../../constants/errorCode.js';
 
 // ======================== BaseAgent ========================
