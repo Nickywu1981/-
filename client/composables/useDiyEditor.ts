@@ -1,53 +1,56 @@
 /**
- * DIY 拖拽编辑器核心状态管理
+ * DIY 拖拽编辑器核心状态管理 (TypeScript)
  * 包含：undo/redo 栈、section 操作、剪贴板、选择状态、网格吸附
  */
+import type { DiySection, DiyComponent } from '~/types/diy'
+
 export function useDiyEditor() {
-  const sections = ref([])
-  const selectedIdxs = ref([])            // 多选支持
-  const clipboard = ref(null)             // 复制/粘贴
-  const previewMode = ref('mobile')       // mobile | pc
-  const snapEnabled = ref(true)           // 网格吸附
+  const sections = ref<DiySection[]>([])
+  const selectedIdxs = ref<number[]>([])
+  const clipboard = ref<DiySection | null>(null)
+  const previewMode = ref<'mobile' | 'pc'>('mobile')
+  const snapEnabled = ref(true)
   const gridSize = 8
 
   // ── Undo / Redo ──
   const MAX_HISTORY = 60
-  const undoStack = ref([])
-  const redoStack = ref([])
+  const undoStack = ref<DiySection[][]>([])
+  const redoStack = ref<DiySection[][]>([])
 
   function pushHistory() {
-    undoStack.value.push(JSON.parse(JSON.stringify(sections.value)))
+    undoStack.value.push(structuredClone(sections.value))
     if (undoStack.value.length > MAX_HISTORY) undoStack.value.shift()
     redoStack.value = []
   }
 
-  function undo() {
+  function undo(): boolean {
     if (undoStack.value.length === 0) return false
-    redoStack.value.push(JSON.parse(JSON.stringify(sections.value)))
-    sections.value = undoStack.value.pop()
+    redoStack.value.push(structuredClone(sections.value))
+    sections.value = undoStack.value.pop()!
     selectedIdxs.value = []
     return true
   }
 
-  function redo() {
+  function redo(): boolean {
     if (redoStack.value.length === 0) return false
-    undoStack.value.push(JSON.parse(JSON.stringify(sections.value)))
-    sections.value = redoStack.value.pop()
+    undoStack.value.push(structuredClone(sections.value))
+    sections.value = redoStack.value.pop()!
     selectedIdxs.value = []
     return true
   }
 
   // ── Section 操作 ──
-  function addSection(comp, insertIdx = -1) {
+  function addSection(comp: DiyComponent, insertIdx = -1): number {
     pushHistory()
-    const config = JSON.parse(JSON.stringify(comp.default_config || { id: Date.now().toString(36), component: comp.component_code }))
-    const section = {
+    const config = structuredClone(comp.default_config || {})
+    config.id = Date.now().toString(36)
+    const section: DiySection = {
       id: 's' + Date.now(),
       component: comp.component_code,
       config,
       locked: false,
       hidden: false,
-      _style: {},   // 画布内联样式（圆角/阴影/间距）
+      _style: {},
     }
     const idx = insertIdx >= 0 ? insertIdx : sections.value.length
     sections.value.splice(idx, 0, section)
@@ -55,17 +58,17 @@ export function useDiyEditor() {
     return idx
   }
 
-  function duplicateSection(idx) {
+  function duplicateSection(idx: number) {
     if (idx < 0 || idx >= sections.value.length) return
     pushHistory()
-    const clone = JSON.parse(JSON.stringify(sections.value[idx]))
+    const clone = structuredClone(sections.value[idx])
     clone.id = 's' + Date.now()
-    clone.config = { ...clone.config, id: Date.now().toString(36) }
+    clone.config.id = Date.now().toString(36)
     sections.value.splice(idx + 1, 0, clone)
     selectedIdxs.value = [idx + 1]
   }
 
-  function removeSection(idx) {
+  function removeSection(idx: number) {
     if (idx < 0 || idx >= sections.value.length) return
     pushHistory()
     sections.value.splice(idx, 1)
@@ -79,7 +82,7 @@ export function useDiyEditor() {
     selectedIdxs.value = []
   }
 
-  function moveSection(idx, direction) {
+  function moveSection(idx: number, direction: number) {
     const newIdx = idx + direction
     if (newIdx < 0 || newIdx >= sections.value.length) return
     pushHistory()
@@ -94,7 +97,7 @@ export function useDiyEditor() {
     }
   }
 
-  function reorderSection(fromIdx, toIdx) {
+  function reorderSection(fromIdx: number, toIdx: number) {
     if (fromIdx === toIdx) return
     pushHistory()
     const item = sections.value.splice(fromIdx, 1)[0]
@@ -102,30 +105,30 @@ export function useDiyEditor() {
     selectedIdxs.value = [toIdx]
   }
 
-  function toggleHidden(idx) {
+  function toggleHidden(idx: number) {
     sections.value[idx].hidden = !sections.value[idx].hidden
   }
 
-  function toggleLock(idx) {
+  function toggleLock(idx: number) {
     sections.value[idx].locked = !sections.value[idx].locked
   }
 
-  function copySection(idx) {
+  function copySection(idx: number) {
     if (idx < 0 || idx >= sections.value.length) return
-    clipboard.value = JSON.parse(JSON.stringify(sections.value[idx]))
+    clipboard.value = structuredClone(sections.value[idx])
   }
 
   function pasteSection(insertIdx = -1) {
     if (!clipboard.value) return
     pushHistory()
-    const clone = JSON.parse(JSON.stringify(clipboard.value))
+    const clone = structuredClone(clipboard.value)
     clone.id = 's' + Date.now()
     const idx = insertIdx >= 0 ? insertIdx : sections.value.length
     sections.value.splice(idx, 0, clone)
     selectedIdxs.value = [idx]
   }
 
-  function selectSection(idx, multi = false) {
+  function selectSection(idx: number, multi = false) {
     if (multi) {
       const pos = selectedIdxs.value.indexOf(idx)
       if (pos >= 0) selectedIdxs.value.splice(pos, 1)
@@ -139,18 +142,18 @@ export function useDiyEditor() {
   function selectAll() { selectedIdxs.value = sections.value.map((_, i) => i) }
 
   // ── 网格吸附 ──
-  function snapToGrid(val) {
+  function snapToGrid(val: number): number {
     if (!snapEnabled.value) return val
     return Math.round(val / gridSize) * gridSize
   }
 
   // ── 序列化 ──
-  function toConfigJson() {
-    return { sections: JSON.parse(JSON.stringify(sections.value)) }
+  function toConfigJson(): { sections: DiySection[] } {
+    return { sections: structuredClone(sections.value) }
   }
 
-  function loadFromConfig(config) {
-    let cfg = typeof config === 'string' ? JSON.parse(config) : config
+  function loadFromConfig(config: string | { sections?: DiySection[] }) {
+    const cfg = typeof config === 'string' ? JSON.parse(config) : config
     sections.value = (cfg?.sections || []).map(s => ({
       ...s,
       locked: s.locked ?? false,

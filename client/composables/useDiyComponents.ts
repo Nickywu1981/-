@@ -1,8 +1,15 @@
 /**
- * DIY 编辑器组件库定义
+ * DIY 编辑器组件库定义 (TypeScript)
  * 12 类组件，含默认配置、属性schema、缩略图标识
  */
-export const DIY_COMPONENTS = {
+import type { DiyComponent, DiyComponentCategory, ComponentProp } from '~/types/diy'
+
+interface DiyComponentCatalog {
+  categories: DiyComponentCategory[]
+  components: DiyComponent[]
+}
+
+export const DIY_COMPONENTS: DiyComponentCatalog = {
   categories: [
     { key: 'banner',   label: '横幅/轮播', icon: '🖼️' },
     { key: 'product',  label: '商品/营销', icon: '🛒' },
@@ -21,7 +28,7 @@ export const DIY_COMPONENTS = {
       props: [
         { key: 'height', label: '高度(px)', type: 'number', default: 200 },
         { key: 'autoplay', label: '自动播放', type: 'checkbox', default: true },
-        { key: 'interval', label: '间隔(ms)', type: 'number', default: 3000, show: (cfg) => cfg.autoplay },
+        { key: 'interval', label: '间隔(ms)', type: 'number', default: 3000, show: (cfg: Record<string, any>) => cfg.autoplay },
         { key: 'radius', label: '圆角(px)', type: 'number', default: 8 },
       ],
     },
@@ -159,18 +166,18 @@ export const DIY_COMPONENTS = {
   ],
 }
 
-export function getComponentByCode(code) {
+export function getComponentByCode(code: string): DiyComponent | undefined {
   return DIY_COMPONENTS.components.find(c => c.component_code === code)
 }
 
-export function getPropDef(comp, key) {
+export function getPropDef(comp: DiyComponent | undefined, key: string): ComponentProp | undefined {
   return comp?.props?.find(p => p.key === key)
 }
 
-export function getDefaultConfig(code) {
+export function getDefaultConfig(code: string): Record<string, any> {
   const comp = getComponentByCode(code)
   if (!comp) return {}
-  const cfg = {}
+  const cfg: Record<string, any> = {}
   comp.props?.forEach(p => { cfg[p.key] = p.default })
   return cfg
 }

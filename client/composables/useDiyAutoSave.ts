@@ -1,21 +1,40 @@
 /**
- * DIY 编辑器自动保存
+ * DIY 编辑器自动保存 (TypeScript)
  * - 空闲 30 秒后自动保存版本快照
- * - 网络中断自动恢复
+ * - 崩溃恢复检测
  * - 保存状态指示器
  */
-export function useDiyAutoSave(pageId, getSections, { delay = 30000 } = {}) {
-  const lastSaved = ref(null)
+import type { DiySection } from '~/types/diy'
+
+interface AutoSaveState {
+  lastSaved: Ref<Date | null>
+  saving: Ref<boolean>
+  saveError: Ref<string | null>
+  pendingChanges: Ref<number>
+  recovered: Ref<boolean>
+  formatLastSaved: () => string
+  autoSave: () => Promise<void>
+  checkRecovery: () => Promise<{ id: number; config_json: { sections: DiySection[] } } | null>
+  start: () => void
+  stop: () => void
+}
+
+export function useDiyAutoSave(
+  pageId: Ref<number | null>,
+  getSections: () => DiySection[],
+  { delay = 30000 } = {},
+): AutoSaveState {
+  const lastSaved = ref<Date | null>(null)
   const saving = ref(false)
-  const saveError = ref(null)
+  const saveError = ref<string | null>(null)
   const pendingChanges = ref(0)
   const recovered = ref(false)
 
-  let timer = null
-  let unwatch = null
+  let timer: ReturnType<typeof setTimeout> | null = null
+  let unwatch: (() => void) | null = null
 
   function resetTimer() {
-    clearTimeout(timer)
+    if (timer) clearTimeout(timer)
     pendingChanges.value++
     timer = setTimeout(autoSave, delay)
   }
@@ -28,14 +47,13 @@ export function useDiyAutoSave(pageId, getSections, { delay = 30000 } = {}) {
       const sections = getSections()
       await $fetch(`/api/diy/${pageId.value}/versions/auto-save`, {
         method: 'POST',
-        body: { configJson: { sections: JSON.parse(JSON.stringify(sections)) } },
+        body: { mobileConfig: { sections: structuredClone(sections) } },
       })
       lastSaved.value = new Date()
       pendingChanges.value = 0
-    } catch (e) {
+    } catch (e: any) {
       saveError.value = e.data?.msg || e.message
-      // 失败后 10 秒重试
-      clearTimeout(timer)
+      if (timer) clearTimeout(timer)
       timer = setTimeout(autoSave, 10000)
     } finally {
       saving.value = false
@@ -43,11 +61,11 @@ export function useDiyAutoSave(pageId, getSections, { delay = 30000 } = {}) {
   }
 
   async function checkRecovery() {
-    if (!pageId.value) return
+    if (!pageId.value) return null
     try {
       const res = await $fetch(`/api/diy/${pageId.value}/versions/latest-auto`)
       if (res?.data && res.data.config_json) {
-        recovered.value = res.data
+        recovered.value = true
         return res.data
       }
     } catch { /* no recovery */ }
@@ -60,11 +78,11 @@ export function useDiyAutoSave(pageId, getSections, { delay = 30000 } = {}) {
   }
 
   function stop() {
-    clearTimeout(timer)
+    if (timer) clearTimeout(timer)
     if (unwatch) { unwatch(); unwatch = null }
   }
 
-  function formatLastSaved() {
+  function formatLastSaved(): string {
     if (!lastSaved.value) return ''
     const diff = Date.now() - lastSaved.value.getTime()
     if (diff < 10000) return '刚刚保存'

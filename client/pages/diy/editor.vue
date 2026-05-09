@@ -86,71 +86,18 @@
             <span class="prop-static">{{ getCompName(sections[selectedIdx].component) }}</span>
           </div>
 
-        <!-- 通用属性 -->
-        <div class="prop-group" v-if="hasProp('title')">
-          <label>标题</label>
-          <input v-model="sections[selectedIdx].config.title" @input="markDirty" />
-        </div>
-        <div class="prop-group" v-if="hasProp('subtitle')">
-          <label>副标题</label>
-          <input v-model="sections[selectedIdx].config.subtitle" @input="markDirty" />
-        </div>
-        <div class="prop-group" v-if="hasProp('content')">
-          <label>文本内容</label>
-          <textarea v-model="sections[selectedIdx].config.content" rows="3" @input="markDirty"></textarea>
-        </div>
-        <div class="prop-group" v-if="hasProp('align')">
-          <label>对齐方式</label>
-          <select v-model="sections[selectedIdx].config.align" @change="markDirty">
-            <option value="left">左对齐</option>
-            <option value="center">居中</option>
-            <option value="right">右对齐</option>
-          </select>
-        </div>
-        <div class="prop-group" v-if="hasProp('columns')">
-          <label>列数</label>
-          <select v-model.number="sections[selectedIdx].config.columns" @change="markDirty">
-            <option :value="1">1列</option>
-            <option :value="2">2列</option>
-            <option :value="3">3列</option>
-            <option :value="4">4列</option>
-          </select>
-        </div>
-        <div class="prop-group" v-if="hasProp('color')">
-          <label>颜色</label>
-          <input type="color" v-model="sections[selectedIdx].config.color" @input="markDirty" />
-        </div>
-        <div class="prop-group" v-if="hasProp('direction')">
-          <label>排列方向</label>
-          <select v-model="sections[selectedIdx].config.direction" @change="markDirty">
-            <option value="row">水平</option>
-            <option value="column">垂直</option>
-          </select>
-        </div>
-        <div class="prop-group" v-if="hasProp('gap')">
-          <label>间距 (px)</label>
-          <input type="number" v-model.number="sections[selectedIdx].config.gap" @input="markDirty" />
-        </div>
-        <div class="prop-group" v-if="hasProp('radius')">
-          <label>圆角 (px)</label>
-          <input type="number" v-model.number="sections[selectedIdx].config.radius" @input="markDirty" />
-        </div>
-        <div class="prop-group" v-if="hasProp('fontSize')">
-          <label>字号 (px)</label>
-          <input type="number" v-model.number="sections[selectedIdx].config.fontSize" @input="markDirty" />
-        </div>
-        <div class="prop-group" v-if="hasProp('bgColor')">
-          <label>背景色</label>
-          <input type="color" v-model="sections[selectedIdx].config.bgColor" @input="markDirty" />
-        </div>
-        <div class="prop-group" v-if="hasProp('autoplay')">
-          <label>自动播放</label>
-          <input type="checkbox" v-model="sections[selectedIdx].config.autoplay" @change="markDirty" />
-        </div>
-        <div class="prop-group" v-if="hasProp('showPrice')">
-          <label>显示价格</label>
-          <input type="checkbox" v-model="sections[selectedIdx].config.showPrice" @change="markDirty" />
-        </div>
+          <div v-for="prop in currentProps" :key="prop.key" class="prop-group">
+            <label>{{ prop.label }}</label>
+            <input v-if="prop.type === 'text'" v-model="sections[selectedIdx].config[prop.key]" @input="markDirty">
+            <textarea v-else-if="prop.type === 'textarea'" v-model="sections[selectedIdx].config[prop.key]" rows="3" @input="markDirty"></textarea>
+            <select v-else-if="prop.type === 'select'" v-model="sections[selectedIdx].config[prop.key]" @change="markDirty">
+              <option v-for="opt in prop.options" :key="opt" :value="opt">{{ opt }}</option>
+            </select>
+            <input v-else-if="prop.type === 'number'" type="number" v-model.number="sections[selectedIdx].config[prop.key]" :step="prop.step || 1" @input="markDirty">
+            <input v-else-if="prop.type === 'color'" type="color" v-model="sections[selectedIdx].config[prop.key]" @input="markDirty">
+            <input v-else-if="prop.type === 'checkbox'" type="checkbox" v-model="sections[selectedIdx].config[prop.key]" @change="markDirty">
+            <input v-else type="text" v-model="sections[selectedIdx].config[prop.key]" @input="markDirty">
+          </div>
         </div>
 
         <!-- 图层 Tab -->
@@ -247,7 +194,12 @@ const componentCats = DIY_COMPONENTS.categories
 function componentsByCat(cat: string) { return DIY_COMPONENTS.components.filter(c => c.category === cat) }
 function getCompName(code: string) { return getComponentByCode(code)?.name || code }
 function getCompIcon(code: string) { return getComponentByCode(code)?.icon || '◆' }
-function hasProp(key: string) { const idx = selectedIdx.value; if (idx < 0 || !sections.value[idx]) return false; const comp = getComponentByCode(sections.value[idx].component); return comp?.props?.some(p => p.key === key) ?? false }
+const currentProps = computed(() => {
+  const idx = selectedIdx.value
+  if (idx < 0 || !sections.value[idx]) return []
+  const comp = getComponentByCode(sections.value[idx].component)
+  return comp?.props || []
+})
 function markDirty() { dirty.value = true }
 
 function selectSection(idx: number) { editor.selectSection(idx) }
@@ -374,7 +326,19 @@ const autoSave = useDiyAutoSave(
 )
 autoSave.start()
 
-onMounted(async () => { await loadPage() })
+onMounted(async () => {
+  const id = route.query.id
+  if (!id) { navigateTo('/diy'); return }
+  pageInfo.value = { id: Number(id) }
+
+  const recovered = await autoSave.checkRecovery()
+  if (recovered) {
+    editor.loadFromConfig(recovered.config_json)
+    toast.info('检测到未保存的更改，已自动恢复')
+    return
+  }
+  await loadPage()
+})
 </script>
 
 <style scoped>
