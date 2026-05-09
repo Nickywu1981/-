@@ -1,5 +1,16 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
+
+// Mock the API module before useAuthStore imports it
+vi.mock('@/composables/useApi', () => ({
+  api: {
+    get: vi.fn(() => Promise.resolve({})),
+    post: vi.fn(() => Promise.resolve({})),
+    put: vi.fn(() => Promise.resolve({})),
+    delete: vi.fn(() => Promise.resolve({})),
+  },
+}));
+
 import { useAuthStore } from '../../stores/useAuthStore';
 
 describe('useAuthStore', () => {
@@ -72,7 +83,6 @@ describe('useAuthStore', () => {
 
     it('login uses email field for email-like accounts', () => {
       const store = useAuthStore();
-      // verify the branching logic — string with @ uses email field
       const accountWithAt = 'user@example.com';
       const isEmail = accountWithAt.includes('@');
       expect(isEmail).toBe(true);
