@@ -26,6 +26,9 @@
 </template>
 
 <script setup lang="ts">
+import { formatDateTime } from '@/utils/format'
+
+const formatDate = formatDateTime
 
 const records = ref<any[]>([])
 const balance = ref(0)
@@ -54,7 +57,6 @@ async function fetchRecords() {
   finally { loading.value = false }
 }
 function goPage(p: number) { page.value = p; fetchRecords() }
-function formatDate(d: string) { return d ? new Date(d).toLocaleString('zh-CN') : '-' }
 </script>
 
 <style scoped>

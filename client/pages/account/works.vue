@@ -39,6 +39,8 @@
 </template>
 
 <script setup lang="ts">
+import { formatDateTime } from '@/utils/format';
+const formatDate = (d: string) => d ? formatDateTime(d) : '-';
 
 const works = ref<any[]>([])
 const loading = ref(true)
@@ -64,10 +66,6 @@ const typeMap: Record<string,string> = {
 }
 
 function typeLabel(t: string) { return typeMap[t] || t }
-function formatDate(d: string) {
-  if (!d) return '-'
-  return new Date(d).toLocaleDateString('zh-CN', { year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' })
-}
 
 async function fetchWorks() {
   loading.value = true; error.value = ''

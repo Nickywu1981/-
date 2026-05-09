@@ -87,6 +87,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useAppPage } from '~/composables/useAppPage'
+import { formatDateTime } from '@/utils/format'
+
+const formatTime = formatDateTime
 
 
 
@@ -154,11 +157,6 @@ async function doRedeem(points: number) {
 function loadMoreTx() {
   txPage.value++
   fetchTransactions()
-}
-
-function formatTime(t: string) {
-  if (!t) return ''
-  return new Date(t).toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
 }
 
 onMounted(() => {

@@ -24,6 +24,9 @@
 </template>
 
 <script setup lang="ts">
+import { formatDateTime } from '@/utils/format'
+
+const formatDate = formatDateTime
 
 const orders = ref<any[]>([])
 const loading = ref(true)
@@ -49,7 +52,6 @@ async function fetchOrders() {
 function goPage(p: number) { page.value = p; fetchOrders() }
 function statusClass(s: string) { const m: Record<string,string> = { paid:'badge-ok', refunded:'badge-warn', cancelled:'badge-err' }; return m[s] || '' }
 function statusLabel(s: string) { const m: Record<string,string> = { paid:'已支付', pending:'待支付', refunded:'已退款', cancelled:'已取消' }; return m[s] || s }
-function formatDate(d: string) { return d ? new Date(d).toLocaleString('zh-CN') : '-' }
 </script>
 
 <style scoped>

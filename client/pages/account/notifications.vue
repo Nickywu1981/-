@@ -44,7 +44,9 @@
 </template>
 
 <script lang="ts" setup>
+import { formatDateTime } from '@/utils/format'
 
+const formatTime = formatDateTime
 
 const notifications = ref<any[]>([])
 const loading = ref(true)
@@ -82,17 +84,6 @@ async function markAll() {
     await $fetch('/api/notifications/read-all', { method: 'PUT' })
     notifications.value.forEach((n: any) => n.is_read = 1)
   } catch { /* ignore */ }
-}
-
-function formatTime(t: string) {
-  if (!t) return ''
-  const d = new Date(t)
-  const now = new Date()
-  const diff = now.getTime() - d.getTime()
-  if (diff < 60000) return '刚刚'
-  if (diff < 3600000) return `${Math.floor(diff / 60000)}分钟前`
-  if (diff < 86400000) return `${Math.floor(diff / 3600000)}小时前`
-  return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
 }
 
 onMounted(fetchList)

@@ -74,6 +74,9 @@
 </template>
 
 <script setup lang="ts">
+import { formatDateTime } from '@/utils/format'
+
+const formatTime = formatDateTime
 
 const list = ref<any[]>([])
 const total = ref(0)
@@ -89,7 +92,6 @@ function planLabel(t: number | string) {
   const map: Record<string, string> = { '1': '月卡', '2': '季卡', '3': '年卡' }
   return map[String(t)] || '未知'
 }
-function formatTime(t: string) { return t?.slice(0, 16) || '-' }
 
 async function fetch() {
   loading.value = true

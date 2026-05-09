@@ -77,6 +77,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { formatDate } from '@/utils/format'
 
 definePageMeta({ layout: 'workspace' })
 
@@ -99,7 +100,6 @@ const typeLabels: Record<string, string> = {
 }
 
 function typeLabel(t: string) { return typeLabels[t] || t }
-function formatDate(d: string) { return d ? new Date(d).toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '' }
 
 onMounted(async () => {
   try {

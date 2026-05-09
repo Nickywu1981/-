@@ -133,8 +133,8 @@
 
 <script setup>
 import { useSiteConfig } from '#composables/useSiteConfig';
-
-;
+import { formatDateTime } from '@/utils/format'
+const formatTime = formatDateTime
 
 const { config: headerCfg } = useSiteConfig('page.video_translate');
 
@@ -170,9 +170,6 @@ function typeLabel(type) {
     video_voice_translate: '语音翻译', video_subtitle_translate: '字幕翻译', video_face_translate: '面容翻译',
   };
   return m[type] || type;
-}
-function formatTime(t) {
-  return t ? new Date(t).toLocaleString('zh-CN') : '';
 }
 
 async function doSubmit() {

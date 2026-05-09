@@ -54,6 +54,9 @@
 </template>
 
 <script setup lang="ts">
+import { formatDateTime } from '@/utils/format'
+
+const formatTime = formatDateTime
 
 
 import ImageLightbox from '@/components/shared/ImageLightbox.vue';
@@ -145,11 +148,6 @@ function typeIcon(t: string) {
     color_swap: '🎨', style_transfer: '🖌', wrinkle_remove: '👔', image_translate: '🌐',
   };
   return m[t] || '📁';
-}
-
-function formatTime(t: string) {
-  if (!t) return '-';
-  return new Date(t).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' });
 }
 
 function redoTask(item: any) {

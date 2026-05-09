@@ -163,6 +163,8 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
 import { useApi } from '~/composables/useApi';
+import { formatDateTime } from '@/utils/format';
+const formatDate = formatDateTime;
 
 const api = useApi();
 
@@ -196,11 +198,6 @@ const platformIcons = {
 
 function statusClass(s) {
   return { success: 'success', failed: 'failed', error: 'failed', pending: 'pending', processing: 'processing', scheduled: 'scheduled' }[s] || '';
-}
-
-function formatDate(d) {
-  if (!d) return '';
-  return new Date(d).toLocaleString('zh-CN');
 }
 
 function togglePlatform(key) {

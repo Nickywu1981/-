@@ -81,7 +81,9 @@
 </template>
 
 <script setup lang="ts">
+import { formatDateTime } from '@/utils/format'
 
+const formatTime = formatDateTime
 
 const profile = ref<any>(null);
 const loading = ref(true);
@@ -94,11 +96,6 @@ async function fetchProfile() {
     profile.value = res.data || res;
   } catch (e: any) { error.value = '加载失败，请重试'; }
   loading.value = false;
-}
-
-function formatTime(t: string) {
-  if (!t) return '-';
-  return new Date(t).toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
 onMounted(fetchProfile);

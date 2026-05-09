@@ -103,6 +103,8 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useAppPage } from '~/composables/useAppPage'
+import { formatDate as _fmt } from '@/utils/format'
+const formatDate = (d: string) => d ? _fmt(d, 'MM-DD HH:mm') : ''
 
 
 
@@ -207,11 +209,6 @@ function loadMoreComm() {
 function statusLabel(s: string) {
   const map: Record<string, string> = { pending: '待结算', settled: '已结算', withdrawn: '已提现', cancelled: '已取消' }
   return map[s] || s
-}
-
-function formatDate(d: string) {
-  if (!d) return ''
-  return new Date(d).toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
 }
 
 onMounted(() => {

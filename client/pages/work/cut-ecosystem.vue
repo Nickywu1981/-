@@ -133,6 +133,7 @@
 </template>
 
 <script setup>
+import { formatDate } from '@/utils/format';
 const toast = useToast()
 const api = useApi()
 
@@ -237,11 +238,6 @@ function downloadDraft() {
   a.download = `${draftResult.value.draft.draft_name || 'movio-draft'}.json`
   a.click()
   URL.revokeObjectURL(url)
-}
-
-function formatDate(d) {
-  if (!d) return ''
-  return new Date(d).toLocaleDateString('zh-CN')
 }
 </script>
 

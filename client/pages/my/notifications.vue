@@ -24,7 +24,9 @@
 </template>
 
 <script setup lang="ts">
+import { formatDateTime } from '@/utils/format'
 
+const formatTime = formatDateTime
 
 const list = ref<any[]>([])
 const loading = ref(true)
@@ -48,11 +50,6 @@ async function markRead(id: number) {
 async function markAllRead() {
   await $fetch('/api/notifications/read-all', { method: 'POST', credentials: 'include' })
   list.value.forEach(i => i.is_read = true)
-}
-
-function formatTime(t: string) {
-  if (!t) return ''
-  return new Date(t).toLocaleString('zh-CN', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' })
 }
 
 onMounted(fetchData)

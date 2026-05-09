@@ -54,6 +54,9 @@
 
 <script setup lang="ts">
 import * as echarts from 'echarts'
+import { formatDateTime } from '@/utils/format'
+
+const formatTime = formatDateTime
 
 
 
@@ -72,12 +75,6 @@ const statCards = computed(() => [
   { label: '已用积分', value: stats.creditUsed, sub: '', highlight: false },
   { label: '当前套餐', value: stats.planName, sub: stats.resetDate ? `下月 ${stats.resetDate} 重置` : '', highlight: false },
 ])
-
-function formatTime(ts: string) {
-  if (!ts) return '-'
-  const d = new Date(ts)
-  return d.getMonth()+1+'/'+d.getDate()+' '+d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0')
-}
 
 function initChart(el: HTMLDivElement | undefined) {
   if (!el) return null

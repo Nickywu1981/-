@@ -319,6 +319,8 @@
 </template>
 
 <script setup lang="ts">
+import { formatDateTime } from '@/utils/format';
+const formatTime = (iso: string) => iso ? formatDateTime(iso, 'HH:mm:ss') : '';
 const toast = useToast()
 
 // ---- Tab & State ----
@@ -597,11 +599,6 @@ function formatDuration(ms: number) {
   if (!ms) return '0ms'
   if (ms < 1000) return ms + 'ms'
   return (ms / 1000).toFixed(2) + 's'
-}
-
-function formatTime(iso: string) {
-  if (!iso) return ''
-  return new Date(iso).toLocaleString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
 }
 
 function truncate(s: string, n: number) {

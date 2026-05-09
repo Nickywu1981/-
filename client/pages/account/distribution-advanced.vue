@@ -104,6 +104,8 @@
 
 <script setup>
 ;
+import { formatDate } from '@/utils/format'
+
 const toast = useToast();
 
 const subTabs = [
@@ -192,8 +194,6 @@ watch(activeSub, (val) => {
 async function copyText(text) {
   try { await navigator.clipboard.writeText(text); toast.success('已复制'); } catch { toast.error('复制失败'); }
 }
-
-function formatDate(d) { return d ? new Date(d).toLocaleDateString('zh-CN') : ''; }
 
 onMounted(() => { loadTier(); loadPerformance(); });
 </script>

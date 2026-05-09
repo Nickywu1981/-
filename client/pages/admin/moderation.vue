@@ -67,7 +67,9 @@
 </template>
 
 <script setup lang="ts">
+import { formatDateTime } from '@/utils/format'
 
+const formatTime = formatDateTime
 
 const filter = reactive({ status: '', type: '' as string });
 const list = ref<any[]>([]);
@@ -132,11 +134,6 @@ function reviewText(s: number) {
   if (s === 1) return '已通过';
   if (s === 2) return '已拒绝';
   return '待审核';
-}
-
-function formatTime(t: string) {
-  if (!t) return '-';
-  return new Date(t).toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
 }
 </script>
 

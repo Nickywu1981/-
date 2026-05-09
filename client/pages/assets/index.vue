@@ -63,6 +63,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { formatDate as _fmt } from '@/utils/format';
+const formatDate = (d: string) => d ? _fmt(d, 'MM-DD') : '';
 
 const toast = useToast()
 definePageMeta({ layout: 'workspace' })
@@ -117,11 +119,6 @@ function loadMore() {
 
 function downloadItem(item: any) { if (item.url) window.open(item.url, '_blank') }
 function copyLink(url: string) { navigator.clipboard.writeText(url) }
-
-function formatDate(d: string) {
-  if (!d) return ''
-  return new Date(d).toLocaleString('zh-CN', { month: '2-digit', day: '2-digit' })
-}
 
 onMounted(() => fetchAssets())
 </script>

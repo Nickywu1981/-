@@ -60,6 +60,8 @@
 </template>
 
 <script setup lang="ts">
+import { formatDateTime } from '@/utils/format';
+const formatDate = (d: string) => d ? formatDateTime(d) : '';
 
 
 const filterType = ref('')
@@ -88,11 +90,6 @@ function statusLabel(s: number) {
 function statusClass(s: number) {
   const map: Record<number, string> = { 0: 's-queue', 1: 's-proc', 2: 's-done', 3: 's-fail' }
   return map[s] || ''
-}
-
-function formatDate(d: string) {
-  if (!d) return ''
-  return new Date(d).toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
 }
 
 async function fetchWorks() {

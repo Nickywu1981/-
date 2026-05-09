@@ -91,6 +91,9 @@ fetch('/api/open/v1/image/remove-bg', {
 
 <script setup lang="ts">
 import { api } from '@/composables/useApi'
+import { formatDateTime } from '@/utils/format'
+
+const formatTime = formatDateTime
 
 const keys = ref<any[]>([])
 const loading = ref(false)
@@ -143,11 +146,6 @@ async function deleteKey(k: any) {
     msg.value = e.data?.msg || e.message || '删除失败'
     msgErr.value = true
   }
-}
-
-function formatTime(t: string) {
-  if (!t) return ''
-  return new Date(t).toLocaleDateString('zh-CN')
 }
 
 onMounted(loadKeys)
