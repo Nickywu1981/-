@@ -265,7 +265,7 @@ function onLayerDrop(e, targetIdx) {
 
 async function loadComponents() {
   try { const res = await $fetch('/api/diy/components'); components.value = res.data || [] }
-  catch (e) { console.error(e) }
+  catch (e) { toast.error('加载组件库失败') }
 }
 
 async function loadPage() {
@@ -276,7 +276,7 @@ async function loadPage() {
     pageInfo.value = res.data
     const config = typeof res.data.config_json === 'string' ? JSON.parse(res.data.config_json) : res.data.config_json
     sections.value = config?.sections || []
-  } catch (e) { console.error(e) }
+  } catch (e) { toast.error('加载页面失败') }
 }
 
 async function savePage() {
