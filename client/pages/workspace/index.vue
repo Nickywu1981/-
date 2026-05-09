@@ -61,10 +61,10 @@ const recentProjects = ref<{ icon: string; name: string; time: string; path: str
 
 onMounted(async () => {
   try {
-    const data = await $fetch('/api/auth/me', { credentials: 'include' }).catch(() => ({}))
+    const data = await $fetch('/api/auth/me', { credentials: 'include' })
     recentProjects.value = (data as any).recentItems || []
+    if (!recentProjects.value.length) throw new Error('empty')
   } catch {
-    // 无数据时展示 mock
     recentProjects.value = [
       { icon: '🖼', name: '夏季连衣裙白底图', time: '2小时前', path: '/workspace/creation' },
       { icon: '🎥', name: '护肤品展示视频', time: '昨天', path: '/workspace/creation' },

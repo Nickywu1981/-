@@ -96,7 +96,7 @@ async function handleLogout() {
     toast.add({ title: '已退出登录', color: 'green' })
     router.push('/login')
   } catch {
-    router.push('/login')
+    toast.add({ title: '退出失败，请重试', color: 'orange' })
   }
 }
 
@@ -107,7 +107,9 @@ onMounted(async () => {
     userPoints.value = (data as any).points || 0
     isAdmin.value = !!(data as any).isAdmin
     userInitial.value = userName.value ? userName.value.charAt(0).toUpperCase() : 'U'
-  } catch {}
+  } catch {
+    router.push('/login')
+  }
 })
 
 definePageMeta({ middleware: ['auth'] })

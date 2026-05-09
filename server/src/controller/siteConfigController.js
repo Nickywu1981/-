@@ -7,7 +7,7 @@ export const getPublicSiteConfig = async (req, res) => {
   try {
     const map = await getPublicConfigMap();
     success(res, map);
-  } catch (err) { error(res, err.status || 500, 'Failed to load site config'); }
+  } catch (err) { error(res, err.status || 500, err.message || 'Failed to load site config'); }
 };
 
 // GET /api/admin/site-config - admin only
@@ -15,7 +15,7 @@ export const listAllConfig = async (req, res) => {
   try {
     const rows = await getAllConfig();
     success(res, rows);
-  } catch (err) { error(res, err.status || 500, 'Failed to load config'); }
+  } catch (err) { error(res, err.status || 500, err.message || 'Failed to load config'); }
 };
 
 // POST /api/admin/site-config - admin only
@@ -25,7 +25,7 @@ export const createConfig = async (req, res) => {
     if (!key || value === undefined) return error(res, ERROR_CODE.BAD_REQUEST, 'key and value required');
     await saveConfig(key, typeof value === 'object' ? JSON.stringify(value) : String(value), type || 'text', description || '');
     success(res, { key }, 'Config created');
-  } catch (err) { error(res, err.status || 500, 'Failed to create config'); }
+  } catch (err) { error(res, err.status || 500, err.message || 'Failed to create config'); }
 };
 
 // PUT /api/admin/site-config/:key - admin only
@@ -36,7 +36,7 @@ export const updateConfig = async (req, res) => {
     if (!key || value === undefined) return error(res, ERROR_CODE.BAD_REQUEST, 'key and value required');
     await saveConfig(key, typeof value === 'object' ? JSON.stringify(value) : String(value), type || 'text', description || '');
     success(res, { key }, 'Config updated');
-  } catch (err) { error(res, err.status || 500, 'Failed to update config'); }
+  } catch (err) { error(res, err.status || 500, err.message || 'Failed to update config'); }
 };
 
 // DELETE /api/admin/site-config/:id - admin only
@@ -45,5 +45,5 @@ export const removeConfig = async (req, res) => {
     const affected = await deleteConfig(Number(req.params.id));
     if (!affected) return error(res, ERROR_CODE.NOT_FOUND, 'Not found');
     success(res, null, 'Config deleted');
-  } catch (err) { error(res, err.status || 500, 'Failed to delete config'); }
+  } catch (err) { error(res, err.status || 500, err.message || 'Failed to delete config'); }
 };

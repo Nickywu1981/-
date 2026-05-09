@@ -29,7 +29,7 @@ function api() {
     } else {
       expect(res.status).toBe(200);
     }
-    return { data, cookie };
+    return { data: data?.data, cookie };
   }
 
   return {

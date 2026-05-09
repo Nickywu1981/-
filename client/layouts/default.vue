@@ -223,13 +223,13 @@ async function loadUnread() {
   try {
     const res: any = await $fetch('/api/notifications/unread-count', { credentials: 'include' });
     unreadCount.value = res.data?.count || 0;
-  } catch { /* noop */ }
+  } catch { /* 非关键，静默降级 */ }
 }
 
 async function doLogout() {
   menuOpen.value = false;
   mobileOpen.value = false;
-  await $fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }).catch(() => {})
+  $fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }).catch(() => {})
   user.value = null;
   navigateTo('/login');
 }
