@@ -2,12 +2,12 @@
  * ADK Agent #4 — 多语言本地化 Agent（跨境本地化 API）
  * "中文产品一键出 7 国物料，比本地团队更懂当地审美"
  */
-import { LlmAgent } from '../core/agent.js'
-import { FunctionTool } from '../core/tool.js'
+import { LlmAgent } from '../core/agent.js';
+import { FunctionTool } from '../core/tool.js';
 
 const translateTool = new FunctionTool('translate', async (params) => {
-  const { default: service } = await import('../../services/copywritingService.js')
-  return service.translate(params.text, params.targetLang, params.sourceLang || 'zh')
+  const { default: service } = await import('../../services/copywritingService.js');
+  return service.translate(params.text, params.targetLang, params.sourceLang || 'zh');
 }, {
   description: '翻译并本地化内容到目标语言，适应本地审美',
   parameters: {
@@ -15,7 +15,7 @@ const translateTool = new FunctionTool('translate', async (params) => {
     targetLang: { type: 'string', description: '目标语言: en/ja/ko/es/fr/de/pt/th' },
     sourceLang: { type: 'string', description: '源语言，默认 zh' },
   },
-})
+});
 
 export const LocalizeAgent = new LlmAgent({
   name: 'localize',
@@ -26,4 +26,4 @@ export const LocalizeAgent = new LlmAgent({
   model: 'deepseek-v4-pro',
   tools: [translateTool],
   outputKey: 'localize_result',
-})
+});

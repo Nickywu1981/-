@@ -11,10 +11,10 @@ export class FunctionTool {
    * @param {{ description?: string, parameters?: object }} opts
    */
   constructor(name, fn, opts = {}) {
-    this.name = name
-    this.fn = fn
-    this.description = opts.description || ''
-    this.parameters = opts.parameters || {}
+    this.name = name;
+    this.fn = fn;
+    this.description = opts.description || '';
+    this.parameters = opts.parameters || {};
   }
 
   /** 生成 JSON Schema 供 LLM function calling 使用 */
@@ -30,7 +30,7 @@ export class FunctionTool {
           required: Object.keys(this.parameters),
         },
       },
-    }
+    };
   }
 }
 
@@ -41,9 +41,9 @@ export class AgentTool {
    * @param {{ description?: string }} opts
    */
   constructor(agent, opts = {}) {
-    this.name = agent.name
-    this.agent = agent
-    this.description = opts.description || `Delegate to ${agent.name}`
+    this.name = agent.name;
+    this.agent = agent;
+    this.description = opts.description || `Delegate to ${agent.name}`;
   }
 
   toSchema() {
@@ -54,6 +54,6 @@ export class AgentTool {
         description: this.description,
         parameters: { type: 'object', properties: { query: { type: 'string', description: 'The task/query to delegate' } }, required: ['query'] },
       },
-    }
+    };
   }
 }

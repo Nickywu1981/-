@@ -2,12 +2,12 @@
  * ADK Agent #5 — 内容生成 Agent（写作力）
  * "标题/卖点/详情/直播脚本 — 比文案更懂转化率"
  */
-import { LlmAgent } from '../core/agent.js'
-import { FunctionTool } from '../core/tool.js'
+import { LlmAgent } from '../core/agent.js';
+import { FunctionTool } from '../core/tool.js';
 
 const titleGenTool = new FunctionTool('generate_titles', async (params) => {
-  const { default: service } = await import('../../services/copywritingService.js')
-  return service.generateTitles(params.productName, params.platform, params.count || 5)
+  const { default: service } = await import('../../services/copywritingService.js');
+  return service.generateTitles(params.productName, params.platform, params.count || 5);
 }, {
   description: '生成电商商品标题，带平台适配和转化词优化',
   parameters: {
@@ -15,11 +15,11 @@ const titleGenTool = new FunctionTool('generate_titles', async (params) => {
     platform: { type: 'string', description: '平台: taobao/jd/douyin/shopee/tiktok' },
     count: { type: 'number', description: '生成数量' },
   },
-})
+});
 
 const sellingPointTool = new FunctionTool('generate_selling_points', async (params) => {
-  const { default: service } = await import('../../services/copywritingService.js')
-  return service.generateSellingPoints(params.productName, params.platform, params.count || 5)
+  const { default: service } = await import('../../services/copywritingService.js');
+  return service.generateSellingPoints(params.productName, params.platform, params.count || 5);
 }, {
   description: '生成卖点文案，突出转化关键词',
   parameters: {
@@ -27,11 +27,11 @@ const sellingPointTool = new FunctionTool('generate_selling_points', async (para
     platform: { type: 'string', description: '平台' },
     count: { type: 'number', description: '生成数量' },
   },
-})
+});
 
 const scriptTool = new FunctionTool('generate_script', async (params) => {
-  const { default: service } = await import('../../services/copywritingService.js')
-  return service.generateScript(params.productName, params.platform, params.duration || 60)
+  const { default: service } = await import('../../services/copywritingService.js');
+  return service.generateScript(params.productName, params.platform, params.duration || 60);
 }, {
   description: '生成带货直播/短视频脚本',
   parameters: {
@@ -39,7 +39,7 @@ const scriptTool = new FunctionTool('generate_script', async (params) => {
     platform: { type: 'string', description: '平台: douyin/tiktok' },
     duration: { type: 'number', description: '视频时长(秒)' },
   },
-})
+});
 
 export const ContentAgent = new LlmAgent({
   name: 'content',
@@ -50,4 +50,4 @@ export const ContentAgent = new LlmAgent({
   model: 'deepseek-v4-pro',
   tools: [titleGenTool, sellingPointTool, scriptTool],
   outputKey: 'content_result',
-})
+});

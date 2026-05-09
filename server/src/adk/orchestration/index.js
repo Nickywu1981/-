@@ -2,35 +2,35 @@
  * ADK 编排器 — SequentialAgent / ParallelAgent / LoopAgent
  * 确定性工作流编排，自身不使用 LLM
  */
-import { BaseAgent } from '../core/agent.js'
+import { BaseAgent } from '../core/agent.js';
 
 /** 串行流水线：A → B → C */
 export class SequentialAgent extends BaseAgent {
   constructor(opts) {
-    super(opts)
+    super(opts);
   }
 
   async _runAsyncImpl(ctx) {
-    const results = []
+    const results = [];
     for (const sub of this.subAgents) {
-      const r = await sub.runAsync(ctx)
-      results.push(r)
+      const r = await sub.runAsync(ctx);
+      results.push(r);
     }
-    return results
+    return results;
   }
 }
 
 /** 并行扇出：A，B，C 同时跑 */
 export class ParallelAgent extends BaseAgent {
   constructor(opts) {
-    super(opts)
+    super(opts);
   }
 
   async _runAsyncImpl(ctx) {
     const results = await Promise.all(
-      this.subAgents.map(sub => sub.runAsync(ctx))
-    )
-    return results
+      this.subAgents.map(sub => sub.runAsync(ctx)),
+    );
+    return results;
   }
 }
 
@@ -42,23 +42,23 @@ export class LoopAgent extends BaseAgent {
    * @param {Function} [opts.condition] (ctx, iteration, lastResult) => boolean
    */
   constructor(opts) {
-    super(opts)
-    this.maxIterations = opts.maxIterations || 5
-    this.condition = opts.condition || null
+    super(opts);
+    this.maxIterations = opts.maxIterations || 5;
+    this.condition = opts.condition || null;
   }
 
   async _runAsyncImpl(ctx) {
-    const results = []
+    const results = [];
     for (let i = 0; i < this.maxIterations; i++) {
       // 每次迭代跑所有 subAgent
       for (const sub of this.subAgents) {
-        const r = await sub.runAsync(ctx)
-        results.push(r)
+        const r = await sub.runAsync(ctx);
+        results.push(r);
       }
       if (this.condition && !(await this.condition(ctx, i, results[results.length - 1]))) {
-        break
+        break;
       }
     }
-    return results
+    return results;
   }
 }

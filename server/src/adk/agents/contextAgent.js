@@ -2,7 +2,7 @@
  * ADK Agent #3 — 上下文管理 Agent（理解力）
  * "客户说'那个红色的'，秘书知道指的是上次聊的红色连衣裙"
  */
-import { LlmAgent } from '../core/agent.js'
+import { LlmAgent } from '../core/agent.js';
 
 export const ContextAgent = new LlmAgent({
   name: 'context',
@@ -14,4 +14,4 @@ export const ContextAgent = new LlmAgent({
 返回格式: { "disambiguated": "明确的产品/意图", "confidence": 0.0-1.0, "contextUsed": "引用的历史信息" }`,
   model: 'deepseek-v4-pro',
   outputKey: 'context_result',
-})
+});

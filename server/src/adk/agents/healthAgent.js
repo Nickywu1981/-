@@ -2,7 +2,7 @@
  * ADK Agent #8 — 健康监控 Agent（永不离职）
  * "没有请假、不闹情绪、不跳槽 — 每次调用都是巅峰状态"
  */
-import { LlmAgent } from '../core/agent.js'
+import { LlmAgent } from '../core/agent.js';
 
 export const HealthAgent = new LlmAgent({
   name: 'health',
@@ -17,4 +17,4 @@ export const HealthAgent = new LlmAgent({
 返回格式: { "status": "healthy|degraded|down", "checks": {...}, "uptime": N, "responsibleFor": "24×7 永不离职" }`,
   model: 'deepseek-v4-flash',
   outputKey: 'health_result',
-})
+});

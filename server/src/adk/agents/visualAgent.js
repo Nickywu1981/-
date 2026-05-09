@@ -2,16 +2,16 @@
  * ADK Agent #7 — 视觉生成 Agent（视觉力）
  * "15s/30s TikTok 商品视频，100 SKU 并行 2 小时搞定"
  */
-import { LlmAgent } from '../core/agent.js'
-import { FunctionTool } from '../core/tool.js'
+import { LlmAgent } from '../core/agent.js';
+import { FunctionTool } from '../core/tool.js';
 
 const imageGenTool = new FunctionTool('generate_image', async (params) => {
-  const { default: service } = await import('../../services/image.service.js')
+  const { default: service } = await import('../../services/image.service.js');
   return service.submitMainImage({
     productName: params.productName,
     style: params.style || 'ecommerce',
     userId: params.userId,
-  })
+  });
 }, {
   description: '生成电商商品图片/主图',
   parameters: {
@@ -19,16 +19,16 @@ const imageGenTool = new FunctionTool('generate_image', async (params) => {
     style: { type: 'string', description: '风格' },
     userId: { type: 'number', description: '用户ID' },
   },
-})
+});
 
 const videoGenTool = new FunctionTool('generate_video', async (params) => {
-  const { default: service } = await import('../../services/video.service.js')
+  const { default: service } = await import('../../services/video.service.js');
   return service.submitVideo({
     productName: params.productName,
     duration: params.duration || 15,
     platform: params.platform || 'tiktok',
     userId: params.userId,
-  })
+  });
 }, {
   description: '生成短视频广告',
   parameters: {
@@ -37,11 +37,11 @@ const videoGenTool = new FunctionTool('generate_video', async (params) => {
     platform: { type: 'string', description: '平台' },
     userId: { type: 'number', description: '用户ID' },
   },
-})
+});
 
 const batchTool = new FunctionTool('batch_generate', async (params) => {
-  const { default: service } = await import('../../services/batch.service.js')
-  return service.queue(params.skuList, params.type, params.userId)
+  const { default: service } = await import('../../services/batch.service.js');
+  return service.queue(params.skuList, params.type, params.userId);
 }, {
   description: '批量并行生成，100 SKU 并行处理',
   parameters: {
@@ -49,7 +49,7 @@ const batchTool = new FunctionTool('batch_generate', async (params) => {
     type: { type: 'string', description: '类型: image/video' },
     userId: { type: 'number', description: '用户ID' },
   },
-})
+});
 
 export const VisualAgent = new LlmAgent({
   name: 'visual',
@@ -61,4 +61,4 @@ export const VisualAgent = new LlmAgent({
   model: 'deepseek-v4-pro',
   tools: [imageGenTool, videoGenTool, batchTool],
   outputKey: 'visual_result',
-})
+});

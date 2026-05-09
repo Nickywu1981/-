@@ -2,7 +2,7 @@
  * ADK Agent #2 — 注意力引擎 Agent（判断力/优先级）
  * "退款投诉立刻处理，新品咨询排队稍后 — 优先级的艺术"
  */
-import { LlmAgent } from '../core/agent.js'
+import { LlmAgent } from '../core/agent.js';
 
 export const AttentionAgent = new LlmAgent({
   name: 'attention',
@@ -15,4 +15,4 @@ export const AttentionAgent = new LlmAgent({
 返回格式: { "priority": "urgent|high|normal|low", "category": "分类", "reason": "判断依据" }`,
   model: 'deepseek-v4-flash',
   outputKey: 'attention_result',
-})
+});

@@ -164,10 +164,8 @@ export function tokenLookup(token) {
   const idx = loadTokenIndex();
   const tokens = idx && idx.tokens ? idx.tokens : {};
   const entry = tokens[token];
-  return {
-    found: !!entry,
-    entries: entry || [],
-  };
+  const entries = entry ? (Array.isArray(entry) ? entry : [entry]) : [];
+  return { found: !!entry, entries };
 }
 
 /**

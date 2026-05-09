@@ -2,19 +2,19 @@
  * ADK Agent #6 — 风控合规 Agent（风控力）
  * "五层敏感词过滤，零违规处罚，比合规经理更严谨"
  */
-import { LlmAgent } from '../core/agent.js'
-import { FunctionTool } from '../core/tool.js'
+import { LlmAgent } from '../core/agent.js';
+import { FunctionTool } from '../core/tool.js';
 
 const checkTextTool = new FunctionTool('check_text_compliance', async (params) => {
-  const { default: service } = await import('../../services/sensitiveWordService.js')
-  return service.scan(params.text, { level: params.level || 5 })
+  const { default: service } = await import('../../services/sensitiveWordService.js');
+  return service.scan(params.text, { level: params.level || 5 });
 }, {
   description: '五层敏感词过滤扫描',
   parameters: {
     text: { type: 'string', description: '待检测文本' },
     level: { type: 'number', description: '过滤层级 1-5，默认 5 全覆盖' },
   },
-})
+});
 
 export const GuardAgent = new LlmAgent({
   name: 'guard',
@@ -29,4 +29,4 @@ export const GuardAgent = new LlmAgent({
   model: 'deepseek-v4-pro',
   tools: [checkTextTool],
   outputKey: 'guard_result',
-})
+});
