@@ -1,4 +1,5 @@
 import * as brandDao from '../dao/brandDao.js';
+import { BusinessError } from '../utils/businessError.js';
 
 export async function getBrandSettings(userId) {
   const row = await brandDao.getBrand(userId);
@@ -18,10 +19,6 @@ export async function saveBrandSettings(userId, data) {
   for (const key of allowed) {
     if (data[key] !== undefined) sanitized[key] = data[key];
   }
-  if (Object.keys(sanitized).length === 0) {
-    const err = new Error('没有需要更新的字段');
-    err.statusCode = 400;
-    throw err;
-  }
+  if (Object.keys(sanitized).length === 0) throw new BusinessError(400, '没有需要更新的字段');
   return brandDao.upsertBrand(userId, sanitized);
 }

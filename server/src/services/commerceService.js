@@ -19,11 +19,7 @@ export async function getPlans() {
 
 export async function purchasePlan(userId, planType) {
   const plan = await creditDao.getPlanByType(planType);
-  if (!plan || !plan.status) {
-    const err = new Error('套餐不存在或已下架');
-    err.statusCode = 400;
-    throw err;
-  }
+  if (!plan || !plan.status) throw new BusinessError(400, '套餐不存在或已下架');
 
   const membership = await creditDao.getMembership(userId);
   const now = new Date();

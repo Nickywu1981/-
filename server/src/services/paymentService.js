@@ -4,6 +4,7 @@
  * 通联支付聚合收银台：创建订单 → 返回 H5 支付链接 → 回调通知 → 开通会员
  */
 import { ORDER_STATUS } from '../constants/domainStatus.js';
+import { BusinessError } from '../utils/businessError.js';
 import * as allinpayService from '../services/allinpayService.js';
 import pool from '../dao/db.js';
 import allinpayConfig from '../config/allinpay.js';
@@ -23,17 +24,9 @@ export function getPlans() {
 
 export async function createPaymentOrder(userId, { planType, payChannel = 'wechat' }) {
   const plan = PLANS[planType];
-  if (!plan) {
-    const err = new Error('无效套餐');
-    err.statusCode = 400;
-    throw err;
-  }
+  if (!plan) throw new BusinessError(400, '无效套餐');
 
-  if (!['wechat', 'alipay', 'unionpay'].includes(payChannel)) {
-    const err = new Error('支付方式仅支持 wechat / alipay / unionpay');
-    err.statusCode = 400;
-    throw err;
-  }
+  if (!['wechat', 'alipay', 'unionpay'].includes(payChannel)) throw new BusinessError(400, '支付方式仅支持 wechat / alipay / unionpay');
 
   const result = await allinpayService.createUnifiedOrder({
     userId,
@@ -59,23 +52,11 @@ export async function createPaymentOrder(userId, { planType, payChannel = 'wecha
 // ==================== 沙箱支付（仅沙箱模式可用） ====================
 
 export async function sandboxPay(orderId) {
-  if (!allinpayConfig.isSandbox) {
-    const err = new Error('沙箱支付仅开发环境可用');
-    err.statusCode = 403;
-    throw err;
-  }
+  if (!allinpayConfig.isSandbox) throw new BusinessError(403, '沙箱支付仅开发环境可用');
 
   const order = await allinpayService.queryOrder(orderId);
-  if (!order) {
-    const err = new Error('订单不存在');
-    err.statusCode = 404;
-    throw err;
-  }
-  if (order.status !== ORDER_STATUS.PENDING) {
-    const err = new Error(`订单状态异常: ${order.status}`);
-    err.statusCode = 400;
-    throw err;
-  }
+  if (!order) throw new BusinessError(404, '订单不存在');
+  if (order.status !== ORDER_STATUS.PENDING) throw new BusinessError(400, `订单状态异常: ${order.status}`);
 
   // 模拟回调
   const mockBody = {
@@ -93,11 +74,7 @@ export async function sandboxPay(orderId) {
 
 export async function getOrder(reqsn) {
   const order = await allinpayService.queryOrder(reqsn);
-  if (!order) {
-    const err = new Error('订单不存在');
-    err.statusCode = 404;
-    throw err;
-  }
+  if (!order) throw new BusinessError(404, '订单不存在');
   return order;
 }
 
