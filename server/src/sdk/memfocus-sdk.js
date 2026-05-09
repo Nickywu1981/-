@@ -144,9 +144,18 @@ const localize = {
 };
 
 // ═══════════════ 能力 5: 写作力 ============================================
+const normalizeContentParams = (p = {}) => ({
+  productName: p.productName || p.product_name || p.name || '',
+  platform: p.platform || 'taobao',
+  style: p.style || p.tone || '',
+  keywords: p.keywords || [],
+  count: p.count || 3,
+  model: p.model,
+});
+
 const content = {
   generateTitles(userId, params = {}) {
-    return copywritingService.generateTitles(userId, params);
+    return copywritingService.generateTitles(userId, normalizeContentParams(params));
   },
 
   generateSellingPoints(userId, params = {}) {
@@ -235,7 +244,7 @@ const visual = {
   },
 
   processImage(userId, params = {}) {
-    return imageService.generateImage(userId, params);
+    return imageService.submitMainImage(userId, params);
   },
 };
 
