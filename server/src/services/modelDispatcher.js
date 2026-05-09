@@ -35,7 +35,7 @@ async function ensureModels() {
 
 // ==================== 模型分类管理 ====================
 
-const MODEL_CATEGORIES = ['text', 'image', 'video'];
+const MODEL_CATEGORIES = ['text', 'image', 'video', 'audio'];
 
 const categoryMap = new Map();
 
@@ -78,7 +78,7 @@ const TASK_CATEGORY_MAP = {
   // video
   img2video: 'video', multi2video: 'video', video_edit: 'video',
   video_packaging: 'video', action_transfer: 'video', person_replace: 'video',
-  digital_human: 'video', voice_gen: 'video', voice_clone: 'video',
+  digital_human: 'video', voice_gen: 'audio', voice_clone: 'audio', tts: 'audio',
 };
 
 export function getTaskCategory(taskType) {

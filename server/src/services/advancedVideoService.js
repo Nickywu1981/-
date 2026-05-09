@@ -21,7 +21,7 @@ export async function submitVoiceGen(userId, { text, voiceType = 'sweet-female',
 async function processVoiceGen(taskId, userId, params) {
   try {
     await updateTaskStatus(taskId, userId, { status: 1, progress: 20, progressMsg: '文本分析+分词...', workerId: process.pid.toString() });
-    const result = await infer('gpt-4o-mini', { text: params.text, task: 'tts', voiceType: params.voiceType, speed: params.speed, lang: 'zh' }, {
+    const result = await infer('edge-tts', { text: params.text, task: 'tts', voiceType: params.voiceType, speed: params.speed, lang: 'zh' }, {
       onProgress: (p) => updateTaskStatus(taskId, userId, { progress: Math.round(p * 0.95), progressMsg: p < 60 ? `合成语音: ${params.voiceType}...` : '后处理+降噪...' }),
     });
     const charCount = params.text.length, estimatedDuration = Math.max(1, Math.round(charCount / 4));
@@ -46,7 +46,7 @@ export async function submitVoiceClone(userId, { audioSampleUrl, text, presetVoi
 async function processVoiceClone(taskId, userId, params) {
   try {
     await updateTaskStatus(taskId, userId, { status: 1, progress: 15, progressMsg: '分析音频样本特征...', workerId: process.pid.toString() });
-    const result = await infer('stable-diffusion-img2img', { audioSampleUrl: params.audioSampleUrl, text: params.text, task: 'voice_clone' }, {
+    const result = await infer('elevenlabs-voice-clone', { audioSampleUrl: params.audioSampleUrl, text: params.text, task: 'voice_clone' }, {
       onProgress: (p) => { const msg = p < 30 ? '分析音频样本特征...' : p < 55 ? '提取音色指纹...' : p < 80 ? '训练克隆模型...' : '合成克隆语音...'; updateTaskStatus(taskId, userId, { progress: Math.round(p * 0.95), progressMsg: msg }); },
     });
     const charCount = params.text?.length || 0, estimatedDuration = Math.max(2, Math.round(charCount / 4));

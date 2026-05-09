@@ -74,10 +74,10 @@ export class SessionStore {
   }
 
   /** 从原始 JSON 重新水化 Session */
-  static hydrate(sessionData, SessionClass) {
+  static async hydrate(sessionData, SessionClass) {
     if (!sessionData) return null;
     if (!SessionClass) {
-      const { Session } = require('./session.js');
+      const { Session } = await import('./session.js');
       SessionClass = Session;
     }
     const session = new SessionClass({

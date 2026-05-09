@@ -11,6 +11,7 @@ import { registerOpenAI } from './openaiAdapter.js';
 import { registerClaude } from './claudeAdapter.js';
 import { registerSD } from './sdAdapter.js';
 import { registerStability } from './stabilityAdapter.js';
+import { registerEdgeTTS } from './edgeTtsAdapter.js';
 import logger from '../../utils/logger.js';
 
 export async function registerAllAdapters() {
@@ -22,10 +23,11 @@ export async function registerAllAdapters() {
     registerClaude(),
     registerSD(),
     registerStability(),
+    registerEdgeTTS(),
   ]);
 
   results.forEach((r, i) => {
-    const name = ['OpenAI', 'Claude', 'SD', 'Stability'][i];
+    const name = ['OpenAI', 'Claude', 'SD', 'Stability', 'EdgeTTS'][i];
     if (r.status === 'rejected') logger.error(`[AI] ${name} 注册失败: ${r.reason.message}`);
   });
 

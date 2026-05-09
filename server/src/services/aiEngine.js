@@ -59,6 +59,9 @@ const DEFAULT_MODEL_MAP = {
   title_gen:        'gpt-4o-mini',
   compliance_check: 'claude-sonnet-4-6',
   translate:        'gpt-4o-mini',
+  // 音频类
+  tts:              'edge-tts',
+  voice_clone:      'elevenlabs-voice-clone',
 };
 
 export function getDefaultModel(taskType) {
