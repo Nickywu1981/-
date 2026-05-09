@@ -85,6 +85,8 @@
 import { ref, computed, type PropType } from 'vue'
 import { useRuntimeConfig } from '#app'
 
+const toast = useToast()
+
 const props = defineProps({
   accept: { type: String as PropType<'image' | 'video' | 'all'>, default: 'all' },
   multiple: { type: Boolean, default: false },
@@ -167,7 +169,7 @@ function addFiles(files: File[]) {
   for (const file of files) {
     if (fileList.value.length >= props.maxCount) break
     if (file.size > props.maxSize * 1024 * 1024) {
-      console.warn(`文件 ${file.name} 超过大小限制`)
+      toast.warn(`文件 ${file.name} 超过大小限制`)
       continue
     }
     fileList.value.push({

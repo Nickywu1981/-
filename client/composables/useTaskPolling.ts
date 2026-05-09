@@ -25,11 +25,11 @@ export function useTaskPolling() {
   // -----------------------------------------------------------------------
   async function submit(taskType: string, params: Record<string, any>) {
     if (submitting.value) {
-      console.warn('[useTaskPolling] 任务进行中，已阻止重复提交')
+      useToast().warn('任务进行中，请等待完成后再提交')
       return
     }
     if (jobId.value && ['queued', 'processing'].includes(status.value)) {
-      console.warn('[useTaskPolling] 已有进行中的任务，已阻止重复提交')
+      useToast().warn('已有进行中的任务，请等待完成后再提交')
       return
     }
 
