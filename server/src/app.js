@@ -96,6 +96,7 @@ import digitalHumanRoutesV4 from './route/v4_digital_human.routes.js';
 import platformPublishRoutesV4 from './route/v4_platform_publish.routes.js';
 import templateMarketRoutesV4 from './route/v4_template_market.routes.js';
 import sdkRoutes from './route/sdkRoutes.js';
+import adkRoutes from './route/adkRoutes.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -290,6 +291,7 @@ app.use('/api/digital-human', heavyLimiter, digitalHumanRoutesV4);
 app.use('/api/platform-publish', platformPublishRoutesV4);
 app.use('/api/template-market', templateMarketRoutesV4);
 app.use('/api/sdk', sdkRoutes);
+app.use('/api/adk', adkRoutes);
 
 // 404
 app.use((_req, res) => {
