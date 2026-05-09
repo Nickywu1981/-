@@ -158,6 +158,21 @@ const realPool = mysql.createPool({
 const realPoolProxy = new Proxy(realPool, {
   get(target, prop) {
     const original = target[prop];
+    if (prop === 'getConnection') {
+      return async function () {
+        if (!mockEnabled) return original.apply(target);
+        try {
+          const conn = await original.apply(target);
+          return conn;
+        } catch (err) {
+          if (err.code === 'ECONNREFUSED' || err.code === 'ER_BAD_DB_ERROR' || err.code === 'ENOTFOUND' || err.code === 'ETIMEDOUT') {
+            logger.info(`[Mock] DB getConnection unavailable (${err.code}), using mock`);
+            return { execute: mockExecute, query: mockExecute, release: () => {}, commit: async () => {}, rollback: async () => {}, beginTransaction: async () => {} };
+          }
+          throw err;
+        }
+      };
+    }
     if (prop !== 'execute' && prop !== 'query') return original;
 
     return async function (...args) {
@@ -190,8 +205,23 @@ const contextAwarePool = {
     return db.query(sql, params);
   },
   async getConnection() {
-    const db = getContextDB(realPoolProxy);
-    return db.getConnection();
+    if (!mockEnabled) {
+      const db = getContextDB(realPool);
+      return db.getConnection();
+    }
+    try {
+      const db = getContextDB(realPool);
+      const conn = await db.getConnection();
+      // Test the connection is actually usable
+      await conn.query('SELECT 1');
+      return conn;
+    } catch (err) {
+      if (err.code === 'ECONNREFUSED' || err.code === 'ER_BAD_DB_ERROR' || err.code === 'ENOTFOUND' || err.code === 'ETIMEDOUT' || err.code === 'PROTOCOL_CONNECTION_LOST') {
+        logger.info(`[Mock] DB connection unavailable (${err.code}), using mock`);
+        return { execute: mockExecute, query: mockExecute, release: () => {}, commit: async () => {}, rollback: async () => {}, beginTransaction: async () => {} };
+      }
+      throw err;
+    }
   },
 };
 

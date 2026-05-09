@@ -65,10 +65,13 @@ export default defineNuxtConfig({
   // i18n 多语言配置
   i18n: {
     vueI18n: './i18n.config.ts',
-    locales: ['zh', 'en', 'es'],
+    locales: [
+      { code: 'zh', file: 'zh.json' },
+      { code: 'en', file: 'en.json' },
+    ],
     defaultLocale: 'zh',
     strategy: 'prefix_except_default',
-    langDir: 'i18n/locales',
+    langDir: 'locales',
     // 浏览器语言自动检测 + IP 回退
     detectBrowserLanguage: {
       useCookie: true,
