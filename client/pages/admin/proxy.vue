@@ -106,7 +106,7 @@ async function fetchData() {
     const res: any = await $fetch(`/api/proxy?${params.toString()}`)
     if (res?.code === 200) { list.value = res.data?.list || []; total.value = res.data?.total || 0 }
     else { list.value = res.data || []; total.value = list.value.length }
-  } catch (e: any) { error.value = e.message || '加载失败'; toast.error(error.value) } finally { loading.value = false }
+  } catch (e: any) { error.value = e.data?.msg || e.message || '加载失败'; toast.error(error.value) } finally { loading.value = false }
 }
 
 function search() { page.value = 1; fetchData() }
@@ -122,7 +122,7 @@ async function save() {
     const res: any = await $fetch(url, { method, body: form.value })
     if (res?.code === 200 || res?.code === 0) { toast.success(isEdit.value ? '代理已更新' : '代理已创建'); modalOpen.value = false; fetchData() }
     else { toast.error(res?.msg || '保存失败') }
-  } catch (e: any) { toast.error(e.message || '保存失败') } finally { saving.value = false }
+  } catch (e: any) { toast.error(e.data?.msg || e.message || '保存失败') } finally { saving.value = false }
 }
 
 async function toggleStatus(p: any) {
@@ -131,7 +131,7 @@ async function toggleStatus(p: any) {
     const res: any = await $fetch(`/api/proxy/${p.id}`, { method: 'PUT', body: { status: newStatus } })
     if (res?.code === 200 || res?.code === 0) { p.status = newStatus; toast.success(newStatus === 1 ? '已启用' : '已停用') }
     else { toast.error(res?.msg || '操作失败') }
-  } catch (e: any) { toast.error(e.message || '操作失败') }
+  } catch (e: any) { toast.error(e.data?.msg || e.message || '操作失败') }
 }
 
 async function delProxy(id: number) {
@@ -140,7 +140,7 @@ async function delProxy(id: number) {
     const res: any = await $fetch(`/api/proxy/${id}`, { method: 'DELETE' })
     if (res?.code === 200 || res?.code === 0) { toast.success('代理已删除'); fetchData() }
     else { toast.error(res?.msg || '删除失败') }
-  } catch (e: any) { toast.error(e.message || '删除失败') }
+  } catch (e: any) { toast.error(e.data?.msg || e.message || '删除失败') }
 }
 </script>
 

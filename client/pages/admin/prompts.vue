@@ -138,7 +138,7 @@ async function fetchData() {
     const res = await $fetch(`/api/admin/prompts?${params}`, { credentials: 'include' });
     list.value = (res as any).data?.list || [];
     total.value = (res as any).data?.total || 0;
-  } catch (e: any) { toast.error('加载失败: ' + (e.message || '网络错误')); } finally { loading.value = false; }
+  } catch (e: any) { toast.error('加载失败: ' + (e.data?.msg || e.message || '网络错误')); } finally { loading.value = false; }
 
 }
 
@@ -172,7 +172,7 @@ async function save() {
     });
     showModal.value = false;
     fetchData();
-  } catch (e: any) { toast.error('保存失败: ' + (e.message || '网络错误')); }
+  } catch (e: any) { toast.error('保存失败: ' + (e.data?.msg || e.message || '网络错误')); }
 }
 
 async function review(id: number, status: number) {
@@ -184,7 +184,7 @@ async function review(id: number, status: number) {
       body: JSON.stringify({ status, reviewRemark: status === 3 ? '管理员操作' : '' }),
     });
     fetchData();
-  } catch (e: any) { toast.error('操作失败: ' + (e.message || '网络错误')); }
+  } catch (e: any) { toast.error('操作失败: ' + (e.data?.msg || e.message || '网络错误')); }
 }
 
 async function confirmDelete(t: any) {
@@ -192,7 +192,7 @@ async function confirmDelete(t: any) {
   try {
     await $fetch(`/api/admin/prompts/${t.id}`, { method: 'DELETE', credentials: 'include' });
     fetchData();
-  } catch (e: any) { toast.error('删除失败: ' + (e.message || '网络错误')); }
+  } catch (e: any) { toast.error('删除失败: ' + (e.data?.msg || e.message || '网络错误')); }
 }
 
 function categoryLabel(c: string) {

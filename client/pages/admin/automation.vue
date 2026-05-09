@@ -136,7 +136,7 @@ async function fetchData() {
     const res: any = await $fetch(`/api/automation/tasks?${params.toString()}`)
     if (res?.code === 200) { list.value = res.data?.list || []; total.value = res.data?.total || 0 }
     else { list.value = res.data || []; total.value = list.value.length }
-  } catch (e: any) { error.value = e.message || '加载失败'; toast.error(error.value) } finally { loading.value = false }
+  } catch (e: any) { error.value = e.data?.msg || e.message || '加载失败'; toast.error(error.value) } finally { loading.value = false }
 }
 
 function search() { page.value = 1; fetchData() }
@@ -150,7 +150,7 @@ async function save() {
     const res: any = await $fetch('/api/automation/tasks', { method: 'POST', body: form.value })
     if (res?.code === 200 || res?.code === 0) { toast.success('任务已创建'); modalOpen.value = false; fetchData() }
     else { toast.error(res?.msg || '创建失败') }
-  } catch (e: any) { toast.error(e.message || '创建失败') } finally { saving.value = false }
+  } catch (e: any) { toast.error(e.data?.msg || e.message || '创建失败') } finally { saving.value = false }
 }
 
 async function execute(t: any) {
@@ -158,7 +158,7 @@ async function execute(t: any) {
     const res: any = await $fetch(`/api/automation/admin/execute/${t.id}`, { method: 'POST' })
     if (res?.code === 200 || res?.code === 0) { t.status = 1; toast.success('任务已开始执行') }
     else { toast.error(res?.msg || '执行失败') }
-  } catch (e: any) { toast.error(e.message || '执行失败') }
+  } catch (e: any) { toast.error(e.data?.msg || e.message || '执行失败') }
 }
 
 async function cancel(t: any) {
@@ -166,7 +166,7 @@ async function cancel(t: any) {
     const res: any = await $fetch(`/api/automation/tasks/${t.id}/cancel`, { method: 'POST' })
     if (res?.code === 200 || res?.code === 0) { t.status = 4; toast.success('任务已取消') }
     else { toast.error(res?.msg || '取消失败') }
-  } catch (e: any) { toast.error(e.message || '取消失败') }
+  } catch (e: any) { toast.error(e.data?.msg || e.message || '取消失败') }
 }
 
 async function retryTask(t: any) {
@@ -174,7 +174,7 @@ async function retryTask(t: any) {
     const res: any = await $fetch(`/api/automation/admin/execute/${t.id}`, { method: 'POST' })
     if (res?.code === 200 || res?.code === 0) { t.status = 1; toast.success('任务已重新提交'); fetchData() }
     else { toast.error(res?.msg || '重试失败') }
-  } catch (e: any) { toast.error(e.message || '重试失败') }
+  } catch (e: any) { toast.error(e.data?.msg || e.message || '重试失败') }
 }
 </script>
 

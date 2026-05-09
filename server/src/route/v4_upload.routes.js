@@ -43,10 +43,10 @@ function _withMulter(req, res, next) {
 }
 
 // POST /api/upload/simple — 小文件直接上传
-router.post('/simple', _withMulter, (req, res) => {
+router.post('/simple', _withMulter, async (req, res) => {
   try {
     if (!req.file) return error(res, ERROR_CODE.VALIDATION_ERROR, '请选择文件');
-    const result = uploadService.saveSimpleFile(req.file);
+    const result = await uploadService.saveSimpleFile(req.file);
     return success(res, result, '上传成功');
   } catch (err) {
     return error(res, ERROR_CODE.INTERNAL_ERROR, err.message || '上传失败');
@@ -54,10 +54,10 @@ router.post('/simple', _withMulter, (req, res) => {
 });
 
 // POST /api/upload/init — 初始化分片上传
-router.post('/init', _validate(initUploadSchema), (req, res) => {
+router.post('/init', _validate(initUploadSchema), async (req, res) => {
   try {
     const { file_name, file_size, file_type } = req.validated;
-    const result = uploadService.initUpload({ fileName: file_name, fileSize: file_size, fileType: file_type });
+    const result = await uploadService.initUpload({ fileName: file_name, fileSize: file_size, fileType: file_type });
     return success(res, result);
   } catch (err) {
     return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '初始化上传失败');
@@ -67,13 +67,13 @@ router.post('/init', _validate(initUploadSchema), (req, res) => {
 const UPLOAD_ID_REGEX = /^[a-f0-9]{32}$/;
 
 // POST /api/upload/chunk — 接收分片 (multipart: upload_id, chunk_index, chunk)
-router.post('/chunk', _upload.fields([{ name: 'chunk', maxCount: 1 }]), validate(chunkSchema, 'body'), (req, res) => {
+router.post('/chunk', _upload.fields([{ name: 'chunk', maxCount: 1 }]), validate(chunkSchema, 'body'), async (req, res) => {
   try {
     const { upload_id, chunk_index } = req.body;
     if (!req.files?.chunk?.[0]) {
       return error(res, ERROR_CODE.VALIDATION_ERROR, '缺少分片文件');
     }
-    const result = uploadService.receiveChunk(upload_id, chunk_index, req.files.chunk[0].buffer);
+    const result = await uploadService.receiveChunk(upload_id, chunk_index, req.files.chunk[0].buffer);
     return success(res, result);
   } catch (err) {
     return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '接收分片失败');
@@ -81,12 +81,12 @@ router.post('/chunk', _upload.fields([{ name: 'chunk', maxCount: 1 }]), validate
 });
 
 // GET /api/upload/chunks/:uploadId — 获取已上传分片 (断点续传)
-router.get('/chunks/:uploadId', (req, res) => {
+router.get('/chunks/:uploadId', async (req, res) => {
   try {
     if (!UPLOAD_ID_REGEX.test(req.params.uploadId)) {
       return error(res, ERROR_CODE.VALIDATION_ERROR, 'uploadId 格式不正确');
     }
-    const result = uploadService.getReceivedChunks(req.params.uploadId);
+    const result = await uploadService.getReceivedChunks(req.params.uploadId);
     return success(res, result);
   } catch (err) {
     return error(res, ERROR_CODE.INTERNAL_ERROR, err.message || '查询分片失败');
@@ -94,10 +94,10 @@ router.get('/chunks/:uploadId', (req, res) => {
 });
 
 // POST /api/upload/complete — 完成合并
-router.post('/complete', _validate(completeUploadSchema), (req, res) => {
+router.post('/complete', _validate(completeUploadSchema), async (req, res) => {
   try {
     const { upload_id } = req.validated;
-    const result = uploadService.completeUpload(upload_id);
+    const result = await uploadService.completeUpload(upload_id);
     return success(res, result, '上传完成');
   } catch (err) {
     return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '合并文件失败');

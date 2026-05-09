@@ -97,6 +97,7 @@ const INFER_CONFIG = {
 
 const inferenceCache = new Map();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const MAX_CACHE_SIZE = 500;
 
 /**
  * 增强推理：自动重试 + 降级 + 缓存 + 超时控制
@@ -166,6 +167,10 @@ export async function infer(modelId, input, options = {}) {
       if (INFER_CONFIG.enableCache && !skipCache) {
         const cacheKey = `${modelId}:${JSON.stringify(input)}`;
         inferenceCache.set(cacheKey, { result: output, timestamp: Date.now() });
+        if (inferenceCache.size > MAX_CACHE_SIZE) {
+          const oldest = inferenceCache.keys().next().value;
+          if (oldest) inferenceCache.delete(oldest);
+        }
       }
 
       return output;

@@ -83,7 +83,7 @@ async function fetchConfig() {
     const data: any = await $fetch('/api/admin/site-config', { credentials: 'include' });
     configs.value = data.data || data;
   } catch (e: any) {
-    loadError.value = e.message || '加载失败';
+    loadError.value = e.data?.msg || e.message || '加载失败';
   } finally { loading.value = false; }
 }
 
@@ -108,7 +108,7 @@ async function save(item: any) {
     toast.success('保存成功');
     editingId.value = null;
   } catch (e: any) {
-    toast.error(e.message || '保存失败');
+    toast.error(e.data?.msg || e.message || '保存失败');
   } finally { saving.value = false; }
 }
 
@@ -124,7 +124,7 @@ async function addConfig() {
     showAddForm.value = false;
     newConfig.key = ''; newConfig.value = ''; newConfig.description = '';
     fetchConfig();
-  } catch (e: any) { toast.error(e.message || '添加失败'); }
+  } catch (e: any) { toast.error(e.data?.msg || e.message || '添加失败'); }
   finally { adding.value = false; }
 }
 
@@ -134,7 +134,7 @@ async function deleteConfig(item: any) {
     await $fetch(`/api/admin/site-config/${item.id}`, { method: 'DELETE', credentials: 'include' });
     toast.success('已删除');
     fetchConfig();
-  } catch (e: any) { toast.error(e.message || '删除失败'); }
+  } catch (e: any) { toast.error(e.data?.msg || e.message || '删除失败'); }
 }
 
 function formatJson(val: string) {

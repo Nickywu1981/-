@@ -121,7 +121,7 @@ async function fetchData() {
     if (filterCategory.value) params.set('category', filterCategory.value);
     const res = await $fetch(`/api/badges/admin/all?${params}`, { credentials: 'include' });
     list.value = (res as any).data || [];
-  } catch (e: any) { toast.error(e?.message || '加载失败') } finally { loading.value = false; }
+  } catch (e: any) { toast.error(e.data?.msg || e?.message || '加载失败') } finally { loading.value = false; }
 
 }
 
@@ -158,7 +158,7 @@ async function save() {
     }
     showModal.value = false;
     fetchData();
-  } catch (e: any) { toast.error('保存失败: ' + (e.message || '网络错误')); }
+  } catch (e: any) { toast.error('保存失败: ' + (e.data?.msg || e.message || '网络错误')); }
 }
 
 async function toggleStatus(b: any) {
@@ -169,7 +169,7 @@ async function toggleStatus(b: any) {
       body: JSON.stringify({ status: b.status === 1 ? 0 : 1 }),
     });
     fetchData();
-  } catch (e: any) { toast.error('操作失败: ' + (e.message || '网络错误')); }
+  } catch (e: any) { toast.error('操作失败: ' + (e.data?.msg || e.message || '网络错误')); }
 }
 
 async function confirmDelete(b: any) {
@@ -180,7 +180,7 @@ async function confirmDelete(b: any) {
       credentials: 'include',
     });
     fetchData();
-  } catch (e: any) { toast.error('删除失败: ' + (e.message || '网络错误')); }
+  } catch (e: any) { toast.error('删除失败: ' + (e.data?.msg || e.message || '网络错误')); }
 }
 
 function categoryLabel(c: string) {

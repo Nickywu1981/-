@@ -337,16 +337,18 @@ export async function dailyCreditReward() {
   if (!plan || !plan.daily_credits || plan.daily_credits <= 0) return;
 
   const members = await creditDao.getFreePlanMembers();
-  for (const m of members) {
-    const daily = plan.daily_credits;
-    await creditDao.updateCreditBalance(m.user_id, daily);
-    await creditDao.insertConsumptionLog({
+  if (!members.length) return 0;
+
+  const daily = plan.daily_credits;
+  const affected = await creditDao.batchUpdateFreePlanCredits(daily);
+  await creditDao.batchInsertConsumptionLogs(
+    members.map(m => ({
       userId: m.user_id, type: 1, action: 'daily_free',
       creditBefore: m.credit_balance, creditAfter: m.credit_balance + daily,
-      consumed: -daily, remark: '每日免费赠送', taskId: '', status: 1,
-    });
-  }
-  return members.length;
+      consumed: -daily, remark: '每日免费赠送',
+    })),
+  );
+  return affected;
 }
 
 // ==================== 积分查询 ====================

@@ -168,12 +168,11 @@ async function processActionBatch(taskId, userId, { actionVideoUrl, productImage
     const total = productImageUrls.length;
     await updateTaskStatus(taskId, userId, { status: 1, progress: 0, progressMsg: `0/${total} 处理中...`, workerId: process.pid.toString() });
     const results = [];
-    for (let i = 0; i < total; i++) {
-      const imgResult = await infer('stable-diffusion-img2img', { imageUrl: productImageUrls[i], actionVideoUrl, task: 'action_transfer' });
-      results.push({ original: productImageUrls[i], result: imgResult.output?.videoUrl || `/api/videos/${taskId}_action_${i}.mp4` });
-      const progress = Math.round(((i + 1) / total) * 100);
-      await updateTaskStatus(taskId, userId, { progress, progressMsg: `动作迁移 ${i + 1}/${total} 完成` });
-    }
+    const results = await Promise.all(productImageUrls.map(async (url, i) => {
+      const imgResult = await infer('stable-diffusion-img2img', { imageUrl: url, actionVideoUrl, task: 'action_transfer' });
+      await updateTaskStatus(taskId, userId, { progress: Math.round(((i + 1) / total) * 100), progressMsg: `动作迁移 ${i + 1}/${total} 完成` });
+      return { original: url, result: imgResult.output?.videoUrl || `/api/videos/${taskId}_action_${i}.mp4` };
+    }));
     await completeTask(taskId, userId, { progressMsg: '全部完成', outputResult: { videos: results, total } });
   } catch (err) { await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }); }
 }

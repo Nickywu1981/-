@@ -125,7 +125,7 @@ async function fetchData() {
     const res = data as any
     if (res?.code === 200) { list.value = res.data.list || []; total.value = res.data.total || 0 }
     else { throw new Error(res?.msg || '获取用户列表失败') }
-  } catch (e: any) { error.value = e.message || '加载失败'; toast.error(error.value) } finally { loading.value = false }
+  } catch (e: any) { error.value = e.data?.msg || e.message || '加载失败'; toast.error(error.value) } finally { loading.value = false }
 }
 
 function search() { page.value = 1; selectedIds.value = new Set(); fetchData() }
@@ -148,7 +148,7 @@ async function toggleStatus(user: any, status: number) {
     const res = data as any
     if (res?.code === 200) { user.status = status; toast.success(status === 1 ? `已禁用 ${user.username}` : `已启用 ${user.username}`) }
     else { toast.error(res?.msg || '操作失败') }
-  } catch (e: any) { toast.error(e.message || '操作失败') }
+  } catch (e: any) { toast.error(e.data?.msg || e.message || '操作失败') }
 }
 
 async function batchToggleStatus(status: number) {
@@ -160,7 +160,7 @@ async function batchToggleStatus(status: number) {
     const res = data as any
     if (res?.code === 200) { toast.success(`已批量${label} ${ids.length} 个用户`); selectedIds.value = new Set(); fetchData() }
     else { toast.error(res?.msg || '操作失败') }
-  } catch (e: any) { toast.error(e.message || '操作失败') }
+  } catch (e: any) { toast.error(e.data?.msg || e.message || '操作失败') }
 }
 
 function openEdit(u: any) { editForm.value = { ...u }; editOpen.value = true }
@@ -172,7 +172,7 @@ async function saveEdit() {
     const res = data as any
     if (res?.code === 200) { toast.success('用户信息已更新'); editOpen.value = false; fetchData() }
     else { toast.error(res?.msg || '保存失败') }
-  } catch (e: any) { toast.error(e.message || '保存失败') } finally { saving.value = false }
+  } catch (e: any) { toast.error(e.data?.msg || e.message || '保存失败') } finally { saving.value = false }
 }
 
 function exportCSV() {

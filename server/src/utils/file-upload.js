@@ -1,7 +1,7 @@
 import { BusinessError } from './businessError.js';
 
 /**
- * Movio AI v4.1 — File Upload Service
+ * Movio AI v4.1 — File Upload Service (Async I/O)
  */
 
 // ============= 魔数检测（防伪造文件扩展名） =============
@@ -50,14 +50,15 @@ function matchMagic(buffer, ext) {
   return true;
 }
 
-export function validateFileMagic(filePath, ext) {
-  const fd = fs.openSync(filePath, 'r');
+export async function validateFileMagic(filePath, ext) {
+  const fsp = await import('fs/promises');
+  const fd = await fsp.open(filePath, 'r');
   const buf = Buffer.alloc(16);
-  fs.readSync(fd, buf, 0, 16, 0);
-  fs.closeSync(fd);
+  await fd.read(buf, 0, 16, 0);
+  await fd.close();
 
   if (!matchMagic(buf, ext)) {
-    fs.unlinkSync(filePath); // 删除可疑文件
+    await fsp.unlink(filePath); // 删除可疑文件
     throw new BusinessError(400, `文件内容与声明的类型 (${ext}) 不匹配`);
   }
 }
@@ -72,6 +73,7 @@ export function validateBufferMagic(buffer, ext) {
 // ============= 分片上传 =============
 
 import fs from 'fs';
+import fsp from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';
 import { fileURLToPath } from 'url';
@@ -82,14 +84,14 @@ const CHUNK_DIR = path.join(UPLOAD_DIR, '.chunks');
 const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
 
 // 确保目录存在
-[UPLOAD_DIR, CHUNK_DIR].forEach(dir => {
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-});
+await Promise.all([UPLOAD_DIR, CHUNK_DIR].map(async (dir) => {
+  try { await fsp.access(dir); } catch { await fsp.mkdir(dir, { recursive: true }); }
+}));
 
 /**
  * 初始化上传 (前端上传前调用)
  */
-export function initUpload({ fileName, fileSize, fileType }) {
+export async function initUpload({ fileName, fileSize, fileType }) {
   const uploadId = crypto.randomBytes(16).toString('hex');
   const totalChunks = Math.ceil(fileSize / CHUNK_SIZE);
   const ext = path.extname(fileName);
@@ -103,7 +105,7 @@ export function initUpload({ fileName, fileSize, fileType }) {
 
   // 记录上传元信息
   const metaPath = path.join(CHUNK_DIR, `${uploadId}.json`);
-  fs.writeFileSync(metaPath, JSON.stringify({ fileName, fileSize, fileType, totalChunks, receivedChunks: [], createdAt: Date.now() }));
+  await fsp.writeFile(metaPath, JSON.stringify({ fileName, fileSize, fileType, totalChunks, receivedChunks: [], createdAt: Date.now() }));
 
   return {
     upload_id: uploadId,
@@ -116,23 +118,23 @@ export function initUpload({ fileName, fileSize, fileType }) {
 /**
  * 接收分片
  */
-export function receiveChunk(uploadId, chunkIndex, chunkBuffer) {
+export async function receiveChunk(uploadId, chunkIndex, chunkBuffer) {
   const metaPath = path.join(CHUNK_DIR, `${uploadId}.json`);
-  if (!fs.existsSync(metaPath)) {
-    throw new BusinessError(404, '上传会话不存在或已过期');
-  }
+  try { await fsp.access(metaPath); } catch { throw new BusinessError(404, '上传会话不存在或已过期'); }
 
-  const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
+  const metaRaw = await fsp.readFile(metaPath, 'utf8');
+  let meta;
+  try { meta = JSON.parse(metaRaw); } catch { throw new BusinessError(400, '上传元数据损坏'); }
   const chunkDir = path.join(CHUNK_DIR, uploadId);
-  if (!fs.existsSync(chunkDir)) fs.mkdirSync(chunkDir, { recursive: true });
+  try { await fsp.access(chunkDir); } catch { await fsp.mkdir(chunkDir, { recursive: true }); }
 
   const chunkPath = path.join(chunkDir, `${chunkIndex}`);
-  fs.writeFileSync(chunkPath, chunkBuffer);
+  await fsp.writeFile(chunkPath, chunkBuffer);
 
   // 记录已接收分片
   if (!meta.receivedChunks.includes(chunkIndex)) {
     meta.receivedChunks.push(chunkIndex);
-    fs.writeFileSync(metaPath, JSON.stringify(meta));
+    await fsp.writeFile(metaPath, JSON.stringify(meta));
   }
 
   return { upload_id: uploadId, chunk_index: chunkIndex, received: meta.receivedChunks.length, total: meta.totalChunks };
@@ -141,25 +143,23 @@ export function receiveChunk(uploadId, chunkIndex, chunkBuffer) {
 /**
  * 获取已上传分片列表 (断点续传用)
  */
-export function getReceivedChunks(uploadId) {
+export async function getReceivedChunks(uploadId) {
   const metaPath = path.join(CHUNK_DIR, `${uploadId}.json`);
-  if (!fs.existsSync(metaPath)) return { received: [] };
+  try { await fsp.access(metaPath); } catch { return { received: [] }; }
   let meta;
-  try { meta = JSON.parse(fs.readFileSync(metaPath, 'utf8')); } catch { return { received: [] }; }
+  try { meta = JSON.parse(await fsp.readFile(metaPath, 'utf8')); } catch { return { received: [] }; }
   return { received: meta.receivedChunks || [], total: meta.totalChunks || 0 };
 }
 
 /**
  * 完成上传 → 合并分片 → 返回最终文件路径
  */
-export function completeUpload(uploadId) {
+export async function completeUpload(uploadId) {
   const metaPath = path.join(CHUNK_DIR, `${uploadId}.json`);
-  if (!fs.existsSync(metaPath)) {
-    throw new BusinessError(404, '上传会话不存在');
-  }
+  try { await fsp.access(metaPath); } catch { throw new BusinessError(404, '上传会话不存在'); }
 
   let meta;
-  try { meta = JSON.parse(fs.readFileSync(metaPath, 'utf8')); } catch { throw new BusinessError(400, '上传元数据损坏，请重新上传'); }
+  try { meta = JSON.parse(await fsp.readFile(metaPath, 'utf8')); } catch { throw new BusinessError(400, '上传元数据损坏，请重新上传'); }
   if (meta.receivedChunks.length < meta.totalChunks) {
     throw new BusinessError(400, `分片不完整 (${meta.receivedChunks.length}/${meta.totalChunks})`);
   }
@@ -171,21 +171,29 @@ export function completeUpload(uploadId) {
   const finalName = `${timestamp}_${uploadId.substring(0, 8)}${ext}`;
   const finalPath = path.join(UPLOAD_DIR, finalName);
 
-  const writeStream = fs.createWriteStream(finalPath);
-  for (let i = 0; i < meta.totalChunks; i++) {
-    const chunkPath = path.join(chunkDir, `${i}`);
-    const chunkData = fs.readFileSync(chunkPath);
-    writeStream.write(chunkData);
-  }
-  writeStream.end();
+  await new Promise((resolve, reject) => {
+    const writeStream = fs.createWriteStream(finalPath);
+    (async () => {
+      try {
+        for (let i = 0; i < meta.totalChunks; i++) {
+          const chunkPath = path.join(chunkDir, `${i}`);
+          const chunkData = await fsp.readFile(chunkPath);
+          writeStream.write(chunkData);
+        }
+        writeStream.end();
+        writeStream.on('finish', resolve);
+        writeStream.on('error', reject);
+      } catch (err) { reject(err); }
+    })();
+  });
 
   // 清理临时文件
-  fs.rmSync(chunkDir, { recursive: true, force: true });
-  fs.unlinkSync(metaPath);
+  await fsp.rm(chunkDir, { recursive: true, force: true });
+  await fsp.unlink(metaPath);
 
   // 魔数检测 — 合并后验证
   const extClean = ext.replace('.', '').toLowerCase();
-  validateFileMagic(finalPath, extClean);
+  await validateFileMagic(finalPath, extClean);
 
   const fileUrl = `/uploads/${finalName}`;
   return {
@@ -201,7 +209,7 @@ export function completeUpload(uploadId) {
 /**
  * 接收 multer 上传的文件并保存到 uploads 目录
  */
-export function saveSimpleFile(file) {
+export async function saveSimpleFile(file) {
   const timestamp = Date.now();
   const ext = path.extname(file.originalname);
   const extClean = ext.replace('.', '').toLowerCase();
@@ -211,7 +219,7 @@ export function saveSimpleFile(file) {
   // 魔数检测 — 写入前验证
   validateBufferMagic(file.buffer, extClean);
 
-  fs.writeFileSync(finalPath, file.buffer);
+  await fsp.writeFile(finalPath, file.buffer);
 
   const fileUrl = `/uploads/${finalName}`;
   return {
@@ -226,20 +234,21 @@ export function saveSimpleFile(file) {
 /**
  * 清理过期上传会话 (2小时无活动)
  */
-export function cleanupStaleUploads() {
+export async function cleanupStaleUploads() {
   const now = Date.now();
   const maxAge = 2 * 60 * 60 * 1000;
-  const files = fs.readdirSync(CHUNK_DIR);
+  let files;
+  try { files = await fsp.readdir(CHUNK_DIR); } catch { return; }
   for (const file of files) {
     if (file.endsWith('.json')) {
       const metaPath = path.join(CHUNK_DIR, file);
       try {
-        const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
+        const meta = JSON.parse(await fsp.readFile(metaPath, 'utf8'));
         if (now - meta.createdAt > maxAge) {
           const uploadId = file.replace('.json', '');
           const chunkDir = path.join(CHUNK_DIR, uploadId);
-          if (fs.existsSync(chunkDir)) fs.rmSync(chunkDir, { recursive: true, force: true });
-          fs.unlinkSync(metaPath);
+          try { await fsp.rm(chunkDir, { recursive: true, force: true }); } catch { /* skip */ }
+          try { await fsp.unlink(metaPath); } catch { /* skip */ }
         }
       } catch { /* skip corrupt meta */ }
     }

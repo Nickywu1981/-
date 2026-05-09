@@ -63,11 +63,17 @@ const verified = ref(false)
 const sendCooldown = ref(0)
 const errorMsg = ref('')
 const successMsg = ref('')
+let cooldownTimer: ReturnType<typeof setInterval> | null = null
 
 function startCooldown() {
   sendCooldown.value = 60
-  const t = setInterval(() => { sendCooldown.value--; if (sendCooldown.value <= 0) clearInterval(t) }, 1000)
+  if (cooldownTimer) clearInterval(cooldownTimer)
+  cooldownTimer = setInterval(() => { sendCooldown.value--; if (sendCooldown.value <= 0) { clearInterval(cooldownTimer!); cooldownTimer = null } }, 1000)
 }
+
+onUnmounted(() => {
+  if (cooldownTimer) { clearInterval(cooldownTimer); cooldownTimer = null }
+})
 
 function getAccountInfo(): { phone?: string; email?: string; isEmail: boolean } {
   const val = account.value.trim()

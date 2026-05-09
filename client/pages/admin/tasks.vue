@@ -108,7 +108,7 @@ async function fetchData() {
     const res: any = await $fetch('/api/admin/tasks', { params: { page: page.value, pageSize, status: status.value, typeGroup: typeGroup.value, userId: userId.value } })
     if (res?.code === 200) { list.value = res.data?.list || []; total.value = res.data?.total || 0 }
     else { throw new Error(res?.msg || '获取任务列表失败') }
-  } catch (e: any) { error.value = e.message || '加载失败'; toast.error(error.value) } finally { loading.value = false }
+  } catch (e: any) { error.value = e.data?.msg || e.message || '加载失败'; toast.error(error.value) } finally { loading.value = false }
 }
 
 function search() { page.value = 1; fetchData() }
@@ -120,7 +120,7 @@ async function retryTask(t: any) {
     const res: any = await $fetch(`/api/admin/tasks/${t.id}/retry`, { method: 'POST' })
     if (res?.code === 200) { toast.success('任务已重新提交'); fetchData() }
     else { toast.error(res?.msg || '重试失败') }
-  } catch (e: any) { toast.error(e.message || '重试失败') }
+  } catch (e: any) { toast.error(e.data?.msg || e.message || '重试失败') }
 }
 
 async function cancelTask(t: any) {
@@ -129,7 +129,7 @@ async function cancelTask(t: any) {
     const res: any = await $fetch(`/api/admin/tasks/${t.id}/cancel`, { method: 'POST' })
     if (res?.code === 200) { toast.success('任务已取消'); fetchData() }
     else { toast.error(res?.msg || '取消失败') }
-  } catch (e: any) { toast.error(e.message || '取消失败') }
+  } catch (e: any) { toast.error(e.data?.msg || e.message || '取消失败') }
 }
 
 onMounted(fetchData)

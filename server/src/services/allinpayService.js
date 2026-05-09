@@ -145,7 +145,7 @@ export async function handleNotify(body) {
       content = `您已成功充值${creditAmount}积分，支付￥${(order.amount / 100).toFixed(2)}。`;
     }
     await notificationService.sendNotification(order.user_id, { type: 'payment', title, content });
-  } catch { /* 通知失败不阻塞 */ }
+  } catch (e) { logger.warn('[Allinpay] 通知发送失败', { userId: order.user_id, error: e.message }); }
 
   await allinpayDao.logNotify({ reqsn, trxid, notifyBody: JSON.stringify(body), signVerified: 1, processStatus: 1, processMsg: '处理成功' });
   return true;

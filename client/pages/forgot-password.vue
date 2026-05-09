@@ -39,11 +39,17 @@
 const account = ref(''), code = ref(''), newPassword = ref(''), confirmPassword = ref('')
 const loading = ref(false), verified = ref(false), sendCooldown = ref(0)
 const msg = ref(''), msgErr = ref(false)
+let cooldownTimer: ReturnType<typeof setInterval> | null = null
 
 function startCooldown() {
   sendCooldown.value = 60
-  const t = setInterval(() => { sendCooldown.value--; if (sendCooldown.value <= 0) clearInterval(t) }, 1000)
+  if (cooldownTimer) clearInterval(cooldownTimer)
+  cooldownTimer = setInterval(() => { sendCooldown.value--; if (sendCooldown.value <= 0) { clearInterval(cooldownTimer!); cooldownTimer = null } }, 1000)
 }
+
+onUnmounted(() => {
+  if (cooldownTimer) { clearInterval(cooldownTimer); cooldownTimer = null }
+})
 
 async function sendCode() {
   if (!account.value.trim()) { msg.value = '请输入手机号或邮箱'; msgErr.value = true; return }

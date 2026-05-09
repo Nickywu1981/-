@@ -86,7 +86,7 @@ async function handleRegister() {
     const authStore = useAuthStore()
     await authStore.register(body)
     navigateTo('/workspace')
-  } catch (e: any) { msg.value = e.message || '注册失败'; msgErr.value = true; }
+  } catch (e: any) { msg.value = e.data?.msg || e.message || '注册失败'; msgErr.value = true; }
   loading.value = false;
 }
 

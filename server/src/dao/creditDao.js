@@ -211,6 +211,25 @@ export async function getFreePlanMembers() {
   return rows;
 }
 
+export async function batchUpdateFreePlanCredits(delta) {
+  const [result] = await pool.execute(
+    'UPDATE user_membership SET credit_balance = credit_balance + ? WHERE plan_type = 0 AND status = 1 AND is_deleted = 0',
+    [delta],
+  );
+  return result.affectedRows;
+}
+
+export async function batchInsertConsumptionLogs(entries) {
+  if (!entries.length) return;
+  const values = entries.map(e => [e.userId, e.type, e.action, e.creditBefore, e.creditAfter, e.consumed, e.remark, '', '', 1]);
+  const placeholders = values.map(() => '(?,?,?,?,?,?,?,?,?,?,NOW())').join(',');
+  const flatValues = values.flat();
+  await pool.execute(
+    `INSERT INTO consumption_record (user_id, type, action, credit_before, credit_after, consumed, remark, task_id, request_id, status, freeze_at) VALUES ${placeholders}`,
+    flatValues,
+  );
+}
+
 // ==================== 积分历史 ====================
 
 export async function getCreditHistory(userId, offset, limit) {

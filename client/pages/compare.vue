@@ -92,7 +92,7 @@ const rows = [
 .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 36px; }
 .stat-card { padding: 20px 12px; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-xl); text-align: center; transition: all var(--transition-fast); }
 .stat-card:hover { border-color: var(--brand); transform: translateY(-2px); box-shadow: 0 8px 24px var(--brand-alpha); }
-.stat-value { display: block; font-size: 28px; font-weight: 800; background: var(--brand-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 4px; }
+.stat-value { display: block; font-size: 28px; font-weight: 800; background: var(--brand-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 4px; }
 .stat-label { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
 
 .table-wrap { overflow-x: auto; border-radius: var(--radius-xl); border: 1px solid var(--border-light); }

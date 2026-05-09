@@ -1,4 +1,5 @@
 import { useRuntimeConfig, navigateTo } from '#app';
+import { ref } from 'vue';
 
 interface ApiResponse<T = any> {
   code: number;
@@ -13,11 +14,38 @@ interface PaginatedData<T = any> {
   pageSize: number;
 }
 
-/** 通用 API 请求封装 */
+// ==================== 离线检测 ====================
+
+export const isOffline = ref(false);
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('offline', () => { isOffline.value = true; });
+  window.addEventListener('online', () => { isOffline.value = false; });
+  isOffline.value = !navigator.onLine;
+}
+
+// ==================== 重试配置 ====================
+
+const RETRY_CONFIG = {
+  maxRetries: 3,
+  baseDelayMs: 1000,
+  statuses: [502, 503, 504],
+};
+
+async function delay(ms: number): Promise<void> {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+/** 通用 API 请求封装（含重试 + 离线检测） */
 async function request<T = any>(
   url: string,
   options: { method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'; body?: any; params?: Record<string, any> } = {},
+  retries = 0,
 ): Promise<T> {
+  if (isOffline.value) {
+    throw new Error('网络已断开，请检查网络连接');
+  }
+
   const config = useRuntimeConfig();
   const base = config.public.apiBase as string;
   const fullUrl = url.startsWith('http') ? url : `${base}${url}`;
@@ -37,22 +65,33 @@ async function request<T = any>(
     if (qs) query = `?${qs}`;
   }
 
-  const res = await $fetch<ApiResponse<T>>(`${fullUrl}${query}`, {
-    method: options.method || 'GET',
-    headers,
-    body: options.body,
-    credentials: 'include',
-    onResponseError({ response }) {
-      if (response.status === 401) {
-        navigateTo('/login');
-      }
-    },
-  });
+  try {
+    const res = await $fetch<ApiResponse<T>>(`${fullUrl}${query}`, {
+      method: options.method || 'GET',
+      headers,
+      body: options.body,
+      credentials: 'include',
+      onResponseError({ response }) {
+        if (response.status === 401) {
+          navigateTo('/login');
+        }
+      },
+    });
 
-  if (res.code !== 200) {
-    throw new Error(res.msg || '请求失败');
+    if (res.code !== 200) {
+      throw new Error(res.msg || '请求失败');
+    }
+    return res.data as T;
+  } catch (err: any) {
+    // 5xx 重试（指数退避）
+    const status = err?.response?.status || err?.status;
+    if (RETRY_CONFIG.statuses.includes(status) && retries < RETRY_CONFIG.maxRetries) {
+      const waitMs = RETRY_CONFIG.baseDelayMs * Math.pow(2, retries);
+      await delay(waitMs);
+      return request<T>(url, options, retries + 1);
+    }
+    throw err;
   }
-  return res.data as T;
 }
 
 /** API 方法快捷调用 */
