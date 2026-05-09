@@ -87,6 +87,7 @@ import cspMiddleware from './middleware/csp.js';
 import openApiRoutes from './route/openApiRoutes.js';
 import openApiKeyRoutes from './route/openApiKeyRoutes.js';
 import auditLogRoutes from './route/auditLogRoutes.js';
+import geoRoutes from './route/geoRoutes.js';
 import compareRoutes from './route/compareRoutes.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -185,6 +186,9 @@ app.post('/api/internal/embed', async (req, res) => {
     sendError(res, ERROR_CODE.INTERNAL_ERROR, e.message);
   }
 });
+
+// 公开路由（无需认证）
+app.use(geoRoutes);
 
 // 静态文件服务（上传目录），带缓存
 app.use('/uploads', express.static(path.join(__dirname, '../uploads'), {

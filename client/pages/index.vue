@@ -14,6 +14,7 @@
           <a href="#faq" @click.prevent="scrollTo('faq')">{{ $t('landing.nav_faq') }}</a>
         </nav>
         <div class="lp-nav-act">
+          <LangSwitcher />
           <template v-if="user">
             <NuxtLink to="/workspace" class="lp-btn-main">{{ $t('nav.workspace') }}</NuxtLink>
           </template>

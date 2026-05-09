@@ -16,3 +16,4 @@ __screenshots__/
 .codepilot-uploads/
 .claude/*.lock
 docs/KB_*.json
+movio-ai-docs-v5.0.tar.gz

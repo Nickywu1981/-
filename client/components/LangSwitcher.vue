@@ -1,67 +1,74 @@
 <template>
-  <div class="lang-switcher">
-    <button class="lang-btn" @click="open = !open">
+  <div class="lsw">
+    <button class="lsw-btn" @click="open = !open" :aria-label="'切换语言'">
       <span>{{ currentFlag }}</span>
-      <span class="lang-code">{{ locale.toUpperCase() }}</span>
-      <span class="arrow">▾</span>
+      <span class="lsw-code">{{ locale.toUpperCase() }}</span>
+      <span class="lsw-arrow">▾</span>
     </button>
-    <div v-if="open" class="lang-dropdown" @mouseleave="open = false">
-      <button v-for="l in locales" :key="l.code" class="lang-option" :class="{ active: locale === l.code }" @click="switchLang(l.code); open = false">
-        <span class="lang-flag">{{ l.flag }}</span>
-        <span>{{ l.name }}</span>
-      </button>
-    </div>
+    <transition name="lsw-fade">
+      <div v-if="open" class="lsw-drop" @mouseleave="open = false">
+        <button
+          v-for="l in locales"
+          :key="l.code"
+          class="lsw-opt"
+          :class="{ on: locale === l.code }"
+          @click="switchLang(l.code)"
+        >
+          <span class="lsw-flag">{{ l.flag }}</span>
+          <span>{{ l.name }}</span>
+        </button>
+      </div>
+    </transition>
   </div>
 </template>
 
 <script setup lang="ts">
-const { locale, locales: i18nLocales } = useI18n();
-const open = ref(false);
+const { locale } = useI18n()
+const open = ref(false)
 
 interface LocaleOption { code: string; name: string; flag: string }
 const locales: LocaleOption[] = [
   { code: 'zh', name: '中文', flag: '🇨🇳' },
   { code: 'en', name: 'English', flag: '🇺🇸' },
   { code: 'es', name: 'Español', flag: '🇪🇸' },
-];
+]
 
-const currentFlag = computed(() => locales.find(l => l.code === locale.value)?.flag || '🌐');
+const currentFlag = computed(() => locales.find(l => l.code === locale.value)?.flag || '🌐')
 
 function switchLang(code: string) {
-  locale.value = code;
-  if (typeof window !== 'undefined') localStorage.setItem('lang', code);
-  open.value = false;
+  locale.value = code
+  if (typeof window !== 'undefined') localStorage.setItem('lang', code)
+  open.value = false
 }
-
-onMounted(() => {
-  const saved = typeof window !== 'undefined' ? localStorage.getItem('lang') : null;
-  if (saved && locales.some(l => l.code === saved)) locale.value = saved;
-});
 </script>
 
 <style scoped>
-.lang-switcher { position: relative; }
-.lang-btn {
+.lsw { position: relative; }
+.lsw-btn {
   display: flex; align-items: center; gap: 4px;
-  padding: 4px 10px; border: 1px solid var(--border-light); border-radius: var(--radius-sm);
-  background: transparent; color: var(--text-primary); cursor: pointer; font-size: 12px;
-  transition: border-color var(--transition-fast);
+  padding: 6px 10px; border: 1px solid #ebebea; border-radius: 8px;
+  background: transparent; color: #171717; cursor: pointer;
+  font-size: 12px; font-weight: 500; letter-spacing: -0.01em;
+  transition: all 0.2s;
 }
-.lang-btn:hover { border-color: var(--brand); }
-.arrow { font-size: 10px; color: var(--text-muted); }
-.lang-dropdown {
-  position: absolute; top: 100%; right: 0; margin-top: 4px;
-  background: var(--bg-card); border: 1px solid var(--input-border);
-  border-radius: var(--radius-md); box-shadow: var(--shadow-dropdown);
-  z-index: 300; min-width: 140px; overflow: hidden;
+.lsw-btn:hover { border-color: #c5c5c2; background: rgba(0,0,0,0.02); }
+.lsw-arrow { font-size: 9px; color: #6b6b70; transition: transform 0.2s; }
+.lsw-drop {
+  position: absolute; top: calc(100% + 4px); right: 0;
+  background: #fff; border: 1px solid #ebebea; border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08); z-index: 300;
+  min-width: 150px; overflow: hidden; padding: 4px;
 }
-.lang-option {
-  display: flex; align-items: center; gap: 8px; width: 100%;
-  padding: 8px 14px; border: none; background: transparent;
-  color: var(--text-primary); cursor: pointer; font-size: 13px;
-  transition: background var(--transition-fast); text-align: left;
+.lsw-opt {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 9px 14px; border: none; background: transparent;
+  color: #171717; cursor: pointer; font-size: 13px; border-radius: 7px;
+  transition: background 0.15s; text-align: left; letter-spacing: -0.01em;
 }
-.lang-option:hover { background: var(--sidebar-hover-bg); }
-.lang-option.active { background: var(--sidebar-active-bg); color: var(--brand); }
-.lang-flag { font-size: 16px; }
+.lsw-opt:hover { background: #f5f5f4; }
+.lsw-opt.on { background: #f0efed; font-weight: 500; }
+.lsw-flag { font-size: 16px; }
+
+.lsw-fade-enter-active, .lsw-fade-leave-active { transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1); }
+.lsw-fade-enter-from, .lsw-fade-leave-to { opacity: 0; transform: translateY(-4px); }
 </style>
