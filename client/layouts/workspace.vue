@@ -1,69 +1,53 @@
 <!--
-  Movio AI v5.0 — Workspace Layout
-  三大固定类目: 创作(全额开发) | AI助手(预留) | 工作流(预留)
-  硬性规则: 不准增删大类、不准改名、不准乱归类
+  Movio AI v6.0 — Workspace Layout
+  四大固定导航：首页 | 创作 | AI助手 | 工作流
+  硬性规则：不准增删改顶级菜单，子功能全放在对应分类内
 -->
 <template>
-  <div class="workspace-layout">
-    <aside class="sidebar" :class="{ collapsed: sidebarCollapsed }">
-      <div class="sidebar-header">
-        <NuxtLink to="/workspace" class="sidebar-logo">Movio AI</NuxtLink>
-        <button class="sidebar-toggle" @click="sidebarCollapsed = !sidebarCollapsed">
-          {{ sidebarCollapsed ? '▶' : '◀' }}
+  <div class="wsl">
+    <!-- ═══ 左侧导航 ═══ -->
+    <aside class="wsl-side" :class="{ fold: folded }">
+      <div class="wsl-logo-area">
+        <NuxtLink to="/workspace" class="wsl-logo">Movio AI</NuxtLink>
+        <button class="wsl-fold-btn" @click="folded = !folded" :title="folded ? '展开' : '收起'">
+          {{ folded ? '▶' : '◀' }}
         </button>
       </div>
-      <nav class="sidebar-nav">
-        <template v-for="group in navGroups" :key="group.key">
-          <!-- 分组标题（可折叠） -->
-          <button
-            v-if="!sidebarCollapsed && group.label"
-            class="nav-group-label"
-            @click="toggleGroup(group.key)"
-          >
-            <span>{{ group.label }}</span>
-            <span class="group-arrow" :class="{ open: openGroups.has(group.key) }">▾</span>
-          </button>
-          <!-- 导航项 -->
-          <template v-if="sidebarCollapsed || !group.label || openGroups.has(group.key)">
-            <NuxtLink
-              v-for="item in group.items" :key="item.path"
-              :to="item.disabled ? '#' : item.path"
-              class="nav-item"
-              :class="{
-                active: !item.disabled && currentPath.startsWith(item.path),
-                disabled: item.disabled,
-                placeholder: item.disabled,
-              }"
-              @click.prevent="item.disabled ? null : undefined"
-            >
-              <span class="nav-icon">{{ item.icon }}</span>
-              <span v-if="!sidebarCollapsed" class="nav-label">{{ item.label }}</span>
-              <span v-if="!sidebarCollapsed && item.disabled" class="nav-badge">即将上线</span>
-            </NuxtLink>
-          </template>
-        </template>
+
+      <nav class="wsl-nav">
+        <NuxtLink
+          v-for="item in navItems"
+          :key="item.path"
+          :to="item.disabled ? '#' : item.path"
+          class="wsl-nav-item"
+          :class="{ sel: !item.disabled && isActive(item), off: item.disabled }"
+          @click.prevent="item.disabled ? null : undefined"
+        >
+          <span class="wsl-nav-icon">{{ item.icon }}</span>
+          <span v-if="!folded" class="wsl-nav-label">{{ item.label }}</span>
+          <span v-if="!folded && item.disabled" class="wsl-nav-tag">即将上线</span>
+        </NuxtLink>
       </nav>
-      <div class="sidebar-footer">
-        <div class="user-brief">
-          <span class="avatar-sm">{{ userInitial }}</span>
-          <span v-if="!sidebarCollapsed" class="user-name">{{ userName }}</span>
+
+      <div class="wsl-footer">
+        <div class="wsl-user">
+          <span class="wsl-av">{{ userInitial }}</span>
+          <span v-if="!folded" class="wsl-uname">{{ userName }}</span>
         </div>
+        <div v-if="!folded" class="wsl-points">积分: {{ userPoints }}</div>
       </div>
     </aside>
 
-    <div class="main-area">
-      <header class="topbar">
-        <div class="topbar-title-group">
-          <h2 class="topbar-title">{{ pageTitle }}</h2>
-          <span v-if="pageCategory" class="topbar-category">{{ pageCategory }}</span>
-        </div>
-        <div class="topbar-actions">
-          <span class="points-badge">积分: {{ userPoints }}</span>
-          <NuxtLink v-if="isAdmin" to="/admin" class="btn btn-ghost btn-sm">管理后台</NuxtLink>
-          <button class="btn btn-ghost btn-sm" @click="handleLogout">退出登录</button>
+    <!-- ═══ 右侧主区域 ═══ -->
+    <div class="wsl-main">
+      <header class="wsl-top">
+        <h2 class="wsl-title">{{ pageTitle }}</h2>
+        <div class="wsl-actions">
+          <NuxtLink v-if="isAdmin" to="/admin" class="wsl-btn">管理后台</NuxtLink>
+          <button class="wsl-btn" @click="handleLogout">退出登录</button>
         </div>
       </header>
-      <main class="content">
+      <main class="wsl-content">
         <slot />
       </main>
     </div>
@@ -71,313 +55,121 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, reactive } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 
 const toast = useToast()
 const route = useRoute()
-const currentPath = computed(() => route.path)
+const router = useRouter()
 
-// 从导航数据中动态查找当前页面标题和所属分类
-const pageTitle = computed(() => {
-  for (const group of navGroups.value) {
-    const item = group.items.find(i => !i.disabled && currentPath.value.startsWith(i.path))
-    if (item) return item.label
-  }
-  return '工作台'
-})
-const pageCategory = computed(() => {
-  for (const group of navGroups.value) {
-    const item = group.items.find(i => !i.disabled && currentPath.value.startsWith(i.path))
-    if (item && group.label) return group.label
-  }
-  return ''
-})
-
-const sidebarCollapsed = ref(false)
+const folded = ref(false)
 const userInitial = ref('U')
 const userName = ref('')
 const userPoints = ref(0)
 const isAdmin = ref(false)
 
-const openGroups = reactive(new Set(['create-image', 'create-video']))
+const currentPath = computed(() => route.path)
 
-function toggleGroup(key: string) {
-  if (openGroups.has(key)) { openGroups.delete(key) } else { openGroups.add(key) }
+// ═══════════════════════════════════════════════
+// 四大固定顶级导航 — 不准增删改
+// ═══════════════════════════════════════════════
+const navItems = [
+  { path: '/workspace',            icon: '🏠', label: '首页',    disabled: false },
+  { path: '/workspace/creation',   icon: '🎨', label: '创作',    disabled: false },
+  { path: '/workspace/assistant',  icon: '🤖', label: 'AI 助手', disabled: false },
+  { path: '/workspace/workflow',   icon: '⚙', label: '工作流',  disabled: false },
+]
+
+function isActive(item: { path: string }) {
+  if (item.path === '/workspace') return currentPath.value === '/workspace'
+  return currentPath.value.startsWith(item.path)
 }
 
-// ============================================================
-// 三大固定类目 — 硬性规则：不准加第四大类
-// ============================================================
-const navGroups = ref([
-  // ---- 首页 ----
-  {
-    key: 'home', label: '', items: [
-      { path: '/workspace', icon: '🏠', label: '工作台首页' },
-    ]
-  },
-
-  // ═══════════════════════════════════════════════════
-  // 一、创作类 — 现阶段全力开发，优先级最高
-  // ═══════════════════════════════════════════════════
-  {
-    key: 'create-image', label: '📷 创作 · 图片工具',
-    items: [
-      { path: '/work/image', icon: '🏠', label: '图片工具首页' },
-      { path: '/work/main-image', icon: '🖼', label: '主图生成' },
-      { path: '/work/scene', icon: '🏞', label: '场景图生成' },
-      { path: '/work/poster', icon: '📰', label: '海报生成' },
-      { path: '/work/detail', icon: '📋', label: '海报详情编辑' },
-      { path: '/work/remove-bg', icon: '✂', label: '智能去背景' },
-      { path: '/work/white-bg', icon: '⬜', label: '白底图生成' },
-      { path: '/work/color-swap', icon: '🎯', label: '商品换色' },
-      { path: '/work/color-change', icon: '🎨', label: '颜色替换' },
-      { path: '/work/style-transfer', icon: '🖌', label: '风格迁移' },
-      { path: '/work/text-effect', icon: '🔤', label: '文字特效' },
-      { path: '/work/outpaint', icon: '↔', label: '智能外扩' },
-      { path: '/work/outpainting', icon: '↕', label: '外扩入口' },
-      { path: '/work/retouch', icon: '✨', label: 'AI 精修' },
-      { path: '/work/wrinkle-remove', icon: '🧹', label: '去皱美颜' },
-      { path: '/work/ghost-mannequin', icon: '👤', label: '幽灵模特' },
-      { path: '/work/translate-image', icon: '🌐', label: '图片翻译' },
-    ]
-  },
-  {
-    key: 'create-video', label: '🎬 创作 · 视频工具',
-    items: [
-      { path: '/work/video', icon: '🎥', label: '视频生成' },
-      { path: '/work/video-edit', icon: '✂', label: '视频编辑' },
-      { path: '/work/video-translate', icon: '🌐', label: '视频翻译（语音/字幕/面容）' },
-    ]
-  },
-  {
-    key: 'create-face', label: '🧑 创作 · AI 换脸 / 数字人',
-    items: [
-      { path: '/work/swap-face', icon: '😊', label: 'AI 换脸' },
-      { path: '/work/person-replace', icon: '🔄', label: '人物替换' },
-      { path: '/work/virtual-tryon', icon: '👗', label: '虚拟试穿' },
-      { path: '/work/digital-human', icon: '🤖', label: '数字人带货视频' },
-      { path: '/work/model-generate', icon: '🧍', label: 'AI 模特生成' },
-    ]
-  },
-  {
-    key: 'create-voice', label: '🔊 创作 · 声音工具',
-    items: [
-      { path: '/work/voice-gen', icon: '🔊', label: 'AI 语音生成' },
-      { path: '/work/voice-clone', icon: '🎙', label: '声音克隆' },
-    ]
-  },
-  {
-    key: 'create-copy', label: '📝 创作 · 文案工具',
-    items: [
-      { path: '/work/copywriting', icon: '✍', label: '智能文案（标题/卖点/种草/翻译）' },
-      { path: '/work/script-gen', icon: '📝', label: '短视频脚本生成' },
-    ]
-  },
-  {
-    key: 'create-platform', label: '📐 创作 · 平台适配',
-    items: [
-      { path: '/work/size-templates', icon: '📏', label: '平台尺寸模板库' },
-      { path: '/work/platform-detail', icon: '📋', label: '平台详情页' },
-      { path: '/work/product-render', icon: '🛒', label: '产品渲染' },
-      { path: '/work/detail-h5', icon: '📱', label: '详情页 H5' },
-    ]
-  },
-  {
-    key: 'create-social', label: '📱 创作 · 社媒 / 营销内容工具',
-    items: [
-      { path: '/work/social', icon: '📱', label: '社媒封面生成' },
-      { path: '/work/action-transfer', icon: '🕺', label: '动作迁移' },
-      { path: '/work/compliance-check', icon: '🛡', label: '合规检测' },
-      { path: '/work/viral-clone', icon: '📋', label: '爆款克隆' },
-      { path: '/work/viral-replicate', icon: '🔥', label: '爆款复刻' },
-      { path: '/work/compare', icon: '🔍', label: '图片对比' },
-      { path: '/work/shot-plan', icon: '📐', label: '分镜计划' },
-      { path: '/work/shot-panorama', icon: '🔄', label: '全景拍摄' },
-      { path: '/work/storyboard', icon: '🎞', label: '故事板' },
-    ]
-  },
-  {
-    key: 'create-efficiency', label: '⚡ 创作 · 效率工具',
-    items: [
-      { path: '/work/batch', icon: '📦', label: '批量处理' },
-      { path: '/work/publish', icon: '📤', label: '一键发布' },
-      { path: '/work/output', icon: '📁', label: '导出设置' },
-      { path: '/work/usage', icon: '📊', label: '用量统计' },
-      { path: '/work/brand-settings', icon: '🏷', label: '品牌设置' },
-      { path: '/work/prompt-hub', icon: '💡', label: '提示词市场' },
-    ]
-  },
-  {
-    key: 'create-eco', label: '🌍 创作 · 生态 / 分发',
-    items: [
-      { path: '/work/diy-pages', icon: '🛠', label: 'DIY 页面' },
-      { path: '/work/distribution', icon: '📡', label: '分销推广' },
-      { path: '/work/cut-ecosystem', icon: '✂', label: '剪映生态' },
-      { path: '/work/marketplace', icon: '🏪', label: '场景模板市场' },
-    ]
-  },
-
-  // ═══════════════════════════════════════════════════
-  // 二、AI 助手类 — 只预留架构和名称，暂时不开发
-  // ═══════════════════════════════════════════════════
-  {
-    key: 'ai-placeholder', label: '🤖 AI 助手（即将上线）',
-    items: [
-      { path: '', icon: '💬', label: '店铺客服智能体', disabled: true },
-      { path: '', icon: '🏪', label: '店铺运营智能体', disabled: true },
-      { path: '', icon: '📢', label: '营销推广智能体', disabled: true },
-      { path: '', icon: '🛒', label: '商品优化智能体', disabled: true },
-      { path: '', icon: '🔥', label: '选品爆款智能体', disabled: true },
-      { path: '', icon: '🔎', label: '竞品分析智能体', disabled: true },
-      { path: '', icon: '⭐', label: '评价管理智能体', disabled: true },
-      { path: '', icon: '🛡', label: '违规风控智能体', disabled: true },
-      { path: '', icon: '🎓', label: '行业专家智能体', disabled: true },
-      { path: '', icon: '📊', label: '数据分析智能体', disabled: true },
-      { path: '', icon: '📺', label: '直播专属智能体', disabled: true },
-    ]
-  },
-
-  // ═══════════════════════════════════════════════════
-  // 三、工作流类 — 只预留架构和名称，暂时不开发
-  // ═══════════════════════════════════════════════════
-  {
-    key: 'flow-placeholder', label: '⚙ 工作流（即将上线）',
-    items: [
-      { path: '', icon: '🏪', label: '店铺日常运营工作流', disabled: true },
-      { path: '', icon: '🆕', label: '商品上新全流程工作流', disabled: true },
-      { path: '', icon: '🔥', label: '爆款内容批量生产工作流', disabled: true },
-      { path: '', icon: '⭐', label: '评价 & 问大家自动维护工作流', disabled: true },
-      { path: '', icon: '🎉', label: '大促活动营销工作流', disabled: true },
-      { path: '', icon: '📊', label: '每日数据自动复盘工作流', disabled: true },
-      { path: '', icon: '🛡', label: '违规自查风控工作流', disabled: true },
-      { path: '', icon: '📱', label: '私域引流转化工作流', disabled: true },
-    ]
-  },
-
-  // ---- 快捷入口 ----
-  {
-    key: 'quick', label: '⚡ 快捷入口',
-    items: [
-      { path: '/assets', icon: '🗂', label: '素材库' },
-      { path: '/member', icon: '💎', label: '会员中心' },
-    ]
-  },
-  // ---- 我的 ----
-  {
-    key: 'my', label: '👤 我的',
-    items: [
-      { path: '/my/favorites', icon: '⭐', label: '我的收藏' },
-      { path: '/my/collections', icon: '📁', label: '我的合集' },
-      { path: '/my/templates', icon: '📋', label: '我的模板' },
-      { path: '/my/works', icon: '🎬', label: '我的作品' },
-      { path: '/my/orders', icon: '🧾', label: '我的订单' },
-      { path: '/my/credits', icon: '💎', label: '积分明细' },
-      { path: '/my/settings', icon: '⚙', label: '个人设置' },
-    ]
-  },
-])
-
-onMounted(async () => {
-  try {
-    const res: any = await $fetch('/api/user/profile', { credentials: 'include' })
-    if (res.code === 200) {
-      const u = res.data
-      userName.value = u.nickname || ''
-      userInitial.value = (u.nickname || 'U')[0].toUpperCase()
-      userPoints.value = u.points_balance || 0
-      isAdmin.value = ['admin', 'super_admin'].includes(u.role)
-    }
-  } catch { toast.error('加载用户信息失败') }
+const pageTitle = computed(() => {
+  const item = navItems.find(i => !i.disabled && isActive(i))
+  return item ? item.label : '工作台'
 })
 
 async function handleLogout() {
-  await $fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
-  navigateTo('/login')
+  try {
+    await $fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
+    toast.add({ title: '已退出登录', color: 'green' })
+    router.push('/login')
+  } catch {
+    router.push('/login')
+  }
 }
+
+onMounted(async () => {
+  try {
+    const data = await $fetch('/api/auth/me', { credentials: 'include' })
+    userName.value = (data as any).username || (data as any).email || ''
+    userPoints.value = (data as any).points || 0
+    isAdmin.value = !!(data as any).isAdmin
+    userInitial.value = userName.value ? userName.value.charAt(0).toUpperCase() : 'U'
+  } catch {}
+})
+
+definePageMeta({ middleware: ['auth'] })
 </script>
 
 <style scoped>
-.workspace-layout { display: flex; min-height: 100vh; }
+/* ═══ Layout Shell ═══ */
+.wsl { display: flex; height: 100vh; overflow: hidden; background: var(--bg-page, #fafaf9); }
 
-/* Sidebar */
-.sidebar {
-  width: 260px; background: var(--cfg-bg-primary); border-right: 1px solid var(--cfg-border);
-  display: flex; flex-direction: column; transition: width var(--cfg-transition-base);
-  position: sticky; top: 0; height: 100vh; z-index: 90;
+/* ═══ Sidebar ═══ */
+.wsl-side {
+  width: 200px; background: #fff; border-right: 1px solid var(--brd, #ebebea);
+  display: flex; flex-direction: column; flex-shrink: 0; transition: width 0.2s;
 }
-.sidebar.collapsed { width: 64px; }
-.sidebar-header {
-  height: 56px; display: flex; align-items: center; justify-content: space-between;
-  padding: 0 16px; border-bottom: 1px solid var(--cfg-border); flex-shrink: 0;
-}
-.sidebar-logo { font-size: var(--cfg-font-size-md); font-weight: var(--cfg-font-weight-bold); color: var(--cfg-primary); text-decoration: none; white-space: nowrap; overflow: hidden; }
-.sidebar-toggle { background: none; border: none; font-size: 12px; cursor: pointer; color: var(--cfg-text-muted); padding: 4px; flex-shrink: 0; }
-
-.sidebar-nav { flex: 1; padding: 8px; display: flex; flex-direction: column; gap: 1px; overflow-y: auto; }
-
-/* Group label */
-.nav-group-label {
+.wsl-side.fold { width: 56px; }
+.wsl-logo-area {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 8px 12px 4px; margin-top: 6px;
-  font-size: 11px; font-weight: 600; color: var(--cfg-text-muted);
-  text-transform: uppercase; letter-spacing: 0.5px;
-  background: none; border: none; cursor: pointer; width: 100%; text-align: left;
+  padding: 14px 12px 10px;
 }
-.nav-group-label:hover { color: var(--cfg-text-secondary); }
-.group-arrow { font-size: 10px; transition: transform 0.2s; }
-.group-arrow.open { transform: rotate(180deg); }
-
-/* Nav item */
-.nav-item {
-  display: flex; align-items: center; gap: 12px;
-  padding: 8px 12px; border-radius: var(--cfg-radius-base);
-  font-size: var(--cfg-font-size-base); color: var(--cfg-text-secondary);
-  text-decoration: none; transition: all var(--cfg-transition-fast);
-  white-space: nowrap;
+.wsl-logo { font-size: 15px; font-weight: 600; color: var(--tx, #171717); text-decoration: none; letter-spacing: -0.03em; white-space: nowrap; }
+.wsl-fold-btn {
+  width: 24px; height: 24px; border: none; background: none; cursor: pointer;
+  color: var(--tx2, #6b6b70); font-size: 11px; border-radius: 6px; display: flex; align-items: center; justify-content: center;
 }
-.nav-item:hover { background: var(--cfg-bg-tertiary); color: var(--cfg-text-primary); }
-.nav-item.active { background: var(--cfg-primary-light); color: var(--cfg-primary); font-weight: var(--cfg-font-weight-semibold); }
+.wsl-fold-btn:hover { background: var(--bg-hover, #f5f5f5); }
 
-/* 预留占位项 */
-.nav-item.disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
-.nav-item.placeholder { background: transparent; }
-.nav-badge {
-  font-size: 10px; padding: 1px 6px; border-radius: 8px;
-  background: var(--cfg-bg-tertiary); color: var(--cfg-text-muted);
-  margin-left: auto; white-space: nowrap;
+/* Nav */
+.wsl-nav { flex: 1; display: flex; flex-direction: column; gap: 1px; padding: 4px 8px; overflow-y: auto; }
+.wsl-nav-item {
+  display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px;
+  color: var(--tx2, #6b6b70); font-size: 13px; text-decoration: none; transition: all 0.15s; white-space: nowrap;
 }
-.nav-item.disabled .nav-badge { background: #f0f0f0; color: #999; }
+.wsl-nav-item:hover { background: var(--bg-hover, #f5f5f5); color: var(--tx, #171717); }
+.wsl-nav-item.sel { background: var(--bg-sel, #171717); color: #fff; }
+.wsl-nav-item.off { opacity: 0.45; cursor: default; }
+.wsl-nav-item.off:hover { background: none; color: var(--tx2, #6b6b70); }
+.wsl-nav-icon { font-size: 16px; width: 22px; text-align: center; flex-shrink: 0; }
+.wsl-nav-label { flex: 1; }
+.wsl-nav-tag { font-size: 10px; padding: 1px 6px; border-radius: 4px; background: var(--bg-tag, #f3f4f6); color: var(--tx3, #9d9da3); }
 
-.nav-icon { font-size: 16px; flex-shrink: 0; width: 20px; text-align: center; }
-.nav-label { overflow: hidden; text-overflow: ellipsis; }
+/* Footer */
+.wsl-footer { padding: 10px 12px; border-top: 1px solid var(--brd, #ebebea); }
+.wsl-user { display: flex; align-items: center; gap: 8px; }
+.wsl-av { width: 28px; height: 28px; border-radius: 50%; background: var(--bg-av, #e8e8ec); display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--tx2, #6b6b70); flex-shrink: 0; }
+.wsl-uname { font-size: 13px; color: var(--tx, #171717); }
+.wsl-points { font-size: 11px; color: var(--tx3, #9d9da3); margin-top: 4px; padding-left: 36px; }
 
-.sidebar-footer { padding: 12px 16px; border-top: 1px solid var(--cfg-border); flex-shrink: 0; }
-.user-brief { display: flex; align-items: center; gap: 10px; }
-.avatar-sm {
-  width: 32px; height: 32px; border-radius: 50%;
-  background: var(--cfg-primary); color: #fff; display: flex; align-items: center; justify-content: center;
-  font-size: 13px; font-weight: 600; flex-shrink: 0;
+/* ═══ Main Area ═══ */
+.wsl-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.wsl-top {
+  display: flex; align-items: center; padding: 12px 24px; background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(10px); border-bottom: 1px solid var(--brd, #ebebea); flex-shrink: 0;
 }
-.user-name { font-size: var(--cfg-font-size-sm); color: var(--cfg-text-primary); overflow: hidden; text-overflow: ellipsis; }
-
-/* Main area */
-.main-area { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-
-.topbar {
-  height: 56px; display: flex; align-items: center; justify-content: space-between;
-  padding: 0 24px; border-bottom: 1px solid var(--cfg-border);
-  background: var(--cfg-bg-primary); position: sticky; top: 0; z-index: 80;
+.wsl-title { font-size: 15px; font-weight: 600; color: var(--tx, #171717); letter-spacing: -0.03em; flex: 1; }
+.wsl-actions { display: flex; gap: 8px; align-items: center; }
+.wsl-btn {
+  padding: 6px 14px; border-radius: 7px; font-size: 12px; color: var(--tx2, #6b6b70);
+  background: none; border: 1px solid var(--brd, #ebebea); cursor: pointer; text-decoration: none; transition: all 0.15s;
 }
-.topbar-title { font-size: var(--cfg-font-size-md); font-weight: var(--cfg-font-weight-semibold); color: var(--cfg-text-primary); margin: 0; }
-.topbar-title-group { display: flex; align-items: baseline; gap: 12px; }
-.topbar-category { font-size: var(--cfg-font-size-xs); color: var(--cfg-text-muted); }
-.topbar-actions { display: flex; align-items: center; gap: 12px; }
-.points-badge { font-size: var(--cfg-font-size-sm); color: var(--cfg-primary); font-weight: var(--cfg-font-weight-medium); }
+.wsl-btn:hover { background: var(--bg-hover, #f5f5f5); color: var(--tx, #171717); }
+.wsl-content { flex: 1; overflow-y: auto; }
 
-.content { flex: 1; background: var(--cfg-bg-secondary); }
-
-@media (max-width: 768px) {
-  .sidebar { position: fixed; left: 0; top: 0; z-index: 200; transform: translateX(-100%); }
-  .sidebar.mobile-open { transform: translateX(0); }
-}
+/* Dark */
+:root[data-theme="dark"] .wsl-side, :root.dark .wsl-side { background: #121212; border-color: #2a2a2a; }
+:root[data-theme="dark"] .wsl-top, :root.dark .wsl-top { background: rgba(18,18,18,0.8); border-color: #2a2a2a; }
 </style>
