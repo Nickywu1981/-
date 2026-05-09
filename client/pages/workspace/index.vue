@@ -14,17 +14,19 @@
       </div>
     </div>
 
-    <!-- AI助手 + 工作流 预留 -->
-    <div class="wh-row">
-      <div class="wh-card wh-card--ph">
-        <h3>🤖 AI 助手</h3>
-        <p>电商各类角色智能体，售前售后客服、店铺巡检、商品优化、选品分析等全岗位 AI 化</p>
-        <span class="wh-tag">即将上线</span>
+    <!-- 用量统计 -->
+    <div class="wh-stats">
+      <div class="wh-stat">
+        <span class="wh-stat-num">{{ stats.today }}</span>
+        <span class="wh-stat-label">今日生成</span>
       </div>
-      <div class="wh-card wh-card--ph">
-        <h3>⚙ 工作流</h3>
-        <p>把零散功能串成自动化流程，一键完成上新、做内容、管评价、做复盘</p>
-        <span class="wh-tag">即将上线</span>
+      <div class="wh-stat">
+        <span class="wh-stat-num">{{ stats.total }}</span>
+        <span class="wh-stat-label">累计产出</span>
+      </div>
+      <div class="wh-stat">
+        <span class="wh-stat-num">{{ stats.credits }}</span>
+        <span class="wh-stat-label">剩余额度</span>
       </div>
     </div>
   </div>
@@ -43,10 +45,18 @@ const quickLinks = [
   { path: '/work/usage', icon: '📊', name: '用量统计' },
 ]
 
+const stats = reactive({ today: 0, total: 0, credits: 0 })
+
 onMounted(async () => {
   try {
-    const data = await $fetch('/api/auth/me', { credentials: 'include' })
-    userName.value = (data as any).username || (data as any).email || ''
+    const [auth, statData] = await Promise.all([
+      $fetch('/api/auth/me', { credentials: 'include' }),
+      $fetch('/api/user/stats', { credentials: 'include' }).catch(() => ({})),
+    ])
+    userName.value = (auth as any).username || (auth as any).email || ''
+    stats.today = (statData as any).todayGenerations || 0
+    stats.total = (statData as any).totalGenerations || 0
+    stats.credits = (statData as any).credits || 0
   } catch {}
 })
 </script>
@@ -64,15 +74,17 @@ onMounted(async () => {
 .wh-qcard:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
 .wh-qicon { font-size: 20px; }
 .wh-qname { font-size: 13px; font-weight: 500; color: var(--tx, #171717); }
-.wh-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.wh-card { background: #fff; border-radius: 12px; padding: 22px 20px; border: 1px solid var(--brd, #ebebea); }
-.wh-card--ph { opacity: 0.7; }
-.wh-card h3 { font-size: 15px; font-weight: 600; color: var(--tx, #171717); margin-bottom: 8px; }
-.wh-card p { font-size: 13px; color: var(--tx2, #6b6b70); line-height: 1.5; margin-bottom: 10px; }
-.wh-tag { font-size: 11px; padding: 2px 8px; border-radius: 4px; background: var(--bg-tag, #f3f4f6); color: var(--tx3, #9d9da3); }
+
+.wh-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.wh-stat {
+  background: #fff; border-radius: 10px; padding: 16px; border: 1px solid var(--brd, #ebebea);
+  text-align: center;
+}
+.wh-stat-num { display: block; font-size: 22px; font-weight: 600; color: var(--tx, #171717); }
+.wh-stat-label { font-size: 12px; color: var(--tx3, #9d9da3); margin-top: 2px; }
 
 @media (max-width: 768px) {
   .wh-quick { grid-template-columns: repeat(2, 1fr); }
-  .wh-row { grid-template-columns: 1fr; }
+  .wh-stats { grid-template-columns: repeat(3, 1fr); }
 }
 </style>
