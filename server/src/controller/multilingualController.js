@@ -1,24 +1,25 @@
 import multilingualService from '../services/multilingualService.js';
+import { success, error } from '../utils/response.js';
 
 export async function getLanguages(_req, res) {
   try {
-    res.json({ code: 200, msg: 'success', data: multilingualService.getLanguages() });
-  } catch (err) { res.status(500).json({ code: 500, msg: err.message, data: null }); }
+    return success(res, multilingualService.getLanguages());
+  } catch (err) { return error(res, 500, err.message); }
 }
 
 export async function getScriptTypes(_req, res) {
   try {
-    res.json({ code: 200, msg: 'success', data: multilingualService.getScriptTypes() });
-  } catch (err) { res.status(500).json({ code: 500, msg: err.message, data: null }); }
+    return success(res, multilingualService.getScriptTypes());
+  } catch (err) { return error(res, 500, err.message); }
 }
 
 export async function buildPrompt(req, res) {
   try {
     const { product, language, scriptType, platform, tone } = req.body;
     if (!product || !language || !scriptType) {
-      return res.status(400).json({ code: 400, msg: '缺少必要参数：product, language, scriptType', data: null });
+      return error(res, 400, '缺少必要参数：product, language, scriptType');
     }
     const result = multilingualService.buildMultilingualPrompt({ product, language, scriptType, platform, tone });
-    res.json({ code: 200, msg: 'success', data: result });
-  } catch (err) { res.status(500).json({ code: 500, msg: err.message, data: null }); }
+    return success(res, result);
+  } catch (err) { return error(res, 500, err.message); }
 }
