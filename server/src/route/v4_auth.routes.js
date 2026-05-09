@@ -64,7 +64,7 @@ router.post('/register', _validate(registerSchema), async (req, res) => {
     // 设置 cookie
     _setTokenCookie(res, result.token);
 
-    return success(res, result.user, '注册成功');
+    return success(res, { ...result.user, token: result.token, token_expires_in: result.token_expires_in }, '注册成功');
   } catch (err) {
     return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '注册失败', err.status || ERROR_CODE.INTERNAL_ERROR);
   }
@@ -79,7 +79,7 @@ router.post('/login', _validate(loginSchema), async (req, res) => {
 
     _setTokenCookie(res, result.token);
 
-    return success(res, result.user, '登录成功');
+    return success(res, { ...result.user, token: result.token, token_expires_in: result.token_expires_in }, '登录成功');
   } catch (err) {
     return error(res, err.status || ERROR_CODE.UNAUTHORIZED, err.message || '登录失败', err.status || ERROR_CODE.UNAUTHORIZED);
   }
@@ -97,7 +97,7 @@ router.post('/login-by-code', _validate(loginByCodeSchema), async (req, res) => 
 
     _setTokenCookie(res, result.token);
 
-    return success(res, result.user, '登录成功');
+    return success(res, { ...result.user, token: result.token, token_expires_in: result.token_expires_in }, '登录成功');
   } catch (err) {
     return error(res, err.status || ERROR_CODE.UNAUTHORIZED, err.message || '登录失败', err.status || ERROR_CODE.UNAUTHORIZED);
   }
