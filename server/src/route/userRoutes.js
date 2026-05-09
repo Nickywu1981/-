@@ -5,6 +5,7 @@ import { asyncHandler } from '../middleware/asyncHandler.js';
 import { authLimiter } from '../middleware/rateLimiter.js';
 import { setCsrfCookie } from '../middleware/csrf.js';
 import { validate, passwordSchema, phoneSchema } from '../utils/validate.js';
+import { success } from '../utils/response.js';
 import { z } from 'zod';
 
 const router = Router();
@@ -49,7 +50,7 @@ router.post('/forgot-password', authLimiter, validate(forgotPasswordSchema), asy
 router.post('/reset-password', authLimiter, validate(resetPasswordSchema), asyncHandler(resetPassword));
 
 // 获取 CSRF Token（SPA 首次加载时调用）
-router.get('/csrf-token', setCsrfCookie, (_req, res) => res.json({ code: 200, msg: 'ok', data: null }));
+router.get('/csrf-token', setCsrfCookie, (_req, res) => success(res, null, 'ok'));
 
 // 需要认证
 router.get('/profile', authMiddleware, asyncHandler(profile));
