@@ -13,14 +13,18 @@ const createOrderSchema = z.object({
   payChannel: z.enum(['wechat', 'alipay', 'unionpay']).optional(),
 });
 
+const reqsnParamSchema = z.object({
+  reqsn: z.string().min(1, '缺少订单号'),
+});
+
 // 公开
 router.get('/plans', cacheMiddleware(600), asyncHandler(getPlans));
 
 // 需登录
 router.post('/create-order', authMiddleware, validate(createOrderSchema), asyncHandler(createOrder));
-router.get('/order/:reqsn', authMiddleware, asyncHandler(getOrderStatus));
-router.get('/result/:reqsn', authMiddleware, asyncHandler(checkPaymentResult));
-router.post('/sandbox-pay/:reqsn', authMiddleware, asyncHandler(sandboxPay));
+router.get('/order/:reqsn', authMiddleware, validate(reqsnParamSchema, 'params'), asyncHandler(getOrderStatus));
+router.get('/result/:reqsn', authMiddleware, validate(reqsnParamSchema, 'params'), asyncHandler(checkPaymentResult));
+router.post('/sandbox-pay/:reqsn', authMiddleware, validate(reqsnParamSchema, 'params'), asyncHandler(sandboxPay));
 router.get('/billing', authMiddleware, validate(paginationSchema, 'query'), asyncHandler(getBillingHistory));
 router.get('/orders', authMiddleware, validate(paginationSchema, 'query'), asyncHandler(getBillingHistory));
 

@@ -1,14 +1,25 @@
 {
-  "name": "Movio AI",
+  "name": "Movio AI — 电商AI视觉创作平台",
   "short_name": "Movio AI",
-  "description": "电商图片+视频AI一体化创作平台",
+  "description": "电商图片+视频AI一体化创作平台，抠图/场景/主图/视频/详情页/虚拟模特，一个工具搞定电商全部图文视频素材",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
   "background_color": "#ffffff",
   "theme_color": "#7C3AED",
+  "categories": ["productivity", "utilities", "business"],
+  "lang": "zh-CN",
+  "dir": "ltr",
+  "prefer_related_applications": false,
   "icons": [
-    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
   ],
-  "categories": ["productivity", "utilities"],
-  "lang": "zh-CN"
+  "screenshots": [],
+  "shortcuts": [
+    { "name": "创作中心", "short_name": "创作", "url": "/workspace" },
+    { "name": "图片工具", "short_name": "图片", "url": "/work/image" },
+    { "name": "视频工具", "short_name": "视频", "url": "/work/video" }
+  ]
 }

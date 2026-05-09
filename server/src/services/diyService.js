@@ -1,5 +1,6 @@
 import { BusinessError } from '../utils/businessError.js';
 import { DIY_PAGE_STATUS } from '../constants/domainStatus.js';
+import logger from '../utils/logger.js';
 /**
  * DIY 页面服务（增强版）
  * 完整状态机 / 双端配置 / 自动+手动版本 / Redis缓存 / 克隆 / 批量操作 / 发布校验
@@ -75,7 +76,7 @@ export default {
   async getPageById(id, tenantId) { return diyDao.getPageById(id, tenantId); },
   async getPublishedPage(slug) {
     const page = await diyDao.getPublishedPage(slug);
-    if (page) await diyDao.updateAccessCount(slug).catch(() => {});
+    if (page) await diyDao.updateAccessCount(slug).catch((e) => { logger.warn('更新访问计数失败:', e.message); });
     return page;
   },
 
@@ -236,7 +237,7 @@ export default {
   async batchDelete(ids, tenantId) {
     const pages = await Promise.all(ids.map(id => diyDao.getPageById(id, tenantId).catch(() => null)));
     for (const p of pages) {
-      if (p && p.status === DIY_PAGE_STATUS.PUBLISHED) await diyDao.clearPageCache(p.slug).catch(() => {});
+      if (p && p.status === DIY_PAGE_STATUS.PUBLISHED) await diyDao.clearPageCache(p.slug).catch((e) => { logger.warn('清除页面缓存失败:', e.message); });
     }
     await diyDao.batchUpdateStatus(ids.filter(Number), tenantId, 3);
     return { count: ids.length };

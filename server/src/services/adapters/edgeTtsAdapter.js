@@ -5,6 +5,7 @@
 /* global FormData, Blob */
 import { registerModel } from '../aiEngine.js';
 import logger from '../../utils/logger.js';
+import { BusinessError } from '../../utils/businessError.js';
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
@@ -202,7 +203,7 @@ async function realCloneInfer(text, audioSampleUrl) {
       }
     }
 
-    if (!voiceId) throw new Error('无法创建克隆声音');
+    if (!voiceId) throw new BusinessError(500, '无法创建克隆声音');
 
     // Step 2: TTS with cloned voice
     const ttsResp = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
@@ -211,7 +212,7 @@ async function realCloneInfer(text, audioSampleUrl) {
       body: JSON.stringify({ text: text || '', model_id: 'eleven_multilingual_v2' }),
     });
 
-    if (!ttsResp.ok) throw new Error(`ElevenLabs TTS 返回 ${ttsResp.status}`);
+    if (!ttsResp.ok) throw new BusinessError(ttsResp.status, `ElevenLabs TTS 返回 ${ttsResp.status}`);
 
     const audioBuffer = Buffer.from(await ttsResp.arrayBuffer());
     const filename = `clone_${Date.now()}_${crypto.randomBytes(4).toString('hex')}.mp3`;
@@ -221,7 +222,7 @@ async function realCloneInfer(text, audioSampleUrl) {
     fetch(`https://api.elevenlabs.io/v1/voices/${voiceId}`, {
       method: 'DELETE',
       headers: { 'xi-api-key': apiKey },
-    }).catch(() => {});
+    }).catch((e) => { logger.warn('[VoiceClone] 清理临时声音失败:', e.message); });
 
     const elapsed = Math.round((Date.now() - startTime) / 1000);
     logger.info(`[VoiceClone] 克隆完成: ${filename}, size=${(audioBuffer.length / 1024).toFixed(1)}KB, cost=${elapsed}s`);
@@ -268,7 +269,7 @@ export async function registerEdgeTTS() {
       const text = input.text || input.prompt || '';
       const voiceType = input.voiceType || input.voice || 'sweet-female';
       const speed = input.speed || 1.0;
-      if (!text.trim()) throw new Error('配音文本不能为空');
+      if (!text.trim()) throw new BusinessError(400, '配音文本不能为空');
       return realTTSInfer(text, voiceType, speed);
     },
   });

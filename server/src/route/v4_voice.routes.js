@@ -4,8 +4,8 @@
  */
 import { Router } from 'express';
 import { z } from 'zod';
-import { validate } from '../middleware/validate.js';
-import authMiddleware from '../middleware/auth.js';
+import { validate } from '../utils/validate.js';
+import { authMiddleware } from '../middleware/auth.js';
 import { success } from '../utils/response.js';
 import { infer } from '../services/aiEngine.js';
 
