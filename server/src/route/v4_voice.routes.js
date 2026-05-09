@@ -5,7 +5,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { success } from '../utils/response.js';
-import { aiEngine } from '../services/aiEngine.js';
+import { infer } from '../services/aiEngine.js';
 
 const router = Router();
 
@@ -24,7 +24,7 @@ const cloneSchema = z.object({
 router.post('/generate', async (req, res, next) => {
   try {
     const input = generateSchema.parse(req.body);
-    const result = await aiEngine.infer({ type: 'tts-generate', ...input });
+    const result = await infer({ modelId: 'tts-generate', input });
     return success(res, result, '语音生成成功');
   } catch (e) { next(e); }
 });
@@ -32,7 +32,7 @@ router.post('/generate', async (req, res, next) => {
 router.post('/clone', async (req, res, next) => {
   try {
     const input = cloneSchema.parse(req.body);
-    const result = await aiEngine.infer({ type: 'tts-clone', ...input });
+    const result = await infer({ modelId: 'tts-clone', input });
     return success(res, result, '声音克隆成功');
   } catch (e) { next(e); }
 });

@@ -5,7 +5,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { success } from '../utils/response.js';
-import { aiEngine } from '../services/aiEngine.js';
+import { infer } from '../services/aiEngine.js';
 
 const router = Router();
 
@@ -20,7 +20,7 @@ const generateSchema = z.object({
 router.post('/generate', async (req, res, next) => {
   try {
     const input = generateSchema.parse(req.body);
-    const result = await aiEngine.infer({ type: 'model-generate', ...input });
+    const result = await infer({ modelId: 'model-generate', input });
     return success(res, result, '模特生成成功');
   } catch (e) { next(e); }
 });

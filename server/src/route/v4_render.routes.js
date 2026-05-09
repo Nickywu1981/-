@@ -5,7 +5,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { success } from '../utils/response.js';
-import { aiEngine } from '../services/aiEngine.js';
+import { infer } from '../services/aiEngine.js';
 
 const router = Router();
 
@@ -20,7 +20,7 @@ const renderSchema = z.object({
 router.post('/product', async (req, res, next) => {
   try {
     const input = renderSchema.parse(req.body);
-    const result = await aiEngine.infer({ type: 'product-render', ...input });
+    const result = await infer({ modelId: 'product-render', input });
     return success(res, result, '渲染成功');
   } catch (e) { next(e); }
 });
