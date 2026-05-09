@@ -1,5 +1,6 @@
 import tierService from '../services/tierService.js';
 import logger from '../utils/logger.js';
+import { error } from '../utils/response.js';
 
 /**
  * 会员等级限制中间件
@@ -11,11 +12,7 @@ export function tierGuard(type = 'image') {
     try {
       const result = await tierService.checkDailyLimit(req.userId || req.user?.id, type);
       if (!result.allowed) {
-        return res.status(429).json({
-          code: 429,
-          msg: `今日${type === 'video' ? '视频' : '图片'}生成次数已用完（${result.current}/${result.max}），请升级套餐或明日再试`,
-          data: result,
-        });
+        return error(res, 429, `今日${type === 'video' ? '视频' : '图片'}生成次数已用完（${result.current}/${result.max}），请升级套餐或明日再试`, result);
       }
       req.tierLimit = result;
       next();

@@ -1,4 +1,5 @@
 import rateLimit from 'express-rate-limit';
+import { error } from '../utils/response.js';
 
 const windowMs = parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 60000;
 const max = parseInt(process.env.RATE_LIMIT_MAX, 10) || 200;
@@ -18,7 +19,7 @@ export function concurrencyGuard(maxConcurrent = CONCURRENCY_MAX_PER_USER) {
     const key = getConcurrencyKey(req);
     const current = userConcurrency.get(key) || 0;
     if (current >= maxConcurrent) {
-      return res.status(429).json({ code: 429, msg: `并发请求过多 (${maxConcurrent}路)，请稍后再试`, data: null });
+      return error(res, 429, `并发请求过多 (${maxConcurrent}路)，请稍后再试`);
     }
     userConcurrency.set(key, current + 1);
     res.on('finish', () => {

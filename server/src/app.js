@@ -158,11 +158,11 @@ app.post('/api/internal/embed', async (req, res) => {
   try {
     const { texts } = req.body;
     if (!texts || !Array.isArray(texts) || texts.length === 0) {
-      return res.status(400).json({ code: 400, msg: 'texts 数组必填' });
+      return sendError(res, 400, 'texts 数组必填');
     }
     const apiKey = process.env.OPENAI_API_KEY || '';
     const baseUrl = (process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1').replace(/\/+$/, '');
-    if (!apiKey) return res.status(500).json({ code: 500, msg: 'API key not configured' });
+    if (!apiKey) return sendError(res, 500, 'API key not configured');
 
     const fetchRes = await fetch(`${baseUrl}/embeddings`, {
       method: 'POST',
@@ -173,13 +173,13 @@ app.post('/api/internal/embed', async (req, res) => {
 
     if (!fetchRes.ok) {
       const err = await fetchRes.json().catch(() => ({}));
-      return res.status(fetchRes.status).json({ code: fetchRes.status, msg: err.error?.message || 'upstream error' });
+      return sendError(res, fetchRes.status, err.error?.message || 'upstream error');
     }
 
     const data = await fetchRes.json();
     res.json({ code: 200, msg: 'ok', data: { vectors: data.data.map(d => d.embedding), model: data.model } });
   } catch (e) {
-    res.status(500).json({ code: 500, msg: e.message });
+    sendError(res, 500, e.message);
   }
 });
 

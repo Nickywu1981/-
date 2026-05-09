@@ -6,6 +6,7 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import crypto from 'crypto';
+import { error } from '../utils/response.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const UPLOAD_DIR = path.join(__dirname, '../../uploads/images');
@@ -66,7 +67,7 @@ export function magicNumberGuard(req, res, next) {
   for (const f of files) {
     if (!checkMagicNumber(f.path, f.mimetype)) {
       fs.unlink(f.path, () => {}); // 删除恶意文件
-      return res.status(400).json({ code: 400, msg: '文件内容与扩展名不匹配，已拒绝', data: null });
+      return error(res, 400, '文件内容与扩展名不匹配，已拒绝');
     }
   }
   next();
