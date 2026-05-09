@@ -10,6 +10,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import { success, error } from '../utils/response.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { authMiddleware } from '../middleware/auth.js';
 import db from '../dao/db.js';
@@ -41,7 +42,7 @@ router.get('/profile', async (req, res) => {
         'SELECT id, nickname, phone, email, avatar, role, create_time FROM `user` WHERE id = ?',
         [req.user.id],
       );
-      if (users.length === 0) return error(res, 404, '用户不存在');
+      if (users.length === 0) return error(res, ERROR_CODE.NOT_FOUND, '用户不存在');
 
       const [membership] = await conn.query(
         'SELECT plan_type, credit_balance, start_time, end_time, auto_renew FROM user_membership WHERE user_id = ? AND is_deleted = 0',
@@ -61,7 +62,7 @@ router.get('/profile', async (req, res) => {
       conn.release();
     }
   } catch (err) {
-    return error(res, err.status || 500, err.message);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
   }
 });
 
@@ -88,7 +89,7 @@ router.get('/stats', async (req, res) => {
       conn.release();
     }
   } catch (err) {
-    return error(res, err.status || 500, err.message);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
   }
 });
 
@@ -103,7 +104,7 @@ router.put('/profile', _validate(updateProfileSchema), async (req, res) => {
     if (phone !== undefined) { updates.push('phone = ?'); params.push(phone || null); }
     if (email !== undefined) { updates.push('email = ?'); params.push(email || null); }
 
-    if (updates.length === 0) return error(res, 400, '无更新字段');
+    if (updates.length === 0) return error(res, ERROR_CODE.BAD_REQUEST, '无更新字段');
 
     const conn = await db.getConnection();
     try {
@@ -116,7 +117,7 @@ router.put('/profile', _validate(updateProfileSchema), async (req, res) => {
       conn.release();
     }
   } catch (err) {
-    return error(res, err.status || 500, err.message);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
   }
 });
 
@@ -131,10 +132,10 @@ router.put('/change-password', _validate(changePasswordSchema), async (req, res)
         'SELECT password_hash FROM `user` WHERE id = ?',
         [req.user.id],
       );
-      if (users.length === 0) return error(res, 404, '用户不存在');
+      if (users.length === 0) return error(res, ERROR_CODE.NOT_FOUND, '用户不存在');
 
       const valid = await bcrypt.compare(oldPassword, users[0].password_hash);
-      if (!valid) return error(res, 403, '原密码不正确');
+      if (!valid) return error(res, ERROR_CODE.FORBIDDEN, '原密码不正确');
 
       const hash = await bcrypt.hash(newPassword, 12);
       await conn.query('UPDATE `user` SET password_hash = ? WHERE id = ?', [hash, req.user.id]);
@@ -143,7 +144,7 @@ router.put('/change-password', _validate(changePasswordSchema), async (req, res)
       conn.release();
     }
   } catch (err) {
-    return error(res, err.status || 500, err.message);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
   }
 });
 
@@ -154,12 +155,12 @@ router.put('/membership/auto-renew', _validate(z.object({
   try {
     const m = await membershipDao.findByUserId(req.user.id);
     if (!m || m.plan_type === 'free' || m.plan_type === 0) {
-      return error(res, 400, '仅付费会员支持自动续费');
+      return error(res, ERROR_CODE.BAD_REQUEST, '仅付费会员支持自动续费');
     }
     await membershipDao.setAutoRenew(req.user.id, req.validated.autoRenew);
     success(res, { autoRenew: req.validated.autoRenew }, '自动续费已' + (req.validated.autoRenew ? '开启' : '关闭'));
   } catch (err) {
-    error(res, err.status || 500, err.message);
+    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
   }
 });
 

@@ -15,6 +15,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { success, error } from '../utils/response.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { requireRole } from '../middleware/rbac.js';
 import * as modelRouter from '../services/model-router.service.js';
@@ -139,7 +140,7 @@ router.post('/single', requireRole('admin'), _validate(singleTestSchema), async 
       created_at: new Date().toISOString(),
     };
     _addHistory(entry);
-    return error(res, 502, err.message, { test_id: entry.id });
+    return error(res, ERROR_CODE.INTERNAL_ERROR, err.message, { test_id: entry.id });
   }
 });
 
@@ -180,7 +181,7 @@ router.post('/mixed', requireRole('admin'), _validate(mixedTestSchema), async (r
       created_at: new Date().toISOString(),
     };
     _addHistory(entry);
-    return error(res, 502, err.message, { test_id: entry.id });
+    return error(res, ERROR_CODE.INTERNAL_ERROR, err.message, { test_id: entry.id });
   }
 });
 
@@ -321,7 +322,7 @@ router.get('/history', requireRole('admin'), async (req, res) => {
 // DELETE /api/test/history/:id
 router.delete('/history/:id', requireRole('admin'), async (req, res) => {
   const idx = testHistory.findIndex(h => h.id === req.params.id);
-  if (idx === -1) return error(res, 404, '记录不存在');
+  if (idx === -1) return error(res, ERROR_CODE.NOT_FOUND, '记录不存在');
   testHistory.splice(idx, 1);
   return success(res, { deleted: true });
 });
