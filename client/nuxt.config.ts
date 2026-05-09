@@ -68,6 +68,7 @@ export default defineNuxtConfig({
     locales: ['zh', 'en', 'es'],
     defaultLocale: 'zh',
     strategy: 'prefix_except_default',
+    langDir: 'i18n/locales',
     // 浏览器语言自动检测 + IP 回退
     detectBrowserLanguage: {
       useCookie: true,
@@ -80,9 +81,8 @@ export default defineNuxtConfig({
     },
     // 根据 Accept-Language + Cookie 自动匹配
     experimental: {
-      localeDetector: './locales/locale-detector.ts',
+      localeDetector: './i18n/locales/locale-detector.ts',
     },
-    // 不设置 langDir，直接从 i18n.config.ts 内联加载
   },
 
   // PWA 渐进式应用配置
