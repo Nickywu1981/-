@@ -7,7 +7,7 @@ import logger from '../utils/logger.js';
  * 完整状态机 / 双端配置 / 自动+手动版本 / Redis缓存 / 克隆 / 批量操作 / 发布校验
  * v7: 事务保护 + N+1批量查询优化
  */
-import diyDao, { withTransaction } from '../dao/diyDao.js';
+import diyDao from '../dao/diyDao.js';
 
 // 发布前校验规则
 function validateBeforePublish(page) {
@@ -51,6 +51,24 @@ function checkStateTransition(currentStatus, targetStatus) {
   return rule.msg[targetStatus];
 }
 
+export function compareConfigs(a, b) {
+  if (!a && !b) return [];
+  if (!a) return [{ path: 'root', type: 'added', b: JSON.stringify(b) }];
+  if (!b) return [{ path: 'root', type: 'removed', a: JSON.stringify(a) }];
+  const diffs = [];
+  const aSections = a?.sections || [];
+  const bSections = b?.sections || [];
+  const max = Math.max(aSections.length, bSections.length);
+  for (let i = 0; i < max; i++) {
+    if (!aSections[i]) { diffs.push({ path: `sections[${i}]`, type: 'added', b: bSections[i]?.type }); }
+    else if (!bSections[i]) { diffs.push({ path: `sections[${i}]`, type: 'removed', a: aSections[i]?.type }); }
+    else if (JSON.stringify(aSections[i]) !== JSON.stringify(bSections[i])) {
+      diffs.push({ path: `sections[${i}]`, type: 'modified', aType: aSections[i]?.type, bType: bSections[i]?.type });
+    }
+  }
+  return diffs;
+}
+
 export default {
   // ========== 基础 CRUD ==========
 
@@ -64,20 +82,7 @@ export default {
 
   async createPage(tenantId, ownerId, { title, slug, pageType, accessType, mobileConfig, pcConfig, metaJson }) {
     if (!title?.trim() || !slug?.trim()) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '标题和标识不能为空');
-    return withTransaction(async (conn) => {
-      const [r] = await conn.query(
-        'INSERT INTO diy_page (tenant_id, owner_id, title, slug, page_type, access_type, mobile_config, pc_config, meta_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [tenantId, ownerId || 0, title, slug, pageType || 'mobile', accessType || 'public', JSON.stringify(mobileConfig || { sections: [] }), JSON.stringify(pcConfig || { sections: [] }), metaJson ? JSON.stringify(metaJson) : null],
-      );
-      const id = r.insertId;
-      const [[{ v }]] = await conn.query('SELECT COALESCE(MAX(version),0)+1 as v FROM diy_page_version WHERE page_id = ?', [id]);
-      await conn.query(
-        'INSERT INTO diy_page_version (page_id, version, mobile_config, pc_config, remark, auto_save) VALUES (?, ?, ?, ?, ?, ?)',
-        [id, v, JSON.stringify(mobileConfig || { sections: [] }), JSON.stringify(pcConfig || { sections: [] }), '初始版本', 0],
-      );
-      const [[page]] = await conn.query('SELECT * FROM diy_page WHERE id = ?', [id]);
-      return { ...page, mobile_config: mobileConfig || { sections: [] }, pc_config: pcConfig || { sections: [] }, meta_json: metaJson || null };
-    });
+    return diyDao.createPageWithVersion({ tenantId, ownerId: ownerId || 0, title, slug, pageType: pageType || 'mobile', accessType: accessType || 'public', mobileConfig: mobileConfig || { sections: [] }, pcConfig: pcConfig || { sections: [] }, metaJson });
   },
 
   async updatePage(id, tenantId, fields) {
@@ -95,15 +100,7 @@ export default {
     const msg = checkStateTransition(page.status, 1);
     const issues = validateBeforePublish(page);
     if (issues.length) throw new BusinessError(ERROR_CODE.BAD_REQUEST, `发布校验未通过: ${issues.join('; ')}`);
-    // 事务保护：状态更新 + 版本保存原子执行
-    await withTransaction(async (conn) => {
-      await conn.query('UPDATE diy_page SET status = 1, publish_time = NOW() WHERE id = ? AND tenant_id = ?', [id, tenantId]);
-      const [[{ v }]] = await conn.query('SELECT COALESCE(MAX(version),0)+1 as v FROM diy_page_version WHERE page_id = ?', [id]);
-      await conn.query(
-        'INSERT INTO diy_page_version (page_id, version, mobile_config, pc_config, remark, auto_save) VALUES (?, ?, ?, ?, ?, 0)',
-        [id, v, JSON.stringify(page.mobile_config), JSON.stringify(page.pc_config), '发布'],
-      );
-    });
+    await diyDao.publishWithVersion(id, tenantId, page.mobile_config, page.pc_config, page.slug);
     const published = await diyDao.getPageById(id, tenantId);
     await diyDao.cachePublishedPage(page.slug, {
       id: published.id, title: published.title, slug: published.slug, page_type: published.page_type,
@@ -167,22 +164,7 @@ export default {
   async clonePage(id, tenantId) {
     const src = await diyDao.getPageById(id, tenantId);
     if (!src) throw new BusinessError(ERROR_CODE.NOT_FOUND, '源页面不存在');
-    const slug = `${src.slug}-clone-${Date.now().toString(36)}`;
-    const title = `${src.title}（克隆版）`;
-    return withTransaction(async (conn) => {
-      const [r] = await conn.query(
-        'INSERT INTO diy_page (tenant_id, owner_id, title, slug, page_type, access_type, mobile_config, pc_config, meta_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [tenantId, src.owner_id, title, slug, src.page_type, src.access_type, JSON.stringify(src.mobile_config), JSON.stringify(src.pc_config), src.meta_json ? JSON.stringify(src.meta_json) : null],
-      );
-      const newId = r.insertId;
-      const [[{ v }]] = await conn.query('SELECT COALESCE(MAX(version),0)+1 as v FROM diy_page_version WHERE page_id = ?', [newId]);
-      await conn.query(
-        'INSERT INTO diy_page_version (page_id, version, mobile_config, pc_config, remark, auto_save) VALUES (?, ?, ?, ?, ?, 0)',
-        [newId, v, JSON.stringify(src.mobile_config), JSON.stringify(src.pc_config), `克隆自页面 #${id}`],
-      );
-      const [[page]] = await conn.query('SELECT * FROM diy_page WHERE id = ?', [newId]);
-      return { ...page, mobile_config: src.mobile_config, pc_config: src.pc_config, meta_json: src.meta_json };
-    });
+    return diyDao.cloneWithVersion(src, tenantId);
   },
 
   // ========== 版本管理 ==========
@@ -211,17 +193,7 @@ export default {
     if (!page) throw new BusinessError(ERROR_CODE.NOT_FOUND, '页面不存在');
     const src = await diyDao.getVersion(pageId, version);
     if (!src) throw new BusinessError(ERROR_CODE.NOT_FOUND, '版本不存在');
-    // 事务保护：保存新版本 + 更新页面配置原子执行
-    return withTransaction(async (conn) => {
-      const [[{ v }]] = await conn.query('SELECT COALESCE(MAX(version),0)+1 as v FROM diy_page_version WHERE page_id = ?', [pageId]);
-      await conn.query(
-        'INSERT INTO diy_page_version (page_id, version, mobile_config, pc_config, remark, auto_save, rollback_from) VALUES (?, ?, ?, ?, ?, 0, ?)',
-        [pageId, v, JSON.stringify(src.mobile_config), JSON.stringify(src.pc_config), `回滚自版本 v${version}`, version],
-      );
-      await conn.query('UPDATE diy_page SET mobile_config = ?, pc_config = ? WHERE id = ? AND tenant_id = ?',
-        [JSON.stringify(src.mobile_config), JSON.stringify(src.pc_config), pageId, tenantId]);
-      return { version: v, msg: `已回滚至版本 v${version}` };
-    });
+    return diyDao.rollbackWithVersion(pageId, tenantId, src);
   },
 
   async getLatestAutoVersion(pageId, tenantId) {
@@ -233,12 +205,7 @@ export default {
   // ========== 批量操作 ==========
 
   async batchPublish(ids, tenantId) {
-    const results = [];
-    for (const id of ids) {
-      try { results.push({ id, success: true, ...(await this.publishPage(id, tenantId)) }); }
-      catch (e) { results.push({ id, success: false, error: e.message }); }
-    }
-    return results;
+    return diyDao.batchPublishWithVersions(ids, tenantId);
   },
 
   async batchUnpublish(ids, tenantId) {

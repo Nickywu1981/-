@@ -9,6 +9,7 @@ import { ERROR_CODE } from '../constants/errorCodes.js';
 import { DIY_PAGE_STATUS_LABEL } from '../constants/domainStatus.js';
 import { success, error } from '../utils/response.js';
 import * as diyService from '../services/diyService.js';
+import { compareConfigs } from '../services/diyService.js';
 import {
   listPages, getPage, createPage, updatePage,
   publishPage, unpublishPage, republishPage,
@@ -119,24 +120,6 @@ router.post('/batch/unpublish', authMiddleware, adminAuth, validate(idsSchema), 
 router.post('/batch/delete', authMiddleware, adminAuth, validate(idsSchema), asyncHandler(batchDelete));
 
 // ==================== 版本差异对比 ====================
-function compareConfigs(a, b) {
-  if (!a && !b) return [];
-  if (!a) return [{ path: 'root', type: 'added', b: JSON.stringify(b) }];
-  if (!b) return [{ path: 'root', type: 'removed', a: JSON.stringify(a) }];
-  const diffs = [];
-  const aSections = a?.sections || [];
-  const bSections = b?.sections || [];
-  const max = Math.max(aSections.length, bSections.length);
-  for (let i = 0; i < max; i++) {
-    if (!aSections[i]) { diffs.push({ path: `sections[${i}]`, type: 'added', b: bSections[i]?.type }); }
-    else if (!bSections[i]) { diffs.push({ path: `sections[${i}]`, type: 'removed', a: aSections[i]?.type }); }
-    else if (JSON.stringify(aSections[i]) !== JSON.stringify(bSections[i])) {
-      diffs.push({ path: `sections[${i}]`, type: 'modified', aType: aSections[i]?.type, bType: bSections[i]?.type });
-    }
-  }
-  return diffs;
-}
-
 router.post('/:id/versions/diff', validateParams(idParamSchema), authMiddleware, validate(diffSchema), asyncHandler(async (req, res) => {
   const { versionA, versionB } = req.body;
   const va = await diyService.getVersion(req.params.id, versionA, req.tenantId);

@@ -40,7 +40,10 @@ export default {
   },
 
   async getPageById(id, tenantId) {
-    const [rows] = await pool.query('SELECT * FROM diy_page WHERE id = ? AND tenant_id = ?', [id, tenantId]);
+    const [rows] = await pool.query(
+      'SELECT id, tenant_id, owner_id, title, slug, page_type, access_type, status, mobile_config, pc_config, meta_json, publish_time, offline_time, access_count, latest_published_version, create_time, update_time FROM diy_page WHERE id = ? AND tenant_id = ?',
+      [id, tenantId],
+    );
     if (!rows[0]) return null;
     const p = rows[0];
     return { ...p, mobile_config: parseJson(p.mobile_config), pc_config: parseJson(p.pc_config), meta_json: parseJson(p.meta_json) };
@@ -49,12 +52,18 @@ export default {
   async getPagesByIds(ids, tenantId) {
     if (!ids || !ids.length) return [];
     const placeholders = ids.map(() => '?').join(',');
-    const [rows] = await pool.query(`SELECT * FROM diy_page WHERE id IN (${placeholders}) AND tenant_id = ?`, [...ids, tenantId]);
+    const [rows] = await pool.query(
+      `SELECT id, tenant_id, owner_id, title, slug, page_type, access_type, status, mobile_config, pc_config, meta_json, publish_time, offline_time, access_count, latest_published_version, create_time, update_time FROM diy_page WHERE id IN (${placeholders}) AND tenant_id = ?`,
+      [...ids, tenantId],
+    );
     return rows.map(p => ({ ...p, mobile_config: parseJson(p.mobile_config), pc_config: parseJson(p.pc_config), meta_json: parseJson(p.meta_json) }));
   },
 
   async getPageBySlug(slug, tenantId) {
-    const [rows] = await pool.query('SELECT * FROM diy_page WHERE slug = ? AND tenant_id = ? AND status IN (0,1,2)', [slug, tenantId]);
+    const [rows] = await pool.query(
+      'SELECT id, title, slug, page_type, status FROM diy_page WHERE slug = ? AND tenant_id = ? AND status IN (0,1,2)',
+      [slug, tenantId],
+    );
     return rows[0] || null;
   },
 
@@ -162,14 +171,20 @@ export default {
   },
 
   async getVersion(pageId, version) {
-    const [rows] = await pool.query('SELECT * FROM diy_page_version WHERE page_id = ? AND version = ?', [pageId, version]);
+    const [rows] = await pool.query(
+      'SELECT id, page_id, version, mobile_config, pc_config, remark, auto_save, rollback_from, create_time FROM diy_page_version WHERE page_id = ? AND version = ?',
+      [pageId, version],
+    );
     if (!rows[0]) return null;
     const v = rows[0];
     return { ...v, mobile_config: parseJson(v.mobile_config), pc_config: parseJson(v.pc_config) };
   },
 
   async getLatestAutoVersion(pageId) {
-    const [rows] = await pool.query('SELECT * FROM diy_page_version WHERE page_id = ? AND auto_save = 1 ORDER BY id DESC LIMIT 1', [pageId]);
+    const [rows] = await pool.query(
+      'SELECT id, page_id, version, mobile_config, pc_config, remark, auto_save, rollback_from, create_time FROM diy_page_version WHERE page_id = ? AND auto_save = 1 ORDER BY id DESC LIMIT 1',
+      [pageId],
+    );
     if (!rows[0]) return null;
     const v = rows[0];
     return { ...v, mobile_config: parseJson(v.mobile_config), pc_config: parseJson(v.pc_config) };
@@ -178,7 +193,7 @@ export default {
   // ==================== 组件库 ====================
 
   async listComponents(tenantId, category) {
-    let sql = 'SELECT * FROM diy_component WHERE (tenant_id = ? OR is_builtin = 1) AND status = 1';
+    let sql = 'SELECT id, tenant_id, name, component_code, category, icon, default_config, is_builtin, status, create_time FROM diy_component WHERE (tenant_id = ? OR is_builtin = 1) AND status = 1';
     const params = [tenantId];
     if (category) { sql += ' AND category = ?'; params.push(category); }
     sql += ' ORDER BY category, id';
@@ -217,6 +232,109 @@ export default {
     await pool.query(`UPDATE diy_page SET status = ? WHERE id IN (${placeholders}) AND tenant_id = ?`, [status, ...ids, tenantId]);
   },
 
+  /** 批量发布 — 单次 UPDATE + 单次版本 INSERT，消除 N+1 */
+  async batchPublishWithVersions(ids, tenantId) {
+    if (!ids || !ids.length) return [];
+    const placeholders = ids.map(() => '?').join(',');
+    return withTransaction(async (conn) => {
+      // 1. 批量查询页面信息
+      const [pages] = await conn.query(
+        `SELECT id, slug, title, mobile_config, pc_config FROM diy_page WHERE id IN (${placeholders}) AND tenant_id = ? AND status IN (0,2)`,
+        [...ids, tenantId],
+      );
+      if (!pages.length) return ids.map(id => ({ id: Number(id), success: false, error: '页面不存在或状态不允许发布' }));
+      // 2. 批量更新状态
+      const pageIds = pages.map(p => p.id);
+      await conn.query(
+        `UPDATE diy_page SET status = 1, publish_time = NOW() WHERE id IN (${pageIds.map(() => '?').join(',')}) AND tenant_id = ?`,
+        [...pageIds, tenantId],
+      );
+      // 3. 批量插入版本
+      const versionValues = [];
+      const versionParams = [];
+      for (const p of pages) {
+        versionValues.push('(?, (SELECT COALESCE(MAX(v2.version),0)+1 FROM diy_page_version v2 WHERE v2.page_id = ?), ?, ?, ?, 0)');
+        versionParams.push(p.id, p.id, JSON.stringify(parseJson(p.mobile_config)), JSON.stringify(parseJson(p.pc_config)), '批量发布');
+      }
+      await conn.query(
+        `INSERT INTO diy_page_version (page_id, version, mobile_config, pc_config, remark, auto_save) VALUES ${versionValues.join(', ')}`,
+        versionParams,
+      );
+      return pageIds.map(id => ({ id, success: true, msg: '发布成功' }));
+    });
+  },
+
+  // ==================== 事务封装 ====================
+
+  /** 创建页面 + 初始版本（事务） */
+  async createPageWithVersion({ tenantId, ownerId, title, slug, pageType, accessType, mobileConfig, pcConfig, metaJson }) {
+    return withTransaction(async (conn) => {
+      const [r] = await conn.query(
+        'INSERT INTO diy_page (tenant_id, owner_id, title, slug, page_type, access_type, mobile_config, pc_config, meta_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [tenantId, ownerId || 0, title, slug, pageType || 'mobile', accessType || 'public', JSON.stringify(mobileConfig || { sections: [] }), JSON.stringify(pcConfig || { sections: [] }), metaJson ? JSON.stringify(metaJson) : null],
+      );
+      const id = r.insertId;
+      await conn.query(
+        'INSERT INTO diy_page_version (page_id, version, mobile_config, pc_config, remark, auto_save) VALUES (?, 1, ?, ?, ?, 0)',
+        [id, JSON.stringify(mobileConfig || { sections: [] }), JSON.stringify(pcConfig || { sections: [] }), '初始版本'],
+      );
+      const [[page]] = await conn.query(
+        'SELECT id, tenant_id, owner_id, title, slug, page_type, access_type, status, publish_time, offline_time, access_count, latest_published_version, create_time, update_time FROM diy_page WHERE id = ?',
+        [id],
+      );
+      return { ...page, mobile_config: mobileConfig || { sections: [] }, pc_config: pcConfig || { sections: [] }, meta_json: metaJson || null };
+    });
+  },
+
+  /** 发布页面（事务：状态更新 + 版本插入） */
+  async publishWithVersion(id, tenantId, mobileConfig, pcConfig, slug) {
+    return withTransaction(async (conn) => {
+      await conn.query('UPDATE diy_page SET status = 1, publish_time = NOW() WHERE id = ? AND tenant_id = ?', [id, tenantId]);
+      const [[{ v }]] = await conn.query('SELECT COALESCE(MAX(version),0)+1 as v FROM diy_page_version WHERE page_id = ?', [id]);
+      await conn.query(
+        'INSERT INTO diy_page_version (page_id, version, mobile_config, pc_config, remark, auto_save) VALUES (?, ?, ?, ?, ?, 0)',
+        [id, v, JSON.stringify(mobileConfig), JSON.stringify(pcConfig), '发布'],
+      );
+      return v;
+    });
+  },
+
+  /** 克隆页面（事务） */
+  async cloneWithVersion(src, tenantId) {
+    const slug = `${src.slug}-clone-${Date.now().toString(36)}`;
+    const title = `${src.title}（克隆版）`;
+    return withTransaction(async (conn) => {
+      const [r] = await conn.query(
+        'INSERT INTO diy_page (tenant_id, owner_id, title, slug, page_type, access_type, mobile_config, pc_config, meta_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [tenantId, src.owner_id, title, slug, src.page_type, src.access_type, JSON.stringify(src.mobile_config), JSON.stringify(src.pc_config), src.meta_json ? JSON.stringify(src.meta_json) : null],
+      );
+      const newId = r.insertId;
+      await conn.query(
+        'INSERT INTO diy_page_version (page_id, version, mobile_config, pc_config, remark, auto_save) VALUES (?, 1, ?, ?, ?, 0)',
+        [newId, JSON.stringify(src.mobile_config), JSON.stringify(src.pc_config), `克隆自页面 #${src.id}`],
+      );
+      const [[page]] = await conn.query(
+        'SELECT id, tenant_id, owner_id, title, slug, page_type, access_type, status, publish_time, offline_time, access_count, latest_published_version, create_time, update_time FROM diy_page WHERE id = ?',
+        [newId],
+      );
+      return { ...page, mobile_config: src.mobile_config, pc_config: src.pc_config, meta_json: src.meta_json };
+    });
+  },
+
+  /** 回滚版本（事务：插入新版本 + 更新页面配置） */
+  async rollbackWithVersion(pageId, tenantId, srcVersion) {
+    return withTransaction(async (conn) => {
+      const [[{ v }]] = await conn.query('SELECT COALESCE(MAX(version),0)+1 as v FROM diy_page_version WHERE page_id = ?', [pageId]);
+      await conn.query(
+        'INSERT INTO diy_page_version (page_id, version, mobile_config, pc_config, remark, auto_save, rollback_from) VALUES (?, ?, ?, ?, ?, 0, ?)',
+        [pageId, v, JSON.stringify(srcVersion.mobile_config), JSON.stringify(srcVersion.pc_config), `回滚自版本 v${srcVersion.version}`, srcVersion.version],
+      );
+      await conn.query('UPDATE diy_page SET mobile_config = ?, pc_config = ? WHERE id = ? AND tenant_id = ?',
+        [JSON.stringify(srcVersion.mobile_config), JSON.stringify(srcVersion.pc_config), pageId, tenantId]);
+      return { version: v, msg: `已回滚至版本 v${srcVersion.version}` };
+    });
+  },
+
   // ==================== 模板库 ====================
 
   async listTemplates({ industry, pageType, keyword, page = 1, pageSize = 20 }) {
@@ -233,7 +351,10 @@ export default {
   },
 
   async getTemplateById(id) {
-    const [rows] = await pool.query('SELECT * FROM diy_template WHERE id = ? AND status = 1', [id]);
+    const [rows] = await pool.query(
+      'SELECT id, title, industry, page_type, thumbnail, description, tags, mobile_config, pc_config, use_count, is_official, status, create_time FROM diy_template WHERE id = ? AND status = 1',
+      [id],
+    );
     if (!rows[0]) return null;
     const t = rows[0];
     return { ...t, mobile_config: parseJson(t.mobile_config), pc_config: parseJson(t.pc_config) };
