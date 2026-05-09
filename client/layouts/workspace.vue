@@ -70,9 +70,9 @@ const isAdmin = ref(false)
 const currentPath = computed(() => route.path)
 
 // ═══════════════════════════════════════════════
-// 五大固定顶级导航 — 不准增删改
+// 五大固定顶级导航 — 优先读 site_config，fallback 硬编码
 // ═══════════════════════════════════════════════
-const navItems = [
+const defaultNavItems = [
   { path: '/workspace',            icon: '🏠', label: '首页',    disabled: false },
   { path: '/workspace/creation',   icon: '🎨', label: '创作',    disabled: false },
   { path: '/workspace/assistant',  icon: '🤖', label: 'AI 助手', disabled: false },
@@ -80,13 +80,15 @@ const navItems = [
   { path: '/workspace/lobster',    icon: '🏭', label: '龙虾',    disabled: false },
 ]
 
+const navItems = ref<{ path: string; icon: string; label: string; disabled: boolean }[]>(defaultNavItems)
+
 function isActive(item: { path: string }) {
   if (item.path === '/workspace') return currentPath.value === '/workspace'
   return currentPath.value.startsWith(item.path)
 }
 
 const pageTitle = computed(() => {
-  const item = navItems.find(i => !i.disabled && isActive(i))
+  const item = navItems.value.find(i => !i.disabled && isActive(i))
   return item ? item.label : '工作台'
 })
 
@@ -110,6 +112,13 @@ onMounted(async () => {
   } catch {
     router.push('/login')
   }
+
+  try {
+    const cfg: any = await $fetch('/api/site-config/public')
+    if (cfg?.workspace_nav && Array.isArray(cfg.workspace_nav) && cfg.workspace_nav.length > 0) {
+      navItems.value = cfg.workspace_nav
+    }
+  } catch { /* fallback to defaultNavItems */ }
 })
 
 definePageMeta({ middleware: ['auth'] })

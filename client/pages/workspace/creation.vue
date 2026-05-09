@@ -40,12 +40,12 @@
       <div class="wc-grid">
         <div
           v-for="card in activeCards"
-          :key="card.path"
+          :key="card.id"
           class="wc-card"
-          @click="go(card.path)"
+          @click="go(card.route)"
         >
           <div class="wc-card-icon">{{ card.icon }}</div>
-          <h4 class="wc-card-title">{{ card.name }}</h4>
+          <h4 class="wc-card-title">{{ card.title }}</h4>
           <p class="wc-card-desc">{{ card.desc }}</p>
         </div>
       </div>
@@ -59,12 +59,15 @@ const router = useRouter()
 const toast = useToast()
 
 const prompt = ref('')
-const activeTab = ref('image')
+const activeTab = ref('')
 
-function go(path: string) { router.push(path) }
+type Card = { id: string; category: string; icon: string; title: string; desc: string; route: string; order: number; visible: boolean }
 
-// ═══ 标签定义 — 5大创作分类 ═══
-const tabs = [
+const tabs = ref<{ key: string; label: string }[]>([])
+const cardData = ref<Record<string, Card[]>>({})
+
+// ═══ 默认 fallback 数据 ═══
+const defaultTabs = [
   { key: 'video', label: '视频生成' },
   { key: 'image', label: '图片生成' },
   { key: 'detail', label: '电商详情图' },
@@ -72,7 +75,93 @@ const tabs = [
   { key: 'digital', label: '数字人' },
 ]
 
-const activeTabLabel = computed(() => tabs.find(t => t.key === activeTab.value)?.label || '')
+const defaultCardData: Record<string, Card[]> = {
+  video: [
+    { id:'video_gen', category:'video', icon:'🎥', title:'AI 短视频', desc:'商品图一键生成带货短视频', route:'/work/video', order:1, visible:true },
+    { id:'video_edit', category:'video', icon:'✂', title:'视频编辑', desc:'在线剪辑/加字幕/配乐/调色', route:'/work/video-edit', order:2, visible:true },
+    { id:'video_trans', category:'video', icon:'🌐', title:'视频翻译', desc:'语音/字幕/面容三合一翻译', route:'/work/video-translate', order:3, visible:true },
+    { id:'script_gen', category:'video', icon:'📝', title:'短视频脚本', desc:'带货视频口播脚本自动生成', route:'/work/script-gen', order:4, visible:true },
+    { id:'shot_plan', category:'video', icon:'📐', title:'分镜计划', desc:'视频分镜/镜头顺序/时长规划', route:'/work/shot-plan', order:5, visible:true },
+    { id:'storyboard', category:'video', icon:'🎞', title:'故事板', desc:'视频创意可视化故事板预览', route:'/work/storyboard', order:6, visible:true },
+  ],
+  image: [
+    { id:'img_main', category:'image', icon:'🖼', title:'AI 商品图', desc:'各平台商品主图一键生成', route:'/work/image', order:1, visible:true },
+    { id:'img_scene', category:'image', icon:'🏞', title:'场景图生成', desc:'商品融入生活场景展示', route:'/work/main-image', order:2, visible:true },
+    { id:'img_poster', category:'image', icon:'📰', title:'海报生成', desc:'营销海报/活动海报/首发海报', route:'/work/poster', order:3, visible:true },
+    { id:'img_white_bg', category:'image', icon:'⬜', title:'白底图生成', desc:'符合各平台规范的白底图', route:'/work/white-bg', order:4, visible:true },
+    { id:'img_bg_remove', category:'image', icon:'✂', title:'智能去背景', desc:'AI 3秒精准识别主体去背景', route:'/work/remove-bg', order:5, visible:true },
+    { id:'img_retouch', category:'image', icon:'✨', title:'AI 精修', desc:'调色/锐化/光影质感优化', route:'/work/retouch', order:6, visible:true },
+    { id:'img_recolor', category:'image', icon:'🎯', title:'商品换色', desc:'同一款式展示多种颜色', route:'/work/color-swap', order:7, visible:true },
+    { id:'img_style', category:'image', icon:'🖌', title:'风格迁移', desc:'实拍图变油画/水彩/3D风格', route:'/work/style-transfer', order:8, visible:true },
+    { id:'img_text_fx', category:'image', icon:'🔤', title:'文字特效', desc:'立体/金属/霓虹等标题特效', route:'/work/text-effect', order:9, visible:true },
+    { id:'img_expand', category:'image', icon:'↔', title:'智能外扩', desc:'画面边缘智能扩展补全', route:'/work/outpaint', order:10, visible:true },
+    { id:'batch_process', category:'image', icon:'📦', title:'批量处理', desc:'50张图统一抠图+白底+尺寸', route:'/work/batch', order:11, visible:true },
+  ],
+  detail: [
+    { id:'detail_page', category:'detail', icon:'📄', title:'详情页设计', desc:'商品详情页智能排版设计', route:'/work/detail-page', order:1, visible:true },
+    { id:'product_render', category:'detail', icon:'🛒', title:'产品渲染', desc:'3D展示商品旋转/细节', route:'/work/product-render', order:2, visible:true },
+    { id:'virtual_tryon', category:'detail', icon:'👗', title:'虚拟试穿', desc:'买家在线看衣服上身效果', route:'/work/virtual-tryon', order:3, visible:true },
+    { id:'model_generate', category:'detail', icon:'🧍', title:'AI 模特', desc:'AI 生成虚拟模特穿衣展示', route:'/work/model-generate', order:4, visible:true },
+    { id:'img_ghost', category:'detail', icon:'👤', title:'幽灵模特', desc:'隐形模特展示上身效果', route:'/work/ghost-mannequin', order:5, visible:true },
+    { id:'platform_taobao', category:'detail', icon:'📱', title:'多平台适配', desc:'天猫/京东/拼多多等尺寸适配', route:'/work/multi-platform', order:6, visible:true },
+    { id:'main_img_set', category:'detail', icon:'🖼', title:'主图套装', desc:'主图+辅图+白底图一键套装', route:'/work/main-image-set', order:7, visible:true },
+    { id:'output', category:'detail', icon:'📁', title:'导出设置', desc:'统一导出格式/尺寸/命名规则', route:'/work/output', order:8, visible:true },
+  ],
+  copywrite: [
+    { id:'copy_title', category:'copywrite', icon:'📋', title:'电商标题', desc:'SEO优化标题/卖点标题批量生成', route:'/work/title-gen', order:1, visible:true },
+    { id:'copy_detail', category:'copywrite', icon:'📝', title:'详情文案', desc:'商品详情页长文案智能撰写', route:'/work/detail-copy', order:2, visible:true },
+    { id:'script_gen2', category:'copywrite', icon:'🎙', title:'口播脚本', desc:'带货短视频口播脚本自动生成', route:'/work/script-gen', order:3, visible:true },
+    { id:'campaign_copy', category:'copywrite', icon:'📢', title:'营销文案', desc:'大促/活动/促销文案生成', route:'/work/campaign-copy', order:4, visible:true },
+    { id:'email_copy', category:'copywrite', icon:'📧', title:'邮件文案', desc:'EDM营销邮件/短信文案', route:'/work/email-copy', order:5, visible:true },
+    { id:'social_copy', category:'copywrite', icon:'📱', title:'社媒文案', desc:'小红书/抖音/TikTok文案', route:'/work/social-copy', order:6, visible:true },
+  ],
+  digital: [
+    { id:'digital_human', category:'digital', icon:'🤖', title:'数字人带货', desc:'数字人24小时自动带货视频', route:'/work/digital-human', order:1, visible:true },
+    { id:'digital_live', category:'digital', icon:'📡', title:'数字人直播', desc:'虚拟直播间自动讲解商品', route:'/work/digital-live', order:2, visible:true },
+    { id:'avatar_custom', category:'digital', icon:'🧬', title:'形象定制', desc:'自定义数字人外观/声音/动作', route:'/work/avatar-custom', order:3, visible:true },
+    { id:'ai_host', category:'digital', icon:'🎤', title:'AI 主播', desc:'智能语音播报商品卖点', route:'/work/ai-host', order:4, visible:true },
+    { id:'virtual_model', category:'digital', icon:'👤', title:'虚拟模特', desc:'AI生成虚拟模特穿衣展示', route:'/work/virtual-model', order:5, visible:true },
+    { id:'face_swap', category:'digital', icon:'🔄', title:'换脸', desc:'AI 人脸替换/数字人换脸', route:'/work/face-swap', order:6, visible:true },
+  ],
+}
+
+onMounted(async () => {
+  try {
+    const cfg: any = await $fetch('/api/site-config/public')
+    if (cfg?.workspace_cards && Array.isArray(cfg.workspace_cards)) {
+      const cards: Card[] = cfg.workspace_cards.filter((c: Card) => c.visible !== false)
+      // 提取唯一 category 作为 tabs
+      const seen = new Set<string>()
+      const t: { key: string; label: string }[] = []
+      cards.forEach((c: Card) => {
+        if (!seen.has(c.category)) {
+          seen.add(c.category)
+          t.push({ key: c.category, label: c.category })
+        }
+      })
+      // 分组 cards
+      const groups: Record<string, Card[]> = {}
+      cards.forEach((c: Card) => {
+        if (!groups[c.category]) groups[c.category] = []
+        groups[c.category].push(c)
+      })
+      tabs.value = t.length > 0 ? t : defaultTabs
+      cardData.value = Object.keys(groups).length > 0 ? groups : defaultCardData
+    } else {
+      throw new Error('empty')
+    }
+  } catch {
+    tabs.value = defaultTabs
+    cardData.value = defaultCardData
+  }
+  if (tabs.value.length > 0 && !activeTab.value) {
+    activeTab.value = tabs.value[0].key
+  }
+})
+
+function go(path: string) { router.push(path) }
+
+const activeTabLabel = computed(() => tabs.value.find(t => t.key === activeTab.value)?.label || '')
 const activeTabPlaceholder = computed(() => {
   const map: Record<string, string> = {
     video: '描述你想要的带货视频，例如：护肤品展示视频，15秒口播...',
@@ -94,58 +183,7 @@ const activeTabHint = computed(() => {
   return map[activeTab.value] || ''
 })
 
-// ═══ 5大分类卡片数据 ═══
-const cardData: Record<string, { path: string; icon: string; name: string; desc: string }[]> = {
-  video: [
-    { path:'/work/video',         icon:'🎥', name:'AI 短视频',   desc:'商品图一键生成带货短视频' },
-    { path:'/work/video-edit',    icon:'✂', name:'视频编辑',    desc:'在线剪辑/加字幕/配乐/调色' },
-    { path:'/work/video-translate', icon:'🌐', name:'视频翻译', desc:'语音/字幕/面容三合一翻译' },
-    { path:'/work/script-gen',    icon:'📝', name:'短视频脚本', desc:'带货视频口播脚本自动生成' },
-    { path:'/work/shot-plan',     icon:'📐', name:'分镜计划',   desc:'视频分镜/镜头顺序/时长规划' },
-    { path:'/work/storyboard',    icon:'🎞', name:'故事板',     desc:'视频创意可视化故事板预览' },
-  ],
-  image: [
-    { path:'/work/main-image',  icon:'🖼', name:'AI 商品图',   desc:'各平台商品主图一键生成' },
-    { path:'/work/scene',       icon:'🏞', name:'场景图生成',  desc:'商品融入生活场景展示' },
-    { path:'/work/poster',      icon:'📰', name:'海报生成',    desc:'营销海报/活动海报/首发海报' },
-    { path:'/work/white-bg',    icon:'⬜', name:'白底图生成',  desc:'符合各平台规范的白底图' },
-    { path:'/work/remove-bg',   icon:'✂', name:'智能去背景',  desc:'AI 3秒精准识别主体去背景' },
-    { path:'/work/retouch',     icon:'✨', name:'AI 精修',     desc:'调色/锐化/光影质感优化' },
-    { path:'/work/color-swap',  icon:'🎯', name:'商品换色',    desc:'同一款式展示多种颜色' },
-    { path:'/work/style-transfer', icon:'🖌', name:'风格迁移', desc:'实拍图变油画/水彩/3D风格' },
-    { path:'/work/text-effect', icon:'🔤', name:'文字特效',    desc:'立体/金属/霓虹等标题特效' },
-    { path:'/work/outpaint',    icon:'↔', name:'智能外扩',    desc:'画面边缘智能扩展补全' },
-    { path:'/work/batch',       icon:'📦', name:'批量处理',    desc:'50张图统一抠图+白底+尺寸' },
-  ],
-  detail: [
-    { path:'/work/detail-page',    icon:'📄', name:'详情页设计', desc:'商品详情页智能排版设计' },
-    { path:'/work/product-render', icon:'🛒', name:'产品渲染',   desc:'3D展示商品旋转/细节' },
-    { path:'/work/virtual-tryon',  icon:'👗', name:'虚拟试穿',   desc:'买家在线看衣服上身效果' },
-    { path:'/work/model-generate', icon:'🧍', name:'AI 模特',    desc:'AI 生成虚拟模特穿衣展示' },
-    { path:'/work/ghost-mannequin', icon:'👤', name:'幽灵模特',  desc:'隐形模特展示上身效果' },
-    { path:'/work/multi-platform', icon:'📱', name:'多平台适配', desc:'天猫/京东/拼多多等尺寸适配' },
-    { path:'/work/main-image-set', icon:'🖼', name:'主图套装',   desc:'主图+辅图+白底图一键套装' },
-    { path:'/work/output',        icon:'📁', name:'导出设置',    desc:'统一导出格式/尺寸/命名规则' },
-  ],
-  copywrite: [
-    { path:'/work/title-gen',     icon:'📋', name:'电商标题',   desc:'SEO优化标题/卖点标题批量生成' },
-    { path:'/work/detail-copy',   icon:'📝', name:'详情文案',   desc:'商品详情页长文案智能撰写' },
-    { path:'/work/script-gen',    icon:'🎙', name:'口播脚本',   desc:'带货短视频口播脚本自动生成' },
-    { path:'/work/campaign-copy', icon:'📢', name:'营销文案',   desc:'大促/活动/促销文案生成' },
-    { path:'/work/email-copy',    icon:'📧', name:'邮件文案',   desc:'EDM营销邮件/短信文案' },
-    { path:'/work/social-copy',   icon:'📱', name:'社媒文案',   desc:'小红书/抖音/TikTok文案' },
-  ],
-  digital: [
-    { path:'/work/digital-human', icon:'🤖', name:'数字人带货', desc:'数字人24小时自动带货视频' },
-    { path:'/work/digital-live',  icon:'📡', name:'数字人直播', desc:'虚拟直播间自动讲解商品' },
-    { path:'/work/avatar-custom', icon:'🧬', name:'形象定制',   desc:'自定义数字人外观/声音/动作' },
-    { path:'/work/ai-host',       icon:'🎤', name:'AI 主播',    desc:'智能语音播报商品卖点' },
-    { path:'/work/virtual-model', icon:'👤', name:'虚拟模特',   desc:'AI生成虚拟模特穿衣展示' },
-    { path:'/work/face-swap',     icon:'🔄', name:'换脸',       desc:'AI 人脸替换/数字人换脸' },
-  ],
-}
-
-const activeCards = computed(() => cardData[activeTab.value] || cardData.image)
+const activeCards = computed(() => cardData.value[activeTab.value] || Object.values(cardData.value)[0] || [])
 
 async function handleSubmit() {
   if (!prompt.value.trim()) return

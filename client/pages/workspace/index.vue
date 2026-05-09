@@ -8,10 +8,18 @@
     </div>
 
     <!-- 快捷入口卡片 -->
-    <div class="wh-quick">
-      <div v-for="q in quickLinks" :key="q.path" class="wh-qcard" @click="go(q.path)">
-        <span class="wh-qicon">{{ q.icon }}</span>
-        <span class="wh-qname">{{ q.name }}</span>
+    <div v-for="(group, cat) in cardGroups" :key="cat" class="wh-section">
+      <div class="wh-sec-hd">
+        <h3 class="wh-sec-title">{{ cat }}</h3>
+      </div>
+      <div class="wh-quick">
+        <div v-for="card in group" :key="card.id" class="wh-qcard" @click="go(card.route)">
+          <span class="wh-qicon">{{ card.icon }}</span>
+          <div class="wh-qinfo">
+            <span class="wh-qname">{{ card.title }}</span>
+            <span class="wh-qdesc">{{ card.desc }}</span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -49,17 +57,47 @@ const router = useRouter()
 
 function go(path: string) { router.push(path) }
 
-const quickLinks = [
-  { path: '/workspace/creation?tab=video', icon: '🎥', name: '视频生成' },
-  { path: '/workspace/creation?tab=image', icon: '🖼', name: '图片生成' },
-  { path: '/work/detail-page', icon: '📄', name: '电商详情图' },
-  { path: '/work/copywriting', icon: '✍️', name: '文案工具' },
-  { path: '/work/digital-human', icon: '🤖', name: '数字人' },
+type Card = { id: string; category: string; icon: string; title: string; desc: string; route: string; order: number; visible: boolean }
+
+const cardGroups = ref<Record<string, Card[]>>({})
+
+const defaultCards: Card[] = [
+  { id:'img_main', category:'图片生成', icon:'🖼', title:'AI 商品图', desc:'各平台商品主图一键生成', route:'/work/image', order:1, visible:true },
+  { id:'video_gen', category:'视频生成', icon:'🎥', title:'AI 短视频', desc:'商品图一键生成带货短视频', route:'/work/video', order:1, visible:true },
+  { id:'detail_page', category:'电商详情图', icon:'📄', name:'详情页设计', desc:'商品详情页智能排版设计', route:'/work/detail-page', order:1, visible:true },
+  { id:'copy_title', category:'文案工具', icon:'✍️', title:'标题/卖点生成', desc:'AI生成高转化商品标题', route:'/work/copywriting', order:1, visible:true },
+  { id:'digital_human', category:'数字人', icon:'🤖', title:'数字人带货', desc:'数字人24小时自动带货视频', route:'/work/digital-human', order:1, visible:true },
 ]
 
 const recentProjects = ref<{ icon: string; name: string; time: string; path: string }[]>([])
 
 onMounted(async () => {
+  // 加载功能卡片配置
+  try {
+    const cfg: any = await $fetch('/api/site-config/public')
+    if (cfg?.workspace_cards && Array.isArray(cfg.workspace_cards)) {
+      const cards: Card[] = cfg.workspace_cards.filter((c: Card) => c.visible !== false)
+      const groups: Record<string, Card[]> = {}
+      cards.forEach((c: Card) => {
+        const cat = c.category || '其他'
+        if (!groups[cat]) groups[cat] = []
+        groups[cat].push(c)
+      })
+      cardGroups.value = groups
+    } else {
+      throw new Error('empty')
+    }
+  } catch {
+    // fallback to defaults
+    const groups: Record<string, Card[]> = {}
+    defaultCards.forEach(c => {
+      if (!groups[c.category]) groups[c.category] = []
+      groups[c.category].push(c)
+    })
+    cardGroups.value = groups
+  }
+
+  // 加载最近项目
   try {
     const data = await $fetch('/api/auth/me', { credentials: 'include' })
     recentProjects.value = (data as any).recentItems || []
@@ -81,7 +119,11 @@ onMounted(async () => {
 .wh-greet { font-size: 24px; font-weight: 600; color: var(--tx, #171717); letter-spacing: -0.03em; }
 .wh-sub { font-size: 14px; color: var(--tx3, #9d9da3); margin-top: 4px; }
 
-.wh-quick { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 32px; }
+.wh-section { margin-bottom: 28px; }
+.wh-sec-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.wh-sec-title { font-size: 14px; font-weight: 600; color: var(--tx, #171717); }
+
+.wh-quick { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
 .wh-qcard {
   display: flex; align-items: center; gap: 10px; padding: 16px 16px; background: #fff;
   border-radius: 10px; border: 1px solid var(--brd, #ebebea); cursor: pointer; transition: all 0.15s;
@@ -89,7 +131,9 @@ onMounted(async () => {
 }
 .wh-qcard:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.06); border-color: #c4c4c8; }
 .wh-qicon { font-size: 18px; line-height: 1; flex-shrink: 0; }
+.wh-qinfo { flex: 1; min-width: 0; }
 .wh-qname { font-size: 13px; font-weight: 500; color: var(--tx, #171717); white-space: nowrap; line-height: 1; }
+.wh-qdesc { font-size: 11px; color: var(--tx3, #9d9da3); display: block; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* 最近项目 */
 .wh-recent { }

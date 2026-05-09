@@ -1,6 +1,7 @@
-import { getAllConfig, getPublicConfigMap, saveConfig, deleteConfig } from '../services/siteConfigService.js';
+import { getAllConfig, getPublicConfigMap, saveConfig, deleteConfig, clearPublicCache } from '../services/siteConfigService.js';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
+import { broadcastVersion } from '../services/config-version.service.js';
 
 // GET /api/site-config/public - no auth required
 export const getPublicSiteConfig = async (req, res) => {
@@ -24,6 +25,8 @@ export const createConfig = async (req, res) => {
     const { key, value, type, description } = req.body;
     if (!key || value === undefined) return error(res, ERROR_CODE.BAD_REQUEST, 'key and value required');
     await saveConfig(key, typeof value === 'object' ? JSON.stringify(value) : String(value), type || 'text', description || '');
+    await clearPublicCache();
+    broadcastVersion().catch(() => {});
     success(res, { key }, 'Config created');
   } catch (err) { error(res, err.status || 500, err.message || 'Failed to create config'); }
 };
@@ -35,6 +38,8 @@ export const updateConfig = async (req, res) => {
     const { value, type, description } = req.body;
     if (!key || value === undefined) return error(res, ERROR_CODE.BAD_REQUEST, 'key and value required');
     await saveConfig(key, typeof value === 'object' ? JSON.stringify(value) : String(value), type || 'text', description || '');
+    await clearPublicCache();
+    broadcastVersion().catch(() => {});
     success(res, { key }, 'Config updated');
   } catch (err) { error(res, err.status || 500, err.message || 'Failed to update config'); }
 };
@@ -44,6 +49,8 @@ export const removeConfig = async (req, res) => {
   try {
     const affected = await deleteConfig(Number(req.params.id));
     if (!affected) return error(res, ERROR_CODE.NOT_FOUND, 'Not found');
+    await clearPublicCache();
+    broadcastVersion().catch(() => {});
     success(res, null, 'Config deleted');
   } catch (err) { error(res, err.status || 500, err.message || 'Failed to delete config'); }
 };

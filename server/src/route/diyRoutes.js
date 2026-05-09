@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { authMiddleware, optionalAuth } from '../middleware/auth.js';
-import { adminOnly, editorOrAbove } from '../middleware/rbac.js';
+import { authMiddleware, adminAuth, optionalAuth } from '../middleware/auth.js';
+import { editorOrAbove } from '../middleware/rbac.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
 import { z } from 'zod';
@@ -68,13 +68,13 @@ router.get('/:id', authMiddleware, asyncHandler(getPage));
 router.post('/', authMiddleware, editorOrAbove, validate(pageSchema), asyncHandler(createPage));
 router.put('/:id', authMiddleware, editorOrAbove, validate(pageSchema.partial()), asyncHandler(updatePage));
 
-// ==================== 状态机路由（发布=adminOnly, 编辑=editorOrAbove） ====================
-router.post('/:id/publish', authMiddleware, adminOnly, asyncHandler(publishPage));
-router.post('/:id/unpublish', authMiddleware, adminOnly, asyncHandler(unpublishPage));
-router.post('/:id/republish', authMiddleware, adminOnly, asyncHandler(republishPage));
-router.post('/:id/soft-delete', authMiddleware, adminOnly, asyncHandler(softDeletePage));
+// ==================== 状态机路由（发布=adminAuth, 编辑=editorOrAbove） ====================
+router.post('/:id/publish', authMiddleware, adminAuth, asyncHandler(publishPage));
+router.post('/:id/unpublish', authMiddleware, adminAuth, asyncHandler(unpublishPage));
+router.post('/:id/republish', authMiddleware, adminAuth, asyncHandler(republishPage));
+router.post('/:id/soft-delete', authMiddleware, adminAuth, asyncHandler(softDeletePage));
 router.post('/:id/restore', authMiddleware, editorOrAbove, asyncHandler(restorePage));
-router.delete('/:id/hard-delete', authMiddleware, adminOnly, asyncHandler(hardDeletePage));
+router.delete('/:id/hard-delete', authMiddleware, adminAuth, asyncHandler(hardDeletePage));
 router.post('/:id/clone', authMiddleware, editorOrAbove, asyncHandler(clonePage));
 
 // ==================== 版本管理 ====================
@@ -86,9 +86,9 @@ router.post('/:id/versions/auto-save', authMiddleware, editorOrAbove, validate(a
 router.post('/:id/versions/:version/rollback', authMiddleware, editorOrAbove, asyncHandler(rollbackVersion));
 
 // ==================== 批量操作 ====================
-router.post('/batch/publish', authMiddleware, adminOnly, validate(idsSchema), asyncHandler(batchPublish));
-router.post('/batch/unpublish', authMiddleware, adminOnly, validate(idsSchema), asyncHandler(batchUnpublish));
-router.post('/batch/delete', authMiddleware, adminOnly, validate(idsSchema), asyncHandler(batchDelete));
+router.post('/batch/publish', authMiddleware, adminAuth, validate(idsSchema), asyncHandler(batchPublish));
+router.post('/batch/unpublish', authMiddleware, adminAuth, validate(idsSchema), asyncHandler(batchUnpublish));
+router.post('/batch/delete', authMiddleware, adminAuth, validate(idsSchema), asyncHandler(batchDelete));
 
 // ==================== 版本差异对比 ====================
 function compareConfigs(a, b) {
