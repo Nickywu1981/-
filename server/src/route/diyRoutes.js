@@ -46,6 +46,10 @@ const autoSaveSchema = z.object({
   mobileConfig: z.any().optional(),
   pcConfig: z.any().optional(),
 });
+const diffSchema = z.object({
+  versionA: z.string().min(1),
+  versionB: z.string().min(1),
+});
 
 // ==================== 公开路由 ====================
 router.get('/published/:slug', optionalAuth, asyncHandler(getPublishedPage));
@@ -105,9 +109,8 @@ function compareConfigs(a, b) {
   return diffs;
 }
 
-router.post('/:id/versions/diff', authMiddleware, asyncHandler(async (req, res) => {
+router.post('/:id/versions/diff', authMiddleware, validate(diffSchema), asyncHandler(async (req, res) => {
   const { versionA, versionB } = req.body;
-  if (!versionA || !versionB) return error(res, 400, '需要两个版本号');
   const va = await diyService.getVersion(req.params.id, req.tenantId, versionA);
   const vb = await diyService.getVersion(req.params.id, req.tenantId, versionB);
   if (!va || !vb) return error(res, 404, '版本不存在');
