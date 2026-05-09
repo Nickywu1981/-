@@ -42,6 +42,7 @@ export const apiLimiter = rateLimit({
   max,
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
   message: { code: 429, msg: '请求过于频繁，请稍后再试', data: null },
 });
 

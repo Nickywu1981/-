@@ -102,6 +102,29 @@
       </div>
     </section>
 
+    <!-- ===== MemFocus AI — 百万年薪秘书 ===== -->
+    <section class="lp-memfocus">
+      <div class="lp-sec-hd">
+        <span class="lp-sec-tag">MemFocus AI</span>
+        <h2>你的百万年薪私人总秘书</h2>
+        <p>8 维核心能力，24×7 巅峰状态，永不离职</p>
+      </div>
+      <div class="lp-mf-grid">
+        <div class="lp-mf-card" v-for="c in memfocusCards" :key="c.key">
+          <div class="lp-mf-badge">{{ c.badge }}</div>
+          <div class="lp-mf-title">{{ c.title }}</div>
+          <div class="lp-mf-sub">{{ c.sub }}</div>
+          <div class="lp-mf-divider" />
+          <div class="lp-mf-api">{{ c.api }}</div>
+          <div class="lp-mf-story">"{{ c.story }}"</div>
+          <div class="lp-mf-metric"><span>{{ c.metricLabel }}</span><b>{{ c.metricValue }}</b></div>
+        </div>
+      </div>
+      <div class="lp-mf-quote">
+        <span>"</span>没有请假、不闹情绪、不跳槽——每次调用都是巅峰状态<span>"</span>
+      </div>
+    </section>
+
     <!-- ===== PLATFORMS ===== -->
     <section class="lp-plat">
       <p>{{ $t('landing.section_platforms') }}</p>
@@ -293,6 +316,17 @@ const tabs = [
   { key: 'ai', label: 'AI 功能', icon: '◆' },
 ];
 
+const memfocusCards = [
+  { key:'memory', badge:'记忆力', title:'过目不忘', sub:'精准回顾每个客户', api:'四层记忆 API', story:'王女士上次买了胶原蛋白果冻——问她要不要复购', metricLabel:'客户留存提升', metricValue:'+37%' },
+  { key:'priority', badge:'判断力', title:'优先级分拣', sub:'退款先处理，新品排队', api:'注意力引擎 API', story:'退款投诉立刻处理，新品咨询排队稍后——优先级的艺术', metricLabel:'紧急工单响应', metricValue:'<30s' },
+  { key:'context', badge:'理解力', title:'一点就通', sub:'语境感知，指代消解', api:'上下文管理 API', story:'客户说"那个红色的"——秘书知道指的是上次聊的红色连衣裙', metricLabel:'上下文窗口', metricValue:'8K tokens' },
+  { key:'i18n', badge:'多语言', title:'7 国语物料', sub:'比本地团队更懂当地审美', api:'跨境本地化 API', story:'中文产品一键出 7 国物料——比本地团队更懂当地审美', metricLabel:'覆盖语种', metricValue:'7 语' },
+  { key:'copy', badge:'写作力', title:'转化率导向', sub:'标题/卖点/详情/脚本', api:'内容生成 API', story:'标题/卖点/详情/直播脚本——比文案更懂转化率', metricLabel:'内容类型覆盖', metricValue:'6 类' },
+  { key:'compliance', badge:'风控力', title:'五层过滤', sub:'零违规处罚', api:'安全合规 API', story:'五层敏感词过滤，零违规处罚——比合规经理更严谨', metricLabel:'过滤层数', metricValue:'5 层' },
+  { key:'video', badge:'视觉力', title:'100 SKU 并行', sub:'2 小时搞定全部视频', api:'视频批量生成 API', story:'15s/30s TikTok 商品视频——100 SKU 并行 2 小时搞定', metricLabel:'并行吞吐', metricValue:'100 SKU' },
+  { key:'uptime', badge:'永不离职', title:'24×7 巅峰', sub:'不请假不跳槽不闹情绪', api:'24×7 API 可用', story:'没有请假、不闹情绪、不跳槽——每次调用都是巅峰状态', metricLabel:'可用性目标', metricValue:'99.9%' },
+];
+
 const cards = [
   { id: 'main', icon: '▣', title: '智能做主图', desc: 'AI 自动抠图→白底→精修→裁切→品牌水印，一键生成3张风格主图', tags: ['爆款商品图,', '13平台适配'], color: '#EDE9FE', ai: true, route: '/work/main-image', category: 'image' },
   { id: 'scene', icon: '◈', title: '智能做场景', desc: '产品图+AI场景库→自动光影融合→出5张场景图，支持自定义背景', tags: ['场景融合,', '光影匹配'], color: '#DBEAFE', ai: true, route: '/work/scene', category: 'image' },
@@ -473,6 +507,37 @@ const faqs = [
 .lp-mob-card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .lp-mob-card-grid div { height: 60px; background: #fafaf9; border-radius: 6px; border: 1px solid #f5f5f4; }
 .lp-mob-card-grid div div { width: 60%; height: 24px; background: #f0efed; margin: 10px auto 0; border: none; border-radius: 3px; }
+
+/* ============ MemFocus AI ============ */
+.lp-memfocus { padding: 80px clamp(16px, 4vw, 40px); background: linear-gradient(180deg, #fafaf9 0%, #f5f4f1 50%, #fafaf9 100%); border-top: 1px solid #ebebea; }
+.lp-mf-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; max-width: 1200px; margin: 0 auto 40px; }
+.lp-mf-card {
+  background: #fff; border: 1px solid #ebebea; border-radius: 14px; padding: 22px 18px 18px;
+  display: flex; flex-direction: column; gap: 8px; transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1); position: relative; overflow: hidden;
+}
+.lp-mf-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; opacity: 0; transition: opacity 0.3s; }
+.lp-mf-card:nth-child(1)::before { background: linear-gradient(90deg, #6366f1, #818cf8); }
+.lp-mf-card:nth-child(2)::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+.lp-mf-card:nth-child(3)::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+.lp-mf-card:nth-child(4)::before { background: linear-gradient(90deg, #06b6d4, #22d3ee); }
+.lp-mf-card:nth-child(5)::before { background: linear-gradient(90deg, #ec4899, #f472b6); }
+.lp-mf-card:nth-child(6)::before { background: linear-gradient(90deg, #22c55e, #4ade80); }
+.lp-mf-card:nth-child(7)::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.lp-mf-card:nth-child(8)::before { background: linear-gradient(90deg, #ef4444, #f87171); }
+.lp-mf-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.08); border-color: #d9d9d7; }
+.lp-mf-card:hover::before { opacity: 1; }
+.lp-mf-badge { font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #b0b0b5; }
+.lp-mf-title { font-size: 18px; font-weight: 700; color: #171717; letter-spacing: -0.02em; line-height: 1.2; }
+.lp-mf-sub { font-size: 12px; color: #8e8e93; margin-top: -4px; }
+.lp-mf-divider { height: 1px; background: #f0efed; margin: 2px 0; }
+.lp-mf-api { font-size: 12px; font-weight: 600; color: #5b5fe3; background: rgba(91,95,227,0.06); padding: 6px 10px; border-radius: 7px; text-align: center; letter-spacing: -0.01em; }
+.lp-mf-story { font-size: 12px; line-height: 1.6; color: #6b6b70; font-style: italic; border-left: 2px solid #e5e5e2; padding-left: 10px; }
+.lp-mf-metric { display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid #f5f5f4; margin-top: auto; font-size: 11px; color: #8e8e93; }
+.lp-mf-metric b { font-size: 13px; font-weight: 600; color: #c8a87c; }
+.lp-mf-quote { max-width: 600px; margin: 0 auto; text-align: center; font-size: 15px; font-weight: 500; color: #171717; letter-spacing: -0.01em; line-height: 1.6; }
+.lp-mf-quote span { color: #c8a87c; font-size: 20px; }
+@media (max-width: 1100px) { .lp-mf-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .lp-mf-grid { grid-template-columns: 1fr; } .lp-mf-card { padding: 18px 14px 14px; } }
 
 /* ============ PLATFORMS ============ */
 .lp-plat { padding: 32px clamp(16px, 4vw, 40px); text-align: center; border-bottom: 1px solid #ebebea; }
