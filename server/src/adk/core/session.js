@@ -7,15 +7,22 @@ import { State } from './state.js';
 let _idCounter = 0;
 
 export class Session {
-  /** @param {{ id?: string, userId?: string, agentId?: string }} */
+  /** @param {{ id?: string, userId?: string, agentId?: string, state?: object, createdAt?: number, updatedAt?: number }} */
   constructor(opts = {}) {
     this.id = opts.id || `sess_${Date.now()}_${++_idCounter}`;
     this.userId = opts.userId ?? null;
     this.agentId = opts.agentId ?? null;
     this.state = new State();
     this.events = [];           // Event[]
-    this.createdAt = Date.now();
-    this.updatedAt = Date.now();
+    this.createdAt = opts.createdAt || Date.now();
+    this.updatedAt = opts.updatedAt || Date.now();
+
+    // 从存储恢复 state
+    if (opts.state) {
+      for (const [k, v] of Object.entries(opts.state)) {
+        this.state.set(k, v);
+      }
+    }
   }
 
   pushEvent(event) {

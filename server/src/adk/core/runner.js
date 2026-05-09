@@ -1,10 +1,11 @@
 /**
  * ADK 核心原语 — Runner（执行引擎）
- * 编排 Agent 活动与事件流
+ * 编排 Agent 活动与事件流，Session 持久化到 Redis/DB
  */
 import { Session } from './session.js';
 import { InvocationContext } from './invocationContext.js';
 import { Event } from './event.js';
+import { SessionStore } from './sessionStore.js';
 
 export class Runner {
   /**
@@ -12,7 +13,9 @@ export class Runner {
    */
   constructor(opts) {
     this.rootAgent = opts.agent;
-    this.sessionService = opts.sessionService || new Map();
+    this.sessionService = opts.sessionService instanceof SessionStore
+      ? opts.sessionService
+      : (opts.sessionService || new SessionStore());
     this.memoryService = opts.memoryService || null;
     this.artifactService = opts.artifactService || null;
   }
@@ -38,26 +41,33 @@ export class Runner {
       }
     }
 
-    // 4) 构建 InvocationContext
+    // 4) 构建 InvocationContext (注入 services)
     const ctx = new InvocationContext({
       session,
       agentName: this.rootAgent.name,
       invocationId: `inv_${Date.now()}`,
     });
     if (this.memoryService) ctx.services.memory = this.memoryService;
+    if (this.artifactService) ctx.services.artifact = this.artifactService;
 
     // 5) 执行
     const result = await this.rootAgent.runAsync(ctx);
 
-    // 6) 持久化 session
-    this.sessionService.set(sessionId, session);
+    // 6) 持久化 session (Redis with Map fallback)
+    await this.sessionService.set(sessionId, session);
 
     return { sessionId, result, events: session.events.length };
   }
 
   async _getOrCreateSession(userId, sessionId) {
-    if (sessionId && this.sessionService.has(sessionId)) {
-      return this.sessionService.get(sessionId);
+    if (sessionId) {
+      const existing = await this.sessionService.get(sessionId);
+      if (existing) {
+        // 水化 Session 对象
+        if (existing instanceof Session) return existing;
+        const s = new Session(existing);
+        return s;
+      }
     }
     return new Session({ userId });
   }

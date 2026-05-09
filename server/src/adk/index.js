@@ -8,6 +8,7 @@
 export {
   BaseAgent, LlmAgent, Event, State, Session,
   InvocationContext, FunctionTool, AgentTool, Runner,
+  SessionStore,
 } from './core/index.js';
 export {
   SequentialAgent, ParallelAgent, LoopAgent,

@@ -9,11 +9,12 @@ import {
   VisualAgent, HealthAgent,
 } from '../adk/agents/index.js';
 import { Runner } from '../adk/core/runner.js';
+import { SessionStore } from '../adk/core/sessionStore.js';
 
 const router = Router();
 
-// session 存储（生产环境用 Redis）
-const sessionStore = new Map();
+// 持久化 session 存储（Redis + Map fallback）
+const sessionStore = new SessionStore().startCleanup();
 
 // 标准化响应
 function success(res, data, msg = 'ok') {

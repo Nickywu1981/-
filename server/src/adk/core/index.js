@@ -5,3 +5,4 @@ export { Session } from './session.js';
 export { InvocationContext } from './invocationContext.js';
 export { FunctionTool, AgentTool } from './tool.js';
 export { Runner } from './runner.js';
+export { SessionStore } from './sessionStore.js';

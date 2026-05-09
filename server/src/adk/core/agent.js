@@ -120,20 +120,31 @@ export class LlmAgent extends BaseAgent {
   }
 
   /**
-   * 实际调用模型 — 通过 fetch 直连 OpenAI 兼容 API
+   * 实际调用模型 — 通过 aiEngine 统一调度
    */
   async _callModel(ctx, messages, tools, systemPrompt) {
-    const { aiEngine } = await import('../../services/aiEngine.js');
-    if (aiEngine?.infer) {
-      const result = await aiEngine.infer({
-        model: this.model,
-        messages,
-        temperature: this.generateContentConfig.temperature,
-        maxTokens: this.generateContentConfig.maxOutputTokens,
-      });
-      return result.text || result.content || result;
+    try {
+      const { infer } = await import('../../services/aiEngine.js');
+      if (infer) {
+        const result = await infer(this.model, messages, {
+          temperature: this.generateContentConfig.temperature,
+          maxTokens: this.generateContentConfig.maxOutputTokens,
+        });
+        return result.text || result.content || result;
+      }
+    } catch {
+      // fallback 到 modelDispatcher
+      try {
+        const { dispatch } = await import('../../services/modelDispatcher.js');
+        if (dispatch) {
+          const result = await dispatch(this.model, messages, {
+            temperature: this.generateContentConfig.temperature,
+          });
+          return result?.data?.choices?.[0]?.message?.content
+            || result?.text || result?.content || result;
+        }
+      } catch { /* 最后降级 */ }
     }
-    // 降级：直接 HTTP 调用
-    throw new Error(`Model "${this.model}" not available via aiEngine`);
+    throw new Error(`Model "${this.model}" not available`);
   }
 }
