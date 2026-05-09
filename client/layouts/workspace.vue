@@ -77,7 +77,7 @@ const navItems = [
   { path: '/workspace/creation',   icon: '🎨', label: '创作',    disabled: false },
   { path: '/workspace/assistant',  icon: '🤖', label: 'AI 助手', disabled: false },
   { path: '/workspace/workflow',   icon: '⚙', label: '工作流',  disabled: false },
-  { path: '/workspace/lobster',    icon: '⚙', label: '龙虾',    disabled: false },
+  { path: '/workspace/lobster',    icon: '🏭', label: '龙虾',    disabled: false },
 ]
 
 function isActive(item: { path: string }) {

@@ -9,9 +9,9 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import authMiddleware from '../middleware/auth.js';
+import { authMiddleware } from '../middleware/auth.js';
 import { success, error } from '../utils/response.js';
-import { ERROR_CODE } from '../utils/constants.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 import logger from '../utils/logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
