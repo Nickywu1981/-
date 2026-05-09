@@ -1,256 +1,231 @@
 <template>
-  <div class="landing">
-    <!-- ========== NAVIGATION ========== -->
-    <header class="nav" :class="{ scrolled: scrolled }">
-      <div class="nav-inner">
-        <div class="nav-logo">
-          <span class="logo-icon">◆</span>
-          <span class="logo-text">{{ siteName }}</span>
-        </div>
-        <nav class="nav-links">
+  <div class="lp">
+    <!-- ===== NAV ===== -->
+    <header class="lp-nav" :class="{ on: scrolled }">
+      <div class="lp-nav-in">
+        <a href="/" class="lp-nav-brand" aria-label="Movio AI 首页">
+          <span class="lp-nav-mark">M</span>
+          <span class="lp-nav-name">{{ siteName }}</span>
+        </a>
+        <nav class="lp-nav-lk">
           <a href="#features" @click.prevent="scrollTo('features')">{{ $t('landing.nav_features') }}</a>
           <a href="#how" @click.prevent="scrollTo('how')">{{ $t('landing.nav_how') }}</a>
           <a href="#pricing" @click.prevent="scrollTo('pricing')">{{ $t('landing.nav_pricing') }}</a>
           <a href="#faq" @click.prevent="scrollTo('faq')">{{ $t('landing.nav_faq') }}</a>
         </nav>
-        <div class="nav-actions">
+        <div class="lp-nav-act">
           <template v-if="user">
-            <NuxtLink to="/workspace" class="btn-nav-solid">{{ $t('nav.workspace') }}</NuxtLink>
+            <NuxtLink to="/workspace" class="lp-btn-main">{{ $t('nav.workspace') }}</NuxtLink>
           </template>
           <template v-else>
-            <NuxtLink to="/login" class="btn-nav-outline">{{ $t('nav.login') }}</NuxtLink>
-            <NuxtLink to="/register" class="btn-nav-solid">{{ $t('nav.register') }}</NuxtLink>
+            <NuxtLink to="/login" class="lp-btn-ghost">{{ $t('nav.login') }}</NuxtLink>
+            <NuxtLink to="/register" class="lp-btn-main">{{ $t('nav.register') }}</NuxtLink>
           </template>
-          <button class="hamburger" @click="mobileOpen = !mobileOpen" :aria-label="mobileOpen ? '关闭菜单' : '打开菜单'">
-            <span class="ham-line" :class="{ open: mobileOpen }" />
-            <span class="ham-line" :class="{ open: mobileOpen }" />
-            <span class="ham-line" :class="{ open: mobileOpen }" />
+          <button class="lp-ham" @click="mobileOpen = !mobileOpen" :aria-label="mobileOpen ? '关闭' : '菜单'">
+            <span :class="{ on: mobileOpen }" /><span :class="{ on: mobileOpen }" /><span :class="{ on: mobileOpen }" />
           </button>
         </div>
       </div>
-      <!-- Mobile drawer -->
-      <transition name="slide-down">
-        <div v-if="mobileOpen" class="mobile-drawer" @click="mobileOpen = false">
+      <transition name="sd">
+        <div v-if="mobileOpen" class="lp-mob" @click="mobileOpen = false">
           <a href="#features" @click.prevent="scrollTo('features'); mobileOpen = false">{{ $t('landing.nav_features') }}</a>
           <a href="#how" @click.prevent="scrollTo('how'); mobileOpen = false">{{ $t('landing.nav_how') }}</a>
           <a href="#pricing" @click.prevent="scrollTo('pricing'); mobileOpen = false">{{ $t('landing.nav_pricing') }}</a>
           <a href="#faq" @click.prevent="scrollTo('faq'); mobileOpen = false">{{ $t('landing.nav_faq') }}</a>
           <template v-if="user">
-            <NuxtLink to="/workspace" class="mobile-cta" @click="mobileOpen = false">{{ $t('nav.workspace') }}</NuxtLink>
+            <NuxtLink to="/workspace" class="lp-mob-cta" @click="mobileOpen = false">{{ $t('nav.workspace') }}</NuxtLink>
           </template>
           <template v-else>
             <NuxtLink to="/login" @click="mobileOpen = false">{{ $t('nav.login') }}</NuxtLink>
-            <NuxtLink to="/register" class="mobile-cta" @click="mobileOpen = false">{{ $t('nav.register') }}</NuxtLink>
+            <NuxtLink to="/register" class="lp-mob-cta" @click="mobileOpen = false">{{ $t('nav.register') }}</NuxtLink>
           </template>
         </div>
       </transition>
     </header>
 
-    <!-- ========== HERO ========== -->
-    <section class="hero">
-      <div class="hero-particles" />
-      <div class="hero-inner">
-        <div class="hero-badge"><span class="pulse-dot" />{{ $t('landing.hero_sub') }}</div>
-        <h1 class="hero-title">{{ $t('landing.hero_title') }}<br /><span class="gradient-text">{{ heroTitle }}</span></h1>
-        <p class="hero-desc">
-          {{ heroSubtitle }}
-        </p>
-        <div class="hero-btns">
+    <!-- ===== HERO ===== -->
+    <section class="lp-hero">
+      <div class="lp-hero-bg" />
+      <div class="lp-hero-body">
+        <div class="lp-hero-tag"><i /><span>{{ $t('landing.hero_sub') }}</span></div>
+        <h1 class="lp-hero-h1">{{ $t('landing.hero_title') }}<br /><em>{{ heroTitle }}</em></h1>
+        <p class="lp-hero-p">{{ heroSubtitle }}</p>
+        <div class="lp-hero-btns">
           <template v-if="user">
-            <NuxtLink to="/workspace" class="btn-hero">{{ $t('landing.hero_cta') }}</NuxtLink>
+            <NuxtLink to="/workspace" class="lp-hero-cta">{{ $t('landing.hero_cta') }}</NuxtLink>
           </template>
           <template v-else>
-            <NuxtLink to="/register" class="btn-hero">{{ heroCta }} →</NuxtLink>
+            <NuxtLink to="/register" class="lp-hero-cta">{{ heroCta }} <span>&rarr;</span></NuxtLink>
           </template>
-          <NuxtLink to="/work/main-image" class="btn-hero-outline">
-            <span class="play-icon">▶</span> {{ $t('landing.hero_demo') }}
+          <NuxtLink to="/work/main-image" class="lp-hero-demo">
+            <span class="lp-hero-play">&#9654;</span> {{ $t('landing.hero_demo') }}
           </NuxtLink>
         </div>
-        <div class="hero-metrics">
-          <div class="metric"><strong>200万+</strong><span>{{ $t('landing.hero_metrics.images') }}</span></div>
-          <div class="metric-divider" />
-          <div class="metric"><strong>50万+</strong><span>{{ $t('landing.hero_metrics.merchants') }}</span></div>
-          <div class="metric-divider" />
-          <div class="metric"><strong>98%</strong><span>{{ $t('landing.hero_metrics.satisfaction') }}</span></div>
+        <div class="lp-hero-nums">
+          <div><b>200万+</b><span>{{ $t('landing.hero_metrics.images') }}</span></div>
+          <i />
+          <div><b>50万+</b><span>{{ $t('landing.hero_metrics.merchants') }}</span></div>
+          <i />
+          <div><b>98%</b><span>{{ $t('landing.hero_metrics.satisfaction') }}</span></div>
         </div>
       </div>
-      <!-- Hero Visual -->
-      <div class="hero-mockup">
-        <div class="mockup-frame">
-          <div class="mockup-dots"><span /><span /><span /></div>
-          <div class="mockup-body">
-            <div class="mockup-sidebar">
-              <div class="ms-item active" /><div class="ms-item" /><div class="ms-item" /><div class="ms-item" /><div class="ms-item" />
+      <!-- Desktop Mockup -->
+      <div class="lp-hero-mock">
+        <div class="lp-mock">
+          <div class="lp-mock-bar"><span /><span /><span /></div>
+          <div class="lp-mock-in">
+            <div class="lp-mock-side">
+              <span class="on" /><span /><span /><span /><span />
             </div>
-            <div class="mockup-main">
-              <div class="mm-tabs"><span class="active">智能主图</span><span>智能场景</span><span>智能视频</span></div>
-              <div class="mm-upload"><div class="upload-icon">+</div></div>
-              <div class="mm-grid">
-                <div class="mm-card" v-for="i in 3" :key="i"><div class="mm-img" /><div class="mm-label">生成图 {{ i }}</div></div>
+            <div class="lp-mock-main">
+              <div class="lp-mock-tabs"><span class="on">智能主图</span><span>智能场景</span><span>智能视频</span></div>
+              <div class="lp-mock-up"><span>+</span></div>
+              <div class="lp-mock-grid">
+                <div v-for="i in 3" :key="i"><div /><span>生成图 {{ i }}</span></div>
               </div>
             </div>
           </div>
         </div>
-        <div class="mockup-glow" />
+        <div class="lp-mock-glow" />
       </div>
-      <!-- Mobile Hero Visual -->
-      <div class="hero-mobile-visual">
-        <div class="mobile-card">
-          <div class="mobile-card-header">
-            <span class="mobile-dot" /><span class="mobile-dot" /><span class="mobile-dot" />
-          </div>
-          <div class="mobile-card-body">
-            <div class="mobile-tabs"><span class="active">智能主图</span><span>场景</span><span>视频</span></div>
-            <div class="mobile-upload-zone">+ 上传图片</div>
-            <div class="mobile-grid">
-              <div class="mobile-grid-item" v-for="i in 3" :key="i"><div class="mobile-grid-img" /></div>
-            </div>
+      <!-- Mobile Mockup -->
+      <div class="lp-hero-mob">
+        <div class="lp-mob-card">
+          <div class="lp-mob-card-bar"><span /><span /><span /></div>
+          <div class="lp-mob-card-body">
+            <div class="lp-mob-card-tabs"><span class="on">智能主图</span><span>场景</span><span>视频</span></div>
+            <div class="lp-mob-card-up">+ 上传图片</div>
+            <div class="lp-mob-card-grid"><div v-for="i in 3" :key="i"><div /></div></div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ========== PLATFORMS ========== -->
-    <section class="platforms">
+    <!-- ===== PLATFORMS ===== -->
+    <section class="lp-plat">
       <p>{{ $t('landing.section_platforms') }}</p>
-      <div class="platform-row">
-        <span v-for="p in platforms" :key="p" class="plat-badge">{{ p }}</span>
-      </div>
+      <div class="lp-plat-row"><span v-for="p in platforms" :key="p">{{ p }}</span></div>
     </section>
 
-    <!-- ========== FEATURES ========== -->
-    <section id="features" class="features">
-      <div class="section-head">
-        <span class="section-tag">{{ $t('landing.section_features') }}</span>
+    <!-- ===== FEATURES ===== -->
+    <section id="features" class="lp-feat">
+      <div class="lp-sec-hd">
+        <span class="lp-sec-tag">{{ $t('landing.section_features') }}</span>
         <h2>{{ $t('landing.section_features_title') }}</h2>
         <p>{{ $t('landing.section_features_desc') }}</p>
       </div>
-      <div class="feature-tabs">
-        <button v-for="tab in tabs" :key="tab.key" :class="{ active: activeTab === tab.key }" @click="activeTab = tab.key">
-          <span class="tab-icon">{{ tab.icon }}</span>{{ tab.label }}
+      <div class="lp-feat-tabs">
+        <button v-for="tab in tabs" :key="tab.key" :class="{ on: activeTab === tab.key }" @click="activeTab = tab.key">
+          {{ tab.label }}
         </button>
       </div>
-      <div class="card-grid">
-        <div v-for="item in filteredCards" :key="item.id" class="tool-card" @click="$router.push(item.route)">
-          <div class="card-top">
-            <div class="card-icon" :style="{ background: item.color }">{{ item.icon }}</div>
-            <span v-if="item.ai" class="ai-tag">AI</span>
+      <div class="lp-feat-grid">
+        <div v-for="item in filteredCards" :key="item.id" class="lp-card" @click="$router.push(item.route)">
+          <div class="lp-card-top">
+            <div class="lp-card-ico" :style="{ background: item.color }">{{ item.icon }}</div>
+            <span v-if="item.ai" class="lp-card-ai">AI</span>
           </div>
           <h3>{{ item.title }}</h3>
           <p>{{ item.desc }}</p>
-          <div class="card-tags"><span v-for="t in item.tags" :key="t">{{ t }}</span></div>
+          <div class="lp-card-tags"><span v-for="t in item.tags" :key="t">{{ t }}</span></div>
         </div>
       </div>
     </section>
 
-    <!-- ========== HOW IT WORKS ========== -->
-    <section id="how" class="how">
-      <div class="section-head">
-        <span class="section-tag">{{ $t('landing.section_how') }}</span>
+    <!-- ===== HOW ===== -->
+    <section id="how" class="lp-how">
+      <div class="lp-sec-hd">
+        <span class="lp-sec-tag">{{ $t('landing.section_how') }}</span>
         <h2>{{ $t('landing.section_how_title') }}</h2>
         <p>无需任何设计经验，AI 全自动完成</p>
       </div>
-      <div class="steps-row">
-        <div class="step-card" v-for="(s, i) in steps" :key="i">
-          <div class="step-num">{{ i + 1 }}</div>
-          <div class="step-icon">{{ s.icon }}</div>
+      <div class="lp-how-row">
+        <div class="lp-step" v-for="(s, i) in steps" :key="i">
+          <div class="lp-step-num">{{ i + 1 }}</div>
+          <div class="lp-step-ico">{{ s.icon }}</div>
           <h3>{{ s.title }}</h3>
           <p>{{ s.desc }}</p>
         </div>
       </div>
     </section>
 
-    <!-- ========== USE CASES ========== -->
-    <section class="cases">
-      <div class="section-head">
-        <span class="section-tag">用户故事</span>
+    <!-- ===== USE CASES ===== -->
+    <section class="lp-cases">
+      <div class="lp-sec-hd">
+        <span class="lp-sec-tag">用户故事</span>
         <h2>谁在用 Movio AI？</h2>
       </div>
-      <div class="cases-grid">
-        <div class="case-card" v-for="c in useCases" :key="c.title">
-          <div class="case-avatar">{{ c.avatar }}</div>
+      <div class="lp-cases-grid">
+        <div class="lp-case" v-for="c in useCases" :key="c.title">
+          <div class="lp-case-av">{{ c.avatar }}</div>
           <h3>{{ c.title }}</h3>
-          <p class="case-role">{{ c.desc }}</p>
+          <p class="lp-case-role">{{ c.desc }}</p>
           <ul><li v-for="pt in c.points" :key="pt">{{ pt }}</li></ul>
         </div>
       </div>
     </section>
 
-    <!-- ========== PRICING ========== -->
-    <section id="pricing" class="pricing">
-      <div class="section-head">
-        <span class="section-tag">{{ $t('landing.section_pricing') }}</span>
+    <!-- ===== PRICING ===== -->
+    <section id="pricing" class="lp-price">
+      <div class="lp-sec-hd">
+        <span class="lp-sec-tag">{{ $t('landing.section_pricing') }}</span>
         <h2>{{ $t('landing.section_pricing_title') }}</h2>
         <p>新用户注册即送体验积分，免费试用全部功能</p>
       </div>
-      <div class="pricing-grid">
-        <div class="plan-card" v-for="plan in displayPlans" :key="plan.name" :class="{ featured: plan.featured }">
-          <div v-if="plan.featured" class="plan-badge">最受欢迎</div>
-          <div class="plan-icon">{{ plan.icon }}</div>
+      <div class="lp-price-grid">
+        <div class="lp-plan" v-for="plan in displayPlans" :key="plan.name" :class="{ pop: plan.featured }">
+          <div v-if="plan.featured" class="lp-plan-badge">最受欢迎</div>
+          <div class="lp-plan-ico">{{ plan.icon }}</div>
           <h3>{{ plan.name }}</h3>
-          <div class="plan-price">
-            <span class="currency">¥</span><span class="amount">{{ plan.price }}</span><span class="period">/月</span>
-          </div>
-          <ul class="plan-features">
-            <li v-for="f in plan.features" :key="f">{{ f }}</li>
-          </ul>
-          <button class="plan-btn" :class="{ primary: plan.featured }">{{ plan.featured ? '立即开通' : '开始使用' }}</button>
+          <div class="lp-plan-pr"><b>¥{{ plan.price }}</b><span>/月</span></div>
+          <ul class="lp-plan-feat"><li v-for="f in plan.features" :key="f">{{ f }}</li></ul>
+          <button class="lp-plan-btn" :class="{ on: plan.featured }">{{ plan.featured ? '立即开通' : '开始使用' }}</button>
         </div>
       </div>
     </section>
 
-    <!-- ========== FAQ ========== -->
-    <section id="faq" class="faq">
-      <div class="section-head">
-        <span class="section-tag">{{ $t('landing.section_faq') }}</span>
+    <!-- ===== FAQ ===== -->
+    <section id="faq" class="lp-faq">
+      <div class="lp-sec-hd">
+        <span class="lp-sec-tag">{{ $t('landing.section_faq') }}</span>
         <h2>{{ $t('landing.section_faq_title') }}</h2>
       </div>
-      <div class="faq-list">
-        <div v-for="(q, i) in faqs" :key="i" class="faq-item" :class="{ open: faqOpen === i }" @click="faqOpen = faqOpen === i ? -1 : i">
-          <div class="faq-q"><span>{{ q.q }}</span><span class="faq-arrow">{{ faqOpen === i ? '−' : '+' }}</span></div>
-          <div class="faq-a"><p>{{ q.a }}</p></div>
+      <div class="lp-faq-list">
+        <div v-for="(q, i) in faqs" :key="i" class="lp-faq-it" :class="{ on: faqOpen === i }" @click="faqOpen = faqOpen === i ? -1 : i">
+          <div class="lp-faq-q"><span>{{ q.q }}</span><span class="lp-faq-arw">{{ faqOpen === i ? '−' : '+' }}</span></div>
+          <div class="lp-faq-a"><p>{{ q.a }}</p></div>
         </div>
       </div>
     </section>
 
-    <!-- ========== CTA ========== -->
-    <section class="cta">
-      <div class="cta-card">
-        <div class="cta-glow" />
+    <!-- ===== CTA ===== -->
+    <section class="lp-cta">
+      <div class="lp-cta-card">
+        <div class="lp-cta-glow" />
         <h2>准备好让 AI 帮你作图了吗？</h2>
         <p>注册即送 200 体验积分，免费生成你的第一张商品图</p>
-        <div class="cta-btns">
-          <NuxtLink to="/register" class="btn-hero">免费注册 →</NuxtLink>
-          <NuxtLink to="/help" class="cta-link">了解更多</NuxtLink>
+        <div class="lp-cta-btns">
+          <NuxtLink to="/register" class="lp-hero-cta">免费注册 <span>&rarr;</span></NuxtLink>
+          <NuxtLink to="/help" class="lp-cta-link">了解更多</NuxtLink>
         </div>
       </div>
     </section>
 
-    <!-- ========== FOOTER ========== -->
-    <footer class="footer">
-      <div class="footer-inner">
-        <div class="footer-brand">
-          <span class="footer-logo">◆ {{ siteName }}</span>
+    <!-- ===== FOOTER ===== -->
+    <footer class="lp-foot">
+      <div class="lp-foot-in">
+        <div class="lp-foot-brand">
+          <span class="lp-foot-logo">M</span>
+          <span class="lp-foot-name">{{ siteName }}</span>
           <p>AI 驱动的电商视觉创作平台</p>
         </div>
-        <div class="footer-links">
-          <div class="footer-col">
-            <h4>产品</h4>
-            <a href="#features">功能</a><a href="#pricing">定价</a><a href="#how">使用流程</a>
-          </div>
-          <div class="footer-col">
-            <h4>支持</h4>
-            <a href="#faq">常见问题</a><a href="/help">帮助中心</a><a href="/help">联系我们</a>
-          </div>
-          <div class="footer-col">
-            <h4>法律</h4>
-            <a href="#">隐私政策</a><a href="#">服务条款</a>
-          </div>
+        <div class="lp-foot-lk">
+          <div><h4>产品</h4><a href="#features">功能</a><a href="#pricing">定价</a><a href="#how">使用流程</a></div>
+          <div><h4>支持</h4><a href="#faq">常见问题</a><a href="/help">帮助中心</a><a href="/help">联系我们</a></div>
+          <div><h4>法律</h4><a href="#">隐私政策</a><a href="#">服务条款</a></div>
         </div>
       </div>
-      <div class="footer-bottom">
-        <span>{{ footerText }}</span>
-      </div>
+      <div class="lp-foot-bot"><span>{{ footerText }}</span></div>
     </footer>
   </div>
 </template>
