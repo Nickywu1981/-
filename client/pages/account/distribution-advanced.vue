@@ -115,12 +115,15 @@ const subTabs = [
 ];
 
 interface TierInfo { tier: string; label: string; totalSales: number; rateBonus: number; level2Enabled: boolean; members: any[]; totalMembers: number; totalContribution: number; invite_url: string; invite_code: string; assets: any[]; campaigns: any[]; progress: { current: number; target: number } }
+interface PerfInfo { members: Array<{ id: number; nickname: string; level: number }>; totalMembers: number; totalContribution: number }
+interface PromoInfo { assets: any[] }
+interface CampInfo { campaigns: Array<{ id: number; name: string; progress: { current: number; target: number } }> }
 
 const activeSub = ref('performance');
 const tierData = ref<TierInfo | null>(null);
-const perfData = ref(null);
-const promoData = ref(null);
-const campData = ref(null);
+const perfData = ref<PerfInfo | null>(null);
+const promoData = ref<PromoInfo | null>(null);
+const campData = ref<CampInfo | null>(null);
 const perfLoading = ref(false);
 const promoLoading = ref(false);
 const campLoading = ref(false);

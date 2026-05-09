@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { authMiddleware } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
-import { validate } from '../middleware/validate.js';
+import { validate } from '../utils/validate.js';
 import { success } from '../utils/response.js';
 import { z } from 'zod';
 
