@@ -35,6 +35,12 @@ const whitelistUpdateSchema = z.object({
   isActive: z.coerce.number().int().min(0).max(1).optional(),
 });
 
+const callProxySchema = z.object({}).passthrough();
+
+const cleanLogsSchema = z.object({
+  beforeDays: z.coerce.number().int().min(1).max(365).optional(),
+});
+
 // ==================== 配置 CRUD ====================
 
 router.get('/', authMiddleware, adminAuth, asyncHandler(proxyController.listConfigs));
@@ -45,7 +51,7 @@ router.delete('/:id', authMiddleware, adminAuth, asyncHandler(proxyController.de
 
 // ==================== 代理转发调用 ====================
 
-router.post('/call/:code', authMiddleware, asyncHandler(proxyController.callProxy));
+router.post('/call/:code', authMiddleware, validate(callProxySchema), asyncHandler(proxyController.callProxy));
 
 // ==================== 白名单管理 ====================
 
@@ -62,6 +68,6 @@ router.post('/:id/circuit/reset', authMiddleware, adminAuth, asyncHandler(proxyC
 // ==================== 调用日志 ====================
 
 router.get('/logs', authMiddleware, adminAuth, asyncHandler(proxyController.listLogs));
-router.post('/logs/clean', authMiddleware, adminAuth, asyncHandler(proxyController.cleanLogs));
+router.post('/logs/clean', authMiddleware, adminAuth, validate(cleanLogsSchema), asyncHandler(proxyController.cleanLogs));
 
 export default router;

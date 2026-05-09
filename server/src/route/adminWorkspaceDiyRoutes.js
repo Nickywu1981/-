@@ -18,10 +18,15 @@ const router = Router();
 router.use(authMiddleware, adminAuth);
 
 // ─── Zod schemas ───
+const keyParamSchema = z.object({
+  key: z.string().min(1).max(100),
+});
 const putBodySchema = z.object({
   config_value: z.union([z.array(z.unknown()), z.object({}).passthrough()]),
   description: z.string().optional(),
 });
+
+const validateParams = (schema) => validate(schema, 'params');
 
 // ─── GET /api/admin/workspace-diy — 获取所有配置 ───
 router.get('/', async (req, res, next) => {
@@ -34,7 +39,7 @@ router.get('/', async (req, res, next) => {
 });
 
 // ─── GET /api/admin/workspace-diy/:key — 获取单项配置 ───
-router.get('/:key', async (req, res, next) => {
+router.get('/:key', validateParams(keyParamSchema), async (req, res, next) => {
   try {
     const row = await getConfigByKey(req.params.key);
     if (!row) return error(res, ERROR_CODE.NOT_FOUND, '配置项不存在');
@@ -43,7 +48,7 @@ router.get('/:key', async (req, res, next) => {
 });
 
 // ─── PUT /api/admin/workspace-diy/:key — 更新单项配置 ───
-router.put('/:key', validate(putBodySchema, 'body'), async (req, res, next) => {
+router.put('/:key', validateParams(keyParamSchema), validate(putBodySchema, 'body'), async (req, res, next) => {
   try {
     const { config_value, description } = req.body;
     const updatedBy = req.user?.username || req.user?.email || 'admin';
@@ -54,7 +59,7 @@ router.put('/:key', validate(putBodySchema, 'body'), async (req, res, next) => {
 });
 
 // ─── POST /api/admin/workspace-diy/reset/:key — 恢复默认 ───
-router.post('/reset/:key', async (req, res, next) => {
+router.post('/reset/:key', validateParams(keyParamSchema), async (req, res, next) => {
   try {
     const row = await getConfigByKey(req.params.key);
     if (!row) return error(res, ERROR_CODE.NOT_FOUND, '配置项不存在');

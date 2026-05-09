@@ -85,7 +85,7 @@ router.get('/stats', authMiddleware, asyncHandler(async (_req, res) => {
 
 // ==================== POST /api/ai/cache/clear ====================
 
-router.post('/cache/clear', authMiddleware, asyncHandler(async (_req, res) => {
+router.post('/cache/clear', authMiddleware, validate(z.object({})), asyncHandler(async (_req, res) => {
   clearCache();
   return success(res, {}, 'AI 推理缓存已清除');
 }));
