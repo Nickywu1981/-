@@ -5,7 +5,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { success, error } from '../utils/response.js';
-import { validateV4 as _validate } from '../utils/validate.js';
+import { validateV4 as _validate, validate } from '../utils/validate.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import * as uploadService from '../utils/file-upload.js';
 import multer from 'multer';
@@ -22,6 +22,11 @@ const initUploadSchema = z.object({
 
 const completeUploadSchema = z.object({
   upload_id: z.string().regex(/^[a-f0-9]{32}$/, 'upload_id 格式不正确'),
+});
+
+const chunkSchema = z.object({
+  upload_id: z.string().regex(/^[a-f0-9]{32}$/, 'upload_id 格式错误'),
+  chunk_index: z.coerce.number().int().min(0, 'chunk_index 必须为非负整数'),
 });
 
 // Multer error wrapper
@@ -62,13 +67,9 @@ router.post('/init', _validate(initUploadSchema), (req, res) => {
 const UPLOAD_ID_REGEX = /^[a-f0-9]{32}$/;
 
 // POST /api/upload/chunk — 接收分片 (multipart: upload_id, chunk_index, chunk)
-router.post('/chunk', _upload.fields([{ name: 'chunk', maxCount: 1 }]), (req, res) => {
+router.post('/chunk', _upload.fields([{ name: 'chunk', maxCount: 1 }]), validate(chunkSchema, 'body'), (req, res) => {
   try {
-    const upload_id = req.body.upload_id;
-    const chunk_index = parseInt(req.body.chunk_index, 10);
-    if (!upload_id || !UPLOAD_ID_REGEX.test(upload_id) || isNaN(chunk_index)) {
-      return error(res, ERROR_CODE.VALIDATION_ERROR, 'upload_id 和 chunk_index 必填');
-    }
+    const { upload_id, chunk_index } = req.body;
     if (!req.files?.chunk?.[0]) {
       return error(res, ERROR_CODE.VALIDATION_ERROR, '缺少分片文件');
     }

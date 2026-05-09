@@ -11,7 +11,13 @@ export const getPublicConfig = async () => {
 export const getPublicConfigMap = async () => {
   const rows = await getPublicConfig();
   const map = {};
-  rows.forEach(r => { map[r.config_key] = r.config_type === 'json' ? JSON.parse(r.config_value) : r.config_value; });
+  rows.forEach(r => {
+    if (r.config_type === 'json') {
+      try { map[r.config_key] = JSON.parse(r.config_value); } catch { map[r.config_key] = r.config_value; }
+    } else {
+      map[r.config_key] = r.config_value;
+    }
+  });
   return map;
 };
 

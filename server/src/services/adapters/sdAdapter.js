@@ -43,7 +43,7 @@ async function sdTxt2Img(input, onProgress) {
 
   return {
     base64: base64Image,
-    info: data.info ? JSON.parse(data.info) : {},
+    info: (() => { try { return data.info ? JSON.parse(data.info) : {}; } catch { return {}; } })(),
     parameters: data.parameters || {},
   };
 }
@@ -75,7 +75,7 @@ async function sdImg2Img(input, onProgress) {
 
   return {
     base64: data.images?.[0] || '',
-    info: data.info ? JSON.parse(data.info) : {},
+    info: (() => { try { return data.info ? JSON.parse(data.info) : {}; } catch { return {}; } })(),
   };
 }
 
