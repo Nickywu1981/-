@@ -6,6 +6,8 @@
 import { Event } from './event.js';
 import { InvocationContext } from './invocationContext.js';
 import logger from '../../utils/logger.js';
+import { BusinessError } from '../../utils/errors.js';
+import { ERROR_CODE } from '../../constants/errorCode.js';
 
 // ======================== BaseAgent ========================
 export class BaseAgent {
@@ -30,7 +32,7 @@ export class BaseAgent {
 
   /** 子类实现主逻辑 */
   async _runAsyncImpl(ctx) {
-    throw new Error(`Agent "${this.name}": _runAsyncImpl must be implemented`);
+    throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, `Agent "${this.name}": _runAsyncImpl must be implemented`);
   }
 
   /** 执行入口 */
@@ -148,6 +150,6 @@ export class LlmAgent extends BaseAgent {
         logger.error(`[ADK] Fallback modelDispatcher also failed: ${fallbackErr.message}`);
       }
     }
-    throw new Error(`Model "${this.model}" not available`);
+    throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, `Model "${this.model}" not available`);
   }
 }
