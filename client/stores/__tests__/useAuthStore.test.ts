@@ -46,7 +46,7 @@ describe('useAuthStore', () => {
     it('userTier defaults to free', () => {
       const store = useAuthStore();
       expect(store.userTier).toBe('free');
-      store.user = { id: 1, role: 'pro' } as any;
+      store.user = { id: 1, tier: 'pro' } as any;
       expect(store.userTier).toBe('pro');
     });
 
@@ -59,12 +59,12 @@ describe('useAuthStore', () => {
   });
 
   describe('actions', () => {
-    it('logout clears user state', () => {
+    it('logout clears user state', async () => {
       const store = useAuthStore();
       store.user = { id: 1, nickname: 'Test', credits: 50 };
       store.isLoggedIn = true;
 
-      store.logout().catch(() => {}); // $fetch may fail, ignore
+      await store.logout().catch(() => {});
 
       expect(store.user).toBeNull();
       expect(store.isLoggedIn).toBe(false);
