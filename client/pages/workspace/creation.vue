@@ -94,18 +94,8 @@ const activeTabHint = computed(() => {
   return map[activeTab.value] || ''
 })
 
-// ═══ 各标签页下的卡片数据 ═══
+// ═══ 5大分类卡片数据 ═══
 const cardData: Record<string, { path: string; icon: string; name: string; desc: string }[]> = {
-  image: [
-    { path:'/work/main-image',  icon:'🖼', name:'AI 商品图',   desc:'各平台商品主图一键生成' },
-    { path:'/work/scene',       icon:'🏞', name:'场景图生成',  desc:'商品融入生活场景展示' },
-    { path:'/work/poster',      icon:'📰', name:'海报生成',    desc:'营销海报/活动海报/首发海报' },
-    { path:'/work/white-bg',    icon:'⬜', name:'白底图生成',  desc:'符合各平台规范的白底图' },
-    { path:'/work/model-generate', icon:'🧍', name:'AI 模特',  desc:'AI 生成虚拟模特穿衣展示' },
-    { path:'/work/digital-human', icon:'🤖', name:'数字人带货', desc:'数字人24小时自动带货视频' },
-    { path:'/work/style-transfer', icon:'🖌', name:'风格迁移', desc:'实拍图变油画/水彩/3D风格' },
-    { path:'/work/text-effect', icon:'🔤', name:'文字特效',    desc:'立体/金属/霓虹等标题特效' },
-  ],
   video: [
     { path:'/work/video',         icon:'🎥', name:'AI 短视频',   desc:'商品图一键生成带货短视频' },
     { path:'/work/video-edit',    icon:'✂', name:'视频编辑',    desc:'在线剪辑/加字幕/配乐/调色' },
@@ -114,41 +104,45 @@ const cardData: Record<string, { path: string; icon: string; name: string; desc:
     { path:'/work/shot-plan',     icon:'📐', name:'分镜计划',   desc:'视频分镜/镜头顺序/时长规划' },
     { path:'/work/storyboard',    icon:'🎞', name:'故事板',     desc:'视频创意可视化故事板预览' },
   ],
-  batch: [
-    { path:'/work/batch',         icon:'📦', name:'批量处理',    desc:'50张图统一抠图+白底+尺寸' },
-    { path:'/work/publish',       icon:'📤', name:'一键发布',    desc:'多平台一键分发已生成素材' },
+  image: [
+    { path:'/work/main-image',  icon:'🖼', name:'AI 商品图',   desc:'各平台商品主图一键生成' },
+    { path:'/work/scene',       icon:'🏞', name:'场景图生成',  desc:'商品融入生活场景展示' },
+    { path:'/work/poster',      icon:'📰', name:'海报生成',    desc:'营销海报/活动海报/首发海报' },
+    { path:'/work/white-bg',    icon:'⬜', name:'白底图生成',  desc:'符合各平台规范的白底图' },
+    { path:'/work/remove-bg',   icon:'✂', name:'智能去背景',  desc:'AI 3秒精准识别主体去背景' },
+    { path:'/work/retouch',     icon:'✨', name:'AI 精修',     desc:'调色/锐化/光影质感优化' },
+    { path:'/work/color-swap',  icon:'🎯', name:'商品换色',    desc:'同一款式展示多种颜色' },
+    { path:'/work/style-transfer', icon:'🖌', name:'风格迁移', desc:'实拍图变油画/水彩/3D风格' },
+    { path:'/work/text-effect', icon:'🔤', name:'文字特效',    desc:'立体/金属/霓虹等标题特效' },
+    { path:'/work/outpaint',    icon:'↔', name:'智能外扩',    desc:'画面边缘智能扩展补全' },
+    { path:'/work/batch',       icon:'📦', name:'批量处理',    desc:'50张图统一抠图+白底+尺寸' },
+  ],
+  detail: [
+    { path:'/work/detail-page',    icon:'📄', name:'详情页设计', desc:'商品详情页智能排版设计' },
+    { path:'/work/product-render', icon:'🛒', name:'产品渲染',   desc:'3D展示商品旋转/细节' },
+    { path:'/work/virtual-tryon',  icon:'👗', name:'虚拟试穿',   desc:'买家在线看衣服上身效果' },
+    { path:'/work/model-generate', icon:'🧍', name:'AI 模特',    desc:'AI 生成虚拟模特穿衣展示' },
+    { path:'/work/ghost-mannequin', icon:'👤', name:'幽灵模特',  desc:'隐形模特展示上身效果' },
+    { path:'/work/multi-platform', icon:'📱', name:'多平台适配', desc:'天猫/京东/拼多多等尺寸适配' },
+    { path:'/work/main-image-set', icon:'🖼', name:'主图套装',   desc:'主图+辅图+白底图一键套装' },
     { path:'/work/output',        icon:'📁', name:'导出设置',    desc:'统一导出格式/尺寸/命名规则' },
-    { path:'/work/usage',         icon:'📊', name:'用量统计',    desc:'每日生成量/额度消耗可视化' },
   ],
-  edit: [
-    { path:'/work/retouch',       icon:'✨', name:'AI 精修',     desc:'调色/锐化/光影质感优化' },
-    { path:'/work/color-swap',    icon:'🎯', name:'商品换色',    desc:'同一款式展示多种颜色' },
-    { path:'/work/wrinkle-remove', icon:'🧹', name:'去皱美颜',  desc:'服装褶皱自动去平整' },
-    { path:'/work/ghost-mannequin', icon:'👤', name:'幽灵模特', desc:'隐形模特展示上身效果' },
-    { path:'/work/outpaint',      icon:'↔', name:'智能外扩',    desc:'画面边缘智能扩展补全' },
-    { path:'/work/translate-image', icon:'🌐', name:'图片翻译', desc:'图片上文字一键翻译' },
+  copywrite: [
+    { path:'/work/title-gen',     icon:'📋', name:'电商标题',   desc:'SEO优化标题/卖点标题批量生成' },
+    { path:'/work/detail-copy',   icon:'📝', name:'详情文案',   desc:'商品详情页长文案智能撰写' },
+    { path:'/work/script-gen',    icon:'🎙', name:'口播脚本',   desc:'带货短视频口播脚本自动生成' },
+    { path:'/work/campaign-copy', icon:'📢', name:'营销文案',   desc:'大促/活动/促销文案生成' },
+    { path:'/work/email-copy',    icon:'📧', name:'邮件文案',   desc:'EDM营销邮件/短信文案' },
+    { path:'/work/social-copy',   icon:'📱', name:'社媒文案',   desc:'小红书/抖音/TikTok文案' },
   ],
-  removebg: [
-    { path:'/work/remove-bg',     icon:'✂', name:'智能去背景',  desc:'AI 3秒精准识别主体去背景' },
-    { path:'/work/white-bg',      icon:'⬜', name:'白底图生成',  desc:'去背景后一键输出白底图' },
-    { path:'/work/virtual-tryon', icon:'👗', name:'虚拟试穿',    desc:'买家在线看衣服上身效果' },
-    { path:'/work/product-render', icon:'🛒', name:'产品渲染',  desc:'3D展示商品旋转/细节' },
+  digital: [
+    { path:'/work/digital-human', icon:'🤖', name:'数字人带货', desc:'数字人24小时自动带货视频' },
+    { path:'/work/digital-live',  icon:'📡', name:'数字人直播', desc:'虚拟直播间自动讲解商品' },
+    { path:'/work/avatar-custom', icon:'🧬', name:'形象定制',   desc:'自定义数字人外观/声音/动作' },
+    { path:'/work/ai-host',       icon:'🎤', name:'AI 主播',    desc:'智能语音播报商品卖点' },
+    { path:'/work/virtual-model', icon:'👤', name:'虚拟模特',   desc:'AI生成虚拟模特穿衣展示' },
+    { path:'/work/face-swap',     icon:'🔄', name:'换脸',       desc:'AI 人脸替换/数字人换脸' },
   ],
-    copywrite: [
-      { path:'/work/title-gen',     icon:'📋', name:'电商标题',   desc:'SEO优化标题/卖点标题批量生成' },
-      { path:'/work/detail-copy',   icon:'📝', name:'详情文案',   desc:'商品详情页长文案智能撰写' },
-      { path:'/work/script-gen',    icon:'🎙', name:'口播脚本',   desc:'带货短视频口播脚本自动生成' },
-      { path:'/work/campaign-copy', icon:'📢', name:'营销文案',   desc:'大促/活动/促销文案生成' },
-      { path:'/work/email-copy',    icon:'📧', name:'邮件文案',   desc:'EDM营销邮件/短信文案' },
-      { path:'/work/social-copy',   icon:'📱', name:'社媒文案',   desc:'小红书/抖音/TikTok文案' },
-    ],
-    'digital-human': [
-      { path:'/work/digital-human', icon:'🤖', name:'数字人带货', desc:'数字人24小时自动带货视频' },
-      { path:'/work/digital-live',  icon:'📡', name:'数字人直播', desc:'虚拟直播间自动讲解商品' },
-      { path:'/work/avatar-custom', icon:'🧬', name:'形象定制',   desc:'自定义数字人外观/声音/动作' },
-      { path:'/work/ai-host',       icon:'🎤', name:'AI 主播',    desc:'智能语音播报商品卖点' },
-      { path:'/work/virtual-model', icon:'👤', name:'虚拟模特',   desc:'AI生成虚拟模特穿衣展示' },
-    ],
 }
 
 const activeCards = computed(() => cardData[activeTab.value] || cardData.image)
@@ -156,13 +150,12 @@ const activeCards = computed(() => cardData[activeTab.value] || cardData.image)
 async function handleSubmit() {
   if (!prompt.value.trim()) return
   const tab = activeTab.value
-  // 根据标签跳转到对应创作页面，并携带 prompt 参数
   const routes: Record<string, string> = {
     image: '/work/image',
     video: '/work/video',
-    batch: '/work/batch',
-    edit: '/work/image',
-    removebg: '/work/remove-bg',
+    detail: '/work/detail-page',
+    copywrite: '/work/copywrite',
+    digital: '/work/digital-human',
   }
   const target = routes[tab] || '/work/image'
   router.push({ path: target, query: { prompt: prompt.value } })
