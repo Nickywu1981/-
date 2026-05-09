@@ -84,5 +84,35 @@
     "credits": "Credits",
     "notifications": "Notifications",
     "settings": "Settings"
+  },
+  "nav": {
+    "workspace": "Workspace",
+    "login": "Login",
+    "register": "Sign Up"
+  },
+  "landing": {
+    "nav_features": "Features",
+    "nav_how": "How It Works",
+    "nav_pricing": "Pricing",
+    "nav_faq": "FAQ",
+    "hero_sub": "AI-Powered E-Commerce Visual Content Factory",
+    "hero_title": "Movio AI — Image+Video",
+    "hero_cta": "Go to Workspace",
+    "hero_demo": "Watch Demo",
+    "hero_metrics": {
+      "images": "Images Generated",
+      "merchants": "Active Merchants",
+      "satisfaction": "Satisfaction"
+    },
+    "section_platforms": "Compatible with 13 major e-commerce & social platforms, one-click compliant sizes",
+    "section_features": "Core Features",
+    "section_features_title": "Full E-Commerce Visual Coverage",
+    "section_features_desc": "From product images to short videos, AI does it all. Every module battle-tested in real e-commerce scenarios.",
+    "section_how": "How It Works",
+    "section_how_title": "3 Steps: Upload → AI Generate → Download",
+    "section_pricing": "Pricing",
+    "section_pricing_title": "Flexible plans for every stage",
+    "section_faq": "FAQ",
+    "section_faq_title": "Everything you need to know"
   }
 }

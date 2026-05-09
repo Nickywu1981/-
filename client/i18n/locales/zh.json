@@ -84,5 +84,35 @@
     "credits": "积分",
     "notifications": "消息通知",
     "settings": "设置"
+  },
+  "nav": {
+    "workspace": "控制台",
+    "login": "登录",
+    "register": "免费注册"
+  },
+  "landing": {
+    "nav_features": "功能",
+    "nav_how": "使用流程",
+    "nav_pricing": "定价",
+    "nav_faq": "常见问题",
+    "hero_sub": "AI 驱动的电商视觉内容工厂",
+    "hero_title": "Movio AI — 图片+视频",
+    "hero_cta": "进入控制台",
+    "hero_demo": "查看演示",
+    "hero_metrics": {
+      "images": "图片已生成",
+      "merchants": "商家在用",
+      "satisfaction": "满意率"
+    },
+    "section_platforms": "已适配 13 个主流电商与社交平台，一键生成合规尺寸与格式",
+    "section_features": "核心功能",
+    "section_features_title": "覆盖电商视觉全场景",
+    "section_features_desc": "从商品图到短视频，AI 一站式完成。每个模块都经过真实电商场景验证。",
+    "section_how": "使用流程",
+    "section_how_title": "三步完成：上传 → AI 生成 → 下载上线",
+    "section_pricing": "价格",
+    "section_pricing_title": "灵活的套餐，适合不同阶段",
+    "section_faq": "常见问题",
+    "section_faq_title": "你关心的问题都在这里"
   }
 }
