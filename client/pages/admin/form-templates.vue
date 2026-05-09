@@ -45,7 +45,7 @@ async function fetchData() {
     if (filterType.value) params.set('type', filterType.value)
     const data: any = await $fetch(`/api/forms/admin?${params}`, { credentials: 'include' })
     list.value = data?.data?.list || data?.data || []
-  } catch(e) { /* empty */ }
+  } catch(e) { toast.error('加载失败') }
   loading.value = false
 }
 

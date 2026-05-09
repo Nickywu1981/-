@@ -1,3 +1,5 @@
+import { useToast } from '#imports'
+const toast = useToast()
 <template>
   <div class="size-templates-page">
     <h1>电商平台尺寸模板</h1>
@@ -34,7 +36,7 @@ onMounted(async () => {
     const data: any = await $fetch('/api/templates/platforms', { credentials: 'include' })
     platformSizes.value = data?.data || []
     if (!Array.isArray(platformSizes.value)) platformSizes.value = []
-  } catch(e) { /* fall back to empty */ }
+  } catch(e) { toast.error('加载失败') }
   loading.value = false
 })
 

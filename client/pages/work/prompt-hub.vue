@@ -148,11 +148,11 @@ const openDetail = (t: any) => {
     if (r.myScore) myRating.value = r.myScore
     detail.value.avg_score = r.avgScore
     detail.value.rating_count = r.ratingCount
-  }).catch(() => {})
+  }).catch(() => toast.error('加载失败'))
 }
 
 const useTemplate = (t: any) => {
-  $fetch(`/api/prompts/${t.id}/use`, { method: 'POST', body: { modelType: 'text' } }).catch(() => {})
+  $fetch(`/api/prompts/${t.id}/use`, { method: 'POST', body: { modelType: 'text' } }).catch(() => toast.error('加载失败'))
   openDetail(t)
 }
 

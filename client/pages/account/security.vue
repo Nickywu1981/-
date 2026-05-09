@@ -1,3 +1,5 @@
+import { useToast } from '#imports'
+const toast = useToast()
 <template>
   <div class="account-page"><h1>安全设置</h1>
     <div class="security-section"><h3>修改密码</h3>
@@ -20,7 +22,7 @@ onMounted(async () => {
   try {
     const data: any = await $fetch('/api/user/profile', { credentials: 'include' })
     if (data?.code === 200 && data.data?.devices) devices.value = data.data.devices
-  } catch(e) { /* empty */ }
+  } catch(e) { toast.error('加载失败') }
 })
 
 async function changePwd() {

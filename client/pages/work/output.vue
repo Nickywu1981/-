@@ -1,3 +1,5 @@
+import { useToast } from '#imports'
+const toast = useToast()
 <template>
   <WorkLayout title="作品输出" subtitle="批量导出与发布">
     <LoadingSkeleton v-if="loading" type="card" :rows="4" />
@@ -36,7 +38,7 @@ onMounted(async () => {
     const data: any = await $fetch('/api/tasks/my-works', { credentials: 'include' })
     items.value = data?.data?.list || data?.data || []
     if (!Array.isArray(items.value)) items.value = []
-  } catch(e) { /* empty */ }
+  } catch(e) { toast.error('加载失败') }
   loading.value = false
 })
 

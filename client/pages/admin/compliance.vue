@@ -70,7 +70,7 @@ async function viewRules(target: any) {
   try {
     const data: any = await $fetch(`/api/compliance/rules/${target.code}`, { credentials: 'include' })
     rulesDetail.value = data?.data || target
-  } catch(e: any) { /* empty */ }
+  } catch(e: any) { toast.error(e?.message || '加载失败') }
 }
 
 onMounted(fetchTargets)

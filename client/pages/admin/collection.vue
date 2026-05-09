@@ -46,7 +46,7 @@ async function fetchData() {
     const data: any = await $fetch('/api/collections', { credentials: 'include' })
     list.value = data?.data?.list || data?.data || []
     if (!Array.isArray(list.value)) list.value = []
-  } catch(e) { /* empty */ }
+  } catch(e) { toast.error('加载失败') }
   loading.value = false
 }
 

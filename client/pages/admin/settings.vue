@@ -47,7 +47,7 @@ onMounted(async () => {
         else otherConfigs.value.push(c)
       }
     }
-  } catch(e) { /* empty */ }
+  } catch(e) { toast.error('加载失败') }
   loading.value = false
 })
 

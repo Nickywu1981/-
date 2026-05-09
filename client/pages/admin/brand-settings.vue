@@ -36,7 +36,7 @@ onMounted(async () => {
   try {
     const data: any = await $fetch('/api/brand', { credentials: 'include' })
     if (data?.code === 200 && data.data) Object.assign(form, data.data)
-  } catch(e) { /* empty */ }
+  } catch(e) { toast.error('加载失败') }
   loading.value = false
 })
 

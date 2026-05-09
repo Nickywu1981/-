@@ -62,7 +62,7 @@ async function fetchData() {
     const res: any = await $fetch(`/api/admin/prompts?${params}`, { credentials: 'include' })
     list.value = res?.data?.list || []
     total.value = res?.data?.total || 0
-  } catch(e) { /* empty */ }
+  } catch(e) { toast.error('加载失败') }
   loading.value = false
 }
 function onPageChange(p: number) { page.value = p; fetchData() }

@@ -1,3 +1,5 @@
+import { useToast } from '#imports'
+const toast = useToast()
 <template>
   <div class="diy-page">
     <h1>自定义页面设计</h1>
@@ -24,7 +26,7 @@ onMounted(async () => {
     const data: any = await $fetch('/api/diy', { credentials: 'include' })
     templates.value = data?.data?.list || data?.data || []
     if (!Array.isArray(templates.value)) templates.value = []
-  } catch(e) { /* empty */ }
+  } catch(e) { toast.error('加载失败') }
   loading.value = false
 })
 

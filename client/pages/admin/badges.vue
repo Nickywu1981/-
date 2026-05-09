@@ -121,7 +121,7 @@ async function fetchData() {
     if (filterCategory.value) params.set('category', filterCategory.value);
     const res = await $fetch(`/api/badges/admin/all?${params}`, { credentials: 'include' });
     list.value = (res as any).data || [];
-  } catch (e: any) { /* toast would be used here */ }
+  } catch (e: any) { toast.error(e?.message || '加载失败') }
   loading.value = false;
 }
 
