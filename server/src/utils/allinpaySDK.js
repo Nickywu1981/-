@@ -141,7 +141,7 @@ export async function unifiedOrder(params) {
   logger.info('[Allinpay] 统一下单请求', { reqsn: postData.reqsn, trxamt: postData.trxamt, paytype });
 
   const bodyStr = new URLSearchParams(
-    Object.fromEntries(Object.entries(postData).filter(([, v]) => v !== ''))
+    Object.fromEntries(Object.entries(postData).filter(([, v]) => v !== '')),
   ).toString();
 
   let res;
