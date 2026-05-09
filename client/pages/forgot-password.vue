@@ -5,18 +5,18 @@
       <template v-if="verified">
         <div class="form-group">
           <label>新密码</label>
-          <input v-model="newPassword" type="password" placeholder="至少8位" @keyup.enter="doReset" />
+          <input v-model="newPassword" type="password" placeholder="至少8位" maxlength="128" @keyup.enter="doReset" />
         </div>
         <div class="form-group">
           <label>确认新密码</label>
-          <input v-model="confirmPassword" type="password" placeholder="再次输入新密码" @keyup.enter="doReset" />
+          <input v-model="confirmPassword" type="password" placeholder="再次输入新密码" maxlength="128" @keyup.enter="doReset" />
         </div>
         <button class="btn-save" :disabled="loading" @click="doReset">{{ loading ? '重置中...' : '重置密码' }}</button>
       </template>
       <template v-else>
         <div class="form-group">
           <label>手机号或邮箱</label>
-          <input v-model="account" type="text" placeholder="请输入注册时使用的手机号或邮箱" />
+          <input v-model="account" type="text" placeholder="请输入注册时使用的手机号或邮箱" maxlength="254" />
         </div>
         <div class="form-group code-row">
           <label>验证码</label>

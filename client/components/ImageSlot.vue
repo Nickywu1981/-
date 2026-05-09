@@ -5,8 +5,10 @@
       :src="src"
       :alt="alt"
       class="slot-img"
+      loading="lazy"
       :style="{ opacity: loaded ? 1 : 0.5, transition: 'opacity 0.3s' }"
       @load="loaded = true"
+      @error="loaded = false"
     />
     <div v-else class="slot-empty"><span>{{ emptyText }}</span></div>
     <div v-if="title" class="slot-title">{{ title }}</div>

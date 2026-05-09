@@ -16,11 +16,11 @@
       <form v-if="mode === 'password'" @submit.prevent="handlePasswordLogin">
         <div class="input-group">
           <span class="input-icon">👤</span>
-          <input v-model="username" type="text" placeholder="用户名" required />
+          <input v-model="username" type="text" placeholder="用户名" required maxlength="30" />
         </div>
         <div class="input-group">
           <span class="input-icon">🔒</span>
-          <input v-model="password" type="password" placeholder="密码" required />
+          <input v-model="password" type="password" placeholder="密码" required maxlength="128" />
         </div>
         <button type="submit" class="login-btn" :disabled="loading">
           <span v-if="loading" class="spinner-sm" />
@@ -31,7 +31,7 @@
       <form v-if="mode === 'sms'" @submit.prevent="handleSmsLogin">
         <div class="input-group">
           <span class="input-icon">📱</span>
-          <input v-model="smsPhone" type="tel" placeholder="手机号" required />
+          <input v-model="smsPhone" type="tel" placeholder="手机号" required maxlength="11" />
         </div>
         <div class="sms-row">
           <input v-model="smsCode" type="text" placeholder="验证码" required maxlength="6" />
@@ -48,7 +48,7 @@
       <form v-if="mode === 'email'" @submit.prevent="handleEmailLogin">
         <div class="input-group">
           <span class="input-icon">📧</span>
-          <input v-model="emailAddr" type="email" placeholder="邮箱地址" required />
+          <input v-model="emailAddr" type="email" placeholder="邮箱地址" required maxlength="254" />
         </div>
         <div class="sms-row">
           <input v-model="emailCode" type="text" placeholder="验证码" required maxlength="6" />
