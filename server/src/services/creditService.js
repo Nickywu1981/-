@@ -116,8 +116,18 @@ export async function rollbackCharge(requestId, remark = '') {
   if (!record) throw new BusinessError(404, '预扣记录不存在');
   if (record.status === CREDIT_RECORD_STATUS.ROLLED_BACK) return { alreadyRolledBack: true };
 
-  await creditDao.updateCreditBalance(record.user_id, record.consumed);
-  await creditDao.refundConsumption(record.id, record.credit_before, remark || '系统回滚');
+  const conn = await db.getConnection();
+  try {
+    await conn.beginTransaction();
+    await creditDao.updateCreditBalance(record.user_id, record.consumed, conn);
+    await creditDao.refundConsumption(record.id, record.credit_before, remark || '系统回滚');
+    await conn.commit();
+  } catch (err) {
+    await conn.rollback();
+    throw err;
+  } finally {
+    conn.release();
+  }
 
   await creditDao.insertRequestLog({
     requestId: `${requestId}_rollback`, userId: record.user_id, action: 'rollback',

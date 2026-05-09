@@ -75,7 +75,21 @@ export async function handleNotify(body) {
     throw new BusinessError(400, '签名验证失败');
   }
 
-  // 3. 幂等检查
+  // 3. 幂等检查 + 分布式锁
+  const lockKey = `notify_lock:${reqsn}`;
+  let locked = false;
+  try {
+    const redis = await import('../dao/redis.js');
+    const r = await redis.default.getRedis();
+    if (r) {
+      locked = await r.set(lockKey, '1', { NX: true, EX: 120 });
+      if (!locked) {
+        logger.info('[Allinpay] 回调并发冲突，跳过', { reqsn, trxid });
+        return true;
+      }
+    }
+  } catch { /* Redis 不可用，继续执行 */ }
+
   const alreadyProcessed = await allinpayDao.isCallbackProcessed(reqsn, trxid || '');
   if (alreadyProcessed) {
     logger.info('[Allinpay] 回调已处理，跳过', { reqsn, trxid });

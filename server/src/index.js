@@ -31,6 +31,24 @@ import('./services/workerBootstrap.js').then(({ bootstrapWorkers }) => bootstrap
 
 server.listen(port, () => {
   logger.info(`${env} 模式 — http://localhost:${port}  |  WebSocket /ws  |  BullMQ Workers`);
+
+  // 定时清理废弃上传 (每 30 分钟)
+  setInterval(() => {
+    try { import('./utils/file-upload.js').then(({ cleanupStaleUploads }) => cleanupStaleUploads()); } catch { /* ignore */ }
+  }, 30 * 60 * 1000);
+});
+
+// ==================== 全局异常处理 ====================
+
+process.on('uncaughtException', (err) => {
+  logger.error('未捕获异常', { message: err.message, stack: err.stack?.split('\n').slice(0, 3).join('\n') });
+  gracefulShutdown('uncaughtException');
+});
+
+process.on('unhandledRejection', (reason) => {
+  const msg = reason instanceof Error ? reason.message : String(reason);
+  logger.error('未处理的 Promise 拒绝', { message: msg, stack: reason?.stack?.split('\n').slice(0, 3).join('\n') });
+  gracefulShutdown('unhandledRejection');
 });
 
 // ==================== 优雅关闭 ====================
@@ -47,6 +65,13 @@ function gracefulShutdown(signal) {
       await db.default.end();
       logger.info('DB 连接池已关闭');
     } catch { /* DB may not be connected */ }
+
+    // 关闭 BullMQ
+    try {
+      const qm = await import('./services/queueManager.js');
+      await qm.closeAll();
+      logger.info('BullMQ 队列已关闭');
+    } catch { /* BullMQ may not be connected */ }
 
     // 关闭 Redis
     try {

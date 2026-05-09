@@ -98,8 +98,20 @@ export function registerWorker(name, processor) {
     logger.info(`[BullMQ] ${name} #${job.id} 完成`);
   });
 
-  worker.on('failed', (job, err) => {
+  worker.on('failed', async (job, err) => {
     logger.error(`[BullMQ] ${name} #${job?.id} 失败: ${err.message}`);
+    if (job && job.attemptsMade >= (QUEUES[name].attempts || 3)) {
+      try {
+        const deadQ = new Queue(`${name}-dead`, {
+          connection: { host: process.env.REDIS_HOST || 'localhost', port: parseInt(process.env.REDIS_PORT || '6379', 10) },
+        });
+        await deadQ.add(job.name, job.data, { removeOnComplete: 200 });
+        await deadQ.close();
+        logger.warn(`[BullMQ] ${name} #${job.id} 最终失败 → 死信队列`);
+      } catch (e) {
+        logger.error(`[BullMQ] 死信队列写入失败: ${e.message}`);
+      }
+    }
   });
 
   workerInstances.set(name, worker);
