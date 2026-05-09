@@ -67,7 +67,8 @@ router.post('/reset/:key', async (req, res, next) => {
     const db = getDB();
     const [rows] = await db.query('SELECT * FROM site_config WHERE config_key = ?', [req.params.key]);
     if (!rows.length) return res.status(404).json({ ok: false, message: '配置项不存在' });
-    // Keep the row but mark as reset — delete and let default logic handle
+    await db.query('DELETE FROM site_config WHERE config_key = ?', [req.params.key]);
+    logger.info(`[workspace-diy] ${req.params.key} 已重置为默认值 by ${req.user?.username || 'admin'}`);
     res.json({ ok: true, message: `${req.params.key} 已重置为默认值` });
   } catch (err) { next(err); }
 });
