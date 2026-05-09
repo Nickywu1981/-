@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { listAllConfig, updateConfig, removeConfig, getPublicSiteConfig, createConfig } from '../controller/siteConfigController.js';
 import { getConfigLogs } from '../services/siteConfigService.js';
 import { success, error } from '../utils/response.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
@@ -30,7 +31,7 @@ adminRouter.get('/logs/:key', authMiddleware, adminAuth, asyncHandler(async (req
   try {
     const logs = await getConfigLogs(req.params.key, req.query.limit || 50);
     success(res, logs);
-  } catch (err) { error(res, err.status || 500, err.message || 'Failed to load logs'); }
+  } catch (err) { error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || 'Failed to load logs'); }
 }));
 
 const publicRouter = Router();

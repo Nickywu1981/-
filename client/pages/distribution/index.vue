@@ -104,11 +104,11 @@ function typeLabel(t: string) { return typeLabels[t] || t }
 onMounted(async () => {
   try {
     // 获取绑定平台
-    const bindsRes: any = await $fetch(`${apiBase}/platforms/bindings`).catch(() => null)
+    const bindsRes: any = await $fetch(`${apiBase}/platforms/bindings`, { credentials: 'include' }).catch(() => null)
     if (bindsRes?.code === 200) boundPlatforms.value = bindsRes.data?.list || []
 
     // 获取最近作品
-    const worksRes: any = await $fetch(`${apiBase}/assets/list`, { params: { page: 1, pageSize: 10 } }).catch(() => null)
+    const worksRes: any = await $fetch(`${apiBase}/assets/list`, { params: { page: 1, pageSize: 10 }, credentials: 'include' }).catch(() => null)
     if (worksRes?.code === 200) {
       recentWorks.value = (worksRes.data?.list || []).map((w: any) => ({ ...w, selectedPlatform: '' }))
     }
@@ -125,6 +125,7 @@ async function doPublish(work: any) {
     const res: any = await $fetch(`${apiBase}/platforms/publish`, {
       method: 'POST',
       body: { work_id: work.id, platform: work.selectedPlatform, content_url: work.url },
+      credentials: 'include',
     }).catch(() => null)
     if (res?.code === 200) {
       publishHistory.value.unshift({

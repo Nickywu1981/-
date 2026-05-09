@@ -12,6 +12,8 @@ import {
 } from '../adk/agents/index.js';
 import { Runner } from '../adk/core/runner.js';
 import { SessionStore } from '../adk/core/sessionStore.js';
+import { success, error } from '../utils/response.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 const router = Router();
 
@@ -24,14 +26,6 @@ const runSchema = z.object({
 
 // 持久化 session 存储（Redis + Map fallback）
 const sessionStore = new SessionStore().startCleanup();
-
-// 标准化响应
-function success(res, data, msg = 'ok') {
-  res.json({ code: 200, msg, data });
-}
-function fail(res, msg, status = 400) {
-  res.status(status).json({ code: status, msg });
-}
 
 // ==================== A2A 兼容端点 ====================
 
@@ -62,14 +56,14 @@ router.post('/run/:agentName', validate(runSchema), async (req, res) => {
   };
 
   const agent = agentMap[agentName];
-  if (!agent) return fail(res, `Unknown agent: ${agentName}`, 404);
+  if (!agent) return error(res, 404, `Unknown agent: ${agentName}`);
 
   try {
     const runner = new Runner({ agent, sessionService: sessionStore });
     const result = await runner.run({ userId, sessionId, query, context });
     success(res, result);
   } catch (err) {
-    fail(res, err.message, 500);
+    error(res, ERROR_CODE.INTERNAL_ERROR, err.message);
   }
 });
 
@@ -107,7 +101,7 @@ router.get('/health', async (_req, res) => {
     const result = await runner.run({ userId: 'system', query: 'check all systems' });
     success(res, result);
   } catch (err) {
-    fail(res, err.message, 500);
+    error(res, ERROR_CODE.INTERNAL_ERROR, err.message);
   }
 });
 

@@ -15,6 +15,7 @@ export function useAnalytics() {
       await $fetch('/api/analytics/track', {
         method: 'POST',
         body: { event, metadata },
+        credentials: 'include',
       });
     } catch {
       // 埋点失败静默忽略

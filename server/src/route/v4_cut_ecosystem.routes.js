@@ -32,7 +32,7 @@ router.post('/export/jianying', _validate(exportSchema), async (req, res) => {
     const result = await cutEcosystemService.exportJianyingDraft(req.user.id, req.validated);
     success(res, result);
   } catch (err) {
-    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '导出剪映失败', err.status || ERROR_CODE.INTERNAL_ERROR);
+    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '导出剪映失败');
   }
 });
 
@@ -41,7 +41,7 @@ router.post('/export/capcut', _validate(exportSchema), async (req, res) => {
     const result = await cutEcosystemService.exportCapCutDraft(req.user.id, req.validated);
     success(res, result);
   } catch (err) {
-    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '导出CapCut失败', err.status || ERROR_CODE.INTERNAL_ERROR);
+    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '导出CapCut失败');
   }
 });
 
@@ -60,7 +60,7 @@ router.get('/works', _validate(listSchema, 'query'), async (req, res) => {
     const result = await cutEcosystemService.getUserExportableWorks(req.user.id, req.validated);
     success(res, result);
   } catch (err) {
-    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '查询作品失败', err.status || ERROR_CODE.INTERNAL_ERROR);
+    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '查询作品失败');
   }
 });
 

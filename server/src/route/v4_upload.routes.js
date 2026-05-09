@@ -60,7 +60,7 @@ router.post('/init', _validate(initUploadSchema), (req, res) => {
     const result = uploadService.initUpload({ fileName: file_name, fileSize: file_size, fileType: file_type });
     return success(res, result);
   } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '初始化上传失败', err.status || ERROR_CODE.INTERNAL_ERROR);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '初始化上传失败');
   }
 });
 
@@ -76,7 +76,7 @@ router.post('/chunk', _upload.fields([{ name: 'chunk', maxCount: 1 }]), validate
     const result = uploadService.receiveChunk(upload_id, chunk_index, req.files.chunk[0].buffer);
     return success(res, result);
   } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '接收分片失败', err.status || ERROR_CODE.INTERNAL_ERROR);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '接收分片失败');
   }
 });
 
@@ -100,7 +100,7 @@ router.post('/complete', _validate(completeUploadSchema), (req, res) => {
     const result = uploadService.completeUpload(upload_id);
     return success(res, result, '上传完成');
   } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '合并文件失败', err.status || ERROR_CODE.INTERNAL_ERROR);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '合并文件失败');
   }
 });
 

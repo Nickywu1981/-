@@ -48,6 +48,7 @@ export function useDiyAutoSave(
       await $fetch(`/api/diy/${pageId.value}/versions/auto-save`, {
         method: 'POST',
         body: { mobileConfig: { sections: structuredClone(sections) } },
+        credentials: 'include',
       })
       lastSaved.value = new Date()
       pendingChanges.value = 0
@@ -63,7 +64,7 @@ export function useDiyAutoSave(
   async function checkRecovery() {
     if (!pageId.value) return null
     try {
-      const res = await $fetch(`/api/diy/${pageId.value}/versions/latest-auto`)
+      const res = await $fetch(`/api/diy/${pageId.value}/versions/latest-auto`, { credentials: 'include' })
       if (res?.data && res.data.config_json) {
         recovered.value = true
         return res.data
