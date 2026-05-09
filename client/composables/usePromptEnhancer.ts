@@ -16,12 +16,12 @@ export function usePromptEnhancer() {
   const enhanced = ref('')
   const original = ref('')
 
-  async function enhance(prompt, type = 'image') {
+  async function enhance(prompt: string, type: string = 'image'): Promise<string> {
     if (!prompt?.trim()) return ''
     original.value = prompt
     enhancing.value = true
     try {
-      const res = await api.post('/api/ai/enhance-prompt', { prompt, type })
+      const res = await api.post('/ai/enhance-prompt', { prompt, type })
       enhanced.value = res?.enhanced || res?.result || res?.data?.enhanced || prompt
       return enhanced.value
     } catch {
@@ -32,11 +32,11 @@ export function usePromptEnhancer() {
     }
   }
 
-  function apply() {
+  function apply(): string {
     return enhanced.value || original.value
   }
 
-  function reset() {
+  function reset(): void {
     enhancing.value = false
     enhanced.value = ''
     original.value = ''

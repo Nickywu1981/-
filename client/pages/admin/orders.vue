@@ -75,6 +75,7 @@
 
 <script setup lang="ts">
 import { formatDateTime } from '@/utils/format'
+const toast = useToast()
 
 const list = ref<any[]>([])
 const total = ref(0)
@@ -86,10 +87,8 @@ const loading = ref(true)
 const detailOpen = ref(false)
 const detail = ref<any>({})
 
-function planLabel(t: number | string) {
-  const map: Record<string, string> = { '1': '月卡', '2': '季卡', '3': '年卡' }
-  return map[String(t)] || '未知'
-}
+const planLabels: Record<string, string> = { '1': '月卡', '2': '季卡', '3': '年卡' }
+function planLabel(t: number | string) { return planLabels[String(t)] || '未知' }
 
 async function fetch() {
   loading.value = true
@@ -102,7 +101,7 @@ async function fetch() {
       list.value = data.data.list || []
       total.value = data.data.total || 0
     }
-  } catch (e: any) { /* 管理后台静默处理 — 全局拦截器已记录 */ } finally { loading.value = false }
+  } catch (e: any) { toast.error('加载订单失败: ' + (e.data?.msg || e.message)) } finally { loading.value = false }
 }
 
 function search() { page.value = 1; fetch() }
@@ -115,8 +114,8 @@ async function confirmDelete(o: any) {
     await $fetch(`/api/admin/orders/${o.id}`, { method: 'DELETE' })
     list.value = list.value.filter(item => item.id !== o.id)
     total.value--
-const toast = useToast()
-  } catch (e: any) { toast.error('删除失败') }
+    toast.success('订单已删除')
+  } catch (e: any) { toast.error('删除失败: ' + (e.data?.msg || e.message)) }
 }
 
 onMounted(fetch)

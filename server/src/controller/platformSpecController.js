@@ -1,38 +1,40 @@
 import svc from '../services/platformSpecService.js';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
+import logger from '../utils/logger.js';
 
-export async function listPlatforms(req, res) {
-  const data = await svc.listAll(req);
-  return success(res, data);
+function handle(next, fn) {
+  return async (req, res) => { try { return await fn(req, res); } catch (e) { logger.error('platformSpec', e); next(e); } };
 }
 
-export async function getSpec(req, res) {
-  const data = await svc.getById(req.params.id, req);
-  if (!data) return error(res, ERROR_CODE.NOT_FOUND, '规格不存在');
-  return success(res, data);
+export function listPlatforms(req, res, next) { return handle(next, async () => { const data = await svc.listAll(req); return success(res, data); })(req, res); }
+
+export function getSpec(req, res, next) {
+  return handle(next, async () => {
+    const data = await svc.getById(req.params.id, req);
+    if (!data) return error(res, ERROR_CODE.NOT_FOUND, '规格不存在');
+    return success(res, data);
+  })(req, res);
 }
 
-export async function getSpecsByPlatform(req, res) {
-  const data = await svc.getByPlatformCode(req.params.code, req);
-  return success(res, data);
+export function getSpecsByPlatform(req, res, next) { return handle(next, async () => { const data = await svc.getByPlatformCode(req.params.code, req); return success(res, data); })(req, res); }
+
+export function createSpec(req, res, next) { return handle(next, async () => { const id = await svc.create(req.body, req); return success(res, { id }, '创建成功'); })(req, res); }
+
+export function updateSpec(req, res, next) {
+  return handle(next, async () => {
+    const ok = await svc.update(req.params.id, req.body, req);
+    if (!ok) return error(res, ERROR_CODE.NOT_FOUND, '规格不存在');
+    return success(res, null, '更新成功');
+  })(req, res);
 }
 
-export async function createSpec(req, res) {
-  const id = await svc.create(req.body, req);
-  return success(res, { id }, '创建成功');
-}
-
-export async function updateSpec(req, res) {
-  const ok = await svc.update(req.params.id, req.body, req);
-  if (!ok) return error(res, ERROR_CODE.NOT_FOUND, '规格不存在');
-  return success(res, null, '更新成功');
-}
-
-export async function deleteSpec(req, res) {
-  const ok = await svc.remove(req.params.id, req);
-  if (!ok) return error(res, ERROR_CODE.NOT_FOUND, '规格不存在');
-  return success(res, null, '删除成功');
+export function deleteSpec(req, res, next) {
+  return handle(next, async () => {
+    const ok = await svc.remove(req.params.id, req);
+    if (!ok) return error(res, ERROR_CODE.NOT_FOUND, '规格不存在');
+    return success(res, null, '删除成功');
+  })(req, res);
 }
 
 export async function adaptImage(req, res) {
