@@ -36,7 +36,7 @@ const locales: LocaleOption[] = [
 const currentFlag = computed(() => locales.find(l => l.code === locale.value)?.flag || '🌐')
 
 function switchLang(code: string) {
-  locale.value = code
+  locale.value = code as 'zh' | 'en'
   if (typeof window !== 'undefined') localStorage.setItem('lang', code)
   open.value = false
 }

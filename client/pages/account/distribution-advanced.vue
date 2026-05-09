@@ -114,8 +114,10 @@ const subTabs = [
   { key: 'campaigns', label: '裂变活动' },
 ];
 
+interface TierInfo { tier: string; label: string; totalSales: number; rateBonus: number; level2Enabled: boolean; members: any[]; totalMembers: number; totalContribution: number; invite_url: string; invite_code: string; assets: any[]; campaigns: any[]; progress: { current: number; target: number } }
+
 const activeSub = ref('performance');
-const tierData = ref(null);
+const tierData = ref<TierInfo | null>(null);
 const perfData = ref(null);
 const promoData = ref(null);
 const campData = ref(null);

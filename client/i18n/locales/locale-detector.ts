@@ -3,23 +3,24 @@
  * 优先级：Cookie > Accept-Language > IP Geo > default 'zh'
  */
 export default defineI18nLocaleDetector((event, config) => {
+  const locales = (config as any).locales as string[] || ['zh', 'en']
   // 1. Cookie 中用户手动选择的语言
   const cookie = parseCookies(event.headers.get('cookie') || '')
-  if (cookie.movio_lang && config.locales.includes(cookie.movio_lang)) {
+  if (cookie.movio_lang && locales.includes(cookie.movio_lang)) {
     return cookie.movio_lang
   }
 
   // 2. Accept-Language 请求头
   const acceptLang = event.headers.get('accept-language')
   if (acceptLang) {
-    const detected = detectFromAcceptLanguage(acceptLang, config.locales)
+    const detected = detectFromAcceptLanguage(acceptLang, locales)
     if (detected) return detected
   }
 
   // 3. IP 地理位置（从 x-geo-country 头读取，由反向代理注入）
   const country = event.headers.get('x-geo-country') || event.headers.get('cf-ipcountry')
   if (country) {
-    const locale = countryToLocale(country, config.locales)
+    const locale = countryToLocale(country, locales)
     if (locale) return locale
   }
 

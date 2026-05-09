@@ -68,19 +68,17 @@ async function parseToken(header) {
 
 // ========================= 认证中间件 =========================
 
-// 无需认证的公开路径前缀
+// 无需认证的公开路径（合并了 app 级和路由级白名单）
 const PUBLIC_PREFIXES = [
-  '/api/health',
-  '/api/metrics',
+  '/api/health', '/api/metrics',
   '/api/auth/',
-  '/api/user/register',
-  '/api/user/login',
-  '/api/user/forgot-password',
-  '/api/user/reset-password',
-  '/api/user/send-code',
-  '/api/config',
+  '/api/user/register', '/api/user/login', '/api/user/forgot-password', '/api/user/reset-password', '/api/user/send-code',
+  '/api/users/register', '/api/users/login', '/api/users/forgot-password', '/api/users/reset-password',
+  '/api/config', '/api/config/version/stream',
+  '/api/site-config/public',
   '/api/site-config',
-  '/api/payment/plans',
+  '/api/payment/plans', '/api/payment/notify',
+  '/api/allinpay/notify',
   '/api/plans',
   '/api/badges',
   '/api/platforms',
@@ -88,21 +86,35 @@ const PUBLIC_PREFIXES = [
   '/api/multilingual',
   '/api/size-templates',
   '/api/open',
-  '/api/ai-dispatch/health',
-  '/api/ai-dispatch/categories',
+  '/api/ai-dispatch/health', '/api/ai-dispatch/categories',
   '/api/internal/',
+  '/api/sms/send-code', '/api/sms/verify-code',
+  '/api/email/send-code', '/api/email/verify-code',
+  '/api/diy/published',
+  '/api/templates/platforms',
+  '/api/seo-keywords', '/api/fab/templates', '/api/memory/status',
   '/uploads',
 ];
 
+const RENEW_WINDOW = 24 * 60 * 60;  // 24h: token剩余不足1天自动续期
+
 function isPublicPath(path) {
-  return PUBLIC_PREFIXES.some(p => path === p || path.startsWith(p));
+  if (path.startsWith('/api/docs')) return true;  // Swagger UI 子资源
+  if (PUBLIC_PREFIXES.some(p => path === p || path.startsWith(p.endsWith('/') ? p : p + '/'))) return true;
+  // 精确匹配或前缀匹配（带/后缀的public路径匹配子路径）
+  if (PUBLIC_PREFIXES.some(p => !p.endsWith('/') && path === p)) return true;
+  // GET /api/config/* 公开（排除 /api/admin/config）
+  if (path.startsWith('/api/config/') && !path.startsWith('/api/admin/config')) return true;
+  // GET /api/diy/published/:slug 公开
+  if (path.startsWith('/api/diy/published/')) return true;
+  return false;
 }
 
 export async function authMiddleware(req, res, next) {
   // 公开路径跳过认证
   if (isPublicPath(req.path)) return next();
 
-  // 如果全局 v4.1 认证中间件已鉴权，直接放行（兼容 cookie 认证）
+  // 如果已鉴权（全局中间件先运行），直接放行
   if (req.user) return next();
 
   // 先尝试从 Cookie 中提取 token
@@ -129,7 +141,25 @@ export async function authMiddleware(req, res, next) {
     nickname: payload.nickname || '',
     tenantId: payload.tenantId || 0,
   };
+  req.userId = req.user.id;     // 兼容旧代码直接引用 req.userId
   req.tenantId = req.user.tenantId;
+
+  // 自动续期：token 剩余不足 1 天时签发新 token
+  const timeToExpire = payload.exp - Math.floor(Date.now() / 1000);
+  if (timeToExpire > 0 && timeToExpire < RENEW_WINDOW) {
+    const newToken = jwt.sign(
+      { userId: req.user.id, role: req.user.role, nickname: req.user.nickname, tenantId: req.user.tenantId },
+      jwtSecret,
+      { expiresIn: '7d' },
+    );
+    res.cookie('token', newToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+  }
+
   next();
 }
 

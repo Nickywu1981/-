@@ -155,7 +155,7 @@ const submitting = ref(false);
 const jobId = ref(null);
 const resultUrl = ref(null);
 
-const langs = ref([]);
+const langs = ref<Array<{ code: string; name: string }>>([]);
 const history = ref([]);
 const historyType = ref('');
 const loadingHistory = ref(false);
@@ -191,26 +191,26 @@ async function doSubmit() {
 }
 
 function onCompleted({ resultUrl: url }) { resultUrl.value = url; submitting.value = false; loadHistory(); }
-function onFailed({ error: err }) { useToast().error(err || '翻译失败'); submitting.value = false; jobId.value = null; }
+function onFailed({ error: err }: { error: string }) { useToast().error(err || '翻译失败'); submitting.value = false; jobId.value = null; }
 function downloadResult() { if (resultUrl.value) download(resultUrl.value); }
 function reset() { jobId.value = null; resultUrl.value = null; }
 
 async function loadHistory() {
   loadingHistory.value = true;
   try {
-    const params = new URLSearchParams({ page: hPage.value, limit: hLimit });
+    const params = new URLSearchParams({ page: String(hPage.value), limit: String(hLimit) });
     if (historyType.value) params.set('type', historyType.value);
-    const data = await $fetch(`/api/video-translate/works?${params}`, { credentials: 'include' });
+    const data = await $fetch<{ data?: { rows?: unknown[]; total?: number } }>(`/api/video-translate/works?${params}`, { credentials: 'include' });
     history.value = data.data?.rows || data.data || [];
     totalHistory.value = data.data?.total || 0;
   } catch (_) { useToast().error('加载历史记录失败') } finally { loadingHistory.value = false; }
 }
 
-function download(url) { const a = document.createElement('a'); a.href = url; a.download = ''; a.click(); }
+function download(url: string) { const a = document.createElement('a'); a.href = url; a.download = ''; a.click(); }
 
 onMounted(async () => {
   try {
-    const data = await $fetch('/api/video-translate/langs', { credentials: 'include' });
+    const data = await $fetch<{ data?: { langs?: { code: string; name: string }[] } }>('/api/video-translate/langs', { credentials: 'include' });
     langs.value = data.data?.langs || [{ code: 'zh', name: '中文' }, { code: 'en', name: 'English' }, { code: 'ja', name: '日本語' }, { code: 'ko', name: '한국어' }];
   } catch (_) {
     langs.value = [{ code: 'zh', name: '中文' }, { code: 'en', name: 'English' }, { code: 'ja', name: '日本語' }, { code: 'ko', name: '한국어' }];
