@@ -126,8 +126,6 @@ function handleRedo() { task.reset(); currentStep.value = 0; uploading.value = f
 .voice-preset__icon { font-size: 2rem; margin-bottom: 8px; }
 .voice-preset__name { font-weight: 600; color: var(--text-primary); font-size: 0.9rem; }
 .voice-preset__desc { font-size: 0.75rem; color: var(--text-tertiary); margin-top: 4px; }
-.ws-upload-area { border: 2px dashed var(--brand-soft); border-radius: var(--radius-lg); padding: 40px; text-align: center; cursor: pointer; transition: all var(--transition-fast); background: var(--bg-card); }
-.ws-upload-area:hover { border-color: var(--brand); background: var(--brand-light); }
 .ws-uploading, .ws-uploaded { text-align: center; padding: 8px; font-size: 0.9rem; }
 .ws-uploaded { color: var(--success); }
 .ws-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 24px; flex-wrap: wrap; gap: 12px; }

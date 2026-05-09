@@ -148,9 +148,6 @@ function handleRedo() { task.reset(); currentStep.value = 0; previewUrl.value = 
 .ws-tag { padding: 8px 16px; border-radius: 20px; border: 2px solid var(--border); background: var(--bg-card); cursor: pointer; font-size: 0.85rem; color: var(--text-secondary); transition: all var(--transition-fast); }
 .ws-tag:hover { border-color: var(--brand-soft); color: var(--brand); }
 .ws-tag.active { border-color: var(--brand); background: var(--brand-light); color: var(--brand); font-weight: 600; }
-.ws-upload-area { border: 2px dashed var(--brand-soft); border-radius: var(--radius-lg); padding: 40px; text-align: center; cursor: pointer; transition: all var(--transition-fast); background: var(--bg-card); }
-.ws-upload-area:hover { border-color: var(--brand); background: var(--brand-light); }
-.ws-upload-area__preview { max-width: 100%; max-height: 260px; border-radius: var(--radius-md); }
 .ws-uploading, .ws-uploaded { text-align: center; padding: 8px; font-size: 0.9rem; }
 .ws-uploaded { color: var(--success); }
 .level-row { display: flex; gap: 10px; }

@@ -134,9 +134,6 @@ function handleRedo() { task.reset(); currentStep.value = 0; previewUrl.value = 
 .direction-card.active { border-color: var(--brand); background: var(--brand-light); }
 .direction-card__icon { font-size: 1.5rem; margin-bottom: 4px; }
 .direction-card__name { font-size: 0.8rem; color: var(--text-secondary); }
-.ws-upload-area { border: 2px dashed var(--brand-soft); border-radius: var(--radius-lg); padding: 40px; text-align: center; cursor: pointer; transition: all var(--transition-fast); background: var(--bg-card); }
-.ws-upload-area:hover { border-color: var(--brand); background: var(--brand-light); }
-.ws-upload-area__preview { max-width: 100%; max-height: 260px; border-radius: var(--radius-md); }
 .ws-uploading, .ws-uploaded { text-align: center; padding: 8px; font-size: 0.9rem; }
 .ws-uploaded { color: var(--success); }
 .ws-slider-row { display: flex; align-items: center; gap: 14px; }

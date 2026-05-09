@@ -32,6 +32,7 @@ const contextDisambiguateSchema = z.object({
   history: z.array(z.object({ role: z.string(), content: z.string() })).optional(),
   productContext: z.record(z.unknown()).optional(),
 });
+const paramsWithTaskId = z.object({ taskId: z.string().min(1) });
 const contextSummarizeSchema = z.object({ history: z.array(z.object({ role: z.string(), content: z.string() })).optional() });
 const localizeScriptSchema = z.object({
   product: z.record(z.unknown()).optional(),
@@ -276,7 +277,7 @@ router.get('/visual/tasks', authMiddleware, async (req, res) => {
   } catch (err) { error(res, err); }
 });
 
-router.post('/visual/task/:taskId/cancel', authMiddleware, async (req, res) => {
+router.post('/visual/task/:taskId/cancel', authMiddleware, validate(paramsWithTaskId, 'params'), async (req, res) => {
   try {
     const result = await memfocus.visual.cancelTask(req.params.taskId, (req.user?.userId || req.user?.id));
     success(res, result);
