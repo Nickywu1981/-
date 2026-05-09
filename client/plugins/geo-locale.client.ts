@@ -12,7 +12,7 @@ export default defineNuxtPlugin(async () => {
   try {
     const res = await $fetch<{ locale: string; country: string; source: string }>('/api/geo/suggest-locale')
     if (res?.locale && ['zh', 'en', 'es'].includes(res.locale)) {
-      locale.value = res.locale
+      locale.value = res.locale as 'zh' | 'en'
       localStorage.setItem('lang', res.locale)
     }
   } catch {

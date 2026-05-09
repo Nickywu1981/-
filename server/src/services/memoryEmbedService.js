@@ -12,8 +12,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const VECTOR_STORE_PATH = path.resolve(__dirname, '../../docs/KB_VECTOR_STORE.json');
-const TOKEN_INDEX_PATH = path.resolve(__dirname, '../../docs/KB_TOKEN_INDEX.json');
+const VECTOR_STORE_PATH = path.resolve(__dirname, '../../../docs/KB_VECTOR_STORE.json');
+const TOKEN_INDEX_PATH = path.resolve(__dirname, '../../../docs/KB_TOKEN_INDEX.json');
 
 let store = null;
 let tokenIndex = null;
