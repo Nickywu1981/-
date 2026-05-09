@@ -42,7 +42,7 @@ export async function create(data) {
 }
 
 export async function update(modelKey, data) {
-  const allowed = ['model_name', 'provider', 'api_endpoint', 'api_key', 'max_tokens', 'temperature', 'is_active', 'sort_order', 'config_json'];
+  const allowed = ['display_name', 'vendor', 'category', 'endpoint', 'api_key_enc', 'model_id', 'max_tokens', 'priority', 'enabled', 'rate_limit_rpm', 'rate_limit_rpd', 'concurrency_max', 'breaker_threshold', 'breaker_cooldown_s', 'moderation_enabled', 'moderation_action', 'blocked_words'];
   const fields = [];
   const params = [];
   for (const [k, v] of Object.entries(data)) {
@@ -53,7 +53,9 @@ export async function update(modelKey, data) {
   const [result] = await _db().query(
     `UPDATE ai_model_config SET ${fields.join(', ')} WHERE model_key = ?`, params,
   );
-  return result.affectedRows > 0 ? { model_key: modelKey, ...data } : null;
+  if (result.affectedRows === 0) return null;
+  const [rows] = await _db().query('SELECT * FROM ai_model_config WHERE model_key = ?', [modelKey]);
+  return rows[0] || null;
 }
 
 export async function remove(modelKey) {
