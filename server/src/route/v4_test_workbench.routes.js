@@ -207,9 +207,9 @@ router.post('/custom', requireRole('admin'), _validate(customTestSchema), async 
           });
           steps.push({ model_key: modelKey, duration_ms: Date.now() - stepStart, result: r, success: true });
           return { modelKey, r };
-        } catch (e) {
-          steps.push({ model_key: modelKey, duration_ms: Date.now() - stepStart, error: e.message, success: false });
-          return { modelKey, error: e.message };
+        } catch (err) {
+          steps.push({ model_key: modelKey, duration_ms: Date.now() - stepStart, error: err.message, success: false });
+          return { modelKey, error: err.message };
         }
       });
       await Promise.allSettled(promises);
@@ -231,8 +231,8 @@ router.post('/custom', requireRole('admin'), _validate(customTestSchema), async 
           });
           prevResult = finalResult;
           steps.push({ model_key: modelKey, duration_ms: Date.now() - stepStart, result: finalResult, success: true, order: steps.length + 1 });
-        } catch (e) {
-          steps.push({ model_key: modelKey, duration_ms: Date.now() - stepStart, error: e.message, success: false, order: steps.length + 1 });
+        } catch (err) {
+          steps.push({ model_key: modelKey, duration_ms: Date.now() - stepStart, error: err.message, success: false, order: steps.length + 1 });
           break; // 串行模式：某步失败则停止
         }
       }
@@ -275,8 +275,8 @@ router.post('/compare', requireRole('admin'), _validate(compareTestSchema), asyn
         params: { prompt, ...params },
       });
       return { model_key: modelKey, duration_ms: Date.now() - stepStart, result, success: true };
-    } catch (e) {
-      return { model_key: modelKey, duration_ms: Date.now() - stepStart, error: e.message, success: false };
+    } catch (err) {
+      return { model_key: modelKey, duration_ms: Date.now() - stepStart, error: err.message, success: false };
     }
   });
 
