@@ -93,6 +93,7 @@ const PUBLIC_PREFIXES = [
   '/api/diy/published',
   '/api/templates/platforms',
   '/api/seo-keywords', '/api/fab/templates', '/api/memory/status',
+  '/api/sdk/',
   '/uploads',
 ];
 
