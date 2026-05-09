@@ -22,7 +22,11 @@
     </template>
 
     <template #processing>
-      <div v-if="task.polling.value" class="progress-box">
+      <div v-if="submitting" class="progress-box">
+        <div class="spinner" />
+        <p>正在提交任务...</p>
+      </div>
+      <div v-else-if="task.polling.value" class="progress-box">
         <div class="spinner" />
         <p>{{ task.progressMsg.value }}</p>
       </div>
@@ -70,14 +74,17 @@ const quickTemplates = [
 // Task integration
 const task = useTask()
 const toast = useToast()
+const submitting = ref(false)
 
 const submitTask = async () => {
   if (!scriptText.value.trim()) { toast.warn('请输入脚本内容'); return }
   currentStep.value = 2
+  submitting.value = true
   try {
     const res: any = await $fetch('/api/adv-video/shot-plan', { method: 'POST', body: { script: scriptText.value, style: selectedStyle.value } })
     if (res.data?.task_id) task.pollTask(res.data.task_id, '/api/adv-video/shot-plan/')
   } catch (e: any) { toast.error(e.data?.msg || '提交失败') }
+  finally { submitting.value = false }
 }
 
 watch(currentStep, (v) => { if (v === 2 && !task.taskId.value) submitTask() })

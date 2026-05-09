@@ -16,7 +16,7 @@ export function validate(schema, source = 'body') {
         field: i.path.join('.'),
         message: i.message,
       }));
-      return error(res, 400, '参数校验失败', { errors });
+      return error(res, ERROR_CODE.BAD_REQUEST, '参数校验失败', { errors });
     }
     req[source] = result.data;
     next();

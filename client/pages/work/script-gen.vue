@@ -44,7 +44,10 @@
     </div>
 
     <div v-else class="result-section">
-      <div v-if="task.polling.value" class="progress-box">
+      <div v-if="submitting" class="progress-box">
+        <div class="spinner" /><p>正在提交任务...</p>
+      </div>
+      <div v-else-if="task.polling.value" class="progress-box">
         <div class="spinner" /><p>{{ task.progressMsg.value }}</p>
       </div>
       <div v-else-if="task.status.value === 2">
@@ -95,6 +98,7 @@ const selectedType = ref('short_video');
 const selectedLang = ref('zh');
 const selectedPlatform = ref('');
 const task = useTask();
+const submitting = ref(false);
 
 const languages = ref([
   { code: 'zh', name: '中文', flag: '🇨🇳' }, { code: 'en', name: 'English', flag: '🇺🇸' },
@@ -128,6 +132,7 @@ async function loadLanguages() {
 
 async function submitTask() {
   step.value = 2;
+  submitting.value = true;
   try {
     const res = await $fetch('/api/adv-video/script-gen', {
       method: 'POST', credentials: 'include',
@@ -142,7 +147,7 @@ async function submitTask() {
   } catch (e: any) {
     toast.error(e.data?.msg || '提交失败，请重试');
     step.value = 0;
-  }
+  } finally { submitting.value = false; }
 }
 function handleRedo() { task.reset(); step.value = 0; productInfo.value = ''; selectedType.value = 'short_video'; selectedLang.value = 'zh'; }
 

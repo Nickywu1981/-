@@ -13,7 +13,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
-import { validateV4 as _validate } from '../utils/validate.js';
+import { validateV4 as _validate, validate } from '../utils/validate.js';
 import * as publishService from '../services/publishService.js';
 
 const router = Router();
@@ -25,6 +25,10 @@ const submitSchema = z.object({
   description: z.string().max(2000).optional(),
   tags: z.array(z.string()).max(20).optional(),
   scheduleAt: z.string().datetime().optional(),
+});
+
+const retryParamsSchema = z.object({
+  id: z.coerce.number().int().positive('ID必须为正整数'),
 });
 
 // GET /api/publish/platforms
@@ -61,9 +65,9 @@ router.get('/batch/:id', async (req, res) => {
 });
 
 // POST /api/publish/retry/:id
-router.post('/retry/:id', async (req, res) => {
+router.post('/retry/:id', validate(retryParamsSchema, 'params'), async (req, res) => {
   try {
-    const result = await publishService.retryPublish(Number(req.params.id), req.user.id);
+    const result = await publishService.retryPublish(req.params.id, req.user.id);
     return success(res, result, '已重新提交分发');
   } catch (err) {
     return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
