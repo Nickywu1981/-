@@ -1,166 +1,281 @@
+<!--
+  AdminLayout — 管理后台骨架：分组侧边栏 + 顶栏 + 内容区
+  与工作台共享同一套「温润精工」设计语言
+-->
 <template>
-  <div class="admin-layout">
-    <button class="menu-toggle" @click="sidebarOpen = !sidebarOpen">{{ sidebarOpen ? '✕' : '☰' }}</button>
-    <aside class="sidebar" :class="{ open: sidebarOpen }">
-      <h2 class="s-logo">管理后台</h2>
-      <nav class="s-nav">
-        <NuxtLink to="/admin/dashboard" class="nav-item">📊 数据看板</NuxtLink>
-        <NuxtLink to="/admin/site-config" class="nav-item">⚙️ 站点配置</NuxtLink>
-        <NuxtLink to="/admin/config" class="nav-item">🔧 配置中心</NuxtLink>
-        <NuxtLink to="/admin/users" class="nav-item">👥 用户管理</NuxtLink>
-        <NuxtLink to="/admin/tasks" class="nav-item">📋 任务管理</NuxtLink>
-        <NuxtLink to="/admin/plans" class="nav-item">💳 套餐配置</NuxtLink>
-        <NuxtLink to="/admin/orders" class="nav-item">📋 套餐订单</NuxtLink>
-        <NuxtLink to="/admin/prompts" class="nav-item">💬 提示词模板</NuxtLink>
-        <NuxtLink to="/admin/templates" class="nav-item">📄 模板管理</NuxtLink>
-        <NuxtLink to="/admin/ai-models" class="nav-item">🧠 AI 模型</NuxtLink>
-        <NuxtLink to="/admin/test-workbench" class="nav-item">🧪 测试工作台</NuxtLink>
-        <NuxtLink to="/admin/tenants" class="nav-item">🏢 租户管理</NuxtLink>
-        <NuxtLink to="/admin/diy" class="nav-item">🎨 DIY页面</NuxtLink>
-        <NuxtLink to="/admin/diy-pages" class="nav-item">📄 DIY页面管理</NuxtLink>
-        <NuxtLink to="/admin/forms" class="nav-item">📝 表单管理</NuxtLink>
-        <NuxtLink to="/admin/form-templates" class="nav-item">📋 表单模板</NuxtLink>
-        <NuxtLink to="/admin/proxy" class="nav-item">🔗 API代理</NuxtLink>
-        <NuxtLink to="/admin/recharge" class="nav-item">💰 充值订单</NuxtLink>
-        <NuxtLink to="/admin/credits" class="nav-item">💎 积分消费</NuxtLink>
-        <NuxtLink to="/admin/notifications" class="nav-item">🔔 通知管理</NuxtLink>
-        <NuxtLink to="/admin/automation" class="nav-item">🤖 自动化任务</NuxtLink>
-        <NuxtLink to="/admin/sms-templates" class="nav-item">📱 短信模板</NuxtLink>
-        <NuxtLink to="/admin/sms-logs" class="nav-item">📤 短信日志</NuxtLink>
-        <NuxtLink to="/admin/email-templates" class="nav-item">📧 邮件模板</NuxtLink>
-        <NuxtLink to="/admin/collection" class="nav-item">🖼️ 作品集管理</NuxtLink>
-        <NuxtLink to="/admin/tier" class="nav-item">⭐ 会员等级</NuxtLink>
-        <NuxtLink to="/admin/brand-settings" class="nav-item">🎨 品牌配置</NuxtLink>
-        <NuxtLink to="/admin/size-templates" class="nav-item">📐 尺寸模板</NuxtLink>
-        <NuxtLink to="/admin/multilingual" class="nav-item">🌐 多语言</NuxtLink>
-        <NuxtLink to="/admin/compliance" class="nav-item">🛡️ 合规检查</NuxtLink>
-        <NuxtLink to="/admin/analytics" class="nav-item">📊 数据统计</NuxtLink>
-        <NuxtLink to="/admin/settings" class="nav-item">🔧 系统设置</NuxtLink>
-        <NuxtLink to="/admin/moderation" class="nav-item">🛡️ 内容审核</NuxtLink>
-        <NuxtLink to="/admin/badges" class="nav-item">🏷️ 营销标签</NuxtLink>
-        <NuxtLink to="/admin/abuse" class="nav-item">🚨 滥用监控</NuxtLink>
-        <NuxtLink to="/admin/logs" class="nav-item">📝 操作日志</NuxtLink>
-        <NuxtLink to="/admin/ai-logs" class="nav-item">🤖 AI调用日志</NuxtLink>
-        <NuxtLink to="/" class="nav-item nav-back">← 返回前台</NuxtLink>
+  <div class="al">
+    <!-- 移动端汉堡 -->
+    <button class="al-ham" @click="open = !open">{{ open ? '✕' : '☰' }}</button>
+
+    <!-- 左侧分组导航 -->
+    <aside class="al-side" :class="{ on: open }">
+      <div class="al-logo" @click="$router.push('/admin/dashboard')">
+        <span class="al-logo-dot"></span>
+        Movio 管理
+      </div>
+
+      <nav class="al-nav">
+        <template v-for="g in groups" :key="g.key">
+          <div
+            class="al-grp-hd"
+            @click="g.open = !g.open"
+          >
+            <span class="al-grp-ic">{{ g.icon }}</span>
+            <span class="al-grp-lbl">{{ g.label }}</span>
+            <span class="al-grp-arr" :class="{ down: g.open }">▸</span>
+          </div>
+          <div v-show="g.open" class="al-grp-body">
+            <NuxtLink
+              v-for="item in g.items"
+              :key="item.key"
+              :to="item.route"
+              class="al-item"
+            >{{ item.label }}</NuxtLink>
+          </div>
+        </template>
       </nav>
+
+      <div class="al-side-ft">
+        <NuxtLink to="/workspace" class="al-back">← 返回工作台</NuxtLink>
+      </div>
     </aside>
-    <div v-if="sidebarOpen" class="overlay" @click="sidebarOpen = false" />
-    <main class="content">
+
+    <!-- 遮罩 -->
+    <div v-if="open" class="al-mask" @click="open = false" />
+
+    <!-- 右侧主区域 -->
+    <main class="al-main">
       <slot />
     </main>
   </div>
 </template>
 
 <script setup lang="ts">
-const sidebarOpen = ref(false)
+const open = ref(false)
 const route = useRoute()
-watch(() => route.path, () => { sidebarOpen.value = false })
+watch(() => route.path, () => { open.value = false })
+
+interface NavItem { key: string; label: string; route: string }
+interface NavGroup { key: string; icon: string; label: string; open: boolean; items: NavItem[] }
+
+const groups = reactive<NavGroup[]>([
+  {
+    key: 'overview', icon: '📊', label: '数据总览', open: true,
+    items: [
+      { key: 'dashboard', label: '数据看板', route: '/admin/dashboard' },
+      { key: 'analytics', label: '数据统计', route: '/admin/analytics' },
+    ],
+  },
+  {
+    key: 'users', icon: '👥', label: '用户体系', open: false,
+    items: [
+      { key: 'users', label: '用户管理', route: '/admin/users' },
+      { key: 'tenants', label: '租户管理', route: '/admin/tenants' },
+      { key: 'tier', label: '会员等级', route: '/admin/tier' },
+    ],
+  },
+  {
+    key: 'finance', icon: '💳', label: '交易财务', open: false,
+    items: [
+      { key: 'plans', label: '套餐配置', route: '/admin/plans' },
+      { key: 'orders', label: '套餐订单', route: '/admin/orders' },
+      { key: 'recharge', label: '充值订单', route: '/admin/recharge' },
+      { key: 'credits', label: '积分消费', route: '/admin/credits' },
+    ],
+  },
+  {
+    key: 'ops', icon: '📋', label: '任务运营', open: false,
+    items: [
+      { key: 'tasks', label: '任务管理', route: '/admin/tasks' },
+      { key: 'automation', label: '自动化任务', route: '/admin/automation' },
+      { key: 'notifications', label: '通知管理', route: '/admin/notifications' },
+      { key: 'badges', label: '营销标签', route: '/admin/badges' },
+    ],
+  },
+  {
+    key: 'content', icon: '🎨', label: '内容与模板', open: false,
+    items: [
+      { key: 'collection', label: '作品集管理', route: '/admin/collection' },
+      { key: 'prompts', label: '提示词模板', route: '/admin/prompts' },
+      { key: 'templates', label: '模板管理', route: '/admin/templates' },
+      { key: 'diy', label: 'DIY 页面', route: '/admin/diy' },
+      { key: 'diy-pages', label: 'DIY 页面管理', route: '/admin/diy-pages' },
+    ],
+  },
+  {
+    key: 'msg', icon: '📢', label: '消息通信', open: false,
+    items: [
+      { key: 'sms-templates', label: '短信模板', route: '/admin/sms-templates' },
+      { key: 'sms-logs', label: '短信日志', route: '/admin/sms-logs' },
+      { key: 'email-templates', label: '邮件模板', route: '/admin/email-templates' },
+    ],
+  },
+  {
+    key: 'security', icon: '🛡️', label: '风控合规', open: false,
+    items: [
+      { key: 'moderation', label: '内容审核', route: '/admin/moderation' },
+      { key: 'abuse', label: '滥用监控', route: '/admin/abuse' },
+      { key: 'compliance', label: '合规检查', route: '/admin/compliance' },
+    ],
+  },
+  {
+    key: 'system', icon: '⚙️', label: '系统配置', open: false,
+    items: [
+      { key: 'site-config', label: '站点配置', route: '/admin/site-config' },
+      { key: 'brand-settings', label: '品牌配置', route: '/admin/brand-settings' },
+      { key: 'ai-models', label: 'AI 模型', route: '/admin/ai-models' },
+      { key: 'multilingual', label: '多语言', route: '/admin/multilingual' },
+      { key: 'proxy', label: 'API 代理', route: '/admin/proxy' },
+      { key: 'config', label: '配置中心', route: '/admin/config' },
+      { key: 'settings', label: '系统设置', route: '/admin/settings' },
+    ],
+  },
+  {
+    key: 'tools', icon: '🔧', label: '工具集', open: false,
+    items: [
+      { key: 'forms', label: '表单管理', route: '/admin/forms' },
+      { key: 'form-templates', label: '表单模板', route: '/admin/form-templates' },
+      { key: 'size-templates', label: '尺寸模板', route: '/admin/size-templates' },
+      { key: 'test-workbench', label: '测试工作台', route: '/admin/test-workbench' },
+    ],
+  },
+  {
+    key: 'audit', icon: '📝', label: '审计日志', open: false,
+    items: [
+      { key: 'logs', label: '操作日志', route: '/admin/logs' },
+      { key: 'ai-logs', label: 'AI 调用日志', route: '/admin/ai-logs' },
+    ],
+  },
+])
+
+// Auto-expand the group containing current route
+watch(() => route.path, (p) => {
+  for (const g of groups) {
+    if (g.items.some(it => p.startsWith(it.route))) {
+      g.open = true
+    }
+  }
+}, { immediate: true })
 </script>
 
 <style scoped>
 /* ================================================
-   ADMIN LAYOUT — responsive sidebar + content
+   ADMIN LAYOUT — 与 workspace 一脉相承
    ================================================ */
-.admin-layout { display: flex; min-height: calc(100vh - 56px); position: relative; }
-
-/* Hamburger toggle — only visible on mobile */
-.menu-toggle {
-  display: none; position: fixed; top: 64px; left: 12px; z-index: 200;
-  background: var(--sidebar-bg); color: var(--sidebar-text-active);
-  border: 1px solid var(--border-light); width: 38px; height: 38px;
-  border-radius: var(--radius-md); font-size: 18px; cursor: pointer;
-  transition: all var(--transition-fast); box-shadow: var(--shadow-sm);
-}
-.menu-toggle:hover { background: var(--sidebar-hover-bg); border-color: var(--brand); }
-
-/* ================================================
-   SIDEBAR
-   ================================================ */
-.sidebar {
-  width: var(--sidebar-width); min-width: var(--sidebar-width);
-  background: var(--sidebar-bg); color: var(--sidebar-text-active);
-  padding: 20px 0; flex-shrink: 0; transition: transform 0.3s ease;
-  z-index: 150; overflow-y: auto; border-right: 1px solid var(--border-light);
+.al {
+  display: flex;
+  min-height: calc(100vh - 56px);
+  position: relative;
 }
 
-.s-logo {
-  font-size: 16px; font-weight: 700; padding: 0 20px 16px;
-  border-bottom: 1px solid var(--border-light); margin-bottom: 12px;
-  color: var(--sidebar-text-active); white-space: nowrap;
+/* ---- 移动端汉堡 ---- */
+.al-ham {
+  display: none;
+  position: fixed; top: 64px; left: 12px; z-index: 200;
+  background: #fff; color: #171717;
+  border: 1px solid #ebebea; width: 38px; height: 38px;
+  border-radius: 8px; font-size: 17px; cursor: pointer;
+}
+.al-ham:hover { background: #f5f5f5; }
+
+/* ---- 侧边栏 ---- */
+.al-side {
+  width: 200px; min-width: 200px;
+  background: #fff; border-right: 1px solid #ebebea;
+  display: flex; flex-direction: column;
+  padding: 12px 8px; gap: 2px;
+  overflow-y: auto; z-index: 150;
+  transition: transform 0.25s;
+  flex-shrink: 0;
 }
 
-.s-nav { display: flex; flex-direction: column; gap: 2px; padding: 0 8px; }
-
-.nav-item {
-  padding: 9px 14px; color: var(--sidebar-text); text-decoration: none;
-  font-size: 13px; border-radius: var(--radius-md); border-left: 3px solid transparent;
-  transition: all var(--transition-fast); position: relative; white-space: nowrap;
+.al-logo {
+  font-size: 15px; font-weight: 600; color: #171717;
+  padding: 4px 10px 12px; letter-spacing: -0.03em;
+  display: flex; align-items: center; gap: 7px;
+  cursor: pointer;
 }
-.nav-item:hover { background: var(--sidebar-hover-bg); color: var(--sidebar-text-active); }
+.al-logo-dot { width: 7px; height: 7px; border-radius: 2px; background: #171717; }
 
-.nav-item.router-link-active {
-  background: var(--sidebar-active-bg); color: var(--sidebar-text-active);
-  border-left-color: var(--brand);
-  box-shadow: inset 0 0 0 1px rgba(124,58,237,0.12);
+.al-nav { display: flex; flex-direction: column; gap: 0; flex: 1; }
+
+/* ---- 分组标题 ---- */
+.al-grp-hd {
+  display: flex; align-items: center; gap: 7px;
+  padding: 8px 10px; border-radius: 8px;
+  font-size: 12.5px; color: #9d9da3; font-weight: 500;
+  cursor: pointer; user-select: none;
+  transition: all 0.15s;
 }
-.nav-item.router-link-active::before {
-  content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
-  width: 3px; height: 20px; border-radius: 0 3px 3px 0;
-  background: var(--brand-gradient);
+.al-grp-hd:hover { background: #f5f5f5; color: #6b6b70; }
+.al-grp-ic { font-size: 13px; width: 18px; text-align: center; flex-shrink: 0; }
+.al-grp-lbl { flex: 1; }
+.al-grp-arr {
+  font-size: 10px; transition: transform 0.15s;
+  color: #c8c8ce; flex-shrink: 0;
+}
+.al-grp-arr.down { transform: rotate(90deg); }
+
+/* ---- 分组子项 ---- */
+.al-grp-body {
+  display: flex; flex-direction: column;
+  padding-left: 24px; margin-bottom: 4px;
+}
+.al-item {
+  display: block; padding: 7px 10px; border-radius: 6px;
+  font-size: 13px; color: #6b6b70; text-decoration: none;
+  transition: all 0.15s;
+}
+.al-item:hover { background: #f5f5f5; color: #171717; }
+.al-item.router-link-active {
+  background: #171717; color: #fff; font-weight: 500;
 }
 
-.nav-back {
-  margin-top: 12px; border-top: 1px solid var(--border-light);
-  padding-top: 12px; border-radius: 0; font-size: 12px; color: var(--text-muted);
+/* ---- 侧边栏底部 ---- */
+.al-side-ft {
+  padding: 8px 10px; border-top: 1px solid #ebebea;
 }
-.nav-back:hover { color: var(--brand) !important; }
+.al-back {
+  font-size: 12px; color: #9d9da3; text-decoration: none;
+  transition: color 0.15s;
+}
+.al-back:hover { color: #171717; }
 
-/* ================================================
-   CONTENT AREA
-   ================================================ */
-.content {
-  flex: 1; padding: clamp(16px, 3vw, 32px); background: var(--bg-page);
-  overflow-y: auto; min-width: 0; width: 100%;
+/* ---- 主内容 ---- */
+.al-main {
+  flex: 1; padding: 28px 32px;
+  background: #fafaf9; overflow-y: auto;
+  min-width: 0;
 }
 
-/* Overlay — mobile backdrop */
-.overlay { display: none; }
+/* ---- 遮罩 ---- */
+.al-mask { display: none; }
 
-/* ================================================
-   RESPONSIVE — Mobile: slide-in sidebar
-   ================================================ */
+/* ---- 响应式 ---- */
 @media (max-width: 768px) {
-  .menu-toggle { display: flex; align-items: center; justify-content: center; }
+  .al-ham { display: flex; align-items: center; justify-content: center; }
 
-  .sidebar {
+  .al-side {
     position: fixed; top: 56px; left: 0; bottom: 0;
     transform: translateX(-100%); z-index: 160;
-    box-shadow: var(--shadow-dropdown);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
   }
-  .sidebar.open { transform: translateX(0); }
+  .al-side.on { transform: translateX(0); }
 
-  .overlay {
+  .al-mask {
     display: block; position: fixed; inset: 0; top: 56px;
-    background: var(--modal-overlay); z-index: 155;
-    animation: overlay-fade-in var(--transition-base);
+    background: rgba(0,0,0,0.25); z-index: 155;
   }
 
-  .content { padding: clamp(12px, 3vw, 20px); }
+  .al-main { padding: 16px; }
 }
 
-/* ================================================
-   RESPONSIVE — Wide sidebar on larger screens
-   ================================================ */
 @media (min-width: 769px) and (max-width: 1100px) {
-  .sidebar { width: 200px; min-width: 200px; }
-  .s-logo { font-size: 14px; padding: 0 14px 14px; }
-  .nav-item { font-size: 12px; padding: 7px 12px; }
+  .al-side { width: 180px; min-width: 180px; }
+  .al-item { font-size: 12px; padding: 6px 9px; }
 }
 
-/* ================================================
-   Scrollbar for sidebar
-   ================================================ */
-.sidebar::-webkit-scrollbar { width: 4px; }
-.sidebar::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 4px; }
-.sidebar::-webkit-scrollbar-track { background: transparent; }
+.al-side::-webkit-scrollbar { width: 4px; }
+.al-side::-webkit-scrollbar-thumb { background: #ebebea; border-radius: 4px; }
+.al-side::-webkit-scrollbar-track { background: transparent; }
 </style>
