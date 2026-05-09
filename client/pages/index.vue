@@ -259,12 +259,12 @@ definePageMeta({ layout: 'landing' });
 
 useHead({
   htmlAttrs: { lang: 'zh-CN' },
-  title: 'Movio AI — AI电商视觉创作平台',
+  title: 'Movio AI — 全链路运营助手',
   meta: [
-    { name: 'description', content: 'Movio AI — 电商图片视频全功能一体化平台，支持13个电商平台一键适配，从主图/场景/详情页到短视频/批量生成，AI赋能电商设计' },
+    { name: 'description', content: 'Movio AI — 全链路运营助手，电商AI内容中台。上传产品照片即可生成主图、场景图、详情页、带货视频，一个人就是一支视觉团队' },
     { name: 'keywords', content: 'AI电商图,电商主图制作,AI场景图,详情页生成,电商视频制作,AI抠图,商品图批量处理,淘宝主图,拼多多主图,抖音商品图,小红书封面' },
     { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-    { property: 'og:title', content: 'Movio AI — 图片+视频全功能一体化' },
+    { property: 'og:title', content: 'Movio AI — 全链路运营助手' },
     { property: 'og:description', content: '覆盖13个电商平台，从图片到视频一站式AI创作' },
     { property: 'og:type', content: 'website' },
   ],
@@ -285,7 +285,7 @@ const { data: siteConfig } = await useAsyncData('site-config-home', () =>
 );
 
 const siteName = computed(() => siteConfig.value?.site_name || 'Movio AI');
-const heroTitle = computed(() => siteConfig.value?.hero_title || '让你的产品图秒变爆款视觉');
+const heroTitle = computed(() => siteConfig.value?.hero_title || '让你的产品秒变爆款');
 const heroSubtitle = computed(() => siteConfig.value?.hero_subtitle || '上传产品照片，AI 自动生成主图、场景图、详情页、带货视频。无需设计师，一个人就是一支视觉团队。');
 const heroCta = computed(() => siteConfig.value?.hero_cta || '免费开始使用');
 const footerText = computed(() => siteConfig.value?.footer_text || '© 2026 Movio AI. All rights reserved.');
