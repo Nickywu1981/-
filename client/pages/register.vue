@@ -69,6 +69,12 @@ const loading = ref(false);
 const msg = ref('');
 const msgErr = ref(false);
 
+function randomPassword() {
+  const arr = new Uint8Array(12);
+  crypto.getRandomValues(arr);
+  return Array.from(arr, b => b.toString(16).padStart(2, '0')).join('');
+}
+
 async function handleRegister() {
   loading.value = true; msg.value = '';
   try {
@@ -89,7 +95,7 @@ async function handleSmsRegister() {
     await $fetch('/api/sms/verify-code', { method: 'POST', body: { phone: smsPhone.value, scene: 'register', code: smsCode.value } });
     await $fetch('/api/auth/register', {
       method: 'POST',
-      body: { phone: smsPhone.value, password: `sms_${smsPhone.value}`, nickname: smsNickname.value || smsPhone.value },
+      body: { phone: smsPhone.value, password: randomPassword(), nickname: smsNickname.value || smsPhone.value },
       credentials: 'include',
     });
     await useAuthStore().fetchUser();
@@ -116,7 +122,7 @@ async function handleEmailRegister() {
     await $fetch('/api/email/verify-code', { method: 'POST', body: { email: emailAddr.value, code: emailCode.value } });
     await $fetch('/api/auth/register', {
       method: 'POST',
-      body: { email: emailAddr.value, password: `email_${emailAddr.value}`, nickname: emailNickname.value || emailAddr.value },
+      body: { email: emailAddr.value, password: randomPassword(), nickname: emailNickname.value || emailAddr.value },
       credentials: 'include',
     });
     await useAuthStore().fetchUser();
