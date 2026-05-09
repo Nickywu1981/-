@@ -10,6 +10,7 @@ import * as allinpaySDK from '../utils/allinpaySDK.js';
 import membershipDao from '../dao/membershipDao.js';
 import rechargeDao from '../dao/rechargeDao.js';
 import * as creditDao from '../dao/creditDao.js';
+import * as notificationService from './notificationService.js';
 import logger from '../utils/logger.js';
 import { BusinessError } from '../utils/businessError.js';
 import { ORDER_STATUS } from '../constants/domainStatus.js';
@@ -114,6 +115,24 @@ export async function handleNotify(body) {
   }
 
   logger.info('[Allinpay] 回调履约成功', { reqsn, orderType: order.order_type });
+
+  // 发送用户通知
+  try {
+    let title, content;
+    if (order.order_type === 'membership') {
+      const plan = Object.values(PLANS).find(p => p.price === Number(order.amount));
+      title = '支付成功 — 会员已开通';
+      content = plan
+        ? `您已成功购买${plan.name}，获赠${plan.credits}积分，有效期${plan.days}天。`
+        : `您已成功开通会员，支付￥${(order.amount / 100).toFixed(2)}。`;
+    } else {
+      const creditAmount = order.amount > 1000 ? Math.round(order.amount / 10) : order.amount;
+      title = '支付成功 — 积分已到账';
+      content = `您已成功充值${creditAmount}积分，支付￥${(order.amount / 100).toFixed(2)}。`;
+    }
+    await notificationService.sendNotification(order.user_id, { type: 'payment', title, content });
+  } catch { /* 通知失败不阻塞 */ }
+
   await allinpayDao.logNotify({ reqsn, trxid, notifyBody: JSON.stringify(body), signVerified: 1, processStatus: 1, processMsg: '处理成功' });
   return true;
 }
