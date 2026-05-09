@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authMiddleware, adminOnly } from '../middleware/auth.js';
+import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
 import { z } from 'zod';
@@ -16,7 +16,7 @@ const querySchema = z.object({
   targetId: z.coerce.number().int().optional(),
 });
 
-router.get('/', authMiddleware, adminOnly, validate(querySchema, 'query'), asyncHandler(async (req, res) => {
+router.get('/', authMiddleware, adminAuth, validate(querySchema, 'query'), asyncHandler(async (req, res) => {
   try {
     const { page, pageSize } = parsePagination(req.query);
     const result = await auditLogDao.list({ ...req.query, page, pageSize });

@@ -77,10 +77,11 @@ export default defineNuxtConfig({
       alwaysRedirect: false,
       fallbackLocale: 'zh',
     },
-    // 根据 Accept-Language 自动匹配
+    // 根据 Accept-Language + Cookie 自动匹配
     experimental: {
       localeDetector: './locales/locale-detector.ts',
     },
+    // 不设置 langDir，直接从 i18n.config.ts 内联加载
   },
 
   // PWA 渐进式应用配置
