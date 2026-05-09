@@ -5,6 +5,8 @@
  * - 防止 XSS 标签
  */
 
+const { ERROR_CODE } = require('../constants/errorCode.js');
+
 // XSS/注入检测正则
 const INJECTION_PATTERNS = [
   /<script\b[^>]*>/i,
@@ -65,7 +67,7 @@ export default function paramFilter(req, _res, next) {
   // Injection scan — reject suspicious input
   if (scanForInjection(req.body) || scanForInjection(req.query)) {
     const err = new Error('请求参数包含非法字符');
-    err.status = 400;
+    err.status = ERROR_CODE.BAD_REQUEST;
     return next(err);
   }
 

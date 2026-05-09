@@ -8,7 +8,7 @@ export async function getMembership(req, res) {
     const m = await creditService.getUserMembership(req.user.id);
     if (!m) return error(res, ERROR_CODE.NOT_FOUND, '会员信息不存在');
     success(res, m);
-  } catch (e) { error(res, e.status || 500, e.message); }
+  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
 }
 
 export async function freezeCredit(req, res) {
@@ -17,7 +17,7 @@ export async function freezeCredit(req, res) {
     if (!requestId || !action) return error(res, ERROR_CODE.BAD_REQUEST, '缺少 requestId 或 action 参数');
     const result = await creditService.freezeCredit(req.user.id, requestId, action, batchCount || 1, isNight || false);
     success(res, result);
-  } catch (e) { error(res, e.status || 500, e.message); }
+  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
 }
 
 export async function confirmCredit(req, res) {
@@ -26,7 +26,7 @@ export async function confirmCredit(req, res) {
     if (!requestId) return error(res, ERROR_CODE.BAD_REQUEST, '缺少 requestId');
     const result = await creditService.confirmCharge(requestId);
     success(res, result);
-  } catch (e) { error(res, e.status || 500, e.message); }
+  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
 }
 
 export async function rollbackCredit(req, res) {
@@ -36,7 +36,7 @@ export async function rollbackCredit(req, res) {
     if (!rid) return error(res, ERROR_CODE.BAD_REQUEST, '缺少 requestId 或 recordId');
     const result = await creditService.rollbackCharge(rid, remark || '');
     success(res, result);
-  } catch (e) { error(res, e.status || 500, e.message); }
+  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
 }
 
 export async function listRecords(req, res) {
@@ -45,7 +45,7 @@ export async function listRecords(req, res) {
     const { type, userId } = req.query;
     const data = await creditService.listConsumptionRecords({ userId: userId ? +userId : req.user.id, type: type ? +type : undefined, page, pageSize });
     success(res, data);
-  } catch (e) { error(res, e.status || 500, e.message); }
+  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
 }
 
 export async function listAllRecords(req, res) {
@@ -54,7 +54,7 @@ export async function listAllRecords(req, res) {
     const { type, userId } = req.query;
     const data = await creditService.listConsumptionRecords({ userId: userId ? +userId : undefined, type: type ? +type : undefined, page, pageSize });
     success(res, data);
-  } catch (e) { error(res, e.status || 500, e.message); }
+  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
 }
 
 export async function adminRefund(req, res) {
@@ -63,7 +63,7 @@ export async function adminRefund(req, res) {
     if (!recordId) return error(res, ERROR_CODE.BAD_REQUEST, '缺少 recordId');
     await creditService.adminRefundCredit(recordId, remark || '管理员退款');
     success(res, null, '退款成功');
-  } catch (e) { error(res, e.status || 500, e.message); }
+  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
 }
 
 // ==================== 签到+奖励 ====================
@@ -72,14 +72,14 @@ export async function checkIn(req, res) {
   try {
     const data = await creditService.checkIn(req.user.id);
     success(res, data, `签到成功！+${data.reward}积分，连续${data.streak}天`);
-  } catch (e) { error(res, e.status || 500, e.message); }
+  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
 }
 
 export async function checkInStatus(req, res) {
   try {
     const data = await creditService.getCheckInStatus(req.user.id);
     success(res, data);
-  } catch (e) { error(res, e.status || 500, e.message); }
+  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
 }
 
 export async function shareReward(req, res) {
@@ -87,7 +87,7 @@ export async function shareReward(req, res) {
     const data = await creditService.shareReward(req.user.id);
     if (data.alreadyClaimed) return success(res, data, '今日已领取分享奖励');
     success(res, data, `分享奖励 +${data.reward} 积分`);
-  } catch (e) { error(res, e.status || 500, e.message); }
+  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
 }
 
 export async function creditHistory(req, res) {
@@ -95,12 +95,12 @@ export async function creditHistory(req, res) {
     const { page, pageSize } = parsePagination(req.query);
     const data = await creditService.getCreditHistory(req.user.id, page, pageSize);
     success(res, data);
-  } catch (e) { error(res, e.status || 500, e.message); }
+  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
 }
 
 export async function creditBalance(req, res) {
   try {
     const data = await creditService.getCreditBalance(req.user.id);
     success(res, data);
-  } catch (e) { error(res, e.status || 500, e.message); }
+  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
 }

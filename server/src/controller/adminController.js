@@ -41,6 +41,8 @@ export async function updateUserStatus(req, res, next) {
 export async function batchUpdateUserStatus(req, res, next) {
   try {
     const { ids, status } = req.body;
+    if (!Array.isArray(ids) || ids.length === 0) return error(res, ERROR_CODE.PARAM_INVALID, 'ids 必须为非空数组');
+    if (![0, 1].includes(status)) return error(res, ERROR_CODE.PARAM_INVALID, '状态值无效（0启用/1禁用）');
     const result = await commerce.batchUpdateUserStatus(ids, status);
     return success(res, { affected: result.affected }, `已${status === 1 ? '禁用' : '启用'} ${result.affected} 个用户`);
   } catch (err) { next(err); }

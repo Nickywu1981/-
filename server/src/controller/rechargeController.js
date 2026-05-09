@@ -13,7 +13,7 @@ export async function createOrder(req, res) {
     const { amount, channel } = req.body;
     const data = await rechargeService.createOrder(req.user.id, req.tenantId, req.ip, { amount, payChannel: channel || 'wechat' });
     success(res, data, '订单已创建');
-  } catch (e) { error(res, e.status || 500, e.message); }
+  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
 }
 
 export async function handleCallback(req, res) {
@@ -28,26 +28,26 @@ export async function checkPaymentResult(req, res) {
     const data = await allinpayService.queryOrder(req.params.reqsn);
     if (!data) return error(res, ERROR_CODE.NOT_FOUND, '订单不存在');
     success(res, data);
-  } catch (e) { error(res, e.status || 500, e.message); }
+  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
 }
 
 export async function listUserOrders(req, res) {
   try {
     const rows = await rechargeService.listUserOrders(req.user.id, req.tenantId);
     success(res, rows);
-  } catch (e) { error(res, e.status || 500, e.message); }
+  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
 }
 
 export async function listAllOrders(req, res) {
   try {
     const rows = await rechargeService.listAllOrders();
     success(res, rows);
-  } catch (e) { error(res, e.status || 500, e.message); }
+  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
 }
 
 export async function refundOrder(req, res) {
   try {
     await rechargeService.refundOrder(req.params.orderNo);
     success(res, null, '退款成功');
-  } catch (e) { error(res, e.status || 500, e.message); }
+  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
 }

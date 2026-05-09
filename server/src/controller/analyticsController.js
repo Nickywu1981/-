@@ -3,6 +3,7 @@
  */
 import analyticsService from '../services/analyticsService.js';
 import { success, error } from '../utils/response.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 export async function track(req, res) {
   try {
@@ -10,7 +11,7 @@ export async function track(req, res) {
     const userId = req.user?.id || null;
     await analyticsService.trackEvent(userId, event, { ...metadata, ip: req.ip });
     success(res, null, 'ok');
-  } catch (err) { error(res, err.status || 500, err.message); }
+  } catch (err) { error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 }
 
 export async function funnel(req, res) {
@@ -18,14 +19,14 @@ export async function funnel(req, res) {
     const days = parseInt(req.query.days) || 30;
     const data = await analyticsService.getFunnelMetrics(days);
     success(res, data);
-  } catch (err) { error(res, err.status || 500, err.message); }
+  } catch (err) { error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 }
 
 export async function active(req, res) {
   try {
     const data = await analyticsService.getActiveUsers();
     success(res, data);
-  } catch (err) { error(res, err.status || 500, err.message); }
+  } catch (err) { error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 }
 
 export async function topTools(req, res) {
@@ -34,7 +35,7 @@ export async function topTools(req, res) {
     const limit = parseInt(req.query.limit) || 10;
     const data = await analyticsService.getTopTools(days, limit);
     success(res, data);
-  } catch (err) { error(res, err.status || 500, err.message); }
+  } catch (err) { error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 }
 
 export async function trend(req, res) {
@@ -42,7 +43,7 @@ export async function trend(req, res) {
     const days = parseInt(req.query.days) || 30;
     const data = await analyticsService.getDailyTrend(days);
     success(res, data);
-  } catch (err) { error(res, err.status || 500, err.message); }
+  } catch (err) { error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 }
 
 export async function conversionFunnel(req, res) {
@@ -50,5 +51,5 @@ export async function conversionFunnel(req, res) {
     const days = parseInt(req.query.days) || 30;
     const data = await analyticsService.getConversionFunnel(days);
     success(res, data);
-  } catch (err) { error(res, err.status || 500, err.message); }
+  } catch (err) { error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 }

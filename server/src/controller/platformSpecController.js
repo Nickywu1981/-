@@ -43,7 +43,7 @@ export async function adaptImage(req, res) {
     const result = await svc.adaptImage(inputPath, platformCode, outputDir || './uploads/adapted');
     return success(res, result, '图片适配成功');
   } catch (e) {
-    const status = e.status || 500;
+    const status = e.status || ERROR_CODE.INTERNAL_ERROR;
     return error(res, status, e.message);
   }
 }

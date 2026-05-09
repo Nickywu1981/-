@@ -5,6 +5,7 @@
 import * as modelConfigService from '../services/modelConfigService.js';
 import { success, error } from '../utils/response.js';
 import { parsePagination } from '../utils/pagination.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 // ============ 模型配置 CRUD ============
 
@@ -14,7 +15,7 @@ export async function list(req, res) {
     const rows = await modelConfigService.list(includeDisabled);
     return success(res, rows);
   } catch (e) {
-    return error(res, e.status || 500, e.message);
+    return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message);
   }
 }
 
@@ -23,7 +24,7 @@ export async function getOne(req, res) {
     const row = await modelConfigService.getByKey(req.params.modelKey);
     return success(res, row);
   } catch (e) {
-    return error(res, e.status || 500, e.message);
+    return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message);
   }
 }
 
@@ -32,7 +33,7 @@ export async function create(req, res) {
     const result = await modelConfigService.create(req.validated);
     return success(res, result, '模型注册成功');
   } catch (e) {
-    return error(res, e.status || 500, e.message);
+    return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message);
   }
 }
 
@@ -41,7 +42,7 @@ export async function update(req, res) {
     const result = await modelConfigService.update(req.params.modelKey, req.validated);
     return success(res, result, '模型更新成功');
   } catch (e) {
-    return error(res, e.status || 500, e.message);
+    return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message);
   }
 }
 
@@ -50,7 +51,7 @@ export async function remove(req, res) {
     await modelConfigService.remove(req.params.modelKey);
     return success(res, null, '模型已删除');
   } catch (e) {
-    return error(res, e.status || 500, e.message);
+    return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message);
   }
 }
 
@@ -60,7 +61,7 @@ export async function toggle(req, res) {
     const result = await modelConfigService.toggle(req.params.modelKey, enabled);
     return success(res, result, enabled ? '已启用' : '已禁用');
   } catch (e) {
-    return error(res, e.status || 500, e.message);
+    return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message);
   }
 }
 
@@ -80,7 +81,7 @@ export async function callLogs(req, res) {
     });
     return success(res, result);
   } catch (e) {
-    return error(res, e.status || 500, e.message);
+    return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message);
   }
 }
 
@@ -91,6 +92,6 @@ export async function callStats(req, res) {
     const stats = await modelConfigService.getCallStats(modelKey, days ? parseInt(days) : 7);
     return success(res, stats);
   } catch (e) {
-    return error(res, e.status || 500, e.message);
+    return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message);
   }
 }
