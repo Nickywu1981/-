@@ -1,3 +1,4 @@
+import { USER_STATUS } from '../constants/domainStatus.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import * as userDao from '../dao/userDao.js';
@@ -34,7 +35,7 @@ export async function login({ username, password }) {
     throw err;
   }
 
-  if (user.status !== 1) {
+  if (user.status !== USER_STATUS.ACTIVE) {
     const err = new Error('账号已被禁用，请联系客服');
     err.statusCode = 403;
     throw err;

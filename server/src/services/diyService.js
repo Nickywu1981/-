@@ -1,4 +1,5 @@
 import { BusinessError } from '../utils/businessError.js';
+import { DIY_PAGE_STATUS } from '../constants/domainStatus.js';
 /**
  * DIY 页面服务（增强版）
  * 完整状态机 / 双端配置 / 自动+手动版本 / Redis缓存 / 克隆 / 批量操作 / 发布校验
@@ -140,7 +141,7 @@ export default {
     const page = await diyDao.getPageById(id, tenantId);
     if (!page) throw new BusinessError(404, '页面不存在');
     checkStateTransition(page.status, 3);
-    if (page.status === 1) await diyDao.clearPageCache(page.slug);
+    if (page.status === DIY_PAGE_STATUS.PUBLISHED) await diyDao.clearPageCache(page.slug);
     await diyDao.softDeletePage(id, tenantId);
     return { msg: '已移入回收站' };
   },
@@ -148,7 +149,7 @@ export default {
   async restorePage(id, tenantId) {
     const page = await diyDao.getPageById(id, tenantId);
     if (!page) throw new BusinessError(404, '页面不存在');
-    if (page.status !== 3) throw new BusinessError(400, '仅回收站中的页面可恢复');
+    if (page.status !== DIY_PAGE_STATUS.TRASH) throw new BusinessError(400, '仅回收站中的页面可恢复');
     await diyDao.restorePage(id, tenantId);
     return { msg: '已恢复至草稿状态' };
   },
@@ -156,7 +157,7 @@ export default {
   async hardDeletePage(id, tenantId) {
     const page = await diyDao.getPageById(id, tenantId);
     if (!page) throw new BusinessError(404, '页面不存在');
-    if (page.status !== 3) throw new BusinessError(400, '仅回收站中的页面可彻底删除');
+    if (page.status !== DIY_PAGE_STATUS.TRASH) throw new BusinessError(400, '仅回收站中的页面可彻底删除');
     if (page.status === 1) await diyDao.clearPageCache(page.slug);
     await diyDao.hardDeletePage(id, tenantId);
     return { msg: '页面已彻底删除，不可恢复' };
@@ -235,7 +236,7 @@ export default {
   async batchDelete(ids, tenantId) {
     const pages = await Promise.all(ids.map(id => diyDao.getPageById(id, tenantId).catch(() => null)));
     for (const p of pages) {
-      if (p && p.status === 1) await diyDao.clearPageCache(p.slug).catch(() => {});
+      if (p && p.status === DIY_PAGE_STATUS.PUBLISHED) await diyDao.clearPageCache(p.slug).catch(() => {});
     }
     await diyDao.batchUpdateStatus(ids.filter(Number), tenantId, 3);
     return { count: ids.length };

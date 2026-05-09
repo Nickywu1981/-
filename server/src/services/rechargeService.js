@@ -2,6 +2,7 @@ import rechargeDao from '../dao/rechargeDao.js';
 import * as allinpayService from '../services/allinpayService.js';
 import crypto from 'crypto';
 import { BusinessError } from '../utils/businessError.js';
+import { RECHARGE_PAY_STATUS } from '../constants/domainStatus.js';
 
 export function getRates() {
   return [
@@ -49,7 +50,7 @@ export async function listAllOrders() {
 
 export async function refundOrder(orderNo) {
   const order = await rechargeDao.getByOrderNo(orderNo);
-  if (!order || order.pay_status !== 1) throw new BusinessError(404, '订单不存在或未支付');
+  if (!order || order.pay_status !== RECHARGE_PAY_STATUS.PAID) throw new BusinessError(404, '订单不存在或未支付');
   await rechargeDao.markRefunded(orderNo);
   return true;
 }

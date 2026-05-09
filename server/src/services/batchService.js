@@ -8,6 +8,7 @@ import * as batchTemplateDao from '../dao/batchTemplateDao.js';
 import * as creditService from './creditService.js';
 import wsManager from './wsManager.js';
 import { BusinessError } from '../utils/businessError.js';
+import { BATCH_TASK_STATUS } from '../constants/domainStatus.js';
 import logger from '../utils/logger.js';
 
 const MODEL_MAP = { cutout: 'stable-diffusion-img2img', main_image: 'stable-diffusion-img2img', scene: 'stable-diffusion-xl', enhance: 'stable-diffusion-img2img', white_bg: 'stable-diffusion-img2img', img2video: 'stable-diffusion-xl' };
@@ -110,7 +111,7 @@ export async function listBatchHistory(userId, { page = 1, pageSize = 10 }) {
 export async function getBatchZipUrl(taskId, userId) {
   const task = await getTask(taskId, userId);
   if (!task || task.type !== 'batch') throw new BusinessError(404, '任务不存在或非批量任务');
-  if (task.status !== 2) throw new BusinessError(400, '任务未完成，无法下载');
+  if (task.status !== BATCH_TASK_STATUS.COMPLETED) throw new BusinessError(400, '任务未完成，无法下载');
   return { zipUrl: `/api/batch/${taskId}/download`, total: task.output_result?.total || 0, estimatedSize: `${Math.round((task.output_result?.total || 0) * 0.5)}MB` };
 }
 

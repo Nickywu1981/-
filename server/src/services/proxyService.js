@@ -1,4 +1,5 @@
 import { BusinessError } from '../utils/businessError.js';
+import { PROXY_FLAG, CIRCUIT_STATUS } from '../constants/domainStatus.js';
 import proxyDao from '../dao/proxyDao.js';
 import { encrypt, decrypt } from '../utils/crypto.js';
 
@@ -33,7 +34,7 @@ export async function createConfig(tenantId, data) {
 
   // AES 加密鉴权凭证
   const processed = { ...data };
-  if (processed.authConfig && processed.encryptAuth !== 0) {
+  if (processed.authConfig && processed.encryptAuth !== PROXY_FLAG.OFF) {
     processed.authConfig = JSON.stringify({
       _encrypted: true,
       payload: encrypt(JSON.stringify(processed.authConfig)),
@@ -52,7 +53,7 @@ export async function updateConfig(id, tenantId, data) {
   if (!cfg) throw new BusinessError(404, '代理配置不存在');
 
   if (data.authConfig) {
-    data.authConfig = data.encryptAuth !== 0
+    data.authConfig = data.encryptAuth !== PROXY_FLAG.OFF
       ? JSON.stringify({ _encrypted: true, payload: encrypt(JSON.stringify(data.authConfig)) })
       : JSON.stringify(data.authConfig);
   }
@@ -76,7 +77,7 @@ export async function callProxy(code, tenantId, { method, body, userId, clientIp
   if (!proxy) throw new BusinessError(404, '代理不存在');
 
   // 1. 白名单校验
-  if (proxy.whitelist_enabled !== 0) {
+  if (proxy.whitelist_enabled !== PROXY_FLAG.OFF) {
     const allowed = await proxyDao.checkWhitelist(tenantId, proxy.upstream_url);
     if (!allowed) {
       throw new BusinessError(403, `上游域名不在白名单: ${proxy.upstream_url}`);
@@ -92,7 +93,7 @@ export async function callProxy(code, tenantId, { method, body, userId, clientIp
   }
 
   // 3. 熔断检查
-  if (proxy.circuit_status === 1) {
+  if (proxy.circuit_status === CIRCUIT_STATUS.OPEN) {
     throw new BusinessError(503, '上游已熔断，请稍后重试');
   }
 
@@ -126,7 +127,7 @@ export async function callProxy(code, tenantId, { method, body, userId, clientIp
       const duration = Date.now() - start;
 
       // 熔断恢复
-      if (proxy.circuit_status === 1) await proxyDao.resetCircuit(proxy.id);
+      if (proxy.circuit_status === CIRCUIT_STATUS.OPEN) await proxyDao.resetCircuit(proxy.id);
 
       // 记录成功日志
       await proxyDao.logCall({

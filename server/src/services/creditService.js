@@ -1,5 +1,6 @@
 import * as creditDao from '../dao/creditDao.js';
 import { BusinessError } from '../utils/businessError.js';
+import { CREDIT_RECORD_STATUS } from '../constants/domainStatus.js';
 
 // 操作消耗点数额
 const CONSUMPTION_RULES = {
@@ -74,7 +75,7 @@ export async function freezeCredit(userId, requestId, action, batchCount = 1, is
 export async function confirmCharge(requestId) {
   const record = await creditDao.getConsumptionByRequestId(requestId);
   if (!record) throw new BusinessError(404, '预扣记录不存在');
-  if (record.status === 1) return { alreadyConfirmed: true };
+  if (record.status === CREDIT_RECORD_STATUS.CONFIRMED) return { alreadyConfirmed: true };
 
   await creditDao.confirmConsumption(record.id, record.credit_before - record.consumed);
   await creditDao.insertRequestLog({
@@ -89,7 +90,7 @@ export async function confirmCharge(requestId) {
 export async function rollbackCharge(requestId, remark = '') {
   const record = await creditDao.getConsumptionByRequestId(requestId);
   if (!record) throw new BusinessError(404, '预扣记录不存在');
-  if (record.status === 2) return { alreadyRolledBack: true };
+  if (record.status === CREDIT_RECORD_STATUS.ROLLED_BACK) return { alreadyRolledBack: true };
 
   await creditDao.updateCreditBalance(record.user_id, record.consumed);
   await creditDao.refundConsumption(record.id, record.credit_before, remark || '系统回滚');

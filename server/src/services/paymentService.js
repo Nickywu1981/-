@@ -3,6 +3,7 @@
  *
  * 通联支付聚合收银台：创建订单 → 返回 H5 支付链接 → 回调通知 → 开通会员
  */
+import { ORDER_STATUS } from '../constants/domainStatus.js';
 import * as allinpayService from '../services/allinpayService.js';
 import pool from '../dao/db.js';
 import allinpayConfig from '../config/allinpay.js';
@@ -70,7 +71,7 @@ export async function sandboxPay(orderId) {
     err.statusCode = 404;
     throw err;
   }
-  if (order.status !== 0) {
+  if (order.status !== ORDER_STATUS.PENDING) {
     const err = new Error(`订单状态异常: ${order.status}`);
     err.statusCode = 400;
     throw err;

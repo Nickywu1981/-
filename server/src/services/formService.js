@@ -1,4 +1,5 @@
 import { BusinessError } from '../utils/businessError.js';
+import { FORM_ACCESS_TYPE } from '../constants/domainStatus.js';
 /**
  * P2 增强表单服务 — 校验引擎 + 联动解析 + 脱敏 + 双端适配
  */
@@ -154,7 +155,7 @@ export async function deleteForm(id, tenantId) {
 export async function getPublicForm(code, tenantId, { device = 'pc' } = {}) {
   const form = await formDao.getFormByCode(code, tenantId);
   if (!form) throw new BusinessError(404, '表单不存在或已关闭');
-  if (form.access_type !== 1) throw new BusinessError(403, '此表单不公开');
+  if (form.access_type !== FORM_ACCESS_TYPE.PUBLIC) throw new BusinessError(403, '此表单不公开');
   if (form.start_time && new Date(form.start_time) > new Date()) throw new BusinessError(400, '表单尚未开放');
   if (form.end_time && new Date(form.end_time) < new Date()) throw new BusinessError(400, '表单已结束');
   if (form.submit_limit > 0 && form.submit_count >= form.submit_limit) throw new BusinessError(400, '已达提交上限');
@@ -178,7 +179,7 @@ export async function getPublicForm(code, tenantId, { device = 'pc' } = {}) {
 export async function submitForm(code, tenantId, userId, rawData, ip, userAgent, deviceType) {
   const form = await formDao.getFormByCode(code, tenantId);
   if (!form) throw new BusinessError(404, '表单不存在或已关闭');
-  if (form.access_type !== 1) throw new BusinessError(403, '此表单不公开');
+  if (form.access_type !== FORM_ACCESS_TYPE.PUBLIC) throw new BusinessError(403, '此表单不公开');
   if (form.start_time && new Date(form.start_time) > new Date()) throw new BusinessError(400, '表单尚未开放');
   if (form.end_time && new Date(form.end_time) < new Date()) throw new BusinessError(400, '表单已结束');
   if (form.submit_limit > 0 && form.submit_count >= form.submit_limit) throw new BusinessError(400, '已达提交上限');

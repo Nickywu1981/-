@@ -1,4 +1,5 @@
 import { BusinessError } from '../utils/businessError.js';
+import { USER_STATUS } from '../constants/domainStatus.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import db from '../dao/db.js';
@@ -64,7 +65,7 @@ export async function login({ phone, email, username, password }) {
     if (!users || users.length === 0) throw new BusinessError(401, '账号或密码错误');
     const user = users[0];
 
-    if (user.status !== 1) throw new BusinessError(403, '账号已被禁用');
+    if (user.status !== USER_STATUS.ACTIVE) throw new BusinessError(403, '账号已被禁用');
 
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) throw new BusinessError(401, '账号或密码错误');
@@ -96,7 +97,7 @@ export async function loginByCode({ phone, email, username }) {
     if (!users || users.length === 0) throw new BusinessError(401, '账号不存在，请先注册');
     const user = users[0];
 
-    if (user.status !== 1) throw new BusinessError(403, '账号已被禁用');
+    if (user.status !== USER_STATUS.ACTIVE) throw new BusinessError(403, '账号已被禁用');
 
     await conn.query('UPDATE `user` SET last_login_time = NOW() WHERE id = ?', [user.id]);
 

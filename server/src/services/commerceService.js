@@ -7,6 +7,7 @@ import * as creditDao from '../dao/creditDao.js';
 import * as commerceDao from '../dao/commerceDao.js';
 import { mockEnabled } from '../config/index.js';
 import { BusinessError } from '../utils/businessError.js';
+import { PLAN_TYPE } from '../constants/domainStatus.js';
 
 // ==================== 套餐列表 ====================
 
@@ -36,7 +37,7 @@ export async function purchasePlan(userId, planType) {
   }
 
   // 更新会员
-  if (membership && membership.plan_type !== 0) {
+  if (membership && membership.plan_type !== PLAN_TYPE.FREE) {
     const currentEnd = new Date(membership.end_time);
     if (currentEnd > now) {
       endTime = new Date(currentEnd.getTime() + (endTime.getTime() - now.getTime()));

@@ -1,4 +1,5 @@
 import { BusinessError } from '../utils/businessError.js';
+import { PROMPT_STATUS } from '../constants/domainStatus.js';
 import * as promptDao from '../dao/promptDao.js';
 
 // ==================== 变量解析引擎 ====================
@@ -154,7 +155,7 @@ export async function adminSaveTemplate(body) {
 
 export async function adminReviewTemplate(id, { status, reviewRemark }, reviewerId) {
   await promptDao.updateStatus(id, status, reviewerId, reviewRemark || '');
-  return status === 2 ? '已上架' : '已驳回';
+  return status === PROMPT_STATUS.PUBLISHED ? '已上架' : '已驳回';
 }
 
 export async function adminDeleteTemplate(id) {

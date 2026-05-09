@@ -12,6 +12,7 @@ import rechargeDao from '../dao/rechargeDao.js';
 import * as creditDao from '../dao/creditDao.js';
 import logger from '../utils/logger.js';
 import { BusinessError } from '../utils/businessError.js';
+import { ORDER_STATUS } from '../constants/domainStatus.js';
 
 const PLANS = {
   1: { name: '月卡', price: 29, days: 30, credits: 100 },
@@ -88,7 +89,7 @@ export async function handleNotify(body) {
     return false;
   }
 
-  if (order.status !== 0) {
+  if (order.status !== ORDER_STATUS.PENDING) {
     logger.info('[Allinpay] 订单非待支付状态', { reqsn, status: order.status });
     await allinpayDao.logNotify({ reqsn, trxid, notifyBody: JSON.stringify(body), signVerified: 1, processStatus: 1, processMsg: `订单状态已为${order.status}` });
     return true;
