@@ -84,7 +84,7 @@ export default defineNuxtConfig({
     },
     // 根据 Accept-Language + Cookie 自动匹配
     experimental: {
-      localeDetector: './i18n/locales/locale-detector.ts',
+      localeDetector: './locales/locale-detector.ts',
     },
   },
 

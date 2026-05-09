@@ -29,6 +29,7 @@ export async function authMiddleware(req, res, next) {
     '/api/ai-dispatch/health', '/api/ai-dispatch/categories',
     '/api/internal/embed',
     '/api/diy/published',
+    '/api/seo-keywords', '/api/fab/templates', '/api/memory/status',
   ];
 
   // 文档路径前缀匹配 (Swagger UI 子资源)

@@ -89,6 +89,9 @@ import openApiKeyRoutes from './route/openApiKeyRoutes.js';
 import auditLogRoutes from './route/auditLogRoutes.js';
 import geoRoutes from './route/geoRoutes.js';
 import compareRoutes from './route/compareRoutes.js';
+import seoKeywordRoutes from './route/seoKeywordRoutes.js';
+import fabRoutes from './route/fabRoutes.js';
+import memoryEmbedRoutes from './route/memoryEmbedRoutes.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -276,6 +279,9 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/platform-specs', platformSpecRoutes);
 app.use('/api/ai-dispatch', heavyLimiter, aiDispatchRoutes);  // 多模型统一调度: dispatch/categories/health/stats/cache
 app.use('/api/compare', compareRoutes);
+app.use('/api/seo-keywords', seoKeywordRoutes);
+app.use('/api/fab', fabRoutes);
+app.use('/api/memory', memoryEmbedRoutes);
 
 // 404
 app.use((_req, res) => {
