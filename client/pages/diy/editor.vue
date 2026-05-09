@@ -8,6 +8,11 @@
         <span class="page-type">({{ pageInfo.page_type }})</span>
       </div>
       <div class="toolbar-right">
+        <button class="btn btn-icon-btn" :disabled="undoStack.length === 0" @click="editor.undo(); dirty=true" title="撤销">↩</button>
+        <button class="btn btn-icon-btn" :disabled="redoStack.length === 0" @click="editor.redo(); dirty=true" title="重做">↪</button>
+        <button class="btn btn-outline btn-sm" @click="previewMode = previewMode === 'mobile' ? 'pc' : 'mobile'" :title="previewMode === 'mobile' ? '切换到PC预览' : '切换到移动端预览'">
+          {{ previewMode === 'mobile' ? '📱' : '🖥' }}
+        </button>
         <button class="btn btn-outline" :disabled="saving" @click="saveVersion">{{ saving ? '保存中...' : '保存版本' }}</button>
         <button class="btn btn-outline" :disabled="saving" @click="savePage">{{ saving ? '保存中...' : '保存' }}</button>
         <button class="btn btn-outline" @click="showVersions = true">版本历史</button>
@@ -31,7 +36,7 @@
       </div>
 
       <!-- 中间：画布 -->
-      <div class="center-canvas" @dragover.prevent @drop="onDrop" @click="selectedIdx = -1">
+      <div class="center-canvas" :class="{ 'canvas-pc': previewMode === 'pc' }" @dragover.prevent @drop="onDrop" @click="selectedIdxs = []">
         <div v-if="!sections.length" class="canvas-placeholder">
           从左侧拖拽组件到这里开始搭建页面
         </div>
@@ -215,12 +220,16 @@
 </template>
 
 <script setup lang="ts">
+import { useDiyEditor } from '~/composables/useDiyEditor'
+import { DIY_COMPONENTS, getComponentByCode, getPropDef } from '~/composables/useDiyComponents'
+import { useDiyAutoSave } from '~/composables/useDiyAutoSave'
 
 const route = useRoute()
+const toast = useToast()
+const editor = useDiyEditor()
+const { sections, selectedIdxs, previewMode, undoStack, redoStack } = editor
+const selectedIdx = computed(() => selectedIdxs.value[0] ?? -1)
 const pageInfo = ref({})
-const sections = ref([])
-const components = ref([])
-const selectedIdx = ref(-1)
 const dragOverIdx = ref(-1)
 const rightTab = ref('props')
 const dirty = ref(false)
@@ -234,100 +243,62 @@ const versionLoading = ref(false)
 const selectedVersions = ref<number[]>([])
 const diffResult = ref<any[] | null>(null)
 
-const componentCats = [
-  { key: 'banner', label: '横幅/轮播' },
-  { key: 'product', label: '商品/营销' },
-  { key: 'gallery', label: '图片/视频' },
-  { key: 'text', label: '文本' },
-  { key: 'form', label: '表单' },
-  { key: 'nav', label: '导航' },
-]
-
-function componentsByCat(cat) { return components.value.filter(c => c.category === cat) }
-function getCompName(code) { return components.value.find(c => c.component_code === code)?.name || code }
-function getCompIcon(code) {
-  const icons = { banner_slider:'🖼', text_block:'📝', title_bar:'📌', product_list:'📦', image_showcase:'🖼️', video_player:'▶️', countdown:'⏰', coupon_card:'🎫', button_group:'🔘', nav_bar:'📍', form_container:'📋', hotzone_image:'🗺️' }
-  return icons[code] || '◆'
-}
-function hasProp(key) { return selectedIdx.value >= 0 && sections.value[selectedIdx.value]?.config && key in sections.value[selectedIdx.value].config }
+const componentCats = DIY_COMPONENTS.categories
+function componentsByCat(cat: string) { return DIY_COMPONENTS.components.filter(c => c.category === cat) }
+function getCompName(code: string) { return getComponentByCode(code)?.name || code }
+function getCompIcon(code: string) { return getComponentByCode(code)?.icon || '◆' }
+function hasProp(key: string) { const idx = selectedIdx.value; if (idx < 0 || !sections.value[idx]) return false; const comp = getComponentByCode(sections.value[idx].component); return comp?.props?.some(p => p.key === key) ?? false }
 function markDirty() { dirty.value = true }
 
-function selectSection(idx) { selectedIdx.value = idx }
-function removeSection(idx) { sections.value.splice(idx, 1); if (selectedIdx.value === idx) selectedIdx.value = -1; dirty.value = true }
-function moveSection(idx, dir) {
-  const newIdx = idx + dir
-  if (newIdx < 0 || newIdx >= sections.value.length) return
-  const tmp = sections.value[newIdx]
-  sections.value[newIdx] = sections.value[idx]
-  sections.value[idx] = tmp
-  if (selectedIdx.value === idx) selectedIdx.value = newIdx
-  dirty.value = true
-}
+function selectSection(idx: number) { editor.selectSection(idx) }
+function removeSection(idx: number) { editor.removeSection(idx); dirty.value = true }
+function moveSection(idx: number, dir: number) { editor.moveSection(idx, dir); dirty.value = true }
 
-function onDragStart(e, comp) {
-  e.dataTransfer.setData('component', comp.component_code)
-  e.dataTransfer.effectAllowed = 'copy'
-}
-
-function onDrop(e) {
-  const code = e.dataTransfer.getData('component')
+function onDrop(e: DragEvent) {
+  const code = e.dataTransfer?.getData('component')
   if (!code) return
-  const comp = components.value.find(c => c.component_code === code)
+  const comp = getComponentByCode(code)
   if (!comp) return
-  const config = typeof comp.default_config === 'string' ? JSON.parse(comp.default_config) : { ...(comp.default_config || {}) }
-  const newSection = { id: 's' + Date.now(), component: code, config }
-  const insertAt = dragOverIdx.value >= 0 ? dragOverIdx.value : sections.value.length
-  sections.value.splice(insertAt, 0, newSection)
-  selectedIdx.value = insertAt
+  editor.addSection(comp, dragOverIdx.value >= 0 ? dragOverIdx.value : -1)
+  selectedIdxs.value = [selectedIdxs.value[0] ?? sections.value.length - 1]
   dragOverIdx.value = -1
   dirty.value = true
 }
 
-function onSectionDragStart(e, idx) { e.dataTransfer.setData('sectionIdx', String(idx)); e.dataTransfer.effectAllowed = 'move' }
-function onSectionDragOver(e, idx) { dragOverIdx.value = idx }
-function onSectionDrop(e, idx) {
-  const fromIdx = parseInt(e.dataTransfer.getData('sectionIdx'))
-  if (!isNaN(fromIdx) && fromIdx !== idx) {
-    const item = sections.value.splice(fromIdx, 1)[0]
-    sections.value.splice(idx, 0, item)
-    selectedIdx.value = idx
-    dirty.value = true
-  }
+function onDragStart(e: DragEvent, comp: any) {
+  e.dataTransfer?.setData('component', comp.component_code)
+  e.dataTransfer!.effectAllowed = 'copy'
+}
+
+function onSectionDragStart(e: DragEvent, idx: number) { e.dataTransfer?.setData('sectionIdx', String(idx)); e.dataTransfer!.effectAllowed = 'move' }
+function onSectionDragOver(_e: DragEvent, idx: number) { dragOverIdx.value = idx }
+function onSectionDrop(e: DragEvent, toIdx: number) {
+  const fromIdx = parseInt(e.dataTransfer?.getData('sectionIdx') || '')
+  if (!isNaN(fromIdx)) { editor.reorderSection(fromIdx, toIdx); dirty.value = true }
   dragOverIdx.value = -1
 }
 
-// 图层面板拖拽排序
-function onLayerDragStart(e, idx) { e.dataTransfer.setData('layerIdx', String(idx)); e.dataTransfer.effectAllowed = 'move' }
-function onLayerDragOver(e, idx) { e.dataTransfer.dropEffect = 'move' }
-function onLayerDrop(e, targetIdx) {
-  const fromIdx = parseInt(e.dataTransfer.getData('layerIdx'))
-  if (isNaN(fromIdx) || fromIdx === targetIdx) return
-  const [moved] = sections.value.splice(fromIdx, 1)
-  sections.value.splice(targetIdx, 0, moved)
-  if (selectedIdx.value === fromIdx) selectedIdx.value = targetIdx
-  dirty.value = true
-}
-
-async function loadComponents() {
-  try { const res = await $fetch('/api/diy/components'); components.value = res.data || [] }
-  catch (e) { toast.error('加载组件库失败') }
+function onLayerDragStart(e: DragEvent, idx: number) { e.dataTransfer?.setData('layerIdx', String(idx)); e.dataTransfer!.effectAllowed = 'move' }
+function onLayerDragOver(_e: DragEvent, _idx: number) { e.dataTransfer!.dropEffect = 'move' }
+function onLayerDrop(e: DragEvent, targetIdx: number) {
+  const fromIdx = parseInt(e.dataTransfer?.getData('layerIdx') || '')
+  if (!isNaN(fromIdx) && fromIdx !== targetIdx) { editor.reorderSection(fromIdx, targetIdx); dirty.value = true }
 }
 
 async function loadPage() {
   const id = route.query.id
-  if (!id) { $router.replace('/diy'); return }
+  if (!id) { navigateTo('/diy'); return }
   try {
     const res = await $fetch(`/api/diy/${id}`)
     pageInfo.value = res.data
-    const config = typeof res.data.config_json === 'string' ? JSON.parse(res.data.config_json) : res.data.config_json
-    sections.value = config?.sections || []
-  } catch (e) { toast.error('加载页面失败') }
+    editor.loadFromConfig(res.data.config_json)
+  } catch { toast.error('加载页面失败') }
 }
 
 async function savePage() {
   saving.value = true
   try {
-    const body = { config_json: { sections: sections.value } }
+    const body = { config_json: editor.toConfigJson() }
     await $fetch(`/api/diy/${pageInfo.value.id}`, { method: 'PUT', body })
     dirty.value = false
     toast.success('保存成功')
@@ -339,7 +310,7 @@ async function saveVersion() {
   const remark = prompt('版本备注 (可选):')
   saving.value = true
   try {
-    await $fetch(`/api/diy/${pageInfo.value.id}/versions`, { method: 'POST', body: { configJson: { sections: sections.value }, remark: remark || undefined } })
+    await $fetch(`/api/diy/${pageInfo.value.id}/versions`, { method: 'POST', body: { configJson: editor.toConfigJson(), remark: remark || undefined } })
     toast.success('版本已保存')
   } catch (e) { toast.error('保存版本失败: ' + (e.data?.msg || e.message)) }
   finally { saving.value = false }
@@ -348,7 +319,7 @@ async function saveVersion() {
 async function publishPage() {
   publishing.value = true
   try {
-    await $fetch(`/api/diy/${pageInfo.value.id}`, { method: 'PUT', body: { config_json: { sections: sections.value } } })
+    await $fetch(`/api/diy/${pageInfo.value.id}`, { method: 'PUT', body: { config_json: editor.toConfigJson() } })
     await $fetch(`/api/diy/${pageInfo.value.id}/publish`, { method: 'POST' })
     dirty.value = false
     toast.success('发布成功！访问地址：/diy/preview?slug=' + pageInfo.value.slug)
@@ -396,7 +367,14 @@ async function rollbackVersion() {
   } catch { toast.error('回滚失败') }
 }
 
-onMounted(async () => { await loadComponents(); await loadPage() })
+// 自动保存
+const autoSave = useDiyAutoSave(
+  computed(() => pageInfo.value?.id),
+  () => editor.toConfigJson(),
+)
+autoSave.start()
+
+onMounted(async () => { await loadPage() })
 </script>
 
 <style scoped>
@@ -415,6 +393,7 @@ onMounted(async () => { await loadComponents(); await loadPage() })
 .comp-item:hover { background: var(--brand-light); border-color: var(--brand); }
 .comp-icon { font-size: 16px; width: 20px; text-align: center; }
 .center-canvas { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; max-width: 430px; margin: 0 auto; }
+.center-canvas.canvas-pc { max-width: 960px; }
 .canvas-placeholder { text-align: center; padding: 80px 20px; color: var(--text-muted); font-size: 15px; border: 2px dashed var(--border-light); border-radius: 12px; }
 .canvas-section { background: var(--bg-card); border-radius: 8px; border: 2px solid transparent; overflow: hidden; cursor: pointer; transition: border-color .15s; }
 .canvas-section.selected { border-color: var(--brand); }
@@ -459,6 +438,10 @@ onMounted(async () => { await loadComponents(); await loadPage() })
 .btn-primary { background: var(--brand); color: #fff; }
 .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
 .btn-outline { background: var(--bg-card); border: 1px solid var(--border-light); color: var(--text-primary); }
+.btn-sm { padding: 4px 12px; font-size: 12px; }
+.btn-icon-btn { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-light); border-radius: 6px; background: var(--bg-card); cursor: pointer; font-size: 16px; color: var(--text-secondary); }
+.btn-icon-btn:hover { border-color: var(--brand); color: var(--brand); }
+.btn-icon-btn:disabled { opacity: .3; cursor: not-allowed; }
 .btn-ghost { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 13px; }
 
 /* ── 版本历史 Modal ── */
