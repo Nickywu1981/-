@@ -7,7 +7,7 @@ import { BusinessError } from '../utils/businessError.js';
  */
 import { submitJob } from './job-queue.service.js';
 import * as moderationService from './moderation.service.js';
-import db from '../dao/db.js';
+import videoTranslateDao from '../dao/videoTranslateDao.js';
 
 /**
  * 视频语音翻译 (语音翻译成其他语言配音)
@@ -78,13 +78,7 @@ export async function translateFace(userId, {
  * 获取用户翻译历史
  */
 export async function getUserTranslateHistory(userId, { type, page = 1, limit = 20 } = {}) {
-  const offset = (page - 1) * limit;
-  const prefix = type ? `video_${type}_translate` : 'video_%_translate';
-  const [rows] = await db.query(
-    'SELECT * FROM user_works WHERE user_id = ? AND task_category LIKE ? ORDER BY create_time DESC LIMIT ? OFFSET ?',
-    [userId, prefix, limit, offset],
-  );
-  return rows;
+  return videoTranslateDao.findByUser(userId, { taskType: type || null, page, limit });
 }
 
 // 支持的语言列表
