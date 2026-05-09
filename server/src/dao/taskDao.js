@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { tenantPool } from './tenantPool.js';
+import logger from '../utils/logger.js';
 
 function pool() {
   return tenantPool();
@@ -100,7 +101,7 @@ export async function completeTask(taskId, userId, { progressMsg = '完成', out
   const task = await getTask(taskId, userId);
   if (task) {
     const { notifyComplete } = await import('../services/taskNotifier.js');
-    notifyComplete(taskId, userId, { type: task.type, title: task.title, result: outputResult }).catch(() => {});
+    notifyComplete(taskId, userId, { type: task.type, title: task.title, result: outputResult }).catch(err => logger.warn('[TaskComplete] notify failed', { taskId, error: err.message }));
   }
 }
 

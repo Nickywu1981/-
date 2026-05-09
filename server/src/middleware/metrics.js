@@ -5,6 +5,7 @@
  * 采集: HTTP QPS、响应耗时、状态码分布、队列积压
  */
 import { success } from '../utils/response.js';
+import logger from '../utils/logger.js';
 
 // ========================= 指标存储 =========================
 
@@ -56,7 +57,7 @@ export function metricsEndpoint(req, res) {
       if (pool?._allConnections) {
         metrics.db_pool_size = pool._allConnections.length;
       }
-    }).catch(() => {});
+    }).catch(err => logger.warn('[Metrics] db pool read failed', { error: err.message }));
   } catch { /* noop */ }
 
   // 序列化为 Prometheus 格式

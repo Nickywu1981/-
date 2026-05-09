@@ -1,4 +1,5 @@
 import { cacheGet, cacheSet } from '../dao/redis.js';
+import logger from '../utils/logger.js';
 
 /**
  * Redis 缓存中间件
@@ -29,7 +30,7 @@ export function cacheMiddleware(ttl = 300, keyFn) {
       const originalJson = res.json.bind(res);
       res.json = function (body) {
         if (res.statusCode === 200 && body?.code === 200) {
-          cacheSet(cacheKey, body, ttl).catch(() => {});
+          cacheSet(cacheKey, body, ttl).catch(err => logger.warn('[Cache] write failed', { key: cacheKey, error: err.message }));
         }
         res.setHeader('X-Cache', 'MISS');
         return originalJson(body);
