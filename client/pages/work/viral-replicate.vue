@@ -63,6 +63,7 @@
         <div class="input-group" style="margin-top:16px">
           <label>自定义提示词（可选，覆盖AI自动生成的提示词）</label>
           <textarea v-model="customPrompt" class="input" rows="2" placeholder="自定义提示词..." :disabled="!analysisDone"></textarea>
+          <PromptEnhancer v-if="analysisDone && customPrompt.trim()" mode="video" :initial-prompt="customPrompt" @applied="(v) => customPrompt = v" />
         </div>
       </div>
 
@@ -89,6 +90,7 @@ import { ref, computed } from 'vue'
 import { useAppPage } from '~/composables/useAppPage'
 import { useTaskPolling } from '~/composables/useTaskPolling'
 import { copyToClipboard } from '@/utils/format'
+import PromptEnhancer from '~/components/PromptEnhancer.vue'
 
 definePageMeta({ layout: 'workspace' })
 

@@ -5,6 +5,7 @@
         <div class="ws-section__title">输入配音文案</div>
         <textarea class="ws-textarea" v-model="text" placeholder="输入需要配音的文案内容..." rows="5"></textarea>
         <div class="ws-hint">{{ text.length }} / 1000 字符 · 支持中/英/日/韩多语种</div>
+        <PromptEnhancer v-if="text.trim()" mode="script" :initial-prompt="text" @applied="(v) => text = v" />
       </div>
       <div class="ws-section">
         <div class="ws-section__title">选择音色</div>
@@ -47,6 +48,8 @@
 </template>
 
 <script setup lang="ts">
+import PromptEnhancer from '~/components/PromptEnhancer.vue'
+
 
 const steps = ['输入文案', '选择音色', '生成语音']
 const currentStep = ref(0)

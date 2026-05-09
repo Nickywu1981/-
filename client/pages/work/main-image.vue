@@ -44,6 +44,12 @@
         <button class="btn-outline" @click="step = 1">返回</button>
         <button class="btn" :disabled="!selectedStyle" @click="submitTask">开始生成</button>
       </div>
+
+      <!-- 提示词润色 -->
+      <div class="enhance-section">
+        <p class="enhance-label">不确定怎么描述？让 AI 帮你优化</p>
+        <PromptEnhancer mode="image" :initial-prompt="stylePrompt" @applied="(v) => stylePrompt = v" />
+      </div>
     </div>
 
     <!-- Step 4: 生成中 / 结果 -->
@@ -73,12 +79,15 @@
 
 <script setup lang="ts">
 
+import PromptEnhancer from '~/components/PromptEnhancer.vue'
+
 const step = ref(0);
 const previewUrl = ref('');
 const uploadedUrl = ref('');
 const uploading = ref(false);
 const selectedPlatform = ref('');
 const selectedStyle = ref('');
+const stylePrompt = ref('');
 const task = useTask();
 
 const platforms = [

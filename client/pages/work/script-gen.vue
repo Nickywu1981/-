@@ -7,6 +7,9 @@
         <button v-for="q in quickInputs" :key="q.label" class="quick-btn" @click="productInfo = q.text">{{ q.label }}</button>
       </div>
       <button v-if="productInfo.trim()" class="btn" @click="step = 1">下一步：选脚本类型</button>
+
+      <!-- 提示词润色 -->
+      <PromptEnhancer v-if="productInfo.trim()" mode="script" :initial-prompt="productInfo" @applied="(v) => productInfo = v" />
     </div>
 
     <div v-else-if="step === 1" class="select-section">
@@ -91,6 +94,8 @@
 </template>
 
 <script setup lang="ts">
+
+import PromptEnhancer from '~/components/PromptEnhancer.vue'
 
 const step = ref(0);
 const productInfo = ref('');

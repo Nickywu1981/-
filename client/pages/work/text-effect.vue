@@ -5,7 +5,9 @@
       <p class="step-desc">输入要生成特效的文字，选择特效风格后 AI 自动渲染</p>
       <textarea v-model="text" placeholder="请输入要添加特效的文字，例如：限时特卖..." rows="5" class="text-input" maxlength="100" />
       <p class="char-count">{{ text.length }}/100</p>
-      <div v-if="text.trim()" class="actions"><button class="btn-primary" @click="step = 1">下一步：选择特效 →</button></div>
+      <div v-if="text.trim()" class="actions">
+        <PromptEnhancer mode="image" :initial-prompt="text" @applied="(v) => text = v" />
+        <button class="btn-primary" @click="step = 1">下一步：选择特效 →</button></div>
     </div>
 
     <div v-else-if="step === 1" class="step-content">
@@ -43,6 +45,8 @@
 </template>
 
 <script setup lang="ts">
+
+import PromptEnhancer from '~/components/PromptEnhancer.vue'
 
 const step = ref(0); const text = ref(''); const selectedEffect = ref('neon')
 const processing = ref(false); const resultUrl = ref('')

@@ -26,6 +26,7 @@
         <div class="input-group">
           <label>商品卖点 (选填，每行一个)</label>
           <textarea v-model="highlightsText" class="input" rows="4" placeholder="防水材质，透气舒适&#10;耐磨鞋底，防滑设计&#10;..."></textarea>
+          <PromptEnhancer v-if="highlightsText.trim()" mode="detail" :initial-prompt="highlightsText" @applied="(v) => highlightsText = v" />
         </div>
 
         <AppMediaUpload accept="image" :multiple="true" :max-size="20" :max-count="10" @uploaded="onImagesUploaded" />
@@ -70,6 +71,7 @@ import { ref, computed } from 'vue'
 import { useAppPage } from '~/composables/useAppPage'
 import { useTaskPolling } from '~/composables/useTaskPolling'
 import { useAppDict } from '~/composables/useAppDict'
+import PromptEnhancer from '~/components/PromptEnhancer.vue'
 
 definePageMeta({ layout: 'workspace' })
 

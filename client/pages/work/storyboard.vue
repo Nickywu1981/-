@@ -9,6 +9,7 @@
           <span class="tag-label">快捷模板：</span>
           <button v-for="t in quickTemplates" :key="t.label" class="tag-btn" @click="scriptText = t.text">{{ t.label }}</button>
         </div>
+        <PromptEnhancer v-if="scriptText.trim()" mode="script" :initial-prompt="scriptText" @applied="(v) => scriptText = v" />
       </div>
       <div class="ws-section">
         <div class="ws-section__title">画面风格</div>
@@ -51,6 +52,8 @@
 </template>
 
 <script setup lang="ts">
+import PromptEnhancer from '~/components/PromptEnhancer.vue'
+
 
 const currentStep = ref(0)
 const steps = ['输入脚本', '选择风格', '生成分镜']
