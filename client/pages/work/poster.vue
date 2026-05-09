@@ -345,10 +345,14 @@ function downloadImage(url) {
 async function copyImage(url) {
   if (!url) return;
   try {
-    const resp = await fetch(url);
-    const blob = await resp.blob();
-    await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
-    toast.success('已复制到剪贴板');
+    if (navigator.clipboard && typeof ClipboardItem !== 'undefined') {
+      const resp = await fetch(url);
+      const blob = await resp.blob();
+      await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+      toast.success('已复制到剪贴板');
+    } else {
+      window.open(url, '_blank');
+    }
   } catch {
     window.open(url, '_blank');
   }

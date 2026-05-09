@@ -162,6 +162,8 @@ app.get('/api/health', async (_req, res) => {
   try { const db = await import('./dao/db.js'); const conn = await db.default.getConnection(); const [tables] = await conn.query('SHOW TABLES'); status.checks.db = true; schemaVersion = tables.length; conn.release(); } catch { /* ignore */ }
   try { const redis = await import('./dao/redis.js'); await redis.default.ping(); status.checks.redis = true; } catch { /* ignore */ }
   try { const { listModels } = await import('./services/aiEngine.js'); for (const m of listModels()) { status.checks.ai[m.id] = m.health ? (await m.health()).status : 'unknown'; } } catch { /* ignore */ }
+  // BullMQ 队列指标
+  try { const { getAllQueueStats } = await import('./services/queueManager.js'); status.queues = await getAllQueueStats(); } catch { status.queues = {}; }
   const aiOnline = Object.values(status.checks.ai).filter((s) => s === 'ok').length;
   const aiTotal = Object.keys(status.checks.ai).length;
   status.schema_version = schemaVersion;

@@ -32,7 +32,7 @@
         <div class="card-preview">
           <img v-if="item.thumbnail" :src="item.thumbnail" :alt="item.title" @error="onImgError" />
           <span v-else class="card-placeholder">{{ item.type === 'video' ? '🎬' : '🖼️' }}</span>
-          <button class="card-remove" title="取消收藏" @click.stop="removeFavorite(item.id)">×</button>
+          <button class="card-remove" title="取消收藏" aria-label="取消收藏" @click.stop="removeFavorite(item.id)">×</button>
         </div>
         <div class="card-body">
           <span class="card-type">{{ typeLabel(item.type) }}</span>
