@@ -44,8 +44,8 @@ export async function freezeCredit(userId, requestId, action, batchCount = 1, is
 
     const plan = await creditDao.getPlanByType(membership.plan_type);
 
-    const dailyUsed = await creditDao.getDailyUsedCredits(userId);
-    const monthlyUsed = await creditDao.getMonthlyUsedCredits(userId);
+    const dailyUsed = await creditDao.getDailyUsedCredits(userId, conn);
+    const monthlyUsed = await creditDao.getMonthlyUsedCredits(userId, conn);
     if (plan && plan.daily_limit > 0 && dailyUsed + consumedAmount > plan.daily_limit) {
       await conn.rollback();
       throw new BusinessError(4103, '超出每日消费上限');
@@ -65,7 +65,7 @@ export async function freezeCredit(userId, requestId, action, batchCount = 1, is
       throw new BusinessError(4103, '点数不足，请升级会员');
     }
 
-    const ok = await creditDao.updateCreditBalance(userId, -consumedAmount);
+    const ok = await creditDao.updateCreditBalance(userId, -consumedAmount, conn);
     if (!ok) {
       await conn.rollback();
       throw new BusinessError(500, '扣费失败');
@@ -149,14 +149,14 @@ export async function consumeCredit(userId, action, batchCount = 1) {
         throw new BusinessError(4103, `单次批量上限为 ${plan.batch_limit} 张`);
       }
       if (plan.daily_limit > 0) {
-        const dailyUsed = await creditDao.getDailyUsedCredits(userId);
+        const dailyUsed = await creditDao.getDailyUsedCredits(userId, conn);
         if (dailyUsed + consumed > plan.daily_limit) {
           await conn.rollback();
           throw new BusinessError(4103, '超出每日消费上限');
         }
       }
       if (plan.monthly_limit > 0) {
-        const monthlyUsed = await creditDao.getMonthlyUsedCredits(userId);
+        const monthlyUsed = await creditDao.getMonthlyUsedCredits(userId, conn);
         if (monthlyUsed + consumed > plan.monthly_limit) {
           await conn.rollback();
           throw new BusinessError(4103, '超出每月消费上限');
@@ -170,7 +170,7 @@ export async function consumeCredit(userId, action, batchCount = 1) {
       throw new BusinessError(4103, '点数不足');
     }
 
-    const ok = await creditDao.updateCreditBalance(userId, -consumed);
+    const ok = await creditDao.updateCreditBalance(userId, -consumed, conn);
     if (!ok) {
       await conn.rollback();
       throw new BusinessError(500, '扣费失败');

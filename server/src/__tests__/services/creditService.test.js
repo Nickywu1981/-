@@ -75,7 +75,7 @@ describe('creditService', () => {
       const r = await creditService.consumeCredit(1, 'cutout');
       expect(r.success).toBe(true);
       expect(r.creditBefore).toBe(10);
-      expect(creditDao.updateCreditBalance).toHaveBeenCalledWith(1, -1);
+      expect(creditDao.updateCreditBalance).toHaveBeenCalledWith(1, -1, expect.any(Object));
     });
 
     it('批量计算折扣', async () => {

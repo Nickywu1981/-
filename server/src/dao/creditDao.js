@@ -16,8 +16,9 @@ export async function getMembershipForUpdate(conn, userId) {
   return rows[0] || null;
 }
 
-export async function updateCreditBalance(userId, delta) {
-  const [result] = await pool.execute(
+export async function updateCreditBalance(userId, delta, conn) {
+  const db = conn || pool;
+  const [result] = await db.execute(
     'UPDATE user_membership SET credit_balance = credit_balance + ? WHERE user_id = ? AND status = 1 AND is_deleted = 0 AND credit_balance + ? >= 0',
     [delta, userId, delta],
   );
@@ -79,16 +80,18 @@ export async function getConsumptionByRequestId(requestId) {
   return rows[0] || null;
 }
 
-export async function getDailyUsedCredits(userId) {
-  const [rows] = await pool.execute(
+export async function getDailyUsedCredits(userId, conn) {
+  const db = conn || pool;
+  const [rows] = await db.execute(
     'SELECT IFNULL(SUM(consumed), 0) AS used FROM consumption_record WHERE user_id = ? AND status = 1 AND type = 2 AND DATE(create_time) = CURDATE()',
     [userId],
   );
   return rows[0].used;
 }
 
-export async function getMonthlyUsedCredits(userId) {
-  const [rows] = await pool.execute(
+export async function getMonthlyUsedCredits(userId, conn) {
+  const db = conn || pool;
+  const [rows] = await db.execute(
     'SELECT IFNULL(SUM(consumed), 0) AS used FROM consumption_record WHERE user_id = ? AND status = 1 AND type = 2 AND YEAR(create_time) = YEAR(CURDATE()) AND MONTH(create_time) = MONTH(CURDATE())',
     [userId],
   );
