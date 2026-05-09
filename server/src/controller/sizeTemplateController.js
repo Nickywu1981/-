@@ -10,8 +10,8 @@ export async function getAllPlatforms(req, res, next) {
     const data = await sizeTemplateService.getAllPlatformSizes();
     return sendSuccess(res, data);
   } catch (err) {
-    if (err.statusCode) {
-      return sendError(res, err.statusCode, err.message);
+    if (err.status) {
+      return sendError(res, err.status, err.message);
     }
     next(err);
   }
@@ -55,8 +55,8 @@ export async function createUserTemplate(req, res, next) {
     const data = await sizeTemplateService.createUserTemplate(req.user.id, { name, width, height, platform });
     return sendSuccess(res, data, '模板创建成功');
   } catch (err) {
-    if (err.statusCode) {
-      return sendError(res, err.statusCode, err.message);
+    if (err.status) {
+      return sendError(res, err.status, err.message);
     }
     next(err);
   }
@@ -85,8 +85,8 @@ export async function updateUserTemplate(req, res, next) {
     const data = await sizeTemplateService.updateUserTemplate(req.user.id, req.params.id, { name, width, height, platform });
     return sendSuccess(res, data, '模板更新成功');
   } catch (err) {
-    if (err.statusCode) {
-      return sendError(res, err.statusCode, err.message);
+    if (err.status) {
+      return sendError(res, err.status, err.message);
     }
     next(err);
   }
@@ -101,8 +101,8 @@ export async function deleteUserTemplate(req, res, next) {
     const data = await sizeTemplateService.deleteUserTemplate(req.user.id, req.params.id);
     return sendSuccess(res, data, '模板已删除');
   } catch (err) {
-    if (err.statusCode) {
-      return sendError(res, err.statusCode, err.message);
+    if (err.status) {
+      return sendError(res, err.status, err.message);
     }
     next(err);
   }

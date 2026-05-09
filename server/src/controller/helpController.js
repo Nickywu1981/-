@@ -9,17 +9,17 @@ export async function getFaqs(req, res) {
     const data = await helpService.getFaqs({ keyword, page, pageSize });
     success(res, data);
   } catch (e) {
-    error(res, e.message, 500);
+    error(res, e.status || 500, e.message);
   }
 }
 
 export async function getFaqById(req, res) {
   try {
     const faq = await helpService.getFaqById(req.params.id);
-    if (!faq) return error(res, 'FAQ不存在', 404);
+    if (!faq) return error(res, 404, 'FAQ不存在');
     success(res, faq);
   } catch (e) {
-    error(res, e.message, 500);
+    error(res, e.status || 500, e.message);
   }
 }
 
@@ -28,7 +28,7 @@ export async function createFaq(req, res) {
     const id = await helpService.createFaq(req.body);
     success(res, { id }, '创建成功');
   } catch (e) {
-    error(res, e.message, 500);
+    error(res, e.status || 500, e.message);
   }
 }
 
@@ -37,7 +37,7 @@ export async function updateFaq(req, res) {
     await helpService.updateFaq(req.params.id, req.body);
     success(res, null, '更新成功');
   } catch (e) {
-    error(res, e.message, 500);
+    error(res, e.status || 500, e.message);
   }
 }
 
@@ -46,6 +46,6 @@ export async function deleteFaq(req, res) {
     await helpService.deleteFaq(req.params.id);
     success(res, null, '删除成功');
   } catch (e) {
-    error(res, e.message, 500);
+    error(res, e.status || 500, e.message);
   }
 }

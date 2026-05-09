@@ -6,7 +6,7 @@ export const getPublicSiteConfig = async (req, res) => {
   try {
     const map = await getPublicConfigMap();
     success(res, map);
-  } catch (__) { error(res, 'Failed to load site config', 500); }
+  } catch (__) { error(res, 500, 'Failed to load site config'); }
 };
 
 // GET /api/admin/site-config - admin only
@@ -14,17 +14,17 @@ export const listAllConfig = async (req, res) => {
   try {
     const rows = await getAllConfig();
     success(res, rows);
-  } catch (__) { error(res, 'Failed to load config', 500); }
+  } catch (__) { error(res, 500, 'Failed to load config'); }
 };
 
 // POST /api/admin/site-config - admin only
 export const createConfig = async (req, res) => {
   try {
     const { key, value, type, description } = req.body;
-    if (!key || value === undefined) return error(res, 'key and value required', 400);
+    if (!key || value === undefined) return error(res, 400, 'key and value required');
     await saveConfig(key, typeof value === 'object' ? JSON.stringify(value) : String(value), type || 'text', description || '');
     success(res, { key }, 'Config created');
-  } catch (__) { error(res, 'Failed to create config', 500); }
+  } catch (__) { error(res, 500, 'Failed to create config'); }
 };
 
 // PUT /api/admin/site-config/:key - admin only
@@ -32,17 +32,17 @@ export const updateConfig = async (req, res) => {
   try {
     const { key } = req.params;
     const { value, type, description } = req.body;
-    if (!key || value === undefined) return error(res, 'key and value required', 400);
+    if (!key || value === undefined) return error(res, 400, 'key and value required');
     await saveConfig(key, typeof value === 'object' ? JSON.stringify(value) : String(value), type || 'text', description || '');
     success(res, { key }, 'Config updated');
-  } catch (__) { error(res, 'Failed to update config', 500); }
+  } catch (__) { error(res, 500, 'Failed to update config'); }
 };
 
 // DELETE /api/admin/site-config/:id - admin only
 export const removeConfig = async (req, res) => {
   try {
     const affected = await deleteConfig(Number(req.params.id));
-    if (!affected) return error(res, 'Not found', 404);
+    if (!affected) return error(res, 404, 'Not found');
     success(res, null, 'Config deleted');
-  } catch (__) { error(res, 'Failed to delete config', 500); }
+  } catch (__) { error(res, 500, 'Failed to delete config'); }
 };

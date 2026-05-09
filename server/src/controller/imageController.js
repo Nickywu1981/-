@@ -16,7 +16,7 @@ export async function submitMainImage(req, res, next) {
     const data = await imageService.submitMainImage(req.user.id, { imageUrl, platform, style });
     return success(res, data, '主图任务已提交');
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }
@@ -34,7 +34,7 @@ export async function submitSceneImage(req, res, next) {
     const data = await imageService.submitSceneImage(req.user.id, { imageUrl, sceneCategory, customBgUrl });
     return success(res, data, '场景图任务已提交');
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }
@@ -52,7 +52,7 @@ export async function submitDetailH5(req, res, next) {
     const data = await imageService.submitDetailH5(req.user.id, { imageUrl, category, templateId });
     return success(res, data, '详情页任务已提交');
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }
@@ -70,7 +70,7 @@ export async function submitBatchTask(req, res, next) {
     const data = await imageService.submitBatchTask(req.user.id, { imageUrls, operation, platform, style });
     return success(res, data, '批量任务已提交');
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }
@@ -88,7 +88,7 @@ export async function submitRetouch(req, res, next) {
     const data = await imageService.submitRetouch(req.user.id, { imageUrl, level, features });
     return success(res, data, '精修任务已提交');
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }
@@ -106,7 +106,7 @@ export async function submitRemoveBg(req, res, next) {
     const data = await imageService.submitRemoveBg(req.user.id, { imageUrl, format });
     return success(res, data, '抠图任务已提交');
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }
@@ -124,7 +124,7 @@ export async function submitWhiteBg(req, res, next) {
     const data = await imageService.submitWhiteBg(req.user.id, { imageUrl, bgColor });
     return success(res, data, '白底图任务已提交');
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }
@@ -138,7 +138,7 @@ export async function getTaskResult(req, res, next) {
     const data = await imageService.getTaskResult(req.params.taskId, req.user.id);
     return success(res, data);
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }

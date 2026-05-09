@@ -10,7 +10,7 @@ export async function submitVirtualTryon(req, res, next) {
     const data = await advService.submitVirtualTryon(req.user.id, { productImageUrl, skinTone, bodyType, style });
     return success(res, data, '虚拟模特任务已提交');
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }
@@ -22,7 +22,7 @@ export async function submitColorSwap(req, res, next) {
     const data = await advService.submitColorSwap(req.user.id, { productImageUrl, targetColors, preserveTexture });
     return success(res, data, '换色任务已提交');
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }
@@ -34,7 +34,7 @@ export async function submitStyleTransfer(req, res, next) {
     const data = await advService.submitStyleTransfer(req.user.id, { productImageUrl, targetStyle, strength });
     return success(res, data, '风格转化任务已提交');
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }
@@ -46,7 +46,7 @@ export async function submitWrinkleRemove(req, res, next) {
     const data = await advService.submitWrinkleRemove(req.user.id, { productImageUrl, fabricType });
     return success(res, data, '去褶皱任务已提交');
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }
@@ -59,7 +59,7 @@ export async function submitImageTranslate(req, res, next) {
     const data = await advService.submitImageTranslate(req.user.id, { productImageUrl, sourceLang, targetLang });
     return success(res, data, '图片翻译任务已提交');
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }
@@ -71,7 +71,7 @@ export async function submitOutpainting(req, res, next) {
     const data = await advService.submitOutpainting(req.user.id, { productImageUrl, direction, ratio });
     return success(res, data, '扩图任务已提交');
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }
@@ -83,7 +83,7 @@ export async function submitGhostMannequin(req, res, next) {
     const data = await advService.submitGhostMannequin(req.user.id, { productImageUrl, effect, category });
     return success(res, data, '幽灵模特任务已提交');
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }
@@ -93,7 +93,7 @@ export async function getTaskResult(req, res, next) {
     const data = await advService.getTaskResult(req.params.taskId, req.user.id);
     return success(res, data);
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }
@@ -116,7 +116,7 @@ export async function submitModelGenerate(req, res, next) {
     if (!imageUrl) return error(res, ERROR_CODE.PARAM_MISSING, '请上传商品图片');
     const data = await advService.submitModelGenerate(req.user.id, { imageUrl, modelType });
     return success(res, data, '模特生成任务已提交');
-  } catch (err) { if (err.statusCode) return error(res, err.statusCode, err.message); next(err); }
+  } catch (err) { if (err.status) return error(res, err.status, err.message); next(err); }
 }
 
 export async function submitShotPanorama(req, res, next) {
@@ -125,7 +125,7 @@ export async function submitShotPanorama(req, res, next) {
     if (!imageUrl) return error(res, ERROR_CODE.PARAM_MISSING, '请上传商品图片');
     const data = await advService.submitShotPanorama(req.user.id, { imageUrl, mode });
     return success(res, data, '全景拍摄任务已提交');
-  } catch (err) { if (err.statusCode) return error(res, err.statusCode, err.message); next(err); }
+  } catch (err) { if (err.status) return error(res, err.status, err.message); next(err); }
 }
 
 export async function submitSwapFace(req, res, next) {
@@ -134,7 +134,7 @@ export async function submitSwapFace(req, res, next) {
     if (!baseUrl || !faceUrl) return error(res, ERROR_CODE.PARAM_MISSING, '请上传底图和面部图片');
     const data = await advService.submitSwapFace(req.user.id, { baseUrl, faceUrl });
     return success(res, data, 'AI换脸任务已提交');
-  } catch (err) { if (err.statusCode) return error(res, err.statusCode, err.message); next(err); }
+  } catch (err) { if (err.status) return error(res, err.status, err.message); next(err); }
 }
 
 export async function submitTextEffect(req, res, next) {
@@ -143,5 +143,5 @@ export async function submitTextEffect(req, res, next) {
     if (!text) return error(res, ERROR_CODE.PARAM_MISSING, '请输入文字内容');
     const data = await advService.submitTextEffect(req.user.id, { text, effect });
     return success(res, data, '文字特效任务已提交');
-  } catch (err) { if (err.statusCode) return error(res, err.statusCode, err.message); next(err); }
+  } catch (err) { if (err.status) return error(res, err.status, err.message); next(err); }
 }

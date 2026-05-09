@@ -27,14 +27,14 @@ export async function createPage(req, res) {
     const { title, slug, pageType, accessType, mobileConfig, pcConfig, metaJson } = req.body;
     const page = await diyService.createPage(req.tenantId, req.user?.id, { title, slug, pageType, accessType, mobileConfig, pcConfig, metaJson });
     return success(res, page, '页面创建成功');
-  } catch (err) { return error(res, err.statusCode || ERROR_CODE.INTERNAL_ERROR, err.message); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 }
 
 export async function updatePage(req, res) {
   try {
     const page = await diyService.updatePage(req.params.id, req.tenantId, req.body);
     return success(res, page, '更新成功');
-  } catch (err) { return error(res, err.statusCode || ERROR_CODE.INTERNAL_ERROR, err.message); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 }
 
 // ==================== 状态机操作 ====================
@@ -43,42 +43,42 @@ export async function publishPage(req, res) {
   try {
     const result = await diyService.publishPage(req.params.id, req.tenantId);
     return success(res, result.page, result.msg);
-  } catch (err) { return error(res, err.statusCode || ERROR_CODE.INTERNAL_ERROR, err.message); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 }
 
 export async function unpublishPage(req, res) {
   try {
     const result = await diyService.unpublishPage(req.params.id, req.tenantId);
     return success(res, null, result.msg);
-  } catch (err) { return error(res, err.statusCode || ERROR_CODE.INTERNAL_ERROR, err.message); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 }
 
 export async function republishPage(req, res) {
   try {
     const result = await diyService.republishPage(req.params.id, req.tenantId);
     return success(res, result.page, result.msg);
-  } catch (err) { return error(res, err.statusCode || ERROR_CODE.INTERNAL_ERROR, err.message); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 }
 
 export async function softDeletePage(req, res) {
   try {
     const result = await diyService.softDeletePage(req.params.id, req.tenantId);
     return success(res, null, result.msg);
-  } catch (err) { return error(res, err.statusCode || ERROR_CODE.INTERNAL_ERROR, err.message); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 }
 
 export async function restorePage(req, res) {
   try {
     const result = await diyService.restorePage(req.params.id, req.tenantId);
     return success(res, null, result.msg);
-  } catch (err) { return error(res, err.statusCode || ERROR_CODE.INTERNAL_ERROR, err.message); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 }
 
 export async function hardDeletePage(req, res) {
   try {
     const result = await diyService.hardDeletePage(req.params.id, req.tenantId);
     return success(res, null, result.msg);
-  } catch (err) { return error(res, err.statusCode || ERROR_CODE.INTERNAL_ERROR, err.message); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 }
 
 // ==================== 公开访问 ====================
@@ -97,7 +97,7 @@ export async function clonePage(req, res) {
   try {
     const page = await diyService.clonePage(req.params.id, req.tenantId);
     return success(res, page, '页面已克隆');
-  } catch (err) { return error(res, err.statusCode || ERROR_CODE.INTERNAL_ERROR, err.message); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 }
 
 // ==================== 版本管理 ====================
@@ -107,7 +107,7 @@ export async function autoSaveVersion(req, res) {
     const { mobileConfig, pcConfig } = req.body;
     const result = await diyService.saveVersion(req.params.id, req.tenantId, mobileConfig, pcConfig, null, { autoSave: true });
     return success(res, result);
-  } catch (err) { return error(res, err.statusCode || ERROR_CODE.INTERNAL_ERROR, err.message); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 }
 
 export async function saveVersion(req, res) {
@@ -115,7 +115,7 @@ export async function saveVersion(req, res) {
     const { mobileConfig, pcConfig, remark } = req.body;
     const result = await diyService.saveVersion(req.params.id, req.tenantId, mobileConfig, pcConfig, remark, { autoSave: false });
     return success(res, result, '版本已保存');
-  } catch (err) { return error(res, err.statusCode || ERROR_CODE.INTERNAL_ERROR, err.message); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 }
 
 export async function listVersions(req, res) {
@@ -123,7 +123,7 @@ export async function listVersions(req, res) {
     const { includeAuto } = req.query;
     const rows = await diyService.listVersions(req.params.id, req.tenantId, { includeAuto: includeAuto === 'true' });
     return success(res, rows);
-  } catch (err) { return error(res, err.statusCode || ERROR_CODE.INTERNAL_ERROR, err.message); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 }
 
 export async function getVersion(req, res) {
@@ -131,21 +131,21 @@ export async function getVersion(req, res) {
     const v = await diyService.getVersion(req.params.id, parseInt(req.params.version), req.tenantId);
     if (!v) return error(res, ERROR_CODE.NOT_FOUND, '版本不存在');
     return success(res, { version: v.version, mobileConfig: v.mobile_config, pcConfig: v.pc_config, remark: v.remark, autoSave: v.auto_save, rollbackFrom: v.rollback_from, createTime: v.create_time });
-  } catch (err) { return error(res, err.statusCode || ERROR_CODE.INTERNAL_ERROR, err.message); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 }
 
 export async function rollbackVersion(req, res) {
   try {
     const result = await diyService.rollbackVersion(req.params.id, parseInt(req.params.version), req.tenantId);
     return success(res, { version: result.version }, result.msg);
-  } catch (err) { return error(res, err.statusCode || ERROR_CODE.INTERNAL_ERROR, err.message); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 }
 
 export async function getLatestAutoVersion(req, res) {
   try {
     const v = await diyService.getLatestAutoVersion(req.params.id, req.tenantId);
     return success(res, v || null);
-  } catch (err) { return error(res, err.statusCode || ERROR_CODE.INTERNAL_ERROR, err.message); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 }
 
 // ==================== 批量操作 ====================

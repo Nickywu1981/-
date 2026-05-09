@@ -12,7 +12,7 @@ export async function submitImg2Video(req, res, next) {
     const data = await videoService.submitImg2Video(req.user.id, { imageUrl, style, duration, platform });
     return success(res, data, '视频任务已提交');
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }
@@ -26,7 +26,7 @@ export async function submitMulti2Video(req, res, next) {
     const data = await videoService.submitMulti2Video(req.user.id, { imageUrls, style, duration, sellPoints });
     return success(res, data, '多图合成任务已提交');
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }
@@ -40,7 +40,7 @@ export async function submitVideoPackaging(req, res, next) {
     const data = await videoService.submitVideoPackaging(req.user.id, { videoUrl, options });
     return success(res, data, '包装任务已提交');
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }
@@ -54,7 +54,7 @@ export async function submitActionTransfer(req, res, next) {
     const data = await videoService.submitActionTransfer(req.user.id, { sourceImageUrl, actionVideoUrl, targetAction });
     return success(res, data, '动作迁移任务已提交');
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }
@@ -68,7 +68,7 @@ export async function submitPersonReplace(req, res, next) {
     const data = await videoService.submitPersonReplace(req.user.id, { sourceImageUrl, targetPersonUrl });
     return success(res, data, '人物替换任务已提交');
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }
@@ -82,7 +82,7 @@ export async function submitDigitalHuman(req, res, next) {
     const data = await videoService.submitDigitalHuman(req.user.id, { script, voice, avatar, background });
     return success(res, data, '口播生成任务已提交');
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }
@@ -92,7 +92,7 @@ export async function getVideoTaskResult(req, res, next) {
     const data = await videoService.getTaskResult(req.params.taskId, req.user.id);
     return success(res, data);
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }

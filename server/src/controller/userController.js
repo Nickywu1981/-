@@ -14,8 +14,8 @@ export async function register(req, res, next) {
     const user = await userService.register({ username, password, nickname });
     return sendSuccess(res, user, '注册成功');
   } catch (err) {
-    if (err.statusCode) {
-      return sendError(res, err.statusCode, err.message);
+    if (err.status) {
+      return sendError(res, err.status, err.message);
     }
     next(err);
   }
@@ -31,8 +31,8 @@ export async function login(req, res, next) {
     const data = await userService.login({ username: loginId, password });
     return sendSuccess(res, data, '登录成功');
   } catch (err) {
-    if (err.statusCode) {
-      return sendError(res, err.statusCode, err.message);
+    if (err.status) {
+      return sendError(res, err.status, err.message);
     }
     next(err);
   }
@@ -43,8 +43,8 @@ export async function profile(req, res, next) {
     const data = await userService.getProfile(req.user.id);
     return sendSuccess(res, data);
   } catch (err) {
-    if (err.statusCode) {
-      return sendError(res, err.statusCode, err.message);
+    if (err.status) {
+      return sendError(res, err.status, err.message);
     }
     next(err);
   }
@@ -56,7 +56,7 @@ export async function updateProfile(req, res, next) {
     const data = await userService.updateProfile(req.user.id, { nickname, phone, email, avatar });
     return sendSuccess(res, data, '资料修改成功');
   } catch (err) {
-    if (err.statusCode) return sendError(res, err.statusCode, err.message);
+    if (err.status) return sendError(res, err.status, err.message);
     next(err);
   }
 }
@@ -68,7 +68,7 @@ export async function changePassword(req, res, next) {
     await userService.changePassword(req.user.id, { oldPassword, newPassword });
     return sendSuccess(res, {}, '密码修改成功');
   } catch (err) {
-    if (err.statusCode) return sendError(res, err.statusCode, err.message);
+    if (err.status) return sendError(res, err.status, err.message);
     next(err);
   }
 }
@@ -80,7 +80,7 @@ export async function forgotPassword(req, res, next) {
     const data = await userService.forgotPassword(username);
     return sendSuccess(res, data);
   } catch (err) {
-    if (err.statusCode) return sendError(res, err.statusCode, err.message);
+    if (err.status) return sendError(res, err.status, err.message);
     next(err);
   }
 }
@@ -92,7 +92,7 @@ export async function resetPassword(req, res, next) {
     await userService.resetPassword(token, newPassword);
     return sendSuccess(res, {}, '密码重置成功');
   } catch (err) {
-    if (err.statusCode) return sendError(res, err.statusCode, err.message);
+    if (err.status) return sendError(res, err.status, err.message);
     next(err);
   }
 }
@@ -102,7 +102,7 @@ export async function getStats(req, res, next) {
     const stats = await userService.getUserStats(req.user.id, req.tenantId || 0);
     return sendSuccess(res, stats);
   } catch (err) {
-    if (err.statusCode) return sendError(res, err.statusCode, err.message);
+    if (err.status) return sendError(res, err.status, err.message);
     next(err);
   }
 }
@@ -117,7 +117,7 @@ export async function refreshToken(req, res, next) {
     if (!tokens) return sendError(res, ERROR_CODE.UNAUTHORIZED, 'refreshToken 无效或已过期');
     return sendSuccess(res, tokens, '令牌刷新成功');
   } catch (err) {
-    if (err.statusCode) return sendError(res, err.statusCode, err.message);
+    if (err.status) return sendError(res, err.status, err.message);
     next(err);
   }
 }
@@ -130,7 +130,7 @@ export async function logout(req, res, next) {
     }
     return sendSuccess(res, {}, '已退出登录');
   } catch (err) {
-    if (err.statusCode) return sendError(res, err.statusCode, err.message);
+    if (err.status) return sendError(res, err.status, err.message);
     next(err);
   }
 }
@@ -140,7 +140,7 @@ export async function logoutAll(req, res, next) {
     await userService.revokeAllUserTokens(req.user.id);
     return sendSuccess(res, {}, '已退出所有设备');
   } catch (err) {
-    if (err.statusCode) return sendError(res, err.statusCode, err.message);
+    if (err.status) return sendError(res, err.status, err.message);
     next(err);
   }
 }

@@ -10,7 +10,7 @@ export async function submitScriptGen(req, res, next) {
     const data = await advVideo.submitScriptGen(req.user.id, { productInfo, scriptType, lang, length });
     return success(res, data, '脚本生成任务已提交');
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }
@@ -22,7 +22,7 @@ export async function submitShotPlan(req, res, next) {
     const data = await advVideo.submitShotPlan(req.user.id, { productInfo, videoStyle, totalDuration });
     return success(res, data, '分镜生成任务已提交');
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }
@@ -34,7 +34,7 @@ export async function submitViralClone(req, res, next) {
     const data = await advVideo.submitViralClone(req.user.id, { referenceVideoUrl, productImageUrl, matchStrength });
     return success(res, data, '爆款复刻任务已提交');
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }
@@ -46,7 +46,7 @@ export async function submitActionBatch(req, res, next) {
     const data = await advVideo.submitActionBatch(req.user.id, { actionVideoUrl, productImageUrls, targetAction });
     return success(res, data, `批量动作迁移已提交（${data.count}张）`);
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }
@@ -58,7 +58,7 @@ export async function submitVideoBeautify(req, res, next) {
     const data = await advVideo.submitVideoBeautify(req.user.id, { videoUrl, options });
     return success(res, data, '视频美化任务已提交');
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }
@@ -70,7 +70,7 @@ export async function submitVoiceGen(req, res, next) {
     const data = await advVideo.submitVoiceGen(req.user.id, { text, voiceType, speed, lang });
     return success(res, data, '语音生成任务已提交');
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }
@@ -82,7 +82,7 @@ export async function submitVoiceClone(req, res, next) {
     const data = await advVideo.submitVoiceClone(req.user.id, { audioSampleUrl, text, presetVoice });
     return success(res, data, '声音克隆任务已提交');
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }
@@ -92,7 +92,7 @@ export async function submitVideoEdit(req, res, next) {
     const data = await advVideo.submitVideoEdit(req.user.id, req.body);
     return success(res, data, '视频编辑任务已提交');
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }
@@ -104,7 +104,7 @@ export async function submitViralAnalyze(req, res, next) {
     const data = await advVideo.submitViralAnalyze(req.user.id, { url });
     return success(res, data, '爆款视频分析任务已提交');
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }
@@ -116,7 +116,7 @@ export async function submitViralReplicate(req, res, next) {
     const data = await advVideo.submitViralReplicate(req.user.id, { analysisResult, productImageUrl, productName });
     return success(res, data, '爆款复刻任务已提交');
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }
@@ -126,7 +126,7 @@ export async function getTaskResult(req, res, next) {
     const data = await advVideo.getTaskResult(req.params.taskId, req.user.id);
     return success(res, data);
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }

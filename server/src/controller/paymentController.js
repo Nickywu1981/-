@@ -23,7 +23,7 @@ export async function createOrder(req, res, next) {
     const data = await payment.createPaymentOrder(req.user.id, { planType, payChannel });
     return success(res, data, '订单创建成功');
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }
@@ -35,7 +35,7 @@ export async function getOrderStatus(req, res, next) {
     const data = await payment.getOrder(req.params.reqsn);
     return success(res, data);
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }
@@ -57,7 +57,7 @@ export async function sandboxPay(req, res, next) {
     const data = await payment.sandboxPay(req.params.reqsn);
     return success(res, data, '支付成功，会员已开通');
   } catch (err) {
-    if (err.statusCode) return error(res, err.statusCode, err.message);
+    if (err.status) return error(res, err.status, err.message);
     next(err);
   }
 }

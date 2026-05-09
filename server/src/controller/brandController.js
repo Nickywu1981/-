@@ -15,7 +15,7 @@ export async function saveBrand(req, res, next) {
     const data = await brandService.saveBrandSettings(req.user.id, req.body);
     return sendSuccess(res, data, '品牌设置已更新');
   } catch (err) {
-    if (err.statusCode) return sendError(res, err.statusCode, err.message);
+    if (err.status) return sendError(res, err.status, err.message);
     next(err);
   }
 }
