@@ -36,6 +36,7 @@
           :placeholder="activeTypeCfg?.placeholder || '描述您想要的画面效果...'"
         ></textarea>
         <div class="prompt-actions">
+          <PromptEnhancer v-model="prompt" type="poster" @enhanced="onPromptEnhanced" />
           <button class="btn btn-ghost btn-sm" :disabled="enhancing" @click="doEnhance">
             {{ enhancing ? '优化中...' : '✨ AI 优化提示词' }}
           </button>
@@ -119,6 +120,7 @@
 
 <script setup lang="ts">
 import { useSiteConfig } from '#composables/useSiteConfig';
+import PromptEnhancer from '~/components/PromptEnhancer.vue'
 
 ;
 
@@ -182,6 +184,9 @@ async function doEnhance() {
   } finally {
     enhancing.value = false;
   }
+}
+function onPromptEnhanced({ enhanced: val }: { original: string; enhanced: string }) {
+  enhancedPrompt.value = val
 }
 
 async function doGenerate() {

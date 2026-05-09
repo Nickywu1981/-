@@ -38,6 +38,7 @@
             :placeholder="activeTypeCfg?.placeholder || '描述封面主题和想要的风格...'"
           />
           <div class="prompt-toolbar">
+            <PromptEnhancer v-model="prompt" type="social" @enhanced="onPromptEnhanced" />
             <button class="btn btn-ghost btn-sm" :disabled="enhancing" @click="doEnhance">
               {{ enhancing ? '优化中...' : '✨ AI 优化' }}
             </button>
@@ -119,6 +120,7 @@
 
 <script setup lang="ts">
 import { useSiteConfig } from '~/composables/useSiteConfig.ts'
+import PromptEnhancer from '~/components/PromptEnhancer.vue'
 
 const { config: headerCfg } = useSiteConfig('page.social')
 const toast = useToast()
@@ -161,6 +163,9 @@ async function doEnhance() {
   } finally {
     enhancing.value = false
   }
+}
+function onPromptEnhanced({ enhanced: val }: { original: string; enhanced: string }) {
+  enhancedPrompt.value = val
 }
 
 function onRefImage(e) {
