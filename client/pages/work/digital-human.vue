@@ -48,8 +48,8 @@
 
       <div class="cost-hint">成本：15 点/次</div>
 
-      <button class="btn btn-primary btn-lg" :disabled="!script.trim() || taskStatus === 'processing' || taskStatus === 'queued'" @click="doCreate">
-        {{ taskStatus === 'processing' ? '生成中...' : taskStatus === 'queued' ? '排队中...' : '生成口播视频' }}
+      <button class="btn btn-primary btn-lg" :disabled="!script.trim() || submitting" @click="doCreate">
+        <span v-if="submitting" class="spinner" /> {{ submitting ? '提交中...' : taskStatus === 'processing' ? '生成中...' : taskStatus === 'queued' ? '排队中...' : '生成口播视频' }}
       </button>
 
       <AppTaskProgress v-if="taskStatus !== 'idle'" :status="taskStatus" :progress="taskProgress" :error-message="taskError" :show-download="taskStatus === 'completed'" @retry="doCreate" @download="downloadResult" />
@@ -81,6 +81,7 @@ const audioUrl = ref('')
 const selectedAvatar = ref('default')
 const selectedBg = ref('studio')
 const { status: taskStatus, progress: taskProgress, error: taskError, result, submit } = useTaskPolling()
+const submitting = ref(false)
 const resultUrl = computed(() => result.value?.video_url || result.value?.file_url || '')
 
 const quickTemplates = [
@@ -108,12 +109,17 @@ const backgrounds = [
 function onAudioUploaded(files: any[]) { if (files.length > 0) audioUrl.value = files[0].url }
 
 async function doCreate() {
-  await submit('digital_human', {
-    text: script.value,
-    audio_url: audioUrl.value || undefined,
-    avatar_style: selectedAvatar.value,
-    background: selectedBg.value,
-  })
+  submitting.value = true
+  try {
+    await submit('digital_human', {
+      text: script.value,
+      audio_url: audioUrl.value || undefined,
+      avatar_style: selectedAvatar.value,
+      background: selectedBg.value,
+    })
+  } finally {
+    submitting.value = false
+  }
 }
 
 function downloadResult() { if (resultUrl.value) window.open(resultUrl.value, '_blank') }

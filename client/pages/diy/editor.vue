@@ -8,8 +8,8 @@
         <span class="page-type">({{ pageInfo.page_type }})</span>
       </div>
       <div class="toolbar-right">
-        <button class="btn btn-outline" @click="saveVersion">保存版本</button>
-        <button class="btn btn-outline" @click="savePage">保存</button>
+        <button class="btn btn-outline" :disabled="saving" @click="saveVersion">{{ saving ? '保存中...' : '保存版本' }}</button>
+        <button class="btn btn-outline" :disabled="saving" @click="savePage">{{ saving ? '保存中...' : '保存' }}</button>
         <button class="btn btn-primary" @click="publishPage" :disabled="publishing">发布</button>
       </div>
     </div>
@@ -188,6 +188,7 @@ const dragOverIdx = ref(-1)
 const rightTab = ref('props')
 const dirty = ref(false)
 const publishing = ref(false)
+const saving = ref(false)
 
 const componentCats = [
   { key: 'banner', label: '横幅/轮播' },
@@ -280,20 +281,24 @@ async function loadPage() {
 }
 
 async function savePage() {
+  saving.value = true
   try {
     const body = { config_json: { sections: sections.value } }
     await $fetch(`/api/diy/${pageInfo.value.id}`, { method: 'PUT', body })
     dirty.value = false
     toast.success('保存成功')
   } catch (e) { toast.error('保存失败: ' + (e.data?.msg || e.message)) }
+  finally { saving.value = false }
 }
 
 async function saveVersion() {
   const remark = prompt('版本备注 (可选):')
+  saving.value = true
   try {
     await $fetch(`/api/diy/${pageInfo.value.id}/versions`, { method: 'POST', body: { configJson: { sections: sections.value }, remark: remark || undefined } })
     toast.success('版本已保存')
   } catch (e) { toast.error('保存版本失败: ' + (e.data?.msg || e.message)) }
+  finally { saving.value = false }
 }
 
 async function publishPage() {
