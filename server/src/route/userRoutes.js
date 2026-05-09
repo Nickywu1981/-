@@ -32,6 +32,10 @@ const forgotPasswordSchema = z.object({
   username: z.string().min(1, '请输入用户名'),
 });
 
+const refreshTokenSchema = z.object({
+  refreshToken: z.string().min(1, '请提供 refreshToken'),
+});
+
 const resetPasswordSchema = z.object({
   token: z.string().min(1, '缺少重置令牌'),
   newPassword: passwordSchema,
@@ -59,7 +63,7 @@ router.put('/password', authMiddleware, validate(changePasswordSchema), asyncHan
 router.get('/stats', authMiddleware, asyncHandler(getStats));
 
 // JWT 双令牌 — refresh 使用 refreshTokenMiddleware 校验 httpOnly cookie
-router.post('/refresh', setCsrfCookie, asyncHandler(refreshTokenMiddleware), asyncHandler(refreshToken));
+router.post('/refresh', setCsrfCookie, validate(refreshTokenSchema), asyncHandler(refreshTokenMiddleware), asyncHandler(refreshToken));
 router.post('/logout', authMiddleware, asyncHandler(logout));
 router.post('/logout-all', authMiddleware, asyncHandler(logoutAll));
 
