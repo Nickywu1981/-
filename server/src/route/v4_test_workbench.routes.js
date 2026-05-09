@@ -97,7 +97,7 @@ router.get('/models', requireRole('admin'), async (req, res) => {
 
     return success(res, { models: categorized, categories: CATEGORY_LABELS });
   } catch (err) {
-    return error(res, 500, err.message);
+    return error(res, err.status || 500, err.message);
   }
 });
 
@@ -254,7 +254,7 @@ router.post('/custom', requireRole('admin'), _validate(customTestSchema), async 
 
     return success(res, entry);
   } catch (err) {
-    return error(res, 500, err.message);
+    return error(res, err.status || 500, err.message);
   }
 });
 

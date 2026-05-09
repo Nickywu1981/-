@@ -116,7 +116,7 @@ router.get('/works', async (req, res) => {
     });
     return success(res, result);
   } catch (err) {
-    return error(res, 500, err.message || '查询失败');
+    return error(res, err.status || 500, err.message || '查询失败');
   }
 });
 
@@ -127,7 +127,7 @@ router.post('/enhance-prompt', _validate(enhancePromptSchema), async (req, res) 
     const result = await promptEnhanceService.enhancePrompt(prompt, type || 'image');
     return success(res, result);
   } catch (err) {
-    return error(res, 500, err.message || '增强失败');
+    return error(res, err.status || 500, err.message || '增强失败');
   }
 });
 

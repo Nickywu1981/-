@@ -287,7 +287,7 @@ router.get('/works', async (req, res) => {
       taskType: req.query.task_type,
     });
     return success(res, result);
-  } catch (err) { return error(res, 500, err.message); }
+  } catch (err) { return error(res, err.status || 500, err.message); }
 });
 
 router.get('/job/:id', async (req, res) => {

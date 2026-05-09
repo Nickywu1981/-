@@ -61,7 +61,7 @@ router.get('/profile', async (req, res) => {
       conn.release();
     }
   } catch (err) {
-    return error(res, 500, err.message);
+    return error(res, err.status || 500, err.message);
   }
 });
 
@@ -88,7 +88,7 @@ router.get('/stats', async (req, res) => {
       conn.release();
     }
   } catch (err) {
-    return error(res, 500, err.message);
+    return error(res, err.status || 500, err.message);
   }
 });
 
@@ -116,7 +116,7 @@ router.put('/profile', _validate(updateProfileSchema), async (req, res) => {
       conn.release();
     }
   } catch (err) {
-    return error(res, 500, err.message);
+    return error(res, err.status || 500, err.message);
   }
 });
 
@@ -143,7 +143,7 @@ router.put('/change-password', _validate(changePasswordSchema), async (req, res)
       conn.release();
     }
   } catch (err) {
-    return error(res, 500, err.message);
+    return error(res, err.status || 500, err.message);
   }
 });
 
@@ -159,7 +159,7 @@ router.put('/membership/auto-renew', _validate(z.object({
     await membershipDao.setAutoRenew(req.user.id, req.validated.autoRenew);
     success(res, { autoRenew: req.validated.autoRenew }, '自动续费已' + (req.validated.autoRenew ? '开启' : '关闭'));
   } catch (err) {
-    error(res, 500, err.message);
+    error(res, err.status || 500, err.message);
   }
 });
 

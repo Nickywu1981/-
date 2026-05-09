@@ -69,7 +69,7 @@ router.get('/list', validate(listQuerySchema, 'query'), async (req, res) => {
       conn.release();
     }
   } catch (err) {
-    return error(res, 500, err.message);
+    return error(res, err.status || 500, err.message);
   }
 });
 

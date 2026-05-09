@@ -58,7 +58,7 @@ router.get('/status', requireRole('admin'), async (req, res) => {
     const status = await modelRouterService.getModelStatus();
     return success(res, status);
   } catch (err) {
-    return error(res, 500, err.message);
+    return error(res, err.status || 500, err.message);
   }
 });
 

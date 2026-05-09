@@ -69,7 +69,7 @@ router.get('/works', async (req, res) => {
     });
     return success(res, result);
   } catch (err) {
-    return error(res, 500, err.message || '查询失败');
+    return error(res, err.status || 500, err.message || '查询失败');
   }
 });
 
