@@ -1,9 +1,14 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { validateV4 as _validate } from '../utils/validate.js';
+import { authMiddleware } from '../middleware/auth.js';
 import templateMarketController from '../controller/templateMarketController.js';
 
 const router = Router();
+
+const idParamSchema = z.object({
+  id: z.coerce.number().int().positive('模板ID无效'),
+});
 
 const createSchema = z.object({
   title: z.string().min(1).max(256),
@@ -17,15 +22,15 @@ const createSchema = z.object({
 router.get('/search', templateMarketController.search);
 
 // GET /api/template-market/:id
-router.get('/:id', templateMarketController.detail);
+router.get('/:id', _validate(idParamSchema, 'params'), templateMarketController.detail);
 
 // POST /api/template-market/:id/download
-router.post('/:id/download', templateMarketController.download);
+router.post('/:id/download', authMiddleware, _validate(idParamSchema, 'params'), templateMarketController.download);
 
 // POST /api/template-market/:id/purchase
-router.post('/:id/purchase', templateMarketController.purchase);
+router.post('/:id/purchase', authMiddleware, _validate(idParamSchema, 'params'), templateMarketController.purchase);
 
 // POST /api/template-market/create
-router.post('/create', _validate(createSchema), templateMarketController.create);
+router.post('/create', authMiddleware, _validate(createSchema), templateMarketController.create);
 
 export default router;

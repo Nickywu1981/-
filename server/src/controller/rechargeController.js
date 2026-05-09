@@ -2,6 +2,7 @@ import * as rechargeService from '../services/rechargeService.js';
 import * as allinpayService from '../services/allinpayService.js';
 import { success, error } from '../utils/response.js';
 import logger from '../utils/logger.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 export async function getRates(req, res) {
   success(res, rechargeService.getRates());
@@ -25,7 +26,7 @@ export async function handleCallback(req, res) {
 export async function checkPaymentResult(req, res) {
   try {
     const data = await allinpayService.queryOrder(req.params.reqsn);
-    if (!data) return error(res, 404, '订单不存在');
+    if (!data) return error(res, ERROR_CODE.NOT_FOUND, '订单不存在');
     success(res, data);
   } catch (e) { error(res, e.status || 500, e.message); }
 }

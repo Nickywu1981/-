@@ -7,6 +7,7 @@ export const ERROR_CODE = {
   SUCCESS: 200,
   BAD_REQUEST: 400,
   UNAUTHORIZED: 401,
+  PAYMENT_REQUIRED: 402,
   FORBIDDEN: 403,
   NOT_FOUND: 404,
   CONFLICT: 409,
@@ -52,6 +53,7 @@ export const ERROR_CODE = {
 export const ERROR_MSG = {
   [ERROR_CODE.BAD_REQUEST]: '请求参数错误',
   [ERROR_CODE.UNAUTHORIZED]: '未登录或登录已过期',
+  [ERROR_CODE.PAYMENT_REQUIRED]: '需付费购买',
   [ERROR_CODE.FORBIDDEN]: '无访问权限',
   [ERROR_CODE.NOT_FOUND]: '资源不存在',
   [ERROR_CODE.INTERNAL_ERROR]: '服务器内部异常',

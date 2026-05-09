@@ -1,5 +1,6 @@
 import multilingualService from '../services/multilingualService.js';
 import { success, error } from '../utils/response.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 export async function getLanguages(_req, res) {
   try {
@@ -17,7 +18,7 @@ export async function buildPrompt(req, res) {
   try {
     const { product, language, scriptType, platform, tone } = req.body;
     if (!product || !language || !scriptType) {
-      return error(res, 400, '缺少必要参数：product, language, scriptType');
+      return error(res, ERROR_CODE.BAD_REQUEST, '缺少必要参数：product, language, scriptType');
     }
     const result = multilingualService.buildMultilingualPrompt({ product, language, scriptType, platform, tone });
     return success(res, result);

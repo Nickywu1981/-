@@ -40,9 +40,12 @@ router.use(authMiddleware);
 // 模板（支持 /api/prompts 和 /api/prompts/templates）
 router.get('/', asyncHandler(listTemplates));
 router.get('/templates', asyncHandler(listTemplates));
+const submitReviewSchema = z.object({
+  id: z.coerce.number().int().positive('模板ID无效'),
+});
 router.get('/templates/:id', asyncHandler(getTemplateDetail));
 router.post('/templates', validate(createTemplateSchema), asyncHandler(createTemplate));
-router.post('/templates/:id/submit-review', asyncHandler(submitForReview));
+router.post('/templates/:id/submit-review', validate(submitReviewSchema, 'params'), asyncHandler(submitForReview));
 router.post('/templates/:id/fill', validate(fillSchema), asyncHandler(fillAndPreview));
 
 // 收藏

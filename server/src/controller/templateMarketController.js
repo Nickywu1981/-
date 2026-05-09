@@ -21,7 +21,7 @@ export default {
   async detail(req, res) {
     try {
       const tpl = await templateMarketDao.getById(+req.params.id);
-      if (!tpl) return error(res, 404, '模板不存在');
+      if (!tpl) return error(res, ERROR_CODE.NOT_FOUND, '模板不存在');
       return success(res, tpl);
     } catch (e) {
       return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message);
@@ -31,10 +31,10 @@ export default {
   async download(req, res) {
     try {
       const tpl = await templateMarketDao.getById(+req.params.id);
-      if (!tpl) return error(res, 404, '模板不存在');
+      if (!tpl) return error(res, ERROR_CODE.NOT_FOUND, '模板不存在');
       if (tpl.price > 0) {
         const purchased = await templateMarketDao.hasPurchased(req.userId, tpl.id);
-        if (!purchased) return error(res, 402, '请先购买此模板');
+        if (!purchased) return error(res, ERROR_CODE.PAYMENT_REQUIRED, '请先购买此模板');
       }
       await templateMarketDao.incrementDownload(tpl.id);
       return success(res, { download_url: tpl.preview_images }, '下载成功');
@@ -46,8 +46,8 @@ export default {
   async purchase(req, res) {
     try {
       const tpl = await templateMarketDao.getById(+req.params.id);
-      if (!tpl) return error(res, 404, '模板不存在');
-      if (tpl.price === 0) return error(res, 400, '免费模板无需购买');
+      if (!tpl) return error(res, ERROR_CODE.NOT_FOUND, '模板不存在');
+      if (tpl.price === 0) return error(res, ERROR_CODE.BAD_REQUEST, '免费模板无需购买');
       await templateMarketDao.recordPurchase(req.userId, tpl.id, tpl.price);
       return success(res, null, '购买成功');
     } catch (e) {

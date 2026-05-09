@@ -1,11 +1,12 @@
 import * as creditService from '../services/creditService.js';
 import { success, error } from '../utils/response.js';
 import { parsePagination } from '../utils/pagination.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 export async function getMembership(req, res) {
   try {
     const m = await creditService.getUserMembership(req.user.id);
-    if (!m) return error(res, 404, '会员信息不存在');
+    if (!m) return error(res, ERROR_CODE.NOT_FOUND, '会员信息不存在');
     success(res, m);
   } catch (e) { error(res, e.status || 500, e.message); }
 }
@@ -13,7 +14,7 @@ export async function getMembership(req, res) {
 export async function freezeCredit(req, res) {
   try {
     const { requestId, action, batchCount, isNight } = req.body;
-    if (!requestId || !action) return error(res, 400, '缺少 requestId 或 action 参数');
+    if (!requestId || !action) return error(res, ERROR_CODE.BAD_REQUEST, '缺少 requestId 或 action 参数');
     const result = await creditService.freezeCredit(req.user.id, requestId, action, batchCount || 1, isNight || false);
     success(res, result);
   } catch (e) { error(res, e.status || 500, e.message); }
@@ -22,7 +23,7 @@ export async function freezeCredit(req, res) {
 export async function confirmCredit(req, res) {
   try {
     const { requestId } = req.body;
-    if (!requestId) return error(res, 400, '缺少 requestId');
+    if (!requestId) return error(res, ERROR_CODE.BAD_REQUEST, '缺少 requestId');
     const result = await creditService.confirmCharge(requestId);
     success(res, result);
   } catch (e) { error(res, e.status || 500, e.message); }
@@ -32,7 +33,7 @@ export async function rollbackCredit(req, res) {
   try {
     const { requestId, recordId, remark } = req.body;
     const rid = requestId || recordId;
-    if (!rid) return error(res, 400, '缺少 requestId 或 recordId');
+    if (!rid) return error(res, ERROR_CODE.BAD_REQUEST, '缺少 requestId 或 recordId');
     const result = await creditService.rollbackCharge(rid, remark || '');
     success(res, result);
   } catch (e) { error(res, e.status || 500, e.message); }
@@ -59,7 +60,7 @@ export async function listAllRecords(req, res) {
 export async function adminRefund(req, res) {
   try {
     const { recordId, remark } = req.body;
-    if (!recordId) return error(res, 400, '缺少 recordId');
+    if (!recordId) return error(res, ERROR_CODE.BAD_REQUEST, '缺少 recordId');
     await creditService.adminRefundCredit(recordId, remark || '管理员退款');
     success(res, null, '退款成功');
   } catch (e) { error(res, e.status || 500, e.message); }

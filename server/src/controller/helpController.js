@@ -1,6 +1,7 @@
 import helpService from '../services/helpService.js';
 import { success, error } from '../utils/response.js';
 import { parsePagination } from '../utils/pagination.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 export async function getFaqs(req, res) {
   try {
@@ -16,7 +17,7 @@ export async function getFaqs(req, res) {
 export async function getFaqById(req, res) {
   try {
     const faq = await helpService.getFaqById(req.params.id);
-    if (!faq) return error(res, 404, 'FAQ不存在');
+    if (!faq) return error(res, ERROR_CODE.NOT_FOUND, 'FAQ不存在');
     success(res, faq);
   } catch (e) {
     error(res, e.status || 500, e.message);

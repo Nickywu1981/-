@@ -11,9 +11,9 @@ import z from 'zod';
 import { dispatch, getCategories, getModelsByCategory, getUsageStats, healthCheck, clearCache, extensionHooks } from '../services/modelDispatcher.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
+import { validate } from '../utils/validate.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
-import { success, error } from '../utils/response.js';
-import { ERROR_CODE } from '../constants/errorCode.js';
+import { success } from '../utils/response.js';
 
 const router = Router();
 
@@ -39,12 +39,8 @@ const dispatchSchema = z.object({
 
 // ==================== POST /api/ai/dispatch ====================
 
-router.post('/dispatch', authMiddleware, heavyLimiter, asyncHandler(async (req, res) => {
-  const parsed = dispatchSchema.safeParse(req.body);
-  if (!parsed.success) {
-    return error(res, ERROR_CODE.VALIDATION_ERROR, parsed.error.errors.map(e => e.message).join('; '));
-  }
-  const { mode, taskType, input, modelId, customConfig, skipCache } = parsed.data;
+router.post('/dispatch', authMiddleware, heavyLimiter, validate(dispatchSchema), asyncHandler(async (req, res) => {
+  const { mode, taskType, input, modelId, customConfig, skipCache } = req.body;
 
   const result = await dispatch(
     { mode, taskType, input, modelId, customConfig },

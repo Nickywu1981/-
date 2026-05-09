@@ -1,5 +1,6 @@
 import { getAllConfig, getPublicConfigMap, saveConfig, deleteConfig } from '../services/siteConfigService.js';
 import { success, error } from '../utils/response.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 // GET /api/site-config/public - no auth required
 export const getPublicSiteConfig = async (req, res) => {
@@ -21,7 +22,7 @@ export const listAllConfig = async (req, res) => {
 export const createConfig = async (req, res) => {
   try {
     const { key, value, type, description } = req.body;
-    if (!key || value === undefined) return error(res, 400, 'key and value required');
+    if (!key || value === undefined) return error(res, ERROR_CODE.BAD_REQUEST, 'key and value required');
     await saveConfig(key, typeof value === 'object' ? JSON.stringify(value) : String(value), type || 'text', description || '');
     success(res, { key }, 'Config created');
   } catch (err) { error(res, err.status || 500, 'Failed to create config'); }
@@ -32,7 +33,7 @@ export const updateConfig = async (req, res) => {
   try {
     const { key } = req.params;
     const { value, type, description } = req.body;
-    if (!key || value === undefined) return error(res, 400, 'key and value required');
+    if (!key || value === undefined) return error(res, ERROR_CODE.BAD_REQUEST, 'key and value required');
     await saveConfig(key, typeof value === 'object' ? JSON.stringify(value) : String(value), type || 'text', description || '');
     success(res, { key }, 'Config updated');
   } catch (err) { error(res, err.status || 500, 'Failed to update config'); }
@@ -42,7 +43,7 @@ export const updateConfig = async (req, res) => {
 export const removeConfig = async (req, res) => {
   try {
     const affected = await deleteConfig(Number(req.params.id));
-    if (!affected) return error(res, 404, 'Not found');
+    if (!affected) return error(res, ERROR_CODE.NOT_FOUND, 'Not found');
     success(res, null, 'Config deleted');
   } catch (err) { error(res, err.status || 500, 'Failed to delete config'); }
 };

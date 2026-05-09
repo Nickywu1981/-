@@ -1,5 +1,6 @@
 import svc from '../services/platformSpecService.js';
 import { success, error } from '../utils/response.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 export async function listPlatforms(req, res) {
   const data = await svc.listAll(req);
@@ -8,7 +9,7 @@ export async function listPlatforms(req, res) {
 
 export async function getSpec(req, res) {
   const data = await svc.getById(req.params.id, req);
-  if (!data) return error(res, 404, '规格不存在');
+  if (!data) return error(res, ERROR_CODE.NOT_FOUND, '规格不存在');
   return success(res, data);
 }
 
@@ -24,13 +25,13 @@ export async function createSpec(req, res) {
 
 export async function updateSpec(req, res) {
   const ok = await svc.update(req.params.id, req.body, req);
-  if (!ok) return error(res, 404, '规格不存在');
+  if (!ok) return error(res, ERROR_CODE.NOT_FOUND, '规格不存在');
   return success(res, null, '更新成功');
 }
 
 export async function deleteSpec(req, res) {
   const ok = await svc.remove(req.params.id, req);
-  if (!ok) return error(res, 404, '规格不存在');
+  if (!ok) return error(res, ERROR_CODE.NOT_FOUND, '规格不存在');
   return success(res, null, '删除成功');
 }
 

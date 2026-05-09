@@ -4,6 +4,7 @@
  */
 import { success, error } from '../utils/response.js';
 import * as openApiKeyService from '../services/openApiKeyService.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 export async function listKeys(req, res) {
   const { page = 1, pageSize = 20 } = req.query;
@@ -25,7 +26,7 @@ export async function toggleKey(req, res) {
   const { id } = req.params;
   const { status } = req.body;
   const result = await openApiKeyService.toggleKey(parseInt(id), req.user.tenantId || 1, status);
-  if (!result.ok) return error(res, 404, 'API Key 不存在');
+  if (!result.ok) return error(res, ERROR_CODE.NOT_FOUND, 'API Key 不存在');
   success(res, result);
 }
 
@@ -35,14 +36,14 @@ export async function updateKey(req, res) {
   const result = await openApiKeyService.updateKey(parseInt(id), req.user.tenantId || 1, {
     description, rateLimit, dailyLimit,
   });
-  if (!result.ok) return error(res, 404, 'API Key 不存在');
+  if (!result.ok) return error(res, ERROR_CODE.NOT_FOUND, 'API Key 不存在');
   success(res, result);
 }
 
 export async function deleteKey(req, res) {
   const { id } = req.params;
   const result = await openApiKeyService.deleteKey(parseInt(id), req.user.tenantId || 1);
-  if (!result.ok) return error(res, 404, 'API Key 不存在');
+  if (!result.ok) return error(res, ERROR_CODE.NOT_FOUND, 'API Key 不存在');
   success(res, result);
 }
 

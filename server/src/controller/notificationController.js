@@ -1,6 +1,7 @@
 import * as notificationService from '../services/notificationService.js';
 import { success, listResult, error } from '../utils/response.js';
 import { parsePagination } from '../utils/pagination.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 export async function listNotifications(req, res, next) {
   try {
@@ -34,7 +35,7 @@ export async function markAllRead(req, res, next) {
 export async function sendNotification(req, res, next) {
   try {
     const { userId, type, title, content } = req.body;
-    if (!userId || !title || !content) return error(res, 400, '缺少必要参数');
+    if (!userId || !title || !content) return error(res, ERROR_CODE.BAD_REQUEST, '缺少必要参数');
     const id = await notificationService.sendToUser({ userId, type: type || 'system', title, content });
     return success(res, { id }, '发送成功');
   } catch (err) { next(err); }

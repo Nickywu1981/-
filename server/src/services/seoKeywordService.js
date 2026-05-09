@@ -6,6 +6,8 @@
  *   - 高搜索量关键词 + 长尾词双维度
  *   - 关键词嵌入密度 ≥3 个/标题
  */
+import { BusinessError } from '../utils/businessError.js';
+
 // 13 平台核心高搜索量关键词库（种子数据）
 const PLATFORM_KEYWORDS = {
   taobao: {
@@ -148,7 +150,7 @@ function extractCategoryHints({ productName, category, description }) {
  */
 export async function embedSEOKeywords({ productName, platformCode, category, description, count = 5 }) {
   const platform = PLATFORM_KEYWORDS[platformCode];
-  if (!platform) throw new Error(`不支持的平台: ${platformCode}`);
+  if (!platform) throw new BusinessError(400, `不支持的平台: ${platformCode}`);
 
   const traits = PLATFORM_SEO_TRAITS[platformCode];
   const hints = extractCategoryHints({ productName, category, description });
@@ -210,7 +212,7 @@ export async function embedSEOKeywords({ productName, platformCode, category, de
  */
 export function getPlatformKeywords(platformCode) {
   const platform = PLATFORM_KEYWORDS[platformCode];
-  if (!platform) throw new Error(`不支持的平台: ${platformCode}`);
+  if (!platform) throw new BusinessError(400, `不支持的平台: ${platformCode}`);
   return {
     platform: platform.name,
     highVolume: platform.highVolume,

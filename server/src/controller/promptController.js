@@ -1,6 +1,7 @@
 import * as promptService from '../services/promptService.js';
 import { success, error, listResult } from '../utils/response.js';
 import { parsePagination } from '../utils/pagination.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 // ==================== 模板 ====================
 export async function listTemplates(req, res) {
@@ -15,7 +16,7 @@ export async function listTemplates(req, res) {
 export async function getTemplateDetail(req, res) {
   try {
     const t = await promptService.useTemplate(req.user.id, +req.params.id);
-    if (!t) return error(res, 404, '模板不存在');
+    if (!t) return error(res, ERROR_CODE.NOT_FOUND, '模板不存在');
     success(res, t);
   } catch (e) { error(res, e.status || 500, e.message); }
 }

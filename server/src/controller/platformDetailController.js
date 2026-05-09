@@ -1,5 +1,6 @@
 import platformDetailService from '../services/platformDetailService.js';
 import { success, error } from '../utils/response.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 export async function listAllPlatforms(_req, res) {
   try {
@@ -11,7 +12,7 @@ export async function listAllPlatforms(_req, res) {
 export async function getPlatformConfig(req, res) {
   try {
     const config = platformDetailService.getPlatformConfig(req.params.code);
-    if (!config) return error(res, 404, '平台不存在');
+    if (!config) return error(res, ERROR_CODE.NOT_FOUND, '平台不存在');
     return success(res, config);
   } catch (err) { return error(res, err.status || 500, err.message); }
 }
