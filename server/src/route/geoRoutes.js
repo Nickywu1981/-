@@ -4,9 +4,10 @@
  *
  * 优先级：国内 IP → zh，英语国家 → en，西语国家 → es，默认 → zh
  */
-import express from 'express';
+import { Router } from 'express';
+import { success } from '../utils/response.js';
 
-const router = express.Router();
+const router = Router();
 
 // 内联国家→语言映射，无需外部 GeoIP 数据库
 const COUNTRY_TO_LOCALE = {
@@ -38,11 +39,11 @@ function extractIP(req) {
   return req.ip || req.socket?.remoteAddress || '';
 }
 
-router.get('/api/geo/suggest-locale', (req, res) => {
+router.get('/api/geo/suggest-locale', async (req, res) => {
   // 1. Cloudflare / CDN 注入的国家头（最快）
   const country = extractCountry(req);
   if (country && COUNTRY_TO_LOCALE[country]) {
-    return res.json({
+    return success(res, {
       locale: COUNTRY_TO_LOCALE[country],
       country,
       source: 'cdn-header',
@@ -53,22 +54,19 @@ router.get('/api/geo/suggest-locale', (req, res) => {
   // 2. 无 CDN 头时，使用免费 IP API 查询（服务端代理，不暴露给前端）
   const ip = extractIP(req);
   if (!ip || ip === '127.0.0.1' || ip === '::1' || ip.startsWith('192.168.') || ip.startsWith('10.')) {
-    // 本地开发 → 默认中文
-    return res.json({ locale: 'zh', country: 'LOCAL', source: 'localhost-fallback', ip });
+    return success(res, { locale: 'zh', country: 'LOCAL', source: 'localhost-fallback', ip });
   }
 
   // 3. 异步查询免费 IP 地理位置 API
-  fetch(`http://ip-api.com/json/${encodeURIComponent(ip)}?fields=countryCode`)
-    .then((r) => r.json())
-    .then((data) => {
-      const cc = (data?.countryCode || '').toUpperCase();
-      const locale = COUNTRY_TO_LOCALE[cc] || 'zh';
-      res.json({ locale, country: cc, source: 'ip-api', ip });
-    })
-    .catch(() => {
-      // IP API 失败 → 回退默认
-      res.json({ locale: 'zh', country: 'UNKNOWN', source: 'error-fallback', ip });
-    });
+  try {
+    const r = await fetch(`http://ip-api.com/json/${encodeURIComponent(ip)}?fields=countryCode`);
+    const data = await r.json();
+    const cc = (data?.countryCode || '').toUpperCase();
+    const locale = COUNTRY_TO_LOCALE[cc] || 'zh';
+    return success(res, { locale, country: cc, source: 'ip-api', ip });
+  } catch {
+    return success(res, { locale: 'zh', country: 'UNKNOWN', source: 'error-fallback', ip });
+  }
 });
 
 export default router;
