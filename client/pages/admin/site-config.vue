@@ -80,7 +80,7 @@ async function fetchConfig() {
   loading.value = true;
   loadError.value = '';
   try {
-    const data: any = await $fetch('/api/admin/site-config');
+    const data: any = await $fetch('/api/admin/site-config', { credentials: 'include' });
     configs.value = data.data || data;
   } catch (e: any) {
     loadError.value = e.message || '加载失败';
@@ -101,7 +101,7 @@ async function save(item: any) {
   saving.value = true;
   try {
     await $fetch(`/api/admin/site-config/${item.config_key}`, {
-      method: 'PUT',
+      method: 'PUT', credentials: 'include',
       body: { value: editValue.value, type: item.config_type, description: item.description }
     });
     item.config_value = editValue.value;
@@ -117,7 +117,7 @@ async function addConfig() {
   adding.value = true;
   try {
     await $fetch('/api/admin/site-config', {
-      method: 'POST',
+      method: 'POST', credentials: 'include',
       body: { key: newConfig.key, value: newConfig.value, type: newConfig.type, description: newConfig.description }
     });
     toast.success('添加成功');
@@ -131,7 +131,7 @@ async function addConfig() {
 async function deleteConfig(item: any) {
   if (!confirm(`确定删除配置 "${item.config_key}"？`)) return;
   try {
-    await $fetch(`/api/admin/site-config/${item.id}`, { method: 'DELETE' });
+    await $fetch(`/api/admin/site-config/${item.id}`, { method: 'DELETE', credentials: 'include' });
     toast.success('已删除');
     fetchConfig();
   } catch (e: any) { toast.error(e.message || '删除失败'); }

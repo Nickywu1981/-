@@ -3,6 +3,7 @@
     <div class="page-header">
       <h1>页面管理</h1>
       <div class="header-actions">
+        <button class="btn btn-outline" @click="navigateTo('/work/diy-pages')">从模板创建</button>
         <button class="btn btn-primary" @click="showCreate = true">+ 新建页面</button>
       </div>
     </div>
