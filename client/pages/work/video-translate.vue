@@ -205,7 +205,7 @@ async function loadHistory() {
     const data = await $fetch(`/api/video-translate/works?${params}`, { credentials: 'include' });
     history.value = data.data?.rows || data.data || [];
     totalHistory.value = data.data?.total || 0;
-  } catch (_) {} finally { loadingHistory.value = false; }
+  } catch (_) { useToast().error('加载历史记录失败') } finally { loadingHistory.value = false; }
 }
 
 function download(url) { const a = document.createElement('a'); a.href = url; a.download = ''; a.click(); }

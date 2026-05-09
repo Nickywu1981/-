@@ -253,7 +253,7 @@ onMounted(async () => {
     if (styles.custom_options) {
       styleOptions.value = styles.custom_options.map((s, i) => ({ item_key: `s${i}`, item_value: s }));
     }
-  } catch (_) {}
+  } catch (_) { useToast().error('加载海报样式失败') }
   loadWorks();
 });
 </script>

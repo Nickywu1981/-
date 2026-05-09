@@ -156,7 +156,7 @@ async function loadTier() {
   try {
     const resp = await $fetch('/api/distribution/tier', { credentials: 'include' });
     tierData.value = resp.data || resp;
-  } catch {}
+  } catch { toast.error('加载分销等级失败') }
 }
 
 async function loadPerformance() {

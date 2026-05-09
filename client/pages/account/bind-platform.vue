@@ -107,7 +107,7 @@ async function fetchBindings() {
   try {
     const res: any = await $fetch(`${apiBase}/platforms/bindings`).catch(() => null)
     if (res?.code === 200) boundList.value = res.data?.list || []
-  } catch {}
+  } catch { toast.error('加载平台绑定失败') }
   loading.value = false
 }
 
@@ -140,7 +140,7 @@ async function doUnbind(item: any) {
   try {
     await $fetch(`${apiBase}/platforms/bind/${item.id}`, { method: 'DELETE' })
     fetchBindings()
-  } catch {}
+  } catch { toast.error('解绑失败') }
 }
 
 onMounted(() => fetchBindings())

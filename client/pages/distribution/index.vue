@@ -81,6 +81,7 @@ import { ref, onMounted } from 'vue'
 definePageMeta({ layout: 'workspace' })
 
 const apiBase = useRuntimeConfig().public.apiBase || '/api'
+const toast = useToast()
 
 const boundPlatforms = ref<any[]>([])
 const recentWorks = ref<any[]>([])
@@ -114,7 +115,7 @@ onMounted(async () => {
 
     // 发布历史 (模拟)
     publishHistory.value = []
-  } catch {}
+  } catch { toast.error('加载分发数据失败') }
 })
 
 async function doPublish(work: any) {
@@ -131,7 +132,7 @@ async function doPublish(work: any) {
         published_url: res.data?.published_url || '', created_at: new Date().toISOString(),
       })
     }
-  } catch {}
+  } catch { toast.error('发布失败') }
   publishing.value = null
 }
 </script>

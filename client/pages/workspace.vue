@@ -451,7 +451,7 @@ async function loadRecentTasks() {
         });
       });
     }
-  } catch {}
+  } catch { toast.error('加载最近任务失败') }
 }
 
 async function loadRecentWorks() {
@@ -473,7 +473,7 @@ async function loadRecentWorks() {
         });
       });
     }
-  } catch {}
+  } catch { toast.error('加载最近作品失败') }
 }
 
 async function loadUnread() {
