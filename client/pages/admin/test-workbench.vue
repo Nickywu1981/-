@@ -319,7 +319,7 @@
 </template>
 
 <script setup lang="ts">
-import { formatDateTime, copyToClipboard } from '@/utils/format';
+import { formatDateTime, copyToClipboard, truncate } from '@/utils/format';
 const formatTime = (iso: string) => iso ? formatDateTime(iso, 'HH:mm:ss') : '';
 const toast = useToast()
 
@@ -601,9 +601,6 @@ function formatDuration(ms: number) {
   return (ms / 1000).toFixed(2) + 's'
 }
 
-function truncate(s: string, n: number) {
-  if (!s) return ''
-  return s.length > n ? s.slice(0, n) + '...' : s
 }
 
 function formatResult(r: any) {

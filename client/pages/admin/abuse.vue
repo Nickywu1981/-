@@ -66,6 +66,7 @@
 </template>
 
 <script setup lang="ts">
+import { truncate } from '@/utils/format';
 
 const list = ref<any[]>([]);
 const total = ref(0);
@@ -120,11 +121,6 @@ async function checkUser(userId: number) {
 
 function isBotUA(ua: string) {
   return /python|curl|wget|scrapy|selenium|headless/i.test(ua || '');
-}
-
-function truncate(s: string, max: number) {
-  if (!s) return '';
-  return s.length > max ? s.slice(0, max) + '...' : s;
 }
 </script>
 

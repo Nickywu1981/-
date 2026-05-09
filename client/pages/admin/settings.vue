@@ -26,13 +26,12 @@
   </AdminLayout>
 </template>
 <script setup lang="ts">
+import { truncate } from '@/utils/format';
 
 const toast = useToast()
 const loading = ref(true), saving = ref(false), savedMsg = ref('')
 const otherConfigs = ref<any[]>([])
 const form = reactive({ siteName: 'Movio AI', contact: '', dailyLimit: 5000, maintenance: false })
-
-function truncate(s: string, n: number) { return s && s.length > n ? s.slice(0, n) + '...' : (s || '') }
 
 onMounted(async () => {
   try {
