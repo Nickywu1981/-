@@ -1,4 +1,5 @@
-import { getAll, getByKey, getByKeys, upsert, remove } from '../dao/siteConfigDao.js';
+import { getAll, getByKey, getByKeys, upsert, remove, removeByKey } from '../dao/siteConfigDao.js';
+import { insertLog, getLogsByKey } from '../dao/siteConfigLogDao.js';
 import { cacheGet, cacheSet, cacheDel } from '../dao/redis.js';
 import logger from '../utils/logger.js';
 
@@ -35,11 +36,50 @@ export const getPublicConfigMap = async () => {
 
 export const getConfigByKey = async (key) => getByKey(key);
 
-export const saveConfig = async (key, value, type, description) => upsert(key, value, type, description);
+export const saveConfig = async (key, value, type, description) => {
+  const old = await getByKey(key);
+  const oldValue = old?.config_value ?? null;
+  await upsert(key, value, type, description);
+  try {
+    await insertLog({
+      configKey: key,
+      oldValue,
+      newValue: value,
+      changedBy: null, // will be set by controller with actual user
+    });
+  } catch (err) { logger.warn('[SiteConfig] audit log insert failed', { key, error: err.message }); }
+};
 
-export const deleteConfig = async (id) => remove(id);
+export const deleteConfig = async (id) => {
+  const row = await getByKey(id);
+  const result = await remove(id);
+  if (result && row) {
+    try {
+      await insertLog({
+        configKey: typeof row === 'object' ? row.config_key : id,
+        oldValue: typeof row === 'object' ? row.config_value : null,
+        newValue: null,
+        changedBy: null,
+      });
+    } catch (err) { logger.warn('[SiteConfig] audit log insert failed', { id, error: err.message }); }
+  }
+  return result;
+};
+
+export const deleteConfigByKey = async (key) => {
+  const old = await getByKey(key);
+  const result = await removeByKey(key);
+  if (result && old) {
+    try {
+      await insertLog({ configKey: key, oldValue: old.config_value, newValue: null, changedBy: null });
+    } catch (err) { logger.warn('[SiteConfig] audit log insert failed', { key, error: err.message }); }
+  }
+  return result;
+};
 
 /** 清除公开配置缓存（写操作后调用） */
 export const clearPublicCache = async () => {
   try { await cacheDel(CACHE_PREFIX + 'public'); } catch { /* noop */ }
 };
+
+export const getConfigLogs = async (key, limit) => getLogsByKey(key, limit);

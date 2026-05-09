@@ -22,7 +22,7 @@ const router = Router();
 const pageSchema = z.object({
   title: z.string().min(1, '标题不能为空').max(200),
   slug: z.string().min(1, '标识不能为空').max(100).regex(/^[a-z0-9_-]+$/, '标识仅允许小写字母、数字、下划线、连字符'),
-  pageType: z.enum(['mobile', 'desktop', 'responsive']).optional(),
+  pageType: z.enum(['mobile', 'pc', 'h5']).optional(),
   accessType: z.enum(['public', 'private']).optional(),
   mobileConfig: z.object({ sections: z.array(z.any()) }).optional(),
   pcConfig: z.object({ sections: z.array(z.any()) }).optional(),

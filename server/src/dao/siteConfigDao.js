@@ -32,3 +32,8 @@ export const remove = async (id) => {
   const [result] = await pool.query(`DELETE FROM ${table} WHERE id = ?`, [id]);
   return result.affectedRows;
 };
+
+export const removeByKey = async (key) => {
+  const [result] = await pool.query(`DELETE FROM ${table} WHERE config_key = ?`, [key]);
+  return result.affectedRows;
+};

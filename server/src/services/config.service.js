@@ -8,7 +8,6 @@ import logger from '../utils/logger.js';
  * P0-4: 重构为 configDao，移除全部裸SQL
  */
 import configDao from '../dao/configDao.js';
-import pool from '../dao/db.js';
 import redis from '../dao/redis.js';
 import { broadcastVersion } from './config-version.service.js';
 
@@ -79,11 +78,9 @@ export async function getConfigLogs(groupKey, limit = 50) {
 }
 
 export async function getGroupList() {
-  const [groups] = await pool.execute('SELECT group_key, group_name, parent_key, sort_order, is_enabled FROM sys_config_group ORDER BY sort_order, group_key');
-  return groups;
+  return configDao.getGroupList();
 }
 
 export async function getGroupItems(groupKey) {
-  const [items] = await pool.execute('SELECT item_key, item_value, item_type, default_val, placeholder, sort_order, is_enabled FROM sys_config_item WHERE group_key = ? ORDER BY sort_order', [groupKey]);
-  return items;
+  return configDao.getGroupItems(groupKey);
 }

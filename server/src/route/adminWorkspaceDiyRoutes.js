@@ -9,8 +9,7 @@ import { validate } from '../utils/validate.js';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
-import { getAllConfig, getConfigByKey, saveConfig } from '../services/siteConfigService.js';
-import { getDB } from '../dao/db.js';
+import { getAllConfig, getConfigByKey, saveConfig, deleteConfigByKey } from '../services/siteConfigService.js';
 import logger from '../utils/logger.js';
 
 const router = Router();
@@ -20,7 +19,7 @@ router.use(authMiddleware, adminAuth);
 
 // ─── Zod schemas ───
 const putBodySchema = z.object({
-  config_value: z.array(z.unknown()).min(1, 'config_value 必须是非空数组'),
+  config_value: z.union([z.array(z.unknown()), z.object({}).passthrough()]),
   description: z.string().optional(),
 });
 
@@ -59,8 +58,7 @@ router.post('/reset/:key', async (req, res, next) => {
   try {
     const row = await getConfigByKey(req.params.key);
     if (!row) return error(res, ERROR_CODE.NOT_FOUND, '配置项不存在');
-    const db = getDB();
-    await db.query('DELETE FROM site_config WHERE config_key = ?', [req.params.key]);
+    await deleteConfigByKey(req.params.key);
     logger.info(`[workspace-diy] ${req.params.key} 已重置为默认值 by ${req.user?.username || 'admin'}`);
     return success(res, { message: `${req.params.key} 已重置为默认值` });
   } catch (err) { next(err); }

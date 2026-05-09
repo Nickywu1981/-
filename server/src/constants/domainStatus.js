@@ -38,7 +38,7 @@ export const CREDIT_RECORD_STATUS = {
 export const DIY_PAGE_STATUS = {
   DRAFT: 0,
   PUBLISHED: 1,
-  REVIEWING: 2,
+  OFFLINE: 2,
   TRASH: 3,
 };
 

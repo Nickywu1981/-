@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { listAllConfig, updateConfig, removeConfig, getPublicSiteConfig, createConfig } from '../controller/siteConfigController.js';
+import { getConfigLogs } from '../services/siteConfigService.js';
+import { success, error } from '../utils/response.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
@@ -22,6 +24,14 @@ adminRouter.get('/', authMiddleware, adminAuth, asyncHandler(listAllConfig));
 adminRouter.post('/', authMiddleware, adminAuth, validate(configSchema), asyncHandler(createConfig));
 adminRouter.put('/:key', authMiddleware, adminAuth, validate(updateConfigSchema), asyncHandler(updateConfig));
 adminRouter.delete('/:id', authMiddleware, adminAuth, asyncHandler(removeConfig));
+
+// GET /api/admin/site-config/logs/:key — 审计日志
+adminRouter.get('/logs/:key', authMiddleware, adminAuth, asyncHandler(async (req, res) => {
+  try {
+    const logs = await getConfigLogs(req.params.key, req.query.limit || 50);
+    success(res, logs);
+  } catch (err) { error(res, err.status || 500, err.message || 'Failed to load logs'); }
+}));
 
 const publicRouter = Router();
 publicRouter.get('/', asyncHandler(getPublicSiteConfig));

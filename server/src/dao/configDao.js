@@ -53,6 +53,21 @@ const configDao = {
     );
     return rows;
   },
+
+  async getGroupList() {
+    const [rows] = await pool.execute(
+      'SELECT group_key, group_name, parent_key, sort_order, is_enabled FROM sys_config_group ORDER BY sort_order, group_key',
+    );
+    return rows;
+  },
+
+  async getGroupItems(groupKey) {
+    const [rows] = await pool.execute(
+      'SELECT item_key, item_value, item_type, default_val, placeholder, sort_order, is_enabled FROM sys_config_item WHERE group_key = ? ORDER BY sort_order',
+      [groupKey],
+    );
+    return rows;
+  },
 };
 
 export default configDao;
