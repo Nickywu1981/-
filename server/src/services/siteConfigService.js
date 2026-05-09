@@ -3,7 +3,7 @@ import { getAll, getByKey, getByKeys, upsert, remove } from '../dao/siteConfigDa
 export const getAllConfig = async () => getAll();
 
 export const getPublicConfig = async () => {
-  const keys = ['site_name', 'site_logo', 'hero_title', 'hero_subtitle', 'hero_cta', 'footer_text', 'features', 'pricing', 'nav_links', 'workspace_tools'];
+  const keys = ['site_name', 'site_logo', 'hero_title', 'hero_subtitle', 'hero_cta', 'footer_text', 'features', 'pricing', 'nav_links', 'workspace_tools', 'workspace_nav', 'workspace_cards', 'workspace_assistant', 'workspace_workflow'];
   return getByKeys(keys);
 };
 
