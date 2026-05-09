@@ -265,7 +265,7 @@ app.use('/api/upload', uploadLimiter, uploadRoutes);
 app.use('/api/prompts', promptRoutes);
 app.use('/api/credits', creditRoutes);
 app.use('/api/tenants', tenantRoutes);
-app.use('/api/diy', diyRoutes);
+app.use('/api/diy', apiLimiter, diyRoutes);
 app.use('/api/forms', formRoutes);
 app.use('/api/proxy', proxyRoutes);
 app.use('/api/recharge', rechargeRoutes);

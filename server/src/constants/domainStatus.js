@@ -42,6 +42,13 @@ export const DIY_PAGE_STATUS = {
   TRASH: 3,
 };
 
+export const DIY_PAGE_STATUS_LABEL = {
+  [DIY_PAGE_STATUS.DRAFT]: '草稿',
+  [DIY_PAGE_STATUS.PUBLISHED]: '已发布',
+  [DIY_PAGE_STATUS.OFFLINE]: '已下线',
+  [DIY_PAGE_STATUS.TRASH]: '回收站',
+};
+
 // ========== 批量任务状态 ==========
 
 export const BATCH_TASK_STATUS = {

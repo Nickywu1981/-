@@ -1,5 +1,5 @@
 <template>
-  <div class="diy-editor">
+  <div class="diy-editor" @keydown="onKeydown" tabindex="0">
     <!-- 顶部操作栏 -->
     <div class="editor-toolbar">
       <div class="toolbar-left">
@@ -168,7 +168,7 @@
 
 <script setup lang="ts">
 import { useDiyEditor } from '~/composables/useDiyEditor'
-import { DIY_COMPONENTS, getComponentByCode, getPropDef } from '~/composables/useDiyComponents'
+import { DIY_COMPONENTS, getComponentByCode } from '~/composables/useDiyComponents'
 import { useDiyAutoSave } from '~/composables/useDiyAutoSave'
 
 const route = useRoute()
@@ -201,6 +201,17 @@ const currentProps = computed(() => {
   return comp?.props || []
 })
 function markDirty() { dirty.value = true }
+
+function onKeydown(e: KeyboardEvent) {
+  const ctrl = e.ctrlKey || e.metaKey
+  const target = e.target as HTMLElement
+  const inInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT' || target.isContentEditable
+
+  if (ctrl && e.key === 'z' && !e.shiftKey) { e.preventDefault(); editor.undo(); dirty.value = true }
+  else if (ctrl && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) { e.preventDefault(); editor.redo(); dirty.value = true }
+  else if (ctrl && e.key === 's') { e.preventDefault(); savePage() }
+  else if (!inInput && (e.key === 'Delete' || e.key === 'Backspace')) { e.preventDefault(); editor.removeSelected(); dirty.value = true }
+}
 
 function selectSection(idx: number) { editor.selectSection(idx) }
 function removeSection(idx: number) { editor.removeSection(idx); dirty.value = true }

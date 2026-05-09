@@ -6,6 +6,7 @@ import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
 import { z } from 'zod';
 import { ERROR_CODE } from '../constants/errorCodes.js';
+import { DIY_PAGE_STATUS_LABEL } from '../constants/domainStatus.js';
 import { success, error } from '../utils/response.js';
 import * as diyService from '../services/diyService.js';
 import {
@@ -63,7 +64,7 @@ const versionsQuerySchema = z.object({ includeAuto: z.enum(['true', 'false']).op
 function validateParams(schema) {
   return (req, _res, next) => {
     const result = schema.safeParse(req.params);
-    if (!result.success) return next(new BusinessError(400, result.error.issues.map(i => i.message).join('; ')));
+    if (!result.success) return next(new BusinessError(ERROR_CODE.BAD_REQUEST, result.error.issues.map(i => i.message).join('; ')));
     req.params = result.data;
     next();
   };
@@ -72,7 +73,7 @@ function validateParams(schema) {
 function validateQuery(schema) {
   return (req, _res, next) => {
     const result = schema.safeParse(req.query);
-    if (!result.success) return next(new BusinessError(400, result.error.issues.map(i => i.message).join('; ')));
+    if (!result.success) return next(new BusinessError(ERROR_CODE.BAD_REQUEST, result.error.issues.map(i => i.message).join('; ')));
     req.query = result.data;
     next();
   };
@@ -151,7 +152,7 @@ router.get('/:id/stats', validateParams(idParamSchema), authMiddleware, asyncHan
   if (!page) return error(res, ERROR_CODE.NOT_FOUND, '页面不存在');
   success(res, {
     accessCount: page.access_count || 0,
-    status: { 0: '草稿', 1: '已发布', 2: '已下线', 3: '回收站' }[page.status] || '未知',
+    status: DIY_PAGE_STATUS_LABEL[page.status] || '未知',
     publishTime: page.publish_time,
     latestVersion: page.latest_published_version,
   });
