@@ -62,7 +62,7 @@ adminRouter.get('/groups', requireRole('admin'), async (req, res) => {
     const groups = await getGroupList();
     return success(res, groups);
   } catch (err) {
-    return error(res, ERROR_CODE.INTERNAL_ERROR, err.message || '查询分组失败', ERROR_CODE.INTERNAL_ERROR);
+    return error(res, ERROR_CODE.INTERNAL_ERROR, err.message || '查询分组失败');
   }
 });
 
@@ -73,7 +73,7 @@ adminRouter.get('/items/:groupKey', requireRole('admin'), async (req, res) => {
     const items = await getGroupItems(req.params.groupKey);
     return success(res, items);
   } catch (err) {
-    return error(res, ERROR_CODE.INTERNAL_ERROR, err.message || '查询配置项失败', ERROR_CODE.INTERNAL_ERROR);
+    return error(res, ERROR_CODE.INTERNAL_ERROR, err.message || '查询配置项失败');
   }
 });
 
@@ -116,7 +116,7 @@ adminRouter.get('/seed/verify', requireRole('admin'), async (req, res) => {
     const result = await validateSeed((await import('../dao/db.js')).default);
     return success(res, result);
   } catch (err) {
-    return error(res, ERROR_CODE.INTERNAL_ERROR, err.message || '校验失败', ERROR_CODE.INTERNAL_ERROR);
+    return error(res, ERROR_CODE.INTERNAL_ERROR, err.message || '校验失败');
   }
 });
 

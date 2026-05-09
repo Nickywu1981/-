@@ -5,6 +5,7 @@ import { validate } from '../utils/validate.js';
 import { z } from 'zod';
 import auditLogDao from '../dao/auditLogDao.js';
 import { listResult, error } from '../utils/response.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 import { parsePagination } from '../utils/pagination.js';
 
 const router = Router();
@@ -21,7 +22,7 @@ router.get('/', authMiddleware, adminAuth, validate(querySchema, 'query'), async
     const { page, pageSize } = parsePagination(req.query);
     const result = await auditLogDao.list({ ...req.query, page, pageSize });
     listResult(res, result);
-  } catch (e) { error(res, 500, e.message); }
+  } catch (e) { error(res, ERROR_CODE.INTERNAL_ERROR, e.message); }
 }));
 
 export default router;

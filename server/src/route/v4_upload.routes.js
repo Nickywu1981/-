@@ -36,7 +36,7 @@ function _withMulter(req, res, next) {
       if (err.code === 'LIMIT_FILE_SIZE') {
         return error(res, ERROR_CODE.VALIDATION_ERROR, '文件大小超过50MB限制');
       }
-      return error(res, ERROR_CODE.INTERNAL_ERROR, err.message || '上传处理失败', ERROR_CODE.INTERNAL_ERROR);
+      return error(res, ERROR_CODE.INTERNAL_ERROR, err.message || '上传处理失败');
     }
     next();
   });
@@ -49,7 +49,7 @@ router.post('/simple', _withMulter, (req, res) => {
     const result = uploadService.saveSimpleFile(req.file);
     return success(res, result, '上传成功');
   } catch (err) {
-    return error(res, ERROR_CODE.INTERNAL_ERROR, err.message || '上传失败', ERROR_CODE.INTERNAL_ERROR);
+    return error(res, ERROR_CODE.INTERNAL_ERROR, err.message || '上传失败');
   }
 });
 
@@ -89,7 +89,7 @@ router.get('/chunks/:uploadId', (req, res) => {
     const result = uploadService.getReceivedChunks(req.params.uploadId);
     return success(res, result);
   } catch (err) {
-    return error(res, ERROR_CODE.INTERNAL_ERROR, err.message || '查询分片失败', ERROR_CODE.INTERNAL_ERROR);
+    return error(res, ERROR_CODE.INTERNAL_ERROR, err.message || '查询分片失败');
   }
 });
 

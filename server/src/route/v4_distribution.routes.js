@@ -26,7 +26,7 @@ router.get('/invite-code', async (req, res) => {
     const result = await distributionService.getMyInviteCode(req.user.id);
     return success(res, result);
   } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
   }
 });
 
@@ -39,7 +39,7 @@ router.get('/team', async (req, res) => {
     });
     return success(res, result);
   } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
   }
 });
 
@@ -49,7 +49,7 @@ router.get('/balance', async (req, res) => {
     const result = await distributionService.getCommissionBalance(req.user.id);
     return success(res, result);
   } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
   }
 });
 
@@ -60,7 +60,7 @@ router.post('/withdraw', _validate(withdrawSchema), async (req, res) => {
     const result = await distributionService.withdrawCommission(req.user.id, amount);
     return success(res, result, `成功提现 ${result.withdrawn} 元`);
   } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
   }
 });
 
@@ -73,7 +73,7 @@ router.get('/history', async (req, res) => {
     });
     return success(res, result);
   } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
   }
 });
 
