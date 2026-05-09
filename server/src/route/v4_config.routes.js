@@ -34,7 +34,7 @@ router.get('/:group', async (req, res) => {
     );
     return success(res, config);
   } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '读取配置失败', err.status || 500);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '读取配置失败', err.status || ERROR_CODE.INTERNAL_ERROR);
   }
 });
 
@@ -44,7 +44,7 @@ router.get('/dict/:dictKey', async (req, res) => {
     const dict = await configService.getDict(req.params.dictKey);
     return success(res, dict);
   } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '读取字典失败', err.status || 500);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '读取字典失败', err.status || ERROR_CODE.INTERNAL_ERROR);
   }
 });
 
@@ -62,7 +62,7 @@ adminRouter.get('/groups', requireRole('admin'), async (req, res) => {
     const groups = await getGroupList();
     return success(res, groups);
   } catch (err) {
-    return error(res, ERROR_CODE.INTERNAL_ERROR, err.message || '查询分组失败', 500);
+    return error(res, ERROR_CODE.INTERNAL_ERROR, err.message || '查询分组失败', ERROR_CODE.INTERNAL_ERROR);
   }
 });
 
@@ -73,7 +73,7 @@ adminRouter.get('/items/:groupKey', requireRole('admin'), async (req, res) => {
     const items = await getGroupItems(req.params.groupKey);
     return success(res, items);
   } catch (err) {
-    return error(res, ERROR_CODE.INTERNAL_ERROR, err.message || '查询配置项失败', 500);
+    return error(res, ERROR_CODE.INTERNAL_ERROR, err.message || '查询配置项失败', ERROR_CODE.INTERNAL_ERROR);
   }
 });
 
@@ -84,7 +84,7 @@ adminRouter.post('/', requireRole('admin'), _validate(setConfigSchema), async (r
     const result = await configService.setConfig(group_key, item_key, item_value, req.user.id);
     return success(res, result, '配置已更新');
   } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '更新配置失败', err.status || 500);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '更新配置失败', err.status || ERROR_CODE.INTERNAL_ERROR);
   }
 });
 
@@ -95,7 +95,7 @@ adminRouter.post('/rollback', requireRole('admin'), _validate(rollbackSchema), a
     const result = await configService.rollbackConfig(log_id, req.user.id);
     return success(res, result, '配置已回滚');
   } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '回滚失败', err.status || 500);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '回滚失败', err.status || ERROR_CODE.INTERNAL_ERROR);
   }
 });
 
@@ -105,7 +105,7 @@ adminRouter.get('/logs/:group', requireRole('admin'), async (req, res) => {
     const logs = await configService.getConfigLogs(req.params.group);
     return success(res, logs);
   } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '查询日志失败', err.status || 500);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '查询日志失败', err.status || ERROR_CODE.INTERNAL_ERROR);
   }
 });
 
@@ -116,7 +116,7 @@ adminRouter.get('/seed/verify', requireRole('admin'), async (req, res) => {
     const result = await validateSeed((await import('../dao/db.js')).default);
     return success(res, result);
   } catch (err) {
-    return error(res, ERROR_CODE.INTERNAL_ERROR, err.message || '校验失败', 500);
+    return error(res, ERROR_CODE.INTERNAL_ERROR, err.message || '校验失败', ERROR_CODE.INTERNAL_ERROR);
   }
 });
 

@@ -15,6 +15,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { success, error } from '../utils/response.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { requireRole } from '../middleware/rbac.js';
 import * as modelRouterService from '../services/model-router.service.js';
@@ -58,7 +59,7 @@ router.get('/status', requireRole('admin'), async (req, res) => {
     const status = await modelRouterService.getModelStatus();
     return success(res, status);
   } catch (err) {
-    return error(res, err.status || 500, err.message);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
   }
 });
 
@@ -68,7 +69,7 @@ router.post('/reset-breaker', requireRole('admin'), _validate(resetBreakerSchema
     const result = modelRouterService.resetBreaker(model_id);
     return success(res, result);
   } catch (err) {
-    return error(res, err.status || 500, err.message);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
   }
 });
 

@@ -9,6 +9,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { success, error } from '../utils/response.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { adminAuth} from '../middleware/auth.js';
 import * as pointsService from '../services/points.service.js';
@@ -31,7 +32,7 @@ router.get('/account', async (req, res) => {
     const result = await pointsService.getPointsAccount(req.user.id);
     return success(res, result);
   } catch (err) {
-    return error(res, err.status || 500, err.message, err.status || 500);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR);
   }
 });
 
@@ -44,7 +45,7 @@ router.get('/transactions', async (req, res) => {
     });
     return success(res, result);
   } catch (err) {
-    return error(res, err.status || 500, err.message, err.status || 500);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR);
   }
 });
 
@@ -55,7 +56,7 @@ router.post('/redeem', _validate(redeemSchema), async (req, res) => {
     const result = await pointsService.redeemPointsForCredits(req.user.id, points);
     return success(res, result, `成功兑换 ${result.redeemed_credits} 点数`);
   } catch (err) {
-    return error(res, err.status || 500, err.message, err.status || 500);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR);
   }
 });
 
@@ -70,7 +71,7 @@ router.post('/earn', adminAuth, _validate(earnSchema), async (req, res) => {
     });
     return success(res, result, '积分发放成功');
   } catch (err) {
-    return error(res, err.status || 500, err.message, err.status || 500);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR);
   }
 });
 

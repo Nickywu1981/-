@@ -66,7 +66,7 @@ router.post('/register', _validate(registerSchema), async (req, res) => {
 
     return success(res, result.user, '注册成功');
   } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '注册失败', err.status || 500);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '注册失败', err.status || ERROR_CODE.INTERNAL_ERROR);
   }
 });
 
@@ -111,7 +111,7 @@ router.post('/reset-password', _validate(resetPasswordSchema), async (req, res) 
     const result = await authService.resetPassword({ phone, email, newPassword: new_password });
     return success(res, result, '密码重置成功');
   } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '重置失败', err.status || 500);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '重置失败', err.status || ERROR_CODE.INTERNAL_ERROR);
   }
 });
 

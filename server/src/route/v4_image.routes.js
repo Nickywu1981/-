@@ -7,6 +7,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { success, error } from '../utils/response.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { contentModerationMiddleware } from '../middleware/content-moderation.middleware.js';
 import { tierGuard } from '../middleware/tierGuard.js';
@@ -57,7 +58,7 @@ router.post('/generate', _validate(generateSchema), contentModerationMiddleware(
     const result = await imageService.generateImage(req.user.id, { prompt, ratio, style });
     return success(res, result, '任务已提交');
   } catch (err) {
-    return error(res, err.status || 500, err.message || '生成失败', err.status || 500);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '生成失败', err.status || ERROR_CODE.INTERNAL_ERROR);
   }
 });
 
@@ -68,7 +69,7 @@ router.post('/replicate', _validate(replicateSchema), async (req, res) => {
     const result = await imageService.replicateMainImage(req.user.id, { referenceImageUrl: reference_image_url, productName: product_name, style, ratio });
     return success(res, result, '任务已提交');
   } catch (err) {
-    return error(res, err.status || 500, err.message || '复刻失败', err.status || 500);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '复刻失败', err.status || ERROR_CODE.INTERNAL_ERROR);
   }
 });
 
@@ -79,7 +80,7 @@ router.post('/batch-generate', _validate(batchGenerateSchema), tierGuard('image'
     const result = await imageService.batchGenerateImage(req.user.id, { prompts, ratio, style });
     return success(res, result, `已提交${prompts.length}个生图任务`);
   } catch (err) {
-    return error(res, err.status || 500, err.message || '批量生成失败', err.status || 500);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '批量生成失败', err.status || ERROR_CODE.INTERNAL_ERROR);
   }
 });
 
@@ -90,7 +91,7 @@ router.post('/batch-edit', _validate(batchEditSchema), tierGuard('image'), async
     const result = await imageService.batchEditImage(req.user.id, { images, operations });
     return success(res, result, '批量编辑任务已提交');
   } catch (err) {
-    return error(res, err.status || 500, err.message || '批量编辑失败', err.status || 500);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '批量编辑失败', err.status || ERROR_CODE.INTERNAL_ERROR);
   }
 });
 
@@ -101,7 +102,7 @@ router.post('/batch-replace', _validate(batchReplaceSchema), tierGuard('image'),
     const result = await imageService.batchReplaceImage(req.user.id, { images, newBackground: new_background, newScene: new_scene });
     return success(res, result, '批量替换任务已提交');
   } catch (err) {
-    return error(res, err.status || 500, err.message || '批量替换失败', err.status || 500);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '批量替换失败', err.status || ERROR_CODE.INTERNAL_ERROR);
   }
 });
 
@@ -115,7 +116,7 @@ router.get('/works', async (req, res) => {
     });
     return success(res, result);
   } catch (err) {
-    return error(res, err.status || 500, err.message || '查询失败');
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '查询失败');
   }
 });
 
@@ -126,7 +127,7 @@ router.post('/enhance-prompt', _validate(enhancePromptSchema), async (req, res) 
     const result = await promptEnhanceService.enhancePrompt(prompt, type || 'image');
     return success(res, result);
   } catch (err) {
-    return error(res, err.status || 500, err.message || '增强失败');
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '增强失败');
   }
 });
 

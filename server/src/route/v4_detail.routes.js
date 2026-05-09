@@ -7,6 +7,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { success, error } from '../utils/response.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { contentModerationMiddleware } from '../middleware/content-moderation.middleware.js';
 import * as detailService from '../services/detail-image.service.js';
@@ -39,7 +40,7 @@ router.post('/generate-set', _validate(generateSetSchema), contentModerationMidd
     });
     return success(res, result, '详情图套图生成任务已提交');
   } catch (err) {
-    return error(res, err.status || 500, err.message || '生成失败');
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '生成失败');
   }
 });
 
@@ -55,7 +56,7 @@ router.post('/replicate', _validate(replicateSchema), async (req, res) => {
     });
     return success(res, result, '详情图复刻任务已提交');
   } catch (err) {
-    return error(res, err.status || 500, err.message || '复刻失败');
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '复刻失败');
   }
 });
 
@@ -68,7 +69,7 @@ router.get('/works', async (req, res) => {
     });
     return success(res, result);
   } catch (err) {
-    return error(res, err.status || 500, err.message || '查询失败');
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '查询失败');
   }
 });
 

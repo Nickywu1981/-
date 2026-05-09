@@ -31,7 +31,7 @@ function _withMulter(req, res, next) {
       if (err.code === 'LIMIT_FILE_SIZE') {
         return error(res, ERROR_CODE.VALIDATION_ERROR, '文件大小超过50MB限制');
       }
-      return error(res, ERROR_CODE.INTERNAL_ERROR, err.message || '上传处理失败', 500);
+      return error(res, ERROR_CODE.INTERNAL_ERROR, err.message || '上传处理失败', ERROR_CODE.INTERNAL_ERROR);
     }
     next();
   });
@@ -44,7 +44,7 @@ router.post('/simple', _withMulter, (req, res) => {
     const result = uploadService.saveSimpleFile(req.file);
     return success(res, result, '上传成功');
   } catch (err) {
-    return error(res, ERROR_CODE.INTERNAL_ERROR, err.message || '上传失败', 500);
+    return error(res, ERROR_CODE.INTERNAL_ERROR, err.message || '上传失败', ERROR_CODE.INTERNAL_ERROR);
   }
 });
 
@@ -55,7 +55,7 @@ router.post('/init', _validate(initUploadSchema), (req, res) => {
     const result = uploadService.initUpload({ fileName: file_name, fileSize: file_size, fileType: file_type });
     return success(res, result);
   } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '初始化上传失败', err.status || 500);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '初始化上传失败', err.status || ERROR_CODE.INTERNAL_ERROR);
   }
 });
 
@@ -75,7 +75,7 @@ router.post('/chunk', _upload.fields([{ name: 'chunk', maxCount: 1 }]), (req, re
     const result = uploadService.receiveChunk(upload_id, chunk_index, req.files.chunk[0].buffer);
     return success(res, result);
   } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '接收分片失败', err.status || 500);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '接收分片失败', err.status || ERROR_CODE.INTERNAL_ERROR);
   }
 });
 
@@ -88,7 +88,7 @@ router.get('/chunks/:uploadId', (req, res) => {
     const result = uploadService.getReceivedChunks(req.params.uploadId);
     return success(res, result);
   } catch (err) {
-    return error(res, ERROR_CODE.INTERNAL_ERROR, err.message || '查询分片失败', 500);
+    return error(res, ERROR_CODE.INTERNAL_ERROR, err.message || '查询分片失败', ERROR_CODE.INTERNAL_ERROR);
   }
 });
 
@@ -99,7 +99,7 @@ router.post('/complete', _validate(completeUploadSchema), (req, res) => {
     const result = uploadService.completeUpload(upload_id);
     return success(res, result, '上传完成');
   } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '合并文件失败', err.status || 500);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '合并文件失败', err.status || ERROR_CODE.INTERNAL_ERROR);
   }
 });
 

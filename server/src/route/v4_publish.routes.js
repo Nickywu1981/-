@@ -12,6 +12,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { success, error } from '../utils/response.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate } from '../utils/validate.js';
 import * as publishService from '../services/publishService.js';
 
@@ -31,7 +32,7 @@ router.get('/platforms', (_req, res) => {
   try {
     return success(res, publishService.getPublishPlatforms());
   } catch (err) {
-    return error(res, err.status || 500, err.message);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
   }
 });
 
@@ -45,7 +46,7 @@ router.post('/submit', _validate(submitSchema), async (req, res) => {
     );
     return success(res, result, '分发任务已提交');
   } catch (err) {
-    return error(res, err.status || 500, err.message);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
   }
 });
 
@@ -55,7 +56,7 @@ router.get('/batch/:id', async (req, res) => {
     const result = await publishService.getPublishBatch(req.params.id, req.user.id);
     return success(res, result);
   } catch (err) {
-    return error(res, err.status || 500, err.message);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
   }
 });
 
@@ -65,7 +66,7 @@ router.post('/retry/:id', async (req, res) => {
     const result = await publishService.retryPublish(Number(req.params.id), req.user.id);
     return success(res, result, '已重新提交分发');
   } catch (err) {
-    return error(res, err.status || 500, err.message);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
   }
 });
 
@@ -78,7 +79,7 @@ router.get('/history', async (req, res) => {
     const result = await publishService.listPublishHistory(req.user.id, { page, pageSize, status, platform });
     return success(res, result);
   } catch (err) {
-    return error(res, err.status || 500, err.message);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
   }
 });
 
@@ -88,7 +89,7 @@ router.get('/stats', async (req, res) => {
     const result = await publishService.getPublishStats(req.user.id);
     return success(res, result);
   } catch (err) {
-    return error(res, err.status || 500, err.message);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
   }
 });
 

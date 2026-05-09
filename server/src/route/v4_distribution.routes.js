@@ -10,6 +10,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { success, error } from '../utils/response.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate } from '../utils/validate.js';
 import * as distributionService from '../services/distribution.service.js';
 
@@ -25,7 +26,7 @@ router.get('/invite-code', async (req, res) => {
     const result = await distributionService.getMyInviteCode(req.user.id);
     return success(res, result);
   } catch (err) {
-    return error(res, err.status || 500, err.message, err.status || 500);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR);
   }
 });
 
@@ -38,7 +39,7 @@ router.get('/team', async (req, res) => {
     });
     return success(res, result);
   } catch (err) {
-    return error(res, err.status || 500, err.message, err.status || 500);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR);
   }
 });
 
@@ -48,7 +49,7 @@ router.get('/balance', async (req, res) => {
     const result = await distributionService.getCommissionBalance(req.user.id);
     return success(res, result);
   } catch (err) {
-    return error(res, err.status || 500, err.message, err.status || 500);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR);
   }
 });
 
@@ -59,7 +60,7 @@ router.post('/withdraw', _validate(withdrawSchema), async (req, res) => {
     const result = await distributionService.withdrawCommission(req.user.id, amount);
     return success(res, result, `成功提现 ${result.withdrawn} 元`);
   } catch (err) {
-    return error(res, err.status || 500, err.message, err.status || 500);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR);
   }
 });
 
@@ -72,7 +73,7 @@ router.get('/history', async (req, res) => {
     });
     return success(res, result);
   } catch (err) {
-    return error(res, err.status || 500, err.message, err.status || 500);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR);
   }
 });
 
@@ -82,7 +83,7 @@ router.get('/tier', async (req, res) => {
     const result = await distributionService.getUserTier(req.user.id);
     return success(res, result);
   } catch (err) {
-    return error(res, err.status || 500, err.message);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
   }
 });
 
@@ -100,7 +101,7 @@ router.get('/performance', async (req, res) => {
     });
     return success(res, result);
   } catch (err) {
-    return error(res, err.status || 500, err.message);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
   }
 });
 
@@ -110,7 +111,7 @@ router.get('/promo', async (req, res) => {
     const result = await distributionService.getMyPromoLink(req.user.id);
     return success(res, result);
   } catch (err) {
-    return error(res, err.status || 500, err.message);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
   }
 });
 
@@ -120,7 +121,7 @@ router.get('/campaigns', async (req, res) => {
     const result = await distributionService.getMyCampaignProgress(req.user.id);
     return success(res, result);
   } catch (err) {
-    return error(res, err.status || 500, err.message);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
   }
 });
 

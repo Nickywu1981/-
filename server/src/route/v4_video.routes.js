@@ -6,6 +6,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { success, error } from '../utils/response.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { tierGuard} from '../middleware/tierGuard.js';
 import * as videoService from '../services/video.service.js';
@@ -129,7 +130,7 @@ router.post('/generate', _validate(generateSchema), tierGuard('video'), async (r
     const { prompt, duration, ratio, enhanced_prompt } = req.validated;
     const result = await videoService.generateVideo(req.user.id, { prompt, duration, ratio, enhancedPrompt: enhanced_prompt });
     return success(res, result, '视频生成任务已提交');
-  } catch (err) { return error(res, err.status || 500, err.message, err.status || 500); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR); }
 });
 
 router.post('/image-to-video', _validate(imageToVideoSchema), tierGuard('video'), async (req, res) => {
@@ -137,7 +138,7 @@ router.post('/image-to-video', _validate(imageToVideoSchema), tierGuard('video')
     const { image_url, prompt, duration, ratio } = req.validated;
     const result = await videoService.imageToVideo(req.user.id, { imageUrl: image_url, prompt, duration, ratio });
     return success(res, result, '图生视频任务已提交');
-  } catch (err) { return error(res, err.status || 500, err.message, err.status || 500); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR); }
 });
 
 router.post('/multi-image-to-video', _validate(multiImageSchema), tierGuard('video'), async (req, res) => {
@@ -145,7 +146,7 @@ router.post('/multi-image-to-video', _validate(multiImageSchema), tierGuard('vid
     const { images, prompt, duration, ratio, transition } = req.validated;
     const result = await videoService.multiImageToVideo(req.user.id, { images, prompt, duration, ratio, transition });
     return success(res, result, '多图合成任务已提交');
-  } catch (err) { return error(res, err.status || 500, err.message, err.status || 500); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR); }
 });
 
 router.post('/package', _validate(packageSchema), async (req, res) => {
@@ -153,7 +154,7 @@ router.post('/package', _validate(packageSchema), async (req, res) => {
     const { video_url, options } = req.validated;
     const result = await videoService.autoPackageVideo(req.user.id, { videoUrl: video_url, options });
     return success(res, result, '视频包装任务已提交');
-  } catch (err) { return error(res, err.status || 500, err.message, err.status || 500); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR); }
 });
 
 router.post('/replace-character', _validate(replaceCharSchema), tierGuard('video'), async (req, res) => {
@@ -161,7 +162,7 @@ router.post('/replace-character', _validate(replaceCharSchema), tierGuard('video
     const { video_url, target_person_image } = req.validated;
     const result = await videoService.replaceCharacter(req.user.id, { videoUrl: video_url, targetPersonImage: target_person_image });
     return success(res, result, '角色替换任务已提交');
-  } catch (err) { return error(res, err.status || 500, err.message, err.status || 500); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR); }
 });
 
 router.post('/product-ad', _validate(productAdSchema), tierGuard('video'), async (req, res) => {
@@ -169,7 +170,7 @@ router.post('/product-ad', _validate(productAdSchema), tierGuard('video'), async
     const { product_name, product_images, highlights, style, duration } = req.validated;
     const result = await videoService.productAdVideo(req.user.id, { productName: product_name, productImages: product_images, highlights, style, duration });
     return success(res, result, '一键成片任务已提交');
-  } catch (err) { return error(res, err.status || 500, err.message, err.status || 500); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR); }
 });
 
 router.post('/storyboard', _validate(storyboardSchema), async (req, res) => {
@@ -177,7 +178,7 @@ router.post('/storyboard', _validate(storyboardSchema), async (req, res) => {
     const { prompt, scene_count } = req.validated;
     const result = await videoService.generateStoryboard(req.user.id, { prompt, sceneCount: scene_count || 5 });
     return success(res, result, '分镜生成任务已提交');
-  } catch (err) { return error(res, err.status || 500, err.message, err.status || 500); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR); }
 });
 
 // ============================================================
@@ -188,7 +189,7 @@ router.post('/action-migrate', _validate(actionMigrateSchema), tierGuard('video'
     const { source_video_url, target_person_image, options } = req.validated;
     const result = await actionMigrateService.migrateAction(req.user.id, { sourceVideoUrl: source_video_url, targetPersonImage: target_person_image, options });
     return success(res, result, '动作迁移任务已提交');
-  } catch (err) { return error(res, err.status || 500, err.message, err.status || 500); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR); }
 });
 
 router.post('/action-migrate/batch', _validate(batchActionMigrateSchema), tierGuard('video'), async (req, res) => {
@@ -196,14 +197,14 @@ router.post('/action-migrate/batch', _validate(batchActionMigrateSchema), tierGu
     const { source_video_urls, target_person_images, options } = req.validated;
     const result = await actionMigrateService.batchMigrateAction(req.user.id, { sourceVideoUrls: source_video_urls, targetPersonImages: target_person_images, options });
     return success(res, result, `批量动作迁移已提交 (${result.total_jobs || '?'} 个子任务)`);
-  } catch (err) { return error(res, err.status || 500, err.message, err.status || 500); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR); }
 });
 
 router.get('/action-migrate/batch/:id/progress', async (req, res) => {
   try {
     const result = await actionMigrateService.getBatchMigrateProgress(req.params.id, req.user.id);
     return success(res, result);
-  } catch (err) { return error(res, err.status || 500, err.message, err.status || 500); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR); }
 });
 
 // ============================================================
@@ -214,7 +215,7 @@ router.post('/viral/analyze', _validate(viralAnalyzeSchema), async (req, res) =>
     const { video_url, platform } = req.validated;
     const result = await viralVideoService.analyzeViralVideo(req.user.id, { videoUrl: video_url, platform });
     return success(res, result, '爆款分析任务已提交');
-  } catch (err) { return error(res, err.status || 500, err.message, err.status || 500); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR); }
 });
 
 router.post('/viral/replicate', _validate(viralReplicateSchema), tierGuard('video'), async (req, res) => {
@@ -222,7 +223,7 @@ router.post('/viral/replicate', _validate(viralReplicateSchema), tierGuard('vide
     const { analysis_job_id, product_name, product_images, custom_prompt } = req.validated;
     const result = await viralVideoService.replicateViralVideo(req.user.id, { analysisJobId: analysis_job_id, productName: product_name, productImages: product_images, customPrompt: custom_prompt });
     return success(res, result, '爆款复刻任务已提交');
-  } catch (err) { return error(res, err.status || 500, err.message, err.status || 500); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR); }
 });
 
 // ============================================================
@@ -233,7 +234,7 @@ router.post('/digital-human', _validate(digitalHumanSchema), tierGuard('video'),
     const { text, audio_url, avatar_style, background } = req.validated;
     const result = await digitalHumanService.createDigitalHuman(req.user.id, { text, audioUrl: audio_url, avatarStyle: avatar_style, background });
     return success(res, result, '数字人任务已提交');
-  } catch (err) { return error(res, err.status || 500, err.message, err.status || 500); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR); }
 });
 
 // ============================================================
@@ -247,7 +248,7 @@ router.post('/smart-clip', _validate(smartClipSchema), tierGuard('video'), async
       ? await liveClipService.smartClipWithRegions(req.user.id, { videoUrl: video_url, clipRegions: clip_regions })
       : await liveClipService.smartClipLiveVideo(req.user.id, { videoUrl: video_url, duration, clipCount: clip_count, style });
     return success(res, result, '精剪任务已提交');
-  } catch (err) { return error(res, err.status || 500, err.message, err.status || 500); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR); }
 });
 
 router.post('/remove-redundant', _validate(removeRedundantSchema), tierGuard('video'), async (req, res) => {
@@ -255,7 +256,7 @@ router.post('/remove-redundant', _validate(removeRedundantSchema), tierGuard('vi
     const { video_url, threshold } = req.validated;
     const result = await liveClipService.removeRedundantSegments(req.user.id, { videoUrl: video_url, threshold });
     return success(res, result, '去冗余任务已提交');
-  } catch (err) { return error(res, err.status || 500, err.message, err.status || 500); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR); }
 });
 
 router.post('/optimize-audio', _validate(optimizeAudioSchema), tierGuard('video'), async (req, res) => {
@@ -263,7 +264,7 @@ router.post('/optimize-audio', _validate(optimizeAudioSchema), tierGuard('video'
     const { video_url, level } = req.validated;
     const result = await liveClipService.optimizeAudio(req.user.id, { videoUrl: video_url, level });
     return success(res, result, '杂音优化任务已提交');
-  } catch (err) { return error(res, err.status || 500, err.message, err.status || 500); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR); }
 });
 
 router.post('/subtitle-fix', _validate(subtitleFixSchema), async (req, res) => {
@@ -271,7 +272,7 @@ router.post('/subtitle-fix', _validate(subtitleFixSchema), async (req, res) => {
     const { video_url, source_language } = req.validated;
     const result = await liveClipService.subtitleCorrection(req.user.id, { videoUrl: video_url, sourceLanguage: source_language });
     return success(res, result, '字幕校对任务已提交');
-  } catch (err) { return error(res, err.status || 500, err.message, err.status || 500); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR); }
 });
 
 // ============================================================
@@ -286,14 +287,14 @@ router.get('/works', async (req, res) => {
       taskType: req.query.task_type,
     });
     return success(res, result);
-  } catch (err) { return error(res, err.status || 500, err.message); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 });
 
 router.get('/job/:id', async (req, res) => {
   try {
     const job = await videoService.getVideoJobStatus(req.params.id, req.user.id);
     return success(res, job);
-  } catch (err) { return error(res, err.status || 500, err.message, err.status || 500); }
+  } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR); }
 });
 
 export default router;

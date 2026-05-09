@@ -7,6 +7,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { success, error } from '../utils/response.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate } from '../utils/validate.js';
 import * as jobQueueService from '../services/job-queue.service.js';
 
@@ -33,7 +34,7 @@ router.post('/', _validate(submitJobSchema), async (req, res) => {
     const result = await jobQueueService.submitJob(req.user.id, task_type, task_params || {});
     return success(res, result, '任务已提交');
   } catch (err) {
-    return error(res, err.status || 500, err.message, err.status || 500);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR);
   }
 });
 
@@ -43,7 +44,7 @@ router.get('/:id', async (req, res) => {
     const job = await jobQueueService.getJobStatus(req.params.id, req.user.id);
     return success(res, job);
   } catch (err) {
-    return error(res, err.status || 500, err.message, err.status || 500);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message, err.status || ERROR_CODE.INTERNAL_ERROR);
   }
 });
 

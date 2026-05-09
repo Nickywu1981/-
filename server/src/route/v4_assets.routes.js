@@ -6,6 +6,7 @@
 import { Router } from 'express';
 import z from 'zod';
 import { success, error } from '../utils/response.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 import { validate } from '../utils/validate.js';
 import db from '../dao/db.js';
 
@@ -69,7 +70,7 @@ router.get('/list', validate(listQuerySchema, 'query'), async (req, res) => {
       conn.release();
     }
   } catch (err) {
-    return error(res, err.status || 500, err.message);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
   }
 });
 
