@@ -1,6 +1,6 @@
 <!--
   Movio AI v6.0 — Workspace Layout
-  四大固定导航：首页 | 创作 | AI助手 | 工作流
+  五大固定导航：首页 | 创作 | AI助手 | 工作流 | 龙虾
   硬性规则：不准增删改顶级菜单，子功能全放在对应分类内
 -->
 <template>
@@ -70,13 +70,15 @@ const isAdmin = ref(false)
 const currentPath = computed(() => route.path)
 
 // ═══════════════════════════════════════════════
-// 四大固定顶级导航 — 不准增删改
+// 五大固定顶级导航 — 不准增删改
 // ═══════════════════════════════════════════════
 const navItems = [
   { path: '/workspace',            icon: '🏠', label: '首页',    disabled: false },
   { path: '/workspace/creation',   icon: '🎨', label: '创作',    disabled: false },
   { path: '/workspace/assistant',  icon: '🤖', label: 'AI 助手', disabled: false },
-  { path: '/workspace/workflow',   icon: '⚙', label: '工作流',  disabled: false }]
+  { path: '/workspace/workflow',   icon: '⚙', label: '工作流',  disabled: false },
+  { path: '/workspace/lobster',    icon: '🦞', label: '龙虾',    disabled: false },
+]
 
 function isActive(item: { path: string }) {
   if (item.path === '/workspace') return currentPath.value === '/workspace'
