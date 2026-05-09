@@ -3,6 +3,8 @@
  * 兼容 Google ADK A2A 协议 `/run` 端点
  */
 import { Router } from 'express';
+import { z } from 'zod';
+import { validate } from '../utils/validate.js';
 import {
   MemoryAgent, AttentionAgent, ContextAgent,
   LocalizeAgent, ContentAgent, GuardAgent,
@@ -12,6 +14,13 @@ import { Runner } from '../adk/core/runner.js';
 import { SessionStore } from '../adk/core/sessionStore.js';
 
 const router = Router();
+
+// Zod schema for /run/:agentName
+const runSchema = z.object({
+  query: z.string().min(1).max(5000),
+  sessionId: z.string().max(64).optional(),
+  context: z.record(z.unknown()).optional(),
+});
 
 // 持久化 session 存储（Redis + Map fallback）
 const sessionStore = new SessionStore().startCleanup();
@@ -40,7 +49,7 @@ router.get('/agents', (_req, res) => {
 });
 
 // A2A 标准 /run 端点
-router.post('/run/:agentName', async (req, res) => {
+router.post('/run/:agentName', validate(runSchema), async (req, res) => {
   const { agentName } = req.params;
   const { query, sessionId, context } = req.body || {};
   const userId = req.user?.id || req.user?.userId || 'anonymous';
