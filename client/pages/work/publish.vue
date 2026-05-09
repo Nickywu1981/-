@@ -160,7 +160,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue';
 import { useApi } from '~/composables/useApi';
 import { formatDateTime } from '@/utils/format';

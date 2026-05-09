@@ -131,7 +131,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useSiteConfig } from '#composables/useSiteConfig';
 import { formatDateTime } from '@/utils/format'
 const formatTime = formatDateTime

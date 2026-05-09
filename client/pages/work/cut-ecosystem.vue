@@ -132,7 +132,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { formatDate } from '@/utils/format';
 const toast = useToast()
 const api = useApi()

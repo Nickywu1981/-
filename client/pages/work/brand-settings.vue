@@ -20,7 +20,7 @@
     <template #actions><button class="btn-primary" @click="saveSettings" :disabled="task.status===1">保存品牌配置</button><p v-if="errorMsg" class="error-msg">{{ errorMsg }}</p></template>
   </WorkLayout>
 </template>
-<script setup>
+<script setup lang="ts">
 
 const steps = ['品牌信息','水印设置','角标设置','确认保存'], currentStep = ref(0)
 const form = reactive({ brandName:'', logoUrl:'', watermarkType:'text', watermarkText:'', watermarkPosition:'bottomRight', watermarkOpacity:30, badges:[] })

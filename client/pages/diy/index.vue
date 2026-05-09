@@ -75,7 +75,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 
 const { $api } = useNuxtApp()
 const pages = ref([])
