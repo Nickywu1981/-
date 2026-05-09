@@ -21,7 +21,7 @@ let tokenIndex = null;
 function loadStore() {
   if (store) return store;
   if (fs.existsSync(VECTOR_STORE_PATH)) {
-    store = JSON.parse(fs.readFileSync(VECTOR_STORE_PATH, 'utf-8'));
+    try { store = JSON.parse(fs.readFileSync(VECTOR_STORE_PATH, 'utf-8')); } catch { store = null; }
   }
   return store;
 }
@@ -29,7 +29,7 @@ function loadStore() {
 function loadTokenIndex() {
   if (tokenIndex) return tokenIndex;
   if (fs.existsSync(TOKEN_INDEX_PATH)) {
-    tokenIndex = JSON.parse(fs.readFileSync(TOKEN_INDEX_PATH, 'utf-8'));
+    try { tokenIndex = JSON.parse(fs.readFileSync(TOKEN_INDEX_PATH, 'utf-8')); } catch { tokenIndex = null; }
   }
   return tokenIndex;
 }

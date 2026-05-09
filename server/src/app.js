@@ -16,7 +16,12 @@ import { ERROR_CODE } from './constants/errorCode.js';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './config/swagger.js';
 import { readFileSync } from 'fs';
-const swaggerDoc = JSON.parse(readFileSync(new URL('./config/swagger.json', import.meta.url), 'utf-8'));
+let swaggerDoc;
+try {
+  swaggerDoc = JSON.parse(readFileSync(new URL('./config/swagger.json', import.meta.url), 'utf-8'));
+} catch {
+  swaggerDoc = { openapi: '3.0.0', info: { title: 'Movio API', version: '1.0.0' }, paths: {} };
+}
 import userRoutes from './route/userRoutes.js';
 import sizeTemplateRoutes from './route/sizeTemplateRoutes.js';
 import brandRoutes from './route/brandRoutes.js';

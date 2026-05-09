@@ -9,7 +9,7 @@
         <div class="check-col">
           <h4>目标平台</h4>
           <div class="target-list">
-            <button v-for="t in targets.filter((t: any) => ['amazon','temu','tiktok','shein'].includes(t.code))" :key="t.code" class="target-card" :class="{ active: selectedPlatform === t.code }" @click="selectedPlatform = t.code">
+            <button v-for="t in platformTargets" :key="t.code" class="target-card" :class="{ active: selectedPlatform === t.code }" @click="selectedPlatform = t.code">
               <span class="target-name">{{ t.name }}</span>
               <span class="target-count">{{ t.imageRuleCount + t.textRuleCount }} 条规则</span>
             </button>
@@ -18,7 +18,7 @@
         <div class="check-col">
           <h4>目标区域（可选）</h4>
           <div class="target-list">
-            <button v-for="t in targets.filter((t: any) => ['eu','us','jp'].includes(t.code))" :key="t.code" class="target-card" :class="{ active: selectedRegion === t.code }" @click="selectedRegion = t.code">
+            <button v-for="t in regionTargets" :key="t.code" class="target-card" :class="{ active: selectedRegion === t.code }" @click="selectedRegion = t.code">
               <span class="target-name">{{ t.name }}</span>
               <span class="target-count">{{ t.imageRuleCount + t.textRuleCount }} 条规则</span>
             </button>
@@ -123,6 +123,8 @@ const step = ref(0);
 const selectedPlatform = ref('');
 const selectedRegion = ref('');
 const targets = ref<any[]>([]);
+const platformTargets = computed(() => targets.value.filter((t: any) => ['amazon','temu','tiktok','shein'].includes(t.code)));
+const regionTargets = computed(() => targets.value.filter((t: any) => ['eu','us','jp'].includes(t.code)));
 const previews = ref<PreviewItem[]>([]);
 const textToCheck = ref('');
 const checkResult = ref<any>(null);

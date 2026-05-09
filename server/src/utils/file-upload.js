@@ -144,8 +144,9 @@ export function receiveChunk(uploadId, chunkIndex, chunkBuffer) {
 export function getReceivedChunks(uploadId) {
   const metaPath = path.join(CHUNK_DIR, `${uploadId}.json`);
   if (!fs.existsSync(metaPath)) return { received: [] };
-  const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
-  return { received: meta.receivedChunks, total: meta.totalChunks };
+  let meta;
+  try { meta = JSON.parse(fs.readFileSync(metaPath, 'utf8')); } catch { return { received: [] }; }
+  return { received: meta.receivedChunks || [], total: meta.totalChunks || 0 };
 }
 
 /**
@@ -157,7 +158,8 @@ export function completeUpload(uploadId) {
     throw new BusinessError(404, '上传会话不存在');
   }
 
-  const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
+  let meta;
+  try { meta = JSON.parse(fs.readFileSync(metaPath, 'utf8')); } catch { throw new BusinessError(400, '上传元数据损坏，请重新上传'); }
   if (meta.receivedChunks.length < meta.totalChunks) {
     throw new BusinessError(400, `分片不完整 (${meta.receivedChunks.length}/${meta.totalChunks})`);
   }
