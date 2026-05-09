@@ -1162,13 +1162,7 @@ function onResize() {
   transition: all 0.25s ease;
 }
 .ws-side-tog-bar.a { background: var(--brand); }
-  flex-shrink: 0;
-}
 .ws-side-tog:hover { border-color: var(--brand); }
-.toggle-bar { display: block; width: 100%; height: 2px; background: var(--text-secondary); border-radius: 2px; transition: all 0.25s; }
-.toggle-bar.open:nth-child(1) { transform: translateY(6px) rotate(45deg); }
-.toggle-bar.open:nth-child(2) { opacity: 0; }
-.toggle-bar.open:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
 
 /* ================================================
    INPUT CARD — Hero element
