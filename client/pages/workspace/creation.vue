@@ -63,39 +63,33 @@ const activeTab = ref('image')
 
 function go(path: string) { router.push(path) }
 
-// ═══ 标签定义 ═══
+// ═══ 标签定义 — 5大创作分类 ═══
 const tabs = [
-  { key: 'image', label: '图片生成' },
   { key: 'video', label: '视频生成' },
-  { key: 'batch', label: '批量处理' },
-  { key: 'edit', label: '图片编辑' },
-  { key: 'removebg', label: '背景移除' },
-  { key: 'copywrite', label: '文案生成' },
-  { key: 'digital-human', label: '数字人' },
+  { key: 'image', label: '图片生成' },
+  { key: 'detail', label: '电商详情图' },
+  { key: 'copywrite', label: '文案工具' },
+  { key: 'digital', label: '数字人' },
 ]
 
 const activeTabLabel = computed(() => tabs.find(t => t.key === activeTab.value)?.label || '')
 const activeTabPlaceholder = computed(() => {
   const map: Record<string, string> = {
-    image: '描述你想要的商品图，例如：夏季连衣裙白底图，简约高级风格...',
     video: '描述你想要的带货视频，例如：护肤品展示视频，15秒口播...',
-    batch: '批量处理模式，上传多张图片统一操作...',
-    edit: '描述要编辑的图片效果，例如：调亮肤色、去除褶皱...',
-    removebg: '上传图片，AI 自动识别主体并移除背景...',
+    image: '描述你想要的商品图，例如：夏季连衣裙白底图，简约高级风格...',
+    detail: '描述你的详情页需求，例如：面膜产品详情页，日式极简风...',
     copywrite: '描述你的文案需求，例如：618 大促女装促销标题...',
-    'digital-human': '描述数字人需求，例如：女装带货数字人，甜美风格...',
+    digital: '描述数字人需求，例如：女装带货数字人，甜美风格...',
   }
   return map[activeTab.value] || '描述你的创作需求...'
 })
 const activeTabHint = computed(() => {
   const map: Record<string, string> = {
-    image: '支持文字描述生成 / 参考图生成 / 模板生成',
-    video: '支持图片转视频 / 文字转视频 / 数字人口播',
-    batch: '支持批量抠图 / 批量白底 / 批量尺寸调整',
-    edit: '支持精修 / 换色 / 去皱 / 风格迁移 / 文字特效',
-    removebg: '3秒智能抠图，支持手动微调边缘',
+    video: '支持图片转视频 / 文字转视频 / 分镜规划 / 数字人口播',
+    image: '支持文字生成 / 参考图生成 / 批量处理 / 精修 / 去背景',
+    detail: '支持详情页设计 / 主图套装 / 多平台适配 / 产品渲染',
     copywrite: '支持电商标题 / 详情文案 / 口播脚本 / 营销文案',
-    'digital-human': '支持带货视频 / 虚拟直播 / 形象定制 / AI 主播',
+    digital: '支持带货视频 / 虚拟直播 / 形象定制 / AI 主播',
   }
   return map[activeTab.value] || ''
 })

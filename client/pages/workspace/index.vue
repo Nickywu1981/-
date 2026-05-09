@@ -53,8 +53,8 @@ const quickLinks = [
   { path: '/workspace/creation?tab=video', icon: '🎥', name: '视频生成' },
   { path: '/workspace/creation?tab=image', icon: '🖼', name: '图片生成' },
   { path: '/work/detail-page', icon: '📄', name: '电商详情图' },
-  { path: '/work/poster', icon: '📰', name: '活动海报' },
-  { path: '/work/digital-human', icon: '🤖', name: '换脸/数字人' },
+  { path: '/work/copywriting', icon: '✍️', name: '文案工具' },
+  { path: '/work/digital-human', icon: '🤖', name: '数字人' },
 ]
 
 const recentProjects = ref<{ icon: string; name: string; time: string; path: string }[]>([])
