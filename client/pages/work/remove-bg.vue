@@ -202,9 +202,9 @@ function startPolling(taskId: string) {
       }
     } catch { consecutiveFailures++ }
     pollCount++
-    let interval = 1000
-    if (pollCount > 5) interval = 3000
-    if (consecutiveFailures > 3) interval = 5000
+    let interval = POLL_INITIAL_MS
+    if (pollCount > 5) interval = POLL_INTERVAL_MS
+    if (consecutiveFailures > 3) interval = POLL_BACKOFF_MS
     pollTimer = setTimeout(poll, interval)
   }
   poll()

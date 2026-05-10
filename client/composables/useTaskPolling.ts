@@ -9,6 +9,7 @@
  */
 import { ref, onUnmounted, onDeactivated, onActivated } from 'vue'
 import { useRuntimeConfig } from '#app'
+import { POLL_INTERVAL_MS } from '~/constants/ui'
 
 export function useTaskPolling() {
   const jobId = ref<number | null>(null)
@@ -83,7 +84,7 @@ export function useTaskPolling() {
       } catch {
         // 轮询失败不中断
       }
-    }, 3000) // 每3秒轮询
+    }, POLL_INTERVAL_MS)
   }
 
   function stopPolling() {

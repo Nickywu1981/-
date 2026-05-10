@@ -3,6 +3,7 @@
  *
  * 使用: import { POLL_INTERVAL, TOAST_DURATION, Z_INDEX } from '~/constants/ui'
  */
+export const POLL_INITIAL_MS = 1000
 export const POLL_INTERVAL_MS = 3000
 export const POLL_BACKOFF_MS = 5000
 export const POLL_MAX_BACKOFF_MS = 15000
