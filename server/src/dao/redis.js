@@ -70,7 +70,11 @@ export async function cacheGet(key) {
 export async function cacheSet(key, value, ttl = 300) {
   try {
     const r = await getRedis();
-    if (!r) { memStore.set(key, { _v: value, _ts: Date.now() }); evictOldest(); return; }
+    if (!r) {
+      const v = typeof value === 'string' ? value : JSON.stringify(value);
+      if (Buffer.byteLength(v, 'utf8') > 512 * 1024) { logger.warn(`[cache] Skip oversized entry (${key}: ${Math.round(Buffer.byteLength(v, 'utf8') / 1024)}KB > 512KB)`); return; }
+      memStore.set(key, { _v: value, _ts: Date.now() }); evictOldest(); return;
+    }
     await r.set(key, JSON.stringify(value), { EX: ttl });
   } catch { memStore.set(key, { _v: value, _ts: Date.now() }); evictOldest(); }
 }

@@ -81,7 +81,7 @@ export const logout = wrapController(async (req, res, next) => {
     const rt = req.cookies?.refreshToken;
     if (rt) {
       try { await userService.revokeRefreshToken(rt); } catch (e) { logger.warn('[Logout] RefreshToken 撤销失败', { message: e.message }); }
-      res.clearCookie('refreshToken', { httpOnly: true, secure: true, sameSite: 'lax', path: '/' });
+      res.clearCookie('refreshToken', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/' });
     }
     return sendSuccess(res, {}, '已退出登录');
   })

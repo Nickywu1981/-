@@ -10,6 +10,7 @@ import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
+import { authMiddleware } from '../middleware/auth.middleware.js';
 import * as jobQueueService from '../services/job-queue.service.js';
 
 const VALID_TASK_TYPES = new Set([
@@ -21,6 +22,7 @@ const VALID_TASK_TYPES = new Set([
 ]);
 
 const router = Router();
+router.use(authMiddleware);
 
 const VALID_TYPES_ARR = [...VALID_TASK_TYPES];
 const submitJobSchema = z.object({

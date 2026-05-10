@@ -80,6 +80,7 @@ export async function createPaymentOrder(userId, { planType, payChannel = 'wecha
 // ==================== 沙箱支付（仅沙箱模式可用） ====================
 
 export async function sandboxPay(orderId) {
+  if (process.env.NODE_ENV === 'production') throw new BusinessError(403, '沙箱支付不可在生产环境使用');
   if (!allinpayConfig.isSandbox) throw new BusinessError(403, '沙箱支付仅开发环境可用');
 
   const order = await allinpayService.queryOrder(orderId);

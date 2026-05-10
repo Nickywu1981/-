@@ -7,7 +7,7 @@ import { jwtSecret } from '../config/index.js';
 import { guardSQL } from '../utils/sqlGuard.js';
 import { generateTokens, refreshAccessToken as refreshTokenUtil, revokeAccessToken as revokeTokenUtil, revokeRefreshToken as revokeRefreshUtil, revokeAllUserTokens as revokeAllUtil } from '../utils/jwtToken.js';
 
-const SALT_ROUNDS = 10;
+const SALT_ROUNDS = 12;
 
 export async function register({ username, password, nickname }) {
   guardSQL(username, 'username');

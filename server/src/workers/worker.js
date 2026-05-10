@@ -100,6 +100,9 @@ async function processJob(job) {
   }
 }
 
+let _consecutiveErrors = 0;
+const MAX_BACKOFF = 120000; // 最大退避 2 分钟
+
 async function poll() {
   while (running) {
     try {
@@ -111,8 +114,13 @@ async function poll() {
           processJob(job).catch(err => logger.error('[Worker] Unhandled job error:', err.message));
         }
       }
+      _consecutiveErrors = 0;
     } catch (err) {
-      logger.error(`[Worker] Poll error: ${err.message}`);
+      _consecutiveErrors++;
+      const backoff = Math.min(POLL_INTERVAL * Math.pow(2, Math.min(_consecutiveErrors, 6)), MAX_BACKOFF);
+      logger.error(`[Worker] Poll error (consecutive=${_consecutiveErrors}, backoff=${backoff}ms): ${err.message}`);
+      await new Promise(resolve => setTimeout(resolve, backoff));
+      continue;
     }
     await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL));
   }

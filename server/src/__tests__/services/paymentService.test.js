@@ -114,6 +114,9 @@ describe('paymentService', () => {
   });
 
   describe('sandboxPay', () => {
+    beforeEach(() => { vi.stubEnv('NODE_ENV', 'development'); });
+    afterAll(() => { vi.unstubAllEnvs(); });
+
     it('should pay an existing order', async () => {
       allinpayDao.getByReqsn.mockResolvedValue({
         reqsn: 'MOV_TEST', status: 0, order_type: 'membership',

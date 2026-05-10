@@ -13,7 +13,7 @@ const BLOCKED_WORDS = [
 ];
 
 export function contentModerationMiddleware(stage = 'input') {
-  return async (req, _res, next) => {
+  return async (req, res, next) => {
     // W1 MVP: 基础敏感词过滤，后续接入 T-G5-005 moderation.service
     const textToCheck = req.body?.prompt || req.body?.text || req.body?.content || '';
 

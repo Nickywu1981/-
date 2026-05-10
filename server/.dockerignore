@@ -5,3 +5,8 @@ dist
 .nuxt
 *.log
 uploads
+coverage
+sql
+.env
+.env.*
+certs

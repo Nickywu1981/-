@@ -29,9 +29,12 @@ export function validateStartupConfig() {
     errors.push('生产环境 EMAIL_PROVIDER 不能为 mock');
   }
 
-  // P0: AI API key in production
-  if (isProd && !config.ai.apiKey) {
-    errors.push('生产环境必须设置 OPENAI_API_KEY');
+  // P0: AI API key not a placeholder
+  if (isProd) {
+    const apiKey = config.ai.apiKey || '';
+    if (!apiKey || ['your-openai-api-key', 'your-', 'sk-your-', 'CHANGE_ME'].some(p => apiKey.startsWith(p) || apiKey === p)) {
+      errors.push('生产环境必须设置真实 OPENAI_API_KEY（不能为占位值）');
+    }
   }
 
   // P1: ENCRYPTION_KEY present and valid
@@ -41,14 +44,22 @@ export function validateStartupConfig() {
     errors.push(`ENCRYPTION_KEY 长度必须为 32 字节（当前: ${Buffer.from(process.env.ENCRYPTION_KEY, 'utf8').length})`);
   }
 
+  // P1: JWT_SECRET not a known placeholder
+  if (isProd && ['CHANGE_ME', 'your-secret-key', 'dev-secret'].includes(process.env.JWT_SECRET || '')) {
+    errors.push('生产环境 JWT_SECRET 不能为占位值 CHANGE_ME/your-secret-key');
+  }
+
   // P1: JWT_REFRESH_SECRET
   if (isProd && !process.env.JWT_REFRESH_SECRET) {
     errors.push('生产环境必须设置 JWT_REFRESH_SECRET');
   }
 
-  // P1: DB password not default
-  if (isProd && (!config.mysql.password || config.mysql.password === 'CHANGE_ME')) {
-    errors.push('生产环境 DB_PASSWORD 未设置或仍为默认值 CHANGE_ME');
+  // P0: DB password not default (also catch placeholder patterns)
+  if (isProd) {
+    const dbPwd = config.mysql.password || '';
+    if (!dbPwd || ['CHANGE_ME', 'your-db-password', 'password', 'root', 'changeme'].includes(dbPwd.toLowerCase())) {
+      errors.push('生产环境 DB_PASSWORD 未设置或仍为弱密码');
+    }
   }
 
   // P1: CSRF secret strength (beyond known defaults)
