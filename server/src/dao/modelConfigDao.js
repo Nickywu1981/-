@@ -7,26 +7,28 @@ import { als } from './context.js';
 
 function _db() { return als.getStore()?.db || tenantPool; }
 
+const COLS = 'id, model_key, display_name, vendor, category, endpoint, api_key_enc, model_id, max_tokens, priority, enabled, rate_limit_rpm, rate_limit_rpd, concurrency_max, breaker_threshold, breaker_cooldown_s, moderation_enabled, moderation_action, blocked_words, create_time, update_time';
+
 // ============ 模型配置 CRUD ============
 
 export async function listAll(includeDisabled = false) {
   const sql = includeDisabled
-    ? 'SELECT * FROM ai_model_config ORDER BY priority DESC'
-    : 'SELECT * FROM ai_model_config WHERE enabled = 1 ORDER BY priority DESC';
+    ? `SELECT ${COLS} FROM ai_model_config ORDER BY priority DESC`
+    : `SELECT ${COLS} FROM ai_model_config WHERE enabled = 1 ORDER BY priority DESC`;
   const [rows] = await _db().query(sql);
   return rows;
 }
 
 export async function getByKey(modelKey) {
   const [rows] = await _db().query(
-    'SELECT * FROM ai_model_config WHERE model_key = ?', [modelKey],
+    `SELECT ${COLS} FROM ai_model_config WHERE model_key = ?`, [modelKey],
   );
   return rows[0] || null;
 }
 
 export async function getByVendorAndCategory(vendor, category) {
   const [rows] = await _db().query(
-    'SELECT * FROM ai_model_config WHERE vendor = ? AND category = ? AND enabled = 1 ORDER BY priority DESC',
+    `SELECT ${COLS} FROM ai_model_config WHERE vendor = ? AND category = ? AND enabled = 1 ORDER BY priority DESC`,
     [vendor, category],
   );
   return rows;
