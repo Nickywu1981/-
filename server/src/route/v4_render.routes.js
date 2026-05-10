@@ -6,6 +6,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { success } from '../utils/response.js';
 import { validateV4 as _validate } from '../utils/validate.js';
+import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { infer } from '../services/aiEngine.js';
 
 const router = Router();
@@ -18,7 +19,7 @@ const renderSchema = z.object({
   format: z.enum(['png', 'jpg', 'webp']).optional(),
 });
 
-router.post('/product', _validate(renderSchema), async (req, res, next) => {
+router.post('/product', heavyLimiter, _validate(renderSchema), async (req, res, next) => {
   try {
     const result = await infer('product-render', req.validated);
     return success(res, result, '渲染成功');

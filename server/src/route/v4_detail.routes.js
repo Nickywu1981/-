@@ -10,6 +10,7 @@ import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { contentModerationMiddleware } from '../middleware/content-moderation.middleware.js';
+import { heavyLimiter } from '../middleware/rateLimiter.js';
 import * as detailService from '../services/detail-image.service.js';
 
 const router = Router();
@@ -29,7 +30,7 @@ const replicateSchema = z.object({
 });
 
 // POST /api/detail/generate-set
-router.post('/generate-set', _validate(generateSetSchema), contentModerationMiddleware('input'), async (req, res) => {
+router.post('/generate-set', heavyLimiter, _validate(generateSetSchema), contentModerationMiddleware('input'), async (req, res) => {
   try {
     const { product_name, product_images, highlights, template } = req.validated;
     const result = await detailService.generateDetailSet(req.user.id, {
@@ -45,7 +46,7 @@ router.post('/generate-set', _validate(generateSetSchema), contentModerationMidd
 });
 
 // POST /api/detail/replicate
-router.post('/replicate', _validate(replicateSchema), async (req, res) => {
+router.post('/replicate', heavyLimiter, _validate(replicateSchema), async (req, res) => {
   try {
     const { reference_url, product_name, product_images, template } = req.validated;
     const result = await detailService.replicateDetail(req.user.id, {

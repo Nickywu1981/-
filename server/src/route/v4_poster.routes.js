@@ -10,6 +10,7 @@ import { success, error } from '../utils/response.js';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { contentModerationMiddleware } from '../middleware/content-moderation.middleware.js';
+import { heavyLimiter } from '../middleware/rateLimiter.js';
 import * as posterService from '../services/poster.service.js';
 import * as promptEnhanceService from '../services/prompt-enhance.service.js';
 
@@ -24,7 +25,7 @@ const generateSchema = z.object({
 });
 
 router.post('/generate',
-  _validate(generateSchema),
+  heavyLimiter, _validate(generateSchema),
   contentModerationMiddleware('input'),
   async (req, res) => {
     try {
@@ -43,7 +44,7 @@ const enhanceSchema = z.object({
   posterType: z.enum(['product', 'holiday', 'event', 'private', 'xhs', 'wechat']),
 });
 
-router.post('/enhance-prompt', _validate(enhanceSchema), async (req, res) => {
+router.post('/enhance-prompt', heavyLimiter, _validate(enhanceSchema), async (req, res) => {
   try {
     // poster类型的poster→poster策略，xhs/wechat→social策略
     const promptType = ['xhs', 'wechat'].includes(req.validated.posterType) ? 'social' : 'poster';

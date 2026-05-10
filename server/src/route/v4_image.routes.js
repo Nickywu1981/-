@@ -11,6 +11,7 @@ import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { contentModerationMiddleware } from '../middleware/content-moderation.middleware.js';
 import { tierGuard } from '../middleware/tierGuard.js';
+import { heavyLimiter } from '../middleware/rateLimiter.js';
 import * as imageService from '../services/image.service.js';
 import * as promptEnhanceService from '../services/prompt-enhance.service.js';
 
@@ -52,7 +53,7 @@ const enhancePromptSchema = z.object({
 });
 
 // POST /api/images/generate
-router.post('/generate', _validate(generateSchema), contentModerationMiddleware('input'), async (req, res) => {
+router.post('/generate', heavyLimiter, _validate(generateSchema), contentModerationMiddleware('input'), async (req, res) => {
   try {
     const { prompt, ratio, style } = req.validated;
     const result = await imageService.generateImage(req.user.id, { prompt, ratio, style });
@@ -63,7 +64,7 @@ router.post('/generate', _validate(generateSchema), contentModerationMiddleware(
 });
 
 // POST /api/images/replicate — 主图复刻
-router.post('/replicate', _validate(replicateSchema), async (req, res) => {
+router.post('/replicate', heavyLimiter, _validate(replicateSchema), async (req, res) => {
   try {
     const { reference_image_url, product_name, style, ratio } = req.validated;
     const result = await imageService.replicateMainImage(req.user.id, { referenceImageUrl: reference_image_url, productName: product_name, style, ratio });
@@ -74,7 +75,7 @@ router.post('/replicate', _validate(replicateSchema), async (req, res) => {
 });
 
 // POST /api/images/batch-generate
-router.post('/batch-generate', _validate(batchGenerateSchema), tierGuard('image'), async (req, res) => {
+router.post('/batch-generate', heavyLimiter, _validate(batchGenerateSchema), tierGuard('image'), async (req, res) => {
   try {
     const { prompts, ratio, style } = req.validated;
     const result = await imageService.batchGenerateImage(req.user.id, { prompts, ratio, style });
@@ -85,7 +86,7 @@ router.post('/batch-generate', _validate(batchGenerateSchema), tierGuard('image'
 });
 
 // POST /api/images/batch-edit
-router.post('/batch-edit', _validate(batchEditSchema), tierGuard('image'), async (req, res) => {
+router.post('/batch-edit', heavyLimiter, _validate(batchEditSchema), tierGuard('image'), async (req, res) => {
   try {
     const { images, operations } = req.validated;
     const result = await imageService.batchEditImage(req.user.id, { images, operations });
@@ -96,7 +97,7 @@ router.post('/batch-edit', _validate(batchEditSchema), tierGuard('image'), async
 });
 
 // POST /api/images/batch-replace
-router.post('/batch-replace', _validate(batchReplaceSchema), tierGuard('image'), async (req, res) => {
+router.post('/batch-replace', heavyLimiter, _validate(batchReplaceSchema), tierGuard('image'), async (req, res) => {
   try {
     const { images, new_background, new_scene } = req.validated;
     const result = await imageService.batchReplaceImage(req.user.id, { images, newBackground: new_background, newScene: new_scene });
@@ -121,7 +122,7 @@ router.get('/works', async (req, res) => {
 });
 
 // POST /api/ai/enhance-prompt — 统一提示词增强
-router.post('/enhance-prompt', _validate(enhancePromptSchema), async (req, res) => {
+router.post('/enhance-prompt', heavyLimiter, _validate(enhancePromptSchema), async (req, res) => {
   try {
     const { prompt, type } = req.validated;
     const result = await promptEnhanceService.enhancePrompt(prompt, type || 'image');

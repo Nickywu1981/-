@@ -9,6 +9,7 @@ import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate, validate } from '../utils/validate.js';
 import { tierGuard} from '../middleware/tierGuard.js';
+import { heavyLimiter } from '../middleware/rateLimiter.js';
 import * as videoService from '../services/video.service.js';
 import * as actionMigrateService from '../services/action-migrate.service.js';
 import * as viralVideoService from '../services/viral-video.service.js';
@@ -127,7 +128,7 @@ const subtitleFixSchema = z.object({
 // ============================================================
 // 视频生成
 // ============================================================
-router.post('/generate', _validate(generateSchema), tierGuard('video'), async (req, res) => {
+router.post('/generate', heavyLimiter, _validate(generateSchema), tierGuard('video'), async (req, res) => {
   try {
     const { prompt, duration, ratio, enhanced_prompt } = req.validated;
     const result = await videoService.generateVideo(req.user.id, { prompt, duration, ratio, enhancedPrompt: enhanced_prompt });
@@ -135,7 +136,7 @@ router.post('/generate', _validate(generateSchema), tierGuard('video'), async (r
   } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 });
 
-router.post('/image-to-video', _validate(imageToVideoSchema), tierGuard('video'), async (req, res) => {
+router.post('/image-to-video', heavyLimiter, _validate(imageToVideoSchema), tierGuard('video'), async (req, res) => {
   try {
     const { image_url, prompt, duration, ratio } = req.validated;
     const result = await videoService.imageToVideo(req.user.id, { imageUrl: image_url, prompt, duration, ratio });
@@ -143,7 +144,7 @@ router.post('/image-to-video', _validate(imageToVideoSchema), tierGuard('video')
   } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 });
 
-router.post('/multi-image-to-video', _validate(multiImageSchema), tierGuard('video'), async (req, res) => {
+router.post('/multi-image-to-video', heavyLimiter, _validate(multiImageSchema), tierGuard('video'), async (req, res) => {
   try {
     const { images, prompt, duration, ratio, transition } = req.validated;
     const result = await videoService.multiImageToVideo(req.user.id, { images, prompt, duration, ratio, transition });
@@ -151,7 +152,7 @@ router.post('/multi-image-to-video', _validate(multiImageSchema), tierGuard('vid
   } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 });
 
-router.post('/package', _validate(packageSchema), async (req, res) => {
+router.post('/package', heavyLimiter, _validate(packageSchema), async (req, res) => {
   try {
     const { video_url, options } = req.validated;
     const result = await videoService.autoPackageVideo(req.user.id, { videoUrl: video_url, options });
@@ -159,7 +160,7 @@ router.post('/package', _validate(packageSchema), async (req, res) => {
   } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 });
 
-router.post('/replace-character', _validate(replaceCharSchema), tierGuard('video'), async (req, res) => {
+router.post('/replace-character', heavyLimiter, _validate(replaceCharSchema), tierGuard('video'), async (req, res) => {
   try {
     const { video_url, target_person_image } = req.validated;
     const result = await videoService.replaceCharacter(req.user.id, { videoUrl: video_url, targetPersonImage: target_person_image });
@@ -167,7 +168,7 @@ router.post('/replace-character', _validate(replaceCharSchema), tierGuard('video
   } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 });
 
-router.post('/product-ad', _validate(productAdSchema), tierGuard('video'), async (req, res) => {
+router.post('/product-ad', heavyLimiter, _validate(productAdSchema), tierGuard('video'), async (req, res) => {
   try {
     const { product_name, product_images, highlights, style, duration } = req.validated;
     const result = await videoService.productAdVideo(req.user.id, { productName: product_name, productImages: product_images, highlights, style, duration });
@@ -175,7 +176,7 @@ router.post('/product-ad', _validate(productAdSchema), tierGuard('video'), async
   } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 });
 
-router.post('/storyboard', _validate(storyboardSchema), async (req, res) => {
+router.post('/storyboard', heavyLimiter, _validate(storyboardSchema), async (req, res) => {
   try {
     const { prompt, scene_count } = req.validated;
     const result = await videoService.generateStoryboard(req.user.id, { prompt, sceneCount: scene_count || 5 });
@@ -186,7 +187,7 @@ router.post('/storyboard', _validate(storyboardSchema), async (req, res) => {
 // ============================================================
 // 动作迁移 (杀手功能)
 // ============================================================
-router.post('/action-migrate', _validate(actionMigrateSchema), tierGuard('video'), async (req, res) => {
+router.post('/action-migrate', heavyLimiter, _validate(actionMigrateSchema), tierGuard('video'), async (req, res) => {
   try {
     const { source_video_url, target_person_image, options } = req.validated;
     const result = await actionMigrateService.migrateAction(req.user.id, { sourceVideoUrl: source_video_url, targetPersonImage: target_person_image, options });
@@ -194,7 +195,7 @@ router.post('/action-migrate', _validate(actionMigrateSchema), tierGuard('video'
   } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 });
 
-router.post('/action-migrate/batch', _validate(batchActionMigrateSchema), tierGuard('video'), async (req, res) => {
+router.post('/action-migrate/batch', heavyLimiter, _validate(batchActionMigrateSchema), tierGuard('video'), async (req, res) => {
   try {
     const { source_video_urls, target_person_images, options } = req.validated;
     const result = await actionMigrateService.batchMigrateAction(req.user.id, { sourceVideoUrls: source_video_urls, targetPersonImages: target_person_images, options });
@@ -212,7 +213,7 @@ router.get('/action-migrate/batch/:id/progress', validate(idParamSchema, 'params
 // ============================================================
 // 爆款视频
 // ============================================================
-router.post('/viral/analyze', _validate(viralAnalyzeSchema), async (req, res) => {
+router.post('/viral/analyze', heavyLimiter, _validate(viralAnalyzeSchema), async (req, res) => {
   try {
     const { video_url, platform } = req.validated;
     const result = await viralVideoService.analyzeViralVideo(req.user.id, { videoUrl: video_url, platform });
@@ -220,7 +221,7 @@ router.post('/viral/analyze', _validate(viralAnalyzeSchema), async (req, res) =>
   } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 });
 
-router.post('/viral/replicate', _validate(viralReplicateSchema), tierGuard('video'), async (req, res) => {
+router.post('/viral/replicate', heavyLimiter, _validate(viralReplicateSchema), tierGuard('video'), async (req, res) => {
   try {
     const { analysis_job_id, product_name, product_images, custom_prompt } = req.validated;
     const result = await viralVideoService.replicateViralVideo(req.user.id, { analysisJobId: analysis_job_id, productName: product_name, productImages: product_images, customPrompt: custom_prompt });
@@ -231,7 +232,7 @@ router.post('/viral/replicate', _validate(viralReplicateSchema), tierGuard('vide
 // ============================================================
 // 数字人
 // ============================================================
-router.post('/digital-human', _validate(digitalHumanSchema), tierGuard('video'), async (req, res) => {
+router.post('/digital-human', heavyLimiter, _validate(digitalHumanSchema), tierGuard('video'), async (req, res) => {
   try {
     const { text, audio_url, avatar_style, background } = req.validated;
     const result = await digitalHumanService.createDigitalHuman(req.user.id, { text, audioUrl: audio_url, avatarStyle: avatar_style, background });
@@ -242,7 +243,7 @@ router.post('/digital-human', _validate(digitalHumanSchema), tierGuard('video'),
 // ============================================================
 // 长视频精剪
 // ============================================================
-router.post('/smart-clip', _validate(smartClipSchema), tierGuard('video'), async (req, res) => {
+router.post('/smart-clip', heavyLimiter, _validate(smartClipSchema), tierGuard('video'), async (req, res) => {
   try {
     const { video_url, duration, clip_count, style, clip_regions } = req.validated;
 
@@ -253,7 +254,7 @@ router.post('/smart-clip', _validate(smartClipSchema), tierGuard('video'), async
   } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 });
 
-router.post('/remove-redundant', _validate(removeRedundantSchema), tierGuard('video'), async (req, res) => {
+router.post('/remove-redundant', heavyLimiter, _validate(removeRedundantSchema), tierGuard('video'), async (req, res) => {
   try {
     const { video_url, threshold } = req.validated;
     const result = await liveClipService.removeRedundantSegments(req.user.id, { videoUrl: video_url, threshold });
@@ -261,7 +262,7 @@ router.post('/remove-redundant', _validate(removeRedundantSchema), tierGuard('vi
   } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 });
 
-router.post('/optimize-audio', _validate(optimizeAudioSchema), tierGuard('video'), async (req, res) => {
+router.post('/optimize-audio', heavyLimiter, _validate(optimizeAudioSchema), tierGuard('video'), async (req, res) => {
   try {
     const { video_url, level } = req.validated;
     const result = await liveClipService.optimizeAudio(req.user.id, { videoUrl: video_url, level });
@@ -269,7 +270,7 @@ router.post('/optimize-audio', _validate(optimizeAudioSchema), tierGuard('video'
   } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 });
 
-router.post('/subtitle-fix', _validate(subtitleFixSchema), async (req, res) => {
+router.post('/subtitle-fix', heavyLimiter, _validate(subtitleFixSchema), async (req, res) => {
   try {
     const { video_url, source_language } = req.validated;
     const result = await liveClipService.subtitleCorrection(req.user.id, { videoUrl: video_url, sourceLanguage: source_language });

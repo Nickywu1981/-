@@ -6,6 +6,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { validate } from '../utils/validate.js';
 import { authMiddleware } from '../middleware/auth.js';
+import { heavyLimiter } from '../middleware/rateLimiter.js';
 import {
   MemoryAgent, AttentionAgent, ContextAgent,
   LocalizeAgent, ContentAgent, GuardAgent,
@@ -44,7 +45,7 @@ router.get('/agents', (_req, res) => {
 });
 
 // A2A 标准 /run 端点
-router.post('/run/:agentName', authMiddleware, validate(runSchema), async (req, res) => {
+router.post('/run/:agentName', authMiddleware, heavyLimiter, validate(runSchema), async (req, res) => {
   const { agentName } = req.params;
   const { query, sessionId, context } = req.body || {};
   const userId = req.user?.id || req.user?.userId || 'anonymous';

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { contentModerationMiddleware } from '../middleware/content-moderation.middleware.js';
+import { heavyLimiter } from '../middleware/rateLimiter.js';
 import digitalHumanController from '../controller/digitalHumanController.js';
 
 const router = Router();
@@ -14,7 +15,7 @@ const createSchema = z.object({
 }).refine(d => d.text || d.audioUrl, { message: '请提供口播文本或音频' });
 
 // POST /api/digital-human/create
-router.post('/create', _validate(createSchema), contentModerationMiddleware, digitalHumanController.create);
+router.post('/create', heavyLimiter, _validate(createSchema), contentModerationMiddleware, digitalHumanController.create);
 
 // GET /api/digital-human/history
 router.get('/history', digitalHumanController.getHistory);

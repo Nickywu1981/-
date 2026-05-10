@@ -6,6 +6,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { validate } from '../utils/validate.js';
 import { authMiddleware } from '../middleware/auth.js';
+import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { success } from '../utils/response.js';
 import { infer } from '../services/aiEngine.js';
 
@@ -23,14 +24,14 @@ const cloneSchema = z.object({
   name: z.string().max(30).optional(),
 });
 
-router.post('/generate', authMiddleware, validate(generateSchema), async (req, res, next) => {
+router.post('/generate', authMiddleware, heavyLimiter, validate(generateSchema), async (req, res, next) => {
   try {
     const result = await infer('edge-tts', { text: req.body.text, voiceType: req.body.voice, speed: req.body.speed, task: 'tts' });
     return success(res, result, '语音生成成功');
   } catch (e) { next(e); }
 });
 
-router.post('/clone', authMiddleware, validate(cloneSchema), async (req, res, next) => {
+router.post('/clone', authMiddleware, heavyLimiter, validate(cloneSchema), async (req, res, next) => {
   try {
     const result = await infer('elevenlabs-voice-clone', { audioSampleUrl: req.body.sampleUrl, text: req.body.text, task: 'voice_clone' });
     return success(res, result, '声音克隆成功');
