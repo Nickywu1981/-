@@ -4,8 +4,9 @@
  */
 import { tenantPool } from './tenantPool.js';
 import { als } from './context.js';
+import pool from './db.js';
 
-function _db() { return als.getStore()?.db || tenantPool; }
+function _db() { return als.getStore()?.db || pool; }
 
 const COLS = 'id, model_key, display_name, vendor, category, endpoint, api_key_enc, model_id, max_tokens, priority, enabled, rate_limit_rpm, rate_limit_rpd, concurrency_max, breaker_threshold, breaker_cooldown_s, moderation_enabled, moderation_action, blocked_words, create_time, update_time';
 

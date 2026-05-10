@@ -142,7 +142,7 @@ export async function authMiddleware(req, res, next) {
   }
 
   req.user = {
-    id: payload.userId || payload.id,
+    id: payload.userId ?? payload.id,
     role: payload.role || 'user',
     nickname: payload.nickname || '',
     tenantId: payload.tenantId || 0,

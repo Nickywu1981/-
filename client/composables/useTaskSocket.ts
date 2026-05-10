@@ -17,6 +17,7 @@
 export function useTaskSocket() {
   const isConnected = ref(false);
   const progressMap = reactive(new Map<string, { progress: number; status: string; result?: any; error?: string }>());
+  const MAX_ENTRIES = 100;
   let socket: WebSocket | null = null;
 
   async function connect(_uid?: string) {
@@ -47,6 +48,17 @@ export function useTaskSocket() {
               result: msg.result,
               error: msg.error,
             });
+            // 修剪旧条目：超过上限时删除最早完成/失败的条目
+            if (progressMap.size > MAX_ENTRIES) {
+              const keys = [...progressMap.keys()];
+              for (const k of keys) {
+                if (progressMap.size <= MAX_ENTRIES) break;
+                const v = progressMap.get(k);
+                if (v?.status === 'completed' || v?.status === 'failed') {
+                  progressMap.delete(k);
+                }
+              }
+            }
             break;
         }
       } catch { /* malformed */ }

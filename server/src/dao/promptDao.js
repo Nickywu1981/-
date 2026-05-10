@@ -1,4 +1,5 @@
 import pool from './db.js';
+import logger from '../utils/logger.js';
 
 // ==================== 模板 CRUD ====================
 export async function listTemplates({ category, status, keyword, isPublic, creatorId, page = 1, pageSize = 20 }) {
@@ -88,7 +89,10 @@ export async function addFavorite(userId, templateId, groupId) {
   try {
     await pool.execute('INSERT INTO prompt_favorite (user_id, template_id, group_id) VALUES (?,?,?)', [userId, templateId, groupId || null]);
     return true;
-  } catch { return false; }
+  } catch (err) {
+    logger.warn('[promptDao] addFavorite failed:', err.message);
+    return false;
+  }
 }
 
 export async function removeFavorite(userId, templateId) {

@@ -22,7 +22,8 @@ setInterval(() => {
 }, CONCURRENCY_TTL_MS).unref();
 
 function getConcurrencyKey(req) {
-  const ip = req.ip || req.connection?.remoteAddress || '0.0.0.0';
+  const ip = req.ip || req.connection?.remoteAddress;
+  if (!ip) return `anon_${Math.random().toString(36).slice(2, 8)}`;
   return req.user?.id || ip.replace(/^::ffff:/, '');
 }
 

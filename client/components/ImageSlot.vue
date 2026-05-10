@@ -1,5 +1,5 @@
 <template>
-  <div class="image-slot" :class="{ 'slot-sm': size === 'sm' }" @click="$emit('click')">
+  <div class="image-slot" :class="{ 'slot-sm': size === 'sm' }" role="button" tabindex="0" @click="$emit('click')" @keydown.enter="$emit('click')">
     <img
       v-if="src"
       :src="src"

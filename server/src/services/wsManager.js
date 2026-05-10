@@ -80,7 +80,14 @@ class WsManager {
         return;
       }
 
-      if (userId) this.userSockets.set(userId, socket);
+      if (userId) {
+        const existing = this.userSockets.get(userId);
+        if (existing && existing !== socket) {
+          this._unsubscribeAll(existing);
+          if (existing.readyState === 1) existing.close(4000, '新连接替代');
+        }
+        this.userSockets.set(userId, socket);
+      }
 
       socket.on('message', (raw) => {
         try {
@@ -105,12 +112,14 @@ class WsManager {
   _handle(socket, msg) {
     switch (msg.type) {
       case 'subscribe_task': {
+        if (!msg.taskId) break;
         const room = this.taskRooms.get(msg.taskId);
         if (room) room.add(socket);
         else this.taskRooms.set(msg.taskId, new Set([socket]));
         break;
       }
       case 'unsubscribe_task': {
+        if (!msg.taskId) break;
         const room = this.taskRooms.get(msg.taskId);
         if (room) {
           room.delete(socket);

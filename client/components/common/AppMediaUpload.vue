@@ -9,11 +9,15 @@
     <!-- 拖拽区域 -->
     <div
       class="upload-zone"
+      role="button"
+      tabindex="0"
       @dragenter.prevent="onDragEnter"
       @dragover.prevent="onDragOver"
       @dragleave.prevent="onDragLeave"
       @drop.prevent="onDrop"
       @click="triggerInput"
+      @keydown.enter.prevent="triggerInput"
+      @keydown.space.prevent="triggerInput"
     >
       <input
         ref="fileInput"

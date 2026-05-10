@@ -21,6 +21,7 @@ export const isOffline = ref(false);
 
 // 401 重定向锁（防并发请求同时触发多次 navigateTo）
 let isRedirecting = false;
+let redirectTimer: ReturnType<typeof setTimeout> | null = null;
 let listenersInit = false;
 
 function onOffline() { isOffline.value = true; }
@@ -86,7 +87,8 @@ async function request<T = any>(
           isRedirecting = true;
           navigateTo('/login').finally(() => { isRedirecting = false; });
           // 兜底：5s 后强制解锁（防止 navigateTo 异常导致永久锁死）
-          setTimeout(() => { isRedirecting = false; }, REDIRECT_UNLOCK_MS);
+          if (redirectTimer) clearTimeout(redirectTimer);
+          redirectTimer = setTimeout(() => { isRedirecting = false; redirectTimer = null; }, REDIRECT_UNLOCK_MS);
         }
       },
     });
@@ -163,6 +165,8 @@ export function useApi() {
     if (activeInstances <= 0 && typeof window !== 'undefined') {
       window.removeEventListener('offline', onOffline);
       window.removeEventListener('online', onOnline);
+      if (redirectTimer) { clearTimeout(redirectTimer); redirectTimer = null; }
+      isRedirecting = false;
       listenersInit = false;
       activeInstances = 0;
     }
