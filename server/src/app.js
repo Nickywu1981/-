@@ -152,7 +152,7 @@ import('./middleware/cache.js').then(({ invalidateCache }) => {
     });
     next();
   });
-});
+}).catch(() => { /* cache middleware unavailable — cache invalidation disabled */ });
 
 // 健康检查 — DB 必须在线，Redis 离线仅标记 degraded，同步检测 AI 模型状态
 app.get('/api/health', async (_req, res) => {

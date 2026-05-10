@@ -34,7 +34,7 @@ server.listen(port, () => {
 
   // 定时清理废弃上传 (每 30 分钟)
   setInterval(() => {
-    try { import('./utils/file-upload.js').then(({ cleanupStaleUploads }) => cleanupStaleUploads()); } catch { /* ignore */ }
+    import('./utils/file-upload.js').then(({ cleanupStaleUploads }) => cleanupStaleUploads()).catch((err) => { logger.warn('[Cleanup] 加载失败', { error: err.message }); });
   }, 30 * 60 * 1000);
 });
 
