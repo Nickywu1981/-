@@ -17,7 +17,7 @@
         <div class="input-group">
           <span class="input-icon">👤</span>
           <label for="login-username" class="sr-only">用户名</label>
-          <input id="login-username" v-model="username" type="text" placeholder="用户名" required maxlength="30" />
+          <input id="login-username" v-model="username" type="text" placeholder="用户名" required maxlength="30" autocomplete="username" />
         </div>
         <div class="input-group">
           <span class="input-icon">🔒</span>
@@ -34,7 +34,7 @@
         <div class="input-group">
           <span class="input-icon">📱</span>
           <label for="login-sms-phone" class="sr-only">手机号</label>
-          <input id="login-sms-phone" v-model="smsPhone" type="tel" placeholder="手机号" required maxlength="11" />
+          <input id="login-sms-phone" v-model="smsPhone" type="tel" placeholder="手机号" required maxlength="11" autocomplete="tel" />
         </div>
         <div class="sms-row">
           <label for="login-sms-code" class="sr-only">短信验证码</label>
@@ -53,7 +53,7 @@
         <div class="input-group">
           <span class="input-icon">📧</span>
           <label for="login-email" class="sr-only">邮箱地址</label>
-          <input id="login-email" v-model="emailAddr" type="email" placeholder="邮箱地址" required maxlength="254" />
+          <input id="login-email" v-model="emailAddr" type="email" placeholder="邮箱地址" required maxlength="254" autocomplete="email" />
         </div>
         <div class="sms-row">
           <label for="login-email-code" class="sr-only">邮箱验证码</label>

@@ -59,6 +59,33 @@ module.exports = {
       autorestart: true,
       vizion: false,
     },
+    {
+      name: 'movio-worker',
+      script: 'src/workers/worker.js',
+      interpreter: 'node',
+
+      instances: 1,
+      exec_mode: 'fork',
+
+      env: { NODE_ENV: 'development' },
+      env_production: { NODE_ENV: 'production' },
+
+      listen_timeout: 5000,
+      kill_timeout: 15000,
+
+      max_memory_restart: '256M',
+      max_restarts: 5,
+      min_uptime: '10s',
+      restart_delay: 5000,
+
+      error_file: 'logs/pm2-worker-error.log',
+      out_file: 'logs/pm2-worker-out.log',
+      log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+      time: true,
+
+      autorestart: true,
+      vizion: false,
+    },
   ],
 
   // 部署配置（可选）

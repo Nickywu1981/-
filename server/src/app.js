@@ -48,7 +48,7 @@ import tierRoutes from './route/tierRoutes.js';
 import abuseRoutes from './route/abuseRoutes.js';
 import platformDetailRoutes from './route/platformDetailRoutes.js';
 import multilingualRoutes from './route/multilingualRoutes.js';
-import complianceRoutes from './route/complianceRoutes.js';
+// complianceRoutes (V1) removed — v4_compliance supersedes
 import analyticsRoutes from './route/analyticsRoutes.js';
 import platformSpecRoutes from './route/platformSpecRoutes.js';
 import aiDispatchRoutes from './route/aiDispatchRoutes.js';

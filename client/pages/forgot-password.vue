@@ -16,7 +16,7 @@
       <template v-else>
         <div class="form-group">
           <label for="account">手机号或邮箱</label>
-          <input id="account" v-model="account" type="text" placeholder="请输入注册时使用的手机号或邮箱" maxlength="254" />
+          <input id="account" v-model="account" type="text" placeholder="请输入注册时使用的手机号或邮箱" maxlength="254" autocomplete="username" />
         </div>
         <div class="form-group code-row">
           <label for="code">验证码</label>

@@ -18,7 +18,8 @@
     "db:migrate:status": "node src/dao/migrate.js pending",
     "db:migrate:history": "node src/dao/migrate.js executed",
     "db:seed": "node scripts/run-seed.js",
-    "db:reset": "node scripts/db-reset.js"
+    "db:reset": "node scripts/db-reset.js",
+    "worker": "node src/workers/worker.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1043.0",

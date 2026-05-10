@@ -13,7 +13,7 @@
       <!-- 密码注册 -->
       <form v-if="mode === 'password'" @submit.prevent="handleRegister">
         <label for="reg-username" class="sr-only">用户名</label>
-        <input id="reg-username" v-model="username" type="text" placeholder="用户名" required />
+        <input id="reg-username" v-model="username" type="text" placeholder="用户名" required autocomplete="username" />
         <label for="reg-password" class="sr-only">密码</label>
         <input id="reg-password" v-model="password" type="password" placeholder="密码（至少8位）" required minlength="8" autocomplete="new-password" />
         <label for="reg-nickname" class="sr-only">昵称</label>
@@ -24,7 +24,7 @@
       <!-- 手机注册 -->
       <form v-if="mode === 'sms'" @submit.prevent="handleSmsRegister">
         <label for="reg-sms-phone" class="sr-only">手机号</label>
-        <input id="reg-sms-phone" v-model="smsPhone" type="tel" placeholder="手机号" required />
+        <input id="reg-sms-phone" v-model="smsPhone" type="tel" placeholder="手机号" required autocomplete="tel" />
         <div class="sms-row">
           <label for="reg-sms-code" class="sr-only">验证码</label>
           <input id="reg-sms-code" v-model="smsCode" type="text" placeholder="验证码" required maxlength="6" />
@@ -40,7 +40,7 @@
       <!-- 邮箱注册 -->
       <form v-if="mode === 'email'" @submit.prevent="handleEmailRegister">
         <label for="reg-email" class="sr-only">邮箱地址</label>
-        <input id="reg-email" v-model="emailAddr" type="email" placeholder="邮箱地址" required />
+        <input id="reg-email" v-model="emailAddr" type="email" placeholder="邮箱地址" required autocomplete="email" />
         <div class="sms-row">
           <label for="reg-email-code" class="sr-only">验证码</label>
           <input id="reg-email-code" v-model="emailCode" type="text" placeholder="验证码" required maxlength="6" />

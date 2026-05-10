@@ -27,7 +27,7 @@ const client = createClient({
     host: redisConfig.host,
     port: redisConfig.port,
     connectTimeout: 2000,
-    reconnectStrategy: (retries) => Math.min(retries * 1000, 30000),
+    reconnectStrategy: (retries) => Math.min(Math.pow(2, retries) * 100, 30000),
   },
   password: redisConfig.password || undefined,
 });
