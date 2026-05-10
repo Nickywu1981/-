@@ -214,7 +214,7 @@ onMounted(async () => {
   try {
     const res = await $fetch('/api/posters/works', { query: { page: 1, pageSize: 20 }, credentials: 'include' })
     history.value = (res.list || res.data || []).filter(h => h.posterType === 'xhs' || h.posterType === 'wechat')
-  } catch { /* silent */ }
+  } catch { history.value = [] }
 })
 
 onUnmounted(() => { clearInterval(loadingTimer) })

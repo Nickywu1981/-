@@ -71,7 +71,7 @@ async function fetchUnread() {
   try {
     const res: any = await $fetch('/api/notifications/unread-count');
     unreadCount.value = res.data?.count || 0;
-  } catch { /* silent */ }
+  } catch { unreadCount.value = 0 }
 }
 
 async function readOne(item: any) {

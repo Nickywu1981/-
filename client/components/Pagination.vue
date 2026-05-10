@@ -2,9 +2,9 @@
   <div class="pagination-bar" v-if="total > 0">
     <span class="pg-info">{{ (page - 1) * pageSize + 1 }}-{{ Math.min(page * pageSize, total) }} / 共 {{ total }} 条</span>
     <div class="pg-btns">
-      <button :disabled="page <= 1" @click="$emit('change', page - 1)">‹ 上一页</button>
-      <span class="pg-num">{{ page }} / {{ totalPages }}</span>
-      <button :disabled="page >= totalPages" @click="$emit('change', page + 1)">下一页 ›</button>
+      <button :disabled="page <= 1" @click="$emit('change', page - 1)" aria-label="上一页">‹ 上一页</button>
+      <span class="pg-num" aria-label="当前第 {{ page }} 页，共 {{ totalPages }} 页">{{ page }} / {{ totalPages }}</span>
+      <button :disabled="page >= totalPages" @click="$emit('change', page + 1)" aria-label="下一页">下一页 ›</button>
     </div>
   </div>
 </template>

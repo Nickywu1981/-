@@ -81,7 +81,7 @@ const removeFavorite = async (id: number) => {
     await $fetch(`/api/collections/${id}`, { method: 'DELETE' })
     items.value = items.value.filter(i => i.id !== id)
     total.value--
-  } catch { /* silent */ }
+  } catch { /* 全局拦截器已 toast 提示 */ }
 }
 
 watch(page, fetchFavorites)

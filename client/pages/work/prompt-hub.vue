@@ -162,7 +162,7 @@ const doRate = async (score: number) => {
     await $fetch(`/api/prompts/${detail.value.id}/rate`, { method: 'POST', body: { score }, credentials: 'include' })
     myRating.value = score
     fetchAll()
-  } catch { /* silent */ }
+  } catch { toast.warn('评分失败') }
 }
 
 const toast = useToast()

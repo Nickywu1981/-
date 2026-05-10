@@ -30,7 +30,7 @@ async function checkSaved() {
   try {
     const res: any = await $fetch(`/api/collections/check?workId=${props.workId}`)
     isSaved.value = res?.data?.saved || false
-  } catch { /* silent */ }
+  } catch { isSaved.value = false }
 }
 
 async function toggle() {

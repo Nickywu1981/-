@@ -1,6 +1,6 @@
 <template>
   <Teleport to="body">
-    <div class="toast-container">
+    <div class="toast-container" role="alert" aria-live="polite">
       <TransitionGroup name="toast">
         <div v-for="t in toasts" :key="t.id" class="toast-item" :class="t.type">
           <span class="toast-icon">{{ iconMap[t.type] }}</span>

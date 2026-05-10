@@ -138,11 +138,11 @@ const saveDraft = async () => {
       body: { title: form.title, description: form.description, platforms: selected.value },
     })
     toast.success('草稿已保存')
-  } catch { /* silent */ }
+  } catch { toast.warn('草稿保存失败') }
 }
 
 const retry = async (id: number) => {
-  try { await $fetch(`/api/publish/retry/${id}`, { method: 'POST' }); fetchHistory() } catch { /* */ }
+  try { await $fetch(`/api/publish/retry/${id}`, { method: 'POST' }); fetchHistory() } catch { toast.warn('重试失败') }
 }
 
 const fetchHistory = async () => {

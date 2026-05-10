@@ -55,7 +55,7 @@ async function fetchBadges() {
   try {
     const res = await $fetch('/api/badges', { credentials: 'include' });
     badges.value = (res as any).data || [];
-  } catch { /* silent */ }
+  } catch { badges.value = [] }
 }
 
 onMounted(() => { fetchBadges(); });
