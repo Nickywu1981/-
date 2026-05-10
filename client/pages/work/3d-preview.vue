@@ -67,7 +67,6 @@
 const { createBlobUrl, revoke } = useBlobUrl()
 import { ref } from 'vue';
 import ThreeViewer from '~/components/ThreeViewer.vue';
-import { useBlobUrl } from '~/composables/useBlobUrl'
 
 const fileInput = ref<HTMLInputElement>();
 const viewerRef = ref();

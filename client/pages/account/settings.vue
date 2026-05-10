@@ -6,6 +6,9 @@
       <button :class="{ active: tab === 'password' }" @click="tab = 'password'">修改密码</button>
     </div>
 
+    <LoadingSkeleton v-if="loading" type="form" :rows="4" />
+
+    <template v-else>
     <!-- 个人资料 -->
     <div v-if="tab === 'profile'" class="card">
       <div class="form-group">
@@ -70,6 +73,7 @@
       <button class="btn-save" :disabled="pwSaving" @click="savePassword">{{ pwSaving ? '修改中...' : '修改密码' }}</button>
       <p v-if="pwMsg" class="msg" :class="{ error: pwMsgErr }">{{ pwMsg }}</p>
     </div>
+    </template>
   </div>
 </template>
 
@@ -78,6 +82,7 @@ import { useCountdown } from '~/composables/useCountdown'
 
 
 const tab = ref('profile');
+const loading = ref(true)
 const form = reactive({ nickname: '', phone: '', email: '' });
 const pw = reactive({ oldPassword: '', newPassword: '' });
 const phoneForm = reactive({ phone: '', code: '' });
@@ -96,11 +101,13 @@ const { countdown: codeCooldown, start: startCodeCd } = useCountdown(60)
 const toast = useToast()
 
 onMounted(async () => {
+  loading.value = true
   try {
     const res: any = await $fetch('/api/user/profile');
     Object.assign(form, { nickname: res.data?.nickname || '', phone: res.data?.phone || '', email: res.data?.email || '' });
     if (res.data?.phone) boundPhone.value = res.data.phone;
   } catch { toast.error('加载用户信息失败') }
+  finally { loading.value = false }
 });
 
 async function saveProfile() {

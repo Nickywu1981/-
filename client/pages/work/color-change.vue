@@ -30,8 +30,14 @@
     </div>
     <div v-else class="result-section">
       <div v-if="processing" class="processing"><span class="spinner" /> 处理中...</div>
-      <img loading="lazy" v-if="resultUrl" :src="resultUrl" alt="result" class="result-image" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
-      <button v-if="resultUrl" class="btn" @click="downloadImage">下载</button>
+      <div v-else-if="resultUrl">
+        <img loading="lazy" :src="resultUrl" alt="result" class="result-image" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+        <button class="btn" @click="downloadImage">下载</button>
+      </div>
+      <div v-else class="empty-result">
+        <p>暂无替换结果</p>
+        <button class="btn-outline" @click="step = 1">重新配置颜色</button>
+      </div>
     </div>
   </WorkLayout>
 </template>

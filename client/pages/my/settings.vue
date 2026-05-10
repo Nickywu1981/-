@@ -2,6 +2,10 @@
   <div class="page">
     <h2>账户设置</h2>
 
+    <LoadingSkeleton v-if="loading" type="form" :rows="3" />
+
+    <template v-else>
+
     <div class="settings-section">
       <h3>基本信息</h3>
       <div class="form-group">
@@ -52,10 +56,12 @@
 
 const toast = useToast()
 const saving = ref(false)
+const loading = ref(true)
 
 const form = reactive({ nickname: '', phone: '', email: '' })
 
 onMounted(async () => {
+  loading.value = true
   try {
     const res: any = await $fetch('/api/user/profile', { credentials: 'include' })
     if (res.data) {
@@ -63,7 +69,8 @@ onMounted(async () => {
       form.phone = res.data.phone || ''
       form.email = res.data.email || ''
     }
-  } catch { /* ignore */ }
+  } catch { toast.error('加载用户信息失败，请刷新重试') }
+  finally { loading.value = false }
 })
 
 const selectedTheme = ref('dark')

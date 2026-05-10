@@ -85,7 +85,6 @@
 const { createBlobUrl, revoke } = useBlobUrl()
 
 import PromptEnhancer from '~/components/PromptEnhancer.vue'
-import { useBlobUrl } from '~/composables/useBlobUrl'
 
 const step = ref(0);
 const previewUrl = ref('');

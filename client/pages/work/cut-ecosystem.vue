@@ -135,7 +135,6 @@
 <script setup lang="ts">
 const { createBlobUrl, revoke } = useBlobUrl()
 import { formatDate } from '@/utils/format';
-import { useBlobUrl } from '~/composables/useBlobUrl'
 const toast = useToast()
 const api = useApi()
 

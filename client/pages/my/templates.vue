@@ -3,13 +3,20 @@
     <h2>我的尺寸模板</h2>
     <button class="btn" @click="showForm = true">+ 新建模板</button>
 
+    <LoadingSkeleton v-if="loading" type="card" :rows="3" />
+
+    <template v-else>
     <div v-if="showForm" class="form-card">
-      <input v-model="form.name" placeholder="模板名称（如：拼多多活动图）" />
+      <label for="tmpl-name">模板名称</label>
+      <input id="tmpl-name" v-model="form.name" placeholder="模板名称（如：拼多多活动图）" />
+      <label for="tmpl-width">宽度 (px)</label>
       <div class="size-row">
-        <input v-model.number="form.width" type="number" placeholder="宽度 px" /> ×
-        <input v-model.number="form.height" type="number" placeholder="高度 px" />
+        <input id="tmpl-width" v-model.number="form.width" type="number" placeholder="宽度 px" /> ×
+        <label for="tmpl-height" class="sr-only">高度 (px)</label>
+        <input id="tmpl-height" v-model.number="form.height" type="number" placeholder="高度 px" />
       </div>
-      <select v-model="form.platform">
+      <label for="tmpl-platform">关联平台</label>
+      <select id="tmpl-platform" v-model="form.platform">
         <option value="">不关联平台</option>
         <option v-for="p in platforms" :key="p.code" :value="p.code">{{ p.name }}</option>
       </select>
@@ -29,6 +36,7 @@
     </div>
 
     <div v-if="!templates.length && !showForm" class="empty">还没有自定义模板，新建一个吧</div>
+    </template>
   </div>
 </template>
 
@@ -36,8 +44,10 @@
 
 
 const showForm = ref(false);
+const loading = ref(true);
 const templates = ref<any[]>([]);
 const form = reactive({ name: '', width: 800, height: 800, platform: '' });
+const toast = useToast()
 
 const platforms = [
   { code: 'taobao', name: '淘宝' }, { code: 'pdd', name: '拼多多' }, { code: 'douyin', name: '抖音' },
@@ -45,20 +55,31 @@ const platforms = [
 ];
 
 async function loadTemplates() {
-  const res = await $fetch('/api/templates/my', { credentials: 'include' });
-  templates.value = (res as any).data?.list || [];
+  loading.value = true
+  try {
+    const res = await $fetch('/api/templates/my', { credentials: 'include' });
+    templates.value = (res as any).data?.list || [];
+  } catch { toast.error('加载模板失败') }
+  finally { loading.value = false }
 }
 
 async function saveTemplate() {
-  await $fetch('/api/templates/my', { method: 'POST', credentials: 'include', body: { ...form } });
-  showForm.value = false;
-  Object.assign(form, { name: '', width: 800, height: 800, platform: '' });
-  loadTemplates();
+  if (!form.name.trim()) { toast.warn('请输入模板名称'); return }
+  try {
+    await $fetch('/api/templates/my', { method: 'POST', credentials: 'include', body: { ...form } });
+    toast.success('模板创建成功')
+    showForm.value = false;
+    Object.assign(form, { name: '', width: 800, height: 800, platform: '' });
+    loadTemplates();
+  } catch { toast.error('保存模板失败') }
 }
 
 async function deleteTemplate(id: number) {
-  await $fetch(`/api/templates/my/${id}`, { method: 'DELETE', credentials: 'include' });
-  loadTemplates();
+  try {
+    await $fetch(`/api/templates/my/${id}`, { method: 'DELETE', credentials: 'include' });
+    toast.success('模板已删除')
+    loadTemplates();
+  } catch { toast.error('删除模板失败') }
 }
 
 onMounted(() => loadTemplates());

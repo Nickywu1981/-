@@ -117,7 +117,6 @@
 const { createBlobUrl, revoke } = useBlobUrl()
 import { useToast } from '#imports'
 import ImageSlot from '~/components/ImageSlot.vue'
-import { useBlobUrl } from '~/composables/useBlobUrl'
 
 const toast = useToast()
 

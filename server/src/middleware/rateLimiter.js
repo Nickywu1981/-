@@ -4,10 +4,18 @@ import { error } from '../utils/response.js';
 const windowMs = parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 60000;
 const max = parseInt(process.env.RATE_LIMIT_MAX, 10) || 200;
 
+// Per-limiter max overrides from env (with sensible defaults)
+const AUTH_MAX = parseInt(process.env.RATE_LIMIT_AUTH_MAX, 10) || 10;
+const CODE_MAX = parseInt(process.env.RATE_LIMIT_CODE_MAX, 10) || 1;
+const HEAVY_MAX = parseInt(process.env.RATE_LIMIT_HEAVY_MAX, 10) || 30;
+const UPLOAD_MAX = parseInt(process.env.RATE_LIMIT_UPLOAD_MAX, 10) || 20;
+const PAYMENT_MAX = parseInt(process.env.RATE_LIMIT_PAYMENT_MAX, 10) || 15;
+const ADMIN_MAX = parseInt(process.env.RATE_LIMIT_ADMIN_MAX, 10) || 60;
+
 // ==================== 并发控制 ====================
 
-const CONCURRENCY_MAX_PER_USER = 6;
-const CONCURRENCY_AI_PER_USER = 3;
+const CONCURRENCY_MAX_PER_USER = parseInt(process.env.RATE_LIMIT_CONCURRENCY_MAX, 10) || 6;
+const CONCURRENCY_AI_PER_USER = parseInt(process.env.RATE_LIMIT_AI_CONCURRENCY_MAX, 10) || 3;
 const userConcurrency = new Map();
 
 // 每 30 分钟清理一次超时条目（防止 socket hang-up 导致泄漏）
@@ -71,7 +79,7 @@ export const apiLimiter = rateLimit({
 /** 登录/注册严格限流 */
 export const authLimiter = rateLimit({
   windowMs: 60000,
-  max: 10,
+  max: AUTH_MAX,
   standardHeaders: true,
   legacyHeaders: false,
   message: { code: 429, msg: '操作过于频繁，请1分钟后再试', data: null },
@@ -80,7 +88,7 @@ export const authLimiter = rateLimit({
 /** 发送验证码严格限流（防短信轰炸） */
 export const codeLimiter = rateLimit({
   windowMs: 60000,
-  max: 1,
+  max: CODE_MAX,
   standardHeaders: true,
   legacyHeaders: false,
   message: { code: 429, msg: '验证码已发送，请60秒后再试', data: null },
@@ -89,7 +97,7 @@ export const codeLimiter = rateLimit({
 /** AI 重度操作限流（图片/视频/批量生成消耗 GPU） */
 export const heavyLimiter = rateLimit({
   windowMs: 60000,
-  max: 30,
+  max: HEAVY_MAX,
   standardHeaders: true,
   legacyHeaders: false,
   message: { code: 429, msg: 'AI生成请求过于频繁，请稍后再试', data: null },
@@ -98,7 +106,7 @@ export const heavyLimiter = rateLimit({
 /** 上传限流 */
 export const uploadLimiter = rateLimit({
   windowMs: 60000,
-  max: 20,
+  max: UPLOAD_MAX,
   standardHeaders: true,
   legacyHeaders: false,
   message: { code: 429, msg: '上传请求过于频繁，请稍后再试', data: null },
@@ -107,7 +115,7 @@ export const uploadLimiter = rateLimit({
 /** 支付/充值限流（财务敏感） */
 export const paymentLimiter = rateLimit({
   windowMs: 60000,
-  max: 15,
+  max: PAYMENT_MAX,
   standardHeaders: true,
   legacyHeaders: false,
   message: { code: 429, msg: '支付请求过于频繁，请稍后再试', data: null },
@@ -116,7 +124,7 @@ export const paymentLimiter = rateLimit({
 /** 管理后台限流 */
 export const adminLimiter = rateLimit({
   windowMs: 60000,
-  max: 60,
+  max: ADMIN_MAX,
   standardHeaders: true,
   legacyHeaders: false,
   message: { code: 429, msg: '管理操作过于频繁，请稍后再试', data: null },

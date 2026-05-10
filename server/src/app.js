@@ -6,6 +6,7 @@ import helmet from 'helmet';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import { apiLimiter, authLimiter, codeLimiter, heavyLimiter, uploadLimiter, paymentLimiter, adminLimiter, aiConcurrencyGuard } from './middleware/rateLimiter.js';
+import { metricsMiddleware, metricsEndpoint } from './middleware/metrics.js';
 import { sqlGuardMiddleware } from './utils/sqlGuard.js';
 import { requestLogger } from './utils/logger.js';
 import logger from './utils/logger.js';
