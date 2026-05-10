@@ -39,6 +39,8 @@
     </table>
     </div>
 
+    <Pagination v-if="total > pageSize" :page="page" :page-size="pageSize" :total="total" @change="onPageChange" />
+
     <div v-if="!list.length && !loading" class="empty">暂无标签数据</div>
 
     <Teleport to="body">
@@ -63,6 +65,7 @@
             <div class="form-group">
               <label>分类</label>
               <select v-model="form.category" class="sel">
+                <option value="">请选择分类</option>
                 <option value="sales">销售类</option>
                 <option value="promotion">促销类</option>
                 <option value="trust">信任类</option>
@@ -99,6 +102,9 @@ const { confirm } = useConfirm()
 
 const toast = useToast()
 const list = ref<any[]>([]);
+const total = ref(0);
+const page = ref(1);
+const pageSize = 20;
 const loading = ref(false);
 const showModal = ref(false);
 const filterCategory = ref('');
@@ -119,13 +125,18 @@ onMounted(() => { fetchData(); });
 async function fetchData() {
   loading.value = true;
   try {
-    const params = new URLSearchParams();
+    const params = new URLSearchParams({ page: String(page.value), pageSize: String(pageSize) });
     if (filterCategory.value) params.set('category', filterCategory.value);
     const res = await $fetch(`/api/badges/admin/all?${params}`, { credentials: 'include' });
-    list.value = (res as any).data || [];
+    const body = (res as any).data || res;
+    list.value = body?.list || body || [];
+    if (!Array.isArray(list.value)) list.value = [];
+    total.value = body?.total || 0;
   } catch (e: any) { toast.error(e.data?.msg || e?.message || '加载失败') } finally { loading.value = false; }
 
 }
+
+function onPageChange(p: number) { page.value = p; fetchData() }
 
 function openCreate() {
   editing.value = {};

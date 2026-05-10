@@ -63,6 +63,7 @@
 </template>
 
 <script setup lang="ts">
+import type { ApiResponse } from '~/composables/useApi'
 
 const { confirm } = useConfirm()
 
@@ -85,10 +86,10 @@ async function fetch() {
     const params = new URLSearchParams({ page: String(page.value), pageSize: String(pageSize) })
     if (filterUserId.value) params.set('userId', filterUserId.value)
     if (filterType.value) params.set('type', filterType.value)
-    const data = await $fetch(`/api/notifications/admin/all?${params.toString()}`, { credentials: 'include' })
-    if ((data as any)?.code === 200) {
-      list.value = (data as any).data.list || []
-      total.value = (data as any).data.total || 0
+    const data = await $fetch(`/api/notifications/admin/all?${params.toString()}`, { credentials: 'include' }) as ApiResponse<{list: any[], total: number}>
+    if (data?.code === 200) {
+      list.value = data.data.list || []
+      total.value = data.data.total || 0
     }
   } catch (e: any) { toast.error('加载失败') } finally { loading.value = false }
 }
@@ -99,18 +100,18 @@ function onPageChange(p: number) { page.value = p; fetch() }
 async function confirmSend() {
   if (!sendDialog.userId || !sendDialog.title || !sendDialog.content) { toast.warn('请填写完整信息'); return }
   try {
-    const data = await $fetch('/api/notifications/send', { method: 'POST', credentials: 'include', body: { userId: +sendDialog.userId, type: sendDialog.type, title: sendDialog.title, content: sendDialog.content } })
-    if ((data as any)?.code === 200) { toast.success('已发送'); sendDialog.open = false; fetch() }
-    else { toast.error((data as any)?.message || '发送失败') }
+    const data = await $fetch('/api/notifications/send', { method: 'POST', credentials: 'include', body: { userId: +sendDialog.userId, type: sendDialog.type, title: sendDialog.title, content: sendDialog.content } }) as ApiResponse
+    if (data?.code === 200) { toast.success('已发送'); sendDialog.open = false; fetch() }
+    else { toast.error(data?.msg || '发送失败') }
   } catch (e: any) { toast.error('发送失败') }
 }
 
 async function doDelete(n: any) {
   if (!await confirm({ message: `确定删除通知 #${n.id}？`)) return
   try {
-    const data = await $fetch(`/api/notifications/${n.id}`, { method: 'DELETE', credentials: 'include' })
-    if ((data as any)?.code === 200) { toast.success('已删除'); fetch() }
-    else { toast.error((data as any)?.message || '删除失败') }
+    const data = await $fetch(`/api/notifications/${n.id}`, { method: 'DELETE', credentials: 'include' }) as ApiResponse
+    if (data?.code === 200) { toast.success('已删除'); fetch() }
+    else { toast.error(data?.msg || '删除失败') }
   } catch (e: any) { toast.error('删除失败') }
 }
 

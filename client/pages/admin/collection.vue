@@ -9,6 +9,7 @@
     <table class="table"><thead><tr><th>ID</th><th>名称</th><th>类型</th><th>创建时间</th><th>操作</th></tr></thead>
     <tbody><tr v-for="c in list" :key="c.id"><td>{{ c.id }}</td><td>{{ c.name }}</td><td><span class="type-tag">{{ typeLabel(c.type) }}</span></td><td>{{ c.created_at?.slice(0,10) || '-' }}</td><td><button class="btn-sm" @click="openEdit(c)">编辑</button><button class="btn-sm btn-danger" @click="deleteItem(c.id)">删除</button></td></tr></tbody></table>
     </div>
+    <Pagination v-if="total > pageSize" :page="page" :page-size="pageSize" :total="total" @change="onPageChange" />
     <EmptyState v-else icon="🖼️" title="暂无作品集" description="创建您的第一个作品集" action-label="新建作品集" @action="openCreate" />
 
     <Teleport to="body">
@@ -18,6 +19,7 @@
           <div class="form-group"><label>名称</label><input v-model="editForm.name" maxlength="100" class="input" placeholder="作品集名称" /></div>
           <div class="form-group"><label>类型</label>
             <select v-model="editForm.type" class="input">
+              <option value="">请选择类型</option>
               <option value="image">图片</option><option value="video">视频</option>
               <option value="template">模板</option><option value="prompt">提示词</option>
             </select>
@@ -36,7 +38,7 @@
 const { confirm } = useConfirm()
 
 const toast = useToast()
-const list = ref<any[]>([]), loading = ref(true)
+const list = ref<any[]>([]), total = ref(0), page = ref(1), pageSize = 20, loading = ref(true)
 const showModal = ref(false), editing = ref<any>(null), saving = ref(false)
 const editForm = reactive({ name: '', type: 'image' })
 
@@ -45,12 +47,16 @@ function typeLabel(t: string) { return { image:'图片', video:'视频', templat
 async function fetchData() {
   loading.value = true
   try {
-    const data: any = await $fetch('/api/collections', { credentials: 'include' })
+    const params = new URLSearchParams({ page: String(page.value), pageSize: String(pageSize) })
+    const data: any = await $fetch(`/api/collections?${params}`, { credentials: 'include' })
     list.value = data?.data?.list || data?.data || []
     if (!Array.isArray(list.value)) list.value = []
+    total.value = data?.data?.total || 0
   } catch(e) { toast.error('加载失败') }
   loading.value = false
 }
+
+function onPageChange(p: number) { page.value = p; fetchData() }
 
 function openCreate() { editing.value = null; editForm.name = ''; editForm.type = 'image'; showModal.value = true }
 function openEdit(c: any) { editing.value = c; editForm.name = c.name; editForm.type = c.type || 'image'; showModal.value = true }

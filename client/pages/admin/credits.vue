@@ -68,6 +68,7 @@
 </template>
 
 <script setup lang="ts">
+import type { ApiResponse } from '~/composables/useApi'
 
 const list = ref<any[]>([])
 const total = ref(0)
@@ -91,10 +92,10 @@ async function fetch() {
     if (filterUserId.value) params.set('userId', filterUserId.value)
     if (filterType.value) params.set('type', filterType.value)
     if (filterStatus.value) params.set('status', filterStatus.value)
-    const data = await $fetch(`/api/credits/admin/records?${params.toString()}`, { credentials: 'include' })
-    if ((data as any)?.code === 200) {
-      list.value = (data as any).data.list || []
-      total.value = (data as any).data.total || 0
+    const data = await $fetch(`/api/credits/admin/records?${params.toString()}`, { credentials: 'include' }) as ApiResponse<{list: any[], total: number}>
+    if (data?.code === 200) {
+      list.value = data.data.list || []
+      total.value = data.data.total || 0
     }
   } catch (e: any) { toast.error('加载失败') } finally { loading.value = false }
 }
@@ -110,9 +111,9 @@ function doRefund(record: any) {
 
 async function confirmRefund() {
   try {
-    const data = await $fetch('/api/credits/admin/refund', { method: 'POST', credentials: 'include', body: { recordId: refundDialog.record.id, remark: refundDialog.remark || '管理员退款' } })
-    if ((data as any)?.code === 200) { toast.success('退款成功'); refundDialog.open = false; fetch() }
-    else { toast.error((data as any)?.message || '退款失败') }
+    const data = await $fetch('/api/credits/admin/refund', { method: 'POST', credentials: 'include', body: { recordId: refundDialog.record.id, remark: refundDialog.remark || '管理员退款' } }) as ApiResponse
+    if (data?.code === 200) { toast.success('退款成功'); refundDialog.open = false; fetch() }
+    else { toast.error(data?.msg || '退款失败') }
   } catch (e: any) { toast.error('退款失败') }
 }
 

@@ -11,6 +11,7 @@
       <div v-if="showAddForm" class="add-form">
         <input v-model="newConfig.key" maxlength="50" placeholder="配置键名 (如 hero_title)" class="input" />
         <select v-model="newConfig.type" class="input sel">
+          <option value="">请选择类型</option>
           <option value="text">text</option>
           <option value="json">json</option>
         </select>

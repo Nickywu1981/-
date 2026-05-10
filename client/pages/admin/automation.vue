@@ -60,6 +60,7 @@
             <label>店铺名称 <input v-model="form.store_name" maxlength="100" placeholder="店铺名称" /></label>
             <label>任务类型
               <select v-model="form.task_type">
+                <option value="">请选择任务类型</option>
                 <option value="product_on">商品上架</option><option value="product_off">商品下架</option><option value="ship_order">发货</option><option value="reply_review">评价回复</option><option value="stock_check">库存检查</option>
               </select>
             </label>
