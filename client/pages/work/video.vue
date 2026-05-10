@@ -199,6 +199,7 @@ const enhancedPrompt = ref('')
 const { enhancing, enhance } = usePromptEnhance()
 const { status: taskStatus, progress: taskProgress, error: taskError, result, submit } = useTaskPolling()
 const resultUrl = computed(() => result.value?.video_url || result.value?.file_url || '')
+const { download } = useFileDownload()
 
 function onImagesUploaded(files: any[]) { images.value = files }
 async function doEnhance() {
@@ -273,7 +274,7 @@ async function doPackage() {
 }
 
 // ---- 工具 ----
-function downloadResult() { if (resultUrl.value) window.open(resultUrl.value, '_blank', 'noopener,noreferrer') }
+function downloadResult() { if (resultUrl.value) download(resultUrl.value, 'generated-video.mp4') }
 </script>
 
 <style scoped>

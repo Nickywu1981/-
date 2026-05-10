@@ -105,6 +105,7 @@ const taskStatus = ref(-1)
 const progress = ref(0)
 const progressMsg = ref('')
 const errorMsg = ref('')
+const { download } = useFileDownload()
 let pollTimer: ReturnType<typeof setTimeout> | null = null
 let pollCount = 0
 let consecutiveFailures = 0

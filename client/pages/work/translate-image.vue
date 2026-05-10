@@ -72,6 +72,7 @@
 <script setup lang="ts">
 
 const toast = useToast()
+const { download } = useFileDownload()
 const fileInput = ref<HTMLInputElement>()
 const previewUrl = ref('')
 const resultUrl = ref('')

@@ -119,6 +119,7 @@ const targetImageUrl = ref('')
 const actionStyle = ref('')
 const { status: taskStatus, progress: taskProgress, error: taskError, result, submit } = useTaskPolling()
 const resultUrl = computed(() => result.value?.video_url || result.value?.file_url || '')
+const { download } = useFileDownload()
 
 function onSourceVideoUploaded(files: any[]) { if (files.length > 0) sourceVideoUrl.value = files[0].url }
 function onTargetImageUploaded(files: any[]) { if (files.length > 0) targetImageUrl.value = files[0].url }
@@ -157,7 +158,7 @@ function statusLabel(s: string) {
   return map[s] || s
 }
 
-function downloadResult() { if (resultUrl.value) window.open(resultUrl.value, '_blank', 'noopener,noreferrer') }
+function downloadResult() { if (resultUrl.value) download(resultUrl.value, 'action-transfer.mp4') }
 </script>
 
 <style scoped>

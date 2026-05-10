@@ -147,6 +147,7 @@ const enhancedPrompt = ref('')
 const { enhancing, enhance } = usePromptEnhance()
 const { status: taskStatus, progress: taskProgress, error: taskError, result, submit } = useTaskPolling()
 const resultUrl = computed(() => result.value?.image_url || result.value?.file_url || '')
+const { download } = useFileDownload()
 
 async function doEnhance() {
   if (!prompt.value.trim()) return
@@ -184,7 +185,7 @@ async function doBatchEdit() {
   await submit('batch_image_edit', { images: batchImages.value.map(f => ({ url: f.url })), operations: [] })
 }
 
-function downloadResult() { if (resultUrl.value) window.open(resultUrl.value, '_blank', 'noopener,noreferrer') }
+function downloadResult() { if (resultUrl.value) download(resultUrl.value, 'generated-image.png') }
 </script>
 
 <style scoped>

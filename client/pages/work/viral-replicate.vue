@@ -133,6 +133,7 @@ const productImages = ref<any[]>([])
 const customPrompt = ref('')
 const { status: repStatus, progress: repProgress, error: repError, result: repResult, submit: submitRep } = useTaskPolling()
 const replicateResultUrl = computed(() => repResult.value?.video_url || repResult.value?.file_url || '')
+const { download } = useFileDownload()
 
 function onProductImagesUploaded(files: any[]) { productImages.value = files }
 
@@ -146,7 +147,7 @@ async function doReplicate() {
   })
 }
 
-function downloadResult() { if (replicateResultUrl.value) window.open(replicateResultUrl.value, '_blank', 'noopener,noreferrer') }
+function downloadResult() { if (replicateResultUrl.value) download(replicateResultUrl.value, 'viral-video.mp4') }
 </script>
 
 <style scoped>

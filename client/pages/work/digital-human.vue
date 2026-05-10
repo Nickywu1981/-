@@ -88,6 +88,7 @@ const selectedBg = ref('studio')
 const { status: taskStatus, progress: taskProgress, error: taskError, result, submit } = useTaskPolling()
 const submitting = ref(false)
 const resultUrl = computed(() => result.value?.video_url || result.value?.file_url || '')
+const { download } = useFileDownload()
 
 const quickTemplates = [
   '这款新品首发，限时特惠只要99元，点击下方链接立即抢购！',
@@ -127,7 +128,7 @@ async function doCreate() {
   }
 }
 
-function downloadResult() { if (resultUrl.value) window.open(resultUrl.value, '_blank', 'noopener,noreferrer') }
+function downloadResult() { if (resultUrl.value) download(resultUrl.value, 'digital-human.mp4') }
 </script>
 
 <style scoped>
