@@ -36,17 +36,6 @@ client.on('error', (err) => { logger.warn('[Redis] 连接错误', { error: err.m
 
 let connected = false;
 let triedConnect = false;
-let retryDelay = 5000;
-
-// 指数退避重试 Redis 连接
-setInterval(() => {
-  if (!connected) {
-    triedConnect = false;
-    retryDelay = Math.min(retryDelay * 2, 60000);
-  } else {
-    retryDelay = 5000;
-  }
-}, retryDelay).unref();
 
 export async function getRedis() {
   if (connected) return client;
@@ -55,8 +44,13 @@ export async function getRedis() {
     try {
       await client.connect();
       connected = true;
+      logger.info('[Redis] 连接成功');
       return client;
-    } catch { /* 无 Redis，使用内存缓存 */ }
+    } catch (err) {
+      logger.warn('[Redis] 初始连接失败，使用内存缓存', { error: err.message });
+      // 60s 后允许重试一次初始连接
+      setTimeout(() => { triedConnect = false; }, 60000).unref();
+    }
   }
   return null;
 }

@@ -36,12 +36,18 @@ export function concurrencyGuard(maxConcurrent = CONCURRENCY_MAX_PER_USER) {
     entry.count++;
     entry.ts = Date.now();
     userConcurrency.set(key, entry);
-    res.on('finish', () => {
+
+    let decremented = false;
+    const decrement = () => {
+      if (decremented) return;
+      decremented = true;
       const cur = userConcurrency.get(key);
       if (!cur) return;
       if (cur.count <= 1) userConcurrency.delete(key);
       else { cur.count--; cur.ts = Date.now(); }
-    });
+    };
+    res.on('finish', decrement);
+    res.on('close', decrement);
     next();
   };
 }

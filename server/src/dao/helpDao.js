@@ -1,5 +1,13 @@
 import pool from './db.js';
 
+const FAQ_COLS = ['question', 'answer', 'category', 'sort', 'status'];
+
+function pickAllowed(data, allowed) {
+  const out = {};
+  for (const k of allowed) { if (data[k] !== undefined) out[k] = data[k]; }
+  return out;
+}
+
 export default {
   async listFaqs({ keyword, page = 1, pageSize = 50 } = {}) {
     const offset = (page - 1) * pageSize;
@@ -16,25 +24,25 @@ export default {
   },
 
   async getFaqById(id) {
-const [rows] = await pool.query('SELECT * FROM help_faq WHERE id = ?', [id]);
+    const [rows] = await pool.query('SELECT * FROM help_faq WHERE id = ?', [id]);
     return rows[0] || null;
   },
 
   async insertFaq(data) {
-const [result] = await pool.query('INSERT INTO help_faq SET ?', data);
+    const [result] = await pool.query('INSERT INTO help_faq SET ?', pickAllowed(data, FAQ_COLS));
     return result.insertId;
   },
 
   async updateFaq(id, data) {
-await pool.query('UPDATE help_faq SET ? WHERE id = ?', [data, id]);
+    await pool.query('UPDATE help_faq SET ? WHERE id = ?', [pickAllowed(data, FAQ_COLS), id]);
   },
 
   async deleteFaq(id) {
-await pool.query('DELETE FROM help_faq WHERE id = ?', [id]);
+    await pool.query('DELETE FROM help_faq WHERE id = ?', [id]);
   },
 
   async insertSeed() {
-const [[{ cnt }]] = await pool.query('SELECT COUNT(*) as cnt FROM help_faq');
+    const [[{ cnt }]] = await pool.query('SELECT COUNT(*) as cnt FROM help_faq');
     if (cnt > 0) return;
     const faqs = [
       ['支持哪些电商平台？', '淘宝、拼多多、抖音、小红书、视频号、亚马逊、Temu、Shein、TikTok Shop、美客多、Ozon、Shopee、Lazada — 共13个平台，一键适配官方标准尺寸。', 'platform', 1],

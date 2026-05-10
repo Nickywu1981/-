@@ -159,7 +159,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 
 definePageMeta({ layout: 'workspace' })
 
@@ -184,6 +184,7 @@ const configItems = ref<any[]>([])
 const editValues = ref<Record<string, any>>({})
 const originalValues = ref<Record<string, any>>({})
 const saveStatus = ref<Record<string, string>>({})
+let msgTimer: ReturnType<typeof setTimeout> | null = null
 const hasChanges = computed(() =>
   configItems.value.some(item => isModified(item))
 )
@@ -256,7 +257,7 @@ async function saveItem(itemKey: string) {
     if (res.code === 200) {
       originalValues.value[itemKey] = editValues.value[itemKey]
       saveStatus.value[itemKey] = '✓ 已保存'
-      setTimeout(() => delete saveStatus.value[itemKey], 2000)
+      msgTimer = setTimeout(() => delete saveStatus.value[itemKey], 2000)
     } else {
       saveStatus.value[itemKey] = '✗ ' + (res.msg || '保存失败')
     }
@@ -292,6 +293,7 @@ async function rollback(logId: number) {
 }
 
 onMounted(loadGroups)
+onBeforeUnmount(() => { if (msgTimer) { clearTimeout(msgTimer); msgTimer = null; } })
 </script>
 
 <style scoped>

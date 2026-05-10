@@ -5,10 +5,17 @@
 import pool from './db.js';
 
 const TABLE = 'open_api_key';
+const KEY_COLS = ['api_key', 'description', 'status', 'rate_limit', 'daily_limit', 'tenant_id'];
 
 function clean(obj) {
   const out = {};
   for (const [k, v] of Object.entries(obj)) { if (v !== undefined) out[k] = v; }
+  return out;
+}
+
+function pickAllowed(data) {
+  const out = {};
+  for (const k of KEY_COLS) { if (data[k] !== undefined) out[k] = data[k]; }
   return out;
 }
 
@@ -44,14 +51,14 @@ export async function getByApiKey(apiKey) {
 }
 
 export async function create(data) {
-  const [result] = await pool.query(`INSERT INTO ${TABLE} SET ?`, clean(data));
+  const [result] = await pool.query(`INSERT INTO ${TABLE} SET ?`, pickAllowed(clean(data)));
   return result.insertId;
 }
 
 export async function update(id, tenantId, data) {
   const [result] = await pool.query(
     `UPDATE ${TABLE} SET ? WHERE id = ? AND tenant_id = ? AND is_deleted = 0`,
-    [clean(data), id, tenantId],
+    [pickAllowed(clean(data)), id, tenantId],
   );
   return result.affectedRows > 0;
 }

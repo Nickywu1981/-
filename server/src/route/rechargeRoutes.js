@@ -15,12 +15,16 @@ const refundSchema = z.object({
   reason: z.string().max(500).optional(),
 });
 
+const callbackChannelSchema = z.object({
+  channel: z.enum(['wechat', 'alipay', 'unionpay']),
+});
+
 router.get('/rates', asyncHandler(rechargeController.getRates));
 router.get('/', authMiddleware, asyncHandler(rechargeController.listUserOrders));
 router.get('/orders', authMiddleware, asyncHandler(rechargeController.listUserOrders));
 router.post('/create', authMiddleware, validate(createOrderSchema), asyncHandler(rechargeController.createOrder));
 router.get('/result/:reqsn', authMiddleware, asyncHandler(rechargeController.checkPaymentResult));
-router.post('/callback/:channel', asyncHandler(rechargeController.handleCallback));
+router.post('/callback/:channel', validate(callbackChannelSchema, 'params'), asyncHandler(rechargeController.handleCallback));
 router.get('/admin/orders', authMiddleware, adminAuth, asyncHandler(rechargeController.listAllOrders));
 router.post('/admin/refund/:orderNo', authMiddleware, adminAuth, validate(refundSchema), asyncHandler(rechargeController.refundOrder));
 
