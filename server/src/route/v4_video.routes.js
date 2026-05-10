@@ -10,6 +10,7 @@ import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate, validate } from '../utils/validate.js';
 import { tierGuard} from '../middleware/tierGuard.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
+import { authMiddleware } from '../middleware/auth.js';
 import * as videoService from '../services/video.service.js';
 import * as actionMigrateService from '../services/action-migrate.service.js';
 import * as viralVideoService from '../services/viral-video.service.js';
@@ -17,6 +18,7 @@ import * as digitalHumanService from '../services/digital-human.service.js';
 import * as liveClipService from '../services/live-clip.service.js';
 
 const router = Router();
+router.use(authMiddleware);
 
 const idParamSchema = z.object({ id: z.string().min(1).max(50) });
 

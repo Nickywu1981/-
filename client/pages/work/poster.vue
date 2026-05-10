@@ -307,8 +307,17 @@ async function submitTask() {
 }
 
 function startPolling(jobId) {
+  let pollCount = 0;
+  const MAX_POLL = 40;
   clearInterval(pollTimer);
   pollTimer = setInterval(async () => {
+    pollCount++;
+    if (pollCount > MAX_POLL) {
+      clearInterval(pollTimer);
+      generating.value = false;
+      errorMsg.value = '任务超时，请刷新页面查看结果';
+      return;
+    }
     try {
       const resp = await $fetch(`/api/job/${jobId}`, { credentials: 'include' });
       const job = resp.data || resp;

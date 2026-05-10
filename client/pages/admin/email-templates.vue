@@ -138,6 +138,7 @@ async function saveTpl(tpl: any) {
       method: 'PUT',
       body: { name: tpl.name, subject: tpl.subject, content: tpl.content, provider_template_id: tpl.provider_template_id, provider: tpl.provider, status: tpl.status, remark: tpl.remark },
     });
+    if (msgTimer) clearTimeout(msgTimer);
     msg.value = '已保存'; msgTimer = setTimeout(() => (msg.value = ''), 2000);
   } catch (e: any) { msg.value = e.data?.msg || '保存失败'; }
   saving.value = 0;

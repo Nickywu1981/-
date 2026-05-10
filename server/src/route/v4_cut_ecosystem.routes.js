@@ -9,8 +9,10 @@ import { validateV4 as _validate } from '../utils/validate.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import cutEcosystemService from '../services/cutEcosystemService.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
+import { authMiddleware } from '../middleware/auth.js';
 
 const router = Router();
+router.use(authMiddleware);
 
 const exportSchema = z.object({
   workIds: z.array(z.number().int().positive()).min(1, '请选择至少一个作品').max(50, '单次最多导出50个作品'),

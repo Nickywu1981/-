@@ -11,10 +11,12 @@ import { validateV4 as _validate } from '../utils/validate.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { contentModerationMiddleware } from '../middleware/content-moderation.middleware.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
+import { authMiddleware } from '../middleware/auth.js';
 import * as posterService from '../services/poster.service.js';
 import * as promptEnhanceService from '../services/prompt-enhance.service.js';
 
 const router = Router();
+router.use(authMiddleware);
 
 // ─── POST /api/posters/generate ───────────────────────────────
 const generateSchema = z.object({
@@ -64,10 +66,16 @@ router.get('/sizes', (_req, res) => {
 });
 
 // ─── GET /api/posters/works ────────────────────────────────────
-router.get('/works', async (req, res) => {
+const worksQuerySchema = z.object({
+  type: z.string().max(50).optional(),
+  page: z.coerce.number().int().min(1).optional().default(1),
+  limit: z.coerce.number().int().min(1).max(100).optional().default(20),
+});
+
+router.get('/works', _validate(worksQuerySchema, 'query'), async (req, res) => {
   try {
-    const { type, page, limit } = req.query;
-    const rows = await posterService.getUserPosters(req.user.id, { type, page: +page || 1, limit: +limit || 20 });
+    const { type, page, limit } = req.validated;
+    const rows = await posterService.getUserPosters(req.user.id, { type, page, limit });
     return success(res, rows);
   } catch (__) {
     return error(res, ERROR_CODE.INTERNAL_ERROR, '获取作品列表失败');

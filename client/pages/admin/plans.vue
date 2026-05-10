@@ -165,6 +165,7 @@ async function savePlan(plan: any) {
         brand_kit: plan.brand_kit, priority_queue: plan.priority_queue, status: plan.status,
       },
     });
+    if (msgTimer) clearTimeout(msgTimer);
     msg.value = '已保存'; msgTimer = setTimeout(() => (msg.value = ''), 2000);
   } catch (e: any) { msg.value = e.data?.msg || '保存失败'; }
   saving.value = 0;

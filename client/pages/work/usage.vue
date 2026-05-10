@@ -53,7 +53,12 @@
 </template>
 
 <script setup lang="ts">
-import * as echarts from 'echarts'
+import * as echarts from 'echarts/core'
+import { PieChart, BarChart } from 'echarts/charts'
+import { TooltipComponent, GridComponent } from 'echarts/components'
+import { CanvasRenderer } from 'echarts/renderers'
+
+echarts.use([PieChart, BarChart, TooltipComponent, GridComponent, CanvasRenderer])
 import { formatDateTime } from '@/utils/format'
 
 const loading = ref(false); const error = ref('')

@@ -8,6 +8,7 @@ import logger from '../utils/logger.js';
 import * as emailTemplateDao from '../dao/emailTemplateDao.js';
 
 const CODE_CACHE = new Map(); // key: email, value: { code, expires, attempts }
+const EMAIL_SEND_LOG = new Map(); // key: email, value: [timestamp, ...]
 
 // ==================== HTML 模板消毒 ====================
 

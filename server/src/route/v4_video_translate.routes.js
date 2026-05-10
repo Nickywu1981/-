@@ -12,9 +12,11 @@ import { validateV4 as _validate } from '../utils/validate.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { contentModerationMiddleware } from '../middleware/content-moderation.middleware.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
+import { authMiddleware } from '../middleware/auth.js';
 import * as translateService from '../services/video-translate.service.js';
 
 const router = Router();
+router.use(authMiddleware);
 
 const baseTranslateSchema = z.object({
   videoUrl: z.string().url('请提供有效视频链接'),
@@ -78,10 +80,16 @@ router.get('/langs', (_req, res) => {
 });
 
 // ─── GET /api/video-translate/works ────────────────────────────
-router.get('/works', async (req, res) => {
+const worksQuerySchema = z.object({
+  type: z.string().max(50).optional(),
+  page: z.coerce.number().int().min(1).optional().default(1),
+  limit: z.coerce.number().int().min(1).max(100).optional().default(20),
+});
+
+router.get('/works', _validate(worksQuerySchema, 'query'), async (req, res) => {
   try {
-    const { type, page, limit } = req.query;
-    const rows = await translateService.getUserTranslateHistory(req.user.id, { type, page: +page || 1, limit: +limit || 20 });
+    const { type, page, limit } = req.validated;
+    const rows = await translateService.getUserTranslateHistory(req.user.id, { type, page, limit });
     return success(res, rows);
   } catch (__) {
     logger.error('获取翻译历史失败', __);

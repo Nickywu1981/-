@@ -12,10 +12,12 @@ import { validateV4 as _validate } from '../utils/validate.js';
 import { contentModerationMiddleware } from '../middleware/content-moderation.middleware.js';
 import { tierGuard } from '../middleware/tierGuard.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
+import { authMiddleware } from '../middleware/auth.js';
 import * as imageService from '../services/image.service.js';
 import * as promptEnhanceService from '../services/prompt-enhance.service.js';
 
 const router = Router();
+router.use(authMiddleware);
 
 const generateSchema = z.object({
   prompt: z.string().min(1, '请提供提示词').max(4000),
