@@ -14,7 +14,7 @@ export default {
       });
       return success(res, result);
     } catch (e) {
-      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message);
+      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.status ? e.message : '操作失败');
     }
   },
 
@@ -24,7 +24,7 @@ export default {
       if (!tpl) return error(res, ERROR_CODE.NOT_FOUND, '模板不存在');
       return success(res, tpl);
     } catch (e) {
-      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message);
+      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.status ? e.message : '操作失败');
     }
   },
 
@@ -39,7 +39,7 @@ export default {
       await templateMarketDao.incrementDownload(tpl.id);
       return success(res, { download_url: tpl.preview_images }, '下载成功');
     } catch (e) {
-      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message);
+      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.status ? e.message : '操作失败');
     }
   },
 
@@ -51,7 +51,7 @@ export default {
       await templateMarketDao.recordPurchase(req.userId, tpl.id, tpl.price);
       return success(res, null, '购买成功');
     } catch (e) {
-      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message);
+      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.status ? e.message : '操作失败');
     }
   },
 
@@ -60,7 +60,7 @@ export default {
       const result = await templateMarketDao.create(req.userId, req.validated);
       return success(res, { id: result.id }, '模板发布成功');
     } catch (e) {
-      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message);
+      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.status ? e.message : '操作失败');
     }
   },
 };

@@ -10,7 +10,7 @@ export default {
       const job = await digitalHumanService.createDigitalHuman(req.userId, req.validated);
       return success(res, { job_id: job.id, status: 'queued' }, '数字人任务已提交');
     } catch (e) {
-      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message);
+      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.status ? e.message : '操作失败');
     }
   },
 

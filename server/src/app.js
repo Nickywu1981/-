@@ -211,7 +211,7 @@ app.post('/api/internal/embed', async (req, res) => {
     const data = await fetchRes.json();
     return success(res, { vectors: data.data.map(d => d.embedding), model: data.model }, 'ok');
   } catch (e) {
-    sendError(res, ERROR_CODE.INTERNAL_ERROR, e.message);
+    sendError(res, ERROR_CODE.INTERNAL_ERROR, e.status ? e.message : '嵌入服务异常');
   }
 });
 

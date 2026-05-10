@@ -10,7 +10,7 @@ export default {
       const job = await translateService.translateVoice(req.userId, req.validated);
       return success(res, { job_id: job.id, status: 'queued' }, '语音翻译任务已提交');
     } catch (e) {
-      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message);
+      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.status ? e.message : '操作失败');
     }
   },
 
@@ -19,7 +19,7 @@ export default {
       const job = await translateService.translateSubtitles(req.userId, req.validated);
       return success(res, { job_id: job.id, status: 'queued' }, '字幕翻译任务已提交');
     } catch (e) {
-      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message);
+      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.status ? e.message : '操作失败');
     }
   },
 
@@ -28,7 +28,7 @@ export default {
       const job = await translateService.translateFace(req.userId, req.validated);
       return success(res, { job_id: job.id, status: 'queued' }, '面容翻译任务已提交');
     } catch (e) {
-      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message);
+      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.status ? e.message : '操作失败');
     }
   },
 

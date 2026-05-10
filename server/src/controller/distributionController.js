@@ -8,7 +8,7 @@ export default {
       const result = await distributionService.getMyInviteCode(req.user.id);
       return success(res, result);
     } catch (e) {
-      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message);
+      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.status ? e.message : '操作失败');
     }
   },
 
@@ -20,7 +20,7 @@ export default {
       });
       return success(res, result);
     } catch (e) {
-      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message);
+      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.status ? e.message : '操作失败');
     }
   },
 
@@ -29,7 +29,7 @@ export default {
       const result = await distributionService.getCommissionBalance(req.user.id);
       return success(res, result);
     } catch (e) {
-      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message);
+      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.status ? e.message : '操作失败');
     }
   },
 
@@ -38,7 +38,7 @@ export default {
       const result = await distributionService.withdrawCommission(req.user.id, req.validated.amount);
       return success(res, result, `成功提现 ${result.withdrawn} 元`);
     } catch (e) {
-      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message);
+      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.status ? e.message : '操作失败');
     }
   },
 
@@ -50,7 +50,7 @@ export default {
       });
       return success(res, result);
     } catch (e) {
-      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message);
+      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.status ? e.message : '操作失败');
     }
   },
 
@@ -59,7 +59,7 @@ export default {
       const result = await distributionService.getUserTier(req.user.id);
       return success(res, result);
     } catch (e) {
-      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message);
+      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.status ? e.message : '操作失败');
     }
   },
 
@@ -75,7 +75,7 @@ export default {
       });
       return success(res, result);
     } catch (e) {
-      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message);
+      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.status ? e.message : '操作失败');
     }
   },
 
@@ -84,7 +84,7 @@ export default {
       const result = await distributionService.getMyPromoLink(req.user.id);
       return success(res, result);
     } catch (e) {
-      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message);
+      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.status ? e.message : '操作失败');
     }
   },
 
@@ -93,7 +93,7 @@ export default {
       const result = await distributionService.getMyCampaignProgress(req.user.id);
       return success(res, result);
     } catch (e) {
-      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message);
+      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.status ? e.message : '操作失败');
     }
   },
 };

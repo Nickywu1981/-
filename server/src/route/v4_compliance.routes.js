@@ -18,7 +18,7 @@ router.get('/targets', (_req, res) => {
     const targets = complianceService.listComplianceTargets();
     return success(res, targets);
   } catch (e) {
-    return error(res, ERROR_CODE.INTERNAL_ERROR, e.message);
+    return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.status ? e.message : '合规检查失败');
   }
 });
 
@@ -34,7 +34,7 @@ router.post('/check', _validate(checkSchema), (req, res) => {
     const result = complianceService.checkCompliance(req.validated);
     return success(res, result);
   } catch (e) {
-    return error(res, ERROR_CODE.INTERNAL_ERROR, e.message);
+    return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.status ? e.message : '合规检查失败');
   }
 });
 
@@ -46,7 +46,7 @@ router.get('/rules/:code', _validate(z.object({ code: z.string().min(1) }), 'par
     if (!rules) return error(res, ERROR_CODE.NOT_FOUND, '未找到合规规则');
     return success(res, rules);
   } catch (e) {
-    return error(res, ERROR_CODE.INTERNAL_ERROR, e.message);
+    return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.status ? e.message : '合规检查失败');
   }
 });
 

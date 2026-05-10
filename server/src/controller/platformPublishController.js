@@ -27,7 +27,7 @@ export default {
       });
       return success(res, null, `${platform} 绑定成功`);
     } catch (e) {
-      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message);
+      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.status ? e.message : '操作失败');
     }
   },
 
@@ -46,7 +46,7 @@ export default {
       await platformPublishDao.disconnectPlatform(req.userId, req.params.platform);
       return success(res, null, '解绑成功');
     } catch (e) {
-      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message);
+      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.status ? e.message : '操作失败');
     }
   },
 
@@ -67,7 +67,7 @@ export default {
       });
       return success(res, { id: record.id, status: 'pending' }, '发布任务已提交');
     } catch (e) {
-      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message);
+      return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.status ? e.message : '操作失败');
     }
   },
 
