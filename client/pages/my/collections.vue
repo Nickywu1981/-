@@ -4,8 +4,10 @@
     <button class="btn" @click="showForm = true">+ 新建合集</button>
 
     <div v-if="showForm" class="form-card">
-      <input v-model="form.name" placeholder="合集名称" />
-      <input v-model="form.description" placeholder="描述（选填）" />
+      <label for="coll-name">合集名称</label>
+      <input id="coll-name" v-model="form.name" placeholder="合集名称" />
+      <label for="coll-desc">描述</label>
+      <input id="coll-desc" v-model="form.description" placeholder="描述（选填）" />
       <div class="form-actions">
         <button class="btn-outline" @click="showForm = false">取消</button>
         <button class="btn" @click="saveCollection" :disabled="saving">{{ saving ? '保存中...' : '保存' }}</button>
