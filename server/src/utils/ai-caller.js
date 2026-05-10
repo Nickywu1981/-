@@ -20,6 +20,11 @@ export async function call(endpoint, apiKey, params, options = {}) {
 
   let lastError;
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    // 熔断器检查（阻断请求而非仅记录）
+    if (breaker instanceof CircuitBreaker && !breaker.isAvailable()) {
+      throw new BusinessError(503, `[${modelName || 'AI'}] 熔断器已开启，请稍后重试`);
+    }
+
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), timeoutMs);
@@ -52,22 +57,17 @@ export async function call(endpoint, apiKey, params, options = {}) {
     } catch (err) {
       lastError = err;
 
-      // 记录失败到熔断器
       if (breaker instanceof CircuitBreaker) {
         breaker.recordFailure();
       }
 
-      // 最后一次尝试失败则抛出
       if (attempt >= maxRetries) {
         throw err;
       }
 
-      // 指数退避: 1s, 2s, 4s
       await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, attempt)));
     }
   }
-
-  throw lastError;
 }
 
 export const aiCaller = { call };

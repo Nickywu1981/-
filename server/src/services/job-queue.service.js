@@ -1,4 +1,5 @@
 import { BusinessError } from '../utils/businessError.js';
+import logger from '../utils/logger.js';
 
 /**
  * Movio AI v4.1 — Job Queue Service
@@ -122,10 +123,14 @@ export async function updateProgress(jobId, progress) {
 export async function completeJob(jobId, resultData) {
   const conn = await db.getConnection();
   try {
-    await conn.query(
-      'UPDATE job_queue SET status = ?, progress = 100, result_data = ?, completed_at = NOW() WHERE id = ?',
-      ['completed', JSON.stringify(resultData), jobId],
+    const [result] = await conn.query(
+      'UPDATE job_queue SET status = ?, progress = 100, result_data = ?, completed_at = NOW() WHERE id = ? AND status = ?',
+      ['completed', JSON.stringify(resultData), jobId, 'processing'],
     );
+    if (result.affectedRows === 0) {
+      // 任务可能已被 recoverStuckJobs 重置或已取消
+      logger.warn(`[JobQueue] completeJob #${jobId} 状态已变更，跳过覆盖`);
+    }
   } finally {
     conn.release();
   }
@@ -137,8 +142,9 @@ export async function completeJob(jobId, resultData) {
 export async function cancelJob(jobId, userId) {
   const conn = await db.getConnection();
   try {
+    await conn.beginTransaction();
     const [rows] = await conn.query(
-      'SELECT id, status FROM job_queue WHERE id = ? AND user_id = ?',
+      'SELECT id, status FROM job_queue WHERE id = ? AND user_id = ? FOR UPDATE',
       [jobId, userId],
     );
     if (rows.length === 0) throw new BusinessError(404, '任务不存在');
@@ -149,7 +155,11 @@ export async function cancelJob(jobId, userId) {
       "UPDATE job_queue SET status = 'cancelled', completed_at = NOW() WHERE id = ?",
       [jobId],
     );
+    await conn.commit();
     return { job_id: jobId, status: 'cancelled' };
+  } catch (err) {
+    await conn.rollback();
+    throw err;
   } finally {
     conn.release();
   }
@@ -185,22 +195,18 @@ export async function retryJob(jobId, userId) {
 export async function failJob(jobId, errorMessage) {
   const conn = await db.getConnection();
   try {
-    const [rows] = await conn.query('SELECT retry_count, max_retries FROM job_queue WHERE id = ?', [jobId]);
-    if (rows.length === 0) return;
-
-    const { retry_count, max_retries } = rows[0];
-    if (retry_count < max_retries) {
-      // 重新排队重试
-      await conn.query(
-        'UPDATE job_queue SET status = ?, retry_count = retry_count + 1, error_message = ? WHERE id = ?',
-        ['queued', errorMessage, jobId],
-      );
-    } else {
-      // 彻底失败
-      await conn.query(
-        'UPDATE job_queue SET status = ?, error_message = ?, completed_at = NOW() WHERE id = ?',
-        ['failed', errorMessage, jobId],
-      );
+    // 原子操作：仅处理 processing 状态，避免竞态覆盖
+    const [result] = await conn.query(
+      `UPDATE job_queue
+       SET status = CASE WHEN retry_count < max_retries THEN 'queued' ELSE 'failed' END,
+           retry_count = retry_count + 1,
+           error_message = ?,
+           completed_at = CASE WHEN retry_count >= max_retries THEN NOW() ELSE completed_at END
+       WHERE id = ? AND status = 'processing'`,
+      [errorMessage, jobId],
+    );
+    if (result.affectedRows === 0) {
+      logger.warn(`[JobQueue] failJob #${jobId} 非 processing 状态，跳过`);
     }
   } finally {
     conn.release();
