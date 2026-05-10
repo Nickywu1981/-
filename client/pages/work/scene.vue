@@ -45,6 +45,10 @@
           <button class="btn-outline" @click="handleRedo">换一批</button>
         </div>
       </div>
+      <div v-else-if="task.status.value === 3" class="error-box">
+        <p class="error-msg">{{ task.errorMsg.value || '生成失败，请重试' }}</p>
+        <button class="btn" @click="handleRedo">重新生成</button>
+      </div>
     </div>
   </WorkLayout>
 </template>

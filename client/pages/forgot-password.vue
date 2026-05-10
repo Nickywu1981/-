@@ -86,14 +86,16 @@ async function doReset() {
   if (newPassword.value.length < 8) { msg.value = '新密码至少8位'; msgErr.value = true; return }
   if (newPassword.value !== confirmPassword.value) { msg.value = '两次密码不一致'; msgErr.value = true; return }
   loading.value = true; msg.value = ''
+  let navTimer: ReturnType<typeof setTimeout> | null = null
   try {
     const isEmail = account.value.includes('@')
     const body = isEmail ? { email: account.value.trim(), new_password: newPassword.value } : { phone: account.value.trim(), new_password: newPassword.value }
     await $fetch('/api/auth/reset-password', { method: 'POST', body, credentials: 'include' })
     msg.value = '密码重置成功，跳转登录...'; msgErr.value = false
-    setTimeout(() => navigateTo('/login'), 1500)
+    navTimer = setTimeout(() => navigateTo('/login'), 1500)
   } catch (e: any) { msg.value = e.data?.msg || '重置失败'; msgErr.value = true }
   loading.value = false
+  onBeforeUnmount(() => { if (navTimer) clearTimeout(navTimer) })
 }
 </script>
 

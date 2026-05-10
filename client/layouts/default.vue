@@ -230,7 +230,7 @@ async function loadUnread() {
 async function doLogout() {
   menuOpen.value = false;
   mobileOpen.value = false;
-  $fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }).catch(() => {})
+  try { await $fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }); } catch { /* best-effort */ }
   user.value = null;
   navigateTo('/login');
 }
