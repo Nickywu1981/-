@@ -137,7 +137,13 @@ export async function handleNotify(body) {
   try {
     await conn.beginTransaction();
 
-    await allinpayDao.markPaid(reqsn, trxid || '', body, conn);
+    const affected = await allinpayDao.markPaid(reqsn, trxid || '', body, conn);
+    if (affected === 0) {
+      // 乐观锁冲突：另一并发回调已处理，跳过履约
+      await conn.rollback();
+      logger.info('[Allinpay] 订单已被并发回调处理，跳过履约', { reqsn });
+      return true;
+    }
 
     if (order.order_type === 'membership') {
       await fulfillMembership(order, conn);

@@ -13,7 +13,14 @@ export async function listLogs({ page = 1, pageSize = 30, phone, result, startDa
   if (phone) { sql += ' AND phone LIKE ?'; params.push(`%${phone}%`); }
   if (result !== undefined && result !== '') { sql += ' AND result = ?'; params.push(Number(result)); }
   if (startDate) { sql += ' AND create_time >= ?'; params.push(startDate); }
-  if (endDate) { sql += ' AND create_time <= ?'; params.push(endDate + ' 23:59:59'); }
+  if (endDate) {
+    const end = new Date(endDate);
+    if (!isNaN(end.getTime())) {
+      end.setHours(23, 59, 59, 999);
+      sql += ' AND create_time <= ?';
+      params.push(end);
+    }
+  }
   params.push((page - 1) * pageSize, pageSize);
   sql += ' ORDER BY create_time DESC LIMIT ?, ?';
 
