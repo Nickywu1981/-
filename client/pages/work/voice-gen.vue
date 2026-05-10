@@ -1,6 +1,5 @@
 <template>
   <WorkLayout title="语音生成" subtitle="AI 配音/TTS 语音合成" :steps="steps" :current-step="currentStep">
-    <template #input>
       <div class="ws-section">
         <div class="ws-section__title">输入配音文案</div>
         <textarea class="ws-textarea" v-model="text" placeholder="输入需要配音的文案内容..." rows="5" maxlength="1000"></textarea>
@@ -28,8 +27,6 @@
         <div class="ws-cost">预计消耗 <strong>3</strong> 积分</div>
         <button class="ws-btn ws-btn--primary ws-btn--lg" :disabled="!text.trim() || submitting" @click="handleGenerate">{{ submitting ? '生成中...' : '开始生成' }}</button>
       </div>
-    </template>
-    <template #output>
       <div class="ws-section">
         <div class="ws-section__title">生成结果</div>
         <div v-if="task.polling.value" class="progress-box">
@@ -43,8 +40,7 @@
         <div v-else-if="task.status.value === 3" class="error-box"><p>{{ task.errorMsg.value || '生成失败' }}</p><button class="ws-btn ws-btn--primary" @click="handleRedo">重试</button></div>
         <div v-else class="ws-placeholder"><div class="ws-placeholder__icon">🔊</div><div class="ws-placeholder__text">生成后的语音将显示在这里</div></div>
       </div>
-    </template>
-  </WorkLayout>
+      </WorkLayout>
 </template>
 
 <script setup lang="ts">

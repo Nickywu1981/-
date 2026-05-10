@@ -1,6 +1,5 @@
 <template>
   <WorkLayout title="智能扩图" subtitle="AI 智能扩展图片边缘，自动补全构图" :steps="steps" :current-step="currentStep">
-    <template #input>
       <div class="ws-section">
         <div class="ws-section__title">上传需要扩图的图片</div>
         <div class="ws-section__desc">AI 智能分析画面内容，自然扩展边缘区域</div>
@@ -36,8 +35,6 @@
         <div class="ws-cost">预计消耗 <strong>3</strong> 积分</div>
         <button class="ws-btn ws-btn--primary ws-btn--lg" :disabled="!uploadedUrl || submitting" @click="submitOutpaint">{{ submitting ? '提交中...' : '开始扩图' }}</button>
       </div>
-    </template>
-    <template #output>
       <div class="ws-section">
         <div class="ws-section__title">扩图结果</div>
         <div v-if="task.polling.value" class="progress-box">
@@ -63,8 +60,7 @@
         <div v-else-if="task.status.value === 3" class="error-box"><p>{{ task.errorMsg.value || '任务失败' }}</p><button class="ws-btn ws-btn--primary" @click="handleRedo">重试</button></div>
         <div v-else class="ws-placeholder"><div class="ws-placeholder__icon">↔</div><div class="ws-placeholder__text">扩图结果将显示在这里</div></div>
       </div>
-    </template>
-  </WorkLayout>
+      </WorkLayout>
 </template>
 
 <script setup lang="ts">

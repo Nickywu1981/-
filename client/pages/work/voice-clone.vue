@@ -1,6 +1,5 @@
 <template>
   <WorkLayout title="声音克隆" subtitle="AI 语音合成与音色克隆" :steps="steps" :current-step="currentStep">
-    <template #input>
       <div class="ws-section">
         <div class="ws-section__title">上传音频样本</div>
         <div class="ws-section__desc">上传 10-60 秒清晰人声，AI 将学习并克隆该音色</div>
@@ -39,8 +38,6 @@
         <div class="ws-cost">预计消耗 <strong>5</strong> 积分</div>
         <button class="ws-btn ws-btn--primary ws-btn--lg" :disabled="!uploadedUrl || !text.trim() || submitting" @click="handleGenerate">{{ submitting ? '生成中...' : '开始生成' }}</button>
       </div>
-    </template>
-    <template #output>
       <div class="ws-section">
         <div class="ws-section__title">生成结果</div>
         <div v-if="task.polling.value" class="progress-box">
@@ -54,8 +51,7 @@
         <div v-else-if="task.status.value === 3" class="error-box"><p>{{ task.errorMsg.value || '生成失败' }}</p><button class="ws-btn ws-btn--primary" @click="handleRedo">重试</button></div>
         <div v-else class="ws-placeholder"><div class="ws-placeholder__icon">🔊</div><div class="ws-placeholder__text">生成后的音频将显示在这里</div></div>
       </div>
-    </template>
-  </WorkLayout>
+      </WorkLayout>
 </template>
 
 <script setup lang="ts">

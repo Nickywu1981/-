@@ -1,6 +1,5 @@
 <template>
   <WorkLayout title="人物替换" subtitle="AI 智能替换模特/人物，保留服装细节" :steps="steps" :current-step="currentStep">
-    <template #input>
       <div class="ws-section">
         <div class="ws-section__title">上传素材</div>
         <div class="dual-upload">
@@ -55,8 +54,6 @@
         <div class="ws-cost">预计消耗 <strong>6</strong> 积分</div>
         <button class="ws-btn ws-btn--primary ws-btn--lg" :disabled="!sourceUrl || !targetUrl" @click="submitTask">开始生成</button>
       </div>
-    </template>
-    <template #output>
       <div class="ws-section">
         <div class="ws-section__title">生成结果</div>
         <div class="ws-placeholder" v-if="task.status.value === 0">
@@ -86,8 +83,7 @@
           <button class="ws-btn ws-btn--primary" @click="handleRedo">重试</button>
         </div>
       </div>
-    </template>
-  </WorkLayout>
+      </WorkLayout>
 </template>
 
 <script setup lang="ts">

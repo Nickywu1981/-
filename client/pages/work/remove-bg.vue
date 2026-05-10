@@ -1,6 +1,7 @@
 <template>
   <WorkLayout title="智能抠图" subtitle="AI 精准识别主体，一键去除背景" :steps="steps" :current-step="currentStep">
-    <template #input>
+    <!-- Input mode: no task running -->
+    <div v-if="taskStatus === -1">
       <div class="upload-section">
         <div class="dropzone" @dragover.prevent @drop.prevent="handleDrop">
           <p class="dz-icon">🖼️</p>
@@ -20,10 +21,8 @@
           <button class="btn btn-brand" @click="currentStep = 1">下一步：选择背景</button>
         </div>
       </div>
-    </template>
 
-    <template #input v-if="currentStep >= 1">
-      <div class="param-section">
+      <div v-if="currentStep >= 1" class="param-section">
         <h3 class="param-title">选择输出背景</h3>
         <div class="bg-grid">
           <button v-for="bg in bgOptions" :key="bg.id" class="bg-card" :class="{ active: selectedBg === bg.id }" @click="selectedBg = bg.id">
@@ -39,52 +38,53 @@
           </button>
         </div>
       </div>
-    </template>
 
-    <template #output v-if="taskStatus === 2">
-      <div class="result-section">
-        <h3 class="result-title">去背景完成</h3>
-        <div class="compare-row">
-          <div class="compare-card">
-            <span class="compare-label">原图</span>
-            <img loading="lazy" :src="uploadedUrl" class="compare-img" alt="原图" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
-          </div>
-          <span class="compare-arrow">→</span>
-          <div class="compare-card">
-            <span class="compare-label">去背景后</span>
-            <img loading="lazy" :src="resultUrl" class="compare-img" alt="结果" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
-          </div>
-        </div>
-        <div class="actions">
-          <button class="btn btn-brand" @click="downloadResult">下载 PNG</button>
-          <button class="btn-outline" @click="resetAll">重新处理</button>
-        </div>
-      </div>
-    </template>
-
-    <template #output v-else-if="taskStatus === 0 || taskStatus === 1">
-      <div class="progress-section">
-        <div class="spinner-lg" />
-        <p>{{ progressMsg || '排队中...' }}</p>
-        <div class="progress-bar"><div class="progress-fill" :style="{ width: progress + '%' }" /></div>
-        <p class="progress-pct">{{ progress }}%</p>
-      </div>
-    </template>
-
-    <template #output v-else-if="taskStatus === 3">
-      <div class="error-section">
-        <p class="error-icon">!</p>
-        <p>{{ errorMsg || '处理失败' }}</p>
-        <button class="btn-outline" @click="startRemoveBg">重试</button>
-      </div>
-    </template>
-
-    <template #empty>
-      <div class="empty-hint">
+      <div v-if="!previewUrl" class="empty-hint">
         <span class="empty-icon">🖼️</span>
         <p>上传商品图片，AI 自动识别主体并去除背景</p>
       </div>
-    </template>
+    </div>
+
+    <!-- Result -->
+    <div v-else-if="taskStatus === 2" class="result-section">
+      <h3 class="result-title">去背景完成</h3>
+      <div class="compare-row">
+        <div class="compare-card">
+          <span class="compare-label">原图</span>
+          <img loading="lazy" :src="uploadedUrl" class="compare-img" alt="原图" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+        </div>
+        <span class="compare-arrow">→</span>
+        <div class="compare-card">
+          <span class="compare-label">去背景后</span>
+          <img loading="lazy" :src="resultUrl" class="compare-img" alt="结果" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-brand" @click="downloadResult">下载 PNG</button>
+        <button class="btn-outline" @click="resetAll">重新处理</button>
+      </div>
+    </div>
+
+    <!-- Progress -->
+    <div v-else-if="taskStatus === 0 || taskStatus === 1" class="progress-section">
+      <div class="spinner-lg" />
+      <p>{{ progressMsg || '排队中...' }}</p>
+      <div class="progress-bar"><div class="progress-fill" :style="{ width: progress + '%' }" /></div>
+      <p class="progress-pct">{{ progress }}%</p>
+    </div>
+
+    <!-- Error -->
+    <div v-else-if="taskStatus === 3" class="error-section">
+      <p class="error-icon">!</p>
+      <p>{{ errorMsg || '处理失败' }}</p>
+      <button class="btn-outline" @click="startRemoveBg">重试</button>
+    </div>
+
+    <!-- Fallback -->
+    <div v-else class="empty-hint">
+      <span class="empty-icon">🖼️</span>
+      <p>上传商品图片，AI 自动识别主体并去除背景</p>
+    </div>
   </WorkLayout>
 </template>
 

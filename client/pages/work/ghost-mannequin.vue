@@ -1,6 +1,5 @@
 <template>
   <WorkLayout title="幽灵模特" subtitle="AI 去假模 → 立体悬浮展示，无需真人拍摄" :steps="steps" :current-step="currentStep">
-    <template #input>
       <div class="ws-section">
         <div class="ws-section__title">上传假人模特图</div>
         <div class="ws-section__desc">上传穿在假模上的服装图，AI 自动去除假模，生成立体悬浮展示效果</div>
@@ -36,8 +35,6 @@
         <div class="ws-cost">预计消耗 <strong>4</strong> 积分</div>
         <button class="ws-btn ws-btn--primary ws-btn--lg" :disabled="!uploadedUrl || submitting" @click="handleGenerate">{{ submitting ? '提交中...' : '开始生成' }}</button>
       </div>
-    </template>
-    <template #output>
       <div class="ws-section">
         <div class="ws-section__title">生成结果</div>
         <div v-if="task.polling.value" class="progress-box">
@@ -63,8 +60,7 @@
         <div v-else-if="task.status.value === 3" class="error-box"><p>{{ task.errorMsg.value || '任务失败' }}</p><button class="ws-btn ws-btn--primary" @click="handleRedo">重试</button></div>
         <div v-else class="ws-placeholder"><div class="ws-placeholder__icon">✨</div><div class="ws-placeholder__text">幽灵模特展示图将显示在这里</div></div>
       </div>
-    </template>
-  </WorkLayout>
+      </WorkLayout>
 </template>
 
 <script setup lang="ts">

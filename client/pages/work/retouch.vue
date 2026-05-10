@@ -1,6 +1,5 @@
 <template>
   <WorkLayout title="图片精修" subtitle="AI 自动美化：亮度+对比度+锐化+色彩增强" :steps="steps" :current-step="currentStep">
-    <template #input>
       <div class="ws-section">
         <div class="ws-section__title">上传商品图片</div>
         <div class="ws-section__desc">AI 自动检测并优化图片质量</div>
@@ -32,8 +31,6 @@
         <div class="ws-cost">预计消耗 <strong>2</strong> 积分</div>
         <button class="ws-btn ws-btn--primary ws-btn--lg" :disabled="!uploadedUrl || submitting" @click="submitRetouch">{{ submitting ? '提交中...' : '开始精修' }}</button>
       </div>
-    </template>
-    <template #output>
       <div class="ws-section">
         <div class="ws-section__title">精修结果</div>
         <div v-if="task.polling.value" class="progress-box">
@@ -66,8 +63,7 @@
           <div class="ws-placeholder__text">精修结果将显示在这里</div>
         </div>
       </div>
-    </template>
-  </WorkLayout>
+      </WorkLayout>
 </template>
 
 <script setup lang="ts">
