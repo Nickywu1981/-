@@ -173,6 +173,7 @@ function onRefImage(e) {
 }
 
 function doSubmit() {
+  if (loadingTimer) { clearInterval(loadingTimer); loadingTimer = null; }
   submitting.value = true
   result.value = null
   enhancedPrompt.value = ''

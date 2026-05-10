@@ -64,21 +64,21 @@ function gracefulShutdown(signal) {
       const db = await import('./dao/db.js');
       await db.default.end();
       logger.info('DB 连接池已关闭');
-    } catch { /* DB may not be connected */ }
+    } catch (e) { logger.warn('DB 关闭失败', { message: e.message }); }
 
     // 关闭 BullMQ
     try {
       const qm = await import('./services/queueManager.js');
       await qm.closeAll();
       logger.info('BullMQ 队列已关闭');
-    } catch { /* BullMQ may not be connected */ }
+    } catch (e) { logger.warn('BullMQ 关闭失败', { message: e.message }); }
 
     // 关闭 Redis
     try {
       const redis = await import('./dao/redis.js');
       await redis.default.quit();
       logger.info('Redis 已关闭');
-    } catch { /* Redis may not be connected */ }
+    } catch (e) { logger.warn('Redis 关闭失败', { message: e.message }); }
 
     // eslint-disable-next-line no-process-exit
     process.exit(0);

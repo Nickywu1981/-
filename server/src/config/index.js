@@ -24,7 +24,7 @@ const config = {
   },
 
   jwt: {
-    secret: process.env.JWT_SECRET || 'dev-secret-change-in-production',
+    secret: process.env.JWT_SECRET || (process.env.NODE_ENV === 'production' ? (() => { throw new Error('JWT_SECRET 必须在生产环境设置'); })() : 'dev-secret'),
     expiresIn: process.env.JWT_EXPIRES_IN || '7d',
   },
 

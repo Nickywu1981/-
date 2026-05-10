@@ -89,7 +89,7 @@ export async function handleNotify(body) {
         return true;
       }
     }
-  } catch { /* Redis 不可用，继续执行 */ }
+  } catch (e) { logger.warn('[Allinpay] Redis 锁失败，继续执行', { message: e.message }); }
 
   const alreadyProcessed = await allinpayDao.isCallbackProcessed(reqsn, trxid || '');
   if (alreadyProcessed) {

@@ -308,8 +308,8 @@ async function processRemoveBg(taskId, userId, params) {
     }, { onProgress: (p) => taskProxy(p) });
 
     await completeTask(taskId, userId, {
-      resultUrls: [result.output?.imageUrl || `https://cdn.movio.ai/results/${taskId}/transparent.png`],
-      thumbnail: result.output?.thumbnail || `https://cdn.movio.ai/results/${taskId}/thumb.png`,
+      resultUrls: [result.output?.imageUrl || `${process.env.CDN_BASE_URL || ''}/api/results/${taskId}/transparent.png`],
+      thumbnail: result.output?.thumbnail || `${process.env.CDN_BASE_URL || ''}/api/results/${taskId}/thumb.png`,
       metadata: { format: params.format, modelUsed: result.modelId },
     });
   } catch (err) {
@@ -350,7 +350,7 @@ async function processWhiteBg(taskId, userId, params) {
     });
 
     await completeTask(taskId, userId, {
-      resultUrls: [pipeResult.final?.imageUrl || `https://cdn.movio.ai/results/${taskId}/white-bg.png`],
+      resultUrls: [pipeResult.final?.imageUrl || `${process.env.CDN_BASE_URL || ''}/api/results/${taskId}/white-bg.png`],
       thumbnail: pipeResult.final?.thumbnail || `https://cdn.movio.ai/results/${taskId}/thumb.png`,
       metadata: { bgColor: params.bgColor, pipeline: pipeResult },
     });

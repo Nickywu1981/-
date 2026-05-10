@@ -113,7 +113,7 @@ export async function revokeAccessToken(token) {
     if (r) {
       await r.set(`jwt_blacklist:${token.slice(-32)}`, '1', 'EX', ttl);
     }
-  } catch { /* ignore decode errors */ }
+  } catch (e) { logger.warn('[JWT] 黑名单添加失败', { message: e.message }); }
 }
 
 /**
@@ -132,7 +132,7 @@ export async function isTokenBlacklisted(token) {
       const revokedAt = await r.get(`user_revoke:${payload.id}`);
       if (revokedAt && payload.iat && payload.iat < Number(revokedAt)) return true;
     }
-  } catch { /* decode error, treat as not blacklisted */ }
+  } catch (e) { logger.warn('[JWT] 解码失败, 按未列入黑名单处理', { message: e.message }); }
   return false;
 }
 
@@ -150,7 +150,7 @@ export async function revokeRefreshToken(refreshToken) {
     if (r) {
       await r.set(`rt_blacklist:${payload.jti}`, '1', 'EX', ttl);
     }
-  } catch { /* ignore decode errors */ }
+  } catch (e) { logger.warn('[JWT] 黑名单添加失败', { message: e.message }); }
 }
 export async function revokeAllUserTokens(userId) {
   const r = await getRedis();

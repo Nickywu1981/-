@@ -77,6 +77,8 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({ layout: 'landing' })
+
 import { useAuthStore } from '~/stores/useAuthStore'
 
 const mode = ref('password');

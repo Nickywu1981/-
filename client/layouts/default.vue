@@ -2,7 +2,7 @@
   <div class="layout">
     <header class="header">
       <div class="header-inner">
-        <h1 class="logo" @click="navigateTo('/')">Movio AI</h1>
+        <h1 class="logo" role="link" tabindex="0" aria-label="Movio AI 首页" @click="navigateTo('/')" @keydown.enter="navigateTo('/')">Movio AI</h1>
 
         <!-- 桌面导航 -->
         <nav class="nav desktop-nav">
@@ -24,6 +24,7 @@
             ref="searchInput"
             type="text"
             placeholder="搜索功能..."
+            aria-label="搜索功能"
             class="search-input"
             @keydown.esc="closeSearch"
             @keydown.enter="doSearch"
@@ -44,7 +45,7 @@
 
         <div class="user-area">
           <!-- 主题切换 -->
-          <button class="theme-btn" @click="toggleTheme" :title="theme === 'dark' ? '切换亮色' : '切换暗色'">
+          <button class="theme-btn" @click="toggleTheme" :title="theme === 'dark' ? '切换亮色' : '切换暗色'" :aria-label="theme === 'dark' ? '切换到亮色模式' : '切换到暗色模式'">
             {{ theme === 'dark' ? '☀️' : '🌙' }}
           </button>
           <template v-if="user">
@@ -52,7 +53,7 @@
               🔔
               <span v-if="unreadCount" class="badge">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
             </NuxtLink>
-            <div class="user-menu" @click="menuOpen = !menuOpen">
+            <div class="user-menu" role="button" tabindex="0" aria-label="用户菜单" @click="menuOpen = !menuOpen" @keydown.enter="menuOpen = !menuOpen">
               <span class="avatar">{{ user.nickname?.[0] || 'U' }}</span>
               <span class="uname desktop-nav">{{ user.nickname }}</span>
               <span class="arrow">▾</span>

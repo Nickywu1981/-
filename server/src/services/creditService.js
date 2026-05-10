@@ -100,43 +100,64 @@ export async function freezeCredit(userId, requestId, action, batchCount = 1, is
 // ==================== 确认消费 ====================
 
 export async function confirmCharge(requestId) {
-  const record = await creditDao.getConsumptionByRequestId(requestId);
-  if (!record) throw new BusinessError(404, '预扣记录不存在');
-  if (record.status === CREDIT_RECORD_STATUS.CONFIRMED) return { alreadyConfirmed: true };
-
-  await creditDao.confirmConsumption(record.id, record.credit_before - record.consumed);
-  await creditDao.insertRequestLog({
-    requestId: `${requestId}_confirm`, userId: record.user_id, action: 'confirm',
-    creditAmount: record.consumed, remark: 'confirmed', requestBody: {}, responseBody: {}, status: 1,
-  });
-  return { confirmed: true, recordId: record.id };
-}
-
-// ==================== 回滚 ====================
-
-export async function rollbackCharge(requestId, remark = '') {
-  const record = await creditDao.getConsumptionByRequestId(requestId);
-  if (!record) throw new BusinessError(404, '预扣记录不存在');
-  if (record.status === CREDIT_RECORD_STATUS.ROLLED_BACK) return { alreadyRolledBack: true };
-
   const conn = await db.getConnection();
   try {
     await conn.beginTransaction();
-    await creditDao.updateCreditBalance(record.user_id, record.consumed, conn);
-    await creditDao.refundConsumption(record.id, record.credit_before, remark || '系统回滚');
+    const record = await creditDao.getConsumptionByRequestIdForUpdate(conn, requestId);
+    if (!record) {
+      await conn.rollback();
+      throw new BusinessError(404, '预扣记录不存在');
+    }
+    if (record.status === CREDIT_RECORD_STATUS.CONFIRMED) {
+      await conn.rollback();
+      return { alreadyConfirmed: true };
+    }
+
+    await creditDao.confirmConsumption(record.id, record.credit_before - record.consumed);
+    await creditDao.insertRequestLog({
+      requestId: `${requestId}_confirm`, userId: record.user_id, action: 'confirm',
+      creditAmount: record.consumed, remark: 'confirmed', requestBody: {}, responseBody: {}, status: 1,
+    }, conn);
     await conn.commit();
+    return { confirmed: true, recordId: record.id };
   } catch (err) {
     await conn.rollback();
     throw err;
   } finally {
     conn.release();
   }
+}
 
-  await creditDao.insertRequestLog({
-    requestId: `${requestId}_rollback`, userId: record.user_id, action: 'rollback',
-    creditAmount: record.consumed, remark: remark || 'system rollback', requestBody: {}, responseBody: {}, status: 1,
-  });
-  return { rolledBack: true, recordId: record.id };
+// ==================== 回滚 ====================
+
+export async function rollbackCharge(requestId, remark = '') {
+  const conn = await db.getConnection();
+  try {
+    await conn.beginTransaction();
+    const record = await creditDao.getConsumptionByRequestIdForUpdate(conn, requestId);
+    if (!record) {
+      await conn.rollback();
+      throw new BusinessError(404, '预扣记录不存在');
+    }
+    if (record.status === CREDIT_RECORD_STATUS.ROLLED_BACK) {
+      await conn.rollback();
+      return { alreadyRolledBack: true };
+    }
+
+    await creditDao.updateCreditBalance(record.user_id, record.consumed, conn);
+    await creditDao.refundConsumption(record.id, record.credit_before, remark || '系统回滚');
+    await creditDao.insertRequestLog({
+      requestId: `${requestId}_rollback`, userId: record.user_id, action: 'rollback',
+      creditAmount: record.consumed, remark: remark || 'system rollback', requestBody: {}, responseBody: {}, status: 1,
+    }, conn);
+    await conn.commit();
+    return { rolledBack: true, recordId: record.id };
+  } catch (err) {
+    await conn.rollback();
+    throw err;
+  } finally {
+    conn.release();
+  }
 }
 
 // ==================== 简单消费（兼容旧接口） ====================

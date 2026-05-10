@@ -30,7 +30,11 @@ export default defineNuxtRouteMiddleware(async (to) => {
       isAuthenticated = data?.code === 200
       userRole = data?.data?.role || ''
     }
-  } catch { /* 未认证 */ }
+  } catch (e: any) {
+    // 只在明确的 401 时跳转登录；网络/5xx 错误允许页面继续渲染
+    if (e?.response?.status === 401 || e?.statusCode === 401) return
+    // 其他错误静默降级，页面以未认证状态渲染
+  }
 
   if (!isAuthenticated) {
     return navigateTo(`/login?redirect=${encodeURIComponent(to.fullPath)}`)

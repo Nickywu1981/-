@@ -36,6 +36,8 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({ layout: 'landing' })
+
 const account = ref(''), code = ref(''), newPassword = ref(''), confirmPassword = ref('')
 const loading = ref(false), verified = ref(false), sendCooldown = ref(0)
 const msg = ref(''), msgErr = ref(false)
