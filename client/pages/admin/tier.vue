@@ -32,7 +32,7 @@
         <h3>用量查询</h3>
         <div class="check-row">
           <select v-model="checkType" class="sel"><option value="image">图片</option><option value="video">视频</option><option value="text">文案</option></select>
-          <button class="btn-primary" @click="doCheckLimit">查询</button>
+          <button class="btn-primary" :disabled="checkingLimit" @click="doCheckLimit">{{ checkingLimit ? '查询中...' : '查询' }}</button>
         </div>
         <div v-if="limitResult" class="limit-result">
           <div class="limit-item"><span>已用</span><strong>{{ limitResult.used || 0 }}</strong></div>
@@ -47,7 +47,7 @@
 <script setup lang="ts">
 
 const loading = ref(true), tierData = ref<any>(null), exportPerms = ref<any>(null)
-const checkType = ref('image'), limitResult = ref<any>(null)
+const checkType = ref('image'), limitResult = ref<any>(null), checkingLimit = ref(false)
 
 function tierLabel(t: string) { return { free:'免费版', pro:'专业版', enterprise:'企业版' }[t] || t || '未知' }
 function tierIcon(t: string) { return { free:'🌱', pro:'⭐', enterprise:'💎' }[t] || '📦' }
@@ -70,10 +70,11 @@ onMounted(async () => {
 })
 
 async function doCheckLimit() {
+  checkingLimit.value = true;
   try {
     const data: any = await $fetch(`/api/tier/check-limit?type=${checkType.value}`, { credentials: 'include' })
     if (data?.code === 200) limitResult.value = data.data
-  } catch(e: any) { toast.error(e.data?.msg || '加载失败') }
+  } catch(e: any) { toast.error(e.data?.msg || '加载失败') } finally { checkingLimit.value = false; }
 }
 </script>
 <style scoped>

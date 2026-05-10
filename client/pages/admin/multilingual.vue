@@ -1,6 +1,17 @@
 <template>
   <AdminLayout>
     <h2 class="ptitle">多语言管理</h2>
+
+    <LoadingSkeleton v-if="loading" :rows="2" />
+
+    <template v-else-if="errorMsg">
+      <div class="error-state">
+        <span>⚠️ {{ errorMsg }}</span>
+        <button class="retry-btn" @click="retry">重试</button>
+      </div>
+    </template>
+
+    <template v-else>
     <div class="stats-row">
       <div class="stat-card"><span class="stat-val">{{ languages.length }}</span><span class="stat-lbl">支持语言</span></div>
       <div class="stat-card"><span class="stat-val">{{ scriptTypes.length }}</span><span class="stat-lbl">文案类型</span></div>
@@ -17,39 +28,51 @@
       </div>
     </div>
 
+    <div v-if="!languages.length && !scriptTypes.length" class="empty-state">暂无多语言数据</div>
+
     <div class="section" v-if="scriptTypes.length">
       <h3>文案类型</h3>
       <div class="tag-list">
         <span v-for="s in scriptTypes" :key="s.value" class="tag">{{ s.label || s.value }}</span>
       </div>
     </div>
+    </template>
   </AdminLayout>
 </template>
 <script setup lang="ts">
 
 const languages = ref<any[]>([])
 const scriptTypes = ref<any[]>([])
+const loading = ref(true)
+const errorMsg = ref('')
 const toast = useToast()
 
 async function fetchLanguages() {
   try {
     const data: any = await $fetch('/api/multilingual/languages', { credentials: 'include' })
     languages.value = data?.data || []
-  } catch(e: any) { toast.error(e.data?.msg || '加载失败') }
+  } catch(e: any) { errorMsg.value = e.data?.msg || '加载失败'; toast.error(errorMsg.value) }
 }
 
 async function fetchScriptTypes() {
   try {
     const data: any = await $fetch('/api/multilingual/script-types', { credentials: 'include' })
     scriptTypes.value = data?.data || []
-  } catch(e: any) { toast.error(e.data?.msg || '加载失败') }
+  } catch(e: any) { errorMsg.value = e.data?.msg || '加载失败'; toast.error(errorMsg.value) }
 }
 
-onMounted(() => { fetchLanguages(); fetchScriptTypes() })
+async function retry() { errorMsg.value = ''; loading.value = true; await Promise.all([fetchLanguages(), fetchScriptTypes()]); loading.value = false; }
+
+onMounted(async () => { await Promise.all([fetchLanguages(), fetchScriptTypes()]); loading.value = false; })
 </script>
 <style scoped>
 h2 { font-size: 22px; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; }
 h3 { font-size: 16px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px; }
+
+.error-state { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 60px 20px; color: var(--text-secondary); }
+.retry-btn { padding: 8px 24px; background: var(--brand); color: #fff; border: none; border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; }
+.retry-btn:hover { opacity: 0.9; }
+.empty-state { text-align: center; padding: 40px; color: var(--text-muted); }
 
 .stats-row { display: flex; gap: 12px; margin-bottom: 24px; }
 .stat-card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 20px 28px; display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 140px; }

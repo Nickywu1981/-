@@ -37,7 +37,7 @@
           <td class="ua-cell" :title="r.user_agent">{{ truncate(r.user_agent, 40) }}</td>
           <td>{{ r.create_time?.slice(0, 19) }}</td>
           <td class="actions">
-            <button class="btn-sm" @click="checkUser(r.user_id)">检测该用户</button>
+            <button class="btn-sm" :disabled="checking" @click="checkUser(r.user_id)">{{ checking ? '检测中...' : '检测该用户' }}</button>
           </td>
         </tr>
       </tbody>
@@ -51,8 +51,9 @@
       <div class="modal-overlay" v-if="showCheckModal" @click.self="showCheckModal = false">
         <div class="modal">
           <h3>用户 #{{ checkUserId }} 滥用检测</h3>
-          <div class="check-result" :class="checkResult?.abusing ? 'abusing' : 'normal'">
-            <p v-if="checkResult === null">检测中...</p>
+          <div class="check-result" :class="checkResult?.error ? '' : (checkResult?.abusing ? 'abusing' : 'normal')">
+            <p v-if="checkResult?.error" class="check-error">❌ 请求失败，请稍后重试</p>
+            <p v-else-if="checkResult === null">检测中...</p>
             <p v-else-if="checkResult.abusing">⚠️ 该用户存在高频滥用行为（60秒内超过30次调用）</p>
             <p v-else>✅ 该用户调用频率正常</p>
           </div>
@@ -75,6 +76,7 @@ const page = ref(1);
 const pageSize = 20;
 const filterUserId = ref('');
 const loading = ref(false);
+const checking = ref(false);
 const showCheckModal = ref(false);
 const checkUserId = ref(0);
 const checkResult = ref<any>(null);
@@ -110,6 +112,7 @@ async function fetchData() {
 function onPageChange(p: number) { page.value = p; fetchData(); }
 
 async function checkUser(userId: number) {
+  checking.value = true;
   checkUserId.value = userId;
   checkResult.value = null;
   showCheckModal.value = true;
@@ -119,7 +122,7 @@ async function checkUser(userId: number) {
   } catch {
     checkResult.value = { abusing: false, error: true };
     toast.error('滥用检测请求失败');
-  }
+  } finally { checking.value = false; }
 }
 
 function isBotUA(ua: string) {
@@ -162,6 +165,7 @@ tr:hover td { background: var(--table-row-hover); }
 .check-result { padding: 20px; border-radius: var(--radius-md); text-align: center; font-size: 15px; margin-bottom: 16px; }
 .check-result.abusing { background: var(--status-fail-bg); color: var(--status-fail-text); }
 .check-result.normal { background: var(--status-done-bg); color: var(--status-done-text); }
+.check-error { color: var(--text-muted); }
 .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
 .actions { white-space: nowrap; }
 </style>

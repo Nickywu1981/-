@@ -5,7 +5,7 @@ function getToast() {
   }
   if (import.meta.env.DEV) {
     return {
-      success: (m: string) => console.log('[success]', m),
+      success: (m: string) => console.debug('[success]', m),
       error: (m: string) => console.error('[error]', m),
       warn: (m: string) => console.warn('[warn]', m),
       info: (m: string) => console.info('[info]', m),

@@ -31,8 +31,8 @@
               <td><span :class="['status', reviewLabel(item.review_status)]">{{ reviewText(item.review_status) }}</span></td>
               <td>{{ formatDateTime(item.create_time) }}</td>
               <td class="actions">
-                <button v-if="item.review_status === 0" class="btn-sm btn-ok" @click="approve(item)">通过</button>
-                <button v-if="item.review_status === 0" class="btn-sm btn-no" @click="reject(item)">拒绝</button>
+                <button v-if="item.review_status === 0" class="btn-sm btn-ok" :disabled="reviewing" @click="approve(item)">通过</button>
+                <button v-if="item.review_status === 0" class="btn-sm btn-no" :disabled="reviewing" @click="reject(item)">拒绝</button>
                 <button class="btn-sm btn-view" @click="viewDetail(item)">详情</button>
               </td>
             </tr>
@@ -55,8 +55,8 @@
               <div v-if="detail.output_result"><label>输出结果</label><pre>{{ JSON.stringify(detail.output_result, null, 2) }}</pre></div>
             </div>
             <div class="modal-actions" v-if="detail.review_status === 0">
-              <button class="btn-sm btn-ok" @click="approve(detail)">通过</button>
-              <button class="btn-sm btn-no" @click="reject(detail)">拒绝</button>
+              <button class="btn-sm btn-ok" :disabled="reviewing" @click="approve(detail)">通过</button>
+              <button class="btn-sm btn-no" :disabled="reviewing" @click="reject(detail)">拒绝</button>
             </div>
             <button class="modal-close" @click="detail = null">关闭</button>
           </div>
@@ -80,6 +80,8 @@ const toast = useToast();
 
 onMounted(() => fetchList());
 
+const reviewing = ref(false)
+
 async function fetchList() {
   isLoading.value = true;
   try {
@@ -88,26 +90,27 @@ async function fetchList() {
     });
     list.value = res.data?.list || [];
     total.value = res.data?.total || 0;
-  } catch(e: any) { toast.error(e.data?.msg || '加载失败') }
-  isLoading.value = false;
+  } catch(e: any) { toast.error(e.data?.msg || '加载失败') } finally { isLoading.value = false; }
 }
 
 function onPageChange(p: number) { page.value = p; fetchList(); }
 
 async function approve(item: any) {
+  reviewing.value = true;
   try {
     await $fetch(`/api/admin/tasks/${item.id}/approve`, { method: 'POST' });
     item.review_status = 1;
     if (detail.value?.id === item.id) detail.value.review_status = 1;
-  } catch(e: any) { toast.error(e.data?.msg || '加载失败') }
+  } catch(e: any) { toast.error(e.data?.msg || '加载失败') } finally { reviewing.value = false; }
 }
 
 async function reject(item: any) {
+  reviewing.value = true;
   try {
     await $fetch(`/api/admin/tasks/${item.id}/reject`, { method: 'POST' });
     item.review_status = 2;
     if (detail.value?.id === item.id) detail.value.review_status = 2;
-  } catch(e: any) { toast.error(e.data?.msg || '加载失败') }
+  } catch(e: any) { toast.error(e.data?.msg || '加载失败') } finally { reviewing.value = false; }
 }
 
 function viewDetail(item: any) { detail.value = item; }
