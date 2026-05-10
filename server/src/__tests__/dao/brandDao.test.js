@@ -22,13 +22,10 @@ describe('brandDao', () => {
   });
 
   it('upsertBrand 新品牌走 INSERT', async () => {
-    // first call: getBrand returns null (not exists)
-    // second call: INSERT
-    // third call: getBrand returns the new row
+    // new code uses INSERT...ON DUPLICATE KEY UPDATE (1 call) + getBrand (1 call)
     mockExecute
-      .mockResolvedValueOnce([[]])                           // getBrand (not exists)
-      .mockResolvedValueOnce([])                              // INSERT
-      .mockResolvedValueOnce([[{ id: 1, brand_name: 'New' }]]); // getBrand (after insert)
+      .mockResolvedValueOnce([])                              // INSERT...ON DUPLICATE KEY UPDATE
+      .mockResolvedValueOnce([[{ id: 1, brand_name: 'New' }]]); // getBrand (after upsert)
 
     const r = await brandDao.upsertBrand(1, { brand_name: 'New', logo_url: '/a.png' });
     expect(r.brand_name).toBe('New');
@@ -36,9 +33,8 @@ describe('brandDao', () => {
 
   it('upsertBrand 已有品牌走 UPDATE', async () => {
     mockExecute
-      .mockResolvedValueOnce([[{ id: 1, brand_name: 'Old' }]]) // getBrand (exists)
-      .mockResolvedValueOnce([])                                 // UPDATE
-      .mockResolvedValueOnce([[{ id: 1, brand_name: 'Updated' }]]); // getBrand (after update)
+      .mockResolvedValueOnce([])                                 // INSERT...ON DUPLICATE KEY UPDATE
+      .mockResolvedValueOnce([[{ id: 1, brand_name: 'Updated' }]]); // getBrand (after upsert)
 
     const r = await brandDao.upsertBrand(1, { brand_name: 'Updated' });
     expect(r.brand_name).toBe('Updated');

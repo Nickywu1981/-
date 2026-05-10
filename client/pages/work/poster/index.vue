@@ -78,7 +78,7 @@
         @failed="onFailed"
       />
       <div v-if="resultUrl" class="result-preview">
-        <img loading="lazy" :src="resultUrl" :alt="activeTypeCfg?.label" />
+        <img loading="lazy" :src="resultUrl" :alt="activeTypeCfg?.label" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
         <div class="result-actions">
           <button class="btn btn-secondary" @click="downloadResult">下载</button>
           <button class="btn btn-ghost" @click="reset">重新生成</button>
@@ -99,7 +99,7 @@
       <div v-else-if="!works.length" class="empty">暂无作品，快去创作吧</div>
       <div v-else class="works-grid">
         <div v-for="w in works" :key="w.id" class="work-card">
-          <img :src="w.thumbnail_url || w.result_url" :alt="w.poster_type" loading="lazy" />
+          <img :src="w.thumbnail_url || w.result_url" :alt="w.poster_type" loading="lazy" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
           <div class="work-meta">
             <span class="meta-type">{{ typeLabel(w.poster_type) }}</span>
             <span class="meta-status" :class="w.status">{{ w.status }}</span>

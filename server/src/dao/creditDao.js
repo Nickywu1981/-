@@ -26,7 +26,7 @@ export async function updateCreditBalance(userId, delta, conn) {
 }
 
 export async function getPlanByType(planType) {
-  const [rows] = await pool.execute('SELECT * FROM membership_plan WHERE plan_type = ? AND status = 1 LIMIT 1', [planType]);
+  const [rows] = await pool.execute('SELECT plan_type, name, price, original_price, credits, daily_credits, daily_limit, monthly_limit, save_days, watermark_free, hd_export, brand_kit, batch_limit, priority_queue, status FROM membership_plan WHERE plan_type = ? AND status = 1 LIMIT 1', [planType]);
   return rows[0] || null;
 }
 
@@ -40,7 +40,7 @@ export async function listActivePlans() {
 // ==================== 幂等日志 ====================
 
 export async function getRequestLog(requestId) {
-  const [rows] = await pool.execute('SELECT * FROM credit_request_log WHERE request_id = ?', [requestId]);
+  const [rows] = await pool.execute('SELECT id, request_id, user_id, action, credit_amount, status, remark, create_time FROM credit_request_log WHERE request_id = ?', [requestId]);
   return rows[0] || null;
 }
 
@@ -53,8 +53,9 @@ export async function insertRequestLog({ requestId, userId, action, creditAmount
 
 // ==================== 消费记录（增强版） ====================
 
-export async function insertConsumptionLog({ userId, type, action, creditBefore, creditAfter, consumed, remark, taskId, requestId, status }) {
-  const [r] = await pool.execute(
+export async function insertConsumptionLog({ userId, type, action, creditBefore, creditAfter, consumed, remark, taskId, requestId, status }, conn) {
+  const db = conn || pool;
+  const [r] = await db.execute(
     'INSERT INTO consumption_record (user_id, type, action, credit_before, credit_after, consumed, remark, task_id, request_id, status, freeze_at) VALUES (?,?,?,?,?,?,?,?,?,?,NOW())',
     [userId, type, action, creditBefore, creditAfter, consumed, remark, taskId || '', requestId || null, status || 1],
   );
@@ -76,7 +77,7 @@ export async function refundConsumption(recordId, creditAfter, remark = '') {
 }
 
 export async function getConsumptionByRequestId(requestId) {
-  const [rows] = await pool.execute('SELECT * FROM consumption_record WHERE request_id = ?', [requestId]);
+  const [rows] = await pool.execute('SELECT id, user_id, type, action, credit_before, credit_after, consumed, status, remark, request_id, create_time, freeze_at FROM consumption_record WHERE request_id = ?', [requestId]);
   return rows[0] || null;
 }
 
@@ -106,7 +107,7 @@ export async function adminRefund(userId, recordId, remark) {
     await conn.beginTransaction();
 
     // 锁定记录
-    const [[record]] = await conn.execute('SELECT * FROM consumption_record WHERE id = ? AND status = 1 AND type = 2 FOR UPDATE', [recordId]);
+    const [[record]] = await conn.execute('SELECT id, user_id, type, action, credit_before, credit_after, consumed, status, remark, request_id, create_time, confirm_at FROM consumption_record WHERE id = ? AND status = 1 AND type = 2 FOR UPDATE', [recordId]);
     if (!record) { await conn.rollback(); return { ok: false, msg: '记录不存在或已退款' }; }
 
     // 退款
@@ -153,8 +154,9 @@ export async function insertMembership(userId, planType, trialQuota) {
 
 // ==================== 签到 ====================
 
-export async function getCheckInByDate(userId, date) {
-  const [rows] = await pool.execute(
+export async function getCheckInByDate(userId, date, conn) {
+  const db = conn || pool;
+  const [rows] = await db.execute(
     'SELECT id, streak FROM check_ins WHERE user_id = ? AND check_date = ?',
     [userId, date],
   );
@@ -169,8 +171,9 @@ export async function getLastCheckIn(userId) {
   return rows[0] || null;
 }
 
-export async function insertCheckIn(userId, date, streak, reward) {
-  await pool.execute(
+export async function insertCheckIn(userId, date, streak, reward, conn) {
+  const db = conn || pool;
+  await db.execute(
     'INSERT INTO check_ins (user_id, check_date, streak, reward) VALUES (?, ?, ?, ?)',
     [userId, date, streak, reward],
   );
@@ -186,16 +189,18 @@ export async function getWeekCheckIns(userId) {
 
 // ==================== 分享/邀请奖励 ====================
 
-export async function getActionRecordToday(userId, action, date) {
-  const [rows] = await pool.execute(
+export async function getActionRecordToday(userId, action, date, conn) {
+  const db = conn || pool;
+  const [rows] = await db.execute(
     'SELECT id FROM consumption_record WHERE user_id = ? AND action = ? AND DATE(create_time) = ?',
     [userId, action, date],
   );
   return rows[0] || null;
 }
 
-export async function getInviteRewardRecord(inviterId, invitedUserId) {
-  const [rows] = await pool.execute(
+export async function getInviteRewardRecord(inviterId, invitedUserId, conn) {
+  const db = conn || pool;
+  const [rows] = await db.execute(
     'SELECT id FROM consumption_record WHERE user_id = ? AND action = ? AND remark = ?',
     [inviterId, 'invite_reward', `invited:${invitedUserId}`],
   );

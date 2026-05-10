@@ -206,4 +206,10 @@ input::placeholder { color: var(--input-placeholder); }
 .link { text-align: center; margin-top: 18px; font-size: 13px; color: var(--text-muted); }
 .link a { color: var(--text-link); font-weight: 500; text-decoration: none; }
 .link a:hover { text-decoration: underline; }
+
+@media (max-width: 480px) {
+  .card { max-width: 100%; padding: 24px 16px; }
+  .mode-tabs button { font-size: 12px; padding: 8px 6px; }
+  .card h2 { font-size: 20px; }
+}
 </style>

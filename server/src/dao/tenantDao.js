@@ -3,12 +3,12 @@ import pool from './db.js';
 
 export default {
   async findById(id) {
-    const [rows] = await pool.query('SELECT * FROM tenant WHERE id = ?', [id]);
+    const [rows] = await pool.query('SELECT id, code, name, logo, domain, plan_type, status, max_users, quota_images, quota_video, expire_time, contact_name, contact_email FROM tenant WHERE id = ?', [id]);
     return rows[0] || null;
   },
 
   async findByCode(code) {
-    const [rows] = await pool.query('SELECT * FROM tenant WHERE code = ?', [code]);
+    const [rows] = await pool.query('SELECT id, code, name, logo, domain, plan_type, status, max_users, quota_images, quota_video, expire_time, contact_name, contact_email FROM tenant WHERE code = ?', [code]);
     return rows[0] || null;
   },
 

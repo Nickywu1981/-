@@ -35,7 +35,7 @@
             >
               <div class="work-check"><span v-if="selectedWorkId === w.id">&#10003;</span></div>
               <div class="work-thumb">
-                <img loading="lazy" v-if="w.thumbnail" :src="w.thumbnail" :alt="w.title" />
+                <img loading="lazy" v-if="w.thumbnail" :src="w.thumbnail" :alt="w.title" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
                 <span v-else class="thumb-icon">{{ w.file_type?.startsWith('video') ? '🎬' : '🖼️' }}</span>
               </div>
               <div class="work-title">{{ w.title || '未命名' }}</div>

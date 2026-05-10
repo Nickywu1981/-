@@ -36,7 +36,7 @@
         <div class="storyboard-grid" v-if="task.result.value?.scenes">
           <div v-for="(s, i) in task.result.value.scenes" :key="i" class="story-card">
             <div class="story-card__number">#{{ Number(i) + 1 }}</div>
-            <img loading="lazy" v-if="s.image" :src="s.image" class="story-card__img" />
+            <img loading="lazy" v-if="s.image" :src="s.image" class="story-card__img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
             <div v-else class="story-card__placeholder">🎬</div>
             <div class="story-card__info">
               <div class="story-card__time">{{ s.duration || '3' }}s</div>

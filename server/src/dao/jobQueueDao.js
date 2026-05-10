@@ -9,7 +9,7 @@ const jobQueueDao = {
   },
 
   async findById(id, userId) {
-    const sql = 'SELECT * FROM job_queue WHERE id = ?' + (userId ? ' AND user_id = ?' : '');
+    const sql = 'SELECT id, user_id, job_type, status, priority, progress, input_data, result_data, error_message, retry_count, created_at, completed_at FROM job_queue WHERE id = ?' + (userId ? ' AND user_id = ?' : '');
     const params = userId ? [id, userId] : [id];
     const [rows] = await pool.execute(sql, params);
     return rows[0] || null;
@@ -20,7 +20,7 @@ const jobQueueDao = {
     const params = [userId];
     if (status) { where.push('status = ?'); params.push(status); }
     if (jobType) { where.push('job_type = ?'); params.push(jobType); }
-    const sql = `SELECT * FROM job_queue WHERE ${where.join(' AND ')} ORDER BY created_at DESC LIMIT ? OFFSET ?`;
+    const sql = `SELECT id, user_id, job_type, status, priority, progress, input_data, result_data, error_message, retry_count, created_at, completed_at FROM job_queue WHERE ${where.join(' AND ')} ORDER BY created_at DESC LIMIT ? OFFSET ?`;
     params.push(Number(limit), Number(offset));
     const [rows] = await pool.query(sql, params);
     const [countResult] = await pool.execute(`SELECT COUNT(*) as total FROM job_queue WHERE ${where.join(' AND ')}`, params);

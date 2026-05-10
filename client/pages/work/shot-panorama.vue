@@ -11,7 +11,7 @@
           <input ref="fileInput" type="file" accept="image/*" hidden @change="handleFile" />
           <button class="btn-outline-sm" @click="($refs.fileInput as HTMLInputElement)?.click()">选择图片</button>
         </template>
-        <img loading="lazy" v-else :src="previewUrl" alt="preview" class="preview-img" />
+        <img loading="lazy" v-else :src="previewUrl" alt="preview" class="preview-img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
       </div>
       <p v-if="uploading" class="upload-status"><span class="spinner-sm" /> 上传中...</p>
       <button v-if="uploadedUrl" class="btn-primary" @click="step = 1">下一步：选择模式 →</button>
@@ -41,7 +41,7 @@
         <p class="hint">多角度合成处理中，预计 8-20 秒</p>
       </div>
       <div v-if="resultUrl && !processing" class="result-display">
-        <img loading="lazy" :src="resultUrl" alt="result" class="result-image" />
+        <img loading="lazy" :src="resultUrl" alt="result" class="result-image" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
         <p class="result-hint">全景图已生成，可用于商品详情页 360° 展示模块</p>
         <div class="result-actions">
           <button class="btn-primary" @click="downloadImage">下载图片</button>

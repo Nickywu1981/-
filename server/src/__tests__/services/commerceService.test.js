@@ -8,7 +8,19 @@ import * as creditDao from '../../dao/creditDao.js';
 // commerceService uses pool from '../dao/db.js' with both execute() and query()
 const mockExecute = vi.hoisted(() => vi.fn());
 const mockQuery = vi.hoisted(() => vi.fn());
-vi.mock('../../dao/db.js', () => ({ default: { execute: mockExecute, query: mockQuery } }));
+const mockBeginTransaction = vi.hoisted(() => vi.fn());
+const mockCommit = vi.hoisted(() => vi.fn());
+const mockRollback = vi.hoisted(() => vi.fn());
+const mockRelease = vi.hoisted(() => vi.fn());
+const mockGetConnection = vi.hoisted(() => vi.fn(() => ({
+  execute: mockExecute,
+  query: mockQuery,
+  beginTransaction: mockBeginTransaction,
+  commit: mockCommit,
+  rollback: mockRollback,
+  release: mockRelease,
+})));
+vi.mock('../../dao/db.js', () => ({ default: { execute: mockExecute, query: mockQuery, getConnection: mockGetConnection } }));
 
 describe('commerceService', () => {
   beforeEach(() => { vi.clearAllMocks(); });

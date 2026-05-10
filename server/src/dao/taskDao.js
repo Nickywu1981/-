@@ -18,7 +18,7 @@ export async function createTask({ userId, type, title, inputParams, priority = 
 
 export async function getTask(taskId, userId) {
   const [rows] = await pool().execute(
-    'SELECT * FROM task WHERE id = ? AND user_id = ? LIMIT 1',
+    'SELECT id, user_id, type, title, status, priority, progress, progress_msg, error_msg, output_result, input_params, start_time, end_time, create_time, retry_count, worker_id FROM task WHERE id = ? AND user_id = ? LIMIT 1',
     [taskId, userId],
   );
   if (rows[0]) {
@@ -89,7 +89,7 @@ export async function updateTaskStatus(taskId, userId, { status, progress, progr
 
 export async function getPendingTasks(limit = 5) {
   const [rows] = await pool().execute(
-    'SELECT * FROM task WHERE status = 0 ORDER BY priority DESC, create_time ASC LIMIT ?',
+    'SELECT id, user_id, type, title, status, priority, input_params, retry_count, create_time FROM task WHERE status = 0 ORDER BY priority DESC, create_time ASC LIMIT ?',
     [Number(limit)],
   );
   return rows.map((r) => ({ ...r, input_params: safeJson(r.input_params) }));

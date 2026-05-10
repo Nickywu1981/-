@@ -34,7 +34,7 @@
         <p class="hint">预计耗时 3-8 秒，请耐心等待</p>
       </div>
       <div v-if="resultUrl && !processing" class="result-display">
-        <img loading="lazy" :src="resultUrl" alt="result" class="result-image" />
+        <img loading="lazy" :src="resultUrl" alt="result" class="result-image" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
         <div class="result-actions">
           <button class="btn-primary" @click="downloadImage">下载图片</button>
           <button class="btn-outline" @click="resetAll">重新生成</button>

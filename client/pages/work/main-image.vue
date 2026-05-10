@@ -10,7 +10,7 @@
         <button class="btn-outline" @click="($refs.fileInput as HTMLInputElement)?.click()">选择文件</button>
       </div>
       <div v-if="previewUrl" class="preview">
-        <img loading="lazy" :src="previewUrl" alt="预览" />
+        <img loading="lazy" :src="previewUrl" alt="预览" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
         <p v-if="uploading" class="uploading-hint">上传中...</p>
         <p v-else-if="uploadedUrl" class="uploaded-hint">已上传 ✓</p>
       </div>

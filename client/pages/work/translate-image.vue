@@ -42,11 +42,11 @@
 
       <div class="preview-area" v-if="previewUrl">
         <div class="preview-card">
-          <img loading="lazy" :src="previewUrl" alt="原图" />
+          <img loading="lazy" :src="previewUrl" alt="原图" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
           <span class="label-badge">原图</span>
         </div>
         <div class="preview-card" v-if="resultUrl">
-          <img loading="lazy" :src="resultUrl" alt="翻译结果" />
+          <img loading="lazy" :src="resultUrl" alt="翻译结果" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
           <span class="label-badge result">翻译结果</span>
         </div>
       </div>

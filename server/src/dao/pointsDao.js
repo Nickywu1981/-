@@ -2,7 +2,7 @@ import pool from './db.js';
 
 const pointsDao = {
   async getAccount(userId) {
-    const [rows] = await pool.execute('SELECT * FROM points_account WHERE user_id = ?', [userId]);
+    const [rows] = await pool.execute('SELECT id, user_id, balance, total_earned, total_spent, frozen, version FROM points_account WHERE user_id = ?', [userId]);
     return rows[0] || null;
   },
 
