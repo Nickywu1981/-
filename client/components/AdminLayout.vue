@@ -172,16 +172,16 @@ watch(() => route.path, (p) => {
 .al-ham {
   display: none;
   position: fixed; top: 64px; left: 12px; z-index: 200;
-  background: #fff; color: #171717;
-  border: 1px solid #ebebea; width: 38px; height: 38px;
+  background: var(--bg-card); color: var(--text-primary);
+  border: 1px solid var(--border-light); width: 38px; height: 38px;
   border-radius: 8px; font-size: 17px; cursor: pointer;
 }
-.al-ham:hover { background: #f5f5f5; }
+.al-ham:hover { background: var(--border-light); }
 
 /* ---- 侧边栏 ---- */
 .al-side {
   width: 200px; min-width: 200px;
-  background: #fff; border-right: 1px solid #ebebea;
+  background: var(--bg-card); border-right: 1px solid var(--border-light);
   display: flex; flex-direction: column;
   padding: 12px 8px; gap: 2px;
   overflow-y: auto; z-index: 150;
@@ -190,12 +190,12 @@ watch(() => route.path, (p) => {
 }
 
 .al-logo {
-  font-size: 15px; font-weight: 600; color: #171717;
+  font-size: 15px; font-weight: 600; color: var(--text-primary);
   padding: 4px 10px 12px; letter-spacing: -0.03em;
   display: flex; align-items: center; gap: 7px;
   cursor: pointer;
 }
-.al-logo-dot { width: 7px; height: 7px; border-radius: 2px; background: #171717; }
+.al-logo-dot { width: 7px; height: 7px; border-radius: 2px; background: var(--text-primary); }
 
 .al-nav { display: flex; flex-direction: column; gap: 0; flex: 1; }
 
@@ -203,16 +203,16 @@ watch(() => route.path, (p) => {
 .al-grp-hd {
   display: flex; align-items: center; gap: 7px;
   padding: 8px 10px; border-radius: 8px;
-  font-size: 12.5px; color: #9d9da3; font-weight: 500;
+  font-size: 12.5px; color: var(--text-muted); font-weight: 500;
   cursor: pointer; user-select: none;
   transition: all 0.15s;
 }
-.al-grp-hd:hover { background: #f5f5f5; color: #6b6b70; }
+.al-grp-hd:hover { background: var(--border-light); color: var(--text-secondary); }
 .al-grp-ic { font-size: 13px; width: 18px; text-align: center; flex-shrink: 0; }
 .al-grp-lbl { flex: 1; }
 .al-grp-arr {
   font-size: 10px; transition: transform 0.15s;
-  color: #c8c8ce; flex-shrink: 0;
+  color: var(--text-muted); flex-shrink: 0;
 }
 .al-grp-arr.down { transform: rotate(90deg); }
 
@@ -223,28 +223,28 @@ watch(() => route.path, (p) => {
 }
 .al-item {
   display: block; padding: 7px 10px; border-radius: 6px;
-  font-size: 13px; color: #6b6b70; text-decoration: none;
+  font-size: 13px; color: var(--text-secondary); text-decoration: none;
   transition: all 0.15s;
 }
-.al-item:hover { background: #f5f5f5; color: #171717; }
+.al-item:hover { background: var(--border-light); color: var(--text-primary); }
 .al-item.router-link-active {
-  background: #171717; color: #fff; font-weight: 500;
+  background: var(--brand); color: var(--white); font-weight: 500;
 }
 
 /* ---- 侧边栏底部 ---- */
 .al-side-ft {
-  padding: 8px 10px; border-top: 1px solid #ebebea;
+  padding: 8px 10px; border-top: 1px solid var(--border-light);
 }
 .al-back {
-  font-size: 12px; color: #9d9da3; text-decoration: none;
+  font-size: 12px; color: var(--text-muted); text-decoration: none;
   transition: color 0.15s;
 }
-.al-back:hover { color: #171717; }
+.al-back:hover { color: var(--text-primary); }
 
 /* ---- 主内容 ---- */
 .al-main {
   flex: 1; padding: 28px 32px;
-  background: #fafaf9; overflow-y: auto;
+  background: var(--bg-page); overflow-y: auto;
   min-width: 0;
 }
 

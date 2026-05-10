@@ -12,24 +12,24 @@
 
       <form @submit.prevent="handleRegister">
         <div class="input-group">
-          <label>{{ config.phone_label || '手机号' }}</label>
-          <input v-model="phone" type="tel" class="input" placeholder="请输入手机号" maxlength="11" />
+          <label for="reg-phone">{{ config.phone_label || '手机号' }}</label>
+          <input id="reg-phone" v-model="phone" type="tel" class="input" placeholder="请输入手机号" maxlength="11" />
         </div>
 
         <div class="input-group">
-          <label>{{ config.email_label || '邮箱' }}</label>
-          <input v-model="email" type="email" class="input" placeholder="选填" />
+          <label for="reg-email">{{ config.email_label || '邮箱' }}</label>
+          <input id="reg-email" v-model="email" type="email" class="input" placeholder="选填" />
         </div>
 
         <div class="input-group">
-          <label>{{ config.password_label || '密码' }}</label>
-          <input v-model="password" type="password" class="input" placeholder="请输入密码" required autocomplete="new-password" />
+          <label for="reg-password">{{ config.password_label || '密码' }}</label>
+          <input id="reg-password" v-model="password" type="password" class="input" placeholder="请输入密码" required autocomplete="new-password" />
           <p class="hint">{{ config.password_hint || '8-20位，含字母+数字+特殊字符' }}</p>
         </div>
 
         <div class="input-group">
-          <label>{{ config.invite_label || '邀请码（选填）' }}</label>
-          <input v-model="inviteCode" type="text" class="input" placeholder="请输入邀请码" maxlength="8" />
+          <label for="reg-invite">{{ config.invite_label || '邀请码（选填）' }}</label>
+          <input id="reg-invite" v-model="inviteCode" type="text" class="input" placeholder="请输入邀请码" maxlength="8" />
         </div>
 
         <p class="agreement">{{ config.agreement || '注册即表示同意《用户协议》和《隐私政策》' }}</p>

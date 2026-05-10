@@ -75,6 +75,9 @@ defineExpose({ open, close });
   flex-direction: column;
   outline: none;
 }
+.lightbox-overlay:focus-visible {
+  box-shadow: inset 0 0 0 3px var(--brand);
+}
 .lightbox-close {
   position: absolute; top: 16px; right: 16px;
   background: rgba(255,255,255,0.15); border: none; color: var(--text-inverse, #fff);

@@ -13,13 +13,13 @@
       <!-- Step 1: Identity verification -->
       <template v-if="!verified">
         <div class="input-group">
-          <label>手机号 / 邮箱</label>
-          <input v-model="account" type="text" class="input" placeholder="请输入手机号或邮箱" />
+          <label for="reset-account">手机号 / 邮箱</label>
+          <input id="reset-account" v-model="account" type="text" class="input" placeholder="请输入手机号或邮箱" />
         </div>
         <div class="input-group">
-          <label>验证码</label>
+          <label for="reset-code">验证码</label>
           <div class="code-row">
-            <input v-model="code" type="text" class="input code-input" placeholder="6位验证码" maxlength="6" />
+            <input id="reset-code" v-model="code" type="text" class="input code-input" placeholder="6位验证码" maxlength="6" />
             <button type="button" class="btn btn-send" :disabled="sendCooldown > 0" @click="sendCode">
               {{ sendCooldown > 0 ? `${sendCooldown}s` : '发送验证码' }}
             </button>
@@ -34,8 +34,8 @@
       <!-- Step 2: Set new password -->
       <form v-else @submit.prevent="handleReset">
         <div class="input-group">
-          <label>新密码</label>
-          <input v-model="newPassword" type="password" class="input" placeholder="请输入新密码" required autocomplete="new-password" />
+          <label for="reset-new-pass">新密码</label>
+          <input id="reset-new-pass" v-model="newPassword" type="password" class="input" placeholder="请输入新密码" required autocomplete="new-password" />
           <p class="hint">8-20位，含字母+数字+特殊字符</p>
         </div>
         <button type="submit" class="btn btn-primary btn-block" :disabled="loading">

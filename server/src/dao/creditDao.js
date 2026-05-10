@@ -158,7 +158,8 @@ export async function listConsumptionRecords({ userId, status, type, page = 1, p
     `SELECT ${RECORD_COLS} FROM consumption_record ${where} ORDER BY create_time DESC LIMIT ?, ?`,
     params,
   );
-  const [[{ total }]] = await pool.query(`SELECT COUNT(*) AS total FROM consumption_record ${where}`, params);
+  const countParams = params.slice(0, -2);
+  const [[{ total }]] = await pool.query(`SELECT COUNT(*) AS total FROM consumption_record ${where}`, countParams);
   return { list: rows, total };
 }
 
