@@ -1,5 +1,6 @@
 import pool from './db.js';
 import { getRedis } from './redis.js';
+import logger from '../utils/logger.js';
 
 const REDIS_KEY_PREFIX = 'diy:page:';
 const REDIS_TTL = 86400; // 24h
@@ -377,7 +378,7 @@ export default {
 };
 
 function parseJson(val) {
-  if (!val) return null;
+  if (!val) return {};
   if (typeof val === 'object') return val;
-  try { return JSON.parse(val); } catch (___) { return null; }
+  try { return JSON.parse(val); } catch (e) { logger.warn('JSON parse failed for diy config:', e.message?.slice(0, 100)); return {}; }
 }

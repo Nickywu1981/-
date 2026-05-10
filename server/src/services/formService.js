@@ -261,11 +261,19 @@ export async function updateSubmission(subId, data) {
 }
 
 export async function exportSubmissions(formId, _format = 'csv') {
-  const rows = await formDao.getAllSubmissions(formId);
-  if (!rows.length) return { csv: '', count: 0 };
-  const headers = Object.keys(rows[0]).filter(k => k !== 'user_ip_long');
+  const batchSize = 1000;
+  let page = 1;
+  let allRows: any[] = [];
+  let batch: any[];
+  do {
+    batch = await formDao.getAllSubmissions(formId, { page, pageSize: batchSize });
+    allRows = allRows.concat(batch);
+    page++;
+  } while (batch.length === batchSize);
+  if (!allRows.length) return { csv: '', count: 0 };
+  const headers = Object.keys(allRows[0]).filter(k => k !== 'user_ip_long');
   const csvRows = [headers.join(',')];
-  for (const row of rows) {
+  for (const row of allRows) {
     csvRows.push(headers.map(h => {
       const v = row[h];
       if (v === null || v === undefined) return '';
@@ -273,7 +281,7 @@ export async function exportSubmissions(formId, _format = 'csv') {
       return /[",\n\r]/.test(s) ? `"${s}"` : s;
     }).join(','));
   }
-  return { csv: csvRows.join('\n'), count: rows.length, headers };
+  return { csv: csvRows.join('\n'), count: allRows.length, headers };
 }
 
 // ── 字段管理(独立CRUD) ──
@@ -282,9 +290,12 @@ export async function listFields(formId, tenantId) {
 }
 
 export async function upsertFields(formId, tenantId, fields) {
-  await formDao.deleteFields(formId, tenantId);
-  if (fields?.length) await formDao.batchInsertFields(tenantId, formId, fields);
-  return formDao.listFields(formId, tenantId);
+  const { withTransaction } = await import('../dao/diyDao.js');
+  return withTransaction(async (conn) => {
+    await formDao.deleteFields(formId, tenantId, conn);
+    if (fields?.length) await formDao.batchInsertFields(tenantId, formId, fields, conn);
+    return formDao.listFields(formId, tenantId);
+  });
 }
 
 // ── 数据清理(定时任务) ──

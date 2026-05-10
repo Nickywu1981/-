@@ -1,4 +1,5 @@
 import pool from './db.js';
+import { withTransaction } from './diyDao.js';
 
 export default {
   // ── 表单 CRUD ──
@@ -64,9 +65,11 @@ export default {
   },
 
   async deleteForm(id, tenantId) {
-    await pool.query('DELETE FROM custom_form_submission WHERE form_id = ?', [id]);
-    await pool.query('DELETE FROM diy_custom_field WHERE form_id = ? AND tenant_id = ?', [id, tenantId]);
-    await pool.query('DELETE FROM custom_form WHERE id = ? AND tenant_id = ?', [id, tenantId]);
+    return withTransaction(async (conn) => {
+      await conn.query('DELETE FROM custom_form_submission WHERE form_id = ?', [id]);
+      await conn.query('DELETE FROM diy_custom_field WHERE form_id = ? AND tenant_id = ?', [id, tenantId]);
+      await conn.query('DELETE FROM custom_form WHERE id = ? AND tenant_id = ?', [id, tenantId]);
+    });
   },
 
   async incrementSubmitCount(formId) {
@@ -130,12 +133,14 @@ export default {
     return rows;
   },
 
-  async deleteFields(formId, tenantId) {
-    await pool.query('DELETE FROM diy_custom_field WHERE form_id = ? AND tenant_id = ?', [formId, tenantId]);
+  async deleteFields(formId, tenantId, conn) {
+    const db = conn || pool;
+    await db.query('DELETE FROM diy_custom_field WHERE form_id = ? AND tenant_id = ?', [formId, tenantId]);
   },
 
-  async batchInsertFields(tenantId, formId, fields) {
+  async batchInsertFields(tenantId, formId, fields, conn) {
     if (!fields?.length) return;
+    const db = conn || pool;
     const sql = `INSERT INTO diy_custom_field
       (tenant_id, form_id, field_name, field_label, field_type, sort_order, is_required, is_visible,
        default_value, placeholder, options_json, validation_rules, linkage_conditions, linkage_action,
@@ -154,7 +159,7 @@ export default {
         f.pc_col_span ?? 12, f.mobile_col_span ?? 12, f.css_class || null,
       );
     }
-    await pool.query(sql, vals);
+    await db.query(sql, vals);
   },
 
   // ── 数据清理 ──

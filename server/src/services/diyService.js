@@ -87,11 +87,13 @@ export default {
     const exist = await diyDao.getPageById(id, tenantId);
     if (!exist) throw new BusinessError(ERROR_CODE.NOT_FOUND, '页面不存在');
     if (fields.title !== undefined) fields.title = fields.title.replace(/<[^>]*>/g, '');
-    if (fields.slug && fields.slug !== exist.slug) {
+    const slugChanged = fields.slug && fields.slug !== exist.slug;
+    if (slugChanged) {
       const collision = await diyDao.getPageBySlug(fields.slug, tenantId);
       if (collision) throw new BusinessError(ERROR_CODE.BAD_REQUEST, `页面标识 "${fields.slug}" 已被使用`);
     }
     await diyDao.updatePage(id, tenantId, fields);
+    if (slugChanged && exist.status === 1) await diyDao.clearPageCache(exist.slug);
     return diyDao.getPageById(id, tenantId);
   },
 
@@ -216,12 +218,11 @@ export default {
   },
 
   async batchUnpublish(ids, tenantId) {
-    await diyDao.batchUpdateStatus(ids.filter(Number), tenantId, 2);
-    // 批量清除 Redis 缓存
     const pages = await diyDao.getPagesByIds(ids, tenantId);
     for (const p of pages) {
       if (p) await diyDao.clearPageCache(p.slug).catch((e) => { logger.warn('清除页面缓存失败:', e.message); });
     }
+    await diyDao.batchUpdateStatus(ids.filter(Number), tenantId, DIY_PAGE_STATUS.OFFLINE);
     return { count: ids.length };
   },
 

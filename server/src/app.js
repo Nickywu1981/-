@@ -295,7 +295,7 @@ app.use('/api/tasks', taskRoutes);
 app.use('/api/help', helpRoutes);
 app.use('/api/collections', collectionRoutes);
 app.use('/api/admin/site-config', siteConfigAdminRouter);
-app.use('/api/admin/workspace-diy', adminWorkspaceDiyRoutes);
+app.use('/api/admin/workspace-diy', adminLimiter, adminWorkspaceDiyRoutes);
 app.use('/api/site-config/public', siteConfigPublicRouter);
 app.use('/api/badges', adminLimiter, badgeRoutes);
 app.use('/api/tier', apiLimiter, tierRoutes);

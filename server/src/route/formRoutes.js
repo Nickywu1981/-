@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { authMiddleware, optionalAuth, adminAuth } from '../middleware/auth.js';
+import { apiLimiter } from '../middleware/rateLimiter.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
 import { z } from 'zod';
@@ -68,6 +69,6 @@ router.put('/admin/:id/fields', authMiddleware, adminAuth, validate(upsertFields
 
 // ── 公开端（双端感知） ──
 router.get('/public/:code', optionalAuth, asyncHandler(formController.getPublicForm));
-router.post('/public/:code', optionalAuth, validate(submitFormSchema), asyncHandler(formController.submitForm));
+router.post('/public/:code', apiLimiter, optionalAuth, validate(submitFormSchema), asyncHandler(formController.submitForm));
 
 export default router;
