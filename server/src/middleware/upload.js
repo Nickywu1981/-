@@ -76,3 +76,42 @@ export function magicNumberGuard(req, res, next) {
   }
   next();
 }
+
+// ── 上传配额（每日每租户上传量上限）──
+
+const DAILY_UPLOAD_LIMIT_MB = parseInt(process.env.UPLOAD_DAILY_LIMIT_MB, 10) || 2048;
+const QUOTA_CLEANUP_MS = 60 * 60 * 1000;
+const tenantUploadQuota = new Map(); // key → { total: number, ts: number }
+
+setInterval(() => {
+  const now = Date.now();
+  for (const [k, v] of tenantUploadQuota) {
+    if (now - v.ts > 24 * 60 * 60 * 1000) tenantUploadQuota.delete(k);
+  }
+}, QUOTA_CLEANUP_MS).unref();
+
+export function uploadQuotaGuard(req, res, next) {
+  const tenantId = req.tenantId || req.user?.tenantId || 0;
+  const key = `quota:${tenantId}`;
+  const entry = tenantUploadQuota.get(key) || { total: 0, ts: Date.now() };
+
+  // 预估本次上传大小
+  const files = req.file ? [req.file] : (req.files ? (Array.isArray(req.files) ? req.files : Object.values(req.files).flat()) : []);
+  const estSize = files.reduce((sum, f) => sum + (f.size || 0), 0);
+
+  if (entry.total + estSize > DAILY_UPLOAD_LIMIT_MB * 1024 * 1024) {
+    return error(res, 429, `每日上传配额已用尽 (${DAILY_UPLOAD_LIMIT_MB}MB)`);
+  }
+
+  // 挂载累加回调
+  const done = () => {
+    const cur = tenantUploadQuota.get(key) || { total: 0, ts: Date.now() };
+    cur.total += estSize;
+    cur.ts = Date.now();
+    tenantUploadQuota.set(key, cur);
+  };
+  res.on('finish', () => { if (res.statusCode < 400) done(); });
+  res.on('close', () => { if (res.statusCode < 400) done(); });
+
+  next();
+}

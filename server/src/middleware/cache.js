@@ -18,7 +18,7 @@ export function cacheMiddleware(ttl = 300, keyFn) {
     try {
       const cacheKey = keyFn
         ? keyFn(req)
-        : `cache:${req.originalUrl}`;
+        : `cache:${req.tenantId || req.user?.tenantId || 0}:${req.originalUrl}`;
 
       const cached = await cacheGet(cacheKey);
       if (cached) {

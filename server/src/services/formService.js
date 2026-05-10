@@ -281,7 +281,9 @@ export async function exportSubmissions(formId, _format = 'csv') {
       const v = row[h];
       if (v === null || v === undefined) return '';
       const s = String(v).replace(/"/g, '""');
-      return /[",\n\r]/.test(s) ? `"${s}"` : s;
+      // Prevent CSV formula injection
+      const safe = /^[=@+\-]/.test(s) ? `'${s}` : s;
+      return /[",\n\r]/.test(safe) ? `"${safe}"` : safe;
     }).join(','));
   }
   return { csv: csvRows.join('\n'), count: allRows.length, headers };

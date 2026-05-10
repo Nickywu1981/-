@@ -25,7 +25,7 @@ export async function register({ phone, email, password, nickname, inviteCode: _
     if (!username) throw new BusinessError(400, '请提供手机号或邮箱');
 
     const [existing] = await conn.query('SELECT id FROM `user` WHERE username = ?', [username]);
-    if (existing.length > 0) throw new BusinessError(409, '该账号已注册');
+    if (existing.length > 0) throw new BusinessError(400, '注册失败，请检查输入信息');
 
     const passwordHash = await bcrypt.hash(password, 12);
     const [result] = await conn.query(
@@ -64,13 +64,14 @@ export async function login({ phone, email, username, password }) {
       [identifier],
     );
 
-    if (!users || users.length === 0) throw new BusinessError(401, '账号或密码错误');
-    const user = users[0];
+    const user = users?.[0] || null;
 
+    // Prevent timing-based account enumeration: always run bcrypt
+    const DUMMY = '$2a$12$abcdefghijklmnopqrstuvabcdefghijklmnopqrstuv34567890123';
+    const validPassword = await bcrypt.compare(password, user ? user.password : DUMMY);
+
+    if (!user || !validPassword) throw new BusinessError(401, '账号或密码错误');
     if (user.status !== USER_STATUS.ACTIVE) throw new BusinessError(403, '账号已被禁用');
-
-    const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) throw new BusinessError(401, '账号或密码错误');
 
     await conn.query('UPDATE `user` SET last_login_time = NOW() WHERE id = ?', [user.id]);
 
@@ -118,7 +119,7 @@ export async function loginByCode({ phone, email, username, code }) {
       [identifier],
     );
 
-    if (!users || users.length === 0) throw new BusinessError(401, '账号不存在，请先注册');
+    if (!users || users.length === 0) throw new BusinessError(401, '账号或验证码错误');
     const user = users[0];
 
     if (user.status !== USER_STATUS.ACTIVE) throw new BusinessError(403, '账号已被禁用');
@@ -156,7 +157,13 @@ export async function resetPassword({ phone, email, newPassword, code }) {
       [passwordHash, username],
     );
 
-    if (result.affectedRows === 0) throw new BusinessError(404, '账号不存在');
+    if (result.affectedRows === 0) throw new BusinessError(400, '密码重置失败，请检查输入信息');
+    // Revoke all existing tokens after password reset
+    const [userRow] = await conn.query('SELECT id FROM `user` WHERE username = ?', [username]);
+    if (userRow.length > 0) {
+      const { revokeAllUserTokens } = await import('../utils/jwtToken.js');
+      await revokeAllUserTokens(userRow[0].id);
+    }
     return { message: '密码重置成功' };
   } finally {
     conn.release();

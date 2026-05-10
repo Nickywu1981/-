@@ -43,10 +43,51 @@ const upload = multer({
   },
 });
 
+// Magic bytes for 3D model formats to prevent extension-spoofing
+const MAGIC_BYTES = {
+  '.glb': { offset: 0, bytes: Buffer.from('glTF') },
+  '.fbx': { offset: 0, bytes: Buffer.from('Kaydara FBX Binary') },
+};
+const TEXT_STARTS = {
+  '.gltf': '{',
+  '.obj': ['#', 'v', 'f', 'g', 'o', 's', 'm', 'u'],
+  '.stl': 'solid',
+};
+
+function validateMagicBytes(filePath, ext) {
+  // Binary format check
+  const magic = MAGIC_BYTES[ext];
+  if (magic) {
+    const fd = fs.openSync(filePath, 'r');
+    try {
+      const buf = Buffer.alloc(magic.bytes.length);
+      fs.readSync(fd, buf, 0, buf.length, magic.offset);
+      return buf.equals(magic.bytes);
+    } finally { fs.closeSync(fd); }
+  }
+  // Text format check: read first 256 bytes
+  const fd = fs.openSync(filePath, 'r');
+  try {
+    const buf = Buffer.alloc(256);
+    const n = fs.readSync(fd, buf, 0, 256, 0);
+    const head = buf.toString('utf8', 0, n).trimStart();
+    if (!head) return false;
+    const expected = TEXT_STARTS[ext];
+    if (typeof expected === 'string') return head.startsWith(expected);
+    if (Array.isArray(expected)) return expected.some(c => head.startsWith(c));
+    return true;
+  } finally { fs.closeSync(fd); }
+}
+
 // POST /api/3d/upload
 router.post('/upload', authMiddleware, upload.single('model'), (req, res, next) => {
   try {
     if (!req.file) return error(res, ERROR_CODE.BAD_REQUEST, '请上传 3D 模型文件');
+    const ext = path.extname(req.file.originalname).toLowerCase();
+    if (!validateMagicBytes(req.file.path, ext)) {
+      fs.unlink(req.file.path, () => {});
+      return error(res, ERROR_CODE.BAD_REQUEST, '文件格式与扩展名不匹配');
+    }
     const url = `/uploads/3d/${req.file.filename}`;
     logger.info(`[3D] 模型上传: ${req.file.filename} → ${url}`);
     return success(res, {

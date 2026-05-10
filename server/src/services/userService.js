@@ -89,13 +89,15 @@ export async function changePassword(userId, { oldPassword, newPassword }) {
 
   const hashed = await bcrypt.hash(newPassword, SALT_ROUNDS);
   await userDao.updatePassword(userId, hashed);
+  await revokeAllUtil(userId);
   return { success: true };
 }
 
 export async function forgotPassword(username) {
   guardSQL(username, 'username');
   const user = await userDao.findByUsername(username);
-  if (!user) throw new BusinessError(404, '该用户名不存在');
+  // Always return same message regardless of account existence
+  if (!user) return { message: '重置链接已发送至注册邮箱（Mock模式：若账号存在）' };
   // Mock: 生成重置令牌（真实环境发邮件/短信）
   const resetToken = jwt.sign({ userId: user.id, purpose: 'reset' }, jwtSecret, { expiresIn: '15m' });
   return { message: '重置链接已发送至注册邮箱（Mock模式：token=' + resetToken.slice(-20) + '）' };
@@ -108,6 +110,7 @@ export async function resetPassword(token, newPassword) {
   if (payload.purpose !== 'reset') throw new BusinessError(400, '无效的重置令牌');
   const hashed = await bcrypt.hash(newPassword, SALT_ROUNDS);
   await userDao.updatePassword(payload.userId, hashed);
+  await revokeAllUtil(payload.userId);
   return { success: true };
 }
 
