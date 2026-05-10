@@ -205,6 +205,7 @@ async function addFiles(files: File[]) {
       skuList.value[skuIndex].uploaded = true;
     } catch {
       skuList.value[skuIndex].uploaded = false;
+      toast.error(`${f.name || '图片'} 上传失败`);
     }
   }
   uploading.value = false;

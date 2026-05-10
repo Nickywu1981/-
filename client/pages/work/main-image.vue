@@ -123,6 +123,7 @@ async function uploadFile(file: File) {
 async function handleFile(e: Event) {
   const file = (e.target as HTMLInputElement).files?.[0];
   if (file) {
+    if (previewUrl.value) URL.revokeObjectURL(previewUrl.value);
     previewUrl.value = URL.createObjectURL(file);
     await uploadFile(file);
   }
@@ -131,6 +132,7 @@ async function handleFile(e: Event) {
 async function handleDrop(e: DragEvent) {
   const file = e.dataTransfer?.files?.[0];
   if (file) {
+    if (previewUrl.value) URL.revokeObjectURL(previewUrl.value);
     previewUrl.value = URL.createObjectURL(file);
     await uploadFile(file);
   }
@@ -158,6 +160,8 @@ function handleRedo() {
   previewUrl.value = '';
   uploadedUrl.value = '';
 }
+
+onUnmounted(() => { if (previewUrl.value) URL.revokeObjectURL(previewUrl.value) })
 </script>
 
 <style scoped>

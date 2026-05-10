@@ -79,12 +79,12 @@ async function uploadFile(file: File) {
 
 async function handleFile(e: Event) {
   const f = (e.target as HTMLInputElement).files?.[0];
-  if (f) { previewUrl.value = URL.createObjectURL(f); await uploadFile(f); }
+  if (f) { if (previewUrl.value) URL.revokeObjectURL(previewUrl.value); previewUrl.value = URL.createObjectURL(f); await uploadFile(f); }
 }
 
 async function handleDrop(e: DragEvent) {
   const f = e.dataTransfer?.files?.[0];
-  if (f) { previewUrl.value = URL.createObjectURL(f); await uploadFile(f); }
+  if (f) { if (previewUrl.value) URL.revokeObjectURL(previewUrl.value); previewUrl.value = URL.createObjectURL(f); await uploadFile(f); }
 }
 
 async function submitTask() {
@@ -99,6 +99,8 @@ async function submitTask() {
   }
 }
 function handleRedo() { task.reset(); step.value = 0; previewUrl.value = ''; uploadedUrl.value = ''; selectedScene.value = ''; }
+
+onUnmounted(() => { if (previewUrl.value) URL.revokeObjectURL(previewUrl.value) })
 </script>
 
 <style scoped>

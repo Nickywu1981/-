@@ -22,6 +22,7 @@
               :alt="item.title"
               class="card-thumb"
               loading="lazy"
+              @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }"
             />
             <div v-else class="img-placeholder">{{ typeIcon(item.type) }}</div>
           </div>
