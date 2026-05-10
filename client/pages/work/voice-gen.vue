@@ -37,7 +37,7 @@
           <div class="bar"><div class="bar-fill" :style="{ width: task.progress.value + '%' }" /></div>
         </div>
         <div v-else-if="task.status.value === 2" class="ws-audio-box">
-          <audio v-if="task.result.value" controls style="width:100%"><source :src="task.result.value" /></audio>
+          <audio v-if="task.result.value" controls class="w-full"><source :src="task.result.value" /></audio>
           <div class="ws-audio-meta">音色：{{ voices.find(v=>v.id===selectedVoice)?.name }} · 语速：{{ speed }}x</div>
         </div>
         <div v-else-if="task.status.value === 3" class="error-box"><p>{{ task.errorMsg.value || '生成失败' }}</p><button class="ws-btn ws-btn--primary" @click="handleRedo">重试</button></div>

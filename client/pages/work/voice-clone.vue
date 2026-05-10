@@ -48,7 +48,7 @@
           <div class="bar"><div class="bar-fill" :style="{ width: task.progress.value + '%' }" /></div>
         </div>
         <div v-else-if="task.status.value === 2" class="ws-result">
-          <audio v-if="task.result.value" class="ws-audio" controls :src="task.result.value" style="width:100%"></audio>
+          <audio v-if="task.result.value" class="ws-audio" controls :src="task.result.value"></audio>
           <div class="ws-result__meta"><span>音色：{{ presets.find(p=>p.id===selectedPreset)?.name || '自定义克隆' }}</span></div>
         </div>
         <div v-else-if="task.status.value === 3" class="error-box"><p>{{ task.errorMsg.value || '生成失败' }}</p><button class="ws-btn ws-btn--primary" @click="handleRedo">重试</button></div>

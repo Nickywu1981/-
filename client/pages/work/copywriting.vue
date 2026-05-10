@@ -28,21 +28,21 @@
           <el-row :gutter="16">
             <el-col :span="8">
               <el-form-item label="目标平台">
-                <el-select v-model="titleForm.platform" placeholder="选择平台" style="width:100%">
+                <el-select v-model="titleForm.platform" placeholder="选择平台" class="w-full">
                   <el-option v-for="(v,k) in platforms" :key="k" :label="v.name" :value="k" />
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="8">
               <el-form-item label="语言">
-                <el-select v-model="titleForm.language" placeholder="选择语言" style="width:100%">
+                <el-select v-model="titleForm.language" placeholder="选择语言" class="w-full">
                   <el-option v-for="(v,k) in languages" :key="k" :label="v" :value="k" />
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="8">
               <el-form-item label="生成数量">
-                <el-input-number v-model="titleForm.count" :min="1" :max="20" style="width:100%" />
+                <el-input-number v-model="titleForm.count" :min="1" :max="20" class="w-full" />
               </el-form-item>
             </el-col>
           </el-row>
@@ -86,14 +86,14 @@
             </el-col>
             <el-col :span="6">
               <el-form-item label="目标平台">
-                <el-select v-model="descForm.platform" style="width:100%">
+                <el-select v-model="descForm.platform" class="w-full">
                   <el-option v-for="(v,k) in platforms" :key="k" :label="v.name" :value="k" />
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item label="语言">
-                <el-select v-model="descForm.language" style="width:100%">
+                <el-select v-model="descForm.language" class="w-full">
                   <el-option v-for="(v,k) in languages" :key="k" :label="v" :value="k" />
                 </el-select>
               </el-form-item>
@@ -134,14 +134,14 @@
             </el-col>
             <el-col :span="6">
               <el-form-item label="源语言">
-                <el-select v-model="transForm.sourceLang" style="width:100%">
+                <el-select v-model="transForm.sourceLang" class="w-full">
                   <el-option v-for="(v,k) in languages" :key="k" :label="v" :value="k" />
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="6">
               <el-form-item label="目标语言" required>
-                <el-select v-model="transForm.targetLang" style="width:100%">
+                <el-select v-model="transForm.targetLang" class="w-full">
                   <el-option v-for="(v,k) in languages" :key="k" :label="v" :value="k" />
                 </el-select>
               </el-form-item>
