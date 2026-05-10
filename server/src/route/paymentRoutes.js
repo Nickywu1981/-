@@ -3,6 +3,7 @@ import { getPlans, createOrder, getOrderStatus, sandboxPay, checkPaymentResult, 
 import { authMiddleware } from '../middleware/auth.js';
 import { cacheMiddleware } from '../middleware/cache.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
+import { paymentLimiter } from '../middleware/rateLimiter.js';
 import { validate, paginationSchema } from '../utils/validate.js';
 import { z } from 'zod';
 
@@ -21,10 +22,10 @@ const reqsnParamSchema = z.object({
 router.get('/plans', cacheMiddleware(600), asyncHandler(getPlans));
 
 // 需登录
-router.post('/create-order', authMiddleware, validate(createOrderSchema), asyncHandler(createOrder));
+router.post('/create-order', paymentLimiter, authMiddleware, validate(createOrderSchema), asyncHandler(createOrder));
 router.get('/order/:reqsn', authMiddleware, validate(reqsnParamSchema, 'params'), asyncHandler(getOrderStatus));
 router.get('/result/:reqsn', authMiddleware, validate(reqsnParamSchema, 'params'), asyncHandler(checkPaymentResult));
-router.post('/sandbox-pay/:reqsn', authMiddleware, validate(reqsnParamSchema, 'params'), asyncHandler(sandboxPay));
+router.post('/sandbox-pay/:reqsn', paymentLimiter, authMiddleware, validate(reqsnParamSchema, 'params'), asyncHandler(sandboxPay));
 router.get('/billing', authMiddleware, validate(paginationSchema, 'query'), asyncHandler(getBillingHistory));
 router.get('/orders', authMiddleware, validate(paginationSchema, 'query'), asyncHandler(getBillingHistory));
 

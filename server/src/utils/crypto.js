@@ -5,11 +5,16 @@
 import crypto from 'crypto';
 
 const ALGORITHM = 'aes-256-gcm';
+const KEY_LENGTH = 32; // AES-256 requires exactly 32 bytes
 let _secretKey = null;
 function getSecretKey() {
   if (_secretKey) return _secretKey;
-  if (!process.env.ENCRYPTION_KEY) throw new Error('FATAL: ENCRYPTION_KEY env var is required');
-  _secretKey = Buffer.from(process.env.ENCRYPTION_KEY, 'utf8');
+  const raw = process.env.ENCRYPTION_KEY;
+  if (!raw) throw new Error('FATAL: ENCRYPTION_KEY env var is required');
+  _secretKey = Buffer.from(raw, 'utf8');
+  if (_secretKey.length !== KEY_LENGTH) {
+    throw new Error(`FATAL: ENCRYPTION_KEY must be exactly ${KEY_LENGTH} bytes (got ${_secretKey.length})`);
+  }
   return _secretKey;
 }
 

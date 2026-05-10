@@ -10,7 +10,7 @@ export async function getUserPlan(userId) {
 
 export async function countTodayTasks(userId, category) {
   const [rows] = await pool.execute(
-    'SELECT COUNT(*) AS cnt FROM task WHERE user_id = ? AND category = ? AND DATE(create_time) = CURDATE()',
+    'SELECT COUNT(*) AS cnt FROM task WHERE user_id = ? AND type = ? AND DATE(create_time) = CURDATE()',
     [userId, category],
   );
   return rows[0].cnt;

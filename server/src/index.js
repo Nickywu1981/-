@@ -15,8 +15,12 @@ import wsManager from './services/wsManager.js';
 import logger from './utils/logger.js';
 import { server as serverConfig } from './config/index.js';
 import { registerAllAdapters } from './services/adapters/index.js';
+import { validateStartupConfig } from './utils/startupGuard.js';
 
 const { port, env } = serverConfig;
+
+// 启动前配置校验
+validateStartupConfig();
 
 // 注册 AI 模型适配器（启动时自动加载）
 await registerAllAdapters();

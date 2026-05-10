@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { authMiddleware } from '../middleware/auth.js';
 import { validate } from '../utils/validate.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
+import { heavyLimiter } from '../middleware/rateLimiter.js';
 import * as ctrl from '../controller/seoKeywordController.js';
 
 const router = Router();
@@ -24,6 +25,6 @@ const listSchema = z.object({
 
 router.get('/', validate(listSchema), asyncHandler(ctrl.listPlatforms));
 router.get('/keywords', asyncHandler(ctrl.getKeywords));
-router.post('/embed', authMiddleware, validate(embedSchema), asyncHandler(ctrl.embedKeywords));
+router.post('/embed', heavyLimiter, authMiddleware, validate(embedSchema), asyncHandler(ctrl.embedKeywords));
 
 export default router;

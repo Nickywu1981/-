@@ -9,7 +9,7 @@ import dotenv from 'dotenv';
 dotenv.config({ override: true });
 
 const allinpayConfig = {
-  env: process.env.ALLINPAY_ENV || 'sandbox',
+  env: process.env.ALLINPAY_ENV || (process.env.NODE_ENV === 'production' ? 'production' : 'sandbox'),
   cusid: process.env.ALLINPAY_CUSID || '',
   appid: process.env.ALLINPAY_APPID || '',
   privateKeyPath: process.env.ALLINPAY_PRIVATE_KEY_PATH || './certs/allinpay_private.pem',

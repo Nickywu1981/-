@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { getMembership, freezeCredit, confirmCredit, rollbackCredit, listRecords, listAllRecords, adminRefund, checkIn, checkInStatus, shareReward, creditHistory, creditBalance } from '../controller/creditController.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
+import { paymentLimiter, adminLimiter } from '../middleware/rateLimiter.js';
 import { validate, idSchema } from '../utils/validate.js';
 import { z } from 'zod';
 
@@ -26,11 +27,11 @@ const adminRefundSchema = z.object({
 
 router.get('/membership', authMiddleware, asyncHandler(getMembership));
 router.get('/records', authMiddleware, asyncHandler(listRecords));
-router.post('/freeze', authMiddleware, validate(freezeSchema), asyncHandler(freezeCredit));
-router.post('/confirm', authMiddleware, validate(confirmSchema), asyncHandler(confirmCredit));
-router.post('/rollback', authMiddleware, validate(rollbackSchema), asyncHandler(rollbackCredit));
-router.get('/admin/records', authMiddleware, adminAuth, asyncHandler(listAllRecords));
-router.post('/admin/refund', authMiddleware, adminAuth, validate(adminRefundSchema), asyncHandler(adminRefund));
+router.post('/freeze', paymentLimiter, authMiddleware, validate(freezeSchema), asyncHandler(freezeCredit));
+router.post('/confirm', paymentLimiter, authMiddleware, validate(confirmSchema), asyncHandler(confirmCredit));
+router.post('/rollback', paymentLimiter, authMiddleware, validate(rollbackSchema), asyncHandler(rollbackCredit));
+router.get('/admin/records', adminLimiter, authMiddleware, adminAuth, asyncHandler(listAllRecords));
+router.post('/admin/refund', adminLimiter, authMiddleware, adminAuth, validate(adminRefundSchema), asyncHandler(adminRefund));
 
 // 签到与奖励
 router.post('/checkin', authMiddleware, asyncHandler(checkIn));

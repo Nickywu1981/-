@@ -13,6 +13,7 @@ import { ERROR_CODE } from '../constants/errorCode.js';
 import logger from '../utils/logger.js';
 import { validate } from '../utils/validate.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
+import { heavyLimiter } from '../middleware/rateLimiter.js';
 
 const router = Router();
 
@@ -114,7 +115,7 @@ router.get('/ping', (_req, res) => {
 });
 
 // ═══════════════════ 记忆力 ═══════════════════
-router.post('/memory/search', authMiddleware, validate(memorySearchSchema), async (req, res) => {
+router.post('/memory/search', heavyLimiter, authMiddleware, validate(memorySearchSchema), async (req, res) => {
   try {
     const result = await memfocus.memory.search(req.body.query);
     success(res, result);
@@ -124,7 +125,7 @@ router.post('/memory/search', authMiddleware, validate(memorySearchSchema), asyn
   }
 });
 
-router.post('/memory/embed', authMiddleware, validate(memoryEmbedSchema), async (req, res) => {
+router.post('/memory/embed', heavyLimiter, authMiddleware, validate(memoryEmbedSchema), async (req, res) => {
   try {
     const result = await memfocus.memory.embed(req.body);
     success(res, result);
@@ -145,7 +146,7 @@ router.get('/memory/list/:userId', authMiddleware, validate(userIdParamSchema, '
 });
 
 // ═══════════════════ 判断力 ═══════════════════
-router.post('/attention/classify', authMiddleware, validate(attentionClassifySchema), async (req, res) => {
+router.post('/attention/classify', heavyLimiter, authMiddleware, validate(attentionClassifySchema), async (req, res) => {
   try {
     const result = await memfocus.attention.classify(req.body);
     success(res, result);
@@ -155,7 +156,7 @@ router.post('/attention/classify', authMiddleware, validate(attentionClassifySch
   }
 });
 
-router.post('/attention/rank', authMiddleware, validate(attentionRankSchema), async (req, res) => {
+router.post('/attention/rank', heavyLimiter, authMiddleware, validate(attentionRankSchema), async (req, res) => {
   try {
     const result = await memfocus.attention.rank(req.body.queries || []);
     success(res, result);
@@ -166,7 +167,7 @@ router.post('/attention/rank', authMiddleware, validate(attentionRankSchema), as
 });
 
 // ═══════════════════ 理解力 ═══════════════════
-router.post('/context/disambiguate', authMiddleware, validate(contextDisambiguateSchema), async (req, res) => {
+router.post('/context/disambiguate', heavyLimiter, authMiddleware, validate(contextDisambiguateSchema), async (req, res) => {
   try {
     const result = await memfocus.context.disambiguate(req.body);
     success(res, result);
@@ -176,7 +177,7 @@ router.post('/context/disambiguate', authMiddleware, validate(contextDisambiguat
   }
 });
 
-router.post('/context/summarize', authMiddleware, validate(contextSummarizeSchema), async (req, res) => {
+router.post('/context/summarize', heavyLimiter, authMiddleware, validate(contextSummarizeSchema), async (req, res) => {
   try {
     const result = await memfocus.context.summarize(req.body.history || []);
     success(res, { summary: result });
@@ -199,7 +200,7 @@ router.get('/localize/platforms/:platform', (req, res) => {
   success(res, memfocus.localize.getPlatformSpecs(req.params.platform));
 });
 
-router.post('/localize/script', authMiddleware, validate(localizeScriptSchema), async (req, res) => {
+router.post('/localize/script', heavyLimiter, authMiddleware, validate(localizeScriptSchema), async (req, res) => {
   try {
     const result = await memfocus.localize.generateScript(req.body);
     success(res, result);
@@ -209,7 +210,7 @@ router.post('/localize/script', authMiddleware, validate(localizeScriptSchema), 
   }
 });
 
-router.post('/localize/translate', authMiddleware, validate(localizeTranslateSchema), async (req, res) => {
+router.post('/localize/translate', heavyLimiter, authMiddleware, validate(localizeTranslateSchema), async (req, res) => {
   try {
     const result = await memfocus.localize.translate({ userId: (req.user?.userId || req.user?.id), ...req.body });
     success(res, result);
@@ -220,7 +221,7 @@ router.post('/localize/translate', authMiddleware, validate(localizeTranslateSch
 });
 
 // ═══════════════════ 写作力 ═══════════════════
-router.post('/content/titles', authMiddleware, validate(contentGenerateSchema), async (req, res) => {
+router.post('/content/titles', heavyLimiter, authMiddleware, validate(contentGenerateSchema), async (req, res) => {
   try {
     const result = await memfocus.content.generateTitles((req.user?.userId || req.user?.id), req.body);
     success(res, result);
@@ -230,7 +231,7 @@ router.post('/content/titles', authMiddleware, validate(contentGenerateSchema), 
   }
 });
 
-router.post('/content/selling-points', authMiddleware, validate(contentGenerateSchema), async (req, res) => {
+router.post('/content/selling-points', heavyLimiter, authMiddleware, validate(contentGenerateSchema), async (req, res) => {
   try {
     const result = await memfocus.content.generateSellingPoints((req.user?.userId || req.user?.id), req.body);
     success(res, result);
@@ -240,7 +241,7 @@ router.post('/content/selling-points', authMiddleware, validate(contentGenerateS
   }
 });
 
-router.post('/content/description', authMiddleware, validate(contentGenerateSchema), async (req, res) => {
+router.post('/content/description', heavyLimiter, authMiddleware, validate(contentGenerateSchema), async (req, res) => {
   try {
     const result = await memfocus.content.generateDescription((req.user?.userId || req.user?.id), req.body);
     success(res, result);
@@ -250,7 +251,7 @@ router.post('/content/description', authMiddleware, validate(contentGenerateSche
   }
 });
 
-router.post('/content/seeding', authMiddleware, validate(contentGenerateSchema), async (req, res) => {
+router.post('/content/seeding', heavyLimiter, authMiddleware, validate(contentGenerateSchema), async (req, res) => {
   try {
     const result = await memfocus.content.generateSeeding((req.user?.userId || req.user?.id), req.body);
     success(res, result);
@@ -260,7 +261,7 @@ router.post('/content/seeding', authMiddleware, validate(contentGenerateSchema),
   }
 });
 
-router.post('/content/script', authMiddleware, validate(contentGenerateSchema), async (req, res) => {
+router.post('/content/script', heavyLimiter, authMiddleware, validate(contentGenerateSchema), async (req, res) => {
   try {
     const result = await memfocus.content.generateScript((req.user?.userId || req.user?.id), req.body);
     success(res, result);
@@ -275,7 +276,7 @@ router.get('/content/platform-rules', (_req, res) => {
 });
 
 // ═══════════════════ 风控力 ═══════════════════
-router.post('/guard/check-text', authMiddleware, validate(guardCheckTextSchema), async (req, res) => {
+router.post('/guard/check-text', heavyLimiter, authMiddleware, validate(guardCheckTextSchema), async (req, res) => {
   try {
     const result = await memfocus.guard.checkText(req.body.text, req.body.options || {});
     success(res, result);
@@ -285,7 +286,7 @@ router.post('/guard/check-text', authMiddleware, validate(guardCheckTextSchema),
   }
 });
 
-router.post('/guard/check-image', authMiddleware, validate(guardCheckImageSchema), async (req, res) => {
+router.post('/guard/check-image', heavyLimiter, authMiddleware, validate(guardCheckImageSchema), async (req, res) => {
   try {
     const result = await memfocus.guard.checkImage(req.body.imageUrl, req.body.options || {});
     success(res, result);
@@ -295,7 +296,7 @@ router.post('/guard/check-image', authMiddleware, validate(guardCheckImageSchema
   }
 });
 
-router.post('/guard/audit', authMiddleware, validate(guardAuditSchema), async (req, res) => {
+router.post('/guard/audit', heavyLimiter, authMiddleware, validate(guardAuditSchema), async (req, res) => {
   try {
     const result = await memfocus.guard.fullAudit(req.body);
     success(res, result);
@@ -306,7 +307,7 @@ router.post('/guard/audit', authMiddleware, validate(guardAuditSchema), async (r
 });
 
 // ═══════════════════ 视觉力 ═══════════════════
-router.post('/visual/video', authMiddleware, validate(visualSubmitSchema), async (req, res) => {
+router.post('/visual/video', heavyLimiter, authMiddleware, validate(visualSubmitSchema), async (req, res) => {
   try {
     const result = await memfocus.visual.submitVideo((req.user?.userId || req.user?.id), req.body);
     success(res, result);
@@ -316,7 +317,7 @@ router.post('/visual/video', authMiddleware, validate(visualSubmitSchema), async
   }
 });
 
-router.post('/visual/batch', authMiddleware, validate(visualBatchSchema), async (req, res) => {
+router.post('/visual/batch', heavyLimiter, authMiddleware, validate(visualBatchSchema), async (req, res) => {
   try {
     const result = await memfocus.visual.submitBatch((req.user?.userId || req.user?.id), req.body);
     success(res, result);
@@ -356,7 +357,7 @@ router.post('/visual/task/:taskId/cancel', authMiddleware, validate(paramsWithTa
   }
 });
 
-router.post('/visual/image', authMiddleware, validate(visualImageSchema), async (req, res) => {
+router.post('/visual/image', heavyLimiter, authMiddleware, validate(visualImageSchema), async (req, res) => {
   try {
     const result = await memfocus.visual.processImage((req.user?.userId || req.user?.id), req.body);
     success(res, result);

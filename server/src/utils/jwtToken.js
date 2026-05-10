@@ -15,7 +15,17 @@ import logger from '../utils/logger.js';
 const ACCESS_EXPIRES = process.env.JWT_ACCESS_EXPIRES || '15m';
 const REFRESH_EXPIRES = process.env.JWT_REFRESH_EXPIRES || '7d';
 const ACCESS_SECRET = jwtConfig.secret;
-const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || jwtConfig.secret + '_refresh';
+const REFRESH_SECRET = (() => {
+  if (process.env.JWT_REFRESH_SECRET) return process.env.JWT_REFRESH_SECRET;
+  if (process.env.NODE_ENV === 'development') {
+    if (!jwtConfig.secret || jwtConfig.secret === 'dev-secret') {
+      throw new Error('JWT_REFRESH_SECRET 未设置且 JWT_SECRET 无效，无法生成 refresh token');
+    }
+    console.warn('[JWT] 开发环境 REFRESH_SECRET 派生自 JWT_SECRET，生产环境必须独立设置 JWT_REFRESH_SECRET');
+    return jwtConfig.secret + '_refresh_dev_only';
+  }
+  throw new Error('JWT_REFRESH_SECRET 必须在非开发环境通过环境变量设置');
+})();
 
 // 动态加载 Redis（不做硬依赖，Redis 离线跳过黑名单校验）
 let redis = null;

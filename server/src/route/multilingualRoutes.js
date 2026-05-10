@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { getLanguages, getScriptTypes, buildPrompt } from '../controller/multilingualController.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
+import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { validate } from '../utils/validate.js';
 import { z } from 'zod';
 
@@ -23,6 +24,6 @@ router.use(authMiddleware);
 
 router.get('/languages', asyncHandler(getLanguages));
 router.get('/script-types', asyncHandler(getScriptTypes));
-router.post('/build-prompt', validate(buildPromptSchema), asyncHandler(buildPrompt));
+router.post('/build-prompt', heavyLimiter, validate(buildPromptSchema), asyncHandler(buildPrompt));
 
 export default router;

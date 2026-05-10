@@ -24,7 +24,18 @@ const config = {
   },
 
   jwt: {
-    secret: process.env.JWT_SECRET || (process.env.NODE_ENV === 'development' ? (console.warn('[config] 警告: 使用开发默认 JWT_SECRET，请在生产环境通过环境变量设置'), 'dev-secret') : (() => { throw new Error('JWT_SECRET 必须在非开发环境通过环境变量设置'); })()),
+    secret: (() => {
+      const s = process.env.JWT_SECRET;
+      if (s && s.length >= 32) return s;
+      if (process.env.NODE_ENV === 'development') {
+        if (!s || s === 'dev-secret' || s.length < 16) {
+          throw new Error('JWT_SECRET 开发环境必须使用至少16字符的密钥，严禁使用 dev-secret');
+        }
+        console.warn('[config] 警告: JWT_SECRET 长度不足32字符，仅允许开发环境使用');
+        return s;
+      }
+      throw new Error('JWT_SECRET 必须通过环境变量设置且长度 >= 32 字符');
+    })(),
     expiresIn: process.env.JWT_EXPIRES_IN || '7d',
   },
 
@@ -34,10 +45,16 @@ const config = {
     replicateBaseUrl: process.env.REPLICATE_BASE_URL || 'https://api.replicate.com/v1',
   },
 
-  mockEnabled: process.env.MOCK_ENABLED !== 'false',
+  mockEnabled: process.env.MOCK_ENABLED === 'true',
 
   sms: {
-    provider: process.env.SMS_PROVIDER || 'mock',
+    provider: (() => {
+      const p = process.env.SMS_PROVIDER || 'mock';
+      if (p === 'mock' && process.env.NODE_ENV === 'production') {
+        throw new Error('生产环境必须配置 SMS_PROVIDER，不允许使用 mock');
+      }
+      return p;
+    })(),
     providers: {
       aliyun: {
         accessKeyId: process.env.SMS_ALI_ACCESS_KEY_ID || '',
@@ -54,7 +71,13 @@ const config = {
   },
 
   email: {
-    provider: process.env.EMAIL_PROVIDER || 'mock',
+    provider: (() => {
+      const p = process.env.EMAIL_PROVIDER || 'mock';
+      if (p === 'mock' && process.env.NODE_ENV === 'production') {
+        throw new Error('生产环境必须配置 EMAIL_PROVIDER，不允许使用 mock');
+      }
+      return p;
+    })(),
     smtp: {
       host: process.env.SMTP_HOST || '',
       port: parseInt(process.env.SMTP_PORT, 10) || 587,

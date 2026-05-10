@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { generateTitles, generateDescription, generateScript, translateProduct, listPlatforms, listLanguages, listHistory, deleteHistory } from '../controller/copywritingController.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
+import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { validate } from '../utils/validate.js';
 import { z } from 'zod';
 
@@ -53,10 +54,10 @@ const historyQuerySchema = z.object({ type: z.string().max(50).optional() });
 router.use(authMiddleware);
 
 // 生成
-router.post('/titles', validate(titleGenSchema), asyncHandler(generateTitles));
-router.post('/description', validate(descriptionSchema), asyncHandler(generateDescription));
-router.post('/script', validate(scriptSchema), asyncHandler(generateScript));
-router.post('/translate', validate(translateSchema), asyncHandler(translateProduct));
+router.post('/titles', heavyLimiter, validate(titleGenSchema), asyncHandler(generateTitles));
+router.post('/description', heavyLimiter, validate(descriptionSchema), asyncHandler(generateDescription));
+router.post('/script', heavyLimiter, validate(scriptSchema), asyncHandler(generateScript));
+router.post('/translate', heavyLimiter, validate(translateSchema), asyncHandler(translateProduct));
 
 // 参考数据
 router.get('/platforms', asyncHandler(listPlatforms));

@@ -12,6 +12,7 @@ import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
+import { paymentLimiter, adminLimiter } from '../middleware/rateLimiter.js';
 import * as pointsService from '../services/points.service.js';
 
 const router = Router();
@@ -50,7 +51,7 @@ router.get('/transactions', authMiddleware, async (req, res) => {
 });
 
 // POST /api/points/redeem — 积分兑换点数
-router.post('/redeem', authMiddleware, _validate(redeemSchema), async (req, res) => {
+router.post('/redeem', paymentLimiter, authMiddleware, _validate(redeemSchema), async (req, res) => {
   try {
     const { points } = req.validated;
     const result = await pointsService.redeemPointsForCredits(req.user.id, points);
@@ -61,7 +62,7 @@ router.post('/redeem', authMiddleware, _validate(redeemSchema), async (req, res)
 });
 
 // POST /api/points/earn — 管理后台手动发放积分
-router.post('/earn', authMiddleware, adminAuth, _validate(earnSchema), async (req, res) => {
+router.post('/earn', adminLimiter, authMiddleware, adminAuth, _validate(earnSchema), async (req, res) => {
   try {
     const { user_id, amount, remark } = req.validated;
     const result = await pointsService.earnPoints(user_id, {
