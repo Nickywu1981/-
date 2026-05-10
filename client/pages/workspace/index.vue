@@ -98,7 +98,8 @@ onMounted(async () => {
     } else {
       throw new Error('empty')
     }
-  } catch {
+  } catch (e: any) {
+    console.error('[工作台] 配置加载失败，使用默认卡片', e.message)
     // fallback to defaults
     const groups: Record<string, Card[]> = {}
     defaultCards.forEach(c => {

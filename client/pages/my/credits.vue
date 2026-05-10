@@ -58,6 +58,8 @@ const creditBalance = ref(0)
 const totalEarned = ref(0)
 const totalSpent = ref(0)
 
+const toast = useToast()
+
 const fetchAll = async () => {
   loading.value = true
   try {
@@ -67,7 +69,10 @@ const fetchAll = async () => {
     creditBalance.value = res?.balance || 0
     totalEarned.value = res?.totalEarned || 0
     totalSpent.value = res?.totalSpent || 0
-  } catch { /* use mock */ }
+  } catch (e: any) {
+    console.error('[积分明细] 加载失败', e.message)
+    toast.error('加载失败，请刷新重试')
+  }
   loading.value = false
 }
 

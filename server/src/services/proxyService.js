@@ -2,6 +2,7 @@ import { BusinessError } from '../utils/businessError.js';
 import { PROXY_FLAG, CIRCUIT_STATUS } from '../constants/domainStatus.js';
 import proxyDao from '../dao/proxyDao.js';
 import { encrypt, decrypt } from '../utils/crypto.js';
+import logger from '../utils/logger.js';
 
 // ==================== 配置管理 ====================
 
@@ -202,7 +203,9 @@ function buildHeaders(proxy) {
   const headers = { 'Content-Type': 'application/json', 'User-Agent': 'MovioAI-Proxy/1.0' };
   try {
     if (proxy.headers_json) Object.assign(headers, safeJson(proxy.headers_json));
-  } catch { /* ignore */ }
+  } catch (e) {
+    logger.warn('[Proxy] Headers JSON 解析失败', { error: e.message });
+  }
 
   if (proxy.auth_type === 'bearer' || proxy.auth_type === 'api_key') {
     try {
@@ -242,7 +245,9 @@ function maskSensitive(cfg) {
       const ac = typeof masked.auth_config === 'string' ? safeJson(masked.auth_config) : masked.auth_config;
       if (ac?._encrypted) masked.auth_config = '***ENCRYPTED***';
     }
-  } catch { /* ignore */ }
+  } catch (e) {
+    logger.warn('[Proxy] Headers JSON 解析失败', { error: e.message });
+  }
   return masked;
 }
 

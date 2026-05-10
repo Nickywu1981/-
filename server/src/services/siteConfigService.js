@@ -18,7 +18,9 @@ export const getPublicConfigMap = async () => {
   try {
     const cached = await cacheGet(CACHE_PREFIX + 'public');
     if (cached) return cached;
-  } catch { /* noop */ }
+  } catch (e) {
+    logger.warn('[SiteConfig] Redis 缓存读取失败', { error: e.message });
+  }
 
   const rows = await getPublicConfig();
   const map = {};
@@ -30,7 +32,7 @@ export const getPublicConfigMap = async () => {
     }
   });
 
-  try { await cacheSet(CACHE_PREFIX + 'public', map, CACHE_TTL); } catch { /* noop */ }
+  try { await cacheSet(CACHE_PREFIX + 'public', map, CACHE_TTL); } catch (e) { logger.warn('[SiteConfig] Redis 缓存写入失败', { error: e.message }); }
   return map;
 };
 
@@ -79,7 +81,7 @@ export const deleteConfigByKey = async (key, userId) => {
 
 /** 清除公开配置缓存（写操作后调用） */
 export const clearPublicCache = async () => {
-  try { await cacheDel(CACHE_PREFIX + 'public'); } catch { /* noop */ }
+  try { await cacheDel(CACHE_PREFIX + 'public'); } catch (e) { logger.warn('[SiteConfig] Redis 缓存清除失败', { error: e.message }); }
 };
 
 export const getConfigLogs = async (key, limit) => getLogsByKey(key, limit);

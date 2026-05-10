@@ -56,6 +56,7 @@
 <script setup lang="ts">
 import { formatDateTime } from '@/utils/format'
 import ImageLightbox from '@/components/shared/ImageLightbox.vue';
+const toast = useToast()
 const activeTab = ref('all');
 const page = ref(1);
 const pageSize = 20;
@@ -115,7 +116,9 @@ async function fetchAll() {
       new Date(b.create_time).getTime() - new Date(a.create_time).getTime()
     );
     total.value = results.reduce((sum: number, r: any) => sum + (r.total || 0), 0);
-  } catch {
+  } catch (e: any) {
+    console.error('[素材库] 加载失败', e.message)
+    toast.error('加载失败，请刷新重试')
     allTasks.value = [];
   }
   loading.value = false;

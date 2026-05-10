@@ -34,13 +34,15 @@ export async function getGroupConfig(groupKey, userId, userRole) {
   try {
     const cached = await redis.get(CACHE_PREFIX + groupKey);
     if (cached) return JSON.parse(cached);
-  } catch { /* noop */ }
+  } catch (e) {
+    logger.warn('[Config] Redis 缓存读取失败', { groupKey, error: e.message });
+  }
 
   const items = await configDao.getItemsByGroup(groupKey);
   const result = {};
   for (const item of items) result[item.item_key] = item.item_value ?? item.default_val;
 
-  try { await redis.setex(CACHE_PREFIX + groupKey, CACHE_TTL, JSON.stringify(result)); } catch { /* noop */ }
+  try { await redis.setex(CACHE_PREFIX + groupKey, CACHE_TTL, JSON.stringify(result)); } catch (e) { logger.warn('[Config] Redis 缓存写入失败', { groupKey, error: e.message }); }
   return result;
 }
 
@@ -48,9 +50,11 @@ export async function getDict(dictKey) {
   try {
     const cached = await redis.get(CACHE_PREFIX + 'dict:' + dictKey);
     if (cached) return JSON.parse(cached);
-  } catch { /* noop */ }
+  } catch (e) {
+    logger.warn('[Config] Redis 缓存读取失败', { dictKey, error: e.message });
+  }
   const items = await configDao.getDictItems(dictKey);
-  try { await redis.setex(CACHE_PREFIX + 'dict:' + dictKey, CACHE_TTL, JSON.stringify(items)); } catch { /* noop */ }
+  try { await redis.setex(CACHE_PREFIX + 'dict:' + dictKey, CACHE_TTL, JSON.stringify(items)); } catch (e) { logger.warn('[Config] Dict 缓存写入失败', { dictKey, error: e.message }); }
   return items;
 }
 

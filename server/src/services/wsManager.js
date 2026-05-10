@@ -2,6 +2,7 @@ import { WebSocketServer } from 'ws';
 import { parse } from 'url';
 import jwt from 'jsonwebtoken';
 import config from '../config/index.js';
+import logger from '../utils/logger.js';
 
 const JWT_SECRET = config.jwt.secret;
 
@@ -59,7 +60,9 @@ class WsManager {
         try {
           const msg = JSON.parse(raw.toString());
           this._handle(socket, msg);
-        } catch { /* ignore malformed */ }
+        } catch (e) {
+          logger.warn('[WS] 畸形消息', { error: e.message });
+        }
       });
 
       socket.on('close', () => {

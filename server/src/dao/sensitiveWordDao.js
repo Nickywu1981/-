@@ -1,5 +1,23 @@
 import pool from '../dao/db.js';
 
+let wordCache = null;
+let cacheTimestamp = 0;
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 分钟缓存
+
+async function getActiveWords() {
+  const now = Date.now();
+  if (wordCache && (now - cacheTimestamp) < CACHE_TTL_MS) return wordCache;
+  const [words] = await pool.execute('SELECT word, category, level FROM sensitive_word WHERE status = 1 LIMIT 5000');
+  wordCache = words;
+  cacheTimestamp = now;
+  return words;
+}
+
+export function invalidateWordCache() {
+  wordCache = null;
+  cacheTimestamp = 0;
+}
+
 export async function listSensitiveWords({ keyword, page = 1, pageSize = 50 }) {
   const cond = keyword ? 'WHERE word LIKE ?' : '';
   const params = keyword ? [`%${keyword}%`] : [];
@@ -19,7 +37,7 @@ export async function deleteSensitiveWord(id) {
 }
 
 export async function checkText(text) {
-  const [words] = await pool.execute('SELECT word, category, level FROM sensitive_word WHERE status = 1');
+  const words = await getActiveWords();
   const hits = [];
   for (const w of words) {
     try {

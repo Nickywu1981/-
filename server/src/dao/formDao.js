@@ -104,8 +104,9 @@ export default {
     return { list: rows, total: c[0].total, page, pageSize };
   },
 
-  async getAllSubmissions(formId) {
-    const [rows] = await pool.query('SELECT * FROM custom_form_submission WHERE form_id = ? ORDER BY create_time DESC', [formId]);
+  async getAllSubmissions(formId, { page = 1, pageSize = 1000 } = {}) {
+    const offset = (page - 1) * pageSize;
+    const [rows] = await pool.query('SELECT * FROM custom_form_submission WHERE form_id = ? ORDER BY create_time DESC LIMIT ? OFFSET ?', [formId, pageSize, offset]);
     return rows;
   },
 

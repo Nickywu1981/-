@@ -6,6 +6,7 @@
 import { BusinessError } from '../utils/businessError.js';
 import db from '../dao/db.js';
 import path from 'path';
+import logger from '../utils/logger.js';
 
 // CapCut / Jianying 项目文件模板
 function buildJianyingDraft({ assets, projectName, ratio = '9:16' }) {
@@ -72,7 +73,7 @@ export default {
 
     const assets = works.map(w => {
       let data = {};
-      try { data = typeof w.result_data === 'string' ? JSON.parse(w.result_data) : (w.result_data || {}); } catch { /* noop */ }
+      try { data = typeof w.result_data === 'string' ? JSON.parse(w.result_data) : (w.result_data || {}); } catch (e) { logger.warn('[CutEcosystem] JSON 解析失败', { id: w.id, error: e.message }); }
       const url = data.file_url || data.video_url || data.image_url || '';
       const filename = path.basename(url.split('?')[0]) || `asset_${w.id}.mp4`;
 

@@ -177,7 +177,7 @@ export async function getOperationLogs({ offset, pageSize, userId, action }) {
 // ==================== 任务管理（Admin） ====================
 
 export async function getTaskById(taskId) {
-  const [[task]] = await pool.execute('SELECT * FROM task WHERE id = ?', [taskId]);
+  const [[task]] = await pool.execute('SELECT id, user_id, type, title, status, progress, progress_msg, retry_count, input_params, output_result, error_msg, create_time, start_time FROM task WHERE id = ?', [taskId]);
   return task || null;
 }
 

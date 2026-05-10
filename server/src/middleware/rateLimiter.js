@@ -10,6 +10,17 @@ const CONCURRENCY_MAX_PER_USER = 6;
 const CONCURRENCY_AI_PER_USER = 3;
 const userConcurrency = new Map();
 
+// 每 30 分钟清理一次超时条目（防止 socket hang-up 导致泄漏）
+const CONCURRENCY_TTL_MS = 30 * 60 * 1000;
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, entry] of userConcurrency) {
+    if (now - entry.ts > CONCURRENCY_TTL_MS) {
+      userConcurrency.delete(key);
+    }
+  }
+}, CONCURRENCY_TTL_MS).unref();
+
 function getConcurrencyKey(req) {
   return req.user?.id || req.ip.replace(/^::ffff:/, '');
 }
@@ -17,15 +28,18 @@ function getConcurrencyKey(req) {
 export function concurrencyGuard(maxConcurrent = CONCURRENCY_MAX_PER_USER) {
   return (req, res, next) => {
     const key = getConcurrencyKey(req);
-    const current = userConcurrency.get(key) || 0;
-    if (current >= maxConcurrent) {
+    const entry = userConcurrency.get(key) || { count: 0, ts: Date.now() };
+    if (entry.count >= maxConcurrent) {
       return error(res, 429, `并发请求过多 (${maxConcurrent}路)，请稍后再试`);
     }
-    userConcurrency.set(key, current + 1);
+    entry.count++;
+    entry.ts = Date.now();
+    userConcurrency.set(key, entry);
     res.on('finish', () => {
-      const c = userConcurrency.get(key) || 1;
-      if (c <= 1) userConcurrency.delete(key);
-      else userConcurrency.set(key, c - 1);
+      const cur = userConcurrency.get(key);
+      if (!cur) return;
+      if (cur.count <= 1) userConcurrency.delete(key);
+      else { cur.count--; cur.ts = Date.now(); }
     });
     next();
   };

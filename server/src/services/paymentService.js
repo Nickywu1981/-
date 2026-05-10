@@ -87,7 +87,8 @@ export async function getBillingHistory(userId) {
       [userId],
     );
     return rows;
-  } catch {
+  } catch (e) {
+    logger.error('[Payment] 查询订单失败', e.message);
     return [];
   }
 }

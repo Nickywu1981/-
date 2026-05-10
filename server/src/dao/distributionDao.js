@@ -103,11 +103,11 @@ export default {
   },
 
   async withdrawCommissions(userId, ids) {
-    for (const id of ids) {
-      await db.query(
-        'UPDATE distributor_commission SET status = ?, settled_at = NOW() WHERE id = ? AND distributor_id = ?',
-        ['withdrawn', id, userId],
-      );
-    }
+    if (!ids.length) return;
+    const placeholders = ids.map(() => '?').join(',');
+    await db.query(
+      `UPDATE distributor_commission SET status = ?, settled_at = NOW() WHERE id IN (${placeholders}) AND distributor_id = ?`,
+      ['withdrawn', ...ids, userId],
+    );
   },
 };
