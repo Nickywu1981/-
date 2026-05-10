@@ -135,6 +135,7 @@ export default {
   },
 
   async batchInsertFields(tenantId, formId, fields) {
+    if (!fields?.length) return;
     const sql = `INSERT INTO diy_custom_field
       (tenant_id, form_id, field_name, field_label, field_type, sort_order, is_required, is_visible,
        default_value, placeholder, options_json, validation_rules, linkage_conditions, linkage_action,

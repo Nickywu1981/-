@@ -24,17 +24,21 @@ export async function withTransaction(fn) {
 
 export default {
   async listPages(tenantId, { pageType, status, keyword, ownerId, accessType, page = 1, pageSize = 20 }) {
-    let sql = 'SELECT id, owner_id, title, slug, page_type, access_type, status, publish_time, offline_time, access_count, latest_published_version, create_time, update_time FROM diy_page WHERE tenant_id = ? AND status != 3'; // 默认不显示回收站
+    const baseWhere = 'WHERE tenant_id = ?';
     const params = [tenantId];
-    if (status !== undefined && status !== null && status !== '') { sql += ' AND status = ?'; params.push(Number(status)); }
-    if (status === 3) sql = sql.replace('AND status != 3', ''); // 明确查回收站时去掉过滤
-    if (pageType) { sql += ' AND page_type = ?'; params.push(pageType); }
-    if (accessType) { sql += ' AND access_type = ?'; params.push(accessType); }
-    if (ownerId) { sql += ' AND owner_id = ?'; params.push(Number(ownerId)); }
-    if (keyword) { sql += ' AND title LIKE ?'; params.push(`%${keyword}%`); }
-    const [{ total }] = await pool.query(`SELECT COUNT(*) as total FROM (${sql}) t`, params);
+    let filter = '';
+    const includedTrash = status === 3 || String(status) === '3';
+    if (!includedTrash) filter += ' AND status != 3';
+    if (status !== undefined && status !== null && status !== '') { filter += ' AND status = ?'; params.push(Number(status)); }
+    if (pageType) { filter += ' AND page_type = ?'; params.push(pageType); }
+    if (accessType) { filter += ' AND access_type = ?'; params.push(accessType); }
+    if (ownerId) { filter += ' AND owner_id = ?'; params.push(Number(ownerId)); }
+    if (keyword) { filter += ' AND title LIKE ?'; params.push(`%${keyword}%`); }
+    const fromWhere = `FROM diy_page ${baseWhere}${filter}`;
+    const cParams = [...params];
+    const [{ total }] = await pool.query(`SELECT COUNT(*) as total ${fromWhere}`, cParams);
     params.push((page - 1) * pageSize, pageSize);
-    sql += ' ORDER BY update_time DESC LIMIT ?, ?';
+    const sql = `SELECT id, owner_id, title, slug, page_type, access_type, status, publish_time, offline_time, access_count, latest_published_version, create_time, update_time ${fromWhere} ORDER BY update_time DESC LIMIT ?, ?`;
     const [rows] = await pool.query(sql, params);
     return { list: rows, total, page, pageSize };
   },
@@ -338,14 +342,16 @@ export default {
   // ==================== 模板库 ====================
 
   async listTemplates({ industry, pageType, keyword, page = 1, pageSize = 20 }) {
-    let sql = 'SELECT id, title, industry, page_type, thumbnail, description, tags, use_count, is_official, create_time FROM diy_template WHERE status = 1';
-    const params = [];
-    if (industry) { sql += ' AND industry = ?'; params.push(industry); }
-    if (pageType) { sql += ' AND page_type = ?'; params.push(pageType); }
-    if (keyword) { sql += ' AND (title LIKE ? OR description LIKE ? OR tags LIKE ?)'; params.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`); }
-    const [{ total }] = await pool.query(`SELECT COUNT(*) as total FROM (${sql}) t`, params);
-    sql += ' ORDER BY use_count DESC, id ASC LIMIT ?, ?';
+    const baseWhere = 'WHERE status = 1';
+    const params: any[] = [];
+    let filter = '';
+    if (industry) { filter += ' AND industry = ?'; params.push(industry); }
+    if (pageType) { filter += ' AND page_type = ?'; params.push(pageType); }
+    if (keyword) { filter += ' AND (title LIKE ? OR description LIKE ? OR tags LIKE ?)'; params.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`); }
+    const fromWhere = `FROM diy_template ${baseWhere}${filter}`;
+    const [{ total }] = await pool.query(`SELECT COUNT(*) as total ${fromWhere}`, [...params]);
     params.push((page - 1) * pageSize, pageSize);
+    const sql = `SELECT id, title, industry, page_type, thumbnail, description, tags, use_count, is_official, create_time ${fromWhere} ORDER BY use_count DESC, id ASC LIMIT ?, ?`;
     const [rows] = await pool.query(sql, params);
     return { list: rows, total, page, pageSize };
   },

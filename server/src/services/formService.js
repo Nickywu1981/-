@@ -4,6 +4,7 @@ import { FORM_ACCESS_TYPE } from '../constants/domainStatus.js';
  * P2 增强表单服务 — 校验引擎 + 联动解析 + 脱敏 + 双端适配
  */
 import formDao from '../dao/formDao.js';
+import logger from '../utils/logger.js';
 
 // ── 校验引擎 ──
 const VALIDATORS = {
@@ -229,9 +230,21 @@ export async function submitForm(code, tenantId, userId, rawData, ip, userAgent,
   });
   await formDao.incrementSubmitCount(form.id);
 
-  // 5️⃣ 异步发邮件通知(占位)
+  // 5️⃣ 异步发邮件通知
   if (form.notify_email) {
-    // TODO: 接入邮件服务
+    setImmediate(async () => {
+      try {
+        const { default: emailService } = await import('./emailService.js');
+        const provider = emailService.getProvider ? emailService.getProvider() : null;
+        if (provider) {
+          await provider.send({
+            email: form.notify_email,
+            subject: `【表单通知】${form.title} - 新提交`,
+            content: `<h3>${form.title}</h3><p>收到一条新提交，请登录后台查看。</p>`,
+          });
+        }
+      } catch (e) { logger.warn('表单邮件通知失败:', e.message); }
+    });
   }
 
   return { id, redirectUrl: form.redirect_url };
@@ -249,8 +262,18 @@ export async function updateSubmission(subId, data) {
 
 export async function exportSubmissions(formId, _format = 'csv') {
   const rows = await formDao.getAllSubmissions(formId);
-  // TODO: EasyExcel 格式导出
-  return rows;
+  if (!rows.length) return { csv: '', count: 0 };
+  const headers = Object.keys(rows[0]).filter(k => k !== 'user_ip_long');
+  const csvRows = [headers.join(',')];
+  for (const row of rows) {
+    csvRows.push(headers.map(h => {
+      const v = row[h];
+      if (v === null || v === undefined) return '';
+      const s = String(v).replace(/"/g, '""');
+      return /[",\n\r]/.test(s) ? `"${s}"` : s;
+    }).join(','));
+  }
+  return { csv: csvRows.join('\n'), count: rows.length, headers };
 }
 
 // ── 字段管理(独立CRUD) ──
