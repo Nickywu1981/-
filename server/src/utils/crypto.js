@@ -5,7 +5,8 @@
 import crypto from 'crypto';
 
 const ALGORITHM = 'aes-256-gcm';
-const SECRET_KEY = Buffer.from(process.env.ENCRYPTION_KEY || 'movio-dev-encryption-key-32bytes', 'utf8');
+if (!process.env.ENCRYPTION_KEY) throw new Error('FATAL: ENCRYPTION_KEY env var is required');
+const SECRET_KEY = Buffer.from(process.env.ENCRYPTION_KEY, 'utf8');
 
 export function encrypt(text) {
   if (!text) return '';

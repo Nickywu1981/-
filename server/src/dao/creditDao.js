@@ -44,8 +44,14 @@ export async function getRequestLog(requestId) {
   return rows[0] || null;
 }
 
-export async function insertRequestLog({ requestId, userId, action, creditAmount, remark, requestBody, responseBody, status = 1 }) {
-  await pool.execute(
+export async function getRequestLogForUpdate(conn, requestId) {
+  const [rows] = await conn.execute('SELECT id, request_id, user_id, action, credit_amount, status, remark, create_time FROM credit_request_log WHERE request_id = ? FOR UPDATE', [requestId]);
+  return rows[0] || null;
+}
+
+export async function insertRequestLog({ requestId, userId, action, creditAmount, remark, requestBody, responseBody, status = 1 }, conn) {
+  const db = conn || pool;
+  await db.execute(
     'INSERT INTO credit_request_log (request_id, user_id, action, credit_amount, remark, request_body, response_body, status) VALUES (?,?,?,?,?,?,?,?)',
     [requestId, userId, action, creditAmount, remark, JSON.stringify(requestBody || {}), JSON.stringify(responseBody || {}), status],
   );

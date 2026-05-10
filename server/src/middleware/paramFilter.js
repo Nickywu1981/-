@@ -5,7 +5,7 @@
  * - 防止 XSS 标签
  */
 
-const { ERROR_CODE } = require('../constants/errorCode.js');
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 // XSS/注入检测正则
 const INJECTION_PATTERNS = [

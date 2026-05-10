@@ -6,5 +6,8 @@ export default {
     mockReset: true,
     restoreMocks: true,
     globals: true,
+    env: {
+      ENCRYPTION_KEY: 'exactly-32-byte-encryption-key!!',
+    },
   },
 };

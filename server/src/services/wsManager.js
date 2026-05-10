@@ -59,7 +59,7 @@ class WsManager {
       let userId = null;
       try {
         const payload = jwt.verify(cookies.token || '', JWT_SECRET);
-        userId = String(payload.id);
+        userId = String(payload.userId || payload.id);
       } catch {
         // 未认证连接 — 关闭连接，不提供公开订阅
         socket.close(4001, '未授权');

@@ -77,7 +77,7 @@ if grep -q "your-secret-key" .env 2>/dev/null; then
   sed -i "s/your-secret-key/${JWT_SECRET}/" .env
   sed -i "s/your-refresh-secret/${JWT_SECRET}_refresh/" .env
   sed -i "s/your-csrf-secret/${CSRF_SECRET}/" .env
-  sed -i "s|AES_ENCRYPTION_KEY=.*|AES_ENCRYPTION_KEY=${AES_KEY}|" .env 2>/dev/null || echo "AES_ENCRYPTION_KEY=${AES_KEY}" >> .env
+  sed -i "s|ENCRYPTION_KEY=.*|ENCRYPTION_KEY=${AES_KEY}|" .env 2>/dev/null || echo "ENCRYPTION_KEY=${AES_KEY}" >> .env
   sed -i "s/NODE_ENV=development/NODE_ENV=production/" .env
   sed -i "s/MOCK_ENABLED=true/MOCK_ENABLED=false/" .env
   log "JWT/AES/CSRF 密钥已自动生成"

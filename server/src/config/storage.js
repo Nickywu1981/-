@@ -9,7 +9,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const UPLOAD_DIR = path.join(__dirname, '../../uploads');
 
 const config = {
-  provider: process.env.STORAGE_PROVIDER || 'local',
+  provider: process.env.STORAGE_DRIVER || process.env.STORAGE_PROVIDER || 'local',
   local: { uploadDir: UPLOAD_DIR, publicUrl: '/uploads' },
   cos: {
     secretId: process.env.COS_SECRET_ID || '',

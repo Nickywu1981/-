@@ -24,17 +24,19 @@ function calcConsumed(action, batchCount = 1, isNight = false) {
 // ==================== 冻结（预扣） ====================
 
 export async function freezeCredit(userId, requestId, action, batchCount = 1, isNight = false) {
-  const cached = await creditDao.getRequestLog(requestId);
-  if (cached) {
-    const record = await creditDao.getConsumptionByRequestId(requestId);
-    return { idempotent: true, recordId: record?.id, status: cached.status };
-  }
-
   const consumedAmount = calcConsumed(action, batchCount, isNight);
 
   const conn = await db.getConnection();
   try {
     await conn.beginTransaction();
+
+    // 幂等性守卫: INSERT request_log 带 UNIQUE(request_id), 冲突则返回已存在记录
+    const existingLog = await creditDao.getRequestLogForUpdate(conn, requestId);
+    if (existingLog) {
+      await conn.commit();
+      const record = await creditDao.getConsumptionByRequestId(requestId);
+      return { idempotent: true, recordId: record?.id, status: existingLog.status };
+    }
 
     const membership = await creditDao.getMembershipForUpdate(conn, userId);
     if (!membership) {
@@ -78,12 +80,13 @@ export async function freezeCredit(userId, requestId, action, batchCount = 1, is
       remark: `freeze batch=${batchCount}`, taskId: '', requestId, status: 0,
     });
 
-    await conn.commit();
-
+    // 幂等日志写入事务内，UNIQUE(request_id) 防止重复扣费
     await creditDao.insertRequestLog({
       requestId, userId, action: 'freeze', creditAmount: consumedAmount,
       remark: `action=${action} batchCount=${batchCount}`, requestBody: { action, batchCount }, responseBody: { recordId, creditAfter }, status: 1,
-    });
+    }, conn);
+
+    await conn.commit();
 
     return { idempotent: false, recordId, creditBefore, creditAfter, consumed: consumedAmount };
   } catch (err) {

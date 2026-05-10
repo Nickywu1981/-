@@ -8,7 +8,7 @@ import logger from '../utils/logger.js';
  * P0-4: 重构为 configDao，移除全部裸SQL
  */
 import configDao from '../dao/configDao.js';
-import redis from '../dao/redis.js';
+import { cacheGet, cacheSet, cacheDel } from '../dao/redis.js';
 import { broadcastVersion } from './config-version.service.js';
 
 const CACHE_PREFIX = 'config:';
@@ -32,7 +32,7 @@ export async function getGroupConfig(groupKey, userId, userRole) {
   if (userLevel < getPermissionLevel(groupKey)) throw new BusinessError(403, '无权限读取此配置');
 
   try {
-    const cached = await redis.get(CACHE_PREFIX + groupKey);
+    const cached = await cacheGet(CACHE_PREFIX + groupKey);
     if (cached) return JSON.parse(cached);
   } catch (e) {
     logger.warn('[Config] Redis 缓存读取失败', { groupKey, error: e.message });
@@ -42,19 +42,19 @@ export async function getGroupConfig(groupKey, userId, userRole) {
   const result = {};
   for (const item of items) result[item.item_key] = item.item_value ?? item.default_val;
 
-  try { await redis.setex(CACHE_PREFIX + groupKey, CACHE_TTL, JSON.stringify(result)); } catch (e) { logger.warn('[Config] Redis 缓存写入失败', { groupKey, error: e.message }); }
+  try { await cacheSet(CACHE_PREFIX + groupKey, CACHE_TTL, JSON.stringify(result)); } catch (e) { logger.warn('[Config] Redis 缓存写入失败', { groupKey, error: e.message }); }
   return result;
 }
 
 export async function getDict(dictKey) {
   try {
-    const cached = await redis.get(CACHE_PREFIX + 'dict:' + dictKey);
+    const cached = await cacheGet(CACHE_PREFIX + 'dict:' + dictKey);
     if (cached) return JSON.parse(cached);
   } catch (e) {
     logger.warn('[Config] Redis 缓存读取失败', { dictKey, error: e.message });
   }
   const items = await configDao.getDictItems(dictKey);
-  try { await redis.setex(CACHE_PREFIX + 'dict:' + dictKey, CACHE_TTL, JSON.stringify(items)); } catch (e) { logger.warn('[Config] Dict 缓存写入失败', { dictKey, error: e.message }); }
+  try { await cacheSet(CACHE_PREFIX + 'dict:' + dictKey, CACHE_TTL, JSON.stringify(items)); } catch (e) { logger.warn('[Config] Dict 缓存写入失败', { dictKey, error: e.message }); }
   return items;
 }
 
@@ -63,7 +63,7 @@ export async function setConfig(groupKey, itemKey, itemValue, changedBy) {
   if (oldValue === null) throw new BusinessError(404, '配置项不存在');
   await configDao.updateItemValue(groupKey, itemKey, itemValue);
   await configDao.insertLog({ group_key: groupKey, item_key: itemKey, old_value: oldValue, new_value: itemValue, changed_by: changedBy });
-  try { await redis.del(CACHE_PREFIX + groupKey); await broadcastVersion(); } catch (err) { logger.warn('[Config] setConfig cache/broadcast failed', { groupKey, error: err.message }); }
+  try { await cacheDel(CACHE_PREFIX + groupKey); await broadcastVersion(); } catch (err) { logger.warn('[Config] setConfig cache/broadcast failed', { groupKey, error: err.message }); }
   return { group_key: groupKey, item_key: itemKey, old_value: oldValue, new_value: itemValue };
 }
 
@@ -72,7 +72,7 @@ export async function rollbackConfig(logId, changedBy) {
   if (!log) throw new BusinessError(404, '变更记录不存在');
   await configDao.updateItemValue(log.group_key, log.item_key, log.old_value);
   await configDao.insertLog({ group_key: log.group_key, item_key: log.item_key, old_value: log.new_value, new_value: log.old_value, changed_by: changedBy });
-  try { await redis.del(CACHE_PREFIX + log.group_key); await broadcastVersion(); } catch (err) { logger.warn('[Config] rollback cache/broadcast failed', { groupKey: log.group_key, error: err.message }); }
+  try { await cacheDel(CACHE_PREFIX + log.group_key); await broadcastVersion(); } catch (err) { logger.warn('[Config] rollback cache/broadcast failed', { groupKey: log.group_key, error: err.message }); }
   return { message: '回滚成功', group_key: log.group_key, item_key: log.item_key };
 }
 

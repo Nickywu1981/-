@@ -14,11 +14,10 @@
  *   task_failed → { taskId, error }
  */
 
-let socket: WebSocket | null = null;
-
 export function useTaskSocket() {
   const isConnected = ref(false);
   const progressMap = reactive(new Map<string, { progress: number; status: string; result?: any; error?: string }>());
+  let socket: WebSocket | null = null;
 
   async function connect(_uid?: string) {
     if (socket?.readyState === WebSocket.OPEN) return;

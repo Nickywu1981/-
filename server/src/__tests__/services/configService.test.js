@@ -12,7 +12,7 @@ vi.mock('../../dao/configDao.js', () => ({
     getDictItems: vi.fn(),
   },
 }));
-vi.mock('../../dao/redis.js', () => ({ default: { get: vi.fn(), setex: vi.fn(), del: vi.fn() } }));
+vi.mock('../../dao/redis.js', () => ({ cacheGet: vi.fn(), cacheSet: vi.fn(), cacheDel: vi.fn() }));
 vi.mock('../../dao/db.js', () => ({ default: { execute: vi.fn(), query: vi.fn() } }));
 vi.mock('../../utils/businessError.js', () => ({
   BusinessError: class BusinessError extends Error {
@@ -22,7 +22,7 @@ vi.mock('../../utils/businessError.js', () => ({
 vi.mock('../config-version.service.js', () => ({ broadcastVersion: vi.fn() }));
 
 import configDao from '../../dao/configDao.js';
-import redis from '../../dao/redis.js';
+import { cacheGet, cacheSet, cacheDel } from '../../dao/redis.js';
 import {
   getGroupConfig, getDict, setConfig, rollbackConfig,
 } from '../../services/config.service.js';
@@ -95,7 +95,7 @@ describe('getGroupConfig', () => {
       { item_key: 'title', item_value: 'Movio', default_val: null },
       { item_key: 'logo', item_value: null, default_val: '/logo.svg' },
     ]);
-    redis.get.mockRejectedValue(new Error('noop'));
+    cacheGet.mockRejectedValue(new Error('noop'));
 
     const result = await getGroupConfig('page.home', null, null);
     expect(result).toEqual({ title: 'Movio', logo: '/logo.svg' });
@@ -105,7 +105,7 @@ describe('getGroupConfig', () => {
     configDao.getItemsByGroup.mockResolvedValue([
       { item_key: 'default_model', item_value: 'gpt-4o', default_val: null },
     ]);
-    redis.get.mockRejectedValue(new Error('noop'));
+    cacheGet.mockRejectedValue(new Error('noop'));
 
     const result = await getGroupConfig('sys.model', 1, 'admin');
     expect(result).toEqual({ default_model: 'gpt-4o' });
@@ -121,14 +121,14 @@ describe('getGroupConfig', () => {
 
   it('超级管理员可访问 sys.model', async () => {
     configDao.getItemsByGroup.mockResolvedValue([]);
-    redis.get.mockRejectedValue(new Error('noop'));
+    cacheGet.mockRejectedValue(new Error('noop'));
 
     const result = await getGroupConfig('sys.model', 1, 'super_admin');
     expect(result).toEqual({});
   });
 
   it('命中 Redis 缓存直接返回', async () => {
-    redis.get.mockResolvedValue(JSON.stringify({ cached: true }));
+    cacheGet.mockResolvedValue(JSON.stringify({ cached: true }));
     // DAO 不应被调用
     const result = await getGroupConfig('page.home', null, null);
     expect(result).toEqual({ cached: true });
@@ -147,17 +147,17 @@ describe('getDict', () => {
   it('从 DB 获取字典项并缓存', async () => {
     const items = [{ item_key: 'text', item_value: '文案生成' }];
     configDao.getDictItems.mockResolvedValue(items);
-    redis.get.mockRejectedValue(new Error('noop'));
-    redis.setex.mockResolvedValue('OK');
+    cacheGet.mockRejectedValue(new Error('noop'));
+    cacheSet.mockResolvedValue('OK');
 
     const result = await getDict('task_category');
     expect(result).toEqual(items);
-    expect(redis.setex).toHaveBeenCalled();
+    expect(cacheSet).toHaveBeenCalled();
   });
 
   it('命中缓存直接返回', async () => {
     const cached = [{ item_key: 'image', item_value: '图片生成' }];
-    redis.get.mockResolvedValue(JSON.stringify(cached));
+    cacheGet.mockResolvedValue(JSON.stringify(cached));
 
     const result = await getDict('task_category');
     expect(result).toEqual(cached);
@@ -177,7 +177,7 @@ describe('setConfig', () => {
     configDao.getItemValue.mockResolvedValue('old-val');
     configDao.updateItemValue.mockResolvedValue();
     configDao.insertLog.mockResolvedValue();
-    redis.del.mockResolvedValue(1);
+    cacheDel.mockResolvedValue(1);
 
     const result = await setConfig('biz.credit', 'max_credits', '500', 1);
     expect(result).toEqual({
@@ -188,7 +188,7 @@ describe('setConfig', () => {
       group_key: 'biz.credit', item_key: 'max_credits',
       old_value: 'old-val', new_value: '500', changed_by: 1,
     }));
-    expect(redis.del).toHaveBeenCalledWith('config:biz.credit');
+    expect(cacheDel).toHaveBeenCalledWith('config:biz.credit');
   });
 
   it('配置项不存在时抛出 404', async () => {
@@ -212,7 +212,7 @@ describe('rollbackConfig', () => {
     });
     configDao.updateItemValue.mockResolvedValue();
     configDao.insertLog.mockResolvedValue();
-    redis.del.mockResolvedValue(1);
+    cacheDel.mockResolvedValue(1);
 
     const result = await rollbackConfig(1, 2);
     expect(result).toMatchObject({ message: '回滚成功' });
