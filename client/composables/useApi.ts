@@ -18,6 +18,9 @@ interface PaginatedData<T = any> {
 
 export const isOffline = ref(false);
 
+// 401 重定向锁（防并发请求同时触发多次 navigateTo）
+let isRedirecting = false;
+
 if (typeof window !== 'undefined') {
   window.addEventListener('offline', () => { isOffline.value = true; });
   window.addEventListener('online', () => { isOffline.value = false; });
@@ -72,9 +75,9 @@ async function request<T = any>(
       body: options.body,
       credentials: 'include',
       onResponseError({ response }) {
-        if (response.status === 401) {
-          // 防抖: 避免并发请求同时触发多次 navigateTo
-          if (window.location.pathname !== '/login') navigateTo('/login');
+        if (response.status === 401 && !isRedirecting) {
+          isRedirecting = true;
+          navigateTo('/login').finally(() => { isRedirecting = false; });
         }
       },
     });

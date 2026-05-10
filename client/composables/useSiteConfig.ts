@@ -91,6 +91,31 @@ const FALLBACKS: Record<string, Record<string, string>> = {
 
 const cache: Record<string, any> = {}
 
+// ── SSE 连接池：所有 useSiteConfig 调用共享一个 EventSource ──
+let sharedEventSource: EventSource | null = null;
+const sseListeners = new Map<string, () => void>();
+
+function ensureSSE() {
+  if (sharedEventSource || import.meta.server) return;
+  try {
+    sharedEventSource = new EventSource('/api/config/version/stream');
+    sharedEventSource.onmessage = (e) => {
+      const data = JSON.parse(e.data);
+      if (data.version && !data.heartbeat) {
+        // 通知所有注册的监听器（各自清缓存 + 刷新）
+        sseListeners.forEach(fn => fn());
+      }
+    };
+  } catch { /* SSE not available */ }
+}
+
+function teardownSSE() {
+  if (sharedEventSource && sseListeners.size === 0) {
+    sharedEventSource.close();
+    sharedEventSource = null;
+  }
+}
+
 export function useSiteConfig(groupKey: string) {
   const config = ref<Record<string, string>>(cache[groupKey] || {})
   const loading = ref(!cache[groupKey])
@@ -128,29 +153,22 @@ export function useSiteConfig(groupKey: string) {
   }
 
   // -----------------------------------------------------------------------
-  // SSE 监听配置版本 → 静默刷新
+  // SSE 监听配置版本 → 静默刷新（共享连接池）
   // -----------------------------------------------------------------------
-  let eventSource: EventSource | null = null
 
   function startSSE() {
-    if (import.meta.server) return
-    try {
-      eventSource = new EventSource('/api/config/version/stream')
-      eventSource.onmessage = (e) => {
-        const data = JSON.parse(e.data)
-        if (data.version && !data.heartbeat) {
-          delete cache[groupKey] // 清除缓存 → 下次 fetch 拉最新
-          fetchConfig()
-        }
-      }
-    } catch { /* SSE not available */ }
+    if (import.meta.server) return;
+    const listener = () => {
+      delete cache[groupKey];
+      fetchConfig();
+    };
+    sseListeners.set(groupKey, listener);
+    ensureSSE();
   }
 
   function stopSSE() {
-    if (eventSource) {
-      eventSource.close()
-      eventSource = null
-    }
+    sseListeners.delete(groupKey);
+    teardownSSE();
   }
 
   // -----------------------------------------------------------------------
