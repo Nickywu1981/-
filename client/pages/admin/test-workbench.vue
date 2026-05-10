@@ -531,7 +531,7 @@ async function loadModels() {
     }
     allModels.value = flat
   } catch {
-    // fallback: use hardcoded
+    toast.error('加载模型列表失败，使用默认列表');
     const fallback: any[] = [
       { key: 'tongyi_qwen', name: '千问 (Qwen)', category: 'text', available: true, state: 'ok', failedCount: 0 },
       { key: 'deepseek', name: 'DeepSeek', category: 'text', available: true, state: 'ok', failedCount: 0 },
@@ -557,6 +557,7 @@ async function loadHistory() {
     historyList.value = data.items || []
     historyTotal.value = data.total || 0
   } catch {
+    toast.error('加载历史记录失败');
     historyList.value = []
   } finally {
     historyLoading.value = false

@@ -49,6 +49,7 @@ import { formatDateTime } from '@/utils/format'
 const notifications = ref<any[]>([])
 const loading = ref(true)
 const error = ref('')
+const toast = useToast()
 const page = ref(1)
 const pageSize = 20
 const total = ref(0)
@@ -74,14 +75,14 @@ async function readOne(item: any) {
   try {
     await $fetch(`/api/notifications/${item.id}/read`, { method: 'PUT' })
     item.is_read = 1
-  } catch { /* ignore */ }
+  } catch { toast.error('标记已读失败') }
 }
 
 async function markAll() {
   try {
     await $fetch('/api/notifications/read-all', { method: 'PUT' })
     notifications.value.forEach((n: any) => n.is_read = 1)
-  } catch { /* ignore */ }
+  } catch { toast.error('全部标为已读失败') }
 }
 
 onMounted(fetchList)

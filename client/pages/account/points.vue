@@ -119,7 +119,7 @@ async function fetchAccount() {
   try {
     const res: any = await $fetch(`${apiBase}/points/account`)
     if (res.code === 200) account.value = res.data
-  } catch { /* ignore */ }
+  } catch { toast.error('加载积分账户失败') }
 }
 
 async function fetchTransactions() {
@@ -130,7 +130,7 @@ async function fetchTransactions() {
       transactions.value = res.data.list || []
       txTotal.value = res.data.total || 0
     }
-  } catch { /* ignore */ }
+  } catch { toast.error('加载积分记录失败') }
   loadingTx.value = false
 }
 

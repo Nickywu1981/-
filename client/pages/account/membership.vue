@@ -99,6 +99,7 @@
 
 const currentPlan = ref<any>(null);
 const autoRenew = ref(false);
+const toast = useToast()
 const buying = ref(false);
 const paying = ref(false);
 const showPayModal = ref(false);
@@ -121,7 +122,7 @@ async function loadMembership() {
       currentPlan.value = res.data || {};
       autoRenew.value = res.data?.auto_renew === 1;
     }
-  } catch { /* fallback */ }
+  } catch { toast.error('加载会员信息失败') }
 }
 
 async function toggleAutoRenew() {
@@ -133,7 +134,8 @@ async function toggleAutoRenew() {
       body: { autoRenew: autoRenew.value },
     });
   } catch {
-    autoRenew.value = !autoRenew.value; // revert on error
+    autoRenew.value = !autoRenew.value;
+    toast.error('切换自动续费失败');
   }
 }
 

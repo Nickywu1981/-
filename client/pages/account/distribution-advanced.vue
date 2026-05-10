@@ -171,7 +171,7 @@ async function loadPerformance() {
   try {
     const resp = await $fetch('/api/distribution/performance', { credentials: 'include' });
     perfData.value = resp.data || resp;
-  } catch { /* silent */ } finally { perfLoading.value = false; }
+  } catch { toast.error('加载业绩数据失败') } finally { perfLoading.value = false; }
 }
 
 async function loadPromo() {
@@ -179,7 +179,7 @@ async function loadPromo() {
   try {
     const resp = await $fetch('/api/distribution/promo', { credentials: 'include' });
     promoData.value = resp.data || resp;
-  } catch { /* silent */ } finally { promoLoading.value = false; }
+  } catch { toast.error('加载推广数据失败') } finally { promoLoading.value = false; }
 }
 
 async function loadCampaigns() {
@@ -187,7 +187,7 @@ async function loadCampaigns() {
   try {
     const resp = await $fetch('/api/distribution/campaigns', { credentials: 'include' });
     campData.value = resp.data || resp;
-  } catch { /* silent */ } finally { campLoading.value = false; }
+  } catch { toast.error('加载活动数据失败') } finally { campLoading.value = false; }
 }
 
 watch(activeSub, (val) => {

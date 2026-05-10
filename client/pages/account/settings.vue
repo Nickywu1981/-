@@ -92,6 +92,7 @@ const pwMsg = ref('');
 const pwMsgErr = ref(false);
 const phoneMsg = ref('');
 const phoneMsgErr = ref(false);
+const toast = useToast()
 let codeTimer: ReturnType<typeof setInterval> | null = null;
 
 onMounted(async () => {
@@ -99,7 +100,7 @@ onMounted(async () => {
     const res: any = await $fetch('/api/user/profile');
     Object.assign(form, { nickname: res.data?.nickname || '', phone: res.data?.phone || '', email: res.data?.email || '' });
     if (res.data?.phone) boundPhone.value = res.data.phone;
-  } catch { /* ignore */ }
+  } catch { toast.error('加载用户信息失败') }
 });
 
 async function saveProfile() {
