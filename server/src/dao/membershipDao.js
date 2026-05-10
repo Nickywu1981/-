@@ -22,10 +22,6 @@ const membershipDao = {
     return this.findByUserId(userId);
   },
 
-  async addCredits(userId, amount) {
-    await pool.execute('UPDATE user_membership SET credit_balance = credit_balance + ? WHERE user_id = ?', [amount, userId]);
-  },
-
   async setAutoRenew(userId, autoRenew) {
     await pool.execute('UPDATE user_membership SET auto_renew = ? WHERE user_id = ?', [autoRenew ? 1 : 0, userId]);
   },

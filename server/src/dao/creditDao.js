@@ -121,9 +121,13 @@ export async function adminRefund(userId, recordId, remark) {
   try {
     await conn.beginTransaction();
 
-    // 锁定记录
+    // 锁定消费记录
     const [[record]] = await conn.execute('SELECT id, user_id, type, action, credit_before, credit_after, consumed, status, remark, request_id, create_time, confirm_at FROM consumption_record WHERE id = ? AND status = 1 AND type = 2 FOR UPDATE', [recordId]);
     if (!record) { await conn.rollback(); return { ok: false, msg: '记录不存在或已退款' }; }
+
+    // 锁定会员余额行，防止并发退款/消费竞态
+    const [[membership]] = await conn.execute('SELECT id, credit_balance FROM user_membership WHERE user_id = ? AND status = 1 FOR UPDATE', [record.user_id]);
+    if (!membership) { await conn.rollback(); return { ok: false, msg: '会员不存在' }; }
 
     // 退款
     await conn.execute('UPDATE user_membership SET credit_balance = credit_balance + ? WHERE user_id = ? AND status = 1', [record.consumed, record.user_id]);

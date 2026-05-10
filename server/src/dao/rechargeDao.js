@@ -42,10 +42,6 @@ export default {
     await pool.query('UPDATE recharge_order SET pay_status = 3 WHERE order_no = ?', [orderNo]);
   },
 
-  async addCredit(userId, tenantId, amount) {
-    await pool.query('UPDATE user_membership SET credit_balance = credit_balance + ? WHERE user_id = ? AND tenant_id = ?', [amount, userId, tenantId]);
-  },
-
   async addConsumptionRecord(data) {
     const [r] = await pool.query(
       'INSERT INTO consumption_record (tenant_id, user_id, type, amount, balance_after, remark, request_id) VALUES (?, ?, ?, ?, (SELECT credit_balance FROM user_membership WHERE user_id = ? AND tenant_id = ?), ?, ?)',
