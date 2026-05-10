@@ -48,10 +48,10 @@ router.post('/upload', authMiddleware, upload.single('model'), (req, res, next) 
   try {
     if (!req.file) return error(res, ERROR_CODE.BAD_REQUEST, '请上传 3D 模型文件');
     const url = `/uploads/3d/${req.file.filename}`;
-    logger.info(`[3D] 模型上传: ${req.file.originalname} → ${url}`);
+    logger.info(`[3D] 模型上传: ${req.file.filename} → ${url}`);
     return success(res, {
       url,
-      name: req.file.originalname,
+      name: req.file.originalname.replace(/[\\/:*?"<>|]/g, '_'),
       size: req.file.size,
     }, '上传成功');
   } catch (e) { next(e); }

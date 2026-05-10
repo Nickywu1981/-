@@ -3,7 +3,7 @@ import { success, listResult, error, mockSuccess } from '../../utils/response.js
 
 
 function mockRes() {
-  return { json: vi.fn(), status: vi.fn() };
+  return { json: vi.fn(), status: vi.fn(), setHeader: vi.fn() };
 }
 
 describe('success', () => {

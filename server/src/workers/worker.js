@@ -53,6 +53,7 @@ function getApiKey() {
 }
 
 async function processJob(job) {
+  if (!job?.id) return;
   activeJobIds.add(job.id);
   try {
     await jobQueueService.updateProgress(job.id, 10);

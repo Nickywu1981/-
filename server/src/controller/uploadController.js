@@ -11,9 +11,10 @@ export const uploadFile = wrapController(async (req, res) => {
     }
 
     const url = `/uploads/images/${req.file.filename}`;
+    const safeName = req.file.originalname.replace(/[\\/:*?"<>|]/g, '_');
     return success(res, {
       url,
-      originalName: req.file.originalname,
+      originalName: safeName,
       size: req.file.size,
       mimeType: req.file.mimetype,
     }, '上传成功');
@@ -26,7 +27,7 @@ export const uploadMultipleFiles = wrapController(async (req, res) => {
 
     const urls = req.files.map((f) => ({
       url: `/uploads/images/${f.filename}`,
-      originalName: f.originalname,
+      originalName: f.originalname.replace(/[\\/:*?"<>|]/g, '_'),
       size: f.size,
     }));
 

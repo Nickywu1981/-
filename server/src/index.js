@@ -29,11 +29,13 @@ wsManager.attach(server);
 // BullMQ Worker 启动（非阻塞，Redis 不可用时降级）
 import('./services/workerBootstrap.js').then(({ bootstrapWorkers }) => bootstrapWorkers()).catch((err) => { logger.warn('[Worker] 启动失败，队列将降级', { error: err.message }); });
 
+let cleanupTimer = null;
+
 server.listen(port, () => {
   logger.info(`${env} 模式 — http://localhost:${port}  |  WebSocket /ws  |  BullMQ Workers`);
 
   // 定时清理废弃上传 (每 30 分钟)
-  setInterval(() => {
+  cleanupTimer = setInterval(() => {
     import('./utils/file-upload.js').then(({ cleanupStaleUploads }) => cleanupStaleUploads()).catch((err) => { logger.warn('[Cleanup] 加载失败', { error: err.message }); });
   }, 30 * 60 * 1000);
 });
@@ -57,6 +59,9 @@ function gracefulShutdown(signal) {
   logger.info(`收到 ${signal}，开始优雅关闭...`);
   const isCrash = signal === 'uncaughtException' || signal === 'unhandledRejection';
   const exitCode = isCrash ? 1 : 0;
+
+  // 清理定时器
+  if (cleanupTimer) { clearInterval(cleanupTimer); cleanupTimer = null; }
 
   server.close(async () => {
     logger.info('HTTP/WS 服务已停止');

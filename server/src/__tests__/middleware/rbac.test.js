@@ -197,6 +197,7 @@ describe('roleGuard', () => {
     const res = {};
     res.status = vi.fn(() => res);
     res.json = vi.fn(() => res);
+    res.setHeader = vi.fn(() => res);
     return res;
   };
 

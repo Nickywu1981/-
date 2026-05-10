@@ -14,12 +14,13 @@ const CONSUMPTION_RULES = {
 
 /** 计算消耗 */
 function calcConsumed(action, batchCount = 1, isNight = false) {
+  const safeBatch = Math.max(1, Number.isFinite(batchCount) ? Math.floor(batchCount) : 1);
   const base = CONSUMPTION_RULES[action] || 1;
-  if (batchCount > 1) {
+  if (safeBatch > 1) {
     const discount = isNight ? CONSUMPTION_RULES.night_batch_discount : CONSUMPTION_RULES.batch_discount;
-    return Math.ceil(base * batchCount * discount);
+    return Math.ceil(base * safeBatch * discount);
   }
-  return base;
+  return Math.max(1, base);
 }
 
 // ==================== 冻结（预扣） ====================

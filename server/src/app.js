@@ -109,7 +109,16 @@ app.set('trust proxy', 'loopback');
 // 基础安全中间件
 app.use(helmet());
 app.use(cspMiddleware);
-app.use(cors({ credentials: true, origin: process.env.CORS_ORIGIN || (process.env.NODE_ENV === 'production' ? 'https://movio.ai' : true) }));
+const ALLOWED_ORIGINS = (process.env.CORS_ORIGIN || 'http://localhost:3000,http://localhost:3001').split(',').map(s => s.trim());
+app.use(cors({
+  credentials: true,
+  origin: (origin, callback) => {
+    // 允许无 Origin 的请求（服务端调用、Postman、curl）
+    if (!origin) return callback(null, true);
+    if (ALLOWED_ORIGINS.includes(origin)) return callback(null, true);
+    callback(new Error(`CORS blocked: ${origin}`));
+  },
+}));
 
 // 响应压缩
 app.use(compression());
@@ -259,7 +268,7 @@ app.use('/api/users', userRoutes);  // must precede /api/user to avoid prefix ma
 app.use('/api/user', userRoutesV4);
 app.use('/api/upload', uploadLimiter, uploadRoutesV4);
 app.use('/api/open', openApiRoutes);
-app.use('/api/open', openApiKeyRoutes);
+app.use('/api/open/keys', openApiKeyRoutes);
 app.use('/api/copywriting', copywritingRoutes);
 app.use('/api/templates', sizeTemplateRoutes);
 app.use('/api/brand', brandRoutes);

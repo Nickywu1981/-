@@ -76,6 +76,15 @@ export default {
     await pool.query('UPDATE custom_form SET submit_count = submit_count + 1 WHERE id = ?', [formId]);
   },
 
+  /** 原子递增并检查上限，返回 true=成功，false=已达上限 */
+  async incrementSubmitCountAtomic(formId, submitLimit) {
+    const [r] = await pool.query(
+      'UPDATE custom_form SET submit_count = submit_count + 1 WHERE id = ? AND (submit_limit = 0 OR submit_count < submit_limit)',
+      [formId, submitLimit],
+    );
+    return r.affectedRows > 0;
+  },
+
   // ── 提交管理 ──
   async getUserSubmissionCount(formId, userId) {
     const [rows] = await pool.query(

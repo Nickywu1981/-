@@ -183,7 +183,6 @@ export async function submitForm(code, tenantId, userId, rawData, ip, userAgent,
   if (form.access_type !== FORM_ACCESS_TYPE.PUBLIC) throw new BusinessError(403, '此表单不公开');
   if (form.start_time && new Date(form.start_time) > new Date()) throw new BusinessError(400, '表单尚未开放');
   if (form.end_time && new Date(form.end_time) < new Date()) throw new BusinessError(400, '表单已结束');
-  if (form.submit_limit > 0 && form.submit_count >= form.submit_limit) throw new BusinessError(400, '已达提交上限');
 
   // 每用户提交上限
   if (form.max_submissions_per_user > 0 && userId) {
@@ -222,13 +221,17 @@ export async function submitForm(code, tenantId, userId, rawData, ip, userAgent,
       : val;
   }
 
-  // 4️⃣ 提交
+  // 4️⃣ 原子提交（TOCTOU 防护：原子递增+上限检查）
   const ipLong = ip ? ip.split('.').reduce((acc, octet) => (acc << 8) + parseInt(octet, 10), 0) >>> 0 : null;
   const id = await formDao.addSubmission({
     formId: form.id, tenantId, userId,
     dataJson: maskedData, ip, userAgent, deviceType, ipLong,
   });
-  await formDao.incrementSubmitCount(form.id);
+  const incremented = await formDao.incrementSubmitCountAtomic(form.id, form.submit_limit);
+  if (!incremented) {
+    logger.warn(`[Form] 提交上限竞态拦截 formId=${form.id}`);
+    throw new BusinessError(400, '已达提交上限');
+  }
 
   // 5️⃣ 异步发邮件通知
   if (form.notify_email) {
@@ -263,8 +266,8 @@ export async function updateSubmission(subId, data) {
 export async function exportSubmissions(formId, _format = 'csv') {
   const batchSize = 1000;
   let page = 1;
-  let allRows: any[] = [];
-  let batch: any[];
+  let allRows = [];
+  let batch;
   do {
     batch = await formDao.getAllSubmissions(formId, { page, pageSize: batchSize });
     allRows = allRows.concat(batch);

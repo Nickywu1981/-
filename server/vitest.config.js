@@ -1,3 +1,5 @@
+process.env.ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'exactly-32-byte-encryption-key!!';
+
 export default {
   test: {
     include: ['src/__tests__/**/*.test.{js,mjs}'],
@@ -6,6 +8,7 @@ export default {
     mockReset: true,
     restoreMocks: true,
     globals: true,
+    setupFiles: ['./vitest.setup.js'],
     env: {
       ENCRYPTION_KEY: 'exactly-32-byte-encryption-key!!',
     },

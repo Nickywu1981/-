@@ -41,7 +41,7 @@ describe('sqlGuardMiddleware', () => {
   it('恶意 query 参数被拦截返回 400', () => {
     const json = vi.fn();
     const status = vi.fn();
-    const res = { json, status };
+    const res = { json, status, setHeader: vi.fn() };
     const req = { query: { q: "1' UNION SELECT" }, body: {} };
     const next = vi.fn();
     sqlGuardMiddleware(req, res, next);

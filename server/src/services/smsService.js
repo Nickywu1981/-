@@ -18,7 +18,7 @@ const CODE_CACHE = new Map();
 const providers = {
   mock: {
     async send({ phone, content, templateCode }) {
-      logger.info(`[SMS Mock] → ${phone} | ${templateCode} | ${content}`);
+      logger.info(`[SMS Mock] → ${phone.slice(0,3)}****${phone.slice(-4)} | ${templateCode} | ${content.slice(0,20)}...`);
       return { success: true, raw: { code: 'OK', messageId: `mock_${Date.now()}` } };
     },
   },
