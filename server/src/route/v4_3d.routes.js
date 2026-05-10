@@ -101,7 +101,11 @@ router.get('/demo/:key', _validate(demoParamsSchema, 'params'), (req, res, next)
     const file = DEMO_MODELS[req.validated.key];
     if (!file) return error(res, ERROR_CODE.NOT_FOUND, '示例模型不存在');
     const filePath = path.join(uploadDir, 'demo', file);
-    if (!fs.existsSync(filePath)) return error(res, ERROR_CODE.NOT_FOUND, '示例模型文件不存在');
+    try {
+      await fs.promises.access(filePath);
+    } catch {
+      return error(res, ERROR_CODE.NOT_FOUND, '示例模型文件不存在');
+    }
     return res.sendFile(filePath);
   } catch (e) { next(e); }
 });
