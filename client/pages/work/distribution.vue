@@ -138,18 +138,20 @@ const saveDraft = async () => {
       body: { title: form.title, description: form.description, platforms: selected.value },
     })
     toast.success('草稿已保存')
-  } catch { toast.warn('草稿保存失败') }
+  } catch (e: any) {
+    toast.error(e.data?.msg || e.message || '保存草稿失败，请稍后重试')
+  }
 }
 
 const retry = async (id: number) => {
-  try { await $fetch(`/api/publish/retry/${id}`, { method: 'POST' }); fetchHistory() } catch { toast.warn('重试失败') }
+  try { await $fetch(`/api/publish/retry/${id}`, { method: 'POST' }); fetchHistory() } catch (e: any) { toast.warn(e.data?.msg || e.message || '重试分发失败，请稍后重试') }
 }
 
 const fetchHistory = async () => {
   loading.value = true
   try {
     const { data, error } = await useFetch('/api/distribution/history')
-    if (error.value) { toast.error((error.value as any)?.message || '加载历史失败'); return }
+    if (error.value) { toast.error((error.value as any)?.message || (error.value as any)?.data?.msg || '加载分发历史失败'); return }
     history.value = (data.value as any)?.list || (data.value as any)?.data || []
   } finally {
     loading.value = false

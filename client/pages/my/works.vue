@@ -14,7 +14,7 @@
 
     <template v-else>
       <div v-if="filteredList.length > 0" class="grid">
-        <div v-for="item in filteredList" :key="item.id" class="card" @click="viewDetail(item)">
+        <div v-for="item in filteredList" :key="item.id" class="card" tabindex="0" role="button" @click="viewDetail(item)" @keydown.enter="viewDetail(item)" @keydown.space.prevent="viewDetail(item)">
           <div class="card-img">
             <img
               v-if="getThumbnail(item)"

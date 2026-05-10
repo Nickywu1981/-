@@ -26,7 +26,7 @@
 
     <template v-else>
       <div v-if="works.length > 0" class="works-grid">
-        <div v-for="item in works" :key="item.id" class="work-card" @click="openDetail(item)">
+        <div v-for="item in works" :key="item.id" class="work-card" tabindex="0" role="button" @click="openDetail(item)" @keydown.enter="openDetail(item)" @keydown.space.prevent="openDetail(item)">
           <div class="card-thumb">
             <img v-if="item.thumbnail" :src="item.thumbnail" :alt="item.title" loading="lazy" />
             <div v-else class="thumb-placeholder">{{ typeIcon(item.type) }}</div>

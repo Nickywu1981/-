@@ -93,3 +93,53 @@ const removeFavorite = async (id: number) => {
 watch(page, fetchFavorites)
 onMounted(fetchFavorites)
 </script>
+
+<style scoped>
+.favorites-page { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
+
+.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+.page-header h1 { font-size: 22px; font-weight: 700; color: var(--text-primary); }
+.subtitle { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+
+.header-actions { display: flex; gap: 8px; }
+.btn-outline { padding: 6px 16px; border: 1px solid var(--border-light); border-radius: 20px; background: var(--bg-card); color: var(--text-secondary); font-size: 13px; cursor: pointer; transition: all var(--transition-fast); }
+.btn-outline:hover { border-color: var(--brand); color: var(--brand); }
+.btn-outline.active { background: var(--brand-gradient); color: #fff; border-color: transparent; }
+
+.favorites-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+
+.favorite-card { background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-lg); overflow: hidden; transition: all var(--transition-fast); }
+.favorite-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(124,58,237,0.08); border-color: var(--brand-soft); }
+
+.card-preview { position: relative; aspect-ratio: 1; background: var(--bg-hover); overflow: hidden; }
+.card-preview img { width: 100%; height: 100%; object-fit: cover; }
+.card-placeholder { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 36px; }
+
+.card-remove { position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; border-radius: 50%; border: none; background: rgba(0,0,0,0.5); color: #fff; font-size: 16px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity var(--transition-fast); }
+.favorite-card:hover .card-remove { opacity: 1; }
+
+.card-body { padding: 12px; }
+.card-type { font-size: 11px; padding: 2px 8px; border-radius: 4px; background: var(--brand-light); color: var(--brand); }
+.card-title { font-size: 14px; font-weight: 500; color: var(--text-primary); margin: 6px 0 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-meta { font-size: 12px; color: var(--text-muted); }
+
+.error-state, .empty-state { text-align: center; padding: 60px 20px; }
+.error-icon, .empty-icon { font-size: 48px; display: block; margin-bottom: 12px; }
+.error-state p { color: var(--danger); font-size: 15px; margin-bottom: 16px; }
+.empty-state p { color: var(--text-secondary); font-size: 15px; margin-bottom: 16px; }
+.btn-primary { display: inline-block; padding: 10px 24px; background: var(--brand-gradient); color: #fff; border: none; border-radius: var(--radius-md); font-size: 14px; cursor: pointer; text-decoration: none; font-weight: 600; transition: opacity var(--transition-fast); }
+.btn-primary:hover { opacity: 0.9; }
+
+.pagination { display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 32px; font-size: 14px; }
+.pagination button { padding: 6px 20px; border: 1px solid var(--border-light); border-radius: 6px; background: var(--bg-card); cursor: pointer; }
+.pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+.pagination span { color: var(--text-muted); }
+
+@media (max-width: 768px) {
+  .favorites-grid { grid-template-columns: repeat(2, 1fr); }
+  .page-header { flex-direction: column; align-items: flex-start; }
+}
+@media (max-width: 480px) {
+  .favorites-grid { grid-template-columns: 1fr; }
+}
+</style>
