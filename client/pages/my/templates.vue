@@ -102,4 +102,5 @@ h2 { font-size: 22px; margin-bottom: 16px; }
 .card-platform { font-size: 12px; color: var(--text-tertiary); }
 .btn-del { margin-top: 8px; padding: 4px 12px; background: none; border: 1px solid var(--danger); color: var(--danger); border-radius: 4px; font-size: 12px; cursor: pointer; opacity: 0.6; }
 .empty { text-align: center; padding: 60px 0; color: var(--text-tertiary); }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 </style>
