@@ -25,6 +25,7 @@ const toast = useToast()
 <script setup lang="ts">
 const items = ref<any[]>([])
 const loading = ref(true)
+const { download } = useFileDownload()
 
 function statusLabel(s: string) {
   return { pending:'排队中', processing:'处理中', completed:'已完成', failed:'失败', cancelled:'已取消' }[s] || s || '未知'
@@ -44,8 +45,7 @@ onMounted(async () => {
 
 function downloadItem(item: any) {
   if (!item.result_url) return
-  const a = document.createElement('a')
-  a.href = item.result_url; a.download = item.name || `output_${item.id}.png`; a.click()
+  download(item.result_url, item.name || `output_${item.id}.png`)
 }
 
 function exportAll() {

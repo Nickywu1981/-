@@ -243,12 +243,7 @@ async function loadWorks() {
   }
 }
 
-function download(url) {
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = '';
-  a.click();
-}
+const { download } = useFileDownload()
 
 // load sizes/styles on mount
 onMounted(async () => {

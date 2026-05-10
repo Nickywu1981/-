@@ -79,6 +79,7 @@ const dateEnd = ref('')
 const loading = ref(true)
 const detail = ref<any>(null)
 const stats = ref<any>(null)
+const { downloadBlob } = useFileDownload()
 const toast = useToast()
 
 async function fetch() {
@@ -111,9 +112,7 @@ function exportLogs() {
   const csv = ['ID,用户ID,操作,级别,详情,IP,时间']
   list.value.forEach(l => csv.push(`${l.id},${l.user_id},"${l.action}","${l.level || 'INFO'}","${l.detail || ''}",${l.ip || ''},"${l.create_time}"`))
   const blob = new Blob(['\uFEFF' + csv.join('\n')], { type: 'text/csv;charset=utf-8' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a'); a.href = url; a.download = `logs-${new Date().toISOString().slice(0,10)}.csv`; a.click()
-  URL.revokeObjectURL(url)
+  downloadBlob(blob, `logs-${new Date().toISOString().slice(0,10)}.csv`)
   toast.success('CSV 已导出')
 }
 

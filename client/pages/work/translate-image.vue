@@ -125,9 +125,7 @@ async function startTranslate() {
 }
 
 function downloadResult() {
-  if (resultUrl.value) {
-    const a = document.createElement('a'); a.href = resultUrl.value; a.download = 'translated.png'; a.click()
-  }
+  if (resultUrl.value) { download(resultUrl.value, 'translated.png') }
 }
 
 function resetAll() { previewUrl.value = ''; resultUrl.value = '' }

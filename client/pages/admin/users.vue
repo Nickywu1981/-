@@ -107,6 +107,7 @@ const saving = ref(false)
 const selectedIds = ref(new Set<number>())
 const editOpen = ref(false)
 const editForm = ref<any>({})
+const { downloadBlob } = useFileDownload()
 
 const toast = useToast()
 
@@ -185,10 +186,7 @@ function exportCSV() {
   ])
   const csv = [headers.join(','), ...rows.map(r => r.map(c => `"${c}"`).join(','))].join('\n')
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url; a.download = `用户列表_${new Date().toISOString().slice(0, 10)}.csv`
-  a.click(); URL.revokeObjectURL(url)
+  downloadBlob(blob, `用户列表_${new Date().toISOString().slice(0, 10)}.csv`)
   toast.success('导出成功')
 }
 </script>

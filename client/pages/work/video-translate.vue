@@ -204,7 +204,7 @@ async function loadHistory() {
   } catch (e: any) { useToast().error(e?.data?.msg || e?.message || '加载历史记录失败') } finally { loadingHistory.value = false; }
 }
 
-function download(url: string) { const a = document.createElement('a'); a.href = url; a.download = ''; a.click(); }
+const { download } = useFileDownload()
 
 onMounted(async () => {
   try {

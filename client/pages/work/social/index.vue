@@ -198,12 +198,11 @@ function doSubmit() {
     .finally(() => { submitting.value = false; clearInterval(loadingTimer) })
 }
 
+const { download } = useFileDownload()
+
 function doDownload() {
   if (result.value?.imageUrl) {
-    const a = document.createElement('a')
-    a.href = result.value.imageUrl
-    a.download = `social_cover_${Date.now()}.png`
-    a.click()
+    download(result.value.imageUrl, `social_cover_${Date.now()}.png`)
   }
 }
 

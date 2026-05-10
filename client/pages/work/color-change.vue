@@ -88,6 +88,6 @@ async function submitTask() {
 }
 
 function downloadImage() {
-  if (resultUrl.value) { const a = document.createElement('a'); a.href = resultUrl.value; a.download = 'color-changed.png'; a.click() }
+  if (resultUrl.value) { download(resultUrl.value, 'color-changed.png') }
 }
 </script>

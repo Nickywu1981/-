@@ -196,7 +196,7 @@ function startPolling(taskId: string) {
 function stopPolling() { if (pollTimer) { clearTimeout(pollTimer); pollTimer = null } }
 
 function downloadResult() {
-  if (resultUrl.value) { const a = document.createElement('a'); a.href = resultUrl.value; a.download = 'white-bg.jpg'; a.click() }
+  if (resultUrl.value) { download(resultUrl.value, 'white-bg.jpg') }
 }
 
 function resetAll() { stopPolling(); currentStep.value = 0; taskStatus.value = -1; resultUrl.value = ''; clearImage() }

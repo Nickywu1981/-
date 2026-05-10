@@ -69,7 +69,8 @@ async function submitTask() {
     step.value = 1
   } finally { processing.value = false }
 }
-function downloadImage() { if (resultUrl.value) { const a = document.createElement('a'); a.href = resultUrl.value; a.download = 'text-effect.png'; a.click() } }
+const { download } = useFileDownload()
+function downloadImage() { if (resultUrl.value) download(resultUrl.value, 'text-effect.png') }
 function resetAll() { step.value = 0; text.value = ''; resultUrl.value = ''; processing.value = false }
 </script>
 

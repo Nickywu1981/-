@@ -87,7 +87,8 @@ async function submitTask() {
     step.value = 1
   } finally { processing.value = false }
 }
-function downloadImage() { if (resultUrl.value) { const a = document.createElement('a'); a.href = resultUrl.value; a.download = 'panorama.png'; a.click() } }
+const { download } = useFileDownload()
+function downloadImage() { if (resultUrl.value) download(resultUrl.value, 'panorama.png') }
 function resetAll() { step.value = 0; previewUrl.value = ''; uploadedUrl.value = ''; resultUrl.value = ''; processing.value = false }
 </script>
 

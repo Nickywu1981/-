@@ -192,6 +192,7 @@ const TEMPLATES = {
 };
 
 const activeTab = ref('product');
+const { download } = useFileDownload()
 const prompt = ref('');
 const styleOverride = ref('');
 const enhancedPrompt = ref('');
@@ -336,10 +337,7 @@ function retry() {
 
 function downloadImage(url) {
   if (!url) return;
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `poster_${activeTab.value}_${Date.now()}.png`;
-  a.click();
+  download(url, `poster_${activeTab.value}_${Date.now()}.png`);
 }
 
 async function copyImage(url) {

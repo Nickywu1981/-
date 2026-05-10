@@ -212,9 +212,7 @@ function startPolling(taskId: string) {
 function stopPolling() { if (pollTimer) { clearTimeout(pollTimer); pollTimer = null } }
 
 function downloadResult() {
-  if (resultUrl.value) {
-    const a = document.createElement('a'); a.href = resultUrl.value; a.download = 'remove-bg.png'; a.click()
-  }
+  if (resultUrl.value) { download(resultUrl.value, 'remove-bg.png') }
 }
 
 function resetAll() {

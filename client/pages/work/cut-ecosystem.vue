@@ -151,6 +151,7 @@ const page = ref(1)
 const pageSize = 20
 const totalPages = ref(1)
 const filterType = ref('')
+const { downloadBlob } = useFileDownload()
 
 const platforms = [
   { key: 'jianying', name: '剪映', icon: '✂️', desc: '国内专业版，抖音创作者首选' },
@@ -234,12 +235,7 @@ function downloadDraft() {
   if (!draftResult.value) return
   const json = JSON.stringify(draftResult.value, null, 2)
   const blob = new Blob([json], { type: 'application/json' })
-  const url = createBlobUrl(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = `${draftResult.value.draft.draft_name || 'movio-draft'}.json`
-  a.click()
-  revoke(url)
+  downloadBlob(blob, `${draftResult.value.draft.draft_name || 'movio-draft'}.json`)
 }
 </script>
 

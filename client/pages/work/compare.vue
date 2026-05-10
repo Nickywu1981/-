@@ -161,6 +161,7 @@ const pickerTarget = ref<'original' | 'variant' | number>('original')
 const pickerTab = ref<'works' | 'upload'>('works')
 const pickerSelected = ref('')
 const gridPickerIndex = ref(-1)
+const { download } = useFileDownload()
 
 const works = ref<any[]>([])
 const worksLoading = ref(false)
@@ -251,7 +252,7 @@ function handleUploadDrop(e: DragEvent) {
 function downloadBoth() {
   [original, variant].forEach((img) => {
     if (!img.src) return
-    const a = document.createElement('a'); a.href = img.src; a.download = img.alt || 'compare.png'; a.click()
+    download(img.src, img.alt || 'compare.png')
   })
 }
 </script>
