@@ -197,10 +197,9 @@ export function editorAuth(req, res, next) {
   next();
 }
 
-// ========================= 超级管理员认证 =========================
-
+/** 超级管理员认证 */
 export function superAdminAuth(req, res, next) {
-  if (!req.user || req.user.role !== 'super_admin') {
+  if (!hasRole(req.user, 'super_admin')) {
     return sendError(res, ERROR_CODE.FORBIDDEN, '需要超级管理员权限');
   }
   next();

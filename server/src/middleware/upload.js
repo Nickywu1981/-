@@ -10,6 +10,7 @@ import { error } from '../utils/response.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const UPLOAD_DIR = path.join(__dirname, '../../uploads/images');
+fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
 // 文件头魔数签名（前 N 字节十六进制）
 const MAGIC_SIGNATURES = {
@@ -28,7 +29,10 @@ function checkMagicNumber(filePath, mimeType) {
   const expected = MAGIC_SIGNATURES[mimeType];
   if (!expected) return true; // 无签名定义时信任 MIME
   try {
-    const buf = fs.readFileSync(filePath, { flag: 'r' });
+    const fd = fs.openSync(filePath, 'r');
+    const buf = Buffer.alloc(expected.length);
+    fs.readSync(fd, buf, 0, expected.length, 0);
+    fs.closeSync(fd);
     for (let i = 0; i < expected.length; i++) {
       if (buf[i] !== expected[i]) return false;
     }

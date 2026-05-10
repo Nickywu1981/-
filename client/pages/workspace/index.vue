@@ -83,9 +83,14 @@ const defaultCards: Card[] = [
 const recentProjects = ref<{ icon: string; name: string; time: string; path: string }[]>([])
 
 onMounted(async () => {
+  const [cfgResult, meResult] = await Promise.allSettled([
+    $fetch('/api/site-config/public'),
+    $fetch('/api/auth/me', { credentials: 'include' }),
+  ])
+
   // 加载功能卡片配置
-  try {
-    const cfg: any = await $fetch('/api/site-config/public')
+  if (cfgResult.status === 'fulfilled') {
+    const cfg: any = cfgResult.value
     if (cfg?.workspace_cards && Array.isArray(cfg.workspace_cards)) {
       const cards: Card[] = cfg.workspace_cards.filter((c: Card) => c.visible !== false)
       const groups: Record<string, Card[]> = {}
@@ -96,11 +101,15 @@ onMounted(async () => {
       })
       cardGroups.value = groups
     } else {
-      throw new Error('empty')
+      const groups: Record<string, Card[]> = {}
+      defaultCards.forEach(c => {
+        if (!groups[c.category]) groups[c.category] = []
+        groups[c.category].push(c)
+      })
+      cardGroups.value = groups
     }
-  } catch (e: any) {
-    console.error('[工作台] 配置加载失败，使用默认卡片', e.message)
-    // fallback to defaults
+  } else {
+    console.error('[工作台] 配置加载失败，使用默认卡片', cfgResult.reason?.message)
     const groups: Record<string, Card[]> = {}
     defaultCards.forEach(c => {
       if (!groups[c.category]) groups[c.category] = []
@@ -110,20 +119,20 @@ onMounted(async () => {
   }
 
   // 加载最近项目
-  try {
-    const data = await $fetch('/api/auth/me', { credentials: 'include' })
-    recentProjects.value = (data as any).recentItems || []
-    if (!recentProjects.value.length) throw new Error('empty')
-  } catch {
+  if (meResult.status === 'fulfilled') {
+    const data: any = meResult.value
+    recentProjects.value = (data).recentItems || []
+  }
+  if (!recentProjects.value.length) {
     recentProjects.value = [
       { icon: '🖼', name: '夏季连衣裙白底图', time: '2小时前', path: '/workspace/creation' },
       { icon: '🎥', name: '护肤品展示视频', time: '昨天', path: '/workspace/creation' },
       { icon: '📄', name: '面膜详情页设计', time: '昨天', path: '/workspace/creation' },
       { icon: '📰', name: '618活动海报', time: '2天前', path: '/workspace/creation' },
     ]
-  } finally {
-    loading.value = false
   }
+
+  loading.value = false
 })
 </script>
 

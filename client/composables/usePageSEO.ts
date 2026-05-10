@@ -293,7 +293,7 @@ export function usePageSEO(overrides?: { title?: string; description?: string; k
     script: [
       {
         type: 'application/ld+json',
-        innerHTML: JSON.stringify({
+        children: JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'WebApplication',
           name: `Movio AI — ${title}`,

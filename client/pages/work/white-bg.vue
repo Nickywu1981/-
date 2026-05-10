@@ -126,7 +126,9 @@ const taskStatus = ref(-1)
 const progress = ref(0)
 const progressMsg = ref('')
 const errorMsg = ref('')
-let pollTimer: ReturnType<typeof setInterval> | null = null
+let pollTimer: ReturnType<typeof setTimeout> | null = null
+let pollCount = 0
+let consecutiveFailures = 0
 
 function handleDrop(e: DragEvent) {
   const file = e.dataTransfer?.files?.[0]
@@ -170,18 +172,27 @@ async function startWhiteBg() {
 
 function startPolling(taskId: string) {
   stopPolling()
-  pollTimer = setInterval(async () => {
+  pollCount = 0
+  consecutiveFailures = 0
+  const poll = async () => {
     try {
       const res: any = await $fetch(`/api/images/tasks/${taskId}`, { credentials: 'include' })
       const d = res.data
       taskStatus.value = d.status; progress.value = d.progress ?? 0; progressMsg.value = d.progress_msg || ''
-      if (d.status === 2) { resultUrl.value = d.output_result?.url || d.resultUrl || uploadedUrl.value; stopPolling() }
-      else if (d.status === 3) { errorMsg.value = d.error_msg || '任务失败'; stopPolling() }
-    } catch { /* continue */ }
-  }, 1000)
+      consecutiveFailures = 0
+      if (d.status === 2) { resultUrl.value = d.output_result?.url || d.resultUrl || uploadedUrl.value; stopPolling(); return }
+      else if (d.status === 3) { errorMsg.value = d.error_msg || '任务失败'; stopPolling(); return }
+    } catch { consecutiveFailures++ }
+    pollCount++
+    let interval = 1000
+    if (pollCount > 5) interval = 3000
+    if (consecutiveFailures > 3) interval = 5000
+    pollTimer = setTimeout(poll, interval)
+  }
+  poll()
 }
 
-function stopPolling() { if (pollTimer) { clearInterval(pollTimer); pollTimer = null } }
+function stopPolling() { if (pollTimer) { clearTimeout(pollTimer); pollTimer = null } }
 
 function downloadResult() {
   if (resultUrl.value) { const a = document.createElement('a'); a.href = resultUrl.value; a.download = 'white-bg.jpg'; a.click() }

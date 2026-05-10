@@ -214,11 +214,17 @@ export async function createImageWorker() {
   });
 }
 
-// 预加载
+// 预加载 + 周期重连检测
 ensureBullMQ().then(() => checkRedis()).then((ok) => {
   if (ok) logger.info('[BullMQ] Redis 已连接，队列功能可用');
   else logger.warn('[BullMQ] Redis 未运行 — 队列降级为同步模式，启动后自动恢复');
 });
+setInterval(async () => {
+  if (!redisAvailable && bullmqAvailable) {
+    const ok = await checkRedis();
+    if (ok) logger.info('[BullMQ] Redis 已恢复，队列功能重新可用');
+  }
+}, 60000).unref();
 
 export default {
   getQueue, registerWorker, addJob, getJobStatus,
