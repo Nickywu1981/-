@@ -34,6 +34,7 @@ const recordUsageSchema = z.object({
 const rateSchema = z.object({
   score: z.coerce.number().int().min(1, '最低1分').max(5, '最高5分'),
 });
+const idParamSchema = z.object({ id: z.string().regex(/^\d+$/).transform(Number) });
 
 router.use(authMiddleware);
 
@@ -43,10 +44,10 @@ router.get('/templates', asyncHandler(listTemplates));
 const submitReviewSchema = z.object({
   id: z.coerce.number().int().positive('模板ID无效'),
 });
-router.get('/templates/:id', asyncHandler(getTemplateDetail));
+router.get('/templates/:id', validate(idParamSchema, 'params'), asyncHandler(getTemplateDetail));
 router.post('/templates', validate(createTemplateSchema), asyncHandler(createTemplate));
 router.post('/templates/:id/submit-review', validate(submitReviewSchema, 'params'), asyncHandler(submitForReview));
-router.post('/templates/:id/fill', validate(fillSchema), asyncHandler(fillAndPreview));
+router.post('/templates/:id/fill', validate(idParamSchema, 'params'), validate(fillSchema), asyncHandler(fillAndPreview));
 
 // 收藏
 router.get('/favorites', asyncHandler(listFavorites));
@@ -55,18 +56,18 @@ router.post('/favorites/toggle', validate(toggleFavoriteSchema), asyncHandler(to
 // 分组
 router.get('/groups', asyncHandler(listGroups));
 router.post('/groups', validate(groupSchema), asyncHandler(createGroup));
-router.put('/groups/:id', validate(groupSchema), asyncHandler(renameGroup));
-router.delete('/groups/:id', asyncHandler(deleteGroup));
+router.put('/groups/:id', validate(idParamSchema, 'params'), validate(groupSchema), asyncHandler(renameGroup));
+router.delete('/groups/:id', validate(idParamSchema, 'params'), asyncHandler(deleteGroup));
 
 // 智能推荐
 router.get('/recommendations', asyncHandler(getRecommendations));
 
 // 使用历史
 router.get('/usage-history', asyncHandler(usageHistory));
-router.post('/:id/use', validate(recordUsageSchema), asyncHandler(recordUsage));
+router.post('/:id/use', validate(idParamSchema, 'params'), validate(recordUsageSchema), asyncHandler(recordUsage));
 
 // 评分
-router.post('/:id/rate', validate(rateSchema), asyncHandler(rateTemplate));
-router.get('/:id/rating', asyncHandler(getTemplateRating));
+router.post('/:id/rate', validate(idParamSchema, 'params'), validate(rateSchema), asyncHandler(rateTemplate));
+router.get('/:id/rating', validate(idParamSchema, 'params'), asyncHandler(getTemplateRating));
 
 export default router;

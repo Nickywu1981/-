@@ -13,12 +13,13 @@ const tenantSchema = z.object({
   settings: z.record(z.unknown()).optional(),
 });
 const tenantUpdateSchema = tenantSchema.partial();
+const idParamSchema = z.object({ id: z.string().regex(/^\d+$/).transform(Number) });
 
 router.get('/', authMiddleware, adminAuth, asyncHandler(listTenants));
 router.get('/me', authMiddleware, asyncHandler(getMyTenant));
-router.get('/:id', authMiddleware, adminAuth, asyncHandler(getTenant));
+router.get('/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(getTenant));
 router.post('/', authMiddleware, adminAuth, validate(tenantSchema), asyncHandler(createTenant));
-router.put('/:id', authMiddleware, adminAuth, validate(tenantUpdateSchema), asyncHandler(updateTenant));
-router.delete('/:id', authMiddleware, adminAuth, asyncHandler(deleteTenant));
+router.put('/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(tenantUpdateSchema), asyncHandler(updateTenant));
+router.delete('/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(deleteTenant));
 
 export default router;

@@ -24,11 +24,12 @@ const updateSchema = z.object({
   rateLimit: z.number().int().min(1).max(1000).optional(),
   dailyLimit: z.number().int().min(1).max(100000).optional(),
 });
+const idParamSchema = z.object({ id: z.string().regex(/^\d+$/).transform(Number) });
 
 router.get('/keys', adminAuth, asyncHandler(ctl.listKeys));
 router.post('/keys', adminAuth, validate(createSchema), asyncHandler(ctl.createKey));
-router.put('/keys/:id/toggle', adminAuth, validate(toggleSchema), asyncHandler(ctl.toggleKey));
-router.put('/keys/:id', adminAuth, validate(updateSchema), asyncHandler(ctl.updateKey));
-router.delete('/keys/:id', adminAuth, asyncHandler(ctl.deleteKey));
+router.put('/keys/:id/toggle', adminAuth, validate(idParamSchema, 'params'), validate(toggleSchema), asyncHandler(ctl.toggleKey));
+router.put('/keys/:id', adminAuth, validate(idParamSchema, 'params'), validate(updateSchema), asyncHandler(ctl.updateKey));
+router.delete('/keys/:id', adminAuth, validate(idParamSchema, 'params'), asyncHandler(ctl.deleteKey));
 
 export default router;

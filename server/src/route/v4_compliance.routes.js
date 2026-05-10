@@ -39,7 +39,7 @@ router.post('/check', _validate(checkSchema), (req, res) => {
 });
 
 // ─── GET /api/compliance/rules/:code ─────────────────────────────
-router.get('/rules/:code', (req, res) => {
+router.get('/rules/:code', _validate(z.object({ code: z.string().min(1) }), 'params'), (req, res) => {
   try {
     const rules = complianceService.getPlatformCompliance(req.params.code)
       || complianceService.getRegionCompliance(req.params.code);

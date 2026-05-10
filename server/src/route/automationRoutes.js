@@ -19,14 +19,16 @@ const taskSchema = z.object({
   schedule: z.string().max(100).optional(),
   config: z.record(z.unknown()).optional(),
 });
+const idParamSchema = z.object({ id: z.string().regex(/^\d+$/).transform(Number) });
+const taskIdParamSchema = z.object({ taskId: z.string().regex(/^\d+$/).transform(Number) });
 
 router.get('/', authMiddleware, asyncHandler(automationController.listTasks));
 router.get('/tasks', authMiddleware, asyncHandler(automationController.listTasks));
 router.get('/accounts', authMiddleware, asyncHandler(automationController.listAccounts));
 router.post('/accounts', authMiddleware, validate(accountSchema), asyncHandler(automationController.createAccount));
-router.delete('/accounts/:id', authMiddleware, asyncHandler(automationController.deleteAccount));
+router.delete('/accounts/:id', authMiddleware, validate(idParamSchema, 'params'), asyncHandler(automationController.deleteAccount));
 router.post('/tasks', authMiddleware, validate(taskSchema), asyncHandler(automationController.createTask));
-router.post('/tasks/:id/cancel', authMiddleware, asyncHandler(automationController.cancelTask));
-router.post('/admin/execute/:taskId', authMiddleware, adminAuth, asyncHandler(automationController.executeTask));
+router.post('/tasks/:id/cancel', authMiddleware, validate(idParamSchema, 'params'), asyncHandler(automationController.cancelTask));
+router.post('/admin/execute/:taskId', authMiddleware, adminAuth, validate(taskIdParamSchema, 'params'), asyncHandler(automationController.executeTask));
 
 export default router;

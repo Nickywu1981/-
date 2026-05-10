@@ -13,13 +13,14 @@ const collectionSchema = z.object({
 });
 
 const updateCollectionSchema = collectionSchema.partial();
+const idParamSchema = z.object({ id: z.string().regex(/^\d+$/).transform(Number) });
 
 const router = Router();
 router.use(authMiddleware);
 router.get('/', cacheMiddleware(120), asyncHandler(listCollections));
-router.get('/:id', cacheMiddleware(120), asyncHandler(getCollection));
+router.get('/:id', cacheMiddleware(120), validate(idParamSchema, 'params'), asyncHandler(getCollection));
 router.post('/', adminAuth, validate(collectionSchema), asyncHandler(createCollection));
-router.put('/:id', adminAuth, validate(updateCollectionSchema), asyncHandler(updateCollection));
-router.delete('/:id', adminAuth, asyncHandler(deleteCollection));
+router.put('/:id', adminAuth, validate(idParamSchema, 'params'), validate(updateCollectionSchema), asyncHandler(updateCollection));
+router.delete('/:id', adminAuth, validate(idParamSchema, 'params'), asyncHandler(deleteCollection));
 
 export default router;

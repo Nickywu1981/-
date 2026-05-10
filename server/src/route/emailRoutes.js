@@ -30,10 +30,11 @@ const createTemplateSchema = z.object({
   remark: z.string().max(500).optional(),
 });
 const updateTemplateSchema = createTemplateSchema.partial().omit({ template_code: true });
+const idParamSchema = z.object({ id: z.string().regex(/^\d+$/).transform(Number) });
 
 router.get('/templates', authMiddleware, adminAuth, asyncHandler(listTemplates));
 router.post('/templates', authMiddleware, adminAuth, validate(createTemplateSchema), asyncHandler(createTemplate));
-router.put('/templates/:id', authMiddleware, adminAuth, validate(updateTemplateSchema), asyncHandler(updateTemplate));
-router.delete('/templates/:id', authMiddleware, adminAuth, asyncHandler(deleteTemplate));
+router.put('/templates/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(updateTemplateSchema), asyncHandler(updateTemplate));
+router.delete('/templates/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(deleteTemplate));
 
 export default router;

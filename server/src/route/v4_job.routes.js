@@ -39,7 +39,8 @@ router.post('/', _validate(submitJobSchema), async (req, res) => {
 });
 
 // GET /api/job/:id — 查询任务状态
-router.get('/:id', async (req, res) => {
+const idParamSchema = z.object({ id: z.string().regex(/^\d+$/).transform(Number) });
+router.get('/:id', _validate(idParamSchema, 'params'), async (req, res) => {
   try {
     const job = await jobQueueService.getJobStatus(req.params.id, req.user.id);
     return success(res, job);
