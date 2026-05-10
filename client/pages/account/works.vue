@@ -9,7 +9,7 @@
     <div v-else-if="works.length" class="works-grid">
       <div v-for="w in works" :key="w.id" class="work-card" @click="previewWork(w)">
         <div class="work-thumb">
-          <img v-if="w.output_url" :src="w.output_url" :alt="w.task_type" loading="lazy" />
+          <img v-if="w.output_url" :src="w.output_url" :alt="w.task_type" loading="lazy" @error="e => (e.target as HTMLImageElement).style.display='none'" />
           <div v-else class="thumb-placeholder">{{ w.task_type === 'video' ? '🎬' : '🖼' }}</div>
           <span class="type-badge">{{ typeLabel(w.task_type) }}</span>
         </div>
@@ -27,7 +27,7 @@
       <div v-if="preview" class="preview-overlay" @click.self="preview = null">
         <div class="preview-modal">
           <button class="close-btn" @click="preview = null">✕</button>
-          <img v-if="preview.output_url" :src="preview.output_url" :alt="preview.task_type" />
+          <img v-if="preview.output_url" :src="preview.output_url" :alt="preview.task_type" loading="lazy" @error="e => (e.target as HTMLImageElement).style.display='none'" />
           <div class="preview-meta">
             <span>{{ typeLabel(preview.task_type) }}</span>
             <span>{{ formatDateTime(preview.create_time || preview.created_at) }}</span>

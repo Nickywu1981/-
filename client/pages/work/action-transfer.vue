@@ -157,7 +157,7 @@ function statusLabel(s: string) {
   return map[s] || s
 }
 
-function downloadResult() { if (resultUrl.value) window.open(resultUrl.value, '_blank') }
+function downloadResult() { if (resultUrl.value) window.open(resultUrl.value, '_blank', 'noopener,noreferrer') }
 </script>
 
 <style scoped>

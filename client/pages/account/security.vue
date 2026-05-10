@@ -1,9 +1,9 @@
 <template>
   <div class="account-page"><h1>安全设置</h1>
     <div class="security-section"><h3>修改密码</h3>
-      <div class="form-group"><label for="sec-current-pwd">当前密码</label><input id="sec-current-pwd" v-model="form.currentPwd" type="password" class="text-input" /></div>
-      <div class="form-group"><label for="sec-new-pwd">新密码</label><input id="sec-new-pwd" v-model="form.newPwd" type="password" class="text-input" /></div>
-      <div class="form-group"><label for="sec-confirm-pwd">确认新密码</label><input id="sec-confirm-pwd" v-model="form.confirmPwd" type="password" class="text-input" /></div>
+      <div class="form-group"><label for="sec-current-pwd">当前密码</label><input id="sec-current-pwd" v-model="form.currentPwd" type="password" class="text-input" autocomplete="current-password" /></div>
+      <div class="form-group"><label for="sec-new-pwd">新密码</label><input id="sec-new-pwd" v-model="form.newPwd" type="password" class="text-input" autocomplete="new-password" minlength="8" /></div>
+      <div class="form-group"><label for="sec-confirm-pwd">确认新密码</label><input id="sec-confirm-pwd" v-model="form.confirmPwd" type="password" class="text-input" autocomplete="new-password" /></div>
       <button class="btn-primary" :disabled="saving" @click="changePwd">{{ saving ? '修改中...' : '修改密码' }}</button>
       <p v-if="msg" class="msg" :class="{ error: msgErr }">{{ msg }}</p>
     </div>

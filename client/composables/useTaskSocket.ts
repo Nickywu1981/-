@@ -83,5 +83,7 @@ export function useTaskSocket() {
     isConnected.value = false;
   }
 
+  onUnmounted(() => disconnect());
+
   return { connect, subscribe, unsubscribe, disconnect, isConnected, progressMap };
 }

@@ -15,7 +15,7 @@
         <label for="reg-username" class="sr-only">用户名</label>
         <input id="reg-username" v-model="username" type="text" placeholder="用户名" required />
         <label for="reg-password" class="sr-only">密码</label>
-        <input id="reg-password" v-model="password" type="password" placeholder="密码（至少6位）" required minlength="6" />
+        <input id="reg-password" v-model="password" type="password" placeholder="密码（至少8位）" required minlength="8" autocomplete="new-password" />
         <label for="reg-nickname" class="sr-only">昵称</label>
         <input id="reg-nickname" v-model="nickname" type="text" placeholder="昵称（选填）" />
         <button type="submit" class="btn" :disabled="loading">{{ loading ? '注册中...' : '注册' }}</button>

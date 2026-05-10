@@ -146,7 +146,7 @@ async function doReplicate() {
   })
 }
 
-function downloadResult() { if (replicateResultUrl.value) window.open(replicateResultUrl.value, '_blank') }
+function downloadResult() { if (replicateResultUrl.value) window.open(replicateResultUrl.value, '_blank', 'noopener,noreferrer') }
 </script>
 
 <style scoped>

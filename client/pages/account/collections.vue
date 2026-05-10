@@ -28,7 +28,7 @@
     <div v-else class="collection-grid">
       <div v-for="item in list" :key="item.id" class="collection-card" @click="viewCollection(item)">
         <div class="card-cover">
-          <img v-if="item.cover_url" :src="item.cover_url" alt="" />
+          <img v-if="item.cover_url" :src="item.cover_url" :alt="item.name" loading="lazy" @error="e => (e.target as HTMLImageElement).style.display='none'" />
           <span v-else class="cover-placeholder">{{ item.name?.slice(0, 2) }}</span>
           <span v-if="item.is_public" class="badge-public">公开</span>
         </div>

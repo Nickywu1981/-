@@ -118,7 +118,7 @@ function loadMore() {
   fetchAssets()
 }
 
-function downloadItem(item: any) { if (item.url) window.open(item.url, '_blank') }
+function downloadItem(item: any) { if (item.url) window.open(item.url, '_blank', 'noopener,noreferrer') }
 
 onMounted(() => fetchAssets())
 </script>

@@ -351,10 +351,10 @@ async function copyImage(url) {
       await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
       toast.success('已复制到剪贴板');
     } else {
-      window.open(url, '_blank');
+      window.open(url, '_blank', 'noopener,noreferrer');
     }
   } catch {
-    window.open(url, '_blank');
+    window.open(url, '_blank', 'noopener,noreferrer');
   }
 }
 

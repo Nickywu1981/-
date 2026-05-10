@@ -112,7 +112,7 @@ async function saveProfile() {
 }
 
 async function savePassword() {
-  if (!pw.oldPassword || pw.newPassword.length < 6) { pwMsg.value = '新密码至少6位'; pwMsgErr.value = true; return; }
+  if (!pw.oldPassword || pw.newPassword.length < 8) { pwMsg.value = '新密码至少8位'; pwMsgErr.value = true; return; }
   pwSaving.value = true; pwMsg.value = '';
   try {
     await $fetch('/api/user/change-password', { method: 'PUT', body: { oldPassword: pw.oldPassword, newPassword: pw.newPassword } });

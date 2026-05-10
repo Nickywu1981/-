@@ -24,7 +24,7 @@
     <div v-else class="templates-grid">
       <div v-for="tpl in templates" :key="tpl.id" class="template-card">
         <div class="card-preview">
-          <img v-if="tpl.thumbnail" :src="tpl.thumbnail" :alt="tpl.name" />
+          <img v-if="tpl.thumbnail" :src="tpl.thumbnail" :alt="tpl.name" loading="lazy" @error="e => (e.target as HTMLImageElement).style.display='none'" />
           <div v-else class="preview-placeholder">{{ tpl.name?.[0] }}</div>
         </div>
         <div class="card-body">

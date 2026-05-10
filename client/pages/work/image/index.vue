@@ -183,7 +183,7 @@ async function doBatchEdit() {
   await submit('batch_image_edit', { images: batchImages.value.map(f => ({ url: f.url })), operations: [] })
 }
 
-function downloadResult() { if (resultUrl.value) window.open(resultUrl.value, '_blank') }
+function downloadResult() { if (resultUrl.value) window.open(resultUrl.value, '_blank', 'noopener,noreferrer') }
 </script>
 
 <style scoped>
