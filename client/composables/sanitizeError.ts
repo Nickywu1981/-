@@ -68,5 +68,5 @@ export function sanitizeError(err: unknown, fallback?: string): string {
  */
 export function toastError(err: unknown, fallback?: string): string {
   const msg = sanitizeError(err, fallback);
-  return msg.length > 40 ? msg.slice(0, 40) + '...' : msg;
+  return msg.length > 40 ? [...msg].slice(0, 40).join('') + '...' : msg;
 }

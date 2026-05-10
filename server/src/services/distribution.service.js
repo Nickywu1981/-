@@ -172,15 +172,20 @@ export async function withdrawCommission(userId, amount) {
       [userId],
     );
 
+    // 批量标记已提现: 收集要更新的ID, 单条UPDATE ... WHERE id IN(...)
+    const withdrawIds = [];
     for (const row of pendingCommissions) {
       if (remaining <= 0) break;
       if (row.commission <= remaining) {
-        await conn.query(
-          'UPDATE distributor_commission SET status = \'withdrawn\', settled_at = NOW() WHERE id = ?',
-          [row.id],
-        );
+        withdrawIds.push(row.id);
         remaining -= row.commission;
       }
+    }
+    if (withdrawIds.length > 0) {
+      await conn.query(
+        `UPDATE distributor_commission SET status = 'withdrawn', settled_at = NOW() WHERE id IN (${withdrawIds.map(() => '?').join(',')})`,
+        withdrawIds,
+      );
     }
 
     await conn.commit();

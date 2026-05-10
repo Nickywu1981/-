@@ -26,7 +26,7 @@ export function cacheMiddleware(ttl = 300, keyFn) {
         return res.json(cached);
       }
 
-      // 拦截 res.json 以捕获响应
+      // 拦截 res.json 以捕获响应体, 完成后恢复原始方法
       const originalJson = res.json.bind(res);
       res.json = function (body) {
         if (res.statusCode === 200 && body?.code === 200) {
@@ -35,6 +35,8 @@ export function cacheMiddleware(ttl = 300, keyFn) {
         res.setHeader('X-Cache', 'MISS');
         return originalJson(body);
       };
+      // 响应完成后恢复, 防止后续中间件/错误处理器误写入缓存
+      res.on('finish', () => { res.json = originalJson; });
 
       next();
     } catch {

@@ -14,7 +14,7 @@ export default defineNuxtConfig({
         { name: 'theme-color', content: '#4F46E5' },
         { 'http-equiv': 'X-UA-Compatible', content: 'IE=edge' },
         // Content Security Policy (CSP)
-        { 'http-equiv': 'Content-Security-Policy', content: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' wss: ws: http://localhost:3001 http://localhost:3000; worker-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" },
+        { 'http-equiv': 'Content-Security-Policy', content: `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' wss: ws:${process.env.NODE_ENV !== 'production' ? ' http://localhost:3001 http://localhost:3000' : ''}; worker-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'` },
         // XSS 防护
         { 'http-equiv': 'X-XSS-Protection', content: '1; mode=block' },
         // 仅允许同源框架
