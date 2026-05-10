@@ -81,6 +81,8 @@ export const useAppStore = defineStore('app', {
         theme: this.theme,
         locale: this.locale,
       }));
+      // 同步到 useTheme 使用的独立 key（防闪烁脚本依赖此 key）
+      localStorage.setItem('app-theme', this.theme);
     },
   },
 });

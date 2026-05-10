@@ -38,7 +38,7 @@ export default defineNuxtConfig({
       script: [
         // 内联暗黑模式防闪烁脚本
         {
-          children: '(function(){var t=localStorage.getItem("theme");if(t==="dark"||(!t&&window.matchMedia("(prefers-color-scheme:dark)").matches)){document.documentElement.setAttribute("data-theme","dark")}})()',
+          children: '(function(){var t=localStorage.getItem("app-theme");if(t==="dark"||(!t&&window.matchMedia("(prefers-color-scheme:dark)").matches)){document.documentElement.setAttribute("data-theme","dark")}})()',
           type: 'text/javascript',
         },
       ],

@@ -103,6 +103,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 
+// 信任来自回环地址的反向代理（内部 embed 端点依赖 req.ip 鉴权）
+app.set('trust proxy', 'loopback');
+
 // 基础安全中间件
 app.use(helmet());
 app.use(cspMiddleware);
