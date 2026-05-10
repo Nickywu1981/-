@@ -65,15 +65,21 @@ const modelsQuerySchema = z.object({
 // GET /api/3d/models
 router.get('/models', authMiddleware, _validate(modelsQuerySchema, 'query'), async (req, res, next) => {
   try {
-    const files = fs.readdirSync(uploadDir)
-      .filter((f) => ['.glb', '.gltf', '.fbx', '.obj', '.stl'].includes(path.extname(f).toLowerCase()))
-      .map((f) => ({
-        name: f,
-        url: `/uploads/3d/${f}`,
-        size: fs.statSync(path.join(uploadDir, f)).size,
-        uploadedAt: fs.statSync(path.join(uploadDir, f)).mtime.toISOString(),
-      }))
-      .sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime());
+    const entries = await fs.promises.readdir(uploadDir);
+    const files = await Promise.all(
+      entries
+        .filter((f) => ['.glb', '.gltf', '.fbx', '.obj', '.stl'].includes(path.extname(f).toLowerCase()))
+        .map(async (f) => {
+          const stat = await fs.promises.stat(path.join(uploadDir, f));
+          return {
+            name: f,
+            url: `/uploads/3d/${f}`,
+            size: stat.size,
+            uploadedAt: stat.mtime.toISOString(),
+          };
+        }),
+    );
+    files.sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime());
     return success(res, { list: files, total: files.length });
   } catch (e) { next(e); }
 });

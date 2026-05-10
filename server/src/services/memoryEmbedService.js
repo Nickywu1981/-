@@ -18,19 +18,19 @@ const TOKEN_INDEX_PATH = path.resolve(__dirname, '../../../docs/KB_TOKEN_INDEX.j
 let store = null;
 let tokenIndex = null;
 
-function loadStore() {
+async function loadStore() {
   if (store) return store;
-  if (fs.existsSync(VECTOR_STORE_PATH)) {
-    try { store = JSON.parse(fs.readFileSync(VECTOR_STORE_PATH, 'utf-8')); } catch { store = null; }
-  }
+  try {
+    store = JSON.parse(await fs.promises.readFile(VECTOR_STORE_PATH, 'utf-8'));
+  } catch { store = null; }
   return store;
 }
 
-function loadTokenIndex() {
+async function loadTokenIndex() {
   if (tokenIndex) return tokenIndex;
-  if (fs.existsSync(TOKEN_INDEX_PATH)) {
-    try { tokenIndex = JSON.parse(fs.readFileSync(TOKEN_INDEX_PATH, 'utf-8')); } catch { tokenIndex = null; }
-  }
+  try {
+    tokenIndex = JSON.parse(await fs.promises.readFile(TOKEN_INDEX_PATH, 'utf-8'));
+  } catch { tokenIndex = null; }
   return tokenIndex;
 }
 
@@ -79,8 +79,8 @@ function cosineSimilarity(a, b) {
  * @param {string} text
  * @returns {{ vector: Record<string,number>, dimensions: number, model: string }}
  */
-export function embed(text) {
-  const data = loadStore();
+export async function embed(text) {
+  const data = await loadStore();
   const tokens = tokenize(text);
 
   // 构建 TF-IDF 词汇表和 IDF
@@ -116,8 +116,8 @@ export function embed(text) {
  * @param {number} [topK=5]
  * @returns {{ results: Array<{source, content, score}>, model: string, totalChunks: number }}
  */
-export function semanticSearch(query, topK = 5) {
-  const data = loadStore();
+export async function semanticSearch(query, topK = 5) {
+  const data = await loadStore();
   if (!data || !data.chunks) {
     return { results: [], model: 'none', totalChunks: 0 };
   }
@@ -160,8 +160,8 @@ export function semanticSearch(query, topK = 5) {
  * @param {string} token - 函数名/路由/表名
  * @returns {{ found: boolean, entries: Array<{type, file, line}> }}
  */
-export function tokenLookup(token) {
-  const idx = loadTokenIndex();
+export async function tokenLookup(token) {
+  const idx = await loadTokenIndex();
   const tokens = idx && idx.tokens ? idx.tokens : {};
   const entry = tokens[token];
   const entries = entry ? (Array.isArray(entry) ? entry : [entry]) : [];
@@ -171,9 +171,9 @@ export function tokenLookup(token) {
 /**
  * 向量记忆状态
  */
-export function getMemoryStatus() {
-  const data = loadStore();
-  const idx = loadTokenIndex();
+export async function getMemoryStatus() {
+  const data = await loadStore();
+  const idx = await loadTokenIndex();
   return {
     vectorStore: {
       loaded: !!data,

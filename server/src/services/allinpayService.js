@@ -73,7 +73,7 @@ export async function handleNotify(body) {
   await allinpayDao.logNotify({ reqsn, trxid, notifyBody: JSON.stringify(body), signVerified: 0, processStatus: 0 });
 
   // 2. 验签
-  const verified = allinpaySDK.verifyNotify(body);
+  const verified = await allinpaySDK.verifyNotify(body);
   if (!verified) {
     await allinpayDao.logNotify({ reqsn, trxid, notifyBody: JSON.stringify(body), signVerified: 2, processStatus: 2, processMsg: '签名验证失败' });
     throw new BusinessError(400, '签名验证失败');

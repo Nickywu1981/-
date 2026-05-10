@@ -202,7 +202,8 @@ async function realCloneInfer(text, audioSampleUrl) {
       }
       if (fs.existsSync(resolvedPath)) {
         const formData = new FormData();
-        formData.append('files', new Blob([fs.readFileSync(samplePath)]), 'sample.mp3');
+        const buffer = await fs.promises.readFile(samplePath);
+        formData.append('files', new Blob([buffer]), 'sample.mp3');
         formData.append('name', `clone_${Date.now()}`);
         const addResp = await fetch(process.env.ELEVENLABS_API_URL || 'https://api.elevenlabs.io/v1/voices/add', {
           method: 'POST',

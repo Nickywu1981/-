@@ -5,7 +5,7 @@
  * 零外部依赖：使用 Node.js 内置 crypto + 项目已有的 fetch
  */
 import crypto from 'crypto';
-import { readFileSync } from 'fs';
+import { promises as fs } from 'fs';
 import allinpayConfig from '../config/allinpay.js';
 import logger from './logger.js';
 import { BusinessError } from './businessError.js';
@@ -15,10 +15,10 @@ import { BusinessError } from './businessError.js';
 let _privateKey = null;
 let _publicKey = null;
 
-function getPrivateKey() {
+async function getPrivateKey() {
   if (_privateKey) return _privateKey;
   try {
-    _privateKey = readFileSync(allinpayConfig.privateKeyPath, 'utf-8');
+    _privateKey = await fs.readFile(allinpayConfig.privateKeyPath, 'utf-8');
   } catch {
     if (!allinpayConfig.isSandbox) {
       logger.warn('[Allinpay] 私钥文件未找到: ' + allinpayConfig.privateKeyPath);
@@ -28,10 +28,10 @@ function getPrivateKey() {
   return _privateKey;
 }
 
-function getPublicKey() {
+async function getPublicKey() {
   if (_publicKey) return _publicKey;
   try {
-    _publicKey = readFileSync(allinpayConfig.publicKeyPath, 'utf-8');
+    _publicKey = await fs.readFile(allinpayConfig.publicKeyPath, 'utf-8');
   } catch {
     if (!allinpayConfig.isSandbox) {
       logger.warn('[Allinpay] 公钥文件未找到: ' + allinpayConfig.publicKeyPath);
@@ -56,8 +56,8 @@ export function buildSignString(params) {
 
 // ==================== RSA 签名 ====================
 
-export function rsaSign(signStr) {
-  const privateKey = getPrivateKey();
+export async function rsaSign(signStr) {
+  const privateKey = await getPrivateKey();
   if (!privateKey) throw new BusinessError(503, '商户私钥未配置');
   const sign = crypto.createSign('RSA-SHA1');
   sign.update(signStr, 'utf-8');
@@ -66,8 +66,8 @@ export function rsaSign(signStr) {
 
 // ==================== RSA 验签 ====================
 
-export function rsaVerify(signStr, signature) {
-  const publicKey = getPublicKey();
+export async function rsaVerify(signStr, signature) {
+  const publicKey = await getPublicKey();
   if (!publicKey) throw new BusinessError(503, '通联公钥未配置');
   const verify = crypto.createVerify('RSA-SHA1');
   verify.update(signStr, 'utf-8');
@@ -76,8 +76,8 @@ export function rsaVerify(signStr, signature) {
 
 // ==================== Mock 模式检测 ====================
 
-function isMockMode() {
-  return allinpayConfig.isSandbox && (!allinpayConfig.cusid || !getPrivateKey());
+async function isMockMode() {
+  return allinpayConfig.isSandbox && (!allinpayConfig.cusid || !(await getPrivateKey()));
 }
 
 // ==================== 支付渠道映射 ====================
@@ -100,7 +100,7 @@ const PAYTYPE_MAP = {
  */
 export async function unifiedOrder(params) {
   // ---- Mock 模式：模拟通联响应 ----
-  if (isMockMode()) {
+  if (await isMockMode()) {
     logger.info('[Allinpay Mock] 统一下单', { reqsn: params.reqsn, trxamt: params.trxamt });
     return {
       payUrl: `${allinpayConfig.returnUrl}?reqsn=${params.reqsn}&mock=1&amount=${params.trxamt}`,
@@ -136,7 +136,7 @@ export async function unifiedOrder(params) {
   };
 
   const signStr = buildSignString(postData);
-  postData.sign = rsaSign(signStr);
+  postData.sign = await rsaSign(signStr);
 
   logger.info('[Allinpay] 统一下单请求', { reqsn: postData.reqsn, trxamt: postData.trxamt, paytype });
 
@@ -174,11 +174,11 @@ export async function unifiedOrder(params) {
   const respSign = result.sign;
   if (respSign) {
     const verifyStr = buildSignString(result);
-    if (!rsaVerify(verifyStr, respSign)) {
+    if (!(await rsaVerify(verifyStr, respSign))) {
       logger.error('[Allinpay] 响应验签失败，拒绝响应', { reqsn: postData.reqsn });
       throw new BusinessError(502, '支付网关签名验证失败');
     }
-  } else if (!isMockMode()) {
+  } else if (!(await isMockMode())) {
     logger.error('[Allinpay] 响应缺少 sign 字段', { reqsn: postData.reqsn });
     throw new BusinessError(502, '支付网关响应缺少签名');
   }
@@ -196,9 +196,9 @@ export async function unifiedOrder(params) {
  * 验证通联异步回调签名
  * @returns {boolean}
  */
-export function verifyNotify(body) {
+export async function verifyNotify(body) {
   // Mock 模式仅在非生产环境且调用方显式标记为 sanbox 允许跳过验签
-  if (isMockMode()) {
+  if (await isMockMode()) {
     if (process.env.NODE_ENV === 'production') {
       logger.error('[Allinpay] 生产环境禁止 Mock 模式验签跳过');
       return false;
@@ -213,7 +213,7 @@ export function verifyNotify(body) {
     return false;
   }
   const signStr = buildSignString(rest);
-  return rsaVerify(signStr, sign);
+  return await rsaVerify(signStr, sign);
 }
 
 export default { buildSignString, rsaSign, rsaVerify, unifiedOrder, verifyNotify };

@@ -32,24 +32,24 @@ import * as imageService from '../services/image.service.js';
 // ═══════════════ 能力 1: 记忆力 ============================================
 const memory = {
   /** 语义搜索 — "王女士买了胶原蛋白果冻，问她要不要复购" */
-  search(query) {
+  async search(query) {
     return memoryEmbedService.semanticSearch(query);
   },
 
   /** 录入新记忆，返回向量结果 */
-  embed({ content, source: _source, tags: _tags } = {}) {
+  async embed({ content, source: _source, tags: _tags } = {}) {
     return memoryEmbedService.embed(content || '');
   },
 
   /** 按用户分页列出记忆 */
-  list(userId, options = {}) {
+  async list(userId, options = {}) {
     return memoryEmbedService.listByUser
       ? memoryEmbedService.listByUser(userId, options)
       : memoryEmbedService.semanticSearch('*', options.pageSize || 20);
   },
 
   /** 记忆统计 */
-  stats() {
+  async stats() {
     return memoryEmbedService.getMemoryStatus();
   },
 };
@@ -252,7 +252,7 @@ const visual = {
 const health = {
   async check() {
     const checks = {};
-    try { checks.memory = memoryEmbedService.getMemoryStatus() ? 'ok' : 'degraded'; } catch { checks.memory = 'down'; }
+    try { checks.memory = await memoryEmbedService.getMemoryStatus() ? 'ok' : 'degraded'; } catch { checks.memory = 'down'; }
     try { checks.ai = 'ok'; } catch { checks.ai = 'down'; }
     checks.uptime = process.uptime();
     checks.status = Object.values(checks).every(v => v === 'ok' || v === 'uptime') ? 'healthy' : 'degraded';

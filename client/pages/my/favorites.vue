@@ -69,7 +69,13 @@ const filtered = computed(() => {
 const typeLabel = (t: string) => ({ image: '图片', video: '视频', prompt: '提示词' }[t] || t)
 
 const fetchFavorites = async () => {
+  loading.value = true
+  error.value = ''
   try {
+    const data = await $fetch('/api/collections', { params: { page: page.value, pageSize } })
+    items.value = data.list || []
+    total.value = data.total || 0
+  } catch (e: any) {
     error.value = e.message || '加载失败'
   } finally {
     loading.value = false
