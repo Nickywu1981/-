@@ -56,13 +56,16 @@ export async function listAllOrders() {
 }
 
 export async function refundOrder(orderNo) {
-  const order = await rechargeDao.getByOrderNo(orderNo);
-  if (!order || order.pay_status !== RECHARGE_PAY_STATUS.PAID) throw new BusinessError(404, '订单不存在或未支付');
-
-  // 退还积分 + 标记退款
+  // 在事务内 SELECT FOR UPDATE 防止并发退款
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
+    const [[order]] = await conn.query('SELECT * FROM recharge_order WHERE order_no = ? FOR UPDATE', [orderNo]);
+    if (!order || order.pay_status !== RECHARGE_PAY_STATUS.PAID) {
+      await conn.rollback();
+      throw new BusinessError(404, '订单不存在或未支付');
+    }
+
     await rechargeDao.markRefunded(orderNo);
     await creditDao.updateCreditBalance(order.user_id, -order.coin_amount, conn);
     await creditDao.insertConsumptionLog({
