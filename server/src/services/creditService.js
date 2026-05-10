@@ -2,6 +2,7 @@ import * as creditDao from '../dao/creditDao.js';
 import { BusinessError } from '../utils/businessError.js';
 import { CREDIT_RECORD_STATUS } from '../constants/domainStatus.js';
 import db from '../dao/db.js';
+import logger from '../utils/logger.js';
 
 // 操作消耗点数额
 const CONSUMPTION_RULES = {

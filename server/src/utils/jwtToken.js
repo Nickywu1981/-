@@ -8,6 +8,7 @@
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { jwtConfig } from '../config/index.js';
+import logger from '../utils/logger.js';
 
 // ========================= 配置 =========================
 

@@ -22,7 +22,7 @@ export function contentModerationMiddleware(stage = 'input') {
     const lower = textToCheck.toLowerCase();
     for (const word of BLOCKED_WORDS) {
       if (lower.includes(word.toLowerCase())) {
-        return error(_res, ERROR_CODE.CONTENT_MODERATION, '内容包含违规信息，请修改后重试', 422);
+        return res.status(422).json({ code: ERROR_CODE.CONTENT_MODERATION, msg: '内容包含违规信息，请修改后重试' });
       }
     }
 

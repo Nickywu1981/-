@@ -16,9 +16,9 @@ export async function submitJob(userId, taskType, taskParams, options = {}) {
   const conn = await db.getConnection();
   try {
     const [result] = await conn.query(
-      `INSERT INTO job_queue (user_id, task_type, task_params, status, priority, scheduled_at)
-       VALUES (?, ?, ?, 'queued', ?, ?)`,
-      [userId, taskType, JSON.stringify(taskParams), options.priority || 5, options.scheduledAt || null],
+      `INSERT INTO job_queue (user_id, task_type, task_params, status, priority, scheduled_at, max_retries)
+       VALUES (?, ?, ?, 'queued', ?, ?, ?)`,
+      [userId, taskType, JSON.stringify(taskParams), options.priority || 5, options.scheduledAt || null, options.maxRetries ?? 3],
     );
     return { job_id: result.insertId, status: 'queued' };
   } finally {

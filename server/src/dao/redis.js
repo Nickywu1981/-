@@ -36,11 +36,17 @@ client.on('error', (err) => { logger.warn('[Redis] 连接错误', { error: err.m
 
 let connected = false;
 let triedConnect = false;
+let retryDelay = 5000;
 
-// 每 60 秒重试 Redis 连接
+// 指数退避重试 Redis 连接
 setInterval(() => {
-  if (!connected) triedConnect = false;
-}, 60000).unref();
+  if (!connected) {
+    triedConnect = false;
+    retryDelay = Math.min(retryDelay * 2, 60000);
+  } else {
+    retryDelay = 5000;
+  }
+}, retryDelay).unref();
 
 export async function getRedis() {
   if (connected) return client;

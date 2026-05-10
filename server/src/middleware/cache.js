@@ -35,8 +35,11 @@ export function cacheMiddleware(ttl = 300, keyFn) {
         res.setHeader('X-Cache', 'MISS');
         return originalJson(body);
       };
-      // 响应完成后恢复, 防止后续中间件/错误处理器误写入缓存
-      res.on('finish', () => { res.json = originalJson; });
+      // 响应完成/出错/客户端断开均恢复原始方法
+      const restore = () => { res.json = originalJson; };
+      res.on('finish', restore);
+      res.on('close', restore);
+      res.on('error', restore);
 
       next();
     } catch {

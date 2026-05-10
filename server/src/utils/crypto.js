@@ -5,13 +5,18 @@
 import crypto from 'crypto';
 
 const ALGORITHM = 'aes-256-gcm';
-if (!process.env.ENCRYPTION_KEY) throw new Error('FATAL: ENCRYPTION_KEY env var is required');
-const SECRET_KEY = Buffer.from(process.env.ENCRYPTION_KEY, 'utf8');
+let _secretKey = null;
+function getSecretKey() {
+  if (_secretKey) return _secretKey;
+  if (!process.env.ENCRYPTION_KEY) throw new Error('FATAL: ENCRYPTION_KEY env var is required');
+  _secretKey = Buffer.from(process.env.ENCRYPTION_KEY, 'utf8');
+  return _secretKey;
+}
 
 export function encrypt(text) {
   if (!text) return '';
   const iv = crypto.randomBytes(16);
-  const cipher = crypto.createCipheriv(ALGORITHM, SECRET_KEY, iv);
+  const cipher = crypto.createCipheriv(ALGORITHM, getSecretKey(), iv);
   let encrypted = cipher.update(text, 'utf8', 'hex');
   encrypted += cipher.final('hex');
   const authTag = cipher.getAuthTag().toString('hex');
@@ -24,7 +29,7 @@ export function decrypt(encryptedText) {
   if (parts.length !== 3) return encryptedText; // 旧格式兼容
   const iv = Buffer.from(parts[0], 'hex');
   const authTag = Buffer.from(parts[1], 'hex');
-  const decipher = crypto.createDecipheriv(ALGORITHM, SECRET_KEY, iv);
+  const decipher = crypto.createDecipheriv(ALGORITHM, getSecretKey(), iv);
   decipher.setAuthTag(authTag);
   let decrypted = decipher.update(parts[2], 'hex', 'utf8');
   decrypted += decipher.final('utf8');

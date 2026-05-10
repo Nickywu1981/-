@@ -30,7 +30,7 @@ export async function register({ phone, email, password, nickname, inviteCode: _
     const passwordHash = await bcrypt.hash(password, 12);
     const [result] = await conn.query(
       `INSERT INTO user (username, password, nickname, phone, email, role, status)
-       VALUES (?, ?, ?, ?, ?, 'free', 1)`,
+       VALUES (?, ?, ?, ?, ?, 'user', 1)`,
       [username, passwordHash, nickname || '', phone || '', email || ''],
     );
     const userId = result.insertId;
@@ -98,11 +98,23 @@ export async function loginByCode({ phone, email, username, code }) {
 
   const conn = await db.getConnection();
   try {
-    const identifier = username || phone || email || '';
-    if (!identifier) throw new BusinessError(400, '请提供手机号、邮箱或用户名');
+    // 根据验证渠道查找用户：手机验证→按手机查，邮箱验证→按邮箱查，否则按用户名
+    let identifier, idField;
+    if (phone) {
+      identifier = phone;
+      idField = 'phone';
+    } else if (email) {
+      identifier = email;
+      idField = 'email';
+    } else if (username) {
+      identifier = username;
+      idField = 'username';
+    } else {
+      throw new BusinessError(400, '请提供手机号、邮箱或用户名');
+    }
 
     const [users] = await conn.query(
-      'SELECT id, tenant_id, role, nickname, status FROM `user` WHERE username = ?',
+      `SELECT id, tenant_id, role, nickname, status FROM \`user\` WHERE ${idField} = ?`,
       [identifier],
     );
 

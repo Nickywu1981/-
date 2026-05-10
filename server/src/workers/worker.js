@@ -154,7 +154,7 @@ setInterval(async () => {
     const recovered = await jobQueueService.recoverStuckJobs();
     if (recovered > 0) logger.warn(`[Worker] Recovered ${recovered} stuck job(s)`);
   } catch (err) { logger.error(`[Worker] Stuck-job scan error: ${err.message}`); }
-}, 5 * 60 * 1000).unref();
+}, 30000).unref();
 
 logger.info('[Worker] Job queue worker started');
 

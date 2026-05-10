@@ -65,6 +65,12 @@ export function verifyCode(phone, scene, code) {
     CODE_CACHE.delete(key);
     return { valid: false, reason: '验证码已过期' };
   }
+  // 暴力破解防护：最多5次尝试
+  stored.attempts = (stored.attempts || 0) + 1;
+  if (stored.attempts > 5) {
+    CODE_CACHE.delete(key);
+    return { valid: false, reason: '尝试次数过多，请重新获取验证码' };
+  }
   if (stored.code !== String(code)) return { valid: false, reason: '验证码错误' };
   CODE_CACHE.delete(key);
   // 验证通过后设置已验证标记，供 login-by-code 使用
