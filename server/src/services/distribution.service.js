@@ -94,6 +94,16 @@ export async function settleCommission(consumerId, orderId, orderAmount) {
     if (relations.length > 0) {
       const { parent_id, grandparent_id } = relations[0];
 
+      // 幂等检查：防止同一订单重复结算
+      const [existing] = await conn.query(
+        'SELECT id FROM distributor_commission WHERE order_id = ? LIMIT 1',
+        [orderId],
+      );
+      if (existing.length > 0) {
+        await conn.commit();
+        return [];
+      }
+
       // 一级佣金
       if (parent_id) {
         const rate = COMMISSION_RATES.level1;

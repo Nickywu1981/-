@@ -11,9 +11,9 @@ export async function handleNotify(req, res) {
     const body = req.body;
     logger.info('[Allinpay] 回调接收', { reqsn: body.reqsn, trxid: body.trxid, trxstatus: body.trxstatus });
 
-    await allinpayService.handleNotify(body);
+    const ok = await allinpayService.handleNotify(body);
 
-    res.type('text/plain').send('success');
+    res.type('text/plain').send(ok ? 'success' : 'fail');
   } catch (err) {
     logger.error('[Allinpay] 回调处理异常', err.message);
     res.type('text/plain').send('fail');

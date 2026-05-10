@@ -444,12 +444,13 @@ export async function dailyCreditReward() {
 // ==================== 积分查询 ====================
 
 export async function getCreditHistory(userId, page = 1, pageSize = 20) {
-  const offset = (page - 1) * pageSize;
+  const limit = Math.min(pageSize, 200);
+  const offset = (page - 1) * limit;
   const [list, total] = await Promise.all([
-    creditDao.getCreditHistory(userId, offset, pageSize),
+    creditDao.getCreditHistory(userId, offset, limit),
     creditDao.getCreditHistoryCount(userId),
   ]);
-  return { list, total, page, pageSize };
+  return { list, total, page: page, pageSize: limit };
 }
 
 export async function getCreditBalance(userId) {

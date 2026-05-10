@@ -46,13 +46,19 @@ export async function createUnifiedOrder({ userId, orderType, businessId, amount
     reqsn, orderType, businessId: businessId || reqsn, userId, amount, trxamt, payChannel, expireTime,
   });
 
-  // 2. 调用通联统一下单（含 payChannel 映射 paytype）
-  const result = await allinpaySDK.unifiedOrder({
-    trxamt, reqsn,
-    payChannel,
-    body: body || (orderType === 'membership' ? 'Movio会员购买' : 'Movio虾币充值'),
-    remark: remark || '',
-  });
+  // 2. 调用通联统一下单（失败时标记本地订单为失败，防止孤儿订单）
+  let result;
+  try {
+    result = await allinpaySDK.unifiedOrder({
+      trxamt, reqsn,
+      payChannel,
+      body: body || (orderType === 'membership' ? 'Movio会员购买' : 'Movio虾币充值'),
+      remark: remark || '',
+    });
+  } catch (err) {
+    await allinpayDao.markFailed(reqsn).catch(() => {});
+    throw err;
+  }
 
   logger.info('[Allinpay] 统一下单成功', { reqsn, payUrl: result.payUrl });
 

@@ -14,6 +14,7 @@ describe('allinpayNotifyController — 通联支付回调', () => {
   beforeEach(() => { vi.clearAllMocks(); });
 
   it('成功回调应返回纯文本 success', async () => {
+    allinpayService.handleNotify.mockResolvedValueOnce(true);
     const req = { body: { reqsn: 'T001', trxid: 'P001', trxstatus: 'TRX_SUCCESS' } };
     const res = mockRes();
     await handleNotify(req, res);
@@ -32,6 +33,7 @@ describe('allinpayNotifyController — 通联支付回调', () => {
   });
 
   it('空 body 也能正常处理不 crash', async () => {
+    allinpayService.handleNotify.mockResolvedValueOnce(true);
     const req = { body: {} };
     const res = mockRes();
     await handleNotify(req, res);

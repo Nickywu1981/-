@@ -40,20 +40,20 @@ const refundSchema = z.object({
 const updateUserSchema = z.object({
   nickname: z.string().max(100).optional(),
   email: z.string().email().max(200).optional(),
-  role: z.enum(['user', 'admin', 'super_admin']).optional(),
+  role: z.enum(['user', 'admin']).optional(),
 });
 const createPlanSchema = z.object({
   name: z.string().min(1, '套餐名称不能为空').max(100),
-  price: z.coerce.number().min(0).optional(),
-  credits: z.coerce.number().int().min(0).optional(),
-  duration_days: z.coerce.number().int().min(1).optional(),
-  plan_type: z.coerce.number().int().min(0).optional(),
+  price: z.coerce.number().min(0).max(999999).optional(),
+  credits: z.coerce.number().int().min(0).max(1000000).optional(),
+  duration_days: z.coerce.number().int().min(1).max(3650).optional(),
+  plan_type: z.coerce.number().int().min(0).max(99).optional(),
 });
 const sendNotificationSchema = z.object({
   userId: idSchema,
   type: z.string().max(50).optional(),
   title: z.string().min(1, '标题不能为空').max(200),
-  content: z.string().min(1, '内容不能为空'),
+  content: z.string().min(1, '内容不能为空').max(10000),
 });
 const userStatusSchema = z.object({
   status: z.union([z.literal(0), z.literal(1)]),

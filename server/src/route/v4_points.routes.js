@@ -11,7 +11,7 @@ import { z } from 'zod';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate } from '../utils/validate.js';
-import { adminAuth} from '../middleware/auth.js';
+import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import * as pointsService from '../services/points.service.js';
 
 const router = Router();
@@ -27,7 +27,7 @@ const earnSchema = z.object({
 });
 
 // GET /api/points/account
-router.get('/account', async (req, res) => {
+router.get('/account', authMiddleware, async (req, res) => {
   try {
     const result = await pointsService.getPointsAccount(req.user.id);
     return success(res, result);
@@ -37,11 +37,11 @@ router.get('/account', async (req, res) => {
 });
 
 // GET /api/points/transactions
-router.get('/transactions', async (req, res) => {
+router.get('/transactions', authMiddleware, async (req, res) => {
   try {
     const result = await pointsService.getPointsTransactions(req.user.id, {
       page: parseInt(req.query.page) || 1,
-      pageSize: parseInt(req.query.pageSize) || 20,
+      pageSize: Math.min(parseInt(req.query.pageSize) || 20, 200),
     });
     return success(res, result);
   } catch (err) {
@@ -50,7 +50,7 @@ router.get('/transactions', async (req, res) => {
 });
 
 // POST /api/points/redeem — 积分兑换点数
-router.post('/redeem', _validate(redeemSchema), async (req, res) => {
+router.post('/redeem', authMiddleware, _validate(redeemSchema), async (req, res) => {
   try {
     const { points } = req.validated;
     const result = await pointsService.redeemPointsForCredits(req.user.id, points);
@@ -61,7 +61,7 @@ router.post('/redeem', _validate(redeemSchema), async (req, res) => {
 });
 
 // POST /api/points/earn — 管理后台手动发放积分
-router.post('/earn', adminAuth, _validate(earnSchema), async (req, res) => {
+router.post('/earn', authMiddleware, adminAuth, _validate(earnSchema), async (req, res) => {
   try {
     const { user_id, amount, remark } = req.validated;
     const result = await pointsService.earnPoints(user_id, {

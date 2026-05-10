@@ -32,6 +32,12 @@ class WsManager {
     this.userSockets = new Map();
     /** @type {Map<string, Set<import('ws').WebSocket>>}  ip → sockets */
     this.ipConnections = new Map();
+    /** @type {Map<import('ws').WebSocket, number>}  socket → lastMessageTs */
+    this.msgTimestamps = new Map();
+    /** @type {Map<import('ws').WebSocket, string>}  socket → userId */
+    this.socketUsers = new Map();
+    /** @type {Map<string, string>}  taskId → ownerUserId */
+    this.taskOwners = new Map();
     /** @type {WebSocketServer | null} */
     this.wss = null;
   }
@@ -87,9 +93,18 @@ class WsManager {
           if (existing.readyState === 1) existing.close(4000, '新连接替代');
         }
         this.userSockets.set(userId, socket);
+        this.socketUsers.set(socket, userId);
       }
 
+      // Rate limit: max 20 messages/sec per socket
       socket.on('message', (raw) => {
+        const now = Date.now();
+        const last = this.msgTimestamps.get(socket) || 0;
+        if (now - last < 50) {
+          socket.close(4003, '消息频率过高');
+          return;
+        }
+        this.msgTimestamps.set(socket, now);
         try {
           const msg = JSON.parse(raw.toString());
           this._handle(socket, msg);
@@ -101,6 +116,8 @@ class WsManager {
       socket.on('close', () => {
         if (userId) this.userSockets.delete(String(userId));
         this._unsubscribeAll(socket);
+        this.msgTimestamps.delete(socket);
+        this.socketUsers.delete(socket);
         ipSockets.delete(socket);
         if (ipSockets.size === 0) this.ipConnections.delete(clientIp);
       });
@@ -110,9 +127,16 @@ class WsManager {
   }
 
   _handle(socket, msg) {
+    const userId = this.socketUsers.get(socket);
     switch (msg.type) {
       case 'subscribe_task': {
         if (!msg.taskId) break;
+        // Enforce task ownership: only the task owner can subscribe
+        const owner = this.taskOwners.get(msg.taskId);
+        if (owner && owner !== userId) {
+          socket.send(JSON.stringify({ type: 'error', message: '无权订阅此任务' }));
+          break;
+        }
         const room = this.taskRooms.get(msg.taskId);
         if (room) room.add(socket);
         else this.taskRooms.set(msg.taskId, new Set([socket]));
@@ -173,6 +197,16 @@ class WsManager {
   pushToUser(userId, data) {
     const s = this.userSockets.get(String(userId));
     if (s && s.readyState === 1) s.send(JSON.stringify(data));
+  }
+
+  /** 注册任务所有者（Service 层在创建任务时调用） */
+  registerTaskOwner(taskId, userId) {
+    this.taskOwners.set(taskId, String(userId));
+  }
+
+  /** 注销任务所有者（任务完成/失败后清理） */
+  unregisterTask(taskId) {
+    this.taskOwners.delete(taskId);
   }
 
   /** 广播系统通知（管理员用） */
