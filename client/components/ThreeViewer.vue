@@ -25,9 +25,10 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
-import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+
+let _THREE: any = null;
+let _OrbitControls: any = null;
+let _GLTFLoader: any = null;
 
 const props = defineProps<{
   modelUrl?: string;
@@ -46,11 +47,11 @@ const canvasRef = ref<HTMLCanvasElement>();
 const loading = ref(false);
 const error = ref('');
 
-let renderer: THREE.WebGLRenderer | null = null;
-let scene: THREE.Scene | null = null;
-let camera: THREE.PerspectiveCamera | null = null;
-let orbitControls: OrbitControls | null = null;
-let model: THREE.Group | null = null;
+let renderer: any = null;
+let scene: any = null;
+let camera: any = null;
+let orbitControls: any = null;
+let model: any = null;
 let animationId = 0;
 let autoRotateActive = props.autoRotate !== false;
 
@@ -70,20 +71,20 @@ function initScene() {
   const width = containerRef.value.clientWidth;
   const height = containerRef.value.clientHeight;
 
-  renderer = new THREE.WebGLRenderer({ canvas: canvasRef.value, antialias: true, alpha: true });
+  renderer = new _THREE.WebGLRenderer({ canvas: canvasRef.value, antialias: true, alpha: true });
   renderer.setSize(width, height);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.shadowMap.enabled = true;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMapping = _THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.2;
 
-  scene = new THREE.Scene();
-  scene.background = new THREE.Color(props.bgColor || '#1a1a2e');
+  scene = new _THREE.Scene();
+  scene.background = new _THREE.Color(props.bgColor || '#1a1a2e');
 
-  camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
+  camera = new _THREE.PerspectiveCamera(45, width / height, 0.1, 100);
   camera.position.set(3, 2, 5);
 
-  orbitControls = new OrbitControls(camera, renderer.domElement);
+  orbitControls = new _OrbitControls(camera, renderer.domElement);
   orbitControls.enableDamping = true;
   orbitControls.dampingFactor = 0.08;
   orbitControls.autoRotate = autoRotateActive;
@@ -93,24 +94,24 @@ function initScene() {
   orbitControls.target.set(0, 0.5, 0);
 
   // Lighting
-  const ambientLight = new THREE.AmbientLight('#ffffff', 1.5);
+  const ambientLight = new _THREE.AmbientLight('#ffffff', 1.5);
   scene.add(ambientLight);
 
-  const keyLight = new THREE.DirectionalLight('#ffffff', 3);
+  const keyLight = new _THREE.DirectionalLight('#ffffff', 3);
   keyLight.position.set(5, 5, 5);
   keyLight.castShadow = true;
   scene.add(keyLight);
 
-  const fillLight = new THREE.DirectionalLight('#8888ff', 1);
+  const fillLight = new _THREE.DirectionalLight('#8888ff', 1);
   fillLight.position.set(-3, 2, -2);
   scene.add(fillLight);
 
-  const rimLight = new THREE.DirectionalLight('#ff8866', 1.5);
+  const rimLight = new _THREE.DirectionalLight('#ff8866', 1.5);
   rimLight.position.set(0, -1, 3);
   scene.add(rimLight);
 
   // Grid helper
-  const grid = new THREE.GridHelper(4, 20, '#333355', '#222244');
+  const grid = new _THREE.GridHelper(4, 20, '#333355', '#222244');
   scene.add(grid);
 
   animate();
@@ -130,10 +131,10 @@ function loadModel(url: string) {
   // Remove existing model
   if (model) {
     scene.remove(model);
-    model.traverse((child: THREE.Object3D) => {
-      if ((child as THREE.Mesh).geometry) (child as THREE.Mesh).geometry.dispose();
-      if ((child as THREE.Mesh).material) {
-        const mat = (child as THREE.Mesh).material;
+    model.traverse((child: _THREE.Object3D) => {
+      if ((child as _THREE.Mesh).geometry) (child as _THREE.Mesh).geometry.dispose();
+      if ((child as _THREE.Mesh).material) {
+        const mat = (child as _THREE.Mesh).material;
         if (Array.isArray(mat)) mat.forEach((m) => m.dispose());
         else mat.dispose();
       }
@@ -141,7 +142,7 @@ function loadModel(url: string) {
     model = null;
   }
 
-  const loader = new GLTFLoader();
+  const loader = new _GLTFLoader();
   const modelUrl = url.startsWith('http') ? url : `/api/${url.replace(/^\//, '')}`;
 
   loader.load(
@@ -150,16 +151,16 @@ function loadModel(url: string) {
       model = gltf.scene;
       if (!model) return;
       // Center and scale
-      const box = new THREE.Box3().setFromObject(model);
-      const center = box.getCenter(new THREE.Vector3());
-      const size = box.getSize(new THREE.Vector3());
+      const box = new _THREE.Box3().setFromObject(model);
+      const center = box.getCenter(new _THREE.Vector3());
+      const size = box.getSize(new _THREE.Vector3());
       const maxDim = Math.max(size.x, size.y, size.z);
       const scale = maxDim > 0 ? 2 / maxDim : 1;
       model.scale.setScalar(scale);
       model.position.sub(center.multiplyScalar(scale));
 
-      model.traverse((child: THREE.Object3D) => {
-        if ((child as THREE.Mesh).isMesh) {
+      model.traverse((child: _THREE.Object3D) => {
+        if ((child as _THREE.Mesh).isMesh) {
           child.castShadow = true;
           child.receiveShadow = true;
         }
@@ -170,14 +171,14 @@ function loadModel(url: string) {
       // Count vertices, faces, materials
       let vertices = 0, faces = 0;
       const materials = new Set<string>();
-      model.traverse((child: THREE.Object3D) => {
-        if ((child as THREE.Mesh).isMesh) {
-          const geom = (child as THREE.Mesh).geometry;
+      model.traverse((child: _THREE.Object3D) => {
+        if ((child as _THREE.Mesh).isMesh) {
+          const geom = (child as _THREE.Mesh).geometry;
           if (geom) {
             vertices += geom.attributes.position?.count || 0;
             faces += geom.index ? geom.index.count / 3 : (geom.attributes.position?.count || 0) / 3;
           }
-          const mat = (child as THREE.Mesh).material;
+          const mat = (child as _THREE.Mesh).material;
           if (Array.isArray(mat)) mat.forEach((m) => materials.add(m.name || m.type));
           else materials.add(mat.name || mat.type);
         }
@@ -211,9 +212,9 @@ function toggleRotate() {
 function toggleWireframe() {
   controls.value[1].active = !controls.value[1].active;
   if (model) {
-    model.traverse((child: THREE.Object3D) => {
-      if ((child as THREE.Mesh).isMesh) {
-        const mat = (child as THREE.Mesh).material;
+    model.traverse((child: _THREE.Object3D) => {
+      if ((child as _THREE.Mesh).isMesh) {
+        const mat = (child as _THREE.Mesh).material;
         if (Array.isArray(mat)) mat.forEach((m) => (m.wireframe = controls.value[1].active));
         else mat.wireframe = controls.value[1].active;
       }
@@ -259,10 +260,18 @@ watch(() => props.modelUrl, (url) => {
 });
 
 watch(() => props.bgColor, (color) => {
-  if (scene && color) scene.background = new THREE.Color(color);
+  if (scene && color) scene.background = new _THREE.Color(color);
 });
 
-onMounted(() => {
+onMounted(async () => {
+  try {
+    _THREE = await import('three');
+    _OrbitControls = (await import('three/examples/jsm/controls/OrbitControls.js')).OrbitControls;
+    _GLTFLoader = (await import('three/examples/jsm/loaders/GLTFLoader.js')).GLTFLoader;
+  } catch (e) {
+    error.value = '3D 引擎加载失败';
+    return;
+  }
   nextTick(() => {
     initScene();
     if (props.modelUrl) loadModel(props.modelUrl);

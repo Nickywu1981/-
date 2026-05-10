@@ -97,6 +97,7 @@ async function mockPay(result: 'success' | 'fail') {
 }
 
 function startPoll() {
+  if (pollTimer) clearInterval(pollTimer);
   pollTimer = setInterval(async () => {
     pollCount++
     try {

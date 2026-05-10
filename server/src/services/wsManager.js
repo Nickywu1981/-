@@ -30,15 +30,30 @@ class WsManager {
     this.taskRooms = new Map();
     /** @type {Map<string, import('ws').WebSocket>}  userId → socket */
     this.userSockets = new Map();
+    /** @type {Map<string, Set<import('ws').WebSocket>>}  ip → sockets */
+    this.ipConnections = new Map();
     /** @type {WebSocketServer | null} */
     this.wss = null;
   }
 
   /** 挂载到 HTTP server */
   attach(server) {
-    this.wss = new WebSocketServer({ server, path: '/ws' });
+    this.wss = new WebSocketServer({ server, path: '/ws', maxPayload: 64 * 1024 });
 
     this.wss.on('connection', (socket, req) => {
+      const clientIp = req.socket?.remoteAddress || 'unknown';
+
+      // 每 IP 最多 5 个并发连接
+      if (!this.ipConnections.has(clientIp)) {
+        this.ipConnections.set(clientIp, new Set());
+      }
+      const ipSockets = this.ipConnections.get(clientIp);
+      if (ipSockets.size >= 5) {
+        socket.close(4002, '连接数过多');
+        return;
+      }
+      ipSockets.add(socket);
+
       // 仅通过 JWT cookie 认证，拒绝匿名连接
       const cookies = parseCookies(req.headers.cookie);
       let userId = null;
@@ -65,6 +80,8 @@ class WsManager {
       socket.on('close', () => {
         if (userId) this.userSockets.delete(String(userId));
         this._unsubscribeAll(socket);
+        ipSockets.delete(socket);
+        if (ipSockets.size === 0) this.ipConnections.delete(clientIp);
       });
 
       socket.send(JSON.stringify({ type: 'connected', userId }));

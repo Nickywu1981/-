@@ -37,6 +37,11 @@ client.on('error', (err) => { logger.warn('[Redis] 连接错误', { error: err.m
 let connected = false;
 let triedConnect = false;
 
+// 每 60 秒重试 Redis 连接
+setInterval(() => {
+  if (!connected) triedConnect = false;
+}, 60000).unref();
+
 export async function getRedis() {
   if (connected) return client;
   if (!triedConnect) {

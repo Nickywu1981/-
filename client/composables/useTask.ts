@@ -12,38 +12,55 @@ export function useTask() {
   const polling = ref(false);
 
   let timer: ReturnType<typeof setInterval> | null = null;
+  let pollCount = 0;
+  let consecutiveFailures = 0;
+  let currentInterval = 1000;
 
   async function pollTask(id: string, baseUrl = '/api/images/tasks/') {
     taskId.value = id;
     polling.value = true;
     status.value = 0;
+    pollCount = 0;
+    consecutiveFailures = 0;
+    currentInterval = 1000;
 
-    timer = setInterval(async () => {
+    const doPoll = async () => {
+      if (!polling.value) return;
       try {
-        const res = await $fetch(`${baseUrl}${id}`, {
-          credentials: 'include',
-        });
+        const res = await $fetch(`${baseUrl}${id}`, { credentials: 'include' });
         const data = (res as any).data;
         status.value = data.status;
         progress.value = data.progress;
         progressMsg.value = data.progress_msg;
+        consecutiveFailures = 0;
 
         if (data.status === 2) {
           result.value = data.output_result;
           stopPolling();
+          return;
         } else if (data.status === 3) {
           errorMsg.value = data.error_msg || '任务失败';
           stopPolling();
+          return;
         }
       } catch {
-        // 网络错误不中断轮询
+        consecutiveFailures++;
       }
-    }, 1000);
+
+      // 自适应退避: 前5秒1s, 之后3s, 连续失败>3次则5s
+      pollCount++;
+      if (consecutiveFailures > 3) currentInterval = 5000;
+      else if (pollCount > 5) currentInterval = 3000;
+
+      if (polling.value) timer = setTimeout(doPoll, currentInterval) as any;
+    };
+
+    timer = setTimeout(doPoll, 1000) as any;
   }
 
   function stopPolling() {
     polling.value = false;
-    if (timer) { clearInterval(timer); timer = null; }
+    if (timer) { clearTimeout(timer); timer = null; }
   }
 
   function reset() {

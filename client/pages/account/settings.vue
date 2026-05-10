@@ -9,16 +9,16 @@
     <!-- 个人资料 -->
     <div v-if="tab === 'profile'" class="card">
       <div class="form-group">
-        <label>用户名</label>
-        <input v-model="form.nickname" type="text" placeholder="昵称" />
+        <label for="prof-nickname">用户名</label>
+        <input id="prof-nickname" v-model="form.nickname" type="text" placeholder="昵称" />
       </div>
       <div class="form-group">
-        <label>手机号</label>
-        <input v-model="form.phone" type="text" placeholder="选填" />
+        <label for="prof-phone">手机号</label>
+        <input id="prof-phone" v-model="form.phone" type="text" placeholder="选填" />
       </div>
       <div class="form-group">
-        <label>邮箱</label>
-        <input v-model="form.email" type="email" placeholder="选填" />
+        <label for="prof-email">邮箱</label>
+        <input id="prof-email" v-model="form.email" type="email" placeholder="选填" />
       </div>
       <button class="btn-save" :disabled="saving" @click="saveProfile">{{ saving ? '保存中...' : '保存' }}</button>
       <p v-if="msg" class="msg" :class="{ error: msgErr }">{{ msg }}</p>
@@ -33,13 +33,13 @@
       </div>
       <div v-else>
         <div class="form-group">
-          <label>手机号</label>
-          <input v-model="phoneForm.phone" type="text" maxlength="11" placeholder="请输入手机号" />
+          <label for="bind-phone">手机号</label>
+          <input id="bind-phone" v-model="phoneForm.phone" type="text" maxlength="11" placeholder="请输入手机号" />
         </div>
         <div class="form-group">
-          <label>验证码</label>
+          <label for="bind-code">验证码</label>
           <div class="code-row">
-            <input v-model="phoneForm.code" type="text" maxlength="6" placeholder="6位验证码" class="code-input" />
+            <input id="bind-code" v-model="phoneForm.code" type="text" maxlength="6" placeholder="6位验证码" class="code-input" />
             <button class="btn-code" :disabled="codeCooldown > 0" @click="sendBindCode">{{ codeCooldown > 0 ? `${codeCooldown}s` : '获取验证码' }}</button>
           </div>
         </div>
@@ -60,12 +60,12 @@
     <!-- 修改密码 -->
     <div v-if="tab === 'password'" class="card">
       <div class="form-group">
-        <label>原密码</label>
-        <input v-model="pw.oldPassword" type="password" placeholder="请输入原密码" />
+        <label for="pw-old">原密码</label>
+        <input id="pw-old" v-model="pw.oldPassword" type="password" placeholder="请输入原密码" />
       </div>
       <div class="form-group">
-        <label>新密码</label>
-        <input v-model="pw.newPassword" type="password" placeholder="至少6位" />
+        <label for="pw-new">新密码</label>
+        <input id="pw-new" v-model="pw.newPassword" type="password" placeholder="至少6位" />
       </div>
       <button class="btn-save" :disabled="pwSaving" @click="savePassword">{{ pwSaving ? '修改中...' : '修改密码' }}</button>
       <p v-if="pwMsg" class="msg" :class="{ error: pwMsgErr }">{{ pwMsg }}</p>
