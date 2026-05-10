@@ -48,7 +48,7 @@ onMounted(() => { guide.checkAndShow() })
 .onboard-title { font-size: 20px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
 .onboard-desc { font-size: 14px; color: var(--text-secondary); line-height: 1.6; min-height: 48px; }
 .onboard-dots { display: flex; justify-content: center; gap: 6px; margin: 20px 0 24px; }
-.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border-light); transition: all .3s; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border-light); transition: background .3s, width .3s, border-radius .3s; }
 .dot.active { background: var(--brand); width: 20px; border-radius: 4px; }
 .onboard-actions { display: flex; justify-content: center; gap: 10px; }
 .btn-primary {

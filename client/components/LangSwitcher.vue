@@ -49,7 +49,7 @@ function switchLang(code: string) {
   padding: 6px 10px; border: 1px solid #ebebea; border-radius: 8px;
   background: transparent; color: #171717; cursor: pointer;
   font-size: 12px; font-weight: 500; letter-spacing: -0.01em;
-  transition: all 0.2s;
+  transition: border-color 0.2s, background 0.2s;
 }
 .lsw-btn:hover { border-color: #c5c5c2; background: rgba(0,0,0,0.02); }
 .lsw-arrow { font-size: 9px; color: #6b6b70; transition: transform 0.2s; }

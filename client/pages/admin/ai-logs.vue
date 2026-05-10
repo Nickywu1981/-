@@ -142,7 +142,7 @@ tr:hover td { background: var(--table-row-hover); }
 .s-ok { color: var(--success); font-weight: 600; }
 .s-fail { color: var(--danger); font-weight: 600; }
 .time { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
-.btn-sm { padding: 4px 12px; font-size: 12px; border: 1px solid var(--border-light); border-radius: var(--radius-xs); background: var(--bg-card); color: var(--brand); cursor: pointer; transition: all var(--transition-fast); }
+.btn-sm { padding: 4px 12px; font-size: 12px; border: 1px solid var(--border-light); border-radius: var(--radius-xs); background: var(--bg-card); color: var(--brand); cursor: pointer; transition: border-color var(--transition-fast), color var(--transition-fast); }
 .btn-sm:hover { border-color: var(--brand); background: var(--brand-alpha); }
 
 .empty { text-align: center; padding: 40px; color: var(--text-muted); }

@@ -222,7 +222,7 @@ function statusClass(s: number) {
 .btn:hover { border-color: var(--brand); color: var(--brand); }
 .btn-primary { background: var(--brand); color: var(--text-on-brand); border-color: var(--brand); }
 .btn-primary:hover { opacity: 0.9; color: var(--text-on-brand); }
-.btn-sm { padding: 4px 10px; font-size: 12px; border: 1px solid var(--input-border); border-radius: var(--radius-xs); cursor: pointer; margin-right: 4px; background: var(--bg-card); color: var(--text-primary); transition: all var(--transition-fast); }
+.btn-sm { padding: 4px 10px; font-size: 12px; border: 1px solid var(--input-border); border-radius: var(--radius-xs); cursor: pointer; margin-right: 4px; background: var(--bg-card); color: var(--text-primary); transition: border-color var(--transition-fast), color var(--transition-fast); }
 .btn-sm:hover { border-color: var(--brand); color: var(--brand); }
 .btn-sm.success { background: var(--success); color: var(--text-on-brand); border-color: var(--success); }
 .btn-sm.success:hover { opacity: 0.85; }

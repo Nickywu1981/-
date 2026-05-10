@@ -141,7 +141,7 @@ onMounted(fetch)
 .nf-system { background: var(--brand-bg); color: var(--brand); }
 .nf-task { background: var(--info-bg); color: var(--info); }
 .nf-credit { background: var(--warning-bg); color: var(--warning); }
-.btn-sm { padding: 4px 12px; border-radius: var(--radius-sm); font-size: 12px; cursor: pointer; border: none; transition: all var(--transition-fast); }
+.btn-sm { padding: 4px 12px; border-radius: var(--radius-sm); font-size: 12px; cursor: pointer; border: none; transition: border-color var(--transition-fast), color var(--transition-fast); }
 .btn-del { background: var(--danger-bg); color: var(--danger); }
 .btn-del:hover { background: var(--danger); color: #fff; }
 /* Modal */

@@ -24,7 +24,7 @@ const totalPages = computed(() => Math.max(1, Math.ceil(props.total / props.page
   padding: 6px 14px; border: 1px solid var(--input-border);
   border-radius: var(--radius-sm); background: var(--bg-card);
   cursor: pointer; font-size: 13px; color: var(--text-secondary);
-  transition: all var(--transition-fast);
+  transition: border-color var(--transition-fast), color var(--transition-fast);
 }
 .pg-btns button:hover:not(:disabled) { border-color: var(--brand); color: var(--brand); }
 .pg-btns button:disabled { opacity: .4; cursor: not-allowed; }

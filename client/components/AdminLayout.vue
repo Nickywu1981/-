@@ -205,7 +205,7 @@ watch(() => route.path, (p) => {
   padding: 8px 10px; border-radius: 8px;
   font-size: 12.5px; color: var(--text-muted); font-weight: 500;
   cursor: pointer; user-select: none;
-  transition: all 0.15s;
+  transition: background 0.15s, color 0.15s;
 }
 .al-grp-hd:hover { background: var(--border-light); color: var(--text-secondary); }
 .al-grp-ic { font-size: 13px; width: 18px; text-align: center; flex-shrink: 0; }
@@ -224,7 +224,7 @@ watch(() => route.path, (p) => {
 .al-item {
   display: block; padding: 7px 10px; border-radius: 6px;
   font-size: 13px; color: var(--text-secondary); text-decoration: none;
-  transition: all 0.15s;
+  transition: background 0.15s, color 0.15s;
 }
 .al-item:hover { background: var(--border-light); color: var(--text-primary); }
 .al-item.router-link-active {

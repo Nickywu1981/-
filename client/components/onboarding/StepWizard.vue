@@ -231,7 +231,7 @@ onMounted(() => {
 }
 .wizard-dot {
   width: 10px; height: 10px; border-radius: 50%;
-  background: var(--border-light); transition: all 0.3s;
+  background: var(--border-light); transition: background 0.3s, width 0.3s, border-radius 0.3s;
 }
 .wizard-dot.active { background: var(--brand); width: 28px; border-radius: 5px; }
 .wizard-dot.done { background: rgba(124,58,237,0.4); }
@@ -250,7 +250,7 @@ onMounted(() => {
 .platform-card {
   display: flex; flex-direction: column; align-items: center; gap: 6px;
   padding: 14px 8px; border: 2px solid var(--border-light); border-radius: 14px;
-  background: var(--bg-page); cursor: pointer; transition: all 0.2s;
+  background: var(--bg-page); cursor: pointer; transition: border-color 0.2s, transform 0.2s, background 0.2s;
   position: relative;
 }
 .platform-card:hover { border-color: var(--brand); transform: translateY(-2px); }
@@ -267,7 +267,7 @@ onMounted(() => {
 /* Step 2: Upload zone */
 .upload-zone {
   border: 2px dashed var(--border-light); border-radius: 16px;
-  padding: 36px 16px; cursor: pointer; transition: all 0.2s;
+  padding: 36px 16px; cursor: pointer; transition: border-color 0.2s, background 0.2s;
   margin-bottom: 16px; position: relative; min-height: 140px;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
 }
@@ -287,7 +287,7 @@ onMounted(() => {
 .example-chip {
   padding: 5px 14px; border: 1px solid var(--border-light); border-radius: 20px;
   background: var(--bg-page); font-size: 12px; color: var(--text-secondary);
-  cursor: pointer; transition: all 0.15s;
+  cursor: pointer; transition: border-color 0.15s, color 0.15s;
 }
 .example-chip:hover { border-color: var(--brand); color: var(--brand); }
 
@@ -299,7 +299,7 @@ onMounted(() => {
 .tool-card {
   display: flex; flex-direction: column; align-items: center; gap: 4px;
   padding: 16px 10px; border: 1px solid var(--border-light); border-radius: 14px;
-  cursor: pointer; transition: all 0.2s; background: var(--bg-page);
+  cursor: pointer; transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s; background: var(--bg-page);
 }
 .tool-card:hover { border-color: var(--brand); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(124,58,237,0.1); }
 .tool-icon { font-size: 28px; }
@@ -310,7 +310,7 @@ onMounted(() => {
 /* Buttons */
 .wizard-next, .wizard-finish {
   width: 100%; padding: 12px; border: none; border-radius: 12px;
-  font-size: 15px; cursor: pointer; font-weight: 600; transition: all 0.2s;
+  font-size: 15px; cursor: pointer; font-weight: 600; transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
 }
 .wizard-next {
   background: var(--brand-gradient); color: #fff;

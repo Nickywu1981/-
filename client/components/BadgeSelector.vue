@@ -68,7 +68,7 @@ onMounted(() => { fetchBadges(); });
   display: inline-flex; align-items: center; gap: 4px;
   padding: 5px 12px; border-radius: var(--badge-radius); font-size: 13px;
   border: 1.5px solid var(--input-border); background: var(--bg-card);
-  color: var(--text-primary); cursor: pointer; transition: all var(--transition-fast);
+  color: var(--text-primary); cursor: pointer; transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
 }
 .badge-chip:hover { border-color: var(--chip-color, var(--brand)); box-shadow: 0 0 0 2px color-mix(in srgb, var(--chip-color, #7C3AED) 15%, transparent); }
 .badge-chip.active {

@@ -69,7 +69,7 @@ watch(() => props.workId, () => { checkSaved() })
   padding: 6px 12px; border: 1px solid var(--border-light);
   border-radius: var(--radius-md); background: var(--bg-card);
   color: var(--text-secondary); font-size: 12px; cursor: pointer;
-  transition: all var(--transition-fast); user-select: none;
+  transition: border-color var(--transition-fast), color var(--transition-fast), background var(--transition-fast); user-select: none;
 }
 .quick-save-btn:hover { border-color: var(--brand); color: var(--brand); }
 .quick-save-btn.saved { border-color: #ec4899; color: #ec4899; background: #fdf2f8; }

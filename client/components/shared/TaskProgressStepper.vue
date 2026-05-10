@@ -66,7 +66,7 @@ const percent = computed(() => {
 .progress-stepper { padding: 20px 0; }
 .steps { display: flex; align-items: flex-start; gap: 0; }
 .step { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; text-align: center; min-width: 0; }
-.step-indicator { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; transition: all 0.3s ease; flex-shrink: 0; }
+.step-indicator { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; transition: background 0.3s ease, color 0.3s ease, border 0.3s ease, box-shadow 0.3s ease; flex-shrink: 0; }
 .step.pending .step-indicator { background: var(--bg-secondary); color: var(--text-muted); border: 2px solid var(--border-light); }
 .step.active .step-indicator { background: var(--brand); color: #fff; border: 2px solid var(--brand); box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.15); }
 .step.done .step-indicator { background: #22C55E; color: #fff; border: 2px solid #22C55E; }

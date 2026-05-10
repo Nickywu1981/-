@@ -116,7 +116,7 @@ tr:hover td { background: var(--table-row-hover); }
 .status-tag.pending { background: var(--status-pending-bg); color: var(--status-pending-text); }
 .status-tag.active { background: var(--status-done-bg); color: var(--status-done-text); }
 .status-tag.banned { background: var(--status-fail-bg); color: var(--status-fail-text); }
-.btn-sm { padding: 3px 10px; border: 1px solid var(--input-border); border-radius: var(--radius-xs); background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 12px; margin-right: 4px; transition: all var(--transition-fast); }
+.btn-sm { padding: 3px 10px; border: 1px solid var(--input-border); border-radius: var(--radius-xs); background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 12px; margin-right: 4px; transition: border-color var(--transition-fast), color var(--transition-fast); }
 .btn-sm:hover { border-color: var(--brand); color: var(--brand); }
 .btn-sm.success { background: var(--success); color: #fff; border-color: var(--success); }
 .btn-sm.warn { background: var(--warning); color: #fff; border-color: var(--warning); }

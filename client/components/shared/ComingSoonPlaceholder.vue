@@ -37,7 +37,7 @@ defineProps<{
 .wp-progress-label { font-size: 12px; color: var(--tx3, #9d9da3); }
 .wp-btn {
   padding: 9px 28px; border-radius: 8px; font-size: 13px; font-weight: 500; border: 1px solid var(--tx, #171717);
-  background: var(--tx, #171717); color: #fff; cursor: pointer; transition: all 0.15s;
+  background: var(--tx, #171717); color: #fff; cursor: pointer; transition: opacity 0.15s;
 }
 .wp-btn:hover { opacity: 0.85; }
 </style>

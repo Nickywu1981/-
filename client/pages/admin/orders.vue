@@ -132,7 +132,7 @@ onMounted(fetch)
 .filters input { width: 160px; }
 .btn { padding: 8px 20px; background: var(--brand); color: #fff; border: none; border-radius: var(--radius-md); cursor: pointer; font-size: 13px; transition: opacity var(--transition-fast); }
 .btn:hover { opacity: 0.9; }
-.btn-sm { padding: 4px 10px; font-size: 12px; border-radius: var(--radius-sm); border: 1px solid var(--input-border); background: var(--bg-card); color: var(--text-primary); cursor: pointer; transition: all var(--transition-fast); }
+.btn-sm { padding: 4px 10px; font-size: 12px; border-radius: var(--radius-sm); border: 1px solid var(--input-border); background: var(--bg-card); color: var(--text-primary); cursor: pointer; transition: border-color var(--transition-fast), color var(--transition-fast); }
 .btn-sm:hover { background: var(--brand-subtle); border-color: var(--brand); color: var(--brand); }
 .btn-sm.danger { color: var(--danger); border-color: transparent; }
 .btn-sm.danger:hover { background: var(--danger-subtle); border-color: var(--danger); }

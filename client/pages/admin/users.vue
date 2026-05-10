@@ -227,7 +227,7 @@ tr.selected { background: var(--brand-light); }
 .status { padding: 2px 8px; border-radius: var(--radius-xs); font-size: 12px; }
 .status.active { background: var(--status-done-bg); color: var(--status-done-text); }
 .status.banned { background: var(--status-fail-bg); color: var(--status-fail-text); }
-.btn-sm { padding: 4px 12px; border: 1px solid var(--input-border); border-radius: var(--radius-xs); background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 12px; transition: all var(--transition-fast); }
+.btn-sm { padding: 4px 12px; border: 1px solid var(--input-border); border-radius: var(--radius-xs); background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 12px; transition: border-color var(--transition-fast), color var(--transition-fast); }
 .btn-sm:hover { border-color: var(--brand); color: var(--brand); }
 .btn-sm.danger { color: var(--danger); border-color: var(--danger); }
 .btn-sm.danger:hover { background: var(--danger); color: #fff; }

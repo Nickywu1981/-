@@ -130,7 +130,7 @@ function apply() {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 6px 14px; border-radius: 6px; border: 1px dashed #90caf9;
   background: #e3f2fd; color: #1565c0; font-size: 13px; font-weight: 500;
-  cursor: pointer; transition: all .15s;
+  cursor: pointer; transition: background .15s, border-color .15s;
 }
 .pe-trigger:hover { background: #bbdefb; border-color: #42a5f5; }
 .pe-icon { font-size: 16px; }

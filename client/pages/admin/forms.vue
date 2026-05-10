@@ -248,7 +248,7 @@ tr:hover td { background: var(--table-row-hover); }
 .subs-panel { margin-top: 30px; background: var(--bg-card); border-radius: var(--radius-lg); padding: 20px; border: 1px solid var(--border-light); }
 .subs-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
 
-.btn-sm { padding: 4px 10px; font-size: 12px; border: 1px solid var(--input-border); border-radius: var(--radius-xs); background: var(--bg-card); color: var(--text-primary); cursor: pointer; transition: all var(--transition-fast); }
+.btn-sm { padding: 4px 10px; font-size: 12px; border: 1px solid var(--input-border); border-radius: var(--radius-xs); background: var(--bg-card); color: var(--text-primary); cursor: pointer; transition: border-color var(--transition-fast), color var(--transition-fast); }
 .btn-sm:hover { border-color: var(--brand); color: var(--brand); }
 .btn-sm.danger { color: var(--danger); border-color: var(--danger); }
 .btn-sm.danger:hover { background: var(--danger); color: #fff; }

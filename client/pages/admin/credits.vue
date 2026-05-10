@@ -145,7 +145,7 @@ onMounted(fetch)
 .earn { color: var(--success); font-weight: 600; }
 .spend { color: var(--danger); font-weight: 600; }
 .muted { color: var(--text-muted); }
-.btn-sm { padding: 4px 12px; border-radius: var(--radius-sm); font-size: 12px; cursor: pointer; border: none; transition: all var(--transition-fast); }
+.btn-sm { padding: 4px 12px; border-radius: var(--radius-sm); font-size: 12px; cursor: pointer; border: none; transition: border-color var(--transition-fast), color var(--transition-fast); }
 .btn-refund { background: var(--danger-light, #FEE2E2); color: var(--danger); }
 .btn-refund:hover { background: var(--danger); color: #fff; }
 /* Modal */

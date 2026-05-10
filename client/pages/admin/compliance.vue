@@ -89,7 +89,7 @@ h4 { font-size: 14px; font-weight: 600; color: var(--text-secondary); margin: 8p
 .btn-primary { background: var(--brand); color: #fff; }
 .btn-primary:hover { opacity: 0.9; }
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-.btn-sm { padding: 4px 12px; border: 1px solid var(--input-border); border-radius: var(--radius-xs); background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 12px; transition: all var(--transition-fast); }
+.btn-sm { padding: 4px 12px; border: 1px solid var(--input-border); border-radius: var(--radius-xs); background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 12px; transition: border-color var(--transition-fast), color var(--transition-fast); }
 .btn-sm:hover { border-color: var(--brand); color: var(--brand); }
 
 .rules-section { margin-top: 24px; }

@@ -47,8 +47,8 @@ function handleBack() {
 .error-title { font-size: 22px; color: var(--text-primary); margin-bottom: 12px; font-weight: 600; }
 .error-desc { font-size: 14px; color: var(--text-muted); margin-bottom: 32px; }
 .error-actions { display: flex; justify-content: center; gap: 16px; }
-.btn-back { padding: 10px 32px; background: var(--bg-card); color: var(--brand); border: 1px solid var(--brand); border-radius: var(--radius-md); font-size: 15px; cursor: pointer; transition: all var(--transition-fast); }
+.btn-back { padding: 10px 32px; background: var(--bg-card); color: var(--brand); border: 1px solid var(--brand); border-radius: var(--radius-md); font-size: 15px; cursor: pointer; transition: background var(--transition-fast); }
 .btn-back:hover { background: var(--brand-light); }
-.btn-home { padding: 10px 32px; background: var(--brand-gradient); color: #fff; border-radius: var(--radius-md); font-size: 15px; text-decoration: none; display: inline-block; transition: all var(--transition-fast); }
+.btn-home { padding: 10px 32px; background: var(--brand-gradient); color: #fff; border-radius: var(--radius-md); font-size: 15px; text-decoration: none; display: inline-block; transition: transform var(--transition-fast), box-shadow var(--transition-fast); }
 .btn-home:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(124,58,237,0.3); }
 </style>

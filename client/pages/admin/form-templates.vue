@@ -100,7 +100,7 @@ h2 { font-size: 22px; font-weight: 700; color: var(--text-primary); margin-botto
 .table th, .table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--table-border); }
 .table th { color: var(--text-secondary); font-weight: 500; font-size: 12px; background: var(--table-header-bg); }
 tr:hover td { background: var(--table-row-hover); }
-.btn-sm { padding: 4px 12px; border: 1px solid var(--input-border); border-radius: var(--radius-xs); background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 12px; margin-right: 6px; transition: all var(--transition-fast); }
+.btn-sm { padding: 4px 12px; border: 1px solid var(--input-border); border-radius: var(--radius-xs); background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 12px; margin-right: 6px; transition: border-color var(--transition-fast), color var(--transition-fast); }
 .btn-sm:hover { border-color: var(--brand); color: var(--brand); }
 .btn-danger { color: var(--danger); border-color: var(--danger); }
 .btn-danger:hover { background: var(--danger); color: #fff; }

@@ -274,7 +274,7 @@ watch(() => useRoute().path, close);
   display: flex; align-items: center; gap: 6px;
   padding: 8px 16px; border: 1px solid var(--border-light); border-radius: 10px;
   background: var(--bg-page); color: var(--text-primary); font-size: 13px;
-  cursor: pointer; transition: all var(--transition-fast);
+  cursor: pointer; transition: border-color var(--transition-fast), background var(--transition-fast);
 }
 .palette-hot-btn:hover { border-color: var(--brand); background: rgba(124,58,237,0.06); }
 

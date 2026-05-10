@@ -114,7 +114,7 @@ defineExpose({ open, close });
 .lightbox-thumb {
   width: 56px; height: 56px; border-radius: 6px; overflow: hidden;
   cursor: pointer; border: 2px solid transparent; opacity: 0.5;
-  transition: all 0.15s; flex-shrink: 0;
+  transition: border-color 0.15s, opacity 0.15s; flex-shrink: 0;
 }
 .lightbox-thumb.active { border-color: var(--brand); opacity: 1; }
 .lightbox-thumb img { width: 100%; height: 100%; object-fit: cover; }

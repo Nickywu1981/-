@@ -108,7 +108,7 @@ function handleAction() {
   cursor: pointer;
   border: none;
   font-weight: 500;
-  transition: all var(--transition-fast);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
   white-space: nowrap;
 }
 .empty-action--primary {

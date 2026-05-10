@@ -199,7 +199,7 @@ a:hover { color: var(--cfg-primary-hover); }
   border: 1px solid transparent;
   border-radius: var(--cfg-radius-base);
   cursor: pointer;
-  transition: all var(--cfg-transition-fast);
+  transition: background var(--cfg-transition-fast), opacity var(--cfg-transition-fast), color var(--cfg-transition-fast), border-color var(--cfg-transition-fast), transform var(--cfg-transition-fast), box-shadow var(--cfg-transition-fast);
   white-space: nowrap;
   user-select: none;
 }

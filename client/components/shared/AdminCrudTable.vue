@@ -131,7 +131,7 @@ defineExpose({ fetch, list, total, page })
 .crud-toolbar input:focus { border-color:var(--input-focus-border); box-shadow:var(--focus-ring); }
 .sel { padding:8px 12px; border:1px solid var(--input-border); border-radius:var(--radius-sm); font-size:13px; background:var(--bg-card); color:var(--text-primary); outline:none; transition:border-color var(--transition-fast); }
 .sel:focus { border-color:var(--input-focus-border); }
-.btn { padding:8px 16px; border:1px solid var(--input-border); border-radius:var(--radius-sm); background:var(--bg-card); color:var(--text-primary); cursor:pointer; font-size:13px; transition:all var(--transition-fast); }
+.btn { padding:8px 16px; border:1px solid var(--input-border); border-radius:var(--radius-sm); background:var(--bg-card); color:var(--text-primary); cursor:pointer; font-size:13px; transition:border-color var(--transition-fast), color var(--transition-fast), opacity var(--transition-fast); }
 .btn:hover { border-color:var(--brand); color:var(--brand); }
 .btn-primary { background:var(--brand); color:var(--text-on-brand); border-color:var(--brand); }
 .btn-primary:hover { opacity:0.9; color:var(--text-on-brand); }
@@ -146,7 +146,7 @@ tr:hover td { background:var(--table-row-hover); }
 .status-dot.off { background:var(--text-muted); }
 .badge { padding:2px 8px; border-radius:var(--badge-radius); font-size:11px; font-weight:600; }
 .actions { display:flex; gap:6px; white-space:nowrap; }
-.btn-sm { padding:4px 10px; font-size:12px; border:1px solid var(--input-border); border-radius:var(--radius-xs); cursor:pointer; background:var(--bg-card); color:var(--text-primary); transition:all var(--transition-fast); }
+.btn-sm { padding:4px 10px; font-size:12px; border:1px solid var(--input-border); border-radius:var(--radius-xs); cursor:pointer; background:var(--bg-card); color:var(--text-primary); transition:border-color var(--transition-fast), color var(--transition-fast); }
 .btn-sm:hover { border-color:var(--brand); color:var(--brand); }
 .btn-sm.success { background:var(--success); color:var(--text-on-brand); border-color:var(--success); }
 .btn-sm.warn { background:var(--warning); color:var(--text-on-brand); border-color:var(--warning); }
