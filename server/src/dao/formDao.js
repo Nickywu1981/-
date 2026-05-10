@@ -65,7 +65,7 @@ export default {
 
   async deleteForm(id, tenantId) {
     await pool.query('DELETE FROM custom_form_submission WHERE form_id = ?', [id]);
-    await pool.query('DELETE FROM diy_custom_field WHERE form_id = ?', [id]);
+    await pool.query('DELETE FROM diy_custom_field WHERE form_id = ? AND tenant_id = ?', [id, tenantId]);
     await pool.query('DELETE FROM custom_form WHERE id = ? AND tenant_id = ?', [id, tenantId]);
   },
 

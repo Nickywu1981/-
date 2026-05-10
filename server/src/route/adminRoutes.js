@@ -25,6 +25,7 @@ const checkContentSchema = z.object({
 const sensitiveWordSchema = z.object({
   word: z.string().min(1, '敏感词不能为空').max(100),
   category: z.string().max(50).optional(),
+  level: z.coerce.number().int().min(1).max(2).default(1),
 });
 const refundSchema = z.object({
   recordId: idSchema,

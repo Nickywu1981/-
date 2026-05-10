@@ -24,7 +24,8 @@ export async function listSensitiveWords({ keyword, page = 1, pageSize = 50 }) {
   const offset = (page - 1) * pageSize;
   params.push(offset, pageSize);
   const [rows] = await pool.query(`SELECT * FROM sensitive_word ${cond} ORDER BY create_time DESC LIMIT ?, ?`, params);
-  const [[{ total }]] = await pool.query(`SELECT COUNT(*) AS total FROM sensitive_word ${cond}`, params);
+  const countParams = keyword ? [`%${keyword}%`] : [];
+  const [[{ total }]] = await pool.query(`SELECT COUNT(*) AS total FROM sensitive_word ${cond}`, countParams);
   return { list: rows, total };
 }
 
@@ -41,7 +42,8 @@ export async function checkText(text) {
   const hits = [];
   for (const w of words) {
     try {
-      if (new RegExp(w.word, 'i').test(text)) hits.push(w);
+      const escaped = w.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      if (new RegExp(escaped, 'i').test(text)) hits.push(w);
     } catch { if (text.includes(w.word)) hits.push(w); }
   }
   return { safe: hits.length === 0, hits, block: hits.some(h => h.level === 1), review: hits.some(h => h.level === 2) };

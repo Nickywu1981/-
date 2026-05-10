@@ -4,8 +4,8 @@ export async function listSensitiveWords(options) {
   return sensitiveWordDao.listSensitiveWords(options || {});
 }
 
-export async function addSensitiveWord(word, category) {
-  return sensitiveWordDao.addSensitiveWord(word, category);
+export async function addSensitiveWord(word, category, level) {
+  return sensitiveWordDao.addSensitiveWord(word, category, level);
 }
 
 export async function deleteSensitiveWord(id) {

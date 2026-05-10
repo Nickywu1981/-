@@ -117,7 +117,7 @@ export async function addSensitiveWord(req, res, next) {
   try {
     const { word } = req.body;
     if (!word) return error(res, ERROR_CODE.PARAM_MISSING, '请输入敏感词');
-    await sensitiveWordService.addSensitiveWord(req.body.word, req.body.category);
+    await sensitiveWordService.addSensitiveWord(req.body.word, req.body.category, req.body.level);
     return success(res, {}, '已添加');
   } catch (err) { next(err); }
 }
