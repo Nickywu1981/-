@@ -1,5 +1,3 @@
-import { useToast } from '#imports'
-const toast = useToast()
 <template>
   <WorkLayout title="作品输出" subtitle="批量导出与发布">
     <LoadingSkeleton v-if="loading" type="card" :rows="4" />

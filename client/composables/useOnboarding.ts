@@ -30,7 +30,8 @@ export default function useOnboarding() {
   const checkAndShow = () => {
     if (import.meta.server) return
     if (!hasSeenGuide()) {
-      setTimeout(() => { isVisible.value = true }, 800)
+      const timer = setTimeout(() => { isVisible.value = true }, 800)
+      onUnmounted(() => clearTimeout(timer))
     }
   }
 

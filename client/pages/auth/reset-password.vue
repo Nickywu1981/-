@@ -63,6 +63,8 @@ const loading = ref(false)
 const verified = ref(false)
 const errorMsg = ref('')
 const successMsg = ref('')
+const navTimer = ref<ReturnType<typeof setTimeout> | null>(null)
+onBeforeUnmount(() => { if (navTimer.value) clearTimeout(navTimer.value) })
 
 const { countdown: sendCooldown, start: startCd } = useCountdown(60)
 
@@ -111,7 +113,7 @@ async function handleReset() {
     const res: any = await $fetch('/api/auth/reset-password', { method: 'POST', body, credentials: 'include' })
     if (res.code === 200) {
       successMsg.value = '密码重置成功，3秒后跳转登录'
-      setTimeout(() => navigateTo('/login'), 3000)
+      navTimer.value = setTimeout(() => navigateTo('/login'), 3000)
     } else {
       errorMsg.value = res.msg || '重置失败'
     }

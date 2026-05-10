@@ -14,6 +14,7 @@ export function useTaskProgress(taskId?: string) {
 
   let socket: WebSocket | null = null;
   let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  let intentionalClose = false;
 
   function connect() {
     if (!taskId) return;
@@ -52,7 +53,7 @@ export function useTaskProgress(taskId?: string) {
     };
 
     socket.onclose = () => {
-      if (status.value === 'processing') {
+      if (!intentionalClose && status.value === 'processing') {
         reconnectTimer = setTimeout(() => connect(), 3000);
       }
     };
@@ -63,6 +64,7 @@ export function useTaskProgress(taskId?: string) {
   }
 
   function disconnect() {
+    intentionalClose = true;
     if (reconnectTimer) clearTimeout(reconnectTimer);
     if (socket) {
       socket.send(JSON.stringify({ type: 'unsubscribe_task', taskId }));

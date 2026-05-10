@@ -40,14 +40,15 @@ class WsManager {
   attach(server) {
     this.wss = new WebSocketServer({ server, path: '/ws', maxPayload: 64 * 1024 });
 
-    // 心跳检测：每 30 秒 ping，60 秒无 pong 视为断连
+    // 心跳检测：可通过 WS_HEARTBEAT_MS 配置间隔
+    const heartbeatMs = config.ws?.heartbeatIntervalMs || 30000;
     const interval = setInterval(() => {
       this.wss?.clients.forEach((ws) => {
         if (ws.isAlive === false) return ws.terminate();
         ws.isAlive = false;
         ws.ping();
       });
-    }, 30000);
+    }, heartbeatMs);
     this.wss.on('close', () => clearInterval(interval));
 
     this.wss.on('connection', (socket, req) => {
@@ -61,7 +62,7 @@ class WsManager {
         this.ipConnections.set(clientIp, new Set());
       }
       const ipSockets = this.ipConnections.get(clientIp);
-      if (ipSockets.size >= 5) {
+      if (ipSockets.size >= (config.ws?.maxConnectionsPerIp || 5)) {
         socket.close(4002, '连接数过多');
         return;
       }

@@ -151,8 +151,22 @@ export const adminApi = {
 export type { ApiResponse, PaginatedData };
 export default api;
 
+let activeInstances = 0;
+
 /** Composable wrapper for pages that import { useApi } */
 export function useApi() {
   ensureListeners();
+  activeInstances++;
+
+  onUnmounted(() => {
+    activeInstances--;
+    if (activeInstances <= 0 && typeof window !== 'undefined') {
+      window.removeEventListener('offline', onOffline);
+      window.removeEventListener('online', onOnline);
+      listenersInit = false;
+      activeInstances = 0;
+    }
+  });
+
   return api;
 }

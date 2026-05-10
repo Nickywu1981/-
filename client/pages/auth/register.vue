@@ -66,6 +66,8 @@ const inviteCode = ref('')
 const loading = ref(false)
 const errorMsg = ref('')
 const successMsg = ref('')
+const navTimer = ref<ReturnType<typeof setTimeout> | null>(null)
+onBeforeUnmount(() => { if (navTimer.value) clearTimeout(navTimer.value) })
 
 async function handleRegister() {
   errorMsg.value = ''
@@ -94,7 +96,7 @@ async function handleRegister() {
     })
     if (res.code === 200) {
       successMsg.value = '注册成功，正在跳转...'
-      setTimeout(() => navigateTo('/workspace'), 1000)
+      navTimer.value = setTimeout(() => navigateTo('/workspace'), 1000)
     } else {
       errorMsg.value = res.msg || '注册失败'
     }

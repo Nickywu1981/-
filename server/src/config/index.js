@@ -71,6 +71,12 @@ const config = {
   get isProd() {
     return this.env === 'production';
   },
+
+  ws: {
+    maxConnectionsPerIp: parseInt(process.env.WS_MAX_CONN_PER_IP, 10) || 5,
+    heartbeatIntervalMs: parseInt(process.env.WS_HEARTBEAT_MS, 10) || 30000,
+    heartbeatThresholdMs: parseInt(process.env.WS_HEARTBEAT_THRESHOLD_MS, 10) || 60000,
+  },
 };
 
 export default config;

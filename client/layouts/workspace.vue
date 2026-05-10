@@ -48,7 +48,9 @@
         </div>
       </header>
       <main class="wsl-content">
-        <slot />
+        <SharedErrorBoundary>
+          <slot />
+        </SharedErrorBoundary>
       </main>
     </div>
   </div>

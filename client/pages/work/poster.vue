@@ -279,7 +279,7 @@ function discardEnhance() {
 }
 
 async function submitTask() {
-  if (!prompt.value.trim()) return;
+  if (!prompt.value.trim() || submitting.value) return;
   submitting.value = true;
   generating.value = true;
   errorMsg.value = '';

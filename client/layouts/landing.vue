@@ -1,3 +1,5 @@
 <template>
-  <main><slot /></main>
+  <SharedErrorBoundary>
+    <main><slot /></main>
+  </SharedErrorBoundary>
 </template>
