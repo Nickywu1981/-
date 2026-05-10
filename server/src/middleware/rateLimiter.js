@@ -22,7 +22,8 @@ setInterval(() => {
 }, CONCURRENCY_TTL_MS).unref();
 
 function getConcurrencyKey(req) {
-  return req.user?.id || req.ip.replace(/^::ffff:/, '');
+  const ip = req.ip || req.connection?.remoteAddress || '0.0.0.0';
+  return req.user?.id || ip.replace(/^::ffff:/, '');
 }
 
 export function concurrencyGuard(maxConcurrent = CONCURRENCY_MAX_PER_USER) {

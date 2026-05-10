@@ -4,7 +4,7 @@
  * 独立Worker进程：轮询 job_queue → 调用AI模型 → 更新结果
  * 用法: node server/src/workers/worker.js
  */
-import '../utils/env.js'; // 确保环境变量已加载
+// dotenv 由 config/index.js 负责加载
 import logger from '../utils/logger.js';
 import config from '../config/index.js';
 import * as jobQueueService from '../services/job-queue.service.js';

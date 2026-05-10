@@ -43,6 +43,11 @@ const logger = createLogger({
       new transports.File({ filename: path.join(LOG_DIR, 'combined.log'), maxsize: 10 * 1024 * 1024, maxFiles: 30 }),
     ]),
   ],
+  exitOnError: false,
+});
+
+logger.on('error', (err) => {
+  console.error('[Logger] Transport error:', err.message);
 });
 
 /** 请求日志中间件（带采样） */

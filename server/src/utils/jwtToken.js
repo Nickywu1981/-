@@ -117,13 +117,23 @@ export async function revokeAccessToken(token) {
 }
 
 /**
- * 检查 access token 是否在黑名单中
+ * 检查 access token 是否在黑名单中（含用户级吊销）
  */
 export async function isTokenBlacklisted(token) {
   const r = await getRedis();
   if (!r) return false;
-  const exists = await r.get(`jwt_blacklist:${token.slice(-32)}`);
-  return exists !== null;
+  // 检查 token 级黑名单
+  const blacklisted = await r.get(`jwt_blacklist:${token.slice(-32)}`);
+  if (blacklisted) return true;
+  // 检查用户级吊销
+  try {
+    const payload = jwt.decode(token);
+    if (payload?.id) {
+      const revokedAt = await r.get(`user_revoke:${payload.id}`);
+      if (revokedAt && payload.iat && payload.iat < Number(revokedAt)) return true;
+    }
+  } catch { /* decode error, treat as not blacklisted */ }
+  return false;
 }
 
 /**
