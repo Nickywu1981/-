@@ -15,7 +15,7 @@
       <!-- 左侧: 分组树 -->
       <aside class="config-sidebar">
         <div class="sidebar-search">
-          <input v-model="searchQuery" type="text" class="input" placeholder="搜索配置组..." />
+          <input v-model="searchQuery" type="text" maxlength="100" class="input" placeholder="搜索配置组..." />
         </div>
         <div class="group-tree">
           <div
@@ -72,6 +72,7 @@
                 v-if="item.item_type === 'text' || item.item_type === 'url'"
                 v-model="editValues[item.item_key]"
                 type="text"
+                maxlength="2000"
                 class="input"
                 :placeholder="item.placeholder || item.default_val"
               />
@@ -81,6 +82,7 @@
                 v-else-if="item.item_type === 'textarea'"
                 v-model="editValues[item.item_key]"
                 class="input"
+                maxlength="5000"
                 rows="3"
                 :placeholder="item.placeholder || item.default_val"
               ></textarea>

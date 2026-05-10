@@ -5,7 +5,7 @@
     </div>
 
     <div class="toolbar">
-      <input v-model="keyword" type="text" placeholder="搜索订单号" @keyup.enter="search" />
+      <input v-model="keyword" type="text" maxlength="100" placeholder="搜索订单号" @keyup.enter="search" />
       <select v-model="filterStatus" class="sel" @change="search">
         <option value="">全部状态</option>
         <option value="0">待支付</option>

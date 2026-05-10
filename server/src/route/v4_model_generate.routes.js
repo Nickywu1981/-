@@ -6,10 +6,12 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { success } from '../utils/response.js';
 import { validateV4 as _validate } from '../utils/validate.js';
+import { authMiddleware } from '../middleware/auth.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { infer } from '../services/aiEngine.js';
 
 const router = Router();
+router.use(authMiddleware);
 
 const generateSchema = z.object({
   clothingImage: z.string().min(1, '请上传服装图片'),

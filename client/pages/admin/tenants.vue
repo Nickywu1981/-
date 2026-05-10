@@ -6,7 +6,7 @@
     </div>
 
     <div class="toolbar">
-      <input v-model="keyword" type="text" placeholder="搜索名称 / 编码" @keyup.enter="search" />
+      <input v-model="keyword" type="text" maxlength="100" placeholder="搜索名称 / 编码" @keyup.enter="search" />
       <select v-model="filterStatus" class="sel" @change="search">
         <option value="">全部状态</option>
         <option value="1">启用</option>

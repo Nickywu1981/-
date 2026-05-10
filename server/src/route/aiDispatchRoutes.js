@@ -57,9 +57,11 @@ router.get('/categories', asyncHandler(async (_req, res) => {
   return success(res, categories);
 }));
 
+const categoryParamSchema = z.object({ category: z.string().min(1).max(50) });
+
 // ==================== GET /api/ai/categories/:category ====================
 
-router.get('/categories/:category', asyncHandler(async (req, res) => {
+router.get('/categories/:category', validate(categoryParamSchema, 'params'), asyncHandler(async (req, res) => {
   const models = getModelsByCategory(req.params.category);
   return success(res, { category: req.params.category, models: models.map((m) => m.id) });
 }));
