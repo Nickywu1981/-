@@ -7,6 +7,21 @@ import { BusinessError } from '../utils/businessError.js';
  */
 import db from '../dao/db.js';
 
+// ── 乐观锁重试工具（版本冲突时自动重试，最大 3 次指数退避）──
+async function withOptimisticRetry(fn, maxRetries = 3) {
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      if ((err.status === 409 || err.code === 409) && attempt < maxRetries - 1) {
+        await new Promise(r => setTimeout(r, 50 * Math.pow(2, attempt)));
+        continue;
+      }
+      throw err;
+    }
+  }
+}
+
 // 积分规则
 const POINT_RULES = {
   register: 100,        // 注册奖励
@@ -42,37 +57,37 @@ async function getOrCreateAccount(conn, userId) {
 export async function earnPoints(userId, { amount, businessType, businessId, remark = '' }) {
   if (amount <= 0) throw new BusinessError(400, '积分数量必须大于0');
 
-  const conn = await db.getConnection();
-  try {
-    await conn.beginTransaction();
+  return withOptimisticRetry(async () => {
+    const conn = await db.getConnection();
+    try {
+      await conn.beginTransaction();
 
-    const account = await getOrCreateAccount(conn, userId);
+      const account = await getOrCreateAccount(conn, userId);
 
-    // 乐观锁更新
-    const [result] = await conn.query(
-      `UPDATE points_account SET balance = balance + ?, total_earned = total_earned + ?, version = version + 1
-       WHERE user_id = ? AND version = ?`,
-      [amount, amount, userId, account.version],
-    );
-    if (result.affectedRows === 0) throw new BusinessError(409, '积分更新冲突，请重试');
+      const [result] = await conn.query(
+        `UPDATE points_account SET balance = balance + ?, total_earned = total_earned + ?, version = version + 1
+         WHERE user_id = ? AND version = ?`,
+        [amount, amount, userId, account.version],
+      );
+      if (result.affectedRows === 0) throw new BusinessError(409, '积分更新冲突，请重试');
 
-    const newBalance = account.balance + amount;
+      const newBalance = account.balance + amount;
 
-    // 记录流水
-    await conn.query(
-      `INSERT INTO points_transaction (user_id, trans_type, amount, balance_after, business_type, business_id, remark)
-       VALUES (?, 'earn', ?, ?, ?, ?, ?)`,
-      [userId, amount, newBalance, businessType, businessId || null, remark],
-    );
+      await conn.query(
+        `INSERT INTO points_transaction (user_id, trans_type, amount, balance_after, business_type, business_id, remark)
+         VALUES (?, 'earn', ?, ?, ?, ?, ?)`,
+        [userId, amount, newBalance, businessType, businessId || null, remark],
+      );
 
-    await conn.commit();
-    return { user_id: userId, balance: newBalance, earned: amount };
-  } catch (err) {
-    await conn.rollback();
-    throw err;
-  } finally {
-    conn.release();
-  }
+      await conn.commit();
+      return { user_id: userId, balance: newBalance, earned: amount };
+    } catch (err) {
+      await conn.rollback();
+      throw err;
+    } finally {
+      conn.release();
+    }
+  });
 }
 
 // ============================================================
@@ -81,36 +96,38 @@ export async function earnPoints(userId, { amount, businessType, businessId, rem
 export async function spendPoints(userId, { amount, businessType, businessId, remark = '' }) {
   if (amount <= 0) throw new BusinessError(400, '积分数量必须大于0');
 
-  const conn = await db.getConnection();
-  try {
-    await conn.beginTransaction();
+  return withOptimisticRetry(async () => {
+    const conn = await db.getConnection();
+    try {
+      await conn.beginTransaction();
 
-    const account = await getOrCreateAccount(conn, userId);
-    if (account.balance < amount) throw new BusinessError(400, `积分不足，当前余额 ${account.balance}`);
+      const account = await getOrCreateAccount(conn, userId);
+      if (account.balance < amount) throw new BusinessError(400, `积分不足，当前余额 ${account.balance}`);
 
-    const [result] = await conn.query(
-      `UPDATE points_account SET balance = balance - ?, total_spent = total_spent + ?, version = version + 1
-       WHERE user_id = ? AND version = ? AND balance >= ?`,
-      [amount, amount, userId, account.version, amount],
-    );
-    if (result.affectedRows === 0) throw new BusinessError(409, '积分更新冲突或余额不足，请重试');
+      const [result] = await conn.query(
+        `UPDATE points_account SET balance = balance - ?, total_spent = total_spent + ?, version = version + 1
+         WHERE user_id = ? AND version = ? AND balance >= ?`,
+        [amount, amount, userId, account.version, amount],
+      );
+      if (result.affectedRows === 0) throw new BusinessError(409, '积分更新冲突或余额不足，请重试');
 
-    const newBalance = account.balance - amount;
+      const newBalance = account.balance - amount;
 
-    await conn.query(
-      `INSERT INTO points_transaction (user_id, trans_type, amount, balance_after, business_type, business_id, remark)
-       VALUES (?, 'spend', ?, ?, ?, ?, ?)`,
-      [userId, -amount, newBalance, businessType, businessId || null, remark],
-    );
+      await conn.query(
+        `INSERT INTO points_transaction (user_id, trans_type, amount, balance_after, business_type, business_id, remark)
+         VALUES (?, 'spend', ?, ?, ?, ?, ?)`,
+        [userId, -amount, newBalance, businessType, businessId || null, remark],
+      );
 
-    await conn.commit();
-    return { user_id: userId, balance: newBalance, spent: amount };
-  } catch (err) {
-    await conn.rollback();
-    throw err;
-  } finally {
-    conn.release();
-  }
+      await conn.commit();
+      return { user_id: userId, balance: newBalance, spent: amount };
+    } catch (err) {
+      await conn.rollback();
+      throw err;
+    } finally {
+      conn.release();
+    }
+  });
 }
 
 // ============================================================
@@ -121,47 +138,47 @@ export async function redeemPointsForCredits(userId, pointsAmount) {
   const creditAmount = rates[pointsAmount];
   if (!creditAmount) throw new BusinessError(400, `不支持该兑换档位，可选: ${Object.keys(rates).join(', ')}`);
 
-  const conn = await db.getConnection();
-  try {
-    await conn.beginTransaction();
+  return withOptimisticRetry(async () => {
+    const conn = await db.getConnection();
+    try {
+      await conn.beginTransaction();
 
-    const account = await getOrCreateAccount(conn, userId);
-    if (account.balance < pointsAmount) throw new BusinessError(400, `积分不足，当前余额 ${account.balance}`);
+      const account = await getOrCreateAccount(conn, userId);
+      if (account.balance < pointsAmount) throw new BusinessError(400, `积分不足，当前余额 ${account.balance}`);
 
-    // 扣积分
-    const [result] = await conn.query(
-      `UPDATE points_account SET balance = balance - ?, total_spent = total_spent + ?, version = version + 1
-       WHERE user_id = ? AND version = ? AND balance >= ?`,
-      [pointsAmount, pointsAmount, userId, account.version, pointsAmount],
-    );
-    if (result.affectedRows === 0) throw new BusinessError(409, '兑换失败，请重试');
+      const [result] = await conn.query(
+        `UPDATE points_account SET balance = balance - ?, total_spent = total_spent + ?, version = version + 1
+         WHERE user_id = ? AND version = ? AND balance >= ?`,
+        [pointsAmount, pointsAmount, userId, account.version, pointsAmount],
+      );
+      if (result.affectedRows === 0) throw new BusinessError(409, '兑换失败，请重试');
 
-    const newBalance = account.balance - pointsAmount;
+      const newBalance = account.balance - pointsAmount;
 
-    await conn.query(
-      `INSERT INTO points_transaction (user_id, trans_type, amount, balance_after, business_type, remark)
-       VALUES (?, 'spend', ?, ?, 'redeem_credits', ?)`,
-      [userId, -pointsAmount, newBalance, `兑换${creditAmount}点数`],
-    );
+      await conn.query(
+        `INSERT INTO points_transaction (user_id, trans_type, amount, balance_after, business_type, remark)
+         VALUES (?, 'spend', ?, ?, 'redeem_credits', ?)`,
+        [userId, -pointsAmount, newBalance, `兑换${creditAmount}点数`],
+      );
 
-    // 加点数到会员账户
-    const [membership] = await conn.query(
-      'UPDATE user_membership SET credit_balance = credit_balance + ? WHERE user_id = ?',
-      [creditAmount, userId],
-    );
-    if (membership.affectedRows === 0) {
+      const [membership] = await conn.query(
+        'UPDATE user_membership SET credit_balance = credit_balance + ? WHERE user_id = ?',
+        [creditAmount, userId],
+      );
+      if (membership.affectedRows === 0) {
+        await conn.rollback();
+        throw new BusinessError(404, '会员账户不存在');
+      }
+
+      await conn.commit();
+      return { user_id: userId, points_balance: newBalance, redeemed_credits: creditAmount, cost_points: pointsAmount };
+    } catch (err) {
       await conn.rollback();
-      throw new BusinessError(404, '会员账户不存在');
+      throw err;
+    } finally {
+      conn.release();
     }
-
-    await conn.commit();
-    return { user_id: userId, points_balance: newBalance, redeemed_credits: creditAmount, cost_points: pointsAmount };
-  } catch (err) {
-    await conn.rollback();
-    throw err;
-  } finally {
-    conn.release();
-  }
+  });
 }
 
 // ============================================================

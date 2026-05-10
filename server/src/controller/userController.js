@@ -2,6 +2,7 @@ import { wrapController } from '../utils/wrapController.js';
 import * as userService from '../services/userService.js';
 import { success as sendSuccess, error as sendError } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
+import logger from '../utils/logger.js';
 
 export const register = wrapController(async (req, res, next) => {
     const { username, password, nickname } = req.body;

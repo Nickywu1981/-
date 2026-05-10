@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate } from '../utils/validate.js';
+import { heavyLimiter } from '../middleware/rateLimiter.js';
 import * as jobQueueService from '../services/job-queue.service.js';
 
 const VALID_TASK_TYPES = new Set([
@@ -28,7 +29,7 @@ const submitJobSchema = z.object({
 });
 
 // POST /api/jobs — 通用任务提交
-router.post('/', _validate(submitJobSchema), async (req, res) => {
+router.post('/', heavyLimiter, _validate(submitJobSchema), async (req, res) => {
   try {
     const { task_type, task_params } = req.validated;
     const result = await jobQueueService.submitJob(req.user.id, task_type, task_params || {});

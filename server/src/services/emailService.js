@@ -39,7 +39,7 @@ function renderTemplate(templateContent, params) {
 const providers = {
   mock: {
     async send({ email, subject, content }) {
-      logger.info(`[Email Mock] → ${email.replace(/(.{2}).*(@.*)/, '$1***$2')} | ${subject} | code: ${content.match(/\d{6}/)?.[0] || 'N/A'}`);
+      logger.info(`[Email Mock] → ${email.replace(/(.{2}).*(@.*)/, '$1***$2')} | ${subject} | code: ***`);
       return { success: true, messageId: `mock_${Date.now()}` };
     },
   },
