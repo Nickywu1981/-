@@ -24,15 +24,18 @@ export async function getPage(req, res) {
 
 export async function createPage(req, res) {
   try {
-    const { title, slug, pageType, accessType, mobileConfig, pcConfig, metaJson } = req.body;
-    const page = await diyService.createPage(req.tenantId, req.user?.id, { title, slug, pageType, accessType, mobileConfig, pcConfig, metaJson });
+    const { title, slug, pageType, accessType, mobileConfig, pcConfig, metaJson, description } = req.body;
+    const mergedMeta = { ...(metaJson || {}), ...(description ? { description } : {}) };
+    const page = await diyService.createPage(req.tenantId, req.user?.id, { title, slug, pageType, accessType, mobileConfig, pcConfig, metaJson: Object.keys(mergedMeta).length ? mergedMeta : undefined });
     return success(res, page, '页面创建成功');
   } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 }
 
 export async function updatePage(req, res) {
   try {
-    const page = await diyService.updatePage(req.params.id, req.tenantId, req.body);
+    const { description, ...rest } = req.body;
+    if (description !== undefined) rest.metaJson = { ...(rest.metaJson || {}), description };
+    const page = await diyService.updatePage(req.params.id, req.tenantId, rest);
     return success(res, page, '更新成功');
   } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 }

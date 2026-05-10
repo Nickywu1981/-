@@ -122,15 +122,13 @@ async function loadAll() {
   loading.value = true
   try {
     const res = await $fetch('/api/admin/workspace-diy')
-    if (res.ok) {
-      const d = res.data
-      navItems.value = tryParse(d.workspace_nav) || []
-      cardItems.value = tryParse(d.workspace_cards) || []
-      assistantItems.value = tryParse(d.workspace_assistant) || []
-      workflowItems.value = tryParse(d.workspace_workflow) || []
-      navChanged.value = cardsChanged.value = assistantChanged.value = workflowChanged.value = false
-      ElMessage.success('配置已加载')
-    }
+    const d = res.data || res
+    navItems.value = tryParse(d.workspace_nav) || []
+    cardItems.value = tryParse(d.workspace_cards) || []
+    assistantItems.value = tryParse(d.workspace_assistant) || []
+    workflowItems.value = tryParse(d.workspace_workflow) || []
+    navChanged.value = cardsChanged.value = assistantChanged.value = workflowChanged.value = false
+    ElMessage.success('配置已加载')
   } catch (err: any) {
     ElMessage.error(err?.data?.message || '加载失败')
   } finally { loading.value = false }

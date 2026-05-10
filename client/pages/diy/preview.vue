@@ -115,7 +115,7 @@ async function loadPage() {
     const slug = route.query.slug || 'product-detail-demo'
     const res = await $fetch(`/api/diy/published/${slug}`)
     page.value = res.data
-    const config = typeof res.data?.config_json === 'string' ? JSON.parse(res.data.config_json) : res.data?.config_json
+    const config = res.data?.mobileConfig || res.data?.pcConfig
     sections.value = config?.sections || []
   } catch (e: any) {
     error.value = '页面加载失败: ' + (e.data?.msg || e.message)

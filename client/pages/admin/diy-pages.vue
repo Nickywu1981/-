@@ -76,7 +76,7 @@
             <label class="full">标题 <input v-model="editForm.title" class="input" placeholder="页面标题" /></label>
             <label>标识(Slug) <input v-model="editForm.slug" class="input" placeholder="my-page" :disabled="!!editing" /></label>
             <label>类型
-              <select v-model="editForm.page_type" class="input" :disabled="!!editing">
+              <select v-model="editForm.pageType" class="input" :disabled="!!editing">
                 <option value="landing">落地页</option>
                 <option value="detail">详情页</option>
                 <option value="activity">活动页</option>
@@ -112,7 +112,7 @@ const selectedIds = ref<number[]>([])
 const saving = ref(false)
 const showModal = ref(false)
 const editing = ref<any>(null)
-const editForm = reactive({ title: '', slug: '', page_type: 'landing', description: '' })
+const editForm = reactive({ title: '', slug: '', pageType: 'landing', description: '' })
 
 const allSelected = computed(() => list.value.length > 0 && selectedIds.value.length === list.value.length)
 
@@ -147,8 +147,8 @@ async function fetchData() {
   }
 }
 
-function openCreate() { editing.value = null; editForm.title = ''; editForm.slug = ''; editForm.page_type = 'landing'; editForm.description = ''; showModal.value = true }
-function openEdit(p: any) { editing.value = p; editForm.title = p.title || p.name || ''; editForm.slug = p.slug || ''; editForm.page_type = p.page_type || 'landing'; editForm.description = p.description || ''; showModal.value = true }
+function openCreate() { editing.value = null; editForm.title = ''; editForm.slug = ''; editForm.pageType = 'landing'; editForm.description = ''; showModal.value = true }
+function openEdit(p: any) { editing.value = p; editForm.title = p.title || p.name || ''; editForm.slug = p.slug || ''; editForm.pageType = p.page_type || 'landing'; editForm.description = p.description || ''; showModal.value = true }
 
 async function save() {
   saving.value = true
@@ -167,9 +167,13 @@ async function save() {
 }
 
 async function toggleStatus(p: any) {
-  const newStatus = (p.is_published || p.status === 1) ? 0 : 1
+  const isPublished = (p.is_published || p.status === 1)
   try {
-    await $fetch(`/api/diy/${p.id}`, { method: 'PUT', credentials: 'include', body: { is_published: !!newStatus, status: newStatus } })
+    if (isPublished) {
+      await $fetch(`/api/diy/${p.id}/unpublish`, { method: 'POST', credentials: 'include' })
+    } else {
+      await $fetch(`/api/diy/${p.id}/publish`, { method: 'POST', credentials: 'include' })
+    }
     fetchData()
   } catch (e: any) { toast.error(e.data?.msg || '操作失败') }
 }
@@ -177,7 +181,7 @@ async function toggleStatus(p: any) {
 async function deleteItem(id: number) {
   if (!confirm('确定删除？此操作不可恢复。')) return
   try {
-    await $fetch(`/api/diy/${id}`, { method: 'DELETE', credentials: 'include' })
+    await $fetch(`/api/diy/${id}/hard-delete`, { method: 'DELETE', credentials: 'include' })
     selectedIds.value = selectedIds.value.filter(i => i !== id)
     fetchData()
   } catch (e: any) { toast.error(e.data?.msg || '删除失败') }

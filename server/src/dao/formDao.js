@@ -130,8 +130,8 @@ export default {
     return rows;
   },
 
-  async deleteFields(formId) {
-    await pool.query('DELETE FROM diy_custom_field WHERE form_id = ?', [formId]);
+  async deleteFields(formId, tenantId) {
+    await pool.query('DELETE FROM diy_custom_field WHERE form_id = ? AND tenant_id = ?', [formId, tenantId]);
   },
 
   async batchInsertFields(tenantId, formId, fields) {

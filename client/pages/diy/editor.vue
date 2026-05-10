@@ -328,9 +328,10 @@ async function rollbackVersion() {
   const v = versions.value[idx]
   if (!confirm(`确定回滚到版本 v${v.version}？当前未保存的更改将丢失。`)) return
   try {
-    const res: any = await $fetch(`/api/diy/${pageInfo.value.id}/versions/${v.version}/rollback`, { method: 'POST' })
-    sections.value = res?.data?.sections || []
-    dirty.value = false; showVersions.value = false; selectedVersions.value = []; diffResult.value = null
+    await $fetch(`/api/diy/${pageInfo.value.id}/versions/${v.version}/rollback`, { method: 'POST' })
+    showVersions.value = false; selectedVersions.value = []; diffResult.value = null
+    await loadPage()
+    dirty.value = false
     toast.success('已回滚')
   } catch { toast.error('回滚失败') }
 }

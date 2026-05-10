@@ -259,7 +259,7 @@ export async function listFields(formId, tenantId) {
 }
 
 export async function upsertFields(formId, tenantId, fields) {
-  await formDao.deleteFields(formId);
+  await formDao.deleteFields(formId, tenantId);
   if (fields?.length) await formDao.batchInsertFields(tenantId, formId, fields);
   return formDao.listFields(formId, tenantId);
 }

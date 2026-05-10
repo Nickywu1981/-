@@ -81,13 +81,15 @@ export default {
   },
 
   async createPage(tenantId, ownerId, { title, slug, pageType, accessType, mobileConfig, pcConfig, metaJson }) {
-    if (!title?.trim() || !slug?.trim()) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '标题和标识不能为空');
-    return diyDao.createPageWithVersion({ tenantId, ownerId: ownerId || 0, title, slug, pageType: pageType || 'mobile', accessType: accessType || 'public', mobileConfig: mobileConfig || { sections: [] }, pcConfig: pcConfig || { sections: [] }, metaJson });
+    const sanitizedTitle = title?.replace(/<[^>]*>/g, '') || '';
+    if (!sanitizedTitle.trim() || !slug?.trim()) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '标题和标识不能为空');
+    return diyDao.createPageWithVersion({ tenantId, ownerId: ownerId || 0, title: sanitizedTitle, slug, pageType: pageType || 'mobile', accessType: accessType || 'public', mobileConfig: mobileConfig || { sections: [] }, pcConfig: pcConfig || { sections: [] }, metaJson });
   },
 
   async updatePage(id, tenantId, fields) {
     const exist = await diyDao.getPageById(id, tenantId);
     if (!exist) throw new BusinessError(ERROR_CODE.NOT_FOUND, '页面不存在');
+    if (fields.title !== undefined) fields.title = fields.title.replace(/<[^>]*>/g, '');
     await diyDao.updatePage(id, tenantId, fields);
     return diyDao.getPageById(id, tenantId);
   },
