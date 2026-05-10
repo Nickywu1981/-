@@ -227,6 +227,11 @@ async function handleSubmit() {
   width: 100%; border: none; resize: none; font-size: 14px; line-height: 1.6; color: var(--tx, #171717);
   font-family: inherit; outline: none; background: none;
 }
+.wc-textarea:focus-visible {
+  outline: 2px solid var(--brand, var(--cfg-primary));
+  outline-offset: 2px;
+  border-radius: 4px;
+}
 .wc-textarea::placeholder { color: var(--tx3, #9d9da3); }
 .wc-input-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
 .wc-hint { font-size: 11px; color: var(--tx3, #9d9da3); }

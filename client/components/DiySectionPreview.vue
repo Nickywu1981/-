@@ -28,7 +28,7 @@
   <!-- 图片展示 -->
   <div v-else-if="section.component === 'image_showcase'" class="preview-gallery">
     <div class="grid" :style="gridStyle(config.columns||3, config.gap||8)">
-      <img v-for="(img, i) in (config.images?.length ? config.images : [placeholder])" :key="i" :src="img" :style="{ borderRadius: (config.radius||8)+'px' }" loading="lazy" @error="onImgError" />
+      <img v-for="(img, i) in (config.images?.length ? config.images : [placeholder])" :key="i" :src="img" :alt="'展示图片 '+(i+1)" :style="{ borderRadius: (config.radius||8)+'px' }" loading="lazy" @error="onImgError" />
     </div>
   </div>
   <!-- 视频 -->
@@ -62,7 +62,7 @@
   </div>
   <!-- 热区图片 -->
   <div v-else-if="section.component === 'hotzone_image'" class="preview-hotzone" :style="{ borderRadius: (config.radius||8)+'px' }">
-    <img v-if="config.src" :src="config.src" loading="lazy" @error="onImgError" :style="{ borderRadius: (config.radius||8)+'px' }" />
+    <img v-if="config.src" :src="config.src" :alt="config.alt || '热区图片'" loading="lazy" @error="onImgError" :style="{ borderRadius: (config.radius||8)+'px' }" />
     <div v-else class="empty-media">未设置图片</div>
     <span v-if="(config.zones||[]).length" class="zone-badge">{{ config.zones.length }}个热区</span>
   </div>

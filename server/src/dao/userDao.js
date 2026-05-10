@@ -92,18 +92,14 @@ export async function batchUpdateUserStatus(ids, status) {
 }
 
 export async function getUserStats(userId) {
-  const [[{ taskTotal }]] = await pool.execute(
-    'SELECT COUNT(*) AS taskTotal FROM task WHERE user_id = ?',
-    [userId],
-  );
-  const [[{ todayTotal }]] = await pool.execute(
-    'SELECT COUNT(*) AS todayTotal FROM task WHERE user_id = ? AND DATE(create_time) = CURDATE()',
-    [userId],
-  );
-  const [[{ creditUsed }]] = await pool.execute(
-    `SELECT COALESCE(SUM(CASE WHEN action='freeze' THEN -credit_amount WHEN action='rollback' THEN credit_amount ELSE 0 END), 0) AS creditUsed
-     FROM credit_request_log WHERE user_id = ? AND status = 1`,
-    [userId],
-  );
+  const [[[{ taskTotal }]], [[{ todayTotal }]], [[{ creditUsed }]]] = await Promise.all([
+    pool.execute('SELECT COUNT(*) AS taskTotal FROM task WHERE user_id = ?', [userId]),
+    pool.execute('SELECT COUNT(*) AS todayTotal FROM task WHERE user_id = ? AND DATE(create_time) = CURDATE()', [userId]),
+    pool.execute(
+      `SELECT COALESCE(SUM(CASE WHEN action='freeze' THEN -credit_amount WHEN action='rollback' THEN credit_amount ELSE 0 END), 0) AS creditUsed
+       FROM credit_request_log WHERE user_id = ? AND status = 1`,
+      [userId],
+    ),
+  ]);
   return { taskTotal, todayTotal, creditUsed };
 }

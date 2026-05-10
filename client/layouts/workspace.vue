@@ -9,7 +9,7 @@
     <aside class="wsl-side" :class="{ fold: folded }">
       <div class="wsl-logo-area">
         <NuxtLink to="/workspace" class="wsl-logo">Movio AI</NuxtLink>
-        <button class="wsl-fold-btn" @click="folded = !folded" :title="folded ? '展开' : '收起'">
+        <button class="wsl-fold-btn" @click="folded = !folded" :title="folded ? '展开' : '收起'" :aria-label="folded ? '展开侧边栏' : '收起侧边栏'">
           {{ folded ? '▶' : '◀' }}
         </button>
       </div>

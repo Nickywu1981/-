@@ -39,30 +39,28 @@ export async function countBillingHistory(userId) {
 // ==================== 仪表盘统计 ====================
 
 export async function getDashboardStats() {
-  const [[{ userCount }]] = await pool.execute('SELECT COUNT(*) AS userCount FROM user WHERE is_deleted = 0');
-  const [[{ taskCount }]] = await pool.execute('SELECT COUNT(*) AS taskCount FROM task');
-  const [[{ todayTaskCount }]] = await pool.execute(
-    'SELECT COUNT(*) AS todayTaskCount FROM task WHERE DATE(create_time) = CURDATE()',
-  );
-  const [[{ paidUserCount }]] = await pool.execute(
-    'SELECT COUNT(*) AS paidUserCount FROM user_membership WHERE plan_type > 0',
-  );
-  const [[{ totalRevenue }]] = await pool.execute(
-    'SELECT COALESCE(SUM(consumed), 0) AS totalRevenue FROM consumption_record WHERE type = 3',
-  );
+  const [[[{ userCount }]], [[{ taskCount }]], [[{ todayTaskCount }]], [[{ paidUserCount }]], [[{ totalRevenue }]]] = await Promise.all([
+    pool.execute('SELECT COUNT(*) AS userCount FROM user WHERE is_deleted = 0'),
+    pool.execute('SELECT COUNT(*) AS taskCount FROM task'),
+    pool.execute('SELECT COUNT(*) AS todayTaskCount FROM task WHERE DATE(create_time) = CURDATE()'),
+    pool.execute('SELECT COUNT(*) AS paidUserCount FROM user_membership WHERE plan_type > 0'),
+    pool.execute('SELECT COALESCE(SUM(consumed), 0) AS totalRevenue FROM consumption_record WHERE type = 3'),
+  ]);
 
-  const [taskTrend] = await pool.execute(
-    `SELECT DATE(create_time) AS date, COUNT(*) AS count FROM task
-     WHERE create_time >= DATE_SUB(CURDATE(), INTERVAL 6 DAY) GROUP BY DATE(create_time) ORDER BY date`,
-  );
-  const [userTrend] = await pool.execute(
-    `SELECT DATE(create_time) AS date, COUNT(*) AS count FROM user
-     WHERE create_time >= DATE_SUB(CURDATE(), INTERVAL 6 DAY) AND is_deleted = 0 GROUP BY DATE(create_time) ORDER BY date`,
-  );
-  const [revenueTrend] = await pool.execute(
-    `SELECT DATE(create_time) AS date, COALESCE(SUM(consumed), 0) AS amount FROM consumption_record
-     WHERE type = 3 AND create_time >= DATE_SUB(CURDATE(), INTERVAL 6 DAY) GROUP BY DATE(create_time) ORDER BY date`,
-  );
+  const [[taskTrend], [userTrend], [revenueTrend]] = await Promise.all([
+    pool.execute(
+      `SELECT DATE(create_time) AS date, COUNT(*) AS count FROM task
+       WHERE create_time >= DATE_SUB(CURDATE(), INTERVAL 6 DAY) GROUP BY DATE(create_time) ORDER BY date`,
+    ),
+    pool.execute(
+      `SELECT DATE(create_time) AS date, COUNT(*) AS count FROM user
+       WHERE create_time >= DATE_SUB(CURDATE(), INTERVAL 6 DAY) AND is_deleted = 0 GROUP BY DATE(create_time) ORDER BY date`,
+    ),
+    pool.execute(
+      `SELECT DATE(create_time) AS date, COALESCE(SUM(consumed), 0) AS amount FROM consumption_record
+       WHERE type = 3 AND create_time >= DATE_SUB(CURDATE(), INTERVAL 6 DAY) GROUP BY DATE(create_time) ORDER BY date`,
+    ),
+  ]);
 
   return { userCount, taskCount, todayTaskCount, paidUserCount, totalRevenue: Math.abs(totalRevenue), taskTrend, userTrend, revenueTrend };
 }

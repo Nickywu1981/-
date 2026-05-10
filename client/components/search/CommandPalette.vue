@@ -12,6 +12,7 @@
               type="text"
               :placeholder="placeholder"
               class="palette-input"
+              aria-label="搜索功能"
               @keydown="onKeydown"
               @input="onInput"
             />
@@ -229,6 +230,11 @@ watch(() => useRoute().path, close);
 .palette-input {
   flex: 1; border: none; outline: none; font-size: 15px;
   background: transparent; color: var(--text-primary);
+}
+.palette-input:focus-visible {
+  outline: 2px solid var(--brand, var(--cfg-primary));
+  outline-offset: -2px;
+  border-radius: 4px;
 }
 .palette-input::placeholder { color: var(--text-muted); }
 .palette-esc {

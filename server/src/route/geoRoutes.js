@@ -47,14 +47,13 @@ router.get('/api/geo/suggest-locale', async (req, res) => {
       locale: COUNTRY_TO_LOCALE[country],
       country,
       source: 'cdn-header',
-      ip: extractIP(req),
     });
   }
 
   // 2. 无 CDN 头时，使用免费 IP API 查询（服务端代理，不暴露给前端）
   const ip = extractIP(req);
   if (!ip || ip === '127.0.0.1' || ip === '::1' || ip.startsWith('192.168.') || ip.startsWith('10.')) {
-    return success(res, { locale: 'zh', country: 'LOCAL', source: 'localhost-fallback', ip });
+    return success(res, { locale: 'zh', country: 'LOCAL', source: 'localhost-fallback' });
   }
 
   // 3. 异步查询免费 IP 地理位置 API
@@ -63,9 +62,9 @@ router.get('/api/geo/suggest-locale', async (req, res) => {
     const data = await r.json();
     const cc = (data?.countryCode || '').toUpperCase();
     const locale = COUNTRY_TO_LOCALE[cc] || 'zh';
-    return success(res, { locale, country: cc, source: 'ip-api', ip });
+    return success(res, { locale, country: cc, source: 'ip-api' });
   } catch {
-    return success(res, { locale: 'zh', country: 'UNKNOWN', source: 'error-fallback', ip });
+    return success(res, { locale: 'zh', country: 'UNKNOWN', source: 'error-fallback' });
   }
 });
 

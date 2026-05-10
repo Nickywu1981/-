@@ -14,7 +14,7 @@
 
         <!-- 全局搜索 (Ctrl+K 唤起 CommandPalette) -->
         <div class="search-box desktop-nav" :class="{ open: searchOpen }">
-          <button class="search-trigger" @click="searchOpen = !searchOpen" title="搜索功能 (Ctrl+K)">
+          <button class="search-trigger" @click="searchOpen = !searchOpen" title="搜索功能 (Ctrl+K)" aria-label="搜索功能 (Ctrl+K)">
             🔍
             <kbd class="search-hotkey">Ctrl+K</kbd>
           </button>
@@ -73,7 +73,7 @@
           </template>
 
           <!-- 移动端汉堡 -->
-          <button class="hamburger" @click="mobileOpen = !mobileOpen">{{ mobileOpen ? '✕' : '☰' }}</button>
+          <button class="hamburger" @click="mobileOpen = !mobileOpen" :aria-label="mobileOpen ? '关闭菜单' : '打开菜单'">{{ mobileOpen ? '✕' : '☰' }}</button>
         </div>
       </div>
 
