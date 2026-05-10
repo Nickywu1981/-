@@ -71,7 +71,7 @@ router.post('/register', authLimiter, _validate(registerSchema), async (req, res
 
     return success(res, { ...result.user, token: result.token, token_expires_in: result.token_expires_in }, '注册成功');
   } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '注册失败');
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '注册失败');
   }
 });
 
@@ -86,7 +86,7 @@ router.post('/login', authLimiter, _validate(loginSchema), async (req, res) => {
 
     return success(res, { ...result.user, token: result.token, token_expires_in: result.token_expires_in }, '登录成功');
   } catch (err) {
-    return error(res, err.status || ERROR_CODE.UNAUTHORIZED, err.message || '登录失败');
+    return error(res, err.status || ERROR_CODE.UNAUTHORIZED, err.status ? err.message : '登录失败');
   }
 });
 
@@ -104,7 +104,7 @@ router.post('/login-by-code', authLimiter, _validate(loginByCodeSchema), async (
 
     return success(res, { ...result.user, token: result.token, token_expires_in: result.token_expires_in }, '登录成功');
   } catch (err) {
-    return error(res, err.status || ERROR_CODE.UNAUTHORIZED, err.message || '登录失败');
+    return error(res, err.status || ERROR_CODE.UNAUTHORIZED, err.status ? err.message : '登录失败');
   }
 });
 
@@ -116,7 +116,7 @@ router.post('/reset-password', authLimiter, _validate(resetPasswordSchema), asyn
     const result = await authService.resetPassword({ phone, email, newPassword: new_password, code });
     return success(res, result, '密码重置成功');
   } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '重置失败');
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '重置失败');
   }
 });
 

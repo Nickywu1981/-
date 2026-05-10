@@ -105,7 +105,7 @@ async function fetchWorks() {
     works.value = res.data?.list || res.data || []
     total.value = res.data?.total || 0
   } catch (e: any) {
-    error.value = e.message || '加载失败'
+    error.value = e.data?.msg || e.message || '加载失败'
   } finally {
     loading.value = false
   }

@@ -142,7 +142,7 @@ async function fetchData() {
     if (!Array.isArray(list.value)) list.value = []
     total.value = data?.data?.total || list.value.length
   } catch (e: any) {
-    error.value = e.message || '加载失败'
+    error.value = e.data?.msg || e.message || '加载失败'
     toast.error(error.value)
   } finally {
     loading.value = false

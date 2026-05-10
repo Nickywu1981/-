@@ -30,6 +30,6 @@ const form = reactive({ brandName:'', logoUrl:'', watermarkType:'text', watermar
 const badgeOptions = [{value:'hot',label:'🔥 爆款'},{value:'new',label:'🆕 新品'},{value:'sale',label:'🏷️ 特惠'},{value:'free_shipping',label:'📦 包邮'},{value:'limited',label:'⏰ 限时'}]
 const task = reactive({ status:0, polling:false, progressMsg:'' })
 const previewUrl = ref(''), errorMsg = ref('')
-const saveSettings = async () => { task.status=1; task.progressMsg='保存中...'; try { await $fetch('/api/brand',{method:'PUT',body:{name:form.brandName,logo:form.logoUrl}}); task.status=2 } catch(e: any) { errorMsg.value=e.message; toast.error(e.data?.msg || e.message || '保存失败') } }
+const saveSettings = async () => { task.status=1; task.progressMsg='保存中...'; try { await $fetch('/api/brand',{method:'PUT',body:{name:form.brandName,logo:form.logoUrl}}); task.status=2 } catch(e: any) { errorMsg.value=e.data?.msg || '保存失败'; toast.error(errorMsg.value) } }
 const uploadLogo = () => {}
 </script>

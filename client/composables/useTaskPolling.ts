@@ -53,7 +53,7 @@ export function useTaskPolling() {
       }
     } catch (e: any) {
       status.value = 'failed'
-      error.value = e.message || '任务提交失败'
+      error.value = e.data?.msg || e.message || '任务提交失败'
       useToast().error(e.data?.msg || e.message || '任务提交失败，请重试')
     } finally {
       submitting.value = false

@@ -277,7 +277,7 @@ async function fetchAll() {
     if (t?.code === 200) { recentTasks.value = t.data?.list || [] }
     else { throw new Error(t?.msg || '获取任务列表失败') }
   } catch (e: any) {
-    error.value = e.message || '加载失败，请稍后重试'
+    error.value = e.data?.msg || e.message || '加载失败，请稍后重试'
     toast.error(error.value)
   } finally { loading.value = false }
 }

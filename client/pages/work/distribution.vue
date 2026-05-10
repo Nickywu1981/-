@@ -125,7 +125,7 @@ const publish = async () => {
     toast.success('发布成功！')
     fetchHistory()
   } catch (e: any) {
-    toast.error(e.message || '发布失败')
+    toast.error(e.data?.msg || e.message || '发布失败')
   } finally {
     submitting.value = false
   }

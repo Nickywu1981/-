@@ -62,7 +62,7 @@ export default {
           // TODO: 调用真实平台 API
           await platformPublishDao.updatePublishStatus(record.id, 'success', `https://${platform}.com/item/${itemId || record.id}`);
         } catch (e) {
-          await platformPublishDao.updatePublishStatus(record.id, 'failed', null, e.message);
+          await platformPublishDao.updatePublishStatus(record.id, 'failed', null, e.status ? e.message : '发布失败');
         }
       });
       return success(res, { id: record.id, status: 'pending' }, '发布任务已提交');
