@@ -21,9 +21,12 @@ export const isOffline = ref(false);
 // 401 重定向锁（防并发请求同时触发多次 navigateTo）
 let isRedirecting = false;
 
+function onOffline() { isOffline.value = true; }
+function onOnline() { isOffline.value = false; }
+
 if (typeof window !== 'undefined') {
-  window.addEventListener('offline', () => { isOffline.value = true; });
-  window.addEventListener('online', () => { isOffline.value = false; });
+  window.addEventListener('offline', onOffline);
+  window.addEventListener('online', onOnline);
   isOffline.value = !navigator.onLine;
 }
 
