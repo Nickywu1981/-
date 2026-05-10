@@ -9,8 +9,7 @@ import { ERROR_CODE } from '../constants/errorCode.js';
 
 export const getPlans = wrapController(async (_req, res, next) => {
     return success(res, payment.getPlans());
-  } catch (err) { next(err); }
-}
+  })
 
 // ==================== 创建支付订单（通联聚合支付） ====================
 
@@ -21,22 +20,14 @@ export const createOrder = wrapController(async (req, res, next) => {
     }
     const data = await payment.createPaymentOrder(req.user.id, { planType, payChannel });
     return success(res, data, '订单创建成功');
-  } catch (err) {
-    if (err.status) return error(res, err.status, err.message);
-    next(err);
-  }
-}
+  })
 
 // ==================== 查询订单状态 ====================
 
 export const getOrderStatus = wrapController(async (req, res, next) => {
     const data = await payment.getOrder(req.params.reqsn);
     return success(res, data);
-  } catch (err) {
-    if (err.status) return error(res, err.status, err.message);
-    next(err);
-  }
-}
+  })
 
 // ==================== 检查支付结果（前端轮询用） ====================
 
@@ -44,19 +35,14 @@ export const checkPaymentResult = wrapController(async (req, res, next) => {
     const data = await allinpayService.queryOrder(req.params.reqsn);
     if (!data) return error(res, ERROR_CODE.PAY_ORDER_NOT_FOUND, '订单不存在');
     return success(res, data);
-  } catch (err) { next(err); }
-}
+  })
 
 // ==================== 沙箱支付（仅开发环境） ====================
 
 export const sandboxPay = wrapController(async (req, res, next) => {
     const data = await payment.sandboxPay(req.params.reqsn);
     return success(res, data, '支付成功，会员已开通');
-  } catch (err) {
-    if (err.status) return error(res, err.status, err.message);
-    next(err);
-  }
-}
+  })
 
 // ==================== 账单 ====================
 
@@ -64,5 +50,4 @@ export const getBillingHistory = wrapController(async (req, res, next) => {
     const { page, pageSize } = parsePagination(req.query);
     const rows = await payment.getBillingHistory(req.user.id);
     return listResult(res, { rows, total: rows.length, page: page || 1, pageSize: pageSize || 20 });
-  } catch (err) { next(err); }
-}
+  })

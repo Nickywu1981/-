@@ -15,11 +15,7 @@ export const submitBatchTask = wrapController(async (req, res, next) => {
     const data = await batchService.submitBatchTask(req.user.id, { imageUrls, operation, platform, style, nightMode });
     const msg = nightMode ? '夜间托管任务已提交，凌晨2点自动执行（6折优惠）' : '批量任务已提交';
     return success(res, data, msg);
-  } catch (err) {
-    if (err.status) return error(res, err.status, err.message);
-    next(err);
-  }
-}
+  })
 
 export const redoBatchTask = wrapController(async (req, res, next) => {
     const { taskId } = req.body;
@@ -28,38 +24,23 @@ export const redoBatchTask = wrapController(async (req, res, next) => {
     }
     const data = await batchService.redoBatchTask(req.user.id, taskId);
     return success(res, data, '已复刻批量任务');
-  } catch (err) {
-    if (err.status) return error(res, err.status, err.message);
-    next(err);
-  }
-}
+  })
 
 export const listBatchHistory = wrapController(async (req, res, next) => {
     const { page, pageSize } = parsePagination(req.query, { defaultPageSize: 10, maxPageSize: 50 });
     const data = await batchService.listBatchHistory(req.user.id, { page, pageSize });
     return listResult(res, data);
-  } catch (err) {
-    next(err);
-  }
-}
+  })
 
 export const getBatchZipUrl = wrapController(async (req, res, next) => {
     const data = await batchService.getBatchZipUrl(req.params.taskId, req.user.id);
     return success(res, data);
-  } catch (err) {
-    if (err.status) return error(res, err.status, err.message);
-    next(err);
-  }
-}
+  })
 
 export const getTaskResult = wrapController(async (req, res, next) => {
     const data = await batchService.getTaskResult(req.params.taskId, req.user.id);
     return success(res, data);
-  } catch (err) {
-    if (err.status) return error(res, err.status, err.message);
-    next(err);
-  }
-}
+  })
 
 // ==================== 批量模板 ====================
 
@@ -67,25 +48,14 @@ export const saveBatchTemplate = wrapController(async (req, res, next) => {
     const { name, operation, platform, style, nightMode, imageCount } = req.body;
     const data = await batchService.saveBatchTemplate(req.user.id, { name, operation, platform, style, nightMode, imageCount });
     return success(res, { id: data }, '模板已保存');
-  } catch (err) {
-    if (err.status) return error(res, err.status, err.message);
-    next(err);
-  }
-}
+  })
 
 export const listBatchTemplates = wrapController(async (req, res, next) => {
     const data = await batchService.listBatchTemplates(req.user.id);
     return success(res, { list: data });
-  } catch (err) {
-    next(err);
-  }
-}
+  })
 
 export const deleteBatchTemplate = wrapController(async (req, res, next) => {
     await batchService.deleteBatchTemplate(req.user.id, parseInt(req.params.id, 10));
     return success(res, {}, '模板已删除');
-  } catch (err) {
-    if (err.status) return error(res, err.status, err.message);
-    next(err);
-  }
-}
+  })

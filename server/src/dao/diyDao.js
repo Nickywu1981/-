@@ -343,7 +343,7 @@ export default {
 
   async listTemplates({ industry, pageType, keyword, page = 1, pageSize = 20 }) {
     const baseWhere = 'WHERE status = 1';
-    const params: any[] = [];
+    const params = [];
     let filter = '';
     if (industry) { filter += ' AND industry = ?'; params.push(industry); }
     if (pageType) { filter += ' AND page_type = ?'; params.push(pageType); }

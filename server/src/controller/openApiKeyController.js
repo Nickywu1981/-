@@ -13,8 +13,7 @@ export const listKeys = wrapController(async (req, res, next) => {
       page: parseInt(page), pageSize: parseInt(pageSize),
     });
     success(res, result);
-  } catch (e) { next(e); }
-}
+})
 
 export const createKey = wrapController(async (req, res, next) => {
     const { description, rateLimit, dailyLimit } = req.body;
@@ -22,8 +21,7 @@ export const createKey = wrapController(async (req, res, next) => {
       description, rateLimit, dailyLimit,
     });
     success(res, result);
-  } catch (e) { next(e); }
-}
+})
 
 export const toggleKey = wrapController(async (req, res, next) => {
     const { id } = req.params;
@@ -31,8 +29,7 @@ export const toggleKey = wrapController(async (req, res, next) => {
     const result = await openApiKeyService.toggleKey(parseInt(id), req.user.tenantId || 1, status);
     if (!result.ok) return error(res, ERROR_CODE.NOT_FOUND, 'API Key 不存在');
     success(res, result);
-  } catch (e) { next(e); }
-}
+})
 
 export const updateKey = wrapController(async (req, res, next) => {
     const { id } = req.params;
@@ -42,15 +39,13 @@ export const updateKey = wrapController(async (req, res, next) => {
     });
     if (!result.ok) return error(res, ERROR_CODE.NOT_FOUND, 'API Key 不存在');
     success(res, result);
-  } catch (e) { next(e); }
-}
+})
 
 export const deleteKey = wrapController(async (req, res, next) => {
     const { id } = req.params;
     const result = await openApiKeyService.deleteKey(parseInt(id), req.user.tenantId || 1);
     if (!result.ok) return error(res, ERROR_CODE.NOT_FOUND, 'API Key 不存在');
     success(res, result);
-  } catch (e) { next(e); }
-}
+})
 
 export default { listKeys, createKey, toggleKey, updateKey, deleteKey };

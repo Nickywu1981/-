@@ -21,7 +21,7 @@ function validateBeforePublish(page) {
 
   for (const s of allSections) {
     const type = s.type || s.component;
-    if (s.props?.images && s.props.images.some((img: string) => !img)) issues.push(`"${type}"组件存在空图片链接`);
+    if (s.props?.images && s.props.images.some((img) => !img)) issues.push(`"${type}"组件存在空图片链接`);
     if (s.props?.bgImage && !s.props.bgImage.trim()) issues.push(`"${type}"组件背景图为空`);
     if (type === 'ctaButton' && (!s.props?.text || !s.props.text.trim())) issues.push('CTA按钮文案不能为空');
     if (type === 'form_container' && (!s.props?.submitText || !s.props.submitText.trim())) issues.push('表单提交按钮文案不能为空');

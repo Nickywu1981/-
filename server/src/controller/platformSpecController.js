@@ -42,10 +42,6 @@ export const adaptImage = wrapController(async (req, res) => {
     const { inputPath, platformCode, outputDir } = req.body;
     const result = await svc.adaptImage(inputPath, platformCode, outputDir || './uploads/adapted');
     return success(res, result, '图片适配成功');
-  } catch (e) {
-    const status = e.status || ERROR_CODE.INTERNAL_ERROR;
-    return error(res, status, e.message);
-  }
-}
+})
 
 export default { listPlatforms, getSpec, getSpecsByPlatform, createSpec, updateSpec, deleteSpec, adaptImage };

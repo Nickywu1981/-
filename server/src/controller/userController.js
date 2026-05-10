@@ -13,13 +13,7 @@ export const register = wrapController(async (req, res, next) => {
     }
     const user = await userService.register({ username, password, nickname });
     return sendSuccess(res, user, '注册成功');
-  } catch (err) {
-    if (err.status) {
-      return sendError(res, err.status, err.message);
-    }
-    next(err);
-  }
-}
+  })
 
 export const login = wrapController(async (req, res, next) => {
     const { username, account, email, password } = req.body;
@@ -29,76 +23,44 @@ export const login = wrapController(async (req, res, next) => {
     }
     const data = await userService.login({ username: loginId, password });
     return sendSuccess(res, data, '登录成功');
-  } catch (err) {
-    if (err.status) {
-      return sendError(res, err.status, err.message);
-    }
-    next(err);
-  }
-}
+  })
 
 export const profile = wrapController(async (req, res, next) => {
     const data = await userService.getProfile(req.user.id);
     return sendSuccess(res, data);
-  } catch (err) {
-    if (err.status) {
-      return sendError(res, err.status, err.message);
-    }
-    next(err);
-  }
-}
+  })
 
 export const updateProfile = wrapController(async (req, res, next) => {
     const { nickname, phone, email, avatar } = req.body;
     const data = await userService.updateProfile(req.user.id, { nickname, phone, email, avatar });
     return sendSuccess(res, data, '资料修改成功');
-  } catch (err) {
-    if (err.status) return sendError(res, err.status, err.message);
-    next(err);
-  }
-}
+  })
 
 export const changePassword = wrapController(async (req, res, next) => {
     const { oldPassword, newPassword } = req.body;
     if (!oldPassword || !newPassword) return sendError(res, ERROR_CODE.BAD_REQUEST, '旧密码和新密码不能为空');
     await userService.changePassword(req.user.id, { oldPassword, newPassword });
     return sendSuccess(res, {}, '密码修改成功');
-  } catch (err) {
-    if (err.status) return sendError(res, err.status, err.message);
-    next(err);
-  }
-}
+  })
 
 export const forgotPassword = wrapController(async (req, res, next) => {
     const { username } = req.body;
     if (!username) return sendError(res, ERROR_CODE.BAD_REQUEST, '请输入用户名');
     const data = await userService.forgotPassword(username);
     return sendSuccess(res, data);
-  } catch (err) {
-    if (err.status) return sendError(res, err.status, err.message);
-    next(err);
-  }
-}
+  })
 
 export const resetPassword = wrapController(async (req, res, next) => {
     const { token, newPassword } = req.body;
     if (!token || !newPassword) return sendError(res, ERROR_CODE.BAD_REQUEST, '缺少必填参数');
     await userService.resetPassword(token, newPassword);
     return sendSuccess(res, {}, '密码重置成功');
-  } catch (err) {
-    if (err.status) return sendError(res, err.status, err.message);
-    next(err);
-  }
-}
+  })
 
 export const getStats = wrapController(async (req, res, next) => {
     const stats = await userService.getUserStats(req.user.id, req.tenantId || 0);
     return sendSuccess(res, stats);
-  } catch (err) {
-    if (err.status) return sendError(res, err.status, err.message);
-    next(err);
-  }
-}
+  })
 
 // ========================= JWT 双令牌 =========================
 
@@ -108,11 +70,7 @@ export const refreshToken = wrapController(async (req, res, next) => {
     const tokens = await userService.refreshAccessToken(token);
     if (!tokens) return sendError(res, ERROR_CODE.UNAUTHORIZED, 'refreshToken 无效或已过期');
     return sendSuccess(res, tokens, '令牌刷新成功');
-  } catch (err) {
-    if (err.status) return sendError(res, err.status, err.message);
-    next(err);
-  }
-}
+  })
 
 export const logout = wrapController(async (req, res, next) => {
     const header = req.headers.authorization;
@@ -125,17 +83,9 @@ export const logout = wrapController(async (req, res, next) => {
       res.clearCookie('refreshToken', { httpOnly: true, secure: true, sameSite: 'lax', path: '/' });
     }
     return sendSuccess(res, {}, '已退出登录');
-  } catch (err) {
-    if (err.status) return sendError(res, err.status, err.message);
-    next(err);
-  }
-}
+  })
 
 export const logoutAll = wrapController(async (req, res, next) => {
     await userService.revokeAllUserTokens(req.user.id);
     return sendSuccess(res, {}, '已退出所有设备');
-  } catch (err) {
-    if (err.status) return sendError(res, err.status, err.message);
-    next(err);
-  }
-}
+  })

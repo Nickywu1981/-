@@ -9,13 +9,7 @@ import { success as sendSuccess, error as sendError } from '../utils/response.js
 export const getAllPlatforms = wrapController(async (req, res, next) => {
     const data = await sizeTemplateService.getAllPlatformSizes();
     return sendSuccess(res, data);
-  } catch (err) {
-    if (err.status) {
-      return sendError(res, err.status, err.message);
-    }
-    next(err);
-  }
-}
+  })
 
 /**
  * GET /api/templates/platforms/list
@@ -24,10 +18,7 @@ export const getAllPlatforms = wrapController(async (req, res, next) => {
 export const getPlatformList = wrapController(async (req, res, next) => {
     const data = await sizeTemplateService.getPlatformList();
     return sendSuccess(res, data);
-  } catch (err) {
-    next(err);
-  }
-}
+  })
 
 /**
  * GET /api/templates/platforms/:platform
@@ -36,10 +27,7 @@ export const getPlatformList = wrapController(async (req, res, next) => {
 export const getSizesByPlatform = wrapController(async (req, res, next) => {
     const data = await sizeTemplateService.getSizesByPlatform(req.params.platform);
     return sendSuccess(res, data);
-  } catch (err) {
-    next(err);
-  }
-}
+  })
 
 // ==================== 用户自定义模板 ====================
 
@@ -51,13 +39,7 @@ export const createUserTemplate = wrapController(async (req, res, next) => {
     const { name, width, height, platform } = req.body;
     const data = await sizeTemplateService.createUserTemplate(req.user.id, { name, width, height, platform });
     return sendSuccess(res, data, '模板创建成功');
-  } catch (err) {
-    if (err.status) {
-      return sendError(res, err.status, err.message);
-    }
-    next(err);
-  }
-}
+  })
 
 /**
  * GET /api/templates/my
@@ -66,10 +48,7 @@ export const createUserTemplate = wrapController(async (req, res, next) => {
 export const listUserTemplates = wrapController(async (req, res, next) => {
     const data = await sizeTemplateService.listUserTemplates(req.user.id);
     return sendSuccess(res, data);
-  } catch (err) {
-    next(err);
-  }
-}
+  })
 
 /**
  * PUT /api/templates/my/:id
@@ -79,13 +58,7 @@ export const updateUserTemplate = wrapController(async (req, res, next) => {
     const { name, width, height, platform } = req.body;
     const data = await sizeTemplateService.updateUserTemplate(req.user.id, req.params.id, { name, width, height, platform });
     return sendSuccess(res, data, '模板更新成功');
-  } catch (err) {
-    if (err.status) {
-      return sendError(res, err.status, err.message);
-    }
-    next(err);
-  }
-}
+  })
 
 /**
  * DELETE /api/templates/my/:id
@@ -94,10 +67,4 @@ export const updateUserTemplate = wrapController(async (req, res, next) => {
 export const deleteUserTemplate = wrapController(async (req, res, next) => {
     const data = await sizeTemplateService.deleteUserTemplate(req.user.id, req.params.id);
     return sendSuccess(res, data, '模板已删除');
-  } catch (err) {
-    if (err.status) {
-      return sendError(res, err.status, err.message);
-    }
-    next(err);
-  }
-}
+  })

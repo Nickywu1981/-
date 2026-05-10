@@ -17,10 +17,7 @@ export const uploadFile = wrapController(async (req, res) => {
       size: req.file.size,
       mimeType: req.file.mimetype,
     }, '上传成功');
-  } catch (err) {
-    return error(res, ERROR_CODE.INTERNAL_ERROR, err.message);
-  }
-}
+  })
 
 export const uploadMultipleFiles = wrapController(async (req, res) => {
     if (!req.files || req.files.length === 0) {
@@ -34,7 +31,4 @@ export const uploadMultipleFiles = wrapController(async (req, res) => {
     }));
 
     return success(res, { files: urls, count: urls.length }, '上传成功');
-  } catch (err) {
-    return error(res, ERROR_CODE.INTERNAL_ERROR, err.message);
-  }
-}
+  })
