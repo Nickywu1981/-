@@ -114,6 +114,10 @@ export async function loginByCode({ phone, email, username, code }) {
       throw new BusinessError(400, '请提供手机号、邮箱或用户名');
     }
 
+    // 白名单校验 idField 防动态列名注入（即使当前代码安全，加固未来重构）
+    const ALLOWED = ['phone', 'email', 'username'];
+    if (!ALLOWED.includes(idField)) throw new BusinessError(400, '请提供手机号、邮箱或用户名');
+
     const [users] = await conn.query(
       `SELECT id, tenant_id, role, nickname, status FROM \`user\` WHERE ${idField} = ?`,
       [identifier],
