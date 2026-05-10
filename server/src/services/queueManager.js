@@ -1,6 +1,10 @@
 /**
  * BullMQ 消息队列管理器（增强版）
  *
+ * @dead-code — 当前无任何路由调用 addJob()，实际生产使用 MySQL 轮询队列
+ *   (services/job-queue.service.js + workers/worker.js)。
+ *   保留此模块供未来迁移至 BullMQ 时参考，修复时勿删。
+ *
  * 新增：
  *   - 重试机制：默认 3 次，指数退避 1s→3s→9s
  *   - 超时控制：image 5min, video 30min, batch 60min

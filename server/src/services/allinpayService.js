@@ -75,15 +75,15 @@ export async function createUnifiedOrder({ userId, orderType, businessId, amount
 export async function handleNotify(body) {
   const { reqsn, trxid } = body;
 
-  // 1. 记录回调日志（幂等 — 总是插入）
-  await allinpayDao.logNotify({ reqsn, trxid, notifyBody: JSON.stringify(body), signVerified: 0, processStatus: 0 });
-
-  // 2. 验签
+  // 1. 先验签（防恶意回调污染数据库）
   const verified = await allinpaySDK.verifyNotify(body);
   if (!verified) {
-    await allinpayDao.logNotify({ reqsn, trxid, notifyBody: JSON.stringify(body), signVerified: 2, processStatus: 2, processMsg: '签名验证失败' });
+    logger.warn('[Allinpay] 回调签名验证失败', { reqsn, trxid });
     throw new BusinessError(400, '签名验证失败');
   }
+
+  // 2. 记录回调日志（验签通过后才入库）
+  await allinpayDao.logNotify({ reqsn, trxid, notifyBody: JSON.stringify(body), signVerified: 1, processStatus: 0 });
 
   // 3. 幂等检查 + 分布式锁
   const lockKey = `notify_lock:${reqsn}`;

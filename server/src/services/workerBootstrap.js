@@ -1,5 +1,10 @@
 /**
  * Worker 启动器 — 在 app 启动时注册所有 BullMQ Worker
+ *
+ * @dead-code — BullMQ workers 监听队列但无路由投递任务；
+ *   实际 worker 为 workers/worker.js (MySQL 轮询模式)。
+ *   保留供未来迁移参考，修复时勿删。
+ *
  * 由 index.js 在 HTTP server listen 后调用
  */
 import logger from '../utils/logger.js';

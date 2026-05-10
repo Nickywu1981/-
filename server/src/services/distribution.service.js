@@ -169,10 +169,10 @@ export async function withdrawCommission(userId, amount) {
   try {
     await conn.beginTransaction();
 
-    // 查可用余额
+    // 查可用余额（FOR UPDATE 防并发提现）
     const [[balance]] = await conn.query(
       `SELECT COALESCE(SUM(commission), 0) as available
-       FROM distributor_commission WHERE distributor_id = ? AND status = 'settled'`,
+       FROM distributor_commission WHERE distributor_id = ? AND status = 'settled' FOR UPDATE`,
       [userId],
     );
 
@@ -184,7 +184,7 @@ export async function withdrawCommission(userId, amount) {
     let remaining = requestAmount;
     const [pendingCommissions] = await conn.query(
       `SELECT id, commission FROM distributor_commission
-       WHERE distributor_id = ? AND status = 'settled' ORDER BY id ASC`,
+       WHERE distributor_id = ? AND status = 'settled' ORDER BY id ASC FOR UPDATE`,
       [userId],
     );
 
