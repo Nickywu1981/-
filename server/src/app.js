@@ -5,7 +5,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
-import { apiLimiter, authLimiter, codeLimiter, heavyLimiter, uploadLimiter } from './middleware/rateLimiter.js';
+import { apiLimiter, authLimiter, codeLimiter, heavyLimiter, uploadLimiter, paymentLimiter, adminLimiter, aiConcurrencyGuard } from './middleware/rateLimiter.js';
 import { sqlGuardMiddleware } from './utils/sqlGuard.js';
 import { requestLogger } from './utils/logger.js';
 import logger from './utils/logger.js';
@@ -140,6 +140,20 @@ app.use(authMiddleware);
 app.use(tenantContext);
 app.use(auditLogMiddleware);
 
+// 全局缓存失效：POST/PUT/DELETE 2xx 响应后自动清除对应 GET 缓存
+import('./middleware/cache.js').then(({ invalidateCache }) => {
+  app.use((req, res, next) => {
+    if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) return next();
+    res.on('finish', () => {
+      if (res.statusCode >= 200 && res.statusCode < 300) {
+        const basePath = req.baseUrl || req.originalUrl.split('?')[0];
+        invalidateCache(`${basePath}*`).catch(() => {});
+      }
+    });
+    next();
+  });
+});
+
 // 健康检查 — DB 必须在线，Redis 离线仅标记 degraded，同步检测 AI 模型状态
 app.get('/api/health', async (_req, res) => {
   const status = {
@@ -247,10 +261,10 @@ app.use('/api/videos', heavyLimiter, videoRoutes);
 app.use('/api/batch', heavyLimiter, batchRoutes);
 app.use('/api/advanced', heavyLimiter, advancedImageRoutes);
 app.use('/api/adv-video', heavyLimiter, advancedVideoRoutes);
-app.use('/api/payment', paymentRoutes);
-app.use('/api/plans', paymentRoutes); // 公开别名
-app.use('/api/admin', adminRoutes);
-app.use('/api/admin/models', adminModelsRoutesV4);
+app.use('/api/payment', paymentLimiter, paymentRoutes);
+app.use('/api/plans', paymentRoutes); // 公开别名（查看套餐无需限流）
+app.use('/api/admin', adminLimiter, adminRoutes);
+app.use('/api/admin/models', adminLimiter, adminModelsRoutesV4);
 app.use('/api/test', testWorkbenchRoutesV4);
 app.use('/api/posters', heavyLimiter, posterRoutesV4);
 app.use('/api/video-translate', heavyLimiter, videoTranslateRoutesV4);
@@ -269,7 +283,7 @@ app.use('/api/tenants', tenantRoutes);
 app.use('/api/diy', diyRoutes);
 app.use('/api/forms', formRoutes);
 app.use('/api/proxy', proxyRoutes);
-app.use('/api/recharge', rechargeRoutes);
+app.use('/api/recharge', paymentLimiter, rechargeRoutes);
 app.use('/api/allinpay', allinpayRoutes);
 app.use('/api/automation', automationRoutes);
 app.use('/api/admin/ai-logs', aiLogRoutes);
@@ -288,7 +302,7 @@ app.use('/api/multilingual', multilingualRoutes);
 app.use('/api/compliance', complianceRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/platform-specs', platformSpecRoutes);
-app.use('/api/ai-dispatch', heavyLimiter, aiDispatchRoutes);  // 多模型统一调度: dispatch/categories/health/stats/cache
+app.use('/api/ai-dispatch', aiConcurrencyGuard, heavyLimiter, aiDispatchRoutes);  // 多模型统一调度: dispatch/categories/health/stats/cache
 app.use('/api/compare', compareRoutes);
 app.use('/api/seo-keywords', seoKeywordRoutes);
 app.use('/api/fab', fabRoutes);

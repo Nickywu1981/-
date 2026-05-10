@@ -86,7 +86,7 @@ export async function adaptImage(inputPath, platformCode, outputDir) {
   const outputPath = path.join(outputDir, outputFileName);
 
   try {
-    await sharp(inputPath)
+    await sharp(inputPath, { limitInputPixels: 268435456 })
       .resize(spec.width, spec.height, { fit: 'fill' })
       .toFormat(ext)
       .toFile(outputPath);

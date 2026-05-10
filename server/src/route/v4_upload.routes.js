@@ -18,7 +18,7 @@ const _upload = multer({ storage: _storage, limits: { fileSize: 50 * 1024 * 1024
 
 const initUploadSchema = z.object({
   file_name: z.string().min(1, '请提供文件名').max(255),
-  file_size: z.number().int().positive('文件大小不正确').max(10 * 1024 * 1024 * 1024),
+  file_size: z.number().int().positive('文件大小不正确').max(500 * 1024 * 1024),
   file_type: z.string().min(1, '请提供文件类型').max(100),
 });
 

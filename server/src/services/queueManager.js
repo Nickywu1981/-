@@ -114,6 +114,10 @@ export function registerWorker(name, processor) {
     }
   });
 
+  worker.on('error', (err) => {
+    logger.error(`[BullMQ] Worker ${name} 级错误: ${err.message}`, { stack: err.stack });
+  });
+
   workerInstances.set(name, worker);
   logger.info(`[BullMQ] Worker 已注册: ${name} (concurrency=${QUEUES[name].concurrency})`);
   return worker;
@@ -182,7 +186,18 @@ export async function cleanQueue(queueName, graceSeconds = 3600) {
 }
 
 export async function closeAll() {
-  for (const worker of workerInstances.values()) await worker.close();
+  for (const [name, worker] of workerInstances) {
+    await worker.pause();
+    // 等待飞行中的任务完成（最长 30 秒）
+    const start = Date.now();
+    while (Date.now() - start < 30000) {
+      const counts = await worker.getJobCounts('active');
+      if (!counts.active) break;
+      await new Promise(r => setTimeout(r, 500));
+    }
+    await worker.close();
+    logger.info(`[BullMQ] Worker ${name} 已关闭`);
+  }
   for (const queue of queueInstances.values()) await queue.close();
   logger.info('[BullMQ] 所有队列已关闭');
 }

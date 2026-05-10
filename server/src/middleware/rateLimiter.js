@@ -96,3 +96,21 @@ export const uploadLimiter = rateLimit({
   legacyHeaders: false,
   message: { code: 429, msg: '上传请求过于频繁，请稍后再试', data: null },
 });
+
+/** 支付/充值限流（财务敏感） */
+export const paymentLimiter = rateLimit({
+  windowMs: 60000,
+  max: 15,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { code: 429, msg: '支付请求过于频繁，请稍后再试', data: null },
+});
+
+/** 管理后台限流 */
+export const adminLimiter = rateLimit({
+  windowMs: 60000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { code: 429, msg: '管理操作过于频繁，请稍后再试', data: null },
+});

@@ -40,7 +40,20 @@ class WsManager {
   attach(server) {
     this.wss = new WebSocketServer({ server, path: '/ws', maxPayload: 64 * 1024 });
 
+    // 心跳检测：每 30 秒 ping，60 秒无 pong 视为断连
+    const interval = setInterval(() => {
+      this.wss?.clients.forEach((ws) => {
+        if (ws.isAlive === false) return ws.terminate();
+        ws.isAlive = false;
+        ws.ping();
+      });
+    }, 30000);
+    this.wss.on('close', () => clearInterval(interval));
+
     this.wss.on('connection', (socket, req) => {
+      socket.isAlive = true;
+      socket.on('pong', () => { socket.isAlive = true; });
+
       const clientIp = req.socket?.remoteAddress || 'unknown';
 
       // 每 IP 最多 5 个并发连接

@@ -16,7 +16,7 @@ export async function convertToWebP(filePath) {
   const webpPath = filePath.replace(ext, '.webp');
 
   try {
-    const pipeline = sharp(filePath);
+    const pipeline = sharp(filePath, { limitInputPixels: 268435456 }); // max ~16384x16384
 
     if (ext === '.png') {
       pipeline.webp({ quality: 85, lossless: false, alphaQuality: 90 });
