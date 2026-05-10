@@ -39,20 +39,17 @@ class WsManager {
     this.wss = new WebSocketServer({ server, path: '/ws' });
 
     this.wss.on('connection', (socket, req) => {
-      // 从 cookie 中读取 JWT token 认证
+      // 仅通过 JWT cookie 认证，拒绝匿名连接
       const cookies = parseCookies(req.headers.cookie);
       let userId = null;
       try {
         const payload = jwt.verify(cookies.token || '', JWT_SECRET);
         userId = String(payload.id);
       } catch {
-        // 匿名连接 (仅允许订阅公开任务进度)
-        userId = null;
+        // 未认证连接 — 关闭连接，不提供公开订阅
+        socket.close(4001, '未授权');
+        return;
       }
-
-      // 也兼容 query param userId (向后兼容)
-      const query = parse(req.url || '/', true).query;
-      if (!userId && query.userId) userId = String(query.userId);
 
       if (userId) this.userSockets.set(userId, socket);
 

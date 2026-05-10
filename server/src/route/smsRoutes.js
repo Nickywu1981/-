@@ -6,6 +6,7 @@ import {
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate, phoneSchema, codeSchema } from '../utils/validate.js';
+import { codeLimiter } from '../middleware/rateLimiter.js';
 import { z } from 'zod';
 
 const router = Router();
@@ -38,7 +39,7 @@ const smsTemplateSchema = z.object({
 const smsTemplateUpdateSchema = smsTemplateSchema.partial().omit({ template_code: true });
 
 // 公开 — 验证码收发
-router.post('/send-code', validate(sendCodeSchema), asyncHandler(sendVerificationCode));
+router.post('/send-code', codeLimiter, validate(sendCodeSchema), asyncHandler(sendVerificationCode));
 router.post('/verify-code', validate(verifyCodeSchema), asyncHandler(verifyCode));
 
 // 登录用户 — 手动触发通知短信

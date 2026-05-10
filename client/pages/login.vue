@@ -16,11 +16,13 @@
       <form v-if="mode === 'password'" @submit.prevent="handlePasswordLogin">
         <div class="input-group">
           <span class="input-icon">👤</span>
-          <input v-model="username" type="text" placeholder="用户名" required maxlength="30" />
+          <label for="login-username" class="sr-only">用户名</label>
+          <input id="login-username" v-model="username" type="text" placeholder="用户名" required maxlength="30" />
         </div>
         <div class="input-group">
           <span class="input-icon">🔒</span>
-          <input v-model="password" type="password" placeholder="密码" required maxlength="128" />
+          <label for="login-password" class="sr-only">密码</label>
+          <input id="login-password" v-model="password" type="password" placeholder="密码" required maxlength="128" />
         </div>
         <button type="submit" class="login-btn" :disabled="loading">
           <span v-if="loading" class="spinner-sm" />
@@ -31,10 +33,12 @@
       <form v-if="mode === 'sms'" @submit.prevent="handleSmsLogin">
         <div class="input-group">
           <span class="input-icon">📱</span>
-          <input v-model="smsPhone" type="tel" placeholder="手机号" required maxlength="11" />
+          <label for="login-sms-phone" class="sr-only">手机号</label>
+          <input id="login-sms-phone" v-model="smsPhone" type="tel" placeholder="手机号" required maxlength="11" />
         </div>
         <div class="sms-row">
-          <input v-model="smsCode" type="text" placeholder="验证码" required maxlength="6" />
+          <label for="login-sms-code" class="sr-only">短信验证码</label>
+          <input id="login-sms-code" v-model="smsCode" type="text" placeholder="验证码" required maxlength="6" />
           <button type="button" class="code-btn" :disabled="smsCountdown > 0" @click="sendSmsCode('login')">
             {{ smsCountdown > 0 ? `${smsCountdown}秒` : '获取验证码' }}
           </button>
@@ -48,10 +52,12 @@
       <form v-if="mode === 'email'" @submit.prevent="handleEmailLogin">
         <div class="input-group">
           <span class="input-icon">📧</span>
-          <input v-model="emailAddr" type="email" placeholder="邮箱地址" required maxlength="254" />
+          <label for="login-email" class="sr-only">邮箱地址</label>
+          <input id="login-email" v-model="emailAddr" type="email" placeholder="邮箱地址" required maxlength="254" />
         </div>
         <div class="sms-row">
-          <input v-model="emailCode" type="text" placeholder="验证码" required maxlength="6" />
+          <label for="login-email-code" class="sr-only">邮箱验证码</label>
+          <input id="login-email-code" v-model="emailCode" type="text" placeholder="验证码" required maxlength="6" />
           <button type="button" class="code-btn" :disabled="emailCountdown > 0" @click="sendEmailCode('login')">
             {{ emailCountdown > 0 ? `${emailCountdown}秒` : '获取验证码' }}
           </button>
@@ -96,7 +102,7 @@ async function handlePasswordLogin() {
     await authStore.fetchUser()
     navigateTo('/workspace')
   } catch (e: any) { msg.value = e.data?.msg || e.message || '登录失败'; msgErr.value = true; }
-  loading.value = false;
+  finally { loading.value = false; }
 }
 
 async function handleSmsLogin() {
@@ -108,7 +114,7 @@ async function handleSmsLogin() {
     await useAuthStore().fetchUser();
     navigateTo('/workspace');
   } catch (e: any) { msg.value = e.data?.msg || '登录失败'; msgErr.value = true; }
-  loading.value = false;
+  finally { loading.value = false; }
 }
 
 async function sendSmsCode(scene: string) {
@@ -131,7 +137,7 @@ async function handleEmailLogin() {
     await useAuthStore().fetchUser();
     navigateTo('/workspace');
   } catch (e: any) { msg.value = e.data?.msg || '登录失败'; msgErr.value = true; }
-  loading.value = false;
+  finally { loading.value = false; }
 }
 
 async function sendEmailCode(scene: string) {
@@ -235,4 +241,5 @@ input::placeholder { color: var(--input-placeholder); }
   .mode-tabs button { font-size: 12px; padding: 8px 6px; }
   .login-header h2 { font-size: 20px; }
 }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 </style>

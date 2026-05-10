@@ -12,35 +12,44 @@
 
       <!-- 密码注册 -->
       <form v-if="mode === 'password'" @submit.prevent="handleRegister">
-        <input v-model="username" type="text" placeholder="用户名" required />
-        <input v-model="password" type="password" placeholder="密码（至少6位）" required minlength="6" />
-        <input v-model="nickname" type="text" placeholder="昵称（选填）" />
+        <label for="reg-username" class="sr-only">用户名</label>
+        <input id="reg-username" v-model="username" type="text" placeholder="用户名" required />
+        <label for="reg-password" class="sr-only">密码</label>
+        <input id="reg-password" v-model="password" type="password" placeholder="密码（至少6位）" required minlength="6" />
+        <label for="reg-nickname" class="sr-only">昵称</label>
+        <input id="reg-nickname" v-model="nickname" type="text" placeholder="昵称（选填）" />
         <button type="submit" class="btn" :disabled="loading">{{ loading ? '注册中...' : '注册' }}</button>
       </form>
 
       <!-- 手机注册 -->
       <form v-if="mode === 'sms'" @submit.prevent="handleSmsRegister">
-        <input v-model="smsPhone" type="tel" placeholder="手机号" required />
+        <label for="reg-sms-phone" class="sr-only">手机号</label>
+        <input id="reg-sms-phone" v-model="smsPhone" type="tel" placeholder="手机号" required />
         <div class="sms-row">
-          <input v-model="smsCode" type="text" placeholder="验证码" required maxlength="6" />
+          <label for="reg-sms-code" class="sr-only">验证码</label>
+          <input id="reg-sms-code" v-model="smsCode" type="text" placeholder="验证码" required maxlength="6" />
           <button type="button" class="btn-sms" :disabled="smsCountdown > 0" @click="sendSmsCode('register')">
             {{ smsCountdown > 0 ? `${smsCountdown}秒` : '获取验证码' }}
           </button>
         </div>
-        <input v-model="smsNickname" type="text" placeholder="昵称（选填）" />
+        <label for="reg-sms-nickname" class="sr-only">昵称</label>
+        <input id="reg-sms-nickname" v-model="smsNickname" type="text" placeholder="昵称（选填）" />
         <button type="submit" class="btn" :disabled="loading">{{ loading ? '注册中...' : '注册' }}</button>
       </form>
 
       <!-- 邮箱注册 -->
       <form v-if="mode === 'email'" @submit.prevent="handleEmailRegister">
-        <input v-model="emailAddr" type="email" placeholder="邮箱地址" required />
+        <label for="reg-email" class="sr-only">邮箱地址</label>
+        <input id="reg-email" v-model="emailAddr" type="email" placeholder="邮箱地址" required />
         <div class="sms-row">
-          <input v-model="emailCode" type="text" placeholder="验证码" required maxlength="6" />
+          <label for="reg-email-code" class="sr-only">验证码</label>
+          <input id="reg-email-code" v-model="emailCode" type="text" placeholder="验证码" required maxlength="6" />
           <button type="button" class="btn-sms" :disabled="emailCountdown > 0" @click="sendEmailCode('register')">
             {{ emailCountdown > 0 ? `${emailCountdown}秒` : '获取验证码' }}
           </button>
         </div>
-        <input v-model="emailNickname" type="text" placeholder="昵称（选填）" />
+        <label for="reg-email-nickname" class="sr-only">昵称</label>
+        <input id="reg-email-nickname" v-model="emailNickname" type="text" placeholder="昵称（选填）" />
         <button type="submit" class="btn" :disabled="loading">{{ loading ? '注册中...' : '注册' }}</button>
       </form>
 
@@ -87,7 +96,7 @@ async function handleRegister() {
     await authStore.register(body)
     navigateTo('/workspace')
   } catch (e: any) { msg.value = e.data?.msg || e.message || '注册失败'; msgErr.value = true; }
-  loading.value = false;
+  finally { loading.value = false; }
 }
 
 async function handleSmsRegister() {
@@ -103,7 +112,7 @@ async function handleSmsRegister() {
     await useAuthStore().fetchUser();
     navigateTo('/workspace');
   } catch (e: any) { msg.value = e.data?.msg || '注册失败'; msgErr.value = true; }
-  loading.value = false;
+  finally { loading.value = false; }
 }
 
 async function sendSmsCode(scene: string) {
@@ -130,7 +139,7 @@ async function handleEmailRegister() {
     await useAuthStore().fetchUser();
     navigateTo('/workspace');
   } catch (e: any) { msg.value = e.data?.msg || '注册失败'; msgErr.value = true; }
-  loading.value = false;
+  finally { loading.value = false; }
 }
 
 async function sendEmailCode(scene: string) {
@@ -212,4 +221,5 @@ input::placeholder { color: var(--input-placeholder); }
   .mode-tabs button { font-size: 12px; padding: 8px 6px; }
   .card h2 { font-size: 20px; }
 }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 </style>
