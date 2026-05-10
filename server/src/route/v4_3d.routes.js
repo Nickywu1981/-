@@ -12,6 +12,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { authMiddleware } from '../middleware/auth.js';
 import { uploadLimiter } from '../middleware/rateLimiter.js';
+import { uploadQuotaGuard } from '../middleware/upload.js';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate } from '../utils/validate.js';
@@ -81,7 +82,7 @@ function validateMagicBytes(filePath, ext) {
 }
 
 // POST /api/3d/upload
-router.post('/upload', uploadLimiter, authMiddleware, upload.single('model'), (req, res, next) => {
+router.post('/upload', uploadLimiter, authMiddleware, upload.single('model'), uploadQuotaGuard, (req, res, next) => {
   try {
     if (!req.file) return error(res, ERROR_CODE.BAD_REQUEST, '请上传 3D 模型文件');
     const ext = path.extname(req.file.originalname).toLowerCase();

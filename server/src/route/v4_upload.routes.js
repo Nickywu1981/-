@@ -9,6 +9,7 @@ import { validateV4 as _validate, validate } from '../utils/validate.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { uploadLimiter } from '../middleware/rateLimiter.js';
+import { uploadQuotaGuard } from '../middleware/upload.js';
 import * as uploadService from '../utils/file-upload.js';
 import multer from 'multer';
 
@@ -79,7 +80,7 @@ function _withMulter(req, res, next) {
 }
 
 // POST /api/upload/simple — 小文件直接上传
-router.post('/simple', uploadLimiter, _withMulter, async (req, res) => {
+router.post('/simple', uploadLimiter, _withMulter, uploadQuotaGuard, async (req, res) => {
   try {
     if (!req.file) return error(res, ERROR_CODE.VALIDATION_ERROR, '请选择文件');
     if (!checkBufferMagic(req.file.buffer, req.file.mimetype)) {
@@ -106,7 +107,7 @@ router.post('/init', uploadLimiter, _validate(initUploadSchema), async (req, res
 const UPLOAD_ID_REGEX = /^[a-f0-9]{32}$/;
 
 // POST /api/upload/chunk — 接收分片 (multipart: upload_id, chunk_index, chunk)
-router.post('/chunk', uploadLimiter, _upload.fields([{ name: 'chunk', maxCount: 1 }]), validate(chunkSchema, 'body'), async (req, res) => {
+router.post('/chunk', uploadLimiter, _upload.fields([{ name: 'chunk', maxCount: 1 }]), uploadQuotaGuard, validate(chunkSchema, 'body'), async (req, res) => {
   try {
     const { upload_id, chunk_index } = req.body;
     const chunkFile = req.files?.chunk?.[0];

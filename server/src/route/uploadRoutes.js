@@ -14,7 +14,7 @@ const uploadSchema = z.object({
   tags: z.string().max(200).optional(),
 });
 
-router.post('/image', authMiddleware, uploadLimiter, uploadQuotaGuard, validate(uploadSchema), uploadMiddleware.single('file'), magicNumberGuard, asyncHandler(uploadFile));
-router.post('/images', authMiddleware, uploadLimiter, uploadQuotaGuard, validate(uploadSchema), uploadMiddleware.array('files', 50), magicNumberGuard, asyncHandler(uploadMultipleFiles));
+router.post('/image', authMiddleware, uploadLimiter, validate(uploadSchema), uploadMiddleware.single('file'), magicNumberGuard, uploadQuotaGuard, asyncHandler(uploadFile));
+router.post('/images', authMiddleware, uploadLimiter, validate(uploadSchema), uploadMiddleware.array('files', 50), magicNumberGuard, uploadQuotaGuard, asyncHandler(uploadMultipleFiles));
 
 export default router;

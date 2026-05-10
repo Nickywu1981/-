@@ -7,6 +7,14 @@ const LOG_DIR = path.join(__dirname, '../../logs');
 
 const isDev = process.env.NODE_ENV !== 'production';
 
+// LOG_LEVEL env var takes precedence over NODE_ENV-derived default
+const LOG_LEVEL = (() => {
+  const fromEnv = process.env.LOG_LEVEL;
+  const validLevels = ['error', 'warn', 'info', 'http', 'verbose', 'debug', 'silly'];
+  if (fromEnv && validLevels.includes(fromEnv)) return fromEnv;
+  return isDev ? 'debug' : 'info';
+})();
+
 // ==================== 日志采样配置 ====================
 
 const LOG_SAMPLE_RATE = parseFloat(process.env.LOG_SAMPLE_RATE || (isDev ? '1.0' : '0.1'));
@@ -25,7 +33,7 @@ function shouldSample(path, statusCode) {
 }
 
 const logger = createLogger({
-  level: isDev ? 'debug' : 'info',
+  level: LOG_LEVEL,
   format: format.combine(
     format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     format.errors({ stack: true }),

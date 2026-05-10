@@ -51,9 +51,44 @@ export function validateStartupConfig() {
     errors.push('生产环境 DB_PASSWORD 未设置或仍为默认值 CHANGE_ME');
   }
 
-  // P1: CSRF secret
+  // P1: CSRF secret strength (beyond known defaults)
   if (isProd && (!process.env.CSRF_SECRET || process.env.CSRF_SECRET === 'dev-csrf-secret' || process.env.CSRF_SECRET === 'your-csrf-secret')) {
     errors.push('生产环境必须设置强 CSRF_SECRET');
+  }
+  if (isProd && process.env.CSRF_SECRET && process.env.CSRF_SECRET.length < 32) {
+    errors.push('生产环境 CSRF_SECRET 长度不足 32 字符');
+  }
+
+  // P1: ALLINPAY payment keys in production
+  if (isProd) {
+    const allinpayCusid = process.env.ALLINPAY_CUSID || '';
+    const allinpayAppid = process.env.ALLINPAY_APPID || '';
+    if (!allinpayCusid) {
+      errors.push('生产环境必须设置 ALLINPAY_CUSID（通联支付商户号）');
+    }
+    if (!allinpayAppid) {
+      errors.push('生产环境必须设置 ALLINPAY_APPID（通联支付应用ID）');
+    }
+    if (!process.env.ALLINPAY_NOTIFY_URL) {
+      errors.push('生产环境必须设置 ALLINPAY_NOTIFY_URL（支付回调地址）');
+    }
+  }
+
+  // P1: STORAGE_DRIVER must not be local in production
+  const storageDriver = process.env.STORAGE_DRIVER || process.env.STORAGE_PROVIDER || 'local';
+  if (isProd && storageDriver === 'local') {
+    errors.push('生产环境 STORAGE_DRIVER 不能为 local（本地存储不支持水平扩展），请使用 cos 或 s3');
+  }
+  if (isProd && storageDriver === 'cos') {
+    if (!process.env.COS_SECRET_ID) errors.push('生产环境 COS 存储需设置 COS_SECRET_ID');
+    if (!process.env.COS_SECRET_KEY) errors.push('生产环境 COS 存储需设置 COS_SECRET_KEY');
+    if (!process.env.COS_BUCKET) errors.push('生产环境 COS 存储需设置 COS_BUCKET');
+  }
+  if (isProd && storageDriver === 's3') {
+    if (!process.env.S3_ACCESS_KEY) errors.push('生产环境 S3 存储需设置 S3_ACCESS_KEY');
+    if (!process.env.S3_SECRET_KEY) errors.push('生产环境 S3 存储需设置 S3_SECRET_KEY');
+    if (!process.env.S3_BUCKET) errors.push('生产环境 S3 存储需设置 S3_BUCKET');
+    if (!process.env.S3_ENDPOINT) errors.push('生产环境 S3 存储需设置 S3_ENDPOINT');
   }
 
   // P2: Warnings
