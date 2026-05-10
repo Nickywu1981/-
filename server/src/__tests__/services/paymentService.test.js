@@ -5,7 +5,14 @@ vi.mock('../../dao/db.js', () => ({
   default: {
     execute: vi.fn().mockResolvedValue([[{ affectedRows: 1 }]]),
     query: vi.fn().mockResolvedValue([[{ affectedRows: 1 }]]),
-    getConnection: vi.fn().mockResolvedValue({ execute: vi.fn(), release: vi.fn() }),
+    getConnection: vi.fn().mockResolvedValue({
+      execute: vi.fn(),
+      query: vi.fn().mockResolvedValue([[{ affectedRows: 1 }]]),
+      beginTransaction: vi.fn().mockResolvedValue(undefined),
+      commit: vi.fn().mockResolvedValue(undefined),
+      rollback: vi.fn().mockResolvedValue(undefined),
+      release: vi.fn(),
+    }),
   },
 }));
 vi.mock('../../dao/allinpayDao.js', () => ({

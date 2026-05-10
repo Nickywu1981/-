@@ -10,9 +10,12 @@ import { z } from 'zod';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate } from '../utils/validate.js';
+import { authMiddleware } from '../middleware/auth.js';
 import db from '../dao/db.js';
 
 const router = Router();
+
+router.use(authMiddleware);
 
 const bindSchema = z.object({
   platform: z.string().min(1, '请提供平台标识').max(50),
