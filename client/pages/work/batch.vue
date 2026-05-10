@@ -96,7 +96,7 @@
 
       <!-- 保存为模板 -->
       <div class="save-template-row">
-        <input v-model="templateName" placeholder="保存为批量模板..." class="input-sm" />
+        <input v-model="templateName" placeholder="保存为批量模板..." class="input-sm" maxlength="100" />
         <button class="btn-outline-sm" :disabled="!templateName" @click="saveTemplate">保存模板</button>
       </div>
 

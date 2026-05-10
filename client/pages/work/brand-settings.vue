@@ -2,12 +2,12 @@
   <WorkLayout title="品牌统一配置" subtitle="一键设置品牌VI/水印/角标，全局统一应用到全部素材" :steps="steps" :current-step="currentStep">
     <template #input>
       <div class="ws-section"><div class="ws-section__title">品牌信息</div>
-        <div class="form-grid"><div class="form-group"><label>品牌名称</label><input v-model="form.brandName" class="input" placeholder="输入品牌名称" /></div>
+        <div class="form-grid"><div class="form-group"><label>品牌名称</label><input v-model="form.brandName" class="input" placeholder="输入品牌名称" maxlength="100" /></div>
         <div class="form-group"><label>品牌Logo</label><div class="upload-zone" @click="uploadLogo"><span v-if="!form.logoUrl">📷 上传Logo</span><img loading="lazy" v-else :src="form.logoUrl" style="max-width:120px;max-height:60px" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" /></div></div></div>
       </div>
       <div class="ws-section"><div class="ws-section__title">水印设置</div>
         <div class="form-grid"><div class="form-group"><label>水印类型</label><select v-model="form.watermarkType" class="input"><option value="text">文字水印</option><option value="image">图片水印</option><option value="none">无水印</option></select></div>
-        <div class="form-group" v-if="form.watermarkType==='text'"><label>水印文字</label><input v-model="form.watermarkText" class="input" placeholder="品牌名称或网址" /></div>
+        <div class="form-group" v-if="form.watermarkType==='text'"><label>水印文字</label><input v-model="form.watermarkText" class="input" placeholder="品牌名称或网址" maxlength="200" /></div>
         <div class="form-group"><label>位置</label><select v-model="form.watermarkPosition" class="input"><option value="bottomRight">右下角</option><option value="bottomLeft">左下角</option><option value="topRight">右上角</option><option value="center">居中</option></select></div>
         <div class="form-group"><label>透明度</label><input v-model="form.watermarkOpacity" type="range" min="0" max="100" class="input" /><span>{{ form.watermarkOpacity }}%</span></div></div>
       </div>

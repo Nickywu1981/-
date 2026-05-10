@@ -5,7 +5,7 @@
 <template>
   <div class="al">
     <!-- 移动端汉堡 -->
-    <button class="al-ham" @click="open = !open">{{ open ? '✕' : '☰' }}</button>
+    <button class="al-ham" @click="open = !open" :aria-label="open ? '关闭菜单' : '打开菜单'">{{ open ? '✕' : '☰' }}</button>
 
     <!-- 左侧分组导航 -->
     <aside class="al-side" :class="{ on: open }">

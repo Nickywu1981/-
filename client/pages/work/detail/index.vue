@@ -20,12 +20,12 @@
       <div v-if="mode === 'generate'">
         <div class="input-group">
           <label>商品名称 *</label>
-          <input v-model="productName" type="text" class="input" placeholder="输入商品名称" />
+          <input v-model="productName" type="text" class="input" placeholder="输入商品名称" maxlength="200" />
         </div>
 
         <div class="input-group">
           <label>商品卖点 (选填，每行一个)</label>
-          <textarea v-model="highlightsText" class="input" rows="4" placeholder="防水材质，透气舒适&#10;耐磨鞋底，防滑设计&#10;..."></textarea>
+          <textarea v-model="highlightsText" class="input" rows="4" placeholder="防水材质，透气舒适&#10;耐磨鞋底，防滑设计&#10;..." maxlength="2000"></textarea>
           <PromptEnhancer v-if="highlightsText.trim()" mode="detail" :initial-prompt="highlightsText" @applied="(v) => highlightsText = v" />
         </div>
 
@@ -50,7 +50,7 @@
 
         <div class="input-group" style="margin-top:16px">
           <label>商品名称 *</label>
-          <input v-model="productName" type="text" class="input" placeholder="输入商品名称" />
+          <input v-model="productName" type="text" class="input" placeholder="输入商品名称" maxlength="200" />
         </div>
 
         <AppMediaUpload accept="image" :multiple="true" :max-size="20" :max-count="10" @uploaded="onImagesUploaded" />

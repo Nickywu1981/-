@@ -69,7 +69,7 @@
 
       <div class="text-check-section">
         <h4>文案检查（可选）</h4>
-        <textarea v-model="textToCheck" placeholder="输入产品标题/描述文案进行检查..." rows="3" class="text-input" />
+        <textarea v-model="textToCheck" placeholder="输入产品标题/描述文案进行检查..." rows="3" class="text-input" maxlength="5000" />
       </div>
 
       <div class="actions">

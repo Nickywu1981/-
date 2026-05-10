@@ -14,7 +14,7 @@
       <!-- 口播文案 -->
       <div class="input-group">
         <label>口播文案</label>
-        <textarea v-model="script" class="input prompt-input" rows="6" placeholder="请输入口播文案...&#10;&#10;如：这款秋季新品连衣裙，采用高支棉面料，亲肤透气不起球。限时特惠只要99元！&#10;&#10;约5字/秒，30秒口播约150字"></textarea>
+        <textarea v-model="script" class="input prompt-input" rows="6" placeholder="请输入口播文案...&#10;&#10;如：这款秋季新品连衣裙，采用高支棉面料，亲肤透气不起球。限时特惠只要99元！&#10;&#10;约5字/秒，30秒口播约150字" maxlength="2000"></textarea>
         <div class="enhance-row">
           <PromptEnhancer mode="script" :initial-prompt="script" @applied="(v) => script = v" />
         </div>

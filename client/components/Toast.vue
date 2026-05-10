@@ -5,7 +5,7 @@
         <div v-for="t in toasts" :key="t.id" class="toast-item" :class="t.type">
           <span class="toast-icon">{{ iconMap[t.type] }}</span>
           <span class="toast-msg">{{ t.msg }}</span>
-          <button v-if="t.closable" class="toast-close" @click="remove(t.id)">✕</button>
+          <button v-if="t.closable" class="toast-close" @click="remove(t.id)" aria-label="关闭通知">✕</button>
         </div>
       </TransitionGroup>
     </div>

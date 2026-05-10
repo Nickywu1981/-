@@ -2,7 +2,7 @@
   <WorkLayout :steps="['输入产品', '选风格', '生成分镜']" :current-step="step">
     <div v-if="step === 0" class="upload-section">
       <h3>输入产品信息</h3>
-      <textarea v-model="productInfo" class="input-area" placeholder="描述你的产品和拍摄需求...&#10;&#10;如：女士长袖衬衫，经典翻领设计，纯棉面料舒适透气，适合通勤穿搭" rows="5" />
+      <textarea v-model="productInfo" class="input-area" placeholder="描述你的产品和拍摄需求...&#10;&#10;如：女士长袖衬衫，经典翻领设计，纯棉面料舒适透气，适合通勤穿搭" rows="5" maxlength="2000" />
       <div v-if="productInfo.trim()" class="quick-inputs">
         <button v-for="q in quickInputs" :key="q.label" class="quick-btn" @click="productInfo = q.text">{{ q.label }}</button>
       </div>

@@ -18,7 +18,7 @@
           <span class="step-label">粘贴爆款视频链接进行分析</span>
         </div>
         <div class="input-row">
-          <input v-model="viralUrl" class="input" placeholder="https://v.douyin.com/xxxxx 或 小红书/TikTok链接" :disabled="analyzing" />
+          <input v-model="viralUrl" class="input" placeholder="https://v.douyin.com/xxxxx 或 小红书/TikTok链接" :disabled="analyzing" maxlength="500" />
           <button class="btn btn-primary btn-sm" :disabled="!viralUrl.trim() || analyzing" @click="doAnalyze">
             {{ analyzing ? '分析中...' : '分析' }}
           </button>
@@ -55,14 +55,14 @@
         </div>
         <div class="input-group">
           <label>商品名称</label>
-          <input v-model="productName" type="text" class="input" placeholder="输入商品名称" :disabled="!analysisDone" />
+          <input v-model="productName" type="text" class="input" placeholder="输入商品名称" :disabled="!analysisDone" maxlength="200" />
         </div>
         <AppMediaUpload accept="image" :multiple="true" :max-size="20" :max-count="9" @uploaded="onProductImagesUploaded" />
         <p v-if="productImages.length" class="hint ok">✓ 已选择 {{ productImages.length }} 张产品图</p>
 
         <div class="input-group" style="margin-top:16px">
           <label>自定义提示词（可选，覆盖AI自动生成的提示词）</label>
-          <textarea v-model="customPrompt" class="input" rows="2" placeholder="自定义提示词..." :disabled="!analysisDone"></textarea>
+          <textarea v-model="customPrompt" class="input" rows="2" placeholder="自定义提示词..." :disabled="!analysisDone" maxlength="2000"></textarea>
           <PromptEnhancer v-if="analysisDone && customPrompt.trim()" mode="video" :initial-prompt="customPrompt" @applied="(v) => customPrompt = v" />
         </div>
       </div>

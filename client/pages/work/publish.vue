@@ -76,7 +76,7 @@
           </div>
           <div class="form-group">
             <label>标签 (逗号分隔)</label>
-            <input v-model="form.tagsStr" type="text" placeholder="e.g. 春季新品, 爆款推荐" />
+            <input v-model="form.tagsStr" type="text" placeholder="e.g. 春季新品, 爆款推荐" maxlength="500" />
           </div>
         </section>
 

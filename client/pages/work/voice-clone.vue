@@ -22,7 +22,7 @@
       </div>
       <div class="ws-section">
         <div class="ws-section__title">输入文本</div>
-        <textarea class="ws-textarea" v-model="text" placeholder="输入需要朗读的文本内容..." rows="5"></textarea>
+        <textarea class="ws-textarea" v-model="text" placeholder="输入需要朗读的文本内容..." rows="5" maxlength="1000"></textarea>
         <div class="ws-hint">{{ text.length }} / 500 字符</div>
       </div>
       <div class="ws-section">

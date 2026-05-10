@@ -23,7 +23,7 @@
 
       <div class="input-group" style="margin-top:16px">
         <label>提示词（描述想要的视频效果）</label>
-        <textarea v-model="prompt" class="input prompt-input" rows="3" placeholder="例如: 产品旋转展示，柔和灯光，快节奏转场..."></textarea>
+        <textarea v-model="prompt" class="input prompt-input" rows="3" placeholder="例如: 产品旋转展示，柔和灯光，快节奏转场..." maxlength="2000"></textarea>
         <div class="prompt-actions">
           <PromptEnhancer v-model="prompt" type="video" @enhanced="onPromptEnhanced" />
           <button class="btn btn-ghost btn-sm" :disabled="enhancing" @click="doEnhance">
@@ -69,14 +69,14 @@
     <div v-if="activeTab === 'productAd'" class="work-panel">
       <div class="input-group">
         <label>商品名称</label>
-        <input v-model="productName" type="text" class="input" placeholder="输入商品名称" />
+        <input v-model="productName" type="text" class="input" placeholder="输入商品名称" maxlength="200" />
       </div>
 
       <AppMediaUpload accept="image" :multiple="true" :max-size="20" :max-count="9" @uploaded="onProductImagesUploaded" />
 
       <div class="input-group" style="margin-top:16px">
         <label>卖点（每行一个）</label>
-        <textarea v-model="highlightsText" class="input" rows="3" placeholder="限时特惠 买一送一&#10;进口面料 亲肤透气&#10;7天无理由退换"></textarea>
+        <textarea v-model="highlightsText" class="input" rows="3" placeholder="限时特惠 买一送一&#10;进口面料 亲肤透气&#10;7天无理由退换" maxlength="2000"></textarea>
       </div>
 
       <div class="options-row">
@@ -129,7 +129,7 @@
     <div v-if="activeTab === 'storyboard'" class="work-panel">
       <div class="input-group">
         <label>视频创意描述</label>
-        <textarea v-model="storyPrompt" class="input prompt-input" rows="4" placeholder="描述你想要拍摄的视频内容..."></textarea>
+        <textarea v-model="storyPrompt" class="input prompt-input" rows="4" placeholder="描述你想要拍摄的视频内容..." maxlength="2000"></textarea>
       </div>
       <div class="option" style="max-width:200px;margin-bottom:16px">
         <label>分镜数量</label>

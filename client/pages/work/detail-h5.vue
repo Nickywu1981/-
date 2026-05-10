@@ -16,7 +16,7 @@
           <div v-for="(sku, i) in skuList" :key="i" class="sku-card">
             <img loading="lazy" :src="sku.previewUrl" class="sku-thumb" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
             <div class="sku-info">
-              <input v-model="sku.name" placeholder="SKU名称（如：红色-M）" class="sku-name-input" />
+              <input v-model="sku.name" placeholder="SKU名称（如：红色-M）" class="sku-name-input" maxlength="100" />
               <input v-model="sku.color" type="color" class="sku-color" title="选颜色" />
               <button class="sku-remove" @click="removeSku(i)" title="移除">✕</button>
             </div>
@@ -38,8 +38,8 @@
         <div v-for="(sku, i) in skuList" :key="i" class="sku-config-row">
           <img loading="lazy" :src="sku.previewUrl" class="sku-thumb-sm" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
           <div class="sku-fields">
-            <input v-model="sku.name" placeholder="SKU名称" class="input-sm" />
-            <input v-model="sku.spec" placeholder="规格（如：500ml）" class="input-sm" />
+            <input v-model="sku.name" placeholder="SKU名称" class="input-sm" maxlength="100" />
+            <input v-model="sku.spec" placeholder="规格（如：500ml）" class="input-sm" maxlength="100" />
             <input v-model.number="sku.price" placeholder="价格" type="number" class="input-sm price-input" />
           </div>
           <div class="sku-color-pick">

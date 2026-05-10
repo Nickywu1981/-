@@ -68,7 +68,7 @@
           <h4>填写参数</h4>
           <div v-for="v in detail.variables" :key="v.name" class="form-group">
             <label>{{ v.label || v.name }}</label>
-            <input v-if="v.type !== 'select'" v-model="fillValues[v.name]" class="input" :placeholder="v.placeholder || v.label" />
+            <input v-if="v.type !== 'select'" v-model="fillValues[v.name]" class="input" :placeholder="v.placeholder || v.label" maxlength="500" />
             <select v-else v-model="fillValues[v.name]" class="input">
               <option v-for="o in v.options" :key="o" :value="o">{{ o }}</option>
             </select>

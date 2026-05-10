@@ -4,7 +4,7 @@
       <div class="ws-section">
         <div class="ws-section__title">输入视频脚本</div>
         <div class="ws-section__desc">粘贴文案脚本，AI 自动拆分为分镜画面</div>
-        <textarea v-model="scriptText" class="input-area" placeholder="粘贴你的视频脚本...&#10;&#10;如：第一幕：清晨阳光洒进卧室，女主起床伸懒腰&#10;第二幕：走到厨房，打开冰箱拿出一瓶牛奶&#10;第三幕：喝牛奶特写，满足的笑容" rows="8" />
+        <textarea v-model="scriptText" class="input-area" placeholder="粘贴你的视频脚本...&#10;&#10;如：第一幕：清晨阳光洒进卧室，女主起床伸懒腰&#10;第二幕：走到厨房，打开冰箱拿出一瓶牛奶&#10;第三幕：喝牛奶特写，满足的笑容" rows="8" maxlength="5000" />
         <div class="quick-tags">
           <span class="tag-label">快捷模板：</span>
           <button v-for="t in quickTemplates" :key="t.label" class="tag-btn" @click="scriptText = t.text">{{ t.label }}</button>

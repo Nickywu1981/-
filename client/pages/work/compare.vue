@@ -63,7 +63,7 @@
         <div v-for="(slot, i) in gridSlots" :key="i" class="grid-col">
           <ImageSlot :src="slot.src" :alt="slot.alt" :title="slot.label" empty-text="点击选择" size="sm" @click="openGridPicker(i)" />
           <div class="grid-meta">
-            <input v-model="slot.label" class="label-input" placeholder="标签" />
+            <input v-model="slot.label" class="label-input" placeholder="标签" maxlength="50" />
             <button class="btn-remove" @click="removeGridSlot(i)" title="移除">✕</button>
           </div>
         </div>

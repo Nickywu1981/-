@@ -8,7 +8,7 @@
       <div class="header-actions">
         <div class="search-box">
           <span class="search-icon">🔍</span>
-          <input v-model="search" placeholder="搜索模板..." @input="onSearch" />
+          <input v-model="search" placeholder="搜索模板..." @input="onSearch" maxlength="200" />
         </div>
         <select v-model="category" class="filter-select" @change="onFilter">
           <option value="">全部分类</option>

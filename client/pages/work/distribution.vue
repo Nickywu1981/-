@@ -25,11 +25,11 @@
       <h2>内容配置</h2>
       <div class="form-group">
         <label>标题</label>
-        <input v-model="form.title" class="input" placeholder="输入发布标题" />
+        <input v-model="form.title" class="input" placeholder="输入发布标题" maxlength="200" />
       </div>
       <div class="form-group">
         <label>描述</label>
-        <textarea v-model="form.description" class="input" rows="3" placeholder="输入描述文案（支持 #话题标签）" />
+        <textarea v-model="form.description" class="input" rows="3" placeholder="输入描述文案（支持 #话题标签）" maxlength="2000" />
       </div>
       <div class="form-group">
         <label>图片素材</label>

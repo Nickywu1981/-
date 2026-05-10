@@ -1,9 +1,9 @@
 <template>
   <Teleport to="body">
     <div v-if="visible" class="lightbox-overlay" @click.self="close" @keydown.esc="close" tabindex="0" ref="overlay">
-      <button class="lightbox-close" @click="close" title="关闭">✕</button>
-      <button v-if="hasPrev" class="lightbox-nav lightbox-prev" @click.stop="prev">‹</button>
-      <button v-if="hasNext" class="lightbox-nav lightbox-next" @click.stop="next">›</button>
+      <button class="lightbox-close" @click="close" aria-label="关闭">✕</button>
+      <button v-if="hasPrev" class="lightbox-nav lightbox-prev" @click.stop="prev" aria-label="上一张">‹</button>
+      <button v-if="hasNext" class="lightbox-nav lightbox-next" @click.stop="next" aria-label="下一张">›</button>
       <div class="lightbox-body" @click.stop>
         <img :src="currentSrc" :alt="currentAlt" @load="loaded = true" />
         <div v-if="currentTitle" class="lightbox-caption">{{ currentTitle }}</div>

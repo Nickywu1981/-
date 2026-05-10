@@ -14,7 +14,7 @@
         <option value="pc">PC端</option>
         <option value="h5">H5</option>
       </select>
-      <input v-model="keyword" class="input-search" placeholder="搜索模板..." @keyup.enter="loadTemplates" />
+      <input v-model="keyword" class="input-search" placeholder="搜索模板..." @keyup.enter="loadTemplates" maxlength="100" />
     </div>
 
     <LoadingSkeleton v-if="loading" type="card" :rows="3" />

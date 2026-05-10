@@ -52,7 +52,7 @@
 
       <div class="input-group">
         <label>手动指定剪切区间（可选，JSON格式）</label>
-        <textarea v-model="clipRegionsText" class="input" rows="3" placeholder='[{"start": 10, "end": 30}, {"start": 60, "end": 90}]'></textarea>
+        <textarea v-model="clipRegionsText" class="input" rows="3" placeholder='[{"start": 10, "end": 30}, {"start": 60, "end": 90}]' maxlength="2000"></textarea>
         <PromptEnhancer v-if="clipRegionsText.trim()" mode="video" :initial-prompt="clipRegionsText" @applied="(v) => clipRegionsText = v" />
       </div>
 

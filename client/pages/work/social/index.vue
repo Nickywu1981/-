@@ -36,6 +36,7 @@
             class="input prompt-input"
             rows="4"
             :placeholder="activeTypeCfg?.placeholder || '描述封面主题和想要的风格...'"
+            maxlength="4000"
           />
           <div class="prompt-toolbar">
             <PromptEnhancer v-model="prompt" type="social" @enhanced="onPromptEnhanced" />

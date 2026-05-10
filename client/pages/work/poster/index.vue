@@ -34,6 +34,7 @@
           class="input prompt-input"
           rows="4"
           :placeholder="activeTypeCfg?.placeholder || '描述您想要的画面效果...'"
+          maxlength="4000"
         ></textarea>
         <div class="prompt-actions">
           <PromptEnhancer v-model="prompt" type="poster" @enhanced="onPromptEnhanced" />

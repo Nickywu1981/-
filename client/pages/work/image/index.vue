@@ -25,6 +25,7 @@
           class="input prompt-input"
           rows="4"
           placeholder="例如: 一款白色运动鞋放在木质地板上，自然光从左侧照射，45度俯拍角度，简约风格..."
+          maxlength="2000"
         ></textarea>
         <div class="prompt-actions">
           <PromptEnhancer v-model="prompt" type="image" @enhanced="onPromptEnhanced" />
@@ -82,7 +83,7 @@
       <AppMediaUpload accept="image" :multiple="false" :max-size="20" :max-count="1" @uploaded="onRefUploaded" />
       <div class="input-group" style="margin-top:16px">
         <label>商品名称</label>
-        <input v-model="productName" type="text" class="input" placeholder="输入商品名称" />
+        <input v-model="productName" type="text" class="input" placeholder="输入商品名称" maxlength="200" />
       </div>
       <button class="btn btn-primary btn-lg" :disabled="!refImageUrl || !productName" @click="doReplicate">
         开始复刻
@@ -100,7 +101,7 @@
 
       <div v-if="batchMode === 'generate'" class="batch-generate">
         <p class="hint">每行一个提示词，最多50行</p>
-        <textarea v-model="batchPrompts" class="input" rows="8" placeholder="白色运动鞋 简约风格&#10;黑色高跟鞋 时尚风格&#10;..."></textarea>
+        <textarea v-model="batchPrompts" class="input" rows="8" placeholder="白色运动鞋 简约风格&#10;黑色高跟鞋 时尚风格&#10;..." maxlength="5000"></textarea>
         <button class="btn btn-primary" :disabled="!batchPrompts.trim()" @click="doBatchGenerate">
           批量生成 ({{ batchLines.length }} 张)
         </button>

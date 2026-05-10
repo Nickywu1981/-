@@ -14,7 +14,7 @@
     <div v-if="open" class="pe-panel">
       <div class="pe-header">
         <span>✍ 润色提示词 ({{ typeLabel }})</span>
-        <button class="pe-close" @click="open = false">✕</button>
+        <button class="pe-close" @click="open = false" aria-label="关闭面板">✕</button>
       </div>
 
       <div class="pe-body">

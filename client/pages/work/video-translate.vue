@@ -26,7 +26,7 @@
     <div class="work-panel">
       <div class="form-row">
         <label class="form-label">视频链接</label>
-        <input v-model="videoUrl" class="input" placeholder="输入视频URL 或 上传视频后粘贴链接" />
+        <input v-model="videoUrl" class="input" placeholder="输入视频URL 或 上传视频后粘贴链接" maxlength="500" />
         <AppMediaUpload v-model="videoUrl" accept="video/*" label="上传视频" class="mt-2" />
       </div>
 

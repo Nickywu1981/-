@@ -57,7 +57,7 @@
               </template>
               <template v-else>
                 <img :src="uploadedImage" class="upload-preview" alt="预览" />
-                <button class="upload-remove" @click.stop="uploadedImage = ''">✕</button>
+                <button class="upload-remove" @click.stop="uploadedImage = ''" aria-label="移除图片">✕</button>
               </template>
               <input ref="fileInput" type="file" accept="image/*" hidden @change="handleFile" />
             </div>

@@ -58,6 +58,7 @@
           v-if="file.status !== 'uploading'"
           class="btn-remove"
           @click.stop="removeFile(idx)"
+          aria-label="移除文件"
         >×</button>
       </div>
     </div>

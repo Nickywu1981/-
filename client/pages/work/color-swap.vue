@@ -24,7 +24,7 @@
       </div>
       <div class="custom-color">
         <input v-model="customColor" type="color" />
-        <input v-model="customColorHex" placeholder="#FF0000" class="color-hex" />
+        <input v-model="customColorHex" placeholder="#FF0000" class="color-hex" maxlength="20" />
         <button class="btn-outline-sm" @click="addCustomColor">添加</button>
       </div>
       <div v-if="selectedColors.length" class="selected-colors">

@@ -2,7 +2,7 @@
   <WorkLayout :steps="['输入卖点', '选类型+语言', '生成脚本']" :current-step="step">
     <div v-if="step === 0" class="upload-section">
       <h3>输入产品卖点信息</h3>
-      <textarea v-model="productInfo" class="input-area" placeholder="描述你的产品卖点信息...&#10;&#10;如：秋季新款长袖连衣裙，高支棉面料亲肤透气，收腰A字版型遮肉显高，适合日常通勤约会，限时特惠99元" rows="6" />
+      <textarea v-model="productInfo" class="input-area" placeholder="描述你的产品卖点信息...&#10;&#10;如：秋季新款长袖连衣裙，高支棉面料亲肤透气，收腰A字版型遮肉显高，适合日常通勤约会，限时特惠99元" rows="6" maxlength="2000" />
       <div class="quick-inputs">
         <button v-for="q in quickInputs" :key="q.label" class="quick-btn" @click="productInfo = q.text">{{ q.label }}</button>
       </div>
