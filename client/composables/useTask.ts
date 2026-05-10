@@ -2,6 +2,8 @@
  * 任务状态轮询 composable
  * 用于所有 AI 生成任务的状态追踪
  */
+import { POLL_INTERVAL_MS, POLL_BACKOFF_MS } from '~/constants/ui'
+
 export function useTask() {
   const taskId = ref('');
   const status = ref(-1); // -1=未提交 0=排队 1=处理中 2=完成 3=失败
@@ -50,8 +52,8 @@ export function useTask() {
 
       // 自适应退避: 前5秒1s, 之后3s, 连续失败>3次则5s
       pollCount++;
-      if (consecutiveFailures > 3) currentInterval = 5000;
-      else if (pollCount > 5) currentInterval = 3000;
+      if (consecutiveFailures > 3) currentInterval = POLL_BACKOFF_MS;
+      else if (pollCount > 5) currentInterval = POLL_INTERVAL_MS;
 
       if (polling.value) timer = setTimeout(doPoll, currentInterval) as any;
     };

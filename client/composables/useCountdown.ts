@@ -2,7 +2,9 @@
  * 倒计时 composable — 验证码/重发等场景通用
  * 用法: const { countdown, start } = useCountdown(60)
  */
-export function useCountdown(seconds = 60) {
+import { COUNTDOWN_SECONDS } from '~/constants/ui'
+
+export function useCountdown(seconds = COUNTDOWN_SECONDS) {
   const countdown = ref(0)
   let timer: ReturnType<typeof setInterval> | null = null
 

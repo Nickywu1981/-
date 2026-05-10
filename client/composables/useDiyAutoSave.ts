@@ -4,6 +4,7 @@
  * - 崩溃恢复检测
  * - 保存状态指示器
  */
+import { AUTO_SAVE_INTERVAL_MS } from '~/constants/ui'
 import type { DiySection } from '~/types/diy'
 
 interface AutoSaveState {
@@ -56,7 +57,7 @@ export function useDiyAutoSave(
     } catch (e: any) {
       saveError.value = e.data?.msg || e.message
       if (timer) clearTimeout(timer)
-      timer = setTimeout(autoSave, 10000)
+      timer = setTimeout(autoSave, AUTO_SAVE_INTERVAL_MS)
     } finally {
       saving.value = false
     }

@@ -1,5 +1,6 @@
 import { useRuntimeConfig, navigateTo } from '#app';
 import { ref } from 'vue';
+import { REDIRECT_UNLOCK_MS } from '~/constants/ui'
 
 interface ApiResponse<T = any> {
   code: number;
@@ -85,7 +86,7 @@ async function request<T = any>(
           isRedirecting = true;
           navigateTo('/login').finally(() => { isRedirecting = false; });
           // 兜底：5s 后强制解锁（防止 navigateTo 异常导致永久锁死）
-          setTimeout(() => { isRedirecting = false; }, 5000);
+          setTimeout(() => { isRedirecting = false; }, REDIRECT_UNLOCK_MS);
         }
       },
     });
