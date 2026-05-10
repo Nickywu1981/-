@@ -148,7 +148,8 @@ const retry = async (id: number) => {
 const fetchHistory = async () => {
   loading.value = true
   try {
-    const { data } = await useFetch('/api/distribution/history')
+    const { data, error } = await useFetch('/api/distribution/history')
+    if (error.value) { toast.error((error.value as any)?.message || '加载历史失败'); return }
     history.value = (data.value as any)?.list || (data.value as any)?.data || []
   } finally {
     loading.value = false

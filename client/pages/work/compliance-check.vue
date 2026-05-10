@@ -117,6 +117,7 @@
 
 <script setup lang="ts">
 const { createBlobUrl, revoke } = useBlobUrl()
+const toast = useToast()
 
 interface PreviewItem { url: string; uploadedUrl: string }
 
@@ -138,7 +139,7 @@ async function loadTargets() {
   try {
     const res = await $fetch('/api/compliance/targets', { credentials: 'include' });
     targets.value = (res as any).data || [];
-  } catch { /* use defaults */ }
+  } catch { toast.warn('加载合规目标失败') }
 }
 
 async function loadRulesPreview() {
@@ -152,7 +153,7 @@ async function loadRulesPreview() {
       body: JSON.stringify({ platform: selectedPlatform.value, region: selectedRegion.value || undefined }),
     });
     previewRules.value = (res as any).data?.results || [];
-  } catch { previewRules.value = []; }
+  } catch { previewRules.value = []; toast.warn('加载审核规则失败') }
 }
 
 watch([selectedPlatform, selectedRegion], () => { loadRulesPreview(); });

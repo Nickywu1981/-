@@ -96,6 +96,7 @@
 <script setup lang="ts">
 
 import PromptEnhancer from '~/components/PromptEnhancer.vue'
+const toast = useToast()
 
 const step = ref(0);
 const productInfo = ref('');
@@ -132,7 +133,7 @@ async function loadLanguages() {
     const res = await $fetch('/api/multilingual/languages', { credentials: 'include' });
     const data = (res as any).data;
     if (data?.length) languages.value = data;
-  } catch { /* use defaults */ }
+  } catch { toast.warn('加载语言列表失败') }
 }
 
 async function submitTask() {

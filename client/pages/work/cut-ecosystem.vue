@@ -179,7 +179,7 @@ async function loadRatios() {
   try {
     const res = await api.get('/cut-ecosystem/ratios')
     ratios.value = res
-  } catch { /* noop */ }
+  } catch { toast.warn('加载比例失败') }
 }
 
 async function loadWorks() {

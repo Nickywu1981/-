@@ -165,6 +165,7 @@ import { ref, reactive, onMounted } from 'vue';
 import { useApi } from '~/composables/useApi';
 import { formatDateTime } from '@/utils/format';
 const api = useApi();
+const toast = useToast()
 
 const platforms = ref([]);
 const works = ref([]);
@@ -215,7 +216,7 @@ async function loadPlatforms() {
   try {
     const res = await api.get('/publish/platforms');
     platforms.value = res || [];
-  } catch { /* ignore */ }
+  } catch { toast.warn('加载平台列表失败') }
 }
 
 async function loadWorks() {
@@ -225,7 +226,7 @@ async function loadWorks() {
     if (filterType.value) params.type = filterType.value;
     const res = await api.get('/assets', params);
     works.value = res?.list || [];
-  } catch { /* ignore */ }
+  } catch { toast.warn('加载平台列表失败') }
   finally { loadingWorks.value = false; }
 }
 
@@ -241,7 +242,7 @@ async function loadHistory() {
     historyList.value = histRes?.list || [];
     historyTotal.value = histRes?.total || 0;
     stats.value = statsRes;
-  } catch { /* ignore */ }
+  } catch { toast.warn('加载平台列表失败') }
   finally { loadingHistory.value = false; }
 }
 

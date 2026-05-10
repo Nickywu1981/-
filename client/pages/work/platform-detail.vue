@@ -141,7 +141,7 @@ async function loadPlatforms() {
       p._config = (detail as any).data;
     }
     platforms.value = list;
-  } catch { /* silent */ }
+  } catch (e: any) { toast.error(e?.data?.msg || '加载平台失败') }
 }
 
 async function uploadSingle(file: File): Promise<string> {

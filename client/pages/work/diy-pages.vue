@@ -61,7 +61,7 @@ async function loadIndustries() {
   try {
     const data: any = await $fetch('/api/diy/templates/industries', { credentials: 'include' })
     industries.value = data?.data || []
-  } catch { /* fallback */ }
+  } catch (e: any) { toast.warn(e?.data?.msg || '加载行业失败') }
 }
 
 async function loadTemplates() {
