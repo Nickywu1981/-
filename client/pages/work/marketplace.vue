@@ -162,7 +162,7 @@ h1 { font-size: 24px; font-weight: 700; color: var(--text-primary); margin-botto
 .filter-select { padding: 8px 12px; border: 1px solid var(--border-light); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-primary); font-size: 13px; cursor: pointer; }
 
 .template-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
-.template-card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); overflow: hidden; cursor: pointer; transition: all var(--transition-fast); }
+.template-card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); overflow: hidden; cursor: pointer; transition: border-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast); }
 .template-card:hover { border-color: var(--brand); transform: translateY(-2px); box-shadow: var(--shadow-card); }
 .card-preview { height: 120px; display: flex; align-items: center; justify-content: center; position: relative; }
 .preview-bg { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }

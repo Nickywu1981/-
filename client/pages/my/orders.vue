@@ -75,14 +75,14 @@ onMounted(fetchAll)
 h2 { font-size: 22px; font-weight: 700; color: var(--text-primary); margin-bottom: 16px; }
 
 .tabs { display: flex; gap: 8px; margin-bottom: 24px; }
-.tabs button { padding: 6px 20px; border: 1px solid var(--border-light); border-radius: 20px; background: var(--bg-card); color: var(--text-secondary); font-size: 13px; cursor: pointer; transition: all var(--transition-fast); }
+.tabs button { padding: 6px 20px; border: 1px solid var(--border-light); border-radius: 20px; background: var(--bg-card); color: var(--text-secondary); font-size: 13px; cursor: pointer; transition: border-color var(--transition-fast), color var(--transition-fast), background var(--transition-fast); }
 .tabs button:hover { border-color: var(--brand); color: var(--brand); }
 .tabs button.active { background: var(--brand-gradient); color: #fff; border-color: transparent; }
 
 .loading { text-align: center; padding: 60px 0; color: var(--text-tertiary); font-size: 14px; }
 
 .order-list { display: flex; flex-direction: column; gap: 12px; }
-.order-card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 16px; transition: all var(--transition-fast); }
+.order-card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 16px; transition: border-color var(--transition-fast); }
 .order-card:hover { border-color: var(--brand-soft); }
 
 .order-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
@@ -99,7 +99,7 @@ h2 { font-size: 22px; font-weight: 700; color: var(--text-primary); margin-botto
 
 .order-card__footer { display: flex; justify-content: space-between; align-items: center; }
 .order-card__time { font-size: 12px; color: var(--text-tertiary); }
-.btn-xs { padding: 4px 12px; font-size: 12px; border: 1px solid var(--brand); border-radius: 6px; background: transparent; color: var(--brand); cursor: pointer; transition: all var(--transition-fast); }
+.btn-xs { padding: 4px 12px; font-size: 12px; border: 1px solid var(--brand); border-radius: 6px; background: transparent; color: var(--brand); cursor: pointer; transition: background var(--transition-fast), color var(--transition-fast); }
 .btn-xs:hover { background: var(--brand); color: #fff; }
 
 .empty-state { text-align: center; padding: 60px 0; color: var(--text-tertiary); font-size: 15px; }

@@ -191,13 +191,13 @@ function formatSize(bytes: number) {
 .bg-swatch.active { border-color: #6c5ce7; }
 .btn-export, .btn-upload-new {
   background: #2a2a3a; color: #ccc; border: 1px solid #444; padding: 6px 14px; border-radius: 6px;
-  cursor: pointer; font-size: 13px; transition: all 0.15s;
+  cursor: pointer; font-size: 13px; transition: background 0.15s, color 0.15s;
 }
 .btn-export:hover, .btn-upload-new:hover { background: #333; color: #fff; }
 
 .lighting-presets { display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: #151525; border-top: 1px solid #2a2a3a; }
 .preset-label { font-size: 12px; color: #888; }
-.preset-btn { background: #2a2a3a; color: #aaa; border: none; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; transition: all 0.15s; }
+.preset-btn { background: #2a2a3a; color: #aaa; border: none; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; transition: background 0.15s, color 0.15s; }
 .preset-btn:hover { background: #3a3a4a; }
 .preset-btn.active { background: #6c5ce7; color: #fff; }
 
@@ -207,7 +207,7 @@ function formatSize(bytes: number) {
 @media (max-width: 640px) { .demo-grid { grid-template-columns: repeat(2, 1fr); } }
 .demo-card {
   background: #1e1e2e; border: 1px solid #2a2a3a; border-radius: 10px; padding: 20px 16px;
-  text-align: center; cursor: pointer; transition: all 0.2s;
+  text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s;
 }
 .demo-card:hover { border-color: #6c5ce7; background: #252540; }
 .demo-icon { font-size: 36px; margin-bottom: 8px; }

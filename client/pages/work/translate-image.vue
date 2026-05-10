@@ -134,7 +134,7 @@ function resetAll() { previewUrl.value = ''; resultUrl.value = '' }
 
 <style scoped>
 .translate-workspace { max-width: 900px; margin: 0 auto; }
-.upload-zone { border: 2px dashed var(--border-light); border-radius: var(--radius-xl); padding: 48px 24px; text-align: center; cursor: pointer; transition: all var(--transition-fast); background: var(--bg-card); margin-bottom: 16px; }
+.upload-zone { border: 2px dashed var(--border-light); border-radius: var(--radius-xl); padding: 48px 24px; text-align: center; cursor: pointer; transition: border-color var(--transition-fast), background var(--transition-fast); background: var(--bg-card); margin-bottom: 16px; }
 .upload-zone:hover { border-color: var(--brand); background: var(--brand-light); }
 .zone-content h3 { font-size: 18px; color: var(--text-primary); margin-bottom: 8px; }
 .zone-content p { font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; }

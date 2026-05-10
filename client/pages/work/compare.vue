@@ -263,7 +263,7 @@ function downloadBoth() {
 
 /* Mode bar */
 .mode-bar { display: flex; justify-content: center; gap: 8px; margin-bottom: 24px; }
-.mode-btn { padding: 8px 20px; border: 1px solid var(--border-light); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-secondary); cursor: pointer; font-size: 14px; transition: all 0.15s; }
+.mode-btn { padding: 8px 20px; border: 1px solid var(--border-light); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-secondary); cursor: pointer; font-size: 14px; transition: border-color 0.15s, color 0.15s, background 0.15s; }
 .mode-btn:hover { border-color: var(--brand); color: var(--brand); }
 .mode-btn.active { background: var(--brand); color: #fff; border-color: var(--brand); }
 
@@ -271,7 +271,7 @@ function downloadBoth() {
 .compare-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
 .compare-col { display: flex; flex-direction: column; gap: 8px; }
 .col-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); text-align: center; }
-.pick-btn { padding: 6px 16px; border: 1px solid var(--brand); border-radius: var(--radius-sm); background: transparent; color: var(--brand); cursor: pointer; font-size: 12px; transition: all 0.15s; width: fit-content; margin: 0 auto; }
+.pick-btn { padding: 6px 16px; border: 1px solid var(--brand); border-radius: var(--radius-sm); background: transparent; color: var(--brand); cursor: pointer; font-size: 12px; transition: background 0.15s, color 0.15s; width: fit-content; margin: 0 auto; }
 .pick-btn:hover { background: var(--brand); color: #fff; }
 .compare-actions { display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 12px; }
 .ratio-hint { font-size: 12px; color: var(--text-muted); }
@@ -303,7 +303,7 @@ function downloadBoth() {
 .picker-header h3 { font-size: 16px; font-weight: 600; color: var(--text-primary); }
 .picker-close { background: none; border: none; font-size: 20px; color: var(--text-muted); cursor: pointer; }
 .picker-tabs { display: flex; border-bottom: 1px solid var(--border-light); }
-.picker-tabs .tab-btn { flex: 1; padding: 10px; border: none; background: transparent; color: var(--text-secondary); font-size: 13px; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; }
+.picker-tabs .tab-btn { flex: 1; padding: 10px; border: none; background: transparent; color: var(--text-secondary); font-size: 13px; cursor: pointer; border-bottom: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
 .picker-tabs .tab-btn.active { color: var(--brand); border-bottom-color: var(--brand); }
 .picker-body { flex: 1; overflow-y: auto; padding: 16px 20px; min-height: 200px; }
 .picker-footer { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 20px; border-top: 1px solid var(--border-light); }
@@ -321,7 +321,7 @@ function downloadBoth() {
 .hint { font-size: 13px; color: var(--text-muted); }
 
 /* Buttons */
-.btn { padding: 8px 20px; border-radius: var(--radius-md); border: none; font-size: 14px; cursor: pointer; transition: all 0.15s; }
+.btn { padding: 8px 20px; border-radius: var(--radius-md); border: none; font-size: 14px; cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s, opacity 0.15s; }
 .btn-primary { background: var(--brand); color: #fff; }
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn-ghost { background: transparent; color: var(--text-secondary); border: 1px solid var(--border-light); }

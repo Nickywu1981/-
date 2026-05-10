@@ -137,12 +137,12 @@ onMounted(() => fetchFaqs())
 .help-hero p { font-size: 14px; color: var(--text-secondary); }
 
 .search-bar { position: relative; margin-bottom: 20px; }
-.search-bar input { width: 100%; padding: 12px 16px 12px 42px; border: 2px solid var(--input-border); border-radius: var(--radius-xl); font-size: 15px; outline: none; box-sizing: border-box; background: var(--bg-card); color: var(--text-primary); transition: all var(--transition-fast); }
+.search-bar input { width: 100%; padding: 12px 16px 12px 42px; border: 2px solid var(--input-border); border-radius: var(--radius-xl); font-size: 15px; outline: none; box-sizing: border-box; background: var(--bg-card); color: var(--text-primary); transition: border-color var(--transition-fast), box-shadow var(--transition-fast); }
 .search-bar input:focus { border-color: var(--brand); box-shadow: var(--focus-ring); }
 .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
 
 .category-tabs { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
-.cat-tab { padding: 6px 16px; border: 1px solid var(--input-border); border-radius: 20px; background: var(--bg-card); color: var(--text-secondary); font-size: 13px; cursor: pointer; transition: all var(--transition-fast); display: flex; align-items: center; gap: 6px; }
+.cat-tab { padding: 6px 16px; border: 1px solid var(--input-border); border-radius: 20px; background: var(--bg-card); color: var(--text-secondary); font-size: 13px; cursor: pointer; transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast); display: flex; align-items: center; gap: 6px; }
 .cat-tab:hover { border-color: var(--brand); color: var(--brand); }
 .cat-tab.active { background: var(--brand-gradient); color: #fff; border-color: transparent; }
 .cat-tab .count { font-size: 11px; opacity: 0.7; }
@@ -164,7 +164,7 @@ onMounted(() => fetchFaqs())
 .empty-sub { font-size: 13px !important; color: var(--text-muted) !important; }
 
 .faq-list { display: flex; flex-direction: column; gap: 8px; }
-.faq-item { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); overflow: hidden; transition: all var(--transition-fast); }
+.faq-item { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); overflow: hidden; transition: border-color var(--transition-fast), box-shadow var(--transition-fast); }
 .faq-item:hover { border-color: var(--brand-alpha); box-shadow: 0 2px 8px rgba(124,58,237,.06); }
 .faq-item.open { border-color: var(--brand); box-shadow: 0 4px 16px var(--brand-alpha); }
 .faq-q { display: flex; justify-content: space-between; align-items: center; padding: 16px 18px; cursor: pointer; user-select: none; }
@@ -176,7 +176,7 @@ onMounted(() => fetchFaqs())
 .a-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid var(--border-light); }
 .a-cat { font-size: 11px; padding: 2px 8px; background: var(--brand-alpha); color: var(--brand); border-radius: 10px; }
 .a-helpful { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
-.a-fb-btn { padding: 2px 8px; font-size: 12px; border: 1px solid var(--input-border); border-radius: var(--radius-sm); background: transparent; cursor: pointer; transition: all var(--transition-fast); }
+.a-fb-btn { padding: 2px 8px; font-size: 12px; border: 1px solid var(--input-border); border-radius: var(--radius-sm); background: transparent; cursor: pointer; transition: border-color var(--transition-fast), background var(--transition-fast); }
 .a-fb-btn:hover { border-color: var(--brand); }
 .a-fb-btn.voted { border-color: var(--brand); background: var(--brand-alpha); }
 

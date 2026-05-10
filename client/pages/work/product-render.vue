@@ -51,7 +51,7 @@ async function startRender() {
 </script>
 <style scoped>
 .render-workspace { max-width: 800px; margin: 0 auto; }
-.upload-card { background: var(--bg-card); border: 2px dashed var(--border-light); border-radius: var(--radius-xl); padding: 32px; text-align: center; cursor: pointer; transition: all var(--transition-base); }
+.upload-card { background: var(--bg-card); border: 2px dashed var(--border-light); border-radius: var(--radius-xl); padding: 32px; text-align: center; cursor: pointer; transition: border-color var(--transition-base), background var(--transition-base); }
 .upload-card:hover { border-color: var(--brand); background: var(--brand-light); }
 .upload-icon { font-size: 48px; margin-bottom: 8px; }
 .upload-card p { font-weight: 600; color: var(--text-primary); margin: 4px 0; }
@@ -61,9 +61,9 @@ async function startRender() {
 .render-options { margin: 24px 0; }
 .render-options h3 { font-size: 15px; font-weight: 600; margin-bottom: 10px; color: var(--text-primary); }
 .option-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
-.option-card { padding: 12px; border: 1px solid var(--border-light); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 14px; text-align: center; transition: all var(--transition-fast); }
+.option-card { padding: 12px; border: 1px solid var(--border-light); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 14px; text-align: center; transition: border-color var(--transition-fast), background var(--transition-fast), color var(--transition-fast); }
 .option-card:hover, .option-card.selected { border-color: var(--brand); background: var(--brand-light); color: var(--brand); font-weight: 600; }
-.btn-generate { width: 100%; padding: 14px; background: var(--brand-gradient); color: #fff; border: none; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 24px; transition: all var(--transition-fast); }
+.btn-generate { width: 100%; padding: 14px; background: var(--brand-gradient); color: #fff; border: none; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 24px; transition: transform var(--transition-fast), box-shadow var(--transition-fast); }
 .btn-generate:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(124,58,237,0.3); }
 .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
 .result-area { margin-top: 24px; text-align: center; padding: 24px; background: var(--bg-card); border-radius: var(--radius-lg); }

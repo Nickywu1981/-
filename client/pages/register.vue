@@ -175,7 +175,7 @@ async function sendEmailCode(scene: string) {
 .mode-tabs button {
   flex: 1; padding: 10px; border: none; background: var(--bg-card);
   font-size: 13px; font-weight: 500; cursor: pointer; color: var(--text-secondary);
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), color var(--transition-fast);
 }
 .mode-tabs button:hover { color: var(--brand); }
 .mode-tabs button.active { background: var(--brand); color: #fff; font-weight: 600; }
@@ -193,14 +193,14 @@ input::placeholder { color: var(--input-placeholder); }
 .btn-sms {
   padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--brand);
   color: var(--brand); border-radius: var(--radius-md); font-size: 13px; font-weight: 500;
-  cursor: pointer; white-space: nowrap; transition: all var(--transition-fast);
+  cursor: pointer; white-space: nowrap; transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), opacity var(--transition-fast);
 }
 .btn-sms:hover { background: var(--brand-bg); }
 .btn-sms:disabled { opacity: 0.4; cursor: not-allowed; background: var(--bg-hover); border-color: var(--border-light); color: var(--text-muted); }
 .btn {
   padding: 12px; background: var(--brand-gradient); color: #fff; border: none;
   border-radius: var(--radius-md); font-size: 15px; cursor: pointer; font-weight: 600;
-  transition: all var(--transition-fast); box-shadow: 0 4px 16px rgba(124,58,237,0.2);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), opacity var(--transition-fast); box-shadow: 0 4px 16px rgba(124,58,237,0.2);
 }
 .btn:hover { box-shadow: 0 6px 20px rgba(124,58,237,0.3); transform: translateY(-1px); }
 .btn:active { transform: scale(0.98); }

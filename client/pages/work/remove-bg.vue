@@ -229,14 +229,14 @@ onUnmounted(() => stopPolling())
 
 <style scoped>
 .upload-section { display: flex; flex-direction: column; align-items: center; gap: 16px; }
-.dropzone { width: 100%; max-width: 480px; padding: 48px 24px; border: 2px dashed var(--border-light); border-radius: var(--radius-xl); text-align: center; cursor: pointer; transition: all var(--transition-fast); }
+.dropzone { width: 100%; max-width: 480px; padding: 48px 24px; border: 2px dashed var(--border-light); border-radius: var(--radius-xl); text-align: center; cursor: pointer; transition: border-color var(--transition-fast), background var(--transition-fast); }
 .dropzone:hover { border-color: var(--brand); background: var(--brand-alpha); }
 .dz-icon { font-size: 40px; margin-bottom: 8px; }
 .dropzone p { margin: 4px 0; color: var(--text-primary); font-size: 15px; }
 .hint { font-size: 12px !important; color: var(--text-muted) !important; }
-.btn-outline { padding: 8px 20px; border: 1px solid var(--brand); border-radius: var(--radius-lg); background: transparent; color: var(--brand); font-size: 14px; cursor: pointer; transition: all var(--transition-fast); }
+.btn-outline { padding: 8px 20px; border: 1px solid var(--brand); border-radius: var(--radius-lg); background: transparent; color: var(--brand); font-size: 14px; cursor: pointer; transition: background var(--transition-fast); }
 .btn-outline:hover { background: var(--brand-alpha); }
-.btn-brand { padding: 10px 24px; border: none; border-radius: var(--radius-lg); background: var(--brand-gradient); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; transition: all var(--transition-fast); display: flex; align-items: center; gap: 8px; }
+.btn-brand { padding: 10px 24px; border: none; border-radius: var(--radius-lg); background: var(--brand-gradient); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; transition: transform var(--transition-fast), box-shadow var(--transition-fast); display: flex; align-items: center; gap: 8px; }
 .btn-brand:hover:not(:disabled) { transform: scale(1.02); box-shadow: 0 4px 16px var(--brand-alpha); }
 .btn-brand:disabled { opacity: 0.5; cursor: not-allowed; }
 .preview-box { position: relative; width: 100%; max-width: 320px; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--border-light); }
@@ -251,7 +251,7 @@ onUnmounted(() => stopPolling())
 .param-section { display: flex; flex-direction: column; gap: 20px; }
 .param-title { font-size: 16px; font-weight: 600; color: var(--text-primary); }
 .bg-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px; }
-.bg-card { padding: 16px 12px; border: 2px solid var(--border-light); border-radius: var(--radius-lg); background: var(--bg-card); cursor: pointer; text-align: center; transition: all var(--transition-fast); position: relative; }
+.bg-card { padding: 16px 12px; border: 2px solid var(--border-light); border-radius: var(--radius-lg); background: var(--bg-card); cursor: pointer; text-align: center; transition: border-color var(--transition-fast), transform var(--transition-fast); position: relative; }
 .bg-card:hover { border-color: var(--brand); transform: translateY(-2px); }
 .bg-card.active { border-color: var(--brand); box-shadow: 0 0 0 2px var(--brand-alpha); }
 .bg-preview { display: block; width: 80px; height: 60px; margin: 0 auto 8px; border-radius: var(--radius-md); border: 1px solid var(--border-light); }

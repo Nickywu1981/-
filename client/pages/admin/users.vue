@@ -204,7 +204,7 @@ h2 { font-size: 22px; font-weight: 700; color: var(--text-primary); }
 .sel:focus { border-color: var(--input-focus-border); }
 .btn { padding: 8px 20px; background: var(--brand); color: #fff; border: none; border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; white-space: nowrap; transition: opacity var(--transition-fast); }
 .btn:hover { opacity: 0.9; }
-.btn-outline { padding: 8px 20px; background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--input-border); border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; white-space: nowrap; transition: all var(--transition-fast); }
+.btn-outline { padding: 8px 20px; background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--input-border); border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; white-space: nowrap; transition: border-color var(--transition-fast), color var(--transition-fast); }
 .btn-outline:hover { border-color: var(--brand); color: var(--brand); }
 .btn-danger { padding: 8px 20px; background: var(--danger); color: #fff; border: none; border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; white-space: nowrap; transition: opacity var(--transition-fast); }
 .btn-danger:hover { opacity: 0.9; }
@@ -241,7 +241,7 @@ tr.selected { background: var(--brand-light); }
 .form-grid input, .form-grid select { padding: 8px 12px; border: 1px solid var(--input-border); border-radius: var(--radius-sm); font-size: 13px; background: var(--bg-input); color: var(--text-primary); outline: none; transition: border-color var(--transition-fast), box-shadow var(--transition-fast); }
 .form-grid input:focus, .form-grid select:focus { border-color: var(--input-focus-border); box-shadow: var(--focus-ring); }
 .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
-.btn-cancel { padding: 8px 20px; border: 1px solid var(--input-border); border-radius: var(--radius-sm); background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 13px; transition: all var(--transition-fast); }
+.btn-cancel { padding: 8px 20px; border: 1px solid var(--input-border); border-radius: var(--radius-sm); background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 13px; transition: border-color var(--transition-fast); }
 .btn-cancel:hover { border-color: var(--text-muted); }
 .btn-save { padding: 8px 20px; background: var(--brand); color: #fff; border: none; border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; transition: opacity var(--transition-fast); }
 .btn-save:hover { opacity: 0.9; }

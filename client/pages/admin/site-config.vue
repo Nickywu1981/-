@@ -224,7 +224,7 @@ onMounted(fetchConfig);
 .input:focus { border-color: var(--brand); outline: none; box-shadow: 0 0 0 2px var(--brand-light); }
 .textarea { resize: vertical; font-family: monospace; font-size: 12px; }
 .edit-actions { display: flex; gap: 8px; }
-.btn { padding: 6px 16px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text-primary); cursor: pointer; font-size: 13px; transition: all .15s; }
+.btn { padding: 6px 16px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text-primary); cursor: pointer; font-size: 13px; transition: border-color .15s, color .15s; }
 .btn:hover { border-color: var(--brand); color: var(--brand); }
 .btn-sm { padding: 4px 12px; font-size: 12px; }
 .btn-primary { background: var(--brand); color: #fff; border-color: var(--brand); }

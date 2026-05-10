@@ -101,7 +101,7 @@ function handleRedo() { task.reset(); step.value = 0; previewUrl.value = ''; upl
 .fabric-btn {
   padding: 8px 20px; border: 2px solid var(--border-light); border-radius: var(--radius-full);
   background: var(--bg-card); cursor: pointer; font-size: 13px; color: var(--text-secondary);
-  transition: all var(--transition-fast);
+  transition: border-color var(--transition-fast), background var(--transition-fast);
 }
 .fabric-btn:hover { border-color: var(--brand); color: var(--brand); }
 .fabric-btn.active {

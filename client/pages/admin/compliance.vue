@@ -94,7 +94,7 @@ h4 { font-size: 14px; font-weight: 600; color: var(--text-secondary); margin: 8p
 
 .rules-section { margin-top: 24px; }
 .rules-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
-.rule-card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 16px; cursor: pointer; transition: all var(--transition-base); display: flex; flex-direction: column; gap: 8px; }
+.rule-card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 16px; cursor: pointer; transition: border-color var(--transition-base), box-shadow var(--transition-base), transform var(--transition-base); display: flex; flex-direction: column; gap: 8px; }
 .rule-card:hover { border-color: var(--brand); box-shadow: var(--shadow-card); transform: translateY(-1px); }
 .rule-name { font-weight: 600; font-size: 15px; color: var(--text-primary); }
 .rule-counts { font-size: 12px; color: var(--text-muted); }
@@ -115,7 +115,7 @@ h4 { font-size: 14px; font-weight: 600; color: var(--text-secondary); margin: 8p
 .rules-detail h3 { display: flex; justify-content: space-between; align-items: center; }
 .rules-detail ul { list-style: disc; padding-left: 20px; margin: 0; }
 .rules-detail li { padding: 4px 0; font-size: 13px; color: var(--text-secondary); }
-.btn-close { background: none; border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 4px 10px; cursor: pointer; font-size: 14px; color: var(--text-muted); transition: all var(--transition-fast); }
+.btn-close { background: none; border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 4px 10px; cursor: pointer; font-size: 14px; color: var(--text-muted); transition: color var(--transition-fast), border-color var(--transition-fast); }
 .btn-close:hover { color: var(--danger); border-color: var(--danger); }
 
 @media (max-width: 640px) {

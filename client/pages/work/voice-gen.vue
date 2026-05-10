@@ -83,7 +83,7 @@ function handleRedo() { task.reset(); currentStep.value = 0; submitting.value = 
 
 <style scoped>
 .voice-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
-.voice-card { padding: 14px; border-radius: 12px; border: 2px solid var(--border-light); background: var(--bg-card); cursor: pointer; text-align: center; transition: all var(--transition-fast); }
+.voice-card { padding: 14px; border-radius: 12px; border: 2px solid var(--border-light); background: var(--bg-card); cursor: pointer; text-align: center; transition: border-color var(--transition-fast), transform var(--transition-fast); }
 .voice-card:hover { border-color: var(--brand-soft); transform: translateY(-2px); }
 .voice-card.active { border-color: var(--brand); background: var(--brand-light); }
 .voice-card__icon { font-size: 1.6rem; margin-bottom: 4px; }

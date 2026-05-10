@@ -218,7 +218,7 @@ function statusClass(s: number) {
 .toolbar input:focus { border-color: var(--input-focus-border); box-shadow: var(--focus-ring); }
 .sel { padding: 6px 12px; border: 1px solid var(--input-border); border-radius: var(--radius-sm); background: var(--bg-card); color: var(--text-primary); font-size: 13px; outline: none; transition: border-color var(--transition-fast); }
 .sel:focus { border-color: var(--input-focus-border); }
-.btn { padding: 6px 14px; border: 1px solid var(--input-border); border-radius: var(--radius-sm); background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 13px; transition: all var(--transition-fast); }
+.btn { padding: 6px 14px; border: 1px solid var(--input-border); border-radius: var(--radius-sm); background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 13px; transition: border-color var(--transition-fast), color var(--transition-fast); }
 .btn:hover { border-color: var(--brand); color: var(--brand); }
 .btn-primary { background: var(--brand); color: var(--text-on-brand); border-color: var(--brand); }
 .btn-primary:hover { opacity: 0.9; color: var(--text-on-brand); }

@@ -400,7 +400,7 @@ const faqs = [
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
   padding: 0 clamp(12px, 3vw, 24px); height: 56px;
   display: flex; align-items: center;
-  background: transparent; transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  background: transparent; transition: background 0.3s cubic-bezier(0.22, 1, 0.36, 1), backdrop-filter 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .lp-nav.on { background: rgba(250,250,249,0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid #ebebea; }
 .lp-nav-in { width: 100%; max-width: 1280px; margin: 0 auto; display: flex; align-items: center; gap: 40px; }
@@ -416,19 +416,19 @@ const faqs = [
   display: inline-flex; align-items: center; padding: 8px 18px;
   background: #171717; color: #fafaf9; border: none; border-radius: 8px;
   font-size: 13px; font-weight: 500; cursor: pointer; text-decoration: none;
-  transition: all 0.2s; letter-spacing: -0.01em;
+  transition: background 0.2s, transform 0.2s; letter-spacing: -0.01em;
 }
 .lp-btn-main:hover { background: #2d2d2d; transform: translateY(-1px); }
 .lp-btn-ghost {
   display: inline-flex; align-items: center; padding: 8px 18px;
   background: transparent; color: #171717; border: 1px solid #ebebea; border-radius: 8px;
   font-size: 13px; font-weight: 500; cursor: pointer; text-decoration: none;
-  transition: all 0.2s; letter-spacing: -0.01em;
+  transition: border-color 0.2s, background 0.2s; letter-spacing: -0.01em;
 }
 .lp-btn-ghost:hover { border-color: #c5c5c2; background: rgba(0,0,0,0.02); }
 
 .lp-ham { display: none; width: 36px; height: 36px; border: none; background: transparent; flex-direction: column; align-items: center; justify-content: center; gap: 5px; cursor: pointer; border-radius: 8px; }
-.lp-ham span { display: block; width: 18px; height: 1.5px; background: #171717; border-radius: 1px; transition: all 0.25s; }
+.lp-ham span { display: block; width: 18px; height: 1.5px; background: #171717; border-radius: 1px; transition: transform 0.25s, opacity 0.25s; }
 .lp-ham span.on:first-child { transform: translateY(6.5px) rotate(45deg); }
 .lp-ham span.on:nth-child(2) { opacity: 0; }
 .lp-ham span.on:last-child { transform: translateY(-6.5px) rotate(-45deg); }
@@ -452,7 +452,7 @@ const faqs = [
   display: inline-flex; align-items: center; gap: 6px; padding: 12px 28px;
   background: #171717; color: #fafaf9; border: none; border-radius: 10px;
   font-size: 15px; font-weight: 500; cursor: pointer; text-decoration: none;
-  transition: all 0.25s; letter-spacing: -0.02em;
+  transition: background 0.25s, transform 0.25s, box-shadow 0.25s; letter-spacing: -0.02em;
 }
 .lp-hero-cta:hover { background: #2d2d2d; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
 .lp-hero-cta span { transition: transform 0.2s; }
@@ -461,7 +461,7 @@ const faqs = [
   display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px;
   background: transparent; color: #171717; border: 1px solid #ebebea; border-radius: 10px;
   font-size: 14px; font-weight: 500; cursor: pointer; text-decoration: none;
-  transition: all 0.2s;
+  transition: border-color 0.2s, background 0.2s;
 }
 .lp-hero-demo:hover { border-color: #c5c5c2; background: rgba(0,0,0,0.02); }
 .lp-hero-play { font-size: 10px; }
@@ -515,7 +515,7 @@ const faqs = [
 .lp-mf-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; max-width: 1200px; margin: 0 auto 40px; }
 .lp-mf-card {
   background: #fff; border: 1px solid #ebebea; border-radius: 14px; padding: 22px 18px 18px;
-  display: flex; flex-direction: column; gap: 8px; transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1); position: relative; overflow: hidden;
+  display: flex; flex-direction: column; gap: 8px; transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s cubic-bezier(0.22, 1, 0.36, 1); position: relative; overflow: hidden;
 }
 .lp-mf-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; opacity: 0; transition: opacity 0.3s; }
 .lp-mf-card:nth-child(1)::before { background: linear-gradient(90deg, #6366f1, #818cf8); }
@@ -558,14 +558,14 @@ const faqs = [
 .lp-feat-tabs { display: flex; gap: 4px; justify-content: center; margin-bottom: 40px; background: rgba(0,0,0,0.04); border-radius: 10px; padding: 4px; width: fit-content; margin-left: auto; margin-right: auto; }
 .lp-feat-tabs button {
   padding: 7px 20px; border: none; background: transparent; border-radius: 7px;
-  font-size: 13px; color: #6b6b70; cursor: pointer; transition: all 0.2s; font-weight: 500;
+  font-size: 13px; color: #6b6b70; cursor: pointer; transition: background 0.2s, color 0.2s, box-shadow 0.2s; font-weight: 500;
 }
 .lp-feat-tabs button.on { background: #fff; color: #171717; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
 .lp-feat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; max-width: 1200px; margin: 0 auto; }
 
 .lp-card {
   background: #fff; border: 1px solid #ebebea; border-radius: 12px; padding: 24px;
-  cursor: pointer; transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  cursor: pointer; transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .lp-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.07); border-color: #d9d9d7; }
 .lp-card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
@@ -602,7 +602,7 @@ const faqs = [
 /* ============ PRICING ============ */
 .lp-price { padding: 80px clamp(16px, 4vw, 40px); background: #fff; border-top: 1px solid #ebebea; }
 .lp-price-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; max-width: 960px; margin: 0 auto; }
-.lp-plan { background: #fafaf9; border: 1px solid #ebebea; border-radius: 12px; padding: 32px 24px; text-align: center; position: relative; transition: all 0.3s; }
+.lp-plan { background: #fafaf9; border: 1px solid #ebebea; border-radius: 12px; padding: 32px 24px; text-align: center; position: relative; transition: transform 0.3s, box-shadow 0.3s; }
 .lp-plan:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.05); }
 .lp-plan.pop { background: #171717; border-color: #171717; transform: scale(1.03); }
 .lp-plan.pop:hover { transform: scale(1.03) translateY(-2px); box-shadow: 0 12px 32px rgba(0,0,0,0.15); }
@@ -621,7 +621,7 @@ const faqs = [
 .lp-plan-btn {
   width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ebebea;
   background: #fff; color: #171717; font-size: 14px; font-weight: 500; cursor: pointer;
-  transition: all 0.2s;
+  transition: border-color 0.2s;
 }
 .lp-plan-btn.on { background: #fafaf9; color: #171717; border-color: #d9d9d7; font-weight: 500; }
 .lp-plan-btn:hover { border-color: #c5c5c2; }
@@ -632,7 +632,7 @@ const faqs = [
 /* ============ FAQ ============ */
 .lp-faq { padding: 80px clamp(16px, 4vw, 40px); }
 .lp-faq-list { max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
-.lp-faq-it { border: 1px solid #ebebea; border-radius: 10px; overflow: hidden; cursor: pointer; transition: all 0.2s; }
+.lp-faq-it { border: 1px solid #ebebea; border-radius: 10px; overflow: hidden; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
 .lp-faq-it:hover { border-color: #d9d9d7; }
 .lp-faq-it.on { border-color: #c5c5c2; background: #fff; }
 .lp-faq-q { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; font-size: 14px; font-weight: 500; color: #171717; }

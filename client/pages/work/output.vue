@@ -67,7 +67,7 @@ function exportAll() {
 .item-date { font-size: 12px; color: var(--text-muted); }
 .btn-sm { padding: 5px 14px; border: 1px solid var(--brand); border-radius: var(--radius-sm); background: var(--brand); color: #fff; cursor: pointer; font-size: 12px; white-space: nowrap; transition: opacity var(--transition-fast); }
 .btn-sm:hover { opacity: 0.85; }
-.btn-export { width: 100%; padding: 12px; background: var(--brand-gradient); color: #fff; border: none; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; transition: all var(--transition-fast); }
+.btn-export { width: 100%; padding: 12px; background: var(--brand-gradient); color: #fff; border: none; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer; transition: transform var(--transition-fast), box-shadow var(--transition-fast); }
 .btn-export:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(124,58,237,0.3); }
 .empty { text-align: center; color: var(--text-muted); padding: 60px 20px; font-size: 14px; }
 </style>

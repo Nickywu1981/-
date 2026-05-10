@@ -231,7 +231,7 @@ h1 { font-size: 20px; font-weight: 700; color: var(--text-primary); }
 .sel:focus { border-color: var(--input-focus-border); }
 
 .batch-actions { display: flex; gap: 6px; align-items: center; margin-left: auto; }
-.btn-batch { padding: 6px 14px; border: 1px solid var(--brand); border-radius: var(--radius-sm); background: var(--brand-light); color: var(--brand); cursor: pointer; font-size: 12px; transition: all var(--transition-fast); }
+.btn-batch { padding: 6px 14px; border: 1px solid var(--brand); border-radius: var(--radius-sm); background: var(--brand-light); color: var(--brand); cursor: pointer; font-size: 12px; transition: background var(--transition-fast), color var(--transition-fast); }
 .btn-batch:hover { background: var(--brand); color: #fff; }
 .btn-batch.btn-danger { border-color: var(--danger); background: var(--danger-light, #fef2f2); color: var(--danger); }
 .btn-batch.btn-danger:hover { background: var(--danger); color: #fff; }

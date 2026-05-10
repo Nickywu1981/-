@@ -133,7 +133,7 @@ async function handleReset() {
 .hint { font-size: var(--cfg-font-size-xs); color: var(--cfg-text-muted); margin: 4px 0 0 0; }
 .code-row { display: flex; gap: 8px; }
 .code-input { flex: 1; }
-.btn-send { padding: 10px 16px; background: var(--cfg-bg-primary); color: var(--cfg-primary); border: 1px solid var(--cfg-primary); border-radius: var(--cfg-radius-md); font-size: 13px; cursor: pointer; white-space: nowrap; transition: all var(--cfg-transition-fast); }
+.btn-send { padding: 10px 16px; background: var(--cfg-bg-primary); color: var(--cfg-primary); border: 1px solid var(--cfg-primary); border-radius: var(--cfg-radius-md); font-size: 13px; cursor: pointer; white-space: nowrap; transition: background var(--cfg-transition-fast), border-color var(--cfg-transition-fast), color var(--cfg-transition-fast), opacity var(--cfg-transition-fast); }
 .btn-send:hover { background: var(--cfg-primary-light); }
 .btn-send:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn-block { width: 100%; justify-content: center; padding: 12px; }

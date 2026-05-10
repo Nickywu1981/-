@@ -75,7 +75,7 @@ function goBack() {
 .btn-home {
   padding: 10px 28px; border-radius: 8px; background: var(--brand-gradient);
   color: var(--text-on-brand); font-size: 14px; text-decoration: none; display: inline-block; font-weight: 600;
-  transition: all var(--transition-fast);
+  transition: opacity var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 .btn-home:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(124,58,237,0.3); }
 </style>

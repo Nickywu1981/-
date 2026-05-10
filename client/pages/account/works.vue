@@ -90,12 +90,12 @@ onMounted(() => { fetchWorks() })
 .account-page { max-width: 960px; margin: 0 auto; padding: 24px; }
 h2 { font-size: 22px; font-weight: 700; margin-bottom: 20px; }
 .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
-.tabs button { padding: 7px 18px; border: 1px solid var(--border); border-radius: 20px; background: var(--bg-card); color: var(--text-secondary); font-size: 13px; cursor: pointer; transition: all .2s; }
+.tabs button { padding: 7px 18px; border: 1px solid var(--border); border-radius: 20px; background: var(--bg-card); color: var(--text-secondary); font-size: 13px; cursor: pointer; transition: border-color .2s, color .2s, background .2s; }
 .tabs button:hover { border-color: var(--brand); color: var(--brand); }
 .tabs button.active { background: var(--brand); color: #fff; border-color: var(--brand); }
 
 .works-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
-.work-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; cursor: pointer; transition: all .25s; }
+.work-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; cursor: pointer; transition: transform .25s, box-shadow .25s, border-color .25s; }
 .work-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px var(--shadow); border-color: var(--brand-light); }
 .work-thumb { aspect-ratio: 1; overflow: hidden; position: relative; background: var(--bg-elevated); display: flex; align-items: center; justify-content: center; }
 .work-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s; }

@@ -205,7 +205,7 @@ onMounted(fetchPlans);
 <style scoped>
 .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
 .ptitle { font-size: 20px; font-weight: 700; color: var(--text-primary); }
-.btn { padding: 8px 16px; border: none; border-radius: var(--btn-radius); cursor: pointer; font-size: 13px; font-weight: 500; transition: all var(--transition-fast); }
+.btn { padding: 8px 16px; border: none; border-radius: var(--btn-radius); cursor: pointer; font-size: 13px; font-weight: 500; transition: opacity var(--transition-fast), transform var(--transition-fast); }
 .btn--primary { background: var(--brand); color: #fff; }
 .btn--primary:hover { opacity: 0.9; transform: translateY(-1px); }
 .btn-icon { margin-right: 4px; }
@@ -224,7 +224,7 @@ onMounted(fetchPlans);
 .plan-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
 .plan-type { font-weight: 700; font-size: 16px; color: var(--text-primary); }
 .plan-actions { display: flex; gap: 8px; }
-.act-btn { width: 28px; height: 28px; border: 1px solid var(--border-light); border-radius: var(--radius-sm); background: var(--bg-card); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: all var(--transition-fast); }
+.act-btn { width: 28px; height: 28px; border: 1px solid var(--border-light); border-radius: var(--radius-sm); background: var(--bg-card); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: transform var(--transition-fast); }
 .act-btn:hover { transform: scale(1.1); }
 .toggle-btn.off { opacity: 0.4; }
 .del-btn:hover { border-color: var(--danger); background: var(--danger-light, #FEE2E2); }
@@ -235,7 +235,7 @@ onMounted(fetchPlans);
 .checks { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
 .checks label { font-size: 13px; display: flex; align-items: center; gap: 4px; cursor: pointer; color: var(--text-primary); }
 .plan-footer { margin-top: 16px; }
-.btn-save { width: 100%; padding: var(--btn-padding); background: var(--brand); color: #fff; border: none; border-radius: var(--btn-radius); cursor: pointer; font-size: var(--btn-font-size); transition: all var(--transition-fast); }
+.btn-save { width: 100%; padding: var(--btn-padding); background: var(--brand); color: #fff; border: none; border-radius: var(--btn-radius); cursor: pointer; font-size: var(--btn-font-size); transition: opacity var(--transition-fast); }
 .btn-save:hover { opacity: 0.9; }
 .btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 1000; animation: var(--fade-in); }

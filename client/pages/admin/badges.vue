@@ -206,7 +206,7 @@ function categoryLabel(c: string) {
 .ptitle { font-size: 20px; font-weight: 700; margin-bottom: 20px; color: var(--text-primary); }
 .toolbar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
 .sel { padding: 6px 12px; border: 1px solid var(--input-border); border-radius: var(--radius-sm); background: var(--bg-card); color: var(--text-primary); font-size: 13px; outline: none; }
-.btn { padding: 6px 14px; border: 1px solid var(--input-border); border-radius: var(--radius-sm); background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 13px; transition: all var(--transition-fast); }
+.btn { padding: 6px 14px; border: 1px solid var(--input-border); border-radius: var(--radius-sm); background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 13px; transition: border-color var(--transition-fast), color var(--transition-fast); }
 .btn:hover { border-color: var(--brand); color: var(--brand); }
 .btn-primary { background: var(--brand); color: var(--text-on-brand); border-color: var(--brand); }
 .btn-primary:hover { opacity: 0.9; color: var(--text-on-brand); }

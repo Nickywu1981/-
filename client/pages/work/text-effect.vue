@@ -90,7 +90,7 @@ function resetAll() { step.value = 0; text.value = ''; resultUrl.value = ''; pro
 .effect-card {
   display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 16px 8px;
   border: 2px solid var(--input-border); border-radius: var(--radius-lg); background: var(--bg-card);
-  cursor: pointer; transition: all var(--transition-fast); text-align: center;
+  cursor: pointer; transition: border-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast); text-align: center;
 }
 .effect-card:hover { border-color: var(--brand-light); transform: translateY(-2px); box-shadow: var(--shadow-md); }
 .effect-card.active { border-color: var(--brand); background: var(--brand-subtle); box-shadow: var(--shadow-brand); }
@@ -103,14 +103,14 @@ function resetAll() { step.value = 0; text.value = ''; resultUrl.value = ''; pro
 .btn-primary {
   padding: 10px 28px; background: var(--brand-gradient); color: #fff; border: none;
   border-radius: var(--radius-lg); cursor: pointer; font-size: 14px; font-weight: 600;
-  transition: all var(--transition-fast); box-shadow: var(--shadow-brand);
+  transition: opacity var(--transition-fast), transform var(--transition-fast); box-shadow: var(--shadow-brand);
 }
 .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 .btn-outline {
   padding: 10px 28px; background: transparent; color: var(--text-primary);
   border: 1px solid var(--input-border); border-radius: var(--radius-lg); cursor: pointer;
-  font-size: 14px; transition: all var(--transition-fast);
+  font-size: 14px; transition: border-color var(--transition-fast), color var(--transition-fast);
 }
 .btn-outline:hover { border-color: var(--brand); color: var(--brand); }
 .processing-card { text-align: center; padding: 48px 24px; background: var(--bg-card); border-radius: var(--radius-xl); }

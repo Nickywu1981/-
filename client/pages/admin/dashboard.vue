@@ -309,7 +309,7 @@ onUnmounted(() => {
 .refresh-btn {
   padding: 7px 16px; border: 1px solid #ebebea; border-radius: 8px;
   background: #fff; color: #6b6b70; cursor: pointer;
-  font-size: 13px; transition: all 0.15s;
+  font-size: 13px; transition: background 0.15s, color 0.15s;
 }
 .refresh-btn:hover { background: #f5f5f5; color: #171717; }
 .refresh-btn:disabled { opacity: 0.4; cursor: not-allowed; }
@@ -324,7 +324,7 @@ onUnmounted(() => {
 .stat-card {
   background: #fff; border: 1px solid #ebebea; border-radius: 10px;
   padding: 20px 16px; text-align: center;
-  transition: all 0.15s;
+  transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
 }
 .stat-card:hover { border-color: #d5d5d8; transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
 .stat-card.highlight {

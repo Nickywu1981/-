@@ -90,7 +90,7 @@ const rows = [
 .compare-hero p { font-size: 14px; color: var(--text-secondary); }
 
 .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 36px; }
-.stat-card { padding: 20px 12px; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-xl); text-align: center; transition: all var(--transition-fast); }
+.stat-card { padding: 20px 12px; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-xl); text-align: center; transition: border-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast); }
 .stat-card:hover { border-color: var(--brand); transform: translateY(-2px); box-shadow: 0 8px 24px var(--brand-alpha); }
 .stat-value { display: block; font-size: 28px; font-weight: 800; background: var(--brand-gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 4px; }
 .stat-label { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
@@ -118,7 +118,7 @@ const rows = [
 .cta-section { text-align: center; margin-top: 48px; padding: 40px 20px; background: var(--brand-gradient); border-radius: var(--radius-xl); color: #fff; }
 .cta-section h3 { font-size: 22px; font-weight: 700; margin: 0 0 8px; }
 .cta-section p { font-size: 14px; margin: 0 0 20px; opacity: 0.9; }
-.cta-btn { display: inline-block; padding: 12px 32px; background: #fff; color: var(--brand); border-radius: var(--radius-lg); font-size: 15px; font-weight: 700; text-decoration: none; transition: all var(--transition-fast); }
+.cta-btn { display: inline-block; padding: 12px 32px; background: #fff; color: var(--brand); border-radius: var(--radius-lg); font-size: 15px; font-weight: 700; text-decoration: none; transition: transform var(--transition-fast), box-shadow var(--transition-fast); }
 .cta-btn:hover { transform: scale(1.04); box-shadow: 0 6px 20px rgba(0,0,0,.2); }
 
 @media (max-width: 640px) {

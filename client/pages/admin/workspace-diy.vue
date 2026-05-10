@@ -178,7 +178,7 @@ onMounted(loadAll)
   display: flex; align-items: center; gap: 8px;
   padding: 10px 12px; margin-bottom: 4px;
   background: #fff; border: 1px solid #e4e7ed; border-radius: 8px;
-  transition: all .2s;
+  transition: border-color .2s, box-shadow .2s;
 }
 .item-row:hover { border-color: #409eff; box-shadow: 0 2px 8px rgba(64,158,255,.12); }
 .item-row.hidden { opacity: .45; }

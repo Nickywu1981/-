@@ -126,7 +126,7 @@ function handleRedo() { task.reset(); currentStep.value = 0; previewUrl.value = 
 
 <style scoped>
 .direction-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
-.direction-card { padding: 14px; border-radius: var(--radius-lg); border: 2px solid var(--border); background: var(--bg-card); cursor: pointer; text-align: center; transition: all var(--transition-fast); }
+.direction-card { padding: 14px; border-radius: var(--radius-lg); border: 2px solid var(--border); background: var(--bg-card); cursor: pointer; text-align: center; transition: border-color var(--transition-fast), transform var(--transition-fast), background var(--transition-fast); }
 .direction-card:hover { border-color: var(--brand-soft); transform: translateY(-2px); }
 .direction-card.active { border-color: var(--brand); background: var(--brand-light); }
 .direction-card__icon { font-size: 1.5rem; margin-bottom: 4px; }

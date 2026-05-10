@@ -104,10 +104,10 @@ async function doReset() {
 .code-row label { margin-bottom: 6px; }
 .code-input-row { display: flex; gap: 8px; }
 .code-input-row input { flex: 1; }
-.btn-send { padding: 11px 16px; background: var(--bg-card); color: var(--brand); border: 1px solid var(--brand); border-radius: var(--radius-md); font-size: 13px; cursor: pointer; white-space: nowrap; transition: all var(--transition-fast); }
+.btn-send { padding: 11px 16px; background: var(--bg-card); color: var(--brand); border: 1px solid var(--brand); border-radius: var(--radius-md); font-size: 13px; cursor: pointer; white-space: nowrap; transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), opacity var(--transition-fast); }
 .btn-send:hover { background: var(--brand-light); }
 .btn-send:disabled { opacity: 0.5; cursor: not-allowed; }
-.btn-save { width: 100%; padding: 12px; background: var(--brand-gradient); color: #fff; border: none; border-radius: var(--radius-md); font-size: 15px; cursor: pointer; font-weight: 600; transition: all var(--transition-fast); box-shadow: 0 4px 16px rgba(124,58,237,0.2); }
+.btn-save { width: 100%; padding: 12px; background: var(--brand-gradient); color: #fff; border: none; border-radius: var(--radius-md); font-size: 15px; cursor: pointer; font-weight: 600; transition: transform var(--transition-fast), box-shadow var(--transition-fast), opacity var(--transition-fast); box-shadow: 0 4px 16px rgba(124,58,237,0.2); }
 .btn-save:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(124,58,237,0.3); }
 .btn-save:active { transform: scale(0.98); }
 .btn-save:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }

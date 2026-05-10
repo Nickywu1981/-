@@ -204,7 +204,7 @@ onMounted(() => { loadTargets(); });
 @media (max-width: 640px) { .check-grid { grid-template-columns: 1fr; } }
 .check-col h4 { font-size: 14px; color: var(--text-secondary); margin-bottom: 10px; }
 .target-list { display: flex; flex-direction: column; gap: 6px; }
-.target-card { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border: 2px solid var(--input-border); border-radius: var(--radius-md); background: var(--bg-card); cursor: pointer; transition: all var(--transition-fast); text-align: left; }
+.target-card { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border: 2px solid var(--input-border); border-radius: var(--radius-md); background: var(--bg-card); cursor: pointer; transition: border-color var(--transition-fast), background var(--transition-fast); text-align: left; }
 .target-card:hover { border-color: var(--brand); }
 .target-card.active { border-color: var(--brand); background: var(--status-processing-bg); }
 .target-name { font-size: 14px; font-weight: 600; color: var(--text-primary); }

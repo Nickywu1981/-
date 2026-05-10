@@ -129,7 +129,7 @@ function openDetail(log: any) { detail.value = log }
 .sel:focus { border-color: var(--input-focus-border); box-shadow: var(--focus-ring); }
 .toolbar input[type=date] { padding: 8px 12px; border: 1px solid var(--input-border); border-radius: var(--radius-md); font-size: 13px; background: var(--bg-input); color: var(--text-primary); outline: none; transition: border-color var(--transition-fast), box-shadow var(--transition-fast); }
 .toolbar input[type=date]:focus { border-color: var(--input-focus-border); box-shadow: var(--focus-ring); }
-.btn { padding: 8px 16px; border: none; border-radius: var(--radius-md); cursor: pointer; font-size: 13px; transition: all var(--transition-fast); }
+.btn { padding: 8px 16px; border: none; border-radius: var(--radius-md); cursor: pointer; font-size: 13px; transition: opacity var(--transition-fast); }
 .btn-refresh { background: var(--brand); color: #fff; }
 .btn-refresh:hover { opacity: 0.9; }
 

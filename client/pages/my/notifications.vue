@@ -74,6 +74,6 @@ onMounted(fetchData)
 .notif-title { font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
 .notif-content { font-size: .875rem; color: var(--text-secondary); line-height: 1.5; }
 .notif-time { font-size: .75rem; color: var(--text-tertiary); margin-top: 4px; }
-.read-btn { flex-shrink: 0; background: none; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 4px 12px; border-radius: var(--radius); cursor: pointer; font-size: .75rem; transition: all .2s; }
+.read-btn { flex-shrink: 0; background: none; border: 1px solid var(--border-color); color: var(--text-secondary); padding: 4px 12px; border-radius: var(--radius); cursor: pointer; font-size: .75rem; transition: border-color .2s, color .2s; }
 .read-btn:hover { border-color: var(--brand); color: var(--brand); }
 </style>

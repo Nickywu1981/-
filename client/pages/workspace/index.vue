@@ -149,7 +149,7 @@ onMounted(async () => {
 .wh-quick { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
 .wh-qcard {
   display: flex; align-items: center; gap: 10px; padding: 16px 16px; background: #fff;
-  border-radius: 10px; border: 1px solid var(--brd, #ebebea); cursor: pointer; transition: all 0.15s;
+  border-radius: 10px; border: 1px solid var(--brd, #ebebea); cursor: pointer; transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
   min-height: 52px;
 }
 .wh-qcard:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.06); border-color: #c4c4c8; }
@@ -167,7 +167,7 @@ onMounted(async () => {
 .wh-recent-list { display: flex; flex-direction: column; gap: 6px; }
 .wh-recent-item {
   display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: #fff;
-  border-radius: 9px; border: 1px solid var(--brd, #ebebea); cursor: pointer; transition: all 0.15s;
+  border-radius: 9px; border: 1px solid var(--brd, #ebebea); cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s;
 }
 .wh-recent-item:hover { border-color: #c4c4c8; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
 .wh-recent-icon { font-size: 18px; flex-shrink: 0; }

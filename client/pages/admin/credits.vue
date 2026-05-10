@@ -126,7 +126,7 @@ onMounted(fetch)
 .filters input, .filters select { padding: 8px 12px; border: 1px solid var(--input-border); border-radius: var(--radius-md); font-size: 13px; background: var(--bg-card); color: var(--text-primary); outline: none; transition: border-color var(--transition-fast), box-shadow var(--transition-fast); }
 .filters input:focus, .filters select:focus { border-color: var(--input-focus-border); box-shadow: var(--focus-ring); }
 .filters input { width: 160px; }
-.btn { padding: 8px 20px; background: var(--brand-gradient); color: #fff; border: none; border-radius: var(--radius-md); font-size: 13px; font-weight: 600; cursor: pointer; transition: all var(--transition-fast); }
+.btn { padding: 8px 20px; background: var(--brand-gradient); color: #fff; border: none; border-radius: var(--radius-md); font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast); }
 .btn:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: var(--shadow-md); }
 .table-wrap { overflow-x: auto; border-radius: var(--radius-lg); border: 1px solid var(--border-light); background: var(--bg-card); }
 .table { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -156,6 +156,6 @@ onMounted(fetch)
 .modal-box input { width: 100%; padding: 8px 12px; border: 1px solid var(--input-border); border-radius: var(--radius-md); font-size: 13px; background: var(--bg-input); color: var(--text-primary); outline: none; margin-bottom: 16px; transition: border-color var(--transition-fast); }
 .modal-box input:focus { border-color: var(--input-focus-border); box-shadow: var(--focus-ring); }
 .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
-.btn-cancel { padding: 8px 16px; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-light); border-radius: var(--radius-md); font-size: 13px; cursor: pointer; transition: all var(--transition-fast); }
+.btn-cancel { padding: 8px 16px; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-light); border-radius: var(--radius-md); font-size: 13px; cursor: pointer; transition: background var(--transition-fast); }
 .btn-cancel:hover { background: var(--bg-hover); }
 </style>

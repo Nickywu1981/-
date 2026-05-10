@@ -216,7 +216,7 @@ async function handleSubmit() {
 .wc-tabs { display: flex; gap: 4px; margin-bottom: 20px; flex-wrap: wrap; }
 .wc-tab {
   padding: 7px 16px; border-radius: 8px; font-size: 13px; background: none; border: none;
-  color: var(--tx2, #6b6b70); cursor: pointer; transition: all 0.15s;
+  color: var(--tx2, #6b6b70); cursor: pointer; transition: background 0.15s, color 0.15s;
 }
 .wc-tab:hover { background: #fff; color: var(--tx, #171717); }
 .wc-tab.sel { background: var(--tx, #171717); color: #fff; }
@@ -232,7 +232,7 @@ async function handleSubmit() {
 .wc-hint { font-size: 11px; color: var(--tx3, #9d9da3); }
 .wc-submit {
   padding: 8px 20px; border-radius: 8px; font-size: 13px; font-weight: 500; border: none;
-  background: var(--tx, #171717); color: #fff; cursor: pointer; transition: all 0.15s;
+  background: var(--tx, #171717); color: #fff; cursor: pointer; transition: opacity 0.15s, transform 0.15s;
 }
 .wc-submit:hover { opacity: 0.85; transform: scale(1.02); }
 .wc-submit:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
@@ -246,7 +246,7 @@ async function handleSubmit() {
 .wc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
 .wc-card {
   background: #fff; border-radius: 11px; padding: 18px 16px; border: 1px solid var(--brd, #ebebea);
-  cursor: pointer; transition: all 0.2s;
+  cursor: pointer; transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 }
 .wc-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); border-color: #d4d4d4; }
 .wc-card-icon { font-size: 24px; margin-bottom: 8px; }

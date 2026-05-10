@@ -170,7 +170,7 @@ function handleRedo() { task.reset(); currentStep.value = 0; sourceUrl.value = '
 .ws-tag {
   padding: 6px 16px; border-radius: 20px; border: 1px solid var(--border);
   background: var(--bg-card); cursor: pointer; font-size: 0.85rem;
-  color: var(--text-secondary); transition: all var(--transition-fast);
+  color: var(--text-secondary); transition: border-color var(--transition-fast), color var(--transition-fast), background var(--transition-fast);
 }
 .ws-tag:hover { border-color: var(--brand-soft); color: var(--brand); }
 .ws-tag.active { border-color: var(--brand); background: var(--brand-light); color: var(--brand); font-weight: 600; }

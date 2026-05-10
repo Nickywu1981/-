@@ -116,7 +116,7 @@ function handleRedo() { task.reset(); currentStep.value = 0; uploading.value = f
 
 <style scoped>
 .voice-preset-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
-.voice-preset { padding: 16px; border-radius: 12px; border: 2px solid var(--border); background: var(--bg-card); text-align: center; cursor: pointer; transition: all var(--transition-fast); }
+.voice-preset { padding: 16px; border-radius: 12px; border: 2px solid var(--border); background: var(--bg-card); text-align: center; cursor: pointer; transition: border-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast); }
 .voice-preset:hover { border-color: var(--brand); transform: translateY(-2px); box-shadow: var(--shadow-md); }
 .voice-preset.active { border-color: var(--brand); background: var(--brand-light); }
 .voice-preset__icon { font-size: 2rem; margin-bottom: 8px; }

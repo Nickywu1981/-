@@ -326,7 +326,7 @@ onBeforeUnmount(() => {
   border-radius: 8px;
   cursor: pointer;
   font-size: 11px;
-  transition: all 0.2s;
+  transition: color 0.2s, background 0.2s, border-color 0.2s;
 }
 .ctrl-btn:hover { color: #fff; background: rgba(255,255,255,0.1); }
 .ctrl-btn.active { color: #6c5ce7; border-color: #6c5ce7; background: rgba(108,92,231,0.15); }

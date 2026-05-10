@@ -142,13 +142,13 @@ function handleRedo() { task.reset(); currentStep.value = 0; previewUrl.value = 
 
 <style scoped>
 .tag-row { display: flex; gap: 8px; flex-wrap: wrap; }
-.ws-tag { padding: 8px 16px; border-radius: 20px; border: 2px solid var(--border); background: var(--bg-card); cursor: pointer; font-size: 0.85rem; color: var(--text-secondary); transition: all var(--transition-fast); }
+.ws-tag { padding: 8px 16px; border-radius: 20px; border: 2px solid var(--border); background: var(--bg-card); cursor: pointer; font-size: 0.85rem; color: var(--text-secondary); transition: border-color var(--transition-fast), color var(--transition-fast), background var(--transition-fast); }
 .ws-tag:hover { border-color: var(--brand-soft); color: var(--brand); }
 .ws-tag.active { border-color: var(--brand); background: var(--brand-light); color: var(--brand); font-weight: 600; }
 .ws-uploading, .ws-uploaded { text-align: center; padding: 8px; font-size: 0.9rem; }
 .ws-uploaded { color: var(--success); }
 .level-row { display: flex; gap: 10px; }
-.level-chip { padding: 8px 24px; border-radius: var(--radius-full); border: 2px solid var(--border); background: var(--bg-card); cursor: pointer; font-size: 0.9rem; color: var(--text-secondary); transition: all var(--transition-fast); }
+.level-chip { padding: 8px 24px; border-radius: var(--radius-full); border: 2px solid var(--border); background: var(--bg-card); cursor: pointer; font-size: 0.9rem; color: var(--text-secondary); transition: border-color var(--transition-fast), color var(--transition-fast), background var(--transition-fast); }
 .level-chip:hover { border-color: var(--brand-soft); color: var(--brand); }
 .level-chip.active { border-color: var(--brand); background: var(--brand-gradient); color: #fff; font-weight: 600; }
 .ws-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 24px; flex-wrap: wrap; gap: 12px; }

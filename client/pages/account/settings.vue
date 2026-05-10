@@ -179,13 +179,13 @@ async function unbindPhone() {
 .form-group label { display: block; font-size: 13px; color: var(--text-secondary); margin-bottom: 6px; }
 .form-group input { width: 100%; padding: 10px 12px; border: 1px solid var(--border-light); border-radius: 8px; font-size: 14px; outline: none; box-sizing: border-box; background: var(--bg-input); color: var(--text-primary); transition: border-color var(--transition-fast), box-shadow var(--transition-fast); }
 .form-group input:focus { border-color: var(--brand); box-shadow: var(--focus-ring); }
-.btn-save { width: 100%; padding: 12px; background: var(--brand-gradient); color: #fff; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; font-weight: 600; transition: all var(--transition-fast); }
+.btn-save { width: 100%; padding: 12px; background: var(--brand-gradient); color: #fff; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; font-weight: 600; transition: box-shadow var(--transition-fast), transform var(--transition-fast), opacity var(--transition-fast); }
 .btn-save:hover { box-shadow: 0 4px 12px rgba(124,58,237,0.3); transform: translateY(-1px); }
 .btn-save:active { transform: scale(0.98); }
 .btn-save:disabled { opacity: 0.6; transform: none; box-shadow: none; }
 .code-row { display: flex; gap: 12px; }
 .code-input { flex: 1; }
-.btn-code { flex-shrink: 0; padding: 10px 16px; background: var(--bg-card); color: var(--brand); border: 1px solid var(--brand); border-radius: 8px; font-size: 13px; cursor: pointer; white-space: nowrap; transition: all var(--transition-fast); }
+.btn-code { flex-shrink: 0; padding: 10px 16px; background: var(--bg-card); color: var(--brand); border: 1px solid var(--brand); border-radius: 8px; font-size: 13px; cursor: pointer; white-space: nowrap; transition: background var(--transition-fast), opacity var(--transition-fast); }
 .btn-code:hover { background: var(--brand-bg); }
 .btn-code:disabled { opacity: 0.5; cursor: not-allowed; }
 .bound-info { text-align: center; padding: 16px 0; }

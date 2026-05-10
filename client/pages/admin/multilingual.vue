@@ -82,7 +82,7 @@ h3 { font-size: 16px; font-weight: 600; color: var(--text-primary); margin-botto
 .section { margin-bottom: 24px; }
 
 .lang-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
-.lang-card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 16px; display: flex; flex-direction: column; align-items: center; gap: 6px; transition: all var(--transition-base); }
+.lang-card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 16px; display: flex; flex-direction: column; align-items: center; gap: 6px; transition: border-color var(--transition-base), box-shadow var(--transition-base); }
 .lang-card:hover { border-color: var(--brand); box-shadow: var(--shadow-card); }
 .lang-flag { font-size: 28px; }
 .lang-name { font-size: 14px; font-weight: 600; color: var(--text-primary); }

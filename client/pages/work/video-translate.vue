@@ -225,7 +225,7 @@ onMounted(async () => {
 .work-header p { color: var(--text-secondary); margin-top: 4px; }
 
 .work-tabs { display: flex; gap: 0; margin-bottom: 24px; border-bottom: 2px solid var(--border-color); }
-.tab-btn { display: flex; align-items: center; gap: 6px; padding: 12px 24px; border: none; background: none; font-size: 14px; font-weight: 600; color: var(--text-secondary); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all .2s; }
+.tab-btn { display: flex; align-items: center; gap: 6px; padding: 12px 24px; border: none; background: none; font-size: 14px; font-weight: 600; color: var(--text-secondary); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: color .2s, border-color .2s; }
 .tab-btn:hover { color: var(--text-primary); }
 .tab-btn.active { color: var(--brand); border-bottom-color: var(--brand); }
 

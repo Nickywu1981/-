@@ -131,7 +131,7 @@ onMounted(() => fetchAssets())
 
 .toolbar { margin-bottom: 20px; }
 .filter-tabs { display: flex; gap: 8px; }
-.filter-btn { padding: 8px 16px; border: 1px solid var(--cfg-border); background: var(--cfg-bg-primary); border-radius: var(--cfg-radius-full); font-size: var(--cfg-font-size-sm); cursor: pointer; color: var(--cfg-text-secondary); transition: all var(--cfg-transition-fast); }
+.filter-btn { padding: 8px 16px; border: 1px solid var(--cfg-border); background: var(--cfg-bg-primary); border-radius: var(--cfg-radius-full); font-size: var(--cfg-font-size-sm); cursor: pointer; color: var(--cfg-text-secondary); transition: background var(--cfg-transition-fast), color var(--cfg-transition-fast), border-color var(--cfg-transition-fast); }
 .filter-btn.active { background: var(--cfg-primary); color: #fff; border-color: var(--cfg-primary); }
 
 .empty-state { text-align: center; padding: 60px 20px; color: var(--cfg-text-muted); }

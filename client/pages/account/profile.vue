@@ -125,7 +125,7 @@ onMounted(fetchProfile);
 
 .quick-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 24px; }
 @media (max-width: 640px) { .quick-actions { grid-template-columns: repeat(2, 1fr); } }
-.action-card { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 20px; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); text-decoration: none; color: var(--text-primary); transition: all var(--transition-fast); }
+.action-card { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 20px; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); text-decoration: none; color: var(--text-primary); transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast); }
 .action-card:hover { border-color: var(--brand); box-shadow: var(--shadow-md); transform: translateY(-2px); }
 .action-icon { font-size: 28px; }
 .action-text { font-size: 13px; font-weight: 500; }

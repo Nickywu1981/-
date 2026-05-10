@@ -163,7 +163,7 @@ function viewDetail(_item: any) {
 .page { max-width: 1200px; margin: 0 auto; padding: 24px 16px; }
 h2 { font-size: 22px; margin-bottom: 16px; }
 .tabs { display: flex; gap: 8px; margin-bottom: 24px; }
-.tabs button { padding: 6px 20px; border: 1px solid var(--border-light); border-radius: 20px; background: var(--bg-card); font-size: 13px; cursor: pointer; transition: all 0.15s; }
+.tabs button { padding: 6px 20px; border: 1px solid var(--border-light); border-radius: 20px; background: var(--bg-card); font-size: 13px; cursor: pointer; transition: border-color 0.15s, color 0.15s, background 0.15s; }
 .tabs button:hover { border-color: var(--brand); color: var(--brand); }
 .tabs button.active { background: var(--brand); color: #fff; border-color: var(--brand); }
 
@@ -173,7 +173,7 @@ h2 { font-size: 22px; margin-bottom: 16px; }
 @media (max-width: 900px) { .grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 640px) { .grid { grid-template-columns: repeat(2, 1fr); } }
 
-.card { border: 1px solid var(--border-card); border-radius: 12px; overflow: hidden; background: var(--bg-card); cursor: pointer; transition: all 0.2s; }
+.card { border: 1px solid var(--border-card); border-radius: 12px; overflow: hidden; background: var(--bg-card); cursor: pointer; transition: box-shadow 0.2s, border-color 0.2s; }
 .card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); border-color: var(--border-light); }
 .card-img { width: 100%; aspect-ratio: 1; background: var(--bg-hover); display: flex; align-items: center; justify-content: center; overflow: hidden; }
 .img-placeholder { font-size: 40px; }

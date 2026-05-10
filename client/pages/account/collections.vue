@@ -212,7 +212,7 @@ h1 { font-size: 24px; font-weight: 700; color: var(--text-primary); }
 .error-state p { color: var(--text-muted); margin: 12px 0 20px; }
 
 .collection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
-.collection-card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); overflow: hidden; cursor: pointer; transition: all var(--transition-fast); }
+.collection-card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); overflow: hidden; cursor: pointer; transition: border-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast); }
 .collection-card:hover { border-color: var(--brand); transform: translateY(-2px); box-shadow: var(--shadow-card); }
 .card-cover { height: 140px; background: var(--bg-secondary); display: flex; align-items: center; justify-content: center; position: relative; }
 .card-cover img { width: 100%; height: 100%; object-fit: cover; }

@@ -250,7 +250,7 @@ function downloadDraft() {
 .platform-section { display: flex; gap: 16px; margin-bottom: 32px; }
 .platform-card {
   flex: 1; padding: 24px; border: 2px solid var(--border-card);
-  border-radius: 12px; cursor: pointer; text-align: center; transition: all .2s;
+  border-radius: 12px; cursor: pointer; text-align: center; transition: border-color .2s, background .2s;
 }
 .platform-card:hover { border-color: var(--brand-light); }
 .platform-card.active { border-color: var(--brand-color); background: var(--brand-light-alt); }
@@ -264,7 +264,7 @@ function downloadDraft() {
 .ratio-options { display: flex; gap: 10px; flex-wrap: wrap; }
 .ratio-btn {
   padding: 8px 16px; border: 1px solid var(--border-card); border-radius: 8px;
-  background: var(--bg-card); cursor: pointer; text-align: center; transition: all .2s;
+  background: var(--bg-card); cursor: pointer; text-align: center; transition: border-color .2s, background .2s;
   display: flex; flex-direction: column; gap: 2px;
 }
 .ratio-btn:hover { border-color: var(--brand-light); }
@@ -282,7 +282,7 @@ function downloadDraft() {
 .works-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
 .work-card {
   border: 2px solid var(--border-card); border-radius: 10px; overflow: hidden;
-  cursor: pointer; transition: all .15s; position: relative;
+  cursor: pointer; transition: border-color .15s, transform .15s; position: relative;
 }
 .work-card:hover { border-color: var(--brand-light); transform: translateY(-2px); }
 .work-card.selected { border-color: var(--brand-color); }

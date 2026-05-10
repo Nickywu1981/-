@@ -158,7 +158,7 @@ function downloadResult() { if (replicateResultUrl.value) download(replicateResu
 
 .work-panel { background: var(--cfg-bg-primary); border: 1px solid var(--cfg-border); border-radius: var(--cfg-radius-lg); padding: 24px; }
 
-.step-section { opacity: 0.55; padding: 16px; border-radius: var(--cfg-radius-base); margin-bottom: 20px; border: 1px solid var(--cfg-border); transition: all var(--cfg-transition-fast); }
+.step-section { opacity: 0.55; padding: 16px; border-radius: var(--cfg-radius-base); margin-bottom: 20px; border: 1px solid var(--cfg-border); transition: opacity var(--cfg-transition-fast), border-color var(--cfg-transition-fast); }
 .step-section.active, .step-section.done { opacity: 1; border-color: var(--cfg-primary); }
 .step-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
 .step-num { width: 26px; height: 26px; border-radius: 50%; background: var(--cfg-bg-tertiary); color: var(--cfg-text-muted); display: flex; align-items: center; justify-content: center; font-size: var(--cfg-font-size-xs); font-weight: var(--cfg-font-weight-bold); }
@@ -170,7 +170,7 @@ function downloadResult() { if (replicateResultUrl.value) download(replicateResu
 .input-row .input { flex: 1; }
 
 .platform-badges { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: var(--cfg-font-size-sm); color: var(--cfg-text-muted); }
-.badge { padding: 4px 12px; border: 1px solid var(--cfg-border); border-radius: var(--cfg-radius-full); background: var(--cfg-bg-primary); cursor: pointer; font-size: var(--cfg-font-size-xs); transition: all var(--cfg-transition-fast); }
+.badge { padding: 4px 12px; border: 1px solid var(--cfg-border); border-radius: var(--cfg-radius-full); background: var(--cfg-bg-primary); cursor: pointer; font-size: var(--cfg-font-size-xs); transition: background var(--cfg-transition-fast), color var(--cfg-transition-fast), border-color var(--cfg-transition-fast); }
 .badge.active { background: var(--cfg-primary); color: #fff; border-color: var(--cfg-primary); }
 
 .analysis-box { margin-top: 16px; padding: 16px; background: var(--cfg-bg-tertiary); border-radius: var(--cfg-radius-base); }

@@ -127,14 +127,14 @@ function handleRedo() { task.reset(); currentStep.value = 0; previewUrl.value = 
 
 <style scoped>
 .effect-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
-.effect-card { padding: 16px; border-radius: var(--radius-lg); border: 2px solid var(--border); background: var(--bg-card); cursor: pointer; text-align: center; transition: all var(--transition-fast); }
+.effect-card { padding: 16px; border-radius: var(--radius-lg); border: 2px solid var(--border); background: var(--bg-card); cursor: pointer; text-align: center; transition: border-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast); }
 .effect-card:hover { border-color: var(--brand-soft); transform: translateY(-2px); box-shadow: var(--shadow-md); }
 .effect-card.active { border-color: var(--brand); background: var(--brand-light); }
 .effect-card__preview { font-size: 2rem; margin-bottom: 8px; }
 .effect-card__name { font-weight: 600; color: var(--text-primary); font-size: 0.9rem; }
 .effect-card__desc { font-size: 0.72rem; color: var(--text-tertiary); margin-top: 4px; }
 .tag-row { display: flex; gap: 8px; flex-wrap: wrap; }
-.ws-tag { padding: 6px 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg-card); cursor: pointer; font-size: 0.85rem; color: var(--text-secondary); transition: all var(--transition-fast); }
+.ws-tag { padding: 6px 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg-card); cursor: pointer; font-size: 0.85rem; color: var(--text-secondary); transition: border-color var(--transition-fast), color var(--transition-fast), background var(--transition-fast); }
 .ws-tag:hover { border-color: var(--brand-soft); color: var(--brand); }
 .ws-tag.active { border-color: var(--brand); background: var(--brand-light); color: var(--brand); font-weight: 600; }
 .ws-uploading, .ws-uploaded { text-align: center; padding: 8px; font-size: 0.9rem; }

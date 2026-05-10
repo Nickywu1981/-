@@ -102,13 +102,13 @@ onMounted(fetchFavorites)
 .subtitle { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
 
 .header-actions { display: flex; gap: 8px; }
-.btn-outline { padding: 6px 16px; border: 1px solid var(--border-light); border-radius: 20px; background: var(--bg-card); color: var(--text-secondary); font-size: 13px; cursor: pointer; transition: all var(--transition-fast); }
+.btn-outline { padding: 6px 16px; border: 1px solid var(--border-light); border-radius: 20px; background: var(--bg-card); color: var(--text-secondary); font-size: 13px; cursor: pointer; transition: border-color var(--transition-fast), color var(--transition-fast), background var(--transition-fast); }
 .btn-outline:hover { border-color: var(--brand); color: var(--brand); }
 .btn-outline.active { background: var(--brand-gradient); color: #fff; border-color: transparent; }
 
 .favorites-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
 
-.favorite-card { background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-lg); overflow: hidden; transition: all var(--transition-fast); }
+.favorite-card { background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-lg); overflow: hidden; transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast); }
 .favorite-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(124,58,237,0.08); border-color: var(--brand-soft); }
 
 .card-preview { position: relative; aspect-ratio: 1; background: var(--bg-hover); overflow: hidden; }

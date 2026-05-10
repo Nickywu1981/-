@@ -50,7 +50,7 @@ const useTemplate = (s: any) => {
 h1 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
 .subtitle { color: var(--text-secondary); margin-bottom: 32px; }
 .platform-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
-.platform-card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 12px; padding: 16px; cursor: pointer; transition: all .2s; }
+.platform-card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 12px; padding: 16px; cursor: pointer; transition: border-color .2s, transform .2s; }
 .platform-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,.08); border-color: var(--brand); }
 .platform-card__header { display: flex; align-items: center; gap: 8px; font-weight: 600; margin-bottom: 12px; font-size: 16px; }
 .platform-card__sizes { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -60,7 +60,7 @@ h1 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
 .selected-platform { margin-top: 32px; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 16px; padding: 24px; }
 .selected-platform h2 { margin: 0 0 16px; font-size: 18px; }
 .size-detail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
-.size-detail-card { background: var(--bg-page); border-radius: 10px; padding: 16px; text-align: center; cursor: pointer; transition: all .2s; }
+.size-detail-card { background: var(--bg-page); border-radius: 10px; padding: 16px; text-align: center; cursor: pointer; transition: border-color .2s, transform .2s, box-shadow .2s; }
 .size-detail-card:hover { box-shadow: 0 4px 12px rgba(124,58,237,0.1); }
 .size-label { font-weight: 600; margin-bottom: 8px; }
 .size-dims { font-size: 24px; font-weight: 700; color: var(--brand); }

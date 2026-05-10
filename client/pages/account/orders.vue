@@ -56,7 +56,7 @@ function statusLabel(s: string) { const m: Record<string,string> = { paid:'å·²æ”
 .account-page { max-width: 960px; margin: 0 auto; padding: 32px 24px; }
 h2 { font-size: 24px; font-weight: 700; margin-bottom: 20px; color: var(--text-primary); }
 .tabs { display: flex; gap: 4px; margin-bottom: 24px; background: var(--bg-secondary); border-radius: 10px; padding: 4px; width: fit-content; }
-.tabs button { padding: 8px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; background: transparent; color: var(--text-secondary); transition: all 0.2s; }
+.tabs button { padding: 8px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; background: transparent; color: var(--text-secondary); transition: background 0.2s, color 0.2s, box-shadow 0.2s; }
 .tabs button.active { background: var(--card-bg); color: var(--brand); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
 .orders-table { width: 100%; border-collapse: collapse; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
 .orders-table th, .orders-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }

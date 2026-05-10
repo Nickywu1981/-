@@ -170,7 +170,7 @@ onUnmounted(() => { if (previewUrl.value) revoke(previewUrl.value) })
 </script>
 
 <style scoped>
-.plat-card { padding: 10px 18px; border: 1px solid var(--border-light); border-radius: var(--radius-full); background: var(--bg-card); font-size: 14px; cursor: pointer; color: var(--text-secondary); transition: all var(--transition-fast); }
+.plat-card { padding: 10px 18px; border: 1px solid var(--border-light); border-radius: var(--radius-full); background: var(--bg-card); font-size: 14px; cursor: pointer; color: var(--text-secondary); transition: border-color var(--transition-fast), color var(--transition-fast), background var(--transition-fast); }
 .plat-card:hover { border-color: var(--brand); color: var(--brand); }
 .plat-card.active { background: var(--brand-gradient); color: #fff; border-color: transparent; }
 .style-preview { font-size: 32px; margin-bottom: 8px; }

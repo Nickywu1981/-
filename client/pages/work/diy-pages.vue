@@ -94,7 +94,7 @@ h1 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
 .input-search:focus { border-color: var(--brand); }
 
 .diy-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
-.diy-card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 12px; overflow: hidden; cursor: pointer; transition: all .2s; }
+.diy-card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 12px; overflow: hidden; cursor: pointer; transition: box-shadow .2s, transform .2s; }
 .diy-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.1); transform: translateY(-2px); }
 .diy-card__preview { height: 140px; display: flex; align-items: center; justify-content: center; position: relative; }
 .diy-card__icon { font-size: 48px; }

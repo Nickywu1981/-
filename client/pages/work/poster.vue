@@ -390,7 +390,7 @@ onBeforeUnmount(() => {
 .page-desc { color: var(--text-secondary); font-size: 14px; margin: 0; }
 
 .type-tabs { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
-.tab-btn { display: flex; align-items: center; gap: 6px; padding: 8px 16px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-card); color: var(--text-secondary); cursor: pointer; font-size: 13px; transition: all 0.2s; }
+.tab-btn { display: flex; align-items: center; gap: 6px; padding: 8px 16px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-card); color: var(--text-secondary); cursor: pointer; font-size: 13px; transition: border-color 0.2s, color 0.2s; }
 .tab-btn:hover { border-color: var(--brand); color: var(--brand); }
 .tab-btn.active { background: var(--brand); color: #fff; border-color: var(--brand); }
 .tab-icon { font-size: 16px; }
@@ -415,11 +415,11 @@ onBeforeUnmount(() => {
 .style-input:focus { outline: none; border-color: var(--brand); }
 
 .template-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.tpl-chip { padding: 6px 14px; border: 1px solid var(--border-color); border-radius: 20px; background: var(--bg-card); color: var(--text-secondary); cursor: pointer; font-size: 12px; transition: all 0.2s; }
+.tpl-chip { padding: 6px 14px; border: 1px solid var(--border-color); border-radius: 20px; background: var(--bg-card); color: var(--text-secondary); cursor: pointer; font-size: 12px; transition: border-color 0.2s, color 0.2s, background 0.2s; }
 .tpl-chip:hover { border-color: var(--brand); color: var(--brand); background: var(--brand-light); }
 
 .action-row { display: flex; gap: 10px; }
-.btn { padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; display: flex; align-items: center; gap: 6px; transition: all 0.2s; }
+.btn { padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; display: flex; align-items: center; gap: 6px; transition: background 0.2s, opacity 0.2s; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn-primary { background: var(--brand); color: #fff; flex: 1; }
 .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-primary); }

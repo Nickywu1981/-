@@ -88,7 +88,7 @@ onMounted(() => loadTemplates());
 <style scoped>
 .page { max-width: 800px; margin: 0 auto; padding: 24px 16px; }
 h2 { font-size: 22px; margin-bottom: 16px; }
-.btn { padding: 8px 20px; background: var(--brand-gradient); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all var(--transition-fast); }
+.btn { padding: 8px 20px; background: var(--brand-gradient); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; transition: background var(--transition-fast), color var(--transition-fast); }
 .btn-outline { padding: 8px 20px; border: 1px solid var(--border-light); border-radius: 6px; background: var(--bg-card); cursor: pointer; }
 .form-card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 8px; padding: 16px; margin-bottom: 24px; display: flex; flex-direction: column; gap: 10px; }
 .form-card input, .form-card select { padding: 8px 12px; border: 1px solid var(--border-light); border-radius: 6px; font-size: 14px; }

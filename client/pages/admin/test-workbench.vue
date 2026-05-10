@@ -634,7 +634,7 @@ onMounted(() => {
 .tw-tab {
   padding: 10px 18px; font-size: 13px; border: none; background: none;
   color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent;
-  margin-bottom: -2px; transition: all var(--transition-fast);
+  margin-bottom: -2px; transition: color var(--transition-fast), border-bottom-color var(--transition-fast);
 }
 .tw-tab:hover { color: var(--text-primary); }
 .tw-tab.active {
@@ -656,7 +656,7 @@ onMounted(() => {
 .cat-btn {
   padding: 7px 16px; border: 1px solid var(--border-light); border-radius: var(--radius-md);
   background: var(--bg-page); cursor: pointer; font-size: 13px; color: var(--text-secondary);
-  transition: all var(--transition-fast);
+  transition: border-color var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
 }
 .cat-btn:hover { border-color: var(--brand); }
 .cat-btn.active { background: var(--brand); color: #fff; border-color: var(--brand); }
@@ -688,7 +688,7 @@ onMounted(() => {
 .btn-mini {
   padding: 4px 10px; font-size: 11px; border: 1px solid var(--border-light);
   border-radius: var(--radius-sm); background: var(--bg-page); color: var(--text-secondary);
-  cursor: pointer; transition: all var(--transition-fast);
+  cursor: pointer; transition: border-color var(--transition-fast), color var(--transition-fast);
 }
 .btn-mini:hover { border-color: var(--brand); color: var(--brand); }
 .btn-mini.danger:hover { border-color: #ef4444; color: #ef4444; }
@@ -726,7 +726,7 @@ onMounted(() => {
   padding: 5px 12px; border: 1px solid var(--border-light);
   border-radius: var(--radius-md); background: var(--bg-page);
   cursor: pointer; font-size: 12px; color: var(--text-secondary);
-  transition: all var(--transition-fast);
+  transition: border-color var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
 }
 .pool-chip:hover:not(:disabled) { border-color: var(--brand); }
 .pool-chip.used { background: var(--brand); color: #fff; border-color: var(--brand); }
@@ -748,7 +748,7 @@ onMounted(() => {
 .btn-run {
   padding: 10px 28px; background: var(--brand); color: #fff; border: none;
   border-radius: var(--radius-md); font-size: 14px; font-weight: 600;
-  cursor: pointer; transition: all var(--transition-fast);
+  cursor: pointer; transition: filter var(--transition-fast);
   display: flex; align-items: center; gap: 8px;
 }
 .btn-run:hover:not(:disabled) { filter: brightness(1.1); }
@@ -878,7 +878,7 @@ onMounted(() => {
 .history-item {
   display: flex; align-items: center; gap: 10px; padding: 10px 14px;
   border: 1px solid var(--border-light); border-radius: var(--radius-md);
-  cursor: pointer; transition: all var(--transition-fast);
+  cursor: pointer; transition: border-color var(--transition-fast), background var(--transition-fast);
   font-size: 12px;
 }
 .history-item:hover { border-color: var(--brand); background: rgba(124,58,237,0.03); }

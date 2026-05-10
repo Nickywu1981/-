@@ -162,7 +162,7 @@ onMounted(() => { loadLanguages(); });
 
 <style scoped>
 .lang-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; margin-bottom: 16px; }
-.lang-card { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border: 2px solid var(--input-border); border-radius: var(--radius-md); background: var(--bg-card); cursor: pointer; transition: all var(--transition-fast); }
+.lang-card { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border: 2px solid var(--input-border); border-radius: var(--radius-md); background: var(--bg-card); cursor: pointer; transition: border-color var(--transition-fast), background var(--transition-fast); }
 .lang-card:hover { border-color: var(--brand); }
 .lang-card.active { border-color: var(--brand); background: var(--status-processing-bg); }
 .lang-flag { font-size: 20px; }

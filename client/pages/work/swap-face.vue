@@ -160,23 +160,23 @@ onBeforeUnmount(() => {
 .step-content { max-width: 720px; margin: 0 auto; }
 .step-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: var(--text-primary); }
 .step-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
-.dropzone { border: 2px dashed var(--input-border); border-radius: var(--radius-xl); padding: 36px 24px; text-align: center; background: var(--bg-card); transition: all var(--transition-fast); cursor: pointer; }
+.dropzone { border: 2px dashed var(--input-border); border-radius: var(--radius-xl); padding: 36px 24px; text-align: center; background: var(--bg-card); transition: border-color var(--transition-fast), background var(--transition-fast); cursor: pointer; }
 .dropzone:hover { border-color: var(--brand-light); background: var(--brand-subtle); }
 .dropzone.has-file { padding: 12px; border-style: solid; border-color: var(--brand); }
 .dz-icon { font-size: 48px; display: block; margin-bottom: 8px; }
 .dz-label { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
 .dz-hint { font-size: 12px; color: var(--text-muted); margin-bottom: 14px; }
 .preview-img { max-width: 100%; max-height: 280px; border-radius: var(--radius-lg); }
-.btn-outline-sm { padding: 8px 18px; background: transparent; color: var(--brand); border: 1px solid var(--brand); border-radius: var(--radius-md); cursor: pointer; font-size: 13px; transition: all var(--transition-fast); }
+.btn-outline-sm { padding: 8px 18px; background: transparent; color: var(--brand); border: 1px solid var(--brand); border-radius: var(--radius-md); cursor: pointer; font-size: 13px; transition: background var(--transition-fast); }
 .btn-outline-sm:hover { background: var(--brand-subtle); }
 .upload-status { display: flex; align-items: center; gap: 6px; justify-content: center; margin-top: 12px; font-size: 13px; color: var(--brand); }
 .spinner-sm { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--input-border); border-top-color: var(--brand); border-radius: 50%; animation: spin 0.8s linear infinite; }
 .cost-badge { display: inline-flex; align-items: center; gap: 4px; margin-top: 16px; padding: 6px 14px; background: var(--bg-subtle); border-radius: 20px; font-size: 12px; color: var(--text-secondary); }
 .actions { display: flex; gap: 10px; margin-top: 20px; justify-content: center; }
-.btn-primary { padding: 10px 28px; background: var(--brand-gradient); color: #fff; border: none; border-radius: var(--radius-lg); cursor: pointer; font-size: 14px; font-weight: 600; transition: all var(--transition-fast); box-shadow: var(--shadow-brand); display: block; margin: 16px auto 0; }
+.btn-primary { padding: 10px 28px; background: var(--brand-gradient); color: #fff; border: none; border-radius: var(--radius-lg); cursor: pointer; font-size: 14px; font-weight: 600; transition: opacity var(--transition-fast), transform var(--transition-fast); box-shadow: var(--shadow-brand); display: block; margin: 16px auto 0; }
 .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-.btn-outline { padding: 10px 28px; background: transparent; color: var(--text-primary); border: 1px solid var(--input-border); border-radius: var(--radius-lg); cursor: pointer; font-size: 14px; transition: all var(--transition-fast); }
+.btn-outline { padding: 10px 28px; background: transparent; color: var(--text-primary); border: 1px solid var(--input-border); border-radius: var(--radius-lg); cursor: pointer; font-size: 14px; transition: border-color var(--transition-fast), color var(--transition-fast); }
 .btn-outline:hover { border-color: var(--brand); color: var(--brand); }
 .processing-card { text-align: center; padding: 48px 24px; background: var(--bg-card); border-radius: var(--radius-xl); }
 .processing-card h4 { margin: 12px 0 6px; font-size: 16px; color: var(--text-primary); }

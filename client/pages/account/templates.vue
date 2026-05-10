@@ -79,7 +79,7 @@ onMounted(fetchTemplates)
 .empty-state span { font-size: 13px; color: var(--text-tertiary); display: block; margin-bottom: 20px; }
 
 .templates-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-.template-card { background: var(--bg-secondary); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; transition: all .2s; }
+.template-card { background: var(--bg-secondary); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; transition: transform .2s, box-shadow .2s; }
 .template-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px var(--shadow); }
 .card-preview { height: 120px; background: var(--bg-tertiary); display: flex; align-items: center; justify-content: center; }
 .card-preview img { width: 100%; height: 100%; object-fit: cover; }
@@ -89,7 +89,7 @@ onMounted(fetchTemplates)
 .card-type { font-size: 12px; color: var(--brand); background: var(--brand-bg); padding: 2px 8px; border-radius: 4px; }
 .card-footer { padding: 8px 16px 12px; display: flex; justify-content: space-between; align-items: center; }
 .card-date { font-size: 12px; color: var(--text-tertiary); }
-.btn-use { padding: 4px 14px; font-size: 12px; color: var(--brand); background: var(--brand-bg); border: 1px solid var(--brand-border); border-radius: 6px; cursor: pointer; transition: all .15s; }
+.btn-use { padding: 4px 14px; font-size: 12px; color: var(--brand); background: var(--brand-bg); border: 1px solid var(--brand-border); border-radius: 6px; cursor: pointer; transition: background .15s, color .15s; }
 .btn-use:hover { background: var(--brand); color: #fff; }
 .btn-primary { display: inline-block; padding: 10px 24px; background: var(--brand); color: #fff; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; text-decoration: none; transition: opacity .15s; }
 .btn-primary:hover { opacity: .9; }

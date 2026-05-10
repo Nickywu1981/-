@@ -107,7 +107,7 @@ onMounted(fetchStatus)
 .refresh-btn {
   padding: 8px 16px; border: 1px solid var(--cfg-border, #e2e8f0); border-radius: 8px;
   background: var(--cfg-bg-secondary, #fff); color: var(--cfg-text-secondary, #64748b);
-  cursor: pointer; font-size: 13px; transition: all 0.2s;
+  cursor: pointer; font-size: 13px; transition: border-color 0.2s, color 0.2s;
 }
 .refresh-btn:hover { border-color: var(--cfg-primary, #3B82F6); color: var(--cfg-primary, #3B82F6); }
 .refresh-btn:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -145,7 +145,7 @@ onMounted(fetchStatus)
 .btn-sm {
   padding: 6px 12px; font-size: 12px; border: 1px solid var(--cfg-border, #e2e8f0);
   border-radius: 6px; background: var(--cfg-bg-secondary, #fff); color: var(--cfg-primary, #3B82F6);
-  cursor: pointer; transition: all 0.2s;
+  cursor: pointer; transition: background 0.2s, color 0.2s, border-color 0.2s;
 }
 .btn-sm:hover:not(:disabled) { background: var(--cfg-primary, #3B82F6); color: #fff; border-color: var(--cfg-primary, #3B82F6); }
 .btn-sm:disabled { opacity: 0.4; cursor: not-allowed; }

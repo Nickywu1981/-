@@ -231,7 +231,7 @@ onUnmounted(() => { clearInterval(loadingTimer) })
 .type-card {
   display: flex; flex-direction: column; align-items: center; gap: 6px;
   padding: 16px 24px; border: 2px solid var(--border-color); border-radius: 12px;
-  background: var(--bg-card); cursor: pointer; transition: all .2s; min-width: 160px;
+  background: var(--bg-card); cursor: pointer; transition: border-color .2s, transform .2s; min-width: 160px;
 }
 .type-card:hover { border-color: var(--brand); }
 .type-card.active { border-color: var(--brand); background: color-mix(in srgb, var(--brand) 8%, var(--bg-card)); }

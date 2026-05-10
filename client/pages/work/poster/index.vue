@@ -269,7 +269,7 @@ onMounted(async () => {
 .type-card {
   display: flex; flex-direction: column; align-items: center; gap: 4px;
   padding: 16px 8px; border: 2px solid var(--border-color); border-radius: 12px;
-  background: var(--bg-card); cursor: pointer; transition: all .2s;
+  background: var(--bg-card); cursor: pointer; transition: border-color .2s, transform .2s, box-shadow .2s;
 }
 .type-card:hover { border-color: var(--brand); }
 .type-card.active { border-color: var(--brand); background: var(--brand-light, #eef2ff); }

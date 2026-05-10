@@ -197,11 +197,11 @@ onMounted(() => { loadPlatforms(); });
 
 <style scoped>
 .region-tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
-.region-tab { padding: 6px 14px; border: 1px solid var(--input-border); border-radius: var(--badge-radius); background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 13px; transition: all var(--transition-fast); }
+.region-tab { padding: 6px 14px; border: 1px solid var(--input-border); border-radius: var(--badge-radius); background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 13px; transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast); }
 .region-tab.active { background: var(--brand); color: var(--text-on-brand); border-color: var(--brand); }
 .region-tab:hover:not(.active) { border-color: var(--brand); }
 .platform-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin-bottom: 20px; }
-.platform-card { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 16px 12px; border: 2px solid var(--input-border); border-radius: var(--radius-lg); background: var(--bg-card); cursor: pointer; transition: all var(--transition-fast); }
+.platform-card { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 16px 12px; border: 2px solid var(--input-border); border-radius: var(--radius-lg); background: var(--bg-card); cursor: pointer; transition: border-color var(--transition-fast), box-shadow var(--transition-fast); }
 .platform-card:hover { border-color: var(--brand); box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand) 12%, transparent); }
 .platform-card.active { border-color: var(--brand); background: var(--status-processing-bg); }
 .pf-name { font-size: 15px; font-weight: 600; color: var(--text-primary); }
@@ -212,7 +212,7 @@ onMounted(() => { loadPlatforms(); });
 .spec-item { font-size: 12px; padding: 4px 10px; background: var(--bg-hover); border-radius: var(--radius-sm); color: var(--text-secondary); }
 
 .tmpl-grid-lg { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-.tmpl-card-lg { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; border: 2px solid var(--input-border); border-radius: var(--radius-lg); background: var(--bg-card); cursor: pointer; text-align: left; transition: all var(--transition-fast); }
+.tmpl-card-lg { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; border: 2px solid var(--input-border); border-radius: var(--radius-lg); background: var(--bg-card); cursor: pointer; text-align: left; transition: border-color var(--transition-fast); }
 .tmpl-card-lg:hover { border-color: var(--brand); }
 .tmpl-card-lg.active { border-color: var(--brand); background: var(--status-processing-bg); }
 .tmpl-header { display: flex; align-items: center; gap: 10px; }

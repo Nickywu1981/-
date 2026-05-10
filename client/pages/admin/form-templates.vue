@@ -117,7 +117,7 @@ tr:hover td { background: var(--table-row-hover); }
 .input:focus { border-color: var(--input-focus-border); box-shadow: var(--focus-ring); }
 .input:disabled { opacity: 0.6; cursor: not-allowed; }
 .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
-.btn-cancel { padding: 8px 20px; border: 1px solid var(--input-border); border-radius: var(--radius-sm); background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 13px; transition: all var(--transition-fast); }
+.btn-cancel { padding: 8px 20px; border: 1px solid var(--input-border); border-radius: var(--radius-sm); background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 13px; transition: border-color var(--transition-fast); }
 .btn-cancel:hover { border-color: var(--text-muted); }
 .btn-save { padding: 8px 20px; background: var(--brand); color: #fff; border: none; border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; transition: opacity var(--transition-fast); }
 .btn-save:hover { opacity: 0.9; }
