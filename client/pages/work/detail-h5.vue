@@ -232,7 +232,9 @@ async function submitTask() {
   } catch (e: any) { toast.error(e.data?.msg || '提交失败，请重试'); step.value = 2; }
 }
 
-function handleRedo() { task.reset(); step.value = 0; skuList.value = []; }
+function handleRedo() { task.reset(); step.value = 0; skuList.value.forEach(s => { if (s.previewUrl) URL.revokeObjectURL(s.previewUrl) }); skuList.value = []; }
+
+onUnmounted(() => { skuList.value.forEach(s => { if (s.previewUrl) URL.revokeObjectURL(s.previewUrl) }) });
 </script>
 
 <style scoped>

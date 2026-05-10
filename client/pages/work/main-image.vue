@@ -63,7 +63,7 @@
         <h3>生成完成 — 3张不同风格</h3>
         <div class="image-grid">
           <div v-for="img in task.result.value?.images" :key="img.id" class="result-card">
-            <div class="img-placeholder">{{ img.style }}</div>
+            <img loading="lazy" :src="img.url" :alt="img.style" class="result-img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
             <span class="img-label">{{ img.style }}</span>
             <button class="btn-sm">下载</button>
           </div>

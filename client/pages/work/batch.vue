@@ -268,9 +268,10 @@ async function submitTask() {
     step.value = 2;
   }
 }
-function handleRedo() { task.reset(); }
+function handleRedo() { task.reset(); previews.value.forEach(u => URL.revokeObjectURL(u)); previews.value = []; uploadedUrls.value = []; }
 
 onMounted(() => { loadTemplates(); loadHistory(); });
+onUnmounted(() => { previews.value.forEach(u => URL.revokeObjectURL(u)) });
 </script>
 
 <style scoped>

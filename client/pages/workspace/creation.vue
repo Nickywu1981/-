@@ -32,7 +32,11 @@
     </div>
 
     <!-- ═══ 当前标签下的工具卡片宫格 ═══ -->
-    <div class="wc-section">
+    <div v-if="loading" class="wc-loading">
+      <div class="spinner" />
+      <p>加载创作工具...</p>
+    </div>
+    <div v-else class="wc-section">
       <div class="wc-sec-hd">
         <h3 class="wc-sec-title">{{ activeTabLabel }} · 创作工具</h3>
         <button class="wc-sec-more">查看全部 →</button>
@@ -122,6 +126,7 @@ const toast = useToast()
 
 const prompt = ref('')
 const activeTab = ref('')
+const loading = ref(true)
 
 const tabs = ref<{ key: string; label: string }[]>([])
 const cardData = ref<Record<string, Card[]>>({})
@@ -155,6 +160,8 @@ onMounted(async () => {
     console.error('[创作页] 配置加载失败，使用默认卡片', e.message)
     tabs.value = defaultTabs
     cardData.value = defaultCardData
+  } finally {
+    loading.value = false
   }
   if (tabs.value.length > 0 && !activeTab.value) {
     activeTab.value = tabs.value[0].key
@@ -249,4 +256,8 @@ async function handleSubmit() {
 @media (max-width: 1000px) { .wc-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 700px) { .wc-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 480px) { .wc-grid { grid-template-columns: 1fr; } }
+
+.wc-loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 0; color: var(--tx2, #6b6b70); font-size: 13px; gap: 12px; }
+.spinner { width: 32px; height: 32px; border: 3px solid var(--brd, #ebebea); border-top-color: var(--tx, #171717); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
 </style>

@@ -117,8 +117,28 @@ async function poll() {
 }
 
 // 优雅退出
-process.on('SIGTERM', () => { running = false; logger.info('[Worker] SIGTERM received, shutting down...'); });
-process.on('SIGINT', () => { running = false; logger.info('[Worker] SIGINT received, shutting down...'); });
+process.on('SIGTERM', async () => {
+  logger.info('[Worker] SIGTERM received, shutting down...');
+  running = false;
+  await waitForJobs();
+  process.exit(0);
+});
+process.on('SIGINT', async () => {
+  logger.info('[Worker] SIGINT received, shutting down...');
+  running = false;
+  await waitForJobs();
+  process.exit(0);
+});
+
+async function waitForJobs() {
+  if (activeJobs <= 0) return;
+  logger.info(`[Worker] Waiting for ${activeJobs} in-flight job(s)...`);
+  await new Promise(resolve => {
+    const check = setInterval(() => {
+      if (activeJobs <= 0) { clearInterval(check); resolve(); }
+    }, 500);
+  });
+}
 
 // 定期扫描卡住任务（Worker 崩溃后残留 processing 状态）
 setInterval(async () => {

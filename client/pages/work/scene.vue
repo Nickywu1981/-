@@ -37,7 +37,7 @@
         <h3>生成完成 — 5张场景图</h3>
         <div class="image-grid-5">
           <div v-for="img in task.result.value?.images" :key="img.id" class="result-card">
-            <div class="img-placeholder" />
+            <img loading="lazy" :src="img.url" :alt="img.style || '场景图'" class="result-img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
             <button class="btn-sm">下载</button>
           </div>
         </div>
