@@ -110,7 +110,11 @@ async function fetch() {
       list.value = res.data || []
       total.value = list.value.length
     }
-  } catch (e: any) { /* 静默处理 - API 可能走 mock */ }
+  } catch (e: any) {
+    const { $toast } = useNuxtApp()
+    $toast?.warn('数据加载失败，请稍后再试')
+    logger.warn('[AdminCrudTable] fetch failed', { api: props.api, error: e.message })
+  }
   loading.value = false
 }
 

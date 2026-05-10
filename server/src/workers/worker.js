@@ -16,7 +16,8 @@ const BATCH_SIZE = parseInt(process.env.WORKER_BATCH_SIZE, 10) || 3;
 const MAX_CONCURRENT = parseInt(process.env.WORKER_MAX_CONCURRENT, 10) || 5;
 
 let running = true;
-let activeJobs = 0;
+const activeJobIds = new Set();
+
 
 // 任务类型 → AI模型映射
 // { model, action, endpoint?, apiKey? } — endpoint/apiKey 优先于默认 NewAPI 路由
@@ -52,7 +53,7 @@ function getApiKey() {
 }
 
 async function processJob(job) {
-  activeJobs++;
+  activeJobIds.add(job.id);
   try {
     await jobQueueService.updateProgress(job.id, 10);
 
@@ -94,14 +95,14 @@ async function processJob(job) {
     logger.error(`[Worker] Job #${job.id} failed: ${err.message}`);
     await jobQueueService.failJob(job.id, err.message);
   } finally {
-    activeJobs--;
+    activeJobIds.delete(job.id);
   }
 }
 
 async function poll() {
   while (running) {
     try {
-      const available = MAX_CONCURRENT - activeJobs;
+      const available = MAX_CONCURRENT - activeJobIds.size;
       if (available > 0) {
         const limit = Math.min(BATCH_SIZE, available);
         const jobs = await jobQueueService.fetchPending(limit);
@@ -131,11 +132,11 @@ process.on('SIGINT', async () => {
 });
 
 async function waitForJobs() {
-  if (activeJobs <= 0) return;
-  logger.info(`[Worker] Waiting for ${activeJobs} in-flight job(s)...`);
+  if (activeJobIds.size <= 0) return;
+  logger.info(`[Worker] Waiting for ${activeJobIds.size} in-flight job(s)...`);
   await new Promise(resolve => {
     const check = setInterval(() => {
-      if (activeJobs <= 0) { clearInterval(check); resolve(); }
+      if (activeJobIds.size <= 0) { clearInterval(check); resolve(); }
     }, 500);
   });
 }

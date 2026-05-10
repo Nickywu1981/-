@@ -151,11 +151,12 @@ export async function handleNotify(body) {
       title = '支付成功 — 会员已开通';
       content = plan
         ? `您已成功购买${plan.name}，获赠${plan.credits}积分，有效期${plan.days}天。`
-        : `您已成功开通会员，支付￥${(order.amount / 100).toFixed(2)}。`;
+        : `您已成功开通会员，支付￥${Number(order.amount).toFixed(2)}。`;
     } else {
-      const creditAmount = order.amount > 1000 ? Math.round(order.amount / 10) : order.amount;
+      // 充值: order.amount 为充值金额(元)，积分按充值金额 1:1
+      const creditAmount = Number(order.amount);
       title = '支付成功 — 积分已到账';
-      content = `您已成功充值${creditAmount}积分，支付￥${(order.amount / 100).toFixed(2)}。`;
+      content = `您已成功充值${creditAmount}积分，支付￥${creditAmount.toFixed(2)}。`;
     }
     await notificationService.sendNotification(order.user_id, { type: 'payment', title, content });
   } catch (e) { logger.warn('[Allinpay] 通知发送失败', { userId: order.user_id, error: e.message }); }
@@ -167,12 +168,17 @@ export async function handleNotify(body) {
 // ==================== 会员履约 (P0-4: 走 membershipDao) ====================
 
 async function fulfillMembership(order, conn) {
-  const plan = Object.values(PLANS).find(p => p.price === Number(order.amount));
-  if (!plan) { logger.warn('[Allinpay] 未匹配到会员套餐', { amount: order.amount }); return; }
+  // 按价格匹配套餐(金额为元: 29/69/199)，备选按 plan_type 字段
+  let planType = Number(order.plan_type) || 0;
+  let plan = PLANS[planType] || null;
+  if (!plan) {
+    plan = Object.values(PLANS).find(p => p.price === Number(order.amount));
+    if (plan) planType = Number(Object.keys(PLANS).find(k => PLANS[k].price === plan.price)) || 1;
+  }
+  if (!plan) { logger.warn('[Allinpay] 未匹配到会员套餐', { amount: order.amount, planType }); return; }
 
   const days = plan.days;
   const credits = plan.credits;
-  const planType = Number(Object.keys(PLANS).find(k => PLANS[k].price === plan.price)) || 1;
   const now = new Date();
   const endTime = new Date(now.getTime() + days * 86400000);
 

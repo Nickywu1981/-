@@ -15,18 +15,27 @@
 <script setup lang="ts">
 const toasts = ref<Array<{ id: number; msg: string; type: string; closable: boolean }>>([])
 let _id = 0
+const timers = new Map<number, ReturnType<typeof setTimeout>>()
 const iconMap: Record<string, string> = { success: '✅', error: '❌', warn: '⚠️', info: 'ℹ️' }
 
 function add(msg: string, type = 'info', duration = 3000, closable = true) {
   const id = ++_id
   toasts.value.push({ id, msg, type, closable })
-  if (duration > 0) setTimeout(() => remove(id), duration)
+  if (duration > 0) {
+    const timer = setTimeout(() => remove(id), duration)
+    timers.set(id, timer)
+  }
 }
-function remove(id: number) { toasts.value = toasts.value.filter(t => t.id !== id) }
+function remove(id: number) {
+  const timer = timers.get(id)
+  if (timer) { clearTimeout(timer); timers.delete(id) }
+  toasts.value = toasts.value.filter(t => t.id !== id)
+}
 
 const exposed = { success: (m: string) => add(m, 'success'), error: (m: string) => add(m, 'error', 5000), warn: (m: string) => add(m, 'warn', 4000), info: (m: string) => add(m, 'info') }
 defineExpose(exposed)
 onMounted(() => { (window as any).__toast = exposed })
+onUnmounted(() => { for (const timer of timers.values()) clearTimeout(timer); timers.clear() })
 </script>
 
 <style scoped>

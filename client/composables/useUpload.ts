@@ -10,7 +10,11 @@ export function useUpload(options?: { maxFiles?: number; acceptVideo?: boolean }
   const uploading = ref(false);
   const error = ref('');
 
+  const blobUrls: string[] = [];
+
   function reset() {
+    for (const url of blobUrls) URL.revokeObjectURL(url);
+    blobUrls.length = 0;
     previews.value = [];
     uploadedUrls.value = [];
     uploading.value = false;
@@ -43,7 +47,11 @@ export function useUpload(options?: { maxFiles?: number; acceptVideo?: boolean }
     }
 
     // 立即显示预览
-    for (const f of fileArr) previews.value.push(URL.createObjectURL(f));
+    for (const f of fileArr) {
+      const url = URL.createObjectURL(f);
+      blobUrls.push(url);
+      previews.value.push(url);
+    }
 
     // 上传到服务器
     uploading.value = true;
@@ -68,6 +76,11 @@ export function useUpload(options?: { maxFiles?: number; acceptVideo?: boolean }
   function handleDrop(e: DragEvent) {
     if (e.dataTransfer?.files?.length) handleFiles(e.dataTransfer.files);
   }
+
+  onUnmounted(() => {
+    for (const url of blobUrls) URL.revokeObjectURL(url);
+    blobUrls.length = 0;
+  });
 
   return {
     previews,

@@ -141,6 +141,7 @@ async function uploadFile(file: File) {
 }
 
 function clearImage() {
+  if (previewUrl.value) URL.revokeObjectURL(previewUrl.value);
   previewUrl.value = ''
   uploadedUrl.value = ''
   uploadErr.value = ''
