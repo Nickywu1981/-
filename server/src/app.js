@@ -82,7 +82,7 @@ import voiceRoutesV4 from './route/v4_voice.routes.js';
 import { adminRouter as siteConfigAdminRouter, publicRouter as siteConfigPublicRouter } from './route/siteConfigRoutes.js';
 import adminWorkspaceDiyRoutes from './route/adminWorkspaceDiyRoutes.js';
 import tenantContext from './middleware/tenantContext.js';
-import { metricsMiddleware, metricsEndpoint } from './middleware/metrics.js';
+import { optionalAuth } from './middleware/auth.js';
 import { setCsrfCookie, csrfProtection } from './middleware/csrf.js';
 import cspMiddleware from './middleware/csp.js';
 import openApiRoutes from './route/openApiRoutes.js';
@@ -158,7 +158,8 @@ import('./middleware/cache.js').then(({ invalidateCache }) => {
 }).catch(() => { /* cache middleware unavailable — cache invalidation disabled */ });
 
 // 健康检查 — DB 必须在线，Redis 离线仅标记 degraded，同步检测 AI 模型状态
-app.get('/api/health', async (_req, res) => {
+app.get('/api/health', optionalAuth, async (req, res) => {
+  if (!req.user) return success(res, { status: 'ok' }, 'ok');
   const status = {
     status: 'ok',
     uptime: Math.floor(process.uptime()),
