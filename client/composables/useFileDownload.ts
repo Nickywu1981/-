@@ -7,6 +7,7 @@
  */
 export function useFileDownload() {
   function trigger(url: string, filename: string) {
+    if (!import.meta.client) return
     const a = document.createElement('a')
     a.href = url
     a.download = filename || ''

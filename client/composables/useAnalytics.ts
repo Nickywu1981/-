@@ -34,7 +34,7 @@ export function useAnalytics() {
       if (oldest) lastPageTrack.delete(oldest[0]);
     }
     lastPageTrack.set(path, now);
-    track('page_view', { path, title: document.title });
+    track('page_view', { path, title: import.meta.client ? document.title : '' });
   }
 
   // 工具使用快捷方法

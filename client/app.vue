@@ -3,7 +3,7 @@
     <span class="app-error-icon">⚠️</span>
     <h2 class="app-error-title">页面加载异常</h2>
     <p class="app-error-desc">{{ appError }}</p>
-    <button class="eb-btn eb-btn-primary" @click="appError = ''; window.location.reload()">重新加载</button>
+    <button class="eb-btn eb-btn-primary" @click="reloadPage">重新加载</button>
   </div>
   <template v-else>
     <NuxtLayout>
@@ -31,6 +31,11 @@ onErrorCaptured((err) => {
   appError.value = err?.message || '未知错误'
   return false
 })
+
+function reloadPage() {
+  appError.value = ''
+  if (import.meta.client) window.location.reload()
+}
 </script>
 
 <style scoped>

@@ -5,7 +5,11 @@
  * - X-Frame-Options: DENY
  * - Referrer-Policy: strict-origin-when-cross-origin
  */
-export default function cspMiddleware(_req, res, next) {
+export default function cspMiddleware(req, res, next) {
+  // Strict-Transport-Security (仅 HTTPS)
+  if (req.secure || req.headers['x-forwarded-proto'] === 'https') {
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  }
   // Content-Security-Policy
   res.setHeader(
     'Content-Security-Policy',

@@ -117,6 +117,7 @@
   --modal-radius: 16px;
   --modal-shadow: 0 20px 60px rgba(15, 18, 30, 0.12);
   --modal-padding: 28px;
+  --z-modal: 5000;
   --badge-radius: 4px;
   --badge-font-size: 11px;
   --toolbar-gap: 8px;
@@ -240,6 +241,7 @@
   --input-placeholder: #5d6380;
   --modal-overlay: rgba(0, 0, 0, 0.7);
   --modal-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  --z-modal: 5000;
 
   --status-pending-bg: #3d2e00;
   --status-pending-text: #fbbf24;

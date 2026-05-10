@@ -73,3 +73,10 @@ input, textarea, select {
    Utility Classes
    ================================================ */
 .w-full { width: 100%; }
+
+/* 全局模态遮罩（替代 27 个页面中的重复 .modal-overlay 定义） */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: var(--z-modal);
+  background: var(--modal-overlay); display: flex;
+  align-items: center; justify-content: center;
+}
