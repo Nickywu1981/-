@@ -8,6 +8,7 @@ import * as commerceDao from '../dao/commerceDao.js';
 import { mockEnabled } from '../config/index.js';
 import { BusinessError } from '../utils/businessError.js';
 import { PLAN_TYPE } from '../constants/domainStatus.js';
+import db from '../dao/db.js';
 
 // ==================== 套餐列表 ====================
 
@@ -21,45 +22,55 @@ export async function purchasePlan(userId, planType) {
   const plan = await creditDao.getPlanByType(planType);
   if (!plan || !plan.status) throw new BusinessError(400, '套餐不存在或已下架');
 
-  const membership = await creditDao.getMembership(userId);
-  const now = new Date();
-  let endTime;
+  const conn = await db.getConnection();
+  try {
+    await conn.beginTransaction();
 
-  switch (planType) {
-    case 1: endTime = new Date(now.getTime() + 30 * 86400000); break;  // 月卡+30天
-    case 2: endTime = new Date(now.getTime() + 90 * 86400000); break;  // 季卡+90天
-    case 3: endTime = new Date(now.getTime() + 365 * 86400000); break; // 年卡+365天
-    default: endTime = null;
-  }
+    const membership = await creditDao.getMembershipForUpdate(conn, userId);
+    const now = new Date();
+    let endTime;
 
-  // 更新会员
-  if (membership && membership.plan_type !== PLAN_TYPE.FREE) {
-    const currentEnd = new Date(membership.end_time);
-    if (currentEnd > now) {
-      endTime = new Date(currentEnd.getTime() + (endTime.getTime() - now.getTime()));
+    switch (planType) {
+      case 1: endTime = new Date(now.getTime() + 30 * 86400000); break;
+      case 2: endTime = new Date(now.getTime() + 90 * 86400000); break;
+      case 3: endTime = new Date(now.getTime() + 365 * 86400000); break;
+      default: endTime = null;
     }
-    await commerceDao.renewMembership(userId, planType, endTime);
-  } else {
-    await commerceDao.updateMembership(userId, planType, plan.credits, endTime);
+
+    if (membership && membership.plan_type !== PLAN_TYPE.FREE) {
+      const currentEnd = new Date(membership.end_time);
+      if (currentEnd > now) {
+        endTime = new Date(currentEnd.getTime() + (endTime.getTime() - now.getTime()));
+      }
+      await commerceDao.renewMembership(userId, planType, endTime);
+    } else {
+      await commerceDao.updateMembership(userId, planType, plan.credits, endTime);
+    }
+
+    await creditDao.insertConsumptionLog({
+      userId, type: 3,
+      action: `purchase_plan_${planType}`,
+      creditBefore: membership?.credit_balance || 0,
+      creditAfter: (membership?.credit_balance || 0) + plan.credits,
+      consumed: -plan.credits,
+      remark: `购买${plan.name} ¥${plan.price}`,
+    }, conn);
+
+    await conn.commit();
+
+    return {
+      planType,
+      planName: plan.name,
+      price: plan.price,
+      creditsAdded: plan.credits,
+      endTime: endTime?.toISOString(),
+    };
+  } catch (err) {
+    await conn.rollback();
+    throw err;
+  } finally {
+    conn.release();
   }
-
-  // 记录购买账单
-  await creditDao.insertConsumptionLog({
-    userId, type: 3,
-    action: `purchase_plan_${planType}`,
-    creditBefore: membership?.credit_balance || 0,
-    creditAfter: (membership?.credit_balance || 0) + plan.credits,
-    consumed: -plan.credits,
-    remark: `购买${plan.name} ¥${plan.price}`,
-  });
-
-  return {
-    planType,
-    planName: plan.name,
-    price: plan.price,
-    creditsAdded: plan.credits,
-    endTime: endTime?.toISOString(),
-  };
 }
 
 // ==================== 账单记录 ====================

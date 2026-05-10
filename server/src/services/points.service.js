@@ -201,19 +201,50 @@ export async function awardPointsForTask(userId, taskType, taskId) {
   const points = POINT_RULES[taskType] || 0;
   if (points <= 0) return null;
 
-  // 防重：同一任务只奖励一次
+  // 防重：同一任务只奖励一次 — 检查+写入在同一事务中
   const conn = await db.getConnection();
   try {
+    await conn.beginTransaction();
+
     const [existing] = await conn.query(
-      'SELECT id FROM points_transaction WHERE user_id = ? AND business_type = ? AND business_id = ?',
+      'SELECT id FROM points_transaction WHERE user_id = ? AND business_type = ? AND business_id = ? FOR UPDATE',
       [userId, taskType, taskId],
     );
-    if (existing.length > 0) return null; // 已奖励
+    if (existing.length > 0) {
+      await conn.rollback();
+      return null; // 已奖励
+    }
+
+    const account = await getOrCreateAccount(conn, userId);
+
+    // 乐观锁更新
+    const [result] = await conn.query(
+      `UPDATE points_account SET balance = balance + ?, total_earned = total_earned + ?, version = version + 1
+       WHERE user_id = ? AND version = ?`,
+      [points, points, userId, account.version],
+    );
+    if (result.affectedRows === 0) {
+      await conn.rollback();
+      throw new BusinessError(409, '积分更新冲突，请重试');
+    }
+
+    const newBalance = account.balance + points;
+
+    // 记录流水
+    await conn.query(
+      `INSERT INTO points_transaction (user_id, trans_type, amount, balance_after, business_type, business_id, remark)
+       VALUES (?, 'earn', ?, ?, ?, ?, ?)`,
+      [userId, points, newBalance, taskType, taskId, `完成${taskType}任务`],
+    );
+
+    await conn.commit();
+    return { user_id: userId, balance: newBalance, earned: points };
+  } catch (err) {
+    await conn.rollback();
+    throw err;
   } finally {
     conn.release();
   }
-
-  return earnPoints(userId, { amount: points, businessType: taskType, businessId: taskId, remark: `完成${taskType}任务` });
 }
 
 export { POINT_RULES };

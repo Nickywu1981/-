@@ -81,7 +81,6 @@ const PUBLIC_PREFIXES = [
   '/api/allinpay/notify',
   '/api/plans',
   '/api/badges',
-  '/api/platforms',
   '/api/compliance',
   '/api/multilingual',
   '/api/size-templates',
@@ -167,7 +166,9 @@ export async function authMiddleware(req, res, next) {
 // ========================= 可选认证 =========================
 
 export async function optionalAuth(req, _res, next) {
-  const { payload } = await parseToken(req.headers.authorization);
+  const tokenFromCookie = req.cookies?.token;
+  const header = tokenFromCookie ? `Bearer ${tokenFromCookie}` : req.headers.authorization;
+  const { payload } = await parseToken(header);
   if (payload) {
     req.user = payload;
     req.tenantId = payload.tenantId || 0;

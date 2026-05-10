@@ -241,38 +241,50 @@ const CHECK_IN_REWARDS = { 1: 2, 2: 2, 3: 3, 4: 3, 5: 5, 6: 5, 7: 8 };
 export async function checkIn(userId) {
   const today = new Date().toISOString().slice(0, 10);
 
-  const todayRow = await creditDao.getCheckInByDate(userId, today);
-  if (todayRow) {
-    throw new BusinessError(409, '今日已签到');
-  }
+  const conn = await db.getConnection();
+  try {
+    await conn.beginTransaction();
 
-  const prevRow = await creditDao.getLastCheckIn(userId);
-  let streak = 1;
-  if (prevRow) {
-    const prevDate = new Date(prevRow.check_date);
-    const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1);
-    if (prevDate.toISOString().slice(0, 10) === yesterday.toISOString().slice(0, 10)) {
-      streak = prevRow.streak + 1;
+    const todayRow = await creditDao.getCheckInByDate(userId, today, conn);
+    if (todayRow) {
+      await conn.rollback();
+      throw new BusinessError(409, '今日已签到');
     }
+
+    const prevRow = await creditDao.getLastCheckIn(userId);
+    let streak = 1;
+    if (prevRow) {
+      const prevDate = new Date(prevRow.check_date);
+      const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1);
+      if (prevDate.toISOString().slice(0, 10) === yesterday.toISOString().slice(0, 10)) {
+        streak = prevRow.streak + 1;
+      }
+    }
+    if (streak > 7) streak = 1;
+
+    const reward = CHECK_IN_REWARDS[streak] || 2;
+
+    await creditDao.insertCheckIn(userId, today, streak, reward, conn);
+
+    const membership = await creditDao.getMembershipForUpdate(conn, userId);
+    if (membership) {
+      const creditBefore = membership.credit_balance;
+      await creditDao.updateCreditBalance(userId, reward, conn);
+      await creditDao.insertConsumptionLog({
+        userId, type: 1, action: 'daily_checkin',
+        creditBefore, creditAfter: creditBefore + reward,
+        consumed: -reward, remark: `签到第${streak}天`, taskId: '', status: 1,
+      }, conn);
+    }
+
+    await conn.commit();
+    return { streak, reward, today };
+  } catch (err) {
+    await conn.rollback();
+    throw err;
+  } finally {
+    conn.release();
   }
-  if (streak > 7) streak = 1;
-
-  const reward = CHECK_IN_REWARDS[streak] || 2;
-
-  await creditDao.insertCheckIn(userId, today, streak, reward);
-
-  const membership = await creditDao.getMembership(userId);
-  if (membership) {
-    const creditBefore = membership.credit_balance;
-    await creditDao.updateCreditBalance(userId, reward);
-    await creditDao.insertConsumptionLog({
-      userId, type: 1, action: 'daily_checkin',
-      creditBefore, creditAfter: creditBefore + reward,
-      consumed: -reward, remark: `签到第${streak}天`, taskId: '', status: 1,
-    });
-  }
-
-  return { streak, reward, today };
 }
 
 export async function getCheckInStatus(userId) {
@@ -297,37 +309,74 @@ const INVITE_REWARD = 10;
 
 export async function shareReward(userId) {
   const today = new Date().toISOString().slice(0, 10);
-  const record = await creditDao.getActionRecordToday(userId, 'share_reward', today);
-  if (record) return { alreadyClaimed: true };
 
-  const membership = await creditDao.getMembership(userId);
-  if (!membership) throw new BusinessError(404, '会员不存在');
+  const conn = await db.getConnection();
+  try {
+    await conn.beginTransaction();
 
-  const creditBefore = membership.credit_balance;
-  await creditDao.updateCreditBalance(userId, SHARE_REWARD);
-  await creditDao.insertConsumptionLog({
-    userId, type: 1, action: 'share_reward',
-    creditBefore, creditAfter: creditBefore + SHARE_REWARD,
-    consumed: -SHARE_REWARD, remark: '分享奖励', taskId: '', status: 1,
-  });
-  return { reward: SHARE_REWARD, creditBefore, creditAfter: creditBefore + SHARE_REWARD };
+    const record = await creditDao.getActionRecordToday(userId, 'share_reward', today, conn);
+    if (record) {
+      await conn.rollback();
+      return { alreadyClaimed: true };
+    }
+
+    const membership = await creditDao.getMembershipForUpdate(conn, userId);
+    if (!membership) {
+      await conn.rollback();
+      throw new BusinessError(404, '会员不存在');
+    }
+
+    const creditBefore = membership.credit_balance;
+    await creditDao.updateCreditBalance(userId, SHARE_REWARD, conn);
+    await creditDao.insertConsumptionLog({
+      userId, type: 1, action: 'share_reward',
+      creditBefore, creditAfter: creditBefore + SHARE_REWARD,
+      consumed: -SHARE_REWARD, remark: '分享奖励', taskId: '', status: 1,
+    }, conn);
+
+    await conn.commit();
+    return { reward: SHARE_REWARD, creditBefore, creditAfter: creditBefore + SHARE_REWARD };
+  } catch (err) {
+    await conn.rollback();
+    throw err;
+  } finally {
+    conn.release();
+  }
 }
 
 export async function inviteReward(inviterId, invitedUserId) {
-  const record = await creditDao.getInviteRewardRecord(inviterId, invitedUserId);
-  if (record) return { alreadyClaimed: true };
+  const conn = await db.getConnection();
+  try {
+    await conn.beginTransaction();
 
-  const membership = await creditDao.getMembership(inviterId);
-  if (!membership) return { error: 'inviter not found' };
+    const record = await creditDao.getInviteRewardRecord(inviterId, invitedUserId, conn);
+    if (record) {
+      await conn.rollback();
+      return { alreadyClaimed: true };
+    }
 
-  const creditBefore = membership.credit_balance;
-  await creditDao.updateCreditBalance(inviterId, INVITE_REWARD);
-  await creditDao.insertConsumptionLog({
-    userId: inviterId, type: 1, action: 'invite_reward',
-    creditBefore, creditAfter: creditBefore + INVITE_REWARD,
-    consumed: -INVITE_REWARD, remark: `invited:${invitedUserId}`, taskId: '', status: 1,
-  });
-  return { reward: INVITE_REWARD, inviterId, invitedUserId };
+    const membership = await creditDao.getMembershipForUpdate(conn, inviterId);
+    if (!membership) {
+      await conn.rollback();
+      return { error: 'inviter not found' };
+    }
+
+    const creditBefore = membership.credit_balance;
+    await creditDao.updateCreditBalance(inviterId, INVITE_REWARD, conn);
+    await creditDao.insertConsumptionLog({
+      userId: inviterId, type: 1, action: 'invite_reward',
+      creditBefore, creditAfter: creditBefore + INVITE_REWARD,
+      consumed: -INVITE_REWARD, remark: `invited:${invitedUserId}`, taskId: '', status: 1,
+    }, conn);
+
+    await conn.commit();
+    return { reward: INVITE_REWARD, inviterId, invitedUserId };
+  } catch (err) {
+    await conn.rollback();
+    throw err;
+  } finally {
+    conn.release();
+  }
 }
 
 // ==================== 每日自动赠送 ====================

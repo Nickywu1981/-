@@ -115,7 +115,7 @@ const app = express();
 // 基础安全中间件
 app.use(helmet());
 app.use(cspMiddleware);
-app.use(cors({ credentials: true, origin: true }));
+app.use(cors({ credentials: true, origin: process.env.CORS_ORIGIN || (process.env.NODE_ENV === 'production' ? 'https://movio.ai' : true) }));
 
 // 响应压缩
 app.use(compression());
@@ -180,6 +180,9 @@ app.get('/api/metrics', metricsEndpoint);
 // 内部 Embedding 端点（仅 localhost，脚本调用）
 const embedSchema = z.object({ texts: z.array(z.string().min(1).max(8000)).min(1).max(100) });
 app.post('/api/internal/embed', async (req, res) => {
+  if (req.ip !== '127.0.0.1' && req.ip !== '::1' && req.ip !== '::ffff:127.0.0.1') {
+    return sendError(res, ERROR_CODE.FORBIDDEN, '仅限内部调用');
+  }
   try {
     const parsed = embedSchema.safeParse(req.body);
     if (!parsed.success) return sendError(res, ERROR_CODE.BAD_REQUEST, parsed.error.errors[0]?.message || '参数校验失败');
@@ -267,7 +270,7 @@ app.use('/api/voice', heavyLimiter, voiceRoutesV4);
 app.use('/api/3d', heavyLimiter, d3RoutesV4);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/sms', codeLimiter, smsRoutes);
-app.use('/api/email', emailRoutes);
+app.use('/api/email', codeLimiter, emailRoutes);
 app.use('/api/upload', uploadLimiter, uploadRoutes);
 app.use('/api/prompts', promptRoutes);
 app.use('/api/credits', creditRoutes);

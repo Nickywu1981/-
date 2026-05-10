@@ -25,7 +25,7 @@ const generateSchema = z.object({
 
 router.post('/generate',
   _validate(generateSchema),
-  contentModerationMiddleware,
+  contentModerationMiddleware('input'),
   async (req, res) => {
     try {
       const job = await posterService.generatePoster(req.userId, req.validated);

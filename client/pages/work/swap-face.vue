@@ -11,7 +11,7 @@
           <input ref="fileInput" type="file" accept="image/*" hidden @change="handleFile" />
           <button class="btn-outline-sm" @click="($refs.fileInput as HTMLInputElement)?.click()">选择底图</button>
         </template>
-        <img loading="lazy" v-else :src="previewUrl" alt="preview" class="preview-img" />
+        <img loading="lazy" v-else :src="previewUrl" alt="preview" class="preview-img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
       </div>
       <p v-if="uploading" class="upload-status"><span class="spinner-sm" /> 上传中...</p>
       <button v-if="uploadedUrl" class="btn-primary" @click="step = 1">下一步：上传目标人脸 →</button>
@@ -28,7 +28,7 @@
           <input ref="faceInput" type="file" accept="image/*" hidden @change="handleFaceFile" />
           <button class="btn-outline-sm" @click="($refs.faceInput as HTMLInputElement)?.click()">选择人脸</button>
         </template>
-        <img loading="lazy" v-else :src="facePreviewUrl" alt="face" class="preview-img" />
+        <img loading="lazy" v-else :src="facePreviewUrl" alt="face" class="preview-img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
       </div>
       <div class="cost-badge"><span class="cost-icon">⚡</span> 成本：8 积分/次</div>
       <div class="actions">
@@ -46,11 +46,11 @@
       </div>
       <div v-if="resultUrl && !processing" class="result-display">
         <div class="compare-row">
-          <div class="compare-item"><p class="compare-label">原底图</p><img loading="lazy" :src="previewUrl" alt="original" /></div>
+          <div class="compare-item"><p class="compare-label">原底图</p><img loading="lazy" :src="previewUrl" alt="original" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" /></div>
           <span class="compare-arrow">+</span>
-          <div class="compare-item"><p class="compare-label">目标人脸</p><img loading="lazy" :src="facePreviewUrl" alt="face" /></div>
+          <div class="compare-item"><p class="compare-label">目标人脸</p><img loading="lazy" :src="facePreviewUrl" alt="face" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" /></div>
           <span class="compare-arrow">→</span>
-          <div class="compare-item"><p class="compare-label">换脸结果</p><img loading="lazy" :src="resultUrl" alt="result" /></div>
+          <div class="compare-item"><p class="compare-label">换脸结果</p><img loading="lazy" :src="resultUrl" alt="result" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" /></div>
         </div>
         <div class="result-actions">
           <button class="btn-primary" @click="downloadImage">下载图片</button>
@@ -71,7 +71,11 @@ const processing = ref(false); const resultUrl = ref('')
 const toast = useToast()
 async function handleFile(e: Event) {
   const file = (e.target as HTMLInputElement).files?.[0]
-  if (!file) return; previewUrl.value = URL.createObjectURL(file); uploading.value = true
+  if (!file) return
+  const oldUrl = previewUrl.value
+  previewUrl.value = URL.createObjectURL(file)
+  if (oldUrl) URL.revokeObjectURL(oldUrl)
+  uploading.value = true
   try {
     const fd = new FormData(); fd.append('file', file)
     const res: any = await $fetch('/api/upload/image', { method: 'POST', body: fd })
@@ -83,7 +87,10 @@ async function handleFile(e: Event) {
 }
 async function handleFaceFile(e: Event) {
   const file = (e.target as HTMLInputElement).files?.[0]
-  if (!file) return; facePreviewUrl.value = URL.createObjectURL(file)
+  if (!file) return
+  const oldUrl = facePreviewUrl.value
+  facePreviewUrl.value = URL.createObjectURL(file)
+  if (oldUrl) URL.revokeObjectURL(oldUrl)
   try {
     const fd = new FormData(); fd.append('file', file)
     const res: any = await $fetch('/api/upload/image', { method: 'POST', body: fd })
@@ -93,8 +100,39 @@ async function handleFaceFile(e: Event) {
     facePreviewUrl.value = ''
   }
 }
-function handleDrop(e: DragEvent) { e.preventDefault(); if (e.dataTransfer?.files[0]) previewUrl.value = URL.createObjectURL(e.dataTransfer.files[0]) }
-function handleFaceDrop(e: DragEvent) { e.preventDefault(); if (e.dataTransfer?.files[0]) facePreviewUrl.value = URL.createObjectURL(e.dataTransfer.files[0]) }
+async function handleDrop(e: DragEvent) {
+  e.preventDefault()
+  const file = e.dataTransfer?.files?.[0]
+  if (!file) return
+  const oldUrl = previewUrl.value
+  previewUrl.value = URL.createObjectURL(file)
+  if (oldUrl) URL.revokeObjectURL(oldUrl)
+  uploading.value = true
+  try {
+    const fd = new FormData(); fd.append('file', file)
+    const res: any = await $fetch('/api/upload/image', { method: 'POST', body: fd })
+    uploadedUrl.value = res.data?.url || res.url
+  } catch (err: any) {
+    toast.error(err?.data?.msg || err?.message || '上传失败')
+    previewUrl.value = ''
+  } finally { uploading.value = false }
+}
+async function handleFaceDrop(e: DragEvent) {
+  e.preventDefault()
+  const file = e.dataTransfer?.files?.[0]
+  if (!file) return
+  const oldUrl = facePreviewUrl.value
+  facePreviewUrl.value = URL.createObjectURL(file)
+  if (oldUrl) URL.revokeObjectURL(oldUrl)
+  try {
+    const fd = new FormData(); fd.append('file', file)
+    const res: any = await $fetch('/api/upload/image', { method: 'POST', body: fd })
+    faceUploadedUrl.value = res.data?.url || res.url
+  } catch (err: any) {
+    toast.error(err?.data?.msg || err?.message || '上传失败')
+    facePreviewUrl.value = ''
+  }
+}
 async function submitTask() {
   processing.value = true; step.value = 2
   try {
@@ -107,6 +145,11 @@ async function submitTask() {
 }
 function downloadImage() { if (resultUrl.value) { const a = document.createElement('a'); a.href = resultUrl.value; a.download = 'swap-face.png'; a.click() } }
 function resetAll() { step.value = 0; previewUrl.value = ''; uploadedUrl.value = ''; facePreviewUrl.value = ''; faceUploadedUrl.value = ''; resultUrl.value = ''; processing.value = false }
+
+onBeforeUnmount(() => {
+  if (previewUrl.value) URL.revokeObjectURL(previewUrl.value)
+  if (facePreviewUrl.value) URL.revokeObjectURL(facePreviewUrl.value)
+})
 </script>
 
 <style scoped>
