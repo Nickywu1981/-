@@ -234,7 +234,7 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads'), {
 // v4.1 路由 (2026-05-08)
 // v4.1 路由 (2026-05-08) — 认证限流 10次/分钟
 app.use('/api/auth', authLimiter, authRoutes);
-app.use('/api/config', configPublicRouter);
+app.use('/api/config', apiLimiter, configPublicRouter);
 app.use('/api/admin/config', configAdminRouter);
 app.use('/api/images', heavyLimiter, imageRoutesV4);
 app.use('/api/ai', (req, res, next) => {

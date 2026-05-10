@@ -249,7 +249,10 @@ export async function autoMode(taskType, input, options = {}) {
   });
 
   const secondaryPromises = ranking.ranked.slice(1, 3).map((r) =>
-    infer(r.modelId, input, { skipCache: true }).catch(() => null),
+    infer(r.modelId, input, { skipCache: true }).catch((err) => {
+      logger.warn('Secondary model infer failed', { modelId: r.modelId, error: err.message });
+      return null;
+    }),
   );
   const secondaryResults = (await Promise.all(secondaryPromises)).filter(Boolean);
 

@@ -6,6 +6,7 @@
  */
 import { Router } from 'express';
 import { z } from 'zod';
+import logger from '../utils/logger.js';
 import { success, error } from '../utils/response.js';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
@@ -82,6 +83,7 @@ router.get('/works', async (req, res) => {
     const rows = await translateService.getUserTranslateHistory(req.user.id, { type, page: +page || 1, limit: +limit || 20 });
     return success(res, rows);
   } catch (__) {
+    logger.error('获取翻译历史失败', __);
     return error(res, ERROR_CODE.INTERNAL_ERROR, '获取翻译历史失败');
   }
 });

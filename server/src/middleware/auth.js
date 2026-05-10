@@ -95,6 +95,7 @@ const PUBLIC_PREFIXES = [
   '/api/seo-keywords', '/api/fab/templates', '/api/memory/status',
   '/api/adk/',
   '/api/sdk/',
+  '/api/geo',
   '/uploads',
 ];
 
