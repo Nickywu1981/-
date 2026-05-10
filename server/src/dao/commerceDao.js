@@ -259,8 +259,10 @@ export async function rejectTask(taskId) {
 
 // ==================== 套餐管理 ====================
 
+const PLAN_COLS = 'id, plan_type, name, price, original_price, credits, daily_credits, save_days, watermark_free, hd_export, brand_kit, batch_limit, priority_queue, status, sort_order, create_time, update_time';
+
 export async function listAllPlans() {
-  const [rows] = await pool.execute('SELECT * FROM membership_plan ORDER BY sort_order, id');
+  const [rows] = await pool.execute(`SELECT ${PLAN_COLS} FROM membership_plan ORDER BY sort_order, id`);
   return rows;
 }
 
@@ -288,7 +290,7 @@ export async function updatePlan(planId, data) {
   if (sets.length === 0) return null;
   params.push(planId);
   await pool.execute(`UPDATE membership_plan SET ${sets.join(', ')}, update_time = NOW() WHERE id = ?`, params);
-  const [rows] = await pool.execute('SELECT * FROM membership_plan WHERE id = ?', [planId]);
+  const [rows] = await pool.execute(`SELECT ${PLAN_COLS} FROM membership_plan WHERE id = ?`, [planId]);
   return rows[0] || null;
 }
 

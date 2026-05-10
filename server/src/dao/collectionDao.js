@@ -1,14 +1,16 @@
 import db from './db.js';
 
+const COLS = 'id, user_id, name, description, cover_url, is_public, sort_order, created_at, updated_at';
+
 export async function listByUser(userId, { page = 1, size = 20 }) {
   const offset = (page - 1) * size;
-  const [rows] = await db.query('SELECT * FROM user_collections WHERE user_id = ? ORDER BY updated_at DESC LIMIT ? OFFSET ?', [userId, size, offset]);
+  const [rows] = await db.query(`SELECT ${COLS} FROM user_collections WHERE user_id = ? ORDER BY updated_at DESC LIMIT ? OFFSET ?`, [userId, size, offset]);
   const [[{ total }]] = await db.query('SELECT COUNT(*) as total FROM user_collections WHERE user_id = ?', [userId]);
   return { list: rows, total };
 }
 
 export async function getById(id) {
-  const [rows] = await db.query('SELECT * FROM user_collections WHERE id = ?', [id]);
+  const [rows] = await db.query(`SELECT ${COLS} FROM user_collections WHERE id = ?`, [id]);
   return rows[0] || null;
 }
 

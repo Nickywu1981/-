@@ -1,5 +1,7 @@
 import pool from './db.js';
 
+const TASK_COLS = 'id, tenant_id, user_id, account_id, task_type, task_config, status, start_time, end_time, result_json, screenshot_url, error_msg, create_time, update_time';
+
 export default {
   async listTasks(userId, tenantId, limit = 50) {
     const [rows] = await pool.query(
@@ -10,7 +12,7 @@ export default {
   },
 
   async getTaskById(id) {
-    const [rows] = await pool.query('SELECT * FROM automation_task WHERE id = ?', [id]);
+    const [rows] = await pool.query(`SELECT ${TASK_COLS} FROM automation_task WHERE id = ?`, [id]);
     return rows[0] || null;
   },
 
@@ -58,7 +60,7 @@ export default {
 
   // Admin: list all
   async listAllTasks(limit = 200) {
-    const [rows] = await pool.query('SELECT * FROM automation_task ORDER BY create_time DESC LIMIT ?', [limit]);
+    const [rows] = await pool.query(`SELECT ${TASK_COLS} FROM automation_task ORDER BY create_time DESC LIMIT ?`, [limit]);
     return rows;
   },
 };
