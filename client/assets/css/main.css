@@ -80,3 +80,11 @@ input, textarea, select {
   background: var(--modal-overlay); display: flex;
   align-items: center; justify-content: center;
 }
+
+/* 全局 Toast 消息（替代 plans/sms-templates/email-templates 中的重复定义） */
+.toast-msg {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  padding: 10px 24px; background: var(--bg-tooltip); color: var(--text-primary);
+  border-radius: var(--radius-md); font-size: 13px;
+  box-shadow: var(--shadow-lg); z-index: 2000; animation: var(--slide-up);
+}

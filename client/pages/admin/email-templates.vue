@@ -229,5 +229,4 @@ onBeforeUnmount(() => { if (msgTimer) { clearTimeout(msgTimer); msgTimer = null;
 .btn-confirm:hover { opacity: 0.9; }
 .btn-confirm:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn-danger { background: var(--danger); }
-.toast-msg { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); padding: 10px 24px; background: var(--bg-tooltip); color: var(--text-primary); border-radius: var(--radius-md); font-size: 13px; box-shadow: var(--shadow-lg); z-index: 2000; animation: var(--slide-up); }
 </style>

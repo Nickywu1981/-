@@ -10,6 +10,7 @@
  * @param {string} [msg='success']
  */
 export function success(res, data = {}, msg = 'success') {
+  res.setHeader('Cache-Control', 'private, no-store');
   return res.json({ code: 200, msg, data });
 }
 
@@ -20,6 +21,7 @@ export function success(res, data = {}, msg = 'success') {
  * @param {string} [msg='success']
  */
 export function listResult(res, result, msg = 'success') {
+  res.setHeader('Cache-Control', 'private, no-store');
   return res.json({
     code: 200,
     msg,
@@ -40,6 +42,7 @@ export function listResult(res, result, msg = 'success') {
  * @param {object|null} [data=null]
  */
 export function error(res, code = 500, msg = '服务异常', data = null) {
+  res.setHeader('Cache-Control', 'private, no-store');
   // 仅 HTTP 状态码范围内(100-599)的 code 才设 res.status；业务错误码如 4201 保持 HTTP 200
   if (code >= 100 && code < 600) {
     res.status(code);
