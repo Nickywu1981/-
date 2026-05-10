@@ -73,7 +73,8 @@ async function request<T = any>(
       credentials: 'include',
       onResponseError({ response }) {
         if (response.status === 401) {
-          navigateTo('/login');
+          // 防抖: 避免并发请求同时触发多次 navigateTo
+          if (window.location.pathname !== '/login') navigateTo('/login');
         }
       },
     });

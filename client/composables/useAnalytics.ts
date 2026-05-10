@@ -22,13 +22,17 @@ export function useAnalytics() {
     }
   }
 
-  // 页面浏览自动上报（去重：同路径5秒内不重复报）
+  // 页面浏览自动上报（去重：同路径5秒内不重复报，最多保留100条防内存泄漏）
   const lastPageTrack = new Map<string, number>();
   function trackPageView() {
     const path = route.path;
     const now = Date.now();
     const last = lastPageTrack.get(path) || 0;
     if (now - last < 5000) return;
+    if (lastPageTrack.size > 100) {
+      const oldest = [...lastPageTrack.entries()].sort((a, b) => a[1] - b[1])[0];
+      if (oldest) lastPageTrack.delete(oldest[0]);
+    }
     lastPageTrack.set(path, now);
     track('page_view', { path, title: document.title });
   }

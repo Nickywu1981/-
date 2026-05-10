@@ -91,6 +91,11 @@ function toggle() {
   }
 }
 
+// 面板打开时同步父组件更新
+watch(() => props.modelValue, (val) => {
+  if (open.value && !applied.value) draft.value = val
+})
+
 async function run() {
   enhancing.value = true
   try {
