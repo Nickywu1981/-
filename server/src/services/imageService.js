@@ -351,7 +351,7 @@ async function processWhiteBg(taskId, userId, params) {
 
     await completeTask(taskId, userId, {
       resultUrls: [pipeResult.final?.imageUrl || `${process.env.CDN_BASE_URL || ''}/api/results/${taskId}/white-bg.png`],
-      thumbnail: pipeResult.final?.thumbnail || `https://cdn.movio.ai/results/${taskId}/thumb.png`,
+      thumbnail: pipeResult.final?.thumbnail || `${process.env.CDN_BASE_URL || ''}/results/${taskId}/thumb.png`,
       metadata: { bgColor: params.bgColor, pipeline: pipeResult },
     });
   } catch (err) {

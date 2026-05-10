@@ -28,7 +28,7 @@ router.post('/generate',
   contentModerationMiddleware('input'),
   async (req, res) => {
     try {
-      const job = await posterService.generatePoster(req.userId, req.validated);
+      const job = await posterService.generatePoster(req.user.id, req.validated);
       return success(res, { job_id: job.id, status: 'queued' }, '海报任务已提交');
     } catch (e) {
       if (e.status) return error(res, e.status, e.message);
@@ -66,7 +66,7 @@ router.get('/sizes', (_req, res) => {
 router.get('/works', async (req, res) => {
   try {
     const { type, page, limit } = req.query;
-    const rows = await posterService.getUserPosters(req.userId, { type, page: +page || 1, limit: +limit || 20 });
+    const rows = await posterService.getUserPosters(req.user.id, { type, page: +page || 1, limit: +limit || 20 });
     return success(res, rows);
   } catch (__) {
     return error(res, ERROR_CODE.INTERNAL_ERROR, '获取作品列表失败');

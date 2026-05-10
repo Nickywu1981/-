@@ -20,7 +20,7 @@ export default {
   async getTeam(userId, { page = 1, pageSize = 20 } = {}) {
     const offset = (page - 1) * pageSize;
     const [rows] = await db.query(
-      `SELECT dr.id, dr.user_id, dr.level, dr.bound_at, u.nickname, u.avatar_url
+      `SELECT dr.id, dr.user_id, dr.level, dr.bound_at, u.nickname, u.avatar
        FROM distributor_relation dr
        JOIN user u ON u.id = dr.user_id
        WHERE dr.parent_id = ? OR dr.grandparent_id = ?

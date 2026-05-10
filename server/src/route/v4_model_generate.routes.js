@@ -20,7 +20,7 @@ const generateSchema = z.object({
 
 router.post('/generate', _validate(generateSchema), async (req, res, next) => {
   try {
-    const result = await infer({ modelId: 'model-generate', input: req.validated });
+    const result = await infer('model-generate', req.validated);
     return success(res, result, '模特生成成功');
   } catch (e) { next(e); }
 });

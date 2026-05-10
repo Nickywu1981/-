@@ -20,7 +20,7 @@ const renderSchema = z.object({
 
 router.post('/product', _validate(renderSchema), async (req, res, next) => {
   try {
-    const result = await infer({ modelId: 'product-render', input: req.validated });
+    const result = await infer('product-render', req.validated);
     return success(res, result, '渲染成功');
   } catch (e) { next(e); }
 });

@@ -12,7 +12,7 @@ import crypto from 'node:crypto';
 import WebSocket from 'ws';
 
 const AUDIO_DIR = path.join(process.cwd(), 'uploads', 'audio');
-const EDGE_WS_URL = 'wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=6A5AA1D4EAFF4E9FB37E23D68491D6F4';
+const EDGE_WS_URL = process.env.EDGE_TTS_WS_URL || 'wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=6A5AA1D4EAFF4E9FB37E23D68491D6F4';
 
 const EDGE_TTS_VOICES = {
   'sweet-female': 'zh-CN-XiaoxiaoNeural',
@@ -188,12 +188,23 @@ async function realCloneInfer(text, audioSampleUrl) {
     // Step 1: Upload audio sample → get voice_id
     let voiceId;
     if (audioSampleUrl) {
-      const samplePath = path.join(process.cwd(), audioSampleUrl.replace(/^\/uploads\//, 'uploads/'));
-      if (fs.existsSync(samplePath)) {
+      // 防路径遍历：拒绝含 .. 或绝对路径的输入
+      if (audioSampleUrl.includes('..') || path.isAbsolute(audioSampleUrl)) {
+        throw new BusinessError(400, '无效的音频样本路径');
+      }
+      const safePath = audioSampleUrl.replace(/^\/uploads\//, '');
+      const samplePath = path.join(process.cwd(), 'uploads', safePath);
+      // 二次确认解析后路径仍在 uploads 目录内
+      const resolvedPath = path.resolve(samplePath);
+      const uploadsRoot = path.resolve(process.cwd(), 'uploads');
+      if (!resolvedPath.startsWith(uploadsRoot)) {
+        throw new BusinessError(400, '无效的音频样本路径');
+      }
+      if (fs.existsSync(resolvedPath)) {
         const formData = new FormData();
         formData.append('files', new Blob([fs.readFileSync(samplePath)]), 'sample.mp3');
         formData.append('name', `clone_${Date.now()}`);
-        const addResp = await fetch('https://api.elevenlabs.io/v1/voices/add', {
+        const addResp = await fetch(process.env.ELEVENLABS_API_URL || 'https://api.elevenlabs.io/v1/voices/add', {
           method: 'POST',
           headers: { 'xi-api-key': apiKey },
           body: formData,

@@ -28,7 +28,7 @@ router.post('/voice',
   contentModerationMiddleware,
   async (req, res) => {
     try {
-      const job = await translateService.translateVoice(req.userId, req.validated);
+      const job = await translateService.translateVoice(req.user.id, req.validated);
       return success(res, { job_id: job.id, status: 'queued' }, '语音翻译任务已提交');
     } catch (e) {
       if (e.status) return error(res, e.status, e.message);
@@ -44,7 +44,7 @@ router.post('/subtitles',
   })),
   async (req, res) => {
     try {
-      const job = await translateService.translateSubtitles(req.userId, req.validated);
+      const job = await translateService.translateSubtitles(req.user.id, req.validated);
       return success(res, { job_id: job.id, status: 'queued' }, '字幕翻译任务已提交');
     } catch (e) {
       if (e.status) return error(res, e.status, e.message);
@@ -61,7 +61,7 @@ router.post('/face',
   contentModerationMiddleware,
   async (req, res) => {
     try {
-      const job = await translateService.translateFace(req.userId, req.validated);
+      const job = await translateService.translateFace(req.user.id, req.validated);
       return success(res, { job_id: job.id, status: 'queued' }, '面容翻译任务已提交');
     } catch (e) {
       if (e.status) return error(res, e.status, e.message);
@@ -79,7 +79,7 @@ router.get('/langs', (_req, res) => {
 router.get('/works', async (req, res) => {
   try {
     const { type, page, limit } = req.query;
-    const rows = await translateService.getUserTranslateHistory(req.userId, { type, page: +page || 1, limit: +limit || 20 });
+    const rows = await translateService.getUserTranslateHistory(req.user.id, { type, page: +page || 1, limit: +limit || 20 });
     return success(res, rows);
   } catch (__) {
     return error(res, ERROR_CODE.INTERNAL_ERROR, '获取翻译历史失败');
