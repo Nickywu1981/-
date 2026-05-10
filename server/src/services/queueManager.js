@@ -233,7 +233,7 @@ export async function createImageWorker() {
 ensureBullMQ().then(() => checkRedis()).then((ok) => {
   if (ok) logger.info('[BullMQ] Redis 已连接，队列功能可用');
   else logger.warn('[BullMQ] Redis 未运行 — 队列降级为同步模式，启动后自动恢复');
-});
+}).catch((err) => { logger.warn('[BullMQ] 初始化检测失败', { error: err.message }); });
 setInterval(async () => {
   if (!redisAvailable && bullmqAvailable) {
     const ok = await checkRedis();

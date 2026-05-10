@@ -29,7 +29,8 @@ adminRouter.delete('/:id', authMiddleware, adminAuth, asyncHandler(removeConfig)
 // GET /api/admin/site-config/logs/:key — 审计日志
 adminRouter.get('/logs/:key', authMiddleware, adminAuth, asyncHandler(async (req, res) => {
   try {
-    const logs = await getConfigLogs(req.params.key, req.query.limit || 50);
+    const limit = Math.min(parseInt(req.query.limit, 10) || 50, 200);
+    const logs = await getConfigLogs(req.params.key, limit);
     success(res, logs);
   } catch (err) { error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || 'Failed to load logs'); }
 }));

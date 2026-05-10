@@ -181,7 +181,7 @@ export async function handleNotify(body) {
     } else {
       // 充值: 读取实际充值套餐比例
       const rechargeOrder = await rechargeDao.getByOrderNo(order.business_id);
-      const creditAmount = rechargeOrder ? rechargeOrder.coin_amount : Math.round(Number(order.amount) * 10);
+      const creditAmount = rechargeOrder ? rechargeOrder.coin_amount : Math.round((Number(order.amount) || 0) * 10);
       title = '支付成功 — 积分已到账';
       content = `您已成功充值${creditAmount}积分，支付￥${Number(order.amount).toFixed(2)}。`;
     }

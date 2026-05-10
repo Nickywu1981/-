@@ -27,7 +27,7 @@ const server = createServer(app);
 wsManager.attach(server);
 
 // BullMQ Worker 启动（非阻塞，Redis 不可用时降级）
-import('./services/workerBootstrap.js').then(({ bootstrapWorkers }) => bootstrapWorkers());
+import('./services/workerBootstrap.js').then(({ bootstrapWorkers }) => bootstrapWorkers()).catch((err) => { logger.warn('[Worker] 启动失败，队列将降级', { error: err.message }); });
 
 server.listen(port, () => {
   logger.info(`${env} 模式 — http://localhost:${port}  |  WebSocket /ws  |  BullMQ Workers`);

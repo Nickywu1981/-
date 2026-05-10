@@ -8,6 +8,7 @@ import jwt from 'jsonwebtoken';
 import { success, error } from '../utils/response.js';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
+import { authLimiter } from '../middleware/rateLimiter.js';
 import * as authService from '../services/auth.service.js';
 import { revokeAccessToken, revokeRefreshToken } from '../utils/jwtToken.js';
 
@@ -57,7 +58,7 @@ const resetPasswordSchema = z.object({
 }).refine(d => d.phone || d.email, { message: '手机号或邮箱至少填一项' });
 
 // POST /api/auth/register
-router.post('/register', _validate(registerSchema), async (req, res) => {
+router.post('/register', authLimiter, _validate(registerSchema), async (req, res) => {
   try {
     const { phone, email, password, nickname, invite_code } = req.validated;
 
@@ -75,7 +76,7 @@ router.post('/register', _validate(registerSchema), async (req, res) => {
 });
 
 // POST /api/auth/login
-router.post('/login', _validate(loginSchema), async (req, res) => {
+router.post('/login', authLimiter, _validate(loginSchema), async (req, res) => {
   try {
     const { phone, email, username, account, password } = req.validated;
 
@@ -90,7 +91,7 @@ router.post('/login', _validate(loginSchema), async (req, res) => {
 });
 
 // POST /api/auth/login-by-code — 短信/邮箱验证码登录
-router.post('/login-by-code', _validate(loginByCodeSchema), async (req, res) => {
+router.post('/login-by-code', authLimiter, _validate(loginByCodeSchema), async (req, res) => {
   try {
     const { phone, email, username, code } = req.validated;
     if (!phone && !email && !username) {
@@ -108,7 +109,7 @@ router.post('/login-by-code', _validate(loginByCodeSchema), async (req, res) => 
 });
 
 // POST /api/auth/reset-password
-router.post('/reset-password', _validate(resetPasswordSchema), async (req, res) => {
+router.post('/reset-password', authLimiter, _validate(resetPasswordSchema), async (req, res) => {
   try {
     const { phone, email, new_password, code } = req.validated;
 
@@ -120,7 +121,7 @@ router.post('/reset-password', _validate(resetPasswordSchema), async (req, res) 
 });
 
 // POST /api/auth/logout
-router.post('/logout', async (req, res) => {
+router.post('/logout', authLimiter, async (req, res) => {
   const header = req.headers.authorization;
   if (header?.startsWith('Bearer ')) {
     try { await revokeAccessToken(header.slice(7)); } catch { /* best-effort */ }

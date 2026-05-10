@@ -75,6 +75,10 @@ export async function getMyTeam(userId, { page = 1, pageSize = 20 } = {}) {
 // 佣金结算（消费时触发）
 // ============================================================
 export async function settleCommission(consumerId, orderId, orderAmount) {
+  const safeAmount = Number(orderAmount);
+  if (!Number.isFinite(safeAmount) || safeAmount <= 0) {
+    throw new BusinessError(400, '无效的订单金额');
+  }
   const conn = await db.getConnection();
   try {
     await conn.beginTransaction();
@@ -93,7 +97,7 @@ export async function settleCommission(consumerId, orderId, orderAmount) {
       // 一级佣金
       if (parent_id) {
         const rate = COMMISSION_RATES.level1;
-        const amount = parseFloat((orderAmount * rate / 100).toFixed(2));
+        const amount = Math.round(safeAmount * rate) / 100;
         await conn.query(
           `INSERT INTO distributor_commission (distributor_id, consumer_id, order_id, order_amount, commission_rate, commission, level, status)
            VALUES (?, ?, ?, ?, ?, ?, 1, 'settled')`,
@@ -105,7 +109,7 @@ export async function settleCommission(consumerId, orderId, orderAmount) {
       // 二级佣金
       if (grandparent_id) {
         const rate = COMMISSION_RATES.level2;
-        const amount = parseFloat((orderAmount * rate / 100).toFixed(2));
+        const amount = Math.round(safeAmount * rate) / 100;
         await conn.query(
           `INSERT INTO distributor_commission (distributor_id, consumer_id, order_id, order_amount, commission_rate, commission, level, status)
            VALUES (?, ?, ?, ?, ?, ?, 2, 'settled')`,
@@ -162,9 +166,9 @@ export async function withdrawCommission(userId, amount) {
       [userId],
     );
 
-    const availableAmount = parseFloat(Number(balance.available).toFixed(2));
-    const requestAmount = parseFloat(Number(amount).toFixed(2));
-    if (availableAmount < requestAmount) throw new BusinessError(400, `可提现余额不足，当前可用 ${availableAmount}`);
+    const availableAmount = Number(balance.available) || 0;
+    const requestAmount = Number(amount) || 0;
+    if (availableAmount < requestAmount) throw new BusinessError(400, `可提现余额不足，当前可用 ${availableAmount.toFixed(2)}`);
 
     // 逐笔扣减
     let remaining = requestAmount;
