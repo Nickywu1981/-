@@ -64,8 +64,10 @@
 </template>
 
 <script setup lang="ts">
+const { createBlobUrl, revoke } = useBlobUrl()
 import { ref } from 'vue';
 import ThreeViewer from '~/components/ThreeViewer.vue';
+import { useBlobUrl } from '~/composables/useBlobUrl'
 
 const fileInput = ref<HTMLInputElement>();
 const viewerRef = ref();
@@ -118,10 +120,10 @@ async function processFile(file: File) {
 
   try {
     const res = await $fetch('/api/3d/upload', { method: 'POST', body: formData });
-    currentModel.value = { url: res.url || URL.createObjectURL(file), name: file.name, size: file.size };
+    currentModel.value = { url: res.url || createBlobUrl(file), name: file.name, size: file.size };
   } catch {
     // Fallback: use local object URL for preview
-    currentModel.value = { url: URL.createObjectURL(file), name: file.name, size: file.size };
+    currentModel.value = { url: createBlobUrl(file), name: file.name, size: file.size };
   }
 }
 

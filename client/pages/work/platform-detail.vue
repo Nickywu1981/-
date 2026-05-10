@@ -101,6 +101,7 @@
 </template>
 
 <script setup lang="ts">
+const { createBlobUrl, revoke } = useBlobUrl()
 
 interface PreviewItem { url: string; uploadedUrl: string; role: string; uploaded: boolean }
 
@@ -153,7 +154,7 @@ async function handleFiles(e: Event) {
   const files = (e.target as HTMLInputElement).files;
   if (!files?.length) return;
   for (const f of files) {
-    const url = URL.createObjectURL(f);
+    const url = createBlobUrl(f);
     const idx = previews.value.length;
     previews.value.push({ url, uploadedUrl: '', role: idx === 0 ? 'main' : 'detail', uploaded: false });
     const i = idx;
@@ -166,7 +167,7 @@ async function handleDrop(e: DragEvent) {
   const files = e.dataTransfer?.files;
   if (files) {
     for (const f of files) {
-      const url = URL.createObjectURL(f);
+      const url = createBlobUrl(f);
       previews.value.push({ url, uploadedUrl: '', role: 'detail', uploaded: false });
     }
   }

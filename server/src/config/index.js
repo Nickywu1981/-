@@ -31,6 +31,7 @@ const config = {
   ai: {
     baseUrl: process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1',
     apiKey: process.env.OPENAI_API_KEY || '',
+    replicateBaseUrl: process.env.REPLICATE_BASE_URL || 'https://api.replicate.com/v1',
   },
 
   mockEnabled: process.env.MOCK_ENABLED !== 'false',

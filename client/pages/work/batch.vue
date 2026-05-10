@@ -139,6 +139,7 @@
 </template>
 
 <script setup lang="ts">
+const { createBlobUrl, revoke } = useBlobUrl()
 
 const step = ref(0);
 const previews = ref<string[]>([]);
@@ -178,7 +179,7 @@ const estimatedCost = computed(() => {
 async function handleFiles(e: Event) {
   const files = (e.target as HTMLInputElement).files;
   if (files) {
-    for (const f of files) previews.value.push(URL.createObjectURL(f));
+    for (const f of files) previews.value.push(createBlobUrl(f));
     await uploadMultiple(Array.from(files));
   }
 }
@@ -186,7 +187,7 @@ async function handleFiles(e: Event) {
 async function handleDrop(e: DragEvent) {
   const files = e.dataTransfer?.files;
   if (files) {
-    for (const f of files) previews.value.push(URL.createObjectURL(f));
+    for (const f of files) previews.value.push(createBlobUrl(f));
     await uploadMultiple(Array.from(files));
   }
 }
@@ -268,10 +269,10 @@ async function submitTask() {
     step.value = 2;
   }
 }
-function handleRedo() { task.reset(); previews.value.forEach(u => URL.revokeObjectURL(u)); previews.value = []; uploadedUrls.value = []; }
+function handleRedo() { task.reset(); previews.value.forEach(u => revoke(u)); previews.value = []; uploadedUrls.value = []; }
 
 onMounted(() => { loadTemplates(); loadHistory(); });
-onUnmounted(() => { previews.value.forEach(u => URL.revokeObjectURL(u)) });
+onUnmounted(() => { previews.value.forEach(u => revoke(u)) });
 </script>
 
 <style scoped>

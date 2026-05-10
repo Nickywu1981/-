@@ -109,6 +109,7 @@
 </template>
 
 <script setup lang="ts">
+const { createBlobUrl, revoke } = useBlobUrl()
 
 const steps = ['上传图片', '参数设置', '下载结果']
 const currentStep = ref(0)
@@ -141,7 +142,7 @@ function handleFile(e: Event) {
 }
 
 async function uploadFile(file: File) {
-  previewUrl.value = URL.createObjectURL(file)
+  previewUrl.value = createBlobUrl(file)
   uploadErr.value = ''
   uploading.value = true
   try {

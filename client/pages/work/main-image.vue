@@ -78,8 +78,10 @@
 </template>
 
 <script setup lang="ts">
+const { createBlobUrl, revoke } = useBlobUrl()
 
 import PromptEnhancer from '~/components/PromptEnhancer.vue'
+import { useBlobUrl } from '~/composables/useBlobUrl'
 
 const step = ref(0);
 const previewUrl = ref('');
@@ -123,8 +125,8 @@ async function uploadFile(file: File) {
 async function handleFile(e: Event) {
   const file = (e.target as HTMLInputElement).files?.[0];
   if (file) {
-    if (previewUrl.value) URL.revokeObjectURL(previewUrl.value);
-    previewUrl.value = URL.createObjectURL(file);
+    if (previewUrl.value) revoke(previewUrl.value);
+    previewUrl.value = createBlobUrl(file);
     await uploadFile(file);
   }
 }
@@ -132,8 +134,8 @@ async function handleFile(e: Event) {
 async function handleDrop(e: DragEvent) {
   const file = e.dataTransfer?.files?.[0];
   if (file) {
-    if (previewUrl.value) URL.revokeObjectURL(previewUrl.value);
-    previewUrl.value = URL.createObjectURL(file);
+    if (previewUrl.value) revoke(previewUrl.value);
+    previewUrl.value = createBlobUrl(file);
     await uploadFile(file);
   }
 }
@@ -161,7 +163,7 @@ function handleRedo() {
   uploadedUrl.value = '';
 }
 
-onUnmounted(() => { if (previewUrl.value) URL.revokeObjectURL(previewUrl.value) })
+onUnmounted(() => { if (previewUrl.value) revoke(previewUrl.value) })
 </script>
 
 <style scoped>

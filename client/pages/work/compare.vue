@@ -114,8 +114,10 @@
 </template>
 
 <script setup lang="ts">
+const { createBlobUrl, revoke } = useBlobUrl()
 import { useToast } from '#imports'
 import ImageSlot from '~/components/ImageSlot.vue'
+import { useBlobUrl } from '~/composables/useBlobUrl'
 
 const toast = useToast()
 
@@ -224,7 +226,7 @@ function confirmPicker() {
 async function handleUploadFile(e: Event) {
   const f = (e.target as HTMLInputElement).files?.[0]
   if (!f) return
-  uploadPreview.value = URL.createObjectURL(f)
+  uploadPreview.value = createBlobUrl(f)
   uploadingMsg.value = '上传中...'
   const fd = new FormData(); fd.append('file', f)
   try {
@@ -238,7 +240,7 @@ async function handleUploadFile(e: Event) {
 function handleUploadDrop(e: DragEvent) {
   const f = e.dataTransfer?.files?.[0]
   if (!f) return
-  uploadPreview.value = URL.createObjectURL(f)
+  uploadPreview.value = createBlobUrl(f)
   uploadingMsg.value = '上传中...'
   const fd = new FormData(); fd.append('file', f)
   $fetch('/api/upload/image', { method: 'POST', credentials: 'include', body: fd })

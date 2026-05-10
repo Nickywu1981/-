@@ -59,7 +59,7 @@ router.get('/api/geo/suggest-locale', async (req, res) => {
 
   // 3. 异步查询免费 IP 地理位置 API
   try {
-    const r = await fetch(`http://ip-api.com/json/${encodeURIComponent(ip)}?fields=countryCode`);
+    const r = await fetch(`https://ip-api.com/json/${encodeURIComponent(ip)}?fields=countryCode`, { signal: AbortSignal.timeout(3000) });
     const data = await r.json();
     const cc = (data?.countryCode || '').toUpperCase();
     const locale = COUNTRY_TO_LOCALE[cc] || 'zh';

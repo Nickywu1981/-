@@ -1,7 +1,13 @@
 import pool from './db.js';
 
 const pointsDao = {
-  async getAccount(userId) {
+  async getAccount(userId, conn) {
+    const db = conn || pool;
+    const [rows] = await db.execute('SELECT id, user_id, balance, total_earned, total_spent, frozen, version FROM points_account WHERE user_id = ? FOR UPDATE', [userId]);
+    return rows[0] || null;
+  },
+
+  async getAccountReadOnly(userId) {
     const [rows] = await pool.execute('SELECT id, user_id, balance, total_earned, total_spent, frozen, version FROM points_account WHERE user_id = ?', [userId]);
     return rows[0] || null;
   },
@@ -10,12 +16,14 @@ const pointsDao = {
     await pool.execute('INSERT INTO points_account (user_id, balance, total_earned) VALUES (?, 0, 0)', [userId]);
   },
 
-  async addPoints(userId, amount) {
-    await pool.execute('UPDATE points_account SET balance = balance + ?, total_earned = total_earned + ? WHERE user_id = ?', [amount, amount, userId]);
+  async addPoints(userId, amount, conn) {
+    const db = conn || pool;
+    await db.execute('UPDATE points_account SET balance = balance + ?, total_earned = total_earned + ? WHERE user_id = ?', [amount, amount, userId]);
   },
 
-  async deductPoints(userId, amount) {
-    const [r] = await pool.execute('UPDATE points_account SET balance = balance - ? WHERE user_id = ? AND balance >= ?', [amount, userId, amount]);
+  async deductPoints(userId, amount, conn) {
+    const db = conn || pool;
+    const [r] = await db.execute('UPDATE points_account SET balance = balance - ? WHERE user_id = ? AND balance >= ?', [amount, userId, amount]);
     return r.affectedRows > 0;
   },
 

@@ -62,6 +62,7 @@
 </template>
 
 <script setup lang="ts">
+const { createBlobUrl, revoke } = useBlobUrl()
 
 const step = ref(0)
 const previewUrl = ref(''); const uploadedUrl = ref(''); const uploading = ref(false)
@@ -73,8 +74,8 @@ async function handleFile(e: Event) {
   const file = (e.target as HTMLInputElement).files?.[0]
   if (!file) return
   const oldUrl = previewUrl.value
-  previewUrl.value = URL.createObjectURL(file)
-  if (oldUrl) URL.revokeObjectURL(oldUrl)
+  previewUrl.value = createBlobUrl(file)
+  if (oldUrl) revoke(oldUrl)
   uploading.value = true
   try {
     const fd = new FormData(); fd.append('file', file)
@@ -89,8 +90,8 @@ async function handleFaceFile(e: Event) {
   const file = (e.target as HTMLInputElement).files?.[0]
   if (!file) return
   const oldUrl = facePreviewUrl.value
-  facePreviewUrl.value = URL.createObjectURL(file)
-  if (oldUrl) URL.revokeObjectURL(oldUrl)
+  facePreviewUrl.value = createBlobUrl(file)
+  if (oldUrl) revoke(oldUrl)
   try {
     const fd = new FormData(); fd.append('file', file)
     const res: any = await $fetch('/api/upload/image', { method: 'POST', body: fd })
@@ -105,8 +106,8 @@ async function handleDrop(e: DragEvent) {
   const file = e.dataTransfer?.files?.[0]
   if (!file) return
   const oldUrl = previewUrl.value
-  previewUrl.value = URL.createObjectURL(file)
-  if (oldUrl) URL.revokeObjectURL(oldUrl)
+  previewUrl.value = createBlobUrl(file)
+  if (oldUrl) revoke(oldUrl)
   uploading.value = true
   try {
     const fd = new FormData(); fd.append('file', file)
@@ -122,8 +123,8 @@ async function handleFaceDrop(e: DragEvent) {
   const file = e.dataTransfer?.files?.[0]
   if (!file) return
   const oldUrl = facePreviewUrl.value
-  facePreviewUrl.value = URL.createObjectURL(file)
-  if (oldUrl) URL.revokeObjectURL(oldUrl)
+  facePreviewUrl.value = createBlobUrl(file)
+  if (oldUrl) revoke(oldUrl)
   try {
     const fd = new FormData(); fd.append('file', file)
     const res: any = await $fetch('/api/upload/image', { method: 'POST', body: fd })
@@ -147,8 +148,8 @@ function downloadImage() { if (resultUrl.value) { const a = document.createEleme
 function resetAll() { step.value = 0; previewUrl.value = ''; uploadedUrl.value = ''; facePreviewUrl.value = ''; faceUploadedUrl.value = ''; resultUrl.value = ''; processing.value = false }
 
 onBeforeUnmount(() => {
-  if (previewUrl.value) URL.revokeObjectURL(previewUrl.value)
-  if (facePreviewUrl.value) URL.revokeObjectURL(facePreviewUrl.value)
+  if (previewUrl.value) revoke(previewUrl.value)
+  if (facePreviewUrl.value) revoke(facePreviewUrl.value)
 })
 </script>
 

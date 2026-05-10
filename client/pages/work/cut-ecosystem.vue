@@ -133,7 +133,9 @@
 </template>
 
 <script setup lang="ts">
+const { createBlobUrl, revoke } = useBlobUrl()
 import { formatDate } from '@/utils/format';
+import { useBlobUrl } from '~/composables/useBlobUrl'
 const toast = useToast()
 const api = useApi()
 
@@ -232,12 +234,12 @@ function downloadDraft() {
   if (!draftResult.value) return
   const json = JSON.stringify(draftResult.value, null, 2)
   const blob = new Blob([json], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
+  const url = createBlobUrl(blob)
   const a = document.createElement('a')
   a.href = url
   a.download = `${draftResult.value.draft.draft_name || 'movio-draft'}.json`
   a.click()
-  URL.revokeObjectURL(url)
+  revoke(url)
 }
 </script>
 

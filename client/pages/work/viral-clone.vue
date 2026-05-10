@@ -75,6 +75,7 @@
 </template>
 
 <script setup lang="ts">
+const { createBlobUrl, revoke } = useBlobUrl()
 
 const step = ref(0);
 const refVideoUrl = ref('');
@@ -101,7 +102,7 @@ async function uploadFile(file: File, type: string) {
 async function handleFile(e: Event, type: string) {
   const files = (e.target as HTMLInputElement).files;
   if (!files?.length) return;
-  const url = URL.createObjectURL(files[0]);
+  const url = createBlobUrl(files[0]);
   if (type === 'ref') refVideoUrl.value = url;
   else productImageUrl.value = url;
   await uploadFile(files[0], type);
@@ -109,7 +110,7 @@ async function handleFile(e: Event, type: string) {
 async function handleDrop(e: DragEvent, type: string) {
   const files = e.dataTransfer?.files;
   if (!files?.length) return;
-  const url = URL.createObjectURL(files[0]);
+  const url = createBlobUrl(files[0]);
   if (type === 'ref') refVideoUrl.value = url;
   else productImageUrl.value = url;
   await uploadFile(files[0], type);

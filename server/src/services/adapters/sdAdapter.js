@@ -6,6 +6,7 @@
 
 import { registerModel } from '../aiEngine.js';
 import { BusinessError } from '../../utils/businessError.js';
+import config from '../../config/index.js';
 import logger from '../../utils/logger.js';
 
 const SD_API_URL = process.env.SD_API_URL || 'http://localhost:7860';
@@ -89,7 +90,7 @@ async function replicateInfer(input, onProgress) {
   onProgress?.(20);
 
   // 创建预测
-  const createRes = await fetch('https://api.replicate.com/v1/predictions', {
+  const createRes = await fetch(`${config.ai.replicateBaseUrl}/predictions`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Token ${REPLICATE_API_KEY}` },
     body: JSON.stringify({

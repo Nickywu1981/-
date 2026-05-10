@@ -68,6 +68,7 @@
 </template>
 
 <script setup lang="ts">
+const { createBlobUrl, revoke } = useBlobUrl()
 
 const steps = ['上传图片', '扩图设置', '查看结果']
 const currentStep = ref(0)
@@ -102,12 +103,12 @@ async function uploadFile(file: File) {
 
 async function handleFile(e: Event) {
   const files = (e.target as HTMLInputElement).files
-  if (files?.length) { previewUrl.value = URL.createObjectURL(files[0]); await uploadFile(files[0]) }
+  if (files?.length) { previewUrl.value = createBlobUrl(files[0]); await uploadFile(files[0]) }
 }
 
 async function handleDrop(e: DragEvent) {
   const files = e.dataTransfer?.files
-  if (files?.length) { previewUrl.value = URL.createObjectURL(files[0]); await uploadFile(files[0]) }
+  if (files?.length) { previewUrl.value = createBlobUrl(files[0]); await uploadFile(files[0]) }
 }
 
 async function submitOutpaint() {

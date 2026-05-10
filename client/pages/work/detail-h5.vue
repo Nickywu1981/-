@@ -121,6 +121,7 @@
 </template>
 
 <script setup lang="ts">
+const { createBlobUrl, revoke } = useBlobUrl()
 
 
 const toast = useToast()
@@ -191,7 +192,7 @@ async function addFiles(files: File[]) {
   uploading.value = true;
 
   for (const f of files) {
-    const previewUrl = URL.createObjectURL(f);
+    const previewUrl = createBlobUrl(f);
     const idx = skuList.value.length;
     skuList.value.push({
       previewUrl, uploadedUrl: '', uploaded: false,
@@ -232,9 +233,9 @@ async function submitTask() {
   } catch (e: any) { toast.error(e.data?.msg || '提交失败，请重试'); step.value = 2; }
 }
 
-function handleRedo() { task.reset(); step.value = 0; skuList.value.forEach(s => { if (s.previewUrl) URL.revokeObjectURL(s.previewUrl) }); skuList.value = []; }
+function handleRedo() { task.reset(); step.value = 0; skuList.value.forEach(s => { if (s.previewUrl) revoke(s.previewUrl) }); skuList.value = []; }
 
-onUnmounted(() => { skuList.value.forEach(s => { if (s.previewUrl) URL.revokeObjectURL(s.previewUrl) }) });
+onUnmounted(() => { skuList.value.forEach(s => { if (s.previewUrl) revoke(s.previewUrl) }) });
 </script>
 
 <style scoped>

@@ -91,6 +91,7 @@
 </template>
 
 <script setup lang="ts">
+const { createBlobUrl, revoke } = useBlobUrl()
 
 const steps = ['上传素材', '设置参数', '生成结果']
 const currentStep = ref(0)
@@ -125,7 +126,7 @@ async function uploadFile(file: File, type: string) {
 async function handleFile(e: Event, type: string) {
   const files = (e.target as HTMLInputElement).files
   if (!files?.length) return
-  const url = URL.createObjectURL(files[0])
+  const url = createBlobUrl(files[0])
   if (type === 'source') sourceUrl.value = url
   else targetUrl.value = url
   await uploadFile(files[0], type)
@@ -133,7 +134,7 @@ async function handleFile(e: Event, type: string) {
 async function handleDrop(e: DragEvent, type: string) {
   const files = e.dataTransfer?.files
   if (!files?.length) return
-  const url = URL.createObjectURL(files[0])
+  const url = createBlobUrl(files[0])
   if (type === 'source') sourceUrl.value = url
   else targetUrl.value = url
   await uploadFile(files[0], type)

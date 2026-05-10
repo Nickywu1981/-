@@ -53,6 +53,7 @@
 </template>
 
 <script setup lang="ts">
+const { createBlobUrl, revoke } = useBlobUrl()
 
 const step = ref(0); const previewUrl = ref(''); const uploadedUrl = ref('')
 const uploading = ref(false); const processing = ref(false); const resultUrl = ref('')
@@ -65,7 +66,7 @@ const modes = [
 const toast = useToast()
 async function handleFile(e: Event) {
   const file = (e.target as HTMLInputElement).files?.[0]
-  if (!file) return; previewUrl.value = URL.createObjectURL(file); uploading.value = true
+  if (!file) return; previewUrl.value = createBlobUrl(file); uploading.value = true
   try {
     const fd = new FormData(); fd.append('file', file)
     const res: any = await $fetch('/api/upload/image', { method: 'POST', body: fd })
@@ -75,7 +76,7 @@ async function handleFile(e: Event) {
     previewUrl.value = ''
   } finally { uploading.value = false }
 }
-function handleDrop(e: DragEvent) { e.preventDefault(); if (e.dataTransfer?.files[0]) { previewUrl.value = URL.createObjectURL(e.dataTransfer.files[0]); uploadFile(e.dataTransfer.files[0]) } }
+function handleDrop(e: DragEvent) { e.preventDefault(); if (e.dataTransfer?.files[0]) { previewUrl.value = createBlobUrl(e.dataTransfer.files[0]); uploadFile(e.dataTransfer.files[0]) } }
 async function submitTask() {
   processing.value = true; step.value = 2
   try {
