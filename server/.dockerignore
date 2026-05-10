@@ -10,3 +10,5 @@ sql
 .env
 .env.*
 certs
+logs
+scripts

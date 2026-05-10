@@ -96,8 +96,7 @@ import LoadingSkeleton from '~/components/LoadingSkeleton.vue';
 
 const templates = ref<any[]>([]);
 const saving = ref(0);
-const msg = ref('');
-let msgTimer: ReturnType<typeof setTimeout> | null = null;
+const { message: msg, show: showMsg } = useTimedMessage();
 const isLoading = ref(false);
 const searchQuery = ref('');
 const filterProvider = ref('');
@@ -136,8 +135,7 @@ async function saveTpl(tpl: any) {
       method: 'PUT',
       body: { name: tpl.name, content: tpl.content, provider_template_id: tpl.provider_template_id, provider: tpl.provider, status: tpl.status, remark: tpl.remark },
     });
-    if (msgTimer) clearTimeout(msgTimer);
-    msg.value = '已保存'; msgTimer = setTimeout(() => (msg.value = ''), 2000);
+    showMsg('已保存');
   } catch (e: any) { msg.value = e.data?.msg || '保存失败'; }
   saving.value = 0;
 }
@@ -150,8 +148,7 @@ async function createTpl() {
   creating.value = true;
   try {
     await $fetch('/api/sms/templates', { method: 'POST', body: newTpl.value });
-    showCreate.value = false; msg.value = '模板已创建';
-    msgTimer = setTimeout(() => (msg.value = ''), 2000);
+    showCreate.value = false; showMsg('模板已创建');
     fetchTemplates();
   } catch (e: any) { msg.value = e.data?.msg || '创建失败'; }
   creating.value = false;
@@ -163,8 +160,7 @@ async function doDelete() {
   if (!deleteTarget.value) return; deleting.value = true;
   try {
     await $fetch(`/api/sms/templates/${deleteTarget.value.id}`, { method: 'DELETE' });
-    showDelete.value = false; msg.value = '模板已删除';
-    msgTimer = setTimeout(() => (msg.value = ''), 2000);
+    showDelete.value = false; showMsg('模板已删除');
     fetchTemplates();
   } catch (e: any) { msg.value = e.data?.msg || '删除失败'; }
   deleting.value = false;
@@ -173,7 +169,6 @@ async function doDelete() {
 function onSearch() { currentPage.value = 1; fetchTemplates(); }
 
 onMounted(fetchTemplates);
-onBeforeUnmount(() => { if (msgTimer) { clearTimeout(msgTimer); msgTimer = null; } });
 </script>
 
 <style scoped>

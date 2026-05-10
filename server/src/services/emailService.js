@@ -73,7 +73,11 @@ const providers = {
 
   sendgrid: {
     async send(_payload) {
-      throw new BusinessError(503, 'SendGrid 密钥未配置');
+      const cfg = config.email?.sendgrid || {};
+      if (!cfg.apiKey) {
+        throw new BusinessError(503, 'SendGrid 密钥未配置');
+      }
+      throw new BusinessError(503, 'SendGrid SDK 未集成，请联系管理员');
     },
   },
 };

@@ -25,13 +25,21 @@ const providers = {
 
   aliyun: {
     async send(_payload) {
-      throw new BusinessError(503, '阿里云短信密钥未配置');
+      const cfg = config.sms?.providers?.aliyun || {};
+      if (!cfg.accessKeyId || !cfg.accessKeySecret) {
+        throw new BusinessError(503, '阿里云短信密钥未配置');
+      }
+      throw new BusinessError(503, '阿里云短信SDK未集成，请联系管理员');
     },
   },
 
   tencent: {
     async send(_payload) {
-      throw new BusinessError(503, '腾讯云短信密钥未配置');
+      const cfg = config.sms?.providers?.tencent || {};
+      if (!cfg.secretId || !cfg.secretKey) {
+        throw new BusinessError(503, '腾讯云短信密钥未配置');
+      }
+      throw new BusinessError(503, '腾讯云短信SDK未集成，请联系管理员');
     },
   },
 };

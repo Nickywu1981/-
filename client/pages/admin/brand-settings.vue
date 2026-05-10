@@ -29,8 +29,8 @@
 <script setup lang="ts">
 
 const toast = useToast()
-const loading = ref(true), saving = ref(false), savedMsg = ref('')
-let msgTimer: ReturnType<typeof setTimeout> | null = null
+const loading = ref(true), saving = ref(false)
+const { message: savedMsg, show: showMsg } = useTimedMessage(3000)
 const form = reactive({ brand_name: '', logo_url: '', primary_color: '#7C3AED', watermark_enabled: false, watermark_opacity: 30, watermark_position: 'br' })
 
 onMounted(async () => {
@@ -45,13 +45,11 @@ async function save() {
   saving.value = true; savedMsg.value = ''
   try {
     const data: any = await $fetch('/api/brand', { method: 'PUT', credentials: 'include', body: form })
-    savedMsg.value = data?.msg || '保存成功'
-    msgTimer = setTimeout(() => savedMsg.value = '', 3000)
+    showMsg(data?.msg || '保存成功')
   } catch(e: any) { toast.error(e.data?.msg || '保存失败') }
   saving.value = false
 }
 
-onBeforeUnmount(() => { if (msgTimer) { clearTimeout(msgTimer); msgTimer = null; } })
 </script>
 <style scoped>
 h2 { font-size: 22px; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; }

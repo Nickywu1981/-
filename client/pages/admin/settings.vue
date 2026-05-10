@@ -29,8 +29,8 @@
 import { truncate } from '@/utils/format';
 
 const toast = useToast()
-const loading = ref(true), saving = ref(false), savedMsg = ref('')
-let msgTimer: ReturnType<typeof setTimeout> | null = null
+const loading = ref(true), saving = ref(false)
+const { message: savedMsg, show: showMsg } = useTimedMessage(3000)
 const otherConfigs = ref<any[]>([])
 const form = reactive({ siteName: 'Movio AI', contact: '', dailyLimit: 5000, maintenance: false })
 
@@ -65,13 +65,11 @@ async function saveSettings() {
       const key = encodeURIComponent(item.key)
       await $fetch(`/api/admin/site-config/${key}`, { method: 'PUT', credentials: 'include', body: { config_value: item.value, config_type: item.type, description: item.description } })
     }
-    savedMsg.value = '设置已保存'
-    msgTimer = setTimeout(() => savedMsg.value = '', 3000)
+    showMsg('设置已保存')
   } catch(e: any) { toast.error(e.data?.msg || '保存失败') }
   saving.value = false
 }
 
-onBeforeUnmount(() => { if (msgTimer) { clearTimeout(msgTimer); msgTimer = null; } })
 </script>
 <style scoped>
 h2 { font-size: 22px; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; }

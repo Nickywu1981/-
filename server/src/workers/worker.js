@@ -7,9 +7,13 @@
 // dotenv 由 config/index.js 负责加载
 import logger from '../utils/logger.js';
 import config from '../config/index.js';
+import { validateStartupConfig } from '../utils/startupGuard.js';
 import * as jobQueueService from '../services/job-queue.service.js';
 import * as aiCaller from '../utils/ai-caller.js';
 import * as _circuitBreaker from '../utils/circuit-breaker.js';
+
+// 启动配置校验
+validateStartupConfig();
 
 const POLL_INTERVAL = parseInt(process.env.WORKER_POLL_INTERVAL, 10) || 2000;
 const BATCH_SIZE = parseInt(process.env.WORKER_BATCH_SIZE, 10) || 3;

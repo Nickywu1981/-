@@ -111,8 +111,7 @@ import LoadingSkeleton from '~/components/LoadingSkeleton.vue';
 
 const plans = ref<any[]>([]);
 const saving = ref(0);
-const msg = ref('');
-let msgTimer: ReturnType<typeof setTimeout> | null = null;
+const { message: msg, show: showMsg } = useTimedMessage();
 const isLoading = ref(false);
 const searchQuery = ref('');
 const filterType = ref('');
@@ -165,8 +164,7 @@ async function savePlan(plan: any) {
         brand_kit: plan.brand_kit, priority_queue: plan.priority_queue, status: plan.status,
       },
     });
-    if (msgTimer) clearTimeout(msgTimer);
-    msg.value = '已保存'; msgTimer = setTimeout(() => (msg.value = ''), 2000);
+    showMsg('已保存');
   } catch (e: any) { msg.value = e.data?.msg || '保存失败'; }
   saving.value = 0;
 }
@@ -182,8 +180,7 @@ async function createPlan() {
   creating.value = true;
   try {
     await $fetch('/api/admin/plans', { method: 'POST', body: newPlan.value });
-    showCreate.value = false; msg.value = '套餐已创建';
-    msgTimer = setTimeout(() => (msg.value = ''), 2000);
+    showCreate.value = false; showMsg('套餐已创建');
     fetchPlans();
   } catch (e: any) { msg.value = e.data?.msg || '创建失败'; }
   creating.value = false;
@@ -195,8 +192,7 @@ async function doDelete() {
   if (!deleteTarget.value) return; deleting.value = true;
   try {
     await $fetch(`/api/admin/plans/${deleteTarget.value.id}`, { method: 'DELETE' });
-    showDelete.value = false; msg.value = '套餐已删除';
-    msgTimer = setTimeout(() => (msg.value = ''), 2000);
+    showDelete.value = false; showMsg('套餐已删除');
     fetchPlans();
   } catch (e: any) { msg.value = e.data?.msg || '删除失败'; }
   deleting.value = false;
@@ -205,7 +201,6 @@ async function doDelete() {
 function onSearch() { currentPage.value = 1; fetchPlans(); }
 
 onMounted(fetchPlans);
-onBeforeUnmount(() => { if (msgTimer) { clearTimeout(msgTimer); msgTimer = null; } });
 </script>
 
 <style scoped>
