@@ -58,7 +58,7 @@
         <p>拖拽产品图片到此处</p>
         <p class="hint">建议上传多角度图片（白底图、场景图、细节图）</p>
         <input ref="fileInput" type="file" accept="image/*" multiple hidden @change="handleFiles" />
-        <button class="btn-outline" @click="($refs.fileInput as HTMLInputElement)?.click()">选择图片</button>
+        <button class="btn-outline" @click="fileInput?.click()">选择图片</button>
       </div>
 
       <div v-if="previews.length" class="preview-grid">
@@ -111,6 +111,7 @@ const selectedTemplate = ref('');
 const activeRegion = ref('all');
 const platforms = ref<any[]>([]);
 const previews = ref<PreviewItem[]>([]);
+const fileInput = ref<HTMLInputElement | null>(null)
 const task = useTask();
 const toast = useToast();
 

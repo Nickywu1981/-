@@ -6,7 +6,7 @@
         <p>上传带褶皱的服装图</p>
         <p class="hint">AI自动识别褶皱区域，保留材质纹理</p>
         <input ref="fileInput" type="file" accept="image/*" hidden @change="handleFile" />
-        <button class="btn-outline" @click="($refs.fileInput as HTMLInputElement)?.click()">选择图片</button>
+        <button class="btn-outline" @click="fileInput?.click()">选择图片</button>
       </div>
       <div v-if="previewUrl" class="preview-box"><img loading="lazy" :src="previewUrl" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" /></div>
       <p v-if="uploading" class="hint uploading">⏳ 上传中...</p>
@@ -53,6 +53,7 @@ const previewUrl = ref('');
 const uploadedUrl = ref('');
 const uploading = ref(false);
 const selectedFabric = ref('auto');
+const fileInput = ref<HTMLInputElement | null>(null)
 const task = useTask();
 
 const fabrics = ['auto', '棉', '麻', '丝', '毛', '化纤', '牛仔', '针织'];

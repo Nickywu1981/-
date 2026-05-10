@@ -9,7 +9,7 @@
           <p class="dz-label">拖拽或点击上传产品图片</p>
           <p class="dz-hint">建议白色/纯色背景产品图，效果最佳</p>
           <input ref="fileInput" type="file" accept="image/*" hidden @change="handleFile" />
-          <button class="btn-outline-sm" @click="($refs.fileInput as HTMLInputElement)?.click()">选择图片</button>
+          <button class="btn-outline-sm" @click="fileInput?.click()">选择图片</button>
         </template>
         <img loading="lazy" v-else :src="previewUrl" alt="preview" class="preview-img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
       </div>
@@ -58,6 +58,7 @@ const { createBlobUrl, revoke } = useBlobUrl()
 const step = ref(0); const previewUrl = ref(''); const uploadedUrl = ref('')
 const uploading = ref(false); const processing = ref(false); const resultUrl = ref('')
 const selectedMode = ref('360_spin')
+const fileInput = ref<HTMLInputElement | null>(null)
 const modes = [
   { id: '360_spin', name: '360°旋转', icon: '🔄', desc: '多角度合成连续旋转图' },
   { id: 'pano_expand', name: '全景扩展', icon: '🌐', desc: 'AI 智能画面外扩' },

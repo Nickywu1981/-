@@ -11,7 +11,7 @@
               <img loading="lazy" v-else :src="sourceUrl" class="ws-upload-area__preview" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
               <div class="ws-upload-area__text">{{ sourceUrl ? '点击更换' : '上传产品图' }}</div>
               <input ref="sourceInput" type="file" accept="image/*" hidden @change="(e: Event) => handleFile(e, 'source')" />
-              <button class="ws-btn ws-btn--secondary ws-btn--sm" type="button" @click="($refs.sourceInput as HTMLInputElement)?.click()">选择图片</button>
+              <button class="ws-btn ws-btn--secondary ws-btn--sm" type="button" @click="sourceInput?.click()">选择图片</button>
             </div>
             <div class="upload-status" v-if="uploadingSrc">⏳ 上传中...</div>
             <div class="upload-status ok" v-else-if="uploadedSourceUrl">✓ 已上传</div>
@@ -23,7 +23,7 @@
               <img loading="lazy" v-else :src="targetUrl" class="ws-upload-area__preview" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
               <div class="ws-upload-area__text">{{ targetUrl ? '点击更换' : '上传人物图' }}</div>
               <input ref="targetInput" type="file" accept="image/*" hidden @change="(e: Event) => handleFile(e, 'target')" />
-              <button class="ws-btn ws-btn--secondary ws-btn--sm" type="button" @click="($refs.targetInput as HTMLInputElement)?.click()">选择图片</button>
+              <button class="ws-btn ws-btn--secondary ws-btn--sm" type="button" @click="targetInput?.click()">选择图片</button>
             </div>
             <div class="upload-status" v-if="uploadingTgt">⏳ 上传中...</div>
             <div class="upload-status ok" v-else-if="uploadedTargetUrl">✓ 已上传</div>
@@ -104,6 +104,8 @@ const uploadingTgt = ref(false)
 const selectedSkin = ref('自然')
 const selectedBody = ref('标准')
 const selectedStyle = ref('休闲')
+const sourceInput = ref<HTMLInputElement | null>(null)
+const targetInput = ref<HTMLInputElement | null>(null)
 const task = useTask()
 
 const skinTones = ['白皙', '自然', '小麦', '深色']

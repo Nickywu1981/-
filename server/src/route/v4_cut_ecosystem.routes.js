@@ -8,6 +8,7 @@ import { success, error } from '../utils/response.js';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import cutEcosystemService from '../services/cutEcosystemService.js';
+import { heavyLimiter } from '../middleware/rateLimiter.js';
 
 const router = Router();
 
@@ -27,7 +28,7 @@ const listSchema = z.object({
 // ============================================================
 // 剪映/CapCut 导出
 // ============================================================
-router.post('/export/jianying', _validate(exportSchema), async (req, res) => {
+router.post('/export/jianying', heavyLimiter, _validate(exportSchema), async (req, res) => {
   try {
     const result = await cutEcosystemService.exportJianyingDraft(req.user.id, req.validated);
     success(res, result);
@@ -36,7 +37,7 @@ router.post('/export/jianying', _validate(exportSchema), async (req, res) => {
   }
 });
 
-router.post('/export/capcut', _validate(exportSchema), async (req, res) => {
+router.post('/export/capcut', heavyLimiter, _validate(exportSchema), async (req, res) => {
   try {
     const result = await cutEcosystemService.exportCapCutDraft(req.user.id, req.validated);
     success(res, result);

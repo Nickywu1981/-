@@ -9,7 +9,7 @@
           <p class="dz-label">拖拽或点击上传底图</p>
           <p class="dz-hint">支持商品模特图、人物照片</p>
           <input ref="fileInput" type="file" accept="image/*" hidden @change="handleFile" />
-          <button class="btn-outline-sm" @click="($refs.fileInput as HTMLInputElement)?.click()">选择底图</button>
+          <button class="btn-outline-sm" @click="fileInput?.click()">选择底图</button>
         </template>
         <img loading="lazy" v-else :src="previewUrl" alt="preview" class="preview-img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
       </div>
@@ -26,7 +26,7 @@
           <p class="dz-label">拖拽或点击上传人脸照片</p>
           <p class="dz-hint">清晰正面照效果最佳</p>
           <input ref="faceInput" type="file" accept="image/*" hidden @change="handleFaceFile" />
-          <button class="btn-outline-sm" @click="($refs.faceInput as HTMLInputElement)?.click()">选择人脸</button>
+          <button class="btn-outline-sm" @click="faceInput?.click()">选择人脸</button>
         </template>
         <img loading="lazy" v-else :src="facePreviewUrl" alt="face" class="preview-img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
       </div>
@@ -68,6 +68,8 @@ const step = ref(0)
 const previewUrl = ref(''); const uploadedUrl = ref(''); const uploading = ref(false)
 const facePreviewUrl = ref(''); const faceUploadedUrl = ref('')
 const processing = ref(false); const resultUrl = ref('')
+const fileInput = ref<HTMLInputElement | null>(null)
+const faceInput = ref<HTMLInputElement | null>(null)
 
 const toast = useToast()
 async function handleFile(e: Event) {

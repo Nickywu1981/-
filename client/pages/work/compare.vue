@@ -93,7 +93,7 @@
             </div>
           </div>
           <div v-else class="picker-body upload-tab">
-            <div class="dropzone" @dragover.prevent @drop.prevent="handleUploadDrop" @click="($refs.uploadInput as HTMLInputElement)?.click()">
+            <div class="dropzone" @dragover.prevent @drop.prevent="handleUploadDrop" @click="uploadInput?.click()">
               <p>拖拽图片或点击上传</p>
               <input ref="uploadInput" type="file" accept="image/*" hidden @change="handleUploadFile" />
             </div>

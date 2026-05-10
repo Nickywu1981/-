@@ -114,6 +114,8 @@ const headerCfg = computed(() => configs.value['page.distribution.header'] || {}
 
 const apiBase = useRuntimeConfig().public.apiBase || '/api'
 
+const requestURL = useRequestURL()
+
 const inviteData = ref<any>(null)
 const balance = ref<any>(null)
 const teamStats = ref<any>(null)
@@ -126,7 +128,7 @@ const withdrawing = ref(false)
 
 const inviteUrl = computed(() => {
   const code = inviteData.value?.invite_code
-  return code ? `${window.location.origin}/auth/register?invite=${code}` : ''
+  return code ? `${requestURL.origin}/auth/register?invite=${code}` : ''
 })
 
 async function fetchInviteCode() {

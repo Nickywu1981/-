@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { authMiddleware } from '../middleware/auth.js';
 import platformPublishController from '../controller/platformPublishController.js';
+import { apiLimiter } from '../middleware/rateLimiter.js';
 
 const router = Router();
 
@@ -32,13 +33,13 @@ router.get('/platforms', platformPublishController.getPlatforms);
 router.get('/bindings', platformPublishController.getMyBindings);
 
 // POST /api/platform-publish/bind
-router.post('/bind', _validate(bindSchema), platformPublishController.bindPlatform);
+router.post('/bind', apiLimiter, _validate(bindSchema), platformPublishController.bindPlatform);
 
 // DELETE /api/platform-publish/unbind/:platform
-router.delete('/unbind/:platform', platformPublishController.unbind);
+router.delete('/unbind/:platform', apiLimiter, platformPublishController.unbind);
 
 // POST /api/platform-publish/publish
-router.post('/publish', _validate(publishSchema), platformPublishController.publish);
+router.post('/publish', apiLimiter, _validate(publishSchema), platformPublishController.publish);
 
 // GET /api/platform-publish/history
 router.get('/history', platformPublishController.getPublishHistory);

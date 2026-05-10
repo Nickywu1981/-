@@ -6,7 +6,7 @@
         <p>上传商品图片进行颜色替换</p>
         <p class="hint">精准识别商品区域，替换为指定颜色</p>
         <input ref="fileInput" type="file" accept="image/*" hidden @change="handleFile" />
-        <button class="btn-outline" @click="($refs.fileInput as HTMLInputElement)?.click()">选择图片</button>
+        <button class="btn-outline" @click="fileInput?.click()">选择图片</button>
       </div>
       <div v-if="previewUrl" class="preview-box"><img loading="lazy" :src="previewUrl" alt="preview" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" /></div>
       <p v-if="uploading" class="hint uploading">⏳ 上传中...</p>
@@ -46,6 +46,7 @@ const uploading = ref(false)
 const processing = ref(false)
 const resultUrl = ref('')
 const targetColor = ref('#7C3AED')
+const fileInput = ref<HTMLInputElement | null>(null)
 
 const presetColors = [
   { name: '经典红', value: '#DC2626' }, { name: '活力橙', value: '#EA580C' },

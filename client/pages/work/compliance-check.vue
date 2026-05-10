@@ -57,7 +57,7 @@
         <p class="dz-icon">📤</p>
         <p>拖拽图片到此处</p>
         <input ref="fileInput" type="file" accept="image/*" multiple hidden @change="handleFiles" />
-        <button class="btn-outline" @click="($refs.fileInput as HTMLInputElement)?.click()">选择图片</button>
+        <button class="btn-outline" @click="fileInput?.click()">选择图片</button>
       </div>
 
       <div v-if="previews.length" class="preview-grid">
@@ -132,6 +132,7 @@ const textToCheck = ref('');
 const checkResult = ref<any>(null);
 const checking = ref(false);
 const previewRules = ref<any[]>([]);
+const fileInput = ref<HTMLInputElement | null>(null)
 
 function removeImage(i: number) { previews.value.splice(i, 1); }
 

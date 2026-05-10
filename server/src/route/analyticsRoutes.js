@@ -4,6 +4,7 @@ import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
 import { z } from 'zod';
+import { apiLimiter } from '../middleware/rateLimiter.js';
 
 const router = Router();
 
@@ -13,7 +14,7 @@ const trackSchema = z.object({
 });
 
 // 埋点上报（需登录）
-router.post('/track', authMiddleware, validate(trackSchema), asyncHandler(track));
+router.post('/track', authMiddleware, apiLimiter, validate(trackSchema), asyncHandler(track));
 
 // 数据查询（仅管理员）
 router.get('/funnel', authMiddleware, adminAuth, asyncHandler(funnel));

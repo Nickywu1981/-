@@ -7,7 +7,7 @@
         <p>拖拽图片文件夹到此处</p>
         <p class="hint">支持 JPG / PNG / WebP，一次最多 100 张</p>
         <input ref="fileInput" type="file" accept="image/*" multiple hidden @change="handleFiles" />
-        <button class="btn-outline" @click="($refs.fileInput as HTMLInputElement)?.click()">选择图片</button>
+        <button class="btn-outline" @click="fileInput?.click()">选择图片</button>
       </div>
       <div v-if="previews.length" class="file-count">{{ previews.length }} 张图片已就绪</div>
 
@@ -152,6 +152,7 @@ const nightMode = ref(false);
 const templateName = ref('');
 const templates = ref<any[]>([]);
 const history = ref<any[]>([]);
+const fileInput = ref<HTMLInputElement | null>(null)
 const task = useTask();
 
 const operations = [

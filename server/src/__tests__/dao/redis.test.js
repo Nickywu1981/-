@@ -5,7 +5,7 @@ const { mockGet, mockSet, mockConnect, mockClient } = vi.hoisted(() => {
   const set = vi.fn();
   const del = vi.fn();
   const connect = vi.fn();
-  const client = { connect, get, set, del, on: vi.fn() };
+  const client = { connect, get, set, del, on: vi.fn(), isReady: true };
   return { mockGet: get, mockSet: set, mockDel: del, mockConnect: connect, mockClient: client };
 });
 

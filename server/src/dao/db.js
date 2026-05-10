@@ -150,6 +150,7 @@ const realPool = mysql.createPool({
   queueLimit: 0,
   enableKeepAlive: true,
   keepAliveInitialDelay: 10000,
+  idleTimeout: 60000,
   dateStrings: true,
   connectTimeout: 3000, // fail fast if no MySQL
 });

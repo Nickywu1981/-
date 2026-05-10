@@ -9,7 +9,7 @@
           <p class="dz-label">拖拽或点击上传服装图片</p>
           <p class="dz-hint">支持 JPG / PNG / WebP，建议 800×800 以上</p>
           <input ref="fileInput" type="file" accept="image/*" hidden @change="handleFile" />
-          <button class="btn-outline-sm" @click="($refs.fileInput as HTMLInputElement)?.click()">选择图片</button>
+          <button class="btn-outline-sm" @click="fileInput?.click()">选择图片</button>
         </template>
         <img loading="lazy" v-else :src="previewUrl" alt="preview" class="preview-img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
       </div>
@@ -62,6 +62,7 @@ const step = ref(0)
 const previewUrl = ref(''); const uploadedUrl = ref(''); const uploading = ref(false)
 const processing = ref(false); const resultUrl = ref('')
 const selectedModel = ref('asian_female')
+const fileInput = ref<HTMLInputElement | null>(null)
 const models = [
   { id: 'asian_female', name: '亚洲女性', icon: '👩', desc: '自然肤色优雅气质' },
   { id: 'asian_male', name: '亚洲男性', icon: '👨', desc: '阳光活力商务范' },

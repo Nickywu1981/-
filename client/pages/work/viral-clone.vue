@@ -10,7 +10,7 @@
             <video v-else :src="refVideoUrl" class="preview-media" controls />
             <p>{{ refVideoUrl ? '点击更换' : '上传爆款视频' }}</p>
             <input ref="refInput" type="file" accept="video/*" hidden @change="(e) => handleFile(e, 'ref')" />
-            <button class="btn-outline" @click="($refs.refInput as HTMLInputElement)?.click()">选择视频</button>
+            <button class="btn-outline" @click="refInput?.click()">选择视频</button>
           </div>
           <p v-if="uploadingRef" class="status">⏳ 上传中...</p>
           <p v-else-if="uploadedRefUrl" class="status ok">✓ 已上传</p>
@@ -22,7 +22,7 @@
             <img loading="lazy" v-else :src="productImageUrl" class="preview-media" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
             <p>{{ productImageUrl ? '点击更换' : '上传产品图' }}</p>
             <input ref="imgInput" type="file" accept="image/*" hidden @change="(e) => handleFile(e, 'product')" />
-            <button class="btn-outline" @click="($refs.imgInput as HTMLInputElement)?.click()">选择图片</button>
+            <button class="btn-outline" @click="imgInput?.click()">选择图片</button>
           </div>
           <p v-if="uploadingProd" class="status">⏳ 上传中...</p>
           <p v-else-if="uploadedProductUrl" class="status ok">✓ 已上传</p>
@@ -85,6 +85,8 @@ const uploadedProductUrl = ref('');
 const uploadingRef = ref(false);
 const uploadingProd = ref(false);
 const matchStrength = ref(0.8);
+const refInput = ref<HTMLInputElement | null>(null)
+const imgInput = ref<HTMLInputElement | null>(null)
 const task = useTask();
 
 async function uploadFile(file: File, type: string) {

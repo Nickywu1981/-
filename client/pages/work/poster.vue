@@ -342,6 +342,7 @@ function downloadImage(url) {
 
 async function copyImage(url) {
   if (!url) return;
+  if (!process.client) return;
   try {
     if (navigator.clipboard && typeof ClipboardItem !== 'undefined') {
       const resp = await fetch(url);

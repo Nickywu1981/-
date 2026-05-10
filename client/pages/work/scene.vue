@@ -5,7 +5,7 @@
         <p class="dz-icon">🖼</p>
         <p>拖拽产品图（已抠好最佳）或直接上传</p>
         <input ref="fileInput" type="file" accept="image/*" hidden @change="handleFile" />
-        <button class="btn-outline" @click="($refs.fileInput as HTMLInputElement)?.click()">选择文件</button>
+        <button class="btn-outline" @click="fileInput?.click()">选择文件</button>
       </div>
       <img loading="lazy" v-if="previewUrl" :src="previewUrl" class="preview-img" alt="预览" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
       <p v-if="uploading" class="hint">上传中...</p>
@@ -61,6 +61,7 @@ const previewUrl = ref('');
 const uploadedUrl = ref('');
 const uploading = ref(false);
 const selectedScene = ref('');
+const fileInput = ref<HTMLInputElement | null>(null)
 const task = useTask();
 
 const scenes = [

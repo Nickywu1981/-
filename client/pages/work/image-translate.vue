@@ -6,7 +6,7 @@
         <p>上传包含中文文字的电商图片</p>
         <p class="hint">AI识别并翻译文字，自动排版融入原图风格</p>
         <input ref="fileInput" type="file" accept="image/*" hidden @change="handleFile" />
-        <button class="btn-outline" @click="($refs.fileInput as HTMLInputElement)?.click()">选择图片</button>
+        <button class="btn-outline" @click="fileInput?.click()">选择图片</button>
       </div>
       <div v-if="previewUrl" class="preview-box"><img loading="lazy" :src="previewUrl" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" /></div>
       <p v-if="uploading" class="hint uploading">⏳ 上传中...</p>
@@ -59,6 +59,7 @@ const previewUrl = ref('');
 const uploadedUrl = ref('');
 const uploading = ref(false);
 const selectedLang = ref('en');
+const fileInput = ref<HTMLInputElement | null>(null)
 const task = useTask();
 
 const languages = [

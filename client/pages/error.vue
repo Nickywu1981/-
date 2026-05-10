@@ -47,6 +47,7 @@ const desc = computed(() => s.value.desc);
 const backLabel = computed(() => s.value.back);
 
 function goBack() {
+  if (!process.client) return
   if (code.value === 500) location.reload();
   else window.history.back();
 }

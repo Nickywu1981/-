@@ -19,6 +19,7 @@ import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate, validate } from '../utils/validate.js';
 import { requireRole } from '../middleware/rbac.js';
 import * as modelRouter from '../services/model-router.service.js';
+import { heavyLimiter } from '../middleware/rateLimiter.js';
 
 const router = Router();
 
@@ -105,7 +106,7 @@ router.get('/models', requireRole('admin'), async (req, res) => {
 });
 
 // POST /api/test/single — 单模型独立测试
-router.post('/single', requireRole('admin'), _validate(singleTestSchema), async (req, res) => {
+router.post('/single', requireRole('admin'), heavyLimiter, _validate(singleTestSchema), async (req, res) => {
   const { model_key, prompt, category, params } = req.validated;
   const start = Date.now();
 
@@ -147,7 +148,7 @@ router.post('/single', requireRole('admin'), _validate(singleTestSchema), async 
 });
 
 // POST /api/test/mixed — 自动混合模型调用
-router.post('/mixed', requireRole('admin'), _validate(mixedTestSchema), async (req, res) => {
+router.post('/mixed', requireRole('admin'), heavyLimiter, _validate(mixedTestSchema), async (req, res) => {
   const { task_type, prompt, category, params } = req.validated;
   const start = Date.now();
 
@@ -188,7 +189,7 @@ router.post('/mixed', requireRole('admin'), _validate(mixedTestSchema), async (r
 });
 
 // POST /api/test/custom — 自定义多模型编排测试
-router.post('/custom', requireRole('admin'), _validate(customTestSchema), async (req, res) => {
+router.post('/custom', requireRole('admin'), heavyLimiter, _validate(customTestSchema), async (req, res) => {
   const { task_type, prompt, category, model_sequence, parallel, params } = req.validated;
   const start = Date.now();
   const steps = [];
@@ -262,7 +263,7 @@ router.post('/custom', requireRole('admin'), _validate(customTestSchema), async 
 });
 
 // POST /api/test/compare — 多模型并行对比
-router.post('/compare', requireRole('admin'), _validate(compareTestSchema), async (req, res) => {
+router.post('/compare', requireRole('admin'), heavyLimiter, _validate(compareTestSchema), async (req, res) => {
   const { prompt, category, model_keys, params } = req.validated;
   const start = Date.now();
   const comparisons = [];

@@ -34,24 +34,22 @@ const client = createClient({
 
 client.on('error', (err) => { logger.warn('[Redis] 连接错误', { error: err.message }); });
 
-let connected = false;
 let triedConnect = false;
 
 export async function getRedis() {
-  if (connected) return client;
+  if (client.isReady) return client;
   if (!triedConnect) {
     triedConnect = true;
     try {
       await client.connect();
-      connected = true;
       logger.info('[Redis] 连接成功');
       return client;
     } catch (err) {
-      logger.warn('[Redis] 初始连接失败，使用内存缓存', { error: err.message });
-      // 60s 后允许重试一次初始连接
-      setTimeout(() => { triedConnect = false; }, 60000).unref();
+      logger.warn('[Redis] 初始连接失败，将依赖内置 retryStrategy 自动重连', { error: err.message });
+      // 客户端内置 reconnectStrategy 会持续重试，isReady 变为 true 时自动恢复
     }
   }
+  // 仍在重连中或已失败，回退到内存缓存
   return null;
 }
 
@@ -95,9 +93,8 @@ export async function ping() {
 }
 
 export async function quit() {
-  if (connected) {
+  if (client.isReady) {
     try { await client.quit(); } catch { /* ignore */ }
-    connected = false;
   }
 }
 

@@ -7,7 +7,7 @@
           <p>上传商品图片</p>
           <p class="hint">支持 JPG / PNG / WebP，最大 20MB</p>
           <input ref="fileInput" type="file" accept="image/*" hidden @change="handleFile" />
-          <button class="btn-outline" @click="(fileInput as HTMLInputElement)?.click()">选择图片</button>
+          <button class="btn-outline" @click="fileInput?.click()">选择图片</button>
         </div>
         <div v-if="previewUrl" class="preview-box">
           <img loading="lazy" :src="previewUrl" alt="预览" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
@@ -122,8 +122,11 @@ const processing = ref(false)
 const shadow = ref('soft')
 const size = ref('original')
 const edge = ref('auto')
-const fileInput = ref<HTMLInputElement>()
+const fileInput = ref<HTMLInputElement | null>(null)
 const taskStatus = ref(-1)
+const POLL_INITIAL_MS = 1000
+const POLL_INTERVAL_MS = 2000
+const POLL_BACKOFF_MS = 5000
 const progress = ref(0)
 const progressMsg = ref('')
 const errorMsg = ref('')

@@ -7,7 +7,7 @@
         <p>拖拽产品图，支持多张（每张对应一个SKU）</p>
         <p class="hint">支持 JPG / PNG / WebP，一次最多 20 张</p>
         <input ref="fileInput" type="file" accept="image/*" multiple hidden @change="handleFiles" />
-        <button class="btn-outline" @click="($refs.fileInput as HTMLInputElement)?.click()">选择文件</button>
+        <button class="btn-outline" @click="fileInput?.click()">选择文件</button>
       </div>
 
       <div v-if="skuList.length" class="sku-preview-section">
@@ -141,6 +141,7 @@ const selectedCategory = ref('');
 const selectedTemplate = ref('');
 const selectedPlatform = ref('');
 const task = useTask();
+const fileInput = ref<HTMLInputElement | null>(null)
 
 const skuList = ref<SkuItem[]>([]);
 

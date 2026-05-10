@@ -149,6 +149,7 @@ function onViewerError(msg: string) {
 }
 
 function captureScreenshot() {
+  if (!process.client) return
   const canvas = document.querySelector('.viewer-canvas') as HTMLCanvasElement;
   if (canvas) {
     screenshotUrl.value = canvas.toDataURL('image/png');

@@ -6,7 +6,7 @@
         <p>上传服装/鞋包/配饰产品图</p>
         <p class="hint">AI自动识别可换色区域，保留褶皱纹理细节</p>
         <input ref="fileInput" type="file" accept="image/*" hidden @change="handleFile" />
-        <button class="btn-outline" @click="($refs.fileInput as HTMLInputElement)?.click()">选择图片</button>
+        <button class="btn-outline" @click="fileInput?.click()">选择图片</button>
       </div>
       <div v-if="previewUrl" class="preview-box"><img loading="lazy" :src="previewUrl" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" /></div>
       <p v-if="uploading" class="hint uploading">⏳ 上传中...</p>
@@ -67,6 +67,7 @@ const uploading = ref(false);
 const selectedColors = ref<string[]>([]);
 const customColor = ref('#FF0000');
 const customColorHex = ref('');
+const fileInput = ref<HTMLInputElement | null>(null)
 const task = useTask();
 
 const presetColors = [

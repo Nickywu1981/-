@@ -176,6 +176,7 @@ function viewCollection(item: any) {
 }
 
 async function shareCollection(item: any) {
+  if (!process.client) return
   const url = `${window.location.origin}/my/collections?id=${item.id}`
   const ok = await copyToClipboard(url)
   if (ok) {

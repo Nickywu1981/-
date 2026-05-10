@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { authMiddleware } from '../middleware/auth.js';
 import templateMarketController from '../controller/templateMarketController.js';
+import { paymentLimiter } from '../middleware/rateLimiter.js';
 
 const router = Router();
 
@@ -28,7 +29,7 @@ router.get('/:id', _validate(idParamSchema, 'params'), templateMarketController.
 router.post('/:id/download', authMiddleware, _validate(idParamSchema, 'params'), templateMarketController.download);
 
 // POST /api/template-market/:id/purchase
-router.post('/:id/purchase', authMiddleware, _validate(idParamSchema, 'params'), templateMarketController.purchase);
+router.post('/:id/purchase', authMiddleware, paymentLimiter, _validate(idParamSchema, 'params'), templateMarketController.purchase);
 
 // POST /api/template-market/create
 router.post('/create', authMiddleware, _validate(createSchema), templateMarketController.create);
