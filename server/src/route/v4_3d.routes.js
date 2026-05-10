@@ -139,7 +139,7 @@ const demoParamsSchema = z.object({
   key: z.enum(['shoe', 'watch', 'bag', 'bottle']),
 });
 
-router.get('/demo/:key', _validate(demoParamsSchema, 'params'), (req, res, next) => {
+router.get('/demo/:key', _validate(demoParamsSchema, 'params'), async (req, res, next) => {
   try {
     const file = DEMO_MODELS[req.validated.key];
     if (!file) return error(res, ERROR_CODE.NOT_FOUND, '示例模型不存在');

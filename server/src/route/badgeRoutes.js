@@ -21,7 +21,10 @@ const badgeSchema = z.object({
   sortOrder: z.number().int().min(0).optional().default(0),
 });
 
-// 用户端：可用的标签列表（缓存 5 分钟）
+// 公开端点：可用标签列表（无需登录）
+router.get('/public', cacheMiddleware(300), validate(badgeQuerySchema, 'query'), asyncHandler(listBadges));
+
+// 用户端：可用的标签列表（需登录，缓存 5 分钟）
 router.get('/', authMiddleware, cacheMiddleware(300), validate(badgeQuerySchema, 'query'), asyncHandler(listBadges));
 router.get('/:id', authMiddleware, validate(idParamSchema, 'params'), asyncHandler(getBadge));
 

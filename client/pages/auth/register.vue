@@ -13,12 +13,12 @@
       <form @submit.prevent="handleRegister">
         <div class="input-group">
           <label for="reg-phone">{{ config.phone_label || '手机号' }}</label>
-          <input id="reg-phone" v-model="phone" type="tel" class="input" placeholder="请输入手机号" maxlength="11" />
+          <input id="reg-phone" v-model="phone" type="tel" class="input" placeholder="请输入手机号" maxlength="11" autocomplete="tel" />
         </div>
 
         <div class="input-group">
           <label for="reg-email">{{ config.email_label || '邮箱' }}</label>
-          <input id="reg-email" v-model="email" type="email" class="input" placeholder="选填" />
+          <input id="reg-email" v-model="email" type="email" class="input" placeholder="选填" autocomplete="email" />
         </div>
 
         <div class="input-group">
@@ -29,7 +29,7 @@
 
         <div class="input-group">
           <label for="reg-invite">{{ config.invite_label || '邀请码（选填）' }}</label>
-          <input id="reg-invite" v-model="inviteCode" type="text" class="input" placeholder="请输入邀请码" maxlength="8" />
+          <input id="reg-invite" v-model="inviteCode" type="text" class="input" placeholder="请输入邀请码" maxlength="8" autocomplete="off" />
         </div>
 
         <p class="agreement">{{ config.agreement || '注册即表示同意《用户协议》和《隐私政策》' }}</p>

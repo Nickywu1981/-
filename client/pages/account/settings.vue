@@ -13,11 +13,11 @@
     <div v-if="tab === 'profile'" class="card">
       <div class="form-group">
         <label for="prof-nickname">用户名</label>
-        <input id="prof-nickname" v-model="form.nickname" type="text" placeholder="昵称" />
+        <input id="prof-nickname" v-model="form.nickname" type="text" placeholder="昵称" autocomplete="nickname" />
       </div>
       <div class="form-group">
         <label for="prof-phone">手机号</label>
-        <input id="prof-phone" v-model="form.phone" type="text" placeholder="选填" />
+        <input id="prof-phone" v-model="form.phone" type="text" placeholder="选填" autocomplete="tel" />
       </div>
       <div class="form-group">
         <label for="prof-email">邮箱</label>

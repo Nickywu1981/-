@@ -99,6 +99,15 @@ export async function sendVerificationCode(email, scene = 'login') {
     throw new BusinessError(429, '发送过于频繁，请60秒后再试');
   }
 
+  // 小时/日频率控制
+  const now = Date.now();
+  const sends = (EMAIL_SEND_LOG.get(email) || []).filter(t => now - t < 86400000);
+  const hourSends = sends.filter(t => now - t < 3600000).length;
+  if (hourSends >= 5) throw new BusinessError(429, '该邮箱1小时内发送次数已达上限');
+  if (sends.length >= 10) throw new BusinessError(429, '该邮箱24小时内发送次数已达上限');
+  sends.push(now);
+  EMAIL_SEND_LOG.set(email, sends);
+
   const code = generateCode(6);
   const expires = Date.now() + 5 * 60 * 1000; // 5分钟有效
 
