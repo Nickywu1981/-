@@ -52,7 +52,7 @@ function switchLang(code: string) {
   transition: border-color 0.2s, background 0.2s;
 }
 .lsw-btn:hover { border-color: #c5c5c2; background: rgba(0,0,0,0.02); }
-.lsw-arrow { font-size: 9px; color: #6b6b70; transition: transform 0.2s; }
+.lsw-arrow { font-size: 10px; color: #6b6b70; transition: transform 0.2s; }
 .lsw-drop {
   position: absolute; top: calc(100% + 4px); right: 0;
   background: #fff; border: 1px solid #ebebea; border-radius: 10px;

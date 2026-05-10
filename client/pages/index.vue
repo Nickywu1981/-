@@ -304,7 +304,16 @@ function scrollTo(id: string) {
 }
 const faqOpen = ref(-1);
 
-const handleScroll = () => { scrolled.value = window.scrollY > 50; };
+let scrollTicking = false;
+const handleScroll = () => {
+  if (!scrollTicking) {
+    requestAnimationFrame(() => {
+      scrolled.value = window.scrollY > 50;
+      scrollTicking = false;
+    });
+    scrollTicking = true;
+  }
+};
 onMounted(() => {
   window.addEventListener('scroll', handleScroll, { passive: true });
   checkAuth();

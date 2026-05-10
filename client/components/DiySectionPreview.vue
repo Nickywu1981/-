@@ -124,7 +124,7 @@ function onImgError(e: Event) {
 .coupon-card { padding: 12px; border: 2px dashed; display: flex; flex-direction: column; gap: 4px; }
 .coupon-card .amount { font-size: 22px; font-weight: 700; }
 .preview-buttons { display: flex; justify-content: center; padding: 12px; }
-.btn-pill { display: inline-block; padding: 6px 18px; color: #fff; font-weight: 600; font-size: 13px; }
+.btn-pill { display: inline-block; padding: 6px 18px; color: #fff; font-weight: 600; font-size: 13px; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
 .preview-nav { display: flex; gap: 8px; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-light); overflow-x: auto; }
 .nav-chip { font-size: 11px; white-space: nowrap; }
 .preview-hotzone { position: relative; }

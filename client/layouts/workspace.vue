@@ -111,8 +111,8 @@ onMounted(async () => {
     userPoints.value = (data as any).points || 0
     isAdmin.value = !!(data as any).isAdmin
     userInitial.value = userName.value ? userName.value.charAt(0).toUpperCase() : 'U'
-  } catch {
-    router.push('/login')
+  } catch (e: any) {
+    if (e?.status === 401 || e?.statusCode === 401) router.push('/login')
   }
 
   try {
