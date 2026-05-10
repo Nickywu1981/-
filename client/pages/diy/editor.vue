@@ -159,14 +159,27 @@ import { useDiyAutoSave } from '~/composables/useDiyAutoSave'
 const route = useRoute()
 const toast = useToast()
 const editor = useDiyEditor()
-const { sections, selectedIdxs, previewMode, undoStack, redoStack } = editor
+const { sections, selectedIdxs, undoStack, redoStack } = editor
+const previewMode = ref<'mobile' | 'pc'>('mobile')
 const selectedIdx = computed(() => selectedIdxs.value[0] ?? -1)
-const pageInfo = ref({})
+const pageInfo = ref<any>({})
 const dragOverIdx = ref(-1)
 const rightTab = ref('props')
 const dirty = ref(false)
 const publishing = ref(false)
 const saving = ref(false)
+
+// 双端独立配置存储
+const mobileSections = ref<any[]>([])
+const pcSections = ref<any[]>([])
+
+watch(previewMode, (newMode, oldMode) => {
+  if (oldMode) {
+    (oldMode === 'mobile' ? mobileSections : pcSections).value = structuredClone(sections.value)
+  }
+  const target = (newMode === 'mobile' ? mobileSections : pcSections).value
+  editor.loadFromConfig({ sections: target.length ? target : [] })
+})
 
 // 版本管理
 const showVersions = ref(false)
@@ -243,24 +256,31 @@ async function loadPage() {
   const id = route.query.id
   if (!id) { navigateTo('/diy'); return }
   try {
-    const res = await $fetch(`/api/diy/${id}`)
+    const res: any = await $fetch(`/api/diy/${id}`)
     pageInfo.value = res.data
     const isPC = res.data.page_type === 'pc'
-    editor.loadFromConfig(isPC ? (res.data.pc_config || res.data.mobile_config) : (res.data.mobile_config || res.data.pc_config))
+    const mCfg = res.data.mobile_config || { sections: [] }
+    const pCfg = res.data.pc_config || { sections: [] }
+    mobileSections.value = mCfg.sections || []
+    pcSections.value = pCfg.sections || []
+    previewMode.value = isPC ? 'pc' : 'mobile'
+    editor.loadFromConfig(isPC ? pCfg : mCfg)
   } catch { toast.error('加载页面失败') }
 }
 
 async function savePage() {
   saving.value = true
   try {
-    const mCfg = editor.toConfigJson()
-    const body: Record<string, any> = {}
-    if (pageInfo.value.page_type !== 'pc') body.mobileConfig = mCfg
-    if (pageInfo.value.page_type !== 'mobile') body.pcConfig = mCfg
+    if (previewMode.value === 'mobile') mobileSections.value = structuredClone(sections.value)
+    else pcSections.value = structuredClone(sections.value)
+    const body: Record<string, any> = {
+      mobileConfig: { sections: mobileSections.value },
+      pcConfig: { sections: pcSections.value },
+    }
     await $fetch(`/api/diy/${pageInfo.value.id}`, { method: 'PUT', body })
     dirty.value = false
     toast.success('保存成功')
-  } catch (e) { toast.error('保存失败: ' + (e.data?.msg || e.message)) }
+  } catch (e: any) { toast.error('保存失败: ' + (e.data?.msg || e.message)) }
   finally { saving.value = false }
 }
 
@@ -268,15 +288,17 @@ async function saveVersion() {
   const remark = prompt('版本备注 (可选):')
   saving.value = true
   try {
-    const mCfg = editor.toConfigJson()
-    const body: Record<string, any> = {}
-    if (pageInfo.value.page_type !== 'pc') body.mobileConfig = mCfg
-    if (pageInfo.value.page_type !== 'mobile') body.pcConfig = mCfg
+    if (previewMode.value === 'mobile') mobileSections.value = structuredClone(sections.value)
+    else pcSections.value = structuredClone(sections.value)
+    const body: Record<string, any> = {
+      mobileConfig: { sections: mobileSections.value },
+      pcConfig: { sections: pcSections.value },
+    }
     if (remark) body.remark = remark
     await $fetch(`/api/diy/${pageInfo.value.id}/versions`, { method: 'POST', body })
     dirty.value = false
     toast.success('版本已保存')
-  } catch (e) { toast.error('保存版本失败: ' + (e.data?.msg || e.message)) }
+  } catch (e: any) { toast.error('保存版本失败: ' + (e.data?.msg || e.message)) }
   finally { saving.value = false }
 }
 

@@ -78,6 +78,8 @@ export default {
   async createPage(tenantId, ownerId, { title, slug, pageType, accessType, mobileConfig, pcConfig, metaJson }) {
     const sanitizedTitle = title?.replace(/<[^>]*>/g, '') || '';
     if (!sanitizedTitle.trim() || !slug?.trim()) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '标题和标识不能为空');
+    const exists = await diyDao.getPageBySlug(slug, tenantId);
+    if (exists) throw new BusinessError(ERROR_CODE.BAD_REQUEST, `页面标识 "${slug}" 已被使用`);
     return diyDao.createPageWithVersion({ tenantId, ownerId: ownerId || 0, title: sanitizedTitle, slug, pageType: pageType || 'mobile', accessType: accessType || 'public', mobileConfig: mobileConfig || { sections: [] }, pcConfig: pcConfig || { sections: [] }, metaJson });
   },
 
@@ -85,6 +87,10 @@ export default {
     const exist = await diyDao.getPageById(id, tenantId);
     if (!exist) throw new BusinessError(ERROR_CODE.NOT_FOUND, '页面不存在');
     if (fields.title !== undefined) fields.title = fields.title.replace(/<[^>]*>/g, '');
+    if (fields.slug && fields.slug !== exist.slug) {
+      const collision = await diyDao.getPageBySlug(fields.slug, tenantId);
+      if (collision) throw new BusinessError(ERROR_CODE.BAD_REQUEST, `页面标识 "${fields.slug}" 已被使用`);
+    }
     await diyDao.updatePage(id, tenantId, fields);
     return diyDao.getPageById(id, tenantId);
   },
@@ -121,6 +127,8 @@ export default {
     const page = await diyDao.getPageById(id, tenantId);
     if (!page) throw new BusinessError(ERROR_CODE.NOT_FOUND, '页面不存在');
     const msg = checkStateTransition(page.status, 1);
+    const issues = validateBeforePublish(page);
+    if (issues.length) throw new BusinessError(ERROR_CODE.BAD_REQUEST, `发布校验未通过: ${issues.join('; ')}`);
     await diyDao.republishPage(id, tenantId);
     page.status = 1;
     page.publish_time = new Date().toISOString();

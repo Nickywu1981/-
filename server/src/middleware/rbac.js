@@ -156,10 +156,10 @@ export function requireAnyPermission(...permList) {
   };
 }
 
-/** 快捷别名 */
-export const adminOnly = roleGuard('admin');
-export const editorOrAbove = roleGuard('admin', 'editor');
-export const userOrAbove = roleGuard('admin', 'editor', 'user');
+/** 快捷别名 — 使用等级制 requireRole，确保 super_admin 不被误拦截 */
+export const adminOnly = requireRole('admin');
+export const editorOrAbove = requireRole('editor');
+export const userOrAbove = requireRole('user');
 
 export default { ROLES, PERMISSIONS, hasPermission, hasRole, requireRole, requirePermission, requireAnyPermission, roleGuard, adminOnly, editorOrAbove, userOrAbove };
 
