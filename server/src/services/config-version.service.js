@@ -6,6 +6,7 @@
 import { EventEmitter } from 'events';
 
 const versionEmitter = new EventEmitter();
+versionEmitter.setMaxListeners(200); // SSE 连接上限
 let currentVersion = 0;
 
 export function getCurrentVersion() {

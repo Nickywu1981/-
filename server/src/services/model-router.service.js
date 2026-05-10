@@ -7,7 +7,7 @@ import { aiCaller } from '../utils/ai-caller.js';
 import { BusinessError } from '../utils/businessError.js';
 import * as modelConfigDao from '../dao/modelConfigDao.js';
 
-const modelInstances = {};
+let modelInstances = {};
 const TASK_MODEL_MAP = {
   video_gen: ['seedance'],
   image_gen: ['tongyi_wanxiang'],
@@ -47,7 +47,7 @@ async function loadRegistry() {
   return registryCache;
 }
 
-export function invalidateCache() { registryCache = null; cacheExpiry = 0; }
+export function invalidateCache() { registryCache = null; cacheExpiry = 0; modelInstances = {}; }
 
 function getModelInstance(modelKey, registry) {
   if (!modelInstances[modelKey]) {

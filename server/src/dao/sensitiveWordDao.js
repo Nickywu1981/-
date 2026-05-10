@@ -1,6 +1,7 @@
 import pool from '../dao/db.js';
 
 let wordCache = null;
+let regexCache = null;  // 缓存的 { word, regex, category, level } 数组
 let cacheTimestamp = 0;
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 分钟缓存
 
@@ -15,6 +16,7 @@ async function getActiveWords() {
 
 export function invalidateWordCache() {
   wordCache = null;
+  regexCache = null;
   cacheTimestamp = 0;
 }
 
@@ -39,11 +41,20 @@ export async function deleteSensitiveWord(id) {
 
 export async function checkText(text) {
   const words = await getActiveWords();
+  // 复用编译后的正则表达式（避免每次调用 O(n) 编译）
+  if (!regexCache) {
+    regexCache = words.map(w => {
+      try {
+        const escaped = w.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return { ...w, regex: new RegExp(escaped, 'i') };
+      } catch { return { ...w, regex: null }; }
+    });
+  }
   const hits = [];
-  for (const w of words) {
+  for (const w of regexCache) {
     try {
-      const escaped = w.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      if (new RegExp(escaped, 'i').test(text)) hits.push(w);
+      if (w.regex?.test(text)) hits.push(w);
+      else if (!w.regex && text.includes(w.word)) hits.push(w);
     } catch { if (text.includes(w.word)) hits.push(w); }
   }
   return { safe: hits.length === 0, hits, block: hits.some(h => h.level === 1), review: hits.some(h => h.level === 2) };
