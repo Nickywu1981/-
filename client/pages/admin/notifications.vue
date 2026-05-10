@@ -51,8 +51,8 @@
           <option value="task">任务通知</option>
           <option value="credit">积分通知</option>
         </select>
-        <input v-model="sendDialog.title" type="text" placeholder="通知标题 *" />
-        <textarea v-model="sendDialog.content" placeholder="通知内容 *" rows="3"></textarea>
+        <input v-model="sendDialog.title" maxlength="100" type="text" placeholder="通知标题 *" />
+        <textarea v-model="sendDialog.content" maxlength="5000" placeholder="通知内容 *" rows="3"></textarea>
         <div class="modal-actions">
           <button class="btn-cancel" @click="sendDialog.open = false">取消</button>
           <button class="btn" @click="confirmSend">发送</button>

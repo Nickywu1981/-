@@ -69,9 +69,9 @@
         <div class="modal">
           <h3>编辑用户 #{{ editForm.id }}</h3>
           <div class="form-grid">
-            <label>用户名 <input v-model="editForm.username" /></label>
-            <label>昵称 <input v-model="editForm.nickname" /></label>
-            <label>手机号 <input v-model="editForm.phone" /></label>
+            <label>用户名 <input v-model="editForm.username" maxlength="100" /></label>
+            <label>昵称 <input v-model="editForm.nickname" maxlength="100" /></label>
+            <label>手机号 <input v-model="editForm.phone" maxlength="20" /></label>
             <label>会员类型
               <select v-model="editForm.plan_type">
                 <option :value="0">免费</option><option :value="1">月卡</option><option :value="2">季卡</option><option :value="3">年卡</option>

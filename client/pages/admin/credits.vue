@@ -57,7 +57,7 @@
       <div class="modal-box">
         <h4>确认退款</h4>
         <p class="modal-info">记录 #{{ refundDialog.record?.id }}，消耗 {{ refundDialog.record?.consumed }} 点</p>
-        <input v-model="refundDialog.remark" type="text" placeholder="退款原因（选填）" @keyup.enter="confirmRefund" />
+        <input v-model="refundDialog.remark" maxlength="500" type="text" placeholder="退款原因（选填）" @keyup.enter="confirmRefund" />
         <div class="modal-actions">
           <button class="btn-cancel" @click="refundDialog.open = false">取消</button>
           <button class="btn btn-refund" @click="confirmRefund">确认退款</button>

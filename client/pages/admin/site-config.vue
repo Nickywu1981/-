@@ -9,13 +9,13 @@
 
       <!-- Add form -->
       <div v-if="showAddForm" class="add-form">
-        <input v-model="newConfig.key" placeholder="配置键名 (如 hero_title)" class="input" />
+        <input v-model="newConfig.key" maxlength="50" placeholder="配置键名 (如 hero_title)" class="input" />
         <select v-model="newConfig.type" class="input sel">
           <option value="text">text</option>
           <option value="json">json</option>
         </select>
-        <input v-model="newConfig.description" placeholder="描述说明" class="input" />
-        <textarea v-model="newConfig.value" :placeholder="newConfig.type === 'json' ? 'JSON 值' : '文本值'" class="input textarea" :rows="newConfig.type === 'json' ? 6 : 2" />
+        <input v-model="newConfig.description" maxlength="500" placeholder="描述说明" class="input" />
+        <textarea v-model="newConfig.value" maxlength="2000" :placeholder="newConfig.type === 'json' ? 'JSON 值' : '文本值'" class="input textarea" :rows="newConfig.type === 'json' ? 6 : 2" />
         <button class="btn btn-primary" :disabled="adding" @click="addConfig">{{ adding ? '添加中...' : '确认添加' }}</button>
       </div>
 
@@ -48,10 +48,11 @@
             <textarea
               v-if="item.config_type === 'json'"
               v-model="editValue"
+              maxlength="2000"
               class="input textarea"
               rows="8"
             />
-            <input v-else v-model="editValue" class="input" />
+            <input v-else v-model="editValue" maxlength="2000" class="input" />
             <div class="edit-actions">
               <button class="btn btn-primary btn-sm" :disabled="saving" @click="save(item)">{{ saving ? '保存中...' : '保存' }}</button>
               <button class="btn btn-sm" @click="cancelEdit">取消</button>

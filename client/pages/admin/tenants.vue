@@ -51,8 +51,8 @@
         <div class="modal">
           <h3>{{ isEdit ? '编辑租户' : '新建租户' }}</h3>
           <div class="form-grid">
-            <label>名称 <input v-model="form.name" placeholder="公司/组织名称" /></label>
-            <label>编码 <input v-model="form.code" placeholder="唯一标识" /></label>
+            <label>名称 <input v-model="form.name" maxlength="100" placeholder="公司/组织名称" /></label>
+            <label>编码 <input v-model="form.code" maxlength="50" placeholder="唯一标识" /></label>
             <label>套餐
               <select v-model="form.plan_type">
                 <option value="free">免费版</option>

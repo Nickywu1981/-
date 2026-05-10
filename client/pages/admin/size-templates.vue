@@ -20,7 +20,7 @@
         <div class="modal">
           <h3>{{ editing ? '编辑尺寸' : '新建尺寸' }}</h3>
           <div class="form-grid">
-            <label>名称 <input v-model="editForm.name" class="input" /></label>
+            <label>名称 <input v-model="editForm.name" maxlength="100" class="input" /></label>
             <label>平台
               <select v-model="editForm.platform" class="input">
                 <option v-for="p in platforms" :key="p" :value="p">{{ p }}</option>
@@ -28,7 +28,7 @@
             </label>
             <label>宽度(px) <input v-model.number="editForm.width" type="number" class="input" /></label>
             <label>高度(px) <input v-model.number="editForm.height" type="number" class="input" /></label>
-            <label>分类 <input v-model="editForm.category" class="input" placeholder="如：主图、详情图" /></label>
+            <label>分类 <input v-model="editForm.category" maxlength="100" class="input" placeholder="如：主图、详情图" /></label>
           </div>
           <div class="modal-actions">
             <button class="btn-cancel" @click="showModal=false">取消</button>

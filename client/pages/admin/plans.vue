@@ -35,7 +35,7 @@
           </div>
         </div>
         <div class="plan-body">
-          <div class="row"><span>套餐名:</span> <input v-model="plan.name" /></div>
+          <div class="row"><span>套餐名:</span> <input v-model="plan.name" maxlength="100" /></div>
           <div class="row"><span>售价:</span> <input v-model.number="plan.price" type="number" /> 元</div>
           <div class="row"><span>原价:</span> <input v-model.number="plan.original_price" type="number" /> 元</div>
           <div class="row"><span>月点数:</span> <input v-model.number="plan.credits" type="number" /></div>
@@ -62,7 +62,7 @@
       <div class="modal">
         <div class="modal-header"><h3>新建套餐</h3><button class="modal-close" aria-label="关闭" @click="showCreate = false">✕</button></div>
         <div class="modal-body">
-          <div class="row"><span>套餐名:</span> <input v-model="newPlan.name" /></div>
+          <div class="row"><span>套餐名:</span> <input v-model="newPlan.name" maxlength="100" /></div>
           <div class="row"><span>类型:</span>
             <select v-model.number="newPlan.plan_type">
               <option :value="0">免费版</option><option :value="1">月卡</option><option :value="2">季卡</option><option :value="3">年卡</option>

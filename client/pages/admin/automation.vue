@@ -56,14 +56,14 @@
         <div class="modal">
           <h3>新建自动化任务</h3>
           <div class="form-grid">
-            <label>平台 <input v-model="form.platform" placeholder="如: 淘宝/京东/拼多多" /></label>
-            <label>店铺名称 <input v-model="form.store_name" placeholder="店铺名称" /></label>
+            <label>平台 <input v-model="form.platform" maxlength="100" placeholder="如: 淘宝/京东/拼多多" /></label>
+            <label>店铺名称 <input v-model="form.store_name" maxlength="100" placeholder="店铺名称" /></label>
             <label>任务类型
               <select v-model="form.task_type">
                 <option value="product_on">商品上架</option><option value="product_off">商品下架</option><option value="ship_order">发货</option><option value="reply_review">评价回复</option><option value="stock_check">库存检查</option>
               </select>
             </label>
-            <label>店铺ID <input v-model="form.store_id" placeholder="可选" /></label>
+            <label>店铺ID <input v-model="form.store_id" maxlength="100" placeholder="可选" /></label>
           </div>
           <div class="modal-actions">
             <button class="btn-cancel" @click="modalOpen = false">取消</button>

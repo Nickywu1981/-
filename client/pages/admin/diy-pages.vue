@@ -73,8 +73,8 @@
         <div class="modal">
           <h3>{{ editing ? '编辑页面' : '新建页面' }}</h3>
           <div class="form-grid">
-            <label class="full">标题 <input v-model="editForm.title" class="input" placeholder="页面标题" /></label>
-            <label>标识(Slug) <input v-model="editForm.slug" class="input" placeholder="my-page" :disabled="!!editing" /></label>
+            <label class="full">标题 <input v-model="editForm.title" maxlength="100" class="input" placeholder="页面标题" /></label>
+            <label>标识(Slug) <input v-model="editForm.slug" maxlength="50" class="input" placeholder="my-page" :disabled="!!editing" /></label>
             <label>类型
               <select v-model="editForm.pageType" class="input" :disabled="!!editing">
                 <option value="landing">落地页</option>
@@ -84,7 +84,7 @@
               </select>
             </label>
           </div>
-          <div class="form-group"><label>描述</label><textarea v-model="editForm.description" class="input" rows="2" /></div>
+          <div class="form-group"><label>描述</label><textarea v-model="editForm.description" maxlength="500" class="input" rows="2" /></div>
           <div class="modal-actions">
             <button class="btn-cancel" @click="showModal = false">取消</button>
             <button class="btn-save" :disabled="saving" @click="save">{{ saving ? '保存中...' : '保存' }}</button>

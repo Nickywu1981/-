@@ -52,9 +52,9 @@
         <div class="modal">
           <h3>{{ isEdit ? '编辑代理' : '新建代理' }}</h3>
           <div class="form-grid">
-            <label>名称 <input v-model="form.name" placeholder="代理名称" /></label>
-            <label>编码 <input v-model="form.proxy_code" placeholder="唯一标识" /></label>
-            <label class="full">上游URL <input v-model="form.upstream_url" placeholder="https://api.example.com/v1" /></label>
+            <label>名称 <input v-model="form.name" maxlength="100" placeholder="代理名称" /></label>
+            <label>编码 <input v-model="form.proxy_code" maxlength="50" placeholder="唯一标识" /></label>
+            <label class="full">上游URL <input v-model="form.upstream_url" maxlength="500" placeholder="https://api.example.com/v1" /></label>
             <label>请求方法
               <select v-model="form.method">
                 <option value="GET">GET</option><option value="POST">POST</option><option value="PUT">PUT</option><option value="DELETE">DELETE</option><option value="PATCH">PATCH</option>

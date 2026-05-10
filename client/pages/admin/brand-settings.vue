@@ -5,8 +5,8 @@
     <div v-else class="form-wrap">
       <div class="section">
         <h3>品牌信息</h3>
-        <div class="form-group"><label>品牌名称</label><input v-model="form.brand_name" class="input" placeholder="如：Movio AI" /></div>
-        <div class="form-group"><label>Logo URL</label><input v-model="form.logo_url" class="input" placeholder="https://..." /></div>
+        <div class="form-group"><label>品牌名称</label><input v-model="form.brand_name" maxlength="100" class="input" placeholder="如：Movio AI" /></div>
+        <div class="form-group"><label>Logo URL</label><input v-model="form.logo_url" maxlength="500" class="input" placeholder="https://..." /></div>
         <div class="form-group"><label>品牌主色</label><div class="color-row"><input v-model="form.primary_color" type="color" class="color-picker" /><code class="color-code">{{ form.primary_color }}</code></div></div>
       </div>
       <div class="section">

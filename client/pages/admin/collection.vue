@@ -15,7 +15,7 @@
       <div v-if="showModal" class="modal-overlay" @click.self="showModal=false">
         <div class="modal">
           <h3>{{ editing ? '编辑作品集' : '新建作品集' }}</h3>
-          <div class="form-group"><label>名称</label><input v-model="editForm.name" class="input" placeholder="作品集名称" /></div>
+          <div class="form-group"><label>名称</label><input v-model="editForm.name" maxlength="100" class="input" placeholder="作品集名称" /></div>
           <div class="form-group"><label>类型</label>
             <select v-model="editForm.type" class="input">
               <option value="image">图片</option><option value="video">视频</option>

@@ -21,13 +21,13 @@
       <div v-if="showModal" class="modal-overlay" @click.self="showModal=false">
         <div class="modal">
           <h3>{{ editing.id ? '编辑模板' : '新建模板' }}</h3>
-          <div class="form-group"><label>标题</label><input v-model="form.title" class="input" /></div>
+          <div class="form-group"><label>标题</label><input v-model="form.title" maxlength="100" class="input" /></div>
           <div class="form-row">
             <div class="form-group"><label>分类</label><select v-model="form.category" class="input"><option value="main_image">主图</option><option value="scene">场景</option><option value="video">视频</option><option value="script">口播脚本</option><option value="copy">营销文案</option></select></div>
             <div class="form-group"><label>状态</label><select v-model="form.status" class="input"><option :value="0">草稿</option><option :value="1">待审核</option><option :value="2">已上架</option><option :value="3">已下架</option></select></div>
           </div>
-          <div class="form-group"><label>描述</label><input v-model="form.description" class="input" /></div>
-          <div class="form-group"><label>提示词内容</label><textarea v-model="form.content" class="input" rows="5" placeholder="提示词模板内容..."></textarea></div>
+          <div class="form-group"><label>描述</label><input v-model="form.description" maxlength="500" class="input" /></div>
+          <div class="form-group"><label>提示词内容</label><textarea v-model="form.content" maxlength="5000" class="input" rows="5" placeholder="提示词模板内容..."></textarea></div>
           <div class="modal-actions">
             <button class="btn-cancel" @click="showModal=false">取消</button>
             <button class="btn-save" :disabled="saving" @click="save">{{ saving?'保存中...':'保存' }}</button>

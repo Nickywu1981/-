@@ -48,11 +48,11 @@
           <div class="form-row">
             <div class="form-group">
               <label>名称</label>
-              <input v-model="form.name" type="text" placeholder="如：热卖爆款" />
+              <input v-model="form.name" maxlength="100" type="text" placeholder="如：热卖爆款" />
             </div>
             <div class="form-group">
               <label>图标代码</label>
-              <input v-model="form.icon" type="text" placeholder="如：fire, star, discount" />
+              <input v-model="form.icon" maxlength="50" type="text" placeholder="如：fire, star, discount" />
             </div>
           </div>
           <div class="form-row">
@@ -73,7 +73,7 @@
           <div class="form-row">
             <div class="form-group">
               <label>描述</label>
-              <input v-model="form.description" type="text" placeholder="简短说明" />
+              <input v-model="form.description" maxlength="500" type="text" placeholder="简短说明" />
             </div>
             <div class="form-group">
               <label>排序</label>

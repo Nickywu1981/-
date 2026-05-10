@@ -19,9 +19,9 @@
       <div v-if="showModal" class="modal-overlay" @click.self="showModal=false">
         <div class="modal">
           <h3>{{ editing ? '编辑表单' : '新建表单' }}</h3>
-          <div class="form-group"><label>名称</label><input v-model="editForm.name" class="input" /></div>
-          <div class="form-group"><label>编码</label><input v-model="editForm.code" class="input" :disabled="!!editing" /></div>
-          <div class="form-group"><label>描述</label><textarea v-model="editForm.description" class="input" rows="2" /></div>
+          <div class="form-group"><label>名称</label><input v-model="editForm.name" maxlength="100" class="input" /></div>
+          <div class="form-group"><label>编码</label><input v-model="editForm.code" maxlength="50" class="input" :disabled="!!editing" /></div>
+          <div class="form-group"><label>描述</label><textarea v-model="editForm.description" maxlength="500" class="input" rows="2" /></div>
           <div class="modal-actions">
             <button class="btn-cancel" @click="showModal=false">取消</button>
             <button class="btn-save" :disabled="saving" @click="saveForm">{{ saving?'保存中...':'保存' }}</button>

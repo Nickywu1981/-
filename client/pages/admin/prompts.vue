@@ -53,11 +53,11 @@
           <h3>{{ editing.id ? '编辑模板' : '新建模板' }}</h3>
           <div class="form-group">
             <label>标题</label>
-            <input v-model="form.title" type="text" placeholder="模板标题" />
+            <input v-model="form.title" maxlength="100" type="text" placeholder="模板标题" />
           </div>
           <div class="form-group">
             <label>描述</label>
-            <input v-model="form.description" type="text" placeholder="简短描述" />
+            <input v-model="form.description" maxlength="500" type="text" placeholder="简短描述" />
           </div>
           <div class="form-row">
             <div class="form-group">
@@ -68,12 +68,12 @@
             </div>
             <div class="form-group">
               <label>图标</label>
-              <input v-model="form.icon" type="text" placeholder="star" />
+              <input v-model="form.icon" maxlength="50" type="text" placeholder="star" />
             </div>
           </div>
           <div class="form-group">
             <label>提示词内容（用双大括号包裹变量名做占位符，如 product_name）</label>
-            <textarea v-model="form.content" rows="8" placeholder="输入提示词模板内容..."></textarea>
+            <textarea v-model="form.content" maxlength="5000" rows="8" placeholder="输入提示词模板内容..."></textarea>
           </div>
           <div class="form-row">
             <div class="form-group">
