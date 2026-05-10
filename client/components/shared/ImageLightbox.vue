@@ -69,7 +69,7 @@ defineExpose({ open, close });
 
 <style scoped>
 .lightbox-overlay {
-  position: fixed; inset: 0; z-index: 9999;
+  position: fixed; inset: 0; z-index: var(--cfg-z-modal, 1050);
   background: rgba(0,0,0,0.92);
   display: flex; align-items: center; justify-content: center;
   flex-direction: column;

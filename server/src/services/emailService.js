@@ -6,6 +6,7 @@ import config from '../config/index.js';
 import { BusinessError } from '../utils/businessError.js';
 import logger from '../utils/logger.js';
 import * as emailTemplateDao from '../dao/emailTemplateDao.js';
+import * as codeStore from './codeStore.js';
 
 const CODE_CACHE = new Map(); // key: email, value: { code, expires, attempts }
 const EMAIL_SEND_LOG = new Map(); // key: email, value: [timestamp, ...]
@@ -117,6 +118,7 @@ export async function sendVerificationCode(email, scene = 'login') {
   const expires = Date.now() + 5 * 60 * 1000; // 5分钟有效
 
   CODE_CACHE.set(email, { code, expires, lastSent: Date.now(), attempts: 0 });
+  await codeStore.saveCode(`email:${email}`, code, 300).catch(() => {});
 
   // 场景 → 模板编码映射
   const templateCodeMap = {
@@ -174,41 +176,37 @@ export async function sendVerificationCode(email, scene = 'login') {
 
 // ==================== 校验 ====================
 
-export function verifyCode(email, code) {
+export async function verifyCode(email, code) {
+  // 优先 Redis 共享存储
+  const result = await codeStore.verifyCode(`email:${email}`, code, 5);
+  if (result.valid) {
+    try { await codeStore.saveCode(`verified:email:${email}`, '1', 300); } catch { /* ignore */ }
+    return true;
+  }
+  if (result.reason !== 'error') {
+    throw new BusinessError(result.reason === 'max_attempts' ? 429 : 400,
+      result.reason === 'max_attempts' ? '验证码错误次数过多，请重新获取'
+        : result.reason === 'not_found' ? '请先获取验证码' : '验证码错误');
+  }
+  // Redis 不可用降级为进程内 Map
   const cached = CODE_CACHE.get(email);
-  if (!cached) {
-    throw new BusinessError(400, '请先获取验证码');
-  }
-
-  // 防爆破：最多5次错误
-  if (cached.attempts >= 5) {
-    CODE_CACHE.delete(email);
-    throw new BusinessError(429, '验证码错误次数过多，请重新获取');
-  }
-
-  if (Date.now() > cached.expires) {
-    CODE_CACHE.delete(email);
-    throw new BusinessError(400, '验证码已过期，请重新获取');
-  }
-
-  if (cached.code !== String(code)) {
-    cached.attempts++;
-    throw new BusinessError(400, '验证码错误');
-  }
-
-  // 验证通过后删除缓存 + 设置已验证标记
+  if (!cached) throw new BusinessError(400, '请先获取验证码');
+  if (cached.attempts >= 5) { CODE_CACHE.delete(email); throw new BusinessError(429, '验证码错误次数过多，请重新获取'); }
+  if (Date.now() > cached.expires) { CODE_CACHE.delete(email); throw new BusinessError(400, '验证码已过期，请重新获取'); }
+  if (cached.code !== String(code)) { cached.attempts++; throw new BusinessError(400, '验证码错误'); }
   CODE_CACHE.delete(email);
   CODE_CACHE.set(`verified:email:${email}`, { time: Date.now() });
   return true;
 }
 
-export function checkVerified(email) {
+export async function checkVerified(email) {
   const key = `verified:email:${email}`;
+  try {
+    const result = await codeStore.verifyCode(key, '1', 1);
+    if (result.valid || result.reason === 'mismatch') return true;
+  } catch { /* ignore */ }
   const entry = CODE_CACHE.get(key);
-  if (!entry || Date.now() - entry.time > 300000) {
-    CODE_CACHE.delete(key);
-    return false;
-  }
+  if (!entry || Date.now() - entry.time > 300000) { CODE_CACHE.delete(key); return false; }
   CODE_CACHE.delete(key);
   return true;
 }

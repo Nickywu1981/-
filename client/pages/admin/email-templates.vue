@@ -94,7 +94,6 @@
 <script setup lang="ts">
 
 import AdminLayout from '~/components/AdminLayout.vue';
-import LoadingSkeleton from '~/components/LoadingSkeleton.vue';
 
 const templates = ref<any[]>([]);
 const saving = ref(0);

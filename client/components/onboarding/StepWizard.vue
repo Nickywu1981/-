@@ -204,7 +204,7 @@ onMounted(() => {
 
 <style scoped>
 .wizard-overlay {
-  position: fixed; inset: 0; z-index: 2000;
+  position: fixed; inset: 0; z-index: var(--cfg-z-modal, 1050);
   background: rgba(0, 0, 0, 0.55);
   backdrop-filter: blur(6px);
   display: flex; align-items: center; justify-content: center;

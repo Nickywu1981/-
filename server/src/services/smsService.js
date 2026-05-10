@@ -10,7 +10,9 @@ import * as smsTemplateDao from '../dao/smsTemplateDao.js';
 import config from '../config/index.js';
 import { BusinessError } from '../utils/businessError.js';
 import logger from '../utils/logger.js';
+import * as codeStore from './codeStore.js';
 
+// 兜底: Redis 不可用时降级为进程内 Map
 const CODE_CACHE = new Map();
 
 // ==================== 服务商抽象层 ====================
@@ -65,34 +67,39 @@ function cacheKey(phone, scene) {
   return `sms:${scene}:${phone}`;
 }
 
-export function verifyCode(phone, scene, code) {
+export async function verifyCode(phone, scene, code) {
   const key = cacheKey(phone, scene);
-  const stored = CODE_CACHE.get(key);
-  if (!stored) return { valid: false, reason: '验证码不存在或已过期' };
-  if (Date.now() - stored.time > 300000) {
-    CODE_CACHE.delete(key);
-    return { valid: false, reason: '验证码已过期' };
+  // 优先使用 Redis 共享存储（cluster 模式兼容）
+  const result = await codeStore.verifyCode(key, code, 5);
+  if (result.valid) {
+    // 验证通过标记（Redis）
+    try { await codeStore.saveCode(`verified:sms:${phone}`, '1', 300); } catch { /* ignore */ }
+    return { valid: true };
   }
-  // 暴力破解防护：最多5次尝试
-  stored.attempts = (stored.attempts || 0) + 1;
-  if (stored.attempts > 5) {
+  // Redis 不可用时降级为进程内 Map
+  if (result.reason === 'error') {
+    const stored = CODE_CACHE.get(key);
+    if (!stored) return { valid: false, reason: '验证码不存在或已过期' };
+    if (Date.now() - stored.time > 300000) { CODE_CACHE.delete(key); return { valid: false, reason: '验证码已过期' }; }
+    stored.attempts = (stored.attempts || 0) + 1;
+    if (stored.attempts > 5) { CODE_CACHE.delete(key); return { valid: false, reason: '尝试次数过多' }; }
+    if (stored.code !== String(code)) return { valid: false, reason: '验证码错误' };
     CODE_CACHE.delete(key);
-    return { valid: false, reason: '尝试次数过多，请重新获取验证码' };
+    CODE_CACHE.set(`verified:sms:${phone}`, { time: Date.now() });
+    return { valid: true };
   }
-  if (stored.code !== String(code)) return { valid: false, reason: '验证码错误' };
-  CODE_CACHE.delete(key);
-  // 验证通过后设置已验证标记，供 login-by-code 使用
-  CODE_CACHE.set(`verified:sms:${phone}`, { time: Date.now() });
-  return { valid: true };
+  return { valid: false, reason: result.reason === 'max_attempts' ? '尝试次数过多，请重新获取验证码' : result.reason === 'not_found' ? '验证码不存在或已过期' : '验证码错误' };
 }
 
-export function checkVerified(phone) {
+export async function checkVerified(phone) {
   const key = `verified:sms:${phone}`;
+  try {
+    const result = await codeStore.verifyCode(key, '1', 1);
+    if (result.valid || result.reason === 'mismatch') return true;
+  } catch { /* ignore */ }
+  // 降级: 进程内 Map
   const entry = CODE_CACHE.get(key);
-  if (!entry || Date.now() - entry.time > 300000) {
-    CODE_CACHE.delete(key);
-    return false;
-  }
+  if (!entry || Date.now() - entry.time > 300000) { CODE_CACHE.delete(key); return false; }
   CODE_CACHE.delete(key);
   return true;
 }
@@ -142,6 +149,7 @@ export async function sendVerificationCode({ phone, scene }) {
     });
 
     CODE_CACHE.set(key, { code, time: Date.now() });
+    await codeStore.saveCode(key, code, 300).catch(() => {});
 
     await smsLogDao.insertLog({
       templateCode,
