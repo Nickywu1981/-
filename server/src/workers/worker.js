@@ -134,9 +134,16 @@ process.on('SIGINT', async () => {
 async function waitForJobs() {
   if (activeJobIds.size <= 0) return;
   logger.info(`[Worker] Waiting for ${activeJobIds.size} in-flight job(s)...`);
+  const deadline = Date.now() + 30000; // 30s 硬超时
   await new Promise(resolve => {
     const check = setInterval(() => {
-      if (activeJobIds.size <= 0) { clearInterval(check); resolve(); }
+      if (activeJobIds.size <= 0 || Date.now() >= deadline) {
+        clearInterval(check);
+        if (activeJobIds.size > 0) {
+          logger.warn(`[Worker] Timeout waiting for ${activeJobIds.size} job(s), force exit`);
+        }
+        resolve();
+      }
     }, 500);
   });
 }
@@ -150,4 +157,10 @@ setInterval(async () => {
 }, 5 * 60 * 1000).unref();
 
 logger.info('[Worker] Job queue worker started');
+
+// 启动时校验 API Key
+const startupKey = config.ai?.apiKey;
+if (!startupKey || startupKey === 'sk-your-api-key-here') {
+  logger.warn('[Worker] AI API Key 未配置或为默认值，所有 AI 任务将失败');
+}
 poll();

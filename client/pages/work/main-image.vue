@@ -7,7 +7,7 @@
         <p>拖拽商品图到此处 或 点击上传</p>
         <p class="dz-hint">支持 JPG / PNG / WebP，建议 800×800 以上</p>
         <input ref="fileInput" type="file" accept="image/*" hidden @change="handleFile" />
-        <button class="btn-outline" @click="($refs.fileInput as HTMLInputElement)?.click()">选择文件</button>
+        <button class="btn-outline" @click="fileInput?.click()">选择文件</button>
       </div>
       <div v-if="previewUrl" class="preview">
         <img loading="lazy" :src="previewUrl" alt="预览" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />

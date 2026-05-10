@@ -237,7 +237,10 @@ app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/config', configPublicRouter);
 app.use('/api/admin/config', configAdminRouter);
 app.use('/api/images', heavyLimiter, imageRoutesV4);
-app.use('/api/ai', heavyLimiter, imageRoutesV4);  // /api/ai/enhance-prompt 也在 v4_image.routes 中
+app.use('/api/ai', (req, res, next) => {
+  if (req.path === '/enhance-prompt') return next();
+  return res.status(404).json({ code: 404, message: 'Not Found' });
+}, heavyLimiter, imageRoutesV4);  // 仅放行 /api/ai/enhance-prompt
 app.use('/api/detail', detailRoutesV4);
 app.use('/api/videos', heavyLimiter, videoRoutesV4);
 app.use('/api/jobs', jobRoutesV4);
@@ -294,24 +297,24 @@ app.use('/api/collections', collectionRoutes);
 app.use('/api/admin/site-config', siteConfigAdminRouter);
 app.use('/api/admin/workspace-diy', adminWorkspaceDiyRoutes);
 app.use('/api/site-config/public', siteConfigPublicRouter);
-app.use('/api/badges', badgeRoutes);
-app.use('/api/tier', tierRoutes);
+app.use('/api/badges', adminLimiter, badgeRoutes);
+app.use('/api/tier', apiLimiter, tierRoutes);
 app.use('/api/admin/abuse', abuseRoutes);
 app.use('/api/platforms', platformDetailRoutes);
 app.use('/api/multilingual', multilingualRoutes);
-app.use('/api/compliance', complianceRoutes);
+// complianceRoutes (V1) /targets + /check → v4 覆盖; /rules/:code → 已合并到 v4_compliance
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/platform-specs', platformSpecRoutes);
 app.use('/api/ai-dispatch', aiConcurrencyGuard, heavyLimiter, aiDispatchRoutes);  // 多模型统一调度: dispatch/categories/health/stats/cache
-app.use('/api/compare', compareRoutes);
-app.use('/api/seo-keywords', seoKeywordRoutes);
-app.use('/api/fab', fabRoutes);
-app.use('/api/memory', memoryEmbedRoutes);
+app.use('/api/compare', heavyLimiter, compareRoutes);
+app.use('/api/seo-keywords', heavyLimiter, seoKeywordRoutes);
+app.use('/api/fab', heavyLimiter, fabRoutes);
+app.use('/api/memory', heavyLimiter, memoryEmbedRoutes);
 app.use('/api/digital-human', heavyLimiter, digitalHumanRoutesV4);
-app.use('/api/platform-publish', platformPublishRoutesV4);
-app.use('/api/template-market', templateMarketRoutesV4);
-app.use('/api/sdk', sdkRoutes);
-app.use('/api/adk', adkRoutes);
+app.use('/api/platform-publish', apiLimiter, platformPublishRoutesV4);
+app.use('/api/template-market', apiLimiter, templateMarketRoutesV4);
+app.use('/api/sdk', heavyLimiter, sdkRoutes);
+app.use('/api/adk', heavyLimiter, adkRoutes);
 
 // 404
 app.use((_req, res) => {

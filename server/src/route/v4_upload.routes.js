@@ -13,8 +13,41 @@ import multer from 'multer';
 
 const router = Router();
 router.use(authMiddleware);
+
+// 魔数签名（前 N 字节）
+const MAGIC_BYTES = {
+  'image/png':      [0x89, 0x50, 0x4E, 0x47],
+  'image/jpeg':     [0xFF, 0xD8, 0xFF],
+  'image/webp':     [0x52, 0x49, 0x46, 0x46],
+  'image/gif':      [0x47, 0x49, 0x46, 0x38],
+  'image/avif':     null,
+  'video/mp4':      null,
+  'video/quicktime': null,
+};
+const ALLOWED_MIMES = Object.keys(MAGIC_BYTES);
+
+function checkBufferMagic(buffer, mimeType) {
+  const expected = MAGIC_BYTES[mimeType];
+  if (!expected) return true;
+  if (buffer.length < expected.length) return false;
+  for (let i = 0; i < expected.length; i++) {
+    if (buffer[i] !== expected[i]) return false;
+  }
+  return true;
+}
+
 const _storage = multer.memoryStorage();
-const _upload = multer({ storage: _storage, limits: { fileSize: 50 * 1024 * 1024 } });
+const _upload = multer({
+  storage: _storage,
+  limits: { fileSize: 50 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (!ALLOWED_MIMES.includes(file.mimetype)) {
+      cb(new Error('不支持的文件类型'), false);
+    } else {
+      cb(null, true);
+    }
+  },
+});
 
 const initUploadSchema = z.object({
   file_name: z.string().min(1, '请提供文件名').max(255),
@@ -48,6 +81,9 @@ function _withMulter(req, res, next) {
 router.post('/simple', _withMulter, async (req, res) => {
   try {
     if (!req.file) return error(res, ERROR_CODE.VALIDATION_ERROR, '请选择文件');
+    if (!checkBufferMagic(req.file.buffer, req.file.mimetype)) {
+      return error(res, ERROR_CODE.VALIDATION_ERROR, '文件内容与类型不匹配');
+    }
     const result = await uploadService.saveSimpleFile(req.file);
     return success(res, result, '上传成功');
   } catch (err) {
@@ -72,10 +108,14 @@ const UPLOAD_ID_REGEX = /^[a-f0-9]{32}$/;
 router.post('/chunk', _upload.fields([{ name: 'chunk', maxCount: 1 }]), validate(chunkSchema, 'body'), async (req, res) => {
   try {
     const { upload_id, chunk_index } = req.body;
-    if (!req.files?.chunk?.[0]) {
+    const chunkFile = req.files?.chunk?.[0];
+    if (!chunkFile) {
       return error(res, ERROR_CODE.VALIDATION_ERROR, '缺少分片文件');
     }
-    const result = await uploadService.receiveChunk(upload_id, chunk_index, req.files.chunk[0].buffer);
+    if (!checkBufferMagic(chunkFile.buffer, chunkFile.mimetype)) {
+      return error(res, ERROR_CODE.VALIDATION_ERROR, '文件内容与类型不匹配');
+    }
+    const result = await uploadService.receiveChunk(upload_id, chunk_index, chunkFile.buffer);
     return success(res, result);
   } catch (err) {
     return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '接收分片失败');

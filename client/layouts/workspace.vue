@@ -95,10 +95,10 @@ const pageTitle = computed(() => {
 async function handleLogout() {
   try {
     await $fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
-    toast.add({ title: '已退出登录', color: 'green' })
+    toast.success('已退出登录')
     router.push('/login')
   } catch {
-    toast.add({ title: '退出失败，请重试', color: 'orange' })
+    toast.error('退出失败，请重试')
   }
 }
 

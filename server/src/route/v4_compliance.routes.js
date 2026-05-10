@@ -38,4 +38,16 @@ router.post('/check', _validate(checkSchema), (req, res) => {
   }
 });
 
+// ─── GET /api/compliance/rules/:code ─────────────────────────────
+router.get('/rules/:code', (req, res) => {
+  try {
+    const rules = complianceService.getPlatformCompliance(req.params.code)
+      || complianceService.getRegionCompliance(req.params.code);
+    if (!rules) return error(res, ERROR_CODE.NOT_FOUND, '未找到合规规则');
+    return success(res, rules);
+  } catch (e) {
+    return error(res, ERROR_CODE.INTERNAL_ERROR, e.message);
+  }
+});
+
 export default router;

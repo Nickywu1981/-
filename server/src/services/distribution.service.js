@@ -162,25 +162,30 @@ export async function withdrawCommission(userId, amount) {
       [userId],
     );
 
-    if (balance.available < amount) throw new BusinessError(400, `可提现余额不足，当前可用 ${balance.available}`);
+    const availableAmount = parseFloat(Number(balance.available).toFixed(2));
+    const requestAmount = parseFloat(Number(amount).toFixed(2));
+    if (availableAmount < requestAmount) throw new BusinessError(400, `可提现余额不足，当前可用 ${availableAmount}`);
 
     // 逐笔扣减
-    let remaining = amount;
+    let remaining = requestAmount;
     const [pendingCommissions] = await conn.query(
       `SELECT id, commission FROM distributor_commission
        WHERE distributor_id = ? AND status = 'settled' ORDER BY id ASC`,
       [userId],
     );
 
-    // 批量标记已提现: 收集要更新的ID, 单条UPDATE ... WHERE id IN(...)
+    // 批量标记已提现
     const withdrawIds = [];
     for (const row of pendingCommissions) {
       if (remaining <= 0) break;
-      if (row.commission <= remaining) {
+      const rowCommission = parseFloat(Number(row.commission).toFixed(2));
+      if (rowCommission <= remaining + 0.001) {  // 浮点容差
         withdrawIds.push(row.id);
-        remaining -= row.commission;
+        remaining = parseFloat((remaining - rowCommission).toFixed(2));
       }
     }
+    const actualWithdrawn = parseFloat((requestAmount - remaining).toFixed(2));
+    if (actualWithdrawn <= 0) throw new BusinessError(400, '无可提取的佣金');
     if (withdrawIds.length > 0) {
       await conn.query(
         `UPDATE distributor_commission SET status = 'withdrawn', settled_at = NOW() WHERE id IN (${withdrawIds.map(() => '?').join(',')})`,
@@ -189,7 +194,7 @@ export async function withdrawCommission(userId, amount) {
     }
 
     await conn.commit();
-    return { withdrawn: amount, from_balance: balance.available };
+    return { withdrawn: actualWithdrawn, from_balance: availableAmount };
   } catch (err) {
     await conn.rollback();
     throw err;

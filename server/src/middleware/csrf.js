@@ -53,12 +53,13 @@ export function csrfProtection(req, res, next) {
     '/api/auth/login', '/api/auth/register', '/api/auth/forgot-password', '/api/auth/login-by-code', '/api/auth/reset-password',
     '/auth/login', '/auth/register', '/auth/forgot-password', '/auth/login-by-code', '/auth/reset-password',
     '/users/login', '/users/register', '/users/forgot-password',
-    '/api/sms/', '/api/email/', '/sms/', '/email/',
+    '/api/sms/send', '/api/email/send-code', '/api/email/verify-code',
+    '/sms/send', '/email/send-code', '/email/verify-code',
     '/api/site-config/public', '/site-config/public',
     '/api/health', '/api/metrics', '/health', '/metrics',
     '/api/ai-dispatch/health', '/api/ai-dispatch/categories',
     '/api/recharge/callback', '/api/payment/notify', '/recharge/callback', '/payment/notify'];
-  const isPublic = publicPaths.some(p => req.path.startsWith(p))
+  const isPublic = publicPaths.some(p => req.path === p || req.path.startsWith(p + '/'))
     || req.path.startsWith('/api/internal/')
     || req.path.startsWith('/internal/');
   if (isPublic) {

@@ -31,9 +31,12 @@ export default defineNuxtRouteMiddleware(async (to) => {
       userRole = data?.data?.role || ''
     }
   } catch (e: any) {
-    // 只在明确的 401 时跳转登录；网络/5xx 错误允许页面继续渲染
-    if (e?.response?.status === 401 || e?.statusCode === 401) return
-    // 其他错误静默降级，页面以未认证状态渲染
+    // 401 = token 过期/无效 → 重定向登录
+    if (e?.response?.status === 401 || e?.statusCode === 401) {
+      return navigateTo(`/login?redirect=${encodeURIComponent(to.fullPath)}`)
+    }
+    // 5xx/网络错误：放行页面渲染（不停机体验），页面 API 自行兜底
+    return
   }
 
   if (!isAuthenticated) {
