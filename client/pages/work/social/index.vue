@@ -174,13 +174,15 @@ function onRefImage(e) {
 }
 
 function doSubmit() {
+  if (submitting.value) return
   if (loadingTimer) { clearInterval(loadingTimer); loadingTimer = null; }
   submitting.value = true
   result.value = null
   enhancedPrompt.value = ''
   loadingText.value = loadingTexts[0]
   let i = 0
-  loadingTimer = setInterval(() => { i = (i + 1) % loadingTexts.length; loadingText.value = loadingTexts[i] }, 2500)
+  const timer = setInterval(() => { i = (i + 1) % loadingTexts.length; loadingText.value = loadingTexts[i] }, 2500)
+  loadingTimer = timer
 
   $fetch('/api/posters/generate', {
     method: 'POST',
@@ -195,8 +197,8 @@ function doSubmit() {
       result.value = { ...res, posterType: activeType.value }
       history.value.unshift({ ...res, posterType: activeType.value })
     })
-    .catch((e) => { toast.error('生成失败: ' + (e.message || '未知错误')) })
-    .finally(() => { submitting.value = false; clearInterval(loadingTimer) })
+    .catch((e) => { toast.error('生成失败: ' + (e.data?.msg || e.message || '未知错误')) })
+    .finally(() => { submitting.value = false; if (loadingTimer === timer) { clearInterval(loadingTimer); loadingTimer = null; } })
 }
 
 const { download } = useFileDownload()

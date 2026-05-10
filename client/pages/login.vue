@@ -77,6 +77,7 @@
 </template>
 
 <script setup lang="ts">
+import { useCountdown } from '~/composables/useCountdown'
 definePageMeta({ layout: 'landing' })
 
 import { useAuthStore } from '~/stores/useAuthStore'
@@ -86,15 +87,14 @@ const username = ref('');
 const password = ref('');
 const smsPhone = ref('');
 const smsCode = ref('');
-const smsCountdown = ref(0);
 const emailAddr = ref('');
 const emailCode = ref('');
-const emailCountdown = ref(0);
 const loading = ref(false);
 const msg = ref('');
 const msgErr = ref(false);
-let smsTimer: ReturnType<typeof setInterval> | null = null;
-let emailTimer: ReturnType<typeof setInterval> | null = null;
+
+const { countdown: smsCountdown, start: startSmsCd } = useCountdown(60)
+const { countdown: emailCountdown, start: startEmailCd } = useCountdown(60)
 
 async function handlePasswordLogin() {
   loading.value = true; msg.value = '';
@@ -124,8 +124,7 @@ async function sendSmsCode(scene: string) {
   msg.value = '';
   try {
     await $fetch('/api/sms/send-code', { method: 'POST', body: { phone: smsPhone.value, scene } });
-    smsCountdown.value = 60;
-    smsTimer = setInterval(() => { smsCountdown.value--; if (smsCountdown.value <= 0) { clearInterval(smsTimer!); smsTimer = null; } }, 1000);
+    startSmsCd(60);
     msg.value = '验证码已发送'; msgErr.value = false;
   } catch (e: any) { msg.value = e.data?.msg || '发送失败'; msgErr.value = true; }
 }
@@ -147,16 +146,10 @@ async function sendEmailCode(scene: string) {
   msg.value = '';
   try {
     await $fetch('/api/email/send-code', { method: 'POST', body: { email: emailAddr.value, scene } });
-    emailCountdown.value = 60;
-    emailTimer = setInterval(() => { emailCountdown.value--; if (emailCountdown.value <= 0) { clearInterval(emailTimer!); emailTimer = null; } }, 1000);
+    startEmailCd(60);
     msg.value = '验证码已发送'; msgErr.value = false;
   } catch (e: any) { msg.value = e.data?.msg || '发送失败'; msgErr.value = true; }
 }
-
-onBeforeUnmount(() => {
-  if (smsTimer) { clearInterval(smsTimer); smsTimer = null; }
-  if (emailTimer) { clearInterval(emailTimer); emailTimer = null; }
-});
 </script>
 
 <style scoped>

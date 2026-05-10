@@ -36,22 +36,14 @@
 </template>
 
 <script setup lang="ts">
+import { useCountdown } from '~/composables/useCountdown'
 definePageMeta({ layout: 'landing' })
 
 const account = ref(''), code = ref(''), newPassword = ref(''), confirmPassword = ref('')
-const loading = ref(false), verified = ref(false), sendCooldown = ref(0)
+const loading = ref(false), verified = ref(false)
 const msg = ref(''), msgErr = ref(false)
-let cooldownTimer: ReturnType<typeof setInterval> | null = null
 
-function startCooldown() {
-  sendCooldown.value = 60
-  if (cooldownTimer) clearInterval(cooldownTimer)
-  cooldownTimer = setInterval(() => { sendCooldown.value--; if (sendCooldown.value <= 0) { clearInterval(cooldownTimer!); cooldownTimer = null } }, 1000)
-}
-
-onUnmounted(() => {
-  if (cooldownTimer) { clearInterval(cooldownTimer); cooldownTimer = null }
-})
+const { countdown: sendCooldown, start: startCd } = useCountdown(60)
 
 async function sendCode() {
   if (!account.value.trim()) { msg.value = '请输入手机号或邮箱'; msgErr.value = true; return }
@@ -62,7 +54,7 @@ async function sendCode() {
     const body = isEmail ? { email: account.value.trim(), scene: 'reset_password' } : { phone: account.value.trim(), scene: 'reset_password' }
     await $fetch(url, { method: 'POST', body, credentials: 'include' })
     msg.value = '验证码已发送'; msgErr.value = false
-    startCooldown()
+    startCd(60)
   } catch (e: any) { msg.value = e.data?.msg || '发送失败'; msgErr.value = true }
   loading.value = false
 }

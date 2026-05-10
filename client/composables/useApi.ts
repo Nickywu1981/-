@@ -20,14 +20,17 @@ export const isOffline = ref(false);
 
 // 401 重定向锁（防并发请求同时触发多次 navigateTo）
 let isRedirecting = false;
+let listenersInit = false;
 
 function onOffline() { isOffline.value = true; }
 function onOnline() { isOffline.value = false; }
 
-if (typeof window !== 'undefined') {
+function ensureListeners() {
+  if (listenersInit || typeof window === 'undefined') return;
   window.addEventListener('offline', onOffline);
   window.addEventListener('online', onOnline);
   isOffline.value = !navigator.onLine;
+  listenersInit = true;
 }
 
 // ==================== 重试配置 ====================
@@ -81,6 +84,8 @@ async function request<T = any>(
         if (response.status === 401 && !isRedirecting) {
           isRedirecting = true;
           navigateTo('/login').finally(() => { isRedirecting = false; });
+          // 兜底：5s 后强制解锁（防止 navigateTo 异常导致永久锁死）
+          setTimeout(() => { isRedirecting = false; }, 5000);
         }
       },
     });
@@ -147,5 +152,6 @@ export default api;
 
 /** Composable wrapper for pages that import { useApi } */
 export function useApi() {
+  ensureListeners();
   return api;
 }

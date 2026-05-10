@@ -53,6 +53,7 @@
 </template>
 
 <script setup lang="ts">
+import { useCountdown } from '~/composables/useCountdown'
 definePageMeta({ layout: 'landing' })
 
 const account = ref('')
@@ -60,20 +61,10 @@ const code = ref('')
 const newPassword = ref('')
 const loading = ref(false)
 const verified = ref(false)
-const sendCooldown = ref(0)
 const errorMsg = ref('')
 const successMsg = ref('')
-let cooldownTimer: ReturnType<typeof setInterval> | null = null
 
-function startCooldown() {
-  sendCooldown.value = 60
-  if (cooldownTimer) clearInterval(cooldownTimer)
-  cooldownTimer = setInterval(() => { sendCooldown.value--; if (sendCooldown.value <= 0) { clearInterval(cooldownTimer!); cooldownTimer = null } }, 1000)
-}
-
-onUnmounted(() => {
-  if (cooldownTimer) { clearInterval(cooldownTimer); cooldownTimer = null }
-})
+const { countdown: sendCooldown, start: startCd } = useCountdown(60)
 
 function getAccountInfo(): { phone?: string; email?: string; isEmail: boolean } {
   const val = account.value.trim()
@@ -90,7 +81,7 @@ async function sendCode() {
     const url = isEmail ? '/api/email/send-code' : '/api/sms/send-code'
     const body = isEmail ? { email, scene: 'reset_password' } : { phone, scene: 'reset_password' }
     await $fetch(url, { method: 'POST', body, credentials: 'include' })
-    startCooldown()
+    startCd(60)
   } catch (e: any) { errorMsg.value = e?.data?.msg || '发送失败' }
   loading.value = false
 }

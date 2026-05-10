@@ -74,6 +74,7 @@
 </template>
 
 <script setup lang="ts">
+import { useCountdown } from '~/composables/useCountdown'
 
 
 const tab = ref('profile');
@@ -83,7 +84,6 @@ const phoneForm = reactive({ phone: '', code: '' });
 const saving = ref(false);
 const pwSaving = ref(false);
 const phoneSaving = ref(false);
-const codeCooldown = ref(0);
 const boundPhone = ref('');
 const unbinding = ref(false);
 const msg = ref('');
@@ -92,8 +92,8 @@ const pwMsg = ref('');
 const pwMsgErr = ref(false);
 const phoneMsg = ref('');
 const phoneMsgErr = ref(false);
+const { countdown: codeCooldown, start: startCodeCd } = useCountdown(60)
 const toast = useToast()
-let codeTimer: ReturnType<typeof setInterval> | null = null;
 
 onMounted(async () => {
   try {
@@ -131,8 +131,7 @@ async function sendBindCode() {
   try {
     await $fetch('/api/sms/send-code', { method: 'POST', body: { phone: phoneForm.phone, scene: 'bind_phone' } });
     phoneMsg.value = '验证码已发送'; phoneMsgErr.value = false;
-    codeCooldown.value = 60;
-    codeTimer = setInterval(() => { codeCooldown.value--; if (codeCooldown.value <= 0) { clearInterval(codeTimer!); codeTimer = null; } }, 1000);
+    startCodeCd(60);
   } catch (e: any) { phoneMsg.value = e.data?.msg || '发送失败'; phoneMsgErr.value = true; }
 }
 
@@ -160,10 +159,6 @@ async function unbindPhone() {
   } catch (e: any) { phoneMsg.value = e.data?.msg || '解绑失败'; phoneMsgErr.value = true; }
   phoneSaving.value = false;
 }
-
-onBeforeUnmount(() => {
-  if (codeTimer) { clearInterval(codeTimer); codeTimer = null; }
-});
 </script>
 
 <style scoped>
