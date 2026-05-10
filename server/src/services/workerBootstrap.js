@@ -34,12 +34,12 @@ export async function bootstrapWorkers() {
     await createImageWorker();
     logger.info('[Worker] image-processing 已启动');
 
-    // 视频生成 Worker
+    // 视频生成 Worker — STUB: 模拟分步进度，待对接真实视频生成服务
     registerWorker('video-generation', async (job) => {
       const { _userId, taskId } = job.data;
       await job.updateProgress(10);
-      logger.info(`[Worker] 视频任务 ${taskId} 开始`);
-      // 模拟分步进度
+      logger.info(`[Worker] 视频任务 ${taskId} 开始 (STUB)`);
+      // STUB: 模拟分步进度
       for (let p = 20; p <= 100; p += 20) {
         await new Promise((r) => setTimeout(r, 1500));
         await job.updateProgress(p);
@@ -48,7 +48,7 @@ export async function bootstrapWorkers() {
     });
     logger.info('[Worker] video-generation 已启动');
 
-    // 批量任务 Worker
+    // 批量任务 Worker — STUB: 模拟处理，待对接真实批量处理服务
     registerWorker('batch-tasks', async (job) => {
       const { _userId, taskId, imageUrls, _operation } = job.data;
       await job.updateProgress(5);

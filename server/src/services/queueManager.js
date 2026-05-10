@@ -49,10 +49,10 @@ async function checkRedis() {
 // ==================== 队列定义 ====================
 
 const QUEUES = {
-  'image-processing': { concurrency: parseInt(process.env.BULL_IMAGE_CONCURRENCY || '3', 10), attempts: 3, backoff: { type: 'exponential', delay: 2000 }, timeout: 300000 },
-  'video-generation': { concurrency: parseInt(process.env.BULL_VIDEO_CONCURRENCY || '2', 10), attempts: 3, backoff: { type: 'exponential', delay: 5000 }, timeout: 1800000 },
-  'batch-tasks':      { concurrency: parseInt(process.env.BULL_BATCH_CONCURRENCY || '5', 10), attempts: 2, backoff: { type: 'fixed', delay: 1000 },      timeout: 3600000 },
-  'notifications':    { concurrency: parseInt(process.env.BULL_NOTIFY_CONCURRENCY || '10', 10), attempts: 1,                                          timeout: 60000 },
+  'image-processing': { concurrency: parseInt(process.env.BULL_IMAGE_CONCURRENCY || '3', 10), attempts: 3, backoff: { type: 'exponential', delay: 2000 }, timeout: 300000, lockDuration: 360000 },
+  'video-generation': { concurrency: parseInt(process.env.BULL_VIDEO_CONCURRENCY || '2', 10), attempts: 3, backoff: { type: 'exponential', delay: 5000 }, timeout: 1800000, lockDuration: 1860000 },
+  'batch-tasks':      { concurrency: parseInt(process.env.BULL_BATCH_CONCURRENCY || '5', 10), attempts: 2, backoff: { type: 'fixed', delay: 1000 },      timeout: 3600000, lockDuration: 3660000 },
+  'notifications':    { concurrency: parseInt(process.env.BULL_NOTIFY_CONCURRENCY || '10', 10), attempts: 1,                                          timeout: 60000, lockDuration: 120000 },
 };
 
 const queueInstances = new Map();
@@ -72,6 +72,7 @@ export function getQueue(name) {
         backoff: QUEUES[name].backoff,
         removeOnComplete: 100,
         removeOnFail: 500,
+        lockDuration: QUEUES[name].lockDuration,
       },
     }));
     logger.info(`[BullMQ] 队列已创建: ${name}`);
