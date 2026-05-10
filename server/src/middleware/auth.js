@@ -96,6 +96,9 @@ const PUBLIC_PREFIXES = [
   '/api/adk/',
   '/api/sdk/',
   '/api/geo',
+  '/api/help',
+  '/api/platform-specs',
+  '/api/forms/public',
   '/uploads',
 ];
 

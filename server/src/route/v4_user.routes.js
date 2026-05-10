@@ -160,7 +160,7 @@ router.put('/membership/auto-renew', _validate(z.object({
     await membershipDao.setAutoRenew(req.user.id, req.validated.autoRenew);
     success(res, { autoRenew: req.validated.autoRenew }, '自动续费已' + (req.validated.autoRenew ? '开启' : '关闭'));
   } catch (err) {
-    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
   }
 });
 

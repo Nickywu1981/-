@@ -48,6 +48,7 @@ const total = ref(0);
 const page = ref(1);
 const pageSize = 20;
 const loading = ref(true);
+const toast = useToast()
 
 onMounted(() => { fetchData(); });
 
@@ -59,7 +60,7 @@ async function fetchData() {
       list.value = data.data.list || [];
       total.value = data.data.total || 0;
     }
-  } catch { /* ignore */ }
+  } catch { toast.error('加载账单失败') }
   loading.value = false;
 }
 

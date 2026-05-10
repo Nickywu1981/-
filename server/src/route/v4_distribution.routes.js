@@ -12,6 +12,7 @@ import { z } from 'zod';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate } from '../utils/validate.js';
+import { paymentLimiter } from '../middleware/rateLimiter.js';
 import * as distributionService from '../services/distribution.service.js';
 
 const router = Router();
@@ -54,7 +55,7 @@ router.get('/balance', async (req, res) => {
 });
 
 // POST /api/distribution/withdraw
-router.post('/withdraw', _validate(withdrawSchema), async (req, res) => {
+router.post('/withdraw', paymentLimiter, _validate(withdrawSchema), async (req, res) => {
   try {
     const { amount } = req.validated;
     const result = await distributionService.withdrawCommission(req.user.id, amount);

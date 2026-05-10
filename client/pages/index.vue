@@ -246,7 +246,7 @@
         <div class="lp-foot-lk">
           <div><h4>产品</h4><a href="#features">功能</a><a href="#pricing">定价</a><a href="#how">使用流程</a></div>
           <div><h4>支持</h4><a href="#faq">常见问题</a><NuxtLink to="/help">帮助中心</NuxtLink><NuxtLink to="/help">联系我们</NuxtLink></div>
-          <div><h4>法律</h4><a href="#">隐私政策</a><a href="#">服务条款</a></div>
+          <div><h4>法律</h4><NuxtLink to="/legal/privacy">隐私政策</NuxtLink><NuxtLink to="/legal/terms">服务条款</NuxtLink></div>
         </div>
       </div>
       <div class="lp-foot-bot"><span>{{ footerText }}</span></div>

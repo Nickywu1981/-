@@ -133,14 +133,14 @@ async function fetchInviteCode() {
   try {
     const res: any = await $fetch(`${apiBase}/distribution/invite-code`)
     if (res.code === 200) inviteData.value = res.data
-  } catch { /* ignore */ }
+  } catch { toast.error('加载邀请码失败') }
 }
 
 async function fetchBalance() {
   try {
     const res: any = await $fetch(`${apiBase}/distribution/balance`)
     if (res.code === 200) balance.value = res.data
-  } catch { /* ignore */ }
+  } catch { toast.error('加载余额失败') }
 }
 
 async function fetchTeam() {
@@ -150,7 +150,7 @@ async function fetchTeam() {
       teamList.value = res.data.list || []
       teamStats.value = res.data.stats || {}
     }
-  } catch { /* ignore */ }
+  } catch { toast.error('加载团队数据失败') }
 }
 
 async function fetchCommissions() {
@@ -161,7 +161,7 @@ async function fetchCommissions() {
       commissionList.value = res.data.list || []
       commTotal.value = res.data.total || 0
     }
-  } catch { /* ignore */ }
+  } catch { toast.error('加载佣金记录失败') }
   loadingComm.value = false
 }
 
