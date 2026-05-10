@@ -17,8 +17,8 @@ export function useAnalytics() {
         body: { event, metadata },
         credentials: 'include',
       });
-    } catch {
-      // 埋点失败静默忽略
+    } catch (err: any) {
+      console.debug('[analytics] 埋点失败', err?.message || err)
     }
   }
 

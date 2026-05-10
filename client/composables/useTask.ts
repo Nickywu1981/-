@@ -43,7 +43,8 @@ export function useTask() {
           stopPolling();
           return;
         }
-      } catch {
+      } catch (err: any) {
+        console.warn('[useTask] 轮询请求失败', err?.message || err)
         consecutiveFailures++;
       }
 

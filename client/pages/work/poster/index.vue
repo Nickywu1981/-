@@ -238,7 +238,7 @@ async function loadWorks() {
     works.value = data.data?.rows || data.data || [];
     totalWorks.value = data.data?.total || 0;
   } catch (e) {
-    // silent
+    console.error('[poster] 加载作品列表失败', e)
   } finally {
     loadingWorks.value = false;
   }

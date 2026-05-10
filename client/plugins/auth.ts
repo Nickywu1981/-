@@ -47,7 +47,8 @@ export default defineNuxtPlugin((nuxtApp) => {
           router.push('/login')
         }
         return res
-      } catch {
+      } catch (err: any) {
+        console.warn('[auth fetch] 请求增强失败，使用原始fetch', err?.message || err)
         return origFetch.call(window, input, init)
       }
     }

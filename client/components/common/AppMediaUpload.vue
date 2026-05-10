@@ -203,7 +203,8 @@ async function startUpload() {
       item.status = 'done'
       item.progress = 100
       results.push({ url: result.url, name: item.name, size: item.size, type: item.type })
-    } catch {
+    } catch (err: any) {
+      console.error('[AppMediaUpload] 上传失败', err?.message || err)
       item.status = 'error'
     }
   }

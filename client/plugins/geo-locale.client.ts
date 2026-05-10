@@ -15,7 +15,7 @@ export default defineNuxtPlugin(async () => {
       locale.value = res.locale as 'zh' | 'en'
       localStorage.setItem('lang', res.locale)
     }
-  } catch {
-    // API 不可用 → 保持默认语言
+  } catch (err: any) {
+    console.debug('[geo-locale] 地理位置API不可用，保持默认语言', err?.message || err)
   }
 })

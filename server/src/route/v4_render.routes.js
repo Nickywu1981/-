@@ -6,10 +6,12 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { success } from '../utils/response.js';
 import { validateV4 as _validate } from '../utils/validate.js';
+import { authMiddleware } from '../middleware/auth.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { infer } from '../services/aiEngine.js';
 
 const router = Router();
+router.use(authMiddleware);
 
 const renderSchema = z.object({
   modelUrl: z.string().min(1, '请上传产品 3D 模型'),

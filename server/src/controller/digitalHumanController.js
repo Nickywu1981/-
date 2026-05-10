@@ -2,6 +2,7 @@ import digitalHumanDao from '../dao/digitalHumanDao.js';
 import * as digitalHumanService from '../services/digital-human.service.js';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
+import logger from '../utils/logger.js';
 
 export default {
   async create(req, res) {
@@ -20,7 +21,8 @@ export default {
         limit: +req.query.limit || 20,
       });
       return success(res, rows);
-    } catch (_) {
+    } catch (err) {
+      logger.error(err.message);
       return error(res, ERROR_CODE.INTERNAL_ERROR, '获取数字人历史失败');
     }
   },

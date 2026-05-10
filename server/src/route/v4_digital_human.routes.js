@@ -2,10 +2,12 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { contentModerationMiddleware } from '../middleware/content-moderation.middleware.js';
+import { authMiddleware } from '../middleware/auth.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 import digitalHumanController from '../controller/digitalHumanController.js';
 
 const router = Router();
+router.use(authMiddleware);
 
 const createSchema = z.object({
   text: z.string().optional(),

@@ -88,7 +88,7 @@ async function mockPay(result: 'success' | 'fail') {
         status: result === 'success' ? '1' : '0',
       }).toString(),
     })
-  } catch { /* 回调接口始终返回 success */ }
+  } catch (err: any) { console.warn('[payment-result] 回调发送失败', err?.message || err) }
 
   mockMsg.value = result === 'success' ? '回调已发送，正在查询结果...' : '失败回调已发送'
 
@@ -116,7 +116,8 @@ function startPoll() {
         failMsg.value = '支付确认超时，如已支付请稍后查看订单状态'
         if (pollTimer) clearInterval(pollTimer)
       }
-    } catch {
+    } catch (err: any) {
+      console.warn('[payment-result] 轮询请求失败', err?.message || err)
       if (pollCount >= MAX_POLL) {
         status.value = 'fail'
         failMsg.value = '网络异常，请稍后查看订单状态'

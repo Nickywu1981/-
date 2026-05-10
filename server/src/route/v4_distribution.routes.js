@@ -12,10 +12,12 @@ import { z } from 'zod';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate } from '../utils/validate.js';
+import { authMiddleware } from '../middleware/auth.js';
 import { paymentLimiter } from '../middleware/rateLimiter.js';
 import * as distributionService from '../services/distribution.service.js';
 
 const router = Router();
+router.use(authMiddleware);
 
 const withdrawSchema = z.object({
   amount: z.number().positive('提现金额必须大于0').max(100000),

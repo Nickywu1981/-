@@ -281,7 +281,7 @@ async function checkAuth() {
 
 // Fetch site config from admin-controlled backend
 const { data: siteConfig } = await useAsyncData('site-config-home', () =>
-  $fetch<any>('/api/site-config/public').catch(() => ({}))
+  $fetch<any>('/api/site-config/public').catch((err: any) => { console.warn('[home] 站点配置加载失败', err?.message || err); return {} })
 );
 
 const siteName = computed(() => siteConfig.value?.site_name || 'Movio AI');

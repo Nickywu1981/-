@@ -2,13 +2,15 @@ import platformPublishDao from '../dao/platformPublishDao.js';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { encrypt } from '../utils/crypto.js';
+import logger from '../utils/logger.js';
 
 export default {
   async getPlatforms(_req, res) {
     try {
       const configs = await platformPublishDao.getPlatformConfigs();
       return success(res, { platforms: configs });
-    } catch (_) {
+    } catch (err) {
+      logger.error(err.message);
       return error(res, ERROR_CODE.INTERNAL_ERROR, '获取平台列表失败');
     }
   },
@@ -33,7 +35,8 @@ export default {
     try {
       const rows = await platformPublishDao.getUserCredentials(req.userId);
       return success(res, { bindings: rows });
-    } catch (_) {
+    } catch (err) {
+      logger.error(err.message);
       return error(res, ERROR_CODE.INTERNAL_ERROR, '获取绑定列表失败');
     }
   },
@@ -76,7 +79,8 @@ export default {
         limit: +req.query.limit || 20,
       });
       return success(res, { list: rows });
-    } catch (_) {
+    } catch (err) {
+      logger.error(err.message);
       return error(res, ERROR_CODE.INTERNAL_ERROR, '获取发布历史失败');
     }
   },

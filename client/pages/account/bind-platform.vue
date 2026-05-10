@@ -107,7 +107,7 @@ function platformIcon(p: string) { return platformIcons[p] || '🔗' }
 async function fetchBindings() {
   loading.value = true
   try {
-    const res: any = await $fetch(`${apiBase}/platforms/bindings`, { credentials: 'include' }).catch(() => null)
+    const res: any = await $fetch(`${apiBase}/platforms/bindings`, { credentials: 'include' }).catch((err: any) => { console.warn('[bind-platform] 绑定列表加载失败', err?.message || err); return null })
     if (res?.code === 200) boundList.value = res.data?.list || []
   } catch { toast.error('加载平台绑定失败') } finally { loading.value = false }
 
@@ -124,7 +124,7 @@ async function doBind(platform: any) {
         account_id: bindAccountId.value,
       },
       credentials: 'include',
-    }).catch(() => null)
+    }).catch((err: any) => { console.warn('[bind-platform] 绑定请求失败', err?.message || err); return null })
     if (res?.code === 200) {
       bindTarget.value = null
       bindAccountId.value = ''

@@ -104,11 +104,11 @@ function typeLabel(t: string) { return typeLabels[t] || t }
 onMounted(async () => {
   try {
     // 获取绑定平台
-    const bindsRes: any = await $fetch(`${apiBase}/platforms/bindings`, { credentials: 'include' }).catch(() => null)
+    const bindsRes: any = await $fetch(`${apiBase}/platforms/bindings`, { credentials: 'include' }).catch((err: any) => { console.warn('[distribution] 绑定平台加载失败', err?.message || err); return null })
     if (bindsRes?.code === 200) boundPlatforms.value = bindsRes.data?.list || []
 
     // 获取最近作品
-    const worksRes: any = await $fetch(`${apiBase}/assets/list`, { params: { page: 1, pageSize: 10 }, credentials: 'include' }).catch(() => null)
+    const worksRes: any = await $fetch(`${apiBase}/assets/list`, { params: { page: 1, pageSize: 10 }, credentials: 'include' }).catch((err: any) => { console.warn('[distribution] 作品列表加载失败', err?.message || err); return null })
     if (worksRes?.code === 200) {
       recentWorks.value = (worksRes.data?.list || []).map((w: any) => ({ ...w, selectedPlatform: '' }))
     }
@@ -126,7 +126,7 @@ async function doPublish(work: any) {
       method: 'POST',
       body: { work_id: work.id, platform: work.selectedPlatform, content_url: work.url },
       credentials: 'include',
-    }).catch(() => null)
+    }).catch((err: any) => { console.warn('[distribution] 发布请求失败', err?.message || err); return null })
     if (res?.code === 200) {
       publishHistory.value.unshift({
         id: Date.now(), platform: work.selectedPlatform, status: 'success',

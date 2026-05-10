@@ -2,6 +2,7 @@ import videoTranslateDao from '../dao/videoTranslateDao.js';
 import * as translateService from '../services/video-translate.service.js';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
+import logger from '../utils/logger.js';
 
 export default {
   async submitVoice(req, res) {
@@ -44,7 +45,8 @@ export default {
         limit: +limit || 20,
       });
       return success(res, rows);
-    } catch (_) {
+    } catch (err) {
+      logger.error(err.message);
       return error(res, ERROR_CODE.INTERNAL_ERROR, '获取翻译历史失败');
     }
   },

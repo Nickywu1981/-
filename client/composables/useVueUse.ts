@@ -30,7 +30,8 @@ export function useCopyToClipboard() {
     try {
       await navigator.clipboard.writeText(text);
       return true;
-    } catch {
+    } catch (err: any) {
+      console.warn('[useVueUse] clipboard API失败，使用fallback', err?.message || err)
       const textarea = document.createElement('textarea');
       textarea.value = text;
       textarea.style.position = 'fixed';

@@ -24,7 +24,8 @@ export function usePromptEnhancer() {
       const res = await api.post('/ai/enhance-prompt', { prompt, type })
       enhanced.value = res?.enhanced || res?.result || res?.data?.enhanced || prompt
       return enhanced.value
-    } catch {
+    } catch (err: any) {
+      console.warn('[usePromptEnhancer] 增强失败，使用原提示词', err?.message || err)
       enhanced.value = prompt
       return prompt
     } finally {
