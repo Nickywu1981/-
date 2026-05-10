@@ -76,9 +76,7 @@ export const useAuthStore = defineStore('auth', {
       } catch { /* best-effort */ }
       this.user = null
       this.isLoggedIn = false
-      if (typeof window !== 'undefined') {
-        window.location.href = '/'
-      }
+      await navigateTo('/')
     },
   },
 })

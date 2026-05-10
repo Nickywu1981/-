@@ -1,11 +1,14 @@
 export default defineEventHandler((event) => {
+  const config = useRuntimeConfig(event)
+  const apiOrigin = (config.public?.apiBase || '').replace(/\/api\/?$/, '') || '*'
+
   setResponseHeader(event, 'Content-Security-Policy', [
     "default-src 'self'",
     "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
     "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: blob: http://localhost:*",
+    `img-src 'self' data: blob: ${apiOrigin} *`,
     "font-src 'self'",
-    "connect-src 'self' http://localhost:*",
+    `connect-src 'self' ${apiOrigin}`,
     "media-src 'self'",
   ].join('; '))
   setResponseHeader(event, 'X-Content-Type-Options', 'nosniff')
