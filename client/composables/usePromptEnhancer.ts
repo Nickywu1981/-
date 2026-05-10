@@ -1,47 +1,34 @@
 /**
- * usePromptEnhancer — 提示词润色 composable
- * 一行调用，所有页面共享，无需逐页嵌入组件
+ * usePromptEnhance — AI 提示词增强请求
+ * 增强失败自动降级返回原提示词，不影响主流程
  *
  * 用法:
- *   const { enhance, enhancing, result, apply } = usePromptEnhancer()
- *   await enhance('一件红色连衣裙', 'image')
- *   // result.value → 润色后的提示词
+ *   const { enhancing, enhance } = usePromptEnhance()
+ *   const improved = await enhance('红色连衣裙', 'image')
  */
 import { ref } from 'vue'
-import { useApi } from './useApi'
+import { useRuntimeConfig } from '#app'
 
-export function usePromptEnhancer() {
-  const api = useApi()
+export function usePromptEnhance() {
   const enhancing = ref(false)
-  const enhanced = ref('')
-  const original = ref('')
+  const apiBase = useRuntimeConfig().public.apiBase || '/api'
 
   async function enhance(prompt: string, type: string = 'image'): Promise<string> {
-    if (!prompt?.trim()) return ''
-    original.value = prompt
     enhancing.value = true
     try {
-      const res = await api.post('/ai/enhance-prompt', { prompt, type })
-      enhanced.value = res?.enhanced || res?.result || res?.data?.enhanced || prompt
-      return enhanced.value
-    } catch (err: any) {
-      console.warn('[usePromptEnhancer] 增强失败，使用原提示词', err?.message || err)
-      enhanced.value = prompt
+      const res: any = await $fetch(`${apiBase}/ai/enhance-prompt`, {
+        method: 'POST',
+        body: { prompt, type },
+        credentials: 'include',
+      })
+      if (res.code === 200) return res.data.enhanced_prompt || prompt
       return prompt
+    } catch {
+      return prompt // 降级返回原提示词
     } finally {
       enhancing.value = false
     }
   }
 
-  function apply(): string {
-    return enhanced.value || original.value
-  }
-
-  function reset(): void {
-    enhancing.value = false
-    enhanced.value = ''
-    original.value = ''
-  }
-
-  return { enhance, enhancing, enhanced, original, apply, reset }
+  return { enhancing, enhance }
 }

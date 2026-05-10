@@ -119,7 +119,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useAppPage } from '~/composables/useAppPage'
-import { useTaskPolling, usePromptEnhance } from '~/composables/useTaskPolling'
+import { useTaskPolling } from '~/composables/useTaskPolling'
 import { useAppDict } from '~/composables/useAppDict'
 import { copyToClipboard } from '@/utils/format'
 import PromptEnhancer from '~/components/PromptEnhancer.vue'
