@@ -128,6 +128,11 @@ export async function logout(req, res, next) {
     if (header?.startsWith('Bearer ')) {
       await userService.revokeAccessToken(header.slice(7));
     }
+    const rt = req.cookies?.refreshToken;
+    if (rt) {
+      try { await userService.revokeRefreshToken(rt); } catch { /* best-effort */ }
+      res.clearCookie('refreshToken', { httpOnly: true, secure: true, sameSite: 'lax', path: '/' });
+    }
     return sendSuccess(res, {}, '已退出登录');
   } catch (err) {
     if (err.status) return sendError(res, err.status, err.message);

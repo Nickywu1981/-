@@ -15,8 +15,9 @@ export default {
     return rows[0] || null;
   },
 
-  async markPaid(reqsn, trxid, notifyRaw) {
-    const [r] = await pool.query(
+  async markPaid(reqsn, trxid, notifyRaw, conn) {
+    const db = conn || pool;
+    const [r] = await db.query(
       `UPDATE allinpay_order SET status = 1, trxid = ?, pay_time = NOW(), notify_raw = ?, update_time = NOW()
        WHERE reqsn = ? AND status = 0`,
       [trxid || '', JSON.stringify(notifyRaw || {}), reqsn],

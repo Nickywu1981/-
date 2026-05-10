@@ -127,8 +127,21 @@ export async function isTokenBlacklisted(token) {
 }
 
 /**
- * 吊销指定用户的所有 token（管理员踢人/用户改密后）
+ * 吊销 refresh token（将其 jti 加入黑名单）
  */
+export async function revokeRefreshToken(refreshToken) {
+  try {
+    const payload = jwt.decode(refreshToken);
+    if (!payload || !payload.jti) return;
+    const ttl = payload.exp - Math.floor(Date.now() / 1000);
+    if (ttl <= 0) return;
+
+    const r = await getRedis();
+    if (r) {
+      await r.set(`rt_blacklist:${payload.jti}`, '1', 'EX', ttl);
+    }
+  } catch { /* ignore decode errors */ }
+}
 export async function revokeAllUserTokens(userId) {
   const r = await getRedis();
   if (r) {

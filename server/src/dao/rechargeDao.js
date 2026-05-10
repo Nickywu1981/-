@@ -5,8 +5,8 @@ const COIN_RATES = { '10': 100, '50': 550, '100': 1200, '200': 2500, '500': 7000
 export default {
   COIN_RATES,
 
-  async listByUser(userId, tenantId, limit = 50) {
-    const [rows] = await pool.query('SELECT * FROM recharge_order WHERE user_id = ? AND tenant_id = ? ORDER BY create_time DESC LIMIT ?', [userId, tenantId, limit]);
+  async listByUser(userId, tenantId, { limit = 50, offset = 0 } = {}) {
+    const [rows] = await pool.query('SELECT * FROM recharge_order WHERE user_id = ? AND tenant_id = ? ORDER BY create_time DESC LIMIT ? OFFSET ?', [userId, tenantId, Number(limit), Number(offset)]);
     return rows;
   },
 
@@ -28,8 +28,9 @@ export default {
     return r.insertId;
   },
 
-  async markPaid(orderNo, tradeNo) {
-    await pool.query('UPDATE recharge_order SET pay_status = 1, pay_time = NOW(), trade_no = ? WHERE order_no = ? AND pay_status = 0', [tradeNo || '', orderNo]);
+  async markPaid(orderNo, tradeNo, conn) {
+    const db = conn || pool;
+    await db.query('UPDATE recharge_order SET pay_status = 1, pay_time = NOW(), trade_no = ? WHERE order_no = ? AND pay_status = 0', [tradeNo || '', orderNo]);
   },
 
   async markFailed(orderNo) {

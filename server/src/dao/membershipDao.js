@@ -6,8 +6,9 @@ const membershipDao = {
     return rows[0] || null;
   },
 
-  async upsert(userId, data) {
-    await pool.execute(
+  async upsert(userId, data, conn) {
+    const db = conn || pool;
+    await db.execute(
       `INSERT INTO user_membership (user_id, plan_type, credit_balance, start_time, end_time)
        VALUES (?, ?, ?, NOW(), ?)
        ON DUPLICATE KEY UPDATE

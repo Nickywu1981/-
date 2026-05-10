@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 import * as userDao from '../dao/userDao.js';
 import { jwtSecret } from '../config/index.js';
 import { guardSQL } from '../utils/sqlGuard.js';
-import { generateTokens, refreshAccessToken as refreshTokenUtil, revokeAccessToken as revokeTokenUtil, revokeAllUserTokens as revokeAllUtil } from '../utils/jwtToken.js';
+import { generateTokens, refreshAccessToken as refreshTokenUtil, revokeAccessToken as revokeTokenUtil, revokeRefreshToken as revokeRefreshUtil, revokeAllUserTokens as revokeAllUtil } from '../utils/jwtToken.js';
 
 const SALT_ROUNDS = 10;
 
@@ -140,4 +140,5 @@ export async function adminUpdateUser(userId, fields) {
 
 export { refreshTokenUtil as refreshAccessToken };
 export { revokeTokenUtil as revokeAccessToken };
+export { revokeRefreshUtil as revokeRefreshToken };
 export { revokeAllUtil as revokeAllUserTokens };

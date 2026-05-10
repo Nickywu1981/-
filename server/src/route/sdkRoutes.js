@@ -89,8 +89,8 @@ const visualImageSchema = z.object({
 });
 
 // ═══════════════════ CSRF 令牌获取 ═══════════════════
-router.get('/csrf', (_req, res) => {
-  success(res, { csrfToken: _req.csrfToken ? _req.csrfToken() : null });
+router.get('/csrf', (req, res) => {
+  success(res, { csrfToken: req.csrfToken || null });
 });
 
 // ═══════════════════ 能力清单 ═══════════════════

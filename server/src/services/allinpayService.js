@@ -5,6 +5,7 @@
  * 回调处理必须幂等：同一 reqsn+trxid 重复回调仅处理一次
  */
 import crypto from 'crypto';
+import pool from '../dao/db.js';
 import allinpayDao from '../dao/allinpayDao.js';
 import * as allinpaySDK from '../utils/allinpaySDK.js';
 import membershipDao from '../dao/membershipDao.js';
@@ -119,16 +120,28 @@ export async function handleNotify(body) {
     return true;
   }
 
-  // 6. 标记支付成功 (P0-4: 走 allinpayDao)
-  await allinpayDao.markPaid(reqsn, trxid || '', body);
+  // 6. 事务包裹：标记支付 + 履约发放（防数据损坏）
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
 
-  if (order.order_type === 'membership') {
-    await fulfillMembership(order);
-  } else if (order.order_type === 'recharge') {
-    await fulfillRecharge(order);
+    await allinpayDao.markPaid(reqsn, trxid || '', body, conn);
+
+    if (order.order_type === 'membership') {
+      await fulfillMembership(order, conn);
+    } else if (order.order_type === 'recharge') {
+      await fulfillRecharge(order, conn);
+    }
+
+    await conn.commit();
+    logger.info('[Allinpay] 回调履约成功', { reqsn, orderType: order.order_type });
+  } catch (e) {
+    await conn.rollback();
+    logger.error('[Allinpay] 回调履约失败，已回滚', { reqsn, orderType: order.order_type, error: e.message });
+    throw e;
+  } finally {
+    conn.release();
   }
-
-  logger.info('[Allinpay] 回调履约成功', { reqsn, orderType: order.order_type });
 
   // 发送用户通知
   try {
@@ -153,7 +166,7 @@ export async function handleNotify(body) {
 
 // ==================== 会员履约 (P0-4: 走 membershipDao) ====================
 
-async function fulfillMembership(order) {
+async function fulfillMembership(order, conn) {
   const plan = Object.values(PLANS).find(p => p.price === Number(order.amount));
   if (!plan) { logger.warn('[Allinpay] 未匹配到会员套餐', { amount: order.amount }); return; }
 
@@ -171,7 +184,7 @@ async function fulfillMembership(order) {
     if (currentEnd > now) endTime.setTime(currentEnd.getTime() + days * 86400000);
   }
 
-  await membershipDao.upsert(order.user_id, { plan_type: planType, credit_balance: creditBefore + credits, end_time: endTime, start_time: now });
+  await membershipDao.upsert(order.user_id, { plan_type: planType, credit_balance: creditBefore + credits, end_time: endTime, start_time: now }, conn);
 
   await creditDao.insertConsumptionLog({
     userId: order.user_id,
@@ -192,15 +205,15 @@ async function fulfillMembership(order) {
 
 // ==================== 充值履约 (P0-4: 走 membershipDao + rechargeDao) ====================
 
-async function fulfillRecharge(order) {
+async function fulfillRecharge(order, conn) {
   const rechargeOrder = await rechargeDao.getByOrderNo(order.business_id);
   if (!rechargeOrder) { logger.warn('[Allinpay] 充值订单不存在', { businessId: order.business_id }); return; }
 
   const existing = await membershipDao.findByUserId(order.user_id);
   const creditBefore = existing ? existing.credit_balance : 0;
 
-  await rechargeDao.markPaid(order.business_id, order.trxid || order.reqsn);
-  await membershipDao.upsert(order.user_id, { credit_balance: creditBefore + rechargeOrder.coin_amount });
+  await rechargeDao.markPaid(order.business_id, order.trxid || order.reqsn, conn);
+  await membershipDao.upsert(order.user_id, { credit_balance: creditBefore + rechargeOrder.coin_amount }, conn);
 
   await creditDao.insertConsumptionLog({
     userId: order.user_id,
@@ -212,7 +225,7 @@ async function fulfillRecharge(order) {
     remark: `虾币充值 ${rechargeOrder.coin_amount}个 — 通联支付 ${order.reqsn}`,
     requestId: order.reqsn,
     status: 1,
-  });
+  }, conn);
 
   logger.info('[Allinpay] 充值履约完成', {
     userId: order.user_id, amount: rechargeOrder.amount, credits: rechargeOrder.coin_amount,

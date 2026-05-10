@@ -9,6 +9,7 @@ import { success, error } from '../utils/response.js';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import * as authService from '../services/auth.service.js';
+import { revokeAccessToken, revokeRefreshToken } from '../utils/jwtToken.js';
 
 const router = Router();
 
@@ -119,7 +120,16 @@ router.post('/reset-password', _validate(resetPasswordSchema), async (req, res) 
 });
 
 // POST /api/auth/logout
-router.post('/logout', (_req, res) => {
+router.post('/logout', async (req, res) => {
+  const header = req.headers.authorization;
+  if (header?.startsWith('Bearer ')) {
+    try { await revokeAccessToken(header.slice(7)); } catch { /* best-effort */ }
+  }
+  const rt = req.cookies?.refreshToken;
+  if (rt) {
+    try { await revokeRefreshToken(rt); } catch { /* best-effort */ }
+    res.clearCookie('refreshToken', { httpOnly: true, secure: true, sameSite: 'lax', path: '/' });
+  }
   res.clearCookie('token');
   return success(res, {}, '已退出登录');
 });

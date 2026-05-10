@@ -91,7 +91,9 @@ const PUBLIC_PREFIXES = [
   '/api/email/send-code', '/api/email/verify-code',
   '/api/diy/published',
   '/api/templates/platforms',
+  '/api/template-market/',
   '/api/seo-keywords', '/api/fab/templates', '/api/memory/status',
+  '/api/adk/',
   '/api/sdk/',
   '/uploads',
 ];
