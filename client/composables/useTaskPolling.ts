@@ -7,7 +7,7 @@
  *   await submit('video_gen', { prompt: '...' })
  *   // 自动轮询直到 completed/failed
  */
-import { ref, onUnmounted } from 'vue'
+import { ref, onUnmounted, onDeactivated, onActivated } from 'vue'
 import { useRuntimeConfig } from '#app'
 
 export function useTaskPolling() {
@@ -66,7 +66,7 @@ export function useTaskPolling() {
   function startPolling() {
     stopPolling()
     pollTimer.value = setInterval(async () => {
-      if (!jobId.value) return
+      if (!_active || !jobId.value) return
       try {
         const res: any = await $fetch(`${apiBase}/job/${jobId.value}`, { credentials: 'include' })
         if (res.code === 200) {
@@ -103,7 +103,10 @@ export function useTaskPolling() {
     submitting.value = false
   }
 
-  onUnmounted(() => stopPolling())
+  let _active = true
+  onUnmounted(() => { _active = false; stopPolling() })
+  onDeactivated(() => { _active = false; stopPolling() })
+  onActivated(() => { _active = true })
 
   return { jobId, status, progress, result, error, submitting, submit, stopPolling, reset }
 }

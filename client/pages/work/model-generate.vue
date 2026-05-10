@@ -83,7 +83,10 @@ async function handleFile(e: Event) {
 }
 function handleDrop(e: DragEvent) {
   e.preventDefault()
-  if (e.dataTransfer?.files[0]) previewUrl.value = URL.createObjectURL(e.dataTransfer.files[0])
+  if (e.dataTransfer?.files[0]) {
+    previewUrl.value = URL.createObjectURL(e.dataTransfer.files[0])
+    uploadFile(e.dataTransfer.files[0])
+  }
 }
 async function submitTask() {
   processing.value = true; step.value = 2

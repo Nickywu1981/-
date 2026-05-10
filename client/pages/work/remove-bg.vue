@@ -141,10 +141,12 @@ async function uploadFile(file: File) {
 }
 
 function clearImage() {
+  stopPolling()
   if (previewUrl.value) URL.revokeObjectURL(previewUrl.value);
   previewUrl.value = ''
   uploadedUrl.value = ''
   uploadErr.value = ''
+  taskStatus.value = -1
   currentStep.value = 0
 }
 

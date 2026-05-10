@@ -154,7 +154,7 @@ async function uploadFile(file: File) {
   finally { uploading.value = false }
 }
 
-function clearImage() { previewUrl.value = ''; uploadedUrl.value = ''; uploadErr.value = ''; currentStep.value = 0 }
+function clearImage() { stopPolling(); previewUrl.value = ''; uploadedUrl.value = ''; uploadErr.value = ''; taskStatus.value = -1; currentStep.value = 0 }
 
 async function startWhiteBg() {
   processing.value = true; taskStatus.value = 0; progress.value = 0
