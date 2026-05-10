@@ -294,7 +294,7 @@ onMounted(checkAuth);
   background: var(--brand-gradient); color: #fff !important;
   padding: 6px clamp(12px, 2vw, 18px); border-radius: 8px;
   font-weight: 600; font-size: 13px;
-  transition: all var(--transition-fast);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), opacity var(--transition-fast);
 }
 .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 2px 12px rgba(124,58,237,0.35); }
 
@@ -302,7 +302,7 @@ onMounted(checkAuth);
 .theme-btn {
   background: none; border: 1px solid var(--border-light);
   border-radius: 8px; font-size: 16px; cursor: pointer;
-  padding: 6px 8px; transition: all var(--transition-fast);
+  padding: 6px 8px; transition: background var(--transition-fast), border-color var(--transition-fast);
   flex-shrink: 0;
 }
 .theme-btn:hover { background: var(--bg-hover); border-color: var(--brand); }
@@ -371,7 +371,7 @@ onMounted(checkAuth);
   width: 100%; padding: 8px 14px; border: 1px solid var(--brand); border-radius: 8px;
   font-size: 14px; outline: none;
   background: var(--bg-input); color: var(--text-primary);
-  transition: all var(--transition-base);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
   animation: fadeIn var(--transition-fast) ease-out;
 }
 .search-input::placeholder { color: var(--text-muted); }
@@ -398,7 +398,7 @@ onMounted(checkAuth);
 .hamburger {
   display: none; background: none; border: 1px solid var(--border-light);
   font-size: 18px; cursor: pointer; padding: 6px 8px; border-radius: 8px;
-  color: var(--text-secondary); transition: all var(--transition-fast);
+  color: var(--text-secondary); transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
 }
 .hamburger:hover { border-color: var(--brand); color: var(--brand); background: var(--bg-hover); }
 

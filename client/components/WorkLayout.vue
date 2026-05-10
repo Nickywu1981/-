@@ -36,7 +36,7 @@ const st = computed(() => p.steps ?? []);
   display: flex; align-items: center; justify-content: center;
   font-size: 13px; font-weight: 600;
   background: var(--bg-hover); color: var(--text-muted);
-  transition: all var(--transition-slow);
+  transition: background var(--transition-slow), color var(--transition-slow), box-shadow var(--transition-slow);
 }
 .step.active .step-circle {
   background: var(--brand-gradient);
@@ -47,7 +47,7 @@ const st = computed(() => p.steps ?? []);
 .step-label { font-size: 13px; color: var(--text-muted); white-space: nowrap; font-weight: 500; transition: color var(--transition-fast); }
 .step.active .step-label { color: var(--brand); font-weight: 600; }
 .step.done .step-label { color: var(--success); }
-.step-connector { width: 52px; height: 2px; background: var(--border-light); margin: 0 14px; border-radius: 1px; transition: all var(--transition-slow); }
+.step-connector { width: 52px; height: 2px; background: var(--border-light); margin: 0 14px; border-radius: 1px; transition: background var(--transition-slow); }
 .step-connector.filled { background: linear-gradient(90deg, var(--success), var(--success)); }
 
 .work-body { min-height: 420px; }
@@ -58,7 +58,7 @@ const st = computed(() => p.steps ?? []);
   border-radius: var(--radius-xl);
   padding: 52px 24px;
   text-align: center;
-  transition: all var(--transition-fast);
+  transition: border-color var(--transition-fast), background var(--transition-fast);
   background: var(--bg-card);
   cursor: pointer;
 }
@@ -72,8 +72,9 @@ const st = computed(() => p.steps ?? []);
   padding: 11px 28px; border-radius: var(--radius-lg); border: none;
   background: var(--brand-gradient);
   color: #fff; font-size: 14px; font-weight: 600; cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), opacity var(--transition-fast);
   box-shadow: 0 4px 16px var(--brand-alpha-20);
+  will-change: transform;
 }
 :deep(.btn:hover) { transform: translateY(-1px); box-shadow: 0 8px 24px var(--brand-alpha-30); }
 :deep(.btn:active) { transform: scale(0.97); }
@@ -81,7 +82,7 @@ const st = computed(() => p.steps ?? []);
 :deep(.btn-outline) {
   padding: 10px 24px; border-radius: var(--radius-lg); border: 1px solid var(--border-light);
   background: var(--bg-card); color: var(--text-primary); font-size: 13px; font-weight: 500; cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: border-color var(--transition-fast), color var(--transition-fast);
 }
 :deep(.btn-outline:hover) { border-color: var(--brand); color: var(--brand); }
 
@@ -97,7 +98,7 @@ const st = computed(() => p.steps ?? []);
 :deep(.style-card), :deep(.scene-card), :deep(.plat-card), :deep(.op-card), :deep(.style-option), :deep(.dur-btn) {
   padding: 12px 20px; border-radius: var(--radius-lg); border: 1px solid var(--border-light);
   background: var(--bg-card); color: var(--text-secondary); font-size: 13px; font-weight: 500;
-  cursor: pointer; transition: all var(--transition-fast); display: flex; align-items: center; gap: 8px;
+  cursor: pointer; transition: border-color var(--transition-fast), color var(--transition-fast), background var(--transition-fast); display: flex; align-items: center; gap: 8px;
 }
 :deep(.style-card:hover), :deep(.scene-card:hover), :deep(.plat-card:hover), :deep(.op-card:hover), :deep(.style-option:hover), :deep(.dur-btn:hover) {
   border-color: var(--brand-soft); color: var(--brand);
@@ -126,7 +127,8 @@ const st = computed(() => p.steps ?? []);
 :deep(.result-card) {
   background: var(--bg-card); border: 1px solid var(--border-card);
   border-radius: var(--radius-lg); overflow: hidden;
-  transition: all var(--transition-fast);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  will-change: transform;
 }
 :deep(.result-card:hover) { box-shadow: 0 8px 24px var(--brand-alpha-08); transform: translateY(-2px); }
 :deep(.img-placeholder) { height: 180px; background: linear-gradient(135deg, var(--brand-light-alt), var(--brand-light)); display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--brand); }
@@ -153,7 +155,7 @@ const st = computed(() => p.steps ?? []);
 :deep(.cat-card), :deep(.tmpl-card) {
   padding: 12px 20px; border-radius: var(--radius-lg); border: 1px solid var(--border-light);
   background: var(--bg-card); color: var(--text-secondary); font-size: 13px; font-weight: 500;
-  cursor: pointer; transition: all var(--transition-fast);
+  cursor: pointer; transition: border-color var(--transition-fast), color var(--transition-fast), background var(--transition-fast);
 }
 :deep(.cat-card:hover), :deep(.tmpl-card:hover) { border-color: var(--brand-soft); color: var(--brand); }
 :deep(.cat-card.active), :deep(.tmpl-card.active) {
@@ -168,7 +170,7 @@ const st = computed(() => p.steps ?? []);
 :deep(.opt-btn), :deep(.voice-btn), :deep(.bg-btn), :deep(.avatar-card), :deep(.action-card), :deep(.type-card) {
   padding: 10px 18px; border-radius: var(--radius-lg); border: 1px solid var(--border-light);
   background: var(--bg-card); color: var(--text-secondary); font-size: 13px; font-weight: 500;
-  cursor: pointer; transition: all var(--transition-fast); display: flex; align-items: center; gap: 8px;
+  cursor: pointer; transition: border-color var(--transition-fast), color var(--transition-fast), background var(--transition-fast); display: flex; align-items: center; gap: 8px;
 }
 :deep(.opt-btn:hover), :deep(.voice-btn:hover), :deep(.bg-btn:hover), :deep(.avatar-card:hover), :deep(.action-card:hover), :deep(.type-card:hover) {
   border-color: var(--brand-soft); color: var(--brand);
@@ -196,7 +198,7 @@ const st = computed(() => p.steps ?? []);
 :deep(.quick-btn) {
   padding: 6px 14px; border-radius: var(--radius-full); border: 1px solid var(--border-light);
   background: var(--bg-card); color: var(--text-secondary); font-size: 12px;
-  cursor: pointer; transition: all var(--transition-fast);
+  cursor: pointer; transition: border-color var(--transition-fast), color var(--transition-fast), background var(--transition-fast);
 }
 :deep(.quick-btn:hover) { border-color: var(--brand-soft); color: var(--brand); background: var(--ws-sidebar-hover); }
 
@@ -227,7 +229,7 @@ const st = computed(() => p.steps ?? []);
 :deep(.mode-row) { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
 :deep(.mode-card) {
   padding: 20px; border-radius: var(--radius-lg); border: 1px solid var(--border-light);
-  background: var(--bg-card); text-align: center; cursor: pointer; transition: all var(--transition-fast);
+  background: var(--bg-card); text-align: center; cursor: pointer; transition: border-color var(--transition-fast), background var(--transition-fast);
   position: relative;
 }
 :deep(.mode-card:hover) { border-color: var(--brand-soft); }
@@ -246,7 +248,7 @@ const st = computed(() => p.steps ?? []);
 :deep(.template-item), :deep(.history-item) {
   padding: 8px 16px; border-radius: var(--radius-full); border: 1px solid var(--border-light);
   background: var(--bg-card); color: var(--text-secondary); font-size: 12px;
-  cursor: pointer; transition: all var(--transition-fast);
+  cursor: pointer; transition: border-color var(--transition-fast), color var(--transition-fast);
 }
 :deep(.template-item:hover), :deep(.history-item:hover) { border-color: var(--brand-soft); color: var(--brand); }
 

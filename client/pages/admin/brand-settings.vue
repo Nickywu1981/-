@@ -63,8 +63,6 @@ h3 { font-size: 15px; font-weight: 600; color: var(--text-primary); margin-botto
 .color-row { display: flex; align-items: center; gap: 10px; }
 .color-picker { width: 40px; height: 36px; border: 1px solid var(--input-border); border-radius: var(--radius-sm); cursor: pointer; padding: 2px; background: var(--bg-input); }
 .color-code { font-size: 13px; color: var(--text-muted); background: var(--tag-bg); padding: 4px 10px; border-radius: var(--radius-xs); }
-.switch-label { display: flex !important; align-items: center; gap: 8px; cursor: pointer; font-size: 14px !important; color: var(--text-primary) !important; }
-.switch-label input { width: 18px; height: 18px; accent-color: var(--brand); }
 .range-input { width: 100%; accent-color: var(--brand); }
 .btn-save { padding: 10px 28px; background: var(--brand); color: #fff; border: none; border-radius: var(--radius-md); cursor: pointer; font-size: 14px; transition: opacity var(--transition-fast); }
 .btn-save:hover { opacity: 0.9; }

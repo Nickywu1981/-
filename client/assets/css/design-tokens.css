@@ -315,3 +315,21 @@ a:hover { color: var(--cfg-primary-hover); }
   color: var(--cfg-text-muted);
   text-align: center;
 }
+
+/* ==============================
+ * 共享组件样式
+ * ============================== */
+
+.switch-label {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px !important;
+  color: var(--cfg-text-primary) !important;
+}
+.switch-label input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--brand, var(--cfg-primary));
+}

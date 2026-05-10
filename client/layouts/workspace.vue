@@ -151,7 +151,7 @@ definePageMeta({ middleware: ['auth'] })
 .wsl-nav { flex: 1; display: flex; flex-direction: column; gap: 1px; padding: 4px 8px; overflow-y: auto; }
 .wsl-nav-item {
   display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px;
-  color: var(--tx2, #6b6b70); font-size: 13px; text-decoration: none; transition: all 0.15s; white-space: nowrap;
+  color: var(--tx2, #6b6b70); font-size: 13px; text-decoration: none; transition: background 0.15s, color 0.15s; white-space: nowrap;
 }
 .wsl-nav-item:hover { background: var(--bg-hover, #f5f5f5); color: var(--tx, #171717); }
 .wsl-nav-item.sel { background: var(--bg-sel, #171717); color: #fff; }
@@ -178,7 +178,7 @@ definePageMeta({ middleware: ['auth'] })
 .wsl-actions { display: flex; gap: 8px; align-items: center; }
 .wsl-btn {
   padding: 6px 14px; border-radius: 7px; font-size: 12px; color: var(--tx2, #6b6b70);
-  background: none; border: 1px solid var(--brd, #ebebea); cursor: pointer; text-decoration: none; transition: all 0.15s;
+  background: none; border: 1px solid var(--brd, #ebebea); cursor: pointer; text-decoration: none; transition: background 0.15s, color 0.15s;
 }
 .wsl-btn:hover { background: var(--bg-hover, #f5f5f5); color: var(--tx, #171717); }
 .wsl-content { flex: 1; overflow-y: auto; }

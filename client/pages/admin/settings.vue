@@ -78,8 +78,6 @@ h3 { font-size: 15px; font-weight: 600; color: var(--text-primary); margin-botto
 .section { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 16px; }
 .form-group { margin-bottom: 14px; }
 .form-group label { display: block; font-size: 13px; color: var(--text-secondary); margin-bottom: 4px; }
-.switch-label { display: flex !important; align-items: center; gap: 8px; cursor: pointer; font-size: 14px !important; color: var(--text-primary) !important; }
-.switch-label input { width: 18px; height: 18px; accent-color: var(--brand); }
 .input { width: 100%; padding: 8px 12px; border: 1px solid var(--input-border); border-radius: var(--radius-sm); font-size: 13px; background: var(--bg-input); color: var(--text-primary); outline: none; transition: border-color var(--transition-fast); }
 .input:focus { border-color: var(--input-focus-border); box-shadow: var(--focus-ring); }
 .save-row { display: flex; align-items: center; gap: 12px; }
