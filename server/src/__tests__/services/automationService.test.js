@@ -152,12 +152,12 @@ describe('automationService', () => {
       ).rejects.toMatchObject({ message: '平台、用户名和密码不能为空', status: 400 });
     });
 
-    it('base64-encodes password before DAO call', async () => {
+    it('AES-encrypts password before DAO call', async () => {
       mockDao.createAccount.mockResolvedValue(7);
       await createAccount('u1', 't1', { platform: 'taobao', storeName: '店A', username: 'admin', password: 'secret123' });
       expect(mockDao.createAccount).toHaveBeenCalledWith(
         expect.objectContaining({
-          encryptedPassword: Buffer.from('secret123').toString('base64'),
+          encryptedPassword: expect.stringMatching(/^[0-9a-f]+:[0-9a-f]+:[0-9a-f]+$/),
         }),
       );
     });

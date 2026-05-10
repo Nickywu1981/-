@@ -1,4 +1,5 @@
 import automationDao from '../dao/automationDao.js';
+import { encrypt } from '../utils/crypto.js';
 import { BusinessError } from '../utils/businessError.js';
 
 const TASK_TYPES = ['product_on', 'product_off', 'ship_order', 'reply_review', 'stock_check'];
@@ -57,7 +58,7 @@ export async function listAccounts(userId, tenantId) {
 
 export async function createAccount(userId, tenantId, { platform, storeName, username, password }) {
   if (!platform || !username || !password) throw new BusinessError(400, '平台、用户名和密码不能为空');
-  const encrypted = Buffer.from(password).toString('base64');
+  const encrypted = encrypt(password);
   const id = await automationDao.createAccount({ tenantId, userId, platform, storeName, username, encryptedPassword: encrypted });
   return { id };
 }
