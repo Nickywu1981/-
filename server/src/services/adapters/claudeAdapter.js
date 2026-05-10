@@ -111,7 +111,8 @@ async function health() {
       signal: AbortSignal.timeout(5000),
     });
     return { status: res.ok ? 'ok' : 'error', provider: 'anthropic' };
-  } catch {
+  } catch (err) {
+    logger.warn('[ClaudeAdapter] 健康检查失败', { error: err.message });
     return { status: 'unavailable', provider: 'anthropic' };
   }
 }

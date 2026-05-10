@@ -42,7 +42,8 @@ export function cacheMiddleware(ttl = 300, keyFn) {
       res.on('error', restore);
 
       next();
-    } catch {
+    } catch (err) {
+      logger.warn('[Cache] 中间件失败', { error: err.message });
       next(); // 缓存失败不影响主流程
     }
   };

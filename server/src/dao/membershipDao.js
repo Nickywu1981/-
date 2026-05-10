@@ -1,5 +1,7 @@
 import pool from './db.js';
 
+const COLS = 'id, user_id, plan_type, status, trial_quota, trial_used, credit_balance, start_time, end_time, auto_renew, created_at, updated_at, is_deleted, tenant_id';
+
 const membershipDao = {
   async findByUserId(userId) {
     const [rows] = await pool.execute('SELECT id, user_id, plan_type, status, trial_quota, trial_used, credit_balance, start_time, end_time, auto_renew FROM user_membership WHERE user_id = ?', [userId]);
@@ -30,7 +32,7 @@ const membershipDao = {
 
   async findExpiring(daysWithin = 7) {
     const [rows] = await pool.execute(
-      'SELECT * FROM user_membership WHERE auto_renew = 1 AND plan_type != \'free\' AND end_time BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL ? DAY)',
+      `SELECT ${COLS} FROM user_membership WHERE auto_renew = 1 AND plan_type != 'free' AND end_time BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL ? DAY)`,
       [daysWithin],
     );
     return rows;

@@ -1,5 +1,7 @@
 import pool from './db.js';
 
+const RECORD_COLS = 'id, user_id, type, action, credit_before, credit_after, consumed, remark, task_id, request_id, status, create_time, freeze_at, confirm_at, refund_at, refund_remark';
+
 export async function getMembership(userId) {
   const [rows] = await pool.execute(
     'SELECT id, user_id, plan_type, status, trial_quota, trial_used, credit_balance, start_time, end_time, auto_renew FROM user_membership WHERE user_id = ? AND status = 1 AND is_deleted = 0 ORDER BY id DESC LIMIT 1',
@@ -149,7 +151,7 @@ export async function listConsumptionRecords({ userId, status, type, page = 1, p
   const limit = parseInt(pageSize, 10);
   params.push(offset, limit);
   const [rows] = await pool.query(
-    `SELECT * FROM consumption_record ${where} ORDER BY create_time DESC LIMIT ?, ?`,
+    `SELECT ${RECORD_COLS} FROM consumption_record ${where} ORDER BY create_time DESC LIMIT ?, ?`,
     params,
   );
   const [[{ total }]] = await pool.query(`SELECT COUNT(*) AS total FROM consumption_record ${where}`, params);

@@ -10,6 +10,7 @@
 import crypto from 'crypto';
 import { error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
+import logger from '../utils/logger.js';
 
 // ========================= API Key 生成 =========================
 
@@ -74,7 +75,8 @@ export async function openApiAuth(req, res, next) {
         [apiKey],
       );
       keyRecord = rows?.[0];
-    } catch {
+    } catch (err) {
+      logger.error('[OpenAPI] API Key 查询失败', { error: err.message });
       keyRecord = null;
     }
 

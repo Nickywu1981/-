@@ -1,12 +1,13 @@
 import pool from './db.js';
 
 const COIN_RATES = { '10': 100, '50': 550, '100': 1200, '200': 2500, '500': 7000 };
+const COLS = 'id, tenant_id, user_id, order_no, amount, coin_amount, pay_channel, pay_status, trade_no, pay_time, client_ip, expire_time, create_time, update_time';
 
 export default {
   COIN_RATES,
 
   async listByUser(userId, tenantId, { limit = 50, offset = 0 } = {}) {
-    const [rows] = await pool.query('SELECT * FROM recharge_order WHERE user_id = ? AND tenant_id = ? ORDER BY create_time DESC LIMIT ? OFFSET ?', [userId, tenantId, Number(limit), Number(offset)]);
+    const [rows] = await pool.query(`SELECT ${COLS} FROM recharge_order WHERE user_id = ? AND tenant_id = ? ORDER BY create_time DESC LIMIT ? OFFSET ?`, [userId, tenantId, Number(limit), Number(offset)]);
     return rows;
   },
 
@@ -16,7 +17,7 @@ export default {
   },
 
   async getByOrderNo(orderNo) {
-    const [rows] = await pool.query('SELECT * FROM recharge_order WHERE order_no = ?', [orderNo]);
+    const [rows] = await pool.query(`SELECT ${COLS} FROM recharge_order WHERE order_no = ?`, [orderNo]);
     return rows[0] || null;
   },
 

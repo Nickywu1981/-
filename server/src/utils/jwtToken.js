@@ -24,7 +24,8 @@ async function getRedis() {
   try {
     const mod = await import('../dao/redis.js');
     redis = await mod.getRedis() || false;
-  } catch {
+  } catch (err) {
+    logger.warn('[JWT] Redis 加载失败，跳过黑名单功能', { error: err.message });
     redis = false;
   }
   return redis;

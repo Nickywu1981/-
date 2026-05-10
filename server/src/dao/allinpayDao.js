@@ -1,5 +1,7 @@
 import pool from './db.js';
 
+const COLS = 'id, reqsn, order_type, business_id, user_id, amount, trxamt, pay_channel, status, trxid, pay_time, expire_time, notify_raw, create_time, update_time';
+
 export default {
   async create(data) {
     const [r] = await pool.query(
@@ -11,7 +13,7 @@ export default {
   },
 
   async getByReqsn(reqsn) {
-    const [rows] = await pool.query('SELECT * FROM allinpay_order WHERE reqsn = ?', [reqsn]);
+    const [rows] = await pool.query(`SELECT ${COLS} FROM allinpay_order WHERE reqsn = ?`, [reqsn]);
     return rows[0] || null;
   },
 
