@@ -5,11 +5,11 @@
       <template v-if="verified">
         <div class="form-group">
           <label>新密码</label>
-          <input v-model="newPassword" type="password" placeholder="至少8位" maxlength="128" @keyup.enter="doReset" />
+          <input v-model="newPassword" type="password" placeholder="至少8位" maxlength="128" autocomplete="new-password" @keyup.enter="doReset" />
         </div>
         <div class="form-group">
           <label>确认新密码</label>
-          <input v-model="confirmPassword" type="password" placeholder="再次输入新密码" maxlength="128" @keyup.enter="doReset" />
+          <input v-model="confirmPassword" type="password" placeholder="再次输入新密码" maxlength="128" autocomplete="new-password" @keyup.enter="doReset" />
         </div>
         <button class="btn-save" :disabled="loading" @click="doReset">{{ loading ? '重置中...' : '重置密码' }}</button>
       </template>

@@ -22,7 +22,7 @@
         <div class="input-group">
           <span class="input-icon">🔒</span>
           <label for="login-password" class="sr-only">密码</label>
-          <input id="login-password" v-model="password" type="password" placeholder="密码" required maxlength="128" />
+          <input id="login-password" v-model="password" type="password" placeholder="密码" required maxlength="128" autocomplete="current-password" />
         </div>
         <button type="submit" class="login-btn" :disabled="loading">
           <span v-if="loading" class="spinner-sm" />

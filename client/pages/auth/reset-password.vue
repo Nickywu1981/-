@@ -35,7 +35,7 @@
       <form v-else @submit.prevent="handleReset">
         <div class="input-group">
           <label>新密码</label>
-          <input v-model="newPassword" type="password" class="input" placeholder="请输入新密码" />
+          <input v-model="newPassword" type="password" class="input" placeholder="请输入新密码" required autocomplete="new-password" />
           <p class="hint">8-20位，含字母+数字+特殊字符</p>
         </div>
         <button type="submit" class="btn btn-primary btn-block" :disabled="loading">

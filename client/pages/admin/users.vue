@@ -77,7 +77,7 @@
                 <option :value="0">免费</option><option :value="1">月卡</option><option :value="2">季卡</option><option :value="3">年卡</option>
               </select>
             </label>
-            <label>余额 <input v-model.number="editForm.credit_balance" type="number" /></label>
+            <label>余额 <input v-model.number="editForm.credit_balance" type="number" min="0" /></label>
             <label>状态
               <select v-model="editForm.status"><option :value="0">正常</option><option :value="1">禁用</option></select>
             </label>

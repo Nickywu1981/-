@@ -36,12 +36,12 @@
         </div>
         <div class="plan-body">
           <div class="row"><span>套餐名:</span> <input v-model="plan.name" maxlength="100" /></div>
-          <div class="row"><span>售价:</span> <input v-model.number="plan.price" type="number" /> 元</div>
-          <div class="row"><span>原价:</span> <input v-model.number="plan.original_price" type="number" /> 元</div>
-          <div class="row"><span>月点数:</span> <input v-model.number="plan.credits" type="number" /></div>
-          <div class="row"><span>日赠送:</span> <input v-model.number="plan.daily_credits" type="number" /></div>
-          <div class="row"><span>批量上限:</span> <input v-model.number="plan.batch_limit" type="number" /></div>
-          <div class="row"><span>保存天数:</span> <input v-model.number="plan.save_days" type="number" /></div>
+          <div class="row"><span>售价:</span> <input v-model.number="plan.price" type="number" min="0" /> 元</div>
+          <div class="row"><span>原价:</span> <input v-model.number="plan.original_price" type="number" min="0" /> 元</div>
+          <div class="row"><span>月点数:</span> <input v-model.number="plan.credits" type="number" min="0" /></div>
+          <div class="row"><span>日赠送:</span> <input v-model.number="plan.daily_credits" type="number" min="0" /></div>
+          <div class="row"><span>批量上限:</span> <input v-model.number="plan.batch_limit" type="number" min="0" /></div>
+          <div class="row"><span>保存天数:</span> <input v-model.number="plan.save_days" type="number" min="0" /></div>
           <div class="checks">
             <label><input v-model="plan.watermark_free" type="checkbox" :true-value="1" :false-value="0" /> 去水印</label>
             <label><input v-model="plan.hd_export" type="checkbox" :true-value="1" :false-value="0" /> 高清导出</label>
@@ -68,12 +68,12 @@
               <option :value="0">免费版</option><option :value="1">月卡</option><option :value="2">季卡</option><option :value="3">年卡</option>
             </select>
           </div>
-          <div class="row"><span>售价:</span> <input v-model.number="newPlan.price" type="number" /></div>
-          <div class="row"><span>原价:</span> <input v-model.number="newPlan.original_price" type="number" /></div>
-          <div class="row"><span>月点数:</span> <input v-model.number="newPlan.credits" type="number" /></div>
-          <div class="row"><span>日赠送:</span> <input v-model.number="newPlan.daily_credits" type="number" /></div>
-          <div class="row"><span>批量上限:</span> <input v-model.number="newPlan.batch_limit" type="number" /></div>
-          <div class="row"><span>保存天数:</span> <input v-model.number="newPlan.save_days" type="number" /></div>
+          <div class="row"><span>售价:</span> <input v-model.number="newPlan.price" type="number" min="0" /></div>
+          <div class="row"><span>原价:</span> <input v-model.number="newPlan.original_price" type="number" min="0" /></div>
+          <div class="row"><span>月点数:</span> <input v-model.number="newPlan.credits" type="number" min="0" /></div>
+          <div class="row"><span>日赠送:</span> <input v-model.number="newPlan.daily_credits" type="number" min="0" /></div>
+          <div class="row"><span>批量上限:</span> <input v-model.number="newPlan.batch_limit" type="number" min="0" /></div>
+          <div class="row"><span>保存天数:</span> <input v-model.number="newPlan.save_days" type="number" min="0" /></div>
           <div class="checks">
             <label><input v-model="newPlan.watermark_free" type="checkbox" :true-value="1" :false-value="0" /> 去水印</label>
             <label><input v-model="newPlan.hd_export" type="checkbox" :true-value="1" :false-value="0" /> 高清导出</label>

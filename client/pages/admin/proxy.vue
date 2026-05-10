@@ -65,7 +65,7 @@
                 <option value="none">无</option><option value="api_key">API Key</option><option value="bearer">Bearer Token</option><option value="basic">Basic Auth</option>
               </select>
             </label>
-            <label>超时(ms) <input v-model.number="form.timeout_ms" type="number" /></label>
+            <label>超时(ms) <input v-model.number="form.timeout_ms" type="number" min="1" /></label>
             <label>状态
               <select v-model="form.status"><option :value="1">启用</option><option :value="0">停用</option></select>
             </label>

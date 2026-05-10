@@ -45,7 +45,7 @@
     <div v-if="sendDialog.open" class="modal-overlay" @click.self="sendDialog.open = false">
       <div class="modal-box">
         <h4>发送通知</h4>
-        <input v-model="sendDialog.userId" type="number" placeholder="用户ID *" />
+        <input v-model="sendDialog.userId" type="number" min="1" placeholder="用户ID *" />
         <select v-model="sendDialog.type">
           <option value="system">系统通知</option>
           <option value="task">任务通知</option>

@@ -7,7 +7,7 @@
         <h3>基本设置</h3>
         <div class="form-group"><label>站点名称</label><input v-model="form.siteName" maxlength="100" class="input" /></div>
         <div class="form-group"><label>联系方式</label><input v-model="form.contact" maxlength="200" class="input" placeholder="support@example.com" /></div>
-        <div class="form-group"><label>单日调用上限</label><input v-model.number="form.dailyLimit" type="number" class="input" /></div>
+        <div class="form-group"><label>单日调用上限</label><input v-model.number="form.dailyLimit" type="number" min="0" class="input" /></div>
         <div class="form-group"><label class="switch-label"><input v-model="form.maintenance" type="checkbox" /><span>维护模式</span></label></div>
       </div>
       <div class="section" v-if="otherConfigs.length">

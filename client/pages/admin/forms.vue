@@ -76,7 +76,7 @@
           <div class="form-grid">
             <label class="full">标题 <input v-model="form.title" maxlength="100" placeholder="表单标题" /></label>
             <label>编码 <input v-model="form.form_code" maxlength="50" placeholder="唯一编码" /></label>
-            <label>提交上限 <input v-model.number="form.submit_limit" type="number" placeholder="0=不限" /></label>
+            <label>提交上限 <input v-model.number="form.submit_limit" type="number" min="0" placeholder="0=不限" /></label>
             <label>开始时间 <input v-model="form.start_time" type="datetime-local" /></label>
             <label>结束时间 <input v-model="form.end_time" type="datetime-local" /></label>
             <label>状态

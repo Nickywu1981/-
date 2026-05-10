@@ -60,9 +60,9 @@
                 <option value="enterprise">企业版</option>
               </select>
             </label>
-            <label>图片配额 <input v-model.number="form.quota_images" type="number" /></label>
-            <label>视频配额 <input v-model.number="form.quota_video" type="number" /></label>
-            <label>最大人数 <input v-model.number="form.max_users" type="number" /></label>
+            <label>图片配额 <input v-model.number="form.quota_images" type="number" min="0" /></label>
+            <label>视频配额 <input v-model.number="form.quota_video" type="number" min="0" /></label>
+            <label>最大人数 <input v-model.number="form.max_users" type="number" min="0" /></label>
             <label>到期时间 <input v-model="form.expire_time" type="date" /></label>
             <label>状态
               <select v-model="form.status">

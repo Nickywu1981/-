@@ -61,11 +61,11 @@
     <div v-if="tab === 'password'" class="card">
       <div class="form-group">
         <label for="pw-old">原密码</label>
-        <input id="pw-old" v-model="pw.oldPassword" type="password" placeholder="请输入原密码" />
+        <input id="pw-old" v-model="pw.oldPassword" type="password" placeholder="请输入原密码" autocomplete="current-password" />
       </div>
       <div class="form-group">
         <label for="pw-new">新密码</label>
-        <input id="pw-new" v-model="pw.newPassword" type="password" placeholder="至少6位" />
+        <input id="pw-new" v-model="pw.newPassword" type="password" placeholder="至少6位" autocomplete="new-password" />
       </div>
       <button class="btn-save" :disabled="pwSaving" @click="savePassword">{{ pwSaving ? '修改中...' : '修改密码' }}</button>
       <p v-if="pwMsg" class="msg" :class="{ error: pwMsgErr }">{{ pwMsg }}</p>

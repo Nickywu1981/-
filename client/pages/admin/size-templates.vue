@@ -26,8 +26,8 @@
                 <option v-for="p in platforms" :key="p" :value="p">{{ p }}</option>
               </select>
             </label>
-            <label>宽度(px) <input v-model.number="editForm.width" type="number" class="input" /></label>
-            <label>高度(px) <input v-model.number="editForm.height" type="number" class="input" /></label>
+            <label>宽度(px) <input v-model.number="editForm.width" type="number" min="1" class="input" /></label>
+            <label>高度(px) <input v-model.number="editForm.height" type="number" min="1" class="input" /></label>
             <label>分类 <input v-model="editForm.category" maxlength="100" class="input" placeholder="如：主图、详情图" /></label>
           </div>
           <div class="modal-actions">

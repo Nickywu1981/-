@@ -23,7 +23,7 @@
 
         <div class="input-group">
           <label>{{ config.password_label || '密码' }}</label>
-          <input v-model="password" type="password" class="input" placeholder="请输入密码" />
+          <input v-model="password" type="password" class="input" placeholder="请输入密码" required autocomplete="new-password" />
           <p class="hint">{{ config.password_hint || '8-20位，含字母+数字+特殊字符' }}</p>
         </div>
 
