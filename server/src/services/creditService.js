@@ -409,19 +409,34 @@ export async function dailyCreditReward() {
   const plan = await creditDao.getPlanByType(0);
   if (!plan || !plan.daily_credits || plan.daily_credits <= 0) return;
 
-  const members = await creditDao.getFreePlanMembers();
-  if (!members.length) return 0;
+  const conn = await db.getConnection();
+  try {
+    await conn.beginTransaction();
 
-  const daily = plan.daily_credits;
-  const affected = await creditDao.batchUpdateFreePlanCredits(daily);
-  await creditDao.batchInsertConsumptionLogs(
-    members.map(m => ({
-      userId: m.user_id, type: 1, action: 'daily_free',
-      creditBefore: m.credit_balance, creditAfter: m.credit_balance + daily,
-      consumed: -daily, remark: '每日免费赠送',
-    })),
-  );
-  return affected;
+    // FOR UPDATE 锁定用户行，防止并发重复发放
+    const members = await creditDao.getFreePlanMembersForUpdate(conn);
+    if (!members.length) { await conn.rollback(); return 0; }
+
+    const daily = plan.daily_credits;
+    const affected = await creditDao.batchUpdateFreePlanCredits(daily, conn);
+    await creditDao.batchInsertConsumptionLogs(
+      members.map(m => ({
+        userId: m.user_id, type: 1, action: 'daily_free',
+        creditBefore: m.credit_balance, creditAfter: m.credit_balance + daily,
+        consumed: -daily, remark: '每日免费赠送',
+      })),
+      conn,
+    );
+
+    await conn.commit();
+    return affected;
+  } catch (err) {
+    await conn.rollback();
+    logger.error('[Credit] 每日赠送失败', err.message);
+    throw err;
+  } finally {
+    conn.release();
+  }
 }
 
 // ==================== 积分查询 ====================

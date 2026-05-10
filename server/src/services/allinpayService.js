@@ -16,10 +16,13 @@ import logger from '../utils/logger.js';
 import { BusinessError } from '../utils/businessError.js';
 import { ORDER_STATUS } from '../constants/domainStatus.js';
 
-const PLANS = {
-  1: { name: '月卡', price: 29, days: 30, credits: 100 },
-  2: { name: '季卡', price: 69, days: 90, credits: 200 },
-  3: { name: '年卡', price: 199, days: 365, credits: 500 },
+// 注意：会员套餐详情从 database membership_plan 表读取
+// 此处仅保留 plan_type → name 的静态映射供回调日志使用
+// 积分/价格由 getPlanByType(planType) 实时查询数据库
+const PLAN_NAMES = {
+  1: '月卡',
+  2: '季卡',
+  3: '年卡',
 };
 
 // ==================== 创建统一下单 ====================
@@ -112,7 +115,16 @@ export async function handleNotify(body) {
     return true;
   }
 
-  // 5. 判断支付结果
+  // 5. 判断支付结果 + 金额校验
+  const callbackAmount = Number(body.trxamt) / 100 || Number(body.amount) || 0;
+  const orderAmount = Number(order.amount);
+  if (callbackAmount > 0 && Math.abs(callbackAmount - orderAmount) > 0.01) {
+    logger.error('[Allinpay] 回调金额与订单金额不匹配', { reqsn, callbackAmount, orderAmount });
+    await allinpayDao.markFailed(reqsn);
+    await allinpayDao.logNotify({ reqsn, trxid, notifyBody: JSON.stringify(body), signVerified: 1, processStatus: 2, processMsg: `金额不匹配: 回调${callbackAmount} != 订单${orderAmount}` });
+    return false;
+  }
+
   const paySuccess = String(body.trxstatus) === '0000' || String(body.status) === '1' || body.trxstatus === '0000';
   if (!paySuccess) {
     await allinpayDao.markFailed(reqsn);
@@ -147,16 +159,25 @@ export async function handleNotify(body) {
   try {
     let title, content;
     if (order.order_type === 'membership') {
-      const plan = Object.values(PLANS).find(p => p.price === Number(order.amount));
+      let planType = Number(order.plan_type) || 0;
+      if (!planType) {
+        const amount = Number(order.amount);
+        if (amount <= 29) planType = 1;
+        else if (amount <= 69) planType = 2;
+        else if (amount <= 199) planType = 3;
+      }
+      const planName = PLAN_NAMES[planType] || '会员';
+      const dbPlan = await creditDao.getPlanByType(planType);
       title = '支付成功 — 会员已开通';
-      content = plan
-        ? `您已成功购买${plan.name}，获赠${plan.credits}积分，有效期${plan.days}天。`
-        : `您已成功开通会员，支付￥${Number(order.amount).toFixed(2)}。`;
+      content = dbPlan
+        ? `您已成功购买${dbPlan.name || planName}，获赠${dbPlan.credits}积分，有效期${dbPlan.save_days}天。`
+        : `您已成功开通${planName}，支付￥${Number(order.amount).toFixed(2)}。`;
     } else {
-      // 充值: order.amount 为充值金额(元)，积分按充值金额 1:1
-      const creditAmount = Number(order.amount);
+      // 充值: 读取实际充值套餐比例
+      const rechargeOrder = await rechargeDao.getByOrderNo(order.business_id);
+      const creditAmount = rechargeOrder ? rechargeOrder.coin_amount : Math.round(Number(order.amount) * 10);
       title = '支付成功 — 积分已到账';
-      content = `您已成功充值${creditAmount}积分，支付￥${creditAmount.toFixed(2)}。`;
+      content = `您已成功充值${creditAmount}积分，支付￥${Number(order.amount).toFixed(2)}。`;
     }
     await notificationService.sendNotification(order.user_id, { type: 'payment', title, content });
   } catch (e) { logger.warn('[Allinpay] 通知发送失败', { userId: order.user_id, error: e.message }); }
@@ -168,26 +189,28 @@ export async function handleNotify(body) {
 // ==================== 会员履约 (P0-4: 走 membershipDao) ====================
 
 async function fulfillMembership(order, conn) {
-  // 按价格匹配套餐(金额为元: 29/69/199)，备选按 plan_type 字段
   let planType = Number(order.plan_type) || 0;
-  let plan = PLANS[planType] || null;
-  if (!plan) {
-    plan = Object.values(PLANS).find(p => p.price === Number(order.amount));
-    if (plan) planType = Number(Object.keys(PLANS).find(k => PLANS[k].price === plan.price)) || 1;
+  if (!planType) {
+    // 从数据库价格匹配套餐类型
+    const allPlans = await creditDao.listActivePlans();
+    const matched = allPlans.find(p => Number(p.price) === Number(order.amount));
+    if (matched) planType = matched.plan_type;
   }
-  if (!plan) { logger.warn('[Allinpay] 未匹配到会员套餐', { amount: order.amount, planType }); return; }
 
-  const days = plan.days;
-  const credits = plan.credits;
+  const dbPlan = await creditDao.getPlanByType(planType);
+  if (!dbPlan) { logger.warn('[Allinpay] 未匹配到会员套餐', { amount: order.amount, planType }); return; }
+
+  const credits = Number(dbPlan.credits) || 0;
+  const saveDays = dbPlan.save_days || 30;
   const now = new Date();
-  const endTime = new Date(now.getTime() + days * 86400000);
+  const endTime = new Date(now.getTime() + saveDays * 86400000);
 
   const existing = await membershipDao.findByUserId(order.user_id);
   const creditBefore = existing ? existing.credit_balance : 0;
 
   if (existing) {
     const currentEnd = existing.end_time ? new Date(existing.end_time) : now;
-    if (currentEnd > now) endTime.setTime(currentEnd.getTime() + days * 86400000);
+    if (currentEnd > now) endTime.setTime(currentEnd.getTime() + saveDays * 86400000);
   }
 
   await membershipDao.upsert(order.user_id, { plan_type: planType, credit_balance: creditBefore + credits, end_time: endTime, start_time: now }, conn);
@@ -198,14 +221,14 @@ async function fulfillMembership(order, conn) {
     action: `purchase_plan_${planType}`,
     creditBefore,
     creditAfter: creditBefore + credits,
-    consumed: plan.price,
-    remark: `${plan.name} — 通联支付 ${order.reqsn}`,
+    consumed: Number(dbPlan.price),
+    remark: `${dbPlan.name} — 通联支付 ${order.reqsn}`,
     requestId: order.reqsn,
     status: 1,
   });
 
   logger.info('[Allinpay] 会员履约完成', {
-    userId: order.user_id, planType, days, credits, creditAfter: creditBefore + credits, endTime,
+    userId: order.user_id, planType, credits, creditAfter: creditBefore + credits, endTime,
   });
 }
 

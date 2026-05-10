@@ -10,20 +10,48 @@ import pool from '../dao/db.js';
 import allinpayConfig from '../config/allinpay.js';
 import logger from '../utils/logger.js';
 
-const PLANS = {
-  1: { name: '月卡', price: 29, days: 30, credits: 100 },
-  2: { name: '季卡', price: 69, days: 90, credits: 200 },
-  3: { name: '年卡', price: 199, days: 365, credits: 500 },
-};
+import * as creditDao from '../dao/creditDao.js';
 
-export function getPlans() {
-  return Object.entries(PLANS).map(([k, v]) => ({ planType: Number(k), ...v }));
+let PLANS_CACHE = null;
+let PLANS_CACHE_TS = 0;
+
+async function loadPlansFromDB() {
+  if (PLANS_CACHE && Date.now() - PLANS_CACHE_TS < 300000) return PLANS_CACHE;
+  const rows = await creditDao.listActivePlans();
+  PLANS_CACHE = {};
+  for (const r of rows) {
+    PLANS_CACHE[r.plan_type] = {
+      name: r.name,
+      price: Number(r.price),
+      original_price: Number(r.original_price),
+      credits: Number(r.credits),
+      daily_credits: r.daily_credits ? Number(r.daily_credits) : null,
+      save_days: r.save_days || 30,
+    };
+  }
+  PLANS_CACHE_TS = Date.now();
+  return PLANS_CACHE;
+}
+
+async function getPlansFromDB() {
+  try {
+    return await loadPlansFromDB();
+  } catch (e) {
+    logger.error('[Payment] 加载套餐失败', e.message);
+    throw new BusinessError(503, '会员套餐信息暂时不可用，请稍后再试');
+  }
+}
+
+export async function getPlans() {
+  const dbPlans = await getPlansFromDB();
+  return Object.entries(dbPlans).map(([k, v]) => ({ planType: Number(k), ...v }));
 }
 
 // ==================== 创建支付订单（通联聚合支付） ====================
 
 export async function createPaymentOrder(userId, { planType, payChannel = 'wechat' }) {
-  const plan = PLANS[planType];
+  const dbPlans = await getPlansFromDB();
+  const plan = dbPlans[planType];
   if (!plan) throw new BusinessError(400, '无效套餐');
 
   if (!['wechat', 'alipay', 'unionpay'].includes(payChannel)) throw new BusinessError(400, '支付方式仅支持 wechat / alipay / unionpay');
@@ -81,14 +109,9 @@ export async function getOrder(reqsn) {
 // ==================== 账单 ====================
 
 export async function getBillingHistory(userId) {
-  try {
-    const [rows] = await pool.query(
-      'SELECT * FROM allinpay_order WHERE user_id = ? AND status = 1 ORDER BY create_time DESC LIMIT 50',
-      [userId],
-    );
-    return rows;
-  } catch (e) {
-    logger.error('[Payment] 查询订单失败', e.message);
-    return [];
-  }
+  const [rows] = await pool.query(
+    'SELECT reqsn, trxid, amount, pay_channel, status, body, create_time, pay_time FROM allinpay_order WHERE user_id = ? AND status = 1 ORDER BY create_time DESC LIMIT 50',
+    [userId],
+  );
+  return rows;
 }

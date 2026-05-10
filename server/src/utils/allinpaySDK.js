@@ -175,8 +175,12 @@ export async function unifiedOrder(params) {
   if (respSign) {
     const verifyStr = buildSignString(result);
     if (!rsaVerify(verifyStr, respSign)) {
-      logger.error('[Allinpay] 响应验签失败', { reqsn: postData.reqsn });
+      logger.error('[Allinpay] 响应验签失败，拒绝响应', { reqsn: postData.reqsn });
+      throw new BusinessError(502, '支付网关签名验证失败');
     }
+  } else if (!isMockMode()) {
+    logger.error('[Allinpay] 响应缺少 sign 字段', { reqsn: postData.reqsn });
+    throw new BusinessError(502, '支付网关响应缺少签名');
   }
 
   return {
@@ -193,9 +197,13 @@ export async function unifiedOrder(params) {
  * @returns {boolean}
  */
 export function verifyNotify(body) {
-  // Mock 模式跳过验签
+  // Mock 模式仅在非生产环境且调用方显式标记为 sanbox 允许跳过验签
   if (isMockMode()) {
-    logger.info('[Allinpay Mock] 回调验签跳过');
+    if (process.env.NODE_ENV === 'production') {
+      logger.error('[Allinpay] 生产环境禁止 Mock 模式验签跳过');
+      return false;
+    }
+    logger.info('[Allinpay Mock] 回调验签跳过 (非生产环境)');
     return true;
   }
 

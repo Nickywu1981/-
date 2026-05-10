@@ -9,6 +9,25 @@ import * as emailTemplateDao from '../dao/emailTemplateDao.js';
 
 const CODE_CACHE = new Map(); // key: email, value: { code, expires, attempts }
 
+// ==================== HTML 模板消毒 ====================
+
+function sanitizeHtml(html) {
+  // 移除 <script> 标签、事件处理器、javascript: 协议
+  return html
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/<script\b[^>]*\/>/gi, '')
+    .replace(/\s+on\w+\s*=\s*["'][^"']*["']/gi, '')
+    .replace(/\s+on\w+\s*=\s*[^\s>]+/gi, '')
+    .replace(/<script\b[^>]*>/gi, '')
+    .replace(/<\/script>/gi, '')
+    .replace(/javascript\s*:/gi, 'data-xss-blocked:')
+    .replace(/<iframe\b[^>]*>/gi, '')
+    .replace(/<\/iframe>/gi, '')
+    .replace(/<embed\b[^>]*>/gi, '')
+    .replace(/<object\b[^>]*>/gi, '')
+    .replace(/<\/object>/gi, '');
+}
+
 // ==================== 模板渲染 ====================
 
 function renderTemplate(templateContent, params) {
@@ -104,7 +123,7 @@ export async function sendVerificationCode(email, scene = 'login') {
     const template = await emailTemplateDao.findByCode(templateCode);
     if (template) {
       subject = renderTemplate(template.subject, { code });
-      html = renderTemplate(template.content, { code });
+      html = sanitizeHtml(renderTemplate(template.content, { code }));
     } else {
       throw new BusinessError(404, '模板未找到');
     }

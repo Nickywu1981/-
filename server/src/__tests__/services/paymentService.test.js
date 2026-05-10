@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import * as creditDao from '../../dao/creditDao.js';
 
 // Mock DAOs and dependencies
 vi.mock('../../dao/db.js', () => ({
@@ -52,7 +53,11 @@ vi.mock('../../dao/creditDao.js', () => ({
   getMembership: vi.fn().mockResolvedValue({ plan_type: 0, end_time: null }),
   createCreditRecord: vi.fn().mockResolvedValue({ id: 1 }),
   insertConsumptionLog: vi.fn().mockResolvedValue({ id: 1 }),
-  listActivePlans: vi.fn().mockResolvedValue([]),
+  listActivePlans: vi.fn().mockResolvedValue([
+    { plan_type: 1, name: '月卡', price: '29.00', original_price: '39.00', credits: 300, daily_credits: 5, save_days: 30 },
+    { plan_type: 2, name: '季卡', price: '69.00', original_price: '99.00', credits: 1000, daily_credits: 10, save_days: 90 },
+    { plan_type: 3, name: '年卡', price: '199.00', original_price: '299.00', credits: 5000, daily_credits: 20, save_days: 365 },
+  ]),
 }));
 
 import * as payment from '../../services/paymentService.js';
@@ -66,11 +71,16 @@ describe('paymentService', () => {
     allinpayDao.create.mockResolvedValue(1);
     allinpaySDK.unifiedOrder.mockResolvedValue({ payUrl: 'https://sandbox.allinpay.com/pay/test', trxid: 'TXN_TEST' });
     allinpaySDK.verifyNotify.mockReturnValue(true);
+    creditDao.listActivePlans.mockResolvedValue([
+      { plan_type: 1, name: '月卡', price: '29.00', original_price: '39.00', credits: 300, daily_credits: 5, save_days: 30 },
+      { plan_type: 2, name: '季卡', price: '69.00', original_price: '99.00', credits: 1000, daily_credits: 10, save_days: 90 },
+      { plan_type: 3, name: '年卡', price: '199.00', original_price: '299.00', credits: 5000, daily_credits: 20, save_days: 365 },
+    ]);
   });
 
   describe('getPlans', () => {
-    it('should return all 3 plans', () => {
-      const plans = payment.getPlans();
+    it('should return all 3 plans', async () => {
+      const plans = await payment.getPlans();
       expect(plans).toHaveLength(3);
       expect(plans[0].planType).toBe(1);
       expect(plans[0].name).toBe('月卡');
