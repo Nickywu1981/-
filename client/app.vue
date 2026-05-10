@@ -10,6 +10,7 @@
       <NuxtPage />
     </NuxtLayout>
     <Toast />
+    <ConfirmDialog ref="confirmDialogRef" />
   </template>
 </template>
 
@@ -18,6 +19,13 @@ import '~/assets/css/main.css'
 import '~/assets/css/theme.css'
 
 const appError = ref('')
+const confirmDialogRef = ref()
+
+// 注册全局确认对话框到 useConfirm
+import { registerConfirmDialog } from '~/composables/useConfirm'
+if (import.meta.client) {
+  onMounted(() => { registerConfirmDialog(confirmDialogRef) })
+}
 
 onErrorCaptured((err) => {
   appError.value = err?.message || '未知错误'

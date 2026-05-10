@@ -82,6 +82,8 @@
 
 <script setup lang="ts">
 
+const { confirm } = useConfirm()
+
 const list = ref<any[]>([])
 const total = ref(0)
 const page = ref(1)
@@ -135,7 +137,7 @@ async function toggleStatus(p: any) {
 }
 
 async function delProxy(id: number) {
-  if (!confirm('确认删除该代理配置？')) return
+  if (!await confirm({ message: '确认删除该代理配置？')) return
   try {
     const res: any = await $fetch(`/api/proxy/${id}`, { method: 'DELETE' })
     if (res?.code === 200 || res?.code === 0) { toast.success('代理已删除'); fetchData() }

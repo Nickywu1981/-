@@ -83,6 +83,7 @@
 
 <script setup lang="ts">
 
+const { confirm } = useConfirm()
 const list = ref<any[]>([])
 const total = ref(0)
 const page = ref(1)
@@ -173,7 +174,7 @@ async function toggleStatus(t: any) {
 }
 
 async function delTenant(id: number) {
-  if (!confirm('确认删除该租户？此操作不可恢复。')) return
+  if (!await confirm({ message: '确认删除该租户？此操作不可恢复。' })) return
   try {
     const res: any = await $fetch(`/api/tenants/${id}`, { method: 'DELETE' })
     if (res?.code === 200 || res?.code === 0) {

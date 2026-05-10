@@ -90,6 +90,8 @@ fetch('/api/open/v1/image/remove-bg', {
 </template>
 
 <script setup lang="ts">
+
+const { confirm } = useConfirm()
 import { api } from '@/composables/useApi'
 import { formatDateTime } from '@/utils/format'
 
@@ -136,7 +138,7 @@ async function toggleKey(k: any) {
 }
 
 async function deleteKey(k: any) {
-  if (!confirm('确定删除该密钥？')) return
+  if (!await confirm({ message: '确定删除该密钥？')) return
   try {
     await api.delete(`/open/keys/${k.id}`)
     await loadKeys()

@@ -33,6 +33,8 @@
 </template>
 <script setup lang="ts">
 
+const { confirm } = useConfirm()
+
 const toast = useToast()
 const list = ref<any[]>([]), loading = ref(true)
 const showModal = ref(false), editing = ref<any>(null), saving = ref(false)
@@ -67,7 +69,7 @@ async function save() {
 }
 
 async function deleteItem(id: number) {
-  if (!confirm('确定删除?')) return
+  if (!await confirm({ message: '确定删除?')) return
   try {
     await $fetch(`/api/collections/${id}`, { method: 'DELETE', credentials: 'include' })
     fetchData()

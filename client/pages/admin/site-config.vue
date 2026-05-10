@@ -65,6 +65,8 @@
 
 <script setup lang="ts">
 
+const { confirm } = useConfirm()
+
 const configs = ref<any[]>([]);
 const editingId = ref<number | null>(null);
 const editValue = ref('');
@@ -129,7 +131,7 @@ async function addConfig() {
 }
 
 async function deleteConfig(item: any) {
-  if (!confirm(`确定删除配置 "${item.config_key}"？`)) return;
+  if (!await confirm({ message: `确定删除配置 "${item.config_key}"？`)) return;
   try {
     await $fetch(`/api/admin/site-config/${item.id}`, { method: 'DELETE', credentials: 'include' });
     toast.success('已删除');

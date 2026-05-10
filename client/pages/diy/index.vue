@@ -87,6 +87,8 @@
 
 <script setup lang="ts">
 
+const { confirm } = useConfirm()
+
 const { $api } = useNuxtApp()
 const toast = useToast()
 const pages = ref<DiyPage[]>([])
@@ -129,7 +131,7 @@ async function publishPage(id) {
 }
 
 async function deletePage(id) {
-  if (!confirm('确认删除？')) return
+  if (!await confirm({ message: '确认删除？')) return
   try { await $fetch(`/api/diy/${id}/soft-delete`, { method: 'POST' }); loadPages() }
   catch (e) { toast.error('删除失败') }
 }

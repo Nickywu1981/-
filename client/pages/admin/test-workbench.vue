@@ -319,6 +319,8 @@
 </template>
 
 <script setup lang="ts">
+
+const { confirm } = useConfirm()
 import { formatDateTime, copyToClipboard, truncate } from '@/utils/format';
 const formatTime = (iso: string) => iso ? formatDateTime(iso, 'HH:mm:ss') : '';
 const toast = useToast()
@@ -572,7 +574,7 @@ async function deleteHistoryItem(id: string) {
 }
 
 async function clearHistory() {
-  if (!confirm('确认清空全部测试历史？')) return
+  if (!await confirm({ message: '确认清空全部测试历史？')) return
   try {
     await $fetch('/api/test/history', { method: 'DELETE', credentials: 'include' })
     toast.success('已清空')

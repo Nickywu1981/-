@@ -82,6 +82,8 @@
 
 <script setup lang="ts">
 
+const { confirm } = useConfirm()
+
 import AdminLayout from '~/components/AdminLayout.vue'
 
 const list = ref<any[]>([])
@@ -124,7 +126,7 @@ async function retryTask(t: any) {
 }
 
 async function cancelTask(t: any) {
-  if (!confirm('确认取消该任务？')) return
+  if (!await confirm({ message: '确认取消该任务？')) return
   try {
     const res: any = await $fetch(`/api/admin/tasks/${t.id}/cancel`, { method: 'POST' })
     if (res?.code === 200) { toast.success('任务已取消'); fetchData() }

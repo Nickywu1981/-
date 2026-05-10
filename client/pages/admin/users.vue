@@ -94,6 +94,7 @@
 
 <script setup lang="ts">
 
+const { confirm } = useConfirm()
 const list = ref<any[]>([])
 const total = ref(0)
 const page = ref(1)
@@ -143,7 +144,7 @@ function toggleAll() {
 }
 
 async function toggleStatus(user: any, status: number) {
-  if (!confirm(status === 1 ? `确认禁用用户「${user.username}」？` : `确认启用用户「${user.username}」？`)) return
+  if (!await confirm({ message: status === 1 ? `确认禁用用户「${user.username}」？` : `确认启用用户「${user.username}」？` })) return
   try {
     const data = await $fetch(`/api/admin/users/${user.id}/status`, { method: 'PUT', credentials: 'include', body: { status } })
     const res = data as any
@@ -154,7 +155,7 @@ async function toggleStatus(user: any, status: number) {
 
 async function batchToggleStatus(status: number) {
   const label = status === 1 ? '禁用' : '启用'
-  if (!confirm(`确认批量${label} ${selectedIds.value.size} 个用户？`)) return
+  if (!await confirm({ message: `确认批量${label} ${selectedIds.value.size} 个用户？` })) return
   try {
     const ids = [...selectedIds.value]
     const data = await $fetch('/api/admin/users/batch-status', { method: 'PUT', credentials: 'include', body: { ids, status } })

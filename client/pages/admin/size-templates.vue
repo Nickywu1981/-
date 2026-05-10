@@ -41,6 +41,8 @@
 </template>
 <script setup lang="ts">
 
+const { confirm } = useConfirm()
+
 const toast = useToast()
 const list = ref<any[]>([]), loading = ref(true), filterPlatform = ref('')
 const showModal = ref(false), editing = ref<any>(null), saving = ref(false)
@@ -83,7 +85,7 @@ async function saveTemplate() {
   saving.value = false
 }
 async function deleteItem(id: number) {
-  if (!confirm('确定删除?')) return
+  if (!await confirm({ message: '确定删除?')) return
   try {
     await $fetch(`/api/templates/my/${id}`, { method: 'DELETE', credentials: 'include' })
     fetchData()

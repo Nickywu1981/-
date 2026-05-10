@@ -110,6 +110,8 @@
 
 <script setup lang="ts">
 
+const { confirm } = useConfirm()
+
 const list = ref<any[]>([]);
 const total = ref(0);
 const page = ref(1);
@@ -176,7 +178,7 @@ async function save() {
 }
 
 async function review(id: number, status: number) {
-  if (!confirm(status === 2 ? '确认通过并上架？' : '确认驳回/下架？')) return;
+  if (!await confirm({ message: status === 2 ? '确认通过并上架？' : '确认驳回/下架？')) return;
   try {
     await $fetch(`/api/admin/prompts/${id}/review`, {
       method: 'PUT',
@@ -188,7 +190,7 @@ async function review(id: number, status: number) {
 }
 
 async function confirmDelete(t: any) {
-  if (!confirm(`确认删除「${t.title}」？此操作不可恢复。`)) return;
+  if (!await confirm({ message: `确认删除「${t.title}」？此操作不可恢复。`)) return;
   try {
     await $fetch(`/api/admin/prompts/${t.id}`, { method: 'DELETE', credentials: 'include' });
     fetchData();

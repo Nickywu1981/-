@@ -32,6 +32,8 @@
 
 <script setup lang="ts">
 
+const { confirm } = useConfirm()
+
 
 const showForm = ref(false);
 const loading = ref(true);
@@ -65,7 +67,7 @@ async function saveCollection() {
 }
 
 async function deleteCollection(id: number) {
-  if (!confirm('确定删除？')) return;
+  if (!await confirm({ message: '确定删除？')) return;
   try {
     await $fetch(`/api/collections/${id}`, { method: 'DELETE', credentials: 'include' });
     toast.success('已删除');

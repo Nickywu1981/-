@@ -98,6 +98,8 @@
 
 <script setup lang="ts">
 
+const { confirm } = useConfirm()
+
 const list = ref<any[]>([])
 const total = ref(0)
 const page = ref(1)
@@ -192,7 +194,7 @@ async function showSubs(f: any) {
 }
 
 async function delForm(id: number) {
-  if (!confirm('确认删除该表单？此操作不可恢复。')) return
+  if (!await confirm({ message: '确认删除该表单？此操作不可恢复。')) return
   try {
     const res: any = await $fetch(`/api/forms/admin/${id}`, { method: 'DELETE' })
     if (res?.code === 200 || res?.code === 0) {

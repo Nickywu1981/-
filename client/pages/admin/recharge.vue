@@ -77,6 +77,7 @@
 
 <script setup lang="ts">
 
+const { confirm } = useConfirm()
 const list = ref<any[]>([])
 const total = ref(0)
 const page = ref(1)
@@ -112,7 +113,7 @@ function onPageChange(p: number) { page.value = p; fetchData() }
 function openDetail(o: any) { detail.value = o; detailOpen.value = true }
 
 async function refund(o: any) {
-  if (!confirm(`确认退款订单 ${o.order_no}？金额 ¥${o.amount}`)) return
+  if (!await confirm({ message: `确认退款订单 ${o.order_no}？金额 ¥${o.amount}` })) return
   try {
     const res: any = await $fetch(`/api/recharge/admin/refund/${o.order_no}`, { method: 'POST' })
     if (res?.code === 200 || res?.code === 0) { o.pay_status = 3; toast.success('退款成功') }

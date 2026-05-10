@@ -87,6 +87,8 @@ const platformIcons: Record<string, string> = {
 </script>
 
 <script setup lang="ts">
+
+const { confirm } = useConfirm()
 import { ref, onMounted } from 'vue'
 
 const toast = useToast()
@@ -137,7 +139,7 @@ async function doBind(platform: any) {
 }
 
 async function doUnbind(item: any) {
-  if (!confirm(`确定解绑 ${item.platform_name || item.platform} 的${item.bind_type === 'shop' ? '店铺' : '账号'}？`)) return
+  if (!await confirm({ message: `确定解绑 ${item.platform_name || item.platform} 的${item.bind_type === 'shop' ? '店铺' : '账号'}？`)) return
   try {
     await $fetch(`${apiBase}/platforms/bind/${item.id}`, { method: 'DELETE', credentials: 'include' })
     fetchBindings()

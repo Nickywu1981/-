@@ -64,6 +64,8 @@
 
 <script setup lang="ts">
 
+const { confirm } = useConfirm()
+
 const list = ref<any[]>([])
 const total = ref(0)
 const page = ref(1)
@@ -104,7 +106,7 @@ async function confirmSend() {
 }
 
 async function doDelete(n: any) {
-  if (!confirm(`确定删除通知 #${n.id}？`)) return
+  if (!await confirm({ message: `确定删除通知 #${n.id}？`)) return
   try {
     const data = await $fetch(`/api/notifications/${n.id}`, { method: 'DELETE', credentials: 'include' })
     if ((data as any)?.code === 200) { toast.success('已删除'); fetch() }

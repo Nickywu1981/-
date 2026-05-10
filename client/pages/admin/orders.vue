@@ -74,6 +74,8 @@
 </template>
 
 <script setup lang="ts">
+
+const { confirm } = useConfirm()
 import { formatDateTime } from '@/utils/format'
 const toast = useToast()
 
@@ -109,7 +111,7 @@ function onPageChange(p: number) { page.value = p; fetch() }
 function openDetail(o: any) { detail.value = o; detailOpen.value = true }
 
 async function confirmDelete(o: any) {
-  if (!confirm(`确认删除订单 #${o.id}？此操作不可撤销。`)) return
+  if (!await confirm({ message: `确认删除订单 #${o.id}？此操作不可撤销。`)) return
   try {
     await $fetch(`/api/admin/orders/${o.id}`, { method: 'DELETE' })
     list.value = list.value.filter(item => item.id !== o.id)
