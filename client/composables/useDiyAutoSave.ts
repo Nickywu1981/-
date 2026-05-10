@@ -45,9 +45,10 @@ export function useDiyAutoSave(
     saveError.value = null
     try {
       const sections = getSections()
+      const body: Record<string, any> = { mobileConfig: { sections: structuredClone(sections) }, pcConfig: { sections: structuredClone(sections) } }
       await $fetch(`/api/diy/${pageId.value}/versions/auto-save`, {
         method: 'POST',
-        body: { mobileConfig: { sections: structuredClone(sections) } },
+        body,
         credentials: 'include',
       })
       lastSaved.value = new Date()
@@ -65,9 +66,10 @@ export function useDiyAutoSave(
     if (!pageId.value) return null
     try {
       const res = await $fetch(`/api/diy/${pageId.value}/versions/latest-auto`, { credentials: 'include' })
-      if (res?.data && res.data.config_json) {
+      if (res?.data) {
+        const d = res.data
         recovered.value = true
-        return res.data
+        return d.pc_config || d.mobile_config || d.pcConfig || d.mobileConfig
       }
     } catch { /* no recovery */ }
     return null

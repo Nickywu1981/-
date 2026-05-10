@@ -12,26 +12,21 @@ import diyDao from '../dao/diyDao.js';
 // 发布前校验规则
 function validateBeforePublish(page) {
   const issues = [];
-  const mobileConfig = page.mobile_config || {};
-  const pcConfig = page.pc_config || {};
-  const sections = mobileConfig.sections || [];
-  const pcSections = pcConfig.sections || [];
+  const mobileCfg = page.mobile_config || {};
+  const pcCfg = page.pc_config || {};
+  const allSections = [...(mobileCfg.sections || []), ...(pcCfg.sections || [])];
 
   if (!page.title || !page.title.trim()) issues.push('页面标题不能为空');
-  if (sections.length === 0 && pcSections.length === 0) issues.push('页面至少需要添加一个组件区块');
-  for (const s of sections) {
-    if (s.props?.images && s.props.images.some(img => !img)) issues.push(`"${s.type}"组件存在空图片链接`);
-    if (s.props?.bgImage && !s.props.bgImage.trim()) issues.push(`"${s.type}"组件背景图为空`);
-  }
-  for (const s of sections) {
-    if (s.type === 'ctaButton' && (!s.props?.text || !s.props.text.trim())) issues.push('CTA按钮文案不能为空');
-    if (s.type === 'form' && (!s.props?.submitText || !s.props.submitText.trim())) issues.push('表单提交按钮文案不能为空');
-  }
-  for (const s of sections) {
-    if (s.type === 'form' && (!s.props?.fields || s.props.fields.length === 0)) issues.push('表单组件至少需要一个字段');
-  }
-  for (const s of sections) {
-    if (s.type === 'countdownTimer' && !s.props?.endTime) issues.push('倒计时组件需设置结束时间');
+  if (!allSections.length) issues.push('页面至少需要添加一个组件区块');
+
+  for (const s of allSections) {
+    const type = s.type || s.component;
+    if (s.props?.images && s.props.images.some((img: string) => !img)) issues.push(`"${type}"组件存在空图片链接`);
+    if (s.props?.bgImage && !s.props.bgImage.trim()) issues.push(`"${type}"组件背景图为空`);
+    if (type === 'ctaButton' && (!s.props?.text || !s.props.text.trim())) issues.push('CTA按钮文案不能为空');
+    if (type === 'form_container' && (!s.props?.submitText || !s.props.submitText.trim())) issues.push('表单提交按钮文案不能为空');
+    if (type === 'form_container' && (!s.props?.fields || s.props.fields.length === 0)) issues.push('表单组件至少需要一个字段');
+    if (type === 'countdown' && !s.props?.endTime) issues.push('倒计时组件需设置结束时间');
   }
   return issues;
 }
@@ -212,6 +207,11 @@ export default {
 
   async batchUnpublish(ids, tenantId) {
     await diyDao.batchUpdateStatus(ids.filter(Number), tenantId, 2);
+    // 批量清除 Redis 缓存
+    const pages = await diyDao.getPagesByIds(ids, tenantId);
+    for (const p of pages) {
+      if (p) await diyDao.clearPageCache(p.slug).catch((e) => { logger.warn('清除页面缓存失败:', e.message); });
+    }
     return { count: ids.length };
   },
 

@@ -126,7 +126,8 @@ router.post('/:id/versions/diff', validateParams(idParamSchema), authMiddleware,
   const vb = await diyService.getVersion(req.params.id, versionB, req.tenantId);
   if (!va || !vb) return error(res, ERROR_CODE.NOT_FOUND, '版本不存在');
   const diff = compareConfigs(va.mobile_config, vb.mobile_config);
-  success(res, { versionA: va, versionB: vb, diff });
+  const diffPc = compareConfigs(va.pc_config, vb.pc_config);
+  success(res, { versionA: va, versionB: vb, diff, diffPc });
 }));
 
 // ==================== 页面访问统计 ====================

@@ -259,14 +259,18 @@ async function loadPage() {
   try {
     const res = await $fetch(`/api/diy/${id}`)
     pageInfo.value = res.data
-    editor.loadFromConfig(res.data.mobile_config || res.data.pc_config)
+    const isPC = res.data.page_type === 'pc'
+    editor.loadFromConfig(isPC ? (res.data.pc_config || res.data.mobile_config) : (res.data.mobile_config || res.data.pc_config))
   } catch { toast.error('加载页面失败') }
 }
 
 async function savePage() {
   saving.value = true
   try {
-    const body = { mobileConfig: editor.toConfigJson() }
+    const mCfg = editor.toConfigJson()
+    const body: Record<string, any> = {}
+    if (pageInfo.value.page_type !== 'pc') body.mobileConfig = mCfg
+    if (pageInfo.value.page_type !== 'mobile') body.pcConfig = mCfg
     await $fetch(`/api/diy/${pageInfo.value.id}`, { method: 'PUT', body })
     dirty.value = false
     toast.success('保存成功')
@@ -278,7 +282,13 @@ async function saveVersion() {
   const remark = prompt('版本备注 (可选):')
   saving.value = true
   try {
-    await $fetch(`/api/diy/${pageInfo.value.id}/versions`, { method: 'POST', body: { configJson: editor.toConfigJson(), remark: remark || undefined } })
+    const mCfg = editor.toConfigJson()
+    const body: Record<string, any> = {}
+    if (pageInfo.value.page_type !== 'pc') body.mobileConfig = mCfg
+    if (pageInfo.value.page_type !== 'mobile') body.pcConfig = mCfg
+    if (remark) body.remark = remark
+    await $fetch(`/api/diy/${pageInfo.value.id}/versions`, { method: 'POST', body })
+    dirty.value = false
     toast.success('版本已保存')
   } catch (e) { toast.error('保存版本失败: ' + (e.data?.msg || e.message)) }
   finally { saving.value = false }
@@ -287,7 +297,6 @@ async function saveVersion() {
 async function publishPage() {
   publishing.value = true
   try {
-    await $fetch(`/api/diy/${pageInfo.value.id}`, { method: 'PUT', body: { config_json: editor.toConfigJson() } })
     await $fetch(`/api/diy/${pageInfo.value.id}/publish`, { method: 'POST' })
     dirty.value = false
     toast.success('发布成功！访问地址：/diy/preview?slug=' + pageInfo.value.slug)
@@ -351,7 +360,9 @@ onMounted(async () => {
   const recovered = await autoSave.checkRecovery()
   if (recovered) {
     try {
-      editor.loadFromConfig(recovered.mobile_config || recovered.pc_config)
+      const isPC = pageInfo.value.page_type === 'pc'
+      const config = recovered.mobile_config || recovered.pc_config || recovered.mobileConfig || recovered.pcConfig
+      editor.loadFromConfig(isPC ? (recovered.pc_config || recovered.mobile_config) : (recovered.mobile_config || recovered.pc_config))
       toast.info('检测到未保存的更改，已自动恢复')
     } catch {
       toast.warn('恢复数据格式异常，已加载最新服务端版本')
