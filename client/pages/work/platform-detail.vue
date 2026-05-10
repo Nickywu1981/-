@@ -68,7 +68,7 @@
             <option value="main">主图</option><option value="detail">细节图</option>
             <option value="scene">场景图</option><option value="size">尺寸图</option>
           </select>
-          <button class="remove-btn" @click="removeImage(i)">✕</button>
+          <button class="remove-btn" @click="removeImage(i)" aria-label="移除图片">✕</button>
         </div>
       </div>
 

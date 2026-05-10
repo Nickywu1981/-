@@ -126,8 +126,8 @@
             <img loading="lazy" v-if="item.url" :src="item.url" :alt="`海报结果 ${idx + 1}`" class="result-img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
             <div v-else class="result-placeholder">生成中...</div>
             <div class="result-actions">
-              <button class="btn-icon" title="下载" @click="downloadImage(item.url)">⬇</button>
-              <button class="btn-icon" title="复制" @click="copyImage(item.url)">📋</button>
+              <button class="btn-icon" title="下载" aria-label="下载海报" @click="downloadImage(item.url)">⬇</button>
+              <button class="btn-icon" title="复制" aria-label="复制海报" @click="copyImage(item.url)">📋</button>
             </div>
           </div>
         </div>

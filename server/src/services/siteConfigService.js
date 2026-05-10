@@ -5,6 +5,7 @@ import logger from '../utils/logger.js';
 
 const CACHE_PREFIX = 'siteconfig:';
 const CACHE_TTL = 600; // 10分钟
+const _inflight = new Map(); // single-flight 防缓存击穿
 
 export const getAllConfig = async () => getAll();
 
@@ -13,27 +14,40 @@ export const getPublicConfig = async () => {
   return getByKeys(keys);
 };
 
-/** 以 key-value map 格式返回公开配置，带 Redis 缓存 */
+/** 以 key-value map 格式返回公开配置，带 Redis 缓存 + single-flight 防击穿 */
 export const getPublicConfigMap = async () => {
+  const cacheKey = CACHE_PREFIX + 'public';
   try {
-    const cached = await cacheGet(CACHE_PREFIX + 'public');
+    const cached = await cacheGet(cacheKey);
     if (cached) return cached;
   } catch (e) {
     logger.warn('[SiteConfig] Redis 缓存读取失败', { error: e.message });
   }
 
-  const rows = await getPublicConfig();
-  const map = {};
-  rows.forEach(r => {
-    if (r.config_type === 'json') {
-      try { map[r.config_key] = JSON.parse(r.config_value); } catch { map[r.config_key] = r.config_value; }
-    } else {
-      map[r.config_key] = r.config_value;
-    }
-  });
+  // single-flight: 多个并发请求共享同一个 DB 查询
+  if (_inflight.has(cacheKey)) return _inflight.get(cacheKey);
+  const promise = (async () => {
+    // 双重检查：可能其他请求已完成缓存写入
+    try {
+      const recheck = await cacheGet(cacheKey);
+      if (recheck) return recheck;
+    } catch { /* ignore */ }
 
-  try { await cacheSet(CACHE_PREFIX + 'public', map, CACHE_TTL); } catch (e) { logger.warn('[SiteConfig] Redis 缓存写入失败', { error: e.message }); }
-  return map;
+    const rows = await getPublicConfig();
+    const map = {};
+    rows.forEach(r => {
+      if (r.config_type === 'json') {
+        try { map[r.config_key] = JSON.parse(r.config_value); } catch { map[r.config_key] = r.config_value; }
+      } else {
+        map[r.config_key] = r.config_value;
+      }
+    });
+
+    try { await cacheSet(cacheKey, map, CACHE_TTL); } catch (e) { logger.warn('[SiteConfig] Redis 缓存写入失败', { error: e.message }); }
+    return map;
+  })();
+  _inflight.set(cacheKey, promise);
+  try { return await promise; } finally { _inflight.delete(cacheKey); }
 };
 
 export const getConfigByKey = async (key) => getByKey(key);

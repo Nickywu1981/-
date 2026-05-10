@@ -12,7 +12,7 @@
         </div>
         <div v-if="previewUrl" class="preview-box">
           <img loading="lazy" :src="previewUrl" alt="预览" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
-          <button class="preview-remove" @click="clearImage">✕</button>
+          <button class="preview-remove" @click="clearImage" aria-label="清除图片">✕</button>
         </div>
         <p v-if="uploadErr" class="msg msg-error">{{ uploadErr }}</p>
         <p v-if="uploading" class="msg">上传中...</p>

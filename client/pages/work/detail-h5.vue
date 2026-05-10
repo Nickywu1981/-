@@ -18,7 +18,7 @@
             <div class="sku-info">
               <input v-model="sku.name" placeholder="SKU名称（如：红色-M）" class="sku-name-input" maxlength="100" />
               <input v-model="sku.color" type="color" class="sku-color" title="选颜色" />
-              <button class="sku-remove" @click="removeSku(i)" title="移除">✕</button>
+              <button class="sku-remove" @click="removeSku(i)" title="移除" aria-label="移除SKU">✕</button>
             </div>
             <span v-if="sku.uploaded" class="sku-badge ok">✓</span>
             <span v-else class="sku-badge pending">上传中</span>

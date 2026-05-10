@@ -34,7 +34,7 @@
         <div class="input-group">
           <span class="input-icon">📱</span>
           <label for="login-sms-phone" class="sr-only">手机号</label>
-          <input id="login-sms-phone" v-model="smsPhone" type="tel" placeholder="手机号" required maxlength="11" autocomplete="tel" />
+          <input id="login-sms-phone" v-model="smsPhone" type="tel" placeholder="手机号" required maxlength="11" autocomplete="tel" inputmode="tel" />
         </div>
         <div class="sms-row">
           <label for="login-sms-code" class="sr-only">短信验证码</label>
@@ -53,7 +53,7 @@
         <div class="input-group">
           <span class="input-icon">📧</span>
           <label for="login-email" class="sr-only">邮箱地址</label>
-          <input id="login-email" v-model="emailAddr" type="email" placeholder="邮箱地址" required maxlength="254" autocomplete="email" />
+          <input id="login-email" v-model="emailAddr" type="email" placeholder="邮箱地址" required maxlength="254" autocomplete="email" inputmode="email" />
         </div>
         <div class="sms-row">
           <label for="login-email-code" class="sr-only">邮箱验证码</label>

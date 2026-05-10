@@ -13,6 +13,7 @@ import { requireRole } from '../middleware/rbac.js';
 
 const router = Router();
 const adminRouter = Router();
+adminRouter.use(requireRole('admin'));
 
 const setConfigSchema = z.object({
   group_key: z.string().min(1, '请提供配置分组').max(50),

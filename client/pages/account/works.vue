@@ -26,7 +26,7 @@
     <Teleport to="body">
       <div v-if="preview" class="preview-overlay" @click.self="preview = null">
         <div class="preview-modal">
-          <button class="close-btn" @click="preview = null">✕</button>
+          <button class="close-btn" @click="preview = null" aria-label="关闭">✕</button>
           <img v-if="preview.output_url" :src="preview.output_url" :alt="preview.task_type" loading="lazy" @error="e => (e.target as HTMLImageElement).style.display='none'" />
           <div class="preview-meta">
             <span>{{ typeLabel(preview.task_type) }}</span>

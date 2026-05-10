@@ -40,7 +40,7 @@
         <div class="card-actions">
           <button class="btn-icon" title="编辑" @click.stop="startEdit(item)">✏️</button>
           <button class="btn-icon" title="分享" @click.stop="shareCollection(item)">🔗</button>
-          <button class="btn-icon danger" title="删除" @click.stop="deleteItem(item)">🗑️</button>
+          <button class="btn-icon danger" title="删除" aria-label="删除收藏" @click.stop="deleteItem(item)">🗑️</button>
         </div>
       </div>
     </div>

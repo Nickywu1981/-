@@ -13,12 +13,12 @@
       <form @submit.prevent="handleRegister">
         <div class="input-group">
           <label for="reg-phone">{{ config.phone_label || '手机号' }}</label>
-          <input id="reg-phone" v-model="phone" type="tel" class="input" placeholder="请输入手机号" maxlength="11" autocomplete="tel" />
+          <input id="reg-phone" v-model="phone" type="tel" class="input" placeholder="请输入手机号" maxlength="11" autocomplete="tel" inputmode="tel" />
         </div>
 
         <div class="input-group">
           <label for="reg-email">{{ config.email_label || '邮箱' }}</label>
-          <input id="reg-email" v-model="email" type="email" class="input" placeholder="选填" autocomplete="email" />
+          <input id="reg-email" v-model="email" type="email" class="input" placeholder="选填" autocomplete="email" inputmode="email" />
         </div>
 
         <div class="input-group">

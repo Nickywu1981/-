@@ -62,7 +62,7 @@
       <div class="modal modal-lg">
         <div class="modal-header">
           <h3>{{ previewing.name }}</h3>
-          <button class="btn-close" @click="previewing = null">✕</button>
+          <button class="btn-close" @click="previewing = null" aria-label="关闭">✕</button>
         </div>
         <div class="preview-meta">
           <span class="meta-item">分类：{{ catLabel(previewing.category) }}</span>

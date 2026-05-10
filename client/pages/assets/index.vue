@@ -48,7 +48,7 @@
     <Teleport to="body">
       <div v-if="previewItem" class="preview-overlay" @click.self="previewItem = null">
         <div class="preview-box">
-          <button class="preview-close" @click="previewItem = null">✕</button>
+          <button class="preview-close" @click="previewItem = null" aria-label="关闭">✕</button>
           <video v-if="previewItem.type === 'video'" :src="previewItem.url" class="preview-media" controls />
           <img v-else :src="previewItem.url" class="preview-media" />
           <div class="preview-actions">

@@ -103,7 +103,7 @@
             <button class="layer-visibility" @click.stop="sec.visible = !sec.visible" :title="sec.visible ? '隐藏' : '显示'">
               {{ sec.visible ? '👁' : '👁‍🗨' }}
             </button>
-            <button class="layer-delete" @click.stop="removeSection(idx)" title="删除">✕</button>
+            <button class="layer-delete" @click.stop="removeSection(idx)" title="删除" aria-label="删除图层">✕</button>
           </div>
         </div>
 

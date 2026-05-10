@@ -17,11 +17,11 @@
       </div>
       <div class="form-group">
         <label for="prof-phone">手机号</label>
-        <input id="prof-phone" v-model="form.phone" type="text" placeholder="选填" autocomplete="tel" />
+        <input id="prof-phone" v-model="form.phone" type="tel" placeholder="选填" autocomplete="tel" inputmode="tel" />
       </div>
       <div class="form-group">
         <label for="prof-email">邮箱</label>
-        <input id="prof-email" v-model="form.email" type="email" placeholder="选填" />
+        <input id="prof-email" v-model="form.email" type="email" placeholder="选填" inputmode="email" />
       </div>
       <button class="btn-save" :disabled="saving" @click="saveProfile">{{ saving ? '保存中...' : '保存' }}</button>
       <p v-if="msg" class="msg" :class="{ error: msgErr }">{{ msg }}</p>

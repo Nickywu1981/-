@@ -6,24 +6,21 @@
 import { error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
-// 敏感词临时列表 (W1用，后续接入通义千问 moderation API)
-const BLOCKED_WORDS = [
-  // W1 MVP: 留空，接入阿里云/通义 moderation API 后替换
-  // 正式版由 moderation.service 调用外部审核API
-];
-
 export function contentModerationMiddleware(stage = 'input') {
   return async (req, res, next) => {
-    // W1 MVP: 基础敏感词过滤，后续接入 T-G5-005 moderation.service
     const textToCheck = req.body?.prompt || req.body?.text || req.body?.content || '';
 
     if (!textToCheck) return next();
 
-    const lower = textToCheck.toLowerCase();
-    for (const word of BLOCKED_WORDS) {
-      if (lower.includes(word.toLowerCase())) {
+    // 动态加载敏感词服务，避免模块循环依赖
+    try {
+      const { checkText } = await import('../services/sensitiveWordService.js');
+      const found = await checkText(textToCheck);
+      if (found && found.length > 0) {
         return res.status(422).json({ code: ERROR_CODE.CONTENT_MODERATION, msg: '内容包含违规信息，请修改后重试' });
       }
+    } catch {
+      // sensitiveWordService 不可用时降级放行（避免阻断正常业务）
     }
 
     // 记录审核请求到 content_audit_log

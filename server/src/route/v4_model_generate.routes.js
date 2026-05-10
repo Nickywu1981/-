@@ -4,8 +4,9 @@
  */
 import { Router } from 'express';
 import { z } from 'zod';
-import { success } from '../utils/response.js';
+import { success, error } from '../utils/response.js';
 import { validateV4 as _validate } from '../utils/validate.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { infer } from '../services/aiEngine.js';
@@ -21,11 +22,13 @@ const generateSchema = z.object({
   count: z.number().int().min(1).max(4).optional(),
 });
 
-router.post('/generate', heavyLimiter, _validate(generateSchema), async (req, res, next) => {
+router.post('/generate', heavyLimiter, _validate(generateSchema), async (req, res) => {
   try {
     const result = await infer('model-generate', req.validated);
     return success(res, result, '模特生成成功');
-  } catch (e) { next(e); }
+  } catch (e) {
+    return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message || '模特生成失败');
+  }
 });
 
 export default router;

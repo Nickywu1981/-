@@ -60,7 +60,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h2>{{ detail.title }}</h2>
-          <button class="modal-close" @click="detail = null">×</button>
+          <button class="modal-close" @click="detail = null" aria-label="关闭">×</button>
         </div>
         <span class="modal-category">{{ detail.category }}</span>
         <pre class="modal-content-text">{{ detail.content }}</pre>

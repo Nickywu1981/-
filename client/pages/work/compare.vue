@@ -64,7 +64,7 @@
           <ImageSlot :src="slot.src" :alt="slot.alt" :title="slot.label" empty-text="点击选择" size="sm" @click="openGridPicker(i)" />
           <div class="grid-meta">
             <input v-model="slot.label" class="label-input" placeholder="标签" maxlength="50" />
-            <button class="btn-remove" @click="removeGridSlot(i)" title="移除">✕</button>
+            <button class="btn-remove" @click="removeGridSlot(i)" title="移除" aria-label="移除">✕</button>
           </div>
         </div>
       </div>
@@ -76,7 +76,7 @@
         <div class="picker-modal">
           <div class="picker-header">
             <h3>{{ pickerTarget === 'original' ? '选择原图' : pickerTarget === 'variant' ? '选择生成图' : '选择图片' }}</h3>
-            <button class="picker-close" @click="pickerOpen = false">✕</button>
+            <button class="picker-close" @click="pickerOpen = false" aria-label="关闭">✕</button>
           </div>
           <div class="picker-tabs">
             <button class="tab-btn" :class="{ active: pickerTab === 'works' }" @click="pickerTab = 'works'">我的作品</button>

@@ -24,7 +24,7 @@
       <!-- 手机注册 -->
       <form v-if="mode === 'sms'" @submit.prevent="handleSmsRegister">
         <label for="reg-sms-phone" class="sr-only">手机号</label>
-        <input id="reg-sms-phone" v-model="smsPhone" type="tel" placeholder="手机号" required autocomplete="tel" />
+        <input id="reg-sms-phone" v-model="smsPhone" type="tel" placeholder="手机号" required autocomplete="tel" inputmode="tel" />
         <div class="sms-row">
           <label for="reg-sms-code" class="sr-only">验证码</label>
           <input id="reg-sms-code" v-model="smsCode" type="text" placeholder="验证码" required maxlength="6" />
@@ -40,7 +40,7 @@
       <!-- 邮箱注册 -->
       <form v-if="mode === 'email'" @submit.prevent="handleEmailRegister">
         <label for="reg-email" class="sr-only">邮箱地址</label>
-        <input id="reg-email" v-model="emailAddr" type="email" placeholder="邮箱地址" required autocomplete="email" />
+        <input id="reg-email" v-model="emailAddr" type="email" placeholder="邮箱地址" required autocomplete="email" inputmode="email" />
         <div class="sms-row">
           <label for="reg-email-code" class="sr-only">验证码</label>
           <input id="reg-email-code" v-model="emailCode" type="text" placeholder="验证码" required maxlength="6" />

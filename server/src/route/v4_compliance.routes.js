@@ -8,7 +8,7 @@ import { z } from 'zod';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate } from '../utils/validate.js';
-import { authMiddleware } from '../middleware/auth.middleware.js';
+import { authMiddleware } from '../middleware/auth.js';
 import * as complianceService from '../services/complianceService.js';
 
 const router = Router();

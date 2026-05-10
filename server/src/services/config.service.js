@@ -13,6 +13,7 @@ import { broadcastVersion } from './config-version.service.js';
 
 const CACHE_PREFIX = 'config:';
 const CACHE_TTL = 600; // 10分钟
+const _inflight = new Map(); // single-flight 防缓存击穿
 
 const PERMISSION_LEVELS = {
   'page.': 0, 'comp.': 0, 'nav.': 0, 'dict.': 0, 'tpl.': 0,
@@ -31,31 +32,54 @@ export async function getGroupConfig(groupKey, userId, userRole) {
   const userLevel = userRole === 'super_admin' || userRole === 'admin' ? 2 : userId ? 1 : 0;
   if (userLevel < getPermissionLevel(groupKey)) throw new BusinessError(403, '无权限读取此配置');
 
+  const cacheKey = CACHE_PREFIX + groupKey;
   try {
-    const cached = await cacheGet(CACHE_PREFIX + groupKey);
+    const cached = await cacheGet(cacheKey);
     if (cached) return JSON.parse(cached);
   } catch (e) {
     logger.warn('[Config] Redis 缓存读取失败', { groupKey, error: e.message });
   }
 
-  const items = await configDao.getItemsByGroup(groupKey);
-  const result = {};
-  for (const item of items) result[item.item_key] = item.item_value ?? item.default_val;
+  if (_inflight.has(cacheKey)) return _inflight.get(cacheKey);
+  const promise = (async () => {
+    try {
+      const recheck = await cacheGet(cacheKey);
+      if (recheck) return JSON.parse(recheck);
+    } catch { /* ignore */ }
 
-  try { await cacheSet(CACHE_PREFIX + groupKey, CACHE_TTL, JSON.stringify(result)); } catch (e) { logger.warn('[Config] Redis 缓存写入失败', { groupKey, error: e.message }); }
-  return result;
+    const items = await configDao.getItemsByGroup(groupKey);
+    const result = {};
+    for (const item of items) result[item.item_key] = item.item_value ?? item.default_val;
+
+    try { await cacheSet(cacheKey, CACHE_TTL, JSON.stringify(result)); } catch (e) { logger.warn('[Config] Redis 缓存写入失败', { groupKey, error: e.message }); }
+    return result;
+  })();
+  _inflight.set(cacheKey, promise);
+  try { return await promise; } finally { _inflight.delete(cacheKey); }
 }
 
 export async function getDict(dictKey) {
+  const cacheKey = CACHE_PREFIX + 'dict:' + dictKey;
   try {
-    const cached = await cacheGet(CACHE_PREFIX + 'dict:' + dictKey);
+    const cached = await cacheGet(cacheKey);
     if (cached) return JSON.parse(cached);
   } catch (e) {
     logger.warn('[Config] Redis 缓存读取失败', { dictKey, error: e.message });
   }
-  const items = await configDao.getDictItems(dictKey);
-  try { await cacheSet(CACHE_PREFIX + 'dict:' + dictKey, CACHE_TTL, JSON.stringify(items)); } catch (e) { logger.warn('[Config] Dict 缓存写入失败', { dictKey, error: e.message }); }
-  return items;
+
+  if (_inflight.has(cacheKey)) return _inflight.get(cacheKey);
+  const promise = (async () => {
+    try {
+      const recheck = await cacheGet(cacheKey);
+      if (recheck) return JSON.parse(recheck);
+    } catch { /* ignore */ }
+
+    const items = await configDao.getDictItems(dictKey);
+    try { await cacheSet(cacheKey, CACHE_TTL, JSON.stringify(items)); } catch (e) { logger.warn('[Config] Dict 缓存写入失败', { dictKey, error: e.message }); }
+    return items;
+  })();
+  _inflight.set(cacheKey, promise);
+  try { return await promise; } finally { _inflight.delete(cacheKey); }
 }
 
 export async function setConfig(groupKey, itemKey, itemValue, changedBy) {
