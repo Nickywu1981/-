@@ -259,6 +259,7 @@ app.use('/api/open', openApiKeyRoutes);
 app.use('/api/copywriting', copywritingRoutes);
 app.use('/api/templates', sizeTemplateRoutes);
 app.use('/api/brand', brandRoutes);
+// DEPRECATED v1 — v4 routes mounted above supersede these. Remove after v4 migration complete.
 app.use('/api/images', heavyLimiter, imageRoutes);
 app.use('/api/videos', heavyLimiter, videoRoutes);
 app.use('/api/batch', heavyLimiter, batchRoutes);
