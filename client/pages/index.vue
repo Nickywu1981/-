@@ -3,10 +3,10 @@
     <!-- ===== NAV ===== -->
     <header class="lp-nav" :class="{ on: scrolled }">
       <div class="lp-nav-in">
-        <a href="/" class="lp-nav-brand" aria-label="Movio AI 首页">
+        <NuxtLink to="/" class="lp-nav-brand" aria-label="Movio AI 首页">
           <span class="lp-nav-mark">M</span>
           <span class="lp-nav-name">{{ siteName }}</span>
-        </a>
+        </NuxtLink>
         <nav class="lp-nav-lk">
           <a href="#features" @click.prevent="scrollTo('features')">{{ $t('landing.nav_features') }}</a>
           <a href="#how" @click.prevent="scrollTo('how')">{{ $t('landing.nav_how') }}</a>
@@ -245,7 +245,7 @@
         </div>
         <div class="lp-foot-lk">
           <div><h4>产品</h4><a href="#features">功能</a><a href="#pricing">定价</a><a href="#how">使用流程</a></div>
-          <div><h4>支持</h4><a href="#faq">常见问题</a><a href="/help">帮助中心</a><a href="/help">联系我们</a></div>
+          <div><h4>支持</h4><a href="#faq">常见问题</a><NuxtLink to="/help">帮助中心</NuxtLink><NuxtLink to="/help">联系我们</NuxtLink></div>
           <div><h4>法律</h4><a href="#">隐私政策</a><a href="#">服务条款</a></div>
         </div>
       </div>
