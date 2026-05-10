@@ -20,6 +20,15 @@ const config = {
     imageDomain: process.env.IMAGE_DOMAIN || '',
     videoDomain: process.env.VIDEO_DOMAIN || '',
   },
+  s3: {
+    endpoint: process.env.S3_ENDPOINT || '',
+    bucket: process.env.S3_BUCKET || '',
+    region: process.env.S3_REGION || 'us-east-1',
+    accessKey: process.env.S3_ACCESS_KEY || '',
+    secretKey: process.env.S3_SECRET_KEY || '',
+    forcePathStyle: process.env.S3_FORCE_PATH_STYLE === 'true',
+    cdnBaseUrl: process.env.CDN_BASE_URL || '',
+  },
   limits: {
     imageMaxSize: 20 * 1024 * 1024,   // 20MB
     videoMaxSize: 500 * 1024 * 1024,  // 500MB
