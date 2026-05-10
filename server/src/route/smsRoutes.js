@@ -11,6 +11,8 @@ import { z } from 'zod';
 
 const router = Router();
 
+const idParamSchema = z.object({ id: z.string().regex(/^\d+$/).transform(Number) });
+
 const sendCodeSchema = z.object({
   phone: phoneSchema,
   scene: z.enum(['register', 'login', 'reset_password', 'bind']),
@@ -48,8 +50,8 @@ router.post('/send', authMiddleware, validate(sendNotificationSchema), asyncHand
 // 管理后台 — 模板管理 + 日志
 router.get('/templates', authMiddleware, adminAuth, asyncHandler(listTemplates));
 router.post('/templates', authMiddleware, adminAuth, validate(smsTemplateSchema), asyncHandler(createTemplate));
-router.put('/templates/:id', authMiddleware, adminAuth, validate(smsTemplateUpdateSchema), asyncHandler(updateTemplate));
-router.delete('/templates/:id', authMiddleware, adminAuth, asyncHandler(deleteTemplate));
+router.put('/templates/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(smsTemplateUpdateSchema), asyncHandler(updateTemplate));
+router.delete('/templates/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(deleteTemplate));
 router.get('/logs', authMiddleware, adminAuth, asyncHandler(listLogs));
 
 export default router;

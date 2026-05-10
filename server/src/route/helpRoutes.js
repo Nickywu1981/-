@@ -7,6 +7,8 @@ import { z } from 'zod';
 
 const router = Router();
 
+const idParamSchema = z.object({ id: z.string().regex(/^\d+$/).transform(Number) });
+
 const faqSchema = z.object({
   title: z.string().min(1, '标题不能为空').max(200),
   content: z.string().min(1, '内容不能为空'),
@@ -17,9 +19,9 @@ const faqSchema = z.object({
 const faqQuerySchema = z.object({ keyword: z.string().max(200).optional() });
 
 router.get('/', validate(faqQuerySchema, 'query'), asyncHandler(getFaqs));
-router.get('/:id', asyncHandler(getFaqById));
+router.get('/:id', validate(idParamSchema, 'params'), asyncHandler(getFaqById));
 router.post('/', authMiddleware, adminAuth, validate(faqSchema), asyncHandler(createFaq));
-router.put('/:id', authMiddleware, adminAuth, validate(faqSchema.partial()), asyncHandler(updateFaq));
-router.delete('/:id', authMiddleware, adminAuth, asyncHandler(deleteFaq));
+router.put('/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(faqSchema.partial()), asyncHandler(updateFaq));
+router.delete('/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(deleteFaq));
 
 export default router;

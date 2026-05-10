@@ -81,6 +81,6 @@ router.post('/swap-face', authMiddleware, heavyLimiter, tierGuard('image'), vali
 router.post('/text-effect', authMiddleware, heavyLimiter, tierGuard('image'), validate(textEffectSchema), asyncHandler(submitTextEffect));
 
 router.get('/tasks', authMiddleware, asyncHandler(listMyTasks));
-router.get('/tasks/:taskId', authMiddleware, asyncHandler(getTaskResult));
+router.get('/tasks/:taskId', authMiddleware, validate(z.object({ taskId: z.string().regex(/^\d+$/).transform(Number) }), 'params'), asyncHandler(getTaskResult));
 
 export default router;

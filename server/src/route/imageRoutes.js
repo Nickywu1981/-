@@ -13,6 +13,8 @@ import { z } from 'zod';
 
 const router = Router();
 
+const taskIdParamSchema = z.object({ taskId: z.string().regex(/^\d+$/).transform(Number) });
+
 const imageUrlSchema = z.string().url('请提供有效的图片URL').min(1);
 const platformSchema = z.string().min(1, '请选择平台');
 
@@ -64,8 +66,8 @@ router.post('/white-bg', authMiddleware, tierGuard('image'), heavyLimiter, valid
 
 // 任务查询
 router.get('/tasks', authMiddleware, validate(paginationSchema, 'query'), asyncHandler(listMyTasks));
-router.get('/tasks/:taskId', authMiddleware, asyncHandler(getTaskResult));
-router.post('/tasks/:taskId/cancel', authMiddleware, asyncHandler(cancelTask));
-router.post('/tasks/:taskId/retry', authMiddleware, asyncHandler(retryTask));
+router.get('/tasks/:taskId', authMiddleware, validate(taskIdParamSchema, 'params'), asyncHandler(getTaskResult));
+router.post('/tasks/:taskId/cancel', authMiddleware, validate(taskIdParamSchema, 'params'), asyncHandler(cancelTask));
+router.post('/tasks/:taskId/retry', authMiddleware, validate(taskIdParamSchema, 'params'), asyncHandler(retryTask));
 
 export default router;

@@ -8,9 +8,13 @@ import { authMiddleware } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { tierGuard } from '../middleware/tierGuard.js';
-import { validate, idSchema, paginationSchema } from '../utils/validate.js';
+import { validate, paginationSchema } from '../utils/validate.js';
 
 const router = Router();
+
+const numericParam = (name) => z.object({ [name]: z.string().regex(/^\d+$/).transform(Number) });
+const taskIdParamSchema = numericParam('taskId');
+const idParamSchema = numericParam('id');
 
 const submitSchema = z.object({
   imageUrls: z.array(z.string().url()).min(1, '至少需要1张图片').max(100, '最多100张图片'),
@@ -37,12 +41,12 @@ const templateSchema = z.object({
 router.post('/submit', authMiddleware, heavyLimiter, tierGuard('image'), validate(submitSchema), asyncHandler(submitBatchTask));
 router.post('/redo', authMiddleware, heavyLimiter, tierGuard('image'), validate(redoSchema), asyncHandler(redoBatchTask));
 router.get('/history', authMiddleware, validate(paginationSchema, 'query'), asyncHandler(listBatchHistory));
-router.get('/tasks/:taskId', authMiddleware, asyncHandler(getTaskResult));
-router.get('/:taskId/download', authMiddleware, asyncHandler(getBatchZipUrl));
+router.get('/tasks/:taskId', authMiddleware, validate(taskIdParamSchema, 'params'), asyncHandler(getTaskResult));
+router.get('/:taskId/download', authMiddleware, validate(taskIdParamSchema, 'params'), asyncHandler(getBatchZipUrl));
 
 // 批量模板
 router.post('/templates', authMiddleware, validate(templateSchema), asyncHandler(saveBatchTemplate));
 router.get('/templates', authMiddleware, validate(paginationSchema, 'query'), asyncHandler(listBatchTemplates));
-router.delete('/templates/:id', authMiddleware, validate(idSchema, 'params'), asyncHandler(deleteBatchTemplate));
+router.delete('/templates/:id', authMiddleware, validate(idParamSchema, 'params'), asyncHandler(deleteBatchTemplate));
 
 export default router;

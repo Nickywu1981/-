@@ -64,6 +64,6 @@ router.get('/languages', asyncHandler(listLanguages));
 
 // 历史
 router.get('/history', validate(historyQuerySchema, 'query'), asyncHandler(listHistory));
-router.delete('/history/:id', asyncHandler(deleteHistory));
+router.delete('/history/:id', validate(z.object({ id: z.string().regex(/^\d+$/).transform(Number) }), 'params'), asyncHandler(deleteHistory));
 
 export default router;

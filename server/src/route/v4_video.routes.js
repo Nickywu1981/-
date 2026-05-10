@@ -7,7 +7,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
-import { validateV4 as _validate } from '../utils/validate.js';
+import { validateV4 as _validate, validate } from '../utils/validate.js';
 import { tierGuard} from '../middleware/tierGuard.js';
 import * as videoService from '../services/video.service.js';
 import * as actionMigrateService from '../services/action-migrate.service.js';
@@ -16,6 +16,8 @@ import * as digitalHumanService from '../services/digital-human.service.js';
 import * as liveClipService from '../services/live-clip.service.js';
 
 const router = Router();
+
+const idParamSchema = z.object({ id: z.string().min(1).max(50) });
 
 const urlField = z.string().url('URL格式不正确');
 const optUrl = z.string().url().optional();
@@ -200,7 +202,7 @@ router.post('/action-migrate/batch', _validate(batchActionMigrateSchema), tierGu
   } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 });
 
-router.get('/action-migrate/batch/:id/progress', async (req, res) => {
+router.get('/action-migrate/batch/:id/progress', validate(idParamSchema, 'params'), async (req, res) => {
   try {
     const result = await actionMigrateService.getBatchMigrateProgress(req.params.id, req.user.id);
     return success(res, result);
@@ -290,7 +292,7 @@ router.get('/works', async (req, res) => {
   } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 });
 
-router.get('/job/:id', async (req, res) => {
+router.get('/job/:id', validate(idParamSchema, 'params'), async (req, res) => {
   try {
     const job = await videoService.getVideoJobStatus(req.params.id, req.user.id);
     return success(res, job);

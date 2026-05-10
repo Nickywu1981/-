@@ -8,6 +8,9 @@ import { z } from 'zod';
 
 const router = Router();
 
+const idParamSchema = z.object({ id: z.string().regex(/^\d+$/).transform(Number) });
+const codeParamSchema = z.object({ code: z.string().min(1).max(30) });
+
 const createSchema = z.object({
   platform: z.string().min(2).max(30),
   category: z.string().min(1).max(50),
@@ -26,13 +29,13 @@ const adaptSchema = z.object({
 });
 
 router.get('/', asyncHandler(listPlatforms));
-router.get('/:id', asyncHandler(getSpec));
-router.get('/platform/:code', asyncHandler(getSpecsByPlatform));
+router.get('/:id', validate(idParamSchema, 'params'), asyncHandler(getSpec));
+router.get('/platform/:code', validate(codeParamSchema, 'params'), asyncHandler(getSpecsByPlatform));
 
 router.use(authMiddleware);
 router.post('/', requireRole('admin'), validate(createSchema), asyncHandler(createSpec));
 router.post('/adapt', requireRole('admin'), validate(adaptSchema), asyncHandler(adaptImage));
-router.put('/:id', requireRole('admin'), validate(updateSchema), asyncHandler(updateSpec));
-router.delete('/:id', requireRole('admin'), asyncHandler(deleteSpec));
+router.put('/:id', requireRole('admin'), validate(idParamSchema, 'params'), validate(updateSchema), asyncHandler(updateSpec));
+router.delete('/:id', requireRole('admin'), validate(idParamSchema, 'params'), asyncHandler(deleteSpec));
 
 export default router;

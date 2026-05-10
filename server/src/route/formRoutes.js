@@ -8,6 +8,11 @@ import * as formController from '../controller/formController.js';
 
 const router = Router();
 
+const numericParam = (name) => z.object({ [name]: z.string().regex(/^\d+$/).transform(Number) });
+const idParamSchema = numericParam('id');
+const subIdParamSchema = numericParam('subId');
+const codeParamSchema = z.object({ code: z.string().min(1).max(50) });
+
 // ── Zod 校验 ──
 const createFormSchema = z.object({
   title: z.string().min(1, '标题不能为空').max(100),
@@ -53,22 +58,22 @@ const updateSubmissionSchema = z.object({
 
 // ── 管理端 ──
 router.get('/admin', authMiddleware, adminAuth, asyncHandler(formController.listForms));
-router.get('/admin/:id', authMiddleware, adminAuth, asyncHandler(formController.getFormById));
+router.get('/admin/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(formController.getFormById));
 router.post('/admin', authMiddleware, adminAuth, validate(createFormSchema), asyncHandler(formController.createForm));
-router.put('/admin/:id', authMiddleware, adminAuth, validate(updateFormSchema), asyncHandler(formController.updateForm));
-router.delete('/admin/:id', authMiddleware, adminAuth, asyncHandler(formController.deleteForm));
+router.put('/admin/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(updateFormSchema), asyncHandler(formController.updateForm));
+router.delete('/admin/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(formController.deleteForm));
 
 // 提交记录
-router.get('/admin/:id/submissions', authMiddleware, adminAuth, asyncHandler(formController.listSubmissions));
-router.get('/admin/:id/submissions/export', authMiddleware, adminAuth, asyncHandler(formController.exportSubmissions));
-router.put('/admin/submissions/:subId', authMiddleware, adminAuth, validate(updateSubmissionSchema), asyncHandler(formController.updateSubmission));
+router.get('/admin/:id/submissions', authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(formController.listSubmissions));
+router.get('/admin/:id/submissions/export', authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(formController.exportSubmissions));
+router.put('/admin/submissions/:subId', authMiddleware, adminAuth, validate(subIdParamSchema, 'params'), validate(updateSubmissionSchema), asyncHandler(formController.updateSubmission));
 
 // 字段管理
-router.get('/admin/:id/fields', authMiddleware, adminAuth, asyncHandler(formController.listFields));
-router.put('/admin/:id/fields', authMiddleware, adminAuth, validate(upsertFieldsSchema), asyncHandler(formController.upsertFields));
+router.get('/admin/:id/fields', authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(formController.listFields));
+router.put('/admin/:id/fields', authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(upsertFieldsSchema), asyncHandler(formController.upsertFields));
 
 // ── 公开端（双端感知） ──
-router.get('/public/:code', optionalAuth, asyncHandler(formController.getPublicForm));
-router.post('/public/:code', apiLimiter, optionalAuth, validate(submitFormSchema), asyncHandler(formController.submitForm));
+router.get('/public/:code', optionalAuth, validate(codeParamSchema, 'params'), asyncHandler(formController.getPublicForm));
+router.post('/public/:code', apiLimiter, optionalAuth, validate(codeParamSchema, 'params'), validate(submitFormSchema), asyncHandler(formController.submitForm));
 
 export default router;

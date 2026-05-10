@@ -7,6 +7,11 @@ import * as proxyController from '../controller/proxyController.js';
 
 const router = Router();
 
+const numericParam = (name) => z.object({ [name]: z.string().regex(/^\d+$/).transform(Number) });
+const idParamSchema = numericParam('id');
+const entryIdParamSchema = numericParam('entryId');
+const codeParamSchema = z.object({ code: z.string().min(1).max(50) });
+
 // ==================== Zod Schemas ====================
 
 const configSchema = z.object({
@@ -41,29 +46,34 @@ const cleanLogsSchema = z.object({
   beforeDays: z.coerce.number().int().min(1).max(365).optional(),
 });
 
+const idEntryParamSchema = z.object({
+  id: z.string().regex(/^\d+$/).transform(Number),
+  entryId: z.string().regex(/^\d+$/).transform(Number),
+});
+
 // ==================== 配置 CRUD ====================
 
 router.get('/', authMiddleware, adminAuth, asyncHandler(proxyController.listConfigs));
-router.get('/:id', authMiddleware, adminAuth, asyncHandler(proxyController.getConfig));
+router.get('/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(proxyController.getConfig));
 router.post('/', authMiddleware, adminAuth, validate(configSchema), asyncHandler(proxyController.createConfig));
-router.put('/:id', authMiddleware, adminAuth, validate(configSchema.partial()), asyncHandler(proxyController.updateConfig));
-router.delete('/:id', authMiddleware, adminAuth, asyncHandler(proxyController.deleteConfig));
+router.put('/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(configSchema.partial()), asyncHandler(proxyController.updateConfig));
+router.delete('/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(proxyController.deleteConfig));
 
 // ==================== 代理转发调用 ====================
 
-router.post('/call/:code', authMiddleware, validate(callProxySchema), asyncHandler(proxyController.callProxy));
+router.post('/call/:code', authMiddleware, validate(codeParamSchema, 'params'), validate(callProxySchema), asyncHandler(proxyController.callProxy));
 
 // ==================== 白名单管理 ====================
 
-router.get('/:id/whitelist', authMiddleware, adminAuth, asyncHandler(proxyController.listWhitelist));
-router.post('/:id/whitelist', authMiddleware, adminAuth, validate(whitelistSchema), asyncHandler(proxyController.addWhitelist));
-router.put('/:id/whitelist/:entryId', authMiddleware, adminAuth, validate(whitelistUpdateSchema), asyncHandler(proxyController.updateWhitelist));
-router.delete('/:id/whitelist/:entryId', authMiddleware, adminAuth, asyncHandler(proxyController.removeWhitelist));
+router.get('/:id/whitelist', authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(proxyController.listWhitelist));
+router.post('/:id/whitelist', authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(whitelistSchema), asyncHandler(proxyController.addWhitelist));
+router.put('/:id/whitelist/:entryId', authMiddleware, adminAuth, validate(idEntryParamSchema, 'params'), validate(whitelistUpdateSchema), asyncHandler(proxyController.updateWhitelist));
+router.delete('/:id/whitelist/:entryId', authMiddleware, adminAuth, validate(idEntryParamSchema, 'params'), asyncHandler(proxyController.removeWhitelist));
 
 // ==================== 熔断管理 ====================
 
-router.get('/:id/circuit', authMiddleware, adminAuth, asyncHandler(proxyController.getCircuitStatus));
-router.post('/:id/circuit/reset', authMiddleware, adminAuth, asyncHandler(proxyController.resetCircuit));
+router.get('/:id/circuit', authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(proxyController.getCircuitStatus));
+router.post('/:id/circuit/reset', authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(proxyController.resetCircuit));
 
 // ==================== 调用日志 ====================
 

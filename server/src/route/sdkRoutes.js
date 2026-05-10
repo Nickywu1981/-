@@ -16,6 +16,10 @@ import { authMiddleware } from '../middleware/auth.middleware.js';
 
 const router = Router();
 
+const numericParam = (name) => z.object({ [name]: z.string().regex(/^\d+$/).transform(Number) });
+const userIdParamSchema = numericParam('userId');
+const taskIdParamSchema = numericParam('taskId');
+
 // ── Zod schemas ────────────────────────────────────────────────────────
 const memorySearchSchema = z.object({ query: z.string().min(1) });
 const memoryEmbedSchema = z.object({
@@ -130,7 +134,7 @@ router.post('/memory/embed', authMiddleware, validate(memoryEmbedSchema), async 
   }
 });
 
-router.get('/memory/list/:userId', authMiddleware, async (req, res) => {
+router.get('/memory/list/:userId', authMiddleware, validate(userIdParamSchema, 'params'), async (req, res) => {
   try {
     const result = await memfocus.memory.list(req.params.userId, req.query);
     success(res, result);
@@ -322,7 +326,7 @@ router.post('/visual/batch', authMiddleware, validate(visualBatchSchema), async 
   }
 });
 
-router.get('/visual/task/:taskId', authMiddleware, async (req, res) => {
+router.get('/visual/task/:taskId', authMiddleware, validate(taskIdParamSchema, 'params'), async (req, res) => {
   try {
     const result = await memfocus.visual.getTaskStatus(req.params.taskId, (req.user?.userId || req.user?.id));
     success(res, result);

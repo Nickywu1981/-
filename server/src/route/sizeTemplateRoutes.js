@@ -11,6 +11,9 @@ import { z } from 'zod';
 
 const router = Router();
 
+const idParamSchema = z.object({ id: z.string().regex(/^\d+$/).transform(Number) });
+const platformParamSchema = z.object({ platform: z.string().min(1).max(30) });
+
 const templateSchema = z.object({
   platform: z.string().min(1, '平台不能为空'),
   name: z.string().min(1, '模板名称不能为空').max(100),
@@ -23,12 +26,12 @@ const updateTemplateSchema = templateSchema.partial();
 // 公共 — 平台尺寸查询（缓存 30 分钟）
 router.get('/platforms', cacheMiddleware(1800), asyncHandler(getAllPlatforms));
 router.get('/platforms/list', cacheMiddleware(1800), asyncHandler(getPlatformList));
-router.get('/platforms/:platform', cacheMiddleware(1800), asyncHandler(getSizesByPlatform));
+router.get('/platforms/:platform', cacheMiddleware(1800), validate(platformParamSchema, 'params'), asyncHandler(getSizesByPlatform));
 
 // 用户自定义模板（需要登录）
 router.post('/my', authMiddleware, validate(templateSchema), asyncHandler(createUserTemplate));
 router.get('/my', authMiddleware, asyncHandler(listUserTemplates));
-router.put('/my/:id', authMiddleware, validate(updateTemplateSchema), asyncHandler(updateUserTemplate));
-router.delete('/my/:id', authMiddleware, asyncHandler(deleteUserTemplate));
+router.put('/my/:id', authMiddleware, validate(idParamSchema, 'params'), validate(updateTemplateSchema), asyncHandler(updateUserTemplate));
+router.delete('/my/:id', authMiddleware, validate(idParamSchema, 'params'), asyncHandler(deleteUserTemplate));
 
 export default router;

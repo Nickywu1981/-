@@ -13,6 +13,8 @@ import { z } from 'zod';
 
 const router = Router();
 
+const taskIdParamSchema = z.object({ taskId: z.string().regex(/^\d+$/).transform(Number) });
+
 const imageUrlSchema = z.string().url('请提供有效的图片URL');
 const img2VideoSchema = z.object({
   imageUrl: imageUrlSchema,
@@ -55,8 +57,8 @@ router.post('/digital-human', authMiddleware, heavyLimiter, tierGuard('video'), 
 
 // 任务查询
 router.get('/tasks', authMiddleware, validate(paginationSchema, 'query'), asyncHandler(listMyVideoTasks));
-router.get('/tasks/:taskId', authMiddleware, asyncHandler(getVideoTaskResult));
-router.post('/tasks/:taskId/cancel', authMiddleware, asyncHandler(cancelVideoTask));
-router.post('/tasks/:taskId/retry', authMiddleware, asyncHandler(retryVideoTask));
+router.get('/tasks/:taskId', authMiddleware, validate(taskIdParamSchema, 'params'), asyncHandler(getVideoTaskResult));
+router.post('/tasks/:taskId/cancel', authMiddleware, validate(taskIdParamSchema, 'params'), asyncHandler(cancelVideoTask));
+router.post('/tasks/:taskId/retry', authMiddleware, validate(taskIdParamSchema, 'params'), asyncHandler(retryVideoTask));
 
 export default router;

@@ -9,11 +9,13 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
-import { validateV4 as _validate } from '../utils/validate.js';
+import { validateV4 as _validate, validate } from '../utils/validate.js';
 import { authMiddleware } from '../middleware/auth.js';
 import db from '../dao/db.js';
 
 const router = Router();
+
+const idParamSchema = z.object({ id: z.string().regex(/^\d+$/).transform(Number) });
 
 router.use(authMiddleware);
 
@@ -71,7 +73,7 @@ router.post('/bind', _validate(bindSchema), async (req, res) => {
 });
 
 // DELETE /api/platforms/bind/:id
-router.delete('/bind/:id', async (req, res) => {
+router.delete('/bind/:id', validate(idParamSchema, 'params'), async (req, res) => {
   try {
     const conn = await db.getConnection();
     try {

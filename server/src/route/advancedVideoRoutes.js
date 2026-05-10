@@ -72,6 +72,6 @@ router.post('/voice-clone', authMiddleware, heavyLimiter, tierGuard('video'), va
 router.post('/video-edit', authMiddleware, heavyLimiter, tierGuard('video'), validate(videoEditSchema), asyncHandler(submitVideoEdit));
 
 router.get('/tasks', authMiddleware, asyncHandler(listMyTasks));
-router.get('/tasks/:taskId', authMiddleware, asyncHandler(getTaskResult));
+router.get('/tasks/:taskId', authMiddleware, validate(z.object({ taskId: z.string().regex(/^\d+$/).transform(Number) }), 'params'), asyncHandler(getTaskResult));
 
 export default router;

@@ -4,9 +4,11 @@ import { listBadges, getBadge, listAllBadges, createBadge, updateBadge, deleteBa
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { cacheMiddleware } from '../middleware/cache.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
-import { validate, idSchema } from '../utils/validate.js';
+import { validate } from '../utils/validate.js';
 
 const router = Router();
+
+const idParamSchema = z.object({ id: z.string().regex(/^\d+$/).transform(Number) });
 
 const badgeQuerySchema = z.object({ category: z.string().max(50).optional() });
 
@@ -21,12 +23,12 @@ const badgeSchema = z.object({
 
 // 用户端：可用的标签列表（缓存 5 分钟）
 router.get('/', authMiddleware, cacheMiddleware(300), validate(badgeQuerySchema, 'query'), asyncHandler(listBadges));
-router.get('/:id', authMiddleware, validate(idSchema, 'params'), asyncHandler(getBadge));
+router.get('/:id', authMiddleware, validate(idParamSchema, 'params'), asyncHandler(getBadge));
 
 // 管理端：CRUD
 router.get('/admin/all', authMiddleware, adminAuth, validate(badgeQuerySchema, 'query'), asyncHandler(listAllBadges));
 router.post('/admin', authMiddleware, adminAuth, validate(badgeSchema), asyncHandler(createBadge));
-router.put('/admin/:id', authMiddleware, adminAuth, validate(idSchema, 'params'), validate(badgeSchema.partial()), asyncHandler(updateBadge));
-router.delete('/admin/:id', authMiddleware, adminAuth, validate(idSchema, 'params'), asyncHandler(deleteBadge));
+router.put('/admin/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(badgeSchema.partial()), asyncHandler(updateBadge));
+router.delete('/admin/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(deleteBadge));
 
 export default router;

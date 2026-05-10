@@ -16,11 +16,13 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
-import { validateV4 as _validate } from '../utils/validate.js';
+import { validateV4 as _validate, validate } from '../utils/validate.js';
 import { requireRole } from '../middleware/rbac.js';
 import * as modelRouter from '../services/model-router.service.js';
 
 const router = Router();
+
+const idParamSchema = z.object({ id: z.string().regex(/^\d+$/).transform(Number) });
 
 // ---- 内存测试历史（MVP: 不建表，重启即清） ----
 const testHistory = [];
@@ -320,7 +322,7 @@ router.get('/history', requireRole('admin'), async (req, res) => {
 });
 
 // DELETE /api/test/history/:id
-router.delete('/history/:id', requireRole('admin'), async (req, res) => {
+router.delete('/history/:id', requireRole('admin'), validate(idParamSchema, 'params'), async (req, res) => {
   const idx = testHistory.findIndex(h => h.id === req.params.id);
   if (idx === -1) return error(res, ERROR_CODE.NOT_FOUND, '记录不存在');
   testHistory.splice(idx, 1);
