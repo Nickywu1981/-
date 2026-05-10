@@ -54,16 +54,37 @@
               <div v-for="(s, si) in (sec.config.slides||[{}])" :key="si" class="preview-slide">{{ s.img ? '🖼️ 图片'+(si+1) : '空幻灯片'+(si+1) }}</div>
             </div>
             <div v-else-if="sec.component === 'text_block'" class="preview-text">{{ sec.config.content || '文本段落' }}</div>
-            <div v-else-if="sec.component === 'title_bar'" class="preview-title">{{ sec.config.title || '标题' }}</div>
-            <div v-else-if="sec.component === 'product_list'" class="preview-products">📦 商品列表 ({{ sec.config.columns || 2 }}列)</div>
-            <div v-else-if="sec.component === 'image_showcase'" class="preview-gallery">🖼️ 图片展示</div>
-            <div v-else-if="sec.component === 'video_player'" class="preview-video">▶️ 视频播放</div>
-            <div v-else-if="sec.component === 'countdown'" class="preview-countdown">⏰ 倒计时</div>
-            <div v-else-if="sec.component === 'coupon_card'" class="preview-coupon">🎫 优惠券</div>
-            <div v-else-if="sec.component === 'button_group'" class="preview-buttons">🔘 按钮组</div>
-            <div v-else-if="sec.component === 'nav_bar'" class="preview-nav">📍 导航栏</div>
-            <div v-else-if="sec.component === 'form_container'" class="preview-form">📝 表单容器</div>
-            <div v-else-if="sec.component === 'hotzone_image'" class="preview-hotzone">🗺️ 热区图片</div>
+            <div v-else-if="sec.component === 'title_bar'" class="preview-title">
+              <strong>{{ sec.config.title || '标题' }}</strong>
+              <small v-if="sec.config.subtitle"> · {{ sec.config.subtitle }}</small>
+            </div>
+            <div v-else-if="sec.component === 'product_list'" class="preview-products">
+              📦 {{ sec.config.columns || 2 }}列{{ sec.config.showPrice !== false ? ' · 含价格' : '' }}{{ sec.config.showBadge !== false ? ' · 含角标' : '' }}
+            </div>
+            <div v-else-if="sec.component === 'image_showcase'" class="preview-gallery">
+              🖼️ {{ (sec.config.images || []).length || 0 }}张图片 · {{ sec.config.columns || 2 }}列
+            </div>
+            <div v-else-if="sec.component === 'video_player'" class="preview-video">
+              ▶️ {{ sec.config.src ? '已设置视频' : '未设置视频源' }}
+            </div>
+            <div v-else-if="sec.component === 'countdown'" class="preview-countdown">
+              ⏰ {{ sec.config.title || '倒计时' }}{{ sec.config.endTime ? ' · 已设置' : ' · 未设置结束时间' }}
+            </div>
+            <div v-else-if="sec.component === 'coupon_card'" class="preview-coupon">
+              🎫 {{ sec.config.amount || '¥?' }}{{ sec.config.condition ? ' · ' + sec.config.condition : '' }}
+            </div>
+            <div v-else-if="sec.component === 'button_group'" class="preview-buttons">
+              🔘 {{ (sec.config.buttons || []).length || 1 }}个按钮{{ sec.config.direction === 'column' ? ' · 竖排' : '' }}
+            </div>
+            <div v-else-if="sec.component === 'nav_bar'" class="preview-nav">
+              📍 {{ (sec.config.items || []).length || 1 }}项导航{{ sec.config.fixed ? ' · 固定顶部' : '' }}
+            </div>
+            <div v-else-if="sec.component === 'form_container'" class="preview-form">
+              📝 {{ (sec.config.fields || []).length || 0 }}个字段 · 「{{ sec.config.submitText || '提交' }}」
+            </div>
+            <div v-else-if="sec.component === 'hotzone_image'" class="preview-hotzone">
+              🗺️ {{ sec.config.src ? '已设置图片' : '未设置图片' }}{{ (sec.config.zones || []).length ? ' · ' + sec.config.zones.length + '个热区' : '' }}
+            </div>
             <div v-else class="preview-unknown">{{ sec.component }}</div>
           </div>
         </div>
@@ -404,6 +425,15 @@ onMounted(async () => {
 .section-preview { padding: 16px; min-height: 60px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 14px; }
 .preview-banner { display: flex; gap: 8px; }
 .preview-slide { padding: 20px 30px; background: var(--bg-hover); border-radius: 6px; font-size: 12px; }
+.preview-text { padding: 16px 20px; font-size: 14px; color: var(--text-secondary); line-height: 1.5; }
+.preview-title { padding: 14px 20px; font-size: 16px; color: var(--text-primary); }
+.preview-title strong { display: block; }
+.preview-title small { font-size: 12px; color: var(--text-tertiary); }
+.preview-products, .preview-gallery, .preview-video, .preview-countdown,
+.preview-coupon, .preview-buttons, .preview-nav, .preview-form, .preview-hotzone, .preview-unknown {
+  padding: 20px 24px; font-size: 13px; color: var(--text-secondary);
+  background: var(--bg-hover); border-radius: 6px; text-align: center;
+}
 .drop-indicator { height: 3px; background: var(--brand); border-radius: 2px; }
 .right-panel { width: 260px; background: var(--bg-card); border-left: 1px solid var(--border-light); overflow-y: auto; padding: 16px; flex-shrink: 0; }
 .right-panel h3 { font-size: 14px; margin-bottom: 14px; color: var(--text-secondary); }

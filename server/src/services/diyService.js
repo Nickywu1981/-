@@ -98,13 +98,14 @@ export default {
     const issues = validateBeforePublish(page);
     if (issues.length) throw new BusinessError(ERROR_CODE.BAD_REQUEST, `发布校验未通过: ${issues.join('; ')}`);
     await diyDao.publishWithVersion(id, tenantId, page.mobile_config, page.pc_config, page.slug);
-    const published = await diyDao.getPageById(id, tenantId);
+    page.status = 1;
+    page.publish_time = new Date().toISOString();
     await diyDao.cachePublishedPage(page.slug, {
-      id: published.id, title: published.title, slug: published.slug, page_type: published.page_type,
-      mobileConfig: published.mobile_config, pcConfig: published.pc_config, meta: published.meta_json,
-      publishTime: published.publish_time, ownerId: published.owner_id,
+      id: page.id, title: page.title, slug: page.slug, page_type: page.page_type,
+      mobileConfig: page.mobile_config, pcConfig: page.pc_config, meta: page.meta_json,
+      publishTime: page.publish_time, ownerId: page.owner_id,
     });
-    return { page: published, msg };
+    return { page, msg };
   },
 
   async unpublishPage(id, tenantId) {
@@ -121,13 +122,14 @@ export default {
     if (!page) throw new BusinessError(ERROR_CODE.NOT_FOUND, '页面不存在');
     const msg = checkStateTransition(page.status, 1);
     await diyDao.republishPage(id, tenantId);
-    const published = await diyDao.getPageById(id, tenantId);
+    page.status = 1;
+    page.publish_time = new Date().toISOString();
     await diyDao.cachePublishedPage(page.slug, {
-      id: published.id, title: published.title, slug: published.slug, page_type: published.page_type,
-      mobileConfig: published.mobile_config, pcConfig: published.pc_config, meta: published.meta_json,
-      publishTime: published.publish_time, ownerId: published.owner_id,
+      id: page.id, title: page.title, slug: page.slug, page_type: page.page_type,
+      mobileConfig: page.mobile_config, pcConfig: page.pc_config, meta: page.meta_json,
+      publishTime: page.publish_time, ownerId: page.owner_id,
     });
-    return { page: published, msg };
+    return { page, msg };
   },
 
   async softDeletePage(id, tenantId) {
