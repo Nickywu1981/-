@@ -1,10 +1,10 @@
+import { wrapController } from '../utils/wrapController.js';
 import * as batchService from '../services/batchService.js';
 import { success, error, listResult } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { parsePagination } from '../utils/pagination.js';
 
-export async function submitBatchTask(req, res, next) {
-  try {
+export const submitBatchTask = wrapController(async (req, res, next) => {
     const { imageUrls, operation, platform, style, nightMode } = req.body;
     if (!imageUrls || !imageUrls.length) {
       return error(res, ERROR_CODE.PARAM_MISSING, '请上传至少一张图片');
@@ -21,8 +21,7 @@ export async function submitBatchTask(req, res, next) {
   }
 }
 
-export async function redoBatchTask(req, res, next) {
-  try {
+export const redoBatchTask = wrapController(async (req, res, next) => {
     const { taskId } = req.body;
     if (!taskId) {
       return error(res, ERROR_CODE.PARAM_MISSING, '请提供源任务ID');
@@ -35,8 +34,7 @@ export async function redoBatchTask(req, res, next) {
   }
 }
 
-export async function listBatchHistory(req, res, next) {
-  try {
+export const listBatchHistory = wrapController(async (req, res, next) => {
     const { page, pageSize } = parsePagination(req.query, { defaultPageSize: 10, maxPageSize: 50 });
     const data = await batchService.listBatchHistory(req.user.id, { page, pageSize });
     return listResult(res, data);
@@ -45,8 +43,7 @@ export async function listBatchHistory(req, res, next) {
   }
 }
 
-export async function getBatchZipUrl(req, res, next) {
-  try {
+export const getBatchZipUrl = wrapController(async (req, res, next) => {
     const data = await batchService.getBatchZipUrl(req.params.taskId, req.user.id);
     return success(res, data);
   } catch (err) {
@@ -55,8 +52,7 @@ export async function getBatchZipUrl(req, res, next) {
   }
 }
 
-export async function getTaskResult(req, res, next) {
-  try {
+export const getTaskResult = wrapController(async (req, res, next) => {
     const data = await batchService.getTaskResult(req.params.taskId, req.user.id);
     return success(res, data);
   } catch (err) {
@@ -67,8 +63,7 @@ export async function getTaskResult(req, res, next) {
 
 // ==================== 批量模板 ====================
 
-export async function saveBatchTemplate(req, res, next) {
-  try {
+export const saveBatchTemplate = wrapController(async (req, res, next) => {
     const { name, operation, platform, style, nightMode, imageCount } = req.body;
     const data = await batchService.saveBatchTemplate(req.user.id, { name, operation, platform, style, nightMode, imageCount });
     return success(res, { id: data }, '模板已保存');
@@ -78,8 +73,7 @@ export async function saveBatchTemplate(req, res, next) {
   }
 }
 
-export async function listBatchTemplates(req, res, next) {
-  try {
+export const listBatchTemplates = wrapController(async (req, res, next) => {
     const data = await batchService.listBatchTemplates(req.user.id);
     return success(res, { list: data });
   } catch (err) {
@@ -87,8 +81,7 @@ export async function listBatchTemplates(req, res, next) {
   }
 }
 
-export async function deleteBatchTemplate(req, res, next) {
-  try {
+export const deleteBatchTemplate = wrapController(async (req, res, next) => {
     await batchService.deleteBatchTemplate(req.user.id, parseInt(req.params.id, 10));
     return success(res, {}, '模板已删除');
   } catch (err) {

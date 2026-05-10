@@ -1,3 +1,4 @@
+import { wrapController } from '../utils/wrapController.js';
 import svc from '../services/platformSpecService.js';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
@@ -37,8 +38,7 @@ export function deleteSpec(req, res, next) {
   })(req, res);
 }
 
-export async function adaptImage(req, res) {
-  try {
+export const adaptImage = wrapController(async (req, res) => {
     const { inputPath, platformCode, outputDir } = req.body;
     const result = await svc.adaptImage(inputPath, platformCode, outputDir || './uploads/adapted');
     return success(res, result, '图片适配成功');

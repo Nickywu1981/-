@@ -1,11 +1,11 @@
+import { wrapController } from '../utils/wrapController.js';
 import * as videoService from '../services/videoService.js';
 import { cancelJob, retryJob } from '../services/job-queue.service.js';
 import { success, error, listResult } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { parsePagination } from '../utils/pagination.js';
 
-export async function submitImg2Video(req, res, next) {
-  try {
+export const submitImg2Video = wrapController(async (req, res, next) => {
     const { imageUrl, style, duration, platform } = req.body;
     if (!imageUrl) {
       return error(res, ERROR_CODE.PARAM_MISSING, '请上传产品图');
@@ -18,8 +18,7 @@ export async function submitImg2Video(req, res, next) {
   }
 }
 
-export async function submitMulti2Video(req, res, next) {
-  try {
+export const submitMulti2Video = wrapController(async (req, res, next) => {
     const { imageUrls, style, duration, sellPoints } = req.body;
     if (!imageUrls || imageUrls.length < 2) {
       return error(res, ERROR_CODE.PARAM_MISSING, '至少需要2张图片');
@@ -32,8 +31,7 @@ export async function submitMulti2Video(req, res, next) {
   }
 }
 
-export async function submitVideoPackaging(req, res, next) {
-  try {
+export const submitVideoPackaging = wrapController(async (req, res, next) => {
     const { videoUrl, options } = req.body;
     if (!videoUrl) {
       return error(res, ERROR_CODE.PARAM_MISSING, '请提供视频地址');
@@ -46,8 +44,7 @@ export async function submitVideoPackaging(req, res, next) {
   }
 }
 
-export async function submitActionTransfer(req, res, next) {
-  try {
+export const submitActionTransfer = wrapController(async (req, res, next) => {
     const { sourceImageUrl, actionVideoUrl, targetAction } = req.body;
     if (!sourceImageUrl || !actionVideoUrl) {
       return error(res, ERROR_CODE.PARAM_MISSING, '请上传源图片和动作视频');
@@ -60,8 +57,7 @@ export async function submitActionTransfer(req, res, next) {
   }
 }
 
-export async function submitPersonReplace(req, res, next) {
-  try {
+export const submitPersonReplace = wrapController(async (req, res, next) => {
     const { sourceImageUrl, targetPersonUrl } = req.body;
     if (!sourceImageUrl || !targetPersonUrl) {
       return error(res, ERROR_CODE.PARAM_MISSING, '请上传商品图和目标人物图');
@@ -74,8 +70,7 @@ export async function submitPersonReplace(req, res, next) {
   }
 }
 
-export async function submitDigitalHuman(req, res, next) {
-  try {
+export const submitDigitalHuman = wrapController(async (req, res, next) => {
     const { script, voice, avatar, background } = req.body;
     if (!script) {
       return error(res, ERROR_CODE.PARAM_MISSING, '请输入口播文案');
@@ -88,8 +83,7 @@ export async function submitDigitalHuman(req, res, next) {
   }
 }
 
-export async function getVideoTaskResult(req, res, next) {
-  try {
+export const getVideoTaskResult = wrapController(async (req, res, next) => {
     const data = await videoService.getTaskResult(req.params.taskId, req.user.id);
     return success(res, data);
   } catch (err) {
@@ -98,8 +92,7 @@ export async function getVideoTaskResult(req, res, next) {
   }
 }
 
-export async function listMyVideoTasks(req, res, next) {
-  try {
+export const listMyVideoTasks = wrapController(async (req, res, next) => {
     const { status, type } = req.query;
     const { page, pageSize } = parsePagination(req.query, { maxPageSize: 100 });
     const data = await videoService.listMyTasks(req.user.id, { status, type, page, pageSize });
@@ -109,8 +102,7 @@ export async function listMyVideoTasks(req, res, next) {
   }
 }
 
-export async function cancelVideoTask(req, res, next) {
-  try {
+export const cancelVideoTask = wrapController(async (req, res, next) => {
     const data = await cancelJob(req.params.taskId, req.user.id);
     return success(res, data, '任务已取消');
   } catch (err) {
@@ -119,8 +111,7 @@ export async function cancelVideoTask(req, res, next) {
   }
 }
 
-export async function retryVideoTask(req, res, next) {
-  try {
+export const retryVideoTask = wrapController(async (req, res, next) => {
     const data = await retryJob(req.params.taskId, req.user.id);
     return success(res, data, '任务已重新排队');
   } catch (err) {

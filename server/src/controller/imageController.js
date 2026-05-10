@@ -1,3 +1,4 @@
+import { wrapController } from '../utils/wrapController.js';
 import * as imageService from '../services/imageService.js';
 import { cancelJob, retryJob } from '../services/job-queue.service.js';
 import { success, error, listResult } from '../utils/response.js';
@@ -8,8 +9,7 @@ import { parsePagination } from '../utils/pagination.js';
  * POST /api/images/main-image
  * 提交主图生成任务
  */
-export async function submitMainImage(req, res, next) {
-  try {
+export const submitMainImage = wrapController(async (req, res, next) => {
     const { imageUrl, platform, style } = req.body;
     if (!imageUrl || !platform) {
       return error(res, ERROR_CODE.PARAM_MISSING, '请上传商品图并选择平台');
@@ -26,8 +26,7 @@ export async function submitMainImage(req, res, next) {
  * POST /api/images/scene
  * 提交场景图生成任务
  */
-export async function submitSceneImage(req, res, next) {
-  try {
+export const submitSceneImage = wrapController(async (req, res, next) => {
     const { imageUrl, sceneCategory, customBgUrl } = req.body;
     if (!imageUrl) {
       return error(res, ERROR_CODE.PARAM_MISSING, '请上传产品图');
@@ -44,8 +43,7 @@ export async function submitSceneImage(req, res, next) {
  * POST /api/images/detail-h5
  * 提交详情页生成任务
  */
-export async function submitDetailH5(req, res, next) {
-  try {
+export const submitDetailH5 = wrapController(async (req, res, next) => {
     const { imageUrl, category, templateId } = req.body;
     if (!imageUrl || !category) {
       return error(res, ERROR_CODE.PARAM_MISSING, '请上传产品图并选择商品类目');
@@ -62,8 +60,7 @@ export async function submitDetailH5(req, res, next) {
  * POST /api/images/batch
  * 提交批量处理任务
  */
-export async function submitBatchTask(req, res, next) {
-  try {
+export const submitBatchTask = wrapController(async (req, res, next) => {
     const { imageUrls, operation, platform, style } = req.body;
     if (!imageUrls || !imageUrls.length) {
       return error(res, ERROR_CODE.PARAM_MISSING, '请上传至少一张图片');
@@ -80,8 +77,7 @@ export async function submitBatchTask(req, res, next) {
  * POST /api/images/retouch
  * 提交图片精修任务
  */
-export async function submitRetouch(req, res, next) {
-  try {
+export const submitRetouch = wrapController(async (req, res, next) => {
     const { imageUrl, level, features } = req.body;
     if (!imageUrl) {
       return error(res, ERROR_CODE.PARAM_MISSING, '请上传需要精修的图片');
@@ -98,8 +94,7 @@ export async function submitRetouch(req, res, next) {
  * POST /api/images/remove-bg
  * 智能抠图任务
  */
-export async function submitRemoveBg(req, res, next) {
-  try {
+export const submitRemoveBg = wrapController(async (req, res, next) => {
     const { imageUrl, format } = req.body;
     if (!imageUrl) {
       return error(res, ERROR_CODE.PARAM_MISSING, '请上传需要抠图的图片');
@@ -116,8 +111,7 @@ export async function submitRemoveBg(req, res, next) {
  * POST /api/images/white-bg
  * 白底图生成任务
  */
-export async function submitWhiteBg(req, res, next) {
-  try {
+export const submitWhiteBg = wrapController(async (req, res, next) => {
     const { imageUrl, bgColor } = req.body;
     if (!imageUrl) {
       return error(res, ERROR_CODE.PARAM_MISSING, '请上传需要换白底的图片');
@@ -134,8 +128,7 @@ export async function submitWhiteBg(req, res, next) {
  * GET /api/images/tasks/:taskId
  * 查询任务状态
  */
-export async function getTaskResult(req, res, next) {
-  try {
+export const getTaskResult = wrapController(async (req, res, next) => {
     const data = await imageService.getTaskResult(req.params.taskId, req.user.id);
     return success(res, data);
   } catch (err) {
@@ -148,8 +141,7 @@ export async function getTaskResult(req, res, next) {
  * GET /api/images/tasks
  * 我的任务列表
  */
-export async function listMyTasks(req, res, next) {
-  try {
+export const listMyTasks = wrapController(async (req, res, next) => {
     const { status, type } = req.query;
     const { page, pageSize } = parsePagination(req.query, { maxPageSize: 100 });
     const data = await imageService.listMyTasks(req.user.id, { status, type, page, pageSize });
@@ -163,8 +155,7 @@ export async function listMyTasks(req, res, next) {
  * POST /api/images/tasks/:taskId/cancel
  * 取消任务
  */
-export async function cancelTask(req, res, next) {
-  try {
+export const cancelTask = wrapController(async (req, res, next) => {
     const data = await cancelJob(req.params.taskId, req.user.id);
     return success(res, data, '任务已取消');
   } catch (err) {
@@ -177,8 +168,7 @@ export async function cancelTask(req, res, next) {
  * POST /api/images/tasks/:taskId/retry
  * 重试失败任务
  */
-export async function retryTask(req, res, next) {
-  try {
+export const retryTask = wrapController(async (req, res, next) => {
     const data = await retryJob(req.params.taskId, req.user.id);
     return success(res, data, '任务已重新排队');
   } catch (err) {

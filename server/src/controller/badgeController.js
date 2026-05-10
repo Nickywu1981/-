@@ -1,62 +1,39 @@
+import { wrapController } from '../utils/wrapController.js';
 import badgeService from '../services/badgeService.js';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
-export async function listBadges(req, res) {
-  try {
+export const listBadges = wrapController(async (req, res) => {
     const { category } = req.query;
     const rows = await badgeService.listBadges({ category, status: 1 });
-    return success(res, rows);
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
-  }
+    return success(res, rows);
 }
 
-export async function getBadge(req, res) {
-  try {
+export const getBadge = wrapController(async (req, res) => {
     const badge = await badgeService.getBadgeById(req.params.id);
     if (!badge) return error(res, ERROR_CODE.NOT_FOUND, '标签不存在');
-    return success(res, badge);
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
-  }
+    return success(res, badge);
 }
 
-export async function listAllBadges(req, res) {
-  try {
+export const listAllBadges = wrapController(async (req, res) => {
     const { category } = req.query;
     const rows = await badgeService.listBadges({ category, status: undefined });
-    return success(res, rows);
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
-  }
+    return success(res, rows);
 }
 
-export async function createBadge(req, res) {
-  try {
+export const createBadge = wrapController(async (req, res) => {
     const id = await badgeService.createBadge(req.body);
-    return success(res, { id }, '创建成功');
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
-  }
+    return success(res, { id }, '创建成功');
 }
 
-export async function updateBadge(req, res) {
-  try {
+export const updateBadge = wrapController(async (req, res) => {
     await badgeService.updateBadge(req.params.id, req.body);
-    return success(res, null, '更新成功');
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
-  }
+    return success(res, null, '更新成功');
 }
 
-export async function deleteBadge(req, res) {
-  try {
+export const deleteBadge = wrapController(async (req, res) => {
     await badgeService.deleteBadge(req.params.id);
-    return success(res, null, '删除成功');
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
-  }
+    return success(res, null, '删除成功');
 }
 
 export default { listBadges, getBadge, listAllBadges, createBadge, updateBadge, deleteBadge };

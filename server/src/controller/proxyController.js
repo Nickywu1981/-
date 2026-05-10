@@ -1,3 +1,4 @@
+import { wrapController } from '../utils/wrapController.js';
 import * as proxyService from '../services/proxyService.js';
 import { success, error } from '../utils/response.js';
 import { parsePagination } from '../utils/pagination.js';
@@ -5,47 +6,36 @@ import { ERROR_CODE } from '../constants/errorCode.js';
 
 // ==================== 配置 CRUD ====================
 
-export async function listConfigs(req, res) {
-  try {
+export const listConfigs = wrapController(async (req, res) => {
     const { page, pageSize } = parsePagination(req.query);
     const { status } = req.query;
     const rows = await proxyService.listConfigs(req.tenantId, { page, pageSize, status });
-    success(res, rows);
-  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
+    success(res, rows);
 }
 
-export async function getConfig(req, res) {
-  try {
+export const getConfig = wrapController(async (req, res) => {
     const data = await proxyService.getConfig(req.params.id, req.tenantId);
-    success(res, data);
-  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
+    success(res, data);
 }
 
-export async function createConfig(req, res) {
-  try {
+export const createConfig = wrapController(async (req, res) => {
     const data = await proxyService.createConfig(req.tenantId, req.body);
-    success(res, data, '代理配置创建成功');
-  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
+    success(res, data, '代理配置创建成功');
 }
 
-export async function updateConfig(req, res) {
-  try {
+export const updateConfig = wrapController(async (req, res) => {
     const data = await proxyService.updateConfig(req.params.id, req.tenantId, req.body);
-    success(res, data, '更新成功');
-  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
+    success(res, data, '更新成功');
 }
 
-export async function deleteConfig(req, res) {
-  try {
+export const deleteConfig = wrapController(async (req, res) => {
     await proxyService.deleteConfig(req.params.id, req.tenantId);
-    success(res, null, '删除成功');
-  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
+    success(res, null, '删除成功');
 }
 
 // ==================== 代理转发调用 ====================
 
-export async function callProxy(req, res) {
-  try {
+export const callProxy = wrapController(async (req, res) => {
     const data = await proxyService.callProxy(req.params.code, req.tenantId, {
       method: req.method,
       body: req.body,
@@ -60,65 +50,49 @@ export async function callProxy(req, res) {
 
 // ==================== 白名单管理 ====================
 
-export async function addWhitelist(req, res) {
-  try {
+export const addWhitelist = wrapController(async (req, res) => {
     const data = await proxyService.addWhitelist(req.tenantId, req.body);
-    success(res, data, '白名单添加成功');
-  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
+    success(res, data, '白名单添加成功');
 }
 
-export async function listWhitelist(req, res) {
-  try {
+export const listWhitelist = wrapController(async (req, res) => {
     const rows = await proxyService.listWhitelist(req.tenantId);
-    success(res, rows);
-  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
+    success(res, rows);
 }
 
-export async function updateWhitelist(req, res) {
-  try {
+export const updateWhitelist = wrapController(async (req, res) => {
     await proxyService.updateWhitelist(req.params.id, req.tenantId, req.body);
-    success(res, null, '白名单更新成功');
-  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
+    success(res, null, '白名单更新成功');
 }
 
-export async function removeWhitelist(req, res) {
-  try {
+export const removeWhitelist = wrapController(async (req, res) => {
     await proxyService.removeWhitelist(req.params.id, req.tenantId);
-    success(res, null, '白名单已删除');
-  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
+    success(res, null, '白名单已删除');
 }
 
 // ==================== 熔断管理 ====================
 
-export async function resetCircuit(req, res) {
-  try {
+export const resetCircuit = wrapController(async (req, res) => {
     const data = await proxyService.resetCircuit(req.params.id, req.tenantId);
-    success(res, data, '熔断已重置');
-  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
+    success(res, data, '熔断已重置');
 }
 
-export async function getCircuitStatus(req, res) {
-  try {
+export const getCircuitStatus = wrapController(async (req, res) => {
     const data = await proxyService.getCircuitStatus(req.params.id, req.tenantId);
-    success(res, data);
-  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
+    success(res, data);
 }
 
 // ==================== 调用日志 ====================
 
-export async function listLogs(req, res) {
-  try {
+export const listLogs = wrapController(async (req, res) => {
     const { page, pageSize } = parsePagination(req.query);
     const { proxyId, status } = req.query;
     const rows = await proxyService.listLogs(req.tenantId, { page, pageSize, proxyId, status });
-    success(res, rows);
-  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
+    success(res, rows);
 }
 
-export async function cleanLogs(req, res) {
-  try {
+export const cleanLogs = wrapController(async (req, res) => {
     const { days = 30 } = req.body;
     const data = await proxyService.cleanLogs(req.tenantId, days);
-    success(res, data, `已清理 ${days} 天前的日志`);
-  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
+    success(res, data, `已清理 ${days} 天前的日志`);
 }

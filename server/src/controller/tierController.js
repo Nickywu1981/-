@@ -1,25 +1,23 @@
+import { wrapController } from '../utils/wrapController.js';
 import tierService from '../services/tierService.js';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
-export async function getMyTier(req, res, next) {
-  try {
+export const getMyTier = wrapController(async (req, res, next) => {
     const tier = await tierService.getUserTier(req.userId);
     const limits = tierService.getTierLimits(tier);
     return success(res, { tier, limits });
   } catch (e) { next(e); }
 }
 
-export async function checkLimit(req, res, next) {
-  try {
+export const checkLimit = wrapController(async (req, res, next) => {
     const { type = 'image' } = req.query;
     const result = await tierService.checkDailyLimit(req.userId, type);
     return success(res, result);
   } catch (e) { next(e); }
 }
 
-export async function getExportPermission(req, res, next) {
-  try {
+export const getExportPermission = wrapController(async (req, res, next) => {
     const [hd, noWatermark] = await Promise.all([
       tierService.canExportHd(req.userId),
       tierService.canExportWithoutWatermark(req.userId),

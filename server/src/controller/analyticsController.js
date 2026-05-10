@@ -1,55 +1,44 @@
 /**
  * 行为埋点控制器
  */
+import { wrapController } from '../utils/wrapController.js';
 import analyticsService from '../services/analyticsService.js';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
-export async function track(req, res) {
-  try {
+export const track = wrapController(async (req, res) => {
     const { event, metadata } = req.body;
     const userId = req.user?.id || null;
     await analyticsService.trackEvent(userId, event, { ...metadata, ip: req.ip });
-    success(res, null, 'ok');
-  } catch (err) { error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
+    success(res, null, 'ok');
 }
 
-export async function funnel(req, res) {
-  try {
+export const funnel = wrapController(async (req, res) => {
     const days = parseInt(req.query.days) || 30;
     const data = await analyticsService.getFunnelMetrics(days);
-    success(res, data);
-  } catch (err) { error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
+    success(res, data);
 }
 
-export async function active(req, res) {
-  try {
+export const active = wrapController(async (req, res) => {
     const data = await analyticsService.getActiveUsers();
-    success(res, data);
-  } catch (err) { error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
+    success(res, data);
 }
 
-export async function topTools(req, res) {
-  try {
+export const topTools = wrapController(async (req, res) => {
     const days = parseInt(req.query.days) || 7;
     const limit = parseInt(req.query.limit) || 10;
     const data = await analyticsService.getTopTools(days, limit);
-    success(res, data);
-  } catch (err) { error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
+    success(res, data);
 }
 
-export async function trend(req, res) {
-  try {
+export const trend = wrapController(async (req, res) => {
     const days = parseInt(req.query.days) || 30;
     const data = await analyticsService.getDailyTrend(days);
-    success(res, data);
-  } catch (err) { error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
+    success(res, data);
 }
 
-export async function conversionFunnel(req, res) {
-  try {
+export const conversionFunnel = wrapController(async (req, res) => {
     const days = parseInt(req.query.days) || 30;
     const data = await analyticsService.getConversionFunnel(days);
-    success(res, data);
-  } catch (err) { error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
+    success(res, data);
 }

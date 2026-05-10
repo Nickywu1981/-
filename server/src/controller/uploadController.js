@@ -1,11 +1,11 @@
 /**
  * 文件上传接口
  */
+import { wrapController } from '../utils/wrapController.js';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
-export async function uploadFile(req, res) {
-  try {
+export const uploadFile = wrapController(async (req, res) => {
     if (!req.file) {
       return error(res, ERROR_CODE.PARAM_MISSING, '请选择文件');
     }
@@ -22,8 +22,7 @@ export async function uploadFile(req, res) {
   }
 }
 
-export async function uploadMultipleFiles(req, res) {
-  try {
+export const uploadMultipleFiles = wrapController(async (req, res) => {
     if (!req.files || req.files.length === 0) {
       return error(res, ERROR_CODE.PARAM_MISSING, '请选择文件');
     }

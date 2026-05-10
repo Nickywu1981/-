@@ -1,10 +1,10 @@
+import { wrapController } from '../utils/wrapController.js';
 import * as advVideo from '../services/advancedVideoService.js';
 import { success, error } from '../utils/response.js';
 import { parsePagination } from '../utils/pagination.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
-export async function submitScriptGen(req, res, next) {
-  try {
+export const submitScriptGen = wrapController(async (req, res, next) => {
     const { productInfo, scriptType, lang, length } = req.body;
     if (!productInfo) return error(res, ERROR_CODE.PARAM_MISSING, '请输入产品卖点信息');
     const data = await advVideo.submitScriptGen(req.user.id, { productInfo, scriptType, lang, length });
@@ -15,8 +15,7 @@ export async function submitScriptGen(req, res, next) {
   }
 }
 
-export async function submitShotPlan(req, res, next) {
-  try {
+export const submitShotPlan = wrapController(async (req, res, next) => {
     const { productInfo, videoStyle, totalDuration } = req.body;
     if (!productInfo) return error(res, ERROR_CODE.PARAM_MISSING, '请输入产品信息');
     const data = await advVideo.submitShotPlan(req.user.id, { productInfo, videoStyle, totalDuration });
@@ -27,8 +26,7 @@ export async function submitShotPlan(req, res, next) {
   }
 }
 
-export async function submitViralClone(req, res, next) {
-  try {
+export const submitViralClone = wrapController(async (req, res, next) => {
     const { referenceVideoUrl, productImageUrl, matchStrength } = req.body;
     if (!referenceVideoUrl || !productImageUrl) return error(res, ERROR_CODE.PARAM_MISSING, '请上传爆款视频和产品图');
     const data = await advVideo.submitViralClone(req.user.id, { referenceVideoUrl, productImageUrl, matchStrength });
@@ -39,8 +37,7 @@ export async function submitViralClone(req, res, next) {
   }
 }
 
-export async function submitActionBatch(req, res, next) {
-  try {
+export const submitActionBatch = wrapController(async (req, res, next) => {
     const { actionVideoUrl, productImageUrls, targetAction } = req.body;
     if (!actionVideoUrl || !productImageUrls?.length) return error(res, ERROR_CODE.PARAM_MISSING, '请上传动作视频和至少一张产品图');
     const data = await advVideo.submitActionBatch(req.user.id, { actionVideoUrl, productImageUrls, targetAction });
@@ -51,8 +48,7 @@ export async function submitActionBatch(req, res, next) {
   }
 }
 
-export async function submitVideoBeautify(req, res, next) {
-  try {
+export const submitVideoBeautify = wrapController(async (req, res, next) => {
     const { videoUrl, options } = req.body;
     if (!videoUrl) return error(res, ERROR_CODE.PARAM_MISSING, '请提供视频地址');
     const data = await advVideo.submitVideoBeautify(req.user.id, { videoUrl, options });
@@ -63,8 +59,7 @@ export async function submitVideoBeautify(req, res, next) {
   }
 }
 
-export async function submitVoiceGen(req, res, next) {
-  try {
+export const submitVoiceGen = wrapController(async (req, res, next) => {
     const { text, voiceType, speed, lang } = req.body;
     if (!text) return error(res, ERROR_CODE.PARAM_MISSING, '请输入配音文案');
     const data = await advVideo.submitVoiceGen(req.user.id, { text, voiceType, speed, lang });
@@ -75,8 +70,7 @@ export async function submitVoiceGen(req, res, next) {
   }
 }
 
-export async function submitVoiceClone(req, res, next) {
-  try {
+export const submitVoiceClone = wrapController(async (req, res, next) => {
     const { audioSampleUrl, text, presetVoice } = req.body;
     if (!audioSampleUrl) return error(res, ERROR_CODE.PARAM_MISSING, '请上传音频样本');
     const data = await advVideo.submitVoiceClone(req.user.id, { audioSampleUrl, text, presetVoice });
@@ -87,8 +81,7 @@ export async function submitVoiceClone(req, res, next) {
   }
 }
 
-export async function submitVideoEdit(req, res, next) {
-  try {
+export const submitVideoEdit = wrapController(async (req, res, next) => {
     const data = await advVideo.submitVideoEdit(req.user.id, req.body);
     return success(res, data, '视频编辑任务已提交');
   } catch (err) {
@@ -97,8 +90,7 @@ export async function submitVideoEdit(req, res, next) {
   }
 }
 
-export async function submitViralAnalyze(req, res, next) {
-  try {
+export const submitViralAnalyze = wrapController(async (req, res, next) => {
     const { url } = req.body;
     if (!url) return error(res, ERROR_CODE.PARAM_MISSING, '请输入爆款视频链接');
     const data = await advVideo.submitViralAnalyze(req.user.id, { url });
@@ -109,8 +101,7 @@ export async function submitViralAnalyze(req, res, next) {
   }
 }
 
-export async function submitViralReplicate(req, res, next) {
-  try {
+export const submitViralReplicate = wrapController(async (req, res, next) => {
     const { analysisResult, productImageUrl, productName } = req.body;
     if (!productImageUrl) return error(res, ERROR_CODE.PARAM_MISSING, '请上传产品图');
     const data = await advVideo.submitViralReplicate(req.user.id, { analysisResult, productImageUrl, productName });
@@ -121,8 +112,7 @@ export async function submitViralReplicate(req, res, next) {
   }
 }
 
-export async function getTaskResult(req, res, next) {
-  try {
+export const getTaskResult = wrapController(async (req, res, next) => {
     const data = await advVideo.getTaskResult(req.params.taskId, req.user.id);
     return success(res, data);
   } catch (err) {
@@ -131,8 +121,7 @@ export async function getTaskResult(req, res, next) {
   }
 }
 
-export async function listMyTasks(req, res, next) {
-  try {
+export const listMyTasks = wrapController(async (req, res, next) => {
     const { status, type } = req.query;
     const { page, pageSize } = parsePagination(req.query);
     const data = await advVideo.listMyTasks(req.user.id, { status, type, page, pageSize });

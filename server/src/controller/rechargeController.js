@@ -1,3 +1,4 @@
+import { wrapController } from '../utils/wrapController.js';
 import * as rechargeService from '../services/rechargeService.js';
 import * as allinpayService from '../services/allinpayService.js';
 import { success, error } from '../utils/response.js';
@@ -8,46 +9,35 @@ export async function getRates(req, res) {
   success(res, rechargeService.getRates());
 }
 
-export async function createOrder(req, res) {
-  try {
+export const createOrder = wrapController(async (req, res) => {
     const { amount, channel } = req.body;
     const data = await rechargeService.createOrder(req.user.id, req.tenantId, req.ip, { amount, payChannel: channel || 'wechat' });
-    success(res, data, '订单已创建');
-  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
+    success(res, data, '订单已创建');
 }
 
-export async function handleCallback(req, res) {
-  try {
+export const handleCallback = wrapController(async (req, res) => {
     await rechargeService.handleCallback(req.params.channel, req.body);
     res.send('success');
   } catch (e) { logger.error('[Callback Error]', { message: e.message }); res.send('fail'); }
 }
 
-export async function checkPaymentResult(req, res) {
-  try {
+export const checkPaymentResult = wrapController(async (req, res) => {
     const data = await allinpayService.queryOrder(req.params.reqsn);
     if (!data) return error(res, ERROR_CODE.NOT_FOUND, '订单不存在');
-    success(res, data);
-  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
+    success(res, data);
 }
 
-export async function listUserOrders(req, res) {
-  try {
+export const listUserOrders = wrapController(async (req, res) => {
     const rows = await rechargeService.listUserOrders(req.user.id, req.tenantId);
-    success(res, rows);
-  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
+    success(res, rows);
 }
 
-export async function listAllOrders(req, res) {
-  try {
+export const listAllOrders = wrapController(async (req, res) => {
     const rows = await rechargeService.listAllOrders();
-    success(res, rows);
-  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
+    success(res, rows);
 }
 
-export async function refundOrder(req, res) {
-  try {
+export const refundOrder = wrapController(async (req, res) => {
     await rechargeService.refundOrder(req.params.orderNo);
-    success(res, null, '退款成功');
-  } catch (e) { error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message); }
+    success(res, null, '退款成功');
 }
