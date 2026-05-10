@@ -55,6 +55,8 @@ process.on('unhandledRejection', (reason) => {
 
 function gracefulShutdown(signal) {
   logger.info(`收到 ${signal}，开始优雅关闭...`);
+  const isCrash = signal === 'uncaughtException' || signal === 'unhandledRejection';
+  const exitCode = isCrash ? 1 : 0;
 
   server.close(async () => {
     logger.info('HTTP/WS 服务已停止');
@@ -81,7 +83,7 @@ function gracefulShutdown(signal) {
     } catch (e) { logger.warn('Redis 关闭失败', { message: e.message }); }
 
     // eslint-disable-next-line no-process-exit
-    process.exit(0);
+    process.exit(exitCode);
   });
 
   // 10秒强制退出

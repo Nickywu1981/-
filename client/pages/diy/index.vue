@@ -137,6 +137,7 @@ async function deletePage(id) {
 }
 
 onMounted(loadPages)
+onUnmounted(() => { if (keywordTimer) clearTimeout(keywordTimer) })
 </script>
 
 <style scoped>
