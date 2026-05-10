@@ -33,7 +33,7 @@
     </div>
 
     <div v-if="rulesDetail" class="rules-detail">
-      <h3>{{ rulesDetail.name }} 合规规则 <button class="btn-close" @click="rulesDetail=null">✕</button></h3>
+      <h3>{{ rulesDetail.name }} 合规规则 <button class="btn-close" aria-label="关闭规则详情" @click="rulesDetail=null">✕</button></h3>
       <div v-if="rulesDetail.imageRules?.length"><h4>图片规则</h4><ul><li v-for="r in rulesDetail.imageRules" :key="r.id">{{ r.desc }}</li></ul></div>
       <div v-if="rulesDetail.textRules?.length"><h4>文案规则</h4><ul><li v-for="r in rulesDetail.textRules" :key="r.id">{{ r.desc }}</li></ul></div>
     </div>

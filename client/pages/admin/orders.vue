@@ -53,7 +53,7 @@
         <div class="modal">
           <div class="modal-header">
             <h3>订单详情 #{{ detail.id }}</h3>
-            <button class="modal-close" @click="detailOpen = false">✕</button>
+            <button class="modal-close" aria-label="关闭" @click="detailOpen = false">✕</button>
           </div>
           <div class="modal-body">
             <div class="detail-grid">

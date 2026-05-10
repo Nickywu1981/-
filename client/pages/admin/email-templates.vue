@@ -25,15 +25,15 @@
         <div class="tpl-header">
           <span class="tpl-code">{{ tpl.template_code }}</span>
           <div class="tpl-actions">
-            <button class="act-btn toggle-btn" :class="{ off: !tpl.status }" @click="toggleStatus(tpl)" :title="tpl.status ? '禁用' : '启用'">{{ tpl.status ? '🟢' : '🔴' }}</button>
-            <button class="act-btn del-btn" @click="confirmDelete(tpl)" title="删除">🗑</button>
+            <button class="act-btn toggle-btn" :class="{ off: !tpl.status }" :aria-label="tpl.status ? '已启用，点击禁用' : '已禁用，点击启用'" @click="toggleStatus(tpl)" :title="tpl.status ? '禁用' : '启用'">{{ tpl.status ? '🟢' : '🔴' }}</button>
+            <button class="act-btn del-btn" aria-label="删除模板" @click="confirmDelete(tpl)" title="删除">🗑</button>
           </div>
         </div>
         <div class="tpl-body">
-          <div class="row"><span>模板名称:</span> <input v-model="tpl.name" /></div>
-          <div class="row"><span>邮件主题:</span> <input v-model="tpl.subject" /></div>
-          <div class="row"><span>HTML内容:</span> <textarea v-model="tpl.content" rows="4"></textarea></div>
-          <div class="row"><span>服务商ID:</span> <input v-model="tpl.provider_template_id" placeholder="接入后填写" /></div>
+          <div class="row"><span>模板名称:</span> <input v-model="tpl.name" maxlength="100" /></div>
+          <div class="row"><span>邮件主题:</span> <input v-model="tpl.subject" maxlength="200" /></div>
+          <div class="row"><span>HTML内容:</span> <textarea v-model="tpl.content" maxlength="5000" rows="4"></textarea></div>
+          <div class="row"><span>服务商ID:</span> <input v-model="tpl.provider_template_id" maxlength="100" placeholder="接入后填写" /></div>
           <div class="row"><span>服务商:</span>
             <select v-model="tpl.provider">
               <option value="mock">Mock(开发)</option>
@@ -41,7 +41,7 @@
               <option value="sendgrid">SendGrid</option>
             </select>
           </div>
-          <div class="row"><span>备注:</span> <input v-model="tpl.remark" /></div>
+          <div class="row"><span>备注:</span> <input v-model="tpl.remark" maxlength="500" /></div>
         </div>
         <div class="tpl-footer">
           <button class="btn-save" :disabled="saving === tpl.id" @click="saveTpl(tpl)">{{ saving === tpl.id ? '保存中...' : '保存' }}</button>
@@ -54,19 +54,19 @@
     <!-- Create Modal -->
     <div v-if="showCreate" class="modal-overlay" @click.self="showCreate = false">
       <div class="modal">
-        <div class="modal-header"><h3>新建邮件模板</h3><button class="modal-close" @click="showCreate = false">✕</button></div>
+        <div class="modal-header"><h3>新建邮件模板</h3><button class="modal-close" aria-label="关闭" @click="showCreate = false">✕</button></div>
         <div class="modal-body">
-          <div class="row"><span>模板编码:</span> <input v-model="newTpl.template_code" placeholder="如 EMAIL_WELCOME" /></div>
-          <div class="row"><span>模板名称:</span> <input v-model="newTpl.name" placeholder="如 欢迎邮件" /></div>
-          <div class="row"><span>邮件主题:</span> <input v-model="newTpl.subject" placeholder="如 欢迎加入AI电商工具箱" /></div>
-          <div class="row"><span>HTML内容:</span> <textarea v-model="newTpl.content" rows="4" placeholder="支持HTML格式，可使用{code}{task_type}等占位符"></textarea></div>
-          <div class="row"><span>服务商ID:</span> <input v-model="newTpl.provider_template_id" placeholder="接入后填写" /></div>
+          <div class="row"><span>模板编码:</span> <input v-model="newTpl.template_code" maxlength="50" placeholder="如 EMAIL_WELCOME" /></div>
+          <div class="row"><span>模板名称:</span> <input v-model="newTpl.name" maxlength="100" placeholder="如 欢迎邮件" /></div>
+          <div class="row"><span>邮件主题:</span> <input v-model="newTpl.subject" maxlength="200" placeholder="如 欢迎加入AI电商工具箱" /></div>
+          <div class="row"><span>HTML内容:</span> <textarea v-model="newTpl.content" maxlength="5000" rows="4" placeholder="支持HTML格式，可使用{code}{task_type}等占位符"></textarea></div>
+          <div class="row"><span>服务商ID:</span> <input v-model="newTpl.provider_template_id" maxlength="100" placeholder="接入后填写" /></div>
           <div class="row"><span>服务商:</span>
             <select v-model="newTpl.provider">
               <option value="mock">Mock(开发)</option><option value="smtp">SMTP</option><option value="sendgrid">SendGrid</option>
             </select>
           </div>
-          <div class="row"><span>备注:</span> <input v-model="newTpl.remark" /></div>
+          <div class="row"><span>备注:</span> <input v-model="newTpl.remark" maxlength="500" /></div>
         </div>
         <div class="modal-footer">
           <button class="btn-cancel" @click="showCreate = false">取消</button>

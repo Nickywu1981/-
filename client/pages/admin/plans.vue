@@ -28,10 +28,10 @@
         <div class="plan-header">
           <span class="plan-type">{{ planTypeLabel(plan.plan_type) }}</span>
           <div class="plan-actions">
-            <button class="act-btn toggle-btn" :class="{ off: !plan.status }" @click="toggleStatus(plan)" :title="plan.status ? '禁用' : '启用'">
+            <button class="act-btn toggle-btn" :class="{ off: !plan.status }" :aria-label="plan.status ? '已启用，点击禁用' : '已禁用，点击启用'" @click="toggleStatus(plan)" :title="plan.status ? '禁用' : '启用'">>
               {{ plan.status ? '🟢' : '🔴' }}
             </button>
-            <button class="act-btn del-btn" @click="confirmDelete(plan)" title="删除">🗑</button>
+            <button class="act-btn del-btn" aria-label="删除套餐" @click="confirmDelete(plan)" title="删除">🗑</button>
           </div>
         </div>
         <div class="plan-body">
@@ -60,7 +60,7 @@
     <!-- Create Modal -->
     <div v-if="showCreate" class="modal-overlay" @click.self="showCreate = false">
       <div class="modal">
-        <div class="modal-header"><h3>新建套餐</h3><button class="modal-close" @click="showCreate = false">✕</button></div>
+        <div class="modal-header"><h3>新建套餐</h3><button class="modal-close" aria-label="关闭" @click="showCreate = false">✕</button></div>
         <div class="modal-body">
           <div class="row"><span>套餐名:</span> <input v-model="newPlan.name" /></div>
           <div class="row"><span>类型:</span>

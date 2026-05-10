@@ -44,7 +44,7 @@
             <div v-for="(m, i) in selectedSequence" :key="m" class="seq-chip">
               <span class="seq-num">{{ i + 1 }}</span>
               <span>{{ modelMap[m]?.name || m }}</span>
-              <button class="seq-remove" @click="removeFromSequence(i)">×</button>
+              <button class="seq-remove" aria-label="从序列中移除" @click="removeFromSequence(i)">×</button>
             </div>
             <div v-if="selectedSequence.length === 0" class="seq-empty">尚未选择模型，请从下方添加</div>
           </div>
@@ -305,7 +305,7 @@
           <span class="hi-dur">{{ formatDuration(h.duration_ms) }}</span>
           <span class="hi-status">{{ h.error ? '❌' : '✅' }}</span>
           <span class="hi-time">{{ formatTime(h.created_at) }}</span>
-          <button class="hi-delete" @click.stop="deleteHistoryItem(h.id)">🗑</button>
+          <button class="hi-delete" aria-label="删除历史记录" @click.stop="deleteHistoryItem(h.id)">🗑</button>
         </div>
       </div>
 
