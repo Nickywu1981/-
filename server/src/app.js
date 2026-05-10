@@ -239,7 +239,7 @@ app.use('/api/admin/config', configAdminRouter);
 app.use('/api/images', heavyLimiter, imageRoutesV4);
 app.use('/api/ai', (req, res, next) => {
   if (req.path === '/enhance-prompt') return next();
-  return res.status(404).json({ code: 404, message: 'Not Found' });
+  return sendError(res, ERROR_CODE.NOT_FOUND, 'Not Found');
 }, heavyLimiter, imageRoutesV4);  // 仅放行 /api/ai/enhance-prompt
 app.use('/api/detail', detailRoutesV4);
 app.use('/api/videos', heavyLimiter, videoRoutesV4);
