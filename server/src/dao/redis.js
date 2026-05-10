@@ -1,6 +1,7 @@
 import { createClient } from 'redis';
 import config from '../config/index.js';
 import { BusinessError } from '../utils/businessError.js';
+import logger from '../utils/logger.js';
 const redisConfig = config.redis;
 
 // 内存 fallback（开发/无 Redis 环境）
@@ -31,7 +32,7 @@ const client = createClient({
   password: redisConfig.password || undefined,
 });
 
-client.on('error', () => { /* Redis 不可用，走内存缓存 */ });
+client.on('error', (err) => { logger.warn('[Redis] 连接错误', { error: err.message }); });
 
 let connected = false;
 let triedConnect = false;

@@ -7,10 +7,12 @@ import { z } from 'zod';
 import { success, error } from '../utils/response.js';
 import { validateV4 as _validate, validate } from '../utils/validate.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
+import { authMiddleware } from '../middleware/auth.js';
 import * as uploadService from '../utils/file-upload.js';
 import multer from 'multer';
 
 const router = Router();
+router.use(authMiddleware);
 const _storage = multer.memoryStorage();
 const _upload = multer({ storage: _storage, limits: { fileSize: 50 * 1024 * 1024 } });
 

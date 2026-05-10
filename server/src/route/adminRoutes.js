@@ -97,7 +97,7 @@ router.get('/logs', authMiddleware, adminAuth, validate(paginationSchema, 'query
 router.get('/orders', authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(listAllOrders));
 router.delete('/orders/:orderId', authMiddleware, adminAuth, asyncHandler(deleteOrder));
 // 风控
-router.post('/check-content', authMiddleware, validate(checkContentSchema), asyncHandler(checkContentRisk));
+router.post('/check-content', authMiddleware, adminAuth, validate(checkContentSchema), asyncHandler(checkContentRisk));
 router.get('/sensitive-words', authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(listSensitiveWords));
 router.post('/sensitive-words', authMiddleware, adminAuth, validate(sensitiveWordSchema), asyncHandler(addSensitiveWord));
 router.delete('/sensitive-words/:id', authMiddleware, adminAuth, asyncHandler(deleteSensitiveWord));

@@ -106,7 +106,7 @@ async function poll() {
         const limit = Math.min(BATCH_SIZE, available);
         const jobs = await jobQueueService.fetchPending(limit);
         for (const job of jobs) {
-          processJob(job); // fire-and-forget (不await，并发处理)
+          processJob(job).catch(err => logger.error('[Worker] Unhandled job error:', err.message));
         }
       }
     } catch (err) {
@@ -119,6 +119,14 @@ async function poll() {
 // 优雅退出
 process.on('SIGTERM', () => { running = false; logger.info('[Worker] SIGTERM received, shutting down...'); });
 process.on('SIGINT', () => { running = false; logger.info('[Worker] SIGINT received, shutting down...'); });
+
+// 定期扫描卡住任务（Worker 崩溃后残留 processing 状态）
+setInterval(async () => {
+  try {
+    const recovered = await jobQueueService.recoverStuckJobs();
+    if (recovered > 0) logger.warn(`[Worker] Recovered ${recovered} stuck job(s)`);
+  } catch (err) { logger.error(`[Worker] Stuck-job scan error: ${err.message}`); }
+}, 5 * 60 * 1000).unref();
 
 logger.info('[Worker] Job queue worker started');
 poll();

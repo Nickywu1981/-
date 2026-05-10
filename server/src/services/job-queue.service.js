@@ -206,3 +206,19 @@ export async function failJob(jobId, errorMessage) {
     conn.release();
   }
 }
+
+/**
+ * 恢复卡住任务（Worker 崩溃后残留 processing → queued）
+ */
+export async function recoverStuckJobs(timeoutMinutes = 10) {
+  const conn = await db.getConnection();
+  try {
+    const [result] = await conn.query(
+      'UPDATE job_queue SET status = ?, error_message = ? WHERE status = ? AND started_at < DATE_SUB(NOW(), INTERVAL ? MINUTE)',
+      ['queued', 'Worker timeout recovery', 'processing', timeoutMinutes],
+    );
+    return result.affectedRows;
+  } finally {
+    conn.release();
+  }
+}
