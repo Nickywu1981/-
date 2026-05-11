@@ -1,0 +1,74 @@
+# ============================================================
+# 生产环境 Docker Compose 覆写
+# 使用: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+# ============================================================
+
+services:
+  mysql:
+    deploy:
+      resources:
+        limits: { cpus: '2', memory: 1G }
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?生产环境必须设置 DB_ROOT_PASSWORD}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+
+  redis:
+    deploy:
+      resources:
+        limits: { cpus: '1', memory: 512M }
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "3"
+
+  server:
+    build:
+      dockerfile: Dockerfile.prod
+    environment:
+      NODE_ENV: production
+      MOCK_ENABLED: "false"
+    volumes:
+      - server_uploads:/app/uploads
+    # 生产环境不挂载源码（使用构建镜像内的代码）
+    deploy:
+      resources:
+        limits: { cpus: '2', memory: 2G }
+        reservations: { cpus: '1', memory: 512M }
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "10"
+
+  client:
+    build:
+      dockerfile: Dockerfile
+      target: prod
+    environment:
+      NODE_ENV: production
+    # 生产环境不挂载源码
+    volumes: []
+    deploy:
+      resources:
+        limits: { cpus: '1', memory: 512M }
+        reservations: { cpus: '0.5', memory: 256M }
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  minio:
+    deploy:
+      resources:
+        limits: { cpus: '1', memory: 1G }
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "3"
