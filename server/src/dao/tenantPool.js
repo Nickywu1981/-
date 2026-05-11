@@ -18,7 +18,7 @@ const TENANT_TABLES = new Set([
   'api_proxy_config', 'recharge_order',
   'automation_account', 'automation_task',
   'prompt_template', 'prompt_group', 'prompt_favorite',
-  'sensitive_word', 'credit_request_log', 'ai_call_log',
+  'sensitive_word', 'user', 'credit_request_log', 'ai_call_log',
 ]);
 
 /** 从 SQL 里提取表名 */

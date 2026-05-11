@@ -29,7 +29,7 @@ export const listAllUsers = wrapController(async (req, res, next) => {
 export const updateUserStatus = wrapController(async (req, res, next) => {
     const { status } = req.body;
     if (![0, 1].includes(status)) return error(res, ERROR_CODE.PARAM_INVALID, '状态值无效（0启用/1禁用）');
-    await commerce.updateUserStatus(req.params.userId, status);
+    await commerce.updateUserStatus(req.params.userId, status, req.user?.tenantId);
     return success(res, {}, '用户状态已更新');
   })
 
@@ -37,7 +37,7 @@ export const batchUpdateUserStatus = wrapController(async (req, res, next) => {
     const { ids, status } = req.body;
     if (!Array.isArray(ids) || ids.length === 0) return error(res, ERROR_CODE.PARAM_INVALID, 'ids 必须为非空数组');
     if (![0, 1].includes(status)) return error(res, ERROR_CODE.PARAM_INVALID, '状态值无效（0启用/1禁用）');
-    const result = await commerce.batchUpdateUserStatus(ids, status);
+    const result = await commerce.batchUpdateUserStatus(ids, status, req.user?.tenantId);
     return success(res, { affected: result.affected }, `已${status === 1 ? '禁用' : '启用'} ${result.affected} 个用户`);
   })
 
@@ -107,34 +107,34 @@ export const deleteSensitiveWord = wrapController(async (req, res, next) => {
 // ==================== 任务重试/暂停/续跑 ====================
 
 export const retryTask = wrapController(async (req, res, next) => {
-    await commerce.retryTask(req.params.taskId);
+    await commerce.retryTask(req.params.taskId, req.user?.tenantId);
     return success(res, {}, '已加入重试队列');
   })
 
 export const pauseTask = wrapController(async (req, res, next) => {
-    await commerce.pauseTask(req.params.taskId);
+    await commerce.pauseTask(req.params.taskId, req.user?.tenantId);
     return success(res, {}, '已暂停');
   })
 
 export const resumeTask = wrapController(async (req, res, next) => {
-    await commerce.resumeTask(req.params.taskId);
+    await commerce.resumeTask(req.params.taskId, req.user?.tenantId);
     return success(res, {}, '已恢复');
   })
 
 export const cancelTask = wrapController(async (req, res, next) => {
-    await commerce.cancelTask(req.params.taskId);
+    await commerce.cancelTask(req.params.taskId, req.user?.tenantId);
     return success(res, {}, '已取消');
   })
 
 // ==================== 任务审核 ====================
 
 export const approveTask = wrapController(async (req, res, next) => {
-    await commerce.approveTask(req.params.taskId);
+    await commerce.approveTask(req.params.taskId, req.user?.tenantId);
     return success(res, {}, '已批准');
   })
 
 export const rejectTask = wrapController(async (req, res, next) => {
-    await commerce.rejectTask(req.params.taskId);
+    await commerce.rejectTask(req.params.taskId, req.user?.tenantId);
     return success(res, {}, '已驳回');
   })
 
@@ -211,6 +211,6 @@ export const deletePlan = wrapController(async (req, res, next) => {
 // ==================== 订单删除 ====================
 
 export const deleteOrder = wrapController(async (req, res, next) => {
-    await commerce.deleteOrder(+req.params.orderId);
+    await commerce.deleteOrder(+req.params.orderId, req.user?.tenantId);
     return success(res, {}, '订单已删除');
   })

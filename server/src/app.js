@@ -308,7 +308,6 @@ app.use('/api/3d', heavyLimiter, d3RoutesV4);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/sms', codeLimiter, smsRoutes);
 app.use('/api/email', emailRoutes);
-app.use('/api/upload', uploadLimiter, uploadRoutes);
 app.use('/api/prompts', promptRoutes);
 app.use('/api/credits', creditRoutes);
 app.use('/api/tenants', tenantRoutes);

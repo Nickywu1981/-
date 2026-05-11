@@ -42,8 +42,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   }
 
   // 管理员路由保护
-  const adminOnlyPaths = ['/admin', '/admin/config', '/admin/users']
-  if (adminOnlyPaths.some(p => to.path.startsWith(p))) {
+  if (to.path.startsWith('/admin')) {
     if (!['admin', 'super_admin'].includes(userRole)) {
       return navigateTo('/error?code=403')
     }

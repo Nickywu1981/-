@@ -115,16 +115,19 @@ export async function listAllUsers({ offset, pageSize, keyword, status, planType
   return { list: rows, total };
 }
 
-export async function updateUserStatus(userId, status) {
-  await pool.execute('UPDATE user SET status = ?, update_time = NOW() WHERE id = ?', [status, userId]);
+export async function updateUserStatus(userId, status, tenantId) {
+  let sql = 'UPDATE user SET status = ?, update_time = NOW() WHERE id = ?';
+  const params = [status, userId];
+  if (tenantId) { sql += ' AND tenant_id = ?'; params.push(tenantId); }
+  await pool.execute(sql, params);
 }
 
-export async function batchUpdateUserStatus(ids, status) {
+export async function batchUpdateUserStatus(ids, status, tenantId) {
   const placeholders = ids.map(() => '?').join(',');
-  const [result] = await pool.execute(
-    `UPDATE user SET status = ? WHERE id IN (${placeholders})`,
-    [status, ...ids],
-  );
+  let sql = `UPDATE user SET status = ? WHERE id IN (${placeholders})`;
+  const params = [status, ...ids];
+  if (tenantId) { sql += ' AND tenant_id = ?'; params.push(tenantId); }
+  const [result] = await pool.execute(sql, params);
   return result.affectedRows;
 }
 
@@ -224,35 +227,54 @@ export async function listAllTasks({ offset, pageSize, userId, status, type, typ
   return { list: rows, total };
 }
 
-export async function updateTaskStatusDirect(taskId, fields) {
+export async function updateTaskStatusDirect(taskId, fields, tenantId) {
   const allowed = ['status', 'progress', 'progress_msg', 'error_msg', 'output_result', 'worker_id'];
   const sets = [];
   const params = [];
   for (const [k, v] of Object.entries(fields)) {
     if (allowed.includes(k) && v !== undefined) {
-      sets.push(`${k} = ?`);
+      sets.push(`t.${k} = ?`);
       params.push(v);
     }
   }
   if (sets.length === 0) return;
   params.push(taskId);
-  await pool.execute(`UPDATE task SET ${sets.join(', ')} WHERE id = ?`, params);
+  if (tenantId) {
+    params.push(tenantId);
+    await pool.execute(`UPDATE task t JOIN user u ON t.user_id = u.id SET ${sets.join(', ')} WHERE t.id = ? AND u.tenant_id = ?`, params);
+  } else {
+    await pool.execute(`UPDATE task SET ${sets.join(', ')} WHERE id = ?`, params);
+  }
 }
 
 // ==================== 审核 ====================
 
-export async function approveTask(taskId) {
-  await pool.execute(
-    'UPDATE task SET review_status = 1, update_time = NOW() WHERE id = ?',
-    [taskId],
-  );
+export async function approveTask(taskId, tenantId) {
+  if (tenantId) {
+    await pool.execute(
+      'UPDATE task t JOIN user u ON t.user_id = u.id SET t.review_status = 1, t.update_time = NOW() WHERE t.id = ? AND u.tenant_id = ?',
+      [taskId, tenantId],
+    );
+  } else {
+    await pool.execute(
+      'UPDATE task SET review_status = 1, update_time = NOW() WHERE id = ?',
+      [taskId],
+    );
+  }
 }
 
-export async function rejectTask(taskId) {
-  await pool.execute(
-    'UPDATE task SET review_status = 2, update_time = NOW() WHERE id = ?',
-    [taskId],
-  );
+export async function rejectTask(taskId, tenantId) {
+  if (tenantId) {
+    await pool.execute(
+      'UPDATE task t JOIN user u ON t.user_id = u.id SET t.review_status = 2, t.update_time = NOW() WHERE t.id = ? AND u.tenant_id = ?',
+      [taskId, tenantId],
+    );
+  } else {
+    await pool.execute(
+      'UPDATE task SET review_status = 2, update_time = NOW() WHERE id = ?',
+      [taskId],
+    );
+  }
 }
 
 // ==================== 套餐管理 ====================
@@ -329,6 +351,10 @@ export async function listAllOrders({ offset, pageSize, userId, planType }) {
   return { list: rows, total };
 }
 
-export async function deletePaymentOrder(orderId) {
-  await pool.execute('DELETE FROM payment_order WHERE id = ?', [orderId]);
+export async function deletePaymentOrder(orderId, tenantId) {
+  if (tenantId) {
+    await pool.execute('DELETE po FROM payment_order po JOIN user u ON po.user_id = u.id WHERE po.id = ? AND u.tenant_id = ?', [orderId, tenantId]);
+  } else {
+    await pool.execute('DELETE FROM payment_order WHERE id = ?', [orderId]);
+  }
 }

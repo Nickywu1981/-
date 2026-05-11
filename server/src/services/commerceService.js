@@ -131,8 +131,8 @@ export async function listAllUsers({ page = 1, pageSize = 20, keyword = '', stat
   return { list, total: Number(total), page, pageSize };
 }
 
-export async function updateUserStatus(userId, status) {
-  await commerceDao.updateUserStatus(userId, status);
+export async function updateUserStatus(userId, status, tenantId) {
+  await commerceDao.updateUserStatus(userId, status, tenantId);
   // 账号禁用时吊销所有令牌，立即生效
   if (status === 0 || status === 'disabled') {
     const { revokeAllUserTokens } = await import('../utils/jwtToken.js');
@@ -206,18 +206,18 @@ export async function deletePlan(planId) {
   await commerceDao.deletePlan(planId);
 }
 
-export async function deleteOrder(orderId) {
-  await commerceDao.deletePaymentOrder(orderId);
+export async function deleteOrder(orderId, tenantId) {
+  await commerceDao.deletePaymentOrder(orderId, tenantId);
 }
 
 // ==================== 内容审核 ====================
 
-export async function approveTask(taskId) {
-  await commerceDao.approveTask(taskId);
+export async function approveTask(taskId, tenantId) {
+  await commerceDao.approveTask(taskId, tenantId);
 }
 
-export async function rejectTask(taskId) {
-  await commerceDao.rejectTask(taskId);
+export async function rejectTask(taskId, tenantId) {
+  await commerceDao.rejectTask(taskId, tenantId);
 }
 
 // ==================== 套餐订单管理 ====================
@@ -230,16 +230,16 @@ export async function listAllOrders({ page = 1, pageSize = 20, userId, planType 
 
 // ==================== 批量操作 ====================
 
-export async function batchUpdateUserStatus(ids, status) {
+export async function batchUpdateUserStatus(ids, status, tenantId) {
   if (!Array.isArray(ids) || ids.length === 0) throw new BusinessError(400, '请选择用户');
   if (![0, 1].includes(status)) throw new BusinessError(400, '状态值无效（0启用/1禁用）');
-  const affected = await commerceDao.batchUpdateUserStatus(ids, status);
+  const affected = await commerceDao.batchUpdateUserStatus(ids, status, tenantId);
   return { affected };
 }
 
 // ==================== 任务操作 ====================
 
-export async function retryTask(taskId) {
+export async function retryTask(taskId, tenantId) {
   const task = await commerceDao.getTaskById(taskId);
   if (!task) throw new BusinessError(404, '任务不存在');
   if (![3, 4].includes(task.status)) throw new BusinessError(400, '只有失败/异常任务才能重试');
@@ -248,26 +248,26 @@ export async function retryTask(taskId) {
   await commerceDao.updateTaskStatusDirect(taskId, {
     status: 6, progress: 0,
     progress_msg: `重试中(${task.retry_count + 1}/3)`,
-  });
+  }, tenantId);
 }
 
-export async function pauseTask(taskId) {
+export async function pauseTask(taskId, tenantId) {
   const task = await commerceDao.getTaskById(taskId);
   if (!task) throw new BusinessError(404, '任务不存在');
   if (![1].includes(task.status)) throw new BusinessError(400, '只能暂停处理中的任务');
-  await commerceDao.updateTaskStatusDirect(taskId, { status: 5 });
+  await commerceDao.updateTaskStatusDirect(taskId, { status: 5 }, tenantId);
 }
 
-export async function resumeTask(taskId) {
+export async function resumeTask(taskId, tenantId) {
   const task = await commerceDao.getTaskById(taskId);
   if (!task) throw new BusinessError(404, '任务不存在');
   if (![5].includes(task.status)) throw new BusinessError(400, '只能恢复已暂停的任务');
-  await commerceDao.updateTaskStatusDirect(taskId, { status: 1 });
+  await commerceDao.updateTaskStatusDirect(taskId, { status: 1 }, tenantId);
 }
 
-export async function cancelTask(taskId) {
+export async function cancelTask(taskId, tenantId) {
   const task = await commerceDao.getTaskById(taskId);
   if (!task) throw new BusinessError(404, '任务不存在');
   if (![0, 1, 5].includes(task.status)) throw new BusinessError(400, '只能取消待处理/处理中/已暂停的任务');
-  await commerceDao.updateTaskStatusDirect(taskId, { status: 4, progress_msg: '已取消' });
+  await commerceDao.updateTaskStatusDirect(taskId, { status: 4, progress_msg: '已取消' }, tenantId);
 }
