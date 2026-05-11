@@ -55,8 +55,8 @@ export async function deleteUserTemplate(userId, templateId) {
   return { success: true };
 }
 
-export async function listUserTemplates(userId) {
-  const list = await sizeTemplateDao.listUserTemplates(userId);
+export async function listUserTemplates(userId, { page = 1, pageSize = 20 } = {}) {
+  const list = await sizeTemplateDao.listUserTemplates(userId, { page, pageSize });
   const total = await sizeTemplateDao.countUserTemplates(userId);
-  return { list, total };
+  return { list, total, page, pageSize };
 }

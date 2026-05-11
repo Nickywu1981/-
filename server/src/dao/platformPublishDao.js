@@ -36,7 +36,7 @@ export default {
 
   async getPlatformConfigs() {
     const [rows] = await db.query(
-      'SELECT * FROM platform_config WHERE status = ? ORDER BY id', ['active'],
+      'SELECT * FROM platform_config WHERE status = ? ORDER BY id LIMIT 200', ['active'],
     );
     return rows;
   },

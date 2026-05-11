@@ -13,6 +13,10 @@ const router = Router();
 
 const idParamSchema = z.object({ id: z.string().regex(/^\d+$/).transform(Number) });
 const platformParamSchema = z.object({ platform: z.string().min(1).max(30) });
+const myListQuerySchema = z.object({
+  page: z.string().regex(/^\d+$/).optional().default('1'),
+  pageSize: z.string().regex(/^\d+$/).optional().default('20'),
+});
 
 const templateSchema = z.object({
   platform: z.string().min(1, '平台不能为空'),
@@ -30,7 +34,7 @@ router.get('/platforms/:platform', cacheMiddleware(1800), validate(platformParam
 
 // 用户自定义模板（需要登录）
 router.post('/my', authMiddleware, validate(templateSchema), asyncHandler(createUserTemplate));
-router.get('/my', authMiddleware, asyncHandler(listUserTemplates));
+router.get('/my', authMiddleware, validate(myListQuerySchema, 'query'), asyncHandler(listUserTemplates));
 router.put('/my/:id', authMiddleware, validate(idParamSchema, 'params'), validate(updateTemplateSchema), asyncHandler(updateUserTemplate));
 router.delete('/my/:id', authMiddleware, validate(idParamSchema, 'params'), asyncHandler(deleteUserTemplate));
 

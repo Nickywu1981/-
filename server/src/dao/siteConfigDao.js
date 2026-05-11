@@ -3,7 +3,7 @@ import pool from './db.js';
 const table = 'site_config';
 
 export const getAll = async () => {
-  const [rows] = await pool.query(`SELECT * FROM ${table} ORDER BY id`);
+  const [rows] = await pool.query(`SELECT * FROM ${table} ORDER BY id LIMIT 200`);
   return rows;
 };
 

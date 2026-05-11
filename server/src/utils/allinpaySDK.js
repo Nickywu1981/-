@@ -150,6 +150,7 @@ export async function unifiedOrder(params) {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: bodyStr,
+      signal: AbortSignal.timeout(30000),
     });
   } catch (err) {
     logger.error('[Allinpay] 统一下单网络错误', err);

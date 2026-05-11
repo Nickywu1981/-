@@ -55,10 +55,11 @@ export async function deleteUserTemplate(id, userId) {
   return result.affectedRows > 0;
 }
 
-export async function listUserTemplates(userId) {
+export async function listUserTemplates(userId, { page = 1, pageSize = 20 } = {}) {
+  const offset = (page - 1) * pageSize;
   const [rows] = await pool.execute(
-    'SELECT id, name, width, height, platform, create_time FROM user_size_template WHERE user_id = ? AND is_deleted = 0 ORDER BY create_time DESC',
-    [userId],
+    'SELECT id, name, width, height, platform, create_time FROM user_size_template WHERE user_id = ? AND is_deleted = 0 ORDER BY create_time DESC LIMIT ? OFFSET ?',
+    [userId, pageSize, offset],
   );
   return rows;
 }

@@ -46,7 +46,9 @@ export const createUserTemplate = wrapController(async (req, res, next) => {
  * 获取用户自定义模板列表
  */
 export const listUserTemplates = wrapController(async (req, res, next) => {
-    const data = await sizeTemplateService.listUserTemplates(req.user.id);
+    const page = parseInt(req.query.page, 10) || 1;
+    const pageSize = Math.min(parseInt(req.query.pageSize, 10) || 20, 100);
+    const data = await sizeTemplateService.listUserTemplates(req.user.id, { page, pageSize });
     return sendSuccess(res, data);
   })
 

@@ -57,26 +57,33 @@ export async function submitPublish(userId, workId, platforms, options = {}) {
 
     await conn.beginTransaction();
 
-    // 为每个平台创建一条发布记录
+    // 批量创建发布记录（单条 INSERT 多 VALUES，避免 N+1）
     const batchId = `PUB_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-    const records = [];
-
+    const status = options.scheduleAt ? 'scheduled' : 'pending';
+    const values = platforms.map(() => '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').join(', ');
+    const params = [];
     for (const platform of platforms) {
       const spec = PLATFORM_PUBLISH_SPECS[platform];
-      const status = options.scheduleAt ? 'scheduled' : 'pending';
-
-      const [result] = await conn.query(
-        `INSERT INTO publish_record (batch_id, user_id, asset_id, platform, platform_name, status,
-           title, description, tags, content_url, scheduled_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [
-          batchId, userId, workId, platform, spec.name, status,
-          options.title || '', options.description || '',
-          JSON.stringify(options.tags || []), asset.file_url,
-          options.scheduleAt || null,
-        ],
+      params.push(
+        batchId, userId, workId, platform, spec.name, status,
+        options.title || '', options.description || '',
+        JSON.stringify(options.tags || []), asset.file_url,
+        options.scheduleAt || null,
       );
-      records.push({ id: result.insertId, platform, platformName: spec.name, status });
+    }
+
+    const [result] = await conn.query(
+      `INSERT INTO publish_record (batch_id, user_id, asset_id, platform, platform_name, status,
+         title, description, tags, content_url, scheduled_at)
+       VALUES ${values}`,
+      params,
+    );
+
+    const records = [];
+    let firstInsertId = result.insertId;
+    for (let i = 0; i < platforms.length; i++) {
+      const spec = PLATFORM_PUBLISH_SPECS[platforms[i]];
+      records.push({ id: firstInsertId + i, platform: platforms[i], platformName: spec.name, status });
     }
 
     await conn.commit();
