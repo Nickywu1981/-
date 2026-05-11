@@ -72,18 +72,20 @@ export async function insertConsumptionLog({ userId, type, action, creditBefore,
 
 export async function confirmConsumption(recordId, userId, creditAfter, conn) {
   const db = conn || pool;
-  await db.execute(
+  const [r] = await db.execute(
     'UPDATE consumption_record SET status = 1, credit_after = ?, confirm_at = NOW() WHERE id = ? AND user_id = ?',
     [creditAfter, recordId, userId],
   );
+  return r.affectedRows;
 }
 
 export async function refundConsumption(recordId, userId, creditAfter, remark = '', conn) {
   const db = conn || pool;
-  await db.execute(
+  const [r] = await db.execute(
     'UPDATE consumption_record SET status = 2, credit_after = ?, refund_at = NOW(), refund_remark = ? WHERE id = ? AND user_id = ?',
     [creditAfter, remark, recordId, userId],
   );
+  return r.affectedRows;
 }
 
 export async function getConsumptionByRequestId(requestId) {

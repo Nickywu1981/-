@@ -58,17 +58,18 @@ export default {
         vals.push(['fields_json', 'pc_config', 'mobile_config'].includes(k) ? JSON.stringify(fields[k]) : fields[k]);
       }
     }
-    if (!sets.length) return false;
+    if (!sets.length) return 0;
     vals.push(id, tenantId);
-    await pool.query(`UPDATE custom_form SET ${sets.join(', ')} WHERE id = ? AND tenant_id = ?`, vals);
-    return true;
+    const [r] = await pool.query(`UPDATE custom_form SET ${sets.join(', ')} WHERE id = ? AND tenant_id = ?`, vals);
+    return r.affectedRows;
   },
 
   async deleteForm(id, tenantId) {
     return withTransaction(async (conn) => {
       await conn.query('DELETE FROM custom_form_submission WHERE form_id = ?', [id]);
       await conn.query('DELETE FROM diy_custom_field WHERE form_id = ? AND tenant_id = ?', [id, tenantId]);
-      await conn.query('DELETE FROM custom_form WHERE id = ? AND tenant_id = ?', [id, tenantId]);
+      const [r] = await conn.query('DELETE FROM custom_form WHERE id = ? AND tenant_id = ?', [id, tenantId]);
+      return r.affectedRows;
     });
   },
 
@@ -128,9 +129,10 @@ export default {
     for (const k of allowed) {
       if (fields[k] !== undefined) { sets.push(`${k} = ?`); vals.push(fields[k]); }
     }
-    if (!sets.length) return;
+    if (!sets.length) return 0;
     vals.push(id, formId);
-    await pool.query(`UPDATE custom_form_submission SET ${sets.join(', ')} WHERE id = ? AND form_id = ?`, vals);
+    const [r] = await pool.query(`UPDATE custom_form_submission SET ${sets.join(', ')} WHERE id = ? AND form_id = ?`, vals);
+    return r.affectedRows;
   },
 
   // ── 字段管理(独立表) ──

@@ -29,10 +29,10 @@ export async function update(id, userId, data) {
   for (const [k, v] of Object.entries(data)) {
     if (v !== undefined && allowed.includes(k)) { fields.push(`${k} = ?`); values.push(v); }
   }
-  if (!fields.length) return false;
+  if (!fields.length) return 0;
   values.push(id, userId);
-  await db.query(`UPDATE user_collections SET ${fields.join(', ')} WHERE id = ? AND user_id = ?`, values);
-  return true;
+  const [r] = await db.query(`UPDATE user_collections SET ${fields.join(', ')} WHERE id = ? AND user_id = ?`, values);
+  return r.affectedRows;
 }
 
 export async function remove(id, userId) {

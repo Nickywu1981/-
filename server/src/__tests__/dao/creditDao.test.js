@@ -39,9 +39,10 @@ describe('creditDao', () => {
     expect(id).toBe(42);
   });
 
-  it('confirmConsumption 确认消费不返回值', async () => {
-    mockExecute.mockResolvedValue([]);
-    await expect(creditDao.confirmConsumption(1, 95)).resolves.toBeUndefined();
+  it('confirmConsumption 确认消费返回 affectedRows', async () => {
+    mockExecute.mockResolvedValue([{ affectedRows: 1 }]);
+    const r = await creditDao.confirmConsumption(1, 95);
+    expect(r).toBe(1);
   });
 
   it('getDailyUsedCredits 返回当天用量', async () => {
