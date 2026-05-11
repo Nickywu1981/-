@@ -32,8 +32,8 @@ export async function addBankAccount(tenantId, data) {
   return result.insertId;
 }
 
-export async function findBankAccountById(id) {
-  const [rows] = await pool.query('SELECT * FROM bank_account WHERE id = ? AND is_deleted = 0', [id]);
+export async function findBankAccountById(id, tenantId) {
+  const [rows] = await pool.query('SELECT * FROM bank_account WHERE id = ? AND tenant_id = ? AND is_deleted = 0', [id, tenantId]);
   return rows[0] || null;
 }
 

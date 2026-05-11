@@ -31,8 +31,8 @@ export async function addBankAccount(tenantId, data) {
 }
 
 export async function removeBankAccount(tenantId, id) {
-  const account = await financeDao.findBankAccountById(id);
-  if (!account || account.tenant_id !== tenantId) {
+  const account = await financeDao.findBankAccountById(id, tenantId);
+  if (!account) {
     throw new BusinessError(ERROR_CODE.NOT_FOUND, '收款账户不存在');
   }
   return financeDao.removeBankAccount(id, tenantId);

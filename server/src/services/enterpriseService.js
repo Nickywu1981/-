@@ -230,14 +230,14 @@ export async function updateEnterpriseUser(tenantId, id, data) {
   // 跨租户防护：验证该用户属于当前租户
   const eu = await enterpriseDao.findEnterpriseUser(tenantId, id);
   if (!eu) throw new BusinessError(ERROR_CODE.NOT_FOUND, '子账号不存在');
-  return enterpriseDao.updateEnterpriseUser(id, data);
+  return enterpriseDao.updateEnterpriseUser(id, tenantId, data);
 }
 
 export async function removeEnterpriseUser(tenantId, id) {
   // 跨租户防护：验证该用户属于当前租户
   const eu = await enterpriseDao.findEnterpriseUser(tenantId, id);
   if (!eu) throw new BusinessError(ERROR_CODE.NOT_FOUND, '子账号不存在');
-  return enterpriseDao.removeEnterpriseUser(id);
+  return enterpriseDao.removeEnterpriseUser(id, tenantId);
 }
 
 // ==================== 仪表盘 ====================

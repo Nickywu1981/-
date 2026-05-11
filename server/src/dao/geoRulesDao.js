@@ -1,23 +1,24 @@
 import pool from './db.js';
 
 const table = 'geo_rules';
+const COLS = 'id, rule_name, country_codes, platform_codes, locale, blocked_models, review_level, output_constraints, priority, enabled, description, create_time, update_time';
 
 export const listAll = async () => {
-  const [rows] = await pool.query(`SELECT * FROM ${table} ORDER BY priority DESC, id ASC LIMIT 200`);
+  const [rows] = await pool.query(`SELECT ${COLS} FROM ${table} ORDER BY priority DESC, id ASC LIMIT 200`);
   return rows;
 };
 
 export const getById = async (id) => {
-  const [rows] = await pool.query(`SELECT * FROM ${table} WHERE id = ?`, [id]);
+  const [rows] = await pool.query(`SELECT ${COLS} FROM ${table} WHERE id = ?`, [id]);
   return rows[0] || null;
 };
 
 export const getMatchingRules = async (countryCode, platformCode) => {
   const [rows] = await pool.query(
-    `SELECT * FROM ${table} WHERE enabled = 1 AND (
+    `SELECT ${COLS} FROM ${table} WHERE enabled = 1 AND (
       JSON_CONTAINS(country_codes, ?) OR country_codes IS NULL
     )
-    ORDER BY priority DESC`,
+    ORDER BY priority DESC LIMIT 200`,
     [JSON.stringify(countryCode)],
   );
   return rows;

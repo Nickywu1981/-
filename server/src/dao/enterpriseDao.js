@@ -133,18 +133,18 @@ export async function addEnterpriseUser(data) {
   return result.insertId;
 }
 
-export async function updateEnterpriseUser(id, data) {
+export async function updateEnterpriseUser(id, tenantId, data) {
   const fields = {};
   if (data.role !== undefined) fields.role = data.role;
   if (data.permissions !== undefined) fields.permissions = JSON.stringify(data.permissions);
   if (data.status !== undefined) fields.status = data.status;
   if (Object.keys(fields).length === 0) return 0;
-  const [result] = await pool.query('UPDATE ?? SET ? WHERE id = ? AND is_deleted = 0', [TABLE.ENTERPRISE_USER, fields, id]);
+  const [result] = await pool.query('UPDATE ?? SET ? WHERE id = ? AND tenant_id = ? AND is_deleted = 0', [TABLE.ENTERPRISE_USER, fields, id, tenantId]);
   return result.affectedRows;
 }
 
-export async function removeEnterpriseUser(id) {
-  const [result] = await pool.query('UPDATE ?? SET is_deleted = 1 WHERE id = ?', [TABLE.ENTERPRISE_USER, id]);
+export async function removeEnterpriseUser(id, tenantId) {
+  const [result] = await pool.query('UPDATE ?? SET is_deleted = 1 WHERE id = ? AND tenant_id = ?', [TABLE.ENTERPRISE_USER, id, tenantId]);
   return result.affectedRows;
 }
 
