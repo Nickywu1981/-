@@ -34,9 +34,9 @@ router.get('/admin/records', adminLimiter, authMiddleware, adminAuth, asyncHandl
 router.post('/admin/refund', adminLimiter, authMiddleware, adminAuth, validate(adminRefundSchema), asyncHandler(adminRefund));
 
 // 签到与奖励
-router.post('/checkin', authMiddleware, asyncHandler(checkIn));
+router.post('/checkin', paymentLimiter, authMiddleware, asyncHandler(checkIn));
 router.get('/checkin/status', authMiddleware, asyncHandler(checkInStatus));
-router.post('/share-reward', authMiddleware, asyncHandler(shareReward));
+router.post('/share-reward', paymentLimiter, authMiddleware, asyncHandler(shareReward));
 router.get('/history', authMiddleware, asyncHandler(creditHistory));
 router.get('/balance', authMiddleware, asyncHandler(creditBalance));
 
