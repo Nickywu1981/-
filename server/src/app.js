@@ -322,7 +322,7 @@ app.use('/api/admin/audit-logs', adminLimiter, auditLogRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/help', helpRoutes);
 app.use('/api/collections', collectionRoutes);
-app.use('/api/admin/site-config', siteConfigAdminRouter);
+app.use('/api/admin/site-config', adminLimiter, siteConfigAdminRouter);
 app.use('/api/admin/workspace-diy', adminLimiter, adminWorkspaceDiyRoutes);
 app.use('/api/admin/geo-rules', adminLimiter, geoRuleAdminRouter);
 app.use('/api/site-config/public', siteConfigPublicRouter);
@@ -331,7 +331,7 @@ app.use('/api/tier', apiLimiter, tierRoutes);
 app.use('/api/admin/abuse', adminLimiter, abuseRoutes);
 app.use('/api/platforms', platformDetailRoutes);
 app.use('/api/multilingual', multilingualRoutes);
-app.use('/api/analytics', analyticsRoutes);
+app.use('/api/analytics', adminLimiter, analyticsRoutes);
 app.use('/api/platform-specs', platformSpecRoutes);
 app.use('/api/ai-dispatch', aiConcurrencyGuard, heavyLimiter, aiDispatchRoutes);  // 多模型统一调度: dispatch/categories/health/stats/cache
 app.use('/api/ai/gateway', aiConcurrencyGuard, heavyLimiter, aiGatewayRoutes);  // Token 集约化中台: infer/dispatch/route/stats/pricing

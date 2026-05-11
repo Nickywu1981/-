@@ -13,14 +13,19 @@ const trackSchema = z.object({
   metadata: z.record(z.unknown()).optional(),
 });
 
+const querySchema = z.object({
+  days: z.string().optional().transform(s => Math.min(Math.max(parseInt(s, 10) || 30, 1), 365)),
+  limit: z.string().optional().transform(s => Math.min(Math.max(parseInt(s, 10) || 10, 1), 100)),
+});
+
 // 埋点上报（需登录）
 router.post('/track', authMiddleware, apiLimiter, validate(trackSchema), asyncHandler(track));
 
 // 数据查询（仅管理员）
-router.get('/funnel', authMiddleware, adminAuth, asyncHandler(funnel));
+router.get('/funnel', authMiddleware, adminAuth, validate(querySchema), asyncHandler(funnel));
 router.get('/active', authMiddleware, adminAuth, asyncHandler(active));
-router.get('/top-tools', authMiddleware, adminAuth, asyncHandler(topTools));
-router.get('/trend', authMiddleware, adminAuth, asyncHandler(trend));
-router.get('/conversion', authMiddleware, adminAuth, asyncHandler(conversionFunnel));
+router.get('/top-tools', authMiddleware, adminAuth, validate(querySchema), asyncHandler(topTools));
+router.get('/trend', authMiddleware, adminAuth, validate(querySchema), asyncHandler(trend));
+router.get('/conversion', authMiddleware, adminAuth, validate(querySchema), asyncHandler(conversionFunnel));
 
 export default router;
