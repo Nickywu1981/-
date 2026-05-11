@@ -12,11 +12,6 @@ import { revokeAllUserTokens } from '../utils/jwtToken.js';
 import * as enterpriseService from '../services/enterpriseService.js';
 import * as auditLogDao from '../dao/auditLogDao.js';
 
-/** 获取当前用户的 tenantId（企业端专用） */
-function getTenantId(req) {
-  return req.user?.entId || req.user?.tenantId;
-}
-
 /** 写入审计日志（fire-and-forget） */
 function audit(req, action, targetId, targetTitle) {
   auditLogDao.insert({
@@ -73,14 +68,14 @@ export const logoutEnterprise = wrapController(async (req, res) => {
 // ==================== 企业信息 ====================
 
 export const getProfile = wrapController(async (req, res) => {
-  const tenantId = getTenantId(req);
+  const tenantId = req.tenantId;
   if (!tenantId) throw new BusinessError(ERROR_CODE.FORBIDDEN, '无企业权限');
   const profile = await enterpriseService.getEnterpriseProfile(tenantId, req.user?.id);
   return success(res, profile);
 });
 
 export const updateProfile = wrapController(async (req, res) => {
-  const tenantId = getTenantId(req);
+  const tenantId = req.tenantId;
   if (!tenantId) throw new BusinessError(ERROR_CODE.FORBIDDEN, '无企业权限');
   const profile = await enterpriseService.updateEnterpriseProfile(tenantId, req.validated || req.body);
   audit(req, 'enterprise.updateProfile', tenantId, '更新企业信息');
@@ -90,7 +85,7 @@ export const updateProfile = wrapController(async (req, res) => {
 // ==================== 子账号管理 ====================
 
 export const listUsers = wrapController(async (req, res) => {
-  const tenantId = getTenantId(req);
+  const tenantId = req.tenantId;
   const page = Math.max(1, parseInt(req.query.page, 10) || 1);
   const pageSize = Math.min(Math.max(1, parseInt(req.query.pageSize, 10) || 20), 100);
   const { status, keyword } = req.query;
@@ -103,7 +98,7 @@ export const listUsers = wrapController(async (req, res) => {
 });
 
 export const addUser = wrapController(async (req, res) => {
-  const tenantId = getTenantId(req);
+  const tenantId = req.tenantId;
   const { phone, email, nickname, password, role } = req.validated || req.body;
   const id = await enterpriseService.addEnterpriseUser(tenantId, { phone, email, nickname, password, role });
   audit(req, 'enterprise.addUser', id, `添加子账号: ${phone}`);
@@ -111,7 +106,7 @@ export const addUser = wrapController(async (req, res) => {
 });
 
 export const updateUser = wrapController(async (req, res) => {
-  const tenantId = getTenantId(req);
+  const tenantId = req.tenantId;
   const id = parseInt(req.params.id, 10);
   if (!id || id < 1) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '无效的子账号ID');
   const data = req.validated || req.body;
@@ -121,7 +116,7 @@ export const updateUser = wrapController(async (req, res) => {
 });
 
 export const removeUser = wrapController(async (req, res) => {
-  const tenantId = getTenantId(req);
+  const tenantId = req.tenantId;
   const id = parseInt(req.params.id, 10);
   if (!id || id < 1) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '无效的子账号ID');
   await enterpriseService.removeEnterpriseUser(tenantId, id);
@@ -132,13 +127,13 @@ export const removeUser = wrapController(async (req, res) => {
 // ==================== 仪表盘 ====================
 
 export const getDashboard = wrapController(async (req, res) => {
-  const tenantId = getTenantId(req);
+  const tenantId = req.tenantId;
   const dashboard = await enterpriseService.getEnterpriseDashboard(tenantId);
   return success(res, dashboard);
 });
 
 export const getUsage = wrapController(async (req, res) => {
-  const tenantId = getTenantId(req);
+  const tenantId = req.tenantId;
   const { startDate, endDate, userId, page, pageSize } = req.validated || req.query;
   const usage = await enterpriseService.getEnterpriseUsageDetail(tenantId, {
     startDate, endDate, userId, page, pageSize,
@@ -149,13 +144,13 @@ export const getUsage = wrapController(async (req, res) => {
 // ==================== 白标 ====================
 
 export const getWhiteLabel = wrapController(async (req, res) => {
-  const tenantId = getTenantId(req);
+  const tenantId = req.tenantId;
   const whiteLabel = await enterpriseService.getWhiteLabel(tenantId);
   return success(res, whiteLabel);
 });
 
 export const updateWhiteLabel = wrapController(async (req, res) => {
-  const tenantId = getTenantId(req);
+  const tenantId = req.tenantId;
   const whiteLabel = await enterpriseService.updateWhiteLabel(tenantId, req.validated || req.body);
   audit(req, 'enterprise.updateWhiteLabel', tenantId, '更新白标配置');
   return success(res, whiteLabel, '白标配置已更新');

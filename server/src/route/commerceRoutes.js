@@ -9,8 +9,6 @@ import pool from '../dao/db.js';
 
 const router = Router({ mergeParams: true });
 
-const getTenantId = (req) => req.user?.entId || req.user?.tenantId;
-
 const orderQuerySchema = z.object({
   status: z.enum(['pending', 'paid', 'processing', 'completed', 'refunded', 'cancelled']).optional(),
   startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
@@ -25,7 +23,7 @@ router.use(authMiddleware, rateLimiter, enterpriseOnly);
 // 企业端订单列表（仅查看旗下客户订单）
 router.get('/', validate(orderQuerySchema, 'query'), async (req, res, next) => {
   try {
-    const tenantId = getTenantId(req);
+    const tenantId = req.tenantId;
     const { page, pageSize, status, startDate, endDate, keyword } = req.query;
     const conditions = ['o.tenant_id = ?'];
     const params = [tenantId];
@@ -53,7 +51,7 @@ router.get('/', validate(orderQuerySchema, 'query'), async (req, res, next) => {
 // 订单详情
 router.get('/:id', async (req, res, next) => {
   try {
-    const tenantId = getTenantId(req);
+    const tenantId = req.tenantId;
     const [rows] = await pool.query(
       `SELECT o.*, u.nickname AS customer_name, u.phone AS customer_phone, u.email AS customer_email
        FROM \`order\` o LEFT JOIN user u ON o.user_id = u.id
@@ -68,7 +66,7 @@ router.get('/:id', async (req, res, next) => {
 // 订单统计（概览卡片）
 router.get('/stats/summary', async (req, res, next) => {
   try {
-    const tenantId = getTenantId(req);
+    const tenantId = req.tenantId;
     const [rows] = await pool.query(
       `SELECT COUNT(*) AS total_orders,
               COALESCE(SUM(CASE WHEN status IN ('paid','completed') THEN amount ELSE 0 END), 0) AS total_revenue,

@@ -11,7 +11,7 @@ import { tenantPool } from '../dao/tenantPool.js';
 
 export default function tenantContext(req, _res, next) {
   if (req.tenantId === undefined) {
-    req.tenantId = req.user?.tenantId || 0;
+    req.tenantId = req.user?.entId || req.user?.tenantId || 0;
   }
 
   // 为当前请求创建租户感知的 DB 句柄，存入 ALS

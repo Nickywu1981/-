@@ -9,26 +9,22 @@ import { BusinessError } from '../utils/businessError.js';
 import { wrapController } from '../utils/wrapController.js';
 import * as financeService from '../services/financeService.js';
 
-function getTenantId(req) {
-  return req.user?.entId || req.user?.tenantId;
-}
-
 // ==================== 收款账户 ====================
 
 export const listBankAccounts = wrapController(async (req, res) => {
-  const accounts = await financeService.listBankAccounts(getTenantId(req));
+  const accounts = await financeService.listBankAccounts(req.tenantId);
   return success(res, accounts);
 });
 
 export const addBankAccount = wrapController(async (req, res) => {
-  const id = await financeService.addBankAccount(getTenantId(req), req.validated || req.body);
+  const id = await financeService.addBankAccount(req.tenantId, req.validated || req.body);
   return success(res, { id }, '收款账户已绑定');
 });
 
 export const removeBankAccount = wrapController(async (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (!id || id < 1) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '无效的账户ID');
-  await financeService.removeBankAccount(getTenantId(req), id);
+  await financeService.removeBankAccount(req.tenantId, id);
   return success(res, null, '收款账户已解绑');
 });
 
@@ -36,7 +32,7 @@ export const removeBankAccount = wrapController(async (req, res) => {
 
 export const listLedger = wrapController(async (req, res) => {
   const { page, pageSize, type, startDate, endDate } = req.query;
-  const result = await financeService.listLedger(getTenantId(req), {
+  const result = await financeService.listLedger(req.tenantId, {
     page: parseInt(page, 10) || 1,
     pageSize: Math.min(parseInt(pageSize, 10) || 20, 100),
     type,
@@ -50,7 +46,7 @@ export const listLedger = wrapController(async (req, res) => {
 
 export const listSettlements = wrapController(async (req, res) => {
   const { page, pageSize } = req.query;
-  const result = await financeService.listSettlements(getTenantId(req), {
+  const result = await financeService.listSettlements(req.tenantId, {
     page: parseInt(page, 10) || 1,
     pageSize: Math.min(parseInt(pageSize, 10) || 20, 100),
   });
@@ -68,14 +64,14 @@ export const getSettlementDetail = wrapController(async (req, res) => {
 
 export const listEarnings = wrapController(async (req, res) => {
   const { page, pageSize, status, startDate, endDate } = req.query;
-  const result = await financeService.listEarnings(getTenantId(req), {
+  const result = await financeService.listEarnings(req.tenantId, {
     page: parseInt(page, 10) || 1,
     pageSize: Math.min(parseInt(pageSize, 10) || 20, 100),
     status,
     startDate,
     endDate,
   });
-  const summary = await financeService.getEarningsSummary(getTenantId(req));
+  const summary = await financeService.getEarningsSummary(req.tenantId);
   return success(res, { ...result, summary });
 });
 
@@ -83,7 +79,7 @@ export const listEarnings = wrapController(async (req, res) => {
 
 export const listWithdrawals = wrapController(async (req, res) => {
   const { page, pageSize, status } = req.query;
-  const result = await financeService.listWithdrawals(getTenantId(req), {
+  const result = await financeService.listWithdrawals(req.tenantId, {
     page: parseInt(page, 10) || 1,
     pageSize: Math.min(parseInt(pageSize, 10) || 20, 100),
     status,
@@ -94,7 +90,7 @@ export const listWithdrawals = wrapController(async (req, res) => {
 export const createWithdrawal = wrapController(async (req, res) => {
   const { amount, bankAccountId } = req.validated || req.body;
   const result = await financeService.createWithdrawal(
-    getTenantId(req),
+    req.tenantId,
     req.user?.id || req.user?.userId,
     { amount, bankAccountId },
   );
@@ -111,20 +107,20 @@ export const getWithdrawalDetail = wrapController(async (req, res) => {
 // ==================== 分润政策（仅代理） ====================
 
 export const getCommissionPolicy = wrapController(async (req, res) => {
-  const policy = await financeService.getCommissionPolicy(getTenantId(req));
+  const policy = await financeService.getCommissionPolicy(req.tenantId);
   return success(res, policy);
 });
 
 export const updateCommissionPolicy = wrapController(async (req, res) => {
   const data = req.validated || req.body;
-  const policy = await financeService.updateCommissionPolicy(getTenantId(req), data);
+  const policy = await financeService.updateCommissionPolicy(req.tenantId, data);
   return success(res, policy, '分润政策已更新');
 });
 
 // ==================== 财务仪表盘 ====================
 
 export const getFinanceDashboard = wrapController(async (req, res) => {
-  const dashboard = await financeService.getFinanceDashboard(getTenantId(req), getTenantType(req));
+  const dashboard = await financeService.getFinanceDashboard(req.tenantId, getTenantType(req));
   return success(res, dashboard);
 });
 
