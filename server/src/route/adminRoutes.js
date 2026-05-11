@@ -4,16 +4,15 @@ import { adminListTemplates, adminSaveTemplate, adminReviewTemplate, adminDelete
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { adminLimiter } from '../middleware/rateLimiter.js';
-import { validate, idSchema, paginationSchema } from '../utils/validate.js';
+import { validate, idSchema, paginationSchema, numericParamSchema } from '../utils/validate.js';
 import { z } from 'zod';
 
 const router = Router();
 
-const numericParam = (name) => z.object({ [name]: z.string().regex(/^\d+$/).transform(Number) });
-const idParamSchema = numericParam('id');
-const userIdParamSchema = numericParam('userId');
-const planIdParamSchema = numericParam('planId');
-const orderIdParamSchema = numericParam('orderId');
+const idParamSchema = numericParamSchema('id');
+const userIdParamSchema = numericParamSchema('userId');
+const planIdParamSchema = numericParamSchema('planId');
+const orderIdParamSchema = numericParamSchema('orderId');
 
 const batchUserStatusSchema = z.object({
   ids: z.array(idSchema).min(1).max(500),

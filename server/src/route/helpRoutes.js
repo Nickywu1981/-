@@ -3,12 +3,10 @@ import { getFaqs, getFaqById, createFaq, updateFaq, deleteFaq } from '../control
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { adminLimiter } from '../middleware/rateLimiter.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
-import { validate } from '../utils/validate.js';
+import { validate, idParamSchema } from '../utils/validate.js';
 import { z } from 'zod';
 
 const router = Router();
-
-const idParamSchema = z.object({ id: z.string().regex(/^\d+$/).transform(Number) });
 
 const faqSchema = z.object({
   title: z.string().min(1, '标题不能为空').max(200),

@@ -12,15 +12,14 @@ import { retrieveContext } from '../services/ragService.js';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import logger from '../utils/logger.js';
-import { validate } from '../utils/validate.js';
+import { validate, numericParamSchema } from '../utils/validate.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 
 const router = Router();
 
-const numericParam = (name) => z.object({ [name]: z.string().regex(/^\d+$/).transform(Number) });
-const userIdParamSchema = numericParam('userId');
-const taskIdParamSchema = numericParam('taskId');
+const userIdParamSchema = numericParamSchema('userId');
+const taskIdParamSchema = numericParamSchema('taskId');
 
 // ── Zod schemas ────────────────────────────────────────────────────────
 const memorySearchSchema = z.object({ query: z.string().min(1) });

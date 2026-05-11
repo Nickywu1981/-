@@ -4,12 +4,11 @@ import { authMiddleware } from '../middleware/auth.middleware.js';
 import { requireRole } from '../middleware/rbac.js';
 import { rateLimiter } from '../middleware/rateLimiter.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
-import { validate } from '../utils/validate.js';
+import { validate, idParamSchema } from '../utils/validate.js';
 import { z } from 'zod';
 
 const router = Router();
 
-const idParamSchema = z.object({ id: z.string().regex(/^\d+$/).transform(Number) });
 const codeParamSchema = z.object({ code: z.string().min(1).max(30) });
 
 const createSchema = z.object({

@@ -4,7 +4,7 @@ import { authMiddleware, adminAuth, optionalAuth } from '../middleware/auth.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { editorOrAbove } from '../middleware/rbac.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
-import { validate } from '../utils/validate.js';
+import { validate, idParamSchema } from '../utils/validate.js';
 import { z } from 'zod';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { DIY_PAGE_STATUS_LABEL } from '../constants/domainStatus.js';
@@ -73,7 +73,6 @@ const diffSchema = z.object({
 });
 
 // 路由参数校验 schemas
-const idParamSchema = z.object({ id: z.string().regex(/^\d+$/, 'id 必须为正整数').transform(Number) });
 const versionParamSchema = z.object({ id: z.string().regex(/^\d+$/, 'id 必须为正整数').transform(Number), version: z.string().regex(/^\d+$/, 'version 必须为正整数').transform(Number) });
 const slugParamSchema = z.object({ slug: z.string().min(1, 'slug 不能为空').max(100) });
 const templateIdParamSchema = z.object({ id: z.string().regex(/^\d+$/, 'id 必须为正整数').transform(Number) });

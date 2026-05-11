@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { adminLimiter } from '../middleware/rateLimiter.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
-import { validate } from '../utils/validate.js';
+import { validate, idParamSchema } from '../utils/validate.js';
 import { z } from 'zod';
 import { listTenants, getTenant, createTenant, updateTenant, deleteTenant, getMyTenant, reviewTenant } from '../controller/tenantController.js';
 
@@ -14,7 +14,6 @@ const tenantSchema = z.object({
   settings: z.record(z.unknown()).optional(),
 });
 const tenantUpdateSchema = tenantSchema.partial();
-const idParamSchema = z.object({ id: z.string().regex(/^\d+$/).transform(Number) });
 
 router.get('/', authMiddleware, adminAuth, asyncHandler(listTenants));
 router.get('/me', authMiddleware, asyncHandler(getMyTenant));

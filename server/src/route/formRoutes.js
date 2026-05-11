@@ -2,15 +2,13 @@ import { Router } from 'express';
 import { authMiddleware, optionalAuth, adminAuth } from '../middleware/auth.js';
 import { apiLimiter } from '../middleware/rateLimiter.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
-import { validate } from '../utils/validate.js';
+import { validate, idParamSchema, numericParamSchema } from '../utils/validate.js';
 import { z } from 'zod';
 import * as formController from '../controller/formController.js';
 
 const router = Router();
 
-const numericParam = (name) => z.object({ [name]: z.string().regex(/^\d+$/).transform(Number) });
-const idParamSchema = numericParam('id');
-const subIdParamSchema = numericParam('subId');
+const subIdParamSchema = numericParamSchema('subId');
 const codeParamSchema = z.object({ code: z.string().min(1).max(50) });
 
 // ── Zod 校验 ──

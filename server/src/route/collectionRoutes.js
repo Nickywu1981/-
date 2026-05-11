@@ -4,7 +4,7 @@ import { rateLimiter } from '../middleware/rateLimiter.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { cacheMiddleware } from '../middleware/cache.js';
 import { listCollections, getCollection, createCollection, updateCollection, deleteCollection } from '../controller/collectionController.js';
-import { validate } from '../utils/validate.js';
+import { validate, idParamSchema } from '../utils/validate.js';
 import { z } from 'zod';
 
 const collectionSchema = z.object({
@@ -14,7 +14,6 @@ const collectionSchema = z.object({
 });
 
 const updateCollectionSchema = collectionSchema.partial();
-const idParamSchema = z.object({ id: z.string().regex(/^\d+$/).transform(Number) });
 
 const router = Router();
 router.use(authMiddleware);

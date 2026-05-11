@@ -73,3 +73,7 @@ export const passwordSchema = z.string().min(8, '密码至少8位').max(32, '密
 
 /** ID */
 export const idSchema = z.coerce.number().int().positive('ID必须为正整数');
+
+/** URL params 动态数值校验（如 /:id） */
+export const numericParamSchema = (name) => z.object({ [name]: z.string().regex(/^\d+$/).transform(Number) });
+export const idParamSchema = numericParamSchema('id');

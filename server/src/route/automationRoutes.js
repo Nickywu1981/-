@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
-import { validate } from '../utils/validate.js';
+import { validate, idParamSchema, numericParamSchema } from '../utils/validate.js';
 import { z } from 'zod';
 import * as automationController from '../controller/automationController.js';
 
@@ -20,8 +20,7 @@ const taskSchema = z.object({
   schedule: z.string().max(100).optional(),
   config: z.record(z.unknown()).optional(),
 });
-const idParamSchema = z.object({ id: z.string().regex(/^\d+$/).transform(Number) });
-const taskIdParamSchema = z.object({ taskId: z.string().regex(/^\d+$/).transform(Number) });
+const taskIdParamSchema = numericParamSchema('taskId');
 
 router.get('/', authMiddleware, asyncHandler(automationController.listTasks));
 router.get('/tasks', authMiddleware, asyncHandler(automationController.listTasks));

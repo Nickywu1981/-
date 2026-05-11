@@ -5,13 +5,11 @@ import {
 } from '../controller/smsController.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
-import { validate, phoneSchema, codeSchema } from '../utils/validate.js';
+import { validate, phoneSchema, codeSchema, idParamSchema } from '../utils/validate.js';
 import { codeLimiter, verifyLimiter } from '../middleware/rateLimiter.js';
 import { z } from 'zod';
 
 const router = Router();
-
-const idParamSchema = z.object({ id: z.string().regex(/^\d+$/).transform(Number) });
 
 const sendCodeSchema = z.object({
   phone: phoneSchema,

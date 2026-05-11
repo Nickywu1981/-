@@ -8,7 +8,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
-import { validateV4 as _validate } from '../utils/validate.js';
+import { validateV4 as _validate, idParamSchema } from '../utils/validate.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
 import * as jobQueueService from '../services/job-queue.service.js';
@@ -42,7 +42,6 @@ router.post('/', heavyLimiter, _validate(submitJobSchema), async (req, res) => {
 });
 
 // GET /api/job/:id — 查询任务状态
-const idParamSchema = z.object({ id: z.string().regex(/^\d+$/).transform(Number) });
 router.get('/:id', _validate(idParamSchema, 'params'), async (req, res) => {
   try {
     const job = await jobQueueService.getJobStatus(req.params.id, req.user.id);

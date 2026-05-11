@@ -3,7 +3,7 @@ import { listNotifications, getUnreadCount, markOneRead, markAllRead, sendNotifi
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { adminLimiter } from '../middleware/rateLimiter.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
-import { validate } from '../utils/validate.js';
+import { validate, idParamSchema } from '../utils/validate.js';
 import { z } from 'zod';
 
 const router = Router();
@@ -16,7 +16,6 @@ const sendSchema = z.object({
 });
 
 const adminListQuerySchema = z.object({ userId: z.coerce.number().int().positive().optional(), type: z.string().max(50).optional() });
-const idParamSchema = z.object({ id: z.string().regex(/^\d+$/).transform(Number) });
 
 router.get('/', authMiddleware, asyncHandler(listNotifications));
 router.get('/unread-count', authMiddleware, asyncHandler(getUnreadCount));

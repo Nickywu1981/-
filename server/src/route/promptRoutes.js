@@ -3,7 +3,7 @@ import { listTemplates, getTemplateDetail, createTemplate, submitForReview, fill
 import { authMiddleware } from '../middleware/auth.js';
 import { rateLimiter } from '../middleware/rateLimiter.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
-import { validate } from '../utils/validate.js';
+import { validate, idParamSchema } from '../utils/validate.js';
 import { z } from 'zod';
 
 const router = Router();
@@ -35,7 +35,7 @@ const recordUsageSchema = z.object({
 const rateSchema = z.object({
   score: z.coerce.number().int().min(1, '最低1分').max(5, '最高5分'),
 });
-const idParamSchema = z.object({ id: z.string().regex(/^\d+$/).transform(Number) });
+// (idParamSchema imported from validate.js)
 
 router.use(authMiddleware);
 router.use(rateLimiter);

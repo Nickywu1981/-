@@ -8,13 +8,11 @@ import { authMiddleware } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { tierGuard } from '../middleware/tierGuard.js';
-import { validate, paginationSchema } from '../utils/validate.js';
+import { validate, paginationSchema, idParamSchema, numericParamSchema } from '../utils/validate.js';
 
 const router = Router();
 
-const numericParam = (name) => z.object({ [name]: z.string().regex(/^\d+$/).transform(Number) });
-const taskIdParamSchema = numericParam('taskId');
-const idParamSchema = numericParam('id');
+const taskIdParamSchema = numericParamSchema('taskId');
 
 const submitSchema = z.object({
   imageUrls: z.array(z.string().url()).min(1, '至少需要1张图片').max(100, '最多100张图片'),

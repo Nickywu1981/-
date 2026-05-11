@@ -1,16 +1,14 @@
 import { Router } from 'express';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
-import { validate } from '../utils/validate.js';
+import { validate, idParamSchema, numericParamSchema } from '../utils/validate.js';
 import { z } from 'zod';
 import * as proxyController from '../controller/proxyController.js';
 import { adminLimiter, heavyLimiter } from '../middleware/rateLimiter.js';
 
 const router = Router();
 
-const numericParam = (name) => z.object({ [name]: z.string().regex(/^\d+$/).transform(Number) });
-const idParamSchema = numericParam('id');
-const entryIdParamSchema = numericParam('entryId');
+const entryIdParamSchema = numericParamSchema('entryId');
 const codeParamSchema = z.object({ code: z.string().min(1).max(50) });
 
 // ==================== Zod Schemas ====================

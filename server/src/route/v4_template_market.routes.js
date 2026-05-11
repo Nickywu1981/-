@@ -1,15 +1,11 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { validateV4 as _validate } from '../utils/validate.js';
+import { validateV4 as _validate, idParamSchema } from '../utils/validate.js';
 import { authMiddleware } from '../middleware/auth.js';
 import * as templateMarketController from '../controller/templateMarketController.js';
 import { paymentLimiter } from '../middleware/rateLimiter.js';
 
 const router = Router();
-
-const idParamSchema = z.object({
-  id: z.coerce.number().int().positive('模板ID无效'),
-});
 
 const createSchema = z.object({
   title: z.string().min(1).max(256),

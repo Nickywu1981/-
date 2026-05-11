@@ -2,12 +2,11 @@ import { Router } from 'express';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { adminLimiter } from '../middleware/rateLimiter.js';
-import { validate, paginationSchema } from '../utils/validate.js';
+import { validate, paginationSchema, idParamSchemaSchema } from '../utils/validate.js';
 import { z } from 'zod';
 import * as ctrl from '../controller/campaignController.js';
 
 const router = Router();
-const idParam = z.object({ id: z.string().regex(/^\d+$/).transform(Number) });
 
 // ---- Campaign ----
 const campaignSchema = z.object({
@@ -26,10 +25,10 @@ const campaignSchema = z.object({
 });
 
 router.get('/campaigns', authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(ctrl.listCampaigns));
-router.get('/campaigns/:id', authMiddleware, adminAuth, validate(idParam, 'params'), asyncHandler(ctrl.getCampaign));
+router.get('/campaigns/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(ctrl.getCampaign));
 router.post('/campaigns', adminLimiter, authMiddleware, adminAuth, validate(campaignSchema), asyncHandler(ctrl.createCampaign));
-router.put('/campaigns/:id', adminLimiter, authMiddleware, adminAuth, validate(idParam, 'params'), validate(campaignSchema.partial()), asyncHandler(ctrl.updateCampaign));
-router.delete('/campaigns/:id', adminLimiter, authMiddleware, adminAuth, validate(idParam, 'params'), asyncHandler(ctrl.deleteCampaign));
+router.put('/campaigns/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(campaignSchema.partial()), asyncHandler(ctrl.updateCampaign));
+router.delete('/campaigns/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(ctrl.deleteCampaign));
 
 // ---- Coupon ----
 const couponSchema = z.object({
@@ -48,10 +47,10 @@ const couponSchema = z.object({
 });
 
 router.get('/coupons', authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(ctrl.listCoupons));
-router.get('/coupons/:id', authMiddleware, adminAuth, validate(idParam, 'params'), asyncHandler(ctrl.getCoupon));
+router.get('/coupons/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(ctrl.getCoupon));
 router.post('/coupons', adminLimiter, authMiddleware, adminAuth, validate(couponSchema), asyncHandler(ctrl.createCoupon));
-router.put('/coupons/:id', adminLimiter, authMiddleware, adminAuth, validate(idParam, 'params'), validate(couponSchema.partial()), asyncHandler(ctrl.updateCoupon));
-router.delete('/coupons/:id', adminLimiter, authMiddleware, adminAuth, validate(idParam, 'params'), asyncHandler(ctrl.deleteCoupon));
+router.put('/coupons/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(couponSchema.partial()), asyncHandler(ctrl.updateCoupon));
+router.delete('/coupons/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(ctrl.deleteCoupon));
 router.get('/user-coupons', authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(ctrl.listUserCoupons));
 
 // ---- Announcement ----
@@ -67,9 +66,9 @@ const announcementSchema = z.object({
 });
 
 router.get('/announcements', authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(ctrl.listAnnouncements));
-router.get('/announcements/:id', authMiddleware, adminAuth, validate(idParam, 'params'), asyncHandler(ctrl.getAnnouncement));
+router.get('/announcements/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(ctrl.getAnnouncement));
 router.post('/announcements', adminLimiter, authMiddleware, adminAuth, validate(announcementSchema), asyncHandler(ctrl.createAnnouncement));
-router.put('/announcements/:id', adminLimiter, authMiddleware, adminAuth, validate(idParam, 'params'), validate(announcementSchema.partial()), asyncHandler(ctrl.updateAnnouncement));
-router.delete('/announcements/:id', adminLimiter, authMiddleware, adminAuth, validate(idParam, 'params'), asyncHandler(ctrl.deleteAnnouncement));
+router.put('/announcements/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(announcementSchema.partial()), asyncHandler(ctrl.updateAnnouncement));
+router.delete('/announcements/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(ctrl.deleteAnnouncement));
 
 export default router;

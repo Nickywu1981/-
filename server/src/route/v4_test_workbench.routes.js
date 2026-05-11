@@ -16,15 +16,13 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
-import { validateV4 as _validate, validate } from '../utils/validate.js';
+import { validateV4 as _validate, validate, idParamSchema } from '../utils/validate.js';
 import { requireRole } from '../middleware/rbac.js';
 import * as modelRouter from '../services/model-router.service.js';
 import { gatewayRoute } from '../gateway/aiGatewayHub.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 
 const router = Router();
-
-const idParamSchema = z.object({ id: z.string().regex(/^\d+$/).transform(Number) });
 
 // ---- 内存测试历史（MVP: 不建表，重启即清） ----
 const testHistory = [];

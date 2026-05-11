@@ -6,11 +6,9 @@ import { rateLimiter } from '../middleware/rateLimiter.js';
 import { cacheMiddleware } from '../middleware/cache.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { csrfProtection } from '../middleware/csrf.js';
-import { validate } from '../utils/validate.js';
+import { validate, idParamSchema } from '../utils/validate.js';
 
 const router = Router();
-
-const idParamSchema = z.object({ id: z.string().regex(/^\d+$/).transform(Number) });
 
 const badgeQuerySchema = z.object({ category: z.string().max(50).optional() });
 

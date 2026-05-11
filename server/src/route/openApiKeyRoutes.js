@@ -7,7 +7,7 @@ import { authMiddleware } from '../middleware/auth.middleware.js';
 import { adminAuth } from '../middleware/auth.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
-import { validate } from '../utils/validate.js';
+import { validate, idParamSchema } from '../utils/validate.js';
 import { z } from 'zod';
 import * as ctl from '../controller/openApiKeyController.js';
 
@@ -25,7 +25,6 @@ const updateSchema = z.object({
   rateLimit: z.number().int().min(1).max(1000).optional(),
   dailyLimit: z.number().int().min(1).max(100000).optional(),
 });
-const idParamSchema = z.object({ id: z.string().regex(/^\d+$/).transform(Number) });
 
 router.get('/keys', adminAuth, asyncHandler(ctl.listKeys));
 router.post('/keys', heavyLimiter, adminAuth, validate(createSchema), asyncHandler(ctl.createKey));

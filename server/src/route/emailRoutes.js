@@ -6,7 +6,7 @@ import {
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { codeLimiter, verifyLimiter, adminLimiter } from '../middleware/rateLimiter.js';
-import { validate, emailSchema, codeSchema } from '../utils/validate.js';
+import { validate, emailSchema, codeSchema, idParamSchema } from '../utils/validate.js';
 import { z } from 'zod';
 
 const router = Router();
@@ -30,7 +30,6 @@ const createTemplateSchema = z.object({
   remark: z.string().max(500).optional(),
 });
 const updateTemplateSchema = createTemplateSchema.partial().omit({ template_code: true });
-const idParamSchema = z.object({ id: z.string().regex(/^\d+$/).transform(Number) });
 
 router.get('/templates', authMiddleware, adminAuth, asyncHandler(listTemplates));
 router.post('/templates', adminLimiter, authMiddleware, adminAuth, validate(createTemplateSchema), asyncHandler(createTemplate));
