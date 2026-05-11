@@ -106,8 +106,13 @@ router.get('/capabilities', (_req, res) => {
 
 // ═══════════════════ 健康检查 ═══════════════════
 router.get('/health', async (_req, res) => {
-  const result = await memfocus.health.check();
-  success(res, result);
+  try {
+    const result = await memfocus.health.check();
+    success(res, result);
+  } catch (err) {
+    logger.error('[sdk/health]', err);
+    error(res, err.status || 500, err.message || '健康检查失败');
+  }
 });
 
 router.get('/ping', (_req, res) => {
