@@ -62,7 +62,7 @@
       <div class="chart-bar-wrap">
         <div class="chart-bar" v-for="item in usage" :key="item.date"
           :style="{ height: barHeight(item.call_count) + '%' }"
-          :title="`${item.date}: ${item.call_count}次`">
+          :title="`${item.date}: ${item.call_count}`">
           <span class="bar-label">{{ item.call_count }}</span>
         </div>
       </div>
