@@ -1,6 +1,9 @@
 import { describe, it, expect, vi, beforeAll } from 'vitest';
 vi.mock('../../config/index.js', () => ({
-  jwtConfig: { secret: 'test-secret-key-unit-test' },
+  jwtConfig: { secret: 'test-secret-key-unit-test', accessExpiresIn: '15m', refreshExpiresIn: '7d' },
+  jwtRefreshSecret: 'test-refresh-secret',
+  isDevelopment: true,
+  logConfig: { level: 'info', sampleRate: 1.0, slowQueryMs: 1000 },
 }));
 
 let generateTokens, verifyAccessToken, JWT_CONFIG, revokeAccessToken, isTokenBlacklisted;

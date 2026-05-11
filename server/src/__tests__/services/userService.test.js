@@ -4,7 +4,7 @@ vi.mock('../../dao/userDao.js');
 vi.mock('../../dao/db.js', () => ({ default: { execute: vi.fn(), query: vi.fn() } }));
 vi.mock('bcryptjs', () => ({ default: { hash: vi.fn().mockResolvedValue('hashed'), compare: vi.fn().mockResolvedValue(true) } }));
 vi.mock('jsonwebtoken', () => ({ default: { sign: vi.fn().mockReturnValue('fake-token'), verify: vi.fn() } }));
-vi.mock('../../config/index.js', () => ({ jwtSecret: 'test-secret', jwtExpiresIn: '7d', jwtConfig: { secret: 'test-secret' } }));
+vi.mock('../../config/index.js', () => ({ jwtSecret: 'test-secret', jwtExpiresIn: '7d', jwtConfig: { secret: 'test-secret', accessExpiresIn: '15m', refreshExpiresIn: '7d' }, jwtRefreshSecret: 'test-refresh-secret', isDevelopment: true, isProduction: false, logConfig: { level: 'info', sampleRate: 1.0, slowQueryMs: 1000 } }));
 vi.mock('../../utils/sqlGuard.js', () => ({ guardSQL: vi.fn() }));
 
 import * as userService from '../../services/userService.js';

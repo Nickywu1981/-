@@ -5,6 +5,9 @@ vi.mock('jsonwebtoken', () => ({ default: { verify: vi.fn(), sign: vi.fn() } }))
 vi.mock('../../config/index.js', () => ({
   jwtSecret: 'test-secret',
   jwtConfig: { secret: 'test-secret' },
+  jwtRefreshSecret: 'test-refresh-secret',
+  isDevelopment: true,
+  isProduction: false,
 }));
 vi.mock('../../utils/jwtToken.js', () => ({
   isTokenBlacklisted: vi.fn().mockResolvedValue(false),

@@ -9,15 +9,14 @@
  * 新版统一认证中心: server/src/platform/authCenter.js
  */
 import jwt from 'jsonwebtoken';
-import config, { jwtSecret } from '../config/index.js';
+import config, { jwtSecret, jwtRefreshSecret, isDevelopment, isProduction } from '../config/index.js';
 import { isTokenBlacklisted } from '../utils/jwtToken.js';
 import { error as sendError } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
-// 独立 refresh secret：优先取环境变量，开发环境派生自 jwtSecret
 const refreshSecret = (() => {
-  if (process.env.JWT_REFRESH_SECRET) return process.env.JWT_REFRESH_SECRET;
-  if (process.env.NODE_ENV === 'development') return jwtSecret + '_refresh_dev_only';
+  if (jwtRefreshSecret && jwtRefreshSecret !== 'dev-refresh-fallback') return jwtRefreshSecret;
+  if (isDevelopment) return jwtSecret + '_refresh_dev_only';
   throw new Error('JWT_REFRESH_SECRET 未设置，无法签发 refresh token');
 })();
 
@@ -182,7 +181,7 @@ export async function authMiddleware(req, res, next) {
       : 15 * 60 * 1000;
     res.cookie('token', newToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: isProduction,
       sameSite: 'lax',
       maxAge: accessMaxAge,
     });

@@ -7,17 +7,17 @@
  */
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import { jwtConfig } from '../config/index.js';
+import { jwtConfig, jwtRefreshSecret, isDevelopment } from '../config/index.js';
 import logger from '../utils/logger.js';
 
 // ========================= 配置 =========================
 
-const ACCESS_EXPIRES = process.env.JWT_ACCESS_EXPIRES || '15m';
-const REFRESH_EXPIRES = process.env.JWT_REFRESH_EXPIRES || '7d';
+const ACCESS_EXPIRES = jwtConfig.accessExpiresIn;
+const REFRESH_EXPIRES = jwtConfig.refreshExpiresIn;
 const ACCESS_SECRET = jwtConfig.secret;
 const REFRESH_SECRET = (() => {
-  if (process.env.JWT_REFRESH_SECRET) return process.env.JWT_REFRESH_SECRET;
-  if (process.env.NODE_ENV === 'development') {
+  if (jwtRefreshSecret && jwtRefreshSecret !== 'dev-refresh-fallback') return jwtRefreshSecret;
+  if (isDevelopment) {
     if (!jwtConfig.secret || jwtConfig.secret === 'dev-secret') {
       throw new Error('JWT_REFRESH_SECRET 未设置且 JWT_SECRET 无效，无法生成 refresh token');
     }

@@ -126,7 +126,7 @@ async function processFile(file: File) {
     const res = await $fetch('/api/3d/upload', { method: 'POST', body: formData });
     currentModel.value = { url: res.url || createBlobUrl(file), name: file.name, size: file.size };
   } catch (err: any) {
-    console.warn('[3d-preview] 模型上传失败，使用本地预览', err?.message || err)
+    if (import.meta.dev) console.warn('[3d-preview] 模型上传失败，使用本地预览', err?.message || err)
     currentModel.value = { url: createBlobUrl(file), name: file.name, size: file.size };
   } finally { uploading.value = false }
 }

@@ -14,6 +14,7 @@ import { success, error as sendError } from './utils/response.js';
 import { BusinessError } from './utils/businessError.js';
 import { z } from 'zod';
 import { ERROR_CODE } from './constants/errorCode.js';
+import { corsOrigin, aiConfig, isProduction } from './config/index.js';
 
 // =====================================================
 // 四层架构 - 网关层 + 中台层 集成 (Phase 0-A, 2026-05-11)
@@ -126,7 +127,7 @@ app.set('trust proxy', 'loopback');
 app.disable('x-powered-by');
 app.use(helmet());
 app.use(cspMiddleware);
-const ALLOWED_ORIGINS = (process.env.CORS_ORIGIN || 'http://localhost:3000,http://localhost:3001').split(',').map(s => s.trim());
+const ALLOWED_ORIGINS = (corsOrigin || 'http://localhost:3000,http://localhost:3001').split(',').map(s => s.trim());
 app.use(cors({
   credentials: true,
   origin: (origin, callback) => {
@@ -217,8 +218,8 @@ app.post('/api/internal/embed', async (req, res) => {
     const parsed = embedSchema.safeParse(req.body);
     if (!parsed.success) return sendError(res, ERROR_CODE.BAD_REQUEST, parsed.error.errors[0]?.message || '参数校验失败');
     const { texts } = parsed.data;
-    const apiKey = process.env.OPENAI_API_KEY || '';
-    const baseUrl = (process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1').replace(/\/+$/, '');
+    const apiKey = aiConfig.apiKey;
+    const baseUrl = aiConfig.baseUrl.replace(/\/+$/, '');
     if (!apiKey) return sendError(res, ERROR_CODE.INTERNAL_ERROR, 'API key not configured');
 
     const fetchRes = await fetch(`${baseUrl}/embeddings`, {
@@ -361,7 +362,7 @@ app.use((_req, res) => {
 app.use((err, _req, res, _next) => {
   // 生产环境不记录完整堆栈，防止泄露服务器路径等敏感信息
   const logEntry = { message: err.message };
-  if (process.env.NODE_ENV !== 'production') logEntry.stack = err.stack;
+  if (!isProduction) logEntry.stack = err.stack;
   logger.error('[Server Error]', logEntry);
   if (err instanceof BusinessError) {
     return sendError(res, err.status, err.message);

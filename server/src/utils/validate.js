@@ -1,8 +1,7 @@
 import { z } from 'zod';
 import { error } from './response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
-
-const isProduction = process.env.NODE_ENV === 'production';
+import { isProduction } from '../config/index.js';
 
 /**
  * 通用 Zod 校验中间件工厂

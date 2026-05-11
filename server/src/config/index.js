@@ -136,12 +136,39 @@ const config = {
   get aiTimeoutMs() {
     return parseInt(process.env.AI_TIMEOUT_MS, 10) || 300000;
   },
+
+  worker: {
+    pollInterval: parseInt(process.env.WORKER_POLL_INTERVAL, 10) || 2000,
+    batchSize: parseInt(process.env.WORKER_BATCH_SIZE, 10) || 3,
+    maxConcurrent: parseInt(process.env.WORKER_MAX_CONCURRENT, 10) || 5,
+  },
+
+  upload: {
+    dailyLimitMb: parseInt(process.env.UPLOAD_DAILY_LIMIT_MB, 10) || 2048,
+    allowedTypes: (process.env.ALLOWED_UPLOAD_TYPES || 'jpg,jpeg,png,webp,mp4,mov,avi,webm').split(','),
+    cdnBaseUrl: process.env.CDN_BASE_URL || '',
+  },
+
+  security: {
+    encryptionKey: process.env.ENCRYPTION_KEY || '',
+  },
+
+  bull: {
+    imageConcurrency: parseInt(process.env.BULL_IMAGE_CONCURRENCY || '3', 10),
+    videoConcurrency: parseInt(process.env.BULL_VIDEO_CONCURRENCY || '2', 10),
+    batchConcurrency: parseInt(process.env.BULL_BATCH_CONCURRENCY || '5', 10),
+    notifyConcurrency: parseInt(process.env.BULL_NOTIFY_CONCURRENCY || '10', 10),
+  },
+
+  appUrl: process.env.APP_URL || 'https://movio.ai',
 };
 
 export default config;
 
 // 按模块解构导出，方便按需 import
 export const { jwt: jwtConfig, mysql: db, redis: redisConfig, mockEnabled, port, env } = config;
+export const isProduction = config.isProd;
+export const isDevelopment = config.isDev;
 export const jwtSecret = config.jwt.secret;
 export const jwtExpiresIn = config.jwt.expiresIn;
 export const jwtRefreshSecret = config.jwtRefreshSecret;
@@ -150,3 +177,9 @@ export const { rateLimit: rateLimitConfig } = config;
 export const corsOrigin = config.corsOrigin;
 export const { log: logConfig } = config;
 export const aiTimeoutMs = config.aiTimeoutMs;
+export const { worker: workerConfig } = config;
+export const { upload: uploadConfig } = config;
+export const { security: securityConfig } = config;
+export const { bull: bullConfig } = config;
+export const appUrl = config.appUrl;
+export const { ai: aiConfig } = config;

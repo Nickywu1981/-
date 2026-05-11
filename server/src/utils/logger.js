@@ -5,11 +5,13 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const LOG_DIR = path.join(__dirname, '../../logs');
 
-const isDev = process.env.NODE_ENV !== 'production';
+import { isDevelopment, logConfig } from '../config/index.js';
+
+const isDev = isDevelopment;
 
 // LOG_LEVEL env var takes precedence over NODE_ENV-derived default
 const LOG_LEVEL = (() => {
-  const fromEnv = process.env.LOG_LEVEL;
+  const fromEnv = logConfig.level;
   const validLevels = ['error', 'warn', 'info', 'http', 'verbose', 'debug', 'silly'];
   if (fromEnv && validLevels.includes(fromEnv)) return fromEnv;
   return isDev ? 'debug' : 'info';
@@ -17,8 +19,8 @@ const LOG_LEVEL = (() => {
 
 // ==================== 日志采样配置 ====================
 
-const LOG_SAMPLE_RATE = parseFloat(process.env.LOG_SAMPLE_RATE || (isDev ? '1.0' : '0.1'));
-const SLOW_QUERY_THRESHOLD_MS = parseInt(process.env.SLOW_QUERY_MS || '500', 10);
+const LOG_SAMPLE_RATE = logConfig.sampleRate;
+const SLOW_QUERY_THRESHOLD_MS = logConfig.slowQueryMs;
 
 /** 判断是否应该记录此请求（采样） */
 function shouldSample(path, statusCode) {
