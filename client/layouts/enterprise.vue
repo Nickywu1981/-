@@ -62,6 +62,8 @@
 </template>
 
 <script setup lang="ts">
+import { api } from '~/composables/useApi'
+
 const route = useRoute()
 const router = useRouter()
 const { theme, toggle: toggleTheme } = useTheme()
@@ -125,8 +127,6 @@ async function handleLogout() {
   document.cookie = 'refreshToken=; path=/; max-age=0'
   router.push('/enterprise/login')
 }
-
-import { api } from '~/composables/useApi'
 
 watch(() => route.path, () => { mobileOpen.value = false })
 definePageMeta({ middleware: ['auth'] })
