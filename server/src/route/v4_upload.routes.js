@@ -22,9 +22,9 @@ const MAGIC_BYTES = {
   'image/jpeg':     [0xFF, 0xD8, 0xFF],
   'image/webp':     [0x52, 0x49, 0x46, 0x46],
   'image/gif':      [0x47, 0x49, 0x46, 0x38],
-  'image/avif':     null,
-  'video/mp4':      null,
-  'video/quicktime': null,
+  'image/avif':     [0x00, 0x00, 0x00, 0x1C, 0x66, 0x74, 0x79, 0x70, 0x61, 0x76, 0x69, 0x66], // ftypavif box
+  'video/mp4':      [0x00, 0x00, 0x00, null, 0x66, 0x74, 0x79, 0x70],     // ftyp box (ISOM/MP4)
+  'video/quicktime': [0x00, 0x00, 0x00, null, 0x66, 0x74, 0x79, 0x70],     // ftyp box (MOV)
 };
 const ALLOWED_MIMES = Object.keys(MAGIC_BYTES);
 
@@ -33,7 +33,7 @@ function checkBufferMagic(buffer, mimeType) {
   if (!expected) return true;
   if (buffer.length < expected.length) return false;
   for (let i = 0; i < expected.length; i++) {
-    if (buffer[i] !== expected[i]) return false;
+    if (expected[i] !== null && buffer[i] !== expected[i]) return false;
   }
   return true;
 }

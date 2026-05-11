@@ -46,16 +46,17 @@ function checkMagicNumber(filePath, mimeType) {
   if (!sig) return true;
   const offset = sig.offset || 0;
   const expected = sig.bytes;
+  let fd;
   try {
-    const fd = fs.openSync(filePath, 'r');
+    fd = fs.openSync(filePath, 'r');
     const buf = Buffer.alloc(offset + expected.length);
     fs.readSync(fd, buf, 0, buf.length, 0);
-    fs.closeSync(fd);
     for (let i = 0; i < expected.length; i++) {
       if (buf[offset + i] !== expected[i]) return false;
     }
     return true;
   } catch { return false; }
+  finally { if (fd !== undefined) fs.closeSync(fd); }
 }
 
 const storage = multer.diskStorage({

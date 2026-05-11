@@ -54,11 +54,14 @@ export async function validateFileMagic(filePath, ext) {
   const fsp = await import('fs/promises');
   const fd = await fsp.open(filePath, 'r');
   const buf = Buffer.alloc(16);
-  await fd.read(buf, 0, 16, 0);
-  await fd.close();
+  try {
+    await fd.read(buf, 0, 16, 0);
+  } finally {
+    await fd.close();
+  }
 
   if (!matchMagic(buf, ext)) {
-    await fsp.unlink(filePath); // 删除可疑文件
+    await fsp.unlink(filePath);
     throw new BusinessError(400, `文件内容与声明的类型 (${ext}) 不匹配`);
   }
 }
@@ -178,7 +181,9 @@ export async function completeUpload(uploadId) {
         for (let i = 0; i < meta.totalChunks; i++) {
           const chunkPath = path.join(chunkDir, `${i}`);
           const chunkData = await fsp.readFile(chunkPath);
-          writeStream.write(chunkData);
+          if (!writeStream.write(chunkData)) {
+            await new Promise(r => writeStream.once('drain', r));
+          }
         }
         writeStream.end();
         writeStream.on('finish', resolve);
@@ -193,7 +198,12 @@ export async function completeUpload(uploadId) {
 
   // 魔数检测 — 合并后验证
   const extClean = ext.replace('.', '').toLowerCase();
-  await validateFileMagic(finalPath, extClean);
+  try {
+    await validateFileMagic(finalPath, extClean);
+  } catch {
+    await fsp.unlink(finalPath).catch(() => {}); // 清理问题文件
+    throw new BusinessError(400, `文件内容与声明的类型 (${extClean}) 不匹配，已删除`);
+  }
 
   const fileUrl = `/uploads/${finalName}`;
   return {

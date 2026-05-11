@@ -42,6 +42,11 @@ server.listen(port, () => {
   cleanupTimer = setInterval(() => {
     import('./utils/file-upload.js').then(({ cleanupStaleUploads }) => cleanupStaleUploads()).catch((err) => { logger.warn('[Cleanup] 加载失败', { error: err.message }); });
   }, 30 * 60 * 1000);
+
+  // 定时恢复卡住的任务 (每 5 分钟)
+  setInterval(() => {
+    import('./dao/taskDao.js').then(({ recoverStuckTasks }) => recoverStuckTasks()).catch(() => {});
+  }, 5 * 60 * 1000).unref();
 });
 
 // ==================== 全局异常处理 ====================

@@ -161,7 +161,7 @@ import('./middleware/cache.js').then(({ invalidateCache }) => {
     res.on('finish', () => {
       if (res.statusCode >= 200 && res.statusCode < 300) {
         const basePath = req.baseUrl || req.originalUrl.split('?')[0];
-        invalidateCache(`${basePath}*`).catch(() => {});
+        invalidateCache(`*:${basePath}*`).catch(() => {});
       }
     });
     next();
@@ -179,7 +179,7 @@ app.get('/api/health', optionalAuth, async (req, res) => {
     checks: { db: false, redis: false, ai: {} },
   };
   let schemaVersion = 0;
-  try { const db = await import('./dao/db.js'); const conn = await db.default.getConnection(); const [tables] = await conn.query('SHOW TABLES'); status.checks.db = true; schemaVersion = tables.length; conn.release(); } catch { status.checks.db = false; }
+  try { const db = await import('./dao/db.js'); const conn = await db.default.getConnection(); try { const [tables] = await conn.query('SHOW TABLES'); status.checks.db = true; schemaVersion = tables.length; } finally { conn.release(); } } catch { status.checks.db = false; }
   try { const redis = await import('./dao/redis.js'); await redis.default.ping(); status.checks.redis = true; } catch { status.checks.redis = false; }
   try { const { listModels } = await import('./services/aiEngine.js'); for (const m of listModels()) { status.checks.ai[m.id] = m.health ? (await m.health()).status : 'unknown'; } } catch { status.checks.ai = {}; }
   // BullMQ 队列指标

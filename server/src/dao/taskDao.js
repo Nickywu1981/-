@@ -105,6 +105,15 @@ export async function completeTask(taskId, userId, { progressMsg = '完成', out
   }
 }
 
+/** 恢复卡住的任务：将超时处理中的任务重置为 pending（默认 15 分钟） */
+export async function recoverStuckTasks(timeoutMs = 15 * 60 * 1000) {
+  const [r] = await pool().execute(
+    'UPDATE task SET status = 0, worker_id = NULL, progress = 0, progress_msg = ? WHERE status = 1 AND start_time < DATE_SUB(NOW(), INTERVAL ? SECOND)',
+    ['排队中（自动恢复）', Math.floor(timeoutMs / 1000)],
+  );
+  if (r.affectedRows > 0) logger.warn(`[TaskRecovery] 恢复 ${r.affectedRows} 个卡住任务`);
+}
+
 function safeJson(v) {
   if (!v) return null;
   try { return typeof v === 'string' ? JSON.parse(v) : v; } catch { return null; }

@@ -121,11 +121,16 @@ async function handleDrop(e: DragEvent, type: string) {
 async function submitTask() {
   if (!uploadedRefUrl.value || !uploadedProductUrl.value) { toast.warn('请先上传素材'); return; }
   step.value = 2;
-  const res = await $fetch('/api/adv-video/viral-clone', {
-    method: 'POST', credentials: 'include',
-    body: { referenceVideoUrl: uploadedRefUrl.value, productImageUrl: uploadedProductUrl.value, matchStrength: matchStrength.value },
-  });
-  task.pollTask((res as any).data.taskId, '/api/adv-video/tasks/');
+  try {
+    const res = await $fetch('/api/adv-video/viral-clone', {
+      method: 'POST', credentials: 'include',
+      body: { referenceVideoUrl: uploadedRefUrl.value, productImageUrl: uploadedProductUrl.value, matchStrength: matchStrength.value },
+    });
+    task.pollTask((res as any).data.taskId, '/api/adv-video/tasks/');
+  } catch (err: any) {
+    toast.error(err?.data?.msg || err?.message || '提交失败，请重试');
+    step.value = 1;
+  }
 }
 function handleRedo() { task.reset(); step.value = 0; refVideoUrl.value = ''; productImageUrl.value = ''; uploadedRefUrl.value = ''; uploadedProductUrl.value = ''; }
 </script>

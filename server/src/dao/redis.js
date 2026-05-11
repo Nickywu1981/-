@@ -20,7 +20,7 @@ setInterval(() => {
   for (const [key, entry] of memStore) {
     if (entry?._ts && now - entry._ts > 300000) memStore.delete(key);
   }
-}, 60000);
+}, 60000).unref();
 
 const client = createClient({
   socket: {
