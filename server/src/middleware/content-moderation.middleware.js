@@ -20,7 +20,8 @@ export function contentModerationMiddleware(stage = 'input') {
         return res.status(422).json({ code: ERROR_CODE.CONTENT_MODERATION, msg: '内容包含违规信息，请修改后重试' });
       }
     } catch {
-      // sensitiveWordService 不可用时降级放行（避免阻断正常业务）
+      // sensitiveWordService 不可用时降级放行（避免阻断正常业务），但记录日志
+      console.warn('[ContentModeration] sensitiveWordService unavailable, skipping check');
     }
 
     // 记录审核请求到 content_audit_log

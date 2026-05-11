@@ -8,6 +8,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { memfocus } from '../sdk/memfocus-sdk.js';
+import { retrieveContext } from '../services/ragService.js';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import logger from '../utils/logger.js';
@@ -146,6 +147,28 @@ router.get('/memory/list/:userId', authMiddleware, validate(userIdParamSchema, '
     success(res, result);
   } catch (err) {
     logger.error('[sdk]', err);
+    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
+  }
+});
+
+router.get('/memory/status', async (_req, res) => {
+  try {
+    const result = await memfocus.memory.getStatus();
+    success(res, result);
+  } catch (err) {
+    logger.error('[sdk]', err);
+    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
+  }
+});
+
+// POST /api/sdk/memory/rag — RAG 全量上下文检索 (LLM 消费专用)
+router.post('/memory/rag', heavyLimiter, authMiddleware, validate(memorySearchSchema), async (req, res) => {
+  try {
+    const { query, topK = 5 } = req.body;
+    const result = await retrieveContext(query, { topK, format: 'compact' });
+    success(res, result);
+  } catch (err) {
+    logger.error('[sdk/rag]', err);
     error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
   }
 });

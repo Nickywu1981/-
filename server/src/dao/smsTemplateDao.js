@@ -2,7 +2,7 @@ import pool from './db.js';
 
 export async function listTemplates() {
   const [rows] = await pool.execute(
-    'SELECT id, template_code, name, content, params_count, provider_template_id, provider, status, remark, create_time FROM sms_template ORDER BY id',
+    'SELECT id, template_code, name, content, params_count, provider_template_id, provider, status, remark, create_time FROM sms_template ORDER BY id LIMIT 200',
   );
   return rows;
 }

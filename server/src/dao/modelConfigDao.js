@@ -14,8 +14,8 @@ const COLS = 'id, model_key, display_name, vendor, category, endpoint, api_key_e
 
 export async function listAll(includeDisabled = false) {
   const sql = includeDisabled
-    ? `SELECT ${COLS} FROM ai_model_config ORDER BY priority DESC`
-    : `SELECT ${COLS} FROM ai_model_config WHERE enabled = 1 ORDER BY priority DESC`;
+    ? `SELECT ${COLS} FROM ai_model_config ORDER BY priority DESC LIMIT 500`
+    : `SELECT ${COLS} FROM ai_model_config WHERE enabled = 1 ORDER BY priority DESC LIMIT 500`;
   const [rows] = await _db().query(sql);
   return rows;
 }
