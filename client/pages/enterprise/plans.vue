@@ -40,7 +40,7 @@ onMounted(async () => {
     ]);
     plans.value = planRes.data || [];
     currentPlan.value = profileRes.data?.planType || '';
-  } catch (e) { console.error(e); toast.error('套餐加载失败'); }
+  } catch (e) { toast.error('套餐加载失败'); }
 });
 
 const planLabel = computed(() => {

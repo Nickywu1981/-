@@ -66,7 +66,7 @@ async function loadData() {
     const data = await api.get('/enterprise/finance/ledger', params);
     list.value = data?.list || [];
     total.value = data?.total || 0;
-  } catch (e) { console.error(e); toast.error('流水明细加载失败'); }
+  } catch (e) { toast.error('流水明细加载失败'); }
 }
 
 function typeLabel(t) { const m = { revenue: '收入', commission: '佣金', withdrawal: '提现', refund: '退款', adjustment: '调账' }; return m[t] || t; }

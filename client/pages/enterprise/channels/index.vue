@@ -95,21 +95,21 @@ async function loadChannels(page = 1) {
   try {
     const data = await $fetch(`/api/enterprise/channel/relations?page=${page}&pageSize=${channels.pageSize}`, { credentials: 'include' });
     if (data.code === 200) Object.assign(channels, data.data);
-  } catch (e) { console.error('loadChannels failed', e); toast.error('渠道列表加载失败'); }
+  } catch (e) { toast.error('渠道列表加载失败'); }
 }
 
 async function loadPolicies() {
   try {
     const data = await $fetch('/api/enterprise/channel/policies', { credentials: 'include' });
     if (data.code === 200) policies.value = data.data;
-  } catch (e) { console.error('loadPolicies failed', e); toast.error('策略加载失败'); }
+  } catch (e) { toast.error('策略加载失败'); }
 }
 
 async function loadDownstream() {
   try {
     const data = await $fetch('/api/enterprise/channel/downstream', { credentials: 'include' });
     if (data.code === 200) downstream.value = data.data;
-  } catch (e) { console.error('loadDownstream failed', e); toast.error('下级代理加载失败'); }
+  } catch (e) { toast.error('下级代理加载失败'); }
 }
 
 async function doApply() {

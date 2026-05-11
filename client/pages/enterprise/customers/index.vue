@@ -116,16 +116,16 @@ async function loadCustomers() {
     customers.value = data.list || [];
     total.value = data.total || 0;
     (data.list || []).forEach(c => { if (c.customer_tags) customerTagsMap[c.id] = c.customer_tags; });
-  } catch (e) { console.error(e); toast.error('客户列表加载失败'); }
+  } catch (e) { toast.error('客户列表加载失败'); }
   loading.value = false;
 }
 
 async function loadStats() {
-  try { Object.assign(stats, await $api('/stats')); } catch (e) { console.error(e); toast.error('客户统计加载失败'); }
+  try { Object.assign(stats, await $api('/stats')); } catch (e) { toast.error('客户统计加载失败'); }
 }
 
 async function loadTags() {
-  try { tags.value = await $api('/tags'); } catch (e) { console.error(e); toast.error('标签列表加载失败'); }
+  try { tags.value = await $api('/tags'); } catch (e) { toast.error('标签列表加载失败'); }
 }
 
 function getCustomerTags(cid) { return customerTagsMap[cid] || []; }
@@ -146,7 +146,7 @@ async function applyTags() {
     }
     showTagPicker.value = false;
     loadCustomers();
-  } catch (e) { console.error(e); toast.error('批量打标失败'); }
+  } catch (e) { toast.error('批量打标失败'); }
 }
 
 function planLabel(type) {

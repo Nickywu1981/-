@@ -72,13 +72,13 @@ async function loadOrders(page = 1) {
   try {
     const r = await $fetch(`/api/enterprise/commerce?${q}`, { credentials: 'include' });
     if (r.code === 200) Object.assign(orders, r.data);
-  } catch (e) { console.error('loadOrders', e); toast.error('订单列表加载失败'); }
+  } catch (e) { toast.error('订单列表加载失败'); }
 }
 async function loadSummary() {
   try {
     const r = await $fetch('/api/enterprise/commerce/stats/summary', { credentials: 'include' });
     if (r.code === 200) summary.value = r.data;
-  } catch (e) { console.error('loadSummary', e); toast.error('数据概览加载失败'); }
+  } catch (e) { toast.error('数据概览加载失败'); }
 }
 function debounceSearch() { clearTimeout(searchTimer); searchTimer = setTimeout(() => loadOrders(), 400); }
 function statusClass(s) { return { pending: 'status-warn', paid: 'status-ok', processing: 'status-info', completed: 'status-ok', refunded: 'status-err', cancelled: 'status-err' }[s] || ''; }

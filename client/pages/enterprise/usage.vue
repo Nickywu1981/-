@@ -69,7 +69,7 @@ async function loadUsage() {
     const res = await $fetch('/api/enterprise/usage', { credentials: 'include', params });
     timeline.value = res.data?.timeline || [];
     byUser.value = res.data?.byUser || [];
-  } catch (e) { console.error(e); toast.error('用量明细加载失败'); }
+  } catch (e) { toast.error('用量明细加载失败'); }
   finally { loading.value = false; }
 }
 
