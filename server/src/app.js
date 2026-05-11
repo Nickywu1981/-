@@ -339,7 +339,10 @@ app.use((_req, res) => {
 
 // 全局异常捕获
 app.use((err, _req, res, _next) => {
-  logger.error('[Server Error]', { message: err.message, stack: err.stack });
+  // 生产环境不记录完整堆栈，防止泄露服务器路径等敏感信息
+  const logEntry = { message: err.message };
+  if (process.env.NODE_ENV !== 'production') logEntry.stack = err.stack;
+  logger.error('[Server Error]', logEntry);
   if (err instanceof BusinessError) {
     return sendError(res, err.status, err.message);
   }

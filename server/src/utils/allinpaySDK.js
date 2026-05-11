@@ -166,7 +166,7 @@ export async function unifiedOrder(params) {
     throw new BusinessError(502, '支付网关响应异常');
   }
 
-  logger.info('[Allinpay] 统一下单响应', result);
+  logger.info('[Allinpay] 统一下单响应', { retcode: result.retcode, retmsg: result.retmsg, trxid: result.trxid, reqsn: postData.reqsn });
 
   if (result.retcode !== 'SUCCESS') {
     throw new BusinessError(502, result.retmsg || '支付下单失败');

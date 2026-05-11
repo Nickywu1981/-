@@ -94,6 +94,15 @@ export const codeLimiter = rateLimit({
   message: { code: 429, msg: '验证码已发送，请60秒后再试', data: null },
 });
 
+/** 验证码校验限流（比发送宽松，允许用户多次尝试验证码） */
+export const verifyLimiter = rateLimit({
+  windowMs: 60000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { code: 429, msg: '验证次数过多，请60秒后再试', data: null },
+});
+
 /** AI 重度操作限流（图片/视频/批量生成消耗 GPU） */
 export const heavyLimiter = rateLimit({
   windowMs: 60000,

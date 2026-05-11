@@ -2,16 +2,11 @@ import { wrapController } from '../utils/wrapController.js';
 import * as rechargeService from '../services/rechargeService.js';
 import * as allinpayService from '../services/allinpayService.js';
 import { success, error } from '../utils/response.js';
-import logger from '../utils/logger.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
-export async function getRates(req, res) {
-  try {
-    success(res, rechargeService.getRates());
-  } catch (err) {
-    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '获取充值费率失败');
-  }
-}
+export const getRates = wrapController(async (req, res) => {
+  success(res, rechargeService.getRates());
+});
 
 export const createOrder = wrapController(async (req, res) => {
     const { amount, channel } = req.body;

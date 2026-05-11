@@ -5,7 +5,7 @@ import {
 } from '../controller/emailController.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
-import { codeLimiter } from '../middleware/rateLimiter.js';
+import { codeLimiter, verifyLimiter } from '../middleware/rateLimiter.js';
 import { validate, emailSchema, codeSchema } from '../utils/validate.js';
 import { z } from 'zod';
 
@@ -16,7 +16,7 @@ const verifyCodeSchema = z.object({ email: emailSchema, code: codeSchema });
 
 // 公开 — 验证码收发
 router.post('/send-code', codeLimiter, validate(sendCodeSchema), asyncHandler(sendVerificationCode));
-router.post('/verify-code', codeLimiter, validate(verifyCodeSchema), asyncHandler(verifyCode));
+router.post('/verify-code', verifyLimiter, validate(verifyCodeSchema), asyncHandler(verifyCode));
 
 // 管理后台 — 模板管理
 const createTemplateSchema = z.object({

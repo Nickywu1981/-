@@ -7,8 +7,8 @@ const TASK_LABELS = { product_on: '商品上架完成', product_off: '商品下�
 
 const runningTimers = new Map();
 
-export async function listTasks(userId, tenantId) {
-  return automationDao.listTasks(userId, tenantId);
+export async function listTasks(userId, tenantId, pagination = {}) {
+  return automationDao.listTasks(userId, tenantId, pagination);
 }
 
 export async function createTask(userId, tenantId, { accountId, taskType, taskConfig }) {
@@ -52,8 +52,8 @@ export async function executeTask(taskId) {
 }
 
 // Account management
-export async function listAccounts(userId, tenantId) {
-  return automationDao.listAccounts(userId, tenantId);
+export async function listAccounts(userId, tenantId, pagination = {}) {
+  return automationDao.listAccounts(userId, tenantId, pagination);
 }
 
 export async function createAccount(userId, tenantId, { platform, storeName, username, password }) {

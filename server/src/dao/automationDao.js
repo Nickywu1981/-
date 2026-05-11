@@ -3,10 +3,11 @@ import pool from './db.js';
 const TASK_COLS = 'id, tenant_id, user_id, account_id, task_type, task_config, status, start_time, end_time, result_json, screenshot_url, error_msg, create_time, update_time';
 
 export default {
-  async listTasks(userId, tenantId, limit = 50) {
+  async listTasks(userId, tenantId, { page = 1, pageSize = 20 } = {}) {
+    const offset = (page - 1) * pageSize;
     const [rows] = await pool.query(
-      'SELECT at.*, aa.platform, aa.store_name FROM automation_task at LEFT JOIN automation_account aa ON at.account_id = aa.id WHERE at.user_id = ? AND at.tenant_id = ? ORDER BY at.create_time DESC LIMIT ?',
-      [userId, tenantId, limit],
+      'SELECT at.*, aa.platform, aa.store_name FROM automation_task at LEFT JOIN automation_account aa ON at.account_id = aa.id WHERE at.user_id = ? AND at.tenant_id = ? ORDER BY at.create_time DESC LIMIT ? OFFSET ?',
+      [userId, tenantId, pageSize, offset],
     );
     return rows;
   },
@@ -41,8 +42,9 @@ export default {
   },
 
   // Account management
-  async listAccounts(userId, tenantId) {
-    const [rows] = await pool.query('SELECT id, platform, store_name, username, status, last_login, create_time FROM automation_account WHERE user_id = ? AND tenant_id = ?', [userId, tenantId]);
+  async listAccounts(userId, tenantId, { page = 1, pageSize = 20 } = {}) {
+    const offset = (page - 1) * pageSize;
+    const [rows] = await pool.query('SELECT id, platform, store_name, username, status, last_login, create_time FROM automation_account WHERE user_id = ? AND tenant_id = ? ORDER BY create_time DESC LIMIT ? OFFSET ?', [userId, tenantId, pageSize, offset]);
     return rows;
   },
 
