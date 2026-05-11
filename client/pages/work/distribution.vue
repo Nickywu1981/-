@@ -25,7 +25,7 @@
       <h2>内容配置</h2>
       <div class="form-group">
         <label>标题</label>
-        <input v-model="form.title" class="input" placeholder="输入发布标题" maxlength="200" />
+        <input v-model="form.title" class="input" placeholder="输入发布标题" maxlength="200" required />
       </div>
       <div class="form-group">
         <label>描述</label>

@@ -13,7 +13,7 @@ export function useTask() {
   const errorMsg = ref('');
   const polling = ref(false);
 
-  let timer: ReturnType<typeof setInterval> | null = null;
+  let timer: ReturnType<typeof setTimeout> | null = null;
   let pollCount = 0;
   let consecutiveFailures = 0;
   let currentInterval = 1000;

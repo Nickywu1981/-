@@ -161,7 +161,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, onUnmounted } from 'vue';
 import { useApi } from '~/composables/useApi';
 import { formatDateTime } from '@/utils/format';
 const api = useApi();
@@ -188,6 +188,7 @@ const stats = ref(null);
 const showToast = ref(false);
 const toastMsg = ref('');
 const toastType = ref('success');
+let toastTimer: ReturnType<typeof setTimeout> | null = null;
 
 const platformIcons = {
   taobao: '🍑', tmall: '🐱', jd: '🐶', pdd: '📱',
@@ -205,11 +206,12 @@ function togglePlatform(key) {
   else selectedPlatforms.value.push(key);
 }
 
-function toast(msg, type = 'success') {
+function toast(msg: string, type = 'success') {
   toastMsg.value = msg;
   toastType.value = type;
   showToast.value = true;
-  setTimeout(() => { showToast.value = false; }, 3000);
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { showToast.value = false; }, 3000);
 }
 
 async function loadPlatforms() {
@@ -287,6 +289,10 @@ onMounted(() => {
   loadPlatforms();
   loadWorks();
   loadHistory();
+});
+
+onUnmounted(() => {
+  if (toastTimer) { clearTimeout(toastTimer); toastTimer = null; }
 });
 </script>
 

@@ -161,8 +161,7 @@ async function doDelete() {
   if (!deleteTarget.value) return; deleting.value = true;
   try {
     await $fetch(`/api/email/templates/${deleteTarget.value.id}`, { method: 'DELETE' });
-    showDelete.value = false; msg.value = '模板已删除';
-    msgTimer = setTimeout(() => (msg.value = ''), 2000);
+    showDelete.value = false; showMsg('模板已删除');
     fetchTemplates();
   } catch (e: any) { msg.value = e.data?.msg || '删除失败'; }
   deleting.value = false;

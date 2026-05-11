@@ -196,9 +196,14 @@ function checkFirstVisit() {
   } catch { visible.value = true; }
 }
 
+let wizardTimer: ReturnType<typeof setTimeout> | null = null
+
 onMounted(() => {
-  // Delay to let page render first
-  setTimeout(checkFirstVisit, 800);
+  wizardTimer = setTimeout(checkFirstVisit, 800);
+});
+
+onUnmounted(() => {
+  if (wizardTimer) { clearTimeout(wizardTimer); wizardTimer = null; }
 });
 </script>
 
