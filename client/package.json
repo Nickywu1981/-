@@ -18,7 +18,6 @@
   "dependencies": {
     "@nuxtjs/i18n": "^10.3.0",
     "@vite-pwa/nuxt": "^1.1.1",
-    "@vueuse/core": "^14.3.0",
     "dayjs": "^1.11.20",
     "echarts": "^6.0.0",
     "element-plus": "^2.13.7",
@@ -28,7 +27,7 @@
     "qs": "^6.15.1",
     "three": "^0.184.0",
     "vue-echarts": "^8.0.1",
-    "zod": "^4.4.3"
+    "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
