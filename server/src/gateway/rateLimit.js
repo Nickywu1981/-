@@ -45,8 +45,7 @@ export function concurrencyGuard(maxConcurrent = CONCURRENCY_MAX_PER_USER) {
     const key = getConcurrencyKey(req);
     const entry = userConcurrency.get(key) || { count: 0, ts: Date.now() };
     if (entry.count >= maxConcurrent) {
-      res.status(429).json({ code: 429, msg: `并发请求过多 (${maxConcurrent}路)，请稍后再试`, data: null });
-      return;
+      return res.status(429).json({ code: 429, msg: `并发请求过多 (${maxConcurrent}路)，请稍后再试`, data: null });
     }
     entry.count++;
     entry.ts = Date.now();

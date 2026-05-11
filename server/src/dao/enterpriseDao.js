@@ -3,7 +3,7 @@
  *
  * Phase 1: 企业/代理端 MVP (2026-05-11)
  */
-import { pool } from '../dao/db.js';
+import pool from '../dao/db.js';
 
 const TABLE = {
   TENANT: 'tenant',
@@ -90,6 +90,14 @@ export async function findEnterpriseUser(tenantId, userId) {
   const [rows] = await pool.query(
     'SELECT * FROM ?? WHERE tenant_id = ? AND user_id = ? AND is_deleted = 0',
     [TABLE.ENTERPRISE_USER, tenantId, userId],
+  );
+  return rows[0] || null;
+}
+
+export async function findEnterpriseUserByUserId(userId) {
+  const [rows] = await pool.query(
+    'SELECT * FROM ?? WHERE user_id = ? AND is_deleted = 0 LIMIT 1',
+    [TABLE.ENTERPRISE_USER, userId],
   );
   return rows[0] || null;
 }

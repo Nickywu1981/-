@@ -70,6 +70,14 @@ export async function updatePassword(id, hashedPassword) {
   await pool.execute('UPDATE user SET password = ?, update_time = NOW() WHERE id = ?', [hashedPassword, id]);
 }
 
+export async function findByPhone(phone) {
+  const [rows] = await pool.execute(
+    'SELECT id, username, nickname, phone, email, password, role, tenant_id, status, last_login_time, create_time, update_time FROM user WHERE phone = ? AND is_deleted = 0 LIMIT 1',
+    [phone],
+  );
+  return rows[0] || null;
+}
+
 export async function findByEmail(email) {
   const [rows] = await pool.execute(
     'SELECT id, username, nickname, email FROM user WHERE email = ? AND is_deleted = 0 LIMIT 1',
