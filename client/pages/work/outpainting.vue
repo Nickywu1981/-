@@ -55,6 +55,7 @@ async function startOutpaint() {
   } catch(e: any) { errorMsg.value = e?.data?.msg || '扩展失败' }
   processing.value = false
 }
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 <style scoped>
 .outpaint-workspace { max-width: 800px; margin: 0 auto; }

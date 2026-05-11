@@ -41,6 +41,7 @@ async function changePwd() {
   } catch(e: any) { msg.value = e?.data?.msg || '修改失败'; msgErr.value = true }
   finally { saving.value = false }
 }
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

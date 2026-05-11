@@ -256,6 +256,7 @@ onMounted(async () => {
   } catch (e: any) { useToast().error(e?.data?.msg || e?.message || '加载海报样式失败') }
   loadWorks();
 });
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

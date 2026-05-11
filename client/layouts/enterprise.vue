@@ -1,226 +1,231 @@
+<!--
+  企业端布局 — 统一设计系统 v3.0
+  暗色侧边栏 + 亮色主区域，与 AdminShell 保持视觉一致
+-->
 <template>
-  <div class="enterprise-layout">
-    <!-- 侧边栏 -->
-    <aside class="ent-sidebar">
+  <div class="ent">
+    <!-- 移动端遮罩 -->
+    <div v-if="mobileOpen" class="ent-overlay" @click="mobileOpen = false" />
+
+    <!-- 左侧导航 -->
+    <aside class="ent-side" :class="{ 'ent-side--open': mobileOpen }">
       <div class="ent-brand">
-        <h2 @click="navigateTo('/enterprise/dashboard')">{{ entName || '企业中心' }}</h2>
+        <div class="ent-brand-icon">E</div>
+        <div class="ent-brand-text">
+          <div class="ent-brand-name">{{ entName || '企业中心' }}</div>
+          <div class="ent-brand-sub">Enterprise Console</div>
+        </div>
       </div>
+
       <nav class="ent-nav">
-        <NuxtLink to="/enterprise/dashboard" class="ent-nav-item">
-          <span class="icon">📊</span> {{ $t('enterprise.dashboard') }}
-        </NuxtLink>
-        <NuxtLink to="/enterprise/finance/dashboard" class="ent-nav-item">
-          <span class="icon">💵</span> {{ $t('enterprise.finance') }}
-        </NuxtLink>
-        <NuxtLink to="/enterprise/users" class="ent-nav-item">
-          <span class="icon">👥</span> {{ $t('enterprise.users') }}
-        </NuxtLink>
-        <NuxtLink to="/enterprise/customers" class="ent-nav-item">
-          <span class="icon">👤</span> {{ $t('enterprise.customers') }}
-        </NuxtLink>
-        <NuxtLink to="/enterprise/customers/tags" class="ent-nav-item">
-          <span class="icon">🏷️</span> {{ $t('enterprise.tags') }}
-        </NuxtLink>
-        <NuxtLink to="/enterprise/channels" class="ent-nav-item">
-          <span class="icon">🔗</span> {{ $t('enterprise.channels') }}
-        </NuxtLink>
-        <NuxtLink to="/enterprise/distribution" class="ent-nav-item">
-          <span class="icon">📢</span> {{ $t('enterprise.distribution') }}
-        </NuxtLink>
-        <NuxtLink to="/enterprise/commerce" class="ent-nav-item">
-          <span class="icon">📦</span> {{ $t('enterprise.commerce') }}
-        </NuxtLink>
-        <NuxtLink to="/enterprise/reports" class="ent-nav-item">
-          <span class="icon">📋</span> {{ $t('enterprise.reports') }}
-        </NuxtLink>
-        <NuxtLink to="/enterprise/usage" class="ent-nav-item">
-          <span class="icon">📈</span> {{ $t('enterprise.usage') }}
-        </NuxtLink>
-        <NuxtLink to="/enterprise/plans" class="ent-nav-item">
-          <span class="icon">💎</span> {{ $t('enterprise.plans') }}
-        </NuxtLink>
-        <NuxtLink to="/enterprise/whitelabel" class="ent-nav-item">
-          <span class="icon">🎨</span> {{ $t('enterprise.whitelabel') }}
-        </NuxtLink>
-        <NuxtLink to="/enterprise/settings" class="ent-nav-item">
-          <span class="icon">⚙️</span> {{ $t('enterprise.settings') }}
-        </NuxtLink>
+        <template v-for="group in navGroups" :key="group.key">
+          <button class="ent-nav-group" @click="group.open = !group.open" :class="{ 'ent-nav-group--open': group.open }">
+            <span class="ent-nav-group-icon">{{ group.icon }}</span>
+            <span class="ent-nav-group-label">{{ group.label }}</span>
+            <svg class="ent-nav-group-chevron" width="10" height="6" viewBox="0 0 10 6"><path d="M1 0.5L5 4.5L9 0.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+          <div v-show="group.open" class="ent-nav-items">
+            <NuxtLink
+              v-for="item in group.items"
+              :key="item.key"
+              :to="item.route"
+              class="ent-nav-item"
+              :class="{ 'ent-nav-item--active': isActive(item.route) }"
+              @click="mobileOpen = false"
+            >{{ item.label }}</NuxtLink>
+          </div>
+        </template>
       </nav>
-      <div class="ent-footer">
-        <button class="ent-theme-btn" @click="toggleTheme" :title="theme === 'dark' ? '切换亮色' : '切换暗色'" :aria-label="theme === 'dark' ? '切换到亮色模式' : '切换到暗色模式'">
-          {{ theme === 'dark' ? '☀️' : '🌙' }}
-        </button>
-        <button class="logout-btn" @click="handleLogout">{{ $t('enterprise.logout') }}</button>
+
+      <div class="ent-side-footer">
+        <button class="ent-theme-btn" @click="toggleTheme" :title="isDark ? '切亮色' : '切暗色'">{{ isDark ? '☀️' : '🌙' }}</button>
+        <button class="ent-logout" @click="handleLogout">退出登录</button>
       </div>
     </aside>
 
-    <!-- 主内容区 -->
-    <main class="ent-main">
-      <slot />
-    </main>
+    <!-- 右侧主区域 -->
+    <div class="ent-body">
+      <header class="ent-topbar">
+        <button class="ent-hamburger" @click="mobileOpen = !mobileOpen">
+          <span /><span /><span />
+        </button>
+        <h2 class="ent-title">{{ pageTitle }}</h2>
+        <div class="ent-actions">
+          <slot name="topbar-actions" />
+        </div>
+      </header>
+      <main class="ent-content">
+        <slot />
+      </main>
+    </div>
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+<script setup lang="ts">
+const route = useRoute()
+const router = useRouter()
+const { theme, toggle: toggleTheme } = useTheme()
+const isDark = computed(() => theme.value === 'dark')
+const mobileOpen = ref(false)
+const entName = ref('')
 
-const router = useRouter();
-const entName = ref('');
-const { theme, toggle: toggleTheme } = useTheme();
+const navGroups = reactive([
+  { key: 'main', icon: '📊', label: '数据总览', open: true,
+    items: [{ key: 'dashboard', label: '企业看板', route: '/enterprise/dashboard' }] },
+  { key: 'users', icon: '👥', label: '用户管理', open: false,
+    items: [
+      { key: 'users', label: '成员管理', route: '/enterprise/users' },
+      { key: 'customers', label: '客户管理', route: '/enterprise/customers' },
+      { key: 'tags', label: '客户标签', route: '/enterprise/customers/tags' },
+    ]},
+  { key: 'biz', icon: '📦', label: '业务管理', open: false,
+    items: [
+      { key: 'channels', label: '渠道管理', route: '/enterprise/channels' },
+      { key: 'distribution', label: '分销管理', route: '/enterprise/distribution' },
+      { key: 'commerce', label: '电商管理', route: '/enterprise/commerce' },
+    ]},
+  { key: 'finance', icon: '💵', label: '财务管理', open: false,
+    items: [{ key: 'finance', label: '财务看板', route: '/enterprise/finance/dashboard' }] },
+  { key: 'data', icon: '📈', label: '数据分析', open: false,
+    items: [
+      { key: 'reports', label: '数据报表', route: '/enterprise/reports' },
+      { key: 'usage', label: '用量统计', route: '/enterprise/usage' },
+    ]},
+  { key: 'settings', icon: '⚙️', label: '设置', open: false,
+    items: [
+      { key: 'plans', label: '套餐计划', route: '/enterprise/plans' },
+      { key: 'whitelabel', label: '白标设置', route: '/enterprise/whitelabel' },
+      { key: 'settings', label: '企业设置', route: '/enterprise/settings' },
+    ]},
+])
+
+const pageTitle = computed(() => {
+  for (const g of navGroups) {
+    const it = g.items.find(i => isActive(i.route))
+    if (it) return it.label
+  }
+  return '企业中心'
+})
+
+function isActive(itemRoute: string) { return route.path === itemRoute || (itemRoute !== '/' && route.path.startsWith(itemRoute + '/')) }
 
 onMounted(async () => {
   try {
-    const data = await $fetch('/api/enterprise/profile', { credentials: 'include' });
-    entName.value = data.data?.name || '';
-  } catch (e) {
-    // 仅 401 未认证才跳转登录，网络波动/5xx 不误清会话
-    if (e?.response?.status === 401) {
-      router.push('/enterprise/login');
-    } else if (!e?.response) {
-      console.debug('Enterprise profile network error', e.message);
-    }
+    const data = await api.get('/enterprise/profile')
+    entName.value = data?.data?.name || ''
+  } catch (e: any) {
+    if (e?.response?.status === 401) router.push('/enterprise/login')
+    else console.error('[enterprise] 加载企业信息失败', e)
   }
-});
+})
 
 async function handleLogout() {
-  try {
-    await $fetch('/api/enterprise/logout', { method: 'POST', credentials: 'include' });
-  } catch (e) { /* 即使服务端请求失败，也清除本地 cookie */ }
-  document.cookie = 'token=; path=/; max-age=0';
-  document.cookie = 'refreshToken=; path=/; max-age=0';
-  router.push('/enterprise/login');
+  try { await api.post('/enterprise/logout') } catch {}
+  document.cookie = 'token=; path=/; max-age=0'
+  document.cookie = 'refreshToken=; path=/; max-age=0'
+  router.push('/enterprise/login')
 }
+
+import { api } from '~/composables/useApi'
+
+watch(() => route.path, () => { mobileOpen.value = false })
+definePageMeta({ middleware: ['auth'] })
 </script>
 
 <style scoped>
-.enterprise-layout {
-  display: flex;
-  min-height: 100vh;
-  background: #f5f7fa;
-}
+/* ═══ Shell ═══ */
+.ent { display: flex; height: 100vh; overflow: hidden; background: var(--bg-app); font-family: var(--font-sans); }
+.ent-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 90; }
 
-.ent-sidebar {
-  width: 240px;
-  background: #1a1a2e;
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  z-index: 100;
+/* ═══ Sidebar — 深色 ═══ */
+.ent-side {
+  width: 240px; min-width: 240px; background: #0f121e; color: #e8eaf0;
+  display: flex; flex-direction: column; flex-shrink: 0;
+  z-index: 100; transition: transform 0.25s;
 }
-
 .ent-brand {
-  padding: 24px 20px 16px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  display: flex; align-items: center; gap: var(--space-3);
+  padding: var(--space-5) var(--space-4); border-bottom: 1px solid rgba(255,255,255,0.06);
 }
-
-.ent-brand h2 {
-  font-size: 18px;
-  margin: 0;
-  cursor: pointer;
-  color: #fff;
+.ent-brand-icon {
+  width: 36px; height: 36px; border-radius: var(--radius-md);
+  background: var(--gradient-brand); display: flex; align-items: center;
+  justify-content: center; font-size: 18px; font-weight: var(--font-bold); color: #fff; flex-shrink: 0;
 }
+.ent-brand-text { min-width: 0; }
+.ent-brand-name { font-size: 16px; font-weight: var(--font-semibold); white-space: nowrap; }
+.ent-brand-sub { font-size: 11px; color: rgba(255,255,255,0.35); white-space: nowrap; }
 
-.ent-nav {
-  flex: 1;
-  padding: 12px 0;
+/* ═══ Nav ═══ */
+.ent-nav { flex: 1; overflow-y: auto; padding: var(--space-2); }
+.ent-nav-group {
+  display: flex; align-items: center; gap: var(--space-2); width: 100%;
+  padding: 9px 12px; border: none; border-radius: var(--radius-md);
+  background: none; color: rgba(255,255,255,0.55); font-size: 13px;
+  font-weight: var(--font-medium); cursor: pointer; transition: all var(--transition-fast);
+  font-family: var(--font-sans); text-align: left;
 }
+.ent-nav-group:hover { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.8); }
+.ent-nav-group--open { color: rgba(255,255,255,0.75); }
+.ent-nav-group-icon { font-size: 15px; width: 22px; text-align: center; flex-shrink: 0; }
+.ent-nav-group-label { flex: 1; }
+.ent-nav-group-chevron { transition: transform var(--transition-fast); }
+.ent-nav-group--open .ent-nav-group-chevron { transform: rotate(180deg); }
 
+.ent-nav-items { padding-left: 34px; margin-bottom: 2px; }
 .ent-nav-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 20px;
-  color: rgba(255,255,255,0.7);
-  text-decoration: none;
-  transition: all 0.2s;
-  font-size: 14px;
+  display: block; padding: 7px 12px; border-radius: var(--radius-sm);
+  font-size: 13px; color: rgba(255,255,255,0.45); text-decoration: none;
+  transition: all var(--transition-fast);
 }
+.ent-nav-item:hover { color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.03); }
+.ent-nav-item--active { background: rgba(107,112,255,0.12); color: #8b95ff; font-weight: var(--font-medium); }
 
-.ent-nav-item:hover,
-.ent-nav-item.router-link-active {
-  background: rgba(255,255,255,0.08);
-  color: #fff;
+/* ═══ Footer ═══ */
+.ent-side-footer {
+  padding: var(--space-3) var(--space-4); border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; gap: var(--space-3);
 }
+.ent-theme-btn {
+  width: 32px; height: 32px; border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-sm);
+  background: none; font-size: 14px; cursor: pointer; transition: all var(--transition-fast);
+  display: flex; align-items: center; justify-content: center;
+}
+.ent-theme-btn:hover { border-color: rgba(255,255,255,0.25); }
+.ent-logout {
+  padding: 6px 14px; border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-sm);
+  background: none; color: rgba(255,255,255,0.5); font-size: 12px; cursor: pointer;
+  transition: all var(--transition-fast); font-family: var(--font-sans);
+}
+.ent-logout:hover { border-color: rgba(239,68,68,0.4); color: #ef4444; }
 
-.ent-nav-item .icon {
-  font-size: 18px;
-  width: 24px;
+/* ═══ Body ═══ */
+.ent-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+.ent-topbar {
+  display: flex; align-items: center; height: var(--header-height);
+  padding: 0 var(--space-5); background: var(--header-bg);
+  border-bottom: 1px solid var(--header-border); backdrop-filter: blur(12px);
+  gap: var(--space-4);
 }
+.ent-hamburger {
+  display: none; flex-direction: column; justify-content: center; gap: 4px;
+  width: 36px; height: 36px; border: 1px solid var(--border-light); border-radius: var(--radius-sm);
+  background: none; cursor: pointer; padding: 8px;
+}
+.ent-hamburger span { display: block; width: 16px; height: 2px; background: var(--text-secondary); border-radius: 1px; }
+.ent-title { font-size: 16px; font-weight: var(--font-medium); color: var(--text-primary); flex: 1; }
+.ent-actions { display: flex; gap: var(--space-2); align-items: center; }
+.ent-content { flex: 1; overflow-y: auto; padding: var(--space-6) var(--space-8); }
 
-.ent-footer {
-  padding: 16px 20px;
-  border-top: 1px solid rgba(255,255,255,0.1);
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 767px) {
+  .ent-hamburger { display: flex; }
+  .ent-side {
+    position: fixed; left: 0; top: 0; bottom: 0; z-index: 100;
+    transform: translateX(-100%); width: 260px !important; min-width: 260px !important;
+  }
+  .ent-side--open { transform: translateX(0); }
+  .ent-overlay { display: block; }
+  .ent-content { padding: var(--space-4) var(--space-3); }
 }
-
-.logout-btn {
-  width: 100%;
-  padding: 8px;
-  background: rgba(255,255,255,0.1);
-  border: none;
-  color: rgba(255,255,255,0.7);
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.2s;
-}
-
-.logout-btn:hover {
-  background: rgba(255,77,77,0.3);
-  color: #ff6b6b;
-}
-
-.ent-main {
-  flex: 1;
-  margin-left: 240px;
-  padding: 32px;
-  min-height: 100vh;
-}
-@media (max-width: 768px) {
-  .ent-sidebar { display: none; }
-  .ent-main { margin-left: 0; padding: 16px; }
-}
-</style>
-
-<style>
-/* 企业端全局工具类 */
-.status-warn { color: #f59e0b; background: #fffbeb; padding: 2px 8px; border-radius: 4px; font-size: 13px; }
-.status-ok { color: #10b981; background: #ecfdf5; padding: 2px 8px; border-radius: 4px; font-size: 13px; }
-.status-info { color: #3b82f6; background: #eff6ff; padding: 2px 8px; border-radius: 4px; font-size: 13px; }
-.status-err { color: #ef4444; background: #fef2f2; padding: 2px 8px; border-radius: 4px; font-size: 13px; }
-.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-.page-header h1 { font-size: 22px; font-weight: 600; color: #1a1a2e; margin: 0; }
-.stat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
-.stat-card { background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-.stat-num { font-size: 28px; font-weight: 700; color: #1a1a2e; }
-.stat-label { font-size: 13px; color: #999; margin-top: 4px; }
-.card { background: #fff; border-radius: 10px; padding: 24px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-.card h3 { font-size: 16px; font-weight: 600; margin: 0 0 16px; color: #1a1a2e; }
-.data-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-.data-table th { text-align: left; padding: 10px 12px; background: #f9fafb; color: #6b7280; font-weight: 500; font-size: 13px; border-bottom: 1px solid #e5e7eb; }
-.data-table td { padding: 12px; border-bottom: 1px solid #f3f4f6; color: #374151; }
-.data-table tr:hover td { background: #f9fafb; }
-.empty { text-align: center; color: #999; padding: 40px 0; font-size: 14px; }
-.pagination { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 16px; font-size: 14px; }
-.pagination button { padding: 6px 14px; border: 1px solid #d1d5db; border-radius: 6px; background: #fff; cursor: pointer; }
-.pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
-.btn-primary { padding: 8px 20px; background: #1a73e8; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
-.btn-primary:hover { background: #1557b0; }
-.btn-cancel { padding: 8px 20px; background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; border-radius: 6px; cursor: pointer; font-size: 14px; }
-.btn-sm { padding: 4px 10px; font-size: 12px; border: 1px solid #d1d5db; border-radius: 4px; background: #fff; cursor: pointer; }
-.btn-sm:hover { background: #f3f4f6; }
-.btn-success { background: #10b981; color: #fff; border-color: #10b981; }
-.btn-success:hover { background: #059669; }
-.btn-danger { background: #ef4444; color: #fff; border-color: #ef4444; }
-.btn-danger:hover { background: #dc2626; margin-left: 6px; }
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 200; }
-.modal { background: #fff; border-radius: 12px; padding: 24px; min-width: 400px; max-width: 90vw; }
-.modal h3 { margin: 0 0 16px; font-size: 18px; }
-.modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
-.input { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
-.input:focus { outline: none; border-color: #1a73e8; box-shadow: 0 0 0 2px rgba(26,115,232,0.15); }
 </style>

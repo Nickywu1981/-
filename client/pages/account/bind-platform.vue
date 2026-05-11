@@ -84,6 +84,7 @@ const platformIcons: Record<string, string> = {
   taobao: '🛒', douyin: '🎵', pdd: '📦', kuaishou: '📱',
   xiaohongshu: '📕', tiktok: '🎬', shopee: '🛍', amazon: '📊',
 }
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <script setup lang="ts">
@@ -147,6 +148,7 @@ async function doUnbind(item: any) {
 }
 
 onMounted(() => fetchBindings())
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

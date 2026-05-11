@@ -157,6 +157,7 @@ function redoTask(item: any) {
 function viewDetail(_item: any) {
   // expand detail view if needed later
 }
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

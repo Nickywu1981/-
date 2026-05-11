@@ -122,6 +122,7 @@ function handleRedo() { task.reset(); step.value = 0; previewUrl.value = ''; upl
 onBeforeUnmount(() => {
   if (previewUrl.value) revoke(previewUrl.value)
 })
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

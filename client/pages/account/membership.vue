@@ -180,6 +180,7 @@ async function doSandboxPay() {
     toast.error('支付异常: ' + (e.message || ''));
   } finally { paying.value = false; }
 }
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

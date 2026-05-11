@@ -65,6 +65,7 @@ async function fetchData() {
 }
 
 function onPageChange(p: number) { page.value = p; fetchData(); }
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

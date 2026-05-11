@@ -48,6 +48,7 @@ async function startRender() {
   } catch(e: any) { errorMsg.value = e?.data?.msg || '渲染失败' }
   finally { processing.value = false }
 }
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 <style scoped>
 .render-workspace { max-width: 800px; margin: 0 auto; }

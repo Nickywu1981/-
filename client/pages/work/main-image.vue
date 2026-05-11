@@ -167,6 +167,7 @@ function handleRedo() {
 }
 
 onUnmounted(() => { if (previewUrl.value) revoke(previewUrl.value) })
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

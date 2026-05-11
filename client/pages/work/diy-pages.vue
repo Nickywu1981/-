@@ -80,6 +80,7 @@ async function loadTemplates() {
 
 function useTemplate(tpl: any) { router.push(`/diy/editor?templateId=${tpl.id}`) }
 function createNew() { router.push('/diy/editor') }
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

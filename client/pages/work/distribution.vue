@@ -162,6 +162,7 @@ const fetchHistory = async () => {
 }
 
 onMounted(fetchHistory)
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

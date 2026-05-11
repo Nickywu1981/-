@@ -97,4 +97,5 @@ async function submitTask() {
 function downloadImage() {
   if (resultUrl.value) { download(resultUrl.value, 'color-changed.png') }
 }
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>

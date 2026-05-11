@@ -129,6 +129,7 @@ function openDetail(item: any) {
 }
 
 onMounted(fetchWorks)
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

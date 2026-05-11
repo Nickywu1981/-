@@ -196,6 +196,7 @@ function severityLabel(s: string) {
 function handleRedo() { step.value = 0; checkResult.value = null; previews.value = []; textToCheck.value = ''; }
 
 onMounted(() => { loadTargets(); });
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

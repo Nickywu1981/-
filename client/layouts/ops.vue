@@ -59,12 +59,15 @@ const navGroups = reactive([
 const breadcrumbs = computed(() => {
   const items = [{ label: '运营后台', route: '/ops/dashboard' }]
   for (const g of navGroups) {
-    const it = g.items.find(i => route.path.startsWith(i.route))
+    const it = g.items.find(i => route.path === i.route || route.path.startsWith(i.route + '/'))
     if (it) { items.push({ label: g.label, route: '' }, { label: it.label, route: it.route }); break }
   }
   return items
 })
 
-function handleLogout() { router.push('/login') }
+async function handleLogout() {
+  try { await $fetch('/api/auth/logout', { method:'POST', credentials:'include' }) } catch {}
+  router.push('/login')
+}
 definePageMeta({ middleware: ['auth'] })
 </script>

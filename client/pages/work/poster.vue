@@ -389,6 +389,7 @@ const toast = useToast();
 onBeforeUnmount(() => {
   clearInterval(pollTimer);
 });
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

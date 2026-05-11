@@ -72,6 +72,7 @@ async function submitTask() {
 const { download } = useFileDownload()
 function downloadImage() { if (resultUrl.value) download(resultUrl.value, 'text-effect.png') }
 function resetAll() { step.value = 0; text.value = ''; resultUrl.value = ''; processing.value = false }
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

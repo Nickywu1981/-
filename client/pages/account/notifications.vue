@@ -86,6 +86,7 @@ async function markAll() {
 }
 
 onMounted(fetchList)
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

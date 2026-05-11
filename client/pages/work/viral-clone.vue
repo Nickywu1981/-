@@ -136,6 +136,7 @@ async function submitTask() {
   } finally { submitting.value = false; }
 }
 function handleRedo() { task.reset(); step.value = 0; refVideoUrl.value = ''; productImageUrl.value = ''; uploadedRefUrl.value = ''; uploadedProductUrl.value = ''; }
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

@@ -294,6 +294,7 @@ onMounted(() => {
 onUnmounted(() => {
   if (toastTimer) { clearTimeout(toastTimer); toastTimer = null; }
 });
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

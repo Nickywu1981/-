@@ -95,4 +95,5 @@ const saveProfile = async () => {
   } catch { toast.error('保存失败') }
   saving.value = false
 }
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>

@@ -2,7 +2,7 @@ export default defineNuxtConfig({
   ssr: true, // 启用 SSR 确保页面正常渲染
   devtools: { enabled: process.env.NODE_ENV !== 'production' },
 
-  css: ['@/assets/css/design-tokens.css'],
+  css: ['@/assets/css/design-tokens.css', '@/assets/css/unified-design-system.css'],
 
   app: {
     // Smooth page transitions for workspace navigation

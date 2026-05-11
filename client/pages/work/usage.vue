@@ -141,6 +141,7 @@ async function fetchAll() {
 
 onMounted(() => fetchAll())
 onUnmounted(() => { modelChart?.dispose(); typeChart?.dispose() })
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

@@ -102,4 +102,5 @@ function handleReset() {
   task.reset()
   currentStep.value = 1
 }
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>

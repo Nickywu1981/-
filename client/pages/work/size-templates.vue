@@ -44,6 +44,7 @@ const selectPlatform = (p: any) => { selected.value = p }
 const useTemplate = (s: any) => {
   router.push(`/work/main-image?w=${s.width}&h=${s.height || s.width}`)
 }
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 <style scoped>
 .size-templates-page { max-width: 1200px; margin: 0 auto; padding: 40px 24px; }

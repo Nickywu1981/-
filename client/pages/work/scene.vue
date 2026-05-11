@@ -107,6 +107,7 @@ async function submitTask() {
 function handleRedo() { task.reset(); step.value = 0; previewUrl.value = ''; uploadedUrl.value = ''; selectedScene.value = ''; }
 
 onUnmounted(() => { if (previewUrl.value) revoke(previewUrl.value) })
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

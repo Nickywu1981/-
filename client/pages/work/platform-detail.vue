@@ -193,6 +193,7 @@ async function submitTask() {
 function handleRedo() { task.reset(); step.value = 0; previews.value = []; selectedPlatform.value = ''; selectedTemplate.value = ''; }
 
 onMounted(() => { loadPlatforms(); });
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

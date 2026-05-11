@@ -218,6 +218,7 @@ onMounted(() => {
   fetchTeam()
   fetchCommissions()
 })
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

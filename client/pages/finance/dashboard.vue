@@ -1,0 +1,92 @@
+<!-- 财务后台仪表盘 -->
+<template>
+  <div class="pg">
+    <div class="page-header">
+      <div>
+        <h1 class="page-header-title">财务看板</h1>
+        <p class="page-header-subtitle">平台财务数据总览</p>
+      </div>
+      <div class="page-header-actions">
+        <select class="select" style="width:140px;">
+          <option>本月</option><option>上月</option><option>本季</option><option>本年</option>
+        </select>
+        <button class="btn btn-gradient btn-sm">导出报表</button>
+      </div>
+    </div>
+
+    <div class="stat-grid">
+      <div v-for="kpi in kpis" :key="kpi.key" class="stat-card">
+        <div class="stat-card-value">{{ kpi.value }}</div>
+        <div class="stat-card-label">{{ kpi.label }}</div>
+        <div class="stat-card-trend" :class="kpi.up ? 'up' : 'down'">{{ kpi.up ? '↑' : '↓' }} {{ kpi.change }}</div>
+      </div>
+    </div>
+
+    <div class="dashboard-grid" style="margin-top: var(--space-6)">
+      <div class="chart-card col-8">
+        <div class="chart-card-header"><span class="chart-card-title">收支趋势</span></div>
+        <div class="chart-card-body" style="min-height:260px;display:flex;align-items:center;justify-content:center;color:var(--text-tertiary);">📈 收支折线图 — 待接入</div>
+      </div>
+      <div class="chart-card col-4">
+        <div class="chart-card-header"><span class="chart-card-title">收入构成</span></div>
+        <div class="chart-card-body" style="min-height:260px;">
+          <div v-for="s in sources" :key="s.name" style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;">
+            <span>{{ s.name }}</span><span style="font-weight:500;">¥{{ s.amount }}</span>
+          </div>
+          <hr class="divider" />
+          <div style="display:flex;justify-content:space-between;font-weight:600;font-size:14px;"><span>合计</span><span>¥{{ totalIncome }}</span></div>
+        </div>
+      </div>
+      <div class="chart-card col-12">
+        <div class="chart-card-header">
+          <span class="chart-card-title">最近交易明细</span>
+          <NuxtLink to="/finance/orders" class="btn btn-ghost btn-sm">全部订单</NuxtLink>
+        </div>
+        <div class="chart-card-body" style="padding:0">
+          <div class="table-container" style="border:none;border-radius:0">
+            <table class="data-table">
+              <thead><tr><th>订单号</th><th>用户</th><th>类型</th><th>金额</th><th>佣金</th><th>时间</th><th>状态</th></tr></thead>
+              <tbody>
+                <tr v-for="o in transactions" :key="o.id">
+                  <td style="font-family:var(--font-mono);font-size:12px;">{{ o.id }}</td>
+                  <td>{{ o.user }}</td>
+                  <td>{{ o.type }}</td>
+                  <td class="text-right">¥{{ o.amount }}</td>
+                  <td class="text-right">¥{{ o.commission }}</td>
+                  <td>{{ o.time }}</td>
+                  <td><span class="badge" :class="'badge-' + o.statusType">{{ o.status }}</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+const kpis = [
+  { key: 'revenue', value: '¥1,284,960', label: '本月营收', change: '+12.5%', up: true },
+  { key: 'commission', value: '¥96,372', label: '分佣支出', change: '+8.3%', up: false },
+  { key: 'orders', value: '8,429', label: '成交订单', change: '+15.2%', up: true },
+  { key: 'arpu', value: '¥218', label: 'ARPU', change: '+3.1%', up: true },
+]
+
+const sources = [
+  { name: '套餐订阅', amount: '892,400' },
+  { name: '积分充值', amount: '284,960' },
+  { name: 'API 调用', amount: '72,600' },
+  { name: '其他收入', amount: '35,000' },
+]
+const totalIncome = computed(() => sources.reduce((s, i) => s + parseInt(i.amount.replace(',','')), 0).toLocaleString())
+
+const transactions = [
+  { id: 'ORD-20260511-001', user: '杭州潮牌', type: '企业版年', amount: '29,980', commission: '5,996', time: '2026-05-11 14:32', status: '已完成', statusType: 'success' },
+  { id: 'ORD-20260511-002', user: '深圳美妆', type: '专业版年', amount: '8,999', commission: '1,800', time: '2026-05-11 13:15', status: '已完成', statusType: 'success' },
+  { id: 'ORD-20260511-003', user: '广州服饰', type: '积分充值', amount: '500', commission: '0', time: '2026-05-11 12:08', status: '待支付', statusType: 'warning' },
+  { id: 'ORD-20260510-004', user: '义乌小商品', type: '基础版月', amount: '299', commission: '60', time: '2026-05-10 18:45', status: '已退款', statusType: 'danger' },
+]
+
+definePageMeta({ layout: 'finance', middleware: ['auth'] })
+</script>

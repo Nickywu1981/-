@@ -193,6 +193,7 @@ function onSearch() {
 
 onMounted(() => fetchData())
 onBeforeUnmount(() => { if (searchTimer) clearTimeout(searchTimer) })
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

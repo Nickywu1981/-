@@ -239,6 +239,7 @@ async function submitTask() {
 function handleRedo() { task.reset(); step.value = 0; skuList.value.forEach(s => { if (s.previewUrl) revoke(s.previewUrl) }); skuList.value = []; }
 
 onUnmounted(() => { skuList.value.forEach(s => { if (s.previewUrl) revoke(s.previewUrl) }) });
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

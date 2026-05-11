@@ -108,6 +108,7 @@ async function submitTask() {
   }
 }
 function handleRedo() { task.reset(); step.value = 0; previewUrl.value = ''; uploadedUrl.value = ''; selectedLang.value = 'en'; }
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

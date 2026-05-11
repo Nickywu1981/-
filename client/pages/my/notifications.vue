@@ -55,6 +55,7 @@ async function markAllRead() {
 }
 
 onMounted(fetchData)
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

@@ -216,6 +216,7 @@ onMounted(async () => {
   }
   loadHistory();
 });
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

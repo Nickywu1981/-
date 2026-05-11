@@ -101,6 +101,7 @@ async function submitTask() {
   }
 }
 function handleRedo() { task.reset(); step.value = 0; if (previewUrl.value) revoke(previewUrl.value); previewUrl.value = ''; uploadedUrl.value = ''; }
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

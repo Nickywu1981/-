@@ -130,6 +130,7 @@ function downloadResult() {
 }
 
 function resetAll() { previewUrl.value = ''; resultUrl.value = '' }
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

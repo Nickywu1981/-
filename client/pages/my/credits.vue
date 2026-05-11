@@ -79,6 +79,7 @@ const fetchAll = async () => {
 const formatTime = (t: string) => t ? new Date(t).toLocaleString('zh-CN') : ''
 
 onMounted(fetchAll)
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

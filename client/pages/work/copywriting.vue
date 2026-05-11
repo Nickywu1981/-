@@ -317,6 +317,7 @@ const copyText = async (text: string) => {
   const ok = await copyToClipboard(text);
   if (ok) ElMessage.success('已复制');
 }
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

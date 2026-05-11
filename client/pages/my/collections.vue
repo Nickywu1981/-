@@ -78,6 +78,7 @@ async function deleteCollection(id: number) {
 }
 
 onMounted(fetchData);
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

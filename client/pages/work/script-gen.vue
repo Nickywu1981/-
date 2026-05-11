@@ -158,6 +158,7 @@ async function submitTask() {
 function handleRedo() { task.reset(); step.value = 0; productInfo.value = ''; selectedType.value = 'short_video'; selectedLang.value = 'zh'; }
 
 onMounted(() => { loadLanguages(); });
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

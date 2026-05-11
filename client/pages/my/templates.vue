@@ -85,6 +85,7 @@ async function deleteTemplate(id: number) {
 }
 
 onMounted(() => loadTemplates());
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

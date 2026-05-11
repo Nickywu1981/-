@@ -102,6 +102,7 @@ async function submitTask() {
 const { download } = useFileDownload()
 function downloadImage() { if (resultUrl.value) download(resultUrl.value, 'model-generate.png') }
 function resetAll() { step.value = 0; previewUrl.value = ''; uploadedUrl.value = ''; resultUrl.value = ''; processing.value = false }
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

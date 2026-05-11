@@ -159,6 +159,7 @@ onMounted(() => {
   fetchAccount()
   fetchTransactions()
 })
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

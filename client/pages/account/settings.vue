@@ -166,6 +166,7 @@ async function unbindPhone() {
   } catch (e: any) { phoneMsg.value = e?.data?.msg || '解绑失败'; phoneMsgErr.value = true; }
   phoneSaving.value = false;
 }
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

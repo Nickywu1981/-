@@ -202,6 +202,7 @@ const copyText = async (text: string) => {
 }
 
 onMounted(() => { loadTier(); loadPerformance(); });
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

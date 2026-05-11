@@ -154,6 +154,7 @@ onBeforeUnmount(() => {
   if (previewUrl.value) revoke(previewUrl.value)
   if (facePreviewUrl.value) revoke(facePreviewUrl.value)
 })
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

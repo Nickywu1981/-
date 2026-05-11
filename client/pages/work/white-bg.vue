@@ -206,6 +206,7 @@ function downloadResult() {
 function resetAll() { stopPolling(); currentStep.value = 0; taskStatus.value = -1; resultUrl.value = ''; clearImage() }
 
 onUnmounted(() => stopPolling())
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

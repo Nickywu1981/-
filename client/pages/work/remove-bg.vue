@@ -225,6 +225,7 @@ function resetAll() {
 }
 
 onUnmounted(() => stopPolling())
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

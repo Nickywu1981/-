@@ -51,13 +51,14 @@ const navGroups = reactive([
 const breadcrumbs = computed(() => {
   const items = [{ label: '代理端', route: '/agent/dashboard' }]
   for (const g of navGroups) {
-    const it = g.items.find(i => route.path.startsWith(i.route))
+    const it = g.items.find(i => route.path === i.route || route.path.startsWith(i.route + '/'))
     if (it) { items.push({ label: g.label, route: '' }, { label: it.label, route: it.route }); break }
   }
   return items
 })
 
-function handleLogout() {
+async function handleLogout() {
+  try { await $fetch('/api/auth/logout', { method:'POST', credentials:'include' }) } catch {}
   router.push('/login')
 }
 

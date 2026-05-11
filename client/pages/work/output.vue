@@ -59,6 +59,7 @@ function exportAll() {
 
 const _timeoutIds: ReturnType<typeof setTimeout>[] = []
 onUnmounted(() => { _timeoutIds.forEach(clearTimeout); _timeoutIds.length = 0 })
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 <style scoped>
 .output-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }

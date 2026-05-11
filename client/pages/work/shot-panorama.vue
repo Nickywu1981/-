@@ -91,6 +91,7 @@ async function submitTask() {
 const { download } = useFileDownload()
 function downloadImage() { if (resultUrl.value) download(resultUrl.value, 'panorama.png') }
 function resetAll() { step.value = 0; previewUrl.value = ''; uploadedUrl.value = ''; resultUrl.value = ''; processing.value = false }
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

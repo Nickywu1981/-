@@ -97,6 +97,7 @@ async function fetchProfile() {
 }
 
 onMounted(fetchProfile);
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

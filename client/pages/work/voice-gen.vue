@@ -79,6 +79,7 @@ async function handleGenerate() {
 }
 
 function handleRedo() { task.reset(); currentStep.value = 0; submitting.value = false }
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

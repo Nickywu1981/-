@@ -94,6 +94,7 @@ const removeFavorite = async (id: number) => {
 
 watch(page, fetchFavorites)
 onMounted(fetchFavorites)
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

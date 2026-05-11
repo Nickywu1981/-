@@ -68,6 +68,7 @@ const viewDetail = (item: any) => {
 const formatTime = (t: string) => t ? new Date(t).toLocaleString('zh-CN') : ''
 
 onMounted(fetchAll)
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

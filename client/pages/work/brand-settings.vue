@@ -91,4 +91,5 @@ const onLogoChange = async (e: Event) => {
     toast.error(e?.data?.msg || 'Logo 上传失败')
   } finally { logoUploading.value = false }
 }
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>

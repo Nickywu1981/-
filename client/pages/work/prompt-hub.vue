@@ -179,4 +179,5 @@ const doFill = async () => {
 }
 
 onMounted(fetchAll)
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>

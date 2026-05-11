@@ -61,6 +61,7 @@ async function fetchTemplates() {
 }
 
 onMounted(fetchTemplates)
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>
