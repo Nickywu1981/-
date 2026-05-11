@@ -207,4 +207,16 @@ onMounted(async () => {
 @media (max-width: 480px) {
   .wh-quick { grid-template-columns: 1fr 1fr; }
 }
+
+/* Dark mode */
+:root[data-theme="dark"] .wh-greet, :root.dark .wh-greet { color: #e5e5e5; }
+:root[data-theme="dark"] .wh-qcard, :root.dark .wh-qcard { background: #1a1a1a; border-color: #2a2a2a; }
+:root[data-theme="dark"] .wh-qname, :root.dark .wh-qname { color: #e5e5e5; }
+:root[data-theme="dark"] .wh-sec-title, :root.dark .wh-sec-title,
+:root[data-theme="dark"] .wh-recent-hd h3, :root.dark .wh-recent-hd h3 { color: #e5e5e5; }
+:root[data-theme="dark"] .wh-recent-item, :root.dark .wh-recent-item { background: #1a1a1a; border-color: #2a2a2a; }
+:root[data-theme="dark"] .wh-recent-name, :root.dark .wh-recent-name { color: #e5e5e5; }
+:root[data-theme="dark"] .wh-sk-card, :root.dark .wh-sk-card { background: #1a1a1a; border-color: #2a2a2a; }
+:root[data-theme="dark"] .wh-sk-line, :root.dark .wh-sk-line,
+:root[data-theme="dark"] .wh-sk-item, :root.dark .wh-sk-item { background: #2a2a2a; }
 </style>

@@ -41,4 +41,10 @@ defineProps<{
 }
 .wp-btn:hover { opacity: 0.9; transform: translateY(-1px); }
 .wp-btn:focus-visible { outline: 2px solid var(--brand, #5b5fe3); outline-offset: 2px; }
+
+/* Dark mode */
+:root[data-theme="dark"] .wp-card h2, :root.dark .wp-card h2 { color: #e5e5e5; }
+:root[data-theme="dark"] .wp-card p, :root.dark .wp-card p { color: #9d9da3; }
+:root[data-theme="dark"] .wp-detail, :root.dark .wp-detail { color: #7d7d83 !important; }
+:root[data-theme="dark"] .wp-progress-bar, :root.dark .wp-progress-bar { background: #2a2a2a; }
 </style>

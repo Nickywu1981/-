@@ -215,4 +215,13 @@ async function handleSubmit() {
 .wc-loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 0; color: var(--tx2, #6b6b70); font-size: 13px; gap: 12px; }
 .spinner { width: 32px; height: 32px; border: 3px solid var(--brd, #ebebea); border-top-color: var(--brand, #5b5fe3); border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* Dark mode */
+:root[data-theme="dark"] .wc-input, :root.dark .wc-input { background: #1a1a1a; border-color: #2a2a2a; }
+:root[data-theme="dark"] .wc-textarea, :root.dark .wc-textarea { color: #e5e5e5; }
+:root[data-theme="dark"] .wc-tab, :root.dark .wc-tab { color: #9d9da3; }
+:root[data-theme="dark"] .wc-tab:hover, :root.dark .wc-tab:hover { background: rgba(255,255,255,0.06); color: #e5e5e5; }
+:root[data-theme="dark"] .wc-card, :root.dark .wc-card { background: #1a1a1a; border-color: #2a2a2a; }
+:root[data-theme="dark"] .wc-card-title, :root.dark .wc-card-title,
+:root[data-theme="dark"] .wc-sec-title, :root.dark .wc-sec-title { color: #e5e5e5; }
 </style>
