@@ -3,6 +3,10 @@
     <h1 class="page-title">账户设置</h1>
 
     <div v-if="loading" class="empty">加载中...</div>
+    <div v-else-if="loadError" class="empty">
+      <p>企业信息加载失败</p>
+      <button class="btn" @click="loadProfile">重试</button>
+    </div>
 
     <template v-else>
     <div class="form-card">
@@ -58,19 +62,22 @@ const loading = ref(true);
 const saving = ref(false);
 const msg = ref('');
 const ok = ref(false);
+const loadError = ref(false);
 
 const typeLabel = computed(() => {
   const map = { enterprise: '企业', agent: '代理商', partner: '合作伙伴' };
   return map[profile.value.type] || profile.value.type || '-';
 });
 
-onMounted(async () => {
+onMounted(() => { loadProfile(); });
+async function loadProfile() {
+  loadError.value = false; loading.value = true;
   try {
     const res = await $fetch('/api/enterprise/profile', { credentials: 'include' });
     profile.value = res.data || res;
-  } catch (e) { /* ignore */ toast.error('加载企业信息失败'); }
+  } catch (e) { loadError.value = true; toast.error('加载企业信息失败'); }
   finally { loading.value = false; }
-});
+};
 
 async function handleSave() {
   msg.value = '';

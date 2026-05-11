@@ -130,7 +130,7 @@ function editUser(u) {
 }
 
 async function handleRemove(u) {
-  if (!confirm(`确定移除子账号 "${u.nickname || u.phone}" 吗？`)) return;
+  if (!window.confirm($t('enterprise.removeUserConfirm', { name: u.nickname || u.phone }))) return;
   try {
     await $fetch(`/api/enterprise/users/${u.id}`, { method: 'DELETE', credentials: 'include' });
     loadUsers();

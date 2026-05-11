@@ -98,11 +98,11 @@ async function uploadFile(file: File) {
 
 async function handleFile(e: Event) {
   const files = (e.target as HTMLInputElement).files;
-  if (files?.length) { previewUrl.value = createBlobUrl(files[0]); await uploadFile(files[0]); }
+  if (files?.length) { if (previewUrl.value) revoke(previewUrl.value); previewUrl.value = createBlobUrl(files[0]); await uploadFile(files[0]); }
 }
 async function handleDrop(e: DragEvent) {
   const files = e.dataTransfer?.files;
-  if (files?.length) { previewUrl.value = createBlobUrl(files[0]); await uploadFile(files[0]); }
+  if (files?.length) { if (previewUrl.value) revoke(previewUrl.value); previewUrl.value = createBlobUrl(files[0]); await uploadFile(files[0]); }
 }
 
 async function submitTask() {
@@ -120,7 +120,7 @@ async function submitTask() {
     step.value = 1;
   }
 }
-function handleRedo() { task.reset(); step.value = 0; previewUrl.value = ''; uploadedUrl.value = ''; selectedColors.value = []; }
+function handleRedo() { task.reset(); step.value = 0; if (previewUrl.value) revoke(previewUrl.value); previewUrl.value = ''; uploadedUrl.value = ''; selectedColors.value = []; }
 </script>
 
 <style scoped>
