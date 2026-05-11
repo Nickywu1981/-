@@ -53,6 +53,7 @@ vi.mock('../../dao/creditDao.js', () => ({
   getMembership: vi.fn().mockResolvedValue({ plan_type: 0, end_time: null }),
   createCreditRecord: vi.fn().mockResolvedValue({ id: 1 }),
   insertConsumptionLog: vi.fn().mockResolvedValue({ id: 1 }),
+  updateCreditBalance: vi.fn().mockResolvedValue(undefined),
   listActivePlans: vi.fn().mockResolvedValue([
     { plan_type: 1, name: '月卡', price: '29.00', original_price: '39.00', credits: 300, daily_credits: 5, save_days: 30 },
     { plan_type: 2, name: '季卡', price: '69.00', original_price: '99.00', credits: 1000, daily_credits: 10, save_days: 90 },

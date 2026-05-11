@@ -54,7 +54,7 @@
           <select v-model="form.bankAccountId">
             <option :value="null">{{ $t('enterprise.finance.withdrawal.applyAccountPlaceholder') }}</option>
             <option v-for="acc in bankAccounts" :key="acc.id" :value="acc.id">
-              {{ acc.account_name }} - {{ acc.bank_name || acc.account_type }} (***{{ acc.account_no.slice(-4) }})
+              {{ acc.account_name }} - {{ acc.bank_name || acc.account_type }} (***{{ acc.account_no?.slice(-4) || '****' }})
             </option>
           </select>
         </div>

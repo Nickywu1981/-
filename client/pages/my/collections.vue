@@ -18,7 +18,7 @@
 
     <div v-else-if="collections.length" class="grid">
       <div v-for="c in collections" :key="c.id" class="card">
-        <div class="card-cover">{{ c.name.slice(0, 1) }}</div>
+        <div class="card-cover">{{ c.name?.slice(0, 1) || '?' }}</div>
         <div class="card-name">{{ c.name }}</div>
         <div class="card-desc">{{ c.description || '暂无描述' }}</div>
         <div class="card-meta">{{ c.item_count || 0 }} 项 · {{ c.is_public ? '公开' : '私密' }}</div>
