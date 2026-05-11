@@ -91,7 +91,7 @@ async function handleSubmit() {
     showForm.value = false;
     form.value = { accountType: 'bank', accountName: '', accountNo: '', bankName: '', bankBranch: '', isDefault: false };
     loadAccounts();
-  } catch (e) { modalError.value = e.data?.msg || e.message || '绑定失败'; }
+  } catch (e) { modalError.value = e?.data?.msg || e.message || '绑定失败'; }
   finally { submitting.value = false; }
 }
 
@@ -100,7 +100,7 @@ async function handleRemove(acc) {
   try {
     await api.delete(`/enterprise/finance/bank-accounts/${acc.id}`);
     loadAccounts();
-  } catch (e) { alert(e.data?.msg || e.message || '解绑失败'); }
+  } catch (e) { alert(e?.data?.msg || e.message || '解绑失败'); }
 }
 
 function typeLabel(t) { const m = { bank: '银行卡', wechat: '微信', alipay: '支付宝' }; return m[t] || t; }

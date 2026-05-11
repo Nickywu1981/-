@@ -114,9 +114,9 @@ async function uploadFile(file: File, type: string) {
   const formData = new FormData(); formData.append('file', file)
   try {
     const res: any = await $fetch('/api/upload/image', { method: 'POST', credentials: 'include', body: formData })
-    if (type === 'source') uploadedSourceUrl.value = res.data.url
-    else uploadedTargetUrl.value = res.data.url
-  } catch (e: any) { toast.error(e.data?.msg || '上传失败') }
+    if (type === 'source') uploadedSourceUrl.value = res.data?.url
+    else uploadedTargetUrl.value = res.data?.url
+  } catch (e: any) { toast.error(e?.data?.msg || '上传失败') }
   if (type === 'source') uploadingSrc.value = false
   else uploadingTgt.value = false
 }

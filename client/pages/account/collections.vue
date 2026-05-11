@@ -118,7 +118,7 @@ async function fetchData() {
     list.value = res.data?.list || res.data || []
     total.value = res.data?.total || 0
   } catch (e: any) {
-    error.value = e.data?.msg || e.message || '加载失败'
+    error.value = e?.data?.msg || e.message || '加载失败'
     toast.error(error.value)
   } finally { loading.value = false }
 }
@@ -135,7 +135,7 @@ async function createCollection() {
     toast.success('合集创建成功')
     fetchData()
   } catch (e: any) {
-    toast.error(e.data?.msg || e.message || '创建失败')
+    toast.error(e?.data?.msg || e.message || '创建失败')
   } finally { saving.value = false }
 }
 
@@ -156,7 +156,7 @@ async function saveEdit() {
     editing.value = null
     fetchData()
   } catch (e: any) {
-    toast.error(e.data?.msg || e.message || '更新失败')
+    toast.error(e?.data?.msg || e.message || '更新失败')
   }
 }
 
@@ -167,7 +167,7 @@ async function deleteItem(item: any) {
     toast.success('已删除')
     fetchData()
   } catch (e: any) {
-    toast.error(e.data?.msg || e.message || '删除失败')
+    toast.error(e?.data?.msg || e.message || '删除失败')
   }
 }
 

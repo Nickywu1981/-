@@ -55,7 +55,7 @@ async function toggle() {
       toast.success('已收藏')
     }
   } catch (e: any) {
-    toast.error(e.data?.msg || e.message || '操作失败')
+    toast.error(e?.data?.msg || e.message || '操作失败')
   } finally { saving.value = false }
 }
 

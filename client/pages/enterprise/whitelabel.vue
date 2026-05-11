@@ -61,7 +61,7 @@ async function handleSave() {
     saveMsg.value = '白标设置已保存';
   } catch (e) {
     saveOk.value = false;
-    saveMsg.value = e.data?.msg || '保存失败';
+    saveMsg.value = e?.data?.msg || '保存失败';
   } finally { saving.value = false; }
 }
 

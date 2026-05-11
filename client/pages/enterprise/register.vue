@@ -75,7 +75,7 @@ async function handleRegister() {
       error.value = res.msg || '入驻失败';
     }
   } catch (e) {
-    error.value = e.data?.msg || '入驻失败，请检查网络';
+    error.value = e?.data?.msg || '入驻失败，请检查网络';
   } finally {
     loading.value = false;
   }

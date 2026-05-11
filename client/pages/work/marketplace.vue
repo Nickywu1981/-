@@ -119,7 +119,7 @@ async function fetchData() {
     list.value = res.data?.list || []
     total.value = res.data?.total || 0
   } catch (e: any) {
-    error.value = e.data?.msg || e.message || '加载失败'
+    error.value = e?.data?.msg || e.message || '加载失败'
     toast.error(error.value)
   } finally { loading.value = false }
 }

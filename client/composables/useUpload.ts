@@ -31,7 +31,7 @@ export function useUpload(options?: { maxFiles?: number; acceptVideo?: boolean }
       body: formData,
       credentials: 'include',
     });
-    return res.data.url;
+    return res.data?.url;
   }
 
   async function handleFiles(files: FileList | File[]) {
@@ -61,7 +61,7 @@ export function useUpload(options?: { maxFiles?: number; acceptVideo?: boolean }
         uploadedUrls.value.push(url);
       }
     } catch (e: any) {
-      error.value = e.data?.msg || '上传失败';
+      error.value = e?.data?.msg || '上传失败';
       // 移除失败的预览
       previews.value = previews.value.slice(0, uploadedUrls.value.length);
     }

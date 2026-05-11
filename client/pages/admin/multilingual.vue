@@ -51,14 +51,14 @@ async function fetchLanguages() {
   try {
     const data: any = await $fetch('/api/multilingual/languages', { credentials: 'include' })
     languages.value = data?.data || []
-  } catch(e: any) { errorMsg.value = e.data?.msg || '加载失败'; toast.error(errorMsg.value) }
+  } catch(e: any) { errorMsg.value = e?.data?.msg || '加载失败'; toast.error(errorMsg.value) }
 }
 
 async function fetchScriptTypes() {
   try {
     const data: any = await $fetch('/api/multilingual/script-types', { credentials: 'include' })
     scriptTypes.value = data?.data || []
-  } catch(e: any) { errorMsg.value = e.data?.msg || '加载失败'; toast.error(errorMsg.value) }
+  } catch(e: any) { errorMsg.value = e?.data?.msg || '加载失败'; toast.error(errorMsg.value) }
 }
 
 async function retry() { errorMsg.value = ''; loading.value = true; await Promise.all([fetchLanguages(), fetchScriptTypes()]); loading.value = false; }

@@ -103,7 +103,7 @@ async function handlePasswordLogin() {
     await authStore.login(username.value, password.value)
     await authStore.fetchUser()
     navigateTo('/workspace')
-  } catch (e: any) { msg.value = e.data?.msg || e.message || '登录失败'; msgErr.value = true; }
+  } catch (e: any) { msg.value = e?.data?.msg || e.message || '登录失败'; msgErr.value = true; }
   finally { loading.value = false; }
 }
 
@@ -115,7 +115,7 @@ async function handleSmsLogin() {
     await api.post('/auth/login-by-code', { phone: smsPhone.value });
     await useAuthStore().fetchUser();
     navigateTo('/workspace');
-  } catch (e: any) { msg.value = e.data?.msg || '登录失败'; msgErr.value = true; }
+  } catch (e: any) { msg.value = e?.data?.msg || '登录失败'; msgErr.value = true; }
   finally { loading.value = false; }
 }
 
@@ -126,7 +126,7 @@ async function sendSmsCode(scene: string) {
     await $fetch('/api/sms/send-code', { method: 'POST', body: { phone: smsPhone.value, scene } });
     startSmsCd(60);
     msg.value = '验证码已发送'; msgErr.value = false;
-  } catch (e: any) { msg.value = e.data?.msg || '发送失败'; msgErr.value = true; }
+  } catch (e: any) { msg.value = e?.data?.msg || '发送失败'; msgErr.value = true; }
 }
 
 async function handleEmailLogin() {
@@ -137,7 +137,7 @@ async function handleEmailLogin() {
     await api.post('/auth/login-by-code', { email: emailAddr.value });
     await useAuthStore().fetchUser();
     navigateTo('/workspace');
-  } catch (e: any) { msg.value = e.data?.msg || '登录失败'; msgErr.value = true; }
+  } catch (e: any) { msg.value = e?.data?.msg || '登录失败'; msgErr.value = true; }
   finally { loading.value = false; }
 }
 
@@ -148,7 +148,7 @@ async function sendEmailCode(scene: string) {
     await $fetch('/api/email/send-code', { method: 'POST', body: { email: emailAddr.value, scene } });
     startEmailCd(60);
     msg.value = '验证码已发送'; msgErr.value = false;
-  } catch (e: any) { msg.value = e.data?.msg || '发送失败'; msgErr.value = true; }
+  } catch (e: any) { msg.value = e?.data?.msg || '发送失败'; msgErr.value = true; }
 }
 </script>
 

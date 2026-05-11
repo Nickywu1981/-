@@ -90,7 +90,7 @@ async function fetchList() {
     });
     list.value = res.data?.list || [];
     total.value = res.data?.total || 0;
-  } catch(e: any) { toast.error(e.data?.msg || '加载失败') } finally { isLoading.value = false; }
+  } catch(e: any) { toast.error(e?.data?.msg || '加载失败') } finally { isLoading.value = false; }
 }
 
 function onPageChange(p: number) { page.value = p; fetchList(); }
@@ -101,7 +101,7 @@ async function approve(item: any) {
     await $fetch(`/api/admin/tasks/${item.id}/approve`, { method: 'POST' });
     item.review_status = 1;
     if (detail.value?.id === item.id) detail.value.review_status = 1;
-  } catch(e: any) { toast.error(e.data?.msg || '加载失败') } finally { reviewing.value = false; }
+  } catch(e: any) { toast.error(e?.data?.msg || '加载失败') } finally { reviewing.value = false; }
 }
 
 async function reject(item: any) {
@@ -110,7 +110,7 @@ async function reject(item: any) {
     await $fetch(`/api/admin/tasks/${item.id}/reject`, { method: 'POST' });
     item.review_status = 2;
     if (detail.value?.id === item.id) detail.value.review_status = 2;
-  } catch(e: any) { toast.error(e.data?.msg || '加载失败') } finally { reviewing.value = false; }
+  } catch(e: any) { toast.error(e?.data?.msg || '加载失败') } finally { reviewing.value = false; }
 }
 
 function viewDetail(item: any) { detail.value = item; }

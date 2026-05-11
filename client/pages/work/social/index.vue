@@ -197,7 +197,7 @@ function doSubmit() {
       result.value = { ...res, posterType: activeType.value }
       history.value.unshift({ ...res, posterType: activeType.value })
     })
-    .catch((e) => { toast.error('生成失败: ' + (e.data?.msg || e.message || '未知错误')) })
+    .catch((e) => { toast.error('生成失败: ' + (e?.data?.msg || e.message || '未知错误')) })
     .finally(() => { submitting.value = false; if (loadingTimer === timer) { clearInterval(loadingTimer); loadingTimer = null; } })
 }
 

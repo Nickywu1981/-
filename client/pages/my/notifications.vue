@@ -35,7 +35,7 @@ async function fetchData() {
   try {
     const res: any = await $fetch('/api/notifications', { credentials: 'include' })
     list.value = res.data?.list ?? res.data ?? []
-  } catch (e: any) { error.value = e.data?.msg || e.message || '加载失败' }
+  } catch (e: any) { error.value = e?.data?.msg || e.message || '加载失败' }
   finally { loading.value = false }
 }
 

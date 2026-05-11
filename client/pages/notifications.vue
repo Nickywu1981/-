@@ -63,7 +63,7 @@ async function fetch() {
     const res: any = await $fetch('/api/notifications', { params: { page: page.value, pageSize: pageSize.value } });
     list.value = res.data?.list || [];
     total.value = res.data?.total || 0;
-  } catch (e: any) { error.value = e.data?.msg || e.message || '加载失败'; }
+  } catch (e: any) { error.value = e?.data?.msg || e.message || '加载失败'; }
   finally { loading.value = false; }
 }
 

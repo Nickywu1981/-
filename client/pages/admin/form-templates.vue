@@ -73,7 +73,7 @@ async function saveForm() {
     }
     showModal.value = false
     fetchData()
-  } catch(e: any) { toast.error(e.data?.msg || '保存失败') }
+  } catch(e: any) { toast.error(e?.data?.msg || '保存失败') }
   saving.value = false
 }
 async function deleteItem(id: number) {
@@ -81,7 +81,7 @@ async function deleteItem(id: number) {
   try {
     await $fetch(`/api/forms/admin/${id}`, { method: 'DELETE', credentials: 'include' })
     fetchData()
-  } catch(e: any) { toast.error(e.data?.msg || '删除失败') }
+  } catch(e: any) { toast.error(e?.data?.msg || '删除失败') }
 }
 onMounted(fetchData)
 </script>

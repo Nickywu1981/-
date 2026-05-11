@@ -105,7 +105,7 @@ async function fetchData() {
     const res: any = await $fetch(`/api/recharge/admin/orders?${params.toString()}`)
     if (res?.code === 200) { list.value = res.data?.list || []; total.value = res.data?.total || 0 }
     else { list.value = res.data || []; total.value = list.value.length }
-  } catch (e: any) { error.value = e.data?.msg || e.message || '加载失败'; toast.error(error.value) } finally { loading.value = false }
+  } catch (e: any) { error.value = e?.data?.msg || e.message || '加载失败'; toast.error(error.value) } finally { loading.value = false }
 }
 
 function search() { page.value = 1; fetchData() }
@@ -118,7 +118,7 @@ async function refund(o: any) {
     const res: any = await $fetch(`/api/recharge/admin/refund/${o.order_no}`, { method: 'POST' })
     if (res?.code === 200 || res?.code === 0) { o.pay_status = 3; toast.success('退款成功') }
     else { toast.error(res?.msg || '退款失败') }
-  } catch (e: any) { toast.error(e.data?.msg || e.message || '退款失败') }
+  } catch (e: any) { toast.error(e?.data?.msg || e.message || '退款失败') }
 }
 </script>
 

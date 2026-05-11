@@ -141,7 +141,7 @@ async function uploadFile(file: File) {
     })
     uploadedUrl.value = res.data?.url || previewUrl.value
   } catch (e: any) {
-    uploadErr.value = e.data?.msg || '上传失败'
+    uploadErr.value = e?.data?.msg || '上传失败'
   } finally { uploading.value = false }
 }
 
@@ -175,7 +175,7 @@ async function startRemoveBg() {
     processing.value = false
   } catch (e: any) {
     taskStatus.value = 3
-    errorMsg.value = e.data?.msg || '处理失败'
+    errorMsg.value = e?.data?.msg || '处理失败'
     processing.value = false
   }
 }

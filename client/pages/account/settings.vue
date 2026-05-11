@@ -115,7 +115,7 @@ async function saveProfile() {
   try {
     await $fetch('/api/user/profile', { method: 'PUT', body: { nickname: form.nickname, phone: form.phone, email: form.email } });
     msg.value = '保存成功'; msgErr.value = false;
-  } catch (e: any) { msg.value = e.data?.msg || '保存失败'; msgErr.value = true; }
+  } catch (e: any) { msg.value = e?.data?.msg || '保存失败'; msgErr.value = true; }
   saving.value = false;
 }
 
@@ -126,7 +126,7 @@ async function savePassword() {
     await $fetch('/api/user/change-password', { method: 'PUT', body: { oldPassword: pw.oldPassword, newPassword: pw.newPassword } });
     pwMsg.value = '密码修改成功'; pwMsgErr.value = false;
     pw.oldPassword = ''; pw.newPassword = '';
-  } catch (e: any) { pwMsg.value = e.data?.msg || '修改失败'; pwMsgErr.value = true; }
+  } catch (e: any) { pwMsg.value = e?.data?.msg || '修改失败'; pwMsgErr.value = true; }
   pwSaving.value = false;
 }
 
@@ -139,7 +139,7 @@ async function sendBindCode() {
     await $fetch('/api/sms/send-code', { method: 'POST', body: { phone: phoneForm.phone, scene: 'bind_phone' } });
     phoneMsg.value = '验证码已发送'; phoneMsgErr.value = false;
     startCodeCd(60);
-  } catch (e: any) { phoneMsg.value = e.data?.msg || '发送失败'; phoneMsgErr.value = true; }
+  } catch (e: any) { phoneMsg.value = e?.data?.msg || '发送失败'; phoneMsgErr.value = true; }
 }
 
 async function bindPhone() {
@@ -153,7 +153,7 @@ async function bindPhone() {
     form.phone = phoneForm.phone;
     phoneForm.phone = ''; phoneForm.code = '';
     phoneMsg.value = '手机号绑定成功'; phoneMsgErr.value = false;
-  } catch (e: any) { phoneMsg.value = e.data?.msg || '绑定失败'; phoneMsgErr.value = true; }
+  } catch (e: any) { phoneMsg.value = e?.data?.msg || '绑定失败'; phoneMsgErr.value = true; }
   phoneSaving.value = false;
 }
 
@@ -163,7 +163,7 @@ async function unbindPhone() {
     await $fetch('/api/user/profile', { method: 'PUT', body: { phone: '' } });
     boundPhone.value = ''; form.phone = ''; unbinding.value = false;
     phoneMsg.value = '已解绑'; phoneMsgErr.value = false;
-  } catch (e: any) { phoneMsg.value = e.data?.msg || '解绑失败'; phoneMsgErr.value = true; }
+  } catch (e: any) { phoneMsg.value = e?.data?.msg || '解绑失败'; phoneMsgErr.value = true; }
   phoneSaving.value = false;
 }
 </script>

@@ -137,7 +137,7 @@ async function fetchData() {
       total.value = list.value.length
     }
   } catch (e: any) {
-    error.value = e.data?.msg || e.message || '加载失败'
+    error.value = e?.data?.msg || e.message || '加载失败'
     toast.error(error.value)
   } finally {
     loading.value = false
@@ -173,7 +173,7 @@ async function save() {
       toast.error(res?.msg || '保存失败')
     }
   } catch (e: any) {
-    toast.error(e.data?.msg || e.message || '保存失败')
+    toast.error(e?.data?.msg || e.message || '保存失败')
   } finally {
     saving.value = false
   }
@@ -204,7 +204,7 @@ async function delForm(id: number) {
       toast.error(res?.msg || '删除失败')
     }
   } catch (e: any) {
-    toast.error(e.data?.msg || e.message || '删除失败')
+    toast.error(e?.data?.msg || e.message || '删除失败')
   }
 }
 </script>

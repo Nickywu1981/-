@@ -183,7 +183,7 @@ async function doWithdraw() {
       toast.error(res.msg || '提现失败')
     }
   } catch (e: any) {
-    toast.error(e.data?.msg || '提现失败')
+    toast.error(e?.data?.msg || '提现失败')
   }
   withdrawing.value = false
 }

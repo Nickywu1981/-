@@ -224,7 +224,7 @@ async function uploadFile(item: FileItem): Promise<{ url: string }> {
     formData.append('file', item.file)
     const res: any = await $fetch(`${apiBase}/upload/simple`, { method: 'POST', body: formData })
     if (res.code !== 200) throw new Error(res.msg)
-    return { url: res.data.file_url }
+    return { url: res.data?.file_url }
   }
 
   // 大文件分片上传

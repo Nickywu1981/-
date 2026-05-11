@@ -82,7 +82,7 @@ async function handleSave() {
     msg.value = '设置已保存';
   } catch (e) {
     ok.value = false;
-    msg.value = e.data?.msg || '保存失败';
+    msg.value = e?.data?.msg || '保存失败';
   } finally { saving.value = false; }
 }
 

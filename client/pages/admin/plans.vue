@@ -147,7 +147,7 @@ async function fetchPlans() {
     const res: any = await $fetch(`/api/admin/plans?${params}`);
     plans.value = res.data?.list || res.data || [];
     total.value = res.data?.total || plans.value.length;
-  } catch(e: any) { toast.error(e.data?.msg || '加载失败') }
+  } catch(e: any) { toast.error(e?.data?.msg || '加载失败') }
   isLoading.value = false;
 }
 
@@ -164,7 +164,7 @@ async function savePlan(plan: any) {
       },
     });
     showMsg('已保存');
-  } catch (e: any) { msg.value = e.data?.msg || '保存失败'; }
+  } catch (e: any) { msg.value = e?.data?.msg || '保存失败'; }
   saving.value = 0;
 }
 
@@ -181,7 +181,7 @@ async function createPlan() {
     await $fetch('/api/admin/plans', { method: 'POST', body: newPlan.value });
     showCreate.value = false; showMsg('套餐已创建');
     fetchPlans();
-  } catch (e: any) { msg.value = e.data?.msg || '创建失败'; }
+  } catch (e: any) { msg.value = e?.data?.msg || '创建失败'; }
   creating.value = false;
 }
 
@@ -193,7 +193,7 @@ async function doDelete() {
     await $fetch(`/api/admin/plans/${deleteTarget.value.id}`, { method: 'DELETE' });
     showDelete.value = false; showMsg('套餐已删除');
     fetchPlans();
-  } catch (e: any) { msg.value = e.data?.msg || '删除失败'; }
+  } catch (e: any) { msg.value = e?.data?.msg || '删除失败'; }
   deleting.value = false;
 }
 

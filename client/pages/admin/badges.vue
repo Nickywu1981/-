@@ -132,7 +132,7 @@ async function fetchData() {
     list.value = body?.list || body || [];
     if (!Array.isArray(list.value)) list.value = [];
     total.value = body?.total || 0;
-  } catch (e: any) { toast.error(e.data?.msg || e?.message || '加载失败') } finally { loading.value = false; }
+  } catch (e: any) { toast.error(e?.data?.msg || e?.message || '加载失败') } finally { loading.value = false; }
 
 }
 
@@ -171,7 +171,7 @@ async function save() {
     }
     showModal.value = false;
     fetchData();
-  } catch (e: any) { toast.error('保存失败: ' + (e.data?.msg || e.message || '网络错误')); }
+  } catch (e: any) { toast.error('保存失败: ' + (e?.data?.msg || e.message || '网络错误')); }
 }
 
 async function toggleStatus(b: any) {
@@ -182,7 +182,7 @@ async function toggleStatus(b: any) {
       body: JSON.stringify({ status: b.status === 1 ? 0 : 1 }),
     });
     fetchData();
-  } catch (e: any) { toast.error('操作失败: ' + (e.data?.msg || e.message || '网络错误')); }
+  } catch (e: any) { toast.error('操作失败: ' + (e?.data?.msg || e.message || '网络错误')); }
 }
 
 async function confirmDelete(b: any) {
@@ -193,7 +193,7 @@ async function confirmDelete(b: any) {
       credentials: 'include',
     });
     fetchData();
-  } catch (e: any) { toast.error('删除失败: ' + (e.data?.msg || e.message || '网络错误')); }
+  } catch (e: any) { toast.error('删除失败: ' + (e?.data?.msg || e.message || '网络错误')); }
 }
 
 function categoryLabel(c: string) {

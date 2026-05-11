@@ -78,7 +78,7 @@ async function save() {
     if (editing.value.id) { body.id = editing.value.id; body.templateCode = editing.value.template_code }
     await $fetch('/api/admin/prompts', { method:'POST', credentials:'include', body: JSON.stringify(body) })
     showModal.value = false; fetchData()
-  } catch(e: any) { toast.error(e.data?.msg || '保存失败') }
+  } catch(e: any) { toast.error(e?.data?.msg || '保存失败') }
   saving.value = false
 }
 async function review(id: number, status: number) {
@@ -86,14 +86,14 @@ async function review(id: number, status: number) {
   try {
     await $fetch(`/api/admin/prompts/${id}/review`, { method:'PUT', credentials:'include', body: JSON.stringify({ status, reviewRemark: status===3?'管理员操作':'' }) })
     fetchData()
-  } catch(e: any) { toast.error(e.data?.msg || '操作失败') }
+  } catch(e: any) { toast.error(e?.data?.msg || '操作失败') }
 }
 async function deleteItem(t: any) {
   if (!await confirm({ message: `确认删除「${t.title}」？`)) return
   try {
     await $fetch(`/api/admin/prompts/${t.id}`, { method:'DELETE', credentials:'include' })
     fetchData()
-  } catch(e: any) { toast.error(e.data?.msg || '删除失败') }
+  } catch(e: any) { toast.error(e?.data?.msg || '删除失败') }
 }
 </script>
 <style scoped>

@@ -231,7 +231,7 @@ async function submitTask() {
       },
     });
     task.pollTask((res as any).data.taskId);
-  } catch (e: any) { toast.error(e.data?.msg || '提交失败，请重试'); step.value = 2; }
+  } catch (e: any) { toast.error(e?.data?.msg || '提交失败，请重试'); step.value = 2; }
 }
 
 function handleRedo() { task.reset(); step.value = 0; skuList.value.forEach(s => { if (s.previewUrl) revoke(s.previewUrl) }); skuList.value = []; }

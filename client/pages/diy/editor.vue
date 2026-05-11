@@ -283,7 +283,7 @@ async function savePage() {
     await $fetch(`/api/diy/${pageInfo.value.id}`, { method: 'PUT', body })
     dirty.value = false
     toast.success('保存成功')
-  } catch (e: any) { toast.error('保存失败: ' + (e.data?.msg || e.message)) }
+  } catch (e: any) { toast.error('保存失败: ' + (e?.data?.msg || e.message)) }
   finally { saving.value = false }
 }
 
@@ -301,7 +301,7 @@ async function saveVersion() {
     await $fetch(`/api/diy/${pageInfo.value.id}/versions`, { method: 'POST', body })
     dirty.value = false
     toast.success('版本已保存')
-  } catch (e: any) { toast.error('保存版本失败: ' + (e.data?.msg || e.message)) }
+  } catch (e: any) { toast.error('保存版本失败: ' + (e?.data?.msg || e.message)) }
   finally { saving.value = false }
 }
 
@@ -311,7 +311,7 @@ async function publishPage() {
     await $fetch(`/api/diy/${pageInfo.value.id}/publish`, { method: 'POST' })
     dirty.value = false
     toast.success('发布成功！访问地址：/diy/preview?slug=' + pageInfo.value.slug)
-  } catch (e) { toast.error('发布失败: ' + (e.data?.msg || e.message)) }
+  } catch (e) { toast.error('发布失败: ' + (e?.data?.msg || e.message)) }
   finally { publishing.value = false }
 }
 

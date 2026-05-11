@@ -133,7 +133,7 @@ async function doBind(platform: any) {
       toast.error(res?.msg || '绑定失败')
     }
   } catch (e: any) {
-    toast.error(e.data?.msg || '绑定失败')
+    toast.error(e?.data?.msg || '绑定失败')
   }
   binding.value = false
 }

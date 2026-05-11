@@ -84,7 +84,7 @@ const styles = ['休闲', '商务', '甜美', '运动', '街头', '韩系'];
 async function uploadFile(file: File) {
   uploading.value = true;
   const formData = new FormData(); formData.append('file', file);
-  try { const res: any = await $fetch('/api/upload/image', { method: 'POST', credentials: 'include', body: formData }); uploadedUrl.value = res.data.url; } catch (e: any) { toast.error(e.data?.msg || '上传失败'); }
+  try { const res: any = await $fetch('/api/upload/image', { method: 'POST', credentials: 'include', body: formData }); uploadedUrl.value = res.data?.url; } catch (e: any) { toast.error(e?.data?.msg || '上传失败'); }
   uploading.value = false;
 }
 

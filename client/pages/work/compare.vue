@@ -231,7 +231,7 @@ async function handleUploadFile(e: Event) {
   const fd = new FormData(); fd.append('file', f)
   try {
     const res: any = await $fetch('/api/upload/image', { method: 'POST', credentials: 'include', body: fd })
-    uploadedUrl.value = res.data.url
+    uploadedUrl.value = res.data?.url
     uploadingMsg.value = '上传完成 ✓'
     pickerSelected.value = ''
   } catch { uploadingMsg.value = '上传失败' }
@@ -244,7 +244,7 @@ function handleUploadDrop(e: DragEvent) {
   uploadingMsg.value = '上传中...'
   const fd = new FormData(); fd.append('file', f)
   $fetch('/api/upload/image', { method: 'POST', credentials: 'include', body: fd })
-    .then((res: any) => { uploadedUrl.value = res.data.url; uploadingMsg.value = '上传完成 ✓'; pickerSelected.value = '' })
+    .then((res: any) => { uploadedUrl.value = res.data?.url; uploadingMsg.value = '上传完成 ✓'; pickerSelected.value = '' })
     .catch((e: any) => { uploadingMsg.value = '上传失败'; toast.error(e?.data?.msg || '上传失败') })
 }
 

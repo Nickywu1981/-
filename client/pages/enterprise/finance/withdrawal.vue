@@ -115,7 +115,7 @@ async function handleSubmit() {
     showForm.value = false;
     form.value = { amount: 0, bankAccountId: null };
     loadData();
-  } catch (e) { modalError.value = e.data?.msg || e.message || '提现申请失败'; }
+  } catch (e) { modalError.value = e?.data?.msg || e.message || '提现申请失败'; }
   finally { submitting.value = false; }
 }
 

@@ -156,7 +156,7 @@ async function uploadFile(file: File) {
       method: 'POST', credentials: 'include', body: form,
     })
     uploadedUrl.value = res.data?.url || previewUrl.value
-  } catch (e: any) { uploadErr.value = e.data?.msg || '上传失败' }
+  } catch (e: any) { uploadErr.value = e?.data?.msg || '上传失败' }
   finally { uploading.value = false }
 }
 
@@ -173,7 +173,7 @@ async function startWhiteBg() {
     if (taskId) { currentStep.value = 2; startPolling(taskId) }
     else { resultUrl.value = res.data?.resultUrl || uploadedUrl.value; taskStatus.value = 2 }
     processing.value = false
-  } catch (e: any) { taskStatus.value = 3; errorMsg.value = e.data?.msg || '生成失败'; processing.value = false }
+  } catch (e: any) { taskStatus.value = 3; errorMsg.value = e?.data?.msg || '生成失败'; processing.value = false }
 }
 
 function startPolling(taskId: string) {

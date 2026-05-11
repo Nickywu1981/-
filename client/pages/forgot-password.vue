@@ -55,7 +55,7 @@ async function sendCode() {
     await $fetch(url, { method: 'POST', body, credentials: 'include' })
     msg.value = '验证码已发送'; msgErr.value = false
     startCd(60)
-  } catch (e: any) { msg.value = e.data?.msg || '发送失败'; msgErr.value = true }
+  } catch (e: any) { msg.value = e?.data?.msg || '发送失败'; msgErr.value = true }
   loading.value = false
 }
 
@@ -70,7 +70,7 @@ async function doVerify() {
     await $fetch(url, { method: 'POST', body, credentials: 'include' })
     verified.value = true
     msg.value = ''; msgErr.value = false
-  } catch (e: any) { msg.value = e.data?.msg || '验证失败'; msgErr.value = true }
+  } catch (e: any) { msg.value = e?.data?.msg || '验证失败'; msgErr.value = true }
   loading.value = false
 }
 
@@ -87,7 +87,7 @@ async function doReset() {
     await $fetch('/api/auth/reset-password', { method: 'POST', body, credentials: 'include' })
     msg.value = '密码重置成功，跳转登录...'; msgErr.value = false
     navTimer.value = setTimeout(() => navigateTo('/login'), 1500)
-  } catch (e: any) { msg.value = e.data?.msg || '重置失败'; msgErr.value = true }
+  } catch (e: any) { msg.value = e?.data?.msg || '重置失败'; msgErr.value = true }
   loading.value = false
 }
 </script>

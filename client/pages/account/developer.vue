@@ -121,7 +121,7 @@ async function createKey() {
     form.description = ''
     await loadKeys()
   } catch (e: any) {
-    msg.value = e.data?.msg || e.message || '创建失败'
+    msg.value = e?.data?.msg || e.message || '创建失败'
     msgErr.value = true
   }
   creating.value = false
@@ -132,7 +132,7 @@ async function toggleKey(k: any) {
     await api.put(`/open/keys/${k.id}/toggle`, { status: k.status === 1 ? 0 : 1 })
     await loadKeys()
   } catch (e: any) {
-    msg.value = e.data?.msg || e.message || '操作失败'
+    msg.value = e?.data?.msg || e.message || '操作失败'
     msgErr.value = true
   }
 }
@@ -143,7 +143,7 @@ async function deleteKey(k: any) {
     await api.delete(`/open/keys/${k.id}`)
     await loadKeys()
   } catch (e: any) {
-    msg.value = e.data?.msg || e.message || '删除失败'
+    msg.value = e?.data?.msg || e.message || '删除失败'
     msgErr.value = true
   }
 }

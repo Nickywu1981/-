@@ -71,7 +71,7 @@ const saveSettings = async () => {
     }
   } catch(e: any) {
     task.status = 0
-    errorMsg.value = e.data?.msg || e.message || '保存失败'
+    errorMsg.value = e?.data?.msg || e.message || '保存失败'
     toast.error(errorMsg.value)
   }
 }
@@ -88,7 +88,7 @@ const onLogoChange = async (e: Event) => {
     form.logoUrl = res.data?.url || res.url || ''
     if (form.logoUrl) toast.success('Logo 上传成功')
   } catch (e: any) {
-    toast.error(e.data?.msg || 'Logo 上传失败')
+    toast.error(e?.data?.msg || 'Logo 上传失败')
   } finally { logoUploading.value = false }
 }
 </script>

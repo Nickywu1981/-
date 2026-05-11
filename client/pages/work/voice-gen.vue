@@ -73,8 +73,8 @@ async function handleGenerate() {
       body: { text: text.value, voiceType: selectedVoice.value, speed: speed.value, lang: 'zh' },
     })
     currentStep.value = 2
-    task.pollTask(res.data.taskId, '/api/adv-video/tasks/')
-  } catch (e: any) { toast.error(e.data?.msg || '提交失败') }
+    task.pollTask(res.data?.taskId, '/api/adv-video/tasks/')
+  } catch (e: any) { toast.error(e?.data?.msg || '提交失败') }
   submitting.value = false
 }
 

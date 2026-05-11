@@ -97,7 +97,7 @@ async function handleRegister() {
     const authStore = useAuthStore()
     await authStore.register(body)
     navigateTo('/workspace')
-  } catch (e: any) { msg.value = e.data?.msg || e.message || '注册失败'; msgErr.value = true; }
+  } catch (e: any) { msg.value = e?.data?.msg || e.message || '注册失败'; msgErr.value = true; }
   finally { loading.value = false; }
 }
 
@@ -113,7 +113,7 @@ async function handleSmsRegister() {
     });
     await useAuthStore().fetchUser();
     navigateTo('/workspace');
-  } catch (e: any) { msg.value = e.data?.msg || '注册失败'; msgErr.value = true; }
+  } catch (e: any) { msg.value = e?.data?.msg || '注册失败'; msgErr.value = true; }
   finally { loading.value = false; }
 }
 
@@ -124,7 +124,7 @@ async function sendSmsCode(scene: string) {
     await $fetch('/api/sms/send-code', { method: 'POST', body: { phone: smsPhone.value, scene } });
     startSmsCd(60);
     msg.value = '验证码已发送'; msgErr.value = false;
-  } catch (e: any) { msg.value = e.data?.msg || '发送失败'; msgErr.value = true; }
+  } catch (e: any) { msg.value = e?.data?.msg || '发送失败'; msgErr.value = true; }
 }
 
 async function handleEmailRegister() {
@@ -139,7 +139,7 @@ async function handleEmailRegister() {
     });
     await useAuthStore().fetchUser();
     navigateTo('/workspace');
-  } catch (e: any) { msg.value = e.data?.msg || '注册失败'; msgErr.value = true; }
+  } catch (e: any) { msg.value = e?.data?.msg || '注册失败'; msgErr.value = true; }
   finally { loading.value = false; }
 }
 
@@ -150,7 +150,7 @@ async function sendEmailCode(scene: string) {
     await $fetch('/api/email/send-code', { method: 'POST', body: { email: emailAddr.value, scene } });
     startEmailCd(60);
     msg.value = '验证码已发送'; msgErr.value = false;
-  } catch (e: any) { msg.value = e.data?.msg || '发送失败'; msgErr.value = true; }
+  } catch (e: any) { msg.value = e?.data?.msg || '发送失败'; msgErr.value = true; }
 }
 </script>
 

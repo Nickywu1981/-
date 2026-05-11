@@ -46,7 +46,7 @@ async function save() {
   try {
     const data: any = await $fetch('/api/brand', { method: 'PUT', credentials: 'include', body: form })
     showMsg(data?.msg || '保存成功')
-  } catch(e: any) { toast.error(e.data?.msg || '保存失败') }
+  } catch(e: any) { toast.error(e?.data?.msg || '保存失败') }
   saving.value = false
 }
 

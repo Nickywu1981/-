@@ -127,7 +127,7 @@ const publish = async () => {
     toast.success('发布成功！')
     fetchHistory()
   } catch (e: any) {
-    toast.error(e.data?.msg || e.message || '发布失败')
+    toast.error(e?.data?.msg || e.message || '发布失败')
   } finally {
     submitting.value = false
   }
@@ -141,12 +141,12 @@ const saveDraft = async () => {
     })
     toast.success('草稿已保存')
   } catch (e: any) {
-    toast.error(e.data?.msg || e.message || '保存草稿失败，请稍后重试')
+    toast.error(e?.data?.msg || e.message || '保存草稿失败，请稍后重试')
   }
 }
 
 const retry = async (id: number) => {
-  try { await $fetch(`/api/publish/retry/${id}`, { method: 'POST' }); fetchHistory() } catch (e: any) { toast.warn(e.data?.msg || e.message || '重试分发失败，请稍后重试') }
+  try { await $fetch(`/api/publish/retry/${id}`, { method: 'POST' }); fetchHistory() } catch (e: any) { toast.warn(e?.data?.msg || e.message || '重试分发失败，请稍后重试') }
 }
 
 const fetchHistory = async () => {

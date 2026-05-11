@@ -51,7 +51,7 @@ async function handleLogin() {
       error.value = res.msg || '登录失败';
     }
   } catch (e) {
-    error.value = e.data?.msg || '登录失败，请检查网络';
+    error.value = e?.data?.msg || '登录失败，请检查网络';
   } finally {
     loading.value = false;
   }

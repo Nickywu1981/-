@@ -142,7 +142,7 @@ async function fetchData() {
     if (!Array.isArray(list.value)) list.value = []
     total.value = data?.data?.total || list.value.length
   } catch (e: any) {
-    error.value = e.data?.msg || e.message || '加载失败'
+    error.value = e?.data?.msg || e.message || '加载失败'
     toast.error(error.value)
   } finally {
     loading.value = false
@@ -164,7 +164,7 @@ async function save() {
       }
     }
     showModal.value = false; fetchData()
-  } catch (e: any) { toast.error(e.data?.msg || '保存失败') }
+  } catch (e: any) { toast.error(e?.data?.msg || '保存失败') }
   saving.value = false
 }
 
@@ -177,7 +177,7 @@ async function toggleStatus(p: any) {
       await $fetch(`/api/diy/${p.id}/publish`, { method: 'POST', credentials: 'include' })
     }
     fetchData()
-  } catch (e: any) { toast.error(e.data?.msg || '操作失败') }
+  } catch (e: any) { toast.error(e?.data?.msg || '操作失败') }
 }
 
 async function deleteItem(id: number) {
@@ -186,7 +186,7 @@ async function deleteItem(id: number) {
     await $fetch(`/api/diy/${id}/hard-delete`, { method: 'DELETE', credentials: 'include' })
     selectedIds.value = selectedIds.value.filter(i => i !== id)
     fetchData()
-  } catch (e: any) { toast.error(e.data?.msg || '删除失败') }
+  } catch (e: any) { toast.error(e?.data?.msg || '删除失败') }
 }
 
 async function batchPublish() {
@@ -195,7 +195,7 @@ async function batchPublish() {
     await $fetch('/api/diy/batch/publish', { method: 'POST', credentials: 'include', body: { ids: selectedIds.value } })
     toast.success(`已发布 ${selectedIds.value.length} 个页面`)
     selectedIds.value = []; fetchData()
-  } catch (e: any) { toast.error(e.data?.msg || '批量发布失败') }
+  } catch (e: any) { toast.error(e?.data?.msg || '批量发布失败') }
 }
 
 async function batchUnpublish() {
@@ -204,7 +204,7 @@ async function batchUnpublish() {
     await $fetch('/api/diy/batch/unpublish', { method: 'POST', credentials: 'include', body: { ids: selectedIds.value } })
     toast.success(`已下架 ${selectedIds.value.length} 个页面`)
     selectedIds.value = []; fetchData()
-  } catch (e: any) { toast.error(e.data?.msg || '批量下架失败') }
+  } catch (e: any) { toast.error(e?.data?.msg || '批量下架失败') }
 }
 
 async function batchDelete() {
@@ -214,7 +214,7 @@ async function batchDelete() {
     await $fetch('/api/diy/batch/delete', { method: 'POST', credentials: 'include', body: { ids: selectedIds.value } })
     toast.success(`已删除 ${selectedIds.value.length} 个页面`)
     selectedIds.value = []; fetchData()
-  } catch (e: any) { toast.error(e.data?.msg || '批量删除失败') }
+  } catch (e: any) { toast.error(e?.data?.msg || '批量删除失败') }
 }
 </script>
 

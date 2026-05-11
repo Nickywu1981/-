@@ -118,9 +118,9 @@ async function uploadFile(file: File) {
       credentials: 'include',
       body: formData,
     });
-    uploadedUrl.value = res.data.url;
+    uploadedUrl.value = res.data?.url;
   } catch (e: any) {
-    toast.error(e.data?.msg || '上传失败，请重试');
+    toast.error(e?.data?.msg || '上传失败，请重试');
   }
   uploading.value = false;
 }

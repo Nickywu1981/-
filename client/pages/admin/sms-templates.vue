@@ -123,7 +123,7 @@ async function fetchTemplates() {
     const res: any = await $fetch(`/api/sms/templates?${params}`);
     templates.value = res.data?.list || res.data || [];
     total.value = res.data?.total || templates.value.length;
-  } catch(e: any) { toast.error(e.data?.msg || '加载失败') }
+  } catch(e: any) { toast.error(e?.data?.msg || '加载失败') }
   isLoading.value = false;
 }
 
@@ -135,7 +135,7 @@ async function saveTpl(tpl: any) {
       body: { name: tpl.name, content: tpl.content, provider_template_id: tpl.provider_template_id, provider: tpl.provider, status: tpl.status, remark: tpl.remark },
     });
     showMsg('已保存');
-  } catch (e: any) { msg.value = e.data?.msg || '保存失败'; }
+  } catch (e: any) { msg.value = e?.data?.msg || '保存失败'; }
   saving.value = 0;
 }
 
@@ -149,7 +149,7 @@ async function createTpl() {
     await $fetch('/api/sms/templates', { method: 'POST', body: newTpl.value });
     showCreate.value = false; showMsg('模板已创建');
     fetchTemplates();
-  } catch (e: any) { msg.value = e.data?.msg || '创建失败'; }
+  } catch (e: any) { msg.value = e?.data?.msg || '创建失败'; }
   creating.value = false;
 }
 
@@ -161,7 +161,7 @@ async function doDelete() {
     await $fetch(`/api/sms/templates/${deleteTarget.value.id}`, { method: 'DELETE' });
     showDelete.value = false; showMsg('模板已删除');
     fetchTemplates();
-  } catch (e: any) { msg.value = e.data?.msg || '删除失败'; }
+  } catch (e: any) { msg.value = e?.data?.msg || '删除失败'; }
   deleting.value = false;
 }
 

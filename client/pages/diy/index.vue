@@ -122,7 +122,7 @@ async function createPage() {
     showCreate.value = false
     form.title = ''; form.slug = ''; form.pageType = 'mobile'
     loadPages()
-  } catch (e) { toast.error('创建失败: ' + (e.data?.msg || e.message)) }
+  } catch (e) { toast.error('创建失败: ' + (e?.data?.msg || e.message)) }
 }
 
 async function publishPage(id) {

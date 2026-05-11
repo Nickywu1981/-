@@ -132,7 +132,7 @@ async function handleRemove(u) {
   try {
     await $fetch(`/api/enterprise/users/${u.id}`, { method: 'DELETE', credentials: 'include' });
     loadUsers();
-  } catch (e) { alert(e.data?.msg || '移除失败'); }
+  } catch (e) { alert(e?.data?.msg || '移除失败'); }
 }
 
 async function handleSave() {
@@ -148,7 +148,7 @@ async function handleSave() {
     }
     closeModal();
     loadUsers();
-  } catch (e) { modalError.value = e.data?.msg || '操作失败'; }
+  } catch (e) { modalError.value = e?.data?.msg || '操作失败'; }
   finally { saving.value = false; }
 }
 

@@ -135,7 +135,7 @@ async function fetchAll() {
       }
     })
   } catch (e: any) {
-    error.value = e.data?.msg || e.message || '加载失败'
+    error.value = e?.data?.msg || e.message || '加载失败'
   } finally { loading.value = false }
 }
 

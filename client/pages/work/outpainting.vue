@@ -52,7 +52,7 @@ async function startOutpaint() {
     formData.append('direction', activeDir.value)
     const data: any = await $fetch('/api/advanced/outpaint', { method: 'POST', body: formData, credentials: 'include' })
     resultUrl.value = data?.data?.url || data?.data?.result_url || ''
-  } catch(e: any) { errorMsg.value = e.data?.msg || '扩展失败' }
+  } catch(e: any) { errorMsg.value = e?.data?.msg || '扩展失败' }
   processing.value = false
 }
 </script>

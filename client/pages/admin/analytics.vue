@@ -39,7 +39,7 @@ onMounted(async () => {
   try {
     const data: any = await $fetch('/api/admin/stats', { credentials: 'include' })
     if (data?.code === 200) stats.value = data.data
-  } catch (e: any) { toast.error(e.data?.msg || '加载失败') }
+  } catch (e: any) { toast.error(e?.data?.msg || '加载失败') }
   loading.value = false
 })
 

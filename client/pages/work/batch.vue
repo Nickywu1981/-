@@ -202,7 +202,7 @@ async function uploadMultiple(files: File[]) {
       method: 'POST', credentials: 'include', body: formData,
     });
     uploadedUrls.value.push(...(res.data?.files || []).map((f: any) => f.url));
-  } catch (e: any) { toast.error(e.data?.msg || '上传失败'); }
+  } catch (e: any) { toast.error(e?.data?.msg || '上传失败'); }
   uploading.value = false;
 }
 

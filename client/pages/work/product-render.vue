@@ -45,7 +45,7 @@ async function startRender() {
     const fd = new FormData(); fd.append('image', uploadedFile.value); fd.append('mode', activeMode.value)
     const data: any = await $fetch('/api/advanced/model-generate', { method: 'POST', body: fd, credentials: 'include' })
     resultUrl.value = data?.data?.url || data?.data?.result_url || ''
-  } catch(e: any) { errorMsg.value = e.data?.msg || '渲染失败' }
+  } catch(e: any) { errorMsg.value = e?.data?.msg || '渲染失败' }
   processing.value = false
 }
 </script>

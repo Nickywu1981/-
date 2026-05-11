@@ -47,7 +47,7 @@ async function loadPage() {
     const config = isPC ? (res?.data?.pcConfig || res?.data?.mobileConfig) : (res?.data?.mobileConfig || res?.data?.pcConfig)
     sections.value = config?.sections || []
   } catch (e: any) {
-    error.value = '页面加载失败: ' + (e.data?.msg || e.message)
+    error.value = '页面加载失败: ' + (e?.data?.msg || e.message)
   } finally { loading.value = false }
 }
 

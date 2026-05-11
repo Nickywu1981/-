@@ -38,7 +38,7 @@ async function changePwd() {
     await $fetch('/api/user/change-password', { method: 'PUT', credentials: 'include', body: { oldPassword: form.value.currentPwd, newPassword: form.value.newPwd } })
     msg.value = '密码修改成功'; msgErr.value = false
     form.value = { currentPwd: '', newPwd: '', confirmPwd: '' }
-  } catch(e: any) { msg.value = e.data?.msg || '修改失败'; msgErr.value = true }
+  } catch(e: any) { msg.value = e?.data?.msg || '修改失败'; msgErr.value = true }
   finally { saving.value = false }
 }
 </script>

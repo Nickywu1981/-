@@ -145,7 +145,7 @@ async function doRedeem(points: number) {
       toast.error(res.msg || '兑换失败')
     }
   } catch (e: any) {
-    toast.error(e.data?.msg || '兑换失败')
+    toast.error(e?.data?.msg || '兑换失败')
   }
   redeeming.value = false
 }

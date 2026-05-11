@@ -79,7 +79,7 @@ async function fetchStatus() {
       error.value = d?.msg || '获取模型状态失败'
     }
   } catch (e: any) {
-    error.value = e.data?.msg || e.message || '网络错误'
+    error.value = e?.data?.msg || e.message || '网络错误'
   } finally {
     loading.value = false
   }
@@ -93,7 +93,7 @@ async function resetBreaker(modelId: string) {
     })
     await fetchStatus()
   } catch (e: any) {
-    toast.error('重置失败: ' + (e.data?.msg || e.message || '网络错误'))
+    toast.error('重置失败: ' + (e?.data?.msg || e.message || '网络错误'))
   }
 }
 
