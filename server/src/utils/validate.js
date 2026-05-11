@@ -52,7 +52,7 @@ export const paginationSchema = z.object({
 export const phoneSchema = z.string().regex(/^1[3-9]\d{9}$/, '手机号格式不正确');
 
 /** 邮箱 */
-export const emailSchema = z.string().email('邮箱格式不正确');
+export const emailSchema = z.string().email('邮箱格式不正确').max(254, '邮箱地址过长');
 
 /** 验证码 */
 export const codeSchema = z.string().length(6, '验证码为6位数字').regex(/^\d{6}$/, '验证码为6位数字');

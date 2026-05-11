@@ -47,7 +47,7 @@
           <button class="wsl-btn" @click="handleLogout">退出登录</button>
         </div>
       </header>
-      <main class="wsl-content">
+      <main id="main-content" class="wsl-content" tabindex="-1">
         <SharedErrorBoundary>
           <slot />
         </SharedErrorBoundary>

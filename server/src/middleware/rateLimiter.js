@@ -94,10 +94,12 @@ export const codeLimiter = rateLimit({
   message: { code: 429, msg: '验证码已发送，请60秒后再试', data: null },
 });
 
+const verifyMax = parseInt(process.env.RATE_LIMIT_VERIFY_MAX, 10) || 5;
+
 /** 验证码校验限流（比发送宽松，允许用户多次尝试验证码） */
 export const verifyLimiter = rateLimit({
   windowMs: 60000,
-  max: 5,
+  max: verifyMax,
   standardHeaders: true,
   legacyHeaders: false,
   message: { code: 429, msg: '验证次数过多，请60秒后再试', data: null },

@@ -205,7 +205,8 @@ async function realCloneInfer(text, audioSampleUrl) {
         const buffer = await fs.promises.readFile(samplePath);
         formData.append('files', new Blob([buffer]), 'sample.mp3');
         formData.append('name', `clone_${Date.now()}`);
-        const addResp = await fetch(process.env.ELEVENLABS_API_URL || 'https://api.elevenlabs.io/v1/voices/add', {
+        const apiBase = process.env.ELEVENLABS_API_URL || 'https://api.elevenlabs.io';
+        const addResp = await fetch(`${apiBase}/v1/voices/add`, {
           method: 'POST',
           headers: { 'xi-api-key': apiKey },
           body: formData,
@@ -219,7 +220,7 @@ async function realCloneInfer(text, audioSampleUrl) {
     if (!voiceId) throw new BusinessError(500, '无法创建克隆声音');
 
     // Step 2: TTS with cloned voice
-    const ttsResp = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+    const ttsResp = await fetch(`${apiBase}/v1/text-to-speech/${voiceId}`, {
       method: 'POST',
       headers: { 'xi-api-key': apiKey, 'Content-Type': 'application/json' },
       body: JSON.stringify({ text: text || '', model_id: 'eleven_multilingual_v2' }),
@@ -233,7 +234,7 @@ async function realCloneInfer(text, audioSampleUrl) {
     fs.writeFileSync(path.join(AUDIO_DIR, filename), audioBuffer);
 
     // Step 3: Clean up temporary voice
-    fetch(`https://api.elevenlabs.io/v1/voices/${voiceId}`, {
+    fetch(`${apiBase}/v1/voices/${voiceId}`, {
       method: 'DELETE',
       headers: { 'xi-api-key': apiKey },
     }).catch((e) => { logger.warn('[VoiceClone] 清理临时声音失败:', e.message); });

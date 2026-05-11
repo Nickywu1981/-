@@ -1,7 +1,7 @@
 <template>
   <Teleport to="body">
     <Transition name="confirm-fade">
-      <div v-if="visible" class="confirm-overlay" @click.self="onCancel">
+      <div v-if="visible" class="confirm-overlay" @click.self="onCancel" @keydown.escape="onCancel">
         <div class="confirm-dialog" role="alertdialog" aria-modal="true" :aria-label="title">
           <div class="confirm-header">
             <h3>{{ title }}</h3>
@@ -38,6 +38,7 @@ const cancelBtn = ref<HTMLButtonElement>()
 const confirmBtn = ref<HTMLButtonElement>()
 
 let resolvePromise: ((value: boolean) => void) | null = null
+let previousActiveElement: HTMLElement | null = null
 
 const variantClass = computed(() => ({
   'btn-danger': variant.value === 'danger',
@@ -51,6 +52,7 @@ async function show(opts: ConfirmOptions): Promise<boolean> {
   confirmText.value = opts.confirmText || '确定'
   cancelText.value = opts.cancelText || '取消'
   variant.value = opts.variant || 'danger'
+  previousActiveElement = document.activeElement as HTMLElement
   visible.value = true
   await nextTick()
   confirmBtn.value?.focus()
@@ -61,12 +63,21 @@ function onConfirm() {
   visible.value = false
   resolvePromise?.(true)
   resolvePromise = null
+  restoreFocus()
 }
 
 function onCancel() {
   visible.value = false
   resolvePromise?.(false)
   resolvePromise = null
+  restoreFocus()
+}
+
+function restoreFocus() {
+  if (previousActiveElement?.focus) {
+    previousActiveElement.focus()
+    previousActiveElement = null
+  }
 }
 
 defineExpose({ show })

@@ -19,7 +19,7 @@ const generateSchema = z.object({
 });
 
 const cloneSchema = z.object({
-  sampleUrl: z.string().min(1, '请上传声音样本'),
+  sampleUrl: z.string().url('请提供有效的音频URL'),
   text: z.string().min(1, '请输入要合成文本').max(5000),
   name: z.string().max(30).optional(),
 });

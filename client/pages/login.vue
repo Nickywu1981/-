@@ -68,7 +68,7 @@
         </button>
       </form>
 
-      <p class="msg" :class="{ error: msgErr }" v-if="msg">{{ msg }}</p>
+      <p class="msg" :class="{ error: msgErr }" v-if="msg" role="alert" aria-live="assertive">{{ msg }}</p>
       <p class="link">
         还没有账号？<NuxtLink to="/register">免费注册</NuxtLink>
       </p>

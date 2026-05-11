@@ -5,6 +5,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { validate } from '../utils/validate.js';
+import { success, error, safeErrorMessage } from '../utils/response.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 import {
@@ -13,6 +14,8 @@ import {
   VisualAgent, HealthAgent,
 } from '../adk/agents/index.js';
 import { Runner } from '../adk/core/runner.js';
+
+const VALID_AGENTS = new Set(['memory', 'attention', 'context', 'localize', 'content', 'guard', 'visual', 'health']);
 import { SessionStore } from '../adk/core/sessionStore.js';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
@@ -57,21 +60,22 @@ router.post('/run/:agentName', authMiddleware, heavyLimiter, validate(runSchema)
     visual: VisualAgent, health: HealthAgent,
   };
 
+  if (!VALID_AGENTS.has(agentName)) return error(res, ERROR_CODE.NOT_FOUND, 'Agent not found');
+
   const agent = agentMap[agentName];
-  if (!agent) return error(res, ERROR_CODE.NOT_FOUND, `Unknown agent: ${agentName}`);
 
   try {
     const runner = new Runner({ agent, sessionService: sessionStore });
     const result = await runner.run({ userId, sessionId, query, context });
     success(res, result);
   } catch (err) {
-    error(res, ERROR_CODE.INTERNAL_ERROR, err.message);
+    error(res, ERROR_CODE.INTERNAL_ERROR, safeErrorMessage(err));
   }
 });
 
 // A2A 标准 /.well-known/agent.json
 router.get('/.well-known/agent.json', (_req, res) => {
-  res.json({
+  success(res, {
     name: 'Movio ADK',
     description: 'MemFocus AI — 百万年薪秘书 8 大能力',
     version: '1.0.0',

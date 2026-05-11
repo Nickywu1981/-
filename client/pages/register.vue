@@ -53,7 +53,7 @@
         <button type="submit" class="btn" :disabled="loading">{{ loading ? '注册中...' : '注册' }}</button>
       </form>
 
-      <p class="msg" :class="{ error: msgErr }" v-if="msg">{{ msg }}</p>
+      <p class="msg" :class="{ error: msgErr }" v-if="msg" role="alert" aria-live="assertive">{{ msg }}</p>
       <p class="link">已有账号？<NuxtLink to="/login">登录</NuxtLink></p>
     </div>
   </div>

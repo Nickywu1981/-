@@ -111,7 +111,7 @@ router.get('/health', async (_req, res) => {
     success(res, result);
   } catch (err) {
     logger.error('[sdk/health]', err);
-    error(res, err.status || 500, err.message || '健康检查失败');
+    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '健康检查失败');
   }
 });
 

@@ -52,7 +52,7 @@ const _upload = multer({
 });
 
 const initUploadSchema = z.object({
-  file_name: z.string().min(1, '请提供文件名').max(255),
+  file_name: z.string().min(1, '请提供文件名').max(255).refine(v => !v.includes('../') && !v.includes('..\\'), '文件名包含非法路径字符'),
   file_size: z.number().int().positive('文件大小不正确').max(500 * 1024 * 1024),
   file_type: z.string().min(1, '请提供文件类型').max(100),
 });

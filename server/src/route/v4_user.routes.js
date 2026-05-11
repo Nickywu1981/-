@@ -135,7 +135,7 @@ router.put('/change-password', _validate(changePasswordSchema), async (req, res)
       if (users.length === 0) return error(res, ERROR_CODE.NOT_FOUND, '用户不存在');
 
       const valid = await bcrypt.compare(oldPassword, users[0].password);
-      if (!valid) return error(res, ERROR_CODE.FORBIDDEN, '原密码不正确');
+      if (!valid) return error(res, ERROR_CODE.PARAM_INVALID, '原密码不正确');
 
       const hash = await bcrypt.hash(newPassword, 12);
       await conn.query('UPDATE `user` SET password = ? WHERE id = ?', [hash, req.user.id]);
@@ -144,7 +144,7 @@ router.put('/change-password', _validate(changePasswordSchema), async (req, res)
       conn.release();
     }
   } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '服务器内部错误');
   }
 });
 

@@ -86,7 +86,7 @@ router.post('/login', authLimiter, _validate(loginSchema), async (req, res) => {
 
     return success(res, { ...result.user, token: result.token, token_expires_in: result.token_expires_in }, '登录成功');
   } catch (err) {
-    return error(res, err.status || ERROR_CODE.UNAUTHORIZED, err.status ? err.message : '登录失败');
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '登录失败');
   }
 });
 
@@ -104,7 +104,7 @@ router.post('/login-by-code', authLimiter, _validate(loginByCodeSchema), async (
 
     return success(res, { ...result.user, token: result.token, token_expires_in: result.token_expires_in }, '登录成功');
   } catch (err) {
-    return error(res, err.status || ERROR_CODE.UNAUTHORIZED, err.status ? err.message : '登录失败');
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '登录失败');
   }
 });
 

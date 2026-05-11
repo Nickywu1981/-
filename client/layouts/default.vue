@@ -1,5 +1,6 @@
 <template>
   <div class="layout">
+    <a href="#main-content" class="skip-link">跳到主要内容</a>
     <header class="header">
       <div class="header-inner">
         <h1 class="logo" role="link" tabindex="0" aria-label="Movio AI 首页" @click="navigateTo('/')" @keydown.enter="navigateTo('/')">Movio AI</h1>
@@ -14,7 +15,7 @@
 
         <!-- 全局搜索 (Ctrl+K 唤起 CommandPalette) -->
         <div class="search-box desktop-nav" :class="{ open: searchOpen }">
-          <button class="search-trigger" @click="searchOpen = !searchOpen" title="搜索功能 (Ctrl+K)" aria-label="搜索功能 (Ctrl+K)">
+          <button class="search-trigger" @click="searchOpen = !searchOpen" title="搜索功能 (Ctrl+K)" aria-label="搜索功能 (Ctrl+K)" :aria-expanded="searchOpen">
             🔍
             <kbd class="search-hotkey">Ctrl+K</kbd>
           </button>
@@ -53,7 +54,7 @@
               🔔
               <span v-if="unreadCount" class="badge">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
             </NuxtLink>
-            <div class="user-menu" role="button" tabindex="0" aria-label="用户菜单" @click="menuOpen = !menuOpen" @keydown.enter="menuOpen = !menuOpen">
+            <div class="user-menu" role="button" tabindex="0" aria-label="用户菜单" :aria-expanded="menuOpen" @click="menuOpen = !menuOpen" @keydown.enter="menuOpen = !menuOpen">
               <span class="avatar">{{ user.nickname?.[0] || 'U' }}</span>
               <span class="uname desktop-nav">{{ user.nickname }}</span>
               <span class="arrow">▾</span>
@@ -73,7 +74,7 @@
           </template>
 
           <!-- 移动端汉堡 -->
-          <button class="hamburger" @click="mobileOpen = !mobileOpen" :aria-label="mobileOpen ? '关闭菜单' : '打开菜单'">{{ mobileOpen ? '✕' : '☰' }}</button>
+          <button class="hamburger" @click="mobileOpen = !mobileOpen" :aria-label="mobileOpen ? '关闭菜单' : '打开菜单'" :aria-expanded="mobileOpen">{{ mobileOpen ? '✕' : '☰' }}</button>
         </div>
       </div>
 
@@ -95,7 +96,7 @@
       </transition>
     </header>
 
-    <main class="main">
+    <main id="main-content" class="main" tabindex="-1">
       <SharedErrorBoundary>
         <slot />
       </SharedErrorBoundary>
@@ -244,6 +245,14 @@ onMounted(checkAuth);
 </script>
 
 <style scoped>
+/* Skip-to-content — visually hidden until focused */
+.skip-link {
+  position: absolute; top: -100px; left: 16px; z-index: 10000;
+  background: var(--brand, #3b82f6); color: #fff; padding: 10px 20px;
+  border-radius: 0 0 8px 8px; font-size: 14px; text-decoration: none;
+}
+.skip-link:focus { top: 0; }
+
 /* ================================================
    LAYOUT BASE
    ================================================ */

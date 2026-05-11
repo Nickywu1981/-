@@ -29,7 +29,7 @@
         </div>
         <button class="btn-save" :disabled="loading" @click="doVerify">{{ loading ? '验证中...' : '验证并继续' }}</button>
       </template>
-      <p v-if="msg" class="msg" :class="{ error: msgErr }">{{ msg }}</p>
+      <p v-if="msg" class="msg" :class="{ error: msgErr }" role="alert" aria-live="assertive">{{ msg }}</p>
       <p class="tip"><NuxtLink to="/login">想起密码了？去登录</NuxtLink></p>
     </div>
   </div>
