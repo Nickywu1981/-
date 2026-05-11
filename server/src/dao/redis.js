@@ -101,5 +101,3 @@ export async function quit() {
     try { await client.quit(); } catch { /* ignore */ }
   }
 }
-
-export default { getRedis, cacheGet, cacheSet, cacheDel, ping, quit };

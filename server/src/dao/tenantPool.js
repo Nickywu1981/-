@@ -145,5 +145,3 @@ export function tenantPool(req) {
 export function adminPool() {
   return realPool;
 }
-
-export default { tenantPool, adminPool };

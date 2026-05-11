@@ -216,5 +216,3 @@ export async function verifyNotify(body) {
   const signStr = buildSignString(rest);
   return await rsaVerify(signStr, sign);
 }
-
-export default { buildSignString, unifiedOrder, verifyNotify };

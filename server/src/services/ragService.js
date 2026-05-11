@@ -39,5 +39,3 @@ export function buildRAGPrompt(userQuery, context, systemPrompt) {
     user: userQuery,
   };
 }
-
-export default { retrieveContext, buildRAGPrompt };

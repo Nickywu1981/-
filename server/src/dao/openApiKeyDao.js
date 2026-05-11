@@ -70,5 +70,3 @@ export async function softDelete(id, tenantId) {
   );
   return result.affectedRows > 0;
 }
-
-export default { listByTenant, getById, getByApiKey, create, update, softDelete };

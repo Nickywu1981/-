@@ -235,5 +235,3 @@ export async function searchFullContext(query, topK = 5) {
     totalChunks: data.chunks.length,
   };
 }
-
-export default { embed, semanticSearch, searchFullContext, tokenLookup, getMemoryStatus };

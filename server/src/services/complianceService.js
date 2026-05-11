@@ -141,5 +141,3 @@ export function listComplianceTargets() {
     textRuleCount: config.textRules.length,
   }));
 }
-
-export default { getPlatformCompliance, getRegionCompliance, checkCompliance, listComplianceTargets, COMPLIANCE_RULES };

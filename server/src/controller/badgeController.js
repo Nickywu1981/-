@@ -37,5 +37,3 @@ export const deleteBadge = wrapController(async (req, res) => {
     if (!ok) return error(res, ERROR_CODE.NOT_FOUND, '勋章不存在');
     return success(res, null, '删除成功');
 })
-
-export default { listBadges, getBadge, listAllBadges, createBadge, updateBadge, deleteBadge };

@@ -47,5 +47,3 @@ export const deleteKey = wrapController(async (req, res, next) => {
     if (!result.ok) return error(res, ERROR_CODE.NOT_FOUND, 'API Key 不存在');
     success(res, result);
 })
-
-export default { listKeys, createKey, toggleKey, updateKey, deleteKey };

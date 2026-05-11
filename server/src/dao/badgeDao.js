@@ -49,5 +49,3 @@ export async function deleteBadge(id) {
 export async function getAvailableBadges() {
   return listBadges({ status: 1 });
 }
-
-export default { listBadges, getBadgeById, createBadge, updateBadge, deleteBadge, getAvailableBadges };

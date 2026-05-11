@@ -70,5 +70,3 @@ function maskKey(apiKey) {
   if (!apiKey) return '';
   return apiKey.slice(0, 10) + '****' + apiKey.slice(-6);
 }
-
-export default { listKeys, createKey, toggleKey, updateKey, deleteKey };

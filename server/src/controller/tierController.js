@@ -22,5 +22,3 @@ export const getExportPermission = wrapController(async (req, res, next) => {
     ]);
     return success(res, { exportHd: hd, noWatermark });
 })
-
-export default { getMyTier, checkLimit, getExportPermission };

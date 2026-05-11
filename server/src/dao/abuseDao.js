@@ -39,5 +39,3 @@ export async function listAbuseRecords({ page = 1, pageSize = 20, userId } = {})
   );
   return { list: rows, total, page, pageSize };
 }
-
-export default { countUserRecentCalls, insertApiCall, countIpRecentCalls, listAbuseRecords };

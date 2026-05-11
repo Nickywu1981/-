@@ -15,5 +15,3 @@ export async function countTodayTasks(userId, category) {
   );
   return rows[0].cnt;
 }
-
-export default { getUserPlan, countTodayTasks };
