@@ -22,7 +22,7 @@ export const sendVerificationCode = wrapController(async (req, res, next) => {
 export const verifyCode = wrapController(async (req, res, next) => {
     const { phone, scene, code } = req.body;
     if (!phone || !scene || !code) return error(res, ERROR_CODE.PARAM_MISSING, '参数不完整');
-    const result = smsService.verifyCode(phone, scene, code);
+    const result = await smsService.verifyCode(phone, scene, code);
     if (!result.valid) return error(res, ERROR_CODE.BAD_REQUEST, result.reason);
     return success(res, {}, '验证通过');
   })

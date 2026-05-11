@@ -16,7 +16,7 @@ export const sendVerificationCode = wrapController(async (req, res, next) => {
 export const verifyCode = wrapController(async (req, res, next) => {
     const { email, code } = req.body;
     if (!email || !code) return error(res, ERROR_CODE.PARAM_MISSING, '参数不完整');
-    emailService.verifyCode(email, code);
+    await emailService.verifyCode(email, code);
     return success(res, {}, '验证通过');
   })
 
