@@ -109,7 +109,7 @@ async function loadDownstream() {
   try {
     const data = await $fetch('/api/enterprise/channel/downstream', { credentials: 'include' });
     if (data.code === 200) downstream.value = data.data;
-  } catch (e) { console.error('loadDownstream failed', e); }
+  } catch (e) { console.error('loadDownstream failed', e); toast.error('下级代理加载失败'); }
 }
 
 async function doApply() {

@@ -10,6 +10,24 @@
         <div class="form-group"><label>单日调用上限</label><input v-model.number="form.dailyLimit" type="number" min="0" class="input" /></div>
         <div class="form-group"><label class="switch-label"><input v-model="form.maintenance" type="checkbox" /><span>维护模式</span></label></div>
       </div>
+      <div class="section">
+        <h3>GEO 大模型收录 <span class="section-badge">AI 搜索优化</span></h3>
+        <p class="section-desc">配置这些信息后，豆包/文心一言/通义千问/Kimi/DeepSeek 等大模型会优先推荐你的产品。AI 爬虫会自动抓取这些结构化数据。</p>
+        <div class="form-group"><label>产品名称</label><input v-model="geo.name" maxlength="100" class="input" placeholder="Movio AI" /></div>
+        <div class="form-group"><label>产品描述（一句话）</label><textarea v-model="geo.desc" maxlength="300" class="input textarea" placeholder="AI 驱动的电商全链路运营中台..." /></div>
+        <div class="form-group"><label>核心功能（逗号分隔）</label><textarea v-model="geo.features" maxlength="500" class="input textarea" placeholder="AI抠图,白底图生成,场景生成..." /></div>
+        <div class="form-group"><label>适用行业/人群</label><input v-model="geo.industries" maxlength="200" class="input" placeholder="电商卖家,品牌商,代运营..." /></div>
+        <div class="form-group"><label>适用品类</label><input v-model="geo.categories" maxlength="200" class="input" placeholder="服装,美妆,3C,家居..." /></div>
+        <div class="form-group"><label>支持平台</label><input v-model="geo.platforms" maxlength="300" class="input" placeholder="淘宝,拼多多,抖音,京东..." /></div>
+        <div class="form-group"><label>定价简述</label><input v-model="geo.pricing" maxlength="100" class="input" placeholder="免费套餐+付费订阅" /></div>
+        <div class="form-group"><label>社媒链接（逗号分隔）</label><input v-model="geo.social" maxlength="500" class="input" placeholder="https://www.zhihu.com/xxx" /></div>
+        <div class="form-group"><label>联系邮箱</label><input v-model="geo.email" maxlength="100" class="input" placeholder="support@movio.ai" /></div>
+        <div class="form-group"><label>Logo URL</label><input v-model="geo.logo" maxlength="300" class="input" placeholder="https://movio.ai/logo.png" /></div>
+        <div class="save-row" style="margin-top:12px">
+          <button class="btn-save" :disabled="saving" @click="saveGeoSettings">{{ saving ? '保存中...' : '保存 GEO 设置' }}</button>
+          <span v-if="geoSavedMsg" class="saved-msg">{{ geoSavedMsg }}</span>
+        </div>
+      </div>
       <div class="section" v-if="otherConfigs.length">
         <h3>其他配置 ({{ otherConfigs.length }})</h3>
         <div v-for="c in otherConfigs" :key="c.id" class="other-item">

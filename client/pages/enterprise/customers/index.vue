@@ -121,11 +121,11 @@ async function loadCustomers() {
 }
 
 async function loadStats() {
-  try { Object.assign(stats, await $api('/customers/stats')); } catch (e) { console.error(e); }
+  try { Object.assign(stats, await $api('/customers/stats')); } catch (e) { console.error(e); toast.error('客户统计加载失败'); }
 }
 
 async function loadTags() {
-  try { tags.value = await $api('/tags'); } catch (e) { console.error(e); }
+  try { tags.value = await $api('/tags'); } catch (e) { console.error(e); toast.error('标签列表加载失败'); }
 }
 
 function getCustomerTags(cid) { return customerTagsMap[cid] || []; }
@@ -146,7 +146,7 @@ async function applyTags() {
     }
     showTagPicker.value = false;
     loadCustomers();
-  } catch (e) { console.error(e); }
+  } catch (e) { console.error(e); toast.error('批量打标失败'); }
 }
 
 function planLabel(type) {

@@ -142,10 +142,7 @@ const activeTabHint = computed(() => {
 
 const activeCards = computed(() => cardData.value[activeTab.value] || Object.values(cardData.value)[0] || [])
 
-const allCardsRoute = computed(() => {
-  const map: Record<string, string> = { video: '/work/video', image: '/work/image', detail: '/work/detail-page', copywrite: '/work/copywriting', digital: '/work/digital-human' }
-  return map[activeTab.value] || '/workspace/creation'
-})
+const allCardsRoute = computed(() => CATEGORY_ROUTES[activeTab.value] || '/workspace/creation')
 
 async function handleSubmit() {
   if (!prompt.value.trim()) return

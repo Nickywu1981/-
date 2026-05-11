@@ -49,6 +49,8 @@
 </template>
 
 <script setup>
+import { useToast } from '~/composables/useToast';
+const toast = useToast();
 const startDate = ref(new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10));
 const endDate = ref(new Date().toISOString().slice(0, 10));
 const filterUserId = ref('');
@@ -67,7 +69,7 @@ async function loadUsage() {
     const res = await $fetch('/api/enterprise/usage', { credentials: 'include', params });
     timeline.value = res.data?.timeline || [];
     byUser.value = res.data?.byUser || [];
-  } catch (e) { console.error(e); }
+  } catch (e) { console.error(e); toast.error('用量明细加载失败'); }
   finally { loading.value = false; }
 }
 

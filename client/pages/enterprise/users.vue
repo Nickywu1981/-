@@ -119,7 +119,7 @@ async function loadUsers() {
     const res = await $fetch('/api/enterprise/users', { credentials: 'include', params });
     users.value = res.data?.list || [];
     total.value = res.data?.total || 0;
-  } catch (e) { console.error(e); }
+  } catch (e) { console.error(e); toast.error('成员列表加载失败'); }
   finally { loading.value = false; }
 }
 
