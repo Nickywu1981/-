@@ -41,6 +41,7 @@ export async function createTenant(data) {
     white_label: data.whiteLabel ? JSON.stringify(data.whiteLabel) : null,
     plan_type: data.planType || 'free',
     status: 1,
+    review_status: 'pending',
     contact_name: data.contactName || '',
     contact_phone: data.contactPhone || '',
     contact_email: data.contactEmail || '',

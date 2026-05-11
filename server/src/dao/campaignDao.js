@@ -36,12 +36,17 @@ export default {
     }
     if (!sets.length) return false;
     params.push(id);
-    const [result] = await pool.query(`UPDATE campaign SET ${sets.join(', ')} WHERE id = ?`, params);
+    if (data.tenant_id !== undefined) { params.push(data.tenant_id); }
+    const tenantClause = data.tenant_id !== undefined ? ' AND tenant_id = ?' : '';
+    const [result] = await pool.query(`UPDATE campaign SET ${sets.join(', ')} WHERE id = ?${tenantClause}`, params);
     return result.affectedRows > 0;
   },
 
-  async deleteCampaign(id) {
-    const [result] = await pool.query('DELETE FROM campaign WHERE id = ?', [id]);
+  async deleteCampaign(id, tenantId) {
+    const params = [id];
+    if (tenantId !== undefined) { params.push(tenantId); }
+    const tenantClause = tenantId !== undefined ? ' AND tenant_id = ?' : '';
+    const [result] = await pool.query(`DELETE FROM campaign WHERE id = ?${tenantClause}`, params);
     return result.affectedRows > 0;
   },
 
@@ -79,12 +84,17 @@ export default {
     }
     if (!sets.length) return false;
     params.push(id);
-    const [result] = await pool.query(`UPDATE coupon SET ${sets.join(', ')} WHERE id = ?`, params);
+    if (data.campaign_id !== undefined) { params.push(data.campaign_id); }
+    const campaignClause = data.campaign_id !== undefined ? ' AND campaign_id = ?' : '';
+    const [result] = await pool.query(`UPDATE coupon SET ${sets.join(', ')} WHERE id = ?${campaignClause}`, params);
     return result.affectedRows > 0;
   },
 
-  async deleteCoupon(id) {
-    const [result] = await pool.query('DELETE FROM coupon WHERE id = ?', [id]);
+  async deleteCoupon(id, campaignId) {
+    const params = [id];
+    if (campaignId !== undefined) { params.push(campaignId); }
+    const campaignClause = campaignId !== undefined ? ' AND campaign_id = ?' : '';
+    const [result] = await pool.query(`DELETE FROM coupon WHERE id = ?${campaignClause}`, params);
     return result.affectedRows > 0;
   },
 
@@ -134,12 +144,17 @@ export default {
     }
     if (!sets.length) return false;
     params.push(id);
-    const [result] = await pool.query(`UPDATE announcement SET ${sets.join(', ')} WHERE id = ?`, params);
+    if (data.create_by !== undefined) { params.push(data.create_by); }
+    const ownerClause = data.create_by !== undefined ? ' AND create_by = ?' : '';
+    const [result] = await pool.query(`UPDATE announcement SET ${sets.join(', ')} WHERE id = ?${ownerClause}`, params);
     return result.affectedRows > 0;
   },
 
-  async deleteAnnouncement(id) {
-    const [result] = await pool.query('DELETE FROM announcement WHERE id = ?', [id]);
+  async deleteAnnouncement(id, createBy) {
+    const params = [id];
+    if (createBy !== undefined) { params.push(createBy); }
+    const ownerClause = createBy !== undefined ? ' AND create_by = ?' : '';
+    const [result] = await pool.query(`DELETE FROM announcement WHERE id = ?${ownerClause}`, params);
     return result.affectedRows > 0;
   },
 };

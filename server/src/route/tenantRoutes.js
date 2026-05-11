@@ -3,7 +3,7 @@ import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
 import { z } from 'zod';
-import { listTenants, getTenant, createTenant, updateTenant, deleteTenant, getMyTenant } from '../controller/tenantController.js';
+import { listTenants, getTenant, createTenant, updateTenant, deleteTenant, getMyTenant, reviewTenant } from '../controller/tenantController.js';
 
 const router = Router();
 
@@ -21,5 +21,11 @@ router.get('/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'),
 router.post('/', authMiddleware, adminAuth, validate(tenantSchema), asyncHandler(createTenant));
 router.put('/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(tenantUpdateSchema), asyncHandler(updateTenant));
 router.delete('/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(deleteTenant));
+
+const reviewSchema = z.object({
+  reviewStatus: z.enum(['approved', 'rejected']),
+  reviewRemark: z.string().max(500).optional(),
+});
+router.put('/:id/review', authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(reviewSchema), asyncHandler(reviewTenant));
 
 export default router;

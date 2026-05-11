@@ -116,8 +116,10 @@ async function save() {
 
 async function del(id: number) {
   if (!confirm('确认删除？')) return
-  await $api(`/admin/campaign/coupons/${id}`, { method: 'DELETE' })
-  fetch()
+  try {
+    await $api(`/admin/campaign/coupons/${id}`, { method: 'DELETE' })
+    fetch()
+  } catch (e: any) { alert(e.message || '删除失败') }
 }
 
 onMounted(fetch)

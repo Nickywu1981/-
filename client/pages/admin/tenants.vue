@@ -12,6 +12,13 @@
         <option value="1">启用</option>
         <option value="0">停用</option>
       </select>
+      <select v-model="filterReviewStatus" class="sel" @change="search">
+        <option value="">全部审核</option>
+        <option value="pending">待审核</option>
+        <option value="under_review">审核中</option>
+        <option value="approved">已通过</option>
+        <option value="rejected">已驳回</option>
+      </select>
       <button class="btn" @click="search">搜索</button>
     </div>
 
@@ -26,14 +33,16 @@
     <template v-else-if="list.length">
       <div class="table-wrap">
         <table>
-          <thead><tr><th>ID</th><th>名称</th><th>编码</th><th>套餐</th><th>用量(图/视频)</th><th>人数</th><th>到期时间</th><th>状态</th><th>操作</th></tr></thead>
+          <thead><tr><th>ID</th><th>名称</th><th>编码</th><th>套餐</th><th>用量(图/视频)</th><th>人数</th><th>到期时间</th><th>审核</th><th>状态</th><th>操作</th></tr></thead>
           <tbody>
             <tr v-for="t in list" :key="t.id">
               <td>{{ t.id }}</td><td>{{ t.name }}</td><td>{{ t.code }}</td>
               <td>{{ t.plan_type }}</td><td>{{ t.quota_images }}/{{ t.quota_video }}</td>
               <td>{{ t.max_users }}</td><td>{{ t.expire_time || '无限制' }}</td>
+              <td><span :class="reviewBadgeClass(t.review_status)">{{ reviewLabel(t.review_status) }}</span></td>
               <td><span :class="t.status===1?'badge-ok':'badge-off'">{{ t.status===1?'启用':'停用' }}</span></td>
               <td class="actions">
+                <button v-if="t.review_status==='pending'||t.review_status==='under_review'" class="btn-sm ok" @click="openReview(t)">审核</button>
                 <button class="btn-sm" @click="openEdit(t)">编辑</button>
                 <button class="btn-sm" :class="t.status===1?'danger':''" @click="toggleStatus(t)">{{ t.status===1?'停用':'启用' }}</button>
                 <button class="btn-sm danger" @click="delTenant(t.id)">删除</button>
@@ -47,6 +56,22 @@
     <div v-else class="empty">暂无租户数据</div>
 
     <Teleport to="body">
+      <div v-if="reviewModal" class="modal-overlay" @click.self="reviewModal = false">
+        <div class="modal">
+          <h3>企业入驻审核</h3>
+          <div class="review-info">
+            <p><strong>{{ reviewTarget?.name }}</strong>（{{ reviewTarget?.code }}）</p>
+            <p>套餐：{{ reviewTarget?.plan_type }} | 当前审核：<span :class="reviewBadgeClass(reviewTarget?.review_status)">{{ reviewLabel(reviewTarget?.review_status) }}</span></p>
+          </div>
+          <label class="review-label">审核备注（可选）<textarea v-model="reviewRemark" maxlength="500" rows="3" placeholder="通过或驳回的原因说明" /></label>
+          <div class="modal-actions">
+            <button class="btn-cancel" @click="reviewModal = false">取消</button>
+            <button class="btn-save danger" :disabled="reviewing" @click="doReview('rejected')">{{ reviewing ? '提交中...' : '驳回' }}</button>
+            <button class="btn-save" :disabled="reviewing" @click="doReview('approved')">{{ reviewing ? '提交中...' : '审核通过' }}</button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
       <div v-if="modalOpen" class="modal-overlay" @click.self="modalOpen = false">
         <div class="modal">
           <h3>{{ isEdit ? '编辑租户' : '新建租户' }}</h3>
@@ -89,11 +114,16 @@ const total = ref(0)
 const page = ref(1)
 const pageSize = 15
 const keyword = ref('')
+const filterReviewStatus = ref('')
 const filterStatus = ref('')
 const loading = ref(true)
 const error = ref('')
 const saving = ref(false)
 const modalOpen = ref(false)
+const reviewModal = ref(false)
+const reviewing = ref(false)
+const reviewTarget = ref<any>(null)
+const reviewRemark = ref('')
 const isEdit = ref(false)
 const form = ref<any>({})
 
@@ -107,6 +137,7 @@ async function fetchData() {
   try {
     const params = new URLSearchParams({ page: String(page.value), pageSize: String(pageSize), keyword: keyword.value })
     if (filterStatus.value !== '') params.set('status', filterStatus.value)
+    if (filterReviewStatus.value) params.set('reviewStatus', filterReviewStatus.value)
     const res: any = await $fetch(`/api/tenants?${params.toString()}`)
     if (res?.code === 200) {
       list.value = res.data?.list || []
@@ -173,6 +204,42 @@ async function toggleStatus(t: any) {
   }
 }
 
+function reviewLabel(s: string) {
+  const m: Record<string, string> = { pending: '待审核', under_review: '审核中', approved: '已通过', rejected: '已驳回' }
+  return m[s] || s || '已通过'
+}
+function reviewBadgeClass(s: string) {
+  const m: Record<string, string> = { pending: 'badge-pending', under_review: 'badge-reviewing', approved: 'badge-ok', rejected: 'badge-rejected' }
+  return m[s] || 'badge-ok'
+}
+
+function openReview(t: any) {
+  reviewTarget.value = t
+  reviewRemark.value = ''
+  reviewModal.value = true
+}
+
+async function doReview(status: string) {
+  reviewing.value = true
+  try {
+    const res: any = await $fetch(`/api/tenants/${reviewTarget.value.id}/review`, {
+      method: 'PUT',
+      body: { reviewStatus: status, reviewRemark: reviewRemark.value || undefined },
+    })
+    if (res?.code === 200 || res?.code === 0) {
+      toast.success(status === 'approved' ? '审核通过' : '已驳回')
+      reviewModal.value = false
+      fetchData()
+    } else {
+      toast.error(res?.msg || '审核操作失败')
+    }
+  } catch (e: any) {
+    toast.error(e?.data?.msg || e.message || '审核操作失败')
+  } finally {
+    reviewing.value = false
+  }
+}
+
 async function delTenant(id: number) {
   if (!await confirm({ message: '确认删除该租户？此操作不可恢复。' })) return
   try {
@@ -212,6 +279,15 @@ tr:hover td { background: var(--table-row-hover); }
 
 .badge-ok { color: var(--success); font-weight: 600; }
 .badge-off { color: var(--text-muted); }
+.badge-pending { color: #f59e0b; font-weight: 600; }
+.badge-reviewing { color: var(--brand); font-weight: 600; }
+.badge-rejected { color: var(--danger); font-weight: 600; }
+
+.review-info { background: var(--table-header-bg); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 16px; }
+.review-info p { margin: 4px 0; font-size: 13px; color: var(--text-secondary); }
+.review-label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; }
+.review-label textarea { padding: 8px 12px; border: 1px solid var(--input-border); border-radius: var(--radius-sm); font-size: 13px; background: var(--bg-input); color: var(--text-primary); resize: vertical; outline: none; transition: border-color var(--transition-fast); }
+.review-label textarea:focus { border-color: var(--input-focus-border); box-shadow: var(--focus-ring); }
 
 .error-state { text-align: center; padding: 60px 20px; }
 .error-icon { font-size: 48px; }
@@ -222,6 +298,8 @@ tr:hover td { background: var(--table-row-hover); }
 
 .btn-sm { padding: 4px 10px; font-size: 12px; border: 1px solid var(--input-border); border-radius: var(--radius-xs); background: var(--bg-card); color: var(--text-primary); cursor: pointer; transition: border-color var(--transition-fast), color var(--transition-fast); }
 .btn-sm:hover { border-color: var(--brand); color: var(--brand); }
+.btn-sm.ok { color: var(--success); border-color: var(--success); }
+.btn-sm.ok:hover { background: var(--success); color: #fff; }
 .btn-sm.danger { color: var(--danger); border-color: var(--danger); }
 .btn-sm.danger:hover { background: var(--danger); color: #fff; }
 

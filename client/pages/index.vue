@@ -296,9 +296,9 @@ const { data: siteConfig } = await useAsyncData('site-config-home', () =>
 );
 
 const siteName = computed(() => siteConfig.value?.site_name || 'Movio AI');
-const heroTitle = computed(() => siteConfig.value?.hero_title || '让你的产品秒变爆款');
-const heroSubtitle = computed(() => siteConfig.value?.hero_subtitle || '上传产品照片，AI 自动生成主图、场景图、详情页、带货视频。无需设计师，一个人就是一支视觉团队。');
-const heroCta = computed(() => siteConfig.value?.hero_cta || '免费开始使用');
+const heroTitle = computed(() => siteConfig.value?.hero_title || t('landing.hero_title_highlight'));
+const heroSubtitle = computed(() => siteConfig.value?.hero_subtitle || t('landing.hero_subtitle_fallback'));
+const heroCta = computed(() => siteConfig.value?.hero_cta || t('landing.hero_cta'));
 const apiFeatures = computed(() => {
   if (Array.isArray(siteConfig.value?.features) && siteConfig.value.features.length) return siteConfig.value.features;
   return null;

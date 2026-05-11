@@ -41,3 +41,12 @@ export async function deleteTenant(id) {
   if (!ok) throw new BusinessError(404, '租户不存在');
   return true;
 }
+
+export async function reviewTenant(id, { reviewStatus, reviewRemark }, reviewedBy) {
+  if (!['approved', 'rejected'].includes(reviewStatus)) {
+    throw new BusinessError(400, '审核状态仅可为 approved 或 rejected');
+  }
+  const ok = await tenantDao.review(id, { reviewStatus, reviewRemark, reviewedBy });
+  if (!ok) throw new BusinessError(404, '租户不存在');
+  return tenantDao.findById(id);
+}

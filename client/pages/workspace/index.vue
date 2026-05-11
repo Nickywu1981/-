@@ -20,7 +20,7 @@
     <!-- 快捷入口卡片 -->
     <div v-else v-for="(group, cat) in cardGroups" :key="cat" class="wh-section">
       <div class="wh-sec-hd">
-        <h3 class="wh-sec-title">{{ cat }}</h3>
+        <h3 class="wh-sec-title">{{ getCategoryLabel(cat) }}</h3>
       </div>
       <div class="wh-quick">
         <div v-for="card in group" :key="card.id" class="wh-qcard" @click="go(card.route)">
@@ -72,13 +72,25 @@ type Card = { id: string; category: string; icon: string; title: string; desc: s
 const loading = ref(true)
 const cardGroups = ref<Record<string, Card[]>>({})
 
-const defaultCards: Card[] = [
-  { id:'img_main', category:'图片生成', icon:'🖼', title:'AI 商品图', desc:'各平台商品主图一键生成', route:'/work/image', order:1, visible:true },
-  { id:'video_gen', category:'视频生成', icon:'🎥', title:'AI 短视频', desc:'商品图一键生成带货短视频', route:'/work/video', order:1, visible:true },
-  { id:'detail_page', category:'电商详情图', icon:'📄', title:'详情页设计', desc:'商品详情页智能排版设计', route:'/work/detail-page', order:1, visible:true },
-  { id:'copy_title', category:'文案工具', icon:'✍️', title:'标题/卖点生成', desc:'AI生成高转化商品标题', route:'/work/copywriting', order:1, visible:true },
-  { id:'digital_human', category:'数字人', icon:'🤖', title:'数字人带货', desc:'数字人24小时自动带货视频', route:'/work/digital-human', order:1, visible:true },
-]
+const { t } = useI18n()
+
+const defaultCards = computed<Card[]>(() => {
+  const fromI18n = t('workspace.default_cards') as Card[]
+  if (Array.isArray(fromI18n) && fromI18n.length) return fromI18n
+  return [
+    { id:'img_main', category:'image', icon:'🖼', title:'AI 商品图', desc:'各平台商品主图一键生成', route:'/work/image', order:1, visible:true },
+    { id:'video_gen', category:'video', icon:'🎥', title:'AI 短视频', desc:'商品图一键生成带货短视频', route:'/work/video', order:1, visible:true },
+    { id:'detail_page', category:'detail', icon:'📄', title:'详情页设计', desc:'商品详情页智能排版设计', route:'/work/detail-page', order:1, visible:true },
+    { id:'copy_title', category:'copywrite', icon:'✍️', title:'标题/卖点生成', desc:'AI生成高转化商品标题', route:'/work/copywriting', order:1, visible:true },
+    { id:'digital_human', category:'digital', icon:'🤖', title:'数字人带货', desc:'数字人24小时自动带货视频', route:'/work/digital-human', order:1, visible:true },
+  ]
+})
+
+function getCategoryLabel(cat: string): string {
+  const key = `workspace.creation_tabs.${cat}` as string
+  const translated = t(key)
+  return translated !== key ? translated : cat
+}
 
 const recentProjects = ref<{ icon: string; name: string; time: string; path: string }[]>([])
 
@@ -102,7 +114,7 @@ onMounted(async () => {
       cardGroups.value = groups
     } else {
       const groups: Record<string, Card[]> = {}
-      defaultCards.forEach(c => {
+      defaultCards.value.forEach(c => {
         if (!groups[c.category]) groups[c.category] = []
         groups[c.category].push(c)
       })
@@ -111,7 +123,7 @@ onMounted(async () => {
   } else {
     console.error('[工作台] 配置加载失败，使用默认卡片', cfgResult.reason?.message)
     const groups: Record<string, Card[]> = {}
-    defaultCards.forEach(c => {
+    defaultCards.value.forEach(c => {
       if (!groups[c.category]) groups[c.category] = []
       groups[c.category].push(c)
     })
@@ -124,12 +136,10 @@ onMounted(async () => {
     recentProjects.value = (data).recentItems || []
   }
   if (!recentProjects.value.length) {
-    recentProjects.value = [
-      { icon: '🖼', name: '夏季连衣裙白底图', time: '2小时前', path: '/workspace/creation' },
-      { icon: '🎥', name: '护肤品展示视频', time: '昨天', path: '/workspace/creation' },
-      { icon: '📄', name: '面膜详情页设计', time: '昨天', path: '/workspace/creation' },
-      { icon: '📰', name: '618活动海报', time: '2天前', path: '/workspace/creation' },
-    ]
+    const samples = t('workspace.recent_samples') as { icon: string; name: string; time: string }[]
+    if (Array.isArray(samples) && samples.length) {
+      recentProjects.value = samples.map(s => ({ ...s, path: '/workspace/creation' }))
+    }
   }
 
   loading.value = false

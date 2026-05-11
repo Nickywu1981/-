@@ -12,11 +12,12 @@ export default {
     return rows[0] || null;
   },
 
-  async list({ page = 1, pageSize = 20, status, planType, keyword } = {}) {
+  async list({ page = 1, pageSize = 20, status, planType, keyword, reviewStatus } = {}) {
     const conditions = [];
     const params = [];
     if (status !== undefined) { conditions.push('status = ?'); params.push(status); }
     if (planType) { conditions.push('plan_type = ?'); params.push(planType); }
+    if (reviewStatus) { conditions.push('review_status = ?'); params.push(reviewStatus); }
     if (keyword) { conditions.push('(name LIKE ? OR code LIKE ? OR contact_name LIKE ?)'); params.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`); }
     const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
     const [countRows] = await pool.query(`SELECT COUNT(*) as total FROM tenant ${where}`, params);
@@ -56,6 +57,14 @@ export default {
 
   async delete(id) {
     const [result] = await pool.query('DELETE FROM tenant WHERE id = ?', [id]);
+    return result.affectedRows > 0;
+  },
+
+  async review(id, { reviewStatus, reviewRemark, reviewedBy }) {
+    const [result] = await pool.query(
+      'UPDATE tenant SET review_status = ?, review_remark = ?, reviewed_by = ?, reviewed_at = NOW() WHERE id = ?',
+      [reviewStatus, reviewRemark || null, reviewedBy || null, id],
+    );
     return result.affectedRows > 0;
   },
 };

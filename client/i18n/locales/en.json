@@ -12,6 +12,7 @@
   "landing": {
     "hero_title": "Movio AI — Full-Stack Ops Assistant",
     "hero_title_highlight": "Make your products go viral",
+    "hero_subtitle_fallback": "Upload product photos, AI auto-generates main images, scene images, detail pages, and sales videos. No designer needed — one person is your entire visual team.",
     "hero_sub": "AI-Powered E-Commerce Operations Platform",
     "hero_cta": "Start Free",
     "hero_demo": "Watch Demo",
@@ -306,6 +307,19 @@
       "detail": "Detail Page",
       "copywrite": "Copywriting",
       "digital": "Digital Human"
-    }
+    },
+    "recent_samples": [
+      {"icon":"🖼","name":"Summer Dress White Background","time":"2 hours ago"},
+      {"icon":"🎥","name":"Skincare Demo Video","time":"Yesterday"},
+      {"icon":"📄","name":"Face Mask Detail Page","time":"Yesterday"},
+      {"icon":"📰","name":"618 Campaign Poster","time":"2 days ago"}
+    ],
+    "default_cards": [
+      {"id":"img_main","category":"image","icon":"🖼","title":"AI Product Image","desc":"One-click product main image for all platforms","route":"/work/image","order":1,"visible":true},
+      {"id":"video_gen","category":"video","icon":"🎥","title":"AI Short Video","desc":"Turn product images into sales videos","route":"/work/video","order":1,"visible":true},
+      {"id":"detail_page","category":"detail","icon":"📄","title":"Detail Page Design","desc":"Smart layout design for product detail pages","route":"/work/detail-page","order":1,"visible":true},
+      {"id":"copy_title","category":"copywrite","icon":"✍️","title":"Title/Selling Points","desc":"AI-generated high-conversion product titles","route":"/work/copywriting","order":1,"visible":true},
+      {"id":"digital_human","category":"digital","icon":"🤖","title":"Digital Human Sales","desc":"24/7 automated sales videos with digital humans","route":"/work/digital-human","order":1,"visible":true}
+    ]
   }
 }
