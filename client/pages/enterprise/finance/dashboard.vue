@@ -4,8 +4,7 @@
 
     <div v-if="loading" class="loading-spin">加载中...</div>
     <div v-else-if="loadError" class="error-msg">{{ loadError }} <button class="btn-text" @click="loadData">重试</button></div>
-    <div v-else>
-    <div class="stats-grid">
+    <div v-else class="stats-grid">
       <div class="stat-card">
         <div class="stat-label">账户余额</div>
         <div class="stat-value highlight">¥{{ fmt(dashboard.balance) }}</div>
@@ -24,8 +23,7 @@
       </div>
     </div>
 
-    <!-- 代理端专有: 佣金概览 -->
-    <div class="section" v-if="isAgent && dashboard.earnings">
+    <div v-if="!loading && !loadError && isAgent && dashboard.earnings" class="section">
       <h2>佣金概览</h2>
       <div class="commission-grid">
         <div class="comm-item"><span class="label">累计佣金</span><strong>¥{{ fmt(dashboard.earnings.totalEarnings) }}</strong></div>
@@ -36,8 +34,7 @@
       </div>
     </div>
 
-    <!-- 快捷入口 -->
-    <div class="section">
+    <div v-if="!loading && !loadError" class="section">
       <h2>快捷操作</h2>
       <div class="quick-actions">
         <NuxtLink to="/enterprise/finance/ledger" class="action-card">
@@ -58,6 +55,7 @@
       </div>
     </div>
   </div>
+</template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
