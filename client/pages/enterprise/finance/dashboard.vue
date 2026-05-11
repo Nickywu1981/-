@@ -2,6 +2,10 @@
   <div class="finance-dashboard">
     <h1 class="page-title">财务总览</h1>
 
+    <div v-if="loading" class="loading-spin">加载中...</div>
+    <div v-else-if="loadError" class="error-msg">{{ loadError }} <button class="btn-text" @click="loadData">重试</button></div>
+    <template v-else>
+
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-label">账户余额</div>
@@ -56,6 +60,7 @@
     </div>
   </div>
 </template>
+</template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
@@ -64,16 +69,22 @@ import { useToast } from '~/composables/useToast';
 const api = useApi();
 const toast = useToast();
 
+const loading = ref(true);
+const loadError = ref('');
 const dashboard = ref({ balance: 0, totalRevenue: 0, monthRevenue: 0, totalWithdrawn: 0 });
 const isAgent = ref(false);
 
-onMounted(async () => {
+async function loadData() {
+  loading.value = true; loadError.value = '';
   try {
     const data = await api.get('/enterprise/finance/dashboard');
     dashboard.value = data;
     isAgent.value = !!data.earnings;
-  } catch (e) { console.error(e); toast.error('财务数据加载失败，请刷新重试'); }
-});
+  } catch (e) { loadError.value = '财务数据加载失败，请刷新重试'; }
+  finally { loading.value = false; }
+}
+
+onMounted(() => loadData());
 
 function fmt(n) { return (Number(n) || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2 }); }
 

@@ -30,7 +30,7 @@ onMounted(async () => {
     if (inviteCode.value) {
       inviteLink.value = `${window.location.origin}/register?ref=${inviteCode.value}`;
     }
-  } catch (e) { /* ignore */ }
+  } catch (e) { toast.error('邀请码加载失败，请刷新重试'); }
 });
 
 async function copyLink() {
