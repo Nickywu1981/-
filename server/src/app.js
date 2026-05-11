@@ -108,6 +108,7 @@ import templateMarketRoutesV4 from './route/v4_template_market.routes.js';
 import sdkRoutes from './route/sdkRoutes.js';
 import adkRoutes from './route/adkRoutes.js';
 import enterpriseRoutes from './route/enterpriseRoutes.js';   // Phase 1: 企业/代理端 MVP (2026-05-11)
+import financeRoutes from './route/financeRoutes.js';         // Phase 2: 财务核心 (2026-05-11)
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -243,6 +244,7 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads'), {
   etag: true,
   lastModified: true,
   setHeaders(res, filepath) {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
     if (/\.(jpg|jpeg|png|gif|webp|svg|mp4|webm|mov)$/i.test(filepath)) {
       res.setHeader('Cache-Control', 'public, max-age=604800, immutable');
     }
@@ -338,6 +340,7 @@ app.use('/api/adk', heavyLimiter, adkRoutes);
 
 // ===== Phase 1: 企业/代理端 (2026-05-11) =====
 app.use('/api/enterprise', enterpriseRoutes);
+app.use('/api/enterprise/finance', financeRoutes);  // Phase 2: 财务核心
 
 // 404
 app.use((_req, res) => {

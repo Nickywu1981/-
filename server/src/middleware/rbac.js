@@ -18,9 +18,12 @@ export const ROLES = {
   USER:              { level: 1, name: 'user' },
   EDITOR:            { level: 2, name: 'editor' },
   ENTERPRISE_VIEWER: { level: 2, name: 'enterprise_viewer' },
+  AGENT_VIEWER:      { level: 2, name: 'agent_viewer' },
   ADMIN:             { level: 3, name: 'admin' },
   ENTERPRISE_OPERATOR: { level: 3, name: 'enterprise_operator' },
+  AGENT_OPERATOR:    { level: 3, name: 'agent_operator' },
   ENTERPRISE_ADMIN:  { level: 4, name: 'enterprise_admin' },
+  AGENT_ADMIN:       { level: 4, name: 'agent_admin' },
   SUPER_ADMIN:       { level: 4, name: 'super_admin' },
 };
 
@@ -82,6 +85,36 @@ export const PERMISSIONS = {
   // 开放 API
   'api:access':    ROLES.USER,
   'api:manage':    ROLES.ADMIN,
+
+  // ==================== Phase 2: B端权限点 ====================
+
+  // 企业信息
+  'enterprise:profile:write':   ROLES.ENTERPRISE_ADMIN,
+
+  // 子账号管理
+  'enterprise:users:manage':    ROLES.ENTERPRISE_ADMIN,
+
+  // 渠道管理（仅代理）
+  'enterprise:channel:manage':  ROLES.AGENT_ADMIN,
+
+  // 客户管理
+  'enterprise:customer:read':   ROLES.ENTERPRISE_VIEWER,
+  'enterprise:customer:manage': ROLES.ENTERPRISE_ADMIN,
+
+  // 财务管理
+  'enterprise:finance:read':    ROLES.ENTERPRISE_VIEWER,
+  'enterprise:finance:withdraw': ROLES.AGENT_ADMIN,
+  'enterprise:settlement:manage': ROLES.AGENT_ADMIN,
+
+  // 推广分销
+  'enterprise:promotion:manage': ROLES.ENTERPRISE_OPERATOR,
+
+  // 订单管理
+  'enterprise:order:read':      ROLES.ENTERPRISE_VIEWER,
+  'enterprise:order:manage':    ROLES.ENTERPRISE_OPERATOR,
+
+  // 报表导出
+  'enterprise:report:export':   ROLES.ENTERPRISE_ADMIN,
 };
 
 // ========================= 通用权限检查 =========================
@@ -102,8 +135,15 @@ export function hasPermission(user, permission) {
 export function hasRole(user, roleName) {
   if (!user) return false;
   const requiredLevel = ROLES[roleName.toUpperCase()]?.level || 0;
-  const userLevel = user.level || ROLE_LEVEL[user.role] || 1;
-  return userLevel >= requiredLevel;
+  // C端角色检查
+  const cLevel = user.level || ROLE_LEVEL[user.role] || 1;
+  if (cLevel >= requiredLevel) return true;
+  // B端角色检查（企业/代理用户的 entRole）
+  if (user.entRole) {
+    const bLevel = ROLE_LEVEL[user.entRole] || 0;
+    if (bLevel >= requiredLevel) return true;
+  }
+  return false;
 }
 
 // ========================= Express 中间件 =========================

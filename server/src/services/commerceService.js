@@ -133,6 +133,11 @@ export async function listAllUsers({ page = 1, pageSize = 20, keyword = '', stat
 
 export async function updateUserStatus(userId, status) {
   await commerceDao.updateUserStatus(userId, status);
+  // 账号禁用时吊销所有令牌，立即生效
+  if (status === 0 || status === 'disabled') {
+    const { revokeAllUserTokens } = await import('../utils/jwtToken.js');
+    await revokeAllUserTokens(userId);
+  }
 }
 
 // ==================== 风控服务 ====================

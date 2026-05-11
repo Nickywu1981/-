@@ -48,8 +48,11 @@ onMounted(async () => {
   try {
     const data = await $fetch('/api/enterprise/profile', { credentials: 'include' });
     entName.value = data.data?.name || '';
-  } catch {
-    router.push('/enterprise/login');
+  } catch (e) {
+    // 仅 401 未认证才跳转登录，网络波动/5xx 不误清会话
+    if (e?.response?.status === 401) {
+      router.push('/enterprise/login');
+    }
   }
 });
 

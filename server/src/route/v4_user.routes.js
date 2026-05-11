@@ -139,7 +139,12 @@ router.put('/change-password', _validate(changePasswordSchema), async (req, res)
 
       const hash = await bcrypt.hash(newPassword, 12);
       await conn.query('UPDATE `user` SET password = ? WHERE id = ?', [hash, req.user.id]);
-      return success(res, {}, '密码已修改');
+
+      // 吊销所有旧令牌，强制重新登录
+      const { revokeAllUserTokens } = await import('../utils/jwtToken.js');
+      await revokeAllUserTokens(req.user.id);
+
+      return success(res, {}, '密码已修改，请重新登录');
     } finally {
       conn.release();
     }

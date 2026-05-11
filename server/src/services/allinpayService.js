@@ -12,6 +12,7 @@ import membershipDao from '../dao/membershipDao.js';
 import rechargeDao from '../dao/rechargeDao.js';
 import * as creditDao from '../dao/creditDao.js';
 import * as notificationService from './notificationService.js';
+import { settleCommission } from './distribution.service.js';
 import logger from '../utils/logger.js';
 import { BusinessError } from '../utils/businessError.js';
 import { ORDER_STATUS } from '../constants/domainStatus.js';
@@ -193,6 +194,17 @@ export async function handleNotify(body) {
     }
     await notificationService.sendNotification(order.user_id, { type: 'payment', title, content });
   } catch (e) { logger.warn('[Allinpay] 通知发送失败', { userId: order.user_id, error: e.message }); }
+
+  // Phase 2: 会员/充值支付成功后自动结算分销佣金
+  try {
+    const amount = Number(order.amount) || 0;
+    if (amount > 0) {
+      const settled = await settleCommission(order.user_id, order.id || order.business_id, amount);
+      if (settled.length > 0) {
+        logger.info('[Allinpay] 佣金结算完成', { orderId: order.id, commissions: settled.length });
+      }
+    }
+  } catch (e) { logger.warn('[Allinpay] 佣金结算失败（非阻塞）', { userId: order.user_id, error: e.message }); }
 
   await allinpayDao.logNotify({ reqsn, trxid, notifyBody: JSON.stringify(body), signVerified: 1, processStatus: 1, processMsg: '处理成功' });
   return true;

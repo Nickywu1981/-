@@ -9,6 +9,7 @@ import { success, error } from '../utils/response.js';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { authLimiter } from '../middleware/rateLimiter.js';
+import { generateRefreshToken } from '../middleware/auth.js';
 import * as authService from '../services/auth.service.js';
 import { revokeAccessToken, revokeRefreshToken } from '../utils/jwtToken.js';
 
@@ -24,6 +25,16 @@ function _setTokenCookie(res, token) {
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     maxAge,
+  });
+}
+
+function _setRefreshCookie(res, userId) {
+  const refreshToken = generateRefreshToken({ userId });
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 }
 
@@ -68,6 +79,7 @@ router.post('/register', authLimiter, _validate(registerSchema), async (req, res
 
     // 设置 cookie
     _setTokenCookie(res, result.token);
+    _setRefreshCookie(res, result.user.id);
 
     return success(res, { ...result.user, token: result.token, token_expires_in: result.token_expires_in }, '注册成功');
   } catch (err) {
@@ -83,6 +95,7 @@ router.post('/login', authLimiter, _validate(loginSchema), async (req, res) => {
     const result = await authService.login({ phone, email, username: username || account, password });
 
     _setTokenCookie(res, result.token);
+    _setRefreshCookie(res, result.user.id);
 
     return success(res, { ...result.user, token: result.token, token_expires_in: result.token_expires_in }, '登录成功');
   } catch (err) {
@@ -101,6 +114,7 @@ router.post('/login-by-code', authLimiter, _validate(loginByCodeSchema), async (
     const result = await authService.loginByCode({ phone, email, username, code });
 
     _setTokenCookie(res, result.token);
+    _setRefreshCookie(res, result.user.id);
 
     return success(res, { ...result.user, token: result.token, token_expires_in: result.token_expires_in }, '登录成功');
   } catch (err) {
