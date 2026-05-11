@@ -37,6 +37,6 @@ adminRouter.get('/logs/:key', authMiddleware, rateLimiter, adminAuth, asyncHandl
 }));
 
 const publicRouter = Router();
-publicRouter.get('/', asyncHandler(getPublicSiteConfig));
+publicRouter.get('/', rateLimiter, asyncHandler(getPublicSiteConfig));
 
 export { adminRouter, publicRouter };

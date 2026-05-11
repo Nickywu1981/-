@@ -23,7 +23,7 @@ const badgeSchema = z.object({
 });
 
 // 公开端点：可用标签列表（无需登录）
-router.get('/public', cacheMiddleware(300), validate(badgeQuerySchema, 'query'), asyncHandler(listBadges));
+router.get('/public', rateLimiter, cacheMiddleware(300), validate(badgeQuerySchema, 'query'), asyncHandler(listBadges));
 
 // 用户端：可用的标签列表（需登录，缓存 5 分钟）
 router.get('/', authMiddleware, rateLimiter, cacheMiddleware(300), validate(badgeQuerySchema, 'query'), asyncHandler(listBadges));
