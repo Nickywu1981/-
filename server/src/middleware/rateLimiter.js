@@ -5,22 +5,23 @@
  */
 import rateLimit from 'express-rate-limit';
 import { error } from '../utils/response.js';
+import { rateLimitConfig } from '../config/index.js';
 
-const windowMs = parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 60000;
-const max = parseInt(process.env.RATE_LIMIT_MAX, 10) || 200;
+const windowMs = rateLimitConfig.windowMs;
+const max = rateLimitConfig.max;
 
-// Per-limiter max overrides from env (with sensible defaults)
-const AUTH_MAX = parseInt(process.env.RATE_LIMIT_AUTH_MAX, 10) || 10;
-const CODE_MAX = parseInt(process.env.RATE_LIMIT_CODE_MAX, 10) || 1;
-const HEAVY_MAX = parseInt(process.env.RATE_LIMIT_HEAVY_MAX, 10) || 30;
-const UPLOAD_MAX = parseInt(process.env.RATE_LIMIT_UPLOAD_MAX, 10) || 20;
-const PAYMENT_MAX = parseInt(process.env.RATE_LIMIT_PAYMENT_MAX, 10) || 15;
-const ADMIN_MAX = parseInt(process.env.RATE_LIMIT_ADMIN_MAX, 10) || 60;
+// Per-limiter max overrides from config
+const AUTH_MAX = rateLimitConfig.authMax;
+const CODE_MAX = rateLimitConfig.codeMax;
+const HEAVY_MAX = rateLimitConfig.heavyMax;
+const UPLOAD_MAX = rateLimitConfig.uploadMax;
+const PAYMENT_MAX = rateLimitConfig.paymentMax;
+const ADMIN_MAX = rateLimitConfig.adminMax;
 
 // ==================== 并发控制 ====================
 
-const CONCURRENCY_MAX_PER_USER = parseInt(process.env.RATE_LIMIT_CONCURRENCY_MAX, 10) || 6;
-const CONCURRENCY_AI_PER_USER = parseInt(process.env.RATE_LIMIT_AI_CONCURRENCY_MAX, 10) || 3;
+const CONCURRENCY_MAX_PER_USER = rateLimitConfig.concurrencyMax;
+const CONCURRENCY_AI_PER_USER = rateLimitConfig.aiConcurrencyMax;
 const userConcurrency = new Map();
 
 // 每 30 分钟清理一次超时条目（防止 socket hang-up 导致泄漏）
@@ -99,7 +100,7 @@ export const codeLimiter = rateLimit({
   message: { code: 429, msg: '验证码已发送，请60秒后再试', data: null },
 });
 
-const verifyMax = parseInt(process.env.RATE_LIMIT_VERIFY_MAX, 10) || 5;
+const verifyMax = rateLimitConfig.verifyMax;
 
 /** 验证码校验限流（比发送宽松，允许用户多次尝试验证码） */
 export const verifyLimiter = rateLimit({

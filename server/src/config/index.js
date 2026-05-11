@@ -108,6 +108,34 @@ const config = {
     heartbeatIntervalMs: parseInt(process.env.WS_HEARTBEAT_MS, 10) || 30000,
     heartbeatThresholdMs: parseInt(process.env.WS_HEARTBEAT_THRESHOLD_MS, 10) || 60000,
   },
+
+  rateLimit: {
+    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 60000,
+    max: parseInt(process.env.RATE_LIMIT_MAX, 10) || 200,
+    authMax: parseInt(process.env.RATE_LIMIT_AUTH_MAX, 10) || 10,
+    codeMax: parseInt(process.env.RATE_LIMIT_CODE_MAX, 10) || 1,
+    heavyMax: parseInt(process.env.RATE_LIMIT_HEAVY_MAX, 10) || 30,
+    uploadMax: parseInt(process.env.RATE_LIMIT_UPLOAD_MAX, 10) || 20,
+    paymentMax: parseInt(process.env.RATE_LIMIT_PAYMENT_MAX, 10) || 15,
+    adminMax: parseInt(process.env.RATE_LIMIT_ADMIN_MAX, 10) || 60,
+    concurrencyMax: parseInt(process.env.RATE_LIMIT_CONCURRENCY_MAX, 10) || 6,
+    aiConcurrencyMax: parseInt(process.env.RATE_LIMIT_AI_CONCURRENCY_MAX, 10) || 3,
+    verifyMax: parseInt(process.env.RATE_LIMIT_VERIFY_MAX, 10) || 5,
+  },
+
+  jwtRefreshSecret: process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET || 'dev-refresh-fallback',
+
+  corsOrigin: process.env.CORS_ORIGIN || '',
+
+  log: {
+    level: process.env.LOG_LEVEL || 'info',
+    sampleRate: parseFloat(process.env.LOG_SAMPLE_RATE || '1.0'),
+    slowQueryMs: parseInt(process.env.SLOW_QUERY_MS, 10) || 1000,
+  },
+
+  get aiTimeoutMs() {
+    return parseInt(process.env.AI_TIMEOUT_MS, 10) || 300000;
+  },
 };
 
 export default config;
@@ -116,4 +144,9 @@ export default config;
 export const { jwt: jwtConfig, mysql: db, redis: redisConfig, mockEnabled, port, env } = config;
 export const jwtSecret = config.jwt.secret;
 export const jwtExpiresIn = config.jwt.expiresIn;
+export const jwtRefreshSecret = config.jwtRefreshSecret;
 export const server = { port: config.port, env: config.env };
+export const { rateLimit: rateLimitConfig } = config;
+export const corsOrigin = config.corsOrigin;
+export const { log: logConfig } = config;
+export const aiTimeoutMs = config.aiTimeoutMs;
