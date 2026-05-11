@@ -3,7 +3,6 @@ import { z } from 'zod';
 import { listRules, getRule, createRule, updateRule, deleteRule } from '../controller/geoRulesController.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { rateLimiter } from '../middleware/rateLimiter.js';
-import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
 
 const geoSchema = z.object({
@@ -33,10 +32,10 @@ const updateGeoSchema = z.object({
 });
 
 const adminRouter = Router();
-adminRouter.get('/', authMiddleware, rateLimiter, adminAuth, asyncHandler(listRules));
-adminRouter.get('/:id', authMiddleware, rateLimiter, adminAuth, asyncHandler(getRule));
-adminRouter.post('/', authMiddleware, rateLimiter, adminAuth, validate(geoSchema), asyncHandler(createRule));
-adminRouter.put('/:id', authMiddleware, rateLimiter, adminAuth, validate(updateGeoSchema), asyncHandler(updateRule));
-adminRouter.delete('/:id', authMiddleware, rateLimiter, adminAuth, asyncHandler(deleteRule));
+adminRouter.get('/', authMiddleware, rateLimiter, adminAuth, listRules);
+adminRouter.get('/:id', authMiddleware, rateLimiter, adminAuth, getRule);
+adminRouter.post('/', authMiddleware, rateLimiter, adminAuth, validate(geoSchema), createRule);
+adminRouter.put('/:id', authMiddleware, rateLimiter, adminAuth, validate(updateGeoSchema), updateRule);
+adminRouter.delete('/:id', authMiddleware, rateLimiter, adminAuth, deleteRule);
 
 export { adminRouter };

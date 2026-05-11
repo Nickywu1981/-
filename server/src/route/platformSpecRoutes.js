@@ -3,7 +3,6 @@ import { listPlatforms, getSpec, getSpecsByPlatform, createSpec, updateSpec, del
 import { authMiddleware } from '../middleware/auth.middleware.js';
 import { requireRole } from '../middleware/rbac.js';
 import { rateLimiter } from '../middleware/rateLimiter.js';
-import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate, idParamSchema } from '../utils/validate.js';
 import { z } from 'zod';
 
@@ -28,14 +27,14 @@ const adaptSchema = z.object({
   outputDir: z.string().optional(),
 });
 
-router.get('/', rateLimiter, asyncHandler(listPlatforms));
-router.get('/:id', rateLimiter, validate(idParamSchema, 'params'), asyncHandler(getSpec));
-router.get('/platform/:code', rateLimiter, validate(codeParamSchema, 'params'), asyncHandler(getSpecsByPlatform));
+router.get('/', rateLimiter, listPlatforms);
+router.get('/:id', rateLimiter, validate(idParamSchema, 'params'), getSpec);
+router.get('/platform/:code', rateLimiter, validate(codeParamSchema, 'params'), getSpecsByPlatform);
 
 router.use(authMiddleware);
-router.post('/', rateLimiter, requireRole('admin'), validate(createSchema), asyncHandler(createSpec));
-router.post('/adapt', rateLimiter, requireRole('admin'), validate(adaptSchema), asyncHandler(adaptImage));
-router.put('/:id', rateLimiter, requireRole('admin'), validate(idParamSchema, 'params'), validate(updateSchema), asyncHandler(updateSpec));
-router.delete('/:id', rateLimiter, requireRole('admin'), validate(idParamSchema, 'params'), asyncHandler(deleteSpec));
+router.post('/', rateLimiter, requireRole('admin'), validate(createSchema), createSpec);
+router.post('/adapt', rateLimiter, requireRole('admin'), validate(adaptSchema), adaptImage);
+router.put('/:id', rateLimiter, requireRole('admin'), validate(idParamSchema, 'params'), validate(updateSchema), updateSpec);
+router.delete('/:id', rateLimiter, requireRole('admin'), validate(idParamSchema, 'params'), deleteSpec);
 
 export default router;

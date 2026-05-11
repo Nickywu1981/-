@@ -5,7 +5,6 @@ import {
   getVideoTaskResult, listMyVideoTasks, cancelVideoTask, retryVideoTask,
 } from '../controller/videoController.js';
 import { authMiddleware } from '../middleware/auth.js';
-import { asyncHandler } from '../middleware/asyncHandler.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { tierGuard } from '../middleware/tierGuard.js';
 import { validate, paginationSchema } from '../utils/validate.js';
@@ -46,19 +45,19 @@ const digitalHumanSchema = z.object({
 });
 
 // 视频生成
-router.post('/img2video', authMiddleware, heavyLimiter, tierGuard('video'), validate(img2VideoSchema), asyncHandler(submitImg2Video));
-router.post('/multi2video', authMiddleware, heavyLimiter, tierGuard('video'), validate(multi2VideoSchema), asyncHandler(submitMulti2Video));
-router.post('/packaging', authMiddleware, heavyLimiter, tierGuard('video'), validate(packagingSchema), asyncHandler(submitVideoPackaging));
+router.post('/img2video', authMiddleware, heavyLimiter, tierGuard('video'), validate(img2VideoSchema), submitImg2Video);
+router.post('/multi2video', authMiddleware, heavyLimiter, tierGuard('video'), validate(multi2VideoSchema), submitMulti2Video);
+router.post('/packaging', authMiddleware, heavyLimiter, tierGuard('video'), validate(packagingSchema), submitVideoPackaging);
 
 // 视频进阶
-router.post('/action-transfer', authMiddleware, heavyLimiter, tierGuard('video'), validate(transferSchema), asyncHandler(submitActionTransfer));
-router.post('/person-replace', authMiddleware, heavyLimiter, tierGuard('video'), validate(replaceSchema), asyncHandler(submitPersonReplace));
-router.post('/digital-human', authMiddleware, heavyLimiter, tierGuard('video'), validate(digitalHumanSchema), asyncHandler(submitDigitalHuman));
+router.post('/action-transfer', authMiddleware, heavyLimiter, tierGuard('video'), validate(transferSchema), submitActionTransfer);
+router.post('/person-replace', authMiddleware, heavyLimiter, tierGuard('video'), validate(replaceSchema), submitPersonReplace);
+router.post('/digital-human', authMiddleware, heavyLimiter, tierGuard('video'), validate(digitalHumanSchema), submitDigitalHuman);
 
 // 任务查询
-router.get('/tasks', authMiddleware, validate(paginationSchema, 'query'), asyncHandler(listMyVideoTasks));
-router.get('/tasks/:taskId', authMiddleware, validate(taskIdParamSchema, 'params'), asyncHandler(getVideoTaskResult));
-router.post('/tasks/:taskId/cancel', authMiddleware, validate(taskIdParamSchema, 'params'), asyncHandler(cancelVideoTask));
-router.post('/tasks/:taskId/retry', authMiddleware, validate(taskIdParamSchema, 'params'), asyncHandler(retryVideoTask));
+router.get('/tasks', authMiddleware, validate(paginationSchema, 'query'), listMyVideoTasks);
+router.get('/tasks/:taskId', authMiddleware, validate(taskIdParamSchema, 'params'), getVideoTaskResult);
+router.post('/tasks/:taskId/cancel', authMiddleware, validate(taskIdParamSchema, 'params'), cancelVideoTask);
+router.post('/tasks/:taskId/retry', authMiddleware, validate(taskIdParamSchema, 'params'), retryVideoTask);
 
 export default router;

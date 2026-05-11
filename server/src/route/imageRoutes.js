@@ -5,7 +5,6 @@ import {
   getTaskResult, listMyTasks, cancelTask, retryTask,
 } from '../controller/imageController.js';
 import { authMiddleware } from '../middleware/auth.js';
-import { asyncHandler } from '../middleware/asyncHandler.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { tierGuard } from '../middleware/tierGuard.js';
 import { validate, paginationSchema } from '../utils/validate.js';
@@ -56,18 +55,18 @@ const whiteBgSchema = z.object({
 });
 
 // 所有图片任务需要登录
-router.post('/main-image', authMiddleware, heavyLimiter, tierGuard('image'), validate(mainImageSchema), asyncHandler(submitMainImage));
-router.post('/scene', authMiddleware, heavyLimiter, tierGuard('image'), validate(sceneImageSchema), asyncHandler(submitSceneImage));
-router.post('/detail-h5', authMiddleware, heavyLimiter, tierGuard('image'), validate(detailH5Schema), asyncHandler(submitDetailH5));
-router.post('/batch', authMiddleware, heavyLimiter, tierGuard('image'), validate(batchTaskSchema), asyncHandler(submitBatchTask));
-router.post('/retouch', authMiddleware, heavyLimiter, tierGuard('image'), validate(retouchSchema), asyncHandler(submitRetouch));
-router.post('/remove-bg', authMiddleware, heavyLimiter, tierGuard('image'), validate(removeBgSchema), asyncHandler(submitRemoveBg));
-router.post('/white-bg', authMiddleware, heavyLimiter, tierGuard('image'), validate(whiteBgSchema), asyncHandler(submitWhiteBg));
+router.post('/main-image', authMiddleware, heavyLimiter, tierGuard('image'), validate(mainImageSchema), submitMainImage);
+router.post('/scene', authMiddleware, heavyLimiter, tierGuard('image'), validate(sceneImageSchema), submitSceneImage);
+router.post('/detail-h5', authMiddleware, heavyLimiter, tierGuard('image'), validate(detailH5Schema), submitDetailH5);
+router.post('/batch', authMiddleware, heavyLimiter, tierGuard('image'), validate(batchTaskSchema), submitBatchTask);
+router.post('/retouch', authMiddleware, heavyLimiter, tierGuard('image'), validate(retouchSchema), submitRetouch);
+router.post('/remove-bg', authMiddleware, heavyLimiter, tierGuard('image'), validate(removeBgSchema), submitRemoveBg);
+router.post('/white-bg', authMiddleware, heavyLimiter, tierGuard('image'), validate(whiteBgSchema), submitWhiteBg);
 
 // 任务查询
-router.get('/tasks', authMiddleware, validate(paginationSchema, 'query'), asyncHandler(listMyTasks));
-router.get('/tasks/:taskId', authMiddleware, validate(taskIdParamSchema, 'params'), asyncHandler(getTaskResult));
-router.post('/tasks/:taskId/cancel', authMiddleware, validate(taskIdParamSchema, 'params'), asyncHandler(cancelTask));
-router.post('/tasks/:taskId/retry', authMiddleware, validate(taskIdParamSchema, 'params'), asyncHandler(retryTask));
+router.get('/tasks', authMiddleware, validate(paginationSchema, 'query'), listMyTasks);
+router.get('/tasks/:taskId', authMiddleware, validate(taskIdParamSchema, 'params'), getTaskResult);
+router.post('/tasks/:taskId/cancel', authMiddleware, validate(taskIdParamSchema, 'params'), cancelTask);
+router.post('/tasks/:taskId/retry', authMiddleware, validate(taskIdParamSchema, 'params'), retryTask);
 
 export default router;

@@ -6,7 +6,6 @@ import {
   getTaskResult, listMyTasks,
 } from '../controller/advancedImageController.js';
 import { authMiddleware } from '../middleware/auth.js';
-import { asyncHandler } from '../middleware/asyncHandler.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { tierGuard } from '../middleware/tierGuard.js';
 import { validate } from '../utils/validate.js';
@@ -68,19 +67,19 @@ const textEffectSchema = z.object({
   effect: z.string().optional(),
 });
 
-router.post('/virtual-tryon', authMiddleware, heavyLimiter, tierGuard('image'), validate(virtualTryonSchema), asyncHandler(submitVirtualTryon));
-router.post('/color-swap', authMiddleware, heavyLimiter, tierGuard('image'), validate(colorSwapSchema), asyncHandler(submitColorSwap));
-router.post('/style-transfer', authMiddleware, heavyLimiter, tierGuard('image'), validate(styleTransferSchema), asyncHandler(submitStyleTransfer));
-router.post('/wrinkle-remove', authMiddleware, heavyLimiter, tierGuard('image'), validate(wrinkleRemoveSchema), asyncHandler(submitWrinkleRemove));
-router.post('/image-translate', authMiddleware, heavyLimiter, tierGuard('image'), validate(imageTranslateSchema), asyncHandler(submitImageTranslate));
-router.post('/outpaint', authMiddleware, heavyLimiter, tierGuard('image'), validate(outpaintingSchema), asyncHandler(submitOutpainting));
-router.post('/ghost-mannequin', authMiddleware, heavyLimiter, tierGuard('image'), validate(ghostMannequinSchema), asyncHandler(submitGhostMannequin));
-router.post('/model-generate', authMiddleware, heavyLimiter, tierGuard('image'), validate(modelGenerateSchema), asyncHandler(submitModelGenerate));
-router.post('/shot-panorama', authMiddleware, heavyLimiter, tierGuard('image'), validate(shotPanoramaSchema), asyncHandler(submitShotPanorama));
-router.post('/swap-face', authMiddleware, heavyLimiter, tierGuard('image'), validate(swapFaceSchema), asyncHandler(submitSwapFace));
-router.post('/text-effect', authMiddleware, heavyLimiter, tierGuard('image'), validate(textEffectSchema), asyncHandler(submitTextEffect));
+router.post('/virtual-tryon', authMiddleware, heavyLimiter, tierGuard('image'), validate(virtualTryonSchema), submitVirtualTryon);
+router.post('/color-swap', authMiddleware, heavyLimiter, tierGuard('image'), validate(colorSwapSchema), submitColorSwap);
+router.post('/style-transfer', authMiddleware, heavyLimiter, tierGuard('image'), validate(styleTransferSchema), submitStyleTransfer);
+router.post('/wrinkle-remove', authMiddleware, heavyLimiter, tierGuard('image'), validate(wrinkleRemoveSchema), submitWrinkleRemove);
+router.post('/image-translate', authMiddleware, heavyLimiter, tierGuard('image'), validate(imageTranslateSchema), submitImageTranslate);
+router.post('/outpaint', authMiddleware, heavyLimiter, tierGuard('image'), validate(outpaintingSchema), submitOutpainting);
+router.post('/ghost-mannequin', authMiddleware, heavyLimiter, tierGuard('image'), validate(ghostMannequinSchema), submitGhostMannequin);
+router.post('/model-generate', authMiddleware, heavyLimiter, tierGuard('image'), validate(modelGenerateSchema), submitModelGenerate);
+router.post('/shot-panorama', authMiddleware, heavyLimiter, tierGuard('image'), validate(shotPanoramaSchema), submitShotPanorama);
+router.post('/swap-face', authMiddleware, heavyLimiter, tierGuard('image'), validate(swapFaceSchema), submitSwapFace);
+router.post('/text-effect', authMiddleware, heavyLimiter, tierGuard('image'), validate(textEffectSchema), submitTextEffect);
 
-router.get('/tasks', authMiddleware, asyncHandler(listMyTasks));
-router.get('/tasks/:taskId', authMiddleware, validate(z.object({ taskId: z.string().regex(/^\d+$/).transform(Number) }), 'params'), asyncHandler(getTaskResult));
+router.get('/tasks', authMiddleware, listMyTasks);
+router.get('/tasks/:taskId', authMiddleware, validate(z.object({ taskId: z.string().regex(/^\d+$/).transform(Number) }), 'params'), getTaskResult);
 
 export default router;

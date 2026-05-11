@@ -5,7 +5,6 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { authMiddleware } from '../middleware/auth.js';
 import { validate } from '../utils/validate.js';
-import { asyncHandler } from '../middleware/asyncHandler.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 import * as ctrl from '../controller/seoKeywordController.js';
 
@@ -23,8 +22,8 @@ const listSchema = z.object({
   platformCode: z.string().min(1).max(30).optional(),
 });
 
-router.get('/', validate(listSchema), asyncHandler(ctrl.listPlatforms));
-router.get('/keywords', asyncHandler(ctrl.getKeywords));
-router.post('/embed', heavyLimiter, authMiddleware, validate(embedSchema), asyncHandler(ctrl.embedKeywords));
+router.get('/', validate(listSchema), ctrl.listPlatforms);
+router.get('/keywords', ctrl.getKeywords);
+router.post('/embed', heavyLimiter, authMiddleware, validate(embedSchema), ctrl.embedKeywords);
 
 export default router;

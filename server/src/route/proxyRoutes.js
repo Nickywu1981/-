@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
-import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate, idParamSchema, numericParamSchema } from '../utils/validate.js';
 import { z } from 'zod';
 import * as proxyController from '../controller/proxyController.js';
@@ -52,31 +51,31 @@ const idEntryParamSchema = z.object({
 
 // ==================== 配置 CRUD ====================
 
-router.get('/', authMiddleware, adminAuth, asyncHandler(proxyController.listConfigs));
-router.get('/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(proxyController.getConfig));
-router.post('/', authMiddleware, adminAuth, adminLimiter, validate(configSchema), asyncHandler(proxyController.createConfig));
-router.put('/:id', authMiddleware, adminAuth, adminLimiter, validate(idParamSchema, 'params'), validate(configSchema.partial()), asyncHandler(proxyController.updateConfig));
-router.delete('/:id', authMiddleware, adminAuth, adminLimiter, validate(idParamSchema, 'params'), asyncHandler(proxyController.deleteConfig));
+router.get('/', authMiddleware, adminAuth, proxyController.listConfigs);
+router.get('/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), proxyController.getConfig);
+router.post('/', authMiddleware, adminAuth, adminLimiter, validate(configSchema), proxyController.createConfig);
+router.put('/:id', authMiddleware, adminAuth, adminLimiter, validate(idParamSchema, 'params'), validate(configSchema.partial()), proxyController.updateConfig);
+router.delete('/:id', authMiddleware, adminAuth, adminLimiter, validate(idParamSchema, 'params'), proxyController.deleteConfig);
 
 // ==================== 代理转发调用 ====================
 
-router.post('/call/:code', authMiddleware, heavyLimiter, validate(codeParamSchema, 'params'), validate(callProxySchema), asyncHandler(proxyController.callProxy));
+router.post('/call/:code', authMiddleware, heavyLimiter, validate(codeParamSchema, 'params'), validate(callProxySchema), proxyController.callProxy);
 
 // ==================== 白名单管理 ====================
 
-router.get('/:id/whitelist', authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(proxyController.listWhitelist));
-router.post('/:id/whitelist', authMiddleware, adminAuth, adminLimiter, validate(idParamSchema, 'params'), validate(whitelistSchema), asyncHandler(proxyController.addWhitelist));
-router.put('/:id/whitelist/:entryId', authMiddleware, adminAuth, adminLimiter, validate(idEntryParamSchema, 'params'), validate(whitelistUpdateSchema), asyncHandler(proxyController.updateWhitelist));
-router.delete('/:id/whitelist/:entryId', authMiddleware, adminAuth, adminLimiter, validate(idEntryParamSchema, 'params'), asyncHandler(proxyController.removeWhitelist));
+router.get('/:id/whitelist', authMiddleware, adminAuth, validate(idParamSchema, 'params'), proxyController.listWhitelist);
+router.post('/:id/whitelist', authMiddleware, adminAuth, adminLimiter, validate(idParamSchema, 'params'), validate(whitelistSchema), proxyController.addWhitelist);
+router.put('/:id/whitelist/:entryId', authMiddleware, adminAuth, adminLimiter, validate(idEntryParamSchema, 'params'), validate(whitelistUpdateSchema), proxyController.updateWhitelist);
+router.delete('/:id/whitelist/:entryId', authMiddleware, adminAuth, adminLimiter, validate(idEntryParamSchema, 'params'), proxyController.removeWhitelist);
 
 // ==================== 熔断管理 ====================
 
-router.get('/:id/circuit', authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(proxyController.getCircuitStatus));
-router.post('/:id/circuit/reset', authMiddleware, adminAuth, adminLimiter, validate(idParamSchema, 'params'), asyncHandler(proxyController.resetCircuit));
+router.get('/:id/circuit', authMiddleware, adminAuth, validate(idParamSchema, 'params'), proxyController.getCircuitStatus);
+router.post('/:id/circuit/reset', authMiddleware, adminAuth, adminLimiter, validate(idParamSchema, 'params'), proxyController.resetCircuit);
 
 // ==================== 调用日志 ====================
 
-router.get('/logs', authMiddleware, adminAuth, asyncHandler(proxyController.listLogs));
-router.post('/logs/clean', authMiddleware, adminAuth, adminLimiter, validate(cleanLogsSchema), asyncHandler(proxyController.cleanLogs));
+router.get('/logs', authMiddleware, adminAuth, proxyController.listLogs);
+router.post('/logs/clean', authMiddleware, adminAuth, adminLimiter, validate(cleanLogsSchema), proxyController.cleanLogs);
 
 export default router;

@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { track, funnel, active, topTools, trend, conversionFunnel } from '../controller/analyticsController.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
-import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
 import { z } from 'zod';
 import { apiLimiter } from '../middleware/rateLimiter.js';
@@ -19,13 +18,13 @@ const querySchema = z.object({
 });
 
 // 埋点上报（需登录）
-router.post('/track', authMiddleware, apiLimiter, validate(trackSchema), asyncHandler(track));
+router.post('/track', authMiddleware, apiLimiter, validate(trackSchema), track);
 
 // 数据查询（仅管理员）
-router.get('/funnel', authMiddleware, adminAuth, validate(querySchema), asyncHandler(funnel));
-router.get('/active', authMiddleware, adminAuth, asyncHandler(active));
-router.get('/top-tools', authMiddleware, adminAuth, validate(querySchema), asyncHandler(topTools));
-router.get('/trend', authMiddleware, adminAuth, validate(querySchema), asyncHandler(trend));
-router.get('/conversion', authMiddleware, adminAuth, validate(querySchema), asyncHandler(conversionFunnel));
+router.get('/funnel', authMiddleware, adminAuth, validate(querySchema), funnel);
+router.get('/active', authMiddleware, adminAuth, active);
+router.get('/top-tools', authMiddleware, adminAuth, validate(querySchema), topTools);
+router.get('/trend', authMiddleware, adminAuth, validate(querySchema), trend);
+router.get('/conversion', authMiddleware, adminAuth, validate(querySchema), conversionFunnel);
 
 export default router;

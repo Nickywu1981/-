@@ -22,10 +22,10 @@ const updateConfigSchema = z.object({
 });
 
 const adminRouter = Router();
-adminRouter.get('/', authMiddleware, rateLimiter, adminAuth, asyncHandler(listAllConfig));
-adminRouter.post('/', authMiddleware, rateLimiter, adminAuth, validate(configSchema), asyncHandler(createConfig));
-adminRouter.put('/:key', authMiddleware, rateLimiter, adminAuth, validate(updateConfigSchema), asyncHandler(updateConfig));
-adminRouter.delete('/:id', authMiddleware, rateLimiter, adminAuth, asyncHandler(removeConfig));
+adminRouter.get('/', authMiddleware, rateLimiter, adminAuth, listAllConfig);
+adminRouter.post('/', authMiddleware, rateLimiter, adminAuth, validate(configSchema), createConfig);
+adminRouter.put('/:key', authMiddleware, rateLimiter, adminAuth, validate(updateConfigSchema), updateConfig);
+adminRouter.delete('/:id', authMiddleware, rateLimiter, adminAuth, removeConfig);
 
 // GET /api/admin/site-config/logs/:key — 审计日志
 adminRouter.get('/logs/:key', authMiddleware, rateLimiter, adminAuth, asyncHandler(async (req, res) => {
@@ -37,6 +37,6 @@ adminRouter.get('/logs/:key', authMiddleware, rateLimiter, adminAuth, asyncHandl
 }));
 
 const publicRouter = Router();
-publicRouter.get('/', rateLimiter, asyncHandler(getPublicSiteConfig));
+publicRouter.get('/', rateLimiter, getPublicSiteConfig);
 
 export { adminRouter, publicRouter };

@@ -5,7 +5,6 @@ import {
   saveBatchTemplate, listBatchTemplates, deleteBatchTemplate,
 } from '../controller/batchController.js';
 import { authMiddleware } from '../middleware/auth.js';
-import { asyncHandler } from '../middleware/asyncHandler.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { tierGuard } from '../middleware/tierGuard.js';
 import { validate, paginationSchema, idParamSchema, numericParamSchema } from '../utils/validate.js';
@@ -36,15 +35,15 @@ const templateSchema = z.object({
 });
 
 // 批量任务
-router.post('/submit', authMiddleware, heavyLimiter, tierGuard('image'), validate(submitSchema), asyncHandler(submitBatchTask));
-router.post('/redo', authMiddleware, heavyLimiter, tierGuard('image'), validate(redoSchema), asyncHandler(redoBatchTask));
-router.get('/history', authMiddleware, validate(paginationSchema, 'query'), asyncHandler(listBatchHistory));
-router.get('/tasks/:taskId', authMiddleware, validate(taskIdParamSchema, 'params'), asyncHandler(getTaskResult));
-router.get('/:taskId/download', authMiddleware, validate(taskIdParamSchema, 'params'), asyncHandler(getBatchZipUrl));
+router.post('/submit', authMiddleware, heavyLimiter, tierGuard('image'), validate(submitSchema), submitBatchTask);
+router.post('/redo', authMiddleware, heavyLimiter, tierGuard('image'), validate(redoSchema), redoBatchTask);
+router.get('/history', authMiddleware, validate(paginationSchema, 'query'), listBatchHistory);
+router.get('/tasks/:taskId', authMiddleware, validate(taskIdParamSchema, 'params'), getTaskResult);
+router.get('/:taskId/download', authMiddleware, validate(taskIdParamSchema, 'params'), getBatchZipUrl);
 
 // 批量模板
-router.post('/templates', authMiddleware, heavyLimiter, validate(templateSchema), asyncHandler(saveBatchTemplate));
-router.get('/templates', authMiddleware, validate(paginationSchema, 'query'), asyncHandler(listBatchTemplates));
-router.delete('/templates/:id', authMiddleware, heavyLimiter, validate(idParamSchema, 'params'), asyncHandler(deleteBatchTemplate));
+router.post('/templates', authMiddleware, heavyLimiter, validate(templateSchema), saveBatchTemplate);
+router.get('/templates', authMiddleware, validate(paginationSchema, 'query'), listBatchTemplates);
+router.delete('/templates/:id', authMiddleware, heavyLimiter, validate(idParamSchema, 'params'), deleteBatchTemplate);
 
 export default router;

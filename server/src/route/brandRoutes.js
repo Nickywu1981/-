@@ -2,7 +2,6 @@ import { Router } from 'express';
 import { getBrand, saveBrand } from '../controller/brandController.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { rateLimiter } from '../middleware/rateLimiter.js';
-import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
 import { z } from 'zod';
 
@@ -15,7 +14,7 @@ const brandSchema = z.object({
 });
 const brandUpdateSchema = brandSchema.partial();
 
-router.get('/', authMiddleware, rateLimiter, asyncHandler(getBrand));
-router.put('/', authMiddleware, rateLimiter, adminAuth, validate(brandUpdateSchema), asyncHandler(saveBrand));
+router.get('/', authMiddleware, rateLimiter, getBrand);
+router.put('/', authMiddleware, rateLimiter, adminAuth, validate(brandUpdateSchema), saveBrand);
 
 export default router;

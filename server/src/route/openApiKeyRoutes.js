@@ -6,7 +6,6 @@ import { Router } from 'express';
 import { authMiddleware } from '../middleware/auth.middleware.js';
 import { adminAuth } from '../middleware/auth.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
-import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate, idParamSchema } from '../utils/validate.js';
 import { z } from 'zod';
 import * as ctl from '../controller/openApiKeyController.js';
@@ -26,10 +25,10 @@ const updateSchema = z.object({
   dailyLimit: z.number().int().min(1).max(100000).optional(),
 });
 
-router.get('/keys', adminAuth, asyncHandler(ctl.listKeys));
-router.post('/keys', heavyLimiter, adminAuth, validate(createSchema), asyncHandler(ctl.createKey));
-router.put('/keys/:id/toggle', heavyLimiter, adminAuth, validate(idParamSchema, 'params'), validate(toggleSchema), asyncHandler(ctl.toggleKey));
-router.put('/keys/:id', heavyLimiter, adminAuth, validate(idParamSchema, 'params'), validate(updateSchema), asyncHandler(ctl.updateKey));
-router.delete('/keys/:id', heavyLimiter, adminAuth, validate(idParamSchema, 'params'), asyncHandler(ctl.deleteKey));
+router.get('/keys', adminAuth, ctl.listKeys);
+router.post('/keys', heavyLimiter, adminAuth, validate(createSchema), ctl.createKey);
+router.put('/keys/:id/toggle', heavyLimiter, adminAuth, validate(idParamSchema, 'params'), validate(toggleSchema), ctl.toggleKey);
+router.put('/keys/:id', heavyLimiter, adminAuth, validate(idParamSchema, 'params'), validate(updateSchema), ctl.updateKey);
+router.delete('/keys/:id', heavyLimiter, adminAuth, validate(idParamSchema, 'params'), ctl.deleteKey);
 
 export default router;

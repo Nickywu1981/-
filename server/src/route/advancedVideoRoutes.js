@@ -5,7 +5,6 @@ import {
   getTaskResult, listMyTasks,
 } from '../controller/advancedVideoController.js';
 import { authMiddleware } from '../middleware/auth.js';
-import { asyncHandler } from '../middleware/asyncHandler.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { tierGuard } from '../middleware/tierGuard.js';
 import { validate } from '../utils/validate.js';
@@ -65,18 +64,18 @@ const videoEditSchema = z.object({
   subtitle: z.boolean().optional(),
 });
 
-router.post('/script-gen', authMiddleware, heavyLimiter, tierGuard('video'), validate(scriptGenSchema), asyncHandler(submitScriptGen));
-router.post('/shot-plan', authMiddleware, heavyLimiter, tierGuard('video'), validate(shotPlanSchema), asyncHandler(submitShotPlan));
-router.post('/viral-clone', authMiddleware, heavyLimiter, tierGuard('video'), validate(viralCloneSchema), asyncHandler(submitViralClone));
-router.post('/viral-analyze', authMiddleware, heavyLimiter, tierGuard('video'), validate(viralAnalyzeSchema), asyncHandler(submitViralAnalyze));
-router.post('/viral-replicate', authMiddleware, heavyLimiter, tierGuard('video'), validate(viralReplicateSchema), asyncHandler(submitViralReplicate));
-router.post('/action-batch', authMiddleware, heavyLimiter, tierGuard('video'), validate(actionBatchSchema), asyncHandler(submitActionBatch));
-router.post('/beautify', authMiddleware, heavyLimiter, tierGuard('video'), validate(videoBeautifySchema), asyncHandler(submitVideoBeautify));
-router.post('/voice-gen', authMiddleware, heavyLimiter, tierGuard('video'), validate(voiceGenSchema), asyncHandler(submitVoiceGen));
-router.post('/voice-clone', authMiddleware, heavyLimiter, tierGuard('video'), validate(voiceCloneSchema), asyncHandler(submitVoiceClone));
-router.post('/video-edit', authMiddleware, heavyLimiter, tierGuard('video'), validate(videoEditSchema), asyncHandler(submitVideoEdit));
+router.post('/script-gen', authMiddleware, heavyLimiter, tierGuard('video'), validate(scriptGenSchema), submitScriptGen);
+router.post('/shot-plan', authMiddleware, heavyLimiter, tierGuard('video'), validate(shotPlanSchema), submitShotPlan);
+router.post('/viral-clone', authMiddleware, heavyLimiter, tierGuard('video'), validate(viralCloneSchema), submitViralClone);
+router.post('/viral-analyze', authMiddleware, heavyLimiter, tierGuard('video'), validate(viralAnalyzeSchema), submitViralAnalyze);
+router.post('/viral-replicate', authMiddleware, heavyLimiter, tierGuard('video'), validate(viralReplicateSchema), submitViralReplicate);
+router.post('/action-batch', authMiddleware, heavyLimiter, tierGuard('video'), validate(actionBatchSchema), submitActionBatch);
+router.post('/beautify', authMiddleware, heavyLimiter, tierGuard('video'), validate(videoBeautifySchema), submitVideoBeautify);
+router.post('/voice-gen', authMiddleware, heavyLimiter, tierGuard('video'), validate(voiceGenSchema), submitVoiceGen);
+router.post('/voice-clone', authMiddleware, heavyLimiter, tierGuard('video'), validate(voiceCloneSchema), submitVoiceClone);
+router.post('/video-edit', authMiddleware, heavyLimiter, tierGuard('video'), validate(videoEditSchema), submitVideoEdit);
 
-router.get('/tasks', authMiddleware, asyncHandler(listMyTasks));
-router.get('/tasks/:taskId', authMiddleware, validate(z.object({ taskId: z.string().regex(/^\d+$/).transform(Number) }), 'params'), asyncHandler(getTaskResult));
+router.get('/tasks', authMiddleware, listMyTasks);
+router.get('/tasks/:taskId', authMiddleware, validate(z.object({ taskId: z.string().regex(/^\d+$/).transform(Number) }), 'params'), getTaskResult);
 
 export default router;

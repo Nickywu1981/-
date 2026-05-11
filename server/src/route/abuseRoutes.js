@@ -2,7 +2,6 @@ import { Router } from 'express';
 import { listAllRecords, checkAbuse } from '../controller/abuseController.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
-import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate, paginationSchema } from '../utils/validate.js';
 import { z } from 'zod';
 
@@ -15,7 +14,7 @@ const recordsQuerySchema = paginationSchema.extend({
 });
 
 // 管理端：滥用记录列表 + 检测单用户
-router.get('/records', authMiddleware, adminAuth, heavyLimiter, validate(recordsQuerySchema, 'query'), asyncHandler(listAllRecords));
-router.get('/check/:userId', authMiddleware, adminAuth, heavyLimiter, validate(userIdParamSchema, 'params'), asyncHandler(checkAbuse));
+router.get('/records', authMiddleware, adminAuth, heavyLimiter, validate(recordsQuerySchema, 'query'), listAllRecords);
+router.get('/check/:userId', authMiddleware, adminAuth, heavyLimiter, validate(userIdParamSchema, 'params'), checkAbuse);
 
 export default router;
