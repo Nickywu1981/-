@@ -207,8 +207,7 @@ async function doGenerate() {
     useToast().success('任务已提交');
   } catch (e) {
     useToast().error(e.data?.message || '生成失败');
-    submitting.value = false;
-  }
+  } finally { submitting.value = false; }
 }
 
 function onCompleted({ resultUrl: url }) {

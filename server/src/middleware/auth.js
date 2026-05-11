@@ -94,6 +94,7 @@ const PUBLIC_PREFIXES = [
   '/api/payment/plans', '/api/payment/notify',
   '/api/allinpay/notify',
   '/api/plans',
+  '/api/recharge/callback',
   '/api/badges/public',
   '/api/diy/published',
   '/api/open',

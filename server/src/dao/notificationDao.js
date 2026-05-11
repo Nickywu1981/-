@@ -72,8 +72,8 @@ export async function countAll({ userId, type } = {}) {
   return total;
 }
 
-export async function deleteNotification(id) {
-  await pool.execute('DELETE FROM user_notification WHERE id = ?', [id]);
+export async function deleteNotification(id, userId) {
+  await pool.execute('DELETE FROM user_notification WHERE id = ? AND user_id = ?', [id, userId]);
 }
 
 export async function insertNotificationToUser(notification) {
