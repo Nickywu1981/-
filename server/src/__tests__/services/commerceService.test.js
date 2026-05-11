@@ -42,7 +42,7 @@ describe('commerceService', () => {
       creditDao.getPlanByType.mockResolvedValue({ plan_type: 1, name: '月卡', price: 29, credits: 300, status: 1 });
       creditDao.getMembership.mockResolvedValue({ plan_type: 0, credit_balance: 0 });
       creditDao.insertConsumptionLog.mockResolvedValue(undefined);
-      mockExecute.mockResolvedValue([]);
+      mockExecute.mockResolvedValue([{ affectedRows: 1 }]);
       const r = await commerceService.purchasePlan(1, 1);
       expect(r.planType).toBe(1);
       expect(r.planName).toBe('月卡');
@@ -87,7 +87,7 @@ describe('commerceService', () => {
 
   describe('updateUserStatus', () => {
     it('更新用户状态', async () => {
-      mockExecute.mockResolvedValue([]);
+      mockExecute.mockResolvedValue([{ affectedRows: 1 }]);
       await expect(commerceService.updateUserStatus(1, 1)).resolves.toBeUndefined();
     });
   });

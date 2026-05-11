@@ -28,17 +28,19 @@ export default {
   },
 
   async markFailed(reqsn) {
-    await pool.query(
+    const [r] = await pool.query(
       'UPDATE allinpay_order SET status = 2, update_time = NOW() WHERE reqsn = ? AND status = 0',
       [reqsn],
     );
+    return r.affectedRows;
   },
 
   async markClosed(reqsn) {
-    await pool.query(
+    const [r] = await pool.query(
       'UPDATE allinpay_order SET status = 3, update_time = NOW() WHERE reqsn = ? AND status = 0',
       [reqsn],
     );
+    return r.affectedRows;
   },
 
   async logNotify(data) {

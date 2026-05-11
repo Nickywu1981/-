@@ -224,7 +224,8 @@ export async function updateTenantBalanceInTx(conn, tenantId, newBalance) {
 }
 
 export async function updateTenantBalance(tenantId, newBalance) {
-  await pool.query('UPDATE tenant SET balance = ? WHERE id = ?', [newBalance, tenantId]);
+  const [r] = await pool.query('UPDATE tenant SET balance = ? WHERE id = ?', [newBalance, tenantId]);
+  return r.affectedRows;
 }
 
 // ==================== 流水 ====================

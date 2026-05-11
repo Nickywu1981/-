@@ -3,17 +3,19 @@ import pool from './db.js';
 // ==================== 会员套餐更新 ====================
 
 export async function updateMembership(userId, planType, credits, endTime) {
-  await pool.execute(
+  const [r] = await pool.execute(
     'UPDATE user_membership SET plan_type = ?, credit_balance = credit_balance + ?, start_time = COALESCE(start_time, NOW()), end_time = ?, update_time = NOW() WHERE user_id = ?',
     [planType, credits, endTime, userId],
   );
+  return r.affectedRows;
 }
 
 export async function renewMembership(userId, planType, endTime) {
-  await pool.execute(
+  const [r] = await pool.execute(
     'UPDATE user_membership SET plan_type = ?, end_time = ?, update_time = NOW() WHERE user_id = ?',
     [planType, endTime, userId],
   );
+  return r.affectedRows;
 }
 
 // ==================== 账单查询 ====================
@@ -296,7 +298,8 @@ export async function createPlan(data) {
 }
 
 export async function deletePlan(planId) {
-  await pool.execute('DELETE FROM membership_plan WHERE id = ?', [planId]);
+  const [r] = await pool.execute('DELETE FROM membership_plan WHERE id = ?', [planId]);
+  return r.affectedRows;
 }
 
 export async function updatePlan(planId, data) {
