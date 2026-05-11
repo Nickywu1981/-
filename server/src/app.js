@@ -56,7 +56,6 @@ import tierRoutes from './route/tierRoutes.js';
 import abuseRoutes from './route/abuseRoutes.js';
 import platformDetailRoutes from './route/platformDetailRoutes.js';
 import multilingualRoutes from './route/multilingualRoutes.js';
-// complianceRoutes (V1) removed — v4_compliance supersedes
 import analyticsRoutes from './route/analyticsRoutes.js';
 import platformSpecRoutes from './route/platformSpecRoutes.js';
 import aiDispatchRoutes from './route/aiDispatchRoutes.js';
@@ -331,7 +330,6 @@ app.use('/api/tier', apiLimiter, tierRoutes);
 app.use('/api/admin/abuse', abuseRoutes);
 app.use('/api/platforms', platformDetailRoutes);
 app.use('/api/multilingual', multilingualRoutes);
-// complianceRoutes (V1) /targets + /check → v4 覆盖; /rules/:code → 已合并到 v4_compliance
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/platform-specs', platformSpecRoutes);
 app.use('/api/ai-dispatch', aiConcurrencyGuard, heavyLimiter, aiDispatchRoutes);  // 多模型统一调度: dispatch/categories/health/stats/cache
