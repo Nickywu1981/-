@@ -78,9 +78,13 @@ export async function paginatedQuery({ query, opts }, countFn, listFn) {
  * @param {object} pager - parsePagination 返回值
  * @returns {string} SQL ORDER BY ... LIMIT ... OFFSET ...
  */
-export function paginationSQL(pager) {
+export function paginationSQL(pager, allowedSortFields = null) {
+  let sort = pager.sort;
+  if (allowedSortFields && !allowedSortFields.includes(sort)) {
+    sort = 'id';
+  }
   return {
-    sql: `ORDER BY ${pager.sort} ${pager.order} LIMIT ? OFFSET ?`,
+    sql: `ORDER BY ${sort} ${pager.order} LIMIT ? OFFSET ?`,
     params: [pager.pageSize, pager.offset],
   };
 }

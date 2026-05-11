@@ -109,7 +109,7 @@ const modelsQuerySchema = z.object({
 router.get('/models', authMiddleware, _validate(modelsQuerySchema, 'query'), async (req, res, next) => {
   try {
     const entries = await fs.promises.readdir(uploadDir);
-    const files = await Promise.all(
+    const files = (await Promise.allSettled(
       entries
         .filter((f) => ['.glb', '.gltf', '.fbx', '.obj', '.stl'].includes(path.extname(f).toLowerCase()))
         .map(async (f) => {
@@ -121,7 +121,9 @@ router.get('/models', authMiddleware, _validate(modelsQuerySchema, 'query'), asy
             uploadedAt: stat.mtime.toISOString(),
           };
         }),
-    );
+    ))
+      .filter((r) => r.status === 'fulfilled')
+      .map((r) => r.value);
     files.sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime());
     return success(res, { list: files, total: files.length });
   } catch (e) { next(e); }

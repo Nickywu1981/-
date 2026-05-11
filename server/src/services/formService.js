@@ -1,5 +1,10 @@
 import { BusinessError } from '../utils/businessError.js';
 import { FORM_ACCESS_TYPE } from '../constants/domainStatus.js';
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
 /**
  * P2 增强表单服务 — 校验引擎 + 联动解析 + 脱敏 + 双端适配
  */
@@ -242,8 +247,8 @@ export async function submitForm(code, tenantId, userId, rawData, ip, userAgent,
         if (provider) {
           await provider.send({
             email: form.notify_email,
-            subject: `【表单通知】${form.title} - 新提交`,
-            content: `<h3>${form.title}</h3><p>收到一条新提交，请登录后台查看。</p>`,
+            subject: `【表单通知】${escapeHtml(form.title)} - 新提交`,
+            content: `<h3>${escapeHtml(form.title)}</h3><p>收到一条新提交，请登录后台查看。</p>`,
           });
         }
       } catch (e) { logger.warn('表单邮件通知失败:', e.message); }

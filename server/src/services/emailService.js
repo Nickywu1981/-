@@ -27,20 +27,24 @@ setInterval(() => {
 // ==================== HTML 模板消毒 ====================
 
 function sanitizeHtml(html) {
-  // 移除 <script> 标签、事件处理器、javascript: 协议
+  // 移除 <script> 标签、事件处理器、javascript: 协议、iframe/embed/object
   return html
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/<script\b[^>]*\/>/gi, '')
-    .replace(/\s+on\w+\s*=\s*["'][^"']*["']/gi, '')
-    .replace(/\s+on\w+\s*=\s*[^\s>]+/gi, '')
-    .replace(/<script\b[^>]*>/gi, '')
-    .replace(/<\/script>/gi, '')
+    .replace(/<\s*script\b[^>]*\/?\s*>/gi, '')
+    .replace(/<\s*\/\s*script\s*>/gi, '')
+    .replace(/<iframe\b[^>]*\/?\s*>/gi, '')
+    .replace(/<\s*\/\s*iframe\s*>/gi, '')
+    .replace(/<embed\b[^>]*\/?\s*>/gi, '')
+    .replace(/<object\b[^>]*\/?\s*>/gi, '')
+    .replace(/<\s*\/\s*object\s*>/gi, '')
+    .replace(/<svg\b[^>]*\/?\s*>/gi, '')
+    .replace(/<\s*\/\s*svg\s*>/gi, '')
+    .replace(/\s+on\w+\s*=\s*(?:["'][^"']*["']|[^\s>]+)/gi, '')
+    .replace(/\s+on\w+\s*=\s*`[^`]*`/gi, '')
+    .replace(/&#\d+;?/gi, '')
+    .replace(/&#x[0-9a-f]+;?/gi, '')
     .replace(/javascript\s*:/gi, 'data-xss-blocked:')
-    .replace(/<iframe\b[^>]*>/gi, '')
-    .replace(/<\/iframe>/gi, '')
-    .replace(/<embed\b[^>]*>/gi, '')
-    .replace(/<object\b[^>]*>/gi, '')
-    .replace(/<\/object>/gi, '');
+    .replace(/data\s*:\s*text\/html/gi, 'data-xss-blocked:');
 }
 
 // ==================== 模板渲染 ====================

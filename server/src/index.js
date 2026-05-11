@@ -76,7 +76,8 @@ function gracefulShutdown(signal) {
   // 清理定时器
   if (cleanupTimer) { clearInterval(cleanupTimer); cleanupTimer = null; }
 
-  server.close(async () => {
+  server.close(() => {
+    (async () => {
     logger.info('HTTP/WS 服务已停止');
 
     // 关闭 DB 连接池
@@ -102,6 +103,7 @@ function gracefulShutdown(signal) {
 
     // eslint-disable-next-line no-process-exit
     process.exit(exitCode);
+    })().catch((e) => { logger.error('优雅关闭失败', { message: e.message }); process.exit(1); });
   });
 
   // 10秒强制退出
