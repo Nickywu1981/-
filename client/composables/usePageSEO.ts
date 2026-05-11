@@ -264,6 +264,8 @@ const pageSEOMap: Record<string, { title: string; description: string; keywords?
 export function usePageSEO(overrides?: { title?: string; description?: string; keywords?: string }) {
   const route = useRoute();
   const path = route.path;
+  const { appUrl } = useRuntimeConfig().public;
+  const hostname = new URL(appUrl).hostname;
 
   // 匹配路由（精确匹配 → 前缀匹配 → 默认值）
   let config: { title: string; description: string; keywords?: string } | undefined = pageSEOMap[path];
@@ -299,8 +301,8 @@ export function usePageSEO(overrides?: { title?: string; description?: string; k
             {
               '@type': 'Organization',
               name: 'Movio AI',
-              url: 'https://movio.ai',
-              logo: 'https://movio.ai/logo.png',
+              url: appUrl,
+              logo: `${appUrl}/logo.png`,
               description: 'AI 驱动的电商全链路运营中台 — 51个功能模块覆盖商品图、短视频、文案、合规检测，适配13个电商平台',
               sameAs: [
                 'https://www.zhihu.com/org/movio-ai',
@@ -308,7 +310,7 @@ export function usePageSEO(overrides?: { title?: string; description?: string; k
               ],
               contactPoint: {
                 '@type': 'ContactPoint',
-                email: 'support@movio.ai',
+                email: `support@${hostname}`,
                 contactType: 'customer support',
                 availableLanguage: ['Chinese', 'English'],
               },
@@ -318,7 +320,7 @@ export function usePageSEO(overrides?: { title?: string; description?: string; k
               name: 'Movio AI',
               applicationCategory: 'BusinessApplication',
               operatingSystem: 'Web',
-              url: 'https://movio.ai',
+              url: appUrl,
               offers: { '@type': 'Offer', price: '0', priceCurrency: 'CNY' },
               featureList: 'AI抠图,白底图生成,场景生成,主图制作,批量处理,图生视频,数字人口播,AI配音,声音克隆,脚本生成,智能文案,虚拟试衣,合规检测,详情页H5,多平台适配',
               browserRequirements: 'Chrome 90+, Edge 90+, Safari 15+',
@@ -334,7 +336,7 @@ export function usePageSEO(overrides?: { title?: string; description?: string; k
           mainEntity: [
             { '@type': 'Question', name: 'Movio AI 适合小商家吗？', acceptedAnswer: { '@type': 'Answer', text: '适合。Movio AI 提供免费套餐，单日可处理多张图片，零门槛上手。内置淘宝/拼多多/抖音一键尺寸适配，小商家无需设计基础也能做专业级商品图。' } },
             { '@type': 'Question', name: 'Movio AI 支持哪些电商平台？', acceptedAnswer: { '@type': 'Answer', text: '支持淘宝、拼多多、抖音、小红书、京东、亚马逊、Shopee、Lazada、快手、视频号、苏宁、唯品会、1688等13个主流电商平台。' } },
-            { '@type': 'Question', name: '如何开始使用 Movio AI？', acceptedAnswer: { '@type': 'Answer', text: '访问 movio.ai 注册免费账号，无需下载安装。登录后进入工作台，选择需要的功能模块，上传商品图片即可开始AI创作。' } },
+            { '@type': 'Question', name: '如何开始使用 Movio AI？', acceptedAnswer: { '@type': 'Answer', text: `访问 ${hostname} 注册免费账号，无需下载安装。登录后进入工作台，选择需要的功能模块，上传商品图片即可开始AI创作。` } },
             { '@type': 'Question', name: 'Movio AI 的图片处理速度？', acceptedAnswer: { '@type': 'Answer', text: '智能抠图约5秒完成，场景生成15-30秒，视频生成1-3分钟。批量处理模式下可一次上传多张图片并行处理。' } },
             { '@type': 'Question', name: '生成的内容可以商用吗？', acceptedAnswer: { '@type': 'Answer', text: '可以。Movio AI 生成的商品图、视频、文案等版权归用户所有，可自由用于电商店铺、广告投放和社交媒体推广。' } },
           ],

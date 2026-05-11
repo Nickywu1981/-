@@ -136,6 +136,7 @@ export default defineNuxtConfig({
     public: {
       apiBase: process.env.NUXT_PUBLIC_API_BASE || (process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3001/api'),
       appName: process.env.NUXT_PUBLIC_APP_NAME || 'Movio AI',
+      appUrl: process.env.NUXT_PUBLIC_APP_URL || (process.env.APP_URL || 'https://movio.ai'),
       env: process.env.NUXT_PUBLIC_ENV || 'development',
     },
   },

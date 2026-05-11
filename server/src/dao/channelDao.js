@@ -173,5 +173,5 @@ export async function getPerformanceSummary(tenantId, startDate, endDate) {
      FROM ?? WHERE tenant_id = ? AND stat_date >= ? AND stat_date <= ?`,
     [TABLE.PERFORMANCE, tenantId, startDate, endDate],
   );
-  return rows[0];
+  return rows[0] || null;
 }

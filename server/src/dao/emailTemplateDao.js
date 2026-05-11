@@ -26,7 +26,7 @@ export async function updateTemplate(id, fields) {
   params.push(id);
   await pool.execute(`UPDATE email_template SET ${sets.join(', ')} WHERE id = ?`, params);
   const [rows] = await pool.execute('SELECT * FROM email_template WHERE id = ?', [id]);
-  return rows[0];
+  return rows[0] || null;
 }
 
 export async function insertTemplate(fields) {

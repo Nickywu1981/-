@@ -13,7 +13,7 @@
         </div>
         <div class="card-body">
           <div class="info-row"><span class="label">{{ $t('enterprise.finance.bankAccounts.accountName') }}</span><span>{{ acc.account_name }}</span></div>
-          <div class="info-row"><span class="label">{{ $t('enterprise.finance.bankAccounts.accountNo') }}</span><span class="mono">****{{ acc.account_no.toString().slice(-4) }}</span></div>
+          <div class="info-row"><span class="label">{{ $t('enterprise.finance.bankAccounts.accountNo') }}</span><span class="mono">****{{ acc.account_no?.toString()?.slice(-4) || '****' }}</span></div>
           <div class="info-row" v-if="acc.bank_name"><span class="label">{{ $t('enterprise.finance.bankAccounts.bank') }}</span><span>{{ acc.bank_name }}</span></div>
         </div>
         <div class="card-footer">

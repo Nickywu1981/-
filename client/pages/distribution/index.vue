@@ -84,7 +84,7 @@
 import { ref, onMounted } from 'vue'
 import { formatDate } from '@/utils/format'
 
-definePageMeta({ layout: 'workspace' })
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 
 const apiBase = useRuntimeConfig().public.apiBase || '/api'
 const toast = useToast()
