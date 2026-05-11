@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
+import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
 import { z } from 'zod';
@@ -25,10 +26,10 @@ const taskIdParamSchema = z.object({ taskId: z.string().regex(/^\d+$/).transform
 router.get('/', authMiddleware, asyncHandler(automationController.listTasks));
 router.get('/tasks', authMiddleware, asyncHandler(automationController.listTasks));
 router.get('/accounts', authMiddleware, asyncHandler(automationController.listAccounts));
-router.post('/accounts', authMiddleware, validate(accountSchema), asyncHandler(automationController.createAccount));
-router.delete('/accounts/:id', authMiddleware, validate(idParamSchema, 'params'), asyncHandler(automationController.deleteAccount));
-router.post('/tasks', authMiddleware, validate(taskSchema), asyncHandler(automationController.createTask));
-router.post('/tasks/:id/cancel', authMiddleware, validate(idParamSchema, 'params'), asyncHandler(automationController.cancelTask));
+router.post('/accounts', heavyLimiter, authMiddleware, validate(accountSchema), asyncHandler(automationController.createAccount));
+router.delete('/accounts/:id', heavyLimiter, authMiddleware, validate(idParamSchema, 'params'), asyncHandler(automationController.deleteAccount));
+router.post('/tasks', heavyLimiter, authMiddleware, validate(taskSchema), asyncHandler(automationController.createTask));
+router.post('/tasks/:id/cancel', heavyLimiter, authMiddleware, validate(idParamSchema, 'params'), asyncHandler(automationController.cancelTask));
 router.post('/admin/execute/:taskId', authMiddleware, adminAuth, validate(taskIdParamSchema, 'params'), asyncHandler(automationController.executeTask));
 
 export default router;

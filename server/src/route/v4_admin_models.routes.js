@@ -18,6 +18,7 @@ import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { requireRole } from '../middleware/rbac.js';
+import { adminLimiter } from '../middleware/rateLimiter.js';
 import * as modelRouterService from '../services/model-router.service.js';
 import * as modelConfigCtrl from '../controller/modelConfigController.js';
 
@@ -63,7 +64,7 @@ router.get('/status', requireRole('admin'), async (req, res) => {
   }
 });
 
-router.post('/reset-breaker', requireRole('admin'), _validate(resetBreakerSchema), async (req, res) => {
+router.post('/reset-breaker', adminLimiter, requireRole('admin'), _validate(resetBreakerSchema), async (req, res) => {
   try {
     const { model_id } = req.validated;
     const result = modelRouterService.resetBreaker(model_id);
@@ -79,17 +80,17 @@ router.get('/config', requireRole('admin'), (req, res) => modelConfigCtrl.list(r
 
 router.get('/config/:modelKey', requireRole('admin'), (req, res) => modelConfigCtrl.getOne(req, res));
 
-router.post('/config', requireRole('admin'), _validate(modelConfigSchema), (req, res) => {
+router.post('/config', adminLimiter, requireRole('admin'), _validate(modelConfigSchema), (req, res) => {
   return modelConfigCtrl.create(req, res);
 });
 
-router.put('/config/:modelKey', requireRole('admin'), _validate(modelUpdateSchema), (req, res) => {
+router.put('/config/:modelKey', adminLimiter, requireRole('admin'), _validate(modelUpdateSchema), (req, res) => {
   return modelConfigCtrl.update(req, res);
 });
 
-router.delete('/config/:modelKey', requireRole('admin'), (req, res) => modelConfigCtrl.remove(req, res));
+router.delete('/config/:modelKey', adminLimiter, requireRole('admin'), (req, res) => modelConfigCtrl.remove(req, res));
 
-router.patch('/config/:modelKey/toggle', requireRole('admin'), _validate(toggleSchema), (req, res) => modelConfigCtrl.toggle(req, res));
+router.patch('/config/:modelKey/toggle', adminLimiter, requireRole('admin'), _validate(toggleSchema), (req, res) => modelConfigCtrl.toggle(req, res));
 
 // ============ 调用日志 ============
 

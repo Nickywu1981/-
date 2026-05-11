@@ -51,9 +51,13 @@ function exportAll() {
   if (!downloadable.length) { toast.warn('没有可下载的作品'); return }
   toast.info(`正在导出 ${downloadable.length} 个文件...`)
   downloadable.forEach((item, i) => {
-    setTimeout(() => downloadItem(item), i * 300)
+    const tid = setTimeout(() => downloadItem(item), i * 300)
+    _timeoutIds.push(tid)
   })
 }
+
+const _timeoutIds: ReturnType<typeof setTimeout>[] = []
+onUnmounted(() => { _timeoutIds.forEach(clearTimeout); _timeoutIds.length = 0 })
 </script>
 <style scoped>
 .output-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }

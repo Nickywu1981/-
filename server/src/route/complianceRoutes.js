@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { listTargets, check, getRules } from '../controller/complianceController.js';
 import { authMiddleware } from '../middleware/auth.js';
+import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
 import { z } from 'zod';
@@ -17,6 +18,6 @@ router.use(authMiddleware);
 
 router.get('/targets', asyncHandler(listTargets));
 router.get('/rules/:code', asyncHandler(getRules));
-router.post('/check', validate(checkSchema), asyncHandler(check));
+router.post('/check', heavyLimiter, validate(checkSchema), asyncHandler(check));
 
 export default router;

@@ -27,6 +27,6 @@ const reviewSchema = z.object({
   reviewStatus: z.enum(['approved', 'rejected']),
   reviewRemark: z.string().max(500).optional(),
 });
-router.put('/:id/review', authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(reviewSchema), asyncHandler(reviewTenant));
+router.put('/:id/review', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(reviewSchema), asyncHandler(reviewTenant));
 
 export default router;

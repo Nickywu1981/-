@@ -309,10 +309,12 @@ const apiPricing = computed(() => {
 });
 
 function scrollTo(id: string) {
+  if (!process.client) return
   const el = document.getElementById(id);
   if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 function scrollToTop() {
+  if (!process.client) return
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 const faqOpen = ref(-1);

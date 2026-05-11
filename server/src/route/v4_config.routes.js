@@ -8,6 +8,7 @@ import { success, error } from '../utils/response.js';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import * as configService from '../services/config.service.js';
+import { authMiddleware } from '../middleware/auth.js';
 import { sseMiddleware } from '../services/config-version.service.js';
 import { requireRole } from '../middleware/rbac.js';
 
@@ -26,7 +27,7 @@ const rollbackSchema = z.object({
 });
 
 // GET /api/config/:group — 获取配置组
-router.get('/:group', async (req, res) => {
+router.get('/:group', authMiddleware, async (req, res) => {
   try {
     const config = await configService.getGroupConfig(
       req.params.group,

@@ -152,7 +152,7 @@ export default {
 
   async saveVersion(pageId, mobileConfig, pcConfig, { remark, autoSave = false, rollbackFrom = null }) {
     return withTransaction(async (conn) => {
-      const [[{ v }]] = await conn.query('SELECT COALESCE(MAX(version),0)+1 as v FROM diy_page_version WHERE page_id = ?', [pageId]);
+      const [[{ v }]] = await conn.query('SELECT COALESCE(MAX(version),0)+1 as v FROM diy_page_version WHERE page_id = ? FOR UPDATE', [pageId]);
       await conn.query(
         'INSERT INTO diy_page_version (page_id, version, mobile_config, pc_config, remark, auto_save, rollback_from) VALUES (?, ?, ?, ?, ?, ?, ?)',
         [pageId, v, JSON.stringify(mobileConfig || {}), JSON.stringify(pcConfig || {}), remark || null, autoSave ? 1 : 0, rollbackFrom || null],
@@ -295,7 +295,7 @@ export default {
   async publishWithVersion(id, tenantId, mobileConfig, pcConfig, slug) {
     return withTransaction(async (conn) => {
       await conn.query('UPDATE diy_page SET status = 1, publish_time = NOW() WHERE id = ? AND tenant_id = ?', [id, tenantId]);
-      const [[{ v }]] = await conn.query('SELECT COALESCE(MAX(version),0)+1 as v FROM diy_page_version WHERE page_id = ?', [id]);
+      const [[{ v }]] = await conn.query('SELECT COALESCE(MAX(version),0)+1 as v FROM diy_page_version WHERE page_id = ? FOR UPDATE', [id]);
       await conn.query(
         'INSERT INTO diy_page_version (page_id, version, mobile_config, pc_config, remark, auto_save) VALUES (?, ?, ?, ?, ?, 0)',
         [id, v, JSON.stringify(mobileConfig), JSON.stringify(pcConfig), '发布'],
@@ -329,7 +329,7 @@ export default {
   /** 回滚版本（事务：插入新版本 + 更新页面配置） */
   async rollbackWithVersion(pageId, tenantId, srcVersion) {
     return withTransaction(async (conn) => {
-      const [[{ v }]] = await conn.query('SELECT COALESCE(MAX(version),0)+1 as v FROM diy_page_version WHERE page_id = ?', [pageId]);
+      const [[{ v }]] = await conn.query('SELECT COALESCE(MAX(version),0)+1 as v FROM diy_page_version WHERE page_id = ? FOR UPDATE', [pageId]);
       await conn.query(
         'INSERT INTO diy_page_version (page_id, version, mobile_config, pc_config, remark, auto_save, rollback_from) VALUES (?, ?, ?, ?, ?, 0, ?)',
         [pageId, v, JSON.stringify(srcVersion.mobile_config), JSON.stringify(srcVersion.pc_config), `回滚自版本 v${srcVersion.version}`, srcVersion.version],
