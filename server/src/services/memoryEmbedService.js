@@ -62,6 +62,7 @@ function tfidfVector(tokens, vocab, idf) {
 
 // 余弦相似度
 function cosineSimilarity(a, b) {
+  if (!a || !b) return 0;
   let dot = 0, normA = 0, normB = 0;
   const allKeys = new Set([...Object.keys(a), ...Object.keys(b)]);
   for (const k of allKeys) {
@@ -122,7 +123,7 @@ export async function semanticSearch(query, topK = 5) {
     return { results: [], model: 'none', totalChunks: 0 };
   }
 
-  const queryVec = embed(query).vector;
+  const queryVec = (await embed(query)).vector;
   const scored = data.chunks.map((chunk, i) => {
     const emb = data.vectors ? data.vectors[i] : null;
     if (!emb || Object.keys(emb).length === 0) {
@@ -202,7 +203,7 @@ export async function searchFullContext(query, topK = 5) {
     return { results: [], model: 'none', totalChunks: 0 };
   }
 
-  const queryVec = embed(query).vector;
+  const queryVec = (await embed(query)).vector;
   const scored = data.chunks.map((chunk, i) => {
     const emb = data.vectors ? data.vectors[i] : null;
     if (!emb || Object.keys(emb).length === 0) {
