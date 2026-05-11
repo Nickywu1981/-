@@ -66,9 +66,11 @@
 
 <script setup>
 import { ref, computed, reactive, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { useToast } from '~/composables/useToast';
 
 const toast = useToast();
+const router = useRouter();
 const isAgent = ref(true);
 const channels = reactive({ list: [], total: 0, page: 1, pageSize: 20 });
 const policies = ref([]);
@@ -135,7 +137,7 @@ async function doAudit() {
   } catch (e) { toast.error('审核失败: ' + (e.data?.message || '请重试')); }
 }
 
-function viewDetail(id) { /* 详情页待开发 */ }
+function viewDetail(id) { router.push(`/enterprise/channels/${id}`); }
 function statusClass(s) { return { pending: 'status-warn', active: 'status-ok', rejected: 'status-err', suspended: 'status-warn' }[s] || ''; }
 function statusLabel(s) { return { pending: '待审核', active: '已通过', rejected: '已拒绝', suspended: '已停用' }[s] || s; }
 function formatDate(d) { return d ? new Date(d).toLocaleDateString('zh-CN') : '-'; }

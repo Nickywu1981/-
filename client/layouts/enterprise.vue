@@ -181,3 +181,42 @@ async function handleLogout() {
   .ent-main { margin-left: 0; padding: 16px; }
 }
 </style>
+
+<style>
+/* 企业端全局工具类 */
+.status-warn { color: #f59e0b; background: #fffbeb; padding: 2px 8px; border-radius: 4px; font-size: 13px; }
+.status-ok { color: #10b981; background: #ecfdf5; padding: 2px 8px; border-radius: 4px; font-size: 13px; }
+.status-info { color: #3b82f6; background: #eff6ff; padding: 2px 8px; border-radius: 4px; font-size: 13px; }
+.status-err { color: #ef4444; background: #fef2f2; padding: 2px 8px; border-radius: 4px; font-size: 13px; }
+.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.page-header h1 { font-size: 22px; font-weight: 600; color: #1a1a2e; margin: 0; }
+.stat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.stat-card { background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.stat-num { font-size: 28px; font-weight: 700; color: #1a1a2e; }
+.stat-label { font-size: 13px; color: #999; margin-top: 4px; }
+.card { background: #fff; border-radius: 10px; padding: 24px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.card h3 { font-size: 16px; font-weight: 600; margin: 0 0 16px; color: #1a1a2e; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.data-table th { text-align: left; padding: 10px 12px; background: #f9fafb; color: #6b7280; font-weight: 500; font-size: 13px; border-bottom: 1px solid #e5e7eb; }
+.data-table td { padding: 12px; border-bottom: 1px solid #f3f4f6; color: #374151; }
+.data-table tr:hover td { background: #f9fafb; }
+.empty { text-align: center; color: #999; padding: 40px 0; font-size: 14px; }
+.pagination { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 16px; font-size: 14px; }
+.pagination button { padding: 6px 14px; border: 1px solid #d1d5db; border-radius: 6px; background: #fff; cursor: pointer; }
+.pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary { padding: 8px 20px; background: #1a73e8; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
+.btn-primary:hover { background: #1557b0; }
+.btn-cancel { padding: 8px 20px; background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; border-radius: 6px; cursor: pointer; font-size: 14px; }
+.btn-sm { padding: 4px 10px; font-size: 12px; border: 1px solid #d1d5db; border-radius: 4px; background: #fff; cursor: pointer; }
+.btn-sm:hover { background: #f3f4f6; }
+.btn-success { background: #10b981; color: #fff; border-color: #10b981; }
+.btn-success:hover { background: #059669; }
+.btn-danger { background: #ef4444; color: #fff; border-color: #ef4444; }
+.btn-danger:hover { background: #dc2626; margin-left: 6px; }
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 200; }
+.modal { background: #fff; border-radius: 12px; padding: 24px; min-width: 400px; max-width: 90vw; }
+.modal h3 { margin: 0 0 16px; font-size: 18px; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+.input { width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
+.input:focus { outline: none; border-color: #1a73e8; box-shadow: 0 0 0 2px rgba(26,115,232,0.15); }
+</style>
