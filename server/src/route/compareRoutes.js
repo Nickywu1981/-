@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { authMiddleware } from '../middleware/auth.js';
+import { rateLimiter } from '../middleware/rateLimiter.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
 import { success } from '../utils/response.js';
@@ -16,7 +17,7 @@ const sideBySideSchema = z.object({
 });
 
 // 并排对比: 接受两张图片URL，返回对齐后的对比数据
-router.post('/side-by-side', authMiddleware, validate(sideBySideSchema), asyncHandler(async (req, res) => {
+router.post('/side-by-side', authMiddleware, rateLimiter, validate(sideBySideSchema), asyncHandler(async (req, res) => {
   const { imageA, imageB, mode, labelA, labelB } = req.body;
   success(res, {
     mode,

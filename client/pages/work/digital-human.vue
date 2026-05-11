@@ -76,7 +76,7 @@ import { useTaskPolling } from '~/composables/useTaskPolling'
 import { copyToClipboard } from '@/utils/format'
 import PromptEnhancer from '~/components/PromptEnhancer.vue'
 
-definePageMeta({ layout: 'workspace' })
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 
 const { configs } = useAppPage({ configs: ['page.digital_human.header'] })
 const headerCfg = computed(() => configs.value['page.digital_human.header'] || {})

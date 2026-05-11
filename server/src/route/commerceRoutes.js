@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { validateV4 as validate } from '../utils/validate.js';
 import { authMiddleware, enterpriseOnly } from '../middleware/auth.middleware.js';
+import { rateLimiter } from '../middleware/rateLimiter.js';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import pool from '../dao/db.js';
@@ -20,7 +21,7 @@ const orderQuerySchema = z.object({
 });
 
 // 企业端订单列表（仅查看旗下客户订单）
-router.get('/', authMiddleware, enterpriseOnly, validate(orderQuerySchema, 'query'), async (req, res, next) => {
+router.get('/', authMiddleware, rateLimiter, enterpriseOnly, validate(orderQuerySchema, 'query'), async (req, res, next) => {
   try {
     const tenantId = getTenantId(req);
     const { page, pageSize, status, startDate, endDate, keyword } = req.query;
@@ -48,7 +49,7 @@ router.get('/', authMiddleware, enterpriseOnly, validate(orderQuerySchema, 'quer
 });
 
 // 订单详情
-router.get('/:id', authMiddleware, enterpriseOnly, async (req, res, next) => {
+router.get('/:id', authMiddleware, rateLimiter, enterpriseOnly, async (req, res, next) => {
   try {
     const tenantId = getTenantId(req);
     const [rows] = await pool.query(
@@ -63,7 +64,7 @@ router.get('/:id', authMiddleware, enterpriseOnly, async (req, res, next) => {
 });
 
 // 订单统计（概览卡片）
-router.get('/stats/summary', authMiddleware, enterpriseOnly, async (req, res, next) => {
+router.get('/stats/summary', authMiddleware, rateLimiter, enterpriseOnly, async (req, res, next) => {
   try {
     const tenantId = getTenantId(req);
     const [rows] = await pool.query(

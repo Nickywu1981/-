@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { listAiLogs, getAiLogStats } from '../controller/aiLogController.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
+import { rateLimiter } from '../middleware/rateLimiter.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate, paginationSchema } from '../utils/validate.js';
 import { z } from 'zod';
@@ -12,7 +13,7 @@ const logsQuerySchema = paginationSchema.extend({
   status: z.string().optional(),
 });
 
-router.get('/', authMiddleware, adminAuth, validate(logsQuerySchema, 'query'), asyncHandler(listAiLogs));
-router.get('/stats', authMiddleware, adminAuth, asyncHandler(getAiLogStats));
+router.get('/', authMiddleware, rateLimiter, adminAuth, validate(logsQuerySchema, 'query'), asyncHandler(listAiLogs));
+router.get('/stats', authMiddleware, rateLimiter, adminAuth, asyncHandler(getAiLogStats));
 
 export default router;

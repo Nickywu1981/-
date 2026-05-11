@@ -12,7 +12,7 @@
       <div class="ent-brand">
         <div class="ent-brand-icon">E</div>
         <div class="ent-brand-text">
-          <div class="ent-brand-name">{{ entName || '企业中心' }}</div>
+          <div class="ent-brand-name">{{ entName || $t('enterprise.page_title') || '企业中心' }}</div>
           <div class="ent-brand-sub">Enterprise Console</div>
         </div>
       </div>
@@ -38,8 +38,8 @@
       </nav>
 
       <div class="ent-side-footer">
-        <button class="ent-theme-btn" @click="toggleTheme" :title="isDark ? '切亮色' : '切暗色'">{{ isDark ? '☀️' : '🌙' }}</button>
-        <button class="ent-logout" @click="handleLogout">退出登录</button>
+        <button class="ent-theme-btn" @click="toggleTheme" :title="isDark ? t('admin_shell.switch_light') : t('admin_shell.switch_dark')">{{ isDark ? '☀️' : '🌙' }}</button>
+        <button class="ent-logout" @click="handleLogout">{{ t('admin_shell.logout') }}</button>
       </div>
     </aside>
 
@@ -67,6 +67,7 @@ import { api } from '~/composables/useApi'
 const route = useRoute()
 const router = useRouter()
 const { theme, toggle: toggleTheme } = useTheme()
+const { t } = useI18n()
 const isDark = computed(() => theme.value === 'dark')
 const mobileOpen = ref(false)
 const entName = ref('')
@@ -106,7 +107,7 @@ const pageTitle = computed(() => {
     const it = g.items.find(i => isActive(i.route))
     if (it) return it.label
   }
-  return '企业中心'
+  return t('enterprise.page_title') || '企业中心'
 })
 
 function isActive(itemRoute: string) { return route.path === itemRoute || (itemRoute !== '/' && route.path.startsWith(itemRoute + '/')) }

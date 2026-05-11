@@ -124,7 +124,7 @@ import { useAppDict } from '~/composables/useAppDict'
 import { copyToClipboard } from '@/utils/format'
 import PromptEnhancer from '~/components/PromptEnhancer.vue'
 
-definePageMeta({ layout: 'workspace' })
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 
 const { configs } = useAppPage({ configs: ['page.image.header'] })
 const { options: ratioOptions } = useAppDict('image_ratio')

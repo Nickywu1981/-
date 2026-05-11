@@ -4,6 +4,7 @@
  */
 import { Router } from 'express';
 import { openApiAuth, openApiRateLimit } from '../middleware/openApi.js';
+import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { validate } from '../utils/validate.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { z } from 'zod';
@@ -27,13 +28,13 @@ router.use(openApiRateLimit);
 
 router.get('/v1/ping', asyncHandler(openApiController.ping));
 
-router.post('/v1/image/remove-bg', validate(imageUrlSchema), asyncHandler(openApiController.removeBackground));
+router.post('/v1/image/remove-bg', heavyLimiter, validate(imageUrlSchema), asyncHandler(openApiController.removeBackground));
 
-router.post('/v1/image/scene', validate(sceneSchema), asyncHandler(openApiController.generateScene));
+router.post('/v1/image/scene', heavyLimiter, validate(sceneSchema), asyncHandler(openApiController.generateScene));
 
-router.post('/v1/image/retouch', validate(imageUrlSchema), asyncHandler(openApiController.retouchImage));
+router.post('/v1/image/retouch', heavyLimiter, validate(imageUrlSchema), asyncHandler(openApiController.retouchImage));
 
-router.post('/v1/video/generate', validate(videoGenSchema), asyncHandler(openApiController.generateVideo));
+router.post('/v1/video/generate', heavyLimiter, validate(videoGenSchema), asyncHandler(openApiController.generateVideo));
 
 router.get('/v1/usage', asyncHandler(openApiController.getUsage));
 

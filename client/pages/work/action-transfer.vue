@@ -102,7 +102,7 @@ import { useAppPage } from '~/composables/useAppPage'
 import { useTaskPolling } from '~/composables/useTaskPolling'
 import { copyToClipboard } from '@/utils/format'
 
-definePageMeta({ layout: 'workspace' })
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 
 const { configs } = useAppPage({ configs: ['page.action_migrate.header'] })
 const headerCfg = computed(() => configs.value['page.action_migrate.header'] || {})

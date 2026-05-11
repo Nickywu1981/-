@@ -131,7 +131,7 @@ import { useAppPage } from '~/composables/useAppPage'
 import { useTaskPolling } from '~/composables/useTaskPolling'
 import PromptEnhancer from '~/components/PromptEnhancer.vue'
 
-definePageMeta({ layout: 'workspace' })
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 
 const { configs } = useAppPage({ configs: ['page.video_edit.header'] })
 const headerCfg = computed(() => configs.value['page.video_edit.header'] || {})

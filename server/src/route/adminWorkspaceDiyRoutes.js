@@ -9,6 +9,7 @@ import { validate } from '../utils/validate.js';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
+import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { getAllConfig, getConfigByKey, saveConfig, deleteConfigByKey } from '../services/siteConfigService.js';
 import logger from '../utils/logger.js';
 
@@ -48,7 +49,7 @@ router.get('/:key', validateParams(keyParamSchema), async (req, res, next) => {
 });
 
 // ─── PUT /api/admin/workspace-diy/:key — 更新单项配置 ───
-router.put('/:key', validateParams(keyParamSchema), validate(putBodySchema, 'body'), async (req, res, next) => {
+router.put('/:key', heavyLimiter, validateParams(keyParamSchema), validate(putBodySchema, 'body'), async (req, res, next) => {
   try {
     const { config_value, description } = req.body;
     const updatedBy = req.user?.username || req.user?.email || 'admin';
@@ -59,7 +60,7 @@ router.put('/:key', validateParams(keyParamSchema), validate(putBodySchema, 'bod
 });
 
 // ─── POST /api/admin/workspace-diy/reset/:key — 恢复默认 ───
-router.post('/reset/:key', validateParams(keyParamSchema), async (req, res, next) => {
+router.post('/reset/:key', heavyLimiter, validateParams(keyParamSchema), async (req, res, next) => {
   try {
     const row = await getConfigByKey(req.params.key);
     if (!row) return error(res, ERROR_CODE.NOT_FOUND, '配置项不存在');

@@ -92,7 +92,7 @@ import { useTaskPolling } from '~/composables/useTaskPolling'
 import { copyToClipboard } from '@/utils/format'
 import PromptEnhancer from '~/components/PromptEnhancer.vue'
 
-definePageMeta({ layout: 'workspace' })
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 
 const { configs } = useAppPage({ configs: ['page.viral_replicate.header'] })
 const headerCfg = computed(() => configs.value['page.viral_replicate.header'] || {})

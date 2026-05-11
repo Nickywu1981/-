@@ -5,6 +5,7 @@ import { getConfigLogs } from '../services/siteConfigService.js';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
+import { rateLimiter } from '../middleware/rateLimiter.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
 

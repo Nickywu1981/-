@@ -145,3 +145,6 @@ export const adminLimiter = rateLimit({
   legacyHeaders: false,
   message: { code: 429, msg: '管理操作过于频繁，请稍后再试', data: null },
 });
+
+/** 通用限流器 —— 用于读密集型路由的通用保护 */
+export const rateLimiter = apiLimiter;

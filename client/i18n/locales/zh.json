@@ -423,5 +423,14 @@
         {"id":"face_swap","category":"digital","icon":"🔄","title":"换脸","desc":"AI 人脸替换/数字人换脸","route":"/work/face-swap","order":6,"visible":true}
       ]
     }
+  },
+  "admin_shell": {
+    "expand_sidebar": "展开侧栏",
+    "collapse_sidebar": "折叠侧栏",
+    "switch_light": "切亮色",
+    "switch_dark": "切暗色",
+    "notification": "通知",
+    "logout": "退出登录",
+    "back": "返回"
   }
 }

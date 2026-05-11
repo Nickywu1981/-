@@ -175,7 +175,7 @@ import { useAppDict } from '~/composables/useAppDict'
 import { copyToClipboard } from '@/utils/format'
 import PromptEnhancer from '~/components/PromptEnhancer.vue'
 
-definePageMeta({ layout: 'workspace' })
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 
 const { configs } = useAppPage({ configs: ['page.video.header'] })
 const { options: ratioOptions } = useAppDict('video_ratio')

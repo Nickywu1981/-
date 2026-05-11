@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { listRules, getRule, createRule, updateRule, deleteRule } from '../controller/geoRulesController.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
+import { rateLimiter } from '../middleware/rateLimiter.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
 

@@ -5,6 +5,7 @@
 import { Router } from 'express';
 import { authMiddleware } from '../middleware/auth.middleware.js';
 import { adminAuth } from '../middleware/auth.js';
+import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
 import { z } from 'zod';
@@ -27,9 +28,9 @@ const updateSchema = z.object({
 const idParamSchema = z.object({ id: z.string().regex(/^\d+$/).transform(Number) });
 
 router.get('/keys', adminAuth, asyncHandler(ctl.listKeys));
-router.post('/keys', adminAuth, validate(createSchema), asyncHandler(ctl.createKey));
-router.put('/keys/:id/toggle', adminAuth, validate(idParamSchema, 'params'), validate(toggleSchema), asyncHandler(ctl.toggleKey));
-router.put('/keys/:id', adminAuth, validate(idParamSchema, 'params'), validate(updateSchema), asyncHandler(ctl.updateKey));
-router.delete('/keys/:id', adminAuth, validate(idParamSchema, 'params'), asyncHandler(ctl.deleteKey));
+router.post('/keys', heavyLimiter, adminAuth, validate(createSchema), asyncHandler(ctl.createKey));
+router.put('/keys/:id/toggle', heavyLimiter, adminAuth, validate(idParamSchema, 'params'), validate(toggleSchema), asyncHandler(ctl.toggleKey));
+router.put('/keys/:id', heavyLimiter, adminAuth, validate(idParamSchema, 'params'), validate(updateSchema), asyncHandler(ctl.updateKey));
+router.delete('/keys/:id', heavyLimiter, adminAuth, validate(idParamSchema, 'params'), asyncHandler(ctl.deleteKey));
 
 export default router;

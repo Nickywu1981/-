@@ -17,7 +17,7 @@
           <div class="ash-brand-name">{{ brandName }}</div>
           <div class="ash-brand-sub">{{ brandSubtitle }}</div>
         </div>
-        <button class="ash-collapse-btn" @click="collapsed = !collapsed" :title="collapsed ? '展开侧栏' : '折叠侧栏'">
+        <button class="ash-collapse-btn" @click="collapsed = !collapsed" :title="collapsed ? t('admin_shell.expand_sidebar') : t('admin_shell.collapse_sidebar')">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 3L9 7L5 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
         </button>
       </div>
@@ -48,7 +48,7 @@
 
       <!-- 侧栏底部 -->
       <div class="ash-side-footer">
-        <button class="ash-theme-btn" @click="toggleTheme" :title="isDark ? '切亮色' : '切暗色'">
+        <button class="ash-theme-btn" @click="toggleTheme" :title="isDark ? t('admin_shell.switch_light') : t('admin_shell.switch_dark')">
           {{ isDark ? '☀️' : '🌙' }}
         </button>
         <NuxtLink v-if="backRoute" :to="backRoute" class="ash-back-link">
@@ -63,7 +63,7 @@
       <!-- 顶栏 -->
       <header class="ash-topbar">
         <div class="ash-topbar-left">
-          <button class="ash-hamburger" @click="mobileOpen = !mobileOpen" :aria-label="mobileOpen ? '关闭菜单' : '打开菜单'">
+          <button class="ash-hamburger" @click="mobileOpen = !mobileOpen" :aria-label="mobileOpen ? t('landing.menu_close') : t('landing.menu_open')">
             <span /><span /><span />
           </button>
           <!-- 面包屑 -->
@@ -78,7 +78,7 @@
         <div class="ash-topbar-right">
           <slot name="topbar-actions" />
           <!-- 通知 -->
-          <button class="ash-icon-btn" title="通知">
+          <button class="ash-icon-btn" :title="t('admin_shell.notification')">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2a4 4 0 0 0-4 4v2l-1 2h10l-1-2V6a4 4 0 0 0-4-4z" stroke="currentColor" stroke-width="1.2"/><path d="M6 13a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
           </button>
           <!-- 用户 -->
@@ -87,7 +87,7 @@
             <span class="ash-username">{{ userName }}</span>
           </div>
           <div v-if="userOpen" class="ash-user-dropdown" @click.stop>
-            <button @click="handleLogout">退出登录</button>
+            <button @click="handleLogout">{{ t('admin_shell.logout') }}</button>
           </div>
         </div>
       </header>
@@ -128,6 +128,7 @@ type NavGroup = { key: string; icon: string; label: string; open: boolean; items
 
 const route = useRoute()
 const { theme, toggle: toggleTheme } = useTheme()
+const { t } = useI18n()
 const isDark = computed(() => theme.value === 'dark')
 const collapsed = ref(false)
 const mobileOpen = ref(false)

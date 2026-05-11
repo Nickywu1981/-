@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { listBadges, getBadge, listAllBadges, createBadge, updateBadge, deleteBadge } from '../controller/badgeController.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
+import { rateLimiter } from '../middleware/rateLimiter.js';
 import { cacheMiddleware } from '../middleware/cache.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
@@ -25,13 +26,13 @@ const badgeSchema = z.object({
 router.get('/public', cacheMiddleware(300), validate(badgeQuerySchema, 'query'), asyncHandler(listBadges));
 
 // 用户端：可用的标签列表（需登录，缓存 5 分钟）
-router.get('/', authMiddleware, cacheMiddleware(300), validate(badgeQuerySchema, 'query'), asyncHandler(listBadges));
-router.get('/:id', authMiddleware, validate(idParamSchema, 'params'), asyncHandler(getBadge));
+router.get('/', authMiddleware, rateLimiter, cacheMiddleware(300), validate(badgeQuerySchema, 'query'), asyncHandler(listBadges));
+router.get('/:id', authMiddleware, rateLimiter, validate(idParamSchema, 'params'), asyncHandler(getBadge));
 
 // 管理端：CRUD
-router.get('/admin/all', authMiddleware, adminAuth, validate(badgeQuerySchema, 'query'), asyncHandler(listAllBadges));
-router.post('/admin', authMiddleware, adminAuth, validate(badgeSchema), asyncHandler(createBadge));
-router.put('/admin/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(badgeSchema.partial()), asyncHandler(updateBadge));
-router.delete('/admin/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(deleteBadge));
+router.get('/admin/all', authMiddleware, rateLimiter, adminAuth, validate(badgeQuerySchema, 'query'), asyncHandler(listAllBadges));
+router.post('/admin', authMiddleware, rateLimiter, adminAuth, validate(badgeSchema), asyncHandler(createBadge));
+router.put('/admin/:id', authMiddleware, rateLimiter, adminAuth, validate(idParamSchema, 'params'), validate(badgeSchema.partial()), asyncHandler(updateBadge));
+router.delete('/admin/:id', authMiddleware, rateLimiter, adminAuth, validate(idParamSchema, 'params'), asyncHandler(deleteBadge));
 
 export default router;

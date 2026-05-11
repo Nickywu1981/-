@@ -73,7 +73,7 @@ import { useTaskPolling } from '~/composables/useTaskPolling'
 import { useAppDict } from '~/composables/useAppDict'
 import PromptEnhancer from '~/components/PromptEnhancer.vue'
 
-definePageMeta({ layout: 'workspace' })
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 
 const { configs } = useAppPage({ configs: ['page.detail.header'] })
 const { options: templateOptions } = useAppDict('detail_template')

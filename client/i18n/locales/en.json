@@ -423,5 +423,14 @@
         {"id":"face_swap","category":"digital","icon":"🔄","title":"Face Swap","desc":"AI face replacement/digital human swap","route":"/work/face-swap","order":6,"visible":true}
       ]
     }
+  },
+  "admin_shell": {
+    "expand_sidebar": "Expand Sidebar",
+    "collapse_sidebar": "Collapse Sidebar",
+    "switch_light": "Light Mode",
+    "switch_dark": "Dark Mode",
+    "notification": "Notifications",
+    "logout": "Logout",
+    "back": "Back"
   }
 }
