@@ -25,7 +25,7 @@ function getCsrfToken(): string | null {
 
 // ==================== 离线检测 ====================
 
-export const isOffline = ref(false);
+const isOffline = ref(false);
 
 // 401 重定向锁（防并发请求同时触发多次 navigateTo）
 let isRedirecting = false;
@@ -138,34 +138,7 @@ export const api = {
     request<T>(url, { method: 'DELETE' }),
 };
 
-/** 用户相关 API */
-export const userApi = {
-  login: (data: { username: string; password: string }) =>
-    api.post('/auth/login', data),
-  register: (data: any) => api.post('/auth/register', data),
-  profile: () => api.get('/user/profile'),
-  updateProfile: (data: any) => api.put('/user/profile', data),
-  stats: () => api.get('/user/stats'),
-};
-
-/** 管理后台 API */
-export const adminApi = {
-  dashboard: () => api.get('/admin/stats'),
-  users: (params?: any) => api.get('/admin/users', params),
-  tasks: (params?: any) => api.get('/admin/tasks', params),
-  orders: (params?: any) => api.get('/admin/orders', params),
-  plans: (params?: any) => api.get('/admin/plans', params),
-  prompts: (params?: any) => api.get('/admin/prompts', params),
-  credits: (params?: any) => api.get('/admin/credits', params),
-  moderation: {
-    list: (params?: any) => api.get('/admin/sensitive-words', params),
-    add: (word: string) => api.post('/admin/sensitive-words', { word }),
-    remove: (id: number) => api.delete(`/admin/sensitive-words/${id}`),
-  },
-};
-
 export type { ApiResponse, PaginatedData };
-export default api;
 
 let activeInstances = 0;
 

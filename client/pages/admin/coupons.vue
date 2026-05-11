@@ -77,7 +77,6 @@
 import { useConfirm } from '~/composables/useConfirm';
 const toast = useToast();
 const confirm = useConfirm();
-const $api = $fetch
 const list = ref<any[]>([])
 const loading = ref(true)
 const error = ref('')
@@ -93,7 +92,7 @@ const form = reactive({ code: '', name: '', type: 'fixed', value: 0, min_order_a
 async function fetch() {
   loading.value = true; error.value = ''
   try {
-    const res = await $api(`/admin/campaign/coupons?page=${page.value}&pageSize=${pageSize}`)
+    const res = await $fetch(`/admin/campaign/coupons?page=${page.value}&pageSize=${pageSize}`)
     list.value = res.data?.list || []
     total.value = res.data?.total || 0
   } catch (e: any) { error.value = e.message || '加载失败' }
@@ -107,9 +106,9 @@ async function save() {
   saving.value = true
   try {
     if (editing.value) {
-      await $api(`/admin/campaign/coupons/${editing.value.id}`, { method: 'PUT', body: form })
+      await $fetch(`/admin/campaign/coupons/${editing.value.id}`, { method: 'PUT', body: form })
     } else {
-      await $api('/admin/campaign/coupons', { method: 'POST', body: form })
+      await $fetch('/admin/campaign/coupons', { method: 'POST', body: form })
     }
     showModal.value = false
     fetch()
@@ -120,7 +119,7 @@ async function save() {
 async function del(id: number) {
   if (!(await confirm('确认删除此优惠券？', '此操作不可撤销'))) return
   try {
-    await $api(`/admin/campaign/coupons/${id}`, { method: 'DELETE' })
+    await $fetch(`/admin/campaign/coupons/${id}`, { method: 'DELETE' })
     fetch()
   } catch (e: any) { toast.error(e.message || '删除失败') }
 }

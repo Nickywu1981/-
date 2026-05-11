@@ -104,7 +104,6 @@
 import { useConfirm } from '~/composables/useConfirm';
 const toast = useToast();
 const confirm = useConfirm();
-const $api = $fetch
 const list = ref<any[]>([])
 const loading = ref(true)
 const error = ref('')
@@ -129,7 +128,7 @@ async function fetch() {
     const params = new URLSearchParams({ page: String(page.value), pageSize: String(pageSize) })
     if (filterType.value) params.set('type', filterType.value)
     if (filterStatus.value) params.set('status', filterStatus.value)
-    const res = await $api(`/admin/campaign/campaigns?${params}`)
+    const res = await $fetch(`/admin/campaign/campaigns?${params}`)
     list.value = res.data?.list || []
     total.value = res.data?.total || 0
   } catch (e: any) { error.value = e.message || '加载失败' }
@@ -143,9 +142,9 @@ async function save() {
   saving.value = true
   try {
     if (editing.value) {
-      await $api(`/admin/campaign/campaigns/${editing.value.id}`, { method: 'PUT', body: form })
+      await $fetch(`/admin/campaign/campaigns/${editing.value.id}`, { method: 'PUT', body: form })
     } else {
-      await $api('/admin/campaign/campaigns', { method: 'POST', body: form })
+      await $fetch('/admin/campaign/campaigns', { method: 'POST', body: form })
     }
     showModal.value = false
     fetch()
@@ -156,7 +155,7 @@ async function save() {
 async function del(id: number) {
   if (!(await confirm('确认删除此活动？', '此操作不可撤销'))) return
   try {
-    await $api(`/admin/campaign/campaigns/${id}`, { method: 'DELETE' })
+    await $fetch(`/admin/campaign/campaigns/${id}`, { method: 'DELETE' })
     fetch()
   } catch (e: any) { toast.error(e.message || '删除失败') }
 }

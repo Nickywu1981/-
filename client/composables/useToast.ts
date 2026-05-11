@@ -19,5 +19,3 @@ export function useToast() {
     info: (msg: string) => _emit('info', msg),
   }
 }
-// Auto-register toast ref
-export function registerToast(ref: any) { (window as any).__toast = ref; }
