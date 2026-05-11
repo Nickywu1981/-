@@ -119,6 +119,8 @@
       {"icon":"⚡","name":"专业版","price":"99","features":["每月 500 张图片生成","50 个视频/月","全部模板+高级风格","1080p 输出","批量处理","API 接入"],"featured":true},
       {"icon":"🏭","name":"企业版","price":"299","features":["无限图片生成","无限视频生成","专属风格定制","4K 输出","私有化部署","专属客服"],"featured":false}
     ],
+    "currency_symbol": "¥",
+    "pricing_period": "/月",
     "platforms": ["淘宝","拼多多","抖音","小红书","视频号","快手","亚马逊","Temu","Shein","TikTok Shop","美客多","Shopee","Lazada"],
     "feature_cards": [
       {"id":"main","icon":"▣","title":"智能做主图","desc":"AI 自动抠图→白底→精修→裁切→品牌水印，一键生成3张风格主图","tags":["爆款商品图","13平台适配"],"color":"#EDE9FE","ai":true,"route":"/work/main-image","category":"image"},
