@@ -23,6 +23,7 @@
 <script setup lang="ts">
 const items = ref<any[]>([])
 const loading = ref(true)
+const toast = useToast()
 const { download } = useFileDownload()
 
 function statusLabel(s: string) {

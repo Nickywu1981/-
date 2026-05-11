@@ -86,6 +86,7 @@ const { createBlobUrl, revoke } = useBlobUrl()
 
 import PromptEnhancer from '~/components/PromptEnhancer.vue'
 
+const toast = useToast()
 const step = ref(0);
 const previewUrl = ref('');
 const uploadedUrl = ref('');

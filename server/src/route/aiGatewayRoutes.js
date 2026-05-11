@@ -123,7 +123,7 @@ router.get('/stats/tokens', authMiddleware, asyncHandler(async (req, res) => {
 
 // ==================== GET /pricing — 定价查询 ====================
 
-router.get('/pricing', asyncHandler(async (req, res) => {
+router.get('/pricing', authMiddleware, asyncHandler(async (req, res) => {
   const { category } = req.query;
   const pricing = await getGatewayPricing(category || null);
   res.json({ code: 0, data: pricing });

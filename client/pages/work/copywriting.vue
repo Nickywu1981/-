@@ -213,6 +213,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
+const toast = useToast()
 import { MagicStick } from '@element-plus/icons-vue';
 import { copyToClipboard } from '@/utils/format';
 
@@ -234,7 +235,7 @@ onMounted(async () => {
     ]);
     platforms.value = p?.data || {};
     languages.value = l?.data || {};
-  } catch { toast.warn('加载配 置失败') }
+  } catch { toast.warn('加载配置失败') }
 });
 
 // ===== 标题 =====
@@ -300,7 +301,7 @@ async function loadHistory() {
     const r = await $fetch(`/api/copywriting/history?type=${historyType.value}&page=${historyPage.value}&pageSize=20`);
     historyList.value = r?.data?.list || [];
     historyTotal.value = r?.data?.total || 0;
-  } catch { toast.warn('加载配 置失败') }
+  } catch { toast.warn('加载配置失败') }
   finally { historyLoading.value = false; }
 }
 async function deleteRecord(id) {

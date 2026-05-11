@@ -46,7 +46,7 @@
         <h3>换色完成</h3>
         <div class="image-grid">
           <div v-for="img in (task.result.value?.images || [])" :key="img.color" class="result-card">
-            <div class="result-img" />
+            <img loading="lazy" :src="img.url || img.image_url" :alt="img.color" class="result-img" @error="(e) => { (e.target as HTMLImageElement).style.display = 'none' }" />
             <span class="result-label" :style="{ background: img.color }">{{ img.color }}</span>
           </div>
         </div>
@@ -67,6 +67,7 @@ const uploading = ref(false);
 const selectedColors = ref<string[]>([]);
 const customColor = ref('#FF0000');
 const customColorHex = ref('');
+const toast = useToast()
 const fileInput = ref<HTMLInputElement | null>(null)
 const task = useTask();
 
@@ -136,6 +137,6 @@ function handleRedo() { task.reset(); step.value = 0; previewUrl.value = ''; upl
 .tag { padding: 3px 10px; border-radius: 12px; color: #fff; font-size: 11px; text-shadow: 0 0 2px rgba(0,0,0,0.5); }
 .image-grid { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
 .result-card { text-align: center; }
-.result-img { width: 160px; aspect-ratio: 1; background: var(--bg-hover); border-radius: 8px; }
+.result-img { width: 160px; aspect-ratio: 1; background: var(--bg-hover); border-radius: 8px; object-fit: cover; }
 .result-label { font-size: 11px; color: #fff; padding: 2px 8px; border-radius: 10px; margin-top: 4px; display: inline-block; text-shadow: 0 0 2px rgba(0,0,0,0.3); }
 </style>

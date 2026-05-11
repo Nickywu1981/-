@@ -10,7 +10,7 @@ import { Router } from 'express';
 import z from 'zod';
 import { dispatch, getCategories, getModelsByCategory, getUsageStats, healthCheck, clearCache, extensionHooks } from '../services/modelDispatcher.js';
 import { gatewayDispatch } from '../gateway/aiGatewayHub.js';
-import { authMiddleware } from '../middleware/auth.js';
+import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
@@ -88,7 +88,7 @@ router.get('/stats', authMiddleware, asyncHandler(async (_req, res) => {
 
 // ==================== POST /api/ai/cache/clear ====================
 
-router.post('/cache/clear', authMiddleware, validate(z.object({})), asyncHandler(async (_req, res) => {
+router.post('/cache/clear', authMiddleware, adminAuth, validate(z.object({})), asyncHandler(async (_req, res) => {
   clearCache();
   return success(res, {}, 'AI 推理缓存已清除');
 }));

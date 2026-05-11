@@ -86,8 +86,7 @@ async function handleFile(e: Event) {
 function handleDrop(e: DragEvent) {
   e.preventDefault()
   if (e.dataTransfer?.files[0]) {
-    previewUrl.value = createBlobUrl(e.dataTransfer.files[0])
-    uploadFile(e.dataTransfer.files[0])
+    handleFile({ target: { files: e.dataTransfer.files } } as unknown as Event)
   }
 }
 async function submitTask() {

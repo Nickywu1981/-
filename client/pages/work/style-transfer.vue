@@ -38,7 +38,7 @@
         <h3>风格转化完成</h3>
         <div class="image-grid">
           <div v-for="img in (task.result.value?.images || [])" :key="img.id" class="result-card">
-            <div class="result-img" />
+            <img loading="lazy" :src="img.url || img.image_url" :alt="img.variant" class="result-img" @error="(e) => { (e.target as HTMLImageElement).style.display = 'none' }" />
             <span>{{ img.variant }}</span>
           </div>
         </div>
@@ -57,6 +57,7 @@ const previewUrl = ref('');
 const uploadedUrl = ref('');
 const uploading = ref(false);
 const selectedStyle = ref('vintage');
+const toast = useToast()
 const fileInput = ref<HTMLInputElement | null>(null)
 const task = useTask();
 
@@ -105,5 +106,5 @@ function handleRedo() { task.reset(); step.value = 0; previewUrl.value = ''; upl
 <style scoped>
 .image-grid { display: flex; gap: 12px; justify-content: center; }
 .result-card { text-align: center; }
-.result-img { width: 160px; aspect-ratio: 1; background: var(--bg-hover); border-radius: 8px; }
+.result-img { width: 160px; aspect-ratio: 1; background: var(--bg-hover); border-radius: 8px; object-fit: cover; }
 </style>

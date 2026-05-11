@@ -69,6 +69,7 @@ const submitting = ref(false);
 const selectedSkin = ref('natural');
 const selectedBody = ref('standard');
 const selectedStyle = ref('casual');
+const toast = useToast()
 const fileInput = ref<HTMLInputElement | null>(null)
 const task = useTask();
 
