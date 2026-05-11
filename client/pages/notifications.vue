@@ -86,7 +86,7 @@ async function markAllRead() {
   try { await $fetch('/api/notifications/read-all', { method: 'PUT' }); } catch { /* optimistic */ }
 }
 
-onMounted(() => { fetch(); fetchUnread(); });
+onMounted(() => { Promise.all([fetch(), fetchUnread()]); });
 </script>
 
 <style scoped>

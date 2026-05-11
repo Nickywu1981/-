@@ -2,7 +2,7 @@ export default defineNuxtConfig({
   ssr: true, // 启用 SSR 确保页面正常渲染
   devtools: { enabled: process.env.NODE_ENV !== 'production' },
 
-  css: ['vant/lib/index.css', '@/assets/css/design-tokens.css'],
+  css: ['@/assets/css/design-tokens.css'],
 
   app: {
     head: {
@@ -174,7 +174,6 @@ export default defineNuxtConfig({
         output: {
           manualChunks(id: string) {
             if (id.includes('element-plus')) return 'element-plus'
-            if (id.includes('vant')) return 'vant'
             if (id.includes('chart.js')) return 'chartjs'
             if (id.includes('vue') || id.includes('pinia')) return 'vue-core'
           },
@@ -183,8 +182,7 @@ export default defineNuxtConfig({
     },
   },
 
-  // Vant UI SSR 兼容
+  // SSR
   build: {
-    transpile: ['vant'],
   },
 });
