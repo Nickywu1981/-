@@ -81,7 +81,7 @@ onMounted(() => loadAccounts());
 async function loadAccounts() {
   try {
     accounts.value = await api.get('/enterprise/finance/bank-accounts') || [];
-  } catch (e) { console.error(e); toast.error('收款账户加载失败'); }
+  } catch (e) { toast.error('收款账户加载失败'); }
 }
 
 async function handleSubmit() {

@@ -99,13 +99,13 @@ async function loadData() {
     const data = await api.get('/enterprise/finance/withdrawal', params);
     list.value = data?.list || [];
     total.value = data?.total || 0;
-  } catch (e) { console.error(e); toast.error('提现记录加载失败'); }
+  } catch (e) { toast.error('提现记录加载失败'); }
 }
 
 async function loadBankAccounts() {
   try {
     bankAccounts.value = await api.get('/enterprise/finance/bank-accounts') || [];
-  } catch (e) { console.error(e); toast.error('收款账户加载失败'); }
+  } catch (e) { toast.error('收款账户加载失败'); }
 }
 
 async function handleSubmit() {
