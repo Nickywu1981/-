@@ -52,6 +52,7 @@
 
 <script setup lang="ts">
 import { formatDate } from '@/utils/format'
+const { confirm } = useConfirm()
 
 const activeTab = ref('all')
 const page = ref(1)
@@ -83,6 +84,7 @@ const fetchFavorites = async () => {
 }
 
 const removeFavorite = async (id: number) => {
+  if (!await confirm({ message: '确定取消收藏？', variant: 'warning' })) return;
   try {
     await $fetch(`/api/collections/${id}`, { method: 'DELETE' })
     items.value = items.value.filter(i => i.id !== id)

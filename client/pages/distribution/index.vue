@@ -10,6 +10,10 @@
       <p>一键将作品发布到绑定的电商/社交平台</p>
     </header>
 
+    <div v-if="loading" class="loading-state">加载中...</div>
+
+    <template v-else>
+
     <!-- 已绑定平台 -->
     <div class="section">
       <h3>已绑定平台</h3>
@@ -72,6 +76,7 @@
         </div>
       </div>
     </div>
+    </template>
   </div>
 </template>
 
@@ -88,6 +93,7 @@ const boundPlatforms = ref<any[]>([])
 const recentWorks = ref<any[]>([])
 const publishHistory = ref<any[]>([])
 const publishing = ref<number | null>(null)
+const loading = ref(true)
 
 const platformIcons: Record<string, string> = {
   douyin: '🎵', taobao: '🛒', kuaishou: '📱', xiaohongshu: '📕',
@@ -116,6 +122,7 @@ onMounted(async () => {
     // 发布历史 (模拟)
     publishHistory.value = []
   } catch { toast.error('加载分发数据失败') }
+  finally { loading.value = false }
 })
 
 async function doPublish(work: any) {

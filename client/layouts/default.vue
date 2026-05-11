@@ -141,6 +141,7 @@ usePageSEO();
 // 全局 Toast 挂载
 const toast = ref()
 onMounted(() => { (window as any).__toast = toast.value })
+const { confirm } = useConfirm()
 const user = ref<any>(null);
 const unreadCount = ref(0);
 const menuOpen = ref(false);
@@ -228,6 +229,7 @@ async function loadUnread() {
 }
 
 async function doLogout() {
+  if (!await confirm({ message: '确定要退出登录吗？', variant: 'warning' })) return;
   menuOpen.value = false;
   mobileOpen.value = false;
   try { await $fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }); } catch { /* best-effort */ }

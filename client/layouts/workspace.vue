@@ -60,6 +60,7 @@
 import { ref, computed, onMounted } from 'vue'
 
 const toast = useToast()
+const { confirm } = useConfirm()
 const route = useRoute()
 const router = useRouter()
 
@@ -95,6 +96,7 @@ const pageTitle = computed(() => {
 })
 
 async function handleLogout() {
+  if (!await confirm({ message: '确定要退出登录吗？', variant: 'warning' })) return;
   try {
     await $fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
     toast.success('已退出登录')

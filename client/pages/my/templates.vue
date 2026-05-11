@@ -48,6 +48,7 @@ const loading = ref(true);
 const templates = ref<any[]>([]);
 const form = reactive({ name: '', width: 800, height: 800, platform: '' });
 const toast = useToast()
+const { confirm } = useConfirm()
 
 const platforms = [
   { code: 'taobao', name: '淘宝' }, { code: 'pdd', name: '拼多多' }, { code: 'douyin', name: '抖音' },
@@ -75,6 +76,7 @@ async function saveTemplate() {
 }
 
 async function deleteTemplate(id: number) {
+  if (!await confirm({ message: '确定删除该模板？此操作不可恢复', variant: 'danger' })) return;
   try {
     await $fetch(`/api/templates/my/${id}`, { method: 'DELETE', credentials: 'include' });
     toast.success('模板已删除')

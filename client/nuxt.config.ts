@@ -174,7 +174,6 @@ export default defineNuxtConfig({
         output: {
           manualChunks(id: string) {
             if (id.includes('element-plus')) return 'element-plus'
-            if (id.includes('chart.js')) return 'chartjs'
             if (id.includes('vue') || id.includes('pinia')) return 'vue-core'
           },
         },
