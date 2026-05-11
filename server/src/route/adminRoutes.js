@@ -2,7 +2,6 @@ import { Router } from 'express';
 import { getDashboardStats, listAllUsers, updateUserStatus, batchUpdateUserStatus, listAllTasks, listAllPlans, updatePlan, createPlan, deletePlan, getOperationLogs, checkContentRisk, approveTask, rejectTask, listAllOrders, deleteOrder, listCreditRecords, refundCredit, listAiCallLogs, getAiCallStats, listSensitiveWords, addSensitiveWord, deleteSensitiveWord, retryTask, pauseTask, resumeTask, cancelTask, listAllNotifications, sendNotification, deleteNotification, updateUser } from '../controller/adminController.js';
 import { adminListTemplates, adminSaveTemplate, adminReviewTemplate, adminDeleteTemplate } from '../controller/adminPromptController.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
-import { asyncHandler } from '../middleware/asyncHandler.js';
 import { adminLimiter } from '../middleware/rateLimiter.js';
 import { validate, idSchema, paginationSchema, numericParamSchema } from '../utils/validate.js';
 import { z } from 'zod';
@@ -81,49 +80,49 @@ const adminPromptSchema = z.object({
 router.use(adminLimiter, authMiddleware, adminAuth);
 
 // 看板
-router.get('/stats', asyncHandler(getDashboardStats));
-router.get('/dashboard', asyncHandler(getDashboardStats));
+router.get('/stats', getDashboardStats);
+router.get('/dashboard', getDashboardStats);
 // 用户
-router.get('/users', validate(paginationSchema, 'query'), asyncHandler(listAllUsers));
-router.put('/users/:id', validate(idParamSchema, 'params'), validate(updateUserSchema), asyncHandler(updateUser));
-router.put('/users/:userId/status', validate(userIdParamSchema, 'params'), validate(userStatusSchema), asyncHandler(updateUserStatus));
-router.put('/users/batch-status', validate(batchUserStatusSchema), asyncHandler(batchUpdateUserStatus));
+router.get('/users', validate(paginationSchema, 'query'), listAllUsers);
+router.put('/users/:id', validate(idParamSchema, 'params'), validate(updateUserSchema), updateUser);
+router.put('/users/:userId/status', validate(userIdParamSchema, 'params'), validate(userStatusSchema), updateUserStatus);
+router.put('/users/batch-status', validate(batchUserStatusSchema), batchUpdateUserStatus);
 // 任务
-router.get('/tasks', validate(paginationSchema, 'query'), asyncHandler(listAllTasks));
-router.post('/tasks/:taskId/approve', validate(taskActionParamsSchema, 'params'), asyncHandler(approveTask));
-router.post('/tasks/:taskId/reject', validate(taskActionParamsSchema, 'params'), asyncHandler(rejectTask));
-router.post('/tasks/:taskId/retry', validate(taskActionParamsSchema, 'params'), asyncHandler(retryTask));
-router.post('/tasks/:taskId/pause', validate(taskActionParamsSchema, 'params'), asyncHandler(pauseTask));
-router.post('/tasks/:taskId/cancel', validate(taskActionParamsSchema, 'params'), asyncHandler(cancelTask));
-router.post('/tasks/:taskId/resume', validate(taskActionParamsSchema, 'params'), asyncHandler(resumeTask));
+router.get('/tasks', validate(paginationSchema, 'query'), listAllTasks);
+router.post('/tasks/:taskId/approve', validate(taskActionParamsSchema, 'params'), approveTask);
+router.post('/tasks/:taskId/reject', validate(taskActionParamsSchema, 'params'), rejectTask);
+router.post('/tasks/:taskId/retry', validate(taskActionParamsSchema, 'params'), retryTask);
+router.post('/tasks/:taskId/pause', validate(taskActionParamsSchema, 'params'), pauseTask);
+router.post('/tasks/:taskId/cancel', validate(taskActionParamsSchema, 'params'), cancelTask);
+router.post('/tasks/:taskId/resume', validate(taskActionParamsSchema, 'params'), resumeTask);
 // 套餐
-router.get('/plans', validate(paginationSchema, 'query'), asyncHandler(listAllPlans));
-router.post('/plans', validate(createPlanSchema), asyncHandler(createPlan));
-router.put('/plans/:planId', validate(planIdParamSchema, 'params'), validate(planSchema), asyncHandler(updatePlan));
-router.delete('/plans/:planId', validate(planIdParamSchema, 'params'), asyncHandler(deletePlan));
+router.get('/plans', validate(paginationSchema, 'query'), listAllPlans);
+router.post('/plans', validate(createPlanSchema), createPlan);
+router.put('/plans/:planId', validate(planIdParamSchema, 'params'), validate(planSchema), updatePlan);
+router.delete('/plans/:planId', validate(planIdParamSchema, 'params'), deletePlan);
 // 日志
-router.get('/logs', validate(paginationSchema, 'query'), asyncHandler(getOperationLogs));
-router.get('/orders', validate(paginationSchema, 'query'), asyncHandler(listAllOrders));
-router.delete('/orders/:orderId', validate(orderIdParamSchema, 'params'), asyncHandler(deleteOrder));
+router.get('/logs', validate(paginationSchema, 'query'), getOperationLogs);
+router.get('/orders', validate(paginationSchema, 'query'), listAllOrders);
+router.delete('/orders/:orderId', validate(orderIdParamSchema, 'params'), deleteOrder);
 // 风控
-router.post('/check-content', validate(checkContentSchema), asyncHandler(checkContentRisk));
-router.get('/sensitive-words', validate(paginationSchema, 'query'), asyncHandler(listSensitiveWords));
-router.post('/sensitive-words', validate(sensitiveWordSchema), asyncHandler(addSensitiveWord));
-router.delete('/sensitive-words/:id', validate(idParamSchema, 'params'), asyncHandler(deleteSensitiveWord));
+router.post('/check-content', validate(checkContentSchema), checkContentRisk);
+router.get('/sensitive-words', validate(paginationSchema, 'query'), listSensitiveWords);
+router.post('/sensitive-words', validate(sensitiveWordSchema), addSensitiveWord);
+router.delete('/sensitive-words/:id', validate(idParamSchema, 'params'), deleteSensitiveWord);
 // 提示词
-router.get('/prompts', validate(paginationSchema, 'query'), asyncHandler(adminListTemplates));
-router.post('/prompts', validate(adminPromptSchema), asyncHandler(adminSaveTemplate));
-router.put('/prompts/:id/review', validate(idParamSchema, 'params'), validate(promptReviewSchema), asyncHandler(adminReviewTemplate));
-router.delete('/prompts/:id', validate(idParamSchema, 'params'), asyncHandler(adminDeleteTemplate));
+router.get('/prompts', validate(paginationSchema, 'query'), adminListTemplates);
+router.post('/prompts', validate(adminPromptSchema), adminSaveTemplate);
+router.put('/prompts/:id/review', validate(idParamSchema, 'params'), validate(promptReviewSchema), adminReviewTemplate);
+router.delete('/prompts/:id', validate(idParamSchema, 'params'), adminDeleteTemplate);
 // 积分
-router.get('/credits', validate(paginationSchema, 'query'), asyncHandler(listCreditRecords));
-router.post('/credits/refund', validate(refundSchema), asyncHandler(refundCredit));
+router.get('/credits', validate(paginationSchema, 'query'), listCreditRecords);
+router.post('/credits/refund', validate(refundSchema), refundCredit);
 // AI日志
-router.get('/ai-logs', validate(paginationSchema, 'query'), asyncHandler(listAiCallLogs));
-router.get('/ai-logs/stats',asyncHandler(getAiCallStats));
+router.get('/ai-logs', validate(paginationSchema, 'query'), listAiCallLogs);
+router.get('/ai-logs/stats', getAiCallStats);
 // 通知管理
-router.get('/notifications', validate(paginationSchema, 'query'), asyncHandler(listAllNotifications));
-router.post('/notifications/send', validate(sendNotificationSchema), asyncHandler(sendNotification));
-router.delete('/notifications/:id', validate(idParamSchema, 'params'), asyncHandler(deleteNotification));
+router.get('/notifications', validate(paginationSchema, 'query'), listAllNotifications);
+router.post('/notifications/send', validate(sendNotificationSchema), sendNotification);
+router.delete('/notifications/:id', validate(idParamSchema, 'params'), deleteNotification);
 
 export default router;

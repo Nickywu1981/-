@@ -2,7 +2,6 @@ import { Router } from 'express';
 import { getFaqs, getFaqById, createFaq, updateFaq, deleteFaq } from '../controller/helpController.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { adminLimiter } from '../middleware/rateLimiter.js';
-import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate, idParamSchema } from '../utils/validate.js';
 import { z } from 'zod';
 
@@ -17,10 +16,10 @@ const faqSchema = z.object({
 
 const faqQuerySchema = z.object({ keyword: z.string().max(200).optional() });
 
-router.get('/', validate(faqQuerySchema, 'query'), asyncHandler(getFaqs));
-router.get('/:id', validate(idParamSchema, 'params'), asyncHandler(getFaqById));
-router.post('/', adminLimiter, authMiddleware, adminAuth, validate(faqSchema), asyncHandler(createFaq));
-router.put('/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(faqSchema.partial()), asyncHandler(updateFaq));
-router.delete('/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(deleteFaq));
+router.get('/', validate(faqQuerySchema, 'query'), getFaqs);
+router.get('/:id', validate(idParamSchema, 'params'), getFaqById);
+router.post('/', adminLimiter, authMiddleware, adminAuth, validate(faqSchema), createFaq);
+router.put('/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(faqSchema.partial()), updateFaq);
+router.delete('/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), deleteFaq);
 
 export default router;

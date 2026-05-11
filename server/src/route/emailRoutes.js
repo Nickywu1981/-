@@ -4,7 +4,6 @@ import {
   listTemplates, updateTemplate, createTemplate, deleteTemplate,
 } from '../controller/emailController.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
-import { asyncHandler } from '../middleware/asyncHandler.js';
 import { codeLimiter, verifyLimiter, adminLimiter } from '../middleware/rateLimiter.js';
 import { validate, emailSchema, codeSchema, idParamSchema } from '../utils/validate.js';
 import { z } from 'zod';
@@ -15,8 +14,8 @@ const sendCodeSchema = z.object({ email: emailSchema, scene: z.enum(['register',
 const verifyCodeSchema = z.object({ email: emailSchema, code: codeSchema });
 
 // 公开 — 验证码收发
-router.post('/send-code', codeLimiter, validate(sendCodeSchema), asyncHandler(sendVerificationCode));
-router.post('/verify-code', verifyLimiter, validate(verifyCodeSchema), asyncHandler(verifyCode));
+router.post('/send-code', codeLimiter, validate(sendCodeSchema), sendVerificationCode);
+router.post('/verify-code', verifyLimiter, validate(verifyCodeSchema), verifyCode);
 
 // 管理后台 — 模板管理
 const createTemplateSchema = z.object({
@@ -31,9 +30,9 @@ const createTemplateSchema = z.object({
 });
 const updateTemplateSchema = createTemplateSchema.partial().omit({ template_code: true });
 
-router.get('/templates', authMiddleware, adminAuth, asyncHandler(listTemplates));
-router.post('/templates', adminLimiter, authMiddleware, adminAuth, validate(createTemplateSchema), asyncHandler(createTemplate));
-router.put('/templates/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(updateTemplateSchema), asyncHandler(updateTemplate));
-router.delete('/templates/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(deleteTemplate));
+router.get('/templates', authMiddleware, adminAuth, listTemplates);
+router.post('/templates', adminLimiter, authMiddleware, adminAuth, validate(createTemplateSchema), createTemplate);
+router.put('/templates/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(updateTemplateSchema), updateTemplate);
+router.delete('/templates/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), deleteTemplate);
 
 export default router;

@@ -6,7 +6,6 @@ import {
 import { authMiddleware } from '../middleware/auth.js';
 import { rateLimiter } from '../middleware/rateLimiter.js';
 import { cacheMiddleware } from '../middleware/cache.js';
-import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate, idParamSchema } from '../utils/validate.js';
 import { z } from 'zod';
 
@@ -28,14 +27,14 @@ const templateSchema = z.object({
 const updateTemplateSchema = templateSchema.partial();
 
 // 公共 — 平台尺寸查询（缓存 30 分钟）
-router.get('/platforms', rateLimiter, cacheMiddleware(1800), asyncHandler(getAllPlatforms));
-router.get('/platforms/list', rateLimiter, cacheMiddleware(1800), asyncHandler(getPlatformList));
-router.get('/platforms/:platform', rateLimiter, cacheMiddleware(1800), validate(platformParamSchema, 'params'), asyncHandler(getSizesByPlatform));
+router.get('/platforms', rateLimiter, cacheMiddleware(1800), getAllPlatforms);
+router.get('/platforms/list', rateLimiter, cacheMiddleware(1800), getPlatformList);
+router.get('/platforms/:platform', rateLimiter, cacheMiddleware(1800), validate(platformParamSchema, 'params'), getSizesByPlatform);
 
 // 用户自定义模板（需要登录）
-router.post('/my', authMiddleware, rateLimiter, validate(templateSchema), asyncHandler(createUserTemplate));
-router.get('/my', authMiddleware, rateLimiter, validate(myListQuerySchema, 'query'), asyncHandler(listUserTemplates));
-router.put('/my/:id', authMiddleware, rateLimiter, validate(idParamSchema, 'params'), validate(updateTemplateSchema), asyncHandler(updateUserTemplate));
-router.delete('/my/:id', authMiddleware, rateLimiter, validate(idParamSchema, 'params'), asyncHandler(deleteUserTemplate));
+router.post('/my', authMiddleware, rateLimiter, validate(templateSchema), createUserTemplate);
+router.get('/my', authMiddleware, rateLimiter, validate(myListQuerySchema, 'query'), listUserTemplates);
+router.put('/my/:id', authMiddleware, rateLimiter, validate(idParamSchema, 'params'), validate(updateTemplateSchema), updateUserTemplate);
+router.delete('/my/:id', authMiddleware, rateLimiter, validate(idParamSchema, 'params'), deleteUserTemplate);
 
 export default router;

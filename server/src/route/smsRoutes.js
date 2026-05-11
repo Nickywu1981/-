@@ -4,7 +4,6 @@ import {
   updateTemplate, createTemplate, deleteTemplate, listLogs, sendNotification,
 } from '../controller/smsController.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
-import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate, phoneSchema, codeSchema, idParamSchema } from '../utils/validate.js';
 import { codeLimiter, verifyLimiter } from '../middleware/rateLimiter.js';
 import { z } from 'zod';
@@ -39,17 +38,17 @@ const smsTemplateSchema = z.object({
 const smsTemplateUpdateSchema = smsTemplateSchema.partial().omit({ template_code: true });
 
 // 公开 — 验证码收发
-router.post('/send-code', codeLimiter, validate(sendCodeSchema), asyncHandler(sendVerificationCode));
-router.post('/verify-code', verifyLimiter, validate(verifyCodeSchema), asyncHandler(verifyCode));
+router.post('/send-code', codeLimiter, validate(sendCodeSchema), sendVerificationCode);
+router.post('/verify-code', verifyLimiter, validate(verifyCodeSchema), verifyCode);
 
 // 登录用户 — 手动触发通知短信
-router.post('/send', authMiddleware, codeLimiter, validate(sendNotificationSchema), asyncHandler(sendNotification));
+router.post('/send', authMiddleware, codeLimiter, validate(sendNotificationSchema), sendNotification);
 
 // 管理后台 — 模板管理 + 日志
-router.get('/templates', authMiddleware, adminAuth, asyncHandler(listTemplates));
-router.post('/templates', authMiddleware, adminAuth, validate(smsTemplateSchema), asyncHandler(createTemplate));
-router.put('/templates/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(smsTemplateUpdateSchema), asyncHandler(updateTemplate));
-router.delete('/templates/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(deleteTemplate));
-router.get('/logs', authMiddleware, adminAuth, asyncHandler(listLogs));
+router.get('/templates', authMiddleware, adminAuth, listTemplates);
+router.post('/templates', authMiddleware, adminAuth, validate(smsTemplateSchema), createTemplate);
+router.put('/templates/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(smsTemplateUpdateSchema), updateTemplate);
+router.delete('/templates/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), deleteTemplate);
+router.get('/logs', authMiddleware, adminAuth, listLogs);
 
 export default router;

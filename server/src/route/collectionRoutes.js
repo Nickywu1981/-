@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { rateLimiter } from '../middleware/rateLimiter.js';
-import { asyncHandler } from '../middleware/asyncHandler.js';
 import { cacheMiddleware } from '../middleware/cache.js';
 import { listCollections, getCollection, createCollection, updateCollection, deleteCollection } from '../controller/collectionController.js';
 import { validate, idParamSchema } from '../utils/validate.js';
@@ -18,10 +17,10 @@ const updateCollectionSchema = collectionSchema.partial();
 const router = Router();
 router.use(authMiddleware);
 router.use(rateLimiter);
-router.get('/', cacheMiddleware(120), asyncHandler(listCollections));
-router.get('/:id', cacheMiddleware(120), validate(idParamSchema, 'params'), asyncHandler(getCollection));
-router.post('/', adminAuth, validate(collectionSchema), asyncHandler(createCollection));
-router.put('/:id', adminAuth, validate(idParamSchema, 'params'), validate(updateCollectionSchema), asyncHandler(updateCollection));
-router.delete('/:id', adminAuth, validate(idParamSchema, 'params'), asyncHandler(deleteCollection));
+router.get('/', cacheMiddleware(120), listCollections);
+router.get('/:id', cacheMiddleware(120), validate(idParamSchema, 'params'), getCollection);
+router.post('/', adminAuth, validate(collectionSchema), createCollection);
+router.put('/:id', adminAuth, validate(idParamSchema, 'params'), validate(updateCollectionSchema), updateCollection);
+router.delete('/:id', adminAuth, validate(idParamSchema, 'params'), deleteCollection);
 
 export default router;
