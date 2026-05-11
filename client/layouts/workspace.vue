@@ -148,7 +148,7 @@ definePageMeta({ middleware: ['auth'] })
 
 <style scoped>
 /* ═══ Layout Shell ═══ */
-.wsl { display: flex; height: 100vh; overflow: hidden; background: var(--bg-page, #fafaf9); }
+.wsl { display: flex; height: 100vh; overflow: hidden; background: var(--bg-page, #fafaf9); font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif; }
 
 /* ═══ Sidebar ═══ */
 .wsl-side {

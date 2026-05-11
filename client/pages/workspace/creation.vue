@@ -121,6 +121,7 @@ const loading = ref(true)
 
 const tabs = ref<{ key: string; label: string }[]>([])
 const cardData = ref<Record<string, Card[]>>({})
+const { t } = useI18n()
 
 onMounted(async () => {
   try {
@@ -129,11 +130,11 @@ onMounted(async () => {
       const cards: Card[] = cfg.workspace_cards.filter((c: Card) => c.visible !== false)
       // 提取唯一 category 作为 tabs
       const seen = new Set<string>()
-      const t: { key: string; label: string }[] = []
+      const cats: { key: string; label: string }[] = []
       cards.forEach((c: Card) => {
         if (!seen.has(c.category)) {
           seen.add(c.category)
-          t.push({ key: c.category, label: c.category })
+          cats.push({ key: c.category, label: c.category })
         }
       })
       // 分组 cards
@@ -143,7 +144,7 @@ onMounted(async () => {
         groups[c.category].push(c)
       })
       const tabKeys = ["video", "image", "detail", "copywrite", "digital"]
-      tabs.value = t.length > 0 ? t : tabKeys.map(key => ({ key, label: t(`workspace.creation_tabs.${key}`) }))
+      tabs.value = cats.length > 0 ? cats : tabKeys.map(key => ({ key, label: t(`workspace.creation_tabs.${key}`) }))
       cardData.value = Object.keys(groups).length > 0 ? groups : defaultCardData
     } else {
       throw new Error('empty')
@@ -164,7 +165,6 @@ onMounted(async () => {
 function go(path: string) { router.push(path) }
 
 const activeTabLabel = computed(() => tabs.value.find(t => t.key === activeTab.value)?.label || '')
-const { t } = useI18n()
 
 const activeTabPlaceholder = computed(() => {
   const key = `workspace.creation_placeholder_${activeTab.value}` as string
