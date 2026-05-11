@@ -42,6 +42,9 @@
 </template>
 
 <script setup>
+import { useApi } from '~/composables/useApi';
+const api = useApi();
+
 const list = ref([]);
 const total = ref(0);
 const page = ref(1);
@@ -58,9 +61,9 @@ async function loadData() {
     if (filterType.value) params.type = filterType.value;
     if (startDate.value) params.startDate = startDate.value;
     if (endDate.value) params.endDate = endDate.value;
-    const res = await $fetch('/api/enterprise/finance/ledger', { credentials: 'include', params });
-    list.value = res.data?.list || [];
-    total.value = res.data?.total || 0;
+    const data = await api.get('/enterprise/finance/ledger', params);
+    list.value = data?.list || [];
+    total.value = data?.total || 0;
   } catch (e) { console.error(e); }
 }
 

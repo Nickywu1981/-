@@ -74,6 +74,6 @@ router.get('/policy', authMiddleware, enterpriseOnly, requireAgent, ctrl.getComm
 router.put('/policy', authMiddleware, enterpriseOnly, requireAgent, requireRole('agent_admin'), paymentLimiter, csrfProtection, _validate(commissionPolicySchema), ctrl.updateCommissionPolicy);
 
 // ==================== 财务仪表盘 ====================
-router.get('/dashboard', authMiddleware, enterpriseOnly, ctrl.getFinanceDashboard);
+router.get('/dashboard', authMiddleware, enterpriseOnly, setCsrfCookie, ctrl.getFinanceDashboard);
 
 export default router;

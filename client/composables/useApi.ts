@@ -15,6 +15,14 @@ interface PaginatedData<T = any> {
   pageSize: number;
 }
 
+// ==================== CSRF 工具 ====================
+
+function getCsrfToken(): string | null {
+  if (typeof document === 'undefined') return null;
+  const match = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/);
+  return match ? match[1] : null;
+}
+
 // ==================== 离线检测 ====================
 
 export const isOffline = ref(false);
@@ -62,6 +70,12 @@ async function request<T = any>(
   const fullUrl = url.startsWith('http') ? url : `${base}${url}`;
 
   const headers: Record<string, string> = {};
+
+  // CSRF 双重提交 Cookie 模式: 读取 csrf_token → X-CSRF-Token 请求头
+  if (options.method && options.method !== 'GET') {
+    const csrfToken = getCsrfToken();
+    if (csrfToken) headers['x-csrf-token'] = csrfToken;
+  }
 
   // Build query string from params
   let query = '';

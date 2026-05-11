@@ -58,13 +58,15 @@
 </template>
 
 <script setup>
+import { useApi } from '~/composables/useApi';
+const api = useApi();
+
 const dashboard = ref({ balance: 0, totalRevenue: 0, monthRevenue: 0, totalWithdrawn: 0 });
 const isAgent = ref(false);
 
 onMounted(async () => {
   try {
-    const res = await $fetch('/api/enterprise/finance/dashboard', { credentials: 'include' });
-    const data = res.data || res;
+    const data = await api.get('/enterprise/finance/dashboard');
     dashboard.value = data;
     isAgent.value = !!data.earnings;
   } catch (e) { console.error(e); }

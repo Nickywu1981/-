@@ -65,6 +65,9 @@
 </template>
 
 <script setup>
+import { useApi } from '~/composables/useApi';
+const api = useApi();
+
 const accounts = ref([]);
 const showForm = ref(false);
 const form = ref({ accountType: 'bank', accountName: '', accountNo: '', bankName: '', bankBranch: '', isDefault: false });
@@ -75,8 +78,7 @@ onMounted(() => loadAccounts());
 
 async function loadAccounts() {
   try {
-    const res = await $fetch('/api/enterprise/finance/bank-accounts', { credentials: 'include' });
-    accounts.value = res.data || [];
+    accounts.value = await api.get('/enterprise/finance/bank-accounts') || [];
   } catch (e) { console.error(e); }
 }
 
@@ -85,20 +87,20 @@ async function handleSubmit() {
   if (!form.value.accountName || !form.value.accountNo) { modalError.value = '户名和账号为必填项'; return; }
   submitting.value = true;
   try {
-    await $fetch('/api/enterprise/finance/bank-account', { method: 'POST', body: form.value, credentials: 'include' });
+    await api.post('/enterprise/finance/bank-account', form.value);
     showForm.value = false;
     form.value = { accountType: 'bank', accountName: '', accountNo: '', bankName: '', bankBranch: '', isDefault: false };
     loadAccounts();
-  } catch (e) { modalError.value = e.data?.msg || '绑定失败'; }
+  } catch (e) { modalError.value = e.data?.msg || e.message || '绑定失败'; }
   finally { submitting.value = false; }
 }
 
 async function handleRemove(acc) {
   if (!confirm(`确定解绑 ${acc.account_name} 的账户吗？`)) return;
   try {
-    await $fetch(`/api/enterprise/finance/bank-accounts/${acc.id}`, { method: 'DELETE', credentials: 'include' });
+    await api.delete(`/enterprise/finance/bank-accounts/${acc.id}`);
     loadAccounts();
-  } catch (e) { alert(e.data?.msg || '解绑失败'); }
+  } catch (e) { alert(e.data?.msg || e.message || '解绑失败'); }
 }
 
 function typeLabel(t) { const m = { bank: '银行卡', wechat: '微信', alipay: '支付宝' }; return m[t] || t; }

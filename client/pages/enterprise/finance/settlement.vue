@@ -29,6 +29,9 @@
 </template>
 
 <script setup>
+import { useApi } from '~/composables/useApi';
+const api = useApi();
+
 const list = ref([]);
 const total = ref(0);
 const page = ref(1);
@@ -38,11 +41,9 @@ onMounted(() => loadData());
 
 async function loadData() {
   try {
-    const res = await $fetch('/api/enterprise/finance/settlement', {
-      credentials: 'include', params: { page: page.value, pageSize },
-    });
-    list.value = res.data?.list || [];
-    total.value = res.data?.total || 0;
+    const data = await api.get('/enterprise/finance/settlement', { page: page.value, pageSize });
+    list.value = data?.list || [];
+    total.value = data?.total || 0;
   } catch (e) { console.error(e); }
 }
 

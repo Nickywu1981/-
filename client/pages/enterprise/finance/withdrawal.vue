@@ -72,6 +72,9 @@
 </template>
 
 <script setup>
+import { useApi } from '~/composables/useApi';
+const api = useApi();
+
 const list = ref([]);
 const total = ref(0);
 const page = ref(1);
@@ -91,16 +94,15 @@ async function loadData() {
   try {
     const params = { page: page.value, pageSize };
     if (filterStatus.value) params.status = filterStatus.value;
-    const res = await $fetch('/api/enterprise/finance/withdrawal', { credentials: 'include', params });
-    list.value = res.data?.list || [];
-    total.value = res.data?.total || 0;
+    const data = await api.get('/enterprise/finance/withdrawal', params);
+    list.value = data?.list || [];
+    total.value = data?.total || 0;
   } catch (e) { console.error(e); }
 }
 
 async function loadBankAccounts() {
   try {
-    const res = await $fetch('/api/enterprise/finance/bank-accounts', { credentials: 'include' });
-    bankAccounts.value = res.data || [];
+    bankAccounts.value = await api.get('/enterprise/finance/bank-accounts') || [];
   } catch (e) { console.error(e); }
 }
 
@@ -109,11 +111,11 @@ async function handleSubmit() {
   if (!form.value.amount || form.value.amount < 100) { modalError.value = '最低提现金额 100 元'; return; }
   submitting.value = true;
   try {
-    await $fetch('/api/enterprise/finance/withdrawal', { method: 'POST', body: form.value, credentials: 'include' });
+    await api.post('/enterprise/finance/withdrawal', form.value);
     showForm.value = false;
     form.value = { amount: 0, bankAccountId: null };
     loadData();
-  } catch (e) { modalError.value = e.data?.msg || '提现申请失败'; }
+  } catch (e) { modalError.value = e.data?.msg || e.message || '提现申请失败'; }
   finally { submitting.value = false; }
 }
 
