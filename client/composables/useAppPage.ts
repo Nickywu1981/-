@@ -11,7 +11,6 @@
  *   })
  *   // ready → configs['page.video.header'].title, dicts['platform_list'].options
  */
-import { ref, computed, onMounted } from 'vue'
 import { useSiteConfig } from './useSiteConfig'
 import { useAppDict } from './useAppDict'
 

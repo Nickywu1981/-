@@ -8,9 +8,6 @@
  *   const { options, loading } = useAppDict('platform_list')
  *   // options = [{ item_key:'douyin', item_value:'抖音', item_extra:{ratio:'9:16',format:'mp4'} }, ...]
  */
-import { ref, onMounted } from 'vue'
-import { useRuntimeConfig } from '#app'
-
 const cache: Record<string, any[]> = {}
 
 export function useAppDict(dictKey: string, fallbackList?: any[]) {

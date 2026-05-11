@@ -7,8 +7,6 @@
  *   await submit('video_gen', { prompt: '...' })
  *   // 自动轮询直到 completed/failed
  */
-import { ref, onUnmounted, onDeactivated, onActivated } from 'vue'
-import { useRuntimeConfig } from '#app'
 import { POLL_INTERVAL_MS } from '~/constants/ui'
 
 export function useTaskPolling() {

@@ -7,8 +7,6 @@
  *   const ok = await confirm({ message: '确认删除该数据？' })
  *   if (!ok) return
  */
-import { inject, type Ref } from 'vue'
-
 interface ConfirmOptions {
   title?: string
   message: string

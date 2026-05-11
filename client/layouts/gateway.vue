@@ -54,14 +54,7 @@ const navGroups = reactive([
     ]},
 ])
 
-const breadcrumbs = computed(() => {
-  const items = [{ label: '网关中台', route: '/gateway/dashboard' }]
-  for (const g of navGroups) {
-    const it = g.items.find(i => route.path === i.route || route.path.startsWith(i.route + '/'))
-    if (it) { items.push({ label: g.label, route: '' }, { label: it.label, route: it.route }); break }
-  }
-  return items
-})
+const breadcrumbs = useAdminBreadcrumbs(navGroups, '网关中台', '/gateway/dashboard')
 
 const { logout: handleLogout } = useLogout()
 definePageMeta({ middleware: ['auth'] })

@@ -6,9 +6,6 @@
  *   const { enhancing, enhance } = usePromptEnhance()
  *   const improved = await enhance('红色连衣裙', 'image')
  */
-import { ref } from 'vue'
-import { useRuntimeConfig } from '#app'
-
 export function usePromptEnhance() {
   const enhancing = ref(false)
   const apiBase = useRuntimeConfig().public.apiBase || '/api'

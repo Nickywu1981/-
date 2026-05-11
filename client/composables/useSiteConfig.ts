@@ -8,9 +8,6 @@
  *   const { config, loading, error, isFallback } = useSiteConfig('page.home.hero')
  *   // config.title, config.subtitle, config.btn_start ...
  */
-import { ref, onMounted, onUnmounted } from 'vue'
-import { useRuntimeConfig } from '#app'
-
 // ---------------------------------------------------------------------------
 // 内置降级默认文案 (当后端 API 不可用时使用)
 // ---------------------------------------------------------------------------

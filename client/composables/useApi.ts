@@ -1,5 +1,3 @@
-import { useRuntimeConfig, navigateTo } from '#app';
-import { ref } from 'vue';
 import { REDIRECT_UNLOCK_MS } from '~/constants/ui'
 
 interface ApiResponse<T = any> {

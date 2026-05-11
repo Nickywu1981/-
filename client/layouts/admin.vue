@@ -90,14 +90,7 @@ const navGroups = reactive([
     ]},
 ])
 
-const breadcrumbs = computed(() => {
-  const items = [{ label: '管理后台', route: '/admin/dashboard' }]
-  for (const g of navGroups) {
-    const it = g.items.find(i => route.path.startsWith(i.route))
-    if (it) { items.push({ label: g.label, route: '' }, { label: it.label, route: it.route }); break }
-  }
-  return items
-})
+const breadcrumbs = useAdminBreadcrumbs(navGroups, '管理后台', '/admin/dashboard')
 
 function handleLogout() {
   router.push('/login')
