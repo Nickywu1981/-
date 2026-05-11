@@ -13,7 +13,7 @@ const buildPromptSchema = z.object({
     name: z.string().min(1).max(200),
     features: z.string().max(2000).optional(),
     targetAudience: z.string().max(500).optional(),
-  }).passthrough(),
+  }).strict(),
   language: z.string().min(2).max(10),
   scriptType: z.enum(['product-desc', 'ad-copy', 'live-script', 'social-post', 'email']),
   platform: z.string().optional(),

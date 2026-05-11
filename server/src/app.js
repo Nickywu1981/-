@@ -14,6 +14,14 @@ import { success, error as sendError } from './utils/response.js';
 import { BusinessError } from './utils/businessError.js';
 import { z } from 'zod';
 import { ERROR_CODE } from './constants/errorCode.js';
+
+// =====================================================
+// 四层架构 - 网关层 + 中台层 集成 (Phase 0-A, 2026-05-11)
+// =====================================================
+import { correlationIdMiddleware } from './gateway/correlationId.js';
+import { ipWhitelistMiddleware } from './gateway/ipWhitelist.js';
+import { generateRouteMap } from './gateway/routeRegistry.js';
+import { runHealthCheck } from './gateway/healthDashboard.js';
 import userRoutes from './route/userRoutes.js';
 import sizeTemplateRoutes from './route/sizeTemplateRoutes.js';
 import brandRoutes from './route/brandRoutes.js';
@@ -99,6 +107,7 @@ import platformPublishRoutesV4 from './route/v4_platform_publish.routes.js';
 import templateMarketRoutesV4 from './route/v4_template_market.routes.js';
 import sdkRoutes from './route/sdkRoutes.js';
 import adkRoutes from './route/adkRoutes.js';
+import enterpriseRoutes from './route/enterpriseRoutes.js';   // Phase 1: 企业/代理端 MVP (2026-05-11)
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -142,6 +151,12 @@ app.use(sqlGuardMiddleware);
 // 请求日志
 app.use(requestLogger);
 
+// 全链路追踪 — 注入 X-Correlation-Id (Phase 0-A, 2026-05-11)
+app.use(correlationIdMiddleware);
+
+// IP 白名单中间件 — 管理端路径 (Phase 0-A, 2026-05-11)
+app.use(ipWhitelistMiddleware({ paths: ['/api/admin', '/api/ops'] }));
+
 // CSRF Token 生成 (所有请求) — 必须在 csrfProtection 之前
 app.use(setCsrfCookie);
 
@@ -168,30 +183,19 @@ import('./middleware/cache.js').then(({ invalidateCache }) => {
   });
 }).catch(() => { /* cache middleware unavailable — cache invalidation disabled */ });
 
-// 健康检查 — DB 必须在线，Redis 离线仅标记 degraded，同步检测 AI 模型状态
+// 健康检查 — 使用网关健康仪表盘 (Phase 0-A, 2026-05-11)
 app.get('/api/health', optionalAuth, async (req, res) => {
-  if (!req.user) return success(res, { status: 'ok' }, 'ok');
-  const status = {
-    status: 'ok',
-    uptime: Math.floor(process.uptime()),
-    memory: Math.round(process.memoryUsage().rss / 1024 / 1024),
-    node: process.version,
-    checks: { db: false, redis: false, ai: {} },
-  };
-  let schemaVersion = 0;
-  try { const db = await import('./dao/db.js'); const conn = await db.default.getConnection(); try { const [tables] = await conn.query('SHOW TABLES'); status.checks.db = true; schemaVersion = tables.length; } finally { conn.release(); } } catch { status.checks.db = false; }
-  try { const redis = await import('./dao/redis.js'); await redis.default.ping(); status.checks.redis = true; } catch { status.checks.redis = false; }
-  try { const { listModels } = await import('./services/aiEngine.js'); for (const m of listModels()) { status.checks.ai[m.id] = m.health ? (await m.health()).status : 'unknown'; } } catch { status.checks.ai = {}; }
-  // BullMQ 队列指标
-  try { const { getAllQueueStats } = await import('./services/queueManager.js'); status.queues = await getAllQueueStats(); } catch { status.queues = {}; }
-  const aiOnline = Object.values(status.checks.ai).filter((s) => s === 'ok').length;
-  const aiTotal = Object.keys(status.checks.ai).length;
-  status.schema_version = schemaVersion;
-  status.degraded = !status.checks.redis || (aiTotal > 0 && aiOnline === 0);
+  const authenticated = !!req.user;
+  const status = await runHealthCheck(authenticated);
   if (status.checks.db) {
     return success(res, status, status.degraded ? 'degraded' : 'ok');
   }
   return sendError(res, 503, 'db_down', status);
+});
+
+// 网关路由地图端点 (Phase 0-A, 2026-05-11)
+app.get('/api/gateway/routes', (req, res) => {
+  return success(res, generateRouteMap(), 'ok');
 });
 
 // Prometheus 指标端点
@@ -331,6 +335,9 @@ app.use('/api/platform-publish', apiLimiter, platformPublishRoutesV4);
 app.use('/api/template-market', apiLimiter, templateMarketRoutesV4);
 app.use('/api/sdk', heavyLimiter, sdkRoutes);
 app.use('/api/adk', heavyLimiter, adkRoutes);
+
+// ===== Phase 1: 企业/代理端 (2026-05-11) =====
+app.use('/api/enterprise', enterpriseRoutes);
 
 // 404
 app.use((_req, res) => {

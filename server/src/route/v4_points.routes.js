@@ -41,8 +41,8 @@ router.get('/account', authMiddleware, async (req, res) => {
 router.get('/transactions', authMiddleware, validate(paginationSchema, 'query'), async (req, res) => {
   try {
     const result = await pointsService.getPointsTransactions(req.user.id, {
-      page: parseInt(req.query.page) || 1,
-      pageSize: Math.min(parseInt(req.query.pageSize) || 20, 200),
+      page: parseInt(req.query.page, 10) || 1,
+      pageSize: Math.min(parseInt(req.query.pageSize, 10) || 20, 200),
     });
     return success(res, result);
   } catch (err) {

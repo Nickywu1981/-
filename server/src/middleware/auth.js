@@ -3,6 +3,10 @@
  * - JWT 双令牌（Access Token + Refresh Token）
  * - Redis 黑名单校验
  * - 用户级吊销支持
+ * - 多端标识 (aud claim): consumer | enterprise | admin | ops
+ *
+ * Phase 0-A (2026-05-11): 增强多端标识支持
+ * 新版统一认证中心: server/src/platform/authCenter.js
  */
 import jwt from 'jsonwebtoken';
 import { jwtSecret } from '../config/index.js';
@@ -23,6 +27,9 @@ export function generateAccessToken(user) {
       userId: user.userId || user.id,
       role: user.role || 'user',
       tenantId: user.tenantId || 0,
+      aud: user.audience || 'consumer',                // Phase 0-A: 多端标识
+      entId: user.entId || null,                       // Phase 0-A: 企业ID
+      entRole: user.entRole || null,                   // Phase 0-A: 企业内角色
     },
     jwtSecret,
     { expiresIn: '15m' },
@@ -95,6 +102,7 @@ const PUBLIC_PREFIXES = [
   '/api/help',
   '/api/platform-specs',
   '/api/forms/public',
+  '/api/enterprise/register', '/api/enterprise/login', '/api/enterprise/plans',  // Phase 1: B端公开入口
   '/uploads',
 ];
 
@@ -142,6 +150,9 @@ export async function authMiddleware(req, res, next) {
     role: payload.role || 'user',
     nickname: payload.nickname || '',
     tenantId: payload.tenantId || 0,
+    audience: payload.aud || 'consumer',               // Phase 0-A: 多端标识
+    entId: payload.entId || null,                      // Phase 0-A: 企业ID
+    entRole: payload.entRole || null,                  // Phase 0-A: 企业内角色
   };
   req.userId = req.user.id;     // 兼容旧代码直接引用 req.userId
   req.tenantId = req.user.tenantId;

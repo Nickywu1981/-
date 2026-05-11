@@ -41,7 +41,7 @@ const whitelistUpdateSchema = z.object({
   isActive: z.coerce.number().int().min(0).max(1).optional(),
 });
 
-const callProxySchema = z.object({}).passthrough();
+const callProxySchema = z.object({}).passthrough().refine(v => Object.keys(v).length <= 100, '代理参数过多');
 
 const cleanLogsSchema = z.object({
   beforeDays: z.coerce.number().int().min(1).max(365).optional(),

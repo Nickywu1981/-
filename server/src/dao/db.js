@@ -78,8 +78,8 @@ async function mockExecute(sql, params = []) {
     // LIMIT
     const limitMatch = sqlLower.match(/limit\s+(\d+)(?:\s*,\s*(\d+))?/);
     if (limitMatch) {
-      const offset = limitMatch[2] ? parseInt(limitMatch[1]) : 0;
-      const count = limitMatch[2] ? parseInt(limitMatch[2]) : parseInt(limitMatch[1]);
+      const offset = limitMatch[2] ? parseInt(limitMatch[1], 10) : 0;
+      const count = limitMatch[2] ? parseInt(limitMatch[2], 10) : parseInt(limitMatch[1], 10);
       rows = rows.slice(offset, offset + count);
     }
 

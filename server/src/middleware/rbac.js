@@ -4,6 +4,9 @@
  * 角色层级（数值越大权限越高）：
  *  user (1) → editor (2) → admin (3) → super_admin (4)
  *
+ * Phase 0-A (2026-05-11): 新版权限引擎含B端角色已迁移至 server/src/platform/rbacEngine.js
+ * 本文件保留向后兼容，所有原有导出不变 (不含 B端角色)。
+ *
  * 使用方式：router.get('/sensitive', requireRole('admin'), handler)
  */
 import { error } from '../utils/response.js';

@@ -9,7 +9,7 @@ import { z } from 'zod';
 const collectionSchema = z.object({
   type: z.enum(['image', 'video', 'template', 'prompt']),
   name: z.string().min(1).max(200),
-  data: z.record(z.any()),
+  data: z.record(z.any()).refine(v => Object.keys(v).length <= 200, '数据字段过多'),
 });
 
 const updateCollectionSchema = collectionSchema.partial();

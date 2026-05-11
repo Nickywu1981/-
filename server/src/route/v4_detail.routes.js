@@ -67,8 +67,8 @@ router.post('/replicate', heavyLimiter, _validate(replicateSchema), async (req, 
 router.get('/works', validate(paginationSchema, 'query'), async (req, res) => {
   try {
     const result = await detailService.getDetailWorks(req.user.id, {
-      page: parseInt(req.query.page) || 1,
-      pageSize: parseInt(req.query.pageSize) || 20,
+      page: parseInt(req.query.page, 10) || 1,
+      pageSize: parseInt(req.query.pageSize, 10) || 20,
     });
     return success(res, result);
   } catch (err) {

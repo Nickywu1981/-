@@ -37,8 +37,8 @@ router.get('/invite-code', async (req, res) => {
 router.get('/team', validate(paginationSchema, 'query'), async (req, res) => {
   try {
     const result = await distributionService.getMyTeam(req.user.id, {
-      page: parseInt(req.query.page) || 1,
-      pageSize: parseInt(req.query.pageSize) || 20,
+      page: parseInt(req.query.page, 10) || 1,
+      pageSize: parseInt(req.query.pageSize, 10) || 20,
     });
     return success(res, result);
   } catch (err) {
@@ -71,8 +71,8 @@ router.post('/withdraw', paymentLimiter, _validate(withdrawSchema), async (req, 
 router.get('/history', validate(paginationSchema, 'query'), async (req, res) => {
   try {
     const result = await distributionService.getCommissionHistory(req.user.id, {
-      page: parseInt(req.query.page) || 1,
-      pageSize: parseInt(req.query.pageSize) || 20,
+      page: parseInt(req.query.page, 10) || 1,
+      pageSize: parseInt(req.query.pageSize, 10) || 20,
     });
     return success(res, result);
   } catch (err) {
@@ -99,8 +99,8 @@ router.get('/tiers', (_req, res) => {
 router.get('/performance', validate(paginationSchema, 'query'), async (req, res) => {
   try {
     const result = await distributionService.getTeamPerformance(req.user.id, {
-      page: parseInt(req.query.page) || 1,
-      pageSize: parseInt(req.query.pageSize) || 20,
+      page: parseInt(req.query.page, 10) || 1,
+      pageSize: parseInt(req.query.pageSize, 10) || 20,
     });
     return success(res, result);
   } catch (err) {

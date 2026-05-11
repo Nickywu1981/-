@@ -306,8 +306,8 @@ router.post('/compare', requireRole('admin'), heavyLimiter, _validate(compareTes
 
 // GET /api/test/history
 router.get('/history', requireRole('admin'), async (req, res) => {
-  const page = Math.max(1, parseInt(req.query.page) || 1);
-  const pageSize = Math.min(50, Math.max(1, parseInt(req.query.pageSize) || 20));
+  const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+  const pageSize = Math.min(50, Math.max(1, parseInt(req.query.pageSize, 10) || 20));
   const category = req.query.category || '';
   const type = req.query.type || '';
 

@@ -291,8 +291,8 @@ router.post('/subtitle-fix', heavyLimiter, _validate(subtitleFixSchema), async (
 router.get('/works', validate(worksQuerySchema, 'query'), async (req, res) => {
   try {
     const result = await videoService.getVideoWorks(req.user.id, {
-      page: parseInt(req.query.page) || 1,
-      pageSize: parseInt(req.query.pageSize) || 20,
+      page: parseInt(req.query.page, 10) || 1,
+      pageSize: parseInt(req.query.pageSize, 10) || 20,
       status: req.query.status,
       taskType: req.query.task_type,
     });

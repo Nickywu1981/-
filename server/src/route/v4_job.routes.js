@@ -27,7 +27,7 @@ router.use(authMiddleware);
 const VALID_TYPES_ARR = [...VALID_TASK_TYPES];
 const submitJobSchema = z.object({
   task_type: z.enum([VALID_TYPES_ARR[0], ...VALID_TYPES_ARR.slice(1)]),
-  task_params: z.object({}).passthrough().default({}),
+  task_params: z.object({}).passthrough().refine(v => Object.keys(v).length <= 50, '任务参数过多').default({}),
 });
 
 // POST /api/jobs — 通用任务提交

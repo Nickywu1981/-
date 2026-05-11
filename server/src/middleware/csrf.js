@@ -61,7 +61,9 @@ export function csrfProtection(req, res, next) {
     '/api/site-config/public', '/site-config/public',
     '/api/health', '/api/metrics', '/health', '/metrics',
     '/api/ai-dispatch/health', '/api/ai-dispatch/categories',
-    '/api/recharge/callback', '/api/payment/notify', '/recharge/callback', '/payment/notify'];
+    '/api/recharge/callback', '/api/payment/notify', '/recharge/callback', '/payment/notify',
+    '/api/enterprise/register', '/api/enterprise/login',                  // Phase 1: B端注册/登录
+    '/enterprise/register', '/enterprise/login'];                          // Phase 1: devProxy去前缀
   const isPublic = publicPaths.some(p => req.path === p || req.path.startsWith(p + '/'))
     || req.path.startsWith('/api/internal/')
     || req.path.startsWith('/internal/');

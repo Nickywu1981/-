@@ -107,10 +107,10 @@ export async function queryCallLogs({ userId, modelKey, status, days = 7, offset
   if (modelKey) { conditions.push('model_key = ?'); params.push(modelKey); }
   if (status) { conditions.push('status = ?'); params.push(status); }
   conditions.push('created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)');
-  params.push(parseInt(days) || 7);
+  params.push(parseInt(days, 10) || 7);
   const [rows] = await _db().query(
     `SELECT * FROM ai_call_log WHERE ${conditions.join(' AND ')} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
-    [...params, parseInt(limit), parseInt(offset)],
+    [...params, parseInt(limit, 10), parseInt(offset, 10)],
   );
   const [[{ total }]] = await _db().query(
     `SELECT COUNT(*) as total FROM ai_call_log WHERE ${conditions.join(' AND ')}`, params,
