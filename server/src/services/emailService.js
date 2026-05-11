@@ -2,6 +2,7 @@
  * 邮箱验证码服务 — 多服务商抽象 + 频率控制 + 模板渲染
  * 支持: mock / smtp(QQ/Gmail/163) / sendgrid
  */
+import crypto from 'crypto';
 import config from '../config/index.js';
 import { BusinessError } from '../utils/businessError.js';
 import logger from '../utils/logger.js';
@@ -91,7 +92,7 @@ function getProvider() {
 // ==================== 验证码 ====================
 
 function generateCode(len = 6) {
-  return String(Math.floor(Math.random() * 10 ** len)).padStart(len, '0');
+  return String(crypto.randomInt(0, 10 ** len)).padStart(len, '0');
 }
 
 export async function sendVerificationCode(email, scene = 'login') {

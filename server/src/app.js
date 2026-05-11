@@ -108,6 +108,7 @@ const app = express();
 app.set('trust proxy', 'loopback');
 
 // 基础安全中间件
+app.disable('x-powered-by');
 app.use(helmet());
 app.use(cspMiddleware);
 const ALLOWED_ORIGINS = (process.env.CORS_ORIGIN || 'http://localhost:3000,http://localhost:3001').split(',').map(s => s.trim());

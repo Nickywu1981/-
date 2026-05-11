@@ -5,6 +5,7 @@
  * 配置: config.sms = { provider, providers: { aliyun: {...}, tencent: {...} } }
  */
 
+import crypto from 'crypto';
 import * as smsLogDao from '../dao/smsLogDao.js';
 import * as smsTemplateDao from '../dao/smsTemplateDao.js';
 import config from '../config/index.js';
@@ -60,7 +61,7 @@ function renderTemplate(templateContent, params) {
 // ==================== 验证码生成与校验 ====================
 
 function generateCode(length = 6) {
-  return String(Math.floor(Math.random() * 10 ** length)).padStart(length, '0');
+  return String(crypto.randomInt(0, 10 ** length)).padStart(length, '0');
 }
 
 function cacheKey(phone, scene) {

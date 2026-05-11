@@ -2,10 +2,11 @@ import { USER_STATUS } from '../constants/domainStatus.js';
 import { BusinessError } from '../utils/businessError.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import * as userDao from '../dao/userDao.js';
 import { jwtSecret } from '../config/index.js';
 import { guardSQL } from '../utils/sqlGuard.js';
-import { generateTokens, refreshAccessToken as refreshTokenUtil, revokeAccessToken as revokeTokenUtil, revokeRefreshToken as revokeRefreshUtil, revokeAllUserTokens as revokeAllUtil } from '../utils/jwtToken.js';
+import { generateTokens, refreshAccessToken as refreshTokenUtil, revokeAccessToken as revokeTokenUtil, revokeRefreshToken as revokeRefreshUtil, revokeAllUserTokens as revokeAllUtil, isTokenBlacklisted } from '../utils/jwtToken.js';
 
 const SALT_ROUNDS = 12;
 
@@ -97,10 +98,8 @@ export async function changePassword(userId, { oldPassword, newPassword }) {
 export async function forgotPassword(username) {
   guardSQL(username, 'username');
   const user = await userDao.findByUsername(username);
-  // Always return same message regardless of account existence
   if (!user) return { message: '重置链接已发送至注册邮箱（Mock模式：若账号存在）' };
-  // Mock: 生成重置令牌（真实环境发邮件/短信）
-  const resetToken = jwt.sign({ userId: user.id, purpose: 'reset' }, jwtSecret, { expiresIn: '15m' });
+  const resetToken = jwt.sign({ userId: user.id, purpose: 'reset', jti: crypto.randomUUID() }, jwtSecret, { expiresIn: '15m' });
   return { message: '重置链接已发送至注册邮箱（Mock模式：token=' + resetToken.slice(-20) + '）' };
 }
 
@@ -109,9 +108,27 @@ export async function resetPassword(token, newPassword) {
   let payload;
   try { payload = jwt.verify(token, jwtSecret); } catch { throw new BusinessError(400, '重置链接已过期或无效'); }
   if (payload.purpose !== 'reset') throw new BusinessError(400, '无效的重置令牌');
+
+  // 防止重放：吊销已使用的重置 token
+  if (payload.jti && await isTokenBlacklisted(token)) {
+    throw new BusinessError(400, '重置链接已被使用');
+  }
+
   const hashed = await bcrypt.hash(newPassword, SALT_ROUNDS);
   await userDao.updatePassword(payload.userId, hashed);
   await revokeAllUtil(payload.userId);
+
+  // 标记重置 token 为已使用（防止重放）
+  if (payload.jti) {
+    try {
+      const r = await (await import('../dao/redis.js')).getRedis();
+      if (r) {
+        const ttl = Math.max(1, (payload.exp - Math.floor(Date.now() / 1000)));
+        await r.set(`reset_jti:${payload.jti}`, '1', 'EX', ttl);
+      }
+    } catch { /* Redis 不可用时跳过，JWT 15分钟短有效期作为兜底 */ }
+  }
+
   return { success: true };
 }
 

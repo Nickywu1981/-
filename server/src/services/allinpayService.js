@@ -203,7 +203,6 @@ export async function handleNotify(body) {
 async function fulfillMembership(order, conn) {
   let planType = Number(order.plan_type) || 0;
   if (!planType) {
-    // 从数据库价格匹配套餐类型
     const allPlans = await creditDao.listActivePlans();
     const matched = allPlans.find(p => Number(p.price) === Number(order.amount));
     if (matched) planType = matched.plan_type;
@@ -218,21 +217,26 @@ async function fulfillMembership(order, conn) {
   const endTime = new Date(now.getTime() + saveDays * 86400000);
 
   const existing = await membershipDao.findByUserId(order.user_id);
-  const creditBefore = existing ? existing.credit_balance : 0;
-
   if (existing) {
     const currentEnd = existing.end_time ? new Date(existing.end_time) : now;
     if (currentEnd > now) endTime.setTime(currentEnd.getTime() + saveDays * 86400000);
   }
 
-  await membershipDao.upsert(order.user_id, { plan_type: planType, credit_balance: creditBefore + credits, end_time: endTime, start_time: now }, conn);
+  // 存储过程：先 upsert 结构（不覆盖点数），再原子递增点数
+  await membershipDao.upsert(order.user_id, { plan_type: planType, credit_balance: 0, end_time: endTime, start_time: now }, conn);
+  if (credits > 0) await creditDao.updateCreditBalance(order.user_id, credits, conn);
+
+  // 读取最终余额写日志
+  const updated = await membershipDao.findByUserId(order.user_id);
+  const creditBefore = (updated?.credit_balance || 0) - credits;
+  const creditAfter = updated?.credit_balance || 0;
 
   await creditDao.insertConsumptionLog({
     userId: order.user_id,
     type: 3,
     action: `purchase_plan_${planType}`,
     creditBefore,
-    creditAfter: creditBefore + credits,
+    creditAfter,
     consumed: Number(dbPlan.price),
     remark: `${dbPlan.name} — 通联支付 ${order.reqsn}`,
     requestId: order.reqsn,
@@ -240,7 +244,7 @@ async function fulfillMembership(order, conn) {
   });
 
   logger.info('[Allinpay] 会员履约完成', {
-    userId: order.user_id, planType, credits, creditAfter: creditBefore + credits, endTime,
+    userId: order.user_id, planType, credits, creditAfter, endTime,
   });
 }
 
@@ -250,18 +254,22 @@ async function fulfillRecharge(order, conn) {
   const rechargeOrder = await rechargeDao.getByOrderNo(order.business_id);
   if (!rechargeOrder) { logger.warn('[Allinpay] 充值订单不存在', { businessId: order.business_id }); return; }
 
-  const existing = await membershipDao.findByUserId(order.user_id);
-  const creditBefore = existing ? existing.credit_balance : 0;
-
+  // 确保 membership 记录存在，再原子递增点数
+  await membershipDao.upsert(order.user_id, { credit_balance: 0 }, conn);
   await rechargeDao.markPaid(order.business_id, order.trxid || order.reqsn, conn);
-  await membershipDao.upsert(order.user_id, { credit_balance: creditBefore + rechargeOrder.coin_amount }, conn);
+  await creditDao.updateCreditBalance(order.user_id, rechargeOrder.coin_amount, conn);
+
+  // 读取最终余额写日志
+  const updated = await membershipDao.findByUserId(order.user_id);
+  const creditBefore = (updated?.credit_balance || 0) - rechargeOrder.coin_amount;
+  const creditAfter = updated?.credit_balance || 0;
 
   await creditDao.insertConsumptionLog({
     userId: order.user_id,
     type: 3,
     action: 'recharge_coins',
     creditBefore,
-    creditAfter: creditBefore + rechargeOrder.coin_amount,
+    creditAfter,
     consumed: Number(rechargeOrder.amount),
     remark: `虾币充值 ${rechargeOrder.coin_amount}个 — 通联支付 ${order.reqsn}`,
     requestId: order.reqsn,

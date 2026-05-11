@@ -15,7 +15,6 @@ const membershipDao = {
        VALUES (?, ?, ?, NOW(), ?)
        ON DUPLICATE KEY UPDATE
          plan_type = VALUES(plan_type),
-         credit_balance = VALUES(credit_balance),
          end_time = VALUES(end_time)`,
       [userId, data.plan_type ?? 0, data.credit_balance || 0, data.end_time || null],
     );
