@@ -1,51 +1,51 @@
 <template>
   <div class="distribution-page">
-    <div class="page-header"><h1>推广分销</h1></div>
+    <div class="page-header"><h1>{{ $t('enterprise.distribution.index.title') }}</h1></div>
 
-    <div v-if="loading" class="empty">加载中...</div>
+    <div v-if="loading" class="empty">{{ $t('enterprise.common.loading') }}</div>
 
     <template v-else>
     <!-- 概览卡片 -->
     <div class="stat-cards">
-      <div class="stat-card"><div class="stat-num">{{ inviteCode }}</div><div class="stat-label">我的邀请码</div></div>
-      <div class="stat-card"><div class="stat-num">{{ balance.available || '0.00' }}</div><div class="stat-label">佣金余额 (元)</div></div>
-      <div class="stat-card"><div class="stat-num">{{ team.length }}</div><div class="stat-label">团队人数</div></div>
-      <div class="stat-card"><div class="stat-num">{{ balance.totalEarned || '0.00' }}</div><div class="stat-label">累计收益 (元)</div></div>
+      <div class="stat-card"><div class="stat-num">{{ inviteCode }}</div><div class="stat-label">{{ $t('enterprise.distribution.index.myInviteCode') }}</div></div>
+      <div class="stat-card"><div class="stat-num">{{ balance.available || '0.00' }}</div><div class="stat-label">{{ $t('enterprise.distribution.index.commissionBalance') }}</div></div>
+      <div class="stat-card"><div class="stat-num">{{ team.length }}</div><div class="stat-label">{{ $t('enterprise.distribution.index.teamSize') }}</div></div>
+      <div class="stat-card"><div class="stat-num">{{ balance.totalEarned || '0.00' }}</div><div class="stat-label">{{ $t('enterprise.distribution.index.totalEarnings') }}</div></div>
     </div>
 
     <!-- 我的团队 -->
     <div class="card">
-      <h3>我的团队</h3>
+      <h3>{{ $t('enterprise.distribution.index.myTeam') }}</h3>
       <table class="data-table" v-if="team.length">
-        <thead><tr><th>成员</th><th>手机号</th><th>加入时间</th><th>贡献佣金</th><th>层级</th></tr></thead>
+        <thead><tr><th>{{ $t('enterprise.distribution.index.member') }}</th><th>{{ $t('enterprise.distribution.index.phone') }}</th><th>{{ $t('enterprise.distribution.index.joinTime') }}</th><th>{{ $t('enterprise.distribution.index.contributedCommission') }}</th><th>{{ $t('enterprise.distribution.index.level') }}</th></tr></thead>
         <tbody>
           <tr v-for="m in team" :key="m.id">
             <td>{{ m.nickname || m.username }}</td>
             <td>{{ m.phone || '-' }}</td>
             <td>{{ formatDate(m.joined_at) }}</td>
             <td>{{ m.commission || '0.00' }}</td>
-            <td>{{ m.level === 1 ? '一级' : '二级' }}</td>
+            <td>{{ m.level === 1 ? $t('enterprise.distribution.index.level1') : $t('enterprise.distribution.index.level2') }}</td>
           </tr>
         </tbody>
       </table>
-      <p v-else class="empty">暂无团队成员，快去推广吧！</p>
+      <p v-else class="empty">{{ $t('enterprise.distribution.index.noTeam') }}</p>
     </div>
 
     <!-- 佣金流水 -->
     <div class="card">
-      <h3>佣金流水</h3>
+      <h3>{{ $t('enterprise.distribution.index.commissionLog') }}</h3>
       <table class="data-table" v-if="history.list?.length">
-        <thead><tr><th>时间</th><th>类型</th><th>金额</th><th>来源</th></tr></thead>
+        <thead><tr><th>{{ $t('enterprise.distribution.index.time') }}</th><th>{{ $t('enterprise.distribution.index.type') }}</th><th>{{ $t('enterprise.distribution.index.amount') }}</th><th>{{ $t('enterprise.distribution.index.source') }}</th></tr></thead>
         <tbody>
           <tr v-for="h in history.list" :key="h.id">
             <td>{{ formatDate(h.created_at) }}</td>
-            <td>{{ h.type === 'commission' ? '分销佣金' : h.type === 'withdraw' ? '提现' : h.type }}</td>
+            <td>{{ h.type === 'commission' ? $t('enterprise.distribution.index.typeCommission') : h.type === 'withdraw' ? $t('enterprise.distribution.index.typeWithdraw') : h.type }}</td>
             <td :class="h.amount > 0 ? 'text-green' : ''">{{ h.amount > 0 ? '+' : '' }}{{ h.amount }}</td>
             <td>{{ h.source || '-' }}</td>
           </tr>
         </tbody>
       </table>
-      <p v-else class="empty">暂无佣金流水</p>
+      <p v-else class="empty">{{ $t('enterprise.distribution.index.noLog') }}</p>
     </div>
     </template>
   </div>

@@ -1,50 +1,50 @@
 <template>
   <div class="finance-earnings">
-    <h1 class="page-title">佣金收益</h1>
+    <h1 class="page-title">{{ $t('enterprise.finance.earnings.title') }}</h1>
 
     <!-- 收益概览 -->
     <div class="summary-grid" v-if="summary">
-      <div class="summary-item"><span class="label">累计佣金</span><strong>¥{{ fmt(summary.totalEarnings) }}</strong></div>
-      <div class="summary-item"><span class="label">已结算</span><strong class="green">¥{{ fmt(summary.settled) }}</strong></div>
-      <div class="summary-item"><span class="label">待结算</span><strong class="orange">¥{{ fmt(summary.pending) }}</strong></div>
-      <div class="summary-item"><span class="label">已提现</span><strong class="blue">¥{{ fmt(summary.withdrawn) }}</strong></div>
+      <div class="summary-item"><span class="label">{{ $t('enterprise.finance.earnings.totalCommission') }}</span><strong>¥{{ fmt(summary.totalEarnings) }}</strong></div>
+      <div class="summary-item"><span class="label">{{ $t('enterprise.finance.earnings.settled') }}</span><strong class="green">¥{{ fmt(summary.settled) }}</strong></div>
+      <div class="summary-item"><span class="label">{{ $t('enterprise.finance.earnings.pendingSettle') }}</span><strong class="orange">¥{{ fmt(summary.pending) }}</strong></div>
+      <div class="summary-item"><span class="label">{{ $t('enterprise.finance.earnings.withdrawn') }}</span><strong class="blue">¥{{ fmt(summary.withdrawn) }}</strong></div>
     </div>
 
     <!-- 筛选 -->
     <div class="toolbar">
       <select v-model="filterStatus" @change="loadData" class="filter-select">
-        <option value="">全部状态</option>
-        <option value="settled">已结算</option>
-        <option value="pending">待结算</option>
-        <option value="withdrawn">已提现</option>
+        <option value="">{{ $t('enterprise.finance.earnings.allStatus') }}</option>
+        <option value="settled">{{ $t('enterprise.finance.earnings.statusSettled') }}</option>
+        <option value="pending">{{ $t('enterprise.finance.earnings.statusPending') }}</option>
+        <option value="withdrawn">{{ $t('enterprise.finance.earnings.statusWithdrawn') }}</option>
       </select>
       <input type="date" v-model="startDate" class="date-input" @change="loadData" />
-      <span class="sep">至</span>
+      <span class="sep">{{ $t('enterprise.finance.ledger.to') }}</span>
       <input type="date" v-model="endDate" class="date-input" @change="loadData" />
     </div>
 
     <div class="table-wrap">
       <table v-if="list.length">
-        <thead><tr><th>消费用户</th><th>订单金额</th><th>佣金比例</th><th>佣金</th><th>层级</th><th>状态</th><th>时间</th></tr></thead>
+        <thead><tr><th>{{ $t('enterprise.finance.earnings.consumerUser') }}</th><th>{{ $t('enterprise.finance.earnings.orderAmount') }}</th><th>{{ $t('enterprise.finance.earnings.commissionRate') }}</th><th>{{ $t('enterprise.finance.earnings.commission') }}</th><th>{{ $t('enterprise.finance.earnings.level') }}</th><th>{{ $t('enterprise.finance.earnings.status') }}</th><th>{{ $t('enterprise.finance.earnings.time') }}</th></tr></thead>
         <tbody>
           <tr v-for="item in list" :key="item.id">
             <td>{{ item.consumer_name || `用户${item.consumer_id}` }}</td>
             <td>¥{{ fmt(item.order_amount) }}</td>
             <td>{{ item.commission_rate }}%</td>
             <td class="green">¥{{ fmt(item.commission) }}</td>
-            <td>{{ item.level === 1 ? '一级' : '二级' }}</td>
+            <td>{{ item.level === 1 ? $t('enterprise.finance.earnings.level1') : $t('enterprise.finance.earnings.level2') }}</td>
             <td><span :class="['status-tag', item.status]">{{ statusLabel(item.status) }}</span></td>
             <td>{{ formatDate(item.created_at) }}</td>
           </tr>
         </tbody>
       </table>
-      <div v-else class="empty">暂无佣金记录</div>
+      <div v-else class="empty">{{ $t('enterprise.finance.earnings.noData') }}</div>
     </div>
 
     <div class="pager" v-if="total > pageSize">
-      <button :disabled="page <= 1" @click="page--; loadData()">上一页</button>
-      <span>第 {{ page }} / {{ Math.ceil(total / pageSize) }} 页</span>
-      <button :disabled="page >= Math.ceil(total / pageSize)" @click="page++; loadData()">下一页</button>
+      <button :disabled="page <= 1" @click="page--; loadData()">{{ $t('enterprise.common.prevPage') }}</button>
+      <span>{{ $t('enterprise.common.pageOf', { page, total: Math.ceil(total / pageSize) }) }}</span>
+      <button :disabled="page >= Math.ceil(total / pageSize)" @click="page++; loadData()">{{ $t('enterprise.common.nextPage') }}</button>
     </div>
   </div>
 </template>
@@ -52,6 +52,7 @@
 <script setup>
 import { useApi } from '~/composables/useApi';
 import { useToast } from '~/composables/useToast';
+const { t } = useI18n();
 const api = useApi();
 const toast = useToast();
 
@@ -76,10 +77,10 @@ async function loadData() {
     list.value = data?.list || [];
     total.value = data?.total || 0;
     summary.value = data?.summary || null;
-  } catch (e) { toast.error('收益数据加载失败，请刷新重试'); }
+  } catch (e) { toast.error(t('enterprise.finance.earnings.loadError')); }
 }
 
-function statusLabel(s) { const m = { settled: '已结算', pending: '待结算', withdrawn: '已提现', cancelled: '已取消' }; return m[s] || s; }
+function statusLabel(s) { const m = { settled: t('enterprise.finance.earnings.statusSettled'), pending: t('enterprise.finance.earnings.statusPending'), withdrawn: t('enterprise.finance.earnings.statusWithdrawn'), cancelled: t('enterprise.finance.earnings.statusCancelled') }; return m[s] || s; }
 function fmt(n) { return (Number(n) || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2 }); }
 function formatDate(d) { return d ? new Date(d).toLocaleDateString('zh-CN') : '-'; }
 

@@ -1,36 +1,36 @@
 <template>
   <div class="reports-page">
     <div class="page-header">
-      <h1>数据报表</h1>
+      <h1>{{ $t('enterprise.reports.title') }}</h1>
       <div class="header-actions">
         <div class="period-tabs">
-          <button :class="{ active: period === 'daily' }" @click="switchPeriod('daily')">日</button>
-          <button :class="{ active: period === 'weekly' }" @click="switchPeriod('weekly')">周</button>
-          <button :class="{ active: period === 'monthly' }" @click="switchPeriod('monthly')">月</button>
+          <button :class="{ active: period === 'daily' }" @click="switchPeriod('daily')">{{ $t('enterprise.reports.daily') }}</button>
+          <button :class="{ active: period === 'weekly' }" @click="switchPeriod('weekly')">{{ $t('enterprise.reports.weekly') }}</button>
+          <button :class="{ active: period === 'monthly' }" @click="switchPeriod('monthly')">{{ $t('enterprise.reports.monthly') }}</button>
         </div>
-        <button class="btn-primary" @click="exportReport">导出报表</button>
+        <button class="btn-primary" @click="exportReport">{{ $t('enterprise.reports.export') }}</button>
       </div>
     </div>
 
     <div class="stat-cards">
-      <div class="stat-card"><div class="stat-num">&yen;{{ summary.total_revenue || '0.00' }}</div><div class="stat-label">本期营收</div></div>
-      <div class="stat-card"><div class="stat-num">{{ summary.total_orders || 0 }}</div><div class="stat-label">总订单数</div></div>
-      <div class="stat-card"><div class="stat-num">{{ summary.customerCount || 0 }}</div><div class="stat-label">客户数</div></div>
-      <div class="stat-card"><div class="stat-num">&yen;{{ summary.total_refund || '0.00' }}</div><div class="stat-label">退款总额</div></div>
+      <div class="stat-card"><div class="stat-num">&yen;{{ summary.total_revenue || '0.00' }}</div><div class="stat-label">{{ $t('enterprise.reports.periodRevenue') }}</div></div>
+      <div class="stat-card"><div class="stat-num">{{ summary.total_orders || 0 }}</div><div class="stat-label">{{ $t('enterprise.reports.totalOrders') }}</div></div>
+      <div class="stat-card"><div class="stat-num">{{ summary.customerCount || 0 }}</div><div class="stat-label">{{ $t('enterprise.reports.customers') }}</div></div>
+      <div class="stat-card"><div class="stat-num">&yen;{{ summary.total_refund || '0.00' }}</div><div class="stat-label">{{ $t('enterprise.reports.totalRefund') }}</div></div>
     </div>
 
     <div class="card">
       <div class="card-header">
-        <h3>{{ periodLabel }}经营统计</h3>
+        <h3>{{ periodLabel }}{{ $t('enterprise.reports.statsSuffix') }}</h3>
         <div class="date-range">
           <input type="date" v-model="dateRange.start" @change="loadData" class="input input-sm" />
-          <span>至</span>
+          <span>{{ $t('enterprise.reports.to') }}</span>
           <input type="date" v-model="dateRange.end" @change="loadData" class="input input-sm" />
         </div>
       </div>
-      <div v-if="loading" class="loading-spin">加载中...</div>
+      <div v-if="loading" class="loading-spin">{{ $t('enterprise.common.loading') }}</div>
       <table class="data-table" v-else-if="stats.length">
-        <thead><tr><th>日期</th><th>订单数</th><th>营收</th><th>退款</th><th>净收入</th></tr></thead>
+        <thead><tr><th>{{ $t('enterprise.reports.date') }}</th><th>{{ $t('enterprise.reports.orders') }}</th><th>{{ $t('enterprise.reports.revenue') }}</th><th>{{ $t('enterprise.reports.refund') }}</th><th>{{ $t('enterprise.reports.net') }}</th></tr></thead>
         <tbody>
           <tr v-for="d in stats" :key="d.date">
             <td>{{ d.date }}</td>
@@ -41,7 +41,7 @@
           </tr>
         </tbody>
       </table>
-      <p v-else-if="!loading" class="empty">暂无数据</p>
+      <p v-else-if="!loading" class="empty">{{ $t('enterprise.reports.noData') }}</p>
     </div>
   </div>
 </template>
@@ -51,6 +51,7 @@ definePageMeta({ layout: 'enterprise' });
 import { ref, computed, onMounted } from 'vue';
 import { useToast } from '~/composables/useToast';
 const toast = useToast();
+const { t } = useI18n();
 
 const period = ref('daily');
 const loading = ref(false);
@@ -58,7 +59,7 @@ const summary = ref({});
 const stats = ref([]);
 const dateRange = ref({ start: '', end: '' });
 
-const periodLabel = computed(() => ({ daily: '每日', weekly: '每周', monthly: '每月' }[period.value] || '每日'));
+const periodLabel = computed(() => ({ daily: t('enterprise.reports.daily'), weekly: t('enterprise.reports.weekly'), monthly: t('enterprise.reports.monthly') }[period.value] || t('enterprise.reports.daily')));
 
 onMounted(() => {
   const now = new Date();
@@ -81,7 +82,7 @@ async function loadSummary() {
     if (dateRange.value.end) q.set('endDate', dateRange.value.end);
     const r = await $fetch(`/api/enterprise/commerce/stats/summary?${q}`, { credentials: 'include' });
     if (r.code === 200) summary.value = r.data;
-  } catch (e) { toast.error('数据加载失败'); }
+  } catch (e) { toast.error(t('enterprise.reports.loadError')); }
 }
 
 async function loadStats() {
@@ -91,13 +92,13 @@ async function loadStats() {
     if (dateRange.value.end) q.set('endDate', dateRange.value.end);
     const r = await $fetch(`/api/analytics/trend?${q}`, { credentials: 'include' });
     if (r.code === 200) stats.value = r.data?.list || r.data || [];
-  } catch (e) { toast.error('趋势数据加载失败'); }
+  } catch (e) { toast.error(t('enterprise.reports.trendLoadError')); }
 }
 
 function switchPeriod(p) { period.value = p; loadStats(); }
 
 function exportReport() {
-  const csv = [['日期', '订单数', '营收', '退款', '净收入']]
+  const csv = [[t('enterprise.reports.date'), t('enterprise.reports.orders'), t('enterprise.reports.revenue'), t('enterprise.reports.refund'), t('enterprise.reports.net')]]
     .concat(stats.value.map(d => [d.date, d.orders, d.revenue, d.refund, d.net]))
     .map(row => row.join(',')).join('\n');
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });

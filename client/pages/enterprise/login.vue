@@ -1,35 +1,36 @@
 <template>
   <div class="ent-login">
     <div class="login-card">
-      <h1>企业/代理登录</h1>
-      <p class="subtitle">Movio AI 企业服务中心</p>
+      <h1>{{ $t('enterprise.login.title') }}</h1>
+      <p class="subtitle">{{ $t('enterprise.login.subtitle') }}</p>
 
       <form @submit.prevent="handleLogin">
         <div class="form-group">
-          <label>手机号/邮箱</label>
-          <input v-model="account" type="text" placeholder="请输入手机号或邮箱" required />
+          <label>{{ $t('enterprise.login.account') }}</label>
+          <input v-model="account" type="text" :placeholder="$t('enterprise.login.accountPlaceholder')" required />
         </div>
         <div class="form-group">
-          <label>密码</label>
-          <input v-model="password" type="password" placeholder="请输入密码" required />
+          <label>{{ $t('enterprise.login.password') }}</label>
+          <input v-model="password" type="password" :placeholder="$t('enterprise.login.passwordPlaceholder')" required />
         </div>
         <div v-if="error" class="error-msg">{{ error }}</div>
         <button type="submit" class="login-btn" :disabled="loading">
-          {{ loading ? '登录中...' : '登录' }}
+          {{ loading ? $t('enterprise.login.loggingIn') : $t('enterprise.login.loginBtn') }}
         </button>
       </form>
 
       <div class="links">
-        <NuxtLink to="/enterprise/register">还没有企业账号？立即入驻</NuxtLink>
+        <NuxtLink to="/enterprise/register">{{ $t('enterprise.login.noAccount') }}</NuxtLink>
       </div>
       <div class="links">
-        <NuxtLink to="/login">C端用户登录</NuxtLink>
+        <NuxtLink to="/login">{{ $t('enterprise.login.cUserLogin') }}</NuxtLink>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
+const { t } = useI18n();
 const account = ref('');
 const password = ref('');
 const loading = ref(false);
@@ -48,10 +49,10 @@ async function handleLogin() {
     if (res.code === 200) {
       router.push('/enterprise/dashboard');
     } else {
-      error.value = res.msg || '登录失败';
+      error.value = res.msg || t('enterprise.login.loginFailed');
     }
   } catch (e) {
-    error.value = e?.data?.msg || '登录失败，请检查网络';
+    error.value = e?.data?.msg || t('enterprise.login.loginNetworkError');
   } finally {
     loading.value = false;
   }

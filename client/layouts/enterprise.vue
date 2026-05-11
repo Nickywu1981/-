@@ -12,7 +12,7 @@
       <div class="ent-brand">
         <div class="ent-brand-icon">E</div>
         <div class="ent-brand-text">
-          <div class="ent-brand-name">{{ entName || $t('enterprise.page_title') || '企业中心' }}</div>
+          <div class="ent-brand-name">{{ entName || $t('enterprise.nav.pageTitle') }}</div>
           <div class="ent-brand-sub">Enterprise Console</div>
         </div>
       </div>
@@ -73,32 +73,32 @@ const mobileOpen = ref(false)
 const entName = ref('')
 
 const navGroups = reactive([
-  { key: 'main', icon: '📊', label: '数据总览', open: true,
-    items: [{ key: 'dashboard', label: '企业看板', route: '/enterprise/dashboard' }] },
-  { key: 'users', icon: '👥', label: '用户管理', open: false,
+  { key: 'main', icon: '📊', label: t('enterprise.nav.dataOverview'), open: true,
+    items: [{ key: 'dashboard', label: t('enterprise.nav.dashboard'), route: '/enterprise/dashboard' }] },
+  { key: 'users', icon: '👥', label: t('enterprise.nav.userManagement'), open: false,
     items: [
-      { key: 'users', label: '成员管理', route: '/enterprise/users' },
-      { key: 'customers', label: '客户管理', route: '/enterprise/customers' },
-      { key: 'tags', label: '客户标签', route: '/enterprise/customers/tags' },
+      { key: 'users', label: t('enterprise.nav.members'), route: '/enterprise/users' },
+      { key: 'customers', label: t('enterprise.nav.customers'), route: '/enterprise/customers' },
+      { key: 'tags', label: t('enterprise.nav.customerTags'), route: '/enterprise/customers/tags' },
     ]},
-  { key: 'biz', icon: '📦', label: '业务管理', open: false,
+  { key: 'biz', icon: '📦', label: t('enterprise.nav.businessManagement'), open: false,
     items: [
-      { key: 'channels', label: '渠道管理', route: '/enterprise/channels' },
-      { key: 'distribution', label: '分销管理', route: '/enterprise/distribution' },
-      { key: 'commerce', label: '电商管理', route: '/enterprise/commerce' },
+      { key: 'channels', label: t('enterprise.nav.channels'), route: '/enterprise/channels' },
+      { key: 'distribution', label: t('enterprise.nav.distribution'), route: '/enterprise/distribution' },
+      { key: 'commerce', label: t('enterprise.nav.commerce'), route: '/enterprise/commerce' },
     ]},
-  { key: 'finance', icon: '💵', label: '财务管理', open: false,
-    items: [{ key: 'finance', label: '财务看板', route: '/enterprise/finance/dashboard' }] },
-  { key: 'data', icon: '📈', label: '数据分析', open: false,
+  { key: 'finance', icon: '💵', label: t('enterprise.nav.financeManagement'), open: false,
+    items: [{ key: 'finance', label: t('enterprise.nav.financeBoard'), route: '/enterprise/finance/dashboard' }] },
+  { key: 'data', icon: '📈', label: t('enterprise.nav.dataAnalysis'), open: false,
     items: [
-      { key: 'reports', label: '数据报表', route: '/enterprise/reports' },
-      { key: 'usage', label: '用量统计', route: '/enterprise/usage' },
+      { key: 'reports', label: t('enterprise.nav.reports'), route: '/enterprise/reports' },
+      { key: 'usage', label: t('enterprise.nav.usage'), route: '/enterprise/usage' },
     ]},
-  { key: 'settings', icon: '⚙️', label: '设置', open: false,
+  { key: 'settings', icon: '⚙️', label: t('enterprise.nav.settingsNav'), open: false,
     items: [
-      { key: 'plans', label: '套餐计划', route: '/enterprise/plans' },
-      { key: 'whitelabel', label: '白标设置', route: '/enterprise/whitelabel' },
-      { key: 'settings', label: '企业设置', route: '/enterprise/settings' },
+      { key: 'plans', label: t('enterprise.nav.plans'), route: '/enterprise/plans' },
+      { key: 'whitelabel', label: t('enterprise.nav.whitelabel'), route: '/enterprise/whitelabel' },
+      { key: 'settings', label: t('enterprise.nav.enterpriseSettings'), route: '/enterprise/settings' },
     ]},
 ])
 
@@ -107,7 +107,7 @@ const pageTitle = computed(() => {
     const it = g.items.find(i => isActive(i.route))
     if (it) return it.label
   }
-  return t('enterprise.page_title') || '企业中心'
+  return t('enterprise.nav.pageTitle')
 })
 
 function isActive(itemRoute: string) { return route.path === itemRoute || (itemRoute !== '/' && route.path.startsWith(itemRoute + '/')) }
@@ -118,7 +118,7 @@ onMounted(async () => {
     entName.value = data?.data?.name || ''
   } catch (e: any) {
     if (e?.response?.status === 401) router.push('/enterprise/login')
-    else { console.error('[enterprise] 加载企业信息失败', e); toast.error('加载企业信息失败') }
+    else { console.error('[enterprise] 加载企业信息失败', e); toast.error(t('enterprise.nav.loadProfileFailed')) }
   }
 })
 

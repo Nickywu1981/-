@@ -1,24 +1,24 @@
 <template>
   <div class="ent-whitelabel">
-    <h1 class="page-title">白标设置</h1>
-    <p class="subtitle">自定义企业品牌外观，应用于企业专属页面</p>
+    <h1 class="page-title">{{ $t('enterprise.whitelabel.title') }}</h1>
+    <p class="subtitle">{{ $t('enterprise.whitelabel.subtitle') }}</p>
 
-    <div v-if="loading" class="empty">加载中...</div>
+    <div v-if="loading" class="empty">{{ $t('enterprise.common.loading') }}</div>
 
     <div v-else class="form-card">
       <div class="form-group">
-        <label>站点名称</label>
-        <input v-model="form.siteName" placeholder="例如: XX公司AI服务中心" />
+        <label>{{ $t('enterprise.whitelabel.siteName') }}</label>
+        <input v-model="form.siteName" :placeholder="$t('enterprise.whitelabel.siteNamePlaceholder')" />
       </div>
       <div class="form-group">
-        <label>Logo URL</label>
+        <label>{{ $t('enterprise.whitelabel.logoUrl') }}</label>
         <input v-model="form.logo" placeholder="https://your-cdn.com/logo.png" />
         <div class="preview-box" v-if="form.logo">
           <img :src="form.logo" alt="Logo Preview" class="logo-preview" @error="form.logo = ''" />
         </div>
       </div>
       <div class="form-group">
-        <label>主题色</label>
+        <label>{{ $t('enterprise.whitelabel.themeColor') }}</label>
         <div class="color-row">
           <input v-model="form.primaryColor" placeholder="#667eea" class="color-input" />
           <input type="color" v-model="form.primaryColor" class="color-picker" />
@@ -26,14 +26,14 @@
         <div class="color-preview" :style="{ background: form.primaryColor || '#667eea' }"></div>
       </div>
       <div class="form-group">
-        <label>自定义域名（需DNS CNAME解析）</label>
+        <label>{{ $t('enterprise.whitelabel.customDomain') }}</label>
         <input v-model="form.domain" placeholder="ai.yourcompany.com" />
       </div>
 
       <div v-if="saveMsg" :class="['msg', saveOk ? 'success' : 'error']">{{ saveMsg }}</div>
 
       <button class="btn-primary" @click="handleSave" :disabled="saving">
-        {{ saving ? '保存中...' : '保存设置' }}
+        {{ saving ? $t('enterprise.common.saving') : $t('enterprise.whitelabel.saveBtn') }}
       </button>
     </div>
   </div>
@@ -42,6 +42,7 @@
 <script setup>
 import { useToast } from '~/composables/useToast';
 const toast = useToast();
+const { t } = useI18n();
 const form = ref({ siteName: '', logo: '', primaryColor: '#667eea', domain: '' });
 const loading = ref(true);
 const saving = ref(false);
@@ -54,7 +55,7 @@ onMounted(async () => {
     if (res.data && Object.keys(res.data).length) {
       form.value = { ...form.value, ...res.data };
     }
-  } catch (e) { /* ignore */ toast.error('加载白标设置失败'); }
+  } catch (e) { /* ignore */ toast.error(t('enterprise.whitelabel.loadFailed')); }
   finally { loading.value = false; }
 });
 
@@ -64,10 +65,10 @@ async function handleSave() {
   try {
     await $fetch('/api/enterprise/whitelabel', { method: 'PUT', body: form.value, credentials: 'include' });
     saveOk.value = true;
-    saveMsg.value = '白标设置已保存';
+    saveMsg.value = t('enterprise.whitelabel.saveSuccess');
   } catch (e) {
     saveOk.value = false;
-    saveMsg.value = e?.data?.msg || '保存失败';
+    saveMsg.value = e?.data?.msg || t('enterprise.whitelabel.saveFailed');
   } finally { saving.value = false; }
 }
 

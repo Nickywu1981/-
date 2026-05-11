@@ -22,7 +22,6 @@ const campaignSchema = z.object({
   end_time: z.string().optional(),
   status: z.coerce.number().int().min(0).max(3).default(1),
   target_audience: z.string().max(50).default('all'),
-  tenant_id: z.coerce.number().int().optional(),
   sort_order: z.coerce.number().int().default(0),
 });
 

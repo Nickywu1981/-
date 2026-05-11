@@ -1,27 +1,27 @@
 <template>
   <div class="ent-plans">
-    <h1 class="page-title">套餐管理</h1>
-    <p class="subtitle">当前套餐：<span class="plan-badge current">{{ planLabel }}</span></p>
+    <h1 class="page-title">{{ $t('enterprise.plans.title') }}</h1>
+    <p class="subtitle">{{ $t('enterprise.plans.currentPlan') }}<span class="plan-badge current">{{ planLabel }}</span></p>
 
     <div class="plan-cards">
       <div class="plan-card" v-for="plan in plans" :key="plan.id" :class="{ active: currentPlan === plan.id }">
         <h3>{{ plan.name }}</h3>
-        <div class="plan-price">¥{{ plan.price }}<span class="unit">/月</span></div>
+        <div class="plan-price">&yen;{{ plan.price }}<span class="unit">{{ $t('enterprise.plans.perMonth') }}</span></div>
         <p class="plan-desc">{{ plan.description }}</p>
         <ul class="plan-features">
-          <li>{{ plan.credits.toLocaleString() }} 积分</li>
-          <li>最多 {{ plan.maxUsers }} 个子账号</li>
-          <li>{{ plan.quotaImages.toLocaleString() }} 图片/月</li>
-          <li>{{ plan.quotaVideo.toLocaleString() }} 视频/月</li>
+          <li>{{ $t('enterprise.plans.credits', { n: plan.credits.toLocaleString() }) }}</li>
+          <li>{{ $t('enterprise.plans.maxUsers', { n: plan.maxUsers }) }}</li>
+          <li>{{ $t('enterprise.plans.imagesPerMonth', { n: plan.quotaImages.toLocaleString() }) }}</li>
+          <li>{{ $t('enterprise.plans.videosPerMonth', { n: plan.quotaVideo.toLocaleString() }) }}</li>
         </ul>
         <button class="plan-btn" :class="{ current: currentPlan === plan.id }" disabled>
-          {{ currentPlan === plan.id ? '当前套餐' : '升级' }}
+          {{ currentPlan === plan.id ? $t('enterprise.plans.currentPlanLabel') : $t('enterprise.plans.upgrade') }}
         </button>
       </div>
     </div>
 
     <div class="note">
-      <p>如需升级或定制套餐，请联系客户经理或发送邮件至 <strong>sales@movio.ai</strong></p>
+      <p>{{ $t('enterprise.plans.contactSales') }}</p>
     </div>
   </div>
 </template>
@@ -29,6 +29,7 @@
 <script setup>
 import { useToast } from '~/composables/useToast';
 const toast = useToast();
+const { t } = useI18n();
 const plans = ref([]);
 const currentPlan = ref('');
 
@@ -40,12 +41,12 @@ onMounted(async () => {
     ]);
     plans.value = planRes.data || [];
     currentPlan.value = profileRes.data?.planType || '';
-  } catch (e) { toast.error('套餐加载失败'); }
+  } catch (e) { toast.error(t('enterprise.plans.loadFailed')); }
 });
 
 const planLabel = computed(() => {
   const p = plans.value.find(p => p.id === currentPlan.value);
-  return p?.name || currentPlan.value || '未知';
+  return p?.name || currentPlan.value || t('enterprise.plans.unknown');
 });
 
 definePageMeta({ layout: 'enterprise' });

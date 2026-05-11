@@ -50,20 +50,30 @@ export async function createRelation(data) {
 }
 
 export async function auditRelation(id, tenantId, { status, auditRemark }) {
-  const [result] = await pool.query(
-    'UPDATE ?? SET status = ?, audit_remark = ?, audited_at = NOW() WHERE id = ? AND tenant_id = ?',
-    [TABLE.RELATION, status, auditRemark || '', id, tenantId],
-  );
-  if (result.affectedRows && status === 'active') {
-    const rel = await findRelationById(id);
-    if (rel) {
-      await pool.query(
-        'UPDATE ?? SET parent_channel_id = ?, channel_level = ? WHERE id = ?',
-        [TABLE.TENANT, rel.tenant_id, rel.level, rel.child_tenant_id],
-      );
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+    const [result] = await conn.query(
+      'UPDATE ?? SET status = ?, audit_remark = ?, audited_at = NOW() WHERE id = ? AND tenant_id = ?',
+      [TABLE.RELATION, status, auditRemark || '', id, tenantId],
+    );
+    if (result.affectedRows && status === 'active') {
+      const rel = await findRelationById(id);
+      if (rel) {
+        await conn.query(
+          'UPDATE ?? SET parent_channel_id = ?, channel_level = ? WHERE id = ?',
+          [TABLE.TENANT, rel.tenant_id, rel.level, rel.child_tenant_id],
+        );
+      }
     }
+    await conn.commit();
+    return result.affectedRows;
+  } catch (e) {
+    await conn.rollback();
+    throw e;
+  } finally {
+    conn.release();
   }
-  return result.affectedRows;
 }
 
 export async function updateRelationStatus(id, tenantId, status) {

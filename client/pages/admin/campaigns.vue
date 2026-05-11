@@ -102,7 +102,9 @@
 
 <script setup lang="ts">
 import { useToast } from '~/composables/useToast';
+import { useConfirm } from '~/composables/useConfirm';
 const toast = useToast();
+const confirm = useConfirm();
 const { $api } = useNuxtApp() as any
 const list = ref<any[]>([])
 const loading = ref(true)
@@ -153,7 +155,7 @@ async function save() {
 }
 
 async function del(id: number) {
-  if (!confirm('确认删除？')) return
+  if (!(await confirm('确认删除此活动？', '此操作不可撤销'))) return
   try {
     await $api(`/admin/campaign/campaigns/${id}`, { method: 'DELETE' })
     fetch()

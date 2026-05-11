@@ -15,7 +15,8 @@ export const getCampaign = wrapController(async (req) => {
 });
 
 export const createCampaign = wrapController(async (req) => {
-  return success(req.res, await campaignService.createCampaign(req.body), '活动创建成功');
+  const data = { ...req.body, tenant_id: req.user.entId || req.user.tenantId };
+  return success(req.res, await campaignService.createCampaign(data), '活动创建成功');
 });
 
 export const updateCampaign = wrapController(async (req) => {

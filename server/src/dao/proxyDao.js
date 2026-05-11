@@ -65,8 +65,18 @@ export default {
   },
 
   async remove(id, tenantId) {
-    await pool.query('DELETE FROM api_proxy_log WHERE proxy_id = ?', [id]);
-    await pool.query('DELETE FROM api_proxy_config WHERE id = ? AND tenant_id = ?', [id, tenantId]);
+    const conn = await pool.getConnection();
+    try {
+      await conn.beginTransaction();
+      await conn.query('DELETE FROM api_proxy_log WHERE proxy_id = ?', [id]);
+      await conn.query('DELETE FROM api_proxy_config WHERE id = ? AND tenant_id = ?', [id, tenantId]);
+      await conn.commit();
+    } catch (e) {
+      await conn.rollback();
+      throw e;
+    } finally {
+      conn.release();
+    }
   },
 
   // ==================== 白名单 CRUD ====================

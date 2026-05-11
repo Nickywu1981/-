@@ -1,15 +1,15 @@
 <template>
   <div class="page">
-    <div class="page-header"><h1>转化数据看板</h1></div>
-    <div v-if="loading" class="empty">加载中...</div>
-    <div v-else-if="error" class="error-msg">{{ error }} <button class="btn-text" @click="loadStats">重试</button></div>
+    <div class="page-header"><h1>{{ $t('enterprise.distribution.dashboard.title') }}</h1></div>
+    <div v-if="loading" class="empty">{{ $t('enterprise.common.loading') }}</div>
+    <div v-else-if="error" class="error-msg">{{ error }} <button class="btn-text" @click="loadStats">{{ $t('enterprise.common.retry') }}</button></div>
     <template v-else>
     <div class="stat-cards">
-      <div class="stat-card"><div class="stat-num">{{ stats.clicks || 0 }}</div><div class="stat-label">总点击</div></div>
-      <div class="stat-card"><div class="stat-num">{{ stats.registers || 0 }}</div><div class="stat-label">注册转化</div></div>
-      <div class="stat-card"><div class="stat-num">{{ stats.rate ?? '0' }}%</div><div class="stat-label">转化率</div></div>
+      <div class="stat-card"><div class="stat-num">{{ stats.clicks || 0 }}</div><div class="stat-label">{{ $t('enterprise.distribution.dashboard.totalClicks') }}</div></div>
+      <div class="stat-card"><div class="stat-num">{{ stats.registers || 0 }}</div><div class="stat-label">{{ $t('enterprise.distribution.dashboard.registrations') }}</div></div>
+      <div class="stat-card"><div class="stat-num">{{ stats.rate ?? '0' }}%</div><div class="stat-label">{{ $t('enterprise.distribution.dashboard.conversionRate') }}</div></div>
     </div>
-    <div class="card"><h3>每日转化趋势</h3><p class="empty">数据收集中，请稍后查看</p></div>
+    <div class="card"><h3>{{ $t('enterprise.distribution.dashboard.dailyTrend') }}</h3><p class="empty">{{ $t('enterprise.distribution.dashboard.collectingData') }}</p></div>
     </template>
   </div>
 </template>
@@ -17,6 +17,7 @@
 <script setup>
 definePageMeta({ layout: 'enterprise' });
 import { ref, onMounted } from 'vue';
+const { t } = useI18n();
 const stats = ref({});
 const loading = ref(true);
 const error = ref('');
@@ -26,7 +27,7 @@ async function loadStats() {
   try {
     const r = await $fetch('/api/distribution/stats', { credentials: 'include' });
     if (r.code === 200) stats.value = r.data || {};
-  } catch (e) { error.value = e?.data?.msg || '加载失败'; }
+  } catch (e) { error.value = e?.data?.msg || t('enterprise.distribution.dashboard.loadError'); }
   finally { loading.value = false; }
 }
 onMounted(loadStats);

@@ -1,37 +1,37 @@
 <template>
   <div class="ent-customers">
     <div class="page-header">
-      <h1 class="page-title">客户管理</h1>
+      <h1 class="page-title">{{ $t('enterprise.customers.index.title') }}</h1>
     </div>
 
     <!-- 统计卡片 -->
     <div class="stats-row">
-      <div class="stat-card"><span class="stat-num">{{ stats.total }}</span><span class="stat-label">客户总数</span></div>
-      <div class="stat-card"><span class="stat-num">{{ stats.activeToday }}</span><span class="stat-label">今日活跃</span></div>
-      <div class="stat-card"><span class="stat-num">{{ stats.newThisMonth }}</span><span class="stat-label">本月新增</span></div>
-      <div class="stat-card"><span class="stat-num">{{ stats.withMembership }}</span><span class="stat-label">付费会员</span></div>
+      <div class="stat-card"><span class="stat-num">{{ stats.total }}</span><span class="stat-label">{{ $t('enterprise.customers.index.totalCustomers') }}</span></div>
+      <div class="stat-card"><span class="stat-num">{{ stats.activeToday }}</span><span class="stat-label">{{ $t('enterprise.customers.index.todayActive') }}</span></div>
+      <div class="stat-card"><span class="stat-num">{{ stats.newThisMonth }}</span><span class="stat-label">{{ $t('enterprise.customers.index.monthlyNew') }}</span></div>
+      <div class="stat-card"><span class="stat-num">{{ stats.withMembership }}</span><span class="stat-label">{{ $t('enterprise.customers.index.paidMembers') }}</span></div>
     </div>
 
     <!-- 搜索/筛选 -->
     <div class="toolbar">
-      <input v-model="keyword" placeholder="搜索用户名/昵称/手机号" class="search-input" @keyup.enter="loadCustomers" />
+      <input v-model="keyword" :placeholder="$t('enterprise.customers.index.searchPlaceholder')" class="search-input" @keyup.enter="loadCustomers" />
       <select v-model="statusFilter" @change="loadCustomers" class="filter-select">
-        <option value="">全部状态</option>
-        <option value="1">启用</option>
-        <option value="0">禁用</option>
+        <option value="">{{ $t('enterprise.users.allStatus') }}</option>
+        <option value="1">{{ $t('enterprise.common.statusEnabled') }}</option>
+        <option value="0">{{ $t('enterprise.common.statusDisabled') }}</option>
       </select>
       <select v-model="tagFilter" @change="loadCustomers" class="filter-select">
-        <option value="">全部标签</option>
+        <option value="">{{ $t('enterprise.customers.index.allTags') }}</option>
         <option v-for="t in tags" :key="t.id" :value="t.id">{{ t.name }}</option>
       </select>
-      <button class="btn-text" @click="loadCustomers">搜索</button>
+      <button class="btn-text" @click="loadCustomers">{{ $t('enterprise.common.search') }}</button>
     </div>
 
     <!-- 客户列表 -->
     <div class="table-wrap" v-if="!loading">
       <table v-if="customers.length">
         <thead>
-          <tr><th>用户名</th><th>昵称</th><th>手机号</th><th>会员</th><th>标签</th><th>状态</th><th>注册时间</th><th>操作</th></tr>
+          <tr><th>{{ $t('enterprise.customers.index.username') }}</th><th>{{ $t('enterprise.customers.index.nickname') }}</th><th>{{ $t('enterprise.customers.index.phone') }}</th><th>{{ $t('enterprise.customers.index.member') }}</th><th>{{ $t('enterprise.customers.index.tags') }}</th><th>{{ $t('enterprise.customers.index.status') }}</th><th>{{ $t('enterprise.customers.index.registeredAt') }}</th><th>{{ $t('enterprise.customers.index.actions') }}</th></tr>
         </thead>
         <tbody>
           <tr v-for="c in customers" :key="c.id">
@@ -43,28 +43,28 @@
               <span v-for="t in getCustomerTags(c.id)" :key="t?.id" class="tag-chip" :style="{ background: t?.color || '#3B82F6' }">{{ t?.name }}</span>
               <span v-if="!getCustomerTags(c.id).length" class="text-muted">-</span>
             </td>
-            <td><span :class="['status-tag', c.status === 1 ? 'on' : 'off']">{{ c.status === 1 ? '启用' : '禁用' }}</span></td>
+            <td><span :class="['status-tag', c.status === 1 ? 'on' : 'off']">{{ c.status === 1 ? $t('enterprise.common.statusEnabled') : $t('enterprise.common.statusDisabled') }}</span></td>
             <td>{{ formatDate(c.create_time) }}</td>
             <td class="actions">
-              <button class="btn-sm" @click="goDetail(c.id)">详情</button>
-              <button class="btn-sm" @click="openTagPicker(c)">打标</button>
+              <button class="btn-sm" @click="goDetail(c.id)">{{ $t('enterprise.customers.index.detail') }}</button>
+              <button class="btn-sm" @click="openTagPicker(c)">{{ $t('enterprise.customers.index.tagAction') }}</button>
             </td>
           </tr>
         </tbody>
       </table>
-      <div v-else class="empty">暂无客户数据</div>
+      <div v-else class="empty">{{ $t('enterprise.customers.index.noData') }}</div>
 
       <div class="pager" v-if="total > pageSize">
-        <button :disabled="page <= 1" @click="page--; loadCustomers()">上一页</button>
-        <span>第 {{ page }} / {{ Math.ceil(total / pageSize) }} 页</span>
-        <button :disabled="page >= Math.ceil(total / pageSize)" @click="page++; loadCustomers()">下一页</button>
+        <button :disabled="page <= 1" @click="page--; loadCustomers()">{{ $t('enterprise.common.prevPage') }}</button>
+        <span>{{ $t('enterprise.common.pageOf', { page, total: Math.ceil(total / pageSize) }) }}</span>
+        <button :disabled="page >= Math.ceil(total / pageSize)" @click="page++; loadCustomers()">{{ $t('enterprise.common.nextPage') }}</button>
       </div>
     </div>
 
     <!-- 打标弹窗 -->
     <div class="modal-overlay" v-if="showTagPicker" @click.self="showTagPicker = false">
       <div class="modal">
-        <h3>为客户打标 — {{ tagTarget?.nickname || tagTarget?.username }}</h3>
+        <h3>{{ $t('enterprise.customers.index.tagModalTitle') }} — {{ tagTarget?.nickname || tagTarget?.username }}</h3>
         <div class="tag-list">
           <label v-for="t in tags" :key="t.id" class="tag-check">
             <input type="checkbox" :value="t.id" v-model="selectedTags" />
@@ -72,8 +72,8 @@
           </label>
         </div>
         <div class="modal-actions">
-          <button class="btn-text" @click="showTagPicker = false">取消</button>
-          <button class="btn-primary" @click="applyTags">确认打标</button>
+          <button class="btn-text" @click="showTagPicker = false">{{ $t('enterprise.common.cancel') }}</button>
+          <button class="btn-primary" @click="applyTags">{{ $t('enterprise.customers.index.confirmTag') }}</button>
         </div>
       </div>
     </div>
@@ -85,6 +85,7 @@ definePageMeta({ layout: 'enterprise' });
 import { ref, reactive, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useToast } from '~/composables/useToast';
+const { t } = useI18n();
 
 const router = useRouter();
 const toast = useToast();
@@ -117,16 +118,16 @@ async function loadCustomers() {
     customers.value = data.list || [];
     total.value = data.total || 0;
     (data.list || []).forEach(c => { if (c.customer_tags) customerTagsMap[c.id] = c.customer_tags; });
-  } catch (e) { toast.error('客户列表加载失败'); }
+  } catch (e) { toast.error(t('enterprise.customers.index.loadFailed')); }
   loading.value = false;
 }
 
 async function loadStats() {
-  try { Object.assign(stats, await $api('/stats')); } catch (e) { toast.error('客户统计加载失败'); }
+  try { Object.assign(stats, await $api('/stats')); } catch (e) { toast.error(t('enterprise.customers.index.statsLoadFailed')); }
 }
 
 async function loadTags() {
-  try { tags.value = await $api('/tags'); } catch (e) { toast.error('标签列表加载失败'); }
+  try { tags.value = await $api('/tags'); } catch (e) { toast.error(t('enterprise.customers.index.tagsLoadFailed')); }
 }
 
 function getCustomerTags(cid) { return customerTagsMap[cid] || []; }
@@ -147,12 +148,12 @@ async function applyTags() {
     }
     showTagPicker.value = false;
     loadCustomers();
-  } catch (e) { toast.error('批量打标失败'); }
+  } catch (e) { toast.error(t('enterprise.customers.index.batchTagFailed')); }
 }
 
 function planLabel(type) {
-  const map = { 1: '月卡', 2: '季卡', 3: '年卡' };
-  return map[type] || '免费';
+  const map = { 1: t('enterprise.customers.index.memberMonthly'), 2: t('enterprise.customers.index.memberQuarterly'), 3: t('enterprise.customers.index.memberYearly') };
+  return map[type] || t('enterprise.common.freeLabel');
 }
 
 function formatDate(d) { return d ? new Date(d).toLocaleDateString('zh-CN') : '-'; }

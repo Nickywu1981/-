@@ -345,9 +345,9 @@ app.use('/api/sdk', heavyLimiter, sdkRoutes);
 app.use('/api/adk', heavyLimiter, adkRoutes);
 
 // ===== Phase 1: 企业/代理端 (2026-05-11) =====
-app.use('/api/enterprise', enterpriseRoutes);
-app.use('/api/enterprise/finance', financeRoutes);  // Phase 2: 财务核心
-app.use('/api/enterprise/customers', customerRoutes); // Phase 7: 客户管理
+app.use('/api/enterprise', apiLimiter, enterpriseRoutes);
+app.use('/api/enterprise/finance', paymentLimiter, financeRoutes);  // Phase 2: 财务核心
+app.use('/api/enterprise/customers', apiLimiter, customerRoutes); // Phase 7: 客户管理
 app.use('/api/enterprise/channel', adminLimiter, channelRoutes);    // Phase 8: 渠道管理
 app.use('/api/enterprise/commerce', adminLimiter, commerceRoutes);  // Phase 8: 商品订单
 app.use('/api/admin/campaign', adminLimiter, campaignRoutes);        // Phase 11: 运营活动+优惠券+公告

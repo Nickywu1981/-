@@ -1,52 +1,52 @@
 <template>
   <div class="ent-settings">
-    <h1 class="page-title">账户设置</h1>
+    <h1 class="page-title">{{ $t('enterprise.settings.title') }}</h1>
 
-    <div v-if="loading" class="empty">加载中...</div>
+    <div v-if="loading" class="empty">{{ $t('enterprise.common.loading') }}</div>
     <div v-else-if="loadError" class="empty">
-      <p>企业信息加载失败</p>
-      <button class="btn" @click="loadProfile">重试</button>
+      <p>{{ $t('enterprise.settings.loadError') }}</p>
+      <button class="btn" @click="loadProfile">{{ $t('enterprise.common.retry') }}</button>
     </div>
 
     <template v-else>
     <div class="form-card">
-      <h2>企业信息</h2>
+      <h2>{{ $t('enterprise.settings.enterpriseInfo') }}</h2>
       <div class="form-group">
-        <label>企业名称</label>
-        <input v-model="profile.name" placeholder="企业名称" />
+        <label>{{ $t('enterprise.settings.enterpriseName') }}</label>
+        <input v-model="profile.name" :placeholder="$t('enterprise.settings.enterpriseName')" />
       </div>
       <div class="form-group">
         <label>Logo URL</label>
         <input v-model="profile.logo" placeholder="https://..." />
       </div>
       <div class="form-group">
-        <label>联系人姓名</label>
-        <input v-model="profile.contactName" placeholder="联系人" />
+        <label>{{ $t('enterprise.settings.contactName') }}</label>
+        <input v-model="profile.contactName" :placeholder="$t('enterprise.settings.contactPlaceholder')" />
       </div>
       <div class="form-group">
-        <label>联系邮箱</label>
-        <input v-model="profile.contactEmail" type="email" placeholder="联系邮箱" />
+        <label>{{ $t('enterprise.settings.contactEmail') }}</label>
+        <input v-model="profile.contactEmail" type="email" :placeholder="$t('enterprise.settings.emailPlaceholder')" />
       </div>
       <div class="form-group">
-        <label>自定义域名</label>
+        <label>{{ $t('enterprise.settings.customDomain') }}</label>
         <input v-model="profile.domain" placeholder="ai.yourcompany.com" />
       </div>
 
       <div v-if="msg" :class="['msg', ok ? 'success' : 'error']">{{ msg }}</div>
       <button class="btn-primary" @click="handleSave" :disabled="saving">
-        {{ saving ? '保存中...' : '保存修改' }}
+        {{ saving ? $t('enterprise.common.saving') : $t('enterprise.settings.saveBtn') }}
       </button>
     </div>
 
     <div class="info-card">
-      <h2>账户概览</h2>
+      <h2>{{ $t('enterprise.settings.accountOverview') }}</h2>
       <div class="info-grid">
-        <div class="info-item"><span class="label">企业编码</span><span>{{ profile.code }}</span></div>
-        <div class="info-item"><span class="label">企业类型</span><span>{{ typeLabel }}</span></div>
-        <div class="info-item"><span class="label">当前套餐</span><span>{{ profile.planType }}</span></div>
-        <div class="info-item"><span class="label">子账号数</span><span>{{ profile.userCount || 0 }}</span></div>
-        <div class="info-item"><span class="label">账户余额</span><span>¥{{ profile.balance || 0 }}</span></div>
-        <div class="info-item"><span class="label">到期时间</span><span>{{ profile.expireTime || '长期有效' }}</span></div>
+        <div class="info-item"><span class="label">{{ $t('enterprise.dashboard.enterpriseCode') }}</span><span>{{ profile.code }}</span></div>
+        <div class="info-item"><span class="label">{{ $t('enterprise.dashboard.enterpriseType') }}</span><span>{{ typeLabel }}</span></div>
+        <div class="info-item"><span class="label">{{ $t('enterprise.settings.currentPlan') }}</span><span>{{ profile.planType }}</span></div>
+        <div class="info-item"><span class="label">{{ $t('enterprise.dashboard.subAccounts') }}</span><span>{{ profile.userCount || 0 }}</span></div>
+        <div class="info-item"><span class="label">{{ $t('enterprise.dashboard.accountBalance') }}</span><span>&yen;{{ profile.balance || 0 }}</span></div>
+        <div class="info-item"><span class="label">{{ $t('enterprise.settings.expireTime') }}</span><span>{{ profile.expireTime || $t('enterprise.settings.expireNever') }}</span></div>
       </div>
     </div>
     </template>
@@ -56,6 +56,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useToast } from '~/composables/useToast';
+const { t } = useI18n();
 const toast = useToast();
 const profile = ref({});
 const loading = ref(true);
@@ -65,7 +66,7 @@ const ok = ref(false);
 const loadError = ref(false);
 
 const typeLabel = computed(() => {
-  const map = { enterprise: '企业', agent: '代理商', partner: '合作伙伴' };
+  const map = { enterprise: t('enterprise.common.enterpriseLabel'), agent: t('enterprise.common.agentLabel'), partner: t('enterprise.common.partnerLabel') };
   return map[profile.value.type] || profile.value.type || '-';
 });
 
@@ -75,7 +76,7 @@ async function loadProfile() {
   try {
     const res = await $fetch('/api/enterprise/profile', { credentials: 'include' });
     profile.value = res.data || res;
-  } catch (e) { loadError.value = true; toast.error('加载企业信息失败'); }
+  } catch (e) { loadError.value = true; toast.error(t('enterprise.settings.loadFailed')); }
   finally { loading.value = false; }
 };
 
@@ -95,10 +96,10 @@ async function handleSave() {
       credentials: 'include',
     });
     ok.value = true;
-    msg.value = '设置已保存';
+    msg.value = t('enterprise.settings.saveSuccess');
   } catch (e) {
     ok.value = false;
-    msg.value = e?.data?.msg || '保存失败';
+    msg.value = e?.data?.msg || t('enterprise.settings.saveFailed');
   } finally { saving.value = false; }
 }
 

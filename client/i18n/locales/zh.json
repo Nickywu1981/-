@@ -976,6 +976,29 @@
       "loadFailed": "加载白标设置失败",
       "saveSuccess": "白标设置已保存",
       "saveFailed": "保存失败"
+    },
+    "nav": {
+      "dataOverview": "数据总览",
+      "dashboard": "企业看板",
+      "userManagement": "用户管理",
+      "members": "成员管理",
+      "customers": "客户管理",
+      "customerTags": "客户标签",
+      "businessManagement": "业务管理",
+      "channels": "渠道管理",
+      "distribution": "分销管理",
+      "commerce": "电商管理",
+      "financeManagement": "财务管理",
+      "financeBoard": "财务看板",
+      "dataAnalysis": "数据分析",
+      "reports": "数据报表",
+      "usage": "用量统计",
+      "settingsNav": "设置",
+      "plans": "套餐计划",
+      "whitelabel": "白标设置",
+      "enterpriseSettings": "企业设置",
+      "pageTitle": "企业中心",
+      "loadProfileFailed": "加载企业信息失败"
     }
   }
 }

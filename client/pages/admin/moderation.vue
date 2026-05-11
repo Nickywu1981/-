@@ -68,6 +68,8 @@
 
 <script setup lang="ts">
 import { formatDateTime } from '@/utils/format'
+import { useConfirm } from '~/composables/useConfirm';
+const confirmDialog = useConfirm();
 
 const filter = reactive({ status: '', type: '' as string });
 const list = ref<any[]>([]);
@@ -96,6 +98,7 @@ async function fetchList() {
 function onPageChange(p: number) { page.value = p; fetchList(); }
 
 async function approve(item: any) {
+  if (!(await confirmDialog('确认通过此内容？'))) return
   reviewing.value = true;
   try {
     await $fetch(`/api/admin/tasks/${item.id}/approve`, { method: 'POST' });
@@ -105,6 +108,7 @@ async function approve(item: any) {
 }
 
 async function reject(item: any) {
+  if (!(await confirmDialog('确认拒绝此内容？'))) return
   reviewing.value = true;
   try {
     await $fetch(`/api/admin/tasks/${item.id}/reject`, { method: 'POST' });

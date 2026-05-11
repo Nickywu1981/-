@@ -8,57 +8,57 @@
     <!-- Error -->
     <div v-else-if="error" class="error-state">
       <p>{{ error }}</p>
-      <button class="retry-btn" @click="loadData">重试</button>
+      <button class="retry-btn" @click="loadData">{{ $t('enterprise.common.retry') }}</button>
     </div>
 
     <!-- Content -->
     <template v-else>
-    <h1 class="page-title">工作台</h1>
+    <h1 class="page-title">{{ $t('enterprise.dashboard.title') }}</h1>
 
     <!-- 统计卡片 -->
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-label">子账号数</div>
+        <div class="stat-label">{{ $t('enterprise.dashboard.subAccounts') }}</div>
         <div class="stat-value">{{ dashboard.stats?.userCount || 0 }}</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">30天调用次数</div>
+        <div class="stat-label">{{ $t('enterprise.dashboard.calls30d') }}</div>
         <div class="stat-value">{{ formatNumber(dashboard.stats?.totalCalls30d || 0) }}</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">30天消耗积分</div>
+        <div class="stat-label">{{ $t('enterprise.dashboard.credits30d') }}</div>
         <div class="stat-value">{{ formatNumber(dashboard.stats?.totalCredits30d || 0) }}</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">图片配额</div>
+        <div class="stat-label">{{ $t('enterprise.dashboard.imageQuota') }}</div>
         <div class="stat-value">{{ formatNumber(dashboard.stats?.quotaImages || 0) }}</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">视频配额</div>
+        <div class="stat-label">{{ $t('enterprise.dashboard.videoQuota') }}</div>
         <div class="stat-value">{{ formatNumber(dashboard.stats?.quotaVideo || 0) }}</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">账户余额</div>
-        <div class="stat-value">¥{{ dashboard.enterprise?.balance || 0 }}</div>
+        <div class="stat-label">{{ $t('enterprise.dashboard.accountBalance') }}</div>
+        <div class="stat-value">&yen;{{ dashboard.enterprise?.balance || 0 }}</div>
       </div>
     </div>
 
     <!-- 企业信息 -->
     <div class="info-section">
-      <h2>企业信息</h2>
+      <h2>{{ $t('enterprise.dashboard.enterpriseInfo') }}</h2>
       <div class="info-grid">
-        <div class="info-item"><span class="label">企业名称</span><span>{{ enterprise.name }}</span></div>
-        <div class="info-item"><span class="label">企业编码</span><span>{{ enterprise.code }}</span></div>
-        <div class="info-item"><span class="label">企业类型</span><span>{{ typeLabel }}</span></div>
-        <div class="info-item"><span class="label">套餐</span><span class="plan-badge">{{ planLabel }}</span></div>
-        <div class="info-item"><span class="label">联系人</span><span>{{ enterprise.contactName }}</span></div>
-        <div class="info-item"><span class="label">联系电话</span><span>{{ enterprise.contactPhone }}</span></div>
+        <div class="info-item"><span class="label">{{ $t('enterprise.dashboard.enterpriseName') }}</span><span>{{ enterprise.name }}</span></div>
+        <div class="info-item"><span class="label">{{ $t('enterprise.dashboard.enterpriseCode') }}</span><span>{{ enterprise.code }}</span></div>
+        <div class="info-item"><span class="label">{{ $t('enterprise.dashboard.enterpriseType') }}</span><span>{{ typeLabel }}</span></div>
+        <div class="info-item"><span class="label">{{ $t('enterprise.dashboard.plan') }}</span><span class="plan-badge">{{ planLabel }}</span></div>
+        <div class="info-item"><span class="label">{{ $t('enterprise.dashboard.contactName') }}</span><span>{{ enterprise.contactName }}</span></div>
+        <div class="info-item"><span class="label">{{ $t('enterprise.dashboard.contactPhone') }}</span><span>{{ enterprise.contactPhone }}</span></div>
       </div>
     </div>
 
     <!-- 用量趋势 -->
     <div class="chart-section" v-if="usage.length">
-      <h2>近30天用量趋势</h2>
+      <h2>{{ $t('enterprise.dashboard.usageTrend') }}</h2>
       <div class="chart-bar-wrap">
         <div class="chart-bar" v-for="item in usage" :key="item.date"
           :style="{ height: barHeight(item.call_count) + '%' }"
@@ -75,6 +75,7 @@
 </template>
 
 <script setup>
+const { t } = useI18n();
 const dashboard = ref({ stats: {}, enterprise: {} });
 const enterprise = ref({});
 const usage = ref([]);
@@ -82,13 +83,13 @@ const loading = ref(true);
 const error = ref('');
 
 const typeLabel = computed(() => {
-  const map = { enterprise: '企业', agent: '代理商', partner: '合作伙伴' };
+  const map = { enterprise: t('enterprise.common.enterpriseLabel'), agent: t('enterprise.common.agentLabel'), partner: t('enterprise.common.partnerLabel') };
   return map[enterprise.value.type] || enterprise.value.type || '-';
 });
 const planLabel = computed(() => {
   const plan = dashboard.value.enterprise?.planType || enterprise.value.planType;
-  const map = { basic: '基础版', pro: '专业版', enterprise_basic: '企业基础版', enterprise_pro: '企业专业版', ultimate: '旗舰版' };
-  return map[plan] || plan || '免费版';
+  const map = { basic: t('enterprise.dashboard.planBasic'), pro: t('enterprise.dashboard.planPro'), enterprise_basic: t('enterprise.dashboard.planEnterpriseBasic'), enterprise_pro: t('enterprise.dashboard.planEnterprisePro'), ultimate: t('enterprise.dashboard.planUltimate') };
+  return map[plan] || plan || t('enterprise.common.freeLabel');
 });
 
 async function loadData() {
@@ -103,7 +104,7 @@ async function loadData() {
     enterprise.value = profileRes.data || profileRes;
     usage.value = dashboard.value.usage || [];
   } catch (e) {
-    error.value = e?.data?.msg || '加载失败，请稍后重试';
+    error.value = e?.data?.msg || t('enterprise.dashboard.loadError');
   } finally {
     loading.value = false;
   }

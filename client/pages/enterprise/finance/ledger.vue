@@ -1,24 +1,24 @@
 <template>
   <div class="finance-ledger">
-    <h1 class="page-title">账户流水</h1>
+    <h1 class="page-title">{{ $t('enterprise.finance.ledger.title') }}</h1>
 
     <div class="toolbar">
       <select v-model="filterType" @change="loadData" class="filter-select">
-        <option value="">全部类型</option>
-        <option value="revenue">收入</option>
-        <option value="commission">佣金</option>
-        <option value="withdrawal">提现</option>
-        <option value="refund">退款</option>
-        <option value="adjustment">调账</option>
+        <option value="">{{ $t('enterprise.finance.ledger.allTypes') }}</option>
+        <option value="revenue">{{ $t('enterprise.finance.ledger.typeRevenue') }}</option>
+        <option value="commission">{{ $t('enterprise.finance.ledger.typeCommission') }}</option>
+        <option value="withdrawal">{{ $t('enterprise.finance.ledger.typeWithdrawal') }}</option>
+        <option value="refund">{{ $t('enterprise.finance.ledger.typeRefund') }}</option>
+        <option value="adjustment">{{ $t('enterprise.finance.ledger.typeAdjustment') }}</option>
       </select>
       <input type="date" v-model="startDate" class="date-input" @change="loadData" />
-      <span class="sep">至</span>
+      <span class="sep">{{ $t('enterprise.finance.ledger.to') }}</span>
       <input type="date" v-model="endDate" class="date-input" @change="loadData" />
     </div>
 
     <div class="table-wrap">
       <table v-if="list.length">
-        <thead><tr><th>类型</th><th>金额</th><th>变动前</th><th>变动后</th><th>备注</th><th>时间</th></tr></thead>
+        <thead><tr><th>{{ $t('enterprise.finance.ledger.type') }}</th><th>{{ $t('enterprise.finance.ledger.amount') }}</th><th>{{ $t('enterprise.finance.ledger.before') }}</th><th>{{ $t('enterprise.finance.ledger.after') }}</th><th>{{ $t('enterprise.finance.ledger.remark') }}</th><th>{{ $t('enterprise.finance.ledger.time') }}</th></tr></thead>
         <tbody>
           <tr v-for="item in list" :key="item.id">
             <td><span :class="['type-tag', item.ledger_type]">{{ typeLabel(item.ledger_type) }}</span></td>
@@ -30,13 +30,13 @@
           </tr>
         </tbody>
       </table>
-      <div v-else class="empty">暂无流水记录</div>
+      <div v-else class="empty">{{ $t('enterprise.finance.ledger.noData') }}</div>
     </div>
 
     <div class="pager" v-if="total > pageSize">
-      <button :disabled="page <= 1" @click="page--; loadData()">上一页</button>
-      <span>第 {{ page }} / {{ Math.ceil(total / pageSize) }} 页</span>
-      <button :disabled="page >= Math.ceil(total / pageSize)" @click="page++; loadData()">下一页</button>
+      <button :disabled="page <= 1" @click="page--; loadData()">{{ $t('enterprise.common.prevPage') }}</button>
+      <span>{{ $t('enterprise.common.pageOf', { page, total: Math.ceil(total / pageSize) }) }}</span>
+      <button :disabled="page >= Math.ceil(total / pageSize)" @click="page++; loadData()">{{ $t('enterprise.common.nextPage') }}</button>
     </div>
   </div>
 </template>
@@ -44,6 +44,7 @@
 <script setup>
 import { useApi } from '~/composables/useApi';
 import { useToast } from '~/composables/useToast';
+const { t } = useI18n();
 const api = useApi();
 const toast = useToast();
 
@@ -66,10 +67,10 @@ async function loadData() {
     const data = await api.get('/enterprise/finance/ledger', params);
     list.value = data?.list || [];
     total.value = data?.total || 0;
-  } catch (e) { toast.error('流水明细加载失败'); }
+  } catch (e) { toast.error(t('enterprise.finance.ledger.loadError')); }
 }
 
-function typeLabel(t) { const m = { revenue: '收入', commission: '佣金', withdrawal: '提现', refund: '退款', adjustment: '调账' }; return m[t] || t; }
+function typeLabel(ty) { const m: Record<string, string> = { revenue: t('enterprise.finance.ledger.typeRevenue'), commission: t('enterprise.finance.ledger.typeCommission'), withdrawal: t('enterprise.finance.ledger.typeWithdrawal'), refund: t('enterprise.finance.ledger.typeRefund'), adjustment: t('enterprise.finance.ledger.typeAdjustment') }; return m[ty] || ty; }
 function fmt(n) { return (Number(n) || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2 }); }
 function formatDate(d) { return d ? new Date(d).toLocaleDateString('zh-CN') : '-'; }
 

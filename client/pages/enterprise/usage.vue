@@ -1,24 +1,24 @@
 <template>
   <div class="ent-usage">
-    <h1 class="page-title">用量明细</h1>
+    <h1 class="page-title">{{ $t('enterprise.usage.title') }}</h1>
 
     <!-- 日期筛选 -->
     <div class="toolbar">
       <input type="date" v-model="startDate" class="date-input" />
-      <span class="sep">至</span>
+      <span class="sep">{{ $t('enterprise.usage.to') }}</span>
       <input type="date" v-model="endDate" class="date-input" />
       <select v-model="filterUserId" class="filter-select">
-        <option value="">全部用户</option>
-        <option v-for="u in userList" :key="u.user_id" :value="u.user_id">{{ u.nickname || `用户${u.user_id}` }}</option>
+        <option value="">{{ $t('enterprise.usage.allUsers') }}</option>
+        <option v-for="u in userList" :key="u.user_id" :value="u.user_id">{{ u.nickname || `${$t('enterprise.usage.userPrefix')}${u.user_id}` }}</option>
       </select>
-      <button class="btn-text" @click="loadUsage">查询</button>
+      <button class="btn-text" @click="loadUsage">{{ $t('enterprise.usage.query') }}</button>
     </div>
 
     <!-- 按日趋势 -->
     <div class="section" v-if="timeline.length">
-      <h2>调用趋势</h2>
+      <h2>{{ $t('enterprise.usage.callTrend') }}</h2>
       <table>
-        <thead><tr><th>日期</th><th>调用次数</th><th>消耗积分</th></tr></thead>
+        <thead><tr><th>{{ $t('enterprise.usage.date') }}</th><th>{{ $t('enterprise.usage.callCount') }}</th><th>{{ $t('enterprise.usage.creditsUsed') }}</th></tr></thead>
         <tbody>
           <tr v-for="item in timeline" :key="item.date">
             <td>{{ item.date }}</td>
@@ -31,9 +31,9 @@
 
     <!-- 按用户统计 -->
     <div class="section" v-if="byUser.length">
-      <h2>按用户统计</h2>
+      <h2>{{ $t('enterprise.usage.byUser') }}</h2>
       <table>
-        <thead><tr><th>用户ID</th><th>调用次数</th><th>消耗积分</th></tr></thead>
+        <thead><tr><th>{{ $t('enterprise.usage.userId') }}</th><th>{{ $t('enterprise.usage.callCount') }}</th><th>{{ $t('enterprise.usage.creditsUsed') }}</th></tr></thead>
         <tbody>
           <tr v-for="item in byUser" :key="item.user_id">
             <td>{{ item.user_id }}</td>
@@ -44,13 +44,14 @@
       </table>
     </div>
 
-    <div v-if="!timeline.length && !loading" class="empty">暂无用量数据</div>
+    <div v-if="!timeline.length && !loading" class="empty">{{ $t('enterprise.usage.noData') }}</div>
   </div>
 </template>
 
 <script setup>
 import { useToast } from '~/composables/useToast';
 const toast = useToast();
+const { t } = useI18n();
 const startDate = ref(new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10));
 const endDate = ref(new Date().toISOString().slice(0, 10));
 const filterUserId = ref('');
@@ -69,7 +70,7 @@ async function loadUsage() {
     const res = await $fetch('/api/enterprise/usage', { credentials: 'include', params });
     timeline.value = res.data?.timeline || [];
     byUser.value = res.data?.byUser || [];
-  } catch (e) { toast.error('用量明细加载失败'); }
+  } catch (e) { toast.error(t('enterprise.usage.loadError')); }
   finally { loading.value = false; }
 }
 

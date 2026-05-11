@@ -976,6 +976,29 @@
       "loadFailed": "Failed to load white label settings",
       "saveSuccess": "White label settings saved",
       "saveFailed": "Save failed"
+    },
+    "nav": {
+      "dataOverview": "Data Overview",
+      "dashboard": "Dashboard",
+      "userManagement": "User Management",
+      "members": "Members",
+      "customers": "Customers",
+      "customerTags": "Customer Tags",
+      "businessManagement": "Business",
+      "channels": "Channels",
+      "distribution": "Distribution",
+      "commerce": "E-Commerce",
+      "financeManagement": "Finance",
+      "financeBoard": "Finance Board",
+      "dataAnalysis": "Analytics",
+      "reports": "Reports",
+      "usage": "Usage Stats",
+      "settingsNav": "Settings",
+      "plans": "Plans",
+      "whitelabel": "White Label",
+      "enterpriseSettings": "Settings",
+      "pageTitle": "Enterprise Center",
+      "loadProfileFailed": "Failed to load enterprise info"
     }
   }
 }

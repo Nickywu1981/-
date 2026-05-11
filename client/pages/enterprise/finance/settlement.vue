@@ -1,10 +1,10 @@
 <template>
   <div class="finance-settlement">
-    <h1 class="page-title">结算记录</h1>
+    <h1 class="page-title">{{ $t('enterprise.finance.settlement.title') }}</h1>
 
     <div class="table-wrap">
       <table v-if="list.length">
-        <thead><tr><th>批次号</th><th>结算周期</th><th>订单金额</th><th>佣金比例</th><th>佣金金额</th><th>状态</th><th>时间</th></tr></thead>
+        <thead><tr><th>{{ $t('enterprise.finance.settlement.batchNo') }}</th><th>{{ $t('enterprise.finance.settlement.settlePeriod') }}</th><th>{{ $t('enterprise.finance.settlement.orderAmount') }}</th><th>{{ $t('enterprise.finance.settlement.commissionRate') }}</th><th>{{ $t('enterprise.finance.settlement.commissionAmount') }}</th><th>{{ $t('enterprise.finance.settlement.status') }}</th><th>{{ $t('enterprise.finance.settlement.time') }}</th></tr></thead>
         <tbody>
           <tr v-for="item in list" :key="item.id">
             <td>{{ item.batch_no || '-' }}</td>
@@ -12,18 +12,18 @@
             <td>¥{{ fmt(item.order_amount) }}</td>
             <td>{{ item.commission_rate ? item.commission_rate + '%' : '-' }}</td>
             <td>¥{{ fmt(item.commission_amount) }}</td>
-            <td><span :class="['status-tag', item.status]">{{ item.status === 'settled' ? '已结算' : '待结算' }}</span></td>
+            <td><span :class="['status-tag', item.status]">{{ item.status === 'settled' ? $t('enterprise.finance.dashboard.settled') : $t('enterprise.finance.dashboard.pendingSettle') }}</span></td>
             <td>{{ formatDate(item.create_time) }}</td>
           </tr>
         </tbody>
       </table>
-      <div v-else class="empty">暂无结算记录</div>
+      <div v-else class="empty">{{ $t('enterprise.finance.settlement.noData') }}</div>
     </div>
 
     <div class="pager" v-if="total > pageSize">
-      <button :disabled="page <= 1" @click="page--; loadData()">上一页</button>
-      <span>第 {{ page }} / {{ Math.ceil(total / pageSize) }} 页</span>
-      <button :disabled="page >= Math.ceil(total / pageSize)" @click="page++; loadData()">下一页</button>
+      <button :disabled="page <= 1" @click="page--; loadData()">{{ $t('enterprise.common.prevPage') }}</button>
+      <span>{{ $t('enterprise.common.pageOf', { page, total: Math.ceil(total / pageSize) }) }}</span>
+      <button :disabled="page >= Math.ceil(total / pageSize)" @click="page++; loadData()">{{ $t('enterprise.common.nextPage') }}</button>
     </div>
   </div>
 </template>
@@ -31,6 +31,7 @@
 <script setup>
 import { useApi } from '~/composables/useApi';
 import { useToast } from '~/composables/useToast';
+const { t } = useI18n();
 const api = useApi();
 const toast = useToast();
 
@@ -46,7 +47,7 @@ async function loadData() {
     const data = await api.get('/enterprise/finance/settlement', { page: page.value, pageSize });
     list.value = data?.list || [];
     total.value = data?.total || 0;
-  } catch (e) { toast.error('结算记录加载失败'); }
+  } catch (e) { toast.error(t('enterprise.finance.settlement.loadError')); }
 }
 
 function fmt(n) { return (Number(n) || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2 }); }

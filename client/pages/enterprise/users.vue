@@ -1,26 +1,26 @@
 <template>
   <div class="ent-users">
     <div class="page-header">
-      <h1 class="page-title">子账号管理</h1>
-      <button class="btn-primary" @click="showAdd = true">+ 添加子账号</button>
+      <h1 class="page-title">{{ $t('enterprise.users.title') }}</h1>
+      <button class="btn-primary" @click="showAdd = true">+ {{ $t('enterprise.users.addUser') }}</button>
     </div>
 
     <!-- 搜索/筛选 -->
     <div class="toolbar">
-      <input v-model="keyword" placeholder="搜索昵称/手机号/邮箱" class="search-input" @keyup.enter="loadUsers" />
+      <input v-model="keyword" :placeholder="$t('enterprise.users.searchPlaceholder')" class="search-input" @keyup.enter="loadUsers" />
       <select v-model="statusFilter" @change="loadUsers" class="filter-select">
-        <option value="">全部状态</option>
-        <option value="1">启用</option>
-        <option value="0">禁用</option>
+        <option value="">{{ $t('enterprise.users.allStatus') }}</option>
+        <option value="1">{{ $t('enterprise.common.statusEnabled') }}</option>
+        <option value="0">{{ $t('enterprise.common.statusDisabled') }}</option>
       </select>
-      <button class="btn-text" @click="loadUsers">搜索</button>
+      <button class="btn-text" @click="loadUsers">{{ $t('enterprise.common.search') }}</button>
     </div>
 
     <!-- 用户列表 -->
     <div class="table-wrap" v-if="!loading">
       <table v-if="users.length">
         <thead>
-          <tr><th>昵称</th><th>手机号</th><th>邮箱</th><th>角色</th><th>状态</th><th>创建时间</th><th>操作</th></tr>
+          <tr><th>{{ $t('enterprise.users.nickname') }}</th><th>{{ $t('enterprise.users.phone') }}</th><th>{{ $t('enterprise.users.email') }}</th><th>{{ $t('enterprise.users.role') }}</th><th>{{ $t('enterprise.users.status') }}</th><th>{{ $t('enterprise.users.createdAt') }}</th><th>{{ $t('enterprise.users.actions') }}</th></tr>
         </thead>
         <tbody>
           <tr v-for="u in users" :key="u.id">
@@ -28,63 +28,63 @@
             <td>{{ u.phone || '-' }}</td>
             <td>{{ u.email || '-' }}</td>
             <td>{{ roleLabel(u.role) }}</td>
-            <td><span :class="['status-tag', u.status === 1 ? 'on' : 'off']">{{ u.status === 1 ? '启用' : '禁用' }}</span></td>
+            <td><span :class="['status-tag', u.status === 1 ? 'on' : 'off']">{{ u.status === 1 ? $t('enterprise.common.statusEnabled') : $t('enterprise.common.statusDisabled') }}</span></td>
             <td>{{ formatDate(u.create_time) }}</td>
             <td class="actions">
-              <button class="btn-sm" @click="editUser(u)">编辑</button>
-              <button class="btn-sm danger" @click="handleRemove(u)">移除</button>
+              <button class="btn-sm" @click="editUser(u)">{{ $t('enterprise.users.edit') }}</button>
+              <button class="btn-sm danger" @click="handleRemove(u)">{{ $t('enterprise.users.remove') }}</button>
             </td>
           </tr>
         </tbody>
       </table>
-      <div v-else class="empty">暂无子账号</div>
+      <div v-else class="empty">{{ $t('enterprise.users.noUsers') }}</div>
 
       <div class="pager" v-if="total > pageSize">
-        <button :disabled="page <= 1" @click="page--; loadUsers()">上一页</button>
-        <span>第 {{ page }} / {{ Math.ceil(total / pageSize) }} 页</span>
-        <button :disabled="page >= Math.ceil(total / pageSize)" @click="page++; loadUsers()">下一页</button>
+        <button :disabled="page <= 1" @click="page--; loadUsers()">{{ $t('enterprise.common.prevPage') }}</button>
+        <span>{{ $t('enterprise.common.pageOf', { page, total: Math.ceil(total / pageSize) }) }}</span>
+        <button :disabled="page >= Math.ceil(total / pageSize)" @click="page++; loadUsers()">{{ $t('enterprise.common.nextPage') }}</button>
       </div>
     </div>
 
     <!-- 添加/编辑弹窗 -->
     <div class="modal-overlay" v-if="showAdd || showEdit" @click.self="closeModal">
       <div class="modal">
-        <h2>{{ showEdit ? '编辑子账号' : '添加子账号' }}</h2>
+        <h2>{{ showEdit ? $t('enterprise.users.editUser') : $t('enterprise.users.addUser') }}</h2>
         <div class="form-group">
-          <label>手机号 <span class="required">*</span></label>
-          <input v-model="form.phone" placeholder="请输入手机号" />
+          <label>{{ $t('enterprise.users.phone') }} <span class="required">*</span></label>
+          <input v-model="form.phone" :placeholder="$t('enterprise.users.phonePlaceholder')" />
         </div>
         <div class="form-group">
-          <label>邮箱</label>
-          <input v-model="form.email" type="email" placeholder="请输入邮箱" />
+          <label>{{ $t('enterprise.users.email') }}</label>
+          <input v-model="form.email" type="email" :placeholder="$t('enterprise.users.emailPlaceholder')" />
         </div>
         <div class="form-group">
-          <label>昵称</label>
-          <input v-model="form.nickname" placeholder="请输入昵称" />
+          <label>{{ $t('enterprise.users.nickname') }}</label>
+          <input v-model="form.nickname" :placeholder="$t('enterprise.users.nicknamePlaceholder')" />
         </div>
         <div class="form-group" v-if="!showEdit">
-          <label>密码 <span class="required">*</span></label>
-          <input v-model="form.password" type="password" placeholder="至少6位" />
+          <label>{{ $t('enterprise.users.password') }} <span class="required">*</span></label>
+          <input v-model="form.password" type="password" :placeholder="$t('enterprise.users.passwordPlaceholder')" />
         </div>
         <div class="form-group">
-          <label>角色</label>
+          <label>{{ $t('enterprise.users.role') }}</label>
           <select v-model="form.role">
-            <option value="enterprise_admin">企业管理员</option>
-            <option value="enterprise_operator">操作员</option>
-            <option value="enterprise_viewer">查看者</option>
+            <option value="enterprise_admin">{{ $t('enterprise.users.roleAdmin') }}</option>
+            <option value="enterprise_operator">{{ $t('enterprise.users.roleOperator') }}</option>
+            <option value="enterprise_viewer">{{ $t('enterprise.users.roleViewer') }}</option>
           </select>
         </div>
         <div v-if="showEdit" class="form-group">
-          <label>状态</label>
+          <label>{{ $t('enterprise.users.status') }}</label>
           <select v-model="form.status">
-            <option :value="1">启用</option>
-            <option :value="0">禁用</option>
+            <option :value="1">{{ $t('enterprise.common.statusEnabled') }}</option>
+            <option :value="0">{{ $t('enterprise.common.statusDisabled') }}</option>
           </select>
         </div>
         <div v-if="modalError" class="error-msg">{{ modalError }}</div>
         <div class="modal-actions">
-          <button class="btn-cancel" @click="closeModal">取消</button>
-          <button class="btn-primary" @click="handleSave" :disabled="saving">{{ saving ? '保存中...' : '保存' }}</button>
+          <button class="btn-cancel" @click="closeModal">{{ $t('enterprise.common.cancel') }}</button>
+          <button class="btn-primary" @click="handleSave" :disabled="saving">{{ saving ? $t('enterprise.common.saving') : $t('enterprise.common.save') }}</button>
         </div>
       </div>
     </div>
@@ -93,6 +93,7 @@
 
 <script setup>
 import { useToast } from '~/composables/useToast';
+const { t } = useI18n();
 const toast = useToast();
 const users = ref([]);
 const total = ref(0);
@@ -119,7 +120,7 @@ async function loadUsers() {
     const res = await $fetch('/api/enterprise/users', { credentials: 'include', params });
     users.value = res.data?.list || [];
     total.value = res.data?.total || 0;
-  } catch (e) { toast.error('成员列表加载失败'); }
+  } catch (e) { toast.error(t('enterprise.users.loadFailed')); }
   finally { loading.value = false; }
 }
 
@@ -134,13 +135,13 @@ async function handleRemove(u) {
   try {
     await $fetch(`/api/enterprise/users/${u.id}`, { method: 'DELETE', credentials: 'include' });
     loadUsers();
-  } catch (e) { toast.error(e?.data?.msg || '移除失败'); }
+  } catch (e) { toast.error(e?.data?.msg || t('enterprise.users.removeFailed')); }
 }
 
 async function handleSave() {
   modalError.value = '';
-  if (!showEdit.value && !form.value.phone && !form.value.email) { modalError.value = '手机号或邮箱为必填项'; return; }
-  if (!showEdit.value && !form.value.password) { modalError.value = '密码为必填项'; return; }
+  if (!showEdit.value && !form.value.phone && !form.value.email) { modalError.value = t('enterprise.users.phoneOrEmailRequired'); return; }
+  if (!showEdit.value && !form.value.password) { modalError.value = t('enterprise.users.passwordRequired'); return; }
   saving.value = true;
   try {
     if (showEdit.value) {
@@ -150,13 +151,13 @@ async function handleSave() {
     }
     closeModal();
     loadUsers();
-  } catch (e) { modalError.value = e?.data?.msg || '操作失败'; }
+  } catch (e) { modalError.value = e?.data?.msg || t('enterprise.users.operationFailed'); }
   finally { saving.value = false; }
 }
 
 function closeModal() { showAdd.value = false; showEdit.value = false; modalError.value = ''; form.value = { phone: '', email: '', nickname: '', password: '', role: 'enterprise_operator', status: 1 }; }
 
-function roleLabel(r) { const m = { enterprise_admin: '企业管理员', enterprise_operator: '操作员', enterprise_viewer: '查看者' }; return m[r] || r; }
+function roleLabel(r) { const m = { enterprise_admin: t('enterprise.users.roleAdmin'), enterprise_operator: t('enterprise.users.roleOperator'), enterprise_viewer: t('enterprise.users.roleViewer') }; return m[r] || r; }
 function formatDate(d) { return d ? new Date(d).toLocaleDateString('zh-CN') : '-'; }
 
 definePageMeta({ layout: 'enterprise' });

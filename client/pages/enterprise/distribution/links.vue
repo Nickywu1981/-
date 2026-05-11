@@ -1,16 +1,16 @@
 <template>
   <div class="page">
-    <div class="page-header"><h1>推广链接</h1></div>
+    <div class="page-header"><h1>{{ $t('enterprise.distribution.links.title') }}</h1></div>
     <div class="card">
-      <h3>专属推广链接</h3>
+      <h3>{{ $t('enterprise.distribution.links.exclusiveLink') }}</h3>
       <div class="link-box">
         <code>{{ inviteLink }}</code>
-        <button class="btn-primary" @click="copyLink">复制链接</button>
+        <button class="btn-primary" @click="copyLink">{{ $t('enterprise.distribution.links.copyLink') }}</button>
       </div>
     </div>
     <div class="card">
-      <h3>推广二维码</h3>
-      <p class="hint">使用邀请码 <strong>{{ inviteCode }}</strong> 在注册页面填写即可绑定上下级关系</p>
+      <h3>{{ $t('enterprise.distribution.links.qrCode') }}</h3>
+      <p class="hint">{{ $t('enterprise.distribution.links.useInviteCode', { code: inviteCode }) }}</p>
     </div>
   </div>
 </template>
@@ -20,6 +20,7 @@ definePageMeta({ layout: 'enterprise' });
 import { ref, onMounted } from 'vue';
 import { useToast } from '~/composables/useToast';
 const toast = useToast();
+const { t } = useI18n();
 
 const inviteCode = ref('');
 const inviteLink = ref('');
@@ -31,13 +32,13 @@ onMounted(async () => {
     if (inviteCode.value) {
       inviteLink.value = `${window.location.origin}/register?ref=${inviteCode.value}`;
     }
-  } catch (e) { toast.error('邀请码加载失败，请刷新重试'); }
+  } catch (e) { toast.error(t('enterprise.distribution.links.loadError')); }
 });
 
 async function copyLink() {
   try {
     await navigator.clipboard.writeText(inviteLink.value);
-    toast.success('链接已复制');
+    toast.success(t('enterprise.distribution.links.linkCopied'));
   } catch { /* 降级：用户手动复制 */ }
 }
 </script>
