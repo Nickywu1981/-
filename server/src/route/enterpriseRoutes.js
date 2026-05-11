@@ -9,19 +9,19 @@
 import { Router } from 'express';
 import { authMiddleware } from '../middleware/auth.middleware.js';
 import { enterpriseOnly } from '../platform/authCenter.js';
-import { requireRole } from '../middleware/rbac.js';
-import { paymentLimiter } from '../middleware/rateLimiter.js';
+import { roleGuard } from '../middleware/rbac.js';
+import { authLimiter, paymentLimiter } from '../middleware/rateLimiter.js';
 import * as ctrl from '../controller/enterpriseController.js';
 
 const router = Router();
 
 // ==================== 公开路由（无需认证） ====================
 
-// 企业入驻
-router.post('/register', ctrl.registerEnterprise);
+// 企业入驻 — 限流防批量注册
+router.post('/register', authLimiter, ctrl.registerEnterprise);
 
-// 企业登录
-router.post('/login', ctrl.loginEnterprise);
+// 企业登录 — 限流防暴力破解
+router.post('/login', authLimiter, ctrl.loginEnterprise);
 
 // 企业套餐列表（公开查看）
 router.get('/plans', ctrl.listPlans);
@@ -30,13 +30,13 @@ router.get('/plans', ctrl.listPlans);
 
 // 企业信息
 router.get('/profile', authMiddleware, enterpriseOnly, ctrl.getProfile);
-router.put('/profile', authMiddleware, enterpriseOnly, requireRole('enterprise_admin'), ctrl.updateProfile);
+router.put('/profile', authMiddleware, enterpriseOnly, roleGuard('enterprise_admin'), ctrl.updateProfile);
 
 // 子账号管理
 router.get('/users', authMiddleware, enterpriseOnly, ctrl.listUsers);
-router.post('/users', authMiddleware, enterpriseOnly, requireRole('enterprise_admin'), ctrl.addUser);
-router.put('/users/:id', authMiddleware, enterpriseOnly, requireRole('enterprise_admin'), ctrl.updateUser);
-router.delete('/users/:id', authMiddleware, enterpriseOnly, requireRole('enterprise_admin'), ctrl.removeUser);
+router.post('/users', authMiddleware, enterpriseOnly, roleGuard('enterprise_admin'), ctrl.addUser);
+router.put('/users/:id', authMiddleware, enterpriseOnly, roleGuard('enterprise_admin'), ctrl.updateUser);
+router.delete('/users/:id', authMiddleware, enterpriseOnly, roleGuard('enterprise_admin'), ctrl.removeUser);
 
 // 仪表盘 & 用量
 router.get('/dashboard', authMiddleware, enterpriseOnly, ctrl.getDashboard);
@@ -44,6 +44,6 @@ router.get('/usage', authMiddleware, enterpriseOnly, ctrl.getUsage);
 
 // 白标配置
 router.get('/whitelabel', authMiddleware, enterpriseOnly, ctrl.getWhiteLabel);
-router.put('/whitelabel', authMiddleware, enterpriseOnly, requireRole('enterprise_admin'), ctrl.updateWhiteLabel);
+router.put('/whitelabel', authMiddleware, enterpriseOnly, roleGuard('enterprise_admin'), ctrl.updateWhiteLabel);
 
 export default router;

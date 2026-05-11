@@ -1,6 +1,11 @@
 /**
  * Gateway — 统一限流配置注册表
  *
+ * @deprecated 本文件与 middleware/rateLimiter.js 完全重复。
+ * 实际运行时 app.js 使用 middleware/rateLimiter.js 的实例。
+ * 本文件限流器实例+并发守卫+RATE_LIMITER_REGISTRY 均未接入请求链路。
+ * 请使用 middleware/rateLimiter.js，本文件待后续去重合并。
+ *
  * 集中管理全部限流器定义，供 routeRegistry 和 app.js 引用。
  * 从 middleware/rateLimiter.js 提取，保持原有导出兼容。
  */

@@ -7,11 +7,14 @@ import {
 // ROLES — 角色层级定义
 // ============================================================
 describe('ROLES', () => {
-  it('定义 4 级角色', () => {
-    expect(Object.keys(ROLES)).toHaveLength(4);
+  it('定义 7 级角色（含 B 端企业角色）', () => {
+    expect(Object.keys(ROLES)).toHaveLength(7);
     expect(ROLES).toHaveProperty('USER');
     expect(ROLES).toHaveProperty('EDITOR');
+    expect(ROLES).toHaveProperty('ENTERPRISE_VIEWER');
     expect(ROLES).toHaveProperty('ADMIN');
+    expect(ROLES).toHaveProperty('ENTERPRISE_OPERATOR');
+    expect(ROLES).toHaveProperty('ENTERPRISE_ADMIN');
     expect(ROLES).toHaveProperty('SUPER_ADMIN');
   });
 

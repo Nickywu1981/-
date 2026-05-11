@@ -4,6 +4,10 @@
  * 四层架构 - 中台层 - 权限引擎
  * 职责: 角色定义、权限点矩阵、中间件工厂
  *
+ * @deprecated 本文件功能已完全迁移至 middleware/rbac.js（含 enterprise_admin/operator/viewer）。
+ * 本文件未被任何生产代码导入，所有使用者（app.js, enterpriseRoutes 等）均引用 middleware/rbac.js。
+ * 请使用 middleware/rbac.js，本文件待后续去重后删除。
+ *
  * 角色层级（数值越大权限越高）：
  *  user (1) → editor (2) → admin (3) → super_admin (4)
  *

@@ -15,10 +15,13 @@ import { ERROR_CODE } from '../constants/errorCode.js';
 // ========================= 角色定义 =========================
 
 export const ROLES = {
-  USER:         { level: 1, name: 'user' },
-  EDITOR:       { level: 2, name: 'editor' },
-  ADMIN:        { level: 3, name: 'admin' },
-  SUPER_ADMIN:  { level: 4, name: 'super_admin' },
+  USER:              { level: 1, name: 'user' },
+  EDITOR:            { level: 2, name: 'editor' },
+  ENTERPRISE_VIEWER: { level: 2, name: 'enterprise_viewer' },
+  ADMIN:             { level: 3, name: 'admin' },
+  ENTERPRISE_OPERATOR: { level: 3, name: 'enterprise_operator' },
+  ENTERPRISE_ADMIN:  { level: 4, name: 'enterprise_admin' },
+  SUPER_ADMIN:       { level: 4, name: 'super_admin' },
 };
 
 // 角色名 → 等级

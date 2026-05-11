@@ -8,7 +8,9 @@ import * as userDao from '../dao/userDao.js';
 import { generateAccessToken, generateRefreshToken } from '../middleware/auth.js';
 import { BusinessError } from '../utils/businessError.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
-import crypto from 'crypto';
+import bcrypt from 'bcryptjs';
+
+const SALT_ROUNDS = 10;
 
 // ==================== 企业入驻/登录 ====================
 
@@ -34,14 +36,12 @@ export async function registerEnterprise({
   }
 
   // 1. 创建管理员用户账号
-  const passwordHash = crypto.createHash('sha256').update(password).digest('hex');
-  const userId = await userDao.createUser({
+  const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
+  const userId = await userDao.insertUser({
+    username: contactPhone,
+    password: passwordHash,
     nickname: contactName,
-    phone: contactPhone,
-    email: contactEmail,
-    password_hash: passwordHash,
-    role: 'user',
-    status: 1,
+    tenantId: 0,
   });
 
   // 2. 创建企业 tenant
@@ -74,19 +74,22 @@ export async function registerEnterprise({
  * 企业端登录
  */
 export async function loginEnterprise({ account, password }) {
-  // account: 手机号或邮箱
-  const user = await userDao.findByPhoneOrEmail(account);
+  // account: 手机号或邮箱 — 按格式判断
+  const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(account);
+  const user = isEmail
+    ? await userDao.findByEmail(account)
+    : await userDao.findByPhone(account);
   if (!user) {
     throw new BusinessError(ERROR_CODE.UNAUTHORIZED, '账号不存在');
   }
 
-  const passwordHash = crypto.createHash('sha256').update(password).digest('hex');
-  if (user.password_hash !== passwordHash) {
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) {
     throw new BusinessError(ERROR_CODE.UNAUTHORIZED, '密码错误');
   }
 
-  // 查找用户所属企业
-  const enterpriseUser = await enterpriseDao.findEnterpriseUser(null, user.id);
+  // 查找用户所属企业（不限 tenant_id）
+  const enterpriseUser = await enterpriseDao.findEnterpriseUserByUserId(user.id);
   if (!enterpriseUser) {
     throw new BusinessError(ERROR_CODE.FORBIDDEN, '该账号未关联任何企业');
   }
@@ -188,6 +191,13 @@ export async function listEnterpriseUsers(tenantId, query) {
 }
 
 export async function addEnterpriseUser(tenantId, { phone, email, nickname, password, role = 'enterprise_operator' }) {
+  // 检查用户数上限
+  const count = await enterpriseDao.countEnterpriseUsers(tenantId);
+  const tenant = await enterpriseDao.findTenantById(tenantId);
+  if (tenant && count >= tenant.max_users) {
+    throw new BusinessError(ERROR_CODE.BAD_REQUEST, `已达到企业子账号上限 (${tenant.max_users}人)`);
+  }
+
   // 查找或创建用户
   let user;
   if (phone) user = await userDao.findByPhone(phone);
@@ -195,15 +205,13 @@ export async function addEnterpriseUser(tenantId, { phone, email, nickname, pass
 
   if (!user) {
     if (!password) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '新建账号需要提供密码');
-    const passwordHash = crypto.createHash('sha256').update(password).digest('hex');
-    const userId = await userDao.createUser({
+    const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
+    const username = phone || email;
+    const userId = await userDao.insertUser({
+      username,
+      password: passwordHash,
       nickname: nickname || phone || email,
-      phone: phone || '',
-      email: email || '',
-      password_hash: passwordHash,
-      role: 'user',
-      status: 1,
-      tenant_id: tenantId,
+      tenantId,
     });
     user = { id: userId };
   }
@@ -216,10 +224,16 @@ export async function addEnterpriseUser(tenantId, { phone, email, nickname, pass
 }
 
 export async function updateEnterpriseUser(tenantId, id, data) {
+  // 跨租户防护：验证该用户属于当前租户
+  const eu = await enterpriseDao.findEnterpriseUser(tenantId, id);
+  if (!eu) throw new BusinessError(ERROR_CODE.NOT_FOUND, '子账号不存在');
   return enterpriseDao.updateEnterpriseUser(id, data);
 }
 
 export async function removeEnterpriseUser(tenantId, id) {
+  // 跨租户防护：验证该用户属于当前租户
+  const eu = await enterpriseDao.findEnterpriseUser(tenantId, id);
+  if (!eu) throw new BusinessError(ERROR_CODE.NOT_FOUND, '子账号不存在');
   return enterpriseDao.removeEnterpriseUser(id);
 }
 
@@ -287,6 +301,12 @@ export async function updateWhiteLabel(tenantId, data) {
   // 验证主色格式
   if (whiteLabel.primaryColor && !/^#[0-9a-fA-F]{6}$/.test(whiteLabel.primaryColor)) {
     throw new BusinessError(ERROR_CODE.BAD_REQUEST, '主色格式无效，需要 #RRGGBB');
+  }
+  // 验证域名格式（防 XSS）
+  if (whiteLabel.domain) {
+    if (/[<>"'\s]/.test(whiteLabel.domain) || /^javascript:/i.test(whiteLabel.domain)) {
+      throw new BusinessError(ERROR_CODE.BAD_REQUEST, '域名格式无效');
+    }
   }
   await enterpriseDao.updateTenant(tenantId, { white_label: whiteLabel });
   return whiteLabel;

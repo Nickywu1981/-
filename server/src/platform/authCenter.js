@@ -4,6 +4,12 @@
  * 四层架构 - 中台层 - 认证中心
  * 职责: JWT签发/验证/刷新/黑名单/多端token隔离
  *
+ * @deprecated 核心 authMiddleware 逻辑与 middleware/auth.js 完全重复。
+ * 当前仅 enterpriseOnly / consumerOnly 等分端守卫被 enterpriseRoutes 使用。
+ * generateAccessToken / authMiddleware / optionalAuth / refreshTokenMiddleware
+ * 等主体逻辑均未被使用，app.js 使用的是 middleware/auth.js 的版本。
+ * 请将分端守卫迁移至 middleware/auth.js 后废弃本文件。
+ *
  * 从 middleware/auth.js 提取核心逻辑，增加:
  * - 多端标识 (aud claim): consumer | enterprise | admin | ops
  * - 按端隔离的 token 签发/验证

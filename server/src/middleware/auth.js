@@ -160,11 +160,8 @@ export async function authMiddleware(req, res, next) {
   // 自动续期：token 剩余不足 1 天时签发新 token
   const timeToExpire = payload.exp - Math.floor(Date.now() / 1000);
   if (timeToExpire > 0 && timeToExpire < RENEW_WINDOW) {
-    const newToken = jwt.sign(
-      { userId: req.user.id, role: req.user.role, nickname: req.user.nickname, tenantId: req.user.tenantId },
-      jwtSecret,
-      { expiresIn: '7d' },
-    );
+    const { iat, exp, ...renewPayload } = payload;
+    const newToken = jwt.sign(renewPayload, jwtSecret, { expiresIn: '7d' });
     res.cookie('token', newToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
