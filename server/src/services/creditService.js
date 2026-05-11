@@ -115,7 +115,7 @@ export async function confirmCharge(requestId) {
       return { alreadyConfirmed: true };
     }
 
-    await creditDao.confirmConsumption(record.id, record.credit_before - record.consumed, conn);
+    await creditDao.confirmConsumption(record.id, record.user_id, record.credit_before - record.consumed, conn);
     await creditDao.insertRequestLog({
       requestId: `${requestId}_confirm`, userId: record.user_id, action: 'confirm',
       creditAmount: record.consumed, remark: 'confirmed', requestBody: {}, responseBody: {}, status: 1,
@@ -147,7 +147,7 @@ export async function rollbackCharge(requestId, remark = '') {
     }
 
     await creditDao.updateCreditBalance(record.user_id, record.consumed, conn);
-    await creditDao.refundConsumption(record.id, record.credit_before, remark || '系统回滚', conn);
+    await creditDao.refundConsumption(record.id, record.user_id, record.credit_before, remark || '系统回滚', conn);
     await creditDao.insertRequestLog({
       requestId: `${requestId}_rollback`, userId: record.user_id, action: 'rollback',
       creditAmount: record.consumed, remark: remark || 'system rollback', requestBody: {}, responseBody: {}, status: 1,

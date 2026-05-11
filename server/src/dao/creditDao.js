@@ -70,19 +70,19 @@ export async function insertConsumptionLog({ userId, type, action, creditBefore,
   return r.insertId;
 }
 
-export async function confirmConsumption(recordId, creditAfter, conn) {
+export async function confirmConsumption(recordId, userId, creditAfter, conn) {
   const db = conn || pool;
   await db.execute(
-    'UPDATE consumption_record SET status = 1, credit_after = ?, confirm_at = NOW() WHERE id = ?',
-    [creditAfter, recordId],
+    'UPDATE consumption_record SET status = 1, credit_after = ?, confirm_at = NOW() WHERE id = ? AND user_id = ?',
+    [creditAfter, recordId, userId],
   );
 }
 
-export async function refundConsumption(recordId, creditAfter, remark = '', conn) {
+export async function refundConsumption(recordId, userId, creditAfter, remark = '', conn) {
   const db = conn || pool;
   await db.execute(
-    'UPDATE consumption_record SET status = 2, credit_after = ?, refund_at = NOW(), refund_remark = ? WHERE id = ?',
-    [creditAfter, remark, recordId],
+    'UPDATE consumption_record SET status = 2, credit_after = ?, refund_at = NOW(), refund_remark = ? WHERE id = ? AND user_id = ?',
+    [creditAfter, remark, recordId, userId],
   );
 }
 

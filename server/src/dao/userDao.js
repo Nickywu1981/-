@@ -86,19 +86,6 @@ export async function findByEmail(email) {
   return rows[0] || null;
 }
 
-export async function updateUserStatus(id, status) {
-  await pool.execute('UPDATE user SET status = ?, update_time = NOW() WHERE id = ?', [status, id]);
-}
-
-export async function batchUpdateUserStatus(ids, status) {
-  const placeholders = ids.map(() => '?').join(',');
-  const [result] = await pool.execute(
-    `UPDATE user SET status = ? WHERE id IN (${placeholders})`,
-    [status, ...ids],
-  );
-  return result.affectedRows;
-}
-
 export async function getUserStats(userId) {
   const [[[{ taskTotal }]], [[{ todayTotal }]], [[{ creditUsed }]]] = await Promise.all([
     pool.execute('SELECT COUNT(*) AS taskTotal FROM task WHERE user_id = ?', [userId]),

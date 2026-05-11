@@ -8,6 +8,8 @@ import { Router } from 'express';
 import { rateLimiter } from '../middleware/rateLimiter.js';
 import { success } from '../utils/response.js';
 
+const GEOIP_URL = process.env.GEOIP_API_URL || 'https://ip-api.com/json';
+
 const router = Router();
 
 // 内联国家→语言映射，无需外部 GeoIP 数据库
@@ -53,7 +55,7 @@ router.get('/api/geo/suggest-locale', rateLimiter, async (req, res) => {
     }
 
     try {
-      const r = await fetch(`https://ip-api.com/json/${encodeURIComponent(ip)}?fields=countryCode`, { signal: AbortSignal.timeout(3000) });
+      const r = await fetch(`${GEOIP_URL}/${encodeURIComponent(ip)}?fields=countryCode`, { signal: AbortSignal.timeout(3000) });
       const data = await r.json();
       const cc = (data?.countryCode || '').toUpperCase();
       const locale = COUNTRY_TO_LOCALE[cc] || 'zh';
