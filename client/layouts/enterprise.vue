@@ -9,6 +9,9 @@
         <NuxtLink to="/enterprise/dashboard" class="ent-nav-item">
           <span class="icon">📊</span> 工作台
         </NuxtLink>
+        <NuxtLink to="/enterprise/finance/dashboard" class="ent-nav-item">
+          <span class="icon">💵</span> 财务管理
+        </NuxtLink>
         <NuxtLink to="/enterprise/users" class="ent-nav-item">
           <span class="icon">👥</span> 子账号管理
         </NuxtLink>
