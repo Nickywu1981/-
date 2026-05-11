@@ -6,7 +6,7 @@
   <AdminShell
     brand-name="Movio 总控"
     brand-subtitle="Super Admin"
-    accent-color="#4f5cf6"
+    accent-color="#5b5fe3"
     :nav-groups="navGroups"
     :breadcrumbs="breadcrumbs"
     back-route="/"

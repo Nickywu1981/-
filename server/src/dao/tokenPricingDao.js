@@ -83,7 +83,8 @@ export async function upsert(data) {
 }
 
 export async function deactivate(id) {
-  await _db().query('UPDATE ai_model_pricing SET is_active = 0 WHERE id = ?', [id]);
+  const [r] = await _db().query('UPDATE ai_model_pricing SET is_active = 0 WHERE id = ? AND is_active = 1', [id]);
+  return r.affectedRows;
 }
 
 // ============ 成本计算 ============

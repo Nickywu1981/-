@@ -31,15 +31,18 @@ export default {
 
   async markPaid(orderNo, tradeNo, conn) {
     const db = conn || pool;
-    await db.query('UPDATE recharge_order SET pay_status = 1, pay_time = NOW(), trade_no = ? WHERE order_no = ? AND pay_status = 0', [tradeNo || '', orderNo]);
+    const [r] = await db.query('UPDATE recharge_order SET pay_status = 1, pay_time = NOW(), trade_no = ? WHERE order_no = ? AND pay_status = 0', [tradeNo || '', orderNo]);
+    return r.affectedRows;
   },
 
   async markFailed(orderNo) {
-    await pool.query('UPDATE recharge_order SET pay_status = 2 WHERE order_no = ?', [orderNo]);
+    const [r] = await pool.query('UPDATE recharge_order SET pay_status = 2 WHERE order_no = ? AND pay_status = 0', [orderNo]);
+    return r.affectedRows;
   },
 
   async markRefunded(orderNo) {
-    await pool.query('UPDATE recharge_order SET pay_status = 3 WHERE order_no = ?', [orderNo]);
+    const [r] = await pool.query('UPDATE recharge_order SET pay_status = 3 WHERE order_no = ? AND pay_status = 1', [orderNo]);
+    return r.affectedRows;
   },
 
   async addConsumptionRecord(data) {

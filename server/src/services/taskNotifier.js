@@ -53,5 +53,5 @@ async function trySendSms(userId, typeLabel) {
       templateCode: 'sms_task_complete',
       params: { task_type: typeLabel, count: '1' },
     });
-  } catch { /* 短信静默失败 */ }
+  } catch (e) { logger.warn('任务完成短信通知失败', { userId: user.id, taskType, error: e.message }); }
 }

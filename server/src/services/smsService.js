@@ -80,7 +80,7 @@ export async function verifyCode(phone, scene, code) {
   const result = await codeStore.verifyCode(key, code, 5);
   if (result.valid) {
     // 验证通过标记（Redis）
-    try { await codeStore.saveCode(`verified:sms:${phone}`, '1', 300); } catch { /* ignore */ }
+    try { await codeStore.saveCode(`verified:sms:${phone}`, '1', 300); } catch (e) { logger.warn('短信验证标记保存失败', { phone, error: e.message }); }
     return { valid: true };
   }
   // Redis 不可用时降级为进程内 Map

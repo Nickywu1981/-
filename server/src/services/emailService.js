@@ -195,7 +195,7 @@ export async function verifyCode(email, code) {
   // 优先 Redis 共享存储
   const result = await codeStore.verifyCode(`email:${email}`, code, 5);
   if (result.valid) {
-    try { await codeStore.saveCode(`verified:email:${email}`, '1', 300); } catch { /* ignore */ }
+    try { await codeStore.saveCode(`verified:email:${email}`, '1', 300); } catch (e) { logger.warn('邮件验证标记保存失败', { email, error: e.message }); }
     return true;
   }
   if (result.reason !== 'error') {
