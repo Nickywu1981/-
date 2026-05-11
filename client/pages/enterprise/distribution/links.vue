@@ -25,14 +25,17 @@ onMounted(async () => {
   try {
     const r = await $fetch('/api/distribution/invite-code', { credentials: 'include' });
     inviteCode.value = r.data?.code || '';
-    inviteLink.value = `${window.location.origin}/register?ref=${inviteCode.value}`;
+    if (inviteCode.value) {
+      inviteLink.value = `${window.location.origin}/register?ref=${inviteCode.value}`;
+    }
   } catch (e) { /* ignore */ }
 });
 
 async function copyLink() {
   try {
     await navigator.clipboard.writeText(inviteLink.value);
-  } catch { /* fallback */ }
+    alert('链接已复制');
+  } catch { /* 降级：用户手动复制 */ }
 }
 </script>
 

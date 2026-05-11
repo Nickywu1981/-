@@ -4,7 +4,7 @@
     <div class="stat-cards">
       <div class="stat-card"><div class="stat-num">{{ stats.clicks || 0 }}</div><div class="stat-label">总点击</div></div>
       <div class="stat-card"><div class="stat-num">{{ stats.registers || 0 }}</div><div class="stat-label">注册转化</div></div>
-      <div class="stat-card"><div class="stat-num">{{ stats.rate || '0' }}%</div><div class="stat-label">转化率</div></div>
+      <div class="stat-card"><div class="stat-num">{{ stats.rate ?? '0' }}%</div><div class="stat-label">转化率</div></div>
     </div>
     <div class="card"><h3>每日转化趋势</h3><p class="empty">数据收集中，请稍后查看</p></div>
   </div>
