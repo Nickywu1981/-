@@ -2,7 +2,6 @@ import { Router } from 'express';
 import { listTemplates, getTemplateDetail, createTemplate, submitForReview, fillAndPreview, listFavorites, toggleFavorite, listGroups, createGroup, renameGroup, deleteGroup, getRecommendations, recordUsage, usageHistory, rateTemplate, getTemplateRating } from '../controller/promptController.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { rateLimiter } from '../middleware/rateLimiter.js';
-import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate, idParamSchema } from '../utils/validate.js';
 import { z } from 'zod';
 
@@ -41,35 +40,35 @@ router.use(authMiddleware);
 router.use(rateLimiter);
 
 // 模板（支持 /api/prompts 和 /api/prompts/templates）
-router.get('/', asyncHandler(listTemplates));
-router.get('/templates', asyncHandler(listTemplates));
+router.get('/', listTemplates);
+router.get('/templates', listTemplates);
 const submitReviewSchema = z.object({
   id: z.coerce.number().int().positive('模板ID无效'),
 });
-router.get('/templates/:id', validate(idParamSchema, 'params'), asyncHandler(getTemplateDetail));
-router.post('/templates', validate(createTemplateSchema), asyncHandler(createTemplate));
-router.post('/templates/:id/submit-review', validate(submitReviewSchema, 'params'), asyncHandler(submitForReview));
-router.post('/templates/:id/fill', validate(idParamSchema, 'params'), validate(fillSchema), asyncHandler(fillAndPreview));
+router.get('/templates/:id', validate(idParamSchema, 'params'), getTemplateDetail);
+router.post('/templates', validate(createTemplateSchema), createTemplate);
+router.post('/templates/:id/submit-review', validate(submitReviewSchema, 'params'), submitForReview);
+router.post('/templates/:id/fill', validate(idParamSchema, 'params'), validate(fillSchema), fillAndPreview);
 
 // 收藏
-router.get('/favorites', asyncHandler(listFavorites));
-router.post('/favorites/toggle', validate(toggleFavoriteSchema), asyncHandler(toggleFavorite));
+router.get('/favorites', listFavorites);
+router.post('/favorites/toggle', validate(toggleFavoriteSchema), toggleFavorite);
 
 // 分组
-router.get('/groups', asyncHandler(listGroups));
-router.post('/groups', validate(groupSchema), asyncHandler(createGroup));
-router.put('/groups/:id', validate(idParamSchema, 'params'), validate(groupSchema), asyncHandler(renameGroup));
-router.delete('/groups/:id', validate(idParamSchema, 'params'), asyncHandler(deleteGroup));
+router.get('/groups', listGroups);
+router.post('/groups', validate(groupSchema), createGroup);
+router.put('/groups/:id', validate(idParamSchema, 'params'), validate(groupSchema), renameGroup);
+router.delete('/groups/:id', validate(idParamSchema, 'params'), deleteGroup);
 
 // 智能推荐
-router.get('/recommendations', asyncHandler(getRecommendations));
+router.get('/recommendations', getRecommendations);
 
 // 使用历史
-router.get('/usage-history', asyncHandler(usageHistory));
-router.post('/:id/use', validate(idParamSchema, 'params'), validate(recordUsageSchema), asyncHandler(recordUsage));
+router.get('/usage-history', usageHistory);
+router.post('/:id/use', validate(idParamSchema, 'params'), validate(recordUsageSchema), recordUsage);
 
 // 评分
-router.post('/:id/rate', validate(idParamSchema, 'params'), validate(rateSchema), asyncHandler(rateTemplate));
-router.get('/:id/rating', validate(idParamSchema, 'params'), asyncHandler(getTemplateRating));
+router.post('/:id/rate', validate(idParamSchema, 'params'), validate(rateSchema), rateTemplate);
+router.get('/:id/rating', validate(idParamSchema, 'params'), getTemplateRating);
 
 export default router;

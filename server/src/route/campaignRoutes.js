@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
-import { asyncHandler } from '../middleware/asyncHandler.js';
 import { adminLimiter } from '../middleware/rateLimiter.js';
 import { validate, paginationSchema, idParamSchemaSchema } from '../utils/validate.js';
 import { z } from 'zod';
@@ -24,11 +23,11 @@ const campaignSchema = z.object({
   sort_order: z.coerce.number().int().default(0),
 });
 
-router.get('/campaigns', authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(ctrl.listCampaigns));
-router.get('/campaigns/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(ctrl.getCampaign));
-router.post('/campaigns', adminLimiter, authMiddleware, adminAuth, validate(campaignSchema), asyncHandler(ctrl.createCampaign));
-router.put('/campaigns/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(campaignSchema.partial()), asyncHandler(ctrl.updateCampaign));
-router.delete('/campaigns/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(ctrl.deleteCampaign));
+router.get('/campaigns', authMiddleware, adminAuth, validate(paginationSchema, 'query'), ctrl.listCampaigns);
+router.get('/campaigns/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), ctrl.getCampaign);
+router.post('/campaigns', adminLimiter, authMiddleware, adminAuth, validate(campaignSchema), ctrl.createCampaign);
+router.put('/campaigns/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(campaignSchema.partial()), ctrl.updateCampaign);
+router.delete('/campaigns/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), ctrl.deleteCampaign);
 
 // ---- Coupon ----
 const couponSchema = z.object({
@@ -46,12 +45,12 @@ const couponSchema = z.object({
   campaign_id: z.coerce.number().int().optional(),
 });
 
-router.get('/coupons', authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(ctrl.listCoupons));
-router.get('/coupons/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(ctrl.getCoupon));
-router.post('/coupons', adminLimiter, authMiddleware, adminAuth, validate(couponSchema), asyncHandler(ctrl.createCoupon));
-router.put('/coupons/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(couponSchema.partial()), asyncHandler(ctrl.updateCoupon));
-router.delete('/coupons/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(ctrl.deleteCoupon));
-router.get('/user-coupons', authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(ctrl.listUserCoupons));
+router.get('/coupons', authMiddleware, adminAuth, validate(paginationSchema, 'query'), ctrl.listCoupons);
+router.get('/coupons/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), ctrl.getCoupon);
+router.post('/coupons', adminLimiter, authMiddleware, adminAuth, validate(couponSchema), ctrl.createCoupon);
+router.put('/coupons/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(couponSchema.partial()), ctrl.updateCoupon);
+router.delete('/coupons/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), ctrl.deleteCoupon);
+router.get('/user-coupons', authMiddleware, adminAuth, validate(paginationSchema, 'query'), ctrl.listUserCoupons);
 
 // ---- Announcement ----
 const announcementSchema = z.object({
@@ -65,10 +64,10 @@ const announcementSchema = z.object({
   status: z.coerce.number().int().min(0).max(2).default(0),
 });
 
-router.get('/announcements', authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(ctrl.listAnnouncements));
-router.get('/announcements/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(ctrl.getAnnouncement));
-router.post('/announcements', adminLimiter, authMiddleware, adminAuth, validate(announcementSchema), asyncHandler(ctrl.createAnnouncement));
-router.put('/announcements/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(announcementSchema.partial()), asyncHandler(ctrl.updateAnnouncement));
-router.delete('/announcements/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(ctrl.deleteAnnouncement));
+router.get('/announcements', authMiddleware, adminAuth, validate(paginationSchema, 'query'), ctrl.listAnnouncements);
+router.get('/announcements/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), ctrl.getAnnouncement);
+router.post('/announcements', adminLimiter, authMiddleware, adminAuth, validate(announcementSchema), ctrl.createAnnouncement);
+router.put('/announcements/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(announcementSchema.partial()), ctrl.updateAnnouncement);
+router.delete('/announcements/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), ctrl.deleteAnnouncement);
 
 export default router;

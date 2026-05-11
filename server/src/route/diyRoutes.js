@@ -3,7 +3,6 @@ import { BusinessError } from '../utils/businessError.js';
 import { authMiddleware, adminAuth, optionalAuth } from '../middleware/auth.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { editorOrAbove } from '../middleware/rbac.js';
-import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate, idParamSchema } from '../utils/validate.js';
 import { z } from 'zod';
 import { ERROR_CODE } from '../constants/errorCode.js';
@@ -81,7 +80,7 @@ const versionsQuerySchema = z.object({ includeAuto: z.enum(['true', 'false']).op
 function validateParams(schema) {
   return (req, _res, next) => {
     const result = schema.safeParse(req.params);
-    if (!result.success) return next(new BusinessError(ERROR_CODE.BAD_REQUEST, result.error.issues.map(i => i.message).join('; ')));
+    if (!result.success) return next(new BusinessError(ERROR_CODE.BAD_REQUEST, result.error.issues.map(i => i.message).join('; '));
     req.params = result.data;
     next();
   };
@@ -90,53 +89,53 @@ function validateParams(schema) {
 function validateQuery(schema) {
   return (req, _res, next) => {
     const result = schema.safeParse(req.query);
-    if (!result.success) return next(new BusinessError(ERROR_CODE.BAD_REQUEST, result.error.issues.map(i => i.message).join('; ')));
+    if (!result.success) return next(new BusinessError(ERROR_CODE.BAD_REQUEST, result.error.issues.map(i => i.message).join('; '));
     req.query = result.data;
     next();
   };
 }
 
 // ==================== 公开路由 ====================
-router.get('/published/:slug', validateParams(slugParamSchema), optionalAuth, asyncHandler(getPublishedPage));
+router.get('/published/:slug', validateParams(slugParamSchema), optionalAuth, getPublishedPage);
 
 // ==================== 认证路由 — CRUD ====================
-router.get('/', authMiddleware, asyncHandler(listPages));
-router.get('/components', authMiddleware, asyncHandler(listComponents));
+router.get('/', authMiddleware, listPages);
+router.get('/components', authMiddleware, listComponents);
 
 // ==================== 模板库 — 必须在 /:id 之前注册 ====================
-router.get('/templates/industries', authMiddleware, asyncHandler(listTemplateIndustries));
-router.get('/templates', authMiddleware, asyncHandler(listTemplates));
-router.get('/templates/:id', validateParams(templateIdParamSchema), authMiddleware, asyncHandler(getTemplate));
-router.post('/templates/:id/use', validateParams(templateIdParamSchema), authMiddleware, heavyLimiter, asyncHandler(useTemplate));
+router.get('/templates/industries', authMiddleware, listTemplateIndustries);
+router.get('/templates', authMiddleware, listTemplates);
+router.get('/templates/:id', validateParams(templateIdParamSchema), authMiddleware, getTemplate);
+router.post('/templates/:id/use', validateParams(templateIdParamSchema), authMiddleware, heavyLimiter, useTemplate);
 
-router.get('/:id', validateParams(idParamSchema), authMiddleware, asyncHandler(getPage));
-router.post('/', authMiddleware, heavyLimiter, editorOrAbove, validate(pageSchema), asyncHandler(createPage));
-router.put('/:id', validateParams(idParamSchema), authMiddleware, heavyLimiter, editorOrAbove, validate(pageSchema.partial()), asyncHandler(updatePage));
+router.get('/:id', validateParams(idParamSchema), authMiddleware, getPage);
+router.post('/', authMiddleware, heavyLimiter, editorOrAbove, validate(pageSchema), createPage);
+router.put('/:id', validateParams(idParamSchema), authMiddleware, heavyLimiter, editorOrAbove, validate(pageSchema.partial()), updatePage);
 
 // ==================== 状态机路由（发布=adminAuth, 编辑=editorOrAbove） ====================
-router.post('/:id/publish', validateParams(idParamSchema), authMiddleware, heavyLimiter, adminAuth, asyncHandler(publishPage));
-router.post('/:id/unpublish', validateParams(idParamSchema), authMiddleware, heavyLimiter, adminAuth, asyncHandler(unpublishPage));
-router.post('/:id/republish', validateParams(idParamSchema), authMiddleware, heavyLimiter, adminAuth, asyncHandler(republishPage));
-router.post('/:id/soft-delete', validateParams(idParamSchema), authMiddleware, heavyLimiter, adminAuth, asyncHandler(softDeletePage));
-router.post('/:id/restore', validateParams(idParamSchema), authMiddleware, heavyLimiter, editorOrAbove, asyncHandler(restorePage));
-router.delete('/:id/hard-delete', validateParams(idParamSchema), authMiddleware, heavyLimiter, adminAuth, asyncHandler(hardDeletePage));
-router.post('/:id/clone', validateParams(idParamSchema), authMiddleware, heavyLimiter, editorOrAbove, asyncHandler(clonePage));
+router.post('/:id/publish', validateParams(idParamSchema), authMiddleware, heavyLimiter, adminAuth, publishPage);
+router.post('/:id/unpublish', validateParams(idParamSchema), authMiddleware, heavyLimiter, adminAuth, unpublishPage);
+router.post('/:id/republish', validateParams(idParamSchema), authMiddleware, heavyLimiter, adminAuth, republishPage);
+router.post('/:id/soft-delete', validateParams(idParamSchema), authMiddleware, heavyLimiter, adminAuth, softDeletePage);
+router.post('/:id/restore', validateParams(idParamSchema), authMiddleware, heavyLimiter, editorOrAbove, restorePage);
+router.delete('/:id/hard-delete', validateParams(idParamSchema), authMiddleware, heavyLimiter, adminAuth, hardDeletePage);
+router.post('/:id/clone', validateParams(idParamSchema), authMiddleware, heavyLimiter, editorOrAbove, clonePage);
 
 // ==================== 版本管理 ====================
-router.get('/:id/versions', validateParams(idParamSchema), validateQuery(versionsQuerySchema), authMiddleware, asyncHandler(listVersions));
-router.get('/:id/versions/latest-auto', validateParams(idParamSchema), authMiddleware, asyncHandler(getLatestAutoVersion));
-router.get('/:id/versions/:version', validateParams(versionParamSchema), authMiddleware, asyncHandler(getVersion));
-router.post('/:id/versions', validateParams(idParamSchema), authMiddleware, heavyLimiter, editorOrAbove, validate(versionSaveSchema), asyncHandler(saveVersion));
-router.post('/:id/versions/auto-save', validateParams(idParamSchema), authMiddleware, heavyLimiter, editorOrAbove, validate(autoSaveSchema), asyncHandler(autoSaveVersion));
-router.post('/:id/versions/:version/rollback', validateParams(versionParamSchema), authMiddleware, heavyLimiter, editorOrAbove, asyncHandler(rollbackVersion));
+router.get('/:id/versions', validateParams(idParamSchema), validateQuery(versionsQuerySchema), authMiddleware, listVersions);
+router.get('/:id/versions/latest-auto', validateParams(idParamSchema), authMiddleware, getLatestAutoVersion);
+router.get('/:id/versions/:version', validateParams(versionParamSchema), authMiddleware, getVersion);
+router.post('/:id/versions', validateParams(idParamSchema), authMiddleware, heavyLimiter, editorOrAbove, validate(versionSaveSchema), saveVersion);
+router.post('/:id/versions/auto-save', validateParams(idParamSchema), authMiddleware, heavyLimiter, editorOrAbove, validate(autoSaveSchema), autoSaveVersion);
+router.post('/:id/versions/:version/rollback', validateParams(versionParamSchema), authMiddleware, heavyLimiter, editorOrAbove, rollbackVersion);
 
 // ==================== 批量操作 ====================
-router.post('/batch/publish', authMiddleware, heavyLimiter, adminAuth, validate(idsSchema), asyncHandler(batchPublish));
-router.post('/batch/unpublish', authMiddleware, heavyLimiter, adminAuth, validate(idsSchema), asyncHandler(batchUnpublish));
-router.post('/batch/delete', authMiddleware, heavyLimiter, adminAuth, validate(idsSchema), asyncHandler(batchDelete));
+router.post('/batch/publish', authMiddleware, heavyLimiter, adminAuth, validate(idsSchema), batchPublish);
+router.post('/batch/unpublish', authMiddleware, heavyLimiter, adminAuth, validate(idsSchema), batchUnpublish);
+router.post('/batch/delete', authMiddleware, heavyLimiter, adminAuth, validate(idsSchema), batchDelete);
 
 // ==================== 版本差异对比 ====================
-router.post('/:id/versions/diff', validateParams(idParamSchema), authMiddleware, heavyLimiter, validate(diffSchema), asyncHandler(async (req, res) => {
+router.post('/:id/versions/diff', validateParams(idParamSchema), authMiddleware, heavyLimiter, validate(diffSchema), async (req, res) => {
   const { versionA, versionB } = req.body;
   const va = await diyService.getVersion(req.params.id, versionA, req.tenantId);
   const vb = await diyService.getVersion(req.params.id, versionB, req.tenantId);
@@ -144,10 +143,10 @@ router.post('/:id/versions/diff', validateParams(idParamSchema), authMiddleware,
   const diff = compareConfigs(va.mobile_config, vb.mobile_config);
   const diffPc = compareConfigs(va.pc_config, vb.pc_config);
   success(res, { versionA: va, versionB: vb, diff, diffPc });
-}));
+});
 
 // ==================== 页面访问统计 ====================
-router.get('/:id/stats', validateParams(idParamSchema), authMiddleware, asyncHandler(async (req, res) => {
+router.get('/:id/stats', validateParams(idParamSchema), authMiddleware, async (req, res) => {
   const page = await diyService.getPageById(req.params.id, req.tenantId);
   if (!page) return error(res, ERROR_CODE.NOT_FOUND, '页面不存在');
   success(res, {
@@ -156,9 +155,9 @@ router.get('/:id/stats', validateParams(idParamSchema), authMiddleware, asyncHan
     publishTime: page.publish_time,
     latestVersion: page.latest_published_version,
   });
-}));
+});
 
 // ==================== 组件库 ====================
-router.post('/components', authMiddleware, heavyLimiter, editorOrAbove, validate(componentSchema), asyncHandler(createComponent));
+router.post('/components', authMiddleware, heavyLimiter, editorOrAbove, validate(componentSchema), createComponent);
 
 export default router;
