@@ -299,10 +299,6 @@ const siteName = computed(() => siteConfig.value?.site_name || 'Movio AI');
 const heroTitle = computed(() => siteConfig.value?.hero_title || t('landing.hero_title_highlight'));
 const heroSubtitle = computed(() => siteConfig.value?.hero_subtitle || t('landing.hero_subtitle_fallback'));
 const heroCta = computed(() => siteConfig.value?.hero_cta || t('landing.hero_cta'));
-const apiFeatures = computed(() => {
-  if (Array.isArray(siteConfig.value?.features) && siteConfig.value.features.length) return siteConfig.value.features;
-  return null;
-});
 const apiPricing = computed(() => {
   if (Array.isArray(siteConfig.value?.pricing) && siteConfig.value.pricing.length) return siteConfig.value.pricing;
   return null;

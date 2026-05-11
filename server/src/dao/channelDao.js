@@ -49,10 +49,10 @@ export async function createRelation(data) {
   return result.insertId;
 }
 
-export async function auditRelation(id, { status, auditRemark }) {
+export async function auditRelation(id, tenantId, { status, auditRemark }) {
   const [result] = await pool.query(
-    'UPDATE ?? SET status = ?, audit_remark = ?, audited_at = NOW() WHERE id = ?',
-    [TABLE.RELATION, status, auditRemark || '', id],
+    'UPDATE ?? SET status = ?, audit_remark = ?, audited_at = NOW() WHERE id = ? AND tenant_id = ?',
+    [TABLE.RELATION, status, auditRemark || '', id, tenantId],
   );
   if (result.affectedRows && status === 'active') {
     const rel = await findRelationById(id);

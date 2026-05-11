@@ -34,7 +34,7 @@ export async function applyChannel(tenantId, { agentCode }) {
 export async function auditChannel(tenantId, id, { status, auditRemark }) {
   const rel = await channelDao.findRelationById(id);
   if (!rel || rel.tenant_id !== tenantId) throw new BusinessError(404, '渠道关系不存在');
-  return channelDao.auditRelation(id, { status, auditRemark });
+  return channelDao.auditRelation(id, tenantId, { status, auditRemark });
 }
 
 export async function getDownstreamAgents(tenantId) {

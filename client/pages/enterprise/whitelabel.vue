@@ -40,6 +40,8 @@
 </template>
 
 <script setup>
+import { useToast } from '~/composables/useToast';
+const toast = useToast();
 const form = ref({ siteName: '', logo: '', primaryColor: '#667eea', domain: '' });
 const loading = ref(true);
 const saving = ref(false);
@@ -52,7 +54,7 @@ onMounted(async () => {
     if (res.data && Object.keys(res.data).length) {
       form.value = { ...form.value, ...res.data };
     }
-  } catch (e) { /* ignore */ }
+  } catch (e) { /* ignore */ toast.error('加载白标设置失败'); }
   finally { loading.value = false; }
 });
 

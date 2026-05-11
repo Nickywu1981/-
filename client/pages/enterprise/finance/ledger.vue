@@ -43,7 +43,9 @@
 
 <script setup>
 import { useApi } from '~/composables/useApi';
+import { useToast } from '~/composables/useToast';
 const api = useApi();
+const toast = useToast();
 
 const list = ref([]);
 const total = ref(0);
@@ -64,7 +66,7 @@ async function loadData() {
     const data = await api.get('/enterprise/finance/ledger', params);
     list.value = data?.list || [];
     total.value = data?.total || 0;
-  } catch (e) { console.error(e); }
+  } catch (e) { console.error(e); toast.error('流水明细加载失败'); }
 }
 
 function typeLabel(t) { const m = { revenue: '收入', commission: '佣金', withdrawal: '提现', refund: '退款', adjustment: '调账' }; return m[t] || t; }

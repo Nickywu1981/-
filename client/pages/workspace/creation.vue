@@ -73,6 +73,11 @@ const tabs = ref<{ key: string; label: string }[]>([])
 const cardData = ref<Record<string, Card[]>>({})
 const { t } = useI18n()
 
+const CATEGORY_ROUTES: Record<string, string> = {
+  video: '/work/video', image: '/work/image', detail: '/work/detail-page',
+  copywrite: '/work/copywriting', digital: '/work/digital-human',
+}
+
 function getDefaultCards(): Record<string, Card[]> {
   const fromI18n = t('workspace.default_tool_cards') as Record<string, Card[]>
   if (fromI18n && typeof fromI18n === 'object' && Object.keys(fromI18n).length) return fromI18n

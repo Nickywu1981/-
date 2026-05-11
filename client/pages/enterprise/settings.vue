@@ -50,6 +50,9 @@
 </template>
 
 <script setup>
+import { ref, onMounted, computed } from 'vue';
+import { useToast } from '~/composables/useToast';
+const toast = useToast();
 const profile = ref({});
 const loading = ref(true);
 const saving = ref(false);
@@ -65,7 +68,7 @@ onMounted(async () => {
   try {
     const res = await $fetch('/api/enterprise/profile', { credentials: 'include' });
     profile.value = res.data || res;
-  } catch (e) { /* ignore */ }
+  } catch (e) { /* ignore */ toast.error('加载企业信息失败'); }
   finally { loading.value = false; }
 });
 

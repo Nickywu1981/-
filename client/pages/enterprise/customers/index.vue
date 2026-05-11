@@ -83,8 +83,10 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { useToast } from '~/composables/useToast';
 
 const router = useRouter();
+const toast = useToast();
 const customers = ref([]);
 const tags = ref([]);
 const loading = ref(true);

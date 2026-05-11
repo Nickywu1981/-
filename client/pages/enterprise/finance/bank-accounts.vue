@@ -66,7 +66,9 @@
 
 <script setup>
 import { useApi } from '~/composables/useApi';
+import { useToast } from '~/composables/useToast';
 const api = useApi();
+const toast = useToast();
 
 const accounts = ref([]);
 const showForm = ref(false);
@@ -79,7 +81,7 @@ onMounted(() => loadAccounts());
 async function loadAccounts() {
   try {
     accounts.value = await api.get('/enterprise/finance/bank-accounts') || [];
-  } catch (e) { console.error(e); }
+  } catch (e) { console.error(e); toast.error('收款账户加载失败'); }
 }
 
 async function handleSubmit() {

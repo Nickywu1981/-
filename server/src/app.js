@@ -199,8 +199,8 @@ app.get('/api/health', optionalAuth, async (req, res) => {
   return sendError(res, 503, 'db_down', status);
 });
 
-// 网关路由地图端点 (Phase 0-A, 2026-05-11)
-app.get('/api/gateway/routes', (req, res) => {
+// 网关路由地图端点 (Phase 0-A, 2026-05-11) — 需管理员认证
+app.get('/api/gateway/routes', authMiddleware, adminAuth, (req, res) => {
   return success(res, generateRouteMap(), 'ok');
 });
 
