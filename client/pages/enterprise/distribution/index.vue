@@ -52,6 +52,7 @@
 </template>
 
 <script setup>
+definePageMeta({ layout: 'enterprise' });
 import { ref, onMounted } from 'vue';
 
 const inviteCode = ref('');

@@ -47,6 +47,7 @@
 </template>
 
 <script setup>
+definePageMeta({ layout: 'enterprise' });
 import { ref, computed, onMounted } from 'vue';
 import { useToast } from '~/composables/useToast';
 const toast = useToast();

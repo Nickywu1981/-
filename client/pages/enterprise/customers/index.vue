@@ -81,6 +81,7 @@
 </template>
 
 <script setup>
+definePageMeta({ layout: 'enterprise' });
 import { ref, reactive, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useToast } from '~/composables/useToast';

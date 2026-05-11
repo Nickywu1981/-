@@ -50,6 +50,7 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({ layout: 'enterprise' });
 import { ref, reactive, onMounted, onUnmounted } from 'vue';
 import { useToast } from '~/composables/useToast';
 

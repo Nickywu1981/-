@@ -45,6 +45,7 @@
 </template>
 
 <script setup>
+definePageMeta({ layout: 'enterprise' });
 import { ref, reactive, onMounted } from 'vue';
 
 const tags = ref([]);

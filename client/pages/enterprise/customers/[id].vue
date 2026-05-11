@@ -72,6 +72,7 @@
 </template>
 
 <script setup>
+definePageMeta({ layout: 'enterprise' });
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 

@@ -15,6 +15,7 @@
 </template>
 
 <script setup>
+definePageMeta({ layout: 'enterprise' });
 import { ref, onMounted } from 'vue';
 const stats = ref({});
 const loading = ref(true);

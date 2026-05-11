@@ -19,6 +19,7 @@
 </template>
 
 <script setup>
+definePageMeta({ layout: 'enterprise' });
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 const router = useRouter(); const route = useRoute(); const order = ref(null); const loadError = ref(false);
