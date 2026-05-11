@@ -10,6 +10,7 @@
 
 import logger from '../utils/logger.js';
 import { BusinessError } from '../utils/businessError.js';
+import { extractUsage } from './tokenMeteringService.js';
 
 // ==================== 模型注册中心 ====================
 
@@ -161,6 +162,8 @@ export async function infer(modelId, input, options = {}) {
         retries: attempt,
         degraded: currentModelId !== modelId,
         triedModels,
+        tokensIn: extractUsage(result).tokensIn,
+        tokensOut: extractUsage(result).tokensOut,
       };
 
       // 缓存结果
@@ -200,6 +203,8 @@ export async function infer(modelId, input, options = {}) {
       degraded: true,
       triedModels,
       error: lastError?.message,
+      tokensIn: 0,
+      tokensOut: 0,
     };
   }
 

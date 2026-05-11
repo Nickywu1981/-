@@ -42,6 +42,8 @@ const config = {
       return s;
     })(),
     expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+    accessExpiresIn: process.env.JWT_ACCESS_EXPIRES_IN || '15m',
+    refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
   },
 
   ai: {

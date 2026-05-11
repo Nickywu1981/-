@@ -60,6 +60,7 @@ import multilingualRoutes from './route/multilingualRoutes.js';
 import analyticsRoutes from './route/analyticsRoutes.js';
 import platformSpecRoutes from './route/platformSpecRoutes.js';
 import aiDispatchRoutes from './route/aiDispatchRoutes.js';
+import aiGatewayRoutes from './route/aiGatewayRoutes.js';
 import posterRoutesV4 from './route/v4_poster.routes.js';
 import videoTranslateRoutesV4 from './route/v4_video_translate.routes.js';
 import copywritingRoutes from './route/copywritingRoutes.js';
@@ -328,6 +329,7 @@ app.use('/api/multilingual', multilingualRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/platform-specs', platformSpecRoutes);
 app.use('/api/ai-dispatch', aiConcurrencyGuard, heavyLimiter, aiDispatchRoutes);  // 多模型统一调度: dispatch/categories/health/stats/cache
+app.use('/api/ai/gateway', aiConcurrencyGuard, heavyLimiter, aiGatewayRoutes);  // Token 集约化中台: infer/dispatch/route/stats/pricing
 app.use('/api/compare', heavyLimiter, compareRoutes);
 app.use('/api/seo-keywords', heavyLimiter, seoKeywordRoutes);
 app.use('/api/fab', heavyLimiter, fabRoutes);

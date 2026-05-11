@@ -9,7 +9,7 @@
  * 新版统一认证中心: server/src/platform/authCenter.js
  */
 import jwt from 'jsonwebtoken';
-import { jwtSecret } from '../config/index.js';
+import config, { jwtSecret } from '../config/index.js';
 import { isTokenBlacklisted } from '../utils/jwtToken.js';
 import { error as sendError } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
@@ -39,7 +39,7 @@ export function generateAccessToken(user) {
       entRole: user.entRole || null,                   // Phase 0-A: 企业内角色
     },
     jwtSecret,
-    { expiresIn: '15m' },
+    { expiresIn: config.jwt.accessExpiresIn || '15m' },
   );
 }
 
@@ -115,6 +115,13 @@ const PUBLIC_PREFIXES = [
 
 const RENEW_WINDOW = 24 * 60 * 60;  // 24h: token剩余不足1天自动续期
 
+function _parseDurationMs(str) {
+  const m = str.match(/^(\d+)(s|m|h|d)$/);
+  if (!m) return 15 * 60 * 1000;
+  const v = parseInt(m[1], 10);
+  return { s: v * 1000, m: v * 60 * 1000, h: v * 3600 * 1000, d: v * 86400 * 1000 }[m[2]];
+}
+
 function isPublicPath(path) {
   if (path.startsWith('/api/docs')) return true;  // Swagger UI 子资源
   if (PUBLIC_PREFIXES.some(p => path === p || path.startsWith(p.endsWith('/') ? p : p + '/'))) return true;
@@ -168,12 +175,15 @@ export async function authMiddleware(req, res, next) {
   const timeToExpire = payload.exp - Math.floor(Date.now() / 1000);
   if (timeToExpire > 0 && timeToExpire < RENEW_WINDOW) {
     const { iat, exp, ...renewPayload } = payload;
-    const newToken = jwt.sign(renewPayload, jwtSecret, { expiresIn: '7d' });
+    const newToken = jwt.sign(renewPayload, jwtSecret, { expiresIn: config.jwt.accessExpiresIn || '15m' });
+    const accessMaxAge = config.jwt.accessExpiresIn
+      ? _parseDurationMs(config.jwt.accessExpiresIn)
+      : 15 * 60 * 1000;
     res.cookie('token', newToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: accessMaxAge,
     });
   }
 

@@ -9,6 +9,7 @@
 import { Router } from 'express';
 import z from 'zod';
 import { dispatch, getCategories, getModelsByCategory, getUsageStats, healthCheck, clearCache, extensionHooks } from '../services/modelDispatcher.js';
+import { gatewayDispatch } from '../gateway/aiGatewayHub.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
@@ -42,9 +43,9 @@ const dispatchSchema = z.object({
 router.post('/dispatch', authMiddleware, heavyLimiter, validate(dispatchSchema), asyncHandler(async (req, res) => {
   const { mode, taskType, input, modelId, customConfig, skipCache } = req.body;
 
-  const result = await dispatch(
+  const result = await gatewayDispatch(
     { mode, taskType, input, modelId, customConfig },
-    { skipCache, userId: req.user?.id },
+    { skipCache, userId: req.user?.id, tenantId: req.tenantId, taskType, source: 'consumer', correlationId: req.headers['x-correlation-id'] },
   );
 
   return success(res, result);

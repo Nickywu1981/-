@@ -54,7 +54,7 @@ function makeTextInfer(modelId, maxTokens = 2000, timeout = 60000) {
       text: content,
       model: data.model || modelId,
       usage: data.usage
-        ? { promptTokens: data.usage.prompt_tokens, completionTokens: data.usage.completion_tokens, totalTokens: data.usage.total_tokens }
+        ? { inputTokens: data.usage.prompt_tokens, outputTokens: data.usage.completion_tokens, totalTokens: data.usage.total_tokens }
         : null,
     };
   };

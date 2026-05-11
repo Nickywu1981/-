@@ -55,7 +55,7 @@ async function claudeSonnetInfer(input, onProgress) {
   return {
     text,
     model: data.model,
-    usage: data.usage ? { inputTokens: data.usage.input_tokens, outputTokens: data.usage.output_tokens } : null,
+    usage: data.usage ? { inputTokens: data.usage.input_tokens, outputTokens: data.usage.output_tokens, totalTokens: data.usage.input_tokens + data.usage.output_tokens } : null,
   };
 }
 
@@ -97,6 +97,7 @@ async function claudeHaikuInfer(input, onProgress) {
   return {
     text: data.content?.find((c) => c.type === 'text')?.text || '',
     model: data.model,
+    usage: data.usage ? { inputTokens: data.usage.input_tokens, outputTokens: data.usage.output_tokens, totalTokens: data.usage.input_tokens + data.usage.output_tokens } : null,
   };
 }
 

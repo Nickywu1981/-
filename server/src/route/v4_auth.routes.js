@@ -9,7 +9,8 @@ import { success, error } from '../utils/response.js';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { authLimiter } from '../middleware/rateLimiter.js';
-import { generateRefreshToken } from '../middleware/auth.js';
+import { generateRefreshToken, optionalAuth } from '../middleware/auth.js';
+import { csrfProtection } from '../middleware/csrf.js';
 import * as authService from '../services/auth.service.js';
 import { revokeAccessToken, revokeRefreshToken } from '../utils/jwtToken.js';
 
@@ -135,7 +136,7 @@ router.post('/reset-password', authLimiter, _validate(resetPasswordSchema), asyn
 });
 
 // POST /api/auth/logout
-router.post('/logout', authLimiter, async (req, res) => {
+router.post('/logout', authLimiter, csrfProtection, optionalAuth, async (req, res) => {
   const header = req.headers.authorization;
   if (header?.startsWith('Bearer ')) {
     try { await revokeAccessToken(header.slice(7)); } catch { /* best-effort */ }

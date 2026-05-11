@@ -77,25 +77,26 @@ export async function toggle(modelKey, enabled) {
 
 // ============ 用量更新 ============
 
-export async function incrementUsage(modelKey, { latencyMs = 0, tokensIn = 0, tokensOut = 0, isError = false }) {
+export async function incrementUsage(modelKey, { latencyMs = 0, tokensIn = 0, tokensOut = 0, totalCost = 0, isError = false }) {
   await _db().query(
     `UPDATE ai_model_config SET
        total_calls = total_calls + 1,
        total_tokens = total_tokens + ?,
+       total_cost = total_cost + ?,
        total_errors = total_errors + ?,
        avg_latency_ms = ROUND((avg_latency_ms * (total_calls - 1) + ?) / GREATEST(total_calls, 1))
      WHERE model_key = ?`,
-    [tokensIn + tokensOut, isError ? 1 : 0, latencyMs, modelKey],
+    [tokensIn + tokensOut, totalCost, isError ? 1 : 0, latencyMs, modelKey],
   );
 }
 
 // ============ 调用日志 ============
 
-export async function logCall({ userId, tenantId, modelKey, taskType, inputHash, status, latencyMs, tokensIn, tokensOut, errorMsg, moderationResult }) {
+export async function logCall({ userId, tenantId, modelKey, taskType, inputHash, status, latencyMs, tokensIn, tokensOut, errorMsg, moderationResult, costAmount, costCurrency, pricingId, costDetails, correlationId, source }) {
   const [result] = await _db().query(
-    `INSERT INTO ai_call_log (user_id, tenant_id, model_key, task_type, input_hash, status, latency_ms, tokens_in, tokens_out, error_msg, moderation_result)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [userId || null, tenantId || null, modelKey, taskType, inputHash || '', status || 'success', latencyMs || 0, tokensIn || 0, tokensOut || 0, errorMsg || '', moderationResult ? JSON.stringify(moderationResult) : null],
+    `INSERT INTO ai_call_log (user_id, tenant_id, model_key, task_type, input_hash, status, latency_ms, tokens_in, tokens_out, error_msg, moderation_result, cost_amount, cost_currency, pricing_id, cost_details, correlation_id, source)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [userId || null, tenantId || null, modelKey, taskType, inputHash || '', status || 'success', latencyMs || 0, tokensIn || 0, tokensOut || 0, errorMsg || '', moderationResult ? JSON.stringify(moderationResult) : null, costAmount || 0, costCurrency || 'CNY', pricingId || null, costDetails ? JSON.stringify(costDetails) : null, correlationId || null, source || 'consumer'],
   );
   return result.insertId;
 }
