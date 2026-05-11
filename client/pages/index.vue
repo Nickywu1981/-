@@ -731,6 +731,17 @@ const faqs = [
 .lp-foot-bot { max-width: 960px; margin: 0 auto; padding-top: 20px; border-top: 1px solid #f0efed; text-align: center; }
 .lp-foot-bot span { font-size: 12px; color: #b0b0b5; }
 
+/* ============ BACK TO TOP ============ */
+.lp-back-top {
+  position: fixed; bottom: 32px; right: 32px; z-index: 90;
+  width: 44px; height: 44px; border-radius: 50%; border: 1px solid #ebebea;
+  background: #fff; color: #6b6b70; font-size: 18px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06); transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.lp-back-top:hover { background: #5b5fe3; color: #fff; border-color: #5b5fe3; transform: translateY(-2px); box-shadow: 0 4px 16px rgba(91,95,227,0.2); }
+.lp-back-top:focus-visible { outline: 2px solid #5b5fe3; outline-offset: 2px; }
+
 /* ============ TRANSITIONS ============ */
 .sd-enter-active, .sd-leave-active { transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1); }
 .sd-enter-from, .sd-leave-to { opacity: 0; transform: translateY(-8px); }
