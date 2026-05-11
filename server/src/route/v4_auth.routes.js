@@ -131,7 +131,7 @@ router.post('/logout', authLimiter, async (req, res) => {
     try { await revokeRefreshToken(rt); } catch { /* best-effort */ }
     res.clearCookie('refreshToken', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/' });
   }
-  res.clearCookie('token');
+  res.clearCookie('token', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/' });
   return success(res, {}, '已退出登录');
 });
 

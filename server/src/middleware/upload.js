@@ -14,27 +14,39 @@ fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
 // 文件头魔数签名（前 N 字节十六进制）
 const MAGIC_SIGNATURES = {
-  'image/png':      [0x89, 0x50, 0x4E, 0x47],
-  'image/jpeg':     [0xFF, 0xD8, 0xFF],
-  'image/webp':     [0x52, 0x49, 0x46, 0x46], // RIFF
-  'image/gif':      [0x47, 0x49, 0x46, 0x38], // GIF8
-  'image/avif':     null, // AVIF 用 ftyp box，检测较复杂，信任 MIME
-  'video/mp4':      null,
-  'video/quicktime': null,
+  'image/png':      { bytes: [0x89, 0x50, 0x4E, 0x47] },
+  'image/jpeg':     { bytes: [0xFF, 0xD8, 0xFF] },
+  'image/webp':     { bytes: [0x52, 0x49, 0x46, 0x46] }, // RIFF
+  'image/gif':      { bytes: [0x47, 0x49, 0x46, 0x38] }, // GIF8
+  'image/avif':     { bytes: [0x66, 0x74, 0x79, 0x70], offset: 4 }, // ftyp box at byte 4
+  'video/mp4':      { bytes: [0x66, 0x74, 0x79, 0x70], offset: 4 }, // ftyp box
+  'video/quicktime':{ bytes: [0x66, 0x74, 0x79, 0x70], offset: 4 }, // ftyp box (MOV)
 };
 
+// MIME 类型 → 安全扩展名（不信任用户提供的 originalname）
+const MIME_TO_EXT = {
+  'image/png': '.png',
+  'image/jpeg': '.jpg',
+  'image/webp': '.webp',
+  'image/gif': '.gif',
+  'image/avif': '.avif',
+  'video/mp4': '.mp4',
+  'video/quicktime': '.mov',
+};
 
 /** 检测文件头是否匹配声明类型 */
 function checkMagicNumber(filePath, mimeType) {
-  const expected = MAGIC_SIGNATURES[mimeType];
-  if (!expected) return true; // 无签名定义时信任 MIME
+  const sig = MAGIC_SIGNATURES[mimeType];
+  if (!sig) return true;
+  const offset = sig.offset || 0;
+  const expected = sig.bytes;
   try {
     const fd = fs.openSync(filePath, 'r');
-    const buf = Buffer.alloc(expected.length);
-    fs.readSync(fd, buf, 0, expected.length, 0);
+    const buf = Buffer.alloc(offset + expected.length);
+    fs.readSync(fd, buf, 0, buf.length, 0);
     fs.closeSync(fd);
     for (let i = 0; i < expected.length; i++) {
-      if (buf[i] !== expected[i]) return false;
+      if (buf[offset + i] !== expected[i]) return false;
     }
     return true;
   } catch { return false; }
@@ -43,7 +55,7 @@ function checkMagicNumber(filePath, mimeType) {
 const storage = multer.diskStorage({
   destination: (_req, _file, cb) => cb(null, UPLOAD_DIR),
   filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname) || '.png';
+    const ext = MIME_TO_EXT[file.mimetype] || '.png';
     const name = `${Date.now()}_${crypto.randomBytes(4).toString('hex')}${ext}`;
     cb(null, name);
   },

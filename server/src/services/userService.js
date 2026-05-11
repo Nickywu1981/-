@@ -26,12 +26,13 @@ export async function login({ username, password }) {
   guardSQL(username, 'username');
 
   const user = await userDao.findByUsername(username);
-  if (!user) throw new BusinessError(401, '用户名或密码错误');
+  // 总是执行 bcrypt 比较防止时序攻击枚举用户
+  const dummyHash = '$2b$10$dummyhashfordummyhashfordummyhashfordummyhashfo';
+  const hash = user ? user.password : dummyHash;
+  const match = await bcrypt.compare(password, hash);
 
+  if (!user || !match) throw new BusinessError(401, '用户名或密码错误');
   if (user.status !== USER_STATUS.ACTIVE) throw new BusinessError(403, '账号已被禁用，请联系客服');
-
-  const match = await bcrypt.compare(password, user.password);
-  if (!match) throw new BusinessError(401, '用户名或密码错误');
 
   await userDao.updateLastLogin(user.id);
 

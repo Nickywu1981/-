@@ -41,6 +41,7 @@ describe('userService', () => {
 
     it('账号被禁用抛出错误', async () => {
       userDao.findByUsername.mockResolvedValue({ id: 1, username: 'u1', password: 'hash', status: 0 });
+      bcrypt.compare.mockResolvedValue(true);
       await expect(userService.login({ username: 'u1', password: 'p1' }))
         .rejects.toThrow('账号已被禁用');
     });
