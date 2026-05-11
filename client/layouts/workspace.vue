@@ -20,7 +20,7 @@
         </button>
       </div>
 
-      <nav class="wsl-nav">
+      <nav class="wsl-nav" role="navigation" :aria-label="t('workspace.nav_main_label')">
         <NuxtLink
           v-for="item in navItems"
           :key="item.path"

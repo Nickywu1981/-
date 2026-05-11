@@ -10,7 +10,7 @@
           <span class="lp-nav-mark">M</span>
           <span class="lp-nav-name">{{ siteName }}</span>
         </NuxtLink>
-        <nav class="lp-nav-lk">
+        <nav class="lp-nav-lk" role="navigation" :aria-label="$t('landing.nav_label')">
           <a href="#features" :class="{ on: activeSection === 'features' }" @click.prevent="scrollTo('features')">{{ $t('landing.nav_features') }}</a>
           <a href="#how" :class="{ on: activeSection === 'how' }" @click.prevent="scrollTo('how')">{{ $t('landing.nav_how') }}</a>
           <a href="#pricing" :class="{ on: activeSection === 'pricing' }" @click.prevent="scrollTo('pricing')">{{ $t('landing.nav_pricing') }}</a>
@@ -48,7 +48,7 @@
     </header>
 
     <!-- ===== HERO ===== -->
-    <section id="main-content" class="lp-hero">
+    <section id="main-content" class="lp-hero" tabindex="-1">
       <div class="lp-hero-bg" />
       <div class="lp-hero-body">
         <div class="lp-hero-tag"><i /><span>{{ $t('landing.hero_sub') }}</span></div>
@@ -146,7 +146,7 @@
           {{ tab.label }}
         </button>
       </div>
-      <div class="lp-feat-grid">
+      <div class="lp-feat-grid" role="list">
         <div v-for="item in filteredCards" :key="item.id" class="lp-card" @click="$router.push(item.route)">
           <div class="lp-card-top">
             <div class="lp-card-ico" :style="{ background: item.color }">{{ item.icon }}</div>
@@ -218,7 +218,7 @@
         <h2>{{ $t('landing.section_faq_title') }}</h2>
       </div>
       <div class="lp-faq-list">
-        <div v-for="(q, i) in faqs" :key="i" class="lp-faq-it" :class="{ on: faqOpen === i }" @click="faqOpen = faqOpen === i ? -1 : i">
+        <div v-for="(q, i) in faqs" :key="i" class="lp-faq-it" :class="{ on: faqOpen === i }" @click="faqOpen = faqOpen === i ? -1 : i" @keydown.enter.prevent="faqOpen = faqOpen === i ? -1 : i" @keydown.space.prevent="faqOpen = faqOpen === i ? -1 : i" role="button" :aria-expanded="faqOpen === i" tabindex="0">
           <div class="lp-faq-q"><span>{{ q.q }}</span><span class="lp-faq-arw">{{ faqOpen === i ? '−' : '+' }}</span></div>
           <div class="lp-faq-a"><p>{{ q.a }}</p></div>
         </div>
@@ -447,6 +447,7 @@ const displayPlans = computed(() => apiPricing.value || plans.value)
 .lp-btn-ghost:hover { border-color: #c5c5c2; background: rgba(0,0,0,0.02); }
 
 .lp-ham { display: none; width: 36px; height: 36px; border: none; background: transparent; flex-direction: column; align-items: center; justify-content: center; gap: 5px; cursor: pointer; border-radius: 8px; }
+.lp-ham:focus-visible { outline: 2px solid #5b5fe3; outline-offset: 2px; }
 .lp-ham span { display: block; width: 18px; height: 1.5px; background: #171717; border-radius: 1px; transition: transform 0.25s, opacity 0.25s; }
 .lp-ham span.on:first-child { transform: translateY(6.5px) rotate(45deg); }
 .lp-ham span.on:nth-child(2) { opacity: 0; }
@@ -474,6 +475,7 @@ const displayPlans = computed(() => apiPricing.value || plans.value)
   transition: background 0.25s, transform 0.25s, box-shadow 0.25s; letter-spacing: -0.02em;
 }
 .lp-hero-cta:hover { background: #2d2d2d; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+.lp-hero-cta:focus-visible { outline: 2px solid #5b5fe3; outline-offset: 2px; }
 .lp-hero-cta span { transition: transform 0.2s; }
 .lp-hero-cta:hover span { transform: translateX(3px); }
 .lp-hero-demo {
@@ -483,6 +485,7 @@ const displayPlans = computed(() => apiPricing.value || plans.value)
   transition: border-color 0.2s, background 0.2s;
 }
 .lp-hero-demo:hover { border-color: #c5c5c2; background: rgba(0,0,0,0.02); }
+.lp-hero-demo:focus-visible { outline: 2px solid #5b5fe3; outline-offset: 2px; }
 .lp-hero-play { font-size: 10px; }
 .lp-hero-nums { display: flex; align-items: center; gap: 24px; justify-content: center; flex-wrap: wrap; }
 .lp-hero-nums div { text-align: center; }

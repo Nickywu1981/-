@@ -20,6 +20,7 @@
       "merchants": "Active Merchants",
       "satisfaction": "Satisfaction"
     },
+    "nav_label": "Main navigation",
     "nav_features": "Features",
     "nav_how": "How It Works",
     "nav_pricing": "Pricing",
@@ -286,6 +287,7 @@
     "creation_hint_copywrite": "E-commerce titles / Detail copy / Voiceover scripts / Campaign copy",
     "creation_hint_digital": "Sales video / Virtual livestream / Avatar custom / AI host",
     "creation_hint_default": "",
+    "nav_main_label": "Workspace navigation",
     "nav_home": "Home",
     "nav_creation": "Create",
     "nav_assistant": "AI Assistant",

@@ -11,7 +11,8 @@ export default {
       return success(res, { job_id: job.id, status: 'queued' }, '语音翻译任务已提交');
     } catch (e) {
       const code = e.status === 400 ? 400 : ERROR_CODE.INTERNAL_ERROR;
-      const msg = e.status === 400 ? e.message : '操作失败';
+      const msg = e.status === 400 && e.message && !e.message.includes('SQL') && !e.message.includes('ENOENT')
+        ? e.message : '操作失败';
       logger.error('[videoTranslate] submitVoice:', e.message || e);
       return error(res, code, msg);
     }
@@ -23,7 +24,8 @@ export default {
       return success(res, { job_id: job.id, status: 'queued' }, '字幕翻译任务已提交');
     } catch (e) {
       const code = e.status === 400 ? 400 : ERROR_CODE.INTERNAL_ERROR;
-      const msg = e.status === 400 ? e.message : '操作失败';
+      const msg = e.status === 400 && e.message && !e.message.includes('SQL') && !e.message.includes('ENOENT')
+        ? e.message : '操作失败';
       logger.error('[videoTranslate] submitSubtitles:', e.message || e);
       return error(res, code, msg);
     }
@@ -35,7 +37,8 @@ export default {
       return success(res, { job_id: job.id, status: 'queued' }, '面容翻译任务已提交');
     } catch (e) {
       const code = e.status === 400 ? 400 : ERROR_CODE.INTERNAL_ERROR;
-      const msg = e.status === 400 ? e.message : '操作失败';
+      const msg = e.status === 400 && e.message && !e.message.includes('SQL') && !e.message.includes('ENOENT')
+        ? e.message : '操作失败';
       logger.error('[videoTranslate] submitFace:', e.message || e);
       return error(res, code, msg);
     }

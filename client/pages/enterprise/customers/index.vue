@@ -114,16 +114,16 @@ async function loadCustomers() {
     customers.value = data.list || [];
     total.value = data.total || 0;
     (data.list || []).forEach(c => { if (c.customer_tags) customerTagsMap[c.id] = c.customer_tags; });
-  } catch (e) { console.error(e); }
+  } catch (e) { console.error(e); toast.error('客户列表加载失败'); }
   loading.value = false;
 }
 
 async function loadStats() {
-  try { Object.assign(stats, await $api('/customers/stats')); } catch (e) { /* ignore */ }
+  try { Object.assign(stats, await $api('/customers/stats')); } catch (e) { console.error(e); }
 }
 
 async function loadTags() {
-  try { tags.value = await $api('/tags'); } catch (e) { /* ignore */ }
+  try { tags.value = await $api('/tags'); } catch (e) { console.error(e); }
 }
 
 function getCustomerTags(cid) { return customerTagsMap[cid] || []; }

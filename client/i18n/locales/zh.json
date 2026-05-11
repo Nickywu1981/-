@@ -20,6 +20,7 @@
       "merchants": "商家在用",
       "satisfaction": "满意率"
     },
+    "nav_label": "主导航",
     "nav_features": "功能",
     "nav_how": "使用流程",
     "nav_pricing": "定价",
@@ -286,6 +287,7 @@
     "creation_hint_copywrite": "支持电商标题 / 详情文案 / 口播脚本 / 营销文案",
     "creation_hint_digital": "支持带货视频 / 虚拟直播 / 形象定制 / AI 主播",
     "creation_hint_default": "",
+    "nav_main_label": "工作台导航",
     "nav_home": "首页",
     "nav_creation": "创作",
     "nav_assistant": "AI 助手",

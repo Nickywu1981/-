@@ -58,14 +58,6 @@
 </template>
 
 <script lang="ts">
-const defaultTabs = [
-  { key: 'video', label: '视频生成' },
-  { key: 'image', label: '图片生成' },
-  { key: 'detail', label: '电商详情图' },
-  { key: 'copywrite', label: '文案工具' },
-  { key: 'digital', label: '数字人' },
-]
-
 type Card = { id: string; category: string; icon: string; title: string; desc: string; route: string; order: number; visible: boolean }
 
 const defaultCardData: Record<string, Card[]> = {
@@ -150,7 +142,8 @@ onMounted(async () => {
         if (!groups[c.category]) groups[c.category] = []
         groups[c.category].push(c)
       })
-      tabs.value = t.length > 0 ? t : defaultTabs
+      const tabKeys = ["video", "image", "detail", "copywrite", "digital"]
+      tabs.value = t.length > 0 ? t : tabKeys.map(key => ({ key, label: t(`workspace.creation_tabs.${key}`) }))
       cardData.value = Object.keys(groups).length > 0 ? groups : defaultCardData
     } else {
       throw new Error('empty')

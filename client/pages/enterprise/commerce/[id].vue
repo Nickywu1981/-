@@ -13,6 +13,7 @@
         <div><label>邮箱</label><span>{{ order.customer_email || '-' }}</span></div>
       </div>
     </div>
+    <p v-else-if="loadError" class="empty">加载失败 <button class="btn-cancel" @click="loadOrder">重试</button></p>
     <p v-else class="empty">加载中...</p>
   </div>
 </template>
@@ -20,13 +21,15 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-const router = useRouter(); const route = useRoute(); const order = ref(null);
-onMounted(async () => {
+const router = useRouter(); const route = useRoute(); const order = ref(null); const loadError = ref(false);
+async function loadOrder() {
+  loadError.value = false;
   try {
     const r = await $fetch(`/api/enterprise/commerce/${route.params.id}`, { credentials: 'include' });
-    if (r.code === 200) order.value = r.data;
-  } catch (e) { console.debug('loadOrder', e); }
-});
+    if (r.code === 200) order.value = r.data; else loadError.value = true;
+  } catch (e) { console.debug('loadOrder', e); loadError.value = true; }
+}
+onMounted(loadOrder);
 function statusClass(s) { return { pending: 'status-warn', paid: 'status-ok', processing: 'status-info', completed: 'status-ok', refunded: 'status-err', cancelled: 'status-err' }[s] || ''; }
 function statusLabel(s) { return { pending: '待支付', paid: '已支付', processing: '处理中', completed: '已完成', refunded: '已退款', cancelled: '已取消' }[s] || s; }
 function formatDate(d) { return d ? new Date(d).toLocaleString('zh-CN') : '-'; }

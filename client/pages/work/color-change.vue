@@ -79,7 +79,7 @@ async function handleFile(e: Event) {
 
 function handleDrop(e: DragEvent) {
   if (e.dataTransfer?.files[0]) {
-    previewUrl.value = createBlobUrl(e.dataTransfer.files[0])
+    handleFile(e.dataTransfer.files[0])
   }
 }
 

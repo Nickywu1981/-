@@ -74,7 +74,7 @@ async function loadSummary() {
     if (dateRange.value.end) q.set('endDate', dateRange.value.end);
     const r = await $fetch(`/api/enterprise/commerce/stats/summary?${q}`, { credentials: 'include' });
     if (r.code === 200) summary.value = r.data;
-  } catch (e) { /* ignore */ }
+  } catch (e) { console.error(e); }
 }
 
 async function loadStats() {
@@ -84,7 +84,7 @@ async function loadStats() {
     if (dateRange.value.end) q.set('endDate', dateRange.value.end);
     const r = await $fetch(`/api/analytics/trend?${q}`, { credentials: 'include' });
     if (r.code === 200) stats.value = r.data?.list || r.data || [];
-  } catch (e) { /* ignore */ }
+  } catch (e) { console.error(e); }
 }
 
 function switchPeriod(p) { period.value = p; loadStats(); }

@@ -71,23 +71,24 @@ export async function updateRelationStatus(id, status) {
   return result.affectedRows;
 }
 
-export async function findDownstreamAgents(tenantId) {
+export async function findDownstreamAgents(tenantId, { limit = 200 } = {}) {
   const [rows] = await pool.query(
     `SELECT cr.*, t.name, t.code, t.channel_level
      FROM ?? cr JOIN ?? t ON cr.child_tenant_id = t.id
      WHERE cr.tenant_id = ? AND cr.status = 'active'
-     ORDER BY cr.level ASC`,
-    [TABLE.RELATION, TABLE.TENANT, tenantId],
+     ORDER BY cr.level ASC
+     LIMIT ?`,
+    [TABLE.RELATION, TABLE.TENANT, tenantId, limit],
   );
   return rows;
 }
 
 // ==================== 分润政策 ====================
 
-export async function listPolicies(tenantId) {
+export async function listPolicies(tenantId, { limit = 200 } = {}) {
   const [rows] = await pool.query(
-    'SELECT * FROM ?? WHERE tenant_id = ? ORDER BY created_at DESC',
-    [TABLE.POLICY, tenantId],
+    'SELECT * FROM ?? WHERE tenant_id = ? ORDER BY created_at DESC LIMIT ?',
+    [TABLE.POLICY, tenantId, limit],
   );
   return rows;
 }

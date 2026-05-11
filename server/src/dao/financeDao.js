@@ -8,10 +8,10 @@ import pool from '../dao/db.js';
 
 // ==================== 收款账户 ====================
 
-export async function listBankAccounts(tenantId) {
+export async function listBankAccounts(tenantId, { limit = 50 } = {}) {
   const [rows] = await pool.query(
-    'SELECT * FROM bank_account WHERE tenant_id = ? AND is_deleted = 0 ORDER BY is_default DESC, create_time DESC',
-    [tenantId],
+    'SELECT * FROM bank_account WHERE tenant_id = ? AND is_deleted = 0 ORDER BY is_default DESC, create_time DESC LIMIT ?',
+    [tenantId, limit],
   );
   return rows;
 }

@@ -52,13 +52,15 @@
 import { ref, reactive, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 
+const toast = useToast()
 const router = useRouter();
 const orders = reactive({ list: [], total: 0, page: 1, pageSize: 20 });
 const summary = ref({});
 const filters = reactive({ status: '', keyword: '' });
-let searchTimer;
+let searchTimer: ReturnType<typeof setTimeout>;
 
 onMounted(() => { loadOrders(); loadSummary(); });
+onUnmounted(() => { clearTimeout(searchTimer); });
 
 async function loadOrders(page = 1) {
   orders.page = page;
@@ -68,13 +70,13 @@ async function loadOrders(page = 1) {
   try {
     const r = await $fetch(`/api/enterprise/commerce?${q}`, { credentials: 'include' });
     if (r.code === 200) Object.assign(orders, r.data);
-  } catch (e) { console.debug('loadOrders', e); }
+  } catch (e) { console.debug('loadOrders', e); toast.error('订单列表加载失败'); }
 }
 async function loadSummary() {
   try {
     const r = await $fetch('/api/enterprise/commerce/stats/summary', { credentials: 'include' });
     if (r.code === 200) summary.value = r.data;
-  } catch (e) { /* ignore */ }
+  } catch (e) { console.debug('loadSummary', e); }
 }
 function debounceSearch() { clearTimeout(searchTimer); searchTimer = setTimeout(() => loadOrders(), 400); }
 function statusClass(s) { return { pending: 'status-warn', paid: 'status-ok', processing: 'status-info', completed: 'status-ok', refunded: 'status-err', cancelled: 'status-err' }[s] || ''; }
