@@ -13,18 +13,18 @@ const TABLE = {
 // ==================== 企业/租户 CRUD ====================
 
 export async function findTenantById(id) {
-  const [rows] = await pool.query('SELECT * FROM ?? WHERE id = ? AND is_deleted = 0', [TABLE.TENANT, id]);
+  const [rows] = await pool.query('SELECT * FROM ?? WHERE id = ? AND status = 1', [TABLE.TENANT, id]);
   return rows[0] || null;
 }
 
 export async function findTenantByCode(code) {
-  const [rows] = await pool.query('SELECT * FROM ?? WHERE code = ? AND is_deleted = 0', [TABLE.TENANT, code]);
+  const [rows] = await pool.query('SELECT * FROM ?? WHERE code = ? AND status = 1', [TABLE.TENANT, code]);
   return rows[0] || null;
 }
 
 export async function findTenantByDomain(domain) {
   const [rows] = await pool.query(
-    'SELECT * FROM ?? WHERE JSON_EXTRACT(white_label, "$.domain") = ? AND is_deleted = 0',
+    'SELECT * FROM ?? WHERE JSON_EXTRACT(white_label, "$.domain") = ? AND status = 1',
     [TABLE.TENANT, domain],
   );
   return rows[0] || null;
@@ -71,7 +71,7 @@ export async function updateTenant(id, data) {
 }
 
 export async function listTenants({ page = 1, pageSize = 20, type, status, keyword }) {
-  const conditions = ['is_deleted = 0'];
+  const conditions = ['1=1'];
   const params = [];
   if (type) { conditions.push('type = ?'); params.push(type); }
   if (status !== undefined) { conditions.push('status = ?'); params.push(status); }
@@ -163,7 +163,7 @@ export async function getEnterpriseUsage(tenantId, { startDate, endDate, userId 
   const where = conditions.join(' AND ');
 
   const [rows] = await pool.query(
-    `SELECT DATE(create_time) AS date, COUNT(*) AS call_count, SUM(credits_used) AS total_credits
+    `SELECT DATE(create_time) AS date, COUNT(*) AS call_count, SUM(credit_amount) AS total_credits
      FROM credit_request_log WHERE ${where}
      GROUP BY DATE(create_time) ORDER BY date DESC LIMIT 90`,
     params,
@@ -179,7 +179,7 @@ export async function getEnterpriseUsageByUser(tenantId, { startDate, endDate } 
   const where = conditions.join(' AND ');
 
   const [rows] = await pool.query(
-    `SELECT user_id, COUNT(*) AS call_count, SUM(credits_used) AS total_credits
+    `SELECT user_id, COUNT(*) AS call_count, SUM(credit_amount) AS total_credits
      FROM credit_request_log WHERE ${where}
      GROUP BY user_id ORDER BY total_credits DESC LIMIT 50`,
     params,

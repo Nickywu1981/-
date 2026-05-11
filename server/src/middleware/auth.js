@@ -14,6 +14,13 @@ import { isTokenBlacklisted } from '../utils/jwtToken.js';
 import { error as sendError } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
+// 独立 refresh secret：优先取环境变量，开发环境派生自 jwtSecret
+const refreshSecret = (() => {
+  if (process.env.JWT_REFRESH_SECRET) return process.env.JWT_REFRESH_SECRET;
+  if (process.env.NODE_ENV === 'development') return jwtSecret + '_refresh_dev_only';
+  throw new Error('JWT_REFRESH_SECRET 未设置，无法签发 refresh token');
+})();
+
 // ========================= Token 生成 =========================
 
 /**
@@ -47,7 +54,7 @@ export function generateRefreshToken(user) {
       userId: user.userId || user.id,
       type: 'refresh',
     },
-    jwtSecret,
+    refreshSecret,
     { expiresIn: '7d' },
   );
 }
@@ -237,7 +244,7 @@ export async function refreshTokenMiddleware(req, res, next) {
     if (await isTokenBlacklisted(token)) {
       return sendError(res, ERROR_CODE.EC_AUTH_002, 'Refresh Token 已被吊销，请重新登录');
     }
-    payload = jwt.verify(token, jwtSecret);
+    payload = jwt.verify(token, refreshSecret);
   } catch (err) {
     if (err.name === 'TokenExpiredError') {
       return sendError(res, ERROR_CODE.EC_AUTH_002, 'Refresh Token 已过期，请重新登录');
