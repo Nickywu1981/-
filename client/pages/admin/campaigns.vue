@@ -101,6 +101,8 @@
 </template>
 
 <script setup lang="ts">
+import { useToast } from '~/composables/useToast';
+const toast = useToast();
 const { $api } = useNuxtApp() as any
 const list = ref<any[]>([])
 const loading = ref(true)
@@ -146,7 +148,7 @@ async function save() {
     }
     showModal.value = false
     fetch()
-  } catch (e: any) { alert(e.message || '保存失败') }
+  } catch (e: any) { toast.error(e.message || '保存失败') }
   finally { saving.value = false }
 }
 
@@ -155,7 +157,7 @@ async function del(id: number) {
   try {
     await $api(`/admin/campaign/campaigns/${id}`, { method: 'DELETE' })
     fetch()
-  } catch (e: any) { alert(e.message || '删除失败') }
+  } catch (e: any) { toast.error(e.message || '删除失败') }
 }
 
 onMounted(fetch)

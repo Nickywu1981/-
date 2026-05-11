@@ -93,8 +93,8 @@ export async function listPolicies(tenantId, { limit = 200 } = {}) {
   return rows;
 }
 
-export async function getPolicyById(id) {
-  const [rows] = await pool.query('SELECT * FROM ?? WHERE id = ?', [TABLE.POLICY, id]);
+export async function getPolicyById(id, tenantId) {
+  const [rows] = await pool.query('SELECT * FROM ?? WHERE id = ? AND tenant_id = ?', [TABLE.POLICY, id, tenantId]);
   return rows[0] || null;
 }
 
@@ -114,7 +114,7 @@ export async function createPolicy(data) {
   return result.insertId;
 }
 
-export async function updatePolicy(id, data) {
+export async function updatePolicy(id, tenantId, data) {
   const fields = {};
   if (data.name !== undefined) fields.name = data.name;
   if (data.commissionRate !== undefined) fields.commission_rate = data.commissionRate;
@@ -125,7 +125,7 @@ export async function updatePolicy(id, data) {
   if (data.effectiveFrom !== undefined) fields.effective_from = data.effectiveFrom;
   if (data.effectiveTo !== undefined) fields.effective_to = data.effectiveTo;
   if (Object.keys(fields).length === 0) return 0;
-  const [result] = await pool.query('UPDATE ?? SET ? WHERE id = ?', [TABLE.POLICY, fields, id]);
+  const [result] = await pool.query('UPDATE ?? SET ? WHERE id = ? AND tenant_id = ?', [TABLE.POLICY, fields, id, tenantId]);
   return result.affectedRows;
 }
 

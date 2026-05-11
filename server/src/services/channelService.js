@@ -52,9 +52,9 @@ export async function createPolicy(tenantId, data) {
 }
 
 export async function updatePolicy(tenantId, id, data) {
-  const policy = await channelDao.getPolicyById(id);
-  if (!policy || policy.tenant_id !== tenantId) throw new BusinessError(404, '分润政策不存在');
-  return channelDao.updatePolicy(id, data);
+  const policy = await channelDao.getPolicyById(id, tenantId);
+  if (!policy) throw new BusinessError(404, '分润政策不存在');
+  return channelDao.updatePolicy(id, tenantId, data);
 }
 
 // ==================== 渠道业绩 ====================

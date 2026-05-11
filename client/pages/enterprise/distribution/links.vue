@@ -17,6 +17,8 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import { useToast } from '~/composables/useToast';
+const toast = useToast();
 
 const inviteCode = ref('');
 const inviteLink = ref('');
@@ -34,7 +36,7 @@ onMounted(async () => {
 async function copyLink() {
   try {
     await navigator.clipboard.writeText(inviteLink.value);
-    alert('链接已复制');
+    toast.success('链接已复制');
   } catch { /* 降级：用户手动复制 */ }
 }
 </script>
