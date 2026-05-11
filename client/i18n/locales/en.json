@@ -321,6 +321,7 @@
     "coming_soon_detail": "We're building full e-commerce automation capabilities. Once launched, it will support customer service, operations, data review, and all-role AI automation.",
     "progress_label": "Progress",
     "reserve_btn": "Reserve Early Access",
+    "reserve_toast": "We've received your reservation. We'll notify you as soon as it launches.",
     "logout_confirm": "Are you sure you want to logout?",
     "logout_success": "Logged out successfully",
     "logout_fail": "Logout failed, please try again",

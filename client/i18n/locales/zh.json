@@ -321,6 +321,7 @@
     "coming_soon_detail": "我们正在为您打造电商全链路自动化能力，上线后将支持客服、运营、数据复盘等全岗位AI自动化",
     "progress_label": "开发进度",
     "reserve_btn": "预约体验",
+    "reserve_toast": "已收到你的预约，上线后我们会第一时间通知你",
     "logout_confirm": "确定要退出登录吗？",
     "logout_success": "已退出登录",
     "logout_fail": "退出失败，请重试",

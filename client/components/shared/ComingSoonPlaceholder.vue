@@ -17,17 +17,19 @@
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n()
 const props = defineProps<{
   icon: string
   description: string
   progress: number
+  reserveToast?: string
 }>()
 
 const emit = defineEmits<{ (e: 'reserve'): void }>()
 const toast = useToast()
 
 function handleReserve() {
-  toast.success('已收到你的预约，上线后我们会第一时间通知你')
+  toast.success(props.reserveToast || t('workspace.reserve_toast'))
   emit('reserve')
 }
 </script>
