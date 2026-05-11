@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { authMiddleware } from '../middleware/auth.js';
-import templateMarketController from '../controller/templateMarketController.js';
+import * as templateMarketController from '../controller/templateMarketController.js';
 import { paymentLimiter } from '../middleware/rateLimiter.js';
 
 const router = Router();

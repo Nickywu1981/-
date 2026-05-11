@@ -147,7 +147,7 @@ export async function authMiddleware(req, res, next) {
 
   if (!payload) {
     if (expired) {
-      return sendError(res, ERROR_CODE.EC_AUTH_002, 'Access Token 已过期，请刷新');
+      return sendError(res, ERROR_CODE.EC_AUTH_002, '认证已过期，请重新登录');
     }
     return sendError(res, ERROR_CODE.UNAUTHORIZED, '未提供有效认证令牌');
   }
@@ -263,21 +263,24 @@ export function opsAuth(req, res, next) {
 export async function refreshTokenMiddleware(req, res, next) {
   const token = req.cookies?.refreshToken;
   if (!token) {
-    return sendError(res, ERROR_CODE.EC_AUTH_002, '缺少 Refresh Token，请重新登录');
+    return sendError(res, ERROR_CODE.EC_AUTH_002, '认证已过期，请重新登录');
   }
 
   let payload;
   try {
     if (await isTokenBlacklisted(token)) {
-      return sendError(res, ERROR_CODE.EC_AUTH_002, 'Refresh Token 已被吊销，请重新登录');
+      return sendError(res, ERROR_CODE.EC_AUTH_002, '认证已失效，请重新登录');
     }
     payload = jwt.verify(token, refreshSecret);
+  } catch (err) {
+    if (err.name === 'TokenExpiredError') {
+      return sendError(res, ERROR_CODE.EC_AUTH_002, '认证已过期，请重新登录');
     }
-    return sendError(res, ERROR_CODE.EC_AUTH_002, 'Refresh Token 无效，请重新登录');
+    return sendError(res, ERROR_CODE.EC_AUTH_002, '认证已过期，请重新登录');
   }
 
   if (payload.type !== 'refresh') {
-    return sendError(res, ERROR_CODE.EC_AUTH_002, '令牌类型错误，请使用 Refresh Token');
+    return sendError(res, ERROR_CODE.EC_AUTH_002, '认证已过期，请重新登录');
   }
 
   req.newAccessToken = generateAccessToken({
