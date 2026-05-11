@@ -17,6 +17,7 @@
 <script setup>
 import '~/assets/css/main.css'
 import '~/assets/css/theme.css'
+import '~/assets/css/unified-design-system.css'
 
 const appError = ref('')
 const confirmDialogRef = ref()
