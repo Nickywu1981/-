@@ -58,7 +58,12 @@ const voiceCloneSchema = z.object({
   presetVoice: z.string().optional(),
 });
 
-const videoEditSchema = z.object({}).passthrough();
+const videoEditSchema = z.object({
+  videoUrl: z.string().min(1, '请提供视频URL'),
+  edits: z.array(z.unknown()).optional().default([]),
+  bgm: z.string().max(500).optional(),
+  subtitle: z.boolean().optional(),
+});
 
 router.post('/script-gen', authMiddleware, heavyLimiter, tierGuard('video'), validate(scriptGenSchema), asyncHandler(submitScriptGen));
 router.post('/shot-plan', authMiddleware, heavyLimiter, tierGuard('video'), validate(shotPlanSchema), asyncHandler(submitShotPlan));
