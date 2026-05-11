@@ -80,15 +80,15 @@ const adminPromptSchema = z.object({
 });
 
 // 看板
-router.get('/stats', authMiddleware, adminAuth, asyncHandler(getDashboardStats));
-router.get('/dashboard', authMiddleware, adminAuth, asyncHandler(getDashboardStats));
+router.get('/stats', adminLimiter, authMiddleware, adminAuth, asyncHandler(getDashboardStats));
+router.get('/dashboard', adminLimiter, authMiddleware, adminAuth, asyncHandler(getDashboardStats));
 // 用户
-router.get('/users', authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(listAllUsers));
+router.get('/users', adminLimiter, authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(listAllUsers));
 router.put('/users/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(updateUserSchema), asyncHandler(updateUser));
 router.put('/users/:userId/status', adminLimiter, authMiddleware, adminAuth, validate(userIdParamSchema, 'params'), validate(userStatusSchema), asyncHandler(updateUserStatus));
 router.put('/users/batch-status', adminLimiter, authMiddleware, adminAuth, validate(batchUserStatusSchema), asyncHandler(batchUpdateUserStatus));
 // 任务
-router.get('/tasks', authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(listAllTasks));
+router.get('/tasks', adminLimiter, authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(listAllTasks));
 router.post('/tasks/:taskId/approve', adminLimiter, authMiddleware, adminAuth, validate(taskActionParamsSchema, 'params'), asyncHandler(approveTask));
 router.post('/tasks/:taskId/reject', adminLimiter, authMiddleware, adminAuth, validate(taskActionParamsSchema, 'params'), asyncHandler(rejectTask));
 router.post('/tasks/:taskId/retry', adminLimiter, authMiddleware, adminAuth, validate(taskActionParamsSchema, 'params'), asyncHandler(retryTask));
@@ -96,32 +96,32 @@ router.post('/tasks/:taskId/pause', adminLimiter, authMiddleware, adminAuth, val
 router.post('/tasks/:taskId/cancel', adminLimiter, authMiddleware, adminAuth, validate(taskActionParamsSchema, 'params'), asyncHandler(cancelTask));
 router.post('/tasks/:taskId/resume', adminLimiter, authMiddleware, adminAuth, validate(taskActionParamsSchema, 'params'), asyncHandler(resumeTask));
 // 套餐
-router.get('/plans', authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(listAllPlans));
+router.get('/plans', adminLimiter, authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(listAllPlans));
 router.post('/plans', adminLimiter, authMiddleware, adminAuth, validate(createPlanSchema), asyncHandler(createPlan));
 router.put('/plans/:planId', adminLimiter, authMiddleware, adminAuth, validate(planIdParamSchema, 'params'), validate(planSchema), asyncHandler(updatePlan));
 router.delete('/plans/:planId', adminLimiter, authMiddleware, adminAuth, validate(planIdParamSchema, 'params'), asyncHandler(deletePlan));
 // 日志
-router.get('/logs', authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(getOperationLogs));
-router.get('/orders', authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(listAllOrders));
+router.get('/logs', adminLimiter, authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(getOperationLogs));
+router.get('/orders', adminLimiter, authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(listAllOrders));
 router.delete('/orders/:orderId', adminLimiter, authMiddleware, adminAuth, validate(orderIdParamSchema, 'params'), asyncHandler(deleteOrder));
 // 风控
 router.post('/check-content', adminLimiter, authMiddleware, adminAuth, validate(checkContentSchema), asyncHandler(checkContentRisk));
-router.get('/sensitive-words', authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(listSensitiveWords));
+router.get('/sensitive-words', adminLimiter, authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(listSensitiveWords));
 router.post('/sensitive-words', adminLimiter, authMiddleware, adminAuth, validate(sensitiveWordSchema), asyncHandler(addSensitiveWord));
 router.delete('/sensitive-words/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(deleteSensitiveWord));
 // 提示词
-router.get('/prompts', authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(adminListTemplates));
+router.get('/prompts', adminLimiter, authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(adminListTemplates));
 router.post('/prompts', adminLimiter, authMiddleware, adminAuth, validate(adminPromptSchema), asyncHandler(adminSaveTemplate));
 router.put('/prompts/:id/review', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(promptReviewSchema), asyncHandler(adminReviewTemplate));
 router.delete('/prompts/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(adminDeleteTemplate));
 // 积分
-router.get('/credits', authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(listCreditRecords));
+router.get('/credits', adminLimiter, authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(listCreditRecords));
 router.post('/credits/refund', adminLimiter, authMiddleware, adminAuth, validate(refundSchema), asyncHandler(refundCredit));
 // AI日志
-router.get('/ai-logs', authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(listAiCallLogs));
-router.get('/ai-logs/stats', authMiddleware, adminAuth, asyncHandler(getAiCallStats));
+router.get('/ai-logs', adminLimiter, authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(listAiCallLogs));
+router.get('/ai-logs/stats', adminLimiter, authMiddleware, adminAuth, asyncHandler(getAiCallStats));
 // 通知管理
-router.get('/notifications', authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(listAllNotifications));
+router.get('/notifications', adminLimiter, authMiddleware, adminAuth, validate(paginationSchema, 'query'), asyncHandler(listAllNotifications));
 router.post('/notifications/send', adminLimiter, authMiddleware, adminAuth, validate(sendNotificationSchema), asyncHandler(sendNotification));
 router.delete('/notifications/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(deleteNotification));
 

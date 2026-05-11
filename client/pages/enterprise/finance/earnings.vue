@@ -28,7 +28,7 @@
         <thead><tr><th>{{ $t('enterprise.finance.earnings.consumerUser') }}</th><th>{{ $t('enterprise.finance.earnings.orderAmount') }}</th><th>{{ $t('enterprise.finance.earnings.commissionRate') }}</th><th>{{ $t('enterprise.finance.earnings.commission') }}</th><th>{{ $t('enterprise.finance.earnings.level') }}</th><th>{{ $t('enterprise.finance.earnings.status') }}</th><th>{{ $t('enterprise.finance.earnings.time') }}</th></tr></thead>
         <tbody>
           <tr v-for="item in list" :key="item.id">
-            <td>{{ item.consumer_name || `用户${item.consumer_id}` }}</td>
+            <td>{{ item.consumer_name || `${$t('enterprise.finance.earnings.consumerUser')}${item.consumer_id}` }}</td>
             <td>¥{{ fmt(item.order_amount) }}</td>
             <td>{{ item.commission_rate }}%</td>
             <td class="green">¥{{ fmt(item.commission) }}</td>

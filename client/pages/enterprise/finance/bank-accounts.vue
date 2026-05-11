@@ -1,63 +1,63 @@
 <template>
   <div class="finance-bank">
     <div class="page-header">
-      <h1 class="page-title">收款账户</h1>
-      <button class="btn-primary" @click="showForm = true">+ 绑定账户</button>
+      <h1 class="page-title">{{ $t('enterprise.finance.bankAccounts.title') }}</h1>
+      <button class="btn-primary" @click="showForm = true">+ {{ $t('enterprise.finance.bankAccounts.bindAccount') }}</button>
     </div>
 
     <div class="card-list" v-if="accounts.length">
       <div class="account-card" v-for="acc in accounts" :key="acc.id" :class="{ default: acc.is_default }">
         <div class="card-header">
           <span class="account-type">{{ typeLabel(acc.account_type) }}</span>
-          <span class="default-badge" v-if="acc.is_default">默认</span>
+          <span class="default-badge" v-if="acc.is_default">{{ $t('enterprise.finance.bankAccounts.defaultBadge') }}</span>
         </div>
         <div class="card-body">
-          <div class="info-row"><span class="label">户名</span><span>{{ acc.account_name }}</span></div>
-          <div class="info-row"><span class="label">账号</span><span class="mono">****{{ acc.account_no.toString().slice(-4) }}</span></div>
-          <div class="info-row" v-if="acc.bank_name"><span class="label">银行</span><span>{{ acc.bank_name }}</span></div>
+          <div class="info-row"><span class="label">{{ $t('enterprise.finance.bankAccounts.accountName') }}</span><span>{{ acc.account_name }}</span></div>
+          <div class="info-row"><span class="label">{{ $t('enterprise.finance.bankAccounts.accountNo') }}</span><span class="mono">****{{ acc.account_no.toString().slice(-4) }}</span></div>
+          <div class="info-row" v-if="acc.bank_name"><span class="label">{{ $t('enterprise.finance.bankAccounts.bank') }}</span><span>{{ acc.bank_name }}</span></div>
         </div>
         <div class="card-footer">
-          <button class="btn-danger" @click="handleRemove(acc)">解绑</button>
+          <button class="btn-danger" @click="handleRemove(acc)">{{ $t('enterprise.finance.bankAccounts.unbind') }}</button>
         </div>
       </div>
     </div>
-    <div v-else class="empty">暂无绑定收款账户</div>
+    <div v-else class="empty">{{ $t('enterprise.finance.bankAccounts.noData') }}</div>
 
     <!-- 绑定弹窗 -->
     <div class="modal-overlay" v-if="showForm" @click.self="showForm = false">
       <div class="modal">
-        <h2>绑定收款账户</h2>
+        <h2>{{ $t('enterprise.finance.bankAccounts.bindTitle') }}</h2>
         <div class="form-group">
-          <label>账户类型 <span class="required">*</span></label>
+          <label>{{ $t('enterprise.finance.bankAccounts.accountType') }} <span class="required">*</span></label>
           <select v-model="form.accountType">
-            <option value="bank">银行卡</option>
-            <option value="wechat">微信</option>
-            <option value="alipay">支付宝</option>
+            <option value="bank">{{ $t('enterprise.finance.bankAccounts.typeBank') }}</option>
+            <option value="wechat">{{ $t('enterprise.finance.bankAccounts.typeWechat') }}</option>
+            <option value="alipay">{{ $t('enterprise.finance.bankAccounts.typeAlipay') }}</option>
           </select>
         </div>
         <div class="form-group">
-          <label>户名 <span class="required">*</span></label>
-          <input v-model="form.accountName" placeholder="请输入账户户名" />
+          <label>{{ $t('enterprise.finance.bankAccounts.accountName') }} <span class="required">*</span></label>
+          <input v-model="form.accountName" :placeholder="$t('enterprise.finance.bankAccounts.namePlaceholder')" />
         </div>
         <div class="form-group">
-          <label>账号 <span class="required">*</span></label>
-          <input v-model="form.accountNo" placeholder="银行卡号/微信号/支付宝账号" />
+          <label>{{ $t('enterprise.finance.bankAccounts.accountNo') }} <span class="required">*</span></label>
+          <input v-model="form.accountNo" :placeholder="$t('enterprise.finance.bankAccounts.noPlaceholder')" />
         </div>
         <div class="form-group" v-if="form.accountType === 'bank'">
-          <label>开户行</label>
-          <input v-model="form.bankName" placeholder="例如: 中国工商银行" />
+          <label>{{ $t('enterprise.finance.bankAccounts.bankName') }}</label>
+          <input v-model="form.bankName" :placeholder="$t('enterprise.finance.bankAccounts.bankPlaceholder')" />
         </div>
         <div class="form-group" v-if="form.accountType === 'bank'">
-          <label>支行</label>
-          <input v-model="form.bankBranch" placeholder="例如: 深圳南山支行" />
+          <label>{{ $t('enterprise.finance.bankAccounts.branch') }}</label>
+          <input v-model="form.bankBranch" :placeholder="$t('enterprise.finance.bankAccounts.branchPlaceholder')" />
         </div>
         <div class="form-group checkbox">
-          <label><input type="checkbox" v-model="form.isDefault" /> 设为默认账户</label>
+          <label><input type="checkbox" v-model="form.isDefault" /> {{ $t('enterprise.finance.bankAccounts.setDefault') }}</label>
         </div>
         <div v-if="modalError" class="error-msg">{{ modalError }}</div>
         <div class="modal-actions">
-          <button class="btn-cancel" @click="showForm = false">取消</button>
-          <button class="btn-primary" @click="handleSubmit" :disabled="submitting">{{ submitting ? '提交中...' : '确认绑定' }}</button>
+          <button class="btn-cancel" @click="showForm = false">{{ $t('enterprise.common.cancel') }}</button>
+          <button class="btn-primary" @click="handleSubmit" :disabled="submitting">{{ submitting ? $t('enterprise.finance.bankAccounts.submitting') : $t('enterprise.finance.bankAccounts.confirmBind') }}</button>
         </div>
       </div>
     </div>
@@ -67,6 +67,7 @@
 <script setup>
 import { useApi } from '~/composables/useApi';
 import { useToast } from '~/composables/useToast';
+const { t } = useI18n();
 const api = useApi();
 const toast = useToast();
 
@@ -81,31 +82,32 @@ onMounted(() => loadAccounts());
 async function loadAccounts() {
   try {
     accounts.value = await api.get('/enterprise/finance/bank-accounts') || [];
-  } catch (e) { toast.error('收款账户加载失败'); }
+  } catch (e) { toast.error(t('enterprise.finance.bankAccounts.loadFailed')); }
 }
 
 async function handleSubmit() {
   modalError.value = '';
-  if (!form.value.accountName || !form.value.accountNo) { modalError.value = '户名和账号为必填项'; return; }
+  if (!form.value.accountName || !form.value.accountNo) { modalError.value = t('enterprise.finance.bankAccounts.nameAndNoRequired'); return; }
   submitting.value = true;
   try {
     await api.post('/enterprise/finance/bank-account', form.value);
     showForm.value = false;
     form.value = { accountType: 'bank', accountName: '', accountNo: '', bankName: '', bankBranch: '', isDefault: false };
     loadAccounts();
-  } catch (e) { modalError.value = e?.data?.msg || e.message || '绑定失败'; }
+  } catch (e) { modalError.value = e?.data?.msg || e.message || t('enterprise.finance.bankAccounts.bindFailed'); }
   finally { submitting.value = false; }
 }
 
 async function handleRemove(acc) {
-  if (!confirm(`确定解绑 ${acc.account_name} 的账户吗？`)) return;
+  if (!confirm(t('enterprise.finance.bankAccounts.confirmUnbind', { name: acc.account_name }))) return;
   try {
     await api.delete(`/enterprise/finance/bank-accounts/${acc.id}`);
     loadAccounts();
-  } catch (e) { toast.error(e?.data?.msg || e.message || '解绑失败'); }
+  } catch (e) { toast.error(e?.data?.msg || e.message || t('enterprise.finance.bankAccounts.unbindFailed')); }
 }
 
-function typeLabel(t) { const m = { bank: '银行卡', wechat: '微信', alipay: '支付宝' }; return m[t] || t; }
+const typeLabels = { bank: t('enterprise.finance.bankAccounts.typeBank'), wechat: t('enterprise.finance.bankAccounts.typeWechat'), alipay: t('enterprise.finance.bankAccounts.typeAlipay') };
+function typeLabel(type) { return typeLabels[type] || type; }
 
 definePageMeta({ layout: 'enterprise' });
 </script>

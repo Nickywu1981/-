@@ -1,23 +1,23 @@
 <template>
   <div class="ent-customer-detail">
     <div class="page-header">
-      <button class="btn-back" @click="$router.back()">&larr; 返回</button>
+      <button class="btn-back" @click="$router.back()">&larr; {{ $t('enterprise.customers.detail.back') }}</button>
       <h1 class="page-title">{{ customer.nickname || customer.username }}</h1>
     </div>
 
-    <div v-if="loading" class="empty">加载中...</div>
+    <div v-if="loading" class="empty">{{ $t('enterprise.common.loading') }}</div>
     <template v-else-if="customer">
       <!-- 基本信息 -->
       <div class="card">
-        <h3>基本信息</h3>
+        <h3>{{ $t('enterprise.customers.detail.basicInfo') }}</h3>
         <div class="info-grid">
-          <div class="info-item"><span class="label">用户名</span><span>{{ customer.username }}</span></div>
-          <div class="info-item"><span class="label">昵称</span><span>{{ customer.nickname || '-' }}</span></div>
-          <div class="info-item"><span class="label">手机号</span><span>{{ customer.phone || '-' }}</span></div>
-          <div class="info-item"><span class="label">邮箱</span><span>{{ customer.email || '-' }}</span></div>
-          <div class="info-item"><span class="label">状态</span><span :class="customer.status === 1 ? 'text-green' : 'text-red'">{{ customer.status === 1 ? '正常' : '禁用' }}</span></div>
-          <div class="info-item"><span class="label">注册时间</span><span>{{ formatDate(customer.create_time) }}</span></div>
-          <div class="info-item"><span class="label">最近登录</span><span>{{ formatDate(customer.last_login_time) }}</span></div>
+          <div class="info-item"><span class="label">{{ $t('enterprise.customers.detail.username') }}</span><span>{{ customer.username }}</span></div>
+          <div class="info-item"><span class="label">{{ $t('enterprise.customers.detail.nickname') }}</span><span>{{ customer.nickname || '-' }}</span></div>
+          <div class="info-item"><span class="label">{{ $t('enterprise.customers.detail.phone') }}</span><span>{{ customer.phone || '-' }}</span></div>
+          <div class="info-item"><span class="label">{{ $t('enterprise.customers.detail.email') }}</span><span>{{ customer.email || '-' }}</span></div>
+          <div class="info-item"><span class="label">{{ $t('enterprise.customers.detail.status') }}</span><span :class="customer.status === 1 ? 'text-green' : 'text-red'">{{ customer.status === 1 ? $t('enterprise.customers.detail.statusNormal') : $t('enterprise.common.statusDisabled') }}</span></div>
+          <div class="info-item"><span class="label">{{ $t('enterprise.customers.detail.registeredAt') }}</span><span>{{ formatDate(customer.create_time) }}</span></div>
+          <div class="info-item"><span class="label">{{ $t('enterprise.customers.detail.lastLogin') }}</span><span>{{ formatDate(customer.last_login_time) }}</span></div>
         </div>
       </div>
 

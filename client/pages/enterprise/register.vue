@@ -1,51 +1,51 @@
 <template>
   <div class="ent-register">
     <div class="register-card">
-      <h1>企业入驻</h1>
-      <p class="subtitle">开通企业账号，享受团队协作与白标定制</p>
+      <h1>{{ $t('enterprise.register.title') }}</h1>
+      <p class="subtitle">{{ $t('enterprise.register.subtitle') }}</p>
 
       <form @submit.prevent="handleRegister">
         <div class="form-row">
           <div class="form-group">
-            <label>企业名称 <span class="required">*</span></label>
-            <input v-model="form.name" placeholder="请输入企业名称" required />
+            <label>{{ $t('enterprise.register.enterpriseName') }} <span class="required">*</span></label>
+            <input v-model="form.name" :placeholder="$t('enterprise.register.namePlaceholder')" required />
           </div>
           <div class="form-group">
-            <label>企业编码 <span class="required">*</span></label>
-            <input v-model="form.code" placeholder="英文/数字组合" required />
+            <label>{{ $t('enterprise.register.enterpriseCode') }} <span class="required">*</span></label>
+            <input v-model="form.code" :placeholder="$t('enterprise.register.codePlaceholder')" required />
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>联系人姓名 <span class="required">*</span></label>
-            <input v-model="form.contactName" placeholder="请输入真实姓名" required />
+            <label>{{ $t('enterprise.register.contactName') }} <span class="required">*</span></label>
+            <input v-model="form.contactName" :placeholder="$t('enterprise.register.contactPlaceholder')" required />
           </div>
           <div class="form-group">
-            <label>手机号码 <span class="required">*</span></label>
-            <input v-model="form.contactPhone" placeholder="请输入手机号" required />
+            <label>{{ $t('enterprise.register.phone') }} <span class="required">*</span></label>
+            <input v-model="form.contactPhone" :placeholder="$t('enterprise.register.phonePlaceholder')" required />
           </div>
         </div>
         <div class="form-group">
-          <label>邮箱</label>
-          <input v-model="form.contactEmail" type="email" placeholder="请输入邮箱" />
+          <label>{{ $t('enterprise.register.email') }}</label>
+          <input v-model="form.contactEmail" type="email" :placeholder="$t('enterprise.register.emailPlaceholder')" />
         </div>
         <div class="form-group">
-          <label>登录密码 <span class="required">*</span></label>
-          <input v-model="form.password" type="password" placeholder="至少6位" required minlength="6" />
+          <label>{{ $t('enterprise.register.password') }} <span class="required">*</span></label>
+          <input v-model="form.password" type="password" :placeholder="$t('enterprise.register.passwordPlaceholder')" required minlength="6" />
         </div>
         <div class="form-group">
-          <label>域名（可选，白标功能）</label>
-          <input v-model="form.domain" placeholder="例如: ai.yourcompany.com" />
+          <label>{{ $t('enterprise.register.domain') }}</label>
+          <input v-model="form.domain" :placeholder="$t('enterprise.register.domainPlaceholder')" />
         </div>
         <div v-if="error" class="error-msg">{{ error }}</div>
         <div v-if="success" class="success-msg">{{ success }}</div>
         <button type="submit" class="submit-btn" :disabled="loading">
-          {{ loading ? '提交中...' : '立即入驻' }}
+          {{ loading ? $t('enterprise.register.submitting') : $t('enterprise.register.submitBtn') }}
         </button>
       </form>
 
       <div class="links">
-        <NuxtLink to="/enterprise/login">已有企业账号？立即登录</NuxtLink>
+        <NuxtLink to="/enterprise/login">{{ $t('enterprise.register.haveAccount') }}</NuxtLink>
       </div>
     </div>
   </div>
@@ -53,6 +53,7 @@
 
 <script setup>
 import { onBeforeUnmount } from 'vue'
+const { t } = useI18n();
 const form = ref({ name: '', code: '', contactName: '', contactPhone: '', contactEmail: '', password: '', domain: '' });
 const loading = ref(false);
 const error = ref('');
@@ -72,13 +73,13 @@ async function handleRegister() {
       credentials: 'include',
     });
     if (res.code === 200) {
-      success.value = '入驻成功！3秒后跳转登录页...';
+      success.value = t('enterprise.register.success');
       redirectTimer.value = setTimeout(() => router.push('/enterprise/login'), 3000);
     } else {
-      error.value = res.msg || '入驻失败';
+      error.value = res.msg || t('enterprise.register.failed');
     }
   } catch (e) {
-    error.value = e?.data?.msg || '入驻失败，请检查网络';
+    error.value = e?.data?.msg || t('enterprise.register.networkError');
   } finally {
     loading.value = false;
   }

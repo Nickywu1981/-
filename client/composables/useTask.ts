@@ -46,7 +46,7 @@ export function useTask() {
           return;
         }
       } catch (err: any) {
-        console.warn('[useTask] 轮询请求失败', err?.message || err)
+        if (import.meta.dev) console.warn('[useTask] 轮询请求失败', err?.message || err)
         consecutiveFailures++;
         // 连续失败 3 次后报告错误状态
         if (consecutiveFailures >= 3) {

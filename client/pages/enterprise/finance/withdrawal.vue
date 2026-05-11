@@ -1,25 +1,25 @@
 <template>
   <div class="finance-withdrawal">
     <div class="page-header">
-      <h1 class="page-title">提现管理</h1>
-      <button class="btn-primary" @click="showForm = true">+ 申请提现</button>
+      <h1 class="page-title">{{ $t('enterprise.finance.withdrawal.title') }}</h1>
+      <button class="btn-primary" @click="showForm = true">+ {{ $t('enterprise.finance.withdrawal.applyWithdrawal') }}</button>
     </div>
 
     <!-- 筛选 -->
     <div class="toolbar">
       <select v-model="filterStatus" @change="loadData" class="filter-select">
-        <option value="">全部状态</option>
-        <option value="pending_review">待审核</option>
-        <option value="approved">已通过</option>
-        <option value="processing">处理中</option>
-        <option value="completed">已完成</option>
-        <option value="rejected">已驳回</option>
+        <option value="">{{ $t('enterprise.finance.withdrawal.allStatus') }}</option>
+        <option value="pending_review">{{ $t('enterprise.finance.withdrawal.statusPendingReview') }}</option>
+        <option value="approved">{{ $t('enterprise.finance.withdrawal.statusApproved') }}</option>
+        <option value="processing">{{ $t('enterprise.finance.withdrawal.statusProcessing') }}</option>
+        <option value="completed">{{ $t('enterprise.finance.withdrawal.statusCompleted') }}</option>
+        <option value="rejected">{{ $t('enterprise.finance.withdrawal.statusRejected') }}</option>
       </select>
     </div>
 
     <div class="table-wrap">
       <table v-if="list.length">
-        <thead><tr><th>订单号</th><th>金额</th><th>手续费</th><th>到账金额</th><th>收款账户</th><th>状态</th><th>时间</th></tr></thead>
+        <thead><tr><th>{{ $t('enterprise.finance.withdrawal.orderNo') }}</th><th>{{ $t('enterprise.finance.withdrawal.amount') }}</th><th>{{ $t('enterprise.finance.withdrawal.fee') }}</th><th>{{ $t('enterprise.finance.withdrawal.actualAmount') }}</th><th>{{ $t('enterprise.finance.withdrawal.bankAccount') }}</th><th>{{ $t('enterprise.finance.withdrawal.status') }}</th><th>{{ $t('enterprise.finance.withdrawal.time') }}</th></tr></thead>
         <tbody>
           <tr v-for="item in list" :key="item.id">
             <td class="mono">{{ item.order_no }}</td>
@@ -32,39 +32,39 @@
           </tr>
         </tbody>
       </table>
-      <div v-else class="empty">暂无提现记录</div>
+      <div v-else class="empty">{{ $t('enterprise.finance.withdrawal.noData') }}</div>
     </div>
 
     <div class="pager" v-if="total > pageSize">
-      <button :disabled="page <= 1" @click="page--; loadData()">上一页</button>
-      <span>第 {{ page }} / {{ Math.ceil(total / pageSize) }} 页</span>
-      <button :disabled="page >= Math.ceil(total / pageSize)" @click="page++; loadData()">下一页</button>
+      <button :disabled="page <= 1" @click="page--; loadData()">{{ $t('enterprise.common.prevPage') }}</button>
+      <span>{{ $t('enterprise.common.pageOf', { page, total: Math.ceil(total / pageSize) }) }}</span>
+      <button :disabled="page >= Math.ceil(total / pageSize)" @click="page++; loadData()">{{ $t('enterprise.common.nextPage') }}</button>
     </div>
 
     <!-- 提现申请弹窗 -->
     <div class="modal-overlay" v-if="showForm" @click.self="showForm = false">
       <div class="modal">
-        <h2>申请提现</h2>
+        <h2>{{ $t('enterprise.finance.withdrawal.applyTitle') }}</h2>
         <div class="form-group">
-          <label>提现金额 (¥) <span class="required">*</span></label>
-          <input v-model.number="form.amount" type="number" min="100" step="0.01" placeholder="最低 100 元" />
+          <label>{{ $t('enterprise.finance.withdrawal.applyAmount') }} (¥) <span class="required">*</span></label>
+          <input v-model.number="form.amount" type="number" min="100" step="0.01" :placeholder="$t('enterprise.finance.withdrawal.applyAmountPlaceholder')" />
         </div>
         <div class="form-group">
-          <label>收款账户</label>
+          <label>{{ $t('enterprise.finance.withdrawal.applyAccount') }}</label>
           <select v-model="form.bankAccountId">
-            <option :value="null">请选择收款账户</option>
+            <option :value="null">{{ $t('enterprise.finance.withdrawal.applyAccountPlaceholder') }}</option>
             <option v-for="acc in bankAccounts" :key="acc.id" :value="acc.id">
               {{ acc.account_name }} - {{ acc.bank_name || acc.account_type }} (***{{ acc.account_no.slice(-4) }})
             </option>
           </select>
         </div>
         <div v-if="form.amount >= 100" class="fee-note">
-          手续费 {{ (form.amount * 0.006).toFixed(2) }} 元 (0.6%)，到账 {{ (form.amount * 0.994).toFixed(2) }} 元
+          {{ $t('enterprise.finance.withdrawal.feeCalc', { fee: (form.amount * 0.006).toFixed(2), actual: (form.amount * 0.994).toFixed(2) }) }}
         </div>
         <div v-if="modalError" class="error-msg">{{ modalError }}</div>
         <div class="modal-actions">
-          <button class="btn-cancel" @click="showForm = false">取消</button>
-          <button class="btn-primary" @click="handleSubmit" :disabled="submitting">{{ submitting ? '提交中...' : '确认提现' }}</button>
+          <button class="btn-cancel" @click="showForm = false">{{ $t('enterprise.common.cancel') }}</button>
+          <button class="btn-primary" @click="handleSubmit" :disabled="submitting">{{ submitting ? $t('enterprise.finance.withdrawal.submitting') : $t('enterprise.finance.withdrawal.confirmWithdrawal') }}</button>
         </div>
       </div>
     </div>
@@ -74,6 +74,7 @@
 <script setup>
 import { useApi } from '~/composables/useApi';
 import { useToast } from '~/composables/useToast';
+const { t } = useI18n();
 const api = useApi();
 const toast = useToast();
 
@@ -99,32 +100,37 @@ async function loadData() {
     const data = await api.get('/enterprise/finance/withdrawal', params);
     list.value = data?.list || [];
     total.value = data?.total || 0;
-  } catch (e) { toast.error('提现记录加载失败'); }
+  } catch (e) { toast.error(t('enterprise.finance.withdrawal.loadFailed')); }
 }
 
 async function loadBankAccounts() {
   try {
     bankAccounts.value = await api.get('/enterprise/finance/bank-accounts') || [];
-  } catch (e) { toast.error('收款账户加载失败'); }
+  } catch (e) { toast.error(t('enterprise.finance.withdrawal.accountsLoadFailed')); }
 }
 
 async function handleSubmit() {
   modalError.value = '';
-  if (!form.value.amount || form.value.amount < 100) { modalError.value = '最低提现金额 100 元'; return; }
+  if (!form.value.amount || form.value.amount < 100) { modalError.value = t('enterprise.finance.withdrawal.minAmountError'); return; }
   submitting.value = true;
   try {
     await api.post('/enterprise/finance/withdrawal', form.value);
     showForm.value = false;
     form.value = { amount: 0, bankAccountId: null };
     loadData();
-  } catch (e) { modalError.value = e?.data?.msg || e.message || '提现申请失败'; }
+  } catch (e) { modalError.value = e?.data?.msg || e.message || t('enterprise.finance.withdrawal.applyFailed'); }
   finally { submitting.value = false; }
 }
 
-function statusLabel(s) {
-  const m = { pending_review: '待审核', approved: '已通过', processing: '处理中', completed: '已完成', rejected: '已驳回', failed: '失败' };
-  return m[s] || s;
-}
+const statusLabels = {
+  pending_review: t('enterprise.finance.withdrawal.statusPendingReview'),
+  approved: t('enterprise.finance.withdrawal.statusApproved'),
+  processing: t('enterprise.finance.withdrawal.statusProcessing'),
+  completed: t('enterprise.finance.withdrawal.statusCompleted'),
+  rejected: t('enterprise.finance.withdrawal.statusRejected'),
+  failed: t('enterprise.finance.withdrawal.statusFailed'),
+};
+function statusLabel(s) { return statusLabels[s] || s; }
 function fmt(n) { return (Number(n) || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2 }); }
 function formatDate(d) { return d ? new Date(d).toLocaleDateString('zh-CN') : '-'; }
 

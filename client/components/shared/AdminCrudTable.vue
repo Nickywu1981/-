@@ -113,7 +113,7 @@ async function fetch() {
   } catch (e: any) {
     const { $toast } = useNuxtApp()
     $toast?.warn('数据加载失败，请稍后再试')
-    console.warn('[AdminCrudTable] fetch failed', props.api, e.message)
+    if (import.meta.dev) console.warn('[AdminCrudTable] fetch failed', props.api, e.message)
   }
   loading.value = false
 }

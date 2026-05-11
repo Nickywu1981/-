@@ -118,7 +118,7 @@ onMounted(async () => {
     entName.value = data?.data?.name || ''
   } catch (e: any) {
     if (e?.response?.status === 401) router.push('/enterprise/login')
-    else { console.error('[enterprise] 加载企业信息失败', e); toast.error(t('enterprise.nav.loadProfileFailed')) }
+    else { if (import.meta.dev) console.error('[enterprise] 加载企业信息失败', e); toast.error(t('enterprise.nav.loadProfileFailed')) }
   }
 })
 

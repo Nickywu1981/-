@@ -143,7 +143,7 @@ export function useSiteConfig(groupKey: string) {
       }
       throw new Error(res.msg || '配置加载失败')
     } catch (e: any) {
-      console.warn(`[useSiteConfig] ${groupKey} 加载失败, 使用降级文案`, e.message)
+      if (import.meta.dev) console.warn(`[useSiteConfig] ${groupKey} 加载失败, 使用降级文案`, e.message)
       config.value = FALLBACKS[groupKey] || {}
       isFallback.value = true
       error.value = e

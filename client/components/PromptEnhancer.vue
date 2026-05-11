@@ -110,7 +110,7 @@ async function run() {
       enhanced.value = draft.value
     }
   } catch (err: any) {
-    console.warn('[PromptEnhancer] 增强失败，使用原始草稿', err?.message || err)
+    if (import.meta.dev) console.warn('[PromptEnhancer] 增强失败，使用原始草稿', err?.message || err)
     enhanced.value = draft.value
   } finally {
     enhancing.value = false

@@ -1,33 +1,33 @@
 <template>
   <div class="commerce-page">
-    <div class="page-header"><h1>商品订单</h1></div>
+    <div class="page-header"><h1>{{ $t('enterprise.commerce.index.title') }}</h1></div>
 
     <!-- 概览卡片 -->
     <div class="stat-cards">
-      <div class="stat-card"><div class="stat-num">{{ summary.total_orders || 0 }}</div><div class="stat-label">总订单</div></div>
-      <div class="stat-card"><div class="stat-num">¥{{ summary.total_revenue || '0.00' }}</div><div class="stat-label">总营收</div></div>
-      <div class="stat-card"><div class="stat-num">{{ summary.pending_count || 0 }}</div><div class="stat-label">待处理</div></div>
-      <div class="stat-card"><div class="stat-num">¥{{ summary.total_refund || '0.00' }}</div><div class="stat-label">退款总额</div></div>
+      <div class="stat-card"><div class="stat-num">{{ summary.total_orders || 0 }}</div><div class="stat-label">{{ $t('enterprise.commerce.index.totalOrders') }}</div></div>
+      <div class="stat-card"><div class="stat-num">¥{{ summary.total_revenue || '0.00' }}</div><div class="stat-label">{{ $t('enterprise.commerce.index.totalRevenue') }}</div></div>
+      <div class="stat-card"><div class="stat-num">{{ summary.pending_count || 0 }}</div><div class="stat-label">{{ $t('enterprise.commerce.index.pendingOrders') }}</div></div>
+      <div class="stat-card"><div class="stat-num">¥{{ summary.total_refund || '0.00' }}</div><div class="stat-label">{{ $t('enterprise.commerce.index.totalRefund') }}</div></div>
     </div>
 
     <!-- 筛选栏 -->
     <div class="filter-bar">
       <select v-model="filters.status" @change="loadOrders" class="input">
-        <option value="">全部状态</option>
-        <option value="pending">待支付</option>
-        <option value="paid">已支付</option>
-        <option value="processing">处理中</option>
-        <option value="completed">已完成</option>
-        <option value="refunded">已退款</option>
-        <option value="cancelled">已取消</option>
+        <option value="">{{ $t('enterprise.commerce.index.allStatus') }}</option>
+        <option value="pending">{{ $t('enterprise.commerce.index.statusPendingPay') }}</option>
+        <option value="paid">{{ $t('enterprise.commerce.index.statusPaid') }}</option>
+        <option value="processing">{{ $t('enterprise.commerce.index.statusProcessing') }}</option>
+        <option value="completed">{{ $t('enterprise.commerce.index.statusCompleted') }}</option>
+        <option value="refunded">{{ $t('enterprise.commerce.index.statusRefunded') }}</option>
+        <option value="cancelled">{{ $t('enterprise.commerce.index.statusCancelled') }}</option>
       </select>
-      <input v-model="filters.keyword" placeholder="搜索订单号/客户名/手机号" @change="debounceSearch" class="input" />
+      <input v-model="filters.keyword" :placeholder="$t('enterprise.commerce.index.searchPlaceholder')" @change="debounceSearch" class="input" />
     </div>
 
     <!-- 订单列表 -->
-    <div v-if="loading" class="loading-spin">加载中...</div>
+    <div v-if="loading" class="loading-spin">{{ $t('enterprise.common.loading') }}</div>
     <table class="data-table" v-else-if="orders.list?.length">
-      <thead><tr><th>订单号</th><th>客户</th><th>金额</th><th>状态</th><th>下单时间</th><th>操作</th></tr></thead>
+      <thead><tr><th>{{ $t('enterprise.commerce.index.orderNo') }}</th><th>{{ $t('enterprise.commerce.index.customer') }}</th><th>{{ $t('enterprise.commerce.index.amount') }}</th><th>{{ $t('enterprise.commerce.index.status') }}</th><th>{{ $t('enterprise.commerce.index.createdAt') }}</th><th>{{ $t('enterprise.commerce.index.actions') }}</th></tr></thead>
       <tbody>
         <tr v-for="o in orders.list" :key="o.id">
           <td>{{ o.order_no || o.id }}</td>
@@ -35,16 +35,16 @@
           <td>¥{{ o.amount || '0.00' }}</td>
           <td><span :class="statusClass(o.status)">{{ statusLabel(o.status) }}</span></td>
           <td>{{ formatDate(o.created_at) }}</td>
-          <td><button class="btn-sm" @click="router.push(`/enterprise/commerce/${o.id}`)">详情</button></td>
+          <td><button class="btn-sm" @click="router.push(`/enterprise/commerce/${o.id}`)">{{ $t('enterprise.commerce.index.detail') }}</button></td>
         </tr>
       </tbody>
     </table>
-    <p v-else-if="!loading" class="empty">暂无订单</p>
+    <p v-else-if="!loading" class="empty">{{ $t('enterprise.commerce.index.noData') }}</p>
 
     <div class="pagination" v-if="orders.total > orders.pageSize">
-      <button :disabled="orders.page <= 1" @click="loadOrders(orders.page - 1)">上一页</button>
-      <span>第 {{ orders.page }} / {{ Math.ceil(orders.total / orders.pageSize) }} 页</span>
-      <button :disabled="orders.page >= Math.ceil(orders.total / orders.pageSize)" @click="loadOrders(orders.page + 1)">下一页</button>
+      <button :disabled="orders.page <= 1" @click="loadOrders(orders.page - 1)">{{ $t('enterprise.common.prevPage') }}</button>
+      <span>{{ $t('enterprise.common.pageOf', { page: orders.page, total: Math.ceil(orders.total / orders.pageSize) }) }}</span>
+      <button :disabled="orders.page >= Math.ceil(orders.total / orders.pageSize)" @click="loadOrders(orders.page + 1)">{{ $t('enterprise.common.nextPage') }}</button>
     </div>
   </div>
 </template>
@@ -54,6 +54,7 @@ definePageMeta({ layout: 'enterprise' });
 import { ref, reactive, onMounted, onUnmounted } from 'vue';
 import { useToast } from '~/composables/useToast';
 
+const { t } = useI18n()
 const toast = useToast()
 const router = useRouter();
 const loading = ref(true);
@@ -73,17 +74,17 @@ async function loadOrders(page = 1) {
   try {
     const r = await $fetch(`/api/enterprise/commerce?${q}`, { credentials: 'include' });
     if (r.code === 200) Object.assign(orders, r.data);
-  } catch (e) { toast.error('订单列表加载失败'); }
+  } catch (e) { toast.error(t('enterprise.commerce.index.loadFailed')); }
 }
 async function loadSummary() {
   try {
     const r = await $fetch('/api/enterprise/commerce/stats/summary', { credentials: 'include' });
     if (r.code === 200) summary.value = r.data;
-  } catch (e) { toast.error('数据概览加载失败'); }
+  } catch (e) { toast.error(t('enterprise.commerce.index.statsLoadFailed')); }
 }
 function debounceSearch() { clearTimeout(searchTimer); searchTimer = setTimeout(() => loadOrders(), 400); }
 function statusClass(s) { return { pending: 'status-warn', paid: 'status-ok', processing: 'status-info', completed: 'status-ok', refunded: 'status-err', cancelled: 'status-err' }[s] || ''; }
-function statusLabel(s) { return { pending: '待支付', paid: '已支付', processing: '处理中', completed: '已完成', refunded: '已退款', cancelled: '已取消' }[s] || s; }
+function statusLabel(s) { return { pending: t('enterprise.commerce.index.statusPendingPay'), paid: t('enterprise.commerce.index.statusPaid'), processing: t('enterprise.commerce.index.statusProcessing'), completed: t('enterprise.commerce.index.statusCompleted'), refunded: t('enterprise.commerce.index.statusRefunded'), cancelled: t('enterprise.commerce.index.statusCancelled') }[s] || s; }
 function formatDate(d) { return d ? new Date(d).toLocaleDateString('zh-CN') : '-'; }
 </script>
 

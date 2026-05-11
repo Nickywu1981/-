@@ -33,7 +33,7 @@ export function useAppDict(dictKey: string, fallbackList?: any[]) {
         options.value = cache[dictKey]
       }
     } catch (e) {
-      console.warn(`[useAppDict] ${dictKey} 加载失败`, e)
+      if (import.meta.dev) console.warn(`[useAppDict] ${dictKey} 加载失败`, e)
       if (fallbackList?.length && options.value.length === 0) {
         options.value = fallbackList
       }
