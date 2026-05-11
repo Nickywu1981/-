@@ -101,8 +101,8 @@ const groups = reactive<NavGroup[]>([
       { key: 'collection', label: '作品集管理', route: '/admin/collection' },
       { key: 'prompts', label: '提示词模板', route: '/admin/prompts' },
       { key: 'templates', label: '模板管理', route: '/admin/templates' },
-      { key: 'diy', label: 'DIY 页面', route: '/admin/diy' },
       { key: 'diy-pages', label: 'DIY 页面管理', route: '/admin/diy-pages' },
+      { key: 'workspace-diy', label: '工作台 DIY', route: '/admin/workspace-diy' },
     ],
   },
   {

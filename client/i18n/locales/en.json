@@ -110,7 +110,32 @@
       {"icon":"⚡","name":"Pro","price":"99","features":["500 images/month","50 videos/month","All templates + styles","1080p output","Batch processing","API access"],"featured":true},
       {"icon":"🏭","name":"Enterprise","price":"299","features":["Unlimited images","Unlimited videos","Custom style training","4K output","Private deployment","Dedicated support"],"featured":false}
     ],
-    "platforms": ["Taobao","Pinduoduo","Douyin","Xiaohongshu","WeChat Video","Amazon","Temu","Shein","TikTok Shop","Mercado Libre","Shopee","Lazada"]
+    "platforms": ["Taobao","Pinduoduo","Douyin","Xiaohongshu","WeChat Video","Amazon","Temu","Shein","TikTok Shop","Mercado Libre","Shopee","Lazada"],
+    "feature_cards": [
+      {"id":"main","icon":"▣","title":"AI Main Image","desc":"AI auto cutout→white bg→retouch→crop→watermark, one-click 3 styles","tags":["Best-Seller","13 Platforms"],"color":"#EDE9FE","ai":true,"route":"/work/main-image","category":"image"},
+      {"id":"scene","icon":"◈","title":"AI Scene","desc":"Product photo+scene library→auto lighting blend→5 scene images, custom bg","tags":["Scene Blend","Light Match"],"color":"#DBEAFE","ai":true,"route":"/work/scene","category":"image"},
+      {"id":"detail","icon":"⊞","title":"AI Detail Page","desc":"Product photo→AI copy+layout→full detail page, multi-category support","tags":["AI Copy","Auto Layout"],"color":"#D1FAE5","ai":true,"route":"/work/detail-h5","category":"image"},
+      {"id":"video","icon":"▶","title":"AI Video","desc":"Images→AI sales video→auto subtitles+BGM→1080×1920 portrait output","tags":["AI Camera","Auto Subs"],"color":"#FEF3C7","ai":true,"route":"/work/video","category":"video"},
+      {"id":"batch","icon":"⊡","title":"Batch Processing","desc":"Drag folder→select op→queue→notify→ZIP download, night processing support","tags":["Batch Queue","Night Discount"],"color":"#F3E8FF","ai":false,"route":"/work/batch","category":"image"},
+      {"id":"tryon","icon":"◇","title":"Virtual Try-On","desc":"Flat clothing→real model effect, multi-skin tone/body/style options","tags":["AI Try-On","Multi-Skin"],"color":"#ECFEFF","ai":true,"route":"/work/virtual-tryon","category":"image"},
+      {"id":"action","icon":"◉","title":"Action Transfer","desc":"Person image+ref video→AI precise motion transfer, smooth showcase video","tags":["Motion Capture","Precise"],"color":"#FCE7F3","ai":true,"route":"/work/action-transfer","category":"video"},
+      {"id":"color","icon":"◐","title":"Color Swap","desc":"Clothing/shoes/bags color change, preserve wrinkles & texture, batch support","tags":["Multi-Color","Texture Keep"],"color":"#FFF7ED","ai":true,"route":"/work/color-swap","category":"image"},
+      {"id":"style","icon":"◧","title":"Style Transfer","desc":"6 styles: Vintage/China Chic/Illustration/Watercolor/Cyber/Minimal","tags":["6 Styles","Creative"],"color":"#F0FDF4","ai":true,"route":"/work/style-transfer","category":"image"},
+      {"id":"digital","icon":"◓","title":"Digital Human VO","desc":"Input script→select avatar+voice→AI generate sales voiceover video","tags":["Digital Human","TTS Voice"],"color":"#FFFBEB","ai":true,"route":"/work/digital-human","category":"video"},
+      {"id":"script","icon":"▤","title":"Sales Script","desc":"Product USP→AI short video/livestream/social scripts, 9 languages+3 types","tags":["9 Languages","VO+Script"],"color":"#FDF2F8","ai":true,"route":"/work/script-gen","category":"ai"},
+      {"id":"viral","icon":"◆","title":"Viral Clone","desc":"Reference viral video→AI analyze rhythm/color/transition→regenerate your product","tags":["Viral Analysis","Style Clone"],"color":"#FEF2F2","ai":true,"route":"/work/viral-clone","category":"video"},
+      {"id":"remove-bg","icon":"◯","title":"Smart Cutout","desc":"AI hair-level cutout, fur/transparent/complex edges, single+batch support","tags":["Hair-Level","Batch"],"color":"#E8F5E9","ai":true,"route":"/work/remove-bg","category":"image"},
+      {"id":"white-bg","icon":"▭","title":"White BG Generate","desc":"Post-cutout smart white/scene bg, auto light correction+shadow, platform-ready","tags":["White/Transparent","Light Fix"],"color":"#F5F5F5","ai":true,"route":"/work/white-bg","category":"image"},
+      {"id":"retouch","icon":"✦","title":"Image Retouch","desc":"AI auto de-wrinkle/de-spot/fill light/sharpen, preserve texture, batch enhance","tags":["De-Wrinkle","Texture Keep"],"color":"#FFF8E1","ai":true,"route":"/work/retouch","category":"image"},
+      {"id":"platform-detail","icon":"▥","title":"Platform Templates","desc":"13 platform detail page templates, pick platform→template→upload→auto adapt","tags":["13 Platforms","Auto Adapt"],"color":"#EFF6FF","ai":true,"route":"/work/platform-detail","category":"image"},
+      {"id":"compliance","icon":"◬","title":"Compliance Check","desc":"Upload image+copy→auto check Amazon/Temu/TikTok/Shein compliance, US/EU/JP","tags":["Compliance","Multi-Market"],"color":"#FFF1F2","ai":true,"route":"/work/compliance-check","category":"ai"},
+      {"id":"ghost-mannequin","icon":"▯","title":"Ghost Mannequin","desc":"Flat/hanging clothing→AI auto dress invisible mannequin, 3D effect showcase","tags":["3D Effect","Invisible Model"],"color":"#F0F9FF","ai":true,"route":"/work/ghost-mannequin","category":"image"},
+      {"id":"outpaint","icon":"▩","title":"Smart Outpainting","desc":"AI expand image edges, auto complete composition, adapt platform ratios","tags":["Composition Fill","Ratio Adapt"],"color":"#F5F3FF","ai":true,"route":"/work/outpainting","category":"image"},
+      {"id":"image-translate","icon":"🌐","title":"Image Translate","desc":"Product image text OCR→translate 9 languages→in-place replace, cross-border must","tags":["OCR","9 Languages"],"color":"#ECFDF5","ai":true,"route":"/work/image-translate","category":"image"},
+      {"id":"video-edit","icon":"▸","title":"Video Editor","desc":"AI smart crop/speed/transition/color, auto multi-size multi-duration output","tags":["Smart Edit","Multi-Size"],"color":"#FFF7ED","ai":true,"route":"/work/video-edit","category":"video"},
+      {"id":"voice-gen","icon":"♫","title":"AI Voiceover","desc":"Input script→pick voice→natural sales voiceover, 9 languages 50+ voices","tags":["TTS","50+ Voices"],"color":"#FDF2F8","ai":true,"route":"/work/voice-gen","category":"ai"},
+      {"id":"storyboard","icon":"⊟","title":"Smart Storyboard","desc":"Script→AI auto split shots+voiceover+subtitles, one-click full short video","tags":["Script Split","Auto Storyboard"],"color":"#FFF1F2","ai":true,"route":"/work/storyboard","category":"video"}
+    ]
   },
   "work": {
     "title": "AI E-commerce Workspace",
