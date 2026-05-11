@@ -7,7 +7,7 @@
         <div><label>{{ $t('enterprise.commerce.detail.orderNo') }}</label><span>{{ order.order_no || order.id }}</span></div>
         <div><label>{{ $t('enterprise.commerce.detail.status') }}</label><span :class="statusClass(order.status)">{{ statusLabel(order.status) }}</span></div>
         <div><label>{{ $t('enterprise.commerce.detail.amount') }}</label><span>¥{{ order.amount || '0.00' }}</span></div>
-        <div><label>{{ $t('enterprise.commerce.detail.createdAt') }}</label><span>{{ formatDate(order.created_at) }}</span></div>
+        <div><label>{{ $t('enterprise.commerce.detail.createdAt') }}</label><span>{{ formatDateTimeLocale(order.created_at) }}</span></div>
         <div><label>{{ $t('enterprise.commerce.detail.customer') }}</label><span>{{ order.customer_name || '-' }}</span></div>
         <div><label>{{ $t('enterprise.commerce.detail.phone') }}</label><span>{{ order.customer_phone || '-' }}</span></div>
         <div><label>{{ $t('enterprise.commerce.detail.email') }}</label><span>{{ order.customer_email || '-' }}</span></div>
@@ -22,6 +22,7 @@
 definePageMeta({ layout: 'enterprise' });
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import { formatDateTimeLocale } from '~/utils/format';
 const { t } = useI18n()
 const router = useRouter(); const route = useRoute(); const order = ref(null); const loadError = ref(false);
 async function loadOrder() {
@@ -34,7 +35,6 @@ async function loadOrder() {
 onMounted(loadOrder);
 function statusClass(s) { return { pending: 'status-warn', paid: 'status-ok', processing: 'status-info', completed: 'status-ok', refunded: 'status-err', cancelled: 'status-err' }[s] || ''; }
 function statusLabel(s) { return { pending: t('enterprise.commerce.index.statusPendingPay'), paid: t('enterprise.commerce.index.statusPaid'), processing: t('enterprise.commerce.index.statusProcessing'), completed: t('enterprise.commerce.index.statusCompleted'), refunded: t('enterprise.commerce.index.statusRefunded'), cancelled: t('enterprise.commerce.index.statusCancelled') }[s] || s; }
-function formatDate(d) { return d ? new Date(d).toLocaleString('zh-CN') : '-'; }
 </script>
 
 <style scoped>

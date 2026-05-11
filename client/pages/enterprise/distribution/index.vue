@@ -22,7 +22,7 @@
           <tr v-for="m in team" :key="m.id">
             <td>{{ m.nickname || m.username }}</td>
             <td>{{ m.phone || '-' }}</td>
-            <td>{{ formatDate(m.joined_at) }}</td>
+            <td>{{ formatDateLocale(m.joined_at) }}</td>
             <td>{{ m.commission || '0.00' }}</td>
             <td>{{ m.level === 1 ? $t('enterprise.distribution.index.level1') : $t('enterprise.distribution.index.level2') }}</td>
           </tr>
@@ -38,7 +38,7 @@
         <thead><tr><th>{{ $t('enterprise.distribution.index.time') }}</th><th>{{ $t('enterprise.distribution.index.type') }}</th><th>{{ $t('enterprise.distribution.index.amount') }}</th><th>{{ $t('enterprise.distribution.index.source') }}</th></tr></thead>
         <tbody>
           <tr v-for="h in history.list" :key="h.id">
-            <td>{{ formatDate(h.created_at) }}</td>
+            <td>{{ formatDateLocale(h.created_at) }}</td>
             <td>{{ h.type === 'commission' ? $t('enterprise.distribution.index.typeCommission') : h.type === 'withdraw' ? $t('enterprise.distribution.index.typeWithdraw') : h.type }}</td>
             <td :class="h.amount > 0 ? 'text-green' : ''">{{ h.amount > 0 ? '+' : '' }}{{ h.amount }}</td>
             <td>{{ h.source || '-' }}</td>
@@ -54,6 +54,7 @@
 <script setup>
 definePageMeta({ layout: 'enterprise' });
 import { ref, onMounted } from 'vue';
+import { formatDateLocale } from '~/utils/format';
 
 const inviteCode = ref('');
 const team = ref([]);
@@ -90,5 +91,4 @@ async function loadHistory() {
     history.value = r.data || { list: [] };
   } catch (e) { if (import.meta.dev) console.error('loadHistory:', e) }
 }
-function formatDate(d) { return d ? new Date(d).toLocaleDateString('zh-CN') : '-'; }
 </script>

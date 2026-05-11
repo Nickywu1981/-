@@ -4,10 +4,10 @@
 
     <!-- 收益概览 -->
     <div class="summary-grid" v-if="summary">
-      <div class="summary-item"><span class="label">{{ $t('enterprise.finance.earnings.totalCommission') }}</span><strong>¥{{ fmt(summary.totalEarnings) }}</strong></div>
-      <div class="summary-item"><span class="label">{{ $t('enterprise.finance.earnings.settled') }}</span><strong class="green">¥{{ fmt(summary.settled) }}</strong></div>
-      <div class="summary-item"><span class="label">{{ $t('enterprise.finance.earnings.pendingSettle') }}</span><strong class="orange">¥{{ fmt(summary.pending) }}</strong></div>
-      <div class="summary-item"><span class="label">{{ $t('enterprise.finance.earnings.withdrawn') }}</span><strong class="blue">¥{{ fmt(summary.withdrawn) }}</strong></div>
+      <div class="summary-item"><span class="label">{{ $t('enterprise.finance.earnings.totalCommission') }}</span><strong>¥{{ fmtMoney(summary.totalEarnings) }}</strong></div>
+      <div class="summary-item"><span class="label">{{ $t('enterprise.finance.earnings.settled') }}</span><strong class="green">¥{{ fmtMoney(summary.settled) }}</strong></div>
+      <div class="summary-item"><span class="label">{{ $t('enterprise.finance.earnings.pendingSettle') }}</span><strong class="orange">¥{{ fmtMoney(summary.pending) }}</strong></div>
+      <div class="summary-item"><span class="label">{{ $t('enterprise.finance.earnings.withdrawn') }}</span><strong class="blue">¥{{ fmtMoney(summary.withdrawn) }}</strong></div>
     </div>
 
     <!-- 筛选 -->
@@ -29,12 +29,12 @@
         <tbody>
           <tr v-for="item in list" :key="item.id">
             <td>{{ item.consumer_name || `${$t('enterprise.finance.earnings.consumerUser')}${item.consumer_id}` }}</td>
-            <td>¥{{ fmt(item.order_amount) }}</td>
+            <td>¥{{ fmtMoney(item.order_amount) }}</td>
             <td>{{ item.commission_rate }}%</td>
-            <td class="green">¥{{ fmt(item.commission) }}</td>
+            <td class="green">¥{{ fmtMoney(item.commission) }}</td>
             <td>{{ item.level === 1 ? $t('enterprise.finance.earnings.level1') : $t('enterprise.finance.earnings.level2') }}</td>
             <td><span :class="['status-tag', item.status]">{{ statusLabel(item.status) }}</span></td>
-            <td>{{ formatDate(item.created_at) }}</td>
+            <td>{{ formatDateLocale(item.created_at) }}</td>
           </tr>
         </tbody>
       </table>
@@ -51,7 +51,7 @@
 
 <script setup>
 import { useApi } from '~/composables/useApi';
-import { useToast } from '~/composables/useToast';
+import { formatDateLocale, fmtMoney } from '~/utils/format';
 const { t } = useI18n();
 const api = useApi();
 const toast = useToast();
@@ -81,8 +81,6 @@ async function loadData() {
 }
 
 function statusLabel(s) { const m = { settled: t('enterprise.finance.earnings.statusSettled'), pending: t('enterprise.finance.earnings.statusPending'), withdrawn: t('enterprise.finance.earnings.statusWithdrawn'), cancelled: t('enterprise.finance.earnings.statusCancelled') }; return m[s] || s; }
-function fmt(n) { return (Number(n) || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2 }); }
-function formatDate(d) { return d ? new Date(d).toLocaleDateString('zh-CN') : '-'; }
 
 definePageMeta({ layout: 'enterprise' });
 </script>

@@ -22,11 +22,11 @@
         <tbody>
           <tr v-for="item in list" :key="item.id">
             <td><span :class="['type-tag', item.ledger_type]">{{ typeLabel(item.ledger_type) }}</span></td>
-            <td :class="item.amount >= 0 ? 'green' : 'red'">{{ item.amount >= 0 ? '+' : '' }}{{ fmt(item.amount) }}</td>
-            <td>{{ fmt(item.balance_before) }}</td>
-            <td>{{ fmt(item.balance_after) }}</td>
+            <td :class="item.amount >= 0 ? 'green' : 'red'">{{ item.amount >= 0 ? '+' : '' }}{{ fmtMoney(item.amount) }}</td>
+            <td>{{ fmtMoney(item.balance_before) }}</td>
+            <td>{{ fmtMoney(item.balance_after) }}</td>
             <td class="remark">{{ item.remark || '-' }}</td>
-            <td>{{ formatDate(item.create_time) }}</td>
+            <td>{{ formatDateLocale(item.create_time) }}</td>
           </tr>
         </tbody>
       </table>
@@ -43,7 +43,7 @@
 
 <script setup>
 import { useApi } from '~/composables/useApi';
-import { useToast } from '~/composables/useToast';
+import { formatDateLocale, fmtMoney } from '~/utils/format';
 const { t } = useI18n();
 const api = useApi();
 const toast = useToast();
@@ -71,8 +71,6 @@ async function loadData() {
 }
 
 function typeLabel(ty) { const m: Record<string, string> = { revenue: t('enterprise.finance.ledger.typeRevenue'), commission: t('enterprise.finance.ledger.typeCommission'), withdrawal: t('enterprise.finance.ledger.typeWithdrawal'), refund: t('enterprise.finance.ledger.typeRefund'), adjustment: t('enterprise.finance.ledger.typeAdjustment') }; return m[ty] || ty; }
-function fmt(n) { return (Number(n) || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2 }); }
-function formatDate(d) { return d ? new Date(d).toLocaleDateString('zh-CN') : '-'; }
 
 definePageMeta({ layout: 'enterprise' });
 </script>

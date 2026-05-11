@@ -16,8 +16,8 @@
           <div class="info-item"><span class="label">{{ $t('enterprise.customers.detail.phone') }}</span><span>{{ customer.phone || '-' }}</span></div>
           <div class="info-item"><span class="label">{{ $t('enterprise.customers.detail.email') }}</span><span>{{ customer.email || '-' }}</span></div>
           <div class="info-item"><span class="label">{{ $t('enterprise.customers.detail.status') }}</span><span :class="customer.status === 1 ? 'text-green' : 'text-red'">{{ customer.status === 1 ? $t('enterprise.customers.detail.statusNormal') : $t('enterprise.common.statusDisabled') }}</span></div>
-          <div class="info-item"><span class="label">{{ $t('enterprise.customers.detail.registeredAt') }}</span><span>{{ formatDate(customer.create_time) }}</span></div>
-          <div class="info-item"><span class="label">{{ $t('enterprise.customers.detail.lastLogin') }}</span><span>{{ formatDate(customer.last_login_time) }}</span></div>
+          <div class="info-item"><span class="label">{{ $t('enterprise.customers.detail.registeredAt') }}</span><span>{{ formatDateTimeLocale(customer.create_time) }}</span></div>
+          <div class="info-item"><span class="label">{{ $t('enterprise.customers.detail.lastLogin') }}</span><span>{{ formatDateTimeLocale(customer.last_login_time) }}</span></div>
         </div>
       </div>
 
@@ -27,8 +27,8 @@
         <div class="info-grid">
           <div class="info-item"><span class="label">{{ $t('enterprise.customers.detail.memberLevel') }}</span><span>{{ planLabel(customer.plan_type) }}</span></div>
           <div class="info-item"><span class="label">{{ $t('enterprise.customers.detail.pointsBalance') }}</span><span>{{ customer.credit_balance ?? 0 }}</span></div>
-          <div class="info-item"><span class="label">{{ $t('enterprise.customers.detail.memberStart') }}</span><span>{{ formatDate(customer.membership_start) }}</span></div>
-          <div class="info-item"><span class="label">{{ $t('enterprise.customers.detail.memberExpire') }}</span><span>{{ formatDate(customer.membership_end) }}</span></div>
+          <div class="info-item"><span class="label">{{ $t('enterprise.customers.detail.memberStart') }}</span><span>{{ formatDateTimeLocale(customer.membership_start) }}</span></div>
+          <div class="info-item"><span class="label">{{ $t('enterprise.customers.detail.memberExpire') }}</span><span>{{ formatDateTimeLocale(customer.membership_end) }}</span></div>
         </div>
       </div>
 
@@ -60,7 +60,7 @@
               <td>{{ orderActionLabel(o.action) }}</td>
               <td>&yen;{{ o.consumed || 0 }}</td>
               <td>{{ o.remark || '-' }}</td>
-              <td>{{ formatDate(o.create_time) }}</td>
+              <td>{{ formatDateTimeLocale(o.create_time) }}</td>
             </tr>
           </tbody>
         </table>
@@ -75,6 +75,7 @@
 definePageMeta({ layout: 'enterprise' });
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import { formatDateTimeLocale } from '~/utils/format';
 
 const { t } = useI18n()
 const route = useRoute();
@@ -91,7 +92,6 @@ async function loadDetail() {
 }
 
 function planLabel(type) { const map = { 1: t('enterprise.customers.index.memberMonthly'), 2: t('enterprise.customers.index.memberQuarterly'), 3: t('enterprise.customers.index.memberYearly') }; return map[type] || t('enterprise.common.freeLabel'); }
-function formatDate(d) { return d ? new Date(d).toLocaleString('zh-CN') : '-'; }
 function orderActionLabel(a) {
   const map = { purchase_plan_1: t('enterprise.customers.index.memberMonthly'), purchase_plan_2: t('enterprise.customers.index.memberQuarterly'), purchase_plan_3: t('enterprise.customers.index.memberYearly') };
   return map[a] || a || '-';

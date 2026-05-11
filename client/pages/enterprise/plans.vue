@@ -27,7 +27,6 @@
 </template>
 
 <script setup>
-import { useToast } from '~/composables/useToast';
 const toast = useToast();
 const { t } = useI18n();
 const plans = ref([]);

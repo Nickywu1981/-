@@ -40,7 +40,6 @@
 </template>
 
 <script setup>
-import { useToast } from '~/composables/useToast';
 const toast = useToast();
 const { t } = useI18n();
 const form = ref({ siteName: '', logo: '', primaryColor: '#667eea', domain: '' });

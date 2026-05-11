@@ -29,7 +29,7 @@
             <td>{{ u.email || '-' }}</td>
             <td>{{ roleLabel(u.role) }}</td>
             <td><span :class="['status-tag', u.status === 1 ? 'on' : 'off']">{{ u.status === 1 ? $t('enterprise.common.statusEnabled') : $t('enterprise.common.statusDisabled') }}</span></td>
-            <td>{{ formatDate(u.create_time) }}</td>
+            <td>{{ formatDateLocale(u.create_time) }}</td>
             <td class="actions">
               <button class="btn-sm" @click="editUser(u)">{{ $t('enterprise.users.edit') }}</button>
               <button class="btn-sm danger" @click="handleRemove(u)">{{ $t('enterprise.users.remove') }}</button>
@@ -93,8 +93,8 @@
 </template>
 
 <script setup>
-import { useToast } from '~/composables/useToast';
 import { useConfirm } from '~/composables/useConfirm';
+import { formatDateLocale } from '~/utils/format';
 const { t } = useI18n();
 const toast = useToast();
 const { confirm } = useConfirm();
@@ -161,7 +161,6 @@ async function handleSave() {
 function closeModal() { showAdd.value = false; showEdit.value = false; modalError.value = ''; form.value = { phone: '', email: '', nickname: '', password: '', role: 'enterprise_operator', status: 1 }; }
 
 function roleLabel(r) { const m = { enterprise_admin: t('enterprise.users.roleAdmin'), enterprise_operator: t('enterprise.users.roleOperator'), enterprise_viewer: t('enterprise.users.roleViewer') }; return m[r] || r; }
-function formatDate(d) { return d ? new Date(d).toLocaleDateString('zh-CN') : '-'; }
 
 definePageMeta({ layout: 'enterprise' });
 </script>

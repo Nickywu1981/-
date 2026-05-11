@@ -25,7 +25,7 @@
             <td>{{ ch.level === 1 ? $t('enterprise.channels.index.direct') : $t('enterprise.channels.index.level2') }}</td>
             <td>{{ ch.contact_name }} / {{ ch.contact_phone }}</td>
             <td><span :class="statusClass(ch.status)">{{ statusLabel(ch.status) }}</span></td>
-            <td>{{ formatDate(ch.applied_at) }}</td>
+            <td>{{ formatDateLocale(ch.applied_at) }}</td>
             <td>
               <button v-if="ch.status === 'pending'" class="btn-sm btn-success" @click="audit(ch.id, 'active')">{{ $t('enterprise.channels.index.approve') }}</button>
               <button v-if="ch.status === 'pending'" class="btn-sm btn-danger" @click="audit(ch.id, 'rejected')">{{ $t('enterprise.channels.index.reject') }}</button>
@@ -69,7 +69,7 @@
 definePageMeta({ layout: 'enterprise' });
 import { ref, computed, reactive, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { useToast } from '~/composables/useToast';
+import { formatDateLocale } from '~/utils/format';
 const { t } = useI18n();
 
 const toast = useToast();
@@ -145,5 +145,4 @@ async function doAudit() {
 function viewDetail(id) { router.push(`/enterprise/channels/${id}`); }
 function statusClass(s) { return { pending: 'status-warn', active: 'status-ok', rejected: 'status-err', suspended: 'status-warn' }[s] || ''; }
 function statusLabel(s) { return { pending: t('enterprise.common.statusPending'), active: t('enterprise.common.statusActive'), rejected: t('enterprise.common.statusRejected'), suspended: t('enterprise.common.statusSuspended') }[s] || s; }
-function formatDate(d) { return d ? new Date(d).toLocaleDateString('zh-CN') : '-'; }
 </script>

@@ -10,7 +10,7 @@
         <div><label>{{ $t('enterprise.channels.detail.status') }}</label><span :style="statusStyle(channel.status)">{{ statusLabel(channel.status) }}</span></div>
         <div><label>{{ $t('enterprise.channels.detail.contact') }}</label><span>{{ channel.contact_name }}</span></div>
         <div><label>{{ $t('enterprise.channels.detail.contactPhone') }}</label><span>{{ channel.contact_phone }}</span></div>
-        <div><label>{{ $t('enterprise.channels.detail.applyTime') }}</label><span>{{ formatDate(channel.applied_at) }}</span></div>
+        <div><label>{{ $t('enterprise.channels.detail.applyTime') }}</label><span>{{ formatDateTimeLocale(channel.applied_at) }}</span></div>
         <div><label>{{ $t('enterprise.channels.detail.commissionRate') }}</label><span>{{ channel.commission_rate || '-' }}%</span></div>
       </div>
     </div>
@@ -23,6 +23,7 @@
 definePageMeta({ layout: 'enterprise' });
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import { formatDateTimeLocale } from '~/utils/format';
 const { t } = useI18n();
 const router = useRouter(); const route = useRoute(); const channel = ref(null); const loadError = ref(false);
 async function loadChannel() {
@@ -35,7 +36,6 @@ async function loadChannel() {
 onMounted(loadChannel);
 function statusLabel(s) { return { pending: t('enterprise.common.statusPending'), active: t('enterprise.common.statusActive'), rejected: t('enterprise.common.statusRejected'), suspended: t('enterprise.common.statusSuspended') }[s] || s; }
 function statusStyle(s) { return { pending: { color: '#f59e0b' }, active: { color: '#10b981' }, rejected: { color: '#ef4444' }, suspended: { color: '#f59e0b' } }[s] || {}; }
-function formatDate(d) { return d ? new Date(d).toLocaleString('zh-CN') : '-'; }
 </script>
 
 <style scoped>

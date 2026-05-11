@@ -34,7 +34,7 @@
           <td>{{ o.customer_name || '-' }}<br/><small>{{ o.customer_phone || '' }}</small></td>
           <td>¥{{ o.amount || '0.00' }}</td>
           <td><span :class="statusClass(o.status)">{{ statusLabel(o.status) }}</span></td>
-          <td>{{ formatDate(o.created_at) }}</td>
+          <td>{{ formatDateLocale(o.created_at) }}</td>
           <td><button class="btn-sm" @click="router.push(`/enterprise/commerce/${o.id}`)">{{ $t('enterprise.commerce.index.detail') }}</button></td>
         </tr>
       </tbody>
@@ -52,7 +52,7 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'enterprise' });
 import { ref, reactive, onMounted, onUnmounted } from 'vue';
-import { useToast } from '~/composables/useToast';
+import { formatDateLocale } from '~/utils/format';
 
 const { t } = useI18n()
 const toast = useToast()
@@ -85,7 +85,6 @@ async function loadSummary() {
 function debounceSearch() { clearTimeout(searchTimer); searchTimer = setTimeout(() => loadOrders(), 400); }
 function statusClass(s) { return { pending: 'status-warn', paid: 'status-ok', processing: 'status-info', completed: 'status-ok', refunded: 'status-err', cancelled: 'status-err' }[s] || ''; }
 function statusLabel(s) { return { pending: t('enterprise.commerce.index.statusPendingPay'), paid: t('enterprise.commerce.index.statusPaid'), processing: t('enterprise.commerce.index.statusProcessing'), completed: t('enterprise.commerce.index.statusCompleted'), refunded: t('enterprise.commerce.index.statusRefunded'), cancelled: t('enterprise.commerce.index.statusCancelled') }[s] || s; }
-function formatDate(d) { return d ? new Date(d).toLocaleDateString('zh-CN') : '-'; }
 </script>
 
 <style scoped>

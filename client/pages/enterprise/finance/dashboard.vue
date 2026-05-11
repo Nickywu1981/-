@@ -29,19 +29,19 @@
       <div class="stat-grid" style="margin-bottom: var(--space-6);">
         <div class="stat-card">
           <div class="stat-card-label">{{ $t('enterprise.finance.dashboard.accountBalance') }}</div>
-          <div class="stat-card-value" style="color: var(--color-brand-600);">¥{{ fmt(dashboard.balance) }}</div>
+          <div class="stat-card-value" style="color: var(--color-brand-600);">¥{{ fmtMoney(dashboard.balance) }}</div>
         </div>
         <div class="stat-card">
           <div class="stat-card-label">{{ $t('enterprise.finance.dashboard.totalRevenue') }}</div>
-          <div class="stat-card-value">¥{{ fmt(dashboard.totalRevenue) }}</div>
+          <div class="stat-card-value">¥{{ fmtMoney(dashboard.totalRevenue) }}</div>
         </div>
         <div class="stat-card">
           <div class="stat-card-label">{{ $t('enterprise.finance.dashboard.revenue30d') }}</div>
-          <div class="stat-card-value">¥{{ fmt(dashboard.monthRevenue) }}</div>
+          <div class="stat-card-value">¥{{ fmtMoney(dashboard.monthRevenue) }}</div>
         </div>
         <div v-if="isAgent" class="stat-card">
           <div class="stat-card-label">{{ $t('enterprise.finance.dashboard.totalWithdrawal') }}</div>
-          <div class="stat-card-value">¥{{ fmt(dashboard.totalWithdrawn) }}</div>
+          <div class="stat-card-value">¥{{ fmtMoney(dashboard.totalWithdrawn) }}</div>
         </div>
       </div>
 
@@ -51,23 +51,23 @@
         <div class="stat-grid">
           <div style="text-align:center">
             <div class="stat-card-label">{{ $t('enterprise.finance.dashboard.totalCommission') }}</div>
-            <div style="font-size:var(--text-2xl);font-weight:var(--font-semibold);color:var(--text-primary);">¥{{ fmt(dashboard.earnings.totalEarnings) }}</div>
+            <div style="font-size:var(--text-2xl);font-weight:var(--font-semibold);color:var(--text-primary);">¥{{ fmtMoney(dashboard.earnings.totalEarnings) }}</div>
           </div>
           <div style="text-align:center">
             <div class="stat-card-label">{{ $t('enterprise.finance.dashboard.settled') }}</div>
-            <div style="font-size:var(--text-2xl);font-weight:var(--font-semibold);color:var(--color-success-500);">¥{{ fmt(dashboard.earnings.settled) }}</div>
+            <div style="font-size:var(--text-2xl);font-weight:var(--font-semibold);color:var(--color-success-500);">¥{{ fmtMoney(dashboard.earnings.settled) }}</div>
           </div>
           <div style="text-align:center">
             <div class="stat-card-label">{{ $t('enterprise.finance.dashboard.pendingSettle') }}</div>
-            <div style="font-size:var(--text-2xl);font-weight:var(--font-semibold);color:var(--color-warning-500);">¥{{ fmt(dashboard.earnings.pending) }}</div>
+            <div style="font-size:var(--text-2xl);font-weight:var(--font-semibold);color:var(--color-warning-500);">¥{{ fmtMoney(dashboard.earnings.pending) }}</div>
           </div>
           <div style="text-align:center">
             <div class="stat-card-label">{{ $t('enterprise.finance.dashboard.withdrawn') }}</div>
-            <div style="font-size:var(--text-2xl);font-weight:var(--font-semibold);color:var(--text-primary);">¥{{ fmt(dashboard.earnings.withdrawn) }}</div>
+            <div style="font-size:var(--text-2xl);font-weight:var(--font-semibold);color:var(--text-primary);">¥{{ fmtMoney(dashboard.earnings.withdrawn) }}</div>
           </div>
           <div style="text-align:center">
             <div class="stat-card-label">{{ $t('enterprise.finance.dashboard.pendingReview') }}</div>
-            <div style="font-size:var(--text-2xl);font-weight:var(--font-semibold);color:var(--color-info-500);">¥{{ fmt(dashboard.pendingWithdrawal) }}</div>
+            <div style="font-size:var(--text-2xl);font-weight:var(--font-semibold);color:var(--color-info-500);">¥{{ fmtMoney(dashboard.pendingWithdrawal) }}</div>
           </div>
         </div>
       </div>
@@ -88,6 +88,7 @@
 </template>
 
 <script setup lang="ts">
+import { fmtMoney } from '~/utils/format';
 const { t } = useI18n()
 const loading = ref(true)
 const loadError = ref('')
@@ -108,10 +109,6 @@ async function loadData() {
 }
 
 onMounted(() => loadData())
-
-function fmt(n: number | string) {
-  return (Number(n) || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2 })
-}
 
 definePageMeta({ layout: 'enterprise' })
 </script>

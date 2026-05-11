@@ -90,3 +90,15 @@ export async function copyToClipboard(text: string): Promise<boolean> {
     return false;
   }
 }
+
+export function formatDateLocale(iso: string): string {
+  return iso ? new Date(iso).toLocaleDateString('zh-CN') : '-';
+}
+
+export function formatDateTimeLocale(iso: string): string {
+  return iso ? new Date(iso).toLocaleString('zh-CN') : '-';
+}
+
+export function fmtMoney(n: number | string): string {
+  return (Number(n) || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2 });
+}

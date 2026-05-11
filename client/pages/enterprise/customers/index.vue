@@ -44,7 +44,7 @@
               <span v-if="!getCustomerTags(c.id).length" class="text-muted">-</span>
             </td>
             <td><span :class="['status-tag', c.status === 1 ? 'on' : 'off']">{{ c.status === 1 ? $t('enterprise.common.statusEnabled') : $t('enterprise.common.statusDisabled') }}</span></td>
-            <td>{{ formatDate(c.create_time) }}</td>
+            <td>{{ formatDateLocale(c.create_time) }}</td>
             <td class="actions">
               <button class="btn-sm" @click="goDetail(c.id)">{{ $t('enterprise.customers.index.detail') }}</button>
               <button class="btn-sm" @click="openTagPicker(c)">{{ $t('enterprise.customers.index.tagAction') }}</button>
@@ -84,7 +84,7 @@
 definePageMeta({ layout: 'enterprise' });
 import { ref, reactive, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { useToast } from '~/composables/useToast';
+import { formatDateLocale } from '~/utils/format';
 const { t } = useI18n();
 
 const router = useRouter();
@@ -156,7 +156,7 @@ function planLabel(type) {
   return map[type] || t('enterprise.common.freeLabel');
 }
 
-function formatDate(d) { return d ? new Date(d).toLocaleDateString('zh-CN') : '-'; }
+
 
 onMounted(() => { loadCustomers(); loadStats(); loadTags(); });
 </script>

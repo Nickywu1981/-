@@ -9,11 +9,11 @@
           <tr v-for="item in list" :key="item.id">
             <td>{{ item.batch_no || '-' }}</td>
             <td>{{ item.cycle_start }} ~ {{ item.cycle_end }}</td>
-            <td>¥{{ fmt(item.order_amount) }}</td>
+            <td>¥{{ fmtMoney(item.order_amount) }}</td>
             <td>{{ item.commission_rate ? item.commission_rate + '%' : '-' }}</td>
-            <td>¥{{ fmt(item.commission_amount) }}</td>
+            <td>¥{{ fmtMoney(item.commission_amount) }}</td>
             <td><span :class="['status-tag', item.status]">{{ item.status === 'settled' ? $t('enterprise.finance.dashboard.settled') : $t('enterprise.finance.dashboard.pendingSettle') }}</span></td>
-            <td>{{ formatDate(item.create_time) }}</td>
+            <td>{{ formatDateLocale(item.create_time) }}</td>
           </tr>
         </tbody>
       </table>
@@ -30,7 +30,7 @@
 
 <script setup>
 import { useApi } from '~/composables/useApi';
-import { useToast } from '~/composables/useToast';
+import { formatDateLocale, fmtMoney } from '~/utils/format';
 const { t } = useI18n();
 const api = useApi();
 const toast = useToast();
@@ -49,9 +49,6 @@ async function loadData() {
     total.value = data?.total || 0;
   } catch (e) { toast.error(t('enterprise.finance.settlement.loadError')); }
 }
-
-function fmt(n) { return (Number(n) || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2 }); }
-function formatDate(d) { return d ? new Date(d).toLocaleDateString('zh-CN') : '-'; }
 
 definePageMeta({ layout: 'enterprise' });
 </script>

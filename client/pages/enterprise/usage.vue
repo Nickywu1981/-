@@ -49,7 +49,6 @@
 </template>
 
 <script setup>
-import { useToast } from '~/composables/useToast';
 const toast = useToast();
 const { t } = useI18n();
 const startDate = ref(new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10));

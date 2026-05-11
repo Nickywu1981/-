@@ -66,7 +66,6 @@
 
 <script setup>
 import { useApi } from '~/composables/useApi';
-import { useToast } from '~/composables/useToast';
 import { useConfirm } from '~/composables/useConfirm';
 const { t } = useI18n();
 const api = useApi();

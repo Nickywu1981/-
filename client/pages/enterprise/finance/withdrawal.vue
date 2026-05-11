@@ -23,12 +23,12 @@
         <tbody>
           <tr v-for="item in list" :key="item.id">
             <td class="mono">{{ item.order_no }}</td>
-            <td class="red">-¥{{ fmt(item.amount) }}</td>
-            <td>¥{{ fmt(item.fee) }}</td>
-            <td class="green">¥{{ fmt(item.actual_amount) }}</td>
+            <td class="red">-¥{{ fmtMoney(item.amount) }}</td>
+            <td>¥{{ fmtMoney(item.fee) }}</td>
+            <td class="green">¥{{ fmtMoney(item.actual_amount) }}</td>
             <td>{{ item.account_name || '-' }} {{ item.account_no ? '(***' + item.account_no.toString().slice(-4) + ')' : '' }}</td>
             <td><span :class="['status-tag', item.status]">{{ statusLabel(item.status) }}</span></td>
-            <td>{{ formatDate(item.create_time) }}</td>
+            <td>{{ formatDateLocale(item.create_time) }}</td>
           </tr>
         </tbody>
       </table>
@@ -73,7 +73,7 @@
 
 <script setup>
 import { useApi } from '~/composables/useApi';
-import { useToast } from '~/composables/useToast';
+import { formatDateLocale, fmtMoney } from '~/utils/format';
 const { t } = useI18n();
 const api = useApi();
 const toast = useToast();
@@ -131,8 +131,6 @@ const statusLabels = {
   failed: t('enterprise.finance.withdrawal.statusFailed'),
 };
 function statusLabel(s) { return statusLabels[s] || s; }
-function fmt(n) { return (Number(n) || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2 }); }
-function formatDate(d) { return d ? new Date(d).toLocaleDateString('zh-CN') : '-'; }
 
 definePageMeta({ layout: 'enterprise' });
 </script>

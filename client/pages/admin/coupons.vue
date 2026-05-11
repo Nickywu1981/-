@@ -74,7 +74,6 @@
 </template>
 
 <script setup lang="ts">
-import { useToast } from '~/composables/useToast';
 import { useConfirm } from '~/composables/useConfirm';
 const toast = useToast();
 const confirm = useConfirm();

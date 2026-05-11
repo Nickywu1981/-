@@ -55,7 +55,6 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { useToast } from '~/composables/useToast';
 const { t } = useI18n();
 const toast = useToast();
 const profile = ref({});
