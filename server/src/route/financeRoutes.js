@@ -9,22 +9,13 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { validateV4 as _validate } from '../utils/validate.js';
-import { authMiddleware } from '../middleware/auth.middleware.js';
-import { enterpriseOnly } from '../middleware/auth.middleware.js';
+import { authMiddleware, enterpriseOnly, requireAgent } from '../middleware/auth.middleware.js';
 import { requireRole } from '../middleware/rbac.js';
 import { paymentLimiter } from '../middleware/rateLimiter.js';
 import { setCsrfCookie, csrfProtection } from '../middleware/csrf.js';
 import * as ctrl from '../controller/financeController.js';
 
 const router = Router();
-
-function requireAgent(req, res, next) {
-  const entRole = req.user?.entRole;
-  if (!entRole || !['agent_admin', 'agent_operator', 'agent_viewer'].includes(entRole)) {
-    return res.status(403).json({ code: 403, msg: '仅代理端可用此功能', data: null });
-  }
-  next();
-}
 
 // ==================== Zod Schemas ====================
 

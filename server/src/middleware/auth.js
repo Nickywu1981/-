@@ -249,6 +249,15 @@ export function consumerOnly(req, res, next) {
   next();
 }
 
+/** 要求代理端角色（企业端不可用） */
+export function requireAgent(req, res, next) {
+  const entRole = req.user?.entRole;
+  if (!entRole || !['agent_admin', 'agent_operator', 'agent_viewer'].includes(entRole)) {
+    return sendError(res, ERROR_CODE.FORBIDDEN, '仅代理端可用此功能');
+  }
+  next();
+}
+
 export { ROLES };
 
 // ========================= Refresh Token 中间件 =========================

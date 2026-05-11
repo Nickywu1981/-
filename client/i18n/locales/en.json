@@ -75,7 +75,40 @@
     "mockup_scene_short": "Scene",
     "mockup_video_short": "Video",
     "mockup_upload": "Upload Image",
-    "mockup_generate": "Generated"
+    "mockup_generate": "Generated",
+    "memfocus_cards": [
+      {"badge":"Memory","title":"Photographic Memory","sub":"Precise customer review","api":"4-Layer Memory API","story":"Ms. Wang bought collagen jelly last time — ask if she wants to reorder","metricLabel":"Customer Retention","metricValue":"+37%"},
+      {"badge":"Priority","title":"Smart Sorting","sub":"Refunds first, new products later","api":"Attention Engine API","story":"Refund complaints handled immediately, new product inquiries queued","metricLabel":"Urgent Response","metricValue":"<30s"},
+      {"badge":"Context","title":"Quick on the Uptake","sub":"Context-aware, anaphora resolution","api":"Context Manager API","story":"Customer says 'the red one' — knows it means the red dress from last chat","metricLabel":"Context Window","metricValue":"8K tokens"},
+      {"badge":"i18n","title":"7-Language Assets","sub":"More local than local teams","api":"Cross-Border API","story":"One Chinese product → 7 language assets — more local than local teams","metricLabel":"Languages","metricValue":"7"},
+      {"badge":"Copy","title":"Conversion-Driven","sub":"Titles/selling points/details/scripts","api":"Content Gen API","story":"Titles, selling points, detail pages, livestream scripts — better than human copywriters","metricLabel":"Content Types","metricValue":"6"},
+      {"badge":"Compliance","title":"5-Layer Filter","sub":"Zero violation penalties","api":"Safety & Compliance API","story":"5-layer sensitive word filtering, zero violations — more rigorous than compliance managers","metricLabel":"Filter Layers","metricValue":"5"},
+      {"badge":"Vision","title":"100 SKU Parallel","sub":"All videos done in 2 hours","api":"Batch Video API","story":"15s/30s TikTok product videos — 100 SKU parallel, done in 2 hours","metricLabel":"Parallel Throughput","metricValue":"100 SKU"},
+      {"badge":"Nonstop","title":"24×7 Peak","sub":"No leave, no drama, no quitting","api":"24×7 API Uptime","story":"No sick days, no drama, no quitting — peak performance every call","metricLabel":"Uptime Target","metricValue":"99.9%"}
+    ],
+    "steps": [
+      {"icon":"📤","title":"Upload Product Photos","desc":"Drag in product photos, supports JPG/PNG/WebP"},
+      {"icon":"🎯","title":"Choose Function","desc":"Main image, scene, video... one click to select"},
+      {"icon":"✨","title":"AI Auto-Generate","desc":"Images in 5s, batch processing, auto-adapt to platform sizes"}
+    ],
+    "faqs": [
+      {"q":"Do I need to install anything?","a":"No. Pure web-based. Open in browser, supports Chrome / Safari / Edge."},
+      {"q":"Can I use the generated images commercially?","a":"Absolutely. All AI-generated images are yours to use commercially on any e-commerce platform."},
+      {"q":"Which e-commerce platforms are supported?","a":"We cover 13 major platforms including Amazon, Temu, Shein, Taobao, TikTok Shop, Shopee, Lazada and more. Custom sizes also supported."},
+      {"q":"Can I regenerate if not satisfied?","a":"Yes. You can regenerate for free until you're satisfied with the result."},
+      {"q":"How does batch processing work?","a":"Pro plan and above support batch processing. Drag in a folder and it queues automatically. Nighttime processing available (40% off)."}
+    ],
+    "use_cases": [
+      {"avatar":"👤","title":"Individual Seller","desc":"One person, one team","points":["Phone photos → professional main images","Zero design skills → viral detail pages","Save 3 hours of editing daily"]},
+      {"avatar":"🏪","title":"SMB Merchant","desc":"Replace design team with AI","points":["Batch generate all product images","Unified brand visual style","Cut design costs by 80%"]},
+      {"avatar":"🏢","title":"Brand Enterprise","desc":"Scale visual content production","points":["API batch integration","Multi-store multi-platform management","Auto-apply brand guidelines"]}
+    ],
+    "plans": [
+      {"icon":"🌱","name":"Free","price":"0","features":["20 images/month","3 videos/month","Basic templates","720p output"],"featured":false},
+      {"icon":"⚡","name":"Pro","price":"99","features":["500 images/month","50 videos/month","All templates + styles","1080p output","Batch processing","API access"],"featured":true},
+      {"icon":"🏭","name":"Enterprise","price":"299","features":["Unlimited images","Unlimited videos","Custom style training","4K output","Private deployment","Dedicated support"],"featured":false}
+    ],
+    "platforms": ["Taobao","Pinduoduo","Douyin","Xiaohongshu","WeChat Video","Amazon","Temu","Shein","TikTok Shop","Mercado Libre","Shopee","Lazada"]
   },
   "work": {
     "title": "AI E-commerce Workspace",
@@ -264,6 +297,13 @@
     "menu_open_label": "Open navigation menu",
     "menu_close_label": "Close navigation menu",
     "coming_soon_tag": "Coming Soon",
-    "points_label": "Points"
+    "points_label": "Points",
+    "creation_tabs": {
+      "video": "Video",
+      "image": "Image",
+      "detail": "Detail Page",
+      "copywrite": "Copywriting",
+      "digital": "Digital Human"
+    }
   }
 }
