@@ -17,7 +17,6 @@
 
 <script setup>
 definePageMeta({ layout: 'enterprise' });
-import { ref, onMounted } from 'vue';
 const toast = useToast();
 const { t } = useI18n();
 

@@ -52,7 +52,6 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount } from 'vue'
 const { t } = useI18n();
 const form = ref({ name: '', code: '', contactName: '', contactPhone: '', contactEmail: '', password: '', domain: '' });
 const loading = ref(false);

@@ -21,8 +21,6 @@
 
 <script setup>
 definePageMeta({ layout: 'enterprise' });
-import { ref, onMounted } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
 import { formatDateTimeLocale } from '~/utils/format';
 const { t } = useI18n();
 const router = useRouter(); const route = useRoute(); const channel = ref(null); const loadError = ref(false);

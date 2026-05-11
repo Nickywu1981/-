@@ -54,7 +54,6 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
 const { t } = useI18n();
 const toast = useToast();
 const profile = ref({});

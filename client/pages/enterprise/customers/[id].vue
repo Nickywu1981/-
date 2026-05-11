@@ -73,8 +73,6 @@
 
 <script setup>
 definePageMeta({ layout: 'enterprise' });
-import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
 import { formatDateTimeLocale } from '~/utils/format';
 
 const { t } = useI18n()

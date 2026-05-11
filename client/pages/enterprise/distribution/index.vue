@@ -53,7 +53,6 @@
 
 <script setup>
 definePageMeta({ layout: 'enterprise' });
-import { ref, onMounted } from 'vue';
 import { formatDateLocale } from '~/utils/format';
 
 const inviteCode = ref('');

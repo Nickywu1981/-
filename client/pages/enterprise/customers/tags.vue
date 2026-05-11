@@ -47,7 +47,6 @@
 
 <script setup>
 definePageMeta({ layout: 'enterprise' });
-import { ref, reactive, onMounted } from 'vue';
 import { useConfirm } from '~/composables/useConfirm';
 
 const { t } = useI18n()

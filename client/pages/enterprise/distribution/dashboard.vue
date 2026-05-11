@@ -16,7 +16,6 @@
 
 <script setup>
 definePageMeta({ layout: 'enterprise' });
-import { ref, onMounted } from 'vue';
 const { t } = useI18n();
 const stats = ref({});
 const loading = ref(true);
