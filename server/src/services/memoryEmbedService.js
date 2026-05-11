@@ -12,8 +12,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const VECTOR_STORE_PATH = path.resolve(__dirname, '../../../docs/KB_VECTOR_STORE.json');
-const TOKEN_INDEX_PATH = path.resolve(__dirname, '../../../docs/KB_TOKEN_INDEX.json');
+const VECTOR_STORE_PATH = path.resolve(__dirname, '../../../docs/kb/KB_VECTOR_STORE.json');
+const TOKEN_INDEX_PATH = path.resolve(__dirname, '../../../docs/kb/KB_TOKEN_INDEX.json');
 
 let store = null;
 let tokenIndex = null;
@@ -190,4 +190,49 @@ export async function getMemoryStatus() {
   };
 }
 
-export default { embed, semanticSearch, tokenLookup, getMemoryStatus };
+/**
+ * 全量上下文语义搜索（LLM RAG 专用，不截断内容）
+ * @param {string} query
+ * @param {number} [topK=5]
+ * @returns {{ results: Array<{source, content, score}>, model: string, totalChunks: number }}
+ */
+export async function searchFullContext(query, topK = 5) {
+  const data = await loadStore();
+  if (!data || !data.chunks) {
+    return { results: [], model: 'none', totalChunks: 0 };
+  }
+
+  const queryVec = embed(query).vector;
+  const scored = data.chunks.map((chunk, i) => {
+    const emb = data.vectors ? data.vectors[i] : null;
+    if (!emb || Object.keys(emb).length === 0) {
+      return { source: chunk.source, content: chunk.content, score: 0 };
+    }
+    const score = cosineSimilarity(queryVec, emb);
+    return { source: chunk.source, content: chunk.content, score };
+  });
+
+  const sorted = scored
+    .filter(c => c.score > 0.001)
+    .sort((a, b) => b.score - a.score);
+
+  // 去重
+  const unique = [];
+  for (const r of sorted) {
+    const isDup = unique.some(u => u.source === r.source && u.content?.slice(0, 60) === r.content?.slice(0, 60));
+    if (!isDup) unique.push(r);
+    if (unique.length >= topK) break;
+  }
+
+  return {
+    results: unique.map(r => ({
+      source: r.source,
+      content: r.content || '',
+      score: Math.round(r.score * 100) / 100,
+    })),
+    model: data.model || 'tfidf-local',
+    totalChunks: data.chunks.length,
+  };
+}
+
+export default { embed, semanticSearch, searchFullContext, tokenLookup, getMemoryStatus };

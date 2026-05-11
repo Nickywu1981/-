@@ -17,9 +17,9 @@ export function tierGuard(type = 'image') {
       req.tierLimit = result;
       next();
     } catch (err) {
-      // 限额检查失败不影响主流程，放行
-      logger.warn('[TierGuard]', { message: err.message });
-      next();
+      // 限额检查失败时拒绝请求，防止 DB 故障绕过限制
+      logger.warn('[TierGuard] check failed, request denied:', err.message);
+      return error(res, 503, '用量检查服务暂不可用，请稍后重试');
     }
   };
 }

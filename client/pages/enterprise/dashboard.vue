@@ -81,6 +81,16 @@ const usage = ref([]);
 const loading = ref(true);
 const error = ref('');
 
+const typeLabel = computed(() => {
+  const map = { enterprise: '企业', agent: '代理商', partner: '合作伙伴' };
+  return map[enterprise.value.type] || enterprise.value.type || '-';
+});
+const planLabel = computed(() => {
+  const plan = dashboard.value.enterprise?.planType || enterprise.value.planType;
+  const map = { basic: '基础版', pro: '专业版', enterprise_basic: '企业基础版', enterprise_pro: '企业专业版', ultimate: '旗舰版' };
+  return map[plan] || plan || '免费版';
+});
+
 async function loadData() {
   loading.value = true;
   error.value = '';

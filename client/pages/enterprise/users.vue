@@ -92,6 +92,8 @@
 </template>
 
 <script setup>
+import { useToast } from '~/composables/useToast';
+const toast = useToast();
 const users = ref([]);
 const total = ref(0);
 const page = ref(1);
@@ -132,7 +134,7 @@ async function handleRemove(u) {
   try {
     await $fetch(`/api/enterprise/users/${u.id}`, { method: 'DELETE', credentials: 'include' });
     loadUsers();
-  } catch (e) { alert(e?.data?.msg || '移除失败'); }
+  } catch (e) { toast.error(e?.data?.msg || '移除失败'); }
 }
 
 async function handleSave() {
