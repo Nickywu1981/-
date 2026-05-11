@@ -46,7 +46,7 @@ router.get('/bindings', async (req, res) => {
       conn.release();
     }
   } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '服务器内部错误');
   }
 });
 
@@ -68,7 +68,7 @@ router.post('/bind', _validate(bindSchema), async (req, res) => {
       conn.release();
     }
   } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '服务器内部错误');
   }
 });
 
@@ -86,7 +86,7 @@ router.delete('/bind/:id', validate(idParamSchema, 'params'), async (req, res) =
       conn.release();
     }
   } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '服务器内部错误');
   }
 });
 
@@ -98,7 +98,7 @@ router.post('/publish', _validate(publishSchema), async (req, res) => {
     // TODO: 实际对接各平台发布API (W4 MVP先记录)
     return success(res, { published_url: content_url, platform, status: 'submitted' }, '已提交发布任务');
   } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '服务器内部错误');
   }
 });
 

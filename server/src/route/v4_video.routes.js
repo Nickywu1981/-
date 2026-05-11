@@ -7,7 +7,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
-import { validateV4 as _validate, validate } from '../utils/validate.js';
+import { validateV4 as _validate, validate, paginationSchema } from '../utils/validate.js';
 import { tierGuard} from '../middleware/tierGuard.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { authMiddleware } from '../middleware/auth.js';
@@ -24,6 +24,11 @@ const idParamSchema = z.object({ id: z.string().min(1).max(50) });
 
 const urlField = z.string().url('URL格式不正确');
 const optUrl = z.string().url().optional();
+
+const worksQuerySchema = paginationSchema.extend({
+  status: z.string().optional(),
+  task_type: z.string().optional(),
+});
 
 // Schemas
 const generateSchema = z.object({
@@ -283,7 +288,7 @@ router.post('/subtitle-fix', heavyLimiter, _validate(subtitleFixSchema), async (
 // ============================================================
 // 作品管理
 // ============================================================
-router.get('/works', async (req, res) => {
+router.get('/works', validate(worksQuerySchema, 'query'), async (req, res) => {
   try {
     const result = await videoService.getVideoWorks(req.user.id, {
       page: parseInt(req.query.page) || 1,

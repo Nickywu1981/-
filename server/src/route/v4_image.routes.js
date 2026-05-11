@@ -8,7 +8,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
-import { validateV4 as _validate } from '../utils/validate.js';
+import { validateV4 as _validate, validate, paginationSchema } from '../utils/validate.js';
 import { contentModerationMiddleware } from '../middleware/content-moderation.middleware.js';
 import { tierGuard } from '../middleware/tierGuard.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
@@ -18,6 +18,10 @@ import * as promptEnhanceService from '../services/prompt-enhance.service.js';
 
 const router = Router();
 router.use(authMiddleware);
+
+const worksQuerySchema = paginationSchema.extend({
+  status: z.string().optional(),
+});
 
 const generateSchema = z.object({
   prompt: z.string().min(1, '请提供提示词').max(4000),
@@ -110,7 +114,7 @@ router.post('/batch-replace', heavyLimiter, _validate(batchReplaceSchema), tierG
 });
 
 // GET /api/images/works
-router.get('/works', async (req, res) => {
+router.get('/works', validate(worksQuerySchema, 'query'), async (req, res) => {
   try {
     const result = await imageService.getImageWorks(req.user.id, {
       page: parseInt(req.query.page) || 1,

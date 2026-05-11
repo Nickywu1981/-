@@ -96,13 +96,13 @@ describe('validate schemas', () => {
   });
 
   describe('passwordSchema', () => {
-    it('accepts passwords 6-32 chars', () => {
-      expect(passwordSchema.safeParse('123456').success).toBe(true);
+    it('accepts passwords 8-32 chars', () => {
+      expect(passwordSchema.safeParse('12345678').success).toBe(true);
       expect(passwordSchema.safeParse('a'.repeat(32)).success).toBe(true);
     });
 
     it('rejects too short passwords', () => {
-      expect(passwordSchema.safeParse('12345').success).toBe(false);
+      expect(passwordSchema.safeParse('1234567').success).toBe(false);
     });
 
     it('rejects too long passwords', () => {

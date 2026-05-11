@@ -3,6 +3,7 @@ import { parse } from 'url';
 import jwt from 'jsonwebtoken';
 import config from '../config/index.js';
 import logger from '../utils/logger.js';
+import { isTokenBlacklisted } from '../utils/jwtToken.js';
 
 const JWT_SECRET = config.jwt.secret;
 
@@ -57,7 +58,7 @@ class WsManager {
     }, heartbeatMs);
     this.wss.on('close', () => clearInterval(interval));
 
-    this.wss.on('connection', (socket, req) => {
+    this.wss.on('connection', async (socket, req) => {
       socket.isAlive = true;
       socket.on('pong', () => { socket.isAlive = true; });
 
@@ -76,9 +77,15 @@ class WsManager {
 
       // 仅通过 JWT cookie 认证，拒绝匿名连接
       const cookies = parseCookies(req.headers.cookie);
+      const token = cookies.token || '';
       let userId = null;
       try {
-        const payload = jwt.verify(cookies.token || '', JWT_SECRET);
+        const payload = jwt.verify(token, JWT_SECRET);
+        // 检查 Redis 黑名单（与 HTTP authMiddleware 保持一致）
+        if (await isTokenBlacklisted(token)) {
+          socket.close(4001, '令牌已失效');
+          return;
+        }
         userId = String(payload.userId || payload.id);
       } catch {
         // 未认证连接 — 关闭连接，不提供公开订阅

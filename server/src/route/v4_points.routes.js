@@ -10,7 +10,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
-import { validateV4 as _validate } from '../utils/validate.js';
+import { validateV4 as _validate, validate, paginationSchema } from '../utils/validate.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { paymentLimiter, adminLimiter } from '../middleware/rateLimiter.js';
 import * as pointsService from '../services/points.service.js';
@@ -38,7 +38,7 @@ router.get('/account', authMiddleware, async (req, res) => {
 });
 
 // GET /api/points/transactions
-router.get('/transactions', authMiddleware, async (req, res) => {
+router.get('/transactions', authMiddleware, validate(paginationSchema, 'query'), async (req, res) => {
   try {
     const result = await pointsService.getPointsTransactions(req.user.id, {
       page: parseInt(req.query.page) || 1,

@@ -8,7 +8,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
-import { validateV4 as _validate } from '../utils/validate.js';
+import { validateV4 as _validate, validate, paginationSchema } from '../utils/validate.js';
 import { contentModerationMiddleware } from '../middleware/content-moderation.middleware.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { authMiddleware } from '../middleware/auth.js';
@@ -64,7 +64,7 @@ router.post('/replicate', heavyLimiter, _validate(replicateSchema), async (req, 
 });
 
 // GET /api/detail/works
-router.get('/works', async (req, res) => {
+router.get('/works', validate(paginationSchema, 'query'), async (req, res) => {
   try {
     const result = await detailService.getDetailWorks(req.user.id, {
       page: parseInt(req.query.page) || 1,
