@@ -47,13 +47,17 @@ server.listen(port, () => {
 // ==================== 全局异常处理 ====================
 
 process.on('uncaughtException', (err) => {
-  logger.error('未捕获异常', { message: err.message, stack: err.stack?.split('\n').slice(0, 3).join('\n') });
+  const logEntry = { message: err.message };
+  if (process.env.NODE_ENV !== 'production') logEntry.stack = err.stack?.split('\n').slice(0, 3).join('\n');
+  logger.error('未捕获异常', logEntry);
   gracefulShutdown('uncaughtException');
 });
 
 process.on('unhandledRejection', (reason) => {
   const msg = reason instanceof Error ? reason.message : String(reason);
-  logger.error('未处理的 Promise 拒绝', { message: msg, stack: reason?.stack?.split('\n').slice(0, 3).join('\n') });
+  const logEntry = { message: msg };
+  if (process.env.NODE_ENV !== 'production') logEntry.stack = reason?.stack?.split('\n').slice(0, 3).join('\n');
+  logger.error('未处理的 Promise 拒绝', logEntry);
   gracefulShutdown('unhandledRejection');
 });
 

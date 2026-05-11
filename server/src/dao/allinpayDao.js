@@ -29,7 +29,7 @@ export default {
 
   async markFailed(reqsn) {
     await pool.query(
-      'UPDATE allinpay_order SET status = 2, update_time = NOW() WHERE reqsn = ?',
+      'UPDATE allinpay_order SET status = 2, update_time = NOW() WHERE reqsn = ? AND status = 0',
       [reqsn],
     );
   },
