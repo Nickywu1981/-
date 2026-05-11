@@ -33,10 +33,10 @@ const updateGeoSchema = z.object({
 });
 
 const adminRouter = Router();
-adminRouter.get('/', authMiddleware, adminAuth, asyncHandler(listRules));
-adminRouter.get('/:id', authMiddleware, adminAuth, asyncHandler(getRule));
-adminRouter.post('/', authMiddleware, adminAuth, validate(geoSchema), asyncHandler(createRule));
-adminRouter.put('/:id', authMiddleware, adminAuth, validate(updateGeoSchema), asyncHandler(updateRule));
-adminRouter.delete('/:id', authMiddleware, adminAuth, asyncHandler(deleteRule));
+adminRouter.get('/', authMiddleware, rateLimiter, adminAuth, asyncHandler(listRules));
+adminRouter.get('/:id', authMiddleware, rateLimiter, adminAuth, asyncHandler(getRule));
+adminRouter.post('/', authMiddleware, rateLimiter, adminAuth, validate(geoSchema), asyncHandler(createRule));
+adminRouter.put('/:id', authMiddleware, rateLimiter, adminAuth, validate(updateGeoSchema), asyncHandler(updateRule));
+adminRouter.delete('/:id', authMiddleware, rateLimiter, adminAuth, asyncHandler(deleteRule));
 
 export { adminRouter };

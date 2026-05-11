@@ -11,6 +11,7 @@ import { z } from 'zod';
 import { validateV4 } from '../utils/validate.js';
 import { authMiddleware, enterpriseOnly } from '../middleware/auth.middleware.js';
 import { csrfProtection } from '../middleware/csrf.js';
+import { rateLimiter } from '../middleware/rateLimiter.js';
 import * as ctrl from '../controller/customerController.js';
 
 const router = Router();
@@ -35,6 +36,7 @@ const batchTagSchema = z.object({
 });
 
 router.use(authMiddleware, enterpriseOnly);
+router.use(rateLimiter);
 
 // 客户查询 (挂载后: GET /api/enterprise/customers)
 router.get('/', ctrl.listCustomers);

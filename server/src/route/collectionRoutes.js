@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
+import { rateLimiter } from '../middleware/rateLimiter.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { cacheMiddleware } from '../middleware/cache.js';
 import { listCollections, getCollection, createCollection, updateCollection, deleteCollection } from '../controller/collectionController.js';
@@ -17,6 +18,7 @@ const idParamSchema = z.object({ id: z.string().regex(/^\d+$/).transform(Number)
 
 const router = Router();
 router.use(authMiddleware);
+router.use(rateLimiter);
 router.get('/', cacheMiddleware(120), asyncHandler(listCollections));
 router.get('/:id', cacheMiddleware(120), validate(idParamSchema, 'params'), asyncHandler(getCollection));
 router.post('/', adminAuth, validate(collectionSchema), asyncHandler(createCollection));

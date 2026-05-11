@@ -95,7 +95,7 @@ router.get('/stats', async (req, res) => {
 });
 
 // PUT /api/user/profile — 更新资料
-router.put('/profile', _validate(updateProfileSchema), async (req, res) => {
+router.put('/profile', heavyLimiter, _validate(updateProfileSchema), async (req, res) => {
   try {
     const { nickname, phone, email } = req.validated;
     const updates = [];
@@ -123,7 +123,7 @@ router.put('/profile', _validate(updateProfileSchema), async (req, res) => {
 });
 
 // PUT /api/user/change-password — 修改密码（需旧密码）
-router.put('/change-password', _validate(changePasswordSchema), async (req, res) => {
+router.put('/change-password', heavyLimiter, _validate(changePasswordSchema), async (req, res) => {
   try {
     const { oldPassword, newPassword } = req.validated;
 
@@ -155,7 +155,7 @@ router.put('/change-password', _validate(changePasswordSchema), async (req, res)
 });
 
 // PUT /api/user/membership/auto-renew — 自动续费开关
-router.put('/membership/auto-renew', _validate(z.object({
+router.put('/membership/auto-renew', heavyLimiter, _validate(z.object({
   autoRenew: z.boolean(),
 })), async (req, res) => {
   try {

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { listTemplates, getTemplateDetail, createTemplate, submitForReview, fillAndPreview, listFavorites, toggleFavorite, listGroups, createGroup, renameGroup, deleteGroup, getRecommendations, recordUsage, usageHistory, rateTemplate, getTemplateRating } from '../controller/promptController.js';
 import { authMiddleware } from '../middleware/auth.js';
+import { rateLimiter } from '../middleware/rateLimiter.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
 import { z } from 'zod';
@@ -37,6 +38,7 @@ const rateSchema = z.object({
 const idParamSchema = z.object({ id: z.string().regex(/^\d+$/).transform(Number) });
 
 router.use(authMiddleware);
+router.use(rateLimiter);
 
 // 模板（支持 /api/prompts 和 /api/prompts/templates）
 router.get('/', asyncHandler(listTemplates));

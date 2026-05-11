@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { listAllPlatforms, getPlatformConfig, getPlatformsByRegion } from '../controller/platformDetailController.js';
 import { authMiddleware } from '../middleware/auth.js';
+import { rateLimiter } from '../middleware/rateLimiter.js';
 import { cacheMiddleware } from '../middleware/cache.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
@@ -16,6 +17,7 @@ const codeParamsSchema = z.object({
 });
 
 router.use(authMiddleware);
+router.use(rateLimiter);
 
 // 平台列表缓存 30 分钟（极少变动）
 router.get('/', cacheMiddleware(1800), asyncHandler(listAllPlatforms));
