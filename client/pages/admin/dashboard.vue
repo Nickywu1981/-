@@ -141,7 +141,7 @@ function renderLineChart(el: HTMLDivElement | undefined, data: { date: string; v
     grid: { left: 40, right: 16, top: 8, bottom: 24 },
     xAxis: {
       type: 'category',
-      data: data.map(d => d.date.slice(5)),
+      data: data.map(d => d.date?.slice(5) || ''),
       axisLine: { lineStyle: { color: '#e5e7eb' } },
       axisLabel: { fontSize: 11, color: '#999' },
     },

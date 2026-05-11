@@ -32,11 +32,13 @@ export async function listSensitiveWords({ keyword, page = 1, pageSize = 50 }) {
 }
 
 export async function addSensitiveWord(word, category, level) {
-  await pool.execute('INSERT IGNORE INTO sensitive_word (word, category, level) VALUES (?,?,?)', [word, category, level]);
+  const [r] = await pool.execute('INSERT IGNORE INTO sensitive_word (word, category, level) VALUES (?,?,?)', [word, category, level]);
+  return r.affectedRows;
 }
 
 export async function deleteSensitiveWord(id) {
-  await pool.execute('DELETE FROM sensitive_word WHERE id = ?', [id]);
+  const [r] = await pool.execute('DELETE FROM sensitive_word WHERE id = ?', [id]);
+  return r.affectedRows;
 }
 
 export async function checkText(text) {

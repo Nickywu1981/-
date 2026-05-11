@@ -38,5 +38,6 @@ export async function insertTemplate(fields) {
 }
 
 export async function deleteTemplate(id) {
-  await pool.execute('DELETE FROM email_template WHERE id = ?', [id]);
+  const [r] = await pool.execute('DELETE FROM email_template WHERE id = ?', [id]);
+  return r.affectedRows;
 }

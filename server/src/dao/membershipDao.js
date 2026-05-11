@@ -22,7 +22,8 @@ const membershipDao = {
   },
 
   async setAutoRenew(userId, autoRenew) {
-    await pool.execute('UPDATE user_membership SET auto_renew = ? WHERE user_id = ?', [autoRenew ? 1 : 0, userId]);
+    const [r] = await pool.execute('UPDATE user_membership SET auto_renew = ? WHERE user_id = ?', [autoRenew ? 1 : 0, userId]);
+    return r.affectedRows;
   },
 
   async findExpiring(daysWithin = 7) {

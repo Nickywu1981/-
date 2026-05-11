@@ -33,7 +33,8 @@ export default {
     if (extra.screenshotUrl) { sets.push('screenshot_url = ?'); vals.push(extra.screenshotUrl); }
     if (extra.errorMsg) { sets.push('error_msg = ?'); vals.push(extra.errorMsg); }
     vals.push(id, userId, tenantId);
-    await pool.query(`UPDATE automation_task SET ${sets.join(', ')} WHERE id = ? AND user_id = ? AND tenant_id = ?`, vals);
+    const [r] = await pool.query(`UPDATE automation_task SET ${sets.join(', ')} WHERE id = ? AND user_id = ? AND tenant_id = ?`, vals);
+    return r.affectedRows;
   },
 
   async cancelTask(id, userId) {
@@ -57,7 +58,8 @@ export default {
   },
 
   async deleteAccount(id, userId) {
-    await pool.query('DELETE FROM automation_account WHERE id = ? AND user_id = ?', [id, userId]);
+    const [r] = await pool.query('DELETE FROM automation_account WHERE id = ? AND user_id = ?', [id, userId]);
+    return r.affectedRows;
   },
 
   // Admin: list all
