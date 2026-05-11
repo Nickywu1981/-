@@ -82,14 +82,14 @@ async function save() {
   saving.value = false
 }
 async function review(id: number, status: number) {
-  if (!await confirm({ message: status===2?'确认通过并上架？':'确认驳回/下架？')) return
+  if (!await confirm({ message: status===2?'确认通过并上架？':'确认驳回/下架？'} )) return
   try {
     await $fetch(`/api/admin/prompts/${id}/review`, { method:'PUT', credentials:'include', body: JSON.stringify({ status, reviewRemark: status===3?'管理员操作':'' }) })
     fetchData()
   } catch(e: any) { toast.error(e?.data?.msg || '操作失败') }
 }
 async function deleteItem(t: any) {
-  if (!await confirm({ message: `确认删除「${t.title}」？`)) return
+  if (!await confirm({ message: `确认删除「${t.title}」？`} )) return
   try {
     await $fetch(`/api/admin/prompts/${t.id}`, { method:'DELETE', credentials:'include' })
     fetchData()

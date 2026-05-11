@@ -224,8 +224,9 @@ onMounted(fetchPlans);
 .plan-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
 .plan-type { font-weight: 700; font-size: 16px; color: var(--text-primary); }
 .plan-actions { display: flex; gap: 8px; }
-.act-btn { width: 28px; height: 28px; border: 1px solid var(--border-light); border-radius: var(--radius-sm); background: var(--bg-card); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: transform var(--transition-fast); }
+.act-btn { min-width: 36px; min-height: 36px; border: 1px solid var(--border-light); border-radius: var(--radius-sm); background: var(--bg-card); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: transform var(--transition-fast); }
 .act-btn:hover { transform: scale(1.1); }
+.act-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 .toggle-btn.off { opacity: 0.4; }
 .del-btn:hover { border-color: var(--danger); background: var(--danger-light, #FEE2E2); }
 .plan-body .row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 13px; }

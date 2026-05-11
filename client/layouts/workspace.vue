@@ -5,8 +5,11 @@
 -->
 <template>
   <div class="wsl">
+    <!-- 移动端遮罩 -->
+    <div v-if="mobileOpen" class="wsl-overlay" @click="mobileOpen = false" />
+
     <!-- ═══ 左侧导航 ═══ -->
-    <aside class="wsl-side" :class="{ fold: folded }">
+    <aside class="wsl-side" :class="{ fold: folded, 'mobile-open': mobileOpen }">
       <div class="wsl-logo-area">
         <NuxtLink to="/workspace" class="wsl-logo">Movio AI</NuxtLink>
         <button class="wsl-fold-btn" @click="folded = !folded" :title="folded ? '展开' : '收起'" :aria-label="folded ? '展开侧边栏' : '收起侧边栏'">
@@ -21,7 +24,7 @@
           :to="item.disabled ? '#' : item.path"
           class="wsl-nav-item"
           :class="{ sel: !item.disabled && isActive(item), off: item.disabled }"
-          @click.prevent="item.disabled ? null : undefined"
+          @click.prevent="item.disabled ? null : (mobileOpen = false)"
         >
           <span class="wsl-nav-icon">{{ item.icon }}</span>
           <span v-if="!folded" class="wsl-nav-label">{{ item.label }}</span>
@@ -41,6 +44,9 @@
     <!-- ═══ 右侧主区域 ═══ -->
     <div class="wsl-main">
       <header class="wsl-top">
+        <button class="wsl-hamburger" @click="mobileOpen = !mobileOpen" :aria-label="mobileOpen ? '关闭导航' : '打开导航'" aria-expanded="false">
+          <span /><span /><span />
+        </button>
         <h2 class="wsl-title">{{ pageTitle }}</h2>
         <div class="wsl-actions">
           <NuxtLink v-if="isAdmin" to="/admin" class="wsl-btn">管理后台</NuxtLink>
@@ -65,6 +71,7 @@ const route = useRoute()
 const router = useRouter()
 
 const folded = ref(false)
+const mobileOpen = ref(false)
 const userInitial = ref('U')
 const userName = ref('')
 const userPoints = ref(0)
@@ -144,10 +151,11 @@ definePageMeta({ middleware: ['auth'] })
 }
 .wsl-logo { font-size: 15px; font-weight: 600; color: var(--tx, #171717); text-decoration: none; letter-spacing: -0.03em; white-space: nowrap; }
 .wsl-fold-btn {
-  width: 24px; height: 24px; border: none; background: none; cursor: pointer;
-  color: var(--tx2, #6b6b70); font-size: 11px; border-radius: 6px; display: flex; align-items: center; justify-content: center;
+  min-width: 32px; min-height: 32px; border: none; background: none; cursor: pointer;
+  color: var(--tx2, #6b6b70); font-size: 13px; border-radius: 6px; display: flex; align-items: center; justify-content: center;
 }
 .wsl-fold-btn:hover { background: var(--bg-hover, #f5f5f5); }
+.wsl-fold-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 
 /* Nav */
 .wsl-nav { flex: 1; display: flex; flex-direction: column; gap: 1px; padding: 4px 8px; overflow-y: auto; }
@@ -156,6 +164,7 @@ definePageMeta({ middleware: ['auth'] })
   color: var(--tx2, #6b6b70); font-size: 13px; text-decoration: none; transition: background 0.15s, color 0.15s; white-space: nowrap;
 }
 .wsl-nav-item:hover { background: var(--bg-hover, #f5f5f5); color: var(--tx, #171717); }
+.wsl-nav-item:focus-visible { outline: 2px solid var(--brand); outline-offset: -2px; border-radius: 8px; }
 .wsl-nav-item.sel { background: var(--bg-sel, #171717); color: #fff; }
 .wsl-nav-item.off { opacity: 0.45; cursor: default; }
 .wsl-nav-item.off:hover { background: none; color: var(--tx2, #6b6b70); }
@@ -173,7 +182,7 @@ definePageMeta({ middleware: ['auth'] })
 /* ═══ Main Area ═══ */
 .wsl-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 .wsl-top {
-  display: flex; align-items: center; padding: 12px 24px; background: rgba(255,255,255,0.7);
+  display: flex; align-items: center; gap: 12px; padding: 12px 24px; background: rgba(255,255,255,0.7);
   backdrop-filter: blur(10px); border-bottom: 1px solid var(--brd, #ebebea); flex-shrink: 0;
 }
 .wsl-title { font-size: 15px; font-weight: 600; color: var(--tx, #171717); letter-spacing: -0.03em; flex: 1; }
@@ -183,9 +192,36 @@ definePageMeta({ middleware: ['auth'] })
   background: none; border: 1px solid var(--brd, #ebebea); cursor: pointer; text-decoration: none; transition: background 0.15s, color 0.15s;
 }
 .wsl-btn:hover { background: var(--bg-hover, #f5f5f5); color: var(--tx, #171717); }
+.wsl-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 .wsl-content { flex: 1; overflow-y: auto; }
+
+/* Hamburger */
+.wsl-hamburger {
+  display: none; flex-direction: column; justify-content: center; gap: 4px;
+  min-width: 36px; min-height: 36px; border: none; background: none; cursor: pointer;
+  padding: 6px; border-radius: 6px;
+}
+.wsl-hamburger span { display: block; width: 18px; height: 2px; background: var(--tx, #171717); border-radius: 1px; }
+.wsl-hamburger:hover { background: var(--bg-hover, #f5f5f5); }
+.wsl-hamburger:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+/* Overlay */
+.wsl-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 90; }
 
 /* Dark */
 :root[data-theme="dark"] .wsl-side, :root.dark .wsl-side { background: #121212; border-color: #2a2a2a; }
 :root[data-theme="dark"] .wsl-top, :root.dark .wsl-top { background: rgba(18,18,18,0.8); border-color: #2a2a2a; }
+
+/* ═══ Mobile (≤768px) ═══ */
+@media (max-width: 768px) {
+  .wsl-hamburger { display: flex; }
+  .wsl-side {
+    position: fixed; left: 0; top: 0; bottom: 0; z-index: 100;
+    transform: translateX(-100%); transition: transform 0.25s;
+  }
+  .wsl-side.mobile-open { transform: translateX(0); }
+  .wsl-overlay { display: block; }
+  .wsl-side.fold { width: 200px; }
+  .wsl-top { padding: 12px 16px; }
+}
 </style>

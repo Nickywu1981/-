@@ -255,6 +255,15 @@ const st = computed(() => p.steps ?? []);
 /* ── 上传提示状态 ── */
 :deep(.upload-hint.uploading), :deep(.status) { font-size: 12px; color: var(--warning); text-align: center; margin-top: 8px; }
 :deep(.upload-hint.uploaded), :deep(.status.ok) { font-size: 12px; color: var(--success); text-align: center; margin-top: 8px; }
+
+/* ── Keyboard accessibility ── */
+:deep(button:focus-visible), :deep(a:focus-visible), :deep([role="button"]:focus-visible),
+:deep(.style-card:focus-visible), :deep(.scene-card:focus-visible), :deep(.plat-card:focus-visible),
+:deep(.result-card:focus-visible), :deep(.cat-card:focus-visible), :deep(.tmpl-card:focus-visible),
+:deep(.mode-card:focus-visible), :deep(.template-item:focus-visible), :deep(.history-item:focus-visible),
+:deep(.avatar-card:focus-visible), :deep(.action-card:focus-visible) {
+  outline: 2px solid var(--brand); outline-offset: 2px;
+}
 :deep(.file-count) { font-size: 14px; font-weight: 600; color: var(--brand); text-align: center; margin-top: 12px; }
 
 /* ── 视频预览区 ── */

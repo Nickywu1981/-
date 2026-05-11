@@ -181,7 +181,7 @@ async function toggleStatus(p: any) {
 }
 
 async function deleteItem(id: number) {
-  if (!await confirm({ message: '确定删除？此操作不可恢复。')) return
+  if (!await confirm({ message: '确定删除？此操作不可恢复。'} )) return
   try {
     await $fetch(`/api/diy/${id}/hard-delete`, { method: 'DELETE', credentials: 'include' })
     selectedIds.value = selectedIds.value.filter(i => i !== id)
@@ -209,7 +209,7 @@ async function batchUnpublish() {
 
 async function batchDelete() {
   if (!selectedIds.value.length) return
-  if (!await confirm({ message: `确认删除 ${selectedIds.value.length} 个页面？此操作不可恢复。`)) return
+  if (!await confirm({ message: `确认删除 ${selectedIds.value.length} 个页面？此操作不可恢复。`} )) return
   try {
     await $fetch('/api/diy/batch/delete', { method: 'POST', credentials: 'include', body: { ids: selectedIds.value } })
     toast.success(`已删除 ${selectedIds.value.length} 个页面`)

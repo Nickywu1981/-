@@ -194,8 +194,9 @@ onMounted(fetchTemplates);
 .tpl-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
 .tpl-code { font-family: monospace; font-size: 13px; font-weight: 600; color: var(--brand); }
 .tpl-actions { display: flex; gap: 8px; }
-.act-btn { width: 28px; height: 28px; border: 1px solid var(--border-light); border-radius: var(--radius-sm); background: var(--bg-card); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: transform var(--transition-fast); }
+.act-btn { min-width: 36px; min-height: 36px; border: 1px solid var(--border-light); border-radius: var(--radius-sm); background: var(--bg-card); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: transform var(--transition-fast); }
 .act-btn:hover { transform: scale(1.1); }
+.act-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 .toggle-btn.off { opacity: 0.4; }
 .del-btn:hover { border-color: var(--danger); background: var(--danger-light, #FEE2E2); }
 .tpl-body .row { margin-bottom: 8px; font-size: 13px; }

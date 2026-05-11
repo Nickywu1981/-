@@ -113,7 +113,6 @@
         </div>
       </div>
     </div>
-  </div>
 
     <!-- 版本历史 Modal -->
     <Teleport to="body">
@@ -149,6 +148,7 @@
         </div>
       </div>
     </Teleport>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -346,7 +346,7 @@ async function diffVersions() {
 async function rollbackVersion() {
   const idx = selectedVersions.value[0]
   const v = versions.value[idx]
-  if (!await confirm({ message: `确定回滚到版本 v${v.version}？当前未保存的更改将丢失。`)) return
+  if (!await confirm({ message: `确定回滚到版本 v${v.version}？当前未保存的更改将丢失。` })) return
   try {
     await $fetch(`/api/diy/${pageInfo.value.id}/versions/${v.version}/rollback`, { method: 'POST' })
     showVersions.value = false; selectedVersions.value = []; diffResult.value = null

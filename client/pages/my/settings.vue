@@ -4,48 +4,48 @@
 
     <LoadingSkeleton v-if="loading" type="form" :rows="3" />
 
-    <template v-else>
-
-    <div class="settings-section">
-      <h3>基本信息</h3>
-      <div class="form-group">
-        <label>昵称</label>
-        <input v-model="form.nickname" class="input-field" placeholder="输入昵称" />
-      </div>
-      <div class="form-group">
-        <label>手机号</label>
-        <input v-model="form.phone" class="input-field" placeholder="绑定手机号" disabled />
-        <button class="btn-xs btn-outline">更换</button>
-      </div>
-      <div class="form-group">
-        <label>邮箱</label>
-        <input v-model="form.email" class="input-field" placeholder="绑定邮箱" />
-      </div>
-      <button class="btn" @click="saveProfile" :disabled="saving">
-        {{ saving ? '保存中...' : '保存修改' }}
-      </button>
-    </div>
-
-    <div class="settings-section">
-      <h3>通知设置</h3>
-      <div class="toggle-row" v-for="n in notificationSettings" :key="n.key">
-        <div class="toggle-row__label">
-          <span class="toggle-row__title">{{ n.label }}</span>
-          <span class="toggle-row__desc">{{ n.desc }}</span>
+    <div v-else>
+      <div class="settings-section">
+        <h3>基本信息</h3>
+        <div class="form-group">
+          <label>昵称</label>
+          <input v-model="form.nickname" class="input-field" placeholder="输入昵称" />
         </div>
-        <label class="toggle-switch">
-          <input type="checkbox" v-model="n.enabled" />
-          <span class="toggle-slider" />
-        </label>
-      </div>
-    </div>
-
-    <div class="settings-section">
-      <h3>主题偏好</h3>
-      <div class="chips-row">
-        <button v-for="t in themes" :key="t.key" class="chip" :class="{ active: selectedTheme === t.key }" @click="selectedTheme = t.key">
-          {{ t.icon }} {{ t.label }}
+        <div class="form-group">
+          <label>手机号</label>
+          <input v-model="form.phone" class="input-field" placeholder="绑定手机号" disabled />
+          <button class="btn-xs btn-outline">更换</button>
+        </div>
+        <div class="form-group">
+          <label>邮箱</label>
+          <input v-model="form.email" class="input-field" placeholder="绑定邮箱" />
+        </div>
+        <button class="btn" @click="saveProfile" :disabled="saving">
+          {{ saving ? '保存中...' : '保存修改' }}
         </button>
+      </div>
+
+      <div class="settings-section">
+        <h3>通知设置</h3>
+        <div class="toggle-row" v-for="n in notificationSettings" :key="n.key">
+          <div class="toggle-row__label">
+            <span class="toggle-row__title">{{ n.label }}</span>
+            <span class="toggle-row__desc">{{ n.desc }}</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" v-model="n.enabled" />
+            <span class="toggle-slider" />
+          </label>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h3>主题偏好</h3>
+        <div class="chips-row">
+          <button v-for="t in themes" :key="t.key" class="chip" :class="{ active: selectedTheme === t.key }" @click="selectedTheme = t.key">
+            {{ t.icon }} {{ t.label }}
+          </button>
+        </div>
       </div>
     </div>
   </div>

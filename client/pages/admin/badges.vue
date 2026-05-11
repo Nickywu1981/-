@@ -186,7 +186,7 @@ async function toggleStatus(b: any) {
 }
 
 async function confirmDelete(b: any) {
-  if (!await confirm({ message: `确认删除「${b.name}」？`)) return;
+  if (!await confirm({ message: `确认删除「${b.name}」？` })) return;
   try {
     await $fetch(`/api/badges/admin/${b.id}`, {
       method: 'DELETE',

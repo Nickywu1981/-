@@ -137,7 +137,7 @@ async function toggleStatus(p: any) {
 }
 
 async function delProxy(id: number) {
-  if (!await confirm({ message: '确认删除该代理配置？')) return
+  if (!await confirm({ message: '确认删除该代理配置？'} )) return
   try {
     const res: any = await $fetch(`/api/proxy/${id}`, { method: 'DELETE' })
     if (res?.code === 200 || res?.code === 0) { toast.success('代理已删除'); fetchData() }

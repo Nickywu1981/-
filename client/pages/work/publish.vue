@@ -206,7 +206,7 @@ function togglePlatform(key) {
   else selectedPlatforms.value.push(key);
 }
 
-function toast(msg: string, type = 'success') {
+function notify(msg: string, type = 'success') {
   toastMsg.value = msg;
   toastType.value = type;
   showToast.value = true;

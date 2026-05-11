@@ -131,7 +131,7 @@ async function publishPage(id) {
 }
 
 async function deletePage(id) {
-  if (!await confirm({ message: '确认删除？')) return
+  if (!await confirm({ message: '确认删除？' })) return
   try { await $fetch(`/api/diy/${id}/soft-delete`, { method: 'POST' }); loadPages() }
   catch (e) { toast.error('删除失败') }
 }

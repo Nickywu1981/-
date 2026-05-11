@@ -183,6 +183,7 @@ a {
 }
 
 a:hover { color: var(--cfg-primary-hover); }
+a:focus-visible { outline: 2px solid var(--cfg-primary); outline-offset: 2px; border-radius: 2px; }
 
 /* ==============================
  * 按钮 (配置驱动)
@@ -214,6 +215,7 @@ a:hover { color: var(--cfg-primary-hover); }
   color: var(--cfg-text-inverse);
 }
 .btn-primary:hover:not(:disabled) { background: var(--cfg-primary-hover); }
+.btn-primary:focus-visible:not(:disabled) { outline: 2px solid var(--cfg-primary); outline-offset: 2px; }
 
 .btn-secondary {
   background: transparent;
@@ -221,18 +223,21 @@ a:hover { color: var(--cfg-primary-hover); }
   border-color: var(--cfg-primary);
 }
 .btn-secondary:hover:not(:disabled) { background: var(--cfg-primary-light); }
+.btn-secondary:focus-visible:not(:disabled) { outline: 2px solid var(--cfg-primary); outline-offset: 2px; }
 
 .btn-ghost {
   background: transparent;
   color: var(--cfg-text-secondary);
 }
 .btn-ghost:hover:not(:disabled) { background: var(--cfg-bg-tertiary); }
+.btn-ghost:focus-visible:not(:disabled) { outline: 2px solid var(--cfg-primary); outline-offset: 2px; }
 
 .btn-error {
   background: var(--cfg-error);
   color: var(--cfg-text-inverse);
 }
 .btn-error:hover:not(:disabled) { background: #DC2626; }
+.btn-error:focus-visible:not(:disabled) { outline: 2px solid var(--cfg-error); outline-offset: 2px; }
 
 .btn-sm  { padding: var(--cfg-spacing-xs) var(--cfg-spacing-md); font-size: var(--cfg-font-size-sm); }
 .btn-lg  { padding: var(--cfg-spacing-md) var(--cfg-spacing-lg); font-size: var(--cfg-font-size-md); }

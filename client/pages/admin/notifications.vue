@@ -107,7 +107,7 @@ async function confirmSend() {
 }
 
 async function doDelete(n: any) {
-  if (!await confirm({ message: `确定删除通知 #${n.id}？`)) return
+  if (!await confirm({ message: `确定删除通知 #${n.id}？`} )) return
   try {
     const data = await $fetch(`/api/notifications/${n.id}`, { method: 'DELETE', credentials: 'include' }) as ApiResponse
     if (data?.code === 200) { toast.success('已删除'); fetch() }

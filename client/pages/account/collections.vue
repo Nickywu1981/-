@@ -161,7 +161,7 @@ async function saveEdit() {
 }
 
 async function deleteItem(item: any) {
-  if (!await confirm({ message: `确定删除合集「${item.name}」？此操作不可恢复。`)) return
+  if (!await confirm({ message: `确定删除合集「${item.name}」？此操作不可恢复。`} )) return
   try {
     await $fetch(`/api/collections/${item.id}`, { method: 'DELETE' })
     toast.success('已删除')
