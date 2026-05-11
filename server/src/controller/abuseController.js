@@ -8,10 +8,10 @@ export const listAllRecords = wrapController(async (req, res) => {
     const { userId } = req.query;
     const data = await abuseService.listAbuseRecords({ page, pageSize, userId });
     success(res, data);
-})
+});
 
 export const checkAbuse = wrapController(async (req, res) => {
     const { userId } = req.params;
     const isAbusing = await abuseService.checkHighFrequency(+userId);
     success(res, { abusing: isAbusing });
-})
+});

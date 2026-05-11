@@ -1,7 +1,6 @@
 import { wrapController } from '../utils/wrapController.js';
 import tierService from '../services/tierService.js';
-import { success, error } from '../utils/response.js';
-import { ERROR_CODE } from '../constants/errorCode.js';
+import { success } from '../utils/response.js';
 
 export const getMyTier = wrapController(async (req, res, next) => {
     const tier = await tierService.getUserTier(req.userId);

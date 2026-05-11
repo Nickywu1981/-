@@ -3,8 +3,7 @@
  * G5 后端开发 | G-03 修复
  */
 import { wrapController } from '../utils/wrapController.js';
-import { success, error } from '../utils/response.js';
-import { ERROR_CODE } from '../constants/errorCode.js';
+import { success } from '../utils/response.js';
 import * as openApiService from '../services/openApiService.js';
 
 export const ping = wrapController(async (req, res, next) => { success(res, await openApiService.ping(req.tenantId)); })

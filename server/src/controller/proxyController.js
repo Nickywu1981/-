@@ -1,8 +1,7 @@
 import { wrapController } from '../utils/wrapController.js';
 import * as proxyService from '../services/proxyService.js';
-import { success, error } from '../utils/response.js';
+import { success } from '../utils/response.js';
 import { parsePagination } from '../utils/pagination.js';
-import { ERROR_CODE } from '../constants/errorCode.js';
 
 // ==================== 配置 CRUD ====================
 

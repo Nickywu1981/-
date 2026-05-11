@@ -4,9 +4,8 @@
  */
 import { wrapController } from '../utils/wrapController.js';
 import * as modelConfigService from '../services/modelConfigService.js';
-import { success, error } from '../utils/response.js';
+import { success } from '../utils/response.js';
 import { parsePagination } from '../utils/pagination.js';
-import { ERROR_CODE } from '../constants/errorCode.js';
 
 // ============ 模型配置 CRUD ============
 

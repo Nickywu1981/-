@@ -1,7 +1,6 @@
 import { wrapController } from '../utils/wrapController.js';
 import * as tenantService from '../services/tenantService.js';
-import { success, error } from '../utils/response.js';
-import { ERROR_CODE } from '../constants/errorCode.js';
+import { success } from '../utils/response.js';
 
 export const listTenants = wrapController(async (req, res) => {
     const list = await tenantService.listTenants();

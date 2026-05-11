@@ -2,8 +2,7 @@
  * 向量记忆控制器
  */
 import { wrapController } from '../utils/wrapController.js';
-import { success, error } from '../utils/response.js';
-import { ERROR_CODE } from '../constants/errorCode.js';
+import { success } from '../utils/response.js';
 import * as svc from '../services/memoryEmbedService.js';
 
 export const embed = wrapController(async (req, res) => {

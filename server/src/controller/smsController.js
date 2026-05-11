@@ -1,6 +1,6 @@
 import { wrapController } from '../utils/wrapController.js';
 import * as smsService from '../services/smsService.js';
-import { success, listResult, error } from '../utils/response.js';
+import { success, error, listResult } from '../utils/response.js';
 import { parsePagination } from '../utils/pagination.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 

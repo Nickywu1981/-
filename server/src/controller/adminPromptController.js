@@ -1,8 +1,7 @@
 import { wrapController } from '../utils/wrapController.js';
 import * as promptService from '../services/promptService.js';
-import { success, listResult, error } from '../utils/response.js';
+import { success, listResult } from '../utils/response.js';
 import { parsePagination } from '../utils/pagination.js';
-import { ERROR_CODE } from '../constants/errorCode.js';
 
 // 管理后台：模板列表（含草稿/已下架等非公开）
 export const adminListTemplates = wrapController(async (req, res) => {

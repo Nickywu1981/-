@@ -1,7 +1,6 @@
 import { wrapController } from '../utils/wrapController.js';
 import * as automationService from '../services/automationService.js';
-import { success, error } from '../utils/response.js';
-import { ERROR_CODE } from '../constants/errorCode.js';
+import { success } from '../utils/response.js';
 
 export const listTasks = wrapController(async (req, res) => {
     const page = parseInt(req.query.page, 10) || 1;
