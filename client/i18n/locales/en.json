@@ -345,6 +345,55 @@
       {"id":"detail_page","category":"detail","icon":"📄","title":"Detail Page Design","desc":"Smart layout design for product detail pages","route":"/work/detail-page","order":1,"visible":true},
       {"id":"copy_title","category":"copywrite","icon":"✍️","title":"Title/Selling Points","desc":"AI-generated high-conversion product titles","route":"/work/copywriting","order":1,"visible":true},
       {"id":"digital_human","category":"digital","icon":"🤖","title":"Digital Human Sales","desc":"24/7 automated sales videos with digital humans","route":"/work/digital-human","order":1,"visible":true}
-    ]
+    ],
+    "default_tool_cards": {
+      "video": [
+        {"id":"video_gen","category":"video","icon":"🎥","title":"AI Short Video","desc":"Turn product images into sales videos","route":"/work/video","order":1,"visible":true},
+        {"id":"video_edit","category":"video","icon":"✂","title":"Video Editor","desc":"Online clip/subtitle/music/color","route":"/work/video-edit","order":2,"visible":true},
+        {"id":"video_trans","category":"video","icon":"🌐","title":"Video Translate","desc":"Voice/subtitle/face 3-in-1 translation","route":"/work/video-translate","order":3,"visible":true},
+        {"id":"script_gen","category":"video","icon":"📝","title":"Short Video Script","desc":"Auto-generate sales video voiceover scripts","route":"/work/script-gen","order":4,"visible":true},
+        {"id":"shot_plan","category":"video","icon":"📐","title":"Shot Plan","desc":"Video shot plan/order/duration","route":"/work/shot-plan","order":5,"visible":true},
+        {"id":"storyboard","category":"video","icon":"🎞","title":"Storyboard","desc":"Visual storyboard preview for video ideas","route":"/work/storyboard","order":6,"visible":true}
+      ],
+      "image": [
+        {"id":"img_main","category":"image","icon":"🖼","title":"AI Product Image","desc":"One-click product main image for all platforms","route":"/work/image","order":1,"visible":true},
+        {"id":"img_scene","category":"image","icon":"🏞","title":"Scene Generation","desc":"Place products in lifestyle scenes","route":"/work/main-image","order":2,"visible":true},
+        {"id":"img_poster","category":"image","icon":"📰","title":"Poster Generator","desc":"Marketing/campaign/launch posters","route":"/work/poster","order":3,"visible":true},
+        {"id":"img_white_bg","category":"image","icon":"⬜","title":"White BG Image","desc":"Platform-compliant white background images","route":"/work/white-bg","order":4,"visible":true},
+        {"id":"img_bg_remove","category":"image","icon":"✂","title":"Smart Background Removal","desc":"AI 3-second precise subject cutout","route":"/work/remove-bg","order":5,"visible":true},
+        {"id":"img_retouch","category":"image","icon":"✨","title":"AI Retouch","desc":"Color/sharpen/texture enhancement","route":"/work/retouch","order":6,"visible":true},
+        {"id":"img_recolor","category":"image","icon":"🎯","title":"Color Swap","desc":"Show multiple colors for same style","route":"/work/color-swap","order":7,"visible":true},
+        {"id":"img_style","category":"image","icon":"🖌","title":"Style Transfer","desc":"Photo to oil/watercolor/3D style","route":"/work/style-transfer","order":8,"visible":true},
+        {"id":"img_text_fx","category":"image","icon":"🔤","title":"Text Effects","desc":"3D/metallic/neon title effects","route":"/work/text-effect","order":9,"visible":true},
+        {"id":"img_expand","category":"image","icon":"↔","title":"Smart Outpainting","desc":"Intelligent edge extension and completion","route":"/work/outpaint","order":10,"visible":true},
+        {"id":"batch_process","category":"image","icon":"📦","title":"Batch Processing","desc":"50 images unified cutout+white bg+resize","route":"/work/batch","order":11,"visible":true}
+      ],
+      "detail": [
+        {"id":"detail_page","category":"detail","icon":"📄","title":"Detail Page Design","desc":"Smart layout for product detail pages","route":"/work/detail-page","order":1,"visible":true},
+        {"id":"product_render","category":"detail","icon":"🛒","title":"Product Rendering","desc":"3D product rotation/detail showcase","route":"/work/product-render","order":2,"visible":true},
+        {"id":"virtual_tryon","category":"detail","icon":"👗","title":"Virtual Try-On","desc":"Buyers see clothing fit online","route":"/work/virtual-tryon","order":3,"visible":true},
+        {"id":"model_generate","category":"detail","icon":"🧍","title":"AI Model","desc":"AI virtual model wearing showcase","route":"/work/model-generate","order":4,"visible":true},
+        {"id":"img_ghost","category":"detail","icon":"👤","title":"Ghost Mannequin","desc":"Invisible mannequin fit showcase","route":"/work/ghost-mannequin","order":5,"visible":true},
+        {"id":"platform_taobao","category":"detail","icon":"📱","title":"Multi-Platform Adapt","desc":"Tmall/JD/Pinduoduo size adaption","route":"/work/multi-platform","order":6,"visible":true},
+        {"id":"main_img_set","category":"detail","icon":"🖼","title":"Main Image Set","desc":"Main+supplementary+white bg set","route":"/work/main-image-set","order":7,"visible":true},
+        {"id":"output","category":"detail","icon":"📁","title":"Export Settings","desc":"Unified format/size/naming export","route":"/work/output","order":8,"visible":true}
+      ],
+      "copywrite": [
+        {"id":"copy_title","category":"copywrite","icon":"📋","title":"E-Com Title","desc":"SEO titles/selling points batch gen","route":"/work/title-gen","order":1,"visible":true},
+        {"id":"copy_detail","category":"copywrite","icon":"📝","title":"Detail Copy","desc":"Long-form product detail page copy","route":"/work/detail-copy","order":2,"visible":true},
+        {"id":"script_gen2","category":"copywrite","icon":"🎙","title":"VO Script","desc":"Auto sales short video voiceover scripts","route":"/work/script-gen","order":3,"visible":true},
+        {"id":"campaign_copy","category":"copywrite","icon":"📢","title":"Campaign Copy","desc":"Promo/event/sale copy generation","route":"/work/campaign-copy","order":4,"visible":true},
+        {"id":"email_copy","category":"copywrite","icon":"📧","title":"Email Copy","desc":"EDM marketing email/SMS copy","route":"/work/email-copy","order":5,"visible":true},
+        {"id":"social_copy","category":"copywrite","icon":"📱","title":"Social Copy","desc":"Xiaohongshu/Douyin/TikTok copy","route":"/work/social-copy","order":6,"visible":true}
+      ],
+      "digital": [
+        {"id":"digital_human","category":"digital","icon":"🤖","title":"Digital Human Sales","desc":"24/7 automated sales videos","route":"/work/digital-human","order":1,"visible":true},
+        {"id":"digital_live","category":"digital","icon":"📡","title":"Digital Livestream","desc":"Virtual studio auto product showcase","route":"/work/digital-live","order":2,"visible":true},
+        {"id":"avatar_custom","category":"digital","icon":"🧬","title":"Avatar Custom","desc":"Custom digital human look/voice/motion","route":"/work/avatar-custom","order":3,"visible":true},
+        {"id":"ai_host","category":"digital","icon":"🎤","title":"AI Host","desc":"Smart voice product USP broadcast","route":"/work/ai-host","order":4,"visible":true},
+        {"id":"virtual_model","category":"digital","icon":"👤","title":"Virtual Model","desc":"AI virtual model wearing showcase","route":"/work/virtual-model","order":5,"visible":true},
+        {"id":"face_swap","category":"digital","icon":"🔄","title":"Face Swap","desc":"AI face replacement/digital human swap","route":"/work/face-swap","order":6,"visible":true}
+      ]
+    }
   }
 }

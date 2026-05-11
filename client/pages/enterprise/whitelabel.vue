@@ -3,7 +3,9 @@
     <h1 class="page-title">白标设置</h1>
     <p class="subtitle">自定义企业品牌外观，应用于企业专属页面</p>
 
-    <div class="form-card">
+    <div v-if="loading" class="empty">加载中...</div>
+
+    <div v-else class="form-card">
       <div class="form-group">
         <label>站点名称</label>
         <input v-model="form.siteName" placeholder="例如: XX公司AI服务中心" />
@@ -39,6 +41,7 @@
 
 <script setup>
 const form = ref({ siteName: '', logo: '', primaryColor: '#667eea', domain: '' });
+const loading = ref(true);
 const saving = ref(false);
 const saveMsg = ref('');
 const saveOk = ref(false);
@@ -49,7 +52,8 @@ onMounted(async () => {
     if (res.data && Object.keys(res.data).length) {
       form.value = { ...form.value, ...res.data };
     }
-  } catch (e) { console.error(e); }
+  } catch (e) { /* ignore */ }
+  finally { loading.value = false; }
 });
 
 async function handleSave() {

@@ -359,34 +359,14 @@ const useCases = computed(() => t('landing.use_cases') as any[])
 const faqs = computed(() => t('landing.faqs') as any[])
 const platforms = computed(() => t('landing.platforms') as string[])
 
-const cards = [
-  { id: 'main', icon: '▣', title: '智能做主图', desc: 'AI 自动抠图→白底→精修→裁切→品牌水印，一键生成3张风格主图', tags: ['爆款商品图', '13平台适配'], color: '#EDE9FE', ai: true, route: '/work/main-image', category: 'image' },
-  { id: 'scene', icon: '◈', title: '智能做场景', desc: '产品图+AI场景库→自动光影融合→出5张场景图，支持自定义背景', tags: ['场景融合', '光影匹配'], color: '#DBEAFE', ai: true, route: '/work/scene', category: 'image' },
-  { id: 'detail', icon: '⊞', title: '智能做详情', desc: '产品图→AI自动生成文案+图文排版→完整详情页，多品类适配', tags: ['AI文案', '自动排版'], color: '#D1FAE5', ai: true, route: '/work/detail-h5', category: 'image' },
-  { id: 'video', icon: '▶', title: '智能做视频', desc: '图片/多图→AI生成带货视频→自动字幕+BGM→1080×1920竖屏输出', tags: ['AI运镜', '自动字幕'], color: '#FEF3C7', ai: true, route: '/work/video', category: 'video' },
-  { id: 'batch', icon: '⊡', title: '批量处理', desc: '文件夹拖入→选操作→后台排队→完成通知→ZIP下载，支持夜间托管', tags: ['批量队列', '夜间折扣'], color: '#F3E8FF', ai: false, route: '/work/batch', category: 'image' },
-  { id: 'tryon', icon: '◇', title: '虚拟模特', desc: '服装平铺图→真人模特上身效果，多肤色/体型/风格可选', tags: ['AI试穿', '多肤色'], color: '#ECFEFF', ai: true, route: '/work/virtual-tryon', category: 'image' },
-  { id: 'action', icon: '◉', title: '动作迁移', desc: '人物图+参考动作视频→AI精准迁移动作姿态，生成流畅展示视频', tags: ['动作捕捉', '精准迁移'], color: '#FCE7F3', ai: true, route: '/work/action-transfer', category: 'video' },
-  { id: 'color', icon: '◐', title: '一键换色', desc: '服装鞋包颜色变换，保留褶皱纹理质感，支持批量换色', tags: ['多色生成', '纹理保留'], color: '#FFF7ED', ai: true, route: '/work/color-swap', category: 'image' },
-  { id: 'style', icon: '◧', title: '风格转化', desc: '6大风格一键转换：复古/国潮/插画/水彩/赛博/极简，保留商品特征', tags: ['6大风格', '创意设计'], color: '#F0FDF4', ai: true, route: '/work/style-transfer', category: 'image' },
-  { id: 'digital', icon: '◓', title: '口播数字人', desc: '输入文案→选数字人形象+语音→AI生成带货口播视频', tags: ['数字人', 'TTS语音'], color: '#FFFBEB', ai: true, route: '/work/digital-human', category: 'video' },
-  { id: 'script', icon: '▤', title: '带货脚本', desc: '产品卖点→AI生成短视频口播/直播话术/种草文案，支持9语种+3脚本类型', tags: ['9语种', '口播+话术'], color: '#FDF2F8', ai: true, route: '/work/script-gen', category: 'ai' },
-  { id: 'viral', icon: '◆', title: '爆款复刻', desc: '对标爆款视频→AI分析节奏/色调/转场→用你的产品重新生成相似风格', tags: ['爆款分析', '风格复刻'], color: '#FEF2F2', ai: true, route: '/work/viral-clone', category: 'video' },
-  { id: 'remove-bg', icon: '◯', title: '智能抠图', desc: 'AI发丝级抠图，毛发/透明体/复杂边缘精准分离，支持单品+批量处理', tags: ['发丝级', '批量抠图'], color: '#E8F5E9', ai: true, route: '/work/remove-bg', category: 'image' },
-  { id: 'white-bg', icon: '▭', title: '白底图生成', desc: '抠图后智能生成纯白/场景底图，自动光影校正+阴影保留，平台直出', tags: ['白底/透明', '光影校正'], color: '#F5F5F5', ai: true, route: '/work/white-bg', category: 'image' },
-  { id: 'retouch', icon: '✦', title: '图片精修', desc: 'AI自动祛皱/去污/补光/锐化，保留材质纹理，批量提升产品图质感', tags: ['祛皱补光', '纹理保留'], color: '#FFF8E1', ai: true, route: '/work/retouch', category: 'image' },
-  { id: 'platform-detail', icon: '▥', title: '平台详情页模板', desc: '13大电商平台详情页模板库，选平台→选模板→上传素材→一键生成适配尺寸', tags: ['13平台', '尺寸适配'], color: '#EFF6FF', ai: true, route: '/work/platform-detail', category: 'image' },
-  { id: 'compliance', icon: '◬', title: '跨境合规检查', desc: '上传图片+文案→自动检测亚马逊/Temu/TikTok/Shein合规风险，覆盖欧美日市场', tags: ['合规检测', '多市场'], color: '#FFF1F2', ai: true, route: '/work/compliance-check', category: 'ai' },
-  { id: 'ghost-mannequin', icon: '▯', title: '幽灵模特', desc: '服装平铺/挂拍→AI自动穿到隐形模特身上，生成3D立体效果展示图', tags: ['3D立体', '隐形模特'], color: '#F0F9FF', ai: true, route: '/work/ghost-mannequin', category: 'image' },
-  { id: 'outpaint', icon: '▩', title: '智能扩图', desc: 'AI扩展图片边缘自动补全构图，适配各平台尺寸比例，无缝融合不留痕迹', tags: ['构图补全', '比例适配'], color: '#F5F3FF', ai: true, route: '/work/outpainting', category: 'image' },
-  { id: 'image-translate', icon: '🌐', title: '图片翻译', desc: '商品图文字智能识别→翻译为9语种→原位替换，跨境卖家出海必备', tags: ['OCR识别', '9语种翻译'], color: '#ECFDF5', ai: true, route: '/work/image-translate', category: 'image' },
-  { id: 'video-edit', icon: '▸', title: '视频编辑', desc: 'AI智能裁剪/变速/转场/调色，自动生成多尺寸多时长版本供投放', tags: ['智能剪辑', '多尺寸输出'], color: '#FFF7ED', ai: true, route: '/work/video-edit', category: 'video' },
-  { id: 'voice-gen', icon: '♫', title: 'AI语音生成', desc: '输入文案→选主播音色→生成自然流畅带货配音，支持9语种50+音色', tags: ['TTS合成', '50+音色'], color: '#FDF2F8', ai: true, route: '/work/voice-gen', category: 'ai' },
-  { id: 'storyboard', icon: '⊟', title: '智能分镜', desc: '文案脚本→AI自动拆解为分镜画面+配音+字幕，一键生成完整短视频', tags: ['脚本拆解', '自动分镜'], color: '#FFF1F2', ai: true, route: '/work/storyboard', category: 'video' },
-]
+const cards = computed(() => {
+  const fromI18n = t('landing.feature_cards') as any[]
+  if (Array.isArray(fromI18n) && fromI18n.length) return fromI18n
+  return []
+})
 
 const filteredCards = computed(() =>
-  activeTab.value === 'all' ? cards : cards.filter(c => c.category === activeTab.value)
+  activeTab.value === 'all' ? cards.value : cards.value.filter(c => c.category === activeTab.value)
 )
 
 const plans = computed(() => {

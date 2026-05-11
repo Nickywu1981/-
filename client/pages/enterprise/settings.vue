@@ -2,6 +2,9 @@
   <div class="ent-settings">
     <h1 class="page-title">账户设置</h1>
 
+    <div v-if="loading" class="empty">加载中...</div>
+
+    <template v-else>
     <div class="form-card">
       <h2>企业信息</h2>
       <div class="form-group">
@@ -42,11 +45,13 @@
         <div class="info-item"><span class="label">到期时间</span><span>{{ profile.expireTime || '长期有效' }}</span></div>
       </div>
     </div>
+    </template>
   </div>
 </template>
 
 <script setup>
 const profile = ref({});
+const loading = ref(true);
 const saving = ref(false);
 const msg = ref('');
 const ok = ref(false);
@@ -60,7 +65,8 @@ onMounted(async () => {
   try {
     const res = await $fetch('/api/enterprise/profile', { credentials: 'include' });
     profile.value = res.data || res;
-  } catch (e) { console.error(e); }
+  } catch (e) { /* ignore */ }
+  finally { loading.value = false; }
 });
 
 async function handleSave() {

@@ -2,6 +2,9 @@
   <div class="distribution-page">
     <div class="page-header"><h1>推广分销</h1></div>
 
+    <div v-if="loading" class="empty">加载中...</div>
+
+    <template v-else>
     <!-- 概览卡片 -->
     <div class="stat-cards">
       <div class="stat-card"><div class="stat-num">{{ inviteCode }}</div><div class="stat-label">我的邀请码</div></div>
@@ -44,6 +47,7 @@
       </table>
       <p v-else class="empty">暂无佣金流水</p>
     </div>
+    </template>
   </div>
 </template>
 
@@ -54,9 +58,11 @@ const inviteCode = ref('');
 const team = ref([]);
 const balance = ref({});
 const history = ref({ list: [] });
+const loading = ref(true);
 
 onMounted(async () => {
   await Promise.all([loadInviteCode(), loadTeam(), loadBalance(), loadHistory()]);
+  loading.value = false;
 });
 
 async function loadInviteCode() {
