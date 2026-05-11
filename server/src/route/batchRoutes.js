@@ -45,8 +45,8 @@ router.get('/tasks/:taskId', authMiddleware, validate(taskIdParamSchema, 'params
 router.get('/:taskId/download', authMiddleware, validate(taskIdParamSchema, 'params'), asyncHandler(getBatchZipUrl));
 
 // 批量模板
-router.post('/templates', authMiddleware, validate(templateSchema), asyncHandler(saveBatchTemplate));
+router.post('/templates', authMiddleware, heavyLimiter, validate(templateSchema), asyncHandler(saveBatchTemplate));
 router.get('/templates', authMiddleware, validate(paginationSchema, 'query'), asyncHandler(listBatchTemplates));
-router.delete('/templates/:id', authMiddleware, validate(idParamSchema, 'params'), asyncHandler(deleteBatchTemplate));
+router.delete('/templates/:id', authMiddleware, heavyLimiter, validate(idParamSchema, 'params'), asyncHandler(deleteBatchTemplate));
 
 export default router;
