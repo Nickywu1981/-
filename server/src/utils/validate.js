@@ -2,6 +2,8 @@ import { z } from 'zod';
 import { error } from './response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 /**
  * 通用 Zod 校验中间件工厂
  * @param {z.ZodSchema} schema - Zod schema
@@ -12,6 +14,9 @@ export function validate(schema, source = 'body') {
     const data = req[source];
     const result = schema.safeParse(data);
     if (!result.success) {
+      if (isProduction) {
+        return error(res, ERROR_CODE.BAD_REQUEST, '参数校验失败');
+      }
       const errors = result.error.issues.map((i) => ({
         field: i.path.join('.'),
         message: i.message,
@@ -25,12 +30,14 @@ export function validate(schema, source = 'body') {
 
 /**
  * v4 校验中间件 — 结果存入 req.validated，不覆盖 req.body
- * 用于 v4 路由的统一 safeParse + 标准化错误响应
  */
 export function validateV4(schema) {
   return (req, res, next) => {
     const result = schema.safeParse(req.body);
     if (!result.success) {
+      if (isProduction) {
+        return error(res, ERROR_CODE.VALIDATION_ERROR, '参数校验失败');
+      }
       return error(res, ERROR_CODE.VALIDATION_ERROR, result.error.issues.map(e => e.message).join('; '));
     }
     req.validated = result.data;

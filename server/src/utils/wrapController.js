@@ -1,6 +1,7 @@
 import { error } from './response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { BusinessError } from './businessError.js';
+import logger from './logger.js';
 
 /**
  * 控制器包装器 — 消除重复 try/catch 样板代码
@@ -15,6 +16,13 @@ export function wrapController(fn) {
       if (err instanceof BusinessError) {
         return error(res, err.status, err.message);
       }
+      logger.error('[wrapController] 未预期异常', {
+        message: err.message,
+        stack: process.env.NODE_ENV !== 'production' ? err.stack : undefined,
+        path: req.path,
+        method: req.method,
+        userId: req.user?.id || req.user?.userId,
+      });
       return error(res, ERROR_CODE.INTERNAL_ERROR, '服务器内部错误');
     }
   };

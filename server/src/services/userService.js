@@ -100,7 +100,8 @@ export async function forgotPassword(username) {
   const user = await userDao.findByUsername(username);
   if (!user) return { message: '重置链接已发送至注册邮箱（Mock模式：若账号存在）' };
   const resetToken = jwt.sign({ userId: user.id, purpose: 'reset', jti: crypto.randomUUID() }, jwtSecret, { expiresIn: '15m' });
-  return { message: '重置链接已发送至注册邮箱（Mock模式：token=' + resetToken.slice(-20) + '）' };
+  const mockInfo = process.env.NODE_ENV !== 'production' ? `（Mock模式：token=...${resetToken.slice(-8)}）` : '';
+  return { message: `重置链接已发送至注册邮箱${mockInfo}` };
 }
 
 export async function resetPassword(token, newPassword) {
