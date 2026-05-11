@@ -4,6 +4,7 @@
  * Phase 1: 企业/代理端 MVP (2026-05-11)
  */
 import { success } from '../utils/response.js';
+import logger from '../utils/logger.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { BusinessError } from '../utils/businessError.js';
 import { wrapController } from '../utils/wrapController.js';
@@ -25,7 +26,7 @@ function audit(req, action, targetId, targetTitle) {
     targetId: targetId != null ? String(targetId) : null,
     targetTitle,
     ip: req.ip,
-  }).catch(() => {});
+  }).catch(err => { logger.warn('[enterprise] audit log failed', err.message); });
 }
 
 // ==================== 企业入驻/登录 ====================

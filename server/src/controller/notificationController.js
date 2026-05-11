@@ -33,7 +33,8 @@ export const sendNotification = wrapController(async (req, res, next) => {
   })
 
 export const deleteNotification = wrapController(async (req, res, next) => {
-    await notificationService.deleteById(req.params.id, req.user.id);
+    const ok = await notificationService.deleteById(req.params.id, req.user.id);
+    if (!ok) return error(res, ERROR_CODE.NOT_FOUND, '通知不存在');
     return success(res, {}, '已删除');
   })
 

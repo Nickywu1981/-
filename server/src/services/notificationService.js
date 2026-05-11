@@ -42,5 +42,5 @@ export async function sendToUser({ userId, type = 'system', title, content }) {
 }
 
 export async function deleteById(id, userId) {
-  await notificationDao.deleteNotification(id, userId);
+  return notificationDao.deleteNotification(id, userId);
 }
