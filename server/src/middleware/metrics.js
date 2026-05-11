@@ -102,5 +102,3 @@ export function healthCheckEndpoint(req, res) {
   };
   return success(res, checks);
 }
-
-export default { metricsMiddleware, metricsEndpoint, healthCheckEndpoint };

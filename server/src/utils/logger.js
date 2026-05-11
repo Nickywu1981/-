@@ -77,14 +77,14 @@ export function requestLogger(req, res, next) {
 }
 
 /** 慢查询日志 */
-export function slowQueryLog(sql, ms, params) {
+function slowQueryLog(sql, ms, params) {
   if (ms > SLOW_QUERY_THRESHOLD_MS) {
     logger.warn('slow_query', { sql: sql.substring(0, 200), ms, paramCount: params?.length });
   }
 }
 
 /** 获取日志统计 */
-export function getLogStats() {
+function getLogStats() {
   return {
     sampleRate: LOG_SAMPLE_RATE,
     slowQueryThreshold: SLOW_QUERY_THRESHOLD_MS,

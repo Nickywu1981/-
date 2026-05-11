@@ -207,8 +207,6 @@ export const adminOnly = requireRole('admin');
 export const editorOrAbove = requireRole('editor');
 export const userOrAbove = requireRole('user');
 
-export default { ROLES, PERMISSIONS, hasPermission, hasRole, requireRole, requirePermission, requireAnyPermission, roleGuard, adminOnly, editorOrAbove, userOrAbove };
-
 /**
  * 角色守卫中间件工厂 — 允许传入的任一角色匹配即通过（OR 逻辑，非等级制）
  * @param  {...string} roles 允许的角色列表，如 'admin', 'editor', 'user'

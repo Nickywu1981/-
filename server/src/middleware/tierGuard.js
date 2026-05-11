@@ -23,5 +23,3 @@ export function tierGuard(type = 'image') {
     }
   };
 }
-
-export default { tierGuard };

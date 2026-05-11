@@ -125,5 +125,3 @@ export async function openApiRateLimit(req, res, next) {
 
   next();
 }
-
-export default { generateApiKey, verifyApiSignature, openApiAuth, openApiRateLimit };

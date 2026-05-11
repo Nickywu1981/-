@@ -67,5 +67,3 @@ export async function invalidateCache(pattern) {
     }
   } catch { /* ignore */ }
 }
-
-export default { cacheMiddleware, invalidateCache };

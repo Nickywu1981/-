@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { success, listResult, error, mockSuccess } from '../../utils/response.js';
+import { success, listResult, error } from '../../utils/response.js';
 
 
 function mockRes() {
@@ -35,13 +35,5 @@ describe('error', () => {
     error(res, 400, '参数错误', null);
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith({ code: 400, msg: '参数错误', data: null });
-  });
-});
-
-describe('mockSuccess', () => {
-  it('包含 isMock 标记', () => {
-    const res = mockRes();
-    mockSuccess(res, { name: 'test' });
-    expect(res.json).toHaveBeenCalledWith({ code: 200, msg: 'success', data: { isMock: true, name: 'test' } });
   });
 });

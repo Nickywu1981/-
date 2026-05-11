@@ -103,5 +103,3 @@ export function csrfProtection(req, res, next) {
 
   next();
 }
-
-export default { setCsrfCookie, csrfProtection };

@@ -55,7 +55,7 @@ export function error(res, code = 500, msg = '服务异常', data = null) {
  * @param {import('express').Response} res
  * @param {object} [data={}]
  */
-export function mockSuccess(res, data = {}) {
+function mockSuccess(res, data = {}) {
   return res.json({ code: 200, msg: 'success', data: { isMock: true, ...data } });
 }
 

@@ -58,5 +58,3 @@ export function mustTenant(tenantId) {
   }
   return { error: null };
 }
-
-export default { withTenant, insertWithTenant, mustTenant };

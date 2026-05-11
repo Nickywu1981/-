@@ -50,7 +50,7 @@ function matchMagic(buffer, ext) {
   return true;
 }
 
-export async function validateFileMagic(filePath, ext) {
+async function validateFileMagic(filePath, ext) {
   const fsp = await import('fs/promises');
   const fd = await fsp.open(filePath, 'r');
   const buf = Buffer.alloc(16);
@@ -67,7 +67,7 @@ export async function validateFileMagic(filePath, ext) {
 }
 
 // 内存版本（用于 multer buffer）
-export function validateBufferMagic(buffer, ext) {
+function validateBufferMagic(buffer, ext) {
   if (!matchMagic(buffer, ext)) {
     throw new BusinessError(400, `文件内容与声明的类型 (${ext}) 不匹配`);
   }

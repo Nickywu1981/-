@@ -190,5 +190,3 @@ export const JWT_CONFIG = {
   accessExpires: ACCESS_EXPIRES,
   refreshExpires: REFRESH_EXPIRES,
 };
-
-export default { generateTokens, verifyAccessToken, refreshAccessToken, revokeAccessToken, isTokenBlacklisted, revokeAllUserTokens, JWT_CONFIG };

@@ -73,5 +73,3 @@ export const passwordSchema = z.string().min(8, '密码至少8位').max(32, '密
 
 /** ID */
 export const idSchema = z.coerce.number().int().positive('ID必须为正整数');
-
-export default { validate, paginationSchema, phoneSchema, emailSchema, codeSchema, passwordSchema, idSchema };
