@@ -5,6 +5,17 @@ export default defineNuxtConfig({
   css: ['@/assets/css/design-tokens.css'],
 
   app: {
+    // Smooth page transitions for workspace navigation
+    pageTransition: {
+      name: 'page',
+      mode: 'out-in',
+      appear: true,
+    },
+    layoutTransition: {
+      name: 'layout',
+      mode: 'out-in',
+      appear: false,
+    },
     head: {
       title: 'Movio AI — AI电商视觉创作平台',
       meta: [

@@ -112,7 +112,7 @@ async function loadCustomers() {
     if (keyword.value) params.set('keyword', keyword.value);
     if (statusFilter.value) params.set('status', statusFilter.value);
     if (tagFilter.value) params.set('tagId', tagFilter.value);
-    const data = await $api(`/enterprise/customers?${params}`);
+    const data = await $api(`/?${params}`);
     customers.value = data.list || [];
     total.value = data.total || 0;
     (data.list || []).forEach(c => { if (c.customer_tags) customerTagsMap[c.id] = c.customer_tags; });
@@ -121,11 +121,11 @@ async function loadCustomers() {
 }
 
 async function loadStats() {
-  try { Object.assign(stats, await $api('/enterprise/customers/stats')); } catch (e) { console.error(e); toast.error('客户统计加载失败'); }
+  try { Object.assign(stats, await $api('/stats')); } catch (e) { console.error(e); toast.error('客户统计加载失败'); }
 }
 
 async function loadTags() {
-  try { tags.value = await $api('/enterprise/customers/tags'); } catch (e) { console.error(e); toast.error('标签列表加载失败'); }
+  try { tags.value = await $api('/tags'); } catch (e) { console.error(e); toast.error('标签列表加载失败'); }
 }
 
 function getCustomerTags(cid) { return customerTagsMap[cid] || []; }
@@ -142,7 +142,7 @@ async function applyTags() {
   if (!tagTarget.value) return;
   try {
     for (const tagId of selectedTags.value) {
-      await $api(`/enterprise/customers/tags/${tagId}/customers`, { method: 'POST', body: { userId: tagTarget.value.id } });
+      await $api(`/tags/${tagId}/customers`, { method: 'POST', body: { userId: tagTarget.value.id } });
     }
     showTagPicker.value = false;
     loadCustomers();

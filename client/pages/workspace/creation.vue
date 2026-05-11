@@ -33,7 +33,7 @@
 
     <!-- ═══ 当前标签下的工具卡片宫格 ═══ -->
     <div v-if="loading" class="wc-loading">
-      <div class="spinner" />
+      <div class="spinner"></div>
       <p>{{ $t('workspace.loading_tools') }}</p>
     </div>
     <div v-else class="wc-section">
