@@ -156,4 +156,8 @@ async function handleLogout() {
   padding: 32px;
   min-height: 100vh;
 }
+@media (max-width: 768px) {
+  .ent-sidebar { display: none; }
+  .ent-main { margin-left: 0; padding: 16px; }
+}
 </style>

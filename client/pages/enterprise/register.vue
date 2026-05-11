@@ -52,11 +52,14 @@
 </template>
 
 <script setup>
+import { onBeforeUnmount } from 'vue'
 const form = ref({ name: '', code: '', contactName: '', contactPhone: '', contactEmail: '', password: '', domain: '' });
 const loading = ref(false);
 const error = ref('');
 const success = ref('');
 const router = useRouter();
+const redirectTimer = ref(null);
+onBeforeUnmount(() => { if (redirectTimer.value) clearTimeout(redirectTimer.value); });
 
 async function handleRegister() {
   error.value = '';
@@ -70,7 +73,7 @@ async function handleRegister() {
     });
     if (res.code === 200) {
       success.value = '入驻成功！3秒后跳转登录页...';
-      setTimeout(() => router.push('/enterprise/login'), 3000);
+      redirectTimer.value = setTimeout(() => router.push('/enterprise/login'), 3000);
     } else {
       error.value = res.msg || '入驻失败';
     }

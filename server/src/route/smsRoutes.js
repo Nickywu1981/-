@@ -45,7 +45,7 @@ router.post('/send-code', codeLimiter, validate(sendCodeSchema), asyncHandler(se
 router.post('/verify-code', verifyLimiter, validate(verifyCodeSchema), asyncHandler(verifyCode));
 
 // 登录用户 — 手动触发通知短信
-router.post('/send', authMiddleware, validate(sendNotificationSchema), asyncHandler(sendNotification));
+router.post('/send', authMiddleware, codeLimiter, validate(sendNotificationSchema), asyncHandler(sendNotification));
 
 // 管理后台 — 模板管理 + 日志
 router.get('/templates', authMiddleware, adminAuth, asyncHandler(listTemplates));

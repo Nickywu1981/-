@@ -159,7 +159,7 @@ router.post('/multi-image-to-video', heavyLimiter, _validate(multiImageSchema), 
   } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 });
 
-router.post('/package', heavyLimiter, _validate(packageSchema), async (req, res) => {
+router.post('/package', heavyLimiter, tierGuard('video'), _validate(packageSchema), async (req, res) => {
   try {
     const { video_url, options } = req.validated;
     const result = await videoService.autoPackageVideo(req.user.id, { videoUrl: video_url, options });

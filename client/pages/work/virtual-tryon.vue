@@ -65,6 +65,7 @@ const step = ref(0);
 const previewUrl = ref('');
 const uploadedUrl = ref('');
 const uploading = ref(false);
+const submitting = ref(false);
 const selectedSkin = ref('natural');
 const selectedBody = ref('standard');
 const selectedStyle = ref('casual');
@@ -99,6 +100,8 @@ async function handleDrop(e: DragEvent) {
 
 async function submitTask() {
   if (!uploadedUrl.value) { toast.warn('请先上传图片'); return; }
+  if (submitting.value) return;
+  submitting.value = true;
   step.value = 2;
   try {
     const res = await $fetch('/api/advanced/virtual-tryon', {
@@ -109,6 +112,8 @@ async function submitTask() {
   } catch (err: any) {
     toast.error(err?.data?.msg || err?.message || '任务提交失败，请重试');
     step.value = 1;
+  } finally {
+    submitting.value = false;
   }
 }
 function handleRedo() { task.reset(); step.value = 0; previewUrl.value = ''; uploadedUrl.value = ''; }

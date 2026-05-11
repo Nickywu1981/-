@@ -308,7 +308,9 @@ async function submitTask() {
 
 function startPolling(jobId) {
   let pollCount = 0;
+  let failCount = 0;
   const MAX_POLL = 40;
+  const MAX_FAILS = 5;
   clearInterval(pollTimer);
   pollTimer = setInterval(async () => {
     pollCount++;
@@ -321,6 +323,7 @@ function startPolling(jobId) {
     try {
       const resp = await $fetch(`/api/job/${jobId}`, { credentials: 'include' });
       const job = resp.data || resp;
+      failCount = 0;
       if (job.status === 'completed') {
         clearInterval(pollTimer);
         generating.value = false;
@@ -334,7 +337,12 @@ function startPolling(jobId) {
         errorMsg.value = job.error || '生成失败';
       }
     } catch {
-      // polling silently fails
+      failCount++;
+      if (failCount >= MAX_FAILS) {
+        clearInterval(pollTimer);
+        generating.value = false;
+        errorMsg.value = '网络不稳定，查询任务状态失败，请刷新查看结果';
+      }
     }
   }, 3000);
 }

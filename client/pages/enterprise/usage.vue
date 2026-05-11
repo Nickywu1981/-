@@ -85,6 +85,7 @@ definePageMeta({ layout: 'enterprise' });
 .section { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
 .section h2 { font-size: 16px; margin: 0 0 14px; color: #333; }
 table { width: 100%; border-collapse: collapse; }
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 th, td { padding: 10px 14px; text-align: left; font-size: 14px; border-bottom: 1px solid #f0f0f0; }
 th { background: #fafafa; color: #666; font-weight: 500; }
 .empty { text-align: center; padding: 60px; color: #999; font-size: 15px; }

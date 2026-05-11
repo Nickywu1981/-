@@ -6,7 +6,7 @@
  *   视频/图片/详情图/海报/社媒 — 通过 prompt_type 切换 System Prompt
  *   底层共用通义千问 LLM, 不同场景仅 System Prompt 不同
  */
-import { routeModel } from './model-router.service.js';
+import { gatewayRoute } from '../gateway/aiGatewayHub.js';
 import logger from '../utils/logger.js';
 
 const PROMPT_STRATEGIES = {
@@ -42,7 +42,7 @@ export async function enhancePrompt(prompt, type = 'image') {
   const strategy = PROMPT_STRATEGIES[type] || PROMPT_STRATEGIES.image;
 
   try {
-    const result = await routeModel({
+    const result = await gatewayRoute({
       mode: 'mixed',
       taskType: 'text_gen',
       params: {

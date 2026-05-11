@@ -9,7 +9,7 @@
  * W2 接入: 通义万象 (图片)
  * W3 接入: Seedance (视频), 千问 (文本, 已在 prompt-enhance 中使用)
  */
-import { routeModel } from '../services/model-router.service.js';
+import { gatewayRoute } from '../../gateway/aiGatewayHub.js';
 
 /**
  * 通义万象适配器 — 图片生成
@@ -28,7 +28,7 @@ export const TongyiWanxiangAdapter = {
     };
     const size = sizeMap[ratio] || '1024x1024';
 
-    const result = await routeModel({
+    const result = await gatewayRoute({
       mode: 'single',
       modelKey: 'tongyi_wanxiang',
       taskType: 'image_gen',
@@ -52,7 +52,7 @@ export const TongyiWanxiangAdapter = {
   async replicateImage({ referenceImageUrl, productName, _ratio = '1:1' }) {
     const prompt = `复刻参考图的构图和风格，商品: ${productName}`;
     // 通义万象支持图生图
-    const result = await routeModel({
+    const result = await gatewayRoute({
       mode: 'single',
       modelKey: 'tongyi_wanxiang',
       taskType: 'image_gen',
@@ -86,7 +86,7 @@ export const SeedanceAdapter = {
     };
     const size = sizeMap[ratio] || '1080x1920';
 
-    const result = await routeModel({
+    const result = await gatewayRoute({
       mode: 'single',
       modelKey: 'seedance',
       taskType: 'video_gen',
@@ -105,7 +105,7 @@ export const SeedanceAdapter = {
   },
 
   async actionMigrate({ sourceVideoUrl, targetPersonImage }) {
-    const result = await routeModel({
+    const result = await gatewayRoute({
       mode: 'single',
       modelKey: 'seedance',
       taskType: 'action_migrate',
@@ -129,7 +129,7 @@ export const QwenAdapter = {
   category: 'text',
 
   async chat({ systemPrompt, userPrompt, maxTokens = 300, temperature = 0.7 }) {
-    const result = await routeModel({
+    const result = await gatewayRoute({
       mode: 'single',
       modelKey: 'tongyi_qwen',
       taskType: 'text_gen',

@@ -19,6 +19,7 @@ import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate, validate } from '../utils/validate.js';
 import { requireRole } from '../middleware/rbac.js';
 import * as modelRouter from '../services/model-router.service.js';
+import { gatewayRoute } from '../gateway/aiGatewayHub.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 
 const router = Router();
@@ -111,7 +112,7 @@ router.post('/single', requireRole('admin'), heavyLimiter, _validate(singleTestS
   const start = Date.now();
 
   try {
-    const result = await modelRouter.routeModel({
+    const result = await gatewayRoute({
       mode: 'single',
       modelKey: model_key,
       taskType: category + '_gen',
@@ -153,7 +154,7 @@ router.post('/mixed', requireRole('admin'), heavyLimiter, _validate(mixedTestSch
   const start = Date.now();
 
   try {
-    const result = await modelRouter.routeModel({
+    const result = await gatewayRoute({
       mode: 'mixed',
       taskType: task_type,
       params: { prompt, ...params },
@@ -202,7 +203,7 @@ router.post('/custom', requireRole('admin'), heavyLimiter, _validate(customTestS
       const promises = model_sequence.map(async (modelKey) => {
         const stepStart = Date.now();
         try {
-          const r = await modelRouter.routeModel({
+          const r = await gatewayRoute({
             mode: 'single',
             modelKey,
             taskType: task_type,
@@ -226,7 +227,7 @@ router.post('/custom', requireRole('admin'), heavyLimiter, _validate(customTestS
           stepParams.previous_output = prevResult;
         }
         try {
-          finalResult = await modelRouter.routeModel({
+          finalResult = await gatewayRoute({
             mode: 'single',
             modelKey,
             taskType: task_type,
@@ -271,7 +272,7 @@ router.post('/compare', requireRole('admin'), heavyLimiter, _validate(compareTes
   const promises = model_keys.map(async (modelKey) => {
     const stepStart = Date.now();
     try {
-      const result = await modelRouter.routeModel({
+      const result = await gatewayRoute({
         mode: 'single',
         modelKey,
         taskType: category + '_gen',

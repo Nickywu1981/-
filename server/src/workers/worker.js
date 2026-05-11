@@ -9,10 +9,7 @@ import logger from '../utils/logger.js';
 import config from '../config/index.js';
 import { validateStartupConfig } from '../utils/startupGuard.js';
 import * as jobQueueService from '../services/job-queue.service.js';
-import * as aiCaller from '../utils/ai-caller.js';
-import { CircuitBreaker } from '../utils/circuit-breaker.js';
-
-const aiCircuitBreaker = new CircuitBreaker({ failureThreshold: 5, cooldownMs: 60000 });
+import { gatewayInfer } from '../gateway/aiGatewayHub.js';
 
 // 启动配置校验
 validateStartupConfig();
@@ -47,17 +44,6 @@ const TASK_MODEL_MAP = {
   batch_action_migrate: { model: 'seedance', action: 'batch_migrate' },
 };
 
-// 模型 → 端点映射 (NewAPI 兼容)
-function getEndpoint(model) {
-  const BASE = config.ai.baseUrl;
-  if (model === 'gpt-image-2') return BASE.replace(/\/v1$/, '') + '/v1/images/generations';
-  return BASE + '/chat/completions';
-}
-
-function getApiKey() {
-  return config.ai.apiKey;
-}
-
 async function processJob(job) {
   if (!job?.id) return;
   activeJobIds.add(job.id);
@@ -78,15 +64,13 @@ async function processJob(job) {
 
     await jobQueueService.updateProgress(job.id, 30);
 
-    // 调用AI模型
-    const endpoint = getEndpoint(mapping.model);
-    const apiKey = getApiKey();
-    const aiParams = {
-      model: mapping.model,
-      prompt: params.prompt,
-      ...(mapping.model === 'gpt-image-2' ? { n: 1, size: params.size || '1024x1024' } : {}),
-    };
-    const result = await aiCaller.call(endpoint, apiKey, aiParams, { modelName: mapping.model, breaker: aiCircuitBreaker });
+    // 调用AI模型 — 统一走 Token Gateway 收口
+    const result = await gatewayInfer(mapping.model, { prompt: params.prompt, ...(mapping.model === 'gpt-image-2' ? { n: 1, size: params.size || '1024x1024' } : {}) }, {
+      userId: job.user_id || null,
+      tenantId: job.tenant_id || null,
+      taskType: job.task_type || 'unknown',
+      source: 'internal',
+    });
 
     await jobQueueService.updateProgress(job.id, 90);
 
