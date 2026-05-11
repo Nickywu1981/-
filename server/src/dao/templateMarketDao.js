@@ -25,7 +25,8 @@ export default {
   },
 
   async incrementDownload(id) {
-    await db.query('UPDATE template_marketplace SET download_count = download_count + 1 WHERE id = ?', [id]);
+    const [r] = await db.query('UPDATE template_marketplace SET download_count = download_count + 1 WHERE id = ?', [id]);
+    return r.affectedRows;
   },
 
   async hasPurchased(userId, templateId) {
@@ -37,10 +38,11 @@ export default {
   },
 
   async recordPurchase(userId, templateId, price) {
-    await db.query(
+    const [r] = await db.query(
       'INSERT IGNORE INTO template_market_purchases (user_id, template_id, price) VALUES (?, ?, ?)',
       [userId, templateId, price],
     );
+    return r.affectedRows;
   },
 
   async create(userId, { title, description, category, price, previewImages }) {

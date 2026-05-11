@@ -1,10 +1,11 @@
 import pool from './db.js';
 
 export async function insertLog({ templateCode, phone, params, content, result, provider }) {
-  await pool.execute(
+  const [r] = await pool.execute(
     'INSERT INTO sms_log (template_code, phone, params, content, result, provider) VALUES (?, ?, ?, ?, ?, ?)',
     [templateCode, phone, JSON.stringify(params), content, result ? 1 : 0, provider],
   );
+  return r.insertId;
 }
 
 export async function listLogs({ page = 1, pageSize = 30, phone, result, startDate, endDate }) {

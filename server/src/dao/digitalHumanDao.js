@@ -23,9 +23,10 @@ export default {
   },
 
   async updateStatus(id, userId, status, outputUrl = null) {
-    await db.query(
+    const [r] = await db.query(
       'UPDATE digital_human_jobs SET status = ?, output_url = COALESCE(?, output_url) WHERE id = ? AND user_id = ?',
       [status, outputUrl, id, userId],
     );
+    return r.affectedRows;
   },
 };

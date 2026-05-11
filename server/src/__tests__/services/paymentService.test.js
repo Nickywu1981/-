@@ -64,11 +64,20 @@ vi.mock('../../dao/creditDao.js', () => ({
 import * as payment from '../../services/paymentService.js';
 import allinpayDao from '../../dao/allinpayDao.js';
 import * as allinpaySDK from '../../utils/allinpaySDK.js';
+import db from '../../dao/db.js';
 
 describe('paymentService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Reset key mocks to defaults after clear
+    db.getConnection.mockResolvedValue({
+      execute: vi.fn(),
+      query: vi.fn().mockResolvedValue([[{ affectedRows: 1 }]]),
+      beginTransaction: vi.fn().mockResolvedValue(undefined),
+      commit: vi.fn().mockResolvedValue(undefined),
+      rollback: vi.fn().mockResolvedValue(undefined),
+      release: vi.fn(),
+    });
     allinpayDao.create.mockResolvedValue(1);
     allinpaySDK.unifiedOrder.mockResolvedValue({ payUrl: 'https://sandbox.allinpay.com/pay/test', trxid: 'TXN_TEST' });
     allinpaySDK.verifyNotify.mockReturnValue(true);

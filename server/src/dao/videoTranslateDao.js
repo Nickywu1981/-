@@ -26,9 +26,10 @@ export default {
   },
 
   async updateStatus(id, userId, status, outputUrl = null, errorMsg = null) {
-    await db.query(
+    const [r] = await db.query(
       'UPDATE video_translate_jobs SET status = ?, output_url = COALESCE(?, output_url), error_msg = COALESCE(?, error_msg) WHERE id = ? AND user_id = ?',
       [status, outputUrl, errorMsg, id, userId],
     );
+    return r.affectedRows;
   },
 };

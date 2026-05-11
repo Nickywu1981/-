@@ -54,7 +54,8 @@ export default {
   },
 
   async logNotify(orderNo, data, type, verified) {
-    await pool.query('INSERT INTO recharge_notify_log (order_no, notify_raw, notify_type, verified) VALUES (?, ?, ?, ?)',
+    const [r] = await pool.query('INSERT INTO recharge_notify_log (order_no, notify_raw, notify_type, verified) VALUES (?, ?, ?, ?)',
       [orderNo, JSON.stringify(data), type, verified ? 1 : 0]);
+    return r.insertId;
   },
 };

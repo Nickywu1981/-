@@ -11,7 +11,7 @@ function _db() { return als.getStore()?.db || pool; }
 
 export async function incrementAggregation({ dimension, dimensionId, periodKey, callCount = 1, tokensIn = 0, tokensOut = 0, totalCost = 0, isError = false, latencyMs = 0 }) {
   const totalTokens = tokensIn + tokensOut;
-  await _db().query(
+  const [r] = await _db().query(
     `INSERT INTO ai_token_aggregation
        (dimension, dimension_id, period_key, call_count, tokens_in, tokens_out, total_tokens, total_cost, success_count, error_count, avg_latency_ms)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -26,6 +26,7 @@ export async function incrementAggregation({ dimension, dimensionId, periodKey, 
        avg_latency_ms  = ROUND((avg_latency_ms * call_count + VALUES(avg_latency_ms) * VALUES(call_count)) / (call_count + VALUES(call_count)), 2)`,
     [dimension, dimensionId, periodKey, callCount, tokensIn, tokensOut, totalTokens, totalCost, isError ? 0 : 1, isError ? 1 : 0, latencyMs || 0],
   );
+  return r.affectedRows;
 }
 
 /**

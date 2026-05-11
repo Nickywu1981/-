@@ -2,13 +2,14 @@ import db from './db.js';
 
 export default {
   async saveCredential(userId, { platform, appKey, appSecret, accessToken, shopName }) {
-    await db.query(
+    const [r] = await db.query(
       `INSERT INTO platform_credentials (user_id, platform, app_key, app_secret, access_token, shop_name, status)
        VALUES (?, ?, ?, ?, ?, ?, 'connected')
        ON DUPLICATE KEY UPDATE app_key=VALUES(app_key), app_secret=VALUES(app_secret),
                access_token=VALUES(access_token), shop_name=VALUES(shop_name), status='connected'`,
       [userId, platform, appKey, appSecret, accessToken, shopName],
     );
+    return r.affectedRows;
   },
 
   async getUserCredentials(userId) {
@@ -28,10 +29,11 @@ export default {
   },
 
   async disconnectPlatform(userId, platform) {
-    await db.query(
+    const [r] = await db.query(
       'UPDATE platform_credentials SET status = ? WHERE user_id = ? AND platform = ?',
       ['disconnected', userId, platform],
     );
+    return r.affectedRows;
   },
 
   async getPlatformConfigs() {
@@ -51,10 +53,11 @@ export default {
   },
 
   async updatePublishStatus(id, userId, status, resultUrl = null, errorMsg = null) {
-    await db.query(
+    const [r] = await db.query(
       'UPDATE platform_publish_history SET status = ?, result_url = COALESCE(?, result_url), error_msg = COALESCE(?, error_msg) WHERE id = ? AND user_id = ?',
       [status, resultUrl, errorMsg, id, userId],
     );
+    return r.affectedRows;
   },
 
   async getPublishHistory(userId, { platform, page = 1, limit = 20 } = {}) {

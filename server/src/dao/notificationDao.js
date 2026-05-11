@@ -25,17 +25,19 @@ export async function countByUser(userId) {
 }
 
 export async function markAsRead(notificationId, userId) {
-  await pool.execute(
+  const [r] = await pool.execute(
     'UPDATE user_notification SET is_read = 1 WHERE id = ? AND user_id = ?',
     [notificationId, userId],
   );
+  return r.affectedRows;
 }
 
 export async function markAllAsRead(userId) {
-  await pool.execute(
+  const [r] = await pool.execute(
     'UPDATE user_notification SET is_read = 1 WHERE user_id = ? AND is_read = 0',
     [userId],
   );
+  return r.affectedRows;
 }
 
 export async function getUnreadCount(userId) {

@@ -48,7 +48,7 @@ describe('taskDao', () => {
   });
 
   it('updateTaskStatus 动态构建 SQL', async () => {
-    mockExecute.mockResolvedValue([]);
+    mockExecute.mockResolvedValue([{ affectedRows: 1 }]);
     await taskDao.updateTaskStatus('t1', 1, { status: 2, progress: 100, progressMsg: '完成', outputResult: { url: 'x' } });
     expect(mockExecute).toHaveBeenCalledWith(
       expect.stringContaining('UPDATE task'),

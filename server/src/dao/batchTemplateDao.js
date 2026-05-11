@@ -26,8 +26,9 @@ export async function getTemplate(id, userId) {
 }
 
 export async function deleteTemplate(id, userId) {
-  await pool.execute(
+  const [r] = await pool.execute(
     'UPDATE user_batch_template SET is_deleted = 1 WHERE id = ? AND user_id = ?',
     [id, userId],
   );
+  return r.affectedRows;
 }

@@ -82,9 +82,10 @@ export async function updateTaskStatus(taskId, userId, { status, progress, progr
   if (status === 2 || status === 3) {
     fields.push('end_time = NOW()');
   }
-  if (fields.length === 0) return;
+  if (fields.length === 0) return 0;
   params.push(taskId, userId);
-  await pool().execute(`UPDATE task SET ${fields.join(', ')} WHERE id = ? AND user_id = ?`, params);
+  const [r] = await pool().execute(`UPDATE task SET ${fields.join(', ')} WHERE id = ? AND user_id = ?`, params);
+  return r.affectedRows;
 }
 
 export async function getPendingTasks(limit = 5) {

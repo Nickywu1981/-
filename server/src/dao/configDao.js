@@ -18,10 +18,11 @@ const configDao = {
   },
 
   async updateItemValue(groupKey, itemKey, value) {
-    await pool.execute(
+    const [r] = await pool.execute(
       'UPDATE sys_config_item SET item_value = ?, updated_at = NOW() WHERE group_key = ? AND item_key = ?',
       [value, groupKey, itemKey],
     );
+    return r.affectedRows;
   },
 
   async insertLog(data) {

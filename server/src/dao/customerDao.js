@@ -149,30 +149,35 @@ export async function getTagById(tenantId, tagId) {
 // ==================== 标签关联操作 ====================
 
 export async function tagCustomer(tagId, userId) {
-  await pool.execute(
+  const [r] = await pool.execute(
     'INSERT IGNORE INTO customer_tag_rel (tag_id, user_id) VALUES (?, ?)',
     [tagId, userId],
   );
+  return r.affectedRows;
 }
 
 export async function untagCustomer(tagId, userId) {
-  await pool.execute(
+  const [r] = await pool.execute(
     'DELETE FROM customer_tag_rel WHERE tag_id = ? AND user_id = ?',
     [tagId, userId],
   );
+  return r.affectedRows;
 }
 
 export async function batchTagCustomers(tagId, userIds) {
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
+    let count = 0;
     for (const userId of userIds) {
-      await conn.execute(
+      const [r] = await conn.execute(
         'INSERT IGNORE INTO customer_tag_rel (tag_id, user_id) VALUES (?, ?)',
         [tagId, userId],
       );
+      count += r.affectedRows;
     }
     await conn.commit();
+    return count;
   } catch (e) {
     await conn.rollback();
     throw e;

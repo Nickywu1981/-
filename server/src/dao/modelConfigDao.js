@@ -78,7 +78,7 @@ export async function toggle(modelKey, enabled) {
 // ============ 用量更新 ============
 
 export async function incrementUsage(modelKey, { latencyMs = 0, tokensIn = 0, tokensOut = 0, totalCost = 0, isError = false }) {
-  await _db().query(
+  const [r] = await _db().query(
     `UPDATE ai_model_config SET
        total_calls = total_calls + 1,
        total_tokens = total_tokens + ?,
@@ -88,6 +88,7 @@ export async function incrementUsage(modelKey, { latencyMs = 0, tokensIn = 0, to
      WHERE model_key = ?`,
     [tokensIn + tokensOut, totalCost, isError ? 1 : 0, latencyMs, modelKey],
   );
+  return r.affectedRows;
 }
 
 // ============ 调用日志 ============

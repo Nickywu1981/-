@@ -36,7 +36,7 @@ describe('batchTemplateDao', () => {
   });
 
   it('deleteTemplate 软删除', async () => {
-    mockExecute.mockResolvedValue([]);
-    await expect(batchTemplateDao.deleteTemplate(1, 1)).resolves.toBeUndefined();
+    mockExecute.mockResolvedValue([{ affectedRows: 1 }]);
+    await expect(batchTemplateDao.deleteTemplate(1, 1)).resolves.toBe(1);
   });
 });
