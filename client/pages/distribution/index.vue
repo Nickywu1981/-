@@ -133,7 +133,7 @@ async function doPublish(work: any) {
       method: 'POST',
       body: { work_id: work.id, platform: work.selectedPlatform, content_url: work.url },
       credentials: 'include',
-    }).catch((err: any) => { console.warn('[distribution] 发布请求失败', err?.message || err); return null })
+    }).catch((err: any) => { toast.error('发布失败，请重试'); console.warn('[distribution] 发布请求失败', err?.message || err); return null })
     if (res?.code === 200) {
       publishHistory.value.unshift({
         id: Date.now(), platform: work.selectedPlatform, status: 'success',

@@ -197,6 +197,7 @@ function removeFile(idx: number) { fileList.value.splice(idx, 1) }
 // -----------------------------------------------------------------------
 async function startUpload() {
   uploading.value = true
+  let hasNotified = false
   const results: { url: string; name: string; size: number; type: string }[] = []
 
   for (const item of fileList.value.filter(f => !['done'].includes(f.status))) {
@@ -210,6 +211,7 @@ async function startUpload() {
     } catch (err: any) {
       console.error('[AppMediaUpload] 上传失败', err?.message || err)
       item.status = 'error'
+      if (!hasNotified) { toast.error('部分文件上传失败，请重试'); hasNotified = true }
     }
   }
 

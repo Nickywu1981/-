@@ -238,6 +238,7 @@ async function loadWorks() {
     totalWorks.value = data.data?.total || 0;
   } catch (e) {
     console.error('[poster] 加载作品列表失败', e)
+    toast.error('作品列表加载失败，请刷新重试')
   } finally {
     loadingWorks.value = false;
   }
