@@ -18,20 +18,22 @@
     </div>
 
     <!-- 快捷入口卡片 -->
-    <div v-else v-for="(group, cat) in cardGroups" :key="cat" class="wh-section">
-      <div class="wh-sec-hd">
-        <h3 class="wh-sec-title">{{ getCategoryLabel(cat) }}</h3>
-      </div>
-      <div class="wh-quick">
-        <div v-for="card in group" :key="card.id" class="wh-qcard" @click="go(card.route)">
-          <span class="wh-qicon">{{ card.icon }}</span>
-          <div class="wh-qinfo">
-            <span class="wh-qname">{{ card.title }}</span>
-            <span class="wh-qdesc">{{ card.desc }}</span>
+    <template v-else>
+      <div v-for="(group, cat) in cardGroups" :key="cat" class="wh-section">
+        <div class="wh-sec-hd">
+          <h3 class="wh-sec-title">{{ getCategoryLabel(cat) }}</h3>
+        </div>
+        <div class="wh-quick">
+          <div v-for="card in group" :key="card.id" class="wh-qcard" @click="go(card.route)">
+            <span class="wh-qicon">{{ card.icon }}</span>
+            <div class="wh-qinfo">
+              <span class="wh-qname">{{ card.title }}</span>
+              <span class="wh-qdesc">{{ card.desc }}</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </template>
 
     <!-- 最近项目 -->
     <div class="wh-recent">

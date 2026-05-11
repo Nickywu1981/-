@@ -11,17 +11,25 @@
         </div>
         <span class="wp-progress-label">{{ $t('workspace.progress_label') }} {{ progress }}%</span>
       </div>
-      <button class="wp-btn">{{ $t('workspace.reserve_btn') }}</button>
+      <button class="wp-btn" @click="handleReserve">{{ $t('workspace.reserve_btn') }}</button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   icon: string
   description: string
   progress: number
 }>()
+
+const emit = defineEmits<{ (e: 'reserve'): void }>()
+const toast = useToast()
+
+function handleReserve() {
+  toast.success('已收到你的预约，上线后我们会第一时间通知你')
+  emit('reserve')
+}
 </script>
 
 <style scoped>
