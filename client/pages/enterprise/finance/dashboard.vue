@@ -1,113 +1,116 @@
+<!-- 企业端 — 财务看板（统一设计系统 v3.0） -->
 <template>
-  <div class="finance-dashboard">
-    <h1 class="page-title">财务总览</h1>
-
-    <div v-if="loading" class="loading-spin">加载中...</div>
-    <div v-else-if="loadError" class="error-msg">{{ loadError }} <button class="btn-text" @click="loadData">重试</button></div>
-    <div v-else class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-label">账户余额</div>
-        <div class="stat-value highlight">¥{{ fmt(dashboard.balance) }}</div>
+  <div class="pg">
+    <div class="page-header">
+      <div>
+        <h1 class="page-header-title">财务看板</h1>
+        <p class="page-header-subtitle">企业财务数据总览</p>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">累计收入</div>
-        <div class="stat-value">¥{{ fmt(dashboard.totalRevenue) }}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">近30天收入</div>
-        <div class="stat-value">¥{{ fmt(dashboard.monthRevenue) }}</div>
-      </div>
-      <div class="stat-card" v-if="isAgent">
-        <div class="stat-label">累计提现</div>
-        <div class="stat-value">¥{{ fmt(dashboard.totalWithdrawn) }}</div>
+      <div class="page-header-actions">
+        <NuxtLink to="/enterprise/finance/ledger" class="btn btn-sm btn-secondary">账户流水</NuxtLink>
+        <NuxtLink to="/enterprise/finance/bank-accounts" class="btn btn-sm btn-gradient">收款账户</NuxtLink>
       </div>
     </div>
 
-    <div v-if="!loading && !loadError && isAgent && dashboard.earnings" class="section">
-      <h2>佣金概览</h2>
-      <div class="commission-grid">
-        <div class="comm-item"><span class="label">累计佣金</span><strong>¥{{ fmt(dashboard.earnings.totalEarnings) }}</strong></div>
-        <div class="comm-item"><span class="label">已结算</span><strong class="green">¥{{ fmt(dashboard.earnings.settled) }}</strong></div>
-        <div class="comm-item"><span class="label">待结算</span><strong class="orange">¥{{ fmt(dashboard.earnings.pending) }}</strong></div>
-        <div class="comm-item"><span class="label">已提现</span><strong>¥{{ fmt(dashboard.earnings.withdrawn) }}</strong></div>
-        <div class="comm-item"><span class="label">待审核提现</span><strong class="blue">¥{{ fmt(dashboard.pendingWithdrawal) }}</strong></div>
-      </div>
+    <!-- ═══ 加载 / 错误 ═══ -->
+    <div v-if="loading" class="empty-state">
+      <div class="spinner" style="width:32px;height:32px;border:3px solid var(--border-light);border-top-color:var(--color-brand-600);border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+      <div class="empty-state-title" style="margin-top:16px;">加载中...</div>
+    </div>
+    <div v-else-if="loadError" class="empty-state">
+      <div class="empty-state-icon">⚠️</div>
+      <div class="empty-state-title">财务数据加载失败</div>
+      <div class="empty-state-desc">{{ loadError }}</div>
+      <button class="btn btn-primary btn-sm" style="margin-top:16px;" @click="loadData">重试</button>
     </div>
 
-    <div v-if="!loading && !loadError" class="section">
-      <h2>快捷操作</h2>
-      <div class="quick-actions">
-        <NuxtLink to="/enterprise/finance/ledger" class="action-card">
-          <span class="icon">📋</span> 账户流水
-        </NuxtLink>
-        <NuxtLink to="/enterprise/finance/settlement" class="action-card">
-          <span class="icon">📊</span> 结算记录
-        </NuxtLink>
-        <NuxtLink v-if="isAgent" to="/enterprise/finance/earnings" class="action-card">
-          <span class="icon">💰</span> 佣金收益
-        </NuxtLink>
-        <NuxtLink v-if="isAgent" to="/enterprise/finance/withdrawal" class="action-card">
-          <span class="icon">🏦</span> 提现管理
-        </NuxtLink>
-        <NuxtLink to="/enterprise/finance/bank-accounts" class="action-card">
-          <span class="icon">💳</span> 收款账户
-        </NuxtLink>
+    <template v-else>
+      <!-- ═══ KPI 统计卡片 ═══ -->
+      <div class="stat-grid" style="margin-bottom: var(--space-6);">
+        <div class="stat-card">
+          <div class="stat-card-label">账户余额</div>
+          <div class="stat-card-value" style="color: var(--color-brand-600);">¥{{ fmt(dashboard.balance) }}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">累计收入</div>
+          <div class="stat-card-value">¥{{ fmt(dashboard.totalRevenue) }}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">近 30 天收入</div>
+          <div class="stat-card-value">¥{{ fmt(dashboard.monthRevenue) }}</div>
+        </div>
+        <div v-if="isAgent" class="stat-card">
+          <div class="stat-card-label">累计提现</div>
+          <div class="stat-card-value">¥{{ fmt(dashboard.totalWithdrawn) }}</div>
+        </div>
       </div>
-    </div>
+
+      <!-- ═══ 佣金概览（代理端） ═══ -->
+      <div v-if="isAgent && dashboard.earnings" class="card" style="margin-bottom: var(--space-5);">
+        <h2 style="font-size:var(--text-lg);font-weight:var(--font-medium);margin:0 0 16px;">佣金概览</h2>
+        <div class="stat-grid">
+          <div style="text-align:center">
+            <div class="stat-card-label">累计佣金</div>
+            <div style="font-size:var(--text-2xl);font-weight:var(--font-semibold);color:var(--text-primary);">¥{{ fmt(dashboard.earnings.totalEarnings) }}</div>
+          </div>
+          <div style="text-align:center">
+            <div class="stat-card-label">已结算</div>
+            <div style="font-size:var(--text-2xl);font-weight:var(--font-semibold);color:var(--color-success-500);">¥{{ fmt(dashboard.earnings.settled) }}</div>
+          </div>
+          <div style="text-align:center">
+            <div class="stat-card-label">待结算</div>
+            <div style="font-size:var(--text-2xl);font-weight:var(--font-semibold);color:var(--color-warning-500);">¥{{ fmt(dashboard.earnings.pending) }}</div>
+          </div>
+          <div style="text-align:center">
+            <div class="stat-card-label">已提现</div>
+            <div style="font-size:var(--text-2xl);font-weight:var(--font-semibold);color:var(--text-primary);">¥{{ fmt(dashboard.earnings.withdrawn) }}</div>
+          </div>
+          <div style="text-align:center">
+            <div class="stat-card-label">待审核提现</div>
+            <div style="font-size:var(--text-2xl);font-weight:var(--font-semibold);color:var(--color-info-500);">¥{{ fmt(dashboard.pendingWithdrawal) }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ 快捷入口 ═══ -->
+      <div class="card">
+        <h2 style="font-size:var(--text-lg);font-weight:var(--font-medium);margin:0 0 16px;">快捷操作</h2>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:var(--space-3);">
+          <NuxtLink to="/enterprise/finance/ledger" class="btn btn-secondary" style="height:48px;justify-content:flex-start;padding:0 16px;">📋 账户流水</NuxtLink>
+          <NuxtLink to="/enterprise/finance/settlement" class="btn btn-secondary" style="height:48px;justify-content:flex-start;padding:0 16px;">📊 结算记录</NuxtLink>
+          <NuxtLink v-if="isAgent" to="/enterprise/finance/earnings" class="btn btn-secondary" style="height:48px;justify-content:flex-start;padding:0 16px;">💰 佣金收益</NuxtLink>
+          <NuxtLink v-if="isAgent" to="/enterprise/finance/withdrawal" class="btn btn-secondary" style="height:48px;justify-content:flex-start;padding:0 16px;">🏦 提现管理</NuxtLink>
+          <NuxtLink to="/enterprise/finance/bank-accounts" class="btn btn-secondary" style="height:48px;justify-content:flex-start;padding:0 16px;">💳 收款账户</NuxtLink>
+        </div>
+      </div>
+    </template>
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue';
-import { useApi } from '~/composables/useApi';
-import { useToast } from '~/composables/useToast';
-const api = useApi();
-const toast = useToast();
-
-const loading = ref(true);
-const loadError = ref('');
-const dashboard = ref({ balance: 0, totalRevenue: 0, monthRevenue: 0, totalWithdrawn: 0 });
-const isAgent = ref(false);
+<script setup lang="ts">
+const loading = ref(true)
+const loadError = ref('')
+const dashboard = ref({ balance: 0, totalRevenue: 0, monthRevenue: 0, totalWithdrawn: 0 })
+const isAgent = ref(false)
 
 async function loadData() {
-  loading.value = true; loadError.value = '';
+  loading.value = true; loadError.value = ''
   try {
-    const data = await api.get('/enterprise/finance/dashboard');
-    dashboard.value = data;
-    isAgent.value = !!data.earnings;
-  } catch (e) { loadError.value = '财务数据加载失败，请刷新重试'; }
-  finally { loading.value = false; }
+    const data = await $fetch('/api/enterprise/finance/dashboard')
+    dashboard.value = data as any
+    isAgent.value = !!(data as any).earnings
+  } catch (e: any) {
+    loadError.value = e?.message || '请求失败，请稍后重试'
+  } finally {
+    loading.value = false
+  }
 }
 
-onMounted(() => loadData());
+onMounted(() => loadData())
 
-function fmt(n) { return (Number(n) || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2 }); }
+function fmt(n: number | string) {
+  return (Number(n) || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2 })
+}
 
-definePageMeta({ layout: 'enterprise' });
+definePageMeta({ layout: 'enterprise' })
 </script>
-
-<style scoped>
-.page-title { font-size: 24px; margin: 0 0 24px; color: #1a1a2e; }
-
-.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
-.stat-card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-.stat-label { font-size: 13px; color: #888; margin-bottom: 8px; }
-.stat-value { font-size: 26px; font-weight: 700; color: #1a1a2e; }
-.stat-value.highlight { color: #667eea; }
-
-.section { background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-.section h2 { font-size: 16px; margin: 0 0 16px; color: #333; }
-
-.commission-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
-.comm-item { text-align: center; }
-.comm-item .label { display: block; font-size: 13px; color: #888; margin-bottom: 6px; }
-.comm-item strong { font-size: 20px; }
-.comm-item .green { color: #27ae60; }
-.comm-item .orange { color: #f39c12; }
-.comm-item .blue { color: #1a73e8; }
-
-.quick-actions { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
-.action-card { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 20px; background: #f8f9fb; border-radius: 12px; text-decoration: none; color: #333; transition: all 0.2s; }
-.action-card:hover { background: #eef0ff; color: #667eea; }
-.action-card .icon { font-size: 28px; }
-</style>
