@@ -90,7 +90,7 @@ describe('automationService', () => {
       mockDao.getTaskById.mockResolvedValue({ id: 10, task_type: 'product_on', status: 0, user_id: undefined });
       mockDao.updateTaskStatus.mockResolvedValue();
       const result = await executeTask(10);
-      expect(mockDao.updateTaskStatus).toHaveBeenCalledWith(10, 1, { startTime: true });
+      expect(mockDao.updateTaskStatus).toHaveBeenCalledWith(10, undefined, undefined, 1, { startTime: true });
       expect(result).toEqual({ taskId: 10, status: 1 });
     });
 
