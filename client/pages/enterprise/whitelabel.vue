@@ -55,7 +55,7 @@ onMounted(async () => {
     if (res.data && Object.keys(res.data).length) {
       form.value = { ...form.value, ...res.data };
     }
-  } catch (e) { /* ignore */ toast.error(t('enterprise.whitelabel.loadFailed')); }
+  } catch (e) { toast.error(t('enterprise.whitelabel.loadFailed')); }
   finally { loading.value = false; }
 });
 

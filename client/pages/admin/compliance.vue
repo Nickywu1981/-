@@ -42,6 +42,7 @@
 <script setup lang="ts">
 
 const targets = ref<any[]>([])
+const loading = ref(true)
 const checkContent = ref('')
 const checkPlatform = ref('')
 const checkResult = ref<any>(null)
@@ -53,6 +54,7 @@ async function fetchTargets() {
     const data: any = await $fetch('/api/compliance/targets', { credentials: 'include' })
     targets.value = data?.data || []
   } catch(e: any) { toast.error(e?.data?.msg || '加载失败') }
+  finally { loading.value = false }
 }
 
 async function doCheck() {

@@ -123,7 +123,7 @@ onMounted(async () => {
 })
 
 async function handleLogout() {
-  try { await api.post('/enterprise/logout') } catch {}
+  try { await api.post('/enterprise/logout') } catch (e) { if (import.meta.dev) console.error('Logout error:', e) }
   document.cookie = 'token=; path=/; max-age=0'
   document.cookie = 'refreshToken=; path=/; max-age=0'
   router.push('/enterprise/login')

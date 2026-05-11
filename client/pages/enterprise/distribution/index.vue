@@ -76,19 +76,19 @@ async function loadTeam() {
   try {
     const r = await $fetch('/api/distribution/team', { credentials: 'include' });
     team.value = r.data?.list || [];
-  } catch (e) { /* ignore */ }
+  } catch (e) { if (import.meta.dev) console.error('loadTeam:', e) }
 }
 async function loadBalance() {
   try {
     const r = await $fetch('/api/distribution/balance', { credentials: 'include' });
     balance.value = r.data || {};
-  } catch (e) { /* ignore */ }
+  } catch (e) { if (import.meta.dev) console.error('loadBalance:', e) }
 }
 async function loadHistory() {
   try {
     const r = await $fetch('/api/distribution/history', { credentials: 'include' });
     history.value = r.data || { list: [] };
-  } catch (e) { /* ignore */ }
+  } catch (e) { if (import.meta.dev) console.error('loadHistory:', e) }
 }
 function formatDate(d) { return d ? new Date(d).toLocaleDateString('zh-CN') : '-'; }
 </script>

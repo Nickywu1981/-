@@ -65,7 +65,7 @@ async function fetchStatus() {
   try {
     const data: any = await $fetch('/api/sdk/memory/status', { credentials: 'include' });
     status.value = data.data || data;
-  } catch { /* non-critical */ }
+  } catch (e) { if (import.meta.dev) console.error('fetchStatus:', e) }
 }
 
 async function search() {

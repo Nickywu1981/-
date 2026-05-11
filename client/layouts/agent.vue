@@ -58,7 +58,7 @@ const breadcrumbs = computed(() => {
 })
 
 async function handleLogout() {
-  try { await $fetch('/api/auth/logout', { method:'POST', credentials:'include' }) } catch {}
+  try { await $fetch('/api/auth/logout', { method:'POST', credentials:'include' }) } catch (e) { if (import.meta.dev) console.error('Logout error:', e) }
   router.push('/login')
 }
 
