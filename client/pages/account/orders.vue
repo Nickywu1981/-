@@ -6,18 +6,20 @@
     </div>
     <div v-if="loading" class="skeleton"><div v-for="i in 5" :key="i" class="skel-row" /></div>
     <div v-else-if="error" class="error-msg">{{ error }} <button @click="fetchOrders">重试</button></div>
-    <table v-else-if="orders.length" class="orders-table">
-      <thead><tr><th>订单号</th><th>套餐</th><th>金额</th><th>状态</th><th>时间</th></tr></thead>
-      <tbody>
-        <tr v-for="o in orders" :key="o.id">
-          <td class="order-no">{{ o.order_no || o.id }}</td>
-          <td>{{ o.plan_name || '-' }}</td>
-          <td class="amount">&yen;{{ o.amount }}</td>
-          <td><span :class="['badge', statusClass(o.status)]">{{ statusLabel(o.status) }}</span></td>
-          <td>{{ formatDateTime(o.created_at) }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div v-else-if="orders.length" class="table-wrap">
+      <table class="orders-table">
+        <thead><tr><th>订单号</th><th>套餐</th><th>金额</th><th>状态</th><th>时间</th></tr></thead>
+        <tbody>
+          <tr v-for="o in orders" :key="o.id">
+            <td class="order-no">{{ o.order_no || o.id }}</td>
+            <td>{{ o.plan_name || '-' }}</td>
+            <td class="amount">&yen;{{ o.amount }}</td>
+            <td><span :class="['badge', statusClass(o.status)]">{{ statusLabel(o.status) }}</span></td>
+            <td>{{ formatDateTime(o.created_at) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
     <div v-else class="empty">暂无订单记录</div>
     <Pagination v-if="total > pageSize" :page="page" :total="total" :page-size="pageSize" @change="goPage" />
   </div>
@@ -58,7 +60,8 @@ h2 { font-size: 24px; font-weight: 700; margin-bottom: 20px; color: var(--text-p
 .tabs { display: flex; gap: 4px; margin-bottom: 24px; background: var(--bg-secondary); border-radius: 10px; padding: 4px; width: fit-content; }
 .tabs button { padding: 8px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; background: transparent; color: var(--text-secondary); transition: background 0.2s, color 0.2s, box-shadow 0.2s; }
 .tabs button.active { background: var(--card-bg); color: var(--brand); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
-.orders-table { width: 100%; border-collapse: collapse; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.orders-table { width: 100%; border-collapse: collapse; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; min-width: 560px; }
 .orders-table th, .orders-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
 .orders-table th { background: var(--bg-secondary); font-weight: 600; color: var(--text-secondary); font-size: 13px; }
 .order-no { font-family: monospace; font-size: 13px; color: var(--text-secondary); }

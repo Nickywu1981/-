@@ -121,6 +121,6 @@ defineExpose({ open, close });
 
 @media (max-width: 640px) {
   .lightbox-nav { font-size: 28px; width: 40px; height: 56px; }
-  .lightbox-close { top: 8px; right: 8px; font-size: 20px; width: 36px; height: 36px; }
+  .lightbox-close { top: 8px; right: 8px; font-size: 20px; width: 40px; height: 40px; }
 }
 </style>

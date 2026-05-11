@@ -8,18 +8,20 @@
     </div>
     <div v-if="loading" class="skeleton"><div v-for="i in 5" :key="i" class="skel-row" /></div>
     <div v-else-if="error" class="error-msg">{{ error }} <button @click="fetchRecords">重试</button></div>
-    <table v-else-if="records.length" class="credits-table">
-      <thead><tr><th>时间</th><th>类型</th><th>金额</th><th>余额</th><th>备注</th></tr></thead>
-      <tbody>
-        <tr v-for="r in records" :key="r.id">
-          <td>{{ formatDateTime(r.created_at) }}</td>
-          <td><span :class="['badge', r.type === 'earn' ? 'badge-in' : 'badge-out']">{{ r.type === 'earn' ? '获得' : '消耗' }}</span></td>
-          <td :class="r.type === 'earn' ? 'text-in' : 'text-out'">{{ r.type === 'earn' ? '+' : '-' }}{{ r.amount }}</td>
-          <td>{{ r.balance }}</td>
-          <td>{{ r.remark || '-' }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div v-else-if="records.length" class="table-wrap">
+      <table class="credits-table">
+        <thead><tr><th>时间</th><th>类型</th><th>金额</th><th>余额</th><th>备注</th></tr></thead>
+        <tbody>
+          <tr v-for="r in records" :key="r.id">
+            <td>{{ formatDateTime(r.created_at) }}</td>
+            <td><span :class="['badge', r.type === 'earn' ? 'badge-in' : 'badge-out']">{{ r.type === 'earn' ? '获得' : '消耗' }}</span></td>
+            <td :class="r.type === 'earn' ? 'text-in' : 'text-out'">{{ r.type === 'earn' ? '+' : '-' }}{{ r.amount }}</td>
+            <td>{{ r.balance }}</td>
+            <td>{{ r.remark || '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
     <div v-else class="empty">暂无积分记录</div>
     <Pagination v-if="total > pageSize" :page="page" :total="total" :page-size="pageSize" @change="goPage" />
   </div>
@@ -65,7 +67,8 @@ h2 { font-size: 24px; font-weight: 700; margin-bottom: 24px; color: var(--text-p
 .val { display: block; font-size: 28px; font-weight: 800; color: var(--brand); }
 .val.in { color: var(--success); } .val.out { color: var(--danger); }
 .lbl { font-size: 13px; color: var(--text-secondary); margin-top: 4px; display: block; }
-.credits-table { width: 100%; border-collapse: collapse; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.credits-table { width: 100%; border-collapse: collapse; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; min-width: 600px; }
 .credits-table th, .credits-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
 .credits-table th { background: var(--bg-secondary); font-weight: 600; color: var(--text-secondary); font-size: 13px; }
 .badge { padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }

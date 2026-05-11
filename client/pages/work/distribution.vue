@@ -58,20 +58,22 @@
       <h2>发布记录</h2>
       <LoadingSkeleton v-if="loading" type="list" :rows="3" />
       <div v-else-if="history.length === 0" class="empty-hint">暂无发布记录</div>
-      <table v-else class="history-table">
-        <thead>
-          <tr><th>内容</th><th>平台</th><th>状态</th><th>时间</th><th>操作</th></tr>
-        </thead>
-        <tbody>
-          <tr v-for="h in history" :key="h.id">
-            <td>{{ h.title }}</td>
-            <td>{{ h.platforms?.join(', ') || '-' }}</td>
-            <td><span class="status-tag" :class="h.status">{{ statusLabel(h.status) }}</span></td>
-            <td>{{ formatDateTime(h.createdAt) }}</td>
-            <td><button v-if="h.status === 'failed'" class="btn-sm" @click="retry(h.id)">重试</button></td>
-          </tr>
-        </tbody>
-      </table>
+      <div v-else class="table-wrap">
+        <table class="history-table">
+          <thead>
+            <tr><th>内容</th><th>平台</th><th>状态</th><th>时间</th><th>操作</th></tr>
+          </thead>
+          <tbody>
+            <tr v-for="h in history" :key="h.id">
+              <td>{{ h.title }}</td>
+              <td>{{ h.platforms?.join(', ') || '-' }}</td>
+              <td><span class="status-tag" :class="h.status">{{ statusLabel(h.status) }}</span></td>
+              <td>{{ formatDateTime(h.createdAt) }}</td>
+              <td><button v-if="h.status === 'failed'" class="btn-sm" @click="retry(h.id)">重试</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </template>
@@ -160,3 +162,8 @@ const fetchHistory = async () => {
 
 onMounted(fetchHistory)
 </script>
+
+<style scoped>
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.history-table { width: 100%; border-collapse: collapse; min-width: 500px; }
+</style>

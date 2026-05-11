@@ -206,8 +206,8 @@ onMounted(fetchTemplates);
 .btn-save:hover { opacity: 0.9; }
 .btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 1000; animation: var(--fade-in); }
-.modal { background: var(--bg-card); border-radius: var(--radius-xl); width: 540px; max-height: 80vh; overflow-y: auto; box-shadow: var(--shadow-xl); }
-.modal-sm { width: 400px; }
+.modal { background: var(--bg-card); border-radius: var(--radius-xl); width: 540px; max-width: 90vw; max-height: 80vh; overflow-y: auto; box-shadow: var(--shadow-xl); }
+.modal-sm { width: 400px; max-width: 90vw; }
 .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--border-light); }
 .modal-header h3 { font-size: 16px; font-weight: 600; color: var(--text-primary); }
 .modal-close { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--text-secondary); }
