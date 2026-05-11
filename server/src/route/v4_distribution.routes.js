@@ -19,6 +19,16 @@ import * as distributionService from '../services/distribution.service.js';
 const router = Router();
 router.use(authMiddleware);
 
+// GET /api/distribution/stats — 推广转化统计
+router.get('/stats', async (req, res) => {
+  try {
+    const result = await distributionService.getStats(req.user.id);
+    return success(res, result);
+  } catch (err) {
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '服务器内部错误');
+  }
+});
+
 const withdrawSchema = z.object({
   amount: z.number().positive('提现金额必须大于0').max(100000),
 });
