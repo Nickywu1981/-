@@ -42,7 +42,7 @@
 
       <div class="actions">
         <button class="btn-outline" @click="step = 0">返回</button>
-        <button class="btn" @click="submitTask">生成脚本</button>
+        <button class="btn" @click="submitTask" :disabled="submitting">生成脚本</button>
       </div>
     </div>
 

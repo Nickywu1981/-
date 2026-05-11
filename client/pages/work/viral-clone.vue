@@ -45,7 +45,7 @@
       <p class="cost-hint">成本：20 点/次 · 预估60秒</p>
       <div class="actions">
         <button class="btn-outline" @click="step = 0">返回</button>
-        <button class="btn" @click="submitTask">开始复刻</button>
+        <button class="btn" @click="submitTask" :disabled="submitting">开始复刻</button>
       </div>
     </div>
 
@@ -70,6 +70,7 @@
         </div>
       </div>
       <div v-else-if="task.status.value === 3" class="error-box"><p>{{ task.errorMsg.value }}</p><button class="btn" @click="handleRedo">重试</button></div>
+      <div v-else class="progress-box"><div class="spinner" /><p>准备中...</p></div>
     </div>
   </WorkLayout>
 </template>
@@ -88,6 +89,7 @@ const matchStrength = ref(0.8);
 const refInput = ref<HTMLInputElement | null>(null)
 const imgInput = ref<HTMLInputElement | null>(null)
 const task = useTask();
+const submitting = ref(false);
 
 async function uploadFile(file: File, type: string) {
   if (type === 'ref') uploadingRef.value = true;
@@ -120,7 +122,8 @@ async function handleDrop(e: DragEvent, type: string) {
 
 async function submitTask() {
   if (!uploadedRefUrl.value || !uploadedProductUrl.value) { toast.warn('请先上传素材'); return; }
-  step.value = 2;
+  if (submitting.value) return;
+  submitting.value = true; step.value = 2;
   try {
     const res = await $fetch('/api/adv-video/viral-clone', {
       method: 'POST', credentials: 'include',
@@ -130,7 +133,7 @@ async function submitTask() {
   } catch (err: any) {
     toast.error(err?.data?.msg || err?.message || '提交失败，请重试');
     step.value = 1;
-  }
+  } finally { submitting.value = false; }
 }
 function handleRedo() { task.reset(); step.value = 0; refVideoUrl.value = ''; productImageUrl.value = ''; uploadedRefUrl.value = ''; uploadedProductUrl.value = ''; }
 </script>
