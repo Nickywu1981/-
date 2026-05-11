@@ -173,7 +173,7 @@ Page → Component → Composable/Store → API Layer(useApi.ts) → Middleware
 ### 项目目录结构
 ```
 ├── client/                    # Nuxt3 前端
-│   ├── pages/                 # 页面（112个）
+│   ├── pages/                 # 页面（144个）
 │   │   ├── work/              # 工作台页面（41个AI功能页）
 │   │   ├── admin/             # 管理后台（35个）
 │   │   └── account/           # 用户账户（11个）
@@ -185,10 +185,10 @@ Page → Component → Composable/Store → API Layer(useApi.ts) → Middleware
 │   └── server/middleware/     # Nitro服务端中间件
 ├── server/                    # Express 后端
 │   └── src/
-│       ├── controller/        # 38个控制器
+│       ├── controller/        # 49个控制器
 │       ├── services/          # 业务逻辑层
 │       ├── dao/               # 数据访问层
-│       ├── route/             # 36条路由文件
+│       ├── route/             # 75条路由文件
 │       ├── middleware/        # 鉴权/限流/缓存/日志
 │       ├── utils/             # 工具（分页/校验/响应/加密）
 │       └── constants/         # 错误码/枚举/全局常量
@@ -410,11 +410,11 @@ main (生产)
 - 风格：商用上线级别、拒绝 Demo 半成品、架构规范、逻辑闭环
 
 ### 当前项目状态
-- **112 个前端页面**全部 200 OK
-- **36 条后端路由**全部在线
-- **38 个控制器**零内联 SQL
+- **144 个前端页面**全部 200 OK
+- **75 条后端路由**全部在线
+- **49 个控制器**零内联 SQL
 - **23 服务端测试**108 用例全部通过
-- **Zod 校验 29/36 已覆盖**（36 条路由中 29 条已接入 validate schema）
+- **Zod 校验 73/75 已覆盖**（75 条路由中 73 条已接入 validate schema）
 - 品牌色：紫色 `#7C3AED`，CSS 变量 100% 覆盖
 
 ### 关键待办
@@ -777,8 +777,8 @@ Backup Verify → Data Integrity Check → npm audit → License Scan → Cache 
 
 ---
 
-**最后更新**: 2026-05-07
-**项目状态**: 112 页面 + 36 路由 + 38 控制器 + 108 测试用例 + Zod 29/36 覆盖，CSS 变量 100% 覆盖
+**最后更新**: 2026-05-11
+**项目状态**: 144 页面 + 75 路由 + 49 控制器 + 108 测试用例 + Zod 73/75 覆盖，CSS 变量 100% 覆盖
 **优先级**: 最高（所有开发必须遵守，永久锁定不再变更）
 
 ---
