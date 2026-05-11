@@ -100,7 +100,7 @@ describe('automationService', () => {
       mockDao.updateTaskStatus.mockResolvedValue();
       await executeTask(10);
       await vi.runAllTimersAsync();
-      expect(mockDao.updateTaskStatus).toHaveBeenCalledWith(10, 2, expect.objectContaining({
+      expect(mockDao.updateTaskStatus).toHaveBeenCalledWith(10, undefined, undefined, 2, expect.objectContaining({
         endTime: true,
         resultJson: expect.stringContaining('商品上架完成'),
       }));
@@ -113,7 +113,7 @@ describe('automationService', () => {
       mockDao.updateTaskStatus.mockResolvedValue();
       await executeTask(10);
       await vi.runAllTimersAsync();
-      expect(mockDao.updateTaskStatus).toHaveBeenCalledWith(10, 2, expect.objectContaining({
+      expect(mockDao.updateTaskStatus).toHaveBeenCalledWith(10, undefined, undefined, 2, expect.objectContaining({
         resultJson: expect.stringContaining('执行完成'),
       }));
       vi.useRealTimers();
@@ -127,7 +127,7 @@ describe('automationService', () => {
         .mockRejectedValueOnce(new Error('crash')); // completion call
       await executeTask(10);
       await vi.runAllTimersAsync();
-      expect(mockDao.updateTaskStatus).toHaveBeenCalledWith(10, 3, { errorMsg: 'crash' });
+      expect(mockDao.updateTaskStatus).toHaveBeenCalledWith(10, undefined, undefined, 3, { errorMsg: 'crash' });
       vi.useRealTimers();
     });
   });
