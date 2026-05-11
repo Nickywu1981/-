@@ -59,7 +59,10 @@ onMounted(async () => {
   }
 });
 
-function handleLogout() {
+async function handleLogout() {
+  try {
+    await $fetch('/api/enterprise/logout', { method: 'POST', credentials: 'include' });
+  } catch (e) { /* 即使服务端请求失败，也清除本地 cookie */ }
   document.cookie = 'token=; path=/; max-age=0';
   document.cookie = 'refreshToken=; path=/; max-age=0';
   router.push('/enterprise/login');

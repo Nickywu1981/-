@@ -1,17 +1,34 @@
 /**
- * Auth plugin — credentials injection + 401 redirect + global toast.
- * v4.1: httpOnly cookie auth (no localStorage tokens).
+ * Auth plugin — credentials injection + CSRF header + 401 redirect + global toast.
+ * v4.2: httpOnly cookie auth + automatic X-CSRF-Token header for mutating requests.
  */
 export default defineNuxtPlugin((nuxtApp) => {
   const router = useRouter()
   const toast = (nuxtApp.vueApp.config.globalProperties.$toast || { error: console.error, warn: console.warn }) as any
 
-  // Unified $fetch wrapper: credentials + 401 redirect + error toast
+  // Helper: read csrf_token from document.cookie
+  function getCsrfToken(): string | null {
+    if (typeof document === 'undefined') return null
+    const match = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/)
+    return match ? match[1] : null
+  }
+
+  // Unified $fetch wrapper: credentials + CSRF + 401 redirect + error toast
   const originalFetch = globalThis.$fetch
   // @ts-expect-error - wrapper type is compatible at runtime
   globalThis.$fetch = function (url: string, opts: any = {}): any {
     if (typeof window !== 'undefined') {
       opts.credentials = opts.credentials || 'include'
+
+      // Auto-attach CSRF token for mutating requests
+      const method = (opts.method || 'GET').toUpperCase()
+      if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
+        const csrfToken = getCsrfToken()
+        if (csrfToken) {
+          opts.headers = opts.headers || {}
+          opts.headers['x-csrf-token'] = csrfToken
+        }
+      }
       const prev = opts.onResponseError
       opts.onResponseError = async function (ctx: any) {
         if (ctx.response?.status === 401) {

@@ -83,6 +83,9 @@ router.post('/register', authLimiter, csrfProtection, _validate(registerSchema),
 // 企业登录 — 限流 + 校验 + CSRF
 router.post('/login', authLimiter, setCsrfCookie, _validate(loginSchema), ctrl.loginEnterprise);
 
+// 企业退出 — 吊销所有 token
+router.post('/logout', authMiddleware, enterpriseOnly, ctrl.logoutEnterprise);
+
 // 企业套餐列表（公开查看）
 router.get('/plans', ctrl.listPlans);
 

@@ -7,6 +7,7 @@ import { success } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { BusinessError } from '../utils/businessError.js';
 import { wrapController } from '../utils/wrapController.js';
+import { revokeAllUserTokens } from '../utils/jwtToken.js';
 import * as enterpriseService from '../services/enterpriseService.js';
 import * as auditLogDao from '../dao/auditLogDao.js';
 
@@ -56,6 +57,16 @@ export const loginEnterprise = wrapController(async (req, res) => {
 
   audit(req, 'enterprise.login', result.tenantId, '企业登录');
   return success(res, result, '登录成功');
+});
+
+export const logoutEnterprise = wrapController(async (req, res) => {
+  const userId = req.user?.userId || req.user?.id;
+  if (userId) {
+    await revokeAllUserTokens(userId);
+  }
+  res.clearCookie('token', { path: '/' });
+  res.clearCookie('refreshToken', { path: '/' });
+  return success(res, null, '已退出登录');
 });
 
 // ==================== 企业信息 ====================
