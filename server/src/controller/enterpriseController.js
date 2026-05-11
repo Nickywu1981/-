@@ -8,33 +8,36 @@ import { ERROR_CODE } from '../constants/errorCode.js';
 import { BusinessError } from '../utils/businessError.js';
 import { wrapController } from '../utils/wrapController.js';
 import * as enterpriseService from '../services/enterpriseService.js';
+import * as auditLogDao from '../dao/auditLogDao.js';
 
 /** 获取当前用户的 tenantId（企业端专用） */
 function getTenantId(req) {
   return req.user?.entId || req.user?.tenantId;
 }
 
+/** 写入审计日志（fire-and-forget） */
+function audit(req, action, targetId, targetTitle) {
+  auditLogDao.insert({
+    userId: req.user?.userId || req.user?.id || 0,
+    action,
+    targetType: 'enterprise',
+    targetId: targetId != null ? String(targetId) : null,
+    targetTitle,
+    ip: req.ip,
+  }).catch(() => {});
+}
+
 // ==================== 企业入驻/登录 ====================
 
 export const registerEnterprise = wrapController(async (req, res) => {
-  const { name, code, contactName, contactPhone, contactEmail, password, type, logo, domain } = req.body;
-  if (!name || !code || !contactName || !contactPhone || !password) {
-    throw new BusinessError(ERROR_CODE.BAD_REQUEST, '企业名称/编码/联系人/手机/密码为必填项');
-  }
-  if (password.length < 8) {
-    throw new BusinessError(ERROR_CODE.BAD_REQUEST, '密码至少8位');
-  }
-  const result = await enterpriseService.registerEnterprise({
-    name, code, contactName, contactPhone, contactEmail, password: String(password), type, logo, domain,
-  });
+  const data = req.validated || req.body;
+  const result = await enterpriseService.registerEnterprise(data);
+  audit(req, 'enterprise.register', result.tenantId, `企业入驻: ${data.name}`);
   return success(res, result, '企业入驻成功');
 });
 
 export const loginEnterprise = wrapController(async (req, res) => {
-  const { account, password } = req.body;
-  if (!account || !password) {
-    throw new BusinessError(ERROR_CODE.BAD_REQUEST, '账号和密码为必填项');
-  }
+  const { account, password } = req.validated || req.body;
   const result = await enterpriseService.loginEnterprise({ account, password: String(password) });
 
   // 设置 cookie
@@ -51,6 +54,7 @@ export const loginEnterprise = wrapController(async (req, res) => {
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
+  audit(req, 'enterprise.login', result.tenantId, '企业登录');
   return success(res, result, '登录成功');
 });
 
@@ -66,7 +70,8 @@ export const getProfile = wrapController(async (req, res) => {
 export const updateProfile = wrapController(async (req, res) => {
   const tenantId = getTenantId(req);
   if (!tenantId) throw new BusinessError(ERROR_CODE.FORBIDDEN, '无企业权限');
-  const profile = await enterpriseService.updateEnterpriseProfile(tenantId, req.body);
+  const profile = await enterpriseService.updateEnterpriseProfile(tenantId, req.validated || req.body);
+  audit(req, 'enterprise.updateProfile', tenantId, '更新企业信息');
   return success(res, profile, '更新成功');
 });
 
@@ -87,9 +92,9 @@ export const listUsers = wrapController(async (req, res) => {
 
 export const addUser = wrapController(async (req, res) => {
   const tenantId = getTenantId(req);
-  const { phone, email, nickname, password, role } = req.body;
-  if (!phone && !email) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '手机号或邮箱为必填项');
+  const { phone, email, nickname, password, role } = req.validated || req.body;
   const id = await enterpriseService.addEnterpriseUser(tenantId, { phone, email, nickname, password, role });
+  audit(req, 'enterprise.addUser', id, `添加子账号: ${phone}`);
   return success(res, { id }, '子账号创建成功');
 });
 
@@ -97,8 +102,9 @@ export const updateUser = wrapController(async (req, res) => {
   const tenantId = getTenantId(req);
   const id = parseInt(req.params.id, 10);
   if (!id || id < 1) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '无效的子账号ID');
-  const { role, status } = req.body;
-  await enterpriseService.updateEnterpriseUser(tenantId, id, { role, status });
+  const data = req.validated || req.body;
+  await enterpriseService.updateEnterpriseUser(tenantId, id, data);
+  audit(req, 'enterprise.updateUser', id, `更新子账号: ${id}`);
   return success(res, null, '更新成功');
 });
 
@@ -107,6 +113,7 @@ export const removeUser = wrapController(async (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (!id || id < 1) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '无效的子账号ID');
   await enterpriseService.removeEnterpriseUser(tenantId, id);
+  audit(req, 'enterprise.removeUser', id, `移除子账号: ${id}`);
   return success(res, null, '移除成功');
 });
 
@@ -120,8 +127,10 @@ export const getDashboard = wrapController(async (req, res) => {
 
 export const getUsage = wrapController(async (req, res) => {
   const tenantId = getTenantId(req);
-  const { startDate, endDate, userId } = req.query;
-  const usage = await enterpriseService.getEnterpriseUsageDetail(tenantId, { startDate, endDate, userId });
+  const { startDate, endDate, userId, page, pageSize } = req.validated || req.query;
+  const usage = await enterpriseService.getEnterpriseUsageDetail(tenantId, {
+    startDate, endDate, userId, page, pageSize,
+  });
   return success(res, usage);
 });
 
@@ -135,7 +144,8 @@ export const getWhiteLabel = wrapController(async (req, res) => {
 
 export const updateWhiteLabel = wrapController(async (req, res) => {
   const tenantId = getTenantId(req);
-  const whiteLabel = await enterpriseService.updateWhiteLabel(tenantId, req.body);
+  const whiteLabel = await enterpriseService.updateWhiteLabel(tenantId, req.validated || req.body);
+  audit(req, 'enterprise.updateWhiteLabel', tenantId, '更新白标配置');
   return success(res, whiteLabel, '白标配置已更新');
 });
 

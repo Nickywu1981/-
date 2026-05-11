@@ -250,19 +250,20 @@ export async function refreshTokenMiddleware(req, res, next) {
     return sendError(res, ERROR_CODE.EC_AUTH_002, '令牌类型错误，请使用 Refresh Token');
   }
 
-  // 生成新的短期 access token
-  req.newAccessToken = generateAccessToken({
-    userId: payload.userId,
-    role: payload.role || 'user',
-    tenantId: payload.tenantId || 0,
-  });
-
-  // 挂载用户信息，供后续 controller 使用
-  req.user = {
+  // 生成新的短期 access token — 保留企业与代理端字段
+  const tokenPayload = {
     userId: payload.userId,
     role: payload.role || 'user',
     tenantId: payload.tenantId || 0,
   };
+  if (payload.audience) tokenPayload.audience = payload.audience;
+  if (payload.entId) tokenPayload.entId = payload.entId;
+  if (payload.entRole) tokenPayload.entRole = payload.entRole;
+
+  req.newAccessToken = generateAccessToken(tokenPayload);
+
+  // 挂载用户信息，供后续 controller 使用
+  req.user = { ...tokenPayload };
 
   next();
 }

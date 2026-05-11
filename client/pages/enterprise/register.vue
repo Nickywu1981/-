@@ -66,6 +66,7 @@ async function handleRegister() {
     const res = await $fetch('/api/enterprise/register', {
       method: 'POST',
       body: form.value,
+      credentials: 'include',
     });
     if (res.code === 200) {
       success.value = '入驻成功！3秒后跳转登录页...';

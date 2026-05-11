@@ -27,8 +27,11 @@ export async function registerEnterprise({
     throw new BusinessError(ERROR_CODE.BAD_REQUEST, '企业编码已被使用');
   }
 
-  // 校验域名唯一性
+  // 校验域名唯一性 + 格式（防 XSS）
   if (domain) {
+    if (/[<>"'\s]/.test(domain) || /^javascript:/i.test(domain)) {
+      throw new BusinessError(ERROR_CODE.BAD_REQUEST, '域名格式无效');
+    }
     const domainTenant = await enterpriseDao.findTenantByDomain(domain);
     if (domainTenant) {
       throw new BusinessError(ERROR_CODE.BAD_REQUEST, '域名已被使用');
