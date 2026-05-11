@@ -24,7 +24,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
 
 let _THREE: any = null;
 let _OrbitControls: any = null;

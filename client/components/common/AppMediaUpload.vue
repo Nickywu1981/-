@@ -87,8 +87,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, type PropType } from 'vue'
-import { useRuntimeConfig } from '#app'
 
 const toast = useToast()
 

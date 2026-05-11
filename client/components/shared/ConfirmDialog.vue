@@ -18,7 +18,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick } from 'vue'
 
 interface ConfirmOptions {
   title?: string
