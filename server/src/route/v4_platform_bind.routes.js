@@ -11,6 +11,7 @@ import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate, validate } from '../utils/validate.js';
 import { authMiddleware } from '../middleware/auth.js';
+import { heavyLimiter } from '../middleware/rateLimiter.js';
 import db from '../dao/db.js';
 
 const router = Router();
@@ -51,7 +52,7 @@ router.get('/bindings', async (req, res) => {
 });
 
 // POST /api/platforms/bind
-router.post('/bind', _validate(bindSchema), async (req, res) => {
+router.post('/bind', heavyLimiter, _validate(bindSchema), async (req, res) => {
   try {
     const { platform, bind_type, account_id, account_name } = req.validated;
 
@@ -73,7 +74,7 @@ router.post('/bind', _validate(bindSchema), async (req, res) => {
 });
 
 // DELETE /api/platforms/bind/:id
-router.delete('/bind/:id', validate(idParamSchema, 'params'), async (req, res) => {
+router.delete('/bind/:id', heavyLimiter, validate(idParamSchema, 'params'), async (req, res) => {
   try {
     const conn = await db.getConnection();
     try {
@@ -91,7 +92,7 @@ router.delete('/bind/:id', validate(idParamSchema, 'params'), async (req, res) =
 });
 
 // POST /api/platforms/publish — 发布内容到平台
-router.post('/publish', _validate(publishSchema), async (req, res) => {
+router.post('/publish', heavyLimiter, _validate(publishSchema), async (req, res) => {
   try {
     const { work_id, platform, content_url } = req.validated;
 

@@ -1,5 +1,18 @@
 <template>
   <div class="ent-dashboard">
+    <!-- Loading -->
+    <div v-if="loading" class="loading-state">
+      <div class="skeleton-card" v-for="i in 6" :key="i"></div>
+    </div>
+
+    <!-- Error -->
+    <div v-else-if="error" class="error-state">
+      <p>{{ error }}</p>
+      <button class="retry-btn" @click="loadData">重试</button>
+    </div>
+
+    <!-- Content -->
+    <template v-else>
     <h1 class="page-title">工作台</h1>
 
     <!-- 统计卡片 -->
@@ -57,6 +70,7 @@
         <span v-for="item in usage.slice(0, 7)" :key="item.date">{{ item.date.slice(5) }}</span>
       </div>
     </div>
+    </template>
   </div>
 </template>
 
@@ -65,17 +79,11 @@ const dashboard = ref({ stats: {}, enterprise: {} });
 const enterprise = ref({});
 const usage = ref([]);
 const loading = ref(true);
+const error = ref('');
 
-const typeLabel = computed(() => {
-  const map = { enterprise: '企业', agent: '代理商', partner: '合作伙伴' };
-  return map[dashboard.value.enterprise?.type] || '-';
-});
-const planLabel = computed(() => {
-  const map = { free: '免费版', ent_starter: '入门版', ent_pro: '专业版', ent_ultimate: '旗舰版' };
-  return map[dashboard.value.enterprise?.planType] || dashboard.value.enterprise?.planType || '-';
-});
-
-onMounted(async () => {
+async function loadData() {
+  loading.value = true;
+  error.value = '';
   try {
     const [dashRes, profileRes] = await Promise.all([
       $fetch('/api/enterprise/dashboard', { credentials: 'include' }),
@@ -85,11 +93,11 @@ onMounted(async () => {
     enterprise.value = profileRes.data || profileRes;
     usage.value = dashboard.value.usage || [];
   } catch (e) {
-    console.error('Dashboard load failed:', e);
+    error.value = e?.data?.msg || '加载失败，请稍后重试';
   } finally {
     loading.value = false;
   }
-});
+}
 
 function formatNumber(n) {
   if (n >= 10000) return (n / 10000).toFixed(1) + 'w';
@@ -103,6 +111,8 @@ function barHeight(count) {
 }
 
 definePageMeta({ layout: 'enterprise' });
+
+onMounted(loadData);
 </script>
 
 <style scoped>
@@ -127,4 +137,13 @@ definePageMeta({ layout: 'enterprise' });
 .bar-label { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #666; white-space: nowrap; }
 .chart-legend { display: flex; gap: 3px; margin-top: 8px; padding: 0 4px; }
 .chart-legend span { flex: 1; font-size: 10px; color: #999; text-align: center; min-width: 12px; }
+
+.loading-state { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.skeleton-card { background: #f0f0f0; border-radius: 12px; height: 100px; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+.error-state { text-align: center; padding: 60px 20px; }
+.error-state p { color: #999; margin-bottom: 16px; }
+.retry-btn { padding: 8px 24px; background: #667eea; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+.retry-btn:hover { background: #5a6fd6; }
 </style>

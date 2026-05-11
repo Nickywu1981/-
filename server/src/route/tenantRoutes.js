@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
+import { adminLimiter } from '../middleware/rateLimiter.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
 import { z } from 'zod';
@@ -18,9 +19,9 @@ const idParamSchema = z.object({ id: z.string().regex(/^\d+$/).transform(Number)
 router.get('/', authMiddleware, adminAuth, asyncHandler(listTenants));
 router.get('/me', authMiddleware, asyncHandler(getMyTenant));
 router.get('/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(getTenant));
-router.post('/', authMiddleware, adminAuth, validate(tenantSchema), asyncHandler(createTenant));
-router.put('/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(tenantUpdateSchema), asyncHandler(updateTenant));
-router.delete('/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(deleteTenant));
+router.post('/', adminLimiter, authMiddleware, adminAuth, validate(tenantSchema), asyncHandler(createTenant));
+router.put('/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(tenantUpdateSchema), asyncHandler(updateTenant));
+router.delete('/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(deleteTenant));
 
 const reviewSchema = z.object({
   reviewStatus: z.enum(['approved', 'rejected']),

@@ -15,11 +15,11 @@ export default function cspMiddleware(req, res, next) {
     'Content-Security-Policy',
     [
       "default-src 'self'",
-      "script-src 'self' 'strict-dynamic' 'unsafe-inline'",
+      "script-src 'self' 'unsafe-inline' cdn.jsdelivr.net cdnjs.cloudflare.com unpkg.com",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob:",
       "font-src 'self' data:",
-      "connect-src 'self' ws: wss:",
+      "connect-src 'self' ws: wss: http: https:",
       "media-src 'self'",
       "object-src 'none'",
       "frame-ancestors 'none'",

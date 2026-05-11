@@ -15,6 +15,7 @@ import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate, validate } from '../utils/validate.js';
 import { authMiddleware } from '../middleware/auth.js';
+import { heavyLimiter } from '../middleware/rateLimiter.js';
 import * as publishService from '../services/publishService.js';
 
 const router = Router();
@@ -43,7 +44,7 @@ router.get('/platforms', (_req, res) => {
 });
 
 // POST /api/publish/submit
-router.post('/submit', _validate(submitSchema), async (req, res) => {
+router.post('/submit', heavyLimiter, _validate(submitSchema), async (req, res) => {
   try {
     const { workId, platforms, title, description, tags, scheduleAt } = req.validated;
     const result = await publishService.submitPublish(
@@ -67,7 +68,7 @@ router.get('/batch/:id', validate(retryParamsSchema, 'params'), async (req, res)
 });
 
 // POST /api/publish/retry/:id
-router.post('/retry/:id', validate(retryParamsSchema, 'params'), async (req, res) => {
+router.post('/retry/:id', heavyLimiter, validate(retryParamsSchema, 'params'), async (req, res) => {
   try {
     const result = await publishService.retryPublish(req.params.id, req.user.id);
     return success(res, result, '已重新提交分发');
