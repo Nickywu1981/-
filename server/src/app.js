@@ -95,6 +95,7 @@ import { adminRouter as geoRuleAdminRouter } from './route/geoRuleRoutes.js';
 import tenantContext from './middleware/tenantContext.js';
 import { optionalAuth } from './middleware/auth.js';
 import { setCsrfCookie, csrfProtection } from './middleware/csrf.js';
+import paramFilter from './middleware/paramFilter.js';
 import cspMiddleware from './middleware/csp.js';
 import openApiRoutes from './route/openApiRoutes.js';
 import openApiKeyRoutes from './route/openApiKeyRoutes.js';
@@ -152,6 +153,9 @@ app.use(apiLimiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+// 全局参数过滤 — XSS/SQL 注入关键词检测
+app.use(paramFilter);
 
 // SQL 注入防护
 app.use(sqlGuardMiddleware);

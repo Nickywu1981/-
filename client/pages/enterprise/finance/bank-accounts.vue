@@ -67,9 +67,11 @@
 <script setup>
 import { useApi } from '~/composables/useApi';
 import { useToast } from '~/composables/useToast';
+import { useConfirm } from '~/composables/useConfirm';
 const { t } = useI18n();
 const api = useApi();
 const toast = useToast();
+const { confirm } = useConfirm();
 
 const accounts = ref([]);
 const showForm = ref(false);
@@ -99,7 +101,7 @@ async function handleSubmit() {
 }
 
 async function handleRemove(acc) {
-  if (!confirm(t('enterprise.finance.bankAccounts.confirmUnbind', { name: acc.account_name }))) return;
+  if (!(await confirm(t('enterprise.finance.bankAccounts.confirmUnbind', { name: acc.account_name })))) return;
   try {
     await api.delete(`/enterprise/finance/bank-accounts/${acc.id}`);
     loadAccounts();

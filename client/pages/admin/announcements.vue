@@ -106,7 +106,7 @@ import { useToast } from '~/composables/useToast';
 import { useConfirm } from '~/composables/useConfirm';
 const toast = useToast();
 const confirm = useConfirm();
-const { $api } = useNuxtApp() as any
+const $api = $fetch
 const list = ref<any[]>([])
 const loading = ref(true)
 const error = ref('')

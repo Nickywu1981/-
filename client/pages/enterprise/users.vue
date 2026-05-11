@@ -45,6 +45,7 @@
         <button :disabled="page >= Math.ceil(total / pageSize)" @click="page++; loadUsers()">{{ $t('enterprise.common.nextPage') }}</button>
       </div>
     </div>
+    <div v-if="loading" class="loading-spinner">{{ $t('enterprise.common.loading') }}</div>
 
     <!-- 添加/编辑弹窗 -->
     <div class="modal-overlay" v-if="showAdd || showEdit" @click.self="closeModal">
@@ -93,8 +94,10 @@
 
 <script setup>
 import { useToast } from '~/composables/useToast';
+import { useConfirm } from '~/composables/useConfirm';
 const { t } = useI18n();
 const toast = useToast();
+const { confirm } = useConfirm();
 const users = ref([]);
 const total = ref(0);
 const page = ref(1);
@@ -131,7 +134,7 @@ function editUser(u) {
 }
 
 async function handleRemove(u) {
-  if (!window.confirm($t('enterprise.removeUserConfirm', { name: u.nickname || u.phone }))) return;
+  if (!(await confirm($t('enterprise.removeUserConfirm', { name: u.nickname || u.phone })))) return;
   try {
     await $fetch(`/api/enterprise/users/${u.id}`, { method: 'DELETE', credentials: 'include' });
     loadUsers();

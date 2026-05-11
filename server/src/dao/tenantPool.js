@@ -19,6 +19,7 @@ const TENANT_TABLES = new Set([
   'automation_account', 'automation_task',
   'prompt_template', 'prompt_group', 'prompt_favorite',
   'sensitive_word', 'user', 'credit_request_log', 'ai_call_log',
+  'enterprise_user',
 ]);
 
 /** 从 SQL 里提取表名 */

@@ -19,6 +19,7 @@
       </div>
       <div v-if="!tags.length" class="empty">{{ $t('enterprise.customers.tags.noTags') }}</div>
     </div>
+    <div v-if="loading" class="loading-spinner">{{ $t('enterprise.common.loading') }}</div>
 
     <!-- 新建/编辑弹窗 -->
     <div class="modal-overlay" v-if="showAdd || showEdit" @click.self="closeModal">
@@ -47,8 +48,10 @@
 <script setup>
 definePageMeta({ layout: 'enterprise' });
 import { ref, reactive, onMounted } from 'vue';
+import { useConfirm } from '~/composables/useConfirm';
 
 const { t } = useI18n()
+const { confirm } = useConfirm()
 const tags = ref([]);
 const loading = ref(true);
 const showAdd = ref(false);
@@ -92,7 +95,7 @@ async function submitForm() {
 }
 
 async function handleDelete(t) {
-  if (!confirm(t('enterprise.customers.tags.confirmDelete', { name: t.name }))) return;
+  if (!(await confirm(t('enterprise.customers.tags.confirmDelete', { name: t.name })))) return;
   try {
     await $api(`/tags/${t.id}`, { method: 'DELETE' });
     loadTags();
