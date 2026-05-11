@@ -36,6 +36,9 @@
       </nav>
 
       <div class="al-side-ft">
+        <button class="al-theme-btn" @click="toggleTheme" :title="theme === 'dark' ? '切换亮色' : '切换暗色'" :aria-label="theme === 'dark' ? '切换到亮色模式' : '切换到暗色模式'">
+          {{ theme === 'dark' ? '☀️' : '🌙' }}
+        </button>
         <NuxtLink to="/workspace" class="al-back">← 返回工作台</NuxtLink>
       </div>
     </aside>
@@ -53,6 +56,7 @@
 <script setup lang="ts">
 const open = ref(false)
 const route = useRoute()
+const { theme, toggle: toggleTheme } = useTheme()
 watch(() => route.path, () => { open.value = false })
 
 interface NavItem { key: string; label: string; route: string }
@@ -245,6 +249,13 @@ watch(() => route.path, (p) => {
   transition: color 0.15s;
 }
 .al-back:hover { color: var(--text-primary); }
+.al-theme-btn {
+  background: none; border: 1px solid var(--border-light);
+  border-radius: 8px; font-size: 16px; cursor: pointer;
+  padding: 4px 6px; margin-right: 8px;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+.al-theme-btn:hover { background: var(--bg-hover); border-color: var(--brand); }
 
 /* ---- 主内容 ---- */
 .al-main {

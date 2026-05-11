@@ -143,7 +143,7 @@
       </div>
       <div class="lp-feat-tabs">
         <button v-for="tab in tabs" :key="tab.key" :class="{ on: activeTab === tab.key }" @click="activeTab = tab.key">
-          {{ tab.label }}
+          {{ tab.label }} <span class="lp-tab-count">{{ getTabCount(tab.key) }}</span>
         </button>
       </div>
       <div class="lp-feat-grid" role="list">
@@ -391,6 +391,11 @@ const filteredCards = computed(() =>
   activeTab.value === 'all' ? cards.value : cards.value.filter(c => c.category === activeTab.value)
 )
 
+function getTabCount(key: string): number {
+  if (key === 'all') return cards.value.length
+  return cards.value.filter(c => c.category === key).length
+}
+
 const plans = computed(() => {
   const raw = t('landing.plans') as any[]
   if (Array.isArray(raw) && raw.length) return raw
@@ -598,12 +603,22 @@ const displayPlans = computed(() => apiPricing.value || plans.value)
   font-size: 13px; color: #6b6b70; cursor: pointer; transition: background 0.2s, color 0.2s, box-shadow 0.2s; font-weight: 500;
 }
 .lp-feat-tabs button.on { background: #fff; color: #5b5fe3; box-shadow: 0 1px 4px rgba(91,95,227,0.12); }
+.lp-tab-count { font-size: 10px; color: #b0b0b5; margin-left: 3px; font-weight: 400; }
+.lp-feat-tabs button.on .lp-tab-count { color: #5b5fe3; opacity: 0.7; }
 .lp-feat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; max-width: 1200px; margin: 0 auto; }
 
 .lp-card {
   background: #fff; border: 1px solid #ebebea; border-radius: 12px; padding: 24px;
   cursor: pointer; transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative; overflow: hidden;
 }
+.lp-card::after {
+  content: ''; position: absolute; inset: 0; border-radius: 12px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(91,95,227,0.06), transparent 60%);
+  opacity: 0; transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1); pointer-events: none; z-index: 0;
+}
+.lp-card:hover::after { opacity: 1; }
+.lp-card > * { position: relative; z-index: 1; }
 .lp-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.07); border-color: #d9d9d7; }
 .lp-card:focus-visible { outline: 2px solid #5b5fe3; outline-offset: 2px; }
 .lp-card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
@@ -765,6 +780,16 @@ const displayPlans = computed(() => apiPricing.value || plans.value)
 .lp-feat-grid .lp-card:nth-child(10) { transition-delay: 0.36s; }
 .lp-feat-grid .lp-card:nth-child(11) { transition-delay: 0.40s; }
 .lp-feat-grid .lp-card:nth-child(12) { transition-delay: 0.44s; }
+
+/* Use case stagger */
+.lp-case:nth-child(1) { transition-delay: 0s; }
+.lp-case:nth-child(2) { transition-delay: 0.08s; }
+.lp-case:nth-child(3) { transition-delay: 0.16s; }
+
+/* Pricing plan stagger */
+.lp-plan:nth-child(1) { transition-delay: 0s; }
+.lp-plan:nth-child(2) { transition-delay: 0.08s; }
+.lp-plan:nth-child(3) { transition-delay: 0.16s; }
 
 /* Hero gradient subtle shimmer */
 .lp-hero-h1 em {

@@ -34,7 +34,7 @@ export async function executeTask(taskId, userId) {
   if (task.user_id !== userId) throw new BusinessError(403, '无权执行该任务');
   if (task.status !== 0) throw new BusinessError(400, '任务状态不允许执行');
 
-  await automationDao.updateTaskStatus(taskId, 1, { startTime: true });
+  await automationDao.updateTaskStatus(taskId, task.user_id, task.tenant_id, 1, { startTime: true });
 
   const timer = setTimeout(async () => {
     runningTimers.delete(taskId);
@@ -43,13 +43,13 @@ export async function executeTask(taskId, userId) {
       const current = await automationDao.getTaskById(taskId);
       if (!current || current.status === 4) return;
 
-      await automationDao.updateTaskStatus(taskId, 2, {
+      await automationDao.updateTaskStatus(taskId, current.user_id, current.tenant_id, 2, {
         endTime: true,
         resultJson: JSON.stringify({ message: TASK_LABELS[task.task_type] || '执行完成' }),
         screenshotUrl: `/uploads/screenshots/task_${taskId}.png`,
       });
     } catch (e) {
-      await automationDao.updateTaskStatus(taskId, 3, { errorMsg: e.message });
+      await automationDao.updateTaskStatus(taskId, task.user_id, task.tenant_id, 3, { errorMsg: e.message });
     }
   }, 2000);
   runningTimers.set(taskId, timer);

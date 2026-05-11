@@ -54,7 +54,7 @@ export const listSubmissions = wrapController(async (req, res) => {
 })
 
 export const updateSubmission = wrapController(async (req, res) => {
-    await formService.updateSubmission(req.params.subId, req.body);
+    await formService.updateSubmission(req.params.subId, req.params.id, req.body);
     success(res, null, '更新成功');
 })
 

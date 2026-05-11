@@ -47,6 +47,9 @@
         </NuxtLink>
       </nav>
       <div class="ent-footer">
+        <button class="ent-theme-btn" @click="toggleTheme" :title="theme === 'dark' ? '切换亮色' : '切换暗色'" :aria-label="theme === 'dark' ? '切换到亮色模式' : '切换到暗色模式'">
+          {{ theme === 'dark' ? '☀️' : '🌙' }}
+        </button>
         <button class="logout-btn" @click="handleLogout">{{ $t('enterprise.logout') }}</button>
       </div>
     </aside>
@@ -64,6 +67,7 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const entName = ref('');
+const { theme, toggle: toggleTheme } = useTheme();
 
 onMounted(async () => {
   try {

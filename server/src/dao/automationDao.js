@@ -25,15 +25,15 @@ export default {
     return r.insertId;
   },
 
-  async updateTaskStatus(id, status, extra = {}) {
+  async updateTaskStatus(id, userId, tenantId, status, extra = {}) {
     const sets = ['status = ?'], vals = [status];
     if (extra.startTime) { sets.push('start_time = NOW()'); }
     if (extra.endTime) { sets.push('end_time = NOW()'); }
     if (extra.resultJson) { sets.push('result_json = ?'); vals.push(extra.resultJson); }
     if (extra.screenshotUrl) { sets.push('screenshot_url = ?'); vals.push(extra.screenshotUrl); }
     if (extra.errorMsg) { sets.push('error_msg = ?'); vals.push(extra.errorMsg); }
-    vals.push(id);
-    await pool.query(`UPDATE automation_task SET ${sets.join(', ')} WHERE id = ?`, vals);
+    vals.push(id, userId, tenantId);
+    await pool.query(`UPDATE automation_task SET ${sets.join(', ')} WHERE id = ? AND user_id = ? AND tenant_id = ?`, vals);
   },
 
   async cancelTask(id, userId) {

@@ -19,13 +19,17 @@ export async function createCampaign(data) {
 }
 
 export async function updateCampaign(id, data) {
-  const ok = await campaignDao.updateCampaign(id, data);
+  const existing = await campaignDao.getCampaign(id);
+  if (!existing) throw new BusinessError(404, '活动不存在');
+  const ok = await campaignDao.updateCampaign(id, existing.tenant_id, data);
   if (!ok) throw new BusinessError(404, '活动不存在');
   return campaignDao.getCampaign(id);
 }
 
 export async function deleteCampaign(id) {
-  const ok = await campaignDao.deleteCampaign(id);
+  const existing = await campaignDao.getCampaign(id);
+  if (!existing) throw new BusinessError(404, '活动不存在');
+  const ok = await campaignDao.deleteCampaign(id, existing.tenant_id);
   if (!ok) throw new BusinessError(404, '活动不存在');
   return true;
 }
@@ -48,13 +52,17 @@ export async function createCoupon(data) {
 }
 
 export async function updateCoupon(id, data) {
-  const ok = await campaignDao.updateCoupon(id, data);
+  const existing = await campaignDao.getCoupon(id);
+  if (!existing) throw new BusinessError(404, '优惠券不存在');
+  const ok = await campaignDao.updateCoupon(id, existing.campaign_id, data);
   if (!ok) throw new BusinessError(404, '优惠券不存在');
   return campaignDao.getCoupon(id);
 }
 
 export async function deleteCoupon(id) {
-  const ok = await campaignDao.deleteCoupon(id);
+  const existing = await campaignDao.getCoupon(id);
+  if (!existing) throw new BusinessError(404, '优惠券不存在');
+  const ok = await campaignDao.deleteCoupon(id, existing.campaign_id);
   if (!ok) throw new BusinessError(404, '优惠券不存在');
   return true;
 }
@@ -81,13 +89,17 @@ export async function createAnnouncement(data) {
 }
 
 export async function updateAnnouncement(id, data) {
-  const ok = await campaignDao.updateAnnouncement(id, data);
+  const existing = await campaignDao.getAnnouncement(id);
+  if (!existing) throw new BusinessError(404, '公告不存在');
+  const ok = await campaignDao.updateAnnouncement(id, existing.create_by, data);
   if (!ok) throw new BusinessError(404, '公告不存在');
   return campaignDao.getAnnouncement(id);
 }
 
 export async function deleteAnnouncement(id) {
-  const ok = await campaignDao.deleteAnnouncement(id);
+  const existing = await campaignDao.getAnnouncement(id);
+  if (!existing) throw new BusinessError(404, '公告不存在');
+  const ok = await campaignDao.deleteAnnouncement(id, existing.create_by);
   if (!ok) throw new BusinessError(404, '公告不存在');
   return true;
 }

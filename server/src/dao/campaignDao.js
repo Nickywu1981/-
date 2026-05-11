@@ -27,7 +27,7 @@ export default {
     return result.insertId;
   },
 
-  async updateCampaign(id, data) {
+  async updateCampaign(id, tenantId, data) {
     const fields = ['title','type','description','cover_url','rules','reward_type','reward_value','start_time','end_time','status','target_audience','sort_order'];
     const sets = [];
     const params = [];
@@ -35,18 +35,13 @@ export default {
       if (data[f] !== undefined) { sets.push(`${f} = ?`); params.push(data[f]); }
     }
     if (!sets.length) return false;
-    params.push(id);
-    if (data.tenant_id !== undefined) { params.push(data.tenant_id); }
-    const tenantClause = data.tenant_id !== undefined ? ' AND tenant_id = ?' : '';
-    const [result] = await pool.query(`UPDATE campaign SET ${sets.join(', ')} WHERE id = ?${tenantClause}`, params);
+    params.push(id, tenantId);
+    const [result] = await pool.query(`UPDATE campaign SET ${sets.join(', ')} WHERE id = ? AND tenant_id = ?`, params);
     return result.affectedRows > 0;
   },
 
   async deleteCampaign(id, tenantId) {
-    const params = [id];
-    if (tenantId !== undefined) { params.push(tenantId); }
-    const tenantClause = tenantId !== undefined ? ' AND tenant_id = ?' : '';
-    const [result] = await pool.query(`DELETE FROM campaign WHERE id = ?${tenantClause}`, params);
+    const [result] = await pool.query('DELETE FROM campaign WHERE id = ? AND tenant_id = ?', [id, tenantId]);
     return result.affectedRows > 0;
   },
 
@@ -75,26 +70,21 @@ export default {
     return result.insertId;
   },
 
-  async updateCoupon(id, data) {
-    const fields = ['code','name','type','value','min_order_amount','max_discount','total_quantity','per_user_limit','start_time','end_time','status','campaign_id'];
+  async updateCoupon(id, campaignId, data) {
+    const fields = ['code','name','type','value','min_order_amount','max_discount','total_quantity','per_user_limit','start_time','end_time','status'];
     const sets = [];
     const params = [];
     for (const f of fields) {
       if (data[f] !== undefined) { sets.push(`${f} = ?`); params.push(data[f]); }
     }
     if (!sets.length) return false;
-    params.push(id);
-    if (data.campaign_id !== undefined) { params.push(data.campaign_id); }
-    const campaignClause = data.campaign_id !== undefined ? ' AND campaign_id = ?' : '';
-    const [result] = await pool.query(`UPDATE coupon SET ${sets.join(', ')} WHERE id = ?${campaignClause}`, params);
+    params.push(id, campaignId);
+    const [result] = await pool.query(`UPDATE coupon SET ${sets.join(', ')} WHERE id = ? AND campaign_id = ?`, params);
     return result.affectedRows > 0;
   },
 
   async deleteCoupon(id, campaignId) {
-    const params = [id];
-    if (campaignId !== undefined) { params.push(campaignId); }
-    const campaignClause = campaignId !== undefined ? ' AND campaign_id = ?' : '';
-    const [result] = await pool.query(`DELETE FROM coupon WHERE id = ?${campaignClause}`, params);
+    const [result] = await pool.query('DELETE FROM coupon WHERE id = ? AND campaign_id = ?', [id, campaignId]);
     return result.affectedRows > 0;
   },
 
@@ -135,7 +125,7 @@ export default {
     return result.insertId;
   },
 
-  async updateAnnouncement(id, data) {
+  async updateAnnouncement(id, createBy, data) {
     const fields = ['title','content','type','level','is_pinned','target_audience','publish_time','status'];
     const sets = [];
     const params = [];
@@ -143,18 +133,13 @@ export default {
       if (data[f] !== undefined) { sets.push(`${f} = ?`); params.push(data[f]); }
     }
     if (!sets.length) return false;
-    params.push(id);
-    if (data.create_by !== undefined) { params.push(data.create_by); }
-    const ownerClause = data.create_by !== undefined ? ' AND create_by = ?' : '';
-    const [result] = await pool.query(`UPDATE announcement SET ${sets.join(', ')} WHERE id = ?${ownerClause}`, params);
+    params.push(id, createBy);
+    const [result] = await pool.query(`UPDATE announcement SET ${sets.join(', ')} WHERE id = ? AND create_by = ?`, params);
     return result.affectedRows > 0;
   },
 
   async deleteAnnouncement(id, createBy) {
-    const params = [id];
-    if (createBy !== undefined) { params.push(createBy); }
-    const ownerClause = createBy !== undefined ? ' AND create_by = ?' : '';
-    const [result] = await pool.query(`DELETE FROM announcement WHERE id = ?${ownerClause}`, params);
+    const [result] = await pool.query('DELETE FROM announcement WHERE id = ? AND create_by = ?', [id, createBy]);
     return result.affectedRows > 0;
   },
 };

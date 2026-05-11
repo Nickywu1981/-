@@ -122,15 +122,15 @@ export default {
     return rows;
   },
 
-  async updateSubmission(id, fields) {
+  async updateSubmission(id, formId, fields) {
     const allowed = ['status', 'data_status', 'remark'];
     const sets = []; const vals = [];
     for (const k of allowed) {
       if (fields[k] !== undefined) { sets.push(`${k} = ?`); vals.push(fields[k]); }
     }
     if (!sets.length) return;
-    vals.push(id);
-    await pool.query(`UPDATE custom_form_submission SET ${sets.join(', ')} WHERE id = ?`, vals);
+    vals.push(id, formId);
+    await pool.query(`UPDATE custom_form_submission SET ${sets.join(', ')} WHERE id = ? AND form_id = ?`, vals);
   },
 
   // ── 字段管理(独立表) ──

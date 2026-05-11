@@ -263,8 +263,8 @@ export async function listSubmissions(formId, { page = 1, pageSize = 50, status,
   return formDao.listSubmissions(formId, { page, pageSize, status, dataStatus, startDate, endDate });
 }
 
-export async function updateSubmission(subId, data) {
-  await formDao.updateSubmission(subId, data);
+export async function updateSubmission(subId, formId, data) {
+  await formDao.updateSubmission(subId, formId, data);
   return true;
 }
 

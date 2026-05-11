@@ -66,8 +66,8 @@ export async function auditRelation(id, tenantId, { status, auditRemark }) {
   return result.affectedRows;
 }
 
-export async function updateRelationStatus(id, status) {
-  const [result] = await pool.query('UPDATE ?? SET status = ? WHERE id = ?', [TABLE.RELATION, status, id]);
+export async function updateRelationStatus(id, tenantId, status) {
+  const [result] = await pool.query('UPDATE ?? SET status = ? WHERE id = ? AND tenant_id = ?', [TABLE.RELATION, status, id, tenantId]);
   return result.affectedRows;
 }
 
