@@ -53,13 +53,15 @@ export async function updateTemplate(id, fields) {
       params.push(k === 'variables' ? JSON.stringify(v) : v);
     }
   }
-  if (!sets.length) return;
+  if (!sets.length) return 0;
   params.push(id);
-  await pool.execute(`UPDATE prompt_template SET ${sets.join(', ')} WHERE id = ?`, params);
+  const [r] = await pool.execute(`UPDATE prompt_template SET ${sets.join(', ')} WHERE id = ?`, params);
+  return r.affectedRows;
 }
 
 export async function deleteTemplate(id) {
-  await pool.execute('DELETE FROM prompt_template WHERE id = ?', [id]);
+  const [r] = await pool.execute('DELETE FROM prompt_template WHERE id = ?', [id]);
+  return r.affectedRows;
 }
 
 export async function incrUsageCount(id) {
@@ -67,7 +69,8 @@ export async function incrUsageCount(id) {
 }
 
 export async function updateStatus(id, status, reviewerId, reviewRemark) {
-  await pool.execute('UPDATE prompt_template SET status = ?, reviewer_id = ?, review_remark = ? WHERE id = ?', [status, reviewerId, reviewRemark || '', id]);
+  const [r] = await pool.execute('UPDATE prompt_template SET status = ?, reviewer_id = ?, review_remark = ? WHERE id = ?', [status, reviewerId, reviewRemark || '', id]);
+  return r.affectedRows;
 }
 
 // ==================== 收藏 ====================
@@ -117,13 +120,15 @@ export async function updateGroup(id, userId, fields) {
   for (const [k, v] of Object.entries(fields)) {
     if (v !== undefined && allowed.includes(k)) { sets.push(`${k} = ?`); params.push(v); }
   }
-  if (!sets.length) return;
+  if (!sets.length) return 0;
   params.push(id, userId);
-  await pool.execute(`UPDATE prompt_group SET ${sets.join(', ')} WHERE id = ? AND user_id = ?`, params);
+  const [r] = await pool.execute(`UPDATE prompt_group SET ${sets.join(', ')} WHERE id = ? AND user_id = ?`, params);
+  return r.affectedRows;
 }
 
 export async function deleteGroup(id, userId) {
-  await pool.execute('DELETE FROM prompt_group WHERE id = ? AND user_id = ?', [id, userId]);
+  const [r] = await pool.execute('DELETE FROM prompt_group WHERE id = ? AND user_id = ?', [id, userId]);
+  return r.affectedRows;
 }
 
 // ==================== 分类枚举 ====================

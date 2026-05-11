@@ -49,7 +49,8 @@ export async function listUsers(pager, keyword = '') {
 }
 
 export async function updateLastLogin(id) {
-  await pool.execute('UPDATE user SET last_login_time = NOW() WHERE id = ?', [id]);
+  const [r] = await pool.execute('UPDATE user SET last_login_time = NOW() WHERE id = ?', [id]);
+  return r.affectedRows;
 }
 
 export async function updateUser(id, fields) {
@@ -61,13 +62,15 @@ export async function updateUser(id, fields) {
       params.push(v);
     }
   }
-  if (sets.length === 0) return;
+  if (sets.length === 0) return 0;
   params.push(id);
-  await pool.execute(`UPDATE user SET ${sets.join(', ')}, update_time = NOW() WHERE id = ?`, params);
+  const [r] = await pool.execute(`UPDATE user SET ${sets.join(', ')}, update_time = NOW() WHERE id = ?`, params);
+  return r.affectedRows;
 }
 
 export async function updatePassword(id, hashedPassword) {
-  await pool.execute('UPDATE user SET password = ?, update_time = NOW() WHERE id = ?', [hashedPassword, id]);
+  const [r] = await pool.execute('UPDATE user SET password = ?, update_time = NOW() WHERE id = ?', [hashedPassword, id]);
+  return r.affectedRows;
 }
 
 export async function findByPhone(phone) {

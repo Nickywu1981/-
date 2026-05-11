@@ -111,12 +111,12 @@ export default {
         vals.push(['mobile_config', 'pc_config', 'meta_json'].includes(k) ? JSON.stringify(fields[k]) : fields[k]);
       }
     }
-    if (!sets.length) return false;
+    if (!sets.length) return 0;
     if (fields.status === 1) { sets.push('publish_time = NOW()'); }
     if (fields.status === 2) { sets.push('offline_time = NOW()'); }
     vals.push(id, tenantId);
-    await pool.query(`UPDATE diy_page SET ${sets.join(', ')} WHERE id = ? AND tenant_id = ?`, vals);
-    return true;
+    const [r] = await pool.query(`UPDATE diy_page SET ${sets.join(', ')} WHERE id = ? AND tenant_id = ?`, vals);
+    return r.affectedRows;
   },
 
   async updateAccessCount(slug) {
@@ -126,11 +126,13 @@ export default {
   // ==================== 状态机操作 ====================
 
   async softDeletePage(id, tenantId) {
-    await pool.query('UPDATE diy_page SET status = 3 WHERE id = ? AND tenant_id = ?', [id, tenantId]);
+    const [r] = await pool.query('UPDATE diy_page SET status = 3 WHERE id = ? AND tenant_id = ?', [id, tenantId]);
+    return r.affectedRows;
   },
 
   async restorePage(id, tenantId) {
-    await pool.query('UPDATE diy_page SET status = 0 WHERE id = ? AND tenant_id = ? AND status = 3', [id, tenantId]);
+    const [r] = await pool.query('UPDATE diy_page SET status = 0 WHERE id = ? AND tenant_id = ? AND status = 3', [id, tenantId]);
+    return r.affectedRows;
   },
 
   async hardDeletePage(id, tenantId) {
@@ -141,11 +143,13 @@ export default {
   },
 
   async unpublishPage(id, tenantId) {
-    await pool.query('UPDATE diy_page SET status = 2, offline_time = NOW() WHERE id = ? AND tenant_id = ? AND status = 1', [id, tenantId]);
+    const [r] = await pool.query('UPDATE diy_page SET status = 2, offline_time = NOW() WHERE id = ? AND tenant_id = ? AND status = 1', [id, tenantId]);
+    return r.affectedRows;
   },
 
   async republishPage(id, tenantId) {
-    await pool.query('UPDATE diy_page SET status = 1, publish_time = NOW() WHERE id = ? AND tenant_id = ? AND status = 2', [id, tenantId]);
+    const [r] = await pool.query('UPDATE diy_page SET status = 1, publish_time = NOW() WHERE id = ? AND tenant_id = ? AND status = 2', [id, tenantId]);
+    return r.affectedRows;
   },
 
   // ==================== 版本管理（增强版） ====================

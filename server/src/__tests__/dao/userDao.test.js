@@ -49,8 +49,9 @@ describe('userDao', () => {
   });
 
   it('updateLastLogin 执行 SQL', async () => {
-    mockExecute.mockResolvedValue([]);
-    await userDao.updateLastLogin(5);
+    mockExecute.mockResolvedValue([{ affectedRows: 1 }]);
+    const affected = await userDao.updateLastLogin(5);
+    expect(affected).toBe(1);
     expect(mockExecute).toHaveBeenCalledWith(
       expect.stringContaining('UPDATE user SET last_login_time'),
       [5],
