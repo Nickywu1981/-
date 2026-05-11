@@ -26,7 +26,7 @@
       <div class="wc-input-actions">
         <span class="wc-hint">{{ activeTabHint }}</span>
         <button class="wc-submit" :disabled="!prompt.trim()" @click="handleSubmit">
-          开始创作 →
+          {{ $t('workspace.start_create') }} →
         </button>
       </div>
     </div>
@@ -34,12 +34,12 @@
     <!-- ═══ 当前标签下的工具卡片宫格 ═══ -->
     <div v-if="loading" class="wc-loading">
       <div class="spinner" />
-      <p>加载创作工具...</p>
+      <p>{{ $t('workspace.loading_tools') }}</p>
     </div>
     <div v-else class="wc-section">
       <div class="wc-sec-hd">
-        <h3 class="wc-sec-title">{{ activeTabLabel }} · 创作工具</h3>
-        <button class="wc-sec-more">查看全部 →</button>
+        <h3 class="wc-sec-title">{{ activeTabLabel }} · {{ $t('workspace.creation_tools') }}</h3>
+        <button class="wc-sec-more" @click="go(allCardsRoute)">{{ $t('workspace.view_all') }} →</button>
       </div>
       <div class="wc-grid">
         <div
@@ -122,7 +122,6 @@ const defaultCardData: Record<string, Card[]> = {
 <script setup lang="ts">
 definePageMeta({ layout: 'workspace' })
 const router = useRouter()
-const toast = useToast()
 
 const prompt = ref('')
 const activeTab = ref('')
@@ -194,6 +193,11 @@ const activeTabHint = computed(() => {
 
 const activeCards = computed(() => cardData.value[activeTab.value] || Object.values(cardData.value)[0] || [])
 
+const allCardsRoute = computed(() => {
+  const map: Record<string, string> = { video: '/work/video', image: '/work/image', detail: '/work/detail-page', copywrite: '/work/copywriting', digital: '/work/digital-human' }
+  return map[activeTab.value] || '/workspace/creation'
+})
+
 async function handleSubmit() {
   if (!prompt.value.trim()) return
   const tab = activeTab.value
@@ -218,8 +222,9 @@ async function handleSubmit() {
   padding: 7px 16px; border-radius: 8px; font-size: 13px; background: none; border: none;
   color: var(--tx2, #6b6b70); cursor: pointer; transition: background 0.15s, color 0.15s;
 }
-.wc-tab:hover { background: #fff; color: var(--tx, #171717); }
-.wc-tab.sel { background: var(--tx, #171717); color: #fff; }
+.wc-tab:hover { background: rgba(0,0,0,0.04); color: var(--tx, #171717); }
+.wc-tab:focus-visible { outline: 2px solid var(--brand, #5b5fe3); outline-offset: 2px; border-radius: 4px; }
+.wc-tab.sel { background: var(--brand, #5b5fe3); color: #fff; }
 
 /* ═══ Input ═══ */
 .wc-input { background: #fff; border-radius: 14px; padding: 18px; border: 1px solid var(--brd, #ebebea); box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 28px; }
@@ -228,7 +233,7 @@ async function handleSubmit() {
   font-family: inherit; outline: none; background: none;
 }
 .wc-textarea:focus-visible {
-  outline: 2px solid var(--brand, var(--cfg-primary));
+  outline: 2px solid var(--brand, #5b5fe3);
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -237,7 +242,7 @@ async function handleSubmit() {
 .wc-hint { font-size: 11px; color: var(--tx3, #9d9da3); }
 .wc-submit {
   padding: 8px 20px; border-radius: 8px; font-size: 13px; font-weight: 500; border: none;
-  background: var(--tx, #171717); color: #fff; cursor: pointer; transition: opacity 0.15s, transform 0.15s;
+  background: var(--brand, #5b5fe3); color: #fff; cursor: pointer; transition: opacity 0.15s, transform 0.15s;
 }
 .wc-submit:hover { opacity: 0.85; transform: scale(1.02); }
 .wc-submit:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
@@ -245,7 +250,7 @@ async function handleSubmit() {
 /* ═══ Grid ═══ */
 .wc-section { }
 .wc-sec-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-.wc-sec-title { font-size: 14px; font-weight: 600; color: var(--tx, #171717); }
+.wc-sec-title { font-size: 14px; font-weight: 500; color: var(--tx, #171717); }
 .wc-sec-more { font-size: 12px; color: var(--tx3, #9d9da3); background: none; border: none; cursor: pointer; }
 .wc-sec-more:hover { color: var(--tx, #171717); }
 .wc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
@@ -254,8 +259,9 @@ async function handleSubmit() {
   cursor: pointer; transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 }
 .wc-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); border-color: #d4d4d4; }
+.wc-card:focus-visible { outline: 2px solid var(--brand, #5b5fe3); outline-offset: 2px; }
 .wc-card-icon { font-size: 24px; margin-bottom: 8px; }
-.wc-card-title { font-size: 13px; font-weight: 600; color: var(--tx, #171717); margin-bottom: 4px; }
+.wc-card-title { font-size: 13px; font-weight: 500; color: var(--tx, #171717); margin-bottom: 4px; }
 .wc-card-desc { font-size: 12px; color: var(--tx3, #9d9da3); line-height: 1.4; }
 
 @media (max-width: 1000px) { .wc-grid { grid-template-columns: repeat(3, 1fr); } }
@@ -263,6 +269,6 @@ async function handleSubmit() {
 @media (max-width: 480px) { .wc-grid { grid-template-columns: 1fr; } }
 
 .wc-loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 0; color: var(--tx2, #6b6b70); font-size: 13px; gap: 12px; }
-.spinner { width: 32px; height: 32px; border: 3px solid var(--brd, #ebebea); border-top-color: var(--tx, #171717); border-radius: 50%; animation: spin 0.8s linear infinite; }
+.spinner { width: 32px; height: 32px; border: 3px solid var(--brd, #ebebea); border-top-color: var(--brand, #5b5fe3); border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 </style>

@@ -107,7 +107,6 @@
     </div>
   </WorkLayout>
 </template>
-</template>
 
 <script setup lang="ts">
 const { createBlobUrl, revoke } = useBlobUrl()

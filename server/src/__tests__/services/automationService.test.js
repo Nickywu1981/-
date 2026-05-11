@@ -87,7 +87,7 @@ describe('automationService', () => {
     });
 
     it('updates status to 1 (running) and returns { taskId, status: 1 }', async () => {
-      mockDao.getTaskById.mockResolvedValue({ id: 10, task_type: 'product_on' });
+      mockDao.getTaskById.mockResolvedValue({ id: 10, task_type: 'product_on', status: 0, user_id: undefined });
       mockDao.updateTaskStatus.mockResolvedValue();
       const result = await executeTask(10);
       expect(mockDao.updateTaskStatus).toHaveBeenCalledWith(10, 1, { startTime: true });
@@ -96,7 +96,7 @@ describe('automationService', () => {
 
     it('schedules async completion with task type label', async () => {
       vi.useFakeTimers();
-      mockDao.getTaskById.mockResolvedValue({ id: 10, task_type: 'product_on' });
+      mockDao.getTaskById.mockResolvedValue({ id: 10, task_type: 'product_on', status: 0, user_id: undefined });
       mockDao.updateTaskStatus.mockResolvedValue();
       await executeTask(10);
       await vi.runAllTimersAsync();
@@ -109,7 +109,7 @@ describe('automationService', () => {
 
     it('handles unknown task_type with generic label in async', async () => {
       vi.useFakeTimers();
-      mockDao.getTaskById.mockResolvedValue({ id: 10, task_type: 'unknown_type' });
+      mockDao.getTaskById.mockResolvedValue({ id: 10, task_type: 'unknown_type', status: 0, user_id: undefined });
       mockDao.updateTaskStatus.mockResolvedValue();
       await executeTask(10);
       await vi.runAllTimersAsync();
@@ -121,7 +121,7 @@ describe('automationService', () => {
 
     it('sets status=3 on async failure', async () => {
       vi.useFakeTimers();
-      mockDao.getTaskById.mockResolvedValue({ id: 10, task_type: 'product_on' });
+      mockDao.getTaskById.mockResolvedValue({ id: 10, task_type: 'product_on', status: 0, user_id: undefined });
       mockDao.updateTaskStatus
         .mockResolvedValueOnce() // startTime call
         .mockRejectedValueOnce(new Error('crash')); // completion call

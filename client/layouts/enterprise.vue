@@ -15,6 +15,12 @@
         <NuxtLink to="/enterprise/users" class="ent-nav-item">
           <span class="icon">👥</span> 子账号管理
         </NuxtLink>
+        <NuxtLink to="/enterprise/customers" class="ent-nav-item">
+          <span class="icon">👤</span> 客户管理
+        </NuxtLink>
+        <NuxtLink to="/enterprise/customers/tags" class="ent-nav-item">
+          <span class="icon">🏷️</span> 标签管理
+        </NuxtLink>
         <NuxtLink to="/enterprise/usage" class="ent-nav-item">
           <span class="icon">📈</span> 用量明细
         </NuxtLink>

@@ -1,5 +1,8 @@
 <template>
   <div class="lp">
+    <!-- Skip to content (accessibility) -->
+    <a href="#main-content" class="lp-skip">{{ $t('landing.skip_to_content') }}</a>
+
     <!-- ===== NAV ===== -->
     <header class="lp-nav" :class="{ on: scrolled }">
       <div class="lp-nav-in">
@@ -8,10 +11,10 @@
           <span class="lp-nav-name">{{ siteName }}</span>
         </NuxtLink>
         <nav class="lp-nav-lk">
-          <a href="#features" @click.prevent="scrollTo('features')">{{ $t('landing.nav_features') }}</a>
-          <a href="#how" @click.prevent="scrollTo('how')">{{ $t('landing.nav_how') }}</a>
-          <a href="#pricing" @click.prevent="scrollTo('pricing')">{{ $t('landing.nav_pricing') }}</a>
-          <a href="#faq" @click.prevent="scrollTo('faq')">{{ $t('landing.nav_faq') }}</a>
+          <a href="#features" :class="{ on: activeSection === 'features' }" @click.prevent="scrollTo('features')">{{ $t('landing.nav_features') }}</a>
+          <a href="#how" :class="{ on: activeSection === 'how' }" @click.prevent="scrollTo('how')">{{ $t('landing.nav_how') }}</a>
+          <a href="#pricing" :class="{ on: activeSection === 'pricing' }" @click.prevent="scrollTo('pricing')">{{ $t('landing.nav_pricing') }}</a>
+          <a href="#faq" :class="{ on: activeSection === 'faq' }" @click.prevent="scrollTo('faq')">{{ $t('landing.nav_faq') }}</a>
         </nav>
         <div class="lp-nav-act">
           <LangSwitcher />
@@ -22,7 +25,7 @@
             <NuxtLink to="/login" class="lp-btn-ghost">{{ $t('nav.login') }}</NuxtLink>
             <NuxtLink to="/register" class="lp-btn-main">{{ $t('nav.register') }}</NuxtLink>
           </template>
-          <button class="lp-ham" @click="mobileOpen = !mobileOpen" :aria-label="mobileOpen ? '关闭' : '菜单'">
+          <button class="lp-ham" @click="mobileOpen = !mobileOpen" :aria-label="mobileOpen ? $t('landing.menu_close') : $t('landing.menu_open')">
             <span :class="{ on: mobileOpen }" /><span :class="{ on: mobileOpen }" /><span :class="{ on: mobileOpen }" />
           </button>
         </div>
@@ -45,7 +48,7 @@
     </header>
 
     <!-- ===== HERO ===== -->
-    <section class="lp-hero">
+    <section id="main-content" class="lp-hero">
       <div class="lp-hero-bg" />
       <div class="lp-hero-body">
         <div class="lp-hero-tag"><i /><span>{{ $t('landing.hero_sub') }}</span></div>
@@ -105,9 +108,9 @@
     <!-- ===== MemFocus AI — 百万年薪秘书 ===== -->
     <section class="lp-memfocus">
       <div class="lp-sec-hd">
-        <span class="lp-sec-tag">MemFocus AI</span>
-        <h2>你的百万年薪私人总秘书</h2>
-        <p>8 维核心能力，24×7 巅峰状态，永不离职</p>
+        <span class="lp-sec-tag">{{ $t('landing.memfocus_tag') }}</span>
+        <h2>{{ $t('landing.memfocus_title') }}</h2>
+        <p>{{ $t('landing.memfocus_desc') }}</p>
       </div>
       <div class="lp-mf-grid">
         <div class="lp-mf-card" v-for="c in memfocusCards" :key="c.key">
@@ -121,7 +124,7 @@
         </div>
       </div>
       <div class="lp-mf-quote">
-        <span>"</span>没有请假、不闹情绪、不跳槽——每次调用都是巅峰状态<span>"</span>
+        <span>"</span>{{ $t('landing.memfocus_quote') }}<span>"</span>
       </div>
     </section>
 
@@ -161,7 +164,7 @@
       <div class="lp-sec-hd">
         <span class="lp-sec-tag">{{ $t('landing.section_how') }}</span>
         <h2>{{ $t('landing.section_how_title') }}</h2>
-        <p>无需任何设计经验，AI 全自动完成</p>
+        <p>{{ $t('landing.how_subtitle') }}</p>
       </div>
       <div class="lp-how-row">
         <div class="lp-step" v-for="(s, i) in steps" :key="i">
@@ -176,8 +179,8 @@
     <!-- ===== USE CASES ===== -->
     <section class="lp-cases">
       <div class="lp-sec-hd">
-        <span class="lp-sec-tag">用户故事</span>
-        <h2>谁在用 Movio AI？</h2>
+        <span class="lp-sec-tag">{{ $t('landing.cases_tag') }}</span>
+        <h2>{{ $t('landing.cases_title') }}</h2>
       </div>
       <div class="lp-cases-grid">
         <div class="lp-case" v-for="c in useCases" :key="c.title">
@@ -194,16 +197,16 @@
       <div class="lp-sec-hd">
         <span class="lp-sec-tag">{{ $t('landing.section_pricing') }}</span>
         <h2>{{ $t('landing.section_pricing_title') }}</h2>
-        <p>新用户注册即送体验积分，免费试用全部功能</p>
+        <p>{{ $t('landing.pricing_subtitle') }}</p>
       </div>
       <div class="lp-price-grid">
         <div class="lp-plan" v-for="plan in displayPlans" :key="plan.name" :class="{ pop: plan.featured }">
-          <div v-if="plan.featured" class="lp-plan-badge">最受欢迎</div>
+          <div v-if="plan.featured" class="lp-plan-badge">{{ $t('landing.plan_popular') }}</div>
           <div class="lp-plan-ico">{{ plan.icon }}</div>
           <h3>{{ plan.name }}</h3>
           <div class="lp-plan-pr"><b>¥{{ plan.price }}</b><span>/月</span></div>
           <ul class="lp-plan-feat"><li v-for="f in plan.features" :key="f">{{ f }}</li></ul>
-          <button class="lp-plan-btn" :class="{ on: plan.featured }">{{ plan.featured ? '立即开通' : '开始使用' }}</button>
+          <button class="lp-plan-btn" :class="{ on: plan.featured }">{{ plan.featured ? $t('landing.plan_subscribe') : $t('landing.plan_start') }}</button>
         </div>
       </div>
     </section>
@@ -226,11 +229,11 @@
     <section class="lp-cta">
       <div class="lp-cta-card">
         <div class="lp-cta-glow" />
-        <h2>准备好让 AI 帮你作图了吗？</h2>
-        <p>注册即送 200 体验积分，免费生成你的第一张商品图</p>
+        <h2>{{ $t('landing.cta_title') }}</h2>
+        <p>{{ $t('landing.cta_desc') }}</p>
         <div class="lp-cta-btns">
-          <NuxtLink to="/register" class="lp-hero-cta">免费注册 <span>&rarr;</span></NuxtLink>
-          <NuxtLink to="/help" class="lp-cta-link">了解更多</NuxtLink>
+          <NuxtLink to="/register" class="lp-hero-cta">{{ $t('landing.cta_button') }} <span>&rarr;</span></NuxtLink>
+          <NuxtLink to="/help" class="lp-cta-link">{{ $t('landing.cta_link') }}</NuxtLink>
         </div>
       </div>
     </section>
@@ -241,39 +244,47 @@
         <div class="lp-foot-brand">
           <span class="lp-foot-logo">M</span>
           <span class="lp-foot-name">{{ siteName }}</span>
-          <p>AI 驱动的电商视觉创作平台</p>
+          <p>{{ $t('landing.footer_desc') }}</p>
         </div>
         <div class="lp-foot-lk">
-          <div><h4>产品</h4><a href="#features">功能</a><a href="#pricing">定价</a><a href="#how">使用流程</a></div>
-          <div><h4>支持</h4><a href="#faq">常见问题</a><NuxtLink to="/help">帮助中心</NuxtLink><NuxtLink to="/help">联系我们</NuxtLink></div>
-          <div><h4>法律</h4><NuxtLink to="/legal/privacy">隐私政策</NuxtLink><NuxtLink to="/legal/terms">服务条款</NuxtLink></div>
+          <div><h4>{{ $t('landing.footer_products') }}</h4><a href="#features">{{ $t('landing.footer_features') }}</a><a href="#pricing">{{ $t('landing.footer_pricing') }}</a><a href="#how">{{ $t('landing.footer_how') }}</a></div>
+          <div><h4>{{ $t('landing.footer_support') }}</h4><a href="#faq">{{ $t('landing.footer_faq') }}</a><NuxtLink to="/help">{{ $t('landing.footer_help') }}</NuxtLink><NuxtLink to="/help">{{ $t('landing.footer_contact') }}</NuxtLink></div>
+          <div><h4>{{ $t('landing.footer_legal') }}</h4><NuxtLink to="/legal/privacy">{{ $t('landing.footer_privacy') }}</NuxtLink><NuxtLink to="/legal/terms">{{ $t('landing.footer_terms') }}</NuxtLink></div>
         </div>
       </div>
-      <div class="lp-foot-bot"><span>{{ footerText }}</span></div>
+      <div class="lp-foot-bot"><span>© {{ currentYear }} Movio AI. All rights reserved.</span></div>
     </footer>
+
+    <!-- Back to top -->
+    <button v-show="showBackTop" class="lp-back-top" @click="scrollToTop" aria-label="返回顶部" :title="$t('landing.back_top')">↑</button>
   </div>
 </template>
 
 <script setup lang="ts">
 definePageMeta({ layout: 'landing' });
 
-useHead({
-  htmlAttrs: { lang: 'zh-CN' },
+const { locale } = useI18n()
+
+useHead(() => ({
+  htmlAttrs: { lang: locale.value === 'en' ? 'en' : 'zh-CN' },
   title: 'Movio AI — 全链路运营助手',
   meta: [
-    { name: 'description', content: 'Movio AI — 全链路运营助手，电商AI内容中台。上传产品照片即可生成主图、场景图、详情页、带货视频，一个人就是一支视觉团队' },
-    { name: 'keywords', content: 'AI电商图,电商主图制作,AI场景图,详情页生成,电商视频制作,AI抠图,商品图批量处理,淘宝主图,拼多多主图,抖音商品图,小红书封面' },
+    { name: 'description', content: locale.value === 'en' ? 'Movio AI — Full-stack e-commerce AI automation. Upload product photos, generate main images, scene images, detail pages, and video content in one click.' : 'Movio AI — 全链路运营助手，电商AI内容中台。上传产品照片即可生成主图、场景图、详情页、带货视频，一个人就是一支视觉团队' },
+    { name: 'keywords', content: locale.value === 'en' ? 'AI e-commerce images,product image maker,AI scene generator,video creation' : 'AI电商图,电商主图制作,AI场景图,详情页生成,电商视频制作,AI抠图,商品图批量处理,淘宝主图,拼多多主图,抖音商品图,小红书封面' },
     { name: 'viewport', content: 'width=device-width, initial-scale=1' },
     { property: 'og:title', content: 'Movio AI — 全链路运营助手' },
-    { property: 'og:description', content: '覆盖13个电商平台，从图片到视频一站式AI创作' },
+    { property: 'og:description', content: locale.value === 'en' ? 'From photos to videos — one-click AI creation for 13 e-commerce platforms' : '覆盖13个电商平台，从图片到视频一站式AI创作' },
     { property: 'og:type', content: 'website' },
   ],
   link: [{ rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
-});
+}));
 const scrolled = ref(false);
 const mobileOpen = ref(false);
 const activeTab = ref('all');
 const user = ref<any>(null);
+const showBackTop = ref(false);
+const activeSection = ref('');
+const currentYear = new Date().getFullYear();
 
 async function checkAuth() {
   try { const res: any = await $fetch('/api/user/profile'); user.value = res.data; } catch { user.value = null; }
@@ -288,7 +299,6 @@ const siteName = computed(() => siteConfig.value?.site_name || 'Movio AI');
 const heroTitle = computed(() => siteConfig.value?.hero_title || '让你的产品秒变爆款');
 const heroSubtitle = computed(() => siteConfig.value?.hero_subtitle || '上传产品照片，AI 自动生成主图、场景图、详情页、带货视频。无需设计师，一个人就是一支视觉团队。');
 const heroCta = computed(() => siteConfig.value?.hero_cta || '免费开始使用');
-const footerText = computed(() => siteConfig.value?.footer_text || '© 2026 Movio AI. All rights reserved.');
 const apiFeatures = computed(() => {
   if (Array.isArray(siteConfig.value?.features) && siteConfig.value.features.length) return siteConfig.value.features;
   return null;
@@ -302,13 +312,28 @@ function scrollTo(id: string) {
   const el = document.getElementById(id);
   if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 const faqOpen = ref(-1);
 
 let scrollTicking = false;
 const handleScroll = () => {
   if (!scrollTicking) {
     requestAnimationFrame(() => {
-      scrolled.value = window.scrollY > 50;
+      const y = window.scrollY;
+      scrolled.value = y > 50;
+      showBackTop.value = y > 600;
+      // Active section spy
+      const sections = ['features', 'how', 'pricing', 'faq'];
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const el = document.getElementById(sections[i]);
+        if (el && el.getBoundingClientRect().top <= 120) {
+          activeSection.value = sections[i];
+          return;
+        }
+      }
+      activeSection.value = '';
       scrollTicking = false;
     });
     scrollTicking = true;
@@ -339,29 +364,29 @@ const memfocusCards = [
 ];
 
 const cards = [
-  { id: 'main', icon: '▣', title: '智能做主图', desc: 'AI 自动抠图→白底→精修→裁切→品牌水印，一键生成3张风格主图', tags: ['爆款商品图,', '13平台适配'], color: '#EDE9FE', ai: true, route: '/work/main-image', category: 'image' },
-  { id: 'scene', icon: '◈', title: '智能做场景', desc: '产品图+AI场景库→自动光影融合→出5张场景图，支持自定义背景', tags: ['场景融合,', '光影匹配'], color: '#DBEAFE', ai: true, route: '/work/scene', category: 'image' },
-  { id: 'detail', icon: '⊞', title: '智能做详情', desc: '产品图→AI自动生成文案+图文排版→完整详情页，多品类适配', tags: ['AI文案,', '自动排版'], color: '#D1FAE5', ai: true, route: '/work/detail-h5', category: 'image' },
-  { id: 'video', icon: '▶', title: '智能做视频', desc: '图片/多图→AI生成带货视频→自动字幕+BGM→1080×1920竖屏输出', tags: ['AI运镜,', '自动字幕'], color: '#FEF3C7', ai: true, route: '/work/video', category: 'video' },
-  { id: 'batch', icon: '⊡', title: '批量处理', desc: '文件夹拖入→选操作→后台排队→完成通知→ZIP下载，支持夜间托管', tags: ['批量队列,', '夜间折扣'], color: '#F3E8FF', ai: false, route: '/work/batch', category: 'image' },
-  { id: 'tryon', icon: '◇', title: '虚拟模特', desc: '服装平铺图→真人模特上身效果，多肤色/体型/风格可选', tags: ['AI试穿,', '多肤色'], color: '#ECFEFF', ai: true, route: '/work/virtual-tryon', category: 'image' },
-  { id: 'action', icon: '◉', title: '动作迁移', desc: '人物图+参考动作视频→AI精准迁移动作姿态，生成流畅展示视频', tags: ['动作捕捉,', '精准迁移'], color: '#FCE7F3', ai: true, route: '/work/action-transfer', category: 'video' },
-  { id: 'color', icon: '◐', title: '一键换色', desc: '服装鞋包颜色变换，保留褶皱纹理质感，支持批量换色', tags: ['多色生成,', '纹理保留'], color: '#FFF7ED', ai: true, route: '/work/color-swap', category: 'image' },
-  { id: 'style', icon: '◧', title: '风格转化', desc: '6大风格一键转换：复古/国潮/插画/水彩/赛博/极简，保留商品特征', tags: ['6大风格,', '创意设计'], color: '#F0FDF4', ai: true, route: '/work/style-transfer', category: 'image' },
-  { id: 'digital', icon: '◓', title: '口播数字人', desc: '输入文案→选数字人形象+语音→AI生成带货口播视频', tags: ['数字人,', 'TTS语音'], color: '#FFFBEB', ai: true, route: '/work/digital-human', category: 'video' },
-  { id: 'script', icon: '▤', title: '带货脚本', desc: '产品卖点→AI生成短视频口播/直播话术/种草文案，支持9语种+3脚本类型', tags: ['9语种,', '口播+话术'], color: '#FDF2F8', ai: true, route: '/work/script-gen', category: 'ai' },
-  { id: 'viral', icon: '◆', title: '爆款复刻', desc: '对标爆款视频→AI分析节奏/色调/转场→用你的产品重新生成相似风格', tags: ['爆款分析,', '风格复刻'], color: '#FEF2F2', ai: true, route: '/work/viral-clone', category: 'video' },
-  { id: 'remove-bg', icon: '◯', title: '智能抠图', desc: 'AI发丝级抠图，毛发/透明体/复杂边缘精准分离，支持单品+批量处理', tags: ['发丝级,', '批量抠图'], color: '#E8F5E9', ai: true, route: '/work/remove-bg', category: 'image' },
-  { id: 'white-bg', icon: '▭', title: '白底图生成', desc: '抠图后智能生成纯白/场景底图，自动光影校正+阴影保留，平台直出', tags: ['白底/透明,', '光影校正'], color: '#F5F5F5', ai: true, route: '/work/white-bg', category: 'image' },
-  { id: 'retouch', icon: '✦', title: '图片精修', desc: 'AI自动祛皱/去污/补光/锐化，保留材质纹理，批量提升产品图质感', tags: ['祛皱补光,', '纹理保留'], color: '#FFF8E1', ai: true, route: '/work/retouch', category: 'image' },
-  { id: 'platform-detail', icon: '▥', title: '平台详情页模板', desc: '13大电商平台详情页模板库，选平台→选模板→上传素材→一键生成适配尺寸', tags: ['13平台,', '尺寸适配'], color: '#EFF6FF', ai: true, route: '/work/platform-detail', category: 'image' },
-  { id: 'compliance', icon: '◬', title: '跨境合规检查', desc: '上传图片+文案→自动检测亚马逊/Temu/TikTok/Shein合规风险，覆盖欧美日市场', tags: ['合规检测,', '多市场'], color: '#FFF1F2', ai: true, route: '/work/compliance-check', category: 'ai' },
-  { id: 'ghost-mannequin', icon: '▯', title: '幽灵模特', desc: '服装平铺/挂拍→AI自动穿到隐形模特身上，生成3D立体效果展示图', tags: ['3D立体,', '隐形模特'], color: '#F0F9FF', ai: true, route: '/work/ghost-mannequin', category: 'image' },
-  { id: 'outpaint', icon: '▩', title: '智能扩图', desc: 'AI扩展图片边缘自动补全构图，适配各平台尺寸比例，无缝融合不留痕迹', tags: ['构图补全,', '比例适配'], color: '#F5F3FF', ai: true, route: '/work/outpainting', category: 'image' },
-  { id: 'image-translate', icon: '🌐', title: '图片翻译', desc: '商品图文字智能识别→翻译为9语种→原位替换，跨境卖家出海必备', tags: ['OCR识别,', '9语种翻译'], color: '#ECFDF5', ai: true, route: '/work/image-translate', category: 'image' },
-  { id: 'video-edit', icon: '▸', title: '视频编辑', desc: 'AI智能裁剪/变速/转场/调色，自动生成多尺寸多时长版本供投放', tags: ['智能剪辑,', '多尺寸输出'], color: '#FFF7ED', ai: true, route: '/work/video-edit', category: 'video' },
-  { id: 'voice-gen', icon: '♫', title: 'AI语音生成', desc: '输入文案→选主播音色→生成自然流畅带货配音，支持9语种50+音色', tags: ['TTS合成,', '50+音色'], color: '#FDF2F8', ai: true, route: '/work/voice-gen', category: 'ai' },
-  { id: 'storyboard', icon: '⊟', title: '智能分镜', desc: '文案脚本→AI自动拆解为分镜画面+配音+字幕，一键生成完整短视频', tags: ['脚本拆解,', '自动分镜'], color: '#FFF1F2', ai: true, route: '/work/storyboard', category: 'video' },
+  { id: 'main', icon: '▣', title: '智能做主图', desc: 'AI 自动抠图→白底→精修→裁切→品牌水印，一键生成3张风格主图', tags: ['爆款商品图', '13平台适配'], color: '#EDE9FE', ai: true, route: '/work/main-image', category: 'image' },
+  { id: 'scene', icon: '◈', title: '智能做场景', desc: '产品图+AI场景库→自动光影融合→出5张场景图，支持自定义背景', tags: ['场景融合', '光影匹配'], color: '#DBEAFE', ai: true, route: '/work/scene', category: 'image' },
+  { id: 'detail', icon: '⊞', title: '智能做详情', desc: '产品图→AI自动生成文案+图文排版→完整详情页，多品类适配', tags: ['AI文案', '自动排版'], color: '#D1FAE5', ai: true, route: '/work/detail-h5', category: 'image' },
+  { id: 'video', icon: '▶', title: '智能做视频', desc: '图片/多图→AI生成带货视频→自动字幕+BGM→1080×1920竖屏输出', tags: ['AI运镜', '自动字幕'], color: '#FEF3C7', ai: true, route: '/work/video', category: 'video' },
+  { id: 'batch', icon: '⊡', title: '批量处理', desc: '文件夹拖入→选操作→后台排队→完成通知→ZIP下载，支持夜间托管', tags: ['批量队列', '夜间折扣'], color: '#F3E8FF', ai: false, route: '/work/batch', category: 'image' },
+  { id: 'tryon', icon: '◇', title: '虚拟模特', desc: '服装平铺图→真人模特上身效果，多肤色/体型/风格可选', tags: ['AI试穿', '多肤色'], color: '#ECFEFF', ai: true, route: '/work/virtual-tryon', category: 'image' },
+  { id: 'action', icon: '◉', title: '动作迁移', desc: '人物图+参考动作视频→AI精准迁移动作姿态，生成流畅展示视频', tags: ['动作捕捉', '精准迁移'], color: '#FCE7F3', ai: true, route: '/work/action-transfer', category: 'video' },
+  { id: 'color', icon: '◐', title: '一键换色', desc: '服装鞋包颜色变换，保留褶皱纹理质感，支持批量换色', tags: ['多色生成', '纹理保留'], color: '#FFF7ED', ai: true, route: '/work/color-swap', category: 'image' },
+  { id: 'style', icon: '◧', title: '风格转化', desc: '6大风格一键转换：复古/国潮/插画/水彩/赛博/极简，保留商品特征', tags: ['6大风格', '创意设计'], color: '#F0FDF4', ai: true, route: '/work/style-transfer', category: 'image' },
+  { id: 'digital', icon: '◓', title: '口播数字人', desc: '输入文案→选数字人形象+语音→AI生成带货口播视频', tags: ['数字人', 'TTS语音'], color: '#FFFBEB', ai: true, route: '/work/digital-human', category: 'video' },
+  { id: 'script', icon: '▤', title: '带货脚本', desc: '产品卖点→AI生成短视频口播/直播话术/种草文案，支持9语种+3脚本类型', tags: ['9语种', '口播+话术'], color: '#FDF2F8', ai: true, route: '/work/script-gen', category: 'ai' },
+  { id: 'viral', icon: '◆', title: '爆款复刻', desc: '对标爆款视频→AI分析节奏/色调/转场→用你的产品重新生成相似风格', tags: ['爆款分析', '风格复刻'], color: '#FEF2F2', ai: true, route: '/work/viral-clone', category: 'video' },
+  { id: 'remove-bg', icon: '◯', title: '智能抠图', desc: 'AI发丝级抠图，毛发/透明体/复杂边缘精准分离，支持单品+批量处理', tags: ['发丝级', '批量抠图'], color: '#E8F5E9', ai: true, route: '/work/remove-bg', category: 'image' },
+  { id: 'white-bg', icon: '▭', title: '白底图生成', desc: '抠图后智能生成纯白/场景底图，自动光影校正+阴影保留，平台直出', tags: ['白底/透明', '光影校正'], color: '#F5F5F5', ai: true, route: '/work/white-bg', category: 'image' },
+  { id: 'retouch', icon: '✦', title: '图片精修', desc: 'AI自动祛皱/去污/补光/锐化，保留材质纹理，批量提升产品图质感', tags: ['祛皱补光', '纹理保留'], color: '#FFF8E1', ai: true, route: '/work/retouch', category: 'image' },
+  { id: 'platform-detail', icon: '▥', title: '平台详情页模板', desc: '13大电商平台详情页模板库，选平台→选模板→上传素材→一键生成适配尺寸', tags: ['13平台', '尺寸适配'], color: '#EFF6FF', ai: true, route: '/work/platform-detail', category: 'image' },
+  { id: 'compliance', icon: '◬', title: '跨境合规检查', desc: '上传图片+文案→自动检测亚马逊/Temu/TikTok/Shein合规风险，覆盖欧美日市场', tags: ['合规检测', '多市场'], color: '#FFF1F2', ai: true, route: '/work/compliance-check', category: 'ai' },
+  { id: 'ghost-mannequin', icon: '▯', title: '幽灵模特', desc: '服装平铺/挂拍→AI自动穿到隐形模特身上，生成3D立体效果展示图', tags: ['3D立体', '隐形模特'], color: '#F0F9FF', ai: true, route: '/work/ghost-mannequin', category: 'image' },
+  { id: 'outpaint', icon: '▩', title: '智能扩图', desc: 'AI扩展图片边缘自动补全构图，适配各平台尺寸比例，无缝融合不留痕迹', tags: ['构图补全', '比例适配'], color: '#F5F3FF', ai: true, route: '/work/outpainting', category: 'image' },
+  { id: 'image-translate', icon: '🌐', title: '图片翻译', desc: '商品图文字智能识别→翻译为9语种→原位替换，跨境卖家出海必备', tags: ['OCR识别', '9语种翻译'], color: '#ECFDF5', ai: true, route: '/work/image-translate', category: 'image' },
+  { id: 'video-edit', icon: '▸', title: '视频编辑', desc: 'AI智能裁剪/变速/转场/调色，自动生成多尺寸多时长版本供投放', tags: ['智能剪辑', '多尺寸输出'], color: '#FFF7ED', ai: true, route: '/work/video-edit', category: 'video' },
+  { id: 'voice-gen', icon: '♫', title: 'AI语音生成', desc: '输入文案→选主播音色→生成自然流畅带货配音，支持9语种50+音色', tags: ['TTS合成', '50+音色'], color: '#FDF2F8', ai: true, route: '/work/voice-gen', category: 'ai' },
+  { id: 'storyboard', icon: '⊟', title: '智能分镜', desc: '文案脚本→AI自动拆解为分镜画面+配音+字幕，一键生成完整短视频', tags: ['脚本拆解', '自动分镜'], color: '#FFF1F2', ai: true, route: '/work/storyboard', category: 'video' },
 ];
 
 const filteredCards = computed(() =>
@@ -401,6 +426,10 @@ const faqs = [
 
 
 <style scoped>
+/* ============ SKIP LINK ============ */
+.lp-skip { position: absolute; top: -100px; left: 16px; z-index: 200; padding: 10px 20px; background: #5b5fe3; color: #fff; border-radius: 8px; font-size: 14px; font-weight: 500; text-decoration: none; }
+.lp-skip:focus { top: 8px; }
+
 /* ============ ROOT ============ */
 .lp { background: #fafaf9; color: #171717; overflow-x: hidden; font-feature-settings: 'cv02','cv03','cv04','cv11'; }
 
@@ -414,11 +443,13 @@ const faqs = [
 .lp-nav.on { background: rgba(250,250,249,0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid #ebebea; }
 .lp-nav-in { width: 100%; max-width: 1280px; margin: 0 auto; display: flex; align-items: center; gap: 40px; }
 .lp-nav-brand { display: flex; align-items: center; gap: 8px; text-decoration: none; flex-shrink: 0; }
-.lp-nav-mark { width: 28px; height: 28px; background: #171717; color: #fafaf9; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; letter-spacing: -0.5px; }
+.lp-nav-mark { width: 28px; height: 28px; background: #5b5fe3; color: #fff; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; letter-spacing: -0.5px; }
 .lp-nav-name { font-size: 15px; font-weight: 500; color: #171717; letter-spacing: -0.02em; }
 .lp-nav-lk { display: flex; gap: 32px; flex: 1; justify-content: center; }
-.lp-nav-lk a { font-size: 13px; color: #6b6b70; text-decoration: none; transition: color 0.2s; letter-spacing: -0.01em; }
+.lp-nav-lk a { font-size: 14px; color: #6b6b70; text-decoration: none; transition: color 0.2s; letter-spacing: -0.01em; }
 .lp-nav-lk a:hover { color: #171717; }
+.lp-nav-lk a.on { color: #5b5fe3; }
+.lp-nav-lk a:focus-visible { outline: 2px solid #5b5fe3; outline-offset: 4px; border-radius: 2px; }
 .lp-nav-act { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
 .lp-btn-main {
@@ -494,17 +525,29 @@ const faqs = [
 .lp-mock-in { display: flex; height: 340px; }
 .lp-mock-side { width: 48px; border-right: 1px solid #f5f5f4; display: flex; flex-direction: column; align-items: center; padding: 12px 0; gap: 10px; }
 .lp-mock-side span { width: 20px; height: 20px; border-radius: 5px; background: #f5f5f4; }
-.lp-mock-side span.on { background: #171717; }
+.lp-mock-side span.on { background: #5b5fe3; }
 .lp-mock-main { flex: 1; padding: 16px 20px; }
 .lp-mock-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
 .lp-mock-tabs span { padding: 5px 14px; border-radius: 7px; font-size: 12px; color: #6b6b70; background: #f5f5f4; }
-.lp-mock-tabs span.on { background: #171717; color: #fafaf9; }
+.lp-mock-tabs span.on { background: #5b5fe3; color: #fff; }
 .lp-mock-up { height: 120px; border: 1.5px dashed #ebebea; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #b0b0b5; font-size: 28px; font-weight: 300; margin-bottom: 14px; }
 .lp-mock-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 .lp-mock-grid div { background: #fafaf9; border-radius: 8px; height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border: 1px solid #f5f5f4; }
 .lp-mock-grid div div { width: 70%; height: 40px; background: #f0efed; border: none; border-radius: 4px; }
 .lp-mock-grid div span { font-size: 10px; color: #b0b0b5; }
 .lp-mock-glow { position: absolute; top: -40px; left: 50%; transform: translateX(-50%); width: 600px; height: 200px; background: radial-gradient(ellipse, rgba(91,95,227,0.08), transparent 70%); pointer-events: none; z-index: -1; }
+
+/* Mockup shine animation */
+.lp-mock { position: relative; overflow: hidden; }
+.lp-mock::after {
+  content: ''; position: absolute; top: -60%; left: -100%; width: 60%; height: 220%;
+  background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.15) 45%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0.15) 55%, transparent 70%);
+  animation: lp-shine 4s ease-in-out infinite; z-index: 2; pointer-events: none;
+}
+@keyframes lp-shine {
+  0% { left: -100%; }
+  40%, 100% { left: 120%; }
+}
 
 /* Mobile Mockup */
 .lp-mob-card { width: 260px; background: #fff; border-radius: 16px; border: 1px solid #ebebea; box-shadow: 0 4px 24px rgba(0,0,0,0.06); overflow: hidden; margin: 0 auto; }
@@ -513,7 +556,7 @@ const faqs = [
 .lp-mob-card-body { padding: 14px 12px; }
 .lp-mob-card-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
 .lp-mob-card-tabs span { padding: 4px 10px; border-radius: 6px; font-size: 11px; color: #6b6b70; background: #f5f5f4; }
-.lp-mob-card-tabs span.on { background: #171717; color: #fafaf9; }
+.lp-mob-card-tabs span.on { background: #5b5fe3; color: #fff; }
 .lp-mob-card-up { height: 56px; border: 1.5px dashed #ebebea; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #b0b0b5; font-size: 12px; margin-bottom: 10px; }
 .lp-mob-card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .lp-mob-card-grid div { height: 60px; background: #fafaf9; border-radius: 6px; border: 1px solid #f5f5f4; }
@@ -527,18 +570,19 @@ const faqs = [
   display: flex; flex-direction: column; gap: 8px; transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s cubic-bezier(0.22, 1, 0.36, 1); position: relative; overflow: hidden;
 }
 .lp-mf-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; opacity: 0; transition: opacity 0.3s; }
-.lp-mf-card:nth-child(1)::before { background: linear-gradient(90deg, #6366f1, #818cf8); }
-.lp-mf-card:nth-child(2)::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
-.lp-mf-card:nth-child(3)::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
-.lp-mf-card:nth-child(4)::before { background: linear-gradient(90deg, #06b6d4, #22d3ee); }
-.lp-mf-card:nth-child(5)::before { background: linear-gradient(90deg, #ec4899, #f472b6); }
-.lp-mf-card:nth-child(6)::before { background: linear-gradient(90deg, #22c55e, #4ade80); }
-.lp-mf-card:nth-child(7)::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
-.lp-mf-card:nth-child(8)::before { background: linear-gradient(90deg, #ef4444, #f87171); }
+.lp-mf-card:nth-child(1)::before { background: linear-gradient(90deg, #5b5fe3, #7c7ff0); }
+.lp-mf-card:nth-child(2)::before { background: linear-gradient(90deg, #4f5bd5, #6e72e0); }
+.lp-mf-card:nth-child(3)::before { background: linear-gradient(90deg, #a093c7, #b5aad4); }
+.lp-mf-card:nth-child(4)::before { background: linear-gradient(90deg, #6b7db3, #8795c4); }
+.lp-mf-card:nth-child(5)::before { background: linear-gradient(90deg, #c4847b, #d49d95); }
+.lp-mf-card:nth-child(6)::before { background: linear-gradient(90deg, #7ba587, #95b89f); }
+.lp-mf-card:nth-child(7)::before { background: linear-gradient(90deg, #c49a6c, #d4af86); }
+.lp-mf-card:nth-child(8)::before { background: linear-gradient(90deg, #c8a87c, #d4ba95); }
 .lp-mf-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.08); border-color: #d9d9d7; }
 .lp-mf-card:hover::before { opacity: 1; }
+.lp-mf-card:focus-visible { outline: 2px solid #5b5fe3; outline-offset: 2px; }
 .lp-mf-badge { font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #b0b0b5; }
-.lp-mf-title { font-size: 18px; font-weight: 700; color: #171717; letter-spacing: -0.02em; line-height: 1.2; }
+.lp-mf-title { font-size: 18px; font-weight: 500; color: #171717; letter-spacing: -0.02em; line-height: 1.2; }
 .lp-mf-sub { font-size: 12px; color: #8e8e93; margin-top: -4px; }
 .lp-mf-divider { height: 1px; background: #f0efed; margin: 2px 0; }
 .lp-mf-api { font-size: 12px; font-weight: 600; color: #5b5fe3; background: rgba(91,95,227,0.06); padding: 6px 10px; border-radius: 7px; text-align: center; letter-spacing: -0.01em; }
@@ -562,6 +606,9 @@ const faqs = [
 .lp-sec-hd h2 { font-size: clamp(24px, 4vw, 36px); font-weight: 500; letter-spacing: -0.03em; color: #171717; margin: 0 0 12px; }
 .lp-sec-hd p { font-size: 15px; color: #6b6b70; max-width: 480px; margin: 0 auto; line-height: 1.6; }
 
+/* Anchor scroll offset for fixed nav */
+#features, #how, #pricing, #faq { scroll-margin-top: 72px; }
+
 /* ============ FEATURES ============ */
 .lp-feat { padding: 80px clamp(16px, 4vw, 40px); }
 .lp-feat-tabs { display: flex; gap: 4px; justify-content: center; margin-bottom: 40px; background: rgba(0,0,0,0.04); border-radius: 10px; padding: 4px; width: fit-content; margin-left: auto; margin-right: auto; }
@@ -569,7 +616,7 @@ const faqs = [
   padding: 7px 20px; border: none; background: transparent; border-radius: 7px;
   font-size: 13px; color: #6b6b70; cursor: pointer; transition: background 0.2s, color 0.2s, box-shadow 0.2s; font-weight: 500;
 }
-.lp-feat-tabs button.on { background: #fff; color: #171717; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.lp-feat-tabs button.on { background: #fff; color: #5b5fe3; box-shadow: 0 1px 4px rgba(91,95,227,0.12); }
 .lp-feat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; max-width: 1200px; margin: 0 auto; }
 
 .lp-card {
@@ -577,6 +624,7 @@ const faqs = [
   cursor: pointer; transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .lp-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.07); border-color: #d9d9d7; }
+.lp-card:focus-visible { outline: 2px solid #5b5fe3; outline-offset: 2px; }
 .lp-card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
 .lp-card-ico { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
 .lp-card-ai {
@@ -592,7 +640,7 @@ const faqs = [
 .lp-how { padding: 80px clamp(16px, 4vw, 40px); background: #fff; border-top: 1px solid #ebebea; border-bottom: 1px solid #ebebea; }
 .lp-how-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 960px; margin: 0 auto; }
 .lp-step { text-align: center; padding: 32px 20px; }
-.lp-step-num { width: 32px; height: 32px; border-radius: 50%; background: #171717; color: #fafaf9; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; margin-bottom: 16px; }
+.lp-step-num { width: 32px; height: 32px; border-radius: 50%; background: #5b5fe3; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; margin-bottom: 16px; }
 .lp-step-ico { font-size: 32px; margin-bottom: 14px; }
 .lp-step h3 { font-size: 16px; font-weight: 500; color: #171717; margin: 0 0 8px; letter-spacing: -0.01em; }
 .lp-step p { font-size: 13px; color: #6b6b70; line-height: 1.55; margin: 0; }
@@ -613,8 +661,9 @@ const faqs = [
 .lp-price-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; max-width: 960px; margin: 0 auto; }
 .lp-plan { background: #fafaf9; border: 1px solid #ebebea; border-radius: 12px; padding: 32px 24px; text-align: center; position: relative; transition: transform 0.3s, box-shadow 0.3s; }
 .lp-plan:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.05); }
-.lp-plan.pop { background: #171717; border-color: #171717; transform: scale(1.03); }
-.lp-plan.pop:hover { transform: scale(1.03) translateY(-2px); box-shadow: 0 12px 32px rgba(0,0,0,0.15); }
+.lp-plan:focus-visible { outline: 2px solid #5b5fe3; outline-offset: 2px; }
+.lp-plan.pop { background: #171717; border-color: #171717; transform: scale(1.03); box-shadow: 0 8px 48px rgba(91,95,227,0.22); }
+.lp-plan.pop:hover { transform: scale(1.03) translateY(-2px); box-shadow: 0 12px 56px rgba(91,95,227,0.28); }
 .lp-plan-badge { position: absolute; top: -11px; left: 50%; transform: translateX(-50%); background: #c8a87c; color: #fff; font-size: 11px; font-weight: 500; padding: 4px 14px; border-radius: 999px; white-space: nowrap; }
 .lp-plan-ico { font-size: 28px; margin-bottom: 12px; }
 .lp-plan h3 { font-size: 16px; font-weight: 500; color: #171717; margin: 0 0 12px; }
@@ -644,12 +693,13 @@ const faqs = [
 .lp-faq-it { border: 1px solid #ebebea; border-radius: 10px; overflow: hidden; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
 .lp-faq-it:hover { border-color: #d9d9d7; }
 .lp-faq-it.on { border-color: #c5c5c2; background: #fff; }
+.lp-faq-it:focus-visible { outline: 2px solid #5b5fe3; outline-offset: -2px; border-radius: 10px; }
 .lp-faq-q { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; font-size: 14px; font-weight: 500; color: #171717; }
-.lp-faq-arw { font-size: 18px; color: #6b6b70; font-weight: 400; transition: transform 0.3s; }
-.lp-faq-it.on .lp-faq-arw { color: #171717; }
+.lp-faq-arw { font-size: 18px; color: #6b6b70; font-weight: 400; transition: transform 0.3s, color 0.3s; }
+.lp-faq-it.on .lp-faq-arw { color: #5b5fe3; }
 .lp-faq-a { max-height: 0; overflow: hidden; transition: max-height 0.35s ease, padding 0.35s ease; }
 .lp-faq-it.on .lp-faq-a { max-height: 200px; padding: 0 20px 16px; }
-.lp-faq-a p { font-size: 13px; color: #6b6b70; line-height: 1.6; margin: 0; }
+.lp-faq-a p { font-size: 13px; color: #6b6b70; line-height: 1.6; margin: 0; padding-top: 8px; border-top: 1px solid #f0efed; }
 
 /* ============ CTA ============ */
 .lp-cta { padding: 80px clamp(16px, 4vw, 40px); }
@@ -657,18 +707,21 @@ const faqs = [
   position: relative; max-width: 680px; margin: 0 auto; padding: 56px 32px;
   background: #171717; border-radius: 16px; text-align: center; overflow: hidden;
 }
-.lp-cta-glow { position: absolute; top: -60px; right: -60px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(91,95,227,0.25), transparent 60%); pointer-events: none; }
+.lp-cta-glow { position: absolute; top: -80px; right: -80px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(91,95,227,0.2), transparent 60%); pointer-events: none; }
+.lp-cta-glow::after { content: ''; position: absolute; bottom: -40px; left: -40px; width: 180px; height: 180px; background: radial-gradient(circle, rgba(200,168,124,0.12), transparent 60%); pointer-events: none; }
 .lp-cta h2 { font-size: clamp(22px, 3.5vw, 30px); font-weight: 500; color: #fafaf9; margin: 0 0 12px; letter-spacing: -0.03em; position: relative; }
 .lp-cta p { font-size: 15px; color: #b0b0b5; margin: 0 0 28px; position: relative; }
 .lp-cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; position: relative; }
 .lp-cta-link { font-size: 14px; color: #b0b0b5; text-decoration: none; padding: 12px 20px; transition: color 0.2s; }
 .lp-cta-link:hover { color: #fafaf9; }
+.lp-cta-card .lp-hero-cta { background: #fafaf9; color: #5b5fe3; }
+.lp-cta-card .lp-hero-cta:hover { background: #fff; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
 
 /* ============ FOOTER ============ */
 .lp-foot { padding: 48px clamp(16px, 4vw, 40px) 24px; border-top: 1px solid #ebebea; }
 .lp-foot-in { max-width: 960px; margin: 0 auto; display: flex; gap: 80px; flex-wrap: wrap; justify-content: space-between; margin-bottom: 32px; }
 .lp-foot-brand { max-width: 240px; }
-.lp-foot-logo { width: 28px; height: 28px; background: #171717; color: #fafaf9; border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+.lp-foot-logo { width: 28px; height: 28px; background: #5b5fe3; color: #fff; border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; margin-bottom: 12px; }
 .lp-foot-name { font-size: 15px; font-weight: 500; color: #171717; display: block; margin-bottom: 8px; }
 .lp-foot-brand p { font-size: 13px; color: #6b6b70; margin: 0; line-height: 1.5; }
 .lp-foot-lk { display: flex; gap: 64px; }

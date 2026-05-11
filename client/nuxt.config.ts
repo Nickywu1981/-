@@ -11,7 +11,7 @@ export default defineNuxtConfig({
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
         { name: 'description', content: 'Movio AI — 电商AI SaaS，抠图/场景/主图/视频/详情页/虚拟模特，一个工具搞定电商全部图文视频素材' },
-        { name: 'theme-color', content: '#4F46E5' },
+        { name: 'theme-color', content: '#5b5fe3' },
         { 'http-equiv': 'X-UA-Compatible', content: 'IE=edge' },
         // Content Security Policy (CSP)
         { 'http-equiv': 'Content-Security-Policy', content: `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' wss: ws:${process.env.NODE_ENV !== 'production' ? ' http://localhost:3001 http://localhost:3000' : ''}; worker-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'` },
@@ -83,9 +83,6 @@ export default defineNuxtConfig({
       fallbackLocale: 'zh',
     },
     // 根据 Accept-Language + Cookie 自动匹配
-    experimental: {
-      localeDetector: './locales/locale-detector.ts',
-    },
   },
 
   // PWA 渐进式应用配置

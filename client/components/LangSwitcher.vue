@@ -51,6 +51,7 @@ function switchLang(code: string) {
   font-size: 12px; font-weight: 500; letter-spacing: -0.01em;
   transition: border-color 0.2s, background 0.2s;
 }
+.lsw-btn:focus-visible { outline: 2px solid #5b5fe3; outline-offset: 2px; }
 .lsw-btn:hover { border-color: #c5c5c2; background: rgba(0,0,0,0.02); }
 .lsw-arrow { font-size: 10px; color: #6b6b70; transition: transform 0.2s; }
 .lsw-drop {
@@ -65,6 +66,7 @@ function switchLang(code: string) {
   color: #171717; cursor: pointer; font-size: 13px; border-radius: 7px;
   transition: background 0.15s; text-align: left; letter-spacing: -0.01em;
 }
+.lsw-opt:focus-visible { outline: 2px solid #5b5fe3; outline-offset: -2px; border-radius: 7px; }
 .lsw-opt:hover { background: #f5f5f4; }
 .lsw-opt.on { background: #f0efed; font-weight: 500; }
 .lsw-flag { font-size: 16px; }

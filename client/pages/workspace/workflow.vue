@@ -2,7 +2,7 @@
 <template>
   <ComingSoonPlaceholder
     icon="⚙"
-    description="把零散功能串成标准化自动化流程 — 一键上新、批量做内容、自动管评价、每日数据复盘、大促活动营销、违规自查风控"
+    :description="$t('workspace.workflow_desc')"
     :progress="20"
   />
 </template>

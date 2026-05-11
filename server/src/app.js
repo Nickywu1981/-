@@ -110,6 +110,7 @@ import sdkRoutes from './route/sdkRoutes.js';
 import adkRoutes from './route/adkRoutes.js';
 import enterpriseRoutes from './route/enterpriseRoutes.js';   // Phase 1: 企业/代理端 MVP (2026-05-11)
 import financeRoutes from './route/financeRoutes.js';         // Phase 2: 财务核心 (2026-05-11)
+import customerRoutes from './route/customerRoutes.js';       // Phase 7: 客户管理 (2026-05-11)
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -343,6 +344,7 @@ app.use('/api/adk', heavyLimiter, adkRoutes);
 // ===== Phase 1: 企业/代理端 (2026-05-11) =====
 app.use('/api/enterprise', enterpriseRoutes);
 app.use('/api/enterprise/finance', financeRoutes);  // Phase 2: 财务核心
+app.use('/api/enterprise/customers', customerRoutes); // Phase 7: 客户管理
 
 // 404
 app.use((_req, res) => {

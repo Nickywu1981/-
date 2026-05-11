@@ -11,8 +11,11 @@
     <!-- ═══ 左侧导航 ═══ -->
     <aside class="wsl-side" :class="{ fold: folded, 'mobile-open': mobileOpen }">
       <div class="wsl-logo-area">
-        <NuxtLink to="/workspace" class="wsl-logo">Movio AI</NuxtLink>
-        <button class="wsl-fold-btn" @click="folded = !folded" :title="folded ? '展开' : '收起'" :aria-label="folded ? '展开侧边栏' : '收起侧边栏'">
+        <NuxtLink to="/workspace" class="wsl-logo">
+          <span class="wsl-logo-mark">M</span>
+          <span v-if="!folded" class="wsl-logo-text">Movio AI</span>
+        </NuxtLink>
+        <button class="wsl-fold-btn" @click="handleFoldBtnClick" :title="folded ? '展开' : '收起'" :aria-label="folded ? '展开侧边栏' : '收起侧边栏'">
           {{ folded ? '▶' : '◀' }}
         </button>
       </div>
@@ -43,14 +46,15 @@
 
     <!-- ═══ 右侧主区域 ═══ -->
     <div class="wsl-main">
+      <a href="#main-content" class="wsl-skip">{{ $t('landing.skip_to_content') }}</a>
       <header class="wsl-top">
-        <button class="wsl-hamburger" @click="mobileOpen = !mobileOpen" :aria-label="mobileOpen ? '关闭导航' : '打开导航'" aria-expanded="false">
+        <button class="wsl-hamburger" @click="mobileOpen = !mobileOpen" :aria-label="mobileOpen ? '关闭导航' : '打开导航'" :aria-expanded="mobileOpen">
           <span /><span /><span />
         </button>
         <h2 class="wsl-title">{{ pageTitle }}</h2>
         <div class="wsl-actions">
-          <NuxtLink v-if="isAdmin" to="/admin" class="wsl-btn">管理后台</NuxtLink>
-          <button class="wsl-btn" @click="handleLogout">退出登录</button>
+          <NuxtLink v-if="isAdmin" to="/admin" class="wsl-btn">{{ $t('workspace.admin_panel') }}</NuxtLink>
+          <button class="wsl-btn" @click="handleLogout">{{ $t('workspace.exit_login') }}</button>
         </div>
       </header>
       <main id="main-content" class="wsl-content" tabindex="-1">
@@ -69,6 +73,7 @@ const toast = useToast()
 const { confirm } = useConfirm()
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 
 const folded = ref(false)
 const mobileOpen = ref(false)
@@ -76,6 +81,14 @@ const userInitial = ref('U')
 const userName = ref('')
 const userPoints = ref(0)
 const isAdmin = ref(false)
+
+function handleFoldBtnClick() {
+  if (window.innerWidth <= 768) {
+    mobileOpen.value = false
+    return
+  }
+  folded.value = !folded.value
+}
 
 const currentPath = computed(() => route.path)
 
@@ -103,13 +116,13 @@ const pageTitle = computed(() => {
 })
 
 async function handleLogout() {
-  if (!await confirm({ message: '确定要退出登录吗？', variant: 'warning' })) return;
+  if (!await confirm({ message: t('workspace.logout_confirm'), variant: 'warning' })) return;
   try {
     await $fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
-    toast.success('已退出登录')
+    toast.success(t('workspace.logout_success'))
     router.push('/login')
   } catch {
-    toast.error('退出失败，请重试')
+    toast.error(t('workspace.logout_fail'))
   }
 }
 
@@ -149,7 +162,9 @@ definePageMeta({ middleware: ['auth'] })
   display: flex; align-items: center; justify-content: space-between;
   padding: 14px 12px 10px;
 }
-.wsl-logo { font-size: 15px; font-weight: 600; color: var(--tx, #171717); text-decoration: none; letter-spacing: -0.03em; white-space: nowrap; }
+.wsl-logo { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 500; color: var(--tx, #171717); text-decoration: none; letter-spacing: -0.03em; white-space: nowrap; }
+.wsl-logo-mark { width: 26px; height: 26px; background: #5b5fe3; color: #fff; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+.wsl-logo-text { }
 .wsl-fold-btn {
   min-width: 32px; min-height: 32px; border: none; background: none; cursor: pointer;
   color: var(--tx2, #6b6b70); font-size: 13px; border-radius: 6px; display: flex; align-items: center; justify-content: center;
@@ -165,12 +180,12 @@ definePageMeta({ middleware: ['auth'] })
 }
 .wsl-nav-item:hover { background: var(--bg-hover, #f5f5f5); color: var(--tx, #171717); }
 .wsl-nav-item:focus-visible { outline: 2px solid var(--brand); outline-offset: -2px; border-radius: 8px; }
-.wsl-nav-item.sel { background: var(--bg-sel, #171717); color: #fff; }
+.wsl-nav-item.sel { background: var(--brand, #5b5fe3); color: #fff; box-shadow: 0 1px 3px rgba(91,95,227,0.2); }
 .wsl-nav-item.off { opacity: 0.45; cursor: default; }
 .wsl-nav-item.off:hover { background: none; color: var(--tx2, #6b6b70); }
 .wsl-nav-icon { font-size: 16px; width: 22px; text-align: center; flex-shrink: 0; }
 .wsl-nav-label { flex: 1; }
-.wsl-nav-tag { font-size: 10px; padding: 1px 6px; border-radius: 4px; background: var(--bg-tag, #f3f4f6); color: var(--tx3, #9d9da3); }
+.wsl-nav-tag { font-size: 10px; padding: 1px 6px; border-radius: 4px; background: rgba(91,95,227,0.08); color: #5b5fe3; }
 
 /* Footer */
 .wsl-footer { padding: 10px 12px; border-top: 1px solid var(--brd, #ebebea); }
@@ -185,7 +200,7 @@ definePageMeta({ middleware: ['auth'] })
   display: flex; align-items: center; gap: 12px; padding: 12px 24px; background: rgba(255,255,255,0.7);
   backdrop-filter: blur(10px); border-bottom: 1px solid var(--brd, #ebebea); flex-shrink: 0;
 }
-.wsl-title { font-size: 15px; font-weight: 600; color: var(--tx, #171717); letter-spacing: -0.03em; flex: 1; }
+.wsl-title { font-size: 15px; font-weight: 500; color: var(--tx, #171717); letter-spacing: -0.03em; flex: 1; }
 .wsl-actions { display: flex; gap: 8px; align-items: center; }
 .wsl-btn {
   padding: 6px 14px; border-radius: 7px; font-size: 12px; color: var(--tx2, #6b6b70);
@@ -193,7 +208,11 @@ definePageMeta({ middleware: ['auth'] })
 }
 .wsl-btn:hover { background: var(--bg-hover, #f5f5f5); color: var(--tx, #171717); }
 .wsl-btn:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
-.wsl-content { flex: 1; overflow-y: auto; }
+.wsl-content { flex: 1; overflow-y: auto; scroll-margin-top: 56px; }
+
+/* Skip link */
+.wsl-skip { position: absolute; top: -100px; left: 16px; z-index: 200; padding: 10px 20px; background: #5b5fe3; color: #fff; border-radius: 8px; font-size: 14px; font-weight: 500; text-decoration: none; }
+.wsl-skip:focus { top: 8px; }
 
 /* Hamburger */
 .wsl-hamburger {

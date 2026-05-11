@@ -3,8 +3,8 @@
   <div class="wh">
     <!-- 标题 -->
     <div class="wh-hero">
-      <h1 class="wh-greet">欢迎使用 Movio AI</h1>
-      <p class="wh-sub">电商全链路AI自动化工作台</p>
+      <h1 class="wh-greet">{{ $t('workspace.greeting') }}</h1>
+      <p class="wh-sub">{{ $t('workspace.subtitle') }}</p>
     </div>
 
     <!-- 加载骨架 -->
@@ -36,8 +36,8 @@
     <!-- 最近项目 -->
     <div class="wh-recent">
       <div class="wh-recent-hd">
-        <h3>最近项目</h3>
-        <span class="wh-recent-more" @click="go('/workspace/creation')">查看全部 →</span>
+        <h3>{{ $t('workspace.recent_projects') }}</h3>
+        <span class="wh-recent-more" @click="go('/workspace/creation')">{{ $t('workspace.view_all') }} →</span>
       </div>
       <div v-if="recentProjects.length > 0" class="wh-recent-list">
         <div
@@ -55,7 +55,7 @@
         </div>
       </div>
       <div v-else class="wh-recent-empty">
-        暂无最近项目，开始你的第一次创作吧
+        {{ $t('workspace.no_projects') }}
       </div>
     </div>
   </div>
@@ -75,7 +75,7 @@ const cardGroups = ref<Record<string, Card[]>>({})
 const defaultCards: Card[] = [
   { id:'img_main', category:'图片生成', icon:'🖼', title:'AI 商品图', desc:'各平台商品主图一键生成', route:'/work/image', order:1, visible:true },
   { id:'video_gen', category:'视频生成', icon:'🎥', title:'AI 短视频', desc:'商品图一键生成带货短视频', route:'/work/video', order:1, visible:true },
-  { id:'detail_page', category:'电商详情图', icon:'📄', name:'详情页设计', desc:'商品详情页智能排版设计', route:'/work/detail-page', order:1, visible:true },
+  { id:'detail_page', category:'电商详情图', icon:'📄', title:'详情页设计', desc:'商品详情页智能排版设计', route:'/work/detail-page', order:1, visible:true },
   { id:'copy_title', category:'文案工具', icon:'✍️', title:'标题/卖点生成', desc:'AI生成高转化商品标题', route:'/work/copywriting', order:1, visible:true },
   { id:'digital_human', category:'数字人', icon:'🤖', title:'数字人带货', desc:'数字人24小时自动带货视频', route:'/work/digital-human', order:1, visible:true },
 ]
@@ -139,12 +139,12 @@ onMounted(async () => {
 <style scoped>
 .wh { max-width: 1000px; margin: 0 auto; padding: 32px 28px; }
 .wh-hero { margin-bottom: 28px; }
-.wh-greet { font-size: 24px; font-weight: 600; color: var(--tx, #171717); letter-spacing: -0.03em; }
+.wh-greet { font-size: 24px; font-weight: 500; color: var(--tx, #171717); letter-spacing: -0.03em; }
 .wh-sub { font-size: 14px; color: var(--tx3, #9d9da3); margin-top: 4px; }
 
 .wh-section { margin-bottom: 28px; }
 .wh-sec-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-.wh-sec-title { font-size: 14px; font-weight: 600; color: var(--tx, #171717); }
+.wh-sec-title { font-size: 14px; font-weight: 500; color: var(--tx, #171717); }
 
 .wh-quick { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
 .wh-qcard {
@@ -153,6 +153,7 @@ onMounted(async () => {
   min-height: 52px;
 }
 .wh-qcard:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.06); border-color: #c4c4c8; }
+.wh-qcard:focus-visible { outline: 2px solid var(--brand, #5b5fe3); outline-offset: 2px; }
 .wh-qicon { font-size: 18px; line-height: 1; flex-shrink: 0; }
 .wh-qinfo { flex: 1; min-width: 0; }
 .wh-qname { font-size: 13px; font-weight: 500; color: var(--tx, #171717); white-space: nowrap; line-height: 1; }
@@ -161,7 +162,7 @@ onMounted(async () => {
 /* 最近项目 */
 .wh-recent { }
 .wh-recent-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.wh-recent-hd h3 { font-size: 14px; font-weight: 600; color: var(--tx, #171717); }
+.wh-recent-hd h3 { font-size: 14px; font-weight: 500; color: var(--tx, #171717); }
 .wh-recent-more { font-size: 12px; color: var(--tx3, #9d9da3); cursor: pointer; }
 .wh-recent-more:hover { color: var(--tx, #171717); }
 .wh-recent-list { display: flex; flex-direction: column; gap: 6px; }
@@ -170,6 +171,7 @@ onMounted(async () => {
   border-radius: 9px; border: 1px solid var(--brd, #ebebea); cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s;
 }
 .wh-recent-item:hover { border-color: #c4c4c8; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.wh-recent-item:focus-visible { outline: 2px solid var(--brand, #5b5fe3); outline-offset: 2px; }
 .wh-recent-icon { font-size: 18px; flex-shrink: 0; }
 .wh-recent-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
 .wh-recent-name { font-size: 13px; font-weight: 500; color: var(--tx, #171717); }
