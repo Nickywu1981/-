@@ -1,19 +1,19 @@
 import pool from './db.js';
 
-const TASK_COLS = 'id, tenant_id, user_id, account_id, task_type, task_config, status, start_time, end_time, result_json, screenshot_url, error_msg, create_time, update_time';
+const TASK_COLS = 'at.id, at.tenant_id, at.user_id, at.account_id, at.task_type, at.task_config, at.status, at.start_time, at.end_time, at.result_json, at.screenshot_url, at.error_msg, at.create_time, at.update_time';
 
 export default {
   async listTasks(userId, tenantId, { page = 1, pageSize = 20 } = {}) {
     const offset = (page - 1) * pageSize;
     const [rows] = await pool.query(
-      'SELECT at.*, aa.platform, aa.store_name FROM automation_task at LEFT JOIN automation_account aa ON at.account_id = aa.id WHERE at.user_id = ? AND at.tenant_id = ? ORDER BY at.create_time DESC LIMIT ? OFFSET ?',
+      `SELECT ${TASK_COLS}, aa.platform, aa.store_name FROM automation_task at LEFT JOIN automation_account aa ON at.account_id = aa.id WHERE at.user_id = ? AND at.tenant_id = ? ORDER BY at.create_time DESC LIMIT ? OFFSET ?`,
       [userId, tenantId, pageSize, offset],
     );
     return rows;
   },
 
   async getTaskById(id) {
-    const [rows] = await pool.query(`SELECT ${TASK_COLS} FROM automation_task WHERE id = ?`, [id]);
+    const [rows] = await pool.query(`SELECT ${TASK_COLS} FROM automation_task at WHERE at.id = ?`, [id]);
     return rows[0] || null;
   },
 
@@ -64,7 +64,7 @@ export default {
 
   // Admin: list all
   async listAllTasks(limit = 200) {
-    const [rows] = await pool.query(`SELECT ${TASK_COLS} FROM automation_task ORDER BY create_time DESC LIMIT ?`, [limit]);
+    const [rows] = await pool.query(`SELECT ${TASK_COLS} FROM automation_task at ORDER BY at.create_time DESC LIMIT ?`, [limit]);
     return rows;
   },
 };

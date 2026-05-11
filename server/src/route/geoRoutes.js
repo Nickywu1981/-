@@ -7,8 +7,9 @@
 import { Router } from 'express';
 import { rateLimiter } from '../middleware/rateLimiter.js';
 import { success } from '../utils/response.js';
+import config from '../config/index.js';
 
-const GEOIP_URL = process.env.GEOIP_API_URL || 'https://ip-api.com/json';
+const GEOIP_URL = config.geoIpApiUrl;
 
 const router = Router();
 

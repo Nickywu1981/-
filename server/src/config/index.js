@@ -161,6 +161,8 @@ const config = {
   },
 
   appUrl: process.env.APP_URL || 'https://movio.ai',
+
+  geoIpApiUrl: process.env.GEOIP_API_URL || 'https://ip-api.com/json',
 };
 
 export default config;

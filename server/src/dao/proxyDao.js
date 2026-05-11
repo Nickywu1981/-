@@ -58,10 +58,10 @@ export default {
         vals.push(['auth_config', 'headers_json'].includes(k) ? JSON.stringify(fields[k]) : fields[k]);
       }
     }
-    if (!sets.length) return false;
+    if (!sets.length) return 0;
     vals.push(id, tenantId);
-    await pool.query(`UPDATE api_proxy_config SET ${sets.join(', ')} WHERE id = ? AND tenant_id = ?`, vals);
-    return true;
+    const [r] = await pool.query(`UPDATE api_proxy_config SET ${sets.join(', ')} WHERE id = ? AND tenant_id = ?`, vals);
+    return r.affectedRows;
   },
 
   async remove(id, tenantId) {
@@ -69,8 +69,9 @@ export default {
     try {
       await conn.beginTransaction();
       await conn.query('DELETE FROM api_proxy_log WHERE proxy_id = ?', [id]);
-      await conn.query('DELETE FROM api_proxy_config WHERE id = ? AND tenant_id = ?', [id, tenantId]);
+      const [r] = await conn.query('DELETE FROM api_proxy_config WHERE id = ? AND tenant_id = ?', [id, tenantId]);
       await conn.commit();
+      return r.affectedRows;
     } catch (e) {
       await conn.rollback();
       throw e;
@@ -117,14 +118,15 @@ export default {
     for (const k of allowed) {
       if (fields[k] !== undefined) { sets.push(`${k} = ?`); vals.push(fields[k]); }
     }
-    if (!sets.length) return false;
+    if (!sets.length) return 0;
     vals.push(id, tenantId);
-    await pool.query(`UPDATE api_proxy_whitelist SET ${sets.join(', ')} WHERE id = ? AND tenant_id = ?`, vals);
-    return true;
+    const [r] = await pool.query(`UPDATE api_proxy_whitelist SET ${sets.join(', ')} WHERE id = ? AND tenant_id = ?`, vals);
+    return r.affectedRows;
   },
 
   async removeWhitelist(id, tenantId) {
-    await pool.query('DELETE FROM api_proxy_whitelist WHERE id = ? AND tenant_id = ?', [id, tenantId]);
+    const [r] = await pool.query('DELETE FROM api_proxy_whitelist WHERE id = ? AND tenant_id = ?', [id, tenantId]);
+    return r.affectedRows;
   },
 
   // ==================== 限流 & 熔断 ====================
@@ -138,23 +140,25 @@ export default {
   },
 
   async setCircuitBreak(proxyId, failCount) {
-    await pool.query(
+    const [r] = await pool.query(
       `UPDATE api_proxy_config SET circuit_status = 1, circuit_last_fail = NOW(), circuit_fail_count = ?
        WHERE id = ?`,
       [failCount, proxyId],
     );
+    return r.affectedRows;
   },
 
   async resetCircuit(proxyId) {
-    await pool.query(
+    const [r] = await pool.query(
       'UPDATE api_proxy_config SET circuit_status = 0, circuit_fail_count = 0, circuit_last_fail = NULL WHERE id = ?',
       [proxyId],
     );
+    return r.affectedRows;
   },
 
   // ==================== 调用日志 ====================
   async logCall(data) {
-    await pool.query(
+    const [r] = await pool.query(
       `INSERT INTO api_proxy_log (proxy_id, tenant_id, user_id, request_url, request_method,
         request_body, response_status, response_body, duration_ms, retry_used, error_msg, client_ip)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -165,6 +169,7 @@ export default {
         data.retryUsed || 0, data.errorMsg?.substring(0, 500) || null, data.clientIp || null,
       ],
     );
+    return r.insertId;
   },
 
   async listLogs({ tenantId, proxyId, startTime, endTime, status, page = 1, pageSize = 20 }) {
@@ -187,6 +192,7 @@ export default {
   },
 
   async cleanOldLogs(days = 30) {
-    await pool.query('DELETE FROM api_proxy_log WHERE create_time < NOW() - INTERVAL ? DAY', [days]);
+    const [r] = await pool.query('DELETE FROM api_proxy_log WHERE create_time < NOW() - INTERVAL ? DAY', [days]);
+    return r.affectedRows;
   },
 };
