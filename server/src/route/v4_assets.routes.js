@@ -8,11 +8,13 @@ import z from 'zod';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { authMiddleware } from '../middleware/auth.js';
+import { rateLimiter } from '../middleware/rateLimiter.js';
 import { validate } from '../utils/validate.js';
 import db from '../dao/db.js';
 
 const router = Router();
 router.use(authMiddleware);
+router.use(rateLimiter);
 
 const listQuerySchema = z.object({
   page: z.coerce.number().int().min(1).optional().default(1),

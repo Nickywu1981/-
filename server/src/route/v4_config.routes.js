@@ -11,10 +11,12 @@ import * as configService from '../services/config.service.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { sseMiddleware } from '../services/config-version.service.js';
 import { requireRole } from '../middleware/rbac.js';
+import { rateLimiter } from '../middleware/rateLimiter.js';
 
 const router = Router();
 const adminRouter = Router();
 adminRouter.use(requireRole('admin'));
+adminRouter.use(rateLimiter);
 
 const setConfigSchema = z.object({
   group_key: z.string().min(1, '请提供配置分组').max(50),
@@ -27,7 +29,7 @@ const rollbackSchema = z.object({
 });
 
 // GET /api/config/:group — 获取配置组
-router.get('/:group', authMiddleware, async (req, res) => {
+router.get('/:group', authMiddleware, rateLimiter, async (req, res) => {
   try {
     const config = await configService.getGroupConfig(
       req.params.group,
@@ -41,7 +43,7 @@ router.get('/:group', authMiddleware, async (req, res) => {
 });
 
 // GET /api/config/dict/:dictKey — 获取字典
-router.get('/dict/:dictKey', async (req, res) => {
+router.get('/dict/:dictKey', rateLimiter, async (req, res) => {
   try {
     const dict = await configService.getDict(req.params.dictKey);
     return success(res, dict);
@@ -51,7 +53,7 @@ router.get('/dict/:dictKey', async (req, res) => {
 });
 
 // GET /api/config/version/stream — SSE 配置版本推送
-router.get('/version/stream', sseMiddleware);
+router.get('/version/stream', rateLimiter, sseMiddleware);
 
 // ===============================
 // Admin Config Routes (需 admin 权限)

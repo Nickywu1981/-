@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { getMyTier, checkLimit, getExportPermission } from '../controller/tierController.js';
 import { authMiddleware } from '../middleware/auth.js';
+import { rateLimiter } from '../middleware/rateLimiter.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
 import { z } from 'zod';
@@ -12,6 +13,7 @@ const limitQuerySchema = z.object({
 });
 
 router.use(authMiddleware);
+router.use(rateLimiter);
 
 router.get('/my', asyncHandler(getMyTier));
 router.get('/check-limit', validate(limitQuerySchema, 'query'), asyncHandler(checkLimit));

@@ -5,6 +5,7 @@
  * 优先级：国内 IP → zh，英语国家 → en，西语国家 → es，默认 → zh
  */
 import { Router } from 'express';
+import { rateLimiter } from '../middleware/rateLimiter.js';
 import { success } from '../utils/response.js';
 
 const router = Router();
@@ -39,7 +40,7 @@ function extractIP(req) {
   return req.ip || req.socket?.remoteAddress || '';
 }
 
-router.get('/api/geo/suggest-locale', async (req, res) => {
+router.get('/api/geo/suggest-locale', rateLimiter, async (req, res) => {
   try {
     const country = extractCountry(req);
     if (country && COUNTRY_TO_LOCALE[country]) {

@@ -76,7 +76,7 @@ async function loadData() {
     list.value = data?.list || [];
     total.value = data?.total || 0;
     summary.value = data?.summary || null;
-  } catch (e) { console.error(e); toast.error('收益数据加载失败，请刷新重试'); }
+  } catch (e) { toast.error('收益数据加载失败，请刷新重试'); }
 }
 
 function statusLabel(s) { const m = { settled: '已结算', pending: '待结算', withdrawn: '已提现', cancelled: '已取消' }; return m[s] || s; }

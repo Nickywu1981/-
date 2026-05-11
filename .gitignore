@@ -17,3 +17,4 @@ __screenshots__/
 .claude/*.lock
 docs/KB_*.json
 movio-ai-docs-v5.0.tar.gz
+_index_check.html

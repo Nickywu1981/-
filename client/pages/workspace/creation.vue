@@ -119,7 +119,7 @@ onMounted(async () => {
       throw new Error('empty')
     }
   } catch (e: any) {
-    console.error('[创作页] 配置加载失败，使用默认卡片', e.message)
+    // 静默降级：使用默认卡片
     const tabKeys = ["video", "image", "detail", "copywrite", "digital"]
     tabs.value = tabKeys.map(key => ({ key, label: t(`workspace.creation_tabs.${key}`) }))
     cardData.value = getDefaultCards()

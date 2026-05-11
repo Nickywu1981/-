@@ -70,7 +70,6 @@ const fetchAll = async () => {
     totalEarned.value = res?.totalEarned || 0
     totalSpent.value = res?.totalSpent || 0
   } catch (e: any) {
-    console.error('[积分明细] 加载失败', e.message)
     toast.error('加载失败，请刷新重试')
   }
   loading.value = false

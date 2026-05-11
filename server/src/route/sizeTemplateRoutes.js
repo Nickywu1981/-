@@ -4,6 +4,7 @@ import {
   createUserTemplate, listUserTemplates, updateUserTemplate, deleteUserTemplate,
 } from '../controller/sizeTemplateController.js';
 import { authMiddleware } from '../middleware/auth.js';
+import { rateLimiter } from '../middleware/rateLimiter.js';
 import { cacheMiddleware } from '../middleware/cache.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
@@ -28,14 +29,14 @@ const templateSchema = z.object({
 const updateTemplateSchema = templateSchema.partial();
 
 // 公共 — 平台尺寸查询（缓存 30 分钟）
-router.get('/platforms', cacheMiddleware(1800), asyncHandler(getAllPlatforms));
-router.get('/platforms/list', cacheMiddleware(1800), asyncHandler(getPlatformList));
-router.get('/platforms/:platform', cacheMiddleware(1800), validate(platformParamSchema, 'params'), asyncHandler(getSizesByPlatform));
+router.get('/platforms', rateLimiter, cacheMiddleware(1800), asyncHandler(getAllPlatforms));
+router.get('/platforms/list', rateLimiter, cacheMiddleware(1800), asyncHandler(getPlatformList));
+router.get('/platforms/:platform', rateLimiter, cacheMiddleware(1800), validate(platformParamSchema, 'params'), asyncHandler(getSizesByPlatform));
 
 // 用户自定义模板（需要登录）
-router.post('/my', authMiddleware, validate(templateSchema), asyncHandler(createUserTemplate));
-router.get('/my', authMiddleware, validate(myListQuerySchema, 'query'), asyncHandler(listUserTemplates));
-router.put('/my/:id', authMiddleware, validate(idParamSchema, 'params'), validate(updateTemplateSchema), asyncHandler(updateUserTemplate));
-router.delete('/my/:id', authMiddleware, validate(idParamSchema, 'params'), asyncHandler(deleteUserTemplate));
+router.post('/my', authMiddleware, rateLimiter, validate(templateSchema), asyncHandler(createUserTemplate));
+router.get('/my', authMiddleware, rateLimiter, validate(myListQuerySchema, 'query'), asyncHandler(listUserTemplates));
+router.put('/my/:id', authMiddleware, rateLimiter, validate(idParamSchema, 'params'), validate(updateTemplateSchema), asyncHandler(updateUserTemplate));
+router.delete('/my/:id', authMiddleware, rateLimiter, validate(idParamSchema, 'params'), asyncHandler(deleteUserTemplate));
 
 export default router;

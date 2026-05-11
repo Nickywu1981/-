@@ -102,14 +102,14 @@ async function fetchAll() {
   try {
     const endpoints = [];
     if (activeTab.value === 'all' || activeTab.value === 'image') {
-      endpoints.push($fetch('/api/images/tasks', { params: { page: page.value, pageSize }, credentials: 'include' }).catch((err: any) => { console.warn('[my-works] 图片任务加载失败', err?.message || err); return { list: [], total: 0 } }));
+      endpoints.push($fetch('/api/images/tasks', { params: { page: page.value, pageSize }, credentials: 'include' }).catch((err: any) => { toast.error('图片任务加载失败'); console.warn('[my-works] 图片任务加载失败', err?.message || err); return { list: [], total: 0 } }));
     }
     if (activeTab.value === 'all' || activeTab.value === 'video') {
-      endpoints.push($fetch('/api/videos/tasks', { params: { page: page.value, pageSize }, credentials: 'include' }).catch((err: any) => { console.warn('[my-works] 视频任务加载失败', err?.message || err); return { list: [], total: 0 } }));
+      endpoints.push($fetch('/api/videos/tasks', { params: { page: page.value, pageSize }, credentials: 'include' }).catch((err: any) => { toast.error('视频任务加载失败'); console.warn('[my-works] 视频任务加载失败', err?.message || err); return { list: [], total: 0 } }));
     }
     if (activeTab.value === 'all' || activeTab.value === 'batch') {
-      endpoints.push($fetch('/api/advanced/tasks', { params: { page: page.value, pageSize }, credentials: 'include' }).catch((err: any) => { console.warn('[my-works] 高级任务加载失败', err?.message || err); return { list: [], total: 0 } }));
-      endpoints.push($fetch('/api/adv-video/tasks', { params: { page: page.value, pageSize }, credentials: 'include' }).catch((err: any) => { console.warn('[my-works] 高级视频任务加载失败', err?.message || err); return { list: [], total: 0 } }));
+      endpoints.push($fetch('/api/advanced/tasks', { params: { page: page.value, pageSize }, credentials: 'include' }).catch((err: any) => { toast.error('高级任务加载失败'); console.warn('[my-works] 高级任务加载失败', err?.message || err); return { list: [], total: 0 } }));
+      endpoints.push($fetch('/api/adv-video/tasks', { params: { page: page.value, pageSize }, credentials: 'include' }).catch((err: any) => { toast.error('高级视频任务加载失败'); console.warn('[my-works] 高级视频任务加载失败', err?.message || err); return { list: [], total: 0 } }));
     }
 
     const results = await Promise.all(endpoints);
@@ -118,7 +118,6 @@ async function fetchAll() {
     );
     total.value = results.reduce((sum: number, r: any) => sum + (r.total || 0), 0);
   } catch (e: any) {
-    console.error('[素材库] 加载失败', e.message)
     toast.error('加载失败，请刷新重试')
     allTasks.value = [];
   }

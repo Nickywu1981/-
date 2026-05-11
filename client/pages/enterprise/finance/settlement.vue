@@ -46,7 +46,7 @@ async function loadData() {
     const data = await api.get('/enterprise/finance/settlement', { page: page.value, pageSize });
     list.value = data?.list || [];
     total.value = data?.total || 0;
-  } catch (e) { console.error(e); toast.error('结算记录加载失败'); }
+  } catch (e) { toast.error('结算记录加载失败'); }
 }
 
 function fmt(n) { return (Number(n) || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2 }); }

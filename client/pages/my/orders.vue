@@ -54,7 +54,6 @@ const fetchAll = async () => {
     list.value = res?.list || res?.data || []
     total.value = res?.total || 0
   } catch (e: any) {
-    console.error('[我的订单] 加载失败', e.message)
     toast.error('加载失败，请刷新重试')
   }
   loading.value = false

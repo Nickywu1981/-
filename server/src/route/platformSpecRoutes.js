@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { listPlatforms, getSpec, getSpecsByPlatform, createSpec, updateSpec, deleteSpec, adaptImage } from '../controller/platformSpecController.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
 import { requireRole } from '../middleware/rbac.js';
+import { rateLimiter } from '../middleware/rateLimiter.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate } from '../utils/validate.js';
 import { z } from 'zod';
@@ -28,14 +29,14 @@ const adaptSchema = z.object({
   outputDir: z.string().optional(),
 });
 
-router.get('/', asyncHandler(listPlatforms));
-router.get('/:id', validate(idParamSchema, 'params'), asyncHandler(getSpec));
-router.get('/platform/:code', validate(codeParamSchema, 'params'), asyncHandler(getSpecsByPlatform));
+router.get('/', rateLimiter, asyncHandler(listPlatforms));
+router.get('/:id', rateLimiter, validate(idParamSchema, 'params'), asyncHandler(getSpec));
+router.get('/platform/:code', rateLimiter, validate(codeParamSchema, 'params'), asyncHandler(getSpecsByPlatform));
 
 router.use(authMiddleware);
-router.post('/', requireRole('admin'), validate(createSchema), asyncHandler(createSpec));
-router.post('/adapt', requireRole('admin'), validate(adaptSchema), asyncHandler(adaptImage));
-router.put('/:id', requireRole('admin'), validate(idParamSchema, 'params'), validate(updateSchema), asyncHandler(updateSpec));
-router.delete('/:id', requireRole('admin'), validate(idParamSchema, 'params'), asyncHandler(deleteSpec));
+router.post('/', rateLimiter, requireRole('admin'), validate(createSchema), asyncHandler(createSpec));
+router.post('/adapt', rateLimiter, requireRole('admin'), validate(adaptSchema), asyncHandler(adaptImage));
+router.put('/:id', rateLimiter, requireRole('admin'), validate(idParamSchema, 'params'), validate(updateSchema), asyncHandler(updateSpec));
+router.delete('/:id', rateLimiter, requireRole('admin'), validate(idParamSchema, 'params'), asyncHandler(deleteSpec));
 
 export default router;

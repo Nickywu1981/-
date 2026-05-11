@@ -92,7 +92,7 @@ npm install -g pm2 2>&1 | tail -1 || true
 # 创建日志目录
 mkdir -p logs
 
-pm2 delete movio-api 2>/dev/null || true
+pm2 delete movio-server movio-worker movio-client 2>/dev/null || true
 pm2 start ecosystem.config.cjs
 pm2 save
 pm2 startup systemd -u root --hp /root 2>&1 | tail -1 || true
@@ -124,4 +124,4 @@ echo "============================================"
 echo ""
 warn "请立即编辑 .env 填入真实 API-Key:"
 warn "  vim ${APP_DIR}/server/.env"
-warn "  pm2 restart movio-api"
+warn "  pm2 restart all"

@@ -5,7 +5,7 @@ import {
 } from '../controller/emailController.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
-import { codeLimiter, verifyLimiter } from '../middleware/rateLimiter.js';
+import { codeLimiter, verifyLimiter, adminLimiter } from '../middleware/rateLimiter.js';
 import { validate, emailSchema, codeSchema } from '../utils/validate.js';
 import { z } from 'zod';
 
@@ -33,8 +33,8 @@ const updateTemplateSchema = createTemplateSchema.partial().omit({ template_code
 const idParamSchema = z.object({ id: z.string().regex(/^\d+$/).transform(Number) });
 
 router.get('/templates', authMiddleware, adminAuth, asyncHandler(listTemplates));
-router.post('/templates', authMiddleware, adminAuth, validate(createTemplateSchema), asyncHandler(createTemplate));
-router.put('/templates/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(updateTemplateSchema), asyncHandler(updateTemplate));
-router.delete('/templates/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(deleteTemplate));
+router.post('/templates', adminLimiter, authMiddleware, adminAuth, validate(createTemplateSchema), asyncHandler(createTemplate));
+router.put('/templates/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(updateTemplateSchema), asyncHandler(updateTemplate));
+router.delete('/templates/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), asyncHandler(deleteTemplate));
 
 export default router;

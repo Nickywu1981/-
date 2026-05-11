@@ -124,7 +124,7 @@ onMounted(async () => {
       cardGroups.value = groups
     }
   } else {
-    console.error('[工作台] 配置加载失败，使用默认卡片', cfgResult.reason?.message)
+    // 静默降级：使用默认卡片
     const groups: Record<string, Card[]> = {}
     defaultCards.value.forEach(c => {
       if (!groups[c.category]) groups[c.category] = []
