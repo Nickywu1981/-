@@ -158,6 +158,12 @@ onMounted(async () => {
     setTimeout(() => {
       document.querySelectorAll('.wh-qcard').forEach(el => obs.observe(el))
     }, 100)
+    // Safety: reveal all cards after 2.5s
+    setTimeout(() => {
+      document.querySelectorAll('.wh-qcard').forEach(el => {
+        if (!visibleCards.value.has(el)) { el.classList.add('wh-in') }
+      })
+    }, 2500)
   }
 })
 </script>

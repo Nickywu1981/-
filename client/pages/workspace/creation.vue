@@ -140,6 +140,10 @@ onMounted(async () => {
     setTimeout(() => {
       document.querySelectorAll('.wc-card').forEach(el => obs.observe(el))
     }, 150)
+    // Safety: reveal all cards after 2.5s
+    setTimeout(() => {
+      document.querySelectorAll('.wc-card').forEach(el => el.classList.add('wc-in'))
+    }, 2500)
   }
 })
 

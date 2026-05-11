@@ -204,7 +204,7 @@
           <div v-if="plan.featured" class="lp-plan-badge">{{ $t('landing.plan_popular') }}</div>
           <div class="lp-plan-ico">{{ plan.icon }}</div>
           <h3>{{ plan.name }}</h3>
-          <div class="lp-plan-pr"><b>¥{{ plan.price }}</b><span>/月</span></div>
+          <div class="lp-plan-pr"><b>{{ $t('landing.currency_symbol') }}{{ plan.price }}</b><span>{{ $t('landing.pricing_period') }}</span></div>
           <ul class="lp-plan-feat"><li v-for="f in plan.features" :key="f">{{ f }}</li></ul>
           <button class="lp-plan-btn" :class="{ on: plan.featured }">{{ plan.featured ? $t('landing.plan_subscribe') : $t('landing.plan_start') }}</button>
         </div>

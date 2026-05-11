@@ -119,6 +119,8 @@
       {"icon":"⚡","name":"Pro","price":"99","features":["500 images/month","50 videos/month","All templates + styles","1080p output","Batch processing","API access"],"featured":true},
       {"icon":"🏭","name":"Enterprise","price":"299","features":["Unlimited images","Unlimited videos","Custom style training","4K output","Private deployment","Dedicated support"],"featured":false}
     ],
+    "currency_symbol": "$",
+    "pricing_period": "/mo",
     "platforms": ["Taobao","Pinduoduo","Douyin","Xiaohongshu","WeChat Video","Kuaishou","Amazon","Temu","Shein","TikTok Shop","Mercado Libre","Shopee","Lazada"],
     "feature_cards": [
       {"id":"main","icon":"▣","title":"AI Main Image","desc":"AI auto cutout→white bg→retouch→crop→watermark, one-click 3 styles","tags":["Best-Seller","13 Platforms"],"color":"#EDE9FE","ai":true,"route":"/work/main-image","category":"image"},
