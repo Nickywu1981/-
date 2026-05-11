@@ -161,7 +161,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 
 definePageMeta({ layout: 'workspace' })
 

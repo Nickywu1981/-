@@ -65,9 +65,6 @@ const breadcrumbs = computed(() => {
   return items
 })
 
-async function handleLogout() {
-  try { await $fetch('/api/auth/logout', { method:'POST', credentials:'include' }) } catch (e) { if (import.meta.dev) console.error('Logout error:', e) }
-  router.push('/login')
-}
+const { logout: handleLogout } = useLogout()
 definePageMeta({ middleware: ['auth'] })
 </script>

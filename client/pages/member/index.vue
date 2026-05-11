@@ -75,7 +75,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
 
 const toast = useToast()
 definePageMeta({ layout: 'workspace' })

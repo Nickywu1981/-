@@ -115,7 +115,6 @@
 
 <script setup lang="ts">
 const { createBlobUrl, revoke } = useBlobUrl()
-import { useToast } from '#imports'
 import ImageSlot from '~/components/ImageSlot.vue'
 
 const toast = useToast()

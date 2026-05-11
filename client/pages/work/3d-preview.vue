@@ -68,7 +68,6 @@
 
 <script setup lang="ts">
 const { createBlobUrl, revoke } = useBlobUrl()
-import { ref } from 'vue';
 import ThreeViewer from '~/components/ThreeViewer.vue';
 
 const fileInput = ref<HTMLInputElement>();

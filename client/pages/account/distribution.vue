@@ -101,7 +101,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
 import { useAppPage } from '~/composables/useAppPage'
 import { formatDateTime, copyToClipboard } from '@/utils/format'
 

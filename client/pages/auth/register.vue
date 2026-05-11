@@ -52,7 +52,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import { useSiteConfig } from '~/composables/useSiteConfig'
 
 definePageMeta({ layout: 'landing' })

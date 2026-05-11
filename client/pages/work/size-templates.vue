@@ -1,5 +1,3 @@
-import { useToast } from '#imports'
-const toast = useToast()
 <template>
   <div class="size-templates-page">
     <h1>电商平台尺寸模板</h1>

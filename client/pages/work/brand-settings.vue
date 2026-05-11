@@ -43,7 +43,6 @@
   </WorkLayout>
 </template>
 <script setup lang="ts">
-import { useToast } from '#imports'
 
 const toast = useToast()
 

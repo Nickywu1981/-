@@ -90,7 +90,6 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 <script setup lang="ts">
 
 const { confirm } = useConfirm()
-import { ref, onMounted } from 'vue'
 
 const toast = useToast()
 

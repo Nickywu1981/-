@@ -81,7 +81,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
 import { formatDate } from '@/utils/format'
 
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
