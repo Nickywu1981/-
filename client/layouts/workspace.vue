@@ -27,7 +27,7 @@
           :to="item.disabled ? '#' : item.path"
           class="wsl-nav-item"
           :class="{ sel: !item.disabled && isActive(item), off: item.disabled }"
-          @click="if (item.disabled) { $event.preventDefault() } else { mobileOpen = false }"
+          @click="handleNavClick(item, $event)"
         >
           <span class="wsl-nav-icon">{{ item.icon }}</span>
           <span v-if="!folded" class="wsl-nav-label">{{ item.label }}</span>
@@ -80,6 +80,14 @@ const userName = ref('')
 const userPoints = ref(0)
 const isAdmin = ref(false)
 
+function handleNavClick(item: { disabled: boolean }, event: Event) {
+  if (item.disabled) {
+    event.preventDefault()
+  } else {
+    mobileOpen.value = false
+  }
+}
+
 function handleFoldBtnClick() {
   if (window.innerWidth <= 768) {
     mobileOpen.value = false
@@ -93,7 +101,7 @@ const currentPath = computed(() => route.path)
 // ═══════════════════════════════════════════════
 // 五大固定顶级导航 — 优先读 site_config，fallback 硬编码
 // ═══════════════════════════════════════════════
-const defaultNavItems = [
+const defaultNavItems = computed(() => [
   { path: '/workspace',            icon: '🏠', label: t('workspace.nav_home'),    disabled: false },
   { path: '/workspace/creation',   icon: '🎨', label: t('workspace.nav_creation'),    disabled: false },
   { path: '/workspace/assistant',  icon: '🤖', label: t('workspace.nav_assistant'), disabled: false },
@@ -101,7 +109,7 @@ const defaultNavItems = [
   { path: '/workspace/lobster',    icon: '🏭', label: t('workspace.nav_lobster'),    disabled: false },
 ]
 
-const navItems = ref<{ path: string; icon: string; label: string; disabled: boolean }[]>(defaultNavItems)
+const navItems = ref<{ path: string; icon: string; label: string; disabled: boolean }[]>(defaultNavItems.value)
 
 function isActive(item: { path: string }) {
   if (item.path === '/workspace') return currentPath.value === '/workspace'

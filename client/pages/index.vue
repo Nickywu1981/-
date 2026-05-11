@@ -66,11 +66,11 @@
           </NuxtLink>
         </div>
         <div class="lp-hero-nums">
-          <div><b>200万+</b><span>{{ $t('landing.hero_metrics.images') }}</span></div>
+          <div><b>{{ $t('landing.hero_metrics.images_num') }}</b><span>{{ $t('landing.hero_metrics.images') }}</span></div>
           <i />
-          <div><b>50万+</b><span>{{ $t('landing.hero_metrics.merchants') }}</span></div>
+          <div><b>{{ $t('landing.hero_metrics.merchants_num') }}</b><span>{{ $t('landing.hero_metrics.merchants') }}</span></div>
           <i />
-          <div><b>98%</b><span>{{ $t('landing.hero_metrics.satisfaction') }}</span></div>
+          <div><b>{{ $t('landing.hero_metrics.satisfaction_num') }}</b><span>{{ $t('landing.hero_metrics.satisfaction') }}</span></div>
         </div>
       </div>
       <!-- Desktop Mockup -->
@@ -252,7 +252,7 @@
           <div><h4>{{ $t('landing.footer_legal') }}</h4><NuxtLink to="/legal/privacy">{{ $t('landing.footer_privacy') }}</NuxtLink><NuxtLink to="/legal/terms">{{ $t('landing.footer_terms') }}</NuxtLink></div>
         </div>
       </div>
-      <div class="lp-foot-bot"><span>© {{ currentYear }} Movio AI. All rights reserved.</span></div>
+      <div class="lp-foot-bot"><span>{{ $t('landing.footer_copyright', { year: currentYear }) }}</span></div>
     </footer>
 
     <!-- Back to top -->
@@ -372,11 +372,8 @@ const filteredCards = computed(() =>
 const plans = computed(() => {
   const raw = t('landing.plans') as any[]
   if (Array.isArray(raw) && raw.length) return raw
-  return [
-    { icon:'🌱', name:'免费版', price:'0', features:['每月 20 张图片生成','3 个视频/月','基础模板','720p 输出'], featured:false },
-    { icon:'⚡', name:'专业版', price:'99', features:['每月 500 张图片生成','50 个视频/月','全部模板+高级风格','1080p 输出','批量处理','API 接入'], featured:true },
-    { icon:'🏭', name:'企业版', price:'299', features:['无限图片生成','无限视频生成','专属风格定制','4K 输出','私有化部署','专属客服'], featured:false },
-  ]
+  const fallback = t('landing.plans_fallback') as any[]
+  return Array.isArray(fallback) && fallback.length ? fallback : []
 })
 
 const displayPlans = computed(() => apiPricing.value || plans.value)
@@ -707,6 +704,38 @@ const displayPlans = computed(() => apiPricing.value || plans.value)
 /* ============ TRANSITIONS ============ */
 .sd-enter-active, .sd-leave-active { transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1); }
 .sd-enter-from, .sd-leave-to { opacity: 0; transform: translateY(-8px); }
+
+/* ============ DARK MODE ============ */
+:root[data-theme="dark"] .lp, :root.dark .lp { background: #121212; color: #e5e5e5; }
+:root[data-theme="dark"] .lp-nav, :root.dark .lp-nav { background: transparent; }
+:root[data-theme="dark"] .lp-nav.on, :root.dark .lp-nav.on { background: rgba(18,18,18,0.85); border-color: #2a2a2a; }
+:root[data-theme="dark"] .lp-nav-name, :root.dark .lp-nav-name { color: #e5e5e5; }
+:root[data-theme="dark"] .lp-nav-lk a, :root.dark .lp-nav-lk a { color: #9d9da3; }
+:root[data-theme="dark"] .lp-nav-lk a:hover, :root.dark .lp-nav-lk a:hover { color: #e5e5e5; }
+:root[data-theme="dark"] .lp-btn-ghost, :root.dark .lp-btn-ghost { color: #e5e5e5; border-color: #3a3a3a; }
+:root[data-theme="dark"] .lp-hero-h1, :root.dark .lp-hero-h1 { color: #e5e5e5; }
+:root[data-theme="dark"] .lp-hero-p, :root.dark .lp-hero-p { color: #9d9da3; }
+:root[data-theme="dark"] .lp-hero-bg, :root.dark .lp-hero-bg { background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(255,255,255,0.03), transparent 70%); }
+:root[data-theme="dark"] .lp-mock, :root.dark .lp-mock { background: #1a1a1a; border-color: #2a2a2a; }
+:root[data-theme="dark"] .lp-card, :root.dark .lp-card, :root[data-theme="dark"] .lp-case, :root.dark .lp-case, :root[data-theme="dark"] .lp-mf-card, :root.dark .lp-mf-card { background: #1a1a1a; border-color: #2a2a2a; }
+:root[data-theme="dark"] .lp-card h3, :root.dark .lp-card h3, :root[data-theme="dark"] .lp-step h3, :root.dark .lp-step h3, :root[data-theme="dark"] .lp-case h3, :root.dark .lp-case h3, :root[data-theme="dark"] .lp-mf-title, :root.dark .lp-mf-title { color: #e5e5e5; }
+:root[data-theme="dark"] .lp-sec-hd h2, :root.dark .lp-sec-hd h2 { color: #e5e5e5; }
+:root[data-theme="dark"] .lp-mf-story, :root.dark .lp-mf-story, :root[data-theme="dark"] .lp-card p, :root.dark .lp-card p, :root[data-theme="dark"] .lp-step p, :root.dark .lp-step p { color: #9d9da3; }
+:root[data-theme="dark"] .lp-how, :root.dark .lp-how { background: #1a1a1a; border-color: #2a2a2a; }
+:root[data-theme="dark"] .lp-price, :root.dark .lp-price { background: #1a1a1a; border-color: #2a2a2a; }
+:root[data-theme="dark"] .lp-plan, :root.dark .lp-plan { background: #121212; border-color: #2a2a2a; }
+:root[data-theme="dark"] .lp-plan h3, :root.dark .lp-plan h3 { color: #e5e5e5; }
+:root[data-theme="dark"] .lp-plan-pr b, :root.dark .lp-plan-pr b { color: #e5e5e5; }
+:root[data-theme="dark"] .lp-plan-btn, :root.dark .lp-plan-btn { background: #1a1a1a; color: #e5e5e5; border-color: #3a3a3a; }
+:root[data-theme="dark"] .lp-faq-it, :root.dark .lp-faq-it { border-color: #2a2a2a; }
+:root[data-theme="dark"] .lp-faq-q, :root.dark .lp-faq-q { color: #e5e5e5; }
+:root[data-theme="dark"] .lp-faq-it.on, :root.dark .lp-faq-it.on { background: #1a1a1a; }
+:root[data-theme="dark"] .lp-foot, :root.dark .lp-foot { border-color: #2a2a2a; }
+:root[data-theme="dark"] .lp-foot-name, :root.dark .lp-foot-name { color: #e5e5e5; }
+:root[data-theme="dark"] .lp-memfocus, :root.dark .lp-memfocus { background: linear-gradient(180deg, #121212 0%, #1a1a1a 50%, #121212 100%); border-color: #2a2a2a; }
+:root[data-theme="dark"] .lp-plat, :root.dark .lp-plat { border-color: #2a2a2a; }
+:root[data-theme="dark"] .lp-mob, :root.dark .lp-mob { background: #121212; border-color: #2a2a2a; }
+:root[data-theme="dark"] .lp-mob a, :root.dark .lp-mob a { color: #e5e5e5; }
 
 /* ============ RESPONSIVE ============ */
 @media (max-width: 1100px) {

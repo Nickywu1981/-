@@ -28,7 +28,7 @@ export default {
   },
 
   async updateCampaign(id, data) {
-    const fields = ['title','type','description','cover_url','rules','reward_type','reward_value','start_time','end_time','status','target_audience','tenant_id','sort_order'];
+    const fields = ['title','type','description','cover_url','rules','reward_type','reward_value','start_time','end_time','status','target_audience','sort_order'];
     const sets = [];
     const params = [];
     for (const f of fields) {

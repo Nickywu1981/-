@@ -90,7 +90,8 @@ onMounted(async () => {
       cards.forEach((c: Card) => {
         if (!seen.has(c.category)) {
           seen.add(c.category)
-          cats.push({ key: c.category, label: c.category })
+          const labelKey = `workspace.creation_tabs.${c.category}`
+          cats.push({ key: c.category, label: t(labelKey) !== labelKey ? t(labelKey) : c.category })
         }
       })
       // 分组 cards
@@ -100,7 +101,9 @@ onMounted(async () => {
         groups[c.category].push(c)
       })
       const tabKeys = ["video", "image", "detail", "copywrite", "digital"]
-      tabs.value = cats.length > 0 ? cats : tabKeys.map(key => ({ key, label: t(`workspace.creation_tabs.${key}`) }))
+      tabs.value = cats.length > 0
+        ? cats.map(c => ({ key: c.key, label: c.label }))
+        : tabKeys.map(key => ({ key, label: t(`workspace.creation_tabs.${key}`) }))
       cardData.value = Object.keys(groups).length > 0 ? groups : getDefaultCards()
     } else {
       throw new Error('empty')

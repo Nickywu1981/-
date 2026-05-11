@@ -72,6 +72,7 @@
         </div>
       </div>
     </Teleport>
+    <Teleport to="body">
       <div v-if="modalOpen" class="modal-overlay" @click.self="modalOpen = false">
         <div class="modal">
           <h3>{{ isEdit ? '编辑租户' : '新建租户' }}</h3>

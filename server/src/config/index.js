@@ -2,6 +2,7 @@
  * 环境配置中心
  */
 import dotenv from 'dotenv';
+import crypto from 'crypto';
 dotenv.config({ override: true });
 
 const config = {
@@ -31,7 +32,7 @@ const config = {
           throw new Error('JWT_SECRET 生产环境必须使用至少32字符的密钥');
         }
         console.warn('[config] JWT_SECRET 未设置或过短，开发环境使用临时密钥（生产环境启动将被 startupGuard 拦截）');
-        return 'dev-temp-' + require('crypto').randomBytes(16).toString('hex');
+        return 'dev-temp-' + crypto.randomBytes(16).toString('hex');
       }
       if (s.length < 32 && process.env.NODE_ENV !== 'development') {
         throw new Error('JWT_SECRET 非开发环境必须 >= 32 字符');

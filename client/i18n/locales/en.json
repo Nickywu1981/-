@@ -18,8 +18,11 @@
     "hero_demo": "Watch Demo",
     "hero_metrics": {
       "images": "Images Generated",
+      "images_num": "2M+",
       "merchants": "Active Merchants",
-      "satisfaction": "Satisfaction"
+      "merchants_num": "500K+",
+      "satisfaction": "Satisfaction",
+      "satisfaction_num": "98%"
     },
     "nav_label": "Main navigation",
     "nav_features": "Features",
@@ -49,6 +52,7 @@
     "cta_button": "Get Started Free",
     "cta_link": "Learn More",
     "footer_desc": "AI-Powered E-Commerce Visual Creation Platform",
+    "footer_copyright": "© {year} Movio AI. All rights reserved.",
     "plan_popular": "Most Popular",
     "plan_subscribe": "Subscribe Now",
     "plan_start": "Get Started",
@@ -105,12 +109,17 @@
       {"avatar":"🏪","title":"SMB Merchant","desc":"Replace design team with AI","points":["Batch generate all product images","Unified brand visual style","Cut design costs by 80%"]},
       {"avatar":"🏢","title":"Brand Enterprise","desc":"Scale visual content production","points":["API batch integration","Multi-store multi-platform management","Auto-apply brand guidelines"]}
     ],
+    "plans_fallback": [
+      {"icon":"🌱","name":"Free","price":"0","features":["20 images/month","3 videos/month","Basic templates","720p output"],"featured":false},
+      {"icon":"⚡","name":"Pro","price":"99","features":["500 images/month","50 videos/month","All templates + styles","1080p output","Batch processing","API access"],"featured":true},
+      {"icon":"🏭","name":"Enterprise","price":"299","features":["Unlimited images","Unlimited videos","Custom style training","4K output","Private deployment","Dedicated support"],"featured":false}
+    ],
     "plans": [
       {"icon":"🌱","name":"Free","price":"0","features":["20 images/month","3 videos/month","Basic templates","720p output"],"featured":false},
       {"icon":"⚡","name":"Pro","price":"99","features":["500 images/month","50 videos/month","All templates + styles","1080p output","Batch processing","API access"],"featured":true},
       {"icon":"🏭","name":"Enterprise","price":"299","features":["Unlimited images","Unlimited videos","Custom style training","4K output","Private deployment","Dedicated support"],"featured":false}
     ],
-    "platforms": ["Taobao","Pinduoduo","Douyin","Xiaohongshu","WeChat Video","Amazon","Temu","Shein","TikTok Shop","Mercado Libre","Shopee","Lazada"],
+    "platforms": ["Taobao","Pinduoduo","Douyin","Xiaohongshu","WeChat Video","Kuaishou","Amazon","Temu","Shein","TikTok Shop","Mercado Libre","Shopee","Lazada"],
     "feature_cards": [
       {"id":"main","icon":"▣","title":"AI Main Image","desc":"AI auto cutout→white bg→retouch→crop→watermark, one-click 3 styles","tags":["Best-Seller","13 Platforms"],"color":"#EDE9FE","ai":true,"route":"/work/main-image","category":"image"},
       {"id":"scene","icon":"◈","title":"AI Scene","desc":"Product photo+scene library→auto lighting blend→5 scene images, custom bg","tags":["Scene Blend","Light Match"],"color":"#DBEAFE","ai":true,"route":"/work/scene","category":"image"},
@@ -199,6 +208,22 @@
     "badges": "Badges",
     "abuse": "Abuse Monitor",
     "logs": "Logs"
+  },
+  "enterprise": {
+    "dashboard": "Dashboard",
+    "finance": "Finance",
+    "users": "Sub Accounts",
+    "customers": "Customers",
+    "tags": "Tag Groups",
+    "channels": "Channels",
+    "distribution": "Distribution",
+    "commerce": "Orders",
+    "reports": "Reports",
+    "usage": "Usage",
+    "plans": "Plans",
+    "whitelabel": "Whitelabel",
+    "settings": "Settings",
+    "logout": "Logout"
   },
   "tier": {
     "free": "Free",
