@@ -47,6 +47,27 @@ export async function gatewayInfer(modelId, input, ctx = {}) {
   const context = normalizeContext(ctx);
   const start = Date.now();
 
+  // GEO 规则检查 — 若模型在请求来源国被封禁则提前拒绝
+  let geoConstraints = null;
+  try {
+    const countryCode = ctx.countryCode || ctx.geo?.country || context.source?.geo?.country || null;
+    const platformCode = ctx.platformCode || ctx.taskType || null;
+    if (countryCode) {
+      const { evaluateRules } = await import('../services/geoRulesService.js');
+      geoConstraints = await evaluateRules(countryCode, platformCode);
+      if (geoConstraints?.blockedModels?.includes(modelId)) {
+        return {
+          modelId, output: null, elapsed: 0, retries: 0, degraded: false,
+          tokensIn: 0, tokensOut: 0, blocked: true,
+          blockReason: `Model ${modelId} is not available in your region`,
+          correlationId: context.correlationId,
+        };
+      }
+    }
+  } catch (e) {
+    logger.warn(`[Gateway] GEO evaluation failed: ${e.message}`);
+  }
+
   const pricing = await tokenPricingDao.getActiveByKey(modelId);
   const model = listModels().find((m) => m.id === modelId);
 
@@ -82,11 +103,27 @@ export async function gatewayInfer(modelId, input, ctx = {}) {
   }
 
   const latencyMs = result.elapsed || (Date.now() - start);
+
+  // 输出审核 — 替换硬编码 null
+  let moderationResult = null;
+  if (result.output && status === 'success') {
+    try {
+      const { moderateOutput } = await import('../services/outputModerationService.js');
+      const textOutput = typeof result.output === 'string' ? result.output : JSON.stringify(result.output);
+      const reviewLevel = geoConstraints?.reviewLevel || 5;
+      const blockedTerms = geoConstraints?.outputConstraints?.forbiddenTerms || [];
+      const requiredPatterns = geoConstraints?.outputConstraints?.requiredPatterns || null;
+      moderationResult = JSON.stringify(await moderateOutput(textOutput, { level: reviewLevel, blockedTerms, requiredPatterns }));
+    } catch (e) {
+      logger.warn(`[Gateway] Moderation failed: ${e.message}`);
+    }
+  }
+
   await modelConfigDao.logCall({
     userId: context.userId, tenantId: context.tenantId,
     modelKey: modelId, taskType: context.taskType, inputHash: '',
     status, latencyMs, tokensIn: effectiveTokensIn, tokensOut: effectiveTokensOut,
-    errorMsg, moderationResult: null,
+    errorMsg, moderationResult,
     costAmount: cost.amount, costCurrency: cost.currency,
     pricingId: cost.pricingId, costDetails: cost.details,
     correlationId: context.correlationId, source: context.source,
@@ -119,6 +156,19 @@ export async function gatewayDispatch(dispatchReq, ctx = {}) {
   const start = Date.now();
   let result, status = 'success', errorMsg = '';
 
+  // GEO 规则检查
+  let geoConstraints = null;
+  try {
+    const countryCode = ctx.countryCode || ctx.geo?.country || null;
+    const platformCode = ctx.platformCode || ctx.taskType || null;
+    if (countryCode) {
+      const { evaluateRules } = await import('../services/geoRulesService.js');
+      geoConstraints = await evaluateRules(countryCode, platformCode);
+    }
+  } catch (e) {
+    logger.warn(`[Gateway] GEO evaluation failed: ${e.message}`);
+  }
+
   try {
     result = await _dispatch(dispatchReq);
   } catch (err) {
@@ -138,11 +188,24 @@ export async function gatewayDispatch(dispatchReq, ctx = {}) {
     ? await tokenPricingDao.calculateCost(modelId, tokensIn, tokensOut, 1)
     : { amount: 0, currency: 'CNY', pricingId: null, details: null };
 
+  // 输出审核
+  let moderationResult = null;
+  if (result?.result && status === 'success') {
+    try {
+      const { moderateOutput } = await import('../services/outputModerationService.js');
+      const textOutput = typeof result.result === 'string' ? result.result : JSON.stringify(result.result);
+      const reviewLevel = geoConstraints?.reviewLevel || 5;
+      moderationResult = JSON.stringify(await moderateOutput(textOutput, { level: reviewLevel }));
+    } catch (e) {
+      logger.warn(`[Gateway] Moderation failed: ${e.message}`);
+    }
+  }
+
   await modelConfigDao.logCall({
     userId: context.userId, tenantId: context.tenantId,
     modelKey: modelId, taskType: context.taskType, inputHash: '',
     status, latencyMs, tokensIn, tokensOut,
-    errorMsg, moderationResult: null,
+    errorMsg, moderationResult,
     costAmount: cost.amount, costCurrency: cost.currency,
     pricingId: cost.pricingId, costDetails: cost.details,
     correlationId: context.correlationId, source: context.source,
@@ -172,6 +235,19 @@ export async function gatewayRoute(params, ctx = {}) {
   const context = normalizeContext(ctx);
   const start = Date.now();
 
+  // GEO 规则检查
+  let geoConstraints = null;
+  try {
+    const countryCode = ctx.countryCode || ctx.geo?.country || null;
+    const platformCode = ctx.platformCode || ctx.taskType || null;
+    if (countryCode) {
+      const { evaluateRules } = await import('../services/geoRulesService.js');
+      geoConstraints = await evaluateRules(countryCode, platformCode);
+    }
+  } catch (e) {
+    logger.warn(`[Gateway] GEO evaluation failed: ${e.message}`);
+  }
+
   const router = _modelRouter;
   let result, status = 'success', errorMsg = '';
 
@@ -193,12 +269,25 @@ export async function gatewayRoute(params, ctx = {}) {
     ? await tokenPricingDao.calculateCost(modelKey, tokensIn, tokensOut, 1)
     : { amount: 0, currency: 'CNY', pricingId: null, details: null };
 
+  // 输出审核
+  let moderationResult = null;
+  if (result?.response && status === 'success') {
+    try {
+      const { moderateOutput } = await import('../services/outputModerationService.js');
+      const textOutput = result.response?.choices?.[0]?.message?.content || JSON.stringify(result.response);
+      const reviewLevel = geoConstraints?.reviewLevel || 5;
+      moderationResult = JSON.stringify(await moderateOutput(textOutput, { level: reviewLevel }));
+    } catch (e) {
+      logger.warn(`[Gateway] Moderation failed: ${e.message}`);
+    }
+  }
+
   // 追加 Gateway 层日志（含成本字段）— model-router 已写基础行，此行补全成本核算
   await modelConfigDao.logCall({
     userId: context.userId, tenantId: context.tenantId,
     modelKey, taskType: context.taskType, inputHash: '',
     status, latencyMs, tokensIn, tokensOut,
-    errorMsg, moderationResult: null,
+    errorMsg, moderationResult,
     costAmount: cost.amount, costCurrency: cost.currency,
     pricingId: cost.pricingId, costDetails: cost.details,
     correlationId: context.correlationId, source: context.source,

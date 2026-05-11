@@ -119,6 +119,7 @@ const groups = reactive<NavGroup[]>([
       { key: 'moderation', label: '内容审核', route: '/admin/moderation' },
       { key: 'abuse', label: '滥用监控', route: '/admin/abuse' },
       { key: 'compliance', label: '合规检查', route: '/admin/compliance' },
+      { key: 'geo-rules', label: 'GEO 规则', route: '/admin/geo-rules' },
     ],
   },
   {
@@ -131,6 +132,7 @@ const groups = reactive<NavGroup[]>([
       { key: 'proxy', label: 'API 代理', route: '/admin/proxy' },
       { key: 'config', label: '配置中心', route: '/admin/config' },
       { key: 'settings', label: '系统设置', route: '/admin/settings' },
+      { key: 'kb-management', label: '知识库管理', route: '/admin/kb-management' },
     ],
   },
   {
