@@ -752,6 +752,20 @@ const displayPlans = computed(() => apiPricing.value || plans.value)
 .lp-mf-card:nth-child(7) { transition-delay: 0.36s; }
 .lp-mf-card:nth-child(8) { transition-delay: 0.42s; }
 
+/* Feature card grid stagger (up to 12 visible at a time) */
+.lp-feat-grid .lp-card:nth-child(1) { transition-delay: 0s; }
+.lp-feat-grid .lp-card:nth-child(2) { transition-delay: 0.04s; }
+.lp-feat-grid .lp-card:nth-child(3) { transition-delay: 0.08s; }
+.lp-feat-grid .lp-card:nth-child(4) { transition-delay: 0.12s; }
+.lp-feat-grid .lp-card:nth-child(5) { transition-delay: 0.16s; }
+.lp-feat-grid .lp-card:nth-child(6) { transition-delay: 0.20s; }
+.lp-feat-grid .lp-card:nth-child(7) { transition-delay: 0.24s; }
+.lp-feat-grid .lp-card:nth-child(8) { transition-delay: 0.28s; }
+.lp-feat-grid .lp-card:nth-child(9) { transition-delay: 0.32s; }
+.lp-feat-grid .lp-card:nth-child(10) { transition-delay: 0.36s; }
+.lp-feat-grid .lp-card:nth-child(11) { transition-delay: 0.40s; }
+.lp-feat-grid .lp-card:nth-child(12) { transition-delay: 0.44s; }
+
 /* Hero gradient subtle shimmer */
 .lp-hero-h1 em {
   background-size: 200% 200%;
