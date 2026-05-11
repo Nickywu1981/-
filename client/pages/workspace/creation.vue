@@ -57,11 +57,9 @@
   </div>
 </template>
 
-<script lang="ts">
-type Card = { id: string; category: string; icon: string; title: string; desc: string; route: string; order: number; visible: boolean }
-</script>
-
 <script setup lang="ts">
+type Card = { id: string; category: string; icon: string; title: string; desc: string; route: string; order: number; visible: boolean }
+
 definePageMeta({ layout: 'workspace' })
 const router = useRouter()
 
@@ -81,7 +79,14 @@ const CATEGORY_ROUTES: Record<string, string> = {
 function getDefaultCards(): Record<string, Card[]> {
   const fromI18n = t('workspace.default_tool_cards') as Record<string, Card[]>
   if (fromI18n && typeof fromI18n === 'object' && Object.keys(fromI18n).length) return fromI18n
-  return {}
+  // Hard fallback: minimal tool set per category
+  return {
+    video: [{ id:'v1', category:'video', icon:'🎥', title:t('workspace.creation_tabs.video'), desc:'AI powered video generation', route:'/work/video', order:1, visible:true }],
+    image: [{ id:'i1', category:'image', icon:'🖼', title:t('workspace.creation_tabs.image'), desc:'AI powered image creation', route:'/work/image', order:1, visible:true }],
+    detail: [{ id:'d1', category:'detail', icon:'📄', title:t('workspace.creation_tabs.detail'), desc:'Detail page design', route:'/work/detail-page', order:1, visible:true }],
+    copywrite: [{ id:'c1', category:'copywrite', icon:'✍️', title:t('workspace.creation_tabs.copywrite'), desc:'AI copywriting', route:'/work/copywriting', order:1, visible:true }],
+    digital: [{ id:'dh1', category:'digital', icon:'🤖', title:t('workspace.creation_tabs.digital'), desc:'Digital human videos', route:'/work/digital-human', order:1, visible:true }],
+  }
 }
 
 onMounted(async () => {
@@ -146,15 +151,7 @@ const allCardsRoute = computed(() => CATEGORY_ROUTES[activeTab.value] || '/works
 
 async function handleSubmit() {
   if (!prompt.value.trim()) return
-  const tab = activeTab.value
-  const routes: Record<string, string> = {
-    image: '/work/image',
-    video: '/work/video',
-    detail: '/work/detail-page',
-    copywrite: '/work/copywrite',
-    digital: '/work/digital-human',
-  }
-  const target = routes[tab] || '/work/image'
+  const target = CATEGORY_ROUTES[activeTab.value] || '/work/image'
   router.push({ path: target, query: { prompt: prompt.value } })
 }
 </script>

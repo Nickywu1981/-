@@ -49,8 +49,28 @@ import { truncate } from '@/utils/format';
 const toast = useToast()
 const loading = ref(true), saving = ref(false)
 const { message: savedMsg, show: showMsg } = useTimedMessage(3000)
+const { message: geoSavedMsg, show: showGeoMsg } = useTimedMessage(3000)
 const otherConfigs = ref<any[]>([])
 const form = reactive({ siteName: 'Movio AI', contact: '', dailyLimit: 5000, maintenance: false })
+const geo = reactive({
+  name: 'Movio AI',
+  desc: '',
+  features: '',
+  industries: '',
+  categories: '',
+  platforms: '',
+  pricing: '',
+  social: '',
+  email: '',
+  logo: '',
+})
+
+const geoKeyMap: Record<string, string> = {
+  geo_product_name: 'name', geo_product_desc: 'desc', geo_features: 'features',
+  geo_applicable_industries: 'industries', geo_applicable_categories: 'categories',
+  geo_platforms_supported: 'platforms', geo_pricing_summary: 'pricing',
+  geo_social_links: 'social', geo_contact_email: 'email', geo_logo_url: 'logo',
+}
 
 onMounted(async () => {
   try {
@@ -63,6 +83,7 @@ onMounted(async () => {
         else if (c.config_key === 'contact_email') form.contact = c.config_value
         else if (c.config_key === 'daily_limit') form.dailyLimit = Number(c.config_value) || 5000
         else if (c.config_key === 'maintenance_mode') form.maintenance = c.config_value === 'true' || c.config_value === '1'
+        else if (geoKeyMap[c.config_key]) (geo as any)[geoKeyMap[c.config_key]] = c.config_value
         else otherConfigs.value.push(c)
       }
     }
