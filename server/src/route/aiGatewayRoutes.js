@@ -4,7 +4,6 @@
  */
 import { Router } from 'express';
 import { authMiddleware } from '../middleware/auth.js';
-import { csrfProtection } from '../middleware/csrf.js';
 import { aiConcurrencyGuard } from '../middleware/rateLimiter.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { gatewayInfer, gatewayDispatch, gatewayRoute, getGatewayStats, getGatewayPricing } from '../gateway/aiGatewayHub.js';
@@ -17,7 +16,7 @@ const router = Router();
 
 const inferBodySchema = z.object({
   modelId: z.string().min(1, 'modelId 必填'),
-  input: z.record(z.any()).or(z.string()).or(z.array(z.any())),
+  input: z.record(z.unknown()).or(z.string()).or(z.array(z.unknown())),
   taskType: z.string().optional(),
   source: z.enum(['consumer', 'enterprise', 'agent', 'open_api', 'internal']).optional(),
   maxRetries: z.number().int().min(0).max(5).optional(),
@@ -27,7 +26,7 @@ const inferBodySchema = z.object({
 const dispatchBodySchema = z.object({
   mode: z.enum(['auto', 'custom', 'single']).optional(),
   taskType: z.string().optional(),
-  input: z.record(z.any()).or(z.string()),
+  input: z.record(z.unknown()).or(z.string()),
   modelKey: z.string().optional(),
   candidates: z.array(z.string()).optional(),
   source: z.enum(['consumer', 'enterprise', 'agent', 'open_api', 'internal']).optional(),
@@ -37,7 +36,7 @@ const routeBodySchema = z.object({
   mode: z.enum(['single', 'mixed', 'custom']).optional(),
   modelKey: z.string().optional(),
   taskType: z.string().optional(),
-  params: z.record(z.any()),
+  params: z.record(z.unknown()),
   source: z.enum(['consumer', 'enterprise', 'agent', 'open_api', 'internal']).optional(),
 }).passthrough();
 

@@ -61,7 +61,7 @@ const userStatusSchema = z.object({
 });
 const taskActionParamsSchema = z.object({ taskId: z.coerce.number().int().positive('taskId 必须为正整数') });
 const promptReviewSchema = z.object({
-  status: z.coerce.number().int(),
+  status: z.coerce.number().int().min(0).max(2),
   reviewRemark: z.string().max(500).optional(),
 });
 const adminPromptSchema = z.object({

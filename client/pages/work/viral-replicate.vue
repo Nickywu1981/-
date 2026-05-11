@@ -123,7 +123,8 @@ async function doAnalyze() {
 // 监听分析结果
 watch(anaResult, (v) => {
   if (v) {
-    analysisResult.value = typeof v === 'string' ? JSON.parse(v) : v
+    try { analysisResult.value = typeof v === 'string' ? JSON.parse(v) : v }
+    catch { analysisResult.value = null }
   }
 })
 

@@ -116,8 +116,8 @@
         <h3>导出成功</h3>
         <div class="result-info">
           <div><strong>目标平台:</strong> {{ draftResult.platform === 'jianying' ? '剪映' : 'CapCut' }}</div>
-          <div><strong>包含素材:</strong> {{ draftResult.assets.length }} 个</div>
-          <div><strong>项目名称:</strong> {{ draftResult.draft.draft_name }}</div>
+          <div><strong>包含素材:</strong> {{ draftResult?.assets?.length ?? 0 }} 个</div>
+          <div><strong>项目名称:</strong> {{ draftResult?.draft?.draft_name || '-' }}</div>
         </div>
         <div class="result-actions">
           <button class="btn-primary" @click="downloadDraft">下载项目文件 (.json)</button>

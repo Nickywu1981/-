@@ -188,7 +188,7 @@
           </el-table-column>
           <el-table-column prop="inputs" label="输入" min-width="200">
             <template #default="{ row }">
-              <span v-if="row.inputs">{{ (typeof row.inputs === 'string' ? JSON.parse(row.inputs) : row.inputs).productName || '-' }}</span>
+              <span v-if="row.inputs">{{ safeParseJson(row.inputs)?.productName || '-' }}</span>
             </template>
           </el-table-column>
           <el-table-column prop="model_id" label="模型" width="160" />
@@ -215,6 +215,12 @@ import { ref, reactive, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
 import { MagicStick } from '@element-plus/icons-vue';
 import { copyToClipboard } from '@/utils/format';
+
+function safeParseJson(v: unknown): Record<string, unknown> | null {
+  if (typeof v !== 'string') return v as Record<string, unknown> | null;
+  try { return JSON.parse(v); } catch { return null; }
+}
+
 const activeTab = ref('title');
 
 // 平台 & 语言
