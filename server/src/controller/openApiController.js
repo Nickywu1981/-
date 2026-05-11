@@ -6,24 +6,24 @@ import { wrapController } from '../utils/wrapController.js';
 import { success } from '../utils/response.js';
 import * as openApiService from '../services/openApiService.js';
 
-export const ping = wrapController(async (req, res, next) => { success(res, await openApiService.ping(req.tenantId)); })
+export const ping = wrapController(async (req, res, next) => { success(res, await openApiService.ping(req.tenantId)); });
 
-export const getUsage = wrapController(async (req, res, next) => { success(res, await openApiService.getUsage(req.tenantId, req.apiKeyRecord)); })
+export const getUsage = wrapController(async (req, res, next) => { success(res, await openApiService.getUsage(req.tenantId, req.apiKeyRecord)); });
 
 export const removeBackground = wrapController(async (req, res, next) => {
     const result = await openApiService.removeBackground(req.tenantId, req.body.imageUrl);
     success(res, result);
-})
+});
 
 export const generateScene = wrapController(async (req, res, next) => {
     const result = await openApiService.generateScene(req.tenantId, req.body.imageUrl, req.body.sceneType);
     success(res, result);
-})
+});
 
 export const retouchImage = wrapController(async (req, res, next) => {
     const result = await openApiService.retouchImage(req.tenantId, req.body.imageUrl);
     success(res, result);
-})
+});
 
 export const generateVideo = wrapController(async (req, res, next) => {
     const result = await openApiService.generateVideo(req.tenantId, req.body.imageUrls, {
@@ -31,4 +31,4 @@ export const generateVideo = wrapController(async (req, res, next) => {
       duration: req.body.duration,
     });
     success(res, result);
-  })
+  });

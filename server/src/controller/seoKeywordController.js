@@ -9,12 +9,12 @@ export const embedKeywords = wrapController(async (req, res) => {
     const { productName, platformCode, category, description, count } = req.body;
     const result = await svc.embedSEOKeywords({ productName, platformCode, category, description, count });
     return success(res, result, `SEO关键词嵌入成功 (平台: ${result.platform})`);
-})
+});
 
 export const listPlatforms = wrapController(async (req, res) => {
     const platforms = svc.listSEOPlatforms();
     return success(res, { platforms, total: platforms.length });
-})
+});
 
 export const getKeywords = wrapController(async (req, res) => {
     const { platformCode } = req.query;
@@ -24,4 +24,4 @@ export const getKeywords = wrapController(async (req, res) => {
     }
     const platforms = svc.listSEOPlatforms();
     return success(res, { platforms, total: platforms.length });
-})
+});

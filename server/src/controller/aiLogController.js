@@ -8,9 +8,9 @@ export const listAiLogs = wrapController(async (req, res, next) => {
     const { type, status } = req.query;
     const data = await aiLogService.listAiLogs({ page, pageSize, type, status });
     return listResult(res, data);
-  })
+  });
 
 export const getAiLogStats = wrapController(async (req, res, next) => {
     const data = await aiLogService.getStats();
     return success(res, data);
-  })
+  });

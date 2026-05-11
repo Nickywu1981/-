@@ -6,13 +6,13 @@ export const getMyTier = wrapController(async (req, res, next) => {
     const tier = await tierService.getUserTier(req.userId);
     const limits = tierService.getTierLimits(tier);
     return success(res, { tier, limits });
-})
+});
 
 export const checkLimit = wrapController(async (req, res, next) => {
     const { type = 'image' } = req.query;
     const result = await tierService.checkDailyLimit(req.userId, type);
     return success(res, result);
-})
+});
 
 export const getExportPermission = wrapController(async (req, res, next) => {
     const [hd, noWatermark] = await Promise.all([
@@ -20,4 +20,4 @@ export const getExportPermission = wrapController(async (req, res, next) => {
       tierService.canExportWithoutWatermark(req.userId),
     ]);
     return success(res, { exportHd: hd, noWatermark });
-})
+});

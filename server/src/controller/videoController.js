@@ -12,7 +12,7 @@ export const submitImg2Video = wrapController(async (req, res, next) => {
     }
     const data = await videoService.submitImg2Video(req.user.id, { imageUrl, style, duration, platform });
     return success(res, data, '视频任务已提交');
-  })
+  });
 
 export const submitMulti2Video = wrapController(async (req, res, next) => {
     const { imageUrls, style, duration, sellPoints } = req.body;
@@ -21,7 +21,7 @@ export const submitMulti2Video = wrapController(async (req, res, next) => {
     }
     const data = await videoService.submitMulti2Video(req.user.id, { imageUrls, style, duration, sellPoints });
     return success(res, data, '多图合成任务已提交');
-  })
+  });
 
 export const submitVideoPackaging = wrapController(async (req, res, next) => {
     const { videoUrl, options } = req.body;
@@ -30,7 +30,7 @@ export const submitVideoPackaging = wrapController(async (req, res, next) => {
     }
     const data = await videoService.submitVideoPackaging(req.user.id, { videoUrl, options });
     return success(res, data, '包装任务已提交');
-  })
+  });
 
 export const submitActionTransfer = wrapController(async (req, res, next) => {
     const { sourceImageUrl, actionVideoUrl, targetAction } = req.body;
@@ -39,7 +39,7 @@ export const submitActionTransfer = wrapController(async (req, res, next) => {
     }
     const data = await videoService.submitActionTransfer(req.user.id, { sourceImageUrl, actionVideoUrl, targetAction });
     return success(res, data, '动作迁移任务已提交');
-  })
+  });
 
 export const submitPersonReplace = wrapController(async (req, res, next) => {
     const { sourceImageUrl, targetPersonUrl } = req.body;
@@ -48,7 +48,7 @@ export const submitPersonReplace = wrapController(async (req, res, next) => {
     }
     const data = await videoService.submitPersonReplace(req.user.id, { sourceImageUrl, targetPersonUrl });
     return success(res, data, '人物替换任务已提交');
-  })
+  });
 
 export const submitDigitalHuman = wrapController(async (req, res, next) => {
     const { script, voice, avatar, background } = req.body;
@@ -57,26 +57,26 @@ export const submitDigitalHuman = wrapController(async (req, res, next) => {
     }
     const data = await videoService.submitDigitalHuman(req.user.id, { script, voice, avatar, background });
     return success(res, data, '口播生成任务已提交');
-  })
+  });
 
 export const getVideoTaskResult = wrapController(async (req, res, next) => {
     const data = await videoService.getTaskResult(req.params.taskId, req.user.id);
     return success(res, data);
-  })
+  });
 
 export const listMyVideoTasks = wrapController(async (req, res, next) => {
     const { status, type } = req.query;
     const { page, pageSize } = parsePagination(req.query, { maxPageSize: 100 });
     const data = await videoService.listMyTasks(req.user.id, { status, type, page, pageSize });
     return listResult(res, data);
-  })
+  });
 
 export const cancelVideoTask = wrapController(async (req, res, next) => {
     const data = await cancelJob(req.params.taskId, req.user.id);
     return success(res, data, '任务已取消');
-  })
+  });
 
 export const retryVideoTask = wrapController(async (req, res, next) => {
     const data = await retryJob(req.params.taskId, req.user.id);
     return success(res, data, '任务已重新排队');
-  })
+  });

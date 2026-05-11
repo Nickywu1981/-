@@ -13,7 +13,7 @@ export const generateFAB = wrapController(async (req, res) => {
       ...fabData,
       formatted,
     }, `FAB卖点结构生成成功 (${fabData.total}条)`);
-})
+});
 
 export const getTemplates = wrapController(async (req, res) => {
     return success(res, {
@@ -21,4 +21,4 @@ export const getTemplates = wrapController(async (req, res) => {
       archetypes: Object.keys(svc.BENEFIT_ARCHETYPES).length + ' 类受益模板',
       styles: ['standard', 'social', 'concise'],
     });
-})
+});

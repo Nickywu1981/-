@@ -16,7 +16,7 @@ export const submitMainImage = wrapController(async (req, res, next) => {
     }
     const data = await imageService.submitMainImage(req.user.id, { imageUrl, platform, style });
     return success(res, data, '主图任务已提交');
-  })
+  });
 
 /**
  * POST /api/images/scene
@@ -29,7 +29,7 @@ export const submitSceneImage = wrapController(async (req, res, next) => {
     }
     const data = await imageService.submitSceneImage(req.user.id, { imageUrl, sceneCategory, customBgUrl });
     return success(res, data, '场景图任务已提交');
-  })
+  });
 
 /**
  * POST /api/images/detail-h5
@@ -42,7 +42,7 @@ export const submitDetailH5 = wrapController(async (req, res, next) => {
     }
     const data = await imageService.submitDetailH5(req.user.id, { imageUrl, category, templateId });
     return success(res, data, '详情页任务已提交');
-  })
+  });
 
 /**
  * POST /api/images/batch
@@ -55,7 +55,7 @@ export const submitBatchTask = wrapController(async (req, res, next) => {
     }
     const data = await imageService.submitBatchTask(req.user.id, { imageUrls, operation, platform, style });
     return success(res, data, '批量任务已提交');
-  })
+  });
 
 /**
  * POST /api/images/retouch
@@ -68,7 +68,7 @@ export const submitRetouch = wrapController(async (req, res, next) => {
     }
     const data = await imageService.submitRetouch(req.user.id, { imageUrl, level, features });
     return success(res, data, '精修任务已提交');
-  })
+  });
 
 /**
  * POST /api/images/remove-bg
@@ -81,7 +81,7 @@ export const submitRemoveBg = wrapController(async (req, res, next) => {
     }
     const data = await imageService.submitRemoveBg(req.user.id, { imageUrl, format });
     return success(res, data, '抠图任务已提交');
-  })
+  });
 
 /**
  * POST /api/images/white-bg
@@ -94,7 +94,7 @@ export const submitWhiteBg = wrapController(async (req, res, next) => {
     }
     const data = await imageService.submitWhiteBg(req.user.id, { imageUrl, bgColor });
     return success(res, data, '白底图任务已提交');
-  })
+  });
 
 /**
  * GET /api/images/tasks/:taskId
@@ -103,7 +103,7 @@ export const submitWhiteBg = wrapController(async (req, res, next) => {
 export const getTaskResult = wrapController(async (req, res, next) => {
     const data = await imageService.getTaskResult(req.params.taskId, req.user.id);
     return success(res, data);
-  })
+  });
 
 /**
  * GET /api/images/tasks
@@ -114,7 +114,7 @@ export const listMyTasks = wrapController(async (req, res, next) => {
     const { page, pageSize } = parsePagination(req.query, { maxPageSize: 100 });
     const data = await imageService.listMyTasks(req.user.id, { status, type, page, pageSize });
     return listResult(res, data);
-  })
+  });
 
 /**
  * POST /api/images/tasks/:taskId/cancel
@@ -123,7 +123,7 @@ export const listMyTasks = wrapController(async (req, res, next) => {
 export const cancelTask = wrapController(async (req, res, next) => {
     const data = await cancelJob(req.params.taskId, req.user.id);
     return success(res, data, '任务已取消');
-  })
+  });
 
 /**
  * POST /api/images/tasks/:taskId/retry
@@ -132,4 +132,4 @@ export const cancelTask = wrapController(async (req, res, next) => {
 export const retryTask = wrapController(async (req, res, next) => {
     const data = await retryJob(req.params.taskId, req.user.id);
     return success(res, data, '任务已重新排队');
-  })
+  });
