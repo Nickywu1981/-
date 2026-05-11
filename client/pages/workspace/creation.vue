@@ -129,6 +129,18 @@ onMounted(async () => {
   if (tabs.value.length > 0 && !activeTab.value) {
     activeTab.value = tabs.value[0].key
   }
+
+  // Entrance animations for tool cards
+  if (process.client && window.IntersectionObserver) {
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) e.target.classList.add('wc-in')
+      })
+    }, { threshold: 0.08 })
+    setTimeout(() => {
+      document.querySelectorAll('.wc-card').forEach(el => obs.observe(el))
+    }, 150)
+  }
 })
 
 function go(path: string) { router.push(path) }
@@ -223,4 +235,17 @@ async function handleSubmit() {
 :root[data-theme="dark"] .wc-card, :root.dark .wc-card { background: #1a1a1a; border-color: #2a2a2a; }
 :root[data-theme="dark"] .wc-card-title, :root.dark .wc-card-title,
 :root[data-theme="dark"] .wc-sec-title, :root.dark .wc-sec-title { color: #e5e5e5; }
+
+/* Entrance animations */
+.wc-card { opacity: 0; transform: translateY(20px); transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1), transform 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
+.wc-card.wc-in { opacity: 1; transform: translateY(0); }
+.wc-card:nth-child(1) { transition-delay: 0s; }
+.wc-card:nth-child(2) { transition-delay: 0.04s; }
+.wc-card:nth-child(3) { transition-delay: 0.08s; }
+.wc-card:nth-child(4) { transition-delay: 0.12s; }
+.wc-card:nth-child(5) { transition-delay: 0.16s; }
+.wc-card:nth-child(6) { transition-delay: 0.20s; }
+.wc-card:nth-child(7) { transition-delay: 0.24s; }
+.wc-card:nth-child(8) { transition-delay: 0.28s; }
+@media (scripting: none) { .wc-card { opacity: 1; transform: none; } }
 </style>

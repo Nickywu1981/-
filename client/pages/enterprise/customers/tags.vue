@@ -58,7 +58,7 @@ const $api = (url, opts) => $fetch(url, { baseURL: '/api/enterprise/customers', 
 
 async function loadTags() {
   loading.value = true;
-  try { tags.value = await $api('/tags'); } catch (e) { /* ignore */ }
+  try { tags.value = await $api('/enterprise/customers/tags'); } catch (e) { /* ignore */ }
   loading.value = false;
 }
 
@@ -80,9 +80,9 @@ function closeModal() {
 async function submitForm() {
   try {
     if (showEdit.value) {
-      await $api(`/tags/${editingId.value}`, { method: 'PUT', body: { name: form.name, color: form.color } });
+      await $api(`/enterprise/customers/tags/${editingId.value}`, { method: 'PUT', body: { name: form.name, color: form.color } });
     } else {
-      await $api('/tags', { method: 'POST', body: { name: form.name, color: form.color } });
+      await $api('/enterprise/customers/tags', { method: 'POST', body: { name: form.name, color: form.color } });
     }
     closeModal();
     loadTags();
@@ -92,7 +92,7 @@ async function submitForm() {
 async function handleDelete(t) {
   if (!confirm(`确认删除标签"${t.name}"？关联的客户将自动解绑。`)) return;
   try {
-    await $api(`/tags/${t.id}`, { method: 'DELETE' });
+    await $api(`/enterprise/customers/tags/${t.id}`, { method: 'DELETE' });
     loadTags();
   } catch (e) { /* ignore */ }
 }

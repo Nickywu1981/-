@@ -71,6 +71,7 @@ type Card = { id: string; category: string; icon: string; title: string; desc: s
 
 const loading = ref(true)
 const cardGroups = ref<Record<string, Card[]>>({})
+const visibleCards = ref<Set<Element>>(new Set())
 
 const { t } = useI18n()
 
@@ -143,6 +144,21 @@ onMounted(async () => {
   }
 
   loading.value = false
+
+  // Entrance animations for cards
+  if (process.client && window.IntersectionObserver) {
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting && !visibleCards.value.has(e.target)) {
+          visibleCards.value.add(e.target)
+          e.target.classList.add('wh-in')
+        }
+      })
+    }, { threshold: 0.1 })
+    setTimeout(() => {
+      document.querySelectorAll('.wh-qcard').forEach(el => obs.observe(el))
+    }, 100)
+  }
 })
 </script>
 
@@ -219,4 +235,16 @@ onMounted(async () => {
 :root[data-theme="dark"] .wh-sk-card, :root.dark .wh-sk-card { background: #1a1a1a; border-color: #2a2a2a; }
 :root[data-theme="dark"] .wh-sk-line, :root.dark .wh-sk-line,
 :root[data-theme="dark"] .wh-sk-item, :root.dark .wh-sk-item { background: #2a2a2a; }
+
+/* Entrance animations */
+.wh-qcard { opacity: 0; transform: translateY(16px); transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1), transform 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+.wh-qcard.wh-in { opacity: 1; transform: translateY(0); }
+.wh-qcard:nth-child(1) { transition-delay: 0s; }
+.wh-qcard:nth-child(2) { transition-delay: 0.05s; }
+.wh-qcard:nth-child(3) { transition-delay: 0.10s; }
+.wh-qcard:nth-child(4) { transition-delay: 0.15s; }
+.wh-qcard:nth-child(5) { transition-delay: 0.20s; }
+
+/* SSR fallback */
+@media (scripting: none) { .wh-qcard { opacity: 1; transform: none; } }
 </style>

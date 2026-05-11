@@ -83,7 +83,7 @@ const $api = (url) => $fetch(url, { baseURL: '/api/enterprise/customers', creden
 
 async function loadDetail() {
   try {
-    customer.value = await $api(`/customers/${route.params.id}`);
+    customer.value = await $api(`/${route.params.id}`);
   } catch (e) { customer.value = null; }
   loading.value = false;
 }
