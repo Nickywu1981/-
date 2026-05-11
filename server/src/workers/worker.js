@@ -10,7 +10,9 @@ import config from '../config/index.js';
 import { validateStartupConfig } from '../utils/startupGuard.js';
 import * as jobQueueService from '../services/job-queue.service.js';
 import * as aiCaller from '../utils/ai-caller.js';
-import * as _circuitBreaker from '../utils/circuit-breaker.js';
+import { CircuitBreaker } from '../utils/circuit-breaker.js';
+
+const aiCircuitBreaker = new CircuitBreaker({ failureThreshold: 5, cooldownMs: 60000 });
 
 // 启动配置校验
 validateStartupConfig();
@@ -84,7 +86,7 @@ async function processJob(job) {
       prompt: params.prompt,
       ...(mapping.model === 'gpt-image-2' ? { n: 1, size: params.size || '1024x1024' } : {}),
     };
-    const result = await aiCaller.aiCaller.call(endpoint, apiKey, aiParams, { modelName: mapping.model });
+    const result = await aiCaller.call(endpoint, apiKey, aiParams, { modelName: mapping.model, breaker: aiCircuitBreaker });
 
     await jobQueueService.updateProgress(job.id, 90);
 

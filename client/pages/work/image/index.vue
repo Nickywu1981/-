@@ -151,7 +151,9 @@ const { download } = useFileDownload()
 
 async function doEnhance() {
   if (!prompt.value.trim()) return
-  enhancedPrompt.value = await enhance(prompt.value, 'image')
+  try {
+    enhancedPrompt.value = await enhance(prompt.value, 'image')
+  } catch { /* enhance failure is non-blocking, user can still generate with original prompt */ }
 }
 function onPromptEnhanced({ enhanced: val }: { original: string; enhanced: string }) {
   enhancedPrompt.value = val

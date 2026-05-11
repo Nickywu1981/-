@@ -60,12 +60,10 @@ const providers = {
           secure: cfg.secure || false,
           auth: { user: cfg.user, pass: cfg.pass },
         });
-        const info = await transporter.sendMail({
-          from: cfg.from || cfg.user,
-          to: email,
-          subject,
-          html: content,
-        });
+        const info = await Promise.race([
+          transporter.sendMail({ from: cfg.from || cfg.user, to: email, subject, html: content }),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('SMTP 发送超时')), 30000)),
+        ]);
         return { success: true, messageId: info.messageId };
       } catch (e) {
         throw new BusinessError(502, `SMTP 发送失败: ${e.message}`);

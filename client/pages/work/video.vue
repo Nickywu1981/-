@@ -204,7 +204,9 @@ const { download } = useFileDownload()
 function onImagesUploaded(files: any[]) { images.value = files }
 async function doEnhance() {
   if (!prompt.value.trim()) return
-  enhancedPrompt.value = await enhance(prompt.value, 'video')
+  try {
+    enhancedPrompt.value = await enhance(prompt.value, 'video')
+  } catch { /* enhance failure is non-blocking */ }
 }
 function onPromptEnhanced({ enhanced: val }: { original: string; enhanced: string }) {
   enhancedPrompt.value = val

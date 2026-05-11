@@ -237,34 +237,36 @@ function disposeCharts() {
 async function fetchAll() {
   loading.value = true; error.value = ''
   try {
-    const [s, t]: any[] = await Promise.all([
+    const [s, t]: any[] = await Promise.allSettled([
       $fetch('/api/admin/stats'),
       $fetch('/api/admin/tasks?pageSize=8'),
     ])
+    const sVal = s.status === 'fulfilled' ? s.value : null
+    const tVal = t.status === 'fulfilled' ? t.value : null
 
-    if (s?.code === 200) {
-      stats.value = s.data
-      const trends = s.data?.trends
+    if (sVal?.code === 200) {
+      stats.value = sVal.data
+      const trends = sVal.data?.trends
       disposeCharts()
       nextTick(() => {
         renderLineChart(taskChart.value, trends?.tasks || [], '#3B82F6')
         renderLineChart(userChart.value, trends?.users || [], '#22C55E')
         renderLineChart(revenueChart.value, trends?.revenue || [], '#7C3AED')
-        renderPieChart(pieChart.value, s.data?.taskDistribution || [
+        renderPieChart(pieChart.value, sVal.data?.taskDistribution || [
           { label: '主图', value: 35, color: '#3B82F6' },
           { label: '场景', value: 18, color: '#22C55E' },
           { label: '视频', value: 22, color: '#F59E0B' },
           { label: '详情页', value: 12, color: '#7C3AED' },
           { label: '其他', value: 13, color: '#EC4899' },
         ])
-        renderBarChart(barChart.value, s.data?.popularFeatures || [
+        renderBarChart(barChart.value, sVal.data?.popularFeatures || [
           { label: '智能抠图', value: 128 },
           { label: '场景生成', value: 96 },
           { label: '视频生成', value: 74 },
           { label: '图片精修', value: 58 },
           { label: '白底图', value: 43 },
         ])
-        renderModelChart(modelChart.value, s.data?.modelUsage || [
+        renderModelChart(modelChart.value, sVal.data?.modelUsage || [
           { label: 'GPT-4o', value: 45, color: '#7C3AED' },
           { label: 'Claude', value: 25, color: '#3B82F6' },
           { label: 'SD XL', value: 20, color: '#22C55E' },
@@ -272,10 +274,10 @@ async function fetchAll() {
         ])
       })
     } else {
-      throw new Error(s?.msg || '获取统计数据失败')
+      throw new Error(sVal?.msg || '获取统计数据失败')
     }
-    if (t?.code === 200) { recentTasks.value = t.data?.list || [] }
-    else { throw new Error(t?.msg || '获取任务列表失败') }
+    if (tVal?.code === 200) { recentTasks.value = tVal.data?.list || [] }
+    else { throw new Error(tVal?.msg || '获取任务列表失败') }
   } catch (e: any) {
     error.value = e.data?.msg || e.message || '加载失败，请稍后重试'
     toast.error(error.value)

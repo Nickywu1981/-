@@ -111,6 +111,7 @@ async function replicateInfer(input, onProgress) {
 
     const pollRes = await fetch(pollUrl, {
       headers: { Authorization: `Token ${REPLICATE_API_KEY}` },
+      signal: AbortSignal.timeout(30000),
     });
     const pollData = await pollRes.json();
 

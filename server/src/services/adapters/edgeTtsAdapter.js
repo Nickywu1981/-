@@ -209,6 +209,7 @@ async function realCloneInfer(text, audioSampleUrl) {
           method: 'POST',
           headers: { 'xi-api-key': apiKey },
           body: formData,
+          signal: AbortSignal.timeout(30000),
         });
         const addJson = await addResp.json();
         voiceId = addJson.voice_id;
@@ -222,6 +223,7 @@ async function realCloneInfer(text, audioSampleUrl) {
       method: 'POST',
       headers: { 'xi-api-key': apiKey, 'Content-Type': 'application/json' },
       body: JSON.stringify({ text: text || '', model_id: 'eleven_multilingual_v2' }),
+      signal: AbortSignal.timeout(60000),
     });
 
     if (!ttsResp.ok) throw new BusinessError(ttsResp.status, `ElevenLabs TTS 返回 ${ttsResp.status}`);
