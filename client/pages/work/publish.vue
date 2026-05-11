@@ -260,7 +260,7 @@ async function submitPublish() {
       description: form.description,
       tags,
     });
-    toast('分发任务已提交');
+    notify('分发任务已提交');
     selectedWorkId.value = null;
     selectedPlatforms.value = [];
     form.title = '';
@@ -269,7 +269,7 @@ async function submitPublish() {
     historyPage.value = 1;
     await loadHistory();
   } catch (err) {
-    toast(err.message || '提交失败', 'error');
+    notify(err.message || '提交失败', 'error');
   } finally {
     submitting.value = false;
   }
@@ -278,10 +278,10 @@ async function submitPublish() {
 async function retryPublish(recordId) {
   try {
     await api.post(`/publish/retry/${recordId}`);
-    toast('已重新提交分发');
+    notify('已重新提交分发');
     await loadHistory();
   } catch (err) {
-    toast(err.message || '重发失败', 'error');
+    notify(err.message || '重发失败', 'error');
   }
 }
 
@@ -324,7 +324,7 @@ onUnmounted(() => {
 .work-card { border: 2px solid #e5e7eb; border-radius: 10px; padding: 8px; cursor: pointer; transition: .15s; position: relative; }
 .work-card:hover { border-color: #a5b4fc; }
 .work-card.selected { border-color: #6366f1; background: #eef2ff; }
-.work-check { position: absolute; top: 4px; right: 4px; width: 20px; height: 20px; border-radius: 50%; background: #e5e7eb; display: flex; align-items: center; justify-content: center; font-size: 12px; z-index: 1; }
+.work-check { position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; border-radius: 50%; background: #e5e7eb; display: flex; align-items: center; justify-content: center; font-size: 12px; z-index: 1; }
 .work-card.selected .work-check { background: #6366f1; color: #fff; }
 .work-thumb { width: 100%; aspect-ratio: 1; border-radius: 6px; overflow: hidden; background: #f3f4f6; display: flex; align-items: center; justify-content: center; }
 .work-thumb img { width: 100%; height: 100%; object-fit: cover; }

@@ -23,7 +23,7 @@
       </div>
       <div class="actions">
         <button class="btn-outline" @click="step = 0">返回</button>
-        <button class="btn" @click="submitTask">开始生成</button>
+        <button class="btn" :disabled="!uploadedUrl || !selectedScene || task.polling.value" @click="submitTask">{{ task.polling.value ? '生成中...' : '开始生成' }}</button>
       </div>
     </div>
 

@@ -27,8 +27,8 @@ const createFormSchema = z.object({
     type: z.enum(['text','textarea','select','radio','checkbox','date','file','email','phone','number','cascade']).optional(),
     is_required: z.boolean().optional(),
     required: z.boolean().optional(),
-    validation_rules: z.array(z.object({ rule: z.string(), value: z.any().optional(), message: z.string().optional() })).optional(),
-    linkage_conditions: z.array(z.object({ targetField: z.string(), operator: z.string(), value: z.any().optional() })).optional(),
+    validation_rules: z.array(z.object({ rule: z.string(), value: z.unknown().optional(), message: z.string().optional() })).optional(),
+    linkage_conditions: z.array(z.object({ targetField: z.string(), operator: z.string(), value: z.unknown().optional() })).optional(),
     masking_rule: z.enum(['phone','email','idcard','name','custom']).optional(),
   })).optional(),
   accessType: z.number().min(1).max(3).optional(),
@@ -37,7 +37,7 @@ const createFormSchema = z.object({
 });
 
 const submitFormSchema = z.object({
-  fields: z.record(z.any()).refine(v => Object.keys(v).length > 0, '至少填写一个字段'),
+  fields: z.record(z.unknown()).refine(v => Object.keys(v).length > 0, '至少填写一个字段'),
 });
 
 const upsertFieldsSchema = z.object({

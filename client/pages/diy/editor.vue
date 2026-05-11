@@ -445,7 +445,7 @@ onMounted(async () => {
 .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
 .btn-outline { background: var(--bg-card); border: 1px solid var(--border-light); color: var(--text-primary); }
 .btn-sm { padding: 4px 12px; font-size: 12px; }
-.btn-icon-btn { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-light); border-radius: 6px; background: var(--bg-card); cursor: pointer; font-size: 16px; color: var(--text-secondary); }
+.btn-icon-btn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-light); border-radius: 6px; background: var(--bg-card); cursor: pointer; font-size: 16px; color: var(--text-secondary); }
 .btn-icon-btn:hover { border-color: var(--brand); color: var(--brand); }
 .btn-icon-btn:disabled { opacity: .3; cursor: not-allowed; }
 .btn-ghost { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 13px; }

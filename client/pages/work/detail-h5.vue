@@ -250,7 +250,7 @@ onUnmounted(() => { skuList.value.forEach(s => { if (s.previewUrl) revoke(s.prev
 .sku-info { display: flex; align-items: center; gap: 6px; padding: 8px; }
 .sku-name-input { flex: 1; padding: 4px 8px; border: 1px solid var(--input-border); border-radius: var(--radius-xs); font-size: 12px; background: var(--bg-input); color: var(--text-primary); outline: none; min-width: 0; }
 .sku-name-input:focus { border-color: var(--input-focus-border); }
-.sku-color { width: 28px; height: 28px; border: 1px solid var(--input-border); border-radius: 4px; cursor: pointer; padding: 2px; }
+.sku-color { width: 32px; height: 32px; border: 1px solid var(--input-border); border-radius: 4px; cursor: pointer; padding: 2px; }
 .sku-remove { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 14px; padding: 2px 4px; }
 .sku-remove:hover { color: var(--danger); }
 .sku-badge { position: absolute; top: 6px; right: 6px; font-size: 10px; padding: 2px 6px; border-radius: var(--radius-xs); font-weight: 600; }

@@ -23,7 +23,7 @@
       <div class="cost-badge"><span class="cost-icon">⚡</span> 成本：2 积分/次</div>
       <div class="actions">
         <button class="btn-outline" @click="step = 0">← 返回</button>
-        <button class="btn-primary" @click="submitTask" :disabled="!selectedEffect">生成特效</button>
+        <button class="btn-primary" @click="submitTask" :disabled="!selectedEffect || processing">生成特效</button>
       </div>
     </div>
 

@@ -5,9 +5,12 @@
       <div class="upload-section" v-if="!currentModel">
         <div class="upload-card" @click="triggerUpload" @dragover.prevent @drop.prevent="onDrop">
           <div class="upload-icon">🧊</div>
+          <p v-if="uploading">上传中...</p>
+          <template v-else>
           <p>拖拽 3D 模型到此处</p>
           <span>支持 GLB / GLTF / FBX / OBJ，最大 50MB</span>
           <button class="btn-upload">选择文件</button>
+          </template>
         </div>
         <input ref="fileInput" type="file" accept=".glb,.gltf,.fbx,.obj,.stl" class="hidden-input" @change="onFileChange" />
         <p v-if="uploadError" class="error-msg">{{ uploadError }}</p>
@@ -72,6 +75,7 @@ const fileInput = ref<HTMLInputElement>();
 const viewerRef = ref();
 const currentModel = ref<{ url: string; name: string; size: number } | null>(null);
 const uploadError = ref('');
+const uploading = ref(false);
 const activeBg = ref('#1a1a2e');
 const activePreset = ref('studio');
 const screenshotUrl = ref('');
@@ -117,13 +121,14 @@ async function processFile(file: File) {
   const formData = new FormData();
   formData.append('model', file);
 
+  uploading.value = true;
   try {
     const res = await $fetch('/api/3d/upload', { method: 'POST', body: formData });
     currentModel.value = { url: res.url || createBlobUrl(file), name: file.name, size: file.size };
   } catch (err: any) {
     console.warn('[3d-preview] 模型上传失败，使用本地预览', err?.message || err)
     currentModel.value = { url: createBlobUrl(file), name: file.name, size: file.size };
-  }
+  } finally { uploading.value = false }
 }
 
 function loadDemo(demo: typeof demoModels[number]) {

@@ -46,7 +46,7 @@ async function startRender() {
     const data: any = await $fetch('/api/advanced/model-generate', { method: 'POST', body: fd, credentials: 'include' })
     resultUrl.value = data?.data?.url || data?.data?.result_url || ''
   } catch(e: any) { errorMsg.value = e?.data?.msg || '渲染失败' }
-  processing.value = false
+  finally { processing.value = false }
 }
 </script>
 <style scoped>

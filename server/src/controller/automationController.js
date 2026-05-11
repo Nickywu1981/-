@@ -21,7 +21,7 @@ export const cancelTask = wrapController(async (req, res) => {
 })
 
 export const executeTask = wrapController(async (req, res) => {
-    const data = await automationService.executeTask(req.params.taskId);
+    const data = await automationService.executeTask(req.params.taskId, req.user.id);
     success(res, data, '任务执行中');
 })
 

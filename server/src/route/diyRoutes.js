@@ -28,10 +28,10 @@ const pageSchema = z.object({
   slug: z.string().min(1, '标识不能为空').max(100).regex(/^[a-z0-9_-]+$/, '标识仅允许小写字母、数字、下划线、连字符'),
   pageType: z.enum(['mobile', 'pc', 'h5', 'landing', 'detail', 'activity', 'custom']).optional(),
   accessType: z.enum(['public', 'private']).optional(),
-  mobileConfig: z.object({ sections: z.array(z.any()) }).optional().refine(
+  mobileConfig: z.object({ sections: z.array(z.unknown()) }).optional().refine(
     (v) => JSON.stringify(v).length <= 500000, '配置数据不能超过500KB'
   ),
-  pcConfig: z.object({ sections: z.array(z.any()) }).optional().refine(
+  pcConfig: z.object({ sections: z.array(z.unknown()) }).optional().refine(
     (v) => JSON.stringify(v).length <= 500000, '配置数据不能超过500KB'
   ),
   metaJson: z.object({}).passthrough().optional().refine(
@@ -50,19 +50,19 @@ const componentSchema = z.object({
 const idsSchema = z.object({ ids: z.array(z.number().or(z.string())).min(1, '至少选择一项') });
 
 const versionSaveSchema = z.object({
-  mobileConfig: z.any().optional().refine(
+  mobileConfig: z.unknown().optional().refine(
     (v) => v === undefined || JSON.stringify(v).length <= 500000, '配置数据不能超过500KB'
   ),
-  pcConfig: z.any().optional().refine(
+  pcConfig: z.unknown().optional().refine(
     (v) => v === undefined || JSON.stringify(v).length <= 500000, '配置数据不能超过500KB'
   ),
   remark: z.string().max(500).optional(),
 });
 const autoSaveSchema = z.object({
-  mobileConfig: z.any().optional().refine(
+  mobileConfig: z.unknown().optional().refine(
     (v) => v === undefined || JSON.stringify(v).length <= 500000, '配置数据不能超过500KB'
   ),
-  pcConfig: z.any().optional().refine(
+  pcConfig: z.unknown().optional().refine(
     (v) => v === undefined || JSON.stringify(v).length <= 500000, '配置数据不能超过500KB'
   ),
 });
