@@ -231,14 +231,14 @@ export async function getInviteRewardRecord(inviterId, invitedUserId, conn) {
 
 export async function getFreePlanMembers() {
   const [rows] = await pool.execute(
-    'SELECT user_id, credit_balance FROM user_membership WHERE plan_type = 0 AND status = 1 AND is_deleted = 0',
+    'SELECT user_id, credit_balance FROM user_membership WHERE plan_type = 0 AND status = 1 AND is_deleted = 0 LIMIT 10000',
   );
   return rows;
 }
 
 export async function getFreePlanMembersForUpdate(conn) {
   const [rows] = await conn.execute(
-    'SELECT user_id, credit_balance FROM user_membership WHERE plan_type = 0 AND status = 1 AND is_deleted = 0 FOR UPDATE',
+    'SELECT user_id, credit_balance FROM user_membership WHERE plan_type = 0 AND status = 1 AND is_deleted = 0 LIMIT 10000 FOR UPDATE',
   );
   return rows;
 }

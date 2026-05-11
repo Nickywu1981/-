@@ -91,13 +91,13 @@ function handleDrop(e: DragEvent) {
   }
 }
 async function submitTask() {
-  processing.value = true; step.value = 2
+  processing.value = true
   try {
     const res: any = await $fetch('/api/advanced/model-generate', { method: 'POST', body: { image_url: uploadedUrl.value, model_type: selectedModel.value } })
+    step.value = 2
     resultUrl.value = res.data?.result_url || res.result_url
   } catch (err: any) {
     toast.error(err?.data?.msg || err?.message || '生成失败，请重试')
-    step.value = 1
   } finally { processing.value = false }
 }
 const { download } = useFileDownload()

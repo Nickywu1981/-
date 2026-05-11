@@ -145,17 +145,16 @@ async function handleDrop(e: DragEvent) {
 
 async function submitTask() {
   if (!uploadedUrl.value) { toast.warn('请先上传图片'); return; }
-  step.value = 3;
   try {
     const res = await $fetch('/api/images/main-image', {
       method: 'POST',
       credentials: 'include',
       body: { imageUrl: uploadedUrl.value, platform: selectedPlatform.value, style: selectedStyle.value },
     });
+    step.value = 3;
     task.pollTask((res as any).data.taskId);
   } catch (err: any) {
     toast.error(err?.data?.msg || err?.message || '任务提交失败，请重试');
-    step.value = 2;
   }
 }
 

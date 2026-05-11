@@ -48,9 +48,15 @@ export function useTask() {
       } catch (err: any) {
         console.warn('[useTask] 轮询请求失败', err?.message || err)
         consecutiveFailures++;
+        // 连续失败 3 次后报告错误状态
+        if (consecutiveFailures >= 3) {
+          errorMsg.value = '请求失败，请检查网络后刷新重试';
+          stopPolling();
+          return;
+        }
       }
 
-      // 自适应退避: 前5秒1s, 之后3s, 连续失败>3次则5s
+      // 自适应退避: 前5秒1s, 之后3s, 连续失败>3次则5s (but bail at 3)
       pollCount++;
       if (consecutiveFailures > 3) currentInterval = POLL_BACKOFF_MS;
       else if (pollCount > 5) currentInterval = POLL_INTERVAL_MS;

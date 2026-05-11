@@ -41,10 +41,10 @@ export async function countBillingHistory(userId) {
 export async function getDashboardStats() {
   const [[[{ userCount }]], [[{ taskCount }]], [[{ todayTaskCount }]], [[{ paidUserCount }]], [[{ totalRevenue }]]] = await Promise.all([
     pool.execute('SELECT COUNT(*) AS userCount FROM user WHERE is_deleted = 0'),
-    pool.execute('SELECT COUNT(*) AS taskCount FROM task'),
+    pool.execute('SELECT COUNT(*) AS taskCount FROM task WHERE status IN (1,2)'),
     pool.execute('SELECT COUNT(*) AS todayTaskCount FROM task WHERE DATE(create_time) = CURDATE()'),
-    pool.execute('SELECT COUNT(*) AS paidUserCount FROM user_membership WHERE plan_type > 0'),
-    pool.execute('SELECT COALESCE(SUM(consumed), 0) AS totalRevenue FROM consumption_record WHERE type = 3'),
+    pool.execute('SELECT COUNT(*) AS paidUserCount FROM user_membership WHERE plan_type > 0 AND is_deleted = 0'),
+    pool.execute('SELECT COALESCE(SUM(consumed), 0) AS totalRevenue FROM consumption_record WHERE type = 3 AND create_time >= DATE_FORMAT(CURDATE(),\'%Y-%m-01\')'),
   ]);
 
   const [[taskTrend], [userTrend], [revenueTrend]] = await Promise.all([

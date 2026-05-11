@@ -119,7 +119,7 @@ async function handleGenerate() {
     currentStep.value = 2
     task.pollTask(res.data.taskId, '/api/advanced/tasks/')
   } catch (e: any) { toast.error(e.data?.msg || '提交失败') }
-  submitting.value = false
+  finally { submitting.value = false }
 }
 
 function handleRedo() { task.reset(); currentStep.value = 0; previewUrl.value = ''; uploadedUrl.value = ''; submitting.value = false }

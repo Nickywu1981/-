@@ -127,9 +127,9 @@ const fetchAll = async () => {
   loading.value = true
   try {
     const [rec, temps, hist] = await Promise.all([
-      $fetch('/api/prompts/recommendations', { credentials: 'include' }).catch((err: any) => { console.warn('[prompt-hub] 推荐加载失败', err?.message || err); return { list: [] } }),
-      $fetch('/api/prompts?page=1&pageSize=60', { credentials: 'include' }).catch((err: any) => { console.warn('[prompt-hub] 模板加载失败', err?.message || err); return { list: [] } }),
-      $fetch('/api/prompts/usage-history?page=1&pageSize=10', { credentials: 'include' }).catch((err: any) => { console.warn('[prompt-hub] 历史加载失败', err?.message || err); return { list: [] } }),
+      $fetch('/api/prompts/recommendations', { credentials: 'include' }).catch((err: any) => { toast.error('推荐加载失败'); console.warn('[prompt-hub] 推荐加载失败', err?.message || err); return { list: [] } }),
+      $fetch('/api/prompts?page=1&pageSize=60', { credentials: 'include' }).catch((err: any) => { toast.error('模板加载失败'); console.warn('[prompt-hub] 模板加载失败', err?.message || err); return { list: [] } }),
+      $fetch('/api/prompts/usage-history?page=1&pageSize=10', { credentials: 'include' }).catch((err: any) => { toast.error('历史加载失败'); console.warn('[prompt-hub] 历史加载失败', err?.message || err); return { list: [] } }),
     ])
     recommendations.value = (rec as any).list || []
     templates.value = (temps as any).list || []
