@@ -38,7 +38,6 @@ import testWorkbenchRoutesV4 from './route/v4_test_workbench.routes.js';
 import notificationRoutes from './route/notificationRoutes.js';
 import smsRoutes from './route/smsRoutes.js';
 import emailRoutes from './route/emailRoutes.js';
-import uploadRoutes from './route/uploadRoutes.js';
 import promptRoutes from './route/promptRoutes.js';
 import creditRoutes from './route/creditRoutes.js';
 import tenantRoutes from './route/tenantRoutes.js';

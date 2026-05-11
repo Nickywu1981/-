@@ -1,8 +1,7 @@
 import { wrapController } from '../utils/wrapController.js';
 import abuseService from '../services/abuseService.js';
 import { parsePagination } from '../utils/pagination.js';
-import { success, error } from '../utils/response.js';
-import { ERROR_CODE } from '../constants/errorCode.js';
+import { success } from '../utils/response.js';
 
 export const listAllRecords = wrapController(async (req, res) => {
     const { page, pageSize } = parsePagination(req.query);
