@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { authMiddleware } from '../middleware/auth.js';
+import { rateLimiter } from '../middleware/rateLimiter.js';
 import { asyncHandler } from '../middleware/asyncHandler.js';
 import { validate, paginationSchema } from '../utils/validate.js';
 import { z } from 'zod';
@@ -12,6 +13,6 @@ const myWorksQuerySchema = paginationSchema.extend({
   type: z.string().optional(),
 });
 
-router.get('/my-works', authMiddleware, validate(myWorksQuerySchema, 'query'), asyncHandler(listMyWorks));
+router.get('/my-works', authMiddleware, rateLimiter, validate(myWorksQuerySchema, 'query'), asyncHandler(listMyWorks));
 
 export default router;

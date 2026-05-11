@@ -148,7 +148,6 @@ async function doUnbind(item: any) {
 }
 
 onMounted(() => fetchBindings())
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

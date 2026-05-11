@@ -4,8 +4,7 @@
 
     <div v-if="loading" class="loading-spin">加载中...</div>
     <div v-else-if="loadError" class="error-msg">{{ loadError }} <button class="btn-text" @click="loadData">重试</button></div>
-    <template v-else>
-
+    <div v-else>
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-label">账户余额</div>
@@ -59,8 +58,6 @@
       </div>
     </div>
   </div>
-</template>
-</template>
 
 <script setup>
 import { ref, onMounted } from 'vue';

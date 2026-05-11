@@ -88,7 +88,7 @@ async function mockPay(result: 'success' | 'fail') {
         status: result === 'success' ? '1' : '0',
       }).toString(),
     })
-  } catch (err: any) { console.warn('[payment-result] 回调发送失败', err?.message || err) }
+  } catch (err: any) { toast.error('回调发送失败，请刷新重试'); console.warn('[payment-result] 回调发送失败', err?.message || err) }
 
   mockMsg.value = result === 'success' ? '回调已发送，正在查询结果...' : '失败回调已发送'
 
@@ -117,6 +117,7 @@ function startPoll() {
         if (pollTimer) clearInterval(pollTimer)
       }
     } catch (err: any) {
+      toast.error('网络异常，请检查连接后刷新')
       console.warn('[payment-result] 轮询请求失败', err?.message || err)
       if (pollCount >= MAX_POLL) {
         status.value = 'fail'
