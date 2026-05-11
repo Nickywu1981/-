@@ -183,7 +183,7 @@ router.post('/product-ad', heavyLimiter, _validate(productAdSchema), tierGuard('
   } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 });
 
-router.post('/storyboard', heavyLimiter, _validate(storyboardSchema), async (req, res) => {
+router.post('/storyboard', heavyLimiter, tierGuard('video'), _validate(storyboardSchema), async (req, res) => {
   try {
     const { prompt, scene_count } = req.validated;
     const result = await videoService.generateStoryboard(req.user.id, { prompt, sceneCount: scene_count || 5 });
@@ -220,7 +220,7 @@ router.get('/action-migrate/batch/:id/progress', validate(idParamSchema, 'params
 // ============================================================
 // 爆款视频
 // ============================================================
-router.post('/viral/analyze', heavyLimiter, _validate(viralAnalyzeSchema), async (req, res) => {
+router.post('/viral/analyze', heavyLimiter, tierGuard('video'), _validate(viralAnalyzeSchema), async (req, res) => {
   try {
     const { video_url, platform } = req.validated;
     const result = await viralVideoService.analyzeViralVideo(req.user.id, { videoUrl: video_url, platform });
@@ -277,7 +277,7 @@ router.post('/optimize-audio', heavyLimiter, _validate(optimizeAudioSchema), tie
   } catch (err) { return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message); }
 });
 
-router.post('/subtitle-fix', heavyLimiter, _validate(subtitleFixSchema), async (req, res) => {
+router.post('/subtitle-fix', heavyLimiter, tierGuard('video'), _validate(subtitleFixSchema), async (req, res) => {
   try {
     const { video_url, source_language } = req.validated;
     const result = await liveClipService.subtitleCorrection(req.user.id, { videoUrl: video_url, sourceLanguage: source_language });

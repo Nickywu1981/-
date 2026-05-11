@@ -117,7 +117,7 @@ onMounted(fetchFavorites)
 .card-preview img { width: 100%; height: 100%; object-fit: cover; }
 .card-placeholder { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; font-size: 36px; }
 
-.card-remove { position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; border-radius: 50%; border: none; background: rgba(0,0,0,0.5); color: #fff; font-size: 16px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity var(--transition-fast); }
+.card-remove { position: absolute; top: 8px; right: 8px; min-width: 32px; min-height: 32px; border-radius: 50%; border: none; background: rgba(0,0,0,0.5); color: #fff; font-size: 16px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity var(--transition-fast); }
 .favorite-card:hover .card-remove { opacity: 1; }
 
 .card-body { padding: 12px; }

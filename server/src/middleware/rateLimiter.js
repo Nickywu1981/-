@@ -1,8 +1,7 @@
 /**
  * Movio AI — Rate Limiter Middleware
  *
- * Phase 0-A (2026-05-11): 新版统一限流注册表已迁移至 server/src/gateway/rateLimit.js
- * 本文件保留向后兼容，所有导出不变。
+ * 统一限流器定义，被 app.js 及所有路由文件引用。
  */
 import rateLimit from 'express-rate-limit';
 import { error } from '../utils/response.js';

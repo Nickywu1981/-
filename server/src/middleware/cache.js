@@ -1,4 +1,4 @@
-import { cacheGet, cacheSet } from '../dao/redis.js';
+import { cacheGet, cacheSet, getRedis } from '../dao/redis.js';
 import logger from '../utils/logger.js';
 
 /**
@@ -12,7 +12,6 @@ import logger from '../utils/logger.js';
 
 export function cacheMiddleware(ttl = 300, keyFn) {
   return async (req, res, next) => {
-    // 只缓存 GET 请求
     if (req.method !== 'GET') return next();
 
     try {
@@ -26,7 +25,6 @@ export function cacheMiddleware(ttl = 300, keyFn) {
         return res.json(cached);
       }
 
-      // 拦截 res.json 以捕获响应体, 完成后恢复原始方法
       const originalJson = res.json.bind(res);
       res.json = function (body) {
         if (res.statusCode === 200 && body?.code === 200) {
@@ -35,7 +33,6 @@ export function cacheMiddleware(ttl = 300, keyFn) {
         res.setHeader('X-Cache', 'MISS');
         return originalJson(body);
       };
-      // 响应完成/出错/客户端断开均恢复原始方法
       const restore = () => { res.json = originalJson; };
       res.on('finish', restore);
       res.on('close', restore);
@@ -44,19 +41,29 @@ export function cacheMiddleware(ttl = 300, keyFn) {
       next();
     } catch (err) {
       logger.warn('[Cache] 中间件失败', { error: err.message });
-      next(); // 缓存失败不影响主流程
+      next();
     }
   };
 }
 
-/** 清除匹配模式的缓存（通过前缀匹配内存缓存） */
+/**
+ * 通过 SCAN 非阻塞清除匹配模式的缓存。
+ * O(N) 遍历，分批 200 键，不阻塞 Redis 事件循环。
+ */
+async function scanAndDel(redis, pattern) {
+  let cursor = 0;
+  do {
+    const [nextCursor, keys] = await redis.scan(cursor, 'MATCH', pattern, 'COUNT', 200);
+    cursor = parseInt(nextCursor, 10);
+    if (keys.length) await redis.del(keys);
+  } while (cursor !== 0);
+}
+
 export async function invalidateCache(pattern) {
   try {
-    const redis = await import('../dao/redis.js');
-    const r = await redis.getRedis();
+    const r = await getRedis();
     if (r) {
-      const keys = await r.keys(`cache:${pattern}`);
-      if (keys.length) await r.del(keys);
+      await scanAndDel(r, `cache:${pattern}`);
     }
   } catch { /* ignore */ }
 }

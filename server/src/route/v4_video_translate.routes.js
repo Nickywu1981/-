@@ -12,6 +12,7 @@ import { validateV4 as _validate } from '../utils/validate.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { contentModerationMiddleware } from '../middleware/content-moderation.middleware.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
+import { tierGuard } from '../middleware/tierGuard.js';
 import { authMiddleware } from '../middleware/auth.js';
 import * as translateService from '../services/video-translate.service.js';
 
@@ -26,7 +27,7 @@ const baseTranslateSchema = z.object({
 
 // ─── POST /api/video-translate/voice ──────────────────────────
 router.post('/voice',
-  heavyLimiter, _validate(baseTranslateSchema.extend({
+  heavyLimiter, tierGuard('video'), _validate(baseTranslateSchema.extend({
     voiceType: z.string().default('natural'),
   })),
   contentModerationMiddleware,
@@ -43,7 +44,7 @@ router.post('/voice',
 
 // ─── POST /api/video-translate/subtitles ──────────────────────
 router.post('/subtitles',
-  heavyLimiter, _validate(baseTranslateSchema.extend({
+  heavyLimiter, tierGuard('video'), _validate(baseTranslateSchema.extend({
     subtitleStyle: z.string().default('default'),
   })),
   async (req, res) => {
@@ -59,7 +60,7 @@ router.post('/subtitles',
 
 // ─── POST /api/video-translate/face ───────────────────────────
 router.post('/face',
-  heavyLimiter, _validate(baseTranslateSchema.extend({
+  heavyLimiter, tierGuard('video'), _validate(baseTranslateSchema.extend({
     avatarStyle: z.string().default('original'),
   })),
   contentModerationMiddleware,

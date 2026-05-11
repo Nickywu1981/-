@@ -8,7 +8,25 @@
  * - 限流器配置摘要
  * - BullMQ 队列统计
  */
-import { getRateLimiterSummary } from './rateLimit.js';
+
+const RATE_LIMITER_REGISTRY = [
+  { name: 'apiLimiter',    tier: 'global',  description: '全局API限流 (200/min)' },
+  { name: 'authLimiter',   tier: 'strict',  description: '认证限流 (10/min)' },
+  { name: 'codeLimiter',   tier: 'strict',  description: '验证码限流 (1/min)' },
+  { name: 'verifyLimiter', tier: 'normal',  description: '验证校验限流 (5/min)' },
+  { name: 'heavyLimiter',  tier: 'heavy',   description: 'AI生成限流 (30/min)' },
+  { name: 'uploadLimiter', tier: 'normal',  description: '上传限流 (20/min)' },
+  { name: 'paymentLimiter',tier: 'strict',  description: '支付限流 (15/min)' },
+  { name: 'adminLimiter',  tier: 'admin',   description: '管理后台限流 (60/min)' },
+  { name: 'aiConcurrencyGuard', tier: 'heavy', description: 'AI并发控制 (3路)' },
+];
+
+/**
+ * 获取限流器注册表摘要（供健康仪表盘）
+ */
+function getRateLimiterSummary() {
+  return RATE_LIMITER_REGISTRY.map(({ name, tier, description }) => ({ name, tier, description }));
+}
 
 /**
  * 执行全量健康检查

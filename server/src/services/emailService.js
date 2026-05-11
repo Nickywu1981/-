@@ -19,7 +19,7 @@ setInterval(() => {
     if (entry.expires < now) CODE_CACHE.delete(key);
   }
   for (const [key, timestamps] of EMAIL_SEND_LOG) {
-    EMAIL_SEND_LOG.set(key, timestamps.filter((t: number) => now - t < 86400000));
+    EMAIL_SEND_LOG.set(key, timestamps.filter((t) => now - t < 86400000));
     if (EMAIL_SEND_LOG.get(key)?.length === 0) EMAIL_SEND_LOG.delete(key);
   }
 }, 300000).unref();

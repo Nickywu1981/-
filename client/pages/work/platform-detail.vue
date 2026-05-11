@@ -229,6 +229,6 @@ onMounted(() => { loadPlatforms(); });
 .preview-item { position: relative; background: var(--bg-card); border: 1px solid var(--input-border); border-radius: var(--radius-md); overflow: hidden; }
 .preview-thumb { width: 100%; height: 100px; object-fit: cover; display: block; }
 .role-select { width: 100%; padding: 4px 8px; border: none; border-top: 1px solid var(--input-border); font-size: 12px; background: var(--bg-input); color: var(--text-primary); outline: none; }
-.remove-btn { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border: none; border-radius: 50%; background: var(--danger); color: var(--text-on-brand); cursor: pointer; font-size: 11px; display: flex; align-items: center; justify-content: center; }
+.remove-btn { position: absolute; top: 4px; right: 4px; min-width: 28px; min-height: 28px; border: none; border-radius: 50%; background: var(--danger); color: var(--text-on-brand); cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; }
 .result-hint { color: var(--text-muted); margin-bottom: 16px; }
 </style>

@@ -225,7 +225,7 @@ onMounted(() => { loadTargets(); });
 .preview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin: 16px 0; }
 .preview-item { position: relative; }
 .preview-thumb { width: 100%; height: 90px; object-fit: cover; border-radius: var(--radius-md); border: 1px solid var(--input-border); }
-.remove-btn { position: absolute; top: 4px; right: 4px; width: 20px; height: 20px; border: none; border-radius: 50%; background: var(--danger); color: var(--text-on-brand); cursor: pointer; font-size: 10px; display: flex; align-items: center; justify-content: center; }
+.remove-btn { position: absolute; top: 4px; right: 4px; min-width: 28px; min-height: 28px; border: none; border-radius: 50%; background: var(--danger); color: var(--text-on-brand); cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; }
 
 .text-check-section { margin: 20px 0; }
 .text-check-section h4 { font-size: 14px; color: var(--text-secondary); margin-bottom: 8px; }

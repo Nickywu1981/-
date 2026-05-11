@@ -56,13 +56,13 @@ const whiteBgSchema = z.object({
 });
 
 // 所有图片任务需要登录
-router.post('/main-image', authMiddleware, tierGuard('image'), heavyLimiter, validate(mainImageSchema), asyncHandler(submitMainImage));
-router.post('/scene', authMiddleware, tierGuard('image'), heavyLimiter, validate(sceneImageSchema), asyncHandler(submitSceneImage));
-router.post('/detail-h5', authMiddleware, tierGuard('image'), heavyLimiter, validate(detailH5Schema), asyncHandler(submitDetailH5));
-router.post('/batch', authMiddleware, tierGuard('image'), heavyLimiter, validate(batchTaskSchema), asyncHandler(submitBatchTask));
-router.post('/retouch', authMiddleware, tierGuard('image'), heavyLimiter, validate(retouchSchema), asyncHandler(submitRetouch));
-router.post('/remove-bg', authMiddleware, tierGuard('image'), heavyLimiter, validate(removeBgSchema), asyncHandler(submitRemoveBg));
-router.post('/white-bg', authMiddleware, tierGuard('image'), heavyLimiter, validate(whiteBgSchema), asyncHandler(submitWhiteBg));
+router.post('/main-image', authMiddleware, heavyLimiter, tierGuard('image'), validate(mainImageSchema), asyncHandler(submitMainImage));
+router.post('/scene', authMiddleware, heavyLimiter, tierGuard('image'), validate(sceneImageSchema), asyncHandler(submitSceneImage));
+router.post('/detail-h5', authMiddleware, heavyLimiter, tierGuard('image'), validate(detailH5Schema), asyncHandler(submitDetailH5));
+router.post('/batch', authMiddleware, heavyLimiter, tierGuard('image'), validate(batchTaskSchema), asyncHandler(submitBatchTask));
+router.post('/retouch', authMiddleware, heavyLimiter, tierGuard('image'), validate(retouchSchema), asyncHandler(submitRetouch));
+router.post('/remove-bg', authMiddleware, heavyLimiter, tierGuard('image'), validate(removeBgSchema), asyncHandler(submitRemoveBg));
+router.post('/white-bg', authMiddleware, heavyLimiter, tierGuard('image'), validate(whiteBgSchema), asyncHandler(submitWhiteBg));
 
 // 任务查询
 router.get('/tasks', authMiddleware, validate(paginationSchema, 'query'), asyncHandler(listMyTasks));

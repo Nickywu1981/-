@@ -230,6 +230,24 @@ export function superAdminAuth(req, res, next) {
   next();
 }
 
+// ========================= 分端认证守卫 =========================
+
+/** 要求 enterprise 端用户 */
+export function enterpriseOnly(req, res, next) {
+  if (!req.user || req.user.audience !== 'enterprise') {
+    return sendError(res, ERROR_CODE.FORBIDDEN, '仅限企业端用户访问');
+  }
+  next();
+}
+
+/** 要求 consumer 端用户 */
+export function consumerOnly(req, res, next) {
+  if (!req.user || req.user.audience !== 'consumer') {
+    return sendError(res, ERROR_CODE.FORBIDDEN, '仅限C端用户访问');
+  }
+  next();
+}
+
 export { ROLES };
 
 // ========================= Refresh Token 中间件 =========================

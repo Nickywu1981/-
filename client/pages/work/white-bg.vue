@@ -223,7 +223,7 @@ onUnmounted(() => stopPolling())
 .btn-brand:disabled { opacity: 0.5; cursor: not-allowed; }
 .preview-box { position: relative; width: 100%; max-width: 320px; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--border-light); }
 .preview-box img { width: 100%; display: block; }
-.preview-remove { position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; border: none; border-radius: 50%; background: rgba(0,0,0,.5); color: #fff; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.preview-remove { position: absolute; top: 8px; right: 8px; min-width: 28px; min-height: 28px; border: none; border-radius: 50%; background: rgba(0,0,0,.5); color: #fff; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .msg { font-size: 13px; color: var(--text-muted); }
 .msg-error { color: var(--danger); }
 .actions { display: flex; align-items: center; gap: 16px; margin-top: 12px; }
