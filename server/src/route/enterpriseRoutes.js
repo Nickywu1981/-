@@ -12,7 +12,7 @@ import { z } from 'zod';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { authMiddleware, enterpriseOnly } from '../middleware/auth.middleware.js';
 import { roleGuard } from '../middleware/rbac.js';
-import { authLimiter, paymentLimiter } from '../middleware/rateLimiter.js';
+import { authLimiter } from '../middleware/rateLimiter.js';
 import { setCsrfCookie, csrfProtection } from '../middleware/csrf.js';
 import * as ctrl from '../controller/enterpriseController.js';
 
@@ -89,23 +89,24 @@ router.post('/logout', authMiddleware, enterpriseOnly, ctrl.logoutEnterprise);
 router.get('/plans', ctrl.listPlans);
 
 // ==================== 企业管理员路由 ====================
+router.use(authMiddleware, enterpriseOnly);
 
 // 企业信息 — CSRF 保护所有变更操作
-router.get('/profile', authMiddleware, enterpriseOnly, ctrl.getProfile);
-router.put('/profile', authMiddleware, enterpriseOnly, roleGuard('enterprise_admin'), csrfProtection, _validate(updateProfileSchema), ctrl.updateProfile);
+router.get('/profile', ctrl.getProfile);
+router.put('/profile', roleGuard('enterprise_admin'), csrfProtection, _validate(updateProfileSchema), ctrl.updateProfile);
 
 // 子账号管理
-router.get('/users', authMiddleware, enterpriseOnly, ctrl.listUsers);
-router.post('/users', authMiddleware, enterpriseOnly, roleGuard('enterprise_admin'), csrfProtection, _validate(addUserSchema), ctrl.addUser);
-router.put('/users/:id', authMiddleware, enterpriseOnly, roleGuard('enterprise_admin'), csrfProtection, _validate(updateUserSchema), ctrl.updateUser);
-router.delete('/users/:id', authMiddleware, enterpriseOnly, roleGuard('enterprise_admin'), csrfProtection, ctrl.removeUser);
+router.get('/users', ctrl.listUsers);
+router.post('/users', roleGuard('enterprise_admin'), csrfProtection, _validate(addUserSchema), ctrl.addUser);
+router.put('/users/:id', roleGuard('enterprise_admin'), csrfProtection, _validate(updateUserSchema), ctrl.updateUser);
+router.delete('/users/:id', roleGuard('enterprise_admin'), csrfProtection, ctrl.removeUser);
 
 // 仪表盘 & 用量（读操作无需 CSRF）
-router.get('/dashboard', authMiddleware, enterpriseOnly, ctrl.getDashboard);
-router.get('/usage', authMiddleware, enterpriseOnly, _validate(usageQuerySchema), ctrl.getUsage);
+router.get('/dashboard', ctrl.getDashboard);
+router.get('/usage', _validate(usageQuerySchema), ctrl.getUsage);
 
 // 白标配置
-router.get('/whitelabel', authMiddleware, enterpriseOnly, ctrl.getWhiteLabel);
-router.put('/whitelabel', authMiddleware, enterpriseOnly, roleGuard('enterprise_admin'), csrfProtection, _validate(updateWhiteLabelSchema), ctrl.updateWhiteLabel);
+router.get('/whitelabel', ctrl.getWhiteLabel);
+router.put('/whitelabel', roleGuard('enterprise_admin'), csrfProtection, _validate(updateWhiteLabelSchema), ctrl.updateWhiteLabel);
 
 export default router;

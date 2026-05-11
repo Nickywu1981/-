@@ -51,23 +51,26 @@ const perfQuerySchema = z.object({
   pageSize: z.coerce.number().int().min(1).max(200).optional().default(20),
 });
 
+// ==================== 全局中间件 ====================
+router.use(authMiddleware, rateLimiter, enterpriseOnly);
+
 // ==================== 渠道关系 ====================
 
-router.get('/relations', authMiddleware, rateLimiter, enterpriseOnly, ctrl.listChannels);
-router.get('/relations/:id', authMiddleware, rateLimiter, enterpriseOnly, ctrl.getChannelDetail);
-router.post('/relations', authMiddleware, rateLimiter, enterpriseOnly, csrfProtection, validate(applySchema), ctrl.applyChannel);
-router.put('/relations/:id/audit', authMiddleware, rateLimiter, enterpriseOnly, roleGuard('enterprise_admin'), csrfProtection, validate(auditSchema), ctrl.auditChannel);
-router.get('/downstream', authMiddleware, rateLimiter, enterpriseOnly, ctrl.getDownstreamAgents);
+router.get('/relations', ctrl.listChannels);
+router.get('/relations/:id', ctrl.getChannelDetail);
+router.post('/relations', csrfProtection, validate(applySchema), ctrl.applyChannel);
+router.put('/relations/:id/audit', roleGuard('enterprise_admin'), csrfProtection, validate(auditSchema), ctrl.auditChannel);
+router.get('/downstream', ctrl.getDownstreamAgents);
 
 // ==================== 分润政策 ====================
 
-router.get('/policies', authMiddleware, rateLimiter, enterpriseOnly, ctrl.listPolicies);
-router.post('/policies', authMiddleware, rateLimiter, enterpriseOnly, roleGuard('enterprise_admin'), csrfProtection, validate(policySchema), ctrl.createPolicy);
-router.put('/policies/:id', authMiddleware, rateLimiter, enterpriseOnly, roleGuard('enterprise_admin'), csrfProtection, validate(policyUpdateSchema), ctrl.updatePolicy);
+router.get('/policies', ctrl.listPolicies);
+router.post('/policies', roleGuard('enterprise_admin'), csrfProtection, validate(policySchema), ctrl.createPolicy);
+router.put('/policies/:id', roleGuard('enterprise_admin'), csrfProtection, validate(policyUpdateSchema), ctrl.updatePolicy);
 
 // ==================== 渠道业绩 ====================
 
-router.get('/performance', authMiddleware, rateLimiter, enterpriseOnly, validate(perfQuerySchema, 'query'), ctrl.getPerformance);
-router.get('/performance/summary', authMiddleware, rateLimiter, enterpriseOnly, ctrl.getPerformanceSummary);
+router.get('/performance', validate(perfQuerySchema, 'query'), ctrl.getPerformance);
+router.get('/performance/summary', ctrl.getPerformanceSummary);
 
 export default router;

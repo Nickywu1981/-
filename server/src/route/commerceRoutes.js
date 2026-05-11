@@ -20,8 +20,10 @@ const orderQuerySchema = z.object({
   pageSize: z.coerce.number().int().min(1).max(200).optional().default(20),
 });
 
+router.use(authMiddleware, rateLimiter, enterpriseOnly);
+
 // 企业端订单列表（仅查看旗下客户订单）
-router.get('/', authMiddleware, rateLimiter, enterpriseOnly, validate(orderQuerySchema, 'query'), async (req, res, next) => {
+router.get('/', validate(orderQuerySchema, 'query'), async (req, res, next) => {
   try {
     const tenantId = getTenantId(req);
     const { page, pageSize, status, startDate, endDate, keyword } = req.query;
@@ -49,7 +51,7 @@ router.get('/', authMiddleware, rateLimiter, enterpriseOnly, validate(orderQuery
 });
 
 // 订单详情
-router.get('/:id', authMiddleware, rateLimiter, enterpriseOnly, async (req, res, next) => {
+router.get('/:id', async (req, res, next) => {
   try {
     const tenantId = getTenantId(req);
     const [rows] = await pool.query(
@@ -64,7 +66,7 @@ router.get('/:id', authMiddleware, rateLimiter, enterpriseOnly, async (req, res,
 });
 
 // 订单统计（概览卡片）
-router.get('/stats/summary', authMiddleware, rateLimiter, enterpriseOnly, async (req, res, next) => {
+router.get('/stats/summary', async (req, res, next) => {
   try {
     const tenantId = getTenantId(req);
     const [rows] = await pool.query(
