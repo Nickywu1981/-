@@ -28,7 +28,8 @@
           <input type="date" v-model="dateRange.end" @change="loadData" class="input input-sm" />
         </div>
       </div>
-      <table class="data-table" v-if="stats.length">
+      <div v-if="loading" class="loading-spin">加载中...</div>
+      <table class="data-table" v-else-if="stats.length">
         <thead><tr><th>日期</th><th>订单数</th><th>营收</th><th>退款</th><th>净收入</th></tr></thead>
         <tbody>
           <tr v-for="d in stats" :key="d.date">
@@ -40,15 +41,18 @@
           </tr>
         </tbody>
       </table>
-      <p v-else class="empty">暂无数据</p>
+      <p v-else-if="!loading" class="empty">暂无数据</p>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
+import { useToast } from '~/composables/useToast';
+const toast = useToast();
 
 const period = ref('daily');
+const loading = ref(false);
 const summary = ref({});
 const stats = ref([]);
 const dateRange = ref({ start: '', end: '' });
@@ -64,7 +68,9 @@ onMounted(() => {
 });
 
 async function loadData() {
+  loading.value = true;
   await Promise.all([loadSummary(), loadStats()]);
+  loading.value = false;
 }
 
 async function loadSummary() {
@@ -74,7 +80,7 @@ async function loadSummary() {
     if (dateRange.value.end) q.set('endDate', dateRange.value.end);
     const r = await $fetch(`/api/enterprise/commerce/stats/summary?${q}`, { credentials: 'include' });
     if (r.code === 200) summary.value = r.data;
-  } catch (e) { console.error(e); }
+  } catch (e) { console.error(e); toast.error('数据加载失败'); }
 }
 
 async function loadStats() {
@@ -84,7 +90,7 @@ async function loadStats() {
     if (dateRange.value.end) q.set('endDate', dateRange.value.end);
     const r = await $fetch(`/api/analytics/trend?${q}`, { credentials: 'include' });
     if (r.code === 200) stats.value = r.data?.list || r.data || [];
-  } catch (e) { console.error(e); }
+  } catch (e) { console.error(e); toast.error('趋势数据加载失败'); }
 }
 
 function switchPeriod(p) { period.value = p; loadStats(); }

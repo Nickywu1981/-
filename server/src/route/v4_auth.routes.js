@@ -139,11 +139,11 @@ router.post('/reset-password', authLimiter, _validate(resetPasswordSchema), asyn
 router.post('/logout', authLimiter, csrfProtection, optionalAuth, async (req, res) => {
   const header = req.headers.authorization;
   if (header?.startsWith('Bearer ')) {
-    try { await revokeAccessToken(header.slice(7)); } catch { /* best-effort */ }
+    try { await revokeAccessToken(header.slice(7)); } catch { /* best-effort — token may already be expired */ }
   }
   const rt = req.cookies?.refreshToken;
   if (rt) {
-    try { await revokeRefreshToken(rt); } catch { /* best-effort */ }
+    try { await revokeRefreshToken(rt); } catch { /* best-effort — token may already be expired */ }
     res.clearCookie('refreshToken', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/' });
   }
   res.clearCookie('token', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/' });

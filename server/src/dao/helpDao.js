@@ -34,11 +34,13 @@ export default {
   },
 
   async updateFaq(id, data) {
-    await pool.query('UPDATE help_faq SET ? WHERE id = ?', [pickAllowed(data, FAQ_COLS), id]);
+    const [result] = await pool.query('UPDATE help_faq SET ? WHERE id = ?', [pickAllowed(data, FAQ_COLS), id]);
+    return result.affectedRows;
   },
 
   async deleteFaq(id) {
-    await pool.query('DELETE FROM help_faq WHERE id = ?', [id]);
+    const [result] = await pool.query('DELETE FROM help_faq WHERE id = ?', [id]);
+    return result.affectedRows;
   },
 
   async insertSeed() {

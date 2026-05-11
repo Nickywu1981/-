@@ -58,9 +58,11 @@ router.get('/api/geo/suggest-locale', async (req, res) => {
       const locale = COUNTRY_TO_LOCALE[cc] || 'zh';
       return success(res, { locale, country: cc, source: 'ip-api' });
     } catch {
+      // IP-API unreachable — fallback to zh
       return success(res, { locale: 'zh', country: 'UNKNOWN', source: 'error-fallback' });
     }
   } catch {
+    // outer guard — return safe default
     return success(res, { locale: 'zh', country: 'UNKNOWN', source: 'error-fallback' });
   }
 });

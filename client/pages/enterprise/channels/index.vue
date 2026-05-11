@@ -15,7 +15,8 @@
     <!-- 下级代理列表 -->
     <div class="card">
       <h3>下级代理</h3>
-      <table class="data-table" v-if="channels.list?.length">
+      <div v-if="loading" class="loading-spin">加载中...</div>
+      <table class="data-table" v-else-if="channels.list?.length">
         <thead><tr><th>代理名称</th><th>编码</th><th>层级</th><th>联系人</th><th>状态</th><th>申请时间</th><th>操作</th></tr></thead>
         <tbody>
           <tr v-for="ch in channels.list" :key="ch.id">
@@ -38,7 +39,7 @@
         <span>第 {{ channels.page }} / {{ Math.ceil(channels.total / channels.pageSize) }} 页</span>
         <button :disabled="channels.page >= Math.ceil(channels.total / channels.pageSize)" @click="loadChannels(channels.page + 1)">下一页</button>
       </div>
-      <p v-else class="empty">暂无渠道关系</p>
+      <p v-else-if="!loading" class="empty">暂无渠道关系</p>
     </div>
 
     <!-- 申请弹窗 -->
@@ -71,6 +72,7 @@ import { useToast } from '~/composables/useToast';
 
 const toast = useToast();
 const router = useRouter();
+const loading = ref(true);
 const isAgent = ref(true);
 const channels = reactive({ list: [], total: 0, page: 1, pageSize: 20 });
 const policies = ref([]);
@@ -86,27 +88,28 @@ const pendingCount = computed(() => channels.list.filter(c => c.status === 'pend
 
 onMounted(async () => {
   await Promise.all([loadChannels(), loadPolicies(), loadDownstream()]);
+  loading.value = false;
 });
 
 async function loadChannels(page = 1) {
   try {
     const data = await $fetch(`/api/enterprise/channel/relations?page=${page}&pageSize=${channels.pageSize}`, { credentials: 'include' });
     if (data.code === 200) Object.assign(channels, data.data);
-  } catch (e) { console.debug('loadChannels failed', e); }
+  } catch (e) { console.error('loadChannels failed', e); toast.error('渠道列表加载失败'); }
 }
 
 async function loadPolicies() {
   try {
     const data = await $fetch('/api/enterprise/channel/policies', { credentials: 'include' });
     if (data.code === 200) policies.value = data.data;
-  } catch (e) { console.debug('loadPolicies failed', e); }
+  } catch (e) { console.error('loadPolicies failed', e); toast.error('策略加载失败'); }
 }
 
 async function loadDownstream() {
   try {
     const data = await $fetch('/api/enterprise/channel/downstream', { credentials: 'include' });
     if (data.code === 200) downstream.value = data.data;
-  } catch (e) { /* ignore */ }
+  } catch (e) { console.error('loadDownstream failed', e); }
 }
 
 async function doApply() {

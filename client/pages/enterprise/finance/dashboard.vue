@@ -58,8 +58,11 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue';
 import { useApi } from '~/composables/useApi';
+import { useToast } from '~/composables/useToast';
 const api = useApi();
+const toast = useToast();
 
 const dashboard = ref({ balance: 0, totalRevenue: 0, monthRevenue: 0, totalWithdrawn: 0 });
 const isAgent = ref(false);
@@ -69,7 +72,7 @@ onMounted(async () => {
     const data = await api.get('/enterprise/finance/dashboard');
     dashboard.value = data;
     isAgent.value = !!data.earnings;
-  } catch (e) { console.error(e); }
+  } catch (e) { console.error(e); toast.error('财务数据加载失败，请刷新重试'); }
 });
 
 function fmt(n) { return (Number(n) || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2 }); }

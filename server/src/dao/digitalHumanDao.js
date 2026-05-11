@@ -22,10 +22,10 @@ export default {
     return { list: rows, total, page, limit };
   },
 
-  async updateStatus(id, status, outputUrl = null) {
+  async updateStatus(id, userId, status, outputUrl = null) {
     await db.query(
-      'UPDATE digital_human_jobs SET status = ?, output_url = COALESCE(?, output_url) WHERE id = ?',
-      [status, outputUrl, id],
+      'UPDATE digital_human_jobs SET status = ?, output_url = COALESCE(?, output_url) WHERE id = ? AND user_id = ?',
+      [status, outputUrl, id, userId],
     );
   },
 };

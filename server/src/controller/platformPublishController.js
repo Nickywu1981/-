@@ -39,9 +39,9 @@ export const publish = wrapController(async (req, res) => {
   setImmediate(async () => {
     try {
       // TODO: 调用真实平台 API
-      await platformPublishDao.updatePublishStatus(record.id, 'success', `https://${platform}.com/item/${itemId || record.id}`);
+      await platformPublishDao.updatePublishStatus(record.id, req.userId, 'success', `https://${platform}.com/item/${itemId || record.id}`);
     } catch (e) {
-      await platformPublishDao.updatePublishStatus(record.id, 'failed', null, '平台发布失败');
+      await platformPublishDao.updatePublishStatus(record.id, req.userId, 'failed', null, '平台发布失败');
     }
   });
   return success(res, { id: record.id, status: 'pending' }, '发布任务已提交');

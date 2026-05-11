@@ -50,10 +50,10 @@ export default {
     return { id: result.insertId };
   },
 
-  async updatePublishStatus(id, status, resultUrl = null, errorMsg = null) {
+  async updatePublishStatus(id, userId, status, resultUrl = null, errorMsg = null) {
     await db.query(
-      'UPDATE platform_publish_history SET status = ?, result_url = COALESCE(?, result_url), error_msg = COALESCE(?, error_msg) WHERE id = ?',
-      [status, resultUrl, errorMsg, id],
+      'UPDATE platform_publish_history SET status = ?, result_url = COALESCE(?, result_url), error_msg = COALESCE(?, error_msg) WHERE id = ? AND user_id = ?',
+      [status, resultUrl, errorMsg, id, userId],
     );
   },
 

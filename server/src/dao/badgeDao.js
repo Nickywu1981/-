@@ -5,17 +5,17 @@ import pool from './db.js';
 const table = 'marketing_badges';
 
 export async function listBadges({ category, status } = {}) {
-  let sql = `SELECT * FROM ${table} WHERE is_deleted = 0`;
+  let sql = `SELECT id, name, icon, style_class, category, sort_order, status, is_deleted, created_at FROM ${table} WHERE is_deleted = 0`;
   const params = [];
   if (status !== undefined) { sql += ' AND status = ?'; params.push(status); }
   if (category) { sql += ' AND category = ?'; params.push(category); }
-  sql += ' ORDER BY sort_order ASC, id DESC';
+  sql += ' ORDER BY sort_order ASC, id DESC LIMIT 200';
   const [rows] = await pool.execute(sql, params);
   return rows;
 }
 
 export async function getBadgeById(id) {
-  const [rows] = await pool.execute(`SELECT * FROM ${table} WHERE id = ? AND is_deleted = 0`, [id]);
+  const [rows] = await pool.execute(`SELECT id, name, icon, style_class, category, sort_order, status, is_deleted, created_at FROM ${table} WHERE id = ? AND is_deleted = 0`, [id]);
   return rows[0] || null;
 }
 

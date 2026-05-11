@@ -342,11 +342,35 @@ const handleScroll = () => {
     scrollTicking = true;
   }
 };
+// Scroll-triggered entrance animations
+const animatedEls = ref<Set<Element>>(new Set())
+let entranceObserver: IntersectionObserver | null = null
 onMounted(() => {
   window.addEventListener('scroll', handleScroll, { passive: true });
   checkAuth();
+  // Entrance animation observer
+  if (process.client && window.IntersectionObserver) {
+    entranceObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !animatedEls.value.has(entry.target)) {
+          animatedEls.value.add(entry.target)
+          entry.target.classList.add('lp-in')
+        }
+      })
+    }, { threshold: 0.12, rootMargin: '0px 0px -32px 0px' })
+    document.querySelectorAll('.lp-card, .lp-mf-card, .lp-step, .lp-case, .lp-plan, .lp-faq-it').forEach(el => entranceObserver!.observe(el))
+    // Safety: reveal all cards after 2s in case observer misses above-fold content
+    setTimeout(() => {
+      document.querySelectorAll('.lp-card, .lp-mf-card, .lp-step, .lp-case, .lp-plan, .lp-faq-it').forEach(el => {
+        if (!animatedEls.value.has(el)) { el.classList.add('lp-in') }
+      })
+    }, 2000)
+  }
 });
-onUnmounted(() => { window.removeEventListener('scroll', handleScroll); });
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll);
+  if (entranceObserver) entranceObserver.disconnect();
+});
 
 const tabs = computed(() => [
   { key: 'all', label: t('landing.features_tab_all'), icon: '✦' },
@@ -706,6 +730,59 @@ const displayPlans = computed(() => apiPricing.value || plans.value)
 /* ============ TRANSITIONS ============ */
 .sd-enter-active, .sd-leave-active { transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1); }
 .sd-enter-from, .sd-leave-to { opacity: 0; transform: translateY(-8px); }
+
+/* ============ ENTRANCE ANIMATIONS ============ */
+/* Cards start invisible, become visible after JS hydrates */
+.lp-card, .lp-mf-card, .lp-step, .lp-case, .lp-plan, .lp-faq-it {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1), transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* SSR/noscript fallback: reveal immediately */
+@media (scripting: none) {
+  .lp-card, .lp-mf-card, .lp-step, .lp-case, .lp-plan, .lp-faq-it { opacity: 1; transform: none; }
+}
+.lp-card.lp-in, .lp-mf-card.lp-in, .lp-step.lp-in, .lp-case.lp-in, .lp-plan.lp-in, .lp-faq-it.lp-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+/* Stagger delays for grid children */
+.lp-mf-card:nth-child(1) { transition-delay: 0s; }
+.lp-mf-card:nth-child(2) { transition-delay: 0.06s; }
+.lp-mf-card:nth-child(3) { transition-delay: 0.12s; }
+.lp-mf-card:nth-child(4) { transition-delay: 0.18s; }
+.lp-mf-card:nth-child(5) { transition-delay: 0.24s; }
+.lp-mf-card:nth-child(6) { transition-delay: 0.30s; }
+.lp-mf-card:nth-child(7) { transition-delay: 0.36s; }
+.lp-mf-card:nth-child(8) { transition-delay: 0.42s; }
+
+/* Hero gradient subtle shimmer */
+.lp-hero-h1 em {
+  background-size: 200% 200%;
+  animation: lp-gradient-shift 6s ease-in-out infinite alternate;
+}
+@keyframes lp-gradient-shift {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+/* CTA glow pulse */
+.lp-cta-glow {
+  animation: lp-cta-pulse 4s ease-in-out infinite alternate;
+}
+@keyframes lp-cta-pulse {
+  0% { opacity: 0.6; transform: scale(1); }
+  100% { opacity: 1; transform: scale(1.05); }
+}
+
+/* Skip-link focus animation */
+.lp-skip:focus {
+  animation: lp-skip-in 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes lp-skip-in {
+  from { top: -40px; }
+  to { top: 8px; }
+}
 
 /* ============ DARK MODE ============ */
 :root[data-theme="dark"] .lp, :root.dark .lp { background: #121212; color: #e5e5e5; }

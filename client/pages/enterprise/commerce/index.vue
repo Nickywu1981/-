@@ -25,7 +25,8 @@
     </div>
 
     <!-- 订单列表 -->
-    <table class="data-table" v-if="orders.list?.length">
+    <div v-if="loading" class="loading-spin">加载中...</div>
+    <table class="data-table" v-else-if="orders.list?.length">
       <thead><tr><th>订单号</th><th>客户</th><th>金额</th><th>状态</th><th>下单时间</th><th>操作</th></tr></thead>
       <tbody>
         <tr v-for="o in orders.list" :key="o.id">
@@ -38,7 +39,7 @@
         </tr>
       </tbody>
     </table>
-    <p v-else class="empty">暂无订单</p>
+    <p v-else-if="!loading" class="empty">暂无订单</p>
 
     <div class="pagination" v-if="orders.total > orders.pageSize">
       <button :disabled="orders.page <= 1" @click="loadOrders(orders.page - 1)">上一页</button>
@@ -55,12 +56,13 @@ import { useToast } from '~/composables/useToast';
 
 const toast = useToast()
 const router = useRouter();
+const loading = ref(true);
 const orders = reactive({ list: [], total: 0, page: 1, pageSize: 20 });
 const summary = ref({});
 const filters = reactive({ status: '', keyword: '' });
 let searchTimer: ReturnType<typeof setTimeout>;
 
-onMounted(() => { loadOrders(); loadSummary(); });
+onMounted(async () => { await Promise.all([loadOrders(), loadSummary()]); loading.value = false; });
 onUnmounted(() => { clearTimeout(searchTimer); });
 
 async function loadOrders(page = 1) {
@@ -71,13 +73,13 @@ async function loadOrders(page = 1) {
   try {
     const r = await $fetch(`/api/enterprise/commerce?${q}`, { credentials: 'include' });
     if (r.code === 200) Object.assign(orders, r.data);
-  } catch (e) { console.debug('loadOrders', e); toast.error('订单列表加载失败'); }
+  } catch (e) { console.error('loadOrders', e); toast.error('订单列表加载失败'); }
 }
 async function loadSummary() {
   try {
     const r = await $fetch('/api/enterprise/commerce/stats/summary', { credentials: 'include' });
     if (r.code === 200) summary.value = r.data;
-  } catch (e) { console.debug('loadSummary', e); }
+  } catch (e) { console.error('loadSummary', e); toast.error('数据概览加载失败'); }
 }
 function debounceSearch() { clearTimeout(searchTimer); searchTimer = setTimeout(() => loadOrders(), 400); }
 function statusClass(s) { return { pending: 'status-warn', paid: 'status-ok', processing: 'status-info', completed: 'status-ok', refunded: 'status-err', cancelled: 'status-err' }[s] || ''; }

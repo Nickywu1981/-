@@ -25,10 +25,10 @@ export default {
     return { list: rows, total, page, limit };
   },
 
-  async updateStatus(id, status, outputUrl = null, errorMsg = null) {
+  async updateStatus(id, userId, status, outputUrl = null, errorMsg = null) {
     await db.query(
-      'UPDATE video_translate_jobs SET status = ?, output_url = COALESCE(?, output_url), error_msg = COALESCE(?, error_msg) WHERE id = ?',
-      [status, outputUrl, errorMsg, id],
+      'UPDATE video_translate_jobs SET status = ?, output_url = COALESCE(?, output_url), error_msg = COALESCE(?, error_msg) WHERE id = ? AND user_id = ?',
+      [status, outputUrl, errorMsg, id, userId],
     );
   },
 };
