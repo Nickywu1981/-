@@ -173,5 +173,21 @@
     "credits": "Credits",
     "notifications": "Notifications",
     "settings": "Settings"
+  },
+  "enterprise": {
+    "dashboard": "Dashboard",
+    "finance": "Finance",
+    "users": "Sub-accounts",
+    "customers": "Customers",
+    "tags": "Tags",
+    "channels": "Channels",
+    "distribution": "Distribution",
+    "commerce": "Orders",
+    "reports": "Reports",
+    "usage": "Usage",
+    "plans": "Plans",
+    "whitelabel": "White Label",
+    "settings": "Settings",
+    "logout": "Logout"
   }
 }

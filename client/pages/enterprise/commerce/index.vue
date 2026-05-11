@@ -21,7 +21,7 @@
         <option value="refunded">已退款</option>
         <option value="cancelled">已取消</option>
       </select>
-      <input v-model="filters.keyword" placeholder="搜索订单号/客户名/手机号" @input="debounceSearch" class="input" />
+      <input v-model="filters.keyword" placeholder="搜索订单号/客户名/手机号" @change="debounceSearch" class="input" />
     </div>
 
     <!-- 订单列表 -->
@@ -67,13 +67,13 @@ async function loadOrders(page = 1) {
   if (filters.keyword) q.set('keyword', filters.keyword);
   try {
     const r = await $fetch(`/api/enterprise/commerce?${q}`, { credentials: 'include' });
-    if (r.code === 0) Object.assign(orders, r.data);
+    if (r.code === 200) Object.assign(orders, r.data);
   } catch (e) { console.debug('loadOrders', e); }
 }
 async function loadSummary() {
   try {
     const r = await $fetch('/api/enterprise/commerce/stats/summary', { credentials: 'include' });
-    if (r.code === 0) summary.value = r.data;
+    if (r.code === 200) summary.value = r.data;
   } catch (e) { /* ignore */ }
 }
 function debounceSearch() { clearTimeout(searchTimer); searchTimer = setTimeout(() => loadOrders(), 400); }

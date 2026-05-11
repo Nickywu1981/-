@@ -7,47 +7,47 @@
       </div>
       <nav class="ent-nav">
         <NuxtLink to="/enterprise/dashboard" class="ent-nav-item">
-          <span class="icon">📊</span> 工作台
+          <span class="icon">📊</span> {{ $t('enterprise.dashboard') }}
         </NuxtLink>
         <NuxtLink to="/enterprise/finance/dashboard" class="ent-nav-item">
-          <span class="icon">💵</span> 财务管理
+          <span class="icon">💵</span> {{ $t('enterprise.finance') }}
         </NuxtLink>
         <NuxtLink to="/enterprise/users" class="ent-nav-item">
-          <span class="icon">👥</span> 子账号管理
+          <span class="icon">👥</span> {{ $t('enterprise.users') }}
         </NuxtLink>
         <NuxtLink to="/enterprise/customers" class="ent-nav-item">
-          <span class="icon">👤</span> 客户管理
+          <span class="icon">👤</span> {{ $t('enterprise.customers') }}
         </NuxtLink>
         <NuxtLink to="/enterprise/customers/tags" class="ent-nav-item">
-          <span class="icon">🏷️</span> 标签管理
+          <span class="icon">🏷️</span> {{ $t('enterprise.tags') }}
         </NuxtLink>
         <NuxtLink to="/enterprise/channels" class="ent-nav-item">
-          <span class="icon">🔗</span> 渠道管理
+          <span class="icon">🔗</span> {{ $t('enterprise.channels') }}
         </NuxtLink>
         <NuxtLink to="/enterprise/distribution" class="ent-nav-item">
-          <span class="icon">📢</span> 推广分销
+          <span class="icon">📢</span> {{ $t('enterprise.distribution') }}
         </NuxtLink>
         <NuxtLink to="/enterprise/commerce" class="ent-nav-item">
-          <span class="icon">📦</span> 商品订单
+          <span class="icon">📦</span> {{ $t('enterprise.commerce') }}
         </NuxtLink>
         <NuxtLink to="/enterprise/reports" class="ent-nav-item">
-          <span class="icon">📋</span> 数据报表
+          <span class="icon">📋</span> {{ $t('enterprise.reports') }}
         </NuxtLink>
         <NuxtLink to="/enterprise/usage" class="ent-nav-item">
-          <span class="icon">📈</span> 用量明细
+          <span class="icon">📈</span> {{ $t('enterprise.usage') }}
         </NuxtLink>
         <NuxtLink to="/enterprise/plans" class="ent-nav-item">
-          <span class="icon">💎</span> 套餐管理
+          <span class="icon">💎</span> {{ $t('enterprise.plans') }}
         </NuxtLink>
         <NuxtLink to="/enterprise/whitelabel" class="ent-nav-item">
-          <span class="icon">🎨</span> 白标设置
+          <span class="icon">🎨</span> {{ $t('enterprise.whitelabel') }}
         </NuxtLink>
         <NuxtLink to="/enterprise/settings" class="ent-nav-item">
-          <span class="icon">⚙️</span> 账户设置
+          <span class="icon">⚙️</span> {{ $t('enterprise.settings') }}
         </NuxtLink>
       </nav>
       <div class="ent-footer">
-        <button class="logout-btn" @click="handleLogout">退出登录</button>
+        <button class="logout-btn" @click="handleLogout">{{ $t('enterprise.logout') }}</button>
       </div>
     </aside>
 

@@ -16,7 +16,7 @@ const stats = ref({});
 onMounted(async () => {
   try {
     const r = await $fetch('/api/distribution/stats', { credentials: 'include' });
-    stats.value = r.data || {};
+    if (r.code === 200) stats.value = r.data || {};
   } catch (e) { /* ignore */ }
 });
 </script>

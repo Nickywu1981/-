@@ -173,5 +173,21 @@
     "credits": "积分",
     "notifications": "消息通知",
     "settings": "设置"
+  },
+  "enterprise": {
+    "dashboard": "工作台",
+    "finance": "财务管理",
+    "users": "子账号管理",
+    "customers": "客户管理",
+    "tags": "标签管理",
+    "channels": "渠道管理",
+    "distribution": "推广分销",
+    "commerce": "商品订单",
+    "reports": "数据报表",
+    "usage": "用量明细",
+    "plans": "套餐管理",
+    "whitelabel": "白标设置",
+    "settings": "账户设置",
+    "logout": "退出登录"
   }
 }

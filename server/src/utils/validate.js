@@ -33,7 +33,7 @@ export function validate(schema, source = 'body') {
  */
 export function validateV4(schema, source = 'body') {
   return (req, res, next) => {
-    const data = source === 'body' ? req.body : req.query;
+    const data = req[source] || req.body;
     const result = schema.safeParse(data);
     if (!result.success) {
       if (isProduction) {
@@ -44,7 +44,7 @@ export function validateV4(schema, source = 'body') {
     if (source === 'body') {
       req.validated = result.data;
     } else {
-      req.query = result.data;
+      req[source] = result.data;
     }
     next();
   };

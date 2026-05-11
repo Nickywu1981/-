@@ -2,6 +2,8 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { validateV4 as validate } from '../utils/validate.js';
 import { authMiddleware, enterpriseOnly } from '../middleware/auth.middleware.js';
+import { success, error } from '../utils/response.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 import pool from '../dao/db.js';
 
 const router = Router({ mergeParams: true });
@@ -41,7 +43,7 @@ router.get('/', authMiddleware, enterpriseOnly, validate(orderQuerySchema, 'quer
       `SELECT COUNT(*) AS total FROM \`order\` o WHERE ${conditions.join(' AND ')}`,
       params,
     );
-    res.json({ code: 0, data: { list: rows, total, page: +page, pageSize: +pageSize } });
+    return success(res, { list: rows, total, page: +page, pageSize: +pageSize });
   } catch (e) { next(e); }
 });
 
@@ -55,8 +57,8 @@ router.get('/:id', authMiddleware, enterpriseOnly, async (req, res, next) => {
        WHERE o.id = ? AND o.tenant_id = ?`,
       [req.params.id, tenantId],
     );
-    if (!rows.length) return res.status(404).json({ code: 404, message: '订单不存在' });
-    res.json({ code: 0, data: rows[0] });
+    if (!rows.length) return error(res, ERROR_CODE.NOT_FOUND, '订单不存在');
+    return success(res, rows[0]);
   } catch (e) { next(e); }
 });
 
@@ -72,7 +74,7 @@ router.get('/stats/summary', authMiddleware, enterpriseOnly, async (req, res, ne
        FROM \`order\` WHERE tenant_id = ?`,
       [tenantId],
     );
-    res.json({ code: 0, data: rows[0] });
+    return success(res, rows[0]);
   } catch (e) { next(e); }
 });
 

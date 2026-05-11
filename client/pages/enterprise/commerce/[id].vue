@@ -24,7 +24,7 @@ const router = useRouter(); const route = useRoute(); const order = ref(null);
 onMounted(async () => {
   try {
     const r = await $fetch(`/api/enterprise/commerce/${route.params.id}`, { credentials: 'include' });
-    if (r.code === 0) order.value = r.data;
+    if (r.code === 200) order.value = r.data;
   } catch (e) { console.debug('loadOrder', e); }
 });
 function statusClass(s) { return { pending: 'status-warn', paid: 'status-ok', processing: 'status-info', completed: 'status-ok', refunded: 'status-err', cancelled: 'status-err' }[s] || ''; }

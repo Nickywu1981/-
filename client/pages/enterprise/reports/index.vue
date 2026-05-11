@@ -40,13 +40,13 @@ onMounted(async () => {
 async function loadSummary() {
   try {
     const r = await $fetch('/api/enterprise/commerce/stats/summary', { credentials: 'include' });
-    if (r.code === 0) summary.value = r.data;
+    if (r.code === 200) summary.value = r.data;
   } catch (e) { /* ignore */ }
 }
 async function loadDaily() {
   try {
     const r = await $fetch('/api/analytics/trend', { credentials: 'include' });
-    if (r.code === 0) dailyStats.value = r.data?.list || r.data || [];
+    if (r.code === 200) dailyStats.value = r.data?.list || r.data || [];
   } catch (e) { /* ignore */ }
 }
 </script>
