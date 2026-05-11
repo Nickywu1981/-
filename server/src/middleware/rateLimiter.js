@@ -41,7 +41,7 @@ function getConcurrencyKey(req) {
   return req.user?.id || ip.replace(/^::ffff:/, '');
 }
 
-export function concurrencyGuard(maxConcurrent = CONCURRENCY_MAX_PER_USER) {
+function concurrencyGuard(maxConcurrent = CONCURRENCY_MAX_PER_USER) {
   return (req, res, next) => {
     const key = getConcurrencyKey(req);
     const entry = userConcurrency.get(key) || { count: 0, ts: Date.now() };
