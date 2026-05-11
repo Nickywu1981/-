@@ -10,7 +10,13 @@ import { error } from '../utils/response.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const UPLOAD_DIR = path.join(__dirname, '../../uploads/images');
-fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+
+let _dirReady = false;
+async function ensureUploadDir() {
+  if (_dirReady) return;
+  await fs.promises.mkdir(UPLOAD_DIR, { recursive: true });
+  _dirReady = true;
+}
 
 // 文件头魔数签名（前 N 字节十六进制）
 const MAGIC_SIGNATURES = {
@@ -53,7 +59,10 @@ function checkMagicNumber(filePath, mimeType) {
 }
 
 const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, UPLOAD_DIR),
+  destination: async (_req, _file, cb) => {
+    await ensureUploadDir();
+    cb(null, UPLOAD_DIR);
+  },
   filename: (_req, file, cb) => {
     const ext = MIME_TO_EXT[file.mimetype] || '.png';
     const name = `${Date.now()}_${crypto.randomBytes(4).toString('hex')}${ext}`;

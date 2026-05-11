@@ -79,7 +79,12 @@ export async function adaptImage(inputPath, platformCode, outputDir) {
   }
 
   const path = await import('path');
-  const sharp = (await import('sharp')).default;
+  let sharp;
+  try {
+    sharp = (await import('sharp')).default;
+  } catch {
+    throw new BusinessError(500, '图片处理模块未安装，请联系管理员');
+  }
   const ext = 'jpg';
   const baseName = path.basename(inputPath, path.extname(inputPath));
   const outputFileName = `${baseName}_${platformCode}.${ext}`;

@@ -210,14 +210,14 @@ async function loadTemplates() {
   try {
     const res = await $fetch('/api/batch/templates', { credentials: 'include' });
     templates.value = (res as any).data?.list || [];
-  } catch (e: any) { console.error('[批量处理] 模板加载失败', e.message) }
+  } catch (e: any) { toast.error('模板加载失败，请刷新页面重试'); console.error('[批量处理] 模板加载失败', e.message) }
 }
 
 async function loadHistory() {
   try {
     const res = await $fetch('/api/batch/history?pageSize=3', { credentials: 'include' });
     history.value = (res as any).data?.list || [];
-  } catch (e: any) { console.error('[批量处理] 历史加载失败', e.message) }
+  } catch (e: any) { toast.error('历史记录加载失败，请刷新页面重试'); console.error('[批量处理] 历史加载失败', e.message) }
 }
 
 function applyTemplate(t: any) {

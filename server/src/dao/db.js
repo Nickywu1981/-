@@ -148,6 +148,7 @@ const realPool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: dbConfig.connectionLimit || 20,
   queueLimit: 0,
+  acquireTimeout: 10000,
   enableKeepAlive: true,
   keepAliveInitialDelay: 10000,
   idleTimeout: 60000,

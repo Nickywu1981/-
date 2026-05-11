@@ -151,20 +151,20 @@ export default {
   // ==================== 版本管理（增强版） ====================
 
   async saveVersion(pageId, mobileConfig, pcConfig, { remark, autoSave = false, rollbackFrom = null }) {
-    const [r] = await pool.query('SELECT COALESCE(MAX(version),0)+1 as v FROM diy_page_version WHERE page_id = ?', [pageId]);
-    const v = r[0].v;
-    await pool.query(
-      'INSERT INTO diy_page_version (page_id, version, mobile_config, pc_config, remark, auto_save, rollback_from) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [pageId, v, JSON.stringify(mobileConfig || {}), JSON.stringify(pcConfig || {}), remark || null, autoSave ? 1 : 0, rollbackFrom || null],
-    );
-    // clip auto-save versions if > 30
-    if (autoSave) {
-      await pool.query(
-        'DELETE FROM diy_page_version WHERE page_id = ? AND auto_save = 1 AND id NOT IN (SELECT id FROM (SELECT id FROM diy_page_version WHERE page_id = ? AND auto_save = 1 ORDER BY id DESC LIMIT 30) t)',
-        [pageId, pageId],
-      ).catch(() => {});
-    }
-    return v;
+    return withTransaction(async (conn) => {
+      const [[{ v }]] = await conn.query('SELECT COALESCE(MAX(version),0)+1 as v FROM diy_page_version WHERE page_id = ?', [pageId]);
+      await conn.query(
+        'INSERT INTO diy_page_version (page_id, version, mobile_config, pc_config, remark, auto_save, rollback_from) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        [pageId, v, JSON.stringify(mobileConfig || {}), JSON.stringify(pcConfig || {}), remark || null, autoSave ? 1 : 0, rollbackFrom || null],
+      );
+      if (autoSave) {
+        await conn.query(
+          'DELETE FROM diy_page_version WHERE page_id = ? AND auto_save = 1 AND id NOT IN (SELECT id FROM (SELECT id FROM diy_page_version WHERE page_id = ? AND auto_save = 1 ORDER BY id DESC LIMIT 30) t)',
+          [pageId, pageId],
+        ).catch(() => {});
+      }
+      return v;
+    });
   },
 
   async listVersions(pageId, { includeAuto = false } = {}) {
