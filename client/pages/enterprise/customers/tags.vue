@@ -1,8 +1,8 @@
 <template>
   <div class="ent-tags">
     <div class="page-header">
-      <h1 class="page-title">标签管理</h1>
-      <button class="btn-primary" @click="showAdd = true">+ 新建标签</button>
+      <h1 class="page-title">{{ $t('enterprise.customers.tags.title') }}</h1>
+      <button class="btn-primary" @click="showAdd = true">+ {{ $t('enterprise.customers.tags.createTag') }}</button>
     </div>
 
     <div class="tag-grid" v-if="!loading">
@@ -13,31 +13,31 @@
           <span class="tag-color">{{ t.color }}</span>
         </div>
         <div class="tag-actions">
-          <button class="btn-sm" @click="editTag(t)">编辑</button>
-          <button class="btn-sm danger" @click="handleDelete(t)">删除</button>
+          <button class="btn-sm" @click="editTag(t)">{{ $t('enterprise.customers.tags.edit') }}</button>
+          <button class="btn-sm danger" @click="handleDelete(t)">{{ $t('enterprise.customers.tags.delete') }}</button>
         </div>
       </div>
-      <div v-if="!tags.length" class="empty">暂无标签，点击上方按钮新建</div>
+      <div v-if="!tags.length" class="empty">{{ $t('enterprise.customers.tags.noTags') }}</div>
     </div>
 
     <!-- 新建/编辑弹窗 -->
     <div class="modal-overlay" v-if="showAdd || showEdit" @click.self="closeModal">
       <div class="modal">
-        <h3>{{ showEdit ? '编辑标签' : '新建标签' }}</h3>
+        <h3>{{ showEdit ? $t('enterprise.customers.tags.editTag') : $t('enterprise.customers.tags.newTag') }}</h3>
         <div class="form-group">
-          <label>标签名称</label>
-          <input v-model="form.name" placeholder="如：高价值客户" class="form-input" maxlength="50" />
+          <label>{{ $t('enterprise.customers.tags.tagName') }}</label>
+          <input v-model="form.name" :placeholder="$t('enterprise.customers.tags.tagNamePlaceholder')" class="form-input" maxlength="50" />
         </div>
         <div class="form-group">
-          <label>标签颜色</label>
+          <label>{{ $t('enterprise.customers.tags.tagColor') }}</label>
           <div class="color-row">
             <input type="color" v-model="form.color" class="color-picker" />
             <span class="color-hex">{{ form.color }}</span>
           </div>
         </div>
         <div class="modal-actions">
-          <button class="btn-text" @click="closeModal">取消</button>
-          <button class="btn-primary" @click="submitForm">{{ showEdit ? '保存' : '创建' }}</button>
+          <button class="btn-text" @click="closeModal">{{ $t('enterprise.common.cancel') }}</button>
+          <button class="btn-primary" @click="submitForm">{{ showEdit ? $t('enterprise.common.save') : $t('enterprise.customers.tags.create') }}</button>
         </div>
       </div>
     </div>
@@ -48,6 +48,7 @@
 definePageMeta({ layout: 'enterprise' });
 import { ref, reactive, onMounted } from 'vue';
 
+const { t } = useI18n()
 const tags = ref([]);
 const loading = ref(true);
 const showAdd = ref(false);
@@ -91,7 +92,7 @@ async function submitForm() {
 }
 
 async function handleDelete(t) {
-  if (!confirm(`确认删除标签"${t.name}"？关联的客户将自动解绑。`)) return;
+  if (!confirm(t('enterprise.customers.tags.confirmDelete', { name: t.name }))) return;
   try {
     await $api(`/tags/${t.id}`, { method: 'DELETE' });
     loadTags();

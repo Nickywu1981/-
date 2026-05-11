@@ -23,38 +23,38 @@
 
       <!-- 会员信息 -->
       <div class="card">
-        <h3>会员信息</h3>
+        <h3>{{ $t('enterprise.customers.detail.memberInfo') }}</h3>
         <div class="info-grid">
-          <div class="info-item"><span class="label">会员等级</span><span>{{ planLabel(customer.plan_type) }}</span></div>
-          <div class="info-item"><span class="label">积分余额</span><span>{{ customer.credit_balance ?? 0 }}</span></div>
-          <div class="info-item"><span class="label">会员开始</span><span>{{ formatDate(customer.membership_start) }}</span></div>
-          <div class="info-item"><span class="label">会员到期</span><span>{{ formatDate(customer.membership_end) }}</span></div>
+          <div class="info-item"><span class="label">{{ $t('enterprise.customers.detail.memberLevel') }}</span><span>{{ planLabel(customer.plan_type) }}</span></div>
+          <div class="info-item"><span class="label">{{ $t('enterprise.customers.detail.pointsBalance') }}</span><span>{{ customer.credit_balance ?? 0 }}</span></div>
+          <div class="info-item"><span class="label">{{ $t('enterprise.customers.detail.memberStart') }}</span><span>{{ formatDate(customer.membership_start) }}</span></div>
+          <div class="info-item"><span class="label">{{ $t('enterprise.customers.detail.memberExpire') }}</span><span>{{ formatDate(customer.membership_end) }}</span></div>
         </div>
       </div>
 
       <!-- 标签 -->
       <div class="card">
-        <h3>客户标签</h3>
+        <h3>{{ $t('enterprise.customers.detail.customerTags') }}</h3>
         <div class="tag-row">
           <span v-for="t in customer.tags" :key="t.id" class="tag-chip" :style="{ background: t.color }">{{ t.name }}</span>
-          <span v-if="!customer.tags?.length" class="text-muted">暂无标签</span>
+          <span v-if="!customer.tags?.length" class="text-muted">{{ $t('enterprise.customers.detail.noTags') }}</span>
         </div>
       </div>
 
       <!-- 统计 -->
       <div class="card">
-        <h3>使用统计</h3>
+        <h3>{{ $t('enterprise.customers.detail.usageStats') }}</h3>
         <div class="stats-row">
-          <div class="stat-card"><span class="stat-num">{{ customer.stats?.taskTotal || 0 }}</span><span class="stat-label">总任务数</span></div>
-          <div class="stat-card"><span class="stat-num">&yen;{{ customer.stats?.totalSpent || 0 }}</span><span class="stat-label">累计消费</span></div>
+          <div class="stat-card"><span class="stat-num">{{ customer.stats?.taskTotal || 0 }}</span><span class="stat-label">{{ $t('enterprise.customers.detail.totalTasks') }}</span></div>
+          <div class="stat-card"><span class="stat-num">&yen;{{ customer.stats?.totalSpent || 0 }}</span><span class="stat-label">{{ $t('enterprise.customers.detail.totalSpent') }}</span></div>
         </div>
       </div>
 
       <!-- 消费记录 -->
       <div class="card">
-        <h3>最近订单</h3>
+        <h3>{{ $t('enterprise.customers.detail.recentOrders') }}</h3>
         <table v-if="customer.recentOrders?.length">
-          <thead><tr><th>订单类型</th><th>金额</th><th>备注</th><th>时间</th></tr></thead>
+          <thead><tr><th>{{ $t('enterprise.customers.detail.orderType') }}</th><th>{{ $t('enterprise.customers.detail.amount') }}</th><th>{{ $t('enterprise.customers.detail.remark') }}</th><th>{{ $t('enterprise.customers.detail.time') }}</th></tr></thead>
           <tbody>
             <tr v-for="o in customer.recentOrders" :key="o.id">
               <td>{{ orderActionLabel(o.action) }}</td>
@@ -64,10 +64,10 @@
             </tr>
           </tbody>
         </table>
-        <div v-else class="empty">暂无订单记录</div>
+        <div v-else class="empty">{{ $t('enterprise.customers.detail.noOrders') }}</div>
       </div>
     </template>
-    <div v-else class="empty">客户不存在</div>
+    <div v-else class="empty">{{ $t('enterprise.customers.detail.notFound') }}</div>
   </div>
 </template>
 
@@ -76,6 +76,7 @@ definePageMeta({ layout: 'enterprise' });
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 
+const { t } = useI18n()
 const route = useRoute();
 const customer = ref(null);
 const loading = ref(true);
@@ -89,10 +90,10 @@ async function loadDetail() {
   loading.value = false;
 }
 
-function planLabel(type) { const map = { 1: '月卡', 2: '季卡', 3: '年卡' }; return map[type] || '免费'; }
+function planLabel(type) { const map = { 1: t('enterprise.customers.index.memberMonthly'), 2: t('enterprise.customers.index.memberQuarterly'), 3: t('enterprise.customers.index.memberYearly') }; return map[type] || t('enterprise.common.freeLabel'); }
 function formatDate(d) { return d ? new Date(d).toLocaleString('zh-CN') : '-'; }
 function orderActionLabel(a) {
-  const map = { purchase_plan_1: '月卡', purchase_plan_2: '季卡', purchase_plan_3: '年卡' };
+  const map = { purchase_plan_1: t('enterprise.customers.index.memberMonthly'), purchase_plan_2: t('enterprise.customers.index.memberQuarterly'), purchase_plan_3: t('enterprise.customers.index.memberYearly') };
   return map[a] || a || '-';
 }
 

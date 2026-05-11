@@ -12,7 +12,7 @@ import crypto from 'node:crypto';
 import WebSocket from 'ws';
 
 const AUDIO_DIR = path.join(process.cwd(), 'uploads', 'audio');
-const EDGE_WS_URL = process.env.EDGE_TTS_WS_URL || 'wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=6A5AA1D4EAFF4E9FB37E23D68491D6F4';
+const EDGE_WS_URL = process.env.EDGE_TTS_WS_URL || `wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=${process.env.EDGE_TTS_TRUSTED_TOKEN || '6A5AA1D4EAFF4E9FB37E23D68491D6F4'}`;
 
 const EDGE_TTS_VOICES = {
   'sweet-female': 'zh-CN-XiaoxiaoNeural',

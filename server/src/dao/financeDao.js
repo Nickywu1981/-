@@ -17,19 +17,29 @@ export async function listBankAccounts(tenantId, { limit = 50 } = {}) {
 }
 
 export async function addBankAccount(tenantId, data) {
-  if (data.isDefault) {
-    await pool.query('UPDATE bank_account SET is_default = 0 WHERE tenant_id = ?', [tenantId]);
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+    if (data.isDefault) {
+      await conn.query('UPDATE bank_account SET is_default = 0 WHERE tenant_id = ?', [tenantId]);
+    }
+    const [result] = await conn.query('INSERT INTO bank_account SET ?', {
+      tenant_id: tenantId,
+      account_type: data.accountType,
+      account_name: data.accountName,
+      account_no: data.accountNo,
+      bank_name: data.bankName || null,
+      bank_branch: data.bankBranch || null,
+      is_default: data.isDefault ? 1 : 0,
+    });
+    await conn.commit();
+    return result;
+  } catch (e) {
+    await conn.rollback();
+    throw e;
+  } finally {
+    conn.release();
   }
-  const [result] = await pool.query('INSERT INTO bank_account SET ?', {
-    tenant_id: tenantId,
-    account_type: data.accountType,
-    account_name: data.accountName,
-    account_no: data.accountNo,
-    bank_name: data.bankName || null,
-    bank_branch: data.bankBranch || null,
-    is_default: data.isDefault ? 1 : 0,
-  });
-  return result.insertId;
 }
 
 export async function findBankAccountById(id, tenantId) {

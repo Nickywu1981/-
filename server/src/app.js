@@ -329,7 +329,7 @@ app.use('/api/admin/geo-rules', adminLimiter, geoRuleAdminRouter);
 app.use('/api/site-config/public', siteConfigPublicRouter);
 app.use('/api/badges', adminLimiter, badgeRoutes);
 app.use('/api/tier', apiLimiter, tierRoutes);
-app.use('/api/admin/abuse', abuseRoutes);
+app.use('/api/admin/abuse', adminLimiter, abuseRoutes);
 app.use('/api/platforms', platformDetailRoutes);
 app.use('/api/multilingual', multilingualRoutes);
 app.use('/api/analytics', analyticsRoutes);
