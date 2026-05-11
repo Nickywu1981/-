@@ -172,7 +172,7 @@ function removeSku(i: number) { skuList.value.splice(i, 1); }
 async function uploadSingle(file: File): Promise<string> {
   const formData = new FormData(); formData.append('file', file);
   const res: any = await $fetch('/api/upload/image', { method: 'POST', credentials: 'include', body: formData });
-  return res.data.url;
+  return res?.data?.url || '';
 }
 
 async function handleFiles(e: Event) {

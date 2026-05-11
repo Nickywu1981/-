@@ -259,7 +259,8 @@ async function loadPage() {
   if (!id) { navigateTo('/diy'); return }
   try {
     const res: any = await $fetch(`/api/diy/${id}`)
-    pageInfo.value = res.data
+    pageInfo.value = res?.data
+    if (!res?.data) { toast.error('页面数据为空'); return }
     const isPC = res.data.page_type === 'pc'
     const mCfg = res.data.mobile_config || { sections: [] }
     const pCfg = res.data.pc_config || { sections: [] }

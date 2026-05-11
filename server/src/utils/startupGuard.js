@@ -62,13 +62,7 @@ export function validateStartupConfig() {
     }
   }
 
-  // P1: CSRF secret strength (beyond known defaults)
-  if (isProd && (!process.env.CSRF_SECRET || process.env.CSRF_SECRET === 'dev-csrf-secret' || process.env.CSRF_SECRET === 'your-csrf-secret')) {
-    errors.push('生产环境必须设置强 CSRF_SECRET');
-  }
-  if (isProd && process.env.CSRF_SECRET && process.env.CSRF_SECRET.length < 32) {
-    errors.push('生产环境 CSRF_SECRET 长度不足 32 字符');
-  }
+  // P1: CSRF_SECRET 已移除 — csrf.js 使用 crypto.randomBytes 动态生成，不使用环境变量
 
   // P1: ALLINPAY payment keys in production
   if (isProd) {

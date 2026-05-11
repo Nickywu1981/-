@@ -26,15 +26,20 @@ const config = {
   jwt: {
     secret: (() => {
       const s = process.env.JWT_SECRET;
-      if (s && s.length >= 32) return s;
-      if (process.env.NODE_ENV === 'development') {
-        if (!s || s === 'dev-secret' || s.length < 16) {
-          throw new Error('JWT_SECRET 开发环境必须使用至少16字符的密钥，严禁使用 dev-secret');
+      if (!s || s === 'dev-secret' || s.length < 16) {
+        if (process.env.NODE_ENV === 'production') {
+          throw new Error('JWT_SECRET 生产环境必须使用至少32字符的密钥');
         }
-        console.warn('[config] 警告: JWT_SECRET 长度不足32字符，仅允许开发环境使用');
-        return s;
+        console.warn('[config] JWT_SECRET 未设置或过短，开发环境使用临时密钥（生产环境启动将被 startupGuard 拦截）');
+        return 'dev-temp-' + require('crypto').randomBytes(16).toString('hex');
       }
-      throw new Error('JWT_SECRET 必须通过环境变量设置且长度 >= 32 字符');
+      if (s.length < 32 && process.env.NODE_ENV !== 'development') {
+        throw new Error('JWT_SECRET 非开发环境必须 >= 32 字符');
+      }
+      if (s.length < 32) {
+        console.warn('[config] JWT_SECRET 长度不足32字符，仅允许开发环境使用');
+      }
+      return s;
     })(),
     expiresIn: process.env.JWT_EXPIRES_IN || '7d',
   },

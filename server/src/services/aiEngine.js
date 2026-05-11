@@ -168,8 +168,12 @@ export async function infer(modelId, input, options = {}) {
         const cacheKey = `${modelId}:${JSON.stringify(input)}`;
         inferenceCache.set(cacheKey, { result: output, timestamp: Date.now() });
         if (inferenceCache.size > MAX_CACHE_SIZE) {
-          const oldest = inferenceCache.keys().next().value;
-          if (oldest) inferenceCache.delete(oldest);
+          let oldestKey = null;
+          let oldestTs = Infinity;
+          for (const [k, v] of inferenceCache) {
+            if (v.timestamp < oldestTs) { oldestTs = v.timestamp; oldestKey = k; }
+          }
+          if (oldestKey) inferenceCache.delete(oldestKey);
         }
       }
 

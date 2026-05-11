@@ -42,9 +42,9 @@ async function loadPage() {
   try {
     const slug = route.query.slug || 'product-detail-demo'
     const res = await $fetch(`/api/diy/published/${slug}`)
-    page.value = res.data
-    const isPC = res.data?.page_type === 'pc'
-    const config = isPC ? (res.data?.pcConfig || res.data?.mobileConfig) : (res.data?.mobileConfig || res.data?.pcConfig)
+    page.value = res?.data
+    const isPC = res?.data?.page_type === 'pc'
+    const config = isPC ? (res?.data?.pcConfig || res?.data?.mobileConfig) : (res?.data?.mobileConfig || res?.data?.pcConfig)
     sections.value = config?.sections || []
   } catch (e: any) {
     error.value = '页面加载失败: ' + (e.data?.msg || e.message)

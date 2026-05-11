@@ -66,6 +66,9 @@ export class SessionStore {
         }
       }
     }, intervalMs);
+    if (this._cleanupTimer && typeof this._cleanupTimer.unref === 'function') {
+      this._cleanupTimer.unref();
+    }
     return this;
   }
 

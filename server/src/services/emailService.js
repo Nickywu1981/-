@@ -12,6 +12,18 @@ import * as codeStore from './codeStore.js';
 const CODE_CACHE = new Map(); // key: email, value: { code, expires, attempts }
 const EMAIL_SEND_LOG = new Map(); // key: email, value: [timestamp, ...]
 
+// 定期清理过期验证码和发送日志，防止内存泄漏
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, entry] of CODE_CACHE) {
+    if (entry.expires < now) CODE_CACHE.delete(key);
+  }
+  for (const [key, timestamps] of EMAIL_SEND_LOG) {
+    EMAIL_SEND_LOG.set(key, timestamps.filter((t: number) => now - t < 86400000));
+    if (EMAIL_SEND_LOG.get(key)?.length === 0) EMAIL_SEND_LOG.delete(key);
+  }
+}, 300000).unref();
+
 // ==================== HTML 模板消毒 ====================
 
 function sanitizeHtml(html) {
