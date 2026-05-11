@@ -47,7 +47,10 @@ function downloadItem(item: any) {
 }
 
 function exportAll() {
-  items.value.filter(i => i.result_url).forEach((item, i) => {
+  const downloadable = items.value.filter(i => i.result_url)
+  if (!downloadable.length) { toast.warn('没有可下载的作品'); return }
+  toast.info(`正在导出 ${downloadable.length} 个文件...`)
+  downloadable.forEach((item, i) => {
     setTimeout(() => downloadItem(item), i * 300)
   })
 }

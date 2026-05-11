@@ -113,7 +113,7 @@
         <p>{{ $t('landing.memfocus_desc') }}</p>
       </div>
       <div class="lp-mf-grid">
-        <div class="lp-mf-card" v-for="c in memfocusCards" :key="c.key">
+        <div class="lp-mf-card" v-for="(c, i) in memfocusCards" :key="i">
           <div class="lp-mf-badge">{{ c.badge }}</div>
           <div class="lp-mf-title">{{ c.title }}</div>
           <div class="lp-mf-sub">{{ c.sub }}</div>
@@ -353,76 +353,24 @@ const tabs = computed(() => [
   { key: 'ai', label: t('landing.features_tab_ai'), icon: '◆' },
 ]);
 
-const memfocusCards = [
-  { key:'memory', badge:'记忆力', title:'过目不忘', sub:'精准回顾每个客户', api:'四层记忆 API', story:'王女士上次买了胶原蛋白果冻——问她要不要复购', metricLabel:'客户留存提升', metricValue:'+37%' },
-  { key:'priority', badge:'判断力', title:'优先级分拣', sub:'退款先处理，新品排队', api:'注意力引擎 API', story:'退款投诉立刻处理，新品咨询排队稍后——优先级的艺术', metricLabel:'紧急工单响应', metricValue:'<30s' },
-  { key:'context', badge:'理解力', title:'一点就通', sub:'语境感知，指代消解', api:'上下文管理 API', story:'客户说"那个红色的"——秘书知道指的是上次聊的红色连衣裙', metricLabel:'上下文窗口', metricValue:'8K tokens' },
-  { key:'i18n', badge:'多语言', title:'7 国语物料', sub:'比本地团队更懂当地审美', api:'跨境本地化 API', story:'中文产品一键出 7 国物料——比本地团队更懂当地审美', metricLabel:'覆盖语种', metricValue:'7 语' },
-  { key:'copy', badge:'写作力', title:'转化率导向', sub:'标题/卖点/详情/脚本', api:'内容生成 API', story:'标题/卖点/详情/直播脚本——比文案更懂转化率', metricLabel:'内容类型覆盖', metricValue:'6 类' },
-  { key:'compliance', badge:'风控力', title:'五层过滤', sub:'零违规处罚', api:'安全合规 API', story:'五层敏感词过滤，零违规处罚——比合规经理更严谨', metricLabel:'过滤层数', metricValue:'5 层' },
-  { key:'video', badge:'视觉力', title:'100 SKU 并行', sub:'2 小时搞定全部视频', api:'视频批量生成 API', story:'15s/30s TikTok 商品视频——100 SKU 并行 2 小时搞定', metricLabel:'并行吞吐', metricValue:'100 SKU' },
-  { key:'uptime', badge:'永不离职', title:'24×7 巅峰', sub:'不请假不跳槽不闹情绪', api:'24×7 API 可用', story:'没有请假、不闹情绪、不跳槽——每次调用都是巅峰状态', metricLabel:'可用性目标', metricValue:'99.9%' },
-];
+const memfocusCards = computed(() => t('landing.memfocus_cards') as any[])
+const steps = computed(() => t('landing.steps') as any[])
+const useCases = computed(() => t('landing.use_cases') as any[])
+const faqs = computed(() => t('landing.faqs') as any[])
+const platforms = computed(() => t('landing.platforms') as string[])
 
-const cards = [
-  { id: 'main', icon: '▣', title: '智能做主图', desc: 'AI 自动抠图→白底→精修→裁切→品牌水印，一键生成3张风格主图', tags: ['爆款商品图', '13平台适配'], color: '#EDE9FE', ai: true, route: '/work/main-image', category: 'image' },
-  { id: 'scene', icon: '◈', title: '智能做场景', desc: '产品图+AI场景库→自动光影融合→出5张场景图，支持自定义背景', tags: ['场景融合', '光影匹配'], color: '#DBEAFE', ai: true, route: '/work/scene', category: 'image' },
-  { id: 'detail', icon: '⊞', title: '智能做详情', desc: '产品图→AI自动生成文案+图文排版→完整详情页，多品类适配', tags: ['AI文案', '自动排版'], color: '#D1FAE5', ai: true, route: '/work/detail-h5', category: 'image' },
-  { id: 'video', icon: '▶', title: '智能做视频', desc: '图片/多图→AI生成带货视频→自动字幕+BGM→1080×1920竖屏输出', tags: ['AI运镜', '自动字幕'], color: '#FEF3C7', ai: true, route: '/work/video', category: 'video' },
-  { id: 'batch', icon: '⊡', title: '批量处理', desc: '文件夹拖入→选操作→后台排队→完成通知→ZIP下载，支持夜间托管', tags: ['批量队列', '夜间折扣'], color: '#F3E8FF', ai: false, route: '/work/batch', category: 'image' },
-  { id: 'tryon', icon: '◇', title: '虚拟模特', desc: '服装平铺图→真人模特上身效果，多肤色/体型/风格可选', tags: ['AI试穿', '多肤色'], color: '#ECFEFF', ai: true, route: '/work/virtual-tryon', category: 'image' },
-  { id: 'action', icon: '◉', title: '动作迁移', desc: '人物图+参考动作视频→AI精准迁移动作姿态，生成流畅展示视频', tags: ['动作捕捉', '精准迁移'], color: '#FCE7F3', ai: true, route: '/work/action-transfer', category: 'video' },
-  { id: 'color', icon: '◐', title: '一键换色', desc: '服装鞋包颜色变换，保留褶皱纹理质感，支持批量换色', tags: ['多色生成', '纹理保留'], color: '#FFF7ED', ai: true, route: '/work/color-swap', category: 'image' },
-  { id: 'style', icon: '◧', title: '风格转化', desc: '6大风格一键转换：复古/国潮/插画/水彩/赛博/极简，保留商品特征', tags: ['6大风格', '创意设计'], color: '#F0FDF4', ai: true, route: '/work/style-transfer', category: 'image' },
-  { id: 'digital', icon: '◓', title: '口播数字人', desc: '输入文案→选数字人形象+语音→AI生成带货口播视频', tags: ['数字人', 'TTS语音'], color: '#FFFBEB', ai: true, route: '/work/digital-human', category: 'video' },
-  { id: 'script', icon: '▤', title: '带货脚本', desc: '产品卖点→AI生成短视频口播/直播话术/种草文案，支持9语种+3脚本类型', tags: ['9语种', '口播+话术'], color: '#FDF2F8', ai: true, route: '/work/script-gen', category: 'ai' },
-  { id: 'viral', icon: '◆', title: '爆款复刻', desc: '对标爆款视频→AI分析节奏/色调/转场→用你的产品重新生成相似风格', tags: ['爆款分析', '风格复刻'], color: '#FEF2F2', ai: true, route: '/work/viral-clone', category: 'video' },
-  { id: 'remove-bg', icon: '◯', title: '智能抠图', desc: 'AI发丝级抠图，毛发/透明体/复杂边缘精准分离，支持单品+批量处理', tags: ['发丝级', '批量抠图'], color: '#E8F5E9', ai: true, route: '/work/remove-bg', category: 'image' },
-  { id: 'white-bg', icon: '▭', title: '白底图生成', desc: '抠图后智能生成纯白/场景底图，自动光影校正+阴影保留，平台直出', tags: ['白底/透明', '光影校正'], color: '#F5F5F5', ai: true, route: '/work/white-bg', category: 'image' },
-  { id: 'retouch', icon: '✦', title: '图片精修', desc: 'AI自动祛皱/去污/补光/锐化，保留材质纹理，批量提升产品图质感', tags: ['祛皱补光', '纹理保留'], color: '#FFF8E1', ai: true, route: '/work/retouch', category: 'image' },
-  { id: 'platform-detail', icon: '▥', title: '平台详情页模板', desc: '13大电商平台详情页模板库，选平台→选模板→上传素材→一键生成适配尺寸', tags: ['13平台', '尺寸适配'], color: '#EFF6FF', ai: true, route: '/work/platform-detail', category: 'image' },
-  { id: 'compliance', icon: '◬', title: '跨境合规检查', desc: '上传图片+文案→自动检测亚马逊/Temu/TikTok/Shein合规风险，覆盖欧美日市场', tags: ['合规检测', '多市场'], color: '#FFF1F2', ai: true, route: '/work/compliance-check', category: 'ai' },
-  { id: 'ghost-mannequin', icon: '▯', title: '幽灵模特', desc: '服装平铺/挂拍→AI自动穿到隐形模特身上，生成3D立体效果展示图', tags: ['3D立体', '隐形模特'], color: '#F0F9FF', ai: true, route: '/work/ghost-mannequin', category: 'image' },
-  { id: 'outpaint', icon: '▩', title: '智能扩图', desc: 'AI扩展图片边缘自动补全构图，适配各平台尺寸比例，无缝融合不留痕迹', tags: ['构图补全', '比例适配'], color: '#F5F3FF', ai: true, route: '/work/outpainting', category: 'image' },
-  { id: 'image-translate', icon: '🌐', title: '图片翻译', desc: '商品图文字智能识别→翻译为9语种→原位替换，跨境卖家出海必备', tags: ['OCR识别', '9语种翻译'], color: '#ECFDF5', ai: true, route: '/work/image-translate', category: 'image' },
-  { id: 'video-edit', icon: '▸', title: '视频编辑', desc: 'AI智能裁剪/变速/转场/调色，自动生成多尺寸多时长版本供投放', tags: ['智能剪辑', '多尺寸输出'], color: '#FFF7ED', ai: true, route: '/work/video-edit', category: 'video' },
-  { id: 'voice-gen', icon: '♫', title: 'AI语音生成', desc: '输入文案→选主播音色→生成自然流畅带货配音，支持9语种50+音色', tags: ['TTS合成', '50+音色'], color: '#FDF2F8', ai: true, route: '/work/voice-gen', category: 'ai' },
-  { id: 'storyboard', icon: '⊟', title: '智能分镜', desc: '文案脚本→AI自动拆解为分镜画面+配音+字幕，一键生成完整短视频', tags: ['脚本拆解', '自动分镜'], color: '#FFF1F2', ai: true, route: '/work/storyboard', category: 'video' },
-];
+const plans = computed(() => {
+  const raw = t('landing.plans') as any[]
+  if (Array.isArray(raw) && raw.length) return raw
+  return [
+    { icon:'🌱', name:'免费版', price:'0', features:['每月 20 张图片生成','3 个视频/月','基础模板','720p 输出'], featured:false },
+    { icon:'⚡', name:'专业版', price:'99', features:['每月 500 张图片生成','50 个视频/月','全部模板+高级风格','1080p 输出','批量处理','API 接入'], featured:true },
+    { icon:'🏭', name:'企业版', price:'299', features:['无限图片生成','无限视频生成','专属风格定制','4K 输出','私有化部署','专属客服'], featured:false },
+  ]
+})
 
-const filteredCards = computed(() =>
-  activeTab.value === 'all' ? cards : cards.filter(c => c.category === activeTab.value)
-);
+const displayPlans = computed(() => apiPricing.value || plans.value)
 
-const platforms = ['淘宝', '拼多多', '抖音', '小红书', '视频号', '亚马逊', 'Temu', 'Shein', 'TikTok Shop', '美客多', 'Shopee', 'Lazada'];
-
-const steps = [
-  { icon: '📤', title: '上传产品图', desc: '拖入产品照片，支持 JPG/PNG/WebP 格式' },
-  { icon: '🎯', title: '选择功能', desc: '做主图、场景、视频……一键选择需要的能力' },
-  { icon: '✨', title: 'AI 自动生成', desc: '5秒出图，批量处理，自动适配各平台尺寸' },
-];
-
-const useCases = [
-  { avatar: '👤', title: '个人卖家', desc: '一个人就是一支团队', points: ['手机拍照即可生成专业主图', '零设计基础出爆款详情页', '每天省下 3 小时作图时间'] },
-  { avatar: '🏪', title: '中小商家', desc: '用 AI 代替设计团队', points: ['批量生成全店商品图', '统一品牌视觉风格', '降低 80% 设计成本'] },
-  { avatar: '🏢', title: '品牌商家', desc: '规模化视觉内容生产', points: ['API 接口批量对接', '多店铺多平台统一管理', '品牌视觉规范自动套用'] },
-];
-
-const plans = [
-  { icon: '🌱', name: '免费版', price: '0', features: ['每月 20 张图片生成', '3 个视频/月', '基础模板', '720p 输出'], featured: false },
-  { icon: '⚡', name: '专业版', price: '99', features: ['每月 500 张图片生成', '50 个视频/月', '全部模板+高级风格', '1080p 输出', '批量处理', 'API 接入'], featured: true },
-  { icon: '🏭', name: '企业版', price: '299', features: ['无限图片生成', '无限视频生成', '专属风格定制', '4K 输出', '私有化部署', '专属客服'], featured: false },
-];
-
-const displayPlans = computed(() => apiPricing.value || plans);
-
-const faqs = [
-  { q: '需要安装软件吗？', a: '不需要。纯网页版，浏览器打开即可使用，支持 Chrome / Safari / Edge。' },
-  { q: '生成的图片可以商用吗？', a: '完全可以。所有 AI 生成的图片版权归你所有，可放心用于电商平台。' },
-  { q: '支持哪些电商平台尺寸？', a: '覆盖淘宝、拼多多、抖音、小红书、亚马逊、Temu、Shein 等 13 个主流平台的标准尺寸，也支持自定义尺寸。' },
-  { q: '不满意可以重新生成吗？', a: '可以。每次生成结果不满意可以免费重新生成，直到满意为止。' },
-  { q: '如何批量处理？', a: '专业版及以上支持批量处理，拖入文件夹即可后台自动排队处理，支持夜间托管（6折优惠）。' },
-];
 </script>
 
 

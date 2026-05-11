@@ -228,7 +228,7 @@ async function loadWorks() {
     if (filterType.value) params.type = filterType.value;
     const res = await api.get('/assets', params);
     works.value = res?.list || [];
-  } catch { toast.warn('加载平台列表失败') }
+  } catch { toast.warn('加载作品列表失败') }
   finally { loadingWorks.value = false; }
 }
 
@@ -244,7 +244,7 @@ async function loadHistory() {
     historyList.value = histRes?.list || [];
     historyTotal.value = histRes?.total || 0;
     stats.value = statsRes;
-  } catch { toast.warn('加载平台列表失败') }
+  } catch { toast.warn('加载发布历史失败') }
   finally { loadingHistory.value = false; }
 }
 
