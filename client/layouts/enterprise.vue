@@ -21,6 +21,18 @@
         <NuxtLink to="/enterprise/customers/tags" class="ent-nav-item">
           <span class="icon">🏷️</span> 标签管理
         </NuxtLink>
+        <NuxtLink to="/enterprise/channels" class="ent-nav-item">
+          <span class="icon">🔗</span> 渠道管理
+        </NuxtLink>
+        <NuxtLink to="/enterprise/distribution" class="ent-nav-item">
+          <span class="icon">📢</span> 推广分销
+        </NuxtLink>
+        <NuxtLink to="/enterprise/commerce" class="ent-nav-item">
+          <span class="icon">📦</span> 商品订单
+        </NuxtLink>
+        <NuxtLink to="/enterprise/reports" class="ent-nav-item">
+          <span class="icon">📋</span> 数据报表
+        </NuxtLink>
         <NuxtLink to="/enterprise/usage" class="ent-nav-item">
           <span class="icon">📈</span> 用量明细
         </NuxtLink>
@@ -61,6 +73,8 @@ onMounted(async () => {
     // 仅 401 未认证才跳转登录，网络波动/5xx 不误清会话
     if (e?.response?.status === 401) {
       router.push('/enterprise/login');
+    } else if (!e?.response) {
+      console.debug('Enterprise profile network error', e.message);
     }
   }
 });

@@ -82,10 +82,10 @@
               <span class="on" /><span /><span /><span /><span />
             </div>
             <div class="lp-mock-main">
-              <div class="lp-mock-tabs"><span class="on">智能主图</span><span>智能场景</span><span>智能视频</span></div>
+              <div class="lp-mock-tabs"><span class="on">{{ $t('landing.mockup_tab_main') }}</span><span>{{ $t('landing.mockup_tab_scene') }}</span><span>{{ $t('landing.mockup_tab_video') }}</span></div>
               <div class="lp-mock-up"><span>+</span></div>
               <div class="lp-mock-grid">
-                <div v-for="i in 3" :key="i"><div /><span>生成图 {{ i }}</span></div>
+                <div v-for="i in 3" :key="i"><div /><span>{{ $t('landing.mockup_generate') }} {{ i }}</span></div>
               </div>
             </div>
           </div>
@@ -97,8 +97,8 @@
         <div class="lp-mob-card">
           <div class="lp-mob-card-bar"><span /><span /><span /></div>
           <div class="lp-mob-card-body">
-            <div class="lp-mob-card-tabs"><span class="on">智能主图</span><span>场景</span><span>视频</span></div>
-            <div class="lp-mob-card-up">+ 上传图片</div>
+            <div class="lp-mob-card-tabs"><span class="on">{{ $t('landing.mockup_tab_main') }}</span><span>{{ $t('landing.mockup_scene_short') }}</span><span>{{ $t('landing.mockup_video_short') }}</span></div>
+            <div class="lp-mob-card-up">+ {{ $t('landing.mockup_upload') }}</div>
             <div class="lp-mob-card-grid"><div v-for="i in 3" :key="i"><div /></div></div>
           </div>
         </div>
@@ -256,23 +256,23 @@
     </footer>
 
     <!-- Back to top -->
-    <button v-show="showBackTop" class="lp-back-top" @click="scrollToTop" aria-label="返回顶部" :title="$t('landing.back_top')">↑</button>
+    <button v-show="showBackTop" class="lp-back-top" @click="scrollToTop" :aria-label="$t('landing.back_top')" :title="$t('landing.back_top')">↑</button>
   </div>
 </template>
 
 <script setup lang="ts">
 definePageMeta({ layout: 'landing' });
 
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 
 useHead(() => ({
   htmlAttrs: { lang: locale.value === 'en' ? 'en' : 'zh-CN' },
-  title: 'Movio AI — 全链路运营助手',
+  title: locale.value === 'en' ? 'Movio AI — Full-Stack Ops Assistant' : 'Movio AI — 全链路运营助手',
   meta: [
     { name: 'description', content: locale.value === 'en' ? 'Movio AI — Full-stack e-commerce AI automation. Upload product photos, generate main images, scene images, detail pages, and video content in one click.' : 'Movio AI — 全链路运营助手，电商AI内容中台。上传产品照片即可生成主图、场景图、详情页、带货视频，一个人就是一支视觉团队' },
     { name: 'keywords', content: locale.value === 'en' ? 'AI e-commerce images,product image maker,AI scene generator,video creation' : 'AI电商图,电商主图制作,AI场景图,详情页生成,电商视频制作,AI抠图,商品图批量处理,淘宝主图,拼多多主图,抖音商品图,小红书封面' },
     { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-    { property: 'og:title', content: 'Movio AI — 全链路运营助手' },
+    { property: 'og:title', content: locale.value === 'en' ? 'Movio AI — Full-Stack Ops Assistant' : 'Movio AI — 全链路运营助手' },
     { property: 'og:description', content: locale.value === 'en' ? 'From photos to videos — one-click AI creation for 13 e-commerce platforms' : '覆盖13个电商平台，从图片到视频一站式AI创作' },
     { property: 'og:type', content: 'website' },
   ],
@@ -324,16 +324,17 @@ const handleScroll = () => {
       const y = window.scrollY;
       scrolled.value = y > 50;
       showBackTop.value = y > 600;
-      // Active section spy
       const sections = ['features', 'how', 'pricing', 'faq'];
+      let found = false;
       for (let i = sections.length - 1; i >= 0; i--) {
         const el = document.getElementById(sections[i]);
         if (el && el.getBoundingClientRect().top <= 120) {
           activeSection.value = sections[i];
-          return;
+          found = true;
+          break;
         }
       }
-      activeSection.value = '';
+      if (!found) activeSection.value = '';
       scrollTicking = false;
     });
     scrollTicking = true;
@@ -345,12 +346,12 @@ onMounted(() => {
 });
 onUnmounted(() => { window.removeEventListener('scroll', handleScroll); });
 
-const tabs = [
-  { key: 'all', label: '全部', icon: '✦' },
-  { key: 'image', label: '图片工具', icon: '▦' },
-  { key: 'video', label: '视频工具', icon: '▶' },
-  { key: 'ai', label: 'AI 功能', icon: '◆' },
-];
+const tabs = computed(() => [
+  { key: 'all', label: t('landing.features_tab_all'), icon: '✦' },
+  { key: 'image', label: t('landing.features_tab_image'), icon: '▦' },
+  { key: 'video', label: t('landing.features_tab_video'), icon: '▶' },
+  { key: 'ai', label: t('landing.features_tab_ai'), icon: '◆' },
+]);
 
 const memfocusCards = [
   { key:'memory', badge:'记忆力', title:'过目不忘', sub:'精准回顾每个客户', api:'四层记忆 API', story:'王女士上次买了胶原蛋白果冻——问她要不要复购', metricLabel:'客户留存提升', metricValue:'+37%' },

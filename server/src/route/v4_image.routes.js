@@ -59,24 +59,24 @@ const enhancePromptSchema = z.object({
 });
 
 // POST /api/images/generate
-router.post('/generate', heavyLimiter, _validate(generateSchema), contentModerationMiddleware('input'), async (req, res) => {
+router.post('/generate', heavyLimiter, _validate(generateSchema), tierGuard('image'), contentModerationMiddleware('input'), async (req, res) => {
   try {
     const { prompt, ratio, style } = req.validated;
     const result = await imageService.generateImage(req.user.id, { prompt, ratio, style });
     return success(res, result, '任务已提交');
   } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '生成失败');
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '生成失败');
   }
 });
 
 // POST /api/images/replicate — 主图复刻
-router.post('/replicate', heavyLimiter, _validate(replicateSchema), async (req, res) => {
+router.post('/replicate', heavyLimiter, _validate(replicateSchema), tierGuard('image'), async (req, res) => {
   try {
     const { reference_image_url, product_name, style, ratio } = req.validated;
     const result = await imageService.replicateMainImage(req.user.id, { referenceImageUrl: reference_image_url, productName: product_name, style, ratio });
     return success(res, result, '任务已提交');
   } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '复刻失败');
+    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '复刻失败');
   }
 });
 

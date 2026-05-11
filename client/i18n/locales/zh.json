@@ -60,7 +60,22 @@
     "footer_contact": "联系我们",
     "footer_legal": "法律",
     "footer_privacy": "隐私政策",
-    "footer_terms": "服务条款"
+    "footer_terms": "服务条款",
+    "features_tab_all": "全部",
+    "features_tab_image": "图片工具",
+    "features_tab_video": "视频工具",
+    "features_tab_ai": "AI 功能",
+    "skip_to_content": "跳到主要内容",
+    "menu_open": "打开菜单",
+    "menu_close": "关闭菜单",
+    "back_top": "返回顶部",
+    "mockup_tab_main": "智能主图",
+    "mockup_tab_scene": "智能场景",
+    "mockup_tab_video": "智能视频",
+    "mockup_scene_short": "场景",
+    "mockup_video_short": "视频",
+    "mockup_upload": "上传图片",
+    "mockup_generate": "生成图"
   },
   "work": {
     "title": "AI 电商工作台",
@@ -85,7 +100,8 @@
     "features": "核心功能",
     "skip_to_content": "跳到主要内容",
     "menu_open": "菜单",
-    "menu_close": "关闭"
+    "menu_close": "关闭",
+    "back_top": "返回顶部"
   },
   "common": {
     "save": "保存",
@@ -224,6 +240,30 @@
     "workflow_desc": "把零散功能串成标准化自动化流程 — 一键上新、批量做内容、自动管评价、每日数据复盘、大促活动营销、违规自查风控",
     "lobster_desc": "一站串联电商业态全流程 — 选品调研、内容创作、上新发布、客服接待、评价管理、数据复盘、竞品监控、违规风控",
     "admin_panel": "管理后台",
-    "exit_login": "退出登录"
+    "exit_login": "退出登录",
+    "creation_placeholder_video": "描述你想要的带货视频，例如：护肤品展示视频，15秒口播...",
+    "creation_placeholder_image": "描述你想要的商品图，例如：夏季连衣裙白底图，简约高级风格...",
+    "creation_placeholder_detail": "描述你的详情页需求，例如：面膜产品详情页，日式极简风...",
+    "creation_placeholder_copywrite": "描述你的文案需求，例如：618 大促女装促销标题...",
+    "creation_placeholder_digital": "描述数字人需求，例如：女装带货数字人，甜美风格...",
+    "creation_placeholder_default": "描述你的创作需求...",
+    "creation_hint_video": "支持图片转视频 / 文字转视频 / 分镜规划 / 数字人口播",
+    "creation_hint_image": "支持文字生成 / 参考图生成 / 批量处理 / 精修 / 去背景",
+    "creation_hint_detail": "支持详情页设计 / 主图套装 / 多平台适配 / 产品渲染",
+    "creation_hint_copywrite": "支持电商标题 / 详情文案 / 口播脚本 / 营销文案",
+    "creation_hint_digital": "支持带货视频 / 虚拟直播 / 形象定制 / AI 主播",
+    "creation_hint_default": "",
+    "nav_home": "首页",
+    "nav_creation": "创作",
+    "nav_assistant": "AI 助手",
+    "nav_workflow": "工作流",
+    "nav_lobster": "龙虾",
+    "default_page_title": "工作台",
+    "fold_expand": "展开侧边栏",
+    "fold_collapse": "收起侧边栏",
+    "menu_open_label": "打开导航菜单",
+    "menu_close_label": "关闭导航菜单",
+    "coming_soon_tag": "即将上线",
+    "points_label": "积分"
   }
 }

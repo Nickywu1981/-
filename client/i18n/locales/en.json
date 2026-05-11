@@ -60,7 +60,22 @@
     "footer_contact": "Contact Us",
     "footer_legal": "Legal",
     "footer_privacy": "Privacy Policy",
-    "footer_terms": "Terms of Service"
+    "footer_terms": "Terms of Service",
+    "features_tab_all": "All",
+    "features_tab_image": "Image Tools",
+    "features_tab_video": "Video Tools",
+    "features_tab_ai": "AI Features",
+    "skip_to_content": "Skip to main content",
+    "menu_open": "Open menu",
+    "menu_close": "Close menu",
+    "back_top": "Back to top",
+    "mockup_tab_main": "AI Main Image",
+    "mockup_tab_scene": "AI Scene",
+    "mockup_tab_video": "AI Video",
+    "mockup_scene_short": "Scene",
+    "mockup_video_short": "Video",
+    "mockup_upload": "Upload Image",
+    "mockup_generate": "Generated"
   },
   "work": {
     "title": "AI E-commerce Workspace",
@@ -85,7 +100,8 @@
     "features": "Core Features",
     "skip_to_content": "Skip to main content",
     "menu_open": "Menu",
-    "menu_close": "Close"
+    "menu_close": "Close",
+    "back_top": "Back to top"
   },
   "common": {
     "save": "Save",
@@ -224,6 +240,30 @@
     "workflow_desc": "Chain scattered tools into standardized automation workflows — one-click new arrivals, batch content creation, auto review management, daily data review, campaign marketing, self-audit risk control",
     "lobster_desc": "End-to-end e-commerce operations pipeline — product research, content creation, listing & publishing, customer service, review management, data review, competitor monitoring, risk control",
     "admin_panel": "Admin Panel",
-    "exit_login": "Logout"
+    "exit_login": "Logout",
+    "creation_placeholder_video": "Describe your product video, e.g. skincare demo video, 15s...",
+    "creation_placeholder_image": "Describe your product image, e.g. summer dress on white background, minimal...",
+    "creation_placeholder_detail": "Describe your detail page, e.g. face mask product page, Japanese minimal...",
+    "creation_placeholder_copywrite": "Describe your copy needs, e.g. 618 sale women's clothing promo title...",
+    "creation_placeholder_digital": "Describe your digital human needs, e.g. fashion sales, sweet style...",
+    "creation_placeholder_default": "Describe your creative needs...",
+    "creation_hint_video": "Image-to-video / Text-to-video / Storyboard / Digital human voiceover",
+    "creation_hint_image": "Text-to-image / Reference image / Batch processing / Retouch / Background removal",
+    "creation_hint_detail": "Detail page design / Main image set / Multi-platform adapt / Product rendering",
+    "creation_hint_copywrite": "E-commerce titles / Detail copy / Voiceover scripts / Campaign copy",
+    "creation_hint_digital": "Sales video / Virtual livestream / Avatar custom / AI host",
+    "creation_hint_default": "",
+    "nav_home": "Home",
+    "nav_creation": "Create",
+    "nav_assistant": "AI Assistant",
+    "nav_workflow": "Workflow",
+    "nav_lobster": "Lobster",
+    "default_page_title": "Workspace",
+    "fold_expand": "Expand sidebar",
+    "fold_collapse": "Collapse sidebar",
+    "menu_open_label": "Open navigation menu",
+    "menu_close_label": "Close navigation menu",
+    "coming_soon_tag": "Coming Soon",
+    "points_label": "Points"
   }
 }

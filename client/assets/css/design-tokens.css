@@ -48,6 +48,17 @@
   --cfg-border-light:   #F3F4F6;  /* Gray 100 */
   --cfg-border-focus:   #5b5fe3;
 
+  /* ═══ Shared shortcut aliases (used by workspace pages) ═══ */
+  --brand:   #5b5fe3;
+  --tx:      #171717;
+  --tx2:     #6b6b70;
+  --tx3:     #9d9da3;
+  --brd:     #ebebea;
+  --bg-page: #fafaf9;
+  --bg-hover:#f5f5f5;
+  --bg-av:   #e8e8ec;
+  --bg-tag:  #f3f4f6;
+
   /* ==============================
    * 04. 排版
    * ============================== */
@@ -148,6 +159,17 @@
   --cfg-shadow-md:   0 4px 6px rgba(0,0,0,0.5);
   --cfg-shadow-lg:   0 10px 15px rgba(0,0,0,0.5);
   --cfg-shadow-xl:   0 20px 25px rgba(0,0,0,0.5);
+
+  /* Shared shortcut aliases — dark mode */
+  --brand:   #8B8FEE;
+  --tx:      #F9FAFB;
+  --tx2:     #D1D5DB;
+  --tx3:     #6B7280;
+  --brd:     #374151;
+  --bg-page: #0F172A;
+  --bg-hover:#1E293B;
+  --bg-av:   #374151;
+  --bg-tag:  #1F2937;
 }
 
 

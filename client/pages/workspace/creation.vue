@@ -170,25 +170,16 @@ onMounted(async () => {
 function go(path: string) { router.push(path) }
 
 const activeTabLabel = computed(() => tabs.value.find(t => t.key === activeTab.value)?.label || '')
+const { t } = useI18n()
+
 const activeTabPlaceholder = computed(() => {
-  const map: Record<string, string> = {
-    video: '描述你想要的带货视频，例如：护肤品展示视频，15秒口播...',
-    image: '描述你想要的商品图，例如：夏季连衣裙白底图，简约高级风格...',
-    detail: '描述你的详情页需求，例如：面膜产品详情页，日式极简风...',
-    copywrite: '描述你的文案需求，例如：618 大促女装促销标题...',
-    digital: '描述数字人需求，例如：女装带货数字人，甜美风格...',
-  }
-  return map[activeTab.value] || '描述你的创作需求...'
+  const key = `workspace.creation_placeholder_${activeTab.value}` as string
+  const fallback = t('workspace.creation_placeholder_default')
+  return t(key) !== key ? t(key) : fallback
 })
 const activeTabHint = computed(() => {
-  const map: Record<string, string> = {
-    video: '支持图片转视频 / 文字转视频 / 分镜规划 / 数字人口播',
-    image: '支持文字生成 / 参考图生成 / 批量处理 / 精修 / 去背景',
-    detail: '支持详情页设计 / 主图套装 / 多平台适配 / 产品渲染',
-    copywrite: '支持电商标题 / 详情文案 / 口播脚本 / 营销文案',
-    digital: '支持带货视频 / 虚拟直播 / 形象定制 / AI 主播',
-  }
-  return map[activeTab.value] || ''
+  const key = `workspace.creation_hint_${activeTab.value}` as string
+  return t(key) !== key ? t(key) : ''
 })
 
 const activeCards = computed(() => cardData.value[activeTab.value] || Object.values(cardData.value)[0] || [])

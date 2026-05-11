@@ -31,16 +31,21 @@ export function validate(schema, source = 'body') {
 /**
  * v4 校验中间件 — 结果存入 req.validated，不覆盖 req.body
  */
-export function validateV4(schema) {
+export function validateV4(schema, source = 'body') {
   return (req, res, next) => {
-    const result = schema.safeParse(req.body);
+    const data = source === 'body' ? req.body : req.query;
+    const result = schema.safeParse(data);
     if (!result.success) {
       if (isProduction) {
         return error(res, ERROR_CODE.VALIDATION_ERROR, '参数校验失败');
       }
       return error(res, ERROR_CODE.VALIDATION_ERROR, result.error.issues.map(e => e.message).join('; '));
     }
-    req.validated = result.data;
+    if (source === 'body') {
+      req.validated = result.data;
+    } else {
+      req.query = result.data;
+    }
     next();
   };
 }

@@ -15,7 +15,7 @@
           <span class="wsl-logo-mark">M</span>
           <span v-if="!folded" class="wsl-logo-text">Movio AI</span>
         </NuxtLink>
-        <button class="wsl-fold-btn" @click="handleFoldBtnClick" :title="folded ? '展开' : '收起'" :aria-label="folded ? '展开侧边栏' : '收起侧边栏'">
+        <button class="wsl-fold-btn" @click="handleFoldBtnClick" :title="folded ? t('workspace.fold_expand') : t('workspace.fold_collapse')" :aria-label="folded ? t('workspace.fold_expand') : t('workspace.fold_collapse')">
           {{ folded ? '▶' : '◀' }}
         </button>
       </div>
@@ -27,11 +27,11 @@
           :to="item.disabled ? '#' : item.path"
           class="wsl-nav-item"
           :class="{ sel: !item.disabled && isActive(item), off: item.disabled }"
-          @click.prevent="item.disabled ? null : (mobileOpen = false)"
+          @click="if (item.disabled) { $event.preventDefault() } else { mobileOpen = false }"
         >
           <span class="wsl-nav-icon">{{ item.icon }}</span>
           <span v-if="!folded" class="wsl-nav-label">{{ item.label }}</span>
-          <span v-if="!folded && item.disabled" class="wsl-nav-tag">即将上线</span>
+          <span v-if="!folded && item.disabled" class="wsl-nav-tag">{{ $t('workspace.coming_soon_tag') }}</span>
         </NuxtLink>
       </nav>
 
@@ -40,7 +40,7 @@
           <span class="wsl-av">{{ userInitial }}</span>
           <span v-if="!folded" class="wsl-uname">{{ userName }}</span>
         </div>
-        <div v-if="!folded" class="wsl-points">积分: {{ userPoints }}</div>
+        <div v-if="!folded" class="wsl-points">{{ $t('workspace.points_label') }}: {{ userPoints }}</div>
       </div>
     </aside>
 
@@ -48,7 +48,7 @@
     <div class="wsl-main">
       <a href="#main-content" class="wsl-skip">{{ $t('landing.skip_to_content') }}</a>
       <header class="wsl-top">
-        <button class="wsl-hamburger" @click="mobileOpen = !mobileOpen" :aria-label="mobileOpen ? '关闭导航' : '打开导航'" :aria-expanded="mobileOpen">
+        <button class="wsl-hamburger" @click="mobileOpen = !mobileOpen" :aria-label="mobileOpen ? t('workspace.menu_close_label') : t('workspace.menu_open_label')" :aria-expanded="mobileOpen">
           <span /><span /><span />
         </button>
         <h2 class="wsl-title">{{ pageTitle }}</h2>
@@ -58,9 +58,7 @@
         </div>
       </header>
       <main id="main-content" class="wsl-content" tabindex="-1">
-        <SharedErrorBoundary>
-          <slot />
-        </SharedErrorBoundary>
+        <slot />
       </main>
     </div>
   </div>
@@ -96,11 +94,11 @@ const currentPath = computed(() => route.path)
 // 五大固定顶级导航 — 优先读 site_config，fallback 硬编码
 // ═══════════════════════════════════════════════
 const defaultNavItems = [
-  { path: '/workspace',            icon: '🏠', label: '首页',    disabled: false },
-  { path: '/workspace/creation',   icon: '🎨', label: '创作',    disabled: false },
-  { path: '/workspace/assistant',  icon: '🤖', label: 'AI 助手', disabled: false },
-  { path: '/workspace/workflow',   icon: '⚙', label: '工作流',  disabled: false },
-  { path: '/workspace/lobster',    icon: '🏭', label: '龙虾',    disabled: false },
+  { path: '/workspace',            icon: '🏠', label: t('workspace.nav_home'),    disabled: false },
+  { path: '/workspace/creation',   icon: '🎨', label: t('workspace.nav_creation'),    disabled: false },
+  { path: '/workspace/assistant',  icon: '🤖', label: t('workspace.nav_assistant'), disabled: false },
+  { path: '/workspace/workflow',   icon: '⚙', label: t('workspace.nav_workflow'),  disabled: false },
+  { path: '/workspace/lobster',    icon: '🏭', label: t('workspace.nav_lobster'),    disabled: false },
 ]
 
 const navItems = ref<{ path: string; icon: string; label: string; disabled: boolean }[]>(defaultNavItems)
@@ -112,7 +110,7 @@ function isActive(item: { path: string }) {
 
 const pageTitle = computed(() => {
   const item = navItems.value.find(i => !i.disabled && isActive(i))
-  return item ? item.label : '工作台'
+  return item ? item.label : t('workspace.default_page_title')
 })
 
 async function handleLogout() {

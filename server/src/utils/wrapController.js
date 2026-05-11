@@ -11,7 +11,11 @@ import logger from './logger.js';
 export function wrapController(fn) {
   return async (req, res, next) => {
     try {
-      return await fn(req, res, next);
+      const result = await fn(req, res, next);
+      if (result !== undefined && result !== res && !res.headersSent) {
+        return success(res, result);
+      }
+      return result;
     } catch (err) {
       if (err instanceof BusinessError) {
         return error(res, err.status, err.message);
