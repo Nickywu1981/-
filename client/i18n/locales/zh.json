@@ -391,6 +391,16 @@
     "creation_param_copywrite_lang": "输出语种",
     "creation_param_copywrite_tone": "语音音色",
     "creation_param_other_tool": "工具类型",
+    "creation_param_video_ratio": "视频比例",
+    "creation_param_image_bg": "图片背景",
+    "creation_param_copywrite_voice": "主播音色",
+    "creation_param_other_format": "输出格式",
+    "creation_param_other_sort": "排序方式",
+    "creation_input_region": "{tab} — 创作输入区",
+    "creation_upload_label": "上传素材",
+    "creation_tools_region": "{tab} — 快捷工具",
+    "creation_quick_tools": "{tab} · 快捷工具",
+    "redirect_creation": "跳转至创作中心...",
     "creation_upload_hint": "拖拽或点击上传素材",
     "creation_param_label": "参数设置",
     "slide_panel": {
@@ -408,7 +418,9 @@
       "download": "⬇ 下载",
       "reuse": "🔄 复用",
       "close_result": "关闭",
-      "progress_pct": "生成中... {pct}%"
+      "progress_pct": "生成中... {pct}%",
+      "generate_error": "生成失败，请重试",
+      "retry": "重试"
     },
 
     "creation_sub_cards": {
@@ -547,20 +559,16 @@
       ]
     },
     "history_desc": "查看你所有的创作历史记录与作品管理",
-    "panel": {
-      "close": "关闭面板",
-      "params_label": "参数设置",
-      "generate": "⚡ 开始生成",
-      "generating": "生成中... {progress}%",
-      "step_upload": "上传素材",
-      "step_analyze": "AI 分析",
-      "step_generate": "生成内容",
-      "step_done": "完成",
-      "result_name": "生成结果",
-      "download": "⬇ 下载",
-      "reuse": "🔄 复用",
-      "close_btn": "关闭"
-    }
+    "panel_param_type": "类型",
+    "panel_param_quality": "质量",
+    "panel_param_format": "格式",
+    "panel_opt_auto": "自动",
+    "panel_opt_standard": "标准",
+    "panel_opt_premium": "高级",
+    "panel_opt_sd": "标清",
+    "panel_opt_hd": "高清",
+    "panel_opt_uhd": "超清",
+    "panel_generate_title": "{tab} — 生成结果",
   },
   "admin_shell": {
     "expand_sidebar": "展开侧栏",

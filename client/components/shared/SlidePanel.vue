@@ -13,7 +13,7 @@
         <!-- Header -->
         <div class="sp-hd">
           <h3 class="sp-title">{{ title }}</h3>
-          <button class="sp-close" @click="emit('update:modelValue', false)" :aria-label="t('workspace.panel.close')">✕</button>
+          <button class="sp-close" @click="emit('update:modelValue', false)" :aria-label="t('workspace.slide_panel.close_aria')">✕</button>
         </div>
 
         <!-- Content -->
@@ -32,7 +32,7 @@
 
           <!-- Params -->
           <div v-if="showParams && params.length" class="sp-params">
-            <span class="sp-params-label">{{ t('workspace.panel.params_label') }}</span>
+            <span class="sp-params-label">{{ t('workspace.slide_panel.param_label') }}</span>
             <div class="sp-param-row">
               <select v-for="(p, i) in params" :key="i" class="sp-sel" v-model="selectedParams[p.key]">
                 <option v-for="(o, j) in p.options" :key="j" :value="o">{{ o }}</option>
@@ -42,7 +42,7 @@
 
           <!-- Generate Button -->
           <button v-if="showGenerate" class="sp-gen" @click="handleGenerate">
-            {{ t('workspace.panel.generate') }}
+            {{ t('workspace.slide_panel.generate_btn') }}
           </button>
 
           <!-- Progress -->
@@ -50,13 +50,20 @@
             <div class="sp-progress-bar">
               <div class="sp-progress-fill" :style="{ width: progress + '%' }" />
             </div>
-            <div class="sp-progress-text">{{ t('workspace.panel.generating', { progress }) }}</div>
+            <div class="sp-progress-text">{{ t('workspace.slide_panel.progress_pct', { pct: progress }) }}</div>
             <div class="sp-steps">
-              <div class="sp-step" :class="{ done: progress >= 25 }">{{ t('workspace.panel.step_upload') }}</div>
-              <div class="sp-step" :class="{ done: progress >= 50 }">{{ t('workspace.panel.step_analyze') }}</div>
-              <div class="sp-step" :class="{ done: progress >= 75 }">{{ t('workspace.panel.step_generate') }}</div>
-              <div class="sp-step" :class="{ done: progress >= 100 }">{{ t('workspace.panel.step_done') }}</div>
+              <div class="sp-step" :class="{ done: progress >= 25 }">{{ t('workspace.slide_panel.step_upload') }}</div>
+              <div class="sp-step" :class="{ done: progress >= 50 }">{{ t('workspace.slide_panel.step_analyze') }}</div>
+              <div class="sp-step" :class="{ done: progress >= 75 }">{{ t('workspace.slide_panel.step_generate') }}</div>
+              <div class="sp-step" :class="{ done: progress >= 100 }">{{ t('workspace.slide_panel.step_done') }}</div>
             </div>
+          </div>
+
+          <!-- Error -->
+          <div v-if="errorMsg && !generating" class="sp-error" role="alert">
+            <span class="sp-error-icon">⚠️</span>
+            <span class="sp-error-text">{{ errorMsg }}</span>
+            <button class="sp-retry-btn" @click="handleGenerate">{{ t('workspace.slide_panel.retry') }}</button>
           </div>
 
           <!-- Result -->
@@ -65,13 +72,13 @@
               <div class="sp-result-placeholder">🖼️</div>
             </div>
             <div class="sp-result-info">
-              <div class="sp-result-name">{{ t('workspace.panel.result_name') }}</div>
+              <div class="sp-result-name">{{ t('workspace.slide_panel.result_name') }}</div>
               <div v-if="resultMeta" class="sp-result-meta">{{ resultMeta }}</div>
             </div>
             <div class="sp-result-actions">
-              <button class="sp-result-btn primary" @click="emit('download')">{{ t('workspace.panel.download') }}</button>
-              <button class="sp-result-btn" @click="handleReuse">{{ t('workspace.panel.reuse') }}</button>
-              <button class="sp-result-btn" @click="emit('update:modelValue', false)">{{ t('workspace.panel.close_btn') }}</button>
+              <button class="sp-result-btn primary" @click="emit('download')">{{ t('workspace.slide_panel.download') }}</button>
+              <button class="sp-result-btn" @click="handleReuse">{{ t('workspace.slide_panel.reuse') }}</button>
+              <button class="sp-result-btn" @click="emit('update:modelValue', false)">{{ t('workspace.slide_panel.close_result') }}</button>
             </div>
           </div>
         </div>
@@ -113,22 +120,35 @@ const generating = ref(false)
 const showResult = ref(false)
 const progress = ref(0)
 const selectedParams = ref<Record<string, string>>({})
+const errorMsg = ref('')
+const progressTimer = ref<ReturnType<typeof setInterval> | null>(null)
+
+function clearProgressTimer() {
+  if (progressTimer.value) { clearInterval(progressTimer.value); progressTimer.value = null }
+}
 
 async function handleGenerate() {
+  errorMsg.value = ''
   generating.value = true
   showResult.value = false
   progress.value = 0
   emit('generate', { ...selectedParams.value })
-  await simulateProgress()
-  generating.value = false
-  showResult.value = true
+  try {
+    await simulateProgress()
+    showResult.value = true
+  } catch {
+    errorMsg.value = t('workspace.slide_panel.generate_error')
+  } finally {
+    generating.value = false
+  }
 }
 
 async function simulateProgress() {
-  return new Promise<void>(resolve => {
-    const iv = setInterval(() => {
+  return new Promise<void>((resolve) => {
+    clearProgressTimer()
+    progressTimer.value = setInterval(() => {
       progress.value += Math.random() * 12 + 8
-      if (progress.value >= 100) { progress.value = 100; clearInterval(iv); resolve() }
+      if (progress.value >= 100) { progress.value = 100; clearProgressTimer(); resolve() }
     }, 400)
   })
 }
@@ -137,20 +157,25 @@ function handleReuse() {
   showResult.value = false
   generating.value = false
   progress.value = 0
+  errorMsg.value = ''
   selectedParams.value = {}
   emit('reuse')
 }
 
+function resetState() {
+  clearProgressTimer()
+  generating.value = false
+  showResult.value = false
+  progress.value = 0
+  errorMsg.value = ''
+  selectedParams.value = {}
+}
+
 watch(() => props.modelValue, (val) => {
-  if (!val) {
-    setTimeout(() => {
-      generating.value = false
-      showResult.value = false
-      progress.value = 0
-      selectedParams.value = {}
-    }, 300)
-  }
+  if (!val) setTimeout(resetState, 300)
 })
+
+onUnmounted(() => clearProgressTimer())
 </script>
 
 <style scoped>
@@ -230,6 +255,13 @@ watch(() => props.modelValue, (val) => {
 }
 .sp-result-btn.primary { background: var(--color-brand-600); color: #fff; border-color: var(--color-brand-600); }
 .sp-result-btn:hover { opacity: .85; }
+
+/* Error */
+.sp-error { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 24px; background: var(--bg-hover); border-radius: 10px; border: 1px solid var(--border-light); text-align: center; }
+.sp-error-icon { font-size: 28px; }
+.sp-error-text { font-size: 13px; color: var(--text-secondary); }
+.sp-retry-btn { padding: 8px 24px; border: 1px solid var(--color-brand-600); border-radius: 7px; background: none; color: var(--color-brand-600); font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; }
+.sp-retry-btn:hover { background: var(--brand-light); }
 
 /* Transitions */
 .sp-overlay-enter-active, .sp-overlay-leave-active { transition: opacity .3s; }

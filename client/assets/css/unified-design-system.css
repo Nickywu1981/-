@@ -8,17 +8,17 @@
    1. 品牌核心色盘 — 8 端共享
    ================================================ */
 :root {
-  /* ═══ 品牌主色：靛蓝紫 ═══ */
-  --color-brand-50: #f0f1ff;
-  --color-brand-100: #e0e2ff;
-  --color-brand-200: #c4c6ff;
-  --color-brand-300: #a5a8ff;
-  --color-brand-400: #8b8fff;
-  --color-brand-500: #6b70ff;
-  --color-brand-600: #4f5cf6;
-  --color-brand-700: #3d48d9;
-  --color-brand-800: #2d35b0;
-  --color-brand-900: #1e2480;
+  /* ═══ 品牌主色：暖靛蓝 ═══ */
+  --color-brand-50: #f0f0fd;
+  --color-brand-100: #e0dffb;
+  --color-brand-200: #c4c2f7;
+  --color-brand-300: #a5a2f2;
+  --color-brand-400: #8b87ed;
+  --color-brand-500: #7b77e8;
+  --color-brand-600: #5b5fe3;
+  --color-brand-700: #4a4ecf;
+  --color-brand-800: #3b3eb5;
+  --color-brand-900: #2d3091;
 
   /* ═══ 中性灰阶 ═══ */
   --color-gray-25: #fafaf9;

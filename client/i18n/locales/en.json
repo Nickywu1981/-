@@ -390,6 +390,16 @@
     "creation_param_copywrite_lang": "Language",
     "creation_param_copywrite_tone": "Voice Tone",
     "creation_param_other_tool": "Tool Type",
+    "creation_param_video_ratio": "Aspect Ratio",
+    "creation_param_image_bg": "Background",
+    "creation_param_copywrite_voice": "Voice",
+    "creation_param_other_format": "Format",
+    "creation_param_other_sort": "Sort By",
+    "creation_input_region": "{tab} — Creation Input",
+    "creation_upload_label": "Upload",
+    "creation_tools_region": "{tab} — Quick Tools",
+    "creation_quick_tools": "{tab} · Quick Tools",
+    "redirect_creation": "Redirecting to Creation Center...",
     "creation_upload_hint": "Drag or click to upload assets",
     "creation_param_label": "Parameters",
     "slide_panel": {
@@ -558,7 +568,19 @@
       "result_name": "Result",
       "download": "⬇ Download",
       "reuse": "🔄 Reuse",
-      "close_btn": "Close"
+      "close_btn": "Close",
+      "panel_param_type": "Type",
+      "panel_param_quality": "Quality",
+      "panel_param_format": "Format",
+      "panel_opt_auto": "Auto",
+      "panel_opt_standard": "Standard",
+      "panel_opt_premium": "Premium",
+      "panel_opt_sd": "SD",
+      "panel_opt_hd": "HD",
+      "panel_opt_uhd": "UHD",
+      "panel_generate_title": "{tab} — Generate Result",
+      "generate_error": "Generation failed, please retry",
+      "retry": "Retry"
     }
   },
   "admin_shell": {
