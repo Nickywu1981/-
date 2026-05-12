@@ -8,8 +8,8 @@ const REDIS_TTL = 86400; // 24h
 // 事务工具：获取连接 → 执行 → 提交/回滚
 export async function withTransaction(fn) {
   const conn = await pool.getConnection();
-  await conn.beginTransaction();
   try {
+    await conn.beginTransaction();
     const result = await fn(conn);
     await conn.commit();
     return result;

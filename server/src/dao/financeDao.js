@@ -219,6 +219,7 @@ export async function lockTenantBalance(tenantId) {
     const [rows] = await conn.query('SELECT balance FROM tenant WHERE id = ? FOR UPDATE', [tenantId]);
     return { balance: rows[0]?.balance || 0, conn };
   } catch (e) {
+    conn.rollback().catch(() => {}); // 解除行锁，然后释放连接
     conn.release();
     throw e;
   }
