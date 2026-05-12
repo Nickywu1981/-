@@ -1,141 +1,218 @@
 <template>
   <AdminLayout>
-    <h2 class="ptitle">模板管理</h2>
+    <h2 class="ptitle">{{ $t('template.market') || '设计模板市场' }}</h2>
+
     <div class="toolbar">
-      <input v-model="keyword" class="input-search" placeholder="搜索模板..." @keyup.enter="fetchData" />
-      <select v-model="filterCategory" class="sel" @change="fetchData">
-        <option value="">全部分类</option>
-        <option value="main_image">主图</option><option value="scene">场景</option><option value="video">视频</option><option value="script">口播脚本</option><option value="copy">营销文案</option>
+      <select v-model="category" class="sel" @change="search">
+        <option value="">{{ $t('template.allCat') || '全部分类' }}</option>
+        <option value="ecommerce">电商</option><option value="social">社交</option>
+        <option value="brand">品牌</option><option value="event">活动</option>
       </select>
-      <button class="btn-primary" @click="openCreate">+ 新建模板</button>
+      <input v-model="keyword" class="input-search" :placeholder="$t('template.searchPh') || '搜索模板...'" @input="onKeywordInput" />
+      <select v-model="sort" class="sel" @change="search">
+        <option value="newest">{{ $t('template.sortNew') || '最新' }}</option>
+        <option value="download_count">{{ $t('template.sortDown') || '下载最多' }}</option>
+        <option value="rating">{{ $t('template.sortRate') || '评分最高' }}</option>
+      </select>
+      <button class="btn-brand" @click="openCreate">{{ $t('template.create') || '+ 新建模板' }}</button>
     </div>
-    <LoadingSkeleton v-if="loading" type="table" :rows="5" :cols="7" />
-    <div class="table-wrap" v-else-if="list.length">
-    <table class="table"><thead><tr><th>ID</th><th>标题</th><th>分类</th><th>状态</th><th>使用次数</th><th>创建时间</th><th>操作</th></tr></thead>
-    <tbody><tr v-for="t in list" :key="t.id"><td>{{ t.id }}</td><td>{{ t.title }}</td><td><span class="cat-tag">{{ catLabel(t.category) }}</span></td><td><span class="status-tag" :class="statusClass(t.status)">{{ statusLabel(t.status) }}</span></td><td>{{ t.usage_count || 0 }}</td><td>{{ t.create_time?.slice(0,10) }}</td><td class="actions"><button class="btn-sm" @click="openEdit(t)">编辑</button><button v-if="t.status===1" class="btn-sm success" @click="review(t.id,2)">通过</button><button v-if="t.status===2" class="btn-sm warn" @click="review(t.id,3)">下架</button><button v-if="t.status===3" class="btn-sm" @click="review(t.id,2)">上架</button><button class="btn-sm danger" @click="deleteItem(t)">删除</button></td></tr></tbody></table>
+
+    <div v-if="loading" class="card-grid">
+      <div v-for="i in 8" :key="i" class="card-skel pulse" />
     </div>
-    <Pagination v-if="total > pageSize" :page="page" :page-size="pageSize" :total="total" @change="onPageChange" />
-    <div v-if="!loading && !list.length" class="empty">暂无模板</div>
+
+    <div v-else-if="error" class="error-state">
+      <span class="error-icon">!</span>
+      <p>{{ error }}</p>
+      <button class="retry-btn" @click="search">{{ $t('common.retry') || '重试' }}</button>
+    </div>
+
+    <div v-else-if="!list.length" class="empty">{{ $t('template.empty') || '暂无模板' }}</div>
+
+    <div v-else class="card-grid">
+      <div v-for="t in list" :key="t.id" class="card" @click="openDetail(t)">
+        <img :src="(t.preview_images?.[0]) || '/placeholder.svg'" :alt="t.name" class="card-img" />
+        <div class="card-body">
+          <span class="cat-tag">{{ t.category }}</span>
+          <h3 class="card-name">{{ t.name }}</h3>
+          <div class="card-meta">
+            <span class="stars">{{ '★'.repeat(Math.round(t.rating||0)) + '☆'.repeat(5-Math.round(t.rating||0)) }}</span>
+            <span class="downloads">{{ t.download_count || 0 }} 下载</span>
+          </div>
+          <div class="card-footer">
+            <span class="price" :class="{ free: !t.price }">{{ t.price ? '¥'+t.price : ($t('template.free')||'免费') }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <Teleport to="body">
-      <div v-if="showModal" class="modal-overlay" @click.self="showModal=false">
+      <div v-if="showDetail" class="modal-overlay" @click.self="showDetail=false">
         <div class="modal">
-          <h3>{{ editing.id ? '编辑模板' : '新建模板' }}</h3>
-          <div class="form-group"><label>标题</label><input v-model="form.title" maxlength="100" class="input" /></div>
-          <div class="form-row">
-            <div class="form-group"><label>分类</label><select v-model="form.category" class="input"><option value="">请选择分类</option><option value="main_image">主图</option><option value="scene">场景</option><option value="video">视频</option><option value="script">口播脚本</option><option value="copy">营销文案</option></select></div>
-            <div class="form-group"><label>状态</label><select v-model="form.status" class="input"><option value="">请选择状态</option><option :value="0">草稿</option><option :value="1">待审核</option><option :value="2">已上架</option><option :value="3">已下架</option></select></div>
+          <h3>{{ detail?.name }}</h3>
+          <div class="detail-imgs">
+            <img v-for="(img,i) in (detail?.preview_images||[])" :key="i" :src="img" class="detail-img" />
           </div>
-          <div class="form-group"><label>描述</label><input v-model="form.description" maxlength="500" class="input" /></div>
-          <div class="form-group"><label>提示词内容</label><textarea v-model="form.content" maxlength="5000" class="input" rows="5" placeholder="提示词模板内容..."></textarea></div>
+          <p class="detail-desc">{{ detail?.description }}</p>
+          <div v-if="detail?.meta" class="detail-meta">
+            <span v-for="(v,k) in (typeof detail.meta==='string'?JSON.parse(detail.meta||'{}'):detail.meta)" :key="k" class="meta-tag">{{ k }}: {{ v }}</span>
+          </div>
+          <div class="detail-stats">
+            <span>{{ detail?.download_count || 0 }} 下载</span>
+            <span>{{ '★'.repeat(Math.round(detail?.rating||0)) }}</span>
+            <span v-if="detail?.price">¥{{ detail.price }}</span>
+            <span v-else>{{ $t('template.free')||'免费' }}</span>
+          </div>
           <div class="modal-actions">
-            <button class="btn-cancel" @click="showModal=false">取消</button>
-            <button class="btn-save" :disabled="saving" @click="save">{{ saving?'保存中...':'保存' }}</button>
+            <button class="btn-cancel" @click="showDetail=false">{{ $t('common.close')||'关闭' }}</button>
+            <button v-if="detail?.price" class="btn-save" :disabled="acting" @click="purchase(detail)">
+              {{ acting ? ($t('common.processing')||'处理中...') : ($t('template.buy')||'购买') }}
+            </button>
+            <button v-else class="btn-save" :disabled="acting" @click="download(detail)">
+              {{ acting ? ($t('common.processing')||'处理中...') : ($t('template.download')||'下载') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
+    <Teleport to="body">
+      <div v-if="showCreate" class="modal-overlay" @click.self="showCreate=false">
+        <div class="modal">
+          <h3>{{ $t('template.create') || '新建模板' }}</h3>
+          <div class="form-group"><label>{{ $t('template.name')||'名称' }}</label><input v-model="form.name" class="input" /></div>
+          <div class="form-group"><label>{{ $t('template.cat')||'分类' }}</label><select v-model="form.category" class="input"><option value="ecommerce">电商</option><option value="social">社交</option><option value="brand">品牌</option><option value="event">活动</option></select></div>
+          <div class="form-group"><label>{{ $t('template.desc')||'描述' }}</label><textarea v-model="form.description" class="input" rows="3" /></div>
+          <div class="form-group"><label>{{ $t('template.previewUrl')||'预览图URL(逗号分隔)' }}</label><input v-model="form.preview_images" class="input" placeholder="https://a.jpg,https://b.jpg" /></div>
+          <div class="form-group"><label>{{ $t('template.price')||'价格(0=免费)' }}</label><input v-model.number="form.price" type="number" class="input" min="0" step="0.01" /></div>
+          <div class="form-group"><label>{{ $t('template.metaJson')||'Meta JSON' }}</label><textarea v-model="form.meta" class="input" rows="2" placeholder='{"size":"1080x1080"}' /></div>
+          <div class="modal-actions">
+            <button class="btn-cancel" @click="showCreate=false">{{ $t('common.cancel')||'取消' }}</button>
+            <button class="btn-save" :disabled="saving" @click="doCreate">{{ saving?($t('common.saving')||'保存中...'):($t('common.save')||'保存') }}</button>
           </div>
         </div>
       </div>
     </Teleport>
   </AdminLayout>
 </template>
-<script setup lang="ts">
 
-const { confirm } = useConfirm()
+<script setup lang="ts">
+definePageMeta({ layout: 'admin' })
 
 const toast = useToast()
-const list = ref<any[]>([]), total = ref(0), page = ref(1), pageSize = 20, loading = ref(true)
-const keyword = ref(''), filterCategory = ref('')
-const showModal = ref(false), editing = ref<any>({}), saving = ref(false)
-const form = reactive({ title: '', description: '', category: 'main_image', content: '', icon: 'star', modelType: 'text', sortOrder: 0, isPublic: true, status: 2 })
+const list = ref<any[]>([]), loading = ref(true), error = ref('')
+const keyword = ref(''), category = ref(''), sort = ref('newest')
+const showDetail = ref(false), detail = ref<any>(null), acting = ref(false)
+const showCreate = ref(false), saving = ref(false)
+const form = reactive({ name: '', category: 'ecommerce', description: '', preview_images: '', price: 0, meta: '' })
 
-function catLabel(c: string) {
-  const m: Record<string,string> = { main_image:'主图',scene:'场景',video:'视频',script:'口播脚本',copy:'营销文案','viral-clone':'爆款复刻' }
-  return m[c] || c
-}
-function statusLabel(s: number) { const m: Record<number,string> = { 0:'草稿',1:'待审核',2:'已上架',3:'已下架' }; return m[s]||String(s) }
-function statusClass(s: number) { const m: Record<number,string> = { 0:'draft',1:'pending',2:'active',3:'banned' }; return m[s]||'' }
+let debounceTimer: ReturnType<typeof setTimeout>
+function onKeywordInput() { clearTimeout(debounceTimer); debounceTimer = setTimeout(search, 350) }
 
-onMounted(fetchData)
-async function fetchData() {
-  loading.value = true
+onMounted(search)
+async function search() {
+  loading.value = true; error.value = ''
   try {
-    const params = new URLSearchParams({ page:String(page.value), pageSize:String(pageSize) })
-    if (keyword.value) params.set('keyword', keyword.value)
-    if (filterCategory.value) params.set('category', filterCategory.value)
-    const res: any = await $fetch(`/api/admin/prompts?${params}`, { credentials: 'include' })
-    list.value = res?.data?.list || []
-    total.value = res?.data?.total || 0
-  } catch(e) { toast.error('加载失败') }
+    const q = new URLSearchParams({ category: category.value, keyword: keyword.value, sort: sort.value, page: '1', pageSize: '40' })
+    const res: any = await $fetch(`/api/template-market/search?${q}`, { credentials: 'include' })
+    list.value = res?.data?.list || res?.list || []
+  } catch (e: any) { error.value = e?.data?.msg || e.message || ($t('common.loadFail')||'加载失败') }
   loading.value = false
 }
-function onPageChange(p: number) { page.value = p; fetchData() }
-function openCreate() { editing.value = {}; Object.assign(form, { title:'',description:'',category:'main_image',content:'',icon:'star',modelType:'text',sortOrder:0,isPublic:true,status:2 }); showModal.value = true }
-function openEdit(t: any) { editing.value = t; Object.assign(form, { title:t.title,description:t.description||'',category:t.category,content:t.content,icon:t.icon,modelType:t.model_type,sortOrder:t.sort_order,isPublic:!!t.is_public,status:t.status }); showModal.value = true }
 
-async function save() {
+async function openDetail(t: any) {
+  showDetail.value = true; detail.value = t
+  try { detail.value = await $fetch(`/api/template-market/${t.id}`, { credentials: 'include' }) }
+  catch { /* fallback to card data */ }
+}
+
+async function download(t: any) {
+  acting.value = true
+  try { await $fetch(`/api/template-market/${t.id}/download`, { method: 'POST', credentials: 'include' }); toast.success($t('template.dlOk')||'下载成功') }
+  catch (e: any) { toast.error(e?.data?.msg || ($t('template.dlFail')||'下载失败')) }
+  acting.value = false
+}
+
+async function purchase(t: any) {
+  acting.value = true
+  try { await $fetch(`/api/template-market/${t.id}/purchase`, { method: 'POST', credentials: 'include' }); toast.success($t('template.buyOk')||'购买成功'); search() }
+  catch (e: any) { toast.error(e?.data?.msg || ($t('template.buyFail')||'购买失败')) }
+  acting.value = false
+}
+
+function openCreate() {
+  Object.assign(form, { name: '', category: 'ecommerce', description: '', preview_images: '', price: 0, meta: '' })
+  showCreate.value = true
+}
+
+async function doCreate() {
   saving.value = true
   try {
-    const body: any = { ...form }
-    if (editing.value.id) { body.id = editing.value.id; body.templateCode = editing.value.template_code }
-    await $fetch('/api/admin/prompts', { method:'POST', credentials:'include', body: JSON.stringify(body) })
-    showModal.value = false; fetchData()
-  } catch(e: any) { toast.error(e?.data?.msg || '保存失败') }
+    const body: any = {
+      name: form.name, category: form.category, description: form.description,
+      preview_images: form.preview_images.split(',').map((s: string) => s.trim()).filter(Boolean),
+      price: form.price, meta: (() => { try { return JSON.parse(form.meta) } catch { return {} } })()
+    }
+    await $fetch('/api/template-market/create', { method: 'POST', credentials: 'include', body: JSON.stringify(body) })
+    showCreate.value = false; search(); toast.success($t('template.created')||'创建成功')
+  } catch (e: any) { toast.error(e?.data?.msg || ($t('template.createFail')||'创建失败')) }
   saving.value = false
 }
-async function review(id: number, status: number) {
-  if (!await confirm({ message: status===2?'确认通过并上架？':'确认驳回/下架？'} )) return
-  try {
-    await $fetch(`/api/admin/prompts/${id}/review`, { method:'PUT', credentials:'include', body: JSON.stringify({ status, reviewRemark: status===3?'管理员操作':'' }) })
-    fetchData()
-  } catch(e: any) { toast.error(e?.data?.msg || '操作失败') }
-}
-async function deleteItem(t: any) {
-  if (!await confirm({ message: `确认删除「${t.title}」？`} )) return
-  try {
-    await $fetch(`/api/admin/prompts/${t.id}`, { method:'DELETE', credentials:'include' })
-    fetchData()
-  } catch(e: any) { toast.error(e?.data?.msg || '删除失败') }
-}
 </script>
+
 <style scoped>
-.ptitle { font-size: 22px; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; }
-.toolbar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
-.input-search { flex: 1; min-width: 160px; max-width: 280px; padding: 7px 12px; border: 1px solid var(--input-border); border-radius: var(--radius-sm); font-size: 13px; background: var(--bg-input); color: var(--text-primary); outline: none; transition: border-color var(--transition-fast); }
-.input-search:focus { border-color: var(--input-focus-border); box-shadow: var(--focus-ring); }
-.sel { padding: 7px 12px; border: 1px solid var(--input-border); border-radius: var(--radius-sm); font-size: 13px; background: var(--bg-card); color: var(--text-primary); outline: none; }
-.sel:focus { border-color: var(--input-focus-border); }
-.btn-primary { padding: 7px 18px; background: var(--brand); color: #fff; border: none; border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; white-space: nowrap; }
-.btn-primary:hover { opacity: 0.9; }
-.table-wrap { overflow-x: auto; }
-.table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--bg-card); border-radius: var(--radius-lg); overflow: hidden; }
-.table th, .table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--table-border); }
-.table th { color: var(--text-secondary); font-weight: 500; font-size: 12px; background: var(--table-header-bg); }
-tr:hover td { background: var(--table-row-hover); }
-.cat-tag { display: inline-block; padding: 2px 8px; border-radius: var(--badge-radius); font-size: 11px; background: var(--status-processing-bg); color: var(--status-processing-text); }
-.status-tag { display: inline-block; padding: 2px 8px; border-radius: var(--badge-radius); font-size: 11px; }
-.status-tag.draft { background: var(--bg-hover); color: var(--text-muted); }
-.status-tag.pending { background: var(--status-pending-bg); color: var(--status-pending-text); }
-.status-tag.active { background: var(--status-done-bg); color: var(--status-done-text); }
-.status-tag.banned { background: var(--status-fail-bg); color: var(--status-fail-text); }
-.btn-sm { padding: 3px 10px; border: 1px solid var(--input-border); border-radius: var(--radius-xs); background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 12px; margin-right: 4px; transition: border-color var(--transition-fast), color var(--transition-fast); }
-.btn-sm:hover { border-color: var(--brand); color: var(--brand); }
-.btn-sm.success { background: var(--success); color: #fff; border-color: var(--success); }
-.btn-sm.warn { background: var(--warning); color: #fff; border-color: var(--warning); }
-.btn-sm.danger { background: var(--danger); color: #fff; border-color: var(--danger); }
-.actions { white-space: nowrap; }
-.empty { text-align: center; color: var(--text-muted); padding: 40px; }
-.modal-overlay { position: fixed; inset: 0; background: var(--modal-overlay); z-index: 5000; display: flex; align-items: center; justify-content: center; animation: overlay-fade-in var(--transition-base); }
-.modal { background: var(--bg-card); border-radius: var(--modal-radius); padding: var(--modal-padding); width: 90%; max-width: 600px; max-height: 85vh; overflow-y: auto; box-shadow: var(--modal-shadow); animation: modal-enter var(--transition-slow); }
-.modal h3 { font-size: 17px; font-weight: 600; margin-bottom: 18px; color: var(--text-primary); }
-.form-group { margin-bottom: 12px; }
+.ptitle { font-size: 20px; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; }
+.toolbar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+
+.input-search { flex: 1; min-width: 160px; max-width: 280px; padding: 7px 12px; border: 1px solid var(--input-border,#e2e8f0); border-radius: var(--radius-sm,8px); font-size: 13px; background: var(--bg-input,var(--bg-card)); color: var(--text-primary); outline: none; transition: border-color .15s; }
+.input-search:focus { border-color: var(--input-focus-border,var(--brand)); box-shadow: var(--focus-ring); }
+
+.sel { padding: 7px 12px; border: 1px solid var(--input-border,#e2e8f0); border-radius: var(--radius-sm,8px); font-size: 13px; background: var(--bg-card); color: var(--text-primary); outline: none; }
+.sel:focus { border-color: var(--input-focus-border,var(--brand)); }
+
+.btn-brand { padding: 7px 18px; background: var(--brand,#3B82F6); color: var(--text-on-brand,#fff); border: none; border-radius: var(--radius-sm,8px); cursor: pointer; font-size: 13px; white-space: nowrap; transition: opacity .15s; }
+.btn-brand:hover { opacity: .88; }
+
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+.card { background: var(--bg-card); border: 1px solid var(--border,#e5e7eb); border-radius: var(--radius-lg,12px); overflow: hidden; cursor: pointer; transition: transform .15s, box-shadow .15s; }
+.card:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+.card-img { width: 100%; height: 180px; object-fit: cover; background: var(--skeleton-bg,#f3f4f6); }
+.card-body { padding: 12px; }
+.cat-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; background: var(--status-processing-bg,#dbeafe); color: var(--status-processing-text,#1d4ed8); margin-bottom: 6px; }
+.card-name { font-size: 14px; font-weight: 600; color: var(--text-primary); margin: 0 0 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted,#9ca3af); margin-bottom: 8px; }
+.stars { color: #f59e0b; letter-spacing: 1px; }
+.card-footer { display: flex; justify-content: space-between; align-items: center; }
+.price { font-size: 15px; font-weight: 700; color: var(--brand,#3B82F6); }
+.price.free { color: var(--success,#22c55e); }
+
+.card-skel { height: 280px; border-radius: var(--radius-lg,12px); background: var(--skeleton-bg,#f3f4f6); }
+.pulse { animation: sk-pulse 1.5s ease-in-out infinite; }
+@keyframes sk-pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+.error-state { text-align: center; padding: 60px 20px; }
+.error-icon { display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 50%; background: var(--status-fail-bg,#fee2e2); color: var(--status-fail-text,#dc2626); font-size: 22px; font-weight: 700; margin-bottom: 12px; }
+.error-state p { color: var(--text-muted); margin: 0 0 16px; font-size: 14px; }
+.retry-btn { padding: 8px 20px; background: var(--brand); color: var(--text-on-brand,#fff); border: none; border-radius: var(--radius-sm,8px); cursor: pointer; font-size: 13px; }
+.empty { text-align: center; color: var(--text-muted); padding: 60px 20px; font-size: 14px; }
+
+.modal-overlay { position: fixed; inset: 0; background: var(--modal-overlay,rgba(0,0,0,.45)); z-index: 5000; display: flex; align-items: center; justify-content: center; }
+.modal { background: var(--bg-card); border-radius: var(--modal-radius,12px); padding: var(--modal-padding,24px); width: 90%; max-width: 600px; max-height: 85vh; overflow-y: auto; box-shadow: var(--modal-shadow); }
+.modal h3 { font-size: 17px; font-weight: 600; margin: 0 0 16px; color: var(--text-primary); }
+.detail-imgs { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 14px; }
+.detail-img { width: 140px; height: 100px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border,#e5e7eb); flex-shrink: 0; }
+.detail-desc { font-size: 13px; color: var(--text-secondary); margin: 0 0 12px; line-height: 1.6; }
+.detail-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.meta-tag { padding: 2px 8px; border-radius: 4px; font-size: 11px; background: var(--bg-secondary,#f9fafb); color: var(--text-muted); border: 1px solid var(--border-light,#f3f4f6); }
+.detail-stats { display: flex; gap: 14px; font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; padding: 10px 0; border-top: 1px solid var(--border-light,#f3f4f6); border-bottom: 1px solid var(--border-light,#f3f4f6); }
+.form-group { margin-bottom: 10px; }
 .form-group label { display: block; font-size: 13px; color: var(--text-secondary); margin-bottom: 4px; }
-.form-row { display: flex; gap: 12px; }
-.form-row .form-group { flex: 1; }
-.input { width: 100%; padding: 8px 12px; border: 1px solid var(--input-border); border-radius: var(--radius-sm); font-size: 13px; background: var(--bg-input); color: var(--text-primary); outline: none; transition: border-color var(--transition-fast); resize: vertical; }
-.input:focus { border-color: var(--input-focus-border); box-shadow: var(--focus-ring); }
-.modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
-.btn-cancel { padding: 8px 20px; border: 1px solid var(--input-border); border-radius: var(--radius-sm); background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 13px; }
+.form-group .input { width: 100%; padding: 8px 12px; border: 1px solid var(--input-border,#e2e8f0); border-radius: var(--radius-sm,8px); font-size: 13px; background: var(--bg-input,var(--bg-card)); color: var(--text-primary); outline: none; resize: vertical; }
+.form-group .input:focus { border-color: var(--input-focus-border,var(--brand)); box-shadow: var(--focus-ring); }
+.modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+.btn-cancel { padding: 8px 20px; border: 1px solid var(--border,#e5e7eb); border-radius: var(--radius-sm,8px); background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 13px; }
 .btn-cancel:hover { border-color: var(--text-muted); }
-.btn-save { padding: 8px 20px; background: var(--brand); color: #fff; border: none; border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; }
-.btn-save:hover { opacity: 0.9; }
-.btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-save { padding: 8px 20px; background: var(--brand); color: var(--text-on-brand,#fff); border: none; border-radius: var(--radius-sm,8px); cursor: pointer; font-size: 13px; }
+.btn-save:hover { opacity: .88; }
+.btn-save:disabled { opacity: .5; cursor: not-allowed; }
 </style>

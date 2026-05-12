@@ -42,7 +42,7 @@ async function copyLink() {
 </script>
 
 <style scoped>
-.link-box { display: flex; gap: 12px; align-items: center; padding: 16px; background: #f8f9fa; border-radius: 8px; }
-.link-box code { flex: 1; padding: 8px 12px; background: #fff; border: 1px solid #e0e0e0; border-radius: 4px; word-break: break-all; }
-.hint { color: #888; }
+.link-box { display: flex; gap: 12px; align-items: center; padding: 16px; background: var(--bg-input); border-radius: 8px; }
+.link-box code { flex: 1; padding: 8px 12px; background: var(--bg-card); border: 1px solid var(--border-default); border-radius: 4px; word-break: break-all; }
+.hint { color: var(--text-muted); }
 </style>

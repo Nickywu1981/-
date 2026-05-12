@@ -38,6 +38,6 @@ function statusLabel(s) { return { pending: t('enterprise.commerce.index.statusP
 <style scoped>
 .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .detail-grid div { display: flex; flex-direction: column; }
-.detail-grid label { font-size: 12px; color: #999; margin-bottom: 4px; }
-.detail-grid span { font-size: 16px; color: #333; }
+.detail-grid label { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+.detail-grid span { font-size: 16px; color: var(--text-primary); }
 </style>
