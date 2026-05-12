@@ -1,4 +1,5 @@
 import db from './db.js';
+import { parsePagination } from '../utils/pagination.js';
 
 export default {
   async createJob(userId, taskType, { videoUrl, sourceLang, targetLang, extraConfig }) {
@@ -11,7 +12,7 @@ export default {
   },
 
   async findByUser(userId, { taskType, page = 1, limit = 20 } = {}) {
-    const offset = (page - 1) * limit;
+    const { offset } = parsePagination({ page, pageSize: limit });
     let sql = 'SELECT * FROM video_translate_jobs WHERE user_id = ?';
     const params = [userId];
     if (taskType) { sql += ' AND task_type = ?'; params.push(taskType); }

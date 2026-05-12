@@ -1,4 +1,5 @@
 import pool from './db.js';
+import { parsePagination } from '../utils/pagination.js';
 
 export async function insertHistory({ userId, type, inputs, outputs, modelId, tokenUsed, status = 'success', errorMsg = null }) {
   const [r] = await pool.execute(
@@ -10,7 +11,7 @@ export async function insertHistory({ userId, type, inputs, outputs, modelId, to
 }
 
 export async function listHistory({ userId, type, page = 1, pageSize = 20 }) {
-  const offset = Math.max(0, (Number(page) - 1) * Number(pageSize));
+  const { offset } = parsePagination({ page, pageSize });
   const limit = Number(pageSize);
   const hasType = type && type !== 'undefined';
   const where = hasType ? 'AND type = ?' : '';

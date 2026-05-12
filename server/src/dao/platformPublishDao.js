@@ -1,4 +1,5 @@
 import db from './db.js';
+import { parsePagination } from '../utils/pagination.js';
 
 export default {
   async saveCredential(userId, { platform, appKey, appSecret, accessToken, shopName }) {
@@ -61,7 +62,7 @@ export default {
   },
 
   async getPublishHistory(userId, { platform, page = 1, limit = 20 } = {}) {
-    const offset = (page - 1) * limit;
+    const { offset } = parsePagination({ page, pageSize: limit });
     let sql = 'SELECT * FROM platform_publish_history WHERE user_id = ?';
     const params = [userId];
     if (platform) { sql += ' AND platform = ?'; params.push(platform); }

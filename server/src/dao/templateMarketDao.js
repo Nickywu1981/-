@@ -1,8 +1,9 @@
 import db from './db.js';
+import { parsePagination } from '../utils/pagination.js';
 
 export default {
   async search({ category, keyword, sort = 'download_count', page = 1, limit = 20 } = {}) {
-    const offset = (page - 1) * limit;
+    const { offset } = parsePagination({ page, pageSize: limit });
     let where = 'WHERE status = ?';
     const params = ['published'];
     if (category) { where += ' AND category = ?'; params.push(category); }
