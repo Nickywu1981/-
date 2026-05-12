@@ -6,6 +6,8 @@
  *   downloadBlob(blob, 'export.csv')
  */
 export function useFileDownload() {
+  let revokeTimer: ReturnType<typeof setTimeout> | null = null;
+
   function trigger(url: string, filename: string) {
     if (!import.meta.client) return
     const a = document.createElement('a')
@@ -21,9 +23,13 @@ export function useFileDownload() {
   function downloadBlob(blob: Blob, filename: string) {
     const url = URL.createObjectURL(blob)
     trigger(url, filename)
-    // 延迟 revoke 确保浏览器已开始下载
-    setTimeout(() => URL.revokeObjectURL(url), 1000)
+    if (revokeTimer) clearTimeout(revokeTimer)
+    revokeTimer = setTimeout(() => { URL.revokeObjectURL(url); revokeTimer = null; }, 1000)
   }
+
+  onUnmounted(() => {
+    if (revokeTimer) { clearTimeout(revokeTimer); revokeTimer = null; }
+  })
 
   return { download, downloadBlob }
 }
