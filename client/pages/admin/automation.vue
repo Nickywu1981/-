@@ -1,21 +1,29 @@
 <template>
   <AdminLayout>
     <div class="page-header">
-      <h1>自动化任务</h1>
-      <button class="btn-primary" @click="openCreate">+ 新建任务</button>
+      <h1>{{ $t('admin_automation.page_title') }}</h1>
+      <button class="btn-primary" @click="openCreate">{{ $t('admin_automation.new_task') }}</button>
     </div>
 
     <div class="toolbar">
       <select v-model="filterStatus" class="sel" @change="search">
-        <option value="">全部状态</option>
-        <option value="0">排队中</option><option value="1">执行中</option><option value="2">成功</option><option value="3">失败</option><option value="4">已取消</option>
+        <option value="">{{ $t('admin_automation.all_statuses') }}</option>
+        <option value="0">{{ $t('admin_automation.status_queued') }}</option>
+        <option value="1">{{ $t('admin_automation.status_running') }}</option>
+        <option value="2">{{ $t('admin_automation.status_success') }}</option>
+        <option value="3">{{ $t('admin_automation.status_failed') }}</option>
+        <option value="4">{{ $t('admin_automation.status_cancelled') }}</option>
       </select>
       <select v-model="filterType" class="sel" @change="search">
-        <option value="">全部类型</option>
-        <option value="product_on">商品上架</option><option value="product_off">商品下架</option><option value="ship_order">发货</option><option value="reply_review">评价回复</option><option value="stock_check">库存检查</option>
+        <option value="">{{ $t('admin_automation.all_types') }}</option>
+        <option value="product_on">{{ $t('admin_automation.type_product_on') }}</option>
+        <option value="product_off">{{ $t('admin_automation.type_product_off') }}</option>
+        <option value="ship_order">{{ $t('admin_automation.type_ship') }}</option>
+        <option value="reply_review">{{ $t('admin_automation.type_reply') }}</option>
+        <option value="stock_check">{{ $t('admin_automation.type_stock_check') }}</option>
       </select>
-      <input v-model="keyword" type="text" placeholder="搜索平台/店铺" @keyup.enter="search" />
-      <button class="btn" @click="search">搜索</button>
+      <input v-model="keyword" type="text" :placeholder="$t('admin_automation.search_placeholder')" @keyup.enter="search" />
+      <button class="btn" @click="search">{{ $t('common.search') }}</button>
     </div>
 
     <LoadingSkeleton v-if="loading" type="table" :rows="5" :cols="8" />
@@ -23,13 +31,13 @@
     <div v-else-if="error" class="error-state">
       <span class="error-icon">⚠️</span>
       <p>{{ error }}</p>
-      <button class="retry-btn" @click="fetchData">重试</button>
+      <button class="retry-btn" @click="fetchData">{{ $t('common.retry') }}</button>
     </div>
 
     <template v-else-if="list.length">
       <div class="table-wrap">
         <table>
-          <thead><tr><th>ID</th><th>平台</th><th>店铺</th><th>任务类型</th><th>状态</th><th>结果</th><th>时间</th><th>操作</th></tr></thead>
+          <thead><tr><th>{{ $t('common.id') }}</th><th>{{ $t('admin_automation.col_platform') }}</th><th>{{ $t('admin_automation.col_store') }}</th><th>{{ $t('admin_automation.col_type') }}</th><th>{{ $t('common.status') }}</th><th>{{ $t('admin_automation.col_result') }}</th><th>{{ $t('admin_automation.col_time') }}</th><th>{{ $t('common.action') }}</th></tr></thead>
           <tbody>
             <tr v-for="t in list" :key="t.id" class="clickable" @click="openDetail(t)">
               <td>{{ t.id }}</td>
@@ -39,9 +47,9 @@
               <td class="result-cell">{{ t.result_json || t.error_msg || '-' }}</td>
               <td>{{ t.create_time?.slice(0, 16) }}</td>
               <td class="actions" @click.stop>
-                <button v-if="t.status===0" class="btn-sm" @click="execute(t)">执行</button>
-                <button v-if="t.status<=1" class="btn-sm danger" @click="cancel(t)">取消</button>
-                <button v-if="t.status===3" class="btn-sm" @click="retryTask(t)">重试</button>
+                <button v-if="t.status===0" class="btn-sm" @click="execute(t)">{{ $t('admin_automation.execute') }}</button>
+                <button v-if="t.status<=1" class="btn-sm danger" @click="cancel(t)">{{ $t('common.cancel') }}</button>
+                <button v-if="t.status===3" class="btn-sm" @click="retryTask(t)">{{ $t('admin_automation.retry_btn') }}</button>
               </td>
             </tr>
           </tbody>
@@ -49,26 +57,30 @@
       </div>
       <Pagination :page="page" :page-size="pageSize" :total="total" @change="onPageChange" />
     </template>
-    <div v-else class="empty">暂无自动化任务</div>
+    <div v-else class="empty">{{ $t('admin_automation.no_data') }}</div>
 
     <Teleport to="body">
       <div v-if="modalOpen" class="modal-overlay" @click.self="modalOpen = false">
         <div class="modal">
-          <h3>新建自动化任务</h3>
+          <h3>{{ $t('admin_automation.modal_create') }}</h3>
           <div class="form-grid">
-            <label>平台 <input v-model="form.platform" maxlength="100" placeholder="如: 淘宝/京东/拼多多" /></label>
-            <label>店铺名称 <input v-model="form.store_name" maxlength="100" placeholder="店铺名称" /></label>
-            <label>任务类型
+            <label>{{ $t('admin_automation.label_platform') }} <input v-model="form.platform" maxlength="100" :placeholder="$t('admin_automation.platform_placeholder')" /></label>
+            <label>{{ $t('admin_automation.label_store') }} <input v-model="form.store_name" maxlength="100" :placeholder="$t('admin_automation.store_placeholder')" /></label>
+            <label>{{ $t('admin_automation.label_task_type') }}
               <select v-model="form.task_type">
-                <option value="">请选择任务类型</option>
-                <option value="product_on">商品上架</option><option value="product_off">商品下架</option><option value="ship_order">发货</option><option value="reply_review">评价回复</option><option value="stock_check">库存检查</option>
+                <option value="">{{ $t('admin_automation.select_task_type') }}</option>
+                <option value="product_on">{{ $t('admin_automation.type_product_on') }}</option>
+                <option value="product_off">{{ $t('admin_automation.type_product_off') }}</option>
+                <option value="ship_order">{{ $t('admin_automation.type_ship') }}</option>
+                <option value="reply_review">{{ $t('admin_automation.type_reply') }}</option>
+                <option value="stock_check">{{ $t('admin_automation.type_stock_check') }}</option>
               </select>
             </label>
-            <label>店铺ID <input v-model="form.store_id" maxlength="100" placeholder="可选" /></label>
+            <label>{{ $t('admin_automation.label_store_id') }} <input v-model="form.store_id" maxlength="100" :placeholder="$t('admin_automation.store_id_placeholder')" /></label>
           </div>
           <div class="modal-actions">
-            <button class="btn-cancel" @click="modalOpen = false">取消</button>
-            <button class="btn-save" :disabled="saving" @click="save">{{ saving ? '创建中...' : '创建' }}</button>
+            <button class="btn-cancel" @click="modalOpen = false">{{ $t('common.cancel') }}</button>
+            <button class="btn-save" :disabled="saving" @click="save">{{ saving ? $t('common.saving') : $t('common.create') }}</button>
           </div>
         </div>
       </div>
@@ -77,23 +89,23 @@
     <Teleport to="body">
       <div v-if="detailOpen" class="modal-overlay" @click.self="detailOpen = false">
         <div class="modal">
-          <h3>任务详情 #{{ detail.id }}</h3>
+          <h3>{{ $t('admin_automation.detail_title', { id: detail.id }) }}</h3>
           <div class="detail-grid">
-            <div class="detail-item"><span class="dl">平台</span><span class="dv">{{ detail.platform || '-' }}</span></div>
-            <div class="detail-item"><span class="dl">店铺</span><span class="dv">{{ detail.store_name || '-' }}</span></div>
-            <div class="detail-item"><span class="dl">类型</span><span class="dv">{{ typeText(detail.task_type) }}</span></div>
-            <div class="detail-item"><span class="dl">状态</span><span class="dv"><span :class="statusClass(detail.status)">{{ statusText(detail.status) }}</span></span></div>
-            <div class="detail-item"><span class="dl">创建时间</span><span class="dv">{{ detail.create_time }}</span></div>
-            <div class="detail-item"><span class="dl">完成时间</span><span class="dv">{{ detail.finish_time || '-' }}</span></div>
-            <div class="detail-item full" v-if="detail.input_data"><span class="dl">输入参数</span><span class="dv"><pre>{{ JSON.stringify(detail.input_data, null, 2) }}</pre></span></div>
-            <div class="detail-item full" v-if="detail.result_json"><span class="dl">执行结果</span><span class="dv"><pre>{{ detail.result_json }}</pre></span></div>
-            <div class="detail-item full" v-if="detail.error_msg"><span class="dl">错误信息</span><span class="dv error-msg">{{ detail.error_msg }}</span></div>
+            <div class="detail-item"><span class="dl">{{ $t('admin_automation.detail_platform') }}</span><span class="dv">{{ detail.platform || '-' }}</span></div>
+            <div class="detail-item"><span class="dl">{{ $t('admin_automation.detail_store') }}</span><span class="dv">{{ detail.store_name || '-' }}</span></div>
+            <div class="detail-item"><span class="dl">{{ $t('admin_automation.detail_type') }}</span><span class="dv">{{ typeText(detail.task_type) }}</span></div>
+            <div class="detail-item"><span class="dl">{{ $t('admin_automation.detail_status') }}</span><span class="dv"><span :class="statusClass(detail.status)">{{ statusText(detail.status) }}</span></span></div>
+            <div class="detail-item"><span class="dl">{{ $t('admin_automation.detail_create_time') }}</span><span class="dv">{{ detail.create_time }}</span></div>
+            <div class="detail-item"><span class="dl">{{ $t('admin_automation.detail_finish_time') }}</span><span class="dv">{{ detail.finish_time || '-' }}</span></div>
+            <div class="detail-item full" v-if="detail.input_data"><span class="dl">{{ $t('admin_automation.detail_input') }}</span><span class="dv"><pre>{{ JSON.stringify(detail.input_data, null, 2) }}</pre></span></div>
+            <div class="detail-item full" v-if="detail.result_json"><span class="dl">{{ $t('admin_automation.detail_result') }}</span><span class="dv"><pre>{{ detail.result_json }}</pre></span></div>
+            <div class="detail-item full" v-if="detail.error_msg"><span class="dl">{{ $t('admin_automation.detail_error') }}</span><span class="dv error-msg">{{ detail.error_msg }}</span></div>
           </div>
           <div class="modal-actions">
-            <button v-if="detail.status===0" class="btn-save" @click="execute(detail); detailOpen = false">执行</button>
-            <button v-if="detail.status<=1" class="btn-danger" @click="cancel(detail); detailOpen = false">取消</button>
-            <button v-if="detail.status===3" class="btn-save" @click="retryTask(detail); detailOpen = false">重试</button>
-            <button class="btn-cancel" @click="detailOpen = false">关闭</button>
+            <button v-if="detail.status===0" class="btn-save" @click="execute(detail); detailOpen = false">{{ $t('admin_automation.execute') }}</button>
+            <button v-if="detail.status<=1" class="btn-danger" @click="cancel(detail); detailOpen = false">{{ $t('common.cancel') }}</button>
+            <button v-if="detail.status===3" class="btn-save" @click="retryTask(detail); detailOpen = false">{{ $t('admin_automation.retry_btn') }}</button>
+            <button class="btn-cancel" @click="detailOpen = false">{{ $t('common.close') }}</button>
           </div>
         </div>
       </div>
@@ -103,6 +115,7 @@
 
 <script setup lang="ts">
 
+const { t } = useI18n()
 const list = ref<any[]>([])
 const total = ref(0)
 const page = ref(1)
@@ -121,12 +134,25 @@ const form = ref({ platform: '', store_name: '', store_id: '', task_type: 'produ
 const toast = useToast()
 onMounted(fetchData)
 
-function typeText(t: string) {
-  const map: Record<string, string> = { product_on: '商品上架', product_off: '商品下架', ship_order: '发货', reply_review: '评价回复', stock_check: '库存检查' }
-  return map[t] || t
+const TYPE_MAP: Record<string, string> = {
+  product_on: t('admin_automation.type_product_on'),
+  product_off: t('admin_automation.type_product_off'),
+  ship_order: t('admin_automation.type_ship'),
+  reply_review: t('admin_automation.type_reply'),
+  stock_check: t('admin_automation.type_stock_check'),
 }
-function statusText(s: number) { return ['排队中', '执行中', '成功', '失败', '已取消'][s] || '未知' }
-function statusClass(s: number) { return ['badge-pending', 'badge-running', 'badge-ok', 'badge-fail', 'badge-cancel'][s] || '' }
+const STATUS_TEXTS = [
+  t('admin_automation.status_queued'),
+  t('admin_automation.status_running'),
+  t('admin_automation.status_success'),
+  t('admin_automation.status_failed'),
+  t('admin_automation.status_cancelled'),
+]
+const STATUS_CLASSES = ['badge-pending', 'badge-running', 'badge-ok', 'badge-fail', 'badge-cancel']
+
+function typeText(tp: string) { return TYPE_MAP[tp] || tp }
+function statusText(s: number) { return STATUS_TEXTS[s] || t('admin_automation.status_unknown') }
+function statusClass(s: number) { return STATUS_CLASSES[s] || '' }
 
 async function fetchData() {
   loading.value = true; error.value = ''
@@ -137,7 +163,7 @@ async function fetchData() {
     const res: any = await $fetch(`/api/automation/tasks?${params.toString()}`)
     if (res?.code === 200) { list.value = res.data?.list || []; total.value = res.data?.total || 0 }
     else { list.value = res.data || []; total.value = list.value.length }
-  } catch (e: any) { error.value = e?.data?.msg || e.message || '加载失败'; toast.error(error.value) } finally { loading.value = false }
+  } catch (e: any) { error.value = e?.data?.msg || e.message || t('common.loadFail'); toast.error(error.value) } finally { loading.value = false }
 }
 
 function search() { page.value = 1; fetchData() }
@@ -149,33 +175,33 @@ async function save() {
   saving.value = true
   try {
     const res: any = await $fetch('/api/automation/tasks', { method: 'POST', body: form.value })
-    if (res?.code === 200 || res?.code === 0) { toast.success('任务已创建'); modalOpen.value = false; fetchData() }
-    else { toast.error(res?.msg || '创建失败') }
-  } catch (e: any) { toast.error(e?.data?.msg || e.message || '创建失败') } finally { saving.value = false }
+    if (res?.code === 200 || res?.code === 0) { toast.success(t('admin_automation.task_created')); modalOpen.value = false; fetchData() }
+    else { toast.error(res?.msg || t('common.save_failed')) }
+  } catch (e: any) { toast.error(e?.data?.msg || e.message || t('common.save_failed')) } finally { saving.value = false }
 }
 
 async function execute(t: any) {
   try {
     const res: any = await $fetch(`/api/automation/admin/execute/${t.id}`, { method: 'POST' })
-    if (res?.code === 200 || res?.code === 0) { t.status = 1; toast.success('任务已开始执行') }
-    else { toast.error(res?.msg || '执行失败') }
-  } catch (e: any) { toast.error(e?.data?.msg || e.message || '执行失败') }
+    if (res?.code === 200 || res?.code === 0) { t.status = 1; toast.success(t('admin_automation.task_executing')) }
+    else { toast.error(res?.msg || t('common.save_failed')) }
+  } catch (e: any) { toast.error(e?.data?.msg || e.message || t('common.save_failed')) }
 }
 
 async function cancel(t: any) {
   try {
     const res: any = await $fetch(`/api/automation/tasks/${t.id}/cancel`, { method: 'POST' })
-    if (res?.code === 200 || res?.code === 0) { t.status = 4; toast.success('任务已取消') }
-    else { toast.error(res?.msg || '取消失败') }
-  } catch (e: any) { toast.error(e?.data?.msg || e.message || '取消失败') }
+    if (res?.code === 200 || res?.code === 0) { t.status = 4; toast.success(t('admin_automation.task_cancelled')) }
+    else { toast.error(res?.msg || t('common.save_failed')) }
+  } catch (e: any) { toast.error(e?.data?.msg || e.message || t('common.save_failed')) }
 }
 
 async function retryTask(t: any) {
   try {
     const res: any = await $fetch(`/api/automation/admin/execute/${t.id}`, { method: 'POST' })
-    if (res?.code === 200 || res?.code === 0) { t.status = 1; toast.success('任务已重新提交'); fetchData() }
-    else { toast.error(res?.msg || '重试失败') }
-  } catch (e: any) { toast.error(e?.data?.msg || e.message || '重试失败') }
+    if (res?.code === 200 || res?.code === 0) { t.status = 1; toast.success(t('admin_automation.task_retried')); fetchData() }
+    else { toast.error(res?.msg || t('common.save_failed')) }
+  } catch (e: any) { toast.error(e?.data?.msg || e.message || t('common.save_failed')) }
 }
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
