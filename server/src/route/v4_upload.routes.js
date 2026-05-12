@@ -4,39 +4,22 @@
  */
 import { Router } from 'express';
 import { z } from 'zod';
-import { success, error } from '../utils/response.js';
+import { error } from '../utils/response.js';
 import { validateV4 as _validate, validate } from '../utils/validate.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { uploadLimiter } from '../middleware/rateLimiter.js';
 import { uploadQuotaGuard } from '../middleware/upload.js';
-import * as uploadService from '../utils/file-upload.js';
 import multer from 'multer';
+import * as ctrl from '../controller/v4UploadController.js';
 
 const router = Router();
 router.use(authMiddleware);
 
-// 魔数签名（前 N 字节）
-const MAGIC_BYTES = {
-  'image/png':      [0x89, 0x50, 0x4E, 0x47],
-  'image/jpeg':     [0xFF, 0xD8, 0xFF],
-  'image/webp':     [0x52, 0x49, 0x46, 0x46],
-  'image/gif':      [0x47, 0x49, 0x46, 0x38],
-  'image/avif':     [0x00, 0x00, 0x00, 0x1C, 0x66, 0x74, 0x79, 0x70, 0x61, 0x76, 0x69, 0x66], // ftypavif box
-  'video/mp4':      [0x00, 0x00, 0x00, null, 0x66, 0x74, 0x79, 0x70],     // ftyp box (ISOM/MP4)
-  'video/quicktime': [0x00, 0x00, 0x00, null, 0x66, 0x74, 0x79, 0x70],     // ftyp box (MOV)
-};
-const ALLOWED_MIMES = Object.keys(MAGIC_BYTES);
-
-function checkBufferMagic(buffer, mimeType) {
-  const expected = MAGIC_BYTES[mimeType];
-  if (!expected) return true;
-  if (buffer.length < expected.length) return false;
-  for (let i = 0; i < expected.length; i++) {
-    if (expected[i] !== null && buffer[i] !== expected[i]) return false;
-  }
-  return true;
-}
+const ALLOWED_MIMES = Object.keys({
+  'image/png': true, 'image/jpeg': true, 'image/webp': true,
+  'image/gif': true, 'image/avif': true, 'video/mp4': true, 'video/quicktime': true,
+});
 
 const _storage = multer.memoryStorage();
 const _upload = multer({
@@ -66,7 +49,6 @@ const chunkSchema = z.object({
   chunk_index: z.coerce.number().int().min(0, 'chunk_index 必须为非负整数'),
 });
 
-// Multer error wrapper
 function _withMulter(req, res, next) {
   _upload.single('file')(req, res, (err) => {
     if (err) {
@@ -79,73 +61,10 @@ function _withMulter(req, res, next) {
   });
 }
 
-// POST /api/upload/simple — 小文件直接上传
-router.post('/simple', uploadLimiter, _withMulter, uploadQuotaGuard, async (req, res) => {
-  try {
-    if (!req.file) return error(res, ERROR_CODE.VALIDATION_ERROR, '请选择文件');
-    if (!checkBufferMagic(req.file.buffer, req.file.mimetype)) {
-      return error(res, ERROR_CODE.VALIDATION_ERROR, '文件内容与类型不匹配');
-    }
-    const result = await uploadService.saveSimpleFile(req.file);
-    return success(res, result, '上传成功');
-  } catch (err) {
-    return error(res, ERROR_CODE.INTERNAL_ERROR, err.message || '上传失败');
-  }
-});
-
-// POST /api/upload/init — 初始化分片上传
-router.post('/init', uploadLimiter, _validate(initUploadSchema), async (req, res) => {
-  try {
-    const { file_name, file_size, file_type } = req.validated;
-    const result = await uploadService.initUpload({ fileName: file_name, fileSize: file_size, fileType: file_type });
-    return success(res, result);
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '初始化上传失败');
-  }
-});
-
-const UPLOAD_ID_REGEX = /^[a-f0-9]{32}$/;
-
-// POST /api/upload/chunk — 接收分片 (multipart: upload_id, chunk_index, chunk)
-router.post('/chunk', uploadLimiter, _upload.fields([{ name: 'chunk', maxCount: 1 }]), uploadQuotaGuard, validate(chunkSchema, 'body'), async (req, res) => {
-  try {
-    const { upload_id, chunk_index } = req.body;
-    const chunkFile = req.files?.chunk?.[0];
-    if (!chunkFile) {
-      return error(res, ERROR_CODE.VALIDATION_ERROR, '缺少分片文件');
-    }
-    if (!checkBufferMagic(chunkFile.buffer, chunkFile.mimetype)) {
-      return error(res, ERROR_CODE.VALIDATION_ERROR, '文件内容与类型不匹配');
-    }
-    const result = await uploadService.receiveChunk(upload_id, chunk_index, chunkFile.buffer);
-    return success(res, result);
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '接收分片失败');
-  }
-});
-
-// GET /api/upload/chunks/:uploadId — 获取已上传分片 (断点续传)
-router.get('/chunks/:uploadId', async (req, res) => {
-  try {
-    if (!UPLOAD_ID_REGEX.test(req.params.uploadId)) {
-      return error(res, ERROR_CODE.VALIDATION_ERROR, 'uploadId 格式不正确');
-    }
-    const result = await uploadService.getReceivedChunks(req.params.uploadId);
-    return success(res, result);
-  } catch (err) {
-    return error(res, ERROR_CODE.INTERNAL_ERROR, err.message || '查询分片失败');
-  }
-});
-
-// POST /api/upload/complete — 完成合并
-router.post('/complete', uploadLimiter, _validate(completeUploadSchema), async (req, res) => {
-  try {
-    const { upload_id } = req.validated;
-    const result = await uploadService.completeUpload(upload_id);
-    return success(res, result, '上传完成');
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '合并文件失败');
-  }
-});
+router.post('/simple', uploadLimiter, _withMulter, uploadQuotaGuard, ctrl.saveSimpleFile);
+router.post('/init', uploadLimiter, _validate(initUploadSchema), ctrl.initUpload);
+router.post('/chunk', uploadLimiter, _upload.fields([{ name: 'chunk', maxCount: 1 }]), uploadQuotaGuard, validate(chunkSchema, 'body'), ctrl.receiveChunk);
+router.get('/chunks/:uploadId', ctrl.getReceivedChunks);
+router.post('/complete', uploadLimiter, _validate(completeUploadSchema), ctrl.completeUpload);
 
 export default router;

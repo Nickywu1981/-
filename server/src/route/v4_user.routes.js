@@ -1,21 +1,13 @@
 /**
  * Movio AI v4.1 — User Routes
  * G5 后端开发 | W4
- * GET  /api/user/profile       — 用户信息 + 会员状态
- * PUT  /api/user/profile       — 更新用户资料
- * GET  /api/user/stats         — 用量统计
- * PUT  /api/user/change-password — 修改密码（需旧密码验证）
  */
 import { Router } from 'express';
 import { z } from 'zod';
-import bcrypt from 'bcryptjs';
-import { success, error } from '../utils/response.js';
-import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
-import db from '../dao/db.js';
-import membershipDao from '../dao/membershipDao.js';
+import * as ctrl from '../controller/v4UserController.js';
 
 const router = Router();
 
@@ -32,142 +24,14 @@ const changePasswordSchema = z.object({
   newPassword: z.string().min(8, '新密码至少8位').max(64),
 });
 
-// 所有路由需要登录
 router.use(authMiddleware);
 
-router.get('/profile', async (req, res) => {
-  try {
-    const conn = await db.getConnection();
-    try {
-      const [users] = await conn.query(
-        'SELECT id, nickname, phone, email, avatar, role, create_time FROM `user` WHERE id = ?',
-        [req.user.id],
-      );
-      if (users.length === 0) return error(res, ERROR_CODE.NOT_FOUND, '用户不存在');
-
-      const [membership] = await conn.query(
-        'SELECT plan_type, credit_balance, start_time, end_time, auto_renew FROM user_membership WHERE user_id = ? AND is_deleted = 0',
-        [req.user.id],
-      );
-
-      return success(res, {
-        ...users[0],
-        plan_type: membership[0]?.plan_type || 0,
-        credit_balance: membership[0]?.credit_balance || 0,
-        start_time: membership[0]?.start_time,
-        end_time: membership[0]?.end_time,
-        auto_renew: membership[0]?.auto_renew || 0,
-        role: req.user.role,
-      });
-    } finally {
-      conn.release();
-    }
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
-  }
-});
-
-router.get('/stats', async (req, res) => {
-  try {
-    const conn = await db.getConnection();
-    try {
-      const [[{ todayTasks }]] = await conn.query(
-        'SELECT COUNT(*) as todayTasks FROM job_queue WHERE user_id = ? AND DATE(created_at) = CURDATE()',
-        [req.user.id],
-      );
-      const [[{ totalTasks }]] = await conn.query(
-        'SELECT COUNT(*) as totalTasks FROM job_queue WHERE user_id = ?',
-        [req.user.id],
-      );
-      const [[{ thisMonthConsumed }]] = await conn.query(
-        `SELECT COALESCE(SUM(consumed), 0) as thisMonthConsumed FROM consumption_record
-         WHERE user_id = ? AND DATE_FORMAT(create_time, '%Y-%m') = DATE_FORMAT(CURDATE(), '%Y-%m')`,
-        [req.user.id],
-      );
-
-      return success(res, { todayTasks, totalTasks, thisMonthConsumed });
-    } finally {
-      conn.release();
-    }
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
-  }
-});
-
-// PUT /api/user/profile — 更新资料
-router.put('/profile', heavyLimiter, _validate(updateProfileSchema), async (req, res) => {
-  try {
-    const { nickname, phone, email } = req.validated;
-    const updates = [];
-    const params = [];
-
-    if (nickname !== undefined) { updates.push('nickname = ?'); params.push(nickname); }
-    if (phone !== undefined) { updates.push('phone = ?'); params.push(phone || null); }
-    if (email !== undefined) { updates.push('email = ?'); params.push(email || null); }
-
-    if (updates.length === 0) return error(res, ERROR_CODE.BAD_REQUEST, '无更新字段');
-
-    const conn = await db.getConnection();
-    try {
-      await conn.query(
-        `UPDATE \`user\` SET ${updates.join(', ')} WHERE id = ?`,
-        [...params, req.user.id],
-      );
-      return success(res, {}, '资料已更新');
-    } finally {
-      conn.release();
-    }
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
-  }
-});
-
-// PUT /api/user/change-password — 修改密码（需旧密码）
-router.put('/change-password', heavyLimiter, _validate(changePasswordSchema), async (req, res) => {
-  try {
-    const { oldPassword, newPassword } = req.validated;
-
-    const conn = await db.getConnection();
-    try {
-      const [users] = await conn.query(
-        'SELECT password FROM `user` WHERE id = ?',
-        [req.user.id],
-      );
-      if (users.length === 0) return error(res, ERROR_CODE.NOT_FOUND, '用户不存在');
-
-      const valid = await bcrypt.compare(oldPassword, users[0].password);
-      if (!valid) return error(res, ERROR_CODE.PARAM_INVALID, '原密码不正确');
-
-      const hash = await bcrypt.hash(newPassword, 12);
-      await conn.query('UPDATE `user` SET password = ? WHERE id = ?', [hash, req.user.id]);
-
-      // 吊销所有旧令牌，强制重新登录
-      const { revokeAllUserTokens } = await import('../utils/jwtToken.js');
-      await revokeAllUserTokens(req.user.id);
-
-      return success(res, {}, '密码已修改，请重新登录');
-    } finally {
-      conn.release();
-    }
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '服务器内部错误');
-  }
-});
-
-// PUT /api/user/membership/auto-renew — 自动续费开关
+router.get('/profile', ctrl.getProfile);
+router.get('/stats', ctrl.getStats);
+router.put('/profile', heavyLimiter, _validate(updateProfileSchema), ctrl.updateProfile);
+router.put('/change-password', heavyLimiter, _validate(changePasswordSchema), ctrl.changePassword);
 router.put('/membership/auto-renew', heavyLimiter, _validate(z.object({
   autoRenew: z.boolean(),
-})), async (req, res) => {
-  try {
-    const m = await membershipDao.findByUserId(req.user.id);
-    if (!m || m.plan_type === 'free' || m.plan_type === 0) {
-      return error(res, ERROR_CODE.BAD_REQUEST, '仅付费会员支持自动续费');
-    }
-    await membershipDao.setAutoRenew(req.user.id, req.validated.autoRenew);
-    success(res, { autoRenew: req.validated.autoRenew }, '自动续费已' + (req.validated.autoRenew ? '开启' : '关闭'));
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
-  }
-});
+})), ctrl.toggleAutoRenew);
 
 export default router;
