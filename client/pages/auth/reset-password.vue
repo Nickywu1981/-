@@ -6,47 +6,45 @@
   <div class="auth-page">
     <div class="auth-card">
       <div class="auth-header">
-        <h1>重置密码</h1>
-        <p>{{ verified ? '设置您的新密码' : '请先验证您的身份' }}</p>
+        <h1>{{ $t('auth.reset_title') }}</h1>
+        <p>{{ verified ? $t('auth.reset_set_new') : $t('auth.reset_verify_first') }}</p>
       </div>
 
-      <!-- Step 1: Identity verification -->
       <template v-if="!verified">
         <div class="input-group">
-          <label for="reset-account">手机号 / 邮箱</label>
-          <input id="reset-account" v-model="account" type="text" class="input" placeholder="请输入手机号或邮箱" autocomplete="username" />
+          <label for="reset-account">{{ $t('auth.reset_account_label') }}</label>
+          <input id="reset-account" v-model="account" type="text" class="input" :placeholder="$t('auth.reset_account_placeholder')" autocomplete="username" />
         </div>
         <div class="input-group">
-          <label for="reset-code">验证码</label>
+          <label for="reset-code">{{ $t('auth.code') }}</label>
           <div class="code-row">
-            <input id="reset-code" v-model="code" type="text" class="input code-input" placeholder="6位验证码" maxlength="6" autocomplete="one-time-code" />
+            <input id="reset-code" v-model="code" type="text" class="input code-input" :placeholder="$t('auth.reset_code_placeholder')" maxlength="6" autocomplete="one-time-code" />
             <button type="button" class="btn btn-send" :disabled="sendCooldown > 0" @click="sendCode">
-              {{ sendCooldown > 0 ? `${sendCooldown}s` : '发送验证码' }}
+              {{ sendCooldown > 0 ? $t('auth.code_countdown', { n: sendCooldown }) : $t('auth.send_code') }}
             </button>
           </div>
         </div>
         <button type="button" class="btn btn-primary btn-block" :disabled="loading" @click="doVerify">
-          {{ loading ? '验证中...' : '验证并继续' }}
+          {{ loading ? $t('auth.reset_verifying') : $t('auth.reset_verify_btn') }}
         </button>
         <p v-if="errorMsg" class="error-msg">{{ errorMsg }}</p>
       </template>
 
-      <!-- Step 2: Set new password -->
       <form v-else @submit.prevent="handleReset">
         <div class="input-group">
-          <label for="reset-new-pass">新密码</label>
-          <input id="reset-new-pass" v-model="newPassword" type="password" class="input" placeholder="请输入新密码" required autocomplete="new-password" />
-          <p class="hint">8-20位，含字母+数字+特殊字符</p>
+          <label for="reset-new-pass">{{ $t('auth.reset_new_password') }}</label>
+          <input id="reset-new-pass" v-model="newPassword" type="password" class="input" :placeholder="$t('auth.reset_new_pw_placeholder')" required autocomplete="new-password" />
+          <p class="hint">{{ $t('auth.reset_pw_hint') }}</p>
         </div>
         <button type="submit" class="btn btn-primary btn-block" :disabled="loading">
-          {{ loading ? '重置中...' : '重置密码' }}
+          {{ loading ? $t('auth.reset_submitting') : $t('auth.reset_submit') }}
         </button>
         <p v-if="errorMsg" class="error-msg">{{ errorMsg }}</p>
         <p v-if="successMsg" class="success-msg">{{ successMsg }}</p>
       </form>
 
       <div class="auth-footer">
-        <NuxtLink to="/login">返回登录</NuxtLink>
+        <NuxtLink to="/login">{{ $t('auth.reset_back_login') }}</NuxtLink>
       </div>
     </div>
   </div>
@@ -55,6 +53,8 @@
 <script setup lang="ts">
 
 definePageMeta({ layout: 'landing' })
+
+const { t } = useI18n()
 
 const account = ref('')
 const code = ref('')
@@ -76,7 +76,7 @@ function getAccountInfo(): { phone?: string; email?: string; isEmail: boolean } 
 
 async function sendCode() {
   errorMsg.value = ''
-  if (!account.value.trim()) { errorMsg.value = '请输入手机号或邮箱'; return }
+  if (!account.value.trim()) { errorMsg.value = t('auth.reset_enter_account'); return }
   loading.value = true
   try {
     const { phone, email, isEmail } = getAccountInfo()
@@ -84,14 +84,14 @@ async function sendCode() {
     const body = isEmail ? { email, scene: 'reset_password' } : { phone, scene: 'reset_password' }
     await $fetch(url, { method: 'POST', body, credentials: 'include' })
     startCd(60)
-  } catch (e: any) { errorMsg.value = e?.data?.msg || '发送失败' }
+  } catch (e: any) { errorMsg.value = e?.data?.msg || t('auth.send_failed') }
   loading.value = false
 }
 
 async function doVerify() {
   errorMsg.value = ''
-  if (!account.value.trim()) { errorMsg.value = '请输入手机号或邮箱'; return }
-  if (!code.value.trim()) { errorMsg.value = '请输入验证码'; return }
+  if (!account.value.trim()) { errorMsg.value = t('auth.reset_enter_account'); return }
+  if (!code.value.trim()) { errorMsg.value = t('auth.reset_enter_code'); return }
   loading.value = true
   try {
     const { phone, email, isEmail } = getAccountInfo()
@@ -99,25 +99,25 @@ async function doVerify() {
     const body = isEmail ? { email, code: code.value } : { phone, scene: 'reset_password', code: code.value }
     await $fetch(url, { method: 'POST', body, credentials: 'include' })
     verified.value = true
-  } catch (e: any) { errorMsg.value = e?.data?.msg || '验证失败' }
+  } catch (e: any) { errorMsg.value = e?.data?.msg || t('auth.reset_verify_failed') }
   loading.value = false
 }
 
 async function handleReset() {
   errorMsg.value = ''; successMsg.value = ''
-  if (!newPassword.value || newPassword.value.length < 8) { errorMsg.value = '新密码至少8位'; return }
+  if (!newPassword.value || newPassword.value.length < 8) { errorMsg.value = t('auth.reset_pw_short'); return }
   loading.value = true
   try {
     const { phone, email, isEmail } = getAccountInfo()
     const body = { phone: phone || undefined, email: email || undefined, new_password: newPassword.value }
     const res: any = await $fetch('/api/auth/reset-password', { method: 'POST', body, credentials: 'include' })
     if (res.code === 200) {
-      successMsg.value = '密码重置成功，3秒后跳转登录'
+      successMsg.value = t('auth.reset_success')
       navTimer.value = setTimeout(() => navigateTo('/login'), 3000)
     } else {
-      errorMsg.value = res.msg || '重置失败'
+      errorMsg.value = res.msg || t('auth.reset_failed')
     }
-  } catch (e: any) { errorMsg.value = e?.data?.msg || '重置失败，请重试' }
+  } catch (e: any) { errorMsg.value = e?.data?.msg || t('auth.reset_failed_retry') }
   loading.value = false
 }
 </script>

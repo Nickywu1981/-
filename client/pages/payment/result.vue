@@ -1,42 +1,40 @@
 <template>
   <div class="payment-result-page">
-    <!-- Mock 模式：模拟支付面板 -->
     <div class="result-card mock-panel" v-if="isMock">
-      <h2>🧪 沙箱模拟支付</h2>
+      <h2>{{ $t('payment.mock_title') }}</h2>
       <div class="mock-info">
-        <div class="mock-row"><label>订单号</label><code>{{ reqsn }}</code></div>
-        <div class="mock-row"><label>金额</label><strong>&yen;{{ amountYuan }}</strong></div>
+        <div class="mock-row"><label>{{ $t('payment.order_no') }}</label><code>{{ reqsn }}</code></div>
+        <div class="mock-row"><label>{{ $t('payment.amount') }}</label><strong>&yen;{{ amountYuan }}</strong></div>
       </div>
-      <p class="mock-hint">点击下方按钮模拟通联支付回调</p>
+      <p class="mock-hint">{{ $t('payment.mock_hint') }}</p>
       <div class="actions mock-actions">
-        <button class="btn-success" @click="mockPay('success')" :disabled="mockSent">模拟支付成功</button>
-        <button class="btn-fail" @click="mockPay('fail')" :disabled="mockSent">模拟支付失败</button>
+        <button class="btn-success" @click="mockPay('success')" :disabled="mockSent">{{ $t('payment.mock_success_btn') }}</button>
+        <button class="btn-fail" @click="mockPay('fail')" :disabled="mockSent">{{ $t('payment.mock_fail_btn') }}</button>
       </div>
       <p class="mock-result" v-if="mockMsg">{{ mockMsg }}</p>
     </div>
 
-    <!-- 真实模式：轮询 -->
     <div class="result-card" v-if="!isMock && status === 'loading'">
       <div class="spinner"></div>
-      <h2>正在查询支付结果...</h2>
-      <p>请稍候，正在确认您的支付状态</p>
+      <h2>{{ $t('payment.polling_title') }}</h2>
+      <p>{{ $t('payment.polling_hint') }}</p>
     </div>
 
     <div class="result-card success" v-if="status === 'success'">
       <div class="icon">&#10003;</div>
-      <h2>支付成功</h2>
+      <h2>{{ $t('payment.success_title') }}</h2>
       <p>{{ orderTypeText }}</p>
       <div class="actions">
-        <button class="btn-primary" @click="goHome">返回会员中心</button>
+        <button class="btn-primary" @click="goHome">{{ $t('payment.back_member') }}</button>
       </div>
     </div>
 
     <div class="result-card fail" v-if="status === 'fail'">
       <div class="icon">&#10007;</div>
-      <h2>支付未完成</h2>
+      <h2>{{ $t('payment.fail_title') }}</h2>
       <p>{{ failMsg }}</p>
       <div class="actions">
-        <button class="btn-primary" @click="goHome">返回会员中心</button>
+        <button class="btn-primary" @click="goHome">{{ $t('payment.back_member') }}</button>
       </div>
     </div>
   </div>
@@ -47,13 +45,14 @@
 const route = useRoute()
 const router = useRouter()
 const toast = useToast()
+const { t } = useI18n()
 const reqsn = (route.query.reqsn as string) || ''
 const isMock = route.query.mock === '1'
 const amountYuan = computed(() => (Number(route.query.amount) / 100).toFixed(2))
 
 const status = ref<'loading' | 'success' | 'fail'>(isMock ? 'loading' : 'loading')
 const failMsg = ref('')
-const orderTypeText = ref('会员已开通')
+const orderTypeText = ref(t('payment.success_order_type'))
 const mockSent = ref(false)
 const mockMsg = ref('')
 
@@ -65,7 +64,7 @@ const MAX_POLL = 15
 onMounted(() => {
   if (!reqsn) {
     status.value = 'fail'
-    failMsg.value = '缺少订单号参数'
+    failMsg.value = t('payment.missing_order')
     return
   }
   if (!isMock) startPoll()
@@ -78,7 +77,7 @@ onUnmounted(() => {
 
 async function mockPay(result: 'success' | 'fail') {
   mockSent.value = true
-  mockMsg.value = '正在发送模拟回调...'
+  mockMsg.value = t('payment.mock_sending')
 
   try {
     await $fetch('/api/allinpay/notify', {
@@ -91,9 +90,9 @@ async function mockPay(result: 'success' | 'fail') {
         status: result === 'success' ? '1' : '0',
       }).toString(),
     })
-  } catch (err: any) { toast.error('回调发送失败，请刷新重试'); if (import.meta.dev) console.warn('[payment-result] 回调发送失败', err?.message || err) }
+  } catch (err: any) { toast.error(t('payment.callback_failed')); if (import.meta.dev) console.warn('[payment-result] callback failed', err?.message || err) }
 
-  mockMsg.value = result === 'success' ? '回调已发送，正在查询结果...' : '失败回调已发送'
+  mockMsg.value = result === 'success' ? t('payment.mock_sent_success') : t('payment.mock_sent_fail')
 
   // 开始轮询确认
   _mockPollDefer = setTimeout(() => startPoll(), 500)
@@ -108,23 +107,23 @@ function startPoll() {
       const data = res.data
       if (data && data.status === 1) {
         status.value = 'success'
-        orderTypeText.value = '会员已开通'
+        orderTypeText.value = t('payment.success_order_type')
         if (pollTimer) clearInterval(pollTimer)
       } else if (data && (data.status === 2 || data.status === 3)) {
         status.value = 'fail'
-        failMsg.value = '支付失败或已超时，请重新下单'
+        failMsg.value = t('payment.fail_default')
         if (pollTimer) clearInterval(pollTimer)
       } else if (pollCount >= MAX_POLL) {
         status.value = 'fail'
-        failMsg.value = '支付确认超时，如已支付请稍后查看订单状态'
+        failMsg.value = t('payment.fail_timeout')
         if (pollTimer) clearInterval(pollTimer)
       }
     } catch (err: any) {
-      toast.error('网络异常，请检查连接后刷新')
-      if (import.meta.dev) console.warn('[payment-result] 轮询请求失败', err?.message || err)
+      toast.error(t('payment.network_error'))
+      if (import.meta.dev) console.warn('[payment-result] poll failed', err?.message || err)
       if (pollCount >= MAX_POLL) {
         status.value = 'fail'
-        failMsg.value = '网络异常，请稍后查看订单状态'
+        failMsg.value = t('payment.network_fail')
         if (pollTimer) clearInterval(pollTimer)
       }
     }
