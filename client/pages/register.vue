@@ -1,60 +1,60 @@
 <template>
   <div class="page">
     <div class="card">
-      <h2>免费注册</h2>
-      <p class="sub">新用户注册即送 50 算力点</p>
+      <h2>{{ $t('auth.register_title') }}</h2>
+      <p class="sub">{{ $t('auth.register_subtitle') }}</p>
 
       <div class="mode-tabs">
-        <button :class="{ active: mode === 'password' }" @click="mode = 'password'">密码注册</button>
-        <button :class="{ active: mode === 'sms' }" @click="mode = 'sms'">手机注册</button>
-        <button :class="{ active: mode === 'email' }" @click="mode = 'email'">邮箱注册</button>
+        <button :class="{ active: mode === 'password' }" @click="mode = 'password'">{{ $t('auth.tab_password_register') }}</button>
+        <button :class="{ active: mode === 'sms' }" @click="mode = 'sms'">{{ $t('auth.tab_sms_register') }}</button>
+        <button :class="{ active: mode === 'email' }" @click="mode = 'email'">{{ $t('auth.tab_email_register') }}</button>
       </div>
 
       <!-- 密码注册 -->
       <form v-if="mode === 'password'" @submit.prevent="handleRegister">
-        <label for="reg-username" class="sr-only">用户名</label>
-        <input id="reg-username" v-model="username" type="text" placeholder="用户名" required autocomplete="username" />
-        <label for="reg-password" class="sr-only">密码</label>
-        <input id="reg-password" v-model="password" type="password" placeholder="密码（至少8位）" required minlength="8" autocomplete="new-password" />
-        <label for="reg-nickname" class="sr-only">昵称</label>
-        <input id="reg-nickname" v-model="nickname" type="text" placeholder="昵称（选填）" />
-        <button type="submit" class="btn" :disabled="loading">{{ loading ? '注册中...' : '注册' }}</button>
+        <label for="reg-username" class="sr-only">{{ $t('auth.username') }}</label>
+        <input id="reg-username" v-model="username" type="text" :placeholder="$t('auth.username')" required autocomplete="username" />
+        <label for="reg-password" class="sr-only">{{ $t('auth.password') }}</label>
+        <input id="reg-password" v-model="password" type="password" :placeholder="$t('auth.password_hint')" required minlength="8" autocomplete="new-password" />
+        <label for="reg-nickname" class="sr-only">{{ $t('auth.nickname') }}</label>
+        <input id="reg-nickname" v-model="nickname" type="text" :placeholder="$t('auth.nickname')" />
+        <button type="submit" class="btn" :disabled="loading">{{ loading ? $t('auth.registering') : $t('auth.register_btn') }}</button>
       </form>
 
       <!-- 手机注册 -->
       <form v-if="mode === 'sms'" @submit.prevent="handleSmsRegister">
-        <label for="reg-sms-phone" class="sr-only">手机号</label>
-        <input id="reg-sms-phone" v-model="smsPhone" type="tel" placeholder="手机号" required autocomplete="tel" inputmode="tel" />
+        <label for="reg-sms-phone" class="sr-only">{{ $t('auth.phone') }}</label>
+        <input id="reg-sms-phone" v-model="smsPhone" type="tel" :placeholder="$t('auth.phone')" required autocomplete="tel" inputmode="tel" />
         <div class="sms-row">
-          <label for="reg-sms-code" class="sr-only">验证码</label>
-          <input id="reg-sms-code" v-model="smsCode" type="text" placeholder="验证码" required maxlength="6" />
+          <label for="reg-sms-code" class="sr-only">{{ $t('auth.code') }}</label>
+          <input id="reg-sms-code" v-model="smsCode" type="text" :placeholder="$t('auth.code')" required maxlength="6" />
           <button type="button" class="btn-sms" :disabled="smsCountdown > 0" @click="sendSmsCode('register')">
-            {{ smsCountdown > 0 ? `${smsCountdown}秒` : '获取验证码' }}
+            {{ smsCountdown > 0 ? $t('auth.code_countdown', { n: smsCountdown }) : $t('auth.get_code') }}
           </button>
         </div>
-        <label for="reg-sms-nickname" class="sr-only">昵称</label>
-        <input id="reg-sms-nickname" v-model="smsNickname" type="text" placeholder="昵称（选填）" />
-        <button type="submit" class="btn" :disabled="loading">{{ loading ? '注册中...' : '注册' }}</button>
+        <label for="reg-sms-nickname" class="sr-only">{{ $t('auth.nickname') }}</label>
+        <input id="reg-sms-nickname" v-model="smsNickname" type="text" :placeholder="$t('auth.nickname')" />
+        <button type="submit" class="btn" :disabled="loading">{{ loading ? $t('auth.registering') : $t('auth.register_btn') }}</button>
       </form>
 
       <!-- 邮箱注册 -->
       <form v-if="mode === 'email'" @submit.prevent="handleEmailRegister">
-        <label for="reg-email" class="sr-only">邮箱地址</label>
-        <input id="reg-email" v-model="emailAddr" type="email" placeholder="邮箱地址" required autocomplete="email" inputmode="email" />
+        <label for="reg-email" class="sr-only">{{ $t('auth.email') }}</label>
+        <input id="reg-email" v-model="emailAddr" type="email" :placeholder="$t('auth.email')" required autocomplete="email" inputmode="email" />
         <div class="sms-row">
-          <label for="reg-email-code" class="sr-only">验证码</label>
-          <input id="reg-email-code" v-model="emailCode" type="text" placeholder="验证码" required maxlength="6" />
+          <label for="reg-email-code" class="sr-only">{{ $t('auth.code') }}</label>
+          <input id="reg-email-code" v-model="emailCode" type="text" :placeholder="$t('auth.code')" required maxlength="6" />
           <button type="button" class="btn-sms" :disabled="emailCountdown > 0" @click="sendEmailCode('register')">
-            {{ emailCountdown > 0 ? `${emailCountdown}秒` : '获取验证码' }}
+            {{ emailCountdown > 0 ? $t('auth.code_countdown', { n: emailCountdown }) : $t('auth.get_code') }}
           </button>
         </div>
-        <label for="reg-email-nickname" class="sr-only">昵称</label>
-        <input id="reg-email-nickname" v-model="emailNickname" type="text" placeholder="昵称（选填）" />
-        <button type="submit" class="btn" :disabled="loading">{{ loading ? '注册中...' : '注册' }}</button>
+        <label for="reg-email-nickname" class="sr-only">{{ $t('auth.nickname') }}</label>
+        <input id="reg-email-nickname" v-model="emailNickname" type="text" :placeholder="$t('auth.nickname')" />
+        <button type="submit" class="btn" :disabled="loading">{{ loading ? $t('auth.registering') : $t('auth.register_btn') }}</button>
       </form>
 
       <p class="msg" :class="{ error: msgErr }" v-if="msg" role="alert" aria-live="assertive">{{ msg }}</p>
-      <p class="link">已有账号？<NuxtLink to="/login">登录</NuxtLink></p>
+      <p class="link">{{ $t('auth.have_account') }}<NuxtLink to="/login">{{ $t('auth.go_login') }}</NuxtLink></p>
     </div>
   </div>
 </template>
@@ -64,6 +64,8 @@
 definePageMeta({ layout: 'landing' })
 
 import { useAuthStore } from '~/stores/useAuthStore'
+
+const { t } = useI18n()
 
 const mode = ref('password');
 const username = ref('');
@@ -97,12 +99,12 @@ async function handleRegister() {
     const authStore = useAuthStore()
     await authStore.register(body)
     navigateTo('/workspace')
-  } catch (e: any) { msg.value = e?.data?.msg || e.message || '注册失败'; msgErr.value = true; }
+  } catch (e: any) { msg.value = e?.data?.msg || e.message || t('auth.register_failed'); msgErr.value = true; }
   finally { loading.value = false; }
 }
 
 async function handleSmsRegister() {
-  if (!smsPhone.value || !smsCode.value) { msg.value = '请填写手机号和验证码'; msgErr.value = true; return; }
+  if (!smsPhone.value || !smsCode.value) { msg.value = t('auth.enter_phone_and_code_reg'); msgErr.value = true; return; }
   loading.value = true; msg.value = '';
   try {
     await $fetch('/api/sms/verify-code', { method: 'POST', credentials: 'include', body: { phone: smsPhone.value, scene: 'register', code: smsCode.value } });
@@ -113,22 +115,22 @@ async function handleSmsRegister() {
     });
     await useAuthStore().fetchUser();
     navigateTo('/workspace');
-  } catch (e: any) { msg.value = e?.data?.msg || '注册失败'; msgErr.value = true; }
+  } catch (e: any) { msg.value = e?.data?.msg || t('auth.register_failed'); msgErr.value = true; }
   finally { loading.value = false; }
 }
 
 async function sendSmsCode(scene: string) {
-  if (!smsPhone.value) { msg.value = '请输入手机号'; msgErr.value = true; return; }
+  if (!smsPhone.value) { msg.value = t('auth.enter_phone'); msgErr.value = true; return; }
   msg.value = '';
   try {
     await $fetch('/api/sms/send-code', { method: 'POST', credentials: 'include', body: { phone: smsPhone.value, scene } });
     startSmsCd(60);
-    msg.value = '验证码已发送'; msgErr.value = false;
-  } catch (e: any) { msg.value = e?.data?.msg || '发送失败'; msgErr.value = true; }
+    msg.value = t('auth.code_sent'); msgErr.value = false;
+  } catch (e: any) { msg.value = e?.data?.msg || t('auth.send_failed'); msgErr.value = true; }
 }
 
 async function handleEmailRegister() {
-  if (!emailAddr.value || !emailCode.value) { msg.value = '请填写邮箱和验证码'; msgErr.value = true; return; }
+  if (!emailAddr.value || !emailCode.value) { msg.value = t('auth.enter_email_and_code_reg'); msgErr.value = true; return; }
   loading.value = true; msg.value = '';
   try {
     await $fetch('/api/email/verify-code', { method: 'POST', credentials: 'include', body: { email: emailAddr.value, code: emailCode.value } });
@@ -139,18 +141,18 @@ async function handleEmailRegister() {
     });
     await useAuthStore().fetchUser();
     navigateTo('/workspace');
-  } catch (e: any) { msg.value = e?.data?.msg || '注册失败'; msgErr.value = true; }
+  } catch (e: any) { msg.value = e?.data?.msg || t('auth.register_failed'); msgErr.value = true; }
   finally { loading.value = false; }
 }
 
 async function sendEmailCode(scene: string) {
-  if (!emailAddr.value) { msg.value = '请输入邮箱'; msgErr.value = true; return; }
+  if (!emailAddr.value) { msg.value = t('auth.enter_email'); msgErr.value = true; return; }
   msg.value = '';
   try {
     await $fetch('/api/email/send-code', { method: 'POST', credentials: 'include', body: { email: emailAddr.value, scene } });
     startEmailCd(60);
-    msg.value = '验证码已发送'; msgErr.value = false;
-  } catch (e: any) { msg.value = e?.data?.msg || '发送失败'; msgErr.value = true; }
+    msg.value = t('auth.code_sent'); msgErr.value = false;
+  } catch (e: any) { msg.value = e?.data?.msg || t('auth.send_failed'); msgErr.value = true; }
 }
 </script>
 
