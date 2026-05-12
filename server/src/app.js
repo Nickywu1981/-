@@ -295,6 +295,7 @@ app.use('/api/advanced', heavyLimiter, advancedImageRoutes);
 app.use('/api/adv-video', heavyLimiter, advancedVideoRoutes);
 app.use('/api/payment', paymentLimiter, paymentRoutes);
 app.use('/api/plans', paymentRoutes); // 公开别名（查看套餐无需限流）
+app.use('/api/admin/ai-logs', adminLimiter, aiLogRoutes);
 app.use('/api/admin', adminLimiter, adminRoutes);
 app.use('/api/admin/models', adminLimiter, adminModelsRoutesV4);
 app.use('/api/test', adminLimiter, testWorkbenchRoutesV4);
@@ -317,7 +318,6 @@ app.use('/api/proxy', proxyRoutes);
 app.use('/api/recharge', paymentLimiter, rechargeRoutes);
 app.use('/api/allinpay', allinpayRoutes);
 app.use('/api/automation', automationRoutes);
-app.use('/api/admin/ai-logs', adminLimiter, aiLogRoutes);
 app.use('/api/admin/audit-logs', adminLimiter, auditLogRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/help', apiLimiter, helpRoutes);

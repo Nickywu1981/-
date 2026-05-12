@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getDashboardStats, listAllUsers, updateUserStatus, batchUpdateUserStatus, listAllTasks, listAllPlans, updatePlan, createPlan, deletePlan, getOperationLogs, checkContentRisk, approveTask, rejectTask, listAllOrders, deleteOrder, listCreditRecords, refundCredit, listAiCallLogs, getAiCallStats, listSensitiveWords, addSensitiveWord, deleteSensitiveWord, retryTask, pauseTask, resumeTask, cancelTask, listAllNotifications, sendNotification, deleteNotification, updateUser } from '../controller/adminController.js';
+import { getDashboardStats, listAllUsers, updateUserStatus, batchUpdateUserStatus, listAllTasks, listAllPlans, updatePlan, createPlan, deletePlan, getOperationLogs, checkContentRisk, approveTask, rejectTask, listAllOrders, deleteOrder, listCreditRecords, refundCredit, listSensitiveWords, addSensitiveWord, deleteSensitiveWord, retryTask, pauseTask, resumeTask, cancelTask, listAllNotifications, sendNotification, deleteNotification, updateUser } from '../controller/adminController.js';
 import { adminListTemplates, adminSaveTemplate, adminReviewTemplate, adminDeleteTemplate } from '../controller/adminPromptController.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { adminLimiter } from '../middleware/rateLimiter.js';
@@ -117,9 +117,6 @@ router.delete('/prompts/:id', validate(idParamSchema, 'params'), adminDeleteTemp
 // 积分
 router.get('/credits', validate(paginationSchema, 'query'), listCreditRecords);
 router.post('/credits/refund', validate(refundSchema), refundCredit);
-// AI日志
-router.get('/ai-logs', validate(paginationSchema, 'query'), listAiCallLogs);
-router.get('/ai-logs/stats', getAiCallStats);
 // 通知管理
 router.get('/notifications', validate(paginationSchema, 'query'), listAllNotifications);
 router.post('/notifications/send', validate(sendNotificationSchema), sendNotification);
