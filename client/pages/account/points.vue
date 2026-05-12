@@ -85,7 +85,7 @@
 </template>
 
 <script setup lang="ts">
-import { useAppPage } from '~/composables/useAppPage'
+
 import { formatDateTime } from '@/utils/format'
 
 const toast = useToast()

@@ -76,23 +76,6 @@ export function requestLogger(req, res, next) {
   next();
 }
 
-/** 慢查询日志 */
-function slowQueryLog(sql, ms, params) {
-  if (ms > SLOW_QUERY_THRESHOLD_MS) {
-    logger.warn('slow_query', { sql: sql.substring(0, 200), ms, paramCount: params?.length });
-  }
-}
-
-/** 获取日志统计 */
-function getLogStats() {
-  return {
-    sampleRate: LOG_SAMPLE_RATE,
-    slowQueryThreshold: SLOW_QUERY_THRESHOLD_MS,
-    transports: logger.transports.length,
-    level: logger.level,
-  };
-}
-
 /** 创建带标签的子日志器 */
 export function getLogger(label) {
   return logger.child({ label });

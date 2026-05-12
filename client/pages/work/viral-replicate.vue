@@ -86,8 +86,8 @@
 </template>
 
 <script setup lang="ts">
-import { useAppPage } from '~/composables/useAppPage'
-import { useTaskPolling } from '~/composables/useTaskPolling'
+
+
 import { copyToClipboard } from '@/utils/format'
 import PromptEnhancer from '~/components/PromptEnhancer.vue'
 

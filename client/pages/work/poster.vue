@@ -143,7 +143,7 @@
 </template>
 
 <script setup lang="ts">
-import { useSiteConfig } from '~/composables/useSiteConfig';
+
 
 ;
 

@@ -65,7 +65,7 @@
 </template>
 
 <script setup>
-import { useApi } from '~/composables/useApi';
+
 const { t } = useI18n();
 const api = useApi();
 const toast = useToast();

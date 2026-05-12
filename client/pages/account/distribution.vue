@@ -101,7 +101,7 @@
 </template>
 
 <script setup lang="ts">
-import { useAppPage } from '~/composables/useAppPage'
+
 import { formatDateTime, copyToClipboard } from '@/utils/format'
 
 

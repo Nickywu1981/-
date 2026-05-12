@@ -53,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { useCountdown } from '~/composables/useCountdown'
+
 definePageMeta({ layout: 'landing' })
 
 const account = ref('')

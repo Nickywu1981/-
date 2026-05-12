@@ -120,7 +120,7 @@
 </template>
 
 <script setup lang="ts">
-import { useSiteConfig } from '~/composables/useSiteConfig'
+
 import PromptEnhancer from '~/components/PromptEnhancer.vue'
 
 const { config: headerCfg } = useSiteConfig('page.social')

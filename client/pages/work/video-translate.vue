@@ -132,7 +132,7 @@
 </template>
 
 <script setup lang="ts">
-import { useSiteConfig } from '#composables/useSiteConfig';
+
 import { formatDateTime } from '@/utils/format'
 const { config: headerCfg } = useSiteConfig('page.video_translate');
 

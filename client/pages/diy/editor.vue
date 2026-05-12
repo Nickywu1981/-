@@ -154,9 +154,9 @@
 <script setup lang="ts">
 
 const { confirm } = useConfirm()
-import { useDiyEditor } from '~/composables/useDiyEditor'
+
 import { DIY_COMPONENTS, getComponentByCode } from '~/composables/useDiyComponents'
-import { useDiyAutoSave } from '~/composables/useDiyAutoSave'
+
 
 const route = useRoute()
 const toast = useToast()

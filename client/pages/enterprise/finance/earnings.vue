@@ -50,7 +50,7 @@
 </template>
 
 <script setup>
-import { useApi } from '~/composables/useApi';
+
 import { formatDateLocale, fmtMoney } from '~/utils/format';
 const { t } = useI18n();
 const api = useApi();
