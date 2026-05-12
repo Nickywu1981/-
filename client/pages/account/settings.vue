@@ -103,7 +103,7 @@ const toast = useToast()
 onMounted(async () => {
   loading.value = true
   try {
-    const res: any = await $fetch('/api/user/profile');
+    const res: any = await $fetch('/api/user/profile', { credentials: 'include' });
     Object.assign(form, { nickname: res.data?.nickname || '', phone: res.data?.phone || '', email: res.data?.email || '' });
     if (res.data?.phone) boundPhone.value = res.data.phone;
   } catch { toast.error('加载用户信息失败') }
@@ -113,7 +113,7 @@ onMounted(async () => {
 async function saveProfile() {
   saving.value = true; msg.value = '';
   try {
-    await $fetch('/api/user/profile', { method: 'PUT', body: { nickname: form.nickname, phone: form.phone, email: form.email } });
+    await $fetch('/api/user/profile', { method: 'PUT', credentials: 'include', body: { nickname: form.nickname, phone: form.phone, email: form.email } });
     msg.value = '保存成功'; msgErr.value = false;
   } catch (e: any) { msg.value = e?.data?.msg || '保存失败'; msgErr.value = true; }
   saving.value = false;
@@ -123,7 +123,7 @@ async function savePassword() {
   if (!pw.oldPassword || pw.newPassword.length < 8) { pwMsg.value = '新密码至少8位'; pwMsgErr.value = true; return; }
   pwSaving.value = true; pwMsg.value = '';
   try {
-    await $fetch('/api/user/change-password', { method: 'PUT', body: { oldPassword: pw.oldPassword, newPassword: pw.newPassword } });
+    await $fetch('/api/user/change-password', { method: 'PUT', credentials: 'include', body: { oldPassword: pw.oldPassword, newPassword: pw.newPassword } });
     pwMsg.value = '密码修改成功'; pwMsgErr.value = false;
     pw.oldPassword = ''; pw.newPassword = '';
   } catch (e: any) { pwMsg.value = e?.data?.msg || '修改失败'; pwMsgErr.value = true; }
@@ -136,7 +136,7 @@ async function sendBindCode() {
   }
   phoneMsg.value = '';
   try {
-    await $fetch('/api/sms/send-code', { method: 'POST', body: { phone: phoneForm.phone, scene: 'bind' } });
+    await $fetch('/api/sms/send-code', { method: 'POST', credentials: 'include', body: { phone: phoneForm.phone, scene: 'bind' } });
     phoneMsg.value = '验证码已发送'; phoneMsgErr.value = false;
     startCodeCd(60);
   } catch (e: any) { phoneMsg.value = e?.data?.msg || '发送失败'; phoneMsgErr.value = true; }
@@ -146,9 +146,9 @@ async function bindPhone() {
   if (!phoneForm.phone || !phoneForm.code) { phoneMsg.value = '请填写手机号和验证码'; phoneMsgErr.value = true; return; }
   phoneSaving.value = true; phoneMsg.value = '';
   try {
-    const verify: any = await $fetch('/api/sms/verify-code', { method: 'POST', body: { phone: phoneForm.phone, scene: 'bind', code: phoneForm.code } });
+    const verify: any = await $fetch('/api/sms/verify-code', { method: 'POST', credentials: 'include', body: { phone: phoneForm.phone, scene: 'bind', code: phoneForm.code } });
     if (!verify.data?.valid) { phoneMsg.value = '验证码错误或已过期'; phoneMsgErr.value = true; phoneSaving.value = false; return; }
-    await $fetch('/api/user/profile', { method: 'PUT', body: { phone: phoneForm.phone } });
+    await $fetch('/api/user/profile', { method: 'PUT', credentials: 'include', body: { phone: phoneForm.phone } });
     boundPhone.value = phoneForm.phone;
     form.phone = phoneForm.phone;
     phoneForm.phone = ''; phoneForm.code = '';
@@ -160,7 +160,7 @@ async function bindPhone() {
 async function unbindPhone() {
   phoneSaving.value = true;
   try {
-    await $fetch('/api/user/profile', { method: 'PUT', body: { phone: '' } });
+    await $fetch('/api/user/profile', { method: 'PUT', credentials: 'include', body: { phone: '' } });
     boundPhone.value = ''; form.phone = ''; unbinding.value = false;
     phoneMsg.value = '已解绑'; phoneMsgErr.value = false;
   } catch (e: any) { phoneMsg.value = e?.data?.msg || '解绑失败'; phoneMsgErr.value = true; }

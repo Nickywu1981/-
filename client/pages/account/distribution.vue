@@ -134,21 +134,21 @@ const inviteUrl = computed(() => {
 
 async function fetchInviteCode() {
   try {
-    const res: any = await $fetch(`${apiBase}/distribution/invite-code`)
+    const res: any = await $fetch(`${apiBase}/distribution/invite-code`, { credentials: 'include' })
     if (res.code === 200) inviteData.value = res.data
   } catch { toast.error(t('account_pages.distribution.load_invite_error')) }
 }
 
 async function fetchBalance() {
   try {
-    const res: any = await $fetch(`${apiBase}/distribution/balance`)
+    const res: any = await $fetch(`${apiBase}/distribution/balance`, { credentials: 'include' })
     if (res.code === 200) balance.value = res.data
   } catch { toast.error(t('account_pages.distribution.load_balance_error')) }
 }
 
 async function fetchTeam() {
   try {
-    const res: any = await $fetch(`${apiBase}/distribution/team`, { params: { page: 1, pageSize: 20 } })
+    const res: any = await $fetch(`${apiBase}/distribution/team`, { credentials: 'include', params: { page: 1, pageSize: 20 } })
     if (res.code === 200) {
       teamList.value = res.data.list || []
       teamStats.value = res.data.stats || {}
@@ -159,7 +159,7 @@ async function fetchTeam() {
 async function fetchCommissions() {
   loadingComm.value = true
   try {
-    const res: any = await $fetch(`${apiBase}/distribution/history`, { params: { page: commPage.value, pageSize: 20 } })
+    const res: any = await $fetch(`${apiBase}/distribution/history`, { credentials: 'include', params: { page: commPage.value, pageSize: 20 } })
     if (res.code === 200) {
       commissionList.value = res.data.list || []
       commTotal.value = res.data.total || 0
@@ -173,6 +173,7 @@ async function doWithdraw() {
   withdrawing.value = true
   try {
     const res: any = await $fetch(`${apiBase}/distribution/withdraw`, {
+      credentials: 'include',
       method: 'POST',
       body: { amount: balance.value.available },
     })

@@ -96,7 +96,7 @@ export async function getConsumptionByRequestId(requestId) {
 }
 
 export async function getConsumptionByRequestIdForUpdate(conn, requestId) {
-  const [rows] = await conn.execute('SELECT id, user_id, type, action, credit_before, credit_after, consumed, status, remark, request_id, create_time, freeze_at FROM consumption_record WHERE request_id = ? FOR UPDATE', [requestId]);
+  const [rows] = await conn.execute('SELECT id, user_id, type, action, credit_before, credit_after, consumed, status, remark, request_id, create_time, freeze_at FROM consumption_record WHERE request_id = ? FOR UPDATE LIMIT 1', [requestId]);
   return rows[0] || null;
 }
 

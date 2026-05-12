@@ -73,7 +73,7 @@ const fetchFavorites = async () => {
   loading.value = true
   error.value = ''
   try {
-    const data = await $fetch('/api/collections', { params: { page: page.value, pageSize } })
+    const data = await $fetch('/api/collections', { credentials: 'include', params: { page: page.value, pageSize } })
     items.value = data.list || []
     total.value = data.total || 0
   } catch (e: any) {
@@ -86,7 +86,7 @@ const fetchFavorites = async () => {
 const removeFavorite = async (id: number) => {
   if (!await confirm({ message: '确定取消收藏？', variant: 'warning' })) return;
   try {
-    await $fetch(`/api/collections/${id}`, { method: 'DELETE' })
+    await $fetch(`/api/collections/${id}`, { credentials: 'include', method: 'DELETE' })
     items.value = items.value.filter(i => i.id !== id)
     total.value--
   } catch { /* 全局拦截器已 toast 提示 */ }

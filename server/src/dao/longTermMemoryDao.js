@@ -75,7 +75,8 @@ export async function getCandidatesForConsolidation({ namespace, subjectId, memo
 }
 
 export async function markConsolidated(sourceIds, targetId) {
-  await db.execute(`UPDATE ltm_entries SET is_consolidated = 1, consolidated_to = ? WHERE id IN (${sourceIds.join(',')})`, [targetId]);
+  const placeholders = sourceIds.map(() => '?').join(',');
+  await db.execute(`UPDATE ltm_entries SET is_consolidated = 1, consolidated_to = ? WHERE id IN (${placeholders})`, [targetId, ...sourceIds]);
 }
 
 export async function markAccessed(memoryId) {

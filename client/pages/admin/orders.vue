@@ -98,7 +98,7 @@ async function fetch() {
     const params = new URLSearchParams({ page: String(page.value), pageSize: String(pageSize) })
     if (userId.value) params.set('userId', userId.value)
     if (planType.value) params.set('planType', planType.value)
-    const data: any = await $fetch(`/api/admin/orders?${params.toString()}`)
+    const data: any = await $fetch(`/api/admin/orders?${params.toString()}`, { credentials: 'include' })
     if (data?.code === 200) {
       list.value = data.data.list || []
       total.value = data.data.total || 0
@@ -113,7 +113,7 @@ function openDetail(o: any) { detail.value = o; detailOpen.value = true }
 async function confirmDelete(o: any) {
   if (!await confirm({ message: `确认删除订单 #${o.id}？此操作不可撤销。`} )) return
   try {
-    await $fetch(`/api/admin/orders/${o.id}`, { method: 'DELETE' })
+    await $fetch(`/api/admin/orders/${o.id}`, { method: 'DELETE', credentials: 'include' })
     list.value = list.value.filter(item => item.id !== o.id)
     total.value--
     toast.success('订单已删除')

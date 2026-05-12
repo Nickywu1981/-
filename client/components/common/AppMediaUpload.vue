@@ -222,7 +222,7 @@ async function uploadFile(item: FileItem): Promise<{ url: string }> {
     // 小文件直接上传
     const formData = new FormData()
     formData.append('file', item.file)
-    const res: any = await $fetch(`${apiBase}/upload/simple`, { method: 'POST', body: formData })
+    const res: any = await $fetch(`${apiBase}/upload/simple`, { credentials: 'include', method: 'POST', body: formData })
     if (res.code !== 200) throw new Error(res.msg)
     return { url: res.data?.file_url }
   }
@@ -230,6 +230,7 @@ async function uploadFile(item: FileItem): Promise<{ url: string }> {
   // 大文件分片上传
   // 1. 初始化
   const initRes: any = await $fetch(`${apiBase}/upload/init`, {
+    credentials: 'include',
     method: 'POST',
     body: { file_name: item.name, file_size: item.file.size, file_type: item.type },
   })
@@ -247,12 +248,13 @@ async function uploadFile(item: FileItem): Promise<{ url: string }> {
     formData.append('chunk_index', String(i))
     formData.append('chunk', chunk)
 
-    await $fetch(`${apiBase}/upload/chunk`, { method: 'POST', body: formData })
+    await $fetch(`${apiBase}/upload/chunk`, { credentials: 'include', method: 'POST', body: formData })
     item.progress = Math.round(((i + 1) / total_chunks) * 100)
   }
 
   // 3. 完成
   const completeRes: any = await $fetch(`${apiBase}/upload/complete`, {
+    credentials: 'include',
     method: 'POST',
     body: { upload_id },
   })

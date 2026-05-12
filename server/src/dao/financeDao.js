@@ -223,7 +223,6 @@ export async function lockTenantBalance(tenantId) {
   } catch (e) {
     conn.rollback().catch((err) => { logger.warn('[Finance] 回滚失败', { error: err.message }); });
     conn.release();
-    conn.release();
     throw e;
   }
 }

@@ -258,7 +258,7 @@ async function loadPage() {
   const id = route.query.id
   if (!id) { navigateTo('/diy'); return }
   try {
-    const res: any = await $fetch(`/api/diy/${id}`)
+    const res: any = await $fetch(`/api/diy/${id}`, { credentials: 'include' })
     pageInfo.value = res?.data
     if (!res?.data) { toast.error('页面数据为空'); return }
     const isPC = res.data.page_type === 'pc'
@@ -280,7 +280,7 @@ async function savePage() {
       mobileConfig: { sections: mobileSections.value },
       pcConfig: { sections: pcSections.value },
     }
-    await $fetch(`/api/diy/${pageInfo.value.id}`, { method: 'PUT', body })
+    await $fetch(`/api/diy/${pageInfo.value.id}`, { method: 'PUT', body, credentials: 'include' })
     dirty.value = false
     toast.success('保存成功')
   } catch (e: any) { toast.error('保存失败: ' + (e?.data?.msg || e.message)) }
@@ -298,7 +298,7 @@ async function saveVersion() {
       pcConfig: { sections: pcSections.value },
     }
     if (remark) body.remark = remark
-    await $fetch(`/api/diy/${pageInfo.value.id}/versions`, { method: 'POST', body })
+    await $fetch(`/api/diy/${pageInfo.value.id}/versions`, { method: 'POST', body, credentials: 'include' })
     dirty.value = false
     toast.success('版本已保存')
   } catch (e: any) { toast.error('保存版本失败: ' + (e?.data?.msg || e.message)) }
@@ -308,7 +308,7 @@ async function saveVersion() {
 async function publishPage() {
   publishing.value = true
   try {
-    await $fetch(`/api/diy/${pageInfo.value.id}/publish`, { method: 'POST' })
+    await $fetch(`/api/diy/${pageInfo.value.id}/publish`, { method: 'POST', credentials: 'include' })
     dirty.value = false
     toast.success('发布成功！访问地址：/diy/preview?slug=' + pageInfo.value.slug)
   } catch (e) { toast.error('发布失败: ' + (e?.data?.msg || e.message)) }
@@ -319,7 +319,7 @@ watch(showVersions, async (val) => {
   if (!val) { selectedVersions.value = []; diffResult.value = null; return }
   versionLoading.value = true
   try {
-    const res: any = await $fetch(`/api/diy/${pageInfo.value.id}/versions`)
+    const res: any = await $fetch(`/api/diy/${pageInfo.value.id}/versions`, { credentials: 'include' })
     versions.value = res?.data || []
   } catch { toast.error('加载版本历史失败') }
   versionLoading.value = false
@@ -337,7 +337,7 @@ async function diffVersions() {
   const [a, b] = selectedVersions.value.sort((x, y) => x - y)
   try {
     const res: any = await $fetch(`/api/diy/${pageInfo.value.id}/versions/diff`, {
-      method: 'POST', body: { versionA: versions.value[a].version, versionB: versions.value[b].version },
+      method: 'POST', body: { versionA: versions.value[a].version, versionB: versions.value[b].version }, credentials: 'include',
     })
     diffResult.value = res?.data?.diff || []
   } catch { toast.error('对比失败') }
@@ -348,7 +348,7 @@ async function rollbackVersion() {
   const v = versions.value[idx]
   if (!await confirm({ message: `确定回滚到版本 v${v.version}？当前未保存的更改将丢失。` })) return
   try {
-    await $fetch(`/api/diy/${pageInfo.value.id}/versions/${v.version}/rollback`, { method: 'POST' })
+    await $fetch(`/api/diy/${pageInfo.value.id}/versions/${v.version}/rollback`, { method: 'POST', credentials: 'include' })
     showVersions.value = false; selectedVersions.value = []; diffResult.value = null
     await loadPage()
     dirty.value = false

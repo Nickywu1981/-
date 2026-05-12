@@ -28,7 +28,7 @@ async function loadOrder() {
   try {
     const r = await $fetch(`/api/enterprise/commerce/${route.params.id}`, { credentials: 'include' });
     if (r.code === 200) order.value = r.data; else loadError.value = true;
-  } catch (e) { if (import.meta.dev) console.debug('loadOrder', e); loadError.value = true; }
+  } catch (e) { loadError.value = true; }
 }
 onMounted(loadOrder);
 function statusClass(s) { return { pending: 'status-warn', paid: 'status-ok', processing: 'status-info', completed: 'status-ok', refunded: 'status-err', cancelled: 'status-err' }[s] || ''; }

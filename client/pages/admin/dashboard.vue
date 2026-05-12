@@ -222,8 +222,8 @@ async function fetchAll() {
   loading.value = true; error.value = ''
   try {
     const [s, tResult]: any[] = await Promise.allSettled([
-      $fetch('/api/admin/stats'),
-      $fetch('/api/admin/tasks?pageSize=8'),
+      $fetch('/api/admin/stats', { credentials: 'include' }),
+      $fetch('/api/admin/tasks?pageSize=8', { credentials: 'include' }),
     ])
     const sVal = s.status === 'fulfilled' ? s.value : null
     const tVal = tResult.status === 'fulfilled' ? tResult.value : null

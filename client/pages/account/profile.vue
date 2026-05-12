@@ -90,7 +90,7 @@ const error = ref('');
 async function fetchProfile() {
   loading.value = true; error.value = '';
   try {
-    const res: any = await $fetch('/api/user/profile');
+    const res: any = await $fetch('/api/user/profile', { credentials: 'include' });
     profile.value = res.data || res;
   } catch (e: any) { error.value = '加载失败，请重试'; }
   loading.value = false;

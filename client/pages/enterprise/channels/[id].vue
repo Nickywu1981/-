@@ -29,7 +29,7 @@ async function loadChannel() {
   try {
     const r = await $fetch(`/api/enterprise/channel/relations/${route.params.id}`, { credentials: 'include' });
     if (r.code === 200) channel.value = r.data; else loadError.value = true;
-  } catch (e) { if (import.meta.dev) console.debug('loadChannel', e); loadError.value = true; }
+  } catch (e) { loadError.value = true; }
 }
 onMounted(loadChannel);
 function statusLabel(s) { return { pending: t('enterprise.common.statusPending'), active: t('enterprise.common.statusActive'), rejected: t('enterprise.common.statusRejected'), suspended: t('enterprise.common.statusSuspended') }[s] || s; }

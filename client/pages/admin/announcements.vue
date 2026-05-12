@@ -148,7 +148,7 @@ async function fetch() {
     const params = new URLSearchParams({ page: String(page.value), pageSize: String(pageSize) })
     if (filterType.value) params.set('type', filterType.value)
     if (filterStatus.value) params.set('status', filterStatus.value)
-    const res = await $fetch(`/api/admin/campaign/announcements?${params}`)
+    const res = await $fetch(`/api/admin/campaign/announcements?${params}`, { credentials: 'include' })
     list.value = res.data?.list || []
     total.value = res.data?.total || 0
   } catch (e: any) { error.value = e.message || t('common.loadFail') }
@@ -162,9 +162,9 @@ async function save() {
   saving.value = true
   try {
     if (editing.value) {
-      await $fetch(`/api/admin/campaign/announcements/${editing.value.id}`, { method: 'PUT', body: form })
+      await $fetch(`/api/admin/campaign/announcements/${editing.value.id}`, { method: 'PUT', body: form, credentials: 'include' })
     } else {
-      await $fetch('/api/admin/campaign/announcements', { method: 'POST', body: form })
+      await $fetch('/api/admin/campaign/announcements', { method: 'POST', body: form, credentials: 'include' })
     }
     showModal.value = false
     fetch()
@@ -175,7 +175,7 @@ async function save() {
 async function del(id: number) {
   if (!(await confirm({ message: t('admin_announcements.delete_confirm'), title: t('admin_announcements.delete_irreversible') }))) return
   try {
-    await $fetch(`/api/admin/campaign/announcements/${id}`, { method: 'DELETE' })
+    await $fetch(`/api/admin/campaign/announcements/${id}`, { method: 'DELETE', credentials: 'include' })
     fetch()
   } catch (e: any) { toast.error(e.message || t('common.delete_failed')) }
 }

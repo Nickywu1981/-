@@ -54,7 +54,7 @@ export default {
 
   async getPageBySlug(slug, tenantId) {
     const [rows] = await pool.query(
-      'SELECT id, title, slug, page_type, status FROM diy_page WHERE slug = ? AND tenant_id = ? AND status IN (0,1,2)',
+      'SELECT id, title, slug, page_type, status FROM diy_page WHERE slug = ? AND tenant_id = ? AND status IN (0,1,2) LIMIT 1',
       [slug, tenantId],
     );
     return rows[0] || null;
@@ -191,7 +191,7 @@ export default {
 
   // ==================== 组件库 ====================
 
-  async listComponents(tenantId, category) {
+  async listComponents(tenantId, category, { page = 1, pageSize = 500 } = {}) {
     let sql = 'SELECT id, tenant_id, name, component_code, category, icon, default_config, is_builtin, status, create_time FROM diy_component WHERE (tenant_id = ? OR is_builtin = 1) AND status = 1';
     const params = [tenantId];
     const { offset } = parsePagination({ page, pageSize });

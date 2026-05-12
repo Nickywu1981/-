@@ -4,7 +4,7 @@ const COLS = 'id, user_id, plan_type, status, trial_quota, trial_used, credit_ba
 
 const membershipDao = {
   async findByUserId(userId) {
-    const [rows] = await pool.execute('SELECT id, user_id, plan_type, status, trial_quota, trial_used, credit_balance, start_time, end_time, auto_renew FROM user_membership WHERE user_id = ?', [userId]);
+    const [rows] = await pool.execute('SELECT id, user_id, plan_type, status, trial_quota, trial_used, credit_balance, start_time, end_time, auto_renew FROM user_membership WHERE user_id = ? LIMIT 1', [userId]);
     return rows[0] || null;
   },
 

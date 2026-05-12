@@ -22,7 +22,7 @@ export async function listAll(includeDisabled = false) {
 
 export async function getByKey(modelKey) {
   const [rows] = await _db().query(
-    `SELECT ${COLS} FROM ai_model_config WHERE model_key = ?`, [modelKey],
+    `SELECT ${COLS} FROM ai_model_config WHERE model_key = ? LIMIT 1`, [modelKey],
   );
   return rows[0] || null;
 }

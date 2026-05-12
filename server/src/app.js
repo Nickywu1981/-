@@ -287,7 +287,7 @@ app.use('/api/assets', heavyLimiter, assetsRoutesV4);
 app.use('/api/compliance', heavyLimiter, complianceRoutesV4);
 app.use('/api/platforms', heavyLimiter, platformBindRoutesV4);
 app.use('/api/publish', heavyLimiter, publishRoutesV4);
-app.use('/api/users', userRoutes);  // must precede /api/user to avoid prefix match
+app.use('/api/users', apiLimiter, userRoutes);  // must precede /api/user to avoid prefix match
 app.use('/api/user', heavyLimiter, userRoutesV4);
 app.use('/api/upload', uploadLimiter, uploadRoutesV4);
 app.use('/api/open/keys', adminLimiter, openApiKeyRoutes);
@@ -299,7 +299,6 @@ app.use('/api/batch', heavyLimiter, batchRoutes);
 app.use('/api/advanced', heavyLimiter, advancedImageRoutes);
 app.use('/api/adv-video', heavyLimiter, advancedVideoRoutes);
 app.use('/api/payment', paymentLimiter, paymentRoutes);
-app.use('/api/plans', paymentRoutes); // 公开别名（查看套餐无需限流）
 app.use('/api/admin/ai-logs', adminLimiter, aiLogRoutes);
 app.use('/api/admin', adminLimiter, adminRoutes);
 app.use('/api/admin/models', adminLimiter, adminModelsRoutesV4);

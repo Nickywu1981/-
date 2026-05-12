@@ -152,7 +152,7 @@ async function fetchPlans() {
     if (filterType.value) params.set('plan_type', filterType.value);
     params.set('page', String(currentPage.value));
     params.set('pageSize', String(pageSize.value));
-    const res: any = await $fetch(`/api/admin/plans?${params}`);
+    const res: any = await $fetch(`/api/admin/plans?${params}`, { credentials: 'include' });
     plans.value = res.data?.list || res.data || [];
     total.value = res.data?.total || plans.value.length;
   } catch(e: any) { toast.error(e?.data?.msg || t('common.loadFail')) }
@@ -170,6 +170,7 @@ async function savePlan(plan: any) {
         save_days: plan.save_days, watermark_free: plan.watermark_free, hd_export: plan.hd_export,
         brand_kit: plan.brand_kit, priority_queue: plan.priority_queue, status: plan.status,
       },
+      credentials: 'include',
     });
     showMsg(t('admin_plans.saved'));
   } catch (e: any) { msg.value = e?.data?.msg || t('common.save_failed'); }
@@ -186,7 +187,7 @@ function openCreate() { newPlan.value = { name: '', plan_type: 1, price: 0, orig
 async function createPlan() {
   creating.value = true;
   try {
-    await $fetch('/api/admin/plans', { method: 'POST', body: newPlan.value });
+    await $fetch('/api/admin/plans', { method: 'POST', body: newPlan.value, credentials: 'include' });
     showCreate.value = false; showMsg(t('admin_plans.plan_created'));
     fetchPlans();
   } catch (e: any) { msg.value = e?.data?.msg || t('common.save_failed'); }
@@ -198,7 +199,7 @@ function confirmDelete(plan: any) { deleteTarget.value = plan; showDelete.value 
 async function doDelete() {
   if (!deleteTarget.value) return; deleting.value = true;
   try {
-    await $fetch(`/api/admin/plans/${deleteTarget.value.id}`, { method: 'DELETE' });
+    await $fetch(`/api/admin/plans/${deleteTarget.value.id}`, { method: 'DELETE', credentials: 'include' });
     showDelete.value = false; showMsg(t('admin_plans.plan_deleted'));
     fetchPlans();
   } catch (e: any) { msg.value = e?.data?.msg || t('common.delete_failed'); }

@@ -60,7 +60,7 @@ function typeIcon(type: string) {
 async function fetch() {
   loading.value = true; error.value = '';
   try {
-    const res: any = await $fetch('/api/notifications', { params: { page: page.value, pageSize: pageSize.value } });
+    const res: any = await $fetch('/api/notifications', { credentials: 'include', params: { page: page.value, pageSize: pageSize.value } });
     list.value = res.data?.list || [];
     total.value = res.data?.total || 0;
   } catch (e: any) { error.value = e?.data?.msg || e.message || '加载失败'; }
@@ -69,7 +69,7 @@ async function fetch() {
 
 async function fetchUnread() {
   try {
-    const res: any = await $fetch('/api/notifications/unread-count');
+    const res: any = await $fetch('/api/notifications/unread-count', { credentials: 'include' });
     unreadCount.value = res.data?.count || 0;
   } catch { unreadCount.value = 0 }
 }
@@ -77,13 +77,13 @@ async function fetchUnread() {
 async function readOne(item: any) {
   item.is_read = 1;
   unreadCount.value = Math.max(0, unreadCount.value - 1);
-  try { await $fetch(`/api/notifications/${item.id}/read`, { method: 'PUT' }); } catch { /* optimistic */ }
+  try { await $fetch(`/api/notifications/${item.id}/read`, { credentials: 'include', method: 'PUT' }); } catch { /* optimistic */ }
 }
 
 async function markAllRead() {
   list.value.forEach((n: any) => (n.is_read = 1));
   unreadCount.value = 0;
-  try { await $fetch('/api/notifications/read-all', { method: 'PUT' }); } catch { /* optimistic */ }
+  try { await $fetch('/api/notifications/read-all', { credentials: 'include', method: 'PUT' }); } catch { /* optimistic */ }
 }
 
 onMounted(() => { Promise.all([fetch(), fetchUnread()]); });

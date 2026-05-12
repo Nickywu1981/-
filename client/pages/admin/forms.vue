@@ -139,7 +139,7 @@ async function fetchData() {
   try {
     const params = new URLSearchParams({ page: String(page.value), pageSize: String(pageSize), keyword: keyword.value })
     if (filterStatus.value) params.set('status', filterStatus.value)
-    const res: any = await $fetch(`/api/forms/admin?${params.toString()}`)
+    const res: any = await $fetch(`/api/forms/admin?${params.toString()}`, { credentials: 'include' })
     if (res?.code === 200) {
       list.value = res.data?.list || []
       total.value = res.data?.total || 0
@@ -175,7 +175,7 @@ async function save() {
   try {
     const url = isEdit.value ? `/api/forms/admin/${form.value.id}` : '/api/forms/admin'
     const method = isEdit.value ? 'PUT' : 'POST'
-    const res: any = await $fetch(url, { method, body: form.value })
+    const res: any = await $fetch(url, { method, body: form.value, credentials: 'include' })
     if (res?.code === 200 || res?.code === 0) {
       toast.success(isEdit.value ? t('admin_forms.form_updated') : t('admin_forms.form_created'))
       modalOpen.value = false
@@ -195,7 +195,7 @@ async function showSubs(f: any) {
   subsOpen.value = true
   subsLoading.value = true
   try {
-    const res: any = await $fetch(`/api/forms/admin/${f.id}/submissions`)
+    const res: any = await $fetch(`/api/forms/admin/${f.id}/submissions`, { credentials: 'include' })
     submissions.value = res.data?.list || []
   } catch (e: any) {
     toast.error(t('admin_forms.load_sub_failed'))
@@ -207,7 +207,7 @@ async function showSubs(f: any) {
 async function delForm(id: number) {
   if (!await confirm({ message: t('admin_forms.delete_confirm') })) return
   try {
-    const res: any = await $fetch(`/api/forms/admin/${id}`, { method: 'DELETE' })
+    const res: any = await $fetch(`/api/forms/admin/${id}`, { method: 'DELETE', credentials: 'include' })
     if (res?.code === 200 || res?.code === 0) {
       toast.success(t('admin_forms.form_deleted'))
       fetchData()
