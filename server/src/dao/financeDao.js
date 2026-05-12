@@ -214,9 +214,14 @@ export async function getTenantBalance(tenantId) {
 /** 在事务中锁定余额行，返回 { balance, conn }，调用方负责 commit/rollback/release */
 export async function lockTenantBalance(tenantId) {
   const conn = await pool.getConnection();
-  await conn.beginTransaction();
-  const [rows] = await conn.query('SELECT balance FROM tenant WHERE id = ? FOR UPDATE', [tenantId]);
-  return { balance: rows[0]?.balance || 0, conn };
+  try {
+    await conn.beginTransaction();
+    const [rows] = await conn.query('SELECT balance FROM tenant WHERE id = ? FOR UPDATE', [tenantId]);
+    return { balance: rows[0]?.balance || 0, conn };
+  } catch (e) {
+    conn.release();
+    throw e;
+  }
 }
 
 export async function updateTenantBalanceInTx(conn, tenantId, newBalance) {
