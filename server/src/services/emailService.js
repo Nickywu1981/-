@@ -175,7 +175,12 @@ export async function sendVerificationCode(email, scene = 'login') {
   }
 
   const provider = getProvider();
-  await provider.send({ email, subject, content: html });
+  try {
+    await provider.send({ email, subject, content: html });
+  } catch (e) {
+    logger.error('[Email] 发送失败', { email, error: e.message });
+    throw new BusinessError(502, '邮件发送失败，请稍后重试');
+  }
 
   return { success: true, expireMinutes: 5 };
 }
