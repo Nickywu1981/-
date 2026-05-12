@@ -57,7 +57,7 @@ export async function createUnifiedOrder({ userId, orderType, businessId, amount
       remark: remark || '',
     });
   } catch (err) {
-    allinpayDao.markFailed(reqsn).catch(e => logger.error('[Allinpay] markFailed 失败', { reqsn, error: e.message }));
+    await allinpayDao.markFailed(reqsn).catch(e => logger.error('[Allinpay] markFailed 失败', { reqsn, error: e.message }));
     throw err;
   }
 
@@ -80,6 +80,7 @@ export async function handleNotify(body) {
   const verified = await allinpaySDK.verifyNotify(body);
   if (!verified) {
     logger.warn('[Allinpay] 回调签名验证失败', { reqsn, trxid });
+    await allinpayDao.logNotify({ reqsn, trxid, notifyBody: JSON.stringify(body), signVerified: 0, processStatus: 2, processMsg: '签名验证失败' });
     throw new BusinessError(400, '签名验证失败');
   }
 

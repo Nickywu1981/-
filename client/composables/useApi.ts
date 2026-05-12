@@ -103,7 +103,8 @@ async function request<T = any>(
       onResponseError({ response }) {
         if (response.status === 401 && !isRedirecting) {
           isRedirecting = true;
-          navigateTo('/login').finally(() => { isRedirecting = false; });
+          const redirectPath = typeof window !== 'undefined' ? window.location.pathname + window.location.search : '';
+          navigateTo(`/login?redirect=${encodeURIComponent(redirectPath)}`).finally(() => { isRedirecting = false; });
           // 兜底：5s 后强制解锁（防止 navigateTo 异常导致永久锁死）
           if (redirectTimer) clearTimeout(redirectTimer);
           redirectTimer = setTimeout(() => { isRedirecting = false; redirectTimer = null; }, REDIRECT_UNLOCK_MS);

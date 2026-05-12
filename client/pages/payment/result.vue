@@ -48,7 +48,10 @@ const toast = useToast()
 const { t } = useI18n()
 const reqsn = (route.query.reqsn as string) || ''
 const isMock = route.query.mock === '1'
-const amountYuan = computed(() => (Number(route.query.amount) / 100).toFixed(2))
+const amountYuan = computed(() => {
+  const num = Number(route.query.amount)
+  return (isNaN(num) ? 0 : num / 100).toFixed(2)
+})
 
 const status = ref<'loading' | 'success' | 'fail'>(isMock ? 'loading' : 'loading')
 const failMsg = ref('')

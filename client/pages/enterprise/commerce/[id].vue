@@ -25,6 +25,7 @@ const { t } = useI18n()
 const router = useRouter(); const route = useRoute(); const order = ref(null); const loadError = ref(false);
 async function loadOrder() {
   loadError.value = false;
+  if (!route.params.id) { loadError.value = true; return }
   try {
     const r = await $fetch(`/api/enterprise/commerce/${route.params.id}`, { credentials: 'include' });
     if (r.code === 200) order.value = r.data; else loadError.value = true;

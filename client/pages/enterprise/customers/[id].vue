@@ -83,6 +83,7 @@ const loading = ref(true);
 const $api = (url) => $fetch(url, { baseURL: '/api/enterprise/customers', credentials: 'include' });
 
 async function loadDetail() {
+  if (!route.params.id) { loading.value = false; return }
   try {
     customer.value = await $api(`/${route.params.id}`);
   } catch (e) { customer.value = null; }

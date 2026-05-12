@@ -6,7 +6,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const publicPaths = [
     '/', '/login', '/register', '/auth/register',
     '/auth/reset-password', '/help', '/compare', '/legal/terms', '/legal/privacy',
-    '/forgot-password',
   ]
 
   if (publicPaths.includes(to.path) || to.path.startsWith('/legal/')) return

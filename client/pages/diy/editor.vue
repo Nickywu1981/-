@@ -366,7 +366,9 @@ autoSave.start()
 onMounted(async () => {
   const id = route.query.id
   if (!id) { navigateTo('/diy'); return }
-  pageInfo.value = { id: Number(id) }
+  const numId = Number(id)
+  if (isNaN(numId)) { navigateTo('/diy'); return }
+  pageInfo.value = { id: numId }
 
   const recovered = await autoSave.checkRecovery()
   if (recovered) {

@@ -26,6 +26,7 @@ const { t } = useI18n();
 const router = useRouter(); const route = useRoute(); const channel = ref(null); const loadError = ref(false);
 async function loadChannel() {
   loadError.value = false;
+  if (!route.params.id) { loadError.value = true; return }
   try {
     const r = await $fetch(`/api/enterprise/channel/relations/${route.params.id}`, { credentials: 'include' });
     if (r.code === 200) channel.value = r.data; else loadError.value = true;

@@ -40,7 +40,8 @@ async function loadPage() {
   loading.value = true
   error.value = ''
   try {
-    const slug = route.query.slug || 'product-detail-demo'
+    const rawSlug = String(route.query.slug || '')
+    const slug = rawSlug.replace(/[\/\\]/g, '') || 'product-detail-demo'
     const res = await $fetch(`/api/diy/published/${slug}`)
     page.value = res?.data
     const isPC = res?.data?.page_type === 'pc'
