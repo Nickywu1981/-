@@ -32,8 +32,8 @@ export async function deleteTemplate(id) {
 // ─── 作业执行 ───
 export async function executeWorkflow(templateId, userId, inputData) {
   const template = await getTemplate(templateId);
-  if (!template) throw Object.assign(new Error('模板不存在'), { code: 'NOT_FOUND' });
-  if (template.status !== 'published') throw Object.assign(new Error('模板未发布'), { code: 'INVALID_STATUS' });
+  if (!template) throw new BusinessError(404, '模板不存在');
+  if (template.status !== 'published') throw new BusinessError(400, '模板未发布');
 
   const jobId = await wfDao.createJob({
     templateId: template.id,
@@ -66,9 +66,9 @@ export async function listJobs(userId, pagination) {
 
 export async function cancelJob(id) {
   const job = await wfDao.getJob(id);
-  if (!job) throw Object.assign(new Error('作业不存在'), { code: 'NOT_FOUND' });
+  if (!job) throw new BusinessError(404, '作业不存在');
   if (!['pending', 'running'].includes(job.status)) {
-    throw Object.assign(new Error('仅可取消等待/运行中的作业'), { code: 'INVALID_STATUS' });
+    throw new BusinessError(400, '仅可取消等待/运行中的作业');
   }
   return wfDao.cancelJob(id);
 }

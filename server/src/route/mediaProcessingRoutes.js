@@ -9,6 +9,8 @@ import { z } from 'zod';
 import { authMiddleware } from '../middleware/auth.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { validate } from '../utils/validate.js';
+import { wrapController } from '../utils/wrapController.js';
+import { success } from '../utils/response.js';
 import { generateWhiteBg, replaceBackground, batchWhiteBg, BG_TEMPLATES } from '../services/backgroundRemovalService.js';
 import { exportMultiSize, batchExportMultiSize, PLATFORM_SIZES } from '../services/multiSizeExportService.js';
 
@@ -28,33 +30,25 @@ const bgBatchSchema = z.object({
   productName: z.string().optional(),
 });
 
-bgRouter.post('/remove', authMiddleware, heavyLimiter, validate(bgRemoveSchema), async (req, res) => {
-  try {
-    const { imageUrl, mode, templateId, productName } = req.body;
-    let result;
-    if (mode === 'replace' && templateId) {
-      result = await replaceBackground({ imageUrl, templateId, productName });
-    } else {
-      result = await generateWhiteBg({ imageUrl, productName });
-    }
-    res.json({ code: 0, data: result });
-  } catch (err) {
-    res.status(500).json({ code: -1, message: err.message });
+bgRouter.post('/remove', authMiddleware, heavyLimiter, validate(bgRemoveSchema), wrapController(async (req) => {
+  const { imageUrl, mode, templateId, productName } = req.body;
+  let result;
+  if (mode === 'replace' && templateId) {
+    result = await replaceBackground({ imageUrl, templateId, productName });
+  } else {
+    result = await generateWhiteBg({ imageUrl, productName });
   }
-});
+  return success(result);
+}));
 
-bgRouter.post('/batch', authMiddleware, heavyLimiter, validate(bgBatchSchema), async (req, res) => {
-  try {
-    const results = await batchWhiteBg(req.body.imageUrls, req.body.productName);
-    res.json({ code: 0, data: results });
-  } catch (err) {
-    res.status(500).json({ code: -1, message: err.message });
-  }
-});
+bgRouter.post('/batch', authMiddleware, heavyLimiter, validate(bgBatchSchema), wrapController(async (req) => {
+  const results = await batchWhiteBg(req.body.imageUrls, req.body.productName);
+  return success(results);
+}));
 
-bgRouter.get('/templates', async (_req, res) => {
-  res.json({ code: 0, data: BG_TEMPLATES });
-});
+bgRouter.get('/templates', wrapController(async () => {
+  return success(BG_TEMPLATES);
+}));
 
 // ── Multi-Size Export ──
 const msExportSchema = z.object({
@@ -69,31 +63,23 @@ const msBatchSchema = z.object({
   sizeKeys: z.array(z.string()).min(1).optional(),
 });
 
-msRouter.post('/export', authMiddleware, heavyLimiter, validate(msExportSchema), async (req, res) => {
-  try {
-    const result = await exportMultiSize({
-      imageUrl: req.body.imageUrl,
-      preset: req.body.preset,
-      format: req.body.format,
-      quality: req.body.quality,
-    });
-    res.json({ code: 0, data: result });
-  } catch (err) {
-    res.status(500).json({ code: -1, message: err.message });
-  }
-});
+msRouter.post('/export', authMiddleware, heavyLimiter, validate(msExportSchema), wrapController(async (req) => {
+  const result = await exportMultiSize({
+    imageUrl: req.body.imageUrl,
+    preset: req.body.preset,
+    format: req.body.format,
+    quality: req.body.quality,
+  });
+  return success(result);
+}));
 
-msRouter.post('/batch', authMiddleware, heavyLimiter, validate(msBatchSchema), async (req, res) => {
-  try {
-    const results = await batchExportMultiSize(req.body.imageUrls, req.body.sizeKeys);
-    res.json({ code: 0, data: results });
-  } catch (err) {
-    res.status(500).json({ code: -1, message: err.message });
-  }
-});
+msRouter.post('/batch', authMiddleware, heavyLimiter, validate(msBatchSchema), wrapController(async (req) => {
+  const results = await batchExportMultiSize(req.body.imageUrls, req.body.sizeKeys);
+  return success(results);
+}));
 
-msRouter.get('/presets', async (_req, res) => {
-  res.json({ code: 0, data: PLATFORM_SIZES });
-});
+msRouter.get('/presets', wrapController(async () => {
+  return success(PLATFORM_SIZES);
+}));
 
 export { bgRouter, msRouter };

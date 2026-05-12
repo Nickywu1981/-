@@ -5,6 +5,7 @@
  * - 防止 XSS 标签
  */
 
+import { BusinessError } from '../utils/businessError.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
 // XSS/注入检测正则
@@ -66,9 +67,7 @@ export default function paramFilter(req, _res, next) {
 
   // Injection scan — reject suspicious input
   if (scanForInjection(req.body) || scanForInjection(req.query)) {
-    const err = new Error('请求参数包含非法字符');
-    err.status = ERROR_CODE.BAD_REQUEST;
-    return next(err);
+    return next(new BusinessError(ERROR_CODE.BAD_REQUEST, '请求参数包含非法字符'));
   }
 
   next();

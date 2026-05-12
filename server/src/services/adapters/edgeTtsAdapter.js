@@ -52,7 +52,7 @@ function synthesizeEdgeTTS(voiceName, text, speed) {
       if (!resolved) {
         resolved = true;
         ws.close();
-        reject(new Error('Edge TTS 请求超时'));
+        reject(new BusinessError(504, 'Edge TTS 请求超时'));
       }
     }, 30000);
 
@@ -99,7 +99,7 @@ function synthesizeEdgeTTS(voiceName, text, speed) {
       if (!resolved) {
         resolved = true;
         const audioBuffer = Buffer.concat(chunks);
-        if (audioBuffer.length < 100) return reject(new Error('Edge TTS 返回空音频'));
+        if (audioBuffer.length < 100) return reject(new BusinessError(502, 'Edge TTS 返回空音频'));
         resolve(audioBuffer);
       }
     });
