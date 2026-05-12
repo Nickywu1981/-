@@ -11,10 +11,26 @@ function escapeHtml(str) {
 import formDao from '../dao/formDao.js';
 import logger from '../utils/logger.js';
 
+// ── 安全正则包装（防止 ReDoS 嵌套量词回溯爆炸）──
+const RE_MAX_INPUT = 200
+function safeRegexTest(pattern, flags, input) {
+  const str = String(input)
+  if (str.length > RE_MAX_INPUT) return false
+  try { return new RegExp(pattern, flags || '').test(str) }
+  catch { return false }
+}
+
+function safeRegexReplace(pattern, input) {
+  const str = String(input)
+  if (str.length > RE_MAX_INPUT) return str
+  try { return str.replace(new RegExp(pattern), '***') }
+  catch { return str }
+}
+
 // ── 校验引擎 ──
 const VALIDATORS = {
   required: (v) => v !== undefined && v !== null && v !== '',
-  regex: (v, { value, flags }) => new RegExp(value, flags || '').test(String(v)),
+  regex: (v, { value, flags }) => safeRegexTest(value, flags, v),
   min: (v, { value }) => (typeof v === 'number' ? v >= value : String(v).length >= value),
   max: (v, { value }) => (typeof v === 'number' ? v <= value : String(v).length <= value),
   minLength: (v, { value }) => String(v).length >= value,
@@ -72,7 +88,7 @@ function maskValue(value, rule, pattern) {
     case 'email': return s.replace(/(.{2}).*(@.*)/, '$1***$2');
     case 'idcard': return s.replace(/(\d{4})\d{10}(\d{4})/, '$1**********$2');
     case 'name': return s.length > 1 ? s[0] + '*'.repeat(s.length > 2 ? s.length - 2 : 1) + s[s.length - 1] : s + '*';
-    case 'custom': return pattern ? s.replace(new RegExp(pattern), '***') : s;
+    case 'custom': return pattern ? safeRegexReplace(pattern, s) : s;
     default: return s;
   }
 }
