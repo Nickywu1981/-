@@ -1,20 +1,15 @@
 /**
  * Movio AI v4.1 — Image Routes
  * G5 后端开发 | W2
- * POST /api/images/generate | /replicate | /batch-generate | /batch-edit | /batch-replace
- * GET  /api/images/works
  */
 import { Router } from 'express';
 import { z } from 'zod';
-import { success, error } from '../utils/response.js';
-import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate, validate, paginationSchema } from '../utils/validate.js';
 import { contentModerationMiddleware } from '../middleware/content-moderation.middleware.js';
 import { tierGuard } from '../middleware/tierGuard.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { authMiddleware } from '../middleware/auth.js';
-import * as imageService from '../services/image.service.js';
-import * as promptEnhanceService from '../services/prompt-enhance.service.js';
+import * as ctrl from '../controller/v4ImageController.js';
 
 const router = Router();
 router.use(authMiddleware);
@@ -58,84 +53,12 @@ const enhancePromptSchema = z.object({
   type: z.enum(['image', 'video', 'detail', 'poster', 'social']).default('image'),
 });
 
-// POST /api/images/generate
-router.post('/generate', heavyLimiter, _validate(generateSchema), tierGuard('image'), contentModerationMiddleware('input'), async (req, res) => {
-  try {
-    const { prompt, ratio, style } = req.validated;
-    const result = await imageService.generateImage(req.user.id, { prompt, ratio, style });
-    return success(res, result, '任务已提交');
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '生成失败');
-  }
-});
-
-// POST /api/images/replicate — 主图复刻
-router.post('/replicate', heavyLimiter, _validate(replicateSchema), tierGuard('image'), async (req, res) => {
-  try {
-    const { reference_image_url, product_name, style, ratio } = req.validated;
-    const result = await imageService.replicateMainImage(req.user.id, { referenceImageUrl: reference_image_url, productName: product_name, style, ratio });
-    return success(res, result, '任务已提交');
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '复刻失败');
-  }
-});
-
-// POST /api/images/batch-generate
-router.post('/batch-generate', heavyLimiter, _validate(batchGenerateSchema), tierGuard('image'), async (req, res) => {
-  try {
-    const { prompts, ratio, style } = req.validated;
-    const result = await imageService.batchGenerateImage(req.user.id, { prompts, ratio, style });
-    return success(res, result, `已提交${prompts.length}个生图任务`);
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '批量生成失败');
-  }
-});
-
-// POST /api/images/batch-edit
-router.post('/batch-edit', heavyLimiter, _validate(batchEditSchema), tierGuard('image'), async (req, res) => {
-  try {
-    const { images, operations } = req.validated;
-    const result = await imageService.batchEditImage(req.user.id, { images, operations });
-    return success(res, result, '批量编辑任务已提交');
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '批量编辑失败');
-  }
-});
-
-// POST /api/images/batch-replace
-router.post('/batch-replace', heavyLimiter, _validate(batchReplaceSchema), tierGuard('image'), async (req, res) => {
-  try {
-    const { images, new_background, new_scene } = req.validated;
-    const result = await imageService.batchReplaceImage(req.user.id, { images, newBackground: new_background, newScene: new_scene });
-    return success(res, result, '批量替换任务已提交');
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '批量替换失败');
-  }
-});
-
-// GET /api/images/works
-router.get('/works', validate(worksQuerySchema, 'query'), async (req, res) => {
-  try {
-    const result = await imageService.getImageWorks(req.user.id, {
-      page: parseInt(req.query.page, 10) || 1,
-      pageSize: parseInt(req.query.pageSize, 10) || 20,
-      status: req.query.status,
-    });
-    return success(res, result);
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '查询失败');
-  }
-});
-
-// POST /api/ai/enhance-prompt — 统一提示词增强
-router.post('/enhance-prompt', heavyLimiter, _validate(enhancePromptSchema), async (req, res) => {
-  try {
-    const { prompt, type } = req.validated;
-    const result = await promptEnhanceService.enhancePrompt(prompt, type || 'image');
-    return success(res, result);
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '增强失败');
-  }
-});
+router.post('/generate', heavyLimiter, _validate(generateSchema), tierGuard('image'), contentModerationMiddleware('input'), ctrl.generateImage);
+router.post('/replicate', heavyLimiter, _validate(replicateSchema), tierGuard('image'), ctrl.replicateMainImage);
+router.post('/batch-generate', heavyLimiter, _validate(batchGenerateSchema), tierGuard('image'), ctrl.batchGenerateImage);
+router.post('/batch-edit', heavyLimiter, _validate(batchEditSchema), tierGuard('image'), ctrl.batchEditImage);
+router.post('/batch-replace', heavyLimiter, _validate(batchReplaceSchema), tierGuard('image'), ctrl.batchReplaceImage);
+router.get('/works', validate(worksQuerySchema, 'query'), ctrl.getImageWorks);
+router.post('/enhance-prompt', heavyLimiter, _validate(enhancePromptSchema), ctrl.enhancePrompt);
 
 export default router;

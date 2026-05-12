@@ -1,17 +1,15 @@
 /**
- * Movio AI v4.1 — Config Routes / Controller
+ * Movio AI v4.1 — Config Routes
  * G5 后端开发 | GET /api/config/:group  |  POST /api/admin/config
  */
 import { Router } from 'express';
 import { z } from 'zod';
-import { success, error } from '../utils/response.js';
 import { validateV4 as _validate } from '../utils/validate.js';
-import { ERROR_CODE } from '../constants/errorCode.js';
-import * as configService from '../services/config.service.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { sseMiddleware } from '../services/config-version.service.js';
 import { requireRole } from '../middleware/rbac.js';
 import { rateLimiter } from '../middleware/rateLimiter.js';
+import * as ctrl from '../controller/v4ConfigController.js';
 
 const router = Router();
 const adminRouter = Router();
@@ -29,28 +27,10 @@ const rollbackSchema = z.object({
 });
 
 // GET /api/config/:group — 获取配置组
-router.get('/:group', authMiddleware, rateLimiter, async (req, res) => {
-  try {
-    const config = await configService.getGroupConfig(
-      req.params.group,
-      req.user?.id || null,
-      req.user?.role || null,
-    );
-    return success(res, config);
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '读取配置失败');
-  }
-});
+router.get('/:group', authMiddleware, rateLimiter, ctrl.getGroupConfig);
 
 // GET /api/config/dict/:dictKey — 获取字典
-router.get('/dict/:dictKey', rateLimiter, async (req, res) => {
-  try {
-    const dict = await configService.getDict(req.params.dictKey);
-    return success(res, dict);
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '读取字典失败');
-  }
-});
+router.get('/dict/:dictKey', rateLimiter, ctrl.getDict);
 
 // GET /api/config/version/stream — SSE 配置版本推送
 router.get('/version/stream', rateLimiter, sseMiddleware);
@@ -60,68 +40,21 @@ router.get('/version/stream', rateLimiter, sseMiddleware);
 // ===============================
 
 // GET /api/admin/config/groups — 获取所有配置分组
-adminRouter.get('/groups', requireRole('admin'), async (req, res) => {
-  try {
-    const { getGroupList } = await import('../services/config.service.js');
-    const groups = await getGroupList();
-    return success(res, groups);
-  } catch (err) {
-    return error(res, ERROR_CODE.INTERNAL_ERROR, err.message || '查询分组失败');
-  }
-});
+adminRouter.get('/groups', requireRole('admin'), ctrl.getGroupList);
 
 // GET /api/admin/config/items/:groupKey — 获取分组下所有配置项(含完整元数据)
-adminRouter.get('/items/:groupKey', requireRole('admin'), async (req, res) => {
-  try {
-    const { getGroupItems } = await import('../services/config.service.js');
-    const items = await getGroupItems(req.params.groupKey);
-    return success(res, items);
-  } catch (err) {
-    return error(res, ERROR_CODE.INTERNAL_ERROR, err.message || '查询配置项失败');
-  }
-});
+adminRouter.get('/items/:groupKey', requireRole('admin'), ctrl.getGroupItems);
 
 // POST /api/admin/config — 写入配置
-adminRouter.post('/', requireRole('admin'), _validate(setConfigSchema), async (req, res) => {
-  try {
-    const { group_key, item_key, item_value } = req.validated;
-    const result = await configService.setConfig(group_key, item_key, item_value, req.user.id);
-    return success(res, result, '配置已更新');
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '更新配置失败');
-  }
-});
+adminRouter.post('/', requireRole('admin'), _validate(setConfigSchema), ctrl.setConfig);
 
 // POST /api/admin/config/rollback — 回滚配置
-adminRouter.post('/rollback', requireRole('admin'), _validate(rollbackSchema), async (req, res) => {
-  try {
-    const { log_id } = req.validated;
-    const result = await configService.rollbackConfig(log_id, req.user.id);
-    return success(res, result, '配置已回滚');
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '回滚失败');
-  }
-});
+adminRouter.post('/rollback', requireRole('admin'), _validate(rollbackSchema), ctrl.rollbackConfig);
 
 // GET /api/admin/config/logs/:group — 变更日志
-adminRouter.get('/logs/:group', requireRole('admin'), async (req, res) => {
-  try {
-    const logs = await configService.getConfigLogs(req.params.group);
-    return success(res, logs);
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '查询日志失败');
-  }
-});
+adminRouter.get('/logs/:group', requireRole('admin'), ctrl.getConfigLogs);
 
 // GET /api/admin/config/seed/verify — 校验Seed数据
-adminRouter.get('/seed/verify', requireRole('admin'), async (req, res) => {
-  try {
-    const { validateSeed } = await import('../utils/seed-validator.js');
-    const result = await validateSeed((await import('../dao/db.js')).default);
-    return success(res, result);
-  } catch (err) {
-    return error(res, ERROR_CODE.INTERNAL_ERROR, err.message || '校验失败');
-  }
-});
+adminRouter.get('/seed/verify', requireRole('admin'), ctrl.verifySeed);
 
 export { router as configPublicRouter, adminRouter as configAdminRouter };
