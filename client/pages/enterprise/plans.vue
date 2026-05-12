@@ -54,7 +54,7 @@ definePageMeta({ layout: 'enterprise' });
 <style scoped>
 .page-title { font-size: 24px; margin: 0 0 8px; color: var(--text-primary); }
 .subtitle { color: var(--text-secondary); margin: 0 0 28px; font-size: 14px; }
-.plan-badge.current { background: #e8f0fe; color: #1a73e8; padding: 2px 12px; border-radius: 12px; font-size: 13px; }
+.plan-badge.current { background: var(--bg-accent); color: var(--color-info-500); padding: 2px 12px; border-radius: 12px; font-size: 13px; }
 
 .plan-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 32px; }
 .plan-card { background: var(--bg-card); border-radius: 16px; padding: 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); text-align: center; border: 2px solid transparent; transition: border-color 0.2s; }
@@ -69,5 +69,5 @@ definePageMeta({ layout: 'enterprise' });
 .plan-btn { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--color-brand-primary); background: var(--bg-card); color: var(--color-brand-primary); font-size: 14px; cursor: pointer; }
 .plan-btn.current { background: var(--color-brand-primary); color: var(--text-inverse); cursor: default; }
 
-.note { background: #fffbe6; border-radius: 10px; padding: 16px 20px; font-size: 14px; color: #8a6d14; }
+.note { background: var(--warning-bg); border-radius: 10px; padding: 16px 20px; font-size: 14px; color: var(--color-warning-700); }
 </style>

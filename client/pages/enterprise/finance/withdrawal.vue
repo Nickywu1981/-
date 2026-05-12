@@ -151,10 +151,12 @@ th { background: var(--bg-subtle); color: var(--text-secondary); font-weight: 50
 .green { color: var(--color-success); font-weight: 600; }
 .red { color: var(--color-danger); font-weight: 600; }
 .status-tag { padding: 2px 10px; border-radius: 12px; font-size: 12px; }
-.status-tag.completed { background: #e8f5e9; color: #27ae60; }
-.status-tag.pending_review, .status-tag.processing { background: #fff3e0; color: #f39c12; }
-.status-tag.approved { background: #e3f2fd; color: #1a73e8; }
-.status-tag.rejected, .status-tag.failed { background: #fbe9e7; color: #e74c3c; }
+.status-tag.completed { background: var(--status-done-bg); color: var(--status-done-text); }
+.status-tag.pending_review { background: var(--status-pending-bg); color: var(--status-pending-text); }
+.status-tag.processing { background: var(--status-processing-bg); color: var(--status-processing-text); }
+.status-tag.approved { background: var(--status-approved-bg); color: var(--status-approved-text); }
+.status-tag.rejected { background: var(--status-rejected-bg); color: var(--status-rejected-text); }
+.status-tag.failed { background: var(--status-fail-bg); color: var(--status-fail-text); }
 .empty { padding: 60px; text-align: center; color: var(--text-muted); }
 .pager { display: flex; justify-content: center; align-items: center; gap: 12px; padding: 16px; }
 .pager button { padding: 6px 14px; border: 1px solid var(--border-primary); background: var(--bg-card); border-radius: 6px; cursor: pointer; color: var(--text-primary); }

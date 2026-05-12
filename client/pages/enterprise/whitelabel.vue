@@ -92,8 +92,8 @@ definePageMeta({ layout: 'enterprise' });
 .logo-preview { max-height: 48px; }
 
 .msg { padding: 10px; border-radius: 8px; font-size: 14px; margin-bottom: 14px; }
-.msg.success { background: #e8f5e9; color: #27ae60; }
-.msg.error { background: #fbe9e7; color: #e74c3c; }
+.msg.success { background: var(--success-bg); color: var(--color-success-500); }
+.msg.error { background: var(--danger-bg); color: var(--color-danger-500); }
 
 .btn-primary { padding: 12px 28px; background: var(--color-brand-primary); color: var(--text-inverse); border: none; border-radius: 8px; cursor: pointer; font-size: 15px; }
 .btn-primary:disabled { opacity: 0.6; }
