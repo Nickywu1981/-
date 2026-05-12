@@ -362,6 +362,7 @@
     "logout_fail": "退出失败，请重试",
     "workflow_desc": "把零散功能串成标准化自动化流程 — 一键上新、批量做内容、自动管评价、每日数据复盘、大促活动营销、违规自查风控",
     "lobster_desc": "一站串联电商业态全流程 — 选品调研、内容创作、上新发布、客服接待、评价管理、数据复盘、竞品监控、违规风控",
+    "history_desc": "查看你所有的创作历史记录与作品管理",
     "admin_panel": "管理后台",
     "exit_login": "退出登录",
     "creation_placeholder_video": "描述你想要的带货视频，例如：护肤品展示视频，15秒口播...",
@@ -392,6 +393,23 @@
     "creation_param_other_tool": "工具类型",
     "creation_upload_hint": "拖拽或点击上传素材",
     "creation_param_label": "参数设置",
+    "slide_panel": {
+      "close_aria": "关闭面板",
+      "generate_btn": "⚡ 开始生成",
+      "upload_text": "拖拽或点击上传素材",
+      "upload_hint": "支持 JPG / PNG / MP4，单文件 ≤ 50MB",
+      "param_label": "参数设置",
+      "generating": "生成中...",
+      "step_upload": "上传素材",
+      "step_analyze": "AI 分析",
+      "step_generate": "生成内容",
+      "step_done": "完成",
+      "result_name": "生成结果",
+      "download": "⬇ 下载",
+      "reuse": "🔄 复用",
+      "close_result": "关闭",
+      "progress_pct": "生成中... {pct}%"
+    },
 
     "creation_sub_cards": {
       "video": [
@@ -446,10 +464,12 @@
     },
     "nav_main_label": "工作台导航",
     "nav_home": "首页",
-    "nav_creation": "创作",
+    "nav_creation": "创作中心",
+    "nav_agent": "智能体",
     "nav_assistant": "AI 助手",
     "nav_workflow": "工作流",
     "nav_lobster": "龙虾",
+    "nav_history": "历史记录",
     "default_page_title": "工作台",
     "fold_expand": "展开侧边栏",
     "fold_collapse": "收起侧边栏",
@@ -525,6 +545,21 @@
         {"id":"virtual_model","category":"digital","icon":"👤","title":"虚拟模特","desc":"AI生成虚拟模特穿衣展示","route":"/work/virtual-model","order":5,"visible":true},
         {"id":"face_swap","category":"digital","icon":"🔄","title":"换脸","desc":"AI 人脸替换/数字人换脸","route":"/work/face-swap","order":6,"visible":true}
       ]
+    },
+    "history_desc": "查看你所有的创作历史记录与作品管理",
+    "panel": {
+      "close": "关闭面板",
+      "params_label": "参数设置",
+      "generate": "⚡ 开始生成",
+      "generating": "生成中... {progress}%",
+      "step_upload": "上传素材",
+      "step_analyze": "AI 分析",
+      "step_generate": "生成内容",
+      "step_done": "完成",
+      "result_name": "生成结果",
+      "download": "⬇ 下载",
+      "reuse": "🔄 复用",
+      "close_btn": "关闭"
     }
   },
   "admin_shell": {

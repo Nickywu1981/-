@@ -362,6 +362,7 @@
     "logout_fail": "Logout failed, please try again",
     "workflow_desc": "Chain scattered tools into standardized automation workflows — one-click new arrivals, batch content creation, auto review management, daily data review, campaign marketing, self-audit risk control",
     "lobster_desc": "End-to-end e-commerce operations pipeline — product research, content creation, listing & publishing, customer service, review management, data review, competitor monitoring, risk control",
+    "history_desc": "View all your creation history and manage your works",
     "admin_panel": "Admin Panel",
     "exit_login": "Logout",
     "creation_placeholder_video": "Describe your product video, e.g. skincare demo video, 15s...",
@@ -391,6 +392,23 @@
     "creation_param_other_tool": "Tool Type",
     "creation_upload_hint": "Drag or click to upload assets",
     "creation_param_label": "Parameters",
+    "slide_panel": {
+      "close_aria": "Close panel",
+      "generate_btn": "⚡ Generate",
+      "upload_text": "Drag or click to upload",
+      "upload_hint": "Supports JPG / PNG / MP4, max 50MB per file",
+      "param_label": "Parameters",
+      "generating": "Generating...",
+      "step_upload": "Upload",
+      "step_analyze": "AI Analysis",
+      "step_generate": "Generate",
+      "step_done": "Done",
+      "result_name": "Result",
+      "download": "⬇ Download",
+      "reuse": "🔄 Reuse",
+      "close_result": "Close",
+      "progress_pct": "Generating... {pct}%"
+    },
 
     "creation_sub_cards": {
       "video": [
@@ -445,10 +463,12 @@
     },
     "nav_main_label": "Workspace navigation",
     "nav_home": "Home",
-    "nav_creation": "Create",
+    "nav_creation": "Creation Center",
+    "nav_agent": "AI Agent",
     "nav_assistant": "AI Assistant",
     "nav_workflow": "Workflow",
     "nav_lobster": "Lobster",
+    "nav_history": "History",
     "default_page_title": "Workspace",
     "fold_expand": "Expand sidebar",
     "fold_collapse": "Collapse sidebar",
@@ -524,6 +544,21 @@
         {"id":"virtual_model","category":"digital","icon":"👤","title":"Virtual Model","desc":"AI virtual model wearing showcase","route":"/work/virtual-model","order":5,"visible":true},
         {"id":"face_swap","category":"digital","icon":"🔄","title":"Face Swap","desc":"AI face replacement/digital human swap","route":"/work/face-swap","order":6,"visible":true}
       ]
+    },
+    "history_desc": "View all your creation history and manage your work",
+    "panel": {
+      "close": "Close panel",
+      "params_label": "Parameters",
+      "generate": "⚡ Generate",
+      "generating": "Generating... {progress}%",
+      "step_upload": "Upload",
+      "step_analyze": "AI Analyze",
+      "step_generate": "Generate",
+      "step_done": "Done",
+      "result_name": "Result",
+      "download": "⬇ Download",
+      "reuse": "🔄 Reuse",
+      "close_btn": "Close"
     }
   },
   "admin_shell": {
