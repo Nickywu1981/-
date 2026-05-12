@@ -238,22 +238,7 @@
       </div>
     </section>
 
-    <!-- ===== FOOTER ===== -->
-    <footer class="lp-foot">
-      <div class="lp-foot-in">
-        <div class="lp-foot-brand">
-          <span class="lp-foot-logo">M</span>
-          <span class="lp-foot-name">{{ siteName }}</span>
-          <p>{{ $t('landing.footer_desc') }}</p>
-        </div>
-        <div class="lp-foot-lk">
-          <div><h4>{{ $t('landing.footer_products') }}</h4><a href="#features">{{ $t('landing.footer_features') }}</a><a href="#pricing">{{ $t('landing.footer_pricing') }}</a><a href="#how">{{ $t('landing.footer_how') }}</a></div>
-          <div><h4>{{ $t('landing.footer_support') }}</h4><a href="#faq">{{ $t('landing.footer_faq') }}</a><NuxtLink to="/help">{{ $t('landing.footer_help') }}</NuxtLink><NuxtLink to="/help">{{ $t('landing.footer_contact') }}</NuxtLink></div>
-          <div><h4>{{ $t('landing.footer_legal') }}</h4><NuxtLink to="/legal/privacy">{{ $t('landing.footer_privacy') }}</NuxtLink><NuxtLink to="/legal/terms">{{ $t('landing.footer_terms') }}</NuxtLink></div>
-        </div>
-      </div>
-      <div class="lp-foot-bot"><span>{{ $t('landing.footer_copyright', { year: currentYear }) }}</span></div>
-    </footer>
+    <LandingFooter :siteName="siteName" :currentYear="currentYear" />
 
     <!-- Back to top -->
     <button v-show="showBackTop" class="lp-back-top" @click="scrollToTop" :aria-label="$t('landing.back_top')" :title="$t('landing.back_top')">↑</button>
@@ -261,9 +246,11 @@
 </template>
 
 <script setup lang="ts">
+import { useLanding } from '~/composables/useLanding';
+
 definePageMeta({ layout: 'landing' });
 
-const { locale, t } = useI18n()
+const { locale, t } = useI18n();
 
 useHead(() => ({
   htmlAttrs: { lang: locale.value === 'en' ? 'en' : 'zh-CN' },
@@ -276,134 +263,31 @@ useHead(() => ({
     { property: 'og:description', content: locale.value === 'en' ? 'From photos to videos — one-click AI creation for 13 e-commerce platforms' : '覆盖13个电商平台，从图片到视频一站式AI创作' },
     { property: 'og:type', content: 'website' },
   ],
-  link: [{ rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
 }));
-const scrolled = ref(false);
-const mobileOpen = ref(false);
-const activeTab = ref('all');
-const user = ref<any>(null);
-const showBackTop = ref(false);
-const activeSection = ref('');
+
+const {
+  user, checkAuth,
+  siteName, heroTitle, heroSubtitle, heroCta, apiPricing,
+  scrolled, showBackTop, activeSection, mobileOpen,
+  scrollTo, scrollToTop, handleScroll,
+  setupEntranceObserver, destroyEntranceObserver,
+  faqOpen, toggleFaq,
+  activeTab,
+  tabs, memfocusCards, steps, useCases, faqs, platforms, cards,
+  filteredCards, countForTab: getTabCount, displayPlans,
+} = useLanding();
+
 const currentYear = new Date().getFullYear();
 
-async function checkAuth() {
-  try { const res: any = await $fetch('/api/user/profile'); user.value = res.data; } catch { user.value = null; }
-}
-
-// Fetch site config from admin-controlled backend
-const { data: siteConfig } = await useAsyncData('site-config-home', () =>
-  $fetch<any>('/api/site-config/public').catch((err: any) => { if (import.meta.dev) console.warn('[home] 站点配置加载失败', err?.message || err); return {} })
-);
-
-const siteName = computed(() => siteConfig.value?.site_name || 'Movio AI');
-const heroTitle = computed(() => siteConfig.value?.hero_title || t('landing.hero_title_highlight'));
-const heroSubtitle = computed(() => siteConfig.value?.hero_subtitle || t('landing.hero_subtitle_fallback'));
-const heroCta = computed(() => siteConfig.value?.hero_cta || t('landing.hero_cta'));
-const apiPricing = computed(() => {
-  if (Array.isArray(siteConfig.value?.pricing) && siteConfig.value.pricing.length) return siteConfig.value.pricing;
-  return null;
-});
-
-function scrollTo(id: string) {
-  if (!process.client) return
-  const el = document.getElementById(id);
-  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-function scrollToTop() {
-  if (!process.client) return
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-const faqOpen = ref(-1);
-
-let scrollTicking = false;
-const handleScroll = () => {
-  if (!scrollTicking) {
-    requestAnimationFrame(() => {
-      const y = window.scrollY;
-      scrolled.value = y > 50;
-      showBackTop.value = y > 600;
-      const sections = ['features', 'how', 'pricing', 'faq'];
-      let found = false;
-      for (let i = sections.length - 1; i >= 0; i--) {
-        const el = document.getElementById(sections[i]);
-        if (el && el.getBoundingClientRect().top <= 120) {
-          activeSection.value = sections[i];
-          found = true;
-          break;
-        }
-      }
-      if (!found) activeSection.value = '';
-      scrollTicking = false;
-    });
-    scrollTicking = true;
-  }
-};
-// Scroll-triggered entrance animations
-const animatedEls = ref<Set<Element>>(new Set())
-let entranceObserver: IntersectionObserver | null = null
 onMounted(() => {
   window.addEventListener('scroll', handleScroll, { passive: true });
   checkAuth();
-  // Entrance animation observer
-  if (process.client && window.IntersectionObserver) {
-    entranceObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting && !animatedEls.value.has(entry.target)) {
-          animatedEls.value.add(entry.target)
-          entry.target.classList.add('lp-in')
-        }
-      })
-    }, { threshold: 0.12, rootMargin: '0px 0px -32px 0px' })
-    document.querySelectorAll('.lp-card, .lp-mf-card, .lp-step, .lp-case, .lp-plan, .lp-faq-it').forEach(el => entranceObserver!.observe(el))
-    // Safety: reveal all cards after 2s in case observer misses above-fold content
-    setTimeout(() => {
-      document.querySelectorAll('.lp-card, .lp-mf-card, .lp-step, .lp-case, .lp-plan, .lp-faq-it').forEach(el => {
-        if (!animatedEls.value.has(el)) { el.classList.add('lp-in') }
-      })
-    }, 2000)
-  }
+  setupEntranceObserver();
 });
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll);
-  if (entranceObserver) entranceObserver.disconnect();
+  destroyEntranceObserver();
 });
-
-const tabs = computed(() => [
-  { key: 'all', label: t('landing.features_tab_all'), icon: '✦' },
-  { key: 'image', label: t('landing.features_tab_image'), icon: '▦' },
-  { key: 'video', label: t('landing.features_tab_video'), icon: '▶' },
-  { key: 'ai', label: t('landing.features_tab_ai'), icon: '◆' },
-]);
-
-const memfocusCards = computed(() => t('landing.memfocus_cards') as any[])
-const steps = computed(() => t('landing.steps') as any[])
-const useCases = computed(() => t('landing.use_cases') as any[])
-const faqs = computed(() => t('landing.faqs') as any[])
-const platforms = computed(() => t('landing.platforms') as string[])
-
-const cards = computed(() => {
-  const fromI18n = t('landing.feature_cards') as any[]
-  if (Array.isArray(fromI18n) && fromI18n.length) return fromI18n
-  return []
-})
-
-const filteredCards = computed(() =>
-  activeTab.value === 'all' ? cards.value : cards.value.filter(c => c.category === activeTab.value)
-)
-
-function getTabCount(key: string): number {
-  if (key === 'all') return cards.value.length
-  return cards.value.filter(c => c.category === key).length
-}
-
-const plans = computed(() => {
-  const raw = t('landing.plans') as any[]
-  if (Array.isArray(raw) && raw.length) return raw
-  const fallback = t('landing.plans_fallback') as any[]
-  return Array.isArray(fallback) && fallback.length ? fallback : []
-})
-
-const displayPlans = computed(() => apiPricing.value || plans.value)
 
 </script>
 
