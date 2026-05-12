@@ -1,27 +1,18 @@
 /**
  * MemFocus SDK REST 路由 — 对外暴露 8 大能力 API
- *
- * 内部调用：  import { memfocus } from '../sdk/memfocus-sdk.js'
- * 外部调用：  POST /api/sdk/memory/search
  */
-
 import { Router } from 'express';
 import { z } from 'zod';
-import { memfocus } from '../sdk/memfocus-sdk.js';
-import { retrieveContext } from '../services/ragService.js';
-import { success, error } from '../utils/response.js';
-import { ERROR_CODE } from '../constants/errorCode.js';
-import logger from '../utils/logger.js';
+import { sdkController } from '../controller/sdkController.js';
 import { validate, numericParamSchema } from '../utils/validate.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 
 const router = Router();
-
 const userIdParamSchema = numericParamSchema('userId');
 const taskIdParamSchema = numericParamSchema('taskId');
 
-// ── Zod schemas ────────────────────────────────────────────────────────
+// ── Zod schemas ──
 const memorySearchSchema = z.object({ query: z.string().min(1) });
 const memoryEmbedSchema = z.object({
   content: z.string().min(1),
@@ -40,7 +31,9 @@ const contextDisambiguateSchema = z.object({
   productContext: z.record(z.unknown()).optional(),
 });
 const paramsWithTaskId = z.object({ taskId: z.string().min(1) });
-const contextSummarizeSchema = z.object({ history: z.array(z.object({ role: z.string(), content: z.string() })).optional() });
+const contextSummarizeSchema = z.object({
+  history: z.array(z.object({ role: z.string(), content: z.string() })).optional(),
+});
 const localizeScriptSchema = z.object({
   product: z.record(z.unknown()).optional(),
   language: z.string().optional(),
@@ -94,304 +87,53 @@ const visualImageSchema = z.object({
   style: z.string().optional(),
 });
 
-// ═══════════════════ CSRF 令牌获取 ═══════════════════
-router.get('/csrf', (req, res) => {
-  success(res, { csrfToken: req.csrfToken || null });
-});
+// ── CSRF / 能力清单 / 健康 ──
+router.get('/csrf', sdkController.csrf);
+router.get('/capabilities', sdkController.capabilities);
+router.get('/health', sdkController.health);
+router.get('/ping', sdkController.ping);
 
-// ═══════════════════ 能力清单 ═══════════════════
-router.get('/capabilities', (_req, res) => {
-  success(res, memfocus.capabilities());
-});
+// ── 记忆力 ──
+router.post('/memory/search', heavyLimiter, authMiddleware, validate(memorySearchSchema), sdkController.memorySearch);
+router.post('/memory/embed', heavyLimiter, authMiddleware, validate(memoryEmbedSchema), sdkController.memoryEmbed);
+router.get('/memory/list/:userId', authMiddleware, validate(userIdParamSchema, 'params'), sdkController.memoryList);
+router.get('/memory/status', sdkController.memoryStatus);
+router.post('/memory/rag', heavyLimiter, authMiddleware, validate(memorySearchSchema), sdkController.memoryRag);
 
-// ═══════════════════ 健康检查 ═══════════════════
-router.get('/health', async (_req, res) => {
-  try {
-    const result = await memfocus.health.check();
-    success(res, result);
-  } catch (err) {
-    logger.error('[sdk/health]', err);
-    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '健康检查失败');
-  }
-});
+// ── 判断力 ──
+router.post('/attention/classify', heavyLimiter, authMiddleware, validate(attentionClassifySchema), sdkController.attentionClassify);
+router.post('/attention/rank', heavyLimiter, authMiddleware, validate(attentionRankSchema), sdkController.attentionRank);
 
-router.get('/ping', (_req, res) => {
-  success(res, memfocus.health.ping());
-});
+// ── 理解力 ──
+router.post('/context/disambiguate', heavyLimiter, authMiddleware, validate(contextDisambiguateSchema), sdkController.contextDisambiguate);
+router.post('/context/summarize', heavyLimiter, authMiddleware, validate(contextSummarizeSchema), sdkController.contextSummarize);
 
-// ═══════════════════ 记忆力 ═══════════════════
-router.post('/memory/search', heavyLimiter, authMiddleware, validate(memorySearchSchema), async (req, res) => {
-  try {
-    const result = await memfocus.memory.search(req.body.query);
-    success(res, result);
-  } catch (err) {
-    logger.error('[sdk]', err);
-    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
-  }
-});
+// ── 多语言 ──
+router.get('/localize/languages', sdkController.localizeLanguages);
+router.get('/localize/platforms', sdkController.localizePlatforms);
+router.get('/localize/platforms/:platform', sdkController.localizePlatformDetail);
+router.post('/localize/script', heavyLimiter, authMiddleware, validate(localizeScriptSchema), sdkController.localizeScript);
+router.post('/localize/translate', heavyLimiter, authMiddleware, validate(localizeTranslateSchema), sdkController.localizeTranslate);
 
-router.post('/memory/embed', heavyLimiter, authMiddleware, validate(memoryEmbedSchema), async (req, res) => {
-  try {
-    const result = await memfocus.memory.embed(req.body);
-    success(res, result);
-  } catch (err) {
-    logger.error('[sdk]', err);
-    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
-  }
-});
+// ── 写作力 ──
+router.post('/content/titles', heavyLimiter, authMiddleware, validate(contentGenerateSchema), sdkController.contentTitles);
+router.post('/content/selling-points', heavyLimiter, authMiddleware, validate(contentGenerateSchema), sdkController.contentSellingPoints);
+router.post('/content/description', heavyLimiter, authMiddleware, validate(contentGenerateSchema), sdkController.contentDescription);
+router.post('/content/seeding', heavyLimiter, authMiddleware, validate(contentGenerateSchema), sdkController.contentSeeding);
+router.post('/content/script', heavyLimiter, authMiddleware, validate(contentGenerateSchema), sdkController.contentScript);
+router.get('/content/platform-rules', sdkController.contentPlatformRules);
 
-router.get('/memory/list/:userId', authMiddleware, validate(userIdParamSchema, 'params'), async (req, res) => {
-  try {
-    const result = await memfocus.memory.list(req.params.userId, req.query);
-    success(res, result);
-  } catch (err) {
-    logger.error('[sdk]', err);
-    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
-  }
-});
+// ── 风控力 ──
+router.post('/guard/check-text', heavyLimiter, authMiddleware, validate(guardCheckTextSchema), sdkController.guardCheckText);
+router.post('/guard/check-image', heavyLimiter, authMiddleware, validate(guardCheckImageSchema), sdkController.guardCheckImage);
+router.post('/guard/audit', heavyLimiter, authMiddleware, validate(guardAuditSchema), sdkController.guardAudit);
 
-router.get('/memory/status', async (_req, res) => {
-  try {
-    const result = await memfocus.memory.getStatus();
-    success(res, result);
-  } catch (err) {
-    logger.error('[sdk]', err);
-    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
-  }
-});
-
-// POST /api/sdk/memory/rag — RAG 全量上下文检索 (LLM 消费专用)
-router.post('/memory/rag', heavyLimiter, authMiddleware, validate(memorySearchSchema), async (req, res) => {
-  try {
-    const { query, topK = 5 } = req.body;
-    const result = await retrieveContext(query, { topK, format: 'compact' });
-    success(res, result);
-  } catch (err) {
-    logger.error('[sdk/rag]', err);
-    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
-  }
-});
-
-// ═══════════════════ 判断力 ═══════════════════
-router.post('/attention/classify', heavyLimiter, authMiddleware, validate(attentionClassifySchema), async (req, res) => {
-  try {
-    const result = await memfocus.attention.classify(req.body);
-    success(res, result);
-  } catch (err) {
-    logger.error('[sdk]', err);
-    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
-  }
-});
-
-router.post('/attention/rank', heavyLimiter, authMiddleware, validate(attentionRankSchema), async (req, res) => {
-  try {
-    const result = await memfocus.attention.rank(req.body.queries || []);
-    success(res, result);
-  } catch (err) {
-    logger.error('[sdk]', err);
-    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
-  }
-});
-
-// ═══════════════════ 理解力 ═══════════════════
-router.post('/context/disambiguate', heavyLimiter, authMiddleware, validate(contextDisambiguateSchema), async (req, res) => {
-  try {
-    const result = await memfocus.context.disambiguate(req.body);
-    success(res, result);
-  } catch (err) {
-    logger.error('[sdk]', err);
-    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
-  }
-});
-
-router.post('/context/summarize', heavyLimiter, authMiddleware, validate(contextSummarizeSchema), async (req, res) => {
-  try {
-    const result = await memfocus.context.summarize(req.body.history || []);
-    success(res, { summary: result });
-  } catch (err) {
-    logger.error('[sdk]', err);
-    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
-  }
-});
-
-// ═══════════════════ 多语言 ═══════════════════
-router.get('/localize/languages', (_req, res) => {
-  success(res, memfocus.localize.getLanguages());
-});
-
-router.get('/localize/platforms', (_req, res) => {
-  success(res, memfocus.localize.getPlatformSpecs());
-});
-
-router.get('/localize/platforms/:platform', (req, res) => {
-  success(res, memfocus.localize.getPlatformSpecs(req.params.platform));
-});
-
-router.post('/localize/script', heavyLimiter, authMiddleware, validate(localizeScriptSchema), async (req, res) => {
-  try {
-    const result = await memfocus.localize.generateScript(req.body);
-    success(res, result);
-  } catch (err) {
-    logger.error('[sdk]', err);
-    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
-  }
-});
-
-router.post('/localize/translate', heavyLimiter, authMiddleware, validate(localizeTranslateSchema), async (req, res) => {
-  try {
-    const result = await memfocus.localize.translate({ userId: (req.user?.userId || req.user?.id), ...req.body });
-    success(res, result);
-  } catch (err) {
-    logger.error('[sdk]', err);
-    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
-  }
-});
-
-// ═══════════════════ 写作力 ═══════════════════
-router.post('/content/titles', heavyLimiter, authMiddleware, validate(contentGenerateSchema), async (req, res) => {
-  try {
-    const result = await memfocus.content.generateTitles((req.user?.userId || req.user?.id), req.body);
-    success(res, result);
-  } catch (err) {
-    logger.error('[sdk]', err);
-    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
-  }
-});
-
-router.post('/content/selling-points', heavyLimiter, authMiddleware, validate(contentGenerateSchema), async (req, res) => {
-  try {
-    const result = await memfocus.content.generateSellingPoints((req.user?.userId || req.user?.id), req.body);
-    success(res, result);
-  } catch (err) {
-    logger.error('[sdk]', err);
-    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
-  }
-});
-
-router.post('/content/description', heavyLimiter, authMiddleware, validate(contentGenerateSchema), async (req, res) => {
-  try {
-    const result = await memfocus.content.generateDescription((req.user?.userId || req.user?.id), req.body);
-    success(res, result);
-  } catch (err) {
-    logger.error('[sdk]', err);
-    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
-  }
-});
-
-router.post('/content/seeding', heavyLimiter, authMiddleware, validate(contentGenerateSchema), async (req, res) => {
-  try {
-    const result = await memfocus.content.generateSeeding((req.user?.userId || req.user?.id), req.body);
-    success(res, result);
-  } catch (err) {
-    logger.error('[sdk]', err);
-    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
-  }
-});
-
-router.post('/content/script', heavyLimiter, authMiddleware, validate(contentGenerateSchema), async (req, res) => {
-  try {
-    const result = await memfocus.content.generateScript((req.user?.userId || req.user?.id), req.body);
-    success(res, result);
-  } catch (err) {
-    logger.error('[sdk]', err);
-    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
-  }
-});
-
-router.get('/content/platform-rules', (_req, res) => {
-  success(res, memfocus.content.getPlatformRules());
-});
-
-// ═══════════════════ 风控力 ═══════════════════
-router.post('/guard/check-text', heavyLimiter, authMiddleware, validate(guardCheckTextSchema), async (req, res) => {
-  try {
-    const result = await memfocus.guard.checkText(req.body.text, req.body.options || {});
-    success(res, result);
-  } catch (err) {
-    logger.error('[sdk]', err);
-    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
-  }
-});
-
-router.post('/guard/check-image', heavyLimiter, authMiddleware, validate(guardCheckImageSchema), async (req, res) => {
-  try {
-    const result = await memfocus.guard.checkImage(req.body.imageUrl, req.body.options || {});
-    success(res, result);
-  } catch (err) {
-    logger.error('[sdk]', err);
-    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
-  }
-});
-
-router.post('/guard/audit', heavyLimiter, authMiddleware, validate(guardAuditSchema), async (req, res) => {
-  try {
-    const result = await memfocus.guard.fullAudit(req.body);
-    success(res, result);
-  } catch (err) {
-    logger.error('[sdk]', err);
-    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
-  }
-});
-
-// ═══════════════════ 视觉力 ═══════════════════
-router.post('/visual/video', heavyLimiter, authMiddleware, validate(visualSubmitSchema), async (req, res) => {
-  try {
-    const result = await memfocus.visual.submitVideo((req.user?.userId || req.user?.id), req.body);
-    success(res, result);
-  } catch (err) {
-    logger.error('[sdk]', err);
-    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
-  }
-});
-
-router.post('/visual/batch', heavyLimiter, authMiddleware, validate(visualBatchSchema), async (req, res) => {
-  try {
-    const result = await memfocus.visual.submitBatch((req.user?.userId || req.user?.id), req.body);
-    success(res, result);
-  } catch (err) {
-    logger.error('[sdk]', err);
-    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
-  }
-});
-
-router.get('/visual/task/:taskId', authMiddleware, validate(taskIdParamSchema, 'params'), async (req, res) => {
-  try {
-    const result = await memfocus.visual.getTaskStatus(req.params.taskId, (req.user?.userId || req.user?.id));
-    success(res, result);
-  } catch (err) {
-    logger.error('[sdk]', err);
-    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
-  }
-});
-
-router.get('/visual/tasks', authMiddleware, async (req, res) => {
-  try {
-    const result = await memfocus.visual.listTasks((req.user?.userId || req.user?.id), req.query);
-    success(res, result);
-  } catch (err) {
-    logger.error('[sdk]', err);
-    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
-  }
-});
-
-router.post('/visual/task/:taskId/cancel', authMiddleware, validate(paramsWithTaskId, 'params'), async (req, res) => {
-  try {
-    const result = await memfocus.visual.cancelTask(req.params.taskId, (req.user?.userId || req.user?.id));
-    success(res, result);
-  } catch (err) {
-    logger.error('[sdk]', err);
-    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
-  }
-});
-
-router.post('/visual/image', heavyLimiter, authMiddleware, validate(visualImageSchema), async (req, res) => {
-  try {
-    const result = await memfocus.visual.processImage((req.user?.userId || req.user?.id), req.body);
-    success(res, result);
-  } catch (err) {
-    logger.error('[sdk]', err);
-    error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '系统异常');
-  }
-});
+// ── 视觉力 ──
+router.post('/visual/video', heavyLimiter, authMiddleware, validate(visualSubmitSchema), sdkController.visualVideo);
+router.post('/visual/batch', heavyLimiter, authMiddleware, validate(visualBatchSchema), sdkController.visualBatch);
+router.get('/visual/task/:taskId', authMiddleware, validate(taskIdParamSchema, 'params'), sdkController.visualTaskStatus);
+router.get('/visual/tasks', authMiddleware, sdkController.visualListTasks);
+router.post('/visual/task/:taskId/cancel', authMiddleware, validate(paramsWithTaskId, 'params'), sdkController.visualCancelTask);
+router.post('/visual/image', heavyLimiter, authMiddleware, validate(visualImageSchema), sdkController.visualImage);
 
 export default router;
