@@ -43,7 +43,8 @@ async function stabilityTxt2Img(input, onProgress) {
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new BusinessError(502, `Stability API ${res.status}: ${err.message || res.statusText}`);
+    logger.error(`[Stability] API 请求失败 ${res.status}: ${err.message || res.statusText}`);
+    throw new BusinessError(502, `Stability AI 服务暂时不可用，请稍后重试`);
   }
 
   onProgress?.(70);
@@ -92,7 +93,8 @@ async function stabilityImg2Img(input, onProgress) {
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new BusinessError(502, `Stability API ${res.status}: ${err.message || res.statusText}`);
+    logger.error(`[Stability] API 请求失败 ${res.status}: ${err.message || res.statusText}`);
+    throw new BusinessError(502, 'Stability AI 服务暂时不可用，请稍后重试');
   }
 
   onProgress?.(80);

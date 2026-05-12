@@ -87,7 +87,7 @@ jobs:
             cd /opt/movio
             mkdir -p releases/$(date +%Y%m%d_%H%M%S)
             # Symlink update handled by PM2 graceful reload
-            pm2 reload ecosystem.config.js --update-env
+            pm2 reload ecosystem.config.cjs --update-env
 
       # ── Health check ──
       - name: Smoke test

@@ -123,7 +123,17 @@ const config = {
     verifyMax: parseInt(process.env.RATE_LIMIT_VERIFY_MAX, 10) || 5,
   },
 
-  jwtRefreshSecret: process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET,
+  jwtRefreshSecret: (() => {
+    const s = process.env.JWT_REFRESH_SECRET;
+    if (!s) {
+      if (process.env.NODE_ENV === 'production') {
+        throw new Error('生产环境必须设置 JWT_REFRESH_SECRET，禁止回退到 JWT_SECRET');
+      }
+      console.warn('[config] JWT_REFRESH_SECRET 未设置，开发环境回退到 JWT_SECRET（生产环境将被 startupGuard 拦截）');
+      return process.env.JWT_SECRET || 'dev-temp-refresh-fallback';
+    }
+    return s;
+  })(),
 
   corsOrigin: process.env.CORS_ORIGIN || '',
 

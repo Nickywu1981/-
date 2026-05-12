@@ -65,7 +65,7 @@ Image URL: ${imageUrl}`;
     };
   } catch (err) {
     logger.error(`[ProductVision] 识别失败: ${err.message}`);
-    throw new BusinessError(500, `商品识别失败: ${err.message}`);
+    throw new BusinessError(500, '商品识别失败，请稍后重试');
   }
 }
 
@@ -80,7 +80,7 @@ export async function recognizeProductsBatch(imageUrls, category) {
       const r = await recognizeProduct({ imageUrl: imageUrls[i], category });
       results.push({ index: i, url: imageUrls[i], ...r });
     } catch (e) {
-      results.push({ index: i, url: imageUrls[i], error: e.message });
+      results.push({ index: i, url: imageUrls[i], error: '识别失败' });
     }
   }
 

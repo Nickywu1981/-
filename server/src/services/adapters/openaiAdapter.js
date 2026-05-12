@@ -41,7 +41,8 @@ function makeTextInfer(modelId, maxTokens = 2000, timeout = 60000) {
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new BusinessError(502, `HTTP ${res.status}: ${err.error?.message || res.statusText}`);
+      logger.error(`[OpenAI] API 请求失败 ${res.status}: ${err.error?.message || res.statusText}`);
+      throw new BusinessError(502, 'AI 服务暂时不可用，请稍后重试');
     }
 
     onProgress?.(80);
@@ -109,7 +110,8 @@ export async function getEmbedding(text, modelId = 'text-embedding-3-small') {
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new BusinessError(502, `Embedding API ${res.status}: ${err.error?.message || res.statusText}`);
+    logger.error(`[OpenAI] Embedding API 请求失败 ${res.status}: ${err.error?.message || res.statusText}`);
+    throw new BusinessError(502, 'Embedding 服务暂时不可用，请稍后重试');
   }
 
   const data = await res.json();

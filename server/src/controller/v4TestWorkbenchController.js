@@ -76,11 +76,11 @@ export const testSingle = wrapController(async (req, res) => {
       category,
       prompt,
       duration_ms: Date.now() - start,
-      error: err.message,
+      error: '测试执行失败',
       created_at: new Date().toISOString(),
     };
     _addHistory(entry);
-    throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, err.message);
+    throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, '测试执行失败，请稍后重试');
   }
 });
 
@@ -115,11 +115,11 @@ export const testMixed = wrapController(async (req, res) => {
       category,
       prompt,
       duration_ms: Date.now() - start,
-      error: err.message,
+      error: '测试执行失败',
       created_at: new Date().toISOString(),
     };
     _addHistory(entry);
-    throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, err.message);
+    throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, '测试执行失败，请稍后重试');
   }
 });
 
@@ -143,8 +143,8 @@ export const testCustom = wrapController(async (req, res) => {
         steps.push({ model_key: modelKey, duration_ms: Date.now() - stepStart, result: r, success: true });
         return { modelKey, r };
       } catch (err) {
-        steps.push({ model_key: modelKey, duration_ms: Date.now() - stepStart, error: err.message, success: false });
-        return { modelKey, error: err.message };
+        steps.push({ model_key: modelKey, duration_ms: Date.now() - stepStart, error: '模型执行失败', success: false });
+        return { modelKey, error: '模型执行失败' };
       }
     });
     await Promise.allSettled(promises);
@@ -166,7 +166,7 @@ export const testCustom = wrapController(async (req, res) => {
         prevResult = finalResult;
         steps.push({ model_key: modelKey, duration_ms: Date.now() - stepStart, result: finalResult, success: true, order: steps.length + 1 });
       } catch (err) {
-        steps.push({ model_key: modelKey, duration_ms: Date.now() - stepStart, error: err.message, success: false, order: steps.length + 1 });
+        steps.push({ model_key: modelKey, duration_ms: Date.now() - stepStart, error: '模型执行失败', success: false, order: steps.length + 1 });
         break;
       }
     }
@@ -206,7 +206,7 @@ export const testCompare = wrapController(async (req, res) => {
       });
       return { model_key: modelKey, duration_ms: Date.now() - stepStart, result, success: true };
     } catch (err) {
-      return { model_key: modelKey, duration_ms: Date.now() - stepStart, error: err.message, success: false };
+      return { model_key: modelKey, duration_ms: Date.now() - stepStart, error: '模型执行失败', success: false };
     }
   });
 

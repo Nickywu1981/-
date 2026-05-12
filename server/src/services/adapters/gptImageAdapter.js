@@ -44,7 +44,8 @@ async function gptImageTxt2Img(input, onProgress) {
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new BusinessError(502, `gpt-image-2 API ${res.status}: ${err.error?.message || res.statusText}`);
+    logger.error(`[GptImage] API 请求失败 ${res.status}: ${err.error?.message || res.statusText}`);
+    throw new BusinessError(502, '图片生成服务暂时不可用，请稍后重试');
   }
 
   onProgress?.(70);

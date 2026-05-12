@@ -43,7 +43,8 @@ async function claudeSonnetInfer(input, onProgress) {
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new BusinessError(502, `Claude API 错误 ${res.status}: ${err.error?.message || res.statusText}`);
+    logger.error(`[Claude] API 请求失败 ${res.status}: ${err.error?.message || res.statusText}`);
+    throw new BusinessError(502, 'Claude AI 服务暂时不可用，请稍后重试');
   }
 
   onProgress?.(80);

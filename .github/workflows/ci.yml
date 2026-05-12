@@ -54,7 +54,6 @@ jobs:
           ENCRYPTION_KEY: ci-test-32-byte-key-here!!!!!!
           MOCK_ENABLED: "true"
       - run: npx eslint src/ --max-warnings 0
-        continue-on-error: true
 
   # ============ Client Tests ============
   client-tests:
@@ -75,9 +74,7 @@ jobs:
           cache-dependency-path: client/package-lock.json
       - run: npm ci
       - run: npm test
-        continue-on-error: true
       - run: npx eslint . --max-warnings 0
-        continue-on-error: true
 
   # ============ Build Check ============
   build-check:
@@ -95,7 +92,6 @@ jobs:
       - name: Type check client
         working-directory: ./client
         run: npm ci && npx vue-tsc --noEmit
-        continue-on-error: true
 
   # ============ E2E Tests ============
   e2e-tests:

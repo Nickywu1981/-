@@ -56,7 +56,7 @@ function _withMulter(req, res, next) {
       if (err.code === 'LIMIT_FILE_SIZE') {
         return error(res, ERROR_CODE.VALIDATION_ERROR, '文件大小超过50MB限制');
       }
-      return error(res, ERROR_CODE.INTERNAL_ERROR, err.message || '上传处理失败');
+      return error(res, ERROR_CODE.INTERNAL_ERROR, '上传处理失败，请稍后重试');
     }
     next();
   });

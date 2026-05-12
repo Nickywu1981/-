@@ -299,7 +299,6 @@ app.use('/api/advanced', heavyLimiter, advancedImageRoutes);
 app.use('/api/adv-video', heavyLimiter, advancedVideoRoutes);
 app.use('/api/payment', paymentLimiter, paymentRoutes);
 app.use('/api/admin/ai-logs', adminLimiter, aiLogRoutes);
-app.use('/api/admin', adminLimiter, adminRoutes);
 app.use('/api/admin/models', adminLimiter, adminModelsRoutesV4);
 app.use('/api/test', adminLimiter, testWorkbenchRoutesV4);
 app.use('/api/posters', heavyLimiter, posterRoutesV4);
@@ -352,11 +351,11 @@ app.use('/api/sdk', heavyLimiter, sdkRoutes);
 app.use('/api/adk', heavyLimiter, adkRoutes);
 
 // ===== Phase 1: 企业/代理端 (2026-05-11) =====
-app.use('/api/enterprise', apiLimiter, enterpriseRoutes);
 app.use('/api/enterprise/finance', paymentLimiter, financeRoutes);  // Phase 2: 财务核心
 app.use('/api/enterprise/customers', apiLimiter, customerRoutes); // Phase 7: 客户管理
 app.use('/api/enterprise/channel', adminLimiter, channelRoutes);    // Phase 8: 渠道管理
 app.use('/api/enterprise/commerce', adminLimiter, commerceRoutes);  // Phase 8: 商品订单
+app.use('/api/enterprise', apiLimiter, enterpriseRoutes);
 app.use('/api/admin/campaign', adminLimiter, campaignRoutes);        // Phase 11: 运营活动+优惠券+公告
 app.use('/api/ai-assistant', authMiddleware, apiLimiter, aiAssistantRoutes);  // Phase 13: AI 助手 (FAQ/审核/数据分析)
 app.use('/api/workflows', authMiddleware, heavyLimiter, workflowRoutes);       // Phase 14: 工作流引擎 (模板/执行/作业)

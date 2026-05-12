@@ -39,7 +39,8 @@ async function submitVideoTask(modelId, input) {
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new BusinessError(502, `${modelId} 提交失败 ${res.status}: ${err.error?.message || res.statusText}`);
+    logger.error(`[Video] ${modelId} 提交失败 ${res.status}: ${err.error?.message || res.statusText}`);
+    throw new BusinessError(502, '视频生成服务暂时不可用，请稍后重试');
   }
 
   return res.json();
@@ -59,7 +60,8 @@ async function pollVideoTask(taskId, onProgress, timeoutMs = 600000) {
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new BusinessError(502, `轮询失败 ${res.status}: ${err.error?.message || res.statusText}`);
+      logger.error(`[Video] 轮询失败 ${res.status}: ${err.error?.message || res.statusText}`);
+      throw new BusinessError(502, '视频生成查询失败，请稍后重试');
     }
 
     const data = await res.json();

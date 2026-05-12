@@ -90,7 +90,8 @@ export function validateStartupConfig() {
     warnings.push('生产环境建议设置 REDIS_PASSWORD');
   }
 
-  // Report
+  // P1: Runtime connectivity checks (async — call separately after config validation)
+  // See validateRuntimeConnections() below
   if (warnings.length) {
     for (const w of warnings) logger.warn(`[StartupGuard] ${w}`);
   }
@@ -100,4 +101,77 @@ export function validateStartupConfig() {
   }
 
   logger.info(`[StartupGuard] 配置校验通过 (env=${config.env}, mock=${config.mockEnabled})`);
+}
+
+/**
+ * 运行时连接检查 — MySQL / Redis / MinIO
+ * 在 server.listen() 之前调用，确保基础设施可达
+ */
+export async function validateRuntimeConnections() {
+  const results = { ok: true, checks: {} };
+
+  // MySQL
+  try {
+    const { default: mysql } = await import('mysql2/promise');
+    const conn = await mysql.createConnection({
+      host: config.mysql.host,
+      port: config.mysql.port,
+      user: config.mysql.user,
+      password: config.mysql.password,
+      database: config.mysql.database,
+      connectTimeout: 5000,
+    });
+    await conn.execute('SELECT 1');
+    await conn.end();
+    results.checks.mysql = true;
+    logger.info('[StartupGuard] MySQL 连接正常');
+  } catch (err) {
+    results.checks.mysql = false;
+    results.ok = false;
+    logger.error(`[StartupGuard] MySQL 连接失败: ${err.message}`);
+  }
+
+  // Redis
+  try {
+    const { default: Redis } = await import('ioredis');
+    const redis = new Redis({
+      host: config.redis.host,
+      port: config.redis.port,
+      password: config.redis.password || undefined,
+      connectTimeout: 5000,
+      maxRetriesPerRequest: 1,
+      lazyConnect: true,
+    });
+    await redis.connect();
+    await redis.ping();
+    await redis.quit();
+    results.checks.redis = true;
+    logger.info('[StartupGuard] Redis 连接正常');
+  } catch (err) {
+    results.checks.redis = false;
+    results.ok = false;
+    logger.error(`[StartupGuard] Redis 连接失败: ${err.message}`);
+  }
+
+  // MinIO (if configured)
+  if (process.env.MINIO_ENDPOINT) {
+    try {
+      const url = `${process.env.MINIO_USE_SSL === 'true' ? 'https' : 'http'}://${process.env.MINIO_ENDPOINT}:${process.env.MINIO_PORT || 9000}/minio/health/live`;
+      const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+      results.checks.minio = res.ok;
+      if (!res.ok) results.ok = false;
+      logger.info(`[StartupGuard] MinIO 连接${res.ok ? '正常' : '失败'}`);
+    } catch (err) {
+      results.checks.minio = false;
+      results.ok = false;
+      logger.error(`[StartupGuard] MinIO 连接失败: ${err.message}`);
+    }
+  }
+
+  if (!results.ok) {
+    const failed = Object.entries(results.checks).filter(([, v]) => !v).map(([k]) => k).join(', ');
+    throw new Error(`运行时连接检查失败: ${failed}`);
+  }
+  logger.info('[StartupGuard] 运行时连接检查全部通过');
+  return results;
 }

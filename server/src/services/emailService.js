@@ -76,7 +76,8 @@ const providers = {
         ]);
         return { success: true, messageId: info.messageId };
       } catch (e) {
-        throw new BusinessError(502, `SMTP 发送失败: ${e.message}`);
+        logger.error(`[Email] SMTP 发送失败: ${e.message}`);
+        throw new BusinessError(502, '邮件发送失败，请稍后重试');
       }
     },
   },
