@@ -733,7 +733,24 @@
     "close": "关闭",
     "loadFail": "加载失败",
     "processing": "处理中...",
-    "saving": "保存中..."
+    "saving": "保存中...",
+    "status": "状态",
+    "all": "全部",
+    "action": "操作",
+    "enable": "启用",
+    "disable": "禁用",
+    "audit_status": "审核",
+    "create_time": "创建时间",
+    "update_time": "更新时间",
+    "confirm_delete": "确认删除？",
+    "save_success": "保存成功",
+    "save_failed": "保存失败",
+    "delete_success": "删除成功",
+    "delete_failed": "删除失败",
+    "normal": "正常",
+    "banned": "停用",
+    "prev_page": "上一页",
+    "next_page": "下一页"
   },
   "admin": {
     "page_title": "管理后台",
@@ -986,6 +1003,36 @@
     "copied": "已复制",
     "copy_failed": "复制失败",
     "json_error": "JSON 格式错误"
+  },
+  "admin_tenants": {
+    "page_title": "租户管理",
+    "new_tenant": "+ 新建租户",
+    "search_placeholder": "搜索名称 / 编码",
+    "name": "名称",
+    "code": "编码",
+    "plan": "套餐",
+    "image_quota": "图片配额",
+    "video_quota": "视频配额",
+    "max_users": "最大人数",
+    "expire_time": "到期时间",
+    "quota_header": "用量(图/视频)",
+    "members_header": "人数",
+    "expire_header": "到期时间",
+    "company_placeholder": "公司/组织名称",
+    "code_placeholder": "唯一标识",
+    "plan_free": "免费版",
+    "plan_pro": "专业版",
+    "plan_enterprise": "企业版",
+    "edit_tenant": "编辑租户",
+    "new_tenant_modal": "新建租户",
+    "review_title": "企业入驻审核",
+    "review_remark_label": "审核备注（可选）",
+    "review_remark_placeholder": "通过或驳回的原因说明",
+    "reject": "驳回",
+    "approve": "审核通过",
+    "unlimited": "无限制",
+    "no_data": "暂无租户数据",
+    "submitting": "提交中..."
   },
   "enterprise": {
     "common": {
@@ -2804,7 +2851,17 @@
       "load_error": "绑定列表加载失败",
       "bind_error": "平台绑定失败，请重试",
       "unbind_error": "解绑失败",
-      "unbind_confirm": "确定解绑 {platform} 的{type}？"
+      "unbind_confirm": "确定解绑 {platform} 的{type}？",
+      "__platforms": {
+        "taobao": "淘宝", "taobao_desc": "绑定淘宝/天猫店铺",
+        "douyin": "抖音", "douyin_desc": "绑定抖音账号/小店",
+        "pdd": "拼多多", "pdd_desc": "绑定拼多多店铺",
+        "kuaishou": "快手", "kuaishou_desc": "绑定快手账号/小店",
+        "xiaohongshu": "小红书", "xiaohongshu_desc": "绑定小红书账号",
+        "tiktok": "TikTok Shop", "tiktok_desc": "绑定TikTok Shop",
+        "shopee": "Shopee", "shopee_desc": "绑定Shopee店铺",
+        "amazon": "Amazon", "amazon_desc": "绑定Amazon店铺"
+      }
     },
     "billing": {
       "title": "账单记录",

@@ -733,7 +733,24 @@
     "close": "Close",
     "loadFail": "Failed to load",
     "processing": "Processing...",
-    "saving": "Saving..."
+    "saving": "Saving...",
+    "status": "Status",
+    "all": "All",
+    "action": "Action",
+    "enable": "Enable",
+    "disable": "Disable",
+    "audit_status": "Audit",
+    "create_time": "Created",
+    "update_time": "Updated",
+    "confirm_delete": "Confirm delete?",
+    "save_success": "Saved",
+    "save_failed": "Save failed",
+    "delete_success": "Deleted",
+    "delete_failed": "Delete failed",
+    "normal": "Normal",
+    "banned": "Banned",
+    "prev_page": "Previous",
+    "next_page": "Next"
   },
   "admin": {
     "page_title": "Admin Panel",
@@ -986,6 +1003,36 @@
     "copied": "Copied",
     "copy_failed": "Copy failed",
     "json_error": "Invalid JSON format"
+  },
+  "admin_tenants": {
+    "page_title": "Tenant Management",
+    "new_tenant": "+ New Tenant",
+    "search_placeholder": "Search name / code",
+    "name": "Name",
+    "code": "Code",
+    "plan": "Plan",
+    "image_quota": "Image Quota",
+    "video_quota": "Video Quota",
+    "max_users": "Max Users",
+    "expire_time": "Expiry",
+    "quota_header": "Quota(Img/Vid)",
+    "members_header": "Members",
+    "expire_header": "Expiry",
+    "company_placeholder": "Company/Org name",
+    "code_placeholder": "Unique identifier",
+    "plan_free": "Free",
+    "plan_pro": "Pro",
+    "plan_enterprise": "Enterprise",
+    "edit_tenant": "Edit Tenant",
+    "new_tenant_modal": "New Tenant",
+    "review_title": "Enterprise Onboarding Review",
+    "review_remark_label": "Review note (optional)",
+    "review_remark_placeholder": "Reason for approval or rejection",
+    "reject": "Reject",
+    "approve": "Approve",
+    "unlimited": "Unlimited",
+    "no_data": "No tenants yet",
+    "submitting": "Submitting..."
   },
   "enterprise": {
     "common": {
@@ -2803,7 +2850,17 @@
       "load_error": "Failed to load bindings",
       "bind_error": "Binding failed, please retry",
       "unbind_error": "Unbind failed",
-      "unbind_confirm": "Confirm unbind {platform} {type}?"
+      "unbind_confirm": "Confirm unbind {platform} {type}?",
+      "__platforms": {
+        "taobao": "Taobao", "taobao_desc": "Bind Taobao/Tmall store",
+        "douyin": "Douyin", "douyin_desc": "Bind Douyin account/store",
+        "pdd": "Pinduoduo", "pdd_desc": "Bind Pinduoduo store",
+        "kuaishou": "Kuaishou", "kuaishou_desc": "Bind Kuaishou account/store",
+        "xiaohongshu": "Xiaohongshu", "xiaohongshu_desc": "Bind Xiaohongshu account",
+        "tiktok": "TikTok Shop", "tiktok_desc": "Bind TikTok Shop",
+        "shopee": "Shopee", "shopee_desc": "Bind Shopee store",
+        "amazon": "Amazon", "amazon_desc": "Bind Amazon store"
+      }
     },
     "billing": {
       "title": "Billing Records",

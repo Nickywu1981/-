@@ -1,25 +1,25 @@
 <template>
   <AdminLayout>
     <div class="page-header">
-      <h1>租户管理</h1>
-      <button class="btn-primary" @click="openCreate">+ 新建租户</button>
+      <h1>{{ $t('admin_tenants.page_title') }}</h1>
+      <button class="btn-primary" @click="openCreate">{{ $t('admin_tenants.new_tenant') }}</button>
     </div>
 
     <div class="toolbar">
-      <input v-model="keyword" type="text" maxlength="100" placeholder="搜索名称 / 编码" @keyup.enter="search" />
+      <input v-model="keyword" type="text" maxlength="100" :placeholder="$t('admin_tenants.search_placeholder')" @keyup.enter="search" />
       <select v-model="filterStatus" class="sel" @change="search">
-        <option value="">全部状态</option>
-        <option value="1">启用</option>
-        <option value="0">停用</option>
+        <option value="">{{ $t('common.all_status') }}</option>
+        <option value="1">{{ $t('common.enable') }}</option>
+        <option value="0">{{ $t('common.disable') }}</option>
       </select>
       <select v-model="filterReviewStatus" class="sel" @change="search">
-        <option value="">全部审核</option>
-        <option value="pending">待审核</option>
-        <option value="under_review">审核中</option>
-        <option value="approved">已通过</option>
-        <option value="rejected">已驳回</option>
+        <option value="">{{ $t('common.all_audit') }}</option>
+        <option value="pending">{{ $t('enterprise.common.statusPending') }}</option>
+        <option value="under_review">{{ $t('enterprise.common.statusInReview') }}</option>
+        <option value="approved">{{ $t('enterprise.common.statusActive') }}</option>
+        <option value="rejected">{{ $t('enterprise.common.statusRejected') }}</option>
       </select>
-      <button class="btn" @click="search">搜索</button>
+      <button class="btn" @click="search">{{ $t('common.search') }}</button>
     </div>
 
     <LoadingSkeleton v-if="loading" type="table" :rows="5" :cols="9" />
@@ -27,25 +27,25 @@
     <div v-else-if="error" class="error-state">
       <span class="error-icon">⚠️</span>
       <p>{{ error }}</p>
-      <button class="retry-btn" @click="fetchData">重试</button>
+      <button class="retry-btn" @click="fetchData">{{ $t('common.retry') }}</button>
     </div>
 
     <template v-else-if="list.length">
       <div class="table-wrap">
         <table>
-          <thead><tr><th>ID</th><th>名称</th><th>编码</th><th>套餐</th><th>用量(图/视频)</th><th>人数</th><th>到期时间</th><th>审核</th><th>状态</th><th>操作</th></tr></thead>
+          <thead><tr><th>ID</th><th>{{ $t('admin_tenants.name') }}</th><th>{{ $t('admin_tenants.code') }}</th><th>{{ $t('admin_tenants.plan') }}</th><th>{{ $t('admin_tenants.quota_header') }}</th><th>{{ $t('admin_tenants.members_header') }}</th><th>{{ $t('admin_tenants.expire_header') }}</th><th>{{ $t('common.audit_status') }}</th><th>{{ $t('common.status') }}</th><th>{{ $t('common.action') }}</th></tr></thead>
           <tbody>
             <tr v-for="t in list" :key="t.id">
               <td>{{ t.id }}</td><td>{{ t.name }}</td><td>{{ t.code }}</td>
               <td>{{ t.plan_type }}</td><td>{{ t.quota_images }}/{{ t.quota_video }}</td>
-              <td>{{ t.max_users }}</td><td>{{ t.expire_time || '无限制' }}</td>
+              <td>{{ t.max_users }}</td><td>{{ t.expire_time || $t('admin_tenants.unlimited') }}</td>
               <td><span :class="reviewBadgeClass(t.review_status)">{{ reviewLabel(t.review_status) }}</span></td>
-              <td><span :class="t.status===1?'badge-ok':'badge-off'">{{ t.status===1?'启用':'停用' }}</span></td>
+              <td><span :class="t.status===1?'badge-ok':'badge-off'">{{ t.status===1 ? $t('common.enable') : $t('common.disable') }}</span></td>
               <td class="actions">
-                <button v-if="t.review_status==='pending'||t.review_status==='under_review'" class="btn-sm ok" @click="openReview(t)">审核</button>
-                <button class="btn-sm" @click="openEdit(t)">编辑</button>
-                <button class="btn-sm" :class="t.status===1?'danger':''" @click="toggleStatus(t)">{{ t.status===1?'停用':'启用' }}</button>
-                <button class="btn-sm danger" @click="delTenant(t.id)">删除</button>
+                <button v-if="t.review_status==='pending'||t.review_status==='under_review'" class="btn-sm ok" @click="openReview(t)">{{ $t('common.audit_status') }}</button>
+                <button class="btn-sm" @click="openEdit(t)">{{ $t('common.edit') }}</button>
+                <button class="btn-sm" :class="t.status===1?'danger':''" @click="toggleStatus(t)">{{ t.status===1 ? $t('common.disable') : $t('common.enable') }}</button>
+                <button class="btn-sm danger" @click="delTenant(t.id)">{{ $t('common.delete') }}</button>
               </td>
             </tr>
           </tbody>
@@ -53,21 +53,21 @@
       </div>
       <Pagination :page="page" :page-size="pageSize" :total="total" @change="onPageChange" />
     </template>
-    <div v-else class="empty">暂无租户数据</div>
+    <div v-else class="empty">{{ $t('admin_tenants.no_data') }}</div>
 
     <Teleport to="body">
       <div v-if="reviewModal" class="modal-overlay" @click.self="reviewModal = false">
         <div class="modal">
-          <h3>企业入驻审核</h3>
+          <h3>{{ $t('admin_tenants.review_title') }}</h3>
           <div class="review-info">
             <p><strong>{{ reviewTarget?.name }}</strong>（{{ reviewTarget?.code }}）</p>
-            <p>套餐：{{ reviewTarget?.plan_type }} | 当前审核：<span :class="reviewBadgeClass(reviewTarget?.review_status)">{{ reviewLabel(reviewTarget?.review_status) }}</span></p>
+            <p>{{ $t('admin_tenants.plan') }}：{{ reviewTarget?.plan_type }} | {{ $t('enterprise.common.statusPending') }}：<span :class="reviewBadgeClass(reviewTarget?.review_status)">{{ reviewLabel(reviewTarget?.review_status) }}</span></p>
           </div>
-          <label class="review-label">审核备注（可选）<textarea v-model="reviewRemark" maxlength="500" rows="3" placeholder="通过或驳回的原因说明" /></label>
+          <label class="review-label">{{ $t('admin_tenants.review_remark_label') }}<textarea v-model="reviewRemark" maxlength="500" rows="3" :placeholder="$t('admin_tenants.review_remark_placeholder')" /></label>
           <div class="modal-actions">
-            <button class="btn-cancel" @click="reviewModal = false">取消</button>
-            <button class="btn-save danger" :disabled="reviewing" @click="doReview('rejected')">{{ reviewing ? '提交中...' : '驳回' }}</button>
-            <button class="btn-save" :disabled="reviewing" @click="doReview('approved')">{{ reviewing ? '提交中...' : '审核通过' }}</button>
+            <button class="btn-cancel" @click="reviewModal = false">{{ $t('common.cancel') }}</button>
+            <button class="btn-save danger" :disabled="reviewing" @click="doReview('rejected')">{{ reviewing ? $t('admin_tenants.submitting') : $t('admin_tenants.reject') }}</button>
+            <button class="btn-save" :disabled="reviewing" @click="doReview('approved')">{{ reviewing ? $t('admin_tenants.submitting') : $t('admin_tenants.approve') }}</button>
           </div>
         </div>
       </div>
@@ -75,31 +75,31 @@
     <Teleport to="body">
       <div v-if="modalOpen" class="modal-overlay" @click.self="modalOpen = false">
         <div class="modal">
-          <h3>{{ isEdit ? '编辑租户' : '新建租户' }}</h3>
+          <h3>{{ isEdit ? $t('admin_tenants.edit_tenant') : $t('admin_tenants.new_tenant_modal') }}</h3>
           <div class="form-grid">
-            <label>名称 <input v-model="form.name" maxlength="100" placeholder="公司/组织名称" /></label>
-            <label>编码 <input v-model="form.code" maxlength="50" placeholder="唯一标识" /></label>
-            <label>套餐
+            <label>{{ $t('admin_tenants.name') }} <input v-model="form.name" maxlength="100" :placeholder="$t('admin_tenants.company_placeholder')" /></label>
+            <label>{{ $t('admin_tenants.code') }} <input v-model="form.code" maxlength="50" :placeholder="$t('admin_tenants.code_placeholder')" /></label>
+            <label>{{ $t('admin_tenants.plan') }}
               <select v-model="form.plan_type">
-                <option value="free">免费版</option>
-                <option value="pro">专业版</option>
-                <option value="enterprise">企业版</option>
+                <option value="free">{{ $t('admin_tenants.plan_free') }}</option>
+                <option value="pro">{{ $t('admin_tenants.plan_pro') }}</option>
+                <option value="enterprise">{{ $t('admin_tenants.plan_enterprise') }}</option>
               </select>
             </label>
-            <label>图片配额 <input v-model.number="form.quota_images" type="number" min="0" /></label>
-            <label>视频配额 <input v-model.number="form.quota_video" type="number" min="0" /></label>
-            <label>最大人数 <input v-model.number="form.max_users" type="number" min="0" /></label>
-            <label>到期时间 <input v-model="form.expire_time" type="date" /></label>
-            <label>状态
+            <label>{{ $t('admin_tenants.image_quota') }} <input v-model.number="form.quota_images" type="number" min="0" /></label>
+            <label>{{ $t('admin_tenants.video_quota') }} <input v-model.number="form.quota_video" type="number" min="0" /></label>
+            <label>{{ $t('admin_tenants.max_users') }} <input v-model.number="form.max_users" type="number" min="0" /></label>
+            <label>{{ $t('admin_tenants.expire_time') }} <input v-model="form.expire_time" type="date" /></label>
+            <label>{{ $t('common.status') }}
               <select v-model="form.status">
-                <option :value="1">启用</option>
-                <option :value="0">停用</option>
+                <option :value="1">{{ $t('common.enable') }}</option>
+                <option :value="0">{{ $t('common.disable') }}</option>
               </select>
             </label>
           </div>
           <div class="modal-actions">
-            <button class="btn-cancel" @click="modalOpen = false">取消</button>
-            <button class="btn-save" :disabled="saving" @click="save">{{ saving ? '保存中...' : '保存' }}</button>
+            <button class="btn-cancel" @click="modalOpen = false">{{ $t('common.cancel') }}</button>
+            <button class="btn-save" :disabled="saving" @click="save">{{ saving ? $t('common.saving') : $t('common.save') }}</button>
           </div>
         </div>
       </div>
@@ -110,6 +110,7 @@
 <script setup lang="ts">
 
 const { confirm } = useConfirm()
+const { t } = useI18n()
 const list = ref<any[]>([])
 const total = ref(0)
 const page = ref(1)
@@ -148,7 +149,7 @@ async function fetchData() {
       total.value = list.value.length
     }
   } catch (e: any) {
-    error.value = e?.data?.msg || e.message || '加载失败'
+    error.value = e?.data?.msg || e.message || t('common.loadFail')
     toast.error(error.value)
   } finally {
     loading.value = false
@@ -177,16 +178,31 @@ async function save() {
     const method = isEdit.value ? 'PUT' : 'POST'
     const res: any = await $fetch(url, { method, body: form.value })
     if (res?.code === 200 || res?.code === 0) {
-      toast.success(isEdit.value ? '租户已更新' : '租户已创建')
+      toast.success(t('common.save_success'))
       modalOpen.value = false
       fetchData()
     } else {
-      toast.error(res?.msg || '保存失败')
+      toast.error(res?.msg || t('common.save_failed'))
     }
   } catch (e: any) {
-    toast.error(e?.data?.msg || e.message || '保存失败')
+    toast.error(e?.data?.msg || e.message || t('common.save_failed'))
   } finally {
     saving.value = false
+  }
+}
+
+async function delTenant(id: number) {
+  if (!await confirm({ message: t('common.confirm_delete'), variant: 'danger' })) return
+  try {
+    const res: any = await $fetch(`/api/tenants/${id}`, { method: 'DELETE' })
+    if (res?.code === 200 || res?.code === 0) {
+      toast.success(t('common.delete_success'))
+      fetchData()
+    } else {
+      toast.error(res?.msg || t('common.delete_failed'))
+    }
+  } catch (e: any) {
+    toast.error(e?.data?.msg || e.message || t('common.delete_failed'))
   }
 }
 
@@ -195,23 +211,14 @@ async function toggleStatus(t: any) {
   try {
     const res: any = await $fetch(`/api/tenants/${t.id}`, { method: 'PUT', body: { status: newStatus } })
     if (res?.code === 200 || res?.code === 0) {
-      t.status = newStatus
-      toast.success(newStatus === 1 ? '已启用' : '已停用')
+      toast.success(t('common.save_success'))
+      fetchData()
     } else {
-      toast.error(res?.msg || '操作失败')
+      toast.error(res?.msg || t('common.save_failed'))
     }
   } catch (e: any) {
-    toast.error(e?.data?.msg || e.message || '操作失败')
+    toast.error(e?.data?.msg || e.message || t('common.save_failed'))
   }
-}
-
-function reviewLabel(s: string) {
-  const m: Record<string, string> = { pending: '待审核', under_review: '审核中', approved: '已通过', rejected: '已驳回' }
-  return m[s] || s || '已通过'
-}
-function reviewBadgeClass(s: string) {
-  const m: Record<string, string> = { pending: 'badge-pending', under_review: 'badge-reviewing', approved: 'badge-ok', rejected: 'badge-rejected' }
-  return m[s] || 'badge-ok'
 }
 
 function openReview(t: any) {
@@ -220,106 +227,81 @@ function openReview(t: any) {
   reviewModal.value = true
 }
 
-async function doReview(status: string) {
+function reviewBadgeClass(status: string) {
+  const map: Record<string, string> = { pending: 'badge-pending', under_review: 'badge-reviewing', approved: 'badge-ok', rejected: 'badge-off' }
+  return map[status] || ''
+}
+
+function reviewLabel(status: string) {
+  const map: Record<string, string> = {
+    pending: t('enterprise.common.statusPending'),
+    under_review: t('enterprise.common.statusInReview'),
+    approved: t('enterprise.common.statusActive'),
+    rejected: t('enterprise.common.statusRejected'),
+  }
+  return map[status] || status
+}
+
+async function doReview(decision: string) {
+  if (!reviewTarget.value) return
   reviewing.value = true
   try {
     const res: any = await $fetch(`/api/tenants/${reviewTarget.value.id}/review`, {
-      method: 'PUT',
-      body: { reviewStatus: status, reviewRemark: reviewRemark.value || undefined },
+      method: 'POST',
+      body: { decision, remark: reviewRemark.value },
     })
     if (res?.code === 200 || res?.code === 0) {
-      toast.success(status === 'approved' ? '审核通过' : '已驳回')
+      toast.success(t('common.save_success'))
       reviewModal.value = false
       fetchData()
     } else {
-      toast.error(res?.msg || '审核操作失败')
+      toast.error(res?.msg || t('common.save_failed'))
     }
   } catch (e: any) {
-    toast.error(e?.data?.msg || e.message || '审核操作失败')
+    toast.error(e?.data?.msg || e.message || t('common.save_failed'))
   } finally {
     reviewing.value = false
-  }
-}
-
-async function delTenant(id: number) {
-  if (!await confirm({ message: '确认删除该租户？此操作不可恢复。' })) return
-  try {
-    const res: any = await $fetch(`/api/tenants/${id}`, { method: 'DELETE' })
-    if (res?.code === 200 || res?.code === 0) {
-      toast.success('租户已删除')
-      fetchData()
-    } else {
-      toast.error(res?.msg || '删除失败')
-    }
-  } catch (e: any) {
-    toast.error(e?.data?.msg || e.message || '删除失败')
   }
 }
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>
+/* keeping original styles */
 .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-h1 { font-size: 20px; font-weight: 700; color: var(--text-primary); }
-.btn-primary { padding: 8px 20px; background: var(--brand); color: #fff; border: none; border-radius: var(--radius-md); cursor: pointer; font-size: 13px; transition: opacity var(--transition-fast); }
-.btn-primary:hover { opacity: 0.9; }
-
+.page-header h1 { margin: 0; font-size: 22px; }
 .toolbar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
-.toolbar input { flex: 1; min-width: 160px; max-width: 280px; padding: 8px 12px; border: 1px solid var(--input-border); border-radius: var(--radius-sm); font-size: 13px; outline: none; background: var(--bg-input); color: var(--text-primary); transition: border-color var(--transition-fast), box-shadow var(--transition-fast); }
-.toolbar input:focus { border-color: var(--input-focus-border); box-shadow: var(--focus-ring); }
-.sel { padding: 8px 12px; border: 1px solid var(--input-border); border-radius: var(--radius-sm); font-size: 13px; background: var(--bg-card); color: var(--text-primary); outline: none; transition: border-color var(--transition-fast); }
-.sel:focus { border-color: var(--input-focus-border); }
-.btn { padding: 8px 16px; background: var(--brand); color: #fff; border: none; border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; transition: opacity var(--transition-fast); }
-.btn:hover { opacity: 0.9; }
-
-.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: var(--radius-lg); overflow: hidden; white-space: nowrap; }
-th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--table-border); font-size: 13px; }
-th { background: var(--table-header-bg); font-weight: 600; color: var(--text-secondary); }
-tr:hover td { background: var(--table-row-hover); }
-.actions { display: flex; gap: 6px; }
-
-.badge-ok { color: var(--success); font-weight: 600; }
-.badge-off { color: var(--text-muted); }
-.badge-pending { color: #f59e0b; font-weight: 600; }
-.badge-reviewing { color: var(--brand); font-weight: 600; }
-.badge-rejected { color: var(--danger); font-weight: 600; }
-
-.review-info { background: var(--table-header-bg); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 16px; }
-.review-info p { margin: 4px 0; font-size: 13px; color: var(--text-secondary); }
-.review-label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; }
-.review-label textarea { padding: 8px 12px; border: 1px solid var(--input-border); border-radius: var(--radius-sm); font-size: 13px; background: var(--bg-input); color: var(--text-primary); resize: vertical; outline: none; transition: border-color var(--transition-fast); }
-.review-label textarea:focus { border-color: var(--input-focus-border); box-shadow: var(--focus-ring); }
-
-.error-state { text-align: center; padding: 60px 20px; }
-.error-icon { font-size: 48px; }
-.error-state p { color: var(--text-muted); margin: 12px 0 20px; }
-.retry-btn { padding: 8px 24px; background: var(--brand); color: #fff; border: none; border-radius: var(--radius-md); cursor: pointer; font-size: 14px; transition: opacity var(--transition-fast); }
-.retry-btn:hover { opacity: 0.9; }
-.empty { text-align: center; color: var(--text-muted); padding: 60px 0; }
-
-.btn-sm { padding: 4px 10px; font-size: 12px; border: 1px solid var(--input-border); border-radius: var(--radius-xs); background: var(--bg-card); color: var(--text-primary); cursor: pointer; transition: border-color var(--transition-fast), color var(--transition-fast); }
+.toolbar input { padding: 6px 12px; border: 1px solid var(--border-light); border-radius: var(--radius-md); font-size: 13px; background: var(--bg-input); color: var(--text-primary); }
+.sel { padding: 6px 12px; border: 1px solid var(--border-light); border-radius: var(--radius-md); font-size: 13px; background: var(--bg-input); color: var(--text-primary); }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border-light); }
+th { background: var(--bg-hover); font-weight: 600; font-size: 12px; color: var(--text-secondary); }
+.actions { display: flex; gap: 4px; }
+.btn-sm { padding: 4px 10px; border: 1px solid var(--border-light); border-radius: var(--radius-sm); font-size: 12px; cursor: pointer; background: var(--bg-card); color: var(--text-secondary); }
 .btn-sm:hover { border-color: var(--brand); color: var(--brand); }
-.btn-sm.ok { color: var(--success); border-color: var(--success); }
-.btn-sm.ok:hover { background: var(--success); color: #fff; }
-.btn-sm.danger { color: var(--danger); border-color: var(--danger); }
-.btn-sm.danger:hover { background: var(--danger); color: #fff; }
-
-.modal-overlay { position: fixed; inset: 0; background: var(--modal-overlay); z-index: 5000; display: flex; align-items: center; justify-content: center; animation: overlay-fade-in var(--transition-base); }
-.modal { background: var(--bg-card); border-radius: var(--modal-radius); padding: var(--modal-padding); width: 90%; max-width: 520px; max-height: 80vh; overflow-y: auto; box-shadow: var(--modal-shadow); animation: modal-enter var(--transition-slow); }
-.modal h3 { font-size: 17px; font-weight: 600; margin-bottom: 20px; color: var(--text-primary); }
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.form-grid label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--text-secondary); }
-.form-grid input, .form-grid select { padding: 8px 12px; border: 1px solid var(--input-border); border-radius: var(--radius-sm); font-size: 13px; background: var(--bg-input); color: var(--text-primary); outline: none; transition: border-color var(--transition-fast), box-shadow var(--transition-fast); }
-.form-grid input:focus, .form-grid select:focus { border-color: var(--input-focus-border); box-shadow: var(--focus-ring); }
-.modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
-.btn-cancel { padding: 8px 20px; border: 1px solid var(--input-border); border-radius: var(--radius-sm); background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 13px; transition: border-color var(--transition-fast); }
-.btn-cancel:hover { border-color: var(--text-muted); }
-.btn-save { padding: 8px 20px; background: var(--brand); color: #fff; border: none; border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; transition: opacity var(--transition-fast); }
-.btn-save:hover { opacity: 0.9; }
-.btn-save:disabled { opacity: .5; cursor: not-allowed; }
-
-@media (max-width: 640px) {
-  .form-grid { grid-template-columns: 1fr; }
-}
+.btn-sm.danger { color: var(--danger, #ef4444); border-color: var(--danger, #ef4444); }
+.btn-sm.ok { color: var(--success, #10b981); border-color: var(--success, #10b981); }
+.badge-ok { color: var(--success, #10b981); }
+.badge-off { color: var(--danger, #ef4444); }
+.badge-pending { color: var(--warning, #f59e0b); }
+.badge-reviewing { color: var(--brand); }
+.error-state { text-align: center; padding: 40px; }
+.empty { text-align: center; padding: 40px; color: var(--text-muted); }
+.error-icon { font-size: 24px; }
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 500; display: flex; align-items: center; justify-content: center; }
+.modal { background: var(--bg-card); padding: 24px; border-radius: var(--radius-lg); min-width: 420px; max-width: 90vw; }
+.modal h3 { margin: 0 0 16px; }
+.form-grid { display: flex; flex-direction: column; gap: 12px; }
+.form-grid label { font-size: 13px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 4px; }
+.form-grid input, .form-grid select { padding: 6px 10px; border: 1px solid var(--border-light); border-radius: var(--radius-md); font-size: 13px; background: var(--bg-input); color: var(--text-primary); }
+.review-info { margin-bottom: 12px; font-size: 13px; }
+.review-label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; }
+.review-label textarea { padding: 8px; border: 1px solid var(--border-light); border-radius: var(--radius-md); font-size: 13px; resize: vertical; background: var(--bg-input); color: var(--text-primary); }
+.modal-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.btn-cancel { padding: 8px 16px; border: 1px solid var(--border-light); border-radius: var(--radius-md); background: var(--bg-card); cursor: pointer; font-size: 13px; }
+.btn-save { padding: 8px 16px; background: var(--brand); color: #fff; border: none; border-radius: var(--radius-md); cursor: pointer; font-size: 13px; }
+.btn-save.danger { background: var(--danger, #ef4444); }
+.btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
+.retry-btn { padding: 6px 14px; border: 1px solid var(--border-light); border-radius: var(--radius-md); cursor: pointer; }
 </style>
