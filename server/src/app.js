@@ -112,6 +112,7 @@ import customerRoutes from './route/customerRoutes.js';       // Phase 7: 客户
 import channelRoutes from './route/channelRoutes.js';       // Phase 8: 渠道管理 (2026-05-11)
 import commerceRoutes from './route/commerceRoutes.js';     // Phase 8: 商品订单 (2026-05-11)
 import aiAssistantRoutes from './route/aiAssistantRoutes.js'; // Phase 13: AI 助手类 (2026-05-12)
+import workflowRoutes from './route/workflowRoutes.js';       // Phase 14: 工作流引擎 (2026-05-12)
 import campaignRoutes from './route/campaignRoutes.js';     // Phase 11: 运营活动管理 (2026-05-11)
 import operationsRoutes from './route/operationsRoutes.js'; // Phase 12: 跨租户运营看板 (2026-05-12)
 
@@ -350,6 +351,7 @@ app.use('/api/enterprise/channel', adminLimiter, channelRoutes);    // Phase 8: 
 app.use('/api/enterprise/commerce', adminLimiter, commerceRoutes);  // Phase 8: 商品订单
 app.use('/api/admin/campaign', adminLimiter, campaignRoutes);        // Phase 11: 运营活动+优惠券+公告
 app.use('/api/ai-assistant', authMiddleware, apiLimiter, aiAssistantRoutes);  // Phase 13: AI 助手 (FAQ/审核/数据分析)
+app.use('/api/workflows', authMiddleware, heavyLimiter, workflowRoutes);       // Phase 14: 工作流引擎 (模板/执行/作业)
 app.use('/api/ops', adminLimiter, operationsRoutes);                  // Phase 12: 跨租户运营看板
 
 // 404
