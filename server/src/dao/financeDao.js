@@ -43,7 +43,7 @@ export async function addBankAccount(tenantId, data) {
 }
 
 export async function findBankAccountById(id, tenantId) {
-  const [rows] = await pool.query('SELECT * FROM bank_account WHERE id = ? AND tenant_id = ? AND is_deleted = 0', [id, tenantId]);
+  const [rows] = await pool.query('SELECT * FROM bank_account WHERE id = ? AND tenant_id = ? AND is_deleted = 0 LIMIT 1', [id, tenantId]);
   return rows[0] || null;
 }
 
@@ -261,7 +261,7 @@ export async function insertLedgerInTx(conn, data) {
 
 export async function getCommissionPolicy(tenantId) {
   const [rows] = await pool.query(
-    'SELECT * FROM commission_policy WHERE tenant_id = ? AND status = 1', [tenantId],
+    'SELECT * FROM commission_policy WHERE tenant_id = ? AND status = 1 LIMIT 1', [tenantId],
   );
   return rows[0] || null;
 }

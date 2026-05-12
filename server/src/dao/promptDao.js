@@ -30,7 +30,7 @@ export async function getTemplateById(id) {
 }
 
 export async function getTemplateByCode(code) {
-  const [rows] = await pool.execute('SELECT * FROM prompt_template WHERE template_code = ?', [code]);
+  const [rows] = await pool.execute('SELECT * FROM prompt_template WHERE template_code = ? LIMIT 1', [code]);
   return rows[0] || null;
 }
 

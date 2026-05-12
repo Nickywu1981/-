@@ -34,7 +34,7 @@ const configDao = {
   },
 
   async getLogById(id) {
-    const [rows] = await pool.execute('SELECT * FROM sys_config_log WHERE id = ?', [id]);
+    const [rows] = await pool.execute('SELECT * FROM sys_config_log WHERE id = ? LIMIT 1', [id]);
     return rows[0] || null;
   },
 

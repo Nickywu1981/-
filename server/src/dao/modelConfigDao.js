@@ -57,7 +57,7 @@ export async function update(modelKey, data) {
     `UPDATE ai_model_config SET ${fields.join(', ')} WHERE model_key = ?`, params,
   );
   if (result.affectedRows === 0) return null;
-  const [rows] = await _db().query('SELECT * FROM ai_model_config WHERE model_key = ?', [modelKey]);
+  const [rows] = await _db().query('SELECT * FROM ai_model_config WHERE model_key = ? LIMIT 1', [modelKey]);
   return rows[0] || null;
 }
 

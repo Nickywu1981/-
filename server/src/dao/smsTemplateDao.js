@@ -25,7 +25,7 @@ export async function updateTemplate(id, fields) {
   if (sets.length === 0) return null;
   params.push(id);
   await pool.execute(`UPDATE sms_template SET ${sets.join(', ')} WHERE id = ?`, params);
-  const [rows] = await pool.execute('SELECT * FROM sms_template WHERE id = ?', [id]);
+  const [rows] = await pool.execute('SELECT * FROM sms_template WHERE id = ? LIMIT 1', [id]);
   return rows[0] || null;
 }
 

@@ -20,7 +20,7 @@ export default {
   },
 
   async getById(id) {
-    const [rows] = await db.query('SELECT * FROM template_marketplace WHERE id = ?', [id]);
+    const [rows] = await db.query('SELECT * FROM template_marketplace WHERE id = ? LIMIT 1', [id]);
     return rows[0] || null;
   },
 

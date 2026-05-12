@@ -15,13 +15,13 @@ export default {
   },
 
   async getById(id, tenantId) {
-    const [rows] = await pool.query('SELECT * FROM api_proxy_config WHERE id = ? AND tenant_id = ?', [id, tenantId]);
+    const [rows] = await pool.query('SELECT * FROM api_proxy_config WHERE id = ? AND tenant_id = ? LIMIT 1', [id, tenantId]);
     return rows[0] || null;
   },
 
   async getByCode(code, tenantId) {
     const [rows] = await pool.query(
-      'SELECT * FROM api_proxy_config WHERE proxy_code = ? AND tenant_id = ? AND status = 1',
+      'SELECT * FROM api_proxy_config WHERE proxy_code = ? AND tenant_id = ? AND status = 1 LIMIT 1',
       [code, tenantId],
     );
     return rows[0] || null;

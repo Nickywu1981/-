@@ -13,18 +13,18 @@ const TABLE = {
 // ==================== 企业/租户 CRUD ====================
 
 export async function findTenantById(id) {
-  const [rows] = await pool.query('SELECT * FROM ?? WHERE id = ? AND status = 1', [TABLE.TENANT, id]);
+  const [rows] = await pool.query('SELECT * FROM ?? WHERE id = ? AND status = 1 LIMIT 1', [TABLE.TENANT, id]);
   return rows[0] || null;
 }
 
 export async function findTenantByCode(code) {
-  const [rows] = await pool.query('SELECT * FROM ?? WHERE code = ? AND status = 1', [TABLE.TENANT, code]);
+  const [rows] = await pool.query('SELECT * FROM ?? WHERE code = ? AND status = 1 LIMIT 1', [TABLE.TENANT, code]);
   return rows[0] || null;
 }
 
 export async function findTenantByDomain(domain) {
   const [rows] = await pool.query(
-    'SELECT * FROM ?? WHERE JSON_EXTRACT(white_label, "$.domain") = ? AND status = 1',
+    'SELECT * FROM ?? WHERE JSON_EXTRACT(white_label, "$.domain") = ? AND status = 1 LIMIT 1',
     [TABLE.TENANT, domain],
   );
   return rows[0] || null;
@@ -89,7 +89,7 @@ export async function listTenants({ page = 1, pageSize = 20, type, status, keywo
 
 export async function findEnterpriseUser(tenantId, userId) {
   const [rows] = await pool.query(
-    'SELECT * FROM ?? WHERE tenant_id = ? AND user_id = ? AND is_deleted = 0',
+    'SELECT * FROM ?? WHERE tenant_id = ? AND user_id = ? AND is_deleted = 0 LIMIT 1',
     [TABLE.ENTERPRISE_USER, tenantId, userId],
   );
   return rows[0] || null;

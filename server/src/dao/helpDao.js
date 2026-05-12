@@ -24,7 +24,7 @@ export default {
   },
 
   async getFaqById(id) {
-    const [rows] = await pool.query('SELECT * FROM help_faq WHERE id = ?', [id]);
+    const [rows] = await pool.query('SELECT * FROM help_faq WHERE id = ? LIMIT 1', [id]);
     return rows[0] || null;
   },
 

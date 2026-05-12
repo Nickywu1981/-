@@ -104,7 +104,7 @@ export async function listPolicies(tenantId, { limit = 200 } = {}) {
 }
 
 export async function getPolicyById(id, tenantId) {
-  const [rows] = await pool.query('SELECT * FROM ?? WHERE id = ? AND tenant_id = ?', [TABLE.POLICY, id, tenantId]);
+  const [rows] = await pool.query('SELECT * FROM ?? WHERE id = ? AND tenant_id = ? LIMIT 1', [TABLE.POLICY, id, tenantId]);
   return rows[0] || null;
 }
 

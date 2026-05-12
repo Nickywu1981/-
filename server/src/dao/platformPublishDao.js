@@ -22,7 +22,7 @@ export default {
 
   async getCredential(userId, platform) {
     const [rows] = await db.query(
-      'SELECT * FROM platform_credentials WHERE user_id = ? AND platform = ? AND status = ?',
+      'SELECT * FROM platform_credentials WHERE user_id = ? AND platform = ? AND status = ? LIMIT 1',
       [userId, platform, 'connected'],
     );
     return rows[0] || null;

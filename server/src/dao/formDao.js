@@ -16,12 +16,12 @@ export default {
   },
 
   async getFormById(id, tenantId) {
-    const [rows] = await pool.query('SELECT * FROM custom_form WHERE id = ? AND tenant_id = ?', [id, tenantId]);
+    const [rows] = await pool.query('SELECT * FROM custom_form WHERE id = ? AND tenant_id = ? LIMIT 1', [id, tenantId]);
     return rows[0] || null;
   },
 
   async getFormByCode(code, tenantId) {
-    const [rows] = await pool.query('SELECT * FROM custom_form WHERE form_code = ? AND tenant_id = ? AND status = 1', [code, tenantId]);
+    const [rows] = await pool.query('SELECT * FROM custom_form WHERE form_code = ? AND tenant_id = ? AND status = 1 LIMIT 1', [code, tenantId]);
     return rows[0] || null;
   },
 
