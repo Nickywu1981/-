@@ -98,7 +98,7 @@ function onConfirm() {
 :global([data-theme="dark"]) .smart-body { background: #1e1f22; }
 .hint { font-size: var(--cfg-font-size-sm); color: var(--cfg-text-muted); margin: 0 0 12px; }
 .preview-row { display: flex; align-items: center; gap: 16px; margin: 12px 0; }
-.ref-preview { width: 120px; height: 120px; object-fit: contain; border: 1px solid var(--cfg-border); border-radius: var(--cfg-radius-base); background: #fff; }
+.ref-preview { width: 120px; height: 120px; object-fit: contain; border: 1px solid var(--cfg-border); border-radius: var(--cfg-radius-base); background: var(--bg-card); }
 .smart-result { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--cfg-border); }
 .input-group { margin-bottom: 12px; }
 .input-group label { display: block; font-size: var(--cfg-font-size-sm); color: var(--cfg-text-secondary); margin-bottom: 4px; }

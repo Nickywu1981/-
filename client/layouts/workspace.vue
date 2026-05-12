@@ -159,7 +159,7 @@ definePageMeta({ middleware: ['auth'] })
 
 /* ═══ Sidebar ═══ */
 .wsl-side {
-  width: 200px; background: #fff; border-right: 1px solid var(--brd, #ebebea);
+  width: 200px; background: var(--bg-card); border-right: 1px solid var(--brd, #ebebea);
   display: flex; flex-direction: column; flex-shrink: 0; transition: width 0.2s;
 }
 .wsl-side.fold { width: 56px; }

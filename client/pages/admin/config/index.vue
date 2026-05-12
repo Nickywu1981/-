@@ -354,7 +354,7 @@ onBeforeUnmount(() => { if (msgTimer) { clearTimeout(msgTimer); msgTimer = null;
 }
 .switch-slider::before {
   content: ''; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px;
-  background: #fff; border-radius: 50%; transition: transform var(--cfg-transition-fast);
+  background: var(--bg-card); border-radius: 50%; transition: transform var(--cfg-transition-fast);
 }
 .switch input:checked + .switch-slider { background: var(--cfg-primary); }
 .switch input:checked + .switch-slider::before { transform: translateX(20px); }

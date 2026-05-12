@@ -152,7 +152,7 @@ onMounted(() => fetchAssets())
 
 .preview-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 24px; }
 .preview-box { max-width: 90vw; max-height: 90vh; position: relative; }
-.preview-close { position: absolute; top: -12px; right: -12px; width: 32px; height: 32px; border-radius: 50%; background: #fff; border: none; font-size: 16px; cursor: pointer; z-index: 2; }
+.preview-close { position: absolute; top: -12px; right: -12px; width: 32px; height: 32px; border-radius: 50%; background: var(--bg-card); border: none; font-size: 16px; cursor: pointer; z-index: 2; }
 .preview-media { max-width: 90vw; max-height: 80vh; border-radius: var(--cfg-radius-base); }
 .preview-actions { display: flex; gap: 8px; justify-content: center; margin-top: 12px; }
 </style>

@@ -95,9 +95,9 @@ function emitSearch() {
 </script>
 
 <style scoped>
-.data-table-wrapper { background: #fff; border-radius: 8px; }
+.data-table-wrapper { background: var(--bg-card); border-radius: 8px; }
 .dt-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; gap: 12px; flex-wrap: wrap; }
-.dt-search-input { padding: 6px 12px; border: 1px solid #dcdfe6; border-radius: 6px; font-size: 13px; width: 220px; outline: none; }
+.dt-search-input { padding: 6px 12px; border: 1px solid var(--border-light); border-radius: 6px; font-size: 13px; width: 220px; outline: none; }
 .dt-search-input:focus { border-color: #409eff; }
 .dt-table-wrap { overflow-x: auto; }
 .data-table { width: 100%; border-collapse: collapse; font-size: 14px; }

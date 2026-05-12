@@ -120,7 +120,7 @@ definePageMeta({ layout: 'landing' })
 .cta-section { text-align: center; margin-top: 48px; padding: 40px 20px; background: var(--brand-gradient); border-radius: var(--radius-xl); color: #fff; }
 .cta-section h3 { font-size: 22px; font-weight: 700; margin: 0 0 8px; }
 .cta-section p { font-size: 14px; margin: 0 0 20px; opacity: 0.9; }
-.cta-btn { display: inline-block; padding: 12px 32px; background: #fff; color: var(--brand); border-radius: var(--radius-lg); font-size: 15px; font-weight: 700; text-decoration: none; transition: transform var(--transition-fast), box-shadow var(--transition-fast); }
+.cta-btn { display: inline-block; padding: 12px 32px; background: var(--bg-card); color: var(--brand); border-radius: var(--radius-lg); font-size: 15px; font-weight: 700; text-decoration: none; transition: transform var(--transition-fast), box-shadow var(--transition-fast); }
 .cta-btn:hover { transform: scale(1.04); box-shadow: 0 6px 20px rgba(0,0,0,.2); }
 
 @media (max-width: 640px) {

@@ -290,8 +290,8 @@ onMounted(loadAll)
   gap: 8px;
   padding: 10px 12px;
   margin-bottom: 4px;
-  background: #fff;
-  border: 1px solid #e4e7ed;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
   border-radius: 8px;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
@@ -351,8 +351,8 @@ onMounted(loadAll)
   margin-top: 12px;
 }
 .preview-card {
-  background: #fff;
-  border: 1px solid #e4e7ed;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
   border-radius: 8px;
   padding: 12px;
   display: flex;
