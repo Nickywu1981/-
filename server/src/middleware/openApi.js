@@ -11,6 +11,7 @@ import crypto from 'crypto';
 import { error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import logger from '../utils/logger.js';
+import { getRedis } from '../dao/redis.js';
 
 // ========================= API Key 生成 =========================
 
@@ -110,13 +111,13 @@ export async function openApiRateLimit(req, res, next) {
   const key = req.apiKeyRecord;
   if (!key) return next();
 
-  const redis = (await import('../dao/redis.js')).default;
-  if (!redis) return next();
+  const r = await getRedis();
+  if (!r) return next();
 
   const limitKey = `open_api_rate:${key.api_key}`;
-  const current = await redis.incr(limitKey);
+  const current = await r.incr(limitKey);
   if (current === 1) {
-    await redis.expire(limitKey, 60); // 1分钟窗口
+    await r.expire(limitKey, 60); // 1分钟窗口
   }
 
   if (current > (key.rate_limit || 60)) {
