@@ -101,24 +101,24 @@ onMounted(loadDetail);
 <style scoped>
 .ent-customer-detail { max-width: 900px; margin: 0 auto; padding: 24px; }
 .page-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
-.btn-back { padding: 6px 12px; border: 1px solid #d1d5db; border-radius: 6px; background: #fff; cursor: pointer; }
+.btn-back { padding: 6px 12px; border: 1px solid var(--border-light); border-radius: 6px; background: var(--bg-card); cursor: pointer; }
 .page-title { font-size: 24px; font-weight: 700; }
-.card { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
+.card { background: var(--bg-card); border-radius: 8px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.1); }
 .card h3 { font-size: 16px; font-weight: 600; margin-bottom: 12px; }
 .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
 .info-item { display: flex; flex-direction: column; gap: 4px; }
-.info-item .label { font-size: 12px; color: #6b7280; }
+.info-item .label { font-size: 12px; color: var(--text-secondary); }
 .stats-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-.stat-card { background: #f9fafb; border-radius: 6px; padding: 12px; text-align: center; }
-.stat-num { display: block; font-size: 22px; font-weight: 700; color: #3B82F6; }
-.stat-label { font-size: 12px; color: #6b7280; }
+.stat-card { background: var(--bg-input); border-radius: 6px; padding: 12px; text-align: center; }
+.stat-num { display: block; font-size: 22px; font-weight: 700; color: var(--info); }
+.stat-label { font-size: 12px; color: var(--text-secondary); }
 .tag-row { display: flex; flex-wrap: wrap; gap: 8px; }
-.tag-chip { padding: 4px 12px; border-radius: 999px; font-size: 13px; color: #fff; }
-.text-green { color: #065f46; }
-.text-red { color: #991b1b; }
-.text-muted { color: #9ca3af; }
+.tag-chip { padding: 4px 12px; border-radius: 999px; font-size: 13px; color: var(--text-on-brand); }
+.text-green { color: var(--success); }
+.text-red { color: var(--danger); }
+.text-muted { color: var(--text-muted); }
 table { width: 100%; border-collapse: collapse; }
-th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #f3f4f6; font-size: 14px; }
-th { font-weight: 600; color: #6b7280; }
-.empty { text-align: center; padding: 32px; color: #9ca3af; }
+th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border-light); font-size: 14px; }
+th { font-weight: 600; color: var(--text-secondary); }
+.empty { text-align: center; padding: 32px; color: var(--text-muted); }
 </style>
