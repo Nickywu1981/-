@@ -45,7 +45,7 @@ server.listen(port, () => {
 
   // 定时恢复卡住的任务 (每 5 分钟)
   setInterval(() => {
-    import('./dao/taskDao.js').then(({ recoverStuckTasks }) => recoverStuckTasks()).catch(() => {});
+    import('./dao/taskDao.js').then(({ recoverStuckTasks }) => recoverStuckTasks()).catch((err) => { logger.warn('[Cron] 恢复卡住任务失败', { error: err.message }); });
   }, 5 * 60 * 1000).unref();
 });
 

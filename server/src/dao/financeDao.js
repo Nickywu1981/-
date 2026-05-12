@@ -5,6 +5,7 @@
  * 表: bank_account, settlement_batch, settlement_detail, withdrawal_order, account_ledger, commission_policy
  */
 import pool from '../dao/db.js';
+import logger from '../utils/logger.js';
 
 // ==================== 收款账户 ====================
 
@@ -219,7 +220,8 @@ export async function lockTenantBalance(tenantId) {
     const [rows] = await conn.query('SELECT balance FROM tenant WHERE id = ? FOR UPDATE', [tenantId]);
     return { balance: rows[0]?.balance || 0, conn };
   } catch (e) {
-    conn.rollback().catch(() => {}); // 解除行锁，然后释放连接
+    conn.rollback().catch((err) => { logger.warn('[Finance] 回滚失败', { error: err.message }); });
+    conn.release();
     conn.release();
     throw e;
   }

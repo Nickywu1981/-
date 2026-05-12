@@ -186,7 +186,7 @@ import('./middleware/cache.js').then(({ invalidateCache }) => {
     res.on('finish', () => {
       if (res.statusCode >= 200 && res.statusCode < 300) {
         const basePath = req.baseUrl || req.originalUrl.split('?')[0];
-        invalidateCache(`*:${basePath}*`).catch(() => {});
+        invalidateCache(`*:${basePath}*`).catch((err) => { logger.warn('[Cache] 失效失败', { path: basePath, error: err.message }); });
       }
     });
     next();
