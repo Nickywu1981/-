@@ -142,7 +142,7 @@ describe('creditController', () => {
       const res = mockRes();
       await listRecords(req, res);
       expect(creditService.listConsumptionRecords).toHaveBeenCalledWith(
-        expect.objectContaining({ type: 1, userId: 1 })
+        expect.objectContaining({ type: 1, userId: 1 }),
       );
     });
   });
