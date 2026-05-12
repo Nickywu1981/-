@@ -5,18 +5,16 @@
  */
 import { ERROR_CODE } from '../constants/errorCode.js';
 import logger from '../utils/logger.js';
+import { checkText } from '../services/sensitiveWordService.js';
 
 export function contentModerationMiddleware(stage = 'input') {
   return async (req, res, next) => {
-    // 递归提取 body 中所有字符串值，防止字段名绕过
     const textValues = extractTextValues(req.body);
     if (!textValues.length) return next();
 
     const textToCheck = textValues.join(' ').substring(0, 2000);
 
-    // 动态加载敏感词服务，避免模块循环依赖
     try {
-      const { checkText } = await import('../services/sensitiveWordService.js');
       const found = await checkText(textToCheck);
       if (found && found.length > 0) {
         return res.status(422).json({ code: ERROR_CODE.CONTENT_MODERATION, msg: '内容包含违规信息，请修改后重试' });

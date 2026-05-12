@@ -88,6 +88,7 @@ export const authLimiter = rateLimit({
   max: AUTH_MAX,
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
   message: { code: 429, msg: '操作过于频繁，请1分钟后再试', data: null },
 });
 
@@ -97,6 +98,7 @@ export const codeLimiter = rateLimit({
   max: CODE_MAX,
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
   message: { code: 429, msg: '验证码已发送，请60秒后再试', data: null },
 });
 
@@ -108,6 +110,7 @@ export const verifyLimiter = rateLimit({
   max: verifyMax,
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
   message: { code: 429, msg: '验证次数过多，请60秒后再试', data: null },
 });
 
@@ -117,6 +120,7 @@ export const heavyLimiter = rateLimit({
   max: HEAVY_MAX,
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
   message: { code: 429, msg: 'AI生成请求过于频繁，请稍后再试', data: null },
 });
 
@@ -126,6 +130,7 @@ export const uploadLimiter = rateLimit({
   max: UPLOAD_MAX,
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
   message: { code: 429, msg: '上传请求过于频繁，请稍后再试', data: null },
 });
 
@@ -135,6 +140,7 @@ export const paymentLimiter = rateLimit({
   max: PAYMENT_MAX,
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
   message: { code: 429, msg: '支付请求过于频繁，请稍后再试', data: null },
 });
 
@@ -144,6 +150,7 @@ export const adminLimiter = rateLimit({
   max: ADMIN_MAX,
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
   message: { code: 429, msg: '管理操作过于频繁，请稍后再试', data: null },
 });
 

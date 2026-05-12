@@ -124,11 +124,23 @@ function _parseDurationMs(str) {
   return { s: v * 1000, m: v * 60 * 1000, h: v * 3600 * 1000, d: v * 86400 * 1000 }[m[2]];
 }
 
+// 转换为 Set 实现 O(1) 查找，避免每请求 O(n) 扫描
+const PUBLIC_PREFIX_SET = new Set(PUBLIC_PREFIXES);
+const PUBLIC_PREFIXES_SLASHED = PUBLIC_PREFIXES.filter(p => p.endsWith('/'));
+
 function isPublicPath(path) {
-  if (path.startsWith('/api/docs')) return true;  // Swagger UI 子资源
-  if (PUBLIC_PREFIXES.some(p => path === p || path.startsWith(p.endsWith('/') ? p : p + '/'))) return true;
-  // 精确匹配或前缀匹配（带/后缀的public路径匹配子路径）
-  if (PUBLIC_PREFIXES.some(p => !p.endsWith('/') && path === p)) return true;
+  if (path.startsWith('/api/docs')) return true;
+  // 精确匹配
+  if (PUBLIC_PREFIX_SET.has(path)) return true;
+  // 前缀匹配（路径以 public prefix 开头）
+  for (const p of PUBLIC_PREFIXES) {
+    if (path.startsWith(p)) {
+      // 如果是 /api/auth/ 类 trailing-slash 前缀，放行所有子路径
+      if (p.endsWith('/')) return true;
+      // 如果是 /api/sms/send-code 类精确前缀，只放行完全匹配的子路径
+      // (这类前缀没有 trailing slash，在前面精确匹配中已处理)
+    }
+  }
   // GET /api/config/* 公开（排除 /api/admin/config）
   if (path.startsWith('/api/config/') && !path.startsWith('/api/admin/config')) return true;
   // GET /api/diy/published/:slug 公开

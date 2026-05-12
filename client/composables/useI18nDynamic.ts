@@ -9,7 +9,7 @@
  *
  * 合并策略: DB动态翻译 > 静态 locale 文件 ($t)
  */
-import { ref } from 'vue'
+import { ref, onUnmounted } from 'vue'
 
 const IDB_NAME = 'movio-i18n'
 const IDB_VERSION = 1
@@ -118,6 +118,12 @@ export function useI18nDynamic() {
         try { const { version } = JSON.parse(event.data); if (version) refresh() } catch { /* ignore */ }
       }
     } catch { /* SSE not available */ }
+  }
+
+  if (import.meta.client) {
+    onUnmounted(() => {
+      if (sseSource) { sseSource.close(); sseSource = null; }
+    })
   }
 
   return { translations: dynamicMap, ready, loading, error, dt, refresh }
