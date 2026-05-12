@@ -8,7 +8,7 @@ import pool from './db.js';
 
 function _db() { return als.getStore()?.db || pool; }
 
-const COLS = 'id, model_key, display_name, vendor, category, endpoint, api_key_enc, model_id, max_tokens, priority, enabled, rate_limit_rpm, rate_limit_rpd, concurrency_max, breaker_threshold, breaker_cooldown_s, moderation_enabled, moderation_action, blocked_words, create_time, update_time';
+const COLS = 'id, model_key, display_name, vendor, category, endpoint, api_key_enc, model_id, max_tokens, priority, enabled, rate_limit_rpm, rate_limit_rpd, concurrency_max, breaker_threshold, breaker_cooldown_s, moderation_enabled, moderation_action, blocked_words, created_at, updated_at';
 
 // ============ 模型配置 CRUD ============
 
@@ -82,11 +82,10 @@ export async function incrementUsage(modelKey, { latencyMs = 0, tokensIn = 0, to
     `UPDATE ai_model_config SET
        total_calls = total_calls + 1,
        total_tokens = total_tokens + ?,
-       total_cost = total_cost + ?,
        total_errors = total_errors + ?,
        avg_latency_ms = ROUND((avg_latency_ms * (total_calls - 1) + ?) / GREATEST(total_calls, 1))
      WHERE model_key = ?`,
-    [tokensIn + tokensOut, totalCost, isError ? 1 : 0, latencyMs, modelKey],
+    [tokensIn + tokensOut, isError ? 1 : 0, latencyMs, modelKey],
   );
   return r.affectedRows;
 }
