@@ -11,6 +11,7 @@
     </NuxtLayout>
     <Toast />
     <ConfirmDialog ref="confirmDialogRef" />
+    <JsonLd />
   </template>
 </template>
 
