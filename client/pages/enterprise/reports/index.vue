@@ -110,12 +110,12 @@ function exportReport() {
 <style scoped>
 .page-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
 .header-actions { display: flex; gap: 16px; align-items: center; }
-.period-tabs { display: flex; border-radius: 6px; overflow: hidden; border: 1px solid #d9d9d9; }
-.period-tabs button { padding: 6px 16px; border: none; background: #fff; cursor: pointer; font-size: 14px; }
-.period-tabs button.active { background: #1a73e8; color: #fff; }
+.period-tabs { display: flex; border-radius: 6px; overflow: hidden; border: 1px solid var(--border-default); }
+.period-tabs button { padding: 6px 16px; border: none; background: var(--bg-card); cursor: pointer; font-size: 14px; }
+.period-tabs button.active { background: var(--color-brand-600); color: var(--text-on-brand); }
 .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
 .card-header h3 { margin: 0; }
 .date-range { display: flex; align-items: center; gap: 8px; font-size: 14px; }
 .input-sm { width: 150px; padding: 4px 8px; font-size: 13px; }
-.text-green { color: #16a34a; font-weight: 500; }
+.text-green { color: var(--color-success-500); font-weight: 500; }
 </style>

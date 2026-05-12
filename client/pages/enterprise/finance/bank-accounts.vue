@@ -142,5 +142,5 @@ definePageMeta({ layout: 'enterprise' });
 .required { color: var(--danger); }
 .error-msg { color: var(--danger); font-size: 13px; margin-bottom: 8px; }
 .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
-.btn-cancel { padding: 8px 20px; border: 1px solid #ddd; background: #fff; border-radius: 8px; cursor: pointer; }
+.btn-cancel { padding: 8px 20px; border: 1px solid var(--border-light); background: var(--bg-card); border-radius: 8px; cursor: pointer; }
 </style>
