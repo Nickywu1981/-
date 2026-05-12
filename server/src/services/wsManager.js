@@ -170,13 +170,18 @@ class WsManager {
 
   // ============= 推送方法（被 Service 层调用） =============
 
+  /** 安全发送：捕获 send 异常（TOCTOU 竞争），终止死连接 */
+  #safeSend(s, payload) {
+    try { s.send(payload); } catch { /* socket died between check and write */ s.terminate(); }
+  }
+
   /** 推送任务进度 */
   pushProgress(taskId, progress, status) {
     const room = this.taskRooms.get(taskId);
     if (!room) return;
     const payload = JSON.stringify({ type: 'progress', taskId, progress: Math.min(100, Math.max(0, progress)), status });
     for (const s of room) {
-      if (s.readyState === 1) s.send(payload);
+      if (s.readyState === 1) this.#safeSend(s, payload);
     }
   }
 
@@ -186,7 +191,7 @@ class WsManager {
     if (!room) return;
     const payload = JSON.stringify({ type: 'task_complete', taskId, progress: 100, status: 'completed', result });
     for (const s of room) {
-      if (s.readyState === 1) s.send(payload);
+      if (s.readyState === 1) this.#safeSend(s, payload);
     }
   }
 
@@ -196,14 +201,14 @@ class WsManager {
     if (!room) return;
     const payload = JSON.stringify({ type: 'task_failed', taskId, error: String(error) });
     for (const s of room) {
-      if (s.readyState === 1) s.send(payload);
+      if (s.readyState === 1) this.#safeSend(s, payload);
     }
   }
 
   /** 推送给指定用户 */
   pushToUser(userId, data) {
     const s = this.userSockets.get(String(userId));
-    if (s && s.readyState === 1) s.send(JSON.stringify(data));
+    if (s && s.readyState === 1) this.#safeSend(s, JSON.stringify(data));
   }
 
   /** 注册任务所有者（Service 层在创建任务时调用） */
@@ -221,7 +226,7 @@ class WsManager {
     if (!this.wss) return;
     const payload = JSON.stringify(data);
     for (const s of this.wss.clients) {
-      if (s.readyState === 1) s.send(payload);
+      if (s.readyState === 1) this.#safeSend(s, payload);
     }
   }
 }
