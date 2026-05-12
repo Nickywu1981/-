@@ -1,46 +1,46 @@
 <template>
   <div class="pg enterprise-approval">
     <header class="pg-header">
-      <h2>{{ $t('admin.enterprises.approval', '企业入驻审批') }}</h2>
-      <p class="pg-desc">{{ $t('admin.enterprises.desc', '审核企业/代理商入驻申请') }}</p>
+      <h2>{{ $t('admin.enterprises.approval') }}</h2>
+      <p class="pg-desc">{{ $t('admin.enterprises.approval_desc') }}</p>
     </header>
 
     <!-- 统计卡片 -->
     <section class="stats-row" v-if="!loading.stats">
       <div class="stat-card pending">
         <span class="stat-val">{{ stats.pending || 0 }}</span>
-        <span class="stat-label">{{ $t('admin.enterprises.pending', '待审核') }}</span>
+        <span class="stat-label">{{ $t('admin.enterprises.pending') }}</span>
       </div>
       <div class="stat-card reviewing">
         <span class="stat-val">{{ stats.under_review || 0 }}</span>
-        <span class="stat-label">{{ $t('admin.enterprises.under_review', '审核中') }}</span>
+        <span class="stat-label">{{ $t('admin.enterprises.under_review') }}</span>
       </div>
       <div class="stat-card approved">
         <span class="stat-val">{{ stats.approved || 0 }}</span>
-        <span class="stat-label">{{ $t('admin.enterprises.approved', '已通过') }}</span>
+        <span class="stat-label">{{ $t('admin.enterprises.approved') }}</span>
       </div>
       <div class="stat-card rejected">
         <span class="stat-val">{{ stats.rejected || 0 }}</span>
-        <span class="stat-label">{{ $t('admin.enterprises.rejected', '已驳回') }}</span>
+        <span class="stat-label">{{ $t('admin.enterprises.rejected') }}</span>
       </div>
     </section>
 
     <!-- 表格 -->
     <section class="table-wrap">
-      <div v-if="loading.list" class="loading-state">{{ $t('common.loading', '加载中...') }}</div>
+      <div v-if="loading.list" class="loading-state">{{ $t('common.loading') }}</div>
       <div v-else-if="error.list" class="error-state">{{ error.list }}</div>
       <template v-else>
         <table v-if="tenants.length" class="data-table">
           <thead>
             <tr>
               <th>ID</th>
-              <th>{{ $t('admin.enterprises.name', '企业名称') }}</th>
-              <th>{{ $t('admin.enterprises.type', '类型') }}</th>
-              <th>{{ $t('admin.enterprises.contact', '联系人') }}</th>
-              <th>{{ $t('admin.enterprises.phone', '电话') }}</th>
-              <th>{{ $t('admin.enterprises.status', '状态') }}</th>
-              <th>{{ $t('admin.enterprises.time', '申请时间') }}</th>
-              <th>{{ $t('admin.enterprises.actions', '操作') }}</th>
+              <th>{{ $t('admin.enterprises.name') }}</th>
+              <th>{{ $t('admin.enterprises.type') }}</th>
+              <th>{{ $t('admin.enterprises.contact') }}</th>
+              <th>{{ $t('admin.enterprises.phone') }}</th>
+              <th>{{ $t('admin.enterprises.status') }}</th>
+              <th>{{ $t('admin.enterprises.time') }}</th>
+              <th>{{ $t('admin.enterprises.actions') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -57,55 +57,55 @@
               <td class="time">{{ formatTime(t.create_time) }}</td>
               <td class="actions">
                 <button v-if="t.review_status === 'pending' || t.review_status === 'under_review'"
-                  class="btn btn-sm btn-success" @click="doApprove(t)">✓ 通过</button>
+                  class="btn btn-sm btn-success" @click="doApprove(t)">{{ $t('admin.enterprises.approve_btn') }}</button>
                 <button v-if="t.review_status === 'pending' || t.review_status === 'under_review'"
-                  class="btn btn-sm btn-danger" @click="showReject(t)">✗ 驳回</button>
+                  class="btn btn-sm btn-danger" @click="showReject(t)">{{ $t('admin.enterprises.reject_btn') }}</button>
                 <button v-if="t.review_status === 'approved'"
-                  class="btn btn-sm btn-warning" @click="showSuspend(t)">⏸ 停用</button>
+                  class="btn btn-sm btn-warning" @click="showSuspend(t)">{{ $t('admin.enterprises.suspend_btn') }}</button>
                 <button v-if="t.review_status === 'suspended'"
-                  class="btn btn-sm btn-success" @click="doReinstate(t)">↻ 恢复</button>
+                  class="btn btn-sm btn-success" @click="doReinstate(t)">{{ $t('admin.enterprises.reinstate_btn') }}</button>
                 <button v-if="t.review_status === 'rejected'"
-                  class="btn btn-sm btn-outline" @click="doResubmit(t)">↺ 重审</button>
-                <button class="btn btn-sm btn-ghost" @click="showLogs(t)">📋 日志</button>
+                  class="btn btn-sm btn-outline" @click="doResubmit(t)">{{ $t('admin.enterprises.resubmit_btn') }}</button>
+                <button class="btn btn-sm btn-ghost" @click="showLogs(t)">{{ $t('admin.enterprises.view_logs_btn') }}</button>
               </td>
             </tr>
           </tbody>
         </table>
-        <div v-else class="empty-state">{{ $t('admin.enterprises.no_data', '暂无待审核企业') }}</div>
+        <div v-else class="empty-state">{{ $t('admin.enterprises.no_data') }}</div>
       </template>
     </section>
 
     <!-- 审批日志弹窗 -->
     <div v-if="showLogModal" class="modal-overlay" @click.self="showLogModal = false">
       <div class="modal-content">
-        <h3>{{ $t('admin.enterprises.approval_logs', '审批日志') }} — {{ activeTenant?.name }}</h3>
+        <h3>{{ $t('admin.enterprises.approval_logs') }} — {{ activeTenant?.name }}</h3>
         <div v-if="logs.length" class="log-list">
           <div v-for="l in logs" :key="l.id" class="log-item">
             <div class="log-header">
               <span class="badge" :class="actionClass(l.action)">{{ actionLabel(l.action) }}</span>
-              <span class="log-op">{{ l.operator_name || `ID:${l.operator_id}` }}</span>
+              <span class="log-op">{{ l.operator_name || $t('common.id')+':'+l.operator_id }}</span>
               <span class="log-time">{{ formatTime(l.create_time) }}</span>
             </div>
             <div class="log-detail">
               {{ l.old_status }} → {{ l.new_status }}
-              <span v-if="l.reason" class="log-reason">原因: {{ l.reason }}</span>
+              <span v-if="l.reason" class="log-reason">{{ $t('admin.enterprises.reason_label') }}: {{ l.reason }}</span>
             </div>
           </div>
         </div>
-        <div v-else class="empty-state">{{ $t('admin.enterprises.no_logs', '暂无操作日志') }}</div>
-        <button class="btn btn-ghost mt" @click="showLogModal = false">{{ $t('common.close', '关闭') }}</button>
+        <div v-else class="empty-state">{{ $t('admin.enterprises.no_logs') }}</div>
+        <button class="btn btn-ghost mt" @click="showLogModal = false">{{ $t('common.close') }}</button>
       </div>
     </div>
 
     <!-- 驳回原因弹窗 -->
     <div v-if="showRejectModal" class="modal-overlay" @click.self="showRejectModal = false">
       <div class="modal-content">
-        <h3>{{ $t('admin.enterprises.reject_title', '驳回企业入驻') }}</h3>
-        <p>{{ $t('admin.enterprises.reject_hint', '请填写驳回原因（至少4个字符）') }}</p>
-        <textarea v-model="rejectReason" class="input" rows="4" :placeholder="$t('admin.enterprises.reject_placeholder', '例如: 资质不足、营业执照过期、信息不完整')" />
+        <h3>{{ $t('admin.enterprises.reject_title') }}</h3>
+        <p>{{ $t('admin.enterprises.reject_hint') }}</p>
+        <textarea v-model="rejectReason" class="input" rows="4" :placeholder="$t('admin.enterprises.reject_placeholder')" />
         <div class="modal-actions">
-          <button class="btn btn-ghost" @click="showRejectModal = false">{{ $t('common.cancel', '取消') }}</button>
-          <button class="btn btn-danger" :disabled="rejectReason.length < 4" @click="doReject">确认驳回</button>
+          <button class="btn btn-ghost" @click="showRejectModal = false">{{ $t('common.cancel') }}</button>
+          <button class="btn btn-danger" :disabled="rejectReason.length < 4" @click="doReject">{{ $t('admin.enterprises.confirm_reject') }}</button>
         </div>
       </div>
     </div>
@@ -113,11 +113,11 @@
     <!-- 停用原因弹窗 -->
     <div v-if="showSuspendModal" class="modal-overlay" @click.self="showSuspendModal = false">
       <div class="modal-content">
-        <h3>{{ $t('admin.enterprises.suspend_title', '停用企业') }}</h3>
-        <textarea v-model="suspendReason" class="input" rows="3" :placeholder="$t('admin.enterprises.suspend_placeholder', '停用原因（可选）')" />
+        <h3>{{ $t('admin.enterprises.suspend_title') }}</h3>
+        <textarea v-model="suspendReason" class="input" rows="3" :placeholder="$t('admin.enterprises.suspend_placeholder')" />
         <div class="modal-actions">
-          <button class="btn btn-ghost" @click="showSuspendModal = false">{{ $t('common.cancel', '取消') }}</button>
-          <button class="btn btn-warning" @click="doSuspend">确认停用</button>
+          <button class="btn btn-ghost" @click="showSuspendModal = false">{{ $t('common.cancel') }}</button>
+          <button class="btn btn-warning" @click="doSuspend">{{ $t('admin.enterprises.confirm_suspend') }}</button>
         </div>
       </div>
     </div>
@@ -147,26 +147,26 @@ const rejectReason = ref('');
 const suspendReason = ref('');
 
 const STATUS_MAP = {
-  pending: t('admin.enterprises.status_pending', '待审核'),
-  under_review: t('admin.enterprises.status_under_review', '审核中'),
-  approved: t('admin.enterprises.status_approved', '已通过'),
-  rejected: t('admin.enterprises.status_rejected', '已驳回'),
-  suspended: t('admin.enterprises.status_suspended', '已停用'),
+  pending: t('admin.enterprises.status_pending'),
+  under_review: t('admin.enterprises.status_under_review'),
+  approved: t('admin.enterprises.status_approved'),
+  rejected: t('admin.enterprises.status_rejected'),
+  suspended: t('admin.enterprises.status_suspended'),
 };
 
 const TYPE_MAP = {
-  enterprise: t('admin.enterprises.type_enterprise', '企业'),
-  agent: t('admin.enterprises.type_agent', '代理商'),
-  partner: t('admin.enterprises.type_partner', '合作伙伴'),
+  enterprise: t('admin.enterprises.type_enterprise'),
+  agent: t('admin.enterprises.type_agent'),
+  partner: t('admin.enterprises.type_partner'),
 };
 
 const ACTION_MAP = {
-  submit: t('admin.enterprises.action_submit', '提交'),
-  approve: t('admin.enterprises.action_approve', '通过'),
-  reject: t('admin.enterprises.action_reject', '驳回'),
-  suspend: t('admin.enterprises.action_suspend', '停用'),
-  reinstate: t('admin.enterprises.action_reinstate', '恢复'),
-  update_docs: t('admin.enterprises.action_update_docs', '更新资料'),
+  submit: t('admin.enterprises.action_submit'),
+  approve: t('admin.enterprises.action_approve'),
+  reject: t('admin.enterprises.action_reject'),
+  suspend: t('admin.enterprises.action_suspend'),
+  reinstate: t('admin.enterprises.action_reinstate'),
+  update_docs: t('admin.enterprises.action_update_docs'),
 };
 
 function statusClass(s) {
@@ -211,7 +211,7 @@ async function fetchList() {
 async function doApprove(tenant) {
   try {
     await $api(`/admin/enterprises/${tenant.id}/approve`, { method: 'POST' });
-    showToast(`「${tenant.name}」${t('admin.enterprises.approved', '已通过')}`);
+    showToast(`「${tenant.name}」${t('admin.enterprises.approved')}`);
     fetchList(); fetchStats();
   } catch (err) { showToast(err.message, 'error'); }
 }
@@ -222,7 +222,7 @@ async function doReject() {
   if (!activeTenant.value || rejectReason.value.length < 4) return;
   try {
     await $api(`/admin/enterprises/${activeTenant.value.id}/reject`, { method: 'POST', body: { reason: rejectReason.value } });
-    showToast(`「${activeTenant.value.name}」${t('admin.enterprises.rejected_msg', '已驳回')}`);
+    showToast(`「${activeTenant.value.name}」${t('admin.enterprises.rejected_msg')}`);
     showRejectModal.value = false;
     fetchList(); fetchStats();
   } catch (err) { showToast(err.message, 'error'); }
@@ -234,7 +234,7 @@ async function doSuspend() {
   if (!activeTenant.value) return;
   try {
     await $api(`/admin/enterprises/${activeTenant.value.id}/suspend`, { method: 'POST', body: { reason: suspendReason.value || undefined } });
-    showToast(`「${activeTenant.value.name}」${t('admin.enterprises.suspended_msg', '已停用')}`);
+    showToast(`「${activeTenant.value.name}」${t('admin.enterprises.suspended_msg')}`);
     showSuspendModal.value = false;
     fetchList(); fetchStats();
   } catch (err) { showToast(err.message, 'error'); }
@@ -243,7 +243,7 @@ async function doSuspend() {
 async function doReinstate(tenant) {
   try {
     await $api(`/admin/enterprises/${tenant.id}/reinstate`, { method: 'POST' });
-    showToast(`「${tenant.name}」${t('admin.enterprises.reinstated_msg', '已恢复')}`);
+    showToast(`「${tenant.name}」${t('admin.enterprises.reinstated_msg')}`);
     fetchList(); fetchStats();
   } catch (err) { showToast(err.message, 'error'); }
 }

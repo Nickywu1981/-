@@ -750,7 +750,8 @@
     "normal": "正常",
     "banned": "停用",
     "prev_page": "上一页",
-    "next_page": "下一页"
+    "next_page": "下一页",
+    "id": "ID"
   },
   "admin": {
     "page_title": "管理后台",

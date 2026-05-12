@@ -750,7 +750,8 @@
     "normal": "Normal",
     "banned": "Banned",
     "prev_page": "Previous",
-    "next_page": "Next"
+    "next_page": "Next",
+    "id": "ID"
   },
   "admin": {
     "page_title": "Admin Panel",
