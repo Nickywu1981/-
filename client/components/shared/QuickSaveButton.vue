@@ -23,39 +23,38 @@ const props = withDefaults(defineProps<{
 const toast = useToast()
 const isSaved = ref(false)
 const saving = ref(false)
-const showPicker = ref(false)
 
-async function checkSaved() {
+const STORAGE_KEY = 'movio_quick_saves'
+
+function getSavedIds(): string[] {
+  if (!import.meta.client) return []
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]') }
+  catch { return [] }
+}
+
+function checkSaved() {
   if (!props.workId) return
-  try {
-    const res: any = await $fetch(`/api/collections/check?workId=${props.workId}`)
-    isSaved.value = res?.data?.saved || false
-  } catch { isSaved.value = false }
+  isSaved.value = getSavedIds().includes(props.workId)
 }
 
 async function toggle() {
-  if (saving.value || !props.workId) return
+  if (saving.value || !props.workId || !import.meta.client) return
   saving.value = true
   try {
+    const ids = getSavedIds()
     if (isSaved.value) {
-      await $fetch(`/api/collections/items/${props.workId}`, { method: 'DELETE' })
+      const idx = ids.indexOf(props.workId)
+      if (idx !== -1) ids.splice(idx, 1)
       isSaved.value = false
       toast.success('已取消收藏')
     } else {
-      await $fetch('/api/collections/items', {
-        method: 'POST',
-        body: {
-          work_id: props.workId,
-          work_type: props.workType,
-          work_url: props.workUrl,
-          work_title: props.workTitle,
-        },
-      })
+      ids.unshift(props.workId)
       isSaved.value = true
       toast.success('已收藏')
     }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(ids.slice(0, 200)))
   } catch (e: any) {
-    toast.error(e?.data?.msg || e.message || '操作失败')
+    toast.error('操作失败')
   } finally { saving.value = false }
 }
 
