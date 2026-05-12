@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { getPlans, createOrder, getOrderStatus, sandboxPay, checkPaymentResult, getBillingHistory } from '../controller/paymentController.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { cacheMiddleware } from '../middleware/cache.js';
-import { paymentLimiter } from '../middleware/rateLimiter.js';
+// paymentLimiter applied globally in app.js: router.use('/api/payment', paymentLimiter, paymentRoutes)
 import { validate, paginationSchema } from '../utils/validate.js';
 import { z } from 'zod';
 
@@ -21,10 +21,10 @@ const reqsnParamSchema = z.object({
 router.get('/plans', cacheMiddleware(600), getPlans);
 
 // 需登录
-router.post('/create-order', paymentLimiter, authMiddleware, validate(createOrderSchema), createOrder);
+router.post('/create-order', authMiddleware, validate(createOrderSchema), createOrder);
 router.get('/order/:reqsn', authMiddleware, validate(reqsnParamSchema, 'params'), getOrderStatus);
 router.get('/result/:reqsn', authMiddleware, validate(reqsnParamSchema, 'params'), checkPaymentResult);
-router.post('/sandbox-pay/:reqsn', paymentLimiter, authMiddleware, validate(reqsnParamSchema, 'params'), sandboxPay);
+router.post('/sandbox-pay/:reqsn', authMiddleware, validate(reqsnParamSchema, 'params'), sandboxPay);
 router.get('/billing', authMiddleware, validate(paginationSchema, 'query'), getBillingHistory);
 router.get('/orders', authMiddleware, validate(paginationSchema, 'query'), getBillingHistory);
 
