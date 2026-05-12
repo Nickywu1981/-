@@ -151,7 +151,7 @@ export async function sendVerificationCode({ phone, scene }) {
     await smsLogDao.insertLog({
       templateCode,
       phone,
-      params: { code },
+      params: { code_masked: '******' },
       content,
       result: true,
       provider: config.sms?.provider || 'mock',
@@ -163,7 +163,7 @@ export async function sendVerificationCode({ phone, scene }) {
     await smsLogDao.insertLog({
       templateCode,
       phone,
-      params: { code },
+      params: { code_masked: '******' },
       content,
       result: false,
       provider: config.sms?.provider || 'mock',
