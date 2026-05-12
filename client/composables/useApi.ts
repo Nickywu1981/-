@@ -1,3 +1,4 @@
+import type { Ref } from 'vue'
 import { REDIRECT_UNLOCK_MS } from '~/constants/ui'
 
 interface ApiResponse<T = any> {
@@ -23,21 +24,26 @@ function getCsrfToken(): string | null {
 
 // ==================== 离线检测 ====================
 
-const isOffline = ref(false);
+let _isOffline: Ref<boolean> | null = null;
+function getIsOffline(): Ref<boolean> {
+  if (!_isOffline) _isOffline = ref(false);
+  return _isOffline;
+}
 
 // 401 重定向锁（防并发请求同时触发多次 navigateTo）
 let isRedirecting = false;
 let redirectTimer: ReturnType<typeof setTimeout> | null = null;
 let listenersInit = false;
 
-function onOffline() { isOffline.value = true; }
-function onOnline() { isOffline.value = false; }
+function onOffline() { getIsOffline().value = true; }
+function onOnline() { getIsOffline().value = false; }
 
 function ensureListeners() {
   if (listenersInit || typeof window === 'undefined') return;
+  const off = getIsOffline();
   window.addEventListener('offline', onOffline);
   window.addEventListener('online', onOnline);
-  isOffline.value = !navigator.onLine;
+  off.value = !navigator.onLine;
   listenersInit = true;
 }
 
@@ -59,7 +65,7 @@ async function request<T = any>(
   options: { method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'; body?: any; params?: Record<string, any> } = {},
   retries = 0,
 ): Promise<T> {
-  if (isOffline.value) {
+  if (getIsOffline().value) {
     throw new Error('网络已断开，请检查网络连接');
   }
 
