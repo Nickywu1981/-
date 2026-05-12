@@ -1,6 +1,7 @@
 import { wrapController } from '../utils/wrapController.js';
+import { BusinessError } from '../utils/businessError.js';
 import { getAllConfig, getPublicConfigMap, saveConfig, deleteConfig, clearPublicCache } from '../services/siteConfigService.js';
-import { success, error } from '../utils/response.js';
+import { success } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { broadcastVersion } from '../services/config-version.service.js';
 import logger from '../utils/logger.js';
@@ -19,7 +20,7 @@ export const listAllConfig = wrapController(async (req, res) => {
 
 export const createConfig = wrapController(async (req, res) => {
   const { key, value, type, description } = req.body;
-  if (!key || value === undefined) return error(res, ERROR_CODE.BAD_REQUEST, 'key and value required');
+  if (!key || value === undefined) throw new BusinessError(ERROR_CODE.BAD_REQUEST, 'key and value required');
   await saveConfig(key, typeof value === 'object' ? JSON.stringify(value) : String(value), type || 'text', description || '', getUserId(req));
   await clearPublicCache();
   broadcastVersion().catch(err => { logger.warn('[siteConfig] broadcastVersion failed', err.message); });
@@ -29,7 +30,7 @@ export const createConfig = wrapController(async (req, res) => {
 export const updateConfig = wrapController(async (req, res) => {
   const { key } = req.params;
   const { value, type, description } = req.body;
-  if (!key || value === undefined) return error(res, ERROR_CODE.BAD_REQUEST, 'key and value required');
+  if (!key || value === undefined) throw new BusinessError(ERROR_CODE.BAD_REQUEST, 'key and value required');
   await saveConfig(key, typeof value === 'object' ? JSON.stringify(value) : String(value), type || 'text', description || '', getUserId(req));
   await clearPublicCache();
   broadcastVersion().catch(err => { logger.warn('[siteConfig] broadcastVersion failed', err.message); });
@@ -38,7 +39,7 @@ export const updateConfig = wrapController(async (req, res) => {
 
 export const removeConfig = wrapController(async (req, res) => {
   const affected = await deleteConfig(Number(req.params.id), getUserId(req));
-  if (!affected) return error(res, ERROR_CODE.NOT_FOUND, 'Not found');
+  if (!affected) throw new BusinessError(ERROR_CODE.NOT_FOUND, 'Not found');
   await clearPublicCache();
   broadcastVersion().catch(err => { logger.warn('[siteConfig] broadcastVersion failed', err.message); });
   success(res, null, 'Config deleted');

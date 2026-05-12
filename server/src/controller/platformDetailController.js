@@ -1,6 +1,7 @@
 import { wrapController } from '../utils/wrapController.js';
+import { BusinessError } from '../utils/businessError.js';
 import platformDetailService from '../services/platformDetailService.js';
-import { success, error } from '../utils/response.js';
+import { success } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
 export const listAllPlatforms = wrapController(async (_req, res) => {
@@ -10,7 +11,7 @@ export const listAllPlatforms = wrapController(async (_req, res) => {
 
 export const getPlatformConfig = wrapController(async (req, res) => {
     const config = platformDetailService.getPlatformConfig(req.params.code);
-    if (!config) return error(res, ERROR_CODE.NOT_FOUND, '平台不存在');
+    if (!config) throw new BusinessError(ERROR_CODE.NOT_FOUND, '平台不存在');
     return success(res, config);
 });
 

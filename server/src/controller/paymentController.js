@@ -1,7 +1,8 @@
 import { wrapController } from '../utils/wrapController.js';
+import { BusinessError } from '../utils/businessError.js';
 import * as payment from '../services/paymentService.js';
 import * as allinpayService from '../services/allinpayService.js';
-import { success, error, listResult } from '../utils/response.js';
+import { success, listResult } from '../utils/response.js';
 import { parsePagination } from '../utils/pagination.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
@@ -16,7 +17,7 @@ export const getPlans = wrapController(async (_req, res, next) => {
 export const createOrder = wrapController(async (req, res, next) => {
     const { planType, payChannel = 'wechat' } = req.body;
     if (!planType || ![1, 2, 3].includes(planType)) {
-      return error(res, ERROR_CODE.PARAM_INVALID, '请选择有效套餐（1=月卡/2=季卡/3=年卡）');
+      throw new BusinessError(ERROR_CODE.PARAM_INVALID, '请选择有效套餐（1=月卡/2=季卡/3=年卡）');
     }
     const data = await payment.createPaymentOrder(req.user.id, { planType, payChannel });
     return success(res, data, '订单创建成功');
@@ -33,7 +34,7 @@ export const getOrderStatus = wrapController(async (req, res, next) => {
 
 export const checkPaymentResult = wrapController(async (req, res, next) => {
     const data = await allinpayService.queryOrder(req.params.reqsn);
-    if (!data) return error(res, ERROR_CODE.PAY_ORDER_NOT_FOUND, '订单不存在');
+    if (!data) throw new BusinessError(ERROR_CODE.PAY_ORDER_NOT_FOUND, '订单不存在');
     return success(res, data);
   });
 

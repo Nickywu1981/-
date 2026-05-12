@@ -1,6 +1,6 @@
 import { wrapController } from '../utils/wrapController.js';
 import * as sizeTemplateService from '../services/sizeTemplateService.js';
-import { success as sendSuccess, error as sendError } from '../utils/response.js';
+import { success as sendSuccess } from '../utils/response.js';
 
 /**
  * GET /api/templates/platforms

@@ -1,6 +1,7 @@
 import { wrapController } from '../utils/wrapController.js';
+import { BusinessError } from '../utils/businessError.js';
 import * as promptService from '../services/promptService.js';
-import { success, error, listResult } from '../utils/response.js';
+import { success, listResult } from '../utils/response.js';
 import { parsePagination } from '../utils/pagination.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
@@ -14,7 +15,7 @@ export const listTemplates = wrapController(async (req, res) => {
 
 export const getTemplateDetail = wrapController(async (req, res) => {
     const t = await promptService.useTemplate(req.user.id, +req.params.id);
-    if (!t) return error(res, ERROR_CODE.NOT_FOUND, '模板不存在');
+    if (!t) throw new BusinessError(ERROR_CODE.NOT_FOUND, '模板不存在');
     success(res, t);
 });
 

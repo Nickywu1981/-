@@ -1,7 +1,8 @@
 import { wrapController } from '../utils/wrapController.js';
+import { BusinessError } from '../utils/businessError.js';
 import * as rechargeService from '../services/rechargeService.js';
 import * as allinpayService from '../services/allinpayService.js';
-import { success, error } from '../utils/response.js';
+import { success } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
 export const getRates = wrapController(async (req, res) => {
@@ -21,7 +22,7 @@ export const handleCallback = wrapController(async (req, res) => {
 
 export const checkPaymentResult = wrapController(async (req, res) => {
     const data = await allinpayService.queryOrder(req.params.reqsn);
-    if (!data) return error(res, ERROR_CODE.NOT_FOUND, '订单不存在');
+    if (!data) throw new BusinessError(ERROR_CODE.NOT_FOUND, '订单不存在');
     success(res, data);
 });
 

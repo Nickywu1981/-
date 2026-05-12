@@ -1,7 +1,8 @@
 import { wrapController } from '../utils/wrapController.js';
+import { BusinessError } from '../utils/businessError.js';
 import * as imageService from '../services/imageService.js';
 import { cancelJob, retryJob } from '../services/job-queue.service.js';
-import { success, error, listResult } from '../utils/response.js';
+import { success, listResult } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { parsePagination } from '../utils/pagination.js';
 
@@ -12,7 +13,7 @@ import { parsePagination } from '../utils/pagination.js';
 export const submitMainImage = wrapController(async (req, res, next) => {
     const { imageUrl, platform, style } = req.body;
     if (!imageUrl || !platform) {
-      return error(res, ERROR_CODE.PARAM_MISSING, '请上传商品图并选择平台');
+      throw new BusinessError(ERROR_CODE.PARAM_MISSING, '请上传商品图并选择平台');
     }
     const data = await imageService.submitMainImage(req.user.id, { imageUrl, platform, style });
     return success(res, data, '主图任务已提交');
@@ -25,7 +26,7 @@ export const submitMainImage = wrapController(async (req, res, next) => {
 export const submitSceneImage = wrapController(async (req, res, next) => {
     const { imageUrl, sceneCategory, customBgUrl } = req.body;
     if (!imageUrl) {
-      return error(res, ERROR_CODE.PARAM_MISSING, '请上传产品图');
+      throw new BusinessError(ERROR_CODE.PARAM_MISSING, '请上传产品图');
     }
     const data = await imageService.submitSceneImage(req.user.id, { imageUrl, sceneCategory, customBgUrl });
     return success(res, data, '场景图任务已提交');
@@ -38,7 +39,7 @@ export const submitSceneImage = wrapController(async (req, res, next) => {
 export const submitDetailH5 = wrapController(async (req, res, next) => {
     const { imageUrl, category, templateId } = req.body;
     if (!imageUrl || !category) {
-      return error(res, ERROR_CODE.PARAM_MISSING, '请上传产品图并选择商品类目');
+      throw new BusinessError(ERROR_CODE.PARAM_MISSING, '请上传产品图并选择商品类目');
     }
     const data = await imageService.submitDetailH5(req.user.id, { imageUrl, category, templateId });
     return success(res, data, '详情页任务已提交');
@@ -51,7 +52,7 @@ export const submitDetailH5 = wrapController(async (req, res, next) => {
 export const submitBatchTask = wrapController(async (req, res, next) => {
     const { imageUrls, operation, platform, style } = req.body;
     if (!imageUrls || !imageUrls.length) {
-      return error(res, ERROR_CODE.PARAM_MISSING, '请上传至少一张图片');
+      throw new BusinessError(ERROR_CODE.PARAM_MISSING, '请上传至少一张图片');
     }
     const data = await imageService.submitBatchTask(req.user.id, { imageUrls, operation, platform, style });
     return success(res, data, '批量任务已提交');
@@ -64,7 +65,7 @@ export const submitBatchTask = wrapController(async (req, res, next) => {
 export const submitRetouch = wrapController(async (req, res, next) => {
     const { imageUrl, level, features } = req.body;
     if (!imageUrl) {
-      return error(res, ERROR_CODE.PARAM_MISSING, '请上传需要精修的图片');
+      throw new BusinessError(ERROR_CODE.PARAM_MISSING, '请上传需要精修的图片');
     }
     const data = await imageService.submitRetouch(req.user.id, { imageUrl, level, features });
     return success(res, data, '精修任务已提交');
@@ -77,7 +78,7 @@ export const submitRetouch = wrapController(async (req, res, next) => {
 export const submitRemoveBg = wrapController(async (req, res, next) => {
     const { imageUrl, format } = req.body;
     if (!imageUrl) {
-      return error(res, ERROR_CODE.PARAM_MISSING, '请上传需要抠图的图片');
+      throw new BusinessError(ERROR_CODE.PARAM_MISSING, '请上传需要抠图的图片');
     }
     const data = await imageService.submitRemoveBg(req.user.id, { imageUrl, format });
     return success(res, data, '抠图任务已提交');
@@ -90,7 +91,7 @@ export const submitRemoveBg = wrapController(async (req, res, next) => {
 export const submitWhiteBg = wrapController(async (req, res, next) => {
     const { imageUrl, bgColor } = req.body;
     if (!imageUrl) {
-      return error(res, ERROR_CODE.PARAM_MISSING, '请上传需要换白底的图片');
+      throw new BusinessError(ERROR_CODE.PARAM_MISSING, '请上传需要换白底的图片');
     }
     const data = await imageService.submitWhiteBg(req.user.id, { imageUrl, bgColor });
     return success(res, data, '白底图任务已提交');

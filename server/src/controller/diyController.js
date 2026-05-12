@@ -1,8 +1,9 @@
 import diyService from '../services/diyService.js';
-import { success, error } from '../utils/response.js';
+import { success } from '../utils/response.js';
 import { parsePagination } from '../utils/pagination.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { wrapController } from '../utils/wrapController.js';
+import { BusinessError } from '../utils/businessError.js';
 
 // ==================== 页面 CRUD ====================
 
@@ -15,7 +16,7 @@ export const listPages = wrapController(async (req, res) => {
 
 export const getPage = wrapController(async (req, res) => {
   const page = await diyService.getPageById(req.params.id, req.tenantId);
-  if (!page) return error(res, ERROR_CODE.NOT_FOUND, '页面不存在');
+  if (!page) throw new BusinessError(ERROR_CODE.NOT_FOUND, '页面不存在');
   return success(res, page);
 });
 
@@ -69,7 +70,7 @@ export const hardDeletePage = wrapController(async (req, res) => {
 
 export const getPublishedPage = wrapController(async (req, res) => {
   const page = await diyService.getPublishedPage(req.params.slug);
-  if (!page) return error(res, ERROR_CODE.NOT_FOUND, '页面不存在或未发布');
+  if (!page) throw new BusinessError(ERROR_CODE.NOT_FOUND, '页面不存在或未发布');
   return success(res, page);
 });
 
@@ -102,7 +103,7 @@ export const listVersions = wrapController(async (req, res) => {
 
 export const getVersion = wrapController(async (req, res) => {
   const v = await diyService.getVersion(req.params.id, parseInt(req.params.version), req.tenantId);
-  if (!v) return error(res, ERROR_CODE.NOT_FOUND, '版本不存在');
+  if (!v) throw new BusinessError(ERROR_CODE.NOT_FOUND, '版本不存在');
   return success(res, { version: v.version, mobileConfig: v.mobile_config, pcConfig: v.pc_config, remark: v.remark, autoSave: v.auto_save, rollbackFrom: v.rollback_from, createTime: v.create_time });
 });
 
@@ -120,7 +121,7 @@ export const getLatestAutoVersion = wrapController(async (req, res) => {
 
 export const batchPublish = wrapController(async (req, res) => {
   const { ids } = req.body;
-  if (!Array.isArray(ids) || !ids.length) return error(res, ERROR_CODE.PARAM_ERROR, '请选择至少一个页面');
+  if (!Array.isArray(ids) || !ids.length) throw new BusinessError(ERROR_CODE.PARAM_ERROR, '请选择至少一个页面');
   const results = await diyService.batchPublish(ids, req.tenantId);
   const successCount = results.filter(r => r.success).length;
   return success(res, results, `成功${successCount}个，失败${results.length - successCount}个`);
@@ -128,14 +129,14 @@ export const batchPublish = wrapController(async (req, res) => {
 
 export const batchUnpublish = wrapController(async (req, res) => {
   const { ids } = req.body;
-  if (!Array.isArray(ids) || !ids.length) return error(res, ERROR_CODE.PARAM_ERROR, '请选择至少一个页面');
+  if (!Array.isArray(ids) || !ids.length) throw new BusinessError(ERROR_CODE.PARAM_ERROR, '请选择至少一个页面');
   const result = await diyService.batchUnpublish(ids, req.tenantId);
   return success(res, null, `已下线${result.count}个页面`);
 });
 
 export const batchDelete = wrapController(async (req, res) => {
   const { ids } = req.body;
-  if (!Array.isArray(ids) || !ids.length) return error(res, ERROR_CODE.PARAM_ERROR, '请选择至少一个页面');
+  if (!Array.isArray(ids) || !ids.length) throw new BusinessError(ERROR_CODE.PARAM_ERROR, '请选择至少一个页面');
   const result = await diyService.batchDelete(ids, req.tenantId);
   return success(res, null, `已将${result.count}个页面移入回收站`);
 });
@@ -150,7 +151,7 @@ export const listComponents = wrapController(async (req, res) => {
 
 export const createComponent = wrapController(async (req, res) => {
   const { name, componentCode, category, icon, defaultConfig } = req.body;
-  if (!name || !componentCode || !category) return error(res, ERROR_CODE.PARAM_ERROR, '组件名称、编码和分类不能为空');
+  if (!name || !componentCode || !category) throw new BusinessError(ERROR_CODE.PARAM_ERROR, '组件名称、编码和分类不能为空');
   const id = await diyService.createComponent(req.tenantId, { name, componentCode, category, icon, defaultConfig });
   return success(res, { id }, '组件创建成功');
 });
@@ -166,7 +167,7 @@ export const listTemplates = wrapController(async (req, res) => {
 
 export const getTemplate = wrapController(async (req, res) => {
   const t = await diyService.getTemplateById(req.params.id);
-  if (!t) return error(res, ERROR_CODE.NOT_FOUND, '模板不存在');
+  if (!t) throw new BusinessError(ERROR_CODE.NOT_FOUND, '模板不存在');
   return success(res, t);
 });
 

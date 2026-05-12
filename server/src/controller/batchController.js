@@ -1,16 +1,17 @@
 import { wrapController } from '../utils/wrapController.js';
+import { BusinessError } from '../utils/businessError.js';
 import * as batchService from '../services/batchService.js';
-import { success, error, listResult } from '../utils/response.js';
+import { success, listResult } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { parsePagination } from '../utils/pagination.js';
 
 export const submitBatchTask = wrapController(async (req, res, next) => {
     const { imageUrls, operation, platform, style, nightMode } = req.body;
     if (!imageUrls || !imageUrls.length) {
-      return error(res, ERROR_CODE.PARAM_MISSING, '请上传至少一张图片');
+      throw new BusinessError(ERROR_CODE.PARAM_MISSING, '请上传至少一张图片');
     }
     if (!operation) {
-      return error(res, ERROR_CODE.PARAM_MISSING, '请选择操作类型');
+      throw new BusinessError(ERROR_CODE.PARAM_MISSING, '请选择操作类型');
     }
     const data = await batchService.submitBatchTask(req.user.id, { imageUrls, operation, platform, style, nightMode });
     const msg = nightMode ? '夜间托管任务已提交，凌晨2点自动执行（6折优惠）' : '批量任务已提交';
@@ -20,7 +21,7 @@ export const submitBatchTask = wrapController(async (req, res, next) => {
 export const redoBatchTask = wrapController(async (req, res, next) => {
     const { taskId } = req.body;
     if (!taskId) {
-      return error(res, ERROR_CODE.PARAM_MISSING, '请提供源任务ID');
+      throw new BusinessError(ERROR_CODE.PARAM_MISSING, '请提供源任务ID');
     }
     const data = await batchService.redoBatchTask(req.user.id, taskId);
     return success(res, data, '已复刻批量任务');

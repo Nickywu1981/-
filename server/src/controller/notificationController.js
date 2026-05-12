@@ -1,6 +1,7 @@
 import { wrapController } from '../utils/wrapController.js';
+import { BusinessError } from '../utils/businessError.js';
 import * as notificationService from '../services/notificationService.js';
-import { success, error, listResult } from '../utils/response.js';
+import { success, listResult } from '../utils/response.js';
 import { parsePagination } from '../utils/pagination.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
@@ -27,14 +28,14 @@ export const markAllRead = wrapController(async (req, res, next) => {
 
 export const sendNotification = wrapController(async (req, res, next) => {
     const { userId, type, title, content } = req.body;
-    if (!userId || !title || !content) return error(res, ERROR_CODE.BAD_REQUEST, '缺少必要参数');
+    if (!userId || !title || !content) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '缺少必要参数');
     const id = await notificationService.sendToUser({ userId, type: type || 'system', title, content });
     return success(res, { id }, '发送成功');
   });
 
 export const deleteNotification = wrapController(async (req, res, next) => {
     const ok = await notificationService.deleteById(req.params.id, req.user.id);
-    if (!ok) return error(res, ERROR_CODE.NOT_FOUND, '通知不存在');
+    if (!ok) throw new BusinessError(ERROR_CODE.NOT_FOUND, '通知不存在');
     return success(res, {}, '已删除');
   });
 

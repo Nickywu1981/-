@@ -1,6 +1,7 @@
 import { wrapController } from '../utils/wrapController.js';
+import { BusinessError } from '../utils/businessError.js';
 import badgeService from '../services/badgeService.js';
-import { success, error } from '../utils/response.js';
+import { success } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
 export const listBadges = wrapController(async (req, res) => {
@@ -11,7 +12,7 @@ export const listBadges = wrapController(async (req, res) => {
 
 export const getBadge = wrapController(async (req, res) => {
     const badge = await badgeService.getBadgeById(req.params.id);
-    if (!badge) return error(res, ERROR_CODE.NOT_FOUND, '标签不存在');
+    if (!badge) throw new BusinessError(ERROR_CODE.NOT_FOUND, '标签不存在');
     return success(res, badge);
 });
 
@@ -28,12 +29,12 @@ export const createBadge = wrapController(async (req, res) => {
 
 export const updateBadge = wrapController(async (req, res) => {
     const ok = await badgeService.updateBadge(req.params.id, req.body);
-    if (!ok) return error(res, ERROR_CODE.NOT_FOUND, '勋章不存在');
+    if (!ok) throw new BusinessError(ERROR_CODE.NOT_FOUND, '勋章不存在');
     return success(res, null, '更新成功');
 });
 
 export const deleteBadge = wrapController(async (req, res) => {
     const ok = await badgeService.deleteBadge(req.params.id);
-    if (!ok) return error(res, ERROR_CODE.NOT_FOUND, '勋章不存在');
+    if (!ok) throw new BusinessError(ERROR_CODE.NOT_FOUND, '勋章不存在');
     return success(res, null, '删除成功');
 });

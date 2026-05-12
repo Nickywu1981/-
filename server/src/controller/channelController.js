@@ -1,5 +1,6 @@
 import * as channelService from '../services/channelService.js';
 import { wrapController } from '../utils/wrapController.js';
+import { BusinessError } from '../utils/businessError.js';
 
 export const listChannels = wrapController(async (req) => {
   const query = req.validated || req.query;

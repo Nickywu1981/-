@@ -1,7 +1,7 @@
 import { wrapController } from '../utils/wrapController.js';
 import { BusinessError } from '../utils/businessError.js';
 import * as formService from '../services/formService.js';
-import { success, error } from '../utils/response.js';
+import { success } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
 export const listForms = wrapController(async (req, res) => {

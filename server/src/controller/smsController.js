@@ -1,6 +1,7 @@
 import { wrapController } from '../utils/wrapController.js';
+import { BusinessError } from '../utils/businessError.js';
 import * as smsService from '../services/smsService.js';
-import { success, error, listResult } from '../utils/response.js';
+import { success, listResult } from '../utils/response.js';
 import { parsePagination } from '../utils/pagination.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
@@ -8,12 +9,12 @@ import { ERROR_CODE } from '../constants/errorCode.js';
 
 export const sendVerificationCode = wrapController(async (req, res, next) => {
     const { phone, scene } = req.body;
-    if (!phone || !scene) return error(res, ERROR_CODE.PARAM_MISSING, '手机号和场景不能为空');
+    if (!phone || !scene) throw new BusinessError(ERROR_CODE.PARAM_MISSING, '手机号和场景不能为空');
     if (!['register', 'login', 'reset_password', 'bind'].includes(scene)) {
-      return error(res, ERROR_CODE.PARAM_INVALID, '不支持的短信场景');
+      throw new BusinessError(ERROR_CODE.PARAM_INVALID, '不支持的短信场景');
     }
     const result = await smsService.sendVerificationCode({ phone, scene });
-    if (!result.success) return error(res, ERROR_CODE.BAD_REQUEST, result.msg);
+    if (!result.success) throw new BusinessError(ERROR_CODE.BAD_REQUEST, result.msg);
     return success(res, { expire: result.expire }, result.msg);
   });
 
@@ -21,9 +22,9 @@ export const sendVerificationCode = wrapController(async (req, res, next) => {
 
 export const verifyCode = wrapController(async (req, res, next) => {
     const { phone, scene, code } = req.body;
-    if (!phone || !scene || !code) return error(res, ERROR_CODE.PARAM_MISSING, '参数不完整');
+    if (!phone || !scene || !code) throw new BusinessError(ERROR_CODE.PARAM_MISSING, '参数不完整');
     const result = await smsService.verifyCode(phone, scene, code);
-    if (!result.valid) return error(res, ERROR_CODE.BAD_REQUEST, result.reason);
+    if (!result.valid) throw new BusinessError(ERROR_CODE.BAD_REQUEST, result.reason);
     return success(res, {}, '验证通过');
   });
 
@@ -62,8 +63,8 @@ export const listLogs = wrapController(async (req, res, next) => {
 
 export const sendNotification = wrapController(async (req, res, next) => {
     const { phone, scene, templateCode, params } = req.body;
-    if (!phone || (!scene && !templateCode)) return error(res, ERROR_CODE.PARAM_MISSING, '参数不完整');
+    if (!phone || (!scene && !templateCode)) throw new BusinessError(ERROR_CODE.PARAM_MISSING, '参数不完整');
     const result = await smsService.sendNotification(phone, { scene, templateCode, params });
-    if (!result.success) return error(res, ERROR_CODE.BAD_REQUEST, result.msg);
+    if (!result.success) throw new BusinessError(ERROR_CODE.BAD_REQUEST, result.msg);
     return success(res, {}, result.msg);
   });

@@ -1,25 +1,26 @@
 import { wrapController } from '../utils/wrapController.js';
+import { BusinessError } from '../utils/businessError.js';
 import * as creditService from '../services/creditService.js';
-import { success, error } from '../utils/response.js';
+import { success } from '../utils/response.js';
 import { parsePagination } from '../utils/pagination.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
 export const getMembership = wrapController(async (req, res) => {
     const m = await creditService.getUserMembership(req.user.id);
-    if (!m) return error(res, ERROR_CODE.NOT_FOUND, '会员信息不存在');
+    if (!m) throw new BusinessError(ERROR_CODE.NOT_FOUND, '会员信息不存在');
     success(res, m);
 });
 
 export const freezeCredit = wrapController(async (req, res) => {
     const { requestId, action, batchCount, isNight } = req.body;
-    if (!requestId || !action) return error(res, ERROR_CODE.BAD_REQUEST, '缺少 requestId 或 action 参数');
+    if (!requestId || !action) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '缺少 requestId 或 action 参数');
     const result = await creditService.freezeCredit(req.user.id, requestId, action, batchCount || 1, isNight || false);
     success(res, result);
 });
 
 export const confirmCredit = wrapController(async (req, res) => {
     const { requestId } = req.body;
-    if (!requestId) return error(res, ERROR_CODE.BAD_REQUEST, '缺少 requestId');
+    if (!requestId) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '缺少 requestId');
     const result = await creditService.confirmCharge(requestId);
     success(res, result);
 });
@@ -27,7 +28,7 @@ export const confirmCredit = wrapController(async (req, res) => {
 export const rollbackCredit = wrapController(async (req, res) => {
     const { requestId, recordId, remark } = req.body;
     const rid = requestId || recordId;
-    if (!rid) return error(res, ERROR_CODE.BAD_REQUEST, '缺少 requestId 或 recordId');
+    if (!rid) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '缺少 requestId 或 recordId');
     const result = await creditService.rollbackCharge(rid, remark || '');
     success(res, result);
 });
@@ -48,7 +49,7 @@ export const listAllRecords = wrapController(async (req, res) => {
 
 export const adminRefund = wrapController(async (req, res) => {
     const { recordId, remark } = req.body;
-    if (!recordId) return error(res, ERROR_CODE.BAD_REQUEST, '缺少 recordId');
+    if (!recordId) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '缺少 recordId');
     await creditService.adminRefundCredit(recordId, remark || '管理员退款');
     success(res, null, '退款成功');
 });

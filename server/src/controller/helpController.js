@@ -1,6 +1,7 @@
 import { wrapController } from '../utils/wrapController.js';
+import { BusinessError } from '../utils/businessError.js';
 import helpService from '../services/helpService.js';
-import { success, error } from '../utils/response.js';
+import { success } from '../utils/response.js';
 import { parsePagination } from '../utils/pagination.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
@@ -13,7 +14,7 @@ export const getFaqs = wrapController(async (req, res) => {
 
 export const getFaqById = wrapController(async (req, res) => {
     const faq = await helpService.getFaqById(req.params.id);
-    if (!faq) return error(res, ERROR_CODE.NOT_FOUND, 'FAQ不存在');
+    if (!faq) throw new BusinessError(ERROR_CODE.NOT_FOUND, 'FAQ不存在');
     success(res, faq);
 });
 
