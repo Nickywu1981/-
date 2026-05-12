@@ -13,6 +13,7 @@
 import { pipeline } from './aiEngine.js';
 import { jobQueueService } from './job-queue.service.js';
 import { saveSimpleFile } from '../utils/file-upload.js';
+import { BusinessError } from '../../utils/businessError.js';
 import logger from '../utils/logger.js';
 
 // ==================== 场景模板库 ====================
@@ -72,7 +73,7 @@ export async function executeDetailLongImage(params) {
     sceneCount = 3, userId, tenantId, onProgress,
   } = params;
 
-  if (!productImageUrl) throw new Error('productImageUrl 为必填参数');
+  if (!productImageUrl) throw new BusinessError(400, 'productImageUrl 为必填参数');
 
   const scenes = customScenePrompts
     ? customScenePrompts.slice(0, sceneCount).map((p, i) => ({ name: `自定义${i + 1}`, prompt: p }))
@@ -169,7 +170,7 @@ export async function executeDetailLongImage(params) {
 // ==================== Sharp 长图拼接 ====================
 
 async function compositeLongImage(sceneImages, outputWidth, onProgress) {
-  if (sceneImages.length === 0) throw new Error('无可用场景图进行拼接');
+  if (sceneImages.length === 0) throw new BusinessError(500, '无可用场景图进行拼接');
 
   const sharp = (await import('sharp')).default;
   const buffers = [];
@@ -177,7 +178,7 @@ async function compositeLongImage(sceneImages, outputWidth, onProgress) {
 
   for (const scene of sceneImages) {
     const resp = await fetch(scene.url);
-    if (!resp.ok) throw new Error(`下载场景图失败: HTTP ${resp.status}`);
+    if (!resp.ok) throw new BusinessError(500, `下载场景图失败: HTTP ${resp.status}`);
     const buf = Buffer.from(await resp.arrayBuffer());
     const resized = await sharp(buf)
       .resize({ width: outputWidth, fit: 'inside', withoutEnlargement: true })

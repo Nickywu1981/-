@@ -60,7 +60,7 @@ export async function executeActionMigration(params) {
   } = params;
 
   if (!sourceVideoUrl) throw new BusinessError(400, 'sourceVideoUrl 为必填参数');
-  if (!targetImageUrl && !targetVideoUrl) throw new Error('targetImageUrl 或 targetVideoUrl 必填其一');
+  if (!targetImageUrl && !targetVideoUrl) throw new BusinessError(400, 'targetImageUrl 或 targetVideoUrl 必填其一');
 
   // === Phase 1: 源视频分析（骨骼提取+动作序列） ===
   onProgress?.('analyze', 5);
@@ -96,7 +96,7 @@ export async function executeActionMigration(params) {
     }, { userId, tenantId, taskType: 'action_migrate', source: 'pipeline' });
     migratedVideoUrl = migrateResult?.videoUrl || migrateResult?.output?.video_url;
   } catch (e) {
-    throw new Error(`动作迁移失败: ${e.message}`);
+    throw new BusinessError(500, `动作迁移失败: ${e.message}`);
   }
   onProgress?.('migrate_done', 60);
 
@@ -159,7 +159,7 @@ export async function executeBatchActionMigration(params) {
     userId, tenantId, onProgress,
   } = params;
 
-  if (!targets.length) throw new Error('至少需要一个目标人物');
+  if (!targets.length) throw new BusinessError(400, '至少需要一个目标人物');
   if (!sourceVideoUrl) throw new BusinessError(400, 'sourceVideoUrl 为必填参数');
 
   const totalJobs = targets.length * Math.max(1, backgrounds.length || 1) * Math.max(1, bgms.length || 1);
