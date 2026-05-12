@@ -5,7 +5,7 @@ import {
 } from '../controller/smsController.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { validate, phoneSchema, codeSchema, idParamSchema } from '../utils/validate.js';
-import { codeLimiter, verifyLimiter } from '../middleware/rateLimiter.js';
+import { codeLimiter, verifyLimiter, adminLimiter } from '../middleware/rateLimiter.js';
 import { z } from 'zod';
 
 const router = Router();
@@ -46,9 +46,9 @@ router.post('/send', authMiddleware, codeLimiter, validate(sendNotificationSchem
 
 // 管理后台 — 模板管理 + 日志
 router.get('/templates', authMiddleware, adminAuth, listTemplates);
-router.post('/templates', authMiddleware, adminAuth, validate(smsTemplateSchema), createTemplate);
-router.put('/templates/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(smsTemplateUpdateSchema), updateTemplate);
-router.delete('/templates/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), deleteTemplate);
+router.post('/templates', authMiddleware, adminAuth, adminLimiter, validate(smsTemplateSchema), createTemplate);
+router.put('/templates/:id', authMiddleware, adminAuth, adminLimiter, validate(idParamSchema, 'params'), validate(smsTemplateUpdateSchema), updateTemplate);
+router.delete('/templates/:id', authMiddleware, adminAuth, adminLimiter, validate(idParamSchema, 'params'), deleteTemplate);
 router.get('/logs', authMiddleware, adminAuth, listLogs);
 
 export default router;
