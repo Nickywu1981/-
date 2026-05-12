@@ -6,7 +6,7 @@
         <h1 class="page-header-title">客户管理</h1>
         <p class="page-header-subtitle">名下客户列表、详情、标签分组</p>
       </div>
-      <input class="search-input" v-model="search" placeholder="搜索客户..." style="width:220px" />
+      <input class="search-input w-220" v-model="search" placeholder="搜索客户..." />
     </div>
 
     <div class="card">
@@ -19,7 +19,7 @@
             <td>{{ c.createdAt }}</td>
             <td>¥{{ c.totalSpent }}</td>
             <td>{{ c.orderCount }}</td>
-            <td><span v-for="t in c.tags" :key="t" class="badge badge-info" style="margin-right:4px">{{ t }}</span></td>
+            <td><span v-for="t in c.tags" :key="t" class="badge badge-info mr-4">{{ t }}</span></td>
           </tr>
         </tbody>
       </table>
@@ -41,3 +41,8 @@ const filteredCustomers = computed(() =>
   customers.filter(c => c.name.includes(search.value) || c.phone.includes(search.value))
 )
 </script>
+
+<style scoped>
+.w-220 { width: 220px; }
+.mr-4 { margin-right: 4px; }
+</style>

@@ -14,18 +14,18 @@
     </div>
 
     <!-- 图表 + 列表 -->
-    <div class="dashboard-grid" style="margin-top: var(--space-6)">
+    <div class="dashboard-grid chart-section">
       <!-- 佣金趋势 -->
       <div class="chart-card col-6">
         <div class="chart-card-header"><span class="chart-card-title">佣金收入趋势</span></div>
-        <div class="chart-card-body" style="min-height: 240px; display: flex; align-items: center; justify-content: center; color: var(--text-tertiary);">
+        <div class="chart-card-body chart-placeholder">
           📈 图表区域 — 待接入 ECharts / Chart.js
         </div>
       </div>
       <!-- 客户增长 -->
       <div class="chart-card col-6">
         <div class="chart-card-header"><span class="chart-card-title">客户增长</span></div>
-        <div class="chart-card-body" style="min-height: 240px; display: flex; align-items: center; justify-content: center; color: var(--text-tertiary);">
+        <div class="chart-card-body chart-placeholder">
           📈 图表区域 — 待接入 ECharts / Chart.js
         </div>
       </div>
@@ -35,8 +35,8 @@
           <span class="chart-card-title">近期客户</span>
           <NuxtLink to="/agent/customers" class="btn btn-ghost btn-sm">查看全部</NuxtLink>
         </div>
-        <div class="chart-card-body" style="padding: 0">
-          <div class="table-container" style="border: none; border-radius: 0">
+        <div class="chart-card-body no-pad">
+          <div class="table-container table-clean">
             <table class="data-table">
               <thead><tr><th>客户名称</th><th>套餐</th><th>消费金额</th><th>佣金</th><th>注册时间</th><th>状态</th></tr></thead>
               <tbody>
@@ -76,3 +76,10 @@ const customers = [
 
 definePageMeta({ layout: 'agent' })
 </script>
+
+<style scoped>
+.chart-section { margin-top: var(--space-6); }
+.chart-placeholder { min-height: 240px; display: flex; align-items: center; justify-content: center; color: var(--text-tertiary); }
+.no-pad { padding: 0; }
+.table-clean { border: none; border-radius: 0; }
+</style>

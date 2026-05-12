@@ -37,7 +37,7 @@
       <el-tabs v-model="activeTab" type="border-card">
         <!-- ═══ 五大固定导航 ═══ -->
         <el-tab-pane :label="$t('admin_workspace_diy.tab_nav')" name="nav">
-          <el-alert type="warning" :closable="false" show-icon style="margin-bottom:16px">
+          <el-alert type="warning" :closable="false" show-icon class="tab-alert">
             <template #title>{{ $t('admin_workspace_diy.nav_alert') }}</template>
           </el-alert>
           <div v-if="!navItems.length && !loading" class="empty-hint">
@@ -49,9 +49,9 @@
               <div class="item-row">
                 <span class="drag-handle">⠿</span>
                 <span class="item-order">{{ index + 1 }}</span>
-                <el-input v-model="element.icon" size="small" style="width:60px" @change="navChanged = true" />
-                <el-input v-model="element.label" size="small" style="width:100px" @change="navChanged = true" />
-                <el-input v-model="element.path" size="small" style="width:180px" @change="navChanged = true" />
+                <el-input v-model="element.icon" size="small" class="w-60" @change="navChanged = true" />
+                <el-input v-model="element.label" size="small" class="w-100" @change="navChanged = true" />
+                <el-input v-model="element.path" size="small" class="w-180" @change="navChanged = true" />
                 <el-switch v-model="element.disabled" size="small"
                   :active-text="$t('admin_workspace_diy.label_disabled')"
                   :inactive-text="$t('admin_workspace_diy.label_enabled')"
@@ -66,7 +66,7 @@
 
         <!-- ═══ 创作类模块卡片 ═══ -->
         <el-tab-pane :label="$t('admin_workspace_diy.tab_cards')" name="cards">
-          <el-alert type="info" :closable="false" show-icon style="margin-bottom:16px">
+          <el-alert type="info" :closable="false" show-icon class="tab-alert">
             <template #title>{{ $t('admin_workspace_diy.cards_alert') }}</template>
           </el-alert>
           <div v-if="!cardItems.length && !loading" class="empty-hint">
@@ -78,10 +78,10 @@
               <div class="item-row" :class="{ hidden: !element.visible }">
                 <span class="drag-handle">⠿</span>
                 <span class="item-order">{{ index + 1 }}</span>
-                <el-input v-model="element.icon" size="small" style="width:50px" @change="cardsChanged = true" />
-                <el-input v-model="element.title" size="small" style="width:130px" @change="cardsChanged = true" />
-                <el-input v-model="element.desc" size="small" style="width:240px" @change="cardsChanged = true" />
-                <el-input v-model="element.route" size="small" style="width:160px" @change="cardsChanged = true" />
+                <el-input v-model="element.icon" size="small" class="w-50" @change="cardsChanged = true" />
+                <el-input v-model="element.title" size="small" class="w-130" @change="cardsChanged = true" />
+                <el-input v-model="element.desc" size="small" class="w-240" @change="cardsChanged = true" />
+                <el-input v-model="element.route" size="small" class="w-160" @change="cardsChanged = true" />
                 <el-switch v-model="element.visible" size="small" @change="cardsChanged = true" />
               </div>
             </template>
@@ -93,7 +93,7 @@
 
         <!-- ═══ AI 助手预留 ═══ -->
         <el-tab-pane :label="$t('admin_workspace_diy.tab_ai')" name="assistant">
-          <el-alert type="warning" :closable="false" show-icon style="margin-bottom:16px">
+          <el-alert type="warning" :closable="false" show-icon class="tab-alert">
             <template #title>{{ $t('admin_workspace_diy.ai_coming') }}</template>
           </el-alert>
           <div v-if="!assistantItems.length && !loading" class="empty-hint">
@@ -105,9 +105,9 @@
               <div class="item-row dimmed">
                 <span class="drag-handle">⠿</span>
                 <span class="item-order">{{ index + 1 }}</span>
-                <el-input v-model="element.icon" size="small" style="width:50px" @change="assistantChanged = true" />
-                <el-input v-model="element.title" size="small" style="width:160px" @change="assistantChanged = true" />
-                <el-input v-model="element.desc" size="small" style="width:280px" @change="assistantChanged = true" />
+                <el-input v-model="element.icon" size="small" class="w-50" @change="assistantChanged = true" />
+                <el-input v-model="element.title" size="small" class="w-160" @change="assistantChanged = true" />
+                <el-input v-model="element.desc" size="small" class="w-280" @change="assistantChanged = true" />
               </div>
             </template>
           </draggable>
@@ -118,7 +118,7 @@
 
         <!-- ═══ 工作流预留 ═══ -->
         <el-tab-pane :label="$t('admin_workspace_diy.tab_flow')" name="workflow">
-          <el-alert type="warning" :closable="false" show-icon style="margin-bottom:16px">
+          <el-alert type="warning" :closable="false" show-icon class="tab-alert">
             <template #title>{{ $t('admin_workspace_diy.flow_coming') }}</template>
           </el-alert>
           <div v-if="!workflowItems.length && !loading" class="empty-hint">
@@ -130,9 +130,9 @@
               <div class="item-row dimmed">
                 <span class="drag-handle">⠿</span>
                 <span class="item-order">{{ index + 1 }}</span>
-                <el-input v-model="element.icon" size="small" style="width:50px" @change="workflowChanged = true" />
-                <el-input v-model="element.title" size="small" style="width:160px" @change="workflowChanged = true" />
-                <el-input v-model="element.desc" size="small" style="width:280px" @change="workflowChanged = true" />
+                <el-input v-model="element.icon" size="small" class="w-50" @change="workflowChanged = true" />
+                <el-input v-model="element.title" size="small" class="w-160" @change="workflowChanged = true" />
+                <el-input v-model="element.desc" size="small" class="w-280" @change="workflowChanged = true" />
               </div>
             </template>
           </draggable>
@@ -381,4 +381,14 @@ onMounted(loadAll)
   color: #409eff;
   word-break: break-all;
 }
+
+.tab-alert { margin-bottom: 16px; }
+.w-50  { width: 50px; }
+.w-60  { width: 60px; }
+.w-100 { width: 100px; }
+.w-130 { width: 130px; }
+.w-160 { width: 160px; }
+.w-180 { width: 180px; }
+.w-240 { width: 240px; }
+.w-280 { width: 280px; }
 </style>
