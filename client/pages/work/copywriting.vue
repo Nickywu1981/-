@@ -9,6 +9,11 @@
     <el-tabs v-model="activeTab" class="main-tabs">
       <!-- 商品标题 -->
       <el-tab-pane label="商品标题" name="title">
+        <SmartRecognitionPanel
+          hint="上传商品参考图，AI 自动识别产品信息并填充到表单"
+          confirm-label="确认并填充"
+          @confirm="onSmartApply"
+        />
         <el-form :model="titleForm" label-width="100px" class="gen-form">
           <el-row :gutter="16">
             <el-col :span="12">
@@ -215,6 +220,7 @@ import { ElMessage } from 'element-plus';
 const toast = useToast()
 import { MagicStick } from '@element-plus/icons-vue';
 import { copyToClipboard } from '@/utils/format';
+import SmartRecognitionPanel from '~/components/shared/SmartRecognitionPanel.vue'
 
 function safeParseJson(v: unknown): Record<string, unknown> | null {
   if (typeof v !== 'string') return v as Record<string, unknown> | null;
@@ -315,6 +321,12 @@ async function deleteRecord(id) {
 const copyText = async (text: string) => {
   const ok = await copyToClipboard(text);
   if (ok) ElMessage.success('已复制');
+}
+
+function onSmartApply(info: { productName: string; category: string; features: string[]; refUrl: string }) {
+  titleForm.productName = info.productName
+  titleForm.category = info.category
+  titleForm.sellingPoints = info.features.join('、')
 }
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>

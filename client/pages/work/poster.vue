@@ -23,6 +23,11 @@
     <div class="main-content">
       <!-- Left: Input Panel -->
       <div class="input-panel">
+        <SmartRecognitionPanel
+          hint="上传商品参考图，AI 自动生成海报描述文案"
+          confirm-label="确认并生成描述"
+          @confirm="onSmartApply"
+        />
         <div class="panel-section">
           <label class="section-label">海报描述</label>
           <textarea
@@ -144,7 +149,7 @@
 
 <script setup lang="ts">
 
-
+import SmartRecognitionPanel from '~/components/shared/SmartRecognitionPanel.vue'
 ;
 
 const { config } = useSiteConfig('page.poster');
@@ -389,6 +394,10 @@ const toast = useToast();
 onBeforeUnmount(() => {
   clearInterval(pollTimer);
 });
+
+function onSmartApply(info: { productName: string; category: string; features: string[]; refUrl: string }) {
+  prompt.value = `${info.productName}（${info.category}）\n核心卖点：${info.features.join('、')}\n目标风格：专业电商展示，高清细节，干净背景`
+}
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 

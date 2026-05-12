@@ -14,6 +14,12 @@
         <p v-if="uploading" class="uploading-hint">上传中...</p>
         <p v-else-if="uploadedUrl" class="uploaded-hint">已上传 ✓</p>
       </div>
+      <SmartRecognitionPanel
+        v-if="uploadedUrl"
+        hint="AI 可基于此参考图智能识别产品名称、品类、核心特征，自动填充后续步骤"
+        confirm-label="确认并继续"
+        @confirm="onSmartApply"
+      />
       <button v-if="uploadedUrl" class="btn" @click="step = 1">下一步：选平台</button>
     </div>
 
@@ -85,6 +91,7 @@
 const { createBlobUrl, revoke } = useBlobUrl()
 
 import PromptEnhancer from '~/components/PromptEnhancer.vue'
+import SmartRecognitionPanel from '~/components/shared/SmartRecognitionPanel.vue'
 
 const toast = useToast()
 const step = ref(0);
@@ -167,6 +174,12 @@ function handleRedo() {
 }
 
 onUnmounted(() => { if (previewUrl.value) revoke(previewUrl.value) })
+
+function onSmartApply(info: { productName: string; category: string; features: string[]; refUrl: string }) {
+  stylePrompt.value = `产品: ${info.productName}\n品类: ${info.category}\n特征: ${info.features.join(', ')}`
+  step.value = 2 // 跳到风格选择
+}
+
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 

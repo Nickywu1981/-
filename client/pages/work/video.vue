@@ -21,6 +21,13 @@
       <AppMediaUpload accept="image" :multiple="true" :max-size="20" :max-count="9" @uploaded="onImagesUploaded" />
       <p v-if="images.length" class="hint">已选择 {{ images.length }} 张图片{{ images.length === 1 ? ' → 单图生视频' : ' → 多图合成视频' }}</p>
 
+      <SmartRecognitionPanel
+        v-if="images.length"
+        hint="AI 可基于参考图智能识别商品信息，自动生成精准提示词"
+        confirm-label="确认并填充提示词"
+        @confirm="onSmartApply"
+      />
+
       <div class="input-group" style="margin-top:16px">
         <label>提示词（描述想要的视频效果）</label>
         <textarea v-model="prompt" class="input prompt-input" rows="3" placeholder="例如: 产品旋转展示，柔和灯光，快节奏转场..." maxlength="2000"></textarea>
@@ -173,8 +180,13 @@
 
 import { copyToClipboard } from '@/utils/format'
 import PromptEnhancer from '~/components/PromptEnhancer.vue'
+import SmartRecognitionPanel from '~/components/shared/SmartRecognitionPanel.vue'
 
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+
+function onSmartApply(info: { productName: string; category: string; features: string[]; refUrl: string }) {
+  prompt.value = `${info.productName}（${info.category}），核心特征：${info.features.join('、')}。产品旋转展示，柔和灯光，快节奏转场`
+}
 
 const { configs } = useAppPage({ configs: ['page.video.header'] })
 const { options: ratioOptions } = useAppDict('video_ratio')
