@@ -141,7 +141,7 @@ export async function callProxy(code, tenantId, { method, body, userId, clientIp
       const duration = Date.now() - start;
 
       // 熔断恢复
-      if (proxy.circuit_status === CIRCUIT_STATUS.OPEN) await proxyDao.resetCircuit(proxy.id);
+      if (proxy.circuit_status === CIRCUIT_STATUS.OPEN) await proxyDao.resetCircuit(proxy.id, tenantId);
 
       // 记录成功日志
       await proxyDao.logCall({
@@ -212,7 +212,7 @@ export async function cleanLogs(tenantId, days = 30) {
 // ==================== 熔断管理 ====================
 
 export async function resetCircuit(id, _tenantId) {
-  await proxyDao.resetCircuit(id);
+  await proxyDao.resetCircuit(id, _tenantId);
   return { circuit: 'closed' };
 }
 
@@ -255,9 +255,9 @@ async function handleUpstreamFailure(proxy, _tenantId, _status, _body) {
   const failCount = (proxy.circuit_fail_count || 0) + 1;
   const threshold = proxy.circuit_break_count || 5;
   if (failCount >= threshold) {
-    await proxyDao.setCircuitBreak(proxy.id, failCount);
+    await proxyDao.setCircuitBreak(proxy.id, failCount, _tenantId);
   } else {
-    await proxyDao.setCircuitBreak(proxy.id, failCount);
+    await proxyDao.setCircuitBreak(proxy.id, failCount, _tenantId);
   }
 }
 

@@ -68,7 +68,7 @@ export default {
     const conn = await pool.getConnection();
     try {
       await conn.beginTransaction();
-      await conn.query('DELETE FROM api_proxy_log WHERE proxy_id = ?', [id]);
+      await conn.query('DELETE FROM api_proxy_log WHERE proxy_id = ? AND tenant_id = ?', [id, tenantId]);
       const [r] = await conn.query('DELETE FROM api_proxy_config WHERE id = ? AND tenant_id = ?', [id, tenantId]);
       await conn.commit();
       return r.affectedRows;
@@ -139,19 +139,19 @@ export default {
     return rows[0].cnt;
   },
 
-  async setCircuitBreak(proxyId, failCount) {
+  async setCircuitBreak(proxyId, failCount, tenantId) {
     const [r] = await pool.query(
       `UPDATE api_proxy_config SET circuit_status = 1, circuit_last_fail = NOW(), circuit_fail_count = ?
-       WHERE id = ?`,
-      [failCount, proxyId],
+       WHERE id = ? AND tenant_id = ?`,
+      [failCount, proxyId, tenantId],
     );
     return r.affectedRows;
   },
 
-  async resetCircuit(proxyId) {
+  async resetCircuit(proxyId, tenantId) {
     const [r] = await pool.query(
-      'UPDATE api_proxy_config SET circuit_status = 0, circuit_fail_count = 0, circuit_last_fail = NULL WHERE id = ?',
-      [proxyId],
+      'UPDATE api_proxy_config SET circuit_status = 0, circuit_fail_count = 0, circuit_last_fail = NULL WHERE id = ? AND tenant_id = ?',
+      [proxyId, tenantId],
     );
     return r.affectedRows;
   },
