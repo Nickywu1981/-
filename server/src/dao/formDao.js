@@ -64,6 +64,7 @@ export default {
     return r.affectedRows;
   },
 
+  // 依赖调用方已验证 form_id 归属当前租户
   async deleteForm(id, tenantId) {
     return withTransaction(async (conn) => {
       await conn.query('DELETE FROM custom_form_submission WHERE form_id = ?', [id]);

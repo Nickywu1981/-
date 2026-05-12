@@ -136,6 +136,7 @@ export default {
     return r.affectedRows;
   },
 
+  // 依赖调用方已验证 page_id 归属当前租户
   async hardDeletePage(id, tenantId) {
     return withTransaction(async (conn) => {
       await conn.query('DELETE FROM diy_page_version WHERE page_id = ?', [id]);

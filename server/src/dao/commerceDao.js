@@ -355,11 +355,10 @@ export async function listAllOrders({ offset, pageSize, userId, planType }) {
 }
 
 export async function deletePaymentOrder(orderId, tenantId) {
-  if (tenantId) {
-    await pool.execute('DELETE po FROM payment_order po JOIN user u ON po.user_id = u.id WHERE po.id = ? AND u.tenant_id = ?', [orderId, tenantId]);
-  } else {
-    await pool.execute('DELETE FROM payment_order WHERE id = ?', [orderId]);
-  }
+  // tenant_id 隔离必传，避免跨租户删除
+  if (!tenantId) return 0;
+  const [r] = await pool.execute('DELETE po FROM payment_order po JOIN user u ON po.user_id = u.id WHERE po.id = ? AND u.tenant_id = ?', [orderId, tenantId]);
+  return r.affectedRows;
 }
 
 // ==================== 企业订单管理 ====================
