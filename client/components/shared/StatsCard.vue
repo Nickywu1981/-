@@ -31,18 +31,18 @@ defineProps<{
 <style scoped>
 .stat-card {
   padding: 20px;
-  background: #fff;
-  border: 1px solid #e4e7ed;
-  border-top: 3px solid #409eff;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-top: 3px solid var(--brand);
   border-radius: 10px;
   transition: box-shadow .2s;
 }
 .stat-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,.06); }
 .stat-card-top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
 .stat-card-icon { font-size: 24px; }
-.stat-card-value { font-size: 28px; font-weight: 700; color: #303133; }
-.stat-card-label { font-size: 13px; color: #909399; }
+.stat-card-value { font-size: 28px; font-weight: 700; color: var(--text-primary); }
+.stat-card-label { font-size: 13px; color: var(--text-muted); }
 .stat-card-trend { font-size: 12px; margin-top: 6px; }
-.stat-card-trend.up { color: #67c23a; }
-.stat-card-trend.down { color: #f56c6c; }
+.stat-card-trend.up { color: var(--color-success, #67c23a); }
+.stat-card-trend.down { color: var(--danger); }
 </style>

@@ -52,11 +52,11 @@
   </div>
   <!-- 按钮组 -->
   <div v-else-if="section.component === 'button_group'" class="preview-buttons" :style="{ flexDirection: config.direction||'row', gap: (config.gap||12)+'px' }">
-    <span v-for="(btn, i) in (config.buttons||[{text:'按钮',color:'#6366f1'}])" :key="i" class="btn-pill" :style="{ background: btn.color||'#6366f1', borderRadius: (config.radius||20)+'px' }">{{ btn.text }}</span>
+    <span v-for="(btn, i) in (config.buttons||[{text:'按钮',color:'var(--brand)'}])" :key="i" class="btn-pill" :style="{ background: btn.color||'var(--brand)', borderRadius: (config.radius||20)+'px' }">{{ btn.text }}</span>
   </div>
   <!-- 导航栏 -->
-  <div v-else-if="section.component === 'nav_bar'" class="preview-nav" :style="{ background: config.bgColor||'#fff', color: config.textColor||'#333' }">
-    <span v-for="(item, i) in (config.items||[{text:'首页',icon:'🏠'}])" :key="i" class="nav-chip" :style="{ color: config.textColor||'#333' }">
+  <div v-else-if="section.component === 'nav_bar'" class="preview-nav" :style="{ background: config.bgColor||'var(--bg-card)', color: config.textColor||'var(--text-primary)' }">
+    <span v-for="(item, i) in (config.items||[{text:'首页',icon:'🏠'}])" :key="i" class="nav-chip" :style="{ color: config.textColor||'var(--text-primary)' }">
       <span v-if="item.icon">{{ item.icon }}</span> {{ item.text }}
     </span>
   </div>
@@ -67,7 +67,7 @@
     <span v-if="(config.zones||[]).length" class="zone-badge">{{ config.zones.length }}个热区</span>
   </div>
   <!-- 表单容器 -->
-  <div v-else-if="section.component === 'form_container'" class="preview-form" :style="{ background: config.bgColor||'#fff', borderRadius: (config.radius||8)+'px', padding: (config.padding||16)+'px' }">
+  <div v-else-if="section.component === 'form_container'" class="preview-form" :style="{ background: config.bgColor||'var(--bg-card)', borderRadius: (config.radius||8)+'px', padding: (config.padding||16)+'px' }">
     <div v-for="(field, i) in (config.fields||[{label:'示例字段'}])" :key="i" class="form-field">
       <label v-if="field.label" :style="{ fontSize: '12px', color: 'var(--text-muted)' }">{{ field.label }}</label>
       <div class="field-mock">{{ field.placeholder || '请输入' }}</div>
@@ -124,15 +124,15 @@ function onImgError(e: Event) {
 .coupon-card { padding: 12px; border: 2px dashed; display: flex; flex-direction: column; gap: 4px; }
 .coupon-card .amount { font-size: 22px; font-weight: 700; }
 .preview-buttons { display: flex; justify-content: center; padding: 12px; }
-.btn-pill { display: inline-block; padding: 6px 18px; color: #fff; font-weight: 600; font-size: 13px; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+.btn-pill { display: inline-block; padding: 6px 18px; color: var(--text-on-brand, #fff); font-weight: 600; font-size: 13px; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
 .preview-nav { display: flex; gap: 8px; padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-light); overflow-x: auto; }
 .nav-chip { font-size: 11px; white-space: nowrap; }
 .preview-hotzone { position: relative; }
-.zone-badge { position: absolute; top: 6px; right: 6px; background: rgba(99,102,241,0.8); color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 11px; }
+.zone-badge { position: absolute; top: 6px; right: 6px; background: var(--brand); color: var(--text-on-brand, #fff); padding: 2px 8px; border-radius: 10px; font-size: 11px; }
 .preview-form { border: 1px solid var(--border-light); }
 .form-field { margin-bottom: 8px; }
 .field-mock { padding: 6px 10px; border: 1px solid var(--border-light); border-radius: 6px; background: var(--bg-hover); font-size: 12px; color: var(--text-muted); margin-top: 3px; }
-.submit-mock { text-align: center; padding: 8px; background: var(--brand); color: #fff; border-radius: 6px; margin-top: 8px; font-size: 13px; font-weight: 600; }
+.submit-mock { text-align: center; padding: 8px; background: var(--brand); color: var(--text-on-brand, #fff); border-radius: 6px; margin-top: 8px; font-size: 13px; font-weight: 600; }
 .preview-unknown { padding: 20px; text-align: center; color: var(--text-muted); background: var(--bg-hover); border-radius: 6px; font-size: 12px; }
 .w-full { width: 100%; }
 </style>
