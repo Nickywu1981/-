@@ -101,6 +101,7 @@ import compareRoutes from './route/compareRoutes.js';
 import seoKeywordRoutes from './route/seoKeywordRoutes.js';
 import fabRoutes from './route/fabRoutes.js';
 import memoryEmbedRoutes from './route/memoryEmbedRoutes.js';
+import longTermMemoryRoutes from './route/longTermMemoryRoutes.js'; // Phase 15: 长期记忆 (2026-05-12)
 import digitalHumanRoutesV4 from './route/v4_digital_human.routes.js';
 import platformPublishRoutesV4 from './route/v4_platform_publish.routes.js';
 import templateMarketRoutesV4 from './route/v4_template_market.routes.js';
@@ -337,6 +338,7 @@ app.use('/api/compare', heavyLimiter, compareRoutes);
 app.use('/api/seo-keywords', heavyLimiter, seoKeywordRoutes);
 app.use('/api/fab', heavyLimiter, fabRoutes);
 app.use('/api/memory', heavyLimiter, memoryEmbedRoutes);
+app.use('/api/ltm', heavyLimiter, longTermMemoryRoutes); // Phase 15: 长期记忆 (2026-05-12)
 app.use('/api/digital-human', heavyLimiter, digitalHumanRoutesV4);
 app.use('/api/platform-publish', apiLimiter, platformPublishRoutesV4);
 app.use('/api/template-market', apiLimiter, templateMarketRoutesV4);

@@ -25,14 +25,14 @@ export async function register({ phone, email, password, nickname, inviteCode: _
     const username = phone || email || '';
     if (!username) throw new BusinessError(400, '请提供手机号或邮箱');
 
-    const [existing] = await conn.query('SELECT id FROM `user` WHERE username = ?', [username]);
+    const [existing] = await conn.query('SELECT id FROM `users` WHERE phone = ? OR email = ?', [phone || '', email || '']);
     if (existing.length > 0) throw new BusinessError(400, '注册失败，请检查输入信息');
 
     const passwordHash = await bcrypt.hash(password, 12);
     const [result] = await conn.query(
-      `INSERT INTO user (username, password, nickname, phone, email, role, status)
-       VALUES (?, ?, ?, ?, ?, 'user', 1)`,
-      [username, passwordHash, nickname || '', phone || '', email || ''],
+      `INSERT INTO users (phone, email, password_hash, nickname, role, status)
+       VALUES (?, ?, ?, ?, 'free', 'active')`,
+      [phone || '', email || '', passwordHash, nickname || ''],
     );
     const userId = result.insertId;
 
@@ -61,21 +61,29 @@ export async function login({ phone, email, username, password }) {
     const identifier = username || phone || email || '';
     if (!identifier) throw new BusinessError(400, '请提供手机号、邮箱或用户名');
 
+    // Match by phone, email, or nickname
+    const isPhone = /^1[3-9]\d{9}$/.test(identifier);
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
+    let whereClause, whereValue;
+    if (isPhone) { whereClause = 'phone = ?'; whereValue = identifier; }
+    else if (isEmail) { whereClause = 'email = ?'; whereValue = identifier; }
+    else { whereClause = 'nickname = ?'; whereValue = identifier; }
+
     const [users] = await conn.query(
-      'SELECT id, tenant_id, password, role, nickname, status FROM `user` WHERE username = ?',
-      [identifier],
+      `SELECT id, password_hash, role, nickname, status FROM \`users\` WHERE ${whereClause}`,
+      [whereValue],
     );
 
     const user = users?.[0] || null;
 
     // Prevent timing-based account enumeration: always run bcrypt
     const DUMMY = '$2a$12$abcdefghijklmnopqrstuvabcdefghijklmnopqrstuv34567890123';
-    const validPassword = await bcrypt.compare(password, user ? user.password : DUMMY);
+    const validPassword = await bcrypt.compare(password, user ? user.password_hash : DUMMY);
 
     if (!user || !validPassword) throw new BusinessError(401, '账号或密码错误');
     if (user.status !== USER_STATUS.ACTIVE) throw new BusinessError(403, '账号已被禁用');
 
-    await conn.query('UPDATE `user` SET last_login_time = NOW() WHERE id = ?', [user.id]);
+    await conn.query('UPDATE `users` SET last_login_at = NOW() WHERE id = ?', [user.id]);
 
     const token = generateToken(user);
     logger.info('[Auth] 登录成功', { userId: user.id });
@@ -102,7 +110,7 @@ export async function loginByCode({ phone, email, username, code }) {
 
   const conn = await db.getConnection();
   try {
-    // 根据验证渠道查找用户：手机验证→按手机查，邮箱验证→按邮箱查，否则按用户名
+    // 根据验证渠道查找用户：手机验证→按手机查，邮箱验证→按邮箱查，否则按昵称
     let identifier, idField;
     if (phone) {
       identifier = phone;
@@ -112,17 +120,17 @@ export async function loginByCode({ phone, email, username, code }) {
       idField = 'email';
     } else if (username) {
       identifier = username;
-      idField = 'username';
+      idField = 'nickname';
     } else {
       throw new BusinessError(400, '请提供手机号、邮箱或用户名');
     }
 
-    // 白名单校验 idField 防动态列名注入（即使当前代码安全，加固未来重构）
-    const ALLOWED = ['phone', 'email', 'username'];
+    // 白名单校验 idField 防动态列名注入
+    const ALLOWED = ['phone', 'email', 'nickname'];
     if (!ALLOWED.includes(idField)) throw new BusinessError(400, '请提供手机号、邮箱或用户名');
 
     const [users] = await conn.query(
-      `SELECT id, tenant_id, role, nickname, status FROM \`user\` WHERE ${idField} = ?`,
+      `SELECT id, role, nickname, status FROM \`users\` WHERE ${idField} = ?`,
       [identifier],
     );
 
@@ -131,7 +139,7 @@ export async function loginByCode({ phone, email, username, code }) {
 
     if (user.status !== USER_STATUS.ACTIVE) throw new BusinessError(403, '账号已被禁用');
 
-    await conn.query('UPDATE `user` SET last_login_time = NOW() WHERE id = ?', [user.id]);
+    await conn.query('UPDATE `users` SET last_login_at = NOW() WHERE id = ?', [user.id]);
 
     const token = generateToken(user);
     logger.info('[Auth] 验证码登录成功', { userId: user.id });
@@ -152,27 +160,29 @@ export async function resetPassword({ phone, email, newPassword, code }) {
     if (!result.valid) throw new BusinessError(400, result.reason || '验证码无效');
   } else if (email) {
     await emailService.verifyCode(email, code); // throws on invalid
+  } else {
+    throw new BusinessError(400, '请提供手机号或邮箱');
   }
 
   const conn = await db.getConnection();
   try {
-    const username = phone || email || '';
-    if (!username) throw new BusinessError(400, '请提供手机号或邮箱');
+    const identifier = phone || email || '';
+    const idField = phone ? 'phone' : 'email';
 
     const passwordHash = await bcrypt.hash(newPassword, 12);
     const [result] = await conn.query(
-      'UPDATE `user` SET password = ? WHERE username = ?',
-      [passwordHash, username],
+      `UPDATE \`users\` SET password_hash = ? WHERE ${idField} = ?`,
+      [passwordHash, identifier],
     );
 
     if (result.affectedRows === 0) throw new BusinessError(400, '密码重置失败，请检查输入信息');
     // Revoke all existing tokens after password reset
-    const [userRow] = await conn.query('SELECT id FROM `user` WHERE username = ?', [username]);
+    const [userRow] = await conn.query(`SELECT id FROM \`users\` WHERE ${idField} = ?`, [identifier]);
     if (userRow.length > 0) {
       const { revokeAllUserTokens } = await import('../utils/jwtToken.js');
       await revokeAllUserTokens(userRow[0].id);
     }
-    logger.info('[Auth] 密码重置成功', { userId: userRow[0]?.id, username });
+    logger.info('[Auth] 密码重置成功', { userId: userRow[0]?.id });
     return { message: '密码重置成功' };
   } finally {
     conn.release();
@@ -183,7 +193,7 @@ export async function getUserProfile(userId) {
   const conn = await db.getConnection();
   try {
     const [rows] = await conn.query(
-      'SELECT id, phone, email, nickname, avatar, role, status, create_time, last_login_time FROM `user` WHERE id = ?',
+      'SELECT id, phone, email, nickname, avatar_url, role, status, created_at, last_login_at FROM `users` WHERE id = ?',
       [userId],
     );
     if (rows.length === 0) throw new BusinessError(404, '用户不存在');

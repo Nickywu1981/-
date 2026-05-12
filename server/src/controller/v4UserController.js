@@ -13,7 +13,7 @@ export const getProfile = wrapController(async (req, res) => {
   const conn = await db.getConnection();
   try {
     const [users] = await conn.query(
-      'SELECT id, nickname, phone, email, avatar, role, create_time FROM `user` WHERE id = ?',
+      'SELECT id, nickname, phone, email, avatar_url, role, created_at FROM `users` WHERE id = ?',
       [req.user.id],
     );
     if (users.length === 0) throw new BusinessError(ERROR_CODE.NOT_FOUND, '用户不存在');
@@ -73,7 +73,7 @@ export const updateProfile = wrapController(async (req, res) => {
   const conn = await db.getConnection();
   try {
     await conn.query(
-      `UPDATE \`user\` SET ${updates.join(', ')} WHERE id = ?`,
+      `UPDATE \`users\` SET ${updates.join(', ')} WHERE id = ?`,
       [...params, req.user.id],
     );
     return success(res, {}, '资料已更新');
@@ -88,16 +88,16 @@ export const changePassword = wrapController(async (req, res) => {
   const conn = await db.getConnection();
   try {
     const [users] = await conn.query(
-      'SELECT password FROM `user` WHERE id = ?',
+      'SELECT password_hash FROM `users` WHERE id = ?',
       [req.user.id],
     );
     if (users.length === 0) throw new BusinessError(ERROR_CODE.NOT_FOUND, '用户不存在');
 
-    const valid = await bcrypt.compare(oldPassword, users[0].password);
+    const valid = await bcrypt.compare(oldPassword, users[0].password_hash);
     if (!valid) throw new BusinessError(ERROR_CODE.PARAM_INVALID, '原密码不正确');
 
     const hash = await bcrypt.hash(newPassword, 12);
-    await conn.query('UPDATE `user` SET password = ? WHERE id = ?', [hash, req.user.id]);
+    await conn.query('UPDATE `users` SET password_hash = ? WHERE id = ?', [hash, req.user.id]);
 
     const { revokeAllUserTokens } = await import('../utils/jwtToken.js');
     await revokeAllUserTokens(req.user.id);

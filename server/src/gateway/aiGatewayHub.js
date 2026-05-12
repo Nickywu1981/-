@@ -21,6 +21,8 @@ import * as tokenStatsDao from '../dao/tokenStatsDao.js';
 import * as modelConfigDao from '../dao/modelConfigDao.js';
 import { dispatch as _dispatch } from '../services/modelDispatcher.js';
 import * as _modelRouter from '../services/model-router.service.js';
+import { manageContextWindow, saveBudgetLog } from '../services/contextWindowService.js';
+import * as ltmService from '../services/longTermMemoryService.js';
 
 // ==================== 统一调用上下文 ====================
 
@@ -70,6 +72,27 @@ export async function gatewayInfer(modelId, input, ctx = {}) {
 
   const pricing = await tokenPricingDao.getActiveByKey(modelId);
   const model = listModels().find((m) => m.id === modelId);
+
+  // ── 上下文窗口管理（Pre-invoke）──
+  let cwResult = null;
+  if (ctx.enableContextWindow !== false && typeof input === 'string') {
+    try {
+      cwResult = await manageContextWindow({
+        modelId,
+        userInput: input,
+        historyMessages: ctx.historyMessages || [],
+        ragContent: ctx.ragContent || '',
+        sessionId: ctx.sessionId,
+        importanceMap: ctx.importanceMap || {},
+      });
+      // 如果有分块，先不分块，由调用方自行处理
+      if (cwResult?.budget?.overflow > 0) {
+        logger.warn(`[Gateway] Context overflow: ${cwResult.budget.overflow} tokens, strategy: ${cwResult.strategy}`);
+      }
+    } catch (e) {
+      logger.warn(`[Gateway] ContextWindow failed: ${e.message}`);
+    }
+  }
 
   let result, status = 'success', errorMsg = '';
   try {
@@ -140,6 +163,32 @@ export async function gatewayInfer(modelId, input, ctx = {}) {
       tokensIn: effectiveTokensIn, tokensOut: effectiveTokensOut,
       cost: cost.amount, isError: false, latencyMs,
     }).catch((e) => logger.warn(`[Gateway] 聚合写入失败: ${e.message}`));
+  }
+
+  // ── 长期记忆自动存储（Post-invoke）──
+  if (ctx.enableLTM !== false && context.userId && status === 'success') {
+    try {
+      const callId = null; // logCall doesn't return id in current impl
+      if (cwResult?.budget) {
+        saveBudgetLog(ctx.sessionId, cwResult.budget, callId).catch(() => {});
+      }
+      // 自动记住关键交互
+      const userInputSnippet = typeof input === 'string' ? input.slice(0, 500) : '';
+      const outputSnippet = typeof result.output === 'string' ? result.output.slice(0, 500) : '';
+      if (userInputSnippet && outputSnippet) {
+        ltmService.store({
+          namespace: 'user', subjectId: String(context.userId),
+          memoryKey: `call_${Date.now()}`,
+          content: `[Q] ${userInputSnippet}\n[A] ${outputSnippet}`,
+          memoryType: 'conversation', importance: 0.3,
+          source: ctx.sessionId || 'gateway',
+          tags: [modelId, context.taskType].filter(Boolean),
+          metadata: { modelId, tokensIn: effectiveTokensIn, tokensOut: effectiveTokensOut, cost: cost.amount },
+        }).catch(() => {});
+      }
+    } catch (e) {
+      logger.warn(`[Gateway] LTM auto-store failed: ${e.message}`);
+    }
   }
 
   return {
