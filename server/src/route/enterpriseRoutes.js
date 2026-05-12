@@ -13,7 +13,6 @@ import { validateV4 as _validate } from '../utils/validate.js';
 import { authMiddleware, enterpriseOnly } from '../middleware/auth.js';
 import { roleGuard } from '../middleware/rbac.js';
 import { authLimiter } from '../middleware/rateLimiter.js';
-import { setCsrfCookie, csrfProtection } from '../middleware/csrf.js';
 import * as ctrl from '../controller/enterpriseController.js';
 
 const router = Router();
@@ -77,10 +76,10 @@ const usageQuerySchema = z.object({
 // ==================== 公开路由（无需认证） ====================
 
 // 企业入驻 — 限流 + 校验 + CSRF
-router.post('/register', authLimiter, csrfProtection, _validate(registerSchema), ctrl.registerEnterprise);
+router.post('/register', authLimiter, _validate(registerSchema), ctrl.registerEnterprise);
 
 // 企业登录 — 限流 + 校验 + CSRF
-router.post('/login', authLimiter, setCsrfCookie, _validate(loginSchema), ctrl.loginEnterprise);
+router.post('/login', authLimiter, _validate(loginSchema), ctrl.loginEnterprise);
 
 // 企业退出 — 吊销所有 token
 router.post('/logout', authMiddleware, enterpriseOnly, ctrl.logoutEnterprise);
@@ -93,13 +92,13 @@ router.use(authMiddleware, enterpriseOnly);
 
 // 企业信息 — CSRF 保护所有变更操作
 router.get('/profile', ctrl.getProfile);
-router.put('/profile', roleGuard('enterprise_admin'), csrfProtection, _validate(updateProfileSchema), ctrl.updateProfile);
+router.put('/profile', roleGuard('enterprise_admin'), _validate(updateProfileSchema), ctrl.updateProfile);
 
 // 子账号管理
 router.get('/users', ctrl.listUsers);
-router.post('/users', roleGuard('enterprise_admin'), csrfProtection, _validate(addUserSchema), ctrl.addUser);
-router.put('/users/:id', roleGuard('enterprise_admin'), csrfProtection, _validate(updateUserSchema), ctrl.updateUser);
-router.delete('/users/:id', roleGuard('enterprise_admin'), csrfProtection, ctrl.removeUser);
+router.post('/users', roleGuard('enterprise_admin'), _validate(addUserSchema), ctrl.addUser);
+router.put('/users/:id', roleGuard('enterprise_admin'), _validate(updateUserSchema), ctrl.updateUser);
+router.delete('/users/:id', roleGuard('enterprise_admin'), ctrl.removeUser);
 
 // 仪表盘 & 用量（读操作无需 CSRF）
 router.get('/dashboard', ctrl.getDashboard);
@@ -107,6 +106,6 @@ router.get('/usage', _validate(usageQuerySchema), ctrl.getUsage);
 
 // 白标配置
 router.get('/whitelabel', ctrl.getWhiteLabel);
-router.put('/whitelabel', roleGuard('enterprise_admin'), csrfProtection, _validate(updateWhiteLabelSchema), ctrl.updateWhiteLabel);
+router.put('/whitelabel', roleGuard('enterprise_admin'), _validate(updateWhiteLabelSchema), ctrl.updateWhiteLabel);
 
 export default router;

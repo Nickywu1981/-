@@ -12,7 +12,6 @@ import { validateV4 as _validate } from '../utils/validate.js';
 import { authMiddleware, enterpriseOnly, requireAgent } from '../middleware/auth.js';
 import { requireRole } from '../middleware/rbac.js';
 import { paymentLimiter } from '../middleware/rateLimiter.js';
-import { setCsrfCookie, csrfProtection } from '../middleware/csrf.js';
 import * as ctrl from '../controller/financeController.js';
 
 const router = Router();
@@ -45,8 +44,8 @@ router.use(authMiddleware, enterpriseOnly);
 
 // ==================== 收款账户 ====================
 router.get('/bank-accounts', ctrl.listBankAccounts);
-router.post('/bank-account', paymentLimiter, csrfProtection, _validate(bankAccountSchema), ctrl.addBankAccount);
-router.delete('/bank-accounts/:id', paymentLimiter, csrfProtection, ctrl.removeBankAccount);
+router.post('/bank-account', paymentLimiter, _validate(bankAccountSchema), ctrl.addBankAccount);
+router.delete('/bank-accounts/:id', paymentLimiter, ctrl.removeBankAccount);
 
 // ==================== 账户流水 ====================
 router.get('/ledger', ctrl.listLedger);
@@ -60,14 +59,14 @@ router.get('/earnings', requireAgent, ctrl.listEarnings);
 
 // ==================== 提现（仅代理） ====================
 router.get('/withdrawal', requireAgent, ctrl.listWithdrawals);
-router.post('/withdrawal', requireAgent, paymentLimiter, csrfProtection, _validate(withdrawalSchema), ctrl.createWithdrawal);
+router.post('/withdrawal', requireAgent, paymentLimiter, _validate(withdrawalSchema), ctrl.createWithdrawal);
 router.get('/withdrawal/:id', requireAgent, ctrl.getWithdrawalDetail);
 
 // ==================== 分润政策（仅代理） ====================
 router.get('/policy', requireAgent, ctrl.getCommissionPolicy);
-router.put('/policy', requireAgent, requireRole('agent_admin'), paymentLimiter, csrfProtection, _validate(commissionPolicySchema), ctrl.updateCommissionPolicy);
+router.put('/policy', requireAgent, requireRole('agent_admin'), paymentLimiter, _validate(commissionPolicySchema), ctrl.updateCommissionPolicy);
 
 // ==================== 财务仪表盘 ====================
-router.get('/dashboard', setCsrfCookie, ctrl.getFinanceDashboard);
+router.get('/dashboard', ctrl.getFinanceDashboard);
 
 export default router;

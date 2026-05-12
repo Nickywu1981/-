@@ -10,7 +10,6 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { validateV4 } from '../utils/validate.js';
 import { authMiddleware, enterpriseOnly } from '../middleware/auth.js';
-import { csrfProtection } from '../middleware/csrf.js';
 import { rateLimiter } from '../middleware/rateLimiter.js';
 import * as ctrl from '../controller/customerController.js';
 
@@ -45,13 +44,13 @@ router.get('/:id', ctrl.getCustomerDetail);
 
 // 标签管理 (挂载后: GET/POST /api/enterprise/customers/tags)
 router.get('/tags', ctrl.listTags);
-router.post('/tags', csrfProtection, validateV4(createTagSchema), ctrl.createTag);
-router.put('/tags/:id', csrfProtection, validateV4(updateTagSchema), ctrl.updateTag);
-router.delete('/tags/:id', csrfProtection, ctrl.deleteTag);
+router.post('/tags', validateV4(createTagSchema), ctrl.createTag);
+router.put('/tags/:id', validateV4(updateTagSchema), ctrl.updateTag);
+router.delete('/tags/:id', ctrl.deleteTag);
 
 // 打标操作
-router.post('/tags/:tagId/customers', csrfProtection, validateV4(tagUserSchema), ctrl.tagCustomer);
-router.delete('/tags/:tagId/customers', csrfProtection, validateV4(tagUserSchema), ctrl.untagCustomer);
-router.post('/tags/:tagId/batch', csrfProtection, validateV4(batchTagSchema), ctrl.batchTagCustomers);
+router.post('/tags/:tagId/customers', validateV4(tagUserSchema), ctrl.tagCustomer);
+router.delete('/tags/:tagId/customers', validateV4(tagUserSchema), ctrl.untagCustomer);
+router.post('/tags/:tagId/batch', validateV4(batchTagSchema), ctrl.batchTagCustomers);
 
 export default router;

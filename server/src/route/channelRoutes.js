@@ -3,7 +3,6 @@ import { z } from 'zod';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { authMiddleware, enterpriseOnly } from '../middleware/auth.js';
 import { roleGuard } from '../middleware/rbac.js';
-import { csrfProtection } from '../middleware/csrf.js';
 import { rateLimiter } from '../middleware/rateLimiter.js';
 import * as ctrl from '../controller/channelController.js';
 
@@ -58,15 +57,15 @@ router.use(authMiddleware, rateLimiter, enterpriseOnly);
 
 router.get('/relations', ctrl.listChannels);
 router.get('/relations/:id', ctrl.getChannelDetail);
-router.post('/relations', csrfProtection, _validate(applySchema), ctrl.applyChannel);
-router.put('/relations/:id/audit', roleGuard('enterprise_admin'), csrfProtection, _validate(auditSchema), ctrl.auditChannel);
+router.post('/relations', _validate(applySchema), ctrl.applyChannel);
+router.put('/relations/:id/audit', roleGuard('enterprise_admin'), _validate(auditSchema), ctrl.auditChannel);
 router.get('/downstream', ctrl.getDownstreamAgents);
 
 // ==================== 分润政策 ====================
 
 router.get('/policies', ctrl.listPolicies);
-router.post('/policies', roleGuard('enterprise_admin'), csrfProtection, _validate(policySchema), ctrl.createPolicy);
-router.put('/policies/:id', roleGuard('enterprise_admin'), csrfProtection, _validate(policyUpdateSchema), ctrl.updatePolicy);
+router.post('/policies', roleGuard('enterprise_admin'), _validate(policySchema), ctrl.createPolicy);
+router.put('/policies/:id', roleGuard('enterprise_admin'), _validate(policyUpdateSchema), ctrl.updatePolicy);
 
 // ==================== 渠道业绩 ====================
 

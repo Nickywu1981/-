@@ -7,7 +7,6 @@ import { z } from 'zod';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { authLimiter } from '../middleware/rateLimiter.js';
 import { optionalAuth } from '../middleware/auth.js';
-import { csrfProtection } from '../middleware/csrf.js';
 import * as ctrl from '../controller/v4AuthController.js';
 
 const router = Router();
@@ -48,6 +47,6 @@ router.post('/register', authLimiter, _validate(registerSchema), ctrl.register);
 router.post('/login', authLimiter, _validate(loginSchema), ctrl.login);
 router.post('/login-by-code', authLimiter, _validate(loginByCodeSchema), ctrl.loginByCode);
 router.post('/reset-password', authLimiter, _validate(resetPasswordSchema), ctrl.resetPassword);
-router.post('/logout', authLimiter, csrfProtection, optionalAuth, ctrl.logout);
+router.post('/logout', authLimiter, optionalAuth, ctrl.logout);
 
 export default router;

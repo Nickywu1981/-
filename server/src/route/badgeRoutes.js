@@ -4,7 +4,6 @@ import { listBadges, getBadge, listAllBadges, createBadge, updateBadge, deleteBa
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { rateLimiter } from '../middleware/rateLimiter.js';
 import { cacheMiddleware } from '../middleware/cache.js';
-import { csrfProtection } from '../middleware/csrf.js';
 import { validate, idParamSchema } from '../utils/validate.js';
 
 const router = Router();
@@ -29,8 +28,8 @@ router.get('/:id', authMiddleware, rateLimiter, validate(idParamSchema, 'params'
 
 // 管理端：CRUD
 router.get('/admin/all', authMiddleware, rateLimiter, adminAuth, validate(badgeQuerySchema, 'query'), listAllBadges);
-router.post('/admin', authMiddleware, rateLimiter, adminAuth, csrfProtection, validate(badgeSchema), createBadge);
-router.put('/admin/:id', authMiddleware, rateLimiter, adminAuth, csrfProtection, validate(idParamSchema, 'params'), validate(badgeSchema.partial()), updateBadge);
-router.delete('/admin/:id', authMiddleware, rateLimiter, adminAuth, csrfProtection, validate(idParamSchema, 'params'), deleteBadge);
+router.post('/admin', authMiddleware, rateLimiter, adminAuth, validate(badgeSchema), createBadge);
+router.put('/admin/:id', authMiddleware, rateLimiter, adminAuth, validate(idParamSchema, 'params'), validate(badgeSchema.partial()), updateBadge);
+router.delete('/admin/:id', authMiddleware, rateLimiter, adminAuth, validate(idParamSchema, 'params'), deleteBadge);
 
 export default router;
