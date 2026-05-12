@@ -90,11 +90,10 @@ fetch('/api/open/v1/image/remove-bg', {
 </template>
 
 <script setup lang="ts">
-
-const { confirm } = useConfirm()
 import { api } from '@/composables/useApi'
 import { formatDateTime } from '@/utils/format'
 
+const { confirm } = useConfirm()
 const toast = useToast()
 
 const keys = ref<any[]>([])
