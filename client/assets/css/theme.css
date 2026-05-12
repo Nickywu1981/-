@@ -10,6 +10,7 @@
   --bg-header: rgba(255,255,255,0.85);
   --white: #ffffff;
   --text-on-brand: #ffffff;
+  --text-inverse: #ffffff;
   --bg-footer: #f8f9fb;
   --bg-input: #f8f9fb;
   --bg-hover: #f1f3f8;
@@ -203,6 +204,7 @@
   --bg-overlay: rgba(0, 0, 0, 0.7);
   --white: #ffffff;
   --text-on-brand: #ffffff;
+  --text-inverse: #ffffff;
 
   --text-primary: #e8eaf0;
   --text-secondary: #8b90a5;
