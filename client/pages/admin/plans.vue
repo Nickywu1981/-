@@ -1,56 +1,56 @@
 <template>
   <AdminLayout>
     <div class="page-header">
-      <h2 class="ptitle">套餐配置</h2>
+      <h2 class="ptitle">{{ $t('admin_plans.page_title') }}</h2>
       <button class="btn btn--primary" @click="openCreate">
-        <span class="btn-icon">+</span> 新建套餐
+        {{ $t('admin_plans.new_plan') }}
       </button>
     </div>
 
     <div class="toolbar">
       <div class="search-box">
         <span class="search-icon">🔍</span>
-        <input v-model="searchQuery" placeholder="搜索套餐名称..." class="search-input" @input="onSearch" />
+        <input v-model="searchQuery" :placeholder="$t('admin_plans.search_placeholder')" class="search-input" @input="onSearch" />
       </div>
       <select v-model="filterType" class="filter-select" @change="fetchPlans">
-        <option value="">全部类型</option>
-        <option value="0">免费版</option>
-        <option value="1">月卡</option>
-        <option value="2">季卡</option>
-        <option value="3">年卡</option>
+        <option value="">{{ $t('admin_plans.all_types') }}</option>
+        <option value="0">{{ $t('admin_plans.type_free') }}</option>
+        <option value="1">{{ $t('admin_plans.type_monthly') }}</option>
+        <option value="2">{{ $t('admin_plans.type_quarterly') }}</option>
+        <option value="3">{{ $t('admin_plans.type_yearly') }}</option>
       </select>
     </div>
 
     <div v-if="isLoading" class="loading-state"><LoadingSkeleton :rows="3" /></div>
-    <div v-else-if="!plans.length" class="empty-state">暂无套餐数据，点击"新建套餐"创建</div>
+    <div v-else-if="!plans.length" class="empty-state">{{ $t('admin_plans.empty') }}</div>
     <div v-else class="plan-grid">
       <div v-for="plan in plans" :key="plan.id" class="plan-card" :class="{ disabled: !plan.status }">
         <div class="plan-header">
           <span class="plan-type">{{ planTypeLabel(plan.plan_type) }}</span>
           <div class="plan-actions">
-            <button class="act-btn toggle-btn" :class="{ off: !plan.status }" :aria-label="plan.status ? '已启用，点击禁用' : '已禁用，点击启用'" @click="toggleStatus(plan)" :title="plan.status ? '禁用' : '启用'">>
+            <button class="act-btn toggle-btn" :class="{ off: !plan.status }" :aria-label="plan.status ? $t('admin_plans.toggle_disable_aria') : $t('admin_plans.toggle_enable_aria')" @click="toggleStatus(plan)" :title="plan.status ? $t('admin_plans.toggle_disable_title') : $t('admin_plans.toggle_enable_title')">
               {{ plan.status ? '🟢' : '🔴' }}
             </button>
-            <button class="act-btn del-btn" aria-label="删除套餐" @click="confirmDelete(plan)" title="删除">🗑</button>
+            <button class="act-btn del-btn" :aria-label="$t('admin_plans.delete_aria')" @click="confirmDelete(plan)" :title="$t('admin_plans.delete_title')">🗑</button>
           </div>
         </div>
         <div class="plan-body">
-          <div class="row"><span>套餐名:</span> <input v-model="plan.name" maxlength="100" /></div>
-          <div class="row"><span>售价:</span> <input v-model.number="plan.price" type="number" min="0" /> 元</div>
-          <div class="row"><span>原价:</span> <input v-model.number="plan.original_price" type="number" min="0" /> 元</div>
-          <div class="row"><span>月点数:</span> <input v-model.number="plan.credits" type="number" min="0" /></div>
-          <div class="row"><span>日赠送:</span> <input v-model.number="plan.daily_credits" type="number" min="0" /></div>
-          <div class="row"><span>批量上限:</span> <input v-model.number="plan.batch_limit" type="number" min="0" /></div>
-          <div class="row"><span>保存天数:</span> <input v-model.number="plan.save_days" type="number" min="0" /></div>
+          <div class="row"><span>{{ $t('admin_plans.plan_name') }}:</span> <input v-model="plan.name" maxlength="100" /></div>
+          <div class="row"><span>{{ $t('admin_plans.price') }}:</span> <input v-model.number="plan.price" type="number" min="0" /> {{ $t('admin_plans.yuan') }}</div>
+          <div class="row"><span>{{ $t('admin_plans.original_price') }}:</span> <input v-model.number="plan.original_price" type="number" min="0" /> {{ $t('admin_plans.yuan') }}</div>
+          <div class="row"><span>{{ $t('admin_plans.monthly_credits') }}:</span> <input v-model.number="plan.credits" type="number" min="0" /></div>
+          <div class="row"><span>{{ $t('admin_plans.daily_credits') }}:</span> <input v-model.number="plan.daily_credits" type="number" min="0" /></div>
+          <div class="row"><span>{{ $t('admin_plans.batch_limit') }}:</span> <input v-model.number="plan.batch_limit" type="number" min="0" /></div>
+          <div class="row"><span>{{ $t('admin_plans.save_days') }}:</span> <input v-model.number="plan.save_days" type="number" min="0" /></div>
           <div class="checks">
-            <label><input v-model="plan.watermark_free" type="checkbox" :true-value="1" :false-value="0" /> 去水印</label>
-            <label><input v-model="plan.hd_export" type="checkbox" :true-value="1" :false-value="0" /> 高清导出</label>
-            <label><input v-model="plan.brand_kit" type="checkbox" :true-value="1" :false-value="0" /> BrandKit</label>
-            <label><input v-model="plan.priority_queue" type="checkbox" :true-value="1" :false-value="0" /> 优先队列</label>
+            <label><input v-model="plan.watermark_free" type="checkbox" :true-value="1" :false-value="0" /> {{ $t('admin_plans.watermark_free') }}</label>
+            <label><input v-model="plan.hd_export" type="checkbox" :true-value="1" :false-value="0" /> {{ $t('admin_plans.hd_export') }}</label>
+            <label><input v-model="plan.brand_kit" type="checkbox" :true-value="1" :false-value="0" /> {{ $t('admin_plans.brand_kit') }}</label>
+            <label><input v-model="plan.priority_queue" type="checkbox" :true-value="1" :false-value="0" /> {{ $t('admin_plans.priority_queue') }}</label>
           </div>
         </div>
         <div class="plan-footer">
-          <button class="btn-save" :disabled="saving === plan.id" @click="savePlan(plan)">{{ saving === plan.id ? '保存中...' : '保存' }}</button>
+          <button class="btn-save" :disabled="saving === plan.id" @click="savePlan(plan)">{{ saving === plan.id ? $t('common.saving') : $t('common.save') }}</button>
         </div>
       </div>
     </div>
@@ -60,30 +60,30 @@
     <!-- Create Modal -->
     <div v-if="showCreate" class="modal-overlay" @click.self="showCreate = false">
       <div class="modal">
-        <div class="modal-header"><h3>新建套餐</h3><button class="modal-close" aria-label="关闭" @click="showCreate = false">✕</button></div>
+        <div class="modal-header"><h3>{{ $t('admin_plans.create_modal') }}</h3><button class="modal-close" :aria-label="$t('common.close')" @click="showCreate = false">✕</button></div>
         <div class="modal-body">
-          <div class="row"><span>套餐名:</span> <input v-model="newPlan.name" maxlength="100" /></div>
-          <div class="row"><span>类型:</span>
+          <div class="row"><span>{{ $t('admin_plans.plan_name') }}:</span> <input v-model="newPlan.name" maxlength="100" /></div>
+          <div class="row"><span>{{ $t('admin_plans.plan_type') }}:</span>
             <select v-model.number="newPlan.plan_type">
-              <option :value="0">免费版</option><option :value="1">月卡</option><option :value="2">季卡</option><option :value="3">年卡</option>
+              <option :value="0">{{ $t('admin_plans.type_free') }}</option><option :value="1">{{ $t('admin_plans.type_monthly') }}</option><option :value="2">{{ $t('admin_plans.type_quarterly') }}</option><option :value="3">{{ $t('admin_plans.type_yearly') }}</option>
             </select>
           </div>
-          <div class="row"><span>售价:</span> <input v-model.number="newPlan.price" type="number" min="0" /></div>
-          <div class="row"><span>原价:</span> <input v-model.number="newPlan.original_price" type="number" min="0" /></div>
-          <div class="row"><span>月点数:</span> <input v-model.number="newPlan.credits" type="number" min="0" /></div>
-          <div class="row"><span>日赠送:</span> <input v-model.number="newPlan.daily_credits" type="number" min="0" /></div>
-          <div class="row"><span>批量上限:</span> <input v-model.number="newPlan.batch_limit" type="number" min="0" /></div>
-          <div class="row"><span>保存天数:</span> <input v-model.number="newPlan.save_days" type="number" min="0" /></div>
+          <div class="row"><span>{{ $t('admin_plans.price') }}:</span> <input v-model.number="newPlan.price" type="number" min="0" /></div>
+          <div class="row"><span>{{ $t('admin_plans.original_price') }}:</span> <input v-model.number="newPlan.original_price" type="number" min="0" /></div>
+          <div class="row"><span>{{ $t('admin_plans.monthly_credits') }}:</span> <input v-model.number="newPlan.credits" type="number" min="0" /></div>
+          <div class="row"><span>{{ $t('admin_plans.daily_credits') }}:</span> <input v-model.number="newPlan.daily_credits" type="number" min="0" /></div>
+          <div class="row"><span>{{ $t('admin_plans.batch_limit') }}:</span> <input v-model.number="newPlan.batch_limit" type="number" min="0" /></div>
+          <div class="row"><span>{{ $t('admin_plans.save_days') }}:</span> <input v-model.number="newPlan.save_days" type="number" min="0" /></div>
           <div class="checks">
-            <label><input v-model="newPlan.watermark_free" type="checkbox" :true-value="1" :false-value="0" /> 去水印</label>
-            <label><input v-model="newPlan.hd_export" type="checkbox" :true-value="1" :false-value="0" /> 高清导出</label>
-            <label><input v-model="newPlan.brand_kit" type="checkbox" :true-value="1" :false-value="0" /> BrandKit</label>
-            <label><input v-model="newPlan.priority_queue" type="checkbox" :true-value="1" :false-value="0" /> 优先队列</label>
+            <label><input v-model="newPlan.watermark_free" type="checkbox" :true-value="1" :false-value="0" /> {{ $t('admin_plans.watermark_free') }}</label>
+            <label><input v-model="newPlan.hd_export" type="checkbox" :true-value="1" :false-value="0" /> {{ $t('admin_plans.hd_export') }}</label>
+            <label><input v-model="newPlan.brand_kit" type="checkbox" :true-value="1" :false-value="0" /> {{ $t('admin_plans.brand_kit') }}</label>
+            <label><input v-model="newPlan.priority_queue" type="checkbox" :true-value="1" :false-value="0" /> {{ $t('admin_plans.priority_queue') }}</label>
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn-cancel" @click="showCreate = false">取消</button>
-          <button class="btn-confirm" :disabled="creating" @click="createPlan">{{ creating ? '创建中...' : '确认创建' }}</button>
+          <button class="btn-cancel" @click="showCreate = false">{{ $t('common.cancel') }}</button>
+          <button class="btn-confirm" :disabled="creating" @click="createPlan">{{ creating ? $t('admin_plans.creating') : $t('admin_plans.create_btn') }}</button>
         </div>
       </div>
     </div>
@@ -91,11 +91,11 @@
     <!-- Delete Confirm -->
     <div v-if="showDelete" class="modal-overlay" @click.self="showDelete = false">
       <div class="modal modal-sm">
-        <div class="modal-header"><h3>确认删除</h3></div>
-        <div class="modal-body"><p>确定要删除套餐「{{ deleteTarget?.name }}」吗？此操作不可恢复。</p></div>
+        <div class="modal-header"><h3>{{ $t('admin_plans.confirm_delete_title') }}</h3></div>
+        <div class="modal-body"><p>{{ $t('admin_plans.confirm_delete_desc', { name: deleteTarget?.name }) }}</p></div>
         <div class="modal-footer">
-          <button class="btn-cancel" @click="showDelete = false">取消</button>
-          <button class="btn-confirm btn-danger" :disabled="deleting" @click="doDelete">{{ deleting ? '删除中...' : '确认删除' }}</button>
+          <button class="btn-cancel" @click="showDelete = false">{{ $t('common.cancel') }}</button>
+          <button class="btn-confirm btn-danger" :disabled="deleting" @click="doDelete">{{ deleting ? $t('admin_plans.deleting') : $t('admin_plans.delete_btn') }}</button>
         </div>
       </div>
     </div>
@@ -107,6 +107,8 @@
 <script setup lang="ts">
 
 import AdminLayout from '~/components/AdminLayout.vue';
+
+const { t } = useI18n();
 
 const plans = ref<any[]>([]);
 const saving = ref(0);
@@ -130,9 +132,15 @@ const newPlan = ref({
   watermark_free: 0, hd_export: 0, brand_kit: 0, priority_queue: 0, status: 1,
 });
 
-function planTypeLabel(t: number) {
-  const m: Record<number, string> = { 0: '免费版', 1: '月卡', 2: '季卡', 3: '年卡' };
-  return m[t] || '未知';
+const planTypeLabels: Record<number, string> = {
+  0: 'admin_plans.type_free',
+  1: 'admin_plans.type_monthly',
+  2: 'admin_plans.type_quarterly',
+  3: 'admin_plans.type_yearly',
+};
+
+function planTypeLabel(type: number) {
+  return planTypeLabels[type] ? t(planTypeLabels[type]) : t('admin_plans.type_unknown');
 }
 const toast = useToast()
 
@@ -147,7 +155,7 @@ async function fetchPlans() {
     const res: any = await $fetch(`/api/admin/plans?${params}`);
     plans.value = res.data?.list || res.data || [];
     total.value = res.data?.total || plans.value.length;
-  } catch(e: any) { toast.error(e?.data?.msg || '加载失败') }
+  } catch(e: any) { toast.error(e?.data?.msg || t('common.loadFail')) }
   isLoading.value = false;
 }
 
@@ -163,8 +171,8 @@ async function savePlan(plan: any) {
         brand_kit: plan.brand_kit, priority_queue: plan.priority_queue, status: plan.status,
       },
     });
-    showMsg('已保存');
-  } catch (e: any) { msg.value = e?.data?.msg || '保存失败'; }
+    showMsg(t('admin_plans.saved'));
+  } catch (e: any) { msg.value = e?.data?.msg || t('common.save_failed'); }
   saving.value = 0;
 }
 
@@ -179,9 +187,9 @@ async function createPlan() {
   creating.value = true;
   try {
     await $fetch('/api/admin/plans', { method: 'POST', body: newPlan.value });
-    showCreate.value = false; showMsg('套餐已创建');
+    showCreate.value = false; showMsg(t('admin_plans.plan_created'));
     fetchPlans();
-  } catch (e: any) { msg.value = e?.data?.msg || '创建失败'; }
+  } catch (e: any) { msg.value = e?.data?.msg || t('common.save_failed'); }
   creating.value = false;
 }
 
@@ -191,9 +199,9 @@ async function doDelete() {
   if (!deleteTarget.value) return; deleting.value = true;
   try {
     await $fetch(`/api/admin/plans/${deleteTarget.value.id}`, { method: 'DELETE' });
-    showDelete.value = false; showMsg('套餐已删除');
+    showDelete.value = false; showMsg(t('admin_plans.plan_deleted'));
     fetchPlans();
-  } catch (e: any) { msg.value = e?.data?.msg || '删除失败'; }
+  } catch (e: any) { msg.value = e?.data?.msg || t('common.delete_failed'); }
   deleting.value = false;
 }
 

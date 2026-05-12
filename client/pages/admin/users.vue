@@ -1,26 +1,26 @@
 <template>
   <AdminLayout>
     <div class="page-header">
-      <h2>用户管理</h2>
+      <h2>{{ $t('admin_users.page_title') }}</h2>
       <div class="header-actions">
-        <button class="btn-outline" @click="exportCSV">📥 导出</button>
+        <button class="btn-outline" @click="exportCSV">{{ $t('admin_users.export') }}</button>
       </div>
     </div>
 
     <div class="toolbar">
-      <input v-model="keyword" type="text" placeholder="搜索用户名 / 昵称 / 手机号" @keyup.enter="search" />
+      <input v-model="keyword" type="text" :placeholder="$t('admin_users.search_placeholder')" @keyup.enter="search" />
       <select v-model="filterStatus" class="sel" @change="search">
-        <option value="">全部状态</option>
-        <option value="0">正常</option>
-        <option value="1">禁用</option>
+        <option value="">{{ $t('admin_users.all_statuses') }}</option>
+        <option value="0">{{ $t('admin_users.status_normal') }}</option>
+        <option value="1">{{ $t('admin_users.status_banned') }}</option>
       </select>
       <select v-model="filterPlan" class="sel" @change="search">
-        <option value="">全部会员</option>
-        <option value="0">免费</option><option value="1">月卡</option><option value="2">季卡</option><option value="3">年卡</option>
+        <option value="">{{ $t('admin_users.all_plans') }}</option>
+        <option value="0">{{ $t('admin_users.plan_free') }}</option><option value="1">{{ $t('admin_users.plan_monthly') }}</option><option value="2">{{ $t('admin_users.plan_quarterly') }}</option><option value="3">{{ $t('admin_users.plan_yearly') }}</option>
       </select>
-      <button class="btn" @click="search">搜索</button>
-      <button v-if="selectedIds.size" class="btn-danger" @click="batchToggleStatus(1)">批量禁用 ({{ selectedIds.size }})</button>
-      <button v-if="selectedIds.size" class="btn-outline" @click="batchToggleStatus(0)">批量启用 ({{ selectedIds.size }})</button>
+      <button class="btn" @click="search">{{ $t('common.search') }}</button>
+      <button v-if="selectedIds.size" class="btn-danger" @click="batchToggleStatus(1)">{{ $t('admin_users.batch_disable', { count: selectedIds.size }) }}</button>
+      <button v-if="selectedIds.size" class="btn-outline" @click="batchToggleStatus(0)">{{ $t('admin_users.batch_enable', { count: selectedIds.size }) }}</button>
     </div>
 
     <LoadingSkeleton v-if="loading" type="table" :rows="8" :cols="9" />
@@ -28,7 +28,7 @@
     <div v-else-if="error" class="error-state">
       <span class="error-icon">⚠️</span>
       <p>{{ error }}</p>
-      <button class="retry-btn" @click="fetchData">重试</button>
+      <button class="retry-btn" @click="fetchData">{{ $t('common.retry') }}</button>
     </div>
 
     <template v-else-if="list.length">
@@ -37,7 +37,7 @@
           <thead>
             <tr>
               <th class="cb-col"><input type="checkbox" :checked="allSelected" @change="toggleAll" /></th>
-              <th>ID</th><th>用户名</th><th>昵称</th><th>手机号</th><th>会员</th><th>余额</th><th>状态</th><th>注册时间</th><th>操作</th>
+              <th>{{ $t('common.id') }}</th><th>{{ $t('admin_users.col_username') }}</th><th>{{ $t('admin_users.col_nickname') }}</th><th>{{ $t('admin_users.col_phone') }}</th><th>{{ $t('admin_users.col_plan') }}</th><th>{{ $t('admin_users.col_balance') }}</th><th>{{ $t('admin_users.col_status') }}</th><th>{{ $t('admin_users.col_register_time') }}</th><th>{{ $t('common.action') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -47,14 +47,14 @@
               <td>{{ u.username }}</td>
               <td>{{ u.nickname }}</td>
               <td>{{ u.phone || '-' }}</td>
-              <td>{{ u.plan_type > 0 ? ['', '月卡', '季卡', '年卡'][u.plan_type] : '免费' }}</td>
+              <td>{{ planLabel(u.plan_type) }}</td>
               <td>{{ u.credit_balance ?? 0 }}</td>
-              <td><StatusBadge :variant="u.status === 0 ? 'success' : 'danger'" size="sm">{{ u.status === 0 ? '正常' : '禁用' }}</StatusBadge></td>
+              <td><StatusBadge :variant="u.status === 0 ? 'success' : 'danger'" size="sm">{{ u.status === 0 ? $t('admin_users.status_normal') : $t('admin_users.status_banned') }}</StatusBadge></td>
               <td>{{ u.create_time?.slice(0, 10) }}</td>
               <td class="actions">
-                <button class="btn-sm" @click="openEdit(u)">编辑</button>
-                <button v-if="u.status === 0" class="btn-sm danger" @click="toggleStatus(u, 1)">禁用</button>
-                <button v-else class="btn-sm" @click="toggleStatus(u, 0)">启用</button>
+                <button class="btn-sm" @click="openEdit(u)">{{ $t('common.edit') }}</button>
+                <button v-if="u.status === 0" class="btn-sm danger" @click="toggleStatus(u, 1)">{{ $t('common.disable') }}</button>
+                <button v-else class="btn-sm" @click="toggleStatus(u, 0)">{{ $t('common.enable') }}</button>
               </td>
             </tr>
           </tbody>
@@ -62,29 +62,29 @@
       </div>
       <Pagination :page="page" :page-size="pageSize" :total="total" @change="onPageChange" />
     </template>
-    <div v-else class="empty">暂无数据</div>
+    <div v-else class="empty">{{ $t('admin_users.no_data') }}</div>
 
     <Teleport to="body">
       <div v-if="editOpen" class="modal-overlay" @click.self="editOpen = false">
         <div class="modal">
-          <h3>编辑用户 #{{ editForm.id }}</h3>
+          <h3>{{ $t('admin_users.edit_user', { id: editForm.id }) }}</h3>
           <div class="form-grid">
-            <label>用户名 <input v-model="editForm.username" maxlength="100" /></label>
-            <label>昵称 <input v-model="editForm.nickname" maxlength="100" /></label>
-            <label>手机号 <input v-model="editForm.phone" maxlength="20" /></label>
-            <label>会员类型
+            <label>{{ $t('admin_users.label_username') }} <input v-model="editForm.username" maxlength="100" /></label>
+            <label>{{ $t('admin_users.label_nickname') }} <input v-model="editForm.nickname" maxlength="100" /></label>
+            <label>{{ $t('admin_users.label_phone') }} <input v-model="editForm.phone" maxlength="20" /></label>
+            <label>{{ $t('admin_users.label_plan_type') }}
               <select v-model="editForm.plan_type">
-                <option :value="0">免费</option><option :value="1">月卡</option><option :value="2">季卡</option><option :value="3">年卡</option>
+                <option :value="0">{{ $t('admin_users.plan_free') }}</option><option :value="1">{{ $t('admin_users.plan_monthly') }}</option><option :value="2">{{ $t('admin_users.plan_quarterly') }}</option><option :value="3">{{ $t('admin_users.plan_yearly') }}</option>
               </select>
             </label>
-            <label>余额 <input v-model.number="editForm.credit_balance" type="number" min="0" /></label>
-            <label>状态
-              <select v-model="editForm.status"><option :value="0">正常</option><option :value="1">禁用</option></select>
+            <label>{{ $t('admin_users.label_balance') }} <input v-model.number="editForm.credit_balance" type="number" min="0" /></label>
+            <label>{{ $t('admin_users.label_status') }}
+              <select v-model="editForm.status"><option :value="0">{{ $t('admin_users.status_normal') }}</option><option :value="1">{{ $t('admin_users.status_banned') }}</option></select>
             </label>
           </div>
           <div class="modal-actions">
-            <button class="btn-cancel" @click="editOpen = false">取消</button>
-            <button class="btn-save" :disabled="saving" @click="saveEdit">{{ saving ? '保存中...' : '保存' }}</button>
+            <button class="btn-cancel" @click="editOpen = false">{{ $t('common.cancel') }}</button>
+            <button class="btn-save" :disabled="saving" @click="saveEdit">{{ saving ? $t('common.saving') : $t('common.save') }}</button>
           </div>
         </div>
       </div>
@@ -94,7 +94,9 @@
 
 <script setup lang="ts">
 import StatusBadge from '~/components/shared/StatusBadge.vue'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const { confirm } = useConfirm()
 const list = ref<any[]>([])
 const total = ref(0)
@@ -127,8 +129,8 @@ async function fetchData() {
     const data = await $fetch(`/api/admin/users?${params.toString()}`, { credentials: 'include' })
     const res = data as any
     if (res?.code === 200) { list.value = res.data.list || []; total.value = res.data.total || 0 }
-    else { throw new Error(res?.msg || '获取用户列表失败') }
-  } catch (e: any) { error.value = e?.data?.msg || e.message || '加载失败'; toast.error(error.value) } finally { loading.value = false }
+    else { throw new Error(res?.msg || t('admin_users.list_failed')) }
+  } catch (e: any) { error.value = e?.data?.msg || e.message || t('common.loadFail'); toast.error(error.value) } finally { loading.value = false }
 }
 
 function search() { page.value = 1; selectedIds.value = new Set(); fetchData() }
@@ -144,26 +146,29 @@ function toggleAll() {
   else { selectedIds.value = new Set(list.value.map(u => u.id)) }
 }
 
+const PLAN_LABELS: Record<number, string> = { 0: t('admin_users.plan_free'), 1: t('admin_users.plan_monthly'), 2: t('admin_users.plan_quarterly'), 3: t('admin_users.plan_yearly') }
+function planLabel(pt: number) { return PLAN_LABELS[pt] || String(pt) }
+
 async function toggleStatus(user: any, status: number) {
-  if (!await confirm({ message: status === 1 ? `确认禁用用户「${user.username}」？` : `确认启用用户「${user.username}」？` })) return
+  if (!await confirm({ message: status === 1 ? t('admin_users.disable_confirm', { name: user.username }) : t('admin_users.enable_confirm', { name: user.username }) })) return
   try {
     const data = await $fetch(`/api/admin/users/${user.id}/status`, { method: 'PUT', credentials: 'include', body: { status } })
     const res = data as any
-    if (res?.code === 200) { user.status = status; toast.success(status === 1 ? `已禁用 ${user.username}` : `已启用 ${user.username}`) }
-    else { toast.error(res?.msg || '操作失败') }
-  } catch (e: any) { toast.error(e?.data?.msg || e.message || '操作失败') }
+    if (res?.code === 200) { user.status = status; toast.success(status === 1 ? t('admin_users.disabled_msg', { name: user.username }) : t('admin_users.enabled_msg', { name: user.username })) }
+    else { toast.error(res?.msg || t('common.fail')) }
+  } catch (e: any) { toast.error(e?.data?.msg || e.message || t('common.fail')) }
 }
 
 async function batchToggleStatus(status: number) {
-  const label = status === 1 ? '禁用' : '启用'
-  if (!await confirm({ message: `确认批量${label} ${selectedIds.value.size} 个用户？` })) return
+  const label = status === 1 ? t('admin_users.status_banned') : t('admin_users.status_normal')
+  if (!await confirm({ message: status === 1 ? t('admin_users.batch_disable_confirm', { count: selectedIds.value.size }) : t('admin_users.batch_enable_confirm', { count: selectedIds.value.size }) })) return
   try {
     const ids = [...selectedIds.value]
     const data = await $fetch('/api/admin/users/batch-status', { method: 'PUT', credentials: 'include', body: { ids, status } })
     const res = data as any
-    if (res?.code === 200) { toast.success(`已批量${label} ${ids.length} 个用户`); selectedIds.value = new Set(); fetchData() }
-    else { toast.error(res?.msg || '操作失败') }
-  } catch (e: any) { toast.error(e?.data?.msg || e.message || '操作失败') }
+    if (res?.code === 200) { toast.success(status === 1 ? t('admin_users.batch_disabled_msg', { count: ids.length }) : t('admin_users.batch_enabled_msg', { count: ids.length })); selectedIds.value = new Set(); fetchData() }
+    else { toast.error(res?.msg || t('common.fail')) }
+  } catch (e: any) { toast.error(e?.data?.msg || e.message || t('common.fail')) }
 }
 
 function openEdit(u: any) { editForm.value = { ...u }; editOpen.value = true }
@@ -173,23 +178,25 @@ async function saveEdit() {
   try {
     const data = await $fetch(`/api/admin/users/${editForm.value.id}`, { method: 'PUT', credentials: 'include', body: editForm.value })
     const res = data as any
-    if (res?.code === 200) { toast.success('用户信息已更新'); editOpen.value = false; fetchData() }
-    else { toast.error(res?.msg || '保存失败') }
-  } catch (e: any) { toast.error(e?.data?.msg || e.message || '保存失败') } finally { saving.value = false }
+    if (res?.code === 200) { toast.success(t('admin_users.user_updated')); editOpen.value = false; fetchData() }
+    else { toast.error(res?.msg || t('common.save_failed')) }
+  } catch (e: any) { toast.error(e?.data?.msg || e.message || t('common.save_failed')) } finally { saving.value = false }
 }
 
 function exportCSV() {
-  const headers = ['ID', '用户名', '昵称', '手机号', '会员', '余额', '状态', '注册时间']
+  const headers = [t('common.id'), t('admin_users.col_username'), t('admin_users.col_nickname'), t('admin_users.col_phone'), t('admin_users.col_plan'), t('admin_users.col_balance'), t('admin_users.col_status'), t('admin_users.col_register_time')]
+  const planLabels: Record<number, string> = { 0: t('admin_users.plan_free'), 1: t('admin_users.plan_monthly'), 2: t('admin_users.plan_quarterly'), 3: t('admin_users.plan_yearly') }
+  const statusLabels: Record<number, string> = { 0: t('admin_users.status_normal'), 1: t('admin_users.status_banned') }
   const rows = list.value.map(u => [
     u.id, u.username, u.nickname, u.phone || '',
-    u.plan_type > 0 ? ['', '月卡', '季卡', '年卡'][u.plan_type] : '免费',
-    u.credit_balance ?? 0, u.status === 0 ? '正常' : '禁用',
+    planLabels[u.plan_type] ?? '',
+    u.credit_balance ?? 0, statusLabels[u.status] ?? '',
     u.create_time?.slice(0, 10) || '',
   ])
   const csv = [headers.join(','), ...rows.map(r => r.map(c => `"${c}"`).join(','))].join('\n')
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' })
-  downloadBlob(blob, `用户列表_${new Date().toISOString().slice(0, 10)}.csv`)
-  toast.success('导出成功')
+  downloadBlob(blob, `${t('admin_users.page_title')}_${new Date().toISOString().slice(0, 10)}.csv`)
+  toast.success(t('admin_users.export_success'))
 }
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
