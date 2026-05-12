@@ -5,26 +5,17 @@
  */
 import { Router } from 'express';
 import { z } from 'zod';
-import { success, error } from '../utils/response.js';
-import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { rateLimiter } from '../middleware/rateLimiter.js';
-import * as complianceService from '../services/complianceService.js';
+import * as ctrl from '../controller/v4ComplianceController.js';
 
 const router = Router();
 router.use(authMiddleware);
 router.use(rateLimiter);
 
 // ─── GET /api/compliance/targets ──────────────────────────────
-router.get('/targets', (_req, res) => {
-  try {
-    const targets = complianceService.listComplianceTargets();
-    return success(res, targets);
-  } catch (e) {
-    return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.status ? e.message : '合规检查失败');
-  }
-});
+router.get('/targets', ctrl.getTargets);
 
 // ─── POST /api/compliance/check ───────────────────────────────
 const checkSchema = z.object({
@@ -33,25 +24,9 @@ const checkSchema = z.object({
   category: z.string().optional(),
 });
 
-router.post('/check', _validate(checkSchema), (req, res) => {
-  try {
-    const result = complianceService.checkCompliance(req.validated);
-    return success(res, result);
-  } catch (e) {
-    return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.status ? e.message : '合规检查失败');
-  }
-});
+router.post('/check', _validate(checkSchema), ctrl.checkCompliance);
 
 // ─── GET /api/compliance/rules/:code ─────────────────────────────
-router.get('/rules/:code', _validate(z.object({ code: z.string().min(1) }), 'params'), (req, res) => {
-  try {
-    const rules = complianceService.getPlatformCompliance(req.params.code)
-      || complianceService.getRegionCompliance(req.params.code);
-    if (!rules) return error(res, ERROR_CODE.NOT_FOUND, '未找到合规规则');
-    return success(res, rules);
-  } catch (e) {
-    return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.status ? e.message : '合规检查失败');
-  }
-});
+router.get('/rules/:code', _validate(z.object({ code: z.string().min(1) }), 'params'), ctrl.getRules);
 
 export default router;

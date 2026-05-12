@@ -6,13 +6,11 @@
  */
 import { Router } from 'express';
 import { z } from 'zod';
-import { success, error } from '../utils/response.js';
-import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate, validate, paginationSchema } from '../utils/validate.js';
 import { contentModerationMiddleware } from '../middleware/content-moderation.middleware.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { authMiddleware } from '../middleware/auth.js';
-import * as detailService from '../services/detail-image.service.js';
+import * as ctrl from '../controller/v4DetailController.js';
 
 const router = Router();
 router.use(authMiddleware);
@@ -32,48 +30,12 @@ const replicateSchema = z.object({
 });
 
 // POST /api/detail/generate-set
-router.post('/generate-set', heavyLimiter, _validate(generateSetSchema), contentModerationMiddleware('input'), async (req, res) => {
-  try {
-    const { product_name, product_images, highlights, template } = req.validated;
-    const result = await detailService.generateDetailSet(req.user.id, {
-      productName: product_name,
-      productImages: product_images,
-      highlights,
-      template,
-    });
-    return success(res, result, '详情图套图生成任务已提交');
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '生成失败');
-  }
-});
+router.post('/generate-set', heavyLimiter, _validate(generateSetSchema), contentModerationMiddleware('input'), ctrl.generateDetailSet);
 
 // POST /api/detail/replicate
-router.post('/replicate', heavyLimiter, _validate(replicateSchema), async (req, res) => {
-  try {
-    const { reference_url, product_name, product_images, template } = req.validated;
-    const result = await detailService.replicateDetail(req.user.id, {
-      referenceUrl: reference_url,
-      productName: product_name,
-      productImages: product_images,
-      template,
-    });
-    return success(res, result, '详情图复刻任务已提交');
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '复刻失败');
-  }
-});
+router.post('/replicate', heavyLimiter, _validate(replicateSchema), ctrl.replicateDetail);
 
 // GET /api/detail/works
-router.get('/works', validate(paginationSchema, 'query'), async (req, res) => {
-  try {
-    const result = await detailService.getDetailWorks(req.user.id, {
-      page: parseInt(req.query.page, 10) || 1,
-      pageSize: parseInt(req.query.pageSize, 10) || 20,
-    });
-    return success(res, result);
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message || '查询失败');
-  }
-});
+router.get('/works', validate(paginationSchema, 'query'), ctrl.getDetailWorks);
 
 export default router;
