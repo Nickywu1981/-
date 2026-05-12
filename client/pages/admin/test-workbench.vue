@@ -614,6 +614,7 @@ onMounted(() => {
   loadModels()
   loadHistory()
 })
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

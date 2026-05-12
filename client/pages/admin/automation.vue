@@ -177,6 +177,7 @@ async function retryTask(t: any) {
     else { toast.error(res?.msg || '重试失败') }
   } catch (e: any) { toast.error(e?.data?.msg || e.message || '重试失败') }
 }
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

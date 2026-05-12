@@ -200,6 +200,7 @@ function categoryLabel(c: string) {
   const map: Record<string, string> = { sales: '销售类', promotion: '促销类', trust: '信任类', cross_border: '跨境类' };
   return map[c] || c;
 }
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

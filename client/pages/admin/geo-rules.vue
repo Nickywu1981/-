@@ -135,6 +135,7 @@ async function remove(id: number) {
 }
 
 onMounted(fetchRules);
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

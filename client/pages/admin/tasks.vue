@@ -135,6 +135,7 @@ async function cancelTask(t: any) {
 }
 
 onMounted(fetchData)
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

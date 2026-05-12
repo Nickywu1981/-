@@ -120,6 +120,7 @@ async function refund(o: any) {
     else { toast.error(res?.msg || '退款失败') }
   } catch (e: any) { toast.error(e?.data?.msg || e.message || '退款失败') }
 }
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

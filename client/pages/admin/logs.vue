@@ -117,6 +117,7 @@ function exportLogs() {
 }
 
 onMounted(fetch)
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

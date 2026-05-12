@@ -207,6 +207,7 @@ async function delForm(id: number) {
     toast.error(e?.data?.msg || e.message || '删除失败')
   }
 }
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

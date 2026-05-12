@@ -216,6 +216,7 @@ async function batchDelete() {
     selectedIds.value = []; fetchData()
   } catch (e: any) { toast.error(e?.data?.msg || '批量删除失败') }
 }
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

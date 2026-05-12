@@ -168,6 +168,7 @@ async function doDelete() {
 function onSearch() { currentPage.value = 1; fetchTemplates(); }
 
 onMounted(fetchTemplates);
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

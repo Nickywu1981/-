@@ -190,6 +190,7 @@ function exportCSV() {
   downloadBlob(blob, `用户列表_${new Date().toISOString().slice(0, 10)}.csv`)
   toast.success('导出成功')
 }
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

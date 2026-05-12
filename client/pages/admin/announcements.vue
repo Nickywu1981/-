@@ -163,4 +163,5 @@ async function del(id: number) {
 }
 
 onMounted(fetch)
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>

@@ -147,6 +147,7 @@ function formatJson(val: string) {
 }
 
 onMounted(fetchConfig);
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

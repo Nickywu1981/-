@@ -85,6 +85,7 @@ async function search() {
 }
 
 onMounted(fetchStatus);
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

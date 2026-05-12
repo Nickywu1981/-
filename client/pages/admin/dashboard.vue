@@ -275,6 +275,7 @@ onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
   disposeCharts()
 })
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

@@ -109,6 +109,7 @@ async function saveSettings() {
   saving.value = false
 }
 
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 <style scoped>
 h2 { font-size: 22px; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; }

@@ -144,6 +144,7 @@ async function delProxy(id: number) {
     else { toast.error(res?.msg || '删除失败') }
   } catch (e: any) { toast.error(e?.data?.msg || e.message || '删除失败') }
 }
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

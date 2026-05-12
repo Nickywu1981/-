@@ -76,6 +76,7 @@ async function doCheckLimit() {
     if (data?.code === 200) limitResult.value = data.data
   } catch(e: any) { toast.error(e?.data?.msg || '加载失败') } finally { checkingLimit.value = false; }
 }
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 <style scoped>
 h2 { font-size: 22px; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; }

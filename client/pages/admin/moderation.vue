@@ -138,6 +138,7 @@ function reviewText(s: number) {
   if (s === 2) return '已拒绝';
   return '待审核';
 }
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>
