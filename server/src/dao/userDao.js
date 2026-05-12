@@ -9,6 +9,14 @@ export async function insertUser({ username, password, nickname = '', tenantId: 
   return result.insertId;
 }
 
+export async function createUser({ phone, email, password, nickname }) {
+  const [result] = await pool.execute(
+    'INSERT INTO users (phone, email, password_hash, nickname, role, status) VALUES (?, ?, ?, ?, \'free\', \'active\')',
+    [phone || '', email || '', password, nickname || ''],
+  );
+  return result.insertId;
+}
+
 export async function findByUsername(username) {
   // Match by phone, email, or nickname (username field maps loosely)
   const isPhone = /^1[3-9]\d{9}$/.test(username);
@@ -108,14 +116,13 @@ export async function findByEmail(email) {
 }
 
 export async function getUserStats(userId) {
-  const [[[{ taskTotal }]], [[{ todayTotal }]], [[{ creditUsed }]]] = await Promise.all([
-    pool.execute('SELECT COUNT(*) AS taskTotal FROM task WHERE user_id = ?', [userId]),
-    pool.execute('SELECT COUNT(*) AS todayTotal FROM task WHERE user_id = ? AND DATE(created_at) = CURDATE()', [userId]),
+  const [[{ taskTotal }], [{ todayTotal }], [{ creditUsed }]] = await Promise.all([
+    pool.execute('SELECT COUNT(*) AS taskTotal FROM job_queue WHERE user_id = ?', [userId]),
+    pool.execute('SELECT COUNT(*) AS todayTotal FROM job_queue WHERE user_id = ? AND DATE(created_at) = CURDATE()', [userId]),
     pool.execute(
-      `SELECT COALESCE(SUM(CASE WHEN action='freeze' THEN -credit_amount WHEN action='rollback' THEN credit_amount ELSE 0 END), 0) AS creditUsed
-       FROM credit_request_log WHERE user_id = ? AND status = 1`,
+      'SELECT COALESCE(SUM(consumed), 0) AS creditUsed FROM consumption_record WHERE user_id = ? AND DATE_FORMAT(create_time, \'%Y-%m\') = DATE_FORMAT(CURDATE(), \'%Y-%m\')',
       [userId],
     ),
   ]);
-  return { taskTotal, todayTotal, creditUsed };
+  return { todayTasks: todayTotal, totalTasks: taskTotal, thisMonthConsumed: creditUsed };
 }

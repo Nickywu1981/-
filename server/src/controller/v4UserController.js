@@ -53,27 +53,19 @@ export const updateProfile = wrapController(async (req, res) => {
 export const changePassword = wrapController(async (req, res) => {
   const { oldPassword, newPassword } = req.validated;
 
-  const conn = await db.getConnection();
-  try {
-    const [users] = await conn.query(
-      'SELECT password_hash FROM `users` WHERE id = ?',
-      [req.user.id],
-    );
-    if (users.length === 0) throw new BusinessError(ERROR_CODE.NOT_FOUND, '用户不存在');
+  const user = await userDao.findById(req.user.id);
+  if (!user) throw new BusinessError(ERROR_CODE.NOT_FOUND, '用户不存在');
 
-    const valid = await bcrypt.compare(oldPassword, users[0].password_hash);
-    if (!valid) throw new BusinessError(ERROR_CODE.PARAM_INVALID, '原密码不正确');
+  const valid = await bcrypt.compare(oldPassword, user.password);
+  if (!valid) throw new BusinessError(ERROR_CODE.PARAM_INVALID, '原密码不正确');
 
-    const hash = await bcrypt.hash(newPassword, 12);
-    await conn.query('UPDATE `users` SET password_hash = ? WHERE id = ?', [hash, req.user.id]);
+  const hash = await bcrypt.hash(newPassword, 12);
+  await userDao.updatePassword(req.user.id, hash);
 
-    const { revokeAllUserTokens } = await import('../utils/jwtToken.js');
-    await revokeAllUserTokens(req.user.id);
+  const { revokeAllUserTokens } = await import('../utils/jwtToken.js');
+  await revokeAllUserTokens(req.user.id);
 
-    return success(res, {}, '密码已修改，请重新登录');
-  } finally {
-    conn.release();
-  }
+  return success(res, {}, '密码已修改，请重新登录');
 });
 
 export const toggleAutoRenew = wrapController(async (req, res) => {
