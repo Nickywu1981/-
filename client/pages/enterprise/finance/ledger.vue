@@ -76,26 +76,26 @@ definePageMeta({ layout: 'enterprise' });
 </script>
 
 <style scoped>
-.page-title { font-size: 24px; margin: 0 0 20px; color: #1a1a2e; }
+.page-title { font-size: 24px; margin: 0 0 20px; color: var(--text-primary); }
 .toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; }
-.filter-select, .date-input { padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; background: #fff; }
-.sep { color: #999; font-size: 14px; }
+.filter-select, .date-input { padding: 8px 12px; border: 1px solid var(--border-light); border-radius: 8px; font-size: 14px; background: var(--bg-card); }
+.sep { color: var(--text-muted); font-size: 14px; }
 
-.table-wrap { background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow-x: auto; }
+.table-wrap { background: var(--bg-card); border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; }
-th, td { padding: 10px 14px; text-align: left; font-size: 14px; border-bottom: 1px solid #f0f0f0; }
-th { background: #fafafa; color: #666; font-weight: 500; }
+th, td { padding: 10px 14px; text-align: left; font-size: 14px; border-bottom: 1px solid var(--border-light); }
+th { background: var(--table-header-bg); color: var(--text-secondary); font-weight: 500; }
 .type-tag { padding: 2px 10px; border-radius: 12px; font-size: 12px; }
-.type-tag.revenue { background: #e8f5e9; color: #27ae60; }
-.type-tag.commission { background: #fff3e0; color: #f39c12; }
-.type-tag.withdrawal { background: #e3f2fd; color: #1a73e8; }
-.type-tag.refund { background: #fbe9e7; color: #e74c3c; }
-.type-tag.adjustment { background: #f3e5f5; color: #9b59b6; }
-.green { color: #27ae60; font-weight: 600; }
-.red { color: #e74c3c; font-weight: 600; }
+.type-tag.revenue { background: var(--success-bg); color: var(--success); }
+.type-tag.commission { background: var(--warning-bg); color: var(--warning); }
+.type-tag.withdrawal { background: var(--info-bg); color: var(--info); }
+.type-tag.refund { background: var(--danger-bg); color: var(--danger); }
+.type-tag.adjustment { background: var(--brand-bg); color: var(--brand); }
+.green { color: var(--success); font-weight: 600; }
+.red { color: var(--danger); font-weight: 600; }
 .remark { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.empty { padding: 60px; text-align: center; color: #999; }
+.empty { padding: 60px; text-align: center; color: var(--text-muted); }
 .pager { display: flex; justify-content: center; align-items: center; gap: 12px; padding: 16px; }
-.pager button { padding: 6px 14px; border: 1px solid #ddd; background: #fff; border-radius: 6px; cursor: pointer; }
+.pager button { padding: 6px 14px; border: 1px solid var(--border-light); background: var(--bg-card); border-radius: 6px; cursor: pointer; }
 .pager button:disabled { opacity: 0.4; }
 </style>
