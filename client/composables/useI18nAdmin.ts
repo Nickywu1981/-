@@ -35,7 +35,7 @@ export function useI18nAdmin() {
       pendingChanges.value.clear()
       pendingDelete.value.clear()
     } catch (e: any) {
-      console.error('[i18n admin] fetch error', e)
+      if (import.meta.dev) console.error('[i18n admin] fetch error', e)
     } finally { loading.value = false }
   }
 
@@ -72,7 +72,7 @@ export function useI18nAdmin() {
       }
       await fetch()
     } catch (e: any) {
-      console.error('[i18n admin] save error', e)
+      if (import.meta.dev) console.error('[i18n admin] save error', e)
     } finally { saving.value = false }
   }
 

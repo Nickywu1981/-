@@ -182,7 +182,7 @@ function beginEdit(item: { key: string; value: string }) {
   editValue.value = pendingChanges.value.get(item.key) ?? item.value
   startEdit(item.key)
   nextTick(() => {
-    const ta = document.querySelector('.edit-textarea') as HTMLTextAreaElement
+    const ta = editTextarea.value
     if (ta) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length) }
   })
 }

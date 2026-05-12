@@ -22,7 +22,7 @@ export async function findTenantByAgentCode(agentCode) {
 
 export async function findRelationByPair(parentTenantId, childTenantId) {
   const [rows] = await pool.query(
-    'SELECT id FROM ?? WHERE tenant_id = ? AND child_tenant_id = ?',
+    'SELECT id FROM ?? WHERE tenant_id = ? AND child_tenant_id = ? LIMIT 1',
     [TABLE.RELATION, parentTenantId, childTenantId],
   );
   return rows[0] || null;

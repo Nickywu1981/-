@@ -96,7 +96,7 @@ export async function getSettlementDetail(id) {
     `SELECT sd.*, sb.batch_no, sb.cycle_start, sb.cycle_end, sb.status AS batch_status
      FROM settlement_detail sd
      LEFT JOIN settlement_batch sb ON sd.batch_id = sb.id
-     WHERE sd.id = ?`, [id],
+     WHERE sd.id = ? LIMIT 1`, [id],
   );
   return rows[0] || null;
 }
@@ -193,7 +193,7 @@ export async function getWithdrawalById(id) {
     `SELECT wo.*, ba.account_type, ba.account_name, ba.account_no, ba.bank_name
      FROM withdrawal_order wo
      LEFT JOIN bank_account ba ON wo.bank_account_id = ba.id
-     WHERE wo.id = ?`, [id],
+     WHERE wo.id = ? LIMIT 1`, [id],
   );
   return rows[0] || null;
 }

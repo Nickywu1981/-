@@ -15,12 +15,15 @@ import wsManager from './services/wsManager.js';
 import logger from './utils/logger.js';
 import { server as serverConfig, isProduction } from './config/index.js';
 import { registerAllAdapters } from './services/adapters/index.js';
-import { validateStartupConfig } from './utils/startupGuard.js';
+import { validateStartupConfig, validateRuntimeConnections } from './utils/startupGuard.js';
 
 const { port, env } = serverConfig;
 
 // 启动前配置校验
 validateStartupConfig();
+
+// 启动前运行时连接检查 (MySQL / Redis / MinIO)
+await validateRuntimeConnections();
 
 // 注册 AI 模型适配器（启动时自动加载）
 await registerAllAdapters();

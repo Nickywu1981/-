@@ -25,6 +25,9 @@ export async function findByUsername(username) {
   if (isPhone) field = 'phone';
   else if (isEmail) field = 'email';
 
+  const ALLOWED_FIELDS = ['phone', 'email', 'nickname'];
+  if (!ALLOWED_FIELDS.includes(field)) field = 'nickname';
+
   const [rows] = await pool.execute(
     `SELECT id, nickname AS username, password_hash AS password, nickname, phone, email, avatar_url AS avatar, role, status, last_login_at AS last_login_time, created_at AS create_time, updated_at AS update_time FROM users WHERE ${field} = ? AND status != 'deleted' LIMIT 1`,
     [username],

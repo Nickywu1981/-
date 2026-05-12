@@ -34,7 +34,7 @@ export default {
 
   async getPageById(id, tenantId) {
     const [rows] = await pool.query(
-      'SELECT id, tenant_id, owner_id, title, slug, page_type, access_type, status, mobile_config, pc_config, meta_json, publish_time, offline_time, access_count, latest_published_version, create_time, update_time FROM diy_page WHERE id = ? AND tenant_id = ?',
+      'SELECT id, tenant_id, owner_id, title, slug, page_type, access_type, status, mobile_config, pc_config, meta_json, publish_time, offline_time, access_count, latest_published_version, create_time, update_time FROM diy_page WHERE id = ? AND tenant_id = ? LIMIT 1',
       [id, tenantId],
     );
     if (!rows[0]) return null;
@@ -171,7 +171,7 @@ export default {
 
   async getVersion(pageId, version) {
     const [rows] = await pool.query(
-      'SELECT id, page_id, version, mobile_config, pc_config, remark, auto_save, rollback_from, create_time FROM diy_page_version WHERE page_id = ? AND version = ?',
+      'SELECT id, page_id, version, mobile_config, pc_config, remark, auto_save, rollback_from, create_time FROM diy_page_version WHERE page_id = ? AND version = ? LIMIT 1',
       [pageId, version],
     );
     if (!rows[0]) return null;
