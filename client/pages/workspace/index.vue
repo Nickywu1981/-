@@ -98,7 +98,8 @@ function getCategoryLabel(cat: string): string {
 const recentProjects = ref<{ icon: string; name: string; time: string; path: string }[]>([])
 
 onMounted(async () => {
-  const [cfgResult, meResult] = await Promise.allSettled([
+  try {
+    const [cfgResult, meResult] = await Promise.allSettled([
     $fetch('/api/site-config/public'),
     $fetch('/api/auth/me', { credentials: 'include' }),
   ])
@@ -145,7 +146,17 @@ onMounted(async () => {
     }
   }
 
-  loading.value = false
+  } catch {
+    // 静默降级：使用默认卡片
+    const groups: Record<string, Card[]> = {};
+    defaultCards.value.forEach(c => {
+      if (!groups[c.category]) groups[c.category] = [];
+      groups[c.category].push(c);
+    });
+    cardGroups.value = groups;
+  } finally {
+    loading.value = false;
+  }
 
   // Entrance animations for cards
   let _obs: IntersectionObserver | null = null
