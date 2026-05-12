@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <h2>我的素材库</h2>
+    <h2>{{ $t('my_pages.works.title') }}</h2>
     <div class="tabs">
       <button
         v-for="t in tabs"
@@ -10,7 +10,13 @@
       >{{ t.label }}</button>
     </div>
 
-    <div v-if="loading" class="loading">加载中...</div>
+    <div v-if="loading" class="loading">{{ $t('my_pages.works.loading') }}</div>
+
+    <div v-else-if="errorMsg" class="error-box">
+      <span class="error-icon">⚠️</span>
+      <span>{{ errorMsg }}</span>
+      <button class="btn-retry" @click="fetchAll()">{{ $t('my_pages.works.error_retry') }}</button>
+    </div>
 
     <template v-else>
       <div v-if="filteredList.length > 0" class="grid">
@@ -32,21 +38,20 @@
           </div>
           <div class="card-title">{{ item.title }}</div>
           <div class="card-actions">
-            <button class="btn-sm" @click.stop="redoTask(item)">复用参数</button>
-            <button v-if="getImages(item).length > 0" class="btn-sm btn-view" @click.stop="previewImages(item)">预览</button>
+            <button class="btn-sm" @click.stop="redoTask(item)">{{ $t('my_pages.works.reuse_params') }}</button>
+            <button v-if="getImages(item).length > 0" class="btn-sm btn-view" @click.stop="previewImages(item)">{{ $t('my_pages.works.preview') }}</button>
           </div>
         </div>
       </div>
 
       <div v-else class="empty-hint">
-        <p>还没有作品，<NuxtLink to="/">去做一张</NuxtLink></p>
+        <p>{{ $t('my_pages.works.empty') }}，<NuxtLink to="/">{{ $t('my_pages.works.empty_link') }}</NuxtLink></p>
       </div>
 
-      <!-- 分页 -->
       <div v-if="total > pageSize" class="pager">
-        <button :disabled="page <= 1" @click="page--; fetchAll()">上一页</button>
+        <button :disabled="page <= 1" @click="page--; fetchAll()">{{ $t('my_pages.works.prev_page') }}</button>
         <span>{{ page }} / {{ Math.ceil(total / pageSize) }}</span>
-        <button :disabled="page >= Math.ceil(total / pageSize)" @click="page++; fetchAll()">下一页</button>
+        <button :disabled="page >= Math.ceil(total / pageSize)" @click="page++; fetchAll()">{{ $t('my_pages.works.next_page') }}</button>
       </div>
     </template>
 
@@ -56,106 +61,101 @@
 
 <script setup lang="ts">
 import { formatDateTime } from '@/utils/format'
-import ImageLightbox from '@/components/shared/ImageLightbox.vue';
+import ImageLightbox from '@/components/shared/ImageLightbox.vue'
+
+const { t } = useI18n()
 const toast = useToast()
-const activeTab = ref('all');
-const page = ref(1);
-const pageSize = 20;
-const loading = ref(true);
-const allTasks = ref<any[]>([]);
-const total = ref(0);
+const activeTab = ref('all')
+const page = ref(1)
+const pageSize = 20
+const loading = ref(true)
+const errorMsg = ref('')
+const allTasks = ref<any[]>([])
+const total = ref(0)
+const lightbox = useTemplateRef('lightbox')
 
-const tabs = [
-  { key: 'all', label: '全部' },
-  { key: 'image', label: '图片' },
-  { key: 'video', label: '视频' },
-  { key: 'batch', label: '批量' },
-];
+const tabs = computed(() => [
+  { key: 'all', label: t('my_pages.works.tab_all') },
+  { key: 'image', label: t('my_pages.works.tab_image') },
+  { key: 'video', label: t('my_pages.works.tab_video') },
+  { key: 'batch', label: t('my_pages.works.tab_batch') },
+])
 
-const imageTypes = ['main_image', 'scene', 'detail_h5', 'virtual_tryon', 'color_swap', 'style_transfer', 'wrinkle_remove', 'image_translate'];
-const videoTypes = ['img2video', 'multi2video', 'video_packaging', 'action_transfer', 'person_replace', 'digital_human', 'script_gen', 'shot_plan', 'viral_clone', 'action_batch', 'video_beautify'];
-const batchTypes = ['batch'];
+const imageTypes = ['main_image', 'scene', 'detail_h5', 'virtual_tryon', 'color_swap', 'style_transfer', 'wrinkle_remove', 'image_translate']
+const videoTypes = ['img2video', 'multi2video', 'video_packaging', 'action_transfer', 'person_replace', 'digital_human', 'script_gen', 'shot_plan', 'viral_clone', 'action_batch', 'video_beautify']
+const batchTypes = ['batch']
 
-const lightbox = useTemplateRef('lightbox');
+const filteredList = computed(() => allTasks.value)
 
-onMounted(fetchAll);
-
-function getImages(item: any): string[] {
-  const r = item.output_result;
-  if (!r) return [];
-  if (Array.isArray(r.images)) return r.images.map((u: string) => `/uploads/${u.replace(/^\/?uploads\//, '')}`);
-  if (typeof r.url === 'string') return [`/uploads/${r.url.replace(/^\/?uploads\//, '')}`];
-  return [];
+function typeLabel(tp: string) {
+  const key = `my_pages.works.types.${tp}`
+  const translated = t(key)
+  return translated !== key ? translated : tp
 }
 
-function getThumbnail(item: any): string {
-  return getImages(item)[0] || '';
-}
-
-function previewImages(item: any) {
-  const imgs = getImages(item);
-  if (imgs.length > 0) lightbox.value?.open(imgs.map((src: string) => ({ src, title: item.title })));
-}
-
-async function fetchAll() {
-  loading.value = true;
-  try {
-    const endpoints = [];
-    if (activeTab.value === 'all' || activeTab.value === 'image') {
-      endpoints.push($fetch('/api/images/tasks', { params: { page: page.value, pageSize }, credentials: 'include' }).catch((err: any) => { toast.error('图片任务加载失败'); if (import.meta.dev) console.warn('[my-works] 图片任务加载失败', err?.message || err); return { list: [], total: 0 } }));
-    }
-    if (activeTab.value === 'all' || activeTab.value === 'video') {
-      endpoints.push($fetch('/api/videos/tasks', { params: { page: page.value, pageSize }, credentials: 'include' }).catch((err: any) => { toast.error('视频任务加载失败'); if (import.meta.dev) console.warn('[my-works] 视频任务加载失败', err?.message || err); return { list: [], total: 0 } }));
-    }
-    if (activeTab.value === 'all' || activeTab.value === 'batch') {
-      endpoints.push($fetch('/api/advanced/tasks', { params: { page: page.value, pageSize }, credentials: 'include' }).catch((err: any) => { toast.error('高级任务加载失败'); if (import.meta.dev) console.warn('[my-works] 高级任务加载失败', err?.message || err); return { list: [], total: 0 } }));
-      endpoints.push($fetch('/api/adv-video/tasks', { params: { page: page.value, pageSize }, credentials: 'include' }).catch((err: any) => { toast.error('高级视频任务加载失败'); if (import.meta.dev) console.warn('[my-works] 高级视频任务加载失败', err?.message || err); return { list: [], total: 0 } }));
-    }
-
-    const results = await Promise.all(endpoints);
-    allTasks.value = results.flatMap((r: any) => r.list || []).sort((a: any, b: any) =>
-      new Date(b.create_time).getTime() - new Date(a.create_time).getTime()
-    );
-    total.value = results.reduce((sum: number, r: any) => sum + (r.total || 0), 0);
-  } catch (e: any) {
-    toast.error('加载失败，请刷新重试')
-    allTasks.value = [];
-  }
-  loading.value = false;
-}
-
-const filteredList = computed(() => allTasks.value);
-
-function typeLabel(t: string) {
-  const m: Record<string, string> = {
-    main_image: '主图', scene: '场景图', detail_h5: '详情页',
-    img2video: '视频', multi2video: '多图合成', batch: '批量',
-    video_packaging: '包装', action_transfer: '动作迁移', person_replace: '人物替换',
-    digital_human: '口播', script_gen: '脚本', shot_plan: '分镜', viral_clone: '复刻',
-    action_batch: '批量动作', video_beautify: '美化', virtual_tryon: '试穿',
-    color_swap: '换色', style_transfer: '风格', wrinkle_remove: '去褶皱', image_translate: '翻译',
-  };
-  return m[t] || t;
-}
-
-function typeIcon(t: string) {
+function typeIcon(tp: string) {
   const m: Record<string, string> = {
     main_image: '📷', scene: '🖼', detail_h5: '📄', img2video: '🎬',
     multi2video: '🎥', batch: '📦', video_packaging: '🎞', action_transfer: '🕺',
     person_replace: '🧑', digital_human: '🎙', script_gen: '📝', shot_plan: '🎬',
     viral_clone: '🔥', action_batch: '📦', video_beautify: '✨', virtual_tryon: '👗',
     color_swap: '🎨', style_transfer: '🖌', wrinkle_remove: '👔', image_translate: '🌐',
-  };
-  return m[t] || '📁';
+  }
+  return m[tp] || '📁'
+}
+
+function getImages(item: any): string[] {
+  const r = item.output_result
+  if (!r) return []
+  if (Array.isArray(r.images)) return r.images.map((u: string) => `/uploads/${u.replace(/^\/?uploads\//, '')}`)
+  if (typeof r.url === 'string') return [`/uploads/${r.url.replace(/^\/?uploads\//, '')}`]
+  return []
+}
+
+function getThumbnail(item: any): string {
+  return getImages(item)[0] || ''
+}
+
+function previewImages(item: any) {
+  const imgs = getImages(item)
+  if (imgs.length > 0) lightbox.value?.open(imgs.map((src: string) => ({ src, title: item.title })))
+}
+
+async function fetchAll() {
+  loading.value = true
+  errorMsg.value = ''
+  try {
+    const endpoints: Promise<any>[] = []
+    if (activeTab.value === 'all' || activeTab.value === 'image') {
+      endpoints.push($fetch('/api/images/tasks', { params: { page: page.value, pageSize }, credentials: 'include' }).catch((err: any) => { if (import.meta.dev) console.warn('[my-works] image tasks failed', err?.message || err); return { list: [], total: 0 } }))
+    }
+    if (activeTab.value === 'all' || activeTab.value === 'video') {
+      endpoints.push($fetch('/api/videos/tasks', { params: { page: page.value, pageSize }, credentials: 'include' }).catch((err: any) => { if (import.meta.dev) console.warn('[my-works] video tasks failed', err?.message || err); return { list: [], total: 0 } }))
+    }
+    if (activeTab.value === 'all' || activeTab.value === 'batch') {
+      endpoints.push($fetch('/api/advanced/tasks', { params: { page: page.value, pageSize }, credentials: 'include' }).catch((err: any) => { if (import.meta.dev) console.warn('[my-works] advanced tasks failed', err?.message || err); return { list: [], total: 0 } }))
+      endpoints.push($fetch('/api/adv-video/tasks', { params: { page: page.value, pageSize }, credentials: 'include' }).catch((err: any) => { if (import.meta.dev) console.warn('[my-works] adv-video tasks failed', err?.message || err); return { list: [], total: 0 } }))
+    }
+
+    const results = await Promise.all(endpoints)
+    allTasks.value = results.flatMap((r: any) => r.list || []).sort((a: any, b: any) =>
+      new Date(b.create_time).getTime() - new Date(a.create_time).getTime()
+    )
+    total.value = results.reduce((sum: number, r: any) => sum + (r.total || 0), 0)
+  } catch (e: any) {
+    errorMsg.value = t('my_pages.works.load_failed')
+    allTasks.value = []
+  }
+  loading.value = false
 }
 
 function redoTask(item: any) {
-  navigateTo(`/work/${item.type === 'main_image' ? 'main-image' : item.type === 'scene' ? 'scene' : item.type.replace(/_/g, '-')}`);
+  navigateTo(`/work/${item.type === 'main_image' ? 'main-image' : item.type === 'scene' ? 'scene' : item.type.replace(/_/g, '-')}`)
 }
 
-function viewDetail(_item: any) {
-  // expand detail view if needed later
-}
+function viewDetail(_item: any) {}
+
+onMounted(fetchAll)
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
@@ -168,6 +168,11 @@ h2 { font-size: 22px; margin-bottom: 16px; }
 .tabs button.active { background: var(--brand); color: #fff; border-color: var(--brand); }
 
 .loading { text-align: center; padding: 60px 0; color: var(--text-tertiary); }
+
+.error-box { display: flex; align-items: center; gap: 12px; padding: 20px; background: rgba(239,68,68,0.04); border: 1px solid rgba(239,68,68,0.2); border-radius: 10px; color: var(--text-secondary); font-size: 14px; margin-bottom: 16px; }
+.error-icon { font-size: 20px; }
+.btn-retry { padding: 6px 16px; border-radius: 6px; border: 1px solid var(--brand); background: transparent; color: var(--brand); cursor: pointer; font-size: 13px; }
+.btn-retry:hover { background: var(--brand); color: #fff; }
 
 .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 @media (max-width: 900px) { .grid { grid-template-columns: repeat(3, 1fr); } }

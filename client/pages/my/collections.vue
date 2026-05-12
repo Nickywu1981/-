@@ -1,84 +1,93 @@
 <template>
   <div class="page">
-    <h2>我的合集</h2>
-    <button class="btn" @click="showForm = true">+ 新建合集</button>
+    <h2>{{ $t('my_pages.collections.title') }}</h2>
+    <button class="btn" @click="showForm = true">{{ $t('my_pages.collections.new_btn') }}</button>
 
     <div v-if="showForm" class="form-card">
-      <label for="coll-name">合集名称</label>
-      <input id="coll-name" v-model="form.name" placeholder="合集名称" />
-      <label for="coll-desc">描述</label>
-      <input id="coll-desc" v-model="form.description" placeholder="描述（选填）" />
+      <label for="coll-name">{{ $t('my_pages.collections.name_label') }}</label>
+      <input id="coll-name" v-model="form.name" :placeholder="$t('my_pages.collections.name_placeholder')" />
+      <label for="coll-desc">{{ $t('my_pages.collections.desc_label') }}</label>
+      <input id="coll-desc" v-model="form.description" :placeholder="$t('my_pages.collections.desc_placeholder')" />
       <div class="form-actions">
-        <button class="btn-outline" @click="showForm = false">取消</button>
-        <button class="btn" @click="saveCollection" :disabled="saving">{{ saving ? '保存中...' : '保存' }}</button>
+        <button class="btn-outline" @click="showForm = false">{{ $t('my_pages.collections.cancel') }}</button>
+        <button class="btn" @click="saveCollection" :disabled="saving">{{ saving ? $t('my_pages.collections.saving') : $t('my_pages.collections.save') }}</button>
       </div>
     </div>
 
-    <div v-if="loading" class="loading-msg">加载中...</div>
+    <div v-if="loading" class="loading-msg">{{ $t('my_pages.collections.loading') }}</div>
+
+    <div v-else-if="errorMsg" class="error-box">
+      <div class="error-icon">⚠️</div>
+      <span>{{ errorMsg }}</span>
+      <button class="btn-retry" @click="fetchData()">{{ $t('my_pages.collections.error_retry') }}</button>
+    </div>
 
     <div v-else-if="collections.length" class="grid">
       <div v-for="c in collections" :key="c.id" class="card">
         <div class="card-cover">{{ c.name?.slice(0, 1) || '?' }}</div>
         <div class="card-name">{{ c.name }}</div>
-        <div class="card-desc">{{ c.description || '暂无描述' }}</div>
-        <div class="card-meta">{{ c.item_count || 0 }} 项 · {{ c.is_public ? '公开' : '私密' }}</div>
-        <button class="btn-del" @click="deleteCollection(c.id)">删除</button>
+        <div class="card-desc">{{ c.description || $t('my_pages.collections.no_desc') }}</div>
+        <div class="card-meta">{{ c.item_count || 0 }} {{ $t('common.item_unit') }} · {{ c.is_public ? $t('my_pages.collections.public') : $t('my_pages.collections.private') }}</div>
+        <button class="btn-del" @click="deleteCollection(c.id)">{{ $t('my_pages.collections.delete') }}</button>
       </div>
     </div>
 
-    <div v-else class="empty">还没有合集，创建一个吧</div>
+    <div v-else class="empty">{{ $t('my_pages.collections.empty') }}</div>
 
     <Pagination v-if="total > 20" v-model:page="page" :total="total" :page-size="20" @update:page="fetchData" />
   </div>
 </template>
 
 <script setup lang="ts">
-
 const { confirm } = useConfirm()
 const toast = useToast()
 
-
-const showForm = ref(false);
-const loading = ref(true);
-const saving = ref(false);
-const collections = ref<any[]>([]);
-const page = ref(1);
-const total = ref(0);
-const form = reactive({ name: '', description: '' });
+const showForm = ref(false)
+const loading = ref(true)
+const saving = ref(false)
+const errorMsg = ref('')
+const collections = ref<any[]>([])
+const page = ref(1)
+const total = ref(0)
+const form = reactive({ name: '', description: '' })
 
 async function fetchData() {
-  loading.value = true;
+  loading.value = true
+  errorMsg.value = ''
   try {
-    const data: any = await $fetch(`/api/collections?page=${page.value}&size=20`, { credentials: 'include' });
-    collections.value = data.list || data.data?.list || [];
-    total.value = data.total || data.data?.total || 0;
-  } catch { toast.error('加载失败'); }
-  loading.value = false;
+    const data: any = await $fetch(`/api/collections?page=${page.value}&size=20`, { credentials: 'include' })
+    collections.value = data.list || data.data?.list || []
+    total.value = data.total || data.data?.total || 0
+  } catch {
+    errorMsg.value = t('my_pages.collections.load_failed')
+  }
+  loading.value = false
 }
 
 async function saveCollection() {
-  if (!form.name.trim()) return toast.warn('请输入合集名称');
-  saving.value = true;
+  if (!form.name.trim()) return toast.warn(t('my_pages.collections.name_required'))
+  saving.value = true
   try {
-    await $fetch('/api/collections', { method: 'POST', body: { name: form.name, description: form.description }, credentials: 'include' });
-    toast.success('创建成功');
-    showForm.value = false;
-    form.name = ''; form.description = '';
-    fetchData();
-  } catch { toast.error('创建失败'); }
-  saving.value = false;
+    await $fetch('/api/collections', { method: 'POST', body: { name: form.name, description: form.description }, credentials: 'include' })
+    toast.success(t('my_pages.collections.create_success'))
+    showForm.value = false
+    form.name = ''; form.description = ''
+    fetchData()
+  } catch { toast.error(t('my_pages.collections.create_failed')) }
+  saving.value = false
 }
 
 async function deleteCollection(id: number) {
-  if (!await confirm({ message: '确定删除？'} )) return;
+  if (!await confirm({ message: t('my_pages.collections.delete_confirm') })) return
   try {
-    await $fetch(`/api/collections/${id}`, { method: 'DELETE', credentials: 'include' });
-    toast.success('已删除');
-    fetchData();
-  } catch { toast.error('删除失败'); }
+    await $fetch(`/api/collections/${id}`, { method: 'DELETE', credentials: 'include' })
+    toast.success(t('my_pages.collections.deleted'))
+    fetchData()
+  } catch { toast.error(t('my_pages.collections.delete_failed')) }
 }
 
-onMounted(fetchData);
+const { t } = useI18n()
+onMounted(fetchData)
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
@@ -92,6 +101,8 @@ h2 { font-size: 20px; font-weight: 600; color: var(--text-primary); margin-botto
 .btn-outline:hover { border-color: var(--brand); color: var(--brand); }
 .btn-del { padding: 4px 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-secondary); cursor: pointer; font-size: 13px; }
 .btn-del:hover { border-color: var(--danger); color: var(--danger); }
+.btn-retry { padding: 6px 16px; border-radius: 6px; border: 1px solid var(--brand); background: transparent; color: var(--brand); cursor: pointer; font-size: 13px; }
+.btn-retry:hover { background: var(--brand); color: #fff; }
 .form-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 12px; }
 .form-card input { padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-input); color: var(--text-primary); font-size: 14px; transition: border-color .2s; }
 .form-card input:focus { border-color: var(--brand); outline: none; }
@@ -105,4 +116,6 @@ h2 { font-size: 20px; font-weight: 600; color: var(--text-primary); margin-botto
 .card-meta { font-size: 12px; color: var(--text-hint); margin-bottom: 12px; }
 .loading-msg { text-align: center; color: var(--text-secondary); padding: 40px; }
 .empty { text-align: center; color: var(--text-tertiary); padding: 60px 0; }
+.error-box { display: flex; align-items: center; gap: 12px; padding: 20px; background: rgba(239,68,68,0.04); border: 1px solid rgba(239,68,68,0.2); border-radius: 10px; color: var(--text-secondary); font-size: 14px; }
+.error-icon { font-size: 20px; }
 </style>

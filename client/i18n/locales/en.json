@@ -751,7 +751,8 @@
     "banned": "Banned",
     "prev_page": "Previous",
     "next_page": "Next",
-    "id": "ID"
+    "id": "ID",
+    "item_unit": "items"
   },
   "admin": {
     "page_title": "Admin Panel",
@@ -3769,5 +3770,60 @@
     "sortDown": "Downloads",
     "metaJson": "Metadata JSON",
     "previewUrl": "Preview URL"
+  },
+  "my_pages": {
+    "collections": {
+      "title": "My Collections",
+      "new_btn": "+ New Collection",
+      "name_label": "Collection Name",
+      "name_placeholder": "Collection Name",
+      "desc_label": "Description",
+      "desc_placeholder": "Description (optional)",
+      "cancel": "Cancel",
+      "saving": "Saving...",
+      "save": "Save",
+      "loading": "Loading...",
+      "no_desc": "No description",
+      "private": "Private",
+      "public": "Public",
+      "delete": "Delete",
+      "empty": "No collections yet. Create one!",
+      "load_failed": "Failed to load",
+      "name_required": "Please enter a collection name",
+      "create_success": "Created successfully",
+      "create_failed": "Failed to create",
+      "delete_confirm": "Confirm delete?",
+      "deleted": "Deleted",
+      "delete_failed": "Failed to delete",
+      "error_retry": "Retry"
+    },
+    "works": {
+      "title": "My Assets",
+      "tab_all": "All",
+      "tab_image": "Images",
+      "tab_video": "Videos",
+      "tab_batch": "Batch",
+      "loading": "Loading...",
+      "empty": "No works yet",
+      "empty_link": "Create one",
+      "prev_page": "Previous",
+      "next_page": "Next",
+      "reuse_params": "Reuse",
+      "preview": "Preview",
+      "image_load_failed": "Image task load failed",
+      "video_load_failed": "Video task load failed",
+      "advanced_load_failed": "Advanced task load failed",
+      "adv_video_load_failed": "Advanced video task load failed",
+      "load_failed": "Failed to load, please refresh",
+      "error_retry": "Retry",
+      "types": {
+        "main_image": "Main Image", "scene": "Scene", "detail_h5": "Detail Page",
+        "img2video": "Video", "multi2video": "Multi Comp", "batch": "Batch",
+        "video_packaging": "Packaging", "action_transfer": "Action Transfer", "person_replace": "Person Replace",
+        "digital_human": "Voiceover", "script_gen": "Script", "shot_plan": "Storyboard", "viral_clone": "Clone",
+        "action_batch": "Batch Action", "video_beautify": "Beautify", "virtual_tryon": "Try-on",
+        "color_swap": "Color Swap", "style_transfer": "Style Transfer", "wrinkle_remove": "Wrinkle Remove", "image_translate": "Translate"
+      }
+    }
   }
 }
