@@ -92,14 +92,13 @@ export async function refreshAccessToken(refreshToken) {
 
   // 颁发新 token pair，同时吊销旧 refresh token
   // 从 DB 获取最新角色信息，避免刷新后角色过期（动态 import 避免测试 mock 链断裂）
-  let username = ''; let role = 'user'; let tenantId = 0;
+  let username = ''; let role = 'user';
   try {
     const { findById } = await import('../dao/userDao.js');
     const user = await findById(payload.id);
     if (user) {
       username = user.username || '';
       role = user.role || 'user';
-      tenantId = user.tenant_id || 0;
     }
   } catch (e) { logger.warn('[JWT] 刷新时查用户失败', { userId: payload.id, error: e.message }); }
 
@@ -107,7 +106,7 @@ export async function refreshAccessToken(refreshToken) {
     id: payload.id,
     username,
     role,
-    tenantId,
+    tenantId: 0,
   });
 
   if (r && payload.jti) {

@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { requireAuth } from '../middleware/auth.middleware.js';
-import { commonLimiter, heavyLimiter } from '../middleware/rateLimiter.js';
+import { authMiddleware as requireAuth } from '../middleware/auth.js';
+import { apiLimiter, heavyLimiter } from '../middleware/rateLimiter.js';
 import * as ctrl from '../controller/longTermMemoryController.js';
 
 export default function (router) {
@@ -55,7 +55,7 @@ export default function (router) {
   }), ctrl.consolidateMemory);
 
   // 统计信息
-  router.get('/stats', requireAuth, commonLimiter, ctrl.getMemoryStats);
+  router.get('/stats', requireAuth, apiLimiter, ctrl.getMemoryStats);
 
   // 清理过期
   router.post('/purge', requireAuth, heavyLimiter, ctrl.purgeExpiredMemories);
