@@ -57,7 +57,7 @@ export async function createUnifiedOrder({ userId, orderType, businessId, amount
       remark: remark || '',
     });
   } catch (err) {
-    await allinpayDao.markFailed(reqsn).catch(() => {});
+    allinpayDao.markFailed(reqsn).catch(e => logger.error('[Allinpay] markFailed 失败', { reqsn, error: e.message }));
     throw err;
   }
 
