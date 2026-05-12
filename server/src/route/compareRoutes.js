@@ -16,6 +16,6 @@ const sideBySideSchema = z.object({
 });
 
 // 并排对比: 接受两张图片URL，返回对齐后的对比数据
-router.post('/side-by-side', authMiddleware, rateLimiter, validate(sideBySideSchema), (req, res) => ctrl.sideBySide(req, res));
+router.post('/side-by-side', authMiddleware, rateLimiter, validate(sideBySideSchema), ctrl.sideBySide);
 
 export default router;

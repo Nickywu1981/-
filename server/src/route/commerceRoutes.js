@@ -19,12 +19,12 @@ const orderQuerySchema = z.object({
 router.use(authMiddleware, rateLimiter, enterpriseOnly);
 
 // 企业端订单列表（仅查看旗下客户订单）
-router.get('/', _validate(orderQuerySchema, 'query'), (req, res) => ctrl.listOrders(req, res));
+router.get('/', _validate(orderQuerySchema, 'query'), ctrl.listOrders);
 
 // 订单详情
-router.get('/:id', (req, res) => ctrl.getOrderDetail(req, res));
+router.get('/:id', ctrl.getOrderDetail);
 
 // 订单统计（概览卡片）
-router.get('/stats/summary', (req, res) => ctrl.getOrderStats(req, res));
+router.get('/stats/summary', ctrl.getOrderStats);
 
 export default router;

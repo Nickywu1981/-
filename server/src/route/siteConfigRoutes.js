@@ -24,7 +24,7 @@ adminRouter.put('/:key', authMiddleware, rateLimiter, adminAuth, validate(update
 adminRouter.delete('/:id', authMiddleware, rateLimiter, adminAuth, ctrl.removeConfig);
 
 // GET /api/admin/site-config/logs/:key — 审计日志
-adminRouter.get('/logs/:key', authMiddleware, rateLimiter, adminAuth, (req, res) => ctrl.getConfigLogs(req, res));
+adminRouter.get('/logs/:key', authMiddleware, rateLimiter, adminAuth, ctrl.getConfigLogs);
 
 const publicRouter = Router();
 publicRouter.get('/', rateLimiter, ctrl.getPublicSiteConfig);

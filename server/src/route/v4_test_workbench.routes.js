@@ -53,27 +53,27 @@ const compareTestSchema = z.object({
 });
 
 // GET /api/test/models
-router.get('/models', requireRole('admin'), (req, res) => ctrl.getModels(req, res));
+router.get('/models', requireRole('admin'), ctrl.getModels);
 
 // POST /api/test/single — 单模型独立测试
-router.post('/single', requireRole('admin'), heavyLimiter, _validate(singleTestSchema), (req, res) => ctrl.testSingle(req, res));
+router.post('/single', requireRole('admin'), heavyLimiter, _validate(singleTestSchema), ctrl.testSingle);
 
 // POST /api/test/mixed — 自动混合模型调用
-router.post('/mixed', requireRole('admin'), heavyLimiter, _validate(mixedTestSchema), (req, res) => ctrl.testMixed(req, res));
+router.post('/mixed', requireRole('admin'), heavyLimiter, _validate(mixedTestSchema), ctrl.testMixed);
 
 // POST /api/test/custom — 自定义多模型编排测试
-router.post('/custom', requireRole('admin'), heavyLimiter, _validate(customTestSchema), (req, res) => ctrl.testCustom(req, res));
+router.post('/custom', requireRole('admin'), heavyLimiter, _validate(customTestSchema), ctrl.testCustom);
 
 // POST /api/test/compare — 多模型并行对比
-router.post('/compare', requireRole('admin'), heavyLimiter, _validate(compareTestSchema), (req, res) => ctrl.testCompare(req, res));
+router.post('/compare', requireRole('admin'), heavyLimiter, _validate(compareTestSchema), ctrl.testCompare);
 
 // GET /api/test/history
-router.get('/history', requireRole('admin'), (req, res) => ctrl.getHistory(req, res));
+router.get('/history', requireRole('admin'), ctrl.getHistory);
 
 // DELETE /api/test/history/:id
-router.delete('/history/:id', requireRole('admin'), validate(idParamSchema, 'params'), (req, res) => ctrl.deleteHistory(req, res));
+router.delete('/history/:id', requireRole('admin'), validate(idParamSchema, 'params'), ctrl.deleteHistory);
 
 // DELETE /api/test/history — 清空全部
-router.delete('/history', requireRole('admin'), (req, res) => ctrl.clearHistory(req, res));
+router.delete('/history', requireRole('admin'), ctrl.clearHistory);
 
 export default router;

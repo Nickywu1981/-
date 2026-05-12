@@ -23,7 +23,7 @@ const runSchema = z.object({
 router.get('/agents', (_req, res) => ctrl.getAgents(_req, res));
 
 // A2A 标准 /run 端点
-router.post('/run/:agentName', authMiddleware, heavyLimiter, validate(runSchema), (req, res) => ctrl.runAgent(req, res));
+router.post('/run/:agentName', authMiddleware, heavyLimiter, validate(runSchema), ctrl.runAgent);
 
 // A2A 标准 /.well-known/agent.json
 router.get('/.well-known/agent.json', (_req, res) => ctrl.getAgentManifest(_req, res));

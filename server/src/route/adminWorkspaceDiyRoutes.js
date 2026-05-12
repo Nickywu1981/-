@@ -27,15 +27,15 @@ const putBodySchema = z.object({
 const validateParams = (schema) => validate(schema, 'params');
 
 // ─── GET /api/admin/workspace-diy — 获取所有配置 ───
-router.get('/', (req, res) => ctrl.getAll(req, res));
+router.get('/', ctrl.getAll);
 
 // ─── GET /api/admin/workspace-diy/:key — 获取单项配置 ───
-router.get('/:key', validateParams(keyParamSchema), (req, res) => ctrl.getByKey(req, res));
+router.get('/:key', validateParams(keyParamSchema), ctrl.getByKey);
 
 // ─── PUT /api/admin/workspace-diy/:key — 更新单项配置 ───
-router.put('/:key', heavyLimiter, validateParams(keyParamSchema), validate(putBodySchema, 'body'), (req, res) => ctrl.update(req, res));
+router.put('/:key', heavyLimiter, validateParams(keyParamSchema), validate(putBodySchema, 'body'), ctrl.update);
 
 // ─── POST /api/admin/workspace-diy/reset/:key — 恢复默认 ───
-router.post('/reset/:key', heavyLimiter, validateParams(keyParamSchema), (req, res) => ctrl.reset(req, res));
+router.post('/reset/:key', heavyLimiter, validateParams(keyParamSchema), ctrl.reset);
 
 export default router;

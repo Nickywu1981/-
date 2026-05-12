@@ -14,6 +14,6 @@ const querySchema = z.object({
   targetId: z.coerce.number().int().optional(),
 });
 
-router.get('/', authMiddleware, rateLimiter, adminAuth, validate(querySchema, 'query'), (req, res) => ctrl.list(req, res));
+router.get('/', authMiddleware, rateLimiter, adminAuth, validate(querySchema, 'query'), ctrl.list);
 
 export default router;

@@ -52,15 +52,15 @@ const toggleSchema = z.object({ enabled: z.boolean() });
 
 // ============ 模型状态 ============
 
-router.get('/status', requireRole('admin'), (req, res) => ctrl.getModelStatus(req, res));
+router.get('/status', requireRole('admin'), ctrl.getModelStatus);
 
-router.post('/reset-breaker', adminLimiter, requireRole('admin'), _validate(resetBreakerSchema), (req, res) => ctrl.resetBreaker(req, res));
+router.post('/reset-breaker', adminLimiter, requireRole('admin'), _validate(resetBreakerSchema), ctrl.resetBreaker);
 
 // ============ 模型配置 CRUD ============
 
-router.get('/config', requireRole('admin'), (req, res) => ctrl.list(req, res));
+router.get('/config', requireRole('admin'), ctrl.list);
 
-router.get('/config/:modelKey', requireRole('admin'), (req, res) => ctrl.getOne(req, res));
+router.get('/config/:modelKey', requireRole('admin'), ctrl.getOne);
 
 router.post('/config', adminLimiter, requireRole('admin'), _validate(modelConfigSchema), (req, res) => {
   return ctrl.create(req, res);
@@ -70,14 +70,14 @@ router.put('/config/:modelKey', adminLimiter, requireRole('admin'), _validate(mo
   return ctrl.update(req, res);
 });
 
-router.delete('/config/:modelKey', adminLimiter, requireRole('admin'), (req, res) => ctrl.remove(req, res));
+router.delete('/config/:modelKey', adminLimiter, requireRole('admin'), ctrl.remove);
 
-router.patch('/config/:modelKey/toggle', adminLimiter, requireRole('admin'), _validate(toggleSchema), (req, res) => ctrl.toggle(req, res));
+router.patch('/config/:modelKey/toggle', adminLimiter, requireRole('admin'), _validate(toggleSchema), ctrl.toggle);
 
 // ============ 调用日志 ============
 
-router.get('/call-logs', requireRole('admin'), (req, res) => ctrl.callLogs(req, res));
+router.get('/call-logs', requireRole('admin'), ctrl.callLogs);
 
-router.get('/call-stats/:modelKey', requireRole('admin'), (req, res) => ctrl.callStats(req, res));
+router.get('/call-stats/:modelKey', requireRole('admin'), ctrl.callStats);
 
 export default router;
