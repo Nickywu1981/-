@@ -36,7 +36,7 @@ describe('getFunnelMetrics', () => {
   beforeEach(() => { vi.clearAllMocks(); });
 
   it('正常数据：计算各项转化率', async () => {
-    pool.execute.mockResolvedValue([[{
+    pool.query.mockResolvedValue([[{
       registrations: 100, first_uploads: 80, first_generates: 60, payments: 20,
     }]]);
 
@@ -49,7 +49,7 @@ describe('getFunnelMetrics', () => {
   });
 
   it('零注册时转化率均为 0', async () => {
-    pool.execute.mockResolvedValue([[{
+    pool.query.mockResolvedValue([[{
       registrations: 0, first_uploads: 0, first_generates: 0, payments: 0,
     }]]);
 
@@ -60,7 +60,7 @@ describe('getFunnelMetrics', () => {
   });
 
   it('BigInt 类型正确转为 Number', async () => {
-    pool.execute.mockResolvedValue([[{
+    pool.query.mockResolvedValue([[{
       registrations: BigInt(1000), first_uploads: BigInt(500),
       first_generates: BigInt(250), payments: BigInt(50),
     }]]);
@@ -72,15 +72,15 @@ describe('getFunnelMetrics', () => {
   });
 
   it('使用默认 30 天窗口', async () => {
-    pool.execute.mockResolvedValue([[{ registrations: 1, first_uploads: 0, first_generates: 0, payments: 0 }]]);
+    pool.query.mockResolvedValue([[{ registrations: 1, first_uploads: 0, first_generates: 0, payments: 0 }]]);
     await getFunnelMetrics();
-    expect(pool.execute).toHaveBeenCalledWith(expect.any(String), [30]);
+    expect(pool.query).toHaveBeenCalledWith(expect.any(String), ['operation_log', 30]);
   });
 
   it('自定义时间窗口', async () => {
-    pool.execute.mockResolvedValue([[{ registrations: 1, first_uploads: 1, first_generates: 1, payments: 0 }]]);
+    pool.query.mockResolvedValue([[{ registrations: 1, first_uploads: 1, first_generates: 1, payments: 0 }]]);
     await getFunnelMetrics(7);
-    expect(pool.execute).toHaveBeenCalledWith(expect.any(String), [7]);
+    expect(pool.query).toHaveBeenCalledWith(expect.any(String), ['operation_log', 7]);
   });
 });
 
@@ -91,13 +91,13 @@ describe('getActiveUsers', () => {
   beforeEach(() => { vi.clearAllMocks(); });
 
   it('返回 DAU/MAU 数字', async () => {
-    pool.execute
+    pool.query
       .mockResolvedValueOnce([[{ count: BigInt(450) }]])
       .mockResolvedValueOnce([[{ count: BigInt(3200) }]]);
 
     const result = await getActiveUsers();
     expect(result).toEqual({ dau: 450, mau: 3200 });
-    expect(pool.execute).toHaveBeenCalledTimes(2);
+    expect(pool.query).toHaveBeenCalledTimes(2);
   });
 });
 
@@ -108,7 +108,7 @@ describe('getConversionFunnel', () => {
   beforeEach(() => { vi.clearAllMocks(); });
 
   it('五步漏斗转换率正确', async () => {
-    pool.execute.mockResolvedValue([[
+    pool.query.mockResolvedValue([[
       { landing: 1000, registered: 300, activated: 150, paid: 30, retained: 10 },
     ]]);
 
@@ -122,8 +122,8 @@ describe('getConversionFunnel', () => {
   });
 
   it('零数据时各步 count 为 0 rate 为 0%', async () => {
-    pool.execute.mockResolvedValue([[
-      { landing: 0, registered: 0, activated: 0, paid: 0, retained: 0 },
+    pool.query.mockResolvedValue([[{
+      landing: 0, registered: 0, activated: 0, paid: 0, retained: 0 },
     ]]);
 
     const result = await getConversionFunnel();
