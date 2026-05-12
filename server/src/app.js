@@ -118,6 +118,7 @@ import aiAssistantRoutes from './route/aiAssistantRoutes.js'; // Phase 13: AI �
 import workflowRoutes from './route/workflowRoutes.js';       // Phase 14: 工作流引擎 (2026-05-12)
 import campaignRoutes from './route/campaignRoutes.js';     // Phase 11: 运营活动管理 (2026-05-11)
 import operationsRoutes from './route/operationsRoutes.js'; // Phase 12: 跨租户运营看板 (2026-05-12)
+import dashboardRoutes from './route/dashboard.routes.js'; // 运营看板概览
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -337,6 +338,7 @@ app.use('/api/multilingual', apiLimiter, multilingualRoutes);
 app.use('/api/i18n', apiLimiter, i18nRoutes);
 app.use('/api/admin/i18n', adminLimiter, i18nRoutes);
 app.use('/api/analytics', adminLimiter, analyticsRoutes);
+app.use('/api/dashboard', authMiddleware, apiLimiter, dashboardRoutes);  // 运营看板概览
 app.use('/api/platform-specs', apiLimiter, platformSpecRoutes);
 app.use('/api/compare', heavyLimiter, compareRoutes);
 app.use('/api/seo-keywords', heavyLimiter, seoKeywordRoutes);

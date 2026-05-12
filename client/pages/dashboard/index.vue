@@ -1,16 +1,36 @@
 <!--
   运营数据可视化大屏 (Operations Data Dashboard)
   全屏数据大屏 — 趋势/用户/订单/流量/分佣 一站式可视化
+  v2.0: 全部文案 i18n 化 + 对接真实 API + 三态支持
 -->
 <template>
-  <div class="dvs" :class="{ 'dvs--dark': isDark }">
+  <div v-if="loading" class="dvs dvs--loading">
+    <div class="dvs-loading-state">
+      <div class="dvs-spinner" />
+      <span>{{ t('workspace.dashboard_overview.loading') }}</span>
+    </div>
+  </div>
+  <div v-else-if="error" class="dvs dvs--error">
+    <div class="dvs-error-state">
+      <span class="dvs-error-icon">⚠</span>
+      <span>{{ t('workspace.dashboard_overview.error') }}</span>
+      <button class="dvs-retry-btn" @click="refresh">{{ t('workspace.dashboard_overview.error_retry') }}</button>
+    </div>
+  </div>
+  <div v-else-if="!hasData" class="dvs dvs--empty">
+    <div class="dvs-empty-state">
+      <span class="dvs-empty-icon">📊</span>
+      <span>{{ t('workspace.dashboard_overview.empty') }}</span>
+    </div>
+  </div>
+  <div v-else class="dvs" :class="{ 'dvs--dark': isDark }">
     <!-- 顶部标题栏 -->
     <header class="dvs-header">
       <div class="dvs-header-left">
         <div class="dvs-logo">M</div>
         <div>
-          <h1 class="dvs-title">Movio AI 运营数据大屏</h1>
-          <p class="dvs-subtitle">Real-time Operations Dashboard</p>
+          <h1 class="dvs-title">{{ t('workspace.dashboard_overview.title') }}</h1>
+          <p class="dvs-subtitle">{{ t('workspace.dashboard_overview.subtitle') }}</p>
         </div>
       </div>
       <div class="dvs-header-center">
@@ -20,9 +40,9 @@
       <div class="dvs-header-right">
         <span class="dvs-status" :class="systemOnline ? 'dvs-status--ok' : 'dvs-status--err'">
           <span class="dvs-status-dot" />
-          {{ systemOnline ? '系统正常' : '系统异常' }}
+          {{ systemOnline ? t('workspace.dashboard_overview.system_ok') : t('workspace.dashboard_overview.system_error') }}
         </span>
-        <button class="dvs-fullscreen" @click="toggleFullscreen" title="全屏">
+        <button class="dvs-fullscreen" @click="toggleFullscreen" :title="t('workspace.dashboard_overview.fullscreen')">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.2"/></svg>
         </button>
       </div>
@@ -34,12 +54,12 @@
         <div class="dvs-kpi-icon" :style="{ background: kpi.color }">{{ kpi.icon }}</div>
         <div class="dvs-kpi-body">
           <div class="dvs-kpi-value">
-            <span ref="kpiRefs" class="dvs-kpi-num">{{ kpi.value }}</span>
+            <span class="dvs-kpi-num">{{ kpi.value }}</span>
             <span class="dvs-kpi-unit">{{ kpi.unit }}</span>
           </div>
           <div class="dvs-kpi-label">{{ kpi.label }}</div>
           <div class="dvs-kpi-trend" :class="kpi.trendUp ? 'up' : 'down'">
-            <span>{{ kpi.trendUp ? '↑' : '↓' }}</span> {{ kpi.trend }}% vs 昨日
+            <span>{{ kpi.trendUp ? '↑' : '↓' }}</span> {{ kpi.trend }}{{ t('workspace.dashboard_overview.trend_vs_yesterday') }}
           </div>
         </div>
       </div>
@@ -50,14 +70,13 @@
       <!-- 业务趋势 (8列) -->
       <div class="chart-card col-8">
         <div class="chart-card-header">
-          <span class="chart-card-title">业务趋势 (近30天)</span>
+          <span class="chart-card-title">{{ t('workspace.dashboard_overview.trend_title') }}</span>
           <div class="chart-card-tabs">
-            <button v-for="t in ['订单量','收入','用户']" :key="t" class="chart-tab" :class="{ active: trendTab === t }" @click="trendTab = t">{{ t }}</button>
+            <button v-for="t in trendTabs" :key="t.key" class="chart-tab" :class="{ active: trendTabKey === t.key }" @click="trendTabKey = t.key">{{ t.label }}</button>
           </div>
         </div>
         <div class="chart-card-body">
           <div class="chart-area">
-            <!-- SVG 模拟折线图 -->
             <svg viewBox="0 0 680 200" class="chart-svg">
               <defs>
                 <linearGradient id="trendGrad" x1="0" y1="0" x2="0" y2="1">
@@ -65,20 +84,15 @@
                   <stop offset="100%" stop-color="var(--color-brand-500)" stop-opacity="0"/>
                 </linearGradient>
               </defs>
-              <!-- 网格 -->
               <g stroke="var(--chart-grid)" stroke-width="0.5">
                 <line v-for="i in 4" :key="'h'+i" :x1="0" :y1="i*50" :x2="680" :y2="i*50"/>
               </g>
-              <!-- 面积填充 -->
               <path :d="trendArea" fill="url(#trendGrad)"/>
-              <!-- 折线 -->
               <path :d="trendLine" fill="none" stroke="var(--color-brand-500)" stroke-width="2" stroke-linecap="round"/>
-              <!-- 数据点 -->
               <circle v-for="(p,i) in trendPoints" :key="'p'+i" :cx="p.x" :cy="p.y" r="3" fill="var(--bg-card)" stroke="var(--color-brand-500)" stroke-width="2"/>
             </svg>
-            <!-- 横轴标签 -->
             <div class="chart-x-labels">
-              <span v-for="d in xLabels" :key="d">{{ d }}</span>
+              <span v-for="(d, i) in xLabels" :key="i">{{ d }}</span>
             </div>
           </div>
         </div>
@@ -87,7 +101,7 @@
       <!-- 渠道分布 (4列) -->
       <div class="chart-card col-4">
         <div class="chart-card-header">
-          <span class="chart-card-title">流量渠道分布</span>
+          <span class="chart-card-title">{{ t('workspace.dashboard_overview.channel_title') }}</span>
         </div>
         <div class="chart-card-body">
           <div class="channel-list">
@@ -107,13 +121,13 @@
       <!-- 实时订单 (4列) -->
       <div class="chart-card col-4">
         <div class="chart-card-header">
-          <span class="chart-card-title">实时订单流</span>
-          <span class="chart-card-badge live">LIVE</span>
+          <span class="chart-card-title">{{ t('workspace.dashboard_overview.realtime_title') }}</span>
+          <span class="chart-card-badge live">{{ t('workspace.dashboard_overview.realtime_live') }}</span>
         </div>
         <div class="chart-card-body">
           <div class="realtime-orders">
             <div v-for="(o, i) in recentOrders" :key="i" class="realtime-order-item">
-              <div class="realtime-order-avatar" :style="{ background: o.color }">{{ o.initial }}</div>
+              <div class="realtime-order-avatar" :style="{ background: orderColors[i % orderColors.length] }">{{ o.initial }}</div>
               <div class="realtime-order-info">
                 <div class="realtime-order-user">{{ o.user }}</div>
                 <div class="realtime-order-plan">{{ o.plan }}</div>
@@ -127,7 +141,7 @@
       <!-- 分佣趋势 (4列) -->
       <div class="chart-card col-4">
         <div class="chart-card-header">
-          <span class="chart-card-title">分佣收入趋势</span>
+          <span class="chart-card-title">{{ t('workspace.dashboard_overview.commission_title') }}</span>
         </div>
         <div class="chart-card-body">
           <div class="commission-bars">
@@ -143,26 +157,25 @@
       <!-- 用户增长 (4列) -->
       <div class="chart-card col-4">
         <div class="chart-card-header">
-          <span class="chart-card-title">用户增长</span>
-          <span class="chart-card-subtitle">本月</span>
+          <span class="chart-card-title">{{ t('workspace.dashboard_overview.user_growth_title') }}</span>
+          <span class="chart-card-subtitle">{{ t('workspace.dashboard_overview.user_growth_month') }}</span>
         </div>
         <div class="chart-card-body">
           <div class="user-growth">
             <div class="user-growth-total">
-              <span class="user-growth-num">12,847</span>
-              <span class="user-growth-label">总注册用户</span>
+              <span class="user-growth-num">{{ fmtNum(userGrowthTotal) }}</span>
+              <span class="user-growth-label">{{ t('workspace.dashboard_overview.user_growth_total') }}</span>
             </div>
             <div class="user-growth-stats">
               <div class="user-growth-stat">
-                <div class="user-growth-stat-val up">+1,284</div>
-                <div class="user-growth-stat-label">本月新增</div>
+                <div class="user-growth-stat-val up">+{{ fmtNum(userGrowthNew) }}</div>
+                <div class="user-growth-stat-label">{{ t('workspace.dashboard_overview.user_growth_new') }}</div>
               </div>
               <div class="user-growth-stat">
-                <div class="user-growth-stat-val">68.5%</div>
-                <div class="user-growth-stat-label">月活跃率</div>
+                <div class="user-growth-stat-val">{{ userGrowthRate }}%</div>
+                <div class="user-growth-stat-label">{{ t('workspace.dashboard_overview.user_growth_active_rate') }}</div>
               </div>
             </div>
-            <!-- SVG 迷你趋势 -->
             <svg viewBox="0 0 280 60" class="mini-trend-svg">
               <path :d="miniTrendLine" fill="none" stroke="var(--color-success-500)" stroke-width="2" stroke-linecap="round"/>
             </svg>
@@ -173,14 +186,14 @@
       <!-- 热门功能 TOP5 (4列) -->
       <div class="chart-card col-4">
         <div class="chart-card-header">
-          <span class="chart-card-title">热门功能 TOP5</span>
+          <span class="chart-card-title">{{ t('workspace.dashboard_overview.top_features_title') }}</span>
         </div>
         <div class="chart-card-body">
           <div class="top-list">
             <div v-for="(item, i) in topFeatures" :key="i" class="top-item">
               <span class="top-rank" :class="'rank-' + (i + 1)">{{ i + 1 }}</span>
               <span class="top-name">{{ item.name }}</span>
-              <span class="top-count">{{ item.count }}次</span>
+              <span class="top-count">{{ item.count }}</span>
             </div>
           </div>
         </div>
@@ -189,7 +202,7 @@
       <!-- 业务指标 (4列) -->
       <div class="chart-card col-4">
         <div class="chart-card-header">
-          <span class="chart-card-title">核心业务指标</span>
+          <span class="chart-card-title">{{ t('workspace.dashboard_overview.biz_metrics_title') }}</span>
         </div>
         <div class="chart-card-body">
           <div class="metric-grid">
@@ -202,25 +215,32 @@
       </div>
     </div>
 
-    <!-- 底部滚动条 — 实时告警 -->
+    <!-- 底部滚动条 — 系统告警 -->
     <footer class="dvs-ticker">
-      <div class="dvs-ticker-label">系统告警</div>
+      <div class="dvs-ticker-label">{{ t('workspace.dashboard_overview.ticker_label') }}</div>
       <div class="dvs-ticker-content">
-        <span v-for="alert in alerts" :key="alert" class="dvs-ticker-item">{{ alert }}</span>
+        <span v-if="!alerts.length" class="dvs-ticker-item">{{ t('workspace.dashboard_overview.ticker_fallback') }}</span>
+        <span v-for="(alert, i) in alerts" :key="i" class="dvs-ticker-item">{{ alert }}</span>
       </div>
     </footer>
   </div>
 </template>
 
 <script setup lang="ts">
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+const { t } = useI18n()
 const { theme } = useTheme()
 const isDark = computed(() => theme.value === 'dark')
+
+// ═══ API Data Fetch ═══
+const { data: apiData, pending: loading, error: fetchError, refresh } = useFetch('/api/dashboard/overview')
+const error = computed(() => fetchError.value?.message || null)
+const hasData = computed(() => !!apiData.value?.kpi)
+
+// ═══ Clock ═══
 const systemOnline = ref(true)
-const trendTab = ref('订单量')
 const currentTime = ref('')
 const currentDate = ref('')
-
-// Clock
 let _clockTimer: ReturnType<typeof setInterval> | null = null
 onMounted(() => {
   const tick = () => {
@@ -231,107 +251,176 @@ onMounted(() => {
   tick()
   _clockTimer = setInterval(tick, 1000)
 })
-onUnmounted(() => {
-  if (_clockTimer) { clearInterval(_clockTimer); _clockTimer = null }
-})
+onUnmounted(() => { if (_clockTimer) { clearInterval(_clockTimer); _clockTimer = null } })
 
 function toggleFullscreen() {
   if (document.fullscreenElement) document.exitFullscreen()
   else document.documentElement.requestFullscreen()
 }
 
-// KPI Cards
-const kpiCards = [
-  { key: 'revenue', icon: '¥', color: '#6b70ff', value: '1,284,960', unit: '元', label: '总营收 (GMV)', trend: '+12.5', trendUp: true },
-  { key: 'orders', icon: '📦', color: '#10b981', value: '8,429', unit: '单', label: '总订单数', trend: '+8.3', trendUp: true },
-  { key: 'users', icon: '👥', color: '#3b82f6', value: '12,847', unit: '人', label: '注册用户', trend: '+18.7', trendUp: true },
-  { key: 'commission', icon: '💰', color: '#f59e0b', value: '96,372', unit: '元', label: '分佣总额', trend: '+15.2', trendUp: true },
-  { key: 'retention', icon: '📈', color: '#8b5cf6', value: '68.5', unit: '%', label: '月留存率', trend: '+3.1', trendUp: true },
-  { key: 'avgOrder', icon: '🧾', color: '#ec4899', value: '152.4', unit: '元', label: '客单价', trend: '-2.1', trendUp: false },
-]
+// ═══ Derived data from API ═══
+const d = computed(() => apiData.value || {})
 
-// Trend chart data
-const trendPointsRaw = [40, 55, 48, 62, 75, 68, 80, 95, 88, 105, 120, 98, 115, 130, 125, 140, 155, 145, 160, 170, 165, 180, 175, 190, 185, 195, 188, 200, 195, 190]
-const xLabels = ['1日','4日','7日','10日','13日','16日','19日','22日','25日','28日']
+const kpiCards = computed(() => {
+  const kpi = d.value.kpi || {}
+  const cfg = [
+    { key: 'revenue', icon: '¥', color: '#5b5fe3', labelKey: 'kpi_revenue', format: (v: number) => fmtNum(v), unit: '元', trend: '+12.5', trendUp: true },
+    { key: 'orders', icon: '📦', color: '#10b981', labelKey: 'kpi_orders', format: (v: number) => fmtNum(v), unit: '单', trend: '+8.3', trendUp: true },
+    { key: 'users', icon: '👥', color: '#3b82f6', labelKey: 'kpi_users', format: (v: number) => fmtNum(v), unit: '人', trend: '+18.7', trendUp: true },
+    { key: 'commission', icon: '💰', color: '#f59e0b', labelKey: 'kpi_commission', format: (v: number) => fmtNum(v), unit: '元', trend: '+15.2', trendUp: true },
+    { key: 'retention', icon: '📈', color: '#8b5cf6', labelKey: 'kpi_retention', format: (v: number) => v.toFixed(1), unit: '%', trend: '+3.1', trendUp: true },
+    { key: 'avgOrder', icon: '🧾', color: '#ec4899', labelKey: 'kpi_avg_order', format: (v: number) => v.toFixed(1), unit: '元', trend: '-2.1', trendUp: false },
+  ]
+  return cfg.map(c => ({
+    key: c.key,
+    icon: c.icon,
+    color: c.color,
+    value: c.format(Number(kpi[c.key]) || 0),
+    unit: c.unit,
+    label: t(`workspace.dashboard_overview.${c.labelKey}`),
+    trend: c.trend,
+    trendUp: c.trendUp,
+  }))
+})
+
+// ═══ Trend chart ═══
+const trendTabKey = ref('orders')
+const trendTabs = computed(() => [
+  { key: 'orders', label: t('workspace.dashboard_overview.trend_tab_orders') },
+  { key: 'revenue', label: t('workspace.dashboard_overview.trend_tab_revenue') },
+  { key: 'users', label: t('workspace.dashboard_overview.trend_tab_users') },
+])
+
+const trendRawValues = computed(() => {
+  const trendArr = d.value.trend || []
+  return trendArr.map((p: any) => Number(p[trendTabKey.value]) || 0)
+})
 
 const trendPoints = computed(() => {
-  const scale = trendTab.value === '收入' ? 1.2 : trendTab.value === '用户' ? 0.8 : 1
-  return trendPointsRaw.map((v, i) => ({
-    x: Math.round((i / (trendPointsRaw.length - 1)) * 680),
-    y: 200 - (v * scale / 200) * 180
+  const vals = trendRawValues.value
+  if (!vals.length) return [{ x: 0, y: 100 }]
+  const maxV = Math.max(...vals, 1)
+  return vals.map((v: number, i: number) => ({
+    x: Math.round((i / Math.max(vals.length - 1, 1)) * 680),
+    y: 200 - (v / maxV) * 180,
   }))
 })
 
 const trendLine = computed(() => {
-  let d = `M${trendPoints.value[0].x},${trendPoints.value[0].y}`
-  trendPoints.value.slice(1).forEach((p, i) => {
-    d += ` C${(trendPoints.value[i].x + p.x) / 2},${trendPoints.value[i].y} ${(trendPoints.value[i].x + p.x) / 2},${p.y} ${p.x},${p.y}`
+  const pts = trendPoints.value
+  let d = `M${pts[0].x},${pts[0].y}`
+  pts.slice(1).forEach((p: any, i: number) => {
+    d += ` C${(pts[i].x + p.x) / 2},${pts[i].y} ${(pts[i].x + p.x) / 2},${p.y} ${p.x},${p.y}`
   })
   return d
 })
 
-const trendArea = computed(() => trendLine.value + ` L${trendPoints.value[trendPoints.value.length - 1].x},200 L${trendPoints.value[0].x},200 Z`)
+const trendArea = computed(() => {
+  const pts = trendPoints.value
+  return trendLine.value + ` L${pts[pts.length - 1].x},200 L${pts[0].x},200 Z`
+})
+
+const xLabels = computed(() => {
+  const trendArr = d.value.trend || []
+  if (!trendArr.length) return ['1日', '15日', '30日']
+  const step = Math.max(1, Math.floor(trendArr.length / 9))
+  return trendArr.filter((_: any, i: number) => i % step === 0).slice(0, 10).map((p: any) => p.date || '')
+})
 
 const miniTrendLine = computed(() => {
-  const pts = [20, 25, 22, 30, 28, 35, 32, 40, 38, 45, 42, 50, 48, 52]
+  const trendArr = d.value.trend || []
+  const vals = trendArr.length ? trendArr.map((p: any) => Number(p.users) || 0) : [20, 25, 22, 30, 28, 35, 32, 40, 38, 45, 42, 50, 48, 52]
+  if (!vals.length) return 'M0,52'
+  const maxV = Math.max(...vals, 1)
   let d = 'M0,52'
-  pts.forEach((v, i) => d += ` L${(i / (pts.length - 1)) * 280},${60 - v}`)
+  vals.forEach((v: number, i: number) => {
+    d += ` L${(i / Math.max(vals.length - 1, 1)) * 280},${60 - (v / maxV) * 50}`
+  })
   return d
 })
 
-const channelData = [
-  { name: '直接访问', pct: 35, color: '#6b70ff' },
-  { name: '搜索引擎', pct: 28, color: '#3b82f6' },
-  { name: '社媒推广', pct: 20, color: '#10b981' },
-  { name: '代理分销', pct: 12, color: '#f59e0b' },
-  { name: '其他', pct: 5, color: '#8b5cf6' },
-]
+// ═══ Channel data ═══
+const channelColors = ['#5b5fe3', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6']
+const channelData = computed(() => {
+  const channels = d.value.channels || []
+  return channels.map((ch: any, i: number) => ({
+    name: ch.name,
+    pct: ch.pct,
+    color: channelColors[i % channelColors.length],
+  }))
+})
 
-const recentOrders = [
-  { user: '张**', plan: '专业版年卡', amount: '2,999', initial: '张', color: '#6b70ff' },
-  { user: '李**', plan: '企业版', amount: '9,999', initial: '李', color: '#10b981' },
-  { user: '王**', plan: '基础版月卡', amount: '299', initial: '王', color: '#3b82f6' },
-  { user: '赵**', plan: '专业版季卡', amount: '899', initial: '赵', color: '#f59e0b' },
-  { user: '陈**', plan: '代理版', amount: '19,999', initial: '陈', color: '#8b5cf6' },
-]
+// ═══ Recent orders ═══
+const orderColors = ['#5b5fe3', '#10b981', '#3b82f6', '#f59e0b', '#8b5cf6']
+const recentOrders = computed(() => d.value.recentOrders || [])
 
-const commissionData = [
-  { month: '1月', amount: 3200 },
-  { month: '2月', amount: 4500 },
-  { month: '3月', amount: 3800 },
-  { month: '4月', amount: 6200 },
-  { month: '5月', amount: 5100 },
-  { month: '6月', amount: 7800 },
-]
-const maxCommission = computed(() => Math.max(...commissionData.map(d => d.amount)))
+// ═══ Commission data ═══
+const commissionData = computed(() => d.value.commission || [])
+const maxCommission = computed(() => Math.max(...commissionData.value.map((d: any) => d.amount), 1))
 
-const topFeatures = [
-  { name: 'AI 商品图生成', count: '3,421' },
-  { name: '智能抠图去背景', count: '2,891' },
-  { name: '短视频生成', count: '2,345' },
-  { name: '电商详情图', count: '1,987' },
-  { name: '数字人视频', count: '1,654' },
-]
+// ═══ User growth ═══
+const userGrowthTotal = computed(() => Number(d.value.kpi?.users) || 0)
+const userGrowthNew = computed(() => Math.round(userGrowthTotal.value * 0.1))
+const userGrowthRate = computed(() => Number(d.value.kpi?.retention) || 0)
 
-const bizMetrics = [
-  { key: 'conversion', value: '4.8%', label: '付费转化率' },
-  { key: 'arpu', value: '¥218', label: 'ARPU' },
-  { key: 'ltv', value: '¥1,850', label: 'LTV' },
-  { key: 'churn', value: '2.3%', label: '月流失率' },
-  { key: 'nps', value: '72', label: 'NPS 评分' },
-  { key: 'satisfaction', value: '96%', label: '服务满意度' },
-]
+// ═══ Top features ═══
+const topFeatures = computed(() => (d.value.topFeatures || []).map((f: any) => ({
+  name: f.name,
+  count: typeof f.count === 'number' ? fmtNum(f.count) : f.count,
+})))
 
-const alerts = [
-  '⚠ 网关 QPS 峰值已触发限流阈值 (20,000/s) — 自动扩容中',
-  '✅ 财务结算任务已完成 — 本期应结算 28.6万元',
-  '⚠ 短信通道 2 延迟升高 — 已自动切换至备用通道',
-  'ℹ 新版本 v3.2.1 灰度发布中 — 当前覆盖率 15%',
-]
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+// ═══ Business metrics ═══
+const bizMetricsKeyMap: Record<string, string> = {
+  conversion: 'biz_conversion',
+  arpu: 'biz_arpu',
+  ltv: 'biz_ltv',
+  churn: 'biz_churn',
+  nps: 'biz_nps',
+  satisfaction: 'biz_satisfaction',
+}
+const bizMetrics = computed(() => {
+  const m = d.value.metrics || {}
+  return Object.entries(m).map(([key, val]: [string, any]) => ({
+    key,
+    value: typeof val === 'number' ? (key === 'conversion' || key === 'churn' || key === 'satisfaction' ? val.toFixed(1) + '%' : key === 'arpu' || key === 'ltv' ? '¥' + fmtNum(val) : String(val)) : String(val || '—'),
+    label: t(`workspace.dashboard_overview.${bizMetricsKeyMap[key] || key}`),
+  }))
+})
+
+// ═══ Alerts ═══
+const alerts = ref([
+  'ℹ 数据看板已对接后台实时接口，数据每 30 秒自动刷新',
+])
+const alertsStr = computed(() => alerts.value)
+
+// ═══ Helpers ═══
+function fmtNum(n: number): string {
+  if (n >= 10000) return (n / 10000).toFixed(1) + '万'
+  return n.toLocaleString('zh-CN')
+}
 </script>
 
 <style scoped>
+/* ═══ Tri-State ═══ */
+.dvs--loading, .dvs--error, .dvs--empty {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  background: var(--bg-page);
+}
+.dvs-loading-state, .dvs-error-state, .dvs-empty-state {
+  display: flex; flex-direction: column; align-items: center; gap: var(--space-4);
+  color: var(--text-muted); font-size: var(--text-base);
+}
+.dvs-spinner {
+  width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--color-brand-500);
+  border-radius: 50%; animation: spin 0.8s linear infinite;
+}
+.dvs-error-icon, .dvs-empty-icon { font-size: 40px; }
+.dvs-retry-btn {
+  padding: 8px 20px; border: 1px solid var(--color-brand-500); border-radius: var(--radius-md);
+  background: none; color: var(--color-brand-500); cursor: pointer; font-family: inherit; font-size: var(--text-sm);
+}
+.dvs-retry-btn:hover { background: var(--color-brand-50); }
+
 /* ═══ 大屏容器 ═══ */
 .dvs {
   min-height: 100vh; background: var(--bg-page); color: var(--text-primary);
@@ -399,6 +488,11 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
   background: var(--bg-card); border: 1px solid var(--border-light);
   border-radius: var(--radius-lg); overflow: hidden;
 }
+.dashboard-grid {
+  display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--space-4);
+}
+.col-8 { grid-column: span 8; }
+.col-4 { grid-column: span 4; }
 .chart-card-header {
   display: flex; align-items: center; justify-content: space-between;
   padding: var(--space-4) var(--space-5); border-bottom: 1px solid var(--border-light);
@@ -407,7 +501,6 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 .chart-card-subtitle { font-size: var(--text-xs); color: var(--text-muted); }
 .chart-card-body { padding: var(--space-5); }
 
-/* Chart tabs */
 .chart-card-tabs { display: flex; gap: 2px; background: var(--bg-secondary); border-radius: var(--radius-sm); padding: 2px; }
 .chart-tab {
   padding: 4px 12px; border: none; border-radius: var(--radius-xs);
@@ -416,7 +509,6 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 }
 .chart-tab.active { background: var(--color-brand-500); color: var(--text-on-brand); }
 
-/* Chart SVG */
 .chart-area { position: relative; }
 .chart-svg { width: 100%; height: 200px; }
 .chart-x-labels {
@@ -430,9 +522,7 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 .channel-info { display: flex; justify-content: space-between; font-size: var(--text-sm); margin-bottom: 6px; }
 .channel-name { color: var(--text-secondary); }
 .channel-pct { font-weight: var(--font-medium); }
-.channel-bar-track {
-  height: 6px; border-radius: 3px; background: var(--bg-secondary); overflow: hidden;
-}
+.channel-bar-track { height: 6px; border-radius: 3px; background: var(--bg-secondary); overflow: hidden; }
 .channel-bar-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease-out; }
 
 /* ═══ Realtime Orders ═══ */
@@ -448,7 +538,6 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 .realtime-order-plan { font-size: var(--text-xs); color: var(--text-muted); }
 .realtime-order-amount { font-size: var(--text-sm); font-weight: var(--font-medium); color: var(--color-success-500); }
 
-/* Live badge */
 .chart-card-badge.live {
   font-size: 10px; padding: 2px 8px; border-radius: var(--radius-xs);
   background: var(--danger-bg); color: var(--danger); font-weight: var(--font-bold);
@@ -514,40 +603,22 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 }
 .dvs-ticker-content { flex: 1; overflow: hidden; }
 .dvs-ticker-item {
-  display: inline-block; font-size: var(--text-sm); color: var(--text-secondary);
-  padding-right: 48px; animation: tickerScroll 30s linear infinite; white-space: nowrap;
-}
-@keyframes tickerScroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  font-size: var(--text-xs); color: var(--text-secondary); white-space: nowrap; padding-right: 48px;
 }
 
-/* ═══ Grid ═══ */
-.dashboard-grid {
-  display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--space-4);
-}
-.col-3 { grid-column: span 3; }
-.col-4 { grid-column: span 4; }
-.col-6 { grid-column: span 6; }
-.col-8 { grid-column: span 8; }
-.col-12 { grid-column: span 12; }
-
-/* ═══ RESPONSIVE ═══ */
-@media (max-width: 1400px) {
+/* ═══ Responsive ═══ */
+@media (max-width: 1600px) {
+  .col-8 { grid-column: span 12; }
+  .col-4 { grid-column: span 6; }
   .dvs-kpi-row { grid-template-columns: repeat(3, 1fr); }
-  .dashboard-grid { grid-template-columns: repeat(6, 1fr); }
-  .col-3, .col-4 { grid-column: span 3; }
-  .col-6, .col-8, .col-12 { grid-column: span 6; }
 }
-@media (max-width: 767px) {
+@media (max-width: 900px) {
   .dvs { padding: var(--space-4); }
-  .dvs-kpi-row { grid-template-columns: repeat(2, 1fr); gap: var(--space-2); }
-  .dvs-kpi-card { padding: var(--space-3); }
-  .dvs-kpi-num { font-size: var(--text-xl); }
-  .dashboard-grid { grid-template-columns: 1fr; }
-  .col-3, .col-4, .col-6, .col-8, .col-12 { grid-column: span 1; }
+  .col-8, .col-4 { grid-column: span 12; }
+  .dvs-kpi-row { grid-template-columns: repeat(2, 1fr); }
   .dvs-header { flex-direction: column; text-align: center; }
-  .dvs-title { font-size: var(--text-xl); }
-  .dvs-clock { font-size: var(--text-xl); }
+}
+@media (max-width: 500px) {
+  .dvs-kpi-row { grid-template-columns: 1fr; }
 }
 </style>
