@@ -30,6 +30,15 @@ function validateLocale(locale) {
   }
 }
 
+function logAndRespond(res, err, context) {
+  logger.error(`[i18n] ${context}`, { error: err.message, stack: err.stack });
+  const status = err instanceof z.ZodError ? 400 : (err.statusCode || 500);
+  if (err instanceof z.ZodError) {
+    return res.status(400).json({ code: 400, msg: '参数校验失败', errors: err.errors });
+  }
+  res.status(status >= 400 ? status : 500).json({ code: status >= 400 ? status : 500, msg: '服务异常，请稍后重试' });
+}
+
 // ── Zod schemas ──
 
 const singleEntrySchema = z.object({
@@ -53,9 +62,7 @@ publicRouter.get('/:locale', async (req, res) => {
     const data = await i18nService.getTranslations(req.params.locale);
     res.json({ code: 0, data });
   } catch (err) {
-    logger.error('[i18n] getTranslations', { locale: req.params.locale, error: err.message });
-    const code = err.statusCode || 500;
-    res.status(code >= 400 ? code : 500).json({ code: code >= 400 ? code : 500, msg: err.statusCode ? err.message : '获取翻译失败' });
+    logAndRespond(res, err, 'getTranslations');
   }
 });
 
@@ -65,7 +72,7 @@ publicRouter.get('/:locale/:namespace', async (req, res) => {
     const data = await i18nService.getTranslationsByNamespace(req.params.locale, req.params.namespace);
     res.json({ code: 0, data });
   } catch (err) {
-    res.status(500).json({ code: 500, msg: '获取翻译失败' });
+    logAndRespond(res, err, 'getTranslationsByNamespace');
   }
 });
 
@@ -80,12 +87,12 @@ publicRouter.get('/version/stream', (req, res) => {
   const onVersion = (data) => res.write(`data: ${JSON.stringify(data)}\n\n`);
   import('../services/config-version.service.js').then(mod => {
     if (mod.versionEmitter) mod.versionEmitter.on('i18n-version', onVersion);
-  }).catch(() => {});
+  }).catch(err => { logger.error('[i18n] SSE versionEmitter on', { error: err.message }); });
 
   req.on('close', () => {
     import('../services/config-version.service.js').then(mod => {
       if (mod.versionEmitter) mod.versionEmitter.off('i18n-version', onVersion);
-    }).catch(() => {});
+    }).catch(err => { logger.error('[i18n] SSE versionEmitter off', { error: err.message }); });
   });
 });
 
@@ -105,7 +112,7 @@ adminRouter.get('/:locale', async (req, res) => {
     });
     res.json({ code: 0, data: { entries, namespaces } });
   } catch (err) {
-    res.status(500).json({ code: 500, msg: '获取翻译失败' });
+    logAndRespond(res, err, 'admin getTranslations');
   }
 });
 
@@ -115,7 +122,7 @@ adminRouter.get('/:locale/search', async (req, res) => {
     const rows = await i18nService.searchTranslations(req.params.locale, req.query.q || '');
     res.json({ code: 0, data: rows });
   } catch (err) {
-    res.status(500).json({ code: 500, msg: '搜索失败' });
+    logAndRespond(res, err, 'searchTranslations');
   }
 });
 
@@ -126,8 +133,7 @@ adminRouter.post('/:locale', async (req, res) => {
     const result = await i18nService.setTranslation(req.params.locale, key, value, req.user?.id);
     res.json({ code: 0, data: result });
   } catch (err) {
-    if (err instanceof z.ZodError) return res.status(400).json({ code: 400, msg: '参数校验失败', errors: err.errors });
-    res.status(500).json({ code: 500, msg: '保存失败' });
+    logAndRespond(res, err, 'setTranslation');
   }
 });
 
@@ -140,8 +146,7 @@ adminRouter.post('/:locale/batch', async (req, res) => {
     const result = await i18nService.importTranslations(req.params.locale, obj);
     res.json({ code: 0, data: result });
   } catch (err) {
-    if (err instanceof z.ZodError) return res.status(400).json({ code: 400, msg: '参数校验失败', errors: err.errors });
-    res.status(500).json({ code: 500, msg: '批量保存失败' });
+    logAndRespond(res, err, 'batchTranslation');
   }
 });
 
@@ -151,7 +156,7 @@ adminRouter.delete('/:locale/:key', async (req, res) => {
     await i18nService.deleteTranslation(req.params.locale, req.params.key);
     res.json({ code: 0, msg: '删除成功' });
   } catch (err) {
-    res.status(500).json({ code: 500, msg: '删除失败' });
+    logAndRespond(res, err, 'deleteTranslation');
   }
 });
 
@@ -162,8 +167,7 @@ adminRouter.post('/:locale/import', async (req, res) => {
     const result = await i18nService.importTranslations(req.params.locale, data, req.query.skipEdted === '1');
     res.json({ code: 0, data: result });
   } catch (err) {
-    if (err instanceof z.ZodError) return res.status(400).json({ code: 400, msg: '参数校验失败', errors: err.errors });
-    res.status(500).json({ code: 500, msg: '导入失败' });
+    logAndRespond(res, err, 'importTranslations');
   }
 });
 
@@ -175,7 +179,7 @@ adminRouter.get('/:locale/export', async (req, res) => {
     res.setHeader('Content-Disposition', `attachment; filename="${req.params.locale}.json"`);
     res.json(data);
   } catch (err) {
-    res.status(500).json({ code: 500, msg: '导出失败' });
+    logAndRespond(res, err, 'exportTranslations');
   }
 });
 
@@ -185,7 +189,7 @@ adminRouter.get('/:locale/logs/:key', async (req, res) => {
     const logs = await i18nService.getLogs(req.params.locale, req.params.key);
     res.json({ code: 0, data: logs });
   } catch (err) {
-    res.status(500).json({ code: 500, msg: '获取日志失败' });
+    logAndRespond(res, err, 'getLogs');
   }
 });
 
