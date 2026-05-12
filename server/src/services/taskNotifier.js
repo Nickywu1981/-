@@ -5,7 +5,7 @@
 
 import * as notificationService from './notificationService.js';
 import * as smsService from './smsService.js';
-import pool from '../dao/db.js';
+import * as userDao from '../dao/userDao.js';
 import logger from '../utils/logger.js';
 
 /**
@@ -42,18 +42,12 @@ export async function notifyComplete(taskId, userId, { type, title, result: _res
 }
 
 async function trySendSms(userId, typeLabel) {
-  let user;
   try {
-    const [[u]] = await pool.execute(
-      'SELECT phone FROM user WHERE id = ? AND phone IS NOT NULL AND phone != \'\'',
-      [userId],
-    );
-    user = u;
+    const user = await userDao.findPhoneById(userId);
     if (!user?.phone) return;
-
     await smsService.sendNotification(user.phone, {
       templateCode: 'sms_task_complete',
       params: { task_type: typeLabel, count: '1' },
     });
-  } catch (e) { logger.warn('任务完成短信通知失败', { userId: user?.id, taskType: typeLabel, error: e.message }); }
+  } catch (e) { logger.warn('任务完成短信通知失败', { userId, taskType: typeLabel, error: e.message }); }
 }

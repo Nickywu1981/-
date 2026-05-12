@@ -6,7 +6,7 @@
 import { ORDER_STATUS } from '../constants/domainStatus.js';
 import { BusinessError } from '../utils/businessError.js';
 import * as allinpayService from '../services/allinpayService.js';
-import pool from '../dao/db.js';
+import allinpayDao from '../dao/allinpayDao.js';
 import allinpayConfig from '../config/allinpay.js';
 import logger from '../utils/logger.js';
 
@@ -110,9 +110,5 @@ export async function getOrder(reqsn) {
 // ==================== 账单 ====================
 
 export async function getBillingHistory(userId) {
-  const [rows] = await pool.query(
-    'SELECT reqsn, trxid, amount, pay_channel, status, body, create_time, pay_time FROM allinpay_order WHERE user_id = ? AND status = 1 ORDER BY create_time DESC LIMIT 50',
-    [userId],
-  );
-  return rows;
+  return allinpayDao.getBillingHistory(userId);
 }

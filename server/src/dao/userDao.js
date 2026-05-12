@@ -25,6 +25,14 @@ export async function findById(id) {
   return rows[0] || null;
 }
 
+export async function findPhoneById(id) {
+  const [[row]] = await pool.execute(
+    'SELECT phone FROM user WHERE id = ? AND phone IS NOT NULL AND phone != \'\'',
+    [id],
+  );
+  return row || null;
+}
+
 export async function countUsers(keyword = '') {
   const sql = keyword
     ? 'SELECT COUNT(*) AS total FROM user WHERE is_deleted = 0 AND (username LIKE ? OR nickname LIKE ?)'
