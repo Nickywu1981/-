@@ -79,23 +79,6 @@ export function validateStartupConfig() {
     }
   }
 
-  // P1: STORAGE_DRIVER must not be local in production
-  const storageDriver = process.env.STORAGE_DRIVER || process.env.STORAGE_PROVIDER || 'local';
-  if (isProd && storageDriver === 'local') {
-    errors.push('生产环境 STORAGE_DRIVER 不能为 local（本地存储不支持水平扩展），请使用 cos 或 s3');
-  }
-  if (isProd && storageDriver === 'cos') {
-    if (!process.env.COS_SECRET_ID) errors.push('生产环境 COS 存储需设置 COS_SECRET_ID');
-    if (!process.env.COS_SECRET_KEY) errors.push('生产环境 COS 存储需设置 COS_SECRET_KEY');
-    if (!process.env.COS_BUCKET) errors.push('生产环境 COS 存储需设置 COS_BUCKET');
-  }
-  if (isProd && storageDriver === 's3') {
-    if (!process.env.S3_ACCESS_KEY) errors.push('生产环境 S3 存储需设置 S3_ACCESS_KEY');
-    if (!process.env.S3_SECRET_KEY) errors.push('生产环境 S3 存储需设置 S3_SECRET_KEY');
-    if (!process.env.S3_BUCKET) errors.push('生产环境 S3 存储需设置 S3_BUCKET');
-    if (!process.env.S3_ENDPOINT) errors.push('生产环境 S3 存储需设置 S3_ENDPOINT');
-  }
-
   // P2: Warnings
   if (isProd && (!config.mysql.host || config.mysql.host === 'localhost')) {
     warnings.push('生产环境 DB_HOST 仍为 localhost');
