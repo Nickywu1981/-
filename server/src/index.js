@@ -96,8 +96,8 @@ function gracefulShutdown(signal) {
 
     // 关闭 Redis
     try {
-      const redis = await import('./dao/redis.js');
-      await redis.default.quit();
+      const { quit } = await import('./dao/redis.js');
+      await quit();
       logger.info('Redis 已关闭');
     } catch (e) { logger.warn('Redis 关闭失败', { message: e.message }); }
 
