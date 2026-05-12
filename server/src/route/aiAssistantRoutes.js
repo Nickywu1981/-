@@ -3,12 +3,12 @@
  * POST /api/ai-assistant/faq       — FAQ 智能客服
  * POST /api/ai-assistant/review    — 内容审核
  * POST /api/ai-assistant/data      — 数据分析助手
+ *
+ * authMiddleware + apiLimiter 在 app.js 挂载层统一应用
  */
 import { Router } from 'express';
 import { z } from 'zod';
 import { validate } from '../utils/validate.js';
-import { authMiddleware } from '../middleware/auth.js';
-import { rateLimiter } from '../middleware/rateLimiter.js';
 import * as ctrl from '../controller/aiAssistantController.js';
 
 const router = Router();
@@ -21,8 +21,8 @@ const reviewSchema = z.object({
   text: z.string().min(1).max(5000),
 });
 
-router.post('/faq', authMiddleware, rateLimiter, validate(questionSchema), (req, res) => ctrl.askFAQ(req, res));
-router.post('/review', authMiddleware, rateLimiter, validate(reviewSchema), (req, res) => ctrl.review(req, res));
-router.post('/data', authMiddleware, rateLimiter, validate(questionSchema), (req, res) => ctrl.dataQuery(req, res));
+router.post('/faq', validate(questionSchema), ctrl.askFAQ);
+router.post('/review', validate(reviewSchema), ctrl.review);
+router.post('/data', validate(questionSchema), ctrl.dataQuery);
 
 export default router;
