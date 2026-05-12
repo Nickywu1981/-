@@ -6,12 +6,9 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { validate } from '../utils/validate.js';
-import { success, error } from '../utils/response.js';
-import { ERROR_CODE } from '../constants/errorCode.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
-import { getAllConfig, getConfigByKey, saveConfig, deleteConfigByKey } from '../services/siteConfigService.js';
-import logger from '../utils/logger.js';
+import * as ctrl from '../controller/adminWorkspaceDiyController.js';
 
 const router = Router();
 
@@ -30,44 +27,15 @@ const putBodySchema = z.object({
 const validateParams = (schema) => validate(schema, 'params');
 
 // ─── GET /api/admin/workspace-diy — 获取所有配置 ───
-router.get('/', async (req, res, next) => {
-  try {
-    const rows = await getAllConfig();
-    const config = {};
-    for (const r of rows) config[r.config_key] = r.config_value;
-    return success(res, { config, updatedAt: rows[0]?.updated_at || null });
-  } catch (err) { next(err); }
-});
+router.get('/', (req, res) => ctrl.getAll(req, res));
 
 // ─── GET /api/admin/workspace-diy/:key — 获取单项配置 ───
-router.get('/:key', validateParams(keyParamSchema), async (req, res, next) => {
-  try {
-    const row = await getConfigByKey(req.params.key);
-    if (!row) return error(res, ERROR_CODE.NOT_FOUND, '配置项不存在');
-    return success(res, row);
-  } catch (err) { next(err); }
-});
+router.get('/:key', validateParams(keyParamSchema), (req, res) => ctrl.getByKey(req, res));
 
 // ─── PUT /api/admin/workspace-diy/:key — 更新单项配置 ───
-router.put('/:key', heavyLimiter, validateParams(keyParamSchema), validate(putBodySchema, 'body'), async (req, res, next) => {
-  try {
-    const { config_value, description } = req.body;
-    const updatedBy = req.user?.username || req.user?.email || 'admin';
-    await saveConfig(req.params.key, config_value, 'json', description || '');
-    logger.info(`[workspace-diy] ${req.params.key} 已更新 by ${updatedBy}`);
-    return success(res, { message: `${req.params.key} 已保存`, updatedBy });
-  } catch (err) { next(err); }
-});
+router.put('/:key', heavyLimiter, validateParams(keyParamSchema), validate(putBodySchema, 'body'), (req, res) => ctrl.update(req, res));
 
 // ─── POST /api/admin/workspace-diy/reset/:key — 恢复默认 ───
-router.post('/reset/:key', heavyLimiter, validateParams(keyParamSchema), async (req, res, next) => {
-  try {
-    const row = await getConfigByKey(req.params.key);
-    if (!row) return error(res, ERROR_CODE.NOT_FOUND, '配置项不存在');
-    await deleteConfigByKey(req.params.key);
-    logger.info(`[workspace-diy] ${req.params.key} 已重置为默认值 by ${req.user?.username || 'admin'}`);
-    return success(res, { message: `${req.params.key} 已重置为默认值` });
-  } catch (err) { next(err); }
-});
+router.post('/reset/:key', heavyLimiter, validateParams(keyParamSchema), (req, res) => ctrl.reset(req, res));
 
 export default router;
