@@ -12,3 +12,10 @@ sql
 certs
 logs
 scripts
+**/__tests__
+**/*.test.js
+**/*.spec.js
+eslint.config.js
+vitest.config.js
+vitest.setup.js
+grafana-dashboard.json

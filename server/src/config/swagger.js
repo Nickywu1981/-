@@ -9,8 +9,7 @@ const options = {
       description: '电商 AI SaaS 系统接口文档 v4.1 — 图片/视频/批量/商业化/管理后台/积分/分销',
     },
     servers: [
-      { url: 'http://localhost:3001', description: '开发环境' },
-      { url: 'https://api.movio.ai', description: '生产环境' },
+      { url: process.env.SWAGGER_SERVER_URL || `http://localhost:${process.env.PORT || 3001}`, description: process.env.NODE_ENV === 'production' ? '生产环境' : '开发环境' },
     ],
     components: {
       securitySchemes: {
