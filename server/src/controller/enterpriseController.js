@@ -7,6 +7,7 @@ import { success } from '../utils/response.js';
 import logger from '../utils/logger.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { BusinessError } from '../utils/businessError.js';
+import { isProduction } from '../config/index.js';
 import { wrapController } from '../utils/wrapController.js';
 import { revokeAllUserTokens } from '../utils/jwtToken.js';
 import * as enterpriseService from '../services/enterpriseService.js';
@@ -60,8 +61,8 @@ export const logoutEnterprise = wrapController(async (req, res) => {
   if (userId) {
     await revokeAllUserTokens(userId);
   }
-  res.clearCookie('token', { path: '/' });
-  res.clearCookie('refreshToken', { path: '/' });
+  res.clearCookie('token', { httpOnly: true, secure: isProduction, sameSite: 'lax', path: '/' });
+  res.clearCookie('refreshToken', { httpOnly: true, secure: isProduction, sameSite: 'lax', path: '/' });
   return success(res, null, '已退出登录');
 });
 
