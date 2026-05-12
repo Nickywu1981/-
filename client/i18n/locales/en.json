@@ -303,7 +303,13 @@
     "pixel": "px",
     "generate_long": "Generate Long Image",
     "scenes_count": "Scenes",
-    "max_scenes": "Max 20 scenes"
+    "max_scenes": "Max 20 scenes",
+    "smart_recognition_tab": "Smart Recognition",
+    "smart_recognition_desc": "Upload a reference image, AI auto-detects product info",
+    "voice_option": "Voice",
+    "quantity_option": "Quantity",
+    "color_option": "Color",
+    "none": "None"
   },
   "copywriting": {
     "title": "AI Copywriting",

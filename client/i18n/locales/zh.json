@@ -303,7 +303,13 @@
     "pixel": "像素",
     "generate_long": "生成长图",
     "scenes_count": "场景数",
-    "max_scenes": "最多20个场景"
+    "max_scenes": "最多20个场景",
+    "smart_recognition_tab": "智能识别",
+    "smart_recognition_desc": "上传参考图，AI自动识别商品信息",
+    "voice_option": "语音",
+    "quantity_option": "数量",
+    "color_option": "配色",
+    "none": "无"
   },
   "copywriting": {
     "title": "AI 文案生成",
