@@ -221,6 +221,7 @@ const currentTime = ref('')
 const currentDate = ref('')
 
 // Clock
+let _clockTimer: ReturnType<typeof setInterval> | null = null
 onMounted(() => {
   const tick = () => {
     const now = new Date()
@@ -228,7 +229,10 @@ onMounted(() => {
     currentDate.value = now.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })
   }
   tick()
-  setInterval(tick, 1000)
+  _clockTimer = setInterval(tick, 1000)
+})
+onUnmounted(() => {
+  if (_clockTimer) { clearInterval(_clockTimer); _clockTimer = null }
 })
 
 function toggleFullscreen() {

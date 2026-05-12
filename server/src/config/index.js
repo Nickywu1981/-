@@ -6,7 +6,7 @@ import crypto from 'crypto';
 dotenv.config({ override: true });
 
 const config = {
-  port: parseInt(process.env.PORT, 10) || 3000,
+  port: parseInt(process.env.PORT, 10) || 3001,
   env: process.env.NODE_ENV || 'development',
 
   mysql: {
@@ -123,7 +123,7 @@ const config = {
     verifyMax: parseInt(process.env.RATE_LIMIT_VERIFY_MAX, 10) || 5,
   },
 
-  jwtRefreshSecret: process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET || 'dev-refresh-fallback',
+  jwtRefreshSecret: process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET,
 
   corsOrigin: process.env.CORS_ORIGIN || '',
 

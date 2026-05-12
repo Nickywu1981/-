@@ -145,10 +145,12 @@ function toggleGroup(key: string) {
 function handleLogout() { userOpen.value = false; emit('logout') }
 
 // Detect mobile
+const _onResize = () => { isMobile.value = window.innerWidth < 768 }
 onMounted(() => {
   isMobile.value = window.innerWidth < 768
-  window.addEventListener('resize', () => { isMobile.value = window.innerWidth < 768 })
+  window.addEventListener('resize', _onResize)
 })
+onUnmounted(() => { window.removeEventListener('resize', _onResize) })
 
 // Close mobile sidebar on route change
 watch(() => route.path, () => { mobileOpen.value = false; userOpen.value = false })

@@ -3,6 +3,20 @@ import { PROXY_FLAG, CIRCUIT_STATUS } from '../constants/domainStatus.js';
 import proxyDao from '../dao/proxyDao.js';
 import { encrypt, decrypt } from '../utils/crypto.js';
 import logger from '../utils/logger.js';
+import { URL } from 'url';
+
+// ==================== SSRF 防护 ====================
+
+const BLOCKED_HOST_PATTERNS = [
+  /^localhost$/i, /^127\./, /^0\.0\.0\.0$/,
+  /^10\./, /^172\.(1[6-9]|2\d|3[01])\./, /^192\.168\./,
+  /^169\.254\./, /^100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\./,
+  /^::1$/, /^fc00:/, /^fe80:/
+];
+
+function isBlockedHost(hostname) {
+  return BLOCKED_HOST_PATTERNS.some(p => p.test(hostname));
+}
 
 // ==================== 配置管理 ====================
 
@@ -88,21 +102,30 @@ export async function callProxy(code, tenantId, { method, body, userId, clientIp
     throw new BusinessError(503, '上游已熔断，请稍后重试');
   }
 
-  // 4. 请求体大小校验
+  // 4. SSRF 防护：阻止内网/保留地址
+  const upstreamUrl = proxy.upstream_url;
+  let upstreamHost;
+  try { upstreamHost = new URL(upstreamUrl).hostname; } catch {
+    throw new BusinessError(400, '无效的上游地址');
+  }
+  if (isBlockedHost(upstreamHost)) {
+    throw new BusinessError(403, '不允许代理到内网地址');
+  }
+
+  // 5. 请求体大小校验
   if (body && proxy.body_max_bytes > 0 && Buffer.byteLength(body) > proxy.body_max_bytes) {
     throw new BusinessError(413, `请求体超过上限 ${proxy.body_max_bytes} 字节`);
   }
 
-  // 5. 构建请求
+  // 6. 构建请求
   const requestMethod = method || proxy.method || 'GET';
   const headers = buildHeaders(proxy);
-  const upstreamUrl = proxy.upstream_url;
   let requestBody = null;
   if (proxy.pass_body && body && requestMethod !== 'GET') {
     requestBody = typeof body === 'string' ? body : JSON.stringify(body);
   }
 
-  // 6. 带重试退避的请求
+  // 7. 带重试退避的请求
   const maxRetries = proxy.retry_count || 0;
   const timeoutMs = proxy.timeout_ms || 10000;
   let lastError = null;
@@ -148,9 +171,10 @@ export async function callProxy(code, tenantId, { method, body, userId, clientIp
     }
   }
 
-  // 7. 全部重试失败 → 记录
+  // 8. 全部重试失败 → 记录
   await handleUpstreamFailure(proxy, tenantId, 0, lastError?.message);
-  throw new BusinessError(502, '代理请求失败: ' + (lastError?.message || '未知错误'));
+  logger.error(`[proxy] 上游请求失败: ${proxy.code} → ${upstreamUrl}: ${lastError?.message}`);
+  throw new BusinessError(502, '代理请求失败，请稍后重试');
 }
 
 // ==================== 白名单管理 ====================

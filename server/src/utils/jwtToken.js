@@ -16,7 +16,7 @@ const ACCESS_EXPIRES = jwtConfig.accessExpiresIn;
 const REFRESH_EXPIRES = jwtConfig.refreshExpiresIn;
 const ACCESS_SECRET = jwtConfig.secret;
 const REFRESH_SECRET = (() => {
-  if (jwtRefreshSecret && jwtRefreshSecret !== 'dev-refresh-fallback') return jwtRefreshSecret;
+  if (jwtRefreshSecret) return jwtRefreshSecret;
   if (isDevelopment) {
     if (!jwtConfig.secret || jwtConfig.secret === 'dev-secret') {
       throw new Error('JWT_REFRESH_SECRET 未设置且 JWT_SECRET 无效，无法生成 refresh token');
