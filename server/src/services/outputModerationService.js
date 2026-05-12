@@ -66,20 +66,3 @@ export async function moderateOutput(text, { level = 5, blockedTerms = [], requi
 
   return { passed, riskLevel, violations: violations.slice(0, 20) };
 }
-
-/**
- * 应用审核结果
- * @param {Object} result - moderateOutput 返回结果
- * @param {'block'|'warn'|'log'} action
- * @returns {{ action: string, result: Object }}
- */
-export function applyModeration(result, action = 'log') {
-  if (result.passed) return { action: 'pass', result };
-
-  switch (action) {
-    case 'block': return { action: 'block', result };
-    case 'warn':  return { action: 'warn', result };
-    case 'log':   return { action: 'log', result };
-    default:      return { action: 'log', result };
-  }
-}

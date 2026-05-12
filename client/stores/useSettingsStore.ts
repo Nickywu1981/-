@@ -34,6 +34,8 @@ export const useSettingsStore = defineStore('settings', {
   },
 
   actions: {
+    _mqListener: null as ((e: MediaQueryListEvent) => void) | null,
+
     setTheme(mode: ThemeMode) {
       this.theme = mode
       if (process.client) {
@@ -58,9 +60,11 @@ export const useSettingsStore = defineStore('settings', {
     init() {
       if (process.client) {
         const mq = window.matchMedia('(prefers-color-scheme: dark)')
-        mq.addEventListener('change', () => {
+        if (this._mqListener) mq.removeEventListener('change', this._mqListener)
+        this._mqListener = () => {
           if (this.theme === 'system') document.documentElement.classList.toggle('dark', mq.matches)
-        })
+        }
+        mq.addEventListener('change', this._mqListener)
         document.documentElement.classList.toggle('dark', this.isDark)
       }
     },

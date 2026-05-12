@@ -62,42 +62,6 @@ export async function incrementAllDimensions({ userId, tenantId, modelKey, taskT
 
 // ============ 统计查询 ============
 
-export async function getStats({ dimension, dimensionId, days = 7 }) {
-  const [rows] = await _db().query(
-    `SELECT period_key,
-       SUM(call_count) as call_count,
-       SUM(tokens_in) as tokens_in,
-       SUM(tokens_out) as tokens_out,
-       SUM(total_tokens) as total_tokens,
-       SUM(total_cost) as total_cost,
-       SUM(success_count) as success_count,
-       SUM(error_count) as error_count
-     FROM ai_token_aggregation
-     WHERE dimension = ? AND dimension_id = ?
-       AND period_key >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ? DAY), '%Y%m%d')
-     GROUP BY period_key
-     ORDER BY period_key DESC`,
-    [dimension, dimensionId, days],
-  );
-  return rows;
-}
-
-export async function getHourlyStats({ modelKey, hours = 24 }) {
-  const [rows] = await _db().query(
-    `SELECT period_key,
-       SUM(call_count) as call_count,
-       SUM(total_tokens) as total_tokens,
-       SUM(total_cost) as total_cost
-     FROM ai_token_aggregation
-     WHERE dimension = 'hourly' AND dimension_id = ?
-       AND period_key >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ? HOUR), '%Y%m%d%H')
-     GROUP BY period_key
-     ORDER BY period_key DESC`,
-    [modelKey, hours],
-  );
-  return rows;
-}
-
 export async function getCostByModel(days = 7) {
   const [rows] = await _db().query(
     `SELECT dimension_id as model_key,

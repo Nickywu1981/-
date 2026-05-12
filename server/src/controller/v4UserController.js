@@ -3,6 +3,8 @@
  */
 import bcrypt from 'bcryptjs';
 import { wrapController } from '../utils/wrapController.js';
+
+const SALT_ROUNDS = 12;
 import { success } from '../utils/response.js';
 import { BusinessError } from '../utils/businessError.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
@@ -59,7 +61,7 @@ export const changePassword = wrapController(async (req, res) => {
   const valid = await bcrypt.compare(oldPassword, user.password);
   if (!valid) throw new BusinessError(ERROR_CODE.PARAM_INVALID, '原密码不正确');
 
-  const hash = await bcrypt.hash(newPassword, 12);
+  const hash = await bcrypt.hash(newPassword, SALT_ROUNDS);
   await userDao.updatePassword(req.user.id, hash);
 
   const { revokeAllUserTokens } = await import('../utils/jwtToken.js');

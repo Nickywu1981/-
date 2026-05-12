@@ -34,61 +34,6 @@ export async function listActive(category) {
   return rows;
 }
 
-export async function getById(id) {
-  const [rows] = await _db().query(`SELECT ${COLS} FROM ai_model_pricing WHERE id = ? LIMIT 1`, [id]);
-  return rows[0] || null;
-}
-
-// ============ 写入 ============
-
-export async function upsert(data) {
-  const { model_key, category, pricing_type, price_per_unit_in, price_per_unit_out, currency, effective_from, effective_to, is_active } = data;
-  const conn = await pool.getConnection();
-  try {
-    await conn.beginTransaction();
-    const [rows] = await conn.query(
-      `SELECT id FROM ai_model_pricing WHERE model_key = ? AND is_active = 1
-       AND effective_from <= NOW()
-       AND (effective_to IS NULL OR effective_to >= NOW())
-       LIMIT 1 FOR UPDATE`,
-      [model_key],
-    );
-    if (rows.length > 0) {
-      const id = rows[0].id;
-      await conn.query(
-        `UPDATE ai_model_pricing SET
-           category = ?, pricing_type = ?,
-           price_per_unit_in = ?, price_per_unit_out = ?,
-           currency = ?, effective_from = ?, effective_to = ?,
-           is_active = ?
-         WHERE id = ?`,
-        [category, pricing_type, price_per_unit_in, price_per_unit_out, currency || 'CNY', effective_from || new Date(), effective_to || null, is_active ?? 1, id],
-      );
-      await conn.commit();
-      return { id, model_key, category, pricing_type, price_per_unit_in, price_per_unit_out, currency, effective_from, effective_to, is_active, updated: true };
-    }
-    const [result] = await conn.query(
-      `INSERT INTO ai_model_pricing (model_key, category, pricing_type, price_per_unit_in, price_per_unit_out, currency, effective_from, effective_to, is_active)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [model_key, category, pricing_type, price_per_unit_in, price_per_unit_out, currency || 'CNY', effective_from || new Date(), effective_to || null, is_active ?? 1],
-    );
-    await conn.commit();
-    return { id: result.insertId, model_key, category, pricing_type, price_per_unit_in, price_per_unit_out, currency, effective_from, effective_to, is_active, updated: false };
-  } catch (err) {
-    await conn.rollback();
-    throw err;
-  } finally {
-    conn.release();
-  }
-}
-
-export async function deactivate(id) {
-  const [r] = await _db().query('UPDATE ai_model_pricing SET is_active = 0 WHERE id = ? AND is_active = 1', [id]);
-  return r.affectedRows;
-}
-
-// ============ 成本计算 ============
-
 export async function calculateCost(modelKey, tokensIn, tokensOut, count) {
   const pricing = await getActiveByKey(modelKey);
   if (!pricing) return { amount: 0, currency: 'CNY', pricingId: null, details: null };

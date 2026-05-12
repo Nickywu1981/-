@@ -4,6 +4,8 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import * as userDao from '../dao/userDao.js';
 import { jwtSecret as JWT_SECRET, jwtExpiresIn as JWT_EXPIRES } from '../config/index.js';
+
+const SALT_ROUNDS = 12;
 import * as smsService from './smsService.js';
 import * as emailService from './emailService.js';
 import logger from '../utils/logger.js';
@@ -26,7 +28,7 @@ export async function register({ phone, email, password, nickname, inviteCode: _
   ]);
   if (byPhone || byEmail) throw new BusinessError(400, '注册失败，请检查输入信息');
 
-  const passwordHash = await bcrypt.hash(password, 12);
+  const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
   const userId = await userDao.createUser({ phone: phone || '', email: email || '', password: passwordHash, nickname: nickname || '' });
 
   logger.info('[Auth] 注册成功', { userId });
