@@ -13,6 +13,11 @@ import logger from '../utils/logger.js';
 
 const MODEL_MAP = { cutout: 'stable-diffusion-img2img', main_image: 'stable-diffusion-img2img', scene: 'stable-diffusion-xl', enhance: 'stable-diffusion-img2img', white_bg: 'stable-diffusion-img2img', img2video: 'stable-diffusion-xl' };
 
+function safeMsg(err) {
+  const msg = err?.message || '';
+  return msg.length > 0 && msg.length <= 200 ? msg : msg.substring(0, 200) || '处理失败';
+}
+
 // ==================== 批量任务提交 ====================
 
 export async function submitBatchTask(userId, { imageUrls, operation, platform, style, nightMode = false }) {
@@ -46,7 +51,7 @@ async function processBatch(taskId, userId) {
     if (nightMode) {
       const creditMap = { cutout: 'cutout', main_image: 'enhance', scene: 'scene', img2video: 'img2video' };
       try { await creditService.consumeCredit(userId, creditMap[operation] || operation, total); }
-      catch (e) { await updateTaskStatus(taskId, userId, { status: 3, errorMsg: e.message }); return; }
+      catch (e) { await updateTaskStatus(taskId, userId, { status: 3, errorMsg: safeMsg(e) }); return; }
     }
 
     await updateTaskStatus(taskId, userId, { status: 1, progress: 0, progressMsg: `0/${total} 处理中...`, workerId: process.pid.toString() });
@@ -63,7 +68,7 @@ async function processBatch(taskId, userId) {
 
     await completeTask(taskId, userId, { progressMsg: '全部完成', outputResult: { results, total, batchId: taskId, zipUrl: `/api/batch/${taskId}/download`, estimatedZipSize: `${Math.round(total * 0.5)}MB` } });
     wsManager.pushTaskComplete(taskId, { results, total });
-  } catch (err) { await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }); }
+  } catch (err) { await updateTaskStatus(taskId, userId, { status: 3, errorMsg: safeMsg(err) }); }
 }
 
 // ==================== 夜间批量托管 ====================
