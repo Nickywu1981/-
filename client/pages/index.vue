@@ -6,7 +6,7 @@
     <!-- ===== NAV ===== -->
     <header class="lp-nav" :class="{ on: scrolled }">
       <div class="lp-nav-in">
-        <NuxtLink to="/" class="lp-nav-brand" aria-label="Movio AI 首页">
+        <NuxtLink to="/" class="lp-nav-brand" :aria-label="siteName + ' ' + $t('landing.home_label')">
           <span class="lp-nav-mark">M</span>
           <span class="lp-nav-name">{{ siteName }}</span>
         </NuxtLink>

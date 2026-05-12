@@ -72,6 +72,7 @@
     "features_tab_video": "视频工具",
     "features_tab_ai": "AI 功能",
     "skip_to_content": "跳到主要内容",
+    "home_label": "首页",
     "menu_open": "打开菜单",
     "menu_close": "关闭菜单",
     "back_top": "返回顶部",
@@ -352,6 +353,17 @@
     "loading_tools": "加载创作工具...",
     "start_create": "开始创作",
     "assistant_desc": "电商各类角色智能体 — 店铺客服、运营巡检、商品优化、选品分析、竞品监控、评价管理、违规风控、数据分析、直播值守",
+    "assistant_agents": [
+      { "id": "service", "icon": "💬", "title": "店铺客服", "desc": "7×24小时智能应答，售前咨询+售后处理", "tag": "自动接待" },
+      { "id": "ops", "icon": "🔍", "title": "运营巡检", "desc": "全店商品自动巡检，标题/图片/价格异常检测", "tag": "每日巡检" },
+      { "id": "product", "icon": "✨", "title": "商品优化", "desc": "标题SEO优化+主图评分+描述增强建议", "tag": "转化提升" },
+      { "id": "selection", "icon": "🎯", "title": "选品分析", "desc": "大盘趋势+竞品挖掘+蓝海类目推荐", "tag": "数据驱动" },
+      { "id": "compete", "icon": "📊", "title": "竞品监控", "desc": "跟踪竞品上新/价格/活动/评价动态", "tag": "实时追踪" },
+      { "id": "review", "icon": "⭐", "title": "评价管理", "desc": "好评置顶+差评预警+自动回复模板", "tag": "评分维护" },
+      { "id": "compliance", "icon": "🛡️", "title": "违规风控", "desc": "违禁词扫描+图片合规+知识产权预警", "tag": "零违规" },
+      { "id": "data", "icon": "📈", "title": "数据分析", "desc": "销售/流量/转化/客单多维看板+异常告警", "tag": "智能洞察" },
+      { "id": "live", "icon": "📡", "title": "直播值守", "desc": "直播间自动弹幕回复+商品讲解+氛围引导", "tag": "24h在线" }
+    ],
     "coming_soon_title": "功能即将上线，敬请期待",
     "coming_soon_detail": "我们正在为您打造电商全链路自动化能力，上线后将支持客服、运营、数据复盘等全岗位AI自动化",
     "progress_label": "开发进度",
@@ -403,6 +415,24 @@
     "redirect_creation": "跳转至创作中心...",
     "creation_upload_hint": "拖拽或点击上传素材",
     "creation_param_label": "参数设置",
+    "creation_options": {
+      "duration": { "15s": "15 秒", "30s": "30 秒", "60s": "60 秒", "90s": "90 秒", "3min": "3 分钟" },
+      "ratio": { "9_16": "9:16 竖屏", "16_9": "16:9 横屏", "1_1": "1:1 正方形", "4_3": "4:3" },
+      "resolution": { "720p": "720p", "1080p": "1080p", "2k": "2K", "4k": "4K" },
+      "style": { "modern": "现代", "vintage": "复古", "minimal": "极简", "dynamic": "动感", "premium": "高级", "guochao": "国潮", "japanese": "日式", "cyber": "赛博", "korean": "韩式", "western": "欧美" },
+      "size": { "1_1": "1:1 正方形", "3_4": "3:4", "4_3": "4:3", "16_9": "16:9", "9_16": "9:16", "custom": "自定义" },
+      "count": { "1": "1 张", "2": "2 张", "4": "4 张", "6": "6 张", "8": "8 张" },
+      "bg": { "white": "白色", "transparent": "透明", "scene": "场景", "custom": "自定义" },
+      "platform": { "taobao": "淘宝", "pinduoduo": "拼多多", "douyin": "抖音", "amazon": "Amazon", "temu": "Temu", "shein": "Shein" },
+      "modules": { "full": "完整版", "compact": "紧凑版", "hero_usp": "主图+卖点", "custom": "自定义" },
+      "copy_type": { "sales_vo": "带货口播", "product_title": "商品标题", "detail_copy": "详情文案", "campaign_copy": "大促文案", "social_seeding": "社媒种草" },
+      "language": { "chinese": "中文", "english": "English", "japanese": "日本語", "korean": "한국어", "spanish": "Español" },
+      "tone": { "professional": "专业", "friendly": "亲切", "lively": "活泼", "premium": "高级感", "urgent": "紧迫" },
+      "voice": { "sweet_female": "甜美女声", "deep_male": "深沉男声", "energetic_female": "活力女声", "magnetic_male": "磁性男声", "neutral": "中性" },
+      "tool": { "digital_human": "数字人", "face_swap": "换脸", "translate": "翻译", "compliance": "合规检查", "viral_clone": "爆款复刻" },
+      "format": { "all": "全部", "image": "图片", "video": "视频", "copy": "文案", "audio": "音频", "jpg": "JPG", "png": "PNG", "mp4": "MP4", "gif": "GIF" },
+      "sort": { "recommended": "推荐", "newest": "最新", "hottest": "最热", "free_first": "免费优先" }
+    },
     "slide_panel": {
       "close_aria": "关闭面板",
       "generate_btn": "⚡ 开始生成",
@@ -569,7 +599,7 @@
     "panel_opt_sd": "标清",
     "panel_opt_hd": "高清",
     "panel_opt_uhd": "超清",
-    "panel_generate_title": "{tab} — 生成结果",
+    "panel_generate_title": "{tab} — 生成结果"
   },
   "ai_assistant": {
     "review": {

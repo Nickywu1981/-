@@ -97,9 +97,9 @@
   --border-brand: var(--color-brand-200);
 
   /* ═══ 品牌渐变 ═══ */
-  --gradient-brand: linear-gradient(135deg, #6b70ff 0%, #8b5cf6 50%, #a855f7 100%);
-  --gradient-brand-subtle: linear-gradient(135deg, rgba(107,112,255,0.05) 0%, rgba(139,92,246,0.03) 100%);
-  --gradient-hero: linear-gradient(135deg, #6b70ff 0%, #8b5cf6 40%, #ec4899 100%);
+  --gradient-brand: linear-gradient(135deg, #5b5fe3 0%, #7c7ff0 50%, #a78bfa 100%);
+  --gradient-brand-subtle: linear-gradient(135deg, rgba(91,95,227,0.05) 0%, rgba(124,127,240,0.03) 100%);
+  --gradient-hero: linear-gradient(135deg, #5b5fe3 0%, #7c7ff0 40%, #ec4899 100%);
 
   /* ═══ 阴影 ═══ */
   --shadow-xs: 0 1px 2px rgba(15, 18, 30, 0.04);
@@ -107,8 +107,8 @@
   --shadow-md: 0 4px 12px rgba(15, 18, 30, 0.06), 0 1px 4px rgba(15, 18, 30, 0.04);
   --shadow-lg: 0 8px 24px rgba(15, 18, 30, 0.08), 0 2px 8px rgba(15, 18, 30, 0.04);
   --shadow-xl: 0 16px 48px rgba(15, 18, 30, 0.10), 0 4px 16px rgba(15, 18, 30, 0.04);
-  --shadow-brand: 0 0 0 4px rgba(107,112,255,0.12);
-  --shadow-brand-glow: 0 0 24px rgba(107,112,255,0.15);
+  --shadow-brand: 0 0 0 4px rgba(91,95,227,0.12);
+  --shadow-brand-glow: 0 0 24px rgba(91,95,227,0.15);
 
   /* ═══ 圆角 ═══ */
   --radius-xs: 4px;
@@ -180,7 +180,7 @@
   --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-base: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --focus-ring: 0 0 0 3px rgba(107,112,255,0.2);
+  --focus-ring: 0 0 0 3px rgba(91,95,227,0.18);
   --focus-ring-offset: 2px;
 
   /* ═══ 组件 Token ═══ */
@@ -189,7 +189,7 @@
   --input-border: var(--border-default);
   --input-bg: #ffffff;
   --input-focus-border: var(--color-brand-400);
-  --input-focus-shadow: 0 0 0 3px rgba(107,112,255,0.1), 0 0 0 1px var(--color-brand-400);
+  --input-focus-shadow: 0 0 0 3px rgba(91,95,227,0.1), 0 0 0 1px var(--color-brand-400);
 
   --btn-height-sm: 32px;
   --btn-height-md: 40px;
@@ -524,7 +524,7 @@ body {
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 @keyframes countUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes glowPulse { 0%, 100% { box-shadow: 0 0 12px rgba(107,112,255,0.15); } 50% { box-shadow: 0 0 32px rgba(107,112,255,0.35); } }
+@keyframes glowPulse { 0%, 100% { box-shadow: 0 0 12px rgba(91,95,227,0.15); } 50% { box-shadow: 0 0 32px rgba(91,95,227,0.35); } }
 @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 @keyframes spin { to { transform: rotate(360deg); } }
 

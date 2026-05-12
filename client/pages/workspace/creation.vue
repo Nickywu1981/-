@@ -60,7 +60,7 @@
             v-model="selectedParams[p.key]"
           >
             <option value="">{{ p.label }}</option>
-            <option v-for="(o, j) in p.options" :key="j" :value="o">{{ o }}</option>
+            <option v-for="(o, j) in p.options" :key="j" :value="o.value">{{ o.label }}</option>
           </select>
         </div>
 
@@ -149,35 +149,44 @@ const tabs = [
   { key: 'other',   icon: '🧩', label: t('workspace.creation_tabs.other') },
 ]
 
+// ═══ Option builder: maps raw values to i18n {value, label} pairs ═══
+function buildOpts(cat: string, values: string[]): Array<{ value: string; label: string }> {
+  return values.map(v => {
+    const k = v.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '')
+    const label = t(`workspace.creation_options.${cat}.${k}`)
+    return { value: v, label }
+  })
+}
+
 // ═══ Param selects per tab ═══
-const tabParams: Record<string, { key: string; label: string; options: string[] }[]> = {
+const tabParams: Record<string, { key: string; label: string; options: Array<{ value: string; label: string }> }[]> = {
   video: [
-    { key: 'duration', label: t('workspace.creation_param_video_duration'), options: ['15s', '30s', '60s', '90s', '3min'] },
-    { key: 'ratio', label: t('workspace.creation_param_video_ratio'), options: ['9:16', '16:9', '1:1', '4:3'] },
-    { key: 'resolution', label: t('workspace.creation_param_video_resolution'), options: ['720p', '1080p', '2K', '4K'] },
-    { key: 'style', label: t('workspace.creation_param_video_style'), options: ['Modern', 'Vintage', 'Minimal', 'Dynamic', 'Premium'] },
+    { key: 'duration', label: t('workspace.creation_param_video_duration'), options: buildOpts('duration', ['15s', '30s', '60s', '90s', '3min']) },
+    { key: 'ratio', label: t('workspace.creation_param_video_ratio'), options: buildOpts('ratio', ['9:16', '16:9', '1:1', '4:3']) },
+    { key: 'resolution', label: t('workspace.creation_param_video_resolution'), options: buildOpts('resolution', ['720p', '1080p', '2K', '4K']) },
+    { key: 'style', label: t('workspace.creation_param_video_style'), options: buildOpts('style', ['Modern', 'Vintage', 'Minimal', 'Dynamic', 'Premium']) },
   ],
   image: [
-    { key: 'size', label: t('workspace.creation_param_image_size'), options: ['1:1', '3:4', '4:3', '16:9', '9:16', 'Custom'] },
-    { key: 'count', label: t('workspace.creation_param_image_count'), options: ['1', '2', '4', '6', '8'] },
-    { key: 'style', label: t('workspace.creation_param_image_style'), options: ['Minimal', 'Premium', 'Guochao', 'Japanese', 'Cyber'] },
-    { key: 'bg', label: t('workspace.creation_param_image_bg'), options: ['White', 'Transparent', 'Scene', 'Custom'] },
+    { key: 'size', label: t('workspace.creation_param_image_size'), options: buildOpts('size', ['1:1', '3:4', '4:3', '16:9', '9:16', 'Custom']) },
+    { key: 'count', label: t('workspace.creation_param_image_count'), options: buildOpts('count', ['1', '2', '4', '6', '8']) },
+    { key: 'style', label: t('workspace.creation_param_image_style'), options: buildOpts('style', ['Minimal', 'Premium', 'Guochao', 'Japanese', 'Cyber']) },
+    { key: 'bg', label: t('workspace.creation_param_image_bg'), options: buildOpts('bg', ['White', 'Transparent', 'Scene', 'Custom']) },
   ],
   detail: [
-    { key: 'platform', label: t('workspace.creation_param_detail_platform'), options: ['Taobao', 'Pinduoduo', 'Douyin', 'Amazon', 'Temu', 'Shein'] },
-    { key: 'style', label: t('workspace.creation_param_detail_style'), options: ['Minimal', 'Premium', 'Japanese', 'Korean', 'Western'] },
-    { key: 'modules', label: t('workspace.creation_param_detail_modules'), options: ['Full', 'Compact', 'Hero+USP', 'Custom'] },
+    { key: 'platform', label: t('workspace.creation_param_detail_platform'), options: buildOpts('platform', ['Taobao', 'Pinduoduo', 'Douyin', 'Amazon', 'Temu', 'Shein']) },
+    { key: 'style', label: t('workspace.creation_param_detail_style'), options: buildOpts('style', ['Minimal', 'Premium', 'Japanese', 'Korean', 'Western']) },
+    { key: 'modules', label: t('workspace.creation_param_detail_modules'), options: buildOpts('modules', ['Full', 'Compact', 'Hero+USP', 'Custom']) },
   ],
   copywrite: [
-    { key: 'type', label: t('workspace.creation_param_copywrite_type'), options: ['Sales VO', 'Product Title', 'Detail Copy', 'Campaign Copy', 'Social Seeding'] },
-    { key: 'lang', label: t('workspace.creation_param_copywrite_lang'), options: ['Chinese', 'English', 'Japanese', 'Korean', 'Spanish'] },
-    { key: 'tone', label: t('workspace.creation_param_copywrite_tone'), options: ['Professional', 'Friendly', 'Lively', 'Premium', 'Urgent'] },
-    { key: 'voice', label: t('workspace.creation_param_copywrite_voice'), options: ['Sweet Female', 'Deep Male', 'Energetic Female', 'Magnetic Male', 'Neutral'] },
+    { key: 'type', label: t('workspace.creation_param_copywrite_type'), options: buildOpts('copy_type', ['Sales VO', 'Product Title', 'Detail Copy', 'Campaign Copy', 'Social Seeding']) },
+    { key: 'lang', label: t('workspace.creation_param_copywrite_lang'), options: buildOpts('language', ['Chinese', 'English', 'Japanese', 'Korean', 'Spanish']) },
+    { key: 'tone', label: t('workspace.creation_param_copywrite_tone'), options: buildOpts('tone', ['Professional', 'Friendly', 'Lively', 'Premium', 'Urgent']) },
+    { key: 'voice', label: t('workspace.creation_param_copywrite_voice'), options: buildOpts('voice', ['Sweet Female', 'Deep Male', 'Energetic Female', 'Magnetic Male', 'Neutral']) },
   ],
   other: [
-    { key: 'tool', label: t('workspace.creation_param_other_tool'), options: ['Digital Human', 'Face Swap', 'Translate', 'Compliance', 'Viral Clone'] },
-    { key: 'format', label: t('workspace.creation_param_other_format'), options: ['All', 'Image', 'Video', 'Copy', 'Audio'] },
-    { key: 'sort', label: t('workspace.creation_param_other_sort'), options: ['Recommended', 'Newest', 'Hottest', 'Free First'] },
+    { key: 'tool', label: t('workspace.creation_param_other_tool'), options: buildOpts('tool', ['Digital Human', 'Face Swap', 'Translate', 'Compliance', 'Viral Clone']) },
+    { key: 'format', label: t('workspace.creation_param_other_format'), options: buildOpts('format', ['All', 'Image', 'Video', 'Copy', 'Audio']) },
+    { key: 'sort', label: t('workspace.creation_param_other_sort'), options: buildOpts('sort', ['Recommended', 'Newest', 'Hottest', 'Free First']) },
   ],
 }
 
@@ -201,9 +210,17 @@ const activeParamSelects = computed(() => tabParams[activeTab.value] || [])
 const panelParams = computed(() => {
   if (panelMode.value === 'generate') return activeParamSelects.value
   return [
-    { key: 'type', label: t('workspace.panel_param_type'), options: [t('workspace.panel_opt_auto'), t('workspace.panel_opt_standard'), t('workspace.panel_opt_premium')] },
-    { key: 'quality', label: t('workspace.panel_param_quality'), options: [t('workspace.panel_opt_sd'), t('workspace.panel_opt_hd'), t('workspace.panel_opt_uhd')] },
-    { key: 'format', label: t('workspace.panel_param_format'), options: ['JPG', 'PNG', 'MP4', 'GIF'] },
+    { key: 'type', label: t('workspace.panel_param_type'), options: [
+      { value: 'auto', label: t('workspace.panel_opt_auto') },
+      { value: 'standard', label: t('workspace.panel_opt_standard') },
+      { value: 'premium', label: t('workspace.panel_opt_premium') },
+    ]},
+    { key: 'quality', label: t('workspace.panel_param_quality'), options: [
+      { value: 'sd', label: t('workspace.panel_opt_sd') },
+      { value: 'hd', label: t('workspace.panel_opt_hd') },
+      { value: 'uhd', label: t('workspace.panel_opt_uhd') },
+    ]},
+    { key: 'format', label: t('workspace.panel_param_format'), options: buildOpts('format', ['JPG', 'PNG', 'MP4', 'GIF']) },
   ]
 })
 

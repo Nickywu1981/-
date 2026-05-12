@@ -72,6 +72,7 @@
     "features_tab_video": "Video Tools",
     "features_tab_ai": "AI Features",
     "skip_to_content": "Skip to main content",
+    "home_label": "Home",
     "menu_open": "Open menu",
     "menu_close": "Close menu",
     "back_top": "Back to top",
@@ -352,6 +353,17 @@
     "loading_tools": "Loading creation tools...",
     "start_create": "Start Creating",
     "assistant_desc": "E-Commerce AI Agent Suite — Store Customer Service, Operations Inspector, Product Optimizer, Product Selection Analysis, Competitor Monitoring, Review Management, Risk Control, Data Analytics, Live Stream Attendant",
+    "assistant_agents": [
+      { "id": "service", "icon": "💬", "title": "Store Customer Service", "desc": "24/7 intelligent response, pre-sales inquiry + after-sales support", "tag": "Auto Service" },
+      { "id": "ops", "icon": "🔍", "title": "Operations Inspector", "desc": "Auto-inspect all products, detect title/image/price anomalies", "tag": "Daily Inspection" },
+      { "id": "product", "icon": "✨", "title": "Product Optimizer", "desc": "SEO title optimization + hero image scoring + description enhancement", "tag": "Conversion Boost" },
+      { "id": "selection", "icon": "🎯", "title": "Product Selection", "desc": "Market trends + competitor mining + blue ocean category recommendations", "tag": "Data-Driven" },
+      { "id": "compete", "icon": "📊", "title": "Competitor Monitor", "desc": "Track competitor new arrivals, pricing, promotions, and reviews", "tag": "Real-Time Tracking" },
+      { "id": "review", "icon": "⭐", "title": "Review Manager", "desc": "Pin positive reviews + negative review alerts + auto-reply templates", "tag": "Rating Keeper" },
+      { "id": "compliance", "icon": "🛡️", "title": "Risk Control", "desc": "Prohibited word scanning + image compliance + IP infringement alerts", "tag": "Zero Violation" },
+      { "id": "data", "icon": "📈", "title": "Data Analytics", "desc": "Sales/traffic/conversion/AOV multi-dimensional dashboard + anomaly alerts", "tag": "Smart Insights" },
+      { "id": "live", "icon": "📡", "title": "Live Stream Attendant", "desc": "Auto reply to comments + product narration + engagement guidance", "tag": "24/7 Online" }
+    ],
     "coming_soon_title": "Coming Soon",
     "coming_soon_detail": "We're building full e-commerce automation capabilities. Once launched, it will support customer service, operations, data review, and all-role AI automation.",
     "progress_label": "Progress",
@@ -402,6 +414,24 @@
     "redirect_creation": "Redirecting to Creation Center...",
     "creation_upload_hint": "Drag or click to upload assets",
     "creation_param_label": "Parameters",
+    "creation_options": {
+      "duration": { "15s": "15s", "30s": "30s", "60s": "60s", "90s": "90s", "3min": "3 min" },
+      "ratio": { "9_16": "9:16 Portrait", "16_9": "16:9 Landscape", "1_1": "1:1 Square", "4_3": "4:3" },
+      "resolution": { "720p": "720p", "1080p": "1080p", "2k": "2K", "4k": "4K" },
+      "style": { "modern": "Modern", "vintage": "Vintage", "minimal": "Minimal", "dynamic": "Dynamic", "premium": "Premium", "guochao": "Guochao", "japanese": "Japanese", "cyber": "Cyber", "korean": "Korean", "western": "Western" },
+      "size": { "1_1": "1:1 Square", "3_4": "3:4", "4_3": "4:3", "16_9": "16:9", "9_16": "9:16", "custom": "Custom" },
+      "count": { "1": "1", "2": "2", "4": "4", "6": "6", "8": "8" },
+      "bg": { "white": "White", "transparent": "Transparent", "scene": "Scene", "custom": "Custom" },
+      "platform": { "taobao": "Taobao", "pinduoduo": "Pinduoduo", "douyin": "Douyin", "amazon": "Amazon", "temu": "Temu", "shein": "Shein" },
+      "modules": { "full": "Full", "compact": "Compact", "hero_usp": "Hero+USP", "custom": "Custom" },
+      "copy_type": { "sales_vo": "Sales VO", "product_title": "Product Title", "detail_copy": "Detail Copy", "campaign_copy": "Campaign Copy", "social_seeding": "Social Seeding" },
+      "language": { "chinese": "Chinese", "english": "English", "japanese": "Japanese", "korean": "Korean", "spanish": "Spanish" },
+      "tone": { "professional": "Professional", "friendly": "Friendly", "lively": "Lively", "premium": "Premium", "urgent": "Urgent" },
+      "voice": { "sweet_female": "Sweet Female", "deep_male": "Deep Male", "energetic_female": "Energetic Female", "magnetic_male": "Magnetic Male", "neutral": "Neutral" },
+      "tool": { "digital_human": "Digital Human", "face_swap": "Face Swap", "translate": "Translate", "compliance": "Compliance", "viral_clone": "Viral Clone" },
+      "format": { "all": "All", "image": "Image", "video": "Video", "copy": "Copy", "audio": "Audio", "jpg": "JPG", "png": "PNG", "mp4": "MP4", "gif": "GIF" },
+      "sort": { "recommended": "Recommended", "newest": "Newest", "hottest": "Hottest", "free_first": "Free First" }
+    },
     "slide_panel": {
       "close_aria": "Close panel",
       "generate_btn": "⚡ Generate",
@@ -568,7 +598,7 @@
     "panel_opt_sd": "SD",
     "panel_opt_hd": "HD",
     "panel_opt_uhd": "UHD",
-    "panel_generate_title": "{tab} — Generate Result",
+    "panel_generate_title": "{tab} — Generate Result"
   },
   "ai_assistant": {
     "review": {
