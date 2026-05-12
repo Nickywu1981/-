@@ -37,7 +37,7 @@
           <h3 class="card-name">{{ t.name }}</h3>
           <div class="card-meta">
             <span class="stars">{{ '★'.repeat(Math.round(t.rating||0)) + '☆'.repeat(5-Math.round(t.rating||0)) }}</span>
-            <span class="downloads">{{ t.download_count || 0 }} 下载</span>
+            <span class="downloads">{{ t.download_count || 0 }} {{ $t('template.downloads') || '下载' }}</span>
           </div>
           <div class="card-footer">
             <span class="price" :class="{ free: !t.price }">{{ t.price ? '¥'+t.price : ($t('template.free')||'免费') }}</span>
@@ -46,6 +46,7 @@
       </div>
     </div>
 
+    <!-- Detail Modal -->
     <Teleport to="body">
       <div v-if="showDetail" class="modal-overlay" @click.self="showDetail=false">
         <div class="modal">
@@ -55,40 +56,48 @@
           </div>
           <p class="detail-desc">{{ detail?.description }}</p>
           <div v-if="detail?.meta" class="detail-meta">
-            <span v-for="(v,k) in (typeof detail.meta==='string'?JSON.parse(detail.meta||'{}'):detail.meta)" :key="k" class="meta-tag">{{ k }}: {{ v }}</span>
+            <span v-for="(v,k) in parsedMeta" :key="k" class="meta-tag">{{ k }}: {{ v }}</span>
           </div>
           <div class="detail-stats">
-            <span>{{ detail?.download_count || 0 }} 下载</span>
+            <span>{{ detail?.download_count || 0 }} {{ $t('template.downloads') || '下载' }}</span>
             <span>{{ '★'.repeat(Math.round(detail?.rating||0)) }}</span>
             <span v-if="detail?.price">¥{{ detail.price }}</span>
-            <span v-else>{{ $t('template.free')||'免费' }}</span>
+            <span v-else class="free-label">{{ $t('template.free')||'免费' }}</span>
           </div>
           <div class="modal-actions">
             <button class="btn-cancel" @click="showDetail=false">{{ $t('common.close')||'关闭' }}</button>
             <button v-if="detail?.price" class="btn-save" :disabled="acting" @click="purchase(detail)">
-              {{ acting ? ($t('common.processing')||'处理中...') : ($t('template.buy')||'购买') }}
+              {{ acting ? ($t('common.processing')||'...') : ($t('template.buy')||'购买') }}
             </button>
             <button v-else class="btn-save" :disabled="acting" @click="download(detail)">
-              {{ acting ? ($t('common.processing')||'处理中...') : ($t('template.download')||'下载') }}
+              {{ acting ? ($t('common.processing')||'...') : ($t('template.download')||'下载') }}
             </button>
           </div>
         </div>
       </div>
     </Teleport>
 
+    <!-- Create Modal -->
     <Teleport to="body">
       <div v-if="showCreate" class="modal-overlay" @click.self="showCreate=false">
         <div class="modal">
           <h3>{{ $t('template.create') || '新建模板' }}</h3>
           <div class="form-group"><label>{{ $t('template.name')||'名称' }}</label><input v-model="form.name" class="input" /></div>
-          <div class="form-group"><label>{{ $t('template.cat')||'分类' }}</label><select v-model="form.category" class="input"><option value="ecommerce">电商</option><option value="social">社交</option><option value="brand">品牌</option><option value="event">活动</option></select></div>
+          <div class="form-group"><label>{{ $t('template.cat')||'分类' }}</label>
+            <select v-model="form.category" class="input">
+              <option value="ecommerce">电商</option><option value="social">社交</option>
+              <option value="brand">品牌</option><option value="event">活动</option>
+            </select>
+          </div>
           <div class="form-group"><label>{{ $t('template.desc')||'描述' }}</label><textarea v-model="form.description" class="input" rows="3" /></div>
           <div class="form-group"><label>{{ $t('template.previewUrl')||'预览图URL(逗号分隔)' }}</label><input v-model="form.preview_images" class="input" placeholder="https://a.jpg,https://b.jpg" /></div>
           <div class="form-group"><label>{{ $t('template.price')||'价格(0=免费)' }}</label><input v-model.number="form.price" type="number" class="input" min="0" step="0.01" /></div>
           <div class="form-group"><label>{{ $t('template.metaJson')||'Meta JSON' }}</label><textarea v-model="form.meta" class="input" rows="2" placeholder='{"size":"1080x1080"}' /></div>
           <div class="modal-actions">
             <button class="btn-cancel" @click="showCreate=false">{{ $t('common.cancel')||'取消' }}</button>
-            <button class="btn-save" :disabled="saving" @click="doCreate">{{ saving?($t('common.saving')||'保存中...'):($t('common.save')||'保存') }}</button>
+            <button class="btn-save" :disabled="saving" @click="doCreate">
+              {{ saving?($t('common.saving')||'保存中...'):($t('common.save')||'保存') }}
+            </button>
           </div>
         </div>
       </div>
@@ -106,6 +115,12 @@ const showDetail = ref(false), detail = ref<any>(null), acting = ref(false)
 const showCreate = ref(false), saving = ref(false)
 const form = reactive({ name: '', category: 'ecommerce', description: '', preview_images: '', price: 0, meta: '' })
 
+const parsedMeta = computed(() => {
+  if (!detail.value?.meta) return {}
+  if (typeof detail.value.meta === 'string') { try { return JSON.parse(detail.value.meta) } catch { return {} } }
+  return detail.value.meta
+})
+
 let debounceTimer: ReturnType<typeof setTimeout>
 function onKeywordInput() { clearTimeout(debounceTimer); debounceTimer = setTimeout(search, 350) }
 
@@ -122,8 +137,7 @@ async function search() {
 
 async function openDetail(t: any) {
   showDetail.value = true; detail.value = t
-  try { detail.value = await $fetch(`/api/template-market/${t.id}`, { credentials: 'include' }) }
-  catch { /* fallback to card data */ }
+  try { detail.value = await $fetch(`/api/template-market/${t.id}`, { credentials: 'include' }) } catch { /* card data fallback */ }
 }
 
 async function download(t: any) {
@@ -148,7 +162,7 @@ function openCreate() {
 async function doCreate() {
   saving.value = true
   try {
-    const body: any = {
+    const body = {
       name: form.name, category: form.category, description: form.description,
       preview_images: form.preview_images.split(',').map((s: string) => s.trim()).filter(Boolean),
       price: form.price, meta: (() => { try { return JSON.parse(form.meta) } catch { return {} } })()
@@ -164,55 +178,64 @@ async function doCreate() {
 .ptitle { font-size: 20px; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; }
 .toolbar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
 
-.input-search { flex: 1; min-width: 160px; max-width: 280px; padding: 7px 12px; border: 1px solid var(--input-border,#e2e8f0); border-radius: var(--radius-sm,8px); font-size: 13px; background: var(--bg-input,var(--bg-card)); color: var(--text-primary); outline: none; transition: border-color .15s; }
-.input-search:focus { border-color: var(--input-focus-border,var(--brand)); box-shadow: var(--focus-ring); }
+.input-search { flex: 1; min-width: 160px; max-width: 280px; padding: 7px 12px; border: 1px solid var(--input-border); border-radius: var(--radius-sm); font-size: 13px; background: var(--bg-input); color: var(--text-primary); outline: none; transition: border-color .15s; }
+.input-search:focus { border-color: var(--input-focus-border); box-shadow: var(--focus-ring); }
 
-.sel { padding: 7px 12px; border: 1px solid var(--input-border,#e2e8f0); border-radius: var(--radius-sm,8px); font-size: 13px; background: var(--bg-card); color: var(--text-primary); outline: none; }
-.sel:focus { border-color: var(--input-focus-border,var(--brand)); }
+.sel { padding: 7px 12px; border: 1px solid var(--input-border); border-radius: var(--radius-sm); font-size: 13px; background: var(--bg-card); color: var(--text-primary); outline: none; }
+.sel:focus { border-color: var(--input-focus-border); }
 
-.btn-brand { padding: 7px 18px; background: var(--brand,#3B82F6); color: var(--text-on-brand,#fff); border: none; border-radius: var(--radius-sm,8px); cursor: pointer; font-size: 13px; white-space: nowrap; transition: opacity .15s; }
+.btn-brand { padding: 7px 18px; background: var(--brand); color: var(--text-on-brand); border: none; border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; white-space: nowrap; transition: opacity .15s; }
 .btn-brand:hover { opacity: .88; }
 
 .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
-.card { background: var(--bg-card); border: 1px solid var(--border,#e5e7eb); border-radius: var(--radius-lg,12px); overflow: hidden; cursor: pointer; transition: transform .15s, box-shadow .15s; }
+.card { background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-lg); overflow: hidden; cursor: pointer; transition: transform .15s, box-shadow .15s; }
 .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
-.card-img { width: 100%; height: 180px; object-fit: cover; background: var(--skeleton-bg,#f3f4f6); }
+.card-img { width: 100%; height: 180px; object-fit: cover; background: var(--skeleton-bg); }
 .card-body { padding: 12px; }
-.cat-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; background: var(--status-processing-bg,#dbeafe); color: var(--status-processing-text,#1d4ed8); margin-bottom: 6px; }
+.cat-tag { display: inline-block; padding: 2px 8px; border-radius: var(--radius-xs); font-size: 11px; background: var(--status-processing-bg); color: var(--status-processing-text); margin-bottom: 6px; }
 .card-name { font-size: 14px; font-weight: 600; color: var(--text-primary); margin: 0 0 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.card-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted,#9ca3af); margin-bottom: 8px; }
-.stars { color: #f59e0b; letter-spacing: 1px; }
+.card-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+.stars { color: var(--warning); letter-spacing: 1px; }
 .card-footer { display: flex; justify-content: space-between; align-items: center; }
-.price { font-size: 15px; font-weight: 700; color: var(--brand,#3B82F6); }
-.price.free { color: var(--success,#22c55e); }
+.price { font-size: 15px; font-weight: 700; color: var(--brand); }
+.price.free { color: var(--success); }
 
-.card-skel { height: 280px; border-radius: var(--radius-lg,12px); background: var(--skeleton-bg,#f3f4f6); }
+.card-skel { height: 280px; border-radius: var(--radius-lg); background: var(--skeleton-bg); }
 .pulse { animation: sk-pulse 1.5s ease-in-out infinite; }
 @keyframes sk-pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
 
 .error-state { text-align: center; padding: 60px 20px; }
-.error-icon { display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 50%; background: var(--status-fail-bg,#fee2e2); color: var(--status-fail-text,#dc2626); font-size: 22px; font-weight: 700; margin-bottom: 12px; }
+.error-icon { display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: var(--radius-full); background: var(--status-fail-bg); color: var(--status-fail-text); font-size: 22px; font-weight: 700; margin-bottom: 12px; }
 .error-state p { color: var(--text-muted); margin: 0 0 16px; font-size: 14px; }
-.retry-btn { padding: 8px 20px; background: var(--brand); color: var(--text-on-brand,#fff); border: none; border-radius: var(--radius-sm,8px); cursor: pointer; font-size: 13px; }
+.retry-btn { padding: 8px 20px; background: var(--brand); color: var(--text-on-brand); border: none; border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; }
 .empty { text-align: center; color: var(--text-muted); padding: 60px 20px; font-size: 14px; }
 
-.modal-overlay { position: fixed; inset: 0; background: var(--modal-overlay,rgba(0,0,0,.45)); z-index: 5000; display: flex; align-items: center; justify-content: center; }
-.modal { background: var(--bg-card); border-radius: var(--modal-radius,12px); padding: var(--modal-padding,24px); width: 90%; max-width: 600px; max-height: 85vh; overflow-y: auto; box-shadow: var(--modal-shadow); }
+.modal-overlay { position: fixed; inset: 0; background: var(--modal-overlay); z-index: 5000; display: flex; align-items: center; justify-content: center; }
+.modal { background: var(--bg-card); border-radius: var(--modal-radius); padding: var(--modal-padding); width: 90%; max-width: 600px; max-height: 85vh; overflow-y: auto; box-shadow: var(--modal-shadow); }
 .modal h3 { font-size: 17px; font-weight: 600; margin: 0 0 16px; color: var(--text-primary); }
 .detail-imgs { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 14px; }
-.detail-img { width: 140px; height: 100px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border,#e5e7eb); flex-shrink: 0; }
+.detail-img { width: 140px; height: 100px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--border-light); flex-shrink: 0; }
 .detail-desc { font-size: 13px; color: var(--text-secondary); margin: 0 0 12px; line-height: 1.6; }
 .detail-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
-.meta-tag { padding: 2px 8px; border-radius: 4px; font-size: 11px; background: var(--bg-secondary,#f9fafb); color: var(--text-muted); border: 1px solid var(--border-light,#f3f4f6); }
-.detail-stats { display: flex; gap: 14px; font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; padding: 10px 0; border-top: 1px solid var(--border-light,#f3f4f6); border-bottom: 1px solid var(--border-light,#f3f4f6); }
+.meta-tag { padding: 2px 8px; border-radius: var(--radius-xs); font-size: 11px; background: var(--bg-secondary); color: var(--text-muted); border: 1px solid var(--border-light); }
+.detail-stats { display: flex; gap: 14px; font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; padding: 10px 0; border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light); }
+.free-label { color: var(--success); font-weight: 600; }
+
 .form-group { margin-bottom: 10px; }
 .form-group label { display: block; font-size: 13px; color: var(--text-secondary); margin-bottom: 4px; }
-.form-group .input { width: 100%; padding: 8px 12px; border: 1px solid var(--input-border,#e2e8f0); border-radius: var(--radius-sm,8px); font-size: 13px; background: var(--bg-input,var(--bg-card)); color: var(--text-primary); outline: none; resize: vertical; }
-.form-group .input:focus { border-color: var(--input-focus-border,var(--brand)); box-shadow: var(--focus-ring); }
+.form-group .input { width: 100%; padding: 8px 12px; border: 1px solid var(--input-border); border-radius: var(--radius-sm); font-size: 13px; background: var(--bg-input); color: var(--text-primary); outline: none; resize: vertical; }
+.form-group .input:focus { border-color: var(--input-focus-border); box-shadow: var(--focus-ring); }
 .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
-.btn-cancel { padding: 8px 20px; border: 1px solid var(--border,#e5e7eb); border-radius: var(--radius-sm,8px); background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 13px; }
+.btn-cancel { padding: 8px 20px; border: 1px solid var(--border-card); border-radius: var(--radius-sm); background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 13px; }
 .btn-cancel:hover { border-color: var(--text-muted); }
-.btn-save { padding: 8px 20px; background: var(--brand); color: var(--text-on-brand,#fff); border: none; border-radius: var(--radius-sm,8px); cursor: pointer; font-size: 13px; }
+.btn-save { padding: 8px 20px; background: var(--brand); color: var(--text-on-brand); border: none; border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; }
 .btn-save:hover { opacity: .88; }
 .btn-save:disabled { opacity: .5; cursor: not-allowed; }
+
+@media (max-width: 640px) {
+  .card-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .card-img { height: 140px; }
+  .toolbar { flex-direction: column; }
+  .input-search { max-width: 100%; }
+}
 </style>
