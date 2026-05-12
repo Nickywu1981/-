@@ -50,5 +50,5 @@ export const sandboxPay = wrapController(async (req, res) => {
 export const getBillingHistory = wrapController(async (req, res) => {
     const { page, pageSize } = parsePagination(req.query);
     const rows = await payment.getBillingHistory(req.user.id);
-    return listResult(res, { rows, total: rows.length, page: page || 1, pageSize: pageSize || 20 });
+    return listResult(res, { list: rows, total: rows.length, page: page || 1, pageSize: pageSize || 20 });
   });
