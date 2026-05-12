@@ -91,7 +91,7 @@ const form = reactive({ code: '', name: '', type: 'fixed', value: 0, min_order_a
 async function fetch() {
   loading.value = true; error.value = ''
   try {
-    const res = await $fetch(`/api/api/admin/campaign/coupons?page=${page.value}&pageSize=${pageSize}`)
+    const res = await $fetch(`/api/admin/campaign/coupons?page=${page.value}&pageSize=${pageSize}`)
     list.value = res.data?.list || []
     total.value = res.data?.total || 0
   } catch (e: any) { error.value = e.message || '加载失败' }

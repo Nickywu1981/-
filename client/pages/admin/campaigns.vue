@@ -127,7 +127,7 @@ async function fetch() {
     const params = new URLSearchParams({ page: String(page.value), pageSize: String(pageSize) })
     if (filterType.value) params.set('type', filterType.value)
     if (filterStatus.value) params.set('status', filterStatus.value)
-    const res = await $fetch(`/api/api/admin/campaign/campaigns?${params}`)
+    const res = await $fetch(`/api/admin/campaign/campaigns?${params}`)
     list.value = res.data?.list || []
     total.value = res.data?.total || 0
   } catch (e: any) { error.value = e.message || '加载失败' }
