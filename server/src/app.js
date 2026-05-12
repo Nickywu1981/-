@@ -339,7 +339,6 @@ app.use('/api/platforms', platformDetailRoutes);
 app.use('/api/multilingual', multilingualRoutes);
 app.use('/api/analytics', adminLimiter, analyticsRoutes);
 app.use('/api/platform-specs', platformSpecRoutes);
-app.use('/api/ai-dispatch', aiConcurrencyGuard, heavyLimiter, aiDispatchRoutes);  // 多模型统一调度: dispatch/categories/health/stats/cache
 app.use('/api/compare', heavyLimiter, compareRoutes);
 app.use('/api/seo-keywords', heavyLimiter, seoKeywordRoutes);
 app.use('/api/fab', heavyLimiter, fabRoutes);
