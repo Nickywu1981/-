@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "dev": "set NODE_ENV=development && node --watch src/index.js",
+    "dev": "node --env-file=.env --watch src/index.js",
     "start": "node src/index.js",
     "lint": "npx eslint src/",
     "lint:fix": "npx eslint src/ --fix",
@@ -36,7 +36,6 @@
     "nodemailer": "^6.10.0",
     "redis": "^4.7.0",
     "sharp": "^0.34.5",
-    "swagger-jsdoc": "^6.2.8",
     "umzug": "^3.8.3",
     "uuid": "^14.0.0",
     "winston": "^3.19.0",
