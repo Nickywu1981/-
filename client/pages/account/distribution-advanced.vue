@@ -10,7 +10,7 @@
     <template v-else-if="pageError">
       <div class="error-state">
         <p>{{ pageError }}</p>
-        <button class="btn-outline" @click="loadAll">{{ $t('error.retry') }}</button>
+        <button class="btn-outline" @click="loadAll">{{ $t('common.retry') }}</button>
       </div>
     </template>
 
@@ -48,7 +48,7 @@
         <div v-if="perfLoading" class="loading">{{ $t('account_pages.distribution_advanced.loading') }}</div>
         <div v-else-if="perfError" class="error-state">
           <p>{{ perfError }}</p>
-          <button class="btn-outline" @click="loadPerformance">{{ $t('error.retry') }}</button>
+          <button class="btn-outline" @click="loadPerformance">{{ $t('common.retry') }}</button>
         </div>
         <div v-else-if="!perfData?.members?.length" class="empty">{{ $t('account_pages.distribution_advanced.no_members') }}</div>
         <div v-else>
@@ -72,7 +72,7 @@
         <div v-if="promoLoading" class="loading">{{ $t('account_pages.distribution_advanced.loading') }}</div>
         <div v-else-if="promoError" class="error-state">
           <p>{{ promoError }}</p>
-          <button class="btn-outline" @click="loadPromo">{{ $t('error.retry') }}</button>
+          <button class="btn-outline" @click="loadPromo">{{ $t('common.retry') }}</button>
         </div>
         <div v-else-if="!promoData" class="empty">{{ $t('account_pages.distribution_advanced.no_promo') }}</div>
         <div v-else>
@@ -100,7 +100,7 @@
         <div v-if="campLoading" class="loading">{{ $t('account_pages.distribution_advanced.loading') }}</div>
         <div v-else-if="campError" class="error-state">
           <p>{{ campError }}</p>
-          <button class="btn-outline" @click="loadCampaigns">{{ $t('error.retry') }}</button>
+          <button class="btn-outline" @click="loadCampaigns">{{ $t('common.retry') }}</button>
         </div>
         <div v-else-if="!campData?.campaigns?.length" class="empty">{{ $t('account_pages.distribution_advanced.no_campaigns') }}</div>
         <div v-else>

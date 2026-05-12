@@ -187,10 +187,10 @@ export async function completeUpload(uploadId) {
             await new Promise(r => writeStream.once('drain', r));
           }
         }
+        writeStream.on('error', reject);
         writeStream.end();
         writeStream.on('finish', resolve);
-        writeStream.on('error', reject);
-      } catch (err) { reject(err); }
+      } catch (err) { writeStream.destroy(); reject(err); }
     })();
   });
 

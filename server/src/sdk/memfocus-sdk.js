@@ -186,16 +186,18 @@ const content = {
 // ═══════════════ 能力 6: 风控力 ============================================
 const guard = {
   async checkText(text, options = {}) {
-    const [sensitiveResult, complianceResult] = await Promise.all([
+    const [sensitiveResult, complianceResult] = await Promise.allSettled([
       sensitiveWordService.checkText(text),
       options.platform ? complianceService.checkCompliance({ platform: options.platform }) : Promise.resolve(null),
     ]);
+    const sensitive = sensitiveResult.status === 'fulfilled' ? sensitiveResult.value : null;
+    const compliance = complianceResult.status === 'fulfilled' ? complianceResult.value : null;
     return {
-      passed: !sensitiveResult?.blocked,
-      blocked: sensitiveResult?.blocked || false,
-      hits: sensitiveResult?.hits || [],
-      compliance: complianceResult,
-      level: sensitiveResult?.blocked ? 'blocked' : complianceResult?.warnings?.length ? 'warning' : 'clean',
+      passed: !sensitive?.blocked,
+      blocked: sensitive?.blocked || false,
+      hits: sensitive?.hits || [],
+      compliance,
+      level: sensitive?.blocked ? 'blocked' : compliance?.warnings?.length ? 'warning' : 'clean',
     };
   },
 
@@ -204,10 +206,12 @@ const guard = {
   },
 
   async fullAudit({ text, imageUrls = [], platform } = {}) {
-    const [textResult, ...imageResults] = await Promise.all([
+    const results = await Promise.allSettled([
       this.checkText(text, { platform }),
       ...imageUrls.map(url => this.checkImage(url, { platform })),
     ]);
+    const textResult = results[0].status === 'fulfilled' ? results[0].value : { passed: false, hits: [], blocked: false };
+    const imageResults = results.slice(1).map(r => r.status === 'fulfilled' ? r.value : { passed: false });
     const allPassed = textResult.passed && imageResults.every(r => r.passed);
     return {
       passed: allPassed,

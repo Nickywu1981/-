@@ -9,7 +9,7 @@
     <LoadingSkeleton v-if="loading" />
     <div v-else-if="error" class="error-state">
       <p>{{ error }}</p>
-      <button class="btn-outline" @click="fetchData">{{ $t('error.retry') }}</button>
+      <button class="btn-outline" @click="fetchData">{{ $t('common.retry') }}</button>
     </div>
     <template v-else-if="list.length">
     <div class="table-wrap">

@@ -21,7 +21,7 @@
             @click="g.open = !g.open"
           >
             <span class="al-grp-ic">{{ g.icon }}</span>
-            <span class="al-grp-lbl">{{ g.label }}</span>
+            <span class="al-grp-lbl">{{ $t('admin_nav.groups.' + g.key) }}</span>
             <span class="al-grp-arr" :class="{ down: g.open }">▸</span>
           </div>
           <div v-show="g.open" class="al-grp-body">
@@ -30,7 +30,7 @@
               :key="item.key"
               :to="item.route"
               class="al-item"
-            >{{ item.label }}</NuxtLink>
+            >{{ $t('admin_nav.items.' + item.key) }}</NuxtLink>
           </div>
         </template>
       </nav>
@@ -59,101 +59,101 @@ const route = useRoute()
 const { theme, toggle: toggleTheme } = useTheme()
 watch(() => route.path, () => { open.value = false })
 
-interface NavItem { key: string; label: string; route: string }
-interface NavGroup { key: string; icon: string; label: string; open: boolean; items: NavItem[] }
+interface NavItem { key: string; route: string }
+interface NavGroup { key: string; icon: string; open: boolean; items: NavItem[] }
 
 const groups = reactive<NavGroup[]>([
   {
-    key: 'overview', icon: '📊', label: '数据总览', open: true,
+    key: 'overview', icon: '📊', open: true,
     items: [
-      { key: 'dashboard', label: '数据看板', route: '/admin/dashboard' },
-      { key: 'analytics', label: '数据统计', route: '/admin/analytics' },
+      { key: 'dashboard', route: '/admin/dashboard' },
+      { key: 'analytics', route: '/admin/analytics' },
     ],
   },
   {
-    key: 'users', icon: '👥', label: '用户体系', open: false,
+    key: 'users', icon: '👥', open: false,
     items: [
-      { key: 'users', label: '用户管理', route: '/admin/users' },
-      { key: 'tenants', label: '租户管理', route: '/admin/tenants' },
-      { key: 'tier', label: '会员等级', route: '/admin/tier' },
+      { key: 'users', route: '/admin/users' },
+      { key: 'tenants', route: '/admin/tenants' },
+      { key: 'tier', route: '/admin/tier' },
     ],
   },
   {
-    key: 'finance', icon: '💳', label: '交易财务', open: false,
+    key: 'finance', icon: '💳', open: false,
     items: [
-      { key: 'plans', label: '套餐配置', route: '/admin/plans' },
-      { key: 'orders', label: '套餐订单', route: '/admin/orders' },
-      { key: 'recharge', label: '充值订单', route: '/admin/recharge' },
-      { key: 'credits', label: '积分消费', route: '/admin/credits' },
+      { key: 'plans', route: '/admin/plans' },
+      { key: 'orders', route: '/admin/orders' },
+      { key: 'recharge', route: '/admin/recharge' },
+      { key: 'credits', route: '/admin/credits' },
     ],
   },
   {
-    key: 'ops', icon: '📋', label: '任务运营', open: false,
+    key: 'ops', icon: '📋', open: false,
     items: [
-      { key: 'tasks', label: '任务管理', route: '/admin/tasks' },
-      { key: 'automation', label: '自动化任务', route: '/admin/automation' },
-      { key: 'notifications', label: '通知管理', route: '/admin/notifications' },
-      { key: 'badges', label: '营销标签', route: '/admin/badges' },
-      { key: 'campaigns', label: '运营活动', route: '/admin/campaigns' },
-      { key: 'enterprises', label: '企业审批', route: '/admin/enterprises' },
-      { key: 'coupons', label: '优惠券管理', route: '/admin/coupons' },
-      { key: 'announcements', label: '公告管理', route: '/admin/announcements' },
+      { key: 'tasks', route: '/admin/tasks' },
+      { key: 'automation', route: '/admin/automation' },
+      { key: 'notifications', route: '/admin/notifications' },
+      { key: 'badges', route: '/admin/badges' },
+      { key: 'campaigns', route: '/admin/campaigns' },
+      { key: 'enterprises', route: '/admin/enterprises' },
+      { key: 'coupons', route: '/admin/coupons' },
+      { key: 'announcements', route: '/admin/announcements' },
     ],
   },
   {
-    key: 'content', icon: '🎨', label: '内容与模板', open: false,
+    key: 'content', icon: '🎨', open: false,
     items: [
-      { key: 'collection', label: '作品集管理', route: '/admin/collection' },
-      { key: 'prompts', label: '提示词模板', route: '/admin/prompts' },
-      { key: 'templates', label: '模板管理', route: '/admin/templates' },
-      { key: 'diy-pages', label: 'DIY 页面管理', route: '/admin/diy-pages' },
-      { key: 'workspace-diy', label: '工作台 DIY', route: '/admin/workspace-diy' },
+      { key: 'collection', route: '/admin/collection' },
+      { key: 'prompts', route: '/admin/prompts' },
+      { key: 'templates', route: '/admin/templates' },
+      { key: 'diy-pages', route: '/admin/diy-pages' },
+      { key: 'workspace-diy', route: '/admin/workspace-diy' },
     ],
   },
   {
-    key: 'msg', icon: '📢', label: '消息通信', open: false,
+    key: 'msg', icon: '📢', open: false,
     items: [
-      { key: 'sms-templates', label: '短信模板', route: '/admin/sms-templates' },
-      { key: 'sms-logs', label: '短信日志', route: '/admin/sms-logs' },
-      { key: 'email-templates', label: '邮件模板', route: '/admin/email-templates' },
+      { key: 'sms-templates', route: '/admin/sms-templates' },
+      { key: 'sms-logs', route: '/admin/sms-logs' },
+      { key: 'email-templates', route: '/admin/email-templates' },
     ],
   },
   {
-    key: 'security', icon: '🛡️', label: '风控合规', open: false,
+    key: 'security', icon: '🛡️', open: false,
     items: [
-      { key: 'moderation', label: '内容审核', route: '/admin/moderation' },
-      { key: 'abuse', label: '滥用监控', route: '/admin/abuse' },
-      { key: 'compliance', label: '合规检查', route: '/admin/compliance' },
-      { key: 'geo-rules', label: 'GEO 规则', route: '/admin/geo-rules' },
+      { key: 'moderation', route: '/admin/moderation' },
+      { key: 'abuse', route: '/admin/abuse' },
+      { key: 'compliance', route: '/admin/compliance' },
+      { key: 'geo-rules', route: '/admin/geo-rules' },
     ],
   },
   {
-    key: 'system', icon: '⚙️', label: '系统配置', open: false,
+    key: 'system', icon: '⚙️', open: false,
     items: [
-      { key: 'site-config', label: '站点配置', route: '/admin/site-config' },
-      { key: 'brand-settings', label: '品牌配置', route: '/admin/brand-settings' },
-      { key: 'ai-models', label: 'AI 模型', route: '/admin/ai-models' },
-      { key: 'multilingual', label: '多语言', route: '/admin/multilingual' },
-      { key: 'proxy', label: 'API 代理', route: '/admin/proxy' },
-      { key: 'config', label: '配置中心', route: '/admin/config' },
-      { key: 'settings', label: '系统设置', route: '/admin/settings' },
-      { key: 'kb-management', label: '知识库管理', route: '/admin/kb-management' },
+      { key: 'site-config', route: '/admin/site-config' },
+      { key: 'brand-settings', route: '/admin/brand-settings' },
+      { key: 'ai-models', route: '/admin/ai-models' },
+      { key: 'multilingual', route: '/admin/multilingual' },
+      { key: 'proxy', route: '/admin/proxy' },
+      { key: 'config', route: '/admin/config' },
+      { key: 'settings', route: '/admin/settings' },
+      { key: 'kb-management', route: '/admin/kb-management' },
     ],
   },
   {
-    key: 'tools', icon: '🔧', label: '工具集', open: false,
+    key: 'tools', icon: '🔧', open: false,
     items: [
-      { key: 'forms', label: '表单管理', route: '/admin/forms' },
-      { key: 'form-templates', label: '表单模板', route: '/admin/form-templates' },
-      { key: 'size-templates', label: '尺寸模板', route: '/admin/size-templates' },
-      { key: 'test-workbench', label: '测试工作台', route: '/admin/test-workbench' },
+      { key: 'forms', route: '/admin/forms' },
+      { key: 'form-templates', route: '/admin/form-templates' },
+      { key: 'size-templates', route: '/admin/size-templates' },
+      { key: 'test-workbench', route: '/admin/test-workbench' },
     ],
   },
   {
-    key: 'audit', icon: '📝', label: '审计日志', open: false,
+    key: 'audit', icon: '📝', open: false,
     items: [
-      { key: 'logs', label: '操作日志', route: '/admin/logs' },
-      { key: 'ai-logs', label: 'AI 调用日志', route: '/admin/ai-logs' },
+      { key: 'logs', route: '/admin/logs' },
+      { key: 'ai-logs', route: '/admin/ai-logs' },
     ],
   },
 ])

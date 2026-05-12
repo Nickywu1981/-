@@ -27,7 +27,7 @@ export class ParallelAgent extends BaseAgent {
   }
 
   async _runAsyncImpl(ctx) {
-    const results = await Promise.all(
+    const results = await Promise.allSettled(
       this.subAgents.map(sub => sub.runAsync(ctx)),
     );
     return results;

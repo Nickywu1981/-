@@ -37,6 +37,7 @@ wsManager.attach(server);
 import('./services/workerBootstrap.js').then(({ bootstrapWorkers }) => bootstrapWorkers()).catch((err) => { logger.warn('[Worker] 启动失败，队列将降级', { error: err.message }); });
 
 let cleanupTimer = null;
+let recoverTimer = null;
 
 server.listen(port, () => {
   logger.info(`${env} 模式 — http://localhost:${port}  |  WebSocket /ws  |  BullMQ Workers`);
@@ -47,7 +48,7 @@ server.listen(port, () => {
   }, 30 * 60 * 1000);
 
   // 定时恢复卡住的任务 (每 5 分钟)
-  setInterval(() => {
+  recoverTimer = setInterval(() => {
     import('./dao/taskDao.js').then(({ recoverStuckTasks }) => recoverStuckTasks()).catch((err) => { logger.warn('[Cron] 恢复卡住任务失败', { error: err.message }); });
   }, 5 * 60 * 1000).unref();
 });
@@ -78,6 +79,7 @@ function gracefulShutdown(signal) {
 
   // 清理定时器
   if (cleanupTimer) { clearInterval(cleanupTimer); cleanupTimer = null; }
+  if (recoverTimer) { clearInterval(recoverTimer); recoverTimer = null; }
 
   server.close(() => {
     (async () => {

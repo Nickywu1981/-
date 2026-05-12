@@ -13,7 +13,7 @@
     <div v-else-if="error" class="error-state">
       <span class="error-icon">⚠</span>
       <p>{{ error }}</p>
-      <button class="btn-outline" @click="fetchData">{{ $t('error.retry') }}</button>
+      <button class="btn-outline" @click="fetchData">{{ $t('common.retry') }}</button>
     </div>
 
     <EmptyState
@@ -63,7 +63,7 @@
           <input type="checkbox" v-model="form.isPublic" /> {{ $t('account_pages.collections.public_checkbox') }}
         </label>
         <div class="modal-actions">
-          <button class="btn-outline" @click="showCreate = false">{{ $t('account_pages.collections.cancel') }}</button>
+          <button class="btn-outline" @click="showCreate = false">{{ $t('common.cancel') }}</button>
           <button class="btn-primary" :disabled="!form.name || saving" @click="createCollection">
             {{ saving ? $t('account_pages.collections.creating') : $t('account_pages.collections.create_btn') }}
           </button>
@@ -80,7 +80,7 @@
         <label class="field-label">{{ $t('account_pages.collections.edit_desc_label') }}</label>
         <textarea v-model="editForm.description" class="input textarea" rows="2" />
         <div class="modal-actions">
-          <button class="btn-outline" @click="editing = null">{{ $t('account_pages.collections.cancel') }}</button>
+          <button class="btn-outline" @click="editing = null">{{ $t('common.cancel') }}</button>
           <button class="btn-primary" :disabled="!editForm.name" @click="saveEdit">{{ $t('account_pages.collections.save') }}</button>
         </div>
       </div>

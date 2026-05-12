@@ -7,7 +7,7 @@
       <div class="stat"><span class="val out">{{ totalOut }}</span><span class="lbl">{{ $t('account_pages.credits.total_out') }}</span></div>
     </div>
     <div v-if="loading" class="skeleton"><div v-for="i in 5" :key="i" class="skel-row" /></div>
-    <div v-else-if="error" class="error-msg">{{ error }} <button @click="fetchRecords">{{ $t('error.retry') }}</button></div>
+    <div v-else-if="error" class="error-msg">{{ error }} <button @click="fetchRecords">{{ $t('common.retry') }}</button></div>
     <div v-else-if="records.length" class="table-wrap">
       <table class="credits-table">
         <thead><tr>

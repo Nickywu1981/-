@@ -32,14 +32,13 @@ export async function executeTask(taskId, userId) {
   const task = await automationDao.getTaskById(taskId);
   if (!task) throw new BusinessError(404, '任务不存在');
   if (task.user_id !== userId) throw new BusinessError(403, '无权执行该任务');
-  if (task.status !== 0) throw new BusinessError(400, '任务状态不允许执行');
 
-  await automationDao.updateTaskStatus(taskId, task.user_id, task.tenant_id, 1, { startTime: true });
+  const affected = await automationDao.tryStartTask(taskId, task.user_id, task.tenant_id);
+  if (affected === 0) throw new BusinessError(400, '任务状态不允许执行');
 
   const timer = setTimeout(async () => {
     runningTimers.delete(taskId);
     try {
-      // Check if cancelled while waiting
       const current = await automationDao.getTaskById(taskId);
       if (!current || current.status === 4) return;
 

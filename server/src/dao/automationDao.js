@@ -38,6 +38,14 @@ export default {
     return r.affectedRows;
   },
 
+  async tryStartTask(id, userId, tenantId) {
+    const [r] = await pool.query(
+      'UPDATE automation_task SET status = 1, start_time = NOW() WHERE id = ? AND user_id = ? AND tenant_id = ? AND status = 0',
+      [id, userId, tenantId],
+    );
+    return r.affectedRows;
+  },
+
   async cancelTask(id, userId) {
     const [r] = await pool.query('UPDATE automation_task SET status = 4 WHERE id = ? AND user_id = ? AND status IN (0, 1)', [id, userId]);
     return r.affectedRows > 0;

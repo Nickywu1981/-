@@ -6,6 +6,7 @@ const mockDao = {
   cancelTask: vi.fn(),
   getTaskById: vi.fn(),
   updateTaskStatus: vi.fn(),
+  tryStartTask: vi.fn(),
   listAccounts: vi.fn(),
   createAccount: vi.fn(),
   deleteAccount: vi.fn(),
@@ -87,16 +88,17 @@ describe('automationService', () => {
     });
 
     it('updates status to 1 (running) and returns { taskId, status: 1 }', async () => {
-      mockDao.getTaskById.mockResolvedValue({ id: 10, task_type: 'product_on', status: 0, user_id: undefined });
-      mockDao.updateTaskStatus.mockResolvedValue();
+      mockDao.getTaskById.mockResolvedValue({ id: 10, task_type: 'product_on', status: 0, user_id: undefined, tenant_id: undefined });
+      mockDao.tryStartTask.mockResolvedValue(1);
       const result = await executeTask(10);
-      expect(mockDao.updateTaskStatus).toHaveBeenCalledWith(10, undefined, undefined, 1, { startTime: true });
+      expect(mockDao.tryStartTask).toHaveBeenCalledWith(10, undefined, undefined);
       expect(result).toEqual({ taskId: 10, status: 1 });
     });
 
     it('schedules async completion with task type label', async () => {
       vi.useFakeTimers();
-      mockDao.getTaskById.mockResolvedValue({ id: 10, task_type: 'product_on', status: 0, user_id: undefined });
+      mockDao.getTaskById.mockResolvedValue({ id: 10, task_type: 'product_on', status: 0, user_id: undefined, tenant_id: undefined });
+      mockDao.tryStartTask.mockResolvedValue(1);
       mockDao.updateTaskStatus.mockResolvedValue();
       await executeTask(10);
       await vi.runAllTimersAsync();
@@ -109,7 +111,8 @@ describe('automationService', () => {
 
     it('handles unknown task_type with generic label in async', async () => {
       vi.useFakeTimers();
-      mockDao.getTaskById.mockResolvedValue({ id: 10, task_type: 'unknown_type', status: 0, user_id: undefined });
+      mockDao.getTaskById.mockResolvedValue({ id: 10, task_type: 'unknown_type', status: 0, user_id: undefined, tenant_id: undefined });
+      mockDao.tryStartTask.mockResolvedValue(1);
       mockDao.updateTaskStatus.mockResolvedValue();
       await executeTask(10);
       await vi.runAllTimersAsync();
@@ -121,10 +124,9 @@ describe('automationService', () => {
 
     it('sets status=3 on async failure', async () => {
       vi.useFakeTimers();
-      mockDao.getTaskById.mockResolvedValue({ id: 10, task_type: 'product_on', status: 0, user_id: undefined });
-      mockDao.updateTaskStatus
-        .mockResolvedValueOnce() // startTime call
-        .mockRejectedValueOnce(new Error('crash')); // completion call
+      mockDao.getTaskById.mockResolvedValue({ id: 10, task_type: 'product_on', status: 0, user_id: undefined, tenant_id: undefined });
+      mockDao.tryStartTask.mockResolvedValue(1);
+      mockDao.updateTaskStatus.mockRejectedValueOnce(new Error('crash'));
       await executeTask(10);
       await vi.runAllTimersAsync();
       expect(mockDao.updateTaskStatus).toHaveBeenCalledWith(10, undefined, undefined, 3, { errorMsg: 'crash' });

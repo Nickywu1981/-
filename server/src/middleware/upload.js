@@ -127,14 +127,15 @@ export function uploadQuotaGuard(req, res, next) {
     return error(res, 429, `每日上传配额已用尽 (${DAILY_UPLOAD_LIMIT_MB}MB)`);
   }
 
-  // 挂载累加回调
+  let quotaDone = false;
   const done = () => {
+    if (quotaDone) return;
+    quotaDone = true;
     const cur = tenantUploadQuota.get(key) || { total: 0, ts: Date.now() };
     cur.total += estSize;
     cur.ts = Date.now();
     tenantUploadQuota.set(key, cur);
   };
-  res.on('finish', () => { if (res.statusCode < 400) done(); });
   res.on('close', () => { if (res.statusCode < 400) done(); });
 
   next();

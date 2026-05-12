@@ -29,14 +29,14 @@
     <table class="table">
       <thead>
         <tr>
-          <th>{{ $t('id') }}</th>
+          <th>{{ $t('common.id') }}</th>
           <th>{{ $t('admin_prompts.col_code') }}</th>
           <th>{{ $t('admin_prompts.col_title') }}</th>
           <th>{{ $t('admin_prompts.col_category') }}</th>
-          <th>{{ $t('status') }}</th>
+          <th>{{ $t('common.status') }}</th>
           <th>{{ $t('admin_prompts.col_usage') }}</th>
           <th>{{ $t('admin_prompts.col_create_time') }}</th>
-          <th>{{ $t('action') }}</th>
+          <th>{{ $t('common.action') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -49,12 +49,12 @@
           <td>{{ t.usage_count }}</td>
           <td>{{ t.create_time?.slice(0, 10) }}</td>
           <td class="actions">
-            <button class="btn-sm" @click="openEdit(t)">{{ $t('edit') }}</button>
+            <button class="btn-sm" @click="openEdit(t)">{{ $t('common.edit') }}</button>
             <button v-if="t.status === 1" class="btn-sm success" @click="review(t.id, 2)">{{ $t('admin_prompts.approve') }}</button>
             <button v-if="t.status === 1" class="btn-sm danger" @click="review(t.id, 3)">{{ $t('admin_prompts.reject') }}</button>
             <button v-if="t.status === 2" class="btn-sm warn" @click="review(t.id, 3)">{{ $t('admin_prompts.unpublish') }}</button>
             <button v-if="t.status === 3" class="btn-sm" @click="review(t.id, 2)">{{ $t('admin_prompts.publish') }}</button>
-            <button class="btn-sm danger" @click="confirmDelete(t)">{{ $t('delete') }}</button>
+            <button class="btn-sm danger" @click="confirmDelete(t)">{{ $t('common.delete') }}</button>
           </td>
         </tr>
       </tbody>
@@ -126,8 +126,8 @@
             </div>
           </div>
           <div class="modal-actions">
-            <button class="btn" @click="showModal = false">{{ $t('cancel') }}</button>
-            <button class="btn btn-primary" @click="save">{{ $t('save') }}</button>
+            <button class="btn" @click="showModal = false">{{ $t('common.cancel') }}</button>
+            <button class="btn btn-primary" @click="save">{{ $t('common.save') }}</button>
           </div>
         </div>
       </div>
