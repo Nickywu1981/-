@@ -70,12 +70,8 @@ export async function openApiAuth(req, res, next) {
     // 从数据库查 API Key 对应的 secret
     let keyRecord;
     try {
-      const pool = (await import('../dao/db.js')).default;
-      const [rows] = await pool.query(
-        'SELECT api_key, api_secret, tenant_id, status, rate_limit, daily_limit FROM open_api_key WHERE api_key = ? AND is_deleted = 0 LIMIT 1',
-        [apiKey],
-      );
-      keyRecord = rows?.[0];
+      const { getByApiKey } = await import('../dao/openApiKeyDao.js');
+      keyRecord = await getByApiKey(apiKey);
     } catch (err) {
       logger.error('[OpenAPI] API Key 查询失败', { error: err.message });
       keyRecord = null;

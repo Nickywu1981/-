@@ -191,7 +191,7 @@ import('./middleware/cache.js').then(({ invalidateCache }) => {
     });
     next();
   });
-}).catch(() => { /* cache middleware unavailable — cache invalidation disabled */ });
+}).catch((err) => { logger.warn('[Cache] 缓存中间件不可用，失效功能已禁用', { error: err.message }); });
 
 // 健康检查 — 使用网关健康仪表盘 (Phase 0-A, 2026-05-11)
 app.get('/api/health', optionalAuth, async (req, res) => {

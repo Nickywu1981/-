@@ -146,7 +146,7 @@ export async function handleNotify(body) {
       const affected = await allinpayDao.markPaid(reqsn, trxid || '', body, conn);
       if (affected === 0) {
         skipped = true;
-        throw new Error('CONCURRENT_PROCESSED');
+        throw new BusinessError(409, '订单已被并发回调处理');
       }
 
       if (order.order_type === 'membership') {
