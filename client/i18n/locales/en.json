@@ -247,7 +247,24 @@
     "login_btn": "Login",
     "register_btn": "Register",
     "forgot_pwd": "Forgot Password",
-    "remember": "Remember Me"
+    "remember": "Remember Me",
+    "welcome_title": "Welcome Back",
+    "welcome_subtitle": "Log in to your Movio AI account",
+    "tab_password": "Password",
+    "tab_sms": "SMS",
+    "tab_email": "Email",
+    "get_code": "Get Code",
+    "code_countdown": "{n}s",
+    "code_sent": "Code Sent",
+    "send_failed": "Failed to send, check network",
+    "login_failed": "Login Failed",
+    "login_network_error": "Login failed, check network",
+    "enter_phone_and_code": "Please enter phone and code",
+    "enter_phone": "Please enter phone number",
+    "enter_email_and_code": "Please enter email and code",
+    "enter_email": "Please enter email",
+    "no_account": "Don't have an account?",
+    "free_register": "Sign Up Free"
   },
   "image": {
     "title": "AI Image Generation",
@@ -1224,5 +1241,16 @@
       "pageTitle": "Enterprise Center",
       "loadProfileFailed": "Failed to load enterprise info"
     }
+  },
+  "error": {
+    "404_title": "Page Not Found",
+    "404_desc": "The page you visited has been deleted, renamed, or is temporarily unavailable. Please check the URL for typos.",
+    "403_title": "Access Denied",
+    "403_desc": "You do not have permission to access this page. Please contact the administrator or switch accounts.",
+    "500_title": "Server Error",
+    "500_desc": "The server encountered a temporary issue. We are working on it. Please try again later.",
+    "back_prev": "Go Back",
+    "refresh_page": "Refresh Page",
+    "home_btn": "Back to Home"
   }
 }

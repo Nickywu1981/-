@@ -24,6 +24,7 @@
 
 <script setup lang="ts">
 const { locale } = useI18n()
+const { refresh: refreshDynamic } = useI18nDynamic()
 const open = ref(false)
 
 interface LocaleOption { code: string; name: string; flag: string }
@@ -38,6 +39,7 @@ const currentFlag = computed(() => locales.find(l => l.code === locale.value)?.f
 function switchLang(code: string) {
   locale.value = code as 'zh' | 'en'
   if (typeof window !== 'undefined') localStorage.setItem('lang', code)
+  refreshDynamic()
   open.value = false
 }
 </script>

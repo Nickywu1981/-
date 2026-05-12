@@ -7,7 +7,7 @@
       <p class="error-desc">{{ desc }}</p>
       <div class="error-actions">
         <button class="btn-back" @click="goBack">{{ backLabel }}</button>
-        <NuxtLink to="/" class="btn-home">返回首页</NuxtLink>
+        <NuxtLink to="/" class="btn-home">{{ $t('error.home_btn') }}</NuxtLink>
       </div>
     </div>
   </div>
@@ -18,26 +18,28 @@ interface ErrorProps { error?: { statusCode?: number; message?: string } }
 const props = defineProps<ErrorProps>();
 const error = props.error || {};
 
-const states: Record<number, { icon: string; title: string; desc: string; back: string }> = {
+const { t } = useI18n()
+
+const states = computed(() => ({
   404: {
     icon: '🔍',
-    title: '页面不存在',
-    desc: '您访问的页面已删除、更名或暂时不可用。请检查地址是否拼写正确。',
-    back: '返回上一页',
+    title: t('error.404_title'),
+    desc: t('error.404_desc'),
+    back: t('error.back_prev'),
   },
   403: {
     icon: '🔒',
-    title: '暂无权限',
-    desc: '您没有权限访问此页面，请联系管理员开通权限，或切换账号登录。',
-    back: '返回上一页',
+    title: t('error.403_title'),
+    desc: t('error.403_desc'),
+    back: t('error.back_prev'),
   },
   500: {
     icon: '⚙️',
-    title: '服务器开小差了',
-    desc: '服务器遇到临时故障，我们正在抢修中，请稍后重试。',
-    back: '刷新页面',
+    title: t('error.500_title'),
+    desc: t('error.500_desc'),
+    back: t('error.refresh_page'),
   },
-};
+}));
 
 const code = computed(() => error?.statusCode || 404);
 const s = computed(() => states[code.value] || states[404]);

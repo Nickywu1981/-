@@ -247,7 +247,24 @@
     "login_btn": "登录",
     "register_btn": "注册",
     "forgot_pwd": "忘记密码",
-    "remember": "记住我"
+    "remember": "记住我",
+    "welcome_title": "欢迎回来",
+    "welcome_subtitle": "登录你的 Movio AI 账号",
+    "tab_password": "密码登录",
+    "tab_sms": "短信登录",
+    "tab_email": "邮箱登录",
+    "get_code": "获取验证码",
+    "code_countdown": "{n}秒",
+    "code_sent": "验证码已发送",
+    "send_failed": "发送失败，请检查网络",
+    "login_failed": "登录失败",
+    "login_network_error": "登录失败，请检查网络",
+    "enter_phone_and_code": "请输入手机号和验证码",
+    "enter_phone": "请输入手机号",
+    "enter_email_and_code": "请输入邮箱和验证码",
+    "enter_email": "请输入邮箱",
+    "no_account": "还没有账号？",
+    "free_register": "免费注册"
   },
   "image": {
     "title": "AI 图片生成",
@@ -1225,5 +1242,16 @@
       "pageTitle": "企业中心",
       "loadProfileFailed": "加载企业信息失败"
     }
+  },
+  "error": {
+    "404_title": "页面不存在",
+    "404_desc": "您访问的页面已删除、更名或暂时不可用。请检查地址是否拼写正确。",
+    "403_title": "暂无权限",
+    "403_desc": "您没有权限访问此页面，请联系管理员开通权限，或切换账号登录。",
+    "500_title": "服务器开小差了",
+    "500_desc": "服务器遇到临时故障，我们正在抢修中，请稍后重试。",
+    "back_prev": "返回上一页",
+    "refresh_page": "刷新页面",
+    "home_btn": "返回首页"
   }
 }

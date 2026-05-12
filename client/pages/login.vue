@@ -3,74 +3,74 @@
     <div class="login-card">
       <div class="login-header">
         <span class="login-logo">◆</span>
-        <h2>欢迎回来</h2>
-        <p>登录你的 Movio AI 账号</p>
+        <h2>{{ $t('auth.welcome_title') }}</h2>
+        <p>{{ $t('auth.welcome_subtitle') }}</p>
       </div>
 
       <div class="mode-tabs">
-        <button :class="{ active: mode === 'password' }" @click="mode = 'password'">密码登录</button>
-        <button :class="{ active: mode === 'sms' }" @click="mode = 'sms'">短信登录</button>
-        <button :class="{ active: mode === 'email' }" @click="mode = 'email'">邮箱登录</button>
+        <button :class="{ active: mode === 'password' }" @click="mode = 'password'">{{ $t('auth.tab_password') }}</button>
+        <button :class="{ active: mode === 'sms' }" @click="mode = 'sms'">{{ $t('auth.tab_sms') }}</button>
+        <button :class="{ active: mode === 'email' }" @click="mode = 'email'">{{ $t('auth.tab_email') }}</button>
       </div>
 
       <form v-if="mode === 'password'" @submit.prevent="handlePasswordLogin">
         <div class="input-group">
           <span class="input-icon">👤</span>
-          <label for="login-username" class="sr-only">用户名</label>
-          <input id="login-username" v-model="username" type="text" placeholder="用户名" required maxlength="30" autocomplete="username" />
+          <label for="login-form-username" class="sr-only">{{ $t('auth.username') }}</label>
+          <input id="login-form-username" v-model="username" type="text" :placeholder="$t('auth.username')" required maxlength="30" autocomplete="username" />
         </div>
         <div class="input-group">
           <span class="input-icon">🔒</span>
-          <label for="login-password" class="sr-only">密码</label>
-          <input id="login-password" v-model="password" type="password" placeholder="密码" required maxlength="128" autocomplete="current-password" />
+          <label for="login-form-password" class="sr-only">{{ $t('auth.password') }}</label>
+          <input id="login-form-password" v-model="password" type="password" :placeholder="$t('auth.password')" required maxlength="128" autocomplete="current-password" />
         </div>
         <button type="submit" class="login-btn" :disabled="loading">
           <span v-if="loading" class="spinner-sm" />
-          <span v-else>登录</span>
+          <span v-else>{{ $t('auth.login_btn') }}</span>
         </button>
       </form>
 
       <form v-if="mode === 'sms'" @submit.prevent="handleSmsLogin">
         <div class="input-group">
           <span class="input-icon">📱</span>
-          <label for="login-sms-phone" class="sr-only">手机号</label>
-          <input id="login-sms-phone" v-model="smsPhone" type="tel" placeholder="手机号" required maxlength="11" autocomplete="tel" inputmode="tel" />
+          <label for="login-form-sms-phone" class="sr-only">{{ $t('auth.phone') }}</label>
+          <input id="login-form-sms-phone" v-model="smsPhone" type="tel" :placeholder="$t('auth.phone')" required maxlength="11" autocomplete="tel" inputmode="tel" />
         </div>
         <div class="sms-row">
-          <label for="login-sms-code" class="sr-only">短信验证码</label>
-          <input id="login-sms-code" v-model="smsCode" type="text" placeholder="验证码" required maxlength="6" />
+          <label for="login-form-sms-code" class="sr-only">{{ $t('auth.code') }}</label>
+          <input id="login-form-sms-code" v-model="smsCode" type="text" :placeholder="$t('auth.code')" required maxlength="6" />
           <button type="button" class="code-btn" :disabled="smsCountdown > 0" @click="sendSmsCode('login')">
-            {{ smsCountdown > 0 ? `${smsCountdown}秒` : '获取验证码' }}
+            {{ smsCountdown > 0 ? $t('auth.code_countdown', { n: smsCountdown }) : $t('auth.get_code') }}
           </button>
         </div>
         <button type="submit" class="login-btn" :disabled="loading">
           <span v-if="loading" class="spinner-sm" />
-          <span v-else>短信登录</span>
+          <span v-else>{{ $t('auth.tab_sms') }}</span>
         </button>
       </form>
 
       <form v-if="mode === 'email'" @submit.prevent="handleEmailLogin">
         <div class="input-group">
           <span class="input-icon">📧</span>
-          <label for="login-email" class="sr-only">邮箱地址</label>
-          <input id="login-email" v-model="emailAddr" type="email" placeholder="邮箱地址" required maxlength="254" autocomplete="email" inputmode="email" />
+          <label for="login-form-email" class="sr-only">{{ $t('auth.email') }}</label>
+          <input id="login-form-email" v-model="emailAddr" type="email" :placeholder="$t('auth.email')" required maxlength="254" autocomplete="email" inputmode="email" />
         </div>
         <div class="sms-row">
-          <label for="login-email-code" class="sr-only">邮箱验证码</label>
-          <input id="login-email-code" v-model="emailCode" type="text" placeholder="验证码" required maxlength="6" />
+          <label for="login-form-email-code" class="sr-only">{{ $t('auth.code') }}</label>
+          <input id="login-form-email-code" v-model="emailCode" type="text" :placeholder="$t('auth.code')" required maxlength="6" />
           <button type="button" class="code-btn" :disabled="emailCountdown > 0" @click="sendEmailCode('login')">
-            {{ emailCountdown > 0 ? `${emailCountdown}秒` : '获取验证码' }}
+            {{ emailCountdown > 0 ? $t('auth.code_countdown', { n: emailCountdown }) : $t('auth.get_code') }}
           </button>
         </div>
         <button type="submit" class="login-btn" :disabled="loading">
           <span v-if="loading" class="spinner-sm" />
-          <span v-else>邮箱登录</span>
+          <span v-else>{{ $t('auth.tab_email') }}</span>
         </button>
       </form>
 
       <p class="msg" :class="{ error: msgErr }" v-if="msg" role="alert" aria-live="assertive">{{ msg }}</p>
       <p class="link">
-        还没有账号？<NuxtLink to="/register">免费注册</NuxtLink>
+        {{ $t('auth.no_account') }}<NuxtLink to="/register">{{ $t('auth.free_register') }}</NuxtLink>
       </p>
     </div>
   </div>
@@ -81,6 +81,8 @@
 definePageMeta({ layout: 'landing' })
 
 import { useAuthStore } from '~/stores/useAuthStore'
+
+const { t } = useI18n()
 
 const mode = ref('password');
 const username = ref('');
@@ -103,52 +105,52 @@ async function handlePasswordLogin() {
     await authStore.login(username.value, password.value)
     await authStore.fetchUser()
     navigateTo('/workspace')
-  } catch (e: any) { msg.value = e?.data?.msg || e.message || '登录失败'; msgErr.value = true; }
+  } catch (e: any) { msg.value = e?.data?.msg || t('auth.login_network_error'); msgErr.value = true; }
   finally { loading.value = false; }
 }
 
 async function handleSmsLogin() {
-  if (!smsPhone.value || !smsCode.value) { msg.value = '请输入手机号和验证码'; msgErr.value = true; return; }
+  if (!smsPhone.value || !smsCode.value) { msg.value = t('auth.enter_phone_and_code'); msgErr.value = true; return; }
   loading.value = true; msg.value = '';
   try {
     await $fetch('/api/sms/verify-code', { method: 'POST', credentials: 'include', body: { phone: smsPhone.value, scene: 'login', code: smsCode.value } });
     await api.post('/auth/login-by-code', { phone: smsPhone.value });
     await useAuthStore().fetchUser();
     navigateTo('/workspace');
-  } catch (e: any) { msg.value = e?.data?.msg || '登录失败'; msgErr.value = true; }
+  } catch (e: any) { msg.value = e?.data?.msg || t('auth.login_network_error'); msgErr.value = true; }
   finally { loading.value = false; }
 }
 
 async function sendSmsCode(scene: string) {
-  if (!smsPhone.value) { msg.value = '请输入手机号'; msgErr.value = true; return; }
+  if (!smsPhone.value) { msg.value = t('auth.enter_phone'); msgErr.value = true; return; }
   msg.value = '';
   try {
     await $fetch('/api/sms/send-code', { method: 'POST', credentials: 'include', body: { phone: smsPhone.value, scene } });
     startSmsCd(60);
-    msg.value = '验证码已发送'; msgErr.value = false;
-  } catch (e: any) { msg.value = e?.data?.msg || '发送失败'; msgErr.value = true; }
+    msg.value = t('auth.code_sent'); msgErr.value = false;
+  } catch (e: any) { msg.value = e?.data?.msg || t('auth.send_failed'); msgErr.value = true; }
 }
 
 async function handleEmailLogin() {
-  if (!emailAddr.value || !emailCode.value) { msg.value = '请输入邮箱和验证码'; msgErr.value = true; return; }
+  if (!emailAddr.value || !emailCode.value) { msg.value = t('auth.enter_email_and_code'); msgErr.value = true; return; }
   loading.value = true; msg.value = '';
   try {
     await $fetch('/api/email/verify-code', { method: 'POST', credentials: 'include', body: { email: emailAddr.value, code: emailCode.value } });
     await api.post('/auth/login-by-code', { email: emailAddr.value });
     await useAuthStore().fetchUser();
     navigateTo('/workspace');
-  } catch (e: any) { msg.value = e?.data?.msg || '登录失败'; msgErr.value = true; }
+  } catch (e: any) { msg.value = e?.data?.msg || t('auth.login_network_error'); msgErr.value = true; }
   finally { loading.value = false; }
 }
 
 async function sendEmailCode(scene: string) {
-  if (!emailAddr.value) { msg.value = '请输入邮箱'; msgErr.value = true; return; }
+  if (!emailAddr.value) { msg.value = t('auth.enter_email'); msgErr.value = true; return; }
   msg.value = '';
   try {
     await $fetch('/api/email/send-code', { method: 'POST', credentials: 'include', body: { email: emailAddr.value, scene } });
     startEmailCd(60);
-    msg.value = '验证码已发送'; msgErr.value = false;
-  } catch (e: any) { msg.value = e?.data?.msg || '发送失败'; msgErr.value = true; }
+    msg.value = t('auth.code_sent'); msgErr.value = false;
+  } catch (e: any) { msg.value = e?.data?.msg || t('auth.send_failed'); msgErr.value = true; }
 }
 </script>
 
