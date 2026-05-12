@@ -62,8 +62,8 @@ export async function runHealthCheck(authenticated = false) {
 
   // Redis 检查
   try {
-    const redis = await import('../dao/redis.js');
-    await redis.default.ping();
+    const { ping } = await import('../dao/redis.js');
+    await ping();
     status.checks.redis = true;
   } catch {
     status.checks.redis = false;
