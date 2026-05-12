@@ -9,7 +9,7 @@ import { ERROR_CODE } from '../constants/errorCode.js';
 // ==================== 套餐列表（公开） ====================
 
 export const getPlans = wrapController(async (_req, res, next) => {
-    return success(res, payment.getPlans());
+    return success(res, await payment.getPlans());
   });
 
 // ==================== 创建支付订单（通联聚合支付） ====================
