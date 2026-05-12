@@ -4,6 +4,7 @@
  * 三阶段审核: input(输入) → output(生成后) → publish(分发前)
  */
 import { ERROR_CODE } from '../constants/errorCode.js';
+import logger from '../utils/logger.js';
 
 export function contentModerationMiddleware(stage = 'input') {
   return async (req, res, next) => {
@@ -18,9 +19,8 @@ export function contentModerationMiddleware(stage = 'input') {
       if (found && found.length > 0) {
         return res.status(422).json({ code: ERROR_CODE.CONTENT_MODERATION, msg: '内容包含违规信息，请修改后重试' });
       }
-    } catch {
-      // sensitiveWordService 不可用时降级放行（避免阻断正常业务），但记录日志
-      console.warn('[ContentModeration] sensitiveWordService unavailable, skipping check');
+    } catch (err) {
+      logger.warn('[ContentModeration] 敏感词检查失败，降级放行', { error: err.message, stage });
     }
 
     // 记录审核请求到 content_audit_log
