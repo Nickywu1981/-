@@ -10,6 +10,8 @@ import config, { workerConfig } from '../config/index.js';
 import { validateStartupConfig } from '../utils/startupGuard.js';
 import * as jobQueueService from '../services/job-queue.service.js';
 import { gatewayInfer } from '../gateway/aiGatewayHub.js';
+import { saveSimpleFile } from '../utils/file-upload.js';
+import crypto from 'crypto';
 
 // 启动配置校验
 validateStartupConfig();
@@ -42,6 +44,7 @@ const TASK_MODEL_MAP = {
   replace_character: { model: 'seedance', action: 'replace' },
   multi_image_to_video: { model: 'seedance', action: 'generate' },
   batch_action_migrate: { model: 'seedance', action: 'batch_migrate' },
+  detail_long_image: { model: 'seedance', action: 'long_image_composite' },
 };
 
 async function processJob(job) {
@@ -62,7 +65,26 @@ async function processJob(job) {
       params = typeof job.task_params === 'string' ? JSON.parse(job.task_params) : (job.task_params || {});
     } catch { params = {}; }
 
+    // 增强选项提升：将 enhanced_options 拍平到 params 顶层供 seedance 消费
+    if (params.enhanced_options) {
+      const eo = params.enhanced_options;
+      if (eo.replace_background !== undefined) params.replace_background = eo.replace_background;
+      if (eo.background_url) params.background_url = eo.background_url;
+      if (eo.replace_clothing !== undefined) params.replace_clothing = eo.replace_clothing;
+      if (eo.clothing_style) params.clothing_style = eo.clothing_style;
+      if (eo.clothing_color) params.clothing_color = eo.clothing_color;
+      if (eo.keep_original_audio) params.keep_original_audio = eo.keep_original_audio;
+      if (eo.bgm_url) params.bgm_url = eo.bgm_url;
+      if (eo.volume !== undefined) params.volume = eo.volume;
+      if (eo.voiceover) params.voiceover = eo.voiceover;
+    }
+
     await jobQueueService.updateProgress(job.id, 30);
+
+    // 长图合成特殊流程：逐场景生成 → Sharp 垂直拼接
+    if (job.task_type === 'detail_long_image') {
+      return await processLongImageJob(job, params);
+    }
 
     // 调用AI模型 — 统一走 Token Gateway 收口
     const result = await gatewayInfer(mapping.model, { prompt: params.prompt, ...(mapping.model === 'gpt-image-2' ? { n: 1, size: params.size || '1024x1024' } : {}) }, {
@@ -88,6 +110,84 @@ async function processJob(job) {
   } finally {
     activeJobIds.delete(job.id);
   }
+}
+
+async function processLongImageJob(job, params) {
+  const scenes = params.scenes || [];
+  const outputWidth = params.width || 750;
+  const imageBuffers = [];
+  const imageMetas = [];
+
+  for (let i = 0; i < scenes.length; i++) {
+    const scene = scenes[i];
+    try {
+      const sizeStr = `${outputWidth}x${Math.round(outputWidth * 16 / 9)}`;
+      const genResult = await gatewayInfer('gpt-image-2', { prompt: scene.prompt, n: 1, size: sizeStr }, {
+        userId: job.user_id || null,
+        tenantId: job.tenant_id || null,
+        taskType: 'detail_long_image',
+        source: 'internal',
+      });
+      const imgUrl = genResult?.images?.[0]?.url || genResult?.file_url || genResult?.url;
+      if (imgUrl) {
+        const resp = await fetch(imgUrl);
+        if (!resp.ok) throw new Error(`下载场景图失败: HTTP ${resp.status}`);
+        const buf = Buffer.from(await resp.arrayBuffer());
+        imageBuffers.push(buf);
+      }
+    } catch (e) {
+      logger.warn(`[Worker] Scene ${i} generation failed: ${e.message}`);
+    }
+    const pct = 30 + Math.round((i + 1) / scenes.length * 40);
+    await jobQueueService.updateProgress(job.id, Math.min(pct, 70));
+  }
+
+  if (imageBuffers.length === 0) {
+    await jobQueueService.failJob(job.id, '所有场景图生成失败');
+    return;
+  }
+
+  // Sharp 缩放 + 垂直拼接
+  const sharp = (await import('sharp')).default;
+  const sizedBuffers = [];
+  for (const buf of imageBuffers) {
+    const resized = await sharp(buf).resize({ width: outputWidth, fit: 'inside', withoutEnlargement: true }).png().toBuffer();
+    const meta = await sharp(resized).metadata();
+    sizedBuffers.push(resized);
+    imageMetas.push({ width: meta.width || outputWidth, height: meta.height || 400 });
+  }
+
+  const totalHeight = imageMetas.reduce((sum, m) => sum + m.height, 0);
+  const overlays = [];
+  let yOffset = 0;
+  for (let i = 0; i < sizedBuffers.length; i++) {
+    overlays.push({ input: sizedBuffers[i], top: yOffset, left: Math.max(0, Math.floor((outputWidth - imageMetas[i].width) / 2)) });
+    yOffset += imageMetas[i].height;
+  }
+
+  const compositeBuffer = await sharp({
+    create: { width: outputWidth, height: totalHeight, channels: 4, background: { r: 255, g: 255, b: 255, alpha: 1 } },
+  }).composite(overlays).png().toBuffer();
+
+  await jobQueueService.updateProgress(job.id, 85);
+
+  // 保存结果文件
+  const fakeFile = {
+    originalname: `detail_long_${job.id}.png`,
+    buffer: compositeBuffer,
+    size: compositeBuffer.length,
+    mimetype: 'image/png',
+  };
+  const saveResult = await saveSimpleFile(fakeFile);
+  await jobQueueService.completeJob(job.id, {
+    ...saveResult,
+    task_type: job.task_type,
+    scene_count: imageBuffers.length,
+    total_height: totalHeight,
+    completed_at: new Date().toISOString(),
+  });
+
+  logger.info(`[Worker] Long image composite #${job.id}: ${imageBuffers.length} scenes, ${outputWidth}x${totalHeight}`);
 }
 
 let _consecutiveErrors = 0;

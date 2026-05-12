@@ -44,6 +44,83 @@
         </div>
       </div>
 
+      <!-- 增强选项：换背景 -->
+      <div class="enhanced-section">
+        <div class="enhanced-header">
+          <label class="toggle-label">
+            <input type="checkbox" v-model="replaceBackground" />
+            <span>{{ $t('action.background_replace') || '背景替换' }}</span>
+          </label>
+        </div>
+        <div v-if="replaceBackground" class="enhanced-body">
+          <label>{{ $t('action.background_url') || '背景图片URL（可选）' }}</label>
+          <input v-model="backgroundUrl" class="input" :placeholder="$t('action.background_hint') || '留空则AI自动生成场景背景'" />
+        </div>
+      </div>
+
+      <!-- 增强选项：换衣服 -->
+      <div class="enhanced-section">
+        <div class="enhanced-header">
+          <label class="toggle-label">
+            <input type="checkbox" v-model="replaceClothing" />
+            <span>{{ $t('action.clothing_replace') || '服装替换' }}</span>
+          </label>
+        </div>
+        <div v-if="replaceClothing" class="enhanced-body">
+          <div class="options-row">
+            <div class="option">
+              <label>{{ $t('action.clothing_style') || '服装风格' }}</label>
+              <select v-model="clothingStyle" class="input">
+                <option value="">{{ $t('action.clothing_auto') || '自动' }}</option>
+                <option value="casual">休闲</option>
+                <option value="formal">正式</option>
+                <option value="sport">运动</option>
+                <option value="fashion">时尚</option>
+                <option value="vintage">复古</option>
+              </select>
+            </div>
+            <div class="option">
+              <label>{{ $t('action.clothing_color') || '服装颜色' }}</label>
+              <input v-model="clothingColor" class="input" :placeholder="$t('action.color_hint') || '如：白色、黑色、红色'" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 增强选项：音频处理 -->
+      <div class="enhanced-section">
+        <div class="enhanced-header">
+          <label class="toggle-label">
+            <input type="checkbox" v-model="keepOriginalAudio" />
+            <span>{{ $t('action.keep_audio') || '保留原音频' }}</span>
+          </label>
+        </div>
+        <div v-if="keepOriginalAudio" class="enhanced-body">
+          <div class="option">
+            <label>{{ $t('action.bgm_url') || 'BGM 背景音乐 URL（可选）' }}</label>
+            <input v-model="bgmUrl" class="input" :placeholder="$t('action.bgm_hint') || 'https://...'" />
+          </div>
+          <div class="option" style="margin-top:12px">
+            <label>{{ $t('action.volume') || '音量' }}: {{ Math.round(volume * 100) }}%</label>
+            <input type="range" v-model.number="volume" min="0" max="1" step="0.05" class="slider" />
+          </div>
+          <div class="option" style="margin-top:12px">
+            <label>{{ $t('action.voiceover_text') || 'AI 配音文字（可选）' }}</label>
+            <input v-model="voiceoverText" class="input" :placeholder="$t('action.voiceover_hint') || '输入AI配音文案，如不填则不配音'" />
+          </div>
+          <div class="option" style="margin-top:12px" v-if="voiceoverText">
+            <label>{{ $t('action.voiceover_type') || '配音声线' }}</label>
+            <select v-model="voiceoverType" class="input">
+              <option value="">{{ $t('action.voice_auto') || '自动' }}</option>
+              <option value="female_sweet">甜美女生</option>
+              <option value="female_gentle">温柔女生</option>
+              <option value="male_deep">醇厚男声</option>
+              <option value="male_young">活力男声</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
       <div class="cost-hint">成本：30 点/次</div>
 
       <button class="btn btn-primary btn-lg" :disabled="!sourceVideoUrl || !targetImageUrl || taskStatus === 'processing' || taskStatus === 'queued'" @click="doMigrate">
@@ -120,14 +197,50 @@ const { status: taskStatus, progress: taskProgress, error: taskError, result, su
 const resultUrl = computed(() => result.value?.video_url || result.value?.file_url || '')
 const { download } = useFileDownload()
 
+// 增强选项
+const replaceBackground = ref(false)
+const backgroundUrl = ref('')
+const replaceClothing = ref(false)
+const clothingStyle = ref('')
+const clothingColor = ref('')
+const keepOriginalAudio = ref(false)
+const bgmUrl = ref('')
+const volume = ref(1.0)
+const voiceoverText = ref('')
+const voiceoverType = ref('')
+
+function buildEnhancedOptions() {
+  const enh: Record<string, any> = {}
+  if (replaceBackground.value) {
+    enh.replace_background = backgroundUrl.value || true
+  }
+  if (replaceClothing.value) {
+    enh.replace_clothing = true
+    if (clothingStyle.value) enh.clothing_style = clothingStyle.value
+    if (clothingColor.value) enh.clothing_color = clothingColor.value
+  }
+  if (keepOriginalAudio.value) {
+    enh.keep_original_audio = true
+    if (bgmUrl.value) enh.bgm_url = bgmUrl.value
+    enh.volume = volume.value
+    if (voiceoverText.value) {
+      enh.voiceover = { text: voiceoverText.value }
+      if (voiceoverType.value) enh.voiceover.voice_type = voiceoverType.value
+    }
+  }
+  return Object.keys(enh).length ? enh : undefined
+}
+
 function onSourceVideoUploaded(files: any[]) { if (files.length > 0) sourceVideoUrl.value = files[0].url }
 function onTargetImageUploaded(files: any[]) { if (files.length > 0) targetImageUrl.value = files[0].url }
 
 async function doMigrate() {
+  const enhanced = buildEnhancedOptions()
   await submit('action_migrate', {
     source_video_url: sourceVideoUrl.value,
     target_person_image: targetImageUrl.value,
     options: actionStyle.value ? { style: actionStyle.value } : {},
+    ...(enhanced ? { enhanced_options: enhanced } : {}),
   })
 }
 
@@ -141,10 +254,12 @@ function onBatchVideosUploaded(files: any[]) { batchSourceVideos.value = files }
 function onBatchImagesUploaded(files: any[]) { batchTargetImages.value = files }
 
 async function doBatchMigrate() {
+  const enhanced = buildEnhancedOptions()
   await submitBatch('batch_action_migrate', {
     source_video_urls: batchSourceVideos.value.map((f: any) => f.url),
     target_person_images: batchTargetImages.value.map((f: any) => f.url),
     options: {},
+    ...(enhanced ? { enhanced_options: enhanced } : {}),
   })
 }
 
@@ -200,4 +315,14 @@ function downloadResult() { if (resultUrl.value) download(resultUrl.value, 'acti
 .child-bar { flex: 1; height: 6px; background: var(--cfg-bg-tertiary); border-radius: 3px; overflow: hidden; }
 .child-bar-fill { height: 100%; background: var(--cfg-primary); border-radius: 3px; transition: width 0.3s; }
 .child-pct { font-size: var(--cfg-font-size-xs); color: var(--cfg-text-muted); min-width: 36px; text-align: right; }
+
+.enhanced-section { margin-bottom: 16px; border: 1px solid var(--cfg-border); border-radius: var(--cfg-radius-base); overflow: hidden; }
+.enhanced-header { padding: 10px 14px; background: var(--cfg-bg-tertiary); }
+.enhanced-body { padding: 14px; }
+.toggle-label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: var(--cfg-font-size-sm); color: var(--cfg-text-primary); font-weight: var(--cfg-font-weight-medium); }
+.toggle-label input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--cfg-primary); }
+.slider { width: 100%; accent-color: var(--cfg-primary); }
+
+.input { width: 100%; padding: 8px 12px; border: 1px solid var(--cfg-border); border-radius: var(--cfg-radius-base); background: var(--cfg-bg-primary); color: var(--cfg-text-primary); font-size: var(--cfg-font-size-base); box-sizing: border-box; }
+.input:focus { outline: none; border-color: var(--cfg-primary); box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15); }
 </style>

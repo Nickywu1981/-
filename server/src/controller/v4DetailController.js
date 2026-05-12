@@ -34,3 +34,15 @@ export const getDetailWorks = wrapController(async (req, res) => {
   });
   return success(res, result);
 });
+
+export const generateLongImage = wrapController(async (req, res) => {
+  const { product_name, scenes, platform, style, width } = req.validated;
+  const result = await detailService.generateLongImage(req.user.id, {
+    productName: product_name,
+    scenes,
+    platform,
+    style,
+    width,
+  });
+  return success(res, result, '详情长图合成任务已提交');
+});

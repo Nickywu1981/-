@@ -42,20 +42,48 @@ export async function replicateDetail(userId, { referenceUrl, productName, produ
 }
 
 /**
+ * 电商详情长图合成
+ * @param {Object} params
+ * @param {string} params.productName - 商品名称
+ * @param {Array<{prompt: string, imageUrl?: string}>} params.scenes - 场景列表 (1-20)
+ * @param {string} [params.platform] - 目标平台
+ * @param {string} [params.style] - 风格
+ * @param {number} [params.width] - 输出宽度
+ */
+export async function generateLongImage(userId, { productName, scenes, platform, style, width = 750 }) {
+  if (!productName) throw new BusinessError(400, '请提供商品名称');
+  if (!scenes || scenes.length === 0) throw new BusinessError(400, '至少1个场景');
+  if (scenes.length > 20) throw new BusinessError(400, '最多20个场景');
+
+  const auditResult = await moderationService.moderateText(productName, userId, { stage: 'input' });
+  if (auditResult.action === 'block') {
+    throw new BusinessError(422, '内容包含违规信息');
+  }
+
+  return submitJob(userId, 'detail_long_image', {
+    product_name: productName,
+    scenes: scenes.map(s => ({ prompt: s.prompt || '', image_url: s.imageUrl || null })),
+    platform,
+    style,
+    width,
+  }, { priority: 6 });
+}
+
+/**
  * 详情图作品查询
  */
 export async function getDetailWorks(userId, { page = 1, pageSize = 20 } = {}) {
   const conn = await db.getConnection();
   try {
     const [countRows] = await conn.query(
-      "SELECT COUNT(*) as total FROM job_queue WHERE user_id = ? AND task_type IN ('detail_set_gen','detail_replicate')",
+      "SELECT COUNT(*) as total FROM job_queue WHERE user_id = ? AND task_type IN ('detail_set_gen','detail_replicate','detail_long_image')",
       [userId],
     );
     const total = countRows[0].total;
 
     const [rows] = await conn.query(
       `SELECT id, task_type, status, progress, result_data, created_at, completed_at
-       FROM job_queue WHERE user_id = ? AND task_type IN ('detail_set_gen','detail_replicate')
+       FROM job_queue WHERE user_id = ? AND task_type IN ('detail_set_gen','detail_replicate','detail_long_image')
        ORDER BY created_at DESC LIMIT ? OFFSET ?`,
       [userId, pageSize, (page - 1) * pageSize],
     );

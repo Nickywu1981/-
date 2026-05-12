@@ -70,16 +70,32 @@ const storyboardSchema = z.object({
   scene_count: z.number().int().min(2).max(20).default(5),
 });
 
+const enhancedOptionsSchema = z.object({
+  replace_background: z.union([z.boolean(), z.string().url('背景图片URL格式不正确')]).optional(),
+  replace_clothing: z.boolean().optional(),
+  clothing_style: z.string().max(100).optional(),
+  clothing_color: z.string().max(50).optional(),
+  keep_original_audio: z.boolean().optional(),
+  bgm_url: optUrl,
+  volume: z.number().min(0).max(1).optional(),
+  voiceover: z.object({
+    text: z.string().min(1).max(1000),
+    voice_type: z.string().max(50).optional(),
+  }).optional(),
+}).optional();
+
 const actionMigrateSchema = z.object({
   source_video_url: urlField,
   target_person_image: urlField,
   options: z.object({}).passthrough().optional(),
+  enhanced_options: enhancedOptionsSchema,
 });
 
 const batchActionMigrateSchema = z.object({
   source_video_urls: z.array(urlField).min(1).max(50),
   target_person_images: z.array(urlField).min(1).max(50),
   options: z.object({}).passthrough().optional(),
+  enhanced_options: enhancedOptionsSchema,
 });
 
 const viralAnalyzeSchema = z.object({

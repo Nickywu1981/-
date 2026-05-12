@@ -59,14 +59,40 @@ export const generateStoryboard = wrapController(async (req, res) => {
 // 动作迁移
 // ============================================================
 export const migrateAction = wrapController(async (req, res) => {
-  const { source_video_url, target_person_image, options } = req.validated;
-  const result = await actionMigrateService.migrateAction(req.user.id, { sourceVideoUrl: source_video_url, targetPersonImage: target_person_image, options });
+  const { source_video_url, target_person_image, options, enhanced_options = {} } = req.validated;
+  const result = await actionMigrateService.migrateAction(req.user.id, {
+    sourceVideoUrl: source_video_url,
+    targetPersonImage: target_person_image,
+    options,
+    replaceBackground: enhanced_options.replace_background || false,
+    backgroundUrl: typeof enhanced_options.replace_background === 'string' ? enhanced_options.replace_background : null,
+    replaceClothing: enhanced_options.replace_clothing || false,
+    clothingStyle: enhanced_options.clothing_style || null,
+    clothingColor: enhanced_options.clothing_color || null,
+    keepOriginalAudio: enhanced_options.keep_original_audio || false,
+    bgmUrl: enhanced_options.bgm_url || null,
+    volume: enhanced_options.volume ?? 1.0,
+    voiceover: enhanced_options.voiceover || null,
+  });
   return success(res, result, '动作迁移任务已提交');
 });
 
 export const batchMigrateAction = wrapController(async (req, res) => {
-  const { source_video_urls, target_person_images, options } = req.validated;
-  const result = await actionMigrateService.batchMigrateAction(req.user.id, { sourceVideoUrls: source_video_urls, targetPersonImages: target_person_images, options });
+  const { source_video_urls, target_person_images, options, enhanced_options = {} } = req.validated;
+  const result = await actionMigrateService.batchMigrateAction(req.user.id, {
+    sourceVideoUrls: source_video_urls,
+    targetPersonImages: target_person_images,
+    options,
+    replaceBackground: enhanced_options.replace_background || false,
+    backgroundUrl: typeof enhanced_options.replace_background === 'string' ? enhanced_options.replace_background : null,
+    replaceClothing: enhanced_options.replace_clothing || false,
+    clothingStyle: enhanced_options.clothing_style || null,
+    clothingColor: enhanced_options.clothing_color || null,
+    keepOriginalAudio: enhanced_options.keep_original_audio || false,
+    bgmUrl: enhanced_options.bgm_url || null,
+    volume: enhanced_options.volume ?? 1.0,
+    voiceover: enhanced_options.voiceover || null,
+  });
   return success(res, result, `批量动作迁移已提交 (${result.total_jobs || '?'} 个子任务)`);
 });
 

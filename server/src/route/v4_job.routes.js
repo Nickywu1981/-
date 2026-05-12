@@ -17,6 +17,7 @@ const VALID_TASK_TYPES = new Set([
   'viral_analysis', 'viral_replicate', 'live_clip', 'live_cut',
   'live_noise_fix', 'live_subtitle_fix', 'storyboard', 'product_ad',
   'replace_character', 'multi_image_to_video',
+  'detail_long_image',
 ]);
 
 const router = Router();

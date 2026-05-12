@@ -29,11 +29,25 @@ const replicateSchema = z.object({
   template: z.string().max(50).optional().default('standard'),
 });
 
+const longImageSchema = z.object({
+  product_name: z.string().min(1, '请提供商品名称').max(200),
+  scenes: z.array(z.object({
+    prompt: z.string().min(1, '请提供场景描述').max(2000),
+    imageUrl: z.string().url('场景参考图URL格式不正确').optional(),
+  })).min(1, '至少1个场景').max(20, '最多20个场景'),
+  platform: z.string().max(30).optional(),
+  style: z.string().max(50).optional(),
+  width: z.number().int().min(480).max(1280).optional().default(750),
+});
+
 // POST /api/detail/generate-set
 router.post('/generate-set', heavyLimiter, _validate(generateSetSchema), contentModerationMiddleware('input'), ctrl.generateDetailSet);
 
 // POST /api/detail/replicate
 router.post('/replicate', heavyLimiter, _validate(replicateSchema), ctrl.replicateDetail);
+
+// POST /api/detail/long-image
+router.post('/long-image', heavyLimiter, _validate(longImageSchema), ctrl.generateLongImage);
 
 // GET /api/detail/works
 router.get('/works', validate(paginationSchema, 'query'), ctrl.getDetailWorks);
