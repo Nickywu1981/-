@@ -1,6 +1,6 @@
 /* ================================================================
    Movio AI — Design Tokens (Warm Precision)
-   Brand: #5b5fe3 (warm indigo), Accent: #c8a87c (bronze gold)
+   Brand: #5b5fe3 (warm indigo)
    Bridges unified-design-system.css with brand color overrides
    ================================================================ */
 
@@ -17,22 +17,8 @@
   --color-brand-800: #3b3eb5;
   --color-brand-900: #2d3091;
 
-  /* Accent color scale — bronze gold */
-  --color-accent-50: #faf7f2;
-  --color-accent-100: #f5efe4;
-  --color-accent-200: #ece0cb;
-  --color-accent-300: #dfccab;
-  --color-accent-400: #d3ba92;
-  --color-accent-500: #c8a87c;
-  --color-accent-600: #b89668;
-  --color-accent-700: #a07f52;
-  --color-accent-800: #85693f;
-  --color-accent-900: #6b5230;
-
   /* Brand gradients */
   --gradient-brand: linear-gradient(135deg, #5b5fe3 0%, #7c7ff0 50%, #a78bfa 100%);
-  --gradient-brand-subtle: linear-gradient(135deg, rgba(91,95,227,0.05) 0%, rgba(124,127,240,0.03) 100%);
-  --gradient-hero: linear-gradient(135deg, #5b5fe3 0%, #a78bfa 40%, #c8a87c 100%);
 
   /* Semantics */
   --text-link: var(--color-brand-600);
@@ -42,25 +28,6 @@
   /* Sidebar */
   --sidebar-text-active: var(--color-brand-600);
   --sidebar-bg-active: var(--color-brand-50);
-
-  /* Portal identity colors */
-  --color-portal-user: #5b5fe3;
-  --color-portal-agent: #10b981;
-  --color-portal-enterprise: #1a1a2e;
-  --color-portal-admin: #5b5fe3;
-  --color-portal-gateway: #f59e0b;
-  --color-portal-ops: #3b82f6;
-  --color-portal-finance: #10b981;
-
-  /* Chart palette */
-  --color-chart-1: #5b5fe3;
-  --color-chart-2: #10b981;
-  --color-chart-3: #f59e0b;
-  --color-chart-4: #ef4444;
-  --color-chart-5: #3b82f6;
-  --color-chart-6: #8b5cf6;
-  --color-chart-7: #ec4899;
-  --color-chart-8: #14b8a6;
 
   /* Focus + input */
   --focus-ring: 0 0 0 3px rgba(91,95,227,0.2);
