@@ -1,4 +1,3 @@
-import pool from '../dao/db.js';
 import * as channelDao from '../dao/channelDao.js';
 import { BusinessError } from '../utils/businessError.js';
 
@@ -15,18 +14,14 @@ export async function getChannelDetail(tenantId, id) {
 }
 
 export async function applyChannel(tenantId, { agentCode }) {
-  const [parentRows] = await pool.query('SELECT id FROM tenant WHERE agent_code = ? AND status = 1 LIMIT 1', [agentCode]);
-  if (!parentRows.length) throw new BusinessError(404, '邀请码无效');
+  const parent = await channelDao.findTenantByAgentCode(agentCode);
+  if (!parent) throw new BusinessError(404, '邀请码无效');
 
-  const parentId = parentRows[0].id;
+  const parentId = parent.id;
   if (parentId === tenantId) throw new BusinessError(400, '不能绑定自己');
 
-  // 检查是否已存在关系
-  const [dup] = await pool.query(
-    'SELECT id FROM channel_relation WHERE tenant_id = ? AND child_tenant_id = ?',
-    [parentId, tenantId],
-  );
-  if (dup.length) throw new BusinessError(409, '已申请过该渠道');
+  const dup = await channelDao.findRelationByPair(parentId, tenantId);
+  if (dup) throw new BusinessError(409, '已申请过该渠道');
 
   return channelDao.createRelation({ tenantId: parentId, childTenantId: tenantId, level: 1 });
 }

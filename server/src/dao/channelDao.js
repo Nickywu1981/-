@@ -7,7 +7,25 @@ const TABLE = {
   TENANT: 'tenant',
 };
 
+// ==================== 租户查询 ====================
+
+export async function findTenantByAgentCode(agentCode) {
+  const [rows] = await pool.query(
+    'SELECT id FROM ?? WHERE agent_code = ? AND status = 1 LIMIT 1',
+    [TABLE.TENANT, agentCode],
+  );
+  return rows[0] || null;
+}
+
 // ==================== 渠道关系 ====================
+
+export async function findRelationByPair(parentTenantId, childTenantId) {
+  const [rows] = await pool.query(
+    'SELECT id FROM ?? WHERE tenant_id = ? AND child_tenant_id = ?',
+    [TABLE.RELATION, parentTenantId, childTenantId],
+  );
+  return rows[0] || null;
+}
 
 export async function findRelationsByTenant(tenantId, { page = 1, pageSize = 20, status } = {}) {
   const conditions = ['cr.tenant_id = ?'];
