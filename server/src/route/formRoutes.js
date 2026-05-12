@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { authMiddleware, optionalAuth, adminAuth } from '../middleware/auth.js';
-import { apiLimiter } from '../middleware/rateLimiter.js';
+import { authLimiter } from '../middleware/rateLimiter.js';
 import { validate, idParamSchema, numericParamSchema } from '../utils/validate.js';
 import { z } from 'zod';
 import * as formController from '../controller/formController.js';
@@ -71,6 +71,6 @@ router.put('/admin/:id/fields', authMiddleware, adminAuth, validate(idParamSchem
 
 // ── 公开端（双端感知） ──
 router.get('/public/:code', optionalAuth, validate(codeParamSchema, 'params'), formController.getPublicForm);
-router.post('/public/:code', apiLimiter, optionalAuth, validate(codeParamSchema, 'params'), validate(submitFormSchema), formController.submitForm);
+router.post('/public/:code', authLimiter, optionalAuth, validate(codeParamSchema, 'params'), validate(submitFormSchema), formController.submitForm);
 
 export default router;
