@@ -32,12 +32,20 @@ export async function freezeCredit(userId, requestId, action, batchCount = 1, is
   try {
     await conn.beginTransaction();
 
-    // 幂等性守卫: INSERT request_log 带 UNIQUE(request_id), 冲突则返回已存在记录
-    const existingLog = await creditDao.getRequestLogForUpdate(conn, requestId);
-    if (existingLog) {
-      await conn.commit();
-      const record = await creditDao.getConsumptionByRequestId(requestId);
-      return { idempotent: true, recordId: record?.id, status: existingLog.status };
+    // 幂等性守卫: INSERT request_log 带 UNIQUE(request_id)，先插后查消除 TOCTOU 竞态
+    try {
+      await creditDao.insertRequestLog({
+        requestId, userId, action: 'freeze', creditAmount: consumedAmount,
+        remark: `action=${action} batchCount=${batchCount}`, requestBody: { action, batchCount }, responseBody: {}, status: 0,
+      }, conn);
+    } catch (e) {
+      if (e.code === 'ER_DUP_ENTRY') {
+        await conn.rollback();
+        const existing = await creditDao.getConsumptionByRequestId(requestId);
+        return { idempotent: true, recordId: existing?.id, status: existing?.status };
+      }
+      await conn.rollback();
+      throw e;
     }
 
     const membership = await creditDao.getMembershipForUpdate(conn, userId);
@@ -82,11 +90,8 @@ export async function freezeCredit(userId, requestId, action, batchCount = 1, is
       remark: `freeze batch=${batchCount}`, taskId: '', requestId, status: 0,
     });
 
-    // 幂等日志写入事务内，UNIQUE(request_id) 防止重复扣费
-    await creditDao.insertRequestLog({
-      requestId, userId, action: 'freeze', creditAmount: consumedAmount,
-      remark: `action=${action} batchCount=${batchCount}`, requestBody: { action, batchCount }, responseBody: { recordId, creditAfter }, status: 1,
-    }, conn);
+    // 更新幂等日志状态为已消费
+    await creditDao.updateRequestLogStatus(requestId, 1, { recordId, creditAfter }, conn);
 
     await conn.commit();
 

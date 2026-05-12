@@ -27,7 +27,7 @@ setInterval(() => {
 const providers = {
   mock: {
     async send({ phone, content, templateCode }) {
-      logger.warn(`[SMS Mock] → ${phone.slice(0,3)}****${phone.slice(-4)} | ${templateCode} | code:***`);
+      logger.debug(`[SMS Mock] → ${phone.slice(0,3)}****${phone.slice(-4)} | ${templateCode} | code:***`);
       return { success: true, raw: { code: 'OK', messageId: `mock_${Date.now()}` } };
     },
   },
@@ -70,7 +70,7 @@ export async function verifyCode(phone, scene, code) {
   const result = await codeStore.verifyCode(key, code, 5);
   if (result.valid) {
     // 验证通过标记（Redis）
-    try { await codeStore.saveCode(`verified:sms:${phone}`, '1', 300); } catch (e) { logger.warn('短信验证标记保存失败', { phone, error: e.message }); }
+    try { await codeStore.saveCode(`verified:sms:${phone}`, '1', 300); } catch (e) { logger.warn('短信验证标记保存失败', { phone: phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2'), error: e.message }); }
     return { valid: true };
   }
   // Redis 不可用时降级为进程内 Map
@@ -93,7 +93,7 @@ export async function checkVerified(phone) {
   try {
     const result = await codeStore.verifyCode(key, '1', 1);
     if (result.valid || result.reason === 'mismatch') return true;
-  } catch { logger.warn('[SMS] checkVerified Redis 查询失败', { phone }); }
+  } catch { logger.warn('[SMS] checkVerified Redis 查询失败', { phone: phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2') }); }
   // 降级: 进程内 Map
   const entry = CODE_CACHE.get(key);
   if (!entry || Date.now() - entry.time > 300000) { CODE_CACHE.delete(key); return false; }
@@ -159,7 +159,7 @@ export async function sendVerificationCode({ phone, scene }) {
 
     return { success: true, msg: '验证码已发送', expire: 300 };
   } catch (e) {
-    logger.error('[SMS] sendVerificationCode failed:', e);
+    logger.error('[SMS] sendVerificationCode failed', { error: e.message });
     await smsLogDao.insertLog({
       templateCode,
       phone,
@@ -197,7 +197,7 @@ export async function sendNotification(phone, { scene, templateCode, params }) {
     });
     return { success: true, msg: '发送成功' };
   } catch (e) {
-    logger.error('[SMS] sendNotification failed:', e);
+    logger.error('[SMS] sendNotification failed', { error: e.message });
     await smsLogDao.insertLog({
       templateCode: template.template_code, phone, params,
       content, result: false, provider: config.sms?.provider || 'mock',

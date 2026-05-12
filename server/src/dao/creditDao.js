@@ -61,6 +61,14 @@ export async function insertRequestLog({ requestId, userId, action, creditAmount
   );
 }
 
+export async function updateRequestLogStatus(requestId, status, responseBody, conn) {
+  const db = conn || pool;
+  await db.execute(
+    'UPDATE credit_request_log SET status = ?, response_body = ? WHERE request_id = ?',
+    [status, JSON.stringify(responseBody || {}), requestId],
+  );
+}
+
 // ==================== 消费记录（增强版） ====================
 
 export async function insertConsumptionLog({ userId, type, action, creditBefore, creditAfter, consumed, remark, taskId, requestId, status }, conn) {

@@ -31,7 +31,9 @@ function validateLocale(locale) {
 }
 
 function logAndRespond(res, err, context) {
-  logger.error(`[i18n] ${context}`, { error: err.message, stack: err.stack });
+  const logEntry = { error: err.message };
+  if (process.env.NODE_ENV !== 'production') logEntry.stack = err.stack;
+  logger.error(`[i18n] ${context}`, logEntry);
   const status = err instanceof z.ZodError ? 400 : (err.statusCode || 500);
   if (err instanceof z.ZodError) {
     return res.status(400).json({ code: 400, msg: '参数校验失败', errors: err.errors });

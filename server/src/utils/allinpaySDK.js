@@ -154,7 +154,7 @@ export async function unifiedOrder(params) {
       signal: AbortSignal.timeout(30000),
     });
   } catch (err) {
-    logger.error('[Allinpay] 统一下单网络错误', err);
+    logger.error('[Allinpay] 统一下单网络错误', { message: err.message });
     throw new BusinessError(502, '支付网关连接失败，请稍后重试');
   }
 

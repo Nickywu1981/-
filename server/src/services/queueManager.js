@@ -121,7 +121,9 @@ export function registerWorker(name, processor) {
   });
 
   worker.on('error', (err) => {
-    logger.error(`[BullMQ] Worker ${name} 级错误: ${err.message}`, { stack: err.stack });
+    const logEntry = { message: err.message };
+    if (process.env.NODE_ENV !== 'production') logEntry.stack = err.stack;
+    logger.error(`[BullMQ] Worker ${name} 级错误: ${err.message}`, logEntry);
   });
 
   workerInstances.set(name, worker);

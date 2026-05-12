@@ -52,7 +52,7 @@ function sanitizeHtml(html) {
 const providers = {
   mock: {
     async send({ email, subject, content }) {
-      logger.warn(`[Email Mock] → ${email.replace(/(.{2}).*(@.*)/, '$1***$2')} | ${subject} | code: ***`);
+      logger.debug(`[Email Mock] → ${email.replace(/(.{2}).*(@.*)/, '$1***$2')} | ${subject} | code: ***`);
       return { success: true, messageId: `mock_${Date.now()}` };
     },
   },
@@ -179,7 +179,7 @@ export async function sendVerificationCode(email, scene = 'login') {
   try {
     await provider.send({ email, subject, content: html });
   } catch (e) {
-    logger.error('[Email] 发送失败', { email, error: e.message });
+    logger.error('[Email] 发送失败', { email: email.replace(/(.{1,2}).*(@.*)/, '$1***$2'), error: e.message });
     throw new BusinessError(502, '邮件发送失败，请稍后重试');
   }
 
@@ -192,7 +192,7 @@ export async function verifyCode(email, code) {
   // 优先 Redis 共享存储
   const result = await codeStore.verifyCode(`email:${email}`, code, 5);
   if (result.valid) {
-    try { await codeStore.saveCode(`verified:email:${email}`, '1', 300); } catch (e) { logger.warn('邮件验证标记保存失败', { email, error: e.message }); }
+    try { await codeStore.saveCode(`verified:email:${email}`, '1', 300); } catch (e) { logger.warn('邮件验证标记保存失败', { email: email.replace(/(.{1,2}).*(@.*)/, '$1***$2'), error: e.message }); }
     return true;
   }
   if (result.reason !== 'error') {
@@ -216,7 +216,7 @@ export async function checkVerified(email) {
   try {
     const result = await codeStore.verifyCode(key, '1', 1);
     if (result.valid || result.reason === 'mismatch') return true;
-  } catch { logger.warn('[Email] checkVerified Redis 查询失败', { email }); }
+  } catch { logger.warn('[Email] checkVerified Redis 查询失败', { email: email.replace(/(.{1,2}).*(@.*)/, '$1***$2') }); }
   const entry = CODE_CACHE.get(key);
   if (!entry || Date.now() - entry.time > 300000) { CODE_CACHE.delete(key); return false; }
   CODE_CACHE.delete(key);
