@@ -1,13 +1,12 @@
 <!--
-  Movio AI v4.1 — Assets Library (素材库)
-  G4 前端开发 | W4
-  浏览/管理所有AI生成的作品（图片+视频）
+  Movio AI v4.1 — Assets Library
+  Browse/manage all AI-generated works (images + videos)
 -->
 <template>
   <div class="page-container">
     <header class="page-header">
-      <h1>素材库</h1>
-      <p>管理所有AI生成的作品</p>
+      <h1>{{ $t('assets.title') }}</h1>
+      <p>{{ $t('assets.subtitle') }}</p>
     </header>
 
     <div class="toolbar">
@@ -18,11 +17,11 @@
       </div>
     </div>
 
-    <div v-if="loading" class="empty-state">加载中...</div>
+    <div v-if="loading" class="empty-state">{{ $t('assets.loading') }}</div>
     <div v-else-if="items.length === 0" class="empty-state">
       <div class="empty-icon">🗂</div>
-      <p>素材库为空</p>
-      <p class="empty-hint">AI生成的作品将自动保存到此处</p>
+      <p>{{ $t('assets.empty_title') }}</p>
+      <p class="empty-hint">{{ $t('assets.empty_hint') }}</p>
     </div>
 
     <div v-else class="asset-grid">
@@ -41,19 +40,18 @@
     </div>
 
     <div v-if="total > page * pageSize" class="load-more">
-      <button class="btn btn-ghost" @click="loadMore">加载更多</button>
+      <button class="btn btn-ghost" @click="loadMore">{{ $t('assets.load_more') }}</button>
     </div>
 
-    <!-- 预览弹窗 -->
     <Teleport to="body">
       <div v-if="previewItem" class="preview-overlay" @click.self="previewItem = null">
         <div class="preview-box">
-          <button class="preview-close" @click="previewItem = null" aria-label="关闭">✕</button>
+          <button class="preview-close" @click="previewItem = null" :aria-label="$t('assets.close_preview')">✕</button>
           <video v-if="previewItem.type === 'video'" :src="previewItem.url" class="preview-media" controls />
-          <img v-else :src="previewItem.url" alt="资源预览" class="preview-media" />
+          <img v-else :src="previewItem.url" :alt="$t('assets.preview_alt')" class="preview-media" />
           <div class="preview-actions">
-            <button class="btn btn-primary btn-sm" @click="downloadItem(previewItem)">下载</button>
-            <button class="btn btn-secondary btn-sm" @click="copyLink(previewItem.url)">复制链接</button>
+            <button class="btn btn-primary btn-sm" @click="downloadItem(previewItem)">{{ $t('assets.download') }}</button>
+            <button class="btn btn-secondary btn-sm" @click="copyLink(previewItem.url)">{{ $t('assets.copy_link') }}</button>
           </div>
         </div>
       </div>
@@ -62,11 +60,12 @@
 </template>
 
 <script setup lang="ts">
-import { formatDate, copyToClipboard } from '@/utils/format';
+import { formatDate, copyToClipboard } from '@/utils/format'
 
-const copyLink = copyToClipboard;
+const copyLink = copyToClipboard
 
 const toast = useToast()
+const { t } = useI18n()
 definePageMeta({ layout: 'workspace' })
 
 const apiBase = useRuntimeConfig().public.apiBase || '/api'
@@ -79,18 +78,21 @@ const total = ref(0)
 const activeFilter = ref('all')
 const previewItem = ref<any>(null)
 
-const filters = [
-  { key: 'all', label: '全部' },
-  { key: 'image', label: '图片' },
-  { key: 'video', label: '视频' },
-]
+const filters = computed(() => [
+  { key: 'all', label: t('assets.filter_all') },
+  { key: 'image', label: t('assets.filter_image') },
+  { key: 'video', label: t('assets.filter_video') },
+])
 
 const typeLabels: Record<string, string> = {
-  image_gen: 'AI生图', image_replicate: '主图复刻', batch_image_gen: '批量生图', batch_image_edit: '批量编辑',
-  video_gen: 'AI视频', action_migrate: '动作迁移', digital_human: '数字人', viral_replicate: '爆款复刻', live_clip: '智能精剪',
+  image_gen: t('assets.type_image_gen'), image_replicate: t('assets.type_image_replicate'),
+  batch_image_gen: t('assets.type_batch_image'), batch_image_edit: t('assets.type_batch_edit'),
+  video_gen: t('assets.type_video_gen'), action_migrate: t('assets.type_action_migrate'),
+  digital_human: t('assets.type_digital_human'), viral_replicate: t('assets.type_viral_replicate'),
+  live_clip: t('assets.type_live_clip'),
 }
 
-function typeLabel(t: string) { return typeLabels[t] || t }
+function typeLabel(key: string) { return typeLabels[key] || key }
 
 async function fetchAssets() {
   loading.value = true
@@ -101,8 +103,7 @@ async function fetchAssets() {
       items.value = res.data.list || []
       total.value = res.data.total || 0
     }
-  } catch { toast.error('加载资源列表失败') } finally { loading.value = false }
-
+  } catch { toast.error(t('assets.load_error')) } finally { loading.value = false }
 }
 
 function switchFilter(key: string) {
@@ -112,10 +113,7 @@ function switchFilter(key: string) {
   fetchAssets()
 }
 
-function loadMore() {
-  page.value++
-  fetchAssets()
-}
+function loadMore() { page.value++; fetchAssets() }
 
 function downloadItem(item: any) { if (item.url) window.open(item.url, '_blank', 'noopener,noreferrer') }
 
