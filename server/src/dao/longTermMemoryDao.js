@@ -1,18 +1,5 @@
 import db from './db.js';
 
-export async function insertEntry(data) {
-  const [result] = await db.execute(
-    `INSERT INTO ltm_entries
-      (namespace, subject_id, memory_key, content, content_hash,
-       importance, memory_type, source, tags, metadata, is_pinned, expires_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [data.namespace, data.subjectId, data.memoryKey, data.content, data.contentHash,
-     data.importance, data.memoryType, data.source, JSON.stringify(data.tags || []),
-     JSON.stringify(data.metadata || {}), data.isPinned ? 1 : 0, data.expiresAt || null]
-  );
-  return result.insertId;
-}
-
 export async function upsertEntry(data) {
   const [result] = await db.execute(
     `INSERT INTO ltm_entries

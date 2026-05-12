@@ -5,6 +5,7 @@
 import { POLL_INTERVAL_MS, POLL_BACKOFF_MS } from '~/constants/ui'
 
 export function useTask() {
+  const { t } = useI18n()
   const taskId = ref('');
   const status = ref(-1); // -1=未提交 0=排队 1=处理中 2=完成 3=失败
   const progress = ref(0);
@@ -41,7 +42,7 @@ export function useTask() {
           stopPolling();
           return;
         } else if (data.status === 3) {
-          errorMsg.value = data.error_msg || '任务失败';
+          errorMsg.value = data.error_msg || t('task.failed');
           stopPolling();
           return;
         }
@@ -50,7 +51,7 @@ export function useTask() {
         consecutiveFailures++;
         // 连续失败 3 次后报告错误状态
         if (consecutiveFailures >= 3) {
-          errorMsg.value = '请求失败，请检查网络后刷新重试';
+          errorMsg.value = t('task.network_error');
           stopPolling();
           return;
         }

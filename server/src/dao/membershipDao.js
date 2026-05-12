@@ -25,25 +25,6 @@ const membershipDao = {
     const [r] = await pool.execute('UPDATE user_membership SET auto_renew = ? WHERE user_id = ?', [autoRenew ? 1 : 0, userId]);
     return r.affectedRows;
   },
-
-  async findExpiring(daysWithin = 7) {
-    const [rows] = await pool.execute(
-      `SELECT ${COLS} FROM user_membership WHERE auto_renew = 1 AND plan_type != 0 AND end_time BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL ? DAY)`,
-      [daysWithin],
-    );
-    return rows;
-  },
-
-  async listByPlanType(planType, { limit = 20, offset = 0 } = {}) {
-    const where = planType ? 'WHERE plan_type = ?' : '';
-    const params = planType ? [planType, Number(limit), Number(offset)] : [Number(limit), Number(offset)];
-    const [rows] = await pool.query(
-      `SELECT um.*, u.nickname, u.phone FROM user_membership um LEFT JOIN user u ON u.id = um.user_id ${where} ORDER BY um.create_time DESC LIMIT ? OFFSET ?`,
-      params,
-    );
-    const [cnt] = await pool.execute(`SELECT COUNT(*) as total FROM user_membership ${where}`, planType ? [planType] : []);
-    return { rows, total: cnt[0].total };
-  },
 };
 
 export default membershipDao;

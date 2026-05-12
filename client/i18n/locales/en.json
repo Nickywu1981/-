@@ -2555,6 +2555,7 @@
     "creation_placeholder_detail": "Describe your detail page, e.g. face mask product page, Japanese minimal...",
     "creation_placeholder_copywrite": "Describe your voice/copy needs, e.g. product voiceover script, TikTok copy...",
     "creation_placeholder_other": "Describe your other creative needs, e.g. digital human sales, compliance check...",
+    "creation_placeholder_digital": "Describe your digital human needs, e.g. female clothing sales digital human, sweet style...",
     "creation_placeholder_default": "Describe your creative needs...",
     "creation_hint_video": "Image-to-video / Text-to-video / Storyboard / Digital human voiceover",
     "creation_hint_image": "Text-to-image / Reference image / Batch processing / Retouch / Background removal",
@@ -4014,5 +4015,13 @@
     "close": "Close",
     "confirm_approve": "Confirm approval?",
     "confirm_reject": "Confirm rejection?"
+  },
+  "task": {
+    "submit_in_progress": "A task is in progress, please wait for it to complete",
+    "duplicate_submit": "There is already a task in progress, please wait",
+    "submit_failed": "Task submission failed",
+    "submit_failed_retry": "Task submission failed, please retry",
+    "failed": "Task failed",
+    "network_error": "Request failed, please check your network and retry"
   }
 }

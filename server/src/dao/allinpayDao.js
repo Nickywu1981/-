@@ -35,14 +35,6 @@ export default {
     return r.affectedRows;
   },
 
-  async markClosed(reqsn) {
-    const [r] = await pool.query(
-      'UPDATE allinpay_order SET status = 3, update_time = NOW() WHERE reqsn = ? AND status = 0',
-      [reqsn],
-    );
-    return r.affectedRows;
-  },
-
   async logNotify(data) {
     await pool.query(
       `INSERT INTO allinpay_notify_log (reqsn, trxid, notify_body, sign_verified, process_status, process_msg)

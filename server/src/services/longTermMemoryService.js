@@ -113,4 +113,4 @@ async function markAccessed(memoryId) {
   } catch (_) { /* 静默降级 */ }
 }
 
-export { store, storeBatch, recall, applyDecay, consolidate, purgeExpired, getStats, markAccessed, hashContent };
+export { store, storeBatch, recall, applyDecay, consolidate, purgeExpired, getStats, markAccessed };

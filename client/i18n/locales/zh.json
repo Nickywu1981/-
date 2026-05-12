@@ -4015,5 +4015,13 @@
     "close": "关闭",
     "confirm_approve": "确认通过？",
     "confirm_reject": "确认拒绝？"
+  },
+  "task": {
+    "submit_in_progress": "任务进行中，请等待完成后再提交",
+    "duplicate_submit": "已有进行中的任务，请等待完成后再提交",
+    "submit_failed": "任务提交失败",
+    "submit_failed_retry": "任务提交失败，请重试",
+    "failed": "任务失败",
+    "network_error": "请求失败，请检查网络后刷新重试"
   }
 }

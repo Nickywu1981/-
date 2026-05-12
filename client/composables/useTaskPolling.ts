@@ -10,6 +10,7 @@
 import { POLL_INTERVAL_MS } from '~/constants/ui'
 
 export function useTaskPolling() {
+  const { t } = useI18n()
   const jobId = ref<number | null>(null)
   const status = ref<string>('idle') // idle | queued | processing | completed | failed
   const progress = ref(0)
@@ -24,11 +25,11 @@ export function useTaskPolling() {
   // -----------------------------------------------------------------------
   async function submit(taskType: string, params: Record<string, any>) {
     if (submitting.value) {
-      useToast().warn('任务进行中，请等待完成后再提交')
+      useToast().warn(t('task.submit_in_progress'))
       return
     }
     if (jobId.value && ['queued', 'processing'].includes(status.value)) {
-      useToast().warn('已有进行中的任务，请等待完成后再提交')
+      useToast().warn(t('task.duplicate_submit'))
       return
     }
 
@@ -48,12 +49,12 @@ export function useTaskPolling() {
         startPolling()
       } else {
         status.value = 'failed'
-        error.value = res.msg || '任务提交失败'
+        error.value = res.msg || t('task.submit_failed')
       }
     } catch (e: any) {
       status.value = 'failed'
-      error.value = e?.data?.msg || e.message || '任务提交失败'
-      useToast().error(e?.data?.msg || e.message || '任务提交失败，请重试')
+      error.value = e?.data?.msg || e.message || t('task.submit_failed')
+      useToast().error(e?.data?.msg || e.message || t('task.submit_failed_retry'))
     } finally {
       submitting.value = false
     }
