@@ -53,7 +53,7 @@ class WsManager {
       this.wss?.clients.forEach((ws) => {
         if (ws.isAlive === false) return ws.terminate();
         ws.isAlive = false;
-        ws.ping();
+        try { ws.ping(); } catch { ws.terminate(); }
       });
     }, heartbeatMs);
     this.wss.on('close', () => clearInterval(interval));

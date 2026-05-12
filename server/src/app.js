@@ -375,7 +375,7 @@ app.use((err, _req, res, _next) => {
   // Multer 文件上传异常 → 统一转为 4xx 业务错误
   if (err.name === 'MulterError') {
     const multerMessages = {
-      LIMIT_FILE_SIZE: '文件大小超过限制（最大 20MB）',
+      LIMIT_FILE_SIZE: '文件大小超过限制',
       LIMIT_FILE_COUNT: '文件数量超过限制',
       LIMIT_UNEXPECTED_FILE: '上传字段名不匹配',
       LIMIT_FIELD_KEY: '字段名过长',

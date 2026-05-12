@@ -66,6 +66,6 @@ router.post('/simple', uploadLimiter, _withMulter, uploadQuotaGuard, ctrl.saveSi
 router.post('/init', uploadLimiter, _validate(initUploadSchema), ctrl.initUpload);
 router.post('/chunk', uploadLimiter, _upload.fields([{ name: 'chunk', maxCount: 1 }]), uploadQuotaGuard, validate(chunkSchema, 'body'), ctrl.receiveChunk);
 router.get('/chunks/:uploadId', ctrl.getReceivedChunks);
-router.post('/complete', uploadLimiter, _validate(completeUploadSchema), ctrl.completeUpload);
+router.post('/complete', uploadLimiter, _validate(completeUploadSchema), uploadQuotaGuard, ctrl.completeUpload);
 
 export default router;

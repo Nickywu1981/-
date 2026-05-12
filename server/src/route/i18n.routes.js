@@ -94,6 +94,11 @@ publicRouter.get('/version/stream', (req, res) => {
       if (mod.versionEmitter) mod.versionEmitter.off('i18n-version', onVersion);
     }).catch(err => { logger.error('[i18n] SSE versionEmitter off', { error: err.message }); });
   });
+  res.on('error', () => {
+    import('../services/config-version.service.js').then(mod => {
+      if (mod.versionEmitter) mod.versionEmitter.off('i18n-version', onVersion);
+    }).catch(err => { logger.error('[i18n] SSE versionEmitter off', { error: err.message }); });
+  });
 });
 
 // ===================== 管理路由（需 adminAuth） =====================
