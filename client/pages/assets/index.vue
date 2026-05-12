@@ -50,7 +50,7 @@
         <div class="preview-box">
           <button class="preview-close" @click="previewItem = null" aria-label="关闭">✕</button>
           <video v-if="previewItem.type === 'video'" :src="previewItem.url" class="preview-media" controls />
-          <img v-else :src="previewItem.url" class="preview-media" />
+          <img v-else :src="previewItem.url" alt="资源预览" class="preview-media" />
           <div class="preview-actions">
             <button class="btn btn-primary btn-sm" @click="downloadItem(previewItem)">下载</button>
             <button class="btn btn-secondary btn-sm" @click="copyLink(previewItem.url)">复制链接</button>

@@ -7,7 +7,7 @@
             <div class="dual-upload__label">产品/服装图</div>
             <div class="ws-upload-area" @dragover.prevent @drop.prevent="(e: DragEvent) => handleDrop(e, 'source')">
               <div class="ws-upload-area__icon" v-if="!sourceUrl">👕</div>
-              <img loading="lazy" v-else :src="sourceUrl" class="ws-upload-area__preview" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+              <img loading="lazy" v-else :src="sourceUrl" alt="原图" class="ws-upload-area__preview" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
               <div class="ws-upload-area__text">{{ sourceUrl ? '点击更换' : '上传产品图' }}</div>
               <input ref="sourceInput" type="file" accept="image/*" hidden @change="(e: Event) => handleFile(e, 'source')" />
               <button class="ws-btn ws-btn--secondary ws-btn--sm" type="button" @click="sourceInput?.click()">选择图片</button>
@@ -19,7 +19,7 @@
             <div class="dual-upload__label">目标人物图</div>
             <div class="ws-upload-area" @dragover.prevent @drop.prevent="(e: DragEvent) => handleDrop(e, 'target')">
               <div class="ws-upload-area__icon" v-if="!targetUrl">🧑</div>
-              <img loading="lazy" v-else :src="targetUrl" class="ws-upload-area__preview" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+              <img loading="lazy" v-else :src="targetUrl" alt="目标人物" class="ws-upload-area__preview" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
               <div class="ws-upload-area__text">{{ targetUrl ? '点击更换' : '上传人物图' }}</div>
               <input ref="targetInput" type="file" accept="image/*" hidden @change="(e: Event) => handleFile(e, 'target')" />
               <button class="ws-btn ws-btn--secondary ws-btn--sm" type="button" @click="targetInput?.click()">选择图片</button>

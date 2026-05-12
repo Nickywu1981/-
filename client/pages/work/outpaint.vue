@@ -9,7 +9,7 @@
             <div class="ws-upload-area__text">点击上传或拖拽图片到此处</div>
             <div class="ws-upload-area__hint">支持 JPG / PNG / WebP，最大 20MB</div>
           </div>
-          <img loading="lazy" v-else :src="previewUrl" class="ws-upload-area__preview" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+          <img loading="lazy" v-else :src="previewUrl" alt="上传预览" class="ws-upload-area__preview" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
           <input ref="fileInput" type="file" accept="image/*" hidden @change="handleFile" />
         </div>
         <div v-if="uploading" class="ws-uploading">⏳ 上传中...</div>
@@ -44,7 +44,7 @@
         <div v-else-if="task.status.value === 2" class="result-compare">
           <div class="result-compare__item">
             <div class="result-compare__label">原始图片</div>
-            <img loading="lazy" v-if="uploadedUrl" :src="uploadedUrl" class="result-compare__img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+            <img loading="lazy" v-if="uploadedUrl" :src="uploadedUrl" alt="原图" class="result-compare__img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
             <div v-else class="result-compare__img placeholder" />
           </div>
           <div class="result-compare__divider">
@@ -53,7 +53,7 @@
           </div>
           <div class="result-compare__item">
             <div class="result-compare__label">扩展后</div>
-            <img loading="lazy" v-if="task.result.value" :src="task.result.value" class="result-compare__img after" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+            <img loading="lazy" v-if="task.result.value" :src="task.result.value" alt="扩图结果" class="result-compare__img after" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
             <div v-else class="result-compare__img placeholder" />
           </div>
         </div>

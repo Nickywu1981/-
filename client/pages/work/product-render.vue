@@ -21,7 +21,7 @@
       </button>
       <div class="result-area" v-if="resultUrl">
         <h3>渲染结果</h3>
-        <img loading="lazy" :src="resultUrl" class="result-img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+        <img loading="lazy" :src="resultUrl" alt="渲染结果" class="result-img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
       </div>
       <div v-else class="result-area"><p>渲染结果将在此显示</p></div>
       <p v-if="errorMsg" class="error-msg">{{ errorMsg }}</p>

@@ -6,7 +6,7 @@
         <div class="form-grid"><div class="form-group"><label>品牌名称</label><input v-model="form.brandName" class="input" placeholder="输入品牌名称" maxlength="100" /></div>
         <div class="form-group"><label>品牌Logo</label><div class="upload-zone" @click="uploadLogo" tabindex="0" role="button" @keydown.enter="uploadLogo" @keydown.space.prevent="uploadLogo">
           <span v-if="!form.logoUrl">📷 上传Logo</span>
-          <img loading="lazy" v-else :src="form.logoUrl" style="max-width:120px;max-height:60px" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+          <img loading="lazy" v-else :src="form.logoUrl" alt="品牌Logo" style="max-width:120px;max-height:60px" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
         </div>
         <p v-if="logoUploading" class="hint">上传中...</p>
         <input ref="logoInput" type="file" accept="image/*" hidden @change="onLogoChange" />
@@ -33,7 +33,7 @@
     <div v-else class="result-box">
       <h3>品牌配置已保存</h3>
       <div class="preview-box" style="position:relative;display:inline-block">
-        <img loading="lazy" :src="previewUrl || '/images/placeholder.png'" style="max-width:400px;border-radius:12px" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+        <img loading="lazy" :src="previewUrl || '/images/placeholder.png'" alt="品牌配置预览" style="max-width:400px;border-radius:12px" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
         <span v-if="form.watermarkType==='text' && form.watermarkText" style="position:absolute;bottom:16px;right:16px;color:white;opacity:0.7;background:rgba(0,0,0,0.5);padding:4px 12px;border-radius:4px;font-size:13px">{{ form.watermarkText }}</span>
       </div>
       <div style="margin-top:16px">

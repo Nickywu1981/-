@@ -62,7 +62,7 @@
 
       <div v-if="previews.length" class="preview-grid">
         <div v-for="(p, i) in previews" :key="i" class="preview-item">
-          <img loading="lazy" :src="p.url" class="preview-thumb" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+          <img loading="lazy" :src="p.url" alt="合规预览" class="preview-thumb" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
           <button class="remove-btn" @click="removeImage(i)" aria-label="移除图片">✕</button>
         </div>
       </div>

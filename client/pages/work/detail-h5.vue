@@ -14,7 +14,7 @@
         <h4>已添加 {{ skuList.length }} 个SKU</h4>
         <div class="sku-grid">
           <div v-for="(sku, i) in skuList" :key="i" class="sku-card">
-            <img loading="lazy" :src="sku.previewUrl" class="sku-thumb" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+            <img loading="lazy" :src="sku.previewUrl" alt="SKU预览" class="sku-thumb" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
             <div class="sku-info">
               <input v-model="sku.name" placeholder="SKU名称（如：红色-M）" class="sku-name-input" maxlength="100" />
               <input v-model="sku.color" type="color" class="sku-color" title="选颜色" />
@@ -36,7 +36,7 @@
 
       <div class="sku-config-list">
         <div v-for="(sku, i) in skuList" :key="i" class="sku-config-row">
-          <img loading="lazy" :src="sku.previewUrl" class="sku-thumb-sm" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+          <img loading="lazy" :src="sku.previewUrl" alt="SKU预览" class="sku-thumb-sm" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
           <div class="sku-fields">
             <input v-model="sku.name" placeholder="SKU名称" class="input-sm" maxlength="100" />
             <input v-model="sku.spec" placeholder="规格（如：500ml）" class="input-sm" maxlength="100" />
