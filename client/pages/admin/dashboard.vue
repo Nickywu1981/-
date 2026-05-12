@@ -1,8 +1,8 @@
 <template>
   <AdminLayout>
-    <PageHeader title="数据看板">
+    <PageHeader :title="$t('admin_dashboard.page_title')">
       <template #actions>
-        <button class="refresh-btn" :class="{ spinning: loading }" :disabled="loading" @click="fetchAll">↻ 刷新</button>
+        <button class="refresh-btn" :class="{ spinning: loading }" :disabled="loading" @click="fetchAll">↻ {{ $t('admin_dashboard.refresh') }}</button>
       </template>
     </PageHeader>
 
@@ -18,51 +18,51 @@
     <div v-else-if="error" class="error-state">
       <span class="error-icon">⚠️</span>
       <p>{{ error }}</p>
-      <button class="retry-btn" @click="fetchAll">重试</button>
+      <button class="retry-btn" @click="fetchAll">{{ $t('admin_dashboard.retry') }}</button>
     </div>
 
     <template v-else>
       <div class="stats-grid">
-        <StatsCard :value="stats.userCount ?? '-'" label="注册用户" />
-        <StatsCard :value="stats.taskCount ?? '-'" label="任务总数" />
-        <StatsCard :value="stats.todayTaskCount ?? '-'" label="今日任务" />
-        <StatsCard :value="stats.paidUserCount ?? '-'" label="付费用户" />
-        <StatsCard :value="'¥' + (stats.totalRevenue?.toFixed(2) ?? '-')" label="总收入" color="#67c23a" />
-        <StatsCard :value="stats.todayActiveUsers ?? '-'" label="今日活跃" />
-        <StatsCard :value="'¥' + (stats.todayCost?.toFixed(2) ?? '-')" label="今日模型成本" color="#f56c6c" />
+        <StatsCard :value="stats.userCount ?? '-'" :label="$t('admin_dashboard.registered_users')" />
+        <StatsCard :value="stats.taskCount ?? '-'" :label="$t('admin_dashboard.total_tasks')" />
+        <StatsCard :value="stats.todayTaskCount ?? '-'" :label="$t('admin_dashboard.today_tasks')" />
+        <StatsCard :value="stats.paidUserCount ?? '-'" :label="$t('admin_dashboard.paid_users')" />
+        <StatsCard :value="'¥' + (stats.totalRevenue?.toFixed(2) ?? '-')" :label="$t('admin_dashboard.total_revenue')" color="#67c23a" />
+        <StatsCard :value="stats.todayActiveUsers ?? '-'" :label="$t('admin_dashboard.today_active')" />
+        <StatsCard :value="'¥' + (stats.todayCost?.toFixed(2) ?? '-')" :label="$t('admin_dashboard.today_cost')" color="#f56c6c" />
       </div>
 
       <div class="charts-grid">
         <div class="chart-card">
-          <h3>7日任务趋势</h3>
+          <h3>{{ $t('admin_dashboard.chart_7d_tasks') }}</h3>
           <div ref="taskChart" class="chart-box" />
         </div>
         <div class="chart-card">
-          <h3>7日用户增长</h3>
+          <h3>{{ $t('admin_dashboard.chart_7d_users') }}</h3>
           <div ref="userChart" class="chart-box" />
         </div>
         <div class="chart-card">
-          <h3>7日收入 (¥)</h3>
+          <h3>{{ $t('admin_dashboard.chart_7d_revenue') }}</h3>
           <div ref="revenueChart" class="chart-box" />
         </div>
         <div class="chart-card">
-          <h3>任务类型分布</h3>
+          <h3>{{ $t('admin_dashboard.chart_task_dist') }}</h3>
           <div ref="pieChart" class="chart-box" />
         </div>
         <div class="chart-card">
-          <h3>热门功能 TOP5</h3>
+          <h3>{{ $t('admin_dashboard.chart_top5') }}</h3>
           <div ref="barChart" class="chart-box" />
         </div>
         <div class="chart-card">
-          <h3>模型用量分布</h3>
+          <h3>{{ $t('admin_dashboard.chart_model_dist') }}</h3>
           <div ref="modelChart" class="chart-box" />
         </div>
       </div>
 
       <div class="recent-section">
-        <h3>最近任务</h3>
+        <h3>{{ $t('admin_dashboard.recent_tasks') }}</h3>
         <table class="table">
-          <thead><tr><th>任务ID</th><th>用户</th><th>类型</th><th>状态</th><th>时间</th></tr></thead>
+          <thead><tr><th>{{ $t('admin_dashboard.col_task_id') }}</th><th>{{ $t('admin_dashboard.col_user') }}</th><th>{{ $t('admin_dashboard.col_type') }}</th><th>{{ $t('admin_dashboard.col_status') }}</th><th>{{ $t('admin_dashboard.col_time') }}</th></tr></thead>
           <tbody>
             <tr v-for="t in recentTasks" :key="t.id">
               <td class="mono">{{ t.id?.slice(0, 8) }}</td>
@@ -71,7 +71,7 @@
               <td><StatusBadge :variant="statusVariant(t.status)" size="sm" dot>{{ statusLabel(t.status) }}</StatusBadge></td>
               <td class="time">{{ t.create_time?.slice(0, 16) }}</td>
             </tr>
-            <tr v-if="!recentTasks.length"><td colspan="5" class="empty">暂无数据</td></tr>
+            <tr v-if="!recentTasks.length"><td colspan="5" class="empty">{{ $t('admin_dashboard.no_data_text') }}</td></tr>
           </tbody>
         </table>
       </div>
@@ -91,6 +91,8 @@ import { CanvasRenderer } from 'echarts/renderers';
 
 echarts.use([LineChart, PieChart, BarChart, TitleComponent, TooltipComponent, LegendComponent, GridComponent, CanvasRenderer]);
 
+const { t } = useI18n()
+
 const stats = ref<any>({})
 const recentTasks = ref<any[]>([])
 const loading = ref(true)
@@ -106,7 +108,7 @@ let charts: echarts.ECharts[] = []
 const toast = useToast()
 
 const statusVariant = (s: number) => ['info','warning','success','danger'][s] || 'default'
-const statusLabel = (s: number) => ['排队','处理中','完成','失败'][s] || ''
+const statusLabel = (s: number) => [t('admin_dashboard.status_queued'), t('admin_dashboard.status_processing'), t('admin_dashboard.status_done'), t('admin_dashboard.status_failed')][s] || ''
 
 function initChart(el: HTMLDivElement | undefined): echarts.ECharts | null {
   if (!el || typeof window === 'undefined') return null
@@ -219,12 +221,12 @@ function disposeCharts() {
 async function fetchAll() {
   loading.value = true; error.value = ''
   try {
-    const [s, t]: any[] = await Promise.allSettled([
+    const [s, tResult]: any[] = await Promise.allSettled([
       $fetch('/api/admin/stats'),
       $fetch('/api/admin/tasks?pageSize=8'),
     ])
     const sVal = s.status === 'fulfilled' ? s.value : null
-    const tVal = t.status === 'fulfilled' ? t.value : null
+    const tVal = tResult.status === 'fulfilled' ? tResult.value : null
 
     if (sVal?.code === 200) {
       stats.value = sVal.data
@@ -235,33 +237,33 @@ async function fetchAll() {
         renderLineChart(userChart.value, trends?.users || [], '#22C55E')
         renderLineChart(revenueChart.value, trends?.revenue || [], '#7C3AED')
         renderPieChart(pieChart.value, sVal.data?.taskDistribution || [
-          { label: '主图', value: 35, color: '#3B82F6' },
-          { label: '场景', value: 18, color: '#22C55E' },
-          { label: '视频', value: 22, color: '#F59E0B' },
-          { label: '详情页', value: 12, color: '#7C3AED' },
-          { label: '其他', value: 13, color: '#EC4899' },
+          { label: t('admin_dashboard.fb_main_image'), value: 35, color: '#3B82F6' },
+          { label: t('admin_dashboard.fb_scene'), value: 18, color: '#22C55E' },
+          { label: t('admin_dashboard.fb_video'), value: 22, color: '#F59E0B' },
+          { label: t('admin_dashboard.fb_detail'), value: 12, color: '#7C3AED' },
+          { label: t('admin_dashboard.fb_other'), value: 13, color: '#EC4899' },
         ])
         renderBarChart(barChart.value, sVal.data?.popularFeatures || [
-          { label: '智能抠图', value: 128 },
-          { label: '场景生成', value: 96 },
-          { label: '视频生成', value: 74 },
-          { label: '图片精修', value: 58 },
-          { label: '白底图', value: 43 },
+          { label: t('admin_dashboard.fb_smart_cutout'), value: 128 },
+          { label: t('admin_dashboard.fb_scene_gen'), value: 96 },
+          { label: t('admin_dashboard.fb_video_gen'), value: 74 },
+          { label: t('admin_dashboard.fb_image_refine'), value: 58 },
+          { label: t('admin_dashboard.fb_white_bg'), value: 43 },
         ])
         renderModelChart(modelChart.value, sVal.data?.modelUsage || [
           { label: 'GPT-4o', value: 45, color: '#7C3AED' },
           { label: 'Claude', value: 25, color: '#3B82F6' },
           { label: 'SD XL', value: 20, color: '#22C55E' },
-          { label: '其他', value: 10, color: '#F59E0B' },
+          { label: t('admin_dashboard.fb_other_model'), value: 10, color: '#F59E0B' },
         ])
       })
     } else {
-      throw new Error(sVal?.msg || '获取统计数据失败')
+      throw new Error(sVal?.msg || t('admin_dashboard.stats_load_fail'))
     }
     if (tVal?.code === 200) { recentTasks.value = tVal.data?.list || [] }
-    else { throw new Error(tVal?.msg || '获取任务列表失败') }
+    else { throw new Error(tVal?.msg || t('admin_dashboard.tasks_load_fail')) }
   } catch (e: any) {
-    error.value = e?.data?.msg || e.message || '加载失败，请稍后重试'
+    error.value = e?.data?.msg || e.message || t('admin_dashboard.load_failed')
     toast.error(error.value)
   } finally { loading.value = false }
 }

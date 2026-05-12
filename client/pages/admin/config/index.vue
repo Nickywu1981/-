@@ -1,5 +1,5 @@
 <!--
-  Movio AI v4.1 — Config Center Page
+  Movio AI v4.1 -- Config Center Page
   G4 前端开发 | T-G4-004
   可视化配置中心: 分组树 + key-value 表单编辑 + 变更日志 + 回滚
   权限: 仅 admin + 运营
@@ -7,15 +7,15 @@
 <template>
   <div class="config-center">
     <div class="config-header">
-      <h1>配置中心</h1>
-      <p>管理全站文案、选项、模板，修改后实时生效</p>
+      <h1>{{ $t('admin_config.page_title') }}</h1>
+      <p>{{ $t('admin_config.page_desc') }}</p>
     </div>
 
     <div class="config-layout">
       <!-- 左侧: 分组树 -->
       <aside class="config-sidebar">
         <div class="sidebar-search">
-          <input v-model="searchQuery" type="text" maxlength="100" class="input" placeholder="搜索配置组..." />
+          <input v-model="searchQuery" type="text" maxlength="100" class="input" :placeholder="$t('admin_config.search_placeholder')" />
         </div>
         <div class="group-tree">
           <div
@@ -37,7 +37,7 @@
       <!-- 右侧: 编辑面板 -->
       <main class="config-main">
         <div v-if="!activeGroup" class="empty-state">
-          <p>请从左侧选择一个配置分组</p>
+          <p>{{ $t('admin_config.select_group_hint') }}</p>
         </div>
 
         <template v-else>
@@ -46,10 +46,10 @@
             <h2>{{ activeGroup }}</h2>
             <div class="toolbar-actions">
               <button class="btn btn-sm" @click="showLogs = !showLogs">
-                {{ showLogs ? '编辑' : '变更日志' }}
+                {{ showLogs ? $t('admin_config.edit') : $t('admin_config.change_logs') }}
               </button>
               <button class="btn btn-sm btn-primary" :disabled="!hasChanges" @click="saveAll">
-                保存全部
+                {{ $t('admin_config.save_all') }}
               </button>
             </div>
           </div>
@@ -124,14 +124,14 @@
                   :disabled="!isModified(item)"
                   @click="saveItem(item.item_key)"
                 >
-                  保存此项
+                  {{ $t('admin_config.save_item') }}
                 </button>
                 <button
                   class="btn btn-sm btn-ghost"
                   :disabled="!isModified(item)"
                   @click="resetItem(item)"
                 >
-                  重置
+                  {{ $t('admin_config.reset') }}
                 </button>
               </div>
               <p v-if="saveStatus[item.item_key]" class="save-status">{{ saveStatus[item.item_key] }}</p>
@@ -140,18 +140,18 @@
 
           <!-- 变更日志视图 -->
           <div v-if="showLogs" class="logs-panel">
-            <div v-if="changeLogs.length === 0" class="empty-state"><p>暂无变更记录</p></div>
+            <div v-if="changeLogs.length === 0" class="empty-state"><p>{{ $t('admin_config.empty_logs') }}</p></div>
             <div v-for="log in changeLogs" :key="log.id" class="log-entry">
               <div class="log-meta">
                 <span class="log-item">{{ log.item_key }}</span>
                 <span class="log-time">{{ log.created_at }}</span>
-                <span class="log-user">{{ log.changed_by_name || '系统' }}</span>
+                <span class="log-user">{{ log.changed_by_name || $t('admin_config.system') }}</span>
               </div>
               <div class="log-diff">
                 <span class="log-old">- {{ log.old_value?.substring(0, 80) }}</span>
                 <span class="log-new">+ {{ log.new_value?.substring(0, 80) }}</span>
               </div>
-              <button class="btn btn-sm btn-ghost" @click="rollback(log.id)">回滚</button>
+              <button class="btn btn-sm btn-ghost" @click="rollback(log.id)">{{ $t('admin_config.rollback') }}</button>
             </div>
           </div>
         </template>
@@ -161,10 +161,11 @@
 </template>
 
 <script setup lang="ts">
+import { ElMessage } from 'element-plus'
 
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 
-const toast = useToast()
+const { t } = useI18n()
 const apiBase = '/api'
 
 // 分组
@@ -203,7 +204,7 @@ async function loadGroups() {
   try {
     const res: any = await $fetch(`${apiBase}/admin/config/groups`)
     if (res.code === 200) groups.value = res.data || []
-  } catch { toast.error('加载配置分组失败') }
+  } catch { ElMessage.error(t('admin_config.load_groups_failed')) }
 }
 
 // 选择分组
@@ -235,7 +236,7 @@ async function selectGroup(groupKey: string) {
       editValues.value = vals
       originalValues.value = orig
     }
-  } catch { toast.error('加载配置失败') }
+  } catch { ElMessage.error(t('admin_config.load_failed')) }
 }
 
 // 加载变更日志
@@ -243,7 +244,7 @@ async function loadLogs() {
   try {
     const res: any = await $fetch(`${apiBase}/admin/config/logs/${activeGroup.value}`)
     if (res.code === 200) changeLogs.value = res.data || []
-  } catch { toast.error('加载变更日志失败') }
+  } catch { ElMessage.error(t('admin_config.load_logs_failed')) }
 }
 
 watch(showLogs, (v) => { if (v) loadLogs() })
@@ -257,13 +258,13 @@ async function saveItem(itemKey: string) {
     })
     if (res.code === 200) {
       originalValues.value[itemKey] = editValues.value[itemKey]
-      saveStatus.value[itemKey] = '✓ 已保存'
+      saveStatus.value[itemKey] = '\u2713 ' + t('admin_config.saved')
       msgTimer = setTimeout(() => delete saveStatus.value[itemKey], 2000)
     } else {
-      saveStatus.value[itemKey] = '✗ ' + (res.msg || '保存失败')
+      saveStatus.value[itemKey] = '\u2717 ' + (res.msg || t('admin_config.save_failed'))
     }
   } catch (e: any) {
-    saveStatus.value[itemKey] = '✗ ' + (e?.data?.msg || '保存失败')
+    saveStatus.value[itemKey] = '\u2717 ' + (e?.data?.msg || t('admin_config.save_failed'))
   }
 }
 
@@ -290,7 +291,7 @@ async function rollback(logId: number) {
       await selectGroup(activeGroup.value)
       await loadLogs()
     }
-  } catch { toast.error('回滚配置失败') }
+  } catch { ElMessage.error(t('admin_config.rollback_failed')) }
 }
 
 onMounted(loadGroups)

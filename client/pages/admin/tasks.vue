@@ -1,20 +1,25 @@
 <template>
   <AdminLayout>
     <div class="page-header">
-      <h2>任务管理</h2>
+      <h2>{{ $t('admin_tasks.page_title') }}</h2>
     </div>
 
     <div class="filters">
       <select v-model="status" @change="search">
-        <option value="">全部状态</option>
-        <option value="0">排队中</option><option value="1">处理中</option><option value="2">已完成</option><option value="3">失败</option>
+        <option value="">{{ $t('admin_tasks.all_statuses') }}</option>
+        <option value="0">{{ $t('admin_tasks.status_queued') }}</option>
+        <option value="1">{{ $t('admin_tasks.status_processing') }}</option>
+        <option value="2">{{ $t('admin_tasks.status_done') }}</option>
+        <option value="3">{{ $t('admin_tasks.status_failed') }}</option>
       </select>
       <select v-model="typeGroup" @change="search">
-        <option value="">全部类型</option>
-        <option value="image">图片</option><option value="video">视频</option><option value="batch">批量</option>
+        <option value="">{{ $t('admin_tasks.all_types') }}</option>
+        <option value="image">{{ $t('admin_tasks.type_image') }}</option>
+        <option value="video">{{ $t('admin_tasks.type_video') }}</option>
+        <option value="batch">{{ $t('admin_tasks.type_batch') }}</option>
       </select>
-      <input v-model="userId" type="text" placeholder="用户ID" @keyup.enter="search" />
-      <button class="btn" @click="search">搜索</button>
+      <input v-model="userId" type="text" :placeholder="$t('admin_tasks.user_id_placeholder')" @keyup.enter="search" />
+      <button class="btn" @click="search">{{ $t('admin_tasks.search_btn') }}</button>
     </div>
 
     <LoadingSkeleton v-if="loading" type="table" :rows="8" :cols="7" />
@@ -22,14 +27,23 @@
     <div v-else-if="error" class="error-state">
       <span class="error-icon">⚠️</span>
       <p>{{ error }}</p>
-      <button class="retry-btn" @click="fetchData">重试</button>
+      <button class="retry-btn" @click="fetchData">{{ $t('admin_tasks.retry') }}</button>
     </div>
 
     <template v-else-if="list.length">
       <div class="table-wrap">
         <table class="table">
           <thead>
-            <tr><th>ID</th><th>用户</th><th>类型</th><th>状态</th><th>消耗</th><th>进度</th><th>创建时间</th><th>操作</th></tr>
+            <tr>
+              <th>{{ $t('admin_tasks.col_id') }}</th>
+              <th>{{ $t('admin_tasks.col_user') }}</th>
+              <th>{{ $t('admin_tasks.col_type') }}</th>
+              <th>{{ $t('admin_tasks.col_status') }}</th>
+              <th>{{ $t('admin_tasks.col_credits') }}</th>
+              <th>{{ $t('admin_tasks.col_progress') }}</th>
+              <th>{{ $t('admin_tasks.col_create_time') }}</th>
+              <th>{{ $t('admin_tasks.col_action') }}</th>
+            </tr>
           </thead>
           <tbody>
             <tr v-for="t in list" :key="t.id" class="clickable" @click="openDetail(t)">
@@ -37,12 +51,12 @@
               <td>{{ t.nickname || t.username || '-' }}</td>
               <td>{{ typeLabel(t.type) }}</td>
               <td><span class="badge" :class="'s' + t.status">{{ statusLabel(t.status) }}</span></td>
-              <td>{{ t.credits_consumed || 0 }}点</td>
+              <td>{{ t.credits_consumed || 0 }}{{ $t('admin_tasks.points_unit') }}</td>
               <td><div class="progress-bar"><div class="fill" :style="{ width: progress(t) + '%' }"></div></div></td>
               <td class="time">{{ t.create_time }}</td>
               <td class="actions" @click.stop>
-                <button v-if="t.status === 3" class="btn-sm" @click="retryTask(t)">重试</button>
-                <button v-if="t.status === 0 || t.status === 1" class="btn-sm danger" @click="cancelTask(t)">取消</button>
+                <button v-if="t.status === 3" class="btn-sm" @click="retryTask(t)">{{ $t('admin_tasks.retry') }}</button>
+                <button v-if="t.status === 0 || t.status === 1" class="btn-sm danger" @click="cancelTask(t)">{{ $t('admin_tasks.cancel') }}</button>
               </td>
             </tr>
           </tbody>
@@ -50,29 +64,29 @@
       </div>
       <Pagination :page="page" :page-size="pageSize" :total="total" @change="onPageChange" />
     </template>
-    <div v-else class="empty">暂无任务数据</div>
+    <div v-else class="empty">{{ $t('admin_tasks.no_data') }}</div>
 
     <Teleport to="body">
       <div v-if="detailOpen" class="modal-overlay" @click.self="detailOpen = false">
         <div class="modal">
-          <h3>任务详情</h3>
+          <h3>{{ $t('admin_tasks.detail_title') }}</h3>
           <div class="detail-grid">
-            <div class="detail-item"><span class="dl">任务ID</span><span class="dv mono">{{ detail.id }}</span></div>
-            <div class="detail-item"><span class="dl">用户</span><span class="dv">{{ detail.nickname || detail.username || '-' }}</span></div>
-            <div class="detail-item"><span class="dl">类型</span><span class="dv">{{ typeLabel(detail.type) }}</span></div>
-            <div class="detail-item"><span class="dl">状态</span><span class="dv"><span class="badge" :class="'s' + detail.status">{{ statusLabel(detail.status) }}</span></span></div>
-            <div class="detail-item"><span class="dl">消耗点数</span><span class="dv">{{ detail.credits_consumed || 0 }}点</span></div>
-            <div class="detail-item"><span class="dl">进度</span><span class="dv">{{ progress(detail) }}%</span></div>
-            <div class="detail-item"><span class="dl">创建时间</span><span class="dv">{{ detail.create_time }}</span></div>
-            <div class="detail-item"><span class="dl">更新时间</span><span class="dv">{{ detail.update_time || '-' }}</span></div>
-            <div class="detail-item full" v-if="detail.input_data"><span class="dl">输入参数</span><span class="dv"><pre>{{ JSON.stringify(detail.input_data, null, 2) }}</pre></span></div>
-            <div class="detail-item full" v-if="detail.result_data"><span class="dl">结果数据</span><span class="dv"><pre>{{ JSON.stringify(detail.result_data, null, 2) }}</pre></span></div>
-            <div class="detail-item full" v-if="detail.error_msg"><span class="dl">错误信息</span><span class="dv error-msg">{{ detail.error_msg }}</span></div>
+            <div class="detail-item"><span class="dl">{{ $t('admin_tasks.detail_id') }}</span><span class="dv mono">{{ detail.id }}</span></div>
+            <div class="detail-item"><span class="dl">{{ $t('admin_tasks.detail_user') }}</span><span class="dv">{{ detail.nickname || detail.username || '-' }}</span></div>
+            <div class="detail-item"><span class="dl">{{ $t('admin_tasks.detail_type') }}</span><span class="dv">{{ typeLabel(detail.type) }}</span></div>
+            <div class="detail-item"><span class="dl">{{ $t('admin_tasks.detail_status') }}</span><span class="dv"><span class="badge" :class="'s' + detail.status">{{ statusLabel(detail.status) }}</span></span></div>
+            <div class="detail-item"><span class="dl">{{ $t('admin_tasks.detail_credits') }}</span><span class="dv">{{ detail.credits_consumed || 0 }}{{ $t('admin_tasks.points_unit') }}</span></div>
+            <div class="detail-item"><span class="dl">{{ $t('admin_tasks.detail_progress') }}</span><span class="dv">{{ progress(detail) }}%</span></div>
+            <div class="detail-item"><span class="dl">{{ $t('admin_tasks.detail_create_time') }}</span><span class="dv">{{ detail.create_time }}</span></div>
+            <div class="detail-item"><span class="dl">{{ $t('admin_tasks.detail_time') }}</span><span class="dv">{{ detail.update_time || '-' }}</span></div>
+            <div class="detail-item full" v-if="detail.input_data"><span class="dl">{{ $t('admin_tasks.detail_params') }}</span><span class="dv"><pre>{{ JSON.stringify(detail.input_data, null, 2) }}</pre></span></div>
+            <div class="detail-item full" v-if="detail.result_data"><span class="dl">{{ $t('admin_tasks.detail_result') }}</span><span class="dv"><pre>{{ JSON.stringify(detail.result_data, null, 2) }}</pre></span></div>
+            <div class="detail-item full" v-if="detail.error_msg"><span class="dl">{{ $t('admin_tasks.detail_error') }}</span><span class="dv error-msg">{{ detail.error_msg }}</span></div>
           </div>
           <div class="modal-actions">
-            <button v-if="detail.status === 3" class="btn-save" @click="retryTask(detail); detailOpen = false">重试任务</button>
-            <button v-if="detail.status === 0 || detail.status === 1" class="btn-danger" @click="cancelTask(detail); detailOpen = false">取消任务</button>
-            <button class="btn-cancel" @click="detailOpen = false">关闭</button>
+            <button v-if="detail.status === 3" class="btn-save" @click="retryTask(detail); detailOpen = false">{{ $t('admin_tasks.retry') }}</button>
+            <button v-if="detail.status === 0 || detail.status === 1" class="btn-danger" @click="cancelTask(detail); detailOpen = false">{{ $t('admin_tasks.cancel') }}</button>
+            <button class="btn-cancel" @click="detailOpen = false">{{ $t('admin_tasks.close_btn') }}</button>
           </div>
         </div>
       </div>
@@ -82,6 +96,7 @@
 
 <script setup lang="ts">
 
+const { t } = useI18n()
 const { confirm } = useConfirm()
 
 import AdminLayout from '~/components/AdminLayout.vue'
@@ -100,8 +115,28 @@ const detail = ref<any>({})
 
 const toast = useToast()
 
-function statusLabel(s: number) { const m: Record<number, string> = { 0: '排队', 1: '处理中', 2: '完成', 3: '失败' }; return m[s] || '未知' }
-function typeLabel(t: string) { const m: Record<string, string> = { image: '图片', video: '视频', batch: '批量', 'main-image': '主图', scene: '场景', 'detail-h5': '详情页' }; return m[t] || t || '-' }
+function statusLabel(s: number) {
+  const m: Record<number, string> = {
+    0: t('admin_tasks.status_queued'),
+    1: t('admin_tasks.status_processing'),
+    2: t('admin_tasks.status_done'),
+    3: t('admin_tasks.status_failed')
+  }
+  return m[s] || t('admin_tasks.status_unknown')
+}
+
+function typeLabel(tp: string) {
+  const m: Record<string, string> = {
+    image: t('admin_tasks.type_image'),
+    video: t('admin_tasks.type_video'),
+    batch: t('admin_tasks.type_batch'),
+    'main-image': t('admin_tasks.type_main_image'),
+    scene: t('admin_tasks.type_scene'),
+    'detail-h5': t('admin_tasks.type_detail_h5')
+  }
+  return m[tp] || tp || '-'
+}
+
 function progress(t: any) { if (t.status === 2) return 100; if (t.status === 3) return 100; if (t.status === 1) return 50; return 0 }
 
 async function fetchData() {
@@ -109,8 +144,8 @@ async function fetchData() {
   try {
     const res: any = await $fetch('/api/admin/tasks', { params: { page: page.value, pageSize, status: status.value, typeGroup: typeGroup.value, userId: userId.value } })
     if (res?.code === 200) { list.value = res.data?.list || []; total.value = res.data?.total || 0 }
-    else { throw new Error(res?.msg || '获取任务列表失败') }
-  } catch (e: any) { error.value = e?.data?.msg || e.message || '加载失败'; toast.error(error.value) } finally { loading.value = false }
+    else { throw new Error(res?.msg || t('admin_tasks.fetch_failed')) }
+  } catch (e: any) { error.value = e?.data?.msg || e.message || t('admin_tasks.load_failed'); toast.error(error.value) } finally { loading.value = false }
 }
 
 function search() { page.value = 1; fetchData() }
@@ -120,18 +155,18 @@ function openDetail(t: any) { detail.value = t; detailOpen.value = true }
 async function retryTask(t: any) {
   try {
     const res: any = await $fetch(`/api/admin/tasks/${t.id}/retry`, { method: 'POST' })
-    if (res?.code === 200) { toast.success('任务已重新提交'); fetchData() }
-    else { toast.error(res?.msg || '重试失败') }
-  } catch (e: any) { toast.error(e?.data?.msg || e.message || '重试失败') }
+    if (res?.code === 200) { toast.success(t('admin_tasks.retry_success')); fetchData() }
+    else { toast.error(res?.msg || t('admin_tasks.retry_failed')) }
+  } catch (e: any) { toast.error(e?.data?.msg || e.message || t('admin_tasks.retry_failed')) }
 }
 
 async function cancelTask(t: any) {
-  if (!await confirm({ message: '确认取消该任务？'} )) return
+  if (!await confirm({ message: t('admin_tasks.confirm_cancel') })) return
   try {
     const res: any = await $fetch(`/api/admin/tasks/${t.id}/cancel`, { method: 'POST' })
-    if (res?.code === 200) { toast.success('任务已取消'); fetchData() }
-    else { toast.error(res?.msg || '取消失败') }
-  } catch (e: any) { toast.error(e?.data?.msg || e.message || '取消失败') }
+    if (res?.code === 200) { toast.success(t('admin_tasks.cancel_success')); fetchData() }
+    else { toast.error(res?.msg || t('admin_tasks.cancel_failed')) }
+  } catch (e: any) { toast.error(e?.data?.msg || e.message || t('admin_tasks.cancel_failed')) }
 }
 
 onMounted(fetchData)
