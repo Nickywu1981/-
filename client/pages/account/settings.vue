@@ -136,7 +136,7 @@ async function sendBindCode() {
   }
   phoneMsg.value = '';
   try {
-    await $fetch('/api/sms/send-code', { method: 'POST', body: { phone: phoneForm.phone, scene: 'bind_phone' } });
+    await $fetch('/api/sms/send-code', { method: 'POST', body: { phone: phoneForm.phone, scene: 'bind' } });
     phoneMsg.value = '验证码已发送'; phoneMsgErr.value = false;
     startCodeCd(60);
   } catch (e: any) { phoneMsg.value = e?.data?.msg || '发送失败'; phoneMsgErr.value = true; }
@@ -146,7 +146,7 @@ async function bindPhone() {
   if (!phoneForm.phone || !phoneForm.code) { phoneMsg.value = '请填写手机号和验证码'; phoneMsgErr.value = true; return; }
   phoneSaving.value = true; phoneMsg.value = '';
   try {
-    const verify: any = await $fetch('/api/sms/verify-code', { method: 'POST', body: { phone: phoneForm.phone, scene: 'bind_phone', code: phoneForm.code } });
+    const verify: any = await $fetch('/api/sms/verify-code', { method: 'POST', body: { phone: phoneForm.phone, scene: 'bind', code: phoneForm.code } });
     if (!verify.data?.valid) { phoneMsg.value = '验证码错误或已过期'; phoneMsgErr.value = true; phoneSaving.value = false; return; }
     await $fetch('/api/user/profile', { method: 'PUT', body: { phone: phoneForm.phone } });
     boundPhone.value = phoneForm.phone;
