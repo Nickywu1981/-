@@ -55,7 +55,7 @@ Image URL: ${imageUrl}`;
 
     const text = result?.text || result?.output?.text || '';
     const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('AI 未返回有效 JSON');
+    if (!jsonMatch) throw new BusinessError(500, 'AI 未返回有效 JSON');
 
     const parsed = JSON.parse(jsonMatch[0]);
     return {
