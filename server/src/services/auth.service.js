@@ -6,6 +6,7 @@ import db from '../dao/db.js';
 import { jwtSecret as JWT_SECRET, jwtExpiresIn as JWT_EXPIRES } from '../config/index.js';
 import * as smsService from './smsService.js';
 import * as emailService from './emailService.js';
+import logger from '../utils/logger.js';
 
 function generateToken(user) {
   return jwt.sign(
@@ -36,6 +37,7 @@ export async function register({ phone, email, password, nickname, inviteCode: _
     const userId = result.insertId;
 
     await conn.commit();
+    logger.info('[Auth] 注册成功', { userId });
 
     const user = { id: userId, role: 'free', nickname: nickname || '', tenantId: 0 };
     const token = generateToken(user);
@@ -76,6 +78,7 @@ export async function login({ phone, email, username, password }) {
     await conn.query('UPDATE `user` SET last_login_time = NOW() WHERE id = ?', [user.id]);
 
     const token = generateToken(user);
+    logger.info('[Auth] 登录成功', { userId: user.id });
     return {
       user: { id: user.id, nickname: user.nickname, role: user.role },
       token,
@@ -131,6 +134,7 @@ export async function loginByCode({ phone, email, username, code }) {
     await conn.query('UPDATE `user` SET last_login_time = NOW() WHERE id = ?', [user.id]);
 
     const token = generateToken(user);
+    logger.info('[Auth] 验证码登录成功', { userId: user.id });
     return {
       user: { id: user.id, nickname: user.nickname, role: user.role },
       token,
@@ -168,6 +172,7 @@ export async function resetPassword({ phone, email, newPassword, code }) {
       const { revokeAllUserTokens } = await import('../utils/jwtToken.js');
       await revokeAllUserTokens(userRow[0].id);
     }
+    logger.info('[Auth] 密码重置成功', { userId: userRow[0]?.id, username });
     return { message: '密码重置成功' };
   } finally {
     conn.release();

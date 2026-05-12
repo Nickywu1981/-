@@ -10,6 +10,7 @@ import { generateRefreshToken } from '../middleware/auth.js';
 import * as authService from '../services/auth.service.js';
 import { revokeAccessToken, revokeRefreshToken } from '../utils/jwtToken.js';
 import { isProduction } from '../config/index.js';
+import logger from '../utils/logger.js';
 
 function setTokenCookie(res, token) {
   const payload = jwt.decode(token);
@@ -70,11 +71,11 @@ export const resetPassword = wrapController(async (req, res) => {
 export const logout = wrapController(async (req, res) => {
   const header = req.headers.authorization;
   if (header?.startsWith('Bearer ')) {
-    try { await revokeAccessToken(header.slice(7)); } catch { /* best-effort */ }
+    try { await revokeAccessToken(header.slice(7)); } catch (e) { logger.warn('[Auth] logout 撤销 accessToken 失败', { error: e.message }); }
   }
   const rt = req.cookies?.refreshToken;
   if (rt) {
-    try { await revokeRefreshToken(rt); } catch { /* best-effort */ }
+    try { await revokeRefreshToken(rt); } catch (e) { logger.warn('[Auth] logout 撤销 refreshToken 失败', { error: e.message }); }
     res.clearCookie('refreshToken', { httpOnly: true, secure: isProduction, sameSite: 'lax', path: '/' });
   }
   res.clearCookie('token', { httpOnly: true, secure: isProduction, sameSite: 'lax', path: '/' });
