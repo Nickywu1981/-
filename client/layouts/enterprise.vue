@@ -13,7 +13,7 @@
         <div class="ent-brand-icon">E</div>
         <div class="ent-brand-text">
           <div class="ent-brand-name">{{ entName || $t('enterprise.nav.pageTitle') }}</div>
-          <div class="ent-brand-sub">Enterprise Console</div>
+          <div class="ent-brand-sub">{{ $t('enterprise.nav.brand_subtitle') }}</div>
         </div>
       </div>
 
@@ -46,7 +46,7 @@
     <!-- 右侧主区域 -->
     <div class="ent-body">
       <header class="ent-topbar">
-        <button class="ent-hamburger" @click="mobileOpen = !mobileOpen" aria-label="打开菜单" :aria-expanded="mobileOpen">
+        <button class="ent-hamburger" @click="mobileOpen = !mobileOpen" :aria-label="$t('enterprise.nav.open_menu')" :aria-expanded="mobileOpen">
           <span /><span /><span />
         </button>
         <h2 class="ent-title">{{ pageTitle }}</h2>

@@ -4,13 +4,13 @@
 -->
 <template>
   <AdminShell
-    brand-name="Movio 代理"
-    brand-subtitle="Agent Portal"
+    :brand-name="$t('agent_portal.brand_name')"
+    :brand-subtitle="$t('agent_portal.brand_subtitle')"
     accent-color="#10b981"
     :nav-groups="navGroups"
     :breadcrumbs="breadcrumbs"
     back-route="/workspace"
-    back-label="返回工作台"
+    :back-label="$t('agent_portal.back_label')"
     @logout="handleLogout"
   >
     <slot />
@@ -22,33 +22,33 @@ const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
 
-const navGroups = reactive([
-  { key: 'main', icon: '📊', label: '数据总览', open: true,
-    items: [{ key: 'dashboard', label: '代理看板', route: '/agent/dashboard' }] },
-  { key: 'biz', icon: '🤝', label: '业务管理', open: true,
+const navGroups = computed(() => [
+  { key: 'main', icon: '📊', label: t('agent_portal.nav_main'), open: true,
+    items: [{ key: 'dashboard', label: t('agent_portal.agent_dashboard'), route: '/agent/dashboard' }] },
+  { key: 'biz', icon: '🤝', label: t('agent_portal.nav_biz'), open: true,
     items: [
-      { key: 'distribution', label: '分销管理', route: '/agent/distribution' },
-      { key: 'customers', label: '客户管理', route: '/agent/customers' },
-      { key: 'orders', label: '订单管理', route: '/agent/orders' },
+      { key: 'distribution', label: t('agent_portal.distribution'), route: '/agent/distribution' },
+      { key: 'customers', label: t('agent_portal.customers'), route: '/agent/customers' },
+      { key: 'orders', label: t('agent_portal.orders'), route: '/agent/orders' },
     ]},
-  { key: 'finance', icon: '💰', label: '财务管理', open: true,
+  { key: 'finance', icon: '💰', label: t('agent_portal.nav_finance'), open: true,
     items: [
-      { key: 'commission', label: '佣金明细', route: '/agent/commission' },
-      { key: 'withdraw', label: '提现管理', route: '/agent/withdraw' },
+      { key: 'commission', label: t('agent_portal.commission'), route: '/agent/commission' },
+      { key: 'withdraw', label: t('agent_portal.withdraw'), route: '/agent/withdraw' },
     ]},
-  { key: 'content', icon: '🎨', label: '素材中心', open: false,
+  { key: 'content', icon: '🎨', label: t('agent_portal.nav_content'), open: false,
     items: [
-      { key: 'materials', label: '营销素材', route: '/agent/materials' },
-      { key: 'templates', label: '模板管理', route: '/agent/templates' },
+      { key: 'materials', label: t('agent_portal.materials'), route: '/agent/materials' },
+      { key: 'templates', label: t('agent_portal.templates'), route: '/agent/templates' },
     ]},
-  { key: 'settings', icon: '⚙️', label: '设置', open: false,
+  { key: 'settings', icon: '⚙️', label: t('agent_portal.nav_settings'), open: false,
     items: [
-      { key: 'profile', label: '代理资料', route: '/agent/profile' },
-      { key: 'team', label: '团队管理', route: '/agent/team' },
+      { key: 'profile', label: t('agent_portal.profile'), route: '/agent/profile' },
+      { key: 'team', label: t('agent_portal.team'), route: '/agent/team' },
     ]},
 ])
 
-const breadcrumbs = useAdminBreadcrumbs(navGroups, '代理端', '/agent/dashboard')
+const breadcrumbs = computed(() => useAdminBreadcrumbs(navGroups.value, t('agent_portal.page_title'), '/agent/dashboard'))
 
 const { logout: handleLogout } = useLogout()
 

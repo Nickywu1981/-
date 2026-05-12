@@ -1448,7 +1448,9 @@
       "whitelabel": "白标设置",
       "enterpriseSettings": "企业设置",
       "pageTitle": "企业中心",
-      "loadProfileFailed": "加载企业信息失败"
+      "loadProfileFailed": "加载企业信息失败",
+      "brand_subtitle": "Enterprise Console",
+      "open_menu": "打开菜单"
     }
   },
   "tier": {

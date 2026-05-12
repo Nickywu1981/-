@@ -4,13 +4,13 @@
 -->
 <template>
   <AdminShell
-    brand-name="Movio 网关"
-    brand-subtitle="Gateway Console"
+    :brand-name="$t('gateway_admin.brand_name')"
+    :brand-subtitle="$t('gateway_admin.brand_subtitle')"
     accent-color="#f59e0b"
     :nav-groups="navGroups"
     :breadcrumbs="breadcrumbs"
     back-route="/admin/dashboard"
-    back-label="返回总后台"
+    :back-label="$t('gateway_admin.back_label')"
     @logout="handleLogout"
   >
     <slot />
@@ -20,41 +20,42 @@
 <script setup lang="ts">
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 
-const navGroups = reactive([
-  { key: 'overview', icon: '📊', label: '网关总览', open: true,
-    items: [{ key: 'dashboard', label: '网关看板', route: '/gateway/dashboard' }] },
-  { key: 'routes', icon: '🔀', label: '路由管理', open: true,
+const navGroups = computed(() => [
+  { key: 'overview', icon: '📊', label: t('gateway_admin.nav_overview'), open: true,
+    items: [{ key: 'dashboard', label: t('gateway_admin.gw_dashboard'), route: '/gateway/dashboard' }] },
+  { key: 'routes', icon: '🔀', label: t('gateway_admin.nav_routes'), open: true,
     items: [
-      { key: 'routes', label: '路由配置', route: '/gateway/routes' },
-      { key: 'upstream', label: '上游服务', route: '/gateway/upstream' },
-      { key: 'services', label: '服务发现', route: '/gateway/services' },
+      { key: 'routes', label: t('gateway_admin.route_config'), route: '/gateway/routes' },
+      { key: 'upstream', label: t('gateway_admin.upstream'), route: '/gateway/upstream' },
+      { key: 'services', label: t('gateway_admin.services'), route: '/gateway/services' },
     ]},
-  { key: 'traffic', icon: '⚡', label: '流量控制', open: false,
+  { key: 'traffic', icon: '⚡', label: t('gateway_admin.nav_traffic'), open: false,
     items: [
-      { key: 'rate-limit', label: '限流规则', route: '/gateway/rate-limit' },
-      { key: 'circuit-breaker', label: '熔断降级', route: '/gateway/circuit-breaker' },
-      { key: 'load-balance', label: '负载均衡', route: '/gateway/load-balance' },
+      { key: 'rate-limit', label: t('gateway_admin.rate_limit'), route: '/gateway/rate-limit' },
+      { key: 'circuit-breaker', label: t('gateway_admin.circuit_breaker'), route: '/gateway/circuit-breaker' },
+      { key: 'load-balance', label: t('gateway_admin.load_balance'), route: '/gateway/load-balance' },
     ]},
-  { key: 'security', icon: '🔐', label: '安全防护', open: false,
+  { key: 'security', icon: '🔐', label: t('gateway_admin.nav_security'), open: false,
     items: [
-      { key: 'auth-config', label: '认证配置', route: '/gateway/auth-config' },
-      { key: 'ip-block', label: 'IP 黑白名单', route: '/gateway/ip-block' },
-      { key: 'waf', label: 'WAF 策略', route: '/gateway/waf' },
+      { key: 'auth-config', label: t('gateway_admin.auth_config'), route: '/gateway/auth-config' },
+      { key: 'ip-block', label: t('gateway_admin.ip_block'), route: '/gateway/ip-block' },
+      { key: 'waf', label: t('gateway_admin.waf'), route: '/gateway/waf' },
     ]},
-  { key: 'monitor', icon: '📈', label: '监控告警', open: false,
+  { key: 'monitor', icon: '📈', label: t('gateway_admin.nav_monitor'), open: false,
     items: [
-      { key: 'metrics', label: '实时指标', route: '/gateway/metrics' },
-      { key: 'alerts', label: '告警规则', route: '/gateway/alerts' },
+      { key: 'metrics', label: t('gateway_admin.metrics'), route: '/gateway/metrics' },
+      { key: 'alerts', label: t('gateway_admin.alerts'), route: '/gateway/alerts' },
     ]},
-  { key: 'logs', icon: '📝', label: '日志审计', open: false,
+  { key: 'logs', icon: '📝', label: t('gateway_admin.nav_logs'), open: false,
     items: [
-      { key: 'access-log', label: '访问日志', route: '/gateway/access-log' },
-      { key: 'error-log', label: '错误日志', route: '/gateway/error-log' },
+      { key: 'access-log', label: t('gateway_admin.access_log'), route: '/gateway/access-log' },
+      { key: 'error-log', label: t('gateway_admin.error_log'), route: '/gateway/error-log' },
     ]},
 ])
 
-const breadcrumbs = useAdminBreadcrumbs(navGroups, '网关中台', '/gateway/dashboard')
+const breadcrumbs = computed(() => useAdminBreadcrumbs(navGroups.value, t('gateway_admin.page_title'), '/gateway/dashboard'))
 
 const { logout: handleLogout } = useLogout()
 </script>

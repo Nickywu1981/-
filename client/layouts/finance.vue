@@ -4,13 +4,13 @@
 -->
 <template>
   <AdminShell
-    brand-name="Movio 财务"
-    brand-subtitle="Finance Console"
+    :brand-name="$t('finance_admin.brand_name')"
+    :brand-subtitle="$t('finance_admin.brand_subtitle')"
     accent-color="#10b981"
     :nav-groups="navGroups"
     :breadcrumbs="breadcrumbs"
     back-route="/admin/dashboard"
-    back-label="返回总后台"
+    :back-label="$t('finance_admin.back_label')"
     @logout="handleLogout"
   >
     <slot />
@@ -20,41 +20,42 @@
 <script setup lang="ts">
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 
-const navGroups = reactive([
-  { key: 'overview', icon: '📊', label: '财务总览', open: true,
-    items: [{ key: 'dashboard', label: '财务看板', route: '/finance/dashboard' }] },
-  { key: 'transactions', icon: '💳', label: '交易管理', open: true,
+const navGroups = computed(() => [
+  { key: 'overview', icon: '📊', label: t('finance_admin.nav_overview'), open: true,
+    items: [{ key: 'dashboard', label: t('finance_admin.finance_dashboard'), route: '/finance/dashboard' }] },
+  { key: 'transactions', icon: '💳', label: t('finance_admin.nav_transactions'), open: true,
     items: [
-      { key: 'orders', label: '订单流水', route: '/finance/orders' },
-      { key: 'recharge', label: '充值记录', route: '/finance/recharge' },
-      { key: 'refunds', label: '退款管理', route: '/finance/refunds' },
+      { key: 'orders', label: t('finance_admin.orders'), route: '/finance/orders' },
+      { key: 'recharge', label: t('finance_admin.recharge_records'), route: '/finance/recharge' },
+      { key: 'refunds', label: t('finance_admin.refunds'), route: '/finance/refunds' },
     ]},
-  { key: 'billing', icon: '🧾', label: '账单结算', open: false,
+  { key: 'billing', icon: '🧾', label: t('finance_admin.nav_billing'), open: false,
     items: [
-      { key: 'invoices', label: '发票管理', route: '/finance/invoices' },
-      { key: 'settlement', label: '商家结算', route: '/finance/settlement' },
+      { key: 'invoices', label: t('finance_admin.invoices'), route: '/finance/invoices' },
+      { key: 'settlement', label: t('finance_admin.settlement'), route: '/finance/settlement' },
     ]},
-  { key: 'commission', icon: '💰', label: '分佣管理', open: false,
+  { key: 'commission', icon: '💰', label: t('finance_admin.nav_commission'), open: false,
     items: [
-      { key: 'commission-rules', label: '分佣规则', route: '/finance/commission-rules' },
-      { key: 'commission-detail', label: '分佣明细', route: '/finance/commission-detail' },
-      { key: 'payout', label: '打款管理', route: '/finance/payout' },
+      { key: 'commission-rules', label: t('finance_admin.commission_rules'), route: '/finance/commission-rules' },
+      { key: 'commission-detail', label: t('finance_admin.commission_detail'), route: '/finance/commission-detail' },
+      { key: 'payout', label: t('finance_admin.payout'), route: '/finance/payout' },
     ]},
-  { key: 'tax', icon: '📋', label: '税务管理', open: false,
+  { key: 'tax', icon: '📋', label: t('finance_admin.nav_tax'), open: false,
     items: [
-      { key: 'tax-rates', label: '税率配置', route: '/finance/tax-rates' },
-      { key: 'tax-reports', label: '税务报表', route: '/finance/tax-reports' },
+      { key: 'tax-rates', label: t('finance_admin.tax_rates'), route: '/finance/tax-rates' },
+      { key: 'tax-reports', label: t('finance_admin.tax_reports'), route: '/finance/tax-reports' },
     ]},
-  { key: 'reports', icon: '📈', label: '财务报表', open: false,
+  { key: 'reports', icon: '📈', label: t('finance_admin.nav_reports'), open: false,
     items: [
-      { key: 'income-statement', label: '收支报表', route: '/finance/income-statement' },
-      { key: 'revenue-trend', label: '收入趋势', route: '/finance/revenue-trend' },
-      { key: 'export', label: '报表导出', route: '/finance/export' },
+      { key: 'income-statement', label: t('finance_admin.income_statement'), route: '/finance/income-statement' },
+      { key: 'revenue-trend', label: t('finance_admin.revenue_trend'), route: '/finance/revenue-trend' },
+      { key: 'export', label: t('finance_admin.export'), route: '/finance/export' },
     ]},
 ])
 
-const breadcrumbs = useAdminBreadcrumbs(navGroups, '财务后台', '/finance/dashboard')
+const breadcrumbs = computed(() => useAdminBreadcrumbs(navGroups.value, t('finance_admin.page_title'), '/finance/dashboard'))
 
 const { logout: handleLogout } = useLogout()
 </script>
