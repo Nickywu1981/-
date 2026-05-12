@@ -175,7 +175,7 @@ export default {
 
   // ── 数据清理 ──
   async getFormsWithRetention() {
-    const [rows] = await pool.query('SELECT id, data_retention_days FROM custom_form WHERE data_retention_days > 0');
+    const [rows] = await pool.query('SELECT id, data_retention_days FROM custom_form WHERE data_retention_days > 0 LIMIT 500');
     return rows;
   },
 

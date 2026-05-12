@@ -15,7 +15,7 @@ export async function getChannelDetail(tenantId, id) {
 }
 
 export async function applyChannel(tenantId, { agentCode }) {
-  const [parentRows] = await pool.query('SELECT id FROM tenant WHERE agent_code = ? AND status = 1', [agentCode]);
+  const [parentRows] = await pool.query('SELECT id FROM tenant WHERE agent_code = ? AND status = 1 LIMIT 1', [agentCode]);
   if (!parentRows.length) throw new BusinessError(404, '邀请码无效');
 
   const parentId = parentRows[0].id;

@@ -9,7 +9,7 @@ export const listAll = async () => {
 };
 
 export const getById = async (id) => {
-  const [rows] = await pool.query(`SELECT ${COLS} FROM ${table} WHERE id = ?`, [id]);
+  const [rows] = await pool.query(`SELECT ${COLS} FROM ${table} WHERE id = ? LIMIT 1`, [id]);
   return rows[0] || null;
 };
 
