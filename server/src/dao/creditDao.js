@@ -44,12 +44,12 @@ export async function listActivePlans() {
 // ==================== 幂等日志 ====================
 
 export async function getRequestLog(requestId) {
-  const [rows] = await pool.execute('SELECT id, request_id, user_id, action, credit_amount, status, remark, create_time FROM credit_request_log WHERE request_id = ?', [requestId]);
+  const [rows] = await pool.execute('SELECT id, request_id, user_id, action, credit_amount, status, remark, create_time FROM credit_request_log WHERE request_id = ? LIMIT 1', [requestId]);
   return rows[0] || null;
 }
 
 export async function getRequestLogForUpdate(conn, requestId) {
-  const [rows] = await conn.execute('SELECT id, request_id, user_id, action, credit_amount, status, remark, create_time FROM credit_request_log WHERE request_id = ? FOR UPDATE', [requestId]);
+  const [rows] = await conn.execute('SELECT id, request_id, user_id, action, credit_amount, status, remark, create_time FROM credit_request_log WHERE request_id = ? FOR UPDATE LIMIT 1', [requestId]);
   return rows[0] || null;
 }
 
@@ -181,7 +181,7 @@ export async function insertMembership(userId, planType, trialQuota) {
 export async function getCheckInByDate(userId, date, conn) {
   const db = conn || pool;
   const [rows] = await db.execute(
-    'SELECT id, streak FROM check_ins WHERE user_id = ? AND check_date = ?',
+    'SELECT id, streak FROM check_ins WHERE user_id = ? AND check_date = ? LIMIT 1',
     [userId, date],
   );
   return rows[0] || null;

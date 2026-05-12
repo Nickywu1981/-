@@ -177,7 +177,7 @@ const previewCards = computed(() =>
 async function loadAll() {
   loading.value = true
   try {
-    const res = await $fetch('/api/admin/workspace-diy')
+    const res = await $fetch('/api/admin/workspace-diy', { credentials: 'include' })
     const d = res.data || res
     const cfg = d.config || d
     navItems.value = tryParse(cfg.workspace_nav) || []
@@ -212,7 +212,7 @@ async function resetKey(key: string) {
   })
   if (!ok) return
   try {
-    await $fetch(`/api/admin/workspace-diy/reset/${key}`, { method: 'POST' })
+    await $fetch(`/api/admin/workspace-diy/reset/${key}`, { method: 'POST', credentials: 'include' })
     ElMessage.success(t('admin_workspace_diy.reset_success', { key }))
     await loadAll()
   } catch (err: any) {
@@ -263,6 +263,7 @@ async function saveKey(key: string, value: any[]) {
   await $fetch(`/api/admin/workspace-diy/${key}`, {
     method: 'PUT',
     body: { config_value: value, description: '' },
+    credentials: 'include',
   })
 }
 
@@ -284,7 +285,7 @@ onMounted(loadAll)
 }
 .diy-header p {
   margin: 0 0 12px;
-  color: #909399;
+  color: var(--text-secondary, #909399);
 }
 .diy-actions {
   display: flex;
@@ -303,20 +304,20 @@ onMounted(loadAll)
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 .item-row:hover {
-  border-color: #409eff;
-  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.12);
+  border-color: var(--brand, #409eff);
+  box-shadow: 0 2px 8px rgba(91, 95, 227, 0.12);
 }
 .item-row.hidden {
   opacity: 0.45;
 }
 .item-row.dimmed {
   opacity: 0.55;
-  background: #f5f7fa;
+  background: var(--fill-color-light, #f5f7fa);
 }
 .drag-handle {
   cursor: grab;
   font-size: 18px;
-  color: #c0c4cc;
+  color: var(--border-color, #c0c4cc);
   user-select: none;
 }
 .drag-handle:active {
@@ -325,7 +326,7 @@ onMounted(loadAll)
 .item-order {
   width: 22px;
   text-align: center;
-  color: #909399;
+  color: var(--text-secondary, #909399);
   font-size: 13px;
   font-weight: 600;
 }
@@ -333,7 +334,7 @@ onMounted(loadAll)
 .empty-hint {
   text-align: center;
   padding: 40px 20px;
-  color: #909399;
+  color: var(--text-secondary, #909399);
 }
 .empty-hint p {
   margin: 0 0 12px;
@@ -347,9 +348,9 @@ onMounted(loadAll)
 .preview-panel {
   margin-bottom: 20px;
   padding: 16px;
-  border: 1px dashed #409eff;
+  border: 1px dashed var(--brand, #409eff);
   border-radius: 8px;
-  background: #f0f7ff;
+  background: var(--color-brand-50, #f0f7ff);
 }
 .preview-grid {
   display: grid;
@@ -374,11 +375,11 @@ onMounted(loadAll)
 }
 .preview-card small {
   font-size: 12px;
-  color: #909399;
+  color: var(--text-secondary, #909399);
 }
 .preview-card code {
   font-size: 11px;
-  color: #409eff;
+  color: var(--brand, #409eff);
   word-break: break-all;
 }
 

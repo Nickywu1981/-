@@ -3,7 +3,7 @@
  *
  * Phase 1: 企业/代理端 MVP (2026-05-11)
  */
-import pool from '../dao/db.js';
+import pool from './db.js';
 import { parsePagination } from '../utils/pagination.js';
 
 const TABLE = {

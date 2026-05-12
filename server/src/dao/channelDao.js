@@ -52,7 +52,7 @@ export async function findRelationsByTenant(tenantId, { page = 1, pageSize = 20,
 export async function findRelationById(id) {
   const [rows] = await pool.query(
     `SELECT cr.*, t.name AS child_name, t.code AS child_code
-     FROM ?? cr JOIN ?? t ON cr.child_tenant_id = t.id WHERE cr.id = ?`,
+     FROM ?? cr JOIN ?? t ON cr.child_tenant_id = t.id WHERE cr.id = ? LIMIT 1`,
     [TABLE.RELATION, TABLE.TENANT, id],
   );
   return rows[0] || null;

@@ -1,16 +1,16 @@
 <template>
   <AdminLayout>
-    <h2 class="ptitle">营销标签管理</h2>
+    <h2 class="ptitle">{{ $t('admin_badges.page_title') }}</h2>
 
     <div class="toolbar">
       <select v-model="filterCategory" class="sel" @change="fetchData">
-        <option value="">全部分类</option>
-        <option value="sales">销售类</option>
-        <option value="promotion">促销类</option>
-        <option value="trust">信任类</option>
-        <option value="cross_border">跨境类</option>
+        <option value="">{{ $t('admin_badges.all_categories') }}</option>
+        <option value="sales">{{ $t('admin_badges.category_sales') }}</option>
+        <option value="promotion">{{ $t('admin_badges.category_promotion') }}</option>
+        <option value="trust">{{ $t('admin_badges.category_trust') }}</option>
+        <option value="cross_border">{{ $t('admin_badges.category_cross_border') }}</option>
       </select>
-      <button class="btn btn-primary" @click="openCreate">+ 新建标签</button>
+      <button class="btn btn-primary" @click="openCreate">{{ $t('admin_badges.new_badge') }}</button>
     </div>
 
     <LoadingSkeleton v-if="loading" type="table" :rows="5" :cols="6" />
@@ -18,7 +18,7 @@
     <div class="table-wrap" v-else-if="list.length">
     <table class="table">
       <thead>
-        <tr><th>ID</th><th>图标</th><th>名称</th><th>颜色</th><th>分类</th><th>状态</th><th>排序</th><th>操作</th></tr>
+        <tr><th>{{ $t('common.id') }}</th><th>{{ $t('admin_badges.col_icon') }}</th><th>{{ $t('admin_badges.col_name') }}</th><th>{{ $t('admin_badges.col_color') }}</th><th>{{ $t('admin_badges.col_category') }}</th><th>{{ $t('common.status') }}</th><th>{{ $t('admin_badges.col_sort') }}</th><th>{{ $t('common.action') }}</th></tr>
       </thead>
       <tbody>
         <tr v-for="b in list" :key="b.id">
@@ -27,12 +27,12 @@
           <td>{{ b.name }}</td>
           <td><span class="color-swatch" :style="{ background: b.color }" />{{ b.color }}</td>
           <td><span class="category-tag">{{ categoryLabel(b.category) }}</span></td>
-          <td><span class="status-dot" :class="b.status === 1 ? 'on' : 'off'" />{{ b.status === 1 ? '启用' : '停用' }}</td>
+          <td><span class="status-dot" :class="b.status === 1 ? 'on' : 'off'" />{{ b.status === 1 ? $t('common.enable') : $t('common.disable') }}</td>
           <td>{{ b.sort_order }}</td>
           <td class="actions">
-            <button class="btn-sm" @click="openEdit(b)">编辑</button>
-            <button class="btn-sm" :class="b.status === 1 ? 'warn' : 'success'" @click="toggleStatus(b)">{{ b.status === 1 ? '停用' : '启用' }}</button>
-            <button class="btn-sm danger" @click="confirmDelete(b)">删除</button>
+            <button class="btn-sm" @click="openEdit(b)">{{ $t('admin_badges.edit') }}</button>
+            <button class="btn-sm" :class="b.status === 1 ? 'warn' : 'success'" @click="toggleStatus(b)">{{ b.status === 1 ? $t('admin_badges.disable') : $t('admin_badges.enable') }}</button>
+            <button class="btn-sm danger" @click="confirmDelete(b)">{{ $t('admin_badges.delete') }}</button>
           </td>
         </tr>
       </tbody>
@@ -41,54 +41,54 @@
 
     <Pagination v-if="total > pageSize" :page="page" :page-size="pageSize" :total="total" @change="onPageChange" />
 
-    <div v-if="!list.length && !loading" class="empty">暂无标签数据</div>
+    <div v-if="!list.length && !loading" class="empty">{{ $t('admin_badges.empty') }}</div>
 
     <Teleport to="body">
       <div class="modal-overlay" v-if="showModal" @click.self="showModal = false">
         <div class="modal">
-          <h3>{{ editing.id ? '编辑标签' : '新建标签' }}</h3>
+          <h3>{{ editing.id ? $t('admin_badges.edit_modal') : $t('admin_badges.create_modal') }}</h3>
           <div class="form-row">
             <div class="form-group">
-              <label>名称</label>
-              <input v-model="form.name" maxlength="100" type="text" placeholder="如：热卖爆款" />
+              <label>{{ $t('admin_badges.label_name') }}</label>
+              <input v-model="form.name" maxlength="100" type="text" :placeholder="$t('admin_badges.name_placeholder')" />
             </div>
             <div class="form-group">
-              <label>图标代码</label>
-              <input v-model="form.icon" maxlength="50" type="text" placeholder="如：fire, star, discount" />
+              <label>{{ $t('admin_badges.label_icon_code') }}</label>
+              <input v-model="form.icon" maxlength="50" type="text" :placeholder="$t('admin_badges.icon_placeholder')" />
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>颜色</label>
+              <label>{{ $t('admin_badges.label_color') }}</label>
               <input v-model="form.color" type="color" />
             </div>
             <div class="form-group">
-              <label>分类</label>
+              <label>{{ $t('admin_badges.label_category') }}</label>
               <select v-model="form.category" class="sel">
-                <option value="">请选择分类</option>
-                <option value="sales">销售类</option>
-                <option value="promotion">促销类</option>
-                <option value="trust">信任类</option>
-                <option value="cross_border">跨境类</option>
+                <option value="">{{ $t('admin_badges.select_category') }}</option>
+                <option value="sales">{{ $t('admin_badges.category_sales') }}</option>
+                <option value="promotion">{{ $t('admin_badges.category_promotion') }}</option>
+                <option value="trust">{{ $t('admin_badges.category_trust') }}</option>
+                <option value="cross_border">{{ $t('admin_badges.category_cross_border') }}</option>
               </select>
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>描述</label>
-              <input v-model="form.description" maxlength="500" type="text" placeholder="简短说明" />
+              <label>{{ $t('admin_badges.label_desc') }}</label>
+              <input v-model="form.description" maxlength="500" type="text" :placeholder="$t('admin_badges.desc_placeholder')" />
             </div>
             <div class="form-group">
-              <label>排序</label>
-              <input v-model.number="form.sortOrder" type="number" placeholder="数字越大越靠前" />
+              <label>{{ $t('admin_badges.label_sort') }}</label>
+              <input v-model.number="form.sortOrder" type="number" :placeholder="$t('admin_badges.sort_placeholder')" />
             </div>
           </div>
           <div class="form-group">
-            <label><input v-model="form.status" type="checkbox" :true-value="1" :false-value="0" /> 启用</label>
+            <label><input v-model="form.status" type="checkbox" :true-value="1" :false-value="0" /> {{ $t('admin_badges.label_enable') }}</label>
           </div>
           <div class="modal-actions">
-            <button class="btn" @click="showModal = false">取消</button>
-            <button class="btn btn-primary" @click="save">保存</button>
+            <button class="btn" @click="showModal = false">{{ $t('common.cancel') }}</button>
+            <button class="btn btn-primary" @click="save">{{ $t('common.save') }}</button>
           </div>
         </div>
       </div>
@@ -98,6 +98,7 @@
 
 <script setup lang="ts">
 
+const { t } = useI18n()
 const { confirm } = useConfirm()
 
 const toast = useToast()
@@ -132,7 +133,7 @@ async function fetchData() {
     list.value = body?.list || body || [];
     if (!Array.isArray(list.value)) list.value = [];
     total.value = body?.total || 0;
-  } catch (e: any) { toast.error(e?.data?.msg || e?.message || '加载失败') } finally { loading.value = false; }
+  } catch (e: any) { toast.error(e?.data?.msg || e?.message || t('common.loadFail')) } finally { loading.value = false; }
 
 }
 
@@ -171,7 +172,7 @@ async function save() {
     }
     showModal.value = false;
     fetchData();
-  } catch (e: any) { toast.error('保存失败: ' + (e?.data?.msg || e.message || '网络错误')); }
+  } catch (e: any) { toast.error(t('admin_badges.save_failed', { msg: e?.data?.msg || e.message || t('admin_badges.network_error') })); }
 }
 
 async function toggleStatus(b: any) {
@@ -182,22 +183,27 @@ async function toggleStatus(b: any) {
       body: JSON.stringify({ status: b.status === 1 ? 0 : 1 }),
     });
     fetchData();
-  } catch (e: any) { toast.error('操作失败: ' + (e?.data?.msg || e.message || '网络错误')); }
+  } catch (e: any) { toast.error(t('admin_badges.op_failed', { msg: e?.data?.msg || e.message || t('admin_badges.network_error') })); }
 }
 
 async function confirmDelete(b: any) {
-  if (!await confirm({ message: `确认删除「${b.name}」？` })) return;
+  if (!await confirm({ message: t('admin_badges.confirm_delete', { name: b.name }) })) return;
   try {
     await $fetch(`/api/badges/admin/${b.id}`, {
       method: 'DELETE',
       credentials: 'include',
     });
     fetchData();
-  } catch (e: any) { toast.error('删除失败: ' + (e?.data?.msg || e.message || '网络错误')); }
+  } catch (e: any) { toast.error(t('admin_badges.delete_failed', { msg: e?.data?.msg || e.message || t('admin_badges.network_error') })); }
 }
 
 function categoryLabel(c: string) {
-  const map: Record<string, string> = { sales: '销售类', promotion: '促销类', trust: '信任类', cross_border: '跨境类' };
+  const map: Record<string, string> = {
+    sales: t('admin_badges.category_sales'),
+    promotion: t('admin_badges.category_promotion'),
+    trust: t('admin_badges.category_trust'),
+    cross_border: t('admin_badges.category_cross_border'),
+  };
   return map[c] || c;
 }
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })

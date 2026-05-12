@@ -1,24 +1,24 @@
 <template>
   <AdminLayout>
     <div class="page-header">
-      <h1>充值订单</h1>
+      <h1>{{ $t('admin_recharge.page_title') }}</h1>
     </div>
 
     <div class="toolbar">
-      <input v-model="keyword" type="text" maxlength="100" placeholder="搜索订单号" @keyup.enter="search" />
+      <input v-model="keyword" type="text" maxlength="100" :placeholder="$t('admin_recharge.search_placeholder')" @keyup.enter="search" />
       <select v-model="filterStatus" class="sel" @change="search">
-        <option value="">全部状态</option>
-        <option value="0">待支付</option>
-        <option value="1">支付成功</option>
-        <option value="2">支付失败</option>
-        <option value="3">已退款</option>
+        <option value="">{{ $t('admin_recharge.all_statuses') }}</option>
+        <option value="0">{{ $t('admin_recharge.status_pending') }}</option>
+        <option value="1">{{ $t('admin_recharge.status_success') }}</option>
+        <option value="2">{{ $t('admin_recharge.status_failed') }}</option>
+        <option value="3">{{ $t('admin_recharge.status_refunded') }}</option>
       </select>
       <select v-model="filterChannel" class="sel" @change="search">
-        <option value="">全部渠道</option>
-        <option value="wechat">微信</option>
-        <option value="alipay">支付宝</option>
+        <option value="">{{ $t('admin_recharge.all_channels') }}</option>
+        <option value="wechat">{{ $t('admin_recharge.channel_wechat') }}</option>
+        <option value="alipay">{{ $t('admin_recharge.channel_alipay') }}</option>
       </select>
-      <button class="btn" @click="search">搜索</button>
+      <button class="btn" @click="search">{{ $t('common.search') }}</button>
     </div>
 
     <LoadingSkeleton v-if="loading" type="table" :rows="5" :cols="7" />
@@ -26,22 +26,22 @@
     <div v-else-if="error" class="error-state">
       <span class="error-icon">⚠️</span>
       <p>{{ error }}</p>
-      <button class="retry-btn" @click="fetchData">重试</button>
+      <button class="retry-btn" @click="fetchData">{{ $t('common.retry') }}</button>
     </div>
 
     <template v-else-if="list.length">
       <div class="table-wrap">
         <table>
-          <thead><tr><th>订单号</th><th>金额</th><th>虾币</th><th>渠道</th><th>支付状态</th><th>支付时间</th><th>操作</th></tr></thead>
+          <thead><tr><th>{{ $t('admin_recharge.col_order_no') }}</th><th>{{ $t('admin_recharge.col_amount') }}</th><th>{{ $t('admin_recharge.col_coin') }}</th><th>{{ $t('admin_recharge.col_channel') }}</th><th>{{ $t('admin_recharge.col_pay_status') }}</th><th>{{ $t('admin_recharge.col_pay_time') }}</th><th>{{ $t('common.action') }}</th></tr></thead>
           <tbody>
             <tr v-for="o in list" :key="o.id">
               <td>{{ o.order_no }}</td><td>¥{{ o.amount }}</td><td>{{ o.coin_amount }}</td>
-              <td>{{ o.pay_channel === 'wechat' ? '微信' : o.pay_channel === 'alipay' ? '支付宝' : o.pay_channel || '-' }}</td>
+              <td>{{ channelLabel(o.pay_channel) }}</td>
               <td><span :class="statusClass(o.pay_status)">{{ statusText(o.pay_status) }}</span></td>
               <td>{{ o.pay_time || '-' }}</td>
               <td class="actions">
-                <button v-if="o.pay_status===1" class="btn-sm danger" @click="refund(o)">退款</button>
-                <button class="btn-sm" @click="openDetail(o)">详情</button>
+                <button v-if="o.pay_status===1" class="btn-sm danger" @click="refund(o)">{{ $t('admin_recharge.refund') }}</button>
+                <button class="btn-sm" @click="openDetail(o)">{{ $t('admin_recharge.detail') }}</button>
               </td>
             </tr>
           </tbody>
@@ -49,25 +49,25 @@
       </div>
       <Pagination :page="page" :page-size="pageSize" :total="total" @change="onPageChange" />
     </template>
-    <div v-else class="empty">暂无充值订单</div>
+    <div v-else class="empty">{{ $t('admin_recharge.empty') }}</div>
 
     <Teleport to="body">
       <div v-if="detailOpen" class="modal-overlay" @click.self="detailOpen = false">
         <div class="modal">
-          <h3>订单详情</h3>
+          <h3>{{ $t('admin_recharge.detail_title') }}</h3>
           <div class="detail-grid">
-            <div class="detail-item"><span class="dl">订单号</span><span class="dv mono">{{ detail.order_no }}</span></div>
-            <div class="detail-item"><span class="dl">金额</span><span class="dv">¥{{ detail.amount }}</span></div>
-            <div class="detail-item"><span class="dl">虾币</span><span class="dv">{{ detail.coin_amount }}</span></div>
-            <div class="detail-item"><span class="dl">渠道</span><span class="dv">{{ detail.pay_channel === 'wechat' ? '微信' : detail.pay_channel === 'alipay' ? '支付宝' : detail.pay_channel || '-' }}</span></div>
-            <div class="detail-item"><span class="dl">支付状态</span><span class="dv"><span :class="statusClass(detail.pay_status)">{{ statusText(detail.pay_status) }}</span></span></div>
-            <div class="detail-item"><span class="dl">支付时间</span><span class="dv">{{ detail.pay_time || '-' }}</span></div>
-            <div class="detail-item"><span class="dl">创建时间</span><span class="dv">{{ detail.create_time || '-' }}</span></div>
-            <div class="detail-item"><span class="dl">用户ID</span><span class="dv">{{ detail.user_id || '-' }}</span></div>
+            <div class="detail-item"><span class="dl">{{ $t('admin_recharge.label_order_no') }}</span><span class="dv mono">{{ detail.order_no }}</span></div>
+            <div class="detail-item"><span class="dl">{{ $t('admin_recharge.label_amount') }}</span><span class="dv">¥{{ detail.amount }}</span></div>
+            <div class="detail-item"><span class="dl">{{ $t('admin_recharge.label_coin') }}</span><span class="dv">{{ detail.coin_amount }}</span></div>
+            <div class="detail-item"><span class="dl">{{ $t('admin_recharge.label_channel') }}</span><span class="dv">{{ channelLabel(detail.pay_channel) }}</span></div>
+            <div class="detail-item"><span class="dl">{{ $t('admin_recharge.label_pay_status') }}</span><span class="dv"><span :class="statusClass(detail.pay_status)">{{ statusText(detail.pay_status) }}</span></span></div>
+            <div class="detail-item"><span class="dl">{{ $t('admin_recharge.label_pay_time') }}</span><span class="dv">{{ detail.pay_time || '-' }}</span></div>
+            <div class="detail-item"><span class="dl">{{ $t('admin_recharge.label_create_time') }}</span><span class="dv">{{ detail.create_time || '-' }}</span></div>
+            <div class="detail-item"><span class="dl">{{ $t('admin_recharge.label_user_id') }}</span><span class="dv">{{ detail.user_id || '-' }}</span></div>
           </div>
           <div class="modal-actions">
-            <button v-if="detail.pay_status===1" class="btn-danger" @click="refund(detail); detailOpen = false">退款</button>
-            <button class="btn-cancel" @click="detailOpen = false">关闭</button>
+            <button v-if="detail.pay_status===1" class="btn-danger" @click="refund(detail); detailOpen = false">{{ $t('admin_recharge.refund') }}</button>
+            <button class="btn-cancel" @click="detailOpen = false">{{ $t('common.close') }}</button>
           </div>
         </div>
       </div>
@@ -77,6 +77,7 @@
 
 <script setup lang="ts">
 
+const { t } = useI18n()
 const { confirm } = useConfirm()
 const list = ref<any[]>([])
 const total = ref(0)
@@ -93,8 +94,22 @@ const detail = ref<any>({})
 const toast = useToast()
 onMounted(fetchData)
 
-function statusText(s: number) { return ['待支付', '支付成功', '支付失败', '已退款'][s] || '未知' }
+function statusText(s: number) {
+  const map: Record<number, string> = {
+    0: t('admin_recharge.status_pending'),
+    1: t('admin_recharge.status_success'),
+    2: t('admin_recharge.status_failed'),
+    3: t('admin_recharge.status_refunded'),
+  }
+  return map[s] || t('admin_recharge.unknown')
+}
 function statusClass(s: number) { return ['badge-pending', 'badge-ok', 'badge-fail', 'badge-refund'][s] || '' }
+
+function channelLabel(ch: string) {
+  if (ch === 'wechat') return t('admin_recharge.channel_wechat')
+  if (ch === 'alipay') return t('admin_recharge.channel_alipay')
+  return ch || '-'
+}
 
 async function fetchData() {
   loading.value = true; error.value = ''
@@ -102,10 +117,10 @@ async function fetchData() {
     const params = new URLSearchParams({ page: String(page.value), pageSize: String(pageSize), keyword: keyword.value })
     if (filterStatus.value) params.set('payStatus', filterStatus.value)
     if (filterChannel.value) params.set('payChannel', filterChannel.value)
-    const res: any = await $fetch(`/api/recharge/admin/orders?${params.toString()}`)
+    const res: any = await $fetch(`/api/recharge/admin/orders?${params.toString()}`, { credentials: 'include' })
     if (res?.code === 200) { list.value = res.data?.list || []; total.value = res.data?.total || 0 }
     else { list.value = res.data || []; total.value = list.value.length }
-  } catch (e: any) { error.value = e?.data?.msg || e.message || '加载失败'; toast.error(error.value) } finally { loading.value = false }
+  } catch (e: any) { error.value = e?.data?.msg || e.message || t('common.loadFail'); toast.error(error.value) } finally { loading.value = false }
 }
 
 function search() { page.value = 1; fetchData() }
@@ -113,12 +128,12 @@ function onPageChange(p: number) { page.value = p; fetchData() }
 function openDetail(o: any) { detail.value = o; detailOpen.value = true }
 
 async function refund(o: any) {
-  if (!await confirm({ message: `确认退款订单 ${o.order_no}？金额 ¥${o.amount}` })) return
+  if (!await confirm({ message: t('admin_recharge.confirm_refund', { order: o.order_no, amount: o.amount }) })) return
   try {
-    const res: any = await $fetch(`/api/recharge/admin/refund/${o.order_no}`, { method: 'POST' })
-    if (res?.code === 200 || res?.code === 0) { o.pay_status = 3; toast.success('退款成功') }
-    else { toast.error(res?.msg || '退款失败') }
-  } catch (e: any) { toast.error(e?.data?.msg || e.message || '退款失败') }
+    const res: any = await $fetch(`/api/recharge/admin/refund/${o.order_no}`, { method: 'POST', credentials: 'include' })
+    if (res?.code === 200 || res?.code === 0) { o.pay_status = 3; toast.success(t('admin_recharge.refund_success')) }
+    else { toast.error(res?.msg || t('admin_recharge.refund_failed')) }
+  } catch (e: any) { toast.error(e?.data?.msg || e.message || t('admin_recharge.refund_failed')) }
 }
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>

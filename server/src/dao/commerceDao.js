@@ -363,7 +363,7 @@ export async function updatePlan(planId, data) {
   if (sets.length === 0) return null;
   params.push(planId);
   await pool.execute(`UPDATE membership_plan SET ${sets.join(', ')}, update_time = NOW() WHERE id = ?`, params);
-  const [rows] = await pool.execute(`SELECT ${PLAN_COLS} FROM membership_plan WHERE id = ?`, [planId]);
+  const [rows] = await pool.execute(`SELECT ${PLAN_COLS} FROM membership_plan WHERE id = ? LIMIT 1`, [planId]);
   return rows[0] || null;
 }
 
@@ -440,7 +440,8 @@ export async function getEnterpriseOrderById(orderId, tenantId) {
   const [rows] = await pool.query(
     `SELECT o.*, u.nickname AS customer_name, u.phone AS customer_phone, u.email AS customer_email
      FROM \`order\` o LEFT JOIN user u ON o.user_id = u.id
-     WHERE o.id = ? AND o.tenant_id = ?`,
+     WHERE o.id = ? AND o.tenant_id = ?
+     LIMIT 1`,
     [orderId, tenantId],
   );
   return rows[0] || null;

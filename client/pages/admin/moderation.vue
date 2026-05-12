@@ -1,28 +1,28 @@
 <template>
   <AdminLayout>
     <div class="page">
-      <h1 class="page-title">内容审核</h1>
+      <h1 class="page-title">{{ $t('admin_moderation.page_title') }}</h1>
 
       <div class="filters">
         <select v-model="filter.status" class="sel" @change="fetchList">
-          <option value="">全部状态</option>
-          <option value="0">待审核</option><option value="1">已通过</option><option value="2">已拒绝</option>
+          <option value="">{{ $t('admin_moderation.all_statuses') }}</option>
+          <option value="0">{{ $t('admin_moderation.status_pending') }}</option><option value="1">{{ $t('admin_moderation.status_approved') }}</option><option value="2">{{ $t('admin_moderation.status_rejected') }}</option>
         </select>
         <select v-model="filter.type" class="sel" @change="fetchList">
-          <option value="">全部类型</option>
-          <option value="main_image">主图生成</option><option value="scene">场景图</option><option value="detail_h5">详情页</option><option value="img2video">视频生成</option><option value="batch">批量处理</option>
+          <option value="">{{ $t('admin_moderation.all_types') }}</option>
+          <option value="main_image">{{ $t('admin_moderation.type_main_image') }}</option><option value="scene">{{ $t('admin_moderation.type_scene') }}</option><option value="detail_h5">{{ $t('admin_moderation.type_detail_h5') }}</option><option value="img2video">{{ $t('admin_moderation.type_video') }}</option><option value="batch">{{ $t('admin_moderation.type_batch') }}</option>
         </select>
-        <button class="btn-refresh" @click="fetchList">刷新</button>
+        <button class="btn-refresh" @click="fetchList">{{ $t('admin_moderation.refresh') }}</button>
       </div>
 
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>ID</th><th>用户</th><th>类型</th><th>任务标题</th><th>状态</th><th>提交时间</th><th>操作</th></tr>
+            <tr><th>{{ $t('common.id') }}</th><th>{{ $t('admin_moderation.col_user') }}</th><th>{{ $t('admin_moderation.col_type') }}</th><th>{{ $t('admin_moderation.col_title') }}</th><th>{{ $t('admin_moderation.col_status') }}</th><th>{{ $t('admin_moderation.col_submit_time') }}</th><th>{{ $t('common.action') }}</th></tr>
           </thead>
           <tbody>
-            <tr v-if="isLoading"><td colspan="7" class="loading">加载中...</td></tr>
-            <tr v-else-if="list.length === 0"><td colspan="7" class="empty">暂无审核任务</td></tr>
+            <tr v-if="isLoading"><td colspan="7" class="loading">{{ $t('admin_moderation.loading') }}</td></tr>
+            <tr v-else-if="list.length === 0"><td colspan="7" class="empty">{{ $t('admin_moderation.empty') }}</td></tr>
             <tr v-for="item in list" :key="item.id">
               <td>{{ item.id }}</td>
               <td>{{ item.username || '-' }}</td>
@@ -31,9 +31,9 @@
               <td><span :class="['status', reviewLabel(item.review_status)]">{{ reviewText(item.review_status) }}</span></td>
               <td>{{ formatDateTime(item.create_time) }}</td>
               <td class="actions">
-                <button v-if="item.review_status === 0" class="btn-sm btn-ok" :disabled="reviewing" @click="approve(item)">通过</button>
-                <button v-if="item.review_status === 0" class="btn-sm btn-no" :disabled="reviewing" @click="reject(item)">拒绝</button>
-                <button class="btn-sm btn-view" @click="viewDetail(item)">详情</button>
+                <button v-if="item.review_status === 0" class="btn-sm btn-ok" :disabled="reviewing" @click="approve(item)">{{ $t('admin_moderation.approve') }}</button>
+                <button v-if="item.review_status === 0" class="btn-sm btn-no" :disabled="reviewing" @click="reject(item)">{{ $t('admin_moderation.reject') }}</button>
+                <button class="btn-sm btn-view" @click="viewDetail(item)">{{ $t('admin_moderation.detail') }}</button>
               </td>
             </tr>
           </tbody>
@@ -45,20 +45,20 @@
       <Teleport to="body">
         <div v-if="detail" class="modal-mask" @click.self="detail = null">
           <div class="modal-card">
-            <h3>任务详情 #{{ detail.id }}</h3>
+            <h3>{{ $t('admin_moderation.detail_title', { id: detail.id }) }}</h3>
             <div class="detail-grid">
-              <div><label>类型</label><span>{{ typeLabel(detail.type) }}</span></div>
-              <div><label>用户</label><span>{{ detail.username || detail.user_id }}</span></div>
-              <div><label>标题</label><span>{{ detail.title }}</span></div>
-              <div><label>审核状态</label><span :class="['status', reviewLabel(detail.review_status)]">{{ reviewText(detail.review_status) }}</span></div>
-              <div><label>输入参数</label><pre>{{ JSON.stringify(detail.input_params, null, 2) }}</pre></div>
-              <div v-if="detail.output_result"><label>输出结果</label><pre>{{ JSON.stringify(detail.output_result, null, 2) }}</pre></div>
+              <div><label>{{ $t('admin_moderation.label_type') }}</label><span>{{ typeLabel(detail.type) }}</span></div>
+              <div><label>{{ $t('admin_moderation.label_user') }}</label><span>{{ detail.username || detail.user_id }}</span></div>
+              <div><label>{{ $t('admin_moderation.label_title') }}</label><span>{{ detail.title }}</span></div>
+              <div><label>{{ $t('admin_moderation.label_review_status') }}</label><span :class="['status', reviewLabel(detail.review_status)]">{{ reviewText(detail.review_status) }}</span></div>
+              <div><label>{{ $t('admin_moderation.label_input_params') }}</label><pre>{{ JSON.stringify(detail.input_params, null, 2) }}</pre></div>
+              <div v-if="detail.output_result"><label>{{ $t('admin_moderation.label_output_result') }}</label><pre>{{ JSON.stringify(detail.output_result, null, 2) }}</pre></div>
             </div>
             <div class="modal-actions" v-if="detail.review_status === 0">
-              <button class="btn-sm btn-ok" :disabled="reviewing" @click="approve(detail)">通过</button>
-              <button class="btn-sm btn-no" :disabled="reviewing" @click="reject(detail)">拒绝</button>
+              <button class="btn-sm btn-ok" :disabled="reviewing" @click="approve(detail)">{{ $t('admin_moderation.approve') }}</button>
+              <button class="btn-sm btn-no" :disabled="reviewing" @click="reject(detail)">{{ $t('admin_moderation.reject') }}</button>
             </div>
-            <button class="modal-close" @click="detail = null">关闭</button>
+            <button class="modal-close" @click="detail = null">{{ $t('admin_moderation.close') }}</button>
           </div>
         </div>
       </Teleport>
@@ -68,6 +68,8 @@
 
 <script setup lang="ts">
 import { formatDateTime } from '@/utils/format'
+
+const { t } = useI18n()
 
 const filter = reactive({ status: '', type: '' as string });
 const list = ref<any[]>([]);
@@ -87,44 +89,54 @@ async function fetchList() {
   try {
     const res: any = await $fetch('/api/admin/tasks', {
       params: { page: page.value, pageSize, type: filter.type, reviewStatus: filter.status || '' },
+      credentials: 'include',
     });
     list.value = res.data?.list || [];
     total.value = res.data?.total || 0;
-  } catch(e: any) { toast.error(e?.data?.msg || '加载失败') } finally { isLoading.value = false; }
+  } catch(e: any) { toast.error(e?.data?.msg || t('common.loadFail')) } finally { isLoading.value = false; }
 }
 
 function onPageChange(p: number) { page.value = p; fetchList(); }
 
 async function approve(item: any) {
-  if (!(await confirmDialog('确认通过此内容？'))) return
+  if (!(await confirmDialog(t('admin_moderation.confirm_approve')))) return
   reviewing.value = true;
   try {
-    await $fetch(`/api/admin/tasks/${item.id}/approve`, { method: 'POST' });
+    await $fetch(`/api/admin/tasks/${item.id}/approve`, { method: 'POST', credentials: 'include' });
     item.review_status = 1;
     if (detail.value?.id === item.id) detail.value.review_status = 1;
-  } catch(e: any) { toast.error(e?.data?.msg || '加载失败') } finally { reviewing.value = false; }
+  } catch(e: any) { toast.error(e?.data?.msg || t('common.loadFail')) } finally { reviewing.value = false; }
 }
 
 async function reject(item: any) {
-  if (!(await confirmDialog('确认拒绝此内容？'))) return
+  if (!(await confirmDialog(t('admin_moderation.confirm_reject')))) return
   reviewing.value = true;
   try {
-    await $fetch(`/api/admin/tasks/${item.id}/reject`, { method: 'POST' });
+    await $fetch(`/api/admin/tasks/${item.id}/reject`, { method: 'POST', credentials: 'include' });
     item.review_status = 2;
     if (detail.value?.id === item.id) detail.value.review_status = 2;
-  } catch(e: any) { toast.error(e?.data?.msg || '加载失败') } finally { reviewing.value = false; }
+  } catch(e: any) { toast.error(e?.data?.msg || t('common.loadFail')) } finally { reviewing.value = false; }
 }
 
 function viewDetail(item: any) { detail.value = item; }
 
-function typeLabel(t: string) {
+function typeLabel(tp: string) {
   const m: Record<string, string> = {
-    main_image: '主图', scene: '场景图', detail_h5: '详情页', img2video: '视频',
-    batch: '批量', multi2video: '多图合成', video_packaging: '视频包装',
-    action_transfer: '动作迁移', person_replace: '人物替换', digital_human: '口播',
-    script_gen: '脚本', shot_plan: '分镜', viral_clone: '复刻',
+    main_image: t('admin_moderation.type_main_image'),
+    scene: t('admin_moderation.type_scene'),
+    detail_h5: t('admin_moderation.type_detail_h5'),
+    img2video: t('admin_moderation.type_video'),
+    batch: t('admin_moderation.type_batch'),
+    multi2video: t('admin_moderation.type_multi2video'),
+    video_packaging: t('admin_moderation.type_video_packaging'),
+    action_transfer: t('admin_moderation.type_action_transfer'),
+    person_replace: t('admin_moderation.type_person_replace'),
+    digital_human: t('admin_moderation.type_digital_human'),
+    script_gen: t('admin_moderation.type_script_gen'),
+    shot_plan: t('admin_moderation.type_shot_plan'),
+    viral_clone: t('admin_moderation.type_viral_clone'),
   };
-  return m[t] || t;
+  return m[tp] || tp;
 }
 
 function reviewLabel(s: number) {
@@ -134,9 +146,9 @@ function reviewLabel(s: number) {
 }
 
 function reviewText(s: number) {
-  if (s === 1) return '已通过';
-  if (s === 2) return '已拒绝';
-  return '待审核';
+  if (s === 1) return t('admin_moderation.status_approved');
+  if (s === 2) return t('admin_moderation.status_rejected');
+  return t('admin_moderation.status_pending');
 }
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>

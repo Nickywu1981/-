@@ -1,6 +1,6 @@
 /**
  * i18n API Routes — 动态翻译 CRUD + SSE
- * Phase 1.4
+ * Phase 1.4 | Hardened Phase 2.x
  *
  * Public:  GET  /api/i18n/:locale
  *          GET  /api/i18n/:locale/:namespace
@@ -15,27 +15,53 @@
  *          GET  /api/admin/i18n/:locale/logs/:key
  */
 import { Router } from 'express';
+import { z } from 'zod';
+import { adminAuth } from '../middleware/auth.js';
 import * as i18nService from '../services/i18n.service.js';
 import logger from '../utils/logger.js';
 
-const router = Router();
+const LOCALE_RE = /^[a-z]{2}(-[A-Z]{2})?$/;
 
-// ========== 公开接口 ==========
+function validateLocale(locale) {
+  if (!LOCALE_RE.test(locale)) {
+    const err = new Error('无效的语言代码');
+    err.statusCode = 400;
+    throw err;
+  }
+}
 
-/** 获取某语言全量翻译 { "nav.home": "首页", ... } */
-router.get('/:locale', async (req, res) => {
+// ── Zod schemas ──
+
+const singleEntrySchema = z.object({
+  key: z.string().min(1).max(200),
+  value: z.string().min(1).max(5000),
+});
+
+const batchSchema = z.object({
+  entries: z.array(singleEntrySchema).min(1).max(1000),
+});
+
+const importBodySchema = z.record(z.string().min(1).max(200), z.string().max(5000));
+
+// ===================== 公开路由 =====================
+
+const publicRouter = Router();
+
+publicRouter.get('/:locale', async (req, res) => {
   try {
+    validateLocale(req.params.locale);
     const data = await i18nService.getTranslations(req.params.locale);
     res.json({ code: 0, data });
   } catch (err) {
     logger.error('[i18n] getTranslations', { locale: req.params.locale, error: err.message });
-    res.status(500).json({ code: 500, msg: '获取翻译失败' });
+    const code = err.statusCode || 500;
+    res.status(code >= 400 ? code : 500).json({ code: code >= 400 ? code : 500, msg: err.statusCode ? err.message : '获取翻译失败' });
   }
 });
 
-/** 获取某命名空间翻译 */
-router.get('/:locale/:namespace', async (req, res) => {
+publicRouter.get('/:locale/:namespace', async (req, res) => {
   try {
+    validateLocale(req.params.locale);
     const data = await i18nService.getTranslationsByNamespace(req.params.locale, req.params.namespace);
     res.json({ code: 0, data });
   } catch (err) {
@@ -43,8 +69,7 @@ router.get('/:locale/:namespace', async (req, res) => {
   }
 });
 
-/** SSE: i18n 版本推送 */
-router.get('/version/stream', (req, res) => {
+publicRouter.get('/version/stream', (req, res) => {
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
@@ -53,7 +78,6 @@ router.get('/version/stream', (req, res) => {
   res.write(`data: ${JSON.stringify({ version: i18nService.getI18nVersion() })}\n\n`);
 
   const onVersion = (data) => res.write(`data: ${JSON.stringify(data)}\n\n`);
-  // 监听 i18n 版本事件
   import('../services/config-version.service.js').then(mod => {
     if (mod.versionEmitter) mod.versionEmitter.on('i18n-version', onVersion);
   }).catch(() => {});
@@ -65,11 +89,14 @@ router.get('/version/stream', (req, res) => {
   });
 });
 
-// ========== 管理接口 ==========
+// ===================== 管理路由（需 adminAuth） =====================
 
-/** 管理端获取翻译（含元数据） */
-router.get('/:locale/admin', async (req, res) => {
+const adminRouter = Router();
+adminRouter.use(adminAuth);
+
+adminRouter.get('/:locale', async (req, res) => {
   try {
+    validateLocale(req.params.locale);
     const all = await i18nService.getTranslations(req.params.locale);
     const namespaces = await i18nService.getNamespaces(req.params.locale);
     const entries = Object.entries(all).map(([key, value]) => {
@@ -82,9 +109,9 @@ router.get('/:locale/admin', async (req, res) => {
   }
 });
 
-/** 搜索 */
-router.get('/:locale/search', async (req, res) => {
+adminRouter.get('/:locale/search', async (req, res) => {
   try {
+    validateLocale(req.params.locale);
     const rows = await i18nService.searchTranslations(req.params.locale, req.query.q || '');
     res.json({ code: 0, data: rows });
   } catch (err) {
@@ -92,35 +119,35 @@ router.get('/:locale/search', async (req, res) => {
   }
 });
 
-/** 更新/新增单条 */
-router.post('/:locale', async (req, res) => {
+adminRouter.post('/:locale', async (req, res) => {
   try {
-    const { key, value } = req.body;
-    if (!key || value === undefined) return res.status(400).json({ code: 400, msg: '缺少 key 或 value' });
+    validateLocale(req.params.locale);
+    const { key, value } = singleEntrySchema.parse(req.body);
     const result = await i18nService.setTranslation(req.params.locale, key, value, req.user?.id);
     res.json({ code: 0, data: result });
   } catch (err) {
+    if (err instanceof z.ZodError) return res.status(400).json({ code: 400, msg: '参数校验失败', errors: err.errors });
     res.status(500).json({ code: 500, msg: '保存失败' });
   }
 });
 
-/** 批量 upsert */
-router.post('/:locale/batch', async (req, res) => {
+adminRouter.post('/:locale/batch', async (req, res) => {
   try {
-    const { entries } = req.body;
-    if (!Array.isArray(entries)) return res.status(400).json({ code: 400, msg: 'entries 必须是数组' });
+    validateLocale(req.params.locale);
+    const { entries } = batchSchema.parse(req.body);
     const obj = {};
     for (const e of entries) obj[e.key] = e.value;
     const result = await i18nService.importTranslations(req.params.locale, obj);
     res.json({ code: 0, data: result });
   } catch (err) {
+    if (err instanceof z.ZodError) return res.status(400).json({ code: 400, msg: '参数校验失败', errors: err.errors });
     res.status(500).json({ code: 500, msg: '批量保存失败' });
   }
 });
 
-/** 删除 */
-router.delete('/:locale/:key', async (req, res) => {
+adminRouter.delete('/:locale/:key', async (req, res) => {
   try {
+    validateLocale(req.params.locale);
     await i18nService.deleteTranslation(req.params.locale, req.params.key);
     res.json({ code: 0, msg: '删除成功' });
   } catch (err) {
@@ -128,21 +155,21 @@ router.delete('/:locale/:key', async (req, res) => {
   }
 });
 
-/** 导入 JSON */
-router.post('/:locale/import', async (req, res) => {
+adminRouter.post('/:locale/import', async (req, res) => {
   try {
-    const data = req.body;
-    if (typeof data !== 'object') return res.status(400).json({ code: 400, msg: '必须是 JSON 对象' });
+    validateLocale(req.params.locale);
+    const data = importBodySchema.parse(req.body);
     const result = await i18nService.importTranslations(req.params.locale, data, req.query.skipEdted === '1');
     res.json({ code: 0, data: result });
   } catch (err) {
+    if (err instanceof z.ZodError) return res.status(400).json({ code: 400, msg: '参数校验失败', errors: err.errors });
     res.status(500).json({ code: 500, msg: '导入失败' });
   }
 });
 
-/** 导出 JSON */
-router.get('/:locale/export', async (req, res) => {
+adminRouter.get('/:locale/export', async (req, res) => {
   try {
+    validateLocale(req.params.locale);
     const data = await i18nService.getTranslations(req.params.locale);
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.setHeader('Content-Disposition', `attachment; filename="${req.params.locale}.json"`);
@@ -152,9 +179,9 @@ router.get('/:locale/export', async (req, res) => {
   }
 });
 
-/** 变更日志 */
-router.get('/:locale/logs/:key', async (req, res) => {
+adminRouter.get('/:locale/logs/:key', async (req, res) => {
   try {
+    validateLocale(req.params.locale);
     const logs = await i18nService.getLogs(req.params.locale, req.params.key);
     res.json({ code: 0, data: logs });
   } catch (err) {
@@ -162,4 +189,4 @@ router.get('/:locale/logs/:key', async (req, res) => {
   }
 });
 
-export default router;
+export { publicRouter, adminRouter };
