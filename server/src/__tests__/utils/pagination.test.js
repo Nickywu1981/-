@@ -58,7 +58,7 @@ describe('paginatedQuery', () => {
 
 describe('paginationSQL', () => {
   it('生成标准分页 SQL 后缀及参数', () => {
-    const { sql, params } = paginationSQL({ page: 1, pageSize: 20, offset: 0, sort: 'create_time', order: 'DESC' });
+    const { sql, params } = paginationSQL({ page: 1, pageSize: 20, offset: 0, sort: 'create_time', order: 'DESC' }, ['create_time', 'id', 'updated_at']);
     expect(sql).toBe('ORDER BY create_time DESC LIMIT ? OFFSET ?');
     expect(params).toEqual([20, 0]);
   });

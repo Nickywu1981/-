@@ -80,7 +80,7 @@ export async function paginatedQuery({ query, opts }, countFn, listFn) {
  */
 export function paginationSQL(pager, allowedSortFields = null) {
   let sort = pager.sort;
-  if (allowedSortFields && !allowedSortFields.includes(sort)) {
+  if (!allowedSortFields || !allowedSortFields.includes(sort)) {
     sort = 'id';
   }
   return {
