@@ -78,28 +78,28 @@ async function handleDownload() {
 .result-panel {
   min-height: 320px;
   display: flex; align-items: center; justify-content: center;
-  border: 1px dashed #dcdfe6; border-radius: 12px;
-  background: #fafafa; overflow: hidden;
+  border: 1px dashed var(--border-light); border-radius: 12px;
+  background: var(--bg-page); overflow: hidden;
 }
-.result-panel.loading { border-style: solid; border-color: #e4e7ed; }
-.result-panel.error { border-color: #f56c6c; background: #fef0f0; }
+.result-panel.loading { border-style: solid; border-color: var(--border-light); }
+.result-panel.error { border-color: var(--danger); background: var(--danger-light); }
 
 .rp-loading { text-align: center; padding: 40px; }
 .rp-spinner {
-  width: 36px; height: 36px; border: 3px solid #e4e7ed;
-  border-top-color: #409eff; border-radius: 50%;
+  width: 36px; height: 36px; border: 3px solid var(--border-light);
+  border-top-color: var(--brand); border-radius: 50%;
   animation: spin .8s linear infinite; margin: 0 auto 12px;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
-.rp-loading p { color: #909399; font-size: 14px; margin: 0; }
+.rp-loading p { color: var(--text-muted); font-size: 14px; margin: 0; }
 
 .rp-error { text-align: center; padding: 40px; }
-.rp-error p { color: #f56c6c; margin: 0 0 12px; }
+.rp-error p { color: var(--danger); margin: 0 0 12px; }
 
 .rp-result { width: 100%; }
 .rp-image { width: 100%; display: block; cursor: zoom-in; }
 .rp-actions { display: flex; gap: 8px; padding: 12px; justify-content: center; }
 
-.rp-empty { text-align: center; padding: 60px; color: #c0c4cc; }
+.rp-empty { text-align: center; padding: 60px; color: var(--text-muted); }
 .rp-empty p { margin: 0; font-size: 15px; }
 </style>

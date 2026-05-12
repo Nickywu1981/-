@@ -90,12 +90,12 @@ const etaText = computed(() => {
   padding: 16px; border-radius: var(--cfg-radius, 8px);
   border: 1px solid var(--cfg-border, #e5e7eb);
 }
-.status-card.queued { background: #f9fafb; border-color: #d1d5db; }
-.status-card.queued .status-icon { color: #9ca3af; }
-.status-card.processing { background: #eff6ff; border-color: #93c5fd; }
-.status-card.completed { background: #ecfdf5; border-color: #6ee7b7; }
+.status-card.queued { background: var(--bg-page); border-color: var(--border-light); }
+.status-card.queued .status-icon { color: var(--text-muted); }
+.status-card.processing { background: var(--brand-light); border-color: var(--brand-soft); }
+.status-card.completed { background: var(--success-light); border-color: var(--success); }
 .status-card.completed .status-icon { color: var(--cfg-success, #10B981); }
-.status-card.failed { background: #fef2f2; border-color: #fca5a5; }
+.status-card.failed { background: var(--danger-light); border-color: var(--danger); }
 .status-card.failed .status-icon { color: var(--cfg-error, #EF4444); }
 
 .status-text { flex: 1; font-size: 14px; color: var(--cfg-text-primary, #374151); }
