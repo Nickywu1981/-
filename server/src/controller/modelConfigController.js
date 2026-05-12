@@ -4,6 +4,7 @@
  */
 import { wrapController } from '../utils/wrapController.js';
 import * as modelConfigService from '../services/modelConfigService.js';
+import * as modelRouterService from '../services/model-router.service.js';
 import { success } from '../utils/response.js';
 import { parsePagination } from '../utils/pagination.js';
 
@@ -62,4 +63,17 @@ export const callStats = wrapController(async (req, res) => {
     const { days } = req.query;
     const stats = await modelConfigService.getCallStats(modelKey, days ? parseInt(days, 10) : 7);
     return success(res, stats);
+});
+
+// ============ 模型状态与熔断 ============
+
+export const getModelStatus = wrapController(async (_req, res) => {
+  const status = await modelRouterService.getModelStatus();
+  return success(res, status);
+});
+
+export const resetBreaker = wrapController(async (req, res) => {
+  const { model_id } = req.validated;
+  const result = modelRouterService.resetBreaker(model_id);
+  return success(res, result);
 });

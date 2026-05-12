@@ -7,8 +7,7 @@ import { z } from 'zod';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
-import { success } from '../utils/response.js';
-import { infer } from '../services/aiEngine.js';
+import * as ctrl from '../controller/v4VoiceController.js';
 
 const router = Router();
 
@@ -24,18 +23,8 @@ const cloneSchema = z.object({
   name: z.string().max(30).optional(),
 });
 
-router.post('/generate', authMiddleware, heavyLimiter, _validate(generateSchema), async (req, res, next) => {
-  try {
-    const result = await infer('edge-tts', { text: req.validated.text, voiceType: req.validated.voice, speed: req.validated.speed, task: 'tts' });
-    return success(res, result, '语音生成成功');
-  } catch (e) { next(e); }
-});
+router.post('/generate', authMiddleware, heavyLimiter, _validate(generateSchema), ctrl.generateVoice);
 
-router.post('/clone', authMiddleware, heavyLimiter, _validate(cloneSchema), async (req, res, next) => {
-  try {
-    const result = await infer('elevenlabs-voice-clone', { audioSampleUrl: req.validated.sampleUrl, text: req.validated.text, task: 'voice_clone' });
-    return success(res, result, '声音克隆成功');
-  } catch (e) { next(e); }
-});
+router.post('/clone', authMiddleware, heavyLimiter, _validate(cloneSchema), ctrl.cloneVoice);
 
 export default router;

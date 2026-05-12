@@ -4,12 +4,10 @@
  */
 import { Router } from 'express';
 import { z } from 'zod';
-import { success, error } from '../utils/response.js';
 import { validateV4 as _validate } from '../utils/validate.js';
-import { ERROR_CODE } from '../constants/errorCode.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
-import { infer } from '../services/aiEngine.js';
+import * as ctrl from '../controller/v4RenderController.js';
 
 const router = Router();
 router.use(authMiddleware);
@@ -22,13 +20,6 @@ const renderSchema = z.object({
   format: z.enum(['png', 'jpg', 'webp']).optional(),
 });
 
-router.post('/product', heavyLimiter, _validate(renderSchema), async (req, res) => {
-  try {
-    const result = await infer('product-render', req.validated);
-    return success(res, result, '渲染成功');
-  } catch (e) {
-    return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message || '渲染失败');
-  }
-});
+router.post('/product', heavyLimiter, _validate(renderSchema), ctrl.renderProduct);
 
 export default router;

@@ -4,12 +4,10 @@
  */
 import { Router } from 'express';
 import { z } from 'zod';
-import { success, error } from '../utils/response.js';
 import { validateV4 as _validate } from '../utils/validate.js';
-import { ERROR_CODE } from '../constants/errorCode.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
-import { infer } from '../services/aiEngine.js';
+import * as ctrl from '../controller/v4ModelGenerateController.js';
 
 const router = Router();
 router.use(authMiddleware);
@@ -22,13 +20,6 @@ const generateSchema = z.object({
   count: z.number().int().min(1).max(4).optional(),
 });
 
-router.post('/generate', heavyLimiter, _validate(generateSchema), async (req, res) => {
-  try {
-    const result = await infer('model-generate', req.validated);
-    return success(res, result, '模特生成成功');
-  } catch (e) {
-    return error(res, e.status || ERROR_CODE.INTERNAL_ERROR, e.message || '模特生成失败');
-  }
-});
+router.post('/generate', heavyLimiter, _validate(generateSchema), ctrl.generate);
 
 export default router;

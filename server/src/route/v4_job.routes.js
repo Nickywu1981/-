@@ -6,12 +6,10 @@
  */
 import { Router } from 'express';
 import { z } from 'zod';
-import { success, error } from '../utils/response.js';
-import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate, idParamSchema } from '../utils/validate.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
-import * as jobQueueService from '../services/job-queue.service.js';
+import * as ctrl from '../controller/v4JobController.js';
 
 const VALID_TASK_TYPES = new Set([
   'image_gen', 'image_replicate', 'batch_image_gen', 'batch_image_edit', 'batch_image_replace',
@@ -31,24 +29,9 @@ const submitJobSchema = z.object({
 });
 
 // POST /api/jobs — 通用任务提交
-router.post('/', heavyLimiter, _validate(submitJobSchema), async (req, res) => {
-  try {
-    const { task_type, task_params } = req.validated;
-    const result = await jobQueueService.submitJob(req.user.id, task_type, task_params || {});
-    return success(res, result, '任务已提交');
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
-  }
-});
+router.post('/', heavyLimiter, _validate(submitJobSchema), ctrl.submitJob);
 
 // GET /api/job/:id — 查询任务状态
-router.get('/:id', _validate(idParamSchema, 'params'), async (req, res) => {
-  try {
-    const job = await jobQueueService.getJobStatus(req.params.id, req.user.id);
-    return success(res, job);
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
-  }
-});
+router.get('/:id', _validate(idParamSchema, 'params'), ctrl.getJobStatus);
 
 export default router;
