@@ -7,6 +7,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import crypto from 'crypto';
 import { error } from '../utils/response.js';
+import { BusinessError } from '../utils/businessError.js';
 import { uploadConfig } from '../config/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -77,7 +78,7 @@ function fileFilter(_req, file, cb) {
   if (allowed.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error(`不支持的文件类型: ${file.mimetype}`), false);
+    cb(new BusinessError(400, `不支持的文件类型: ${file.mimetype}`), false);
   }
 }
 

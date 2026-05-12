@@ -5,6 +5,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { error } from '../utils/response.js';
+import { BusinessError } from '../utils/businessError.js';
 import { validateV4 as _validate, validate } from '../utils/validate.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { authMiddleware } from '../middleware/auth.js';
@@ -27,7 +28,7 @@ const _upload = multer({
   limits: { fileSize: 50 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     if (!ALLOWED_MIMES.includes(file.mimetype)) {
-      cb(new Error('不支持的文件类型'), false);
+      cb(new BusinessError(400, '不支持的文件类型'), false);
     } else {
       cb(null, true);
     }
