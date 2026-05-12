@@ -93,7 +93,7 @@ export async function checkVerified(phone) {
   try {
     const result = await codeStore.verifyCode(key, '1', 1);
     if (result.valid || result.reason === 'mismatch') return true;
-  } catch { /* ignore */ }
+  } catch { logger.warn('[SMS] checkVerified Redis 查询失败', { phone }); }
   // 降级: 进程内 Map
   const entry = CODE_CACHE.get(key);
   if (!entry || Date.now() - entry.time > 300000) { CODE_CACHE.delete(key); return false; }
@@ -146,7 +146,7 @@ export async function sendVerificationCode({ phone, scene }) {
     });
 
     CODE_CACHE.set(key, { code, time: Date.now() });
-    await codeStore.saveCode(key, code, 300).catch(() => {});
+    await codeStore.saveCode(key, code, 300).catch(err => logger.warn('[SMS] Redis 验证码存储失败，降级使用内存', { error: err.message }));
 
     await smsLogDao.insertLog({
       templateCode,

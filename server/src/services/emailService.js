@@ -123,7 +123,7 @@ export async function sendVerificationCode(email, scene = 'login') {
   const expires = Date.now() + 5 * 60 * 1000; // 5分钟有效
 
   CODE_CACHE.set(email, { code, expires, lastSent: Date.now(), attempts: 0 });
-  await codeStore.saveCode(`email:${email}`, code, 300).catch(() => {});
+  await codeStore.saveCode(`email:${email}`, code, 300).catch(err => logger.warn('[Email] Redis 验证码存储失败，降级使用内存', { error: err.message }));
 
   // 场景 → 模板编码映射
   const templateCodeMap = {
@@ -148,7 +148,8 @@ export async function sendVerificationCode(email, scene = 'login') {
     } else {
       throw new BusinessError(404, '模板未找到');
     }
-  } catch {
+  } catch (e) {
+    logger.warn('[Email] 模板查询失败，降级使用内置模板', { templateCode, error: e.message });
     // 降级内置模板
     const fallbacks = {
       email_login_code: {
@@ -209,7 +210,7 @@ export async function checkVerified(email) {
   try {
     const result = await codeStore.verifyCode(key, '1', 1);
     if (result.valid || result.reason === 'mismatch') return true;
-  } catch { /* ignore */ }
+  } catch { logger.warn('[Email] checkVerified Redis 查询失败', { email }); }
   const entry = CODE_CACHE.get(key);
   if (!entry || Date.now() - entry.time > 300000) { CODE_CACHE.delete(key); return false; }
   CODE_CACHE.delete(key);

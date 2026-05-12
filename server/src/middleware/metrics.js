@@ -58,7 +58,7 @@ export function metricsEndpoint(req, res) {
         metrics.db_pool_size = pool._allConnections.length;
       }
     }).catch(err => logger.warn('[Metrics] db pool read failed', { error: err.message }));
-  } catch { /* noop */ }
+  } catch (e) { logger.warn('[Metrics] 采集数据失败', { error: e.message }); }
 
   // 序列化为 Prometheus 格式
   const lines = ['# HELP http_requests_total Total HTTP requests', '# TYPE http_requests_total counter'];

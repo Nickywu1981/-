@@ -3,6 +3,7 @@
  */
 import { wrapController } from '../utils/wrapController.js';
 import { success } from '../utils/response.js';
+import logger from '../utils/logger.js';
 import config from '../config/index.js';
 
 const GEOIP_URL = config.geoIpApiUrl;
@@ -48,7 +49,8 @@ export const suggestLocale = wrapController(async (req, res) => {
     const cc = (data?.countryCode || '').toUpperCase();
     const locale = COUNTRY_TO_LOCALE[cc] || 'zh';
     return success(res, { locale, country: cc, source: 'ip-api' });
-  } catch {
+  } catch (e) {
+    logger.warn('[Geo] IP 定位查询失败', { error: e.message });
     return success(res, { locale: 'zh', country: 'UNKNOWN', source: 'error-fallback' });
   }
 });

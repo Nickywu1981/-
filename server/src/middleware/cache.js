@@ -65,5 +65,5 @@ export async function invalidateCache(pattern) {
     if (r) {
       await scanAndDel(r, `cache:${pattern}`);
     }
-  } catch { /* ignore */ }
+  } catch (e) { logger.warn('[Cache] invalidateCache 失败', { pattern, error: e.message }); }
 }
