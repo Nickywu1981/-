@@ -1,25 +1,17 @@
 <!-- 财务后台仪表盘 -->
 <template>
   <div class="pg">
-    <div class="page-header">
-      <div>
-        <h1 class="page-header-title">财务看板</h1>
-        <p class="page-header-subtitle">平台财务数据总览</p>
-      </div>
-      <div class="page-header-actions">
+    <PageHeader title="财务看板" subtitle="平台财务数据总览">
+      <template #actions>
         <select class="select" style="width:140px;">
           <option>本月</option><option>上月</option><option>本季</option><option>本年</option>
         </select>
         <button class="btn btn-gradient btn-sm">导出报表</button>
-      </div>
-    </div>
+      </template>
+    </PageHeader>
 
     <div class="stat-grid">
-      <div v-for="kpi in kpis" :key="kpi.key" class="stat-card">
-        <div class="stat-card-value">{{ kpi.value }}</div>
-        <div class="stat-card-label">{{ kpi.label }}</div>
-        <div class="stat-card-trend" :class="kpi.up ? 'up' : 'down'">{{ kpi.up ? '↑' : '↓' }} {{ kpi.change }}</div>
-      </div>
+      <StatsCard v-for="kpi in kpis" :key="kpi.key" :value="kpi.value" :label="kpi.label" :trend="kpi.change" :trend-up="kpi.up" />
     </div>
 
     <div class="dashboard-grid" style="margin-top: var(--space-6)">
@@ -66,6 +58,9 @@
 </template>
 
 <script setup lang="ts">
+import PageHeader from '~/components/shared/PageHeader.vue'
+import StatsCard from '~/components/shared/StatsCard.vue'
+
 const kpis = [
   { key: 'revenue', value: '¥1,284,960', label: '本月营收', change: '+12.5%', up: true },
   { key: 'commission', value: '¥96,372', label: '分佣支出', change: '+8.3%', up: false },

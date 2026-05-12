@@ -1,26 +1,16 @@
 <!-- 代理端仪表盘 -->
 <template>
   <div class="pg">
-    <div class="page-header">
-      <div>
-        <h1 class="page-header-title">代理看板</h1>
-        <p class="page-header-subtitle">{{ agentName }} — 欢迎回来</p>
-      </div>
-      <div class="page-header-actions">
+    <PageHeader title="代理看板" :subtitle="agentName + ' — 欢迎回来'">
+      <template #actions>
         <button class="btn btn-secondary btn-sm">导出报表</button>
         <button class="btn btn-gradient btn-sm">推广链接</button>
-      </div>
-    </div>
+      </template>
+    </PageHeader>
 
     <!-- KPI -->
     <div class="stat-grid">
-      <div v-for="kpi in kpis" :key="kpi.key" class="stat-card">
-        <div class="stat-card-value">{{ kpi.value }}</div>
-        <div class="stat-card-label">{{ kpi.label }}</div>
-        <div class="stat-card-trend" :class="kpi.up ? 'up' : 'down'">
-          {{ kpi.up ? '↑' : '↓' }} {{ kpi.change }} vs 上月
-        </div>
-      </div>
+      <StatsCard v-for="kpi in kpis" :key="kpi.key" :value="kpi.value" :label="kpi.label" :trend="kpi.change + ' vs 上月'" :trend-up="kpi.up" />
     </div>
 
     <!-- 图表 + 列表 -->
@@ -64,6 +54,9 @@
 </template>
 
 <script setup lang="ts">
+import PageHeader from '~/components/shared/PageHeader.vue'
+import StatsCard from '~/components/shared/StatsCard.vue'
+
 const agentName = ref('张代理')
 
 const kpis = [

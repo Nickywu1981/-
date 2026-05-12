@@ -1,19 +1,10 @@
 <!-- 运营后台仪表盘 -->
 <template>
   <div class="pg">
-    <div class="page-header">
-      <div>
-        <h1 class="page-header-title">运营看板</h1>
-        <p class="page-header-subtitle">核心运营数据一览</p>
-      </div>
-    </div>
+    <PageHeader title="运营看板" subtitle="核心运营数据一览" />
 
     <div class="stat-grid">
-      <div v-for="kpi in kpis" :key="kpi.key" class="stat-card">
-        <div class="stat-card-value">{{ kpi.value }}</div>
-        <div class="stat-card-label">{{ kpi.label }}</div>
-        <div class="stat-card-trend" :class="kpi.up ? 'up' : 'down'">{{ kpi.up ? '↑' : '↓' }} {{ kpi.change }}</div>
-      </div>
+      <StatsCard v-for="kpi in kpis" :key="kpi.key" :value="kpi.value" :label="kpi.label" :trend="kpi.change" :trend-up="kpi.up" />
     </div>
 
     <div class="dashboard-grid" style="margin-top: var(--space-6)">
@@ -43,6 +34,9 @@
 </template>
 
 <script setup lang="ts">
+import PageHeader from '~/components/shared/PageHeader.vue'
+import StatsCard from '~/components/shared/StatsCard.vue'
+
 const kpis = [
   { key: 'dau', value: '8,429', label: '日活跃用户', change: '+12.5%', up: true },
   { key: 'mau', value: '45,280', label: '月活跃用户', change: '+18.2%', up: true },

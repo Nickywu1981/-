@@ -1,9 +1,10 @@
 <template>
   <AdminLayout>
-    <div class="page-header">
-      <h2>数据看板</h2>
-      <button class="refresh-btn" :class="{ spinning: loading }" :disabled="loading" @click="fetchAll">↻ 刷新</button>
-    </div>
+    <PageHeader title="数据看板">
+      <template #actions>
+        <button class="refresh-btn" :class="{ spinning: loading }" :disabled="loading" @click="fetchAll">↻ 刷新</button>
+      </template>
+    </PageHeader>
 
     <template v-if="loading">
       <div class="stats-grid">
@@ -22,34 +23,13 @@
 
     <template v-else>
       <div class="stats-grid">
-        <div class="stat-card">
-          <span class="stat-value">{{ stats.userCount ?? '-' }}</span>
-          <span class="stat-label">注册用户</span>
-        </div>
-        <div class="stat-card">
-          <span class="stat-value">{{ stats.taskCount ?? '-' }}</span>
-          <span class="stat-label">任务总数</span>
-        </div>
-        <div class="stat-card">
-          <span class="stat-value">{{ stats.todayTaskCount ?? '-' }}</span>
-          <span class="stat-label">今日任务</span>
-        </div>
-        <div class="stat-card">
-          <span class="stat-value">{{ stats.paidUserCount ?? '-' }}</span>
-          <span class="stat-label">付费用户</span>
-        </div>
-        <div class="stat-card highlight">
-          <span class="stat-value">¥{{ stats.totalRevenue?.toFixed(2) ?? '-' }}</span>
-          <span class="stat-label">总收入</span>
-        </div>
-        <div class="stat-card">
-          <span class="stat-value">{{ stats.todayActiveUsers ?? '-' }}</span>
-          <span class="stat-label">今日活跃</span>
-        </div>
-        <div class="stat-card">
-          <span class="stat-value">¥{{ stats.todayCost?.toFixed(2) ?? '-' }}</span>
-          <span class="stat-label">今日模型成本</span>
-        </div>
+        <StatsCard :value="stats.userCount ?? '-'" label="注册用户" />
+        <StatsCard :value="stats.taskCount ?? '-'" label="任务总数" />
+        <StatsCard :value="stats.todayTaskCount ?? '-'" label="今日任务" />
+        <StatsCard :value="stats.paidUserCount ?? '-'" label="付费用户" />
+        <StatsCard :value="'¥' + (stats.totalRevenue?.toFixed(2) ?? '-')" label="总收入" color="#67c23a" />
+        <StatsCard :value="stats.todayActiveUsers ?? '-'" label="今日活跃" />
+        <StatsCard :value="'¥' + (stats.todayCost?.toFixed(2) ?? '-')" label="今日模型成本" color="#f56c6c" />
       </div>
 
       <div class="charts-grid">
@@ -101,7 +81,8 @@
 
 <script setup lang="ts">
 
-
+import PageHeader from '~/components/shared/PageHeader.vue'
+import StatsCard from '~/components/shared/StatsCard.vue'
 import * as echarts from 'echarts/core';
 import { LineChart, PieChart, BarChart } from 'echarts/charts';
 import { TitleComponent, TooltipComponent, LegendComponent, GridComponent } from 'echarts/components';

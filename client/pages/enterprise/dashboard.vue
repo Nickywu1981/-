@@ -13,34 +13,16 @@
 
     <!-- Content -->
     <template v-else>
-    <h1 class="page-title">{{ $t('enterprise.dashboard.title') }}</h1>
+    <PageHeader :title="$t('enterprise.dashboard.title')" />
 
     <!-- 统计卡片 -->
     <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-label">{{ $t('enterprise.dashboard.subAccounts') }}</div>
-        <div class="stat-value">{{ dashboard.stats?.userCount || 0 }}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">{{ $t('enterprise.dashboard.calls30d') }}</div>
-        <div class="stat-value">{{ formatNumber(dashboard.stats?.totalCalls30d || 0) }}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">{{ $t('enterprise.dashboard.credits30d') }}</div>
-        <div class="stat-value">{{ formatNumber(dashboard.stats?.totalCredits30d || 0) }}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">{{ $t('enterprise.dashboard.imageQuota') }}</div>
-        <div class="stat-value">{{ formatNumber(dashboard.stats?.quotaImages || 0) }}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">{{ $t('enterprise.dashboard.videoQuota') }}</div>
-        <div class="stat-value">{{ formatNumber(dashboard.stats?.quotaVideo || 0) }}</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">{{ $t('enterprise.dashboard.accountBalance') }}</div>
-        <div class="stat-value">&yen;{{ dashboard.enterprise?.balance || 0 }}</div>
-      </div>
+      <StatsCard :value="dashboard.stats?.userCount || 0" :label="$t('enterprise.dashboard.subAccounts')" />
+      <StatsCard :value="formatNumber(dashboard.stats?.totalCalls30d || 0)" :label="$t('enterprise.dashboard.calls30d')" />
+      <StatsCard :value="formatNumber(dashboard.stats?.totalCredits30d || 0)" :label="$t('enterprise.dashboard.credits30d')" />
+      <StatsCard :value="formatNumber(dashboard.stats?.quotaImages || 0)" :label="$t('enterprise.dashboard.imageQuota')" />
+      <StatsCard :value="formatNumber(dashboard.stats?.quotaVideo || 0)" :label="$t('enterprise.dashboard.videoQuota')" />
+      <StatsCard :value="'¥' + (dashboard.enterprise?.balance || 0)" :label="$t('enterprise.dashboard.accountBalance')" color="#67c23a" />
     </div>
 
     <!-- 企业信息 -->
@@ -75,6 +57,8 @@
 </template>
 
 <script setup>
+import PageHeader from '~/components/shared/PageHeader.vue'
+import StatsCard from '~/components/shared/StatsCard.vue'
 const { t } = useI18n();
 const dashboard = ref({ stats: {}, enterprise: {} });
 const enterprise = ref({});

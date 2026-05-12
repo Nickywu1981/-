@@ -1,18 +1,10 @@
 <!-- 网关中台仪表盘 -->
 <template>
   <div class="pg">
-    <div class="page-header">
-      <div>
-        <h1 class="page-header-title">网关看板</h1>
-        <p class="page-header-subtitle">API 网关运行状态实时监控</p>
-      </div>
-    </div>
+    <PageHeader title="网关看板" subtitle="API 网关运行状态实时监控" />
 
     <div class="stat-grid">
-      <div v-for="kpi in kpis" :key="kpi.key" class="stat-card">
-        <div class="stat-card-value">{{ kpi.value }}</div>
-        <div class="stat-card-label">{{ kpi.label }}</div>
-      </div>
+      <StatsCard v-for="kpi in kpis" :key="kpi.key" :value="kpi.value" :label="kpi.label" />
     </div>
 
     <div class="dashboard-grid" style="margin-top: var(--space-6)">
@@ -48,6 +40,9 @@
 </template>
 
 <script setup lang="ts">
+import PageHeader from '~/components/shared/PageHeader.vue'
+import StatsCard from '~/components/shared/StatsCard.vue'
+
 const kpis = [
   { key: 'qps', value: '18,420', label: '当前 QPS' },
   { key: 'latency', value: '42ms', label: '平均延迟' },
