@@ -154,8 +154,6 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 .level-chip:hover { border-color: var(--brand-soft); color: var(--brand); }
 .level-chip.active { border-color: var(--brand); background: var(--brand-gradient); color: #fff; font-weight: 600; }
 .ws-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 24px; flex-wrap: wrap; gap: 12px; }
-.ws-cost { font-size: 0.9rem; color: var(--text-secondary); }
-.ws-cost strong { color: var(--brand); }
 .result-compare { display: flex; align-items: center; gap: 20px; }
 .result-compare__item { flex: 1; text-align: center; }
 .result-compare__label { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 10px; }

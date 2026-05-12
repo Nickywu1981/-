@@ -1,5 +1,4 @@
 export default defineNuxtConfig({
-  ssr: true, // 启用 SSR 确保页面正常渲染
   devtools: { enabled: process.env.NODE_ENV !== 'production' },
 
   css: ['@/assets/css/unified-design-system.css', '@/assets/css/design-tokens.css', '@/assets/css/animations.css', '@/assets/css/responsive.css'],
@@ -58,11 +57,7 @@ export default defineNuxtConfig({
 
   // 实验性功能
   experimental: {
-    // 组件懒加载水合 — 非视口组件延迟水合
-    asyncContext: true,
-    // 客户端组件按需加载
     componentIslands: true,
-    // 页面仅客户端渲染按需
     crossOriginPrefetch: true,
   },
 
@@ -187,9 +182,5 @@ export default defineNuxtConfig({
         },
       },
     },
-  },
-
-  // SSR
-  build: {
-  },
 });
+

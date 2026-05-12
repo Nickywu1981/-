@@ -136,11 +136,7 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 .ws-uploading, .ws-uploaded { text-align: center; padding: 8px; font-size: 0.9rem; }
 .ws-uploaded { color: var(--success); }
 .ws-slider-row { display: flex; align-items: center; gap: 14px; }
-.ws-range { flex: 1; accent-color: var(--brand); }
-.ws-range-val { font-weight: 600; color: var(--brand); min-width: 44px; text-align: right; font-size: 0.9rem; }
 .ws-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 24px; flex-wrap: wrap; gap: 12px; }
-.ws-cost { font-size: 0.9rem; color: var(--text-secondary); }
-.ws-cost strong { color: var(--brand); }
 .result-compare { display: flex; align-items: center; gap: 20px; }
 .result-compare__item { flex: 1; text-align: center; }
 .result-compare__label { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 10px; }
@@ -150,6 +146,8 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 .result-compare__divider { text-align: center; flex-shrink: 0; }
 .result-compare__arrow { font-size: 1.5rem; color: var(--brand); }
 .result-compare__badge { font-size: 0.72rem; color: var(--brand); margin-top: 4px; }
+.ws-range { flex: 1; accent-color: var(--brand); }
+.ws-range-val { font-weight: 600; min-width: 44px; text-align: right; font-size: 0.9rem; color: var(--brand); }
 .progress-box { text-align: center; padding: 40px; }
 .spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--brand); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
 @keyframes spin { to { transform: rotate(360deg); } }

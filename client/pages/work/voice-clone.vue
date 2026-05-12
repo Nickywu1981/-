@@ -127,8 +127,6 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 .ws-uploading, .ws-uploaded { text-align: center; padding: 8px; font-size: 0.9rem; }
 .ws-uploaded { color: var(--success); }
 .ws-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 24px; flex-wrap: wrap; gap: 12px; }
-.ws-cost { font-size: 0.9rem; color: var(--text-secondary); }
-.ws-cost strong { color: var(--brand); }
 .ws-audio { width: 100%; margin-top: 12px; }
 .ws-result__meta { display: flex; gap: 16px; font-size: 0.85rem; color: var(--text-secondary); margin-top: 8px; }
 .progress-box { text-align: center; padding: 40px; }

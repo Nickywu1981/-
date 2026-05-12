@@ -128,7 +128,6 @@ const app = express();
 app.set('trust proxy', 'loopback');
 
 // 基础安全中间件
-app.disable('x-powered-by');
 app.use(helmet());
 app.use(cspMiddleware);
 const ALLOWED_ORIGINS = (corsOrigin || 'http://localhost:3000').split(',').map(s => s.trim());
@@ -153,7 +152,7 @@ app.use(apiLimiter);
 
 // 解析
 app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // 全局参数过滤 — XSS/SQL 注入关键词检测
@@ -249,7 +248,7 @@ app.post('/api/internal/embed', async (req, res) => {
 });
 
 // 公开路由（无需认证）
-app.use(apiLimiter, geoRoutes);
+app.use('/api/geo', apiLimiter, geoRoutes);
 
 // 静态文件服务（上传目录），带缓存
 app.use('/uploads', express.static(path.join(__dirname, '../uploads'), {
@@ -329,7 +328,7 @@ app.use('/api/collections', heavyLimiter, collectionRoutes);
 app.use('/api/admin/site-config', adminLimiter, siteConfigAdminRouter);
 app.use('/api/admin/workspace-diy', adminLimiter, adminWorkspaceDiyRoutes);
 app.use('/api/admin/geo-rules', adminLimiter, geoRuleAdminRouter);
-app.use('/api/site-config/public', siteConfigPublicRouter);
+app.use('/api/site-config/public', apiLimiter, siteConfigPublicRouter);
 app.use('/api/badges', adminLimiter, badgeRoutes);
 app.use('/api/tier', apiLimiter, tierRoutes);
 app.use('/api/admin/abuse', adminLimiter, abuseRoutes);

@@ -88,3 +88,9 @@ input, textarea, select {
   border-radius: var(--radius-md); font-size: 13px;
   box-shadow: var(--shadow-lg); z-index: 2000; animation: var(--slide-up);
 }
+
+/* ================================================
+   Work Service Cost & Range Utilities
+   ================================================ */
+.ws-cost { font-size: 0.9rem; color: var(--text-secondary); }
+.ws-cost strong { color: var(--brand); }

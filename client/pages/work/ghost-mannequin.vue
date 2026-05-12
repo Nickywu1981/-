@@ -142,8 +142,6 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 .ws-uploading, .ws-uploaded { text-align: center; padding: 8px; font-size: 0.9rem; }
 .ws-uploaded { color: var(--success); }
 .ws-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 24px; flex-wrap: wrap; gap: 12px; }
-.ws-cost { font-size: 0.9rem; color: var(--text-secondary); }
-.ws-cost strong { color: var(--brand); }
 .result-compare { display: flex; align-items: center; gap: 20px; }
 .result-compare__item { flex: 1; text-align: center; }
 .result-compare__label { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 10px; }

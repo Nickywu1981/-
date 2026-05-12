@@ -173,20 +173,8 @@ export async function submitTask(userId, mode, params) {
 
 // ==================== 查询接口 ====================
 
-export async function getJobStatus(jobId) {
-  return jobQueueService.getJob(jobId);
-}
-
 export async function getBatchProgress(batchId) {
   return batchProgressCache.get(batchId) || null;
-}
-
-export async function listUserJobs(userId, { status, page = 1, limit = 20 } = {}) {
-  return jobQueueService.listJobs(userId, { status, page, limit });
-}
-
-export async function cancelJob(jobId) {
-  return jobQueueService.cancelJob(jobId);
 }
 
 // ==================== 夜间批量处理 ====================
@@ -214,4 +202,4 @@ export async function getQueueStats() {
   return { ...stats, activeBatches };
 }
 
-export default { submitTask, submitBatchTask, onChildJobComplete, getJobStatus, getBatchProgress, listUserJobs, cancelJob, processNightBatchJobs, getQueueStats };
+export default { submitTask, submitBatchTask, onChildJobComplete, getBatchProgress, processNightBatchJobs, getQueueStats };

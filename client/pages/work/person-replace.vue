@@ -177,8 +177,6 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 .ws-tag:hover { border-color: var(--brand-soft); color: var(--brand); }
 .ws-tag.active { border-color: var(--brand); background: var(--brand-light); color: var(--brand); font-weight: 600; }
 .ws-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 24px; }
-.ws-cost { font-size: 0.9rem; color: var(--text-secondary); }
-.ws-cost strong { color: var(--brand); }
 
 .progress-box { text-align: center; padding: 40px 20px; }
 .spinner {

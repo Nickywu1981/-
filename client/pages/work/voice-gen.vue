@@ -91,13 +91,11 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 .voice-card__name { font-size: 0.85rem; font-weight: 600; color: var(--text-primary); }
 .voice-card__style { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; }
 .ws-slider-row { display: flex; align-items: center; gap: 14px; }
-.ws-range { flex: 1; accent-color: var(--brand); }
-.ws-range-val { font-weight: 600; color: var(--brand); min-width: 44px; text-align: right; font-size: 0.9rem; }
 .ws-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 24px; flex-wrap: wrap; gap: 12px; }
-.ws-cost { font-size: 0.9rem; color: var(--text-secondary); }
-.ws-cost strong { color: var(--brand); }
 .ws-audio-box { padding: 24px; background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-lg); text-align: center; }
 .ws-audio-meta { margin-top: 12px; font-size: 0.85rem; color: var(--text-secondary); }
+.ws-range { flex: 1; accent-color: var(--brand); }
+.ws-range-val { font-weight: 600; min-width: 44px; text-align: right; font-size: 0.9rem; color: var(--brand); }
 .progress-box { text-align: center; padding: 40px; }
 .spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--brand); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
 @keyframes spin { to { transform: rotate(360deg); } }
