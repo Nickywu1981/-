@@ -1,9 +1,8 @@
 /**
  * Movio AI v4.1 — Global Auth Middleware (Nuxt3 Route Guard)
- * httpOnly cookie JWT auth — 验证方式为 API 调用而非读取 cookie
+ * httpOnly cookie JWT auth — 开发模式自动放行所有页面
  */
 export default defineNuxtRouteMiddleware(async (to) => {
-  // 公开路由
   const publicPaths = [
     '/', '/login', '/register', '/auth/register',
     '/auth/reset-password', '/help', '/compare', '/legal/terms', '/legal/privacy',
@@ -11,6 +10,9 @@ export default defineNuxtRouteMiddleware(async (to) => {
   ]
 
   if (publicPaths.includes(to.path) || to.path.startsWith('/legal/')) return
+
+  // 开发模式：后端 DB 不可用时直接放行，方便查看页面 UI
+  if (import.meta.dev) return
 
   let isAuthenticated = false
   let userRole = ''
@@ -29,19 +31,16 @@ export default defineNuxtRouteMiddleware(async (to) => {
       userRole = data?.data?.role || ''
     }
   } catch (e: any) {
-    // 401 = token 过期/无效 → 重定向登录
     if (e?.response?.status === 401 || e?.statusCode === 401) {
       return navigateTo(`/login?redirect=${encodeURIComponent(to.fullPath)}`)
     }
-    // 5xx/网络错误：放行页面渲染（不停机体验），页面 API 自行兜底
-    return
+    return navigateTo(`/login?redirect=${encodeURIComponent(to.fullPath)}`)
   }
 
   if (!isAuthenticated) {
     return navigateTo(`/login?redirect=${encodeURIComponent(to.fullPath)}`)
   }
 
-  // 管理员路由保护
   if (to.path.startsWith('/admin')) {
     if (!['admin', 'super_admin'].includes(userRole)) {
       return navigateTo('/error?code=403')

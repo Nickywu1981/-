@@ -52,5 +52,4 @@ const breadcrumbs = useAdminBreadcrumbs(navGroups, '代理端', '/agent/dashboar
 
 const { logout: handleLogout } = useLogout()
 
-definePageMeta({ middleware: ['auth'] })
 </script>

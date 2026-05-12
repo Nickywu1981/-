@@ -70,7 +70,7 @@ async function loadData() {
   } catch (e) { toast.error(t('enterprise.finance.ledger.loadError')); }
 }
 
-function typeLabel(ty) { const m: Record<string, string> = { revenue: t('enterprise.finance.ledger.typeRevenue'), commission: t('enterprise.finance.ledger.typeCommission'), withdrawal: t('enterprise.finance.ledger.typeWithdrawal'), refund: t('enterprise.finance.ledger.typeRefund'), adjustment: t('enterprise.finance.ledger.typeAdjustment') }; return m[ty] || ty; }
+function typeLabel(ty) { const m = { revenue: t('enterprise.finance.ledger.typeRevenue'), commission: t('enterprise.finance.ledger.typeCommission'), withdrawal: t('enterprise.finance.ledger.typeWithdrawal'), refund: t('enterprise.finance.ledger.typeRefund'), adjustment: t('enterprise.finance.ledger.typeAdjustment') }; return m[ty] || ty; }
 
 definePageMeta({ layout: 'enterprise' });
 </script>

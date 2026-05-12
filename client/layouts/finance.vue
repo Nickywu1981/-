@@ -57,5 +57,4 @@ const navGroups = reactive([
 const breadcrumbs = useAdminBreadcrumbs(navGroups, '财务后台', '/finance/dashboard')
 
 const { logout: handleLogout } = useLogout()
-definePageMeta({ middleware: ['auth'] })
 </script>

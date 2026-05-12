@@ -56,5 +56,5 @@ const campaigns = [
   { name: '代理招募计划', date: '2026-05-15 ~ 06-15', status: '筹备中', type: 'warning' },
 ]
 
-definePageMeta({ layout: 'ops', middleware: ['auth'] })
+definePageMeta({ layout: 'ops' })
 </script>

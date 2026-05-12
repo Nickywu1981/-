@@ -57,5 +57,4 @@ const navGroups = reactive([
 const breadcrumbs = useAdminBreadcrumbs(navGroups, '网关中台', '/gateway/dashboard')
 
 const { logout: handleLogout } = useLogout()
-definePageMeta({ middleware: ['auth'] })
 </script>

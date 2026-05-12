@@ -130,7 +130,6 @@ async function handleLogout() {
 }
 
 watch(() => route.path, () => { mobileOpen.value = false })
-definePageMeta({ middleware: ['auth'] })
 </script>
 
 <style scoped>
