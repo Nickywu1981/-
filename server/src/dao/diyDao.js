@@ -165,7 +165,7 @@ export default {
         await conn.query(
           'DELETE FROM diy_page_version WHERE page_id = ? AND auto_save = 1 AND id NOT IN (SELECT id FROM (SELECT id FROM diy_page_version WHERE page_id = ? AND auto_save = 1 ORDER BY id DESC LIMIT 30) t)',
           [pageId, pageId],
-        ).catch(() => {});
+        ).catch((err) => { logger.warn('[diyDao] 自动保存清理失败:', err.message); });
       }
       return v;
     });

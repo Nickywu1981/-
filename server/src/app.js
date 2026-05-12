@@ -269,6 +269,8 @@ app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/config', apiLimiter, configPublicRouter);
 app.use('/api/admin/config', adminLimiter, configAdminRouter);
 app.use('/api/images', heavyLimiter, imageRoutesV4);
+app.use('/api/ai/gateway', aiConcurrencyGuard, heavyLimiter, aiGatewayRoutes);  // Token 集约化中台 — 必须在 /api/ai 守卫之前
+app.use('/api/ai-dispatch', aiConcurrencyGuard, heavyLimiter, aiDispatchRoutes);  // 多模型统一调度
 app.use('/api/ai', (req, res, next) => {
   if (req.path === '/enhance-prompt') return next();
   return sendError(res, ERROR_CODE.NOT_FOUND, 'Not Found');
@@ -338,7 +340,6 @@ app.use('/api/multilingual', multilingualRoutes);
 app.use('/api/analytics', adminLimiter, analyticsRoutes);
 app.use('/api/platform-specs', platformSpecRoutes);
 app.use('/api/ai-dispatch', aiConcurrencyGuard, heavyLimiter, aiDispatchRoutes);  // 多模型统一调度: dispatch/categories/health/stats/cache
-app.use('/api/ai/gateway', aiConcurrencyGuard, heavyLimiter, aiGatewayRoutes);  // Token 集约化中台: infer/dispatch/route/stats/pricing
 app.use('/api/compare', heavyLimiter, compareRoutes);
 app.use('/api/seo-keywords', heavyLimiter, seoKeywordRoutes);
 app.use('/api/fab', heavyLimiter, fabRoutes);
