@@ -110,6 +110,14 @@ const inferenceCache = new Map();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 const MAX_CACHE_SIZE = 500;
 
+// 定期清理过期缓存条目，避免低流量期间内存滞留
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, entry] of inferenceCache) {
+    if (now - entry.timestamp > CACHE_TTL) inferenceCache.delete(key);
+  }
+}, 300000).unref();
+
 /**
  * 增强推理：自动重试 + 降级 + 缓存 + 超时控制
  * @param {string} modelId - 模型ID

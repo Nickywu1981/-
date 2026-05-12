@@ -30,7 +30,6 @@ import batchRoutes from './route/batchRoutes.js';
 import advancedImageRoutes from './route/advancedImageRoutes.js';
 import advancedVideoRoutes from './route/advancedVideoRoutes.js';
 import paymentRoutes from './route/paymentRoutes.js';
-import adminRoutes from './route/adminRoutes.js';
 import adminModelsRoutesV4 from './route/v4_admin_models.routes.js';
 import testWorkbenchRoutesV4 from './route/v4_test_workbench.routes.js';
 import notificationRoutes from './route/notificationRoutes.js';

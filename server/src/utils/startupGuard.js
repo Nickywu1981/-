@@ -79,7 +79,23 @@ export function validateStartupConfig() {
     }
   }
 
-  // P2: Warnings
+  // P1: ALLINPAY key file existence (production)
+  if (isProd) {
+    const fs = await import('fs');
+    const allinpayConfig = (await import('../config/allinpay.js')).default;
+    const keyPath = allinpayConfig.privateKeyPath;
+    if (keyPath) {
+      try { await fs.promises.access(keyPath); }
+      catch { errors.push(`通联支付私钥文件不存在: ${keyPath}`); }
+    } else if (!allinpayConfig.privateKey) {
+      errors.push('生产环境必须设置 ALLINPAY_PRIVATE_KEY 或 ALLINPAY_PRIVATE_KEY_PATH');
+    }
+  }
+
+  // P2: ELEVENLABS_API_KEY warning (voice clone will degrade silently)
+  if (isProd && !process.env.ELEVENLABS_API_KEY) {
+    warnings.push('生产环境未设置 ELEVENLABS_API_KEY，语音克隆将降级为 Mock 模式');
+  }
   if (isProd && (!config.mysql.host || config.mysql.host === 'localhost')) {
     warnings.push('生产环境 DB_HOST 仍为 localhost');
   }
