@@ -9,6 +9,7 @@
  * 新版统一认证中心: server/src/platform/authCenter.js
  */
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import config, { jwtSecret, jwtRefreshSecret, isDevelopment, isProduction } from '../config/index.js';
 import { isTokenBlacklisted } from '../utils/jwtToken.js';
 import { error as sendError } from '../utils/response.js';
@@ -52,6 +53,7 @@ export function generateRefreshToken(user) {
     {
       userId: user.userId || user.id,
       type: 'refresh',
+      jti: crypto.randomUUID(),
     },
     refreshSecret,
     { expiresIn: '7d' },
