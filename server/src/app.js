@@ -72,6 +72,7 @@ import imageRoutesV4 from './route/v4_image.routes.js';
 import detailRoutesV4 from './route/v4_detail.routes.js';
 import videoRoutesV4 from './route/v4_video.routes.js';
 import jobRoutesV4 from './route/v4_job.routes.js';
+import { bgRouter, msRouter } from './route/mediaProcessingRoutes.js';
 import pointsRoutesV4 from './route/v4_points.routes.js';
 import distributionRoutesV4 from './route/v4_distribution.routes.js';
 import assetsRoutesV4 from './route/v4_assets.routes.js';
@@ -339,6 +340,8 @@ app.use('/api/seo-keywords', heavyLimiter, seoKeywordRoutes);
 app.use('/api/fab', heavyLimiter, fabRoutes);
 app.use('/api/memory', heavyLimiter, memoryEmbedRoutes);
 app.use('/api/ltm', heavyLimiter, longTermMemoryRoutes); // Phase 15: 长期记忆 (2026-05-12)
+app.use('/api/background-removal', heavyLimiter, bgRouter);
+app.use('/api/multi-size', heavyLimiter, msRouter);
 app.use('/api/digital-human', heavyLimiter, digitalHumanRoutesV4);
 app.use('/api/platform-publish', apiLimiter, platformPublishRoutesV4);
 app.use('/api/template-market', apiLimiter, templateMarketRoutesV4);
