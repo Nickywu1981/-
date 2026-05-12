@@ -4,7 +4,6 @@
 import { wrapController } from '../utils/wrapController.js';
 import analyticsService from '../services/analyticsService.js';
 import { success } from '../utils/response.js';
-import { ERROR_CODE } from '../constants/errorCode.js';
 
 export const track = wrapController(async (req, res) => {
     const { event, metadata } = req.body;

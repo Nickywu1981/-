@@ -3,7 +3,6 @@
  * G5 后端开发 | 中间件链第3层 (NEW v4.1)
  * 三阶段审核: input(输入) → output(生成后) → publish(分发前)
  */
-import { error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
 export function contentModerationMiddleware(stage = 'input') {

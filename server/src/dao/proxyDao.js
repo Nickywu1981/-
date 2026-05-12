@@ -83,7 +83,7 @@ export default {
   // ==================== 白名单 CRUD ====================
   async listWhitelist(tenantId) {
     const [rows] = await pool.query(
-      'SELECT * FROM api_proxy_whitelist WHERE tenant_id IN (0, ?) AND status = 1 ORDER BY domain_type, domain_pattern',
+      'SELECT * FROM api_proxy_whitelist WHERE tenant_id IN (0, ?) AND status = 1 ORDER BY domain_type, domain_pattern LIMIT 1000',
       [tenantId],
     );
     return rows;

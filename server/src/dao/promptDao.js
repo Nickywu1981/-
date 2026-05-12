@@ -104,7 +104,7 @@ export async function removeFavorite(userId, templateId) {
 
 // ==================== 分组 ====================
 export async function listGroups(userId) {
-  const [rows] = await pool.execute('SELECT * FROM prompt_group WHERE user_id = ? ORDER BY sort_order', [userId]);
+  const [rows] = await pool.execute('SELECT * FROM prompt_group WHERE user_id = ? ORDER BY sort_order LIMIT 1000', [userId]);
   return rows;
 }
 

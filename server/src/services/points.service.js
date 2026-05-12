@@ -42,7 +42,7 @@ const POINT_RULES = {
 // 获取/创建积分账户
 // ============================================================
 async function getOrCreateAccount(conn, userId) {
-  const [rows] = await conn.query('SELECT * FROM points_account WHERE user_id = ?', [userId]);
+  const [rows] = await conn.query('SELECT * FROM points_account WHERE user_id = ? LIMIT 1', [userId]);
   if (rows.length > 0) return rows[0];
   await conn.query(
     'INSERT INTO points_account (user_id, balance, total_earned, total_spent, frozen) VALUES (?, 0, 0, 0, 0)',

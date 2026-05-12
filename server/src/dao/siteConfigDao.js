@@ -8,13 +8,13 @@ export const getAll = async () => {
 };
 
 export const getByKey = async (key) => {
-  const [rows] = await pool.query(`SELECT * FROM ${table} WHERE config_key = ?`, [key]);
+  const [rows] = await pool.query(`SELECT * FROM ${table} WHERE config_key = ? LIMIT 1`, [key]);
   return rows[0] || null;
 };
 
 export const getByKeys = async (keys) => {
   const placeholders = keys.map(() => '?').join(',');
-  const [rows] = await pool.query(`SELECT * FROM ${table} WHERE config_key IN (${placeholders})`, keys);
+  const [rows] = await pool.query(`SELECT * FROM ${table} WHERE config_key IN (${placeholders}) LIMIT 200`, keys);
   return rows;
 };
 

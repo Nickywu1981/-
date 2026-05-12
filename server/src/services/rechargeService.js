@@ -60,7 +60,7 @@ export async function refundOrder(orderNo) {
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
-    const [[order]] = await conn.query('SELECT * FROM recharge_order WHERE order_no = ? FOR UPDATE', [orderNo]);
+    const [[order]] = await conn.query('SELECT * FROM recharge_order WHERE order_no = ? LIMIT 1 FOR UPDATE', [orderNo]);
     if (!order || order.pay_status !== RECHARGE_PAY_STATUS.PAID) {
       await conn.rollback();
       throw new BusinessError(404, '订单不存在或未支付');

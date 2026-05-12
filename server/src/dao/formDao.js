@@ -138,7 +138,7 @@ export default {
   // ── 字段管理(独立表) ──
   async listFields(formId, tenantId) {
     const [rows] = await pool.query(
-      'SELECT * FROM diy_custom_field WHERE form_id = ? AND tenant_id = ? ORDER BY sort_order',
+      'SELECT * FROM diy_custom_field WHERE form_id = ? AND tenant_id = ? ORDER BY sort_order LIMIT 200',
       [formId, tenantId],
     );
     return rows;

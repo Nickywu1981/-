@@ -89,7 +89,7 @@ export async function createWithdrawal(tenantId, userId, data) {
 
     // 检查最低提现额度
     const policyRows = await conn.query(
-      'SELECT * FROM commission_policy WHERE tenant_id = ? AND status = 1', [tenantId],
+      'SELECT * FROM commission_policy WHERE tenant_id = ? AND status = 1 LIMIT 1', [tenantId],
     );
     const policy = policyRows[0]?.[0] || null;
     const minAmount = policy?.min_withdrawal || 100;
@@ -100,7 +100,7 @@ export async function createWithdrawal(tenantId, userId, data) {
     // 检查收款账户
     if (bankAccountId) {
       const [accountRows] = await conn.query(
-        'SELECT * FROM bank_account WHERE id = ? AND is_deleted = 0', [bankAccountId],
+        'SELECT * FROM bank_account WHERE id = ? AND is_deleted = 0 LIMIT 1', [bankAccountId],
       );
       const account = accountRows[0];
       if (!account || account.tenant_id !== tenantId) {

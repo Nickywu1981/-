@@ -124,7 +124,7 @@ export async function retryPublish(recordId, userId) {
   const conn = await db.getConnection();
   try {
     const [[record]] = await conn.query(
-      'SELECT * FROM publish_record WHERE id = ? AND user_id = ?',
+      'SELECT * FROM publish_record WHERE id = ? AND user_id = ? LIMIT 1',
       [recordId, userId],
     );
     if (!record) throw new BusinessError(404, '发布记录不存在');
