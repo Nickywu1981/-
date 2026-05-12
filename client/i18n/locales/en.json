@@ -417,7 +417,9 @@
       "download": "⬇ Download",
       "reuse": "🔄 Reuse",
       "close_result": "Close",
-      "progress_pct": "Generating... {pct}%"
+      "progress_pct": "Generating... {pct}%",
+      "generate_error": "Generation failed, please retry",
+      "retry": "Retry"
     },
 
     "creation_sub_cards": {
@@ -556,32 +558,16 @@
       ]
     },
     "history_desc": "View all your creation history and manage your work",
-    "panel": {
-      "close": "Close panel",
-      "params_label": "Parameters",
-      "generate": "⚡ Generate",
-      "generating": "Generating... {progress}%",
-      "step_upload": "Upload",
-      "step_analyze": "AI Analyze",
-      "step_generate": "Generate",
-      "step_done": "Done",
-      "result_name": "Result",
-      "download": "⬇ Download",
-      "reuse": "🔄 Reuse",
-      "close_btn": "Close",
-      "panel_param_type": "Type",
-      "panel_param_quality": "Quality",
-      "panel_param_format": "Format",
-      "panel_opt_auto": "Auto",
-      "panel_opt_standard": "Standard",
-      "panel_opt_premium": "Premium",
-      "panel_opt_sd": "SD",
-      "panel_opt_hd": "HD",
-      "panel_opt_uhd": "UHD",
-      "panel_generate_title": "{tab} — Generate Result",
-      "generate_error": "Generation failed, please retry",
-      "retry": "Retry"
-    }
+    "panel_param_type": "Type",
+    "panel_param_quality": "Quality",
+    "panel_param_format": "Format",
+    "panel_opt_auto": "Auto",
+    "panel_opt_standard": "Standard",
+    "panel_opt_premium": "Premium",
+    "panel_opt_sd": "SD",
+    "panel_opt_hd": "HD",
+    "panel_opt_uhd": "UHD",
+    "panel_generate_title": "{tab} — Generate Result",
   },
   "admin_shell": {
     "expand_sidebar": "Expand Sidebar",
