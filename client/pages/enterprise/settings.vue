@@ -105,22 +105,22 @@ definePageMeta({ layout: 'enterprise' });
 </script>
 
 <style scoped>
-.page-title { font-size: 24px; margin: 0 0 28px; color: #1a1a2e; }
+.page-title { font-size: 24px; margin: 0 0 28px; color: var(--text-primary); }
 
-.form-card, .info-card { background: #fff; border-radius: 16px; padding: 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); max-width: 560px; margin-bottom: 24px; }
-.form-card h2, .info-card h2 { font-size: 16px; margin: 0 0 18px; color: #333; }
+.form-card, .info-card { background: var(--bg-card); border-radius: 16px; padding: 28px; box-shadow: var(--shadow-md); max-width: 560px; margin-bottom: 24px; }
+.form-card h2, .info-card h2 { font-size: 16px; margin: 0 0 18px; color: var(--text-primary); }
 .form-group { margin-bottom: 16px; }
-.form-group label { display: block; font-size: 14px; color: #555; margin-bottom: 4px; }
-.form-group input { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
+.form-group label { display: block; font-size: 14px; color: var(--text-secondary); margin-bottom: 4px; }
+.form-group input { width: 100%; padding: 10px 14px; border: 1px solid var(--input-border); border-radius: 8px; font-size: 14px; box-sizing: border-box; }
 
 .msg { padding: 10px; border-radius: 8px; font-size: 14px; margin-bottom: 14px; }
-.msg.success { background: #e8f5e9; color: #27ae60; }
-.msg.error { background: #fbe9e7; color: #e74c3c; }
+.msg.success { background: var(--success-bg); color: var(--color-success-500); }
+.msg.error { background: var(--danger-bg); color: var(--color-danger-500); }
 
-.btn-primary { padding: 12px 28px; background: #667eea; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; }
+.btn-primary { padding: 12px 28px; background: var(--color-brand-600); color: var(--text-on-brand); border: none; border-radius: 8px; cursor: pointer; font-size: 15px; }
 .btn-primary:disabled { opacity: 0.6; }
 
 .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-.info-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
-.info-item .label { color: #888; }
+.info-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-light); font-size: 14px; }
+.info-item .label { color: var(--text-muted); }
 </style>

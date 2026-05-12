@@ -114,33 +114,33 @@ definePageMeta({ layout: 'enterprise' });
 
 <style scoped>
 .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-.page-title { font-size: 24px; margin: 0; color: #1a1a2e; }
-.btn-primary { padding: 10px 20px; background: #667eea; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
+.page-title { font-size: 24px; margin: 0; color: var(--text-primary); }
+.btn-primary { padding: 10px 20px; background: var(--brand); color: var(--text-on-brand); border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
 .btn-primary:disabled { opacity: 0.6; }
 
 .card-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-.account-card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 2px solid transparent; }
-.account-card.default { border-color: #667eea; }
+.account-card { background: var(--bg-card); border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 2px solid transparent; }
+.account-card.default { border-color: var(--brand); }
 .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
 .account-type { font-weight: 600; font-size: 15px; }
-.default-badge { background: #e8f0fe; color: #1a73e8; padding: 2px 10px; border-radius: 12px; font-size: 12px; }
+.default-badge { background: var(--info-bg); color: var(--info); padding: 2px 10px; border-radius: 12px; font-size: 12px; }
 .info-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; }
-.info-row .label { color: #888; }
+.info-row .label { color: var(--text-secondary); }
 .mono { font-family: monospace; }
 .card-footer { margin-top: 14px; text-align: right; }
-.btn-danger { padding: 4px 14px; border: 1px solid #e74c3c; color: #e74c3c; background: #fff; border-radius: 6px; cursor: pointer; font-size: 12px; }
-.empty { text-align: center; padding: 60px; color: #999; }
+.btn-danger { padding: 4px 14px; border: 1px solid var(--danger); color: var(--danger); background: var(--bg-card); border-radius: 6px; cursor: pointer; font-size: 12px; }
+.empty { text-align: center; padding: 60px; color: var(--text-muted); }
 
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-.modal { width: 420px; background: #fff; border-radius: 16px; padding: 28px; }
+.modal-overlay { position: fixed; inset: 0; background: var(--bg-overlay); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+.modal { width: 420px; background: var(--bg-card); border-radius: 16px; padding: 28px; }
 .modal h2 { margin: 0 0 20px; font-size: 18px; }
 .form-group { margin-bottom: 14px; }
-.form-group label { display: block; font-size: 13px; color: #555; margin-bottom: 4px; }
-.form-group input, .form-group select { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
+.form-group label { display: block; font-size: 13px; color: var(--text-secondary); margin-bottom: 4px; }
+.form-group input, .form-group select { width: 100%; padding: 8px 12px; border: 1px solid var(--border-light); border-radius: 8px; font-size: 14px; box-sizing: border-box; }
 .checkbox label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
 .checkbox input[type="checkbox"] { width: auto; }
-.required { color: #e74c3c; }
-.error-msg { color: #e74c3c; font-size: 13px; margin-bottom: 8px; }
+.required { color: var(--danger); }
+.error-msg { color: var(--danger); font-size: 13px; margin-bottom: 8px; }
 .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
 .btn-cancel { padding: 8px 20px; border: 1px solid #ddd; background: #fff; border-radius: 8px; cursor: pointer; }
 </style>

@@ -77,18 +77,18 @@ definePageMeta({ layout: 'enterprise' });
 </script>
 
 <style scoped>
-.page-title { font-size: 24px; margin: 0 0 20px; color: #1a1a2e; }
+.page-title { font-size: 24px; margin: 0 0 20px; color: var(--text-primary); }
 .toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; }
-.date-input { padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
-.sep { color: #999; font-size: 14px; }
-.filter-select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; background: #fff; }
-.btn-text { padding: 8px 16px; background: #f0f0f0; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
+.date-input { padding: 8px 12px; border: 1px solid var(--input-border); border-radius: 8px; font-size: 14px; }
+.sep { color: var(--text-muted); font-size: 14px; }
+.filter-select { padding: 8px 12px; border: 1px solid var(--input-border); border-radius: 8px; font-size: 14px; background: var(--bg-card); }
+.btn-text { padding: 8px 16px; background: var(--bg-hover); border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
 
-.section { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-.section h2 { font-size: 16px; margin: 0 0 14px; color: #333; }
+.section { background: var(--bg-card); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow-sm); }
+.section h2 { font-size: 16px; margin: 0 0 14px; color: var(--text-primary); }
 table { width: 100%; border-collapse: collapse; }
 .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-th, td { padding: 10px 14px; text-align: left; font-size: 14px; border-bottom: 1px solid #f0f0f0; }
-th { background: #fafafa; color: #666; font-weight: 500; }
-.empty { text-align: center; padding: 60px; color: #999; font-size: 15px; }
+th, td { padding: 10px 14px; text-align: left; font-size: 14px; border-bottom: 1px solid var(--border-light); }
+th { background: var(--table-header-bg); color: var(--text-secondary); font-weight: 500; }
+.empty { text-align: center; padding: 60px; color: var(--text-muted); font-size: 15px; }
 </style>
