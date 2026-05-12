@@ -1,23 +1,27 @@
 <template>
   <div class="billing-page">
-    <h2>账单记录</h2>
+    <h2>{{ $t('account_pages.billing.title') }}</h2>
 
     <div class="summary">
-      <span>共 {{ total }} 条记录</span>
+      <span>{{ $t('account_pages.billing.summary', { total }) }}</span>
     </div>
 
     <LoadingSkeleton v-if="loading" />
+    <div v-else-if="error" class="error-state">
+      <p>{{ error }}</p>
+      <button class="btn-outline" @click="fetchData">{{ $t('error.retry') }}</button>
+    </div>
     <template v-else-if="list.length">
     <div class="table-wrap">
     <table class="table">
       <thead>
         <tr>
-          <th>记录</th>
-          <th>变动前</th>
-          <th>变动后</th>
-          <th>变更</th>
-          <th>备注</th>
-          <th>时间</th>
+          <th>{{ $t('account_pages.billing.col_record') }}</th>
+          <th>{{ $t('account_pages.billing.col_before') }}</th>
+          <th>{{ $t('account_pages.billing.col_after') }}</th>
+          <th>{{ $t('account_pages.billing.col_change') }}</th>
+          <th>{{ $t('account_pages.billing.col_remark') }}</th>
+          <th>{{ $t('account_pages.billing.col_time') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -37,30 +41,32 @@
 
     <Pagination v-if="total > pageSize" :page="page" :total="total" :page-size="pageSize" @change="onPageChange" />
     </template>
-    <div v-else class="empty">暂无账单记录</div>
+    <div v-else class="empty">{{ $t('account_pages.billing.empty') }}</div>
   </div>
 </template>
 
 <script setup lang="ts">
 
+const { t } = useI18n()
 const list = ref<any[]>([]);
 const total = ref(0);
 const page = ref(1);
 const pageSize = 20;
 const loading = ref(true);
+const error = ref('');
 const toast = useToast()
 
 onMounted(() => { fetchData(); });
 
 async function fetchData() {
-  loading.value = true;
+  loading.value = true; error.value = '';
   try {
     const data: any = await $fetch(`/api/payment/billing?page=${page.value}&pageSize=${pageSize}`, { credentials: 'include' });
     if (data.code === 200) {
       list.value = data.data.list || [];
       total.value = data.data.total || 0;
     }
-  } catch { toast.error('加载账单失败') }
+  } catch { error.value = t('account_pages.billing.load_error') }
   loading.value = false;
 }
 
@@ -81,4 +87,8 @@ h2 { font-size: 24px; font-weight: 700; color: var(--text-primary); margin-botto
 .earn { color: var(--success); font-weight: 600; }
 
 .empty { text-align: center; color: var(--text-tertiary); padding: 60px 0; }
+.error-state { text-align: center; padding: 60px 20px; }
+.error-state p { color: var(--danger); margin-bottom: 16px; }
+.btn-outline { padding: 8px 20px; border: 1px solid var(--border-light); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 13px; }
+.btn-outline:hover { border-color: var(--brand); }
 </style>

@@ -1,27 +1,27 @@
 <template>
   <div class="collections-page">
     <div class="page-header">
-      <h1>我的合集</h1>
+      <h1>{{ $t('account_pages.collections.title') }}</h1>
       <div class="header-actions">
-        <input v-model="search" placeholder="搜索合集..." class="search-input" @input="onSearch" />
-        <button class="btn-primary" @click="showCreate = true">+ 新建合集</button>
+        <input v-model="search" :placeholder="$t('account_pages.collections.search_placeholder')" class="search-input" @input="onSearch" />
+        <button class="btn-primary" @click="showCreate = true">{{ $t('account_pages.collections.new_collection') }}</button>
       </div>
     </div>
 
     <LoadingSkeleton v-if="loading" type="card" :rows="3" />
 
     <div v-else-if="error" class="error-state">
-      <span class="error-icon">⚠️</span>
+      <span class="error-icon">⚠</span>
       <p>{{ error }}</p>
-      <button class="btn-outline" @click="fetchData">重试</button>
+      <button class="btn-outline" @click="fetchData">{{ $t('error.retry') }}</button>
     </div>
 
     <EmptyState
       v-else-if="!list.length"
       icon="📁"
-      title="还没有合集"
-      description="将喜欢的作品收藏到合集中，方便管理和分享"
-      action-label="新建合集"
+      :title="$t('account_pages.collections.empty_title')"
+      :description="$t('account_pages.collections.empty_desc')"
+      :action-label="$t('account_pages.collections.empty_action')"
       @action="showCreate = true"
     />
 
@@ -30,17 +30,17 @@
         <div class="card-cover">
           <img v-if="item.cover_url" :src="item.cover_url" :alt="item.name" loading="lazy" @error="e => (e.target as HTMLImageElement).style.display='none'" />
           <span v-else class="cover-placeholder">{{ item.name?.slice(0, 2) }}</span>
-          <span v-if="item.is_public" class="badge-public">公开</span>
+          <span v-if="item.is_public" class="badge-public">{{ $t('account_pages.collections.public_badge') }}</span>
         </div>
         <div class="card-body">
           <h3>{{ item.name }}</h3>
-          <p>{{ item.item_count ?? 0 }} 个作品</p>
+          <p>{{ $t('account_pages.collections.items_count', { count: item.item_count ?? 0 }) }}</p>
           <p class="card-desc" v-if="item.description">{{ item.description }}</p>
         </div>
         <div class="card-actions">
-          <button class="btn-icon" title="编辑" @click.stop="startEdit(item)">✏️</button>
-          <button class="btn-icon" title="分享" @click.stop="shareCollection(item)">🔗</button>
-          <button class="btn-icon danger" title="删除" aria-label="删除收藏" @click.stop="deleteItem(item)">🗑️</button>
+          <button class="btn-icon" :title="$t('account_pages.collections.edit')" @click.stop="startEdit(item)">✏</button>
+          <button class="btn-icon" :title="$t('account_pages.collections.share')" @click.stop="shareCollection(item)">🔗</button>
+          <button class="btn-icon danger" :title="$t('account_pages.collections.delete')" :aria-label="$t('account_pages.collections.delete')" @click.stop="deleteItem(item)">🗑</button>
         </div>
       </div>
     </div>
@@ -54,18 +54,18 @@
     <!-- Create Modal -->
     <div v-if="showCreate" class="modal-overlay" @click.self="showCreate = false">
       <div class="modal">
-        <h3>新建合集</h3>
-        <label class="field-label">合集名称</label>
-        <input v-model="form.name" placeholder="例如：夏季新品、节日素材..." class="input" maxlength="50" />
-        <label class="field-label">描述（可选）</label>
-        <textarea v-model="form.desc" placeholder="简要描述合集内容..." class="input textarea" rows="2" maxlength="200" />
+        <h3>{{ $t('account_pages.collections.create_modal_title') }}</h3>
+        <label class="field-label">{{ $t('account_pages.collections.name_label') }}</label>
+        <input v-model="form.name" :placeholder="$t('account_pages.collections.name_placeholder')" class="input" maxlength="50" />
+        <label class="field-label">{{ $t('account_pages.collections.desc_label') }}</label>
+        <textarea v-model="form.desc" :placeholder="$t('account_pages.collections.desc_placeholder')" class="input textarea" rows="2" maxlength="200" />
         <label class="checkbox-label">
-          <input type="checkbox" v-model="form.isPublic" /> 公开合集（其他人可见）
+          <input type="checkbox" v-model="form.isPublic" /> {{ $t('account_pages.collections.public_checkbox') }}
         </label>
         <div class="modal-actions">
-          <button class="btn-outline" @click="showCreate = false">取消</button>
+          <button class="btn-outline" @click="showCreate = false">{{ $t('account_pages.collections.cancel') }}</button>
           <button class="btn-primary" :disabled="!form.name || saving" @click="createCollection">
-            {{ saving ? '创建中...' : '创建' }}
+            {{ saving ? $t('account_pages.collections.creating') : $t('account_pages.collections.create_btn') }}
           </button>
         </div>
       </div>
@@ -74,14 +74,14 @@
     <!-- Edit Modal -->
     <div v-if="editing" class="modal-overlay" @click.self="editing = null">
       <div class="modal">
-        <h3>编辑合集</h3>
-        <label class="field-label">名称</label>
+        <h3>{{ $t('account_pages.collections.edit_modal_title') }}</h3>
+        <label class="field-label">{{ $t('account_pages.collections.edit_name_label') }}</label>
         <input v-model="editForm.name" class="input" />
-        <label class="field-label">描述</label>
+        <label class="field-label">{{ $t('account_pages.collections.edit_desc_label') }}</label>
         <textarea v-model="editForm.description" class="input textarea" rows="2" />
         <div class="modal-actions">
-          <button class="btn-outline" @click="editing = null">取消</button>
-          <button class="btn-primary" :disabled="!editForm.name" @click="saveEdit">保存</button>
+          <button class="btn-outline" @click="editing = null">{{ $t('account_pages.collections.cancel') }}</button>
+          <button class="btn-primary" :disabled="!editForm.name" @click="saveEdit">{{ $t('account_pages.collections.save') }}</button>
         </div>
       </div>
     </div>
@@ -90,9 +90,9 @@
 
 <script setup lang="ts">
 
+const { t } = useI18n()
 const { confirm } = useConfirm()
 import { copyToClipboard } from '@/utils/format';
-
 
 const toast = useToast()
 const list: Ref<any[]> = ref([])
@@ -118,8 +118,7 @@ async function fetchData() {
     list.value = res.data?.list || res.data || []
     total.value = res.data?.total || 0
   } catch (e: any) {
-    error.value = e?.data?.msg || e.message || '加载失败'
-    toast.error(error.value)
+    error.value = e?.data?.msg || e.message || t('account_pages.collections.create_fail')
   } finally { loading.value = false }
 }
 
@@ -132,10 +131,10 @@ async function createCollection() {
     })
     showCreate.value = false
     form.name = ''; form.desc = ''; form.isPublic = false
-    toast.success('合集创建成功')
+    toast.success(t('account_pages.collections.create_success'))
     fetchData()
   } catch (e: any) {
-    toast.error(e?.data?.msg || e.message || '创建失败')
+    toast.error(e?.data?.msg || e.message || t('account_pages.collections.create_fail'))
   } finally { saving.value = false }
 }
 
@@ -152,22 +151,22 @@ async function saveEdit() {
       method: 'PUT',
       body: { name: editForm.name, description: editForm.description },
     })
-    toast.success('已更新')
+    toast.success(t('account_pages.collections.update_success'))
     editing.value = null
     fetchData()
   } catch (e: any) {
-    toast.error(e?.data?.msg || e.message || '更新失败')
+    toast.error(e?.data?.msg || e.message || t('account_pages.collections.update_fail'))
   }
 }
 
 async function deleteItem(item: any) {
-  if (!await confirm({ message: `确定删除合集「${item.name}」？此操作不可恢复。`} )) return
+  if (!await confirm({ message: t('account_pages.collections.delete_confirm', { name: item.name }) })) return
   try {
     await $fetch(`/api/collections/${item.id}`, { method: 'DELETE' })
-    toast.success('已删除')
+    toast.success(t('account_pages.collections.delete_success'))
     fetchData()
   } catch (e: any) {
-    toast.error(e?.data?.msg || e.message || '删除失败')
+    toast.error(e?.data?.msg || e.message || t('account_pages.collections.delete_fail'))
   }
 }
 
@@ -180,9 +179,9 @@ async function shareCollection(item: any) {
   const url = `${window.location.origin}/my/collections?id=${item.id}`
   const ok = await copyToClipboard(url)
   if (ok) {
-    toast.success('链接已复制到剪贴板')
+    toast.success(t('account_pages.collections.copy_success'))
   } else {
-    prompt('复制此链接分享合集:', url)
+    prompt(t('account_pages.collections.copy_prompt'), url)
   }
 }
 

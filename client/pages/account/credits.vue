@@ -1,20 +1,26 @@
 <template>
   <div class="account-page">
-    <h2>积分明细</h2>
+    <h2>{{ $t('account_pages.credits.title') }}</h2>
     <div class="credit-summary">
-      <div class="stat"><span class="val">{{ balance }}</span><span class="lbl">当前积分</span></div>
-      <div class="stat"><span class="val in">{{ totalIn }}</span><span class="lbl">累计获得</span></div>
-      <div class="stat"><span class="val out">{{ totalOut }}</span><span class="lbl">累计消耗</span></div>
+      <div class="stat"><span class="val">{{ balance }}</span><span class="lbl">{{ $t('account_pages.credits.balance') }}</span></div>
+      <div class="stat"><span class="val in">{{ totalIn }}</span><span class="lbl">{{ $t('account_pages.credits.total_earn') }}</span></div>
+      <div class="stat"><span class="val out">{{ totalOut }}</span><span class="lbl">{{ $t('account_pages.credits.total_out') }}</span></div>
     </div>
     <div v-if="loading" class="skeleton"><div v-for="i in 5" :key="i" class="skel-row" /></div>
-    <div v-else-if="error" class="error-msg">{{ error }} <button @click="fetchRecords">重试</button></div>
+    <div v-else-if="error" class="error-msg">{{ error }} <button @click="fetchRecords">{{ $t('error.retry') }}</button></div>
     <div v-else-if="records.length" class="table-wrap">
       <table class="credits-table">
-        <thead><tr><th>时间</th><th>类型</th><th>金额</th><th>余额</th><th>备注</th></tr></thead>
+        <thead><tr>
+          <th>{{ $t('account_pages.credits.col_time') }}</th>
+          <th>{{ $t('account_pages.credits.col_type') }}</th>
+          <th>{{ $t('account_pages.credits.col_amount') }}</th>
+          <th>{{ $t('account_pages.credits.col_balance') }}</th>
+          <th>{{ $t('account_pages.credits.col_remark') }}</th>
+        </tr></thead>
         <tbody>
           <tr v-for="r in records" :key="r.id">
             <td>{{ formatDateTime(r.created_at) }}</td>
-            <td><span :class="['badge', r.type === 'earn' ? 'badge-in' : 'badge-out']">{{ r.type === 'earn' ? '获得' : '消耗' }}</span></td>
+            <td><span :class="['badge', r.type === 'earn' ? 'badge-in' : 'badge-out']">{{ r.type === 'earn' ? $t('account_pages.credits.earn') : $t('account_pages.credits.consume') }}</span></td>
             <td :class="r.type === 'earn' ? 'text-in' : 'text-out'">{{ r.type === 'earn' ? '+' : '-' }}{{ r.amount }}</td>
             <td>{{ r.balance }}</td>
             <td>{{ r.remark || '-' }}</td>
@@ -22,7 +28,7 @@
         </tbody>
       </table>
     </div>
-    <div v-else class="empty">暂无积分记录</div>
+    <div v-else class="empty">{{ $t('account_pages.credits.empty') }}</div>
     <Pagination v-if="total > pageSize" :page="page" :total="total" :page-size="pageSize" @change="goPage" />
   </div>
 </template>
@@ -30,6 +36,7 @@
 <script setup lang="ts">
 import { formatDateTime } from '@/utils/format'
 
+const { t } = useI18n()
 const records = ref<any[]>([])
 const balance = ref(0)
 const totalIn = ref(0)
@@ -52,8 +59,8 @@ async function fetchRecords() {
       balance.value = data.data.balance || 0
       totalIn.value = data.data.totalIn || 0
       totalOut.value = data.data.totalOut || 0
-    } else { error.value = data.msg || '加载失败' }
-  } catch (e: any) { error.value = e?.data?.msg || e.message || '加载失败' }
+    } else { error.value = data.msg || t('account_pages.credits.load_error') }
+  } catch (e: any) { error.value = e?.data?.msg || e.message || t('account_pages.credits.load_error') }
   finally { loading.value = false }
 }
 function goPage(p: number) { page.value = p; fetchRecords() }

@@ -1,63 +1,64 @@
 <template>
   <div class="account-page">
-    <h1>开发者设置</h1>
-    <p class="page-desc">管理 Open API 密钥，接入第三方开发</p>
+    <h1>{{ $t('account_pages.developer.title') }}</h1>
+    <p class="page-desc">{{ $t('account_pages.developer.desc') }}</p>
 
     <div class="api-section">
       <div class="section-header">
-        <h3>API Keys</h3>
+        <h3>{{ $t('account_pages.developer.api_keys') }}</h3>
         <button class="btn-primary" :disabled="creating" @click="showCreate = true">
-          + 创建密钥
+          {{ $t('account_pages.developer.create_key') }}
         </button>
       </div>
 
       <!-- 创建表单 -->
       <div v-if="showCreate" class="create-form">
         <div class="form-group">
-          <label>密钥描述</label>
-          <input v-model="form.description" class="text-input" placeholder="例如：我的小程序接入" maxlength="200" />
+          <label>{{ $t('account_pages.developer.key_desc_label') }}</label>
+          <input v-model="form.description" class="text-input" :placeholder="$t('account_pages.developer.key_desc_placeholder')" maxlength="200" />
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>每分钟限制</label>
+            <label>{{ $t('account_pages.developer.rate_limit') }}</label>
             <input v-model.number="form.rateLimit" type="number" class="text-input" min="1" max="1000" />
           </div>
           <div class="form-group">
-            <label>每日限制</label>
+            <label>{{ $t('account_pages.developer.daily_limit') }}</label>
             <input v-model.number="form.dailyLimit" type="number" class="text-input" min="1" max="100000" />
           </div>
         </div>
         <div class="form-actions">
-          <button class="btn-primary" :disabled="creating" @click="createKey">确认创建</button>
-          <button class="btn-secondary" @click="showCreate = false">取消</button>
+          <button class="btn-primary" :disabled="creating" @click="createKey">{{ $t('account_pages.developer.confirm_create') }}</button>
+          <button class="btn-secondary" @click="showCreate = false">{{ $t('account_pages.developer.cancel') }}</button>
         </div>
       </div>
 
       <!-- 新密钥展示 -->
       <div v-if="newKey" class="new-key-box">
-        <p class="new-key-warn">！密钥仅显示一次，请立即保存</p>
+        <p class="new-key-warn">{{ $t('account_pages.developer.key_once_warning') }}</p>
         <div class="key-row"><span class="key-label">API Key</span><code class="key-value">{{ newKey.apiKey }}</code></div>
         <div class="key-row"><span class="key-label">API Secret</span><code class="key-value">{{ newKey.apiSecret }}</code></div>
-        <button class="btn-primary" @click="newKey = null">已保存，关闭</button>
+        <button class="btn-primary" @click="newKey = null">{{ $t('account_pages.developer.saved_close') }}</button>
       </div>
 
       <!-- 密钥列表 -->
-      <p v-if="!keys.length && !loading" class="empty-hint">暂无 API Key</p>
+      <LoadingSkeleton v-if="loading" />
+      <p v-else-if="!keys.length" class="empty-hint">{{ $t('account_pages.developer.no_keys') }}</p>
       <div v-else class="key-list">
         <div v-for="k in keys" :key="k.id" class="key-card" :class="{ disabled: k.status === 0 }">
           <div class="key-info">
             <code class="key-display">{{ k.apiKey }}</code>
-            <span class="key-desc">{{ k.description || '未命名密钥' }}</span>
+            <span class="key-desc">{{ k.description || $t('account_pages.developer.unnamed_key') }}</span>
             <span class="key-meta">
               {{ k.rateLimit }}/min · {{ k.dailyLimit }}/day · {{ formatDateTime(k.createTime) }}
             </span>
           </div>
           <div class="key-actions">
             <span class="status-badge" :class="k.status === 1 ? 'active' : 'inactive'">
-              {{ k.status === 1 ? '启用' : '禁用' }}
+              {{ k.status === 1 ? $t('account_pages.developer.enabled') : $t('account_pages.developer.disabled') }}
             </span>
-            <button class="btn-sm" @click="toggleKey(k)">{{ k.status === 1 ? '禁用' : '启用' }}</button>
-            <button class="btn-sm danger" @click="deleteKey(k)">删除</button>
+            <button class="btn-sm" @click="toggleKey(k)">{{ k.status === 1 ? $t('account_pages.developer.disabled') : $t('account_pages.developer.enabled') }}</button>
+            <button class="btn-sm danger" @click="deleteKey(k)">{{ $t('account_pages.developer.delete') }}</button>
           </div>
         </div>
       </div>
@@ -67,9 +68,9 @@
 
     <!-- 接入文档 -->
     <div class="api-section">
-      <h3>接入文档</h3>
+      <h3>{{ $t('account_pages.developer.api_doc_title') }}</h3>
       <div class="doc-box">
-        <p>使用 API Key 调用 Open API 端点：</p>
+        <p>{{ $t('account_pages.developer.api_doc_desc') }}</p>
         <pre><code>const ts = Math.floor(Date.now() / 1000)
 const body = JSON.stringify({ imageUrl: 'https://...' })
 const sign = await hmacSha256(ts + 'POST' + '/api/open/v1/image/remove-bg' + body, apiSecret)
@@ -93,11 +94,12 @@ fetch('/api/open/v1/image/remove-bg', {
 import { api } from '@/composables/useApi'
 import { formatDateTime } from '@/utils/format'
 
+const { t } = useI18n()
 const { confirm } = useConfirm()
 const toast = useToast()
 
 const keys = ref<any[]>([])
-const loading = ref(false)
+const loading = ref(true)
 const showCreate = ref(false)
 const creating = ref(false)
 const newKey = ref<any>(null)
@@ -106,10 +108,10 @@ const msgErr = ref(false)
 const form = reactive({ description: '', rateLimit: 100, dailyLimit: 10000 })
 
 async function loadKeys() {
-  loading.value = true
+  loading.value = true; msg.value = ''
   try {
     keys.value = (await api.get('/open/keys'))?.items || []
-  } catch { toast.error('加载API Key失败') }
+  } catch { toast.error(t('account_pages.developer.load_error')) }
   finally { loading.value = false }
 }
 
@@ -122,7 +124,7 @@ async function createKey() {
     form.description = ''
     await loadKeys()
   } catch (e: any) {
-    msg.value = e?.data?.msg || e.message || '创建失败'
+    msg.value = e?.data?.msg || e.message || t('account_pages.developer.create_error')
     msgErr.value = true
   }
   creating.value = false
@@ -133,18 +135,18 @@ async function toggleKey(k: any) {
     await api.put(`/open/keys/${k.id}/toggle`, { status: k.status === 1 ? 0 : 1 })
     await loadKeys()
   } catch (e: any) {
-    msg.value = e?.data?.msg || e.message || '操作失败'
+    msg.value = e?.data?.msg || e.message || t('account_pages.developer.toggle_error')
     msgErr.value = true
   }
 }
 
 async function deleteKey(k: any) {
-  if (!await confirm({ message: '确定删除该密钥？'} )) return
+  if (!await confirm({ message: t('account_pages.developer.delete_confirm') })) return
   try {
     await api.delete(`/open/keys/${k.id}`)
     await loadKeys()
   } catch (e: any) {
-    msg.value = e?.data?.msg || e.message || '删除失败'
+    msg.value = e?.data?.msg || e.message || t('account_pages.developer.delete_error')
     msgErr.value = true
   }
 }

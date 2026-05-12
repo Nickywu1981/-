@@ -6,78 +6,81 @@
 <template>
   <div class="page-container">
     <header class="page-header">
-      <h1>平台绑定</h1>
-      <p>绑定您的电商平台店铺和社交账号，一键分发内容</p>
+      <h1>{{ $t('account_pages.bind_platform.title') }}</h1>
+      <p>{{ $t('account_pages.bind_platform.subtitle') }}</p>
     </header>
 
-    <!-- 已绑定列表 -->
-    <div class="section">
-      <h3>已绑定</h3>
-      <div v-if="boundList.length === 0 && !loading" class="empty-state">暂未绑定任何平台</div>
-      <div v-else class="bound-list">
-        <div v-for="b in boundList" :key="b.id" class="bound-row">
-          <span class="bd-icon">{{ platformIcon(b.platform) }}</span>
-          <div class="bd-info">
-            <span class="bd-platform">{{ b.platform_name || b.platform }}</span>
-            <span class="bd-account">{{ b.account_name || b.account_id }}</span>
-          </div>
-          <span class="bd-type" :class="b.bind_type">{{ b.bind_type === 'shop' ? '店铺' : '账号' }}</span>
-          <button class="btn btn-ghost btn-xs" @click="doUnbind(b)">解绑</button>
-        </div>
-      </div>
-    </div>
+    <LoadingSkeleton v-if="loading" />
 
-    <!-- 绑定新平台 -->
-    <div class="section">
-      <h3>绑定新平台</h3>
-      <div class="bind-grid">
-        <div v-for="p in availablePlatforms" :key="p.code" class="bind-card">
-          <span class="bind-icon">{{ p.icon }}</span>
-          <div class="bind-info">
-            <span class="bind-name">{{ p.name }}</span>
-            <span class="bind-desc">{{ p.desc }}</span>
-          </div>
-
-          <div v-if="bindTarget?.code === p.code" class="bind-form">
-            <select v-model="bindType" class="input input-sm">
-              <option value="shop">店铺绑定</option>
-              <option value="account">账号绑定</option>
-            </select>
-            <input v-model="bindAccountId" class="input input-sm" :placeholder="p.code === 'taobao' ? '店铺ID/旺旺名' : '账号ID/用户名'" />
-            <div class="bind-form-actions">
-              <button class="btn btn-primary btn-xs" :disabled="!bindAccountId || binding" @click="doBind(p)">{{ binding ? '绑定中...' : '确认绑定' }}</button>
-              <button class="btn btn-ghost btn-xs" @click="bindTarget = null">取消</button>
+    <template v-else>
+      <!-- 已绑定列表 -->
+      <div class="section">
+        <h3>{{ $t('account_pages.bind_platform.bound_section') }}</h3>
+        <div v-if="boundList.length === 0" class="empty-state">{{ $t('account_pages.bind_platform.no_bound') }}</div>
+        <div v-else class="bound-list">
+          <div v-for="b in boundList" :key="b.id" class="bound-row">
+            <span class="bd-icon">{{ platformIcon(b.platform) }}</span>
+            <div class="bd-info">
+              <span class="bd-platform">{{ b.platform_name || b.platform }}</span>
+              <span class="bd-account">{{ b.account_name || b.account_id }}</span>
             </div>
+            <span class="bd-type" :class="b.bind_type">{{ b.bind_type === 'shop' ? $t('account_pages.bind_platform.shop_type') : $t('account_pages.bind_platform.account_type') }}</span>
+            <button class="btn btn-ghost btn-xs" @click="doUnbind(b)">{{ $t('account_pages.bind_platform.unbind') }}</button>
           </div>
-
-          <button v-else class="btn btn-outline btn-xs" @click="bindTarget = p">绑定</button>
         </div>
       </div>
-    </div>
 
-    <!-- 说明 -->
-    <div class="info-box">
-      <h4>为什么需要绑定平台？</h4>
-      <ul>
-        <li>绑定后可一键将AI素材发布到对应平台</li>
-        <li>系统会自动适配各平台的图片尺寸和视频格式</li>
-        <li>您的账号凭证使用AES-256加密存储，安全有保障</li>
-        <li>可随时解绑，数据不会丢失</li>
-      </ul>
-    </div>
+      <!-- 绑定新平台 -->
+      <div class="section">
+        <h3>{{ $t('account_pages.bind_platform.bind_new') }}</h3>
+        <div class="bind-grid">
+          <div v-for="p in availablePlatforms" :key="p.code" class="bind-card">
+            <span class="bind-icon">{{ p.icon }}</span>
+            <div class="bind-info">
+              <span class="bind-name">{{ $t(p.nameKey) }}</span>
+              <span class="bind-desc">{{ $t(p.descKey) }}</span>
+            </div>
+
+            <div v-if="bindTarget?.code === p.code" class="bind-form">
+              <select v-model="bindType" class="input input-sm">
+                <option value="shop">{{ $t('account_pages.bind_platform.bind_shop') }}</option>
+                <option value="account">{{ $t('account_pages.bind_platform.bind_account') }}</option>
+              </select>
+              <input v-model="bindAccountId" class="input input-sm" :placeholder="$t(p.placeholderKey)" />
+              <div class="bind-form-actions">
+                <button class="btn btn-primary btn-xs" :disabled="!bindAccountId || binding" @click="doBind(p)">
+                  {{ binding ? $t('account_pages.bind_platform.binding') : $t('account_pages.bind_platform.confirm_bind') }}
+                </button>
+                <button class="btn btn-ghost btn-xs" @click="bindTarget = null">{{ $t('account_pages.bind_platform.cancel') }}</button>
+              </div>
+            </div>
+
+            <button v-else class="btn btn-outline btn-xs" @click="bindTarget = p">{{ $t('account_pages.bind_platform.bind') }}</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 说明 -->
+      <div class="info-box">
+        <h4>{{ $t('account_pages.bind_platform.why_title') }}</h4>
+        <ul>
+          <li v-for="(item, i) in $t('account_pages.bind_platform.why_items')" :key="i">{{ item }}</li>
+        </ul>
+      </div>
+    </template>
   </div>
 </template>
 
 <script lang="ts">
 const availablePlatforms = [
-  { code: 'taobao', name: '淘宝', icon: '🛒', desc: '绑定淘宝/天猫店铺' },
-  { code: 'douyin', name: '抖音', icon: '🎵', desc: '绑定抖音账号/小店' },
-  { code: 'pdd', name: '拼多多', icon: '📦', desc: '绑定拼多多店铺' },
-  { code: 'kuaishou', name: '快手', icon: '📱', desc: '绑定快手账号/小店' },
-  { code: 'xiaohongshu', name: '小红书', icon: '📕', desc: '绑定小红书账号' },
-  { code: 'tiktok', name: 'TikTok Shop', icon: '🎬', desc: '绑定TikTok Shop' },
-  { code: 'shopee', name: 'Shopee', icon: '🛍', desc: '绑定Shopee店铺' },
-  { code: 'amazon', name: 'Amazon', icon: '📊', desc: '绑定Amazon店铺' },
+  { code: 'taobao', nameKey: 'account_pages.bind_platform.__platforms.taobao', descKey: 'account_pages.bind_platform.__platforms.taobao_desc', placeholderKey: 'account_pages.bind_platform.shop_placeholder', icon: '🛒' },
+  { code: 'douyin', nameKey: 'account_pages.bind_platform.__platforms.douyin', descKey: 'account_pages.bind_platform.__platforms.douyin_desc', placeholderKey: 'account_pages.bind_platform.account_placeholder', icon: '🎵' },
+  { code: 'pdd', nameKey: 'account_pages.bind_platform.__platforms.pdd', descKey: 'account_pages.bind_platform.__platforms.pdd_desc', placeholderKey: 'account_pages.bind_platform.shop_placeholder', icon: '📦' },
+  { code: 'kuaishou', nameKey: 'account_pages.bind_platform.__platforms.kuaishou', descKey: 'account_pages.bind_platform.__platforms.kuaishou_desc', placeholderKey: 'account_pages.bind_platform.account_placeholder', icon: '📱' },
+  { code: 'xiaohongshu', nameKey: 'account_pages.bind_platform.__platforms.xiaohongshu', descKey: 'account_pages.bind_platform.__platforms.xiaohongshu_desc', placeholderKey: 'account_pages.bind_platform.account_placeholder', icon: '📕' },
+  { code: 'tiktok', nameKey: 'account_pages.bind_platform.__platforms.tiktok', descKey: 'account_pages.bind_platform.__platforms.tiktok_desc', placeholderKey: 'account_pages.bind_platform.account_placeholder', icon: '🎬' },
+  { code: 'shopee', nameKey: 'account_pages.bind_platform.__platforms.shopee', descKey: 'account_pages.bind_platform.__platforms.shopee_desc', placeholderKey: 'account_pages.bind_platform.shop_placeholder', icon: '🛍' },
+  { code: 'amazon', nameKey: 'account_pages.bind_platform.__platforms.amazon', descKey: 'account_pages.bind_platform.__platforms.amazon_desc', placeholderKey: 'account_pages.bind_platform.shop_placeholder', icon: '📊' },
 ]
 
 const platformIcons: Record<string, string> = {
@@ -89,14 +92,13 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 
 <script setup lang="ts">
 
+const { t } = useI18n()
 const { confirm } = useConfirm()
-
 const toast = useToast()
-
 const apiBase = useRuntimeConfig().public.apiBase || '/api'
 
 const boundList = ref<any[]>([])
-const loading = ref(false)
+const loading = ref(true)
 const binding = ref(false)
 const bindTarget = ref<any>(null)
 const bindType = ref('shop')
@@ -107,10 +109,9 @@ function platformIcon(p: string) { return platformIcons[p] || '🔗' }
 async function fetchBindings() {
   loading.value = true
   try {
-    const res: any = await $fetch(`${apiBase}/platforms/bindings`, { credentials: 'include' }).catch((err: any) => { toast.error('绑定列表加载失败'); if (import.meta.dev) console.warn('[bind-platform] 绑定列表加载失败', err?.message || err); return null })
+    const res: any = await $fetch(`${apiBase}/platforms/bindings`, { credentials: 'include' }).catch((err: any) => { if (import.meta.dev) console.warn('[bind-platform] 绑定列表加载失败', err?.message || err); return null })
     if (res?.code === 200) boundList.value = res.data?.list || []
-  } catch { toast.error('加载平台绑定失败') } finally { loading.value = false }
-
+  } catch { toast.error(t('account_pages.bind_platform.load_error')) } finally { loading.value = false }
 }
 
 async function doBind(platform: any) {
@@ -118,32 +119,30 @@ async function doBind(platform: any) {
   try {
     const res: any = await $fetch(`${apiBase}/platforms/bind`, {
       method: 'POST',
-      body: {
-        platform: platform.code,
-        bind_type: bindType.value,
-        account_id: bindAccountId.value,
-      },
+      body: { platform: platform.code, bind_type: bindType.value, account_id: bindAccountId.value },
       credentials: 'include',
-    }).catch((err: any) => { toast.error('平台绑定失败，请重试'); if (import.meta.dev) console.warn('[bind-platform] 绑定请求失败', err?.message || err); return null })
+    }).catch((err: any) => { if (import.meta.dev) console.warn('[bind-platform] 绑定请求失败', err?.message || err); return null })
     if (res?.code === 200) {
       bindTarget.value = null
       bindAccountId.value = ''
       fetchBindings()
     } else {
-      toast.error(res?.msg || '绑定失败')
+      toast.error(res?.msg || t('account_pages.bind_platform.bind_error'))
     }
   } catch (e: any) {
-    toast.error(e?.data?.msg || '绑定失败')
+    toast.error(e?.data?.msg || t('account_pages.bind_platform.bind_error'))
   }
   binding.value = false
 }
 
 async function doUnbind(item: any) {
-  if (!await confirm({ message: `确定解绑 ${item.platform_name || item.platform} 的${item.bind_type === 'shop' ? '店铺' : '账号'}？`} )) return
+  const typeLabel = item.bind_type === 'shop' ? t('account_pages.bind_platform.shop_type') : t('account_pages.bind_platform.account_type')
+  const confirmMsg = t('account_pages.bind_platform.unbind_confirm', { platform: item.platform_name || item.platform, type: typeLabel })
+  if (!await confirm({ message: confirmMsg })) return
   try {
     await $fetch(`${apiBase}/platforms/bind/${item.id}`, { method: 'DELETE', credentials: 'include' })
     fetchBindings()
-  } catch { toast.error('解绑失败') }
+  } catch { toast.error(t('account_pages.bind_platform.unbind_error')) }
 }
 
 onMounted(() => fetchBindings())
