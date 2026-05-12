@@ -144,8 +144,11 @@
 </template>
 
 <script setup lang="ts">
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import draggable from 'vuedraggable'
+import { useConfirm } from '~/composables/useConfirm'
+
+const { confirm } = useConfirm()
 
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 
@@ -199,15 +202,8 @@ function tryParse(v: any) {
 }
 
 async function resetKey(key: string) {
-  try {
-    await ElMessageBox.confirm(`确定恢复「${key}」为默认值？此操作不可撤销。`, '确认重置', {
-      type: 'warning',
-      confirmButtonText: '确定重置',
-      cancelButtonText: '取消',
-    })
-  } catch {
-    return
-  }
+  const ok = await confirm({ title: '确认重置', message: `确定恢复「${key}」为默认值？此操作不可撤销。`, variant: 'danger' })
+  if (!ok) return
   try {
     await $fetch(`/api/admin/workspace-diy/reset/${key}`, { method: 'POST' })
     ElMessage.success(`${key} 已恢复默认`)
