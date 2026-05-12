@@ -45,6 +45,12 @@ export default {
     return r.affectedRows;
   },
 
+  /** 事务内 SELECT FOR UPDATE 锁定充值订单行，需在 conn 事务中调用 */
+  async lockByOrderNo(orderNo, conn) {
+    const [[order]] = await conn.query('SELECT * FROM recharge_order WHERE order_no = ? LIMIT 1 FOR UPDATE', [orderNo]);
+    return order || null;
+  },
+
   async addConsumptionRecord(data) {
     const [r] = await pool.query(
       'INSERT INTO consumption_record (tenant_id, user_id, type, amount, balance_after, remark, request_id) VALUES (?, ?, ?, ?, (SELECT credit_balance FROM user_membership WHERE user_id = ? AND tenant_id = ?), ?, ?)',
