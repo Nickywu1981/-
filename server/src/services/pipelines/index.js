@@ -3,3 +3,4 @@
  */
 export { executeDetailLongImage, submitDetailLongImageJob, SCENE_TEMPLATES, SIZE_PRESETS } from './detailLongImagePipeline.js';
 export { executeActionMigration, executeBatchActionMigration, submitActionMigrationJob, submitBatchActionMigrationJob, BGM_OPTIONS, BG_OPTIONS } from './actionMigrationPipeline.js';
+export { generateProductCopy, quickProductCopy } from './productCopyPipeline.js';

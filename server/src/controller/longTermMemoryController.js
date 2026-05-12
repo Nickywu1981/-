@@ -1,84 +1,52 @@
+import { wrapController } from '../utils/wrapController.js';
+import { success } from '../utils/response.js';
+import { BusinessError } from '../utils/businessError.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 import * as ltmService from '../services/longTermMemoryService.js';
 
-export async function storeMemory(req, res) {
-  try {
-    const { namespace = 'user', subjectId, memoryKey, content, memoryType, importance, source, tags, metadata, isPinned, expiresAt } = req.body;
-    if (!subjectId || !content) return res.status(400).json({ error: 'subjectId and content are required' });
+export const storeMemory = wrapController(async (req, res) => {
+  const d = req.validated;
+  const id = await ltmService.store({
+    namespace: d.namespace, subjectId: d.subjectId,
+    memoryKey: d.memoryKey || `auto_${Date.now()}`,
+    content: d.content, memoryType: d.memoryType, importance: d.importance,
+    source: d.source, tags: d.tags, metadata: d.metadata,
+    isPinned: d.isPinned, expiresAt: d.expiresAt,
+  });
+  return success(res, { id });
+});
 
-    const id = await ltmService.store({
-      namespace, subjectId, memoryKey: memoryKey || `auto_${Date.now()}`,
-      content, memoryType, importance, source, tags, metadata, isPinned, expiresAt,
-    });
+export const batchStoreMemory = wrapController(async (req, res) => {
+  const results = await ltmService.storeBatch(req.validated.entries);
+  return success(res, { stored: results.length, items: results });
+});
 
-    res.json({ success: true, data: { id } });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+export const recallMemory = wrapController(async (req, res) => {
+  const d = req.validated;
+  const memories = await ltmService.recall(d);
+
+  for (const m of memories) {
+    ltmService.markAccessed(m.id).catch(() => {});
   }
-}
 
-export async function batchStoreMemory(req, res) {
-  try {
-    const { entries } = req.body;
-    if (!Array.isArray(entries) || entries.length === 0) return res.status(400).json({ error: 'entries array required' });
-    const results = await ltmService.storeBatch(entries);
-    res.json({ success: true, data: { stored: results.length, items: results } });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-}
+  return success(res, { memories, count: memories.length });
+});
 
-export async function recallMemory(req, res) {
-  try {
-    const { namespace = 'user', subjectId, query, topK = 5, memoryType, minImportance = 0.1 } = req.body;
-    if (!subjectId || !query) return res.status(400).json({ error: 'subjectId and query are required' });
+export const consolidateMemory = wrapController(async (req, res) => {
+  const d = req.validated;
+  await ltmService.applyDecay({ namespace: d.namespace, subjectId: d.subjectId });
+  const result = await ltmService.consolidate(d);
+  return success(res, result || { message: 'Nothing to consolidate' });
+});
 
-    const memories = await ltmService.recall({ namespace, subjectId, query, topK, memoryType, minImportance });
+export const getMemoryStats = wrapController(async (req, res) => {
+  const { namespace = 'user', subjectId } = req.query;
+  if (!subjectId) throw new BusinessError(ERROR_CODE.VALIDATION_ERROR, 'subjectId is required');
+  const stats = await ltmService.getStats({ namespace, subjectId });
+  return success(res, stats);
+});
 
-    // 标记已召回的记忆为已访问
-    for (const m of memories) {
-      ltmService.markAccessed(m.id).catch(() => {});
-    }
-
-    res.json({ success: true, data: { memories, count: memories.length } });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-}
-
-export async function consolidateMemory(req, res) {
-  try {
-    const { namespace = 'user', subjectId, maxEntries = 20, memoryType } = req.body;
-    if (!subjectId) return res.status(400).json({ error: 'subjectId is required' });
-
-    // 先应用衰减
-    await ltmService.applyDecay({ namespace, subjectId });
-
-    // 再合并
-    const result = await ltmService.consolidate({ namespace, subjectId, maxEntries, memoryType });
-
-    res.json({ success: true, data: result || { message: 'Nothing to consolidate' } });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-}
-
-export async function getMemoryStats(req, res) {
-  try {
-    const { namespace = 'user', subjectId } = req.query;
-    if (!subjectId) return res.status(400).json({ error: 'subjectId is required' });
-
-    const stats = await ltmService.getStats({ namespace, subjectId });
-    res.json({ success: true, data: stats });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-}
-
-export async function purgeExpiredMemories(req, res) {
-  try {
-    const count = await ltmService.purgeExpired();
-    res.json({ success: true, data: { purged: count } });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-}
+export const purgeExpiredMemories = wrapController(async (req, res) => {
+  const count = await ltmService.purgeExpired();
+  return success(res, { purged: count });
+});

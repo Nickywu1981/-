@@ -3,11 +3,66 @@ import { BusinessError } from '../utils/businessError.js';
 /**
  * Movio AI v4.1 — Detail Image Service
  * G5 后端开发 | W2
- * 详情图套图生成 / 详情图复刻
+ * 详情图套图生成 / 详情图复刻 / 长图合成 / 商品信息提取
  */
 import { submitJob } from './job-queue.service.js';
 import * as moderationService from './moderation.service.js';
 import db from '../dao/db.js';
+import { gatewayInfer } from '../gateway/aiGatewayHub.js';
+import logger from '../utils/logger.js';
+
+/**
+ * 从参考图提取商品信息（AI视觉分析）
+ * 返回商品名称、品类、核心特征清单
+ */
+export async function extractProductInfo(userId, { imageUrl }) {
+  if (!imageUrl) throw new BusinessError(400, '请提供参考图片URL');
+
+  const prompt = `Analyze this product image and return a JSON object with the following fields (respond in Chinese):
+{
+  "productName": "商品名称（简洁准确，5-15字）",
+  "category": "商品品类（如：女装/男装/鞋靴/箱包/美妆/3C数码/家居/食品/运动户外/母婴）",
+  "features": ["核心特征1（严格基于图中可见内容）", "核心特征2", "核心特征3", "核心特征4", "核心特征5"]
+}
+
+Rules:
+- features must be strictly based on visible content in the image, no fabrication
+- Each feature should be short (5-15 characters), describing material/design/function
+- Return 3-6 features depending on how much is visible
+- productName and category should be specific, not generic
+- Return ONLY valid JSON, no markdown wrapping`;
+
+  try {
+    const result = await gatewayInfer('gpt-image-2', prompt, {
+      userId,
+      images: [imageUrl],
+      temperature: 0.3,
+      maxTokens: 800,
+    });
+
+    const text = result?.text || result?.content || '';
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      logger.warn('[extractProductInfo] AI response not valid JSON:', text.slice(0, 200));
+      throw new BusinessError(500, 'AI分析结果解析失败，请重试');
+    }
+
+    const parsed = JSON.parse(jsonMatch[0]);
+    if (!parsed.productName || !parsed.features?.length) {
+      throw new BusinessError(500, 'AI未能识别到足够的商品信息，请换一张清晰的商品图');
+    }
+
+    return {
+      productName: parsed.productName,
+      category: parsed.category || '其他',
+      features: parsed.features.slice(0, 8),
+    };
+  } catch (err) {
+    if (err instanceof BusinessError) throw err;
+    logger.error('[extractProductInfo] failed:', err.message);
+    throw new BusinessError(500, '商品信息提取失败，请稍后重试');
+  }
+}
 
 /**
  * 详情图套图一键生成

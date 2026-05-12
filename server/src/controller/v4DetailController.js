@@ -46,3 +46,9 @@ export const generateLongImage = wrapController(async (req, res) => {
   });
   return success(res, result, '详情长图合成任务已提交');
 });
+
+export const extractProductInfo = wrapController(async (req, res) => {
+  const { image_url } = req.validated;
+  const result = await detailService.extractProductInfo(req.user.id, { imageUrl: image_url });
+  return success(res, result, '商品信息提取完成');
+});

@@ -128,7 +128,7 @@ app.set('trust proxy', 'loopback');
 app.disable('x-powered-by');
 app.use(helmet());
 app.use(cspMiddleware);
-const ALLOWED_ORIGINS = (corsOrigin || 'http://localhost:3000,http://localhost:3001').split(',').map(s => s.trim());
+const ALLOWED_ORIGINS = (corsOrigin || 'http://localhost:3000').split(',').map(s => s.trim());
 app.use(cors({
   credentials: true,
   origin: (origin, callback) => {

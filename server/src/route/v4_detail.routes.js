@@ -49,6 +49,13 @@ router.post('/replicate', heavyLimiter, _validate(replicateSchema), ctrl.replica
 // POST /api/detail/long-image
 router.post('/long-image', heavyLimiter, _validate(longImageSchema), ctrl.generateLongImage);
 
+const extractProductInfoSchema = z.object({
+  image_url: z.string().url('请提供有效的参考图片URL'),
+});
+
+// POST /api/detail/extract-product-info
+router.post('/extract-product-info', heavyLimiter, _validate(extractProductInfoSchema), ctrl.extractProductInfo);
+
 // GET /api/detail/works
 router.get('/works', validate(paginationSchema, 'query'), ctrl.getDetailWorks);
 
