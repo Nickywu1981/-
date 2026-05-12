@@ -1,13 +1,13 @@
 <template>
   <div class="help-page">
     <div class="help-hero">
-      <h2>帮助中心</h2>
-      <p>解答你关于 Movio AI 的常见问题</p>
+      <h2>{{ $t('help.title') }}</h2>
+      <p>{{ $t('help.subtitle') }}</p>
     </div>
 
     <div class="search-bar">
       <svg class="search-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input v-model="search" type="text" placeholder="搜索问题... 输入关键词快速定位" @input="filterLocal" />
+      <input v-model="search" type="text" :placeholder="$t('help.search_placeholder')" @input="filterLocal" />
     </div>
 
     <div class="category-tabs">
@@ -24,13 +24,13 @@
     <div v-else-if="error" class="error-state">
       <span class="err-icon">!</span>
       <p>{{ error }}</p>
-      <button class="retry-btn" @click="fetchFaqs">重新加载</button>
+      <button class="retry-btn" @click="fetchFaqs">{{ $t('help.retry') }}</button>
     </div>
 
     <div v-else-if="filteredFaqs.length === 0" class="empty-state">
       <span class="empty-icon">🔍</span>
-      <p>没有找到相关问题</p>
-      <p class="empty-sub">换个关键词试试，或联系我们获取帮助</p>
+      <p>{{ $t('help.no_results') }}</p>
+      <p class="empty-sub">{{ $t('help.no_results_hint') }}</p>
     </div>
 
     <div v-else class="faq-list">
@@ -45,7 +45,7 @@
           <div class="a-content">{{ item.answer }}</div>
           <div class="a-footer">
             <span class="a-cat">{{ catLabel(item.category) }}</span>
-            <span class="a-helpful">有帮助吗？
+            <span class="a-helpful">{{ $t('help.helpful') }}
               <button class="a-fb-btn" :class="{ voted: item.voted === 1 }" @click="voteFaq(item, 1)">👍 {{ item.upvotes || 0 }}</button>
               <button class="a-fb-btn" :class="{ voted: item.voted === -1 }" @click="voteFaq(item, -1)">👎 {{ item.downvotes || 0 }}</button>
             </span>
@@ -55,14 +55,15 @@
     </div>
 
     <div class="contact-bar">
-      <span>没找到答案？</span>
+      <span>{{ $t('help.no_answer') }}</span>
       <a href="mailto:support@movio.ai">📧 support@movio.ai</a>
-      <span class="contact-time">工作日 9:00-18:00</span>
+      <span class="contact-time">{{ $t('help.work_hours') }}</span>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n()
 const search = ref('')
 const open = ref(-1)
 const activeCat = ref('all')
@@ -70,15 +71,15 @@ const loading = ref(true)
 const error = ref('')
 const faqs = ref<any[]>([])
 
-const categories = [
-  { key: 'all', label: '全部' },
-  { key: 'usage', label: '使用指南' },
-  { key: 'account', label: '账户与会员' },
-  { key: 'platform', label: '平台相关' },
-]
+const categories = computed(() => [
+  { key: 'all', label: t('help.cat_all') },
+  { key: 'usage', label: t('help.cat_usage') },
+  { key: 'account', label: t('help.cat_account') },
+  { key: 'platform', label: t('help.cat_platform') },
+])
 
 function catLabel(key: string) {
-  return categories.find(c => c.key === key)?.label || key
+  return categories.value.find(c => c.key === key)?.label || key
 }
 
 function catCount(key: string) {
@@ -120,10 +121,10 @@ async function fetchFaqs() {
         ...f, voted: 0, upvotes: 0, downvotes: 0,
       }))
     } else {
-      error.value = data.msg || '加载失败'
+      error.value = data.msg || t('help.load_failed')
     }
   } catch (e: any) {
-    error.value = e?.data?.msg || '加载FAQ失败，请稍后重试'
+    error.value = e?.data?.msg || t('help.load_error')
   } finally { loading.value = false }
 }
 

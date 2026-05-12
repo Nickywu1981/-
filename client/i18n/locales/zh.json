@@ -84,69 +84,574 @@
     "mockup_upload": "上传图片",
     "mockup_generate": "生成图",
     "memfocus_cards": [
-      {"badge":"记忆力","title":"过目不忘","sub":"精准回顾每个客户","api":"四层记忆 API","story":"王女士上次买了胶原蛋白果冻——问她要不要复购","metricLabel":"客户留存提升","metricValue":"+37%"},
-      {"badge":"判断力","title":"优先级分拣","sub":"退款先处理，新品排队","api":"注意力引擎 API","story":"退款投诉立刻处理，新品咨询排队稍后——优先级的艺术","metricLabel":"紧急工单响应","metricValue":"<30s"},
-      {"badge":"理解力","title":"一点就通","sub":"语境感知，指代消解","api":"上下文管理 API","story":"客户说「那个红色的」——秘书知道指的是上次聊的红色连衣裙","metricLabel":"上下文窗口","metricValue":"8K tokens"},
-      {"badge":"多语言","title":"7 国语物料","sub":"比本地团队更懂当地审美","api":"跨境本地化 API","story":"中文产品一键出 7 国物料——比本地团队更懂当地审美","metricLabel":"覆盖语种","metricValue":"7 语"},
-      {"badge":"写作力","title":"转化率导向","sub":"标题/卖点/详情/脚本","api":"内容生成 API","story":"标题/卖点/详情/直播脚本——比文案更懂转化率","metricLabel":"内容类型覆盖","metricValue":"6 类"},
-      {"badge":"风控力","title":"五层过滤","sub":"零违规处罚","api":"安全合规 API","story":"五层敏感词过滤，零违规处罚——比合规经理更严谨","metricLabel":"过滤层数","metricValue":"5 层"},
-      {"badge":"视觉力","title":"100 SKU 并行","sub":"2 小时搞定全部视频","api":"视频批量生成 API","story":"15s/30s TikTok 商品视频——100 SKU 并行 2 小时搞定","metricLabel":"并行吞吐","metricValue":"100 SKU"},
-      {"badge":"永不离职","title":"24×7 巅峰","sub":"不请假不跳槽不闹情绪","api":"24×7 API 可用","story":"没有请假、不闹情绪、不跳槽——每次调用都是巅峰状态","metricLabel":"可用性目标","metricValue":"99.9%"}
+      {
+        "badge": "记忆力",
+        "title": "过目不忘",
+        "sub": "精准回顾每个客户",
+        "api": "四层记忆 API",
+        "story": "王女士上次买了胶原蛋白果冻——问她要不要复购",
+        "metricLabel": "客户留存提升",
+        "metricValue": "+37%"
+      },
+      {
+        "badge": "判断力",
+        "title": "优先级分拣",
+        "sub": "退款先处理，新品排队",
+        "api": "注意力引擎 API",
+        "story": "退款投诉立刻处理，新品咨询排队稍后——优先级的艺术",
+        "metricLabel": "紧急工单响应",
+        "metricValue": "<30s"
+      },
+      {
+        "badge": "理解力",
+        "title": "一点就通",
+        "sub": "语境感知，指代消解",
+        "api": "上下文管理 API",
+        "story": "客户说「那个红色的」——秘书知道指的是上次聊的红色连衣裙",
+        "metricLabel": "上下文窗口",
+        "metricValue": "8K tokens"
+      },
+      {
+        "badge": "多语言",
+        "title": "7 国语物料",
+        "sub": "比本地团队更懂当地审美",
+        "api": "跨境本地化 API",
+        "story": "中文产品一键出 7 国物料——比本地团队更懂当地审美",
+        "metricLabel": "覆盖语种",
+        "metricValue": "7 语"
+      },
+      {
+        "badge": "写作力",
+        "title": "转化率导向",
+        "sub": "标题/卖点/详情/脚本",
+        "api": "内容生成 API",
+        "story": "标题/卖点/详情/直播脚本——比文案更懂转化率",
+        "metricLabel": "内容类型覆盖",
+        "metricValue": "6 类"
+      },
+      {
+        "badge": "风控力",
+        "title": "五层过滤",
+        "sub": "零违规处罚",
+        "api": "安全合规 API",
+        "story": "五层敏感词过滤，零违规处罚——比合规经理更严谨",
+        "metricLabel": "过滤层数",
+        "metricValue": "5 层"
+      },
+      {
+        "badge": "视觉力",
+        "title": "100 SKU 并行",
+        "sub": "2 小时搞定全部视频",
+        "api": "视频批量生成 API",
+        "story": "15s/30s TikTok 商品视频——100 SKU 并行 2 小时搞定",
+        "metricLabel": "并行吞吐",
+        "metricValue": "100 SKU"
+      },
+      {
+        "badge": "永不离职",
+        "title": "24×7 巅峰",
+        "sub": "不请假不跳槽不闹情绪",
+        "api": "24×7 API 可用",
+        "story": "没有请假、不闹情绪、不跳槽——每次调用都是巅峰状态",
+        "metricLabel": "可用性目标",
+        "metricValue": "99.9%"
+      }
     ],
     "steps": [
-      {"icon":"📤","title":"上传产品图","desc":"拖入产品照片，支持 JPG/PNG/WebP 格式"},
-      {"icon":"🎯","title":"选择功能","desc":"做主图、场景、视频……一键选择需要的能力"},
-      {"icon":"✨","title":"AI 自动生成","desc":"5秒出图，批量处理，自动适配各平台尺寸"}
+      {
+        "icon": "📤",
+        "title": "上传产品图",
+        "desc": "拖入产品照片，支持 JPG/PNG/WebP 格式"
+      },
+      {
+        "icon": "🎯",
+        "title": "选择功能",
+        "desc": "做主图、场景、视频……一键选择需要的能力"
+      },
+      {
+        "icon": "✨",
+        "title": "AI 自动生成",
+        "desc": "5秒出图，批量处理，自动适配各平台尺寸"
+      }
     ],
     "faqs": [
-      {"q":"需要安装软件吗？","a":"不需要。纯网页版，浏览器打开即可使用，支持 Chrome / Safari / Edge。"},
-      {"q":"生成的图片可以商用吗？","a":"完全可以。所有 AI 生成的图片版权归你所有，可放心用于电商平台。"},
-      {"q":"支持哪些电商平台尺寸？","a":"覆盖淘宝、拼多多、抖音、小红书、亚马逊、Temu、Shein 等 13 个主流平台的标准尺寸，也支持自定义尺寸。"},
-      {"q":"不满意可以重新生成吗？","a":"可以。每次生成结果不满意可以免费重新生成，直到满意为止。"},
-      {"q":"如何批量处理？","a":"专业版及以上支持批量处理，拖入文件夹即可后台自动排队处理，支持夜间托管（6折优惠）。"}
+      {
+        "q": "需要安装软件吗？",
+        "a": "不需要。纯网页版，浏览器打开即可使用，支持 Chrome / Safari / Edge。"
+      },
+      {
+        "q": "生成的图片可以商用吗？",
+        "a": "完全可以。所有 AI 生成的图片版权归你所有，可放心用于电商平台。"
+      },
+      {
+        "q": "支持哪些电商平台尺寸？",
+        "a": "覆盖淘宝、拼多多、抖音、小红书、亚马逊、Temu、Shein 等 13 个主流平台的标准尺寸，也支持自定义尺寸。"
+      },
+      {
+        "q": "不满意可以重新生成吗？",
+        "a": "可以。每次生成结果不满意可以免费重新生成，直到满意为止。"
+      },
+      {
+        "q": "如何批量处理？",
+        "a": "专业版及以上支持批量处理，拖入文件夹即可后台自动排队处理，支持夜间托管（6折优惠）。"
+      }
     ],
     "use_cases": [
-      {"avatar":"👤","title":"个人卖家","desc":"一个人就是一支团队","points":["手机拍照即可生成专业主图","零设计基础出爆款详情页","每天省下 3 小时作图时间"]},
-      {"avatar":"🏪","title":"中小商家","desc":"用 AI 代替设计团队","points":["批量生成全店商品图","统一品牌视觉风格","降低 80% 设计成本"]},
-      {"avatar":"🏢","title":"品牌商家","desc":"规模化视觉内容生产","points":["API 接口批量对接","多店铺多平台统一管理","品牌视觉规范自动套用"]}
+      {
+        "avatar": "👤",
+        "title": "个人卖家",
+        "desc": "一个人就是一支团队",
+        "points": [
+          "手机拍照即可生成专业主图",
+          "零设计基础出爆款详情页",
+          "每天省下 3 小时作图时间"
+        ]
+      },
+      {
+        "avatar": "🏪",
+        "title": "中小商家",
+        "desc": "用 AI 代替设计团队",
+        "points": [
+          "批量生成全店商品图",
+          "统一品牌视觉风格",
+          "降低 80% 设计成本"
+        ]
+      },
+      {
+        "avatar": "🏢",
+        "title": "品牌商家",
+        "desc": "规模化视觉内容生产",
+        "points": [
+          "API 接口批量对接",
+          "多店铺多平台统一管理",
+          "品牌视觉规范自动套用"
+        ]
+      }
     ],
     "plans_fallback": [
-      {"icon":"🌱","name":"免费版","price":"0","features":["每月 20 张图片生成","3 个视频/月","基础模板","720p 输出"],"featured":false},
-      {"icon":"⚡","name":"专业版","price":"99","features":["每月 500 张图片生成","50 个视频/月","全部模板+高级风格","1080p 输出","批量处理","API 接入"],"featured":true},
-      {"icon":"🏭","name":"企业版","price":"299","features":["无限图片生成","无限视频生成","专属风格定制","4K 输出","私有化部署","专属客服"],"featured":false}
+      {
+        "icon": "🌱",
+        "name": "免费版",
+        "price": "0",
+        "features": [
+          "每月 20 张图片生成",
+          "3 个视频/月",
+          "基础模板",
+          "720p 输出"
+        ],
+        "featured": false
+      },
+      {
+        "icon": "⚡",
+        "name": "专业版",
+        "price": "99",
+        "features": [
+          "每月 500 张图片生成",
+          "50 个视频/月",
+          "全部模板+高级风格",
+          "1080p 输出",
+          "批量处理",
+          "API 接入"
+        ],
+        "featured": true
+      },
+      {
+        "icon": "🏭",
+        "name": "企业版",
+        "price": "299",
+        "features": [
+          "无限图片生成",
+          "无限视频生成",
+          "专属风格定制",
+          "4K 输出",
+          "私有化部署",
+          "专属客服"
+        ],
+        "featured": false
+      }
     ],
     "plans": [
-      {"icon":"🌱","name":"免费版","price":"0","features":["每月 20 张图片生成","3 个视频/月","基础模板","720p 输出"],"featured":false},
-      {"icon":"⚡","name":"专业版","price":"99","features":["每月 500 张图片生成","50 个视频/月","全部模板+高级风格","1080p 输出","批量处理","API 接入"],"featured":true},
-      {"icon":"🏭","name":"企业版","price":"299","features":["无限图片生成","无限视频生成","专属风格定制","4K 输出","私有化部署","专属客服"],"featured":false}
+      {
+        "icon": "🌱",
+        "name": "免费版",
+        "price": "0",
+        "features": [
+          "每月 20 张图片生成",
+          "3 个视频/月",
+          "基础模板",
+          "720p 输出"
+        ],
+        "featured": false
+      },
+      {
+        "icon": "⚡",
+        "name": "专业版",
+        "price": "99",
+        "features": [
+          "每月 500 张图片生成",
+          "50 个视频/月",
+          "全部模板+高级风格",
+          "1080p 输出",
+          "批量处理",
+          "API 接入"
+        ],
+        "featured": true
+      },
+      {
+        "icon": "🏭",
+        "name": "企业版",
+        "price": "299",
+        "features": [
+          "无限图片生成",
+          "无限视频生成",
+          "专属风格定制",
+          "4K 输出",
+          "私有化部署",
+          "专属客服"
+        ],
+        "featured": false
+      }
     ],
     "currency_symbol": "¥",
     "pricing_period": "/月",
-    "platforms": ["淘宝","拼多多","抖音","小红书","视频号","快手","亚马逊","Temu","Shein","TikTok Shop","美客多","Shopee","Lazada"],
+    "platforms": [
+      "淘宝",
+      "拼多多",
+      "抖音",
+      "小红书",
+      "视频号",
+      "快手",
+      "亚马逊",
+      "Temu",
+      "Shein",
+      "TikTok Shop",
+      "美客多",
+      "Shopee",
+      "Lazada"
+    ],
     "feature_cards": [
-      {"id":"main","icon":"▣","title":"智能做主图","desc":"AI 自动抠图→白底→精修→裁切→品牌水印，一键生成3张风格主图","tags":["爆款商品图","13平台适配"],"color":"#EDE9FE","ai":true,"route":"/work/main-image","category":"image"},
-      {"id":"scene","icon":"◈","title":"智能做场景","desc":"产品图+AI场景库→自动光影融合→出5张场景图，支持自定义背景","tags":["场景融合","光影匹配"],"color":"#DBEAFE","ai":true,"route":"/work/scene","category":"image"},
-      {"id":"detail","icon":"⊞","title":"智能做详情","desc":"产品图→AI自动生成文案+图文排版→完整详情页，多品类适配","tags":["AI文案","自动排版"],"color":"#D1FAE5","ai":true,"route":"/work/detail-h5","category":"image"},
-      {"id":"video","icon":"▶","title":"智能做视频","desc":"图片/多图→AI生成带货视频→自动字幕+BGM→1080×1920竖屏输出","tags":["AI运镜","自动字幕"],"color":"#FEF3C7","ai":true,"route":"/work/video","category":"video"},
-      {"id":"batch","icon":"⊡","title":"批量处理","desc":"文件夹拖入→选操作→后台排队→完成通知→ZIP下载，支持夜间托管","tags":["批量队列","夜间折扣"],"color":"#F3E8FF","ai":false,"route":"/work/batch","category":"image"},
-      {"id":"tryon","icon":"◇","title":"虚拟模特","desc":"服装平铺图→真人模特上身效果，多肤色/体型/风格可选","tags":["AI试穿","多肤色"],"color":"#ECFEFF","ai":true,"route":"/work/virtual-tryon","category":"image"},
-      {"id":"action","icon":"◉","title":"动作迁移","desc":"人物图+参考动作视频→AI精准迁移动作姿态，生成流畅展示视频","tags":["动作捕捉","精准迁移"],"color":"#FCE7F3","ai":true,"route":"/work/action-transfer","category":"video"},
-      {"id":"color","icon":"◐","title":"一键换色","desc":"服装鞋包颜色变换，保留褶皱纹理质感，支持批量换色","tags":["多色生成","纹理保留"],"color":"#FFF7ED","ai":true,"route":"/work/color-swap","category":"image"},
-      {"id":"style","icon":"◧","title":"风格转化","desc":"6大风格一键转换：复古/国潮/插画/水彩/赛博/极简，保留商品特征","tags":["6大风格","创意设计"],"color":"#F0FDF4","ai":true,"route":"/work/style-transfer","category":"image"},
-      {"id":"digital","icon":"◓","title":"口播数字人","desc":"输入文案→选数字人形象+语音→AI生成带货口播视频","tags":["数字人","TTS语音"],"color":"#FFFBEB","ai":true,"route":"/work/digital-human","category":"video"},
-      {"id":"script","icon":"▤","title":"带货脚本","desc":"产品卖点→AI生成短视频口播/直播话术/种草文案，支持9语种+3脚本类型","tags":["9语种","口播+话术"],"color":"#FDF2F8","ai":true,"route":"/work/script-gen","category":"ai"},
-      {"id":"viral","icon":"◆","title":"爆款复刻","desc":"对标爆款视频→AI分析节奏/色调/转场→用你的产品重新生成相似风格","tags":["爆款分析","风格复刻"],"color":"#FEF2F2","ai":true,"route":"/work/viral-clone","category":"video"},
-      {"id":"remove-bg","icon":"◯","title":"智能抠图","desc":"AI发丝级抠图，毛发/透明体/复杂边缘精准分离，支持单品+批量处理","tags":["发丝级","批量抠图"],"color":"#E8F5E9","ai":true,"route":"/work/remove-bg","category":"image"},
-      {"id":"white-bg","icon":"▭","title":"白底图生成","desc":"抠图后智能生成纯白/场景底图，自动光影校正+阴影保留，平台直出","tags":["白底/透明","光影校正"],"color":"#F5F5F5","ai":true,"route":"/work/white-bg","category":"image"},
-      {"id":"retouch","icon":"✦","title":"图片精修","desc":"AI自动祛皱/去污/补光/锐化，保留材质纹理，批量提升产品图质感","tags":["祛皱补光","纹理保留"],"color":"#FFF8E1","ai":true,"route":"/work/retouch","category":"image"},
-      {"id":"platform-detail","icon":"▥","title":"平台详情页模板","desc":"13大电商平台详情页模板库，选平台→选模板→上传素材→一键生成适配尺寸","tags":["13平台","尺寸适配"],"color":"#EFF6FF","ai":true,"route":"/work/platform-detail","category":"image"},
-      {"id":"compliance","icon":"◬","title":"跨境合规检查","desc":"上传图片+文案→自动检测亚马逊/Temu/TikTok/Shein合规风险，覆盖欧美日市场","tags":["合规检测","多市场"],"color":"#FFF1F2","ai":true,"route":"/work/compliance-check","category":"ai"},
-      {"id":"ghost-mannequin","icon":"▯","title":"幽灵模特","desc":"服装平铺/挂拍→AI自动穿到隐形模特身上，生成3D立体效果展示图","tags":["3D立体","隐形模特"],"color":"#F0F9FF","ai":true,"route":"/work/ghost-mannequin","category":"image"},
-      {"id":"outpaint","icon":"▩","title":"智能扩图","desc":"AI扩展图片边缘自动补全构图，适配各平台尺寸比例，无缝融合不留痕迹","tags":["构图补全","比例适配"],"color":"#F5F3FF","ai":true,"route":"/work/outpainting","category":"image"},
-      {"id":"image-translate","icon":"🌐","title":"图片翻译","desc":"商品图文字智能识别→翻译为9语种→原位替换，跨境卖家出海必备","tags":["OCR识别","9语种翻译"],"color":"#ECFDF5","ai":true,"route":"/work/image-translate","category":"image"},
-      {"id":"video-edit","icon":"▸","title":"视频编辑","desc":"AI智能裁剪/变速/转场/调色，自动生成多尺寸多时长版本供投放","tags":["智能剪辑","多尺寸输出"],"color":"#FFF7ED","ai":true,"route":"/work/video-edit","category":"video"},
-      {"id":"voice-gen","icon":"♫","title":"AI语音生成","desc":"输入文案→选主播音色→生成自然流畅带货配音，支持9语种50+音色","tags":["TTS合成","50+音色"],"color":"#FDF2F8","ai":true,"route":"/work/voice-gen","category":"ai"},
-      {"id":"storyboard","icon":"⊟","title":"智能分镜","desc":"文案脚本→AI自动拆解为分镜画面+配音+字幕，一键生成完整短视频","tags":["脚本拆解","自动分镜"],"color":"#FFF1F2","ai":true,"route":"/work/storyboard","category":"video"}
+      {
+        "id": "main",
+        "icon": "▣",
+        "title": "智能做主图",
+        "desc": "AI 自动抠图→白底→精修→裁切→品牌水印，一键生成3张风格主图",
+        "tags": [
+          "爆款商品图",
+          "13平台适配"
+        ],
+        "color": "#EDE9FE",
+        "ai": true,
+        "route": "/work/main-image",
+        "category": "image"
+      },
+      {
+        "id": "scene",
+        "icon": "◈",
+        "title": "智能做场景",
+        "desc": "产品图+AI场景库→自动光影融合→出5张场景图，支持自定义背景",
+        "tags": [
+          "场景融合",
+          "光影匹配"
+        ],
+        "color": "#DBEAFE",
+        "ai": true,
+        "route": "/work/scene",
+        "category": "image"
+      },
+      {
+        "id": "detail",
+        "icon": "⊞",
+        "title": "智能做详情",
+        "desc": "产品图→AI自动生成文案+图文排版→完整详情页，多品类适配",
+        "tags": [
+          "AI文案",
+          "自动排版"
+        ],
+        "color": "#D1FAE5",
+        "ai": true,
+        "route": "/work/detail-h5",
+        "category": "image"
+      },
+      {
+        "id": "video",
+        "icon": "▶",
+        "title": "智能做视频",
+        "desc": "图片/多图→AI生成带货视频→自动字幕+BGM→1080×1920竖屏输出",
+        "tags": [
+          "AI运镜",
+          "自动字幕"
+        ],
+        "color": "#FEF3C7",
+        "ai": true,
+        "route": "/work/video",
+        "category": "video"
+      },
+      {
+        "id": "batch",
+        "icon": "⊡",
+        "title": "批量处理",
+        "desc": "文件夹拖入→选操作→后台排队→完成通知→ZIP下载，支持夜间托管",
+        "tags": [
+          "批量队列",
+          "夜间折扣"
+        ],
+        "color": "#F3E8FF",
+        "ai": false,
+        "route": "/work/batch",
+        "category": "image"
+      },
+      {
+        "id": "tryon",
+        "icon": "◇",
+        "title": "虚拟模特",
+        "desc": "服装平铺图→真人模特上身效果，多肤色/体型/风格可选",
+        "tags": [
+          "AI试穿",
+          "多肤色"
+        ],
+        "color": "#ECFEFF",
+        "ai": true,
+        "route": "/work/virtual-tryon",
+        "category": "image"
+      },
+      {
+        "id": "action",
+        "icon": "◉",
+        "title": "动作迁移",
+        "desc": "人物图+参考动作视频→AI精准迁移动作姿态，生成流畅展示视频",
+        "tags": [
+          "动作捕捉",
+          "精准迁移"
+        ],
+        "color": "#FCE7F3",
+        "ai": true,
+        "route": "/work/action-transfer",
+        "category": "video"
+      },
+      {
+        "id": "color",
+        "icon": "◐",
+        "title": "一键换色",
+        "desc": "服装鞋包颜色变换，保留褶皱纹理质感，支持批量换色",
+        "tags": [
+          "多色生成",
+          "纹理保留"
+        ],
+        "color": "#FFF7ED",
+        "ai": true,
+        "route": "/work/color-swap",
+        "category": "image"
+      },
+      {
+        "id": "style",
+        "icon": "◧",
+        "title": "风格转化",
+        "desc": "6大风格一键转换：复古/国潮/插画/水彩/赛博/极简，保留商品特征",
+        "tags": [
+          "6大风格",
+          "创意设计"
+        ],
+        "color": "#F0FDF4",
+        "ai": true,
+        "route": "/work/style-transfer",
+        "category": "image"
+      },
+      {
+        "id": "digital",
+        "icon": "◓",
+        "title": "口播数字人",
+        "desc": "输入文案→选数字人形象+语音→AI生成带货口播视频",
+        "tags": [
+          "数字人",
+          "TTS语音"
+        ],
+        "color": "#FFFBEB",
+        "ai": true,
+        "route": "/work/digital-human",
+        "category": "video"
+      },
+      {
+        "id": "script",
+        "icon": "▤",
+        "title": "带货脚本",
+        "desc": "产品卖点→AI生成短视频口播/直播话术/种草文案，支持9语种+3脚本类型",
+        "tags": [
+          "9语种",
+          "口播+话术"
+        ],
+        "color": "#FDF2F8",
+        "ai": true,
+        "route": "/work/script-gen",
+        "category": "ai"
+      },
+      {
+        "id": "viral",
+        "icon": "◆",
+        "title": "爆款复刻",
+        "desc": "对标爆款视频→AI分析节奏/色调/转场→用你的产品重新生成相似风格",
+        "tags": [
+          "爆款分析",
+          "风格复刻"
+        ],
+        "color": "#FEF2F2",
+        "ai": true,
+        "route": "/work/viral-clone",
+        "category": "video"
+      },
+      {
+        "id": "remove-bg",
+        "icon": "◯",
+        "title": "智能抠图",
+        "desc": "AI发丝级抠图，毛发/透明体/复杂边缘精准分离，支持单品+批量处理",
+        "tags": [
+          "发丝级",
+          "批量抠图"
+        ],
+        "color": "#E8F5E9",
+        "ai": true,
+        "route": "/work/remove-bg",
+        "category": "image"
+      },
+      {
+        "id": "white-bg",
+        "icon": "▭",
+        "title": "白底图生成",
+        "desc": "抠图后智能生成纯白/场景底图，自动光影校正+阴影保留，平台直出",
+        "tags": [
+          "白底/透明",
+          "光影校正"
+        ],
+        "color": "#F5F5F5",
+        "ai": true,
+        "route": "/work/white-bg",
+        "category": "image"
+      },
+      {
+        "id": "retouch",
+        "icon": "✦",
+        "title": "图片精修",
+        "desc": "AI自动祛皱/去污/补光/锐化，保留材质纹理，批量提升产品图质感",
+        "tags": [
+          "祛皱补光",
+          "纹理保留"
+        ],
+        "color": "#FFF8E1",
+        "ai": true,
+        "route": "/work/retouch",
+        "category": "image"
+      },
+      {
+        "id": "platform-detail",
+        "icon": "▥",
+        "title": "平台详情页模板",
+        "desc": "13大电商平台详情页模板库，选平台→选模板→上传素材→一键生成适配尺寸",
+        "tags": [
+          "13平台",
+          "尺寸适配"
+        ],
+        "color": "#EFF6FF",
+        "ai": true,
+        "route": "/work/platform-detail",
+        "category": "image"
+      },
+      {
+        "id": "compliance",
+        "icon": "◬",
+        "title": "跨境合规检查",
+        "desc": "上传图片+文案→自动检测亚马逊/Temu/TikTok/Shein合规风险，覆盖欧美日市场",
+        "tags": [
+          "合规检测",
+          "多市场"
+        ],
+        "color": "#FFF1F2",
+        "ai": true,
+        "route": "/work/compliance-check",
+        "category": "ai"
+      },
+      {
+        "id": "ghost-mannequin",
+        "icon": "▯",
+        "title": "幽灵模特",
+        "desc": "服装平铺/挂拍→AI自动穿到隐形模特身上，生成3D立体效果展示图",
+        "tags": [
+          "3D立体",
+          "隐形模特"
+        ],
+        "color": "#F0F9FF",
+        "ai": true,
+        "route": "/work/ghost-mannequin",
+        "category": "image"
+      },
+      {
+        "id": "outpaint",
+        "icon": "▩",
+        "title": "智能扩图",
+        "desc": "AI扩展图片边缘自动补全构图，适配各平台尺寸比例，无缝融合不留痕迹",
+        "tags": [
+          "构图补全",
+          "比例适配"
+        ],
+        "color": "#F5F3FF",
+        "ai": true,
+        "route": "/work/outpainting",
+        "category": "image"
+      },
+      {
+        "id": "image-translate",
+        "icon": "🌐",
+        "title": "图片翻译",
+        "desc": "商品图文字智能识别→翻译为9语种→原位替换，跨境卖家出海必备",
+        "tags": [
+          "OCR识别",
+          "9语种翻译"
+        ],
+        "color": "#ECFDF5",
+        "ai": true,
+        "route": "/work/image-translate",
+        "category": "image"
+      },
+      {
+        "id": "video-edit",
+        "icon": "▸",
+        "title": "视频编辑",
+        "desc": "AI智能裁剪/变速/转场/调色，自动生成多尺寸多时长版本供投放",
+        "tags": [
+          "智能剪辑",
+          "多尺寸输出"
+        ],
+        "color": "#FFF7ED",
+        "ai": true,
+        "route": "/work/video-edit",
+        "category": "video"
+      },
+      {
+        "id": "voice-gen",
+        "icon": "♫",
+        "title": "AI语音生成",
+        "desc": "输入文案→选主播音色→生成自然流畅带货配音，支持9语种50+音色",
+        "tags": [
+          "TTS合成",
+          "50+音色"
+        ],
+        "color": "#FDF2F8",
+        "ai": true,
+        "route": "/work/voice-gen",
+        "category": "ai"
+      },
+      {
+        "id": "storyboard",
+        "icon": "⊟",
+        "title": "智能分镜",
+        "desc": "文案脚本→AI自动拆解为分镜画面+配音+字幕，一键生成完整短视频",
+        "tags": [
+          "脚本拆解",
+          "自动分镜"
+        ],
+        "color": "#FFF1F2",
+        "ai": true,
+        "route": "/work/storyboard",
+        "category": "video"
+      }
     ]
   },
   "work": {
@@ -211,469 +716,6 @@
     "badges": "营销标签",
     "abuse": "滥用监控",
     "logs": "操作日志"
-  },
-  "enterprise": {
-    "dashboard": "数据大盘",
-    "finance": "财务",
-    "users": "子账号管理",
-    "customers": "客户管理",
-    "tags": "标签分组",
-    "channels": "渠道管理",
-    "distribution": "推广分销",
-    "commerce": "商品订单",
-    "reports": "数据报表",
-    "usage": "用量明细",
-    "plans": "套餐购买",
-    "whitelabel": "白标设置",
-    "settings": "账户设置",
-    "logout": "退出登录"
-  },
-  "tier": {
-    "free": "免费版",
-    "vip": "会员版",
-    "admin": "管理员",
-    "upgrade": "升级套餐",
-    "daily_limit": "今日限额",
-    "quota_used": "已用",
-    "quota_total": "总额"
-  },
-  "auth": {
-    "username": "用户名",
-    "password": "密码",
-    "email": "邮箱",
-    "phone": "手机号",
-    "code": "验证码",
-    "send_code": "发送验证码",
-    "login_btn": "登录",
-    "register_btn": "注册",
-    "forgot_pwd": "忘记密码",
-    "remember": "记住我",
-    "welcome_title": "欢迎回来",
-    "welcome_subtitle": "登录你的 Movio AI 账号",
-    "tab_password": "密码登录",
-    "tab_sms": "短信登录",
-    "tab_email": "邮箱登录",
-    "get_code": "获取验证码",
-    "code_countdown": "{n}秒",
-    "code_sent": "验证码已发送",
-    "send_failed": "发送失败，请检查网络",
-    "login_failed": "登录失败",
-    "login_network_error": "登录失败，请检查网络",
-    "enter_phone_and_code": "请输入手机号和验证码",
-    "enter_phone": "请输入手机号",
-    "enter_email_and_code": "请输入邮箱和验证码",
-    "enter_email": "请输入邮箱",
-    "no_account": "还没有账号？",
-    "free_register": "免费注册"
-  },
-  "image": {
-    "title": "AI 图片生成",
-    "generate": "生成图片",
-    "mainImage": "商品主图",
-    "background": "背景去除",
-    "whiteBackground": "白底图",
-    "retouch": "图片精修",
-    "scene": "场景生成",
-    "colorChange": "颜色替换",
-    "faceSwap": "换脸",
-    "virtualTryOn": "虚拟试穿",
-    "model": "AI 模型",
-    "resolution": "分辨率",
-    "prompt": "正向提示词",
-    "negativePrompt": "反向提示词",
-    "referenceImage": "参考图片"
-  },
-  "video": {
-    "title": "AI 视频创作",
-    "generate": "生成视频",
-    "script": "短视频脚本",
-    "storyboard": "分镜脚本",
-    "shootingPlan": "拍摄方案",
-    "digitalHuman": "数字人",
-    "voiceClone": "声音克隆",
-    "subtitles": "自动字幕",
-    "translation": "视频翻译"
-  },
-  "action": {
-    "background_replace": "背景替换",
-    "background_url": "背景图片URL（可选）",
-    "background_hint": "留空则AI自动生成场景背景",
-    "clothing_replace": "服装替换",
-    "clothing_style": "服装风格",
-    "clothing_color": "服装颜色",
-    "clothing_auto": "自动",
-    "color_hint": "如：白色、黑色、红色",
-    "keep_audio": "保留原音频",
-    "bgm_url": "BGM 背景音乐 URL",
-    "bgm_hint": "https://...",
-    "volume": "音量",
-    "voiceover_text": "AI 配音文字（可选）",
-    "voiceover_hint": "输入AI配音文案，如不填则不配音",
-    "voiceover_type": "配音声线",
-    "voice_auto": "自动",
-    "long_image_tab": "长图合成",
-    "long_image_desc": "多场景图智能合成一张完整长图",
-    "platform": "目标平台",
-    "scene_prompt": "场景描述",
-    "scene_image_url": "场景参考图URL",
-    "add_scene": "添加场景",
-    "output_width": "输出宽度",
-    "pixel": "像素",
-    "generate_long": "生成长图",
-    "scenes_count": "场景数",
-    "max_scenes": "最多20个场景",
-    "smart_recognition_tab": "智能识别",
-    "smart_recognition_desc": "上传参考图，AI自动识别商品信息",
-    "voice_option": "语音",
-    "quantity_option": "数量",
-    "color_option": "配色",
-    "none": "无"
-  },
-  "copywriting": {
-    "title": "AI 文案生成",
-    "productTitle": "商品标题",
-    "sellingPoints": "卖点文案",
-    "script": "脚本生成",
-    "socialContent": "社媒内容",
-    "translation": "跨境翻译",
-    "seoCopy": "SEO 文案",
-    "platform": "目标平台"
-  },
-  "diy": {
-    "title": "页面搭建",
-    "editor": "可视化编辑器",
-    "templates": "模板库",
-    "pages": "页面管理",
-    "forms": "表单搭建",
-    "components": "组件库",
-    "saveDraft": "保存草稿",
-    "previewPage": "预览",
-    "publishPage": "发布"
-  },
-  "account": {
-    "title": "账户中心",
-    "profile": "个人资料",
-    "security": "安全设置",
-    "billing": "账单",
-    "subscription": "订阅管理",
-    "credits": "积分",
-    "notifications": "消息通知",
-    "settings": "设置"
-  },
-  "workspace": {
-    "greeting": "欢迎使用 Movio AI",
-    "subtitle": "电商全链路AI自动化工作台",
-    "recent_projects": "最近项目",
-    "view_all": "查看全部",
-    "no_projects": "暂无最近项目，开始你的第一次创作吧",
-    "creation_tools": "创作工具",
-    "loading_tools": "加载创作工具...",
-    "start_create": "开始创作",
-    "assistant_desc": "电商各类角色智能体 — 店铺客服、运营巡检、商品优化、选品分析、竞品监控、评价管理、违规风控、数据分析、直播值守",
-    "assistant_agents": [
-      { "id": "service", "icon": "💬", "title": "店铺客服", "desc": "7×24小时智能应答，售前咨询+售后处理", "tag": "自动接待" },
-      { "id": "ops", "icon": "🔍", "title": "运营巡检", "desc": "全店商品自动巡检，标题/图片/价格异常检测", "tag": "每日巡检" },
-      { "id": "product", "icon": "✨", "title": "商品优化", "desc": "标题SEO优化+主图评分+描述增强建议", "tag": "转化提升" },
-      { "id": "selection", "icon": "🎯", "title": "选品分析", "desc": "大盘趋势+竞品挖掘+蓝海类目推荐", "tag": "数据驱动" },
-      { "id": "compete", "icon": "📊", "title": "竞品监控", "desc": "跟踪竞品上新/价格/活动/评价动态", "tag": "实时追踪" },
-      { "id": "review", "icon": "⭐", "title": "评价管理", "desc": "好评置顶+差评预警+自动回复模板", "tag": "评分维护" },
-      { "id": "compliance", "icon": "🛡️", "title": "违规风控", "desc": "违禁词扫描+图片合规+知识产权预警", "tag": "零违规" },
-      { "id": "data", "icon": "📈", "title": "数据分析", "desc": "销售/流量/转化/客单多维看板+异常告警", "tag": "智能洞察" },
-      { "id": "live", "icon": "📡", "title": "直播值守", "desc": "直播间自动弹幕回复+商品讲解+氛围引导", "tag": "24h在线" }
-    ],
-    "coming_soon_title": "功能即将上线，敬请期待",
-    "coming_soon_detail": "我们正在为您打造电商全链路自动化能力，上线后将支持客服、运营、数据复盘等全岗位AI自动化",
-    "progress_label": "开发进度",
-    "reserve_btn": "预约体验",
-    "reserve_toast": "已收到你的预约，上线后我们会第一时间通知你",
-    "logout_confirm": "确定要退出登录吗？",
-    "logout_success": "已退出登录",
-    "logout_fail": "退出失败，请重试",
-    "workflow_desc": "把零散功能串成标准化自动化流程 — 一键上新、批量做内容、自动管评价、每日数据复盘、大促活动营销、违规自查风控",
-    "lobster_desc": "一站串联电商业态全流程 — 选品调研、内容创作、上新发布、客服接待、评价管理、数据复盘、竞品监控、违规风控",
-    "history_desc": "查看你所有的创作历史记录与作品管理",
-    "admin_panel": "管理后台",
-    "exit_login": "退出登录",
-    "creation_placeholder_video": "描述你想要的带货视频，例如：护肤品展示视频，15秒口播...",
-    "creation_placeholder_image": "描述你想要的商品图，例如：夏季连衣裙白底图，简约高级风格...",
-    "creation_placeholder_detail": "描述你的详情页需求，例如：面膜产品详情页，日式极简风...",
-    "creation_placeholder_copywrite": "描述你的文案需求，例如：618 大促女装促销标题...",
-    "creation_placeholder_digital": "描述数字人需求，例如：女装带货数字人，甜美风格...",
-    "creation_placeholder_default": "描述你的创作需求...",
-    "creation_hint_video": "支持图片转视频 / 文字转视频 / 分镜规划 / 数字人口播",
-    "creation_hint_image": "支持文字生成 / 参考图生成 / 批量处理 / 精修 / 去背景",
-    "creation_hint_detail": "支持详情页设计 / 主图套装 / 多平台适配 / 产品渲染",
-    "creation_hint_copywrite": "支持带货口播 / 商品文案 / 多语种翻译 / AI 配音 / 营销脚本",
-    "creation_hint_other": "支持数字人带货 / 虚拟直播 / 换脸 / 图片翻译 / 合规检查",
-    "creation_hint_default": "",
-    "creation_placeholder_other": "描述你的其他创作需求，例如：数字人带货、合规检查...",
-    "creation_param_video_duration": "视频时长",
-    "creation_param_video_resolution": "分辨率",
-    "creation_param_video_style": "视频风格",
-    "creation_param_image_size": "图片尺寸",
-    "creation_param_image_style": "图片风格",
-    "creation_param_image_count": "生成数量",
-    "creation_param_detail_platform": "目标平台",
-    "creation_param_detail_style": "页面风格",
-    "creation_param_detail_modules": "包含模块",
-    "creation_param_copywrite_type": "文案类型",
-    "creation_param_copywrite_lang": "输出语种",
-    "creation_param_copywrite_tone": "语音音色",
-    "creation_param_other_tool": "工具类型",
-    "creation_param_video_ratio": "视频比例",
-    "creation_param_image_bg": "图片背景",
-    "creation_param_copywrite_voice": "主播音色",
-    "creation_param_other_format": "输出格式",
-    "creation_param_other_sort": "排序方式",
-    "creation_input_region": "{tab} — 创作输入区",
-    "creation_upload_label": "上传素材",
-    "creation_tools_region": "{tab} — 快捷工具",
-    "creation_quick_tools": "{tab} · 快捷工具",
-    "redirect_creation": "跳转至创作中心...",
-    "creation_upload_hint": "拖拽或点击上传素材",
-    "creation_param_label": "参数设置",
-    "creation_options": {
-      "duration": { "15s": "15 秒", "30s": "30 秒", "60s": "60 秒", "90s": "90 秒", "3min": "3 分钟" },
-      "ratio": { "9_16": "9:16 竖屏", "16_9": "16:9 横屏", "1_1": "1:1 正方形", "4_3": "4:3" },
-      "resolution": { "720p": "720p", "1080p": "1080p", "2k": "2K", "4k": "4K" },
-      "style": { "modern": "现代", "vintage": "复古", "minimal": "极简", "dynamic": "动感", "premium": "高级", "guochao": "国潮", "japanese": "日式", "cyber": "赛博", "korean": "韩式", "western": "欧美" },
-      "size": { "1_1": "1:1 正方形", "3_4": "3:4", "4_3": "4:3", "16_9": "16:9", "9_16": "9:16", "custom": "自定义" },
-      "count": { "1": "1 张", "2": "2 张", "4": "4 张", "6": "6 张", "8": "8 张" },
-      "bg": { "white": "白色", "transparent": "透明", "scene": "场景", "custom": "自定义" },
-      "platform": { "taobao": "淘宝", "pinduoduo": "拼多多", "douyin": "抖音", "amazon": "Amazon", "temu": "Temu", "shein": "Shein" },
-      "modules": { "full": "完整版", "compact": "紧凑版", "hero_usp": "主图+卖点", "custom": "自定义" },
-      "copy_type": { "sales_vo": "带货口播", "product_title": "商品标题", "detail_copy": "详情文案", "campaign_copy": "大促文案", "social_seeding": "社媒种草" },
-      "language": { "chinese": "中文", "english": "English", "japanese": "日本語", "korean": "한국어", "spanish": "Español" },
-      "tone": { "professional": "专业", "friendly": "亲切", "lively": "活泼", "premium": "高级感", "urgent": "紧迫" },
-      "voice": { "sweet_female": "甜美女声", "deep_male": "深沉男声", "energetic_female": "活力女声", "magnetic_male": "磁性男声", "neutral": "中性" },
-      "tool": { "digital_human": "数字人", "face_swap": "换脸", "translate": "翻译", "compliance": "合规检查", "viral_clone": "爆款复刻" },
-      "format": { "all": "全部", "image": "图片", "video": "视频", "copy": "文案", "audio": "音频", "jpg": "JPG", "png": "PNG", "mp4": "MP4", "gif": "GIF" },
-      "sort": { "recommended": "推荐", "newest": "最新", "hottest": "最热", "free_first": "免费优先" }
-    },
-    "slide_panel": {
-      "close_aria": "关闭面板",
-      "generate_btn": "⚡ 开始生成",
-      "upload_text": "拖拽或点击上传素材",
-      "upload_hint": "支持 JPG / PNG / MP4，单文件 ≤ 50MB",
-      "param_label": "参数设置",
-      "generating": "生成中...",
-      "step_upload": "上传素材",
-      "step_analyze": "AI 分析",
-      "step_generate": "生成内容",
-      "step_done": "完成",
-      "result_name": "生成结果",
-      "download": "⬇ 下载",
-      "reuse": "🔄 复用",
-      "close_result": "关闭",
-      "progress_pct": "生成中... {pct}%",
-      "prompt_label": "创作需求",
-      "generate_error": "生成失败，请重试",
-      "retry": "重试"
-    },
-
-    "creation_sub_cards": {
-      "video": [
-        {"icon":"🎥","title":"AI 短视频生成","desc":"商品图一键生成带货短视频，自动配乐+字幕","route":"/work/video"},
-        {"icon":"🕺","title":"动作迁移","desc":"人物图+参考动作视频，AI精准迁移动作姿态","route":"/work/action-transfer"},
-        {"icon":"🎬","title":"智能分镜","desc":"文案脚本AI自动拆解为分镜画面+配音+字幕","route":"/work/storyboard"},
-        {"icon":"✂️","title":"视频编辑","desc":"智能裁剪/变速/转场/调色，多尺寸多时长输出","route":"/work/video-edit"},
-        {"icon":"📡","title":"直播切片","desc":"直播回放自动剪辑高光片段，批量生成短视频","route":"/work/live-clip"},
-        {"icon":"📋","title":"批量生成","desc":"文件夹拖入→后台排队→完成通知→批量下载","route":"/work/batch"}
-      ],
-      "image": [
-        {"icon":"🖼️","title":"AI 商品图","desc":"各平台商品主图一键生成，自动抠图+精修+白底","route":"/work/image"},
-        {"icon":"🏞️","title":"场景生成","desc":"产品图+AI场景库→自动光影融合→出5张场景图","route":"/work/scene"},
-        {"icon":"✂️","title":"智能抠图","desc":"AI发丝级抠图，毛发/透明体/复杂边缘精准分离","route":"/work/remove-bg"},
-        {"icon":"⬜","title":"白底图生成","desc":"抠图后智能生成纯白/场景底图，平台直出","route":"/work/white-bg"},
-        {"icon":"✨","title":"图片精修","desc":"AI自动祛皱/去污/补光/锐化，批量提升质感","route":"/work/retouch"},
-        {"icon":"🎨","title":"风格转化","desc":"6大风格一键转换：复古/国潮/插画/水彩/赛博/极简","route":"/work/style-transfer"},
-        {"icon":"🔄","title":"一键换色","desc":"服装鞋包颜色变换，保留褶皱纹理质感，支持批量","route":"/work/color-swap"},
-        {"icon":"↔️","title":"智能扩图","desc":"AI扩展图片边缘自动补全构图，适配各平台比例","route":"/work/outpaint"},
-        {"icon":"📦","title":"批量渲染","desc":"50张图统一抠图+白底+尺寸，支持夜间托管折扣","route":"/work/batch"}
-      ],
-      "detail": [
-        {"icon":"📄","title":"详情页设计","desc":"商品详情页智能排版设计，AI自动生成文案+图文","route":"/work/detail-h5"},
-        {"icon":"📱","title":"多平台适配","desc":"13大电商平台详情页模板库，选平台→选模板→生成","route":"/work/platform-detail"},
-        {"icon":"🏷️","title":"卖点生成","desc":"AI自动提炼商品卖点，生成高转化详情文案","route":"/work/selling-points"},
-        {"icon":"🎯","title":"模板套用","desc":"精品详情页模板一键套用，上传素材即可出页","route":"/work/template-apply"},
-        {"icon":"👗","title":"虚拟试穿","desc":"服装平铺图→真人模特上身效果，多肤色体型可选","route":"/work/virtual-tryon"},
-        {"icon":"👤","title":"幽灵模特","desc":"服装平铺/挂拍→AI穿到隐形模特，3D立体展示","route":"/work/ghost-mannequin"},
-        {"icon":"🛒","title":"产品渲染","desc":"3D展示商品旋转/细节，支持360度产品展示","route":"/work/product-render"},
-        {"icon":"📁","title":"导出设置","desc":"统一导出格式/尺寸/命名规则，一键打包下载","route":"/work/output"}
-      ],
-      "copywrite": [
-        {"icon":"🎙️","title":"带货口播","desc":"产品卖点→AI生成短视频口播脚本，支持3种脚本类型","route":"/work/script-gen"},
-        {"icon":"📝","title":"商品文案","desc":"SEO优化标题+详情长文案智能撰写，高转化率导向","route":"/work/detail-copy"},
-        {"icon":"🌐","title":"多语种翻译","desc":"商品图文字智能识别→翻译为9语种→原位替换","route":"/work/image-translate"},
-        {"icon":"🔊","title":"AI 语音生成","desc":"输入文案→选主播音色→生成自然流畅带货配音","route":"/work/voice-gen"},
-        {"icon":"📢","title":"营销文案","desc":"大促/活动/促销文案生成，多平台适配","route":"/work/campaign-copy"},
-        {"icon":"📱","title":"社媒文案","desc":"小红书/抖音/TikTok种草文案一键生成","route":"/work/social-copy"},
-        {"icon":"📧","title":"邮件文案","desc":"EDM营销邮件/短信文案，多语种支持","route":"/work/email-copy"},
-        {"icon":"🎤","title":"音色定制","desc":"50+主播音色可选，支持9语种TTS语音合成","route":"/work/voice-custom"}
-      ],
-      "other": [
-        {"icon":"🤖","title":"口播数字人","desc":"输入文案→选数字人形象+语音→AI生成带货视频","route":"/work/digital-human"},
-        {"icon":"📡","title":"数字人直播","desc":"虚拟直播间自动讲解商品，24小时不间断带货","route":"/work/digital-live"},
-        {"icon":"🔄","title":"AI 换脸","desc":"AI人脸替换/数字人换脸，多肤色多风格","route":"/work/face-swap"},
-        {"icon":"🌐","title":"图片翻译","desc":"OCR识别商品图文字→9语种原位替换翻译","route":"/work/image-translate"},
-        {"icon":"🛡️","title":"跨境合规检查","desc":"检测亚马逊/Temu/TikTok/Shein合规风险，覆盖欧美日","route":"/work/compliance-check"},
-        {"icon":"🔥","title":"爆款复刻","desc":"对标爆款视频→AI分析节奏/色调→你的产品重新生成","route":"/work/viral-clone"},
-        {"icon":"🧬","title":"形象定制","desc":"自定义数字人外观/声音/动作，打造专属IP形象","route":"/work/avatar-custom"},
-        {"icon":"📐","title":"分镜计划","desc":"视频分镜/镜头顺序/时长规划，可视化预览","route":"/work/shot-plan"}
-      ]
-    },
-    "nav_main_label": "工作台导航",
-    "nav_home": "首页",
-    "nav_creation": "创作中心",
-    "nav_agent": "智能体",
-    "nav_assistant": "AI 助手",
-    "nav_workflow": "工作流",
-    "nav_lobster": "龙虾",
-    "nav_history": "历史记录",
-    "default_page_title": "工作台",
-    "fold_expand": "展开侧边栏",
-    "fold_collapse": "收起侧边栏",
-    "menu_open_label": "打开导航菜单",
-    "menu_close_label": "关闭导航菜单",
-    "coming_soon_tag": "即将上线",
-    "points_label": "积分",
-    "creation_tabs": {
-      "video": "视频生成",
-      "image": "图片生成",
-      "detail": "电商详情页生成",
-      "copywrite": "语音文案生成",
-      "other": "其他创作类"
-    },
-    "recent_samples": [
-      {"icon":"🖼","name":"夏季连衣裙白底图","time":"2小时前"},
-      {"icon":"🎥","name":"护肤品展示视频","time":"昨天"},
-      {"icon":"📄","name":"面膜详情页设计","time":"昨天"},
-      {"icon":"📰","name":"618活动海报","time":"2天前"}
-    ],
-    "default_cards": [
-      {"id":"img_main","category":"image","icon":"🖼","title":"AI 商品图","desc":"各平台商品主图一键生成","route":"/work/image","order":1,"visible":true},
-      {"id":"video_gen","category":"video","icon":"🎥","title":"AI 短视频","desc":"商品图一键生成带货短视频","route":"/work/video","order":1,"visible":true},
-      {"id":"detail_page","category":"detail","icon":"📄","title":"详情页设计","desc":"商品详情页智能排版设计","route":"/work/detail-page","order":1,"visible":true},
-      {"id":"copy_title","category":"copywrite","icon":"✍️","title":"标题/卖点生成","desc":"AI生成高转化商品标题","route":"/work/copywriting","order":1,"visible":true},
-      {"id":"digital_human","category":"digital","icon":"🤖","title":"数字人带货","desc":"数字人24小时自动带货视频","route":"/work/digital-human","order":1,"visible":true}
-    ],
-    "default_tool_cards": {
-      "video": [
-        {"id":"video_gen","category":"video","icon":"🎥","title":"AI 短视频","desc":"商品图一键生成带货短视频","route":"/work/video","order":1,"visible":true},
-        {"id":"video_edit","category":"video","icon":"✂","title":"视频编辑","desc":"在线剪辑/加字幕/配乐/调色","route":"/work/video-edit","order":2,"visible":true},
-        {"id":"video_trans","category":"video","icon":"🌐","title":"视频翻译","desc":"语音/字幕/面容三合一翻译","route":"/work/video-translate","order":3,"visible":true},
-        {"id":"script_gen","category":"video","icon":"📝","title":"短视频脚本","desc":"带货视频口播脚本自动生成","route":"/work/script-gen","order":4,"visible":true},
-        {"id":"shot_plan","category":"video","icon":"📐","title":"分镜计划","desc":"视频分镜/镜头顺序/时长规划","route":"/work/shot-plan","order":5,"visible":true},
-        {"id":"storyboard","category":"video","icon":"🎞","title":"故事板","desc":"视频创意可视化故事板预览","route":"/work/storyboard","order":6,"visible":true}
-      ],
-      "image": [
-        {"id":"img_main","category":"image","icon":"🖼","title":"AI 商品图","desc":"各平台商品主图一键生成","route":"/work/image","order":1,"visible":true},
-        {"id":"img_scene","category":"image","icon":"🏞","title":"场景图生成","desc":"商品融入生活场景展示","route":"/work/main-image","order":2,"visible":true},
-        {"id":"img_poster","category":"image","icon":"📰","title":"海报生成","desc":"营销海报/活动海报/首发海报","route":"/work/poster","order":3,"visible":true},
-        {"id":"img_white_bg","category":"image","icon":"⬜","title":"白底图生成","desc":"符合各平台规范的白底图","route":"/work/white-bg","order":4,"visible":true},
-        {"id":"img_bg_remove","category":"image","icon":"✂","title":"智能去背景","desc":"AI 3秒精准识别主体去背景","route":"/work/remove-bg","order":5,"visible":true},
-        {"id":"img_retouch","category":"image","icon":"✨","title":"AI 精修","desc":"调色/锐化/光影质感优化","route":"/work/retouch","order":6,"visible":true},
-        {"id":"img_recolor","category":"image","icon":"🎯","title":"商品换色","desc":"同一款式展示多种颜色","route":"/work/color-swap","order":7,"visible":true},
-        {"id":"img_style","category":"image","icon":"🖌","title":"风格迁移","desc":"实拍图变油画/水彩/3D风格","route":"/work/style-transfer","order":8,"visible":true},
-        {"id":"img_text_fx","category":"image","icon":"🔤","title":"文字特效","desc":"立体/金属/霓虹等标题特效","route":"/work/text-effect","order":9,"visible":true},
-        {"id":"img_expand","category":"image","icon":"↔","title":"智能外扩","desc":"画面边缘智能扩展补全","route":"/work/outpaint","order":10,"visible":true},
-        {"id":"batch_process","category":"image","icon":"📦","title":"批量处理","desc":"50张图统一抠图+白底+尺寸","route":"/work/batch","order":11,"visible":true}
-      ],
-      "detail": [
-        {"id":"detail_page","category":"detail","icon":"📄","title":"详情页设计","desc":"商品详情页智能排版设计","route":"/work/detail-page","order":1,"visible":true},
-        {"id":"product_render","category":"detail","icon":"🛒","title":"产品渲染","desc":"3D展示商品旋转/细节","route":"/work/product-render","order":2,"visible":true},
-        {"id":"virtual_tryon","category":"detail","icon":"👗","title":"虚拟试穿","desc":"买家在线看衣服上身效果","route":"/work/virtual-tryon","order":3,"visible":true},
-        {"id":"model_generate","category":"detail","icon":"🧍","title":"AI 模特","desc":"AI 生成虚拟模特穿衣展示","route":"/work/model-generate","order":4,"visible":true},
-        {"id":"img_ghost","category":"detail","icon":"👤","title":"幽灵模特","desc":"隐形模特展示上身效果","route":"/work/ghost-mannequin","order":5,"visible":true},
-        {"id":"platform_taobao","category":"detail","icon":"📱","title":"多平台适配","desc":"天猫/京东/拼多多等尺寸适配","route":"/work/multi-platform","order":6,"visible":true},
-        {"id":"main_img_set","category":"detail","icon":"🖼","title":"主图套装","desc":"主图+辅图+白底图一键套装","route":"/work/main-image-set","order":7,"visible":true},
-        {"id":"output","category":"detail","icon":"📁","title":"导出设置","desc":"统一导出格式/尺寸/命名规则","route":"/work/output","order":8,"visible":true}
-      ],
-      "copywrite": [
-        {"id":"copy_title","category":"copywrite","icon":"📋","title":"电商标题","desc":"SEO优化标题/卖点标题批量生成","route":"/work/title-gen","order":1,"visible":true},
-        {"id":"copy_detail","category":"copywrite","icon":"📝","title":"详情文案","desc":"商品详情页长文案智能撰写","route":"/work/detail-copy","order":2,"visible":true},
-        {"id":"script_gen2","category":"copywrite","icon":"🎙","title":"口播脚本","desc":"带货短视频口播脚本自动生成","route":"/work/script-gen","order":3,"visible":true},
-        {"id":"campaign_copy","category":"copywrite","icon":"📢","title":"营销文案","desc":"大促/活动/促销文案生成","route":"/work/campaign-copy","order":4,"visible":true},
-        {"id":"email_copy","category":"copywrite","icon":"📧","title":"邮件文案","desc":"EDM营销邮件/短信文案","route":"/work/email-copy","order":5,"visible":true},
-        {"id":"social_copy","category":"copywrite","icon":"📱","title":"社媒文案","desc":"小红书/抖音/TikTok文案","route":"/work/social-copy","order":6,"visible":true}
-      ],
-      "digital": [
-        {"id":"digital_human","category":"digital","icon":"🤖","title":"数字人带货","desc":"数字人24小时自动带货视频","route":"/work/digital-human","order":1,"visible":true},
-        {"id":"digital_live","category":"digital","icon":"📡","title":"数字人直播","desc":"虚拟直播间自动讲解商品","route":"/work/digital-live","order":2,"visible":true},
-        {"id":"avatar_custom","category":"digital","icon":"🧬","title":"形象定制","desc":"自定义数字人外观/声音/动作","route":"/work/avatar-custom","order":3,"visible":true},
-        {"id":"ai_host","category":"digital","icon":"🎤","title":"AI 主播","desc":"智能语音播报商品卖点","route":"/work/ai-host","order":4,"visible":true},
-        {"id":"virtual_model","category":"digital","icon":"👤","title":"虚拟模特","desc":"AI生成虚拟模特穿衣展示","route":"/work/virtual-model","order":5,"visible":true},
-        {"id":"face_swap","category":"digital","icon":"🔄","title":"换脸","desc":"AI 人脸替换/数字人换脸","route":"/work/face-swap","order":6,"visible":true}
-      ]
-    },
-    "history_desc": "查看你所有的创作历史记录与作品管理",
-    "panel_param_type": "类型",
-    "panel_param_quality": "质量",
-    "panel_param_format": "格式",
-    "panel_opt_auto": "自动",
-    "panel_opt_standard": "标准",
-    "panel_opt_premium": "高级",
-    "panel_opt_sd": "标清",
-    "panel_opt_hd": "高清",
-    "panel_opt_uhd": "超清",
-    "panel_generate_title": "{tab} — 生成结果"
-  },
-  "ai_assistant": {
-    "review": {
-      "title": "AI 内容审核",
-      "subtitle": "输入文本，自动检测违规内容、联系方式、代码注入等风险",
-      "placeholder": "请输入待审核的文本内容...",
-      "start_review": "开始审核",
-      "clear": "清空",
-      "result_title": "审核结果",
-      "pass": "✓ 通过",
-      "fail": "✕ 不通过",
-      "score_label": "安全评分 / 100",
-      "no_issues": "未检测到风险内容。",
-      "service_error": "服务异常"
-    },
-    "data": {
-      "title": "AI 数据分析助手",
-      "subtitle": "用自然语言查询运营数据，AI 自动分析回答",
-      "placeholder": "输入问题，例如：本周注册用户有多少",
-      "analyze": "分析",
-      "service_unavailable": "分析服务暂不可用，请稍后再试。",
-      "hints": ["本周注册用户有多少", "本月收入情况", "图片生成统计"]
-    }
-  },
-  "assets": {
-    "title": "素材库",
-    "subtitle": "管理所有AI生成的作品",
-    "loading": "加载中...",
-    "empty_title": "素材库为空",
-    "empty_hint": "AI生成的作品将自动保存到此处",
-    "load_more": "加载更多",
-    "load_error": "加载资源列表失败",
-    "close_preview": "关闭",
-    "preview_alt": "资源预览",
-    "download": "下载",
-    "copy_link": "复制链接",
-    "filter_all": "全部",
-    "filter_image": "图片",
-    "filter_video": "视频",
-    "type_image_gen": "AI生图",
-    "type_image_replicate": "主图复刻",
-    "type_batch_image": "批量生图",
-    "type_batch_edit": "批量编辑",
-    "type_video_gen": "AI视频",
-    "type_action_migrate": "动作迁移",
-    "type_digital_human": "数字人",
-    "type_viral_replicate": "爆款复刻",
-    "type_live_clip": "智能精剪"
-  },
-  "admin_shell": {
-    "expand_sidebar": "展开侧栏",
-    "collapse_sidebar": "折叠侧栏",
-    "switch_light": "切亮色",
-    "switch_dark": "切暗色",
-    "notification": "通知",
-    "logout": "退出登录",
-    "back": "返回"
   },
   "enterprise": {
     "common": {
@@ -1243,6 +1285,1200 @@
       "loadProfileFailed": "加载企业信息失败"
     }
   },
+  "tier": {
+    "free": "免费版",
+    "vip": "会员版",
+    "admin": "管理员",
+    "upgrade": "升级套餐",
+    "daily_limit": "今日限额",
+    "quota_used": "已用",
+    "quota_total": "总额"
+  },
+  "auth": {
+    "username": "用户名",
+    "password": "密码",
+    "email": "邮箱",
+    "phone": "手机号",
+    "code": "验证码",
+    "send_code": "发送验证码",
+    "login_btn": "登录",
+    "register_btn": "注册",
+    "forgot_pwd": "忘记密码",
+    "remember": "记住我",
+    "welcome_title": "欢迎回来",
+    "welcome_subtitle": "登录你的 Movio AI 账号",
+    "tab_password": "密码登录",
+    "tab_sms": "短信登录",
+    "tab_email": "邮箱登录",
+    "get_code": "获取验证码",
+    "code_countdown": "{n}秒",
+    "code_sent": "验证码已发送",
+    "send_failed": "发送失败，请检查网络",
+    "login_failed": "登录失败",
+    "login_network_error": "登录失败，请检查网络",
+    "enter_phone_and_code": "请输入手机号和验证码",
+    "enter_phone": "请输入手机号",
+    "enter_email_and_code": "请输入邮箱和验证码",
+    "enter_email": "请输入邮箱",
+    "no_account": "还没有账号？",
+    "free_register": "免费注册"
+  },
+  "image": {
+    "title": "AI 图片生成",
+    "generate": "生成图片",
+    "mainImage": "商品主图",
+    "background": "背景去除",
+    "whiteBackground": "白底图",
+    "retouch": "图片精修",
+    "scene": "场景生成",
+    "colorChange": "颜色替换",
+    "faceSwap": "换脸",
+    "virtualTryOn": "虚拟试穿",
+    "model": "AI 模型",
+    "resolution": "分辨率",
+    "prompt": "正向提示词",
+    "negativePrompt": "反向提示词",
+    "referenceImage": "参考图片"
+  },
+  "video": {
+    "title": "AI 视频创作",
+    "generate": "生成视频",
+    "script": "短视频脚本",
+    "storyboard": "分镜脚本",
+    "shootingPlan": "拍摄方案",
+    "digitalHuman": "数字人",
+    "voiceClone": "声音克隆",
+    "subtitles": "自动字幕",
+    "translation": "视频翻译"
+  },
+  "action": {
+    "background_replace": "背景替换",
+    "background_url": "背景图片URL（可选）",
+    "background_hint": "留空则AI自动生成场景背景",
+    "clothing_replace": "服装替换",
+    "clothing_style": "服装风格",
+    "clothing_color": "服装颜色",
+    "clothing_auto": "自动",
+    "color_hint": "如：白色、黑色、红色",
+    "keep_audio": "保留原音频",
+    "bgm_url": "BGM 背景音乐 URL",
+    "bgm_hint": "https://...",
+    "volume": "音量",
+    "voiceover_text": "AI 配音文字（可选）",
+    "voiceover_hint": "输入AI配音文案，如不填则不配音",
+    "voiceover_type": "配音声线",
+    "voice_auto": "自动",
+    "long_image_tab": "长图合成",
+    "long_image_desc": "多场景图智能合成一张完整长图",
+    "platform": "目标平台",
+    "scene_prompt": "场景描述",
+    "scene_image_url": "场景参考图URL",
+    "add_scene": "添加场景",
+    "output_width": "输出宽度",
+    "pixel": "像素",
+    "generate_long": "生成长图",
+    "scenes_count": "场景数",
+    "max_scenes": "最多20个场景",
+    "smart_recognition_tab": "智能识别",
+    "smart_recognition_desc": "上传参考图，AI自动识别商品信息",
+    "voice_option": "语音",
+    "quantity_option": "数量",
+    "color_option": "配色",
+    "none": "无"
+  },
+  "copywriting": {
+    "title": "AI 文案生成",
+    "productTitle": "商品标题",
+    "sellingPoints": "卖点文案",
+    "script": "脚本生成",
+    "socialContent": "社媒内容",
+    "translation": "跨境翻译",
+    "seoCopy": "SEO 文案",
+    "platform": "目标平台"
+  },
+  "diy": {
+    "title": "页面搭建",
+    "editor": "可视化编辑器",
+    "templates": "模板库",
+    "pages": "页面管理",
+    "forms": "表单搭建",
+    "components": "组件库",
+    "saveDraft": "保存草稿",
+    "previewPage": "预览",
+    "publishPage": "发布"
+  },
+  "account": {
+    "title": "账户中心",
+    "profile": "个人资料",
+    "security": "安全设置",
+    "billing": "账单",
+    "subscription": "订阅管理",
+    "credits": "积分",
+    "notifications": "消息通知",
+    "settings": "设置"
+  },
+  "workspace": {
+    "greeting": "欢迎使用 Movio AI",
+    "subtitle": "电商全链路AI自动化工作台",
+    "recent_projects": "最近项目",
+    "view_all": "查看全部",
+    "no_projects": "暂无最近项目，开始你的第一次创作吧",
+    "creation_tools": "创作工具",
+    "loading_tools": "加载创作工具...",
+    "start_create": "开始创作",
+    "assistant_desc": "电商各类角色智能体 — 店铺客服、运营巡检、商品优化、选品分析、竞品监控、评价管理、违规风控、数据分析、直播值守",
+    "assistant_agents": [
+      {
+        "id": "service",
+        "icon": "💬",
+        "title": "店铺客服",
+        "desc": "7×24小时智能应答，售前咨询+售后处理",
+        "tag": "自动接待"
+      },
+      {
+        "id": "ops",
+        "icon": "🔍",
+        "title": "运营巡检",
+        "desc": "全店商品自动巡检，标题/图片/价格异常检测",
+        "tag": "每日巡检"
+      },
+      {
+        "id": "product",
+        "icon": "✨",
+        "title": "商品优化",
+        "desc": "标题SEO优化+主图评分+描述增强建议",
+        "tag": "转化提升"
+      },
+      {
+        "id": "selection",
+        "icon": "🎯",
+        "title": "选品分析",
+        "desc": "大盘趋势+竞品挖掘+蓝海类目推荐",
+        "tag": "数据驱动"
+      },
+      {
+        "id": "compete",
+        "icon": "📊",
+        "title": "竞品监控",
+        "desc": "跟踪竞品上新/价格/活动/评价动态",
+        "tag": "实时追踪"
+      },
+      {
+        "id": "review",
+        "icon": "⭐",
+        "title": "评价管理",
+        "desc": "好评置顶+差评预警+自动回复模板",
+        "tag": "评分维护"
+      },
+      {
+        "id": "compliance",
+        "icon": "🛡️",
+        "title": "违规风控",
+        "desc": "违禁词扫描+图片合规+知识产权预警",
+        "tag": "零违规"
+      },
+      {
+        "id": "data",
+        "icon": "📈",
+        "title": "数据分析",
+        "desc": "销售/流量/转化/客单多维看板+异常告警",
+        "tag": "智能洞察"
+      },
+      {
+        "id": "live",
+        "icon": "📡",
+        "title": "直播值守",
+        "desc": "直播间自动弹幕回复+商品讲解+氛围引导",
+        "tag": "24h在线"
+      }
+    ],
+    "coming_soon_title": "功能即将上线，敬请期待",
+    "coming_soon_detail": "我们正在为您打造电商全链路自动化能力，上线后将支持客服、运营、数据复盘等全岗位AI自动化",
+    "progress_label": "开发进度",
+    "reserve_btn": "预约体验",
+    "reserve_toast": "已收到你的预约，上线后我们会第一时间通知你",
+    "logout_confirm": "确定要退出登录吗？",
+    "logout_success": "已退出登录",
+    "logout_fail": "退出失败，请重试",
+    "workflow_desc": "把零散功能串成标准化自动化流程 — 一键上新、批量做内容、自动管评价、每日数据复盘、大促活动营销、违规自查风控",
+    "lobster_desc": "一站串联电商业态全流程 — 选品调研、内容创作、上新发布、客服接待、评价管理、数据复盘、竞品监控、违规风控",
+    "history_desc": "查看你所有的创作历史记录与作品管理",
+    "admin_panel": "管理后台",
+    "exit_login": "退出登录",
+    "creation_placeholder_video": "描述你想要的带货视频，例如：护肤品展示视频，15秒口播...",
+    "creation_placeholder_image": "描述你想要的商品图，例如：夏季连衣裙白底图，简约高级风格...",
+    "creation_placeholder_detail": "描述你的详情页需求，例如：面膜产品详情页，日式极简风...",
+    "creation_placeholder_copywrite": "描述你的文案需求，例如：618 大促女装促销标题...",
+    "creation_placeholder_digital": "描述数字人需求，例如：女装带货数字人，甜美风格...",
+    "creation_placeholder_default": "描述你的创作需求...",
+    "creation_hint_video": "支持图片转视频 / 文字转视频 / 分镜规划 / 数字人口播",
+    "creation_hint_image": "支持文字生成 / 参考图生成 / 批量处理 / 精修 / 去背景",
+    "creation_hint_detail": "支持详情页设计 / 主图套装 / 多平台适配 / 产品渲染",
+    "creation_hint_copywrite": "支持带货口播 / 商品文案 / 多语种翻译 / AI 配音 / 营销脚本",
+    "creation_hint_other": "支持数字人带货 / 虚拟直播 / 换脸 / 图片翻译 / 合规检查",
+    "creation_hint_default": "",
+    "creation_placeholder_other": "描述你的其他创作需求，例如：数字人带货、合规检查...",
+    "creation_param_video_duration": "视频时长",
+    "creation_param_video_resolution": "分辨率",
+    "creation_param_video_style": "视频风格",
+    "creation_param_image_size": "图片尺寸",
+    "creation_param_image_style": "图片风格",
+    "creation_param_image_count": "生成数量",
+    "creation_param_detail_platform": "目标平台",
+    "creation_param_detail_style": "页面风格",
+    "creation_param_detail_modules": "包含模块",
+    "creation_param_copywrite_type": "文案类型",
+    "creation_param_copywrite_lang": "输出语种",
+    "creation_param_copywrite_tone": "语音音色",
+    "creation_param_other_tool": "工具类型",
+    "creation_param_video_ratio": "视频比例",
+    "creation_param_image_bg": "图片背景",
+    "creation_param_copywrite_voice": "主播音色",
+    "creation_param_other_format": "输出格式",
+    "creation_param_other_sort": "排序方式",
+    "creation_input_region": "{tab} — 创作输入区",
+    "creation_upload_label": "上传素材",
+    "creation_tools_region": "{tab} — 快捷工具",
+    "creation_quick_tools": "{tab} · 快捷工具",
+    "redirect_creation": "跳转至创作中心...",
+    "creation_upload_hint": "拖拽或点击上传素材",
+    "creation_param_label": "参数设置",
+    "creation_options": {
+      "duration": {
+        "15s": "15 秒",
+        "30s": "30 秒",
+        "60s": "60 秒",
+        "90s": "90 秒",
+        "3min": "3 分钟"
+      },
+      "ratio": {
+        "9_16": "9:16 竖屏",
+        "16_9": "16:9 横屏",
+        "1_1": "1:1 正方形",
+        "4_3": "4:3"
+      },
+      "resolution": {
+        "720p": "720p",
+        "1080p": "1080p",
+        "2k": "2K",
+        "4k": "4K"
+      },
+      "style": {
+        "modern": "现代",
+        "vintage": "复古",
+        "minimal": "极简",
+        "dynamic": "动感",
+        "premium": "高级",
+        "guochao": "国潮",
+        "japanese": "日式",
+        "cyber": "赛博",
+        "korean": "韩式",
+        "western": "欧美"
+      },
+      "size": {
+        "1_1": "1:1 正方形",
+        "3_4": "3:4",
+        "4_3": "4:3",
+        "16_9": "16:9",
+        "9_16": "9:16",
+        "custom": "自定义"
+      },
+      "count": {
+        "1": "1 张",
+        "2": "2 张",
+        "4": "4 张",
+        "6": "6 张",
+        "8": "8 张"
+      },
+      "bg": {
+        "white": "白色",
+        "transparent": "透明",
+        "scene": "场景",
+        "custom": "自定义"
+      },
+      "platform": {
+        "taobao": "淘宝",
+        "pinduoduo": "拼多多",
+        "douyin": "抖音",
+        "amazon": "Amazon",
+        "temu": "Temu",
+        "shein": "Shein"
+      },
+      "modules": {
+        "full": "完整版",
+        "compact": "紧凑版",
+        "hero_usp": "主图+卖点",
+        "custom": "自定义"
+      },
+      "copy_type": {
+        "sales_vo": "带货口播",
+        "product_title": "商品标题",
+        "detail_copy": "详情文案",
+        "campaign_copy": "大促文案",
+        "social_seeding": "社媒种草"
+      },
+      "language": {
+        "chinese": "中文",
+        "english": "English",
+        "japanese": "日本語",
+        "korean": "한국어",
+        "spanish": "Español"
+      },
+      "tone": {
+        "professional": "专业",
+        "friendly": "亲切",
+        "lively": "活泼",
+        "premium": "高级感",
+        "urgent": "紧迫"
+      },
+      "voice": {
+        "sweet_female": "甜美女声",
+        "deep_male": "深沉男声",
+        "energetic_female": "活力女声",
+        "magnetic_male": "磁性男声",
+        "neutral": "中性"
+      },
+      "tool": {
+        "digital_human": "数字人",
+        "face_swap": "换脸",
+        "translate": "翻译",
+        "compliance": "合规检查",
+        "viral_clone": "爆款复刻"
+      },
+      "format": {
+        "all": "全部",
+        "image": "图片",
+        "video": "视频",
+        "copy": "文案",
+        "audio": "音频",
+        "jpg": "JPG",
+        "png": "PNG",
+        "mp4": "MP4",
+        "gif": "GIF"
+      },
+      "sort": {
+        "recommended": "推荐",
+        "newest": "最新",
+        "hottest": "最热",
+        "free_first": "免费优先"
+      }
+    },
+    "slide_panel": {
+      "close_aria": "关闭面板",
+      "generate_btn": "⚡ 开始生成",
+      "upload_text": "拖拽或点击上传素材",
+      "upload_hint": "支持 JPG / PNG / MP4，单文件 ≤ 50MB",
+      "param_label": "参数设置",
+      "generating": "生成中...",
+      "step_upload": "上传素材",
+      "step_analyze": "AI 分析",
+      "step_generate": "生成内容",
+      "step_done": "完成",
+      "result_name": "生成结果",
+      "download": "⬇ 下载",
+      "reuse": "🔄 复用",
+      "close_result": "关闭",
+      "progress_pct": "生成中... {pct}%",
+      "prompt_label": "创作需求",
+      "generate_error": "生成失败，请重试",
+      "retry": "重试"
+    },
+    "creation_sub_cards": {
+      "video": [
+        {
+          "icon": "🎥",
+          "title": "AI 短视频生成",
+          "desc": "商品图一键生成带货短视频，自动配乐+字幕",
+          "route": "/work/video"
+        },
+        {
+          "icon": "🕺",
+          "title": "动作迁移",
+          "desc": "人物图+参考动作视频，AI精准迁移动作姿态",
+          "route": "/work/action-transfer"
+        },
+        {
+          "icon": "🎬",
+          "title": "智能分镜",
+          "desc": "文案脚本AI自动拆解为分镜画面+配音+字幕",
+          "route": "/work/storyboard"
+        },
+        {
+          "icon": "✂️",
+          "title": "视频编辑",
+          "desc": "智能裁剪/变速/转场/调色，多尺寸多时长输出",
+          "route": "/work/video-edit"
+        },
+        {
+          "icon": "📡",
+          "title": "直播切片",
+          "desc": "直播回放自动剪辑高光片段，批量生成短视频",
+          "route": "/work/live-clip"
+        },
+        {
+          "icon": "📋",
+          "title": "批量生成",
+          "desc": "文件夹拖入→后台排队→完成通知→批量下载",
+          "route": "/work/batch"
+        }
+      ],
+      "image": [
+        {
+          "icon": "🖼️",
+          "title": "AI 商品图",
+          "desc": "各平台商品主图一键生成，自动抠图+精修+白底",
+          "route": "/work/image"
+        },
+        {
+          "icon": "🏞️",
+          "title": "场景生成",
+          "desc": "产品图+AI场景库→自动光影融合→出5张场景图",
+          "route": "/work/scene"
+        },
+        {
+          "icon": "✂️",
+          "title": "智能抠图",
+          "desc": "AI发丝级抠图，毛发/透明体/复杂边缘精准分离",
+          "route": "/work/remove-bg"
+        },
+        {
+          "icon": "⬜",
+          "title": "白底图生成",
+          "desc": "抠图后智能生成纯白/场景底图，平台直出",
+          "route": "/work/white-bg"
+        },
+        {
+          "icon": "✨",
+          "title": "图片精修",
+          "desc": "AI自动祛皱/去污/补光/锐化，批量提升质感",
+          "route": "/work/retouch"
+        },
+        {
+          "icon": "🎨",
+          "title": "风格转化",
+          "desc": "6大风格一键转换：复古/国潮/插画/水彩/赛博/极简",
+          "route": "/work/style-transfer"
+        },
+        {
+          "icon": "🔄",
+          "title": "一键换色",
+          "desc": "服装鞋包颜色变换，保留褶皱纹理质感，支持批量",
+          "route": "/work/color-swap"
+        },
+        {
+          "icon": "↔️",
+          "title": "智能扩图",
+          "desc": "AI扩展图片边缘自动补全构图，适配各平台比例",
+          "route": "/work/outpaint"
+        },
+        {
+          "icon": "📦",
+          "title": "批量渲染",
+          "desc": "50张图统一抠图+白底+尺寸，支持夜间托管折扣",
+          "route": "/work/batch"
+        }
+      ],
+      "detail": [
+        {
+          "icon": "📄",
+          "title": "详情页设计",
+          "desc": "商品详情页智能排版设计，AI自动生成文案+图文",
+          "route": "/work/detail-h5"
+        },
+        {
+          "icon": "📱",
+          "title": "多平台适配",
+          "desc": "13大电商平台详情页模板库，选平台→选模板→生成",
+          "route": "/work/platform-detail"
+        },
+        {
+          "icon": "🏷️",
+          "title": "卖点生成",
+          "desc": "AI自动提炼商品卖点，生成高转化详情文案",
+          "route": "/work/selling-points"
+        },
+        {
+          "icon": "🎯",
+          "title": "模板套用",
+          "desc": "精品详情页模板一键套用，上传素材即可出页",
+          "route": "/work/template-apply"
+        },
+        {
+          "icon": "👗",
+          "title": "虚拟试穿",
+          "desc": "服装平铺图→真人模特上身效果，多肤色体型可选",
+          "route": "/work/virtual-tryon"
+        },
+        {
+          "icon": "👤",
+          "title": "幽灵模特",
+          "desc": "服装平铺/挂拍→AI穿到隐形模特，3D立体展示",
+          "route": "/work/ghost-mannequin"
+        },
+        {
+          "icon": "🛒",
+          "title": "产品渲染",
+          "desc": "3D展示商品旋转/细节，支持360度产品展示",
+          "route": "/work/product-render"
+        },
+        {
+          "icon": "📁",
+          "title": "导出设置",
+          "desc": "统一导出格式/尺寸/命名规则，一键打包下载",
+          "route": "/work/output"
+        }
+      ],
+      "copywrite": [
+        {
+          "icon": "🎙️",
+          "title": "带货口播",
+          "desc": "产品卖点→AI生成短视频口播脚本，支持3种脚本类型",
+          "route": "/work/script-gen"
+        },
+        {
+          "icon": "📝",
+          "title": "商品文案",
+          "desc": "SEO优化标题+详情长文案智能撰写，高转化率导向",
+          "route": "/work/detail-copy"
+        },
+        {
+          "icon": "🌐",
+          "title": "多语种翻译",
+          "desc": "商品图文字智能识别→翻译为9语种→原位替换",
+          "route": "/work/image-translate"
+        },
+        {
+          "icon": "🔊",
+          "title": "AI 语音生成",
+          "desc": "输入文案→选主播音色→生成自然流畅带货配音",
+          "route": "/work/voice-gen"
+        },
+        {
+          "icon": "📢",
+          "title": "营销文案",
+          "desc": "大促/活动/促销文案生成，多平台适配",
+          "route": "/work/campaign-copy"
+        },
+        {
+          "icon": "📱",
+          "title": "社媒文案",
+          "desc": "小红书/抖音/TikTok种草文案一键生成",
+          "route": "/work/social-copy"
+        },
+        {
+          "icon": "📧",
+          "title": "邮件文案",
+          "desc": "EDM营销邮件/短信文案，多语种支持",
+          "route": "/work/email-copy"
+        },
+        {
+          "icon": "🎤",
+          "title": "音色定制",
+          "desc": "50+主播音色可选，支持9语种TTS语音合成",
+          "route": "/work/voice-custom"
+        }
+      ],
+      "other": [
+        {
+          "icon": "🤖",
+          "title": "口播数字人",
+          "desc": "输入文案→选数字人形象+语音→AI生成带货视频",
+          "route": "/work/digital-human"
+        },
+        {
+          "icon": "📡",
+          "title": "数字人直播",
+          "desc": "虚拟直播间自动讲解商品，24小时不间断带货",
+          "route": "/work/digital-live"
+        },
+        {
+          "icon": "🔄",
+          "title": "AI 换脸",
+          "desc": "AI人脸替换/数字人换脸，多肤色多风格",
+          "route": "/work/face-swap"
+        },
+        {
+          "icon": "🌐",
+          "title": "图片翻译",
+          "desc": "OCR识别商品图文字→9语种原位替换翻译",
+          "route": "/work/image-translate"
+        },
+        {
+          "icon": "🛡️",
+          "title": "跨境合规检查",
+          "desc": "检测亚马逊/Temu/TikTok/Shein合规风险，覆盖欧美日",
+          "route": "/work/compliance-check"
+        },
+        {
+          "icon": "🔥",
+          "title": "爆款复刻",
+          "desc": "对标爆款视频→AI分析节奏/色调→你的产品重新生成",
+          "route": "/work/viral-clone"
+        },
+        {
+          "icon": "🧬",
+          "title": "形象定制",
+          "desc": "自定义数字人外观/声音/动作，打造专属IP形象",
+          "route": "/work/avatar-custom"
+        },
+        {
+          "icon": "📐",
+          "title": "分镜计划",
+          "desc": "视频分镜/镜头顺序/时长规划，可视化预览",
+          "route": "/work/shot-plan"
+        }
+      ]
+    },
+    "nav_main_label": "工作台导航",
+    "nav_home": "首页",
+    "nav_creation": "创作中心",
+    "nav_agent": "智能体",
+    "nav_assistant": "AI 助手",
+    "nav_workflow": "工作流",
+    "nav_lobster": "龙虾",
+    "nav_history": "历史记录",
+    "default_page_title": "工作台",
+    "fold_expand": "展开侧边栏",
+    "fold_collapse": "收起侧边栏",
+    "menu_open_label": "打开导航菜单",
+    "menu_close_label": "关闭导航菜单",
+    "coming_soon_tag": "即将上线",
+    "points_label": "积分",
+    "creation_tabs": {
+      "video": "视频生成",
+      "image": "图片生成",
+      "detail": "电商详情页生成",
+      "copywrite": "语音文案生成",
+      "other": "其他创作类"
+    },
+    "recent_samples": [
+      {
+        "icon": "🖼",
+        "name": "夏季连衣裙白底图",
+        "time": "2小时前"
+      },
+      {
+        "icon": "🎥",
+        "name": "护肤品展示视频",
+        "time": "昨天"
+      },
+      {
+        "icon": "📄",
+        "name": "面膜详情页设计",
+        "time": "昨天"
+      },
+      {
+        "icon": "📰",
+        "name": "618活动海报",
+        "time": "2天前"
+      }
+    ],
+    "default_cards": [
+      {
+        "id": "img_main",
+        "category": "image",
+        "icon": "🖼",
+        "title": "AI 商品图",
+        "desc": "各平台商品主图一键生成",
+        "route": "/work/image",
+        "order": 1,
+        "visible": true
+      },
+      {
+        "id": "video_gen",
+        "category": "video",
+        "icon": "🎥",
+        "title": "AI 短视频",
+        "desc": "商品图一键生成带货短视频",
+        "route": "/work/video",
+        "order": 1,
+        "visible": true
+      },
+      {
+        "id": "detail_page",
+        "category": "detail",
+        "icon": "📄",
+        "title": "详情页设计",
+        "desc": "商品详情页智能排版设计",
+        "route": "/work/detail-page",
+        "order": 1,
+        "visible": true
+      },
+      {
+        "id": "copy_title",
+        "category": "copywrite",
+        "icon": "✍️",
+        "title": "标题/卖点生成",
+        "desc": "AI生成高转化商品标题",
+        "route": "/work/copywriting",
+        "order": 1,
+        "visible": true
+      },
+      {
+        "id": "digital_human",
+        "category": "digital",
+        "icon": "🤖",
+        "title": "数字人带货",
+        "desc": "数字人24小时自动带货视频",
+        "route": "/work/digital-human",
+        "order": 1,
+        "visible": true
+      }
+    ],
+    "default_tool_cards": {
+      "video": [
+        {
+          "id": "video_gen",
+          "category": "video",
+          "icon": "🎥",
+          "title": "AI 短视频",
+          "desc": "商品图一键生成带货短视频",
+          "route": "/work/video",
+          "order": 1,
+          "visible": true
+        },
+        {
+          "id": "video_edit",
+          "category": "video",
+          "icon": "✂",
+          "title": "视频编辑",
+          "desc": "在线剪辑/加字幕/配乐/调色",
+          "route": "/work/video-edit",
+          "order": 2,
+          "visible": true
+        },
+        {
+          "id": "video_trans",
+          "category": "video",
+          "icon": "🌐",
+          "title": "视频翻译",
+          "desc": "语音/字幕/面容三合一翻译",
+          "route": "/work/video-translate",
+          "order": 3,
+          "visible": true
+        },
+        {
+          "id": "script_gen",
+          "category": "video",
+          "icon": "📝",
+          "title": "短视频脚本",
+          "desc": "带货视频口播脚本自动生成",
+          "route": "/work/script-gen",
+          "order": 4,
+          "visible": true
+        },
+        {
+          "id": "shot_plan",
+          "category": "video",
+          "icon": "📐",
+          "title": "分镜计划",
+          "desc": "视频分镜/镜头顺序/时长规划",
+          "route": "/work/shot-plan",
+          "order": 5,
+          "visible": true
+        },
+        {
+          "id": "storyboard",
+          "category": "video",
+          "icon": "🎞",
+          "title": "故事板",
+          "desc": "视频创意可视化故事板预览",
+          "route": "/work/storyboard",
+          "order": 6,
+          "visible": true
+        }
+      ],
+      "image": [
+        {
+          "id": "img_main",
+          "category": "image",
+          "icon": "🖼",
+          "title": "AI 商品图",
+          "desc": "各平台商品主图一键生成",
+          "route": "/work/image",
+          "order": 1,
+          "visible": true
+        },
+        {
+          "id": "img_scene",
+          "category": "image",
+          "icon": "🏞",
+          "title": "场景图生成",
+          "desc": "商品融入生活场景展示",
+          "route": "/work/main-image",
+          "order": 2,
+          "visible": true
+        },
+        {
+          "id": "img_poster",
+          "category": "image",
+          "icon": "📰",
+          "title": "海报生成",
+          "desc": "营销海报/活动海报/首发海报",
+          "route": "/work/poster",
+          "order": 3,
+          "visible": true
+        },
+        {
+          "id": "img_white_bg",
+          "category": "image",
+          "icon": "⬜",
+          "title": "白底图生成",
+          "desc": "符合各平台规范的白底图",
+          "route": "/work/white-bg",
+          "order": 4,
+          "visible": true
+        },
+        {
+          "id": "img_bg_remove",
+          "category": "image",
+          "icon": "✂",
+          "title": "智能去背景",
+          "desc": "AI 3秒精准识别主体去背景",
+          "route": "/work/remove-bg",
+          "order": 5,
+          "visible": true
+        },
+        {
+          "id": "img_retouch",
+          "category": "image",
+          "icon": "✨",
+          "title": "AI 精修",
+          "desc": "调色/锐化/光影质感优化",
+          "route": "/work/retouch",
+          "order": 6,
+          "visible": true
+        },
+        {
+          "id": "img_recolor",
+          "category": "image",
+          "icon": "🎯",
+          "title": "商品换色",
+          "desc": "同一款式展示多种颜色",
+          "route": "/work/color-swap",
+          "order": 7,
+          "visible": true
+        },
+        {
+          "id": "img_style",
+          "category": "image",
+          "icon": "🖌",
+          "title": "风格迁移",
+          "desc": "实拍图变油画/水彩/3D风格",
+          "route": "/work/style-transfer",
+          "order": 8,
+          "visible": true
+        },
+        {
+          "id": "img_text_fx",
+          "category": "image",
+          "icon": "🔤",
+          "title": "文字特效",
+          "desc": "立体/金属/霓虹等标题特效",
+          "route": "/work/text-effect",
+          "order": 9,
+          "visible": true
+        },
+        {
+          "id": "img_expand",
+          "category": "image",
+          "icon": "↔",
+          "title": "智能外扩",
+          "desc": "画面边缘智能扩展补全",
+          "route": "/work/outpaint",
+          "order": 10,
+          "visible": true
+        },
+        {
+          "id": "batch_process",
+          "category": "image",
+          "icon": "📦",
+          "title": "批量处理",
+          "desc": "50张图统一抠图+白底+尺寸",
+          "route": "/work/batch",
+          "order": 11,
+          "visible": true
+        }
+      ],
+      "detail": [
+        {
+          "id": "detail_page",
+          "category": "detail",
+          "icon": "📄",
+          "title": "详情页设计",
+          "desc": "商品详情页智能排版设计",
+          "route": "/work/detail-page",
+          "order": 1,
+          "visible": true
+        },
+        {
+          "id": "product_render",
+          "category": "detail",
+          "icon": "🛒",
+          "title": "产品渲染",
+          "desc": "3D展示商品旋转/细节",
+          "route": "/work/product-render",
+          "order": 2,
+          "visible": true
+        },
+        {
+          "id": "virtual_tryon",
+          "category": "detail",
+          "icon": "👗",
+          "title": "虚拟试穿",
+          "desc": "买家在线看衣服上身效果",
+          "route": "/work/virtual-tryon",
+          "order": 3,
+          "visible": true
+        },
+        {
+          "id": "model_generate",
+          "category": "detail",
+          "icon": "🧍",
+          "title": "AI 模特",
+          "desc": "AI 生成虚拟模特穿衣展示",
+          "route": "/work/model-generate",
+          "order": 4,
+          "visible": true
+        },
+        {
+          "id": "img_ghost",
+          "category": "detail",
+          "icon": "👤",
+          "title": "幽灵模特",
+          "desc": "隐形模特展示上身效果",
+          "route": "/work/ghost-mannequin",
+          "order": 5,
+          "visible": true
+        },
+        {
+          "id": "platform_taobao",
+          "category": "detail",
+          "icon": "📱",
+          "title": "多平台适配",
+          "desc": "天猫/京东/拼多多等尺寸适配",
+          "route": "/work/multi-platform",
+          "order": 6,
+          "visible": true
+        },
+        {
+          "id": "main_img_set",
+          "category": "detail",
+          "icon": "🖼",
+          "title": "主图套装",
+          "desc": "主图+辅图+白底图一键套装",
+          "route": "/work/main-image-set",
+          "order": 7,
+          "visible": true
+        },
+        {
+          "id": "output",
+          "category": "detail",
+          "icon": "📁",
+          "title": "导出设置",
+          "desc": "统一导出格式/尺寸/命名规则",
+          "route": "/work/output",
+          "order": 8,
+          "visible": true
+        }
+      ],
+      "copywrite": [
+        {
+          "id": "copy_title",
+          "category": "copywrite",
+          "icon": "📋",
+          "title": "电商标题",
+          "desc": "SEO优化标题/卖点标题批量生成",
+          "route": "/work/title-gen",
+          "order": 1,
+          "visible": true
+        },
+        {
+          "id": "copy_detail",
+          "category": "copywrite",
+          "icon": "📝",
+          "title": "详情文案",
+          "desc": "商品详情页长文案智能撰写",
+          "route": "/work/detail-copy",
+          "order": 2,
+          "visible": true
+        },
+        {
+          "id": "script_gen2",
+          "category": "copywrite",
+          "icon": "🎙",
+          "title": "口播脚本",
+          "desc": "带货短视频口播脚本自动生成",
+          "route": "/work/script-gen",
+          "order": 3,
+          "visible": true
+        },
+        {
+          "id": "campaign_copy",
+          "category": "copywrite",
+          "icon": "📢",
+          "title": "营销文案",
+          "desc": "大促/活动/促销文案生成",
+          "route": "/work/campaign-copy",
+          "order": 4,
+          "visible": true
+        },
+        {
+          "id": "email_copy",
+          "category": "copywrite",
+          "icon": "📧",
+          "title": "邮件文案",
+          "desc": "EDM营销邮件/短信文案",
+          "route": "/work/email-copy",
+          "order": 5,
+          "visible": true
+        },
+        {
+          "id": "social_copy",
+          "category": "copywrite",
+          "icon": "📱",
+          "title": "社媒文案",
+          "desc": "小红书/抖音/TikTok文案",
+          "route": "/work/social-copy",
+          "order": 6,
+          "visible": true
+        }
+      ],
+      "digital": [
+        {
+          "id": "digital_human",
+          "category": "digital",
+          "icon": "🤖",
+          "title": "数字人带货",
+          "desc": "数字人24小时自动带货视频",
+          "route": "/work/digital-human",
+          "order": 1,
+          "visible": true
+        },
+        {
+          "id": "digital_live",
+          "category": "digital",
+          "icon": "📡",
+          "title": "数字人直播",
+          "desc": "虚拟直播间自动讲解商品",
+          "route": "/work/digital-live",
+          "order": 2,
+          "visible": true
+        },
+        {
+          "id": "avatar_custom",
+          "category": "digital",
+          "icon": "🧬",
+          "title": "形象定制",
+          "desc": "自定义数字人外观/声音/动作",
+          "route": "/work/avatar-custom",
+          "order": 3,
+          "visible": true
+        },
+        {
+          "id": "ai_host",
+          "category": "digital",
+          "icon": "🎤",
+          "title": "AI 主播",
+          "desc": "智能语音播报商品卖点",
+          "route": "/work/ai-host",
+          "order": 4,
+          "visible": true
+        },
+        {
+          "id": "virtual_model",
+          "category": "digital",
+          "icon": "👤",
+          "title": "虚拟模特",
+          "desc": "AI生成虚拟模特穿衣展示",
+          "route": "/work/virtual-model",
+          "order": 5,
+          "visible": true
+        },
+        {
+          "id": "face_swap",
+          "category": "digital",
+          "icon": "🔄",
+          "title": "换脸",
+          "desc": "AI 人脸替换/数字人换脸",
+          "route": "/work/face-swap",
+          "order": 6,
+          "visible": true
+        }
+      ]
+    },
+    "panel_param_type": "类型",
+    "panel_param_quality": "质量",
+    "panel_param_format": "格式",
+    "panel_opt_auto": "自动",
+    "panel_opt_standard": "标准",
+    "panel_opt_premium": "高级",
+    "panel_opt_sd": "标清",
+    "panel_opt_hd": "高清",
+    "panel_opt_uhd": "超清",
+    "panel_generate_title": "{tab} — 生成结果"
+  },
+  "ai_assistant": {
+    "review": {
+      "title": "AI 内容审核",
+      "subtitle": "输入文本，自动检测违规内容、联系方式、代码注入等风险",
+      "placeholder": "请输入待审核的文本内容...",
+      "start_review": "开始审核",
+      "clear": "清空",
+      "result_title": "审核结果",
+      "pass": "✓ 通过",
+      "fail": "✕ 不通过",
+      "score_label": "安全评分 / 100",
+      "no_issues": "未检测到风险内容。",
+      "service_error": "服务异常"
+    },
+    "data": {
+      "title": "AI 数据分析助手",
+      "subtitle": "用自然语言查询运营数据，AI 自动分析回答",
+      "placeholder": "输入问题，例如：本周注册用户有多少",
+      "analyze": "分析",
+      "service_unavailable": "分析服务暂不可用，请稍后再试。",
+      "hints": [
+        "本周注册用户有多少",
+        "本月收入情况",
+        "图片生成统计"
+      ]
+    }
+  },
+  "assets": {
+    "title": "素材库",
+    "subtitle": "管理所有AI生成的作品",
+    "loading": "加载中...",
+    "empty_title": "素材库为空",
+    "empty_hint": "AI生成的作品将自动保存到此处",
+    "load_more": "加载更多",
+    "load_error": "加载资源列表失败",
+    "close_preview": "关闭",
+    "preview_alt": "资源预览",
+    "download": "下载",
+    "copy_link": "复制链接",
+    "filter_all": "全部",
+    "filter_image": "图片",
+    "filter_video": "视频",
+    "type_image_gen": "AI生图",
+    "type_image_replicate": "主图复刻",
+    "type_batch_image": "批量生图",
+    "type_batch_edit": "批量编辑",
+    "type_video_gen": "AI视频",
+    "type_action_migrate": "动作迁移",
+    "type_digital_human": "数字人",
+    "type_viral_replicate": "爆款复刻",
+    "type_live_clip": "智能精剪"
+  },
+  "admin_shell": {
+    "expand_sidebar": "展开侧栏",
+    "collapse_sidebar": "折叠侧栏",
+    "switch_light": "切亮色",
+    "switch_dark": "切暗色",
+    "notification": "通知",
+    "logout": "退出登录",
+    "back": "返回"
+  },
   "error": {
     "404_title": "页面不存在",
     "404_desc": "您访问的页面已删除、更名或暂时不可用。请检查地址是否拼写正确。",
@@ -1253,5 +2489,22 @@
     "back_prev": "返回上一页",
     "refresh_page": "刷新页面",
     "home_btn": "返回首页"
+  },
+  "help": {
+    "title": "帮助中心",
+    "subtitle": "解答你关于 Movio AI 的常见问题",
+    "search_placeholder": "搜索问题... 输入关键词快速定位",
+    "retry": "重新加载",
+    "no_results": "没有找到相关问题",
+    "no_results_hint": "换个关键词试试，或联系我们获取帮助",
+    "helpful": "有帮助吗？",
+    "no_answer": "没找到答案？",
+    "work_hours": "工作日 9:00-18:00",
+    "cat_all": "全部",
+    "cat_usage": "使用指南",
+    "cat_account": "账户与会员",
+    "cat_platform": "平台相关",
+    "load_failed": "加载失败",
+    "load_error": "加载FAQ失败，请稍后重试"
   }
 }

@@ -84,69 +84,574 @@
     "mockup_upload": "Upload Image",
     "mockup_generate": "Generated",
     "memfocus_cards": [
-      {"badge":"Memory","title":"Photographic Memory","sub":"Precise customer review","api":"4-Layer Memory API","story":"Ms. Wang bought collagen jelly last time — ask if she wants to reorder","metricLabel":"Customer Retention","metricValue":"+37%"},
-      {"badge":"Priority","title":"Smart Sorting","sub":"Refunds first, new products later","api":"Attention Engine API","story":"Refund complaints handled immediately, new product inquiries queued","metricLabel":"Urgent Response","metricValue":"<30s"},
-      {"badge":"Context","title":"Quick on the Uptake","sub":"Context-aware, anaphora resolution","api":"Context Manager API","story":"Customer says 'the red one' — knows it means the red dress from last chat","metricLabel":"Context Window","metricValue":"8K tokens"},
-      {"badge":"i18n","title":"7-Language Assets","sub":"More local than local teams","api":"Cross-Border API","story":"One Chinese product → 7 language assets — more local than local teams","metricLabel":"Languages","metricValue":"7"},
-      {"badge":"Copy","title":"Conversion-Driven","sub":"Titles/selling points/details/scripts","api":"Content Gen API","story":"Titles, selling points, detail pages, livestream scripts — better than human copywriters","metricLabel":"Content Types","metricValue":"6"},
-      {"badge":"Compliance","title":"5-Layer Filter","sub":"Zero violation penalties","api":"Safety & Compliance API","story":"5-layer sensitive word filtering, zero violations — more rigorous than compliance managers","metricLabel":"Filter Layers","metricValue":"5"},
-      {"badge":"Vision","title":"100 SKU Parallel","sub":"All videos done in 2 hours","api":"Batch Video API","story":"15s/30s TikTok product videos — 100 SKU parallel, done in 2 hours","metricLabel":"Parallel Throughput","metricValue":"100 SKU"},
-      {"badge":"Nonstop","title":"24×7 Peak","sub":"No leave, no drama, no quitting","api":"24×7 API Uptime","story":"No sick days, no drama, no quitting — peak performance every call","metricLabel":"Uptime Target","metricValue":"99.9%"}
+      {
+        "badge": "Memory",
+        "title": "Photographic Memory",
+        "sub": "Precise customer review",
+        "api": "4-Layer Memory API",
+        "story": "Ms. Wang bought collagen jelly last time — ask if she wants to reorder",
+        "metricLabel": "Customer Retention",
+        "metricValue": "+37%"
+      },
+      {
+        "badge": "Priority",
+        "title": "Smart Sorting",
+        "sub": "Refunds first, new products later",
+        "api": "Attention Engine API",
+        "story": "Refund complaints handled immediately, new product inquiries queued",
+        "metricLabel": "Urgent Response",
+        "metricValue": "<30s"
+      },
+      {
+        "badge": "Context",
+        "title": "Quick on the Uptake",
+        "sub": "Context-aware, anaphora resolution",
+        "api": "Context Manager API",
+        "story": "Customer says 'the red one' — knows it means the red dress from last chat",
+        "metricLabel": "Context Window",
+        "metricValue": "8K tokens"
+      },
+      {
+        "badge": "i18n",
+        "title": "7-Language Assets",
+        "sub": "More local than local teams",
+        "api": "Cross-Border API",
+        "story": "One Chinese product → 7 language assets — more local than local teams",
+        "metricLabel": "Languages",
+        "metricValue": "7"
+      },
+      {
+        "badge": "Copy",
+        "title": "Conversion-Driven",
+        "sub": "Titles/selling points/details/scripts",
+        "api": "Content Gen API",
+        "story": "Titles, selling points, detail pages, livestream scripts — better than human copywriters",
+        "metricLabel": "Content Types",
+        "metricValue": "6"
+      },
+      {
+        "badge": "Compliance",
+        "title": "5-Layer Filter",
+        "sub": "Zero violation penalties",
+        "api": "Safety & Compliance API",
+        "story": "5-layer sensitive word filtering, zero violations — more rigorous than compliance managers",
+        "metricLabel": "Filter Layers",
+        "metricValue": "5"
+      },
+      {
+        "badge": "Vision",
+        "title": "100 SKU Parallel",
+        "sub": "All videos done in 2 hours",
+        "api": "Batch Video API",
+        "story": "15s/30s TikTok product videos — 100 SKU parallel, done in 2 hours",
+        "metricLabel": "Parallel Throughput",
+        "metricValue": "100 SKU"
+      },
+      {
+        "badge": "Nonstop",
+        "title": "24×7 Peak",
+        "sub": "No leave, no drama, no quitting",
+        "api": "24×7 API Uptime",
+        "story": "No sick days, no drama, no quitting — peak performance every call",
+        "metricLabel": "Uptime Target",
+        "metricValue": "99.9%"
+      }
     ],
     "steps": [
-      {"icon":"📤","title":"Upload Product Photos","desc":"Drag in product photos, supports JPG/PNG/WebP"},
-      {"icon":"🎯","title":"Choose Function","desc":"Main image, scene, video... one click to select"},
-      {"icon":"✨","title":"AI Auto-Generate","desc":"Images in 5s, batch processing, auto-adapt to platform sizes"}
+      {
+        "icon": "📤",
+        "title": "Upload Product Photos",
+        "desc": "Drag in product photos, supports JPG/PNG/WebP"
+      },
+      {
+        "icon": "🎯",
+        "title": "Choose Function",
+        "desc": "Main image, scene, video... one click to select"
+      },
+      {
+        "icon": "✨",
+        "title": "AI Auto-Generate",
+        "desc": "Images in 5s, batch processing, auto-adapt to platform sizes"
+      }
     ],
     "faqs": [
-      {"q":"Do I need to install anything?","a":"No. Pure web-based. Open in browser, supports Chrome / Safari / Edge."},
-      {"q":"Can I use the generated images commercially?","a":"Absolutely. All AI-generated images are yours to use commercially on any e-commerce platform."},
-      {"q":"Which e-commerce platforms are supported?","a":"We cover 13 major platforms including Amazon, Temu, Shein, Taobao, TikTok Shop, Shopee, Lazada and more. Custom sizes also supported."},
-      {"q":"Can I regenerate if not satisfied?","a":"Yes. You can regenerate for free until you're satisfied with the result."},
-      {"q":"How does batch processing work?","a":"Pro plan and above support batch processing. Drag in a folder and it queues automatically. Nighttime processing available (40% off)."}
+      {
+        "q": "Do I need to install anything?",
+        "a": "No. Pure web-based. Open in browser, supports Chrome / Safari / Edge."
+      },
+      {
+        "q": "Can I use the generated images commercially?",
+        "a": "Absolutely. All AI-generated images are yours to use commercially on any e-commerce platform."
+      },
+      {
+        "q": "Which e-commerce platforms are supported?",
+        "a": "We cover 13 major platforms including Amazon, Temu, Shein, Taobao, TikTok Shop, Shopee, Lazada and more. Custom sizes also supported."
+      },
+      {
+        "q": "Can I regenerate if not satisfied?",
+        "a": "Yes. You can regenerate for free until you're satisfied with the result."
+      },
+      {
+        "q": "How does batch processing work?",
+        "a": "Pro plan and above support batch processing. Drag in a folder and it queues automatically. Nighttime processing available (40% off)."
+      }
     ],
     "use_cases": [
-      {"avatar":"👤","title":"Individual Seller","desc":"One person, one team","points":["Phone photos → professional main images","Zero design skills → viral detail pages","Save 3 hours of editing daily"]},
-      {"avatar":"🏪","title":"SMB Merchant","desc":"Replace design team with AI","points":["Batch generate all product images","Unified brand visual style","Cut design costs by 80%"]},
-      {"avatar":"🏢","title":"Brand Enterprise","desc":"Scale visual content production","points":["API batch integration","Multi-store multi-platform management","Auto-apply brand guidelines"]}
+      {
+        "avatar": "👤",
+        "title": "Individual Seller",
+        "desc": "One person, one team",
+        "points": [
+          "Phone photos → professional main images",
+          "Zero design skills → viral detail pages",
+          "Save 3 hours of editing daily"
+        ]
+      },
+      {
+        "avatar": "🏪",
+        "title": "SMB Merchant",
+        "desc": "Replace design team with AI",
+        "points": [
+          "Batch generate all product images",
+          "Unified brand visual style",
+          "Cut design costs by 80%"
+        ]
+      },
+      {
+        "avatar": "🏢",
+        "title": "Brand Enterprise",
+        "desc": "Scale visual content production",
+        "points": [
+          "API batch integration",
+          "Multi-store multi-platform management",
+          "Auto-apply brand guidelines"
+        ]
+      }
     ],
     "plans_fallback": [
-      {"icon":"🌱","name":"Free","price":"0","features":["20 images/month","3 videos/month","Basic templates","720p output"],"featured":false},
-      {"icon":"⚡","name":"Pro","price":"99","features":["500 images/month","50 videos/month","All templates + styles","1080p output","Batch processing","API access"],"featured":true},
-      {"icon":"🏭","name":"Enterprise","price":"299","features":["Unlimited images","Unlimited videos","Custom style training","4K output","Private deployment","Dedicated support"],"featured":false}
+      {
+        "icon": "🌱",
+        "name": "Free",
+        "price": "0",
+        "features": [
+          "20 images/month",
+          "3 videos/month",
+          "Basic templates",
+          "720p output"
+        ],
+        "featured": false
+      },
+      {
+        "icon": "⚡",
+        "name": "Pro",
+        "price": "99",
+        "features": [
+          "500 images/month",
+          "50 videos/month",
+          "All templates + styles",
+          "1080p output",
+          "Batch processing",
+          "API access"
+        ],
+        "featured": true
+      },
+      {
+        "icon": "🏭",
+        "name": "Enterprise",
+        "price": "299",
+        "features": [
+          "Unlimited images",
+          "Unlimited videos",
+          "Custom style training",
+          "4K output",
+          "Private deployment",
+          "Dedicated support"
+        ],
+        "featured": false
+      }
     ],
     "plans": [
-      {"icon":"🌱","name":"Free","price":"0","features":["20 images/month","3 videos/month","Basic templates","720p output"],"featured":false},
-      {"icon":"⚡","name":"Pro","price":"99","features":["500 images/month","50 videos/month","All templates + styles","1080p output","Batch processing","API access"],"featured":true},
-      {"icon":"🏭","name":"Enterprise","price":"299","features":["Unlimited images","Unlimited videos","Custom style training","4K output","Private deployment","Dedicated support"],"featured":false}
+      {
+        "icon": "🌱",
+        "name": "Free",
+        "price": "0",
+        "features": [
+          "20 images/month",
+          "3 videos/month",
+          "Basic templates",
+          "720p output"
+        ],
+        "featured": false
+      },
+      {
+        "icon": "⚡",
+        "name": "Pro",
+        "price": "99",
+        "features": [
+          "500 images/month",
+          "50 videos/month",
+          "All templates + styles",
+          "1080p output",
+          "Batch processing",
+          "API access"
+        ],
+        "featured": true
+      },
+      {
+        "icon": "🏭",
+        "name": "Enterprise",
+        "price": "299",
+        "features": [
+          "Unlimited images",
+          "Unlimited videos",
+          "Custom style training",
+          "4K output",
+          "Private deployment",
+          "Dedicated support"
+        ],
+        "featured": false
+      }
     ],
     "currency_symbol": "$",
     "pricing_period": "/mo",
-    "platforms": ["Taobao","Pinduoduo","Douyin","Xiaohongshu","WeChat Video","Kuaishou","Amazon","Temu","Shein","TikTok Shop","Mercado Libre","Shopee","Lazada"],
+    "platforms": [
+      "Taobao",
+      "Pinduoduo",
+      "Douyin",
+      "Xiaohongshu",
+      "WeChat Video",
+      "Kuaishou",
+      "Amazon",
+      "Temu",
+      "Shein",
+      "TikTok Shop",
+      "Mercado Libre",
+      "Shopee",
+      "Lazada"
+    ],
     "feature_cards": [
-      {"id":"main","icon":"▣","title":"AI Main Image","desc":"AI auto cutout→white bg→retouch→crop→watermark, one-click 3 styles","tags":["Best-Seller","13 Platforms"],"color":"#EDE9FE","ai":true,"route":"/work/main-image","category":"image"},
-      {"id":"scene","icon":"◈","title":"AI Scene","desc":"Product photo+scene library→auto lighting blend→5 scene images, custom bg","tags":["Scene Blend","Light Match"],"color":"#DBEAFE","ai":true,"route":"/work/scene","category":"image"},
-      {"id":"detail","icon":"⊞","title":"AI Detail Page","desc":"Product photo→AI copy+layout→full detail page, multi-category support","tags":["AI Copy","Auto Layout"],"color":"#D1FAE5","ai":true,"route":"/work/detail-h5","category":"image"},
-      {"id":"video","icon":"▶","title":"AI Video","desc":"Images→AI sales video→auto subtitles+BGM→1080×1920 portrait output","tags":["AI Camera","Auto Subs"],"color":"#FEF3C7","ai":true,"route":"/work/video","category":"video"},
-      {"id":"batch","icon":"⊡","title":"Batch Processing","desc":"Drag folder→select op→queue→notify→ZIP download, night processing support","tags":["Batch Queue","Night Discount"],"color":"#F3E8FF","ai":false,"route":"/work/batch","category":"image"},
-      {"id":"tryon","icon":"◇","title":"Virtual Try-On","desc":"Flat clothing→real model effect, multi-skin tone/body/style options","tags":["AI Try-On","Multi-Skin"],"color":"#ECFEFF","ai":true,"route":"/work/virtual-tryon","category":"image"},
-      {"id":"action","icon":"◉","title":"Action Transfer","desc":"Person image+ref video→AI precise motion transfer, smooth showcase video","tags":["Motion Capture","Precise"],"color":"#FCE7F3","ai":true,"route":"/work/action-transfer","category":"video"},
-      {"id":"color","icon":"◐","title":"Color Swap","desc":"Clothing/shoes/bags color change, preserve wrinkles & texture, batch support","tags":["Multi-Color","Texture Keep"],"color":"#FFF7ED","ai":true,"route":"/work/color-swap","category":"image"},
-      {"id":"style","icon":"◧","title":"Style Transfer","desc":"6 styles: Vintage/China Chic/Illustration/Watercolor/Cyber/Minimal","tags":["6 Styles","Creative"],"color":"#F0FDF4","ai":true,"route":"/work/style-transfer","category":"image"},
-      {"id":"digital","icon":"◓","title":"Digital Human VO","desc":"Input script→select avatar+voice→AI generate sales voiceover video","tags":["Digital Human","TTS Voice"],"color":"#FFFBEB","ai":true,"route":"/work/digital-human","category":"video"},
-      {"id":"script","icon":"▤","title":"Sales Script","desc":"Product USP→AI short video/livestream/social scripts, 9 languages+3 types","tags":["9 Languages","VO+Script"],"color":"#FDF2F8","ai":true,"route":"/work/script-gen","category":"ai"},
-      {"id":"viral","icon":"◆","title":"Viral Clone","desc":"Reference viral video→AI analyze rhythm/color/transition→regenerate your product","tags":["Viral Analysis","Style Clone"],"color":"#FEF2F2","ai":true,"route":"/work/viral-clone","category":"video"},
-      {"id":"remove-bg","icon":"◯","title":"Smart Cutout","desc":"AI hair-level cutout, fur/transparent/complex edges, single+batch support","tags":["Hair-Level","Batch"],"color":"#E8F5E9","ai":true,"route":"/work/remove-bg","category":"image"},
-      {"id":"white-bg","icon":"▭","title":"White BG Generate","desc":"Post-cutout smart white/scene bg, auto light correction+shadow, platform-ready","tags":["White/Transparent","Light Fix"],"color":"#F5F5F5","ai":true,"route":"/work/white-bg","category":"image"},
-      {"id":"retouch","icon":"✦","title":"Image Retouch","desc":"AI auto de-wrinkle/de-spot/fill light/sharpen, preserve texture, batch enhance","tags":["De-Wrinkle","Texture Keep"],"color":"#FFF8E1","ai":true,"route":"/work/retouch","category":"image"},
-      {"id":"platform-detail","icon":"▥","title":"Platform Templates","desc":"13 platform detail page templates, pick platform→template→upload→auto adapt","tags":["13 Platforms","Auto Adapt"],"color":"#EFF6FF","ai":true,"route":"/work/platform-detail","category":"image"},
-      {"id":"compliance","icon":"◬","title":"Compliance Check","desc":"Upload image+copy→auto check Amazon/Temu/TikTok/Shein compliance, US/EU/JP","tags":["Compliance","Multi-Market"],"color":"#FFF1F2","ai":true,"route":"/work/compliance-check","category":"ai"},
-      {"id":"ghost-mannequin","icon":"▯","title":"Ghost Mannequin","desc":"Flat/hanging clothing→AI auto dress invisible mannequin, 3D effect showcase","tags":["3D Effect","Invisible Model"],"color":"#F0F9FF","ai":true,"route":"/work/ghost-mannequin","category":"image"},
-      {"id":"outpaint","icon":"▩","title":"Smart Outpainting","desc":"AI expand image edges, auto complete composition, adapt platform ratios","tags":["Composition Fill","Ratio Adapt"],"color":"#F5F3FF","ai":true,"route":"/work/outpainting","category":"image"},
-      {"id":"image-translate","icon":"🌐","title":"Image Translate","desc":"Product image text OCR→translate 9 languages→in-place replace, cross-border must","tags":["OCR","9 Languages"],"color":"#ECFDF5","ai":true,"route":"/work/image-translate","category":"image"},
-      {"id":"video-edit","icon":"▸","title":"Video Editor","desc":"AI smart crop/speed/transition/color, auto multi-size multi-duration output","tags":["Smart Edit","Multi-Size"],"color":"#FFF7ED","ai":true,"route":"/work/video-edit","category":"video"},
-      {"id":"voice-gen","icon":"♫","title":"AI Voiceover","desc":"Input script→pick voice→natural sales voiceover, 9 languages 50+ voices","tags":["TTS","50+ Voices"],"color":"#FDF2F8","ai":true,"route":"/work/voice-gen","category":"ai"},
-      {"id":"storyboard","icon":"⊟","title":"Smart Storyboard","desc":"Script→AI auto split shots+voiceover+subtitles, one-click full short video","tags":["Script Split","Auto Storyboard"],"color":"#FFF1F2","ai":true,"route":"/work/storyboard","category":"video"}
+      {
+        "id": "main",
+        "icon": "▣",
+        "title": "AI Main Image",
+        "desc": "AI auto cutout→white bg→retouch→crop→watermark, one-click 3 styles",
+        "tags": [
+          "Best-Seller",
+          "13 Platforms"
+        ],
+        "color": "#EDE9FE",
+        "ai": true,
+        "route": "/work/main-image",
+        "category": "image"
+      },
+      {
+        "id": "scene",
+        "icon": "◈",
+        "title": "AI Scene",
+        "desc": "Product photo+scene library→auto lighting blend→5 scene images, custom bg",
+        "tags": [
+          "Scene Blend",
+          "Light Match"
+        ],
+        "color": "#DBEAFE",
+        "ai": true,
+        "route": "/work/scene",
+        "category": "image"
+      },
+      {
+        "id": "detail",
+        "icon": "⊞",
+        "title": "AI Detail Page",
+        "desc": "Product photo→AI copy+layout→full detail page, multi-category support",
+        "tags": [
+          "AI Copy",
+          "Auto Layout"
+        ],
+        "color": "#D1FAE5",
+        "ai": true,
+        "route": "/work/detail-h5",
+        "category": "image"
+      },
+      {
+        "id": "video",
+        "icon": "▶",
+        "title": "AI Video",
+        "desc": "Images→AI sales video→auto subtitles+BGM→1080×1920 portrait output",
+        "tags": [
+          "AI Camera",
+          "Auto Subs"
+        ],
+        "color": "#FEF3C7",
+        "ai": true,
+        "route": "/work/video",
+        "category": "video"
+      },
+      {
+        "id": "batch",
+        "icon": "⊡",
+        "title": "Batch Processing",
+        "desc": "Drag folder→select op→queue→notify→ZIP download, night processing support",
+        "tags": [
+          "Batch Queue",
+          "Night Discount"
+        ],
+        "color": "#F3E8FF",
+        "ai": false,
+        "route": "/work/batch",
+        "category": "image"
+      },
+      {
+        "id": "tryon",
+        "icon": "◇",
+        "title": "Virtual Try-On",
+        "desc": "Flat clothing→real model effect, multi-skin tone/body/style options",
+        "tags": [
+          "AI Try-On",
+          "Multi-Skin"
+        ],
+        "color": "#ECFEFF",
+        "ai": true,
+        "route": "/work/virtual-tryon",
+        "category": "image"
+      },
+      {
+        "id": "action",
+        "icon": "◉",
+        "title": "Action Transfer",
+        "desc": "Person image+ref video→AI precise motion transfer, smooth showcase video",
+        "tags": [
+          "Motion Capture",
+          "Precise"
+        ],
+        "color": "#FCE7F3",
+        "ai": true,
+        "route": "/work/action-transfer",
+        "category": "video"
+      },
+      {
+        "id": "color",
+        "icon": "◐",
+        "title": "Color Swap",
+        "desc": "Clothing/shoes/bags color change, preserve wrinkles & texture, batch support",
+        "tags": [
+          "Multi-Color",
+          "Texture Keep"
+        ],
+        "color": "#FFF7ED",
+        "ai": true,
+        "route": "/work/color-swap",
+        "category": "image"
+      },
+      {
+        "id": "style",
+        "icon": "◧",
+        "title": "Style Transfer",
+        "desc": "6 styles: Vintage/China Chic/Illustration/Watercolor/Cyber/Minimal",
+        "tags": [
+          "6 Styles",
+          "Creative"
+        ],
+        "color": "#F0FDF4",
+        "ai": true,
+        "route": "/work/style-transfer",
+        "category": "image"
+      },
+      {
+        "id": "digital",
+        "icon": "◓",
+        "title": "Digital Human VO",
+        "desc": "Input script→select avatar+voice→AI generate sales voiceover video",
+        "tags": [
+          "Digital Human",
+          "TTS Voice"
+        ],
+        "color": "#FFFBEB",
+        "ai": true,
+        "route": "/work/digital-human",
+        "category": "video"
+      },
+      {
+        "id": "script",
+        "icon": "▤",
+        "title": "Sales Script",
+        "desc": "Product USP→AI short video/livestream/social scripts, 9 languages+3 types",
+        "tags": [
+          "9 Languages",
+          "VO+Script"
+        ],
+        "color": "#FDF2F8",
+        "ai": true,
+        "route": "/work/script-gen",
+        "category": "ai"
+      },
+      {
+        "id": "viral",
+        "icon": "◆",
+        "title": "Viral Clone",
+        "desc": "Reference viral video→AI analyze rhythm/color/transition→regenerate your product",
+        "tags": [
+          "Viral Analysis",
+          "Style Clone"
+        ],
+        "color": "#FEF2F2",
+        "ai": true,
+        "route": "/work/viral-clone",
+        "category": "video"
+      },
+      {
+        "id": "remove-bg",
+        "icon": "◯",
+        "title": "Smart Cutout",
+        "desc": "AI hair-level cutout, fur/transparent/complex edges, single+batch support",
+        "tags": [
+          "Hair-Level",
+          "Batch"
+        ],
+        "color": "#E8F5E9",
+        "ai": true,
+        "route": "/work/remove-bg",
+        "category": "image"
+      },
+      {
+        "id": "white-bg",
+        "icon": "▭",
+        "title": "White BG Generate",
+        "desc": "Post-cutout smart white/scene bg, auto light correction+shadow, platform-ready",
+        "tags": [
+          "White/Transparent",
+          "Light Fix"
+        ],
+        "color": "#F5F5F5",
+        "ai": true,
+        "route": "/work/white-bg",
+        "category": "image"
+      },
+      {
+        "id": "retouch",
+        "icon": "✦",
+        "title": "Image Retouch",
+        "desc": "AI auto de-wrinkle/de-spot/fill light/sharpen, preserve texture, batch enhance",
+        "tags": [
+          "De-Wrinkle",
+          "Texture Keep"
+        ],
+        "color": "#FFF8E1",
+        "ai": true,
+        "route": "/work/retouch",
+        "category": "image"
+      },
+      {
+        "id": "platform-detail",
+        "icon": "▥",
+        "title": "Platform Templates",
+        "desc": "13 platform detail page templates, pick platform→template→upload→auto adapt",
+        "tags": [
+          "13 Platforms",
+          "Auto Adapt"
+        ],
+        "color": "#EFF6FF",
+        "ai": true,
+        "route": "/work/platform-detail",
+        "category": "image"
+      },
+      {
+        "id": "compliance",
+        "icon": "◬",
+        "title": "Compliance Check",
+        "desc": "Upload image+copy→auto check Amazon/Temu/TikTok/Shein compliance, US/EU/JP",
+        "tags": [
+          "Compliance",
+          "Multi-Market"
+        ],
+        "color": "#FFF1F2",
+        "ai": true,
+        "route": "/work/compliance-check",
+        "category": "ai"
+      },
+      {
+        "id": "ghost-mannequin",
+        "icon": "▯",
+        "title": "Ghost Mannequin",
+        "desc": "Flat/hanging clothing→AI auto dress invisible mannequin, 3D effect showcase",
+        "tags": [
+          "3D Effect",
+          "Invisible Model"
+        ],
+        "color": "#F0F9FF",
+        "ai": true,
+        "route": "/work/ghost-mannequin",
+        "category": "image"
+      },
+      {
+        "id": "outpaint",
+        "icon": "▩",
+        "title": "Smart Outpainting",
+        "desc": "AI expand image edges, auto complete composition, adapt platform ratios",
+        "tags": [
+          "Composition Fill",
+          "Ratio Adapt"
+        ],
+        "color": "#F5F3FF",
+        "ai": true,
+        "route": "/work/outpainting",
+        "category": "image"
+      },
+      {
+        "id": "image-translate",
+        "icon": "🌐",
+        "title": "Image Translate",
+        "desc": "Product image text OCR→translate 9 languages→in-place replace, cross-border must",
+        "tags": [
+          "OCR",
+          "9 Languages"
+        ],
+        "color": "#ECFDF5",
+        "ai": true,
+        "route": "/work/image-translate",
+        "category": "image"
+      },
+      {
+        "id": "video-edit",
+        "icon": "▸",
+        "title": "Video Editor",
+        "desc": "AI smart crop/speed/transition/color, auto multi-size multi-duration output",
+        "tags": [
+          "Smart Edit",
+          "Multi-Size"
+        ],
+        "color": "#FFF7ED",
+        "ai": true,
+        "route": "/work/video-edit",
+        "category": "video"
+      },
+      {
+        "id": "voice-gen",
+        "icon": "♫",
+        "title": "AI Voiceover",
+        "desc": "Input script→pick voice→natural sales voiceover, 9 languages 50+ voices",
+        "tags": [
+          "TTS",
+          "50+ Voices"
+        ],
+        "color": "#FDF2F8",
+        "ai": true,
+        "route": "/work/voice-gen",
+        "category": "ai"
+      },
+      {
+        "id": "storyboard",
+        "icon": "⊟",
+        "title": "Smart Storyboard",
+        "desc": "Script→AI auto split shots+voiceover+subtitles, one-click full short video",
+        "tags": [
+          "Script Split",
+          "Auto Storyboard"
+        ],
+        "color": "#FFF1F2",
+        "ai": true,
+        "route": "/work/storyboard",
+        "category": "video"
+      }
     ]
   },
   "work": {
@@ -211,468 +716,6 @@
     "badges": "Badges",
     "abuse": "Abuse Monitor",
     "logs": "Logs"
-  },
-  "enterprise": {
-    "dashboard": "Dashboard",
-    "finance": "Finance",
-    "users": "Sub Accounts",
-    "customers": "Customers",
-    "tags": "Tag Groups",
-    "channels": "Channels",
-    "distribution": "Distribution",
-    "commerce": "Orders",
-    "reports": "Reports",
-    "usage": "Usage",
-    "plans": "Plans",
-    "whitelabel": "Whitelabel",
-    "settings": "Settings",
-    "logout": "Logout"
-  },
-  "tier": {
-    "free": "Free",
-    "vip": "VIP",
-    "admin": "Admin",
-    "upgrade": "Upgrade",
-    "daily_limit": "Daily Limit",
-    "quota_used": "Used",
-    "quota_total": "Total"
-  },
-  "auth": {
-    "username": "Username",
-    "password": "Password",
-    "email": "Email",
-    "phone": "Phone",
-    "code": "Code",
-    "send_code": "Send Code",
-    "login_btn": "Login",
-    "register_btn": "Register",
-    "forgot_pwd": "Forgot Password",
-    "remember": "Remember Me",
-    "welcome_title": "Welcome Back",
-    "welcome_subtitle": "Log in to your Movio AI account",
-    "tab_password": "Password",
-    "tab_sms": "SMS",
-    "tab_email": "Email",
-    "get_code": "Get Code",
-    "code_countdown": "{n}s",
-    "code_sent": "Code Sent",
-    "send_failed": "Failed to send, check network",
-    "login_failed": "Login Failed",
-    "login_network_error": "Login failed, check network",
-    "enter_phone_and_code": "Please enter phone and code",
-    "enter_phone": "Please enter phone number",
-    "enter_email_and_code": "Please enter email and code",
-    "enter_email": "Please enter email",
-    "no_account": "Don't have an account?",
-    "free_register": "Sign Up Free"
-  },
-  "image": {
-    "title": "AI Image Generation",
-    "generate": "Generate Image",
-    "mainImage": "Main Product Image",
-    "background": "Background Removal",
-    "whiteBackground": "White Background",
-    "retouch": "Image Retouching",
-    "scene": "Scene Generation",
-    "colorChange": "Color Change",
-    "faceSwap": "Face Swap",
-    "virtualTryOn": "Virtual Try-On",
-    "model": "AI Model",
-    "resolution": "Resolution",
-    "prompt": "Prompt",
-    "negativePrompt": "Negative Prompt",
-    "referenceImage": "Reference Image"
-  },
-  "video": {
-    "title": "AI Video Creation",
-    "generate": "Generate Video",
-    "script": "Video Script",
-    "storyboard": "Storyboard",
-    "shootingPlan": "Shooting Plan",
-    "digitalHuman": "Digital Human",
-    "voiceClone": "Voice Cloning",
-    "subtitles": "Auto Subtitles",
-    "translation": "Video Translation"
-  },
-  "action": {
-    "background_replace": "Background Replace",
-    "background_url": "Background Image URL",
-    "background_hint": "Leave empty for AI auto-generated scene background",
-    "clothing_replace": "Clothing Replace",
-    "clothing_style": "Clothing Style",
-    "clothing_color": "Clothing Color",
-    "clothing_auto": "Auto",
-    "color_hint": "e.g. White, Black, Red",
-    "keep_audio": "Keep Original Audio",
-    "bgm_url": "BGM Background Music URL",
-    "bgm_hint": "https://...",
-    "volume": "Volume",
-    "voiceover_text": "AI Voiceover Text",
-    "voiceover_hint": "Enter voiceover script, skip for no voiceover",
-    "voiceover_type": "Voice Style",
-    "voice_auto": "Auto",
-    "long_image_tab": "Long Image",
-    "long_image_desc": "Composite multiple scene images into one long image",
-    "platform": "Target Platform",
-    "scene_prompt": "Scene Description",
-    "scene_image_url": "Scene Reference Image URL",
-    "add_scene": "Add Scene",
-    "output_width": "Output Width",
-    "pixel": "px",
-    "generate_long": "Generate Long Image",
-    "scenes_count": "Scenes",
-    "max_scenes": "Max 20 scenes",
-    "smart_recognition_tab": "Smart Recognition",
-    "smart_recognition_desc": "Upload a reference image, AI auto-detects product info",
-    "voice_option": "Voice",
-    "quantity_option": "Quantity",
-    "color_option": "Color",
-    "none": "None"
-  },
-  "copywriting": {
-    "title": "AI Copywriting",
-    "productTitle": "Product Title",
-    "sellingPoints": "Selling Points",
-    "script": "Script Generation",
-    "socialContent": "Social Media Content",
-    "translation": "Cross-Border Translation",
-    "seoCopy": "SEO Copywriting",
-    "platform": "Target Platform"
-  },
-  "diy": {
-    "title": "Page Builder",
-    "editor": "Visual Editor",
-    "templates": "Templates",
-    "pages": "Page Manager",
-    "forms": "Form Builder",
-    "components": "Components",
-    "saveDraft": "Save Draft",
-    "previewPage": "Preview",
-    "publishPage": "Publish"
-  },
-  "account": {
-    "title": "Account",
-    "profile": "Profile",
-    "security": "Security",
-    "billing": "Billing",
-    "subscription": "Subscription",
-    "credits": "Credits",
-    "notifications": "Notifications",
-    "settings": "Settings"
-  },
-  "workspace": {
-    "greeting": "Welcome to Movio AI",
-    "subtitle": "E-Commerce Full-Stack AI Automation Workspace",
-    "recent_projects": "Recent Projects",
-    "view_all": "View All",
-    "no_projects": "No recent projects yet, start your first creation",
-    "creation_tools": "Creation Tools",
-    "loading_tools": "Loading creation tools...",
-    "start_create": "Start Creating",
-    "assistant_desc": "E-Commerce AI Agent Suite — Store Customer Service, Operations Inspector, Product Optimizer, Product Selection Analysis, Competitor Monitoring, Review Management, Risk Control, Data Analytics, Live Stream Attendant",
-    "assistant_agents": [
-      { "id": "service", "icon": "💬", "title": "Store Customer Service", "desc": "24/7 intelligent response, pre-sales inquiry + after-sales support", "tag": "Auto Service" },
-      { "id": "ops", "icon": "🔍", "title": "Operations Inspector", "desc": "Auto-inspect all products, detect title/image/price anomalies", "tag": "Daily Inspection" },
-      { "id": "product", "icon": "✨", "title": "Product Optimizer", "desc": "SEO title optimization + hero image scoring + description enhancement", "tag": "Conversion Boost" },
-      { "id": "selection", "icon": "🎯", "title": "Product Selection", "desc": "Market trends + competitor mining + blue ocean category recommendations", "tag": "Data-Driven" },
-      { "id": "compete", "icon": "📊", "title": "Competitor Monitor", "desc": "Track competitor new arrivals, pricing, promotions, and reviews", "tag": "Real-Time Tracking" },
-      { "id": "review", "icon": "⭐", "title": "Review Manager", "desc": "Pin positive reviews + negative review alerts + auto-reply templates", "tag": "Rating Keeper" },
-      { "id": "compliance", "icon": "🛡️", "title": "Risk Control", "desc": "Prohibited word scanning + image compliance + IP infringement alerts", "tag": "Zero Violation" },
-      { "id": "data", "icon": "📈", "title": "Data Analytics", "desc": "Sales/traffic/conversion/AOV multi-dimensional dashboard + anomaly alerts", "tag": "Smart Insights" },
-      { "id": "live", "icon": "📡", "title": "Live Stream Attendant", "desc": "Auto reply to comments + product narration + engagement guidance", "tag": "24/7 Online" }
-    ],
-    "coming_soon_title": "Coming Soon",
-    "coming_soon_detail": "We're building full e-commerce automation capabilities. Once launched, it will support customer service, operations, data review, and all-role AI automation.",
-    "progress_label": "Progress",
-    "reserve_btn": "Reserve Early Access",
-    "reserve_toast": "We've received your reservation. We'll notify you as soon as it launches.",
-    "logout_confirm": "Are you sure you want to logout?",
-    "logout_success": "Logged out successfully",
-    "logout_fail": "Logout failed, please try again",
-    "workflow_desc": "Chain scattered tools into standardized automation workflows — one-click new arrivals, batch content creation, auto review management, daily data review, campaign marketing, self-audit risk control",
-    "lobster_desc": "End-to-end e-commerce operations pipeline — product research, content creation, listing & publishing, customer service, review management, data review, competitor monitoring, risk control",
-    "history_desc": "View all your creation history and manage your works",
-    "admin_panel": "Admin Panel",
-    "exit_login": "Logout",
-    "creation_placeholder_video": "Describe your product video, e.g. skincare demo video, 15s...",
-    "creation_placeholder_image": "Describe your product image, e.g. summer dress on white background, minimal...",
-    "creation_placeholder_detail": "Describe your detail page, e.g. face mask product page, Japanese minimal...",
-    "creation_placeholder_copywrite": "Describe your voice/copy needs, e.g. product voiceover script, TikTok copy...",
-    "creation_placeholder_other": "Describe your other creative needs, e.g. digital human sales, compliance check...",
-    "creation_placeholder_default": "Describe your creative needs...",
-    "creation_hint_video": "Image-to-video / Text-to-video / Storyboard / Digital human voiceover",
-    "creation_hint_image": "Text-to-image / Reference image / Batch processing / Retouch / Background removal",
-    "creation_hint_detail": "Detail page design / Main image set / Multi-platform adapt / Product rendering",
-    "creation_hint_copywrite": "Sales voiceover / Product copy / Multi-language translation / AI voice / Campaign scripts",
-    "creation_hint_other": "Digital human sales / Virtual livestream / Face swap / Image translate / Compliance check",
-    "creation_hint_default": "",
-    "creation_param_video_duration": "Duration",
-    "creation_param_video_resolution": "Resolution",
-    "creation_param_video_style": "Style",
-    "creation_param_image_size": "Image Size",
-    "creation_param_image_style": "Style",
-    "creation_param_image_count": "Count",
-    "creation_param_detail_platform": "Platform",
-    "creation_param_detail_style": "Page Style",
-    "creation_param_detail_modules": "Modules",
-    "creation_param_copywrite_type": "Copy Type",
-    "creation_param_copywrite_lang": "Language",
-    "creation_param_copywrite_tone": "Voice Tone",
-    "creation_param_other_tool": "Tool Type",
-    "creation_param_video_ratio": "Aspect Ratio",
-    "creation_param_image_bg": "Background",
-    "creation_param_copywrite_voice": "Voice",
-    "creation_param_other_format": "Format",
-    "creation_param_other_sort": "Sort By",
-    "creation_input_region": "{tab} — Creation Input",
-    "creation_upload_label": "Upload",
-    "creation_tools_region": "{tab} — Quick Tools",
-    "creation_quick_tools": "{tab} · Quick Tools",
-    "redirect_creation": "Redirecting to Creation Center...",
-    "creation_upload_hint": "Drag or click to upload assets",
-    "creation_param_label": "Parameters",
-    "creation_options": {
-      "duration": { "15s": "15s", "30s": "30s", "60s": "60s", "90s": "90s", "3min": "3 min" },
-      "ratio": { "9_16": "9:16 Portrait", "16_9": "16:9 Landscape", "1_1": "1:1 Square", "4_3": "4:3" },
-      "resolution": { "720p": "720p", "1080p": "1080p", "2k": "2K", "4k": "4K" },
-      "style": { "modern": "Modern", "vintage": "Vintage", "minimal": "Minimal", "dynamic": "Dynamic", "premium": "Premium", "guochao": "Guochao", "japanese": "Japanese", "cyber": "Cyber", "korean": "Korean", "western": "Western" },
-      "size": { "1_1": "1:1 Square", "3_4": "3:4", "4_3": "4:3", "16_9": "16:9", "9_16": "9:16", "custom": "Custom" },
-      "count": { "1": "1", "2": "2", "4": "4", "6": "6", "8": "8" },
-      "bg": { "white": "White", "transparent": "Transparent", "scene": "Scene", "custom": "Custom" },
-      "platform": { "taobao": "Taobao", "pinduoduo": "Pinduoduo", "douyin": "Douyin", "amazon": "Amazon", "temu": "Temu", "shein": "Shein" },
-      "modules": { "full": "Full", "compact": "Compact", "hero_usp": "Hero+USP", "custom": "Custom" },
-      "copy_type": { "sales_vo": "Sales VO", "product_title": "Product Title", "detail_copy": "Detail Copy", "campaign_copy": "Campaign Copy", "social_seeding": "Social Seeding" },
-      "language": { "chinese": "Chinese", "english": "English", "japanese": "Japanese", "korean": "Korean", "spanish": "Spanish" },
-      "tone": { "professional": "Professional", "friendly": "Friendly", "lively": "Lively", "premium": "Premium", "urgent": "Urgent" },
-      "voice": { "sweet_female": "Sweet Female", "deep_male": "Deep Male", "energetic_female": "Energetic Female", "magnetic_male": "Magnetic Male", "neutral": "Neutral" },
-      "tool": { "digital_human": "Digital Human", "face_swap": "Face Swap", "translate": "Translate", "compliance": "Compliance", "viral_clone": "Viral Clone" },
-      "format": { "all": "All", "image": "Image", "video": "Video", "copy": "Copy", "audio": "Audio", "jpg": "JPG", "png": "PNG", "mp4": "MP4", "gif": "GIF" },
-      "sort": { "recommended": "Recommended", "newest": "Newest", "hottest": "Hottest", "free_first": "Free First" }
-    },
-    "slide_panel": {
-      "close_aria": "Close panel",
-      "generate_btn": "⚡ Generate",
-      "upload_text": "Drag or click to upload",
-      "upload_hint": "Supports JPG / PNG / MP4, max 50MB per file",
-      "param_label": "Parameters",
-      "generating": "Generating...",
-      "step_upload": "Upload",
-      "step_analyze": "AI Analysis",
-      "step_generate": "Generate",
-      "step_done": "Done",
-      "result_name": "Result",
-      "download": "⬇ Download",
-      "reuse": "🔄 Reuse",
-      "close_result": "Close",
-      "progress_pct": "Generating... {pct}%",
-      "prompt_label": "Creative Brief",
-      "generate_error": "Generation failed, please retry",
-      "retry": "Retry"
-    },
-
-    "creation_sub_cards": {
-      "video": [
-        {"icon":"🎥","title":"AI Short Video","desc":"Turn product images into sales videos with auto BGM+subtitles","route":"/work/video"},
-        {"icon":"🕺","title":"Action Transfer","desc":"AI-precise motion transfer from reference video to character","route":"/work/action-transfer"},
-        {"icon":"🎬","title":"Smart Storyboard","desc":"Auto-decompose scripts into shot plans+voiceover+subtitles","route":"/work/storyboard"},
-        {"icon":"✂️","title":"Video Editor","desc":"Smart crop/speed/transition/color, multi-size output","route":"/work/video-edit"},
-        {"icon":"📡","title":"Live Clip","desc":"Auto-extract highlights from livestream replays","route":"/work/live-clip"},
-        {"icon":"📋","title":"Batch Generate","desc":"Drag folder→queue→notify→download, night mode discount","route":"/work/batch"}
-      ],
-      "image": [
-        {"icon":"🖼️","title":"AI Product Image","desc":"One-click main image generation with auto cutout+retouch","route":"/work/image"},
-        {"icon":"🏞️","title":"Scene Generation","desc":"Product+AI scene library→auto lighting fusion→5 scene images","route":"/work/scene"},
-        {"icon":"✂️","title":"Smart Cutout","desc":"AI hair-level cutout for fur/transparent/complex edges","route":"/work/remove-bg"},
-        {"icon":"⬜","title":"White BG Image","desc":"Smart white/scene background generation, platform-ready","route":"/work/white-bg"},
-        {"icon":"✨","title":"Image Retouch","desc":"AI auto de-wrinkle/de-spot/light-fill/sharpen, batch enhance","route":"/work/retouch"},
-        {"icon":"🎨","title":"Style Transfer","desc":"6 styles: vintage/guochao/illustration/watercolor/cyber/minimal","route":"/work/style-transfer"},
-        {"icon":"🔄","title":"Color Swap","desc":"Apparel color swap preserving wrinkle texture, batch support","route":"/work/color-swap"},
-        {"icon":"↔️","title":"Smart Outpainting","desc":"AI extends image edges, auto-completes composition seamlessly","route":"/work/outpaint"},
-        {"icon":"📦","title":"Batch Render","desc":"50 images unified cutout+white bg+resize, night discount","route":"/work/batch"}
-      ],
-      "detail": [
-        {"icon":"📄","title":"Detail Page Design","desc":"Smart layout design, AI auto-generates copy+graphics","route":"/work/detail-h5"},
-        {"icon":"📱","title":"Multi-Platform Adapt","desc":"13 e-com platform templates, pick platform→template→generate","route":"/work/platform-detail"},
-        {"icon":"🏷️","title":"Selling Points","desc":"AI extracts product USPs, generates high-conversion detail copy","route":"/work/selling-points"},
-        {"icon":"🎯","title":"Template Apply","desc":"Premium detail page templates, upload+apply in one click","route":"/work/template-apply"},
-        {"icon":"👗","title":"Virtual Try-On","desc":"Flat clothing→real model fit, multi-skin-tone/body-type","route":"/work/virtual-tryon"},
-        {"icon":"👤","title":"Ghost Mannequin","desc":"Flat/hanging clothes→AI 3D ghost mannequin showcase","route":"/work/ghost-mannequin"},
-        {"icon":"🛒","title":"Product Rendering","desc":"3D product rotation/detail, 360° product showcase","route":"/work/product-render"},
-        {"icon":"📁","title":"Export Settings","desc":"Unified format/size/naming, one-click package download","route":"/work/output"}
-      ],
-      "copywrite": [
-        {"icon":"🎙️","title":"Sales Voiceover","desc":"Product USPs→AI voiceover script, 3 script types supported","route":"/work/script-gen"},
-        {"icon":"📝","title":"Product Copy","desc":"SEO titles+long-form detail copy, conversion-rate oriented","route":"/work/detail-copy"},
-        {"icon":"🌐","title":"Multi-Lang Translate","desc":"OCR product image text→9-language in-place translation","route":"/work/image-translate"},
-        {"icon":"🔊","title":"AI Voice Gen","desc":"Input copy→select host voice→natural sales voiceover","route":"/work/voice-gen"},
-        {"icon":"📢","title":"Campaign Copy","desc":"Promo/event/sale copy, multi-platform support","route":"/work/campaign-copy"},
-        {"icon":"📱","title":"Social Copy","desc":"Xiaohongshu/Douyin/TikTok seeding copy one-click","route":"/work/social-copy"},
-        {"icon":"📧","title":"Email Copy","desc":"EDM marketing email/SMS copy, multi-language","route":"/work/email-copy"},
-        {"icon":"🎤","title":"Voice Custom","desc":"50+ host voices, 9-language TTS speech synthesis","route":"/work/voice-custom"}
-      ],
-      "other": [
-        {"icon":"🤖","title":"Digital Human Sales","desc":"Input copy→select avatar+voice→AI sales video","route":"/work/digital-human"},
-        {"icon":"📡","title":"Digital Livestream","desc":"Virtual studio auto product showcase, 24/7 streaming","route":"/work/digital-live"},
-        {"icon":"🔄","title":"AI Face Swap","desc":"AI face replacement/digital human swap, multi-style","route":"/work/face-swap"},
-        {"icon":"🌐","title":"Image Translate","desc":"OCR product image text→9-language in-place translation","route":"/work/image-translate"},
-        {"icon":"🛡️","title":"Compliance Check","desc":"Amazon/Temu/TikTok/Shein compliance check, EU/US/JP","route":"/work/compliance-check"},
-        {"icon":"🔥","title":"Viral Clone","desc":"Analyze viral video rhythm/tone→regenerate with your product","route":"/work/viral-clone"},
-        {"icon":"🧬","title":"Avatar Custom","desc":"Custom digital human look/voice/motion, build your IP","route":"/work/avatar-custom"},
-        {"icon":"📐","title":"Shot Plan","desc":"Video shot order/duration planning, visual preview","route":"/work/shot-plan"}
-      ]
-    },
-    "nav_main_label": "Workspace navigation",
-    "nav_home": "Home",
-    "nav_creation": "Creation Center",
-    "nav_agent": "AI Agent",
-    "nav_assistant": "AI Assistant",
-    "nav_workflow": "Workflow",
-    "nav_lobster": "Lobster",
-    "nav_history": "History",
-    "default_page_title": "Workspace",
-    "fold_expand": "Expand sidebar",
-    "fold_collapse": "Collapse sidebar",
-    "menu_open_label": "Open navigation menu",
-    "menu_close_label": "Close navigation menu",
-    "coming_soon_tag": "Coming Soon",
-    "points_label": "Points",
-    "creation_tabs": {
-      "video": "Video Generation",
-      "image": "Image Generation",
-      "detail": "E-Com Detail Page",
-      "copywrite": "Voice & Copywriting",
-      "other": "Other Creative Tools"
-    },
-    "recent_samples": [
-      {"icon":"🖼","name":"Summer Dress White Background","time":"2 hours ago"},
-      {"icon":"🎥","name":"Skincare Demo Video","time":"Yesterday"},
-      {"icon":"📄","name":"Face Mask Detail Page","time":"Yesterday"},
-      {"icon":"📰","name":"618 Campaign Poster","time":"2 days ago"}
-    ],
-    "default_cards": [
-      {"id":"img_main","category":"image","icon":"🖼","title":"AI Product Image","desc":"One-click product main image for all platforms","route":"/work/image","order":1,"visible":true},
-      {"id":"video_gen","category":"video","icon":"🎥","title":"AI Short Video","desc":"Turn product images into sales videos","route":"/work/video","order":1,"visible":true},
-      {"id":"detail_page","category":"detail","icon":"📄","title":"Detail Page Design","desc":"Smart layout design for product detail pages","route":"/work/detail-page","order":1,"visible":true},
-      {"id":"copy_title","category":"copywrite","icon":"✍️","title":"Title/Selling Points","desc":"AI-generated high-conversion product titles","route":"/work/copywriting","order":1,"visible":true},
-      {"id":"digital_human","category":"digital","icon":"🤖","title":"Digital Human Sales","desc":"24/7 automated sales videos with digital humans","route":"/work/digital-human","order":1,"visible":true}
-    ],
-    "default_tool_cards": {
-      "video": [
-        {"id":"video_gen","category":"video","icon":"🎥","title":"AI Short Video","desc":"Turn product images into sales videos","route":"/work/video","order":1,"visible":true},
-        {"id":"video_edit","category":"video","icon":"✂","title":"Video Editor","desc":"Online clip/subtitle/music/color","route":"/work/video-edit","order":2,"visible":true},
-        {"id":"video_trans","category":"video","icon":"🌐","title":"Video Translate","desc":"Voice/subtitle/face 3-in-1 translation","route":"/work/video-translate","order":3,"visible":true},
-        {"id":"script_gen","category":"video","icon":"📝","title":"Short Video Script","desc":"Auto-generate sales video voiceover scripts","route":"/work/script-gen","order":4,"visible":true},
-        {"id":"shot_plan","category":"video","icon":"📐","title":"Shot Plan","desc":"Video shot plan/order/duration","route":"/work/shot-plan","order":5,"visible":true},
-        {"id":"storyboard","category":"video","icon":"🎞","title":"Storyboard","desc":"Visual storyboard preview for video ideas","route":"/work/storyboard","order":6,"visible":true}
-      ],
-      "image": [
-        {"id":"img_main","category":"image","icon":"🖼","title":"AI Product Image","desc":"One-click product main image for all platforms","route":"/work/image","order":1,"visible":true},
-        {"id":"img_scene","category":"image","icon":"🏞","title":"Scene Generation","desc":"Place products in lifestyle scenes","route":"/work/main-image","order":2,"visible":true},
-        {"id":"img_poster","category":"image","icon":"📰","title":"Poster Generator","desc":"Marketing/campaign/launch posters","route":"/work/poster","order":3,"visible":true},
-        {"id":"img_white_bg","category":"image","icon":"⬜","title":"White BG Image","desc":"Platform-compliant white background images","route":"/work/white-bg","order":4,"visible":true},
-        {"id":"img_bg_remove","category":"image","icon":"✂","title":"Smart Background Removal","desc":"AI 3-second precise subject cutout","route":"/work/remove-bg","order":5,"visible":true},
-        {"id":"img_retouch","category":"image","icon":"✨","title":"AI Retouch","desc":"Color/sharpen/texture enhancement","route":"/work/retouch","order":6,"visible":true},
-        {"id":"img_recolor","category":"image","icon":"🎯","title":"Color Swap","desc":"Show multiple colors for same style","route":"/work/color-swap","order":7,"visible":true},
-        {"id":"img_style","category":"image","icon":"🖌","title":"Style Transfer","desc":"Photo to oil/watercolor/3D style","route":"/work/style-transfer","order":8,"visible":true},
-        {"id":"img_text_fx","category":"image","icon":"🔤","title":"Text Effects","desc":"3D/metallic/neon title effects","route":"/work/text-effect","order":9,"visible":true},
-        {"id":"img_expand","category":"image","icon":"↔","title":"Smart Outpainting","desc":"Intelligent edge extension and completion","route":"/work/outpaint","order":10,"visible":true},
-        {"id":"batch_process","category":"image","icon":"📦","title":"Batch Processing","desc":"50 images unified cutout+white bg+resize","route":"/work/batch","order":11,"visible":true}
-      ],
-      "detail": [
-        {"id":"detail_page","category":"detail","icon":"📄","title":"Detail Page Design","desc":"Smart layout for product detail pages","route":"/work/detail-page","order":1,"visible":true},
-        {"id":"product_render","category":"detail","icon":"🛒","title":"Product Rendering","desc":"3D product rotation/detail showcase","route":"/work/product-render","order":2,"visible":true},
-        {"id":"virtual_tryon","category":"detail","icon":"👗","title":"Virtual Try-On","desc":"Buyers see clothing fit online","route":"/work/virtual-tryon","order":3,"visible":true},
-        {"id":"model_generate","category":"detail","icon":"🧍","title":"AI Model","desc":"AI virtual model wearing showcase","route":"/work/model-generate","order":4,"visible":true},
-        {"id":"img_ghost","category":"detail","icon":"👤","title":"Ghost Mannequin","desc":"Invisible mannequin fit showcase","route":"/work/ghost-mannequin","order":5,"visible":true},
-        {"id":"platform_taobao","category":"detail","icon":"📱","title":"Multi-Platform Adapt","desc":"Tmall/JD/Pinduoduo size adaption","route":"/work/multi-platform","order":6,"visible":true},
-        {"id":"main_img_set","category":"detail","icon":"🖼","title":"Main Image Set","desc":"Main+supplementary+white bg set","route":"/work/main-image-set","order":7,"visible":true},
-        {"id":"output","category":"detail","icon":"📁","title":"Export Settings","desc":"Unified format/size/naming export","route":"/work/output","order":8,"visible":true}
-      ],
-      "copywrite": [
-        {"id":"copy_title","category":"copywrite","icon":"📋","title":"E-Com Title","desc":"SEO titles/selling points batch gen","route":"/work/title-gen","order":1,"visible":true},
-        {"id":"copy_detail","category":"copywrite","icon":"📝","title":"Detail Copy","desc":"Long-form product detail page copy","route":"/work/detail-copy","order":2,"visible":true},
-        {"id":"script_gen2","category":"copywrite","icon":"🎙","title":"VO Script","desc":"Auto sales short video voiceover scripts","route":"/work/script-gen","order":3,"visible":true},
-        {"id":"campaign_copy","category":"copywrite","icon":"📢","title":"Campaign Copy","desc":"Promo/event/sale copy generation","route":"/work/campaign-copy","order":4,"visible":true},
-        {"id":"email_copy","category":"copywrite","icon":"📧","title":"Email Copy","desc":"EDM marketing email/SMS copy","route":"/work/email-copy","order":5,"visible":true},
-        {"id":"social_copy","category":"copywrite","icon":"📱","title":"Social Copy","desc":"Xiaohongshu/Douyin/TikTok copy","route":"/work/social-copy","order":6,"visible":true}
-      ],
-      "digital": [
-        {"id":"digital_human","category":"digital","icon":"🤖","title":"Digital Human Sales","desc":"24/7 automated sales videos","route":"/work/digital-human","order":1,"visible":true},
-        {"id":"digital_live","category":"digital","icon":"📡","title":"Digital Livestream","desc":"Virtual studio auto product showcase","route":"/work/digital-live","order":2,"visible":true},
-        {"id":"avatar_custom","category":"digital","icon":"🧬","title":"Avatar Custom","desc":"Custom digital human look/voice/motion","route":"/work/avatar-custom","order":3,"visible":true},
-        {"id":"ai_host","category":"digital","icon":"🎤","title":"AI Host","desc":"Smart voice product USP broadcast","route":"/work/ai-host","order":4,"visible":true},
-        {"id":"virtual_model","category":"digital","icon":"👤","title":"Virtual Model","desc":"AI virtual model wearing showcase","route":"/work/virtual-model","order":5,"visible":true},
-        {"id":"face_swap","category":"digital","icon":"🔄","title":"Face Swap","desc":"AI face replacement/digital human swap","route":"/work/face-swap","order":6,"visible":true}
-      ]
-    },
-    "history_desc": "View all your creation history and manage your work",
-    "panel_param_type": "Type",
-    "panel_param_quality": "Quality",
-    "panel_param_format": "Format",
-    "panel_opt_auto": "Auto",
-    "panel_opt_standard": "Standard",
-    "panel_opt_premium": "Premium",
-    "panel_opt_sd": "SD",
-    "panel_opt_hd": "HD",
-    "panel_opt_uhd": "UHD",
-    "panel_generate_title": "{tab} — Generate Result"
-  },
-  "ai_assistant": {
-    "review": {
-      "title": "AI Content Review",
-      "subtitle": "Enter text to auto-detect violations, contact info, code injection risks",
-      "placeholder": "Enter text to review...",
-      "start_review": "Start Review",
-      "clear": "Clear",
-      "result_title": "Review Result",
-      "pass": "✓ Pass",
-      "fail": "✕ Fail",
-      "score_label": "Safety Score / 100",
-      "no_issues": "No risk content detected.",
-      "service_error": "Service Error"
-    },
-    "data": {
-      "title": "AI Data Analysis",
-      "subtitle": "Query operational data in natural language, AI auto-analyzes",
-      "placeholder": "Ask a question, e.g. how many users registered this week",
-      "analyze": "Analyze",
-      "service_unavailable": "Analysis service is temporarily unavailable. Please try again later.",
-      "hints": ["How many users registered this week", "Monthly revenue overview", "Image generation stats"]
-    }
-  },
-  "assets": {
-    "title": "Assets Library",
-    "subtitle": "Manage all AI-generated works",
-    "loading": "Loading...",
-    "empty_title": "No assets yet",
-    "empty_hint": "AI-generated works will be saved here automatically",
-    "load_more": "Load More",
-    "load_error": "Failed to load assets",
-    "close_preview": "Close",
-    "preview_alt": "Asset Preview",
-    "download": "Download",
-    "copy_link": "Copy Link",
-    "filter_all": "All",
-    "filter_image": "Images",
-    "filter_video": "Videos",
-    "type_image_gen": "AI Image",
-    "type_image_replicate": "Image Replicate",
-    "type_batch_image": "Batch Image",
-    "type_batch_edit": "Batch Edit",
-    "type_video_gen": "AI Video",
-    "type_action_migrate": "Action Transfer",
-    "type_digital_human": "Digital Human",
-    "type_viral_replicate": "Viral Clone",
-    "type_live_clip": "Smart Clip"
-  },
-  "admin_shell": {
-    "expand_sidebar": "Expand Sidebar",
-    "collapse_sidebar": "Collapse Sidebar",
-    "switch_light": "Light Mode",
-    "switch_dark": "Dark Mode",
-    "notification": "Notifications",
-    "logout": "Logout",
-    "back": "Back"
   },
   "enterprise": {
     "common": {
@@ -1242,6 +1285,1199 @@
       "loadProfileFailed": "Failed to load enterprise info"
     }
   },
+  "tier": {
+    "free": "Free",
+    "vip": "VIP",
+    "admin": "Admin",
+    "upgrade": "Upgrade",
+    "daily_limit": "Daily Limit",
+    "quota_used": "Used",
+    "quota_total": "Total"
+  },
+  "auth": {
+    "username": "Username",
+    "password": "Password",
+    "email": "Email",
+    "phone": "Phone",
+    "code": "Code",
+    "send_code": "Send Code",
+    "login_btn": "Login",
+    "register_btn": "Register",
+    "forgot_pwd": "Forgot Password",
+    "remember": "Remember Me",
+    "welcome_title": "Welcome Back",
+    "welcome_subtitle": "Log in to your Movio AI account",
+    "tab_password": "Password",
+    "tab_sms": "SMS",
+    "tab_email": "Email",
+    "get_code": "Get Code",
+    "code_countdown": "{n}s",
+    "code_sent": "Code Sent",
+    "send_failed": "Failed to send, check network",
+    "login_failed": "Login Failed",
+    "login_network_error": "Login failed, check network",
+    "enter_phone_and_code": "Please enter phone and code",
+    "enter_phone": "Please enter phone number",
+    "enter_email_and_code": "Please enter email and code",
+    "enter_email": "Please enter email",
+    "no_account": "Don't have an account?",
+    "free_register": "Sign Up Free"
+  },
+  "image": {
+    "title": "AI Image Generation",
+    "generate": "Generate Image",
+    "mainImage": "Main Product Image",
+    "background": "Background Removal",
+    "whiteBackground": "White Background",
+    "retouch": "Image Retouching",
+    "scene": "Scene Generation",
+    "colorChange": "Color Change",
+    "faceSwap": "Face Swap",
+    "virtualTryOn": "Virtual Try-On",
+    "model": "AI Model",
+    "resolution": "Resolution",
+    "prompt": "Prompt",
+    "negativePrompt": "Negative Prompt",
+    "referenceImage": "Reference Image"
+  },
+  "video": {
+    "title": "AI Video Creation",
+    "generate": "Generate Video",
+    "script": "Video Script",
+    "storyboard": "Storyboard",
+    "shootingPlan": "Shooting Plan",
+    "digitalHuman": "Digital Human",
+    "voiceClone": "Voice Cloning",
+    "subtitles": "Auto Subtitles",
+    "translation": "Video Translation"
+  },
+  "action": {
+    "background_replace": "Background Replace",
+    "background_url": "Background Image URL",
+    "background_hint": "Leave empty for AI auto-generated scene background",
+    "clothing_replace": "Clothing Replace",
+    "clothing_style": "Clothing Style",
+    "clothing_color": "Clothing Color",
+    "clothing_auto": "Auto",
+    "color_hint": "e.g. White, Black, Red",
+    "keep_audio": "Keep Original Audio",
+    "bgm_url": "BGM Background Music URL",
+    "bgm_hint": "https://...",
+    "volume": "Volume",
+    "voiceover_text": "AI Voiceover Text",
+    "voiceover_hint": "Enter voiceover script, skip for no voiceover",
+    "voiceover_type": "Voice Style",
+    "voice_auto": "Auto",
+    "long_image_tab": "Long Image",
+    "long_image_desc": "Composite multiple scene images into one long image",
+    "platform": "Target Platform",
+    "scene_prompt": "Scene Description",
+    "scene_image_url": "Scene Reference Image URL",
+    "add_scene": "Add Scene",
+    "output_width": "Output Width",
+    "pixel": "px",
+    "generate_long": "Generate Long Image",
+    "scenes_count": "Scenes",
+    "max_scenes": "Max 20 scenes",
+    "smart_recognition_tab": "Smart Recognition",
+    "smart_recognition_desc": "Upload a reference image, AI auto-detects product info",
+    "voice_option": "Voice",
+    "quantity_option": "Quantity",
+    "color_option": "Color",
+    "none": "None"
+  },
+  "copywriting": {
+    "title": "AI Copywriting",
+    "productTitle": "Product Title",
+    "sellingPoints": "Selling Points",
+    "script": "Script Generation",
+    "socialContent": "Social Media Content",
+    "translation": "Cross-Border Translation",
+    "seoCopy": "SEO Copywriting",
+    "platform": "Target Platform"
+  },
+  "diy": {
+    "title": "Page Builder",
+    "editor": "Visual Editor",
+    "templates": "Templates",
+    "pages": "Page Manager",
+    "forms": "Form Builder",
+    "components": "Components",
+    "saveDraft": "Save Draft",
+    "previewPage": "Preview",
+    "publishPage": "Publish"
+  },
+  "account": {
+    "title": "Account",
+    "profile": "Profile",
+    "security": "Security",
+    "billing": "Billing",
+    "subscription": "Subscription",
+    "credits": "Credits",
+    "notifications": "Notifications",
+    "settings": "Settings"
+  },
+  "workspace": {
+    "greeting": "Welcome to Movio AI",
+    "subtitle": "E-Commerce Full-Stack AI Automation Workspace",
+    "recent_projects": "Recent Projects",
+    "view_all": "View All",
+    "no_projects": "No recent projects yet, start your first creation",
+    "creation_tools": "Creation Tools",
+    "loading_tools": "Loading creation tools...",
+    "start_create": "Start Creating",
+    "assistant_desc": "E-Commerce AI Agent Suite — Store Customer Service, Operations Inspector, Product Optimizer, Product Selection Analysis, Competitor Monitoring, Review Management, Risk Control, Data Analytics, Live Stream Attendant",
+    "assistant_agents": [
+      {
+        "id": "service",
+        "icon": "💬",
+        "title": "Store Customer Service",
+        "desc": "24/7 intelligent response, pre-sales inquiry + after-sales support",
+        "tag": "Auto Service"
+      },
+      {
+        "id": "ops",
+        "icon": "🔍",
+        "title": "Operations Inspector",
+        "desc": "Auto-inspect all products, detect title/image/price anomalies",
+        "tag": "Daily Inspection"
+      },
+      {
+        "id": "product",
+        "icon": "✨",
+        "title": "Product Optimizer",
+        "desc": "SEO title optimization + hero image scoring + description enhancement",
+        "tag": "Conversion Boost"
+      },
+      {
+        "id": "selection",
+        "icon": "🎯",
+        "title": "Product Selection",
+        "desc": "Market trends + competitor mining + blue ocean category recommendations",
+        "tag": "Data-Driven"
+      },
+      {
+        "id": "compete",
+        "icon": "📊",
+        "title": "Competitor Monitor",
+        "desc": "Track competitor new arrivals, pricing, promotions, and reviews",
+        "tag": "Real-Time Tracking"
+      },
+      {
+        "id": "review",
+        "icon": "⭐",
+        "title": "Review Manager",
+        "desc": "Pin positive reviews + negative review alerts + auto-reply templates",
+        "tag": "Rating Keeper"
+      },
+      {
+        "id": "compliance",
+        "icon": "🛡️",
+        "title": "Risk Control",
+        "desc": "Prohibited word scanning + image compliance + IP infringement alerts",
+        "tag": "Zero Violation"
+      },
+      {
+        "id": "data",
+        "icon": "📈",
+        "title": "Data Analytics",
+        "desc": "Sales/traffic/conversion/AOV multi-dimensional dashboard + anomaly alerts",
+        "tag": "Smart Insights"
+      },
+      {
+        "id": "live",
+        "icon": "📡",
+        "title": "Live Stream Attendant",
+        "desc": "Auto reply to comments + product narration + engagement guidance",
+        "tag": "24/7 Online"
+      }
+    ],
+    "coming_soon_title": "Coming Soon",
+    "coming_soon_detail": "We're building full e-commerce automation capabilities. Once launched, it will support customer service, operations, data review, and all-role AI automation.",
+    "progress_label": "Progress",
+    "reserve_btn": "Reserve Early Access",
+    "reserve_toast": "We've received your reservation. We'll notify you as soon as it launches.",
+    "logout_confirm": "Are you sure you want to logout?",
+    "logout_success": "Logged out successfully",
+    "logout_fail": "Logout failed, please try again",
+    "workflow_desc": "Chain scattered tools into standardized automation workflows — one-click new arrivals, batch content creation, auto review management, daily data review, campaign marketing, self-audit risk control",
+    "lobster_desc": "End-to-end e-commerce operations pipeline — product research, content creation, listing & publishing, customer service, review management, data review, competitor monitoring, risk control",
+    "history_desc": "View all your creation history and manage your work",
+    "admin_panel": "Admin Panel",
+    "exit_login": "Logout",
+    "creation_placeholder_video": "Describe your product video, e.g. skincare demo video, 15s...",
+    "creation_placeholder_image": "Describe your product image, e.g. summer dress on white background, minimal...",
+    "creation_placeholder_detail": "Describe your detail page, e.g. face mask product page, Japanese minimal...",
+    "creation_placeholder_copywrite": "Describe your voice/copy needs, e.g. product voiceover script, TikTok copy...",
+    "creation_placeholder_other": "Describe your other creative needs, e.g. digital human sales, compliance check...",
+    "creation_placeholder_default": "Describe your creative needs...",
+    "creation_hint_video": "Image-to-video / Text-to-video / Storyboard / Digital human voiceover",
+    "creation_hint_image": "Text-to-image / Reference image / Batch processing / Retouch / Background removal",
+    "creation_hint_detail": "Detail page design / Main image set / Multi-platform adapt / Product rendering",
+    "creation_hint_copywrite": "Sales voiceover / Product copy / Multi-language translation / AI voice / Campaign scripts",
+    "creation_hint_other": "Digital human sales / Virtual livestream / Face swap / Image translate / Compliance check",
+    "creation_hint_default": "",
+    "creation_param_video_duration": "Duration",
+    "creation_param_video_resolution": "Resolution",
+    "creation_param_video_style": "Style",
+    "creation_param_image_size": "Image Size",
+    "creation_param_image_style": "Style",
+    "creation_param_image_count": "Count",
+    "creation_param_detail_platform": "Platform",
+    "creation_param_detail_style": "Page Style",
+    "creation_param_detail_modules": "Modules",
+    "creation_param_copywrite_type": "Copy Type",
+    "creation_param_copywrite_lang": "Language",
+    "creation_param_copywrite_tone": "Voice Tone",
+    "creation_param_other_tool": "Tool Type",
+    "creation_param_video_ratio": "Aspect Ratio",
+    "creation_param_image_bg": "Background",
+    "creation_param_copywrite_voice": "Voice",
+    "creation_param_other_format": "Format",
+    "creation_param_other_sort": "Sort By",
+    "creation_input_region": "{tab} — Creation Input",
+    "creation_upload_label": "Upload",
+    "creation_tools_region": "{tab} — Quick Tools",
+    "creation_quick_tools": "{tab} · Quick Tools",
+    "redirect_creation": "Redirecting to Creation Center...",
+    "creation_upload_hint": "Drag or click to upload assets",
+    "creation_param_label": "Parameters",
+    "creation_options": {
+      "duration": {
+        "15s": "15s",
+        "30s": "30s",
+        "60s": "60s",
+        "90s": "90s",
+        "3min": "3 min"
+      },
+      "ratio": {
+        "9_16": "9:16 Portrait",
+        "16_9": "16:9 Landscape",
+        "1_1": "1:1 Square",
+        "4_3": "4:3"
+      },
+      "resolution": {
+        "720p": "720p",
+        "1080p": "1080p",
+        "2k": "2K",
+        "4k": "4K"
+      },
+      "style": {
+        "modern": "Modern",
+        "vintage": "Vintage",
+        "minimal": "Minimal",
+        "dynamic": "Dynamic",
+        "premium": "Premium",
+        "guochao": "Guochao",
+        "japanese": "Japanese",
+        "cyber": "Cyber",
+        "korean": "Korean",
+        "western": "Western"
+      },
+      "size": {
+        "1_1": "1:1 Square",
+        "3_4": "3:4",
+        "4_3": "4:3",
+        "16_9": "16:9",
+        "9_16": "9:16",
+        "custom": "Custom"
+      },
+      "count": {
+        "1": "1",
+        "2": "2",
+        "4": "4",
+        "6": "6",
+        "8": "8"
+      },
+      "bg": {
+        "white": "White",
+        "transparent": "Transparent",
+        "scene": "Scene",
+        "custom": "Custom"
+      },
+      "platform": {
+        "taobao": "Taobao",
+        "pinduoduo": "Pinduoduo",
+        "douyin": "Douyin",
+        "amazon": "Amazon",
+        "temu": "Temu",
+        "shein": "Shein"
+      },
+      "modules": {
+        "full": "Full",
+        "compact": "Compact",
+        "hero_usp": "Hero+USP",
+        "custom": "Custom"
+      },
+      "copy_type": {
+        "sales_vo": "Sales VO",
+        "product_title": "Product Title",
+        "detail_copy": "Detail Copy",
+        "campaign_copy": "Campaign Copy",
+        "social_seeding": "Social Seeding"
+      },
+      "language": {
+        "chinese": "Chinese",
+        "english": "English",
+        "japanese": "Japanese",
+        "korean": "Korean",
+        "spanish": "Spanish"
+      },
+      "tone": {
+        "professional": "Professional",
+        "friendly": "Friendly",
+        "lively": "Lively",
+        "premium": "Premium",
+        "urgent": "Urgent"
+      },
+      "voice": {
+        "sweet_female": "Sweet Female",
+        "deep_male": "Deep Male",
+        "energetic_female": "Energetic Female",
+        "magnetic_male": "Magnetic Male",
+        "neutral": "Neutral"
+      },
+      "tool": {
+        "digital_human": "Digital Human",
+        "face_swap": "Face Swap",
+        "translate": "Translate",
+        "compliance": "Compliance",
+        "viral_clone": "Viral Clone"
+      },
+      "format": {
+        "all": "All",
+        "image": "Image",
+        "video": "Video",
+        "copy": "Copy",
+        "audio": "Audio",
+        "jpg": "JPG",
+        "png": "PNG",
+        "mp4": "MP4",
+        "gif": "GIF"
+      },
+      "sort": {
+        "recommended": "Recommended",
+        "newest": "Newest",
+        "hottest": "Hottest",
+        "free_first": "Free First"
+      }
+    },
+    "slide_panel": {
+      "close_aria": "Close panel",
+      "generate_btn": "⚡ Generate",
+      "upload_text": "Drag or click to upload",
+      "upload_hint": "Supports JPG / PNG / MP4, max 50MB per file",
+      "param_label": "Parameters",
+      "generating": "Generating...",
+      "step_upload": "Upload",
+      "step_analyze": "AI Analysis",
+      "step_generate": "Generate",
+      "step_done": "Done",
+      "result_name": "Result",
+      "download": "⬇ Download",
+      "reuse": "🔄 Reuse",
+      "close_result": "Close",
+      "progress_pct": "Generating... {pct}%",
+      "prompt_label": "Creative Brief",
+      "generate_error": "Generation failed, please retry",
+      "retry": "Retry"
+    },
+    "creation_sub_cards": {
+      "video": [
+        {
+          "icon": "🎥",
+          "title": "AI Short Video",
+          "desc": "Turn product images into sales videos with auto BGM+subtitles",
+          "route": "/work/video"
+        },
+        {
+          "icon": "🕺",
+          "title": "Action Transfer",
+          "desc": "AI-precise motion transfer from reference video to character",
+          "route": "/work/action-transfer"
+        },
+        {
+          "icon": "🎬",
+          "title": "Smart Storyboard",
+          "desc": "Auto-decompose scripts into shot plans+voiceover+subtitles",
+          "route": "/work/storyboard"
+        },
+        {
+          "icon": "✂️",
+          "title": "Video Editor",
+          "desc": "Smart crop/speed/transition/color, multi-size output",
+          "route": "/work/video-edit"
+        },
+        {
+          "icon": "📡",
+          "title": "Live Clip",
+          "desc": "Auto-extract highlights from livestream replays",
+          "route": "/work/live-clip"
+        },
+        {
+          "icon": "📋",
+          "title": "Batch Generate",
+          "desc": "Drag folder→queue→notify→download, night mode discount",
+          "route": "/work/batch"
+        }
+      ],
+      "image": [
+        {
+          "icon": "🖼️",
+          "title": "AI Product Image",
+          "desc": "One-click main image generation with auto cutout+retouch",
+          "route": "/work/image"
+        },
+        {
+          "icon": "🏞️",
+          "title": "Scene Generation",
+          "desc": "Product+AI scene library→auto lighting fusion→5 scene images",
+          "route": "/work/scene"
+        },
+        {
+          "icon": "✂️",
+          "title": "Smart Cutout",
+          "desc": "AI hair-level cutout for fur/transparent/complex edges",
+          "route": "/work/remove-bg"
+        },
+        {
+          "icon": "⬜",
+          "title": "White BG Image",
+          "desc": "Smart white/scene background generation, platform-ready",
+          "route": "/work/white-bg"
+        },
+        {
+          "icon": "✨",
+          "title": "Image Retouch",
+          "desc": "AI auto de-wrinkle/de-spot/light-fill/sharpen, batch enhance",
+          "route": "/work/retouch"
+        },
+        {
+          "icon": "🎨",
+          "title": "Style Transfer",
+          "desc": "6 styles: vintage/guochao/illustration/watercolor/cyber/minimal",
+          "route": "/work/style-transfer"
+        },
+        {
+          "icon": "🔄",
+          "title": "Color Swap",
+          "desc": "Apparel color swap preserving wrinkle texture, batch support",
+          "route": "/work/color-swap"
+        },
+        {
+          "icon": "↔️",
+          "title": "Smart Outpainting",
+          "desc": "AI extends image edges, auto-completes composition seamlessly",
+          "route": "/work/outpaint"
+        },
+        {
+          "icon": "📦",
+          "title": "Batch Render",
+          "desc": "50 images unified cutout+white bg+resize, night discount",
+          "route": "/work/batch"
+        }
+      ],
+      "detail": [
+        {
+          "icon": "📄",
+          "title": "Detail Page Design",
+          "desc": "Smart layout design, AI auto-generates copy+graphics",
+          "route": "/work/detail-h5"
+        },
+        {
+          "icon": "📱",
+          "title": "Multi-Platform Adapt",
+          "desc": "13 e-com platform templates, pick platform→template→generate",
+          "route": "/work/platform-detail"
+        },
+        {
+          "icon": "🏷️",
+          "title": "Selling Points",
+          "desc": "AI extracts product USPs, generates high-conversion detail copy",
+          "route": "/work/selling-points"
+        },
+        {
+          "icon": "🎯",
+          "title": "Template Apply",
+          "desc": "Premium detail page templates, upload+apply in one click",
+          "route": "/work/template-apply"
+        },
+        {
+          "icon": "👗",
+          "title": "Virtual Try-On",
+          "desc": "Flat clothing→real model fit, multi-skin-tone/body-type",
+          "route": "/work/virtual-tryon"
+        },
+        {
+          "icon": "👤",
+          "title": "Ghost Mannequin",
+          "desc": "Flat/hanging clothes→AI 3D ghost mannequin showcase",
+          "route": "/work/ghost-mannequin"
+        },
+        {
+          "icon": "🛒",
+          "title": "Product Rendering",
+          "desc": "3D product rotation/detail, 360° product showcase",
+          "route": "/work/product-render"
+        },
+        {
+          "icon": "📁",
+          "title": "Export Settings",
+          "desc": "Unified format/size/naming, one-click package download",
+          "route": "/work/output"
+        }
+      ],
+      "copywrite": [
+        {
+          "icon": "🎙️",
+          "title": "Sales Voiceover",
+          "desc": "Product USPs→AI voiceover script, 3 script types supported",
+          "route": "/work/script-gen"
+        },
+        {
+          "icon": "📝",
+          "title": "Product Copy",
+          "desc": "SEO titles+long-form detail copy, conversion-rate oriented",
+          "route": "/work/detail-copy"
+        },
+        {
+          "icon": "🌐",
+          "title": "Multi-Lang Translate",
+          "desc": "OCR product image text→9-language in-place translation",
+          "route": "/work/image-translate"
+        },
+        {
+          "icon": "🔊",
+          "title": "AI Voice Gen",
+          "desc": "Input copy→select host voice→natural sales voiceover",
+          "route": "/work/voice-gen"
+        },
+        {
+          "icon": "📢",
+          "title": "Campaign Copy",
+          "desc": "Promo/event/sale copy, multi-platform support",
+          "route": "/work/campaign-copy"
+        },
+        {
+          "icon": "📱",
+          "title": "Social Copy",
+          "desc": "Xiaohongshu/Douyin/TikTok seeding copy one-click",
+          "route": "/work/social-copy"
+        },
+        {
+          "icon": "📧",
+          "title": "Email Copy",
+          "desc": "EDM marketing email/SMS copy, multi-language",
+          "route": "/work/email-copy"
+        },
+        {
+          "icon": "🎤",
+          "title": "Voice Custom",
+          "desc": "50+ host voices, 9-language TTS speech synthesis",
+          "route": "/work/voice-custom"
+        }
+      ],
+      "other": [
+        {
+          "icon": "🤖",
+          "title": "Digital Human Sales",
+          "desc": "Input copy→select avatar+voice→AI sales video",
+          "route": "/work/digital-human"
+        },
+        {
+          "icon": "📡",
+          "title": "Digital Livestream",
+          "desc": "Virtual studio auto product showcase, 24/7 streaming",
+          "route": "/work/digital-live"
+        },
+        {
+          "icon": "🔄",
+          "title": "AI Face Swap",
+          "desc": "AI face replacement/digital human swap, multi-style",
+          "route": "/work/face-swap"
+        },
+        {
+          "icon": "🌐",
+          "title": "Image Translate",
+          "desc": "OCR product image text→9-language in-place translation",
+          "route": "/work/image-translate"
+        },
+        {
+          "icon": "🛡️",
+          "title": "Compliance Check",
+          "desc": "Amazon/Temu/TikTok/Shein compliance check, EU/US/JP",
+          "route": "/work/compliance-check"
+        },
+        {
+          "icon": "🔥",
+          "title": "Viral Clone",
+          "desc": "Analyze viral video rhythm/tone→regenerate with your product",
+          "route": "/work/viral-clone"
+        },
+        {
+          "icon": "🧬",
+          "title": "Avatar Custom",
+          "desc": "Custom digital human look/voice/motion, build your IP",
+          "route": "/work/avatar-custom"
+        },
+        {
+          "icon": "📐",
+          "title": "Shot Plan",
+          "desc": "Video shot order/duration planning, visual preview",
+          "route": "/work/shot-plan"
+        }
+      ]
+    },
+    "nav_main_label": "Workspace navigation",
+    "nav_home": "Home",
+    "nav_creation": "Creation Center",
+    "nav_agent": "AI Agent",
+    "nav_assistant": "AI Assistant",
+    "nav_workflow": "Workflow",
+    "nav_lobster": "Lobster",
+    "nav_history": "History",
+    "default_page_title": "Workspace",
+    "fold_expand": "Expand sidebar",
+    "fold_collapse": "Collapse sidebar",
+    "menu_open_label": "Open navigation menu",
+    "menu_close_label": "Close navigation menu",
+    "coming_soon_tag": "Coming Soon",
+    "points_label": "Points",
+    "creation_tabs": {
+      "video": "Video Generation",
+      "image": "Image Generation",
+      "detail": "E-Com Detail Page",
+      "copywrite": "Voice & Copywriting",
+      "other": "Other Creative Tools"
+    },
+    "recent_samples": [
+      {
+        "icon": "🖼",
+        "name": "Summer Dress White Background",
+        "time": "2 hours ago"
+      },
+      {
+        "icon": "🎥",
+        "name": "Skincare Demo Video",
+        "time": "Yesterday"
+      },
+      {
+        "icon": "📄",
+        "name": "Face Mask Detail Page",
+        "time": "Yesterday"
+      },
+      {
+        "icon": "📰",
+        "name": "618 Campaign Poster",
+        "time": "2 days ago"
+      }
+    ],
+    "default_cards": [
+      {
+        "id": "img_main",
+        "category": "image",
+        "icon": "🖼",
+        "title": "AI Product Image",
+        "desc": "One-click product main image for all platforms",
+        "route": "/work/image",
+        "order": 1,
+        "visible": true
+      },
+      {
+        "id": "video_gen",
+        "category": "video",
+        "icon": "🎥",
+        "title": "AI Short Video",
+        "desc": "Turn product images into sales videos",
+        "route": "/work/video",
+        "order": 1,
+        "visible": true
+      },
+      {
+        "id": "detail_page",
+        "category": "detail",
+        "icon": "📄",
+        "title": "Detail Page Design",
+        "desc": "Smart layout design for product detail pages",
+        "route": "/work/detail-page",
+        "order": 1,
+        "visible": true
+      },
+      {
+        "id": "copy_title",
+        "category": "copywrite",
+        "icon": "✍️",
+        "title": "Title/Selling Points",
+        "desc": "AI-generated high-conversion product titles",
+        "route": "/work/copywriting",
+        "order": 1,
+        "visible": true
+      },
+      {
+        "id": "digital_human",
+        "category": "digital",
+        "icon": "🤖",
+        "title": "Digital Human Sales",
+        "desc": "24/7 automated sales videos with digital humans",
+        "route": "/work/digital-human",
+        "order": 1,
+        "visible": true
+      }
+    ],
+    "default_tool_cards": {
+      "video": [
+        {
+          "id": "video_gen",
+          "category": "video",
+          "icon": "🎥",
+          "title": "AI Short Video",
+          "desc": "Turn product images into sales videos",
+          "route": "/work/video",
+          "order": 1,
+          "visible": true
+        },
+        {
+          "id": "video_edit",
+          "category": "video",
+          "icon": "✂",
+          "title": "Video Editor",
+          "desc": "Online clip/subtitle/music/color",
+          "route": "/work/video-edit",
+          "order": 2,
+          "visible": true
+        },
+        {
+          "id": "video_trans",
+          "category": "video",
+          "icon": "🌐",
+          "title": "Video Translate",
+          "desc": "Voice/subtitle/face 3-in-1 translation",
+          "route": "/work/video-translate",
+          "order": 3,
+          "visible": true
+        },
+        {
+          "id": "script_gen",
+          "category": "video",
+          "icon": "📝",
+          "title": "Short Video Script",
+          "desc": "Auto-generate sales video voiceover scripts",
+          "route": "/work/script-gen",
+          "order": 4,
+          "visible": true
+        },
+        {
+          "id": "shot_plan",
+          "category": "video",
+          "icon": "📐",
+          "title": "Shot Plan",
+          "desc": "Video shot plan/order/duration",
+          "route": "/work/shot-plan",
+          "order": 5,
+          "visible": true
+        },
+        {
+          "id": "storyboard",
+          "category": "video",
+          "icon": "🎞",
+          "title": "Storyboard",
+          "desc": "Visual storyboard preview for video ideas",
+          "route": "/work/storyboard",
+          "order": 6,
+          "visible": true
+        }
+      ],
+      "image": [
+        {
+          "id": "img_main",
+          "category": "image",
+          "icon": "🖼",
+          "title": "AI Product Image",
+          "desc": "One-click product main image for all platforms",
+          "route": "/work/image",
+          "order": 1,
+          "visible": true
+        },
+        {
+          "id": "img_scene",
+          "category": "image",
+          "icon": "🏞",
+          "title": "Scene Generation",
+          "desc": "Place products in lifestyle scenes",
+          "route": "/work/main-image",
+          "order": 2,
+          "visible": true
+        },
+        {
+          "id": "img_poster",
+          "category": "image",
+          "icon": "📰",
+          "title": "Poster Generator",
+          "desc": "Marketing/campaign/launch posters",
+          "route": "/work/poster",
+          "order": 3,
+          "visible": true
+        },
+        {
+          "id": "img_white_bg",
+          "category": "image",
+          "icon": "⬜",
+          "title": "White BG Image",
+          "desc": "Platform-compliant white background images",
+          "route": "/work/white-bg",
+          "order": 4,
+          "visible": true
+        },
+        {
+          "id": "img_bg_remove",
+          "category": "image",
+          "icon": "✂",
+          "title": "Smart Background Removal",
+          "desc": "AI 3-second precise subject cutout",
+          "route": "/work/remove-bg",
+          "order": 5,
+          "visible": true
+        },
+        {
+          "id": "img_retouch",
+          "category": "image",
+          "icon": "✨",
+          "title": "AI Retouch",
+          "desc": "Color/sharpen/texture enhancement",
+          "route": "/work/retouch",
+          "order": 6,
+          "visible": true
+        },
+        {
+          "id": "img_recolor",
+          "category": "image",
+          "icon": "🎯",
+          "title": "Color Swap",
+          "desc": "Show multiple colors for same style",
+          "route": "/work/color-swap",
+          "order": 7,
+          "visible": true
+        },
+        {
+          "id": "img_style",
+          "category": "image",
+          "icon": "🖌",
+          "title": "Style Transfer",
+          "desc": "Photo to oil/watercolor/3D style",
+          "route": "/work/style-transfer",
+          "order": 8,
+          "visible": true
+        },
+        {
+          "id": "img_text_fx",
+          "category": "image",
+          "icon": "🔤",
+          "title": "Text Effects",
+          "desc": "3D/metallic/neon title effects",
+          "route": "/work/text-effect",
+          "order": 9,
+          "visible": true
+        },
+        {
+          "id": "img_expand",
+          "category": "image",
+          "icon": "↔",
+          "title": "Smart Outpainting",
+          "desc": "Intelligent edge extension and completion",
+          "route": "/work/outpaint",
+          "order": 10,
+          "visible": true
+        },
+        {
+          "id": "batch_process",
+          "category": "image",
+          "icon": "📦",
+          "title": "Batch Processing",
+          "desc": "50 images unified cutout+white bg+resize",
+          "route": "/work/batch",
+          "order": 11,
+          "visible": true
+        }
+      ],
+      "detail": [
+        {
+          "id": "detail_page",
+          "category": "detail",
+          "icon": "📄",
+          "title": "Detail Page Design",
+          "desc": "Smart layout for product detail pages",
+          "route": "/work/detail-page",
+          "order": 1,
+          "visible": true
+        },
+        {
+          "id": "product_render",
+          "category": "detail",
+          "icon": "🛒",
+          "title": "Product Rendering",
+          "desc": "3D product rotation/detail showcase",
+          "route": "/work/product-render",
+          "order": 2,
+          "visible": true
+        },
+        {
+          "id": "virtual_tryon",
+          "category": "detail",
+          "icon": "👗",
+          "title": "Virtual Try-On",
+          "desc": "Buyers see clothing fit online",
+          "route": "/work/virtual-tryon",
+          "order": 3,
+          "visible": true
+        },
+        {
+          "id": "model_generate",
+          "category": "detail",
+          "icon": "🧍",
+          "title": "AI Model",
+          "desc": "AI virtual model wearing showcase",
+          "route": "/work/model-generate",
+          "order": 4,
+          "visible": true
+        },
+        {
+          "id": "img_ghost",
+          "category": "detail",
+          "icon": "👤",
+          "title": "Ghost Mannequin",
+          "desc": "Invisible mannequin fit showcase",
+          "route": "/work/ghost-mannequin",
+          "order": 5,
+          "visible": true
+        },
+        {
+          "id": "platform_taobao",
+          "category": "detail",
+          "icon": "📱",
+          "title": "Multi-Platform Adapt",
+          "desc": "Tmall/JD/Pinduoduo size adaption",
+          "route": "/work/multi-platform",
+          "order": 6,
+          "visible": true
+        },
+        {
+          "id": "main_img_set",
+          "category": "detail",
+          "icon": "🖼",
+          "title": "Main Image Set",
+          "desc": "Main+supplementary+white bg set",
+          "route": "/work/main-image-set",
+          "order": 7,
+          "visible": true
+        },
+        {
+          "id": "output",
+          "category": "detail",
+          "icon": "📁",
+          "title": "Export Settings",
+          "desc": "Unified format/size/naming export",
+          "route": "/work/output",
+          "order": 8,
+          "visible": true
+        }
+      ],
+      "copywrite": [
+        {
+          "id": "copy_title",
+          "category": "copywrite",
+          "icon": "📋",
+          "title": "E-Com Title",
+          "desc": "SEO titles/selling points batch gen",
+          "route": "/work/title-gen",
+          "order": 1,
+          "visible": true
+        },
+        {
+          "id": "copy_detail",
+          "category": "copywrite",
+          "icon": "📝",
+          "title": "Detail Copy",
+          "desc": "Long-form product detail page copy",
+          "route": "/work/detail-copy",
+          "order": 2,
+          "visible": true
+        },
+        {
+          "id": "script_gen2",
+          "category": "copywrite",
+          "icon": "🎙",
+          "title": "VO Script",
+          "desc": "Auto sales short video voiceover scripts",
+          "route": "/work/script-gen",
+          "order": 3,
+          "visible": true
+        },
+        {
+          "id": "campaign_copy",
+          "category": "copywrite",
+          "icon": "📢",
+          "title": "Campaign Copy",
+          "desc": "Promo/event/sale copy generation",
+          "route": "/work/campaign-copy",
+          "order": 4,
+          "visible": true
+        },
+        {
+          "id": "email_copy",
+          "category": "copywrite",
+          "icon": "📧",
+          "title": "Email Copy",
+          "desc": "EDM marketing email/SMS copy",
+          "route": "/work/email-copy",
+          "order": 5,
+          "visible": true
+        },
+        {
+          "id": "social_copy",
+          "category": "copywrite",
+          "icon": "📱",
+          "title": "Social Copy",
+          "desc": "Xiaohongshu/Douyin/TikTok copy",
+          "route": "/work/social-copy",
+          "order": 6,
+          "visible": true
+        }
+      ],
+      "digital": [
+        {
+          "id": "digital_human",
+          "category": "digital",
+          "icon": "🤖",
+          "title": "Digital Human Sales",
+          "desc": "24/7 automated sales videos",
+          "route": "/work/digital-human",
+          "order": 1,
+          "visible": true
+        },
+        {
+          "id": "digital_live",
+          "category": "digital",
+          "icon": "📡",
+          "title": "Digital Livestream",
+          "desc": "Virtual studio auto product showcase",
+          "route": "/work/digital-live",
+          "order": 2,
+          "visible": true
+        },
+        {
+          "id": "avatar_custom",
+          "category": "digital",
+          "icon": "🧬",
+          "title": "Avatar Custom",
+          "desc": "Custom digital human look/voice/motion",
+          "route": "/work/avatar-custom",
+          "order": 3,
+          "visible": true
+        },
+        {
+          "id": "ai_host",
+          "category": "digital",
+          "icon": "🎤",
+          "title": "AI Host",
+          "desc": "Smart voice product USP broadcast",
+          "route": "/work/ai-host",
+          "order": 4,
+          "visible": true
+        },
+        {
+          "id": "virtual_model",
+          "category": "digital",
+          "icon": "👤",
+          "title": "Virtual Model",
+          "desc": "AI virtual model wearing showcase",
+          "route": "/work/virtual-model",
+          "order": 5,
+          "visible": true
+        },
+        {
+          "id": "face_swap",
+          "category": "digital",
+          "icon": "🔄",
+          "title": "Face Swap",
+          "desc": "AI face replacement/digital human swap",
+          "route": "/work/face-swap",
+          "order": 6,
+          "visible": true
+        }
+      ]
+    },
+    "panel_param_type": "Type",
+    "panel_param_quality": "Quality",
+    "panel_param_format": "Format",
+    "panel_opt_auto": "Auto",
+    "panel_opt_standard": "Standard",
+    "panel_opt_premium": "Premium",
+    "panel_opt_sd": "SD",
+    "panel_opt_hd": "HD",
+    "panel_opt_uhd": "UHD",
+    "panel_generate_title": "{tab} — Generate Result"
+  },
+  "ai_assistant": {
+    "review": {
+      "title": "AI Content Review",
+      "subtitle": "Enter text to auto-detect violations, contact info, code injection risks",
+      "placeholder": "Enter text to review...",
+      "start_review": "Start Review",
+      "clear": "Clear",
+      "result_title": "Review Result",
+      "pass": "✓ Pass",
+      "fail": "✕ Fail",
+      "score_label": "Safety Score / 100",
+      "no_issues": "No risk content detected.",
+      "service_error": "Service Error"
+    },
+    "data": {
+      "title": "AI Data Analysis",
+      "subtitle": "Query operational data in natural language, AI auto-analyzes",
+      "placeholder": "Ask a question, e.g. how many users registered this week",
+      "analyze": "Analyze",
+      "service_unavailable": "Analysis service is temporarily unavailable. Please try again later.",
+      "hints": [
+        "How many users registered this week",
+        "Monthly revenue overview",
+        "Image generation stats"
+      ]
+    }
+  },
+  "assets": {
+    "title": "Assets Library",
+    "subtitle": "Manage all AI-generated works",
+    "loading": "Loading...",
+    "empty_title": "No assets yet",
+    "empty_hint": "AI-generated works will be saved here automatically",
+    "load_more": "Load More",
+    "load_error": "Failed to load assets",
+    "close_preview": "Close",
+    "preview_alt": "Asset Preview",
+    "download": "Download",
+    "copy_link": "Copy Link",
+    "filter_all": "All",
+    "filter_image": "Images",
+    "filter_video": "Videos",
+    "type_image_gen": "AI Image",
+    "type_image_replicate": "Image Replicate",
+    "type_batch_image": "Batch Image",
+    "type_batch_edit": "Batch Edit",
+    "type_video_gen": "AI Video",
+    "type_action_migrate": "Action Transfer",
+    "type_digital_human": "Digital Human",
+    "type_viral_replicate": "Viral Clone",
+    "type_live_clip": "Smart Clip"
+  },
+  "admin_shell": {
+    "expand_sidebar": "Expand Sidebar",
+    "collapse_sidebar": "Collapse Sidebar",
+    "switch_light": "Light Mode",
+    "switch_dark": "Dark Mode",
+    "notification": "Notifications",
+    "logout": "Logout",
+    "back": "Back"
+  },
   "error": {
     "404_title": "Page Not Found",
     "404_desc": "The page you visited has been deleted, renamed, or is temporarily unavailable. Please check the URL for typos.",
@@ -1252,5 +2488,22 @@
     "back_prev": "Go Back",
     "refresh_page": "Refresh Page",
     "home_btn": "Back to Home"
+  },
+  "help": {
+    "title": "Help Center",
+    "subtitle": "Answers to common questions about Movio AI",
+    "search_placeholder": "Search questions... Enter keywords to find answers",
+    "retry": "Reload",
+    "no_results": "No matching questions found",
+    "no_results_hint": "Try a different keyword, or contact us for help",
+    "helpful": "Helpful?",
+    "no_answer": "Didn't find an answer?",
+    "work_hours": "Weekdays 9:00-18:00",
+    "cat_all": "All",
+    "cat_usage": "Usage Guide",
+    "cat_account": "Account & Membership",
+    "cat_platform": "Platform",
+    "load_failed": "Failed to load",
+    "load_error": "Failed to load FAQ, please try again later"
   }
 }
