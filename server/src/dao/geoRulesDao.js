@@ -1,4 +1,5 @@
 import pool from './db.js';
+import { BusinessError } from '../utils/businessError.js';
 
 const table = 'geo_rules';
 const COLS = 'id, rule_name, country_codes, platform_codes, locale, blocked_models, review_level, output_constraints, priority, enabled, description, create_time, update_time';
@@ -36,7 +37,7 @@ export const insert = async (fields) => {
       placeholders.push('?');
     }
   }
-  if (keys.length === 0) throw new Error('No valid fields');
+  if (keys.length === 0) throw new BusinessError(400, '没有有效的更新字段');
   const [result] = await pool.query(`INSERT INTO ${table} (${keys.join(', ')}) VALUES (${placeholders.join(', ')})`, vals);
   return result.insertId;
 };

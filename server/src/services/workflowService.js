@@ -3,6 +3,7 @@
  */
 import * as wfDao from '../dao/workflowDao.js';
 import logger from '../utils/logger.js';
+import { BusinessError } from '../utils/businessError.js';
 
 // ─── 模板操作 ───
 export async function listTemplates(filter) {
@@ -131,7 +132,7 @@ async function executeStep(step, context) {
       return { download_url: 'https://example.com/export/batch-output.zip' };
     }
     default:
-      throw new Error(`不支持的步骤类型: ${step.type}`);
+      throw new BusinessError(400, `不支持的步骤类型: ${step.type}`);
   }
 }
 
