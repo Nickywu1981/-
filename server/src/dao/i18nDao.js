@@ -50,7 +50,7 @@ export async function upsertBatch(locale, entries) {
     const [result] = await conn.query(sql, params);
     return result.affectedRows;
   } finally {
-    conn.release();
+    if (conn) conn.release();
   }
 }
 

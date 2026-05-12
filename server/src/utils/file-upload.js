@@ -178,19 +178,25 @@ export async function completeUpload(uploadId) {
 
   await new Promise((resolve, reject) => {
     const writeStream = fs.createWriteStream(finalPath);
+    let writeFailed = false;
+    writeStream.on('error', (err) => { writeFailed = true; reject(err); });
     (async () => {
       try {
         for (let i = 0; i < meta.totalChunks; i++) {
+          if (writeFailed) return;
           const chunkPath = path.join(chunkDir, `${i}`);
           const chunkData = await fsp.readFile(chunkPath);
           if (!writeStream.write(chunkData)) {
-            await new Promise(r => writeStream.once('drain', r));
+            await new Promise((r) => {
+              writeStream.once('drain', r);
+              writeStream.once('error', (err) => { writeFailed = true; reject(err); });
+            });
           }
         }
-        writeStream.on('error', reject);
+        if (writeFailed) return;
         writeStream.end();
-        writeStream.on('finish', resolve);
-      } catch (err) { writeStream.destroy(); reject(err); }
+        writeStream.once('finish', resolve);
+      } catch (err) { writeStream.destroy(); if (!writeFailed) reject(err); }
     })();
   });
 

@@ -45,6 +45,9 @@ class WsManager {
 
   /** 挂载到 HTTP server */
   attach(server) {
+    if (this.wss) {
+      this.wss.close();
+    }
     this.wss = new WebSocketServer({ server, path: '/ws', maxPayload: 64 * 1024 });
 
     // 心跳检测：可通过 WS_HEARTBEAT_MS 配置间隔

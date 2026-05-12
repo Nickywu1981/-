@@ -26,9 +26,10 @@ export async function call(endpoint, apiKey, params, options = {}) {
       throw new BusinessError(503, `[${modelName || 'AI'}] 熔断器已开启，请稍后重试`);
     }
 
+    let timeout;
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), timeoutMs);
+      timeout = setTimeout(() => controller.abort(), timeoutMs);
 
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -56,6 +57,7 @@ export async function call(endpoint, apiKey, params, options = {}) {
 
       return result;
     } catch (err) {
+      if (timeout) clearTimeout(timeout);
       lastError = err;
 
       if (breaker instanceof CircuitBreaker) {

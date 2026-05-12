@@ -91,7 +91,8 @@ export default {
   },
 
   async checkWhitelist(tenantId, url) {
-    const { hostname } = new URL(url);
+    let hostname;
+    try { hostname = new URL(url).hostname; } catch { return []; }
     const [rows] = await pool.query(
       `SELECT id FROM api_proxy_whitelist
        WHERE (tenant_id = 0 OR tenant_id = ?) AND status = 1

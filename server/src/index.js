@@ -45,7 +45,7 @@ server.listen(port, () => {
   // 定时清理废弃上传 (每 30 分钟)
   cleanupTimer = setInterval(() => {
     import('./utils/file-upload.js').then(({ cleanupStaleUploads }) => cleanupStaleUploads()).catch((err) => { logger.warn('[Cleanup] 加载失败', { error: err.message }); });
-  }, 30 * 60 * 1000);
+  }, 30 * 60 * 1000).unref();
 
   // 定时恢复卡住的任务 (每 5 分钟)
   recoverTimer = setInterval(() => {
@@ -72,7 +72,13 @@ process.on('unhandledRejection', (reason) => {
 
 // ==================== 优雅关闭 ====================
 
+let shuttingDown = false;
+let forceExitTimer = null;
+
 function gracefulShutdown(signal) {
+  if (shuttingDown) return;
+  shuttingDown = true;
+
   logger.info(`收到 ${signal}，开始优雅关闭...`);
   const isCrash = signal === 'uncaughtException' || signal === 'unhandledRejection';
   const exitCode = isCrash ? 1 : 0;
@@ -106,13 +112,14 @@ function gracefulShutdown(signal) {
       logger.info('Redis 已关闭');
     } catch (e) { logger.warn('Redis 关闭失败', { message: e.message }); }
 
+    if (forceExitTimer) { clearTimeout(forceExitTimer); forceExitTimer = null; }
     // eslint-disable-next-line no-process-exit
     process.exit(exitCode);
     })().catch((e) => { logger.error('优雅关闭失败', { message: e.message }); process.exit(1); });
   });
 
   // 10秒强制退出
-  setTimeout(() => {
+  forceExitTimer = setTimeout(() => {
     logger.error('强制退出');
     // eslint-disable-next-line no-process-exit
     process.exit(1);
