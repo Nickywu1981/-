@@ -72,6 +72,7 @@ export default {
     return rows[0] || null;
   },
 
+  // 公开页面按 slug 查询，依赖 slug 全局唯一性（建议 DB 层加 UNIQUE(slug) 约束）
   async getPublishedPage(slug) {
     // 先查 Redis
     const redis = getRedis();

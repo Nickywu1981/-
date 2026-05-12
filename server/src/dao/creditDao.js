@@ -246,6 +246,7 @@ export async function getFreePlanMembersForUpdate(conn) {
   return rows;
 }
 
+// 全局定时任务：为所有租户的免费计划用户充值点数（有意跨租户）
 export async function batchUpdateFreePlanCredits(delta, conn) {
   const db = conn || pool;
   const [result] = await db.execute(
