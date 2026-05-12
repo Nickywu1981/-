@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { tenantPool } from './tenantPool.js';
+import { parsePagination } from '../utils/pagination.js';
 import logger from '../utils/logger.js';
 
 function pool() {
