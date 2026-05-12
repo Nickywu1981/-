@@ -175,12 +175,20 @@ export async function updateUserStatus(userId, status, tenantId) {
 }
 
 export async function batchUpdateUserStatus(ids, status, tenantId) {
-  const placeholders = ids.map(() => '?').join(',');
-  let sql = `UPDATE user SET status = ? WHERE id IN (${placeholders})`;
-  const params = [status, ...ids];
-  if (tenantId) { sql += ' AND tenant_id = ?'; params.push(tenantId); }
-  const [result] = await pool.execute(sql, params);
-  return result.affectedRows;
+  if (!ids || !ids.length) return 0;
+  // 分批防止 IN 子句过大
+  const CHUNK = 500;
+  let totalAffected = 0;
+  for (let i = 0; i < ids.length; i += CHUNK) {
+    const chunk = ids.slice(i, i + CHUNK);
+    const placeholders = chunk.map(() => '?').join(',');
+    let sql = `UPDATE user SET status = ? WHERE id IN (${placeholders})`;
+    const params = [status, ...chunk];
+    if (tenantId) { sql += ' AND tenant_id = ?'; params.push(tenantId); }
+    const [result] = await pool.execute(sql, params);
+    totalAffected += result.affectedRows;
+  }
+  return totalAffected;
 }
 
 // ==================== 风控 ====================

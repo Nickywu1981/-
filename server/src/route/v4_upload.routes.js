@@ -28,7 +28,7 @@ const _upload = multer({
   limits: { fileSize: 50 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     if (!ALLOWED_MIMES.includes(file.mimetype)) {
-      cb(new BusinessError(400, '不支持的文件类型'), false);
+      cb(new BusinessError(ERROR_CODE.VALIDATION_ERROR, '不支持的文件类型'), false);
     } else {
       cb(null, true);
     }

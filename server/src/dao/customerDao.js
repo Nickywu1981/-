@@ -166,19 +166,19 @@ export async function untagCustomer(tagId, userId) {
 }
 
 export async function batchTagCustomers(tagId, userIds) {
+  if (!userIds || !userIds.length) return 0;
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
-    let count = 0;
-    for (const userId of userIds) {
-      const [r] = await conn.execute(
-        'INSERT IGNORE INTO customer_tag_rel (tag_id, user_id) VALUES (?, ?)',
-        [tagId, userId],
-      );
-      count += r.affectedRows;
-    }
+    const placeholders = userIds.map(() => '(?, ?)').join(', ');
+    const flatParams = [];
+    for (const uid of userIds) { flatParams.push(tagId, uid); }
+    const [r] = await conn.execute(
+      `INSERT IGNORE INTO customer_tag_rel (tag_id, user_id) VALUES ${placeholders}`,
+      flatParams,
+    );
     await conn.commit();
-    return count;
+    return r.affectedRows;
   } catch (e) {
     await conn.rollback();
     throw e;

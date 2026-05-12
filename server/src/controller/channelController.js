@@ -1,6 +1,7 @@
 import * as channelService from '../services/channelService.js';
 import { wrapController } from '../utils/wrapController.js';
 import { BusinessError } from '../utils/businessError.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 export const listChannels = wrapController(async (req) => {
   const query = req.validated || req.query;
@@ -55,6 +56,6 @@ export const getPerformance = wrapController(async (req) => {
 export const getPerformanceSummary = wrapController(async (req) => {
   const query = req.validated || req.query;
   const { startDate, endDate } = query;
-  if (!startDate || !endDate) throw new BusinessError(400, '请提供统计起止日期');
+  if (!startDate || !endDate) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '请提供统计起止日期');
   return channelService.getPerformanceSummary(req.tenantId, startDate, endDate);
 });
