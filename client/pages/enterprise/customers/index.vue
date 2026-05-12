@@ -175,9 +175,9 @@ table { width: 100%; border-collapse: collapse; }
 th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border-light); font-size: 14px; }
 th { font-weight: 600; color: var(--text-secondary); background: var(--bg-subtle); }
 .status-tag { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; }
-.status-tag.on { background: #d1fae5; color: #065f46; }
-.status-tag.off { background: #fee2e2; color: #991b1b; }
-.tag-chip { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; color: #fff; margin-right: 4px; }
+.status-tag.on { background: var(--success-bg); color: var(--color-success-700); }
+.status-tag.off { background: var(--danger-bg); color: var(--color-danger-700); }
+.tag-chip { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; color: var(--text-on-brand); margin-right: 4px; }
 .actions { display: flex; gap: 8px; }
 .btn-sm { padding: 4px 10px; font-size: 13px; border: 1px solid var(--border-primary); border-radius: 4px; background: var(--bg-card); cursor: pointer; color: var(--text-primary); }
 .btn-sm.danger { color: var(--color-danger); border-color: var(--color-danger-soft); }

@@ -64,6 +64,6 @@ th { background: var(--table-header-bg); color: var(--text-secondary); font-weig
 .status-tag.pending { background: var(--warning-bg); color: var(--warning); }
 .empty { padding: 60px; text-align: center; color: var(--text-muted); }
 .pager { display: flex; justify-content: center; align-items: center; gap: 12px; padding: 16px; }
-.pager button { padding: 6px 14px; border: 1px solid #ddd; background: #fff; border-radius: 6px; cursor: pointer; }
+.pager button { padding: 6px 14px; border: 1px solid var(--border-light); background: var(--bg-card); border-radius: 6px; cursor: pointer; }
 .pager button:disabled { opacity: 0.4; }
 </style>
