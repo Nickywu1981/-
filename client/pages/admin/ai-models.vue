@@ -101,7 +101,7 @@ onMounted(fetchStatus)
 </script>
 
 <style scoped>
-.admin-page { max-width: 1100px; }
+.admin-page { max-width: 1100px; --cfg-warn-bg: #FFFBEB; --cfg-warn-border: #F59E0B; --cfg-text-on-primary: #fff; }
 .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
 .page-header h1 { font-size: 20px; font-weight: 700; color: var(--cfg-text-primary, #1a1a2e); }
 .refresh-btn {
@@ -120,7 +120,7 @@ onMounted(fetchStatus)
   background: var(--cfg-bg-secondary, #fff); border: 1px solid var(--cfg-border, #e2e8f0);
   border-radius: 12px; padding: 20px;
 }
-.stat-card.card-warn { border-color: #F59E0B; background: #FFFBEB; }
+.stat-card.card-warn { border-color: var(--cfg-warn-border); background: var(--cfg-warn-bg); }
 
 .stat-card-skel { height: 130px; background: var(--cfg-bg-secondary, #fff); border: 1px solid var(--cfg-border, #e2e8f0); border-radius: 12px; }
 
@@ -147,7 +147,7 @@ onMounted(fetchStatus)
   border-radius: 6px; background: var(--cfg-bg-secondary, #fff); color: var(--cfg-primary, #3B82F6);
   cursor: pointer; transition: background 0.2s, color 0.2s, border-color 0.2s;
 }
-.btn-sm:hover:not(:disabled) { background: var(--cfg-primary, #3B82F6); color: #fff; border-color: var(--cfg-primary, #3B82F6); }
+.btn-sm:hover:not(:disabled) { background: var(--cfg-primary, #3B82F6); color: var(--cfg-text-on-primary); border-color: var(--cfg-primary, #3B82F6); }
 .btn-sm:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .info-box {
@@ -168,9 +168,15 @@ onMounted(fetchStatus)
 .error-state p { margin: 12px 0; }
 .retry-btn {
   padding: 8px 20px; border: none; border-radius: 8px; background: var(--cfg-primary, #3B82F6);
-  color: #fff; cursor: pointer; font-size: 14px;
+  color: var(--cfg-text-on-primary); cursor: pointer; font-size: 14px;
 }
 
 .pulse { animation: pulse 1.5s ease-in-out infinite; }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+/* Dark mode */
+:root[data-theme="dark"] .admin-page, :root.dark .admin-page {
+  --cfg-warn-bg: #3a2e0a;
+  --cfg-warn-border: #B45309;
+}
 </style>

@@ -181,7 +181,7 @@ async function handleSubmit() {
 </script>
 
 <style scoped>
-.wc { max-width: 1100px; margin: 0 auto; padding: 24px 28px; }
+.wc { max-width: 1100px; margin: 0 auto; padding: 24px 28px; --wc-card-bg: #fff; --wc-input-shadow: 0 1px 3px rgba(0,0,0,0.04); --wc-tab-hover-bg: rgba(0,0,0,0.04); --wc-border-hover: #d4d4d4; --wc-card-shadow: 0 8px 24px rgba(0,0,0,0.08); --wc-text-on-brand: #fff; }
 
 /* ═══ Tabs ═══ */
 .wc-tabs { display: flex; gap: 4px; margin-bottom: 20px; flex-wrap: wrap; }
@@ -189,12 +189,12 @@ async function handleSubmit() {
   padding: 7px 16px; border-radius: 8px; font-size: 13px; background: none; border: none;
   color: var(--tx2, #6b6b70); cursor: pointer; transition: background 0.15s, color 0.15s;
 }
-.wc-tab:hover { background: rgba(0,0,0,0.04); color: var(--tx, #171717); }
+.wc-tab:hover { background: var(--wc-tab-hover-bg); color: var(--tx, #171717); }
 .wc-tab:focus-visible { outline: 2px solid var(--brand, #5b5fe3); outline-offset: 2px; border-radius: 4px; }
-.wc-tab.sel { background: var(--brand, #5b5fe3); color: #fff; }
+.wc-tab.sel { background: var(--brand, #5b5fe3); color: var(--wc-text-on-brand); }
 
 /* ═══ Input ═══ */
-.wc-input { background: #fff; border-radius: 14px; padding: 18px; border: 1px solid var(--brd, #ebebea); box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 28px; }
+.wc-input { background: var(--wc-card-bg); border-radius: 14px; padding: 18px; border: 1px solid var(--brd, #ebebea); box-shadow: var(--wc-input-shadow); margin-bottom: 28px; }
 .wc-textarea {
   width: 100%; border: none; resize: none; font-size: 14px; line-height: 1.6; color: var(--tx, #171717);
   font-family: inherit; outline: none; background: none;
@@ -209,7 +209,7 @@ async function handleSubmit() {
 .wc-hint { font-size: 11px; color: var(--tx3, #9d9da3); }
 .wc-submit {
   padding: 8px 20px; border-radius: 8px; font-size: 13px; font-weight: 500; border: none;
-  background: var(--brand, #5b5fe3); color: #fff; cursor: pointer; transition: opacity 0.15s, transform 0.15s;
+  background: var(--brand, #5b5fe3); color: var(--wc-text-on-brand); cursor: pointer; transition: opacity 0.15s, transform 0.15s;
 }
 .wc-submit:hover { opacity: 0.85; transform: scale(1.02); }
 .wc-submit:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
@@ -222,10 +222,10 @@ async function handleSubmit() {
 .wc-sec-more:hover { color: var(--tx, #171717); }
 .wc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
 .wc-card {
-  background: #fff; border-radius: 11px; padding: 18px 16px; border: 1px solid var(--brd, #ebebea);
+  background: var(--wc-card-bg); border-radius: 11px; padding: 18px 16px; border: 1px solid var(--brd, #ebebea);
   cursor: pointer; transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 }
-.wc-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); border-color: #d4d4d4; }
+.wc-card:hover { transform: translateY(-3px); box-shadow: var(--wc-card-shadow); border-color: var(--wc-border-hover); }
 .wc-card:focus-visible { outline: 2px solid var(--brand, #5b5fe3); outline-offset: 2px; }
 .wc-card-icon { font-size: 24px; margin-bottom: 8px; }
 .wc-card-title { font-size: 13px; font-weight: 500; color: var(--tx, #171717); margin-bottom: 4px; }
@@ -240,13 +240,13 @@ async function handleSubmit() {
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* Dark mode */
-:root[data-theme="dark"] .wc-input, :root.dark .wc-input { background: #1a1a1a; border-color: #2a2a2a; }
-:root[data-theme="dark"] .wc-textarea, :root.dark .wc-textarea { color: #e5e5e5; }
-:root[data-theme="dark"] .wc-tab, :root.dark .wc-tab { color: #9d9da3; }
-:root[data-theme="dark"] .wc-tab:hover, :root.dark .wc-tab:hover { background: rgba(255,255,255,0.06); color: #e5e5e5; }
-:root[data-theme="dark"] .wc-card, :root.dark .wc-card { background: #1a1a1a; border-color: #2a2a2a; }
-:root[data-theme="dark"] .wc-card-title, :root.dark .wc-card-title,
-:root[data-theme="dark"] .wc-sec-title, :root.dark .wc-sec-title { color: #e5e5e5; }
+:root[data-theme="dark"] .wc, :root.dark .wc {
+  --wc-card-bg: #1a1a1a;
+  --wc-tab-hover-bg: rgba(255,255,255,0.06);
+  --wc-border-hover: #3a3a3a;
+  --wc-input-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  --wc-card-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
 
 /* Entrance animations */
 .wc-card { opacity: 0; transform: translateY(20px); transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1), transform 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
