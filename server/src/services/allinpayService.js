@@ -5,7 +5,7 @@
  * 回调处理必须幂等：同一 reqsn+trxid 重复回调仅处理一次
  */
 import crypto from 'crypto';
-import pool from '../dao/db.js';
+import { withTransaction } from '../dao/transaction.js';
 import allinpayDao from '../dao/allinpayDao.js';
 import * as allinpaySDK from '../utils/allinpaySDK.js';
 import membershipDao from '../dao/membershipDao.js';
@@ -140,33 +140,31 @@ export async function handleNotify(body) {
   }
 
   // 6. 事务包裹：标记支付 + 履约发放（防数据损坏）
-  const conn = await pool.getConnection();
+  let skipped = false;
   try {
-    await conn.beginTransaction();
+    await withTransaction(async (conn) => {
+      const affected = await allinpayDao.markPaid(reqsn, trxid || '', body, conn);
+      if (affected === 0) {
+        skipped = true;
+        throw new Error('CONCURRENT_PROCESSED');
+      }
 
-    const affected = await allinpayDao.markPaid(reqsn, trxid || '', body, conn);
-    if (affected === 0) {
-      // 乐观锁冲突：另一并发回调已处理，跳过履约
-      await conn.rollback();
+      if (order.order_type === 'membership') {
+        await fulfillMembership(order, conn);
+      } else if (order.order_type === 'recharge') {
+        await fulfillRecharge(order, conn);
+      }
+    });
+  } catch (e) {
+    if (skipped) {
       logger.info('[Allinpay] 订单已被并发回调处理，跳过履约', { reqsn });
       return true;
     }
-
-    if (order.order_type === 'membership') {
-      await fulfillMembership(order, conn);
-    } else if (order.order_type === 'recharge') {
-      await fulfillRecharge(order, conn);
-    }
-
-    await conn.commit();
-    logger.info('[Allinpay] 回调履约成功', { reqsn, orderType: order.order_type });
-  } catch (e) {
-    await conn.rollback();
     logger.error('[Allinpay] 回调履约失败，已回滚', { reqsn, orderType: order.order_type, error: e.message });
     throw e;
-  } finally {
-    conn.release();
   }
+
+  logger.info('[Allinpay] 回调履约成功', { reqsn, orderType: order.order_type });
 
   // 发送用户通知
   try {

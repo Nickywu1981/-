@@ -1,5 +1,5 @@
 import pool from './db.js';
-import { withTransaction } from './diyDao.js';
+import { withTransaction } from './transaction.js';
 
 export default {
   // ── 表单 CRUD ──

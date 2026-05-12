@@ -2,24 +2,10 @@ import pool from './db.js';
 import { getRedis } from './redis.js';
 import logger from '../utils/logger.js';
 
+import { withTransaction } from './transaction.js';
+
 const REDIS_KEY_PREFIX = 'diy:page:';
 const REDIS_TTL = 86400; // 24h
-
-// 事务工具：获取连接 → 执行 → 提交/回滚
-export async function withTransaction(fn) {
-  const conn = await pool.getConnection();
-  try {
-    await conn.beginTransaction();
-    const result = await fn(conn);
-    await conn.commit();
-    return result;
-  } catch (e) {
-    await conn.rollback();
-    throw e;
-  } finally {
-    conn.release();
-  }
-}
 
 // ==================== 页面 CRUD（增强版） ====================
 

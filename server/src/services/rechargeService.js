@@ -2,7 +2,7 @@ import rechargeDao from '../dao/rechargeDao.js';
 import * as allinpayService from '../services/allinpayService.js';
 import * as creditDao from '../dao/creditDao.js';
 import crypto from 'crypto';
-import pool from '../dao/db.js';
+import { withTransaction } from '../dao/transaction.js';
 import logger from '../utils/logger.js';
 import { BusinessError } from '../utils/businessError.js';
 import { RECHARGE_PAY_STATUS } from '../constants/domainStatus.js';
@@ -56,13 +56,9 @@ export async function listAllOrders() {
 }
 
 export async function refundOrder(orderNo) {
-  // 在事务内 SELECT FOR UPDATE 防止并发退款
-  const conn = await pool.getConnection();
-  try {
-    await conn.beginTransaction();
+  await withTransaction(async (conn) => {
     const order = await rechargeDao.lockByOrderNo(orderNo, conn);
     if (!order || order.pay_status !== RECHARGE_PAY_STATUS.PAID) {
-      await conn.rollback();
       throw new BusinessError(404, '订单不存在或未支付');
     }
 
@@ -73,14 +69,7 @@ export async function refundOrder(orderNo) {
       creditBefore: null, creditAfter: null, consumed: -order.coin_amount,
       remark: `充值退款 — 订单 ${orderNo}`, requestId: orderNo, status: 2,
     }, conn);
-    await conn.commit();
     logger.info('[Recharge] 退款完成', { orderNo, userId: order.user_id, coinAmount: order.coin_amount });
-  } catch (e) {
-    await conn.rollback();
-    logger.error('[Recharge] 退款失败', { orderNo, error: e.message });
-    throw new BusinessError(500, '退款处理失败');
-  } finally {
-    conn.release();
-  }
+  });
   return true;
 }

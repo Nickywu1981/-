@@ -316,7 +316,7 @@ export async function listFields(formId, tenantId) {
 }
 
 export async function upsertFields(formId, tenantId, fields) {
-  const { withTransaction } = await import('../dao/diyDao.js');
+  const { withTransaction } = await import('../dao/transaction.js');
   return withTransaction(async (conn) => {
     await formDao.deleteFields(formId, tenantId, conn);
     if (fields?.length) await formDao.batchInsertFields(tenantId, formId, fields, conn);
