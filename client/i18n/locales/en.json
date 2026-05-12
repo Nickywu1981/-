@@ -418,6 +418,7 @@
       "reuse": "🔄 Reuse",
       "close_result": "Close",
       "progress_pct": "Generating... {pct}%",
+      "prompt_label": "Creative Brief",
       "generate_error": "Generation failed, please retry",
       "retry": "Retry"
     },

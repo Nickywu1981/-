@@ -419,6 +419,7 @@
       "reuse": "🔄 复用",
       "close_result": "关闭",
       "progress_pct": "生成中... {pct}%",
+      "prompt_label": "创作需求",
       "generate_error": "生成失败，请重试",
       "retry": "重试"
     },
