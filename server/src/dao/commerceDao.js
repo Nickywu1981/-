@@ -361,3 +361,50 @@ export async function deletePaymentOrder(orderId, tenantId) {
     await pool.execute('DELETE FROM payment_order WHERE id = ?', [orderId]);
   }
 }
+
+// ==================== 企业订单管理 ====================
+
+export async function listEnterpriseOrders(tenantId, { page, pageSize, status, startDate, endDate, keyword }) {
+  const conditions = ['o.tenant_id = ?'];
+  const params = [tenantId];
+  if (status) { conditions.push('o.status = ?'); params.push(status); }
+  if (startDate) { conditions.push('o.created_at >= ?'); params.push(startDate); }
+  if (endDate) { conditions.push('o.created_at <= ?'); params.push(endDate + ' 23:59:59'); }
+  if (keyword) { conditions.push('(o.order_no LIKE ? OR u.nickname LIKE ? OR u.phone LIKE ?)'); params.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`); }
+
+  const offset = (page - 1) * pageSize;
+  const [rows] = await pool.query(
+    `SELECT o.*, u.nickname AS customer_name, u.phone AS customer_phone
+     FROM \`order\` o LEFT JOIN user u ON o.user_id = u.id
+     WHERE ${conditions.join(' AND ')}
+     ORDER BY o.created_at DESC LIMIT ? OFFSET ?`,
+    [...params, pageSize, offset],
+  );
+  const [[{ total }]] = await pool.query(
+    `SELECT COUNT(*) AS total FROM \`order\` o WHERE ${conditions.join(' AND ')}`,
+    params,
+  );
+  return { list: rows, total };
+}
+
+export async function getEnterpriseOrderById(orderId, tenantId) {
+  const [rows] = await pool.query(
+    `SELECT o.*, u.nickname AS customer_name, u.phone AS customer_phone, u.email AS customer_email
+     FROM \`order\` o LEFT JOIN user u ON o.user_id = u.id
+     WHERE o.id = ? AND o.tenant_id = ?`,
+    [orderId, tenantId],
+  );
+  return rows[0] || null;
+}
+
+export async function getEnterpriseOrderStats(tenantId) {
+  const [rows] = await pool.query(
+    `SELECT COUNT(*) AS total_orders,
+            COALESCE(SUM(CASE WHEN status IN ('paid','completed') THEN amount ELSE 0 END), 0) AS total_revenue,
+            COALESCE(SUM(CASE WHEN status = 'refunded' THEN amount ELSE 0 END), 0) AS total_refund,
+            COALESCE(SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END), 0) AS pending_count
+     FROM \`order\` WHERE tenant_id = ?`,
+    [tenantId],
+  );
+  return rows[0];
+}
