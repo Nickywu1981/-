@@ -1,13 +1,37 @@
 {
   "nav": {
     "home": "首页",
-    "workspace": "控制台",
+    "workspace": "工作台",
     "my": "我的",
     "admin": "管理",
     "help": "帮助",
     "compare": "竞品对比",
     "login": "登录",
-    "register": "免费注册"
+    "register": "免费注册",
+    "notifications": "通知",
+    "user_menu": "用户菜单",
+    "account_settings": "个人设置",
+    "my_membership": "我的会员",
+    "billing": "消费账单",
+    "admin_panel": "管理后台",
+    "logout": "退出登录",
+    "open_menu": "打开菜单",
+    "close_menu": "关闭菜单"
+  },
+  "a11y": {
+    "skip_to_main": "跳到主要内容",
+    "home_page": "Movio AI 首页"
+  },
+  "search": {
+    "placeholder": "搜索功能...",
+    "label": "搜索功能",
+    "hotkey_title": "搜索功能 (Ctrl+K)"
+  },
+  "theme": {
+    "switch_light": "切换亮色",
+    "switch_dark": "切换暗色",
+    "light_mode": "切换到亮色模式",
+    "dark_mode": "切换到暗色模式"
   },
   "landing": {
     "hero_title": "Movio AI — 全链路运营助手",
@@ -704,7 +728,8 @@
     "share": "分享",
     "settings": "设置",
     "more": "更多",
-    "language": "语言"
+    "language": "语言",
+    "logout_confirm": "确定要退出登录吗？"
   },
   "admin": {
     "dashboard": "数据看板",
@@ -1321,7 +1346,20 @@
     "enter_email_and_code": "请输入邮箱和验证码",
     "enter_email": "请输入邮箱",
     "no_account": "还没有账号？",
-    "free_register": "免费注册"
+    "free_register": "免费注册",
+    "register_title": "免费注册",
+    "register_subtitle": "新用户注册即送 50 算力点",
+    "tab_password_register": "密码注册",
+    "tab_sms_register": "手机注册",
+    "tab_email_register": "邮箱注册",
+    "registering": "注册中...",
+    "nickname": "昵称（选填）",
+    "password_hint": "密码（至少8位）",
+    "register_failed": "注册失败",
+    "enter_phone_and_code_reg": "请填写手机号和验证码",
+    "enter_email_and_code_reg": "请填写邮箱和验证码",
+    "have_account": "已有账号？",
+    "go_login": "登录"
   },
   "image": {
     "title": "AI 图片生成",
@@ -2416,7 +2454,53 @@
     "panel_opt_sd": "标清",
     "panel_opt_hd": "高清",
     "panel_opt_uhd": "超清",
-    "panel_generate_title": "{tab} — 生成结果"
+    "panel_generate_title": "{tab} — 生成结果",
+    "dashboard_overview": {
+      "title": "Movio AI 运营数据大屏",
+      "subtitle": "Real-time Operations Dashboard",
+      "system_ok": "系统正常",
+      "system_error": "系统异常",
+      "fullscreen": "全屏",
+      "kpi_revenue": "总营收 (GMV)",
+      "kpi_orders": "总订单数",
+      "kpi_users": "注册用户",
+      "kpi_commission": "分佣总额",
+      "kpi_retention": "月留存率",
+      "kpi_avg_order": "客单价",
+      "trend_title": "业务趋势 (近30天)",
+      "trend_tab_orders": "订单量",
+      "trend_tab_revenue": "收入",
+      "trend_tab_users": "用户",
+      "channel_title": "流量渠道分布",
+      "channel_direct": "直接访问",
+      "channel_search": "搜索引擎",
+      "channel_social": "社媒推广",
+      "channel_agent": "代理分销",
+      "channel_other": "其他",
+      "realtime_title": "实时订单流",
+      "realtime_live": "LIVE",
+      "commission_title": "分佣收入趋势",
+      "user_growth_title": "用户增长",
+      "user_growth_month": "本月",
+      "user_growth_total": "总注册用户",
+      "user_growth_new": "本月新增",
+      "user_growth_active_rate": "月活跃率",
+      "top_features_title": "热门功能 TOP5",
+      "biz_metrics_title": "核心业务指标",
+      "biz_conversion": "付费转化率",
+      "biz_arpu": "ARPU",
+      "biz_ltv": "LTV",
+      "biz_churn": "月流失率",
+      "biz_nps": "NPS 评分",
+      "biz_satisfaction": "服务满意度",
+      "ticker_label": "系统告警",
+      "ticker_fallback": "暂无告警信息",
+      "trend_vs_yesterday": "% vs 昨日",
+      "loading": "加载看板数据...",
+      "error": "数据加载失败",
+      "error_retry": "重试",
+      "empty": "暂无运营数据"
+    }
   },
   "ai_assistant": {
     "review": {
@@ -2506,5 +2590,28 @@
     "cat_platform": "平台相关",
     "load_failed": "加载失败",
     "load_error": "加载FAQ失败，请稍后重试"
+  },
+  "payment": {
+    "mock_title": "🧪 沙箱模拟支付",
+    "order_no": "订单号",
+    "amount": "金额",
+    "mock_hint": "点击下方按钮模拟通联支付回调",
+    "mock_success_btn": "模拟支付成功",
+    "mock_fail_btn": "模拟支付失败",
+    "mock_sending": "正在发送模拟回调...",
+    "mock_sent_success": "回调已发送，正在查询结果...",
+    "mock_sent_fail": "失败回调已发送",
+    "callback_failed": "回调发送失败，请刷新重试",
+    "polling_title": "正在查询支付结果...",
+    "polling_hint": "请稍候，正在确认您的支付状态",
+    "success_title": "支付成功",
+    "success_order_type": "会员已开通",
+    "fail_title": "支付未完成",
+    "fail_default": "支付失败或已超时，请重新下单",
+    "fail_timeout": "支付确认超时，如已支付请稍后查看订单状态",
+    "network_error": "网络异常，请检查连接后刷新",
+    "network_fail": "网络异常，请稍后查看订单状态",
+    "missing_order": "缺少订单号参数",
+    "back_member": "返回会员中心"
   }
 }

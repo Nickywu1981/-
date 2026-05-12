@@ -1,21 +1,21 @@
 <template>
   <div class="layout">
-    <a href="#main-content" class="skip-link">跳到主要内容</a>
+    <a href="#main-content" class="skip-link">{{ $t('a11y.skip_to_main') }}</a>
     <header class="header">
       <div class="header-inner">
-        <h1 class="logo" role="link" tabindex="0" aria-label="Movio AI 首页" @click="navigateTo('/')" @keydown.enter="navigateTo('/')">Movio AI</h1>
+        <h1 class="logo" role="link" tabindex="0" :aria-label="$t('a11y.home_page')" @click="navigateTo('/')" @keydown.enter="navigateTo('/')">Movio AI</h1>
 
         <!-- 桌面导航 -->
         <nav class="nav desktop-nav">
-          <NuxtLink to="/">首页</NuxtLink>
-          <NuxtLink v-if="user" to="/workspace">工作台</NuxtLink>
-          <NuxtLink to="/help">帮助</NuxtLink>
-          <NuxtLink to="/compare">竞品对比</NuxtLink>
+          <NuxtLink to="/">{{ $t('nav.home') }}</NuxtLink>
+          <NuxtLink v-if="user" to="/workspace">{{ $t('nav.workspace') }}</NuxtLink>
+          <NuxtLink to="/help">{{ $t('nav.help') }}</NuxtLink>
+          <NuxtLink to="/compare">{{ $t('nav.compare') }}</NuxtLink>
         </nav>
 
         <!-- 全局搜索 (Ctrl+K 唤起 CommandPalette) -->
         <div class="search-box desktop-nav" :class="{ open: searchOpen }">
-          <button class="search-trigger" @click="searchOpen = !searchOpen" title="搜索功能 (Ctrl+K)" aria-label="搜索功能 (Ctrl+K)" :aria-expanded="searchOpen">
+          <button class="search-trigger" @click="searchOpen = !searchOpen" :title="$t('search.hotkey_title')" :aria-label="$t('search.hotkey_title')" :aria-expanded="searchOpen">
             🔍
             <kbd class="search-hotkey">Ctrl+K</kbd>
           </button>
@@ -24,8 +24,8 @@
             v-model="searchQuery"
             ref="searchInput"
             type="text"
-            placeholder="搜索功能..."
-            aria-label="搜索功能"
+            :placeholder="$t('search.placeholder')"
+            :aria-label="$t('search.label')"
             class="search-input"
             @keydown.esc="closeSearch"
             @keydown.enter="doSearch"
@@ -46,52 +46,52 @@
 
         <div class="user-area">
           <!-- 主题切换 -->
-          <button class="theme-btn" @click="toggleTheme" :title="theme === 'dark' ? '切换亮色' : '切换暗色'" :aria-label="theme === 'dark' ? '切换到亮色模式' : '切换到暗色模式'">
+          <button class="theme-btn" @click="toggleTheme" :title="theme === 'dark' ? $t('theme.switch_light') : $t('theme.switch_dark')" :aria-label="theme === 'dark' ? $t('theme.light_mode') : $t('theme.dark_mode')">
             {{ theme === 'dark' ? '☀️' : '🌙' }}
           </button>
           <template v-if="user">
-            <NuxtLink to="/notifications" class="notif-bell" title="通知">
+            <NuxtLink to="/notifications" class="notif-bell" :title="$t('nav.notifications')">
               🔔
               <span v-if="unreadCount" class="badge">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
             </NuxtLink>
-            <div class="user-menu" role="button" tabindex="0" aria-label="用户菜单" :aria-expanded="menuOpen" @click="menuOpen = !menuOpen" @keydown.enter="menuOpen = !menuOpen">
+            <div class="user-menu" role="button" tabindex="0" :aria-label="$t('nav.user_menu')" :aria-expanded="menuOpen" @click="menuOpen = !menuOpen" @keydown.enter="menuOpen = !menuOpen">
               <span class="avatar">{{ user.nickname?.[0] || 'U' }}</span>
               <span class="uname desktop-nav">{{ user.nickname }}</span>
               <span class="arrow">▾</span>
             </div>
             <div v-if="menuOpen" class="dropdown" @click.stop>
-              <NuxtLink to="/account/settings" @click="menuOpen = false">个人设置</NuxtLink>
-              <NuxtLink to="/account/membership" @click="menuOpen = false">我的会员</NuxtLink>
-              <NuxtLink to="/account/billing" @click="menuOpen = false">消费账单</NuxtLink>
-              <NuxtLink v-if="user?.role === 'admin'" to="/admin/dashboard" @click="menuOpen = false" class="admin-link">管理后台</NuxtLink>
+              <NuxtLink to="/account/settings" @click="menuOpen = false">{{ $t('nav.account_settings') }}</NuxtLink>
+              <NuxtLink to="/account/membership" @click="menuOpen = false">{{ $t('nav.my_membership') }}</NuxtLink>
+              <NuxtLink to="/account/billing" @click="menuOpen = false">{{ $t('nav.billing') }}</NuxtLink>
+              <NuxtLink v-if="user?.role === 'admin'" to="/admin/dashboard" @click="menuOpen = false" class="admin-link">{{ $t('nav.admin_panel') }}</NuxtLink>
               <hr />
-              <a @click="doLogout">退出登录</a>
+              <a @click="doLogout">{{ $t('nav.logout') }}</a>
             </div>
           </template>
           <template v-else>
-            <NuxtLink to="/login">登录</NuxtLink>
-            <NuxtLink to="/register" class="btn-primary">免费注册</NuxtLink>
+            <NuxtLink to="/login">{{ $t('nav.login') }}</NuxtLink>
+            <NuxtLink to="/register" class="btn-primary">{{ $t('nav.register') }}</NuxtLink>
           </template>
 
           <!-- 移动端汉堡 -->
-          <button class="hamburger" @click="mobileOpen = !mobileOpen" :aria-label="mobileOpen ? '关闭菜单' : '打开菜单'" :aria-expanded="mobileOpen">{{ mobileOpen ? '✕' : '☰' }}</button>
+          <button class="hamburger" @click="mobileOpen = !mobileOpen" :aria-label="mobileOpen ? $t('nav.close_menu') : $t('nav.open_menu')" :aria-expanded="mobileOpen">{{ mobileOpen ? '✕' : '☰' }}</button>
         </div>
       </div>
 
       <!-- 移动端展开菜单 -->
       <transition name="slide-down">
         <div v-if="mobileOpen" class="mobile-nav" @click="mobileOpen = false">
-          <NuxtLink to="/">首页</NuxtLink>
-          <NuxtLink v-if="user" to="/workspace">工作台</NuxtLink>
-          <NuxtLink to="/help">帮助</NuxtLink>
-          <NuxtLink to="/compare">竞品对比</NuxtLink>
-          <NuxtLink to="/notifications">通知</NuxtLink>
-          <NuxtLink to="/account/settings">个人设置</NuxtLink>
-          <NuxtLink to="/account/membership">我的会员</NuxtLink>
-          <NuxtLink to="/account/billing">消费账单</NuxtLink>
-          <NuxtLink v-if="user?.role === 'admin'" to="/admin/dashboard" class="admin-link-mobile">管理后台</NuxtLink>
+          <NuxtLink to="/">{{ $t('nav.home') }}</NuxtLink>
+          <NuxtLink v-if="user" to="/workspace">{{ $t('nav.workspace') }}</NuxtLink>
+          <NuxtLink to="/help">{{ $t('nav.help') }}</NuxtLink>
+          <NuxtLink to="/compare">{{ $t('nav.compare') }}</NuxtLink>
+          <NuxtLink to="/notifications">{{ $t('nav.notifications') }}</NuxtLink>
+          <NuxtLink to="/account/settings">{{ $t('nav.account_settings') }}</NuxtLink>
+          <NuxtLink to="/account/membership">{{ $t('nav.my_membership') }}</NuxtLink>
+          <NuxtLink to="/account/billing">{{ $t('nav.billing') }}</NuxtLink>
+          <NuxtLink v-if="user?.role === 'admin'" to="/admin/dashboard" class="admin-link-mobile">{{ $t('nav.admin_panel') }}</NuxtLink>
           <hr />
-          <a @click="doLogout">退出登录</a>
+          <a @click="doLogout">{{ $t('nav.logout') }}</a>
         </div>
       </transition>
     </header>
@@ -105,22 +105,22 @@
     <footer class="footer">
       <div class="footer-inner">
         <div class="footer-col">
-          <strong>产品</strong>
-          <NuxtLink to="/">首页</NuxtLink>
-          <NuxtLink to="/compare">竞品对比</NuxtLink>
+          <strong>{{ $t('landing.footer_products') }}</strong>
+          <NuxtLink to="/">{{ $t('nav.home') }}</NuxtLink>
+          <NuxtLink to="/compare">{{ $t('nav.compare') }}</NuxtLink>
         </div>
         <div class="footer-col">
-          <strong>支持</strong>
-          <NuxtLink to="/help">帮助中心</NuxtLink>
-          <a href="mailto:support@example.com">联系客服</a>
+          <strong>{{ $t('landing.footer_support') }}</strong>
+          <NuxtLink to="/help">{{ $t('landing.footer_help') }}</NuxtLink>
+          <a href="mailto:support@example.com">{{ $t('landing.footer_contact') }}</a>
         </div>
         <div class="footer-col">
-          <strong>法律</strong>
-          <NuxtLink to="/legal/terms">服务条款</NuxtLink>
-          <NuxtLink to="/legal/privacy">隐私政策</NuxtLink>
+          <strong>{{ $t('landing.footer_legal') }}</strong>
+          <NuxtLink to="/legal/terms">{{ $t('landing.footer_terms') }}</NuxtLink>
+          <NuxtLink to="/legal/privacy">{{ $t('landing.footer_privacy') }}</NuxtLink>
         </div>
       </div>
-      <p class="copyright">&copy; 2025 Movio AI — 图片+视频全功能一体化</p>
+      <p class="copyright">{{ $t('landing.footer_copyright', { year: 2025 }) }}</p>
     </footer>
 
     <!-- 全局搜索面板 (Ctrl+K) -->
@@ -143,6 +143,7 @@ usePageSEO();
 const toast = ref()
 onMounted(() => { (window as any).__toast = toast.value })
 const { confirm } = useConfirm()
+const { t } = useI18n()
 const user = ref<any>(null);
 const unreadCount = ref(0);
 const menuOpen = ref(false);
@@ -230,7 +231,7 @@ async function loadUnread() {
 }
 
 async function doLogout() {
-  if (!await confirm({ message: '确定要退出登录吗？', variant: 'warning' })) return;
+  if (!await confirm({ message: t('common.logout_confirm'), variant: 'warning' })) return;
   menuOpen.value = false;
   mobileOpen.value = false;
   try { await $fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }); } catch { /* best-effort */ }

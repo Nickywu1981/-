@@ -1,13 +1,37 @@
 {
   "nav": {
     "home": "Home",
-    "workspace": "Dashboard",
+    "workspace": "Workspace",
     "my": "My Works",
     "admin": "Admin",
     "help": "Help",
     "compare": "Compare",
     "login": "Login",
-    "register": "Get Started Free"
+    "register": "Get Started Free",
+    "notifications": "Notifications",
+    "user_menu": "User Menu",
+    "account_settings": "Settings",
+    "my_membership": "My Membership",
+    "billing": "Billing",
+    "admin_panel": "Admin Panel",
+    "logout": "Logout",
+    "open_menu": "Open Menu",
+    "close_menu": "Close Menu"
+  },
+  "a11y": {
+    "skip_to_main": "Skip to main content",
+    "home_page": "Movio AI Home"
+  },
+  "search": {
+    "placeholder": "Search features...",
+    "label": "Search",
+    "hotkey_title": "Search (Ctrl+K)"
+  },
+  "theme": {
+    "switch_light": "Switch to Light",
+    "switch_dark": "Switch to Dark",
+    "light_mode": "Switch to light mode",
+    "dark_mode": "Switch to dark mode"
   },
   "landing": {
     "hero_title": "Movio AI — Full-Stack Ops Assistant",
@@ -704,7 +728,8 @@
     "share": "Share",
     "settings": "Settings",
     "more": "More",
-    "language": "Language"
+    "language": "Language",
+    "logout_confirm": "Are you sure you want to logout?"
   },
   "admin": {
     "dashboard": "Dashboard",
@@ -1321,7 +1346,20 @@
     "enter_email_and_code": "Please enter email and code",
     "enter_email": "Please enter email",
     "no_account": "Don't have an account?",
-    "free_register": "Sign Up Free"
+    "free_register": "Sign Up Free",
+    "register_title": "Sign Up Free",
+    "register_subtitle": "New users get 50 credits on sign up",
+    "tab_password_register": "Password",
+    "tab_sms_register": "Phone",
+    "tab_email_register": "Email",
+    "registering": "Registering...",
+    "nickname": "Nickname (optional)",
+    "password_hint": "Password (min 8 chars)",
+    "register_failed": "Registration failed",
+    "enter_phone_and_code_reg": "Please enter phone and code",
+    "enter_email_and_code_reg": "Please enter email and code",
+    "have_account": "Already have an account?",
+    "go_login": "Log in"
   },
   "image": {
     "title": "AI Image Generation",
@@ -2415,7 +2453,53 @@
     "panel_opt_sd": "SD",
     "panel_opt_hd": "HD",
     "panel_opt_uhd": "UHD",
-    "panel_generate_title": "{tab} — Generate Result"
+    "panel_generate_title": "{tab} — Generate Result",
+    "dashboard_overview": {
+      "title": "Movio AI Operations Dashboard",
+      "subtitle": "Real-time Operations Dashboard",
+      "system_ok": "System Normal",
+      "system_error": "System Error",
+      "fullscreen": "Fullscreen",
+      "kpi_revenue": "Total Revenue (GMV)",
+      "kpi_orders": "Total Orders",
+      "kpi_users": "Registered Users",
+      "kpi_commission": "Total Commission",
+      "kpi_retention": "Monthly Retention",
+      "kpi_avg_order": "Avg Order Value",
+      "trend_title": "Business Trends (Last 30 Days)",
+      "trend_tab_orders": "Orders",
+      "trend_tab_revenue": "Revenue",
+      "trend_tab_users": "Users",
+      "channel_title": "Traffic Channel Distribution",
+      "channel_direct": "Direct",
+      "channel_search": "Search Engine",
+      "channel_social": "Social Media",
+      "channel_agent": "Agent Distribution",
+      "channel_other": "Other",
+      "realtime_title": "Real-time Order Stream",
+      "realtime_live": "LIVE",
+      "commission_title": "Commission Revenue Trend",
+      "user_growth_title": "User Growth",
+      "user_growth_month": "This Month",
+      "user_growth_total": "Total Registered Users",
+      "user_growth_new": "New This Month",
+      "user_growth_active_rate": "Monthly Active Rate",
+      "top_features_title": "Top 5 Features",
+      "biz_metrics_title": "Core Business Metrics",
+      "biz_conversion": "Conversion Rate",
+      "biz_arpu": "ARPU",
+      "biz_ltv": "LTV",
+      "biz_churn": "Monthly Churn",
+      "biz_nps": "NPS Score",
+      "biz_satisfaction": "Satisfaction",
+      "ticker_label": "System Alerts",
+      "ticker_fallback": "No alerts",
+      "trend_vs_yesterday": "% vs yesterday",
+      "loading": "Loading dashboard...",
+      "error": "Failed to load data",
+      "error_retry": "Retry",
+      "empty": "No operations data available"
+    }
   },
   "ai_assistant": {
     "review": {
@@ -2505,5 +2589,28 @@
     "cat_platform": "Platform",
     "load_failed": "Failed to load",
     "load_error": "Failed to load FAQ, please try again later"
+  },
+  "payment": {
+    "mock_title": "🧪 Sandbox Payment Simulation",
+    "order_no": "Order No.",
+    "amount": "Amount",
+    "mock_hint": "Click below to simulate payment callback",
+    "mock_success_btn": "Simulate Success",
+    "mock_fail_btn": "Simulate Failure",
+    "mock_sending": "Sending mock callback...",
+    "mock_sent_success": "Callback sent, checking result...",
+    "mock_sent_fail": "Failure callback sent",
+    "callback_failed": "Callback failed, please refresh",
+    "polling_title": "Checking payment result...",
+    "polling_hint": "Please wait while we confirm your payment",
+    "success_title": "Payment Successful",
+    "success_order_type": "Membership Activated",
+    "fail_title": "Payment Incomplete",
+    "fail_default": "Payment failed or timed out, please reorder",
+    "fail_timeout": "Confirmation timeout, check order status later if paid",
+    "network_error": "Network error, check connection and refresh",
+    "network_fail": "Network error, check order status later",
+    "missing_order": "Missing order number",
+    "back_member": "Back to Membership"
   }
 }
