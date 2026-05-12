@@ -1,0 +1,79 @@
+/* ===== 入场动画关键帧库 ===== */
+
+:root {
+  --anim-duration-fast: 150ms;
+  --anim-duration-normal: 300ms;
+  --anim-duration-slow: 500ms;
+  --anim-ease-default: cubic-bezier(0.4, 0, 0.2, 1);
+  --anim-ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --anim-ease-smooth: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* ── 基础关键帧 ── */
+@keyframes animFadeIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes animFadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes animFadeInDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes animFadeInLeft { from { opacity: 0; transform: translateX(-16px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes animFadeInRight { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes animScaleIn { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
+@keyframes animSlideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes animShimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes animSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes animPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+/* ── 工具类 ── */
+.anim-fade-in        { animation: animFadeIn var(--anim-duration-normal) var(--anim-ease-default) both; }
+.anim-fade-in-up     { animation: animFadeInUp var(--anim-duration-normal) var(--anim-ease-default) both; }
+.anim-fade-in-down   { animation: animFadeInDown var(--anim-duration-normal) var(--anim-ease-default) both; }
+.anim-fade-in-left   { animation: animFadeInLeft var(--anim-duration-normal) var(--anim-ease-default) both; }
+.anim-fade-in-right  { animation: animFadeInRight var(--anim-duration-normal) var(--anim-ease-default) both; }
+.anim-scale-in       { animation: animScaleIn var(--anim-duration-normal) var(--anim-ease-bounce) both; }
+.anim-spin           { animation: animSpin 1s linear infinite; }
+.anim-pulse          { animation: animPulse 2s var(--anim-ease-default) infinite; }
+
+/* ── 页面过渡 ── */
+.page-enter-active,
+.page-leave-active {
+  transition: opacity var(--anim-duration-normal) var(--anim-ease-default),
+              transform var(--anim-duration-normal) var(--anim-ease-default);
+}
+.page-enter-from { opacity: 0; transform: translateY(12px); }
+.page-leave-to   { opacity: 0; transform: translateY(-12px); }
+
+/* ── 列表交错入场 ── */
+.stagger-list > * {
+  opacity: 0;
+  animation: animFadeInUp var(--anim-duration-slow) var(--anim-ease-default) forwards;
+}
+.stagger-list > *:nth-child(1)  { animation-delay: 0ms; }
+.stagger-list > *:nth-child(2)  { animation-delay: 50ms; }
+.stagger-list > *:nth-child(3)  { animation-delay: 100ms; }
+.stagger-list > *:nth-child(4)  { animation-delay: 150ms; }
+.stagger-list > *:nth-child(5)  { animation-delay: 200ms; }
+.stagger-list > *:nth-child(6)  { animation-delay: 250ms; }
+.stagger-list > *:nth-child(7)  { animation-delay: 300ms; }
+.stagger-list > *:nth-child(8)  { animation-delay: 350ms; }
+.stagger-list > *:nth-child(9)  { animation-delay: 400ms; }
+.stagger-list > *:nth-child(10) { animation-delay: 450ms; }
+
+/* ── 骨架屏闪光 ── */
+.skeleton-shimmer {
+  background: linear-gradient(90deg, var(--el-fill-color-light) 25%, var(--el-fill-color) 50%, var(--el-fill-color-light) 75%);
+  background-size: 200% 100%;
+  animation: animShimmer 2s infinite;
+}
+
+/* ── 减少动效偏好 ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

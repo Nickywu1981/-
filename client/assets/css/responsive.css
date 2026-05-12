@@ -1,0 +1,98 @@
+/* ===== 响应式断点工具 ===== */
+
+:root {
+  --bp-xs: 480px;
+  --bp-sm: 768px;
+  --bp-md: 1024px;
+  --bp-lg: 1280px;
+  --bp-xl: 1600px;
+
+  --sidebar-width: 240px;
+  --sidebar-collapsed-width: 64px;
+  --header-height: 56px;
+
+  --content-max-width: 1400px;
+  --container-padding: 24px;
+}
+
+/* ── 容器 ── */
+.container-responsive {
+  width: 100%;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 0 var(--container-padding);
+}
+
+@media (max-width: 767px) {
+  :root {
+    --container-padding: 16px;
+    --sidebar-width: 100%;
+  }
+}
+
+/* ── 隐藏/显示工具类 ── */
+.hide-on-mobile      { display: none !important; }
+.hide-on-tablet      { display: none !important; }
+.hide-on-desktop     { display: none !important; }
+.show-on-mobile      { display: none !important; }
+.show-on-tablet      { display: none !important; }
+.show-on-desktop     { display: none !important; }
+
+@media (max-width: 767px) {
+  .hide-on-mobile    { display: none !important; }
+  .show-on-mobile    { display: block !important; }
+}
+@media (min-width: 768px) and (max-width: 1023px) {
+  .hide-on-tablet    { display: none !important; }
+  .show-on-tablet    { display: block !important; }
+}
+@media (min-width: 1024px) {
+  .hide-on-desktop   { display: none !important; }
+  .show-on-desktop   { display: block !important; }
+}
+
+/* ── 弹性表单行 ── */
+.form-row-responsive {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+/* ── 管理后台布局 ── */
+.admin-layout {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  grid-template-rows: var(--header-height) 1fr;
+  grid-template-areas: "sidebar header" "sidebar content";
+  min-height: 100vh;
+}
+@media (max-width: 767px) {
+  .admin-layout {
+    grid-template-columns: 1fr;
+    grid-template-areas: "header" "content";
+  }
+}
+
+/* ── 卡片网格 ── */
+.card-grid { display: grid; gap: 16px; }
+.card-grid--2 { grid-template-columns: repeat(2, 1fr); }
+.card-grid--3 { grid-template-columns: repeat(3, 1fr); }
+.card-grid--4 { grid-template-columns: repeat(4, 1fr); }
+
+@media (max-width: 767px) {
+  .card-grid--2, .card-grid--3, .card-grid--4 { grid-template-columns: 1fr; }
+}
+@media (min-width: 768px) and (max-width: 1023px) {
+  .card-grid--3, .card-grid--4 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .card-grid--4 { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ── 触控优化 ── */
+@media (hover: none) and (pointer: coarse) {
+  .touch-target {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
