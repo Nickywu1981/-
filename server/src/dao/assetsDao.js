@@ -17,6 +17,7 @@ export async function listUserAssets({ userId, type, page = 1, pageSize = 20 }) 
 
   const placeholders = taskTypes.map(() => '?').join(',');
   const params = [userId, ...taskTypes];
+  const { offset } = parsePagination({ page, pageSize });
 
   const [[{ total }]] = await pool.query(
     `SELECT COUNT(*) as total FROM job_queue

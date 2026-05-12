@@ -12,6 +12,7 @@ export async function insertLog({ templateCode, phone, params, content, result, 
 export async function listLogs({ page = 1, pageSize = 30, phone, result, startDate, endDate }) {
   let sql = 'SELECT id, template_code, phone, content, result, provider, create_time FROM sms_log WHERE 1=1';
   const params = [];
+  const { offset } = parsePagination({ page, pageSize });
   if (phone) { sql += ' AND phone LIKE ?'; params.push(`%${phone}%`); }
   if (result !== undefined && result !== '') { sql += ' AND result = ?'; params.push(Number(result)); }
   if (startDate) { sql += ' AND create_time >= ?'; params.push(startDate); }

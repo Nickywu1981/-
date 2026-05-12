@@ -10,6 +10,7 @@ export async function insertNotification({ userId, type, title, content }) {
 }
 
 export async function listByUser(userId, { page = 1, pageSize = 20 }) {
+  const { offset } = parsePagination({ page, pageSize });
   const [rows] = await pool.query(
     'SELECT id, type, title, content, is_read, create_time FROM user_notification WHERE user_id = ? ORDER BY create_time DESC LIMIT ?, ?',
     [userId, offset, parseInt(pageSize, 10)],
@@ -52,6 +53,7 @@ export async function getUnreadCount(userId) {
 export async function listAll({ userId, type, page = 1, pageSize = 20 }) {
   const conditions = [];
   const params = [];
+  const { offset } = parsePagination({ page, pageSize });
   if (userId) { conditions.push('un.user_id = ?'); params.push(userId); }
   if (type) { conditions.push('un.type = ?'); params.push(type); }
   const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';

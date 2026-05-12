@@ -14,6 +14,7 @@ export default {
   async listPages(tenantId, { pageType, status, keyword, ownerId, accessType, page = 1, pageSize = 20 }) {
     const baseWhere = 'WHERE tenant_id = ?';
     const params = [tenantId];
+    const { offset } = parsePagination({ page, pageSize });
     let filter = '';
     const includedTrash = status === 3 || String(status) === '3';
     if (!includedTrash) filter += ' AND status != 3';
@@ -193,6 +194,7 @@ export default {
   async listComponents(tenantId, category) {
     let sql = 'SELECT id, tenant_id, name, component_code, category, icon, default_config, is_builtin, status, create_time FROM diy_component WHERE (tenant_id = ? OR is_builtin = 1) AND status = 1';
     const params = [tenantId];
+    const { offset } = parsePagination({ page, pageSize });
     if (category) { sql += ' AND category = ?'; params.push(category); }
     sql += ' ORDER BY category, id';
     const [rows] = await pool.query(sql, params);
@@ -336,6 +338,7 @@ export default {
   // ==================== 模板库 ====================
 
   async listTemplates({ industry, pageType, keyword, page = 1, pageSize = 20 }) {
+    const { offset } = parsePagination({ page, pageSize });
     const baseWhere = 'WHERE status = 1';
     const params = [];
     let filter = '';
