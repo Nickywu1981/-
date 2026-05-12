@@ -153,6 +153,80 @@ export async function countEnterpriseUsers(tenantId) {
   return rows[0].total;
 }
 
+// ==================== 审批状态机 ====================
+
+export async function listTenantsByReviewStatus(status, { page = 1, pageSize = 20, type, keyword } = {}) {
+  const conditions = ['review_status = ?'];
+  const params = [status];
+  if (type) { conditions.push('type = ?'); params.push(type); }
+  if (keyword) { conditions.push('(name LIKE ? OR code LIKE ? OR contact_name LIKE ?)'); params.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`); }
+  const where = conditions.join(' AND ');
+  const [countResult] = await pool.query(`SELECT COUNT(*) AS total FROM ?? WHERE ${where}`, [TABLE.TENANT, ...params]);
+  const total = countResult[0].total;
+  const offset = (page - 1) * pageSize;
+  const [rows] = await pool.query(`SELECT * FROM ?? WHERE ${where} ORDER BY create_time DESC LIMIT ? OFFSET ?`, [TABLE.TENANT, ...params, pageSize, offset]);
+  return { list: rows, total, page, pageSize };
+}
+
+export async function updateTenantReviewStatus(id, { status, approvedBy, reason, reviewedAt }) {
+  const fields = { review_status: status, reviewed_at: reviewedAt || new Date() };
+  if (status === 'approved') {
+    fields.approved_at = new Date();
+    fields.approved_by = approvedBy;
+  }
+  if (status === 'rejected' || reason) {
+    fields.review_remark = reason || null;
+  }
+  const [result] = await pool.query('UPDATE ?? SET ? WHERE id = ?', [TABLE.TENANT, fields, id]);
+  return result.affectedRows;
+}
+
+export async function insertApprovalLog(data) {
+  const [result] = await pool.query('INSERT INTO enterprise_approval_log SET ?', {
+    tenant_id: data.tenantId,
+    action: data.action,
+    operator_id: data.operatorId,
+    old_status: data.oldStatus || null,
+    new_status: data.newStatus,
+    reason: data.reason || null,
+  });
+  return result.insertId;
+}
+
+export async function getApprovalLogs(tenantId, { page = 1, pageSize = 20 } = {}) {
+  const offset = (page - 1) * pageSize;
+  const [rows] = await pool.query(
+    `SELECT eal.*, u.nickname AS operator_name
+     FROM enterprise_approval_log eal
+     LEFT JOIN user u ON eal.operator_id = u.id
+     WHERE eal.tenant_id = ?
+     ORDER BY eal.create_time DESC LIMIT ? OFFSET ?`,
+    [tenantId, pageSize, offset],
+  );
+  const [countResult] = await pool.query(
+    'SELECT COUNT(*) AS total FROM enterprise_approval_log WHERE tenant_id = ?',
+    [tenantId],
+  );
+  return { list: rows, total: countResult[0].total, page, pageSize };
+}
+
+export async function updateQualificationDocs(id, docs) {
+  const [result] = await pool.query('UPDATE ?? SET qualification_docs = ? WHERE id = ?', [TABLE.TENANT, JSON.stringify(docs), id]);
+  return result.affectedRows;
+}
+
+export async function getApprovalStats() {
+  const [rows] = await pool.query(
+    `SELECT review_status, COUNT(*) AS count
+     FROM ?? WHERE status = 1
+     GROUP BY review_status`,
+    [TABLE.TENANT],
+  );
+  const stats = { pending: 0, approved: 0, rejected: 0, under_review: 0 };
+  for (const r of rows) stats[r.review_status] = r.count;
+  return stats;
+}
+
 // ==================== 用量查询 ====================
 
 export async function getEnterpriseUsage(tenantId, { startDate, endDate, userId } = {}) {

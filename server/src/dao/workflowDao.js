@@ -10,7 +10,7 @@ export async function listTemplates({ status } = {}) {
   let sql = `SELECT * FROM ${T('template')} WHERE 1=1`;
   const params = [];
   if (status) { sql += ' AND status = ?'; params.push(status); }
-  sql += ' ORDER BY updated_at DESC';
+  sql += ' ORDER BY updated_at DESC LIMIT 500';
   const [rows] = await pool.execute(sql, params);
   return rows;
 }

@@ -163,3 +163,59 @@ export const listPlans = wrapController(async (req, res) => {
   const plans = enterpriseService.listEnterprisePlans();
   return success(res, plans);
 });
+
+// ==================== 审批状态机 (Admin) ====================
+
+export const listPending = wrapController(async (req, res) => {
+  const result = await enterpriseService.listPendingTenants(req.validated || req.query);
+  return success(res, result);
+});
+
+export const getApprovalStats = wrapController(async (req, res) => {
+  const stats = await enterpriseService.getApprovalStats();
+  return success(res, stats);
+});
+
+export const getApprovalLogs = wrapController(async (req, res) => {
+  const tenantId = parseInt(req.params.id, 10);
+  const result = await enterpriseService.getApprovalLogs(tenantId, req.query);
+  return success(res, result);
+});
+
+export const approve = wrapController(async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const result = await enterpriseService.approveTenant(id, {
+    operatorId: req.user?.userId || req.user?.id,
+  });
+  audit(req, 'enterprise.approve', id, '通过企业入驻审批');
+  return success(res, result, '审批已通过');
+});
+
+export const reject = wrapController(async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const result = await enterpriseService.rejectTenant(id, {
+    operatorId: req.user?.userId || req.user?.id,
+    reason: req.validated?.reason || req.body.reason,
+  });
+  audit(req, 'enterprise.reject', id, `驳回企业: ${result.reason || ''}`);
+  return success(res, result, '已驳回');
+});
+
+export const suspend = wrapController(async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const result = await enterpriseService.suspendTenant(id, {
+    operatorId: req.user?.userId || req.user?.id,
+    reason: req.validated?.reason || req.body.reason,
+  });
+  audit(req, 'enterprise.suspend', id, '停用企业');
+  return success(res, result, '企业已停用');
+});
+
+export const reinstate = wrapController(async (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  const result = await enterpriseService.reinstateTenant(id, {
+    operatorId: req.user?.userId || req.user?.id,
+  });
+  audit(req, 'enterprise.reinstate', id, '恢复企业');
+  return success(res, result, '企业已恢复');
+});

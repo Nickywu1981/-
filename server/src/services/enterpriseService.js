@@ -326,3 +326,109 @@ const ENTERPRISE_PLANS = [
 export function listEnterprisePlans() {
   return ENTERPRISE_PLANS;
 }
+
+// ==================== 审批状态机 ====================
+
+const VALID_TRANSITIONS = {
+  pending: ['under_review', 'approved', 'rejected'],
+  under_review: ['approved', 'rejected'],
+  approved: ['suspended'],
+  rejected: ['pending'],
+  suspended: ['approved', 'rejected'],
+};
+
+export function getValidTransitions(currentStatus) {
+  return VALID_TRANSITIONS[currentStatus] || [];
+}
+
+export async function listPendingTenants(query) {
+  return enterpriseDao.listTenantsByReviewStatus('pending', query);
+}
+
+export async function getApprovalStats() {
+  return enterpriseDao.getApprovalStats();
+}
+
+export async function getApprovalLogs(tenantId, query) {
+  return enterpriseDao.getApprovalLogs(tenantId, query);
+}
+
+export async function submitForReview(code) {
+  const tenant = await enterpriseDao.findTenantByCode(code);
+  if (!tenant) throw new BusinessError(ERROR_CODE.NOT_FOUND, '企业不存在');
+  if (tenant.review_status !== 'pending') throw new BusinessError(ERROR_CODE.BAD_REQUEST, '当前状态不可提交审核');
+
+  await enterpriseDao.updateTenantReviewStatus(tenant.id, { status: 'under_review' });
+  await enterpriseDao.insertApprovalLog({
+    tenantId: tenant.id, action: 'submit', operatorId: 0,
+    oldStatus: 'pending', newStatus: 'under_review',
+  });
+  return { id: tenant.id, status: 'under_review' };
+}
+
+export async function approveTenant(id, { operatorId }) {
+  const tenant = await enterpriseDao.findTenantById(id);
+  if (!tenant) throw new BusinessError(ERROR_CODE.NOT_FOUND, '企业不存在');
+
+  const allowed = getValidTransitions(tenant.review_status);
+  if (!allowed.includes('approved')) {
+    throw new BusinessError(ERROR_CODE.BAD_REQUEST, `当前状态 ${tenant.review_status} 不可审批通过`);
+  }
+
+  await enterpriseDao.updateTenantReviewStatus(id, {
+    status: 'approved', approvedBy: operatorId,
+  });
+  await enterpriseDao.insertApprovalLog({
+    tenantId: id, action: 'approve', operatorId,
+    oldStatus: tenant.review_status, newStatus: 'approved',
+  });
+  return { id, status: 'approved' };
+}
+
+export async function rejectTenant(id, { operatorId, reason }) {
+  const tenant = await enterpriseDao.findTenantById(id);
+  if (!tenant) throw new BusinessError(ERROR_CODE.NOT_FOUND, '企业不存在');
+
+  const allowed = getValidTransitions(tenant.review_status);
+  if (!allowed.includes('rejected')) {
+    throw new BusinessError(ERROR_CODE.BAD_REQUEST, `当前状态 ${tenant.review_status} 不可驳回`);
+  }
+  if (!reason || reason.trim().length < 4) {
+    throw new BusinessError(ERROR_CODE.BAD_REQUEST, '驳回原因至少4个字符');
+  }
+
+  await enterpriseDao.updateTenantReviewStatus(id, {
+    status: 'rejected', approvedBy: operatorId, reason: reason.trim(),
+  });
+  await enterpriseDao.insertApprovalLog({
+    tenantId: id, action: 'reject', operatorId,
+    oldStatus: tenant.review_status, newStatus: 'rejected', reason: reason.trim(),
+  });
+  return { id, status: 'rejected' };
+}
+
+export async function suspendTenant(id, { operatorId, reason }) {
+  const tenant = await enterpriseDao.findTenantById(id);
+  if (!tenant) throw new BusinessError(ERROR_CODE.NOT_FOUND, '企业不存在');
+  if (tenant.review_status !== 'approved') throw new BusinessError(ERROR_CODE.BAD_REQUEST, '仅已通过企业可停用');
+
+  await enterpriseDao.updateTenantReviewStatus(id, { status: 'suspended' });
+  await enterpriseDao.insertApprovalLog({
+    tenantId: id, action: 'suspend', operatorId,
+    oldStatus: 'approved', newStatus: 'suspended', reason,
+  });
+  return { id, status: 'suspended' };
+}
+
+export async function reinstateTenant(id, { operatorId }) {
+  const tenant = await enterpriseDao.findTenantById(id);
+  if (!tenant) throw new BusinessError(ERROR_CODE.NOT_FOUND, '企业不存在');
+  if (tenant.review_status !== 'suspended') throw new BusinessError(ERROR_CODE.BAD_REQUEST, '仅已停用企业可恢复');
+
+  await enterpriseDao.updateTenantReviewStatus(id, { status: 'approved' });
+  await enterpriseDao.insertApprovalLog({
+    tenantId: id, action: 'reinstate', operatorId,
+    oldStatus: 'suspended', newStatus: 'approved',
+  });
+  return { id, status: 'approved' };
+}

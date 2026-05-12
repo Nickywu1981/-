@@ -60,7 +60,8 @@ export async function getCustomerDetail(tenantId, userId) {
   const [tags] = await pool.execute(
     `SELECT t.id, t.name, t.color FROM customer_tag t
      INNER JOIN customer_tag_rel r ON t.id = r.tag_id
-     WHERE r.user_id = ? AND t.tenant_id = ? AND t.is_deleted = 0`,
+     WHERE r.user_id = ? AND t.tenant_id = ? AND t.is_deleted = 0
+     LIMIT 100`,
     [userId, tenantId],
   );
   user.tags = tags;

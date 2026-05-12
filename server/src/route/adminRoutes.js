@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { getDashboardStats, listAllUsers, updateUserStatus, batchUpdateUserStatus, listAllTasks, listAllPlans, updatePlan, createPlan, deletePlan, getOperationLogs, checkContentRisk, approveTask, rejectTask, listAllOrders, deleteOrder, listCreditRecords, refundCredit, listSensitiveWords, addSensitiveWord, deleteSensitiveWord, retryTask, pauseTask, resumeTask, cancelTask, listAllNotifications, sendNotification, deleteNotification, updateUser } from '../controller/adminController.js';
 import { adminListTemplates, adminSaveTemplate, adminReviewTemplate, adminDeleteTemplate } from '../controller/adminPromptController.js';
+import { listPending, getApprovalStats, getApprovalLogs, approve, reject, suspend, reinstate } from '../controller/enterpriseController.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { adminLimiter } from '../middleware/rateLimiter.js';
 import { validate, idSchema, paginationSchema, numericParamSchema } from '../utils/validate.js';
@@ -121,5 +122,18 @@ router.post('/credits/refund', validate(refundSchema), refundCredit);
 router.get('/notifications', validate(paginationSchema, 'query'), listAllNotifications);
 router.post('/notifications/send', validate(sendNotificationSchema), sendNotification);
 router.delete('/notifications/:id', validate(idParamSchema, 'params'), deleteNotification);
+
+// 企业入驻审批 (Phase 2: 2026-05-12)
+const approvalIdSchema = numericParamSchema('id');
+const rejectSchema = z.object({ reason: z.string().min(4, '驳回原因至少4个字符').max(500) });
+const suspendSchema = z.object({ reason: z.string().max(500).optional() });
+
+router.get('/enterprises/pending', validate(paginationSchema, 'query'), listPending);
+router.get('/enterprises/approval-stats', getApprovalStats);
+router.get('/enterprises/:id/approval-logs', validate(approvalIdSchema, 'params'), validate(paginationSchema, 'query'), getApprovalLogs);
+router.post('/enterprises/:id/approve', validate(approvalIdSchema, 'params'), approve);
+router.post('/enterprises/:id/reject', validate(approvalIdSchema, 'params'), validate(rejectSchema), reject);
+router.post('/enterprises/:id/suspend', validate(approvalIdSchema, 'params'), validate(suspendSchema), suspend);
+router.post('/enterprises/:id/reinstate', validate(approvalIdSchema, 'params'), reinstate);
 
 export default router;

@@ -95,6 +95,7 @@ const groups = reactive<NavGroup[]>([
       { key: 'notifications', label: '通知管理', route: '/admin/notifications' },
       { key: 'badges', label: '营销标签', route: '/admin/badges' },
       { key: 'campaigns', label: '运营活动', route: '/admin/campaigns' },
+      { key: 'enterprises', label: '企业审批', route: '/admin/enterprises' },
       { key: 'coupons', label: '优惠券管理', route: '/admin/coupons' },
       { key: 'announcements', label: '公告管理', route: '/admin/announcements' },
     ],

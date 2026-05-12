@@ -373,9 +373,77 @@
     "creation_hint_video": "支持图片转视频 / 文字转视频 / 分镜规划 / 数字人口播",
     "creation_hint_image": "支持文字生成 / 参考图生成 / 批量处理 / 精修 / 去背景",
     "creation_hint_detail": "支持详情页设计 / 主图套装 / 多平台适配 / 产品渲染",
-    "creation_hint_copywrite": "支持电商标题 / 详情文案 / 口播脚本 / 营销文案",
-    "creation_hint_digital": "支持带货视频 / 虚拟直播 / 形象定制 / AI 主播",
+    "creation_hint_copywrite": "支持带货口播 / 商品文案 / 多语种翻译 / AI 配音 / 营销脚本",
+    "creation_hint_other": "支持数字人带货 / 虚拟直播 / 换脸 / 图片翻译 / 合规检查",
     "creation_hint_default": "",
+    "creation_placeholder_other": "描述你的其他创作需求，例如：数字人带货、合规检查...",
+    "creation_param_video_duration": "视频时长",
+    "creation_param_video_resolution": "分辨率",
+    "creation_param_video_style": "视频风格",
+    "creation_param_image_size": "图片尺寸",
+    "creation_param_image_style": "图片风格",
+    "creation_param_image_count": "生成数量",
+    "creation_param_detail_platform": "目标平台",
+    "creation_param_detail_style": "页面风格",
+    "creation_param_detail_modules": "包含模块",
+    "creation_param_copywrite_type": "文案类型",
+    "creation_param_copywrite_lang": "输出语种",
+    "creation_param_copywrite_tone": "语音音色",
+    "creation_param_other_tool": "工具类型",
+    "creation_upload_hint": "拖拽或点击上传素材",
+    "creation_param_label": "参数设置",
+
+    "creation_sub_cards": {
+      "video": [
+        {"icon":"🎥","title":"AI 短视频生成","desc":"商品图一键生成带货短视频，自动配乐+字幕","route":"/work/video"},
+        {"icon":"🕺","title":"动作迁移","desc":"人物图+参考动作视频，AI精准迁移动作姿态","route":"/work/action-transfer"},
+        {"icon":"🎬","title":"智能分镜","desc":"文案脚本AI自动拆解为分镜画面+配音+字幕","route":"/work/storyboard"},
+        {"icon":"✂️","title":"视频编辑","desc":"智能裁剪/变速/转场/调色，多尺寸多时长输出","route":"/work/video-edit"},
+        {"icon":"📡","title":"直播切片","desc":"直播回放自动剪辑高光片段，批量生成短视频","route":"/work/live-clip"},
+        {"icon":"📋","title":"批量生成","desc":"文件夹拖入→后台排队→完成通知→批量下载","route":"/work/batch"}
+      ],
+      "image": [
+        {"icon":"🖼️","title":"AI 商品图","desc":"各平台商品主图一键生成，自动抠图+精修+白底","route":"/work/image"},
+        {"icon":"🏞️","title":"场景生成","desc":"产品图+AI场景库→自动光影融合→出5张场景图","route":"/work/scene"},
+        {"icon":"✂️","title":"智能抠图","desc":"AI发丝级抠图，毛发/透明体/复杂边缘精准分离","route":"/work/remove-bg"},
+        {"icon":"⬜","title":"白底图生成","desc":"抠图后智能生成纯白/场景底图，平台直出","route":"/work/white-bg"},
+        {"icon":"✨","title":"图片精修","desc":"AI自动祛皱/去污/补光/锐化，批量提升质感","route":"/work/retouch"},
+        {"icon":"🎨","title":"风格转化","desc":"6大风格一键转换：复古/国潮/插画/水彩/赛博/极简","route":"/work/style-transfer"},
+        {"icon":"🔄","title":"一键换色","desc":"服装鞋包颜色变换，保留褶皱纹理质感，支持批量","route":"/work/color-swap"},
+        {"icon":"↔️","title":"智能扩图","desc":"AI扩展图片边缘自动补全构图，适配各平台比例","route":"/work/outpaint"},
+        {"icon":"📦","title":"批量渲染","desc":"50张图统一抠图+白底+尺寸，支持夜间托管折扣","route":"/work/batch"}
+      ],
+      "detail": [
+        {"icon":"📄","title":"详情页设计","desc":"商品详情页智能排版设计，AI自动生成文案+图文","route":"/work/detail-h5"},
+        {"icon":"📱","title":"多平台适配","desc":"13大电商平台详情页模板库，选平台→选模板→生成","route":"/work/platform-detail"},
+        {"icon":"🏷️","title":"卖点生成","desc":"AI自动提炼商品卖点，生成高转化详情文案","route":"/work/selling-points"},
+        {"icon":"🎯","title":"模板套用","desc":"精品详情页模板一键套用，上传素材即可出页","route":"/work/template-apply"},
+        {"icon":"👗","title":"虚拟试穿","desc":"服装平铺图→真人模特上身效果，多肤色体型可选","route":"/work/virtual-tryon"},
+        {"icon":"👤","title":"幽灵模特","desc":"服装平铺/挂拍→AI穿到隐形模特，3D立体展示","route":"/work/ghost-mannequin"},
+        {"icon":"🛒","title":"产品渲染","desc":"3D展示商品旋转/细节，支持360度产品展示","route":"/work/product-render"},
+        {"icon":"📁","title":"导出设置","desc":"统一导出格式/尺寸/命名规则，一键打包下载","route":"/work/output"}
+      ],
+      "copywrite": [
+        {"icon":"🎙️","title":"带货口播","desc":"产品卖点→AI生成短视频口播脚本，支持3种脚本类型","route":"/work/script-gen"},
+        {"icon":"📝","title":"商品文案","desc":"SEO优化标题+详情长文案智能撰写，高转化率导向","route":"/work/detail-copy"},
+        {"icon":"🌐","title":"多语种翻译","desc":"商品图文字智能识别→翻译为9语种→原位替换","route":"/work/image-translate"},
+        {"icon":"🔊","title":"AI 语音生成","desc":"输入文案→选主播音色→生成自然流畅带货配音","route":"/work/voice-gen"},
+        {"icon":"📢","title":"营销文案","desc":"大促/活动/促销文案生成，多平台适配","route":"/work/campaign-copy"},
+        {"icon":"📱","title":"社媒文案","desc":"小红书/抖音/TikTok种草文案一键生成","route":"/work/social-copy"},
+        {"icon":"📧","title":"邮件文案","desc":"EDM营销邮件/短信文案，多语种支持","route":"/work/email-copy"},
+        {"icon":"🎤","title":"音色定制","desc":"50+主播音色可选，支持9语种TTS语音合成","route":"/work/voice-custom"}
+      ],
+      "other": [
+        {"icon":"🤖","title":"口播数字人","desc":"输入文案→选数字人形象+语音→AI生成带货视频","route":"/work/digital-human"},
+        {"icon":"📡","title":"数字人直播","desc":"虚拟直播间自动讲解商品，24小时不间断带货","route":"/work/digital-live"},
+        {"icon":"🔄","title":"AI 换脸","desc":"AI人脸替换/数字人换脸，多肤色多风格","route":"/work/face-swap"},
+        {"icon":"🌐","title":"图片翻译","desc":"OCR识别商品图文字→9语种原位替换翻译","route":"/work/image-translate"},
+        {"icon":"🛡️","title":"跨境合规检查","desc":"检测亚马逊/Temu/TikTok/Shein合规风险，覆盖欧美日","route":"/work/compliance-check"},
+        {"icon":"🔥","title":"爆款复刻","desc":"对标爆款视频→AI分析节奏/色调→你的产品重新生成","route":"/work/viral-clone"},
+        {"icon":"🧬","title":"形象定制","desc":"自定义数字人外观/声音/动作，打造专属IP形象","route":"/work/avatar-custom"},
+        {"icon":"📐","title":"分镜计划","desc":"视频分镜/镜头顺序/时长规划，可视化预览","route":"/work/shot-plan"}
+      ]
+    },
     "nav_main_label": "工作台导航",
     "nav_home": "首页",
     "nav_creation": "创作",
@@ -392,9 +460,9 @@
     "creation_tabs": {
       "video": "视频生成",
       "image": "图片生成",
-      "detail": "电商详情图",
-      "copywrite": "文案工具",
-      "digital": "数字人"
+      "detail": "电商详情页生成",
+      "copywrite": "语音文案生成",
+      "other": "其他创作类"
     },
     "recent_samples": [
       {"icon":"🖼","name":"夏季连衣裙白底图","time":"2小时前"},

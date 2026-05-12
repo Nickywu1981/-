@@ -1,4 +1,7 @@
 import pool from '../dao/db.js';
+import { als } from './context.js';
+
+function _db() { return als.getStore()?.db || pool; }
 
 let wordCache = null;
 let regexCache = null;  // 缓存的 { word, regex, category, level } 数组
@@ -25,19 +28,19 @@ export async function listSensitiveWords({ keyword, page = 1, pageSize = 50 }) {
   const params = keyword ? [`%${keyword}%`] : [];
   const offset = (page - 1) * pageSize;
   params.push(offset, pageSize);
-  const [rows] = await pool.query(`SELECT * FROM sensitive_word ${cond} ORDER BY create_time DESC LIMIT ?, ?`, params);
+  const [rows] = await _db().query(`SELECT * FROM sensitive_word ${cond} ORDER BY create_time DESC LIMIT ?, ?`, params);
   const countParams = keyword ? [`%${keyword}%`] : [];
-  const [[{ total }]] = await pool.query(`SELECT COUNT(*) AS total FROM sensitive_word ${cond}`, countParams);
+  const [[{ total }]] = await _db().query(`SELECT COUNT(*) AS total FROM sensitive_word ${cond}`, countParams);
   return { list: rows, total };
 }
 
 export async function addSensitiveWord(word, category, level) {
-  const [r] = await pool.execute('INSERT IGNORE INTO sensitive_word (word, category, level) VALUES (?,?,?)', [word, category, level]);
+  const [r] = await _db().execute('INSERT IGNORE INTO sensitive_word (word, category, level) VALUES (?,?,?)', [word, category, level]);
   return r.affectedRows;
 }
 
 export async function deleteSensitiveWord(id) {
-  const [r] = await pool.execute('DELETE FROM sensitive_word WHERE id = ?', [id]);
+  const [r] = await _db().execute('DELETE FROM sensitive_word WHERE id = ?', [id]);
   return r.affectedRows;
 }
 
