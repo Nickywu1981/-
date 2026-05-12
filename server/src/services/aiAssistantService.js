@@ -2,7 +2,6 @@
  * AI 助手类 — 统一服务层
  * FAQ 智能客服 / 内容审核助手 / 数据问答助手
  */
-import logger from '../utils/logger.js';
 
 // ─── FAQ 知识库 ───
 const faqKnowledge = [
@@ -21,7 +20,7 @@ export function searchFAQ(query) {
   return faqKnowledge
     .filter(item =>
       item.keywords.some(k => q.includes(k)) ||
-      item.q.toLowerCase().includes(q)
+      item.q.toLowerCase().includes(q),
     )
     .map(({ q: question, a: answer }) => ({ question, answer }));
 }
