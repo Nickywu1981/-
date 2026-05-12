@@ -38,7 +38,7 @@ export async function listAll({ userId, type, page = 1, pageSize = 20 }) {
 }
 
 export async function sendToUser({ userId, type = 'system', title, content }) {
-  return notificationDao.insertNotificationToUser({ userId, type, title, content });
+  return notificationDao.insertNotification({ userId, type, title, content });
 }
 
 export async function deleteById(id, userId) {

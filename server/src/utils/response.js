@@ -58,17 +58,3 @@ export function error(res, code = 500, msg = '服务异常', data = null) {
 function mockSuccess(res, data = {}) {
   return res.json({ code: 200, msg: 'success', data: { isMock: true, ...data } });
 }
-
-import { BusinessError } from './businessError.js';
-
-/**
- * 安全提取错误消息 — BusinessError 返回其 message，其他异常返回通用消息
- * 用于 v4 路由 catch 块，防止泄露内部实现细节
- * @param {Error} err
- * @param {string} [fallback='服务异常，请稍后重试']
- * @returns {string}
- */
-export function safeErrorMessage(err, fallback = '服务异常，请稍后重试') {
-  if (err instanceof BusinessError) return err.message;
-  return fallback;
-}

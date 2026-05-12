@@ -70,7 +70,7 @@ export async function cancelJob(id) {
   if (!['pending', 'running'].includes(job.status)) {
     throw new BusinessError(400, '仅可取消等待/运行中的作业');
   }
-  return wfDao.cancelJob(id);
+  return wfDao.updateJobStatus(id, { status: 'cancelled' });
 }
 
 // ─── 内部：异步逐步执行工作流 ───

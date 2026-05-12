@@ -86,7 +86,3 @@ export async function listJobsByUser(userId, { page = 1, pageSize = 20 } = {}) {
   );
   return { list: rows, total, page, pageSize };
 }
-
-export async function cancelJob(id) {
-  return updateJobStatus(id, { status: 'cancelled' });
-}

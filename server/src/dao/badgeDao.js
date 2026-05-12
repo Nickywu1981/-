@@ -45,7 +45,3 @@ export async function deleteBadge(id) {
   const [result] = await pool.execute(`UPDATE ${table} SET is_deleted = 1 WHERE id = ?`, [id]);
   return result.affectedRows > 0;
 }
-
-export async function getAvailableBadges() {
-  return listBadges({ status: 1 });
-}

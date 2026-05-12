@@ -24,7 +24,7 @@ export async function deleteBadge(id) {
 }
 
 export async function getAvailableBadges() {
-  return badgeDao.getAvailableBadges();
+  return badgeDao.listBadges({ status: 1 });
 }
 
 export default { listBadges, getBadgeById, createBadge, updateBadge, deleteBadge, getAvailableBadges };

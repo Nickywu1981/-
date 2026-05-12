@@ -77,7 +77,7 @@ describe('workflowDao', () => {
 
   it('cancelJob sets status to cancelled', async () => {
     pool.execute.mockResolvedValueOnce([{ affectedRows: 1 }]);
-    const ok = await dao.cancelJob(5);
+    const ok = await dao.updateJobStatus(5, { status: 'cancelled' });
     expect(ok).toBe(true);
   });
 });

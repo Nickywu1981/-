@@ -81,7 +81,3 @@ export async function deleteNotification(id, userId) {
   const [result] = await pool.execute('DELETE FROM user_notification WHERE id = ? AND user_id = ?', [id, userId]);
   return result.affectedRows > 0;
 }
-
-export async function insertNotificationToUser(notification) {
-  return insertNotification(notification);
-}
