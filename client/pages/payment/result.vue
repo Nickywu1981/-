@@ -46,6 +46,7 @@
 
 const route = useRoute()
 const router = useRouter()
+const toast = useToast()
 const reqsn = (route.query.reqsn as string) || ''
 const isMock = route.query.mock === '1'
 const amountYuan = computed(() => (Number(route.query.amount) / 100).toFixed(2))

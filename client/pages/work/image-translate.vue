@@ -53,6 +53,7 @@
 
 <script setup lang="ts">
 const { createBlobUrl, revoke } = useBlobUrl()
+const toast = useToast()
 
 const step = ref(0);
 const previewUrl = ref('');

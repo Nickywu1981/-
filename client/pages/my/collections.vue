@@ -35,6 +35,7 @@
 <script setup lang="ts">
 
 const { confirm } = useConfirm()
+const toast = useToast()
 
 
 const showForm = ref(false);
