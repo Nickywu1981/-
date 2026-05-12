@@ -49,7 +49,7 @@
               <td>{{ u.phone || '-' }}</td>
               <td>{{ u.plan_type > 0 ? ['', '月卡', '季卡', '年卡'][u.plan_type] : '免费' }}</td>
               <td>{{ u.credit_balance ?? 0 }}</td>
-              <td><span class="status" :class="u.status === 0 ? 'active' : 'banned'">{{ u.status === 0 ? '正常' : '禁用' }}</span></td>
+              <td><StatusBadge :variant="u.status === 0 ? 'success' : 'danger'" size="sm">{{ u.status === 0 ? '正常' : '禁用' }}</StatusBadge></td>
               <td>{{ u.create_time?.slice(0, 10) }}</td>
               <td class="actions">
                 <button class="btn-sm" @click="openEdit(u)">编辑</button>
@@ -93,6 +93,7 @@
 </template>
 
 <script setup lang="ts">
+import StatusBadge from '~/components/shared/StatusBadge.vue'
 
 const { confirm } = useConfirm()
 const list = ref<any[]>([])

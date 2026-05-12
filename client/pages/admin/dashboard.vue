@@ -68,7 +68,7 @@
               <td class="mono">{{ t.id?.slice(0, 8) }}</td>
               <td>{{ t.username }}</td>
               <td>{{ t.task_type }}</td>
-              <td><span class="badge" :class="statusClass(t.status)">{{ statusLabel(t.status) }}</span></td>
+              <td><StatusBadge :variant="statusVariant(t.status)" size="sm" dot>{{ statusLabel(t.status) }}</StatusBadge></td>
               <td class="time">{{ t.create_time?.slice(0, 16) }}</td>
             </tr>
             <tr v-if="!recentTasks.length"><td colspan="5" class="empty">暂无数据</td></tr>
@@ -83,6 +83,7 @@
 
 import PageHeader from '~/components/shared/PageHeader.vue'
 import StatsCard from '~/components/shared/StatsCard.vue'
+import StatusBadge from '~/components/shared/StatusBadge.vue'
 import * as echarts from 'echarts/core';
 import { LineChart, PieChart, BarChart } from 'echarts/charts';
 import { TitleComponent, TooltipComponent, LegendComponent, GridComponent } from 'echarts/components';
@@ -104,8 +105,8 @@ const modelChart = ref<HTMLDivElement>()
 let charts: echarts.ECharts[] = []
 const toast = useToast()
 
-function statusClass(s: number) { return { 0: 'pending', 1: 'processing', 2: 'done', 3: 'fail' }[s] || '' }
-function statusLabel(s: number) { return { 0: '排队', 1: '处理中', 2: '完成', 3: '失败' }[s] || '' }
+const statusVariant = (s: number) => ['info','warning','success','danger'][s] || 'default'
+const statusLabel = (s: number) => ['排队','处理中','完成','失败'][s] || ''
 
 function initChart(el: HTMLDivElement | undefined): echarts.ECharts | null {
   if (!el || typeof window === 'undefined') return null
