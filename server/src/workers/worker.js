@@ -9,6 +9,7 @@ import logger from '../utils/logger.js';
 import config, { workerConfig } from '../config/index.js';
 import { validateStartupConfig } from '../utils/startupGuard.js';
 import * as jobQueueService from '../services/job-queue.service.js';
+import { onChildJobComplete } from '../services/unifiedQueueService.js';
 import { gatewayInfer } from '../gateway/aiGatewayHub.js';
 import { saveSimpleFile } from '../utils/file-upload.js';
 
@@ -49,6 +50,8 @@ const TASK_MODEL_MAP = {
 async function processJob(job) {
   if (!job?.id) return;
   activeJobIds.add(job.id);
+
+  let params = {};
   try {
     await jobQueueService.updateProgress(job.id, 10);
 
@@ -59,7 +62,6 @@ async function processJob(job) {
     }
 
     // 解析参数
-    let params = {};
     try {
       params = typeof job.task_params === 'string' ? JSON.parse(job.task_params) : (job.task_params || {});
     } catch { params = {}; }
@@ -103,9 +105,19 @@ async function processJob(job) {
     });
 
     logger.info(`[Worker] Job #${job.id} (${job.task_type}) completed`);
+
+    // 批量进度聚合：通知父任务
+    if (params.batchId) {
+      onChildJobComplete(params.batchId, job.id, 'completed', result).catch(() => {});
+    }
   } catch (err) {
     logger.error(`[Worker] Job #${job.id} failed: ${err.message}`);
     await jobQueueService.failJob(job.id, err.message);
+
+    // 批量进度聚合：通知父任务子任务失败
+    if (params.batchId) {
+      onChildJobComplete(params.batchId, job.id, 'failed', { error: err.message }).catch(() => {});
+    }
   } finally {
     activeJobIds.delete(job.id);
   }

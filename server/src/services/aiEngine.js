@@ -39,22 +39,27 @@ export function listModels(type = '') {
 // ==================== 任务类型 → 默认模型映射 ====================
 
 const DEFAULT_MODEL_MAP = {
-  // 图片类 — 映射到已注册的 SD / DALL-E 模型
+  // 图片类 — 映射到已注册的 SD / gpt-image-2 模型
   cutout:           'stable-diffusion-img2img',
   cutout_hq:        'stable-diffusion-img2img',
   bg_white:         'stable-diffusion-img2img',
-  scene_gen:        'stable-diffusion-xl',
+  scene_gen:        'gpt-image-2',
   image_enhance:    'stable-diffusion-img2img',
   img_expand:       'stable-diffusion-img2img',
   ghost_mannequin:  'stable-diffusion-img2img',
-  poster_gen:       'dall-e-3',
+  poster_gen:       'gpt-image-2',
   color_swap:       'stable-diffusion-img2img',
   style_transfer:   'stable-diffusion-img2img',
   virtual_tryon:    'stable-diffusion-img2img',
-  // 视频类（当前用图片模型占位，后续接 Seedance）
-  img2video:        'stable-diffusion-xl',
-  multi2video:      'stable-diffusion-xl',
-  video_edit:       'stable-diffusion-img2img',
+  detail_long_image: 'gpt-image-2',
+  multi_size_export: 'gpt-image-2-multi-size',
+  // 视频类
+  img2video:        'seedance',
+  multi2video:      'seedance',
+  video_edit:       'seedance',
+  action_migrate:   'seedance-action-migrate',
+  digital_human:    'seedance',
+  batch_video:      'seedance-batch',
   // 文本类
   text_gen:         'gpt-4o-mini',
   script_gen:       'gpt-4o',
@@ -79,6 +84,10 @@ const FALLBACK_CHAIN = {
   'claude-haiku-4-5':  ['gpt-4o-mini'],
   'seedance-2.0':    ['pixeldance'],
   'pixeldance':      ['seedance-2.0'],
+  'seedance':        ['cogvideo'],
+  'cogvideo':        ['stable-diffusion-xl'],
+  'gpt-image-2':     ['stable-diffusion-xl', 'stability-sdxl'],
+  'dall-e-3':        ['gpt-image-2', 'stable-diffusion-xl'],
   'rmbg-2.0':        ['sam2-matting'],
   'iclight-v2':      ['bg-postprocess'],
 };

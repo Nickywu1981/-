@@ -12,6 +12,8 @@ import { registerClaude } from './claudeAdapter.js';
 import { registerSD } from './sdAdapter.js';
 import { registerStability } from './stabilityAdapter.js';
 import { registerEdgeTTS } from './edgeTtsAdapter.js';
+import { registerGptImage } from './gptImageAdapter.js';
+import { registerVideo } from './videoAdapter.js';
 import logger from '../../utils/logger.js';
 
 export async function registerAllAdapters() {
@@ -24,10 +26,12 @@ export async function registerAllAdapters() {
     registerSD(),
     registerStability(),
     registerEdgeTTS(),
+    registerGptImage(),
+    registerVideo(),
   ]);
 
   results.forEach((r, i) => {
-    const name = ['OpenAI', 'Claude', 'SD', 'Stability', 'EdgeTTS'][i];
+    const name = ['OpenAI', 'Claude', 'SD', 'Stability', 'EdgeTTS', 'GptImage', 'Video'][i];
     if (r.status === 'rejected') logger.error(`[AI] ${name} 注册失败: ${r.reason.message}`);
   });
 
@@ -47,4 +51,4 @@ export async function registerAllAdapters() {
   logger.info('[AI] =========================================');
 }
 
-export { registerOpenAI, registerClaude, registerSD, registerStability };
+export { registerOpenAI, registerClaude, registerSD, registerStability, registerGptImage, registerVideo };

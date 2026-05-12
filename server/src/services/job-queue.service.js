@@ -228,3 +228,49 @@ export async function recoverStuckJobs(timeoutMinutes = 10) {
     conn.release();
   }
 }
+
+// ─── 别名 + 扩展方法 ───
+
+export async function updateJobPriority(jobId, priority) {
+  const conn = await db.getConnection();
+  try {
+    await conn.query('UPDATE job_queue SET priority = ? WHERE id = ?', [priority, jobId]);
+    return true;
+  } finally {
+    conn.release();
+  }
+}
+
+export async function listJobs(userId, { status, page = 1, limit = 20 } = {}) {
+  return getUserJobs(userId, { status, page, pageSize: limit });
+}
+
+export async function getJob(jobId) {
+  const conn = await db.getConnection();
+  try {
+    const [rows] = await conn.query('SELECT * FROM job_queue WHERE id = ?', [jobId]);
+    return rows[0] || null;
+  } finally {
+    conn.release();
+  }
+}
+
+export async function getQueueStats() {
+  const conn = await db.getConnection();
+  try {
+    const [[{ queued }], [{ processing }], [{ completed }], [{ failed }]] = await Promise.all([
+      conn.query("SELECT COUNT(*) AS queued FROM job_queue WHERE status = 'queued'"),
+      conn.query("SELECT COUNT(*) AS processing FROM job_queue WHERE status = 'processing'"),
+      conn.query("SELECT COUNT(*) AS completed FROM job_queue WHERE status = 'completed' AND updated_at > DATE_SUB(NOW(), INTERVAL 1 HOUR)"),
+      conn.query("SELECT COUNT(*) AS failed FROM job_queue WHERE status = 'failed' AND updated_at > DATE_SUB(NOW(), INTERVAL 1 HOUR)"),
+    ]);
+    return {
+      queued: queued?.queued || 0,
+      processing: processing?.processing || 0,
+      completedRecent: completed?.completed || 0,
+      failedRecent: failed?.failed || 0,
+    };
+  } finally {
+    conn.release();
+  }
+}

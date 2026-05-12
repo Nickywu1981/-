@@ -104,39 +104,70 @@ async function runJob(jobId, steps, inputData) {
   logger.info(`[Workflow] job=${jobId} completed, ${steps.length} steps`);
 }
 
-// ─── 步骤执行器 ───
+// ─── 步骤执行器（对接真实 AI 模型） ───
 async function executeStep(step, context) {
-  // 模拟 AI 步骤执行（MVP 阶段规则引擎模拟，后续接真实 LLM）
-  const delay = 200 + Math.random() * 600; // 模拟延迟
+  const { gatewayInfer } = await import('../gateway/aiGatewayHub.js');
 
   switch (step.type) {
     case 'generate_text': {
-      await sleep(delay);
-      const topic = context.product_name || context.topic || '未指定主题';
-      return { copy_text: `【AI生成】${topic} — 限时特惠，品质保障！点击了解详情 →` };
+      const textPrompt = step.prompt || `为商品 "${context.product_name || context.topic || '未指定'}" 生成电商营销文案`;
+      const result = await gatewayInfer('gpt-4o-mini', {
+        prompt: textPrompt,
+        systemPrompt: '你是资深电商文案专家，输出吸引人的营销文案。',
+        temperature: 0.8,
+      }, { userId: context.userId, tenantId: context.tenantId, taskType: 'text_gen', source: 'workflow' });
+      return { copy_text: result?.text || result?.output?.text || '' };
     }
+
     case 'generate_image': {
-      await sleep(delay * 2);
-      return { image_urls: ['https://placehold.co/800x800/png?text=AI+Generated'] };
+      const imgPrompt = step.prompt || `professional e-commerce product photography of ${context.product_name || 'product'}, studio lighting, white background, 8k`;
+      const result = await gatewayInfer('gpt-image-2', {
+        prompt: imgPrompt,
+        size: step.size || '1024x1024',
+        n: step.n || 1,
+      }, { userId: context.userId, tenantId: context.tenantId, taskType: 'image_gen', source: 'workflow' });
+      const urls = (result?.images || []).map((img) => img.url).filter(Boolean);
+      return { image_urls: urls.length ? urls : [result?.file_url || result?.url].filter(Boolean) };
     }
+
     case 'generate_voice': {
-      await sleep(delay);
-      return { audio_url: 'https://example.com/ai-voice-output.mp3' };
+      const voiceText = step.text || context.copy_text || '欢迎使用AI电商工具箱';
+      const result = await gatewayInfer('edge-tts', {
+        text: voiceText,
+        voice: step.voice || 'zh-CN-XiaoxiaoNeural',
+      }, { userId: context.userId, tenantId: context.tenantId, taskType: 'tts', source: 'workflow' });
+      return { audio_url: result?.audioUrl || result?.url || '' };
     }
+
     case 'generate_video': {
-      await sleep(delay * 3);
-      return { video_url: 'https://example.com/ai-video-output.mp4' };
+      const videoPrompt = step.prompt || `product showcase video of ${context.product_name || 'product'}, cinematic quality`;
+      const result = await gatewayInfer('seedance', {
+        prompt: videoPrompt,
+        imageUrl: context.image_urls?.[0] || step.imageUrl,
+        duration: step.duration || 5,
+        resolution: step.resolution || '1080p',
+      }, { userId: context.userId, tenantId: context.tenantId, taskType: 'video_gen', source: 'workflow' });
+      return { video_url: result?.videoUrl || result?.output?.video_url || '' };
     }
+
     case 'export': {
-      await sleep(delay);
-      return { download_url: 'https://example.com/export/batch-output.zip' };
+      // 导出步骤：收集所有前置步骤的输出
+      return {
+        download_url: context.download_url || '',
+        exported_data: {
+          text: context.copy_text || '',
+          images: context.image_urls || [],
+          audio: context.audio_url || '',
+          video: context.video_url || '',
+        },
+      };
     }
+
     default:
       throw new BusinessError(400, `不支持的步骤类型: ${step.type}`);
   }
 }
 
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 function parseSteps(val) {
   if (!val) return val;
   if (typeof val === 'object') return val;
