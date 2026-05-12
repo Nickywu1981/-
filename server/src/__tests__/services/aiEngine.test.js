@@ -49,7 +49,7 @@ describe('aiEngine', () => {
   describe('getDefaultModel', () => {
     it('已知任务类型返回模型 ID', () => {
       expect(aiEngine.getDefaultModel('cutout')).toBe('stable-diffusion-img2img');
-      expect(aiEngine.getDefaultModel('img2video')).toBe('stable-diffusion-xl');
+      expect(aiEngine.getDefaultModel('img2video')).toBe('seedance');
     });
 
     it('未知类型返回 null', () => {

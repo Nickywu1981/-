@@ -40,21 +40,21 @@ describe('userService', () => {
     });
 
     it('账号被禁用抛出错误', async () => {
-      userDao.findByUsername.mockResolvedValue({ id: 1, username: 'u1', password: 'hash', status: 0 });
+      userDao.findByUsername.mockResolvedValue({ id: 1, username: 'u1', password: 'hash', status: 'disabled' });
       bcrypt.compare.mockResolvedValue(true);
       await expect(userService.login({ username: 'u1', password: 'p1' }))
         .rejects.toThrow('账号已被禁用');
     });
 
     it('密码错误抛出错误', async () => {
-      userDao.findByUsername.mockResolvedValue({ id: 1, username: 'u1', password: 'hash', status: 1 });
+      userDao.findByUsername.mockResolvedValue({ id: 1, username: 'u1', password: 'hash', status: 'active' });
       bcrypt.compare.mockResolvedValue(false);
       await expect(userService.login({ username: 'u1', password: 'wrong' }))
         .rejects.toThrow('用户名或密码错误');
     });
 
     it('登录成功返回 token 和用户', async () => {
-      userDao.findByUsername.mockResolvedValue({ id: 1, username: 'u1', password: 'hash', status: 1, nickname: 'n1', phone: null, email: null, avatar: null, role: 'user', tenant_id: 0 });
+      userDao.findByUsername.mockResolvedValue({ id: 1, username: 'u1', password: 'hash', status: 'active', nickname: 'n1', phone: null, email: null, avatar: null, role: 'user', tenant_id: 0 });
       bcrypt.compare.mockResolvedValue(true);
       userDao.updateLastLogin.mockResolvedValue(undefined);
       jwt.sign.mockReturnValue('fake-token');

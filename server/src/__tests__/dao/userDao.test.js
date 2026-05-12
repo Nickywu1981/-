@@ -15,8 +15,8 @@ describe('userDao', () => {
     const id = await userDao.insertUser({ username: 'u1', password: 'p1', nickname: 'n1' });
     expect(id).toBe(99);
     expect(mockExecute).toHaveBeenCalledWith(
-      expect.stringContaining('INSERT INTO user'),
-      ['u1', 'p1', 'n1', 0],
+      expect.stringContaining('INSERT INTO users'),
+      ['u1', '', 'p1', 'n1'],
     );
   });
 
@@ -53,7 +53,7 @@ describe('userDao', () => {
     const affected = await userDao.updateLastLogin(5);
     expect(affected).toBe(1);
     expect(mockExecute).toHaveBeenCalledWith(
-      expect.stringContaining('UPDATE user SET last_login_time'),
+      expect.stringContaining('UPDATE users SET last_login_at'),
       [5],
     );
   });
