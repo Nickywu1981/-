@@ -87,7 +87,7 @@ export async function getOpsOverview() {
     ]);
 
   const [tenantList] = await db.query(
-    'SELECT id, name, industry, status, created_at FROM tenant WHERE is_deleted = 0 ORDER BY created_at DESC LIMIT 20'
+    'SELECT id, name, industry, status, created_at FROM tenant WHERE is_deleted = 0 ORDER BY created_at DESC LIMIT 20',
   );
 
   return {
@@ -153,7 +153,7 @@ export async function getTokenAggregation({ days = 30 } = {}) {
        COUNT(*) AS totalCalls
      FROM ai_call_log
      WHERE created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)`,
-    [days]
+    [days],
   );
 
   const [modelBreakdown] = await db.query(
@@ -166,7 +166,7 @@ export async function getTokenAggregation({ days = 30 } = {}) {
      WHERE created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)
      GROUP BY model
      ORDER BY totalTokens DESC`,
-    [days]
+    [days],
   );
 
   const [tenantTop10] = await db.query(
@@ -182,7 +182,7 @@ export async function getTokenAggregation({ days = 30 } = {}) {
      GROUP BY acl.tenant_id, t.name
      ORDER BY totalTokens DESC
      LIMIT 10`,
-    [days]
+    [days],
   );
 
   const numericTokens = Number(totalTokens) || 0;
@@ -242,12 +242,12 @@ export async function getProfitOverview() {
       `SELECT
          COALESCE(SUM(amount), 0) AS totalCommission,
          COALESCE(SUM(CASE WHEN status = 'paid' THEN amount ELSE 0 END), 0) AS paidCommission
-       FROM commission_records`
+       FROM commission_records`,
     ),
     db.query(
       `SELECT COALESCE(SUM(amount), 0) AS pendingWithdrawals
        FROM withdrawal_records
-       WHERE status = 'pending'`
+       WHERE status = 'pending'`,
     ),
     db.query(
       `SELECT
@@ -261,7 +261,7 @@ export async function getProfitOverview() {
        LEFT JOIN enterprise_user eu ON eu.id = cr.agent_id
        GROUP BY cr.agent_id, eu.nickname, eu.username, eu.level
        ORDER BY totalCommission DESC
-       LIMIT 10`
+       LIMIT 10`,
     ),
   ]);
 
@@ -313,7 +313,7 @@ export async function getOpsTrends({ days = 30 } = {}) {
        WHERE created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)
        GROUP BY DATE(created_at)
        ORDER BY date`,
-      [days]
+      [days],
     ),
     db.query(
       `SELECT
@@ -323,7 +323,7 @@ export async function getOpsTrends({ days = 30 } = {}) {
        WHERE created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)
        GROUP BY DATE(created_at)
        ORDER BY date`,
-      [days]
+      [days],
     ),
     db.query(
       `SELECT
@@ -333,7 +333,7 @@ export async function getOpsTrends({ days = 30 } = {}) {
        WHERE created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)
        GROUP BY DATE(created_at)
        ORDER BY date`,
-      [days]
+      [days],
     ),
     db.query(
       `SELECT
@@ -343,7 +343,7 @@ export async function getOpsTrends({ days = 30 } = {}) {
        WHERE status = 'paid' AND created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)
        GROUP BY DATE(created_at)
        ORDER BY date`,
-      [days]
+      [days],
     ),
   ]);
 
@@ -434,11 +434,11 @@ export async function getTenantRanking({ metric = 'tokens', limit = 10 } = {}) {
      GROUP BY acl.tenant_id, t.name, t.industry, t.status
      ORDER BY ${orderClause}
      LIMIT ?`,
-    [limit]
+    [limit],
   );
 
   const [{ totalTenantsCompared }] = await db.query(
-    'SELECT COUNT(DISTINCT tenant_id) AS totalTenantsCompared FROM ai_call_log'
+    'SELECT COUNT(DISTINCT tenant_id) AS totalTenantsCompared FROM ai_call_log',
   );
 
   return {

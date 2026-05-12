@@ -42,16 +42,18 @@ export async function notifyComplete(taskId, userId, { type, title, result: _res
 }
 
 async function trySendSms(userId, typeLabel) {
+  let user;
   try {
-    const [[user]] = await pool.execute(
+    const [[u]] = await pool.execute(
       'SELECT phone FROM user WHERE id = ? AND phone IS NOT NULL AND phone != \'\'',
       [userId],
     );
+    user = u;
     if (!user?.phone) return;
 
     await smsService.sendNotification(user.phone, {
       templateCode: 'sms_task_complete',
       params: { task_type: typeLabel, count: '1' },
     });
-  } catch (e) { logger.warn('任务完成短信通知失败', { userId: user.id, taskType, error: e.message }); }
+  } catch (e) { logger.warn('任务完成短信通知失败', { userId: user?.id, taskType: typeLabel, error: e.message }); }
 }

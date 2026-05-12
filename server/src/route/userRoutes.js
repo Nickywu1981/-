@@ -53,7 +53,7 @@ router.post('/forgot-password', authLimiter, validate(forgotPasswordSchema), for
 router.post('/reset-password', authLimiter, validate(resetPasswordSchema), resetPassword);
 
 // 获取 CSRF Token（SPA 首次加载时调用）
-router.get('/csrf-token', setCsrfCookie, (_req, res) => success(res, null, 'ok');
+router.get('/csrf-token', setCsrfCookie, (_req, res) => success(res, null, 'ok'));
 
 // 需要认证
 router.get('/profile', authMiddleware, profile);
@@ -62,7 +62,7 @@ router.put('/password', authMiddleware, validate(changePasswordSchema), changePa
 router.get('/stats', authMiddleware, getStats);
 
 // JWT 双令牌 — refresh 使用 refreshTokenMiddleware 校验 httpOnly cookie
-router.post('/refresh', setCsrfCookie, validate(refreshTokenSchema), refreshTokenMiddleware), refreshToken);
+router.post('/refresh', setCsrfCookie, validate(refreshTokenSchema), refreshTokenMiddleware, refreshToken);
 router.post('/logout', authMiddleware, logout);
 router.post('/logout-all', authMiddleware, logoutAll);
 

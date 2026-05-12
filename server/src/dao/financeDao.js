@@ -286,13 +286,13 @@ export async function getFinanceDashboard(tenantId, tenantType) {
   const balance = await getTenantBalance(tenantId);
 
   const [[{ totalRevenue }]] = await pool.query(
-    `SELECT COALESCE(SUM(amount), 0) AS totalRevenue FROM account_ledger WHERE tenant_id = ? AND ledger_type = 'revenue'`, [tenantId],
+    'SELECT COALESCE(SUM(amount), 0) AS totalRevenue FROM account_ledger WHERE tenant_id = ? AND ledger_type = \'revenue\'', [tenantId],
   );
   const [[{ totalWithdrawn }]] = await pool.query(
-    `SELECT COALESCE(SUM(amount), 0) AS totalWithdrawn FROM account_ledger WHERE tenant_id = ? AND ledger_type = 'withdrawal'`, [tenantId],
+    'SELECT COALESCE(SUM(amount), 0) AS totalWithdrawn FROM account_ledger WHERE tenant_id = ? AND ledger_type = \'withdrawal\'', [tenantId],
   );
   const [[{ monthRevenue }]] = await pool.query(
-    `SELECT COALESCE(SUM(amount), 0) AS monthRevenue FROM account_ledger WHERE tenant_id = ? AND ledger_type = 'revenue' AND create_time >= DATE_SUB(NOW(), INTERVAL 30 DAY)`, [tenantId],
+    'SELECT COALESCE(SUM(amount), 0) AS monthRevenue FROM account_ledger WHERE tenant_id = ? AND ledger_type = \'revenue\' AND create_time >= DATE_SUB(NOW(), INTERVAL 30 DAY)', [tenantId],
   );
 
   const result = { balance, totalRevenue, totalWithdrawn, monthRevenue };

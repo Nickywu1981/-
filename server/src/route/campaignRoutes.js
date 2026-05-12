@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { adminLimiter } from '../middleware/rateLimiter.js';
-import { validate, paginationSchema, idParamSchemaSchema } from '../utils/validate.js';
+import { validate, paginationSchema, idParamSchema } from '../utils/validate.js';
 import { z } from 'zod';
 import * as ctrl from '../controller/campaignController.js';
 

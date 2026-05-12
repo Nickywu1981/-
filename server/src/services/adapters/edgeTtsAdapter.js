@@ -187,6 +187,7 @@ async function realCloneInfer(text, audioSampleUrl) {
   try {
     // Step 1: Upload audio sample → get voice_id
     let voiceId;
+    const apiBase = process.env.ELEVENLABS_API_URL || 'https://api.elevenlabs.io';
     if (audioSampleUrl) {
       // 防路径遍历：拒绝含 .. 或绝对路径的输入
       if (audioSampleUrl.includes('..') || path.isAbsolute(audioSampleUrl)) {
@@ -205,7 +206,6 @@ async function realCloneInfer(text, audioSampleUrl) {
         const buffer = await fs.promises.readFile(samplePath);
         formData.append('files', new Blob([buffer]), 'sample.mp3');
         formData.append('name', `clone_${Date.now()}`);
-        const apiBase = process.env.ELEVENLABS_API_URL || 'https://api.elevenlabs.io';
         const addResp = await fetch(`${apiBase}/v1/voices/add`, {
           method: 'POST',
           headers: { 'xi-api-key': apiKey },

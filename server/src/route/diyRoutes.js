@@ -29,13 +29,13 @@ const pageSchema = z.object({
   pageType: z.enum(['mobile', 'pc', 'h5', 'landing', 'detail', 'activity', 'custom']).optional(),
   accessType: z.enum(['public', 'private']).optional(),
   mobileConfig: z.object({ sections: z.array(z.unknown()) }).optional().refine(
-    (v) => JSON.stringify(v).length <= 500000, '配置数据不能超过500KB'
+    (v) => JSON.stringify(v).length <= 500000, '配置数据不能超过500KB',
   ),
   pcConfig: z.object({ sections: z.array(z.unknown()) }).optional().refine(
-    (v) => JSON.stringify(v).length <= 500000, '配置数据不能超过500KB'
+    (v) => JSON.stringify(v).length <= 500000, '配置数据不能超过500KB',
   ),
   metaJson: z.object({}).passthrough().optional().refine(
-    (v) => JSON.stringify(v).length <= 100000, '元数据不能超过100KB'
+    (v) => JSON.stringify(v).length <= 100000, '元数据不能超过100KB',
   ),
 });
 const componentSchema = z.object({
@@ -44,26 +44,26 @@ const componentSchema = z.object({
   category: z.string().min(1, '分类不能为空').max(50),
   icon: z.string().optional(),
   defaultConfig: z.object({}).passthrough().optional().refine(
-    (v) => JSON.stringify(v).length <= 200000, '组件默认配置不能超过200KB'
+    (v) => JSON.stringify(v).length <= 200000, '组件默认配置不能超过200KB',
   ),
 });
 const idsSchema = z.object({ ids: z.array(z.number().or(z.string())).min(1, '至少选择一项') });
 
 const versionSaveSchema = z.object({
   mobileConfig: z.unknown().optional().refine(
-    (v) => v === undefined || JSON.stringify(v).length <= 500000, '配置数据不能超过500KB'
+    (v) => v === undefined || JSON.stringify(v).length <= 500000, '配置数据不能超过500KB',
   ),
   pcConfig: z.unknown().optional().refine(
-    (v) => v === undefined || JSON.stringify(v).length <= 500000, '配置数据不能超过500KB'
+    (v) => v === undefined || JSON.stringify(v).length <= 500000, '配置数据不能超过500KB',
   ),
   remark: z.string().max(500).optional(),
 });
 const autoSaveSchema = z.object({
   mobileConfig: z.unknown().optional().refine(
-    (v) => v === undefined || JSON.stringify(v).length <= 500000, '配置数据不能超过500KB'
+    (v) => v === undefined || JSON.stringify(v).length <= 500000, '配置数据不能超过500KB',
   ),
   pcConfig: z.unknown().optional().refine(
-    (v) => v === undefined || JSON.stringify(v).length <= 500000, '配置数据不能超过500KB'
+    (v) => v === undefined || JSON.stringify(v).length <= 500000, '配置数据不能超过500KB',
   ),
 });
 const diffSchema = z.object({
@@ -80,7 +80,7 @@ const versionsQuerySchema = z.object({ includeAuto: z.enum(['true', 'false']).op
 function validateParams(schema) {
   return (req, _res, next) => {
     const result = schema.safeParse(req.params);
-    if (!result.success) return next(new BusinessError(ERROR_CODE.BAD_REQUEST, result.error.issues.map(i => i.message).join('; '));
+    if (!result.success) return next(new BusinessError(ERROR_CODE.BAD_REQUEST, result.error.issues.map(i => i.message).join('; ')));
     req.params = result.data;
     next();
   };
@@ -89,7 +89,7 @@ function validateParams(schema) {
 function validateQuery(schema) {
   return (req, _res, next) => {
     const result = schema.safeParse(req.query);
-    if (!result.success) return next(new BusinessError(ERROR_CODE.BAD_REQUEST, result.error.issues.map(i => i.message).join('; '));
+    if (!result.success) return next(new BusinessError(ERROR_CODE.BAD_REQUEST, result.error.issues.map(i => i.message).join('; ')));
     req.query = result.data;
     next();
   };

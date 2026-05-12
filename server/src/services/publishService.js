@@ -80,7 +80,7 @@ export async function submitPublish(userId, workId, platforms, options = {}) {
     );
 
     const records = [];
-    let firstInsertId = result.insertId;
+    const firstInsertId = result.insertId;
     for (let i = 0; i < platforms.length; i++) {
       const spec = PLATFORM_PUBLISH_SPECS[platforms[i]];
       records.push({ id: firstInsertId + i, platform: platforms[i], platformName: spec.name, status });
