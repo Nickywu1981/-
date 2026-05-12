@@ -57,6 +57,7 @@
 <script setup lang="ts">
 
 const steps = ['上传音频', '选择音色', '生成音频']
+const toast = useToast()
 const currentStep = ref(0)
 const audioFileName = ref('')
 const uploadedUrl = ref('')

@@ -25,6 +25,7 @@
 </template>
 <script setup lang="ts">
 const platformSizes = ref<any[]>([])
+const toast = useToast()
 const selected = ref<any>(null)
 const loading = ref(true)
 const router = useRouter()

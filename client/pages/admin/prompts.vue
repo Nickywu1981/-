@@ -111,6 +111,7 @@
 <script setup lang="ts">
 
 const { confirm } = useConfirm()
+const toast = useToast()
 
 const list = ref<any[]>([]);
 const total = ref(0);

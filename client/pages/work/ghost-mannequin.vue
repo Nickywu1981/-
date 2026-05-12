@@ -65,6 +65,7 @@
 
 <script setup lang="ts">
 const { createBlobUrl, revoke } = useBlobUrl()
+const toast = useToast()
 
 const steps = ['上传图片', '选择效果', '生成展示']
 const currentStep = ref(0)

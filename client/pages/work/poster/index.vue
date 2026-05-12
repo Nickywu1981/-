@@ -126,6 +126,7 @@ import PromptEnhancer from '~/components/PromptEnhancer.vue'
 ;
 
 const { config: headerCfg } = useSiteConfig('page.poster');
+const toast = useToast()
 
 const types = [
   { key: 'product', icon: '🛍️', label: '产品营销海报', sizeText: '1200×1800 (2:3)' },

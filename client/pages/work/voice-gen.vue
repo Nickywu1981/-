@@ -45,7 +45,7 @@
 
 <script setup lang="ts">
 import PromptEnhancer from '~/components/PromptEnhancer.vue'
-
+const toast = useToast()
 
 const steps = ['输入文案', '选择音色', '生成语音']
 const currentStep = ref(0)

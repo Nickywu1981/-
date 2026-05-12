@@ -383,6 +383,7 @@ onMounted(async () => {
   }
   await loadPage()
 })
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

@@ -71,6 +71,7 @@ import PromptEnhancer from '~/components/PromptEnhancer.vue'
 
 
 const step = ref(0);
+const toast = useToast()
 const productInfo = ref('');
 const selectedStyle = ref('带货');
 const selectedDuration = ref(30);

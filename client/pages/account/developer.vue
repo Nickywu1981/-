@@ -95,6 +95,8 @@ const { confirm } = useConfirm()
 import { api } from '@/composables/useApi'
 import { formatDateTime } from '@/utils/format'
 
+const toast = useToast()
+
 const keys = ref<any[]>([])
 const loading = ref(false)
 const showCreate = ref(false)

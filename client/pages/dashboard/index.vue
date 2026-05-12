@@ -324,6 +324,7 @@ const alerts = [
   '⚠ 短信通道 2 延迟升高 — 已自动切换至备用通道',
   'ℹ 新版本 v3.2.1 灰度发布中 — 当前覆盖率 15%',
 ]
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

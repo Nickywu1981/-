@@ -132,6 +132,7 @@ function startPoll() {
 function goHome() {
   router.push('/member')
 }
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

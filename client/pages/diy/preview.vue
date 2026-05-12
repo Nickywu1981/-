@@ -54,6 +54,7 @@ async function loadPage() {
 function retry() { loadPage() }
 
 onMounted(loadPage)
+definePageMeta({ layout: 'landing' })
 </script>
 
 <style scoped>
