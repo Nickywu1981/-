@@ -135,7 +135,7 @@ async function health() {
       signal: AbortSignal.timeout(5000),
     });
     if (res.ok) return { status: 'ok', provider: 'sd-webui' };
-  } catch { /* fall through to Replicate check */ }
+  } catch { logger.warn('[AI] SD WebUI 健康检查失败，尝试 Replicate 降级'); }
 
   if (REPLICATE_API_KEY) {
     return { status: 'ok', provider: 'replicate', note: 'SD WebUI offline, using Replicate' };

@@ -120,6 +120,7 @@ async function health() {
     });
     return { status: res.status < 500 ? 'ok' : 'error', provider: 'stability' };
   } catch {
+    logger.warn('[AI] Stability AI 健康检查失败');
     return { status: 'unavailable', provider: 'stability' };
   }
 }
