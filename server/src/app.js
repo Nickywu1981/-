@@ -371,10 +371,25 @@ app.use((_req, res) => {
 
 // 全局异常捕获
 app.use((err, _req, res, _next) => {
-  // 生产环境不记录完整堆栈，防止泄露服务器路径等敏感信息
   const logEntry = { message: err.message };
   if (!isProduction) logEntry.stack = err.stack;
   logger.error('[Server Error]', logEntry);
+
+  // Multer 文件上传异常 → 统一转为 4xx 业务错误
+  if (err.name === 'MulterError') {
+    const multerMessages = {
+      LIMIT_FILE_SIZE: '文件大小超过限制（最大 20MB）',
+      LIMIT_FILE_COUNT: '文件数量超过限制',
+      LIMIT_UNEXPECTED_FILE: '上传字段名不匹配',
+      LIMIT_FIELD_KEY: '字段名过长',
+      LIMIT_FIELD_VALUE: '字段值过长',
+      LIMIT_FIELD_COUNT: '字段数量过多',
+      LIMIT_PART_COUNT: '分段数量过多',
+    };
+    const msg = multerMessages[err.code] || `文件上传错误: ${err.message}`;
+    return sendError(res, ERROR_CODE.BAD_REQUEST, msg);
+  }
+
   if (err instanceof BusinessError) {
     return sendError(res, err.status, err.message);
   }
