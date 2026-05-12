@@ -5,8 +5,6 @@
  * 测试地址: https://syb-test.allinpay.com/apiweb/h5unionpay/onepay
  * 对接文档: https://prodoc.allinpay.com/project/17/
  */
-import dotenv from 'dotenv';
-dotenv.config({ override: true });
 
 const allinpayConfig = {
   env: process.env.ALLINPAY_ENV || (process.env.NODE_ENV === 'production' ? 'production' : 'sandbox'),
