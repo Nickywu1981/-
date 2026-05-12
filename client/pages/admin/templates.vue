@@ -52,7 +52,7 @@
         <div class="modal">
           <h3>{{ detail?.name }}</h3>
           <div class="detail-imgs">
-            <img v-for="(img,i) in (detail?.preview_images||[])" :key="i" :src="img" class="detail-img" />
+            <img v-for="(img,i) in (detail?.preview_images||[])" :key="i" :src="img" :alt="`${detail?.name || '模板'} 预览图 ${i + 1}`" class="detail-img" />
           </div>
           <p class="detail-desc">{{ detail?.description }}</p>
           <div v-if="detail?.meta" class="detail-meta">
