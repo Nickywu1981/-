@@ -112,7 +112,7 @@ let searchTimer: ReturnType<typeof setTimeout> | null = null
 async function fetchData() {
   loading.value = true; error.value = ''
   try {
-    const params = new URLSearchParams({ page: String(page.value), pageSize: String(pageSize.value) })
+    const params = new URLSearchParams({ page: String(page.value), size: String(pageSize.value) })
     if (search.value) params.set('keyword', search.value)
     const res: any = await $fetch(`/api/collections?${params}`)
     list.value = res.data?.list || res.data || []

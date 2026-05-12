@@ -153,7 +153,7 @@ async function doEnhance() {
   if (!prompt.value) return
   enhancing.value = true
   try {
-    const res = await $fetch('/api/ai/enhance-prompt', {
+    const res = await $fetch('/api/images/enhance-prompt', {
       method: 'POST',
       body: { prompt: prompt.value, type: 'social' },
       credentials: 'include',

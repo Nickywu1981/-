@@ -98,7 +98,7 @@ watch(() => props.modelValue, (val) => {
 async function run() {
   enhancing.value = true
   try {
-    const res: any = await $fetch('/api/ai/enhance-prompt', {
+    const res: any = await $fetch('/api/images/enhance-prompt', {
       method:'POST', headers:{ 'Content-Type':'application/json' },
       credentials:'include',
       body: { prompt: draft.value, type: props.type || 'image' }
