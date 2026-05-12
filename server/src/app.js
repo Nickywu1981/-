@@ -26,8 +26,6 @@ import { runHealthCheck } from './gateway/healthDashboard.js';
 import userRoutes from './route/userRoutes.js';
 import sizeTemplateRoutes from './route/sizeTemplateRoutes.js';
 import brandRoutes from './route/brandRoutes.js';
-import imageRoutes from './route/imageRoutes.js';
-import videoRoutes from './route/videoRoutes.js';
 import batchRoutes from './route/batchRoutes.js';
 import advancedImageRoutes from './route/advancedImageRoutes.js';
 import advancedVideoRoutes from './route/advancedVideoRoutes.js';
@@ -287,14 +285,11 @@ app.use('/api/publish', publishRoutesV4);
 app.use('/api/users', userRoutes);  // must precede /api/user to avoid prefix match
 app.use('/api/user', userRoutesV4);
 app.use('/api/upload', uploadLimiter, uploadRoutesV4);
-app.use('/api/open', openApiRoutes);
 app.use('/api/open/keys', adminLimiter, openApiKeyRoutes);
+app.use('/api/open', openApiRoutes);
 app.use('/api/copywriting', copywritingRoutes);
 app.use('/api/templates', sizeTemplateRoutes);
 app.use('/api/brand', brandRoutes);
-// DEPRECATED v1 — v4 routes mounted above supersede these. Remove after v4 migration complete.
-app.use('/api/images', heavyLimiter, imageRoutes);
-app.use('/api/videos', heavyLimiter, videoRoutes);
 app.use('/api/batch', heavyLimiter, batchRoutes);
 app.use('/api/advanced', heavyLimiter, advancedImageRoutes);
 app.use('/api/adv-video', heavyLimiter, advancedVideoRoutes);
