@@ -247,7 +247,7 @@ app.post('/api/internal/embed', async (req, res) => {
 });
 
 // 公开路由（无需认证）
-app.use(geoRoutes);
+app.use(apiLimiter, geoRoutes);
 
 // 静态文件服务（上传目录），带缓存
 app.use('/uploads', express.static(path.join(__dirname, '../uploads'), {
@@ -324,7 +324,7 @@ app.use('/api/automation', automationRoutes);
 app.use('/api/admin/ai-logs', adminLimiter, aiLogRoutes);
 app.use('/api/admin/audit-logs', adminLimiter, auditLogRoutes);
 app.use('/api/tasks', taskRoutes);
-app.use('/api/help', helpRoutes);
+app.use('/api/help', apiLimiter, helpRoutes);
 app.use('/api/collections', collectionRoutes);
 app.use('/api/admin/site-config', adminLimiter, siteConfigAdminRouter);
 app.use('/api/admin/workspace-diy', adminLimiter, adminWorkspaceDiyRoutes);

@@ -1,4 +1,5 @@
 import pool from './db.js';
+import crypto from 'crypto';
 
 const RECORD_COLS = 'id, user_id, type, action, credit_before, credit_after, consumed, remark, task_id, request_id, status, create_time, freeze_at, confirm_at, refund_at, refund_remark';
 
@@ -257,7 +258,7 @@ export async function batchUpdateFreePlanCredits(delta, conn) {
 export async function batchInsertConsumptionLogs(entries, conn) {
   if (!entries.length) return;
   const db = conn || pool;
-  const values = entries.map(e => [e.userId, e.type, e.action, e.creditBefore, e.creditAfter, e.consumed, e.remark, '', '', 1]);
+  const values = entries.map(e => [e.userId, e.type, e.action, e.creditBefore, e.creditAfter, e.consumed, e.remark, '', crypto.randomUUID(), 1]);
   const placeholders = values.map(() => '(?,?,?,?,?,?,?,?,?,?,NOW())').join(',');
   const flatValues = values.flat();
   await db.execute(

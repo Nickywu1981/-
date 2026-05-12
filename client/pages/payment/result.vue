@@ -58,6 +58,7 @@ const mockSent = ref(false)
 const mockMsg = ref('')
 
 let pollTimer: ReturnType<typeof setInterval> | null = null
+let _mockPollDefer: ReturnType<typeof setTimeout> | null = null
 let pollCount = 0
 const MAX_POLL = 15
 
@@ -72,6 +73,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   if (pollTimer) clearInterval(pollTimer)
+  if (_mockPollDefer) clearTimeout(_mockPollDefer)
 })
 
 async function mockPay(result: 'success' | 'fail') {
@@ -94,7 +96,7 @@ async function mockPay(result: 'success' | 'fail') {
   mockMsg.value = result === 'success' ? '回调已发送，正在查询结果...' : '失败回调已发送'
 
   // 开始轮询确认
-  setTimeout(() => startPoll(), 500)
+  _mockPollDefer = setTimeout(() => startPoll(), 500)
 }
 
 function startPoll() {

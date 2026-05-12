@@ -131,20 +131,28 @@ onMounted(async () => {
   }
 
   // Entrance animations for tool cards
+  let _obs: IntersectionObserver | null = null
+  let _animTimer1: ReturnType<typeof setTimeout> | undefined
+  let _animTimer2: ReturnType<typeof setTimeout> | undefined
   if (process.client && window.IntersectionObserver) {
-    const obs = new IntersectionObserver((entries) => {
+    _obs = new IntersectionObserver((entries) => {
       entries.forEach(e => {
         if (e.isIntersecting) e.target.classList.add('wc-in')
       })
     }, { threshold: 0.08 })
-    setTimeout(() => {
-      document.querySelectorAll('.wc-card').forEach(el => obs.observe(el))
+    _animTimer1 = setTimeout(() => {
+      document.querySelectorAll('.wc-card').forEach(el => _obs!.observe(el))
     }, 150)
     // Safety: reveal all cards after 2.5s
-    setTimeout(() => {
+    _animTimer2 = setTimeout(() => {
       document.querySelectorAll('.wc-card').forEach(el => el.classList.add('wc-in'))
     }, 2500)
   }
+  onUnmounted(() => {
+    if (_obs) _obs.disconnect()
+    if (_animTimer1) clearTimeout(_animTimer1)
+    if (_animTimer2) clearTimeout(_animTimer2)
+  })
 })
 
 function go(path: string) { router.push(path) }

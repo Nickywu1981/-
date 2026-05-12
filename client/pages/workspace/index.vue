@@ -148,8 +148,11 @@ onMounted(async () => {
   loading.value = false
 
   // Entrance animations for cards
+  let _obs: IntersectionObserver | null = null
+  let _animTimer1: ReturnType<typeof setTimeout> | undefined
+  let _animTimer2: ReturnType<typeof setTimeout> | undefined
   if (process.client && window.IntersectionObserver) {
-    const obs = new IntersectionObserver((entries) => {
+    _obs = new IntersectionObserver((entries) => {
       entries.forEach(e => {
         if (e.isIntersecting && !visibleCards.value.has(e.target)) {
           visibleCards.value.add(e.target)
@@ -157,16 +160,21 @@ onMounted(async () => {
         }
       })
     }, { threshold: 0.1 })
-    setTimeout(() => {
-      document.querySelectorAll('.wh-qcard').forEach(el => obs.observe(el))
+    _animTimer1 = setTimeout(() => {
+      document.querySelectorAll('.wh-qcard').forEach(el => _obs!.observe(el))
     }, 100)
     // Safety: reveal all cards after 2.5s
-    setTimeout(() => {
+    _animTimer2 = setTimeout(() => {
       document.querySelectorAll('.wh-qcard').forEach(el => {
         if (!visibleCards.value.has(el)) { el.classList.add('wh-in') }
       })
     }, 2500)
   }
+  onUnmounted(() => {
+    if (_obs) _obs.disconnect()
+    if (_animTimer1) clearTimeout(_animTimer1)
+    if (_animTimer2) clearTimeout(_animTimer2)
+  })
 })
 </script>
 
