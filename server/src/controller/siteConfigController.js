@@ -1,6 +1,6 @@
 import { wrapController } from '../utils/wrapController.js';
 import { BusinessError } from '../utils/businessError.js';
-import { getAllConfig, getPublicConfigMap, saveConfig, deleteConfig, clearPublicCache } from '../services/siteConfigService.js';
+import { getAllConfig, getPublicConfigMap, saveConfig, deleteConfig, clearPublicCache, getConfigLogs as _getConfigLogs } from '../services/siteConfigService.js';
 import { success } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { broadcastVersion } from '../services/config-version.service.js';
@@ -42,5 +42,11 @@ export const removeConfig = wrapController(async (req, res) => {
   if (!affected) throw new BusinessError(ERROR_CODE.NOT_FOUND, 'Not found');
   await clearPublicCache();
   broadcastVersion().catch(err => { logger.warn('[siteConfig] broadcastVersion failed', err.message); });
-  success(res, null, 'Config deleted');
+  return success(res, null, 'Config deleted');
+});
+
+export const getConfigLogs = wrapController(async (req, res) => {
+  const limit = Math.min(parseInt(req.query.limit, 10) || 50, 200);
+  const logs = await _getConfigLogs(req.params.key, limit);
+  return success(res, logs);
 });

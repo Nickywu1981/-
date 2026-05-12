@@ -1,7 +1,8 @@
-import diyService from '../services/diyService.js';
+import diyService, { compareConfigs } from '../services/diyService.js';
 import { success } from '../utils/response.js';
 import { parsePagination } from '../utils/pagination.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
+import { DIY_PAGE_STATUS_LABEL } from '../constants/domainStatus.js';
 import { wrapController } from '../utils/wrapController.js';
 import { BusinessError } from '../utils/businessError.js';
 
@@ -179,4 +180,29 @@ export const useTemplate = wrapController(async (req, res) => {
 export const listTemplateIndustries = wrapController(async (req, res) => {
   const industries = await diyService.listTemplateIndustries();
   return success(res, industries);
+});
+
+// ==================== 版本差异对比 ====================
+
+export const diffVersions = wrapController(async (req, res) => {
+  const { versionA, versionB } = req.body;
+  const va = await diyService.getVersion(req.params.id, versionA, req.tenantId);
+  const vb = await diyService.getVersion(req.params.id, versionB, req.tenantId);
+  if (!va || !vb) throw new BusinessError(ERROR_CODE.NOT_FOUND, '版本不存在');
+  const diff = compareConfigs(va.mobile_config, vb.mobile_config);
+  const diffPc = compareConfigs(va.pc_config, vb.pc_config);
+  return success(res, { versionA: va, versionB: vb, diff, diffPc });
+});
+
+// ==================== 页面访问统计 ====================
+
+export const getPageStats = wrapController(async (req, res) => {
+  const page = await diyService.getPageById(req.params.id, req.tenantId);
+  if (!page) throw new BusinessError(ERROR_CODE.NOT_FOUND, '页面不存在');
+  return success(res, {
+    accessCount: page.access_count || 0,
+    status: DIY_PAGE_STATUS_LABEL[page.status] || '未知',
+    publishTime: page.publish_time,
+    latestVersion: page.latest_published_version,
+  });
 });
