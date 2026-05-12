@@ -17,7 +17,7 @@ export default {
   },
 
   async getByOrderNo(orderNo) {
-    const [rows] = await pool.query(`SELECT ${COLS} FROM recharge_order WHERE order_no = ?`, [orderNo]);
+    const [rows] = await pool.query(`SELECT ${COLS} FROM recharge_order WHERE order_no = ? LIMIT 1`, [orderNo]);
     return rows[0] || null;
   },
 

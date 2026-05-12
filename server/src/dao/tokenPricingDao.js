@@ -35,7 +35,7 @@ export async function listActive(category) {
 }
 
 export async function getById(id) {
-  const [rows] = await _db().query(`SELECT ${COLS} FROM ai_model_pricing WHERE id = ?`, [id]);
+  const [rows] = await _db().query(`SELECT ${COLS} FROM ai_model_pricing WHERE id = ? LIMIT 1`, [id]);
   return rows[0] || null;
 }
 

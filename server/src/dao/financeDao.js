@@ -209,7 +209,7 @@ export async function getPendingWithdrawalTotal(tenantId) {
 // ==================== 事务安全的余额操作 ====================
 
 export async function getTenantBalance(tenantId) {
-  const [rows] = await pool.query('SELECT balance FROM tenant WHERE id = ?', [tenantId]);
+  const [rows] = await pool.query('SELECT balance FROM tenant WHERE id = ? LIMIT 1', [tenantId]);
   return rows[0]?.balance || 0;
 }
 

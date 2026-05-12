@@ -16,7 +16,7 @@ export default {
   },
 
   async getCampaign(id) {
-    const [rows] = await pool.query('SELECT id,title,type,description,cover_url,rules,reward_type,reward_value,start_time,end_time,status,target_audience,tenant_id,sort_order,create_time,update_time FROM campaign WHERE id = ?', [id]);
+    const [rows] = await pool.query('SELECT id,title,type,description,cover_url,rules,reward_type,reward_value,start_time,end_time,status,target_audience,tenant_id,sort_order,create_time,update_time FROM campaign WHERE id = ? LIMIT 1', [id]);
     return rows[0] || null;
   },
 
@@ -60,7 +60,7 @@ export default {
   },
 
   async getCoupon(id) {
-    const [rows] = await pool.query('SELECT id,code,name,type,value,min_order_amount,max_discount,total_quantity,used_quantity,per_user_limit,start_time,end_time,status,campaign_id,create_time,update_time FROM coupon WHERE id = ?', [id]);
+    const [rows] = await pool.query('SELECT id,code,name,type,value,min_order_amount,max_discount,total_quantity,used_quantity,per_user_limit,start_time,end_time,status,campaign_id,create_time,update_time FROM coupon WHERE id = ? LIMIT 1', [id]);
     return rows[0] || null;
   },
 
@@ -115,7 +115,7 @@ export default {
   },
 
   async getAnnouncement(id) {
-    const [rows] = await pool.query('SELECT id,title,content,type,level,is_pinned,target_audience,publish_time,status,create_by,create_time,update_time FROM announcement WHERE id = ?', [id]);
+    const [rows] = await pool.query('SELECT id,title,content,type,level,is_pinned,target_audience,publish_time,status,create_by,create_time,update_time FROM announcement WHERE id = ? LIMIT 1', [id]);
     return rows[0] || null;
   },
 

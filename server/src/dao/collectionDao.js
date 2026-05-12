@@ -11,7 +11,7 @@ export async function listByUser(userId, { page = 1, size = 20 }) {
 }
 
 export async function getById(id, userId) {
-  const [rows] = await db.query(`SELECT ${COLS} FROM user_collections WHERE id = ? AND user_id = ?`, [id, userId]);
+  const [rows] = await db.query(`SELECT ${COLS} FROM user_collections WHERE id = ? AND user_id = ? LIMIT 1`, [id, userId]);
   return rows[0] || null;
 }
 

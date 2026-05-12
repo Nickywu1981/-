@@ -91,7 +91,7 @@ export async function refundConsumption(recordId, userId, creditAfter, remark = 
 }
 
 export async function getConsumptionByRequestId(requestId) {
-  const [rows] = await pool.execute('SELECT id, user_id, type, action, credit_before, credit_after, consumed, status, remark, request_id, create_time, freeze_at FROM consumption_record WHERE request_id = ?', [requestId]);
+  const [rows] = await pool.execute('SELECT id, user_id, type, action, credit_before, credit_after, consumed, status, remark, request_id, create_time, freeze_at FROM consumption_record WHERE request_id = ? LIMIT 1', [requestId]);
   return rows[0] || null;
 }
 

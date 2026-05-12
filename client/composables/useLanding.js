@@ -10,7 +10,7 @@ export function useLanding() {
   // ── Auth ──
   const user = ref<any>(null);
   async function checkAuth() {
-    try { const res: any = await $fetch('/api/user/profile'); user.value = res.data; } catch { user.value = null; }
+    try { const res: any = await $fetch('/api/user/profile', { credentials: 'include' }); user.value = res.data; } catch { user.value = null; }
   }
 
   // ── Site config ──

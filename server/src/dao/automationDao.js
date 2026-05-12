@@ -14,7 +14,7 @@ export default {
   },
 
   async getTaskById(id) {
-    const [rows] = await pool.query(`SELECT ${TASK_COLS} FROM automation_task at WHERE at.id = ?`, [id]);
+    const [rows] = await pool.query(`SELECT ${TASK_COLS} FROM automation_task at WHERE at.id = ? LIMIT 1`, [id]);
     return rows[0] || null;
   },
 

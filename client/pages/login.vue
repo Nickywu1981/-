@@ -111,7 +111,7 @@ async function handleSmsLogin() {
   if (!smsPhone.value || !smsCode.value) { msg.value = '请输入手机号和验证码'; msgErr.value = true; return; }
   loading.value = true; msg.value = '';
   try {
-    await $fetch('/api/sms/verify-code', { method: 'POST', body: { phone: smsPhone.value, scene: 'login', code: smsCode.value } });
+    await $fetch('/api/sms/verify-code', { method: 'POST', credentials: 'include', body: { phone: smsPhone.value, scene: 'login', code: smsCode.value } });
     await api.post('/auth/login-by-code', { phone: smsPhone.value });
     await useAuthStore().fetchUser();
     navigateTo('/workspace');
@@ -123,7 +123,7 @@ async function sendSmsCode(scene: string) {
   if (!smsPhone.value) { msg.value = '请输入手机号'; msgErr.value = true; return; }
   msg.value = '';
   try {
-    await $fetch('/api/sms/send-code', { method: 'POST', body: { phone: smsPhone.value, scene } });
+    await $fetch('/api/sms/send-code', { method: 'POST', credentials: 'include', body: { phone: smsPhone.value, scene } });
     startSmsCd(60);
     msg.value = '验证码已发送'; msgErr.value = false;
   } catch (e: any) { msg.value = e?.data?.msg || '发送失败'; msgErr.value = true; }
@@ -133,7 +133,7 @@ async function handleEmailLogin() {
   if (!emailAddr.value || !emailCode.value) { msg.value = '请输入邮箱和验证码'; msgErr.value = true; return; }
   loading.value = true; msg.value = '';
   try {
-    await $fetch('/api/email/verify-code', { method: 'POST', body: { email: emailAddr.value, code: emailCode.value } });
+    await $fetch('/api/email/verify-code', { method: 'POST', credentials: 'include', body: { email: emailAddr.value, code: emailCode.value } });
     await api.post('/auth/login-by-code', { email: emailAddr.value });
     await useAuthStore().fetchUser();
     navigateTo('/workspace');
@@ -145,7 +145,7 @@ async function sendEmailCode(scene: string) {
   if (!emailAddr.value) { msg.value = '请输入邮箱'; msgErr.value = true; return; }
   msg.value = '';
   try {
-    await $fetch('/api/email/send-code', { method: 'POST', body: { email: emailAddr.value, scene } });
+    await $fetch('/api/email/send-code', { method: 'POST', credentials: 'include', body: { email: emailAddr.value, scene } });
     startEmailCd(60);
     msg.value = '验证码已发送'; msgErr.value = false;
   } catch (e: any) { msg.value = e?.data?.msg || '发送失败'; msgErr.value = true; }

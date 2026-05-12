@@ -5,49 +5,54 @@
    ================================================ */
 :root {
   /* 背景 */
-  --bg-page: #f8f9fb;
+  --bg-page: #fafaf9;
   --bg-card: #ffffff;
   --bg-header: rgba(255,255,255,0.85);
   --white: #ffffff;
   --text-on-brand: #ffffff;
   --text-inverse: #ffffff;
-  --bg-footer: #f8f9fb;
+  --bg-footer: #fafaf9;
   --bg-input: #f8f9fb;
-  --bg-hover: #f1f3f8;
-  --bg-accent: #EEF2FF;
+  --bg-hover: #f5f5f4;
+  --bg-av: #e8e8ec;
+  --bg-accent: #f5f3ff;
   --bg-overlay: rgba(15, 18, 30, 0.5);
 
-  /* 文字 */
-  --text-primary: #0f121e;
-  --text-secondary: #5b6178;
-  --text-muted: #949ab0;
-  --text-link: #4f5cf6;
+  /* 文字 — workspace layout aliases */
+  --tx: #171717;
+  --tx2: #6b6b70;
+  --tx3: #9d9da3;
+  --text-primary: #171717;
+  --text-secondary: #6b6b70;
+  --text-muted: #9d9da3;
+  --text-link: #5b5fe3;
 
-  /* 边框 */
-  --border-light: #eaecf2;
-  --border-card: #eaecf2;
+  /* 边框 — workspace layout aliases */
+  --brd: #ebebea;
+  --border-light: #ebebea;
+  --border-card: #ebebea;
 
-  /* 品牌色 — 靛蓝科技紫 */
-  --brand: #4f5cf6;
-  --brand-hover: #3d48d9;
-  --brand-soft: #a5acff;
-  --brand-light: #f0f1ff;
-  --brand-lightest: #f8f9ff;
-  --brand-light-alt: #e8e9ff;
-  --brand-darkest: #2d1fb8;
-  --brand-gradient: linear-gradient(135deg, #4f5cf6 0%, #7c3aed 50%, #a855f7 100%);
-  --brand-glow: 0 0 20px rgba(79, 92, 246, 0.25);
-  --brand-alpha-08: rgba(79, 92, 246, 0.08);
-  --brand-alpha-10: rgba(79, 92, 246, 0.10);
-  --brand-alpha-12: rgba(79, 92, 246, 0.12);
-  --brand-alpha-15: rgba(79, 92, 246, 0.15);
-  --brand-alpha-20: rgba(79, 92, 246, 0.20);
-  --brand-alpha-25: rgba(79, 92, 246, 0.25);
-  --brand-alpha-30: rgba(79, 92, 246, 0.30);
-  --brand-alpha-35: rgba(79, 92, 246, 0.35);
+  /* 品牌色 — 暖靛蓝 #5b5fe3 */
+  --brand: #5b5fe3;
+  --brand-hover: #4a4ed6;
+  --brand-soft: #a5a2f2;
+  --brand-light: #f5f3ff;
+  --brand-lightest: #faf9ff;
+  --brand-light-alt: #eeecff;
+  --brand-darkest: #2d3091;
+  --brand-gradient: linear-gradient(135deg, #5b5fe3 0%, #7c7ff0 50%, #a78bfa 100%);
+  --brand-glow: 0 0 20px rgba(91,95,227,.25);
+  --brand-alpha-08: rgba(91,95,227,.08);
+  --brand-alpha-10: rgba(91,95,227,.10);
+  --brand-alpha-12: rgba(91,95,227,.12);
+  --brand-alpha-15: rgba(91,95,227,.15);
+  --brand-alpha-20: rgba(91,95,227,.20);
+  --brand-alpha-25: rgba(91,95,227,.25);
+  --brand-alpha-30: rgba(91,95,227,.30);
+  --brand-alpha-35: rgba(91,95,227,.35);
 
   /* 边框补充 */
-  --border-muted: #eaecf2;
+  --border-muted: #ebebea;
 
   /* 状态 */
   --success: #10b981;
@@ -64,21 +69,21 @@
   --shadow-sm: 0 1px 2px rgba(15, 18, 30, 0.04);
   --shadow-card: 0 1px 3px rgba(15, 18, 30, 0.05), 0 1px 2px rgba(15, 18, 30, 0.03);
   --shadow-dropdown: 0 8px 24px rgba(15, 18, 30, 0.08);
-  --shadow-glow: 0 0 24px rgba(79, 92, 246, 0.12);
+  --shadow-glow: 0 0 24px rgba(91,95,227,.12);
 
   /* 标签/徽章 */
-  --tag-bg: #f1f3f8;
-  --badge-bg: #f1f3f8;
+  --tag-bg: #f5f5f4;
+  --badge-bg: #f5f5f4;
 
   /* ================================================
      2. 布局与间距
      ================================================ */
   --sidebar-width: 240px;
   --sidebar-bg: #ffffff;
-  --sidebar-text: #5b6178;
-  --sidebar-text-active: #4f5cf6;
-  --sidebar-hover-bg: #f8f9ff;
-  --sidebar-active-bg: #f0f1ff;
+  --sidebar-text: #6b6b70;
+  --sidebar-text-active: #5b5fe3;
+  --sidebar-hover-bg: #f5f5f4;
+  --sidebar-active-bg: #f5f3ff;
   --content-padding: 28px;
   --section-gap: 24px;
   --card-padding: 24px;
@@ -96,8 +101,8 @@
   /* ================================================
      4. 交互状态
      ================================================ */
-  --focus-ring: 0 0 0 3px rgba(79, 92, 246, 0.18);
-  --input-focus-border: #a5acff;
+  --focus-ring: 0 0 0 3px rgba(91,95,227,.18);
+  --input-focus-border: #a5a2f2;
   --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-base: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -105,11 +110,11 @@
   /* ================================================
      5. 组件 Token
      ================================================ */
-  --table-header-bg: #f8f9fb;
-  --table-row-hover: #f1f3f8;
-  --table-border: #eaecf2;
-  --input-border: #eaecf2;
-  --input-placeholder: #949ab0;
+  --table-header-bg: #fafaf9;
+  --table-row-hover: #f5f5f4;
+  --table-border: #ebebea;
+  --input-border: #ebebea;
+  --input-placeholder: #9d9da3;
   --input-radius: 10px;
   --btn-radius: 10px;
   --btn-padding: 8px 20px;
@@ -155,31 +160,31 @@
   --skeleton-shimmer-1: #f1f3f8;
   --skeleton-shimmer-2: #eaecf2;
   --chart-grid: #eaecf2;
-  --chart-text: #949ab0;
+  --chart-text: #9d9da3;
 
-  --hero-cta-bg: linear-gradient(135deg, #4f5cf6 0%, #7c3aed 100%);
+  --hero-cta-bg: linear-gradient(135deg, #5b5fe3 0%, #7c7ff0 100%);
   --text-on-dark: #ffffff;
 
   /* 通用补充 */
   --bg-elevated: #ffffff;
-  --bg-primary: #f8f9fb;
-  --bg-secondary: #f1f3f8;
-  --bg-subtle: #f8f9fb;
-  --bg-tertiary: #f8f9fb;
-  --border: #eaecf2;
+  --bg-primary: #fafaf9;
+  --bg-secondary: #f5f5f4;
+  --bg-subtle: #fafaf9;
+  --bg-tertiary: #fafaf9;
+  --border: #ebebea;
   --card-bg: #ffffff;
-  --brand-alpha: rgba(79, 92, 246, 0.08);
-  --brand-bg: #f0f1ff;
-  --brand-border: rgba(79, 92, 246, 0.12);
+  --brand-alpha: rgba(91,95,227,.08);
+  --brand-bg: #f5f3ff;
+  --brand-border: rgba(91,95,227,.12);
   --danger-bg: #fef2f2;
   --info: #3b82f6;
   --info-bg: #eff6ff;
   --success-bg: #ecfdf5;
-  --text-tertiary: #949ab0;
+  --text-tertiary: #9d9da3;
   --warning-bg: #fffbeb;
   --radius: 10px;
   --shadow: 0 1px 3px rgba(15, 18, 30, 0.05);
-  --shadow-brand: 0 4px 16px rgba(79, 92, 246, 0.12);
+  --shadow-brand: 0 4px 16px rgba(91,95,227,.12);
   --shadow-lg: 0 12px 32px rgba(15, 18, 30, 0.08);
   --shadow-md: 0 6px 16px rgba(15, 18, 30, 0.06);
   --shadow-xl: 0 20px 48px rgba(15, 18, 30, 0.10);
@@ -200,17 +205,22 @@
   --bg-footer: #0d0f18;
   --bg-input: #141724;
   --bg-hover: #1a1d2e;
+  --bg-av: #2a2a35;
   --bg-accent: #1E1A3A;
   --bg-overlay: rgba(0, 0, 0, 0.7);
   --white: #ffffff;
   --text-on-brand: #ffffff;
   --text-inverse: #ffffff;
 
+  --tx: #e8eaf0;
+  --tx2: #8b90a5;
+  --tx3: #5d6380;
   --text-primary: #e8eaf0;
   --text-secondary: #8b90a5;
   --text-muted: #5d6380;
   --text-link: #8b95ff;
 
+  --brd: #1e2235;
   --border-light: #1e2235;
   --border-card: #1e2235;
 
@@ -347,8 +357,8 @@ body {
 
 /* 光晕脉冲 */
 @keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 12px rgba(79, 92, 246, 0.15); }
-  50% { box-shadow: 0 0 28px rgba(79, 92, 246, 0.35); }
+  0%, 100% { box-shadow: 0 0 12px rgba(91,95,227,.15); }
+  50% { box-shadow: 0 0 28px rgba(91,95,227,.35); }
 }
 
 /* 渐变流动 */
@@ -385,14 +395,14 @@ body {
 }
 
 .dot-pattern-subtle {
-  background-image: radial-gradient(circle, rgba(79, 92, 246, 0.06) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(91,95,227,0.06) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
 .gradient-mesh {
   background:
-    radial-gradient(ellipse 80% 60% at 20% 20%, rgba(79, 92, 246, 0.04) 0%, transparent 50%),
-    radial-gradient(ellipse 60% 80% at 80% 80%, rgba(124, 58, 237, 0.03) 0%, transparent 50%),
+    radial-gradient(ellipse 80% 60% at 20% 20%, rgba(91,95,227,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 80% at 80% 80%, rgba(124,58,237,0.03) 0%, transparent 50%),
     var(--bg-page);
 }
 
@@ -412,22 +422,22 @@ body {
    13. 工作台主题 Token (电商AI科技风)
    ================================================ */
 :root {
-  --ws-accent: #4f5cf6;
-  --ws-accent-hover: #3d48d9;
-  --ws-accent-light: #f0f1ff;
-  --ws-accent-gradient: linear-gradient(135deg, #4f5cf6 0%, #7c3aed 50%, #a855f7 100%);
-  --ws-accent-glow: 0 0 20px rgba(79, 92, 246, 0.2);
-  --ws-bg: #f8f9fb;
+  --ws-accent: #5b5fe3;
+  --ws-accent-hover: #4a4ed6;
+  --ws-accent-light: #f5f3ff;
+  --ws-accent-gradient: linear-gradient(135deg, #5b5fe3 0%, #7c7ff0 50%, #a78bfa 100%);
+  --ws-accent-glow: 0 0 20px rgba(91,95,227,.2);
+  --ws-bg: #fafaf9;
   --ws-card: #ffffff;
   --ws-card-hover-shadow: 0 8px 24px rgba(15, 18, 30, 0.08);
-  --ws-dot-color: rgba(79, 92, 246, 0.04);
+  --ws-dot-color: rgba(91,95,227,.04);
   --ws-sidebar-bg: #ffffff;
-  --ws-sidebar-hover: #f8f9ff;
-  --ws-sidebar-active: #f0f1ff;
+  --ws-sidebar-hover: #f5f5f4;
+  --ws-sidebar-active: #f5f3ff;
   --ws-sidebar-width: 200px;
-  --ws-tab-active-bg: #f0f1ff;
-  --ws-tab-hover-bg: #f1f3f8;
-  --ws-input-focus-shadow: 0 0 0 3px rgba(79, 92, 246, 0.1), 0 0 24px rgba(79, 92, 246, 0.06);
+  --ws-tab-active-bg: #f5f3ff;
+  --ws-tab-hover-bg: #f5f5f4;
+  --ws-input-focus-shadow: 0 0 0 3px rgba(91,95,227,.10), 0 0 24px rgba(91,95,227,.06);
   --ws-header-height: 56px;
 }
 

@@ -13,7 +13,7 @@ export default {
   },
 
   async getByReqsn(reqsn) {
-    const [rows] = await pool.query(`SELECT ${COLS} FROM allinpay_order WHERE reqsn = ?`, [reqsn]);
+    const [rows] = await pool.query(`SELECT ${COLS} FROM allinpay_order WHERE reqsn = ? LIMIT 1`, [reqsn]);
     return rows[0] || null;
   },
 

@@ -27,13 +27,13 @@
     <!-- ═══════════════════════════════════════════ -->
     <!-- LAYER 2: 统一创作输入卡片 -->
     <!-- ═══════════════════════════════════════════ -->
-    <div class="cc-input-card" role="region" :aria-label="activeTabLabel + ' — 创作输入区'">
+    <div class="cc-input-card" role="region" :aria-label="t('workspace.creation_input_region', { tab: activeTabLabel })">
       <div class="cc-input-top">
         <!-- 左侧：上传参考素材入口 -->
         <div class="cc-upload-zone" @click="triggerUpload" @dragover.prevent @drop.prevent="handleDrop">
           <input ref="fileInputRef" type="file" multiple accept="image/*,video/*" style="display:none" @change="handleFileChange" />
           <div class="cc-upload-icon">📎</div>
-          <div class="cc-upload-label">上传素材</div>
+          <div class="cc-upload-label">{{ t('workspace.creation_upload_label') }}</div>
         </div>
 
         <!-- 中间：文案输入区 -->
@@ -70,7 +70,7 @@
           :disabled="!prompt.trim()"
           @click="openGeneratePanel"
         >
-          ⚡ 开始生成
+          {{ t('workspace.slide_panel.generate_btn') }}
         </button>
       </div>
 
@@ -86,8 +86,8 @@
     <!-- ═══════════════════════════════════════════ -->
     <!-- LAYER 3: 底部动态子功能区（横向长方形卡片） -->
     <!-- ═══════════════════════════════════════════ -->
-    <section class="cc-sub-panel" role="region" :aria-label="activeTabLabel + ' — 快捷工具'">
-      <h2 class="cc-sub-title">{{ activeTabLabel }} · 快捷工具</h2>
+    <section class="cc-sub-panel" role="region" :aria-label="t('workspace.creation_tools_region', { tab: activeTabLabel })">
+      <h2 class="cc-sub-title">{{ t('workspace.creation_quick_tools', { tab: activeTabLabel }) }}</h2>
       <div class="cc-sub-scroll">
         <div
           v-for="(card, i) in activeSubCards"
@@ -152,32 +152,32 @@ const tabs = [
 // ═══ Param selects per tab ═══
 const tabParams: Record<string, { key: string; label: string; options: string[] }[]> = {
   video: [
-    { key: 'duration', label: '时长', options: ['15s', '30s', '60s', '90s', '3分钟'] },
-    { key: 'ratio', label: '比例', options: ['9:16', '16:9', '1:1', '4:3'] },
-    { key: 'resolution', label: '分辨率', options: ['720p', '1080p', '2K', '4K'] },
-    { key: 'style', label: '风格', options: ['现代', '复古', '简约', '动感', '高级'] },
+    { key: 'duration', label: t('workspace.creation_param_video_duration'), options: ['15s', '30s', '60s', '90s', '3min'] },
+    { key: 'ratio', label: t('workspace.creation_param_video_ratio'), options: ['9:16', '16:9', '1:1', '4:3'] },
+    { key: 'resolution', label: t('workspace.creation_param_video_resolution'), options: ['720p', '1080p', '2K', '4K'] },
+    { key: 'style', label: t('workspace.creation_param_video_style'), options: ['Modern', 'Vintage', 'Minimal', 'Dynamic', 'Premium'] },
   ],
   image: [
-    { key: 'size', label: '尺寸', options: ['1:1', '3:4', '4:3', '16:9', '9:16', '自定义'] },
-    { key: 'count', label: '数量', options: ['1张', '2张', '4张', '6张', '8张'] },
-    { key: 'style', label: '风格', options: ['简约', '高级', '国潮', '日系', '赛博'] },
-    { key: 'bg', label: '背景', options: ['白底', '透明', '场景', '自定义'] },
+    { key: 'size', label: t('workspace.creation_param_image_size'), options: ['1:1', '3:4', '4:3', '16:9', '9:16', 'Custom'] },
+    { key: 'count', label: t('workspace.creation_param_image_count'), options: ['1', '2', '4', '6', '8'] },
+    { key: 'style', label: t('workspace.creation_param_image_style'), options: ['Minimal', 'Premium', 'Guochao', 'Japanese', 'Cyber'] },
+    { key: 'bg', label: t('workspace.creation_param_image_bg'), options: ['White', 'Transparent', 'Scene', 'Custom'] },
   ],
   detail: [
-    { key: 'platform', label: '平台', options: ['淘宝', '拼多多', '抖音', '亚马逊', 'Temu', 'Shein'] },
-    { key: 'style', label: '风格', options: ['简约', '高级', '日式', '韩式', '欧美'] },
-    { key: 'modules', label: '模块', options: ['完整版', '精简版', '仅主图+卖点', '自定义'] },
+    { key: 'platform', label: t('workspace.creation_param_detail_platform'), options: ['Taobao', 'Pinduoduo', 'Douyin', 'Amazon', 'Temu', 'Shein'] },
+    { key: 'style', label: t('workspace.creation_param_detail_style'), options: ['Minimal', 'Premium', 'Japanese', 'Korean', 'Western'] },
+    { key: 'modules', label: t('workspace.creation_param_detail_modules'), options: ['Full', 'Compact', 'Hero+USP', 'Custom'] },
   ],
   copywrite: [
-    { key: 'type', label: '类型', options: ['带货口播', '商品标题', '详情文案', '营销文案', '社媒种草'] },
-    { key: 'lang', label: '语种', options: ['中文', 'English', '日本語', '한국어', 'Español'] },
-    { key: 'tone', label: '风格', options: ['专业', '亲切', '活泼', '高级感', '紧迫感'] },
-    { key: 'voice', label: '音色', options: ['甜美女声', '沉稳男声', '活力女声', '磁性男声', '中性'] },
+    { key: 'type', label: t('workspace.creation_param_copywrite_type'), options: ['Sales VO', 'Product Title', 'Detail Copy', 'Campaign Copy', 'Social Seeding'] },
+    { key: 'lang', label: t('workspace.creation_param_copywrite_lang'), options: ['Chinese', 'English', 'Japanese', 'Korean', 'Spanish'] },
+    { key: 'tone', label: t('workspace.creation_param_copywrite_tone'), options: ['Professional', 'Friendly', 'Lively', 'Premium', 'Urgent'] },
+    { key: 'voice', label: t('workspace.creation_param_copywrite_voice'), options: ['Sweet Female', 'Deep Male', 'Energetic Female', 'Magnetic Male', 'Neutral'] },
   ],
   other: [
-    { key: 'tool', label: '工具', options: ['数字人', '换脸', '翻译', '合规检查', '爆款复刻'] },
-    { key: 'format', label: '格式', options: ['全部', '图片', '视频', '文案', '音频'] },
-    { key: 'sort', label: '排序', options: ['推荐', '最新', '最热', '免费优先'] },
+    { key: 'tool', label: t('workspace.creation_param_other_tool'), options: ['Digital Human', 'Face Swap', 'Translate', 'Compliance', 'Viral Clone'] },
+    { key: 'format', label: t('workspace.creation_param_other_format'), options: ['All', 'Image', 'Video', 'Copy', 'Audio'] },
+    { key: 'sort', label: t('workspace.creation_param_other_sort'), options: ['Recommended', 'Newest', 'Hottest', 'Free First'] },
   ],
 }
 
@@ -191,25 +191,19 @@ const activeSubCards = computed(() => {
 const activeTabLabel = computed(() => tabs.find(t => t.key === activeTab.value)?.label || '')
 
 const activeTabPlaceholder = computed(() => {
-  const map: Record<string, string> = {
-    video: '描述你想要的带货视频，例如：护肤品展示视频，15秒口播...',
-    image: '描述你想要的商品图，例如：夏季连衣裙白底图，简约高级风格...',
-    detail: '描述你的详情页需求，例如：面膜产品详情页，日式极简风...',
-    copywrite: '描述你的文案需求，例如：618 大促女装促销标题...',
-    other: '描述你的其他创作需求，例如：数字人带货、合规检查...',
-  }
-  return map[activeTab.value] || '描述你的创作需求...'
+  const key = `workspace.creation_placeholder_${activeTab.value}`
+  const translated = t(key)
+  return translated !== key ? translated : t('workspace.creation_placeholder_default')
 })
 
 const activeParamSelects = computed(() => tabParams[activeTab.value] || [])
 
 const panelParams = computed(() => {
   if (panelMode.value === 'generate') return activeParamSelects.value
-  // Sub function panel — generic params
   return [
-    { key: 'type', label: '类型', options: ['自动', '标准', '高级'] },
-    { key: 'quality', label: '质量', options: ['标清', '高清', '超清'] },
-    { key: 'format', label: '格式', options: ['JPG', 'PNG', 'MP4', 'GIF'] },
+    { key: 'type', label: t('workspace.panel_param_type'), options: [t('workspace.panel_opt_auto'), t('workspace.panel_opt_standard'), t('workspace.panel_opt_premium')] },
+    { key: 'quality', label: t('workspace.panel_param_quality'), options: [t('workspace.panel_opt_sd'), t('workspace.panel_opt_hd'), t('workspace.panel_opt_uhd')] },
+    { key: 'format', label: t('workspace.panel_param_format'), options: ['JPG', 'PNG', 'MP4', 'GIF'] },
   ]
 })
 
@@ -240,7 +234,7 @@ function removeFile(i: number) { uploadFiles.value.splice(i, 1) }
 function openGeneratePanel() {
   if (!prompt.value.trim()) return
   panelMode.value = 'generate'
-  panelTitle.value = activeTabLabel.value + ' — 生成结果'
+  panelTitle.value = t('workspace.panel_generate_title', { tab: activeTabLabel.value })
   showPanel.value = true
 }
 
