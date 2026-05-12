@@ -6,6 +6,7 @@ import { infer, pipeline } from './aiEngine.js';
 import { createTask, updateTaskStatus, completeTask, getTask, listUserTasks, countUserTasks } from '../dao/taskDao.js';
 import * as creditService from './creditService.js';
 import { BusinessError } from '../utils/businessError.js';
+import { uploadConfig } from '../config/index.js';
 
 // ==================== 主图生成管线 ====================
 
@@ -308,8 +309,8 @@ async function processRemoveBg(taskId, userId, params) {
     }, { onProgress: (p) => taskProxy(p) });
 
     await completeTask(taskId, userId, {
-      resultUrls: [result.output?.imageUrl || `${process.env.CDN_BASE_URL || ''}/api/results/${taskId}/transparent.png`],
-      thumbnail: result.output?.thumbnail || `${process.env.CDN_BASE_URL || ''}/api/results/${taskId}/thumb.png`,
+      resultUrls: [result.output?.imageUrl || `${uploadConfig.cdnBaseUrl}/api/results/${taskId}/transparent.png`],
+      thumbnail: result.output?.thumbnail || `${uploadConfig.cdnBaseUrl}/api/results/${taskId}/thumb.png`,
       metadata: { format: params.format, modelUsed: result.modelId },
     });
   } catch (err) {
@@ -350,8 +351,8 @@ async function processWhiteBg(taskId, userId, params) {
     });
 
     await completeTask(taskId, userId, {
-      resultUrls: [pipeResult.final?.imageUrl || `${process.env.CDN_BASE_URL || ''}/api/results/${taskId}/white-bg.png`],
-      thumbnail: pipeResult.final?.thumbnail || `${process.env.CDN_BASE_URL || ''}/results/${taskId}/thumb.png`,
+      resultUrls: [pipeResult.final?.imageUrl || `${uploadConfig.cdnBaseUrl}/api/results/${taskId}/white-bg.png`],
+      thumbnail: pipeResult.final?.thumbnail || `${uploadConfig.cdnBaseUrl}/results/${taskId}/thumb.png`,
       metadata: { bgColor: params.bgColor, pipeline: pipeResult },
     });
   } catch (err) {

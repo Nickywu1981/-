@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import fs from 'fs';
 
 // 按 NODE_ENV 加载对应的 .env 文件
-const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development';
+const envFile = isProduction ? '.env.production' : '.env.development';
 if (fs.existsSync(envFile)) {
   dotenv.config({ path: envFile, override: true });
 } else {
@@ -13,7 +13,7 @@ if (fs.existsSync(envFile)) {
 import app from './app.js';
 import wsManager from './services/wsManager.js';
 import logger from './utils/logger.js';
-import { server as serverConfig } from './config/index.js';
+import { server as serverConfig, isProduction } from './config/index.js';
 import { registerAllAdapters } from './services/adapters/index.js';
 import { validateStartupConfig } from './utils/startupGuard.js';
 
@@ -53,7 +53,7 @@ server.listen(port, () => {
 
 process.on('uncaughtException', (err) => {
   const logEntry = { message: err.message };
-  if (process.env.NODE_ENV !== 'production') logEntry.stack = err.stack?.split('\n').slice(0, 3).join('\n');
+  if (!isProduction) logEntry.stack = err.stack?.split('\n').slice(0, 3).join('\n');
   logger.error('未捕获异常', logEntry);
   gracefulShutdown('uncaughtException');
 });
@@ -61,7 +61,7 @@ process.on('uncaughtException', (err) => {
 process.on('unhandledRejection', (reason) => {
   const msg = reason instanceof Error ? reason.message : String(reason);
   const logEntry = { message: msg };
-  if (process.env.NODE_ENV !== 'production') logEntry.stack = reason?.stack?.split('\n').slice(0, 3).join('\n');
+  if (!isProduction) logEntry.stack = reason?.stack?.split('\n').slice(0, 3).join('\n');
   logger.error('未处理的 Promise 拒绝', logEntry);
   gracefulShutdown('unhandledRejection');
 });

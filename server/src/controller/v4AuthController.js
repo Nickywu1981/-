@@ -9,13 +9,14 @@ import { ERROR_CODE } from '../constants/errorCode.js';
 import { generateRefreshToken } from '../middleware/auth.js';
 import * as authService from '../services/auth.service.js';
 import { revokeAccessToken, revokeRefreshToken } from '../utils/jwtToken.js';
+import { isProduction } from '../config/index.js';
 
 function setTokenCookie(res, token) {
   const payload = jwt.decode(token);
   const maxAge = payload?.exp ? (payload.exp * 1000) - Date.now() : 7 * 24 * 60 * 60 * 1000;
   res.cookie('token', token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: isProduction,
     sameSite: 'lax',
     maxAge,
   });
@@ -25,7 +26,7 @@ function setRefreshCookie(res, userId) {
   const refreshToken = generateRefreshToken({ userId });
   res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: isProduction,
     sameSite: 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
@@ -74,8 +75,8 @@ export const logout = wrapController(async (req, res) => {
   const rt = req.cookies?.refreshToken;
   if (rt) {
     try { await revokeRefreshToken(rt); } catch { /* best-effort */ }
-    res.clearCookie('refreshToken', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/' });
+    res.clearCookie('refreshToken', { httpOnly: true, secure: isProduction, sameSite: 'lax', path: '/' });
   }
-  res.clearCookie('token', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/' });
+  res.clearCookie('token', { httpOnly: true, secure: isProduction, sameSite: 'lax', path: '/' });
   return success(res, {}, '已退出登录');
 });

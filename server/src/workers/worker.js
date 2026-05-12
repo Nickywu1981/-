@@ -6,7 +6,7 @@
  */
 // dotenv 由 config/index.js 负责加载
 import logger from '../utils/logger.js';
-import config from '../config/index.js';
+import config, { workerConfig } from '../config/index.js';
 import { validateStartupConfig } from '../utils/startupGuard.js';
 import * as jobQueueService from '../services/job-queue.service.js';
 import { gatewayInfer } from '../gateway/aiGatewayHub.js';
@@ -14,9 +14,9 @@ import { gatewayInfer } from '../gateway/aiGatewayHub.js';
 // 启动配置校验
 validateStartupConfig();
 
-const POLL_INTERVAL = parseInt(process.env.WORKER_POLL_INTERVAL, 10) || 2000;
-const BATCH_SIZE = parseInt(process.env.WORKER_BATCH_SIZE, 10) || 3;
-const MAX_CONCURRENT = parseInt(process.env.WORKER_MAX_CONCURRENT, 10) || 5;
+const POLL_INTERVAL = workerConfig.pollInterval;
+const BATCH_SIZE = workerConfig.batchSize;
+const MAX_CONCURRENT = workerConfig.maxConcurrent;
 
 let running = true;
 const activeJobIds = new Set();

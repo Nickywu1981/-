@@ -1,4 +1,5 @@
 import { BusinessError } from './businessError.js';
+import { uploadConfig } from '../config/index.js';
 
 /**
  * Movio AI v4.1 — File Upload Service (Async I/O)
@@ -100,7 +101,7 @@ export async function initUpload({ fileName, fileSize, fileType }) {
   const ext = path.extname(fileName);
 
   // 验证文件类型
-  const allowedTypes = (process.env.ALLOWED_UPLOAD_TYPES || 'jpg,jpeg,png,webp,mp4,mov,avi,webm').split(',');
+  const allowedTypes = uploadConfig.allowedTypes;
   const fileExt = ext.replace('.', '').toLowerCase();
   if (!allowedTypes.includes(fileExt)) {
     throw new BusinessError(400, `不支持的文件格式: ${fileExt}`);
@@ -212,7 +213,7 @@ export async function completeUpload(uploadId) {
     file_size: meta.fileSize,
     file_type: meta.fileType,
     // CDN URL (生产环境)
-    cdn_url: process.env.CDN_BASE_URL ? `${process.env.CDN_BASE_URL}${fileUrl}` : fileUrl,
+    cdn_url: uploadConfig.cdnBaseUrl ? `${uploadConfig.cdnBaseUrl}${fileUrl}` : fileUrl,
   };
 }
 
@@ -237,7 +238,7 @@ export async function saveSimpleFile(file) {
     file_name: file.originalname,
     file_size: file.size,
     file_type: file.mimetype,
-    cdn_url: process.env.CDN_BASE_URL ? `${process.env.CDN_BASE_URL}${fileUrl}` : fileUrl,
+    cdn_url: uploadConfig.cdnBaseUrl ? `${uploadConfig.cdnBaseUrl}${fileUrl}` : fileUrl,
   };
 }
 
