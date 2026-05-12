@@ -1,4 +1,5 @@
 import pool from './db.js';
+import { parsePagination } from '../utils/pagination.js';
 import { getRedis } from './redis.js';
 import logger from '../utils/logger.js';
 
@@ -24,7 +25,7 @@ export default {
     const fromWhere = `FROM diy_page ${baseWhere}${filter}`;
     const cParams = [...params];
     const [{ total }] = await pool.query(`SELECT COUNT(*) as total ${fromWhere}`, cParams);
-    params.push((page - 1) * pageSize, pageSize);
+    params.push(offset, pageSize);
     const sql = `SELECT id, owner_id, title, slug, page_type, access_type, status, publish_time, offline_time, access_count, latest_published_version, create_time, update_time ${fromWhere} ORDER BY update_time DESC LIMIT ?, ?`;
     const [rows] = await pool.query(sql, params);
     return { list: rows, total, page, pageSize };
@@ -343,7 +344,7 @@ export default {
     if (keyword) { filter += ' AND (title LIKE ? OR description LIKE ? OR tags LIKE ?)'; params.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`); }
     const fromWhere = `FROM diy_template ${baseWhere}${filter}`;
     const [{ total }] = await pool.query(`SELECT COUNT(*) as total ${fromWhere}`, [...params]);
-    params.push((page - 1) * pageSize, pageSize);
+    params.push(offset, pageSize);
     const sql = `SELECT id, title, industry, page_type, thumbnail, description, tags, use_count, is_official, create_time ${fromWhere} ORDER BY use_count DESC, id ASC LIMIT ?, ?`;
     const [rows] = await pool.query(sql, params);
     return { list: rows, total, page, pageSize };

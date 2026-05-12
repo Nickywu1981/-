@@ -1,10 +1,11 @@
 import pool from './db.js';
+import { parsePagination } from '../utils/pagination.js';
 
 const TASK_COLS = 'at.id, at.tenant_id, at.user_id, at.account_id, at.task_type, at.task_config, at.status, at.start_time, at.end_time, at.result_json, at.screenshot_url, at.error_msg, at.create_time';
 
 export default {
   async listTasks(userId, tenantId, { page = 1, pageSize = 20 } = {}) {
-    const offset = (page - 1) * pageSize;
+    const { offset } = parsePagination({ page, pageSize });
     const [rows] = await pool.query(
       `SELECT ${TASK_COLS}, aa.platform, aa.store_name FROM automation_task at LEFT JOIN automation_account aa ON at.account_id = aa.id WHERE at.user_id = ? AND at.tenant_id = ? ORDER BY at.create_time DESC LIMIT ? OFFSET ?`,
       [userId, tenantId, pageSize, offset],
@@ -44,7 +45,7 @@ export default {
 
   // Account management
   async listAccounts(userId, tenantId, { page = 1, pageSize = 20 } = {}) {
-    const offset = (page - 1) * pageSize;
+    const { offset } = parsePagination({ page, pageSize });
     const [rows] = await pool.query('SELECT id, platform, store_name, username, status, last_login, create_time FROM automation_account WHERE user_id = ? AND tenant_id = ? ORDER BY create_time DESC LIMIT ? OFFSET ?', [userId, tenantId, pageSize, offset]);
     return rows;
   },

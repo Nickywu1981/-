@@ -1,4 +1,5 @@
 import pool from '../dao/db.js';
+import { parsePagination } from '../utils/pagination.js';
 
 // ==================== ai_call_log ====================
 
@@ -17,7 +18,7 @@ export async function listAiCallLogs({ userId, modelId, status, page = 1, pageSi
   if (modelId) { conditions.push('model_id = ?'); params.push(modelId); }
   if (status !== undefined) { conditions.push('status = ?'); params.push(status); }
   const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
-  const offset = (page - 1) * pageSize;
+  const { offset } = parsePagination({ page, pageSize });
   const [rows] = await pool.query(
     `SELECT id, user_id, model_id, model_name, prompt_tokens, response_tokens, total_tokens, duration_ms, status, result_type, result_preview, task_id, create_time FROM ?? ${where} ORDER BY create_time DESC LIMIT ? OFFSET ?`,
     ['ai_call_log', ...params, pageSize, offset],
@@ -64,7 +65,7 @@ export async function listOperationLogs({ userId, action, page = 1, pageSize = 2
   if (userId) { conditions.push('user_id = ?'); params.push(userId); }
   if (action) { conditions.push('action = ?'); params.push(action); }
   const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
-  const offset = (page - 1) * pageSize;
+  const { offset } = parsePagination({ page, pageSize });
   const [rows] = await pool.query(
     `SELECT * FROM ?? ${where} ORDER BY create_time DESC LIMIT ? OFFSET ?`,
     ['operation_log', ...params, pageSize, offset],
@@ -151,7 +152,7 @@ export async function insertGeneratedImage({ userId, taskId, type, platform, ori
 }
 
 export async function listGeneratedImages(userId, { page = 1, pageSize = 20 }) {
-  const offset = (page - 1) * pageSize;
+  const { offset } = parsePagination({ page, pageSize });
   const [rows] = await pool.query(
     'SELECT * FROM ?? WHERE user_id = ? ORDER BY create_time DESC LIMIT ? OFFSET ?',
     ['generated_image', userId, pageSize, offset],
@@ -174,7 +175,7 @@ export async function insertGeneratedVideo({ userId, taskId, type, platform, ori
 }
 
 export async function listGeneratedVideos(userId, { page = 1, pageSize = 20 }) {
-  const offset = (page - 1) * pageSize;
+  const { offset } = parsePagination({ page, pageSize });
   const [rows] = await pool.query(
     'SELECT * FROM ?? WHERE user_id = ? ORDER BY create_time DESC LIMIT ? OFFSET ?',
     ['generated_video', userId, pageSize, offset],

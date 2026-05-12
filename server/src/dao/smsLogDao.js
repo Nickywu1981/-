@@ -1,4 +1,5 @@
 import pool from './db.js';
+import { parsePagination } from '../utils/pagination.js';
 
 export async function insertLog({ templateCode, phone, params, content, result, provider }) {
   const [r] = await pool.execute(
@@ -22,7 +23,7 @@ export async function listLogs({ page = 1, pageSize = 30, phone, result, startDa
       params.push(end);
     }
   }
-  params.push((page - 1) * pageSize, pageSize);
+  params.push(offset, pageSize);
   sql += ' ORDER BY create_time DESC LIMIT ?, ?';
 
   const [rows] = await pool.execute(sql, params);

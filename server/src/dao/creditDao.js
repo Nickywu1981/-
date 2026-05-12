@@ -1,4 +1,5 @@
 import pool from './db.js';
+import { parsePagination } from '../utils/pagination.js';
 import crypto from 'crypto';
 
 const RECORD_COLS = 'id, user_id, type, action, credit_before, credit_after, consumed, remark, task_id, request_id, status, create_time, freeze_at, confirm_at, refund_at, refund_remark';
@@ -154,7 +155,7 @@ export async function listConsumptionRecords({ userId, status, type, page = 1, p
   if (status !== undefined) { conditions.push('status = ?'); params.push(status); }
   if (type !== undefined) { conditions.push('type = ?'); params.push(type); }
   const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
-  const offset = parseInt((page - 1) * pageSize, 10);
+  const { offset } = parsePagination({ page, pageSize });
   const limit = parseInt(pageSize, 10);
   params.push(offset, limit);
   const [rows] = await pool.query(

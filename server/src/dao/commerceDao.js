@@ -1,4 +1,5 @@
 import pool from './db.js';
+import { parsePagination } from '../utils/pagination.js';
 
 // ==================== 会员套餐更新 ====================
 
@@ -420,7 +421,7 @@ export async function listEnterpriseOrders(tenantId, { page, pageSize, status, s
   if (endDate) { conditions.push('o.created_at <= ?'); params.push(endDate + ' 23:59:59'); }
   if (keyword) { conditions.push('(o.order_no LIKE ? OR u.nickname LIKE ? OR u.phone LIKE ?)'); params.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`); }
 
-  const offset = (page - 1) * pageSize;
+  const { offset } = parsePagination({ page, pageSize });
   const [rows] = await pool.query(
     `SELECT o.*, u.nickname AS customer_name, u.phone AS customer_phone
      FROM \`order\` o LEFT JOIN user u ON o.user_id = u.id

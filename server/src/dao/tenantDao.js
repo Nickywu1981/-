@@ -1,4 +1,5 @@
 import pool from './db.js';
+import { parsePagination } from '../utils/pagination.js';
 
 
 export default {
@@ -21,7 +22,7 @@ export default {
     if (keyword) { conditions.push('(name LIKE ? OR code LIKE ? OR contact_name LIKE ?)'); params.push(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`); }
     const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
     const [countRows] = await pool.query(`SELECT COUNT(*) as total FROM tenant ${where}`, params);
-    const offset = (page - 1) * pageSize;
+    const { offset } = parsePagination({ page, pageSize });
     params.push(offset, pageSize);
     const [rows] = await pool.query(`SELECT * FROM tenant ${where} ORDER BY create_time DESC LIMIT ?, ?`, params);
     return { list: rows, total: countRows[0].total, page, pageSize };

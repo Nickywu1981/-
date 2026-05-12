@@ -1,4 +1,5 @@
 import pool from './db.js';
+import { parsePagination } from '../utils/pagination.js';
 import { withTransaction } from './transaction.js';
 
 export default {
@@ -6,10 +7,11 @@ export default {
   async listForms(tenantId, { page = 1, pageSize = 20, keyword, status }) {
     let sql = 'SELECT id, title, form_code, description, submit_limit, submit_count, max_submissions_per_user, start_time, end_time, status, access_type, create_time FROM custom_form WHERE tenant_id = ?';
     const params = [tenantId];
+    const { offset } = parsePagination({ page, pageSize });
     if (keyword) { sql += ' AND (title LIKE ? OR form_code LIKE ?)'; params.push(`%${keyword}%`, `%${keyword}%`); }
     if (status !== undefined && status !== '') { sql += ' AND status = ?'; params.push(Number(status)); }
     const [c] = await pool.query(`SELECT COUNT(*) as total FROM (${sql}) t`, params);
-    params.push((page - 1) * pageSize, pageSize);
+    params.push(offset, pageSize);
     sql += ' ORDER BY create_time DESC LIMIT ?, ?';
     const [rows] = await pool.query(sql, params);
     return { list: rows, total: c[0].total, page, pageSize };
@@ -107,19 +109,20 @@ export default {
   async listSubmissions(formId, { page = 1, pageSize = 50, status, dataStatus, startDate, endDate }) {
     let sql = 'SELECT * FROM custom_form_submission WHERE form_id = ?';
     const params = [formId];
+    const { offset } = parsePagination({ page, pageSize });
     if (status !== undefined && status !== null && status !== '') { sql += ' AND status = ?'; params.push(Number(status)); }
     if (dataStatus !== undefined && dataStatus !== null && dataStatus !== '') { sql += ' AND data_status = ?'; params.push(Number(dataStatus)); }
     if (startDate) { sql += ' AND create_time >= ?'; params.push(startDate); }
     if (endDate) { sql += ' AND create_time <= ?'; params.push(endDate); }
     const [c] = await pool.query(`SELECT COUNT(*) as total FROM (${sql}) t`, params);
-    params.push((page - 1) * pageSize, pageSize);
+    params.push(offset, pageSize);
     sql += ' ORDER BY create_time DESC LIMIT ?, ?';
     const [rows] = await pool.query(sql, params);
     return { list: rows, total: c[0].total, page, pageSize };
   },
 
   async getAllSubmissions(formId, { page = 1, pageSize = 1000 } = {}) {
-    const offset = (page - 1) * pageSize;
+    const { offset } = parsePagination({ page, pageSize });
     const [rows] = await pool.query('SELECT * FROM custom_form_submission WHERE form_id = ? ORDER BY create_time DESC LIMIT ? OFFSET ?', [formId, pageSize, offset]);
     return rows;
   },

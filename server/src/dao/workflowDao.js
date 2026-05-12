@@ -2,6 +2,7 @@
  * 工作流 — DAO
  */
 import pool from './db.js';
+import { parsePagination } from '../utils/pagination.js';
 
 const T = (name) => `workflow_${name}`;
 
@@ -77,7 +78,7 @@ export async function getJob(id) {
 }
 
 export async function listJobsByUser(userId, { page = 1, pageSize = 20 } = {}) {
-  const offset = (page - 1) * pageSize;
+  const { offset } = parsePagination({ page, pageSize });
   const [[{ total }]] = await pool.execute(`SELECT COUNT(*) AS total FROM ${T('job')} WHERE user_id = ?`, [userId]);
   const [rows] = await pool.execute(
     `SELECT * FROM ${T('job')} WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?`,

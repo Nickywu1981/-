@@ -3,6 +3,7 @@
  * 查询 job_queue 表中已完成的任务作为用户资产
  */
 import pool from './db.js';
+import { parsePagination } from '../utils/pagination.js';
 
 const IMAGE_TYPES = ['image_gen', 'image_replicate', 'batch_image_gen', 'batch_image_edit'];
 const VIDEO_TYPES = ['video_gen', 'action_migrate', 'digital_human', 'viral_replicate', 'live_clip'];
@@ -28,7 +29,7 @@ export async function listUserAssets({ userId, type, page = 1, pageSize = 20 }) 
      FROM job_queue
      WHERE user_id = ? AND status = 'completed' AND task_type IN (${placeholders})
      ORDER BY completed_at DESC LIMIT ? OFFSET ?`,
-    [...params, pageSize, (page - 1) * pageSize],
+    [...params, pageSize, offset],
   );
 
   const list = rows.map(r => {

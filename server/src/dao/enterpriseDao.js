@@ -4,6 +4,7 @@
  * Phase 1: 企业/代理端 MVP (2026-05-11)
  */
 import pool from '../dao/db.js';
+import { parsePagination } from '../utils/pagination.js';
 
 const TABLE = {
   TENANT: 'tenant',
@@ -80,7 +81,7 @@ export async function listTenants({ page = 1, pageSize = 20, type, status, keywo
   const where = conditions.join(' AND ');
   const [countResult] = await pool.query(`SELECT COUNT(*) AS total FROM ?? WHERE ${where}`, [TABLE.TENANT, ...params]);
   const total = countResult[0].total;
-  const offset = (page - 1) * pageSize;
+  const { offset } = parsePagination({ page, pageSize });
   const [rows] = await pool.query(`SELECT * FROM ?? WHERE ${where} ORDER BY create_time DESC LIMIT ? OFFSET ?`, [TABLE.TENANT, ...params, pageSize, offset]);
   return { list: rows, total, page, pageSize };
 }
@@ -114,7 +115,7 @@ export async function listEnterpriseUsers(tenantId, { page = 1, pageSize = 20, s
   const where = conditions.join(' AND ');
   const [countResult] = await pool.query(`SELECT COUNT(*) AS total FROM ?? WHERE ${where}`, [TABLE.ENTERPRISE_USER, ...params]);
   const total = countResult[0].total;
-  const offset = (page - 1) * pageSize;
+  const { offset } = parsePagination({ page, pageSize });
   const [rows] = await pool.query(
     `SELECT eu.*, u.nickname, u.phone, u.email FROM ?? eu LEFT JOIN user u ON eu.user_id = u.id WHERE ${where} ORDER BY eu.create_time DESC LIMIT ? OFFSET ?`,
     [TABLE.ENTERPRISE_USER, ...params, pageSize, offset],
@@ -163,7 +164,7 @@ export async function listTenantsByReviewStatus(status, { page = 1, pageSize = 2
   const where = conditions.join(' AND ');
   const [countResult] = await pool.query(`SELECT COUNT(*) AS total FROM ?? WHERE ${where}`, [TABLE.TENANT, ...params]);
   const total = countResult[0].total;
-  const offset = (page - 1) * pageSize;
+  const { offset } = parsePagination({ page, pageSize });
   const [rows] = await pool.query(`SELECT * FROM ?? WHERE ${where} ORDER BY create_time DESC LIMIT ? OFFSET ?`, [TABLE.TENANT, ...params, pageSize, offset]);
   return { list: rows, total, page, pageSize };
 }
@@ -194,7 +195,7 @@ export async function insertApprovalLog(data) {
 }
 
 export async function getApprovalLogs(tenantId, { page = 1, pageSize = 20 } = {}) {
-  const offset = (page - 1) * pageSize;
+  const { offset } = parsePagination({ page, pageSize });
   const [rows] = await pool.query(
     `SELECT eal.*, u.nickname AS operator_name
      FROM enterprise_approval_log eal

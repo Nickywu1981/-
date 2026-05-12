@@ -44,7 +44,7 @@ export async function listUserTasks(userId, { status, type, page = 1, pageSize =
     params.push(type);
   }
 
-  const offset = (page - 1) * pageSize;
+  const { offset } = parsePagination({ page, pageSize });
   sql += ' ORDER BY create_time DESC LIMIT ? OFFSET ?';
   params.push(pageSize, offset);
 

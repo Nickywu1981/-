@@ -1,4 +1,5 @@
 import pool from './db.js';
+import { parsePagination } from '../utils/pagination.js';
 import logger from '../utils/logger.js';
 
 // ==================== 模板 CRUD ====================
@@ -13,7 +14,7 @@ export async function listTemplates({ category, status, keyword, isPublic, creat
   if (keyword) { conditions.push('(t.title LIKE ? OR t.description LIKE ?)'); params.push(`%${keyword}%`, `%${keyword}%`); }
 
   const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
-  const offset = parseInt((page - 1) * pageSize, 10);
+  const { offset } = parsePagination({ page, pageSize });
   const limit = parseInt(pageSize, 10);
 
   const [rows] = await pool.query(
@@ -78,7 +79,7 @@ export async function listFavorites(userId, { groupId, page = 1, pageSize = 20 }
   const conditions = ['f.user_id = ?'];
   const params = [userId];
   if (groupId) { conditions.push('f.group_id = ?'); params.push(groupId); }
-  const offset = parseInt((page - 1) * pageSize, 10);
+  const { offset } = parsePagination({ page, pageSize });
   const limit = parseInt(pageSize, 10);
   const [rows] = await pool.query(
     `SELECT f.id AS favorite_id, t.* FROM prompt_favorite f JOIN prompt_template t ON f.template_id = t.id WHERE ${conditions.join(' AND ')} ORDER BY f.create_time DESC LIMIT ?, ?`,
@@ -147,7 +148,7 @@ export async function insertUsageHistory(userId, templateId, filledContent, mode
 }
 
 export async function listUsageHistory(userId, { page = 1, pageSize = 20 }) {
-  const offset = parseInt((page - 1) * pageSize, 10);
+  const { offset } = parsePagination({ page, pageSize });
   const limit = parseInt(pageSize, 10);
   const [rows] = await pool.query(
     `SELECT h.*, t.title AS template_title, t.category FROM prompt_usage_history h

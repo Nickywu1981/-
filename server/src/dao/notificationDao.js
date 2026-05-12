@@ -1,4 +1,5 @@
 import pool from './db.js';
+import { parsePagination } from '../utils/pagination.js';
 
 export async function insertNotification({ userId, type, title, content }) {
   const [r] = await pool.execute(
@@ -11,7 +12,7 @@ export async function insertNotification({ userId, type, title, content }) {
 export async function listByUser(userId, { page = 1, pageSize = 20 }) {
   const [rows] = await pool.query(
     'SELECT id, type, title, content, is_read, create_time FROM user_notification WHERE user_id = ? ORDER BY create_time DESC LIMIT ?, ?',
-    [userId, parseInt((page - 1) * pageSize, 10), parseInt(pageSize, 10)],
+    [userId, offset, parseInt(pageSize, 10)],
   );
   return rows;
 }
@@ -56,7 +57,7 @@ export async function listAll({ userId, type, page = 1, pageSize = 20 }) {
   const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
   const [rows] = await pool.query(
     `SELECT un.*, u.nickname, u.phone, u.email FROM user_notification un LEFT JOIN user u ON un.user_id = u.id ${where} ORDER BY un.create_time DESC LIMIT ?, ?`,
-    [...params, parseInt((page - 1) * pageSize, 10), parseInt(pageSize, 10)],
+    [...params, offset, parseInt(pageSize, 10)],
   );
   return rows;
 }

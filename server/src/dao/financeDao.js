@@ -5,6 +5,7 @@
  * 表: bank_account, settlement_batch, settlement_detail, withdrawal_order, account_ledger, commission_policy
  */
 import pool from '../dao/db.js';
+import { parsePagination } from '../utils/pagination.js';
 import logger from '../utils/logger.js';
 
 // ==================== 收款账户 ====================
@@ -64,7 +65,7 @@ export async function listLedger(tenantId, { page = 1, pageSize = 20, type, star
   const where = conditions.join(' AND ');
 
   const [[{ total }]] = await pool.query(`SELECT COUNT(*) AS total FROM account_ledger WHERE ${where}`, params);
-  const offset = (page - 1) * pageSize;
+  const { offset } = parsePagination({ page, pageSize });
   const [rows] = await pool.query(
     `SELECT * FROM account_ledger WHERE ${where} ORDER BY create_time DESC LIMIT ? OFFSET ?`,
     [...params, pageSize, offset],
@@ -75,7 +76,7 @@ export async function listLedger(tenantId, { page = 1, pageSize = 20, type, star
 // ==================== 结算批次/明细 ====================
 
 export async function listSettlements(tenantId, { page = 1, pageSize = 20 } = {}) {
-  const offset = (page - 1) * pageSize;
+  const { offset } = parsePagination({ page, pageSize });
   const [[{ total }]] = await pool.query(
     'SELECT COUNT(*) AS total FROM settlement_detail WHERE tenant_id = ?', [tenantId],
   );
@@ -120,7 +121,7 @@ export async function listEarnings(tenantId, { page = 1, pageSize = 20, status, 
   const where = conditions.join(' AND ');
 
   const [[{ total }]] = await pool.query(`SELECT COUNT(*) AS total FROM distributor_commission dc WHERE ${where}`, params);
-  const offset = (page - 1) * pageSize;
+  const { offset } = parsePagination({ page, pageSize });
   const [rows] = await pool.query(
     `SELECT dc.*, u.nickname AS consumer_name
      FROM distributor_commission dc
@@ -162,7 +163,7 @@ export async function listWithdrawals(tenantId, { page = 1, pageSize = 20, statu
   const where = conditions.join(' AND ');
 
   const [[{ total }]] = await pool.query(`SELECT COUNT(*) AS total FROM withdrawal_order wo WHERE ${where}`, params);
-  const offset = (page - 1) * pageSize;
+  const { offset } = parsePagination({ page, pageSize });
   const [rows] = await pool.query(
     `SELECT wo.*, ba.account_type, ba.account_name, ba.account_no, ba.bank_name
      FROM withdrawal_order wo

@@ -1,4 +1,5 @@
 import pool from '../dao/db.js';
+import { parsePagination } from '../utils/pagination.js';
 import { als } from './context.js';
 
 function _db() { return als.getStore()?.db || pool; }
@@ -26,7 +27,7 @@ export function invalidateWordCache() {
 export async function listSensitiveWords({ keyword, page = 1, pageSize = 50 }) {
   const cond = keyword ? 'WHERE word LIKE ?' : '';
   const params = keyword ? [`%${keyword}%`] : [];
-  const offset = (page - 1) * pageSize;
+  const { offset } = parsePagination({ page, pageSize });
   params.push(offset, pageSize);
   const [rows] = await _db().query(`SELECT * FROM sensitive_word ${cond} ORDER BY create_time DESC LIMIT ?, ?`, params);
   const countParams = keyword ? [`%${keyword}%`] : [];

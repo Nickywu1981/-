@@ -1,4 +1,5 @@
 import pool from './db.js';
+import { parsePagination } from '../utils/pagination.js';
 
 export default {
   // ==================== 代理配置 CRUD ====================
@@ -183,7 +184,7 @@ export default {
 
     const where = conditions.join(' AND ');
     const [countRows] = await pool.query(`SELECT COUNT(*) AS total FROM api_proxy_log WHERE ${where}`, vals);
-    const offset = (page - 1) * pageSize;
+    const { offset } = parsePagination({ page, pageSize });
     const [rows] = await pool.query(
       `SELECT * FROM api_proxy_log WHERE ${where} ORDER BY create_time DESC LIMIT ?, ?`,
       [...vals, offset, pageSize],

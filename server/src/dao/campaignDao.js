@@ -1,4 +1,5 @@
 import pool from './db.js';
+import { parsePagination } from '../utils/pagination.js';
 
 export default {
   // ==================== Campaign ====================
@@ -9,7 +10,7 @@ export default {
     if (status !== undefined) { conditions.push('status = ?'); params.push(status); }
     const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
     const [[{ total }]] = await pool.query(`SELECT COUNT(*) as total FROM campaign ${where}`, params);
-    const offset = (page - 1) * pageSize;
+    const { offset } = parsePagination({ page, pageSize });
     const [rows] = await pool.query(`SELECT id,title,type,description,cover_url,rules,reward_type,reward_value,start_time,end_time,status,target_audience,tenant_id,sort_order,create_time,update_time FROM campaign ${where} ORDER BY sort_order DESC, create_time DESC LIMIT ?,?`, [...params, offset, pageSize]);
     return { list: rows, total, page, pageSize };
   },
@@ -53,7 +54,7 @@ export default {
     if (campaignId) { conditions.push('campaign_id = ?'); params.push(campaignId); }
     const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
     const [[{ total }]] = await pool.query(`SELECT COUNT(*) as total FROM coupon ${where}`, params);
-    const offset = (page - 1) * pageSize;
+    const { offset } = parsePagination({ page, pageSize });
     const [rows] = await pool.query(`SELECT id,code,name,type,value,min_order_amount,max_discount,total_quantity,used_quantity,per_user_limit,start_time,end_time,status,campaign_id,create_time,update_time FROM coupon ${where} ORDER BY create_time DESC LIMIT ?,?`, [...params, offset, pageSize]);
     return { list: rows, total, page, pageSize };
   },
@@ -95,7 +96,7 @@ export default {
     if (status !== undefined) { conditions.push('uc.status = ?'); params.push(status); }
     const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
     const [[{ total }]] = await pool.query(`SELECT COUNT(*) as total FROM user_coupon uc ${where}`, params);
-    const offset = (page - 1) * pageSize;
+    const { offset } = parsePagination({ page, pageSize });
     const [rows] = await pool.query(`SELECT uc.id,uc.user_id,uc.coupon_id,uc.status,uc.used_order_id,uc.obtain_time,uc.use_time,uc.create_time, c.name as coupon_name, c.type as coupon_type, c.value as coupon_value FROM user_coupon uc LEFT JOIN coupon c ON uc.coupon_id = c.id ${where} ORDER BY uc.create_time DESC LIMIT ?,?`, [...params, offset, pageSize]);
     return { list: rows, total, page, pageSize };
   },
@@ -108,7 +109,7 @@ export default {
     if (status !== undefined) { conditions.push('status = ?'); params.push(status); }
     const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
     const [[{ total }]] = await pool.query(`SELECT COUNT(*) as total FROM announcement ${where}`, params);
-    const offset = (page - 1) * pageSize;
+    const { offset } = parsePagination({ page, pageSize });
     const [rows] = await pool.query(`SELECT id,title,content,type,level,is_pinned,target_audience,publish_time,status,create_by,create_time,update_time FROM announcement ${where} ORDER BY is_pinned DESC, create_time DESC LIMIT ?,?`, [...params, offset, pageSize]);
     return { list: rows, total, page, pageSize };
   },

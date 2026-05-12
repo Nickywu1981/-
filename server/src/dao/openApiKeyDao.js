@@ -3,6 +3,7 @@
  * G5 后端 | G6 数据库 | 阶段4
  */
 import pool from './db.js';
+import { parsePagination } from '../utils/pagination.js';
 
 const TABLE = 'open_api_key';
 const KEY_COLS = ['api_key', 'description', 'status', 'rate_limit', 'daily_limit', 'tenant_id'];
@@ -21,7 +22,7 @@ function pickAllowed(data) {
 
 export async function listByTenant(tenantId, opts = {}) {
   const { page = 1, pageSize = 20 } = opts;
-  const offset = (page - 1) * pageSize;
+  const { offset } = parsePagination({ page, pageSize });
   const [rows] = await pool.query(
     `SELECT id, api_key, description, status, rate_limit, daily_limit, create_time, update_time
      FROM ${TABLE} WHERE tenant_id = ? AND is_deleted = 0 ORDER BY create_time DESC LIMIT ? OFFSET ?`,

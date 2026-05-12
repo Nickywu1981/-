@@ -1,4 +1,5 @@
 import pool from '../dao/db.js';
+import { parsePagination } from '../utils/pagination.js';
 
 const TABLE = {
   RELATION: 'channel_relation',
@@ -32,7 +33,7 @@ export async function findRelationsByTenant(tenantId, { page = 1, pageSize = 20,
   const params = [tenantId];
   if (status) { conditions.push('cr.status = ?'); params.push(status); }
 
-  const offset = (page - 1) * pageSize;
+  const { offset } = parsePagination({ page, pageSize });
   const [rows] = await pool.query(
     `SELECT cr.*, t.name AS child_name, t.code AS child_code, t.logo AS child_logo,
             t.channel_level, t.contact_name, t.contact_phone
@@ -166,7 +167,7 @@ export async function getPerformance(tenantId, { startDate, endDate, childTenant
   if (endDate) { conditions.push('cp.stat_date <= ?'); params.push(endDate); }
   if (childTenantId) { conditions.push('cp.child_tenant_id = ?'); params.push(childTenantId); }
 
-  const offset = (page - 1) * pageSize;
+  const { offset } = parsePagination({ page, pageSize });
   const [rows] = await pool.query(
     `SELECT cp.*, t.name AS child_name
      FROM ?? cp LEFT JOIN ?? t ON cp.child_tenant_id = t.id

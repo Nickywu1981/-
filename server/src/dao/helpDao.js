@@ -1,4 +1,5 @@
 import pool from './db.js';
+import { parsePagination } from '../utils/pagination.js';
 
 const FAQ_COLS = ['question', 'answer', 'category', 'sort', 'status'];
 
@@ -10,7 +11,7 @@ function pickAllowed(data, allowed) {
 
 export default {
   async listFaqs({ keyword, page = 1, pageSize = 50 } = {}) {
-    const offset = (page - 1) * pageSize;
+    const { offset } = parsePagination({ page, pageSize });
     let where = 'WHERE status = 1';
     const params = [];
     if (keyword) {
