@@ -72,6 +72,7 @@ async function fetchRemoteModels() {
     const json = await res.json();
     return json.data || [];
   } catch {
+    logger.warn('[AI] 远程模型列表拉取失败');
     return [];
   }
 }
@@ -86,6 +87,7 @@ async function health() {
     });
     return { status: res.ok ? 'ok' : 'error', provider: 'openai' };
   } catch {
+    logger.warn('[AI] OpenAI 健康检查失败');
     return { status: 'unavailable', provider: 'openai' };
   }
 }
