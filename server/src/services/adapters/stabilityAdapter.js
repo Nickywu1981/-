@@ -7,10 +7,11 @@
 
 import { registerModel } from '../aiEngine.js';
 import { BusinessError } from '../../utils/businessError.js';
+import { adapterConfig } from '../../config/index.js';
 import logger from '../../utils/logger.js';
 
-const API_KEY = process.env.STABILITY_API_KEY || '';
-const BASE_URL = process.env.STABILITY_BASE_URL || 'https://api.stability.ai';
+const API_KEY = adapterConfig.stability.apiKey;
+const BASE_URL = adapterConfig.stability.baseUrl;
 
 // ==================== SDXL txt2img ====================
 

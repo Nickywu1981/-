@@ -9,8 +9,8 @@ import { BusinessError } from '../../utils/businessError.js';
 import config from '../../config/index.js';
 import logger from '../../utils/logger.js';
 
-const SD_API_URL = process.env.SD_API_URL || 'http://localhost:7860';
-const REPLICATE_API_KEY = process.env.REPLICATE_API_KEY || '';
+const SD_API_URL = config.adapters.sd.apiUrl;
+const REPLICATE_API_KEY = config.adapters.sd.replicateKey;
 
 // ==================== Stable Diffusion WebUI Adapter ====================
 

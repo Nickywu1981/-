@@ -1,4 +1,5 @@
 import { BusinessError } from '../utils/businessError.js';
+import { appUrl } from '../config/index.js';
 
 /**
  * Movio AI v4.1 — Distribution Service (分销系统)
@@ -306,7 +307,7 @@ export function getPromoAssets() { return PROMO_ASSETS; }
 export async function getMyPromoLink(userId) {
   const [[user]] = await db.query('SELECT invite_code FROM `user` WHERE id = ?', [userId]);
   if (!user) throw new BusinessError(404, '用户不存在');
-  const baseUrl = process.env.APP_URL || 'https://movio.ai';
+  const baseUrl = appUrl;
   const inviteUrl = `${baseUrl}/register?ref=${user.invite_code}`;
   return { invite_code: user.invite_code, invite_url: inviteUrl, assets: PROMO_ASSETS };
 }

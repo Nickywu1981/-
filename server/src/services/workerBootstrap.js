@@ -9,6 +9,7 @@
  */
 import logger from '../utils/logger.js';
 import net from 'node:net';
+import { redisConfig } from '../config/index.js';
 import { createImageWorker, registerWorker } from './queueManager.js';
 
 let booted = false;
@@ -20,7 +21,7 @@ function redisReady() {
     s.on('connect', () => { s.destroy(); resolve(true); });
     s.on('error', () => { s.destroy(); resolve(false); });
     s.on('timeout', () => { s.destroy(); resolve(false); });
-    s.connect(parseInt(process.env.REDIS_PORT || '6379', 10), process.env.REDIS_HOST || 'localhost');
+    s.connect(redisConfig.port, redisConfig.host);
   });
 }
 

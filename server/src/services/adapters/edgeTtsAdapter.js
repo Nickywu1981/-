@@ -11,8 +11,10 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import WebSocket from 'ws';
 
+import { adapterConfig } from '../../config/index.js';
+
 const AUDIO_DIR = path.join(process.cwd(), 'uploads', 'audio');
-const EDGE_WS_URL = process.env.EDGE_TTS_WS_URL || `wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=${process.env.EDGE_TTS_TRUSTED_TOKEN || '6A5AA1D4EAFF4E9FB37E23D68491D6F4'}`;
+const EDGE_WS_URL = adapterConfig.edgeTts.wsUrl;
 
 const EDGE_TTS_VOICES = {
   'sweet-female': 'zh-CN-XiaoxiaoNeural',
@@ -162,7 +164,7 @@ async function realTTSInfer(text, voiceType, speed) {
 }
 
 async function realCloneInfer(text, audioSampleUrl) {
-  const apiKey = process.env.ELEVENLABS_API_KEY;
+  const apiKey = adapterConfig.edgeTts.elevenLabsApiKey;
   if (!apiKey) {
     logger.warn('[VoiceClone] ELEVENLABS_API_KEY 未配置，使用模拟模式');
     const charCount = text?.length || 0;
@@ -187,7 +189,7 @@ async function realCloneInfer(text, audioSampleUrl) {
   try {
     // Step 1: Upload audio sample → get voice_id
     let voiceId;
-    const apiBase = process.env.ELEVENLABS_API_URL || 'https://api.elevenlabs.io';
+    const apiBase = adapterConfig.edgeTts.elevenLabsApiUrl;
     if (audioSampleUrl) {
       // 防路径遍历：拒绝含 .. 或绝对路径的输入
       if (audioSampleUrl.includes('..') || path.isAbsolute(audioSampleUrl)) {
@@ -296,7 +298,7 @@ export async function registerEdgeTTS() {
     name: 'ElevenLabs Voice Clone',
     provider: 'ElevenLabs',
     async health() {
-      const ok = !!process.env.ELEVENLABS_API_KEY;
+      const ok = !!adapterConfig.edgeTts.elevenLabsApiKey;
       return { status: ok ? 'ok' : 'unauthenticated', model: 'elevenlabs-voice-clone' };
     },
     async infer(input) {

@@ -3,6 +3,7 @@ import { BusinessError } from '../utils/businessError.js';
 import * as userService from '../services/userService.js';
 import { success } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
+import { isProduction } from '../config/index.js';
 import logger from '../utils/logger.js';
 
 export const register = wrapController(async (req, res) => {
@@ -82,7 +83,7 @@ export const logout = wrapController(async (req, res) => {
     const rt = req.cookies?.refreshToken;
     if (rt) {
       try { await userService.revokeRefreshToken(rt); } catch (e) { logger.warn('[Logout] RefreshToken 撤销失败', { message: e.message }); }
-      res.clearCookie('refreshToken', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/' });
+      res.clearCookie('refreshToken', { httpOnly: true, secure: isProduction, sameSite: 'lax', path: '/' });
     }
     return success(res, {}, '已退出登录');
   });

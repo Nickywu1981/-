@@ -1,6 +1,7 @@
 import { success, error } from './response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { BusinessError } from './businessError.js';
+import { isProduction } from '../config/index.js';
 import logger from './logger.js';
 
 /**
@@ -22,7 +23,7 @@ export function wrapController(fn) {
       }
       logger.error('[wrapController] 未预期异常', {
         message: err.message,
-        stack: process.env.NODE_ENV !== 'production' ? err.stack : undefined,
+        stack: isProduction ? undefined : err.stack,
         path: req.path,
         method: req.method,
         userId: req.user?.id || req.user?.userId,

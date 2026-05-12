@@ -7,6 +7,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import crypto from 'crypto';
 import { error } from '../utils/response.js';
+import { uploadConfig } from '../config/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const UPLOAD_DIR = path.join(__dirname, '../../uploads/images');
@@ -101,7 +102,7 @@ export function magicNumberGuard(req, res, next) {
 
 // ── 上传配额（每日每租户上传量上限）──
 
-const DAILY_UPLOAD_LIMIT_MB = parseInt(process.env.UPLOAD_DAILY_LIMIT_MB, 10) || 2048;
+const DAILY_UPLOAD_LIMIT_MB = uploadConfig.dailyLimitMb;
 const QUOTA_CLEANUP_MS = 60 * 60 * 1000;
 const tenantUploadQuota = new Map(); // key → { total: number, ts: number }
 

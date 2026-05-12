@@ -5,10 +5,11 @@
 
 import { registerModel } from '../aiEngine.js';
 import { BusinessError } from '../../utils/businessError.js';
+import { adapterConfig } from '../../config/index.js';
 import logger from '../../utils/logger.js';
 
-const API_KEY = process.env.OPENAI_API_KEY || '';
-const BASE_URL = (process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1').replace(/\/+$/, '');
+const API_KEY = adapterConfig.openai.apiKey;
+const BASE_URL = adapterConfig.openai.baseUrl;
 
 // ==================== 通用文本推断工厂 ====================
 

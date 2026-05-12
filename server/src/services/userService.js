@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import * as userDao from '../dao/userDao.js';
-import { jwtSecret } from '../config/index.js';
+import { jwtSecret, isProduction } from '../config/index.js';
 import { guardSQL } from '../utils/sqlGuard.js';
 import { generateTokens, refreshAccessToken as refreshTokenUtil, revokeAccessToken as revokeTokenUtil, revokeRefreshToken as revokeRefreshUtil, revokeAllUserTokens as revokeAllUtil, isTokenBlacklisted } from '../utils/jwtToken.js';
 
@@ -100,7 +100,7 @@ export async function forgotPassword(username) {
   const user = await userDao.findByUsername(username);
   if (!user) return { message: '重置链接已发送至注册邮箱（Mock模式：若账号存在）' };
   const resetToken = jwt.sign({ userId: user.id, purpose: 'reset', jti: crypto.randomUUID() }, jwtSecret, { expiresIn: '15m' });
-  const mockInfo = process.env.NODE_ENV !== 'production' ? `（Mock模式：token=...${resetToken.slice(-8)}）` : '';
+  const mockInfo = isProduction ? '' : `（Mock模式：token=...${resetToken.slice(-8)}）`;
   return { message: `重置链接已发送至注册邮箱${mockInfo}` };
 }
 

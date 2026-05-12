@@ -8,6 +8,7 @@ import { BusinessError } from '../utils/businessError.js';
 import * as allinpayService from '../services/allinpayService.js';
 import allinpayDao from '../dao/allinpayDao.js';
 import allinpayConfig from '../config/allinpay.js';
+import { isProduction } from '../config/index.js';
 import logger from '../utils/logger.js';
 
 import * as creditDao from '../dao/creditDao.js';
@@ -80,7 +81,7 @@ export async function createPaymentOrder(userId, { planType, payChannel = 'wecha
 // ==================== 沙箱支付（仅沙箱模式可用） ====================
 
 export async function sandboxPay(orderId) {
-  if (process.env.NODE_ENV === 'production') throw new BusinessError(403, '沙箱支付不可在生产环境使用');
+  if (isProduction) throw new BusinessError(403, '沙箱支付不可在生产环境使用');
   if (!allinpayConfig.isSandbox) throw new BusinessError(403, '沙箱支付仅开发环境可用');
 
   const order = await allinpayService.queryOrder(orderId);

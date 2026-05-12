@@ -11,6 +11,7 @@
 import logger from '../utils/logger.js';
 import { BusinessError } from '../utils/businessError.js';
 import { extractUsage } from './tokenMeteringService.js';
+import { aiTimeoutMs } from '../config/index.js';
 
 // ==================== 模型注册中心 ====================
 
@@ -91,7 +92,7 @@ export function getFallbackModel(modelId) {
 const INFER_CONFIG = {
   maxRetries: 3,
   retryDelayMs: 1000,
-  timeoutMs: parseInt(process.env.AI_TIMEOUT_MS || '60000', 10),
+  timeoutMs: aiTimeoutMs,
   enableCache: true,
   enableDegradation: true,
 };

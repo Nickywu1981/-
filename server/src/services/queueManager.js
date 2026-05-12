@@ -18,6 +18,7 @@
 
 import logger from '../utils/logger.js';
 import { BusinessError } from '../utils/businessError.js';
+import { redisConfig, bullConfig } from '../config/index.js';
 
 let Queue, Worker;
 let bullmqAvailable = false;
@@ -46,17 +47,17 @@ async function checkRedis() {
     socket.on('connect', () => { socket.destroy(); redisAvailable = true; resolve(true); });
     socket.on('error', () => { socket.destroy(); resolve(false); });
     socket.on('timeout', () => { socket.destroy(); resolve(false); });
-    socket.connect(parseInt(process.env.REDIS_PORT || '6379', 10), process.env.REDIS_HOST || 'localhost');
+    socket.connect(redisConfig.port, redisConfig.host);
   });
 }
 
 // ==================== 队列定义 ====================
 
 const QUEUES = {
-  'image-processing': { concurrency: parseInt(process.env.BULL_IMAGE_CONCURRENCY || '3', 10), attempts: 3, backoff: { type: 'exponential', delay: 2000 }, timeout: 300000, lockDuration: 360000 },
-  'video-generation': { concurrency: parseInt(process.env.BULL_VIDEO_CONCURRENCY || '2', 10), attempts: 3, backoff: { type: 'exponential', delay: 5000 }, timeout: 1800000, lockDuration: 1860000 },
-  'batch-tasks':      { concurrency: parseInt(process.env.BULL_BATCH_CONCURRENCY || '5', 10), attempts: 2, backoff: { type: 'fixed', delay: 1000 },      timeout: 3600000, lockDuration: 3660000 },
-  'notifications':    { concurrency: parseInt(process.env.BULL_NOTIFY_CONCURRENCY || '10', 10), attempts: 1,                                          timeout: 60000, lockDuration: 120000 },
+  'image-processing': { concurrency: bullConfig.imageConcurrency, attempts: 3, backoff: { type: 'exponential', delay: 2000 }, timeout: 300000, lockDuration: 360000 },
+  'video-generation': { concurrency: bullConfig.videoConcurrency, attempts: 3, backoff: { type: 'exponential', delay: 5000 }, timeout: 1800000, lockDuration: 1860000 },
+  'batch-tasks':      { concurrency: bullConfig.batchConcurrency, attempts: 2, backoff: { type: 'fixed', delay: 1000 },      timeout: 3600000, lockDuration: 3660000 },
+  'notifications':    { concurrency: bullConfig.notifyConcurrency, attempts: 1,                                          timeout: 60000, lockDuration: 120000 },
 };
 
 const queueInstances = new Map();
@@ -70,7 +71,7 @@ export function getQueue(name) {
 
   if (!queueInstances.has(name)) {
     queueInstances.set(name, new Queue(name, {
-      connection: { host: process.env.REDIS_HOST || 'localhost', port: parseInt(process.env.REDIS_PORT || '6379', 10) },
+      connection: { host: redisConfig.host, port: redisConfig.port },
       defaultJobOptions: {
         attempts: QUEUES[name].attempts,
         backoff: QUEUES[name].backoff,
@@ -94,7 +95,7 @@ export function registerWorker(name, processor) {
   if (workerInstances.has(name)) return workerInstances.get(name);
 
   const worker = new Worker(name, processor, {
-    connection: { host: process.env.REDIS_HOST || 'localhost', port: parseInt(process.env.REDIS_PORT || '6379', 10) },
+    connection: { host: redisConfig.host, port: redisConfig.port },
     concurrency: QUEUES[name].concurrency,
     autorun: true,
   });
@@ -108,7 +109,7 @@ export function registerWorker(name, processor) {
     if (job && job.attemptsMade >= (QUEUES[name].attempts || 3)) {
       try {
         const deadQ = new Queue(`${name}-dead`, {
-          connection: { host: process.env.REDIS_HOST || 'localhost', port: parseInt(process.env.REDIS_PORT || '6379', 10) },
+          connection: { host: redisConfig.host, port: redisConfig.port },
         });
         await deadQ.add(job.name, job.data, { removeOnComplete: 200 });
         await deadQ.close();

@@ -41,13 +41,13 @@ export const loginEnterprise = wrapController(async (req, res) => {
   // 设置 cookie
   res.cookie('token', result.accessToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: isProduction,
     sameSite: 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
   res.cookie('refreshToken', result.refreshToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: isProduction,
     sameSite: 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });

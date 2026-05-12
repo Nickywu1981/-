@@ -8,8 +8,7 @@
 import crypto from 'crypto';
 import { error as sendError } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
-
-const isProduction = process.env.NODE_ENV === 'production';
+import { isProduction } from '../config/index.js';
 
 // CSRF Token 有效期（30分钟）
 const TOKEN_TTL = 30 * 60 * 1000;

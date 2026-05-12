@@ -6,10 +6,11 @@
 
 import { registerModel } from '../aiEngine.js';
 import { BusinessError } from '../../utils/businessError.js';
+import { adapterConfig } from '../../config/index.js';
 import logger from '../../utils/logger.js';
 
-const API_KEY = process.env.CLAUDE_API_KEY || '';
-const BASE_URL = process.env.CLAUDE_BASE_URL || 'https://api.anthropic.com/v1';
+const API_KEY = adapterConfig.claude.apiKey;
+const BASE_URL = adapterConfig.claude.baseUrl;
 const ANTHROPIC_VERSION = '2023-06-01';
 
 // ==================== Claude Sonnet 4.6 ====================

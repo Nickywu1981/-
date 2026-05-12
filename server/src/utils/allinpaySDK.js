@@ -7,6 +7,7 @@
 import crypto from 'crypto';
 import { promises as fs } from 'fs';
 import allinpayConfig from '../config/allinpay.js';
+import { isProduction } from '../config/index.js';
 import logger from './logger.js';
 import { BusinessError } from './businessError.js';
 
@@ -200,7 +201,7 @@ export async function unifiedOrder(params) {
 export async function verifyNotify(body) {
   // Mock 模式仅在非生产环境且调用方显式标记为 sanbox 允许跳过验签
   if (await isMockMode()) {
-    if (process.env.NODE_ENV === 'production') {
+    if (isProduction) {
       logger.error('[Allinpay] 生产环境禁止 Mock 模式验签跳过');
       return false;
     }

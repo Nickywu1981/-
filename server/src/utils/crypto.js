@@ -3,13 +3,14 @@
  * G5 后端开发 | AES-256-GCM 加解密
  */
 import crypto from 'crypto';
+import { securityConfig } from '../config/index.js';
 
 const ALGORITHM = 'aes-256-gcm';
 const KEY_LENGTH = 32; // AES-256 requires exactly 32 bytes
 let _secretKey = null;
 function getSecretKey() {
   if (_secretKey) return _secretKey;
-  const raw = process.env.ENCRYPTION_KEY;
+  const raw = securityConfig.encryptionKey;
   if (!raw) throw new Error('FATAL: ENCRYPTION_KEY env var is required');
   _secretKey = Buffer.from(raw, 'utf8');
   if (_secretKey.length !== KEY_LENGTH) {

@@ -5,6 +5,7 @@
  * 采集: HTTP QPS、响应耗时、状态码分布、队列积压
  */
 import { success } from '../utils/response.js';
+import { env } from '../config/index.js';
 import logger from '../utils/logger.js';
 
 // ========================= 指标存储 =========================
@@ -98,7 +99,7 @@ export function healthCheckEndpoint(req, res) {
     uptime: Math.floor(process.uptime()),
     memory: Math.round(process.memoryUsage().heapUsed / 1024 / 1024) + 'MB',
     node: process.version,
-    env: process.env.NODE_ENV || 'development',
+    env: env || 'development',
   };
   return success(res, checks);
 }

@@ -163,6 +163,30 @@ const config = {
   appUrl: process.env.APP_URL || 'https://movio.ai',
 
   geoIpApiUrl: process.env.GEOIP_API_URL || 'https://ip-api.com/json',
+
+  adapters: {
+    claude: {
+      apiKey: process.env.CLAUDE_API_KEY || '',
+      baseUrl: process.env.CLAUDE_BASE_URL || 'https://api.anthropic.com/v1',
+    },
+    openai: {
+      apiKey: process.env.OPENAI_API_KEY || '',
+      baseUrl: (process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1').replace(/\/+$/, ''),
+    },
+    sd: {
+      apiUrl: process.env.SD_API_URL || 'http://localhost:7860',
+      replicateKey: process.env.REPLICATE_API_KEY || '',
+    },
+    stability: {
+      apiKey: process.env.STABILITY_API_KEY || '',
+      baseUrl: process.env.STABILITY_BASE_URL || 'https://api.stability.ai',
+    },
+    edgeTts: {
+      wsUrl: process.env.EDGE_TTS_WS_URL || `wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=${process.env.EDGE_TTS_TRUSTED_TOKEN || '6A5AA1D4EAFF4E9FB37E23D68491D6F4'}`,
+      elevenLabsApiKey: process.env.ELEVENLABS_API_KEY,
+      elevenLabsApiUrl: process.env.ELEVENLABS_API_URL || 'https://api.elevenlabs.io',
+    },
+  },
 };
 
 export default config;
@@ -185,3 +209,4 @@ export const { security: securityConfig } = config;
 export const { bull: bullConfig } = config;
 export const appUrl = config.appUrl;
 export const { ai: aiConfig } = config;
+export const { adapters: adapterConfig } = config;
