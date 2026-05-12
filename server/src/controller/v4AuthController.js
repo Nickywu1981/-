@@ -12,6 +12,8 @@ import { revokeAccessToken, revokeRefreshToken } from '../utils/jwtToken.js';
 import { isProduction } from '../config/index.js';
 import logger from '../utils/logger.js';
 
+import { findById } from '../dao/userDao.js';
+
 function setTokenCookie(res, token) {
   const payload = jwt.decode(token);
   const maxAge = payload?.exp ? (payload.exp * 1000) - Date.now() : 7 * 24 * 60 * 60 * 1000;
@@ -80,4 +82,21 @@ export const logout = wrapController(async (req, res) => {
   }
   res.clearCookie('token', { httpOnly: true, secure: isProduction, sameSite: 'lax', path: '/' });
   return success(res, {}, '已退出登录');
+});
+
+export const getMe = wrapController(async (req, res) => {
+  const user = await findById(req.user.id);
+  if (!user) throw new BusinessError(ERROR_CODE.UNAUTHORIZED, '用户不存在');
+  return success(res, {
+    id: user.id,
+    username: user.username,
+    nickname: user.nickname,
+    email: user.email,
+    phone: user.phone,
+    avatar: user.avatar,
+    role: user.role,
+    isAdmin: user.role === 'admin' || user.role === 'super_admin',
+    tenantId: user.tenant_id,
+    points: 0,
+  });
 });

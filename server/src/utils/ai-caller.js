@@ -5,8 +5,9 @@
  */
 import { CircuitBreaker } from './circuit-breaker.js';
 import { BusinessError } from './businessError.js';
+import { aiTimeoutMs } from '../config/index.js';
 
-const DEFAULT_TIMEOUT = 120000;
+const DEFAULT_TIMEOUT = aiTimeoutMs;
 const DEFAULT_RETRIES = 3;
 
 /**

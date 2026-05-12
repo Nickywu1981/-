@@ -5,11 +5,9 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { validateV4 as _validate } from '../utils/validate.js';
-import { wrapController } from '../utils/wrapController.js';
 import { authLimiter } from '../middleware/rateLimiter.js';
 import { optionalAuth, authMiddleware } from '../middleware/auth.js';
 import * as ctrl from '../controller/v4AuthController.js';
-import { findById } from '../dao/userDao.js';
 
 const router = Router();
 
@@ -52,24 +50,6 @@ router.post('/reset-password', authLimiter, _validate(resetPasswordSchema), ctrl
 router.post('/logout', authLimiter, optionalAuth, ctrl.logout);
 
 // GET /me — 返回当前登录用户信息
-router.get('/me', authMiddleware, wrapController(async (req, res) => {
-  const user = await findById(req.user.id);
-  if (!user) return res.status(401).json({ code: 401, msg: '用户不存在' });
-  return res.json({
-    code: 200,
-    data: {
-      id: user.id,
-      username: user.username,
-      nickname: user.nickname,
-      email: user.email,
-      phone: user.phone,
-      avatar: user.avatar,
-      role: user.role,
-      isAdmin: user.role === 'admin' || user.role === 'super_admin',
-      tenantId: user.tenant_id,
-      points: 0,
-    },
-  });
-}));
+router.get('/me', authMiddleware, ctrl.getMe);
 
 export default router;
