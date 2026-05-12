@@ -5,11 +5,11 @@
  * 配置: config.sms = { provider, providers: { aliyun: {...}, tencent: {...} } }
  */
 
-import crypto from 'crypto';
 import * as smsLogDao from '../dao/smsLogDao.js';
 import * as smsTemplateDao from '../dao/smsTemplateDao.js';
 import config from '../config/index.js';
 import { BusinessError } from '../utils/businessError.js';
+import { renderTemplate, generateCode } from '../utils/templateHelpers.js';
 import logger from '../utils/logger.js';
 import * as codeStore from './codeStore.js';
 
@@ -58,17 +58,7 @@ function getProvider() {
   return providers[name] || providers.mock;
 }
 
-// ==================== 模板渲染 ====================
-
-function renderTemplate(templateContent, params) {
-  return templateContent.replace(/\{(\w+)\}/g, (_, key) => params[key] ?? `{${key}}`);
-}
-
 // ==================== 验证码生成与校验 ====================
-
-function generateCode(length = 6) {
-  return String(crypto.randomInt(0, 10 ** length)).padStart(length, '0');
-}
 
 function cacheKey(phone, scene) {
   return `sms:${scene}:${phone}`;

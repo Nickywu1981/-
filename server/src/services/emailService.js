@@ -2,9 +2,9 @@
  * 邮箱验证码服务 — 多服务商抽象 + 频率控制 + 模板渲染
  * 支持: mock / smtp(QQ/Gmail/163) / sendgrid
  */
-import crypto from 'crypto';
 import config from '../config/index.js';
 import { BusinessError } from '../utils/businessError.js';
+import { renderTemplate, generateCode } from '../utils/templateHelpers.js';
 import logger from '../utils/logger.js';
 import * as emailTemplateDao from '../dao/emailTemplateDao.js';
 import * as codeStore from './codeStore.js';
@@ -45,12 +45,6 @@ function sanitizeHtml(html) {
     .replace(/&#x[0-9a-f]+;?/gi, '')
     .replace(/javascript\s*:/gi, 'data-xss-blocked:')
     .replace(/data\s*:\s*text\/html/gi, 'data-xss-blocked:');
-}
-
-// ==================== 模板渲染 ====================
-
-function renderTemplate(templateContent, params) {
-  return templateContent.replace(/\{(\w+)\}/g, (_, key) => params[key] ?? `{${key}}`);
 }
 
 // ==================== 服务商抽象层 ====================
@@ -104,10 +98,6 @@ function getProvider() {
 }
 
 // ==================== 验证码 ====================
-
-function generateCode(len = 6) {
-  return String(crypto.randomInt(0, 10 ** len)).padStart(len, '0');
-}
 
 export async function sendVerificationCode(email, scene = 'login') {
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
