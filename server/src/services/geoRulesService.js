@@ -45,15 +45,28 @@ export async function evaluateRules(countryCode, platformCode) {
 
   const allRules = await geoRulesDao.getMatchingRules(countryCode, platformCode);
 
+  const safeParseArray = (v) => {
+    if (Array.isArray(v)) return v;
+    if (typeof v === 'string') {
+      try { const p = JSON.parse(v); return Array.isArray(p) ? p : []; } catch { return []; }
+    }
+    return [];
+  };
+  const safeParseObj = (v) => {
+    if (v && typeof v === 'object' && !Array.isArray(v)) return v;
+    if (typeof v === 'string') {
+      try { return JSON.parse(v); } catch { return null; }
+    }
+    return null;
+  };
+
   const matched = allRules.filter(r => {
-    let countries = r.country_codes;
-    if (typeof countries === 'string') countries = JSON.parse(countries);
-    if (!Array.isArray(countries) || !countries.includes(countryCode)) return false;
+    const countries = safeParseArray(r.country_codes);
+    if (!countries.includes(countryCode)) return false;
 
     if (r.platform_codes && platformCode) {
-      let platforms = r.platform_codes;
-      if (typeof platforms === 'string') platforms = JSON.parse(platforms);
-      if (Array.isArray(platforms) && platforms.length > 0 && !platforms.includes(platformCode)) return false;
+      const platforms = safeParseArray(r.platform_codes);
+      if (platforms.length > 0 && !platforms.includes(platformCode)) return false;
     }
     return true;
   });
@@ -62,12 +75,12 @@ export async function evaluateRules(countryCode, platformCode) {
   for (const rule of matched.sort((a, b) => (b.priority || 0) - (a.priority || 0))) {
     if (rule.locale && !result.locale) result.locale = rule.locale;
     if (rule.blocked_models) {
-      const blocked = typeof rule.blocked_models === 'string' ? JSON.parse(rule.blocked_models) : rule.blocked_models;
-      if (Array.isArray(blocked)) result.blockedModels = [...new Set([...result.blockedModels, ...blocked])];
+      const blocked = safeParseArray(rule.blocked_models);
+      if (blocked.length) result.blockedModels = [...new Set([...result.blockedModels, ...blocked])];
     }
     if ((rule.review_level || 0) > result.reviewLevel) result.reviewLevel = rule.review_level;
     if (rule.output_constraints && !result.outputConstraints) {
-      result.outputConstraints = typeof rule.output_constraints === 'string' ? JSON.parse(rule.output_constraints) : rule.output_constraints;
+      result.outputConstraints = safeParseObj(rule.output_constraints);
     }
   }
 

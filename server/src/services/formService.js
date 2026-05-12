@@ -286,6 +286,7 @@ export async function updateSubmission(subId, formId, data) {
 
 export async function exportSubmissions(formId, _format = 'csv') {
   const batchSize = 1000;
+  const MAX_PAGES = 50;
   let page = 1;
   let allRows = [];
   let batch;
@@ -293,7 +294,7 @@ export async function exportSubmissions(formId, _format = 'csv') {
     batch = await formDao.getAllSubmissions(formId, { page, pageSize: batchSize });
     allRows = allRows.concat(batch);
     page++;
-  } while (batch.length === batchSize);
+  } while (batch.length === batchSize && page <= MAX_PAGES);
   if (!allRows.length) return { csv: '', count: 0 };
   const headers = Object.keys(allRows[0]).filter(k => k !== 'user_ip_long');
   const csvRows = [headers.join(',')];

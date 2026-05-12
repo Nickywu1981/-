@@ -196,7 +196,8 @@ export default {
     const params = [tenantId];
     const { offset } = parsePagination({ page, pageSize });
     if (category) { sql += ' AND category = ?'; params.push(category); }
-    sql += ' ORDER BY category, id';
+    sql += ' ORDER BY category, id LIMIT ? OFFSET ?';
+    params.push(pageSize, offset);
     const [rows] = await pool.query(sql, params);
     return rows;
   },

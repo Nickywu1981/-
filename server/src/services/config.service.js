@@ -38,6 +38,7 @@ export async function getGroupConfig(groupKey, userId, userRole) {
     if (cached) return JSON.parse(cached);
   } catch (e) {
     logger.warn('[Config] Redis 缓存读取失败', { groupKey, error: e.message });
+    try { await cacheDel(cacheKey); } catch { /* 静默清理 */ }
   }
 
   if (_inflight.has(cacheKey)) return _inflight.get(cacheKey);
