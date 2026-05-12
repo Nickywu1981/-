@@ -46,7 +46,7 @@ ALTER TABLE operation_log ADD INDEX IF NOT EXISTS idx_user_action_time (user_id,
 ALTER TABLE task ADD INDEX IF NOT EXISTS idx_status_priority_time (status, priority, create_time);
 
 -- ======== P2-5: job_queue 复合索引 (status, job_type, priority, created_at) — 作业认领 ========
-ALTER TABLE job_queue ADD INDEX IF NOT EXISTS idx_status_type_priority (status, job_type, priority);
+ALTER TABLE job_queue ADD INDEX IF NOT EXISTS idx_status_type_priority (status, task_type, priority);
 
 -- DOWN
 

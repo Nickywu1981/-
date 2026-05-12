@@ -46,8 +46,8 @@ ALTER TABLE user_membership
 
 -- ======== P0-5: points_transaction 列名对齐 DAO ========
 -- DAO 使用 type/description/ref_id，但 DDL 使用 trans_type/remark/business_id
+-- ADD COLUMN IF NOT EXISTS 兼容已有列
 ALTER TABLE points_transaction
-  CHANGE COLUMN IF EXISTS trans_type type VARCHAR(32) NOT NULL DEFAULT '' COMMENT '变更类型: earn/spend/refund/freeze/unfreeze/admin_adjust',
   ADD COLUMN IF NOT EXISTS description VARCHAR(255) DEFAULT '' COMMENT '变更描述' AFTER balance_after,
   ADD COLUMN IF NOT EXISTS ref_id VARCHAR(64) DEFAULT '' COMMENT '关联业务ID' AFTER description;
 -- 保留 business_id/remark 列作为兼容（m002_business.sql 定义），两套列名共存
