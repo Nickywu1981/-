@@ -8,12 +8,10 @@
  */
 import { Router } from 'express';
 import { z } from 'zod';
-import { success, error } from '../utils/response.js';
-import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate, validate, paginationSchema } from '../utils/validate.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { paymentLimiter, adminLimiter } from '../middleware/rateLimiter.js';
-import * as pointsService from '../services/points.service.js';
+import * as ctrl from '../controller/v4PointsController.js';
 
 const router = Router();
 
@@ -28,52 +26,15 @@ const earnSchema = z.object({
 });
 
 // GET /api/points/account
-router.get('/account', authMiddleware, async (req, res) => {
-  try {
-    const result = await pointsService.getPointsAccount(req.user.id);
-    return success(res, result);
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
-  }
-});
+router.get('/account', authMiddleware, ctrl.getAccount);
 
 // GET /api/points/transactions
-router.get('/transactions', authMiddleware, validate(paginationSchema, 'query'), async (req, res) => {
-  try {
-    const result = await pointsService.getPointsTransactions(req.user.id, {
-      page: parseInt(req.query.page, 10) || 1,
-      pageSize: Math.min(parseInt(req.query.pageSize, 10) || 20, 200),
-    });
-    return success(res, result);
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
-  }
-});
+router.get('/transactions', authMiddleware, validate(paginationSchema, 'query'), ctrl.getTransactions);
 
 // POST /api/points/redeem — 积分兑换点数
-router.post('/redeem', paymentLimiter, authMiddleware, _validate(redeemSchema), async (req, res) => {
-  try {
-    const { points } = req.validated;
-    const result = await pointsService.redeemPointsForCredits(req.user.id, points);
-    return success(res, result, `成功兑换 ${result.redeemed_credits} 点数`);
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
-  }
-});
+router.post('/redeem', paymentLimiter, authMiddleware, _validate(redeemSchema), ctrl.redeemPoints);
 
 // POST /api/points/earn — 管理后台手动发放积分
-router.post('/earn', adminLimiter, authMiddleware, adminAuth, _validate(earnSchema), async (req, res) => {
-  try {
-    const { user_id, amount, remark } = req.validated;
-    const result = await pointsService.earnPoints(user_id, {
-      amount,
-      businessType: 'admin_adjust',
-      remark: remark || '管理员手动发放',
-    });
-    return success(res, result, '积分发放成功');
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.message);
-  }
-});
+router.post('/earn', adminLimiter, authMiddleware, adminAuth, _validate(earnSchema), ctrl.earnPoints);
 
 export default router;

@@ -6,14 +6,11 @@
  */
 import { Router } from 'express';
 import { z } from 'zod';
-import { success, error } from '../utils/response.js';
 import { validateV4 as _validate } from '../utils/validate.js';
-import { ERROR_CODE } from '../constants/errorCode.js';
 import { contentModerationMiddleware } from '../middleware/content-moderation.middleware.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { authMiddleware } from '../middleware/auth.js';
-import * as posterService from '../services/poster.service.js';
-import * as promptEnhanceService from '../services/prompt-enhance.service.js';
+import * as ctrl from '../controller/v4PosterController.js';
 
 const router = Router();
 router.use(authMiddleware);
@@ -29,15 +26,7 @@ const generateSchema = z.object({
 router.post('/generate',
   heavyLimiter, _validate(generateSchema),
   contentModerationMiddleware('input'),
-  async (req, res) => {
-    try {
-      const job = await posterService.generatePoster(req.user.id, req.validated);
-      return success(res, { job_id: job.id, status: 'queued' }, '海报任务已提交');
-    } catch (e) {
-      if (e.status) return error(res, e.status, e.message);
-      return error(res, ERROR_CODE.INTERNAL_ERROR, '海报生成失败');
-    }
-  },
+  ctrl.generatePoster,
 );
 
 // ─── POST /api/posters/enhance-prompt ─────────────────────────
@@ -46,24 +35,10 @@ const enhanceSchema = z.object({
   posterType: z.enum(['product', 'holiday', 'event', 'private', 'xhs', 'wechat']),
 });
 
-router.post('/enhance-prompt', heavyLimiter, _validate(enhanceSchema), async (req, res) => {
-  try {
-    // poster类型的poster→poster策略，xhs/wechat→social策略
-    const promptType = ['xhs', 'wechat'].includes(req.validated.posterType) ? 'social' : 'poster';
-    const result = await promptEnhanceService.enhancePrompt(req.validated.prompt, promptType);
-    return success(res, result);
-  } catch (__) {
-    return error(res, ERROR_CODE.INTERNAL_ERROR, '提示词增强失败');
-  }
-});
+router.post('/enhance-prompt', heavyLimiter, _validate(enhanceSchema), ctrl.enhancePrompt);
 
 // ─── GET /api/posters/sizes ────────────────────────────────────
-router.get('/sizes', (_req, res) => {
-  return success(res, {
-    sizes: posterService.getPosterSizes(),
-    styles: posterService.getPosterStyles(),
-  });
-});
+router.get('/sizes', ctrl.getSizes);
 
 // ─── GET /api/posters/works ────────────────────────────────────
 const worksQuerySchema = z.object({
@@ -72,14 +47,6 @@ const worksQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(100).optional().default(20),
 });
 
-router.get('/works', _validate(worksQuerySchema, 'query'), async (req, res) => {
-  try {
-    const { type, page, limit } = req.validated;
-    const rows = await posterService.getUserPosters(req.user.id, { type, page, limit });
-    return success(res, rows);
-  } catch (__) {
-    return error(res, ERROR_CODE.INTERNAL_ERROR, '获取作品列表失败');
-  }
-});
+router.get('/works', _validate(worksQuerySchema, 'query'), ctrl.getUserPosters);
 
 export default router;

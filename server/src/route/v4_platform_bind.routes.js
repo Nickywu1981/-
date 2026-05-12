@@ -7,12 +7,10 @@
  */
 import { Router } from 'express';
 import { z } from 'zod';
-import { success, error } from '../utils/response.js';
-import { ERROR_CODE } from '../constants/errorCode.js';
 import { validateV4 as _validate, validate, idParamSchema } from '../utils/validate.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
-import db from '../dao/db.js';
+import * as ctrl from '../controller/v4PlatformBindController.js';
 
 const router = Router();
 
@@ -32,73 +30,15 @@ const publishSchema = z.object({
 });
 
 // GET /api/platforms/bindings
-router.get('/bindings', async (req, res) => {
-  try {
-    const conn = await db.getConnection();
-    try {
-      const [rows] = await conn.query(
-        'SELECT id, bind_type, platform, account_id, account_name, created_at FROM user_platform_bind WHERE user_id = ? AND is_active = 1 ORDER BY created_at DESC',
-        [req.user.id],
-      );
-      return success(res, { list: rows });
-    } finally {
-      conn.release();
-    }
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '服务器内部错误');
-  }
-});
+router.get('/bindings', ctrl.getBindings);
 
 // POST /api/platforms/bind
-router.post('/bind', heavyLimiter, _validate(bindSchema), async (req, res) => {
-  try {
-    const { platform, bind_type, account_id, account_name } = req.validated;
-
-    const conn = await db.getConnection();
-    try {
-      await conn.query(
-        `INSERT INTO user_platform_bind (user_id, bind_type, platform, account_id, account_name)
-         VALUES (?, ?, ?, ?, ?)
-         ON DUPLICATE KEY UPDATE account_name = ?, is_active = 1`,
-        [req.user.id, bind_type || 'shop', platform, account_id, account_name || '', account_name || ''],
-      );
-      return success(res, null, '绑定成功');
-    } finally {
-      conn.release();
-    }
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '服务器内部错误');
-  }
-});
+router.post('/bind', heavyLimiter, _validate(bindSchema), ctrl.bind);
 
 // DELETE /api/platforms/bind/:id
-router.delete('/bind/:id', heavyLimiter, validate(idParamSchema, 'params'), async (req, res) => {
-  try {
-    const conn = await db.getConnection();
-    try {
-      await conn.query(
-        'UPDATE user_platform_bind SET is_active = 0 WHERE id = ? AND user_id = ?',
-        [req.params.id, req.user.id],
-      );
-      return success(res, null, '解绑成功');
-    } finally {
-      conn.release();
-    }
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '服务器内部错误');
-  }
-});
+router.delete('/bind/:id', heavyLimiter, validate(idParamSchema, 'params'), ctrl.unbind);
 
 // POST /api/platforms/publish — 发布内容到平台
-router.post('/publish', heavyLimiter, _validate(publishSchema), async (req, res) => {
-  try {
-    const { work_id, platform, content_url } = req.validated;
-
-    // TODO: 实际对接各平台发布API (W4 MVP先记录)
-    return success(res, { published_url: content_url, platform, status: 'submitted' }, '已提交发布任务');
-  } catch (err) {
-    return error(res, err.status || ERROR_CODE.INTERNAL_ERROR, err.status ? err.message : '服务器内部错误');
-  }
-});
+router.post('/publish', heavyLimiter, _validate(publishSchema), ctrl.publish);
 
 export default router;
