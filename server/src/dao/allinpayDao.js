@@ -61,7 +61,7 @@ export default {
 
   async getBillingHistory(userId) {
     const [rows] = await pool.query(
-      'SELECT reqsn, trxid, amount, pay_channel, status, body, create_time, pay_time FROM allinpay_order WHERE user_id = ? AND status = 1 ORDER BY create_time DESC LIMIT 50',
+      'SELECT reqsn, trxid, amount, pay_channel, status, create_time, pay_time FROM allinpay_order WHERE user_id = ? AND status = 1 ORDER BY create_time DESC LIMIT 50',
       [userId],
     );
     return rows;

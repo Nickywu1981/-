@@ -1,6 +1,6 @@
 import pool from './db.js';
 
-const TASK_COLS = 'at.id, at.tenant_id, at.user_id, at.account_id, at.task_type, at.task_config, at.status, at.start_time, at.end_time, at.result_json, at.screenshot_url, at.error_msg, at.create_time, at.update_time';
+const TASK_COLS = 'at.id, at.tenant_id, at.user_id, at.account_id, at.task_type, at.task_config, at.status, at.start_time, at.end_time, at.result_json, at.screenshot_url, at.error_msg, at.create_time';
 
 export default {
   async listTasks(userId, tenantId, { page = 1, pageSize = 20 } = {}) {
