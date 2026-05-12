@@ -89,10 +89,10 @@ export async function login({ phone, email, username, password }) {
 export async function loginByCode({ phone, email, username, code }) {
   // 验证码校验：优先手机号，其次邮箱
   if (phone) {
-    const result = smsService.verifyCode(phone, 'login', code);
+    const result = await smsService.verifyCode(phone, 'login', code);
     if (!result.valid) throw new BusinessError(400, result.reason || '验证码无效');
   } else if (email) {
-    emailService.verifyCode(email, code); // throws on invalid
+    await emailService.verifyCode(email, code); // throws on invalid
   } else {
     throw new BusinessError(400, '验证码登录需提供手机号或邮箱');
   }
@@ -144,10 +144,10 @@ export async function loginByCode({ phone, email, username, code }) {
 export async function resetPassword({ phone, email, newPassword, code }) {
   // 验证码校验
   if (phone) {
-    const result = smsService.verifyCode(phone, 'reset_password', code);
+    const result = await smsService.verifyCode(phone, 'reset_password', code);
     if (!result.valid) throw new BusinessError(400, result.reason || '验证码无效');
   } else if (email) {
-    emailService.verifyCode(email, code); // throws on invalid
+    await emailService.verifyCode(email, code); // throws on invalid
   }
 
   const conn = await db.getConnection();
