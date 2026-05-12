@@ -108,7 +108,7 @@ async function processJob(job) {
 
     // 批量进度聚合：通知父任务
     if (params.batchId) {
-      onChildJobComplete(params.batchId, job.id, 'completed', result).catch(() => {});
+      onChildJobComplete(params.batchId, job.id, 'completed', result).catch(err => logger.warn('[Worker] batch complete notify failed:', err.message));
     }
   } catch (err) {
     logger.error(`[Worker] Job #${job.id} failed: ${err.message}`);
@@ -116,7 +116,7 @@ async function processJob(job) {
 
     // 批量进度聚合：通知父任务子任务失败
     if (params.batchId) {
-      onChildJobComplete(params.batchId, job.id, 'failed', { error: err.message }).catch(() => {});
+      onChildJobComplete(params.batchId, job.id, 'failed', { error: err.message }).catch(err2 => logger.warn('[Worker] batch fail notify failed:', err2.message));
     }
   } finally {
     activeJobIds.delete(job.id);

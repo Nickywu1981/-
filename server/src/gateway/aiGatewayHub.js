@@ -170,7 +170,7 @@ export async function gatewayInfer(modelId, input, ctx = {}) {
     try {
       const callId = null; // logCall doesn't return id in current impl
       if (cwResult?.budget) {
-        saveBudgetLog(ctx.sessionId, cwResult.budget, callId).catch(() => {});
+        saveBudgetLog(ctx.sessionId, cwResult.budget, callId).catch(err => logger.warn('[Gateway] budget log save failed:', err.message));
       }
       // 自动记住关键交互
       const userInputSnippet = typeof input === 'string' ? input.slice(0, 500) : '';
@@ -184,7 +184,7 @@ export async function gatewayInfer(modelId, input, ctx = {}) {
           source: ctx.sessionId || 'gateway',
           tags: [modelId, context.taskType].filter(Boolean),
           metadata: { modelId, tokensIn: effectiveTokensIn, tokensOut: effectiveTokensOut, cost: cost.amount },
-        }).catch(() => {});
+        }).catch(err => logger.warn('[Gateway] LTM auto-store failed:', err.message));
       }
     } catch (e) {
       logger.warn(`[Gateway] LTM auto-store failed: ${e.message}`);

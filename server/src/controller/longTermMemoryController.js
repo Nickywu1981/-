@@ -3,6 +3,7 @@ import { success } from '../utils/response.js';
 import { BusinessError } from '../utils/businessError.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import * as ltmService from '../services/longTermMemoryService.js';
+import logger from '../utils/logger.js';
 
 export const storeMemory = wrapController(async (req, res) => {
   const d = req.validated;
@@ -26,7 +27,7 @@ export const recallMemory = wrapController(async (req, res) => {
   const memories = await ltmService.recall(d);
 
   for (const m of memories) {
-    ltmService.markAccessed(m.id).catch(() => {});
+    ltmService.markAccessed(m.id).catch(err => logger.warn('[LTM] markAccessed failed:', err.message));
   }
 
   return success(res, { memories, count: memories.length });
