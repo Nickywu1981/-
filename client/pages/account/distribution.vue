@@ -6,97 +6,101 @@
 <template>
   <div class="page-container">
     <header class="page-header">
-      <h1>{{ headerCfg.title || '分销中心' }}</h1>
-      <p>{{ headerCfg.subtitle || '邀请好友使用Movio AI — 赚取推广佣金' }}</p>
+      <h1>{{ headerCfg.title || $t('account_pages.distribution.title') }}</h1>
+      <p>{{ headerCfg.subtitle || $t('account_pages.distribution.subtitle') }}</p>
     </header>
 
-    <!-- 邀请码卡片 -->
-    <div class="invite-card">
-      <div class="invite-header">
-        <span class="invite-label">我的邀请码</span>
-        <button class="btn btn-ghost btn-xs" @click="copyInviteCode">📋 复制</button>
-      </div>
-      <div class="invite-code">{{ inviteData?.invite_code || '加载中...' }}</div>
-      <div class="invite-link">
-        <span class="link-label">邀请链接：</span>
-        <code>{{ inviteUrl }}</code>
-        <button class="btn btn-ghost btn-xs" @click="copyInviteLink">复制链接</button>
-      </div>
-    </div>
+    <LoadingSkeleton v-if="pageLoading" />
 
-    <!-- 佣金概览 -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <span class="stat-label">可提现佣金</span>
-        <span class="stat-value available">¥{{ balance?.available || 0 }}</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-label">已提现</span>
-        <span class="stat-value">¥{{ balance?.withdrawn || 0 }}</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-label">累计佣金</span>
-        <span class="stat-value">¥{{ balance?.total || 0 }}</span>
-      </div>
-    </div>
-
-    <!-- 提现 -->
-    <div v-if="(balance?.available || 0) > 0" class="withdraw-section">
-      <button class="btn btn-primary" :disabled="withdrawing" @click="doWithdraw">
-        {{ withdrawing ? '提现中...' : `提现 ¥${balance?.available || 0}` }}
-      </button>
-    </div>
-
-    <!-- 推广团队 -->
-    <div class="section">
-      <h3>推广团队</h3>
-      <div class="team-stats">
-        <div class="team-stat">
-          <span class="team-stat-val">{{ teamStats?.level1_count || 0 }}</span>
-          <span class="team-stat-label">直推成员</span>
+    <template v-else>
+      <!-- 邀请码卡片 -->
+      <div class="invite-card">
+        <div class="invite-header">
+          <span class="invite-label">{{ $t('account_pages.distribution.invite_code_label') }}</span>
+          <button class="btn btn-ghost btn-xs" @click="copyInviteCode">📋 {{ $t('account_pages.distribution.copy') }}</button>
         </div>
-        <div class="team-stat">
-          <span class="team-stat-val">{{ teamStats?.level2_count || 0 }}</span>
-          <span class="team-stat-label">间推成员</span>
+        <div class="invite-code">{{ inviteData?.invite_code || $t('account_pages.distribution.loading') }}</div>
+        <div class="invite-link">
+          <span class="link-label">{{ $t('account_pages.distribution.invite_link_label') }}</span>
+          <code>{{ inviteUrl }}</code>
+          <button class="btn btn-ghost btn-xs" @click="copyInviteLink">{{ $t('account_pages.distribution.copy_link') }}</button>
         </div>
       </div>
 
-      <div v-if="teamList.length > 0" class="team-list">
-        <div v-for="member in teamList" :key="member.id" class="team-row">
-          <span class="member-avatar">{{ member.nickname?.charAt(0) || '?' }}</span>
-          <span class="member-name">{{ member.nickname || '用户' + member.user_id }}</span>
-          <span class="member-level" :class="member.level === 1 ? 'level1' : 'level2'">
-            {{ member.level === 1 ? '直推' : '间推' }}
-          </span>
-          <span class="member-date">{{ formatDateTime(member.bound_at) }}</span>
+      <!-- 佣金概览 -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-label">{{ $t('account_pages.distribution.available_commission') }}</span>
+          <span class="stat-value available">¥{{ balance?.available || 0 }}</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">{{ $t('account_pages.distribution.withdrawn') }}</span>
+          <span class="stat-value">¥{{ balance?.withdrawn || 0 }}</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">{{ $t('account_pages.distribution.total_commission') }}</span>
+          <span class="stat-value">¥{{ balance?.total || 0 }}</span>
         </div>
       </div>
-      <div v-else class="empty-state">还没有推广成员，快去邀请好友吧</div>
-    </div>
 
-    <!-- 佣金流水 -->
-    <div class="section">
-      <h3>佣金流水</h3>
-      <div v-if="commissionList.length === 0 && !loadingComm" class="empty-state">暂无佣金记录</div>
-      <div v-else class="comm-list">
-        <div v-for="c in commissionList" :key="c.id" class="comm-row">
-          <div class="comm-info">
-            <span class="comm-amount">¥{{ c.commission }}</span>
-            <span class="comm-level" :class="c.level === 1 ? 'level1' : 'level2'">
-              {{ c.level === 1 ? '一级' : '二级' }}返利 ({{ c.commission_rate }}%)
+      <!-- 提现 -->
+      <div v-if="(balance?.available || 0) > 0" class="withdraw-section">
+        <button class="btn btn-primary" :disabled="withdrawing" @click="doWithdraw">
+          {{ withdrawing ? $t('account_pages.distribution.withdrawing') : $t('account_pages.distribution.withdraw_btn', { amount: balance?.available || 0 }) }}
+        </button>
+      </div>
+
+      <!-- 推广团队 -->
+      <div class="section">
+        <h3>{{ $t('account_pages.distribution.team_section') }}</h3>
+        <div class="team-stats">
+          <div class="team-stat">
+            <span class="team-stat-val">{{ teamStats?.level1_count || 0 }}</span>
+            <span class="team-stat-label">{{ $t('account_pages.distribution.direct_member') }}</span>
+          </div>
+          <div class="team-stat">
+            <span class="team-stat-val">{{ teamStats?.level2_count || 0 }}</span>
+            <span class="team-stat-label">{{ $t('account_pages.distribution.indirect_member') }}</span>
+          </div>
+        </div>
+
+        <div v-if="teamList.length > 0" class="team-list">
+          <div v-for="member in teamList" :key="member.id" class="team-row">
+            <span class="member-avatar">{{ member.nickname?.charAt(0) || '?' }}</span>
+            <span class="member-name">{{ member.nickname || '用户' + member.user_id }}</span>
+            <span class="member-level" :class="member.level === 1 ? 'level1' : 'level2'">
+              {{ member.level === 1 ? $t('account_pages.distribution.direct_tag') : $t('account_pages.distribution.indirect_tag') }}
             </span>
-          </div>
-          <div class="comm-meta">
-            <span class="comm-order">订单 ¥{{ c.order_amount }} · {{ c.consumer_name || '用户' + c.consumer_id }}</span>
-            <span class="comm-status" :class="c.status">{{ statusLabel(c.status) }}</span>
-            <span class="comm-time">{{ formatDateTime(c.created_at) }}</span>
+            <span class="member-date">{{ formatDateTime(member.bound_at) }}</span>
           </div>
         </div>
+        <div v-else class="empty-state">{{ $t('account_pages.distribution.no_team') }}</div>
       </div>
-      <div v-if="commTotal > commPage * 20" class="load-more">
-        <button class="btn btn-ghost btn-sm" @click="loadMoreComm">加载更多</button>
+
+      <!-- 佣金流水 -->
+      <div class="section">
+        <h3>{{ $t('account_pages.distribution.commission_history') }}</h3>
+        <div v-if="commissionList.length === 0 && !loadingComm" class="empty-state">{{ $t('account_pages.distribution.no_commission') }}</div>
+        <div v-else class="comm-list">
+          <div v-for="c in commissionList" :key="c.id" class="comm-row">
+            <div class="comm-info">
+              <span class="comm-amount">¥{{ c.commission }}</span>
+              <span class="comm-level" :class="c.level === 1 ? 'level1' : 'level2'">
+                {{ c.level === 1 ? $t('account_pages.distribution.level1_rebate') : $t('account_pages.distribution.level2_rebate') }} ({{ c.commission_rate }}%)
+              </span>
+            </div>
+            <div class="comm-meta">
+              <span class="comm-order">订单 ¥{{ c.order_amount }} · {{ c.consumer_name || '用户' + c.consumer_id }}</span>
+              <span class="comm-status" :class="c.status">{{ statusLabel(c.status) }}</span>
+              <span class="comm-time">{{ formatDateTime(c.created_at) }}</span>
+            </div>
+          </div>
+        </div>
+        <div v-if="commTotal > commPage * 20" class="load-more">
+          <button class="btn btn-ghost btn-sm" @click="loadMoreComm">{{ $t('account_pages.distribution.load_more') }}</button>
+        </div>
       </div>
-    </div>
+    </template>
   </div>
 </template>
 
@@ -104,15 +108,12 @@
 
 import { formatDateTime, copyToClipboard } from '@/utils/format'
 
-
-
+const { t } = useI18n()
 const toast = useToast()
-
 const { configs } = useAppPage({ configs: ['page.distribution.header'] })
 const headerCfg = computed(() => configs.value['page.distribution.header'] || {})
 
 const apiBase = useRuntimeConfig().public.apiBase || '/api'
-
 const requestURL = useRequestURL()
 
 const inviteData = ref<any>(null)
@@ -124,6 +125,7 @@ const commPage = ref(1)
 const commTotal = ref(0)
 const loadingComm = ref(false)
 const withdrawing = ref(false)
+const pageLoading = ref(true)
 
 const inviteUrl = computed(() => {
   const code = inviteData.value?.invite_code
@@ -134,14 +136,14 @@ async function fetchInviteCode() {
   try {
     const res: any = await $fetch(`${apiBase}/distribution/invite-code`)
     if (res.code === 200) inviteData.value = res.data
-  } catch { toast.error('加载邀请码失败') }
+  } catch { toast.error(t('account_pages.distribution.load_invite_error')) }
 }
 
 async function fetchBalance() {
   try {
     const res: any = await $fetch(`${apiBase}/distribution/balance`)
     if (res.code === 200) balance.value = res.data
-  } catch { toast.error('加载余额失败') }
+  } catch { toast.error(t('account_pages.distribution.load_balance_error')) }
 }
 
 async function fetchTeam() {
@@ -151,7 +153,7 @@ async function fetchTeam() {
       teamList.value = res.data.list || []
       teamStats.value = res.data.stats || {}
     }
-  } catch { toast.error('加载团队数据失败') }
+  } catch { toast.error(t('account_pages.distribution.load_team_error')) }
 }
 
 async function fetchCommissions() {
@@ -162,7 +164,7 @@ async function fetchCommissions() {
       commissionList.value = res.data.list || []
       commTotal.value = res.data.total || 0
     }
-  } catch { toast.error('加载佣金记录失败') }
+  } catch { toast.error(t('account_pages.distribution.load_history_error')) }
   loadingComm.value = false
 }
 
@@ -175,14 +177,14 @@ async function doWithdraw() {
       body: { amount: balance.value.available },
     })
     if (res.code === 200) {
-      toast.success(res.msg || '提现成功')
+      toast.success(res.msg || t('account_pages.distribution.withdraw_success'))
       fetchBalance()
       fetchCommissions()
     } else {
-      toast.error(res.msg || '提现失败')
+      toast.error(res.msg || t('account_pages.distribution.withdraw_fail'))
     }
   } catch (e: any) {
-    toast.error(e?.data?.msg || '提现失败')
+    toast.error(e?.data?.msg || t('account_pages.distribution.withdraw_fail'))
   }
   withdrawing.value = false
 }
@@ -190,14 +192,14 @@ async function doWithdraw() {
 async function copyInviteCode() {
   if (inviteData.value?.invite_code) {
     const ok = await copyToClipboard(inviteData.value.invite_code)
-    if (ok) toast.success('邀请码已复制')
+    if (ok) toast.success(t('account_pages.distribution.copy_code_success'))
   }
 }
 
 async function copyInviteLink() {
   if (inviteUrl.value) {
     const ok = await copyToClipboard(inviteUrl.value)
-    if (ok) toast.success('邀请链接已复制')
+    if (ok) toast.success(t('account_pages.distribution.copy_link_success'))
   }
 }
 
@@ -207,15 +209,19 @@ function loadMoreComm() {
 }
 
 function statusLabel(s: string) {
-  const map: Record<string, string> = { pending: '待结算', settled: '已结算', withdrawn: '已提现', cancelled: '已取消' }
+  const map: Record<string, string> = {
+    pending: t('account_pages.distribution.status_pending'),
+    settled: t('account_pages.distribution.status_settled'),
+    withdrawn: t('account_pages.distribution.status_withdrawn'),
+    cancelled: t('account_pages.distribution.status_cancelled'),
+  }
   return map[s] || s
 }
 
 onMounted(() => {
-  fetchInviteCode()
-  fetchBalance()
-  fetchTeam()
-  fetchCommissions()
+  Promise.all([fetchInviteCode(), fetchBalance(), fetchTeam(), fetchCommissions()]).finally(() => {
+    pageLoading.value = false
+  })
 })
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>

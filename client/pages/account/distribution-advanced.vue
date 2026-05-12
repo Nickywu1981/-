@@ -1,161 +1,183 @@
 <template>
   <div class="adv-dist-page">
     <header class="page-header">
-      <h1>分销进阶中心</h1>
-      <p>推广等级 · 团队业绩 · 推广素材 · 裂变活动</p>
+      <h1>{{ $t('account_pages.distribution_advanced.title') }}</h1>
+      <p>{{ $t('account_pages.distribution_advanced.subtitle') }}</p>
     </header>
 
-    <!-- Tier Card -->
-    <div v-if="tierData" class="tier-card" :class="tierData.tier">
-      <div class="tier-badge">{{ tierData.label }}</div>
-      <div class="tier-stats">
-        <div class="tier-stat">
-          <span class="ts-label">累计业绩</span>
-          <span class="ts-value">¥{{ tierData.totalSales || 0 }}</span>
-        </div>
-        <div class="tier-stat">
-          <span class="ts-label">佣金加成</span>
-          <span class="ts-value">+{{ tierData.rateBonus }}%</span>
-        </div>
-        <div class="tier-stat">
-          <span class="ts-label">二级分佣</span>
-          <span class="ts-value">{{ tierData.level2Enabled ? '已开启' : '未开启' }}</span>
-        </div>
-      </div>
-      <div class="tier-progress">
-        <div class="tp-bar">
-          <div class="tp-fill" :style="{ width: nextTierProgress + '%' }"></div>
-        </div>
-        <span class="tp-label">{{ nextTierLabel }}</span>
-      </div>
-    </div>
+    <LoadingSkeleton v-if="pageLoading" />
 
-    <!-- Tabs -->
-    <div class="section-tabs">
-      <button v-for="t in subTabs" :key="t.key" :class="['stab', { active: activeSub === t.key }]" @click="activeSub = t.key">{{ t.label }}</button>
-    </div>
+    <template v-else-if="pageError">
+      <div class="error-state">
+        <p>{{ pageError }}</p>
+        <button class="btn-outline" @click="loadAll">{{ $t('error.retry') }}</button>
+      </div>
+    </template>
 
-    <!-- Team Performance -->
-    <div v-if="activeSub === 'performance'" class="panel">
-      <div v-if="perfLoading" class="loading">加载中...</div>
-      <div v-else-if="!perfData?.members?.length" class="empty">暂无团队成员</div>
-      <div v-else>
-        <div class="perf-summary">
-          <span>团队 {{ perfData.totalMembers }} 人</span>
-          <span>总贡献 ¥{{ perfData.totalContribution || 0 }}</span>
-        </div>
-        <div class="perf-list">
-          <div v-for="m in perfData.members" :key="m.id" class="perf-row">
-            <span class="pf-name">{{ m.nickname || '匿名用户' }}</span>
-            <span class="pf-level">L{{ m.level }}</span>
-            <span class="pf-contrib">¥{{ m.contributed || 0 }}</span>
-            <span class="pf-date">{{ formatDate(m.bound_at) }}</span>
+    <template v-else>
+      <!-- Tier Card -->
+      <div v-if="tierData" class="tier-card" :class="tierData.tier">
+        <div class="tier-badge">{{ tierData.label }}</div>
+        <div class="tier-stats">
+          <div class="tier-stat">
+            <span class="ts-label">{{ $t('account_pages.distribution_advanced.total_sales') }}</span>
+            <span class="ts-value">¥{{ tierData.totalSales || 0 }}</span>
+          </div>
+          <div class="tier-stat">
+            <span class="ts-label">{{ $t('account_pages.distribution_advanced.rate_bonus') }}</span>
+            <span class="ts-value">+{{ tierData.rateBonus }}%</span>
+          </div>
+          <div class="tier-stat">
+            <span class="ts-label">{{ $t('account_pages.distribution_advanced.level2_status') }}</span>
+            <span class="ts-value">{{ tierData.level2Enabled ? $t('account_pages.distribution_advanced.level2_enabled') : $t('account_pages.distribution_advanced.level2_disabled') }}</span>
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- Promo Assets -->
-    <div v-if="activeSub === 'promo'" class="panel">
-      <div v-if="promoLoading" class="loading">加载中...</div>
-      <div v-else-if="!promoData" class="empty">暂无推广素材</div>
-      <div v-else>
-        <div class="invite-link-box">
-          <label>邀请链接</label>
-          <div class="link-row">
-            <code>{{ promoData.invite_url }}</code>
-            <button class="btn-sm" @click="copyText(promoData.invite_url)">复制</button>
-          </div>
-          <label>邀请码：<strong>{{ promoData.invite_code }}</strong></label>
-        </div>
-        <div v-if="promoData.assets?.length" class="assets-grid">
-          <div v-for="a in promoData.assets" :key="a.key" class="asset-card">
-            <div class="asset-icon">{{ a.type === 'image' ? '🖼️' : '📝' }}</div>
-            <div class="asset-label">{{ a.label }}</div>
-            <div v-if="a.content" class="asset-content">{{ a.content }}</div>
-            <button v-if="a.content" class="btn-sm" @click="copyText(a.content)">复制文案</button>
-          </div>
+        <div class="tier-progress">
+          <div class="tp-bar"><div class="tp-fill" :style="{ width: nextTierProgress + '%' }"></div></div>
+          <span class="tp-label">{{ nextTierLabel }}</span>
         </div>
       </div>
-    </div>
 
-    <!-- Campaigns -->
-    <div v-if="activeSub === 'campaigns'" class="panel">
-      <div v-if="campLoading" class="loading">加载中...</div>
-      <div v-else-if="!campData?.campaigns?.length" class="empty">暂无进行中的活动</div>
-      <div v-else>
-        <div class="campaigns-list">
-          <div v-for="c in campData.campaigns" :key="c.id" class="camp-card" :class="{ active: c.active }">
-            <div class="camp-header">
-              <span class="camp-title">{{ c.title }}</span>
-              <span :class="['camp-badge', c.active ? 'active' : 'ended']">{{ c.active ? '进行中' : '已结束' }}</span>
-            </div>
-            <p class="camp-desc">{{ c.description }}</p>
-            <div v-if="c.id === 'invite_3_reward'" class="camp-progress">
-              <span>本月已邀请：{{ campData.progress?.monthlyInvites || 0 }}/{{ campData.progress?.targetForVIP || 3 }}</span>
-              <div class="mini-bar"><div class="mini-fill" :style="{ width: Math.min(100, ((campData.progress?.monthlyInvites || 0) / (campData.progress?.targetForVIP || 3)) * 100) + '%' }"></div></div>
+      <!-- Tabs -->
+      <div class="section-tabs">
+        <button v-for="t in subTabs" :key="t.key" :class="['stab', { active: activeSub === t.key }]" @click="activeSub = t.key">{{ t.label }}</button>
+      </div>
+
+      <!-- Team Performance -->
+      <div v-if="activeSub === 'performance'" class="panel">
+        <div v-if="perfLoading" class="loading">{{ $t('account_pages.distribution_advanced.loading') }}</div>
+        <div v-else-if="perfError" class="error-state">
+          <p>{{ perfError }}</p>
+          <button class="btn-outline" @click="loadPerformance">{{ $t('error.retry') }}</button>
+        </div>
+        <div v-else-if="!perfData?.members?.length" class="empty">{{ $t('account_pages.distribution_advanced.no_members') }}</div>
+        <div v-else>
+          <div class="perf-summary">
+            <span>{{ $t('account_pages.distribution_advanced.team_summary', { count: perfData.totalMembers }) }}</span>
+            <span>{{ $t('account_pages.distribution_advanced.team_contrib', { amount: perfData.totalContribution || 0 }) }}</span>
+          </div>
+          <div class="perf-list">
+            <div v-for="m in perfData.members" :key="m.id" class="perf-row">
+              <span class="pf-name">{{ m.nickname || $t('account_pages.distribution_advanced.anonymous_user') }}</span>
+              <span class="pf-level">L{{ m.level }}</span>
+              <span class="pf-contrib">¥{{ m.contributed || 0 }}</span>
+              <span class="pf-date">{{ formatDate(m.bound_at) }}</span>
             </div>
           </div>
         </div>
       </div>
-    </div>
+
+      <!-- Promo Assets -->
+      <div v-if="activeSub === 'promo'" class="panel">
+        <div v-if="promoLoading" class="loading">{{ $t('account_pages.distribution_advanced.loading') }}</div>
+        <div v-else-if="promoError" class="error-state">
+          <p>{{ promoError }}</p>
+          <button class="btn-outline" @click="loadPromo">{{ $t('error.retry') }}</button>
+        </div>
+        <div v-else-if="!promoData" class="empty">{{ $t('account_pages.distribution_advanced.no_promo') }}</div>
+        <div v-else>
+          <div class="invite-link-box">
+            <label>{{ $t('account_pages.distribution_advanced.invite_link_label') }}</label>
+            <div class="link-row">
+              <code>{{ promoData.invite_url }}</code>
+              <button class="btn-sm" @click="copyText(promoData.invite_url)">{{ $t('account_pages.distribution_advanced.copy') }}</button>
+            </div>
+            <label>{{ $t('account_pages.distribution_advanced.invite_code_label') }}：<strong>{{ promoData.invite_code }}</strong></label>
+          </div>
+          <div v-if="promoData.assets?.length" class="assets-grid">
+            <div v-for="a in promoData.assets" :key="a.key" class="asset-card">
+              <div class="asset-icon">{{ a.type === 'image' ? '🖼' : '📝' }}</div>
+              <div class="asset-label">{{ a.label }}</div>
+              <div v-if="a.content" class="asset-content">{{ a.content }}</div>
+              <button v-if="a.content" class="btn-sm" @click="copyText(a.content)">{{ $t('account_pages.distribution_advanced.copy_text_btn') }}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Campaigns -->
+      <div v-if="activeSub === 'campaigns'" class="panel">
+        <div v-if="campLoading" class="loading">{{ $t('account_pages.distribution_advanced.loading') }}</div>
+        <div v-else-if="campError" class="error-state">
+          <p>{{ campError }}</p>
+          <button class="btn-outline" @click="loadCampaigns">{{ $t('error.retry') }}</button>
+        </div>
+        <div v-else-if="!campData?.campaigns?.length" class="empty">{{ $t('account_pages.distribution_advanced.no_campaigns') }}</div>
+        <div v-else>
+          <div class="campaigns-list">
+            <div v-for="c in campData.campaigns" :key="c.id" class="camp-card" :class="{ active: c.active }">
+              <div class="camp-header">
+                <span class="camp-title">{{ c.title }}</span>
+                <span :class="['camp-badge', c.active ? 'active' : 'ended']">{{ c.active ? $t('account_pages.distribution_advanced.campaign_active') : $t('account_pages.distribution_advanced.campaign_ended') }}</span>
+              </div>
+              <p class="camp-desc">{{ c.description }}</p>
+              <div v-if="c.id === 'invite_3_reward'" class="camp-progress">
+                <span>{{ $t('account_pages.distribution_advanced.monthly_invites') }}：{{ campData.progress?.monthlyInvites || 0 }}/{{ campData.progress?.targetForVIP || 3 }}</span>
+                <div class="mini-bar"><div class="mini-fill" :style="{ width: Math.min(100, ((campData.progress?.monthlyInvites || 0) / (campData.progress?.targetForVIP || 3)) * 100) + '%' }"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
-;
+
 import { formatDate, copyToClipboard } from '@/utils/format'
 
+const { t } = useI18n()
 const toast = useToast();
 
 const subTabs = [
-  { key: 'performance', label: '团队业绩' },
-  { key: 'promo', label: '推广素材' },
-  { key: 'campaigns', label: '裂变活动' },
+  { key: 'performance', label: t('account_pages.distribution_advanced.tab_performance') },
+  { key: 'promo', label: t('account_pages.distribution_advanced.tab_promo') },
+  { key: 'campaigns', label: t('account_pages.distribution_advanced.tab_campaigns') },
 ];
 
-interface TierInfo { tier: string; label: string; totalSales: number; rateBonus: number; level2Enabled: boolean; members: any[]; totalMembers: number; totalContribution: number; invite_url: string; invite_code: string; assets: any[]; campaigns: any[]; progress: { current: number; target: number } }
-interface PerfInfo { members: Array<{ id: number; nickname: string; level: number }>; totalMembers: number; totalContribution: number }
-interface PromoInfo { assets: any[] }
-interface CampInfo { campaigns: Array<{ id: number; name: string; progress: { current: number; target: number } }> }
-
 const activeSub = ref('performance');
-const tierData = ref<TierInfo | null>(null);
-const perfData = ref<PerfInfo | null>(null);
-const promoData = ref<PromoInfo | null>(null);
-const campData = ref<CampInfo | null>(null);
+const tierData = ref<any>(null);
+const perfData = ref<any>(null);
+const promoData = ref<any>(null);
+const campData = ref<any>(null);
+const pageLoading = ref(true);
+const pageError = ref('');
 const perfLoading = ref(false);
+const perfError = ref('');
 const promoLoading = ref(false);
+const promoError = ref('');
 const campLoading = ref(false);
+const campError = ref('');
 
 const tiers = [
-  { key: 'bronze', label: '铜牌推广', minSales: 0 },
-  { key: 'silver', label: '银牌推广', minSales: 5000 },
-  { key: 'gold', label: '金牌推广', minSales: 20000 },
-  { key: 'diamond', label: '钻石合伙人', minSales: 100000 },
+  { key: 'bronze', label: t('account_pages.distribution_advanced.__tiers.bronze'), minSales: 0 },
+  { key: 'silver', label: t('account_pages.distribution_advanced.__tiers.silver'), minSales: 5000 },
+  { key: 'gold', label: t('account_pages.distribution_advanced.__tiers.gold'), minSales: 20000 },
+  { key: 'diamond', label: t('account_pages.distribution_advanced.__tiers.diamond'), minSales: 100000 },
 ];
 
 const nextTierLabel = computed(() => {
-  const t = tierData.value;
-  if (!t) return '';
-  const idx = tiers.findIndex(ti => ti.key === t.tier);
+  const td = tierData.value;
+  if (!td) return '';
+  const idx = tiers.findIndex(ti => ti.key === td.tier);
   if (idx < tiers.length - 1) {
     const next = tiers[idx + 1];
-    const remaining = next.minSales - t.totalSales;
-    return `距${next.label}还需 ¥${remaining}`;
+    const remaining = next.minSales - td.totalSales;
+    return t('account_pages.distribution_advanced.next_tier_label', { name: next.label, amount: remaining });
   }
-  return '已达最高等级';
+  return t('account_pages.distribution_advanced.max_tier');
 });
 
 const nextTierProgress = computed(() => {
-  const t = tierData.value;
-  if (!t) return 0;
-  const idx = tiers.findIndex(ti => ti.key === t.tier);
+  const td = tierData.value;
+  if (!td) return 0;
+  const idx = tiers.findIndex(ti => ti.key === td.tier);
   if (idx >= tiers.length - 1) return 100;
   const prev = tiers[idx].minSales;
   const next = tiers[idx + 1].minSales;
   const range = next - prev;
-  const progress = t.totalSales - prev;
+  const progress = td.totalSales - prev;
   return Math.min(100, Math.max(0, (progress / range) * 100));
 });
 
@@ -163,31 +185,37 @@ async function loadTier() {
   try {
     const resp = await $fetch('/api/distribution/tier', { credentials: 'include' });
     tierData.value = resp.data || resp;
-  } catch { toast.error('加载分销等级失败') }
+  } catch { toast.error(t('account_pages.distribution_advanced.load_tier_error')) }
 }
 
 async function loadPerformance() {
-  perfLoading.value = true;
+  perfLoading.value = true; perfError.value = '';
   try {
     const resp = await $fetch('/api/distribution/performance', { credentials: 'include' });
     perfData.value = resp.data || resp;
-  } catch { toast.error('加载业绩数据失败') } finally { perfLoading.value = false; }
+  } catch { perfError.value = t('account_pages.distribution_advanced.load_perf_error') } finally { perfLoading.value = false; }
 }
 
 async function loadPromo() {
-  promoLoading.value = true;
+  promoLoading.value = true; promoError.value = '';
   try {
     const resp = await $fetch('/api/distribution/promo', { credentials: 'include' });
     promoData.value = resp.data || resp;
-  } catch { toast.error('加载推广数据失败') } finally { promoLoading.value = false; }
+  } catch { promoError.value = t('account_pages.distribution_advanced.load_promo_error') } finally { promoLoading.value = false; }
 }
 
 async function loadCampaigns() {
-  campLoading.value = true;
+  campLoading.value = true; campError.value = '';
   try {
     const resp = await $fetch('/api/distribution/campaigns', { credentials: 'include' });
     campData.value = resp.data || resp;
-  } catch { toast.error('加载活动数据失败') } finally { campLoading.value = false; }
+  } catch { campError.value = t('account_pages.distribution_advanced.load_campaign_error') } finally { campLoading.value = false; }
+}
+
+function loadAll() {
+  pageError.value = '';
+  pageLoading.value = true;
+  loadTier().then(() => loadPerformance()).finally(() => { pageLoading.value = false; });
 }
 
 watch(activeSub, (val) => {
@@ -198,10 +226,11 @@ watch(activeSub, (val) => {
 
 const copyText = async (text: string) => {
   const ok = await copyToClipboard(text);
-  if (ok) toast.success('已复制'); else toast.error('复制失败');
+  if (ok) toast.success(t('account_pages.distribution_advanced.copy_success'));
+  else toast.error(t('account_pages.distribution_advanced.copy_fail'));
 }
 
-onMounted(() => { loadTier(); loadPerformance(); });
+onMounted(() => { loadTier(); loadPerformance(); pageLoading.value = false; });
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
@@ -232,6 +261,10 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 
 .panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; }
 .loading, .empty { text-align: center; padding: 40px 0; color: var(--text-tertiary); }
+.error-state { text-align: center; padding: 40px 20px; }
+.error-state p { color: var(--danger); margin-bottom: 12px; }
+.btn-outline { padding: 6px 16px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 13px; }
+.btn-outline:hover { border-color: var(--brand); }
 
 .perf-summary { display: flex; gap: 24px; margin-bottom: 16px; font-size: 13px; color: var(--text-secondary); }
 .perf-list { display: flex; flex-direction: column; gap: 8px; }
