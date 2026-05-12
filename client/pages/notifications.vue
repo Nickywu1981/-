@@ -87,6 +87,8 @@ async function markAllRead() {
 }
 
 onMounted(() => { Promise.all([fetch(), fetchUnread()]); });
+
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

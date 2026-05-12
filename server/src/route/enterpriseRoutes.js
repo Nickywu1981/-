@@ -10,7 +10,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { validateV4 as _validate } from '../utils/validate.js';
-import { authMiddleware, enterpriseOnly } from '../middleware/auth.middleware.js';
+import { authMiddleware, enterpriseOnly } from '../middleware/auth.js';
 import { roleGuard } from '../middleware/rbac.js';
 import { authLimiter } from '../middleware/rateLimiter.js';
 import { setCsrfCookie, csrfProtection } from '../middleware/csrf.js';

@@ -68,8 +68,6 @@
 
 <script setup lang="ts">
 import { formatDateTime } from '@/utils/format'
-import { useConfirm } from '~/composables/useConfirm';
-const confirmDialog = useConfirm();
 
 const filter = reactive({ status: '', type: '' as string });
 const list = ref<any[]>([]);

@@ -67,7 +67,7 @@ import copywritingRoutes from './route/copywritingRoutes.js';
 // =====================================================
 // v4.1 中间件 + 路由 (2026-05-08 引入)
 // =====================================================
-import { authMiddleware, adminAuth } from './middleware/auth.middleware.js';
+import { authMiddleware, adminAuth } from './middleware/auth.js';
 import { auditLogMiddleware } from './middleware/audit-log.middleware.js';
 import authRoutes from './route/v4_auth.routes.js';
 import { configPublicRouter, configAdminRouter } from './route/v4_config.routes.js';

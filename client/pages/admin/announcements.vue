@@ -102,9 +102,8 @@
 </template>
 
 <script setup lang="ts">
-import { useConfirm } from '~/composables/useConfirm';
 const toast = useToast();
-const confirm = useConfirm();
+const { confirm } = useConfirm();
 const list = ref<any[]>([])
 const loading = ref(true)
 const error = ref('')
@@ -156,7 +155,7 @@ async function save() {
 }
 
 async function del(id: number) {
-  if (!(await confirm('确认删除此公告？', '此操作不可撤销'))) return
+  if (!(await confirm({ message: '确认删除此公告？', title: '此操作不可撤销' }))) return
   try {
     await $fetch(`/admin/campaign/announcements/${id}`, { method: 'DELETE' })
     fetch()

@@ -93,7 +93,6 @@
 </template>
 
 <script setup>
-import { useConfirm } from '~/composables/useConfirm';
 import { formatDateLocale } from '~/utils/format';
 const { t } = useI18n();
 const toast = useToast();
@@ -134,7 +133,7 @@ function editUser(u) {
 }
 
 async function handleRemove(u) {
-  if (!(await confirm($t('enterprise.removeUserConfirm', { name: u.nickname || u.phone })))) return;
+  if (!(await confirm({ message: $t('enterprise.removeUserConfirm', { name: u.nickname || u.phone }) }))) return;
   try {
     await $fetch(`/api/enterprise/users/${u.id}`, { method: 'DELETE', credentials: 'include' });
     loadUsers();

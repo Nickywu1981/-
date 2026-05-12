@@ -128,6 +128,8 @@ async function fetchFaqs() {
 }
 
 onMounted(() => fetchFaqs())
+
+definePageMeta({ layout: 'landing' })
 </script>
 
 <style scoped>

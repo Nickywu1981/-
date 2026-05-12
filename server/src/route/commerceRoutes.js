@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { validateV4 as validate } from '../utils/validate.js';
-import { authMiddleware, enterpriseOnly } from '../middleware/auth.middleware.js';
+import { validateV4 as _validate } from '../utils/validate.js';
+import { authMiddleware, enterpriseOnly } from '../middleware/auth.js';
 import { rateLimiter } from '../middleware/rateLimiter.js';
 import * as ctrl from '../controller/commerceController.js';
 
@@ -19,7 +19,7 @@ const orderQuerySchema = z.object({
 router.use(authMiddleware, rateLimiter, enterpriseOnly);
 
 // 企业端订单列表（仅查看旗下客户订单）
-router.get('/', validate(orderQuerySchema, 'query'), (req, res) => ctrl.listOrders(req, res));
+router.get('/', _validate(orderQuerySchema, 'query'), (req, res) => ctrl.listOrders(req, res));
 
 // 订单详情
 router.get('/:id', (req, res) => ctrl.getOrderDetail(req, res));

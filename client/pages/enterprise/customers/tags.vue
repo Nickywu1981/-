@@ -47,7 +47,6 @@
 
 <script setup>
 definePageMeta({ layout: 'enterprise' });
-import { useConfirm } from '~/composables/useConfirm';
 
 const { t } = useI18n()
 const { confirm } = useConfirm()
@@ -94,7 +93,7 @@ async function submitForm() {
 }
 
 async function handleDelete(t) {
-  if (!(await confirm(t('enterprise.customers.tags.confirmDelete', { name: t.name })))) return;
+  if (!(await confirm({ message: t('enterprise.customers.tags.confirmDelete', { name: t.name }) }))) return;
   try {
     await $api(`/tags/${t.id}`, { method: 'DELETE' });
     loadTags();

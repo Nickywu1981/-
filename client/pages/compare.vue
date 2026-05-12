@@ -81,6 +81,8 @@ const rows = [
   { icon: '💰', label: '价格成本', us: '月卡¥29起，按需灵活付费', them: 'Adobe ¥248/月 + 外包费用' },
   { icon: '📚', label: '学习成本', us: '自然语言输入，零学习门槛', them: '需专业软件学习，成本高' },
 ]
+
+definePageMeta({ layout: 'landing' })
 </script>
 
 <style scoped>

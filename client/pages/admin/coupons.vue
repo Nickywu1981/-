@@ -74,9 +74,8 @@
 </template>
 
 <script setup lang="ts">
-import { useConfirm } from '~/composables/useConfirm';
 const toast = useToast();
-const confirm = useConfirm();
+const { confirm } = useConfirm();
 const list = ref<any[]>([])
 const loading = ref(true)
 const error = ref('')
@@ -117,7 +116,7 @@ async function save() {
 }
 
 async function del(id: number) {
-  if (!(await confirm('确认删除此优惠券？', '此操作不可撤销'))) return
+  if (!(await confirm({ message: '确认删除此优惠券？', title: '此操作不可撤销' }))) return
   try {
     await $fetch(`/admin/campaign/coupons/${id}`, { method: 'DELETE' })
     fetch()

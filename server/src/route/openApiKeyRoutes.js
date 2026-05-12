@@ -3,7 +3,7 @@
  * G5 后端 | 阶段4
  */
 import { Router } from 'express';
-import { authMiddleware } from '../middleware/auth.middleware.js';
+import { authMiddleware } from '../middleware/auth.js';
 import { adminAuth } from '../middleware/auth.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { validate, idParamSchema } from '../utils/validate.js';

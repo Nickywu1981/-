@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { listPlatforms, getSpec, getSpecsByPlatform, createSpec, updateSpec, deleteSpec, adaptImage } from '../controller/platformSpecController.js';
-import { authMiddleware } from '../middleware/auth.middleware.js';
+import { authMiddleware } from '../middleware/auth.js';
 import { requireRole } from '../middleware/rbac.js';
 import { rateLimiter } from '../middleware/rateLimiter.js';
 import { validate, idParamSchema } from '../utils/validate.js';

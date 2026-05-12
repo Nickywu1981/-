@@ -5,7 +5,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { sdkController } from '../controller/sdkController.js';
 import { validate, numericParamSchema } from '../utils/validate.js';
-import { authMiddleware } from '../middleware/auth.middleware.js';
+import { authMiddleware } from '../middleware/auth.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 
 const router = Router();
