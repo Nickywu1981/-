@@ -1,49 +1,49 @@
 <template>
   <AdminLayout>
     <div class="page-header">
-      <h2 class="ptitle">短信模板管理</h2>
-      <button class="btn btn--primary" @click="openCreate"><span class="btn-icon">+</span> 新建模板</button>
+      <h2 class="ptitle">{{ $t('admin_sms_templates.page_title') }}</h2>
+      <button class="btn btn--primary" @click="openCreate"><span class="btn-icon">+</span> {{ $t('admin_sms_templates.new_template') }}</button>
     </div>
 
     <div class="toolbar">
       <div class="search-box">
         <span class="search-icon">🔍</span>
-        <input v-model="searchQuery" placeholder="搜索模板名称/编码..." class="search-input" @input="onSearch" />
+        <input v-model="searchQuery" :placeholder="$t('admin_sms_templates.search_placeholder')" class="search-input" @input="onSearch" />
       </div>
       <select v-model="filterProvider" class="filter-select" @change="fetchTemplates">
-        <option value="">全部服务商</option>
-        <option value="mock">Mock(开发)</option>
-        <option value="aliyun">阿里云</option>
-        <option value="tencent">腾讯云</option>
+        <option value="">{{ $t('admin_sms_templates.all_providers') }}</option>
+        <option value="mock">{{ $t('admin_sms_templates.provider_mock') }}</option>
+        <option value="aliyun">{{ $t('admin_sms_templates.provider_aliyun') }}</option>
+        <option value="tencent">{{ $t('admin_sms_templates.provider_tencent') }}</option>
       </select>
     </div>
 
     <div v-if="isLoading" class="loading-state"><LoadingSkeleton :rows="3" /></div>
-    <div v-else-if="!templates.length" class="empty-state">暂无短信模板，点击"新建模板"创建</div>
+    <div v-else-if="!templates.length" class="empty-state">{{ $t('admin_sms_templates.empty') }}</div>
     <div v-else class="tpl-grid">
       <div v-for="tpl in templates" :key="tpl.id" class="tpl-card" :class="{ disabled: !tpl.status }">
         <div class="tpl-header">
           <span class="tpl-code">{{ tpl.template_code }}</span>
           <div class="tpl-actions">
-            <button class="act-btn toggle-btn" :class="{ off: !tpl.status }" :aria-label="tpl.status ? '已启用，点击禁用' : '已禁用，点击启用'" @click="toggleStatus(tpl)" :title="tpl.status ? '禁用' : '启用'">{{ tpl.status ? '🟢' : '🔴' }}</button>
-            <button class="act-btn del-btn" aria-label="删除模板" @click="confirmDelete(tpl)" title="删除">🗑</button>
+            <button class="act-btn toggle-btn" :class="{ off: !tpl.status }" :aria-label="tpl.status ? $t('admin_sms_templates.toggle_enable_aria') : $t('admin_sms_templates.toggle_disable_aria')" @click="toggleStatus(tpl)" :title="tpl.status ? $t('admin_sms_templates.toggle_enable_title') : $t('admin_sms_templates.toggle_disable_title')">{{ tpl.status ? '🟢' : '🔴' }}</button>
+            <button class="act-btn del-btn" :aria-label="$t('admin_sms_templates.delete_aria')" @click="confirmDelete(tpl)" :title="$t('admin_sms_templates.delete_title')">🗑</button>
           </div>
         </div>
         <div class="tpl-body">
-          <div class="row"><span>模板名称:</span> <input v-model="tpl.name" maxlength="100" /></div>
-          <div class="row"><span>模板内容:</span> <textarea v-model="tpl.content" maxlength="5000" rows="3"></textarea></div>
-          <div class="row"><span>服务商ID:</span> <input v-model="tpl.provider_template_id" maxlength="100" placeholder="接入后填写" /></div>
-          <div class="row"><span>服务商:</span>
+          <div class="row"><span>{{ $t('admin_sms_templates.template_name') }}:</span> <input v-model="tpl.name" maxlength="100" /></div>
+          <div class="row"><span>{{ $t('admin_sms_templates.template_content') }}:</span> <textarea v-model="tpl.content" maxlength="5000" rows="3"></textarea></div>
+          <div class="row"><span>{{ $t('admin_sms_templates.provider_template_id') }}:</span> <input v-model="tpl.provider_template_id" maxlength="100" :placeholder="$t('admin_sms_templates.provider_id_placeholder')" /></div>
+          <div class="row"><span>{{ $t('admin_sms_templates.provider') }}:</span>
             <select v-model="tpl.provider">
-              <option value="mock">Mock(开发)</option>
-              <option value="aliyun">阿里云</option>
-              <option value="tencent">腾讯云</option>
+              <option value="mock">{{ $t('admin_sms_templates.provider_mock') }}</option>
+              <option value="aliyun">{{ $t('admin_sms_templates.provider_aliyun') }}</option>
+              <option value="tencent">{{ $t('admin_sms_templates.provider_tencent') }}</option>
             </select>
           </div>
-          <div class="row"><span>备注:</span> <input v-model="tpl.remark" maxlength="500" /></div>
+          <div class="row"><span>{{ $t('admin_sms_templates.remark') }}:</span> <input v-model="tpl.remark" maxlength="500" /></div>
         </div>
         <div class="tpl-footer">
-          <button class="btn-save" :disabled="saving === tpl.id" @click="saveTpl(tpl)">{{ saving === tpl.id ? '保存中...' : '保存' }}</button>
+          <button class="btn-save" :disabled="saving === tpl.id" @click="saveTpl(tpl)">{{ saving === tpl.id ? $t('common.saving') : $t('common.save') }}</button>
         </div>
       </div>
     </div>
@@ -53,22 +53,22 @@
     <!-- Create Modal -->
     <div v-if="showCreate" class="modal-overlay" @click.self="showCreate = false">
       <div class="modal">
-        <div class="modal-header"><h3>新建短信模板</h3><button class="modal-close" aria-label="关闭" @click="showCreate = false">✕</button></div>
+        <div class="modal-header"><h3>{{ $t('admin_sms_templates.new_template') }}</h3><button class="modal-close" :aria-label="$t('admin_sms_templates.close_aria')" @click="showCreate = false">✕</button></div>
         <div class="modal-body">
-          <div class="row"><span>模板编码:</span> <input v-model="newTpl.template_code" maxlength="50" placeholder="如 SMS_LOGIN" /></div>
-          <div class="row"><span>模板名称:</span> <input v-model="newTpl.name" maxlength="100" placeholder="如 登录验证码" /></div>
-          <div class="row"><span>模板内容:</span> <textarea v-model="newTpl.content" maxlength="5000" rows="3" placeholder="如 您的验证码是${code}，有效期5分钟"></textarea></div>
-          <div class="row"><span>服务商ID:</span> <input v-model="newTpl.provider_template_id" maxlength="100" placeholder="接入后填写" /></div>
-          <div class="row"><span>服务商:</span>
+          <div class="row"><span>{{ $t('admin_sms_templates.template_code') }}:</span> <input v-model="newTpl.template_code" maxlength="50" :placeholder="$t('admin_sms_templates.template_code_placeholder')" /></div>
+          <div class="row"><span>{{ $t('admin_sms_templates.template_name') }}:</span> <input v-model="newTpl.name" maxlength="100" :placeholder="$t('admin_sms_templates.template_name_placeholder')" /></div>
+          <div class="row"><span>{{ $t('admin_sms_templates.template_content') }}:</span> <textarea v-model="newTpl.content" maxlength="5000" rows="3" :placeholder="$t('admin_sms_templates.template_content_placeholder')"></textarea></div>
+          <div class="row"><span>{{ $t('admin_sms_templates.provider_template_id') }}:</span> <input v-model="newTpl.provider_template_id" maxlength="100" :placeholder="$t('admin_sms_templates.provider_id_placeholder')" /></div>
+          <div class="row"><span>{{ $t('admin_sms_templates.provider') }}:</span>
             <select v-model="newTpl.provider">
-              <option value="mock">Mock(开发)</option><option value="aliyun">阿里云</option><option value="tencent">腾讯云</option>
+              <option value="mock">{{ $t('admin_sms_templates.provider_mock') }}</option><option value="aliyun">{{ $t('admin_sms_templates.provider_aliyun') }}</option><option value="tencent">{{ $t('admin_sms_templates.provider_tencent') }}</option>
             </select>
           </div>
-          <div class="row"><span>备注:</span> <input v-model="newTpl.remark" maxlength="500" /></div>
+          <div class="row"><span>{{ $t('admin_sms_templates.remark') }}:</span> <input v-model="newTpl.remark" maxlength="500" /></div>
         </div>
         <div class="modal-footer">
-          <button class="btn-cancel" @click="showCreate = false">取消</button>
-          <button class="btn-confirm" :disabled="creating" @click="createTpl">{{ creating ? '创建中...' : '确认创建' }}</button>
+          <button class="btn-cancel" @click="showCreate = false">{{ $t('common.cancel') }}</button>
+          <button class="btn-confirm" :disabled="creating" @click="createTpl">{{ creating ? $t('admin_sms_templates.creating') : $t('admin_sms_templates.create_confirm') }}</button>
         </div>
       </div>
     </div>
@@ -76,11 +76,11 @@
     <!-- Delete Confirm -->
     <div v-if="showDelete" class="modal-overlay" @click.self="showDelete = false">
       <div class="modal modal-sm">
-        <div class="modal-header"><h3>确认删除</h3></div>
-        <div class="modal-body"><p>确定要删除模板「{{ deleteTarget?.name }}」吗？</p></div>
+        <div class="modal-header"><h3>{{ $t('admin_sms_templates.delete_confirm_title') }}</h3></div>
+        <div class="modal-body"><p>{{ $t('admin_sms_templates.delete_confirm_desc', { name: deleteTarget?.name }) }}</p></div>
         <div class="modal-footer">
-          <button class="btn-cancel" @click="showDelete = false">取消</button>
-          <button class="btn-confirm btn-danger" :disabled="deleting" @click="doDelete">{{ deleting ? '删除中...' : '确认删除' }}</button>
+          <button class="btn-cancel" @click="showDelete = false">{{ $t('common.cancel') }}</button>
+          <button class="btn-confirm btn-danger" :disabled="deleting" @click="doDelete">{{ deleting ? $t('admin_sms_templates.deleting') : $t('admin_sms_templates.delete_btn') }}</button>
         </div>
       </div>
     </div>
@@ -92,6 +92,8 @@
 <script setup lang="ts">
 
 import AdminLayout from '~/components/AdminLayout.vue';
+
+const { t } = useI18n();
 
 const templates = ref<any[]>([]);
 const saving = ref(0);
@@ -123,7 +125,7 @@ async function fetchTemplates() {
     const res: any = await $fetch(`/api/sms/templates?${params}`);
     templates.value = res.data?.list || res.data || [];
     total.value = res.data?.total || templates.value.length;
-  } catch(e: any) { toast.error(e?.data?.msg || '加载失败') }
+  } catch(e: any) { toast.error(e?.data?.msg || t('admin_sms_templates.load_failed')) }
   isLoading.value = false;
 }
 
@@ -134,8 +136,8 @@ async function saveTpl(tpl: any) {
       method: 'PUT',
       body: { name: tpl.name, content: tpl.content, provider_template_id: tpl.provider_template_id, provider: tpl.provider, status: tpl.status, remark: tpl.remark },
     });
-    showMsg('已保存');
-  } catch (e: any) { msg.value = e?.data?.msg || '保存失败'; }
+    showMsg(t('admin_sms_templates.saved'));
+  } catch (e: any) { msg.value = e?.data?.msg || t('admin_sms_templates.save_failed'); }
   saving.value = 0;
 }
 
@@ -147,9 +149,9 @@ async function createTpl() {
   creating.value = true;
   try {
     await $fetch('/api/sms/templates', { method: 'POST', body: newTpl.value });
-    showCreate.value = false; showMsg('模板已创建');
+    showCreate.value = false; showMsg(t('admin_sms_templates.template_created'));
     fetchTemplates();
-  } catch (e: any) { msg.value = e?.data?.msg || '创建失败'; }
+  } catch (e: any) { msg.value = e?.data?.msg || t('admin_sms_templates.create_failed'); }
   creating.value = false;
 }
 
@@ -159,9 +161,9 @@ async function doDelete() {
   if (!deleteTarget.value) return; deleting.value = true;
   try {
     await $fetch(`/api/sms/templates/${deleteTarget.value.id}`, { method: 'DELETE' });
-    showDelete.value = false; showMsg('模板已删除');
+    showDelete.value = false; showMsg(t('admin_sms_templates.template_deleted'));
     fetchTemplates();
-  } catch (e: any) { msg.value = e?.data?.msg || '删除失败'; }
+  } catch (e: any) { msg.value = e?.data?.msg || t('admin_sms_templates.delete_failed'); }
   deleting.value = false;
 }
 

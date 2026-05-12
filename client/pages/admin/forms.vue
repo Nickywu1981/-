@@ -1,18 +1,18 @@
 <template>
   <AdminLayout>
     <div class="page-header">
-      <h1>表单管理</h1>
-      <button class="btn-primary" @click="openCreate">+ 新建表单</button>
+      <h1>{{ $t('admin_forms.page_title') }}</h1>
+      <button class="btn-primary" @click="openCreate">{{ $t('admin_forms.new_form') }}</button>
     </div>
 
     <div class="toolbar">
-      <input v-model="keyword" type="text" placeholder="搜索标题 / 编码" @keyup.enter="search" />
+      <input v-model="keyword" type="text" :placeholder="$t('admin_forms.search_placeholder')" @keyup.enter="search" />
       <select v-model="filterStatus" class="sel" @change="search">
-        <option value="">全部状态</option>
-        <option value="1">启用</option>
-        <option value="0">停用</option>
+        <option value="">{{ $t('admin_forms.all_statuses') }}</option>
+        <option value="1">{{ $t('common.enable') }}</option>
+        <option value="0">{{ $t('common.banned') }}</option>
       </select>
-      <button class="btn" @click="search">搜索</button>
+      <button class="btn" @click="search">{{ $t('common.search') }}</button>
     </div>
 
     <LoadingSkeleton v-if="loading" type="table" :rows="5" :cols="7" />
@@ -20,23 +20,23 @@
     <div v-else-if="error" class="error-state">
       <span class="error-icon">⚠️</span>
       <p>{{ error }}</p>
-      <button class="retry-btn" @click="fetchData">重试</button>
+      <button class="retry-btn" @click="fetchData">{{ $t('common.retry') }}</button>
     </div>
 
     <template v-else-if="list.length">
       <div class="table-wrap">
         <table>
-          <thead><tr><th>ID</th><th>标题</th><th>编码</th><th>提交数/上限</th><th>有效期</th><th>状态</th><th>操作</th></tr></thead>
+          <thead><tr><th>{{ $t('common.id') }}</th><th>{{ $t('admin_forms.col_title') }}</th><th>{{ $t('admin_forms.col_code') }}</th><th>{{ $t('admin_forms.col_submissions') }}</th><th>{{ $t('admin_forms.col_validity') }}</th><th>{{ $t('common.status') }}</th><th>{{ $t('common.action') }}</th></tr></thead>
           <tbody>
             <tr v-for="f in list" :key="f.id">
               <td>{{ f.id }}</td><td>{{ f.title }}</td><td>{{ f.form_code }}</td>
               <td>{{ f.submit_count }}/{{ f.submit_limit || '∞' }}</td>
-              <td>{{ f.start_time || '不限' }} ~ {{ f.end_time || '不限' }}</td>
-              <td><span :class="f.status===1?'badge-ok':'badge-off'">{{ f.status===1?'启用':'停用' }}</span></td>
+              <td>{{ f.start_time || $t('admin_forms.unlimited') }} ~ {{ f.end_time || $t('admin_forms.unlimited') }}</td>
+              <td><span :class="f.status===1?'badge-ok':'badge-off'">{{ f.status === 1 ? $t('common.enable') : $t('common.banned') }}</span></td>
               <td class="actions">
-                <button class="btn-sm" @click="showSubs(f)">提交记录</button>
-                <button class="btn-sm" @click="editForm(f)">编辑</button>
-                <button class="btn-sm danger" @click="delForm(f.id)">删除</button>
+                <button class="btn-sm" @click="showSubs(f)">{{ $t('admin_forms.submit_records') }}</button>
+                <button class="btn-sm" @click="editForm(f)">{{ $t('common.edit') }}</button>
+                <button class="btn-sm danger" @click="delForm(f.id)">{{ $t('common.delete') }}</button>
               </td>
             </tr>
           </tbody>
@@ -44,51 +44,51 @@
       </div>
       <Pagination :page="page" :page-size="pageSize" :total="total" @change="onPageChange" />
     </template>
-    <div v-else class="empty">暂无表单数据</div>
+    <div v-else class="empty">{{ $t('admin_forms.no_data') }}</div>
 
     <div v-if="subsOpen" class="subs-panel">
       <div class="subs-header">
-        <h2>提交记录 - {{ activeFormTitle }}</h2>
-        <button class="btn-cancel" @click="subsOpen = false">关闭</button>
+        <h2>{{ $t('admin_forms.submissions_title', { title: activeFormTitle }) }}</h2>
+        <button class="btn-cancel" @click="subsOpen = false">{{ $t('common.close') }}</button>
       </div>
       <LoadingSkeleton v-if="subsLoading" type="table" :rows="3" :cols="5" />
       <template v-else-if="submissions.length">
         <table>
-          <thead><tr><th>ID</th><th>数据</th><th>IP</th><th>状态</th><th>时间</th></tr></thead>
+          <thead><tr><th>{{ $t('common.id') }}</th><th>{{ $t('admin_forms.col_data') }}</th><th>{{ $t('admin_forms.col_user') }}</th><th>{{ $t('common.status') }}</th><th>{{ $t('admin_forms.col_submit_time') }}</th></tr></thead>
           <tbody>
             <tr v-for="s in submissions" :key="s.id">
               <td>{{ s.id }}</td>
               <td class="data-cell">{{ s.data_json }}</td>
               <td>{{ s.ip }}</td>
-              <td><span :class="['badge-pending','badge-ok','badge-done'][s.status]">{{ ['待处理','已查看','已处理'][s.status] || s.status }}</span></td>
+              <td><span :class="['badge-pending','badge-ok','badge-done'][s.status]">{{ subStatusText(s.status) }}</span></td>
               <td>{{ s.create_time }}</td>
             </tr>
           </tbody>
         </table>
       </template>
-      <div v-else class="empty-sm">暂无提交记录</div>
+      <div v-else class="empty-sm">{{ $t('admin_forms.no_data') }}</div>
     </div>
 
     <Teleport to="body">
       <div v-if="modalOpen" class="modal-overlay" @click.self="modalOpen = false">
         <div class="modal">
-          <h3>{{ isEdit ? '编辑表单' : '新建表单' }}</h3>
+          <h3>{{ isEdit ? $t('admin_forms.edit_modal') : $t('admin_forms.create_modal') }}</h3>
           <div class="form-grid">
-            <label class="full">标题 <input v-model="form.title" maxlength="100" placeholder="表单标题" /></label>
-            <label>编码 <input v-model="form.form_code" maxlength="50" placeholder="唯一编码" /></label>
-            <label>提交上限 <input v-model.number="form.submit_limit" type="number" min="0" placeholder="0=不限" /></label>
-            <label>开始时间 <input v-model="form.start_time" type="datetime-local" /></label>
-            <label>结束时间 <input v-model="form.end_time" type="datetime-local" /></label>
-            <label>状态
+            <label class="full">{{ $t('admin_forms.label_title') }} <input v-model="form.title" maxlength="100" :placeholder="$t('admin_forms.label_title')" /></label>
+            <label>{{ $t('admin_forms.label_code') }} <input v-model="form.form_code" maxlength="50" :placeholder="$t('admin_forms.label_code')" /></label>
+            <label>{{ $t('admin_forms.label_limit') }} <input v-model.number="form.submit_limit" type="number" min="0" :placeholder="$t('admin_forms.no_limit')" /></label>
+            <label>{{ $t('admin_forms.label_start') }} <input v-model="form.start_time" type="datetime-local" /></label>
+            <label>{{ $t('admin_forms.label_end') }} <input v-model="form.end_time" type="datetime-local" /></label>
+            <label>{{ $t('common.status') }}
               <select v-model="form.status">
-                <option :value="1">启用</option>
-                <option :value="0">停用</option>
+                <option :value="1">{{ $t('common.enable') }}</option>
+                <option :value="0">{{ $t('common.banned') }}</option>
               </select>
             </label>
           </div>
           <div class="modal-actions">
-            <button class="btn-cancel" @click="modalOpen = false">取消</button>
-            <button class="btn-save" :disabled="saving" @click="save">{{ saving ? '保存中...' : '保存' }}</button>
+            <button class="btn-cancel" @click="modalOpen = false">{{ $t('common.cancel') }}</button>
+            <button class="btn-save" :disabled="saving" @click="save">{{ saving ? $t('common.saving') : $t('common.save') }}</button>
           </div>
         </div>
       </div>
@@ -98,6 +98,7 @@
 
 <script setup lang="ts">
 
+const { t } = useI18n()
 const { confirm } = useConfirm()
 
 const list = ref<any[]>([])
@@ -118,6 +119,16 @@ const subsOpen = ref(false)
 const subsLoading = ref(false)
 const activeFormTitle = ref('')
 
+const SUB_STATUS_TEXTS = [
+  t('admin_forms.status_pending'),
+  t('admin_forms.status_viewed'),
+  t('admin_forms.status_processed'),
+]
+
+function subStatusText(s: number) {
+  return SUB_STATUS_TEXTS[s] || t('admin_forms.unknown')
+}
+
 const toast = useToast()
 
 onMounted(fetchData)
@@ -137,7 +148,7 @@ async function fetchData() {
       total.value = list.value.length
     }
   } catch (e: any) {
-    error.value = e?.data?.msg || e.message || '加载失败'
+    error.value = e?.data?.msg || e.message || t('admin_forms.load_failed')
     toast.error(error.value)
   } finally {
     loading.value = false
@@ -166,14 +177,14 @@ async function save() {
     const method = isEdit.value ? 'PUT' : 'POST'
     const res: any = await $fetch(url, { method, body: form.value })
     if (res?.code === 200 || res?.code === 0) {
-      toast.success(isEdit.value ? '表单已更新' : '表单已创建')
+      toast.success(isEdit.value ? t('admin_forms.form_updated') : t('admin_forms.form_created'))
       modalOpen.value = false
       fetchData()
     } else {
-      toast.error(res?.msg || '保存失败')
+      toast.error(res?.msg || t('admin_forms.save_failed'))
     }
   } catch (e: any) {
-    toast.error(e?.data?.msg || e.message || '保存失败')
+    toast.error(e?.data?.msg || e.message || t('admin_forms.save_failed'))
   } finally {
     saving.value = false
   }
@@ -187,24 +198,24 @@ async function showSubs(f: any) {
     const res: any = await $fetch(`/api/forms/admin/${f.id}/submissions`)
     submissions.value = res.data?.list || []
   } catch (e: any) {
-    toast.error('加载提交记录失败')
+    toast.error(t('admin_forms.load_sub_failed'))
   } finally {
     subsLoading.value = false
   }
 }
 
 async function delForm(id: number) {
-  if (!await confirm({ message: '确认删除该表单？此操作不可恢复。'} )) return
+  if (!await confirm({ message: t('admin_forms.delete_confirm') })) return
   try {
     const res: any = await $fetch(`/api/forms/admin/${id}`, { method: 'DELETE' })
     if (res?.code === 200 || res?.code === 0) {
-      toast.success('表单已删除')
+      toast.success(t('admin_forms.form_deleted'))
       fetchData()
     } else {
-      toast.error(res?.msg || '删除失败')
+      toast.error(res?.msg || t('common.delete_failed'))
     }
   } catch (e: any) {
-    toast.error(e?.data?.msg || e.message || '删除失败')
+    toast.error(e?.data?.msg || e.message || t('common.delete_failed'))
   }
 }
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
