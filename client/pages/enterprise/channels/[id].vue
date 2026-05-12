@@ -33,7 +33,7 @@ async function loadChannel() {
 }
 onMounted(loadChannel);
 function statusLabel(s) { return { pending: t('enterprise.common.statusPending'), active: t('enterprise.common.statusActive'), rejected: t('enterprise.common.statusRejected'), suspended: t('enterprise.common.statusSuspended') }[s] || s; }
-function statusStyle(s) { return { pending: { color: '#f59e0b' }, active: { color: '#10b981' }, rejected: { color: '#ef4444' }, suspended: { color: '#f59e0b' } }[s] || {}; }
+function statusStyle(s) { return { pending: { color: 'var(--color-warning, #f59e0b)' }, active: { color: 'var(--color-success, #10b981)' }, rejected: { color: 'var(--danger)' }, suspended: { color: 'var(--color-warning, #f59e0b)' } }[s] || {}; }
 </script>
 
 <style scoped>
