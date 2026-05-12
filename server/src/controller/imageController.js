@@ -10,7 +10,7 @@ import { parsePagination } from '../utils/pagination.js';
  * POST /api/images/main-image
  * 提交主图生成任务
  */
-export const submitMainImage = wrapController(async (req, res, next) => {
+export const submitMainImage = wrapController(async (req, res) => {
     const { imageUrl, platform, style } = req.body;
     if (!imageUrl || !platform) {
       throw new BusinessError(ERROR_CODE.PARAM_MISSING, '请上传商品图并选择平台');
@@ -23,7 +23,7 @@ export const submitMainImage = wrapController(async (req, res, next) => {
  * POST /api/images/scene
  * 提交场景图生成任务
  */
-export const submitSceneImage = wrapController(async (req, res, next) => {
+export const submitSceneImage = wrapController(async (req, res) => {
     const { imageUrl, sceneCategory, customBgUrl } = req.body;
     if (!imageUrl) {
       throw new BusinessError(ERROR_CODE.PARAM_MISSING, '请上传产品图');
@@ -36,7 +36,7 @@ export const submitSceneImage = wrapController(async (req, res, next) => {
  * POST /api/images/detail-h5
  * 提交详情页生成任务
  */
-export const submitDetailH5 = wrapController(async (req, res, next) => {
+export const submitDetailH5 = wrapController(async (req, res) => {
     const { imageUrl, category, templateId } = req.body;
     if (!imageUrl || !category) {
       throw new BusinessError(ERROR_CODE.PARAM_MISSING, '请上传产品图并选择商品类目');
@@ -49,7 +49,7 @@ export const submitDetailH5 = wrapController(async (req, res, next) => {
  * POST /api/images/batch
  * 提交批量处理任务
  */
-export const submitBatchTask = wrapController(async (req, res, next) => {
+export const submitBatchTask = wrapController(async (req, res) => {
     const { imageUrls, operation, platform, style } = req.body;
     if (!imageUrls || !imageUrls.length) {
       throw new BusinessError(ERROR_CODE.PARAM_MISSING, '请上传至少一张图片');
@@ -62,7 +62,7 @@ export const submitBatchTask = wrapController(async (req, res, next) => {
  * POST /api/images/retouch
  * 提交图片精修任务
  */
-export const submitRetouch = wrapController(async (req, res, next) => {
+export const submitRetouch = wrapController(async (req, res) => {
     const { imageUrl, level, features } = req.body;
     if (!imageUrl) {
       throw new BusinessError(ERROR_CODE.PARAM_MISSING, '请上传需要精修的图片');
@@ -75,7 +75,7 @@ export const submitRetouch = wrapController(async (req, res, next) => {
  * POST /api/images/remove-bg
  * 智能抠图任务
  */
-export const submitRemoveBg = wrapController(async (req, res, next) => {
+export const submitRemoveBg = wrapController(async (req, res) => {
     const { imageUrl, format } = req.body;
     if (!imageUrl) {
       throw new BusinessError(ERROR_CODE.PARAM_MISSING, '请上传需要抠图的图片');
@@ -88,7 +88,7 @@ export const submitRemoveBg = wrapController(async (req, res, next) => {
  * POST /api/images/white-bg
  * 白底图生成任务
  */
-export const submitWhiteBg = wrapController(async (req, res, next) => {
+export const submitWhiteBg = wrapController(async (req, res) => {
     const { imageUrl, bgColor } = req.body;
     if (!imageUrl) {
       throw new BusinessError(ERROR_CODE.PARAM_MISSING, '请上传需要换白底的图片');
@@ -101,7 +101,7 @@ export const submitWhiteBg = wrapController(async (req, res, next) => {
  * GET /api/images/tasks/:taskId
  * 查询任务状态
  */
-export const getTaskResult = wrapController(async (req, res, next) => {
+export const getTaskResult = wrapController(async (req, res) => {
     const data = await imageService.getTaskResult(req.params.taskId, req.user.id);
     return success(res, data);
   });
@@ -110,7 +110,7 @@ export const getTaskResult = wrapController(async (req, res, next) => {
  * GET /api/images/tasks
  * 我的任务列表
  */
-export const listMyTasks = wrapController(async (req, res, next) => {
+export const listMyTasks = wrapController(async (req, res) => {
     const { status, type } = req.query;
     const { page, pageSize } = parsePagination(req.query, { maxPageSize: 100 });
     const data = await imageService.listMyTasks(req.user.id, { status, type, page, pageSize });
@@ -121,7 +121,7 @@ export const listMyTasks = wrapController(async (req, res, next) => {
  * POST /api/images/tasks/:taskId/cancel
  * 取消任务
  */
-export const cancelTask = wrapController(async (req, res, next) => {
+export const cancelTask = wrapController(async (req, res) => {
     const data = await cancelJob(req.params.taskId, req.user.id);
     return success(res, data, '任务已取消');
   });
@@ -130,7 +130,7 @@ export const cancelTask = wrapController(async (req, res, next) => {
  * POST /api/images/tasks/:taskId/retry
  * 重试失败任务
  */
-export const retryTask = wrapController(async (req, res, next) => {
+export const retryTask = wrapController(async (req, res) => {
     const data = await retryJob(req.params.taskId, req.user.id);
     return success(res, data, '任务已重新排队');
   });

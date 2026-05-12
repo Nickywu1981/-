@@ -6,7 +6,7 @@ import { success } from '../utils/response.js';
  * GET /api/templates/platforms
  * 获取所有平台及分组尺寸
  */
-export const getAllPlatforms = wrapController(async (req, res, next) => {
+export const getAllPlatforms = wrapController(async (req, res) => {
     const data = await sizeTemplateService.getAllPlatformSizes();
     return success(res, data);
   });
@@ -15,7 +15,7 @@ export const getAllPlatforms = wrapController(async (req, res, next) => {
  * GET /api/templates/platforms/list
  * 获取平台代码列表
  */
-export const getPlatformList = wrapController(async (req, res, next) => {
+export const getPlatformList = wrapController(async (req, res) => {
     const data = await sizeTemplateService.getPlatformList();
     return success(res, data);
   });
@@ -24,7 +24,7 @@ export const getPlatformList = wrapController(async (req, res, next) => {
  * GET /api/templates/platforms/:platform
  * 按平台获取尺寸
  */
-export const getSizesByPlatform = wrapController(async (req, res, next) => {
+export const getSizesByPlatform = wrapController(async (req, res) => {
     const data = await sizeTemplateService.getSizesByPlatform(req.params.platform);
     return success(res, data);
   });
@@ -35,7 +35,7 @@ export const getSizesByPlatform = wrapController(async (req, res, next) => {
  * POST /api/templates/my
  * 创建用户自定义模板
  */
-export const createUserTemplate = wrapController(async (req, res, next) => {
+export const createUserTemplate = wrapController(async (req, res) => {
     const { name, width, height, platform } = req.body;
     const data = await sizeTemplateService.createUserTemplate(req.user.id, { name, width, height, platform });
     return success(res, data, '模板创建成功');
@@ -45,7 +45,7 @@ export const createUserTemplate = wrapController(async (req, res, next) => {
  * GET /api/templates/my
  * 获取用户自定义模板列表
  */
-export const listUserTemplates = wrapController(async (req, res, next) => {
+export const listUserTemplates = wrapController(async (req, res) => {
     const page = parseInt(req.query.page, 10) || 1;
     const pageSize = Math.min(parseInt(req.query.pageSize, 10) || 20, 100);
     const data = await sizeTemplateService.listUserTemplates(req.user.id, { page, pageSize });
@@ -56,7 +56,7 @@ export const listUserTemplates = wrapController(async (req, res, next) => {
  * PUT /api/templates/my/:id
  * 更新用户自定义模板
  */
-export const updateUserTemplate = wrapController(async (req, res, next) => {
+export const updateUserTemplate = wrapController(async (req, res) => {
     const { name, width, height, platform } = req.body;
     const data = await sizeTemplateService.updateUserTemplate(req.user.id, req.params.id, { name, width, height, platform });
     return success(res, data, '模板更新成功');
@@ -66,7 +66,7 @@ export const updateUserTemplate = wrapController(async (req, res, next) => {
  * DELETE /api/templates/my/:id
  * 删除用户自定义模板
  */
-export const deleteUserTemplate = wrapController(async (req, res, next) => {
+export const deleteUserTemplate = wrapController(async (req, res) => {
     const data = await sizeTemplateService.deleteUserTemplate(req.user.id, req.params.id);
     return success(res, data, '模板已删除');
   });

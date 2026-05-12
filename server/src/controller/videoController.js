@@ -6,7 +6,7 @@ import { success, listResult } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { parsePagination } from '../utils/pagination.js';
 
-export const submitImg2Video = wrapController(async (req, res, next) => {
+export const submitImg2Video = wrapController(async (req, res) => {
     const { imageUrl, style, duration, platform } = req.body;
     if (!imageUrl) {
       throw new BusinessError(ERROR_CODE.PARAM_MISSING, '请上传产品图');
@@ -15,7 +15,7 @@ export const submitImg2Video = wrapController(async (req, res, next) => {
     return success(res, data, '视频任务已提交');
   });
 
-export const submitMulti2Video = wrapController(async (req, res, next) => {
+export const submitMulti2Video = wrapController(async (req, res) => {
     const { imageUrls, style, duration, sellPoints } = req.body;
     if (!imageUrls || imageUrls.length < 2) {
       throw new BusinessError(ERROR_CODE.PARAM_MISSING, '至少需要2张图片');
@@ -24,7 +24,7 @@ export const submitMulti2Video = wrapController(async (req, res, next) => {
     return success(res, data, '多图合成任务已提交');
   });
 
-export const submitVideoPackaging = wrapController(async (req, res, next) => {
+export const submitVideoPackaging = wrapController(async (req, res) => {
     const { videoUrl, options } = req.body;
     if (!videoUrl) {
       throw new BusinessError(ERROR_CODE.PARAM_MISSING, '请提供视频地址');
@@ -33,7 +33,7 @@ export const submitVideoPackaging = wrapController(async (req, res, next) => {
     return success(res, data, '包装任务已提交');
   });
 
-export const submitActionTransfer = wrapController(async (req, res, next) => {
+export const submitActionTransfer = wrapController(async (req, res) => {
     const { sourceImageUrl, actionVideoUrl, targetAction } = req.body;
     if (!sourceImageUrl || !actionVideoUrl) {
       throw new BusinessError(ERROR_CODE.PARAM_MISSING, '请上传源图片和动作视频');
@@ -42,7 +42,7 @@ export const submitActionTransfer = wrapController(async (req, res, next) => {
     return success(res, data, '动作迁移任务已提交');
   });
 
-export const submitPersonReplace = wrapController(async (req, res, next) => {
+export const submitPersonReplace = wrapController(async (req, res) => {
     const { sourceImageUrl, targetPersonUrl } = req.body;
     if (!sourceImageUrl || !targetPersonUrl) {
       throw new BusinessError(ERROR_CODE.PARAM_MISSING, '请上传商品图和目标人物图');
@@ -51,7 +51,7 @@ export const submitPersonReplace = wrapController(async (req, res, next) => {
     return success(res, data, '人物替换任务已提交');
   });
 
-export const submitDigitalHuman = wrapController(async (req, res, next) => {
+export const submitDigitalHuman = wrapController(async (req, res) => {
     const { script, voice, avatar, background } = req.body;
     if (!script) {
       throw new BusinessError(ERROR_CODE.PARAM_MISSING, '请输入口播文案');
@@ -60,24 +60,24 @@ export const submitDigitalHuman = wrapController(async (req, res, next) => {
     return success(res, data, '口播生成任务已提交');
   });
 
-export const getVideoTaskResult = wrapController(async (req, res, next) => {
+export const getVideoTaskResult = wrapController(async (req, res) => {
     const data = await videoService.getTaskResult(req.params.taskId, req.user.id);
     return success(res, data);
   });
 
-export const listMyVideoTasks = wrapController(async (req, res, next) => {
+export const listMyVideoTasks = wrapController(async (req, res) => {
     const { status, type } = req.query;
     const { page, pageSize } = parsePagination(req.query, { maxPageSize: 100 });
     const data = await videoService.listMyTasks(req.user.id, { status, type, page, pageSize });
     return listResult(res, data);
   });
 
-export const cancelVideoTask = wrapController(async (req, res, next) => {
+export const cancelVideoTask = wrapController(async (req, res) => {
     const data = await cancelJob(req.params.taskId, req.user.id);
     return success(res, data, '任务已取消');
   });
 
-export const retryVideoTask = wrapController(async (req, res, next) => {
+export const retryVideoTask = wrapController(async (req, res) => {
     const data = await retryJob(req.params.taskId, req.user.id);
     return success(res, data, '任务已重新排队');
   });

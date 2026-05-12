@@ -7,7 +7,7 @@ import { ERROR_CODE } from '../constants/errorCode.js';
 
 // ==================== 发送验证码（公开） ====================
 
-export const sendVerificationCode = wrapController(async (req, res, next) => {
+export const sendVerificationCode = wrapController(async (req, res) => {
     const { phone, scene } = req.body;
     if (!phone || !scene) throw new BusinessError(ERROR_CODE.PARAM_MISSING, '手机号和场景不能为空');
     if (!['register', 'login', 'reset_password', 'bind'].includes(scene)) {
@@ -20,7 +20,7 @@ export const sendVerificationCode = wrapController(async (req, res, next) => {
 
 // ==================== 校验验证码（公开） ====================
 
-export const verifyCode = wrapController(async (req, res, next) => {
+export const verifyCode = wrapController(async (req, res) => {
     const { phone, scene, code } = req.body;
     if (!phone || !scene || !code) throw new BusinessError(ERROR_CODE.PARAM_MISSING, '参数不完整');
     const result = await smsService.verifyCode(phone, scene, code);
@@ -35,24 +35,24 @@ export const listTemplates = wrapController(async (_req, res, next) => {
     return success(res, data);
   });
 
-export const updateTemplate = wrapController(async (req, res, next) => {
+export const updateTemplate = wrapController(async (req, res) => {
     const data = await smsService.updateTemplate(req.params.id, req.body);
     return success(res, data, '短信模板已更新');
   });
 
-export const createTemplate = wrapController(async (req, res, next) => {
+export const createTemplate = wrapController(async (req, res) => {
     const id = await smsService.createTemplate(req.body);
     return success(res, { id }, '短信模板已创建');
   });
 
-export const deleteTemplate = wrapController(async (req, res, next) => {
+export const deleteTemplate = wrapController(async (req, res) => {
     await smsService.deleteTemplate(req.params.id);
     return success(res, {}, '短信模板已删除');
   });
 
 // ==================== 发送日志（后台） ====================
 
-export const listLogs = wrapController(async (req, res, next) => {
+export const listLogs = wrapController(async (req, res) => {
     const { page, pageSize } = parsePagination(req.query, { defaultPageSize: 30 });
     const { phone, result, startDate, endDate } = req.query;
     const data = await smsService.getLogs({ page, pageSize, phone, result, startDate, endDate });
@@ -61,7 +61,7 @@ export const listLogs = wrapController(async (req, res, next) => {
 
 // ==================== 通知类发送（内部调用/后台手动触发） ====================
 
-export const sendNotification = wrapController(async (req, res, next) => {
+export const sendNotification = wrapController(async (req, res) => {
     const { phone, scene, templateCode, params } = req.body;
     if (!phone || (!scene && !templateCode)) throw new BusinessError(ERROR_CODE.PARAM_MISSING, '参数不完整');
     const result = await smsService.sendNotification(phone, { scene, templateCode, params });

@@ -8,7 +8,7 @@ import { success } from '../utils/response.js';
 import * as openApiKeyService from '../services/openApiKeyService.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
-export const listKeys = wrapController(async (req, res, next) => {
+export const listKeys = wrapController(async (req, res) => {
     const { page = 1, pageSize = 20 } = req.query;
     const result = await openApiKeyService.listKeys(req.user.tenantId || 1, {
       page: parseInt(page), pageSize: parseInt(pageSize),
@@ -16,7 +16,7 @@ export const listKeys = wrapController(async (req, res, next) => {
     success(res, result);
 });
 
-export const createKey = wrapController(async (req, res, next) => {
+export const createKey = wrapController(async (req, res) => {
     const { description, rateLimit, dailyLimit } = req.body;
     const result = await openApiKeyService.createKey(req.user.tenantId || 1, {
       description, rateLimit, dailyLimit,
@@ -24,7 +24,7 @@ export const createKey = wrapController(async (req, res, next) => {
     success(res, result);
 });
 
-export const toggleKey = wrapController(async (req, res, next) => {
+export const toggleKey = wrapController(async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
     const result = await openApiKeyService.toggleKey(parseInt(id), req.user.tenantId || 1, status);
@@ -32,7 +32,7 @@ export const toggleKey = wrapController(async (req, res, next) => {
     success(res, result);
 });
 
-export const updateKey = wrapController(async (req, res, next) => {
+export const updateKey = wrapController(async (req, res) => {
     const { id } = req.params;
     const { description, rateLimit, dailyLimit } = req.body;
     const result = await openApiKeyService.updateKey(parseInt(id), req.user.tenantId || 1, {
@@ -42,7 +42,7 @@ export const updateKey = wrapController(async (req, res, next) => {
     success(res, result);
 });
 
-export const deleteKey = wrapController(async (req, res, next) => {
+export const deleteKey = wrapController(async (req, res) => {
     const { id } = req.params;
     const result = await openApiKeyService.deleteKey(parseInt(id), req.user.tenantId || 1);
     if (!result.ok) throw new BusinessError(ERROR_CODE.NOT_FOUND, 'API Key 不存在');

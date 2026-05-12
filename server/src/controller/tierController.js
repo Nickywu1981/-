@@ -2,19 +2,19 @@ import { wrapController } from '../utils/wrapController.js';
 import tierService from '../services/tierService.js';
 import { success } from '../utils/response.js';
 
-export const getMyTier = wrapController(async (req, res, next) => {
+export const getMyTier = wrapController(async (req, res) => {
     const tier = await tierService.getUserTier(req.userId);
     const limits = tierService.getTierLimits(tier);
     return success(res, { tier, limits });
 });
 
-export const checkLimit = wrapController(async (req, res, next) => {
+export const checkLimit = wrapController(async (req, res) => {
     const { type = 'image' } = req.query;
     const result = await tierService.checkDailyLimit(req.userId, type);
     return success(res, result);
 });
 
-export const getExportPermission = wrapController(async (req, res, next) => {
+export const getExportPermission = wrapController(async (req, res) => {
     const [hd, noWatermark] = await Promise.all([
       tierService.canExportHd(req.userId),
       tierService.canExportWithoutWatermark(req.userId),

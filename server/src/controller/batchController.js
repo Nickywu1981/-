@@ -5,7 +5,7 @@ import { success, listResult } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { parsePagination } from '../utils/pagination.js';
 
-export const submitBatchTask = wrapController(async (req, res, next) => {
+export const submitBatchTask = wrapController(async (req, res) => {
     const { imageUrls, operation, platform, style, nightMode } = req.body;
     if (!imageUrls || !imageUrls.length) {
       throw new BusinessError(ERROR_CODE.PARAM_MISSING, '请上传至少一张图片');
@@ -18,7 +18,7 @@ export const submitBatchTask = wrapController(async (req, res, next) => {
     return success(res, data, msg);
   });
 
-export const redoBatchTask = wrapController(async (req, res, next) => {
+export const redoBatchTask = wrapController(async (req, res) => {
     const { taskId } = req.body;
     if (!taskId) {
       throw new BusinessError(ERROR_CODE.PARAM_MISSING, '请提供源任务ID');
@@ -27,36 +27,36 @@ export const redoBatchTask = wrapController(async (req, res, next) => {
     return success(res, data, '已复刻批量任务');
   });
 
-export const listBatchHistory = wrapController(async (req, res, next) => {
+export const listBatchHistory = wrapController(async (req, res) => {
     const { page, pageSize } = parsePagination(req.query, { defaultPageSize: 10, maxPageSize: 50 });
     const data = await batchService.listBatchHistory(req.user.id, { page, pageSize });
     return listResult(res, data);
   });
 
-export const getBatchZipUrl = wrapController(async (req, res, next) => {
+export const getBatchZipUrl = wrapController(async (req, res) => {
     const data = await batchService.getBatchZipUrl(req.params.taskId, req.user.id);
     return success(res, data);
   });
 
-export const getTaskResult = wrapController(async (req, res, next) => {
+export const getTaskResult = wrapController(async (req, res) => {
     const data = await batchService.getTaskResult(req.params.taskId, req.user.id);
     return success(res, data);
   });
 
 // ==================== 批量模板 ====================
 
-export const saveBatchTemplate = wrapController(async (req, res, next) => {
+export const saveBatchTemplate = wrapController(async (req, res) => {
     const { name, operation, platform, style, nightMode, imageCount } = req.body;
     const data = await batchService.saveBatchTemplate(req.user.id, { name, operation, platform, style, nightMode, imageCount });
     return success(res, { id: data }, '模板已保存');
   });
 
-export const listBatchTemplates = wrapController(async (req, res, next) => {
+export const listBatchTemplates = wrapController(async (req, res) => {
     const data = await batchService.listBatchTemplates(req.user.id);
     return success(res, { list: data });
   });
 
-export const deleteBatchTemplate = wrapController(async (req, res, next) => {
+export const deleteBatchTemplate = wrapController(async (req, res) => {
     await batchService.deleteBatchTemplate(req.user.id, parseInt(req.params.id, 10));
     return success(res, {}, '模板已删除');
   });
