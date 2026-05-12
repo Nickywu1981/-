@@ -11,7 +11,6 @@ import { validateStartupConfig } from '../utils/startupGuard.js';
 import * as jobQueueService from '../services/job-queue.service.js';
 import { gatewayInfer } from '../gateway/aiGatewayHub.js';
 import { saveSimpleFile } from '../utils/file-upload.js';
-import crypto from 'crypto';
 
 // 启动配置校验
 validateStartupConfig();

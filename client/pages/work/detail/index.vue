@@ -170,7 +170,9 @@ async function doReplicate() {
 async function doGenerateLongImage() {
   await submit('detail_long_image', {
     product_name: productName.value,
-    scenes: scenes.value.filter(s => s.prompt.trim()),
+    scenes: scenes.value
+      .filter(s => s.prompt.trim())
+      .map(s => ({ prompt: s.prompt.trim(), ...(s.imageUrl.trim() ? { imageUrl: s.imageUrl.trim() } : {}) }) ),
     width: outputWidth.value,
     platform: platform.value || undefined,
   })
