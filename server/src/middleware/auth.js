@@ -112,6 +112,7 @@ const PUBLIC_PREFIXES = [
   '/api/platform-specs',
   '/api/forms/public',
   '/api/enterprise/register', '/api/enterprise/login', '/api/enterprise/plans',  // Phase 1: B端公开入口
+  '/api/i18n',  // 公开翻译接口（前端SSR/CSR无需登录）
   '/uploads',
 ];
 

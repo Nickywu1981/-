@@ -127,7 +127,7 @@ async function realTTSInfer(text, voiceType, speed) {
   try {
     const audioBuffer = await synthesizeEdgeTTS(voiceName, text, speed);
     const filename = `tts_${Date.now()}_${crypto.randomBytes(4).toString('hex')}.mp3`;
-    fs.writeFileSync(path.join(AUDIO_DIR, filename), audioBuffer);
+    await fs.promises.writeFile(path.join(AUDIO_DIR, filename), audioBuffer);
 
     const duration = Math.max(1, Math.round((Date.now() - startTime) / 1000));
     logger.info(`[EdgeTTS] 合成完成: ${filename}, size=${(audioBuffer.length / 1024).toFixed(1)}KB, cost=${duration}s`);
@@ -203,10 +203,11 @@ async function realCloneInfer(text, audioSampleUrl) {
       if (!resolvedPath.startsWith(uploadsRoot)) {
         throw new BusinessError(400, '无效的音频样本路径');
       }
-      if (fs.existsSync(resolvedPath)) {
+      let sampleBuffer;
+      try { sampleBuffer = await fs.promises.readFile(resolvedPath); } catch { /* sample file not found, skip voice cloning from sample */ }
+      if (sampleBuffer) {
         const formData = new FormData();
-        const buffer = await fs.promises.readFile(samplePath);
-        formData.append('files', new Blob([buffer]), 'sample.mp3');
+        formData.append('files', new Blob([sampleBuffer]), 'sample.mp3');
         formData.append('name', `clone_${Date.now()}`);
         const addResp = await fetch(`${apiBase}/v1/voices/add`, {
           method: 'POST',
@@ -233,7 +234,7 @@ async function realCloneInfer(text, audioSampleUrl) {
 
     const audioBuffer = Buffer.from(await ttsResp.arrayBuffer());
     const filename = `clone_${Date.now()}_${crypto.randomBytes(4).toString('hex')}.mp3`;
-    fs.writeFileSync(path.join(AUDIO_DIR, filename), audioBuffer);
+    await fs.promises.writeFile(path.join(AUDIO_DIR, filename), audioBuffer);
 
     // Step 3: Clean up temporary voice
     fetch(`${apiBase}/v1/voices/${voiceId}`, {

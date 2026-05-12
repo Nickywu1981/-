@@ -10,7 +10,7 @@ import { BusinessError } from '../utils/businessError.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import bcrypt from 'bcryptjs';
 
-const SALT_ROUNDS = 10;
+const SALT_ROUNDS = 12;
 
 // ==================== 企业入驻/登录 ====================
 

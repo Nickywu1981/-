@@ -61,7 +61,7 @@ export async function adaptImage(inputPath, platformCode, outputDir) {
   }
 
   const fs = await import('fs');
-  if (!fs.existsSync(inputPath)) {
+  try { await fs.promises.access(inputPath); } catch {
     throw new BusinessError(404, `输入文件不存在: ${inputPath}`);
   }
 
@@ -74,8 +74,8 @@ export async function adaptImage(inputPath, platformCode, outputDir) {
   const firstKey = Object.keys(specData.specs)[0];
   const spec = specData.specs[firstKey];
 
-  if (!fs.existsSync(outputDir)) {
-    fs.mkdirSync(outputDir, { recursive: true });
+  try { await fs.promises.access(outputDir); } catch {
+    await fs.promises.mkdir(outputDir, { recursive: true });
   }
 
   const path = await import('path');
