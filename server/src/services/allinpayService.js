@@ -90,8 +90,8 @@ export async function handleNotify(body) {
   const lockKey = `notify_lock:${reqsn}`;
   let locked = false;
   try {
-    const redis = await import('../dao/redis.js');
-    const r = await redis.default.getRedis();
+    const { getRedis } = await import('../dao/redis.js');
+    const r = await getRedis();
     if (r) {
       locked = await r.set(lockKey, '1', { NX: true, EX: 120 });
       if (!locked) {
