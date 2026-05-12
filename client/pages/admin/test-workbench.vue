@@ -2,8 +2,8 @@
   <div class="test-workbench">
     <!-- ========== Header ========== -->
     <div class="tw-header">
-      <h1>🧪 内部测试工作台</h1>
-      <p>单模型测试 · 混合调度 · 自定义编排 · 模型对比 · 效果预览</p>
+      <h1>{{ $t('test_workbench.page_title') }}</h1>
+      <p>{{ $t('test_workbench.page_subtitle') }}</p>
     </div>
 
     <!-- ========== 模式选择 Tabs ========== -->
@@ -22,7 +22,7 @@
     <div class="tw-config">
       <div class="tw-row">
         <div class="tw-field">
-          <label>测试类别</label>
+          <label>{{ $t('test_workbench.test_category') }}</label>
           <div class="category-tabs">
             <button
               v-for="cat in categories"
@@ -39,23 +39,23 @@
       <!-- 自定义模式：模型选择器 -->
       <div v-if="activeTab === 'custom'" class="tw-row">
         <div class="tw-field full-width">
-          <label>模型编排顺序 <span class="hint">（拖拽排序、单选/多选组合）</span></label>
+          <label>{{ $t('test_workbench.model_sequence') }} <span class="hint">（{{ $t('test_workbench.sequence_hint') }}）</span></label>
           <div class="model-sequence">
             <div v-for="(m, i) in selectedSequence" :key="m" class="seq-chip">
               <span class="seq-num">{{ i + 1 }}</span>
               <span>{{ modelMap[m]?.name || m }}</span>
-              <button class="seq-remove" aria-label="从序列中移除" @click="removeFromSequence(i)">×</button>
+              <button class="seq-remove" :aria-label="$t('test_workbench.remove_from_seq')" @click="removeFromSequence(i)">×</button>
             </div>
-            <div v-if="selectedSequence.length === 0" class="seq-empty">尚未选择模型，请从下方添加</div>
+            <div v-if="selectedSequence.length === 0" class="seq-empty">{{ $t('test_workbench.no_models_selected') }}</div>
           </div>
           <div class="model-pool">
-            <span class="pool-label">可选模型：</span>
+            <span class="pool-label">{{ $t('test_workbench.available_models') }}</span>
             <button
               v-for="m in availableModels"
               :key="m.key"
               :class="['pool-chip', { used: selectedSequence.includes(m.key) }]"
               :disabled="!m.available"
-              :title="m.available ? '' : '模型不可用'"
+              :title="m.available ? '' : $t('test_workbench.model_unavailable')"
               @click="toggleModelInSequence(m.key)"
             >
               {{ m.name }}
@@ -69,10 +69,10 @@
       <!-- 自定义模式：串行/并行 -->
       <div v-if="activeTab === 'custom'" class="tw-row">
         <div class="tw-field">
-          <label>执行模式</label>
+          <label>{{ $t('test_workbench.exec_mode') }}</label>
           <select v-model="customParallel" class="tw-select">
-            <option :value="false">🔗 串行 — 按顺序依次执行，前置结果传递给后续模型</option>
-            <option :value="true">⚡ 并行 — 所有模型同时执行，汇总全部结果</option>
+            <option :value="false">{{ $t('test_workbench.serial_desc') }}</option>
+            <option :value="true">{{ $t('test_workbench.parallel_desc') }}</option>
           </select>
         </div>
       </div>
@@ -80,9 +80,9 @@
       <!-- 单模型模式：模型选择 -->
       <div v-if="activeTab === 'single'" class="tw-row">
         <div class="tw-field">
-          <label>选择模型</label>
+          <label>{{ $t('test_workbench.select_model') }}</label>
           <select v-model="singleModelKey" class="tw-select">
-            <option value="">-- 选择模型 --</option>
+            <option value="">{{ $t('test_workbench.select_model_placeholder') }}</option>
             <optgroup
               v-for="cat in categories"
               :key="cat.key"
@@ -94,7 +94,7 @@
                 :value="m.key"
                 :disabled="!m.available"
               >
-                {{ m.name }} {{ m.available ? '' : '(不可用)' }}
+                {{ m.name }} {{ m.available ? '' : $t('test_workbench.unavailable') }}
               </option>
             </optgroup>
           </select>
@@ -104,7 +104,7 @@
       <!-- 对比模式：多选模型 -->
       <div v-if="activeTab === 'compare'" class="tw-row">
         <div class="tw-field full-width">
-          <label>对比模型 <span class="hint">（至少选择2个）</span></label>
+          <label>{{ $t('test_workbench.compare_models') }} <span class="hint">（{{ $t('test_workbench.compare_hint') }}）</span></label>
           <div class="model-pool">
             <button
               v-for="m in availableModels"
@@ -124,12 +124,12 @@
       <!-- 混合模式：任务类型 -->
       <div v-if="activeTab === 'mixed'" class="tw-row">
         <div class="tw-field">
-          <label>任务类型（用于自动匹配最优模型）</label>
+          <label>{{ $t('test_workbench.task_type_hint') }}</label>
           <input
             v-model="mixedTaskType"
             type="text"
             class="tw-input"
-            placeholder="如 image_gen, video_gen, text_gen"
+            :placeholder="$t('test_workbench.task_type_placeholder')"
           />
         </div>
       </div>
@@ -138,19 +138,19 @@
       <div class="tw-row">
         <div class="tw-field full-width">
           <label>
-            提示词
+            {{ $t('test_workbench.prompt') }}
             <span class="prompt-actions">
-              <button class="btn-mini" @click="loadPromptTemplate('product')">📦 商品模板</button>
-              <button class="btn-mini" @click="loadPromptTemplate('scene')">🎬 场景模板</button>
-              <button class="btn-mini" @click="loadPromptTemplate('poster')">🎨 海报模板</button>
-              <button class="btn-mini" @click="prompt = ''">🗑 清空</button>
+              <button class="btn-mini" @click="loadPromptTemplate('product')">{{ $t('test_workbench.product_template') }}</button>
+              <button class="btn-mini" @click="loadPromptTemplate('scene')">{{ $t('test_workbench.scene_template') }}</button>
+              <button class="btn-mini" @click="loadPromptTemplate('poster')">{{ $t('test_workbench.poster_template') }}</button>
+              <button class="btn-mini" @click="prompt = ''">{{ $t('test_workbench.clear') }}</button>
             </span>
           </label>
           <textarea
             v-model="prompt"
             class="tw-textarea"
             rows="4"
-            placeholder="输入测试提示词..."
+            :placeholder="$t('test_workbench.prompt_placeholder')"
           ></textarea>
           <span class="char-count">{{ prompt.length }}/5000</span>
         </div>
@@ -158,7 +158,7 @@
 
       <!-- 额外参数 -->
       <details class="tw-params">
-        <summary>⚙️ 高级参数 (JSON)</summary>
+        <summary>{{ $t('test_workbench.advanced_params') }}</summary>
         <textarea
           v-model="extraParamsStr"
           class="tw-textarea mono"
@@ -178,7 +178,7 @@
           <span v-if="running" class="spinner"></span>
           <span v-else>{{ runButtonLabel }}</span>
         </button>
-        <button class="btn-clear" @click="clearResult">清除结果</button>
+        <button class="btn-clear" @click="clearResult">{{ $t('test_workbench.clear_result') }}</button>
       </div>
     </div>
 
@@ -194,16 +194,16 @@
     <div v-if="lastResult && !running" class="tw-result" :class="{ error: lastResult.error }">
       <div class="result-header">
         <h3>
-          <span v-if="lastResult.error">❌ 测试失败</span>
-          <span v-else>✅ 测试完成</span>
+          <span v-if="lastResult.error">{{ $t('test_workbench.test_failed') }}</span>
+          <span v-else>{{ $t('test_workbench.test_success') }}</span>
           <span class="result-meta">
             {{ lastResult.type }} · {{ formatDuration(lastResult.duration_ms) }}
             · {{ formatTime(lastResult.created_at) }}
           </span>
         </h3>
         <div class="result-actions">
-          <button class="btn-mini" @click="copyResult">📋 复制结果</button>
-          <button class="btn-mini" @click="rerunLast">🔄 重跑</button>
+          <button class="btn-mini" @click="copyResult">{{ $t('test_workbench.copy_result') }}</button>
+          <button class="btn-mini" @click="rerunLast">{{ $t('test_workbench.rerun') }}</button>
         </div>
       </div>
 
@@ -230,7 +230,7 @@
             :class="['pipeline-step', step.success ? 'step-ok' : 'step-fail']"
           >
             <div class="step-header">
-              <span class="step-order">Step {{ step.order ?? Number(i) + 1 }}</span>
+              <span class="step-order">{{ $t('test_workbench.step_prefix') }}{{ step.order ?? Number(i) + 1 }}</span>
               <span class="step-model">{{ modelMap[step.model_key]?.name || step.model_key }}</span>
               <span class="step-dur">{{ formatDuration(step.duration_ms) }}</span>
               <span class="step-status">{{ step.success ? '✅' : '❌' }}</span>
@@ -243,7 +243,7 @@
         </div>
         <!-- 最终结果 -->
         <div v-if="lastResult.result" class="final-result">
-          <h4>📌 最终输出</h4>
+          <h4>{{ $t('test_workbench.final_output') }}</h4>
           <pre class="result-json">{{ formatResult(lastResult.result) }}</pre>
         </div>
       </template>
@@ -251,8 +251,8 @@
       <!-- 单模型 / 混合模式 -->
       <template v-else>
         <div class="result-meta-row">
-          <span v-if="lastResult.model_key">模型：{{ modelMap[lastResult.model_key]?.name || lastResult.model_key }}</span>
-          <span v-if="lastResult.task_type">任务：{{ lastResult.task_type }}</span>
+          <span v-if="lastResult.model_key">{{ $t('test_workbench.model_label') }}{{ modelMap[lastResult.model_key]?.name || lastResult.model_key }}</span>
+          <span v-if="lastResult.task_type">{{ $t('test_workbench.task_label') }}{{ lastResult.task_type }}</span>
         </div>
         <div v-if="lastResult.result" class="result-body">
           <pre class="result-json">{{ formatResult(lastResult.result) }}</pre>
@@ -264,27 +264,27 @@
     <!-- ========== 测试历史 ========== -->
     <div class="tw-history">
       <div class="history-header">
-        <h3>📜 测试历史</h3>
+        <h3>{{ $t('test_workbench.test_history') }}</h3>
         <div class="history-filters">
           <select v-model="historyCategory" class="tw-select-sm" @change="loadHistory()">
-            <option value="">全部类别</option>
+            <option value="">{{ $t('test_workbench.all_categories') }}</option>
             <option v-for="c in categories" :key="c.key" :value="c.key">{{ c.label }}</option>
           </select>
           <select v-model="historyType" class="tw-select-sm" @change="loadHistory()">
-            <option value="">全部模式</option>
-            <option value="single">单模型</option>
-            <option value="mixed">混合</option>
-            <option value="custom">自定义</option>
-            <option value="compare">对比</option>
+            <option value="">{{ $t('test_workbench.all_modes') }}</option>
+            <option value="single">{{ $t('test_workbench.tab_single') }}</option>
+            <option value="mixed">{{ $t('test_workbench.tab_mixed') }}</option>
+            <option value="custom">{{ $t('test_workbench.tab_custom') }}</option>
+            <option value="compare">{{ $t('test_workbench.tab_compare') }}</option>
           </select>
-          <button class="btn-mini danger" @click="clearHistory">🗑 清空历史</button>
+          <button class="btn-mini danger" @click="clearHistory">{{ $t('test_workbench.clear_history') }}</button>
         </div>
       </div>
 
-      <div v-if="historyLoading" class="loading-box">加载中...</div>
+      <div v-if="historyLoading" class="loading-box">{{ $t('common.loading') }}</div>
 
       <div v-else-if="historyList.length === 0" class="empty-box">
-        暂无测试记录，跑一次测试吧
+        {{ $t('test_workbench.no_history') }}
       </div>
 
       <div v-else class="history-list">
@@ -295,24 +295,24 @@
           @click="viewHistory(h)"
         >
           <span class="hi-type">
-            <span v-if="h.type === 'single'">🔹 单模型</span>
-            <span v-else-if="h.type === 'mixed'">🔶 混合</span>
-            <span v-else-if="h.type === 'custom'">🔷 自定义</span>
-            <span v-else>🔄 对比</span>
+            <span v-if="h.type === 'single'">{{ $t('test_workbench.type_single') }}</span>
+            <span v-else-if="h.type === 'mixed'">{{ $t('test_workbench.type_mixed') }}</span>
+            <span v-else-if="h.type === 'custom'">{{ $t('test_workbench.type_custom') }}</span>
+            <span v-else>{{ $t('test_workbench.type_compare') }}</span>
           </span>
           <span class="hi-model">{{ h.model_key || h.task_type || h.model_sequence?.join(' → ') }}</span>
           <span class="hi-prompt">{{ truncate(h.prompt, 60) }}</span>
           <span class="hi-dur">{{ formatDuration(h.duration_ms) }}</span>
           <span class="hi-status">{{ h.error ? '❌' : '✅' }}</span>
           <span class="hi-time">{{ formatTime(h.created_at) }}</span>
-          <button class="hi-delete" aria-label="删除历史记录" @click.stop="deleteHistoryItem(h.id)">🗑</button>
+          <button class="hi-delete" :aria-label="$t('test_workbench.delete_history')" @click.stop="deleteHistoryItem(h.id)">🗑</button>
         </div>
       </div>
 
       <div v-if="historyTotal > historyPageSize" class="history-pagination">
-        <button :disabled="historyPage <= 1" @click="historyPage--; loadHistory()">上一页</button>
+        <button :disabled="historyPage <= 1" @click="historyPage--; loadHistory()">{{ $t('enterprise.common.prevPage') }}</button>
         <span>{{ historyPage }} / {{ Math.ceil(historyTotal / historyPageSize) }}</span>
-        <button :disabled="historyPage >= Math.ceil(historyTotal / historyPageSize)" @click="historyPage++; loadHistory()">下一页</button>
+        <button :disabled="historyPage >= Math.ceil(historyTotal / historyPageSize)" @click="historyPage++; loadHistory()">{{ $t('enterprise.common.nextPage') }}</button>
       </div>
     </div>
   </div>
@@ -321,23 +321,24 @@
 <script setup lang="ts">
 
 const { confirm } = useConfirm()
+const { t } = useI18n()
 import { formatDateTime, copyToClipboard, truncate } from '@/utils/format';
 const formatTime = (iso: string) => iso ? formatDateTime(iso, 'HH:mm:ss') : '';
 const toast = useToast()
 
 // ---- Tab & State ----
-const tabs = [
-  { key: 'single', label: '🔹 单模型测试' },
-  { key: 'mixed', label: '🔶 混合调度测试' },
-  { key: 'custom', label: '🔷 自定义编排测试' },
-  { key: 'compare', label: '🔄 模型并行对比' },
-]
+const tabs = computed(() => [
+  { key: 'single', label: t('test_workbench.tab_single') },
+  { key: 'mixed', label: t('test_workbench.tab_mixed') },
+  { key: 'custom', label: t('test_workbench.tab_custom') },
+  { key: 'compare', label: t('test_workbench.tab_compare') },
+])
 const activeTab = ref('single')
-const categories = [
-  { key: 'text', label: '文本', icon: '📝' },
-  { key: 'image', label: '图片', icon: '🖼️' },
-  { key: 'video', label: '视频', icon: '🎬' },
-]
+const categories = computed(() => [
+  { key: 'text', label: t('test_workbench.cat_text'), icon: '📝' },
+  { key: 'image', label: t('test_workbench.cat_image'), icon: '🖼️' },
+  { key: 'video', label: t('test_workbench.cat_video'), icon: '🎬' },
+])
 const testCategory = ref('image')
 
 // Shared
@@ -393,11 +394,11 @@ const canRun = computed(() => {
 
 const runButtonLabel = computed(() => {
   switch (activeTab.value) {
-    case 'single': return '▶ 单模型测试'
-    case 'mixed': return '▶ 混合调度测试'
-    case 'custom': return customParallel.value ? '▶ 并行编排测试' : '▶ 串行编排测试'
-    case 'compare': return '▶ 模型对比测试'
-    default: return '▶ 执行'
+    case 'single': return t('test_workbench.run_single')
+    case 'mixed': return t('test_workbench.run_mixed')
+    case 'custom': return customParallel.value ? t('test_workbench.run_parallel') : t('test_workbench.run_serial')
+    case 'compare': return t('test_workbench.run_compare')
+    default: return t('test_workbench.run_default')
   }
 })
 
@@ -445,7 +446,7 @@ function getExtraParams() {
     paramsError.value = ''
     return parsed
   } catch {
-    paramsError.value = 'JSON 格式错误'
+    paramsError.value = t('test_workbench.json_error')
     return {}
   }
 }
@@ -453,7 +454,7 @@ function getExtraParams() {
 async function executeTest() {
   paramsError.value = ''
   running.value = true
-  statusMessage.value = '正在调用模型...'
+  statusMessage.value = t('test_workbench.calling_model')
   lastResult.value = null
 
   const extraParams = getExtraParams()
@@ -498,11 +499,11 @@ async function executeTest() {
     })
     lastResult.value = res.data || res
     statusMessage.value = ''
-    toast.success('测试完成')
+    toast.success(t('test_workbench.test_complete_toast'))
     loadHistory()
   } catch (err: any) {
-    lastResult.value = { error: err.message || '请求失败', type: activeTab.value, duration_ms: 0, created_at: new Date().toISOString() }
-    toast.error(err.message || '测试失败')
+    lastResult.value = { error: err.message || t('test_workbench.request_failed'), type: activeTab.value, duration_ms: 0, created_at: new Date().toISOString() }
+    toast.error(err.message || t('test_workbench.test_failed_toast'))
   } finally {
     running.value = false
   }
@@ -531,7 +532,7 @@ async function loadModels() {
     }
     allModels.value = flat
   } catch {
-    toast.error('加载模型列表失败，使用默认列表');
+    toast.error(t('test_workbench.models_load_failed'));
     const fallback: any[] = [
       { key: 'tongyi_qwen', name: '千问 (Qwen)', category: 'text', available: true, state: 'ok', failedCount: 0 },
       { key: 'deepseek', name: 'DeepSeek', category: 'text', available: true, state: 'ok', failedCount: 0 },
@@ -557,7 +558,7 @@ async function loadHistory() {
     historyList.value = data.items || []
     historyTotal.value = data.total || 0
   } catch {
-    toast.error('加载历史记录失败');
+    toast.error(t('test_workbench.history_load_failed'));
     historyList.value = []
   } finally {
     historyLoading.value = false
@@ -567,21 +568,21 @@ async function loadHistory() {
 async function deleteHistoryItem(id: string) {
   try {
     await $fetch('/api/test/history/' + id, { method: 'DELETE', credentials: 'include' })
-    toast.success('已删除')
+    toast.success(t('test_workbench.deleted'))
     loadHistory()
   } catch (err: any) {
-    toast.error(err.message || '删除失败')
+    toast.error(err.message || t('test_workbench.delete_failed'))
   }
 }
 
 async function clearHistory() {
-  if (!await confirm({ message: '确认清空全部测试历史？'} )) return
+  if (!await confirm({ message: t('test_workbench.clear_history_confirm') })) return
   try {
     await $fetch('/api/test/history', { method: 'DELETE', credentials: 'include' })
-    toast.success('已清空')
+    toast.success(t('test_workbench.cleared'))
     loadHistory()
   } catch (err: any) {
-    toast.error(err.message || '清空失败')
+    toast.error(err.message || t('test_workbench.clear_failed'))
   }
 }
 
@@ -594,7 +595,7 @@ async function copyResult() {
   if (!lastResult.value) return
   const text = JSON.stringify(lastResult.value, null, 2)
   const ok = await copyToClipboard(text)
-  if (ok) toast.success('已复制'); else toast.error('复制失败')
+  if (ok) toast.success(t('test_workbench.copied')); else toast.error(t('test_workbench.copy_failed'))
 }
 
 // ---- Formatting ----
