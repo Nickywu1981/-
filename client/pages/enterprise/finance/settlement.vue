@@ -54,15 +54,15 @@ definePageMeta({ layout: 'enterprise' });
 </script>
 
 <style scoped>
-.page-title { font-size: 24px; margin: 0 0 20px; color: #1a1a2e; }
-.table-wrap { background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow-x: auto; }
+.page-title { font-size: 24px; margin: 0 0 20px; color: var(--text-primary); }
+.table-wrap { background: var(--bg-card); border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; }
-th, td { padding: 10px 14px; text-align: left; font-size: 14px; border-bottom: 1px solid #f0f0f0; }
-th { background: #fafafa; color: #666; font-weight: 500; }
+th, td { padding: 10px 14px; text-align: left; font-size: 14px; border-bottom: 1px solid var(--border-light); }
+th { background: var(--table-header-bg); color: var(--text-secondary); font-weight: 500; }
 .status-tag { padding: 2px 10px; border-radius: 12px; font-size: 12px; }
-.status-tag.settled { background: #e8f5e9; color: #27ae60; }
-.status-tag.pending { background: #fff3e0; color: #f39c12; }
-.empty { padding: 60px; text-align: center; color: #999; }
+.status-tag.settled { background: var(--success-bg); color: var(--success); }
+.status-tag.pending { background: var(--warning-bg); color: var(--warning); }
+.empty { padding: 60px; text-align: center; color: var(--text-muted); }
 .pager { display: flex; justify-content: center; align-items: center; gap: 12px; padding: 16px; }
 .pager button { padding: 6px 14px; border: 1px solid #ddd; background: #fff; border-radius: 6px; cursor: pointer; }
 .pager button:disabled { opacity: 0.4; }
