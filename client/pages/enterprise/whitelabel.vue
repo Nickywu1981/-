@@ -75,26 +75,26 @@ definePageMeta({ layout: 'enterprise' });
 </script>
 
 <style scoped>
-.page-title { font-size: 24px; margin: 0 0 8px; color: #1a1a2e; }
-.subtitle { color: #666; margin: 0 0 28px; font-size: 14px; }
+.page-title { font-size: 24px; margin: 0 0 8px; color: var(--text-primary); }
+.subtitle { color: var(--text-secondary); margin: 0 0 28px; font-size: 14px; }
 
-.form-card { background: #fff; border-radius: 16px; padding: 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); max-width: 560px; }
+.form-card { background: var(--bg-card); border-radius: 16px; padding: 32px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); max-width: 560px; }
 .form-group { margin-bottom: 20px; }
-.form-group label { display: block; font-size: 14px; color: #333; margin-bottom: 6px; font-weight: 500; }
-.form-group input[type="text"] { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
+.form-group label { display: block; font-size: 14px; color: var(--text-primary); margin-bottom: 6px; font-weight: 500; }
+.form-group input[type="text"] { width: 100%; padding: 10px 14px; border: 1px solid var(--border-primary); border-radius: 8px; font-size: 14px; box-sizing: border-box; background: var(--bg-card); color: var(--text-primary); }
 
 .color-row { display: flex; gap: 10px; align-items: center; }
-.color-input { flex: 1; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+.color-input { flex: 1; padding: 10px 14px; border: 1px solid var(--border-primary); border-radius: 8px; font-size: 14px; background: var(--bg-card); color: var(--text-primary); }
 .color-picker { width: 44px; height: 44px; border: none; border-radius: 8px; cursor: pointer; }
 .color-preview { width: 100%; height: 32px; border-radius: 8px; margin-top: 8px; transition: background 0.2s; }
 
-.preview-box { margin-top: 8px; padding: 12px; background: #f5f5f5; border-radius: 8px; }
+.preview-box { margin-top: 8px; padding: 12px; background: var(--bg-subtle); border-radius: 8px; }
 .logo-preview { max-height: 48px; }
 
 .msg { padding: 10px; border-radius: 8px; font-size: 14px; margin-bottom: 14px; }
 .msg.success { background: #e8f5e9; color: #27ae60; }
 .msg.error { background: #fbe9e7; color: #e74c3c; }
 
-.btn-primary { padding: 12px 28px; background: #667eea; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; }
+.btn-primary { padding: 12px 28px; background: var(--color-brand-primary); color: var(--text-inverse); border: none; border-radius: 8px; cursor: pointer; font-size: 15px; }
 .btn-primary:disabled { opacity: 0.6; }
 </style>

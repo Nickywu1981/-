@@ -52,22 +52,22 @@ definePageMeta({ layout: 'enterprise' });
 </script>
 
 <style scoped>
-.page-title { font-size: 24px; margin: 0 0 8px; color: #1a1a2e; }
-.subtitle { color: #666; margin: 0 0 28px; font-size: 14px; }
+.page-title { font-size: 24px; margin: 0 0 8px; color: var(--text-primary); }
+.subtitle { color: var(--text-secondary); margin: 0 0 28px; font-size: 14px; }
 .plan-badge.current { background: #e8f0fe; color: #1a73e8; padding: 2px 12px; border-radius: 12px; font-size: 13px; }
 
 .plan-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 32px; }
-.plan-card { background: #fff; border-radius: 16px; padding: 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); text-align: center; border: 2px solid transparent; transition: border-color 0.2s; }
-.plan-card.active { border-color: #667eea; }
-.plan-card h3 { font-size: 18px; margin: 0 0 12px; color: #1a1a2e; }
-.plan-price { font-size: 36px; font-weight: 700; color: #1a1a2e; }
-.plan-price .unit { font-size: 14px; color: #999; font-weight: 400; }
-.plan-desc { color: #888; font-size: 13px; margin: 8px 0 16px; }
+.plan-card { background: var(--bg-card); border-radius: 16px; padding: 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); text-align: center; border: 2px solid transparent; transition: border-color 0.2s; }
+.plan-card.active { border-color: var(--color-brand-primary); }
+.plan-card h3 { font-size: 18px; margin: 0 0 12px; color: var(--text-primary); }
+.plan-price { font-size: 36px; font-weight: 700; color: var(--text-primary); }
+.plan-price .unit { font-size: 14px; color: var(--text-muted); font-weight: 400; }
+.plan-desc { color: var(--text-muted); font-size: 13px; margin: 8px 0 16px; }
 .plan-features { list-style: none; padding: 0; margin: 0 0 20px; text-align: left; }
-.plan-features li { padding: 6px 0; font-size: 14px; color: #555; border-bottom: 1px solid #f5f5f5; }
-.plan-features li::before { content: '✓ '; color: #27ae60; font-weight: 700; }
-.plan-btn { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #667eea; background: #fff; color: #667eea; font-size: 14px; cursor: pointer; }
-.plan-btn.current { background: #667eea; color: #fff; cursor: default; }
+.plan-features li { padding: 6px 0; font-size: 14px; color: var(--text-secondary); border-bottom: 1px solid var(--border-light); }
+.plan-features li::before { content: '✓ '; color: var(--color-success); font-weight: 700; }
+.plan-btn { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--color-brand-primary); background: var(--bg-card); color: var(--color-brand-primary); font-size: 14px; cursor: pointer; }
+.plan-btn.current { background: var(--color-brand-primary); color: var(--text-inverse); cursor: default; }
 
 .note { background: #fffbe6; border-radius: 10px; padding: 16px 20px; font-size: 14px; color: #8a6d14; }
 </style>
