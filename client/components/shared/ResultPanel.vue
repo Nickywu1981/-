@@ -70,7 +70,7 @@ async function handleDownload() {
     const a = document.createElement('a')
     a.href = url; a.download = `movio-${Date.now()}.png`; a.click()
     URL.revokeObjectURL(url)
-  } catch { /* fallback: open in new tab */ window.open(props.imageUrl, '_blank') }
+  } catch { /* fallback: open in new tab */ window.open(props.imageUrl, '_blank', 'noopener,noreferrer') }
 }
 </script>
 
