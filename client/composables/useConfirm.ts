@@ -28,6 +28,7 @@ export function useConfirm() {
     if (injected) return injected.show(opts)
     if (_globalDialog?.value) return _globalDialog.value.show(opts)
     // Fallback: native confirm — 在 ConfirmDialog 未挂载时降级
+    if (!import.meta.client) return false
     return window.confirm(opts.message)
   }
 

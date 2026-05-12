@@ -46,7 +46,7 @@
     <!-- 右侧主区域 -->
     <div class="ent-body">
       <header class="ent-topbar">
-        <button class="ent-hamburger" @click="mobileOpen = !mobileOpen">
+        <button class="ent-hamburger" @click="mobileOpen = !mobileOpen" aria-label="打开菜单" :aria-expanded="mobileOpen">
           <span /><span /><span />
         </button>
         <h2 class="ent-title">{{ pageTitle }}</h2>
