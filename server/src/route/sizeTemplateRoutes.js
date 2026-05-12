@@ -18,7 +18,7 @@ const myListQuerySchema = z.object({
 });
 
 const templateSchema = z.object({
-  platform: z.string().min(1, '平台不能为空'),
+  platform: z.string().min(1, '平台不能为空').max(30),
   name: z.string().min(1, '模板名称不能为空').max(100),
   width: z.coerce.number().int().positive('宽度必须为正整数'),
   height: z.coerce.number().int().positive('高度必须为正整数'),

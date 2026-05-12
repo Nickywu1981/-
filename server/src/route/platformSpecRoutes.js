@@ -22,8 +22,8 @@ const createSchema = z.object({
 const updateSchema = createSchema.partial();
 
 const adaptSchema = z.object({
-  inputPath: z.string().min(1),
-  platformCode: z.string().min(1),
+  inputPath: z.string().min(1).max(500),
+  platformCode: z.string().min(1).max(50),
   outputDir: z.string().optional(),
 });
 

@@ -12,7 +12,7 @@ import { aiGatewayController } from '../controller/aiGatewayController.js';
 const router = Router();
 
 const inferBodySchema = z.object({
-  modelId: z.string().min(1, 'modelId 必填'),
+  modelId: z.string().min(1, 'modelId 必填').max(50),
   input: z.record(z.unknown()).or(z.string()).or(z.array(z.unknown())),
   taskType: z.string().optional(),
   source: z.enum(['consumer', 'enterprise', 'agent', 'open_api', 'internal']).optional(),

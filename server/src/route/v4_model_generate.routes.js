@@ -13,7 +13,7 @@ const router = Router();
 router.use(authMiddleware);
 
 const generateSchema = z.object({
-  clothingImage: z.string().min(1, '请上传服装图片'),
+  clothingImage: z.string().min(1, '请上传服装图片').max(2000),
   gender: z.enum(['male', 'female', 'neutral']).optional(),
   skinTone: z.string().max(30).optional(),
   pose: z.string().max(50).optional(),

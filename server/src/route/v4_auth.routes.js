@@ -28,7 +28,7 @@ const loginSchema = z.object({
   email: z.string().email().optional().nullable(),
   username: z.string().min(1).max(100).optional().nullable(),
   account: z.string().min(1).max(100).optional().nullable(),
-  password: z.string().min(1, '请填写密码'),
+  password: z.string().min(1, '请填写密码').max(128),
 }).refine(d => d.phone || d.email || d.username || d.account, { message: '请填写手机号、邮箱或用户名' });
 
 const loginByCodeSchema = z.object({

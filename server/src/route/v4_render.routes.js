@@ -13,7 +13,7 @@ const router = Router();
 router.use(authMiddleware);
 
 const renderSchema = z.object({
-  modelUrl: z.string().min(1, '请上传产品 3D 模型'),
+  modelUrl: z.string().min(1, '请上传产品 3D 模型').max(2000),
   angle: z.enum(['front', 'back', 'side', 'top', '360']).optional(),
   resolution: z.enum(['1K', '2K', '4K']).optional(),
   background: z.string().max(50).optional(),

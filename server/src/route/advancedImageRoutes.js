@@ -28,7 +28,7 @@ const colorSwapSchema = z.object({
 });
 const styleTransferSchema = z.object({
   productImageUrl: productImageUrlSchema,
-  targetStyle: z.string().min(1, '请选择目标风格'),
+  targetStyle: z.string().min(1, '请选择目标风格').max(50),
   strength: z.coerce.number().min(0).max(1).optional(),
 });
 const wrinkleRemoveSchema = z.object({
@@ -38,7 +38,7 @@ const wrinkleRemoveSchema = z.object({
 const imageTranslateSchema = z.object({
   productImageUrl: productImageUrlSchema,
   sourceLang: z.string().optional(),
-  targetLang: z.string().min(1, '请选择目标语言'),
+  targetLang: z.string().min(1, '请选择目标语言').max(10),
 });
 const outpaintingSchema = z.object({
   productImageUrl: productImageUrlSchema,

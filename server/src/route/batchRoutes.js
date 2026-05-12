@@ -15,19 +15,19 @@ const taskIdParamSchema = numericParamSchema('taskId');
 
 const submitSchema = z.object({
   imageUrls: z.array(z.string().url()).min(1, '至少需要1张图片').max(100, '最多100张图片'),
-  operation: z.string().min(1, '请选择操作类型'),
+  operation: z.string().min(1, '请选择操作类型').max(50),
   platform: z.string().optional(),
   style: z.string().optional(),
   nightMode: z.coerce.boolean().optional(),
 });
 
 const redoSchema = z.object({
-  taskId: z.string().min(1),
+  taskId: z.string().min(1).max(50),
 });
 
 const templateSchema = z.object({
   name: z.string().min(1, '模板名称不能为空').max(60),
-  operation: z.string().min(1, '请选择操作类型'),
+  operation: z.string().min(1, '请选择操作类型').max(50),
   platform: z.string().optional(),
   style: z.string().optional(),
   nightMode: z.coerce.boolean().optional(),

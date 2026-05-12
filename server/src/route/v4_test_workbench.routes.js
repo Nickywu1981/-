@@ -40,7 +40,7 @@ const customTestSchema = z.object({
   task_type: z.string().min(1).max(50),
   prompt: z.string().min(1, '请输入提示词').max(5000),
   category: z.enum(['text', 'image', 'video']),
-  model_sequence: z.array(z.string().min(1)).min(1, '至少选择一个模型'),
+  model_sequence: z.array(z.string().min(1).max(50)).min(1, '至少选择一个模型'),
   parallel: z.boolean().optional().default(false),
   params: z.record(z.unknown()).optional().default({}),
 });
@@ -48,7 +48,7 @@ const customTestSchema = z.object({
 const compareTestSchema = z.object({
   prompt: z.string().min(1, '请输入提示词').max(5000),
   category: z.enum(['text', 'image', 'video']),
-  model_keys: z.array(z.string().min(1)).min(2, '对比至少需要2个模型'),
+  model_keys: z.array(z.string().min(1).max(50)).min(2, '对比至少需要2个模型'),
   params: z.record(z.unknown()).optional().default({}),
 });
 

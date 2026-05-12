@@ -17,7 +17,7 @@ router.use(authMiddleware);
 const baseTranslateSchema = z.object({
   videoUrl: z.string().url('请提供有效视频链接'),
   sourceLang: z.string().default('zh'),
-  targetLang: z.string().min(1, '请选择目标语言'),
+  targetLang: z.string().min(1, '请选择目标语言').max(10),
 });
 
 const worksQuerySchema = z.object({

@@ -19,7 +19,7 @@ router.get('/targets', ctrl.getTargets);
 
 // ─── POST /api/compliance/check ───────────────────────────────
 const checkSchema = z.object({
-  platform: z.string().min(1, '请选择目标平台'),
+  platform: z.string().min(1, '请选择目标平台').max(50),
   region: z.string().optional().nullable(),
   category: z.string().optional(),
 });
@@ -27,6 +27,6 @@ const checkSchema = z.object({
 router.post('/check', _validate(checkSchema), ctrl.checkCompliance);
 
 // ─── GET /api/compliance/rules/:code ─────────────────────────────
-router.get('/rules/:code', _validate(z.object({ code: z.string().min(1) }), 'params'), ctrl.getRules);
+router.get('/rules/:code', _validate(z.object({ code: z.string().min(1).max(50) }), 'params'), ctrl.getRules);
 
 export default router;

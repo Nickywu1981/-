@@ -19,24 +19,24 @@ const loginSchema = z.object({
   username: z.string().optional(),
   account: z.string().optional(),
   email: z.string().email('邮箱格式错误').optional(),
-  password: z.string().min(1, '请输入密码'),
+  password: z.string().min(1, '请输入密码').max(128),
 }).refine(d => d.username || d.account || d.email, { message: '请提供用户名/邮箱' });
 
 const changePasswordSchema = z.object({
-  oldPassword: z.string().min(1, '请输入旧密码'),
+  oldPassword: z.string().min(1, '请输入旧密码').max(128),
   newPassword: passwordSchema,
 });
 
 const forgotPasswordSchema = z.object({
-  username: z.string().min(1, '请输入用户名'),
+  username: z.string().min(1, '请输入用户名').max(100),
 });
 
 const refreshTokenSchema = z.object({
-  refreshToken: z.string().min(1, '请提供 refreshToken'),
+  refreshToken: z.string().min(1, '请提供 refreshToken').max(500),
 });
 
 const resetPasswordSchema = z.object({
-  token: z.string().min(1, '缺少重置令牌'),
+  token: z.string().min(1, '缺少重置令牌').max(500),
   newPassword: passwordSchema,
 });
 

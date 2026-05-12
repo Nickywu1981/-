@@ -58,7 +58,7 @@ const voiceCloneSchema = z.object({
 });
 
 const videoEditSchema = z.object({
-  videoUrl: z.string().min(1, '请提供视频URL'),
+  videoUrl: z.string().min(1, '请提供视频URL').max(2000),
   edits: z.array(z.unknown()).optional().default([]),
   bgm: z.string().max(500).optional(),
   subtitle: z.boolean().optional(),

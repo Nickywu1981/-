@@ -18,8 +18,8 @@ const refundSchema = z.object({
 const callbackChannelSchema = z.object({
   channel: z.enum(['wechat', 'alipay', 'unionpay']),
 });
-const reqsnParamSchema = z.object({ reqsn: z.string().min(1) });
-const orderNoParamSchema = z.object({ orderNo: z.string().min(1) });
+const reqsnParamSchema = z.object({ reqsn: z.string().min(1).max(50) });
+const orderNoParamSchema = z.object({ orderNo: z.string().min(1).max(50) });
 
 router.get('/rates', rechargeController.getRates);
 router.get('/', authMiddleware, rechargeController.listUserOrders);

@@ -38,7 +38,7 @@ const regionQuerySchema = z.object({
   region: z.enum(['cn', 'intl']).optional().default('cn'),
 });
 const codeParamsSchema = z.object({
-  code: z.string().min(1, '平台代码不能为空'),
+  code: z.string().min(1, '平台代码不能为空').max(50),
 });
 
 // === 平台绑定 ===

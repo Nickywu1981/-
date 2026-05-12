@@ -88,7 +88,7 @@ const viralAnalyzeSchema = z.object({
 });
 
 const viralReplicateSchema = z.object({
-  analysis_job_id: z.string().min(1, '请提供分析任务ID'),
+  analysis_job_id: z.string().min(1, '请提供分析任务ID').max(50),
   product_name: z.string().min(1, '请提供商品名称').max(200),
   product_images: z.array(urlField).max(10).optional(),
   custom_prompt: z.string().max(4000).optional(),

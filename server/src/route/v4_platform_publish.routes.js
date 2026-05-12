@@ -11,8 +11,8 @@ router.use(authMiddleware);
 
 const bindSchema = z.object({
   platform: z.enum(['taobao', 'jd', 'pdd', 'douyin', 'kuaishou', 'shopee']),
-  appKey: z.string().min(1),
-  appSecret: z.string().min(1),
+  appKey: z.string().min(1).max(256),
+  appSecret: z.string().min(1).max(256),
   accessToken: z.string().optional(),
   shopName: z.string().optional(),
 });

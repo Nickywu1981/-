@@ -14,7 +14,7 @@ const router = Router();
 const imageUrlSchema = z.object({ imageUrl: z.string().url('图片URL格式不正确') });
 const sceneSchema = z.object({
   imageUrl: z.string().url('图片URL格式不正确'),
-  sceneType: z.string().min(1, '场景类型不能为空'),
+  sceneType: z.string().min(1, '场景类型不能为空').max(50),
 });
 const videoGenSchema = z.object({
   imageUrls: z.array(z.string().url()).min(1, '至少需要1张图片'),

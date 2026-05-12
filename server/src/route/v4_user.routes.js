@@ -20,7 +20,7 @@ const updateProfileSchema = z.object({
 });
 
 const changePasswordSchema = z.object({
-  oldPassword: z.string().min(1, '请提供原密码'),
+  oldPassword: z.string().min(1, '请提供原密码').max(128),
   newPassword: z.string().min(8, '新密码至少8位').max(64),
 });
 

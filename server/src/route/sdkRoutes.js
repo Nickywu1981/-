@@ -13,9 +13,9 @@ const userIdParamSchema = numericParamSchema('userId');
 const taskIdParamSchema = numericParamSchema('taskId');
 
 // ── Zod schemas ──
-const memorySearchSchema = z.object({ query: z.string().min(1) });
+const memorySearchSchema = z.object({ query: z.string().min(1).max(500) });
 const memoryEmbedSchema = z.object({
-  content: z.string().min(1),
+  content: z.string().min(1).max(5000),
   source: z.string().optional(),
   tags: z.array(z.string()).optional(),
 });
@@ -30,7 +30,7 @@ const contextDisambiguateSchema = z.object({
   history: z.array(z.object({ role: z.string(), content: z.string() })).optional(),
   productContext: z.record(z.unknown()).optional(),
 });
-const paramsWithTaskId = z.object({ taskId: z.string().min(1) });
+const paramsWithTaskId = z.object({ taskId: z.string().min(1).max(50) });
 const contextSummarizeSchema = z.object({
   history: z.array(z.object({ role: z.string(), content: z.string() })).optional(),
 });
@@ -61,7 +61,7 @@ const contentGenerateSchema = z.object({
   model: z.string().optional(),
 });
 const guardCheckTextSchema = z.object({
-  text: z.string().min(1),
+  text: z.string().min(1).max(5000),
   options: z.record(z.unknown()).optional(),
 });
 const guardCheckImageSchema = z.object({

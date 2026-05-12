@@ -14,7 +14,7 @@ router.use(authMiddleware);
 
 const submitSchema = z.object({
   workId: z.number().int().positive(),
-  platforms: z.array(z.string().min(1)).min(1, '请至少选择一个目标平台'),
+  platforms: z.array(z.string().min(1).max(50)).min(1, '请至少选择一个目标平台'),
   title: z.string().max(200).optional(),
   description: z.string().max(2000).optional(),
   tags: z.array(z.string()).max(20).optional(),

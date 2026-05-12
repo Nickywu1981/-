@@ -9,7 +9,7 @@ const router = Router();
 
 const faqSchema = z.object({
   title: z.string().min(1, '标题不能为空').max(200),
-  content: z.string().min(1, '内容不能为空'),
+  content: z.string().min(1, '内容不能为空').max(50000),
   category: z.string().max(50).optional(),
   sortOrder: z.coerce.number().int().min(0).optional(),
 });

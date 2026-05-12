@@ -31,7 +31,7 @@ const modelConfigSchema = z.object({
   vendor: z.string().min(1).max(50),
   category: z.enum(['image', 'video', 'text', 'audio', 'multimodal', 'custom']),
   endpoint: z.string().url('请输入有效URL'),
-  api_key: z.string().min(1, '请提供API密钥'),
+  api_key: z.string().min(1, '请提供API密钥').max(500),
   model_id: z.string().max(100).optional().default(''),
   max_tokens: z.number().int().min(1).max(1000000).optional().default(4096),
   priority: z.number().int().min(0).max(999).optional().default(0),

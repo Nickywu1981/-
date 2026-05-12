@@ -14,7 +14,7 @@ const createOrderSchema = z.object({
 });
 
 const reqsnParamSchema = z.object({
-  reqsn: z.string().min(1, '缺少订单号'),
+  reqsn: z.string().min(1, '缺少订单号').max(50),
 });
 
 // 公开

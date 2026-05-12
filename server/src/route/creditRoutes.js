@@ -8,12 +8,12 @@ import { z } from 'zod';
 const router = Router();
 
 const freezeSchema = z.object({
-  requestId: z.string().min(1, 'requestId 不能为空'),
-  action: z.string().min(1, 'action 不能为空'),
+  requestId: z.string().min(1, 'requestId 不能为空').max(50),
+  action: z.string().min(1, 'action 不能为空').max(30),
   batchCount: z.coerce.number().int().min(1).optional(),
   isNight: z.coerce.boolean().optional(),
 });
-const confirmSchema = z.object({ requestId: z.string().min(1, 'requestId 不能为空') });
+const confirmSchema = z.object({ requestId: z.string().min(1, 'requestId 不能为空').max(50) });
 const rollbackSchema = z.object({
   requestId: z.string().optional(),
   recordId: idSchema.optional(),

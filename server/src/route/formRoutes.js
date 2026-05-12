@@ -16,10 +16,10 @@ const createFormSchema = z.object({
   formCode: z.string().min(1, '编码不能为空').max(50).regex(/^[a-z0-9_-]+$/, '编码仅允许小写字母、数字、下划线、连字符'),
   description: z.string().optional(),
   fields: z.array(z.object({
-    field_name: z.string().min(1).optional(),
-    name: z.string().min(1).optional(),
-    field_label: z.string().min(1).optional(),
-    label: z.string().min(1).optional(),
+    field_name: z.string().min(1).max(50).optional(),
+    name: z.string().min(1).max(50).optional(),
+    field_label: z.string().min(1).max(100).optional(),
+    label: z.string().min(1).max(100).optional(),
     field_type: z.enum(['text','textarea','select','radio','checkbox','date','file','email','phone','number','cascade']).optional(),
     type: z.enum(['text','textarea','select','radio','checkbox','date','file','email','phone','number','cascade']).optional(),
     is_required: z.boolean().optional(),
@@ -39,8 +39,8 @@ const submitFormSchema = z.object({
 
 const upsertFieldsSchema = z.object({
   fields: z.array(z.object({
-    field_name: z.string().min(1),
-    field_label: z.string().min(1),
+    field_name: z.string().min(1).max(50),
+    field_label: z.string().min(1).max(100),
     field_type: z.enum(['text','textarea','select','radio','checkbox','date','file','email','phone','number','cascade']),
   })).min(1),
 });
