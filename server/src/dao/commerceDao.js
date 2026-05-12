@@ -64,7 +64,56 @@ export async function getDashboardStats() {
     ),
   ]);
 
-  return { userCount, taskCount, todayTaskCount, paidUserCount, totalRevenue: Math.abs(totalRevenue), taskTrend, userTrend, revenueTrend };
+  // 任务类型分布（饼图）
+  const [taskDistribution] = await pool.execute(
+    `SELECT t.type, COUNT(*) AS count FROM task t
+     WHERE t.create_time >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+     GROUP BY t.type ORDER BY count DESC`,
+  );
+  const typeLabelMap = {
+    main_image: '主图', scene: '场景', detail_h5: '详情页', virtual_tryon: '虚拟试穿',
+    color_swap: '换色', style_transfer: '风格迁移', image_translate: '图片翻译',
+    img2video: '图生视频', multi2video: '多图生视频', video_packaging: '视频打包',
+    action_transfer: '动作迁移', person_replace: '人物替换', digital_human: '数字人',
+    action_batch: '批量动作', video_beautify: '视频美化', batch: '批量任务', other: '其他',
+  };
+  const colorPalette = ['#3B82F6', '#22C55E', '#F59E0B', '#7C3AED', '#EC4899', '#06B6D4', '#F97316', '#8B5CF6', '#14B8A6', '#E11D48'];
+  const dist = (taskDistribution || []).map((r, i) => ({
+    label: typeLabelMap[r.type] || r.type || '其他',
+    value: Number(r.count),
+    color: colorPalette[i % colorPalette.length],
+  }));
+
+  // 热门功能（30天任务类型 Top 5）
+  const popularFeatures = (taskDistribution || []).slice(0, 5).map(r => ({
+    label: typeLabelMap[r.type] || r.type || '其他',
+    value: Number(r.count),
+  }));
+
+  // 模型用量分布（30天）
+  const [modelUsage] = await pool.execute(
+    `SELECT model_name, COUNT(*) AS count, COALESCE(SUM(total_tokens), 0) AS tokens
+     FROM ai_call_log WHERE create_time >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+     GROUP BY model_name ORDER BY tokens DESC`,
+  );
+  const modelColorMap = { 'gpt-4o': '#7C3AED', 'gpt-4o-mini': '#A78BFA', 'claude': '#3B82F6', 'claude-3': '#60A5FA',
+    'gpt-image-2': '#22C55E', 'sd': '#F97316', 'stability': '#F59E0B', 'sd-xl': '#EC4899',
+    'cogvideo': '#06B6D4', 'seedance': '#8B5CF6', 'edge-tts': '#14B8A6',
+  };
+  const models = (modelUsage || []).map(r => ({
+    label: r.model_name || 'unknown',
+    value: Number(r.count),
+    tokens: Number(r.tokens),
+    color: modelColorMap[r.model_name] || '#94A3B8',
+  }));
+
+  return {
+    userCount, taskCount, todayTaskCount, paidUserCount, totalRevenue: Math.abs(totalRevenue),
+    taskTrend, userTrend, revenueTrend,
+    taskDistribution: dist.length ? dist : undefined,
+    popularFeatures: popularFeatures.length ? popularFeatures : undefined,
+    modelUsage: models.length ? models : undefined,
+  };
 }
 
 // ==================== 用户管理 ====================

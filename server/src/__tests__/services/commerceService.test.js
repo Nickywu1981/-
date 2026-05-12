@@ -70,6 +70,8 @@ describe('commerceService', () => {
       mockExecute.mockResolvedValueOnce([[]]);
       mockExecute.mockResolvedValueOnce([[]]);
       mockExecute.mockResolvedValueOnce([[]]);
+      mockExecute.mockResolvedValueOnce([[]]); // taskDistribution + popularFeatures
+      mockExecute.mockResolvedValueOnce([[]]); // modelUsage
       const r = await commerceService.getDashboardStats();
       expect(r.userCount).toBe(100);
       expect(r.totalRevenue).toBe(2990);

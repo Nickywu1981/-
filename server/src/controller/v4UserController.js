@@ -6,80 +6,48 @@ import { wrapController } from '../utils/wrapController.js';
 import { success } from '../utils/response.js';
 import { BusinessError } from '../utils/businessError.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
-import db from '../dao/db.js';
+import * as userDao from '../dao/userDao.js';
 import membershipDao from '../dao/membershipDao.js';
 
 export const getProfile = wrapController(async (req, res) => {
-  const conn = await db.getConnection();
-  try {
-    const [users] = await conn.query(
-      'SELECT id, nickname, phone, email, avatar_url, role, created_at FROM `users` WHERE id = ?',
-      [req.user.id],
-    );
-    if (users.length === 0) throw new BusinessError(ERROR_CODE.NOT_FOUND, '用户不存在');
+  const user = await userDao.findById(req.user.id);
+  if (!user) throw new BusinessError(ERROR_CODE.NOT_FOUND, '用户不存在');
 
-    const [membership] = await conn.query(
-      'SELECT plan_type, credit_balance, start_time, end_time, auto_renew FROM user_membership WHERE user_id = ? AND is_deleted = 0',
-      [req.user.id],
-    );
+  const m = await membershipDao.findByUserId(req.user.id);
 
-    return success(res, {
-      ...users[0],
-      plan_type: membership[0]?.plan_type || 0,
-      credit_balance: membership[0]?.credit_balance || 0,
-      start_time: membership[0]?.start_time,
-      end_time: membership[0]?.end_time,
-      auto_renew: membership[0]?.auto_renew || 0,
-      role: req.user.role,
-    });
-  } finally {
-    conn.release();
-  }
+  return success(res, {
+    id: user.id,
+    nickname: user.nickname,
+    phone: user.phone,
+    email: user.email,
+    avatar_url: user.avatar,
+    role: user.role,
+    created_at: user.create_time,
+    plan_type: m?.plan_type || 0,
+    credit_balance: m?.credit_balance || 0,
+    start_time: m?.start_time,
+    end_time: m?.end_time,
+    auto_renew: m?.auto_renew || 0,
+  });
 });
 
 export const getStats = wrapController(async (req, res) => {
-  const conn = await db.getConnection();
-  try {
-    const [[{ todayTasks }]] = await conn.query(
-      'SELECT COUNT(*) as todayTasks FROM job_queue WHERE user_id = ? AND DATE(created_at) = CURDATE()',
-      [req.user.id],
-    );
-    const [[{ totalTasks }]] = await conn.query(
-      'SELECT COUNT(*) as totalTasks FROM job_queue WHERE user_id = ?',
-      [req.user.id],
-    );
-    const [[{ thisMonthConsumed }]] = await conn.query(
-      `SELECT COALESCE(SUM(consumed), 0) as thisMonthConsumed FROM consumption_record
-       WHERE user_id = ? AND DATE_FORMAT(create_time, '%Y-%m') = DATE_FORMAT(CURDATE(), '%Y-%m')`,
-      [req.user.id],
-    );
-    return success(res, { todayTasks, totalTasks, thisMonthConsumed });
-  } finally {
-    conn.release();
-  }
+  // Aggregate stats across job_queue + consumption_record — no dedicated DAO yet
+  const stats = await userDao.getUserStats(req.user.id);
+  return success(res, stats);
 });
 
 export const updateProfile = wrapController(async (req, res) => {
   const { nickname, phone, email } = req.validated;
-  const updates = [];
-  const params = [];
+  const fields = {};
+  if (nickname !== undefined) fields.nickname = nickname;
+  if (phone !== undefined) fields.phone = phone || null;
+  if (email !== undefined) fields.email = email || null;
 
-  if (nickname !== undefined) { updates.push('nickname = ?'); params.push(nickname); }
-  if (phone !== undefined) { updates.push('phone = ?'); params.push(phone || null); }
-  if (email !== undefined) { updates.push('email = ?'); params.push(email || null); }
+  if (Object.keys(fields).length === 0) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '无更新字段');
 
-  if (updates.length === 0) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '无更新字段');
-
-  const conn = await db.getConnection();
-  try {
-    await conn.query(
-      `UPDATE \`users\` SET ${updates.join(', ')} WHERE id = ?`,
-      [...params, req.user.id],
-    );
-    return success(res, {}, '资料已更新');
-  } finally {
-    conn.release();
-  }
+  await userDao.updateUser(req.user.id, fields);
+  return success(res, {}, '资料已更新');
 });
 
 export const changePassword = wrapController(async (req, res) => {
