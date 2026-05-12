@@ -9,9 +9,11 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { validate } from '../utils/validate.js';
+import { heavyLimiter } from '../middleware/rateLimiter.js';
 import * as ctrl from '../controller/aiAssistantController.js';
 
 const router = Router();
+router.use(heavyLimiter);
 
 const questionSchema = z.object({
   question: z.string().min(1).max(500),
