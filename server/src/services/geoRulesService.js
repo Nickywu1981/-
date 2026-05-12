@@ -1,5 +1,6 @@
 import * as geoRulesDao from '../dao/geoRulesDao.js';
 import logger from '../utils/logger.js';
+import { BusinessError } from '../utils/businessError.js';
 
 export async function listRules() {
   return geoRulesDao.listAll();
@@ -7,7 +8,7 @@ export async function listRules() {
 
 export async function getRule(id) {
   const rule = await geoRulesDao.getById(id);
-  if (!rule) throw Object.assign(new Error('GEO rule not found'), { status: 404 });
+  if (!rule) throw new BusinessError(404, 'GEO rule not found');
   return rule;
 }
 
@@ -19,14 +20,14 @@ export async function createRule(data) {
 
 export async function updateRule(id, data) {
   const affected = await geoRulesDao.update(id, data);
-  if (affected === 0) throw Object.assign(new Error('GEO rule not found'), { status: 404 });
+  if (affected === 0) throw new BusinessError(404, 'GEO rule not found');
   logger.info('[GEO] Rule updated', { id });
   return { affected };
 }
 
 export async function deleteRule(id) {
   const affected = await geoRulesDao.remove(id);
-  if (affected === 0) throw Object.assign(new Error('GEO rule not found'), { status: 404 });
+  if (affected === 0) throw new BusinessError(404, 'GEO rule not found');
   logger.info('[GEO] Rule deleted', { id });
   return { affected };
 }
