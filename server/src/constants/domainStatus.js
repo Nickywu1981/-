@@ -6,8 +6,9 @@
 // ========== 用户状态 ==========
 
 export const USER_STATUS = {
-  DISABLED: 0,
-  ACTIVE: 1,
+  DISABLED: 'disabled',
+  ACTIVE: 'active',
+  DELETED: 'deleted',
 };
 
 // ========== 订单/支付状态 ==========
