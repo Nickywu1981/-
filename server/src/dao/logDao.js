@@ -185,3 +185,13 @@ export async function listGeneratedVideos(userId, { page = 1, pageSize = 20 }) {
   );
   return { list: rows, total };
 }
+
+// ==================== content_audit_log ====================
+
+export async function insertContentAuditLog({ userId, jobId, auditStage, contentType, originalText, riskLevel, riskTags, action }) {
+  const [r] = await pool.query(
+    'INSERT INTO ?? (user_id, job_id, audit_stage, content_type, original_text, risk_level, risk_tags, action) VALUES (?,?,?,?,?,?,?,?)',
+    ['content_audit_log', userId, jobId, auditStage, contentType, originalText?.substring?.(0, 2000) || originalText, riskLevel, JSON.stringify(riskTags || []), action],
+  );
+  return r.insertId;
+}

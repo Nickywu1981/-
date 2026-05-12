@@ -4,7 +4,7 @@
  * 三通道审核: 文本(通义千问 moderation) + 图片(阿里绿网) + 视频(截图帧)
  * W1 MVP: 基础敏感词过滤, 后续接入外部API
  */
-import db from '../dao/db.js';
+import { insertContentAuditLog } from '../dao/logDao.js';
 
 /**
  * 文本审核
@@ -29,17 +29,10 @@ export async function moderateText(text, userId, options = {}) {
     }
   }
 
-  // 写入审核日志
-  const conn = await db.getConnection();
-  try {
-    await conn.query(
-      `INSERT INTO content_audit_log (user_id, job_id, audit_stage, content_type, original_text, risk_level, risk_tags, action)
-       VALUES (?, ?, ?, 'text', ?, ?, ?, ?)`,
-      [userId, jobId, stage, text.substring(0, 2000), riskLevel, JSON.stringify(riskTags), action],
-    );
-  } finally {
-    conn.release();
-  }
+  await insertContentAuditLog({
+    userId, jobId, auditStage: stage, contentType: 'text',
+    originalText: text, riskLevel, riskTags, action,
+  });
 
   return { risk_level: riskLevel, action, risk_tags: riskTags };
 }
@@ -49,19 +42,10 @@ export async function moderateText(text, userId, options = {}) {
  */
 export async function moderateImage(imageUrl, userId, options = {}) {
   const { stage = 'output', jobId = null } = options;
-  // W2: 调用阿里云绿网 API
-  // W1: 默认通过，记录日志
-  const conn = await db.getConnection();
-  try {
-    await conn.query(
-      `INSERT INTO content_audit_log (user_id, job_id, audit_stage, content_type, original_text, risk_level, action)
-       VALUES (?, ?, ?, 'image', ?, 'safe', 'pass')`,
-      [userId, jobId, stage, imageUrl],
-    );
-  } finally {
-    conn.release();
-  }
-
+  await insertContentAuditLog({
+    userId, jobId, auditStage: stage, contentType: 'image',
+    originalText: imageUrl, riskLevel: 'safe', riskTags: [], action: 'pass',
+  });
   return { risk_level: 'safe', action: 'pass' };
 }
 
@@ -70,18 +54,9 @@ export async function moderateImage(imageUrl, userId, options = {}) {
  */
 export async function moderateVideo(videoUrl, userId, options = {}) {
   const { stage = 'output', jobId = null } = options;
-  // W2: 截图帧 + moderateImage 流水线
-  // W1: 默认通过
-  const conn = await db.getConnection();
-  try {
-    await conn.query(
-      `INSERT INTO content_audit_log (user_id, job_id, audit_stage, content_type, original_text, risk_level, action)
-       VALUES (?, ?, ?, 'video', ?, 'safe', 'pass')`,
-      [userId, jobId, stage, videoUrl],
-    );
-  } finally {
-    conn.release();
-  }
-
+  await insertContentAuditLog({
+    userId, jobId, auditStage: stage, contentType: 'video',
+    originalText: videoUrl, riskLevel: 'safe', riskTags: [], action: 'pass',
+  });
   return { risk_level: 'safe', action: 'pass' };
 }
