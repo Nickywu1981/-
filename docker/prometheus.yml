@@ -1,0 +1,60 @@
+# =================================================
+# Prometheus 配置 — Movio AI 监控
+# 暴露端口: 9090
+# =================================================
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: movio-ai
+    env: production
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+rule_files: []
+
+scrape_configs:
+  # Express API 服务
+  - job_name: movio-server
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - host.docker.internal:3001
+        labels:
+          service: api-server
+
+  # Nuxt 前端
+  - job_name: movio-client
+    static_configs:
+      - targets:
+          - host.docker.internal:3000
+        labels:
+          service: nuxt-client
+
+  # MySQL
+  - job_name: mysql
+    static_configs:
+      - targets:
+          - host.docker.internal:9104
+        labels:
+          service: mysql
+
+  # Redis
+  - job_name: redis
+    static_configs:
+      - targets:
+          - host.docker.internal:9121
+        labels:
+          service: redis
+
+  # Node Exporter（宿主机指标）
+  - job_name: node
+    static_configs:
+      - targets:
+          - host.docker.internal:9100
+        labels:
+          service: node-exporter
