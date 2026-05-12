@@ -1,4 +1,5 @@
 import { BusinessError } from './businessError.js';
+import logger from './logger.js';
 import { uploadConfig } from '../config/index.js';
 
 /**
@@ -202,7 +203,7 @@ export async function completeUpload(uploadId) {
   try {
     await validateFileMagic(finalPath, extClean);
   } catch {
-    await fsp.unlink(finalPath).catch(() => {}); // 清理问题文件
+    await fsp.unlink(finalPath).catch(err => logger.warn('[FileUpload] 魔数校验清理失败:', err.message)); // 清理问题文件
     throw new BusinessError(400, `文件内容与声明的类型 (${extClean}) 不匹配，已删除`);
   }
 

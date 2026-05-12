@@ -6,6 +6,7 @@
  */
 // dotenv 由 config/index.js 负责加载
 import logger from '../utils/logger.js';
+import { BusinessError } from '../utils/businessError.js';
 import config, { workerConfig } from '../config/index.js';
 import { validateStartupConfig } from '../utils/startupGuard.js';
 import * as jobQueueService from '../services/job-queue.service.js';
@@ -142,7 +143,7 @@ async function processLongImageJob(job, params) {
       const imgUrl = genResult?.images?.[0]?.url || genResult?.file_url || genResult?.url;
       if (imgUrl) {
         const resp = await fetch(imgUrl);
-        if (!resp.ok) throw new Error(`下载场景图失败: HTTP ${resp.status}`);
+        if (!resp.ok) throw new BusinessError(500, `下载场景图失败: HTTP ${resp.status}`);
         const buf = Buffer.from(await resp.arrayBuffer());
         imageBuffers.push(buf);
       }
