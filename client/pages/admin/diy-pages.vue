@@ -1,28 +1,28 @@
 <template>
   <AdminLayout>
     <div class="page-header">
-      <h1>DIY 页面管理</h1>
-      <button class="btn-primary" @click="openCreate">+ 新建页面</button>
+      <h1>{{ $t('admin_diy_pages.page_title') }}</h1>
+      <button class="btn-primary" @click="openCreate">+ {{ $t('admin_diy_pages.new_page') }}</button>
     </div>
 
     <div class="toolbar">
-      <input v-model="keyword" class="input-search" placeholder="搜索标题 / 标识" @keyup.enter="search" />
-      <select v-model="filterType" class="sel" @change="search">
-        <option value="">全部类型</option>
-        <option value="landing">落地页</option>
-        <option value="detail">详情页</option>
-        <option value="activity">活动页</option>
-        <option value="custom">自定义</option>
+      <input v-model="keyword" class="input-search" :placeholder="$t('admin_diy_pages.search_placeholder')" @keyup.enter="search" :aria-label="$t('admin_diy_pages.search_placeholder')" />
+      <select v-model="filterType" class="sel" @change="search" :aria-label="$t('admin_diy_pages.col_type')">
+        <option value="">{{ $t('admin_diy_pages.all_types') }}</option>
+        <option value="landing">{{ $t('admin_diy_pages.type_landing') }}</option>
+        <option value="detail">{{ $t('admin_diy_pages.type_detail') }}</option>
+        <option value="activity">{{ $t('admin_diy_pages.type_activity') }}</option>
+        <option value="custom">{{ $t('admin_diy_pages.type_custom') }}</option>
       </select>
-      <select v-model="filterStatus" class="sel" @change="search">
-        <option value="">全部状态</option>
-        <option value="1">已发布</option>
-        <option value="0">草稿</option>
+      <select v-model="filterStatus" class="sel" @change="search" :aria-label="$t('admin_diy_pages.all_statuses')">
+        <option value="">{{ $t('admin_diy_pages.all_statuses') }}</option>
+        <option value="1">{{ $t('admin_diy_pages.status_published') }}</option>
+        <option value="0">{{ $t('admin_diy_pages.status_draft') }}</option>
       </select>
       <div v-if="selectedIds.length > 0" class="batch-actions">
-        <button class="btn-batch" @click="batchPublish">批量发布</button>
-        <button class="btn-batch" @click="batchUnpublish">批量下架</button>
-        <button class="btn-batch btn-danger" @click="batchDelete">批量删除</button>
+        <button class="btn-batch" @click="batchPublish">{{ $t('admin_diy_pages.batch_publish') }}</button>
+        <button class="btn-batch" @click="batchUnpublish">{{ $t('admin_diy_pages.batch_unpublish') }}</button>
+        <button class="btn-batch btn-danger" @click="batchDelete">{{ $t('admin_diy_pages.batch_delete') }}</button>
       </div>
     </div>
 
@@ -31,15 +31,15 @@
     <div v-else-if="error" class="error-state">
       <span class="error-icon">⚠️</span>
       <p>{{ error }}</p>
-      <button class="retry-btn" @click="fetchData">重试</button>
+      <button class="retry-btn" @click="fetchData">{{ $t('common.retry') }}</button>
     </div>
 
     <div class="table-wrap" v-else-if="list.length">
       <table class="table">
         <thead>
           <tr>
-            <th class="col-cb"><input type="checkbox" :checked="allSelected" @change="toggleAll" /></th>
-            <th>ID</th><th>标题</th><th>Slug</th><th>类型</th><th>状态</th><th>更新时间</th><th>操作</th>
+            <th class="col-cb"><input type="checkbox" :checked="allSelected" @change="toggleAll" :aria-label="$t('common.action')" /></th>
+            <th>ID</th><th>{{ $t('admin_diy_pages.col_title') }}</th><th>{{ $t('admin_diy_pages.col_slug') }}</th><th>{{ $t('admin_diy_pages.col_type') }}</th><th>{{ $t('common.status') }}</th><th>{{ $t('admin_diy_pages.col_update_time') }}</th><th>{{ $t('common.action') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -50,44 +50,44 @@
             <td><code class="slug">{{ p.slug }}</code></td>
             <td>{{ p.page_type || '-' }}</td>
             <td>
-              <span v-if="p.is_published || p.status === 1" class="badge-success">已发布</span>
-              <span v-else class="badge-draft">草稿</span>
+              <span v-if="p.is_published || p.status === 1" class="badge-success">{{ $t('admin_diy_pages.status_published') }}</span>
+              <span v-else class="badge-draft">{{ $t('admin_diy_pages.status_draft') }}</span>
             </td>
             <td>{{ formatDate(p.updated_at || p.update_time) }}</td>
             <td class="actions">
-              <a :href="`/diy/editor?id=${p.id}`" class="btn-sm" target="_blank" rel="noopener noreferrer">编辑</a>
-              <a :href="`/diy/preview?slug=${p.slug}`" class="btn-sm" target="_blank" rel="noopener noreferrer">预览</a>
-              <button class="btn-sm" @click="toggleStatus(p)">{{ (p.is_published || p.status === 1) ? '下架' : '发布' }}</button>
-              <button class="btn-sm btn-danger" @click="deleteItem(p.id)">删除</button>
+              <a :href="`/diy/editor?id=${p.id}`" class="btn-sm" target="_blank" rel="noopener noreferrer" :aria-label="$t('admin_diy_pages.edit')">{{ $t('admin_diy_pages.edit') }}</a>
+              <a :href="`/diy/preview?slug=${p.slug}`" class="btn-sm" target="_blank" rel="noopener noreferrer" :aria-label="$t('admin_diy_pages.preview')">{{ $t('admin_diy_pages.preview') }}</a>
+              <button class="btn-sm" @click="toggleStatus(p)" :aria-label="(p.is_published || p.status === 1) ? $t('admin_diy_pages.unpublish') : $t('admin_diy_pages.publish')">{{ (p.is_published || p.status === 1) ? $t('admin_diy_pages.unpublish') : $t('admin_diy_pages.publish') }}</button>
+              <button class="btn-sm btn-danger" @click="deleteItem(p.id)" :aria-label="$t('admin_diy_pages.delete')">{{ $t('admin_diy_pages.delete') }}</button>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
-    <EmptyState v-else icon="📄" title="暂无 DIY 页面" description="创建您的第一个自定义页面" action-label="新建页面" @action="openCreate" />
+    <EmptyState v-else :icon="$t('admin_diy_pages.empty_icon')" :title="$t('admin_diy_pages.empty_title')" :description="$t('admin_diy_pages.empty_desc')" :action-label="$t('admin_diy_pages.empty_action')" @action="openCreate" />
 
     <Pagination v-if="total > pageSize" :page="page" :page-size="pageSize" :total="total" @change="onPageChange" />
 
     <Teleport to="body">
       <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
         <div class="modal">
-          <h3>{{ editing ? '编辑页面' : '新建页面' }}</h3>
+          <h3>{{ editing ? $t('admin_diy_pages.edit_modal') : $t('admin_diy_pages.create_modal') }}</h3>
           <div class="form-grid">
-            <label class="full">标题 <input v-model="editForm.title" maxlength="100" class="input" placeholder="页面标题" /></label>
-            <label>标识(Slug) <input v-model="editForm.slug" maxlength="50" class="input" placeholder="my-page" :disabled="!!editing" /></label>
-            <label>类型
+            <label class="full">{{ $t('admin_diy_pages.label_title') }} <input v-model="editForm.title" maxlength="100" class="input" :placeholder="$t('admin_diy_pages.title_placeholder')" /></label>
+            <label>{{ $t('admin_diy_pages.label_slug') }} <input v-model="editForm.slug" maxlength="50" class="input" :placeholder="$t('admin_diy_pages.slug_placeholder')" :disabled="!!editing" /></label>
+            <label>{{ $t('admin_diy_pages.label_type') }}
               <select v-model="editForm.pageType" class="input" :disabled="!!editing">
-                <option value="landing">落地页</option>
-                <option value="detail">详情页</option>
-                <option value="activity">活动页</option>
-                <option value="custom">自定义</option>
+                <option value="landing">{{ $t('admin_diy_pages.type_landing') }}</option>
+                <option value="detail">{{ $t('admin_diy_pages.type_detail') }}</option>
+                <option value="activity">{{ $t('admin_diy_pages.type_activity') }}</option>
+                <option value="custom">{{ $t('admin_diy_pages.type_custom') }}</option>
               </select>
             </label>
           </div>
-          <div class="form-group"><label>描述</label><textarea v-model="editForm.description" maxlength="500" class="input" rows="2" /></div>
+          <div class="form-group"><label>{{ $t('admin_diy_pages.label_desc') }}</label><textarea v-model="editForm.description" maxlength="500" class="input" rows="2" /></div>
           <div class="modal-actions">
-            <button class="btn-cancel" @click="showModal = false">取消</button>
-            <button class="btn-save" :disabled="saving" @click="save">{{ saving ? '保存中...' : '保存' }}</button>
+            <button class="btn-cancel" @click="showModal = false">{{ $t('common.cancel') }}</button>
+            <button class="btn-save" :disabled="saving" @click="save">{{ saving ? $t('common.saving') : $t('common.save') }}</button>
           </div>
         </div>
       </div>
@@ -97,6 +97,7 @@
 
 <script setup lang="ts">
 
+const { t } = useI18n()
 const { confirm } = useConfirm()
 import { formatDate } from '~/utils/format'
 
@@ -142,7 +143,7 @@ async function fetchData() {
     if (!Array.isArray(list.value)) list.value = []
     total.value = data?.data?.total || list.value.length
   } catch (e: any) {
-    error.value = e?.data?.msg || e.message || '加载失败'
+    error.value = e?.data?.msg || e.message || t('admin_diy_pages.load_failed')
     toast.error(error.value)
   } finally {
     loading.value = false
@@ -164,7 +165,7 @@ async function save() {
       }
     }
     showModal.value = false; fetchData()
-  } catch (e: any) { toast.error(e?.data?.msg || '保存失败') }
+  } catch (e: any) { toast.error(e?.data?.msg || t('admin_diy_pages.save_failed')) }
   saving.value = false
 }
 
@@ -177,44 +178,44 @@ async function toggleStatus(p: any) {
       await $fetch(`/api/diy/${p.id}/publish`, { method: 'POST', credentials: 'include' })
     }
     fetchData()
-  } catch (e: any) { toast.error(e?.data?.msg || '操作失败') }
+  } catch (e: any) { toast.error(e?.data?.msg || t('admin_diy_pages.op_failed')) }
 }
 
 async function deleteItem(id: number) {
-  if (!await confirm({ message: '确定删除？此操作不可恢复。'} )) return
+  if (!await confirm({ message: t('admin_diy_pages.delete_confirm') })) return
   try {
     await $fetch(`/api/diy/${id}/hard-delete`, { method: 'DELETE', credentials: 'include' })
     selectedIds.value = selectedIds.value.filter(i => i !== id)
     fetchData()
-  } catch (e: any) { toast.error(e?.data?.msg || '删除失败') }
+  } catch (e: any) { toast.error(e?.data?.msg || t('common.delete_failed')) }
 }
 
 async function batchPublish() {
   if (!selectedIds.value.length) return
   try {
     await $fetch('/api/diy/batch/publish', { method: 'POST', credentials: 'include', body: { ids: selectedIds.value } })
-    toast.success(`已发布 ${selectedIds.value.length} 个页面`)
+    toast.success(t('admin_diy_pages.batch_publish_success', { count: selectedIds.value.length }))
     selectedIds.value = []; fetchData()
-  } catch (e: any) { toast.error(e?.data?.msg || '批量发布失败') }
+  } catch (e: any) { toast.error(e?.data?.msg || t('admin_diy_pages.batch_publish_failed')) }
 }
 
 async function batchUnpublish() {
   if (!selectedIds.value.length) return
   try {
     await $fetch('/api/diy/batch/unpublish', { method: 'POST', credentials: 'include', body: { ids: selectedIds.value } })
-    toast.success(`已下架 ${selectedIds.value.length} 个页面`)
+    toast.success(t('admin_diy_pages.batch_unpublish_success', { count: selectedIds.value.length }))
     selectedIds.value = []; fetchData()
-  } catch (e: any) { toast.error(e?.data?.msg || '批量下架失败') }
+  } catch (e: any) { toast.error(e?.data?.msg || t('admin_diy_pages.batch_unpublish_failed')) }
 }
 
 async function batchDelete() {
   if (!selectedIds.value.length) return
-  if (!await confirm({ message: `确认删除 ${selectedIds.value.length} 个页面？此操作不可恢复。`} )) return
+  if (!await confirm({ message: t('admin_diy_pages.batch_delete_confirm', { count: selectedIds.value.length }) })) return
   try {
     await $fetch('/api/diy/batch/delete', { method: 'POST', credentials: 'include', body: { ids: selectedIds.value } })
-    toast.success(`已删除 ${selectedIds.value.length} 个页面`)
+    toast.success(t('admin_diy_pages.batch_delete_success', { count: selectedIds.value.length }))
     selectedIds.value = []; fetchData()
-  } catch (e: any) { toast.error(e?.data?.msg || '批量删除失败') }
+  } catch (e: any) { toast.error(e?.data?.msg || t('admin_diy_pages.batch_delete_failed')) }
 }
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>

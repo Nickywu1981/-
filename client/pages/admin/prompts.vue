@@ -1,18 +1,26 @@
 <template>
   <AdminLayout>
-    <h2 class="ptitle">提示词模板管理</h2>
+    <h2 class="ptitle">{{ $t('admin_prompts.page_title') }}</h2>
 
     <div class="toolbar">
-      <input v-model="keyword" type="text" placeholder="搜索模板标题" @keyup.enter="fetchData" />
+      <input v-model="keyword" type="text" :placeholder="$t('admin_prompts.search_placeholder')" @keyup.enter="fetchData" />
       <select v-model="filterCategory" class="sel" @change="fetchData">
-        <option value="">全部分类</option>
-        <option value="main_image">主图</option><option value="scene">场景</option><option value="video">视频</option><option value="script">口播脚本</option><option value="copy">营销文案</option><option value="viral-clone">爆款复刻</option>
+        <option value="">{{ $t('admin_prompts.all_categories') }}</option>
+        <option value="main_image">{{ $t('admin_prompts.category_main_image') }}</option>
+        <option value="scene">{{ $t('admin_prompts.category_scene') }}</option>
+        <option value="video">{{ $t('admin_prompts.category_video') }}</option>
+        <option value="script">{{ $t('admin_prompts.category_script') }}</option>
+        <option value="copy">{{ $t('admin_prompts.category_copy') }}</option>
+        <option value="viral-clone">{{ $t('admin_prompts.category_viral_clone') }}</option>
       </select>
       <select v-model="filterStatus" class="sel" @change="fetchData">
-        <option value="">全部状态</option>
-        <option value="0">草稿</option><option value="1">待审核</option><option value="2">已上架</option><option value="3">已下架</option>
+        <option value="">{{ $t('admin_prompts.all_statuses') }}</option>
+        <option value="0">{{ $t('admin_prompts.status_draft') }}</option>
+        <option value="1">{{ $t('admin_prompts.status_pending') }}</option>
+        <option value="2">{{ $t('admin_prompts.status_active') }}</option>
+        <option value="3">{{ $t('admin_prompts.status_offline') }}</option>
       </select>
-      <button class="btn btn-primary" @click="openCreate">+ 新建模板</button>
+      <button class="btn btn-primary" @click="openCreate">{{ $t('admin_prompts.new_template') }}</button>
     </div>
 
     <LoadingSkeleton v-if="loading" type="table" :rows="5" :cols="8" />
@@ -20,7 +28,16 @@
     <div class="table-wrap" v-else-if="list.length">
     <table class="table">
       <thead>
-        <tr><th>ID</th><th>编码</th><th>标题</th><th>分类</th><th>状态</th><th>使用次数</th><th>创建时间</th><th>操作</th></tr>
+        <tr>
+          <th>{{ $t('id') }}</th>
+          <th>{{ $t('admin_prompts.col_code') }}</th>
+          <th>{{ $t('admin_prompts.col_title') }}</th>
+          <th>{{ $t('admin_prompts.col_category') }}</th>
+          <th>{{ $t('status') }}</th>
+          <th>{{ $t('admin_prompts.col_usage') }}</th>
+          <th>{{ $t('admin_prompts.col_create_time') }}</th>
+          <th>{{ $t('action') }}</th>
+        </tr>
       </thead>
       <tbody>
         <tr v-for="t in list" :key="t.id">
@@ -32,12 +49,12 @@
           <td>{{ t.usage_count }}</td>
           <td>{{ t.create_time?.slice(0, 10) }}</td>
           <td class="actions">
-            <button class="btn-sm" @click="openEdit(t)">编辑</button>
-            <button v-if="t.status === 1" class="btn-sm success" @click="review(t.id, 2)">通过</button>
-            <button v-if="t.status === 1" class="btn-sm danger" @click="review(t.id, 3)">驳回</button>
-            <button v-if="t.status === 2" class="btn-sm warn" @click="review(t.id, 3)">下架</button>
-            <button v-if="t.status === 3" class="btn-sm" @click="review(t.id, 2)">上架</button>
-            <button class="btn-sm danger" @click="confirmDelete(t)">删除</button>
+            <button class="btn-sm" @click="openEdit(t)">{{ $t('edit') }}</button>
+            <button v-if="t.status === 1" class="btn-sm success" @click="review(t.id, 2)">{{ $t('admin_prompts.approve') }}</button>
+            <button v-if="t.status === 1" class="btn-sm danger" @click="review(t.id, 3)">{{ $t('admin_prompts.reject') }}</button>
+            <button v-if="t.status === 2" class="btn-sm warn" @click="review(t.id, 3)">{{ $t('admin_prompts.unpublish') }}</button>
+            <button v-if="t.status === 3" class="btn-sm" @click="review(t.id, 2)">{{ $t('admin_prompts.publish') }}</button>
+            <button class="btn-sm danger" @click="confirmDelete(t)">{{ $t('delete') }}</button>
           </td>
         </tr>
       </tbody>
@@ -45,62 +62,72 @@
     </div>
 
     <Pagination v-if="total > pageSize" :page="page" :page-size="pageSize" :total="total" @change="onPageChange" />
-    <div v-if="!list.length && !loading" class="empty">暂无模板数据</div>
+    <div v-if="!list.length && !loading" class="empty">{{ $t('admin_prompts.empty') }}</div>
 
     <Teleport to="body">
       <div class="modal-overlay" v-if="showModal" @click.self="showModal = false">
         <div class="modal">
-          <h3>{{ editing.id ? '编辑模板' : '新建模板' }}</h3>
+          <h3>{{ editing.id ? $t('admin_prompts.edit_modal') : $t('admin_prompts.create_modal') }}</h3>
           <div class="form-group">
-            <label>标题</label>
-            <input v-model="form.title" maxlength="100" type="text" placeholder="模板标题" />
+            <label>{{ $t('admin_prompts.label_title') }}</label>
+            <input v-model="form.title" maxlength="100" type="text" :placeholder="$t('admin_prompts.title_placeholder')" />
           </div>
           <div class="form-group">
-            <label>描述</label>
-            <input v-model="form.description" maxlength="500" type="text" placeholder="简短描述" />
+            <label>{{ $t('admin_prompts.label_desc') }}</label>
+            <input v-model="form.description" maxlength="500" type="text" :placeholder="$t('admin_prompts.desc_placeholder')" />
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>分类</label>
+              <label>{{ $t('admin_prompts.label_category') }}</label>
               <select v-model="form.category" class="sel">
-                <option value="main_image">主图</option><option value="scene">场景</option><option value="video">视频</option><option value="script">口播脚本</option><option value="copy">营销文案</option><option value="viral-clone">爆款复刻</option>
+                <option value="main_image">{{ $t('admin_prompts.category_main_image') }}</option>
+                <option value="scene">{{ $t('admin_prompts.category_scene') }}</option>
+                <option value="video">{{ $t('admin_prompts.category_video') }}</option>
+                <option value="script">{{ $t('admin_prompts.category_script') }}</option>
+                <option value="copy">{{ $t('admin_prompts.category_copy') }}</option>
+                <option value="viral-clone">{{ $t('admin_prompts.category_viral_clone') }}</option>
               </select>
             </div>
             <div class="form-group">
-              <label>图标</label>
-              <input v-model="form.icon" maxlength="50" type="text" placeholder="star" />
+              <label>{{ $t('admin_prompts.label_icon') }}</label>
+              <input v-model="form.icon" maxlength="50" type="text" :placeholder="$t('admin_prompts.icon_placeholder')" />
             </div>
           </div>
           <div class="form-group">
-            <label>提示词内容（用双大括号包裹变量名做占位符，如 product_name）</label>
-            <textarea v-model="form.content" maxlength="5000" rows="8" placeholder="输入提示词模板内容..."></textarea>
+            <label>{{ $t('admin_prompts.label_content') }}</label>
+            <textarea v-model="form.content" maxlength="5000" rows="8" :placeholder="$t('admin_prompts.content_placeholder')"></textarea>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>模型类型</label>
+              <label>{{ $t('admin_prompts.label_model_type') }}</label>
               <select v-model="form.modelType" class="sel">
-                <option value="text">文本</option><option value="image">图片</option><option value="video">视频</option>
+                <option value="text">{{ $t('admin_prompts.model_text') }}</option>
+                <option value="image">{{ $t('admin_prompts.model_image') }}</option>
+                <option value="video">{{ $t('admin_prompts.model_video') }}</option>
               </select>
             </div>
             <div class="form-group">
-              <label>排序</label>
-              <input v-model.number="form.sortOrder" type="number" placeholder="数字越大越靠前" />
+              <label>{{ $t('admin_prompts.label_sort') }}</label>
+              <input v-model.number="form.sortOrder" type="number" :placeholder="$t('admin_prompts.sort_placeholder')" />
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label><input v-model="form.isPublic" type="checkbox" /> 公开模板</label>
+              <label><input v-model="form.isPublic" type="checkbox" /> {{ $t('admin_prompts.label_public') }}</label>
             </div>
             <div class="form-group">
-              <label>状态</label>
+              <label>{{ $t('admin_prompts.label_status') }}</label>
               <select v-model="form.status" class="sel">
-                <option :value="0">草稿</option><option :value="1">待审核</option><option :value="2">已上架</option><option :value="3">已下架</option>
+                <option :value="0">{{ $t('admin_prompts.status_draft') }}</option>
+                <option :value="1">{{ $t('admin_prompts.status_pending') }}</option>
+                <option :value="2">{{ $t('admin_prompts.status_active') }}</option>
+                <option :value="3">{{ $t('admin_prompts.status_offline') }}</option>
               </select>
             </div>
           </div>
           <div class="modal-actions">
-            <button class="btn" @click="showModal = false">取消</button>
-            <button class="btn btn-primary" @click="save">保存</button>
+            <button class="btn" @click="showModal = false">{{ $t('cancel') }}</button>
+            <button class="btn btn-primary" @click="save">{{ $t('save') }}</button>
           </div>
         </div>
       </div>
@@ -110,6 +137,7 @@
 
 <script setup lang="ts">
 
+const { t } = useI18n()
 const { confirm } = useConfirm()
 const toast = useToast()
 
@@ -141,7 +169,7 @@ async function fetchData() {
     const res = await $fetch(`/api/admin/prompts?${params}`, { credentials: 'include' });
     list.value = (res as any).data?.list || [];
     total.value = (res as any).data?.total || 0;
-  } catch (e: any) { toast.error('加载失败: ' + (e?.data?.msg || e.message || '网络错误')); } finally { loading.value = false; }
+  } catch (e: any) { toast.error(t('admin_prompts.load_failed') + ': ' + (e?.data?.msg || e.message || t('admin_prompts.network_error'))); } finally { loading.value = false; }
 
 }
 
@@ -175,35 +203,47 @@ async function save() {
     });
     showModal.value = false;
     fetchData();
-  } catch (e: any) { toast.error('保存失败: ' + (e?.data?.msg || e.message || '网络错误')); }
+  } catch (e: any) { toast.error(t('admin_prompts.save_failed') + ': ' + (e?.data?.msg || e.message || t('admin_prompts.network_error'))); }
 }
 
 async function review(id: number, status: number) {
-  if (!await confirm({ message: status === 2 ? '确认通过并上架？' : '确认驳回/下架？'} )) return;
+  if (!await confirm({ message: status === 2 ? t('admin_prompts.approve_confirm') : t('admin_prompts.reject_confirm')} )) return;
   try {
     await $fetch(`/api/admin/prompts/${id}/review`, {
       method: 'PUT',
       credentials: 'include',
-      body: JSON.stringify({ status, reviewRemark: status === 3 ? '管理员操作' : '' }),
+      body: JSON.stringify({ status, reviewRemark: status === 3 ? t('admin_prompts.admin_operation') : '' }),
     });
     fetchData();
-  } catch (e: any) { toast.error('操作失败: ' + (e?.data?.msg || e.message || '网络错误')); }
+  } catch (e: any) { toast.error(t('admin_prompts.review_failed') + ': ' + (e?.data?.msg || e.message || t('admin_prompts.network_error'))); }
 }
 
 async function confirmDelete(t: any) {
-  if (!await confirm({ message: `确认删除「${t.title}」？此操作不可恢复。`} )) return;
+  if (!await confirm({ message: t('admin_prompts.delete_confirm', { title: t.title })} )) return;
   try {
     await $fetch(`/api/admin/prompts/${t.id}`, { method: 'DELETE', credentials: 'include' });
     fetchData();
-  } catch (e: any) { toast.error('删除失败: ' + (e?.data?.msg || e.message || '网络错误')); }
+  } catch (e: any) { toast.error(t('admin_prompts.delete_failed') + ': ' + (e?.data?.msg || e.message || t('admin_prompts.network_error'))); }
 }
 
 function categoryLabel(c: string) {
-  const map: Record<string, string> = { main_image: '主图', scene: '场景', video: '视频', script: '口播脚本', copy: '营销文案', 'viral-clone': '爆款复刻' };
+  const map: Record<string, string> = {
+    main_image: t('admin_prompts.category_main_image'),
+    scene: t('admin_prompts.category_scene'),
+    video: t('admin_prompts.category_video'),
+    script: t('admin_prompts.category_script'),
+    copy: t('admin_prompts.category_copy'),
+    'viral-clone': t('admin_prompts.category_viral_clone'),
+  };
   return map[c] || c;
 }
 function statusLabel(s: number) {
-  const map: Record<number, string> = { 0: '草稿', 1: '待审核', 2: '已上架', 3: '已下架' };
+  const map: Record<number, string> = {
+    0: t('admin_prompts.status_draft'),
+    1: t('admin_prompts.status_pending'),
+    2: t('admin_prompts.status_active'),
+    3: t('admin_prompts.status_offline'),
+  };
   return map[s] || String(s);
 }
 function statusClass(s: number) {
