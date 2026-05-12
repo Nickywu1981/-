@@ -292,6 +292,6 @@ watch(() => route.path, (p) => {
 }
 
 .al-side::-webkit-scrollbar { width: 4px; }
-.al-side::-webkit-scrollbar-thumb { background: #ebebea; border-radius: 4px; }
+.al-side::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 4px; }
 .al-side::-webkit-scrollbar-track { background: transparent; }
 </style>
