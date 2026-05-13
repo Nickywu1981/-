@@ -76,3 +76,9 @@ CREATE TABLE IF NOT EXISTS `announcement` (
   INDEX `idx_type_status` (`type`, `status`),
   INDEX `idx_publish` (`publish_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统公告';
+
+-- DOWN
+DROP TABLE IF EXISTS `announcement`;
+DROP TABLE IF EXISTS `user_coupon`;
+DROP TABLE IF EXISTS `coupon`;
+DROP TABLE IF EXISTS `campaign`;

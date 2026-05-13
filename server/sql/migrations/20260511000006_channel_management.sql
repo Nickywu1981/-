@@ -62,3 +62,13 @@ ALTER TABLE tenant
   ADD COLUMN channel_level TINYINT UNSIGNED DEFAULT 0 COMMENT '渠道层级 0=无上级',
   ADD COLUMN agent_code VARCHAR(50) DEFAULT NULL COMMENT '代理邀请码',
   ADD UNIQUE KEY uk_agent_code (agent_code);
+
+-- DOWN
+DROP TABLE IF EXISTS `channel_performance`;
+DROP TABLE IF EXISTS `commission_policy`;
+DROP TABLE IF EXISTS `channel_relation`;
+ALTER TABLE `tenant`
+  DROP INDEX IF EXISTS uk_agent_code,
+  DROP COLUMN IF EXISTS `agent_code`,
+  DROP COLUMN IF EXISTS `channel_level`,
+  DROP COLUMN IF EXISTS `parent_channel_id`;

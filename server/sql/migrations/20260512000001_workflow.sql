@@ -54,3 +54,8 @@ INSERT INTO `workflow_template` (`name`, `description`, `steps`, `status`) VALUE
   {"type":"generate_voice","label":"AI语音合成","inputs":["script","voice_gender","speed"],"outputs":["audio_url"]},
   {"type":"generate_video","label":"AI视频生成","inputs":["script","audio_url","visual_style"],"outputs":["video_url"]}
 ]', 'published');
+
+-- DOWN
+DELETE FROM `workflow_template` WHERE `name` IN ('电商主图批量生成', '短视频营销全流程');
+DROP TABLE IF EXISTS `workflow_job`;
+DROP TABLE IF EXISTS `workflow_template`;

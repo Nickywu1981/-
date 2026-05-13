@@ -38,3 +38,11 @@ DROP PROCEDURE IF EXISTS add_tenant_review_columns;
 
 -- 为已存在的启用租户设 approved（历史数据兼容）
 UPDATE `tenant` SET `review_status` = 'approved' WHERE `status` = 'active' AND `review_status` = 'pending';
+
+-- DOWN
+ALTER TABLE `tenant`
+  DROP INDEX IF EXISTS `idx_review_status`,
+  DROP COLUMN IF EXISTS `reviewed_at`,
+  DROP COLUMN IF EXISTS `reviewed_by`,
+  DROP COLUMN IF EXISTS `review_remark`,
+  DROP COLUMN IF EXISTS `review_status`;

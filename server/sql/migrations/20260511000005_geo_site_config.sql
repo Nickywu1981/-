@@ -14,3 +14,10 @@ INSERT IGNORE INTO site_config (config_key, config_value, config_type, descripti
 ('geo_pricing_summary', '免费套餐+付费订阅+企业定制', 'text', 'GEO收录：定价简述'),
 ('geo_platforms_supported', '淘宝,拼多多,抖音,小红书,京东,亚马逊,Shopee,Lazada,快手,视频号,苏宁,唯品会,1688', 'text', 'GEO收录：支持平台列表')
 ON DUPLICATE KEY UPDATE description = VALUES(description);
+
+-- DOWN
+DELETE FROM `site_config` WHERE `config_key` IN (
+  'geo_product_name','geo_product_desc','geo_features','geo_applicable_industries',
+  'geo_applicable_categories','geo_social_links','geo_contact_email',
+  'geo_logo_url','geo_pricing_summary','geo_platforms_supported'
+);

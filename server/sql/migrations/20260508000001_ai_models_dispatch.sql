@@ -107,3 +107,8 @@ INSERT INTO `model_task_mappings` (task_type, category, default_model_id, needs_
 ('action_transfer', 'video', 'seedance-2.0', 0),
 ('digital_human', 'video', 'seedance-2.0', 0)
 ON DUPLICATE KEY UPDATE default_model_id=VALUES(default_model_id);
+
+-- DOWN
+DROP TABLE IF EXISTS `model_task_mappings`;
+DROP TABLE IF EXISTS `model_categories`;
+DROP TABLE IF EXISTS `ai_models`;

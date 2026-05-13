@@ -221,3 +221,18 @@ INSERT IGNORE INTO sys_dict_item (dict_key, item_key, item_value, item_extra, so
 ('task_category', 'image', '图片生成', 'AI 图片创作', 2),
 ('task_category', 'video', '视频生成', 'AI 视频创作', 3),
 ('task_category', 'analysis', '数据分析', '数据洞察报告', 4);
+
+-- DOWN
+DROP TABLE IF EXISTS `user_plans`;
+DROP TABLE IF EXISTS `sys_dict_item`;
+DROP TABLE IF EXISTS `sys_config_log`;
+DROP TABLE IF EXISTS `sys_config_item`;
+DROP TABLE IF EXISTS `api_proxy_whitelist`;
+DROP TABLE IF EXISTS `diy_custom_field`;
+DROP TABLE IF EXISTS `diy_template`;
+DROP TABLE IF EXISTS `email_template`;
+DROP TABLE IF EXISTS `copywriting_history`;
+DROP TABLE IF EXISTS `abuse_records`;
+DROP TABLE IF EXISTS `prompt_rating`;
+DROP TABLE IF EXISTS `prompt_usage_history`;
+DROP TABLE IF EXISTS `ai_model_config`;

@@ -31,3 +31,7 @@ CREATE TABLE IF NOT EXISTS `i18n_translation_log` (
   KEY `idx_locale_key` (`locale`, `trans_key`),
   KEY `idx_changed_at` (`changed_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='i18n变更日志';
+
+-- DOWN
+DROP TABLE IF EXISTS `i18n_translation_log`;
+DROP TABLE IF EXISTS `i18n_translation`;
