@@ -12,6 +12,7 @@
  *  意图识别 → 合规校验 → 模板匹配 → 提示词封装 → GEO检查 → PII脱敏 → 内容审核 → invoke → post-invoke
  */
 import logger from '../utils/logger.js';
+import { BusinessError } from '../utils/businessError.js';
 import { CircuitBreaker } from '../utils/circuit-breaker.js';
 import { infer, listModels, getFallbackModel } from '../services/aiEngine.js';
 import { extractUsage, estimateTokens } from '../services/tokenMeteringService.js';
@@ -323,7 +324,7 @@ export async function gatewayInfer(modelId, input, ctx = {}) {
           timeoutPromise(TOTAL_TIMEOUT, '降级模型调用'),
         ]);
       } else {
-        throw new Error(`模型 ${modelId} 不可用且无可用降级模型，请稍后重试`);
+        throw new BusinessError(503, `模型 ${modelId} 不可用且无可用降级模型，请稍后重试`);
       }
     } else {
       // 正常调用（总超时兜底）

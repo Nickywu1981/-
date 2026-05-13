@@ -6,6 +6,7 @@
 export const copywriting = {
   titleGen: {
     description: '电商商品标题生成',
+    system: '你是专业的电商SEO标题优化专家，擅长关键词布局与搜索排名优化。',
     template: `Generate {count} SEO-optimized product titles for an e-commerce listing.
 
 Product: {productName}
@@ -26,6 +27,7 @@ Requirements:
 
   descriptionGen: {
     description: '商品详情描述生成',
+    system: '你是专业的电商详情页文案专家，擅长挖掘产品卖点与消费心理。',
     template: `Write a compelling product description for an e-commerce listing.
 
 Product: {productName}
@@ -48,6 +50,7 @@ Tone: {tone}`,
 
   scriptGen: {
     description: '短视频带货脚本生成（9语种）',
+    system: '你是专业的短视频内容策划专家，擅长带货脚本结构与用户心理。',
     template: `Create a {platform} short-video script for promoting a product.
 
 Product: {productName}
@@ -69,6 +72,7 @@ Include shot descriptions, voiceover text, and on-screen text suggestions.`,
 
   translate: {
     description: '多语言商品信息翻译',
+    system: '你是专业的多语言电商翻译专家，擅长跨文化营销适配。',
     template: `Translate the following e-commerce product information from {sourceLang} to {targetLang}.
 
 Product name: {productName}

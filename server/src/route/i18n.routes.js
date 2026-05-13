@@ -188,7 +188,7 @@ adminRouter.get('/:locale/export', async (req, res) => {
     const data = await i18nService.getTranslations(req.params.locale);
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.setHeader('Content-Disposition', `attachment; filename="${req.params.locale}.json"`);
-    res.json(data);
+    success(res, data);
   } catch (err) {
     handleError(res, err, 'exportTranslations');
   }

@@ -9,6 +9,8 @@
  */
 
 import logger from '../utils/logger.js';
+import { error } from '../utils/response.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 // 默认静态白名单
 const DEFAULT_ADMIN_IPS = new Set([
@@ -70,7 +72,7 @@ export function ipWhitelistMiddleware(opts = {}) {
       return next();
     }
 
-    res.status(403).json({ code: 403, msg: 'IP 不在白名单中，禁止访问管理接口', data: null });
+    error(res, ERROR_CODE.FORBIDDEN, 'IP 不在白名单中，禁止访问管理接口');
   };
 }
 
