@@ -8,6 +8,14 @@ vi.mock('../../config/index.js', () => ({
   jwtSecret: 'test-secret', jwtExpiresIn: '7d',
   isDevelopment: true, isProduction: false,
   logConfig: { level: 'info', sampleRate: 1.0, slowQueryMs: 1000 },
+  allinpayConfig: {
+    env: 'sandbox', cusid: '', appid: '',
+    privateKey: null, publicKey: null, isSandbox: true,
+    privateKeyPath: './certs/allinpay_private.pem',
+    publicKeyPath: './certs/allinpay_public.pem',
+    notifyUrl: '', returnUrl: '', frontUrl: '', signType: 'RSA',
+    baseUrl: 'https://syb-test.allinpay.com/apiweb/h5unionpay/onepay',
+  },
 }));
 vi.mock('../../utils/sqlGuard.js', () => ({ guardSQL: vi.fn((v) => v) }));
 

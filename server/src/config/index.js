@@ -237,6 +237,28 @@ const config = {
 
   geoIpApiUrl: process.env.GEOIP_API_URL || 'https://ip-api.com/json',
 
+  allinpay: {
+    env: process.env.ALLINPAY_ENV || (process.env.NODE_ENV === 'production' ? 'production' : 'sandbox'),
+    cusid: process.env.ALLINPAY_CUSID || '',
+    appid: process.env.ALLINPAY_APPID || '',
+    privateKey: process.env.ALLINPAY_PRIVATE_KEY || null,
+    publicKey: process.env.ALLINPAY_PUBLIC_KEY || null,
+    privateKeyPath: process.env.ALLINPAY_PRIVATE_KEY_PATH || './certs/allinpay_private.pem',
+    publicKeyPath: process.env.ALLINPAY_PUBLIC_KEY_PATH || './certs/allinpay_public.pem',
+    notifyUrl: process.env.ALLINPAY_NOTIFY_URL || '',
+    returnUrl: process.env.ALLINPAY_RETURN_URL || '',
+    frontUrl: process.env.ALLINPAY_FRONT_URL || '',
+    signType: process.env.ALLINPAY_SIGN_TYPE || 'RSA',
+    get isSandbox() {
+      return this.env === 'sandbox';
+    },
+    get baseUrl() {
+      return this.env === 'production'
+        ? 'https://syb.allinpay.com/apiweb/h5unionpay/onepay'
+        : 'https://syb-test.allinpay.com/apiweb/h5unionpay/onepay';
+    },
+  },
+
   adapters: {
     claude: {
       apiKey: process.env.CLAUDE_API_KEY || '',
@@ -285,3 +307,4 @@ export const appUrl = config.appUrl;
 export const { ai: aiConfig } = config;
 export const { aiGateway: aiGatewayConfig } = config;
 export const { adapters: adapterConfig } = config;
+export const { allinpay: allinpayConfig } = config;
