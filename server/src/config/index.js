@@ -132,14 +132,17 @@ const config = {
 
   jwtRefreshSecret: (() => {
     const s = process.env.JWT_REFRESH_SECRET;
-    if (!s) {
-      if (process.env.NODE_ENV === 'production') {
-        throw new Error('生产环境必须设置 JWT_REFRESH_SECRET，禁止回退到 JWT_SECRET');
-      }
-      console.warn('[config] JWT_REFRESH_SECRET 未设置，开发环境回退到 JWT_SECRET（生产环境将被 startupGuard 拦截）');
-      return process.env.JWT_SECRET || 'dev-temp-refresh-fallback';
+    if (s) return s;
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('生产环境必须设置 JWT_REFRESH_SECRET，禁止回退到 JWT_SECRET');
     }
-    return s;
+    // 开发环境：从 JWT_SECRET 派生 refresh secret（与 auth.js / jwtToken.js 历史行为一致）
+    const base = process.env.JWT_SECRET;
+    if (!base || base === 'dev-secret') {
+      throw new Error('JWT_REFRESH_SECRET 未设置且 JWT_SECRET 无效，无法生成 refresh token');
+    }
+    console.warn('[config] JWT_REFRESH_SECRET 未设置，开发环境从 JWT_SECRET 派生（生产环境将被 startupGuard 拦截）');
+    return base + '_refresh_dev_only';
   })(),
 
   corsOrigin: process.env.CORS_ORIGIN || '',

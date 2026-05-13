@@ -7,7 +7,7 @@
  */
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import { jwtConfig, jwtRefreshSecret, isDevelopment } from '../config/index.js';
+import { jwtConfig, jwtRefreshSecret } from '../config/index.js';
 import logger from '../utils/logger.js';
 
 // ========================= 配置 =========================
@@ -15,17 +15,8 @@ import logger from '../utils/logger.js';
 const ACCESS_EXPIRES = jwtConfig.accessExpiresIn;
 const REFRESH_EXPIRES = jwtConfig.refreshExpiresIn;
 const ACCESS_SECRET = jwtConfig.secret;
-const REFRESH_SECRET = (() => {
-  if (jwtRefreshSecret) return jwtRefreshSecret;
-  if (isDevelopment) {
-    if (!jwtConfig.secret || jwtConfig.secret === 'dev-secret') {
-      throw new Error('JWT_REFRESH_SECRET 未设置且 JWT_SECRET 无效，无法生成 refresh token');
-    }
-    logger.warn('[JWT] 开发环境 REFRESH_SECRET 派生自 JWT_SECRET，生产环境必须独立设置 JWT_REFRESH_SECRET');
-    return jwtConfig.secret + '_refresh_dev_only';
-  }
-  throw new Error('JWT_REFRESH_SECRET 必须在非开发环境通过环境变量设置');
-})();
+// Refresh secret 由 config/index.js 统一管理（环境变量 OR 开发环境从 JWT_SECRET 派生）
+const REFRESH_SECRET = jwtRefreshSecret;
 
 // 动态加载 Redis（不做硬依赖，Redis 离线跳过黑名单校验）
 let redis = null;

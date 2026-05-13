@@ -10,17 +10,14 @@
  */
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import config, { jwtSecret, jwtRefreshSecret, isDevelopment, isProduction } from '../config/index.js';
+import config, { jwtSecret, jwtRefreshSecret, isProduction } from '../config/index.js';
 import { isTokenBlacklisted } from '../utils/jwtToken.js';
 import { error as sendError } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import logger from '../utils/logger.js';
 
-const refreshSecret = (() => {
-  if (jwtRefreshSecret && jwtRefreshSecret !== 'dev-refresh-fallback') return jwtRefreshSecret;
-  if (isDevelopment) return jwtSecret + '_refresh_dev_only';
-  throw new Error('JWT_REFRESH_SECRET 未设置，无法签发 refresh token');
-})();
+// Refresh secret 由 config/index.js 统一管理（环境变量 OR 开发环境从 JWT_SECRET 派生）
+const refreshSecret = jwtRefreshSecret;
 
 // ========================= Token 生成 =========================
 
