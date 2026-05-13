@@ -8,7 +8,6 @@ import { validateV4 as _validate, validate, paginationSchema } from '../utils/va
 import { contentModerationMiddleware } from '../middleware/content-moderation.middleware.js';
 import { tierGuard } from '../middleware/tierGuard.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
-import { authMiddleware } from '../middleware/auth.js';
 import * as ctrl from '../controller/v4ImageController.js';
 
 const router = Router();

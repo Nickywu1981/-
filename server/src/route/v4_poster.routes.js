@@ -9,7 +9,6 @@ import { z } from 'zod';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { contentModerationMiddleware } from '../middleware/content-moderation.middleware.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
-import { authMiddleware } from '../middleware/auth.js';
 import * as ctrl from '../controller/v4PosterController.js';
 
 const router = Router();

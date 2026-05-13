@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { listAllRecords, checkAbuse } from '../controller/abuseController.js';
-import { authMiddleware, adminAuth } from '../middleware/auth.js';
+import { adminAuth } from '../middleware/auth.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { validate, paginationSchema } from '../utils/validate.js';
 import { z } from 'zod';

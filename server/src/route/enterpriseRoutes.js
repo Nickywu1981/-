@@ -10,7 +10,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { validateV4 as _validate } from '../utils/validate.js';
-import { authMiddleware, enterpriseOnly } from '../middleware/auth.js';
+import { enterpriseOnly } from '../middleware/auth.js';
 import { roleGuard } from '../middleware/rbac.js';
 import { authLimiter } from '../middleware/rateLimiter.js';
 import * as ctrl from '../controller/enterpriseController.js';
@@ -82,7 +82,7 @@ router.post('/register', authLimiter, _validate(registerSchema), ctrl.registerEn
 router.post('/login', authLimiter, _validate(loginSchema), ctrl.loginEnterprise);
 
 // 企业退出 — 吊销所有 token
-router.post('/logout', authMiddleware, enterpriseOnly, ctrl.logoutEnterprise);
+router.post('/logout', enterpriseOnly, ctrl.logoutEnterprise);
 
 // 企业套餐列表（公开查看）
 router.get('/plans', ctrl.listPlans);

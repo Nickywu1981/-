@@ -5,7 +5,6 @@
  */
 import { Router } from 'express';
 import z from 'zod';
-import { authMiddleware } from '../middleware/auth.js';
 import { rateLimiter } from '../middleware/rateLimiter.js';
 import { validate } from '../utils/validate.js';
 import * as ctrl from '../controller/v4AssetsController.js';

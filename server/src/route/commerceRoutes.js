@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { validateV4 as _validate } from '../utils/validate.js';
-import { authMiddleware, enterpriseOnly } from '../middleware/auth.js';
+import { enterpriseOnly } from '../middleware/auth.js';
 import { rateLimiter } from '../middleware/rateLimiter.js';
 import * as ctrl from '../controller/commerceController.js';
 

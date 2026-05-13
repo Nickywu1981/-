@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { listTemplates, getTemplateDetail, createTemplate, submitForReview, fillAndPreview, listFavorites, toggleFavorite, listGroups, createGroup, renameGroup, deleteGroup, getRecommendations, recordUsage, usageHistory, rateTemplate, getTemplateRating } from '../controller/promptController.js';
-import { authMiddleware } from '../middleware/auth.js';
-import { heavyLimiter } from '../middleware/rateLimiter.js';
+
 import { validate, idParamSchema } from '../utils/validate.js';
 import { z } from 'zod';
 

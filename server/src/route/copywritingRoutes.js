@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { generateTitles, generateDescription, generateScript, translateProduct, listPlatforms, listLanguages, listHistory, deleteHistory } from '../controller/copywritingController.js';
-import { authMiddleware } from '../middleware/auth.js';
-import { heavyLimiter } from '../middleware/rateLimiter.js';
+
 import { validate } from '../utils/validate.js';
 import { z } from 'zod';
 

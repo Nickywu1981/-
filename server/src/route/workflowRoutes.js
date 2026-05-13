@@ -13,7 +13,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { validate } from '../utils/validate.js';
-import { heavyLimiter } from '../middleware/rateLimiter.js';
+
 import * as ctrl from '../controller/workflowController.js';
 
 const router = Router();

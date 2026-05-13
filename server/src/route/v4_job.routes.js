@@ -8,7 +8,6 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { validateV4 as _validate, idParamSchema } from '../utils/validate.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
-import { authMiddleware } from '../middleware/auth.js';
 import * as ctrl from '../controller/v4JobController.js';
 
 const VALID_TASK_TYPES = new Set([

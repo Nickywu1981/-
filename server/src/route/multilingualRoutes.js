@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { getLanguages, getScriptTypes, buildPrompt } from '../controller/multilingualController.js';
-import { authMiddleware } from '../middleware/auth.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 import { validate } from '../utils/validate.js';
 import { z } from 'zod';

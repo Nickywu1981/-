@@ -8,8 +8,7 @@ import { error } from '../utils/response.js';
 import { BusinessError } from '../utils/businessError.js';
 import { validateV4 as _validate, validate } from '../utils/validate.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
-import { authMiddleware } from '../middleware/auth.js';
-import { uploadLimiter } from '../middleware/rateLimiter.js';
+
 import { uploadQuotaGuard, magicNumberGuard } from '../middleware/upload.js';
 import multer from 'multer';
 import * as ctrl from '../controller/v4UploadController.js';

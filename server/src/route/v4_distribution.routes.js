@@ -5,7 +5,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { validateV4 as _validate, validate, paginationSchema } from '../utils/validate.js';
-import { authMiddleware } from '../middleware/auth.js';
 import { paymentLimiter } from '../middleware/rateLimiter.js';
 import * as ctrl from '../controller/v4DistributionController.js';
 

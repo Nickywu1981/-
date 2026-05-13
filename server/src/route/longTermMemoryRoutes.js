@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { authMiddleware as requireAuth } from '../middleware/auth.js';
 import { apiLimiter, heavyLimiter } from '../middleware/rateLimiter.js';
 import { validate } from '../utils/validate.js';
 import * as ctrl from '../controller/longTermMemoryController.js';

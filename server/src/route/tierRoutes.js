@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { getMyTier, checkLimit, getExportPermission } from '../controller/tierController.js';
-import { authMiddleware } from '../middleware/auth.js';
 import { rateLimiter } from '../middleware/rateLimiter.js';
 import { validate } from '../utils/validate.js';
 import { z } from 'zod';

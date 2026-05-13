@@ -11,7 +11,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { validateV4 as _validate, validate, idParamSchema } from '../utils/validate.js';
-import { authMiddleware } from '../middleware/auth.js';
 import { heavyLimiter, rateLimiter } from '../middleware/rateLimiter.js';
 import { cacheMiddleware } from '../middleware/cache.js';
 import * as bindCtrl from '../controller/v4PlatformBindController.js';

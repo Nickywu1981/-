@@ -9,7 +9,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { validateV4 as _validate } from '../utils/validate.js';
-import { authMiddleware, enterpriseOnly, requireAgent } from '../middleware/auth.js';
+import { enterpriseOnly, requireAgent } from '../middleware/auth.js';
 import { requireRole } from '../middleware/rbac.js';
 import { paymentLimiter } from '../middleware/rateLimiter.js';
 import * as ctrl from '../controller/financeController.js';
