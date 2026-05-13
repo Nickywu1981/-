@@ -151,6 +151,7 @@ export function useDashboardData() {
 
   // ── Fullscreen ──
   function toggleFullscreen() {
+    if (!import.meta.client) return
     if (document.fullscreenElement) document.exitFullscreen()
     else document.documentElement.requestFullscreen()
   }

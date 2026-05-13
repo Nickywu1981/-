@@ -31,6 +31,8 @@ interface I18nSearchResult {
   updated_at?: string
 }
 
+import { useToast } from './useToast'
+
 export function useI18nAdmin() {
   const activeLocale = ref('zh')
   const activeNamespace = ref('')
@@ -69,9 +71,13 @@ export function useI18nAdmin() {
     } finally { loading.value = false }
   }
 
+  function startEdit(key: string) {
+    editingKey.value = key
+  }
+
   function cancelEdit() {
-    editingKey.value = null
     pendingChanges.value.delete(editingKey.value!)
+    editingKey.value = null
   }
 
   function setEditValue(key: string, value: string) {
@@ -126,7 +132,7 @@ export function useI18nAdmin() {
   async function importJSON(file: File) {
     const text = await file.text()
     let data: Record<string, unknown>
-    try { data = JSON.parse(text) } catch { toast.error('无效的 JSON 文件'); return }
+    try { data = JSON.parse(text) } catch { useToast().error('无效的 JSON 文件'); return }
     await $fetch(`/api/admin/i18n/${activeLocale.value}/import`, {
       method: 'POST', body: data, params: { skipEdited: '0' }, credentials: 'include',
     })
