@@ -67,7 +67,7 @@
     <div v-else class="empty">{{ $t('admin_tasks.no_data') }}</div>
 
     <Teleport to="body">
-      <div v-if="detailOpen" class="modal-overlay" @click.self="detailOpen = false">
+      <div v-if="detailOpen" class="modal-overlay" @click.self="detailOpen = false" @keydown.escape="detailOpen = false">
         <div class="modal">
           <h3>{{ $t('admin_tasks.detail_title') }}</h3>
           <div class="detail-grid">

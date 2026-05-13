@@ -51,7 +51,7 @@
     <Pagination v-if="total > pageSize" v-model:page="currentPage" :total="total" :page-size="pageSize" @change="fetchTemplates" />
 
     <!-- Create Modal -->
-    <div v-if="showCreate" class="modal-overlay" @click.self="showCreate = false">
+    <div v-if="showCreate" class="modal-overlay" @click.self="showCreate = false" @keydown.escape="showCreate = false">
       <div class="modal">
         <div class="modal-header"><h3>{{ $t('admin_sms_templates.new_template') }}</h3><button class="modal-close" :aria-label="$t('admin_sms_templates.close_aria')" @click="showCreate = false">✕</button></div>
         <div class="modal-body">
@@ -74,7 +74,7 @@
     </div>
 
     <!-- Delete Confirm -->
-    <div v-if="showDelete" class="modal-overlay" @click.self="showDelete = false">
+    <div v-if="showDelete" class="modal-overlay" @click.self="showDelete = false" @keydown.escape="showDelete = false">
       <div class="modal modal-sm">
         <div class="modal-header"><h3>{{ $t('admin_sms_templates.delete_confirm_title') }}</h3></div>
         <div class="modal-body"><p>{{ $t('admin_sms_templates.delete_confirm_desc', { name: deleteTarget?.name }) }}</p></div>

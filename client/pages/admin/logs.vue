@@ -47,7 +47,7 @@
     <div v-else-if="!loading" class="empty">暂无日志</div>
 
     <Teleport to="body">
-      <div v-if="detail" class="modal-overlay" @click.self="detail = null">
+      <div v-if="detail" class="modal-overlay" @click.self="detail = null" @keydown.escape="detail = null">
         <div class="modal-card">
           <h3>日志详情 #{{ detail.id }}</h3>
           <div class="detail-grid">

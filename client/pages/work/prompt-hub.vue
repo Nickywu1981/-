@@ -63,7 +63,7 @@
     </div>
 
     <!-- 详情弹窗 -->
-    <div v-if="detail" class="modal-overlay" @click.self="detail = null">
+    <div v-if="detail" class="modal-overlay" @click.self="detail = null" @keydown.escape="detail = null">
       <div class="modal-content">
         <div class="modal-header">
           <h2>{{ detail.title }}</h2>

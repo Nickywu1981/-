@@ -70,7 +70,7 @@
     </div>
 
     <Teleport to="body">
-      <div v-if="modalOpen" class="modal-overlay" @click.self="modalOpen = false">
+      <div v-if="modalOpen" class="modal-overlay" @click.self="modalOpen = false" @keydown.escape="modalOpen = false">
         <div class="modal">
           <h3>{{ isEdit ? $t('admin_forms.edit_modal') : $t('admin_forms.create_modal') }}</h3>
           <div class="form-grid">

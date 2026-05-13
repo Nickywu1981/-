@@ -58,7 +58,7 @@
       @update:page="(p: number) => { page = p; fetchData() }" />
 
     <!-- Preview Modal -->
-    <div v-if="previewing" class="modal-overlay" @click.self="previewing = null">
+    <div v-if="previewing" class="modal-overlay" @click.self="previewing = null" @keydown.escape="previewing = null">
       <div class="modal modal-lg">
         <div class="modal-header">
           <h3>{{ previewing.name }}</h3>

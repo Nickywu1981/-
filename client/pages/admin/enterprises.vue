@@ -76,7 +76,7 @@
     </section>
 
     <!-- 审批日志弹窗 -->
-    <div v-if="showLogModal" class="modal-overlay" @click.self="showLogModal = false">
+    <div v-if="showLogModal" class="modal-overlay" @click.self="showLogModal = false" @keydown.escape="showLogModal = false">
       <div class="modal-content">
         <h3>{{ $t('admin.enterprises.approval_logs') }} — {{ activeTenant?.name }}</h3>
         <div v-if="logs.length" class="log-list">
@@ -98,7 +98,7 @@
     </div>
 
     <!-- 驳回原因弹窗 -->
-    <div v-if="showRejectModal" class="modal-overlay" @click.self="showRejectModal = false">
+    <div v-if="showRejectModal" class="modal-overlay" @click.self="showRejectModal = false" @keydown.escape="showRejectModal = false">
       <div class="modal-content">
         <h3>{{ $t('admin.enterprises.reject_title') }}</h3>
         <p>{{ $t('admin.enterprises.reject_hint') }}</p>
@@ -111,7 +111,7 @@
     </div>
 
     <!-- 停用原因弹窗 -->
-    <div v-if="showSuspendModal" class="modal-overlay" @click.self="showSuspendModal = false">
+    <div v-if="showSuspendModal" class="modal-overlay" @click.self="showSuspendModal = false" @keydown.escape="showSuspendModal = false">
       <div class="modal-content">
         <h3>{{ $t('admin.enterprises.suspend_title') }}</h3>
         <textarea v-model="suspendReason" class="input" rows="3" :placeholder="$t('admin.enterprises.suspend_placeholder')" />

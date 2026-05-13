@@ -48,7 +48,7 @@
     <div v-else class="empty">暂无代理配置</div>
 
     <Teleport to="body">
-      <div v-if="modalOpen" class="modal-overlay" @click.self="modalOpen = false">
+      <div v-if="modalOpen" class="modal-overlay" @click.self="modalOpen = false" @keydown.escape="modalOpen = false">
         <div class="modal">
           <h3>{{ isEdit ? '编辑代理' : '新建代理' }}</h3>
           <div class="form-grid">

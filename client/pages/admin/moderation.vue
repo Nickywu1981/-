@@ -43,7 +43,7 @@
       <Pagination v-if="total > pageSize" :page="page" :page-size="pageSize" :total="total" @change="onPageChange" />
 
       <Teleport to="body">
-        <div v-if="detail" class="modal-mask" @click.self="detail = null">
+        <div v-if="detail" class="modal-mask" @click.self="detail = null" @keydown.escape="detail = null">
           <div class="modal-card">
             <h3>{{ $t('admin_moderation.detail_title', { id: detail.id }) }}</h3>
             <div class="detail-grid">

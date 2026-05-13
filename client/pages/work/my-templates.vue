@@ -43,7 +43,7 @@
 
     <!-- 编辑弹窗 -->
     <Teleport to="body">
-      <div class="modal-overlay" v-if="showModal" @click.self="showModal = false">
+      <div class="modal-overlay" v-if="showModal" @click.self="showModal = false" @keydown.escape="showModal = false">
         <div class="modal">
           <h3>编辑模板</h3>
           <div class="form-group">

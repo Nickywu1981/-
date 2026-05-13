@@ -56,7 +56,7 @@
     </div>
 
     <!-- Modal -->
-    <div v-if="showModal" class="modal-mask" @click.self="showModal = false">
+    <div v-if="showModal" class="modal-mask" @click.self="showModal = false" @keydown.escape="showModal = false">
       <div class="modal">
         <h2>{{ editing ? $t('admin_campaigns.edit_modal') : $t('admin_campaigns.create_modal') }}</h2>
         <label>{{ $t('admin_campaigns.label_title') }} <input v-model="form.title" class="input" /></label>

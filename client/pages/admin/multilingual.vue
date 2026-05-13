@@ -115,7 +115,7 @@
 
       <!-- 新增 Modal -->
       <Teleport to="body">
-        <div v-if="showAddModal" class="modal-overlay" @click.self="showAddModal = false">
+        <div v-if="showAddModal" class="modal-overlay" @click.self="showAddModal = false" @keydown.escape="showAddModal = false">
           <div class="modal-card">
             <h3>新增翻译</h3>
             <div class="modal-form">
@@ -134,7 +134,7 @@
 
       <!-- 审计日志 Modal -->
       <Teleport to="body">
-        <div v-if="showLogModal" class="modal-overlay" @click.self="showLogModal = false">
+        <div v-if="showLogModal" class="modal-overlay" @click.self="showLogModal = false" @keydown.escape="showLogModal = false">
           <div class="modal-card wide">
             <h3>变更历史 — {{ logTargetKey }}</h3>
             <table v-if="auditLogs.length" class="log-table">

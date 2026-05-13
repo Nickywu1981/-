@@ -52,7 +52,7 @@
     />
 
     <!-- Create Modal -->
-    <div v-if="showCreate" class="modal-overlay" @click.self="showCreate = false">
+    <div v-if="showCreate" class="modal-overlay" @click.self="showCreate = false" @keydown.escape="showCreate = false">
       <div class="modal">
         <h3>{{ $t('account_pages.collections.create_modal_title') }}</h3>
         <label class="field-label">{{ $t('account_pages.collections.name_label') }}</label>
@@ -72,7 +72,7 @@
     </div>
 
     <!-- Edit Modal -->
-    <div v-if="editing" class="modal-overlay" @click.self="editing = null">
+    <div v-if="editing" class="modal-overlay" @click.self="editing = null" @keydown.escape="editing = null">
       <div class="modal">
         <h3>{{ $t('account_pages.collections.edit_modal_title') }}</h3>
         <label class="field-label">{{ $t('account_pages.collections.edit_name_label') }}</label>

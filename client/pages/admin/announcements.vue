@@ -55,7 +55,7 @@
       <button :disabled="page >= totalPages" @click="page++; fetch()">{{ $t('common.next_page') }}</button>
     </div>
 
-    <div v-if="showModal" class="modal-mask" @click.self="showModal = false">
+    <div v-if="showModal" class="modal-mask" @click.self="showModal = false" @keydown.escape="showModal = false">
       <div class="modal" style="max-width:700px">
         <h2>{{ editing ? $t('admin_announcements.edit_modal') : $t('admin_announcements.create_modal') }}</h2>
         <label>{{ $t('admin_announcements.label_title') }} <input v-model="form.title" class="input" /></label>

@@ -54,7 +54,7 @@
     <div v-if="!list.length && !loading" class="empty">暂无数据</div>
 
     <Teleport to="body">
-      <div v-if="detail" class="modal-overlay" @click.self="detail = null">
+      <div v-if="detail" class="modal-overlay" @click.self="detail = null" @keydown.escape="detail = null">
         <div class="modal-card">
           <h3>AI 调用详情 #{{ detail.id }}</h3>
           <div class="dg">

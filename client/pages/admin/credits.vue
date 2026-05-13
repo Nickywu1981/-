@@ -53,7 +53,7 @@
     <Pagination :page="page" :page-size="pageSize" :total="total" @change="onPageChange" />
 
     <!-- Refund Dialog -->
-    <div v-if="refundDialog.open" class="modal-overlay" @click.self="refundDialog.open = false">
+    <div v-if="refundDialog.open" class="modal-overlay" @click.self="refundDialog.open = false" @keydown.escape="refundDialog.open = false">
       <div class="modal-box">
         <h4>确认退款</h4>
         <p class="modal-info">记录 #{{ refundDialog.record?.id }}，消耗 {{ refundDialog.record?.consumed }} 点</p>

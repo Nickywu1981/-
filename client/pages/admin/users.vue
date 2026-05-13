@@ -65,7 +65,7 @@
     <div v-else class="empty">{{ $t('admin_users.no_data') }}</div>
 
     <Teleport to="body">
-      <div v-if="editOpen" class="modal-overlay" @click.self="editOpen = false">
+      <div v-if="editOpen" class="modal-overlay" @click.self="editOpen = false" @keydown.escape="editOpen = false">
         <div class="modal">
           <h3>{{ $t('admin_users.edit_user', { id: editForm.id }) }}</h3>
           <div class="form-grid">

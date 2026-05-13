@@ -69,7 +69,7 @@
     <Pagination v-if="total > pageSize" :page="page" :page-size="pageSize" :total="total" @change="onPageChange" />
 
     <Teleport to="body">
-      <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
+      <div v-if="showModal" class="modal-overlay" @click.self="showModal = false" @keydown.escape="showModal = false">
         <div class="modal">
           <h3>{{ editing ? $t('admin_diy_pages.edit_modal') : $t('admin_diy_pages.create_modal') }}</h3>
           <div class="form-grid">

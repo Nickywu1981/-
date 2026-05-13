@@ -49,7 +49,7 @@
 
     <!-- 详情弹窗 -->
     <Teleport to="body">
-      <div v-if="detailOpen" class="modal-overlay" @click.self="detailOpen = false">
+      <div v-if="detailOpen" class="modal-overlay" @click.self="detailOpen = false" @keydown.escape="detailOpen = false">
         <div class="modal">
           <div class="modal-header">
             <h3>订单详情 #{{ detail.id }}</h3>

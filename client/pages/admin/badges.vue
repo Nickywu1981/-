@@ -44,7 +44,7 @@
     <div v-if="!list.length && !loading" class="empty">{{ $t('admin_badges.empty') }}</div>
 
     <Teleport to="body">
-      <div class="modal-overlay" v-if="showModal" @click.self="showModal = false">
+      <div class="modal-overlay" v-if="showModal" @click.self="showModal = false" @keydown.escape="showModal = false">
         <div class="modal">
           <h3>{{ editing.id ? $t('admin_badges.edit_modal') : $t('admin_badges.create_modal') }}</h3>
           <div class="form-row">

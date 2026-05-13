@@ -52,7 +52,7 @@
     <Pagination v-if="total > pageSize" v-model:page="currentPage" :total="total" :page-size="pageSize" @change="fetchTemplates" />
 
     <!-- Create Modal -->
-    <div v-if="showCreate" class="modal-overlay" @click.self="showCreate = false">
+    <div v-if="showCreate" class="modal-overlay" @click.self="showCreate = false" @keydown.escape="showCreate = false">
       <div class="modal">
         <div class="modal-header"><h3>新建邮件模板</h3><button class="modal-close" aria-label="关闭" @click="showCreate = false">✕</button></div>
         <div class="modal-body">
@@ -76,7 +76,7 @@
     </div>
 
     <!-- Delete Confirm -->
-    <div v-if="showDelete" class="modal-overlay" @click.self="showDelete = false">
+    <div v-if="showDelete" class="modal-overlay" @click.self="showDelete = false" @keydown.escape="showDelete = false">
       <div class="modal modal-sm">
         <div class="modal-header"><h3>确认删除</h3></div>
         <div class="modal-body"><p>确定要删除模板「{{ deleteTarget?.name }}」吗？</p></div>

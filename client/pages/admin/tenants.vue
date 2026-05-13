@@ -56,7 +56,7 @@
     <div v-else class="empty">{{ $t('admin_tenants.no_data') }}</div>
 
     <Teleport to="body">
-      <div v-if="reviewModal" class="modal-overlay" @click.self="reviewModal = false">
+      <div v-if="reviewModal" class="modal-overlay" @click.self="reviewModal = false" @keydown.escape="reviewModal = false">
         <div class="modal">
           <h3>{{ $t('admin_tenants.review_title') }}</h3>
           <div class="review-info">
@@ -73,7 +73,7 @@
       </div>
     </Teleport>
     <Teleport to="body">
-      <div v-if="modalOpen" class="modal-overlay" @click.self="modalOpen = false">
+      <div v-if="modalOpen" class="modal-overlay" @click.self="modalOpen = false" @keydown.escape="modalOpen = false">
         <div class="modal">
           <h3>{{ isEdit ? $t('admin_tenants.edit_tenant') : $t('admin_tenants.new_tenant_modal') }}</h3>
           <div class="form-grid">

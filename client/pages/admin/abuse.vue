@@ -48,7 +48,7 @@
     <div v-if="!list.length && !loading" class="empty">暂无滥用记录</div>
 
     <Teleport to="body">
-      <div class="modal-overlay" v-if="showCheckModal" @click.self="showCheckModal = false">
+      <div class="modal-overlay" v-if="showCheckModal" @click.self="showCheckModal = false" @keydown.escape="showCheckModal = false">
         <div class="modal">
           <h3>用户 #{{ checkUserId }} 滥用检测</h3>
           <div class="check-result" :class="checkResult?.error ? '' : (checkResult?.abusing ? 'abusing' : 'normal')">

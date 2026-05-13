@@ -42,7 +42,7 @@
     <Pagination :page="page" :page-size="pageSize" :total="total" @change="onPageChange" />
 
     <!-- Send Dialog -->
-    <div v-if="sendDialog.open" class="modal-overlay" @click.self="sendDialog.open = false">
+    <div v-if="sendDialog.open" class="modal-overlay" @click.self="sendDialog.open = false" @keydown.escape="sendDialog.open = false">
       <div class="modal-box">
         <h4>发送通知</h4>
         <input v-model="sendDialog.userId" type="number" min="1" placeholder="用户ID *" />

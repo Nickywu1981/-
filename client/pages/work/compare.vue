@@ -72,7 +72,7 @@
 
     <!-- 图片选择弹窗 -->
     <Teleport to="body">
-      <div v-if="pickerOpen" class="picker-overlay" @click.self="pickerOpen = false">
+      <div v-if="pickerOpen" class="picker-overlay" @click.self="pickerOpen = false" @keydown.escape="pickerOpen = false">
         <div class="picker-modal">
           <div class="picker-header">
             <h3>{{ pickerTarget === 'original' ? '选择原图' : pickerTarget === 'variant' ? '选择生成图' : '选择图片' }}</h3>

@@ -60,7 +60,7 @@
     <div v-else class="empty">{{ $t('admin_automation.no_data') }}</div>
 
     <Teleport to="body">
-      <div v-if="modalOpen" class="modal-overlay" @click.self="modalOpen = false">
+      <div v-if="modalOpen" class="modal-overlay" @click.self="modalOpen = false" @keydown.escape="modalOpen = false">
         <div class="modal">
           <h3>{{ $t('admin_automation.modal_create') }}</h3>
           <div class="form-grid">
@@ -87,7 +87,7 @@
     </Teleport>
 
     <Teleport to="body">
-      <div v-if="detailOpen" class="modal-overlay" @click.self="detailOpen = false">
+      <div v-if="detailOpen" class="modal-overlay" @click.self="detailOpen = false" @keydown.escape="detailOpen = false">
         <div class="modal">
           <h3>{{ $t('admin_automation.detail_title', { id: detail.id }) }}</h3>
           <div class="detail-grid">

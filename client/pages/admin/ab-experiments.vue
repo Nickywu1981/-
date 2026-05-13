@@ -91,7 +91,7 @@
       </div>
 
       <!-- 创建/编辑弹窗 -->
-      <div v-if="showCreate" class="modal-mask" @click.self="showCreate = false">
+      <div v-if="showCreate" class="modal-mask" @click.self="showCreate = false" @keydown.escape="showCreate = false">
         <div class="modal">
           <h2>新建 A/B 实验</h2>
           <div class="form-group">
