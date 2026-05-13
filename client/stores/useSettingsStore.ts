@@ -47,7 +47,9 @@ export const useSettingsStore = defineStore('settings', {
       this.theme = mode
       if (process.client) {
         safeSetItem('app-theme', mode)
-        document.documentElement.classList.toggle('dark', this.isDark)
+        const dark = this.isDark
+        document.documentElement.classList.toggle('dark', dark)
+        document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light')
       }
     },
 
@@ -69,10 +71,16 @@ export const useSettingsStore = defineStore('settings', {
         const mq = window.matchMedia('(prefers-color-scheme: dark)')
         if (this._mqListener) mq.removeEventListener('change', this._mqListener)
         this._mqListener = () => {
-          if (this.theme === 'system') document.documentElement.classList.toggle('dark', mq.matches)
+          if (this.theme === 'system') {
+            const dark = mq.matches
+            document.documentElement.classList.toggle('dark', dark)
+            document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light')
+          }
         }
         mq.addEventListener('change', this._mqListener)
-        document.documentElement.classList.toggle('dark', this.isDark)
+        const initDark = this.isDark
+        document.documentElement.classList.toggle('dark', initDark)
+        document.documentElement.setAttribute('data-theme', initDark ? 'dark' : 'light')
       }
     },
   },
