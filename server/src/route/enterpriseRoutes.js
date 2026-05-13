@@ -9,7 +9,7 @@
  */
 import { Router } from 'express';
 import { z } from 'zod';
-import { validateV4 as _validate } from '../utils/validate.js';
+import { validateV4 as _validate, idParamSchema } from '../utils/validate.js';
 import { enterpriseOnly } from '../middleware/auth.js';
 import { roleGuard } from '../middleware/rbac.js';
 import { authLimiter } from '../middleware/rateLimiter.js';
@@ -98,7 +98,7 @@ router.put('/profile', roleGuard('enterprise_admin'), _validate(updateProfileSch
 router.get('/users', ctrl.listUsers);
 router.post('/users', roleGuard('enterprise_admin'), _validate(addUserSchema), ctrl.addUser);
 router.put('/users/:id', roleGuard('enterprise_admin'), _validate(updateUserSchema), ctrl.updateUser);
-router.delete('/users/:id', roleGuard('enterprise_admin'), ctrl.removeUser);
+router.delete('/users/:id', roleGuard('enterprise_admin'), _validate(idParamSchema, 'params'), ctrl.removeUser);
 
 // 仪表盘 & 用量（读操作无需 CSRF）
 router.get('/dashboard', ctrl.getDashboard);

@@ -65,7 +65,7 @@ export const aiGatewayController = {
 
   // ── 监控看板 ──
   dashboard: wrapController(async (req) => {
-    const hours = parseInt(req.query.hours || '24', 10);
+    const hours = Number.isFinite(+req.query.hours) ? +req.query.hours : 24;
     const summary = getDashboardSummary(hours);
     const alerts = checkAlerts(summary);
     return { summary, alerts, timestamp: new Date().toISOString() };
@@ -76,12 +76,12 @@ export const aiGatewayController = {
   }),
 
   timeSeries: wrapController(async (req) => {
-    const hours = parseInt(req.query.hours || '24', 10);
+    const hours = Number.isFinite(+req.query.hours) ? +req.query.hours : 24;
     return getTimeSeries(hours);
   }),
 
   topUsers: wrapController(async (req) => {
-    const limit = parseInt(req.query.limit || '10', 10);
+    const limit = Number.isFinite(+req.query.limit) ? +req.query.limit : 10;
     return getTopUsers(limit);
   }),
 
@@ -106,7 +106,7 @@ export const aiGatewayController = {
     return _getTaskStatus(taskId);
   }),
 
-  // ── SSE 流式输出 ──
+  // TODO: 替换为真实流式 — 配合 streamingService.processStreamingOutput() 实现 token 级实时推送
   streamInfer: wrapController(async (req, res) => {
     const { modelId, input } = req.body;
     const stream = createSSEStream(res);

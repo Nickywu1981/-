@@ -12,7 +12,7 @@
  */
 import { Router } from 'express';
 import { z } from 'zod';
-import { validate } from '../utils/validate.js';
+import { validate, numericParamSchema } from '../utils/validate.js';
 
 import * as ctrl from '../controller/workflowController.js';
 
@@ -35,14 +35,16 @@ const executeSchema = z.object({
   inputData: z.record(z.any()).optional(),
 });
 
+const idParamSchema = numericParamSchema('id');
+
 router.get('/templates', ctrl.listTemplates);
 router.get('/templates/:id', ctrl.getTemplate);
 router.post('/templates', validate(templateSchema), ctrl.createTemplate);
 router.put('/templates/:id', validate(templateSchema.partial()), ctrl.updateTemplate);
-router.delete('/templates/:id', ctrl.deleteTemplate);
+router.delete('/templates/:id', validate(idParamSchema, 'params'), ctrl.deleteTemplate);
 router.post('/execute', validate(executeSchema), ctrl.execute);
 router.get('/jobs', ctrl.listMyJobs);
 router.get('/jobs/:id', ctrl.getJob);
-router.post('/jobs/:id/cancel', ctrl.cancelJob);
+router.post('/jobs/:id/cancel', validate(idParamSchema, 'params'), ctrl.cancelJob);
 
 export default router;

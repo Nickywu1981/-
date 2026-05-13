@@ -14,10 +14,14 @@ const codeSchema = z.object({
   language: z.enum(['python', 'javascript', 'typescript', 'bash', 'r', 'ruby']).optional().default('python'),
 });
 
+const sandboxIdSchema = z.object({
+  sandboxId: z.string().min(1).max(64),
+});
+
 router.post('/sandbox', ctrl.createSandbox);
-router.post('/sandbox/:sandboxId/execute', validate(codeSchema), ctrl.executeCode);
-router.get('/sandbox/:sandboxId', ctrl.getSandbox);
+router.post('/sandbox/:sandboxId/execute', validate(codeSchema), validate(sandboxIdSchema, 'params'), ctrl.executeCode);
+router.get('/sandbox/:sandboxId', validate(sandboxIdSchema, 'params'), ctrl.getSandbox);
 router.get('/sandboxes', ctrl.listSandboxes);
-router.delete('/sandbox/:sandboxId', ctrl.destroySandbox);
+router.delete('/sandbox/:sandboxId', validate(sandboxIdSchema, 'params'), ctrl.destroySandbox);
 
 export default router;

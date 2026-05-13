@@ -5,14 +5,13 @@ import * as allinpayService from '../services/allinpayService.js';
 import { success } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
-export const getRates = wrapController(async (req, res) => {
-  success(res, rechargeService.getRates());
+export const getRates = wrapController(async () => {
+  return rechargeService.getRates();
 });
 
-export const createOrder = wrapController(async (req, res) => {
+export const createOrder = wrapController(async (req) => {
     const { amount, channel } = req.body;
-    const data = await rechargeService.createOrder(req.user.id, req.tenantId, req.ip, { amount, payChannel: channel || 'wechat' });
-    success(res, data, '订单已创建');
+    return rechargeService.createOrder(req.user.id, req.tenantId, req.ip, { amount, payChannel: channel || 'wechat' });
 });
 
 export const handleCallback = wrapController(async (req, res) => {
@@ -20,23 +19,21 @@ export const handleCallback = wrapController(async (req, res) => {
     res.send('success');
 });
 
-export const checkPaymentResult = wrapController(async (req, res) => {
+export const checkPaymentResult = wrapController(async (req) => {
     const data = await allinpayService.queryOrder(req.params.reqsn);
     if (!data) throw new BusinessError(ERROR_CODE.NOT_FOUND, '订单不存在');
-    success(res, data);
+    return data;
 });
 
-export const listUserOrders = wrapController(async (req, res) => {
-    const rows = await rechargeService.listUserOrders(req.user.id, req.tenantId);
-    success(res, rows);
+export const listUserOrders = wrapController(async (req) => {
+    return rechargeService.listUserOrders(req.user.id, req.tenantId);
 });
 
-export const listAllOrders = wrapController(async (req, res) => {
-    const rows = await rechargeService.listAllOrders();
-    success(res, rows);
+export const listAllOrders = wrapController(async () => {
+    return rechargeService.listAllOrders();
 });
 
-export const refundOrder = wrapController(async (req, res) => {
+export const refundOrder = wrapController(async (req) => {
     await rechargeService.refundOrder(req.params.orderNo);
-    success(res, null, '退款成功');
+    return null;
 });

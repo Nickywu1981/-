@@ -8,7 +8,7 @@
  */
 import { Router } from 'express';
 import { z } from 'zod';
-import { validateV4 } from '../utils/validate.js';
+import { validateV4, idParamSchema } from '../utils/validate.js';
 import { enterpriseOnly } from '../middleware/auth.js';
 import { rateLimiter } from '../middleware/rateLimiter.js';
 import * as ctrl from '../controller/customerController.js';
@@ -46,7 +46,7 @@ router.get('/:id', ctrl.getCustomerDetail);
 router.get('/tags', ctrl.listTags);
 router.post('/tags', validateV4(createTagSchema), ctrl.createTag);
 router.put('/tags/:id', validateV4(updateTagSchema), ctrl.updateTag);
-router.delete('/tags/:id', ctrl.deleteTag);
+router.delete('/tags/:id', validateV4(idParamSchema, 'params'), ctrl.deleteTag);
 
 // 打标操作
 router.post('/tags/:tagId/customers', validateV4(tagUserSchema), ctrl.tagCustomer);

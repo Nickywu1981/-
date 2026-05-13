@@ -3,7 +3,11 @@
  */
 import dotenv from 'dotenv';
 import crypto from 'crypto';
-dotenv.config({ override: true });
+
+// 按 NODE_ENV 分层加载：.env 为基，环境特定文件覆盖
+dotenv.config();
+const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development';
+dotenv.config({ path: envFile, override: true });
 
 const config = {
   port: parseInt(process.env.PORT, 10) || 3001,

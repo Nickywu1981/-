@@ -1,14 +1,4 @@
 import { createServer } from 'http';
-import dotenv from 'dotenv';
-import fs from 'fs';
-
-// 按 NODE_ENV 加载对应的 .env 文件
-const envFile = isProduction ? '.env.production' : '.env.development';
-if (fs.existsSync(envFile)) {
-  dotenv.config({ path: envFile, override: true });
-} else {
-  dotenv.config({ override: true }); // fallback to .env
-}
 
 import app from './app.js';
 import wsManager from './services/wsManager.js';
@@ -20,7 +10,7 @@ import { validateStartupConfig, validateRuntimeConnections } from './utils/start
 const { port, env } = serverConfig;
 
 // 启动前配置校验
-validateStartupConfig();
+await validateStartupConfig();
 
 // 启动前运行时连接检查 (MySQL / Redis / MinIO)
 await validateRuntimeConnections();

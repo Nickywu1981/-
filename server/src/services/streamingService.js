@@ -149,10 +149,15 @@ export function getTaskStatus(taskId) {
 
 /**
  * 处理队列
+ * 注意：taskQueue/taskResults 为内存存储，进程重启会丢失。
+ * 生产环境应替换为 Redis/BullMQ 持久化方案。
  */
 async function processQueue() {
   if (isProcessing) return;
   isProcessing = true;
+
+  // 提前加载依赖，避免循环内重复 import
+  const { gatewayInfer } = await import('../gateway/aiGatewayHub.js');
 
   while (taskQueue.length > 0) {
     const task = taskQueue.shift();
@@ -160,10 +165,8 @@ async function processQueue() {
     taskResults.set(task.taskId, { status: 'processing', progress: 0 });
 
     try {
-      // 委托给 aiEngine
       taskResults.set(task.taskId, { status: 'processing', progress: 30 });
 
-      const { gatewayInfer } = await import('../gateway/aiGatewayHub.js');
       const result = await gatewayInfer(task.modelId, task.input, {
         userId: task.userId,
         taskType: task.taskType,

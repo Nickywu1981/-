@@ -182,7 +182,7 @@ export async function gatewayInfer(modelId, input, ctx = {}) {
         error: buildErrorResponse(hookResult.reason || '请求被阻止', { modelId, traceId: getTraceContext()?.traceId }),
       };
     }
-    const modCtx = hookResult.modifiedContext;
+    const modCtx = hookResult.modifiedContext || {};
     security = {
       blocked: false,
       sanitizedInput: modCtx.input || input,
@@ -424,7 +424,7 @@ export async function gatewayDispatch(dispatchReq, ctx = {}) {
         error: buildErrorResponse(hookResult.reason || '请求被阻止', { modelId: dispatchModelId, traceId: getTraceContext()?.traceId }),
       };
     }
-    const modCtx = hookResult.modifiedContext;
+    const modCtx = hookResult.modifiedContext || {};
     dispatchSecurity = {
       blocked: false,
       sanitizedInput: modCtx.input || dispatchReq.input,
@@ -558,7 +558,7 @@ export async function gatewayRoute(params, ctx = {}) {
         error: buildErrorResponse(hookResult.reason || '请求被阻止', { modelId: routeModelId, traceId: getTraceContext()?.traceId }),
       };
     }
-    const modCtx = hookResult.modifiedContext;
+    const modCtx = hookResult.modifiedContext || {};
     routeSecurity = {
       blocked: false,
       sanitizedInput: modCtx.input || routeInput,

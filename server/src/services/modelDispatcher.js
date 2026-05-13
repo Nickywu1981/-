@@ -366,7 +366,8 @@ export async function dispatch(req, options = {}) {
 
   // 多租户配额检查
   if (options.tenantId) {
-    const quotaResult = checkTenantQuota(options.tenantId, 1000);
+    const tenantTokenLimit = parseInt(process.env.AI_TENANT_TOKEN_LIMIT, 10) || 1000;
+    const quotaResult = checkTenantQuota(options.tenantId, tenantTokenLimit);
     if (!quotaResult.allowed) {
       throw new BusinessError(429, quotaResult.reason);
     }

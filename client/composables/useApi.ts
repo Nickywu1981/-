@@ -106,7 +106,7 @@ async function request<T = any>(
           const redirectPath = typeof window !== 'undefined' ? window.location.pathname + window.location.search : '';
           if (redirectTimer) clearTimeout(redirectTimer);
           redirectTimer = setTimeout(() => { isRedirecting = false; redirectTimer = null; }, REDIRECT_UNLOCK_MS);
-          navigateTo(`/login?redirect=${encodeURIComponent(redirectPath)}`);
+          navigateTo(`/login?redirect=${encodeURIComponent(redirectPath)}`).finally(() => { isRedirecting = false; });
         }
       },
     });

@@ -5,7 +5,7 @@
 import config from '../config/index.js';
 import logger from '../utils/logger.js';
 
-export function validateStartupConfig() {
+export async function validateStartupConfig() {
   const errors = [];
   const warnings = [];
   const isProd = config.env === 'production';
@@ -104,6 +104,9 @@ export function validateStartupConfig() {
   }
   if (isProd && !config.redis.password) {
     warnings.push('生产环境建议设置 REDIS_PASSWORD');
+  }
+  if (isProd && (!config.appUrl || config.appUrl.length === 0)) {
+    errors.push('生产环境必须设置 APP_URL，否则邮件/短信/支付回调链接将为空');
   }
 
   // P1: Runtime connectivity checks (async — call separately after config validation)
