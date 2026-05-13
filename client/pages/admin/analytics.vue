@@ -21,13 +21,24 @@
 </template>
 
 <script setup lang="ts">
-import VChart from 'vue-echarts'
-import { use } from 'echarts/core'
-import { BarChart } from 'echarts/charts'
-import { GridComponent, TooltipComponent } from 'echarts/components'
-import { CanvasRenderer } from 'echarts/renderers'
+let VChart: any = null
 
-use([BarChart, GridComponent, TooltipComponent, CanvasRenderer])
+async function _loadVChart() {
+  if (VChart) return
+  const [vChartModule, core, charts, components, renderers] = await Promise.all([
+    import('vue-echarts'),
+    import('echarts/core'),
+    import('echarts/charts'),
+    import('echarts/components'),
+    import('echarts/renderers'),
+  ])
+  core.use([
+    charts.BarChart,
+    components.GridComponent, components.TooltipComponent,
+    renderers.CanvasRenderer,
+  ])
+  VChart = vChartModule.default || vChartModule
+}
 
 
 const loading = ref(true), stats = ref<any>(null)
@@ -37,6 +48,7 @@ function fmtNum(n: number) { return n >= 1000 ? (n / 1000).toFixed(1) + 'k' : St
 
 onMounted(async () => {
   try {
+    await _loadVChart()
     const data: any = await $fetch('/api/admin/stats', { credentials: 'include' })
     if (data?.code === 200) stats.value = data.data
   } catch (e: any) { toast.error(e?.data?.msg || '加载失败') }

@@ -84,12 +84,23 @@
 import PageHeader from '~/components/shared/PageHeader.vue'
 import StatsCard from '~/components/shared/StatsCard.vue'
 import StatusBadge from '~/components/shared/StatusBadge.vue'
-import * as echarts from 'echarts/core';
-import { LineChart, PieChart, BarChart } from 'echarts/charts';
-import { TitleComponent, TooltipComponent, LegendComponent, GridComponent } from 'echarts/components';
-import { CanvasRenderer } from 'echarts/renderers';
 
-echarts.use([LineChart, PieChart, BarChart, TitleComponent, TooltipComponent, LegendComponent, GridComponent, CanvasRenderer]);
+let echarts: any = null
+async function _loadEcharts() {
+  if (echarts) return
+  const [core, charts, components, renderers] = await Promise.all([
+    import('echarts/core'),
+    import('echarts/charts'),
+    import('echarts/components'),
+    import('echarts/renderers'),
+  ])
+  core.use([
+    charts.LineChart, charts.PieChart, charts.BarChart,
+    components.TitleComponent, components.TooltipComponent, components.LegendComponent, components.GridComponent,
+    renderers.CanvasRenderer,
+  ])
+  echarts = core
+}
 
 const { t } = useI18n()
 
@@ -110,15 +121,16 @@ const toast = useToast()
 const statusVariant = (s: number) => ['info','warning','success','danger'][s] || 'default'
 const statusLabel = (s: number) => [t('admin_dashboard.status_queued'), t('admin_dashboard.status_processing'), t('admin_dashboard.status_done'), t('admin_dashboard.status_failed')][s] || ''
 
-function initChart(el: HTMLDivElement | undefined): echarts.ECharts | null {
+async function initChart(el: HTMLDivElement | undefined): Promise<any> {
   if (!el || typeof window === 'undefined') return null
+  await _loadEcharts()
   const instance = echarts.init(el)
   charts.push(instance)
   return instance
 }
 
-function renderLineChart(el: HTMLDivElement | undefined, data: { date: string; value: number }[], color: string) {
-  const chart = initChart(el)
+async function renderLineChart(el: HTMLDivElement | undefined, data: { date: string; value: number }[], color: string) {
+  const chart = await initChart(el)
   if (!chart) return
   chart.setOption({
     tooltip: { trigger: 'axis', backgroundColor: '#fff', borderColor: '#e5e7eb', textStyle: { color: '#333', fontSize: 12 } },
@@ -150,7 +162,7 @@ function renderLineChart(el: HTMLDivElement | undefined, data: { date: string; v
   })
 }
 
-function renderPieChart(el: HTMLDivElement | undefined, data: { label: string; value: number; color: string }[]) {
+async function renderPieChart(el: HTMLDivElement | undefined, data: { label: string; value: number; color: string }[]) {
   const chart = initChart(el)
   if (!chart) return
   const pieColors = ['#3B82F6', '#22C55E', '#F59E0B', '#EF4444', '#7C3AED', '#EC4899', '#06B6D4', '#84CC16']
@@ -174,7 +186,7 @@ function renderPieChart(el: HTMLDivElement | undefined, data: { label: string; v
   })
 }
 
-function renderBarChart(el: HTMLDivElement | undefined, data: { label: string; value: number }[]) {
+async function renderBarChart(el: HTMLDivElement | undefined, data: { label: string; value: number }[]) {
   const chart = initChart(el)
   if (!chart) return
   const barColors = ['#3B82F6', '#22C55E', '#F59E0B', '#7C3AED', '#EC4899']
@@ -191,7 +203,7 @@ function renderBarChart(el: HTMLDivElement | undefined, data: { label: string; v
   })
 }
 
-function renderModelChart(el: HTMLDivElement | undefined, data: { label: string; value: number; color: string }[]) {
+async function renderModelChart(el: HTMLDivElement | undefined, data: { label: string; value: number; color: string }[]) {
   const chart = initChart(el)
   if (!chart) return
   const colors = ['#7C3AED', '#3B82F6', '#22C55E', '#F59E0B', '#EC4899']
@@ -232,25 +244,25 @@ async function fetchAll() {
       stats.value = sVal.data
       const trends = sVal.data?.trends
       disposeCharts()
-      nextTick(() => {
-        renderLineChart(taskChart.value, trends?.tasks || [], '#3B82F6')
-        renderLineChart(userChart.value, trends?.users || [], '#22C55E')
-        renderLineChart(revenueChart.value, trends?.revenue || [], '#7C3AED')
-        renderPieChart(pieChart.value, sVal.data?.taskDistribution || [
+      nextTick(async () => {
+        await renderLineChart(taskChart.value, trends?.tasks || [], '#3B82F6')
+        await renderLineChart(userChart.value, trends?.users || [], '#22C55E')
+        await renderLineChart(revenueChart.value, trends?.revenue || [], '#7C3AED')
+        await renderPieChart(pieChart.value, sVal.data?.taskDistribution || [
           { label: t('admin_dashboard.fb_main_image'), value: 35, color: '#3B82F6' },
           { label: t('admin_dashboard.fb_scene'), value: 18, color: '#22C55E' },
           { label: t('admin_dashboard.fb_video'), value: 22, color: '#F59E0B' },
           { label: t('admin_dashboard.fb_detail'), value: 12, color: '#7C3AED' },
           { label: t('admin_dashboard.fb_other'), value: 13, color: '#EC4899' },
         ])
-        renderBarChart(barChart.value, sVal.data?.popularFeatures || [
+        await renderBarChart(barChart.value, sVal.data?.popularFeatures || [
           { label: t('admin_dashboard.fb_smart_cutout'), value: 128 },
           { label: t('admin_dashboard.fb_scene_gen'), value: 96 },
           { label: t('admin_dashboard.fb_video_gen'), value: 74 },
           { label: t('admin_dashboard.fb_image_refine'), value: 58 },
           { label: t('admin_dashboard.fb_white_bg'), value: 43 },
         ])
-        renderModelChart(modelChart.value, sVal.data?.modelUsage || [
+        await renderModelChart(modelChart.value, sVal.data?.modelUsage || [
           { label: 'GPT-4o', value: 45, color: '#7C3AED' },
           { label: 'Claude', value: 25, color: '#3B82F6' },
           { label: 'SD XL', value: 20, color: '#22C55E' },

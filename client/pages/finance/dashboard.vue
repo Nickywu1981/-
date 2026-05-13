@@ -83,5 +83,5 @@ const transactions = [
   { id: 'ORD-20260510-004', user: '义乌小商品', type: '基础版月', amount: '299', commission: '60', time: '2026-05-10 18:45', status: '已退款', statusType: 'danger' },
 ]
 
-definePageMeta({ layout: 'finance' })
+definePageMeta({ layout: 'finance', middleware: ['auth'] })
 </script>

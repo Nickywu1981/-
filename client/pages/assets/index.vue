@@ -66,7 +66,7 @@ const copyLink = copyToClipboard
 
 const toast = useToast()
 const { t } = useI18n()
-definePageMeta({ layout: 'workspace' })
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 
 const apiBase = useRuntimeConfig().public.apiBase || '/api'
 

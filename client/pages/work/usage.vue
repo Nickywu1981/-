@@ -53,13 +53,24 @@
 </template>
 
 <script setup lang="ts">
-import * as echarts from 'echarts/core'
-import { PieChart, BarChart } from 'echarts/charts'
-import { TooltipComponent, GridComponent } from 'echarts/components'
-import { CanvasRenderer } from 'echarts/renderers'
-
-echarts.use([PieChart, BarChart, TooltipComponent, GridComponent, CanvasRenderer])
 import { formatDateTime } from '@/utils/format'
+
+let echarts: any = null
+async function _loadEcharts() {
+  if (echarts) return
+  const [core, charts, components, renderers] = await Promise.all([
+    import('echarts/core'),
+    import('echarts/charts'),
+    import('echarts/components'),
+    import('echarts/renderers'),
+  ])
+  core.use([
+    charts.PieChart, charts.BarChart,
+    components.TooltipComponent, components.GridComponent,
+    renderers.CanvasRenderer,
+  ])
+  echarts = core
+}
 
 const loading = ref(false); const error = ref('')
 const modelChartRef = ref<HTMLDivElement>(); const typeChartRef = ref<HTMLDivElement>()
@@ -77,8 +88,9 @@ const statCards = computed(() => [
   { label: '当前套餐', value: stats.planName, sub: stats.resetDate ? `下月 ${stats.resetDate} 重置` : '', highlight: false },
 ])
 
-function initChart(el: HTMLDivElement | undefined) {
+async function initChart(el: HTMLDivElement | undefined) {
   if (!el) return null
+  await _loadEcharts()
   const instance = echarts.init(el)
   return instance
 }
@@ -86,6 +98,7 @@ function initChart(el: HTMLDivElement | undefined) {
 async function fetchAll() {
   loading.value = true; error.value = ''
   try {
+    await _loadEcharts()
     const [aiR, creditR, taskR]: any[] = await Promise.all([
       $fetch('/api/ai-dispatch/stats'),
       $fetch('/api/credits/balance'),
@@ -110,11 +123,11 @@ async function fetchAll() {
       }))
     }
 
-    nextTick(() => {
+    nextTick(async () => {
       const mKeys = Object.keys(byModel), mValues = Object.values(byModel)
       if (modelChartRef.value) {
         if (modelChart) modelChart.dispose()
-        modelChart = initChart(modelChartRef.value)
+        modelChart = await initChart(modelChartRef.value)
         if (modelChart && mKeys.length) modelChart.setOption({
           tooltip: { trigger: 'item' },
           series: [{ type: 'pie', radius: ['40%','65%'], center: ['50%','50%'],
@@ -125,7 +138,7 @@ async function fetchAll() {
       const tKeys = Object.keys(byType), tValues = Object.values(byType)
       if (typeChartRef.value) {
         if (typeChart) typeChart.dispose()
-        typeChart = initChart(typeChartRef.value)
+        typeChart = await initChart(typeChartRef.value)
         if (typeChart && tKeys.length) typeChart.setOption({
           tooltip: { trigger: 'axis' },
           xAxis: { type: 'category', data: tKeys, axisLabel: { fontSize: 10, rotate: 20 } },
