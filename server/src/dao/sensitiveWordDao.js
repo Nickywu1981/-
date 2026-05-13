@@ -38,11 +38,13 @@ export async function listSensitiveWords({ keyword, page = 1, pageSize = 50 }) {
 
 export async function addSensitiveWord(word, category, level) {
   const [r] = await _db().execute('INSERT IGNORE INTO sensitive_word (word, category, level) VALUES (?,?,?)', [word, category, level]);
+  invalidateWordCache();
   return r.affectedRows;
 }
 
 export async function deleteSensitiveWord(id) {
   const [r] = await _db().execute('DELETE FROM sensitive_word WHERE id = ?', [id]);
+  invalidateWordCache();
   return r.affectedRows;
 }
 

@@ -108,10 +108,11 @@ const LAYOUT_TEMPLATES = {
  * @returns {{ layout, html, sections, totalHeight, style }}
  */
 export function autoLayout(ctx, opts = {}) {
-  const modules = ctx.modules || ctx.detailModules || [];
-  const sellingPoints = ctx.sellingPoints || [];
-  const productName = ctx.productName || '商品详情';
-  const industry = ctx.industry || 'clothing';
+  try {
+    const modules = ctx.modules || ctx.detailModules || [];
+    const sellingPoints = ctx.sellingPoints || [];
+    const productName = ctx.productName || '商品详情';
+    const industry = ctx.industry || 'clothing';
 
   // 智能布局选择
   let layoutStyle = opts.layoutStyle || _inferLayoutStyle(industry, ctx.style);
@@ -191,6 +192,16 @@ export function autoLayout(ctx, opts = {}) {
   });
 
   return result;
+  } catch (e) {
+    logger.error('[LayoutService] autoLayout failed, returning fallback', e.message);
+    return {
+      layout: { style: 'standard_9_section', styleName: '标准九宫格(降级)', sections: [], totalHeight: 0, spacing: 12, colors: { bg: '#f5f5f5', text: '#333333', accent: '#ff5000' } },
+      html: '',
+      totalModules: 0,
+      productName: ctx?.productName || '商品详情',
+      error: e.message,
+    };
+  }
 }
 
 // ==================== HTML 生成 ====================

@@ -92,6 +92,7 @@ export default {
   },
 
   async updatePage(id, tenantId, fields) {
+    const oldSlug = fields.slug ? null : await this._getSlugById(id, tenantId);
     const allowed = ['title', 'slug', 'page_type', 'access_type', 'mobile_config', 'pc_config', 'meta_json', 'status', 'offline_time'];
     const sets = []; const vals = [];
     for (const k of allowed) {
@@ -105,6 +106,10 @@ export default {
     if (fields.status === 2) { sets.push('offline_time = NOW()'); }
     vals.push(id, tenantId);
     const [r] = await pool.query(`UPDATE diy_page SET ${sets.join(', ')} WHERE id = ? AND tenant_id = ?`, vals);
+    if (r.affectedRows) {
+      if (oldSlug) await this.clearPageCache(oldSlug);
+      if (fields.slug) await this.clearPageCache(fields.slug);
+    }
     return r.affectedRows;
   },
 
@@ -116,6 +121,7 @@ export default {
 
   async softDeletePage(id, tenantId) {
     const [r] = await pool.query('UPDATE diy_page SET status = 3 WHERE id = ? AND tenant_id = ?', [id, tenantId]);
+    if (r.affectedRows) await this._clearCacheById(id, tenantId);
     return r.affectedRows;
   },
 
@@ -126,19 +132,23 @@ export default {
 
   // 依赖调用方已验证 page_id 归属当前租户
   async hardDeletePage(id, tenantId) {
+    const slug = await this._getSlugById(id, tenantId);
     return withTransaction(async (conn) => {
       await conn.query('DELETE FROM diy_page_version WHERE page_id = ?', [id]);
       await conn.query('DELETE FROM diy_page WHERE id = ? AND tenant_id = ? AND status = 3', [id, tenantId]);
+      if (slug) await this.clearPageCache(slug);
     });
   },
 
   async unpublishPage(id, tenantId) {
     const [r] = await pool.query('UPDATE diy_page SET status = 2, offline_time = NOW() WHERE id = ? AND tenant_id = ? AND status = 1', [id, tenantId]);
+    if (r.affectedRows) await this._clearCacheById(id, tenantId);
     return r.affectedRows;
   },
 
   async republishPage(id, tenantId) {
     const [r] = await pool.query('UPDATE diy_page SET status = 1, publish_time = NOW() WHERE id = ? AND tenant_id = ? AND status = 2', [id, tenantId]);
+    if (r.affectedRows) await this._clearCacheById(id, tenantId);
     return r.affectedRows;
   },
 
@@ -224,6 +234,18 @@ export default {
     if (redis) {
       try { await redis.del(`${REDIS_KEY_PREFIX}${slug}`); } catch (e) { logger.warn('[DiyDao] clearPageCache 缓存删除失败', { slug, error: e.message }); }
     }
+  },
+
+  // ── 缓存失效辅助方法 ──
+
+  async _getSlugById(id, tenantId) {
+    const [rows] = await pool.query('SELECT slug FROM diy_page WHERE id = ? AND tenant_id = ? LIMIT 1', [id, tenantId]);
+    return rows[0]?.slug || null;
+  },
+
+  async _clearCacheById(id, tenantId) {
+    const slug = await this._getSlugById(id, tenantId);
+    if (slug) await this.clearPageCache(slug);
   },
 
   // ==================== 批量操作 ====================

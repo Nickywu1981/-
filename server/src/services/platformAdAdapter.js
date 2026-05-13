@@ -200,6 +200,7 @@ const PLATFORM_SPECS = {
  * @returns {{ platform, spec, videoParams, optimization, rules }}
  */
 export function getPlatformSpec(platform, overrides = {}) {
+  try {
   const spec = PLATFORM_SPECS[platform] || PLATFORM_SPECS.qianchuan;
 
   const aspectRatio = overrides.aspectRatio || spec.video.recommendedRatio;
@@ -239,6 +240,20 @@ export function getPlatformSpec(platform, overrides = {}) {
   });
 
   return result;
+  } catch (e) {
+    logger.error('[PlatformAdapter] getPlatformSpec failed', e.message);
+    return {
+      platform: '巨量千川(降级)',
+      displayName: '抖音电商投放',
+      spec: PLATFORM_SPECS.qianchuan,
+      videoParams: { aspectRatio: '9:16', resolution: '1080x1920', duration: 30, format: 'mp4', codec: 'h264', bitrate: '2-6 Mbps', maxSizeMB: 500 },
+      optimization: { goals: PLATFORM_SPECS.qianchuan.optimizationGoals, recommendedGoal: 'conversion' },
+      rules: { forbidden: PLATFORM_SPECS.qianchuan.forbiddenContent, landingPages: PLATFORM_SPECS.qianchuan.landingPages },
+      trends: PLATFORM_SPECS.qianchuan.trends,
+      creativeFormats: PLATFORM_SPECS.qianchuan.creativeFormats,
+      error: e.message,
+    };
+  }
 }
 
 /**
@@ -249,6 +264,7 @@ export function getPlatformSpec(platform, overrides = {}) {
  * @returns {{ platformPrompt, adCopyHints, creativeSuggestions }}
  */
 export function generatePlatformPrompt(platform, productInfo = {}) {
+  try {
   const spec = getPlatformSpec(platform);
   const productName = productInfo.name || '商品';
 
@@ -278,6 +294,17 @@ export function generatePlatformPrompt(platform, productInfo = {}) {
     recommendedRatio: spec.video.recommendedRatio,
     recommendedDuration: spec.video.recommendedDuration,
   };
+  } catch (e) {
+    logger.error('[PlatformAdapter] generatePlatformPrompt failed', e.message);
+    return {
+      platformPrompt: '为电商投放优化创意内容',
+      adCopyHints: ['突出产品卖点', '强调使用场景', '促销优惠引导'],
+      creativeSuggestions: [{ format: 'video', label: '短视频' }, { format: 'image', label: '图片' }],
+      recommendedRatio: '9:16',
+      recommendedDuration: 30,
+      error: e.message,
+    };
+  }
 }
 
 /**
@@ -289,6 +316,7 @@ export function generatePlatformPrompt(platform, productInfo = {}) {
  * @returns 调整后的视频参数 { ratio, duration, resolution }
  */
 export function adaptVideoParams(ctx) {
+  try {
   const platform = ctx.platform || 'qianchuan';
   const spec = getPlatformSpec(platform, {
     duration: ctx.videoDuration || 30,
@@ -300,6 +328,10 @@ export function adaptVideoParams(ctx) {
     platform,
     platformName: spec.displayName,
   };
+  } catch (e) {
+    logger.error('[PlatformAdapter] adaptVideoParams failed', e.message);
+    return { aspectRatio: '9:16', resolution: '1080x1920', duration: 30, format: 'mp4', codec: 'h264', bitrate: '2-6 Mbps', maxSizeMB: 500, platform: 'qianchuan', platformName: '巨量千川(降级)', error: e.message };
+  }
 }
 
 export { PLATFORM_SPECS };

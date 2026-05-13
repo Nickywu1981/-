@@ -98,6 +98,18 @@ async function _singleImageGen(ctx, prompt, taskType, size = '1024x1024') {
   return result?.images?.[0]?.url || result?.url || null;
 }
 
+/** 批量图片生成工厂 — 消除 multi_angle/scene/detail_shot/storyboard 四函数重复 */
+async function _batchImageGenStep(ctx, { intentId, items, itemToPrompt, fallback, outputLabel, size = '1024x1024' }) {
+  let basePrompt;
+  try { const wrapped = await _wrapStepPrompt(ctx, intentId); basePrompt = wrapped.system; } catch { basePrompt = ''; }
+  const results = await Promise.allSettled(items.map(item => {
+    const prompt = (basePrompt ? basePrompt + '. ' : '') + fallback + ', ' + itemToPrompt(item);
+    return _singleImageGen(ctx, prompt, intentId, size);
+  }));
+  const urls = results.map((r, i) => r.status === 'fulfilled' ? r.value : null).filter(Boolean);
+  return { imageUrls: urls, generatedCount: urls.length, [outputLabel]: items };
+}
+
 // ==================== 步骤执行器映射 ====================
 
 const STEP_EXECUTORS = {
@@ -165,72 +177,55 @@ const STEP_EXECUTORS = {
   detail_module_gen:  _imageGenStep('detail_module', null, 'detail_image'),
 
   // 多角度主图 — 6个命名角度并发生成 (对齐 ExpandAgent.multiAngleTool)
-  multi_angle_gen: async (ctx) => {
+  multi_angle_gen: (ctx) => {
     const count = ctx.batchSize || 4;
     const angles = MULTI_ANGLES.slice(0, count);
-    let basePrompt;
-    try { const wrapped = await _wrapStepPrompt(ctx, 'scene_image'); basePrompt = wrapped.system; } catch { basePrompt = ''; }
-    const fallbackBase = `professional e-commerce product photography, pure white background #FFFFFF, studio lighting, product centered, ultra high resolution, commercial quality`;
-    const results = await Promise.allSettled(angles.map(angle => {
-      const prompt = (basePrompt ? basePrompt + '. ' : '')
-        + `${fallbackBase}, ${angle} view${ctx.productName ? ', product: ' + ctx.productName : ''}`;
-      return _singleImageGen(ctx, prompt, 'multi_angle');
-    }));
-    const urls = results.map((r, i) => r.status === 'fulfilled' ? r.value : null).filter(Boolean);
-    return { imageUrls: urls, generatedCount: urls.length, angles };
+    return _batchImageGenStep(ctx, {
+      intentId: 'scene_image',
+      items: angles,
+      itemToPrompt: (angle) => `${angle} view${ctx.productName ? ', product: ' + ctx.productName : ''}`,
+      fallback: 'professional e-commerce product photography, pure white background #FFFFFF, studio lighting, product centered, ultra high resolution, commercial quality',
+      outputLabel: 'angles',
+    });
   },
 
   // 场景图 — 行业场景库驱动 (对齐 ExpandAgent.sceneTool)
-  scene_image_gen: async (ctx) => {
+  scene_image_gen: (ctx) => {
     const scenes = INDUSTRY_SCENES[ctx.industry] || INDUSTRY_SCENES.clothing;
-    let basePrompt;
-    try { const wrapped = await _wrapStepPrompt(ctx, 'scene_image'); basePrompt = wrapped.system; } catch { basePrompt = ''; }
-    const fallbackBase = `professional e-commerce lifestyle photography, natural lighting, commercial quality, realistic setting`;
-    const results = await Promise.allSettled(scenes.map(scene => {
-      const prompt = (basePrompt ? basePrompt + '. ' : '')
-        + `${fallbackBase}, ${ctx.productName || 'product'} in ${scene.replace(/_/g, ' ')}`;
-      return _singleImageGen(ctx, prompt, 'scene_image');
-    }));
-    const urls = results.map((r, i) => r.status === 'fulfilled' ? r.value : null).filter(Boolean);
-    return { imageUrls: urls, generatedCount: urls.length, scenes };
+    return _batchImageGenStep(ctx, {
+      intentId: 'scene_image',
+      items: scenes,
+      itemToPrompt: (scene) => `${ctx.productName || 'product'} in ${scene.replace(/_/g, ' ')}`,
+      fallback: 'professional e-commerce lifestyle photography, natural lighting, commercial quality, realistic setting',
+      outputLabel: 'scenes',
+    });
   },
 
   // 卖点细节图 — 4维度拆分 (对齐 ExpandAgent.detailShotTool)
-  detail_shot_gen: async (ctx) => {
-    let basePrompt;
-    try { const wrapped = await _wrapStepPrompt(ctx, 'detail_image'); basePrompt = wrapped.system; } catch { basePrompt = ''; }
-    const fallbackBase = `extreme close-up e-commerce product photography, macro lens, ultra detailed, studio lighting, pure white background`;
-    const results = await Promise.allSettled(DETAIL_DIMENSIONS.map(dim => {
-      const prompt = (basePrompt ? basePrompt + '. ' : '')
-        + `${fallbackBase}, ${dim.replace(/_/g, ' ')}, ${ctx.productName || 'product'}`;
-      return _singleImageGen(ctx, prompt, 'detail_shot');
-    }));
-    const urls = results.map((r, i) => r.status === 'fulfilled' ? r.value : null).filter(Boolean);
-    return { imageUrls: urls, generatedCount: urls.length, details: DETAIL_DIMENSIONS };
-  },
+  detail_shot_gen: (ctx) => _batchImageGenStep(ctx, {
+    intentId: 'detail_image',
+    items: DETAIL_DIMENSIONS,
+    itemToPrompt: (dim) => `${dim.replace(/_/g, ' ')}, ${ctx.productName || 'product'}`,
+    fallback: 'extreme close-up e-commerce product photography, macro lens, ultra detailed, studio lighting, pure white background',
+    outputLabel: 'details',
+  }),
 
-  // 分镜图 — 从脚本scenes逐帧生成 (修复Bug: storyboard_gen与script_gen数据断链)
   storyboard_gen: async (ctx) => {
     const scenes = _parseScenes(ctx);
     if (scenes && scenes.length > 0) {
-      let baseSystem;
-      try { const wrapped = await _wrapStepPrompt(ctx, 'storyboard'); baseSystem = wrapped.system; } catch { baseSystem = ''; }
-      const results = await Promise.allSettled(scenes.map(scene =>
-        _singleImageGen(ctx,
-          (baseSystem ? baseSystem + '. ' : '')
-            + `e-commerce video storyboard frame, scene ${scene.number}: ${scene.visual || ''}, ${scene.camera || 'medium shot'}, cinematic lighting, 9:16 vertical video frame, commercial quality`,
-          'storyboard',
-          '1024x1792'
-        )
-      ));
-      const frames = results.map((r, i) => ({
-        sceneNumber: scenes[i]?.number || i + 1,
-        url: r.status === 'fulfilled' ? r.value : null,
-      }));
-      const urls = frames.map(f => f.url).filter(Boolean);
-      return { storyboardUrls: urls, imageUrls: urls, frames, generatedCount: urls.length };
+      const result = await _batchImageGenStep(ctx, {
+        intentId: 'storyboard',
+        items: scenes,
+        itemToPrompt: (scene) =>
+          `e-commerce video storyboard frame, scene ${scene.number}: ${scene.visual || ''}, ${scene.camera || 'medium shot'}, cinematic lighting, 9:16 vertical video frame, commercial quality`,
+        fallback: '',
+        outputLabel: 'scenes',
+        size: '1024x1792',
+      });
+      result.storyboardUrls = result.imageUrls;
+      result.frames = result.imageUrls.map((url, i) => ({ sceneNumber: i + 1, url }));
+      return result;
     }
-    // 无脚本场景 → 降级为批量通用分镜图
     return _imageGenStep('storyboard', null, 'storyboard')(ctx);
   },
 
