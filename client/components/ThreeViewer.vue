@@ -9,16 +9,16 @@
     </div>
     <div v-if="loading" class="viewer-overlay">
       <div class="spinner" />
-      <p>加载 3D 模型中...</p>
+      <p>{{ $t('three_viewer.loading') }}</p>
     </div>
     <div v-if="error" class="viewer-overlay error">
       <p>{{ error }}</p>
-      <button @click="retry" aria-label="重试加载">重试</button>
+      <button @click="retry" :aria-label="$t('three_viewer.retry')">{{ $t('three_viewer.retry') }}</button>
     </div>
     <div class="viewer-info" v-if="modelInfo">
-      <span>顶点: {{ modelInfo.vertices }}</span>
-      <span>三角面: {{ modelInfo.faces }}</span>
-      <span>材质: {{ modelInfo.materials }}</span>
+      <span>{{ $t('three_viewer.vertices') }}: {{ modelInfo.vertices }}</span>
+      <span>{{ $t('three_viewer.faces') }}: {{ modelInfo.faces }}</span>
+      <span>{{ $t('three_viewer.materials') }}: {{ modelInfo.materials }}</span>
     </div>
   </div>
 </template>
@@ -56,13 +56,15 @@ let autoRotateActive = props.autoRotate !== false;
 
 const modelInfo = ref<{ vertices: number; faces: number; materials: number } | null>(null);
 
-const controls = ref([
-  { key: 'rotate', icon: '🔄', label: '自动旋转', active: autoRotateActive, action: toggleRotate },
-  { key: 'wireframe', icon: '🔲', label: '线框', active: false, action: toggleWireframe },
-  { key: 'reset', icon: '🏠', label: '复位', active: false, action: resetView },
-  { key: 'top', icon: '⬆', label: '俯视', active: false, action: () => setView('top') },
-  { key: 'front', icon: '👁', label: '正视', active: false, action: () => setView('front') },
-]);
+	const { t } = useI18n()
+
+	const controls = computed(() => [
+	  { key: 'rotate', icon: '🔄', label: t('three_viewer.auto_rotate'), active: autoRotateActive, action: toggleRotate },
+	  { key: 'wireframe', icon: '🔲', label: t('three_viewer.wireframe'), active: false, action: toggleWireframe },
+	  { key: 'reset', icon: '🏠', label: t('three_viewer.reset'), active: false, action: resetView },
+	  { key: 'top', icon: '⬆', label: t('three_viewer.top'), active: false, action: () => setView('top') },
+	  { key: 'front', icon: '👁', label: t('three_viewer.front'), active: false, action: () => setView('front') },
+	]);
 
 function initScene() {
   if (!containerRef.value || !canvasRef.value) return;
@@ -270,7 +272,7 @@ onMounted(async () => {
     _OrbitControls = (await import('three/examples/jsm/controls/OrbitControls.js')).OrbitControls;
     _GLTFLoader = (await import('three/examples/jsm/loaders/GLTFLoader.js')).GLTFLoader;
   } catch (e) {
-    error.value = '3D 引擎加载失败';
+    error.value = t('three_viewer.engine_load_failed');
     return;
   }
   nextTick(() => {
