@@ -6,7 +6,10 @@ import { wrapController } from '../utils/wrapController.js';
 import { gatewayInfer, gatewayDispatch, gatewayRoute, getGatewayStats, getGatewayPricing } from '../gateway/aiGatewayHub.js';
 import { getDashboardSummary, getModelBreakdown, getTimeSeries, getTopUsers } from '../services/monitorService.js';
 import { checkAlerts, getAlertRules } from '../services/alertService.js';
-import { submitAsyncTask, getTaskStatus as _getTaskStatus, createSSEStream } from '../services/streamingService.js';
+import { submitAsyncTask, getTaskStatus as _getTaskStatus, createSSEStream, processStreamingOutput } from '../services/streamingService.js';
+import { streamInfer } from '../services/aiEngine.js';
+import { moderateText } from '../services/moderation.service.js';
+import { moderateOutput } from '../services/outputModerationService.js';
 import logger from '../utils/logger.js';
 
 export const aiGatewayController = {
@@ -106,46 +109,45 @@ export const aiGatewayController = {
     return _getTaskStatus(taskId);
   }),
 
-  // TODO: 替换为真实流式 — 配合 streamingService.processStreamingOutput() 实现 token 级实时推送
-  streamInfer: wrapController(async (req, res) => {
-    const { modelId, input } = req.body;
-    const stream = createSSEStream(res);
 
-    try {
-      const result = await gatewayInfer(modelId, input, {
-        userId: req.user?.id,
-        tenantId: req.tenantId,
-        taskType: req.body.taskType || 'unknown',
-        source: req.body.source || 'consumer',
-        correlationId: req.headers['x-correlation-id'] || null,
-      });
+	  streamInfer: wrapController(async (req, res) => {
+	    const { modelId, input } = req.body;
+	    const stream = createSSEStream(res);
 
-      if (result.blocked) {
-        stream.error(result.blockReason, 400);
-        return;
-      }
+	    try {
+	      // Pre-invoke: 快速输入安全检查
+	      const textInput = typeof input === 'string' ? input : JSON.stringify(input);
+	      const preCheck = await moderateText(textInput, req.user?.id, { stage: 'input' });
+	      if (preCheck.action === 'block') {
+	        stream.error('内容包含违规信息，请修改后重试', 400);
+	        return;
+	      }
 
-      // 流式发送结果（模拟逐段输出）
-      const output = typeof result.output === 'string'
-        ? result.output
-        : JSON.stringify(result.output);
+	      // 创建真实流式源（优先原生 streaming，不支持时自动降级模拟）
+	      const sourceStream = streamInfer(modelId, input, {
+	        onProgress: (p) => logger.debug(`[Stream] ${modelId} progress: ${p}%`),
+	      });
 
-      const chunks = output.match(/.{1,50}/g) || [output];
-      for (const chunk of chunks) {
-        stream.send(chunk, 'token');
-        // 模拟间隔（生产环境由模型真正流式返回）
-        await new Promise(r => setTimeout(r, 10));
-      }
+	      // 边输出边审核管线
+	      const { accumulated, blocked } = await processStreamingOutput(sourceStream, stream, {
+	        moderateInterval: 5,
+	        moderator: async (accumulatedText) => {
+	          if (!accumulatedText || accumulatedText.length < 20) return { passed: true };
+	          try {
+	            const result = await moderateOutput(accumulatedText, { level: 5, enableAliyun: false });
+	            return { passed: result.passed, violations: result.violations };
+	          } catch {
+	            return { passed: true };
+	          }
+	        },
+	      });
 
-      stream.send({
-        tokensIn: result.tokensIn,
-        tokensOut: result.tokensOut,
-        cost: result.cost,
-      }, 'meta');
-
-      stream.done();
-    } catch (err) {
-      stream.error(err.message);
-    }
-  }),
+	      if (blocked) {
+	        logger.warn(`[Stream] 输出审核拦截: model=${modelId} user=${req.user?.id}`);
+	      }
+	    } catch (err) {
+	      logger.error(`[Stream] 流式推理失败: ${err.message}`);
+	      stream.error(err.message);
+	    }
+	  }),
 };

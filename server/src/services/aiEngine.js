@@ -251,6 +251,38 @@ export async function infer(modelId, input, options = {}) {
   throw lastError;
 }
 
+
+/**
+ * 流式推理 — 返回 AsyncGenerator，逐步 yield 模型输出 token
+ * 仅 OpenAI 兼容模型支持流式，其他模型自动降级为模拟流式
+ * @param {string} modelId
+ * @param {object} input
+ * @param {object} [options]
+ * @returns {AsyncGenerator<{text?: string, usage?: object}>}
+ */
+export async function* streamInfer(modelId, input, options = {}) {
+  const model = getModel(modelId);
+
+  if (model.streamInfer) {
+    // 原生流式推理
+    yield* model.streamInfer(input, options.onProgress);
+  } else {
+    // 降级：完整推断后分块 yield
+    logger.warn(`[AI] ${modelId} 不支持原生流式，降级为模拟流式`);
+    const result = await infer(modelId, input, options);
+    const output = typeof result.output === "string" ? result.output : JSON.stringify(result.output);
+    const chunks = output.match(/.{1,50}/g) || [output];
+    for (const chunk of chunks) {
+      yield { text: chunk };
+    }
+    yield {
+      usage: {
+        inputTokens: result.tokensIn || 0,
+        outputTokens: result.tokensOut || 0,
+      },
+    };
+  }
+}
 // ==================== 管线编排器（增强版） ====================
 
 /**
