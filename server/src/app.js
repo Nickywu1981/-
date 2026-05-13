@@ -152,8 +152,17 @@ app.use(apiLimiter);
 
 // 解析
 app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.use(cookieParser());
+
+// 全局请求超时 (防止慢连接资源耗尽)
+app.use((req, _res, next) => {
+  req.setTimeout(30000, () => {
+    if (!_res.headersSent) _res.status(408).json({ code: 408, msg: '请求超时' });
+    req.destroy();
+  });
+  next();
+});
 
 // 全局参数过滤 — XSS/SQL 注入关键词检测
 app.use(paramFilter);

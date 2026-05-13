@@ -25,6 +25,9 @@ vi.mock('../../utils/response.js', () => ({
 vi.mock('../../constants/errorCode.js', () => ({
   ERROR_CODE: { UNAUTHORIZED: 401, EC_AUTH_002: 401, FORBIDDEN: 403 },
 }));
+vi.mock('../../utils/logger.js', () => ({
+  default: { warn: vi.fn(), error: vi.fn(), info: vi.fn() },
+}));
 
 import { authMiddleware, optionalAuth } from '../../middleware/auth.js';
 

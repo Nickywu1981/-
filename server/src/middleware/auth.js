@@ -14,6 +14,7 @@ import config, { jwtSecret, jwtRefreshSecret, isDevelopment, isProduction } from
 import { isTokenBlacklisted } from '../utils/jwtToken.js';
 import { error as sendError } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
+import logger from '../utils/logger.js';
 
 const refreshSecret = (() => {
   if (jwtRefreshSecret && jwtRefreshSecret !== 'dev-refresh-fallback') return jwtRefreshSecret;
@@ -78,7 +79,7 @@ async function parseToken(header) {
       return { payload: null, expired: true };
     }
     if (process.env.NODE_ENV !== 'production') {
-      console.warn('[Auth] JWT 解析异常', err.message, err.name);
+      logger.warn('[Auth] JWT 解析异常', { message: err.message, name: err.name });
     }
     return { payload: null, expired: false };
   }

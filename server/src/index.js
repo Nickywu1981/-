@@ -39,6 +39,15 @@ import('./services/workerBootstrap.js').then(({ bootstrapWorkers }) => bootstrap
 let cleanupTimer = null;
 let recoverTimer = null;
 
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    logger.error(`端口 ${port} 已被占用，请先释放端口再启动服务`, { code: err.code });
+    process.exit(1);
+  }
+  logger.error('服务器启动错误', { message: err.message, code: err.code });
+  process.exit(1);
+});
+
 server.listen(port, () => {
   logger.info(`${env} 模式 — http://localhost:${port}  |  WebSocket /ws  |  BullMQ Workers`);
 

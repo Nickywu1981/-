@@ -48,23 +48,23 @@ const MIME_TO_EXT = {
   'video/quicktime': '.mov',
 };
 
-/** 检测文件头是否匹配声明类型 */
-function checkMagicNumber(filePath, mimeType) {
+/** 检测文件头是否匹配声明类型 (async) */
+async function checkMagicNumber(filePath, mimeType) {
   const sig = MAGIC_SIGNATURES[mimeType];
   if (!sig) return true;
   const offset = sig.offset || 0;
   const expected = sig.bytes;
-  let fd;
+  let fh;
   try {
-    fd = fs.openSync(filePath, 'r');
+    fh = await fs.promises.open(filePath, 'r');
     const buf = Buffer.alloc(offset + expected.length);
-    fs.readSync(fd, buf, 0, buf.length, 0);
+    await fh.read(buf, 0, buf.length, 0);
     for (let i = 0; i < expected.length; i++) {
       if (buf[offset + i] !== expected[i]) return false;
     }
     return true;
   } catch { return false; }
-  finally { if (fd !== undefined) fs.closeSync(fd); }
+  finally { if (fh) await fh.close(); }
 }
 
 const storage = multer.diskStorage({
@@ -95,11 +95,11 @@ export const uploadMiddleware = multer({
 });
 
 /** 魔数后置校验中间件 — 在 multer 写入后、入库前执行 */
-export function magicNumberGuard(req, res, next) {
+export async function magicNumberGuard(req, res, next) {
   if (!req.file && !req.files) return next();
   const files = req.files ? (Array.isArray(req.files) ? req.files : Object.values(req.files).flat()) : [req.file];
   for (const f of files) {
-    if (!checkMagicNumber(f.path, f.mimetype)) {
+    if (!(await checkMagicNumber(f.path, f.mimetype))) {
       fs.unlink(f.path, () => {}); // 删除恶意文件
       return error(res, 400, '文件内容与扩展名不匹配，已拒绝');
     }
