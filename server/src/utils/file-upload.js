@@ -263,8 +263,9 @@ export async function completeUpload(uploadId) {
  */
 export async function saveSimpleFile(file) {
   const timestamp = Date.now();
-  // 优先用 MIME 类型推断扩展名，不信任用户 originalname
-  const ext = MIME_TO_SAFE_EXT[file.mimetype] || path.extname(file.originalname) || '.bin';
+  // MIME 类型 → 安全扩展名（不信任用户提供的 originalname）
+  const ext = MIME_TO_SAFE_EXT[file.mimetype];
+  if (!ext) throw new BusinessError(ERROR_CODE.VALIDATION_ERROR, `不支持的文件类型: ${file.mimetype}`);
   const extClean = ext.replace('.', '').toLowerCase();
   const finalName = `${timestamp}_${crypto.randomBytes(8).toString('hex')}${ext}`;
   const finalPath = path.join(UPLOAD_DIR, finalName);
