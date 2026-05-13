@@ -84,8 +84,8 @@ export const listAllOrders = wrapController(async (req, res) => {
 export const checkContentRisk = wrapController(async (req, res) => {
     const { content, type } = req.body;
     if (!content || !type) throw new BusinessError(ERROR_CODE.PARAM_MISSING, 'content 和 type 为必填');
-    const blocked = commerce.containsBannedKeywords(content);
-    return success(res, { blocked, keyword: blocked ? '包含敏感词' : '' });
+    const result = await sensitiveWordService.checkText(content);
+    return success(res, { blocked: result.block || result.review, hits: result.hits });
   });
 
 export const listSensitiveWords = wrapController(async (req, res) => {

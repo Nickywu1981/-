@@ -99,9 +99,10 @@ export async function changePassword(userId, { oldPassword, newPassword }) {
 export async function forgotPassword(username) {
   guardSQL(username, 'username');
   const user = await userDao.findByUsername(username);
-  if (!user) return { message: '重置链接已发送至注册邮箱' };
+  if (!user) return { message: '如果账号存在，重置链接已发送至注册邮箱' };
   const resetToken = jwt.sign({ userId: user.id, purpose: 'reset', jti: crypto.randomUUID() }, jwtSecret, { expiresIn: '15m' });
-  return { message: '重置链接已发送至注册邮箱' };
+  // TODO: 集成邮件服务发送重置链接，当前通过管理员手动处理
+  return { message: '如果账号存在，重置链接已发送至注册邮箱' };
 }
 
 export async function resetPassword(token, newPassword) {

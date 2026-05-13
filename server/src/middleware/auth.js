@@ -118,7 +118,7 @@ const PUBLIC_PREFIXES = [
   '/uploads',
 ];
 
-const RENEW_WINDOW = 24 * 60 * 60;  // 24h: token剩余不足1天自动续期
+const RENEW_WINDOW = 5 * 60;  // 5min: 仅临近过期时自动续期，防止被盗token无限刷新
 
 function _parseDurationMs(str) {
   const m = str.match(/^(\d+)(s|m|h|d)$/);

@@ -8,6 +8,7 @@ import * as commerceDao from '../dao/commerceDao.js';
 import { mockEnabled } from '../config/index.js';
 import { BusinessError } from '../utils/businessError.js';
 import { PLAN_TYPE } from '../constants/domainStatus.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 import db from '../dao/db.js';
 
 // ==================== 套餐列表 ====================
@@ -210,12 +211,12 @@ export async function createPlan(data) {
 
 export async function deletePlan(planId) {
   const affected = await commerceDao.deletePlan(planId);
-  if (affected === 0) throw new BusinessError(4101, 'Resource not found');
+  if (affected === 0) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
 }
 
 export async function deleteOrder(orderId, tenantId) {
   const affected = await commerceDao.deletePaymentOrder(orderId, tenantId);
-  if (affected === 0) throw new BusinessError(4101, 'Resource not found');
+  if (affected === 0) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
 }
 
 // ==================== 内容审核 ====================
