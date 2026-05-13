@@ -139,6 +139,13 @@ function getMockPool() {
   return mockPool;
 }
 
+// SQL 可重试错误码（死锁/连接断开/拒绝连接/超时）
+const RETRYABLE_CODES = new Set([
+  'ER_LOCK_DEADLOCK', 'ER_LOCK_WAIT_TIMEOUT',
+  'PROTOCOL_CONNECTION_LOST', 'ECONNREFUSED', 'ETIMEDOUT',
+  'ER_QUERY_INTERRUPTED',
+]);
+
 // Real MySQL pool (lazy - won't connect until first query)
 const realPool = mysql.createPool({
   host: dbConfig.host,
@@ -155,6 +162,11 @@ const realPool = mysql.createPool({
   idleTimeout: 60000,
   dateStrings: true,
   connectTimeout: 3000, // fail fast if no MySQL
+});
+
+// 连接验证：每次从池中取出连接时执行 SELECT 1 健康探测
+realPool.on('acquire', (conn) => {
+  conn.query('SELECT 1').catch(() => {});
 });
 
 // Proxy pool: tries real DB first, falls back to mock
@@ -236,8 +248,45 @@ const pool = new Proxy(contextAwarePool, {
   },
 });
 
+// ==================== 连接池指标 ====================
+
+export function getPoolMetrics() {
+  return {
+    active: realPool._allConnections?.length || 0,
+    idle: realPool._freeConnections?.length || 0,
+    queued: realPool._connectionQueue?.length || 0,
+    acquireWaitMs: null, // mysql2 未直接暴露，通过事件估算
+  };
+}
+
+// ==================== SQL 自动重试 ====================
+
+/**
+ * 包装 DAO execute/query，对可恢复错误自动重试
+ * @param {Function} fn - 原始 execute/query 函数
+ * @param {string} sql - SQL 语句
+ * @param {Array} params - 参数
+ * @param {number} maxRetries - 最大重试次数 (默认3)
+ * @returns {Promise<Array>} [rows, fields]
+ */
+export async function executeWithRetry(fn, sql, params = [], maxRetries = 3) {
+  let lastErr;
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn(sql, params);
+    } catch (err) {
+      lastErr = err;
+      if (!RETRYABLE_CODES.has(err.code) || attempt >= maxRetries) throw err;
+      const delay = Math.round(100 * Math.pow(2, attempt)); // 100, 200, 400ms
+      logger.warn('[DB] Retrying SQL', { attempt: attempt + 1, maxRetries, delay, code: err.code, sql: sql.substring(0, 80) });
+      await new Promise(r => setTimeout(r, delay));
+    }
+  }
+  throw lastErr;
+}
+
 export default pool;
-export { realPool };
+export { realPool, getPoolMetrics, executeWithRetry };
 
 /**
  * 获取请求上下文的租户隔离数据库句柄

@@ -47,6 +47,7 @@ export async function runHealthCheck(authenticated = false) {
 
   // DB 检查
   let schemaVersion = 0;
+  let poolMetrics = null;
   try {
     const db = await import('../dao/db.js');
     const conn = await db.default.getConnection();
@@ -57,17 +58,24 @@ export async function runHealthCheck(authenticated = false) {
     } finally {
       conn.release();
     }
+    // 获取连接池指标
+    if (db.getPoolMetrics) {
+      try { poolMetrics = db.getPoolMetrics(); } catch { /* pool metrics optional */ }
+    }
   } catch (e) {
     logger.warn('[HealthDashboard] DB检查失败', { error: e.message });
     status.checks.db = false;
     status.status = 'db_down';
   }
 
-  // Redis 检查
+  // Redis 检查 + 指标暴露
   try {
-    const { ping } = await import('../dao/redis.js');
+    const { ping, getRedisMetrics } = await import('../dao/redis.js');
     await ping();
     status.checks.redis = true;
+    if (getRedisMetrics) {
+      try { status.checks.redisMetrics = getRedisMetrics(); } catch { /* optional */ }
+    }
   } catch (e) {
     logger.warn('[HealthDashboard] Redis检查失败', { error: e.message });
     status.checks.redis = false;
@@ -99,6 +107,7 @@ export async function runHealthCheck(authenticated = false) {
       rateLimiters: getRateLimiterSummary(),
       correlationId: 'enabled',
       ipWhitelist: 'active',
+      poolMetrics: poolMetrics || { active: 0, idle: 0, queued: 0 },
     };
     status.schema_version = schemaVersion;
   }

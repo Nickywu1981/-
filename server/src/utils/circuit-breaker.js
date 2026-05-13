@@ -133,6 +133,24 @@ export class CircuitBreaker {
     this.window = [];
     logger.info('[CircuitBreaker] 已重置为半开状态');
   }
+
+  /** 动态更新阈值（供自适应阈值引擎调用） */
+  updateThresholds({ failureThreshold, cooldownMs, errorRateThreshold }) {
+    if (failureThreshold !== undefined && failureThreshold > 0) {
+      this.failureThreshold = failureThreshold;
+    }
+    if (cooldownMs !== undefined && cooldownMs > 0) {
+      this.cooldownMs = cooldownMs;
+    }
+    if (errorRateThreshold !== undefined && errorRateThreshold > 0 && errorRateThreshold <= 1) {
+      this.errorRateThreshold = errorRateThreshold;
+    }
+    logger.info('[CircuitBreaker] Thresholds updated', {
+      failureThreshold: this.failureThreshold,
+      cooldownMs: this.cooldownMs,
+      errorRateThreshold: this.errorRateThreshold,
+    });
+  }
 }
 
 export default CircuitBreaker;

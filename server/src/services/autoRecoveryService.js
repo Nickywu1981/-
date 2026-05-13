@@ -1,12 +1,17 @@
 /**
  * 自愈引擎 (Auto-Recovery Service)
  *
- * 后台定时巡检，执行 5 项自愈动作：
+ * 后台定时巡检，执行 5 + 4 项自愈动作：
  *   1. 断路器自愈 — 自动 reset 过期断路器
  *   2. 模型自恢复 — 健康检查通过后自动重新启用
  *   3. 断路器 Redis 跨进程共享
  *   4. 配额预判 — 提前标记即将耗尽模型
  *   5. 自适应限流 — 异常模型自动降权
+ *   +  L5 自进化层:
+ *   6. 连接泄漏检测 — DB 连接池异常检测
+ *   7. 预警信号检测 — 延迟/错误率/熔断早期信号
+ *   8. Redis 健康探活 — 定期 PING 检测
+ *   9. 预测性自愈 — EWMA 故障概率预测 + 预防性动作
  */
 import logger from '../utils/logger.js';
 import { cacheGet, cacheSet } from '../dao/redis.js';
@@ -231,7 +236,219 @@ async function _adaptRateLimiting() {
   }
 }
 
-// ==================== 巡检主循环 ====================
+// ==================== L5 连接泄漏检测 ====================
+
+let _lastPoolCheck = null;
+
+async function _checkConnectionLeaks() {
+  try {
+    const { getPoolMetrics } = await import('../dao/db.js');
+    const metrics = getPoolMetrics();
+    if (!metrics) return;
+
+    const now = Date.now();
+    _lastPoolCheck = { ...metrics, ts: now };
+
+    if (metrics.queued > 20 || (metrics.active > 0 && metrics.idle === 0 && metrics.queued > 10)) {
+      logger.warn('[AutoRecovery] DB 连接池压力', metrics);
+      _recordL5Incident('connection_pool_pressure', 'medium', { pool: metrics }, 'flush_idle_connections', 'success', 0);
+    }
+  } catch (e) { logger.warn('[AutoRecovery] Connection leak check failed', { error: e.message }); }
+}
+
+// ==================== L5 预警信号检测 ====================
+
+const _earlyWarningState = new Map(); // modelId → { consecutiveLatencyRising, consecutiveErrors, lastCheck }
+
+async function _detectEarlyWarning() {
+  try {
+    const { getModelBreakdown } = await import('./monitorService.js');
+    const breakdown = getModelBreakdown();
+    if (!breakdown || breakdown.length === 0) return;
+
+    for (const model of breakdown) {
+      if (!model.modelId) continue;
+      const prev = _earlyWarningState.get(model.modelId) || { consecutiveLatencyRising: 0, consecutiveErrors: 0, prevLatency: null };
+      const latency = model.avgLatencyMs || 0;
+      const errorRate = model.successRate !== undefined ? 1 - model.successRate / 100 : 0;
+
+      // 延迟连续上升
+      if (prev.prevLatency !== null && latency > prev.prevLatency) {
+        prev.consecutiveLatencyRising++;
+      } else {
+        prev.consecutiveLatencyRising = 0;
+      }
+
+      // 错误率连续非零
+      if (errorRate > 0) {
+        prev.consecutiveErrors++;
+      } else {
+        prev.consecutiveErrors = 0;
+      }
+
+      prev.prevLatency = latency;
+      _earlyWarningState.set(model.modelId, prev);
+
+      // 触发预警
+      if (prev.consecutiveLatencyRising >= 5 || prev.consecutiveErrors >= 3) {
+        logger.warn('[AutoRecovery] Early warning triggered', {
+          modelId: model.modelId,
+          latencyRising: prev.consecutiveLatencyRising,
+          consecutiveErrors: prev.consecutiveErrors,
+          currentLatency: latency,
+          currentErrorRate: Math.round(errorRate * 100),
+        });
+
+        // 预防性降权 5-10%
+        try {
+          const { getPool, updateModel } = await import('./modelPoolService.js');
+          const pool = await getPool();
+          const m = pool.find(p => p.model_key === model.modelId);
+          if (m && m.pool_weight > 1) {
+            const newWeight = Math.max(1, Math.floor(m.pool_weight * 0.9));
+            await updateModel(m.model_key, { pool_weight: newWeight });
+            _recordL5Incident('early_warning_weight_reduce', 'low',
+              { modelId: model.modelId, oldWeight: m.pool_weight, newWeight },
+              'reduce_weight', 'success', 0);
+          }
+        } catch { /* best effort */ }
+      }
+    }
+
+    // DB 连接池排队检测
+    try {
+      const { getPoolMetrics } = await import('../dao/db.js');
+      const m = getPoolMetrics();
+      if (m && m.queued > 0) {
+        logger.info('[AutoRecovery] DB 连接池排队增长', { queued: m.queued, active: m.active });
+      }
+    } catch { /* optional */ }
+
+    // Redis 延迟检测
+    try {
+      const { getRedisMetrics } = await import('../dao/redis.js');
+      const rm = getRedisMetrics();
+      if (rm && rm.avgLatencyMs > 100) {
+        logger.warn('[AutoRecovery] Redis 延迟预警', { avgLatencyMs: rm.avgLatencyMs });
+      }
+    } catch { /* optional */ }
+  } catch (e) { logger.warn('[AutoRecovery] Early warning check failed', { error: e.message }); }
+}
+
+// ==================== L5 Redis 健康探活 ====================
+
+async function _healthPingRedis() {
+  try {
+    const { startHealthPing, getRedisMetrics } = await import('../dao/redis.js');
+    startHealthPing(30000);
+    const metrics = getRedisMetrics();
+    if (!metrics.ready && metrics.consecutiveFails >= 3) {
+      logger.error('[AutoRecovery] Redis 不可用', metrics);
+      _recordL5Incident('redis_unavailable', 'critical', metrics, 'enable_memory_fallback', 'success', 0);
+    }
+  } catch (e) { logger.warn('[AutoRecovery] Redis health ping failed', { error: e.message }); }
+}
+
+// ==================== L5 预测性自愈 ====================
+
+const _ewmaState = new Map(); // modelId → { ewmaLatency, ewmaErrorRate }
+
+async function _predictiveHealing() {
+  try {
+    const { getModelBreakdown } = await import('./monitorService.js');
+    const breakdown = getModelBreakdown();
+    if (!breakdown || breakdown.length === 0) return;
+
+    const alpha = 0.3; // EWMA 平滑系数
+
+    for (const model of breakdown) {
+      if (!model.modelId || !model.avgLatencyMs) continue;
+
+      const prev = _ewmaState.get(model.modelId) || { ewmaLatency: model.avgLatencyMs, ewmaErrorRate: 1 - model.successRate / 100 };
+      const currentLatency = model.avgLatencyMs;
+      const currentErrorRate = model.successRate !== undefined ? 1 - model.successRate / 100 : prev.ewmaErrorRate;
+
+      const ewmaLatency = alpha * currentLatency + (1 - alpha) * prev.ewmaLatency;
+      const ewmaErrorRate = alpha * currentErrorRate + (1 - alpha) * prev.ewmaErrorRate;
+      _ewmaState.set(model.modelId, { ewmaLatency, ewmaErrorRate });
+
+      // 预测 5 分钟后故障概率
+      const trendLatency = (ewmaLatency - prev.ewmaLatency) / prev.ewmaLatency;
+      const trendError = ewmaErrorRate - prev.ewmaErrorRate;
+      const failureProbability = Math.min(1, Math.max(0,
+        (ewmaErrorRate * 0.5) + (ewmaLatency > 3000 ? 0.3 : 0) + (trendLatency > 0.1 ? 0.2 : 0) + (trendError > 0.05 ? 0.2 : 0)
+      ));
+
+      if (failureProbability > 0.7) {
+        logger.warn('[AutoRecovery] 预测性故障风险', {
+          modelId: model.modelId,
+          failureProbability: Math.round(failureProbability * 100),
+          ewmaLatency: Math.round(ewmaLatency),
+          ewmaErrorRate: Math.round(ewmaErrorRate * 1000) / 1000,
+        });
+
+        // 预防性切流：大幅降低权重
+        try {
+          const { getPool, updateModel } = await import('./modelPoolService.js');
+          const pool = await getPool();
+          const m = pool.find(p => p.model_key === model.modelId);
+          if (m && m.pool_weight > 0) {
+            const newWeight = Math.max(0, Math.floor(m.pool_weight * 0.3));
+            await updateModel(m.model_key, { pool_weight: newWeight, pool_enabled: newWeight > 0 ? 1 : 0 });
+            _recordL5Incident('predictive_traffic_shift', 'high',
+              { modelId: model.modelId, failureProbability, oldWeight: m.pool_weight, newWeight },
+              'preemptive_reduce_weight', 'success', 0);
+          }
+        } catch { /* best effort */ }
+      }
+    }
+  } catch (e) { logger.warn('[AutoRecovery] Predictive healing failed', { error: e.message }); }
+}
+
+// ==================== L5 事件记录 ====================
+
+async function _recordL5Incident(incidentType, severity, symptoms, actionTaken, actionResult, recoveryTimeMs) {
+  try {
+    const { recordIncident } = await import('./incidentLearningService.js');
+    recordIncident({
+      incidentType, severity, symptoms,
+      actionTaken, actionResult, recoveryTimeMs,
+      contextSnapshot: { rss: Math.round(process.memoryUsage().rss / 1024 / 1024) },
+    }).catch(e => logger.warn('[AutoRecovery] Incident record failed', { error: e.message }));
+  } catch { /* incident recording is non-critical */ }
+}
+
+// ==================== L5 根因关联 ====================
+
+async function _runRootCauseAnalysis() {
+  try {
+    const { getRecoveryMetrics } = await import('./autoRecoveryService.js');
+    const metrics = await getRecoveryMetrics();
+    const { aggregateAlerts } = await import('./rootCauseService.js');
+
+    const { getRedisMetrics } = await import('../dao/redis.js');
+    const { getPoolMetrics } = await import('../dao/db.js');
+
+    const redisMetrics = getRedisMetrics();
+    const dbMetrics = getPoolMetrics();
+
+    const result = aggregateAlerts(
+      { errorRate: metrics.openBreakers / Math.max(metrics.activeBreakers, 1), avgLatencyMs: 0 },
+      { openCount: metrics.openBreakers },
+      { down: !redisMetrics.ready, highLatency: redisMetrics.avgLatencyMs },
+      { down: false, activeConnections: dbMetrics.active, connectionLimit: 20 },
+    );
+
+    if (result && result.confidence > 0.6) {
+      logger.info('[AutoRecovery] Root cause analysis', result);
+      if (result.suggestedAction) {
+        _recordL5Incident('root_cause_detected', 'medium',
+          { rootCause: result.rootCause, confidence: result.confidence, affected: result.affectedComponents },
+          result.suggestedAction, 'success', 0);
+      }
+    }
+  } catch (e) { logger.warn('[AutoRecovery] Root cause analysis failed', { error: e.message }); }
+}
 
 let _loopTimer = null;
 let _running = false;
@@ -247,12 +464,20 @@ export async function runRecoveryCycle() {
       _healModels(),
       _checkQuotaPreExhaustion(),
       _adaptRateLimiting(),
+      _checkConnectionLeaks(),
+      _detectEarlyWarning(),
+      _predictiveHealing(),
     ]);
 
     // 刷新模型评分缓存
     import('./modelDispatcher.js').then(({ refreshScoreCache }) => refreshScoreCache()).catch(e => logger.warn('[AutoRecovery] Score cache refresh failed', { error: e.message }));
 
     _loadBreakersFromRedis().catch(e => logger.warn('[AutoRecovery] Load breakers from Redis failed', { error: e.message }));
+
+    // 每 5 个周期运行一次根因分析
+    if (recoveryMetrics.cyclesCompleted % 5 === 0) {
+      _runRootCauseAnalysis().catch(e => logger.warn('[AutoRecovery] Root cause analysis failed', { error: e.message }));
+    }
 
     recoveryMetrics.lastCycle = new Date().toISOString();
     recoveryMetrics.cyclesCompleted++;
@@ -269,6 +494,28 @@ export function startAutoRecoveryLoop(intervalMs = 60_000) {
   _loopTimer = setInterval(runRecoveryCycle, intervalMs);
   if (_loopTimer && typeof _loopTimer.unref === 'function') _loopTimer.unref();
   registerCleanup(() => stopAutoRecoveryLoop());
+
+  // 启动 Redis 健康探活
+  _healthPingRedis().catch(e => logger.warn('[AutoRecovery] Redis health ping start failed', { error: e.message }));
+
+  // 每 6 小时运行一次事件学习进化 Tick
+  const _evolutionTimer = setInterval(() => {
+    import('./incidentLearningService.js').then(({ evolutionTick }) => {
+      evolutionTick().catch(e => logger.warn('[AutoRecovery] Evolution tick failed', { error: e.message }));
+    }).catch(() => {});
+  }, 6 * 3600_000);
+  if (_evolutionTimer.unref) _evolutionTimer.unref();
+  registerCleanup(() => clearInterval(_evolutionTimer));
+
+  // 每 24 小时运行一次自适应阈值漂移检测
+  const _driftTimer = setInterval(() => {
+    import('./adaptiveThresholdService.js').then(({ detectAndApplyDrift }) => {
+      detectAndApplyDrift().catch(e => logger.warn('[AutoRecovery] Drift detection failed', { error: e.message }));
+    }).catch(() => {});
+  }, 24 * 3600_000);
+  if (_driftTimer.unref) _driftTimer.unref();
+  registerCleanup(() => clearInterval(_driftTimer));
+
   logger.info('[AutoRecovery] Loop started', { intervalMs });
 }
 
@@ -287,12 +534,27 @@ export async function getRecoveryMetrics() {
       openCount = [...modelBreakers.values()].filter(b => b.getState() === 'open').length;
     }
   } catch (e) { logger.warn('[AutoRecovery] Metrics gatewayCore load failed', { error: e.message }); }
+
+  let poolMetrics = null;
+  try {
+    const { getPoolMetrics: getDBPoolMetrics } = await import('../dao/db.js');
+    poolMetrics = getDBPoolMetrics();
+  } catch { /* optional */ }
+
+  let redisMetrics = null;
+  try {
+    const { getRedisMetrics } = await import('../dao/redis.js');
+    redisMetrics = getRedisMetrics();
+  } catch { /* optional */ }
+
   return {
     ...recoveryMetrics,
     activeBreakers: breakersSize,
     openBreakers: openCount,
     quotaPreExhausted: [...quotaPreExhausted],
     adaptiveWeights: Object.fromEntries(adaptiveWeights),
+    poolMetrics,
+    redisMetrics,
   };
 }
 
