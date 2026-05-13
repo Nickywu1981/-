@@ -13,8 +13,10 @@ export default {
     return rows;
   },
 
-  async getTaskById(id) {
-    const [rows] = await pool.query(`SELECT ${TASK_COLS} FROM automation_task at WHERE at.id = ? LIMIT 1`, [id]);
+  async getTaskById(id, tenantId) {
+    const params = [id];
+    if (tenantId) { params.push(tenantId); }
+    const [rows] = await pool.query(`SELECT ${TASK_COLS} FROM automation_task at WHERE at.id = ?${tenantId ? ' AND at.tenant_id = ?' : ''} LIMIT 1`, params);
     return rows[0] || null;
   },
 
@@ -46,8 +48,8 @@ export default {
     return r.affectedRows;
   },
 
-  async cancelTask(id, userId) {
-    const [r] = await pool.query('UPDATE automation_task SET status = 4 WHERE id = ? AND user_id = ? AND status IN (0, 1)', [id, userId]);
+  async cancelTask(id, userId, tenantId) {
+    const [r] = await pool.query('UPDATE automation_task SET status = 4 WHERE id = ? AND user_id = ? AND tenant_id = ? AND status IN (0, 1)', [id, userId, tenantId]);
     return r.affectedRows > 0;
   },
 
@@ -66,8 +68,8 @@ export default {
     return r.insertId;
   },
 
-  async deleteAccount(id, userId) {
-    const [r] = await pool.query('DELETE FROM automation_account WHERE id = ? AND user_id = ?', [id, userId]);
+  async deleteAccount(id, userId, tenantId) {
+    const [r] = await pool.query('DELETE FROM automation_account WHERE id = ? AND user_id = ? AND tenant_id = ?', [id, userId, tenantId]);
     return r.affectedRows;
   },
 

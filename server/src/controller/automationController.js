@@ -15,12 +15,12 @@ export const createTask = wrapController(async (req, res) => {
 });
 
 export const cancelTask = wrapController(async (req, res) => {
-    await automationService.cancelTask(req.params.id, req.user.id);
+    await automationService.cancelTask(req.params.id, req.user.id, req.user.tenantId);
     success(res, null, '任务已取消');
 });
 
 export const executeTask = wrapController(async (req, res) => {
-    const data = await automationService.executeTask(req.params.taskId, req.user.id);
+    const data = await automationService.executeTask(req.params.taskId, req.user.id, req.user.tenantId);
     success(res, data, '任务执行中');
 });
 
@@ -38,7 +38,7 @@ export const createAccount = wrapController(async (req, res) => {
 });
 
 export const deleteAccount = wrapController(async (req, res) => {
-    await automationService.deleteAccount(req.params.id, req.user.id);
+    await automationService.deleteAccount(req.params.id, req.user.id, req.user.tenantId);
     success(res, null, '账号已删除');
 });
 

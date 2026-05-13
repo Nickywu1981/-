@@ -21,16 +21,16 @@ export async function createTask(userId, tenantId, { accountId, taskType, taskCo
   return { id };
 }
 
-export async function cancelTask(id, userId) {
+export async function cancelTask(id, userId, tenantId) {
   const timer = runningTimers.get(id);
   if (timer) { clearTimeout(timer); runningTimers.delete(id); }
-  const ok = await automationDao.cancelTask(id, userId);
+  const ok = await automationDao.cancelTask(id, userId, tenantId);
   if (!ok) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   return true;
 }
 
-export async function executeTask(taskId, userId) {
-  const task = await automationDao.getTaskById(taskId);
+export async function executeTask(taskId, userId, tenantId) {
+  const task = await automationDao.getTaskById(taskId, tenantId);
   if (!task) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   if (task.user_id !== userId) throw new BusinessError(ERROR_CODE.FORBIDDEN);
 
@@ -40,7 +40,7 @@ export async function executeTask(taskId, userId) {
   const timer = setTimeout(async () => {
     runningTimers.delete(taskId);
     try {
-      const current = await automationDao.getTaskById(taskId);
+      const current = await automationDao.getTaskById(taskId, task.tenant_id);
       if (!current || current.status === 4) return;
 
       await automationDao.updateTaskStatus(taskId, current.user_id, current.tenant_id, 2, {
@@ -69,8 +69,8 @@ export async function createAccount(userId, tenantId, { platform, storeName, use
   return { id };
 }
 
-export async function deleteAccount(id, userId) {
-  await automationDao.deleteAccount(id, userId);
+export async function deleteAccount(id, userId, tenantId) {
+  await automationDao.deleteAccount(id, userId, tenantId);
   return true;
 }
 
