@@ -239,7 +239,7 @@ export async function consumeCredit(userId, action, batchCount = 1) {
 
 export async function adminRefundCredit(recordId, remark) {
   const result = await creditDao.adminRefund(0, recordId, remark);
-  if (!result.ok) throw new BusinessError(4101, result.msg || 'Refund failed');
+  if (!result.ok) throw new BusinessError(ERROR_CODE.PAY_NOTIFY_FAILED, result.msg || 'Refund failed');
   return result;
 }
 

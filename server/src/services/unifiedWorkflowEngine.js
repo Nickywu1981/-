@@ -132,7 +132,7 @@ const STEP_EXECUTORS = {
       industry: ctx.industry,
     });
     if (blockResult.blocked) {
-      throw Object.assign(new BusinessError(422, blockResult.reason), {
+      throw Object.assign(new BusinessError(ERROR_CODE.VALIDATION_ERROR, blockResult.reason), {
         suggestion: blockResult.suggestion,
         stage: 'compliance',
       });

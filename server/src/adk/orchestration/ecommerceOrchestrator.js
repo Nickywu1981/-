@@ -129,7 +129,7 @@ export async function runEcommercePipeline(params = {}) {
   // ── Step 0: 前置合规快速拦截 ──
   const blockResult = isBlocked(userInput, { platform, industry });
   if (blockResult.blocked) {
-    throw Object.assign(new BusinessError(422, blockResult.reason), {
+    throw Object.assign(new BusinessError(ERROR_CODE.VALIDATION_ERROR, blockResult.reason), {
       suggestion: blockResult.suggestion,
       stage: 'pre_compliance',
     });

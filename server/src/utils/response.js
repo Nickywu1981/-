@@ -57,7 +57,9 @@ function httpStatusFor(code) {
   if (code >= 4100 && code < 4200) return 404;
   if (code >= 4200 && code < 4300) return 400;
   if (code >= 4300 && code < 4400) return 402;
+  if (code >= 4400 && code < 4500) return 422;
   if (code >= 4900 && code < 5000) return 422;
+  if (code >= 5000 && code < 5100) return 500;
   return 200;
 }
 

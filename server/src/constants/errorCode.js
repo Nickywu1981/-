@@ -43,6 +43,10 @@ export const ERROR_CODE = {
   PAY_AMOUNT_MISMATCH: 4305,
   PAY_NOTIFY_FAILED: 4306,
 
+  // 业务 - AI推理
+  AI_INFER_FAILED: 5001,
+  AI_TIMEOUT: 5002,
+
   // 业务 - 内容审核
   CONTENT_MODERATION: 4401,
 
@@ -118,6 +122,14 @@ export const ERROR_MSG = {
   [ERROR_CODE.PAY_AMOUNT_MISMATCH]: 'Amount mismatch',
   [ERROR_CODE.PAY_NOTIFY_FAILED]: 'Payment callback failed',
 
+  [ERROR_CODE.CONTENT_MODERATION]: 'Content moderation flagged',
+  [ERROR_CODE.PUBLISH_VALIDATION]: 'Publish validation failed',
+  [ERROR_CODE.VALIDATION_ERROR]: 'Validation failed',
+  [ERROR_CODE.CONFLICT]: 'Resource conflict',
+
+  [ERROR_CODE.AI_INFER_FAILED]: 'AI inference failed',
+  [ERROR_CODE.AI_TIMEOUT]: 'AI inference timeout',
+
   [ERROR_CODE.EC_AUTH_003]: 'Admin role required',
   [ERROR_CODE.EC_AUTH_004]: 'Editor role or higher required',
   [ERROR_CODE.EC_AUTH_005]: 'Super admin role required',
@@ -182,6 +194,14 @@ export const FRONTEND_I18N_KEY = {
   [ERROR_CODE.PAY_CHANNEL_ERROR]: 'channel_error',
   [ERROR_CODE.PAY_AMOUNT_MISMATCH]: 'amount_mismatch',
   [ERROR_CODE.PAY_NOTIFY_FAILED]: 'callback_failed',
+
+  [ERROR_CODE.CONTENT_MODERATION]: 'content_moderation',
+  [ERROR_CODE.PUBLISH_VALIDATION]: 'publish_validation',
+  [ERROR_CODE.VALIDATION_ERROR]: 'validation_error',
+  [ERROR_CODE.CONFLICT]: 'conflict',
+
+  [ERROR_CODE.AI_INFER_FAILED]: 'ai_infer_failed',
+  [ERROR_CODE.AI_TIMEOUT]: 'ai_timeout',
 
   [ERROR_CODE.EC_AUTH_003]: 'admin_required',
   [ERROR_CODE.EC_AUTH_004]: 'editor_required',

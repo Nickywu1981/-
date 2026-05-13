@@ -1,5 +1,6 @@
 import { createClient } from 'redis';
 import config from '../config/index.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 import { BusinessError } from '../utils/businessError.js';
 import { registerInterval } from '../utils/shutdownRegistry.js';
 import logger from '../utils/logger.js';
@@ -106,10 +107,10 @@ export async function cacheDel(key) {
 export async function ping() {
   try {
     const r = await getRedis();
-    if (!r) throw new BusinessError(503, 'Redis not available');
+    if (!r) throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, 'Redis not available');
     await r.ping();
     return true;
-  } catch (e) { logger.warn('[Redis] ping 失败', { error: e.message }); throw new BusinessError(503, 'Redis ping failed'); }
+  } catch (e) { logger.warn('[Redis] ping 失败', { error: e.message }); throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, 'Redis ping failed'); }
 }
 
 export async function quit() {

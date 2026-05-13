@@ -24,6 +24,6 @@ export default {
 
   async deleteFaq(id) {
     const affected = await helpDao.deleteFaq(id);
-    if (affected === 0) throw new BusinessError(4101, 'Resource not found');
+    if (affected === 0) throw new BusinessError(ERROR_CODE.NOT_FOUND);
   },
 };

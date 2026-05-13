@@ -1,4 +1,5 @@
 import * as notificationDao from '../dao/notificationDao.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 import { BusinessError } from '../utils/businessError.js';
 
 /**
@@ -44,5 +45,5 @@ export async function sendToUser({ userId, type = 'system', title, content }) {
 
 export async function deleteById(id, userId) {
   const deleted = await notificationDao.deleteNotification(id, userId);
-  if (!deleted) throw new BusinessError(4101, 'Notification not found');
+  if (!deleted) throw new BusinessError(ERROR_CODE.NOT_FOUND);
 }

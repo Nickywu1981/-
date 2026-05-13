@@ -194,7 +194,7 @@ async function health() {
 // ==================== Embedding ====================
 
 export async function getEmbedding(text, modelId = 'text-embedding-3-small') {
-  if (!API_KEY) throw new BusinessError(503, 'OPENAI_API_KEY not configured');
+  if (!API_KEY) throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, 'Model API key not configured');
 
   const input = Array.isArray(text) ? text : [text];
 

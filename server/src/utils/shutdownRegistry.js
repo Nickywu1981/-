@@ -50,14 +50,16 @@ export async function runShutdown() {
   shutdownCalled = true;
 
   // 1. 清除所有定时器
+  const timerCount = timers.size;
   for (const id of timers) {
     try { clearInterval(id); } catch (_) { /* noop */ }
     try { clearTimeout(id); } catch (_) { /* noop */ }
   }
   timers.clear();
-  logger.info(`[Shutdown] 已清理 ${timers.size} 个定时器`);
+  logger.info(`[Shutdown] 已清理 ${timerCount} 个定时器`);
 
   // 2. 按 LIFO 顺序执行清理函数（后注册先清理，类似析构顺序）
+  const fnCount = cleanupFns.length;
   for (let i = cleanupFns.length - 1; i >= 0; i--) {
     try {
       const result = cleanupFns[i]();
@@ -67,7 +69,7 @@ export async function runShutdown() {
     }
   }
   cleanupFns.length = 0;
-  logger.info(`[Shutdown] 已执行 ${cleanupFns.length} 个清理函数`);
+  logger.info(`[Shutdown] 已执行 ${fnCount} 个清理函数`);
 }
 
 /** 确认是否已触发关闭 */

@@ -252,5 +252,5 @@ export async function createTemplate(fields) {
 
 export async function deleteTemplate(id) {
   const affected = await emailTemplateDao.deleteTemplate(id);
-  if (affected === 0) throw new BusinessError(4101, 'Resource not found');
+  if (affected === 0) throw new BusinessError(ERROR_CODE.NOT_FOUND);
 }
