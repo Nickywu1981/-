@@ -163,6 +163,13 @@ const config = {
     encryptionKey: process.env.ENCRYPTION_KEY || '',
   },
 
+  e2b: {
+    apiKey: process.env.E2B_API_KEY || '',
+    template: process.env.E2B_TEMPLATE || 'code-interpreter-v2',
+    defaultTimeoutMs: parseInt(process.env.E2B_TIMEOUT_MS || '300000', 10),
+    maxSandboxesPerUser: parseInt(process.env.E2B_MAX_PER_USER || '3', 10),
+  },
+
   bull: {
     imageConcurrency: parseInt(process.env.BULL_IMAGE_CONCURRENCY || '3', 10),
     videoConcurrency: parseInt(process.env.BULL_VIDEO_CONCURRENCY || '2', 10),
@@ -216,6 +223,7 @@ export const aiTimeoutMs = config.aiTimeoutMs;
 export const { worker: workerConfig } = config;
 export const { upload: uploadConfig } = config;
 export const { security: securityConfig } = config;
+export const { e2b: e2bConfig } = config;
 export const { bull: bullConfig } = config;
 export const appUrl = config.appUrl;
 export const { ai: aiConfig } = config;
