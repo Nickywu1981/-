@@ -9,6 +9,8 @@
 
 import * as monitorService from './monitorService.js';
 import logger from '../utils/logger.js';
+import { BusinessError } from '../utils/businessError.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 // 被管理的阈值参数（默认值 → 可通过此服务动态更新）
 const _managedThresholds = {
@@ -111,7 +113,7 @@ export function getAllThresholds() {
 
 export function setThreshold(key, value) {
   const t = _managedThresholds[key];
-  if (!t) throw new Error(`Unknown threshold: ${key}`);
+  if (!t) throw new BusinessError(ERROR_CODE.PARAM_ERROR, `Unknown threshold: ${key}`);
   t.value = value;
   t.updatedAt = new Date().toISOString();
   logger.info('[AdaptiveThreshold] Manual set', { key, value });

@@ -769,12 +769,12 @@ async function _runJob(jobId, steps, mode, input) {
       // ── 执行步骤 ──
       const executor = STEP_EXECUTORS[step.key];
       if (!executor) {
-        throw new Error(`未知步骤类型: ${step.key}`);
+        throw new BusinessError(ERROR_CODE.PARAM_ERROR, `Unknown step type: ${step.key}`);
       }
 
       const output = await Promise.race([
         executor(ctx),
-        new Promise((_, reject) => setTimeout(() => reject(new Error(`${step.label} 执行超时`)), step.timeout || 300_000)),
+        new Promise((_, reject) => setTimeout(() => reject(new BusinessError(ERROR_CODE.AI_TIMEOUT, `${step.label} execution timeout`)), step.timeout || 300_000)),
       ]);
 
       // 合并输出到上下文

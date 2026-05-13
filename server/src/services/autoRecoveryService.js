@@ -430,7 +430,7 @@ async function _recordL5Incident(incidentType, severity, symptoms, actionTaken, 
       actionTaken, actionResult, recoveryTimeMs,
       contextSnapshot: { rss: Math.round(process.memoryUsage().rss / 1024 / 1024) },
     }).catch(e => logger.warn('[AutoRecovery] Incident record failed', { error: e.message }));
-  } catch { /* incident recording is non-critical */ }
+  } catch { logger.debug('[AutoRecovery] Incident record skipped (non-critical)'); }
 }
 
 // ==================== L5 根因关联 ====================
