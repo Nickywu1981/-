@@ -13,7 +13,8 @@ const CODE_CACHE = new Map(); // key: email, value: { code, expires, attempts }
 const EMAIL_SEND_LOG = new Map(); // key: email, value: [timestamp, ...]
 
 // 定期清理过期验证码和发送日志，防止内存泄漏
-setInterval(() => {
+export const _emailCleanupTimer = setInterval(() => {
+  try {
   const now = Date.now();
   for (const [key, entry] of CODE_CACHE) {
     if (entry.expires < now) CODE_CACHE.delete(key);
@@ -22,6 +23,7 @@ setInterval(() => {
     EMAIL_SEND_LOG.set(key, timestamps.filter((t) => now - t < 86400000));
     if (EMAIL_SEND_LOG.get(key)?.length === 0) EMAIL_SEND_LOG.delete(key);
   }
+  } catch (err) { logger.warn('[Email] cleanup interval error', { error: err.message }); }
 }, 300000).unref();
 
 // ==================== HTML 模板消毒 ====================

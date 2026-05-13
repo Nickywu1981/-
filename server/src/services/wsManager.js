@@ -90,8 +90,10 @@ class WsManager {
           return;
         }
         userId = String(payload.userId || payload.id);
-      } catch {
-        // 未认证连接 — 关闭连接，不提供公开订阅
+      } catch (err) {
+        if (err.name !== 'JsonWebTokenError' && err.name !== 'TokenExpiredError') {
+          logger.warn('[WS] 认证失败(非预期)', { error: err.message });
+        }
         socket.close(4001, '未授权');
         return;
       }

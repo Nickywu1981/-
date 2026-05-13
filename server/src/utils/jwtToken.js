@@ -79,7 +79,10 @@ export async function refreshAccessToken(refreshToken) {
   let payload;
   try {
     payload = jwt.verify(refreshToken, REFRESH_SECRET);
-  } catch {
+  } catch (err) {
+    if (err.name !== 'TokenExpiredError' && err.name !== 'JsonWebTokenError' && err.name !== 'NotBeforeError') {
+      logger.warn('[JWT] refreshAccessToken 验证异常', { error: err.message });
+    }
     return null;
   }
 

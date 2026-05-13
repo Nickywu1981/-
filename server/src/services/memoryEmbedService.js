@@ -10,6 +10,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import logger from '../utils/logger.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const VECTOR_STORE_PATH = path.resolve(__dirname, '../../../docs/kb/KB_VECTOR_STORE.json');
@@ -22,7 +23,7 @@ async function loadStore() {
   if (store) return store;
   try {
     store = JSON.parse(await fs.promises.readFile(VECTOR_STORE_PATH, 'utf-8'));
-  } catch { store = null; }
+  } catch (err) { logger.warn('[MemoryEmbed] KB矢量存储加载失败', { error: err.message }); store = null; }
   return store;
 }
 
@@ -30,7 +31,7 @@ async function loadTokenIndex() {
   if (tokenIndex) return tokenIndex;
   try {
     tokenIndex = JSON.parse(await fs.promises.readFile(TOKEN_INDEX_PATH, 'utf-8'));
-  } catch { tokenIndex = null; }
+  } catch (err) { logger.warn('[MemoryEmbed] KB分词索引加载失败', { error: err.message }); tokenIndex = null; }
   return tokenIndex;
 }
 

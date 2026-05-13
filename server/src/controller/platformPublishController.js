@@ -2,6 +2,7 @@ import platformPublishDao from '../dao/platformPublishDao.js';
 import { success } from '../utils/response.js';
 import { encrypt } from '../utils/crypto.js';
 import { wrapController } from '../utils/wrapController.js';
+import logger from '../utils/logger.js';
 
 export const getPlatforms = wrapController(async (_req, res) => {
   const configs = await platformPublishDao.getPlatformConfigs();
@@ -41,7 +42,8 @@ export const publish = wrapController(async (req, res) => {
       // TODO: 调用真实平台 API
       await platformPublishDao.updatePublishStatus(record.id, req.userId, 'success', `https://${platform}.com/item/${itemId || record.id}`);
     } catch (e) {
-      await platformPublishDao.updatePublishStatus(record.id, req.userId, 'failed', null, '平台发布失败');
+      logger.warn('[PlatformPublish] 发布到平台失败', { platform, error: e.message, recordId: record.id });
+      await platformPublishDao.updatePublishStatus(record.id, req.userId, 'failed', null, e.message || '平台发布失败');
     }
   });
   return success(res, { id: record.id, status: 'pending' }, '发布任务已提交');

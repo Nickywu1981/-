@@ -4,6 +4,7 @@
 import * as analyticsService from './analyticsService.js';
 import * as userDao from '../dao/userDao.js';
 import * as logDao from '../dao/logDao.js';
+import logger from '../utils/logger.js';
 
 /** 获取看板全量概览数据 */
 export async function getDashboardOverview() {
@@ -14,8 +15,8 @@ export async function getDashboardOverview() {
     analyticsService.getFunnelMetrics(days),
     analyticsService.getActiveUsers(),
     analyticsService.getConversionFunnel(days),
-    userDao.countUsers('').catch(() => 0),
-    logDao.getAiCallDailyStats(days).catch(() => []),
+    userDao.countUsers('').catch((err) => { logger.warn('[Dashboard] 用户数查询失败', { error: err.message }); return 0; }),
+    logDao.getAiCallDailyStats(days).catch((err) => { logger.warn('[Dashboard] AI调用统计查询失败', { error: err.message }); return []; }),
   ]);
 
   // KPI 指标

@@ -111,11 +111,13 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 const MAX_CACHE_SIZE = 500;
 
 // 定期清理过期缓存条目，避免低流量期间内存滞留
-setInterval(() => {
+export const _cacheCleanupTimer = setInterval(() => {
+  try {
   const now = Date.now();
   for (const [key, entry] of inferenceCache) {
     if (now - entry.timestamp > CACHE_TTL) inferenceCache.delete(key);
   }
+  } catch { /* Map 迭代安全，兜底防护 */ }
 }, 300000).unref();
 
 /**

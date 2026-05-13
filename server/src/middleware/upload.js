@@ -107,11 +107,13 @@ const DAILY_UPLOAD_LIMIT_MB = uploadConfig.dailyLimitMb;
 const QUOTA_CLEANUP_MS = 60 * 60 * 1000;
 const tenantUploadQuota = new Map(); // key → { total: number, ts: number }
 
-setInterval(() => {
+export const _quotaCleanupTimer = setInterval(() => {
+  try {
   const now = Date.now();
   for (const [k, v] of tenantUploadQuota) {
     if (now - v.ts > 24 * 60 * 60 * 1000) tenantUploadQuota.delete(k);
   }
+  } catch { /* Map 迭代安全，兜底防护 */ }
 }, QUOTA_CLEANUP_MS).unref();
 
 export function uploadQuotaGuard(req, res, next) {

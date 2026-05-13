@@ -15,11 +15,13 @@ function evictOldest() {
   }
 }
 
-setInterval(() => {
+export const _memCleanupTimer = setInterval(() => {
+  try {
   const now = Date.now();
   for (const [key, entry] of memStore) {
     if (entry?._ts && now - entry._ts > 300000) memStore.delete(key);
   }
+  } catch { /* Map 迭代安全，兜底防护 */ }
 }, 60000).unref();
 
 const client = createClient({

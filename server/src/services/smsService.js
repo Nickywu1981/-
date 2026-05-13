@@ -15,11 +15,13 @@ import * as codeStore from './codeStore.js';
 
 // 兜底: Redis 不可用时降级为进程内 Map
 const CODE_CACHE = new Map();
-setInterval(() => {
+export const _smsCleanupTimer = setInterval(() => {
+  try {
   const now = Date.now();
   for (const [key, entry] of CODE_CACHE) {
     if (entry.expires < now) CODE_CACHE.delete(key);
   }
+  } catch (err) { logger.warn('[SMS] cleanup interval error', { error: err.message }); }
 }, 300000).unref();
 
 // ==================== 服务商抽象层 ====================

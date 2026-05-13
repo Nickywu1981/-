@@ -26,13 +26,15 @@ const userConcurrency = new Map();
 
 // 每 30 分钟清理一次超时条目（防止 socket hang-up 导致泄漏）
 const CONCURRENCY_TTL_MS = 30 * 60 * 1000;
-setInterval(() => {
+export const _concurrencyCleanupTimer = setInterval(() => {
+  try {
   const now = Date.now();
   for (const [key, entry] of userConcurrency) {
     if (now - entry.ts > CONCURRENCY_TTL_MS) {
       userConcurrency.delete(key);
     }
   }
+  } catch { /* Map 迭代安全，兜底防护 */ }
 }, CONCURRENCY_TTL_MS).unref();
 
 function getConcurrencyKey(req) {

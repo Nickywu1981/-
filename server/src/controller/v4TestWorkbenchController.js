@@ -5,6 +5,7 @@ import { wrapController } from '../utils/wrapController.js';
 import { success } from '../utils/response.js';
 import { BusinessError } from '../utils/businessError.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
+import logger from '../utils/logger.js';
 import * as modelRouter from '../services/model-router.service.js';
 import { gatewayRoute } from '../gateway/aiGatewayHub.js';
 
@@ -69,6 +70,7 @@ export const testSingle = wrapController(async (req, res) => {
     _addHistory(entry);
     return success(res, entry);
   } catch (err) {
+    logger.warn('[TestWorkbench] 单模型测试失败', { model_key, error: err.message });
     const entry = {
       id: 'test_' + Date.now(),
       type: 'single',
@@ -76,11 +78,11 @@ export const testSingle = wrapController(async (req, res) => {
       category,
       prompt,
       duration_ms: Date.now() - start,
-      error: '测试执行失败',
+      error: err.message || '测试执行失败',
       created_at: new Date().toISOString(),
     };
     _addHistory(entry);
-    throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, '测试执行失败，请稍后重试');
+    throw err;
   }
 });
 
@@ -108,6 +110,7 @@ export const testMixed = wrapController(async (req, res) => {
     _addHistory(entry);
     return success(res, entry);
   } catch (err) {
+    logger.warn('[TestWorkbench] 混合模型测试失败', { task_type, error: err.message });
     const entry = {
       id: 'test_' + Date.now(),
       type: 'mixed',
@@ -115,11 +118,11 @@ export const testMixed = wrapController(async (req, res) => {
       category,
       prompt,
       duration_ms: Date.now() - start,
-      error: '测试执行失败',
+      error: err.message || '测试执行失败',
       created_at: new Date().toISOString(),
     };
     _addHistory(entry);
-    throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, '测试执行失败，请稍后重试');
+    throw err;
   }
 });
 
@@ -143,8 +146,9 @@ export const testCustom = wrapController(async (req, res) => {
         steps.push({ model_key: modelKey, duration_ms: Date.now() - stepStart, result: r, success: true });
         return { modelKey, r };
       } catch (err) {
-        steps.push({ model_key: modelKey, duration_ms: Date.now() - stepStart, error: '模型执行失败', success: false });
-        return { modelKey, error: '模型执行失败' };
+        logger.warn('[TestWorkbench] 并行步骤执行失败', { model_key: modelKey, error: err.message });
+        steps.push({ model_key: modelKey, duration_ms: Date.now() - stepStart, error: err.message || '模型执行失败', success: false });
+        return { modelKey, error: err.message || '模型执行失败' };
       }
     });
     await Promise.allSettled(promises);
@@ -166,7 +170,8 @@ export const testCustom = wrapController(async (req, res) => {
         prevResult = finalResult;
         steps.push({ model_key: modelKey, duration_ms: Date.now() - stepStart, result: finalResult, success: true, order: steps.length + 1 });
       } catch (err) {
-        steps.push({ model_key: modelKey, duration_ms: Date.now() - stepStart, error: '模型执行失败', success: false, order: steps.length + 1 });
+        logger.warn('[TestWorkbench] 顺序步骤执行失败', { model_key: modelKey, error: err.message });
+        steps.push({ model_key: modelKey, duration_ms: Date.now() - stepStart, error: err.message || '模型执行失败', success: false, order: steps.length + 1 });
         break;
       }
     }
@@ -206,7 +211,8 @@ export const testCompare = wrapController(async (req, res) => {
       });
       return { model_key: modelKey, duration_ms: Date.now() - stepStart, result, success: true };
     } catch (err) {
-      return { model_key: modelKey, duration_ms: Date.now() - stepStart, error: '模型执行失败', success: false };
+      logger.warn('[TestWorkbench] 对比测试执行失败', { model_key: modelKey, error: err.message });
+      return { model_key: modelKey, duration_ms: Date.now() - stepStart, error: err.message || '模型执行失败', success: false };
     }
   });
 
