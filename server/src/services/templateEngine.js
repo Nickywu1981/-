@@ -46,14 +46,8 @@ const TEMPLATE_REGISTRY = {
   voice:          { category: 'voice', tpl: voiceTpl.voice,        defaults: voiceTpl.voice.defaults },
 };
 
-// 行业子模板参数增强（键名统一为 Zod 枚举值）
-const INDUSTRY_PARAMS = {
-  clothing:  { category: '服装', style: 'fashion editorial', scene: 'urban street / studio', composition: 'full body + detail' },
-  beauty:    { category: '美妆', style: 'beauty glam', scene: 'vanity / bathroom', composition: 'macro + flatlay' },
-  '3c_digital': { category: '3C数码', style: 'tech minimal', scene: 'desk / dark studio', composition: 'product hero + detail' },
-  food:      { category: '食品', style: 'food photography', scene: 'kitchen / dining', composition: 'overhead + close-up' },
-  home:      { category: '家居', style: 'interior design', scene: 'living room / bedroom', composition: 'wide + vignette' },
-};
+// 行业子模板参数增强 (来自集中配置，键名统一为 Zod 枚举值)
+import { INDUSTRY_PARAMS } from './industryConfig.js';
 
 // ── DB-backed template cache (bridges admin-edited templates to workflow engine) ──
 const _templateCache = new Map();

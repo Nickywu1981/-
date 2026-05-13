@@ -39,6 +39,26 @@ function _selectByWeight(models) {
     }
   }
 
+  // A/B 实验分流 (ab_group + ab_percent)
+  const abModels = enabled.filter(m => m.ab_group && (m.ab_percent || 0) > 0);
+  if (abModels.length > 0) {
+    const groups = new Map();
+    for (const m of abModels) {
+      if (!groups.has(m.ab_group)) groups.set(m.ab_group, []);
+      groups.get(m.ab_group).push(m);
+    }
+    const groupNames = [...groups.keys()];
+    const totalAbPercent = groupNames.reduce((sum, g) => sum + (groups.get(g)[0]?.ab_percent || 0), 0);
+    const roll = Math.random() * (totalAbPercent || 100);
+    let cumulative = 0;
+    for (const g of groupNames) {
+      cumulative += groups.get(g)[0]?.ab_percent || 0;
+      if (roll <= cumulative) {
+        return _selectByWeight(groups.get(g));
+      }
+    }
+  }
+
   // 权重轮询
   const totalWeight = enabled.reduce((sum, m) => sum + (m.pool_weight || 1), 0);
   let roll = Math.random() * totalWeight;
@@ -270,8 +290,42 @@ export async function getPoolStats() {
   return stats;
 }
 
+export async function getAbStats(days = 7) {
+  const pool = await getPool();
+  const abGroups = new Map();
+
+  for (const m of pool) {
+    if (m.ab_group) {
+      if (!abGroups.has(m.ab_group)) abGroups.set(m.ab_group, []);
+      abGroups.get(m.ab_group).push(m.model_key);
+    }
+  }
+
+  if (abGroups.size === 0) return { groups: [], message: '未配置 A/B 实验' };
+
+  const rows = [];
+  for (const [group, modelKeys] of abGroups) {
+    let totalCalls = 0, successCount = 0, totalLatency = 0;
+    for (const key of modelKeys) {
+      const stats = await modelConfigDao.getCallStats(key, days);
+      totalCalls += (stats.total_calls || 0);
+      successCount += (stats.success_count || 0);
+      totalLatency += ((stats.avg_latency || 0) * (stats.total_calls || 0));
+    }
+    rows.push({
+      group,
+      models: modelKeys,
+      calls: totalCalls,
+      successRate: totalCalls > 0 ? Math.round((successCount / totalCalls) * 10000) / 10000 : 0,
+      avgMs: totalCalls > 0 ? Math.round(totalLatency / totalCalls) : 0,
+    });
+  }
+
+  return { days, groups: rows };
+}
+
 export default {
   getPool, refreshPool, listByCategory, listEnabledByCategory,
   registerModel, updateModel, removeModel, toggleModel, setGrayPercent,
-  autoSelect, getModelConfig, checkQuota, consumeQuota, getQuotaUsage, getPoolStats,
+  autoSelect, getModelConfig, checkQuota, consumeQuota, getQuotaUsage, getPoolStats, getAbStats,
 };

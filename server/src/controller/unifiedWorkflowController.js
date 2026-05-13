@@ -8,6 +8,7 @@ import * as wfConfigDao from '../dao/workflowConfigDao.js';
 import { wrapController } from '../utils/wrapController.js';
 import { BusinessError } from '../utils/businessError.js';
 import logger from '../utils/logger.js';
+import { INDUSTRY_LIST } from '../services/industryConfig.js';
 
 // ==================== 工作流执行 ====================
 
@@ -122,6 +123,11 @@ export const toggleModel = wrapController(async (req) => {
   return pool.toggleModel(req.params.key, req.body.enabled);
 });
 
+export const getAbStats = wrapController(async (req) => {
+  const { days } = req.query;
+  return pool.getAbStats(parseInt(days) || 7);
+});
+
 // ==================== 可配置清单 ====================
 
 export const getConfigOptions = wrapController(async () => {
@@ -133,13 +139,7 @@ export const getConfigOptions = wrapController(async () => {
     modelPool: poolStats,
     workflows,
     options: {
-      industries: [
-        { key: 'clothing', label: '服装' },
-        { key: 'beauty', label: '美妆' },
-        { key: '3c_digital', label: '3C数码' },
-        { key: 'food', label: '食品' },
-        { key: 'home', label: '家居' },
-      ],
+      industries: INDUSTRY_LIST,
       platforms: [
         { key: 'taobao', label: '淘宝/天猫' },
         { key: 'douyin', label: '抖音' },

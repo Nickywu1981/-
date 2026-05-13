@@ -138,4 +138,7 @@ router.patch('/admin/model-pool/:key/toggle', adminLimiter, authMiddleware, requ
 // PUT /api/admin/model-pool/:key/gray — 灰度百分比
 router.put('/admin/model-pool/:key/gray', adminLimiter, authMiddleware, requireRole('admin'), validate(setGrayPercentSchema), ctrl.setGrayPercent);
 
+// GET /api/admin/model-pool/ab-stats — A/B实验效果统计
+router.get('/admin/model-pool/ab-stats', authMiddleware, requireRole('admin'), ctrl.getAbStats);
+
 export default router;

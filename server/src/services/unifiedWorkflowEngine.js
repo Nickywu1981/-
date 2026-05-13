@@ -25,15 +25,8 @@ import { BusinessError } from '../utils/businessError.js';
 // ==================== 作业存储(内存+后续迁移Redis) ====================
 const jobStore = new Map();
 
-// ==================== 行业场景映射 (与 ExpandAgent 对齐) ====================
-
-const INDUSTRY_SCENES = {
-  clothing:  ['modern_studio', 'urban_street', 'natural_park'],
-  beauty:    ['minimalist_bathroom', 'vanity_table', 'spa_setting'],
-  '3c_digital': ['modern_desk', 'coffee_shop', 'minimalist_office'],
-  food:      ['rustic_kitchen', 'dining_table', 'natural_light'],
-  home:      ['modern_living_room', 'scandinavian_bedroom', 'sunlit_balcony'],
-};
+// ==================== 行业场景映射 (来自集中配置) ====================
+import { INDUSTRY_SCENES } from './industryConfig.js';
 
 const MULTI_ANGLES = ['front', 'side_left', 'side_right', 'back', '45_degree', 'detail_closeup'];
 const DETAIL_DIMENSIONS = ['material_texture', 'craftsmanship_detail', 'size_comparison', 'feature_highlight'];
