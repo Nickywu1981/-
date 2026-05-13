@@ -85,7 +85,7 @@ export async function replaceBackground(params) {
       model: 'gpt-image-2',
     };
   } catch (e) {
-    logger.error(`[BgRemoval] 背景替换失败: ${e.message}`);
+    logger.error('[BgRemoval] 背景替换失败', { error: e.message });
     throw new BusinessError(500, '背景替换失败，请稍后重试');
   }
 }

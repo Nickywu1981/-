@@ -38,7 +38,7 @@ async function getPlansFromDB() {
   try {
     return await loadPlansFromDB();
   } catch (e) {
-    logger.error('[Payment] 加载套餐失败', e.message);
+    logger.error('[Payment] 加载套餐失败', { error: e.message });
     throw new BusinessError(503, '会员套餐信息暂时不可用，请稍后再试');
   }
 }
