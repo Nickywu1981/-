@@ -185,7 +185,7 @@ export async function fillAndPreview(userId, templateId, values = {}) {
   let variables = t.variables;
   if (typeof variables === 'string') {
     try { variables = JSON.parse(variables); }
-    catch { variables = []; }
+    catch (e) { variables = []; logger.debug('[PromptService] variables parse failed', { error: e.message }); }
   }
   variables = buildVariableDefs(t.content, variables);
   const filled = fillTemplate(t.content, values);

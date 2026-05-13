@@ -10,7 +10,7 @@ const memStore = new Map();
 const MAX_MEM_SIZE = 1000;
 
 function evictOldest() {
-  if (memStore.size > MAX_MEM_SIZE) {
+  if (memStore.size >= MAX_MEM_SIZE) {
     const oldest = memStore.keys().next().value;
     if (oldest) memStore.delete(oldest);
   }
@@ -92,7 +92,7 @@ export async function cacheSet(key, value, ttl = 300) {
       memStore.set(key, { _v: value, _ts: Date.now() }); evictOldest(); return;
     }
     await r.set(key, JSON.stringify(value), { EX: ttl });
-  } catch { memStore.set(key, { _v: value, _ts: Date.now() }); evictOldest(); }
+  } catch (e) { logger.warn('[Redis] set 降级到内存', { key, error: e.message }); memStore.set(key, { _v: value, _ts: Date.now() }); evictOldest(); }
 }
 
 export async function cacheDel(key) {
@@ -122,6 +122,7 @@ export async function quit() {
 // ==================== 缓存击穿保护（互斥锁） ====================
 
 const mutexLocks = new Map(); // key → Promise
+const MAX_MUTEX_LOCKS = 1000;
 
 /**
  * cacheGet + 互斥锁：并发 miss 时仅第一个请求回源，其余等待共享结果
@@ -135,6 +136,12 @@ export async function cacheGetWithLock(key, fetchFn, ttl = 300, lockTimeout = 50
   if (cached !== null) return cached;
 
   if (mutexLocks.has(key)) return mutexLocks.get(key);
+
+  if (mutexLocks.size >= MAX_MUTEX_LOCKS) {
+    logger.warn('[Redis] mutexLocks over cap, clearing oldest', { size: mutexLocks.size });
+    const oldest = mutexLocks.keys().next().value;
+    if (oldest) mutexLocks.delete(oldest);
+  }
 
   const lockPromise = (async () => {
     try {

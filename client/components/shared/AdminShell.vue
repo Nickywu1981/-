@@ -101,6 +101,7 @@
 </template>
 
 <script setup lang="ts">
+import { useEventListener } from '@vueuse/core'
 
 const props = withDefaults(defineProps<{
   brandName?: string

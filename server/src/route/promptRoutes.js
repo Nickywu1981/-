@@ -82,6 +82,6 @@ router.post('/templates/:id/copy', validate(idParamSchema, 'params'), copyOffici
 router.put('/templates/:id', validate(idParamSchema, 'params'), validate(updateMyTemplateSchema), updateMyTemplate);
 router.post('/templates/:id/submit-official', validate(idParamSchema, 'params'), submitToOfficial);
 router.get('/my-templates', listMyPrivateTemplates);
-router.get('/by-intent/:intentId', listTemplatesByIntent);
+router.get('/by-intent/:intentId', validate(z.object({ intentId: z.string().min(1).max(100) }), 'params'), listTemplatesByIntent);
 
 export default router;

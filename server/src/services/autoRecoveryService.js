@@ -103,9 +103,12 @@ async function _pingModel(endpoint) {
     const url = endpoint.replace(/\/+$/, '') + '/health';
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 5000);
-    const res = await fetch(url, { signal: ctrl.signal, method: 'GET' });
-    clearTimeout(timer);
-    return res.ok;
+    try {
+      const res = await fetch(url, { signal: ctrl.signal, method: 'GET' });
+      return res.ok;
+    } finally {
+      clearTimeout(timer);
+    }
   } catch {
     return false;
   }
@@ -311,7 +314,7 @@ async function _detectEarlyWarning() {
               { modelId: model.modelId, oldWeight: m.pool_weight, newWeight },
               'reduce_weight', 'success', 0);
           }
-        } catch { /* best effort */ }
+        } catch (e) { logger.debug('[AutoRecovery] early-warning weight reduce failed', { error: e.message }); }
       }
     }
 
@@ -322,7 +325,7 @@ async function _detectEarlyWarning() {
       if (m && m.queued > 0) {
         logger.info('[AutoRecovery] DB 连接池排队增长', { queued: m.queued, active: m.active });
       }
-    } catch { /* optional */ }
+    } catch (e) { logger.debug('[AutoRecovery] DB pool metrics check skipped', { error: e.message }); }
 
     // Redis 延迟检测
     try {
@@ -331,7 +334,7 @@ async function _detectEarlyWarning() {
       if (rm && rm.avgLatencyMs > 100) {
         logger.warn('[AutoRecovery] Redis 延迟预警', { avgLatencyMs: rm.avgLatencyMs });
       }
-    } catch { /* optional */ }
+    } catch (e) { logger.debug('[AutoRecovery] DB pool metrics check skipped', { error: e.message }); }
   } catch (e) { logger.warn('[AutoRecovery] Early warning check failed', { error: e.message }); }
 }
 
@@ -399,7 +402,7 @@ async function _predictiveHealing() {
               { modelId: model.modelId, failureProbability, oldWeight: m.pool_weight, newWeight },
               'preemptive_reduce_weight', 'success', 0);
           }
-        } catch { /* best effort */ }
+        } catch (e) { logger.debug('[AutoRecovery] early-warning weight reduce failed', { error: e.message }); }
       }
     }
   } catch (e) { logger.warn('[AutoRecovery] Predictive healing failed', { error: e.message }); }
@@ -422,7 +425,6 @@ async function _recordL5Incident(incidentType, severity, symptoms, actionTaken, 
 
 async function _runRootCauseAnalysis() {
   try {
-    const { getRecoveryMetrics } = await import('./autoRecoveryService.js');
     const metrics = await getRecoveryMetrics();
     const { aggregateAlerts } = await import('./rootCauseService.js');
 
@@ -561,5 +563,6 @@ export async function getRecoveryMetrics() {
 // 定时同步到 Redis (独立于主循环，每 30s)
 const _redisSyncTimer = setInterval(_syncBreakersToRedis, 30_000);
 if (_redisSyncTimer && typeof _redisSyncTimer.unref === 'function') _redisSyncTimer.unref();
+registerCleanup(() => clearInterval(_redisSyncTimer));
 
 export default { startAutoRecoveryLoop, stopAutoRecoveryLoop, runRecoveryCycle, getRecoveryMetrics, isQuotaPreExhausted };

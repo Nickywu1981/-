@@ -116,7 +116,7 @@ export async function matchAndFill(intentId, variables = {}, opts = {}) {
       if (userTpl && userTpl.content) {
         let dbVariables = [];
         if (userTpl.variables) {
-          try { dbVariables = typeof userTpl.variables === 'string' ? JSON.parse(userTpl.variables) : userTpl.variables; } catch {}
+          try { dbVariables = typeof userTpl.variables === 'string' ? JSON.parse(userTpl.variables) : userTpl.variables; } catch (e) { logger.debug('[TemplateEngine] user tpl variables parse failed', { error: e.message }); }
         }
         const dbSystem = (Array.isArray(dbVariables) ? dbVariables.find(v => v.name === 'system')?.default : null) || '你是专业的电商内容创作专家。';
         return { system: dbSystem, prompt: _normalizeDbToEngine(userTpl.content).trim(), intentId, category: userTpl.category || 'text', _source: 'user_private' };
@@ -137,7 +137,7 @@ export async function matchAndFill(intentId, variables = {}, opts = {}) {
         dbVariables = typeof dbOverride.variables === 'string'
           ? JSON.parse(dbOverride.variables)
           : dbOverride.variables;
-      } catch {}
+      } catch (e) { logger.debug('[TemplateEngine] user tpl lookup failed', { error: e.message }); }
     }
     const dbSystem = (Array.isArray(dbVariables)
       ? dbVariables.find(v => v.name === 'system')?.default
@@ -202,13 +202,13 @@ export async function getAvailableTemplatesForIntent(intentId, userId) {
     try {
       const userTpl = await _getDbTemplate(userCode);
       if (userTpl) result.push({ ...userTpl, _source: 'user_private', template_code: userCode });
-    } catch { /* fall through */ }
+    } catch (e) { logger.debug('[TemplateEngine] user tpl list lookup skipped', { error: e.message }); }
   }
   // 系统官方模板
   try {
     const official = await _getDbTemplate(intentId);
     if (official) result.push({ ...official, _source: 'official' });
-  } catch { /* fall through */ }
+  } catch (e) { logger.debug('[TemplateEngine] official tpl list lookup skipped', { error: e.message }); }
   // 硬编码兜底（永远可用）
   const entry = TEMPLATE_REGISTRY[intentId];
   if (entry) {

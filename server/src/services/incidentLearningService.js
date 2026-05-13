@@ -170,7 +170,7 @@ export async function evolveStrategy(strategyId) {
       importance: 0.7,
       source: 'strategy_evolution',
       tags: ['healing', 'evolution', threshold.nextLevel],
-    }).catch(() => {});
+    }).catch(e => logger.warn('[IncidentLearning] LTM strategy store skipped', { error: e.message }));
 
     return { evolved: true, from: strategy.strategyLevel, to: threshold.nextLevel, strategyId };
   } catch (err) {
