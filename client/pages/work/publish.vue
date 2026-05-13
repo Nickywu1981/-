@@ -1,8 +1,8 @@
 <template>
   <div class="publish-page">
     <header class="page-header">
-      <h1>多平台一键分发</h1>
-      <p>选择作品，勾选目标平台，一键发布到淘宝/抖音/小红书等 13 个电商平台</p>
+      <h1>{{ $t('work_pages.publish.title') }}</h1>
+      <p>{{ $t('work_pages.publish.subtitle') }}</p>
     </header>
 
     <div class="publish-layout">
@@ -11,19 +11,19 @@
         <!-- 作品选择 -->
         <section class="form-section">
           <div class="section-header">
-            <h3>选择作品</h3>
+            <h3>{{ $t('work_pages.publish.select_work') }}</h3>
             <select v-model="filterType" @change="loadWorks">
-              <option value="">全部类型</option>
-              <option value="image">图片</option>
-              <option value="video">视频</option>
+              <option value="">{{ $t('work_pages.publish.all_types') }}</option>
+              <option value="image">{{ $t('work_pages.publish.type_image') }}</option>
+              <option value="video">{{ $t('work_pages.publish.type_video') }}</option>
             </select>
           </div>
 
-          <div v-if="loadingWorks" class="loading-state">加载作品中...</div>
+          <div v-if="loadingWorks" class="loading-state">{{ $t('work_pages.publish.loading_works') }}</div>
 
           <div v-else-if="works.length === 0" class="empty-state">
-            <p>暂无可分发作品</p>
-            <router-link to="/workspace" class="btn-link">去创作</router-link>
+            <p>{{ $t('work_pages.publish.no_works') }}</p>
+            <router-link to="/workspace" class="btn-link">{{ $t('work_pages.publish.go_create') }}</router-link>
           </div>
 
           <div v-else class="works-grid">
@@ -38,14 +38,14 @@
                 <img loading="lazy" v-if="w.thumbnail" :src="w.thumbnail" :alt="w.title" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
                 <span v-else class="thumb-icon">{{ w.file_type?.startsWith('video') ? '🎬' : '🖼️' }}</span>
               </div>
-              <div class="work-title">{{ w.title || '未命名' }}</div>
+              <div class="work-title">{{ w.title || $t('work_pages.publish.unnamed') }}</div>
             </div>
           </div>
         </section>
 
         <!-- 平台选择 -->
         <section class="form-section">
-          <h3>目标平台 <span class="selected-count">已选 {{ selectedPlatforms.length }}</span></h3>
+          <h3>{{ $t('work_pages.publish.target_platforms') }} <span class="selected-count">{{ $t('work_pages.publish.selected_count', { n: selectedPlatforms.length }) }}</span></h3>
           <div class="platforms-grid">
             <div
               v-for="p in platforms"
@@ -65,18 +65,18 @@
 
         <!-- 内容配置 -->
         <section class="form-section">
-          <h3>内容配置</h3>
+          <h3>{{ $t('work_pages.publish.content_config') }}</h3>
           <div class="form-group">
-            <label>{{ $t('work_pages.publish.title_label') }}<label>
-            <input v-model="form.title" type="text" maxlength="200" placeholder="留空则使用作品标题" />
+            <label>{{ $t('work_pages.publish.title_label') }}</label>
+            <input v-model="form.title" type="text" maxlength="200" :placeholder="$t('work_pages.publish.title_placeholder')" />
           </div>
           <div class="form-group">
-            <label>{{ $t('work_pages.publish.desc_label') }}<label>
-            <textarea v-model="form.description" rows="3" maxlength="2000" placeholder="商品/内容描述" />
+            <label>{{ $t('work_pages.publish.desc_label') }}</label>
+            <textarea v-model="form.description" rows="3" maxlength="2000" :placeholder="$t('work_pages.publish.desc_placeholder')" />
           </div>
           <div class="form-group">
-            <label>标签 (逗号分隔)</label>
-            <input v-model="form.tagsStr" type="text" placeholder="e.g. 春季新品, 爆款推荐" maxlength="500" />
+            <label>{{ $t('work_pages.publish.tags_label') }}</label>
+            <input v-model="form.tagsStr" type="text" :placeholder="$t('work_pages.publish.tags_placeholder')" maxlength="500" />
           </div>
         </section>
 
@@ -86,41 +86,41 @@
           :disabled="!selectedWorkId || selectedPlatforms.length === 0 || submitting"
           @click="submitPublish"
         >
-          {{ submitting ? '提交中...' : `一键分发到 ${selectedPlatforms.length} 个平台` }}
+          {{ submitting ? $t('work_pages.publish.publishing') : $t('work_pages.publish.publish_to_n', { n: selectedPlatforms.length }) }}
         </button>
       </div>
 
       <!-- 右侧: 分发历史 -->
       <div class="publish-history">
         <h3>
-          分发历史
+          {{ $t('work_pages.publish.history_title') }}
           <button class="btn-refresh" @click="loadHistory" :disabled="loadingHistory">🔄</button>
         </h3>
 
         <!-- 统计条 -->
         <div v-if="stats" class="stats-bar">
-          <div class="stat-item"><span class="stat-num">{{ stats.total }}</span>总计</div>
-          <div class="stat-item success"><span class="stat-num">{{ stats.success }}</span>成功</div>
-          <div class="stat-item failed"><span class="stat-num">{{ stats.failed }}</span>失败</div>
-          <div class="stat-item pending"><span class="stat-num">{{ stats.inProgress }}</span>进行中</div>
+          <div class="stat-item"><span class="stat-num">{{ stats.total }}</span>{{ $t('work_pages.publish.stats_total') }}</div>
+          <div class="stat-item success"><span class="stat-num">{{ stats.success }}</span>{{ $t('work_pages.publish.stats_success') }}</div>
+          <div class="stat-item failed"><span class="stat-num">{{ stats.failed }}</span>{{ $t('work_pages.publish.stats_failed') }}</div>
+          <div class="stat-item pending"><span class="stat-num">{{ stats.inProgress }}</span>{{ $t('work_pages.publish.stats_in_progress') }}</div>
         </div>
 
         <!-- 筛选 -->
         <div class="filter-row">
           <select v-model="historyStatus" @change="loadHistory">
-            <option value="">全部状态</option>
-            <option value="pending">待处理</option>
-            <option value="processing">处理中</option>
-            <option value="success">成功</option>
-            <option value="failed">失败</option>
+            <option value="">{{ $t('work_pages.publish.all_status') }}</option>
+            <option value="pending">{{ $t('work_pages.publish.status_pending') }}</option>
+            <option value="processing">{{ $t('work_pages.publish.status_processing') }}</option>
+            <option value="success">{{ $t('work_pages.publish.status_success') }}</option>
+            <option value="failed">{{ $t('work_pages.publish.status_failed') }}</option>
           </select>
         </div>
 
         <!-- 列表 -->
-        <div v-if="loadingHistory" class="loading-state">加载历史...</div>
+        <div v-if="loadingHistory" class="loading-state">{{ $t('work_pages.publish.loading_history') }}</div>
 
         <div v-else-if="historyList.length === 0" class="empty-state">
-          <p>暂无分发记录</p>
+          <p>{{ $t('work_pages.publish.no_history') }}</p>
         </div>
 
         <div v-else class="history-list">
@@ -148,9 +148,9 @@
 
         <!-- 分页 -->
         <div v-if="historyTotal > historyPageSize" class="pagination">
-          <button :disabled="historyPage <= 1" @click="historyPage--; loadHistory()">上一页</button>
-          <span>第 {{ historyPage }} / {{ Math.ceil(historyTotal / historyPageSize) }} 页</span>
-          <button :disabled="historyPage * historyPageSize >= historyTotal" @click="historyPage++; loadHistory()">下一页</button>
+          <button :disabled="historyPage <= 1" @click="historyPage--; loadHistory()">{{ $t('work_pages.publish.prev_page') }}</button>
+          <span>{{ $t('work_pages.publish.page_of', { n: historyPage, m: Math.ceil(historyTotal / historyPageSize) }) }}</span>
+          <button :disabled="historyPage * historyPageSize >= historyTotal" @click="historyPage++; loadHistory()">{{ $t('work_pages.publish.next_page') }}</button>
         </div>
       </div>
     </div>
@@ -218,7 +218,7 @@ async function loadPlatforms() {
   try {
     const res = await api.get('/publish/platforms');
     platforms.value = res || [];
-  } catch { toast.warn('加载平台列表失败') }
+  } catch { toast.warn(t('work_pages.publish.load_platforms_failed')) }
 }
 
 async function loadWorks() {
@@ -228,7 +228,7 @@ async function loadWorks() {
     if (filterType.value) params.type = filterType.value;
     const res = await api.get('/assets', params);
     works.value = res?.list || [];
-  } catch { toast.warn('加载作品列表失败') }
+  } catch { toast.warn(t('work_pages.publish.load_works_failed')) }
   finally { loadingWorks.value = false; }
 }
 
@@ -244,7 +244,7 @@ async function loadHistory() {
     historyList.value = histRes?.list || [];
     historyTotal.value = histRes?.total || 0;
     stats.value = statsRes;
-  } catch { toast.warn('加载发布历史失败') }
+  } catch { toast.warn(t('work_pages.publish.load_history_failed')) }
   finally { loadingHistory.value = false; }
 }
 
@@ -260,7 +260,7 @@ async function submitPublish() {
       description: form.description,
       tags,
     });
-    notify('分发任务已提交');
+    notify(t('work_pages.publish.task_submitted'));
     selectedWorkId.value = null;
     selectedPlatforms.value = [];
     form.title = '';
@@ -269,7 +269,7 @@ async function submitPublish() {
     historyPage.value = 1;
     await loadHistory();
   } catch (err) {
-    notify(err.message || '提交失败', 'error');
+    notify(err.message || t('work_pages.publish.submit_failed'), 'error');
   } finally {
     submitting.value = false;
   }
@@ -278,10 +278,10 @@ async function submitPublish() {
 async function retryPublish(recordId) {
   try {
     await api.post(`/publish/retry/${recordId}`);
-    notify('已重新提交分发');
+    notify(t('work_pages.publish.retry_success'));
     await loadHistory();
   } catch (err) {
-    notify(err.message || '重发失败', 'error');
+    notify(err.message || t('work_pages.publish.retry_failed'), 'error');
   }
 }
 

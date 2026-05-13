@@ -6,101 +6,101 @@
 <template>
   <div class="work-page">
     <header class="work-header">
-      <h1>{{ headerCfg.title || 'AI 详情图创作中心' }}</h1>
-      <p>{{ headerCfg.subtitle || '套图一键生成 · 详情图复刻 · 智能排版 · AI识别' }}</p>
+      <h1>{{ headerCfg.title || $t('work_pages.detail_index.page_title') }}</h1>
+      <p>{{ headerCfg.subtitle || $t('work_pages.detail_index.page_subtitle') }}</p>
     </header>
 
     <div class="work-tabs">
-      <button class="tab-btn" :class="{ active: mode === 'generate' }" @click="mode = 'generate'">套图生成</button>
-      <button class="tab-btn" :class="{ active: mode === 'replicate' }" @click="mode = 'replicate'">详情图复刻</button>
-      <button class="tab-btn" :class="{ active: mode === 'longImage' }" @click="mode = 'longImage'">{{ $t('action.long_image_tab') || '长图合成' }}</button>
-      <button class="tab-btn" :class="{ active: mode === 'smartRecognition' }" @click="mode = 'smartRecognition'">{{ $t('action.smart_recognition_tab') || '智能识别' }}</button>
+      <button class="tab-btn" :class="{ active: mode === 'generate' }" @click="mode = 'generate'">{{ $t('work_pages.detail_index.tab_generate') }}</button>
+      <button class="tab-btn" :class="{ active: mode === 'replicate' }" @click="mode = 'replicate'">{{ $t('work_pages.detail_index.tab_replicate') }}</button>
+      <button class="tab-btn" :class="{ active: mode === 'longImage' }" @click="mode = 'longImage'">{{ $t('work_pages.detail_index.tab_long_image') }}</button>
+      <button class="tab-btn" :class="{ active: mode === 'smartRecognition' }" @click="mode = 'smartRecognition'">{{ $t('work_pages.detail_index.tab_smart_recognition') }}</button>
     </div>
 
     <div class="work-panel">
       <!-- 套图生成 -->
       <div v-if="mode === 'generate'">
         <div class="input-group">
-          <label>商品名称 *</label>
-          <input v-model="productName" type="text" class="input" placeholder="输入商品名称" maxlength="200" />
+          <label>{{ $t('work_pages.detail_index.product_name_label') }}</label>
+          <input v-model="productName" type="text" class="input" :placeholder="$t('work_pages.detail_index.product_name_placeholder')" maxlength="200" />
         </div>
 
         <div class="input-group">
-          <label>商品卖点 (选填，每行一个)</label>
-          <textarea v-model="highlightsText" class="input" rows="4" placeholder="防水材质，透气舒适&#10;耐磨鞋底，防滑设计&#10;..." maxlength="2000"></textarea>
+          <label>{{ $t('work_pages.detail_index.highlights_label') }}</label>
+          <textarea v-model="highlightsText" class="input" rows="4" :placeholder="$t('work_pages.detail_index.highlights_placeholder')" maxlength="2000"></textarea>
           <PromptEnhancer v-if="highlightsText.trim()" mode="detail" :initial-prompt="highlightsText" @applied="(v) => highlightsText = v" />
         </div>
 
         <AppMediaUpload accept="image" :multiple="true" :max-size="20" :max-count="10" @uploaded="onImagesUploaded" />
 
         <div class="input-group">
-          <label>详情图模板</label>
+          <label>{{ $t('work_pages.detail_index.template_label') }}</label>
           <select v-model="template" class="input">
             <option v-for="t in templateOptions" :key="t.item_key" :value="t.item_key">{{ t.item_value }}</option>
           </select>
         </div>
 
         <button class="btn btn-primary btn-lg" :disabled="!productName || productImages.length === 0" @click="doGenerate">
-          一键生成详情图套图
+          {{ $t('work_pages.detail_index.generate_set_btn') }}
         </button>
       </div>
 
       <!-- 复刻 -->
       <div v-if="mode === 'replicate'">
         <AppMediaUpload accept="image" :multiple="false" :max-size="20" :max-count="1" @uploaded="onRefUploaded" />
-        <p class="hint">上传一张参考详情图，AI 将分析其布局和风格并复刻</p>
+        <p class="hint">{{ $t('work_pages.detail_index.replicate_hint') }}</p>
 
         <div class="input-group" style="margin-top:16px">
-          <label>商品名称 *</label>
-          <input v-model="productName" type="text" class="input" placeholder="输入商品名称" maxlength="200" />
+          <label>{{ $t('work_pages.detail_index.product_name_label') }}</label>
+          <input v-model="productName" type="text" class="input" :placeholder="$t('work_pages.detail_index.product_name_placeholder')" maxlength="200" />
         </div>
 
         <AppMediaUpload accept="image" :multiple="true" :max-size="20" :max-count="10" @uploaded="onImagesUploaded" />
-        <p class="hint">上传商品图片作为素材</p>
+        <p class="hint">{{ $t('work_pages.detail_index.material_hint') }}</p>
 
         <button class="btn btn-primary btn-lg" :disabled="!refUrl || !productName" @click="doReplicate">
-          开始复刻
+          {{ $t('work_pages.detail_index.replicate_btn') }}
         </button>
       </div>
 
       <!-- 长图合成 -->
       <div v-if="mode === 'longImage'">
         <div class="input-group">
-          <label>商品名称 *</label>
-          <input v-model="productName" type="text" class="input" placeholder="输入商品名称" maxlength="200" />
+          <label>{{ $t('work_pages.detail_index.product_name_label') }}</label>
+          <input v-model="productName" type="text" class="input" :placeholder="$t('work_pages.detail_index.product_name_placeholder')" maxlength="200" />
         </div>
 
         <div class="scenes-section">
           <div class="scenes-header">
-            <label>{{ $t('action.scenes_count') || '场景列表' }} ({{ scenes.length }}/20)</label>
-            <button class="btn btn-secondary btn-sm" :disabled="scenes.length >= 20" @click="addScene">{{ $t('action.add_scene') || '+ 添加场景' }}</button>
+            <label>{{ $t('work_pages.detail_index.scenes_label') }} ({{ scenes.length }}/20)</label>
+            <button class="btn btn-secondary btn-sm" :disabled="scenes.length >= 20" @click="addScene">{{ $t('work_pages.detail_index.add_scene') }}</button>
           </div>
           <div v-for="(scene, idx) in scenes" :key="idx" class="scene-item">
             <div class="scene-top">
-              <span class="scene-label">场景 {{ idx + 1 }}</span>
-              <button v-if="scenes.length > 1" class="btn-icon" title="删除" @click="removeScene(idx)">✕</button>
+              <span class="scene-label">{{ $t('work_pages.detail_index.scene_label', { n: idx + 1 }) }}</span>
+              <button v-if="scenes.length > 1" class="btn-icon" :title="$t('work_pages.detail_index.delete_scene')" @click="removeScene(idx)">✕</button>
             </div>
-            <input v-model="scene.prompt" class="input" :placeholder="$t('action.scene_prompt') || '场景描述，如：夏季户外运动场景'" maxlength="2000" />
-            <input v-model="scene.imageUrl" class="input" :placeholder="$t('action.scene_image_url') || '参考图 URL（可选）'" style="margin-top:8px" />
+            <input v-model="scene.prompt" class="input" :placeholder="$t('work_pages.detail_index.scene_prompt_placeholder')" maxlength="2000" />
+            <input v-model="scene.imageUrl" class="input" :placeholder="$t('work_pages.detail_index.scene_image_url_placeholder')" style="margin-top:8px" />
           </div>
         </div>
 
         <div class="options-row" style="margin-top:16px">
           <div class="option">
-            <label>{{ $t('action.output_width') || '输出宽度' }}</label>
+            <label>{{ $t('work_pages.detail_index.output_width_label') }}</label>
             <select v-model.number="outputWidth" class="input">
-              <option :value="480">480 {{ $t('action.pixel') || '像素' }}</option>
-              <option :value="750">750 {{ $t('action.pixel') || '像素' }}</option>
-              <option :value="800">800 {{ $t('action.pixel') || '像素' }}</option>
-              <option :value="1200">1200 {{ $t('action.pixel') || '像素' }}</option>
+              <option :value="480">480 {{ $t('work_pages.detail_index.pixel_unit') }}</option>
+              <option :value="750">750 {{ $t('work_pages.detail_index.pixel_unit') }}</option>
+              <option :value="800">800 {{ $t('work_pages.detail_index.pixel_unit') }}</option>
+              <option :value="1200">1200 {{ $t('work_pages.detail_index.pixel_unit') }}</option>
             </select>
           </div>
           <div class="option">
-            <label>{{ $t('action.platform') || '目标平台' }}</label>
+            <label>{{ $t('work_pages.detail_index.target_platform_label') }}</label>
             <select v-model="platform" class="input">
-              <option value="">{{ $t('action.clothing_auto') || '通用' }}</option>
-              <option value="taobao">淘宝</option>
-              <option value="amazon">亚马逊</option>
+              <option value="">{{ $t('work_pages.detail_index.platform_default') }}</option>
+              <option value="taobao">{{ $t('work_pages.detail_index.platform_taobao') }}</option>
+              <option value="amazon">{{ $t('work_pages.detail_index.platform_amazon') }}</option>
               <option value="shopify">Shopify</option>
               <option value="shein">Shein</option>
             </select>
@@ -108,76 +108,76 @@
         </div>
 
         <button class="btn btn-primary btn-lg" style="margin-top:16px" :disabled="!productName || scenes.length === 0 || scenes.some(s => !s.prompt.trim()) || taskStatus === 'processing'" @click="doGenerateLongImage">
-          {{ taskStatus === 'processing' ? $t('work_pages.detail_index.generating') : ($t('action.generate_long') || '生成长图') }}
+          {{ taskStatus === 'processing' ? $t('work_pages.detail_index.generating') : $t('work_pages.detail_index.generate_long_image_btn') }}
         </button>
       </div>
 
       <!-- 智能识别 -->
       <div v-if="mode === 'smartRecognition'">
-        <p class="hint" style="margin-top:0">上传一张商品参考图，AI 自动识别产品名称、品类、核心特征，识别后可编辑确认</p>
+        <p class="hint" style="margin-top:0">{{ $t('work_pages.detail_index.smart_hint') }}</p>
 
         <AppMediaUpload accept="image" :multiple="false" :max-size="20" :max-count="1" @uploaded="onSmartRefUploaded" />
 
         <div v-if="smartRefUrl" style="margin-top:16px">
           <div class="preview-row">
-            <img :src="smartRefUrl" alt="参考图预览" class="ref-preview" />
+            <img :src="smartRefUrl" :alt="$t('work_pages.detail_index.ref_preview_alt')" class="ref-preview" />
             <button class="btn btn-primary" :disabled="smartLoading" @click="doExtractInfo">
-              {{ smartLoading ? '识别中...' : '开始识别' }}
+              {{ smartLoading ? $t('work_pages.detail_index.recognizing') : $t('work_pages.detail_index.start_recognize') }}
             </button>
           </div>
         </div>
 
         <div v-if="smartResult" class="smart-result">
           <div class="input-group">
-            <label>产品名称及品类 <span class="hint-inline">（可修改）</span></label>
+            <label>{{ $t('work_pages.detail_index.product_category_label') }} <span class="hint-inline">{{ $t('work_pages.detail_index.editable_hint') }}</span></label>
             <input v-model="smartResult.productName" type="text" class="input" maxlength="200" />
           </div>
           <div class="input-group">
-            <label>品类</label>
+            <label>{{ $t('work_pages.detail_index.category_label') }}</label>
             <select v-model="smartResult.category" class="input">
               <option v-for="c in CATEGORIES" :key="c" :value="c">{{ c }}</option>
             </select>
           </div>
           <div class="input-group">
-            <label>核心特征清单（严格锚定） <span class="hint-inline">（可修改，每行一个）</span></label>
-            <textarea v-model="smartFeaturesText" class="input" rows="4" maxlength="2000" placeholder="每行一个核心特征"></textarea>
+            <label>{{ $t('work_pages.detail_index.features_label') }} <span class="hint-inline">{{ $t('work_pages.detail_index.features_editable_hint') }}</span></label>
+            <textarea v-model="smartFeaturesText" class="input" rows="4" maxlength="2000" :placeholder="$t('work_pages.detail_index.features_placeholder')"></textarea>
           </div>
 
           <div class="options-row" style="margin-top:16px">
             <div class="option">
-              <label>{{ $t('action.voice_option') || '语音' }}</label>
+              <label>{{ $t('work_pages.detail_index.voice_label') }}</label>
               <select v-model="smartOptions.voice" class="input">
-                <option value="">{{ $t('action.none') || '无' }}</option>
-                <option value="female_sweet">甜美女声</option>
-                <option value="male_magnetic">磁性男声</option>
-                <option value="female_natural">自然女声</option>
-                <option value="male_standard">标准男声</option>
+                <option value="">{{ $t('work_pages.detail_index.voice_none') }}</option>
+                <option value="female_sweet">{{ $t('work_pages.detail_index.voice_female_sweet') }}</option>
+                <option value="male_magnetic">{{ $t('work_pages.detail_index.voice_male_magnetic') }}</option>
+                <option value="female_natural">{{ $t('work_pages.detail_index.voice_female_natural') }}</option>
+                <option value="male_standard">{{ $t('work_pages.detail_index.voice_male_standard') }}</option>
               </select>
             </div>
             <div class="option">
-              <label>{{ $t('action.quantity_option') || '数量' }}</label>
+              <label>{{ $t('work_pages.detail_index.quantity_label') }}</label>
               <select v-model.number="smartOptions.quantity" class="input">
-                <option :value="1">1 张</option>
-                <option :value="3">3 张</option>
-                <option :value="5">5 张</option>
-                <option :value="10">10 张</option>
+                <option :value="1">{{ $t('work_pages.detail_index.quantity_n', { n: 1 }) }}</option>
+                <option :value="3">{{ $t('work_pages.detail_index.quantity_n', { n: 3 }) }}</option>
+                <option :value="5">{{ $t('work_pages.detail_index.quantity_n', { n: 5 }) }}</option>
+                <option :value="10">{{ $t('work_pages.detail_index.quantity_n', { n: 10 }) }}</option>
               </select>
             </div>
             <div class="option">
-              <label>{{ $t('action.color_option') || '配色' }}</label>
+              <label>{{ $t('work_pages.detail_index.color_label') }}</label>
               <select v-model="smartOptions.colorScheme" class="input">
-                <option value="">{{ $t('action.clothing_auto') || '自动' }}</option>
-                <option value="white_bg">白底清新</option>
-                <option value="dark_luxury">深色高端</option>
-                <option value="warm_life">暖色生活</option>
-                <option value="brand_blue">品牌蓝调</option>
-                <option value="minimal_gray">极简灰白</option>
+                <option value="">{{ $t('work_pages.detail_index.color_auto') }}</option>
+                <option value="white_bg">{{ $t('work_pages.detail_index.color_white_bg') }}</option>
+                <option value="dark_luxury">{{ $t('work_pages.detail_index.color_dark_luxury') }}</option>
+                <option value="warm_life">{{ $t('work_pages.detail_index.color_warm_life') }}</option>
+                <option value="brand_blue">{{ $t('work_pages.detail_index.color_brand_blue') }}</option>
+                <option value="minimal_gray">{{ $t('work_pages.detail_index.color_minimal_gray') }}</option>
               </select>
             </div>
           </div>
 
           <button class="btn btn-primary btn-lg" style="margin-top:16px" :disabled="!smartResult.productName || !smartFeaturesText.trim()" @click="doGenerateFromSmart">
-            确认并生成详情图
+            {{ $t('work_pages.detail_index.confirm_generate_btn') }}
           </button>
         </div>
 
@@ -225,7 +225,13 @@ const smartFeaturesText = computed({
 })
 const smartOptions = reactive({ voice: '', quantity: 1, colorScheme: '' })
 
-const CATEGORIES = ['女装', '男装', '鞋靴', '箱包', '美妆', '3C数码', '家居', '食品', '运动户外', '母婴', '珠宝配饰', '汽车用品', '其他']
+const CATEGORIES = computed(() => [
+  t('categories.womenswear'), t('categories.menswear'), t('categories.shoes'),
+  t('categories.bags'), t('categories.beauty'), t('categories.electronics'),
+  t('categories.home'), t('categories.food'), t('categories.sports'),
+  t('categories.maternity'), t('categories.jewelry'), t('categories.auto'),
+  t('categories.other'),
+])
 
 function onSmartRefUploaded(files: any[]) { if (files.length > 0) { smartRefUrl.value = files[0].url; smartResult.value = null; smartError.value = '' } }
 
@@ -233,9 +239,9 @@ async function doExtractInfo() {
   smartLoading.value = true; smartError.value = '';
   try {
     const data = await $fetch('/api/detail/extract-product-info', { method: 'POST', body: { image_url: smartRefUrl.value } })
-    smartResult.value = { productName: data.productName || '', category: data.category || '其他', features: data.features || [] }
+    smartResult.value = { productName: data.productName || '', category: data.category || t('categories.other'), features: data.features || [] }
   } catch (e: any) {
-    smartError.value = e?.data?.message || e?.message || '识别失败，请重试'
+    smartError.value = e?.data?.message || e?.message || t('work_pages.detail_index.recognize_failed')
   } finally { smartLoading.value = false }
 }
 
@@ -245,7 +251,7 @@ async function doGenerateFromSmart() {
   await submit('detail_set_gen', {
     product_name: smartResult.value.productName,
     product_images: smartRefUrl.value ? [smartRefUrl.value] : [],
-    highlights: [`品类: ${smartResult.value.category}`, ...features],
+    highlights: [`${t('work_pages.detail_index.category_label')}: ${smartResult.value.category}`, ...features],
     template: template.value,
     extra: {
       voice: smartOptions.voice || undefined,
