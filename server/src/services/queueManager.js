@@ -31,8 +31,8 @@ async function ensureBullMQ() {
     Queue = m.Queue;
     Worker = m.Worker;
     bullmqAvailable = true;
-  } catch {
-    logger.warn('[BullMQ] bullmq 未安装 — 队列功能降级为同步直通模式');
+  } catch (err) {
+    logger.warn('[BullMQ] bullmq 未安装 — 队列功能降级为同步直通模式', { error: err?.message });
     bullmqAvailable = false;
   }
 }

@@ -132,7 +132,7 @@ export default {
 
       const list = rows.map(r => {
         let data = {};
-        try { data = typeof r.result_data === 'string' ? JSON.parse(r.result_data) : (r.result_data || {}); } catch { /* noop */ }
+        try { data = typeof r.result_data === 'string' ? JSON.parse(r.result_data) : (r.result_data || {}); } catch (e) { logger.warn('[CutEcosystem] 作品数据JSON解析失败', { id: r.id, error: e?.message }); }
         const url = data.file_url || data.video_url || data.image_url || '';
         const isVideo = ['video_gen', 'action_migrate', 'digital_human', 'viral_replicate', 'live_clip'].includes(r.task_type);
         return { id: r.id, task_type: r.task_type, title: r.title, thumbnail: r.thumbnail_url, url, type: isVideo ? 'video' : 'image', create_time: r.create_time };

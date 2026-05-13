@@ -7,7 +7,7 @@
 // dotenv 由 config/index.js 负责加载
 import logger from '../utils/logger.js';
 import { BusinessError } from '../utils/businessError.js';
-import config, { workerConfig } from '../config/index.js';
+import config, { workerConfig, isProduction } from '../config/index.js';
 import { validateStartupConfig } from '../utils/startupGuard.js';
 import * as jobQueueService from '../services/job-queue.service.js';
 import { onChildJobComplete } from '../services/unifiedQueueService.js';
@@ -65,7 +65,7 @@ async function processJob(job) {
     // 解析参数
     try {
       params = typeof job.task_params === 'string' ? JSON.parse(job.task_params) : (job.task_params || {});
-    } catch { params = {}; }
+    } catch (e) { logger.warn('[Worker] task_params JSON 解析失败', { jobId: job.id, error: e?.message }); params = {}; }
 
     // 增强选项提升：将 enhanced_options 拍平到 params 顶层供 seedance 消费
     if (params.enhanced_options) {
@@ -231,7 +231,7 @@ async function poll() {
 
 // 全局异常捕获 — 防止未处理异常导致进程静默崩溃
 process.on('uncaughtException', (err) => {
-  logger.error('[Worker] 未捕获异常，进程即将退出', { message: err.message, stack: err.stack });
+  logger.error('[Worker] 未捕获异常，进程即将退出', { message: err.message, ...(isProduction ? {} : { stack: err.stack }) });
   running = false;
   setTimeout(() => process.exit(1), 5000);
 });

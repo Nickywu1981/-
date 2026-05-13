@@ -49,6 +49,7 @@ server.listen(port, () => {
   // 定时恢复卡住的任务 (每 5 分钟)
   recoverTimer = setInterval(() => {
     import('./dao/taskDao.js').then(({ recoverStuckTasks }) => recoverStuckTasks()).catch((err) => { logger.warn('[Cron] 恢复卡住任务失败', { error: err.message }); });
+    import('./services/job-queue.service.js').then(({ recoverStuckJobs }) => recoverStuckJobs()).catch((err) => { logger.warn('[Cron] job_queue 恢复失败', { error: err.message }); });
   }, 5 * 60 * 1000).unref();
 });
 
@@ -66,7 +67,7 @@ process.on('unhandledRejection', (reason) => {
   const logEntry = { message: msg };
   if (!isProduction) logEntry.stack = reason?.stack?.split('\n').slice(0, 3).join('\n');
   logger.error('未处理的 Promise 拒绝', logEntry);
-  gracefulShutdown('unhandledRejection');
+  // unhandledRejection 不触发 shutdown — 与 uncaughtException 不同，进程状态仍可恢复
 });
 
 // ==================== 优雅关闭 ====================

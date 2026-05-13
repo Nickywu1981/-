@@ -202,7 +202,7 @@ export async function getSessionContext(sessionId) {
       const raw = await redis.get(`ctx:session:${sessionId}`);
       if (raw) return JSON.parse(raw);
     }
-  } catch { /* Redis 不可用 */ }
+  } catch (e) { logger.warn('[ContextWindow] Redis 读取降级，使用内存缓存', { error: e?.message }); }
 
   // 内存降级
   const entry = sessionContextCache.get(sessionId);
@@ -222,7 +222,7 @@ export async function setSessionContext(sessionId, data) {
       await redis.setex(`ctx:session:${sessionId}`, Math.ceil(contextCacheTTL / 1000), JSON.stringify(data));
       return;
     }
-  } catch { /* fallback */ }
+  } catch (e) { logger.warn('[ContextWindow] Redis 写入降级，使用内存缓存', { error: e?.message }); }
 
   sessionContextCache.set(sessionId, { data, ts: Date.now() });
 }

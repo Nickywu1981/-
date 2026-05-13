@@ -122,8 +122,8 @@ async function health() {
       signal: AbortSignal.timeout(5000),
     });
     return { status: res.status < 500 ? 'ok' : 'error', provider: 'stability' };
-  } catch {
-    logger.warn('[AI] Stability AI 健康检查失败');
+  } catch (err) {
+    logger.warn('[AI] Stability AI 健康检查失败', { error: err?.message });
     return { status: 'unavailable', provider: 'stability' };
   }
 }
