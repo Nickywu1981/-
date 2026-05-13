@@ -1,6 +1,7 @@
 import { createClient } from 'redis';
 import config from '../config/index.js';
 import { BusinessError } from '../utils/businessError.js';
+import { registerInterval } from '../utils/shutdownRegistry.js';
 import logger from '../utils/logger.js';
 const redisConfig = config.redis;
 
@@ -23,6 +24,7 @@ export const _memCleanupTimer = setInterval(() => {
   }
   } catch { /* Map 迭代安全，兜底防护 */ }
 }, 60000).unref();
+registerInterval(_memCleanupTimer);
 
 const client = createClient({
   socket: {

@@ -3,6 +3,7 @@
  */
 import multer from 'multer';
 import path from 'path';
+import { registerInterval } from '../utils/shutdownRegistry.js';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import crypto from 'crypto';
@@ -121,6 +122,7 @@ export const _quotaCleanupTimer = setInterval(() => {
   }
   } catch { /* Map 迭代安全，兜底防护 */ }
 }, QUOTA_CLEANUP_MS).unref();
+registerInterval(_quotaCleanupTimer);
 
 export function uploadQuotaGuard(req, res, next) {
   const tenantId = req.tenantId || req.user?.tenantId || 0;

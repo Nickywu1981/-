@@ -10,6 +10,7 @@ import * as smsTemplateDao from '../dao/smsTemplateDao.js';
 import config from '../config/index.js';
 import { BusinessError } from '../utils/businessError.js';
 import { renderTemplate, generateCode } from '../utils/templateHelpers.js';
+import { registerInterval } from '../utils/shutdownRegistry.js';
 import logger from '../utils/logger.js';
 import * as codeStore from './codeStore.js';
 
@@ -23,6 +24,7 @@ export const _smsCleanupTimer = setInterval(() => {
   }
   } catch (err) { logger.warn('[SMS] cleanup interval error', { error: err.message }); }
 }, 300000).unref();
+registerInterval(_smsCleanupTimer);
 
 // ==================== 服务商抽象层 ====================
 

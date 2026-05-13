@@ -1,10 +1,14 @@
 import { Router } from 'express';
 import { z } from 'zod';
+import { authMiddleware } from '../middleware/auth.js';
 import { apiLimiter, heavyLimiter } from '../middleware/rateLimiter.js';
 import { validate } from '../utils/validate.js';
 import * as ctrl from '../controller/longTermMemoryController.js';
 
 const router = Router();
+
+// 所有 LTM 路由都需要认证
+router.use(authMiddleware);
 
 const storeSchema = z.object({
   namespace: z.string().max(64).optional().default('user'),
