@@ -584,6 +584,8 @@ export async function executeWorkflow(params = {}) {
           disabledSteps: reqOverrides.disabledSteps || dbConfig.disabled_steps || [],
           modelBindings: reqOverrides.modelBindings || dbConfig.model_bindings || {},
           extraSteps: reqOverrides.extraSteps || dbConfig.extra_steps || [],
+          deletedSteps: reqOverrides.deletedSteps || dbConfig.deleted_steps || [],
+          stepOrder: reqOverrides.stepOrder || dbConfig.step_order || [],
         };
         if (dbConfig.mode && mode === 'auto') overrides._dbMode = dbConfig.mode;
       }
@@ -613,6 +615,24 @@ export async function executeWorkflow(params = {}) {
     const hasVideo = activeSteps.some(s => s.key === 'video_compose');
     if (hasVideo && (!hasScript || !hasStoryboard)) {
       throw new BusinessError(400, '视频类工作流禁止跳过脚本/分镜步骤直接生成视频');
+    }
+  }
+
+  // ── deletedSteps 约束：必填步骤不可删除 ──
+  if (overrides.deletedSteps?.length) {
+    const requiredKeys = new Set(wf.steps.filter(s => s.required).map(s => s.key));
+    const deletedRequired = overrides.deletedSteps.filter(k => requiredKeys.has(k));
+    if (deletedRequired.length > 0) {
+      throw new BusinessError(400, `必填步骤不可删除: ${deletedRequired.join(', ')}`);
+    }
+  }
+
+  // ── stepOrder 校验：未知key拒绝 ──
+  if (overrides.stepOrder?.length) {
+    const validKeys = new Set(steps.map(s => s.key));
+    const invalidKeys = overrides.stepOrder.filter(k => !validKeys.has(k));
+    if (invalidKeys.length > 0) {
+      throw new BusinessError(400, `stepOrder 包含未知步骤: ${invalidKeys.join(', ')}`);
     }
   }
 

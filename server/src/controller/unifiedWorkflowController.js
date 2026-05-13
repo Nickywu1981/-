@@ -65,12 +65,14 @@ export const getBindableSteps_ = wrapController(async (req) => {
 });
 
 export const configureWorkflow = wrapController(async (req) => {
-  const { disabledSteps, modelBindings, extraSteps, params, mode } = req.body || {};
+  const { disabledSteps, modelBindings, extraSteps, deletedSteps, stepOrder, params, mode } = req.body || {};
   const config = {
     workflowId: req.params.id,
     disabledSteps: disabledSteps || [],
     modelBindings: modelBindings || {},
     extraSteps: extraSteps || [],
+    deletedSteps: deletedSteps || [],
+    stepOrder: stepOrder || [],
     params: params || {},
     mode: mode || 'auto',
   };
