@@ -499,6 +499,9 @@ export function getTemplate(intentId, industry = null) {
 /**
  * 填充模板，生成最终 system prompt
  */
+
+const _escapeRx = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 export function fillTemplate(template, variables = {}) {
   const defaults = template.defaults || {};
   const merged = { ...defaults, ...variables };
@@ -506,7 +509,7 @@ export function fillTemplate(template, variables = {}) {
 
   for (const v of template.variables) {
     const val = merged[v] !== undefined ? merged[v] : '';
-    filled = filled.replace(new RegExp(`\\{${v}\\}`, 'g'), String(val));
+    filled = filled.replace(new RegExp(`\\{${_escapeRx(v)}\\}`, 'g'), String(val));
   }
 
   return { systemPrompt: filled, variables: merged };

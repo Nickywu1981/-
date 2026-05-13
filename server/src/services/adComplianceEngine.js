@@ -118,16 +118,34 @@ const PLATFORM_RULES = {
 
 // ==================== 行业敏感词 ====================
 
+// Zod 枚举 → 合规引擎键名映射（统一行业代码）
+const INDUSTRY_ALIAS = { beauty: 'cosmetic', '3c_digital': 'electronics' };
+
 const INDUSTRY_RULES = {
-  food: {
-    name: '食品',
-    block: ['减肥', '瘦身', '排毒', '清肠', '溶脂', '燃脂', '降血糖', '降血压', '降血脂', '抗癌', '防癌', '抗衰老', '增强免疫力', '提高抵抗力', '调节内分泌', '壮阳', '补肾', '药膳', '中药', '治疗肠胃'],
-    warn:  ['低脂', '无糖', '零卡', '低卡', '无添加', '有机', '天然'],
+  clothing: {
+    name: '服装',
+    block: ['治疗', '药用', '抗菌', '减肥', '瘦身', '抗癌', '防癌', '壮阳', '补肾'],
+    warn:  ['纯天然', '有机', '无添加', '零刺激'],
   },
   cosmetic: {
     name: '化妆品',
     block: ['药妆', '医学护肤', '干细胞', 'DNA修复', '基因美白', '细胞再生', '祛斑', '淡斑', '祛痘', '除皱', '去皱', '抗皱', '美白', '褪黑', '消炎', '杀菌', '修复过敏', '治疗皮炎'],
     warn:  ['无添加', '零刺激', '纯天然', '无酒精', '零致敏', '医美级'],
+  },
+  electronics: {
+    name: '3C数码',
+    block: ['军用', '军工', '航天', '卫星', '间谍', '窃听', '破解', '翻墙', 'VPN'],
+    warn:  ['最强', '最快', '顶级', '无敌'],
+  },
+  food: {
+    name: '食品',
+    block: ['减肥', '瘦身', '排毒', '清肠', '溶脂', '燃脂', '降血糖', '降血压', '降血脂', '抗癌', '防癌', '抗衰老', '增强免疫力', '提高抵抗力', '调节内分泌', '壮阳', '补肾', '药膳', '中药', '治疗肠胃'],
+    warn:  ['低脂', '无糖', '零卡', '低卡', '无添加', '有机', '天然'],
+  },
+  home: {
+    name: '家居',
+    block: ['治疗', '药用', '抗癌', '防癌', '壮阳', '补肾'],
+    warn:  ['纯天然', '零甲醛', '无添加'],
   },
   mother_baby: {
     name: '母婴',
@@ -170,9 +188,10 @@ export function checkCompliance(text, opts = {}) {
     _checkPlatformRules(text, PLATFORM_RULES[platform], violations);
   }
 
-  // 3) 行业专项
-  if (industry && INDUSTRY_RULES[industry]) {
-    _checkIndustryRules(text, INDUSTRY_RULES[industry], violations);
+  // 3) 行业专项（含 Zod 枚举 → 合规键名映射）
+  const resolvedIndustry = industry ? (INDUSTRY_ALIAS[industry] || industry) : null;
+  if (resolvedIndustry && INDUSTRY_RULES[resolvedIndustry]) {
+    _checkIndustryRules(text, INDUSTRY_RULES[resolvedIndustry], violations);
   }
 
   // 去重
