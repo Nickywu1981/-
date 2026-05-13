@@ -76,7 +76,7 @@
 <script setup lang="ts">
 const { t } = useI18n()
 
-defineProps<{
+const props = defineProps<{
   modelValue: string
 }>()
 

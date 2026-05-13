@@ -27,6 +27,9 @@ export class CircuitBreaker {
 
     // 滑动窗口（错误率模式）
     this.window = []; // [{ success: boolean, ts: number }]
+
+    // 半开限流：同一时间仅允许一个探测请求
+    this._halfOpenProbeSent = false;
   }
 
   isAvailable() {
@@ -34,11 +37,14 @@ export class CircuitBreaker {
     if (this.state === 'open') {
       if (Date.now() - this.lastFailureTime > this.cooldownMs) {
         this.state = 'half-open';
+        this._halfOpenProbeSent = false;
         logger.info(`[CircuitBreaker] 半开探测 (cooldown=${this.cooldownMs}ms)`);
         return true;
       }
       return false;
     }
+    // half-open: 仅允许一个探测请求
+    if (this._halfOpenProbeSent) return false;
     return this.state === 'half-open';
   }
 
@@ -53,11 +59,15 @@ export class CircuitBreaker {
     }
     this.failureCount = 0;
     this.state = 'closed';
+    this._halfOpenProbeSent = false;
   }
 
   recordFailure() {
     this.failureCount++;
     this.lastFailureTime = Date.now();
+    if (this.state === 'half-open') {
+      this._halfOpenProbeSent = true; // 探测失败，允许下次再试
+    }
 
     // 错误率模式
     if (this.useErrorRate) {

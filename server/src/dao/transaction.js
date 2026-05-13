@@ -24,6 +24,8 @@ export async function withTransaction(fn, options = {}) {
       try {
         await conn.beginTransaction();
         if (isolationLevel) {
+          const VALID_LEVELS = ['READ UNCOMMITTED', 'READ COMMITTED', 'REPEATABLE READ', 'SERIALIZABLE'];
+          if (!VALID_LEVELS.includes(isolationLevel)) throw new Error(`Invalid isolation level: ${isolationLevel}`);
           await conn.query(`SET TRANSACTION ISOLATION LEVEL ${isolationLevel}`);
         }
         const result = await fn(conn);

@@ -14,7 +14,8 @@
  * 共享基础设施已拆分至 gatewayCore.js，本文件仅保留三条核心路径 + 管理API。
  */
 import logger from '../utils/logger.js';
-import { BusinessError } from '../utils/businessError.js';
+import {
+import { ERROR_CODE } from '../constants/errorCode.js'; BusinessError } from '../utils/businessError.js';
 import { infer, listModels, getFallbackModel } from '../services/aiEngine.js';
 import { extractUsage, estimateTokens } from '../services/tokenMeteringService.js';
 import * as tokenPricingDao from '../dao/tokenPricingDao.js';
@@ -161,7 +162,7 @@ export async function gatewayInfer(modelId, input, ctx = {}) {
           timeoutPromise(TOTAL_TIMEOUT, '降级模型调用'),
         ]);
       } else {
-        throw new BusinessError(503, `模型 ${modelId} 不可用且无可用降级模型，请稍后重试`);
+        throw new BusinessError(ERROR_CODE.PARAM_MISSING, `Model ${modelId} unavailable, no fallback`);
       }
     } else {
       // 正常调用（总超时兜底）
@@ -176,7 +177,7 @@ export async function gatewayInfer(modelId, input, ctx = {}) {
     status = 'error';
     errorMsg = err.message;
 
-    if (breaker) breaker.recordFailure();
+    if (breaker) { breaker.recordFailure(); recordCircuitBreakerTrip(modelId); }
 
     // 未降级过则尝试降级
     if (!triedFallback) {

@@ -55,6 +55,14 @@ export function getModelBreaker(modelId) {
   return modelBreakers.get(modelId);
 }
 
+/** 清理已移出池的模型的断路器实例 */
+export function cleanStaleBreakers(activeModelIds) {
+  const activeSet = new Set(activeModelIds);
+  for (const id of modelBreakers.keys()) {
+    if (!activeSet.has(id)) modelBreakers.delete(id);
+  }
+}
+
 export function timeoutPromise(ms, label) {
   return new Promise((_, reject) =>
     setTimeout(() => reject(new Error(`${label} 超时 (${ms}ms)`)), ms),
@@ -109,8 +117,8 @@ export async function runBusinessPipeline(input, ctx = {}) {
 
     return { blocked: false, wrapResult };
   } catch (e) {
-    logger.warn('[Gateway] Business pipeline failed, allowing through', e.message);
-    return { blocked: false, wrapResult: null };
+    logger.warn('[Gateway] Business pipeline crashed, allowing raw prompt through — this bypasses template wrapping', { error: e.message, stack: e.stack?.substring(0, 300) });
+    return { blocked: false, wrapResult: null, pipelineCrashed: true };
   }
 }
 

@@ -15,6 +15,7 @@ import * as modelConfigDao from '../dao/modelConfigDao.js';
 import { BusinessError } from '../utils/businessError.js';
 import { encrypt } from '../utils/crypto.js';
 import logger from '../utils/logger.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 // ==================== 池状态缓存 ====================
 let _poolCache = null;
@@ -60,10 +61,10 @@ function _selectByWeight(models) {
   }
 
   // 权重轮询
-  const totalWeight = enabled.reduce((sum, m) => sum + (m.pool_weight || 1), 0);
+  const totalWeight = enabled.reduce((sum, m) => sum + (m.pool_weight ?? 1), 0);
   let roll = Math.random() * totalWeight;
   for (const m of enabled) {
-    roll -= (m.pool_weight || 1);
+    roll -= (m.pool_weight ?? 1);
     if (roll <= 0) return m;
   }
   return enabled[0];
@@ -121,14 +122,14 @@ export async function listEnabledByCategory(category) {
 
 export async function registerModel(data) {
   const existing = await modelConfigDao.getByKey(data.model_key);
-  if (existing) throw new BusinessError(409, '模型标识已存在');
+  if (existing) throw new BusinessError(ERROR_CODE.RESOURCE_DUPLICATE);
 
   const { api_key, ...rest } = data;
   const record = await modelConfigDao.create({
     ...rest,
     api_key_enc: encrypt(api_key),
     pool_enabled: data.pool_enabled ?? 1,
-    pool_weight: data.pool_weight || 1,
+    pool_weight: data.pool_weight ?? 1,
     gray_percent: data.gray_percent || 0,
     quota_daily: data.quota_daily || 0,
     quota_tenant: data.quota_tenant || 0,
@@ -144,7 +145,7 @@ export async function updateModel(modelKey, data) {
   if (api_key) updateData.api_key_enc = encrypt(api_key);
 
   const result = await modelConfigDao.update(modelKey, updateData);
-  if (!result) throw new BusinessError(404, '模型不存在');
+  if (!result) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
 
   await refreshPool();
   return result;
@@ -152,14 +153,14 @@ export async function updateModel(modelKey, data) {
 
 export async function removeModel(modelKey) {
   const ok = await modelConfigDao.remove(modelKey);
-  if (!ok) throw new BusinessError(404, '模型不存在');
+  if (!ok) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   await refreshPool();
   return true;
 }
 
 export async function toggleModel(modelKey, enabled) {
   const ok = await modelConfigDao.toggle(modelKey, enabled);
-  if (!ok) throw new BusinessError(404, '模型不存在');
+  if (!ok) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   await refreshPool();
   return { model_key: modelKey, enabled };
 }
@@ -180,7 +181,7 @@ export async function autoSelect(category, taskType, options = {}) {
   const model = _selectBest(pool, category, taskType);
 
   if (!model) {
-    throw new BusinessError(502, `没有可用的${category}模型`);
+    throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, `No ${category} models available`);
   }
 
   logger.info('[ModelPool] Auto-selected', {
@@ -204,8 +205,8 @@ export async function autoSelect(category, taskType, options = {}) {
 export async function getModelConfig(modelKey) {
   const pool = await getPool();
   const model = pool.find(m => m.model_key === modelKey);
-  if (!model) throw new BusinessError(404, `模型 ${modelKey} 不存在`);
-  if (!model.enabled) throw new BusinessError(400, `模型 ${modelKey} 已禁用`);
+  if (!model) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND, `模型 ${modelKey} 不存在`);
+  if (!model.enabled) throw new BusinessError(ERROR_CODE.PARAM_INVALID, `Model ${modelKey} disabled`);
   return model;
 }
 

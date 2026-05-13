@@ -166,7 +166,7 @@ const realPool = mysql.createPool({
 
 // 连接验证：每次从池中取出连接时执行 SELECT 1 健康探测
 realPool.on('acquire', (conn) => {
-  conn.query('SELECT 1').catch(() => {});
+  conn.query('SELECT 1').catch((e) => { logger.warn('[DB] Health check SELECT 1 failed, connection may be dead', { error: e.message }); });
 });
 
 // Proxy pool: tries real DB first, falls back to mock

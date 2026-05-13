@@ -12,6 +12,7 @@ import logger from '../utils/logger.js';
 import { BusinessError } from '../utils/businessError.js';
 import { extractUsage } from './tokenMeteringService.js';
 import { aiTimeoutMs } from '../config/index.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 // ==================== 模型注册中心 ====================
 
@@ -19,7 +20,7 @@ const registry = new Map();
 
 export function registerModel(model) {
   if (!model.id || !model.type || !model.infer) {
-    throw new BusinessError(500, 'AI模型注册失败: 缺少 id/type/infer 字段');
+    throw new BusinessError(ERROR_CODE.PARAM_ERROR);
   }
   registry.set(model.id, model);
   logger.info(`[AI] 模型已注册: ${model.id} (${model.type})`);
@@ -27,7 +28,7 @@ export function registerModel(model) {
 
 export function getModel(id) {
   const model = registry.get(id);
-  if (!model) throw new BusinessError(500, `AI模型未注册: ${id}`);
+  if (!model) throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, `AI model not registered: ${id}`);
   return model;
 }
 
@@ -129,7 +130,7 @@ export const _cacheCleanupTimer = setInterval(() => {
   for (const [key, entry] of inferenceCache) {
     if (now - entry.timestamp > CACHE_TTL) inferenceCache.delete(key);
   }
-  } catch { /* Map 迭代安全，兜底防护 */ }
+  } catch (e) { logger.warn('[AIEngine] Inference cache cleanup failed', { error: e.message }); }
 }, 300000).unref();
 
 /**

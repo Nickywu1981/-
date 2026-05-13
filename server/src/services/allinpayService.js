@@ -16,6 +16,7 @@ import { settleCommission } from './distribution.service.js';
 import logger from '../utils/logger.js';
 import { BusinessError } from '../utils/businessError.js';
 import { ORDER_STATUS } from '../constants/domainStatus.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 // 注意：会员套餐详情从 database membership_plan 表读取
 // 此处仅保留 plan_type → name 的静态映射供回调日志使用
@@ -30,12 +31,12 @@ const PLAN_NAMES = {
 
 export async function createUnifiedOrder({ userId, orderType, businessId, amount, payChannel, body, remark }) {
   if (!userId || !amount || !payChannel) {
-    throw new BusinessError(400, '缺少必要参数');
+    throw new BusinessError(ERROR_CODE.PARAM_MISSING);
   }
 
   const validChannels = ['wechat', 'alipay', 'unionpay'];
   if (!validChannels.includes(payChannel)) {
-    throw new BusinessError(400, '支付渠道无效');
+    throw new BusinessError(ERROR_CODE.PARAM_INVALID);
   }
 
   const reqsn = `MOV${Date.now()}${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
@@ -81,7 +82,7 @@ export async function handleNotify(body) {
   if (!verified) {
     logger.warn('[Allinpay] 回调签名验证失败', { reqsn, trxid });
     await allinpayDao.logNotify({ reqsn, trxid, notifyBody: JSON.stringify(body), signVerified: 0, processStatus: 2, processMsg: '签名验证失败' });
-    throw new BusinessError(400, '签名验证失败');
+    throw new BusinessError(ERROR_CODE.PAY_SIGN_FAILED);
   }
 
   // 2. 记录回调日志（验签通过后才入库）
@@ -155,7 +156,7 @@ export async function handleNotify(body) {
       const affected = await allinpayDao.markPaid(reqsn, trxid || '', body, conn);
       if (affected === 0) {
         skipped = true;
-        throw new BusinessError(409, '订单已被并发回调处理');
+        throw new BusinessError(ERROR_CODE.RESOURCE_DUPLICATE);
       }
 
       if (order.order_type === 'membership') {
@@ -316,7 +317,7 @@ export async function queryOrder(reqsn) {
       const lock = await redis.get(`notify_lock:${reqsn}`);
       callbackInProgress = !!lock;
     }
-  } catch { /* Redis 不可用时跳过 */ }
+  } catch (e) { logger.warn('[Allinpay] Redis unavailable, skip callback lock', { error: e.message }); }
 
   return {
     reqsn: order.reqsn,

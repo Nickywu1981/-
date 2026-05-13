@@ -18,6 +18,7 @@ import wsManager from './wsManager.js';
 import logger from '../utils/logger.js';
 import { BusinessError } from '../utils/businessError.js';
 import { cacheSet, cacheGet, cacheDel } from '../dao/redis.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 // ==================== 批量进度聚合器 (Redis-backed) ====================
 
@@ -50,7 +51,7 @@ async function cacheDelete(key) {
   memFallback.delete(key);
   try {
     await cacheDel(key);
-  } catch { /* noop */ }
+  } catch (e) { logger.warn('[UnifiedQueue] cacheDel failed', { error: e.message }); }
 }
 
 function batchKey(batchId) { return `${BATCH_CACHE_PREFIX}${batchId}`; }
@@ -66,7 +67,7 @@ export async function submitBatchTask(userId, params) {
     tenantId,
   } = params;
 
-  if (!items.length) throw new BusinessError(400, '批量任务至少需要1个输入项');
+  if (!items.length) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
 
   // 夜间模式扣费（40%折扣）
   const creditAction = operation || taskType;

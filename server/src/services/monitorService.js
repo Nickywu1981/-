@@ -196,13 +196,13 @@ async function restoreFromRedis() {
   try {
     const snapshot = await cacheGet(REDIS_SNAPSHOT_KEY);
     if (snapshot && typeof snapshot === 'object') {
-      // 仅恢复核心指标，避免覆盖运行中的增量数据
-      if (snapshot.totalCalls) metrics.totalCalls = snapshot.totalCalls;
-      if (snapshot.totalSuccess) metrics.totalSuccess = snapshot.totalSuccess;
-      if (snapshot.totalError) metrics.totalError = snapshot.totalError;
-      if (snapshot.totalTokensIn) metrics.totalTokensIn = snapshot.totalTokensIn;
-      if (snapshot.totalTokensOut) metrics.totalTokensOut = snapshot.totalTokensOut;
-      if (snapshot.totalCost) metrics.totalCost = snapshot.totalCost;
+      // 仅恢复核心指标：用 Math.max 避免覆盖启动后已累加的增量数据
+      if (snapshot.totalCalls) metrics.totalCalls = Math.max(metrics.totalCalls, snapshot.totalCalls);
+      if (snapshot.totalSuccess) metrics.totalSuccess = Math.max(metrics.totalSuccess, snapshot.totalSuccess);
+      if (snapshot.totalError) metrics.totalError = Math.max(metrics.totalError, snapshot.totalError);
+      if (snapshot.totalTokensIn) metrics.totalTokensIn = Math.max(metrics.totalTokensIn, snapshot.totalTokensIn);
+      if (snapshot.totalTokensOut) metrics.totalTokensOut = Math.max(metrics.totalTokensOut, snapshot.totalTokensOut);
+      if (snapshot.totalCost) metrics.totalCost = Math.max(metrics.totalCost, snapshot.totalCost);
       if (snapshot.byModel && typeof snapshot.byModel === 'object') {
         Object.assign(metrics.byModel, snapshot.byModel);
       }
@@ -217,6 +217,8 @@ async function restoreFromRedis() {
     }
   } catch (e) {
     logger.warn(`[Monitor] Redis 快照恢复失败: ${e.message}`);
+    // 恢复失败不标记 _restored，下次调用可重试
+    return;
   }
   _restored = true;
 }

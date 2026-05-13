@@ -261,7 +261,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue';
 
 const { $api, $t } = useNuxtApp();

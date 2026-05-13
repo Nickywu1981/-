@@ -224,7 +224,7 @@ async function processQueue() {
       if (task.callback) {
         try {
           await task.callback(err, taskResults.get(task.taskId));
-        } catch { logger.warn(`[AsyncTask] 回调失败: ${task.taskId}`); }
+        } catch (e) { logger.warn(`[AsyncTask] 回调失败: ${task.taskId}`, { error: e.message }); }
       }
 
       logger.error(`[AsyncTask] 任务失败: ${task.taskId}, ${err.message}`);

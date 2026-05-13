@@ -66,12 +66,36 @@ router.post('/pipeline/wrap', authMiddleware, signatureGuard, aiGatewayControlle
 router.post('/pipeline/compliance', authMiddleware, signatureGuard, aiGatewayController.pipelineCompliance);
 
 // ── 全自动编排 ──
-router.post('/pipeline/orchestrate', authMiddleware, signatureGuard, aiConcurrencyGuard, aiGatewayController.pipelineOrchestrate);
-router.post('/pipeline/resume', authMiddleware, signatureGuard, aiGatewayController.pipelineResume);
+const orchestrateSchema = z.object({
+  intentId: z.string().min(1).max(100),
+  input: z.record(z.unknown()).optional(),
+  options: z.record(z.unknown()).optional(),
+});
+const resumeSchema = z.object({
+  pipelineId: z.string().min(1).max(100),
+  stepIndex: z.coerce.number().int().min(0).optional(),
+});
+router.post('/pipeline/orchestrate', authMiddleware, signatureGuard, aiConcurrencyGuard, validate(orchestrateSchema), aiGatewayController.pipelineOrchestrate);
+router.post('/pipeline/resume', authMiddleware, signatureGuard, validate(resumeSchema), aiGatewayController.pipelineResume);
 
 // ── 人工微调 ──
-router.post('/pipeline/adjust', authMiddleware, signatureGuard, aiGatewayController.pipelineAdjust);
-router.post('/pipeline/regenerate', authMiddleware, signatureGuard, aiConcurrencyGuard, aiGatewayController.pipelineRegenerate);
-router.post('/pipeline/reference', authMiddleware, signatureGuard, aiGatewayController.pipelineUploadReference);
+const adjustSchema = z.object({
+  pipelineId: z.string().min(1).max(100),
+  stepId: z.string().min(1).max(100).optional(),
+  adjustment: z.record(z.unknown()),
+});
+const regenerateSchema = z.object({
+  pipelineId: z.string().min(1).max(100),
+  stepId: z.string().min(1).max(100).optional(),
+  newInput: z.record(z.unknown()).optional(),
+});
+const referenceSchema = z.object({
+  pipelineId: z.string().min(1).max(100).optional(),
+  refUrl: z.string().url().max(500),
+  refType: z.enum(['image', 'video', 'sketch', 'style']).optional(),
+});
+router.post('/pipeline/adjust', authMiddleware, signatureGuard, validate(adjustSchema), aiGatewayController.pipelineAdjust);
+router.post('/pipeline/regenerate', authMiddleware, signatureGuard, aiConcurrencyGuard, validate(regenerateSchema), aiGatewayController.pipelineRegenerate);
+router.post('/pipeline/reference', authMiddleware, signatureGuard, validate(referenceSchema), aiGatewayController.pipelineUploadReference);
 
 export default router;

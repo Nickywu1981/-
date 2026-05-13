@@ -146,7 +146,10 @@ export async function cacheGetWithLock(key, fetchFn, ttl = 300, lockTimeout = 50
   const lockPromise = (async () => {
     try {
       const value = await fetchFn();
-      await cacheSet(key, value, ttl);
+      // 仅在锁仍有效时写入缓存（超时已被删除则跳过，避免脏写）
+      if (mutexLocks.has(key)) {
+        await cacheSet(key, value, ttl);
+      }
       return value;
     } finally {
       mutexLocks.delete(key);

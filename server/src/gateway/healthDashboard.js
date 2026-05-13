@@ -60,7 +60,7 @@ export async function runHealthCheck(authenticated = false) {
     }
     // 获取连接池指标
     if (db.getPoolMetrics) {
-      try { poolMetrics = db.getPoolMetrics(); } catch { /* pool metrics optional */ }
+      try { poolMetrics = db.getPoolMetrics(); } catch (e) { logger.debug('[HealthDashboard] pool metrics unavailable', { error: e.message }); }
     }
   } catch (e) {
     logger.warn('[HealthDashboard] DB检查失败', { error: e.message });
@@ -74,7 +74,7 @@ export async function runHealthCheck(authenticated = false) {
     await ping();
     status.checks.redis = true;
     if (getRedisMetrics) {
-      try { status.checks.redisMetrics = getRedisMetrics(); } catch { /* optional */ }
+      try { status.checks.redisMetrics = getRedisMetrics(); } catch (e) { logger.debug('[HealthDashboard] redis metrics unavailable', { error: e.message }); }
     }
   } catch (e) {
     logger.warn('[HealthDashboard] Redis检查失败', { error: e.message });

@@ -17,6 +17,7 @@ import { aiGatewayConfig } from '../config/index.js';
  */
 
 import { infer, pipeline, registerModel, getModel, listModels, getFallbackModel, healthCheck, getUsageStats, clearCache, getCacheSize } from './aiEngine.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 // ==================== 惰性初始化 ====================
 
@@ -135,11 +136,9 @@ let _scoreCacheTs = 0;
 const SCORE_CACHE_TTL = 60_000;
 
 function _getMonitorScores() {
-  // 从缓存读取（由 refreshScoreCache 或自愈引擎异步刷新）
-  if (!_scoreCache || Date.now() - _scoreCacheTs > SCORE_CACHE_TTL) {
-    _scoreCache = {};
-  }
-  return _scoreCache;
+  // 返回缓存（由 refreshScoreCache 或自愈引擎异步刷新）
+  // 注意：缓存过期后不清空，等待 refreshScoreCache 更新，避免短时间返回空对象导致所有模型评分=100%
+  return _scoreCache || {};
 }
 
 /** 刷新监控评分缓存（由自愈引擎周期性调用） */
@@ -258,7 +257,7 @@ export async function autoMode(taskType, input, options = {}) {
   const ranking = rankModels(analysis.candidates, analysis.category, healthData);
 
   if (!ranking.best) {
-    throw new BusinessError(503, `类别 ${analysis.category} 下无可用模型`);
+    throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, `No models available for ${analysis.category}`);
   }
 
   // 金丝雀灰度：检查是否有灰度版本
@@ -371,7 +370,7 @@ export async function customMode(taskType, input, customConfig = {}, options = {
   }
 
   if (results.length === 0) {
-    throw new BusinessError(503, '自定义组合全部执行失败');
+    throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
   }
 
   const aggregated = aggregateResults(results, taskType);
@@ -431,7 +430,7 @@ export async function dispatch(req, options = {}) {
     let result;
     switch (mode) {
       case 'single': {
-        if (!modelId) throw new BusinessError(400, 'single 模式需要 modelId');
+        if (!modelId) throw new BusinessError(ERROR_CODE.PARAM_ERROR);
         result = await singleMode(modelId, input, options);
         break;
       }
@@ -484,7 +483,7 @@ export function registerExtension(name, handler) {
     extensionHooks[name] = handler;
     logger.info(`[ModelDispatcher] Phase 3 扩展 ${name} 已注册`);
   } else {
-    throw new BusinessError(400, `未知扩展: ${name}. 可用: ${Object.keys(extensionHooks).join(', ')}`);
+    throw new BusinessError(ERROR_CODE.PARAM_ERROR, `Unknown extension: ${name}. 可用: ${Object.keys(extensionHooks).join(', ')}`);
   }
 }
 
