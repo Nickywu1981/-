@@ -197,7 +197,7 @@ async function processDigitalHuman(taskId, userId, params) {
 
     await completeTask(taskId, userId, { progressMsg: '口播视频生成完成', outputResult: {
       videoUrl: pipeResult.final?.videoUrl || `/api/videos/${taskId}_digital_human.mp4`,
-      duration: Math.ceil(params.script.length / 5), format: 'mp4',
+      duration: Math.ceil((params.script?.length || 0) / 5), format: 'mp4',
       thumbnail: pipeResult.final?.thumbnail || `/api/videos/${taskId}_dh_thumb.webp`,
     }});
   } catch (err) { await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }); }

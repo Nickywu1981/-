@@ -48,6 +48,7 @@ function tokenize(text) {
 
 // TF-IDF 向量化
 function tfidfVector(tokens, vocab, idf) {
+  if (!tokens.length) return {};
   const vec = {};
   const tf = {};
   for (const t of tokens) {

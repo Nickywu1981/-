@@ -97,7 +97,8 @@ function ensureSSE() {
   try {
     sharedEventSource = new EventSource('/api/config/version/stream');
     sharedEventSource.onmessage = (e) => {
-      const data = JSON.parse(e.data);
+      let data: any
+      try { data = JSON.parse(e.data) } catch { return }
       if (data.version && !data.heartbeat) {
         // 通知所有注册的监听器（各自清缓存 + 刷新）
         sseListeners.forEach(fn => fn());

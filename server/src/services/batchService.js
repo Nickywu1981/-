@@ -36,7 +36,9 @@ export async function submitBatchTask(userId, { imageUrls, operation, platform, 
 
   if (nightMode) return { taskId, nightMode: true, estimatedCost: calcCost(action, batchSize, discountMultiplier, batchMultiplier) };
 
-  setImmediate(() => processBatch(taskId, userId));
+  setImmediate(() => processBatch(taskId, userId).catch(err =>
+    logger.error('[Batch] setImmediate error:', err.message)
+  ));
   return { taskId, estimatedSeconds: batchSize * 5, batchSize };
 }
 
@@ -77,7 +79,9 @@ export async function processNightBatchJobs() {
   const tasks = await getPendingTasks(50);
   const nightTasks = tasks.filter((t) => t.input_params?.nightMode);
   logger.info(`[NightBatch] 触发夜间批量: ${nightTasks.length} 个任务`);
-  for (const task of nightTasks) setImmediate(() => processBatch(task.id, task.user_id));
+  for (const task of nightTasks) setImmediate(() => processBatch(task.id, task.user_id).catch(err =>
+    logger.error('[NightBatch] setImmediate error:', err.message)
+  ));
   return { processed: nightTasks.length };
 }
 

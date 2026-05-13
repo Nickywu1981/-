@@ -138,7 +138,7 @@ async function doRedeem(points: number) {
   try {
     const res: any = await $fetch(`${apiBase}/points/redeem`, { method: 'POST', body: { points } })
     if (res.code === 200) {
-      account.value.balance = res.data?.points_balance ?? account.value.balance
+      if (account.value) account.value.balance = res.data?.points_balance ?? account.value.balance
       toast.success(`成功兑换 ${res.data?.redeemed_credits ?? points} 点数！`)
     } else {
       toast.error(res.msg || '兑换失败')

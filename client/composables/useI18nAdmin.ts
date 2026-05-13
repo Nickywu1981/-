@@ -96,7 +96,8 @@ export function useI18nAdmin() {
 
   async function importJSON(file: File) {
     const text = await file.text()
-    const data = JSON.parse(text)
+    let data: any
+    try { data = JSON.parse(text) } catch { toast.error('无效的 JSON 文件'); return }
     await $fetch(`/api/admin/i18n/${activeLocale.value}/import`, {
       method: 'POST', body: data, params: { skipEdited: '0' }, credentials: 'include',
     })

@@ -153,7 +153,8 @@ export function useDiyEditor() {
   }
 
   function loadFromConfig(config: string | { sections?: DiySection[] }) {
-    const cfg = typeof config === 'string' ? JSON.parse(config) : config
+    let cfg: any = config
+    if (typeof config === 'string') { try { cfg = JSON.parse(config) } catch { return } }
     sections.value = (cfg?.sections || []).map(s => ({
       ...s,
       locked: s.locked ?? false,

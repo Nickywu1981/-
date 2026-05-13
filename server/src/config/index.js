@@ -192,7 +192,7 @@ const config = {
       baseUrl: process.env.STABILITY_BASE_URL || 'https://api.stability.ai',
     },
     edgeTts: {
-      wsUrl: process.env.EDGE_TTS_WS_URL || `wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=${process.env.EDGE_TTS_TRUSTED_TOKEN || '6A5AA1D4EAFF4E9FB37E23D68491D6F4'}`,
+      wsUrl: process.env.EDGE_TTS_WS_URL || `wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=${process.env.EDGE_TTS_TRUSTED_TOKEN || ''}`,
       elevenLabsApiKey: process.env.ELEVENLABS_API_KEY,
       elevenLabsApiUrl: process.env.ELEVENLABS_API_URL || 'https://api.elevenlabs.io',
     },

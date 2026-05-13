@@ -32,7 +32,7 @@
           <span class="card-type">{{ tpl.type_name || tpl.task_type }}</span>
         </div>
         <div class="card-footer">
-          <span class="card-date">{{ new Date(tpl.create_time).toLocaleDateString() }}</span>
+          <span class="card-date">{{ tpl.create_time ? new Date(tpl.create_time).toLocaleDateString() : '-' }}</span>
           <button class="btn-use" @click="$router.push('/workspace')">使用</button>
         </div>
       </div>

@@ -229,17 +229,15 @@ async function poll() {
 }
 
 // 优雅退出
-process.on('SIGTERM', async () => {
+process.on('SIGTERM', () => {
   logger.info('[Worker] SIGTERM received, shutting down...');
   running = false;
-  await waitForJobs();
-  process.exit(0);
+  waitForJobs().finally(() => process.exit(0));
 });
-process.on('SIGINT', async () => {
+process.on('SIGINT', () => {
   logger.info('[Worker] SIGINT received, shutting down...');
   running = false;
-  await waitForJobs();
-  process.exit(0);
+  waitForJobs().finally(() => process.exit(0));
 });
 
 async function waitForJobs() {

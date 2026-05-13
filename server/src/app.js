@@ -196,13 +196,15 @@ import('./middleware/cache.js').then(({ invalidateCache }) => {
 }).catch((err) => { logger.warn('[Cache] 缓存中间件不可用，失效功能已禁用', { error: err.message }); });
 
 // 健康检查 — 使用网关健康仪表盘 (Phase 0-A, 2026-05-11)
-app.get('/api/health', optionalAuth, async (req, res) => {
-  const authenticated = !!req.user;
-  const status = await runHealthCheck(authenticated);
-  if (status.checks.db) {
-    return success(res, status, status.degraded ? 'degraded' : 'ok');
-  }
-  return sendError(res, 503, 'db_down', status);
+app.get('/api/health', optionalAuth, async (req, res, next) => {
+  try {
+    const authenticated = !!req.user;
+    const status = await runHealthCheck(authenticated);
+    if (status.checks.db) {
+      return success(res, status, status.degraded ? 'degraded' : 'ok');
+    }
+    return sendError(res, 503, 'db_down', status);
+  } catch (err) { next(err); }
 });
 
 // 网关路由地图端点 (Phase 0-A, 2026-05-11) — 需管理员认证

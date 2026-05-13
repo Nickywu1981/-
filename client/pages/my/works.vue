@@ -139,7 +139,7 @@ async function fetchAll() {
 
     const results = await Promise.all(endpoints)
     allTasks.value = results.flatMap((r: any) => r.list || []).sort((a: any, b: any) =>
-      new Date(b.create_time).getTime() - new Date(a.create_time).getTime()
+      new Date(b.create_time || 0).getTime() - new Date(a.create_time || 0).getTime()
     )
     total.value = results.reduce((sum: number, r: any) => sum + (r.total || 0), 0)
   } catch (e: any) {
