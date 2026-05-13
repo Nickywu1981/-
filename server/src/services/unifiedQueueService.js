@@ -17,10 +17,43 @@ import * as creditService from './creditService.js';
 import wsManager from './wsManager.js';
 import logger from '../utils/logger.js';
 import { BusinessError } from '../utils/businessError.js';
+import { cacheSet, cacheGet, cacheDel } from '../dao/redis.js';
 
-// ==================== 批量进度聚合器 ====================
+// ==================== 批量进度聚合器 (Redis-backed) ====================
 
-const batchProgressCache = new Map();
+const BATCH_CACHE_PREFIX = 'batch:progress:';
+const BATCH_CACHE_TTL = 3600; // 1小时
+
+// 内存缓存作为 Redis 不可用时的降级
+const memFallback = new Map();
+
+async function cacheGet(key) {
+  try {
+    const val = await getCache(key);
+    if (val) return val;
+  } catch (e) {
+    logger.warn('[UnifiedQueue] Redis 读取失败，降级内存', { key, error: e.message });
+  }
+  return memFallback.get(key) || null;
+}
+
+async function cacheSet(key, value, ttl = BATCH_CACHE_TTL) {
+  memFallback.set(key, value); // 始终写内存降级
+  try {
+    await setCache(key, value, ttl);
+  } catch (e) {
+    logger.warn('[UnifiedQueue] Redis 写入失败，仅内存缓存', { key, error: e.message });
+  }
+}
+
+async function cacheDelete(key) {
+  memFallback.delete(key);
+  try {
+    await cacheDel(key);
+  } catch { /* noop */ }
+}
+
+function batchKey(batchId) { return `${BATCH_CACHE_PREFIX}${batchId}`; }
 
 /**
  * 提交批量任务并自动拆分
@@ -73,7 +106,7 @@ export async function submitBatchTask(userId, params) {
   }
 
   // 更新父任务子任务列表
-  batchProgressCache.set(batchId, {
+  await cacheSet(batchKey(batchId), {
     total: items.length,
     completed: 0,
     failed: 0,
@@ -106,7 +139,8 @@ export async function submitBatchTask(userId, params) {
  * Worker 完成单个子任务后调用此钩子，自动聚合到父任务进度
  */
 export async function onChildJobComplete(batchId, childJobId, status, result) {
-  const batch = batchProgressCache.get(batchId);
+  const key = batchKey(batchId);
+  const batch = await cacheGet(key);
   if (!batch) return;
 
   if (status === 'completed') batch.completed++;
@@ -141,7 +175,7 @@ export async function onChildJobComplete(batchId, childJobId, status, result) {
     logger.info(`[UnifiedQueue] Batch ${batchId} ${finalStatus}: ${batch.completed}/${batch.total} ok, ${batch.failed} failed`);
 
     // 1小时后清理缓存
-    setTimeout(() => batchProgressCache.delete(batchId), 3600000);
+    setTimeout(() => { cacheDelete(key); }, 3600000);
   }
 }
 
@@ -174,7 +208,8 @@ export async function submitTask(userId, mode, params) {
 // ==================== 查询接口 ====================
 
 export async function getBatchProgress(batchId) {
-  return batchProgressCache.get(batchId) || null;
+  const key = batchKey(batchId);
+  return cacheGet(key);
 }
 
 // ==================== 夜间批量处理 ====================

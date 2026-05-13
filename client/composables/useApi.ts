@@ -14,6 +14,19 @@ interface PaginatedData<T = any> {
   pageSize: number;
 }
 
+export class ApiError extends Error {
+  code: number
+  status: number
+  data: any
+  constructor(message: string, code = 500, status = 500, data?: any) {
+    super(message)
+    this.name = 'ApiError'
+    this.code = code
+    this.status = status
+    this.data = data
+  }
+}
+
 // ==================== CSRF 工具 ====================
 
 function getCsrfToken(): string | null {
@@ -55,18 +68,28 @@ const RETRY_CONFIG = {
   statuses: [502, 503, 504],
 };
 
-async function delay(ms: number): Promise<void> {
+function delay(ms: number): Promise<void> {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-/** 通用 API 请求封装（含重试 + 离线检测） */
+const DEFAULT_TIMEOUT_MS = 30000;
+
+interface RequestOptions {
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
+  body?: any
+  params?: Record<string, any>
+  timeout?: number
+  signal?: AbortSignal
+}
+
+/** 通用 API 请求封装（含 CSRF + 超时 + 重试 + 离线检测 + 401 重定向锁） */
 async function request<T = any>(
   url: string,
-  options: { method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'; body?: any; params?: Record<string, any> } = {},
+  options: RequestOptions = {},
   retries = 0,
 ): Promise<T> {
   if (getIsOffline().value) {
-    throw new Error('网络已断开，请检查网络连接');
+    throw new ApiError('网络已断开，请检查网络连接', 0, 0);
   }
 
   const config = useRuntimeConfig();
@@ -75,24 +98,30 @@ async function request<T = any>(
 
   const headers: Record<string, string> = {};
 
-  // CSRF 双重提交 Cookie 模式: 读取 csrf_token → X-CSRF-Token 请求头
+  // CSRF: 非 GET 请求读取 csrf_token cookie → X-CSRF-Token 请求头
   if (options.method && options.method !== 'GET') {
     const csrfToken = getCsrfToken();
     if (csrfToken) headers['x-csrf-token'] = csrfToken;
   }
 
-  // Build query string from params
+  // Query string
   let query = '';
   if (options.params) {
-    const searchParams = new URLSearchParams();
+    const sp = new URLSearchParams();
     Object.entries(options.params).forEach(([k, v]) => {
-      if (v !== undefined && v !== null && v !== '') {
-        searchParams.append(k, String(v));
-      }
+      if (v !== undefined && v !== null && v !== '') sp.append(k, String(v));
     });
-    const qs = searchParams.toString();
+    const qs = sp.toString();
     if (qs) query = `?${qs}`;
   }
+
+  // AbortController: 外部 signal + 内部 timeout 竞速
+  const timeoutMs = options.timeout ?? DEFAULT_TIMEOUT_MS;
+  const internalCtrl = new AbortController();
+  const timeoutId = setTimeout(() => internalCtrl.abort(new DOMException('请求超时', 'TimeoutError')), timeoutMs);
+  const combinedSignal = options.signal
+    ? anySignal([options.signal, internalCtrl.signal])
+    : internalCtrl.signal;
 
   try {
     const res = await $fetch<ApiResponse<T>>(`${fullUrl}${query}`, {
@@ -100,53 +129,83 @@ async function request<T = any>(
       headers,
       body: options.body,
       credentials: 'include',
+      signal: combinedSignal,
       onResponseError({ response }) {
         if (response.status === 401 && !isRedirecting) {
           isRedirecting = true;
-          const redirectPath = typeof window !== 'undefined' ? window.location.pathname + window.location.search : '';
+          const redirectPath = typeof window !== 'undefined'
+            ? window.location.pathname + window.location.search
+            : '';
           if (redirectTimer) clearTimeout(redirectTimer);
           redirectTimer = setTimeout(() => { isRedirecting = false; redirectTimer = null; }, REDIRECT_UNLOCK_MS);
-          navigateTo(`/login?redirect=${encodeURIComponent(redirectPath)}`).finally(() => { isRedirecting = false; });
+          navigateTo(`/login?redirect=${encodeURIComponent(redirectPath)}`)
+            .finally(() => { isRedirecting = false; });
         }
       },
     });
 
     if (res.code !== 200) {
-      throw new Error(res.msg || '请求失败');
+      throw new ApiError(res.msg || '请求失败', res.code, 200, res.data);
     }
     return res.data as T;
   } catch (err: any) {
-    // 5xx 重试（指数退避）
+    // 超时不重试
+    if (err.name === 'TimeoutError' || err.name === 'AbortError') {
+      if (options.signal?.aborted) throw err; // 外部取消，透传
+      throw new ApiError('请求超时，请稍后重试', 408, 408);
+    }
+
+    // 5xx 指数退避重试
     const status = err?.response?.status || err?.status;
     if (RETRY_CONFIG.statuses.includes(status) && retries < RETRY_CONFIG.maxRetries) {
       const waitMs = RETRY_CONFIG.baseDelayMs * Math.pow(2, retries);
       await delay(waitMs);
       return request<T>(url, options, retries + 1);
     }
-    throw err;
+
+    // 已是 ApiError 则直接抛出
+    if (err instanceof ApiError) throw err;
+
+    throw new ApiError(
+      err?.message || '网络请求失败',
+      err?.response?.status || 500,
+      err?.response?.status || 500,
+    );
+  } finally {
+    clearTimeout(timeoutId);
   }
+}
+
+/** 合并多个 AbortSignal */
+function anySignal(signals: AbortSignal[]): AbortSignal {
+  const ctrl = new AbortController();
+  for (const s of signals) {
+    if (s.aborted) { ctrl.abort(s.reason); return ctrl.signal; }
+    s.addEventListener('abort', () => ctrl.abort(s.reason), { once: true });
+  }
+  return ctrl.signal;
 }
 
 /** API 方法快捷调用 */
 export const api = {
-  get: <T = any>(url: string, params?: Record<string, any>) =>
-    request<T>(url, { params }),
+  get: <T = any>(url: string, params?: Record<string, any>, opts?: Omit<RequestOptions, 'method' | 'params'>) =>
+    request<T>(url, { ...opts, params }),
 
-  post: <T = any>(url: string, body?: any) =>
-    request<T>(url, { method: 'POST', body }),
+  post: <T = any>(url: string, body?: any, opts?: Omit<RequestOptions, 'method' | 'body'>) =>
+    request<T>(url, { ...opts, method: 'POST', body }),
 
-  put: <T = any>(url: string, body?: any) =>
-    request<T>(url, { method: 'PUT', body }),
+  put: <T = any>(url: string, body?: any, opts?: Omit<RequestOptions, 'method' | 'body'>) =>
+    request<T>(url, { ...opts, method: 'PUT', body }),
 
-  delete: <T = any>(url: string) =>
-    request<T>(url, { method: 'DELETE' }),
+  delete: <T = any>(url: string, opts?: Omit<RequestOptions, 'method'>) =>
+    request<T>(url, { ...opts, method: 'DELETE', ...opts }),
 };
 
 export type { ApiResponse, PaginatedData };
 
 let activeInstances = 0;
 
-/** Composable wrapper for pages that import { useApi } */
+/** Composable wrapper — 自动管理离线监听器生命周期 */
 export function useApi() {
   ensureListeners();
   activeInstances++;

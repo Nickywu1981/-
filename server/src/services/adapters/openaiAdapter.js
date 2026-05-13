@@ -65,6 +65,9 @@ function makeTextInfer(modelId, maxTokens = 2000, timeout = 60000) {
 // ==================== 通用文本流式推断工厂 ====================
 
 function makeTextStreamInfer(modelId, maxTokens = 2000, timeout = 300000) {
+  let malformedChunksDiscarded = 0;
+  let totalChunksReceived = 0;
+
   return async function* streamInfer(input, onProgress) {
     if (typeof input === 'string') {
       input = { prompt: input };
@@ -114,6 +117,7 @@ function makeTextStreamInfer(modelId, maxTokens = 2000, timeout = 300000) {
           const data = trimmed.slice(6);
           if (data === '[DONE]') break;
 
+          totalChunksReceived++;
           try {
             const json = JSON.parse(data);
             const delta = json.choices?.[0]?.delta;
@@ -124,17 +128,32 @@ function makeTextStreamInfer(modelId, maxTokens = 2000, timeout = 300000) {
               inputTokens = json.usage.prompt_tokens || inputTokens;
               outputTokens = json.usage.completion_tokens || outputTokens;
             }
-          } catch { /* skip malformed chunks */ }
+          } catch {
+            malformedChunksDiscarded++;
+          }
         }
       }
     } finally {
       reader.releaseLock();
+      if (malformedChunksDiscarded > 0) {
+        logger.warn('[OpenAI] SSE 流中丢弃畸形 chunk', {
+          model: modelId,
+          discarded: malformedChunksDiscarded,
+          total: totalChunksReceived,
+          discardRate: totalChunksReceived > 0
+            ? `${((malformedChunksDiscarded / totalChunksReceived) * 100).toFixed(1)}%`
+            : 'N/A',
+        });
+      }
     }
 
     onProgress?.(100);
 
-    // 最后 yield 用量信息
-    yield { usage: { inputTokens, outputTokens } };
+    // 最后 yield 用量信息 + 监控指标
+    yield {
+      usage: { inputTokens, outputTokens },
+      _meta: { malformedChunksDiscarded, totalChunksReceived },
+    };
   };
 }
 

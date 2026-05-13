@@ -3,6 +3,7 @@
  *
  * Phase 1: 企业/代理端 MVP (2026-05-11)
  */
+import { withTransaction } from '../dao/transaction.js';
 import * as enterpriseDao from '../dao/enterpriseDao.js';
 import * as userDao from '../dao/userDao.js';
 import { generateAccessToken, generateRefreshToken } from '../middleware/auth.js';
@@ -38,37 +39,40 @@ export async function registerEnterprise({
     }
   }
 
-  // 1. 创建管理员用户账号
+  // 1-3: 事务性创建用户 + 企业 + 关联
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
-  const userId = await userDao.insertUser({
-    username: contactPhone,
-    password: passwordHash,
-    nickname: contactName,
-    tenantId: 0,
-  });
 
-  // 2. 创建企业 tenant
-  const tenantId = await enterpriseDao.createTenant({
-    name,
-    code,
-    type,
-    logo,
-    domain,
-    contactName,
-    contactPhone,
-    contactEmail,
-    planType: 'free',
-    maxUsers: 10,
-    quotaImages: 500,
-    quotaVideo: 50,
-  });
+  const { tenantId, userId } = await withTransaction(async (conn) => {
+    const uid = await userDao.insertUser({
+      username: contactPhone,
+      password: passwordHash,
+      nickname: contactName,
+      tenantId: 0,
+    }, conn);
 
-  // 3. 将管理员加入企业子账号表
-  await enterpriseDao.addEnterpriseUser({
-    tenantId,
-    userId,
-    role: 'enterprise_admin',
-  });
+    const tid = await enterpriseDao.createTenant({
+      name,
+      code,
+      type,
+      logo,
+      domain,
+      contactName,
+      contactPhone,
+      contactEmail,
+      planType: 'free',
+      maxUsers: 10,
+      quotaImages: 500,
+      quotaVideo: 50,
+    }, conn);
+
+    await enterpriseDao.addEnterpriseUser({
+      tenantId: tid,
+      userId: uid,
+      role: 'enterprise_admin',
+    }, conn);
+
+    return { tenantId: tid, userId: uid };
+  }, { maxRetries: 2 });
 
   return { tenantId, userId };
 }

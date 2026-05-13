@@ -31,8 +31,9 @@ export async function findTenantByDomain(domain) {
   return rows[0] || null;
 }
 
-export async function createTenant(data) {
-  const [result] = await pool.query('INSERT INTO ?? SET ?', [TABLE.TENANT, {
+export async function createTenant(data, conn) {
+  const db = conn || pool;
+  const [result] = await db.query('INSERT INTO ?? SET ?', [TABLE.TENANT, {
     name: data.name,
     code: data.code,
     type: data.type || 'enterprise',
@@ -123,8 +124,9 @@ export async function listEnterpriseUsers(tenantId, { page = 1, pageSize = 20, s
   return { list: rows, total, page, pageSize };
 }
 
-export async function addEnterpriseUser(data) {
-  const [result] = await pool.query('INSERT INTO ?? SET ?', [TABLE.ENTERPRISE_USER, {
+export async function addEnterpriseUser(data, conn) {
+  const db = conn || pool;
+  const [result] = await db.query('INSERT INTO ?? SET ?', [TABLE.ENTERPRISE_USER, {
     tenant_id: data.tenantId,
     user_id: data.userId,
     role: data.role || 'enterprise_operator',

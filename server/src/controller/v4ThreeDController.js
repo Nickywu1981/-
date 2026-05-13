@@ -28,16 +28,13 @@ const TEXT_STARTS = {
 
 function validateMagicBytes(filePath, ext) {
   const magic = MAGIC_BYTES[ext];
-  if (magic) {
-    const fd = fs.openSync(filePath, 'r');
-    try {
+  const fd = fs.openSync(filePath, 'r');
+  try {
+    if (magic) {
       const buf = Buffer.alloc(magic.bytes.length);
       fs.readSync(fd, buf, 0, buf.length, magic.offset);
       return buf.equals(magic.bytes);
-    } finally { fs.closeSync(fd); }
-  }
-  const fd = fs.openSync(filePath, 'r');
-  try {
+    }
     const buf = Buffer.alloc(256);
     const n = fs.readSync(fd, buf, 0, 256, 0);
     const head = buf.toString('utf8', 0, n).trimStart();

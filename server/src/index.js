@@ -6,6 +6,7 @@ import logger from './utils/logger.js';
 import { server as serverConfig, isProduction } from './config/index.js';
 import { registerAllAdapters } from './services/adapters/index.js';
 import { validateStartupConfig, validateRuntimeConnections } from './utils/startupGuard.js';
+import { registerInterval, runShutdown } from './utils/shutdownRegistry.js';
 
 const { port, env } = serverConfig;
 
@@ -42,15 +43,15 @@ server.listen(port, () => {
   logger.info(`${env} 模式 — http://localhost:${port}  |  WebSocket /ws  |  BullMQ Workers`);
 
   // 定时清理废弃上传 (每 30 分钟)
-  cleanupTimer = setInterval(() => {
+  cleanupTimer = registerInterval(() => {
     import('./utils/file-upload.js').then(({ cleanupStaleUploads }) => cleanupStaleUploads()).catch((err) => { logger.warn('[Cleanup] 加载失败', { error: err.message }); });
-  }, 30 * 60 * 1000).unref();
+  }, 30 * 60 * 1000);
 
   // 定时恢复卡住的任务 (每 5 分钟)
-  recoverTimer = setInterval(() => {
+  recoverTimer = registerInterval(() => {
     import('./dao/taskDao.js').then(({ recoverStuckTasks }) => recoverStuckTasks()).catch((err) => { logger.warn('[Cron] 恢复卡住任务失败', { error: err.message }); });
     import('./services/job-queue.service.js').then(({ recoverStuckJobs }) => recoverStuckJobs()).catch((err) => { logger.warn('[Cron] job_queue 恢复失败', { error: err.message }); });
-  }, 5 * 60 * 1000).unref();
+  }, 5 * 60 * 1000);
 
   // E2B 孤儿沙箱清理 + 预热池初始化
   import('./services/e2b.service.js').then(({ _startupOrphanCheck, _initWarmPool }) => {
@@ -89,9 +90,8 @@ function gracefulShutdown(signal) {
   const isCrash = signal === 'uncaughtException' || signal === 'unhandledRejection';
   const exitCode = isCrash ? 1 : 0;
 
-  // 清理定时器
-  if (cleanupTimer) { clearInterval(cleanupTimer); cleanupTimer = null; }
-  if (recoverTimer) { clearInterval(recoverTimer); recoverTimer = null; }
+  // 清理所有注册的定时器与资源
+  await runShutdown();
 
   server.close(() => {
     (async () => {

@@ -21,15 +21,17 @@ export async function getTemplate(id) {
   return rows[0] || null;
 }
 
-export async function createTemplate({ name, description, steps, status = 'draft', createdBy }) {
-  const [result] = await pool.execute(
+export async function createTemplate({ name, description, steps, status = 'draft', createdBy }, conn) {
+  const db = conn || pool;
+  const [result] = await db.execute(
     `INSERT INTO ${T('template')} (name, description, steps, status, created_by) VALUES (?, ?, ?, ?, ?)`,
     [name, description, JSON.stringify(steps), status, createdBy || null],
   );
   return result.insertId;
 }
 
-export async function updateTemplate(id, { name, description, steps, status }) {
+export async function updateTemplate(id, { name, description, steps, status }, conn) {
+  const db = conn || pool;
   const fields = []; const params = [];
   if (name !== undefined) { fields.push('name = ?'); params.push(name); }
   if (description !== undefined) { fields.push('description = ?'); params.push(description); }
@@ -37,25 +39,28 @@ export async function updateTemplate(id, { name, description, steps, status }) {
   if (status !== undefined) { fields.push('status = ?'); params.push(status); }
   if (!fields.length) return false;
   params.push(id);
-  const [result] = await pool.execute(`UPDATE ${T('template')} SET ${fields.join(', ')} WHERE id = ?`, params);
+  const [result] = await db.execute(`UPDATE ${T('template')} SET ${fields.join(', ')} WHERE id = ?`, params);
   return result.affectedRows > 0;
 }
 
-export async function deleteTemplate(id) {
-  const [result] = await pool.execute(`DELETE FROM ${T('template')} WHERE id = ?`, [id]);
+export async function deleteTemplate(id, conn) {
+  const db = conn || pool;
+  const [result] = await db.execute(`DELETE FROM ${T('template')} WHERE id = ?`, [id]);
   return result.affectedRows > 0;
 }
 
 // ─── 执行记录 ───
-export async function createJob({ templateId, templateName, userId, inputData }) {
-  const [result] = await pool.execute(
+export async function createJob({ templateId, templateName, userId, inputData }, conn) {
+  const db = conn || pool;
+  const [result] = await db.execute(
     `INSERT INTO ${T('job')} (template_id, template_name, user_id, status, input_data) VALUES (?, ?, ?, 'pending', ?)`,
     [templateId || null, templateName || null, userId, JSON.stringify(inputData || {})],
   );
   return result.insertId;
 }
 
-export async function updateJobStatus(id, { status, progress, outputData, stepResults, errorMessage }) {
+export async function updateJobStatus(id, { status, progress, outputData, stepResults, errorMessage }, conn) {
+  const db = conn || pool;
   const updates = []; const params = [];
   if (status !== undefined) {
     updates.push('status = ?'); params.push(status);
@@ -68,7 +73,7 @@ export async function updateJobStatus(id, { status, progress, outputData, stepRe
   if (errorMessage !== undefined) { updates.push('error_message = ?'); params.push(errorMessage?.substring(0, 1000)); }
   if (!updates.length) return false;
   params.push(id);
-  const [result] = await pool.execute(`UPDATE ${T('job')} SET ${updates.join(', ')} WHERE id = ?`, params);
+  const [result] = await db.execute(`UPDATE ${T('job')} SET ${updates.join(', ')} WHERE id = ?`, params);
   return result.affectedRows > 0;
 }
 

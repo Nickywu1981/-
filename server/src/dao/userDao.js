@@ -1,16 +1,18 @@
 import pool from './db.js';
 import { paginationSQL } from '../utils/pagination.js';
 
-export async function insertUser({ username, password, nickname = '', tenantId: _t = 0 }) {
-  const [result] = await pool.execute(
+export async function insertUser({ username, password, nickname = '', tenantId: _t = 0 }, conn) {
+  const db = conn || pool;
+  const [result] = await db.execute(
     'INSERT INTO users (phone, email, password_hash, nickname, role, status) VALUES (?, ?, ?, ?, \'free\', \'active\')',
     [username || '', '', password, nickname || username || ''],
   );
   return result.insertId;
 }
 
-export async function createUser({ phone, email, password, nickname }) {
-  const [result] = await pool.execute(
+export async function createUser({ phone, email, password, nickname }, conn) {
+  const db = conn || pool;
+  const [result] = await db.execute(
     'INSERT INTO users (phone, email, password_hash, nickname, role, status) VALUES (?, ?, ?, ?, \'free\', \'active\')',
     [phone || '', email || '', password, nickname || ''],
   );
