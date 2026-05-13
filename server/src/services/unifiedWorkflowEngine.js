@@ -113,7 +113,25 @@ const STEP_EXECUTORS = {
   },
 
   // ── 图片生成 ──
-  white_bg_gen:       _imageGenStep('white_bg'),
+  // 白底图 — 专用服务(含gpt-image-2→SD img2img双模型降级)
+  white_bg_gen: async (ctx) => {
+    if (ctx.imageUrl) {
+      try {
+        const { generateWhiteBg } = await import('./backgroundRemovalService.js');
+        const result = await generateWhiteBg({
+          imageUrl: ctx.imageUrl,
+          productName: ctx.productName || '',
+          size: ctx.imageSize || '1024x1024',
+        });
+        if (result?.whiteBgUrl) {
+          return { imageUrls: [result.whiteBgUrl], generatedCount: 1, model: result.model, method: 'dedicated_service' };
+        }
+      } catch (e) {
+        logger.warn('[WorkflowEngine] backgroundRemovalService failed, fallback to generic', e.message);
+      }
+    }
+    return _imageGenStep('white_bg')(ctx);
+  },
   detail_module_gen:  _imageGenStep('detail_module'),
 
   // 多角度主图 — 6个命名角度并发生成 (对齐 ExpandAgent.multiAngleTool)
@@ -156,9 +174,11 @@ const STEP_EXECUTORS = {
   storyboard_gen: async (ctx) => {
     const scenes = _parseScenes(ctx);
     if (scenes && scenes.length > 0) {
+      const baseSystem = ctx.wrappedPrompt?.system || '';
       const results = await Promise.allSettled(scenes.map(scene =>
         _singleImageGen(ctx,
-          `e-commerce video storyboard frame, scene ${scene.number}: ${scene.visual || ''}, ${scene.camera || 'medium shot'}, cinematic lighting, 9:16 vertical video frame, commercial quality`,
+          (baseSystem ? baseSystem + '. ' : '')
+            + `e-commerce video storyboard frame, scene ${scene.number}: ${scene.visual || ''}, ${scene.camera || 'medium shot'}, cinematic lighting, 9:16 vertical video frame, commercial quality`,
           'storyboard',
           '1024x1792'
         )
@@ -211,10 +231,42 @@ const STEP_EXECUTORS = {
 
   // ── 详情页 ──
   detail_page_gen: async (ctx) => {
-    // 调用详情页Agent
+    // 检测前序步骤已完成的产出，避免重复执行
+    const alreadyDone = {
+      productInfo: !!ctx.productInfo,
+      modules: !!(ctx.detailModules && ctx.detailModules.length > 0),
+      sellingPoints: !!(ctx.sellingPoints && (Array.isArray(ctx.sellingPoints) ? ctx.sellingPoints.length > 0 : true)),
+      layout: !!ctx.detailHtml,
+    };
+    const allDone = alreadyDone.productInfo && alreadyDone.modules && alreadyDone.sellingPoints && alreadyDone.layout;
+
+    // 全部已有 → 仅做合并输出
+    if (allDone) {
+      return {
+        productInfo: ctx.productInfo,
+        modules: ctx.detailModules,
+        sellingPoints: ctx.sellingPoints,
+        layout: ctx.layout,
+        detailHtml: ctx.detailHtml,
+        source: 'merged_from_previous_steps',
+      };
+    }
+
+    // 部分已有 → 注入到ctx让Agent跳过已完成部分
+    const augmentedCtx = { ...ctx, _alreadyDone: alreadyDone };
+
     const { detailPageAgent } = await import('../adk/agents/detailAgent.js');
-    const adkCtx = { session: { state: { getAll: () => ({ ...ctx, userId: ctx.userId }) } } };
-    return detailPageAgent._runAsyncImpl(adkCtx);
+    const adkCtx = { session: { state: { getAll: () => ({ ...augmentedCtx, userId: augmentedCtx.userId }) } } };
+    const result = await detailPageAgent._runAsyncImpl(adkCtx);
+
+    // 合并不覆盖前序产出
+    return {
+      modules: alreadyDone.modules ? ctx.detailModules : result.modules,
+      sellingPoints: alreadyDone.sellingPoints ? ctx.sellingPoints : result.sellingPoints,
+      layout: alreadyDone.layout ? ctx.layout : result.layout,
+      detailHtml: alreadyDone.layout ? ctx.detailHtml : result.detailHtml,
+      source: Object.values(alreadyDone).filter(Boolean).length > 0 ? 'partial_merge' : 'full_agent',
+    };
   },
 
   // ── 视频 ──
@@ -291,7 +343,29 @@ const STEP_EXECUTORS = {
   text_prepare: async (ctx) => ({
     preparedText: (ctx.userInput || '').replace(/\n{3,}/g, '\n\n').trim(),
   }),
-  size_standardize: async (ctx) => ({ standardized: true, count: (ctx.imageUrls || []).length }),
+  // 尺寸标准化 — 提取图片元信息+平台适配建议
+  size_standardize: async (ctx) => {
+    const urls = ctx.imageUrls || [];
+    const platform = ctx.platform || 'taobao';
+    const platformSizes = {
+      taobao: { white_bg: '800x800', detail: '750x不限', scene: '800x800' },
+      douyin: { white_bg: '1080x1080', detail: '1080x不限', scene: '1080x1920' },
+    };
+    const expected = platformSizes[platform] || platformSizes.taobao;
+
+    const images = urls.map((url, i) => {
+      const ext = (url || '').match(/\.(\w+)(\?|$)/)?.[1] || 'jpg';
+      return { index: i, url, format: ext, expectedSize: expected.white_bg, platform };
+    });
+
+    return {
+      standardized: urls.length > 0,
+      count: urls.length,
+      images,
+      recommendedSizes: expected,
+      platform,
+    };
+  },
 
   // 自动排版 — 4种布局风格智能选择
   auto_layout: async (ctx) => {
@@ -428,8 +502,28 @@ function _imageGenStep(taskType, taskLabel) {
 function _textGenStep(taskType, taskLabel) {
   return async (ctx) => {
     const model = ctx._stepModel || {};
-    const systemPrompt = ctx.wrappedPrompt?.system || `你是电商${taskLabel}专家`;
-    const userMessage = ctx.userInput || ctx.productName || '';
+    // 系统提示词: 优先使用prompt_wrap产物，否则用通用电商模板
+    const systemPrompt = ctx.wrappedPrompt?.system || `你是电商${taskLabel}专家。目标平台: ${ctx.platform || '通用'}，行业: ${ctx.industry || '综合'}`;
+
+    // 用户消息: 累积上下文传递 (修复上下文盲区Bug)
+    const userPrompt = ctx.wrappedPrompt?.prompt || '';
+    const contextParts = [ctx.userInput || ctx.productName || ''];
+
+    if (ctx.sellingPoints) {
+      const points = Array.isArray(ctx.sellingPoints) ? ctx.sellingPoints.join('；') : ctx.sellingPoints;
+      contextParts.push(`核心卖点: ${points}`);
+    }
+    if (ctx.viralFormula || ctx.viralInsight) {
+      contextParts.push(`爆款参考: ${ctx.viralFormula || ctx.viralInsight}`);
+    }
+    if (ctx.industry && ctx.industry !== '综合') {
+      contextParts.push(`行业: ${ctx.industry}`);
+    }
+    if (ctx.textContent && ctx.textContent.length > 10 && taskType !== 'copywriting') {
+      contextParts.push(`前序产出: ${ctx.textContent.slice(0, 600)}`);
+    }
+
+    const userMessage = userPrompt || contextParts.filter(Boolean).join('\n\n');
 
     const result = await gatewayDispatch({
       mode: 'single',
@@ -587,6 +681,12 @@ async function _runJob(jobId, steps, mode, input) {
         } else {
           stepModel = await getModelConfig(step.modelKey);
         }
+        // 配额检查
+        const { checkQuota } = await import('./modelPoolService.js');
+        const quotaResult = await checkQuota(stepModel.model_key, input.userId);
+        if (!quotaResult.allowed) {
+          throw new BusinessError(429, quotaResult.reason || '模型配额已用完');
+        }
         ctx._stepModel = stepModel;
       }
 
@@ -608,6 +708,12 @@ async function _runJob(jobId, steps, mode, input) {
 
       // 合并输出到上下文
       Object.assign(ctx, output);
+
+      // 配额消耗
+      if (stepModel) {
+        const { consumeQuota } = await import('./modelPoolService.js');
+        consumeQuota(stepModel.model_key, input.userId);
+      }
 
       job.steps[i].status = 'completed';
       job.steps[i].output = output;

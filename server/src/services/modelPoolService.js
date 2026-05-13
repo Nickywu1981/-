@@ -191,16 +191,55 @@ export async function getModelConfig(modelKey) {
 
 // ==================== 配额控制 ====================
 
+const _quotaDaily = new Map(); // modelKey_date → count
+const _quotaTenant = new Map(); // modelKey_tenantId_date → count
+
+function _todayKey(prefix, modelKey, id = '') {
+  const d = new Date();
+  const date = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+  return id ? `${prefix}_${modelKey}_${id}_${date}` : `${prefix}_${modelKey}_${date}`;
+}
+
 export async function checkQuota(modelKey, userId) {
   const pool = await getPool();
   const model = pool.find(m => m.model_key === modelKey);
   if (!model) return { allowed: false, reason: '模型不存在' };
 
-  if (model.quota_daily > 0) {
-    // TODO: 查询今日调用次数
+  const quotaDaily = model.quota_daily || 0;
+  const quotaTenant = model.quota_tenant || 0;
+
+  // 检查每日总配额
+  if (quotaDaily > 0) {
+    const key = _todayKey('daily', modelKey);
+    const used = _quotaDaily.get(key) || 0;
+    if (used >= quotaDaily) return { allowed: false, reason: `模型 ${modelKey} 已达每日配额 ${quotaDaily}`, used, quota: quotaDaily };
+  }
+
+  // 检查每租户配额
+  if (quotaTenant > 0 && userId) {
+    const key = _todayKey('tenant', modelKey, userId);
+    const used = _quotaTenant.get(key) || 0;
+    if (used >= quotaTenant) return { allowed: false, reason: `租户 ${userId} 对模型 ${modelKey} 已达每日配额 ${quotaTenant}`, used, quota: quotaTenant };
   }
 
   return { allowed: true };
+}
+
+export function consumeQuota(modelKey, userId) {
+  const dailyKey = _todayKey('daily', modelKey);
+  _quotaDaily.set(dailyKey, (_quotaDaily.get(dailyKey) || 0) + 1);
+
+  if (userId) {
+    const tenantKey = _todayKey('tenant', modelKey, userId);
+    _quotaTenant.set(tenantKey, (_quotaTenant.get(tenantKey) || 0) + 1);
+  }
+}
+
+export function getQuotaUsage(modelKey, userId) {
+  return {
+    daily: _quotaDaily.get(_todayKey('daily', modelKey)) || 0,
+    tenant: userId ? (_quotaTenant.get(_todayKey('tenant', modelKey, userId)) || 0) : 0,
+  };
 }
 
 // ==================== 统计 ====================
@@ -234,5 +273,5 @@ export async function getPoolStats() {
 export default {
   getPool, refreshPool, listByCategory, listEnabledByCategory,
   registerModel, updateModel, removeModel, toggleModel, setGrayPercent,
-  autoSelect, getModelConfig, checkQuota, getPoolStats,
+  autoSelect, getModelConfig, checkQuota, consumeQuota, getQuotaUsage, getPoolStats,
 };
