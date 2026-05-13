@@ -1,9 +1,32 @@
 import { BusinessError } from '../utils/businessError.js';
 import { FORM_ACCESS_TYPE } from '../constants/domainStatus.js';
+import { appUrl } from '../config/index.js';
 
 function escapeHtml(str) {
   if (!str) return '';
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+/**
+ * 校验并净化 redirectUrl，防止开放重定向
+ * - 允许相对路径 (/xxx, // 开头)
+ * - 允许同域 URL (匹配 APP_URL)
+ * - 拒绝 javascript:/data:/vbscript: 等危险协议
+ * - 返回净化后的 URL 或空字符串
+ */
+const BLOCKED_PROTOCOLS = /^(javascript|data|vbscript|file):/i;
+function sanitizeRedirectUrl(url) {
+  if (!url || typeof url !== 'string') return '';
+  const trimmed = url.trim();
+  if (!trimmed) return '';
+  if (BLOCKED_PROTOCOLS.test(trimmed)) return '';
+  if (trimmed.startsWith('/')) return trimmed;
+  try {
+    const parsed = new URL(trimmed);
+    const allowedHost = new URL(appUrl).host;
+    if (parsed.host !== allowedHost) return '';
+    return parsed.toString();
+  } catch { return ''; }
 }
 /**
  * P2 增强表单服务 — 校验引擎 + 联动解析 + 脱敏 + 双端适配
@@ -141,7 +164,7 @@ export async function createForm(tenantId, data) {
     startTime: data.startTime,
     endTime: data.endTime,
     successMsg: data.successMsg,
-    redirectUrl: data.redirectUrl,
+    redirectUrl: sanitizeRedirectUrl(data.redirectUrl),
     notifyEmail: data.notifyEmail,
     accessType: data.accessType ?? 1,
     ownerId: data.ownerId,
@@ -153,6 +176,7 @@ export async function updateForm(id, tenantId, data) {
   const existing = await formDao.getFormById(id, tenantId);
   if (!existing) throw new BusinessError(404, '表单不存在');
 
+  if (data.redirectUrl !== undefined) data.redirectUrl = sanitizeRedirectUrl(data.redirectUrl);
   if (data.fields) {
     data.fields = data.fields.map((f, i) => ({
       ...f,
