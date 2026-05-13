@@ -61,4 +61,8 @@ router.get('/async/status/:taskId', authMiddleware, signatureGuard, aiGatewayCon
 // ── SSE 流式 ──
 router.post('/stream/infer', authMiddleware, signatureGuard, aiConcurrencyGuard, validate(inferBodySchema), aiGatewayController.streamInfer);
 
+// ── 电商管线 ──
+router.post('/pipeline/wrap', authMiddleware, signatureGuard, aiGatewayController.pipelineWrap);
+router.post('/pipeline/compliance', authMiddleware, signatureGuard, aiGatewayController.pipelineCompliance);
+
 export default router;

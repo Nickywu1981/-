@@ -13,6 +13,8 @@ import { moderateOutput } from '../services/outputModerationService.js';
 import { evaluateRules } from '../services/geoRulesService.js';
 import { sanitizePII } from '../services/inputSanitizerService.js';
 import { getTraceContext } from '../services/traceService.js';
+import { wrapPrompt, quickComplianceCheck } from '../services/promptWrapper.js';
+import { checkCompliance } from '../services/adComplianceEngine.js';
 import logger from '../utils/logger.js';
 
 export const aiGatewayController = {
@@ -209,4 +211,32 @@ export const aiGatewayController = {
 	      }
 	    }
 	  }),
+
+  // ── 电商管线：预览/合规校验 ──
+  pipelineWrap: wrapController(async (req) => {
+    const { input, platform, industry, brandTone, variables } = req.body;
+    if (!input || typeof input !== 'string' || !input.trim()) {
+      return { code: 400, message: 'input 必填且不能为空' };
+    }
+    const result = await wrapPrompt(input, {
+      userId: req.user?.id,
+      platform: platform || 'taobao',
+      industry: industry || null,
+      brandTone: brandTone || null,
+      variables: variables || {},
+    });
+    return { code: result.blocked ? 422 : 200, data: result };
+  }),
+
+  pipelineCompliance: wrapController(async (req) => {
+    const { text, platform, industry } = req.body;
+    if (!text || typeof text !== 'string') {
+      return { code: 400, message: 'text 必填' };
+    }
+    const result = checkCompliance(text, {
+      platform: platform || 'taobao',
+      industry: industry || null,
+    });
+    return { code: 200, data: result };
+  }),
 };

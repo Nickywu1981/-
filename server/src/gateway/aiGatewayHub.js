@@ -265,12 +265,12 @@ export async function gatewayInfer(modelId, input, ctx = {}) {
     const modCtx = hookResult.modifiedContext || {};
     security = {
       blocked: false,
-      sanitizedInput: modCtx.input || input,
+      sanitizedInput: modCtx.input || effectiveInput,
       geoConstraints: modCtx._geoConstraints || null,
       moderationResult: modCtx._moderationResult || null,
     };
   } else {
-    security = await runPreInvokeSecurityChecks(modelId, input, {
+    security = await runPreInvokeSecurityChecks(modelId, effectiveInput, {
       ...context,
       countryCode: ctx.countryCode || ctx.geo?.country || null,
       platformCode: ctx.platformCode || ctx.taskType || null,
@@ -517,12 +517,39 @@ export async function gatewayDispatch(dispatchReq, ctx = {}) {
   const start = Date.now();
   let result, status = 'success', errorMsg = '';
 
+  // ── Step 0: 业务管线 ──
+  const dispatchInput = dispatchReq.input || dispatchReq;
+  const dispatchBusiness = await runBusinessPipeline(dispatchInput, {
+    ...context,
+    platform: ctx.platform || ctx.platformCode || null,
+    platformCode: ctx.platformCode || ctx.taskType || null,
+    industry: ctx.industry || null,
+    brandTone: ctx.brandTone || null,
+    variables: ctx.variables || {},
+  });
+  if (dispatchBusiness.blocked) {
+    return {
+      mode: dispatchReq.mode || 'auto', matchLog: [], selected: null, result: null,
+      elapsed: 0, degradationLog: [], blocked: true, correlationId: context.correlationId,
+      error: buildErrorResponse(dispatchBusiness.blockReason, { modelId: dispatchReq?.modelId || 'unknown', traceId: getTraceContext()?.traceId }),
+      businessPipeline: dispatchBusiness.wrapResult,
+    };
+  }
+
+  let effectiveDispatchInput = dispatchInput;
+  if (dispatchBusiness.wrapResult?.wrapped) {
+    effectiveDispatchInput = dispatchBusiness.wrapResult.wrapped.prompt;
+    ctx._systemPrompt = dispatchBusiness.wrapResult.wrapped.system;
+    ctx._intentId = dispatchBusiness.wrapResult.intent?.intentId;
+    ctx._category = dispatchBusiness.wrapResult.wrapped.category;
+  }
+
   // ── Pre-invoke 安全检测 ──
   const dispatchModelId = dispatchReq?.modelId || dispatchReq?.candidates?.[0] || 'unknown';
   let dispatchSecurity;
   if (USE_HOOK_REGISTRY) {
     const hookResult = await runPreHooks({
-      modelId: dispatchModelId, input: dispatchReq.input || dispatchReq,
+      modelId: dispatchModelId, input: effectiveDispatchInput,
       userId: context.userId, taskType: context.taskType,
       countryCode: ctx.countryCode || ctx.geo?.country || null,
       platformCode: ctx.platformCode || ctx.taskType || null,
@@ -537,12 +564,12 @@ export async function gatewayDispatch(dispatchReq, ctx = {}) {
     const modCtx = hookResult.modifiedContext || {};
     dispatchSecurity = {
       blocked: false,
-      sanitizedInput: modCtx.input || dispatchReq.input,
+      sanitizedInput: modCtx.input || effectiveDispatchInput,
       geoConstraints: modCtx._geoConstraints || null,
       moderationResult: modCtx._moderationResult || null,
     };
   } else {
-    dispatchSecurity = await runPreInvokeSecurityChecks(dispatchModelId, dispatchReq.input || dispatchReq, {
+    dispatchSecurity = await runPreInvokeSecurityChecks(dispatchModelId, effectiveDispatchInput, {
       ...context,
       countryCode: ctx.countryCode || ctx.geo?.country || null,
       platformCode: ctx.platformCode || ctx.taskType || null,
@@ -679,13 +706,39 @@ export async function gatewayRoute(params, ctx = {}) {
   const context = normalizeContext(ctx);
   const start = Date.now();
 
+  // ── Step 0: 业务管线 ──
+  const routeInput = params?.params || params;
+  const routeBusiness = await runBusinessPipeline(routeInput, {
+    ...context,
+    platform: ctx.platform || ctx.platformCode || null,
+    platformCode: ctx.platformCode || ctx.taskType || null,
+    industry: ctx.industry || null,
+    brandTone: ctx.brandTone || null,
+    variables: ctx.variables || {},
+  });
+  if (routeBusiness.blocked) {
+    return {
+      blocked: true, tokensIn: 0, tokensOut: 0, cost: { amount: 0, currency: 'CNY' },
+      correlationId: context.correlationId,
+      error: buildErrorResponse(routeBusiness.blockReason, { modelId: params?.modelKey || 'unknown', traceId: getTraceContext()?.traceId }),
+      businessPipeline: routeBusiness.wrapResult,
+    };
+  }
+
+  let effectiveRouteInput = routeInput;
+  if (routeBusiness.wrapResult?.wrapped) {
+    effectiveRouteInput = routeBusiness.wrapResult.wrapped.prompt;
+    ctx._systemPrompt = routeBusiness.wrapResult.wrapped.system;
+    ctx._intentId = routeBusiness.wrapResult.intent?.intentId;
+    ctx._category = routeBusiness.wrapResult.wrapped.category;
+  }
+
   // ── Pre-invoke 安全检测 ──
   const routeModelId = params?.modelKey || 'unknown';
-  const routeInput = params?.params || params;
   let routeSecurity;
   if (USE_HOOK_REGISTRY) {
     const hookResult = await runPreHooks({
-      modelId: routeModelId, input: routeInput,
+      modelId: routeModelId, input: effectiveRouteInput,
       userId: context.userId, taskType: context.taskType,
       countryCode: ctx.countryCode || ctx.geo?.country || null,
       platformCode: ctx.platformCode || ctx.taskType || null,
@@ -700,12 +753,12 @@ export async function gatewayRoute(params, ctx = {}) {
     const modCtx = hookResult.modifiedContext || {};
     routeSecurity = {
       blocked: false,
-      sanitizedInput: modCtx.input || routeInput,
+      sanitizedInput: modCtx.input || effectiveRouteInput,
       geoConstraints: modCtx._geoConstraints || null,
       moderationResult: modCtx._moderationResult || null,
     };
   } else {
-    routeSecurity = await runPreInvokeSecurityChecks(routeModelId, routeInput, {
+    routeSecurity = await runPreInvokeSecurityChecks(routeModelId, effectiveRouteInput, {
       ...context,
       countryCode: ctx.countryCode || ctx.geo?.country || null,
       platformCode: ctx.platformCode || ctx.taskType || null,
