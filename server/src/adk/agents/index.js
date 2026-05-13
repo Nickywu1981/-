@@ -10,4 +10,4 @@ export { IntentAgent } from './intentAgent.js';
 export { DetailPageAgent } from './detailAgent.js';
 export { ExpandAgent } from './expandAgent.js';
 export { ScriptStoryboardAgent } from './storyboardAgent.js';
-export { DispatchAgent } from './dispatchAgent.js';
+export { ContentDispatchAgent } from './dispatchAgent.js';
