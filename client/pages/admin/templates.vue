@@ -131,7 +131,7 @@ async function search() {
     const q = new URLSearchParams({ category: category.value, keyword: keyword.value, sort: sort.value, page: '1', pageSize: '40' })
     const res: any = await $fetch(`/api/template-market/search?${q}`, { credentials: 'include' })
     list.value = res?.data?.list || res?.list || []
-  } catch (e: any) { error.value = e?.data?.msg || e.message || ($t('common.loadFail')||'加载失败') }
+  } catch (e: unknown) { error.value = e?.data?.msg || e.message || ($t('common.loadFail')||'加载失败') }
   loading.value = false
 }
 
@@ -143,14 +143,16 @@ async function openDetail(t: any) {
 async function download(t: any) {
   acting.value = true
   try { await $fetch(`/api/template-market/${t.id}/download`, { method: 'POST', credentials: 'include' }); toast.success($t('template.dlOk')||'下载成功') }
-  catch (e: any) { toast.error(e?.data?.msg || ($t('template.dlFail')||'下载失败')) }
+catch (e: unknown){
+    const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || ($t('template.dlFail')||'下载失败')) }
   acting.value = false
 }
 
 async function purchase(t: any) {
   acting.value = true
   try { await $fetch(`/api/template-market/${t.id}/purchase`, { method: 'POST', credentials: 'include' }); toast.success($t('template.buyOk')||'购买成功'); search() }
-  catch (e: any) { toast.error(e?.data?.msg || ($t('template.buyFail')||'购买失败')) }
+catch (e: unknown){
+    const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || ($t('template.buyFail')||'购买失败')) }
   acting.value = false
 }
 
@@ -169,7 +171,7 @@ async function doCreate() {
     }
     await $fetch('/api/template-market/create', { method: 'POST', credentials: 'include', body: JSON.stringify(body) })
     showCreate.value = false; search(); toast.success($t('template.created')||'创建成功')
-  } catch (e: any) { toast.error(e?.data?.msg || ($t('template.createFail')||'创建失败')) }
+  } catch (e: unknown) { toast.error(e?.data?.msg || ($t('template.createFail')||'创建失败')) }
   saving.value = false
 }
 </script>

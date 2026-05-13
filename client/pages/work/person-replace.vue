@@ -117,7 +117,7 @@ async function uploadFile(file: File, type: string) {
     const res: any = await $fetch('/api/upload/image', { method: 'POST', credentials: 'include', body: formData })
     if (type === 'source') uploadedSourceUrl.value = res.data?.url
     else uploadedTargetUrl.value = res.data?.url
-  } catch (e: any) { toast.error(e?.data?.msg || '上传失败') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '上传失败') }
   if (type === 'source') uploadingSrc.value = false
   else uploadingTgt.value = false
 }
@@ -149,8 +149,8 @@ async function submitTask() {
       body: { sourceImageUrl: uploadedSourceUrl.value, targetPersonUrl: uploadedTargetUrl.value },
     })
     task.pollTask((res as any).data.taskId, '/api/videos/tasks/')
-  } catch (err: any) {
-    toast.error(err?.data?.msg || err?.message || '任务提交失败，请重试');
+  } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
+    toast.error(e?.data?.msg || e?.message || '任务提交失败，请重试');
     currentStep.value = 0;
   }
 }

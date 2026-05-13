@@ -142,8 +142,8 @@ async function fetchData() {
     list.value = data?.data?.list || data?.data || []
     if (!Array.isArray(list.value)) list.value = []
     total.value = data?.data?.total || list.value.length
-  } catch (e: any) {
-    error.value = e?.data?.msg || e.message || t('admin_diy_pages.load_failed')
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
+    error.value = err?.data?.msg || err.message || t('admin_diy_pages.load_failed')
     toast.error(error.value)
   } finally {
     loading.value = false
@@ -165,7 +165,7 @@ async function save() {
       }
     }
     showModal.value = false; fetchData()
-  } catch (e: any) { toast.error(e?.data?.msg || t('admin_diy_pages.save_failed')) }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('admin_diy_pages.save_failed')) }
   saving.value = false
 }
 
@@ -178,7 +178,7 @@ async function toggleStatus(p: any) {
       await $fetch(`/api/diy/${p.id}/publish`, { method: 'POST', credentials: 'include' })
     }
     fetchData()
-  } catch (e: any) { toast.error(e?.data?.msg || t('admin_diy_pages.op_failed')) }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('admin_diy_pages.op_failed')) }
 }
 
 async function deleteItem(id: number) {
@@ -187,7 +187,7 @@ async function deleteItem(id: number) {
     await $fetch(`/api/diy/${id}/hard-delete`, { method: 'DELETE', credentials: 'include' })
     selectedIds.value = selectedIds.value.filter(i => i !== id)
     fetchData()
-  } catch (e: any) { toast.error(e?.data?.msg || t('common.delete_failed')) }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('common.delete_failed')) }
 }
 
 async function batchPublish() {
@@ -196,7 +196,7 @@ async function batchPublish() {
     await $fetch('/api/diy/batch/publish', { method: 'POST', credentials: 'include', body: { ids: selectedIds.value } })
     toast.success(t('admin_diy_pages.batch_publish_success', { count: selectedIds.value.length }))
     selectedIds.value = []; fetchData()
-  } catch (e: any) { toast.error(e?.data?.msg || t('admin_diy_pages.batch_publish_failed')) }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('admin_diy_pages.batch_publish_failed')) }
 }
 
 async function batchUnpublish() {
@@ -205,7 +205,7 @@ async function batchUnpublish() {
     await $fetch('/api/diy/batch/unpublish', { method: 'POST', credentials: 'include', body: { ids: selectedIds.value } })
     toast.success(t('admin_diy_pages.batch_unpublish_success', { count: selectedIds.value.length }))
     selectedIds.value = []; fetchData()
-  } catch (e: any) { toast.error(e?.data?.msg || t('admin_diy_pages.batch_unpublish_failed')) }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('admin_diy_pages.batch_unpublish_failed')) }
 }
 
 async function batchDelete() {
@@ -215,7 +215,7 @@ async function batchDelete() {
     await $fetch('/api/diy/batch/delete', { method: 'POST', credentials: 'include', body: { ids: selectedIds.value } })
     toast.success(t('admin_diy_pages.batch_delete_success', { count: selectedIds.value.length }))
     selectedIds.value = []; fetchData()
-  } catch (e: any) { toast.error(e?.data?.msg || t('admin_diy_pages.batch_delete_failed')) }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('admin_diy_pages.batch_delete_failed')) }
 }
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>

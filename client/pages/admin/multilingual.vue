@@ -207,7 +207,7 @@ async function exportJSON() {
     a.download = `${activeLocale.value}.json`
     a.click()
     URL.revokeObjectURL(a.href)
-  } catch (e: any) { /* ignore */ }
+  } catch (e: unknown) { /* ignore */ }
 }
 
 function formatTime(dt: string) {

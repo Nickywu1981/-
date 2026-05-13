@@ -202,7 +202,7 @@ async function loadHistory() {
     const data = await $fetch<{ data?: { rows?: unknown[]; total?: number } }>(`/api/video-translate/works?${params}`, { credentials: 'include' });
     history.value = data.data?.rows || data.data || [];
     totalHistory.value = data.data?.total || 0;
-  } catch (e: any) { useToast().error(e?.data?.msg || e?.message || '加载历史记录失败') } finally { loadingHistory.value = false; }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; useToast().error(err?.data?.msg || e?.message || '加载历史记录失败') } finally { loadingHistory.value = false; }
 }
 
 const { download } = useFileDownload()

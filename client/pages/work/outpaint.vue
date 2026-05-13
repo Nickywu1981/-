@@ -94,7 +94,7 @@ async function uploadFile(file: File) {
   try {
     const res: any = await $fetch('/api/upload/image', { method: 'POST', credentials: 'include', body: formData })
     uploadedUrl.value = res.data?.url
-  } catch (e: any) { toast.error(e?.data?.msg || '上传失败') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '上传失败') }
   uploading.value = false
 }
 
@@ -118,7 +118,7 @@ async function submitOutpaint() {
     })
     currentStep.value = 2
     task.pollTask(res.data?.taskId, '/api/advanced/tasks/')
-  } catch (e: any) { toast.error(e?.data?.msg || '提交失败') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '提交失败') }
   submitting.value = false
 }
 

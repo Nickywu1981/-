@@ -130,7 +130,7 @@ async function fetchData() {
     const res = data as any
     if (res?.code === 200) { list.value = res.data.list || []; total.value = res.data.total || 0 }
     else { throw new Error(res?.msg || t('admin_users.list_failed')) }
-  } catch (e: any) { error.value = e?.data?.msg || e.message || t('common.loadFail'); toast.error(error.value) } finally { loading.value = false }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; error.value = err?.data?.msg || err.message || t('common.loadFail'); toast.error(error.value) } finally { loading.value = false }
 }
 
 function search() { page.value = 1; selectedIds.value = new Set(); fetchData() }
@@ -156,7 +156,7 @@ async function toggleStatus(user: any, status: number) {
     const res = data as any
     if (res?.code === 200) { user.status = status; toast.success(status === 1 ? t('admin_users.disabled_msg', { name: user.username }) : t('admin_users.enabled_msg', { name: user.username })) }
     else { toast.error(res?.msg || t('common.fail')) }
-  } catch (e: any) { toast.error(e?.data?.msg || e.message || t('common.fail')) }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('common.fail')) }
 }
 
 async function batchToggleStatus(status: number) {
@@ -168,7 +168,7 @@ async function batchToggleStatus(status: number) {
     const res = data as any
     if (res?.code === 200) { toast.success(status === 1 ? t('admin_users.batch_disabled_msg', { count: ids.length }) : t('admin_users.batch_enabled_msg', { count: ids.length })); selectedIds.value = new Set(); fetchData() }
     else { toast.error(res?.msg || t('common.fail')) }
-  } catch (e: any) { toast.error(e?.data?.msg || e.message || t('common.fail')) }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('common.fail')) }
 }
 
 function openEdit(u: any) { editForm.value = { ...u }; editOpen.value = true }
@@ -180,7 +180,7 @@ async function saveEdit() {
     const res = data as any
     if (res?.code === 200) { toast.success(t('admin_users.user_updated')); editOpen.value = false; fetchData() }
     else { toast.error(res?.msg || t('common.save_failed')) }
-  } catch (e: any) { toast.error(e?.data?.msg || e.message || t('common.save_failed')) } finally { saving.value = false }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('common.save_failed')) } finally { saving.value = false }
 }
 
 function exportCSV() {

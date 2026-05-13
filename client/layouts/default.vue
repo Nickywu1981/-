@@ -220,7 +220,7 @@ async function checkAuth() {
     const res: any = await $fetch('/api/user/profile', { credentials: 'include' });
     user.value = res.data;
     loadUnread();
-  } catch (e: any) { if (e?.status === 401 || e?.statusCode === 401) user.value = null; }
+  } catch (e: unknown) { if (e?.status === 401 || e?.statusCode === 401) user.value = null; }
 }
 
 async function loadUnread() {

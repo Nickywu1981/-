@@ -84,7 +84,7 @@ async function sendCode() {
     const body = isEmail ? { email, scene: 'reset_password' } : { phone, scene: 'reset_password' }
     await $fetch(url, { method: 'POST', body, credentials: 'include' })
     startCd(60)
-  } catch (e: any) { errorMsg.value = e?.data?.msg || t('auth.send_failed') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; errorMsg.value = err?.data?.msg || t('auth.send_failed') }
   loading.value = false
 }
 
@@ -99,7 +99,7 @@ async function doVerify() {
     const body = isEmail ? { email, code: code.value } : { phone, scene: 'reset_password', code: code.value }
     await $fetch(url, { method: 'POST', body, credentials: 'include' })
     verified.value = true
-  } catch (e: any) { errorMsg.value = e?.data?.msg || t('auth.reset_verify_failed') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; errorMsg.value = err?.data?.msg || t('auth.reset_verify_failed') }
   loading.value = false
 }
 
@@ -117,7 +117,7 @@ async function handleReset() {
     } else {
       errorMsg.value = res.msg || t('auth.reset_failed')
     }
-  } catch (e: any) { errorMsg.value = e?.data?.msg || t('auth.reset_failed_retry') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; errorMsg.value = err?.data?.msg || t('auth.reset_failed_retry') }
   loading.value = false
 }
 </script>

@@ -155,7 +155,7 @@ async function fetchPlans() {
     const res: any = await $fetch(`/api/admin/plans?${params}`, { credentials: 'include' });
     plans.value = res.data?.list || res.data || [];
     total.value = res.data?.total || plans.value.length;
-  } catch(e: any) { toast.error(e?.data?.msg || t('common.loadFail')) }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('common.loadFail')) }
   isLoading.value = false;
 }
 
@@ -173,7 +173,7 @@ async function savePlan(plan: any) {
       credentials: 'include',
     });
     showMsg(t('admin_plans.saved'));
-  } catch (e: any) { msg.value = e?.data?.msg || t('common.save_failed'); }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || t('common.save_failed'); }
   saving.value = 0;
 }
 
@@ -190,7 +190,7 @@ async function createPlan() {
     await $fetch('/api/admin/plans', { method: 'POST', body: newPlan.value, credentials: 'include' });
     showCreate.value = false; showMsg(t('admin_plans.plan_created'));
     fetchPlans();
-  } catch (e: any) { msg.value = e?.data?.msg || t('common.save_failed'); }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || t('common.save_failed'); }
   creating.value = false;
 }
 
@@ -202,7 +202,7 @@ async function doDelete() {
     await $fetch(`/api/admin/plans/${deleteTarget.value.id}`, { method: 'DELETE', credentials: 'include' });
     showDelete.value = false; showMsg(t('admin_plans.plan_deleted'));
     fetchPlans();
-  } catch (e: any) { msg.value = e?.data?.msg || t('common.delete_failed'); }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || t('common.delete_failed'); }
   deleting.value = false;
 }
 

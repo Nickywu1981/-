@@ -274,8 +274,8 @@ async function fetchAll() {
     }
     if (tVal?.code === 200) { recentTasks.value = tVal.data?.list || [] }
     else { throw new Error(tVal?.msg || t('admin_dashboard.tasks_load_fail')) }
-  } catch (e: any) {
-    error.value = e?.data?.msg || e.message || t('admin_dashboard.load_failed')
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
+    error.value = err?.data?.msg || err.message || t('admin_dashboard.load_failed')
     toast.error(error.value)
   } finally { loading.value = false }
 }

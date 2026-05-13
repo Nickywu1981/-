@@ -210,7 +210,7 @@ async function submitTask() {
       method: 'POST', body, credentials: 'include',
     })
     startPolling(resp.job_id)
-  } catch (e: any) {
+  } catch (e: unknown) {
     errorMsg.value = e.data?.message || '海报生成失败，请重试'
     generating.value = false
   } finally {

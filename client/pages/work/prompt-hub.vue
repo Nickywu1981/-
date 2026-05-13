@@ -175,7 +175,7 @@ const doFill = async () => {
     })
     toast.success((r as any).filled || '生成成功')
     detail.value = null
-  } catch (e: any) { toast.error(e?.data?.msg || e.message || '生成失败') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || '生成失败') }
 }
 
 onMounted(fetchAll)

@@ -99,8 +99,8 @@ async function submitTask() {
       body: { productInfo: productInfo.value, videoStyle: selectedStyle.value, totalDuration: selectedDuration.value },
     });
     task.pollTask((res as any).data.taskId, '/api/adv-video/tasks/');
-  } catch (err: any) {
-    toast.error(err?.data?.msg || err?.message || '任务提交失败，请重试');
+  } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
+    toast.error(e?.data?.msg || e?.message || '任务提交失败，请重试');
     step.value = 1;
   }
 }

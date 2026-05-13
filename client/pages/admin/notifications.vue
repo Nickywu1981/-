@@ -91,7 +91,7 @@ async function fetch() {
       list.value = data.data.list || []
       total.value = data.data.total || 0
     }
-  } catch (e: any) { toast.error('加载失败') } finally { loading.value = false }
+  } catch (e: unknown) { toast.error('加载失败') } finally { loading.value = false }
 }
 
 function search() { page.value = 1; fetch() }
@@ -103,7 +103,7 @@ async function confirmSend() {
     const data = await $fetch('/api/notifications/send', { method: 'POST', credentials: 'include', body: { userId: +sendDialog.userId, type: sendDialog.type, title: sendDialog.title, content: sendDialog.content } }) as ApiResponse
     if (data?.code === 200) { toast.success('已发送'); sendDialog.open = false; fetch() }
     else { toast.error(data?.msg || '发送失败') }
-  } catch (e: any) { toast.error('发送失败') }
+  } catch (e: unknown) { toast.error('发送失败') }
 }
 
 async function doDelete(n: any) {
@@ -112,7 +112,7 @@ async function doDelete(n: any) {
     const data = await $fetch(`/api/notifications/${n.id}`, { method: 'DELETE', credentials: 'include' }) as ApiResponse
     if (data?.code === 200) { toast.success('已删除'); fetch() }
     else { toast.error(data?.msg || '删除失败') }
-  } catch (e: any) { toast.error('删除失败') }
+  } catch (e: unknown) { toast.error('删除失败') }
 }
 
 onMounted(fetch)

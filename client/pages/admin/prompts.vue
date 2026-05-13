@@ -169,7 +169,7 @@ async function fetchData() {
     const res = await $fetch(`/api/admin/prompts?${params}`, { credentials: 'include' });
     list.value = (res as any).data?.list || [];
     total.value = (res as any).data?.total || 0;
-  } catch (e: any) { toast.error(t('admin_prompts.load_failed') + ': ' + (e?.data?.msg || e.message || t('admin_prompts.network_error'))); } finally { loading.value = false; }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(t('admin_prompts.load_failed') + ': ' + (err?.data?.msg || err.message || t('admin_prompts.network_error'))); } finally { loading.value = false; }
 
 }
 
@@ -203,7 +203,7 @@ async function save() {
     });
     showModal.value = false;
     fetchData();
-  } catch (e: any) { toast.error(t('admin_prompts.save_failed') + ': ' + (e?.data?.msg || e.message || t('admin_prompts.network_error'))); }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(t('admin_prompts.save_failed') + ': ' + (err?.data?.msg || err.message || t('admin_prompts.network_error'))); }
 }
 
 async function review(id: number, status: number) {
@@ -215,7 +215,7 @@ async function review(id: number, status: number) {
       body: JSON.stringify({ status, reviewRemark: status === 3 ? t('admin_prompts.admin_operation') : '' }),
     });
     fetchData();
-  } catch (e: any) { toast.error(t('admin_prompts.review_failed') + ': ' + (e?.data?.msg || e.message || t('admin_prompts.network_error'))); }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(t('admin_prompts.review_failed') + ': ' + (err?.data?.msg || err.message || t('admin_prompts.network_error'))); }
 }
 
 async function confirmDelete(t: any) {
@@ -223,7 +223,7 @@ async function confirmDelete(t: any) {
   try {
     await $fetch(`/api/admin/prompts/${t.id}`, { method: 'DELETE', credentials: 'include' });
     fetchData();
-  } catch (e: any) { toast.error(t('admin_prompts.delete_failed') + ': ' + (e?.data?.msg || e.message || t('admin_prompts.network_error'))); }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(t('admin_prompts.delete_failed') + ': ' + (err?.data?.msg || err.message || t('admin_prompts.network_error'))); }
 }
 
 function categoryLabel(c: string) {

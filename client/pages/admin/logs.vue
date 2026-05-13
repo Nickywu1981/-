@@ -95,7 +95,7 @@ async function fetch() {
     list.value = res.data?.list || []
     total.value = res.data?.total || 0
     stats.value = res.data?.stats || null
-  } catch (e: any) { toast.error('加载失败') } finally { loading.value = false }
+  } catch (e: unknown) { toast.error('加载失败') } finally { loading.value = false }
 }
 
 function onPageChange(p: number) { page.value = p; fetch() }

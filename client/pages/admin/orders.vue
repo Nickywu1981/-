@@ -103,7 +103,7 @@ async function fetch() {
       list.value = data.data.list || []
       total.value = data.data.total || 0
     }
-  } catch (e: any) { toast.error('加载订单失败: ' + (e?.data?.msg || e.message)) } finally { loading.value = false }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error('加载订单失败: ' + (err?.data?.msg || err.message)) } finally { loading.value = false }
 }
 
 function search() { page.value = 1; fetch() }
@@ -117,7 +117,7 @@ async function confirmDelete(o: any) {
     list.value = list.value.filter(item => item.id !== o.id)
     total.value--
     toast.success('订单已删除')
-  } catch (e: any) { toast.error('删除失败: ' + (e?.data?.msg || e.message)) }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error('删除失败: ' + (err?.data?.msg || err.message)) }
 }
 
 onMounted(fetch)

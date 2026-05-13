@@ -78,8 +78,8 @@ async function fetchStatus() {
     } else {
       error.value = d?.msg || '获取模型状态失败'
     }
-  } catch (e: any) {
-    error.value = e?.data?.msg || e.message || '网络错误'
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
+    error.value = err?.data?.msg || err.message || '网络错误'
   } finally {
     loading.value = false
   }
@@ -92,8 +92,8 @@ async function resetBreaker(modelId: string) {
       body: { model_id: modelId },
     })
     await fetchStatus()
-  } catch (e: any) {
-    toast.error('重置失败: ' + (e?.data?.msg || e.message || '网络错误'))
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
+    toast.error('重置失败: ' + (err?.data?.msg || err.message || '网络错误'))
   }
 }
 

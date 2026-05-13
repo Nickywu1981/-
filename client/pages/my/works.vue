@@ -142,7 +142,7 @@ async function fetchAll() {
       new Date(b.create_time || 0).getTime() - new Date(a.create_time || 0).getTime()
     )
     total.value = results.reduce((sum: number, r: any) => sum + (r.total || 0), 0)
-  } catch (e: any) {
+  } catch (e: unknown) {
     errorMsg.value = t('my_pages.works.load_failed')
     allTasks.value = []
   }

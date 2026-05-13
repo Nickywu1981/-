@@ -142,7 +142,7 @@ async function loadPlatforms() {
       p._config = (detail as any).data;
     }
     platforms.value = list;
-  } catch (e: any) { toast.error(e?.data?.msg || '加载平台失败') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '加载平台失败') }
 }
 
 async function uploadSingle(file: File): Promise<string> {
@@ -187,7 +187,7 @@ async function submitTask() {
       },
     });
     task.pollTask((res as any).data.taskId);
-  } catch (e: any) { toast.error(e?.data?.msg || '提交失败，请重试'); step.value = 2; }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '提交失败，请重试'); step.value = 2; }
 }
 
 function handleRedo() { task.reset(); step.value = 0; previews.value = []; selectedPlatform.value = ''; selectedTemplate.value = ''; }

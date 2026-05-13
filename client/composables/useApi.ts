@@ -148,15 +148,16 @@ async function request<T = any>(
       throw new ApiError(res.msg || '请求失败', res.code, 200, res.data);
     }
     return res.data as T;
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const e = err as { name?: string; message?: string; data?: { msg?: string } };
     // 超时不重试
-    if (err.name === 'TimeoutError' || err.name === 'AbortError') {
-      if (options.signal?.aborted) throw err; // 外部取消，透传
+    if (e.name === 'TimeoutError' || e.name === 'AbortError') {
+      if (options.signal?.aborted) throw e; // 外部取消，透传
       throw new ApiError('请求超时，请稍后重试', 408, 408);
     }
 
     // 5xx 指数退避重试
-    const status = err?.response?.status || err?.status;
+    const status = e?.response?.status || e?.status;
     if (RETRY_CONFIG.statuses.includes(status) && retries < RETRY_CONFIG.maxRetries) {
       const waitMs = RETRY_CONFIG.baseDelayMs * Math.pow(2, retries);
       await delay(waitMs);
@@ -164,12 +165,12 @@ async function request<T = any>(
     }
 
     // 已是 ApiError 则直接抛出
-    if (err instanceof ApiError) throw err;
+    if (e instanceof ApiError) throw e;
 
     throw new ApiError(
-      err?.message || '网络请求失败',
-      err?.response?.status || 500,
-      err?.response?.status || 500,
+      e?.message || '网络请求失败',
+      e?.response?.status || 500,
+      e?.response?.status || 500,
     );
   } finally {
     clearTimeout(timeoutId);

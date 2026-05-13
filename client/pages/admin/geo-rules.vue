@@ -79,7 +79,7 @@ async function fetchRules() {
   try {
     const data: any = await $fetch('/api/admin/geo-rules', { credentials: 'include' });
     rules.value = data.data || data;
-  } catch (e: any) { toast.error(e?.data?.msg || '加载失败'); }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '加载失败'); }
   finally { loading.value = false; }
 }
 
@@ -121,7 +121,7 @@ async function save() {
     }
     cancelForm();
     fetchRules();
-  } catch (e: any) { toast.error(e?.data?.msg || '保存失败'); }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '保存失败'); }
   finally { saving.value = false; }
 }
 
@@ -131,7 +131,7 @@ async function remove(id: number) {
     await $fetch(`/api/admin/geo-rules/${id}`, { method: 'DELETE', credentials: 'include' });
     toast.success('已删除');
     fetchRules();
-  } catch (e: any) { toast.error(e?.data?.msg || '删除失败'); }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '删除失败'); }
 }
 
 onMounted(fetchRules);

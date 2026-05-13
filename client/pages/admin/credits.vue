@@ -97,7 +97,7 @@ async function fetch() {
       list.value = data.data.list || []
       total.value = data.data.total || 0
     }
-  } catch (e: any) { toast.error('加载失败') } finally { loading.value = false }
+  } catch (e: unknown) { toast.error('加载失败') } finally { loading.value = false }
 }
 
 function search() { page.value = 1; fetch() }
@@ -114,7 +114,7 @@ async function confirmRefund() {
     const data = await $fetch('/api/credits/admin/refund', { method: 'POST', credentials: 'include', body: { recordId: refundDialog.record.id, remark: refundDialog.remark || '管理员退款' } }) as ApiResponse
     if (data?.code === 200) { toast.success('退款成功'); refundDialog.open = false; fetch() }
     else { toast.error(data?.msg || '退款失败') }
-  } catch (e: any) { toast.error('退款失败') }
+  } catch (e: unknown) { toast.error('退款失败') }
 }
 
 onMounted(fetch)

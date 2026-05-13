@@ -263,8 +263,8 @@ async function saveItem(itemKey: string) {
     } else {
       saveStatus.value[itemKey] = '\u2717 ' + (res.msg || t('admin_config.save_failed'))
     }
-  } catch (e: any) {
-    saveStatus.value[itemKey] = '\u2717 ' + (e?.data?.msg || t('admin_config.save_failed'))
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
+    saveStatus.value[itemKey] = '\u2717 ' + (err?.data?.msg || t('admin_config.save_failed'))
   }
 }
 

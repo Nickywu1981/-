@@ -16,7 +16,7 @@ function getLocale(): string {
       const { locale } = JSON.parse(settings);
       return localeMap[locale] || 'zh-cn';
     }
-  } catch (err: any) { if (import.meta.dev) console.warn('[format] 解析locale设置失败', err?.message || err) }
+  } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string }; if (import.meta.dev) console.warn('[format] 解析locale设置失败', e?.message || err) }
   return 'zh-cn';
 }
 
@@ -85,8 +85,8 @@ export async function copyToClipboard(text: string): Promise<boolean> {
   try {
     await navigator.clipboard.writeText(text);
     return true;
-  } catch (err: any) {
-    if (import.meta.dev) console.warn('[format] 复制到剪贴板失败', err?.message || err)
+  } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
+    if (import.meta.dev) console.warn('[format] 复制到剪贴板失败', e?.message || err)
     return false;
   }
 }

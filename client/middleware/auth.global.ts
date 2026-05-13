@@ -29,7 +29,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
       isAuthenticated = data?.code === 200
       userRole = data?.data?.role || ''
     }
-  } catch (e: any) {
+  } catch (e: unknown) {
     if (e?.response?.status === 401 || e?.statusCode === 401) {
       return navigateTo(`/login?redirect=${encodeURIComponent(to.fullPath)}`)
     }

@@ -53,7 +53,7 @@ async function toggle() {
       toast.success('已收藏')
     }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(ids.slice(0, 200)))
-  } catch (e: any) {
+  } catch (e: unknown) {
     toast.error('操作失败')
   } finally { saving.value = false }
 }

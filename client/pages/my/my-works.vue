@@ -105,8 +105,8 @@ async function fetchWorks() {
     const res: any = await $fetch(`/api/tasks/my-works?${params.toString()}`, { credentials: 'include' })
     works.value = res.data?.list || res.data || []
     total.value = res.data?.total || 0
-  } catch (e: any) {
-    error.value = e?.data?.msg || e.message || t('my.works.load_failed')
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
+    error.value = err?.data?.msg || err.message || t('my.works.load_failed')
   } finally {
     loading.value = false
   }

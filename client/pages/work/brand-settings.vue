@@ -68,9 +68,9 @@ const saveSettings = async () => {
       task.status = 0
       errorMsg.value = (res as any)?.msg || '保存失败，请重试'
     }
-  } catch(e: any) {
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
     task.status = 0
-    errorMsg.value = e?.data?.msg || e.message || '保存失败'
+    errorMsg.value = err?.data?.msg || err.message || '保存失败'
     toast.error(errorMsg.value)
   }
 }
@@ -86,8 +86,8 @@ const onLogoChange = async (e: Event) => {
     const res: any = await $fetch('/api/upload/image', { method: 'POST', body: fd })
     form.logoUrl = res.data?.url || res.url || ''
     if (form.logoUrl) toast.success('Logo 上传成功')
-  } catch (e: any) {
-    toast.error(e?.data?.msg || 'Logo 上传失败')
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
+    toast.error(err?.data?.msg || 'Logo 上传失败')
   } finally { logoUploading.value = false }
 }
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })

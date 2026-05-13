@@ -74,7 +74,7 @@ async function handleGenerate() {
     })
     currentStep.value = 2
     task.pollTask(res.data?.taskId, '/api/adv-video/tasks/')
-  } catch (e: any) { toast.error(e?.data?.msg || '提交失败') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '提交失败') }
   finally { submitting.value = false }
 }
 

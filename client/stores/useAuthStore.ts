@@ -62,7 +62,7 @@ export const useAuthStore = defineStore('auth', {
           this.user = data
           this.isLoggedIn = true
         }
-      } catch (e: any) {
+      } catch (e: unknown) {
         // 只在 401 时登出，网络/5xx 错误保留现有状态
         if (e?.response?.status === 401 || e?.statusCode === 401) {
           this.logout()

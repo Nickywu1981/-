@@ -99,8 +99,8 @@ async function handleRegister() {
     } else {
       errorMsg.value = res.msg || '注册失败'
     }
-  } catch (e: any) {
-    errorMsg.value = e?.data?.msg || '注册失败，请重试'
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
+    errorMsg.value = err?.data?.msg || '注册失败，请重试'
   } finally {
     loading.value = false
   }

@@ -145,7 +145,7 @@ async function fetchData() {
     const res: any = await $fetch('/api/admin/tasks', { params: { page: page.value, pageSize, status: status.value, typeGroup: typeGroup.value, userId: userId.value } })
     if (res?.code === 200) { list.value = res.data?.list || []; total.value = res.data?.total || 0 }
     else { throw new Error(res?.msg || t('admin_tasks.fetch_failed')) }
-  } catch (e: any) { error.value = e?.data?.msg || e.message || t('admin_tasks.load_failed'); toast.error(error.value) } finally { loading.value = false }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; error.value = err?.data?.msg || err.message || t('admin_tasks.load_failed'); toast.error(error.value) } finally { loading.value = false }
 }
 
 function search() { page.value = 1; fetchData() }
@@ -157,7 +157,7 @@ async function retryTask(t: any) {
     const res: any = await $fetch(`/api/admin/tasks/${t.id}/retry`, { method: 'POST' })
     if (res?.code === 200) { toast.success(t('admin_tasks.retry_success')); fetchData() }
     else { toast.error(res?.msg || t('admin_tasks.retry_failed')) }
-  } catch (e: any) { toast.error(e?.data?.msg || e.message || t('admin_tasks.retry_failed')) }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('admin_tasks.retry_failed')) }
 }
 
 async function cancelTask(t: any) {
@@ -166,7 +166,7 @@ async function cancelTask(t: any) {
     const res: any = await $fetch(`/api/admin/tasks/${t.id}/cancel`, { method: 'POST' })
     if (res?.code === 200) { toast.success(t('admin_tasks.cancel_success')); fetchData() }
     else { toast.error(res?.msg || t('admin_tasks.cancel_failed')) }
-  } catch (e: any) { toast.error(e?.data?.msg || e.message || t('admin_tasks.cancel_failed')) }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('admin_tasks.cancel_failed')) }
 }
 
 onMounted(fetchData)

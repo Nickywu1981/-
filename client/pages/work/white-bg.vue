@@ -155,7 +155,7 @@ async function uploadFile(file: File) {
       method: 'POST', credentials: 'include', body: form,
     })
     uploadedUrl.value = res.data?.url || previewUrl.value
-  } catch (e: any) { uploadErr.value = e?.data?.msg || t('work_pages.white_bg.upload_failed') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; uploadErr.value = err?.data?.msg || t('work_pages.white_bg.upload_failed') }
   finally { uploading.value = false }
 }
 
@@ -172,7 +172,7 @@ async function startWhiteBg() {
     if (taskId) { currentStep.value = 2; startPolling(taskId) }
     else { resultUrl.value = res.data?.resultUrl || uploadedUrl.value; taskStatus.value = 2 }
     processing.value = false
-  } catch (e: any) { taskStatus.value = 3; errorMsg.value = e?.data?.msg || t('work_pages.white_bg.generation_failed'); processing.value = false }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; taskStatus.value = 3; errorMsg.value = err?.data?.msg || t('work_pages.white_bg.generation_failed'); processing.value = false }
 }
 
 function startPolling(taskId: string) {

@@ -101,7 +101,7 @@ async function loadData() {
     const data = await $fetch('/api/enterprise/finance/dashboard')
     dashboard.value = data as any
     isAgent.value = !!(data as any).earnings
-  } catch (e: any) {
+  } catch (e: unknown) {
     loadError.value = e?.message || t('enterprise.finance.dashboard.requestFailed')
   } finally {
     loading.value = false

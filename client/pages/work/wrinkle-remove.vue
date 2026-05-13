@@ -62,7 +62,7 @@ const fabrics = ['auto', '棉', '麻', '丝', '毛', '化纤', '牛仔', '针织
 async function uploadFile(file: File) {
   uploading.value = true;
   const formData = new FormData(); formData.append('file', file);
-  try { const res: any = await $fetch('/api/upload/image', { method: 'POST', credentials: 'include', body: formData }); uploadedUrl.value = res.data?.url; } catch (e: any) { toast.error(e?.data?.msg || '上传失败'); }
+  try { const res: any = await $fetch('/api/upload/image', { method: 'POST', credentials: 'include', body: formData }); uploadedUrl.value = res.data?.url; } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '上传失败'); }
   uploading.value = false;
 }
 
@@ -84,8 +84,8 @@ async function submitTask() {
       body: { productImageUrl: uploadedUrl.value, fabricType: selectedFabric.value },
     });
     task.pollTask((res as any).data.taskId, '/api/advanced/tasks/');
-  } catch (err: any) {
-    toast.error(err?.data?.msg || err?.message || '任务提交失败，请重试');
+  } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
+    toast.error(e?.data?.msg || e?.message || '任务提交失败，请重试');
     step.value = 1;
   }
 }

@@ -27,7 +27,7 @@ export default defineNuxtPlugin(async () => {
       locale.value = normalized
       safeSet('lang', normalized)
     }
-  } catch (err: any) {
-    if (import.meta.dev) console.debug('[geo-locale] 地理位置API不可用，保持默认语言', err?.message || err)
+  } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
+    if (import.meta.dev) console.debug('[geo-locale] 地理位置API不可用，保持默认语言', e?.message || err)
   }
 })

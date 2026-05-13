@@ -125,7 +125,7 @@ async function fetchTemplates() {
     const res: any = await $fetch(`/api/sms/templates?${params}`);
     templates.value = res.data?.list || res.data || [];
     total.value = res.data?.total || templates.value.length;
-  } catch(e: any) { toast.error(e?.data?.msg || t('admin_sms_templates.load_failed')) }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('admin_sms_templates.load_failed')) }
   isLoading.value = false;
 }
 
@@ -137,7 +137,7 @@ async function saveTpl(tpl: any) {
       body: { name: tpl.name, content: tpl.content, provider_template_id: tpl.provider_template_id, provider: tpl.provider, status: tpl.status, remark: tpl.remark },
     });
     showMsg(t('admin_sms_templates.saved'));
-  } catch (e: any) { msg.value = e?.data?.msg || t('admin_sms_templates.save_failed'); }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || t('admin_sms_templates.save_failed'); }
   saving.value = 0;
 }
 
@@ -151,7 +151,7 @@ async function createTpl() {
     await $fetch('/api/sms/templates', { method: 'POST', body: newTpl.value });
     showCreate.value = false; showMsg(t('admin_sms_templates.template_created'));
     fetchTemplates();
-  } catch (e: any) { msg.value = e?.data?.msg || t('admin_sms_templates.create_failed'); }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || t('admin_sms_templates.create_failed'); }
   creating.value = false;
 }
 
@@ -163,7 +163,7 @@ async function doDelete() {
     await $fetch(`/api/sms/templates/${deleteTarget.value.id}`, { method: 'DELETE' });
     showDelete.value = false; showMsg(t('admin_sms_templates.template_deleted'));
     fetchTemplates();
-  } catch (e: any) { msg.value = e?.data?.msg || t('admin_sms_templates.delete_failed'); }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || t('admin_sms_templates.delete_failed'); }
   deleting.value = false;
 }
 

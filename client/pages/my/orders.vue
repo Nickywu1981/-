@@ -59,7 +59,7 @@ const fetchAll = async () => {
     const res: any = await $fetch('/api/payment/orders', { params: { page: page.value, pageSize, status: activeTab.value === 'all' ? undefined : activeTab.value }, credentials: 'include' })
     list.value = res?.list || res?.data || []
     total.value = res?.total || 0
-  } catch (e: any) {
+  } catch (e: unknown) {
     toast.error(t('my.orders.load_failed'))
   }
   loading.value = false

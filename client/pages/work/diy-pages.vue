@@ -61,7 +61,7 @@ async function loadIndustries() {
   try {
     const data: any = await $fetch('/api/diy/templates/industries', { credentials: 'include' })
     industries.value = data?.data || []
-  } catch (e: any) { toast.warn(e?.data?.msg || '加载行业失败') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.warn(err?.data?.msg || '加载行业失败') }
 }
 
 async function loadTemplates() {
@@ -74,7 +74,7 @@ async function loadTemplates() {
     const qs = params.toString()
     const data: any = await $fetch(`/api/diy/templates${qs ? '?' + qs : ''}`, { credentials: 'include' })
     templates.value = data?.data?.list || []
-  } catch (e: any) { toast.error(e?.data?.msg || '加载模板失败') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '加载模板失败') }
   loading.value = false
 }
 

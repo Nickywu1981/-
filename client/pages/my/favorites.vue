@@ -76,8 +76,8 @@ const fetchFavorites = async () => {
     const data = await $fetch('/api/collections', { credentials: 'include', params: { page: page.value, pageSize } })
     items.value = data.list || []
     total.value = data.total || 0
-  } catch (e: any) {
-    error.value = e?.data?.msg || e.message || '加载失败'
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
+    error.value = err?.data?.msg || err.message || '加载失败'
   } finally {
     loading.value = false
   }

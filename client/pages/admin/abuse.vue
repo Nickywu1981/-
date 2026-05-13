@@ -105,7 +105,7 @@ async function fetchData() {
     const ipMap: Record<string, number> = {};
     (data.list || []).forEach((r: any) => { ipMap[r.ip] = (ipMap[r.ip] || 0) + 1; });
     abuseCount.value = Object.values(ipMap).filter((c: any) => c > 3).length;
-  } catch (e: any) { toast.error(e?.data?.msg || '加载失败') } finally { loading.value = false; }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '加载失败') } finally { loading.value = false; }
 
 }
 

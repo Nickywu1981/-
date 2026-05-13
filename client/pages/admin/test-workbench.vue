@@ -235,8 +235,8 @@ async function executeTest() {
     statusMessage.value = ''
     toast.success(t('test_workbench.test_complete_toast'))
     loadHistory()
-  } catch (err: any) {
-    lastResult.value = { error: err.message || t('test_workbench.request_failed'), type: activeTab.value, duration_ms: 0, created_at: new Date().toISOString() }
+  } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
+    lastResult.value = { error: e.message || t('test_workbench.request_failed'), type: activeTab.value, duration_ms: 0, created_at: new Date().toISOString() }
     toast.error(err.message || t('test_workbench.test_failed_toast'))
   } finally {
     running.value = false
@@ -298,8 +298,8 @@ async function deleteHistoryItem(id: string) {
     await $fetch('/api/test/history/' + id, { method: 'DELETE', credentials: 'include' })
     toast.success(t('test_workbench.deleted'))
     loadHistory()
-  } catch (err: any) {
-    toast.error(err.message || t('test_workbench.delete_failed'))
+  } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
+    toast.error(e.message || t('test_workbench.delete_failed'))
   }
 }
 
@@ -309,8 +309,8 @@ async function clearHistory() {
     await $fetch('/api/test/history', { method: 'DELETE', credentials: 'include' })
     toast.success(t('test_workbench.cleared'))
     loadHistory()
-  } catch (err: any) {
-    toast.error(err.message || t('test_workbench.clear_failed'))
+  } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
+    toast.error(e.message || t('test_workbench.clear_failed'))
   }
 }
 

@@ -214,7 +214,7 @@ async function uploadMultiple(files: File[]) {
       method: 'POST', credentials: 'include', body: formData,
     });
     uploadedUrls.value.push(...(res.data?.files || []).map((f: any) => f.url));
-  } catch (e: any) { toast.error(e?.data?.msg || t('work_pages.batch.upload_error')); }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('work_pages.batch.upload_error')); }
   finally { uploading.value = false; }
 }
 
@@ -248,8 +248,8 @@ async function redoFromHistory(h: any) {
     });
     task.pollTask((res as any).data.taskId);
     step.value = 3;
-  } catch (err: any) {
-    toast.error(err?.data?.msg || err?.message || t('work_pages.batch.redo_failed'));
+  } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
+    toast.error(e?.data?.msg || e?.message || t('work_pages.batch.redo_failed'));
   }
 }
 
@@ -262,8 +262,8 @@ async function saveTemplate() {
     });
     templateName.value = '';
     loadTemplates();
-  } catch (err: any) {
-    toast.error(err?.data?.msg || err?.message || t('work_pages.batch.save_template_failed'));
+  } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
+    toast.error(e?.data?.msg || e?.message || t('work_pages.batch.save_template_failed'));
   }
 }
 
@@ -277,8 +277,8 @@ async function submitTask() {
     });
     if (nightMode.value) return;
     task.pollTask((res as any).data.taskId);
-  } catch (err: any) {
-    toast.error(err?.data?.msg || err?.message || t('work_pages.batch.submit_failed'));
+  } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
+    toast.error(e?.data?.msg || e?.message || t('work_pages.batch.submit_failed'));
     step.value = 2;
   }
 }

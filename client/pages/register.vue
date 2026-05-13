@@ -99,7 +99,7 @@ async function handleRegister() {
     const authStore = useAuthStore()
     await authStore.register(body)
     navigateTo('/workspace')
-  } catch (e: any) { msg.value = e?.data?.msg || e.message || t('auth.register_failed'); msgErr.value = true; }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || err.message || t('auth.register_failed'); msgErr.value = true; }
   finally { loading.value = false; }
 }
 
@@ -115,7 +115,7 @@ async function handleSmsRegister() {
     });
     await useAuthStore().fetchUser();
     navigateTo('/workspace');
-  } catch (e: any) { msg.value = e?.data?.msg || t('auth.register_failed'); msgErr.value = true; }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || t('auth.register_failed'); msgErr.value = true; }
   finally { loading.value = false; }
 }
 
@@ -126,7 +126,7 @@ async function sendSmsCode(scene: string) {
     await $fetch('/api/sms/send-code', { method: 'POST', credentials: 'include', body: { phone: smsPhone.value, scene } });
     startSmsCd(60);
     msg.value = t('auth.code_sent'); msgErr.value = false;
-  } catch (e: any) { msg.value = e?.data?.msg || t('auth.send_failed'); msgErr.value = true; }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || t('auth.send_failed'); msgErr.value = true; }
 }
 
 async function handleEmailRegister() {
@@ -141,7 +141,7 @@ async function handleEmailRegister() {
     });
     await useAuthStore().fetchUser();
     navigateTo('/workspace');
-  } catch (e: any) { msg.value = e?.data?.msg || t('auth.register_failed'); msgErr.value = true; }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || t('auth.register_failed'); msgErr.value = true; }
   finally { loading.value = false; }
 }
 
@@ -152,7 +152,7 @@ async function sendEmailCode(scene: string) {
     await $fetch('/api/email/send-code', { method: 'POST', credentials: 'include', body: { email: emailAddr.value, scene } });
     startEmailCd(60);
     msg.value = t('auth.code_sent'); msgErr.value = false;
-  } catch (e: any) { msg.value = e?.data?.msg || t('auth.send_failed'); msgErr.value = true; }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || t('auth.send_failed'); msgErr.value = true; }
 }
 </script>
 

@@ -45,7 +45,7 @@ async function startRender() {
     const fd = new FormData(); fd.append('image', uploadedFile.value); fd.append('mode', activeMode.value)
     const data: any = await $fetch('/api/advanced/model-generate', { method: 'POST', body: fd, credentials: 'include' })
     resultUrl.value = data?.data?.url || data?.data?.result_url || ''
-  } catch(e: any) { errorMsg.value = e?.data?.msg || '渲染失败' }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; errorMsg.value = err?.data?.msg || '渲染失败' }
   finally { processing.value = false }
 }
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })

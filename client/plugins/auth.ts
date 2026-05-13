@@ -43,7 +43,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         toast?.error?.(res?.msg || res?.message || t('common.request_failed'))
       }
       return res
-    }).catch((err: any) => {
+    }).catch((err: unknown) => {
       if (err?.response?.status === 401) throw err // already handled by onResponseError
       if (err?.response?.status === 429) {
         toast?.warn?.(t('common.too_many_requests'))
@@ -65,8 +65,8 @@ export default defineNuxtPlugin((nuxtApp) => {
           router.push('/login')
         }
         return res
-      } catch (err: any) {
-        if (import.meta.dev) console.warn('[auth fetch] 请求增强失败，使用原始fetch', err?.message || err)
+      } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
+        if (import.meta.dev) console.warn('[auth fetch] 请求增强失败，使用原始fetch', e?.message || err)
         return origFetch.call(window, input, init)
       }
     }

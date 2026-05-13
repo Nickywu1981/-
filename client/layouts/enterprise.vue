@@ -116,7 +116,7 @@ onMounted(async () => {
   try {
     const data = await api.get('/enterprise/profile')
     entName.value = data?.data?.name || ''
-  } catch (e: any) {
+  } catch (e: unknown) {
     if (e?.response?.status === 401) router.push('/enterprise/login')
     else { if (import.meta.dev) console.error('[enterprise] Failed to load profile', e); toast.error(t('enterprise.nav.loadProfileFailed')) }
   }

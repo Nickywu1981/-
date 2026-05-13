@@ -147,8 +147,8 @@ async function fetchData() {
       list.value = res.data?.list || res.data || []
       total.value = list.value.length
     }
-  } catch (e: any) {
-    error.value = e?.data?.msg || e.message || t('admin_forms.load_failed')
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
+    error.value = err?.data?.msg || err.message || t('admin_forms.load_failed')
     toast.error(error.value)
   } finally {
     loading.value = false
@@ -183,8 +183,8 @@ async function save() {
     } else {
       toast.error(res?.msg || t('admin_forms.save_failed'))
     }
-  } catch (e: any) {
-    toast.error(e?.data?.msg || e.message || t('admin_forms.save_failed'))
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
+    toast.error(err?.data?.msg || err.message || t('admin_forms.save_failed'))
   } finally {
     saving.value = false
   }
@@ -197,7 +197,7 @@ async function showSubs(f: any) {
   try {
     const res: any = await $fetch(`/api/forms/admin/${f.id}/submissions`, { credentials: 'include' })
     submissions.value = res.data?.list || []
-  } catch (e: any) {
+  } catch (e: unknown) {
     toast.error(t('admin_forms.load_sub_failed'))
   } finally {
     subsLoading.value = false
@@ -214,8 +214,8 @@ async function delForm(id: number) {
     } else {
       toast.error(res?.msg || t('common.delete_failed'))
     }
-  } catch (e: any) {
-    toast.error(e?.data?.msg || e.message || t('common.delete_failed'))
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
+    toast.error(err?.data?.msg || err.message || t('common.delete_failed'))
   }
 }
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })

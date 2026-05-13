@@ -254,7 +254,7 @@ onMounted(async () => {
     if (styles.custom_options) {
       styleOptions.value = styles.custom_options.map((s, i) => ({ item_key: `s${i}`, item_value: s }));
     }
-  } catch (e: any) { useToast().error(e?.data?.msg || e?.message || '加载海报样式失败') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; useToast().error(err?.data?.msg || e?.message || '加载海报样式失败') }
   loadWorks();
 });
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })

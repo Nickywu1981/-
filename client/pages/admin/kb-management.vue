@@ -79,8 +79,8 @@ async function search() {
       body: { query: query.value.trim(), topK: 5 },
     });
     ragResult.value = data.data || data;
-  } catch (e: any) {
-    searchError.value = e?.data?.msg || e.message || '搜索失败';
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
+    searchError.value = err?.data?.msg || err.message || '搜索失败';
   } finally { searching.value = false; }
 }
 

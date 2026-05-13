@@ -107,7 +107,7 @@ async function fetchData() {
     list.value = res.data?.list || []
     total.value = res.data?.total || 0
     if (res.data?.stats) Object.assign(stats, res.data.stats)
-  } catch (e: any) { error.value = '加载失败'; toast.error('加载失败') } finally { loading.value = false }
+  } catch (e: unknown) { error.value = '加载失败'; toast.error('加载失败') } finally { loading.value = false }
 }
 
 function onPageChange(p: number) { page.value = p; fetchData() }

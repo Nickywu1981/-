@@ -176,8 +176,8 @@ async function doSandboxPay() {
     } else {
       toast.error(payRes?.msg || '支付失败');
     }
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : String(e);
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
+    const msg = e instanceof Error ? err.message : String(e);
     toast.error('支付异常: ' + (msg || ''));
   } finally { paying.value = false; }
 }

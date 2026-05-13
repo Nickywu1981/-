@@ -148,8 +148,8 @@ async function fetchData() {
       list.value = res.data || []
       total.value = list.value.length
     }
-  } catch (e: any) {
-    error.value = e?.data?.msg || e.message || t('common.loadFail')
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
+    error.value = err?.data?.msg || err.message || t('common.loadFail')
     toast.error(error.value)
   } finally {
     loading.value = false
@@ -184,8 +184,8 @@ async function save() {
     } else {
       toast.error(res?.msg || t('common.save_failed'))
     }
-  } catch (e: any) {
-    toast.error(e?.data?.msg || e.message || t('common.save_failed'))
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
+    toast.error(err?.data?.msg || err.message || t('common.save_failed'))
   } finally {
     saving.value = false
   }
@@ -201,8 +201,8 @@ async function delTenant(id: number) {
     } else {
       toast.error(res?.msg || t('common.delete_failed'))
     }
-  } catch (e: any) {
-    toast.error(e?.data?.msg || e.message || t('common.delete_failed'))
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
+    toast.error(err?.data?.msg || err.message || t('common.delete_failed'))
   }
 }
 
@@ -216,8 +216,8 @@ async function toggleStatus(t: any) {
     } else {
       toast.error(res?.msg || t('common.save_failed'))
     }
-  } catch (e: any) {
-    toast.error(e?.data?.msg || e.message || t('common.save_failed'))
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
+    toast.error(err?.data?.msg || err.message || t('common.save_failed'))
   }
 }
 
@@ -257,8 +257,8 @@ async function doReview(decision: string) {
     } else {
       toast.error(res?.msg || t('common.save_failed'))
     }
-  } catch (e: any) {
-    toast.error(e?.data?.msg || e.message || t('common.save_failed'))
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
+    toast.error(err?.data?.msg || err.message || t('common.save_failed'))
   } finally {
     reviewing.value = false
   }

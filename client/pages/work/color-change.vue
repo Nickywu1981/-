@@ -71,8 +71,8 @@ async function handleFile(e: Event) {
     const fd = new FormData(); fd.append('file', file)
     const res: any = await $fetch('/api/upload/image', { method: 'POST', body: fd })
     uploadedUrl.value = res.data?.url || res.url
-  } catch (err: any) {
-    toast.error(err?.data?.msg || err?.message || '上传失败')
+  } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
+    toast.error(e?.data?.msg || e?.message || '上传失败')
     previewUrl.value = ''
   } finally { uploading.value = false }
 }
@@ -88,8 +88,8 @@ async function submitTask() {
   try {
     const res: any = await $fetch('/api/advanced/color-swap', { method: 'POST', body: { image_url: uploadedUrl.value, target_color: targetColor.value } })
     resultUrl.value = res.data?.result_url || res.result_url
-  } catch (err: any) {
-    toast.error(err?.data?.msg || err?.message || '颜色替换失败，请重试')
+  } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
+    toast.error(e?.data?.msg || e?.message || '颜色替换失败，请重试')
     step.value = 1
   } finally { processing.value = false }
 }

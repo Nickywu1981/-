@@ -206,8 +206,9 @@ async function startUpload() {
       item.status = 'done'
       item.progress = 100
       results.push({ url: result.url, name: item.name, size: item.size, type: item.type })
-    } catch (err: any) {
-      if (import.meta.dev) console.error('[AppMediaUpload] 上传失败', err?.message || err)
+    } catch (err: unknown) {
+      const e = err as { message?: string };
+      if (import.meta.dev) console.error('[AppMediaUpload] 上传失败', e?.message || err)
       item.status = 'error'
       if (!hasNotified) { toast.error('部分文件上传失败，请重试'); hasNotified = true }
     }

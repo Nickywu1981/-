@@ -150,8 +150,8 @@ async function submitTask() {
       },
     });
     task.pollTask((res as any).data.taskId, '/api/adv-video/tasks/');
-  } catch (e: any) {
-    toast.error(e?.data?.msg || '提交失败，请重试');
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
+    toast.error(err?.data?.msg || '提交失败，请重试');
     step.value = 0;
   } finally { submitting.value = false; }
 }

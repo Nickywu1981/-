@@ -248,7 +248,7 @@ async function submitTask() {
       },
     });
     task.pollTask((res as any).data.taskId);
-  } catch (e: any) { toast.error(e?.data?.msg || t('work_pages.detail_h5.submit_failed')); step.value = 2; }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('work_pages.detail_h5.submit_failed')); step.value = 2; }
 }
 
 function handleRedo() { task.reset(); step.value = 0; skuList.value.forEach(s => { if (s.previewUrl) revoke(s.previewUrl) }); skuList.value = []; }

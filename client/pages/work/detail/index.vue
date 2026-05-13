@@ -240,7 +240,7 @@ async function doExtractInfo() {
   try {
     const data = await $fetch('/api/detail/extract-product-info', { method: 'POST', body: { image_url: smartRefUrl.value } })
     smartResult.value = { productName: data.productName || '', category: data.category || t('categories.other'), features: data.features || [] }
-  } catch (e: any) {
+  } catch (e: unknown) {
     smartError.value = e?.data?.message || e?.message || t('work_pages.detail_index.recognize_failed')
   } finally { smartLoading.value = false }
 }

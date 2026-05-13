@@ -35,7 +35,7 @@ onMounted(async () => {
     const data: any = await $fetch('/api/templates/platforms', { credentials: 'include' })
     platformSizes.value = data?.data || []
     if (!Array.isArray(platformSizes.value)) platformSizes.value = []
-  } catch(e: any) { toast.error(e?.data?.msg || e?.message || '加载失败') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || e?.message || '加载失败') }
   loading.value = false
 })
 

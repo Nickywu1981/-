@@ -144,7 +144,7 @@ async function fetch() {
     const res = await $fetch(`/api/admin/campaign/campaigns?${params}`)
     list.value = res.data?.list || []
     total.value = res.data?.total || 0
-  } catch (e: any) { error.value = e.message || t('admin_campaigns.load_failed') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; error.value = err.message || t('admin_campaigns.load_failed') }
   finally { loading.value = false }
 }
 
@@ -161,7 +161,7 @@ async function save() {
     }
     showModal.value = false
     fetch()
-  } catch (e: any) { toast.error(e.message || t('common.save_failed')) }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err.message || t('common.save_failed')) }
   finally { saving.value = false }
 }
 
@@ -170,7 +170,7 @@ async function del(id: number) {
   try {
     await $fetch(`/api/admin/campaign/campaigns/${id}`, { method: 'DELETE' })
     fetch()
-  } catch (e: any) { toast.error(e.message || t('common.delete_failed')) }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err.message || t('common.delete_failed')) }
 }
 
 onMounted(fetch)

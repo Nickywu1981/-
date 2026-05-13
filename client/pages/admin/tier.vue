@@ -65,7 +65,7 @@ onMounted(async () => {
     ])
     if (tRes?.code === 200) tierData.value = tRes.data
     if (pRes?.code === 200) exportPerms.value = pRes.data
-  } catch(e: any) { toast.error(e?.data?.msg || '加载失败') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '加载失败') }
   loading.value = false
 })
 
@@ -74,7 +74,7 @@ async function doCheckLimit() {
   try {
     const data: any = await $fetch(`/api/tier/check-limit?type=${checkType.value}`, { credentials: 'include' })
     if (data?.code === 200) limitResult.value = data.data
-  } catch(e: any) { toast.error(e?.data?.msg || '加载失败') } finally { checkingLimit.value = false; }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '加载失败') } finally { checkingLimit.value = false; }
 }
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>

@@ -140,8 +140,8 @@ async function uploadFile(file: File) {
       method: 'POST', credentials: 'include', body: form,
     })
     uploadedUrl.value = res.data?.url || previewUrl.value
-  } catch (e: any) {
-    uploadErr.value = e?.data?.msg || '上传失败'
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
+    uploadErr.value = err?.data?.msg || '上传失败'
   } finally { uploading.value = false }
 }
 
@@ -173,9 +173,9 @@ async function startRemoveBg() {
       taskStatus.value = 2
     }
     processing.value = false
-  } catch (e: any) {
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
     taskStatus.value = 3
-    errorMsg.value = e?.data?.msg || '处理失败'
+    errorMsg.value = err?.data?.msg || '处理失败'
     processing.value = false
   }
 }

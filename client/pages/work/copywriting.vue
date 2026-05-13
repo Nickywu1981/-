@@ -259,7 +259,7 @@ async function doGenerateTitles() {
     const r = await $fetch('/api/copywriting/titles', { method: 'POST', body: titleForm });
     titleResults.value = r?.data?.titles || [];
     titleMeta.value = { model: r?.data?.model, latency: r?.data?.latency };
-  } catch (e: any) { ElMessage.error(e?.data?.msg || e?.message || $t('work_pages.copywriting_ext.generate_failed')); }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; ElMessage.error(err?.data?.msg || e?.message || $t('work_pages.copywriting_ext.generate_failed')); }
   finally { titleGenning.value = false; }
 }
 
@@ -275,7 +275,7 @@ async function doGenerateDesc() {
     const r = await $fetch('/api/copywriting/description', { method: 'POST', body: descForm });
     descResultRaw.value = r?.data?.description || '';
     descMeta.value = { model: r?.data?.model };
-  } catch (e: any) { ElMessage.error(e?.data?.msg || e?.message || $t('work_pages.copywriting_ext.generate_failed')); }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; ElMessage.error(err?.data?.msg || e?.message || $t('work_pages.copywriting_ext.generate_failed')); }
   finally { descGenning.value = false; }
 }
 

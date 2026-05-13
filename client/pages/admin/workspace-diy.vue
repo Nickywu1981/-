@@ -186,7 +186,7 @@ async function loadAll() {
     workflowItems.value = tryParse(cfg.workspace_workflow) || []
     navChanged.value = cardsChanged.value = assistantChanged.value = workflowChanged.value = false
     ElMessage.success(t('admin_workspace_diy.loaded'))
-  } catch (err: any) {
+  } catch (err: unknown) {
     ElMessage.error(err?.data?.message || t('admin_workspace_diy.load_failed'))
   } finally {
     loading.value = false
@@ -215,7 +215,7 @@ async function resetKey(key: string) {
     await $fetch(`/api/admin/workspace-diy/reset/${key}`, { method: 'POST', credentials: 'include' })
     ElMessage.success(t('admin_workspace_diy.reset_success', { key }))
     await loadAll()
-  } catch (err: any) {
+  } catch (err: unknown) {
     ElMessage.error(err?.data?.message || t('admin_workspace_diy.reset_failed'))
   }
 }
@@ -252,7 +252,7 @@ async function saveAll() {
     await Promise.all(tasks)
     navChanged.value = cardsChanged.value = assistantChanged.value = workflowChanged.value = false
     ElMessage.success(t('admin_workspace_diy.save_success_detail', { count: tasks.length }))
-  } catch (err: any) {
+  } catch (err: unknown) {
     ElMessage.error(err?.data?.message || t('admin_workspace_diy.save_failed'))
   } finally {
     saving.value = false

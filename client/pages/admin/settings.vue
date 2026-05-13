@@ -105,7 +105,7 @@ async function saveSettings() {
       await $fetch(`/api/admin/site-config/${key}`, { method: 'PUT', credentials: 'include', body: { config_value: item.value, config_type: item.type, description: item.description } })
     }
     showMsg('设置已保存')
-  } catch(e: any) { toast.error(e?.data?.msg || '保存失败') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '保存失败') }
   saving.value = false
 }
 

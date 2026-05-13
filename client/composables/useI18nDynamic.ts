@@ -81,8 +81,8 @@ export function useI18nDynamic() {
         ready.value = true
         try { await setCache(loc, data, res.version || Date.now()) } catch { /* noop */ }
       }
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : String(e);
+    } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
+      const msg = e instanceof Error ? err.message : String(e);
       if (!ready.value) error.value = msg || '加载翻译失败'
       // 回退到上次成功的快照
       if (_lastOK.value && Object.keys(_lastOK.value).length) dynamicMap.value = _lastOK.value

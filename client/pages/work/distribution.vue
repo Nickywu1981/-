@@ -126,8 +126,8 @@ const publish = async () => {
     await $fetch('/api/publish/submit', { method: 'POST', body: fd })
     toast.success('发布成功！')
     fetchHistory()
-  } catch (e: any) {
-    toast.error(e?.data?.msg || e.message || '发布失败')
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
+    toast.error(err?.data?.msg || err.message || '发布失败')
   } finally {
     submitting.value = false
   }
@@ -140,13 +140,13 @@ const saveDraft = async () => {
       body: { title: form.title, description: form.description, platforms: selected.value },
     })
     toast.success('草稿已保存')
-  } catch (e: any) {
-    toast.error(e?.data?.msg || e.message || '保存草稿失败，请稍后重试')
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
+    toast.error(err?.data?.msg || err.message || '保存草稿失败，请稍后重试')
   }
 }
 
 const retry = async (id: number) => {
-  try { await $fetch(`/api/publish/retry/${id}`, { method: 'POST' }); fetchHistory() } catch (e: any) { toast.warn(e?.data?.msg || e.message || '重试分发失败，请稍后重试') }
+  try { await $fetch(`/api/publish/retry/${id}`, { method: 'POST' }); fetchHistory() } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.warn(err?.data?.msg || err.message || '重试分发失败，请稍后重试') }
 }
 
 const fetchHistory = async () => {
@@ -154,8 +154,8 @@ const fetchHistory = async () => {
   try {
     const res: any = await $fetch('/api/distribution/history', { credentials: 'include' })
     history.value = res?.list || res?.data || []
-  } catch (e: any) {
-    toast.error(e?.data?.msg || e?.message || '加载分发历史失败')
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
+    toast.error(err?.data?.msg || e?.message || '加载分发历史失败')
   } finally {
     loading.value = false
   }

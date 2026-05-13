@@ -93,7 +93,7 @@ async function mockPay(result: 'success' | 'fail') {
         status: result === 'success' ? '1' : '0',
       }).toString(),
     })
-  } catch (err: any) { toast.error(t('payment.callback_failed')); if (import.meta.dev) console.warn('[payment-result] callback failed', err?.message || err) }
+  } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string }; toast.error(t('payment.callback_failed')); if (import.meta.dev) console.warn('[payment-result] callback failed', e?.message || err) }
 
   mockMsg.value = result === 'success' ? t('payment.mock_sent_success') : t('payment.mock_sent_fail')
 
@@ -121,9 +121,9 @@ function startPoll() {
         failMsg.value = t('payment.fail_timeout')
         if (pollTimer) clearInterval(pollTimer)
       }
-    } catch (err: any) {
+    } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
       toast.error(t('payment.network_error'))
-      if (import.meta.dev) console.warn('[payment-result] poll failed', err?.message || err)
+      if (import.meta.dev) console.warn('[payment-result] poll failed', e?.message || err)
       if (pollCount >= MAX_POLL) {
         status.value = 'fail'
         failMsg.value = t('payment.network_fail')

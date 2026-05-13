@@ -123,8 +123,8 @@ async function fetchFaqs() {
     } else {
       error.value = data.msg || t('help.load_failed')
     }
-  } catch (e: any) {
-    error.value = e?.data?.msg || t('help.load_error')
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
+    error.value = err?.data?.msg || t('help.load_error')
   } finally { loading.value = false }
 }
 

@@ -127,8 +127,8 @@ async function uploadFile(file: File) {
       body: formData,
     });
     uploadedUrl.value = res.data?.url;
-  } catch (e: any) {
-    toast.error(e?.data?.msg || '上传失败，请重试');
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
+    toast.error(err?.data?.msg || '上传失败，请重试');
   }
   uploading.value = false;
 }
@@ -161,8 +161,8 @@ async function submitTask() {
     });
     step.value = 3;
     task.pollTask((res as any).data.taskId);
-  } catch (err: any) {
-    toast.error(err?.data?.msg || err?.message || '任务提交失败，请重试');
+  } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
+    toast.error(e?.data?.msg || e?.message || '任务提交失败，请重试');
   }
 }
 

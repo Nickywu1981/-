@@ -86,8 +86,8 @@ async function uploadFile(file: File) {
   try {
     const res: any = await $fetch('/api/upload', { method: 'POST', body: fd })
     return res.data?.url || ''
-  } catch (e: any) {
-    toast.error(e?.data?.msg || e?.message || '上传失败')
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
+    toast.error(err?.data?.msg || e?.message || '上传失败')
     throw e
   }
 }
@@ -121,7 +121,7 @@ async function startTranslate() {
     resultUrl.value = res.data?.outputUrl || res.data?.url || ''
     taskId.value = res.data?.taskId || ''
     toast.success('翻译完成')
-  } catch (e: any) { toast.error(e?.data?.msg || e.message || '翻译失败') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || '翻译失败') }
   finally { translating.value = false }
 }
 

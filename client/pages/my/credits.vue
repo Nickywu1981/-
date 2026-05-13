@@ -69,7 +69,7 @@ const fetchAll = async () => {
     creditBalance.value = res?.balance || 0
     totalEarned.value = res?.totalEarned || 0
     totalSpent.value = res?.totalSpent || 0
-  } catch (e: any) {
+  } catch (e: unknown) {
     toast.error(t('my.credits.load_failed'))
   }
   loading.value = false

@@ -63,8 +63,8 @@ export function useI18nAdmin() {
       namespaces.value = res.data?.namespaces || []
       pendingChanges.value.clear()
       pendingDelete.value.clear()
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : String(e)
+    } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
+      const msg = e instanceof Error ? err.message : String(e)
       if (import.meta.dev) console.error('[i18n admin] fetch error', msg)
     } finally { loading.value = false }
   }
@@ -99,8 +99,8 @@ export function useI18nAdmin() {
         })
       }
       await fetch()
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : String(e)
+    } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
+      const msg = e instanceof Error ? err.message : String(e)
       if (import.meta.dev) console.error('[i18n admin] save error', msg)
     } finally { saving.value = false }
   }

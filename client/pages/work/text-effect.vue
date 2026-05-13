@@ -64,8 +64,8 @@ async function submitTask() {
   try {
     const res: any = await $fetch('/api/advanced/text-effect', { method: 'POST', body: { text: text.value, effect: selectedEffect.value } })
     resultUrl.value = res.data?.result_url || res.result_url
-  } catch (err: any) {
-    toast.error(err?.data?.msg || err?.message || '生成失败，请重试')
+  } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
+    toast.error(e?.data?.msg || e?.message || '生成失败，请重试')
     step.value = 1
   } finally { processing.value = false }
 }

@@ -120,7 +120,7 @@ async function fetchData() {
     const res: any = await $fetch(`/api/recharge/admin/orders?${params.toString()}`, { credentials: 'include' })
     if (res?.code === 200) { list.value = res.data?.list || []; total.value = res.data?.total || 0 }
     else { list.value = res.data || []; total.value = list.value.length }
-  } catch (e: any) { error.value = e?.data?.msg || e.message || t('common.loadFail'); toast.error(error.value) } finally { loading.value = false }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; error.value = err?.data?.msg || err.message || t('common.loadFail'); toast.error(error.value) } finally { loading.value = false }
 }
 
 function search() { page.value = 1; fetchData() }
@@ -133,7 +133,7 @@ async function refund(o: any) {
     const res: any = await $fetch(`/api/recharge/admin/refund/${o.order_no}`, { method: 'POST', credentials: 'include' })
     if (res?.code === 200 || res?.code === 0) { o.pay_status = 3; toast.success(t('admin_recharge.refund_success')) }
     else { toast.error(res?.msg || t('admin_recharge.refund_failed')) }
-  } catch (e: any) { toast.error(e?.data?.msg || e.message || t('admin_recharge.refund_failed')) }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('admin_recharge.refund_failed')) }
 }
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>

@@ -133,7 +133,7 @@ async function fetchData() {
     list.value = body?.list || body || [];
     if (!Array.isArray(list.value)) list.value = [];
     total.value = body?.total || 0;
-  } catch (e: any) { toast.error(e?.data?.msg || e?.message || t('common.loadFail')) } finally { loading.value = false; }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || e?.message || t('common.loadFail')) } finally { loading.value = false; }
 
 }
 
@@ -172,7 +172,7 @@ async function save() {
     }
     showModal.value = false;
     fetchData();
-  } catch (e: any) { toast.error(t('admin_badges.save_failed', { msg: e?.data?.msg || e.message || t('admin_badges.network_error') })); }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(t('admin_badges.save_failed', { msg: err?.data?.msg || err.message || t('admin_badges.network_error') })); }
 }
 
 async function toggleStatus(b: any) {
@@ -183,7 +183,7 @@ async function toggleStatus(b: any) {
       body: JSON.stringify({ status: b.status === 1 ? 0 : 1 }),
     });
     fetchData();
-  } catch (e: any) { toast.error(t('admin_badges.op_failed', { msg: e?.data?.msg || e.message || t('admin_badges.network_error') })); }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(t('admin_badges.op_failed', { msg: err?.data?.msg || err.message || t('admin_badges.network_error') })); }
 }
 
 async function confirmDelete(b: any) {
@@ -194,7 +194,7 @@ async function confirmDelete(b: any) {
       credentials: 'include',
     });
     fetchData();
-  } catch (e: any) { toast.error(t('admin_badges.delete_failed', { msg: e?.data?.msg || e.message || t('admin_badges.network_error') })); }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(t('admin_badges.delete_failed', { msg: err?.data?.msg || err.message || t('admin_badges.network_error') })); }
 }
 
 function categoryLabel(c: string) {

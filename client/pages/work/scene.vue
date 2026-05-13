@@ -80,7 +80,7 @@ async function uploadFile(file: File) {
       method: 'POST', credentials: 'include', body: formData,
     });
     uploadedUrl.value = res.data?.url;
-  } catch (e: any) { toast.error(e?.data?.msg || '上传失败'); }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '上传失败'); }
   uploading.value = false;
 }
 
@@ -100,8 +100,8 @@ async function submitTask() {
   try {
     const res = await $fetch('/api/images/scene', { method: 'POST', credentials: 'include', body: { imageUrl: uploadedUrl.value, sceneCategory: selectedScene.value } });
     task.pollTask((res as any).data.taskId);
-  } catch (err: any) {
-    toast.error(err?.data?.msg || err?.message || '任务提交失败，请重试');
+  } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
+    toast.error(e?.data?.msg || e?.message || '任务提交失败，请重试');
     step.value = 1;
   }
 }
