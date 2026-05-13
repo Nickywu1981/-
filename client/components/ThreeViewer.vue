@@ -119,7 +119,9 @@ function initScene() {
 function animate() {
   animationId = requestAnimationFrame(animate);
   orbitControls?.update();
-  renderer?.render(scene!, camera!);
+  if (renderer && scene && camera) {
+    renderer.render(scene, camera);
+  }
 }
 
 function loadModel(url: string) {
@@ -165,7 +167,7 @@ function loadModel(url: string) {
         }
       });
 
-      scene!.add(model);
+      if (scene) scene.add(model);
 
       // Count vertices, faces, materials
       let vertices = 0, faces = 0;

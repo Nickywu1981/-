@@ -68,7 +68,8 @@ CREATE TABLE IF NOT EXISTS `user_membership` (
   PRIMARY KEY (`id`),
   KEY `idx_user_id` (`user_id`),
   KEY `idx_status` (`status`),
-  KEY `idx_end_time` (`end_time`)
+  KEY `idx_end_time` (`end_time`),
+  KEY `idx_plan_status_del` (`plan_type`, `status`, `is_deleted`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='会员订阅表';
 
 -- ----------------------------
@@ -137,11 +138,15 @@ CREATE TABLE IF NOT EXISTS `consumption_record` (
   `consumed` INT NOT NULL DEFAULT 0 COMMENT '消耗点数',
   `remark` VARCHAR(200) NOT NULL DEFAULT '' COMMENT '备注',
   `task_id` VARCHAR(36) NOT NULL DEFAULT '' COMMENT '关联任务ID',
+  `request_id` VARCHAR(36) NOT NULL DEFAULT '' COMMENT '幂等请求ID',
+  `status` TINYINT NOT NULL DEFAULT 1 COMMENT '状态: 1=正常 2=已回滚',
+  `freeze_at` DATETIME DEFAULT NULL COMMENT '冻结时间',
   `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY (`id`),
   KEY `idx_user_id` (`user_id`),
   KEY `idx_create_time` (`create_time`),
-  KEY `idx_task_id` (`task_id`)
+  KEY `idx_task_id` (`task_id`),
+  KEY `idx_request_id` (`request_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='消费记录表(仅追加)';
 
 -- ----------------------------
@@ -170,7 +175,8 @@ CREATE TABLE IF NOT EXISTS `task` (
   KEY `idx_user_id` (`user_id`),
   KEY `idx_status` (`status`),
   KEY `idx_type` (`type`),
-  KEY `idx_create_time` (`create_time`)
+  KEY `idx_create_time` (`create_time`),
+  KEY `idx_status_priority_time` (`status`, `priority`, `create_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='异步任务表';
 
 -- ----------------------------
@@ -243,7 +249,8 @@ CREATE TABLE IF NOT EXISTS `operation_log` (
   PRIMARY KEY (`id`),
   KEY `idx_user_id` (`user_id`),
   KEY `idx_action` (`action`),
-  KEY `idx_create_time` (`create_time`)
+  KEY `idx_create_time` (`create_time`),
+  KEY `idx_ip` (`ip`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='操作日志表(仅追加)';
 
 -- ----------------------------
@@ -484,6 +491,7 @@ CREATE TABLE IF NOT EXISTS `tenant` (
   `logo` varchar(255) DEFAULT '',
   `domain` varchar(100) DEFAULT '',
   `plan_type` varchar(20) NOT NULL DEFAULT 'free',
+  `review_status` varchar(20) NOT NULL DEFAULT 'pending' COMMENT '审核状态: pending/approved/rejected',
   `status` tinyint NOT NULL DEFAULT '1',
   `contact_name` varchar(50) DEFAULT '',
   `contact_phone` varchar(20) DEFAULT '',
@@ -496,7 +504,9 @@ CREATE TABLE IF NOT EXISTS `tenant` (
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `code` (`code`)
+  UNIQUE KEY `code` (`code`),
+  KEY `idx_status` (`status`),
+  KEY `idx_plan_type` (`plan_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='租户表';
 
 -- DIY页面
@@ -614,7 +624,8 @@ CREATE TABLE IF NOT EXISTS `recharge_order` (
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
   `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `order_no` (`order_no`)
+  UNIQUE KEY `order_no` (`order_no`),
+  KEY `idx_user_tenant` (`user_id`, `tenant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='充值订单';
 
 -- 浏览器自动化
@@ -649,7 +660,8 @@ CREATE TABLE IF NOT EXISTS `automation_task` (
   `end_time` datetime DEFAULT NULL,
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `idx_user` (`user_id`)
+  KEY `idx_user` (`user_id`),
+  KEY `idx_user_tenant` (`user_id`, `tenant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='自动化任务';
 
 -- 提示词模板
@@ -684,7 +696,8 @@ CREATE TABLE IF NOT EXISTS `prompt_group` (
   `name` varchar(64) NOT NULL,
   `sort_order` int DEFAULT '0',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='提示词收藏分组';
 
 CREATE TABLE IF NOT EXISTS `prompt_favorite` (

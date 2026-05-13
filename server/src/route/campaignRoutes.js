@@ -7,6 +7,20 @@ import * as ctrl from '../controller/campaignController.js';
 
 const router = Router();
 
+// ---- Query filter schemas ----
+const campaignQuerySchema = paginationSchema.extend({
+  type: z.enum(['promotion','coupon','event','announcement']).optional(),
+  status: z.coerce.number().int().min(0).max(3).optional(),
+});
+const couponQuerySchema = paginationSchema.extend({
+  status: z.coerce.number().int().min(0).max(1).optional(),
+  campaignId: z.coerce.number().int().optional(),
+});
+const announcementQuerySchema = paginationSchema.extend({
+  type: z.enum(['system','activity','maintenance','notice']).optional(),
+  status: z.coerce.number().int().min(0).max(2).optional(),
+});
+
 // ---- Campaign ----
 const campaignSchema = z.object({
   title: z.string().min(1).max(200),
@@ -23,7 +37,7 @@ const campaignSchema = z.object({
   sort_order: z.coerce.number().int().default(0),
 });
 
-router.get('/campaigns', authMiddleware, adminAuth, validate(paginationSchema, 'query'), ctrl.listCampaigns);
+router.get('/campaigns', authMiddleware, adminAuth, validate(campaignQuerySchema, 'query'), ctrl.listCampaigns);
 router.get('/campaigns/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), ctrl.getCampaign);
 router.post('/campaigns', adminLimiter, authMiddleware, adminAuth, validate(campaignSchema), ctrl.createCampaign);
 router.put('/campaigns/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(campaignSchema.partial()), ctrl.updateCampaign);
@@ -45,12 +59,12 @@ const couponSchema = z.object({
   campaign_id: z.coerce.number().int().optional(),
 });
 
-router.get('/coupons', authMiddleware, adminAuth, validate(paginationSchema, 'query'), ctrl.listCoupons);
+router.get('/coupons', authMiddleware, adminAuth, validate(couponQuerySchema, 'query'), ctrl.listCoupons);
 router.get('/coupons/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), ctrl.getCoupon);
 router.post('/coupons', adminLimiter, authMiddleware, adminAuth, validate(couponSchema), ctrl.createCoupon);
 router.put('/coupons/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(couponSchema.partial()), ctrl.updateCoupon);
 router.delete('/coupons/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), ctrl.deleteCoupon);
-router.get('/user-coupons', authMiddleware, adminAuth, validate(paginationSchema, 'query'), ctrl.listUserCoupons);
+router.get('/user-coupons', authMiddleware, adminAuth, validate(couponQuerySchema, 'query'), ctrl.listUserCoupons);
 
 // ---- Announcement ----
 const announcementSchema = z.object({
@@ -64,7 +78,7 @@ const announcementSchema = z.object({
   status: z.coerce.number().int().min(0).max(2).default(0),
 });
 
-router.get('/announcements', authMiddleware, adminAuth, validate(paginationSchema, 'query'), ctrl.listAnnouncements);
+router.get('/announcements', authMiddleware, adminAuth, validate(announcementQuerySchema, 'query'), ctrl.listAnnouncements);
 router.get('/announcements/:id', authMiddleware, adminAuth, validate(idParamSchema, 'params'), ctrl.getAnnouncement);
 router.post('/announcements', adminLimiter, authMiddleware, adminAuth, validate(announcementSchema), ctrl.createAnnouncement);
 router.put('/announcements/:id', adminLimiter, authMiddleware, adminAuth, validate(idParamSchema, 'params'), validate(announcementSchema.partial()), ctrl.updateAnnouncement);

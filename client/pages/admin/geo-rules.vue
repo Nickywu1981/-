@@ -70,8 +70,12 @@ const form = reactive({
 
 function fmtArr(v: any) {
   if (!v) return '';
-  const arr = typeof v === 'string' ? JSON.parse(v) : v;
-  return Array.isArray(arr) ? arr.join(', ') : String(v);
+  try {
+    const arr = typeof v === 'string' ? JSON.parse(v) : v;
+    return Array.isArray(arr) ? arr.join(', ') : String(v);
+  } catch {
+    return String(v);
+  }
 }
 
 async function fetchRules() {
