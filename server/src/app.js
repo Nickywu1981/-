@@ -268,6 +268,7 @@ app.use('/api/geo', apiLimiter, geoRoutes);
 
 // 静态文件服务（上传目录），带缓存
 app.use('/uploads', express.static(path.join(__dirname, '../uploads'), {
+  dotfiles: 'deny',
   maxAge: '7d',
   etag: true,
   lastModified: true,
