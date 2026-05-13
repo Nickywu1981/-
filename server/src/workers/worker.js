@@ -113,7 +113,8 @@ async function processJob(job) {
     }
   } catch (err) {
     logger.error(`[Worker] Job #${job.id} failed: ${err.message}`);
-    await jobQueueService.failJob(job.id, err.message);
+    const sanitizedMsg = process.env.NODE_ENV === 'production' ? '任务执行失败' : err.message;
+    await jobQueueService.failJob(job.id, sanitizedMsg);
 
     // 批量进度聚合：通知父任务子任务失败
     if (params.batchId) {

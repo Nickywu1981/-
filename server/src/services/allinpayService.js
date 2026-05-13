@@ -246,8 +246,8 @@ async function fulfillMembership(order, conn) {
   await membershipDao.upsert(order.user_id, { plan_type: planType, credit_balance: 0, end_time: endTime, start_time: now }, conn);
   if (credits > 0) await creditDao.updateCreditBalance(order.user_id, credits, conn);
 
-  // 读取最终余额写日志
-  const updated = await membershipDao.findByUserId(order.user_id);
+  // 读取最终余额写日志（通过事务连接确保读到已提交的写入）
+  const updated = await membershipDao.findByUserId(order.user_id, conn);
   const creditBefore = (updated?.credit_balance || 0) - credits;
   const creditAfter = updated?.credit_balance || 0;
 

@@ -3,16 +3,18 @@ import { parsePagination } from '../utils/pagination.js';
 
 // ==================== 会员套餐更新 ====================
 
-export async function updateMembership(userId, planType, credits, endTime) {
-  const [r] = await pool.execute(
+export async function updateMembership(userId, planType, credits, endTime, conn) {
+  const db = conn || pool;
+  const [r] = await db.execute(
     'UPDATE user_membership SET plan_type = ?, credit_balance = credit_balance + ?, start_time = COALESCE(start_time, NOW()), end_time = ?, update_time = NOW() WHERE user_id = ?',
     [planType, credits, endTime, userId],
   );
   return r.affectedRows;
 }
 
-export async function renewMembership(userId, planType, endTime) {
-  const [r] = await pool.execute(
+export async function renewMembership(userId, planType, endTime, conn) {
+  const db = conn || pool;
+  const [r] = await db.execute(
     'UPDATE user_membership SET plan_type = ?, end_time = ?, update_time = NOW() WHERE user_id = ?',
     [planType, endTime, userId],
   );

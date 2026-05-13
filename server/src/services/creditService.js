@@ -88,7 +88,7 @@ export async function freezeCredit(userId, requestId, action, batchCount = 1, is
     const recordId = await creditDao.insertConsumptionLog({
       userId, type: 2, action, creditBefore, creditAfter, consumed: consumedAmount,
       remark: `freeze batch=${batchCount}`, taskId: '', requestId, status: 0,
-    });
+    }, conn);
 
     // 更新幂等日志状态为已消费
     await creditDao.updateRequestLogStatus(requestId, 1, { recordId, creditAfter }, conn);

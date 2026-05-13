@@ -3,8 +3,9 @@ import pool from './db.js';
 const COLS = 'id, user_id, plan_type, status, trial_quota, trial_used, credit_balance, start_time, end_time, auto_renew, create_time, update_time, is_deleted, tenant_id';
 
 const membershipDao = {
-  async findByUserId(userId) {
-    const [rows] = await pool.execute('SELECT id, user_id, plan_type, status, trial_quota, trial_used, credit_balance, start_time, end_time, auto_renew FROM user_membership WHERE user_id = ? LIMIT 1', [userId]);
+  async findByUserId(userId, conn) {
+    const db = conn || pool;
+    const [rows] = await db.execute('SELECT id, user_id, plan_type, status, trial_quota, trial_used, credit_balance, start_time, end_time, auto_renew FROM user_membership WHERE user_id = ? LIMIT 1', [userId]);
     return rows[0] || null;
   },
 
