@@ -155,6 +155,7 @@ const editing = ref<any>({});
 const form = reactive({
   title: '', description: '', category: 'main_image', content: '', icon: 'star',
   modelType: 'text', sortOrder: 0, isPublic: true, status: 2,
+  templateCode: '',
 });
 
 onMounted(() => { fetchData(); });
@@ -177,7 +178,7 @@ function onPageChange(p: number) { page.value = p; fetchData(); }
 
 function openCreate() {
   editing.value = {};
-  Object.assign(form, { title: '', description: '', category: 'main_image', content: '', icon: 'star', modelType: 'text', sortOrder: 0, isPublic: true, status: 2 });
+  Object.assign(form, { title: '', description: '', category: 'main_image', content: '', icon: 'star', modelType: 'text', sortOrder: 0, isPublic: true, status: 2, templateCode: '' });
   showModal.value = true;
 }
 
@@ -187,6 +188,7 @@ function openEdit(t: any) {
     title: t.title, description: t.description || '', category: t.category,
     content: t.content, icon: t.icon, modelType: t.model_type, sortOrder: t.sort_order,
     isPublic: !!t.is_public, status: t.status,
+    templateCode: t.template_code || '',
   });
   showModal.value = true;
 }
