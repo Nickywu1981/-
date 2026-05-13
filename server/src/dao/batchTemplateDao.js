@@ -11,7 +11,7 @@ export async function insertTemplate(userId, { name, operation, platform, style,
 
 export async function listTemplates(userId) {
   const [rows] = await pool.execute(
-    'SELECT id, name, operation, platform, style, night_mode, image_count, create_time FROM user_batch_template WHERE user_id = ? AND is_deleted = 0 ORDER BY create_time DESC',
+    'SELECT id, name, operation, platform, style, night_mode, image_count, create_time FROM user_batch_template WHERE user_id = ? AND is_deleted = 0 ORDER BY create_time DESC LIMIT 200',
     [userId],
   );
   return rows;

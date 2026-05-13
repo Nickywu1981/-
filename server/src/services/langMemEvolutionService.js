@@ -284,7 +284,7 @@ export async function evolutionTick(subjectIds, namespace = 'user') {
   try {
     const allMemories = await ltmDao.recallEntries({ namespace, subjectId: '%', topK: 1, minImportance: 0 });
     _evolutionMetrics.totalMemories = allMemories.length;
-  } catch { /* ignore */ }
+  } catch (e) { logger.warn('[LangMemE] Memory stats retrieval failed', { error: e.message }); }
 
   const elapsed = Date.now() - start;
   logger.info('[LangMemE] Evolution tick completed', {
@@ -312,7 +312,8 @@ export async function getActiveSubjects(namespace = 'user', limit = 50) {
     });
     const subjectSet = new Set(memories.map(m => m.subject_id).filter(Boolean));
     return [...subjectSet].slice(0, limit);
-  } catch {
+  } catch (e) {
+    logger.warn('[LangMemE] getActiveSubjects failed', { error: e.message, namespace });
     return [];
   }
 }

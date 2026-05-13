@@ -9,7 +9,7 @@ export default {
               encrypt_auth, rate_limit_rpm, circuit_break_count, circuit_break_window,
               circuit_status, circuit_fail_count, pass_body, body_max_bytes,
               timeout_ms, retry_count, cache_ttl, status, create_time, update_time
-       FROM api_proxy_config WHERE tenant_id = ? ORDER BY create_time DESC`,
+       FROM api_proxy_config WHERE tenant_id = ? ORDER BY create_time DESC LIMIT 500`,
       [tenantId],
     );
     return rows;

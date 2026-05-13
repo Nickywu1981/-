@@ -27,8 +27,8 @@ export async function listHistory({ userId, type, page = 1, pageSize = 20 }) {
   return { list: rows, total };
 }
 
-export async function getHistoryById(id) {
-  const [rows] = await pool.execute('SELECT * FROM copywriting_history WHERE id = ? LIMIT 1', [id]);
+export async function getHistoryById(id, userId) {
+  const [rows] = await pool.execute('SELECT * FROM copywriting_history WHERE id = ? AND user_id = ? LIMIT 1', [id, userId]);
   return rows[0] || null;
 }
 
