@@ -47,4 +47,11 @@ router.post('/route', authMiddleware, signatureGuard, aiConcurrencyGuard, valida
 router.get('/stats/tokens', authMiddleware, signatureGuard, aiGatewayController.statsTokens);
 router.get('/pricing', authMiddleware, signatureGuard, aiGatewayController.pricing);
 
+// ── 监控看板 ──
+router.get('/monitor/dashboard', authMiddleware, signatureGuard, aiGatewayController.dashboard);
+router.get('/monitor/models', authMiddleware, signatureGuard, aiGatewayController.modelBreakdown);
+router.get('/monitor/timeseries', authMiddleware, signatureGuard, aiGatewayController.timeSeries);
+router.get('/monitor/top-users', authMiddleware, signatureGuard, aiGatewayController.topUsers);
+router.get('/monitor/alerts', authMiddleware, signatureGuard, aiGatewayController.alertRules);
+
 export default router;

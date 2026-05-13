@@ -17,6 +17,20 @@ const LOG_LEVEL = (() => {
   return isDev ? 'debug' : 'info';
 })();
 
+import { getTraceContext } from '../services/traceService.js';
+
+// ==================== TraceID 注入 ====================
+
+const traceIdFormat = format((info) => {
+  try {
+    const ctx = getTraceContext();
+    if (ctx?.traceId && ctx.traceId !== '00000000000000000000000000000000') {
+      info.traceId = ctx.traceId;
+    }
+  } catch { /* traceService not loaded */ }
+  return info;
+});
+
 // ==================== 日志采样配置 ====================
 
 const LOG_SAMPLE_RATE = logConfig.sampleRate;
@@ -37,12 +51,14 @@ function shouldSample(path, statusCode) {
 const logger = createLogger({
   level: LOG_LEVEL,
   format: format.combine(
+    traceIdFormat(),
     format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     format.errors({ stack: true }),
     isDev
-      ? format.combine(format.colorize(), format.printf(({ timestamp, level, message, ...rest }) => {
+      ? format.combine(format.colorize(), format.printf(({ timestamp, level, message, traceId, ...rest }) => {
+          const tid = traceId ? ` [${traceId.slice(0, 8)}]` : '';
           const meta = Object.keys(rest).length > 2 ? ` ${JSON.stringify(rest)}` : '';
-          return `${timestamp} ${level} ${message}${meta}`;
+          return `${timestamp} ${level}${tid} ${message}${meta}`;
         }))
       : format.combine(format.json()),
   ),

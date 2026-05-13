@@ -26,6 +26,8 @@ import { manageContextWindow, saveBudgetLog } from '../services/contextWindowSer
 import * as ltmService from '../services/longTermMemoryService.js';
 import { sanitizePII, sanitizeObject } from '../services/inputSanitizerService.js';
 import { moderateText } from '../services/moderation.service.js';
+import { recordCall, recordCircuitBreakerTrip } from '../services/monitorService.js';
+import { getTraceContext } from '../services/traceService.js';
 
 // ==================== 统一调用上下文 ====================
 
@@ -326,6 +328,13 @@ export async function gatewayInfer(modelId, input, ctx = {}) {
     }).catch((e) => logger.warn(`[Gateway] 聚合写入失败: ${e.message}`));
   }
 
+  // ── 监控指标记录 ──
+  recordCall({
+    modelId, userId: context.userId,
+    status, tokensIn: effectiveTokensIn, tokensOut: effectiveTokensOut,
+    cost, latencyMs,
+  });
+
   // ── 长期记忆自动存储（Post-invoke）──
   if (ctx.enableLTM !== false && context.userId && status === 'success') {
     try {
@@ -455,6 +464,13 @@ export async function gatewayDispatch(dispatchReq, ctx = {}) {
     }).catch((e) => logger.warn(`[Gateway] 聚合写入失败: ${e.message}`));
   }
 
+  // ── 监控指标记录 ──
+  recordCall({
+    modelId, userId: context.userId,
+    status, tokensIn, tokensOut,
+    cost, latencyMs,
+  });
+
   return { ...result, tokensIn, tokensOut, cost, correlationId: context.correlationId };
 }
 
@@ -555,6 +571,13 @@ export async function gatewayRoute(params, ctx = {}) {
       tokensIn, tokensOut, cost: cost.amount, isError: false, latencyMs,
     }).catch((e) => logger.warn(`[Gateway] 聚合写入失败: ${e.message}`));
   }
+
+  // ── 监控指标记录 ──
+  recordCall({
+    modelId: modelKey, userId: context.userId,
+    status, tokensIn, tokensOut,
+    cost, latencyMs,
+  });
 
   return { ...(result || {}), tokensIn, tokensOut, cost, correlationId: context.correlationId };
 }

@@ -4,6 +4,8 @@
  */
 import { wrapController } from '../utils/wrapController.js';
 import { gatewayInfer, gatewayDispatch, gatewayRoute, getGatewayStats, getGatewayPricing } from '../gateway/aiGatewayHub.js';
+import { getDashboardSummary, getModelBreakdown, getTimeSeries, getTopUsers } from '../services/monitorService.js';
+import { checkAlerts, getAlertRules } from '../services/alertService.js';
 import logger from '../utils/logger.js';
 
 export const aiGatewayController = {
@@ -58,5 +60,33 @@ export const aiGatewayController = {
   pricing: wrapController(async (req) => {
     const { category } = req.query;
     return await getGatewayPricing(category || null);
+  }),
+
+  // ── 监控看板 ──
+  dashboard: wrapController(async (req) => {
+    const hours = parseInt(req.query.hours || '24', 10);
+    const summary = getDashboardSummary(hours);
+    const alerts = checkAlerts(summary);
+    return { summary, alerts, timestamp: new Date().toISOString() };
+  }),
+
+  modelBreakdown: wrapController(async () => {
+    return getModelBreakdown();
+  }),
+
+  timeSeries: wrapController(async (req) => {
+    const hours = parseInt(req.query.hours || '24', 10);
+    return getTimeSeries(hours);
+  }),
+
+  topUsers: wrapController(async (req) => {
+    const limit = parseInt(req.query.limit || '10', 10);
+    return getTopUsers(limit);
+  }),
+
+  alertRules: wrapController(async () => {
+    const stats = getDashboardSummary(1);
+    const alerts = checkAlerts(stats);
+    return { rules: getAlertRules(), lastCheck: alerts };
   }),
 };
