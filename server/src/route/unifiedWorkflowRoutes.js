@@ -31,6 +31,8 @@ const configureWorkflowSchema = z.object({
   disabledSteps: z.array(z.string()).optional().default([]),
   modelBindings: z.record(z.string()).optional().default({}),
   extraSteps: z.array(z.object({}).passthrough()).optional().default([]),
+  deletedSteps: z.array(z.string()).optional().default([]),
+  stepOrder: z.array(z.string()).optional().default([]),
   params: z.record(z.unknown()).optional().default({}),
   mode: z.enum(['auto', 'custom']).optional().default('auto'),
 });

@@ -70,7 +70,7 @@ const adminPromptSchema = z.object({
   title: z.string().min(1, '标题不能为空').max(200),
   description: z.string().max(500).optional(),
   content: z.string().min(1, '内容不能为空').max(5000),
-  variables: z.array(z.string()).optional(),
+  variables: z.any().optional(),
   modelType: z.enum(['text', 'image', 'video', 'multimodal']).optional(),
   icon: z.string().max(50).optional(),
   sortOrder: z.coerce.number().int().min(0).optional(),

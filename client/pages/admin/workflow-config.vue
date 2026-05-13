@@ -56,6 +56,18 @@
               {{ step.enabled ? '开启' : '关闭' }}
             </label>
 
+            <!-- 排序按钮 -->
+            <div class="reorder-btns">
+              <button class="btn-reorder" @click.stop="moveStep(step.key, -1)"
+                :disabled="selectedWf.steps.indexOf(step) === 0" title="上移">▲</button>
+              <button class="btn-reorder" @click.stop="moveStep(step.key, 1)"
+                :disabled="selectedWf.steps.indexOf(step) === selectedWf.steps.length - 1" title="下移">▼</button>
+            </div>
+
+            <!-- 删除按钮 (非必填步骤) -->
+            <button v-if="!step.required" class="btn-delete-step" @click.stop="deleteStep(step.key)"
+              title="从该工作流中移除此步骤">✕</button>
+
             <!-- 模型绑定(仅自定义模式) -->
             <select
               v-if="step.allowModel && wfMode === 'custom'"
@@ -175,10 +187,40 @@ function getAutoModelForStep(step) {
 
 async function selectWorkflow(id) {
   try {
-    const res = await $fetch(`/api/workflow/definition/${id}`);
-    if (res?.data) {
-      selectedWf.value = res.data;
-      wfMode.value = res.data.mode || 'auto';
+    const [defRes, configRes] = await Promise.all([
+      $fetch(`/api/workflow/definition/${id}`),
+      $fetch(`/api/workflow/definition/${id}/config`),
+    ]);
+    if (defRes?.data) {
+      selectedWf.value = defRes.data;
+      selectedWf.value._originalSteps = JSON.parse(JSON.stringify(defRes.data.steps));
+      wfMode.value = defRes.data.mode || 'auto';
+
+      // 恢复已保存的配置
+      if (configRes?.data) {
+        const cfg = configRes.data;
+        if (cfg.mode) wfMode.value = cfg.mode;
+        if (cfg.step_order?.length) {
+          const orderMap = new Map(cfg.step_order.map((key, i) => [key, i]));
+          selectedWf.value.steps.sort((a, b) => {
+            const aPos = orderMap.has(a.key) ? orderMap.get(a.key) : 9999;
+            const bPos = orderMap.has(b.key) ? orderMap.get(b.key) : 9999;
+            if (aPos !== bPos) return aPos - bPos;
+            return a.order - b.order;
+          });
+        }
+        if (cfg.deleted_steps?.length) {
+          const delSet = new Set(cfg.deleted_steps);
+          selectedWf.value.steps = selectedWf.value.steps.filter(s => !delSet.has(s.key));
+        }
+        if (cfg.disabled_steps) {
+          selectedWf.value.steps.forEach(s => {
+            if (cfg.disabled_steps.includes(s.key)) s.enabled = false;
+          });
+        }
+        if (cfg.model_bindings) Object.assign(modelBindings, cfg.model_bindings);
+        if (cfg.params) Object.assign(params, cfg.params);
+      }
     }
     // 加载模型池
     const poolRes = await $fetch('/api/admin/model-pool');
@@ -189,12 +231,20 @@ async function selectWorkflow(id) {
 async function saveConfig() {
   if (!selectedWf.value) return;
   try {
+    const originalSteps = selectedWf.value._originalSteps || [];
+    const currentKeys = new Set(selectedWf.value.steps.map(s => s.key));
+    const deletedSteps = originalSteps
+      .filter(s => !currentKeys.has(s.key))
+      .map(s => s.key);
+
     await $fetch(`/api/workflow/definition/${selectedWf.value.id}/config`, {
       method: 'PUT',
       body: {
         mode: wfMode.value,
         disabledSteps: selectedWf.value.steps.filter(s => !s.enabled).map(s => s.key),
         modelBindings: Object.fromEntries(Object.entries(modelBindings).filter(([, v]) => v !== 'auto')),
+        deletedSteps,
+        stepOrder: selectedWf.value.steps.map(s => s.key),
         params: { ...params },
       },
     });
@@ -202,6 +252,23 @@ async function saveConfig() {
   } catch (e) {
     alert('保存失败: ' + (e.message || '未知错误'));
   }
+}
+
+function moveStep(stepKey, direction) {
+  if (!selectedWf.value) return;
+  const steps = selectedWf.value.steps;
+  const idx = steps.findIndex(s => s.key === stepKey);
+  if (idx < 0) return;
+  const newIdx = idx + direction;
+  if (newIdx < 0 || newIdx >= steps.length) return;
+  [steps[idx], steps[newIdx]] = [steps[newIdx], steps[idx]];
+  saveConfig();
+}
+
+function deleteStep(stepKey) {
+  if (!selectedWf.value) return;
+  selectedWf.value.steps = selectedWf.value.steps.filter(s => s.key !== stepKey);
+  saveConfig();
 }
 
 onMounted(async () => {
@@ -259,4 +326,21 @@ onMounted(async () => {
 .param select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; }
 
 .btn-save { margin-top: 24px; padding: 10px 24px; background: #1a73e8; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
+
+.btn-delete-step {
+  width: 24px; height: 24px; border-radius: 50%; border: 1px solid #e53e3e;
+  background: #fff; color: #e53e3e; cursor: pointer; font-size: 13px;
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0; line-height: 1; flex-shrink: 0;
+}
+.btn-delete-step:hover { background: #e53e3e; color: #fff; }
+.reorder-btns { display: flex; flex-direction: column; gap: 2px; }
+.btn-reorder {
+  width: 22px; height: 16px; border: 1px solid #ddd; background: #f5f5f5;
+  border-radius: 3px; cursor: pointer; font-size: 8px; line-height: 1;
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0; color: #666;
+}
+.btn-reorder:hover { background: #1a73e8; color: #fff; border-color: #1a73e8; }
+.btn-reorder:disabled { opacity: 0.3; cursor: not-allowed; }
 </style>

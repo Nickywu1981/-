@@ -18,6 +18,7 @@ import { autoSelect, getModelConfig } from './modelPoolService.js';
 import { isBlocked } from './adComplianceEngine.js';
 import { classifyIntent } from './intentClassifier.js';
 import { wrapPrompt } from './promptWrapper.js';
+import { matchAndFill } from './templateEngine.js';
 import { gatewayInfer, gatewayDispatch } from '../gateway/aiGatewayHub.js';
 import logger from '../utils/logger.js';
 import { BusinessError } from '../utils/businessError.js';
@@ -30,6 +31,16 @@ import { INDUSTRY_SCENES } from './industryConfig.js';
 
 const MULTI_ANGLES = ['front', 'side_left', 'side_right', 'back', '45_degree', 'detail_closeup'];
 const DETAIL_DIMENSIONS = ['material_texture', 'craftsmanship_detail', 'size_comparison', 'feature_highlight'];
+
+/** 步骤执行器 → 模板引擎 intentId 映射 */
+const STEP_INTENT_MAP = {
+  white_bg_gen:      'white_bg',
+  multi_angle_gen:   'scene_image',
+  scene_image_gen:   'scene_image',
+  detail_shot_gen:   'detail_image',
+  storyboard_gen:    'storyboard',
+  detail_module_gen: 'detail_image',
+};
 
 function _parseScenes(ctx) {
   const raw = ctx.scriptContent || ctx.textContent || '';
@@ -50,6 +61,32 @@ function _parseViralInsight(text) {
     if (jsonMatch) return JSON.parse(jsonMatch[0]);
   } catch {}
   return null;
+}
+
+async function _wrapStepPrompt(ctx, intentId) {
+  const variables = {
+    productName: ctx.productName || ctx.userInput || '商品',
+    category: ctx.industry ? (INDUSTRY_SCENES[ctx.industry]?.category || '') : '',
+    platform: ctx.platform || '通用',
+    style: ctx.style || 'professional',
+    sellingPoints: Array.isArray(ctx.sellingPoints)
+      ? ctx.sellingPoints.join('；')
+      : (ctx.sellingPoints || ''),
+    resolution: ctx.imageSize || '2048x2048',
+    language: ctx.language || 'zh-CN',
+    features: ctx.productFeatures || '',
+    specs: ctx.productSpecs || '',
+    frameCount: ctx.storyboardCount || 6,
+    mood: ctx.mood || 'warm natural',
+  };
+  const opts = {
+    industry: ctx.industry,
+    platform: ctx.platform,
+    brandTone: ctx.brandTone,
+  };
+  const wrapped = await matchAndFill(intentId, variables, opts);
+  ctx._lastStepWrapper = wrapped;
+  return wrapped;
 }
 
 async function _singleImageGen(ctx, prompt, taskType, size = '1024x1024') {
@@ -123,17 +160,20 @@ const STEP_EXECUTORS = {
         logger.warn('[WorkflowEngine] backgroundRemovalService failed, fallback to generic', e.message);
       }
     }
-    return _imageGenStep('white_bg')(ctx);
+    return _imageGenStep('white_bg', null, 'white_bg')(ctx);
   },
-  detail_module_gen:  _imageGenStep('detail_module'),
+  detail_module_gen:  _imageGenStep('detail_module', null, 'detail_image'),
 
   // 多角度主图 — 6个命名角度并发生成 (对齐 ExpandAgent.multiAngleTool)
   multi_angle_gen: async (ctx) => {
     const count = ctx.batchSize || 4;
     const angles = MULTI_ANGLES.slice(0, count);
+    let basePrompt;
+    try { const wrapped = await _wrapStepPrompt(ctx, 'scene_image'); basePrompt = wrapped.system; } catch { basePrompt = ''; }
+    const fallbackBase = `professional e-commerce product photography, pure white background #FFFFFF, studio lighting, product centered, ultra high resolution, commercial quality`;
     const results = await Promise.allSettled(angles.map(angle => {
-      const prompt = ctx.wrappedPrompt?.system
-        || `professional e-commerce product photography, ${angle} view, pure white background #FFFFFF, studio lighting, product centered, ultra high resolution, commercial quality${ctx.productName ? `, product: ${ctx.productName}` : ''}`;
+      const prompt = (basePrompt ? basePrompt + '. ' : '')
+        + `${fallbackBase}, ${angle} view${ctx.productName ? ', product: ' + ctx.productName : ''}`;
       return _singleImageGen(ctx, prompt, 'multi_angle');
     }));
     const urls = results.map((r, i) => r.status === 'fulfilled' ? r.value : null).filter(Boolean);
@@ -143,9 +183,12 @@ const STEP_EXECUTORS = {
   // 场景图 — 行业场景库驱动 (对齐 ExpandAgent.sceneTool)
   scene_image_gen: async (ctx) => {
     const scenes = INDUSTRY_SCENES[ctx.industry] || INDUSTRY_SCENES.clothing;
+    let basePrompt;
+    try { const wrapped = await _wrapStepPrompt(ctx, 'scene_image'); basePrompt = wrapped.system; } catch { basePrompt = ''; }
+    const fallbackBase = `professional e-commerce lifestyle photography, natural lighting, commercial quality, realistic setting`;
     const results = await Promise.allSettled(scenes.map(scene => {
-      const prompt = ctx.wrappedPrompt?.system
-        || `professional e-commerce lifestyle photography, ${ctx.productName || 'product'} in ${scene.replace(/_/g, ' ')}, natural lighting, commercial quality, realistic setting`;
+      const prompt = (basePrompt ? basePrompt + '. ' : '')
+        + `${fallbackBase}, ${ctx.productName || 'product'} in ${scene.replace(/_/g, ' ')}`;
       return _singleImageGen(ctx, prompt, 'scene_image');
     }));
     const urls = results.map((r, i) => r.status === 'fulfilled' ? r.value : null).filter(Boolean);
@@ -154,9 +197,12 @@ const STEP_EXECUTORS = {
 
   // 卖点细节图 — 4维度拆分 (对齐 ExpandAgent.detailShotTool)
   detail_shot_gen: async (ctx) => {
+    let basePrompt;
+    try { const wrapped = await _wrapStepPrompt(ctx, 'detail_image'); basePrompt = wrapped.system; } catch { basePrompt = ''; }
+    const fallbackBase = `extreme close-up e-commerce product photography, macro lens, ultra detailed, studio lighting, pure white background`;
     const results = await Promise.allSettled(DETAIL_DIMENSIONS.map(dim => {
-      const prompt = ctx.wrappedPrompt?.system
-        || `extreme close-up e-commerce product photography, ${dim.replace(/_/g, ' ')}, ${ctx.productName || 'product'}, macro lens, ultra detailed, studio lighting, pure white background`;
+      const prompt = (basePrompt ? basePrompt + '. ' : '')
+        + `${fallbackBase}, ${dim.replace(/_/g, ' ')}, ${ctx.productName || 'product'}`;
       return _singleImageGen(ctx, prompt, 'detail_shot');
     }));
     const urls = results.map((r, i) => r.status === 'fulfilled' ? r.value : null).filter(Boolean);
@@ -167,7 +213,8 @@ const STEP_EXECUTORS = {
   storyboard_gen: async (ctx) => {
     const scenes = _parseScenes(ctx);
     if (scenes && scenes.length > 0) {
-      const baseSystem = ctx.wrappedPrompt?.system || '';
+      let baseSystem;
+      try { const wrapped = await _wrapStepPrompt(ctx, 'storyboard'); baseSystem = wrapped.system; } catch { baseSystem = ''; }
       const results = await Promise.allSettled(scenes.map(scene =>
         _singleImageGen(ctx,
           (baseSystem ? baseSystem + '. ' : '')
@@ -184,7 +231,7 @@ const STEP_EXECUTORS = {
       return { storyboardUrls: urls, imageUrls: urls, frames, generatedCount: urls.length };
     }
     // 无脚本场景 → 降级为批量通用分镜图
-    return _imageGenStep('storyboard')(ctx);
+    return _imageGenStep('storyboard', null, 'storyboard')(ctx);
   },
 
   // ── 文案生成 ──
@@ -474,11 +521,22 @@ STEP_EXECUTORS.voice_synthesis = STEP_EXECUTORS.voice_dub;
 
 // ==================== 图片生成步骤工厂 ====================
 
-function _imageGenStep(taskType, taskLabel) {
+function _imageGenStep(taskType, taskLabel, intentId) {
   return async (ctx) => {
     const model = ctx._stepModel || {};
-    const prompt = ctx.wrappedPrompt?.system
-      || `professional e-commerce ${taskType.replace(/_/g, ' ')}, ${ctx.productName || 'product'}, studio lighting, white background`;
+    let prompt;
+    if (intentId) {
+      try {
+        const wrapped = await _wrapStepPrompt(ctx, intentId);
+        prompt = wrapped.system + '\n\n' + wrapped.prompt;
+      } catch (e) {
+        logger.warn('[WorkflowEngine] _wrapStepPrompt failed for', intentId, e.message);
+        prompt = `professional e-commerce ${taskType.replace(/_/g, ' ')}, ${ctx.productName || 'product'}, studio lighting, white background`;
+      }
+    } else {
+      prompt = ctx.wrappedPrompt?.system
+        || `professional e-commerce ${taskType.replace(/_/g, ' ')}, ${ctx.productName || 'product'}, studio lighting, white background`;
+    }
 
     const result = await gatewayInfer(model.model_key || 'gpt-image-2', prompt, {
       size: ctx.imageSize || '1024x1024',
