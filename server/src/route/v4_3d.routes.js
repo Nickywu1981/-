@@ -11,7 +11,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { authMiddleware } from '../middleware/auth.js';
 import { uploadLimiter } from '../middleware/rateLimiter.js';
-import { uploadQuotaGuard } from '../middleware/upload.js';
+import { uploadQuotaGuard, magicNumberGuard } from '../middleware/upload.js';
 import { validateV4 as _validate } from '../utils/validate.js';
 import * as ctrl from '../controller/v4ThreeDController.js';
 
@@ -38,7 +38,7 @@ const upload = multer({
 });
 
 // POST /api/3d/upload
-router.post('/upload', uploadLimiter, authMiddleware, upload.single('model'), uploadQuotaGuard, ctrl.upload);
+router.post('/upload', uploadLimiter, authMiddleware, upload.single('model'), uploadQuotaGuard, magicNumberGuard, ctrl.upload);
 
 const modelsQuerySchema = z.object({
   page: z.coerce.number().int().min(1).optional().default(1),

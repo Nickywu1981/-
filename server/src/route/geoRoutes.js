@@ -10,6 +10,6 @@ import * as ctrl from '../controller/geoController.js';
 
 const router = Router();
 
-router.get('/api/geo/suggest-locale', rateLimiter, ctrl.suggestLocale);
+router.get('/suggest-locale', rateLimiter, ctrl.suggestLocale);
 
 export default router;

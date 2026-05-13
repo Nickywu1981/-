@@ -207,7 +207,7 @@ async function processModelGenerate(taskId, userId, params) {
       const msg = p < 30 ? '识别服装款式...' : p < 60 ? `生成${params.modelType}模特...` : '融合光影细节...';
       updateTaskStatus(taskId, userId, { progress: Math.round(p * 0.95), progressMsg: msg });
     }});
-    const images = (result.output?.images || [0, 1]).map((_, i) => ({ id: `${taskId}_${i}`, type: 'model', url: _.url || `/api/images/${taskId}_model_${i}.webp` }));
+    const images = (result.output?.images || []).map((img, i) => ({ id: `${taskId}_${i}`, type: 'model', url: (img && img.url) || `/api/images/${taskId}_model_${i}.webp` }));
     await completeTask(taskId, userId, { progressMsg: '完成', outputResult: { images } });
   } catch (err) { await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }); }
 }
