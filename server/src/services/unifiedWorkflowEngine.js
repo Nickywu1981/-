@@ -214,10 +214,48 @@ const STEP_EXECUTORS = {
     preparedText: (ctx.userInput || '').replace(/\n{3,}/g, '\n\n').trim(),
   }),
   size_standardize: async (ctx) => ({ standardized: true, count: (ctx.imageUrls || []).length }),
-  auto_layout: async (ctx) => ({ layout: 'standard_9_section', modules: ctx.modules || [] }),
-  bgm_add: async (ctx) => ({ bgmUrl: null, skipped: true }),
-  noise_reduce: async (ctx) => ({ denoised: true }),
-  audio_mix: async (ctx) => ({ mixedUrl: null, skipped: true }),
+
+  // 自动排版 — 4种布局风格智能选择
+  auto_layout: async (ctx) => {
+    const { autoLayout: doLayout } = await import('./layoutService.js');
+    const result = doLayout(ctx, {
+      layoutStyle: ctx.layoutStyle || null,
+    });
+    return { layout: result.layout, detailHtml: result.html, totalModules: result.totalModules };
+  },
+
+  // BGM配乐 — 按行业/风格智能选曲
+  bgm_add: async (ctx) => {
+    const { selectBgm } = await import('./audioMixService.js');
+    const bgm = await selectBgm(ctx);
+    ctx._bgmInfo = bgm;
+    return { bgmUrl: bgm.bgmUrl, bgmName: bgm.bgmName, bgmMood: bgm.mood, bgmBpm: bgm.bpm };
+  },
+
+  // 降噪规整 — ffmpeg降噪+响度归一化，无ffmpeg时建议安装
+  noise_reduce: async (ctx) => {
+    const audioUrl = ctx.voiceUrl || ctx.mixedUrl || null;
+    if (!audioUrl) return { denoised: false, reason: 'no audio input to denoise' };
+    const { reduceNoise } = await import('./audioMixService.js');
+    const result = await reduceNoise(audioUrl);
+    if (result.denoisedUrl && result.denoisedUrl !== audioUrl) {
+      ctx.voiceUrl = result.denoisedUrl;
+    }
+    return { denoised: result.normalized, denoisedUrl: result.denoisedUrl, method: result.method };
+  },
+
+  // 音频合成 — voice+BGM混音，ffmpeg可用时真混合，否则返回分层描述
+  audio_mix: async (ctx) => {
+    const voiceUrl = ctx.voiceUrl || null;
+    if (!voiceUrl) return { mixedUrl: null, skipped: true, reason: 'no voice to mix' };
+    const { mixAudio } = await import('./audioMixService.js');
+    const bgmInfo = ctx._bgmInfo || null;
+    const result = await mixAudio(voiceUrl, bgmInfo);
+    if (result.mixedUrl && result.method !== 'pass_through') {
+      ctx.voiceUrl = result.mixedUrl;
+    }
+    return { mixedUrl: result.mixedUrl, method: result.method, layers: result.layers || null, instructions: result.instructions || '' };
+  },
 
   // ── 打包 ──
   pack_export: async (ctx) => {
