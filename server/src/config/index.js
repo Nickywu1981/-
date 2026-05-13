@@ -130,6 +130,7 @@ const config = {
     aiConcurrencyMax: parseInt(process.env.RATE_LIMIT_AI_CONCURRENCY_MAX, 10) || 3,
     verifyMax: parseInt(process.env.RATE_LIMIT_VERIFY_MAX, 10) || 5,
     e2bMax: parseInt(process.env.RATE_LIMIT_E2B_MAX, 10) || 5,
+    e2bExecuteMax: parseInt(process.env.RATE_LIMIT_E2B_EXECUTE_MAX, 10) || 10,
   },
 
   jwtRefreshSecret: (() => {

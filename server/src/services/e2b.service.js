@@ -1,6 +1,7 @@
 /**
- * Movio AI v4.1 — E2B Cloud Sandbox Service
+ * Movio AI v4.2 — E2B Cloud Sandbox Service
  * 云端代码执行沙箱：创建/执行/销毁/配额管理
+ * v4.2: 归属校验 + 危险代码检测 + stderr脱敏 + Redis防孤儿化
  */
 import { Sandbox } from 'e2b';
 import { BusinessError } from '../utils/businessError.js';
@@ -9,7 +10,7 @@ import { e2bConfig as config, isProduction } from '../config/index.js';
 import { getRedis } from '../dao/redis.js';
 import logger from '../utils/logger.js';
 
-const SANDBOX_STORE = new Map();       // sandboxId → { sandbox, userId, createdAt, refCount }
+const SANDBOX_STORE = new Map();       // sandboxId → { sandbox, userId, createdAt }
 const IDLE_CLEANUP_MS = 10 * 60 * 1000; // 10 分钟空闲清理
 const MAX_IDLE_MS = 30 * 60 * 1000;     // 30 分钟强制过期
 
@@ -17,6 +18,7 @@ function _cleanupEntry(sandboxId, reason = 'idle') {
   const entry = SANDBOX_STORE.get(sandboxId);
   if (!entry) return;
   SANDBOX_STORE.delete(sandboxId);
+  _removeSandboxMeta(sandboxId);
   entry.sandbox.kill().catch(err => {
     logger.warn('[E2B] 沙箱清理失败', { sandboxId, error: err.message });
   });
@@ -109,33 +111,81 @@ export async function _startupOrphanCheck() {
   } catch { /* Redis 不可用则跳过 */ }
 }
 
-// ─────────────────── 核心 API ───────────────────
+// ─────────────────── P0 #1 归属校验 ───────────────────
+function _checkOwnership(entry, userId) {
+  if (!userId) throw new BusinessError(ERROR_CODE.UNAUTHORIZED, '请先登录');
+  if (entry.userId !== String(userId)) {
+    throw new BusinessError(ERROR_CODE.FORBIDDEN, '无权操作此沙箱');
+  }
+}
+
+// ─────────────────── P1 #4 stderr 脱敏 ───────────────────
+const MAX_STDERR_LENGTH = 2000;
+
+function _sanitizeStderr(stderr) {
+  let sanitized = (stderr || '').slice(0, MAX_STDERR_LENGTH);
+  if (isProduction) {
+    sanitized = sanitized
+      .replace(/\/[^\s:]+/g, '[path]')
+      .replace(/\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/g, '[ip]');
+  }
+  return sanitized;
+}
+
+// ═══════════════════ 核心 API ═══════════════════
+
+export async function createSandbox(userId) {
   const uid = String(userId);
   if (_countUserSandboxes(uid) >= config.maxSandboxesPerUser) {
     throw new BusinessError(ERROR_CODE.QUOTA_EXCEEDED, `沙箱数量已达上限 (${config.maxSandboxesPerUser})`);
   }
 
   const apiKey = _getApiKey();
-  const sandbox = await Sandbox.create({
-    apiKey,
-    template: config.template,
-    timeoutMs: config.defaultTimeoutMs,
-  });
+  let sandbox;
+  try {
+    sandbox = await Sandbox.create({
+      apiKey,
+      template: config.template,
+      timeoutMs: config.defaultTimeoutMs,
+    });
+  } catch (err) {
+    logger.error('[E2B] 沙箱创建失败', { userId: uid, template: config.template, error: err.message });
+    throw err;
+  }
 
   SANDBOX_STORE.set(sandbox.sandboxId, {
     sandbox,
     userId: uid,
     createdAt: Date.now(),
-    refCount: 1,
   });
+
+  _persistSandboxMeta(sandbox.sandboxId, uid);
 
   logger.info('[E2B] 沙箱已创建', { sandboxId: sandbox.sandboxId, userId: uid });
   return { sandboxId: sandbox.sandboxId };
 }
 
-export async function executeCode(sandboxId, code, language, timeoutMs) {
+export async function executeCode(sandboxId, userId, code, language, timeoutMs) {
+  // P0: 归属校验
   const entry = SANDBOX_STORE.get(sandboxId);
   if (!entry) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND, '沙箱不存在或已过期');
+  _checkOwnership(entry, userId);
+
+  // P1 #2: 危险代码检测
+  _auditCode(code);
+
+  // P2 #10: 崩溃沙箱检测
+  let running;
+  try {
+    running = await entry.sandbox.isRunning();
+  } catch {
+    _cleanupEntry(sandboxId, 'crashed');
+    throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND, '沙箱已崩溃，请重新创建');
+  }
+  if (!running) {
+    _cleanupEntry(sandboxId, 'stopped');
+    throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND, '沙箱已停止，请重新创建');
+  }
 
   const lang = (language || 'python').toLowerCase();
   const extMap = { python: 'py', javascript: 'js', typescript: 'ts', bash: 'sh', r: 'r', ruby: 'rb' };
@@ -154,31 +204,42 @@ export async function executeCode(sandboxId, code, language, timeoutMs) {
   const fullCmd = `${cmd}${runCmd}`;
 
   const t0 = Date.now();
-  const result = await entry.sandbox.commands.run(fullCmd, {
-    timeoutMs: timeoutMs || config.defaultTimeoutMs,
-  });
+  let result;
+  try {
+    result = await entry.sandbox.commands.run(fullCmd, {
+      timeoutMs: timeoutMs || config.defaultTimeoutMs,
+    });
+  } catch (err) {
+    logger.error('[E2B] 代码执行失败', { sandboxId, userId: String(userId), language: lang, codeLength: code.length, error: err.message });
+    throw err;
+  }
 
   const elapsed = Date.now() - t0;
-  logger.info('[E2B] 代码执行完成', { sandboxId, language: lang, elapsedMs: elapsed, exitCode: result.exitCode });
+  logger.info('[E2B] 代码执行完成', { sandboxId, userId: String(userId), language: lang, elapsedMs: elapsed, exitCode: result.exitCode });
 
   return {
-    stdout: result.stdout || '',
-    stderr: result.stderr || '',
+    stdout: (result.stdout || '').slice(0, 100000),
+    stderr: _sanitizeStderr(result.stderr),
     exitCode: result.exitCode,
     elapsedMs: elapsed,
     sandboxId,
   };
 }
 
-export async function getSandbox(sandboxId) {
+export async function getSandbox(sandboxId, userId) {
   const entry = SANDBOX_STORE.get(sandboxId);
   if (!entry) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND, '沙箱不存在或已过期');
-  const running = await entry.sandbox.isRunning();
+  _checkOwnership(entry, userId);
+  let running;
+  try {
+    running = await entry.sandbox.isRunning();
+  } catch {
+    running = false;
+  }
   return {
     sandboxId,
     running,
     createdAt: new Date(entry.createdAt).toISOString(),
-    refCount: entry.refCount,
   };
 }
 
@@ -197,14 +258,10 @@ export async function listUserSandboxes(userId) {
   return list;
 }
 
-export async function destroySandbox(sandboxId) {
+export async function destroySandbox(sandboxId, userId) {
   const entry = SANDBOX_STORE.get(sandboxId);
   if (!entry) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND, '沙箱不存在或已过期');
+  _checkOwnership(entry, userId);
   _cleanupEntry(sandboxId, 'user_request');
   return { sandboxId };
-}
-
-export function getSandboxOwner(sandboxId) {
-  const entry = SANDBOX_STORE.get(sandboxId);
-  return entry ? entry.userId : null;
 }

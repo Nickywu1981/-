@@ -1,12 +1,12 @@
 /**
- * Movio AI v4.1 — E2B Sandbox Routes
+ * Movio AI v4.2 — E2B Sandbox Routes
  * POST /api/e2b/sandbox | /sandbox/:id/execute | DELETE /sandbox/:id
  */
 import { Router } from 'express';
 import { z } from 'zod';
 import { validate } from '../utils/validate.js';
 import * as ctrl from '../controller/e2bController.js';
-import { e2bLimiter } from '../middleware/rateLimiter.js';
+import { e2bLimiter, e2bExecuteLimiter } from '../middleware/rateLimiter.js';
 
 const router = Router();
 
@@ -20,7 +20,7 @@ const sandboxIdSchema = z.object({
 });
 
 router.post('/sandbox', e2bLimiter, ctrl.createSandbox);
-router.post('/sandbox/:sandboxId/execute', validate(codeSchema), validate(sandboxIdSchema, 'params'), ctrl.executeCode);
+router.post('/sandbox/:sandboxId/execute', e2bExecuteLimiter, validate(codeSchema), validate(sandboxIdSchema, 'params'), ctrl.executeCode);
 router.get('/sandbox/:sandboxId', validate(sandboxIdSchema, 'params'), ctrl.getSandbox);
 router.get('/sandboxes', ctrl.listSandboxes);
 router.delete('/sandbox/:sandboxId', validate(sandboxIdSchema, 'params'), ctrl.destroySandbox);

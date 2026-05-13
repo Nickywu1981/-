@@ -21,6 +21,7 @@ const UPLOAD_MAX = rateLimitConfig.uploadMax;
 const PAYMENT_MAX = rateLimitConfig.paymentMax;
 const ADMIN_MAX = rateLimitConfig.adminMax;
 const E2B_MAX = rateLimitConfig.e2bMax;
+const E2B_EXECUTE_MAX = rateLimitConfig.e2bExecuteMax;
 
 // ==================== 并发控制 ====================
 
@@ -177,6 +178,17 @@ export const e2bLimiter = rateLimit({
   validate: { xForwardedForHeader: false },
   store: new RedisRateLimitStore(60000),
   message: { code: 429, msg: '沙箱创建请求过于频繁，请稍后再试', data: null },
+});
+
+/** E2B 代码执行限流 — 防止单沙箱高频调用耗尽配额 */
+export const e2bExecuteLimiter = rateLimit({
+  windowMs: 60000,
+  max: E2B_EXECUTE_MAX,
+  standardHeaders: true,
+  legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
+  store: new RedisRateLimitStore(60000),
+  message: { code: 429, msg: '代码执行过于频繁，请稍后再试', data: null },
 });
 
 /** 通用限流器 —— 用于读密集型路由的通用保护 */
