@@ -168,25 +168,25 @@ export const rateLimiter = apiLimiter;
  * 同时检查 user / ip / app 三个维度的令牌桶
  * 返回 Header: X-RateLimit-Remaining, X-RateLimit-Reset
  */
-export function aiTokenBucketLimiter(req, res, next) {
+export async function aiTokenBucketLimiter(req, res, next) {
   const userId = req.user?.id || null;
   const ip = req.ip || req.connection?.remoteAddress?.replace(/^::ffff:/, '') || 'unknown';
   const appId = req.headers['x-app-key'] || null;
 
-  import('../services/redisRateLimiterService.js').then(({ multiCheck }) => {
-    multiCheck(userId, ip, appId).then(result => {
-      res.setHeader('X-RateLimit-Remaining', result.remaining);
+  try {
+    const { multiCheck } = await import('../services/redisRateLimiterService.js');
+    const result = await multiCheck(userId, ip, appId);
+    res.setHeader('X-RateLimit-Remaining', result.remaining);
 
-      if (!result.allowed) {
-        res.setHeader('X-RateLimit-Reset', Math.ceil(Date.now() / 1000) + 60);
-        return error(res, 429, result.blockedReasons.join('; ') || '请求过于频繁，请稍后再试');
-      }
+    if (!result.allowed) {
+      res.setHeader('X-RateLimit-Reset', Math.ceil(Date.now() / 1000) + 60);
+      return error(res, 429, result.blockedReasons.join('; ') || '请求过于频繁，请稍后再试');
+    }
 
-      next();
-    }).catch(err => {
-      // 限流服务异常时放行（避免阻塞正常流量）
-      logger.warn('[RateLimiter] TokenBucket check failed:', err.message);
-      next();
-    });
-  }).catch(() => next());
+    next();
+  } catch (err) {
+    // 限流服务异常时放行（避免阻塞正常流量）
+    logger.warn('[RateLimiter] TokenBucket check failed:', err.message);
+    next();
+  }
 }
