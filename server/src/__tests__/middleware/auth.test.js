@@ -23,7 +23,19 @@ vi.mock('../../utils/response.js', () => ({
   }),
 }));
 vi.mock('../../constants/errorCode.js', () => ({
-  ERROR_CODE: { UNAUTHORIZED: 401, EC_AUTH_002: 401, FORBIDDEN: 403 },
+  ERROR_CODE: {
+    UNAUTHORIZED: 401,
+    EC_AUTH_002: 4007,
+    EC_AUTH_003: 4010,
+    EC_AUTH_004: 4011,
+    EC_AUTH_005: 4012,
+    EC_AUTH_006: 4013,
+    EC_AUTH_007: 4014,
+    EC_AUTH_008: 4015,
+    EC_AUTH_009: 4016,
+    EC_AUTH_010: 4017,
+    FORBIDDEN: 403,
+  },
 }));
 vi.mock('../../utils/logger.js', () => ({
   default: { warn: vi.fn(), error: vi.fn(), info: vi.fn() },
@@ -41,15 +53,15 @@ describe('authMiddleware', () => {
     vi.clearAllMocks();
   });
 
-  it('无 header 返回 401', async () => {
+  it('无 header 返回 EC_AUTH_009', async () => {
     await authMiddleware(req, res, next);
-    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 401 }));
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 4016 }));
   });
 
-  it('非 Bearer header 返回 401', async () => {
+  it('非 Bearer header 返回 EC_AUTH_009', async () => {
     req.headers.authorization = 'Basic xxx';
     await authMiddleware(req, res, next);
-    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 401 }));
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 4016 }));
   });
 
   it('有效 token 设置 req.user', async () => {
@@ -61,11 +73,11 @@ describe('authMiddleware', () => {
     expect(next).toHaveBeenCalled();
   });
 
-  it('过期/无效 token 返回 401', async () => {
+  it('过期/无效 token 返回 EC_AUTH_009', async () => {
     req.headers.authorization = 'Bearer bad_token';
     jwt.verify.mockImplementation(() => { throw new Error('jwt expired'); });
     await authMiddleware(req, res, next);
-    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 401 }));
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 4016 }));
   });
 });
 

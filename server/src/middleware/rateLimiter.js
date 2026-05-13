@@ -8,6 +8,7 @@ import rateLimit from 'express-rate-limit';
 import { error } from '../utils/response.js';
 import { rateLimitConfig } from '../config/index.js';
 import logger from '../utils/logger.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 import { RedisRateLimitStore } from './redisRateLimitStore.js';
 
 const windowMs = rateLimitConfig.windowMs;
@@ -55,7 +56,7 @@ function concurrencyGuard(maxConcurrent = CONCURRENCY_MAX_PER_USER) {
     const key = getConcurrencyKey(req);
     const entry = userConcurrency.get(key) || { count: 0, ts: Date.now() };
     if (entry.count >= maxConcurrent) {
-      return error(res, 429, `并发请求过多 (${maxConcurrent}路)，请稍后再试`);
+      return error(res, ERROR_CODE.EC_RATE_CONCURRENCY);
     }
     entry.count++;
     entry.ts = Date.now();
@@ -89,7 +90,7 @@ export const apiLimiter = rateLimit({
   legacyHeaders: false,
   validate: { xForwardedForHeader: false },
   store: new RedisRateLimitStore(windowMs),
-  message: { code: 429, msg: '请求过于频繁，请稍后再试', data: null },
+  message: { code: ERROR_CODE.EC_RATE_GENERAL, msg: '', data: null },
 });
 
 /** 登录/注册严格限流 */
@@ -100,7 +101,7 @@ export const authLimiter = rateLimit({
   legacyHeaders: false,
   validate: { xForwardedForHeader: false },
   store: new RedisRateLimitStore(60000),
-  message: { code: 429, msg: '操作过于频繁，请1分钟后再试', data: null },
+  message: { code: ERROR_CODE.EC_RATE_AUTH, msg: '', data: null },
 });
 
 /** 发送验证码严格限流（防短信轰炸） */
@@ -111,7 +112,7 @@ export const codeLimiter = rateLimit({
   legacyHeaders: false,
   validate: { xForwardedForHeader: false },
   store: new RedisRateLimitStore(60000),
-  message: { code: 429, msg: '验证码已发送，请60秒后再试', data: null },
+  message: { code: ERROR_CODE.EC_RATE_CODE, msg: '', data: null },
 });
 
 const verifyMax = rateLimitConfig.verifyMax;
@@ -124,7 +125,7 @@ export const verifyLimiter = rateLimit({
   legacyHeaders: false,
   validate: { xForwardedForHeader: false },
   store: new RedisRateLimitStore(60000),
-  message: { code: 429, msg: '验证次数过多，请60秒后再试', data: null },
+  message: { code: ERROR_CODE.EC_RATE_VERIFY, msg: '', data: null },
 });
 
 /** AI 重度操作限流（图片/视频/批量生成消耗 GPU） */
@@ -135,7 +136,7 @@ export const heavyLimiter = rateLimit({
   legacyHeaders: false,
   validate: { xForwardedForHeader: false },
   store: new RedisRateLimitStore(60000),
-  message: { code: 429, msg: 'AI生成请求过于频繁，请稍后再试', data: null },
+  message: { code: ERROR_CODE.EC_RATE_HEAVY, msg: '', data: null },
 });
 
 /** 上传限流 */
@@ -146,7 +147,7 @@ export const uploadLimiter = rateLimit({
   legacyHeaders: false,
   validate: { xForwardedForHeader: false },
   store: new RedisRateLimitStore(60000),
-  message: { code: 429, msg: '上传请求过于频繁，请稍后再试', data: null },
+  message: { code: ERROR_CODE.EC_RATE_UPLOAD, msg: '', data: null },
 });
 
 /** 支付/充值限流（财务敏感） */
@@ -157,7 +158,7 @@ export const paymentLimiter = rateLimit({
   legacyHeaders: false,
   validate: { xForwardedForHeader: false },
   store: new RedisRateLimitStore(60000),
-  message: { code: 429, msg: '支付请求过于频繁，请稍后再试', data: null },
+  message: { code: ERROR_CODE.EC_RATE_PAYMENT, msg: '', data: null },
 });
 
 /** 管理后台限流 */
@@ -168,7 +169,7 @@ export const adminLimiter = rateLimit({
   legacyHeaders: false,
   validate: { xForwardedForHeader: false },
   store: new RedisRateLimitStore(60000),
-  message: { code: 429, msg: '管理操作过于频繁，请稍后再试', data: null },
+  message: { code: ERROR_CODE.EC_RATE_ADMIN, msg: '', data: null },
 });
 
 /** E2B 沙箱限流 — 云执行环境创建属于昂贵操作 */
@@ -179,7 +180,7 @@ export const e2bLimiter = rateLimit({
   legacyHeaders: false,
   validate: { xForwardedForHeader: false },
   store: new RedisRateLimitStore(60000),
-  message: { code: 429, msg: '沙箱创建请求过于频繁，请稍后再试', data: null },
+  message: { code: ERROR_CODE.EC_RATE_E2B, msg: '', data: null },
 });
 
 /** E2B 代码执行限流 — 防止单沙箱高频调用耗尽配额 */
@@ -190,7 +191,7 @@ export const e2bExecuteLimiter = rateLimit({
   legacyHeaders: false,
   validate: { xForwardedForHeader: false },
   store: new RedisRateLimitStore(60000),
-  message: { code: 429, msg: '代码执行过于频繁，请稍后再试', data: null },
+  message: { code: ERROR_CODE.EC_RATE_E2B_EXEC, msg: '', data: null },
 });
 
 /** E2B 沙箱读取限流 — 查询沙箱状态/列表 */
@@ -201,7 +202,7 @@ export const e2bListLimiter = rateLimit({
   legacyHeaders: false,
   validate: { xForwardedForHeader: false },
   store: new RedisRateLimitStore(60000),
-  message: { code: 429, msg: '请求过于频繁，请稍后再试', data: null },
+  message: { code: ERROR_CODE.EC_RATE_E2B_READ, msg: '', data: null },
 });
 
 /** E2B 沙箱删除限流 — 销毁操作 */
@@ -212,7 +213,7 @@ export const e2bDestroyLimiter = rateLimit({
   legacyHeaders: false,
   validate: { xForwardedForHeader: false },
   store: new RedisRateLimitStore(60000),
-  message: { code: 429, msg: '删除操作过于频繁，请稍后再试', data: null },
+  message: { code: ERROR_CODE.EC_RATE_E2B_DELETE, msg: '', data: null },
 });
 
 /** 通用限流器 —— 用于读密集型路由的通用保护 */
@@ -237,7 +238,7 @@ export async function aiTokenBucketLimiter(req, res, next) {
 
     if (!result.allowed) {
       res.setHeader('X-RateLimit-Reset', Math.ceil(Date.now() / 1000) + 60);
-      return error(res, 429, result.blockedReasons.join('; ') || '请求过于频繁，请稍后再试');
+      return error(res, ERROR_CODE.EC_RATE_HEAVY, '', { reasons: result.blockedReasons });
     }
 
     next();

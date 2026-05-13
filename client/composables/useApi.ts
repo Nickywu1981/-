@@ -1,6 +1,83 @@
 import type { Ref } from 'vue'
 import { REDIRECT_UNLOCK_MS } from '~/constants/ui'
 
+// ==================== 错误码 → i18n key 映射表 ====================
+// 与 server/src/constants/errorCode.js FRONTEND_I18N_KEY 保持同步
+const ERROR_I18N_MAP: Record<number, string> = {
+  400: 'bad_request',
+  401: 'unauthorized',
+  402: 'payment_required',
+  403: 'forbidden',
+  404: 'not_found',
+  500: 'internal_error',
+  // 用户
+  4001: 'user_exists',
+  4002: 'user_not_found',
+  4003: 'password_wrong',
+  4004: 'token_expired',
+  4005: 'token_invalid',
+  4006: 'account_disabled',
+  4007: 'token_expired',       // EC_AUTH_002
+  4008: 'refresh_token_expired',
+  4009: 'refresh_token_invalid',
+  // 权限细分
+  4010: 'admin_required',      // EC_AUTH_003
+  4011: 'editor_required',     // EC_AUTH_004
+  4012: 'super_admin_required', // EC_AUTH_005
+  4013: 'enterprise_only',     // EC_AUTH_006
+  4014: 'consumer_only',       // EC_AUTH_007
+  4015: 'agent_only',          // EC_AUTH_008
+  4016: 'no_token',            // EC_AUTH_009
+  4017: 'token_revoked',       // EC_AUTH_010
+  // CSRF
+  4020: 'csrf_missing',        // EC_CSRF_001
+  4021: 'csrf_mismatch',       // EC_CSRF_002
+  // 限流
+  4030: 'concurrency',         // EC_RATE_CONCURRENCY
+  4031: 'general',             // EC_RATE_GENERAL
+  4032: 'auth',                // EC_RATE_AUTH
+  4033: 'code',                // EC_RATE_CODE
+  4034: 'verify',              // EC_RATE_VERIFY
+  4035: 'heavy',               // EC_RATE_HEAVY
+  4036: 'upload',              // EC_RATE_UPLOAD
+  4037: 'payment',             // EC_RATE_PAYMENT
+  4038: 'admin',               // EC_RATE_ADMIN
+  4039: 'e2b',                 // EC_RATE_E2B
+  4040: 'e2b_exec',            // EC_RATE_E2B_EXEC
+  4041: 'e2b_read',            // EC_RATE_E2B_READ
+  4042: 'e2b_delete',          // EC_RATE_E2B_DELETE
+  // 资源
+  4101: 'not_found',           // RESOURCE_NOT_FOUND
+  4102: 'resource_duplicate',
+  4103: 'quota_exceeded',
+  // 参数
+  4201: 'param_missing',
+  4202: 'param_invalid',
+  4203: 'param_error',
+  // 支付
+  4301: 'order_not_found',
+  4302: 'order_expired',
+  4303: 'sign_failed',
+  4304: 'channel_error',
+  4305: 'amount_mismatch',
+  4306: 'callback_failed',
+};
+
+/** 将错误码翻译为当前 locale 的 i18n 消息，失败时回退到 server msg */
+function translateErrorCode(code: number, serverMsg: string): string {
+  try {
+    const nuxtApp = useNuxtApp();
+    const i18nKey = ERROR_I18N_MAP[code];
+    if (i18nKey && nuxtApp.$i18n) {
+      const translated = nuxtApp.$i18n.t(`common.error_codes.${i18nKey}`);
+      if (translated && translated !== `common.error_codes.${i18nKey}`) {
+        return translated;
+      }
+    }
+  } catch {}
+  return serverMsg || 'Request failed';
+}
+
 interface ApiResponse<T = any> {
   code: number;
   msg: string;
@@ -89,7 +166,7 @@ async function request<T = any>(
   retries = 0,
 ): Promise<T> {
   if (getIsOffline().value) {
-    throw new ApiError('网络已断开，请检查网络连接', 0, 0);
+    throw new ApiError('Network disconnected', 0, 0);
   }
 
   const config = useRuntimeConfig();
@@ -145,7 +222,7 @@ async function request<T = any>(
     });
 
     if (res.code !== 200) {
-      throw new ApiError(res.msg || '请求失败', res.code, 200, res.data);
+      throw new ApiError(translateErrorCode(res.code, res.msg || ''), res.code, 200, res.data);
     }
     return res.data as T;
   } catch (err: unknown) {
@@ -153,7 +230,7 @@ async function request<T = any>(
     // 超时不重试
     if (e.name === 'TimeoutError' || e.name === 'AbortError') {
       if (options.signal?.aborted) throw e; // 外部取消，透传
-      throw new ApiError('请求超时，请稍后重试', 408, 408);
+      throw new ApiError('Request timeout', 408, 408);
     }
 
     // 5xx 指数退避重试
@@ -168,7 +245,7 @@ async function request<T = any>(
     if (e instanceof ApiError) throw e;
 
     throw new ApiError(
-      e?.message || '网络请求失败',
+      e?.message || 'Network request failed',
       e?.response?.status || 500,
       e?.response?.status || 500,
     );

@@ -85,11 +85,11 @@ export function csrfProtection(req, res, next) {
   const headerToken = req.headers['x-csrf-token'];
 
   if (!cookieToken || !headerToken) {
-    return sendError(res, ERROR_CODE.FORBIDDEN, 'CSRF Token 缺失');
+    return sendError(res, ERROR_CODE.EC_CSRF_001);
   }
 
   if (cookieToken !== headerToken) {
-    return sendError(res, ERROR_CODE.FORBIDDEN, 'CSRF Token 验证失败');
+    return sendError(res, ERROR_CODE.EC_CSRF_002);
   }
 
   // 校验通过，续期

@@ -171,9 +171,9 @@ export async function authMiddleware(req, res, next) {
 
   if (!payload) {
     if (expired) {
-      return sendError(res, ERROR_CODE.EC_AUTH_002, '认证已过期，请重新登录');
+      return sendError(res, ERROR_CODE.EC_AUTH_002);
     }
-    return sendError(res, ERROR_CODE.UNAUTHORIZED, '未提供有效认证令牌');
+    return sendError(res, ERROR_CODE.EC_AUTH_009);
   }
 
   req.user = {
@@ -226,7 +226,7 @@ import { hasRole, ROLES } from './rbac.js';
 
 export function adminAuth(req, res, next) {
   if (!req.user || !hasRole(req.user, 'admin')) {
-    return sendError(res, ERROR_CODE.FORBIDDEN, '需要管理员权限');
+    return sendError(res, ERROR_CODE.EC_AUTH_003);
   }
   next();
 }
@@ -234,7 +234,7 @@ export function adminAuth(req, res, next) {
 /** 编辑及以上权限（审核模板、管理素材等） */
 export function editorAuth(req, res, next) {
   if (!req.user || !hasRole(req.user, 'editor')) {
-    return sendError(res, ERROR_CODE.FORBIDDEN, '需要编辑及以上权限');
+    return sendError(res, ERROR_CODE.EC_AUTH_004);
   }
   next();
 }
@@ -242,7 +242,7 @@ export function editorAuth(req, res, next) {
 /** 超级管理员认证 */
 export function superAdminAuth(req, res, next) {
   if (!hasRole(req.user, 'super_admin')) {
-    return sendError(res, ERROR_CODE.FORBIDDEN, '需要超级管理员权限');
+    return sendError(res, ERROR_CODE.EC_AUTH_005);
   }
   next();
 }
@@ -252,7 +252,7 @@ export function superAdminAuth(req, res, next) {
 /** 要求 enterprise 端用户 */
 export function enterpriseOnly(req, res, next) {
   if (!req.user || req.user.audience !== 'enterprise') {
-    return sendError(res, ERROR_CODE.FORBIDDEN, '仅限企业端用户访问');
+    return sendError(res, ERROR_CODE.EC_AUTH_006);
   }
   next();
 }
@@ -260,7 +260,7 @@ export function enterpriseOnly(req, res, next) {
 /** 要求 consumer 端用户 */
 export function consumerOnly(req, res, next) {
   if (!req.user || req.user.audience !== 'consumer') {
-    return sendError(res, ERROR_CODE.FORBIDDEN, '仅限C端用户访问');
+    return sendError(res, ERROR_CODE.EC_AUTH_007);
   }
   next();
 }
@@ -269,7 +269,7 @@ export function consumerOnly(req, res, next) {
 export function requireAgent(req, res, next) {
   const entRole = req.user?.entRole;
   if (!entRole || !['agent_admin', 'agent_operator', 'agent_viewer'].includes(entRole)) {
-    return sendError(res, ERROR_CODE.FORBIDDEN, '仅代理端可用此功能');
+    return sendError(res, ERROR_CODE.EC_AUTH_008);
   }
   next();
 }
@@ -290,25 +290,25 @@ export async function refreshTokenMiddleware(req, res, next) {
   const token = req.cookies?.refreshToken;
 
   if (!token) {
-    return sendError(res, ERROR_CODE.EC_AUTH_002, '认证已过期，请重新登录');
+    return sendError(res, ERROR_CODE.EC_AUTH_002);
   }
 
   let payload;
   try {
     if (await isTokenBlacklisted(token)) {
-      return sendError(res, ERROR_CODE.EC_AUTH_002, '认证已失效，请重新登录');
+      return sendError(res, ERROR_CODE.EC_AUTH_010);
     }
     payload = jwt.verify(token, refreshSecret);
   } catch (err) {
     if (err.name === 'TokenExpiredError') {
-      return sendError(res, ERROR_CODE.EC_AUTH_002, '认证已过期，请重新登录');
+      return sendError(res, ERROR_CODE.EC_AUTH_002);
     }
-    return sendError(res, ERROR_CODE.EC_AUTH_002, '认证已过期，请重新登录');
+    return sendError(res, ERROR_CODE.EC_AUTH_002);
   }
 
   // 确保是 refresh 类型令牌，防止 access token 误用
   if (payload.type !== 'refresh') {
-    return sendError(res, ERROR_CODE.EC_AUTH_002, '认证已过期，请重新登录');
+    return sendError(res, ERROR_CODE.EC_AUTH_002);
   }
 
   // 生成新的短期 access token — 保留企业与代理端字段
