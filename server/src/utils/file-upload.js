@@ -88,6 +88,22 @@ const UPLOAD_DIR = path.join(__dirname, '../../uploads');
 const CHUNK_DIR = path.join(UPLOAD_DIR, '.chunks');
 const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
 
+// 分片写入互斥锁 — 防止并发 receiveChunk 导致分片记录丢失
+const _chunkLocks = new Map();
+
+async function withChunkLock(uploadId, fn) {
+  while (_chunkLocks.has(uploadId)) {
+    await _chunkLocks.get(uploadId);
+  }
+  const p = fn();
+  _chunkLocks.set(uploadId, p.catch(() => {}).then(() => _chunkLocks.delete(uploadId)));
+  try {
+    return await p;
+  } finally {
+    _chunkLocks.delete(uploadId);
+  }
+}
+
 // MIME 类型 → 安全扩展名（不信任用户提供的 originalname）
 const MIME_TO_SAFE_EXT = {
   'image/jpeg': '.jpg',
@@ -141,20 +157,23 @@ export async function receiveChunk(uploadId, chunkIndex, chunkBuffer) {
   const metaPath = path.join(CHUNK_DIR, `${uploadId}.json`);
   try { await fsp.access(metaPath); } catch { throw new BusinessError(404, '上传会话不存在或已过期'); }
 
-  const metaRaw = await fsp.readFile(metaPath, 'utf8');
-  let meta;
-  try { meta = JSON.parse(metaRaw); } catch { throw new BusinessError(400, '上传元数据损坏'); }
   const chunkDir = path.join(CHUNK_DIR, uploadId);
   try { await fsp.access(chunkDir); } catch { await fsp.mkdir(chunkDir, { recursive: true }); }
 
   const chunkPath = path.join(chunkDir, `${chunkIndex}`);
   await fsp.writeFile(chunkPath, chunkBuffer);
 
-  // 记录已接收分片
-  if (!meta.receivedChunks.includes(chunkIndex)) {
-    meta.receivedChunks.push(chunkIndex);
-    await fsp.writeFile(metaPath, JSON.stringify(meta));
-  }
+  // 加锁更新元数据 — 防止并发写入导致分片记录丢失
+  const meta = await withChunkLock(uploadId, async () => {
+    const raw = await fsp.readFile(metaPath, 'utf8');
+    let m;
+    try { m = JSON.parse(raw); } catch { throw new BusinessError(400, '上传元数据损坏'); }
+    if (!m.receivedChunks.includes(chunkIndex)) {
+      m.receivedChunks.push(chunkIndex);
+      await fsp.writeFile(metaPath, JSON.stringify(m));
+    }
+    return m;
+  });
 
   return { upload_id: uploadId, chunk_index: chunkIndex, received: meta.receivedChunks.length, total: meta.totalChunks };
 }

@@ -77,18 +77,16 @@ export async function exportMultiSize(params) {
 
   if (!allSizes.length) throw new BusinessError(400, '至少需要一种输出尺寸');
 
-  // 批量缩放 + 保存
+  // 批量缩放 + 保存（并行处理）
   const sharp = (await import('sharp')).default;
-  const results = {};
 
-  for (const size of allSizes) {
+  const sizeTasks = allSizes.map(async (size) => {
     try {
       const resizeOpts = size.height
         ? { width: size.width, height: size.height, fit: 'cover' }
         : { width: size.width, fit: 'inside', withoutEnlargement: true };
 
       let pipeline = sharp(sourceBuffer).resize(resizeOpts);
-
       if (format === 'jpeg') pipeline = pipeline.jpeg({ quality });
       else if (format === 'webp') pipeline = pipeline.webp({ quality });
       else pipeline = pipeline.png();
@@ -103,17 +101,20 @@ export async function exportMultiSize(params) {
       };
       const saved = await saveSimpleFile(fakeFile);
 
-      results[size.key] = {
-        ...saved,
-        label: size.label,
-        platform: size.platform,
-        width: size.width,
-        height: size.height,
+      return {
+        key: size.key,
+        result: { ...saved, label: size.label, platform: size.platform, width: size.width, height: size.height },
       };
     } catch (e) {
       logger.warn(`[MultiSize] 尺寸 ${size.key} 导出失败: ${e.message}`);
-      results[size.key] = { error: e.message, label: size.label };
+      return { key: size.key, result: { error: e.message, label: size.label } };
     }
+  });
+
+  const sizeResults = await Promise.all(sizeTasks);
+  const results = {};
+  for (const { key, result } of sizeResults) {
+    results[key] = result;
   }
 
   return {
@@ -129,17 +130,17 @@ export async function exportMultiSize(params) {
 export async function batchExportMultiSize(imageUrls, sizeKeys) {
   if (!imageUrls?.length) throw new BusinessError(400, '至少需要一张图片');
 
-  const all = [];
-  for (const url of imageUrls) {
+  const tasks = imageUrls.map(async (url) => {
     try {
       const r = await exportMultiSize({ imageUrl: url, sizes: sizeKeys });
-      all.push({ imageUrl: url, ...r });
+      return { imageUrl: url, ...r };
     } catch (e) {
-      all.push({ imageUrl: url, error: e.message });
+      return { imageUrl: url, error: e.message };
     }
-  }
+  });
 
-  return { total: imageUrls.length, results: all };
+  const results = await Promise.all(tasks);
+  return { total: imageUrls.length, results };
 }
 
 export default { exportMultiSize, batchExportMultiSize, PLATFORM_SIZES };

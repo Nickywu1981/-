@@ -4,6 +4,7 @@ import proxyDao from '../dao/proxyDao.js';
 import { encrypt, decrypt } from '../utils/crypto.js';
 import logger from '../utils/logger.js';
 import { URL } from 'url';
+import dns from 'dns/promises';
 
 // ==================== SSRF 防护 ====================
 
@@ -110,6 +111,17 @@ export async function callProxy(code, tenantId, { method, body, userId, clientIp
   }
   if (isBlockedHost(upstreamHost)) {
     throw new BusinessError(403, '不允许代理到内网地址');
+  }
+
+  // 4b. SSRF 深度防护：DNS 解析后再次校验 IP（防 DNS Rebinding）
+  try {
+    const addresses = await dns.resolve4(upstreamHost);
+    if (addresses.some((ip) => isBlockedHost(ip))) {
+      throw new BusinessError(403, '不允许代理到内网地址');
+    }
+  } catch (e) {
+    if (e instanceof BusinessError) throw e;
+    // DNS 解析失败不阻止请求，让 fetch 层处理连接错误
   }
 
   // 5. 请求体大小校验

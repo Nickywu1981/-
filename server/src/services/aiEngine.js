@@ -154,7 +154,7 @@ export async function infer(modelId, input, options = {}) {
         return { ...semanticCached, fromCache: true, fromSemanticCache: true };
       }
       recordMiss();
-    } catch { /* semantic cache unavailable */ }
+    } catch (err) { logger.warn('[AI] 语义缓存读取失败', { modelId, err: err.message }); }
   }
 
   const startTime = Date.now();
@@ -215,8 +215,12 @@ export async function infer(modelId, input, options = {}) {
         // 语义缓存存储（文本类模型）
         if (typeof input === 'string') {
           import('./semanticCacheService.js').then(({ setSemantic }) => {
-            setSemantic(modelId, input, output).catch(() => {});
-          }).catch(() => {});
+            setSemantic(modelId, input, output).catch((err) => {
+              logger.warn('[AI] 语义缓存写入失败', { modelId, err: err.message });
+            });
+          }).catch((err) => {
+            logger.warn('[AI] 语义缓存服务加载失败', { modelId, err: err.message });
+          });
         }
       }
 

@@ -3,6 +3,15 @@ import * as campaignService from '../services/campaignService.js';
 import { success, listResult } from '../utils/response.js';
 import { parsePagination } from '../utils/pagination.js';
 
+const OVERRIDE_FIELDS = ['id', 'tenant_id', 'is_admin', 'role', 'created_at', 'updated_at', 'createdAt', 'updatedAt'];
+function safeBody(body) {
+  const s = {};
+  for (const [k, v] of Object.entries(body)) {
+    if (!OVERRIDE_FIELDS.includes(k)) s[k] = v;
+  }
+  return s;
+}
+
 // ==================== Campaign ====================
 export const listCampaigns = wrapController(async (req) => {
   const { page, pageSize } = parsePagination(req.query, { maxPageSize: 100 });
@@ -15,12 +24,12 @@ export const getCampaign = wrapController(async (req) => {
 });
 
 export const createCampaign = wrapController(async (req) => {
-  const data = { ...req.body, tenant_id: req.user.entId || req.user.tenantId };
+  const data = { ...safeBody(req.body), tenant_id: req.user.entId || req.user.tenantId };
   return success(req.res, await campaignService.createCampaign(data), '活动创建成功');
 });
 
 export const updateCampaign = wrapController(async (req) => {
-  return success(req.res, await campaignService.updateCampaign(Number(req.params.id), req.body), '更新成功');
+  return success(req.res, await campaignService.updateCampaign(Number(req.params.id), safeBody(req.body)), '更新成功');
 });
 
 export const deleteCampaign = wrapController(async (req) => {
@@ -40,11 +49,11 @@ export const getCoupon = wrapController(async (req) => {
 });
 
 export const createCoupon = wrapController(async (req) => {
-  return success(req.res, await campaignService.createCoupon(req.body), '优惠券创建成功');
+  return success(req.res, await campaignService.createCoupon(safeBody(req.body)), '优惠券创建成功');
 });
 
 export const updateCoupon = wrapController(async (req) => {
-  return success(req.res, await campaignService.updateCoupon(Number(req.params.id), req.body), '更新成功');
+  return success(req.res, await campaignService.updateCoupon(Number(req.params.id), safeBody(req.body)), '更新成功');
 });
 
 export const deleteCoupon = wrapController(async (req) => {
@@ -70,12 +79,12 @@ export const getAnnouncement = wrapController(async (req) => {
 });
 
 export const createAnnouncement = wrapController(async (req) => {
-  const data = { ...req.body, create_by: req.user?.id };
+  const data = { ...safeBody(req.body), create_by: req.user?.id };
   return success(req.res, await campaignService.createAnnouncement(data), '公告创建成功');
 });
 
 export const updateAnnouncement = wrapController(async (req) => {
-  return success(req.res, await campaignService.updateAnnouncement(Number(req.params.id), req.body), '更新成功');
+  return success(req.res, await campaignService.updateAnnouncement(Number(req.params.id), safeBody(req.body)), '更新成功');
 });
 
 export const deleteAnnouncement = wrapController(async (req) => {
