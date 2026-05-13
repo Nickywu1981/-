@@ -6,8 +6,8 @@
 <template>
   <div class="work-page">
     <header class="work-header">
-      <h1>{{ headerCfg.title || 'AI 动作迁移' }}</h1>
-      <p>{{ headerCfg.subtitle || '将动作视频的舞蹈/姿态迁移到您的产品模特上 — 全球独家' }}</p>
+      <h1>{{ headerCfg.title || $t('work_pages.action_transfer.title') }}</h1>
+      <p>{{ headerCfg.subtitle || $t('work_pages.action_transfer.subtitle') }}</p>
     </header>
 
     <div class="work-tabs">
@@ -20,12 +20,12 @@
     <div v-if="activeTab === 'single'" class="work-panel">
       <div class="two-col-upload">
         <div class="upload-col">
-          <label>动作参考视频</label>
+          <label>{{ $t('work_pages.action_transfer.source_video') }}<label>
           <AppMediaUpload accept="video" :multiple="false" :max-size="200" :max-count="1" @uploaded="onSourceVideoUploaded" />
           <p v-if="sourceVideoUrl" class="hint ok">✓ 已选择</p>
         </div>
         <div class="upload-col">
-          <label>目标人物图片 (您的模特/产品图)</label>
+          <label>{{ $t('work_pages.action_transfer.target_image') }}<label>
           <AppMediaUpload accept="image" :multiple="false" :max-size="20" :max-count="1" @uploaded="onTargetImageUploaded" />
           <p v-if="targetImageUrl" class="hint ok">✓ 已选择</p>
         </div>
@@ -33,7 +33,7 @@
 
       <div class="options-row" style="margin-top:20px">
         <div class="option">
-          <label>动作风格</label>
+          <label>{{ $t('work_pages.action_transfer.action_style') }}<label>
           <select v-model="actionStyle" class="input">
             <option value="">自动识别</option>
             <option value="dance">热舞带货</option>
@@ -49,12 +49,12 @@
         <div class="enhanced-header">
           <label class="toggle-label">
             <input type="checkbox" v-model="replaceBackground" />
-            <span>{{ $t('action.background_replace') || '背景替换' }}</span>
+            <span>{{ $t('action.background_replace') || $t('work_pages.action_transfer.bg_replace') }}</span>
           </label>
         </div>
         <div v-if="replaceBackground" class="enhanced-body">
-          <label>{{ $t('action.background_url') || '背景图片URL（可选）' }}</label>
-          <input v-model="backgroundUrl" class="input" :placeholder="$t('action.background_hint') || '留空则AI自动生成场景背景'" />
+          <label>{{ $t('action.background_url') || $t('work_pages.action_transfer.bg_url') }}</label>
+          <input v-model="backgroundUrl" class="input" :placeholder="$t('action.background_hint') || $t('work_pages.action_transfer.bg_hint')" />
         </div>
       </div>
 
@@ -63,15 +63,15 @@
         <div class="enhanced-header">
           <label class="toggle-label">
             <input type="checkbox" v-model="replaceClothing" />
-            <span>{{ $t('action.clothing_replace') || '服装替换' }}</span>
+            <span>{{ $t('action.clothing_replace') || $t('work_pages.action_transfer.clothing_replace') }}</span>
           </label>
         </div>
         <div v-if="replaceClothing" class="enhanced-body">
           <div class="options-row">
             <div class="option">
-              <label>{{ $t('action.clothing_style') || '服装风格' }}</label>
+              <label>{{ $t('action.clothing_style') || $t('work_pages.action_transfer.clothing_style') }}</label>
               <select v-model="clothingStyle" class="input">
-                <option value="">{{ $t('action.clothing_auto') || '自动' }}</option>
+                <option value="">{{ $t('action.clothing_auto') || $t('work_pages.action_transfer.clothing_auto') }}</option>
                 <option value="casual">休闲</option>
                 <option value="formal">正式</option>
                 <option value="sport">运动</option>
@@ -80,8 +80,8 @@
               </select>
             </div>
             <div class="option">
-              <label>{{ $t('action.clothing_color') || '服装颜色' }}</label>
-              <input v-model="clothingColor" class="input" :placeholder="$t('action.color_hint') || '如：白色、黑色、红色'" />
+              <label>{{ $t('action.clothing_color') || $t('work_pages.action_transfer.clothing_color') }}</label>
+              <input v-model="clothingColor" class="input" :placeholder="$t('action.color_hint') || $t('work_pages.action_transfer.color_hint')" />
             </div>
           </div>
         </div>
@@ -92,12 +92,12 @@
         <div class="enhanced-header">
           <label class="toggle-label">
             <input type="checkbox" v-model="keepOriginalAudio" />
-            <span>{{ $t('action.keep_audio') || '保留原音频' }}</span>
+            <span>{{ $t('action.keep_audio') || $t('work_pages.action_transfer.keep_audio') }}</span>
           </label>
         </div>
         <div v-if="keepOriginalAudio" class="enhanced-body">
           <div class="option">
-            <label>{{ $t('action.bgm_url') || 'BGM 背景音乐 URL（可选）' }}</label>
+            <label>{{ $t('action.bgm_url') || $t('work_pages.action_transfer.bgm_url') }}</label>
             <input v-model="bgmUrl" class="input" :placeholder="$t('action.bgm_hint') || 'https://...'" />
           </div>
           <div class="option" style="margin-top:12px">
@@ -111,7 +111,7 @@
           <div class="option" style="margin-top:12px" v-if="voiceoverText">
             <label>{{ $t('action.voiceover_type') || '配音声线' }}</label>
             <select v-model="voiceoverType" class="input">
-              <option value="">{{ $t('action.voice_auto') || '自动' }}</option>
+              <option value="">{{ $t('action.voice_auto') || $t('work_pages.action_transfer.clothing_auto') }}</option>
               <option value="female_sweet">甜美女生</option>
               <option value="female_gentle">温柔女生</option>
               <option value="male_deep">醇厚男声</option>
@@ -174,6 +174,7 @@
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n()
 
 
 import { copyToClipboard } from '@/utils/format'
@@ -185,8 +186,8 @@ const headerCfg = computed(() => configs.value['page.action_migrate.header'] || 
 
 const activeTab = ref('single')
 const tabs = [
-  { key: 'single', label: '单人迁移' },
-  { key: 'batch', label: '批量迁移' },
+  { key: 'single', label: t('work_pages.action_transfer.tab_single') },
+  { key: 'batch', label: t('work_pages.action_transfer.tab_batch') },
 ]
 
 // ---- 单人迁移 ----

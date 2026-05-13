@@ -1,117 +1,117 @@
 <template>
-  <WorkLayout title="白底图生成" subtitle="AI 自动替换为电商标准纯白背景" :steps="steps" :current-step="currentStep">
-    <!-- Input mode: no task running -->
+  <WorkLayout :title="$t('work_pages.white_bg.title')" :subtitle="$t('work_pages.white_bg.subtitle')" :steps="steps" :current-step="currentStep">
     <div v-if="taskStatus === -1">
       <div class="upload-section">
         <div class="dropzone" @dragover.prevent @drop.prevent="handleDrop">
           <p class="dz-icon">⬜</p>
-          <p>上传商品图片</p>
-          <p class="hint">支持 JPG / PNG / WebP，最大 20MB</p>
+          <p>{{ $t('work_pages.white_bg.upload_image') }}</p>
+          <p class="hint">{{ $t('work_pages.white_bg.support_hint') }}</p>
           <input ref="fileInput" type="file" accept="image/*" hidden @change="handleFile" />
-          <button class="btn-outline" @click="fileInput?.click()">选择图片</button>
+          <button class="btn-outline" @click="fileInput?.click()">{{ $t('work_pages.white_bg.select_image') }}</button>
         </div>
         <div v-if="previewUrl" class="preview-box">
-          <img loading="lazy" :src="previewUrl" alt="预览" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
-          <button class="preview-remove" @click="clearImage" aria-label="清除图片">✕</button>
+          <img loading="lazy" :src="previewUrl" :alt="$t('work_pages.white_bg.preview_alt')" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+          <button class="preview-remove" @click="clearImage" :aria-label="$t('work_pages.white_bg.clear_image')">✕</button>
         </div>
         <p v-if="uploadErr" class="msg msg-error">{{ uploadErr }}</p>
-        <p v-if="uploading" class="msg">上传中...</p>
+        <p v-if="uploading" class="msg">{{ $t('work_pages.white_bg.uploading') }}</p>
         <div v-if="previewUrl" class="actions">
-          <div class="cost-badge">预计消耗 <strong>2</strong> 积分</div>
-          <button class="btn btn-brand" @click="currentStep = 1">下一步：设置参数</button>
+          <div class="cost-badge">{{ $t('work_pages.white_bg.estimated_cost') }}</div>
+          <button class="btn btn-brand" @click="currentStep = 1">{{ $t('work_pages.white_bg.next_params') }}</button>
         </div>
       </div>
 
       <div v-if="currentStep >= 1" class="param-section">
-        <h3 class="param-title">白底图参数</h3>
+        <h3 class="param-title">{{ $t('work_pages.white_bg.param_title') }}</h3>
         <div class="param-grid">
           <label class="param-item">
-            <span class="param-label">阴影效果</span>
+            <span class="param-label">{{ $t('work_pages.white_bg.shadow_effect') }}</span>
             <select v-model="shadow" class="param-select">
-              <option value="soft">柔和阴影</option>
-              <option value="hard">清晰投影</option>
-              <option value="none">无阴影</option>
+              <option value="soft">{{ $t('work_pages.white_bg.shadow_soft') }}</option>
+              <option value="hard">{{ $t('work_pages.white_bg.shadow_hard') }}</option>
+              <option value="none">{{ $t('work_pages.white_bg.shadow_none') }}</option>
             </select>
           </label>
           <label class="param-item">
-            <span class="param-label">输出尺寸</span>
+            <span class="param-label">{{ $t('work_pages.white_bg.output_size') }}</span>
             <select v-model="size" class="param-select">
-              <option value="original">原图尺寸</option>
+              <option value="original">{{ $t('work_pages.white_bg.size_original') }}</option>
               <option value="800">800 px</option>
               <option value="1600">1600 px</option>
               <option value="2000">2000 px</option>
             </select>
           </label>
           <label class="param-item">
-            <span class="param-label">边缘优化</span>
+            <span class="param-label">{{ $t('work_pages.white_bg.edge_optimize') }}</span>
             <select v-model="edge" class="param-select">
-              <option value="auto">自动优化</option>
-              <option value="smooth">柔化边缘</option>
-              <option value="sharp">锐利边缘</option>
+              <option value="auto">{{ $t('work_pages.white_bg.edge_auto') }}</option>
+              <option value="smooth">{{ $t('work_pages.white_bg.edge_smooth') }}</option>
+              <option value="sharp">{{ $t('work_pages.white_bg.edge_sharp') }}</option>
             </select>
           </label>
         </div>
         <div class="actions">
-          <button class="btn-outline" @click="currentStep = 0">返回</button>
+          <button class="btn-outline" @click="currentStep = 0">{{ $t('work_pages.white_bg.back') }}</button>
           <button class="btn btn-brand" :disabled="processing" @click="startWhiteBg">
-            <span v-if="processing" class="spinner" /> {{ processing ? '生成中...' : '生成白底图' }}
+            <span v-if="processing" class="spinner" /> {{ processing ? $t('work_pages.white_bg.generating') : $t('work_pages.white_bg.generate_btn') }}
           </button>
         </div>
       </div>
 
       <div v-if="!previewUrl" class="empty-hint">
         <span class="empty-icon">⬜</span>
-        <p>上传商品图，AI 自动生成电商标准白底图</p>
+        <p>{{ $t('work_pages.white_bg.empty_hint') }}</p>
       </div>
     </div>
 
-    <!-- Result -->
     <div v-else-if="taskStatus === 2" class="result-section">
-      <h3 class="result-title">白底图已生成</h3>
+      <h3 class="result-title">{{ $t('work_pages.white_bg.result_title') }}</h3>
       <div class="compare-row">
         <div class="compare-card">
-          <span class="compare-label">原图</span>
-          <img loading="lazy" :src="uploadedUrl" class="compare-img" alt="原图" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+          <span class="compare-label">{{ $t('work_pages.white_bg.original') }}</span>
+          <img loading="lazy" :src="uploadedUrl" class="compare-img" :alt="$t('work_pages.white_bg.original')" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
         </div>
         <span class="compare-arrow">→</span>
         <div class="compare-card">
-          <span class="compare-label">白底图</span>
-          <img loading="lazy" :src="resultUrl" class="compare-img" alt="结果" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+          <span class="compare-label">{{ $t('work_pages.white_bg.white_bg_img') }}</span>
+          <img loading="lazy" :src="resultUrl" class="compare-img" :alt="$t('work_pages.white_bg.white_bg_img')" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
         </div>
       </div>
       <div class="actions">
-        <button class="btn btn-brand" @click="downloadResult">下载 JPG</button>
-        <button class="btn-outline" @click="resetAll">重新处理</button>
+        <button class="btn btn-brand" @click="downloadResult">{{ $t('work_pages.white_bg.download_jpg') }}</button>
+        <button class="btn-outline" @click="resetAll">{{ $t('work_pages.white_bg.redo') }}</button>
       </div>
     </div>
 
-    <!-- Progress -->
     <div v-else-if="taskStatus === 0 || taskStatus === 1" class="progress-section">
       <div class="spinner-lg" />
-      <p>{{ progressMsg || '生成中...' }}</p>
+      <p>{{ progressMsg || $t('work_pages.white_bg.generating') }}</p>
       <div class="progress-bar"><div class="progress-fill" :style="{ width: progress + '%' }" /></div>
       <p class="progress-pct">{{ progress }}%</p>
     </div>
 
-    <!-- Error -->
     <div v-else-if="taskStatus === 3" class="error-section">
       <p class="error-icon">!</p>
-      <p>{{ errorMsg || '生成失败' }}</p>
-      <button class="btn-outline" @click="startWhiteBg">重试</button>
+      <p>{{ errorMsg || $t('work_pages.white_bg.generation_failed') }}</p>
+      <button class="btn-outline" @click="startWhiteBg">{{ $t('work_pages.white_bg.retry') }}</button>
     </div>
 
-    <!-- Fallback -->
     <div v-else class="empty-hint">
       <span class="empty-icon">⬜</span>
-      <p>上传商品图，AI 自动生成电商标准白底图</p>
+      <p>{{ $t('work_pages.white_bg.empty_hint') }}</p>
     </div>
   </WorkLayout>
 </template>
 
 <script setup lang="ts">
 const { createBlobUrl, revoke } = useBlobUrl()
+const { t } = useI18n()
 
-const steps = ['上传图片', '参数设置', '下载结果']
+const steps = computed(() => [
+  t('work_pages.white_bg.step_upload'),
+  t('work_pages.white_bg.step_params'),
+  t('work_pages.white_bg.step_download'),
+])
 const currentStep = ref(0)
 const previewUrl = ref('')
 const uploadedUrl = ref('')
@@ -155,7 +155,7 @@ async function uploadFile(file: File) {
       method: 'POST', credentials: 'include', body: form,
     })
     uploadedUrl.value = res.data?.url || previewUrl.value
-  } catch (e: any) { uploadErr.value = e?.data?.msg || '上传失败' }
+  } catch (e: any) { uploadErr.value = e?.data?.msg || t('work_pages.white_bg.upload_failed') }
   finally { uploading.value = false }
 }
 
@@ -172,7 +172,7 @@ async function startWhiteBg() {
     if (taskId) { currentStep.value = 2; startPolling(taskId) }
     else { resultUrl.value = res.data?.resultUrl || uploadedUrl.value; taskStatus.value = 2 }
     processing.value = false
-  } catch (e: any) { taskStatus.value = 3; errorMsg.value = e?.data?.msg || '生成失败'; processing.value = false }
+  } catch (e: any) { taskStatus.value = 3; errorMsg.value = e?.data?.msg || t('work_pages.white_bg.generation_failed'); processing.value = false }
 }
 
 function startPolling(taskId: string) {
@@ -186,7 +186,7 @@ function startPolling(taskId: string) {
       taskStatus.value = d.status; progress.value = d.progress ?? 0; progressMsg.value = d.progress_msg || ''
       consecutiveFailures = 0
       if (d.status === 2) { resultUrl.value = d.output_result?.url || d.resultUrl || uploadedUrl.value; stopPolling(); return }
-      else if (d.status === 3) { errorMsg.value = d.error_msg || '任务失败'; stopPolling(); return }
+      else if (d.status === 3) { errorMsg.value = d.error_msg || t('work_pages.white_bg.task_failed'); stopPolling(); return }
     } catch { consecutiveFailures++ }
     pollCount++
     let interval = POLL_INITIAL_MS

@@ -1,52 +1,52 @@
 <template>
   <div class="copywriting-page">
     <div class="page-header">
-      <h1>电商文案生成</h1>
-      <p class="subtitle">商品标题 · 卖点文案 · 跨境翻译 — 9 语种 × 9 平台规则</p>
+      <h1>{{ $t('work_pages.copywriting.title') }}</h1>
+      <p class="subtitle">{{ $t('work_pages.copywriting.subtitle') }}</p>
     </div>
 
     <!-- Tab 切换 -->
     <el-tabs v-model="activeTab" class="main-tabs">
       <!-- 商品标题 -->
-      <el-tab-pane label="商品标题" name="title">
+      <el-tab-pane :label="$t('work_pages.copywriting_ext.tab_title')" name="title">
         <SmartRecognitionPanel
-          hint="上传商品参考图，AI 自动识别产品信息并填充到表单"
-          confirm-label="确认并填充"
+          :hint="$t('work_pages.copywriting_ext.smart_hint')"
+          :confirm-label="$t('work_pages.copywriting_ext.smart_confirm')"
           @confirm="onSmartApply"
         />
         <el-form :model="titleForm" label-width="100px" class="gen-form">
           <el-row :gutter="16">
             <el-col :span="12">
-              <el-form-item label="商品名称" required>
-                <el-input v-model="titleForm.productName" placeholder="如：夏季冰丝凉席三件套" maxlength="200" />
+              <el-form-item :label="$t('work_pages.copywriting_ext.product_name')" required>
+                <el-input v-model="titleForm.productName" :placeholder="$t('work_pages.copywriting_ext.product_name_placeholder')" maxlength="200" />
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="商品类目">
-                <el-input v-model="titleForm.category" placeholder="如：家纺/凉席" maxlength="100" />
+              <el-form-item :label="$t('work_pages.copywriting_ext.product_category')">
+                <el-input v-model="titleForm.category" :placeholder="$t('work_pages.copywriting_ext.category_placeholder')" maxlength="100" />
               </el-form-item>
             </el-col>
           </el-row>
-          <el-form-item label="核心卖点">
-            <el-input v-model="titleForm.sellingPoints" type="textarea" :rows="2" placeholder="如：冰丝面料、清凉透气、可水洗、防螨抗菌" maxlength="1000" />
+          <el-form-item :label="$t('work_pages.copywriting_ext.core_selling_points')">
+            <el-input v-model="titleForm.sellingPoints" type="textarea" :rows="2" :placeholder="$t('work_pages.copywriting_ext.selling_points_placeholder')" maxlength="1000" />
           </el-form-item>
           <el-row :gutter="16">
             <el-col :span="8">
-              <el-form-item label="目标平台">
-                <el-select v-model="titleForm.platform" placeholder="选择平台" class="w-full">
+              <el-form-item :label="$t('work_pages.copywriting_ext.target_platform')">
+                <el-select v-model="titleForm.platform" :placeholder="$t('work_pages.copywriting_ext.target_platform')" class="w-full">
                   <el-option v-for="(v,k) in platforms" :key="k" :label="v.name" :value="k" />
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="8">
-              <el-form-item label="语言">
-                <el-select v-model="titleForm.language" placeholder="选择语言" class="w-full">
+              <el-form-item :label="$t('work_pages.copywriting_ext.language')">
+                <el-select v-model="titleForm.language" :placeholder="$t('work_pages.copywriting_ext.language')" class="w-full">
                   <el-option v-for="(v,k) in languages" :key="k" :label="v" :value="k" />
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="8">
-              <el-form-item label="生成数量">
+              <el-form-item :label="$t('work_pages.copywriting_ext.generate_count')">
                 <el-input-number v-model="titleForm.count" :min="1" :max="20" class="w-full" />
               </el-form-item>
             </el-col>
@@ -55,7 +55,7 @@
             <el-button type="primary" :loading="titleGenning" @click="doGenerateTitles" :icon="MagicStick">
               {{ titleGenning ? '生成中...' : '智能生成标题' }}
             </el-button>
-            <el-button @click="titleForm = getDefaultTitleForm()">重置</el-button>
+            <el-button @click="titleForm = getDefaultTitleForm()">{{ $t('work_pages.copywriting_ext.reset') }}<el-button>
           </el-form-item>
         </el-form>
 
@@ -74,41 +74,41 @@
             <div class="result-row">
               <span class="result-index">{{ i + 1 }}</span>
               <span class="result-text">{{ t }}</span>
-              <el-button size="small" type="primary" plain @click="copyText(t)">复制</el-button>
+              <el-button size="small" type="primary" plain @click="copyText(t)">{{ $t('work_pages.copywriting_ext.copy') }}<el-button>
             </div>
           </el-card>
         </div>
       </el-tab-pane>
 
       <!-- 卖点文案 -->
-      <el-tab-pane label="卖点文案" name="desc">
+      <el-tab-pane :label="$t('work_pages.copywriting_ext.tab_desc')" name="desc">
         <el-form :model="descForm" label-width="100px" class="gen-form">
           <el-row :gutter="16">
             <el-col :span="12">
-              <el-form-item label="商品名称" required>
-                <el-input v-model="descForm.productName" placeholder="如：无线降噪蓝牙耳机" maxlength="200" />
+              <el-form-item :label="$t('work_pages.copywriting_ext.product_name')" required>
+                <el-input v-model="descForm.productName" :placeholder="$t('work_pages.copywriting_ext.product_name_placeholder')" maxlength="200" />
               </el-form-item>
             </el-col>
             <el-col :span="6">
-              <el-form-item label="目标平台">
+              <el-form-item :label="$t('work_pages.copywriting_ext.target_platform')">
                 <el-select v-model="descForm.platform" class="w-full">
                   <el-option v-for="(v,k) in platforms" :key="k" :label="v.name" :value="k" />
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="6">
-              <el-form-item label="语言">
+              <el-form-item :label="$t('work_pages.copywriting_ext.language')">
                 <el-select v-model="descForm.language" class="w-full">
                   <el-option v-for="(v,k) in languages" :key="k" :label="v" :value="k" />
                 </el-select>
               </el-form-item>
             </el-col>
           </el-row>
-          <el-form-item label="核心卖点">
-            <el-input v-model="descForm.features" type="textarea" :rows="3" placeholder="如：主动降噪/40小时续航/蓝牙5.3/Hi-Res音质" maxlength="2000" />
+          <el-form-item :label="$t('work_pages.copywriting_ext.core_selling_points')">
+            <el-input v-model="descForm.features" type="textarea" :rows="3" :placeholder="$t('work_pages.copywriting_ext.features_placeholder')" maxlength="2000" />
           </el-form-item>
-          <el-form-item label="规格参数">
-            <el-input v-model="descForm.specs" type="textarea" :rows="2" placeholder="如：驱动单元40mm/频率响应20Hz-20kHz/阻抗32Ω" maxlength="2000" />
+          <el-form-item :label="$t('work_pages.copywriting_ext.specs')">
+            <el-input v-model="descForm.specs" type="textarea" :rows="2" :placeholder="$t('work_pages.copywriting_ext.specs_placeholder')" maxlength="2000" />
           </el-form-item>
           <el-form-item>
             <el-button type="primary" :loading="descGenning" @click="doGenerateDesc" :icon="MagicStick">
@@ -122,41 +122,41 @@
           <el-card shadow="hover" class="desc-result-card">
             <div class="desc-content">{{ descResultRaw }}</div>
             <div class="desc-actions">
-              <el-button type="primary" size="small" @click="copyText(descResultRaw)">复制全文</el-button>
+              <el-button type="primary" size="small" @click="copyText(descResultRaw)">{{ $t('work_pages.copywriting_ext.copy_full') }}<el-button>
             </div>
           </el-card>
         </div>
       </el-tab-pane>
 
       <!-- 跨境翻译 -->
-      <el-tab-pane label="跨境翻译" name="translate">
+      <el-tab-pane :label="$t('work_pages.copywriting_ext.tab_translate')" name="translate">
         <el-form :model="transForm" label-width="100px" class="gen-form">
           <el-row :gutter="16">
             <el-col :span="12">
-              <el-form-item label="商品名称" required>
-                <el-input v-model="transForm.productName" placeholder="输入商品名称" maxlength="200" />
+              <el-form-item :label="$t('work_pages.copywriting_ext.product_name')" required>
+                <el-input v-model="transForm.productName" :placeholder="$t('work_pages.copywriting_ext.product_name_input_ph')" maxlength="200" />
               </el-form-item>
             </el-col>
             <el-col :span="6">
-              <el-form-item label="源语言">
+              <el-form-item :label="$t('work_pages.copywriting_ext.source_lang')">
                 <el-select v-model="transForm.sourceLang" class="w-full">
                   <el-option v-for="(v,k) in languages" :key="k" :label="v" :value="k" />
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="6">
-              <el-form-item label="目标语言" required>
+              <el-form-item :label="$t('work_pages.copywriting_ext.target_lang')" required>
                 <el-select v-model="transForm.targetLang" class="w-full">
                   <el-option v-for="(v,k) in languages" :key="k" :label="v" :value="k" />
                 </el-select>
               </el-form-item>
             </el-col>
           </el-row>
-          <el-form-item label="商品描述">
-            <el-input v-model="transForm.description" type="textarea" :rows="3" placeholder="输入需要翻译的商品描述" maxlength="5000" />
+          <el-form-item :label="$t('work_pages.copywriting_ext.product_desc')">
+            <el-input v-model="transForm.description" type="textarea" :rows="3" :placeholder="$t('work_pages.copywriting_ext.desc_input_ph')" maxlength="5000" />
           </el-form-item>
-          <el-form-item label="卖点/特性">
-            <el-input v-model="transForm.features" type="textarea" :rows="2" placeholder="输入关键卖点" maxlength="2000" />
+          <el-form-item :label="$t('work_pages.copywriting_ext.features')">
+            <el-input v-model="transForm.features" type="textarea" :rows="2" :placeholder="$t('work_pages.copywriting_ext.features_input_ph')" maxlength="2000" />
           </el-form-item>
           <el-form-item>
             <el-button type="primary" :loading="transRunning" @click="doTranslate" :icon="MagicStick">
@@ -170,42 +170,42 @@
           <el-card shadow="hover">
             <div class="desc-content">{{ transResult }}</div>
             <div class="desc-actions">
-              <el-button type="primary" size="small" @click="copyText(transResult)">复制译文</el-button>
+              <el-button type="primary" size="small" @click="copyText(transResult)">{{ $t('work_pages.copywriting_ext.copy_trans') }}<el-button>
             </div>
           </el-card>
         </div>
       </el-tab-pane>
 
       <!-- 历史记录 -->
-      <el-tab-pane label="历史记录" name="history">
-        <el-select v-model="historyType" placeholder="筛选类型" clearable style="width:160px" class="mb-4" @change="loadHistory">
+      <el-tab-pane :label="$t('work_pages.copywriting_ext.tab_history')" name="history">
+        <el-select v-model="historyType" :placeholder="$t('work_pages.copywriting_ext.filter_type')" clearable style="width:160px" class="mb-4" @change="loadHistory">
           <el-option label="标题生成" value="title" />
-          <el-option label="卖点文案" value="description" />
+          <el-option :label="$t('work_pages.copywriting_ext.tab_desc')" value="description" />
           <el-option label="翻译" value="translate" />
         </el-select>
         <el-table :data="historyList" v-loading="historyLoading" stripe>
-          <el-table-column prop="type" label="类型" width="100">
+          <el-table-column prop="type" :label="$t('work_pages.copywriting_ext.type')" width="100">
             <template #default="{ row }">
               <el-tag :type="row.type === 'title' ? 'success' : row.type === 'description' ? 'primary' : 'warning'" size="small">
-                {{ row.type === 'title' ? '标题' : row.type === 'description' ? '文案' : '翻译' }}
+                {{ (row.type === 'title' ? $t('work_pages.copywriting_ext.type_title') : row.type === 'description' ? $t('work_pages.copywriting_ext.type_desc') : $t('work_pages.copywriting_ext.type_trans')) }}
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="inputs" label="输入" min-width="200">
+          <el-table-column prop="inputs" :label="$t('work_pages.copywriting_ext.input')" min-width="200">
             <template #default="{ row }">
               <span v-if="row.inputs">{{ safeParseJson(row.inputs)?.productName || '-' }}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="model_id" label="模型" width="160" />
-          <el-table-column prop="status" label="状态" width="80">
+          <el-table-column prop="model_id" :label="$t('work_pages.copywriting_ext.model')" width="160" />
+          <el-table-column prop="status" :label="$t('work_pages.copywriting_ext.status')" width="80">
             <template #default="{ row }">
               <el-tag :type="row.status === 'success' ? 'success' : 'danger'" size="small">{{ row.status === 'success' ? '成功' : '失败' }}</el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="created_at" label="时间" width="170" />
-          <el-table-column label="操作" width="80">
+          <el-table-column prop="created_at" :label="$t('work_pages.copywriting_ext.time')" width="170" />
+          <el-table-column :label="$t('work_pages.copywriting_ext.operation')" width="80">
             <template #default="{ row }">
-              <el-button size="small" type="danger" text @click="deleteRecord(row.id)">删除</el-button>
+              <el-button size="small" type="danger" text @click="deleteRecord(row.id)">{{ $t('work_pages.copywriting_ext.delete') }}<el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -218,6 +218,7 @@
 <script setup lang="ts">
 import { ElMessage } from 'element-plus';
 const toast = useToast()
+const { t } = useI18n()
 import { MagicStick } from '@element-plus/icons-vue';
 import { copyToClipboard } from '@/utils/format';
 import SmartRecognitionPanel from '~/components/shared/SmartRecognitionPanel.vue'
@@ -240,7 +241,7 @@ onMounted(async () => {
     ]);
     platforms.value = p?.data || {};
     languages.value = l?.data || {};
-  } catch { toast.warn('加载配置失败') }
+  } catch { toast.warn($t('work_pages.copywriting_ext.config_load_failed')) }
 });
 
 // ===== 标题 =====
@@ -252,13 +253,13 @@ function getDefaultTitleForm() {
   return { productName: '', category: '', sellingPoints: '', platform: 'taobao', language: 'zh-CN', count: 5 };
 }
 async function doGenerateTitles() {
-  if (!titleForm.productName) return ElMessage.warning('请输入商品名称');
+  if (!titleForm.productName) return ElMessage.warning($t('work_pages.copywriting_ext.product_name_required'));
   titleGenning.value = true;
   try {
     const r = await $fetch('/api/copywriting/titles', { method: 'POST', body: titleForm });
     titleResults.value = r?.data?.titles || [];
     titleMeta.value = { model: r?.data?.model, latency: r?.data?.latency };
-  } catch (e: any) { ElMessage.error(e?.data?.msg || e?.message || '生成失败'); }
+  } catch (e: any) { ElMessage.error(e?.data?.msg || e?.message || $t('work_pages.copywriting_ext.generate_failed')); }
   finally { titleGenning.value = false; }
 }
 
@@ -268,13 +269,13 @@ const descResultRaw = ref('');
 const descMeta = ref({});
 const descForm = reactive({ productName: '', features: '', specs: '', platform: 'taobao', language: 'zh-CN' });
 async function doGenerateDesc() {
-  if (!descForm.productName) return ElMessage.warning('请输入商品名称');
+  if (!descForm.productName) return ElMessage.warning($t('work_pages.copywriting_ext.product_name_required'));
   descGenning.value = true;
   try {
     const r = await $fetch('/api/copywriting/description', { method: 'POST', body: descForm });
     descResultRaw.value = r?.data?.description || '';
     descMeta.value = { model: r?.data?.model };
-  } catch (e: any) { ElMessage.error(e?.data?.msg || e?.message || '生成失败'); }
+  } catch (e: any) { ElMessage.error(e?.data?.msg || e?.message || $t('work_pages.copywriting_ext.generate_failed')); }
   finally { descGenning.value = false; }
 }
 
@@ -284,13 +285,13 @@ const transResult = ref('');
 const transMeta = ref({});
 const transForm = reactive({ productName: '', description: '', features: '', sourceLang: 'zh-CN', targetLang: 'en' });
 async function doTranslate() {
-  if (!transForm.productName || !transForm.targetLang) return ElMessage.warning('请填写商品名称和目标语言');
+  if (!transForm.productName || !transForm.targetLang) return ElMessage.warning($t('work_pages.copywriting_ext.trans_fields_required'));
   transRunning.value = true;
   try {
     const r = await $fetch('/api/copywriting/translate', { method: 'POST', body: transForm });
     transResult.value = r?.data?.translation || '';
     transMeta.value = { model: r?.data?.model };
-  } catch (e) { ElMessage.error(e?.data?.msg || '翻译失败'); }
+  } catch (e) { ElMessage.error(e?.data?.msg || $t('work_pages.copywriting_ext.translate_failed')); }
   finally { transRunning.value = false; }
 }
 
@@ -306,21 +307,21 @@ async function loadHistory() {
     const r = await $fetch(`/api/copywriting/history?type=${historyType.value}&page=${historyPage.value}&pageSize=20`);
     historyList.value = r?.data?.list || [];
     historyTotal.value = r?.data?.total || 0;
-  } catch { toast.warn('加载配置失败') }
+  } catch { toast.warn($t('work_pages.copywriting_ext.config_load_failed')) }
   finally { historyLoading.value = false; }
 }
 async function deleteRecord(id) {
   try {
     await $fetch(`/api/copywriting/history/${id}`, { method: 'DELETE' });
-    ElMessage.success('删除成功');
+    ElMessage.success($t('work_pages.copywriting_ext.delete_success'));
     loadHistory();
-  } catch { ElMessage.error('删除失败'); }
+  } catch { ElMessage.error($t('work_pages.copywriting_ext.delete_failed')); }
 }
 
 // 工具
 const copyText = async (text: string) => {
   const ok = await copyToClipboard(text);
-  if (ok) ElMessage.success('已复制');
+  if (ok) ElMessage.success($t('work_pages.copywriting_ext.copy_success'));
 }
 
 function onSmartApply(info: { productName: string; category: string; features: string[]; refUrl: string }) {

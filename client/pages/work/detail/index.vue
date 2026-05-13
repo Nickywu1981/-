@@ -108,7 +108,7 @@
         </div>
 
         <button class="btn btn-primary btn-lg" style="margin-top:16px" :disabled="!productName || scenes.length === 0 || scenes.some(s => !s.prompt.trim()) || taskStatus === 'processing'" @click="doGenerateLongImage">
-          {{ taskStatus === 'processing' ? '生成中...' : ($t('action.generate_long') || '生成长图') }}
+          {{ taskStatus === 'processing' ? $t('work_pages.detail_index.generating') : ($t('action.generate_long') || '生成长图') }}
         </button>
       </div>
 
@@ -190,6 +190,7 @@
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n()
 
 import PromptEnhancer from '~/components/PromptEnhancer.vue'
 

@@ -1,8 +1,8 @@
 <template>
   <div class="cut-ecosystem-page">
     <header class="page-header">
-      <h1>剪映/CapCut 生态对接</h1>
-      <p>一键导出 Movio AI 生成内容到剪映/CapCut 继续编辑</p>
+      <h1>{{ $t('work_pages.cut_ecosystem.title') }}</h1>
+      <p>{{ $t('work_pages.cut_ecosystem.subtitle') }}</p>
     </header>
 
     <!-- 平台选择 -->
@@ -21,7 +21,7 @@
 
     <!-- 画幅选择 -->
     <section class="ratio-section">
-      <h3>目标画幅</h3>
+      <h3>{{ $t('work_pages.cut_ecosystem.target_ratio') }}</h3>
       <div class="ratio-options">
         <button
           v-for="r in ratios"
@@ -38,21 +38,21 @@
     <!-- 作品选择 -->
     <section class="works-section">
       <div class="section-header">
-        <h3>选择导出作品</h3>
+        <h3>{{ $t('work_pages.cut_ecosystem_ext.select_works') }}<h3>
         <div class="filter-row">
           <select v-model="filterType" @change="loadWorks">
-            <option value="">全部类型</option>
+            <option value="">{{ $t('work_pages.cut_ecosystem_ext.all_types') }}<option>
             <option v-for="t in taskTypes" :key="t.value" :value="t.value">{{ t.label }}</option>
           </select>
         </div>
       </div>
 
-      <div v-if="loading" class="loading-state">加载作品中...</div>
+      <div v-if="loading" class="loading-state">{{ $t('work_pages.cut_ecosystem_ext.loading') }}<div>
 
       <div v-else-if="works.length === 0" class="empty-state">
         <div class="empty-icon">📭</div>
-        <p>暂无已完成的作品可供导出</p>
-        <router-link to="/workspace" class="btn-primary">去创作</router-link>
+        <p>{{ $t('work_pages.cut_ecosystem_ext.no_works') }}<p>
+        <router-link to="/workspace" class="btn-primary">{{ $t('work_pages.cut_ecosystem_ext.go_create') }}<router-link>
       </div>
 
       <div v-else class="works-grid">
@@ -72,7 +72,7 @@
           <div class="work-info">
             <div class="work-title">{{ w.title || '未命名' }}</div>
             <div class="work-meta">
-              <span :class="['type-tag', w.type]">{{ w.type === 'video' ? '视频' : '图片' }}</span>
+              <span :class="['type-tag', w.type]">{{ w.type === 'video' ? $t('work_pages.cut_ecosystem_ext.video_tag') : '图片' }}</span>
               <span class="work-date">{{ formatDate(w.create_time) }}</span>
             </div>
           </div>
@@ -80,16 +80,16 @@
       </div>
 
       <div v-if="works.length > 0" class="pagination">
-        <button :disabled="page <= 1" @click="page--; loadWorks()">上一页</button>
+        <button :disabled="page <= 1" @click="page--; loadWorks()">{{ $t('work_pages.cut_ecosystem_ext.prev_page') }}<button>
         <span>第 {{ page }} / {{ totalPages }} 页</span>
-        <button :disabled="page >= totalPages" @click="page++; loadWorks()">下一页</button>
+        <button :disabled="page >= totalPages" @click="page++; loadWorks()">{{ $t('work_pages.cut_ecosystem_ext.next_page') }}<button>
       </div>
     </section>
 
     <!-- 项目名称 -->
     <section v-if="selectedIds.length > 0" class="config-section">
-      <label>项目名称（可选）</label>
-      <input v-model="projectName" class="input" placeholder="输入剪映项目名称" maxlength="100" />
+      <label>{{ $t('work_pages.cut_ecosystem_ext.project_name') }}<label>
+      <input v-model="projectName" class="input" :placeholder="$t('work_pages.cut_ecosystem_ext.project_placeholder')" maxlength="100" />
     </section>
 
     <!-- 操作按钮 -->
@@ -113,18 +113,18 @@
     <!-- 导出结果 -->
     <section v-if="draftResult" class="result-section">
       <div class="result-card">
-        <h3>导出成功</h3>
+        <h3>{{ $t('work_pages.cut_ecosystem_ext.export_success') }}<h3>
         <div class="result-info">
           <div><strong>目标平台:</strong> {{ draftResult.platform === 'jianying' ? '剪映' : 'CapCut' }}</div>
           <div><strong>包含素材:</strong> {{ draftResult?.assets?.length ?? 0 }} 个</div>
           <div><strong>项目名称:</strong> {{ draftResult?.draft?.draft_name || '-' }}</div>
         </div>
         <div class="result-actions">
-          <button class="btn-primary" @click="downloadDraft">下载项目文件 (.json)</button>
-          <button class="btn-text" @click="draftResult = null">关闭</button>
+          <button class="btn-primary" @click="downloadDraft">{{ $t('work_pages.cut_ecosystem_ext.download_project') }}<button>
+          <button class="btn-text" @click="draftResult = null">{{ $t('work_pages.cut_ecosystem_ext.close') }}<button>
         </div>
         <details class="draft-preview">
-          <summary>预览项目结构 (JSON)</summary>
+          <summary>{{ $t('work_pages.cut_ecosystem_ext.preview_json') }}<summary>
           <pre>{{ JSON.stringify(draftResult.draft, null, 2) }}</pre>
         </details>
       </div>
@@ -136,6 +136,7 @@
 const { createBlobUrl, revoke } = useBlobUrl()
 import { formatDate } from '@/utils/format';
 const toast = useToast()
+const { t } = useI18n()
 const api = useApi()
 
 const activePlatform = ref('jianying')
@@ -153,8 +154,8 @@ const filterType = ref('')
 const { downloadBlob } = useFileDownload()
 
 const platforms = [
-  { key: 'jianying', name: '剪映', icon: '✂️', desc: '国内专业版，抖音创作者首选' },
-  { key: 'capcut', name: 'CapCut', icon: '🌍', desc: '海外版剪映，TikTok/YouTube创作者' },
+  { key: 'jianying', name: t('work_pages.cut_ecosystem_ext.platform_jy_name'), icon: '✂️', desc: t('work_pages.cut_ecosystem_ext.platform_jy_desc') },
+  { key: 'capcut', name: t('work_pages.cut_ecosystem_ext.platform_cc_name'), icon: '🌍', desc: t('work_pages.cut_ecosystem_ext.platform_cc_desc') },
 ]
 
 const taskTypes = [
@@ -178,7 +179,7 @@ async function loadRatios() {
   try {
     const res = await api.get('/cut-ecosystem/ratios')
     ratios.value = res
-  } catch { toast.warn('加载比例失败') }
+  } catch { toast.warn($t('work_pages.cut_ecosystem_ext.load_ratios_failed')) }
 }
 
 async function loadWorks() {
@@ -190,7 +191,7 @@ async function loadWorks() {
     works.value = res.list || []
     totalPages.value = Math.max(1, Math.ceil((res.total || 0) / pageSize))
   } catch (e) {
-    toast.error('加载作品失败')
+    toast.error($t('work_pages.cut_ecosystem_ext.load_works_failed'))
   } finally {
     loading.value = false
   }
@@ -203,7 +204,7 @@ function toggleWork(work) {
   } else if (selectedIds.value.length < 50) {
     selectedIds.value.push(work.id)
   } else {
-    toast.warn('单次最多选择 50 个作品')
+    toast.warn($t('work_pages.cut_ecosystem_ext.max_select'))
   }
 }
 
@@ -219,12 +220,12 @@ async function exportDraft(platform) {
     const res = await api.post('/cut-ecosystem/export/' + platform, body)
     if (res) {
       draftResult.value = res
-      toast.success(`已生成${platform === 'jianying' ? '剪映' : 'CapCut'}项目文件`)
+      toast.success(`$t('work_pages.cut_ecosystem_ext.export_done', { name: ${platform === 'jianying' ? '剪映' : 'CapCut'}项目文件`)
     } else {
-      toast.error('导出失败')
+      toast.error($t('work_pages.cut_ecosystem_ext.export_failed'))
     }
   } catch (e) {
-    toast.error('导出请求失败')
+    toast.error($t('work_pages.cut_ecosystem_ext.export_request_failed'))
   } finally {
     exporting.value = null
   }

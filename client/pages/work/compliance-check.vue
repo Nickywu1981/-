@@ -1,44 +1,44 @@
 <template>
-  <WorkLayout :steps="['选目标市场', '上传素材', '合规检查']" :current-step="step">
-    <!-- Step 0: 选目标平台/区域 -->
+  <WorkLayout :steps="complianceSteps" :current-step="step">
+    <!-- Step 0: 选目标市场 -->
     <div v-if="step === 0" class="select-section">
-      <h3>选择目标市场</h3>
-      <p class="section-hint">选择你要投放的平台和国家/地区，系统将检查对应的合规要求</p>
+      <h3>{{ $t('work_pages.compliance.select_target') }}</h3>
+      <p class="section-hint">{{ $t('work_pages.compliance.target_hint') }}</p>
 
       <div class="check-grid">
         <div class="check-col">
-          <h4>目标平台</h4>
+          <h4>{{ $t('work_pages.compliance.target_platform') }}</h4>
           <div class="target-list">
             <button v-for="t in platformTargets" :key="t.code" class="target-card" :class="{ active: selectedPlatform === t.code }" @click="selectedPlatform = t.code">
               <span class="target-name">{{ t.name }}</span>
-              <span class="target-count">{{ t.imageRuleCount + t.textRuleCount }} 条规则</span>
+              <span class="target-count">{{ $t('work_pages.compliance.rules_count', { n: t.imageRuleCount + t.textRuleCount }) }}</span>
             </button>
           </div>
         </div>
         <div class="check-col">
-          <h4>目标区域（可选）</h4>
+          <h4>{{ $t('work_pages.compliance.target_region') }}</h4>
           <div class="target-list">
             <button v-for="t in regionTargets" :key="t.code" class="target-card" :class="{ active: selectedRegion === t.code }" @click="selectedRegion = t.code">
               <span class="target-name">{{ t.name }}</span>
-              <span class="target-count">{{ t.imageRuleCount + t.textRuleCount }} 条规则</span>
+              <span class="target-count">{{ $t('work_pages.compliance.rules_count', { n: t.imageRuleCount + t.textRuleCount }) }}</span>
             </button>
           </div>
         </div>
       </div>
 
       <div v-if="selectedPlatform" class="rules-preview">
-        <h4>适用规则预览</h4>
+        <h4>{{ $t('work_pages.compliance.rules_preview') }}</h4>
         <div v-if="previewRules.length" class="rules-list">
           <div v-for="r in previewRules" :key="r.source" class="rule-group">
-            <h5>{{ r.source }} ({{ r.type === 'platform' ? '平台规则' : '区域法规' }})</h5>
+            <h5>{{ r.source }} ({{ r.type === 'platform' ? $t('work_pages.compliance.platform_rule') : $t('work_pages.compliance.region_rule') }})</h5>
             <div v-for="ir in r.imageRules" :key="ir.id" class="rule-item" :class="ir.severity">
               <span class="severity-dot" :class="ir.severity" />
-              <span class="rule-cat">图片</span>
+              <span class="rule-cat">{{ $t('work_pages.compliance.rule_image') }}</span>
               <span>{{ ir.desc }}</span>
             </div>
             <div v-for="tr in r.textRules" :key="tr.id" class="rule-item" :class="tr.severity">
               <span class="severity-dot" :class="tr.severity" />
-              <span class="rule-cat">文案</span>
+              <span class="rule-cat">{{ $t('work_pages.compliance.rule_copy') }}</span>
               <span>{{ tr.desc }}</span>
             </div>
           </div>
@@ -46,48 +46,48 @@
       </div>
 
       <div class="actions">
-        <button class="btn" :disabled="!selectedPlatform" @click="step = 1">下一步：上传素材</button>
+        <button class="btn" :disabled="!selectedPlatform" @click="step = 1">{{ $t('work_pages.compliance.next_upload') }}</button>
       </div>
     </div>
 
     <!-- Step 1: 上传素材 -->
     <div v-else-if="step === 1" class="upload-section">
-      <h3>上传待检查素材</h3>
+      <h3>{{ $t('work_pages.compliance.upload_material') }}</h3>
       <div class="dropzone" @dragover.prevent @drop.prevent="handleDrop">
         <p class="dz-icon">📤</p>
-        <p>拖拽图片到此处</p>
+        <p>{{ $t('work_pages.compliance.drag_hint') }}</p>
         <input ref="fileInput" type="file" accept="image/*" multiple hidden @change="handleFiles" />
-        <button class="btn-outline" @click="fileInput?.click()">选择图片</button>
+        <button class="btn-outline" @click="fileInput?.click()">{{ $t('work_pages.compliance.select_images') }}</button>
       </div>
 
       <div v-if="previews.length" class="preview-grid">
         <div v-for="(p, i) in previews" :key="i" class="preview-item">
-          <img loading="lazy" :src="p.url" alt="合规预览" class="preview-thumb" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
-          <button class="remove-btn" @click="removeImage(i)" aria-label="移除图片">✕</button>
+          <img loading="lazy" :src="p.url" :alt="$t('work_pages.compliance.preview_alt')" class="preview-thumb" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+          <button class="remove-btn" @click="removeImage(i)" :aria-label="$t('work_pages.compliance.remove_image')">✕</button>
         </div>
       </div>
 
       <div class="text-check-section">
-        <h4>文案检查（可选）</h4>
-        <textarea v-model="textToCheck" placeholder="输入产品标题/描述文案进行检查..." rows="3" class="text-input" maxlength="5000" />
+        <h4>{{ $t('work_pages.compliance.copy_check_optional') }}</h4>
+        <textarea v-model="textToCheck" :placeholder="$t('work_pages.compliance.copy_placeholder')" rows="3" class="text-input" maxlength="5000" />
       </div>
 
       <div class="actions">
-        <button class="btn-outline" @click="step = 0">返回</button>
-        <button class="btn" :disabled="!previews.length && !textToCheck" @click="runCheck">开始合规检查</button>
+        <button class="btn-outline" @click="step = 0">{{ $t('work_pages.compliance.back') }}</button>
+        <button class="btn" :disabled="!previews.length && !textToCheck" @click="runCheck">{{ $t('work_pages.compliance.start_check') }}</button>
       </div>
     </div>
 
     <!-- Step 2: 检查结果 -->
     <div v-else class="result-section">
-      <h3>合规检查结果</h3>
-      <div v-if="checking" class="progress-box"><div class="spinner" /><p>正在检查合规性...</p></div>
+      <h3>{{ $t('work_pages.compliance.result_title') }}</h3>
+      <div v-if="checking" class="progress-box"><div class="spinner" /><p>{{ $t('work_pages.compliance.checking') }}</p></div>
       <template v-else>
-      <div class="check-summary">
-        <div class="summary-card" :class="checkResult?.isCompliant ? 'pass' : 'fail'">
-          <span class="summary-icon">{{ checkResult?.isCompliant ? '✅' : '⚠️' }}</span>
-          <span class="summary-title">{{ checkResult?.isCompliant ? '通过检查' : '发现问题' }}</span>
-          <span class="summary-detail">共 {{ checkResult?.totalRules || 0 }} 条规则，{{ checkResult?.criticalCount || 0 }} 条严重</span>
+      <div v-if="checkResult" class="check-summary">
+        <div class="summary-card" :class="checkResult.isCompliant ? 'pass' : 'fail'">
+          <span class="summary-icon">{{ checkResult.isCompliant ? '✅' : '⚠️' }}</span>
+          <span class="summary-title">{{ checkResult.isCompliant ? $t('work_pages.compliance.passed') : $t('work_pages.compliance.found_issues') }}</span>
+          <span class="summary-detail">{{ $t('work_pages.compliance.total_rules', { total: checkResult.totalRules || 0, critical: checkResult.criticalCount || 0 }) }}</span>
         </div>
       </div>
 
@@ -107,8 +107,14 @@
         </div>
       </div>
 
+      <!-- empty result -->
+      <div v-if="!checkResult" class="empty-hint">
+        <span class="empty-icon">🔍</span>
+        <p>{{ $t('work_pages.compliance.empty_result') }}</p>
+      </div>
+
       <div class="actions">
-        <button class="btn-outline" @click="handleRedo">重新检查</button>
+        <button class="btn-outline" @click="handleRedo">{{ $t('work_pages.compliance.recheck') }}</button>
       </div>
       </template>
     </div>
@@ -118,6 +124,7 @@
 <script setup lang="ts">
 const { createBlobUrl, revoke } = useBlobUrl()
 const toast = useToast()
+const { t } = useI18n()
 
 interface PreviewItem { url: string; uploadedUrl: string }
 
@@ -134,13 +141,19 @@ const checking = ref(false);
 const previewRules = ref<any[]>([]);
 const fileInput = ref<HTMLInputElement | null>(null)
 
+const complianceSteps = computed(() => [
+  t('work_pages.compliance.step_target'),
+  t('work_pages.compliance.step_upload'),
+  t('work_pages.compliance.step_check'),
+])
+
 function removeImage(i: number) { previews.value.splice(i, 1); }
 
 async function loadTargets() {
   try {
     const res = await $fetch('/api/compliance/targets', { credentials: 'include' });
     targets.value = (res as any).data || [];
-  } catch { toast.warn('加载合规目标失败') }
+  } catch { toast.warn(t('work_pages.compliance.load_failed')) }
 }
 
 async function loadRulesPreview() {
@@ -154,7 +167,7 @@ async function loadRulesPreview() {
       body: JSON.stringify({ platform: selectedPlatform.value, region: selectedRegion.value || undefined }),
     });
     previewRules.value = (res as any).data?.results || [];
-  } catch { previewRules.value = []; toast.warn('加载审核规则失败') }
+  } catch { previewRules.value = []; toast.warn(t('work_pages.compliance.load_rules_failed')) }
 }
 
 watch([selectedPlatform, selectedRegion], () => { loadRulesPreview(); });
@@ -189,7 +202,11 @@ async function runCheck() {
 }
 
 function severityLabel(s: string) {
-  const map: Record<string, string> = { critical: '严重', warning: '警告', info: '提示' };
+  const map: Record<string, string> = {
+    critical: t('work_pages.compliance.severity_critical'),
+    warning: t('work_pages.compliance.severity_warning'),
+    info: t('work_pages.compliance.severity_info'),
+  };
   return map[s] || s;
 }
 
@@ -250,4 +267,7 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 .check-status { font-size: 16px; flex-shrink: 0; }
 .check-desc { flex: 1; }
 .check-severity { font-size: 11px; padding: 2px 8px; border-radius: var(--radius-xs); background: var(--bg-hover); color: var(--text-muted); flex-shrink: 0; }
+.empty-hint { text-align: center; padding: 60px 20px; }
+.empty-icon { font-size: 48px; display: block; margin-bottom: 16px; }
+.empty-hint p { font-size: 15px; color: var(--text-secondary); }
 </style>

@@ -6,8 +6,8 @@
 <template>
   <div class="work-page">
     <header class="work-header">
-      <h1>{{ headerCfg.title || 'AI 视频创作中心' }}</h1>
-      <p>{{ headerCfg.subtitle || '图生视频 · 多图合成 · 一键成片 · AI视频包装' }}</p>
+      <h1>{{ headerCfg.title || $t('work_pages.video.title') }}</h1>
+      <p>{{ headerCfg.subtitle || $t('work_pages.video.subtitle') }}</p>
     </header>
 
     <div class="work-tabs">
@@ -23,31 +23,31 @@
 
       <SmartRecognitionPanel
         v-if="images.length"
-        hint="AI 可基于参考图智能识别商品信息，自动生成精准提示词"
-        confirm-label="确认并填充提示词"
+        :hint="$t('work_pages.video.smart_hint')"
+        :confirm-label="$t('work_pages.video.smart_confirm')"
         @confirm="onSmartApply"
       />
 
       <div class="input-group" style="margin-top:16px">
-        <label>提示词（描述想要的视频效果）</label>
-        <textarea v-model="prompt" class="input prompt-input" rows="3" placeholder="例如: 产品旋转展示，柔和灯光，快节奏转场..." maxlength="2000"></textarea>
+        <label>{{ $t('work_pages.video.prompt_label') }}<label>
+        <textarea v-model="prompt" class="input prompt-input" rows="3" :placeholder="$t('work_pages.video.prompt_placeholder')" maxlength="2000"></textarea>
         <div class="prompt-actions">
           <PromptEnhancer v-model="prompt" type="video" @enhanced="onPromptEnhanced" />
           <button class="btn btn-ghost btn-sm" :disabled="enhancing" @click="doEnhance">
-            {{ enhancing ? '优化中...' : '✨ AI 优化提示词' }}
+            {{ enhancing ? $t('work_pages.video.enhancing') : $t('work_pages.video.enhance_btn') }}
           </button>
         </div>
       </div>
 
       <div class="options-row">
         <div class="option">
-          <label>视频比例</label>
+          <label>{{ $t('work_pages.video.ratio_label') }}<label>
           <select v-model="ratio" class="input">
             <option v-for="r in ratioOptions" :key="r.item_key" :value="r.item_key">{{ r.item_value }}</option>
           </select>
         </div>
         <div class="option">
-          <label>视频时长</label>
+          <label>{{ $t('work_pages.video.duration_label') }}<label>
           <select v-model="duration" class="input">
             <option :value="10">10秒</option>
             <option :value="15">15秒</option>
@@ -58,7 +58,7 @@
       </div>
 
       <button class="btn btn-primary btn-lg" :disabled="!images.length || taskStatus === 'processing' || taskStatus === 'queued'" @click="doGenerate">
-        {{ taskStatus === 'processing' ? '生成中...' : taskStatus === 'queued' ? '排队中...' : '开始生成视频' }}
+        {{ taskStatus === 'processing' ? $t('work_pages.video.generating') : taskStatus === 'queued' ? $t('work_pages.video.queued') : $t('work_pages.video.generate_btn') }}
       </button>
 
       <AppTaskProgress v-if="taskStatus !== 'idle'" :status="taskStatus" :progress="taskProgress" :error-message="taskError" :show-download="taskStatus === 'completed'" @retry="doGenerate" @download="downloadResult" />
@@ -66,7 +66,7 @@
       <div v-if="resultUrl" class="result-preview">
         <video :src="resultUrl" class="result-video" controls />
         <div class="result-actions">
-          <button class="btn btn-primary btn-sm" @click="downloadResult">下载</button>
+          <button class="btn btn-primary btn-sm" @click="downloadResult">{{ $t('work_pages.video.download_btn') }}<button>
           <button class="btn btn-secondary btn-sm" @click="copyToClipboard(resultUrl)">复制链接</button>
         </div>
       </div>
@@ -75,8 +75,8 @@
     <!-- 一键成片 (商品广告) -->
     <div v-if="activeTab === 'productAd'" class="work-panel">
       <div class="input-group">
-        <label>商品名称</label>
-        <input v-model="productName" type="text" class="input" placeholder="输入商品名称" maxlength="200" />
+        <label>{{ $t('work_pages.video.product_name') }}<label>
+        <input v-model="productName" type="text" class="input" :placeholder="$t('work_pages.video.product_name_placeholder')" maxlength="200" />
       </div>
 
       <AppMediaUpload accept="image" :multiple="true" :max-size="20" :max-count="9" @uploaded="onProductImagesUploaded" />
@@ -106,7 +106,7 @@
       </div>
 
       <button class="btn btn-primary btn-lg" :disabled="!productName || adTaskStatus === 'processing'" @click="doProductAd">
-        {{ adTaskStatus === 'processing' ? '生成中...' : '一键成片' }}
+        {{ adTaskStatus === 'processing' ? $t('work_pages.video.generating') : '一键成片' }}
       </button>
 
       <AppTaskProgress v-if="adTaskStatus !== 'idle'" :status="adTaskStatus" :progress="adProgress" @retry="doProductAd" />
@@ -148,7 +148,7 @@
         </select>
       </div>
       <button class="btn btn-primary btn-lg" :disabled="!storyPrompt || sbTaskStatus === 'processing'" @click="doStoryboard">
-        {{ sbTaskStatus === 'processing' ? '生成中...' : '生成分镜' }}
+        {{ sbTaskStatus === 'processing' ? $t('work_pages.video.generating') : '生成分镜' }}
       </button>
 
       <AppTaskProgress v-if="sbTaskStatus !== 'idle'" :status="sbTaskStatus" :progress="sbProgress" @retry="doStoryboard" />
@@ -175,6 +175,7 @@
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n()
 
 
 
@@ -194,9 +195,9 @@ const headerCfg = computed(() => configs.value['page.video.header'] || {})
 
 const activeTab = ref('img2video')
 const tabs = [
-  { key: 'img2video', label: '图生视频' },
-  { key: 'productAd', label: '一键成片' },
-  { key: 'replaceChar', label: '角色替换' },
+  { key: 'img2video', label: t('work_pages.video.tab_img2video') },
+  { key: 'productAd', label: t('work_pages.video.tab_oneshot') },
+  { key: 'replaceChar', label: t('work_pages.video.tab_avatar') },
   { key: 'storyboard', label: '分镜生成' },
   { key: 'package', label: '视频包装' },
 ]

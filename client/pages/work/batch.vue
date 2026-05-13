@@ -1,19 +1,19 @@
 <template>
-  <WorkLayout :steps="['拖文件夹', '选操作+模式', '确认执行', '下载结果']" :current-step="step">
+  <WorkLayout :steps="batchSteps" :current-step="step">
     <!-- Step 0: 上传 -->
     <div v-if="step === 0" class="upload-section">
       <div class="dropzone" @dragover.prevent @drop.prevent="handleDrop">
         <p class="dz-icon">📦</p>
-        <p>拖拽图片文件夹到此处</p>
-        <p class="hint">支持 JPG / PNG / WebP，一次最多 100 张</p>
+        <p>{{ $t('work_pages.batch.drag_hint') }}</p>
+        <p class="hint">{{ $t('work_pages.batch.support_hint') }}</p>
         <input ref="fileInput" type="file" accept="image/*" multiple hidden @change="handleFiles" />
-        <button class="btn-outline" @click="fileInput?.click()">选择图片</button>
+        <button class="btn-outline" @click="fileInput?.click()">{{ $t('work_pages.batch.select_files') }}</button>
       </div>
-      <div v-if="previews.length" class="file-count">{{ previews.length }} 张图片已就绪</div>
+      <div v-if="previews.length" class="file-count">{{ $t('work_pages.batch.files_ready', { n: previews.length }) }}</div>
 
       <!-- 历史复刻 -->
       <div v-if="history.length" class="history-section">
-        <h4>📋 历史批量任务 — 点击复刻</h4>
+        <h4>📋 {{ $t('work_pages.batch.history_title') }}</h4>
         <div class="history-list">
           <button v-for="h in history" :key="h.id" class="history-item" @click="redoFromHistory(h)">
             <span class="h-type">{{ h.type }}</span>
@@ -23,86 +23,84 @@
         </div>
       </div>
 
-      <button v-if="previews.length" class="btn" @click="step = 1">下一步：选操作</button>
+      <button v-if="previews.length" class="btn" @click="step = 1">{{ $t('work_pages.batch.next_step') }}</button>
     </div>
 
     <!-- Step 1: 选操作 + 模式 -->
     <div v-else-if="step === 1" class="select-section">
-      <h3>选择批量操作</h3>
+      <h3>{{ $t('work_pages.batch.select_op') }}</h3>
       <div class="op-grid">
         <button v-for="o in operations" :key="o.id" class="op-card" :class="{ active: selectedOp === o.id }" @click="selectedOp = o.id">
           <span class="op-icon">{{ o.icon }}</span>
           <span class="op-name">{{ o.name }}</span>
-          <span class="op-cost">{{ o.cost }} 点/张</span>
+          <span class="op-cost">{{ $t('work_pages.batch.points_per_image', { cost: o.cost }) }}</span>
         </button>
       </div>
 
-      <h3>执行模式</h3>
+      <h3>{{ $t('work_pages.batch.exec_mode') }}</h3>
       <div class="mode-row">
         <button class="mode-card" :class="{ active: !nightMode }" @click="nightMode = false">
           <span class="mode-icon">⚡</span>
-          <span class="mode-name">立即执行</span>
-          <span class="mode-desc">马上排队处理</span>
+          <span class="mode-name">{{ $t('work_pages.batch.immediate') }}</span>
+          <span class="mode-desc">{{ $t('work_pages.batch.immediate_desc') }}</span>
         </button>
         <button class="mode-card night" :class="{ active: nightMode }" @click="nightMode = true">
           <span class="mode-icon">🌙</span>
-          <span class="mode-name">夜间托管</span>
-          <span class="mode-desc">凌晨2点自动执行 · 6折优惠</span>
-          <span class="mode-badge">六折</span>
+          <span class="mode-name">{{ $t('work_pages.batch.night_mode') }}</span>
+          <span class="mode-desc">{{ $t('work_pages.batch.night_desc') }}</span>
+          <span class="mode-badge">{{ $t('work_pages.batch.night_discount') }}</span>
         </button>
       </div>
 
       <!-- 模板 -->
       <div v-if="templates.length" class="template-section">
-        <h4>💾 我的模板</h4>
+        <h4>💾 {{ $t('work_pages.batch.my_templates') }}</h4>
         <div class="template-list">
           <button v-for="t in templates" :key="t.id" class="template-item" @click="applyTemplate(t)">
             <span>{{ t.name }}</span>
             <span class="t-tag">{{ t.operation }}</span>
-            <span v-if="t.night_mode" class="t-night">夜间</span>
+            <span v-if="t.night_mode" class="t-night">{{ $t('work_pages.batch.night_tag') }}</span>
           </button>
         </div>
       </div>
 
       <div class="actions">
-        <button class="btn-outline" @click="step = 0">返回</button>
-        <button class="btn" :disabled="!selectedOp" @click="step = 2">下一步</button>
+        <button class="btn-outline" @click="step = 0">{{ $t('work_pages.batch.back') }}</button>
+        <button class="btn" :disabled="!selectedOp" @click="step = 2">{{ $t('work_pages.batch.next') }}</button>
       </div>
     </div>
 
     <!-- Step 2: 确认 -->
     <div v-else-if="step === 2" class="select-section">
-      <h3>确认批量配置</h3>
+      <h3>{{ $t('work_pages.batch.confirm_config') }}</h3>
       <div class="summary-box">
-        <div class="summary-row"><span>图片数量</span><strong>{{ previews.length }} 张</strong></div>
-        <div class="summary-row"><span>操作类型</span><strong>{{ operationLabel }}</strong></div>
-        <div class="summary-row"><span>执行模式</span><strong>{{ nightMode ? '🌙 夜间托管 (6折)' : '⚡ 立即执行' }}</strong></div>
-        <div class="summary-row cost"><span>预估消耗</span><strong>{{ estimatedCost }} 点</strong></div>
+        <div class="summary-row"><span>{{ $t('work_pages.batch.image_count') }}</span><strong>{{ previews.length }} {{ $t('work_pages.batch.images_unit') }}</strong></div>
+        <div class="summary-row"><span>{{ $t('work_pages.batch.op_type') }}</span><strong>{{ operationLabel }}</strong></div>
+        <div class="summary-row"><span>{{ $t('work_pages.batch.exec_mode_label') }}</span><strong>{{ nightMode ? '🌙 ' + $t('work_pages.batch.night_label') : '⚡ ' + $t('work_pages.batch.immediate_label') }}</strong></div>
+        <div class="summary-row cost"><span>{{ $t('work_pages.batch.estimated_cost') }}</span><strong>{{ estimatedCost }} {{ $t('work_pages.batch.points_unit') }}</strong></div>
       </div>
 
-      <!-- 目标平台+风格 (仅主图/场景操作显示) -->
       <div v-if="selectedOp === 'main_image' || selectedOp === 'scene'" class="quick-row">
         <select v-model="selectedPlatform" class="select">
-          <option value="">-- 选平台 --</option>
+          <option value="">{{ $t('work_pages.batch.select_platform') }}</option>
           <option v-for="p in platforms" :key="p.code" :value="p.code">{{ p.name }}</option>
         </select>
         <select v-model="selectedStyle" class="select">
-          <option value="">-- 选风格 --</option>
-          <option value="simple">简约白底</option>
-          <option value="luxury">高级轻奢</option>
-          <option value="promo">活动促销</option>
+          <option value="">{{ $t('work_pages.batch.select_style') }}</option>
+          <option value="simple">{{ $t('work_pages.batch.style_simple') }}</option>
+          <option value="luxury">{{ $t('work_pages.batch.style_luxury') }}</option>
+          <option value="promo">{{ $t('work_pages.batch.style_promo') }}</option>
         </select>
       </div>
 
-      <!-- 保存为模板 -->
       <div class="save-template-row">
-        <input v-model="templateName" placeholder="保存为批量模板..." class="input-sm" maxlength="100" />
-        <button class="btn-outline-sm" :disabled="!templateName" @click="saveTemplate">保存模板</button>
+        <input v-model="templateName" :placeholder="$t('work_pages.batch.save_template_placeholder')" class="input-sm" maxlength="100" />
+        <button class="btn-outline-sm" :disabled="!templateName" @click="saveTemplate">{{ $t('work_pages.batch.save_template') }}</button>
       </div>
 
       <div class="actions">
-        <button class="btn-outline" @click="step = 1">返回</button>
-        <button class="btn" :disabled="task.polling.value" @click="submitTask">{{ nightMode ? '提交夜间托管' : '开始批量处理' }}</button>
+        <button class="btn-outline" @click="step = 1">{{ $t('work_pages.batch.back') }}</button>
+        <button class="btn" :disabled="task.polling.value" @click="submitTask">{{ nightMode ? $t('work_pages.batch.submit_night') : $t('work_pages.batch.submit_batch') }}</button>
       </div>
     </div>
 
@@ -113,27 +111,32 @@
         <div class="bar"><div class="bar-fill" :style="{ width: task.progress.value + '%' }" /></div>
       </div>
       <div v-else-if="task.status.value === 2">
-        <h3>批量完成 — {{ task.result.value?.total }} 张</h3>
+        <h3>{{ $t('work_pages.batch.batch_complete') }} — {{ task.result.value?.total }} {{ $t('work_pages.batch.images_unit') }}</h3>
         <div class="result-actions">
-          <button class="btn">📥 一键下载 ZIP</button>
-          <p class="zip-hint">约 {{ task.result.value?.estimatedZipSize || '?' }}</p>
+          <button class="btn">📥 {{ $t('work_pages.batch.download_zip') }}</button>
+          <p class="zip-hint">≈ {{ task.result.value?.estimatedZipSize || '?' }}</p>
         </div>
         <div class="actions">
-          <button class="btn-outline" @click="handleRedo">再处理一批</button>
-          <button class="btn-outline" @click="step = 0; handleRedo()">重新开始</button>
+          <button class="btn-outline" @click="handleRedo">{{ $t('work_pages.batch.redo_batch') }}</button>
+          <button class="btn-outline" @click="step = 0; handleRedo()">{{ $t('work_pages.batch.restart') }}</button>
         </div>
       </div>
       <div v-else-if="task.status.value === -1 && nightMode" class="night-confirmed">
         <span class="night-icon">🌙</span>
-        <h3>夜间托管已确认</h3>
-        <p>任务将在凌晨2点自动执行，6折优惠。完成后可在素材库查看结果。</p>
-        <p class="cost-saved">预估节省 {{ Math.round(estimatedCost * 0.4) }} 点</p>
-        <button class="btn" @click="handleRedo(); step = 0">提交新任务</button>
+        <h3>{{ $t('work_pages.batch.night_confirmed_title') }}</h3>
+        <p>{{ $t('work_pages.batch.night_confirmed_desc') }}</p>
+        <p class="cost-saved">{{ $t('work_pages.batch.cost_saved', { n: Math.round(estimatedCost * 0.4) }) }}</p>
+        <button class="btn" @click="handleRedo(); step = 0">{{ $t('work_pages.batch.submit_new') }}</button>
       </div>
       <div v-else-if="task.status.value === 3" class="error-box">
-        <p>{{ task.errorMsg.value || '处理失败' }}</p>
-        <button class="btn" @click="handleRedo()">重试</button>
+        <p>{{ task.errorMsg.value || $t('work_pages.batch.process_failed') }}</p>
+        <button class="btn" @click="handleRedo()">{{ $t('work_pages.batch.retry') }}</button>
       </div>
+    </div>
+    <!-- empty state -->
+    <div v-if="step === 0 && !previews.length && !history.length" class="empty-hint">
+      <span class="empty-icon">📦</span>
+      <p>{{ $t('work_pages.batch.empty_hint') }}</p>
     </div>
   </WorkLayout>
 </template>
@@ -141,6 +144,7 @@
 <script setup lang="ts">
 const { createBlobUrl, revoke } = useBlobUrl()
 const toast = useToast()
+const { t } = useI18n()
 
 const step = ref(0);
 const previews = ref<string[]>([]);
@@ -156,20 +160,27 @@ const history = ref<any[]>([]);
 const fileInput = ref<HTMLInputElement | null>(null)
 const task = useTask();
 
-const operations = [
-  { id: 'cutout', name: '批量抠图', icon: '✂', cost: '1' },
-  { id: 'main_image', name: '批量主图', icon: '📷', cost: '3' },
-  { id: 'scene', name: '批量场景', icon: '🖼', cost: '2' },
-  { id: 'img2video', name: '批量视频', icon: '🎬', cost: '10' },
-];
+const batchSteps = computed(() => [
+  t('work_pages.batch.step_drop'),
+  t('work_pages.batch.step_select'),
+  t('work_pages.batch.step_confirm'),
+  t('work_pages.batch.step_download'),
+])
+
+const operations = computed(() => [
+  { id: 'cutout', name: t('work_pages.batch.op_cutout'), icon: '✂', cost: '1' },
+  { id: 'main_image', name: t('work_pages.batch.op_main_image'), icon: '📷', cost: '3' },
+  { id: 'scene', name: t('work_pages.batch.op_scene'), icon: '🖼', cost: '2' },
+  { id: 'img2video', name: t('work_pages.batch.op_video'), icon: '🎬', cost: '10' },
+]);
 const platforms = [
   { code: 'taobao', name: '淘宝' }, { code: 'pdd', name: '拼多多' }, { code: 'douyin', name: '抖音' },
   { code: 'amazon', name: '亚马逊' }, { code: 'tiktok', name: 'TikTok Shop' },
 ];
 
-const operationLabel = computed(() => operations.find((o) => o.id === selectedOp.value)?.name || selectedOp.value);
+const operationLabel = computed(() => operations.value.find((o) => o.id === selectedOp.value)?.name || selectedOp.value);
 const baseCost = computed(() => {
-  const op = operations.find((o) => o.id === selectedOp.value);
+  const op = operations.value.find((o) => o.id === selectedOp.value);
   return op ? parseInt(op.cost) : 1;
 });
 const estimatedCost = computed(() => {
@@ -203,7 +214,7 @@ async function uploadMultiple(files: File[]) {
       method: 'POST', credentials: 'include', body: formData,
     });
     uploadedUrls.value.push(...(res.data?.files || []).map((f: any) => f.url));
-  } catch (e: any) { toast.error(e?.data?.msg || '上传失败'); }
+  } catch (e: any) { toast.error(e?.data?.msg || t('work_pages.batch.upload_error')); }
   finally { uploading.value = false; }
 }
 
@@ -211,14 +222,14 @@ async function loadTemplates() {
   try {
     const res = await $fetch('/api/batch/templates', { credentials: 'include' });
     templates.value = (res as any).data?.list || [];
-  } catch (e: any) { toast.error('模板加载失败，请刷新页面重试') }
+  } catch { toast.error(t('work_pages.batch.load_template_failed')) }
 }
 
 async function loadHistory() {
   try {
     const res = await $fetch('/api/batch/history?pageSize=3', { credentials: 'include' });
     history.value = (res as any).data?.list || [];
-  } catch (e: any) { toast.error('历史记录加载失败，请刷新页面重试') }
+  } catch { toast.error(t('work_pages.batch.load_history_failed')) }
 }
 
 function applyTemplate(t: any) {
@@ -238,7 +249,7 @@ async function redoFromHistory(h: any) {
     task.pollTask((res as any).data.taskId);
     step.value = 3;
   } catch (err: any) {
-    toast.error(err?.data?.msg || err?.message || '重做失败，请重试');
+    toast.error(err?.data?.msg || err?.message || t('work_pages.batch.redo_failed'));
   }
 }
 
@@ -252,7 +263,7 @@ async function saveTemplate() {
     templateName.value = '';
     loadTemplates();
   } catch (err: any) {
-    toast.error(err?.data?.msg || err?.message || '保存模板失败');
+    toast.error(err?.data?.msg || err?.message || t('work_pages.batch.save_template_failed'));
   }
 }
 
@@ -264,10 +275,10 @@ async function submitTask() {
       credentials: 'include',
       body: { imageUrls: uploadedUrls.value.slice(0, 100), operation: selectedOp.value, platform: selectedPlatform.value, style: selectedStyle.value, nightMode: nightMode.value },
     });
-    if (nightMode.value) return; // 夜间模式不轮询
+    if (nightMode.value) return;
     task.pollTask((res as any).data.taskId);
   } catch (err: any) {
-    toast.error(err?.data?.msg || err?.message || '批量任务提交失败，请重试');
+    toast.error(err?.data?.msg || err?.message || t('work_pages.batch.submit_failed'));
     step.value = 2;
   }
 }
@@ -289,4 +300,7 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 .zip-hint { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
 .night-icon { font-size: 48px; display: block; margin-bottom: 12px; }
 .cost-saved { color: var(--success) !important; font-weight: 600; }
+.empty-hint { text-align: center; padding: 60px 20px; }
+.empty-icon { font-size: 48px; display: block; margin-bottom: 16px; }
+.empty-hint p { font-size: 15px; color: var(--text-secondary); }
 </style>

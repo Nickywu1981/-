@@ -1,8 +1,8 @@
 <template>
   <div class="compare-tool">
     <header class="compare-header">
-      <h1>图片对比 / AB测试</h1>
-      <p>并排对比原图与生成图，挑选最佳效果</p>
+      <h1>{{ $t('work_pages.compare.title') }}</h1>
+      <p>{{ $t('work_pages.compare.subtitle') }}</p>
     </header>
 
     <!-- 模式切换 -->
@@ -16,19 +16,19 @@
     <div v-if="mode === 'side'" class="side-panel">
       <div class="compare-row">
         <div class="compare-col">
-          <div class="col-label">原图</div>
-          <ImageSlot :src="original.src" :alt="original.alt" :title="original.title" empty-text="点击下方选择原图" @click="openPicker('original')" />
-          <button class="pick-btn" @click="openPicker('original')">选择原图</button>
+          <div class="col-label">{{ $t('work_pages.compare.original_label') }}</div>
+          <ImageSlot :src="original.src" :alt="original.alt" :title="original.title" :empty-text="$t('work_pages.compare_ext.pick_hint_original')" @click="openPicker('original')" />
+          <button class="pick-btn" @click="openPicker('original')">{{ $t('work_pages.compare.select_original') }}<button>
         </div>
         <div class="compare-col">
-          <div class="col-label">生成图</div>
-          <ImageSlot :src="variant.src" :alt="variant.alt" :title="variant.title" empty-text="点击下方选择生成图" @click="openPicker('variant')" />
-          <button class="pick-btn" @click="openPicker('variant')">选择生成图</button>
+          <div class="col-label">{{ $t('work_pages.compare.variant_label') }}</div>
+          <ImageSlot :src="variant.src" :alt="variant.alt" :title="variant.title" :empty-text="$t('work_pages.compare_ext.pick_hint_variant')" @click="openPicker('variant')" />
+          <button class="pick-btn" @click="openPicker('variant')">{{ $t('work_pages.compare.select_variant') }}<button>
         </div>
       </div>
       <div class="compare-actions">
-        <button class="btn btn-ghost" @click="downloadBoth">下载两张图片</button>
-        <span class="ratio-hint" v-if="original.src && variant.src">尺寸: {{ originalDims }} / {{ variantDims }}</span>
+        <button class="btn btn-ghost" @click="downloadBoth">{{ $t('work_pages.compare.download_both') }}<button>
+        <span class="ratio-hint" v-if="original.src && variant.src">{{ $t('work_pages.compare.dimensions') }}: {{ originalDims }} / {{ variantDims }}</span>
       </div>
     </div>
 
@@ -40,30 +40,30 @@
         <div v-if="original.src && variant.src" class="slider-line" :style="{ left: sliderPos + '%' }">
           <div class="slider-handle">⟷</div>
         </div>
-        <div v-if="!original.src || !variant.src" class="slider-empty">请先选择原图和生成图</div>
+        <div v-if="!original.src || !variant.src" class="slider-empty">{{ $t('work_pages.compare_ext.pick_empty') }}</div>
       </div>
       <div class="slider-labels">
-        <span>原图</span>
+        <span>{{ $t('work_pages.compare.original_label') }}</span>
         <input type="range" min="0" max="100" v-model.number="sliderPos" class="slider-range" />
-        <span>生成图</span>
+        <span>{{ $t('work_pages.compare.variant_label') }}</span>
       </div>
       <div class="compare-actions">
-        <button class="pick-btn" @click="openPicker('original')">更换原图</button>
-        <button class="pick-btn" @click="openPicker('variant')">更换生成图</button>
+        <button class="pick-btn" @click="openPicker('original')">{{ $t('work_pages.compare_ext.replace_original') }}<button>
+        <button class="pick-btn" @click="openPicker('variant')">{{ $t('work_pages.compare_ext.replace_variant') }}<button>
       </div>
     </div>
 
     <!-- 多图网格对比模式 -->
     <div v-else class="grid-panel">
       <div class="grid-header">
-        <span>最多选择 6 张图片进行对比</span>
-        <button class="btn btn-ghost btn-sm" @click="addGridSlot" :disabled="gridSlots.length >= 6">+ 添加图片</button>
+        <span>{{ $t('work_pages.compare_ext.max_six') }}<span>
+        <button class="btn btn-ghost btn-sm" @click="addGridSlot" :disabled="gridSlots.length >= 6">{{ $t('work_pages.compare_ext.add_image') }}<button>
       </div>
       <div class="grid-compare" :style="{ gridTemplateColumns: `repeat(${gridCols}, 1fr)` }">
         <div v-for="(slot, i) in gridSlots" :key="i" class="grid-col">
-          <ImageSlot :src="slot.src" :alt="slot.alt" :title="slot.label" empty-text="点击选择" size="sm" @click="openGridPicker(i)" />
+          <ImageSlot :src="slot.src" :alt="slot.alt" :title="slot.label" :empty-text="$t('work_pages.compare_ext.pick_hint_click')" size="sm" @click="openGridPicker(i)" />
           <div class="grid-meta">
-            <input v-model="slot.label" class="label-input" placeholder="标签" maxlength="50" />
+            <input v-model="slot.label" class="label-input" :placeholder="$t('work_pages.compare_ext.label_placeholder')" maxlength="50" />
             <button class="btn-remove" @click="removeGridSlot(i)" title="移除" aria-label="移除">✕</button>
           </div>
         </div>
@@ -79,12 +79,12 @@
             <button class="picker-close" @click="pickerOpen = false" aria-label="关闭">✕</button>
           </div>
           <div class="picker-tabs">
-            <button class="tab-btn" :class="{ active: pickerTab === 'works' }" @click="pickerTab = 'works'">我的作品</button>
-            <button class="tab-btn" :class="{ active: pickerTab === 'upload' }" @click="pickerTab = 'upload'">上传新图</button>
+            <button class="tab-btn" :class="{ active: pickerTab === 'works' }" @click="pickerTab = 'works'">{{ $t('work_pages.compare_ext.my_works') }}<button>
+            <button class="tab-btn" :class="{ active: pickerTab === 'upload' }" @click="pickerTab = 'upload'">{{ $t('work_pages.compare_ext.upload_new') }}<button>
           </div>
           <div v-if="pickerTab === 'works'" class="picker-body">
             <LoadingSkeleton v-if="worksLoading" type="card" :rows="4" />
-            <div v-else-if="!works.length" class="empty">暂无作品</div>
+            <div v-else-if="!works.length" class="empty">{{ $t('work_pages.compare_ext.no_works') }}<div>
             <div v-else class="works-grid">
               <div v-for="w in works" :key="w.id" class="work-card" :class="{ selected: pickerSelected === w.id }" @click="pickerSelected = w.id">
                 <img loading="lazy" :src="w.result_url || w.output_result?.images?.[0]?.url" :alt="w.task_code || `#${w.id}`" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
@@ -94,15 +94,15 @@
           </div>
           <div v-else class="picker-body upload-tab">
             <div class="dropzone" @dragover.prevent @drop.prevent="handleUploadDrop" @click="uploadInput?.click()">
-              <p>拖拽图片或点击上传</p>
+              <p>{{ $t('work_pages.compare_ext.drag_upload') }}<p>
               <input ref="uploadInput" type="file" accept="image/*" hidden @change="handleUploadFile" />
             </div>
             <img loading="lazy" v-if="uploadPreview" :src="uploadPreview" class="upload-preview" alt="预览" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
             <p v-if="uploadingMsg" class="hint">{{ uploadingMsg }}</p>
           </div>
           <div class="picker-footer">
-            <button class="btn btn-ghost" @click="pickerOpen = false">取消</button>
-            <button class="btn btn-primary" :disabled="!pickerSelected && !uploadedUrl" @click="confirmPicker">确认选择</button>
+            <button class="btn btn-ghost" @click="pickerOpen = false">{{ $t('work_pages.compare_ext.cancel') }}<button>
+            <button class="btn btn-primary" :disabled="!pickerSelected && !uploadedUrl" @click="confirmPicker">{{ $t('work_pages.compare_ext.confirm') }}<button>
           </div>
         </div>
       </div>
@@ -118,6 +118,7 @@ const { createBlobUrl, revoke } = useBlobUrl()
 import ImageSlot from '~/components/ImageSlot.vue'
 
 const toast = useToast()
+const { t } = useI18n()
 
 const mode = ref<'side' | 'slider' | 'grid'>('side')
 const modes = [
@@ -129,8 +130,8 @@ const modes = [
 // --- Image slots ---
 const original = reactive({ src: '', alt: '', title: '' })
 const variant = reactive({ src: '', alt: '', title: '' })
-const originalDims = computed(() => original.src ? '已有' : '-')
-const variantDims = computed(() => variant.src ? '已有' : '-')
+const originalDims = computed(() => original.src ? $t('work_pages.compare_ext.dimensions_exists') : '-')
+const variantDims = computed(() => variant.src ? $t('work_pages.compare_ext.dimensions_exists') : '-')
 
 // --- Slider ---
 const sliderPos = ref(50)
@@ -226,25 +227,25 @@ async function handleUploadFile(e: Event) {
   const f = (e.target as HTMLInputElement).files?.[0]
   if (!f) return
   uploadPreview.value = createBlobUrl(f)
-  uploadingMsg.value = '上传中...'
+  uploadingMsg.value = $t('work_pages.compare_ext.uploading')
   const fd = new FormData(); fd.append('file', f)
   try {
     const res: any = await $fetch('/api/upload/image', { method: 'POST', credentials: 'include', body: fd })
     uploadedUrl.value = res.data?.url
-    uploadingMsg.value = '上传完成 ✓'
+    uploadingMsg.value = $t('work_pages.compare_ext.upload_done')
     pickerSelected.value = ''
-  } catch { uploadingMsg.value = '上传失败' }
+  } catch { uploadingMsg.value = $t('work_pages.compare_ext.upload_failed') }
 }
 
 function handleUploadDrop(e: DragEvent) {
   const f = e.dataTransfer?.files?.[0]
   if (!f) return
   uploadPreview.value = createBlobUrl(f)
-  uploadingMsg.value = '上传中...'
+  uploadingMsg.value = $t('work_pages.compare_ext.uploading')
   const fd = new FormData(); fd.append('file', f)
   $fetch('/api/upload/image', { method: 'POST', credentials: 'include', body: fd })
-    .then((res: any) => { uploadedUrl.value = res.data?.url; uploadingMsg.value = '上传完成 ✓'; pickerSelected.value = '' })
-    .catch((e: any) => { uploadingMsg.value = '上传失败'; toast.error(e?.data?.msg || '上传失败') })
+    .then((res: any) => { uploadedUrl.value = res.data?.url; uploadingMsg.value = $t('work_pages.compare_ext.upload_done'); pickerSelected.value = '' })
+    .catch((e: any) => { uploadingMsg.value = $t('work_pages.compare_ext.upload_failed'); toast.error(e?.data?.msg || $t('work_pages.compare_ext.upload_failed')) })
 }
 
 function downloadBoth() {

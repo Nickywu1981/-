@@ -1,69 +1,75 @@
 <template>
-  <WorkLayout :steps="['上传产品图', '配置SKU', '选类目+模板', '生成']" :current-step="step">
-    <!-- Step 0: 上传产品图（支持多张，多SKU） -->
+  <WorkLayout :steps="detailSteps" :current-step="step">
+    <!-- Step 0: 上传产品图 -->
     <div v-if="step === 0" class="upload-section">
       <div class="dropzone" @dragover.prevent @drop.prevent="handleDrop">
         <p class="dz-icon">📄</p>
-        <p>拖拽产品图，支持多张（每张对应一个SKU）</p>
-        <p class="hint">支持 JPG / PNG / WebP，一次最多 20 张</p>
+        <p>{{ $t('work_pages.detail_h5.drag_hint') }}</p>
+        <p class="hint">{{ $t('work_pages.detail_h5.support_hint') }}</p>
         <input ref="fileInput" type="file" accept="image/*" multiple hidden @change="handleFiles" />
-        <button class="btn-outline" @click="fileInput?.click()">选择文件</button>
+        <button class="btn-outline" @click="fileInput?.click()">{{ $t('work_pages.detail_h5.select_files') }}</button>
       </div>
 
       <div v-if="skuList.length" class="sku-preview-section">
-        <h4>已添加 {{ skuList.length }} 个SKU</h4>
+        <h4>{{ $t('work_pages.detail_h5.sku_ready', { n: skuList.length }) }}</h4>
         <div class="sku-grid">
           <div v-for="(sku, i) in skuList" :key="i" class="sku-card">
-            <img loading="lazy" :src="sku.previewUrl" alt="SKU预览" class="sku-thumb" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+            <img loading="lazy" :src="sku.previewUrl" :alt="$t('work_pages.detail_h5.sku_preview_alt')" class="sku-thumb" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
             <div class="sku-info">
-              <input v-model="sku.name" placeholder="SKU名称（如：红色-M）" class="sku-name-input" maxlength="100" />
-              <input v-model="sku.color" type="color" class="sku-color" title="选颜色" />
-              <button class="sku-remove" @click="removeSku(i)" title="移除" aria-label="移除SKU">✕</button>
+              <input v-model="sku.name" :placeholder="$t('work_pages.detail_h5.sku_name_placeholder')" class="sku-name-input" maxlength="100" />
+              <input v-model="sku.color" type="color" class="sku-color" :title="$t('work_pages.detail_h5.sku_color_pick')" />
+              <button class="sku-remove" @click="removeSku(i)" :title="$t('work_pages.detail_h5.sku_remove')" :aria-label="$t('work_pages.detail_h5.sku_remove')">✕</button>
             </div>
             <span v-if="sku.uploaded" class="sku-badge ok">✓</span>
-            <span v-else class="sku-badge pending">上传中</span>
+            <span v-else class="sku-badge pending">{{ $t('work_pages.detail_h5.uploading_tag') }}</span>
           </div>
         </div>
       </div>
 
-      <button v-if="skuList.length && allUploaded" class="btn" @click="step = 1">下一步：配置SKU</button>
+      <!-- empty state -->
+      <div v-if="!skuList.length" class="empty-hint">
+        <span class="empty-icon">📄</span>
+        <p>{{ $t('work_pages.detail_h5.empty_hint') }}</p>
+      </div>
+
+      <button v-if="skuList.length && allUploaded" class="btn" @click="step = 1">{{ $t('work_pages.detail_h5.next_config') }}</button>
     </div>
 
-    <!-- Step 1: 配置SKU信息 -->
+    <!-- Step 1: 配置SKU -->
     <div v-else-if="step === 1" class="select-section">
-      <h3>SKU信息配置</h3>
-      <p class="section-hint">为每个SKU设置规格信息，用于生成差异化详情</p>
+      <h3>{{ $t('work_pages.detail_h5.sku_config_title') }}</h3>
+      <p class="section-hint">{{ $t('work_pages.detail_h5.sku_config_hint') }}</p>
 
       <div class="sku-config-list">
         <div v-for="(sku, i) in skuList" :key="i" class="sku-config-row">
-          <img loading="lazy" :src="sku.previewUrl" alt="SKU预览" class="sku-thumb-sm" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+          <img loading="lazy" :src="sku.previewUrl" :alt="$t('work_pages.detail_h5.sku_preview_alt')" class="sku-thumb-sm" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
           <div class="sku-fields">
-            <input v-model="sku.name" placeholder="SKU名称" class="input-sm" maxlength="100" />
-            <input v-model="sku.spec" placeholder="规格（如：500ml）" class="input-sm" maxlength="100" />
-            <input v-model.number="sku.price" placeholder="价格" type="number" class="input-sm price-input" />
+            <input v-model="sku.name" :placeholder="$t('work_pages.detail_h5.sku_name')" class="input-sm" maxlength="100" />
+            <input v-model="sku.spec" :placeholder="$t('work_pages.detail_h5.spec_placeholder')" class="input-sm" maxlength="100" />
+            <input v-model.number="sku.price" :placeholder="$t('work_pages.detail_h5.price_placeholder')" type="number" class="input-sm price-input" />
           </div>
           <div class="sku-color-pick">
-            <input v-model="sku.color" type="color" title="主色调" />
+            <input v-model="sku.color" type="color" :title="$t('work_pages.detail_h5.sku_color_pick')" />
           </div>
         </div>
       </div>
 
       <div class="actions">
-        <button class="btn-outline" @click="step = 0">返回</button>
-        <button class="btn" @click="step = 2">下一步：选类目+模板</button>
+        <button class="btn-outline" @click="step = 0">{{ $t('work_pages.detail_h5.back') }}</button>
+        <button class="btn" @click="step = 2">{{ $t('work_pages.detail_h5.next_select') }}</button>
       </div>
     </div>
 
-    <!-- Step 2: 选类目 + 模板 -->
+    <!-- Step 2: 选类目+模板 -->
     <div v-else-if="step === 2" class="select-section">
-      <h3>选择商品类目</h3>
+      <h3>{{ $t('work_pages.detail_h5.select_category') }}</h3>
       <div class="cat-grid">
         <button v-for="c in categories" :key="c.id" class="cat-card" :class="{ active: selectedCategory === c.id }" @click="selectedCategory = c.id">
           {{ c.icon }} {{ c.name }}
         </button>
       </div>
 
-      <h3>选择详情页模板</h3>
+      <h3>{{ $t('work_pages.detail_h5.select_template') }}</h3>
       <div class="tmpl-grid">
         <button v-for="t in templates" :key="t.id" class="tmpl-card" :class="{ active: selectedTemplate === t.id }" @click="selectedTemplate = t.id">
           <div class="tmpl-preview">{{ t.style }}</div>
@@ -71,35 +77,35 @@
         </button>
       </div>
 
-      <h3>目标平台</h3>
+      <h3>{{ $t('work_pages.detail_h5.target_platform') }}</h3>
       <div class="platform-row">
         <select v-model="selectedPlatform" class="select">
-          <option value="">-- 选平台 --</option>
+          <option value="">{{ $t('work_pages.detail_h5.select_platform') }}</option>
           <option v-for="p in platforms" :key="p.code" :value="p.code">{{ p.name }}</option>
         </select>
       </div>
 
       <div class="summary-box">
-        <div class="summary-row"><span>SKU数量</span><strong>{{ skuList.length }} 个</strong></div>
-        <div class="summary-row"><span>类目</span><strong>{{ categoryLabel }}</strong></div>
-        <div class="summary-row"><span>模板</span><strong>{{ templateLabel }}</strong></div>
-        <div class="summary-row cost"><span>预估消耗</span><strong>{{ estimatedCost }} 点</strong></div>
+        <div class="summary-row"><span>{{ $t('work_pages.detail_h5.sku_count') }}</span><strong>{{ skuList.length }} {{ $t('work_pages.detail_h5.sku_unit') }}</strong></div>
+        <div class="summary-row"><span>{{ $t('work_pages.detail_h5.category') }}</span><strong>{{ categoryLabel }}</strong></div>
+        <div class="summary-row"><span>{{ $t('work_pages.detail_h5.template') }}</span><strong>{{ templateLabel }}</strong></div>
+        <div class="summary-row cost"><span>{{ $t('work_pages.detail_h5.estimated_cost') }}</span><strong>{{ estimatedCost }} {{ $t('work_pages.detail_h5.points_unit') }}</strong></div>
       </div>
 
       <div class="actions">
-        <button class="btn-outline" @click="step = 1">返回</button>
-        <button class="btn" @click="submitTask">开始生成 ({{ skuList.length }} SKU)</button>
+        <button class="btn-outline" @click="step = 1">{{ $t('work_pages.detail_h5.back') }}</button>
+        <button class="btn" @click="submitTask">{{ $t('work_pages.detail_h5.generate_btn') }} ({{ skuList.length }} SKU)</button>
       </div>
     </div>
 
-    <!-- Step 3: 处理/结果 -->
+    <!-- Step 3: 结果 -->
     <div v-else class="result-section">
       <div v-if="task.polling.value" class="progress-box">
         <div class="spinner" /><p>{{ task.progressMsg.value }}</p>
         <div class="bar"><div class="bar-fill" :style="{ width: task.progress.value + '%' }" /></div>
       </div>
       <div v-else-if="task.status.value === 2">
-        <h3>详情页生成完成 — {{ task.result.value?.total }} 个SKU</h3>
+        <h3>{{ $t('work_pages.detail_h5.complete_title') }} — {{ task.result.value?.total }} SKU</h3>
         <div v-if="task.result.value?.skus" class="sku-result-list">
           <div v-for="(s, i) in task.result.value.skus" :key="i" class="sku-result-card">
             <span class="sku-label">{{ s.name }}</span>
@@ -108,13 +114,13 @@
           </div>
         </div>
         <div class="actions">
-          <button class="btn">📥 一键下载全部</button>
-          <button class="btn-outline" @click="handleRedo">重新生成</button>
+          <button class="btn">📥 {{ $t('work_pages.detail_h5.download_all') }}</button>
+          <button class="btn-outline" @click="handleRedo">{{ $t('work_pages.detail_h5.regenerate') }}</button>
         </div>
       </div>
       <div v-else-if="task.status.value === 3" class="error-box">
-        <p>{{ task.errorMsg.value || '生成失败' }}</p>
-        <button class="btn" @click="handleRedo()">重试</button>
+        <p>{{ task.errorMsg.value || $t('work_pages.detail_h5.generate_failed') }}</p>
+        <button class="btn" @click="handleRedo()">{{ $t('work_pages.detail_h5.retry') }}</button>
       </div>
     </div>
   </WorkLayout>
@@ -122,9 +128,9 @@
 
 <script setup lang="ts">
 const { createBlobUrl, revoke } = useBlobUrl()
-
-
 const toast = useToast()
+const { t } = useI18n()
+
 interface SkuItem {
   previewUrl: string;
   uploadedUrl: string;
@@ -142,20 +148,29 @@ const selectedTemplate = ref('');
 const selectedPlatform = ref('');
 const task = useTask();
 const fileInput = ref<HTMLInputElement | null>(null)
-
 const skuList = ref<SkuItem[]>([]);
 
-const categories = [
-  { id: 'clothing', name: '服装', icon: '👗' }, { id: 'shoes', name: '鞋包', icon: '👠' },
-  { id: 'beauty', name: '美妆', icon: '💄' }, { id: 'home', name: '家居', icon: '🏠' },
-  { id: 'digital', name: '数码', icon: '📱' }, { id: 'food', name: '食品', icon: '🍜' },
-];
-const templates = [
-  { id: 'std', name: '标准模板', style: '图文混排' },
-  { id: 'brand', name: '品牌风', style: '大图+文案' },
-  { id: 'spec', name: '参数控', style: '表格+参数' },
-  { id: 'promo', name: '促销风', style: '卖点+优惠' },
-];
+const detailSteps = computed(() => [
+  t('work_pages.detail_h5.step_upload'),
+  t('work_pages.detail_h5.step_config_sku'),
+  t('work_pages.detail_h5.step_category'),
+  t('work_pages.detail_h5.step_generate'),
+])
+
+const categories = computed(() => [
+  { id: 'clothing', name: t('work_pages.detail_h5.cat_clothing'), icon: '👗' },
+  { id: 'shoes', name: t('work_pages.detail_h5.cat_shoes'), icon: '👠' },
+  { id: 'beauty', name: t('work_pages.detail_h5.cat_beauty'), icon: '💄' },
+  { id: 'home', name: t('work_pages.detail_h5.cat_home'), icon: '🏠' },
+  { id: 'digital', name: t('work_pages.detail_h5.cat_digital'), icon: '📱' },
+  { id: 'food', name: t('work_pages.detail_h5.cat_food'), icon: '🍜' },
+]);
+const templatesList = computed(() => [
+  { id: 'std', name: t('work_pages.detail_h5.template_std'), style: t('work_pages.detail_h5.template_std_style') },
+  { id: 'brand', name: t('work_pages.detail_h5.template_brand'), style: t('work_pages.detail_h5.template_brand_style') },
+  { id: 'spec', name: t('work_pages.detail_h5.template_spec'), style: t('work_pages.detail_h5.template_spec_style') },
+  { id: 'promo', name: t('work_pages.detail_h5.template_promo'), style: t('work_pages.detail_h5.template_promo_style') },
+]);
 const platforms = [
   { code: 'taobao', name: '淘宝' }, { code: 'pdd', name: '拼多多' }, { code: 'douyin', name: '抖音' },
   { code: 'amazon', name: '亚马逊' }, { code: 'tiktok', name: 'TikTok Shop' },
@@ -163,8 +178,8 @@ const platforms = [
 ];
 
 const allUploaded = computed(() => skuList.value.length > 0 && skuList.value.every(s => s.uploaded));
-const categoryLabel = computed(() => categories.find(c => c.id === selectedCategory.value)?.name || '未选');
-const templateLabel = computed(() => templates.find(t => t.id === selectedTemplate.value)?.name || '未选');
+const categoryLabel = computed(() => categories.value.find(c => c.id === selectedCategory.value)?.name || t('work_pages.detail_h5.none_selected'));
+const templateLabel = computed(() => templatesList.value.find(t => t.id === selectedTemplate.value)?.name || t('work_pages.detail_h5.none_selected'));
 const estimatedCost = computed(() => skuList.value.length * 8);
 
 function removeSku(i: number) { skuList.value.splice(i, 1); }
@@ -191,7 +206,7 @@ async function handleDrop(e: DragEvent) {
 }
 
 async function addFiles(files: File[]) {
-  if (skuList.value.length + files.length > 20) { toast.error('最多支持20个SKU'); return; }
+  if (skuList.value.length + files.length > 20) { toast.error(t('work_pages.detail_h5.max_sku_error')); return; }
   uploading.value = true;
 
   for (const f of files) {
@@ -209,14 +224,14 @@ async function addFiles(files: File[]) {
       skuList.value[skuIndex].uploaded = true;
     } catch {
       skuList.value[skuIndex].uploaded = false;
-      toast.error(`${f.name || '图片'} 上传失败`);
+      toast.error(t('work_pages.detail_h5.upload_failed', { name: f.name || t('work_pages.detail_h5.image_label') }));
     }
   }
   uploading.value = false;
 }
 
 async function submitTask() {
-  if (!skuList.value.every(s => s.uploaded)) { toast.error('请等待所有图片上传完成'); return; }
+  if (!skuList.value.every(s => s.uploaded)) { toast.error(t('work_pages.detail_h5.wait_upload')); return; }
   step.value = 3;
   try {
     const res = await $fetch('/api/images/detail-h5', {
@@ -233,7 +248,7 @@ async function submitTask() {
       },
     });
     task.pollTask((res as any).data.taskId);
-  } catch (e: any) { toast.error(e?.data?.msg || '提交失败，请重试'); step.value = 2; }
+  } catch (e: any) { toast.error(e?.data?.msg || t('work_pages.detail_h5.submit_failed')); step.value = 2; }
 }
 
 function handleRedo() { task.reset(); step.value = 0; skuList.value.forEach(s => { if (s.previewUrl) revoke(s.previewUrl) }); skuList.value = []; }
@@ -281,4 +296,7 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 .sku-result-card { background: var(--bg-card); border: 1px solid var(--input-border); border-radius: var(--radius-md); padding: 14px; }
 .sku-label { font-size: 12px; font-weight: 600; color: var(--brand); background: var(--status-processing-bg); padding: 2px 8px; border-radius: var(--radius-xs); }
 .copy-preview { font-weight: 600; margin-top: 8px; color: var(--text-primary); }
+.empty-hint { text-align: center; padding: 60px 20px; }
+.empty-icon { font-size: 48px; display: block; margin-bottom: 16px; }
+.empty-hint p { font-size: 15px; color: var(--text-secondary); }
 </style>

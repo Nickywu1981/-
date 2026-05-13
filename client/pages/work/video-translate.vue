@@ -6,8 +6,8 @@
 <template>
   <div class="work-page">
     <header class="work-header">
-      <h1>{{ headerCfg?.title || '视频翻译' }}</h1>
-      <p>{{ headerCfg?.subtitle || 'AI 语音翻译 · 字幕翻译 · 面容翻译 · 多语言支持' }}</p>
+      <h1>{{ headerCfg?.title || $t('work_pages.video_translate.title') }}</h1>
+      <p>{{ headerCfg?.subtitle || $t('work_pages.video_translate.subtitle') }}</p>
     </header>
 
     <div class="work-tabs">
@@ -25,20 +25,20 @@
 
     <div class="work-panel">
       <div class="form-row">
-        <label class="form-label">视频链接</label>
-        <input v-model="videoUrl" class="input" placeholder="输入视频URL 或 上传视频后粘贴链接" maxlength="500" />
+        <label class="form-label">{{ $t('work_pages.video_translate.video_url') }}<label>
+        <input v-model="videoUrl" class="input" :placeholder="$t('work_pages.video_translate.video_url_placeholder')" maxlength="500" />
         <AppMediaUpload v-model="videoUrl" accept="video/*" label="上传视频" class="mt-2" />
       </div>
 
       <div class="options-row">
         <div class="option">
-          <label>源语言</label>
+          <label>{{ $t('work_pages.video_translate.source_lang') }}<label>
           <select v-model="sourceLang" class="input">
             <option v-for="l in langs" :key="l.code" :value="l.code">{{ l.name }}</option>
           </select>
         </div>
         <div class="option">
-          <label>目标语言</label>
+          <label>{{ $t('work_pages.video_translate.target_lang') }}<label>
           <select v-model="targetLang" class="input">
             <option v-for="l in langs" :key="l.code" :value="l.code">{{ l.name }}</option>
           </select>
@@ -47,7 +47,7 @@
 
       <div v-if="activeTab === 'voice'" class="options-row">
         <div class="option">
-          <label>配音音色</label>
+          <label>{{ $t('work_pages.video_translate.voice_style') }}<label>
           <select v-model="voiceType" class="input">
             <option value="natural">自然音色</option>
             <option value="professional">专业播音</option>
@@ -59,7 +59,7 @@
 
       <div v-if="activeTab === 'subtitles'" class="options-row">
         <div class="option">
-          <label>字幕样式</label>
+          <label>{{ $t('work_pages.video_translate.subtitle_style') }}<label>
           <select v-model="subtitleStyle" class="input">
             <option value="default">默认样式</option>
             <option value="minimal">极简白字</option>
@@ -82,7 +82,7 @@
       </div>
 
       <button class="btn btn-primary btn-lg" :disabled="!videoUrl || submitting" @click="doSubmit">
-        {{ submitting ? '提交中...' : tabCfg?.actionLabel || '开始翻译' }}
+        {{ submitting ? '提交中...' : tabCfg?.actionLabel || $t('work_pages.video_translate.generate_btn') }}
       </button>
 
       <AppTaskProgress v-if="jobId" :job-id="jobId" @completed="onCompleted" @failed="onFailed" />
@@ -132,14 +132,15 @@
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n()
 
 import { formatDateTime } from '@/utils/format'
 const { config: headerCfg } = useSiteConfig('page.video_translate');
 
 const tabs = [
-  { key: 'voice', icon: '🎙️', label: '语音翻译', actionLabel: '开始语音翻译' },
-  { key: 'subtitles', icon: '📝', label: '字幕翻译', actionLabel: '开始字幕翻译' },
-  { key: 'face', icon: '🧑', label: '面容翻译', actionLabel: '开始面容翻译' },
+  { key: 'voice', icon: '🎙️', label: t('work_pages.video_translate.tab_voice'), actionLabel: '开始语音翻译' },
+  { key: 'subtitles', icon: '📝', label: t('work_pages.video_translate.tab_subtitles'), actionLabel: '开始字幕翻译' },
+  { key: 'face', icon: '🧑', label: t('work_pages.video_translate.tab_face'), actionLabel: '开始面容翻译' },
 ];
 
 const activeTab = ref('voice');

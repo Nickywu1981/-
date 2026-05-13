@@ -67,11 +67,11 @@
         <section class="form-section">
           <h3>内容配置</h3>
           <div class="form-group">
-            <label>标题</label>
+            <label>{{ $t('work_pages.publish.title_label') }}<label>
             <input v-model="form.title" type="text" maxlength="200" placeholder="留空则使用作品标题" />
           </div>
           <div class="form-group">
-            <label>描述</label>
+            <label>{{ $t('work_pages.publish.desc_label') }}<label>
             <textarea v-model="form.description" rows="3" maxlength="2000" placeholder="商品/内容描述" />
           </div>
           <div class="form-group">
@@ -165,6 +165,7 @@
 import { formatDateTime } from '@/utils/format';
 const api = useApi();
 const toast = useToast()
+const { t } = useI18n()
 
 const platforms = ref([]);
 const works = ref([]);
