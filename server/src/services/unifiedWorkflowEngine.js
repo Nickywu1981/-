@@ -25,6 +25,40 @@ import { BusinessError } from '../utils/businessError.js';
 // ==================== 作业存储(内存+后续迁移Redis) ====================
 const jobStore = new Map();
 
+// ==================== 行业场景映射 (与 ExpandAgent 对齐) ====================
+
+const INDUSTRY_SCENES = {
+  clothing:  ['modern_studio', 'urban_street', 'natural_park'],
+  beauty:    ['minimalist_bathroom', 'vanity_table', 'spa_setting'],
+  '3c_digital': ['modern_desk', 'coffee_shop', 'minimalist_office'],
+  food:      ['rustic_kitchen', 'dining_table', 'natural_light'],
+  home:      ['modern_living_room', 'scandinavian_bedroom', 'sunlit_balcony'],
+};
+
+const MULTI_ANGLES = ['front', 'side_left', 'side_right', 'back', '45_degree', 'detail_closeup'];
+const DETAIL_DIMENSIONS = ['material_texture', 'craftsmanship_detail', 'size_comparison', 'feature_highlight'];
+
+function _parseScenes(ctx) {
+  const raw = ctx.scriptContent || ctx.textContent || '';
+  try {
+    const parsed = JSON.parse(raw);
+    if (parsed.scenes?.length) return parsed.scenes;
+    if (Array.isArray(parsed)) return parsed;
+  } catch {}
+  const lines = raw.split(/\n{2,}/).filter(l => l.trim());
+  if (lines.length >= 3) return lines.map((visual, i) => ({ number: i + 1, visual: visual.slice(0, 200) }));
+  return null;
+}
+
+async function _singleImageGen(ctx, prompt, taskType, size = '1024x1024') {
+  const model = ctx._stepModel || {};
+  const result = await gatewayInfer(model.model_key || 'gpt-image-2', prompt, {
+    size: ctx.imageSize || size,
+    n: 1,
+  }, { taskType, source: 'workflow' });
+  return result?.images?.[0]?.url || result?.url || null;
+}
+
 // ==================== 步骤执行器映射 ====================
 
 const STEP_EXECUTORS = {
@@ -71,11 +105,65 @@ const STEP_EXECUTORS = {
 
   // ── 图片生成 ──
   white_bg_gen:       _imageGenStep('white_bg'),
-  multi_angle_gen:    _imageGenStep('multi_angle'),
-  scene_image_gen:    _imageGenStep('scene_image'),
-  detail_shot_gen:    _imageGenStep('detail_shot'),
-  storyboard_gen:     _imageGenStep('storyboard'),
   detail_module_gen:  _imageGenStep('detail_module'),
+
+  // 多角度主图 — 6个命名角度并发生成 (对齐 ExpandAgent.multiAngleTool)
+  multi_angle_gen: async (ctx) => {
+    const count = ctx.batchSize || 4;
+    const angles = MULTI_ANGLES.slice(0, count);
+    const results = await Promise.allSettled(angles.map(angle => {
+      const prompt = ctx.wrappedPrompt?.system
+        || `professional e-commerce product photography, ${angle} view, pure white background #FFFFFF, studio lighting, product centered, ultra high resolution, commercial quality${ctx.productName ? `, product: ${ctx.productName}` : ''}`;
+      return _singleImageGen(ctx, prompt, 'multi_angle');
+    }));
+    const urls = results.map((r, i) => r.status === 'fulfilled' ? r.value : null).filter(Boolean);
+    return { imageUrls: urls, generatedCount: urls.length, angles };
+  },
+
+  // 场景图 — 行业场景库驱动 (对齐 ExpandAgent.sceneTool)
+  scene_image_gen: async (ctx) => {
+    const scenes = INDUSTRY_SCENES[ctx.industry] || INDUSTRY_SCENES.clothing;
+    const results = await Promise.allSettled(scenes.map(scene => {
+      const prompt = ctx.wrappedPrompt?.system
+        || `professional e-commerce lifestyle photography, ${ctx.productName || 'product'} in ${scene.replace(/_/g, ' ')}, natural lighting, commercial quality, realistic setting`;
+      return _singleImageGen(ctx, prompt, 'scene_image');
+    }));
+    const urls = results.map((r, i) => r.status === 'fulfilled' ? r.value : null).filter(Boolean);
+    return { imageUrls: urls, generatedCount: urls.length, scenes };
+  },
+
+  // 卖点细节图 — 4维度拆分 (对齐 ExpandAgent.detailShotTool)
+  detail_shot_gen: async (ctx) => {
+    const results = await Promise.allSettled(DETAIL_DIMENSIONS.map(dim => {
+      const prompt = ctx.wrappedPrompt?.system
+        || `extreme close-up e-commerce product photography, ${dim.replace(/_/g, ' ')}, ${ctx.productName || 'product'}, macro lens, ultra detailed, studio lighting, pure white background`;
+      return _singleImageGen(ctx, prompt, 'detail_shot');
+    }));
+    const urls = results.map((r, i) => r.status === 'fulfilled' ? r.value : null).filter(Boolean);
+    return { imageUrls: urls, generatedCount: urls.length, details: DETAIL_DIMENSIONS };
+  },
+
+  // 分镜图 — 从脚本scenes逐帧生成 (修复Bug: storyboard_gen与script_gen数据断链)
+  storyboard_gen: async (ctx) => {
+    const scenes = _parseScenes(ctx);
+    if (scenes && scenes.length > 0) {
+      const results = await Promise.allSettled(scenes.map(scene =>
+        _singleImageGen(ctx,
+          `e-commerce video storyboard frame, scene ${scene.number}: ${scene.visual || ''}, ${scene.camera || 'medium shot'}, cinematic lighting, 9:16 vertical video frame, commercial quality`,
+          'storyboard',
+          '1024x1792'
+        )
+      ));
+      const frames = results.map((r, i) => ({
+        sceneNumber: scenes[i]?.number || i + 1,
+        url: r.status === 'fulfilled' ? r.value : null,
+      }));
+      const urls = frames.map(f => f.url).filter(Boolean);
+      return { storyboardUrls: urls, imageUrls: urls, frames, generatedCount: urls.length };
+    }
+    // 无脚本场景 → 降级为批量通用分镜图
+    return _imageGenStep('storyboard')(ctx);
+  },
 
   // ── 文案生成 ──
   detail_copy_gen:    _textGenStep('detail_copy', '生成商品详情页文案'),
@@ -121,22 +209,6 @@ const STEP_EXECUTORS = {
     return { voiceUrl: result?.output?.audioUrl || result?.url };
   },
 
-  // alias: workflowDefinitions.js 'voice_audio' flow uses 'voice_synthesis' key
-  voice_synthesis: async (ctx) => {
-    const model = ctx._stepModel || {};
-    const text = ctx.scriptContent || ctx.userInput || '';
-    const result = await gatewayDispatch({
-      mode: 'single',
-      taskType: 'tts',
-      params: {
-        model: model.model_key || 'edge-tts',
-        messages: [{ role: 'user', content: text.slice(0, 500) }],
-        voice: ctx.voice || 'zh-CN-XiaoxiaoNeural',
-      },
-    }, { taskType: 'tts', source: 'workflow' });
-    return { voiceUrl: result?.output?.audioUrl || result?.url };
-  },
-
   // ── 后处理 ──
   text_prepare: async (ctx) => ({
     preparedText: (ctx.userInput || '').replace(/\n{3,}/g, '\n\n').trim(),
@@ -157,6 +229,9 @@ const STEP_EXECUTORS = {
     return { package: assets, totalAssets: Object.keys(assets).length };
   },
 };
+
+// 向后兼容别名
+STEP_EXECUTORS.voice_synthesis = STEP_EXECUTORS.voice_dub;
 
 // ==================== 图片生成步骤工厂 ====================
 
@@ -226,11 +301,30 @@ function _textGenStep(taskType, taskLabel) {
  * @param {object}   params.overrides.extraSteps     额外插入步骤 [{ after: 'stepKey', step: {...} }]
  */
 export async function executeWorkflow(params = {}) {
-  const { workflowId, mode = 'auto', input = {}, overrides = {} } = params;
+  const { workflowId, mode = 'auto', input = {}, overrides: reqOverrides = {} } = params;
 
   // 验证工作流
   const wf = getWorkflow(workflowId);
   if (!wf) throw new BusinessError(400, `工作流不存在: ${workflowId}`);
+
+  // 从数据库加载已保存的配置(请求覆盖优先)
+  let overrides = { ...reqOverrides };
+  if (input.userId) {
+    try {
+      const { getWorkflowConfig } = await import('../dao/workflowConfigDao.js');
+      const dbConfig = await getWorkflowConfig(workflowId, input.userId);
+      if (dbConfig) {
+        overrides = {
+          disabledSteps: reqOverrides.disabledSteps || dbConfig.disabled_steps || [],
+          modelBindings: reqOverrides.modelBindings || dbConfig.model_bindings || {},
+          extraSteps: reqOverrides.extraSteps || dbConfig.extra_steps || [],
+        };
+        if (dbConfig.mode && mode === 'auto') overrides._dbMode = dbConfig.mode;
+      }
+    } catch (e) {
+      logger.warn(`[WorkflowEngine] failed to load DB config: ${e.message}`);
+    }
+  }
 
   // 获取步骤(含覆盖)
   let steps = getWorkflowSteps(workflowId, overrides);
