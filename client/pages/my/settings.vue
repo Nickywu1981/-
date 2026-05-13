@@ -1,32 +1,32 @@
 <template>
   <div class="page">
-    <h2>账户设置</h2>
+    <h2>{{ $t('my.settings.page_title') }}</h2>
 
     <LoadingSkeleton v-if="loading" type="form" :rows="3" />
 
     <div v-else>
       <div class="settings-section">
-        <h3>基本信息</h3>
+        <h3>{{ $t('my.settings.basic_info') }}</h3>
         <div class="form-group">
-          <label>昵称</label>
-          <input v-model="form.nickname" class="input-field" placeholder="输入昵称" />
+          <label>{{ $t('my.settings.nickname') }}</label>
+          <input v-model="form.nickname" class="input-field" :placeholder="$t('my.settings.nickname_placeholder')" />
         </div>
         <div class="form-group">
-          <label>手机号</label>
-          <input v-model="form.phone" class="input-field" placeholder="绑定手机号" disabled />
-          <button class="btn-xs btn-outline">更换</button>
+          <label>{{ $t('my.settings.phone') }}</label>
+          <input v-model="form.phone" class="input-field" :placeholder="$t('my.settings.phone_placeholder')" disabled />
+          <button class="btn-xs btn-outline">{{ $t('my.settings.change') }}</button>
         </div>
         <div class="form-group">
-          <label>邮箱</label>
-          <input v-model="form.email" class="input-field" placeholder="绑定邮箱" />
+          <label>{{ $t('my.settings.email') }}</label>
+          <input v-model="form.email" class="input-field" :placeholder="$t('my.settings.email_placeholder')" />
         </div>
         <button class="btn" @click="saveProfile" :disabled="saving">
-          {{ saving ? '保存中...' : '保存修改' }}
+          {{ saving ? $t('my.settings.saving') : $t('my.settings.save') }}
         </button>
       </div>
 
       <div class="settings-section">
-        <h3>通知设置</h3>
+        <h3>{{ $t('my.settings.notifications') }}</h3>
         <div class="toggle-row" v-for="n in notificationSettings" :key="n.key">
           <div class="toggle-row__label">
             <span class="toggle-row__title">{{ n.label }}</span>
@@ -40,7 +40,7 @@
       </div>
 
       <div class="settings-section">
-        <h3>主题偏好</h3>
+        <h3>{{ $t('my.settings.theme_pref') }}</h3>
         <div class="chips-row">
           <button v-for="t in themes" :key="t.key" class="chip" :class="{ active: selectedTheme === t.key }" @click="selectedTheme = t.key">
             {{ t.icon }} {{ t.label }}
@@ -53,7 +53,7 @@
 
 <script setup lang="ts">
 
-
+const { t } = useI18n()
 const toast = useToast()
 const saving = ref(false)
 const loading = ref(true)
@@ -69,30 +69,30 @@ onMounted(async () => {
       form.phone = res.data.phone || ''
       form.email = res.data.email || ''
     }
-  } catch { toast.error('加载用户信息失败，请刷新重试') }
+  } catch { toast.error(t('settings.load_failed')) }
   finally { loading.value = false }
 })
 
 const selectedTheme = ref('dark')
 const themes = [
-  { key: 'dark', label: '暗黑模式', icon: '🌙' },
-  { key: 'light', label: '亮色模式', icon: '☀️' },
-  { key: 'auto', label: '跟随系统', icon: '🔄' },
+  { key: 'dark', label: t('settings.theme_dark'), icon: '🌙' },
+  { key: 'light', label: t('settings.theme_light'), icon: '☀️' },
+  { key: 'auto', label: t('settings.theme_auto'), icon: '🔄' },
 ]
 
 const notificationSettings = reactive([
-  { key: 'task_complete', label: '任务完成通知', desc: 'AI 任务处理完成后推送通知', enabled: true },
-  { key: 'credit_warn', label: '积分不足提醒', desc: '积分低于阈值时提醒', enabled: true },
-  { key: 'marketing', label: '营销推送', desc: '优惠活动和功能更新通知', enabled: false },
+  { key: 'task_complete', label: t('settings.notif_task_complete'), desc: t('settings.notif_task_complete_desc'), enabled: true },
+  { key: 'credit_warn', label: t('settings.notif_credit_warn'), desc: t('settings.notif_credit_warn_desc'), enabled: true },
+  { key: 'marketing', label: t('settings.notif_marketing'), desc: t('settings.notif_marketing_desc'), enabled: false },
 ])
 
 const saveProfile = async () => {
-  if (!form.nickname.trim()) { toast.warn('昵称不能为空'); return }
+  if (!form.nickname.trim()) { toast.warn(t('settings.nickname_required')); return }
   saving.value = true
   try {
     await $fetch('/api/user/profile', { method: 'PUT', credentials: 'include', body: form })
-    toast.success('保存成功')
-  } catch { toast.error('保存失败') }
+    toast.success(t('settings.save_success'))
+  } catch { toast.error(t('settings.save_failed')) }
   saving.value = false
 }
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })

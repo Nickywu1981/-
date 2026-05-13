@@ -1,13 +1,13 @@
 <template>
   <div class="my-works-page">
     <div class="page-header">
-      <h2>我的作品</h2>
+      <h2>{{ $t('my.works.page_title') }}</h2>
       <div class="header-actions">
         <select v-model="filterType" class="filter-select" @change="fetchWorks">
-          <option value="">全部类型</option>
-          <option value="image">图片</option>
-          <option value="video">视频</option>
-          <option value="batch">批量</option>
+          <option value="">{{ $t('my.works.filter_all') }}</option>
+          <option value="image">{{ $t('my.works.type_image') }}</option>
+          <option value="video">{{ $t('my.works.type_video') }}</option>
+          <option value="batch">{{ $t('my.works.type_batch') }}</option>
         </select>
       </div>
     </div>
@@ -21,7 +21,7 @@
 
     <div v-else-if="error" class="error-state">
       <p>{{ error }}</p>
-      <button class="btn-retry" @click="fetchWorks">重试</button>
+      <button class="btn-retry" @click="fetchWorks">{{ $t('my.works.retry') }}</button>
     </div>
 
     <template v-else>
@@ -33,7 +33,7 @@
             <span class="card-badge" :class="statusClass(item.status)">{{ statusLabel(item.status) }}</span>
           </div>
           <div class="card-body">
-            <h4 class="card-title">{{ item.title || '未命名作品' }}</h4>
+            <h4 class="card-title">{{ item.title || $t('my.works.unnamed') }}</h4>
             <div class="card-meta">
               <span class="meta-type">{{ typeLabel(item.type) }}</span>
               <span class="meta-date">{{ formatDateTime(item.create_time) }}</span>
@@ -44,8 +44,8 @@
 
       <div v-else class="empty-state">
         <div class="empty-icon">&#127912;</div>
-        <p>还没有作品，去工作台开始创作吧</p>
-        <NuxtLink to="/workspace" class="btn-go">前往工作台</NuxtLink>
+        <p>{{ $t('my.works.empty') }}</p>
+        <NuxtLink to="/workspace" class="btn-go">{{ $t('my.works.go_workspace') }}</NuxtLink>
       </div>
 
       <Pagination
@@ -62,6 +62,7 @@
 <script setup lang="ts">
 import { formatDateTime } from '@/utils/format';
 
+const { t } = useI18n()
 
 
 const filterType = ref('')
@@ -78,13 +79,13 @@ function typeIcon(type: string) {
 }
 
 function typeLabel(type: string) {
-  const map: Record<string, string> = { image: '图片', video: '视频', batch: '批量' }
+  const map: Record<string, string> = { image: t('my.works.type_image'), video: t('my.works.type_video'), batch: t('my.works.type_batch') }
   return map[type] || type
 }
 
 function statusLabel(s: number) {
-  const map: Record<number, string> = { 0: '排队', 1: '处理中', 2: '已完成', 3: '失败' }
-  return map[s] || '未知'
+  const map: Record<number, string> = { 0: t('my.works.status_queued'), 1: t('my.works.status_processing'), 2: t('my.works.status_completed'), 3: t('my.works.status_failed') }
+  return map[s] || t('my.works.status_unknown')
 }
 
 function statusClass(s: number) {
@@ -105,7 +106,7 @@ async function fetchWorks() {
     works.value = res.data?.list || res.data || []
     total.value = res.data?.total || 0
   } catch (e: any) {
-    error.value = e?.data?.msg || e.message || '加载失败'
+    error.value = e?.data?.msg || e.message || t('my.works.load_failed')
   } finally {
     loading.value = false
   }
