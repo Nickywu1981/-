@@ -1,9 +1,9 @@
 <template>
   <div v-if="appError" class="app-error-page">
     <span class="app-error-icon">⚠️</span>
-    <h2 class="app-error-title">页面加载异常</h2>
+    <h2 class="app-error-title">{{ $t('error_boundary.title') }}</h2>
     <p class="app-error-desc">{{ appError }}</p>
-    <button class="eb-btn eb-btn-primary" @click="reloadPage">重新加载</button>
+    <button class="eb-btn eb-btn-primary" @click="reloadPage">{{ $t('error_boundary.reload') }}</button>
   </div>
   <template v-else>
     <NuxtLayout>
@@ -29,7 +29,7 @@ if (import.meta.client) {
 }
 
 onErrorCaptured((err) => {
-  appError.value = err?.message || '未知错误'
+  appError.value = err?.message || $t('common.unknown_error')
   return false
 })
 

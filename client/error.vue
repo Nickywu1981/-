@@ -5,8 +5,8 @@
       <h1 class="error-title">{{ title }}</h1>
       <p class="error-desc">{{ description }}</p>
       <div class="error-actions">
-        <button class="btn-back" @click="handleBack">返回上一页</button>
-        <NuxtLink to="/" class="btn-home">回到首页</NuxtLink>
+        <button class="btn-back" @click="handleBack">{{ $t('error.back_prev') }}</button>
+        <NuxtLink to="/" class="btn-home">{{ $t('error.home_btn') }}</NuxtLink>
       </div>
     </div>
   </div>
@@ -14,21 +14,22 @@
 
 <script setup lang="ts">
 const props = defineProps<{ error?: any }>();
+const { $t } = useNuxtApp();
 
 const title = computed(() => {
   const code = props.error?.statusCode;
-  if (code === 404) return '页面不存在';
-  if (code === 403) return '无权访问';
-  if (code === 500) return '服务器错误';
-  return '发生异常';
+  if (code === 404) return $t('error.404_title');
+  if (code === 403) return $t('error.403_title');
+  if (code === 500) return $t('error.500_title');
+  return $t('error.fallback_title');
 });
 
 const description = computed(() => {
   const code = props.error?.statusCode;
-  if (code === 404) return '您访问的页面已被移除或链接错误';
-  if (code === 403) return '您没有权限访问此页面';
-  if (code === 500) return '服务器暂时无法处理请求，请稍后再试';
-  return '请稍后再试或联系客服';
+  if (code === 404) return $t('error.404_desc');
+  if (code === 403) return $t('error.403_desc');
+  if (code === 500) return $t('error.500_desc');
+  return $t('error.fallback_desc');
 });
 
 function handleBack() {

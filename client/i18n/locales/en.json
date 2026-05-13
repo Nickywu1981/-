@@ -40,7 +40,8 @@
   "error_boundary": {
     "title": "Something went wrong",
     "message": "This section could not be displayed. Please try again or refresh the page.",
-    "retry": "Retry"
+    "retry": "Retry",
+    "reload": "Reload"
   },
   "search": {
     "placeholder": "Search features...",
@@ -4239,7 +4240,9 @@
     "500_desc": "The server encountered a temporary issue. We are working on it. Please try again later.",
     "back_prev": "Go Back",
     "refresh_page": "Refresh Page",
-    "home_btn": "Back to Home"
+    "home_btn": "Back to Home",
+    "fallback_title": "Something went wrong",
+    "fallback_desc": "Please try again later or contact support"
   },
   "help": {
     "title": "Help Center",

@@ -40,7 +40,8 @@
   "error_boundary": {
     "title": "页面加载异常",
     "message": "该区域内容暂时无法显示，请重试或刷新页面。",
-    "retry": "重试"
+    "retry": "重试",
+    "reload": "重新加载"
   },
   "search": {
     "placeholder": "搜索功能...",
@@ -4239,7 +4240,9 @@
     "500_desc": "服务器遇到临时故障，我们正在抢修中，请稍后重试。",
     "back_prev": "返回上一页",
     "refresh_page": "刷新页面",
-    "home_btn": "返回首页"
+    "home_btn": "返回首页",
+    "fallback_title": "发生异常",
+    "fallback_desc": "请稍后再试或联系客服"
   },
   "help": {
     "title": "帮助中心",
