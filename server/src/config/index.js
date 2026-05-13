@@ -2,12 +2,15 @@
  * 环境配置中心
  */
 import dotenv from 'dotenv';
+import fs from 'fs';
 import crypto from 'crypto';
 
-// 按 NODE_ENV 分层加载：.env 为基，环境特定文件覆盖
-dotenv.config();
-const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development';
-dotenv.config({ path: envFile, override: true });
+// 分层加载：.env 为基础，环境特定文件覆盖
+dotenv.config(); // 不 override，优先使用已设置的 process.env
+const envFile = `.env.${process.env.NODE_ENV || 'development'}`;
+if (fs.existsSync(envFile)) {
+  dotenv.config({ path: envFile, override: true });
+}
 
 const config = {
   port: parseInt(process.env.PORT, 10) || 3001,

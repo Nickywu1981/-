@@ -8,7 +8,7 @@
  */
 import { Router } from 'express';
 import { z } from 'zod';
-import { validateV4 as _validate } from '../utils/validate.js';
+import { validateV4 as _validate, idParamSchema } from '../utils/validate.js';
 import { enterpriseOnly, requireAgent } from '../middleware/auth.js';
 import { requireRole } from '../middleware/rbac.js';
 import { paymentLimiter } from '../middleware/rateLimiter.js';
@@ -45,7 +45,7 @@ router.use(enterpriseOnly);
 // ==================== 收款账户 ====================
 router.get('/bank-accounts', ctrl.listBankAccounts);
 router.post('/bank-account', paymentLimiter, _validate(bankAccountSchema), ctrl.addBankAccount);
-router.delete('/bank-accounts/:id', paymentLimiter, ctrl.removeBankAccount);
+router.delete('/bank-accounts/:id', paymentLimiter, _validate(idParamSchema, 'params'), ctrl.removeBankAccount);
 
 // ==================== 账户流水 ====================
 router.get('/ledger', ctrl.listLedger);
