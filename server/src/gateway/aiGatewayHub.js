@@ -8,10 +8,8 @@
  *  - dispatch(dispatchReq, ctx)     → 委托 modelDispatcher.dispatch()
  *  - route(params, ctx)             → 委托 modelRouter.routeModel()
  *
- * 生命周期钩子 (每一条路径都经过):
- *  pre-invoke  → GEO检查 + PII脱敏 + 内容审核 + 定价查询 + 上下文窗口
- *  invoke      → 委托执行引擎（超时控制 + 熔断降级）
- *  post-invoke → Token 归一化 + 成本计算 + 输出审核 + 统一日志 + 聚合统计 + 长期记忆
+ * 全链路强制管线 (每条路径严格按顺序):
+ *  意图识别 → 合规校验 → 模板匹配 → 提示词封装 → GEO检查 → PII脱敏 → 内容审核 → invoke → post-invoke
  */
 import logger from '../utils/logger.js';
 import { CircuitBreaker } from '../utils/circuit-breaker.js';
@@ -30,7 +28,8 @@ import { recordCall, recordCircuitBreakerTrip } from '../services/monitorService
 import { getTraceContext } from '../services/traceService.js';
 import { buildErrorResponse, postProcessOutput } from '../services/outputPostProcessor.js';
 import { registerBuiltinHooks, runPreHooks, runPostHooks } from '../services/hookRegistryService.js';
-import { aiGatewayConfig, securityConfig } from '../config/index.js';
+import { wrapPrompt } from '../services/promptWrapper.js';
+import { aiGatewayConfig, securityConfig, ecommercePipelineConfig } from '../config/index.js';
 
 // 钩子注册中心开关
 const USE_HOOK_REGISTRY = aiGatewayConfig.useHookRegistry;
@@ -84,6 +83,50 @@ function timeoutPromise(ms, label) {
   );
 }
 
+// ==================== Step 0: 业务管线 (强制) ====================
+
+/**
+ * 电商业务中间层管线 — 所有商家请求必经之路
+ * 意图识别 → 合规校验 → 模板匹配 → 提示词封装
+ *
+ * 禁止跳过此步骤直接调用模型。
+ *
+ * @returns {{ blocked: boolean, blockReason?: string, wrapResult: object }}
+ */
+async function runBusinessPipeline(input, ctx = {}) {
+  // 仅对商家请求执行业务管线（source=consumer 或未指定）
+  if (ctx.source === 'admin' || ctx.skipBusinessPipeline) {
+    return { blocked: false, wrapResult: null };
+  }
+
+  try {
+    const wrapResult = await wrapPrompt(
+      typeof input === 'string' ? input : (input?.prompt || input?.text || ''),
+      {
+        userId: ctx.userId,
+        platform: ctx.platform || ctx.platformCode || 'taobao',
+        industry: ctx.industry || null,
+        brandTone: ctx.brandTone || null,
+        variables: ctx.variables || {},
+        historyTags: ctx.historyTags || null,
+      },
+    );
+
+    if (wrapResult.blocked) {
+      return {
+        blocked: true,
+        blockReason: wrapResult.blockReason || '内容不符合平台合规要求',
+        wrapResult,
+      };
+    }
+
+    return { blocked: false, wrapResult };
+  } catch (e) {
+    logger.warn('[Gateway] Business pipeline failed, allowing through', e.message);
+    return { blocked: false, wrapResult: null };
+  }
+}
+
 // ==================== Pre-invoke 安全检测 ====================
 
 /**
@@ -99,6 +142,17 @@ async function runPreInvokeSecurityChecks(modelId, input, context) {
     geoConstraints: null,
     moderationResult: null,
   };
+
+  // 0. 强制封装管道检查 — 禁止商家裸调底层模型
+  if (ecommercePipelineConfig.forceWrap) {
+    const allowedSources = ['ecommerce_pipeline', 'admin', 'internal', 'system', 'migration', 'test'];
+    const source = context?.source || context?.taskType || '';
+    if (!allowedSources.includes(source)) {
+      result.blocked = true;
+      result.blockReason = '裸调用已关闭。请通过 /api/ecommerce/generate 统一入口提交请求，系统将自动完成意图识别、合规校验、模板封装后下发模型。';
+      return result;
+    }
+  }
 
   // 1. GEO 规则检查
   const countryCode = context.countryCode || context.geo?.country || null;
@@ -166,11 +220,38 @@ export async function gatewayInfer(modelId, input, ctx = {}) {
   const pricing = await tokenPricingDao.getActiveByKey(modelId);
   const model = listModels().find((m) => m.id === modelId);
 
+  // ── Step 0: 业务管线 (意图识别 → 合规校验 → 模板匹配 → 提示词封装) ──
+  const businessPipeline = await runBusinessPipeline(input, {
+    ...context,
+    platform: ctx.platform || ctx.platformCode || null,
+    platformCode: ctx.platformCode || ctx.taskType || null,
+    industry: ctx.industry || null,
+    brandTone: ctx.brandTone || null,
+    variables: ctx.variables || {},
+  });
+  if (businessPipeline.blocked) {
+    return {
+      modelId, output: null, elapsed: 0, retries: 0, degraded: false,
+      tokensIn: 0, tokensOut: 0, blocked: true, correlationId: context.correlationId,
+      error: buildErrorResponse(businessPipeline.blockReason, { modelId, traceId: getTraceContext()?.traceId }),
+      businessPipeline: businessPipeline.wrapResult,
+    };
+  }
+
+  // 若有封装结果，用封装后的 prompt 替换原始输入
+  let effectiveInput = input;
+  if (businessPipeline.wrapResult?.wrapped) {
+    effectiveInput = businessPipeline.wrapResult.wrapped.prompt;
+    ctx._systemPrompt = businessPipeline.wrapResult.wrapped.system;
+    ctx._intentId = businessPipeline.wrapResult.intent?.intentId;
+    ctx._category = businessPipeline.wrapResult.wrapped.category;
+  }
+
   // ── Pre-invoke 安全检测 (GEO + PII脱敏 + 内容审核) ──
   let security;
   if (USE_HOOK_REGISTRY) {
     const hookResult = await runPreHooks({
-      modelId, input, userId: context.userId, taskType: context.taskType,
+      modelId, input: effectiveInput, userId: context.userId, taskType: context.taskType,
       countryCode: ctx.countryCode || ctx.geo?.country || null,
       platformCode: ctx.platformCode || ctx.taskType || null,
     });

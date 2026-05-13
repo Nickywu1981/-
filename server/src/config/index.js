@@ -245,6 +245,18 @@ const config = {
     tenantTokenLimit: parseInt(process.env.AI_TENANT_TOKEN_LIMIT || '1000', 10),
   },
 
+  // 电商内容智能中间层 — P0/P1 强制封装管线
+  ecommercePipeline: {
+    enabled: process.env.ECOMMERCE_PIPELINE_ENABLED !== 'false',
+    forceWrap: process.env.ECOMMERCE_FORCE_WRAP !== 'false',
+    autoClassifyIntent: process.env.ECOMMERCE_AUTO_INTENT !== 'false',
+    complianceEnabled: process.env.ECOMMERCE_COMPLIANCE_ENABLED !== 'false',
+    complianceStrict: process.env.ECOMMERCE_COMPLIANCE_STRICT === 'true',
+    templateMandatory: process.env.ECOMMERCE_TEMPLATE_MANDATORY !== 'false',
+    maxUserInputLength: parseInt(process.env.ECOMMERCE_MAX_INPUT_LENGTH || '2000', 10),
+    defaultPlatform: process.env.ECOMMERCE_DEFAULT_PLATFORM || 'taobao',
+  },
+
   e2b: {
     apiKey: process.env.E2B_API_KEY || '',
     template: process.env.E2B_TEMPLATE || 'code-interpreter-v2',
@@ -390,6 +402,7 @@ export const requestTimeoutMs = config.requestTimeoutMs;
 export const { worker: workerConfig } = config;
 export const { upload: uploadConfig } = config;
 export const { security: securityConfig } = config;
+export const { ecommercePipeline: ecommercePipelineConfig } = config;
 export const { e2b: e2bConfig } = config;
 export const { bull: bullConfig } = config;
 export const appUrl = config.appUrl;

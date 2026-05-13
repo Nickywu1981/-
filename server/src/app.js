@@ -121,6 +121,7 @@ import adminRoutes from './route/adminRoutes.js';           // 管理后台统�
 import operationsRoutes from './route/operationsRoutes.js'; // Phase 12: 跨租户运营看板 (2026-05-12)
 import dashboardRoutes from './route/dashboard.routes.js'; // 运营看板概览
 import e2bRoutes from './route/e2b.routes.js';              // E2B 云端代码沙箱
+import ecommerceRoutes from './route/ecommerceRoutes.js';      // 电商内容智能中间层 — 统一入口
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -369,6 +370,9 @@ app.use('/api/adk', heavyLimiter, adkRoutes);
 
 // E2B 云端代码沙箱
 app.use('/api/e2b', heavyLimiter, e2bRoutes);
+
+// 电商内容智能中间层 — P0/P1: 意图识别+合规校验+模板封装+网关调度 统一入口
+app.use('/api/ecommerce', heavyLimiter, ecommerceRoutes);
 
 // ===== Phase 1: 企业/代理端 (2026-05-11) =====
 app.use('/api/enterprise/finance', paymentLimiter, financeRoutes);  // Phase 2: 财务核心
