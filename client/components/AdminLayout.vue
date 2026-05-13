@@ -5,13 +5,13 @@
 <template>
   <div class="al">
     <!-- 移动端汉堡 -->
-    <button class="al-ham" @click="open = !open" :aria-label="open ? '关闭菜单' : '打开菜单'">{{ open ? '✕' : '☰' }}</button>
+    <button class="al-ham" @click="open = !open" :aria-label="open ? $t('admin_layout.close_menu') : $t('admin_layout.open_menu')">{{ open ? '✕' : '☰' }}</button>
 
     <!-- 左侧分组导航 -->
     <aside class="al-side" :class="{ on: open }">
       <div class="al-logo" @click="$router.push('/admin/dashboard')">
         <span class="al-logo-dot"></span>
-        Movio 管理
+        {{ brandName }}
       </div>
 
       <nav class="al-nav">
@@ -36,10 +36,10 @@
       </nav>
 
       <div class="al-side-ft">
-        <button class="al-theme-btn" @click="toggleTheme" :title="theme === 'dark' ? '切换亮色' : '切换暗色'" :aria-label="theme === 'dark' ? '切换到亮色模式' : '切换到暗色模式'">
+        <button class="al-theme-btn" @click="toggleTheme" :title="theme === 'dark' ? $t('admin_layout.switch_light') : $t('admin_layout.switch_dark')" :aria-label="theme === 'dark' ? $t('admin_layout.switch_light') : $t('admin_layout.switch_dark')">
           {{ theme === 'dark' ? '☀️' : '🌙' }}
         </button>
-        <NuxtLink to="/workspace" class="al-back">← 返回工作台</NuxtLink>
+        <NuxtLink to="/workspace" class="al-back">← {{ $t('admin_layout.back_workspace') }}</NuxtLink>
       </div>
     </aside>
 
@@ -54,10 +54,13 @@
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n()
 const open = ref(false)
 const route = useRoute()
 const { theme, toggle: toggleTheme } = useTheme()
 watch(() => route.path, () => { open.value = false })
+
+withDefaults(defineProps<{ brandName?: string }>(), { brandName: 'Movio Admin' })
 
 interface NavItem { key: string; route: string }
 interface NavGroup { key: string; icon: string; open: boolean; items: NavItem[] }
