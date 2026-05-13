@@ -18,12 +18,16 @@
 
 <script setup lang="ts">
 const { t } = useI18n()
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   icon: string
   description: string
   progress: number
   reserveToast?: string
-}>()
+}>(), {
+  icon: '🚧',
+  description: '功能开发中',
+  progress: 0,
+})
 
 const emit = defineEmits<{ (e: 'reserve'): void }>()
 const toast = useToast()

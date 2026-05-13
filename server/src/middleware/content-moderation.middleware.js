@@ -5,6 +5,7 @@
  */
 import { ERROR_CODE } from '../constants/errorCode.js';
 import logger from '../utils/logger.js';
+import { error as sendError } from '../utils/response.js';
 import { checkText } from '../services/sensitiveWordService.js';
 
 export function contentModerationMiddleware(stage = 'input') {
@@ -17,11 +18,11 @@ export function contentModerationMiddleware(stage = 'input') {
     try {
       const found = await checkText(textToCheck);
       if (found && found.length > 0) {
-        return res.status(422).json({ code: ERROR_CODE.CONTENT_MODERATION, msg: '内容包含违规信息，请修改后重试' });
+        return sendError(res, ERROR_CODE.CONTENT_MODERATION, '内容包含违规信息，请修改后重试');
       }
     } catch (err) {
       logger.warn('[ContentModeration] 敏感词检查失败，拒绝放行', { error: err.message, stage });
-      return res.status(500).json({ code: ERROR_CODE.INTERNAL, msg: '内容审核服务暂不可用，请稍后重试' });
+      return sendError(res, ERROR_CODE.INTERNAL_ERROR, '内容审核服务暂不可用，请稍后重试');
     }
 
     // 记录审核请求到 content_audit_log

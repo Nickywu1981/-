@@ -45,13 +45,19 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
+const props = withDefaults(defineProps<{
   results: { url: string }[]
   generating: boolean
   error: string
   statusText: string
   size: { ratio: string }
-}>()
+}>(), {
+  results: () => [],
+  generating: false,
+  error: '',
+  statusText: '',
+  size: () => ({ ratio: '1:1' }),
+})
 
 defineEmits<{
   retry: []

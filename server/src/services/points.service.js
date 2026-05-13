@@ -102,7 +102,7 @@ export async function spendPoints(userId, { amount, businessType, businessId, re
       await conn.beginTransaction();
 
       const account = await getOrCreateAccount(conn, userId);
-      if (account.balance < amount) throw new BusinessError(400, `积分不足，当前余额 ${account.balance}`);
+      if (account.balance < amount) throw new BusinessError(400, '积分不足');
 
       const [result] = await conn.query(
         `UPDATE points_account SET balance = balance - ?, total_spent = total_spent + ?, version = version + 1
@@ -144,7 +144,7 @@ export async function redeemPointsForCredits(userId, pointsAmount) {
       await conn.beginTransaction();
 
       const account = await getOrCreateAccount(conn, userId);
-      if (account.balance < pointsAmount) throw new BusinessError(400, `积分不足，当前余额 ${account.balance}`);
+      if (account.balance < pointsAmount) throw new BusinessError(400, '积分不足');
 
       const [result] = await conn.query(
         `UPDATE points_account SET balance = balance - ?, total_spent = total_spent + ?, version = version + 1

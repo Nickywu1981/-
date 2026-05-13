@@ -58,13 +58,19 @@
 import { truncate } from '@/utils/format'
 import { formatDateTime } from '@/utils/format'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   historyList: any[]
   historyLoading: boolean
   historyPageSize: number
   historyTotal: number
   categories: Array<{ key: string; label: string; icon: string }>
-}>()
+}>(), {
+  historyList: () => [],
+  historyLoading: false,
+  historyPageSize: 10,
+  historyTotal: 0,
+  categories: () => [],
+})
 
 const emit = defineEmits<{
   'loadHistory': []

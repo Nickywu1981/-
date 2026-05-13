@@ -18,6 +18,8 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { adminAuth } from '../middleware/auth.js';
 import * as i18nService from '../services/i18n.service.js';
+import { success, error } from '../utils/response.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 import logger from '../utils/logger.js';
 
 const LOCALE_RE = /^[a-z]{2}(-[A-Z]{2})?$/;
@@ -30,15 +32,15 @@ function validateLocale(locale) {
   }
 }
 
-function logAndRespond(res, err, context) {
+function handleError(res, err, context) {
   const logEntry = { error: err.message };
   if (process.env.NODE_ENV !== 'production') logEntry.stack = err.stack;
   logger.error(`[i18n] ${context}`, logEntry);
-  const status = err instanceof z.ZodError ? 400 : (err.statusCode || 500);
   if (err instanceof z.ZodError) {
-    return res.status(400).json({ code: 400, msg: '参数校验失败', errors: err.errors });
+    return error(res, ERROR_CODE.VALIDATION_ERROR, '参数校验失败', err.errors);
   }
-  res.status(status >= 400 ? status : 500).json({ code: status >= 400 ? status : 500, msg: '服务异常，请稍后重试' });
+  const status = err.statusCode || 500;
+  return error(res, status >= 100 && status < 600 ? status : 500, '服务异常，请稍后重试');
 }
 
 // ── Zod schemas ──
@@ -62,9 +64,9 @@ publicRouter.get('/:locale', async (req, res) => {
   try {
     validateLocale(req.params.locale);
     const data = await i18nService.getTranslations(req.params.locale);
-    res.json({ code: 0, data });
+    success(res, data);
   } catch (err) {
-    logAndRespond(res, err, 'getTranslations');
+    handleError(res, err, 'getTranslations');
   }
 });
 
@@ -72,9 +74,9 @@ publicRouter.get('/:locale/:namespace', async (req, res) => {
   try {
     validateLocale(req.params.locale);
     const data = await i18nService.getTranslationsByNamespace(req.params.locale, req.params.namespace);
-    res.json({ code: 0, data });
+    success(res, data);
   } catch (err) {
-    logAndRespond(res, err, 'getTranslationsByNamespace');
+    handleError(res, err, 'getTranslationsByNamespace');
   }
 });
 
@@ -117,9 +119,9 @@ adminRouter.get('/:locale', async (req, res) => {
       const dot = key.indexOf('.');
       return { key, namespace: dot > 0 ? key.substring(0, dot) : 'common', value };
     });
-    res.json({ code: 0, data: { entries, namespaces } });
+    success(res, { entries, namespaces });
   } catch (err) {
-    logAndRespond(res, err, 'admin getTranslations');
+    handleError(res, err, 'admin getTranslations');
   }
 });
 
@@ -127,9 +129,9 @@ adminRouter.get('/:locale/search', async (req, res) => {
   try {
     validateLocale(req.params.locale);
     const rows = await i18nService.searchTranslations(req.params.locale, req.query.q || '');
-    res.json({ code: 0, data: rows });
+    success(res, rows);
   } catch (err) {
-    logAndRespond(res, err, 'searchTranslations');
+    handleError(res, err, 'searchTranslations');
   }
 });
 
@@ -138,9 +140,9 @@ adminRouter.post('/:locale', async (req, res) => {
     validateLocale(req.params.locale);
     const { key, value } = singleEntrySchema.parse(req.body);
     const result = await i18nService.setTranslation(req.params.locale, key, value, req.user?.id);
-    res.json({ code: 0, data: result });
+    success(res, result);
   } catch (err) {
-    logAndRespond(res, err, 'setTranslation');
+    handleError(res, err, 'setTranslation');
   }
 });
 
@@ -151,9 +153,9 @@ adminRouter.post('/:locale/batch', async (req, res) => {
     const obj = {};
     for (const e of entries) obj[e.key] = e.value;
     const result = await i18nService.importTranslations(req.params.locale, obj);
-    res.json({ code: 0, data: result });
+    success(res, result);
   } catch (err) {
-    logAndRespond(res, err, 'batchTranslation');
+    handleError(res, err, 'batchTranslation');
   }
 });
 
@@ -161,9 +163,9 @@ adminRouter.delete('/:locale/:key', async (req, res) => {
   try {
     validateLocale(req.params.locale);
     await i18nService.deleteTranslation(req.params.locale, req.params.key);
-    res.json({ code: 0, msg: '删除成功' });
+    success(res, {}, '删除成功');
   } catch (err) {
-    logAndRespond(res, err, 'deleteTranslation');
+    handleError(res, err, 'deleteTranslation');
   }
 });
 
@@ -172,9 +174,9 @@ adminRouter.post('/:locale/import', async (req, res) => {
     validateLocale(req.params.locale);
     const data = importBodySchema.parse(req.body);
     const result = await i18nService.importTranslations(req.params.locale, data, req.query.skipEdted === '1');
-    res.json({ code: 0, data: result });
+    success(res, result);
   } catch (err) {
-    logAndRespond(res, err, 'importTranslations');
+    handleError(res, err, 'importTranslations');
   }
 });
 
@@ -186,7 +188,7 @@ adminRouter.get('/:locale/export', async (req, res) => {
     res.setHeader('Content-Disposition', `attachment; filename="${req.params.locale}.json"`);
     res.json(data);
   } catch (err) {
-    logAndRespond(res, err, 'exportTranslations');
+    handleError(res, err, 'exportTranslations');
   }
 });
 
@@ -194,9 +196,9 @@ adminRouter.get('/:locale/logs/:key', async (req, res) => {
   try {
     validateLocale(req.params.locale);
     const logs = await i18nService.getLogs(req.params.locale, req.params.key);
-    res.json({ code: 0, data: logs });
+    success(res, logs);
   } catch (err) {
-    logAndRespond(res, err, 'getLogs');
+    handleError(res, err, 'getLogs');
   }
 });
 

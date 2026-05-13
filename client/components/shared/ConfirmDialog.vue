@@ -80,7 +80,7 @@ function restoreFocus() {
 }
 
 defineExpose({ show })
-</define>
+</script>
 
 <style scoped>
 .confirm-overlay {

@@ -179,7 +179,7 @@ export async function withdrawCommission(userId, amount) {
 
     const availableAmount = Number(balance.available) || 0;
     const requestAmount = Number(amount) || 0;
-    if (availableAmount < requestAmount) throw new BusinessError(400, `可提现余额不足，当前可用 ${availableAmount.toFixed(2)}`);
+    if (availableAmount < requestAmount) throw new BusinessError(400, '可提现余额不足');
 
     // 逐笔扣减
     let remaining = requestAmount;

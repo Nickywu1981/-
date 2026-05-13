@@ -49,12 +49,17 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   modelValue: boolean
   versions: any[]
   loading: boolean
   diffResult: any[] | null
-}>()
+}>(), {
+  modelValue: false,
+  versions: () => [],
+  loading: false,
+  diffResult: null,
+})
 
 const emit = defineEmits<{
   'update:modelValue': [v: boolean]

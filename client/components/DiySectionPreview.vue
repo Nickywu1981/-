@@ -79,7 +79,9 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{ section: { component: string; config?: Record<string, any>; visible?: boolean } }>()
+const props = withDefaults(defineProps<{ section: { component: string; config?: Record<string, any>; visible?: boolean } }>(), {
+  section: () => ({ component: 'unknown' }),
+})
 const config = computed(() => props.section.config || {})
 const placeholder = '/placeholder.svg'
 

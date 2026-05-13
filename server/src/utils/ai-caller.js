@@ -6,6 +6,7 @@
 import { CircuitBreaker } from './circuit-breaker.js';
 import { BusinessError } from './businessError.js';
 import { aiTimeoutMs } from '../config/index.js';
+import logger from './logger.js';
 
 const DEFAULT_TIMEOUT = aiTimeoutMs;
 const DEFAULT_RETRIES = 3;
@@ -46,7 +47,8 @@ export async function call(endpoint, apiKey, params, options = {}) {
 
       if (!response.ok) {
         const errorBody = await response.text();
-        throw new BusinessError(502, `[${modelName || 'AI'}] HTTP ${response.status}: ${errorBody}`);
+        logger.warn(`[${modelName || 'AI'}] upstream error`, { status: response.status, error: errorBody.substring(0, 200) });
+        throw new BusinessError(502, 'AI 服务暂时不可用，请稍后重试');
       }
 
       const result = await response.json();

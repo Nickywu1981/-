@@ -52,7 +52,7 @@ export async function generateWhiteBg(params) {
         fallback: true,
       };
     } catch (e2) {
-      throw new BusinessError(500, `白底图生成失败: ${e2.message}`);
+      throw new BusinessError(500, '白底图生成失败，请稍后重试');
     }
   }
 }

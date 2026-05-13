@@ -96,7 +96,7 @@ export async function adaptImage(inputPath, platformCode, outputDir) {
       .toFormat(ext)
       .toFile(outputPath);
   } catch (sharpErr) {
-    throw new BusinessError(500, `图片处理失败: ${sharpErr.message}`);
+    throw new BusinessError(500, '图片处理失败，请稍后重试');
   }
 
   const stats = fs.statSync(outputPath);

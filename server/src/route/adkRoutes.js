@@ -20,17 +20,17 @@ const runSchema = z.object({
 
 // ==================== A2A 兼容端点 ====================
 
-router.get('/agents', (_req, res) => ctrl.getAgents(_req, res));
+router.get('/agents', ctrl.getAgents);
 
 // A2A 标准 /run 端点
 router.post('/run/:agentName', authMiddleware, heavyLimiter, validate(runSchema), ctrl.runAgent);
 
 // A2A 标准 /.well-known/agent.json
-router.get('/.well-known/agent.json', (_req, res) => ctrl.getAgentManifest(_req, res));
+router.get('/.well-known/agent.json', ctrl.getAgentManifest);
 
 // ==================== 快捷端点（非 A2A） ====================
 
 // 健康检查
-router.get('/health', (_req, res) => ctrl.healthCheck(_req, res));
+router.get('/health', ctrl.healthCheck);
 
 export default router;

@@ -62,13 +62,9 @@ router.get('/config', requireRole('admin'), ctrl.list);
 
 router.get('/config/:modelKey', requireRole('admin'), ctrl.getOne);
 
-router.post('/config', adminLimiter, requireRole('admin'), _validate(modelConfigSchema), (req, res) => {
-  return ctrl.create(req, res);
-});
+router.post('/config', adminLimiter, requireRole('admin'), _validate(modelConfigSchema), ctrl.create);
 
-router.put('/config/:modelKey', adminLimiter, requireRole('admin'), _validate(modelUpdateSchema), (req, res) => {
-  return ctrl.update(req, res);
-});
+router.put('/config/:modelKey', adminLimiter, requireRole('admin'), _validate(modelUpdateSchema), ctrl.update);
 
 router.delete('/config/:modelKey', adminLimiter, requireRole('admin'), ctrl.remove);
 

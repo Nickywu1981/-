@@ -10,7 +10,11 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{ page: number; pageSize: number; total: number }>()
+const props = withDefaults(defineProps<{ page: number; pageSize: number; total: number }>(), {
+  page: 1,
+  pageSize: 10,
+  total: 0,
+})
 defineEmits<{ change: [page: number] }>()
 const totalPages = computed(() => Math.max(1, Math.ceil(props.total / props.pageSize)))
 </script>

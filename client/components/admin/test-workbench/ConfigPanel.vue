@@ -142,7 +142,7 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
+const props = withDefaults(defineProps<{
   activeTab: string
   paramsError: string
   running: boolean
@@ -154,7 +154,19 @@ defineProps<{
   modelsByCategory: (cat: string) => any[]
   selectedSequence: string[]
   compareModels: string[]
-}>()
+}>(), {
+  activeTab: 'text',
+  paramsError: '',
+  running: false,
+  canRun: false,
+  runButtonLabel: 'Run',
+  categories: () => [],
+  modelMap: () => ({}),
+  availableModels: () => [],
+  modelsByCategory: () => () => [],
+  selectedSequence: () => [],
+  compareModels: () => [],
+})
 
 defineEmits<{
   'toggleModelInSequence': [key: string]
