@@ -74,4 +74,15 @@ router.get('/stats', apiLimiter, ctrl.getMemoryStats);
 // 清理过期
 router.post('/purge', heavyLimiter, ctrl.purgeExpiredMemories);
 
+// ==================== LangMemE 自进化 ====================
+
+// POST /api/memory/evolve — 触发自进化（提取模式→生成规则）
+router.post('/evolve', heavyLimiter, ctrl.evolveMemory);
+
+// GET /api/memory/evolution-stats — 进化指标
+router.get('/evolution-stats', apiLimiter, ctrl.getEvolutionStats);
+
+// POST /api/memory/extract-patterns — 单用户模式提取
+router.post('/extract-patterns', apiLimiter, ctrl.extractMemPatterns);
+
 export default router;

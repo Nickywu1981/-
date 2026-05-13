@@ -22,6 +22,7 @@ import { matchAndFill } from './templateEngine.js';
 import { gatewayInfer, gatewayDispatch } from '../gateway/aiGatewayHub.js';
 import logger from '../utils/logger.js';
 import { BusinessError } from '../utils/businessError.js';
+import { WorkingMemory } from './workingMemory.js';
 
 // ==================== 作业存储(内存+后续迁移Redis) ====================
 const jobStore = new Map();
@@ -733,6 +734,8 @@ async function _runJob(jobId, steps, mode, input) {
     package: null,
   };
 
+  const wm = new WorkingMemory();
+
   for (let i = 0; i < steps.length; i++) {
     const step = steps[i];
     job.steps[i].status = 'running';
@@ -790,6 +793,9 @@ async function _runJob(jobId, steps, mode, input) {
         model: stepModel?.model_key || 'builtin',
         output,
       });
+
+      // 工作记忆: 记录步骤执行结果
+      wm.set(`step_${step.key}`, { status: 'completed', model: stepModel?.model_key, ts: Date.now() }, 1);
     } catch (err) {
       job.steps[i].status = 'failed';
       job.steps[i].error = err.message;
@@ -800,11 +806,15 @@ async function _runJob(jobId, steps, mode, input) {
         error: err.message,
       });
 
+      // 工作记忆: 记录失败
+      wm.set(`step_${step.key}`, { status: 'failed', error: err.message, ts: Date.now() }, 2);
+
       // 必填步骤失败 → 终止
       if (step.required) {
         job.status = 'failed';
         job.error = `步骤 "${step.label}" 执行失败: ${err.message}`;
         job.completedAt = new Date().toISOString();
+        wm.flushToLTM(input.userId).catch(() => {});
         return;
       }
       // 可选步骤失败 → 跳过继续
@@ -827,6 +837,12 @@ async function _runJob(jobId, steps, mode, input) {
     package: ctx.package || null,
   };
   job.completedAt = new Date().toISOString();
+
+  // 工作记忆: 记录产品信息并刷新到 LTM
+  if (input.productName) wm.set('product', input.productName, 1);
+  wm.set('job_result', { status: 'completed', outputKeys: Object.keys(job.output) }, 2);
+  wm.flushToLTM(input.userId).catch(() => {});
+
   logger.info(`[WorkflowEngine] job=${jobId} completed, ${steps.length} steps`);
 }
 

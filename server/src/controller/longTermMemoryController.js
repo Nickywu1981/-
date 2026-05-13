@@ -3,6 +3,7 @@ import { success } from '../utils/response.js';
 import { BusinessError } from '../utils/businessError.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import * as ltmService from '../services/longTermMemoryService.js';
+import * as langMemE from '../services/langMemEvolutionService.js';
 import logger from '../utils/logger.js';
 
 // 强制 subjectId 绑定当前登录用户，防止越权访问他人记忆
@@ -60,4 +61,30 @@ export const getMemoryStats = wrapController(async (req, res) => {
 export const purgeExpiredMemories = wrapController(async (req, res) => {
   const count = await ltmService.purgeExpired();
   return success(res, { purged: count });
+});
+
+// ==================== LangMemE 自进化 ====================
+
+export const evolveMemory = wrapController(async (req, res) => {
+  const { namespace = 'user', subjectIds } = req.body || {};
+  if (subjectIds && Array.isArray(subjectIds)) {
+    return success(res, await langMemE.evolutionTick(subjectIds, namespace));
+  }
+  return success(res, await langMemE.fullEvolutionCycle(namespace));
+});
+
+export const getEvolutionStats = wrapController(async (req, res) => {
+  const { namespace = 'user' } = req.query;
+  const subjects = await langMemE.getActiveSubjects(namespace);
+  return success(res, {
+    ...langMemE.getEvolutionMetrics(),
+    activeSubjects: subjects.length,
+  });
+});
+
+export const extractMemPatterns = wrapController(async (req, res) => {
+  const { namespace = 'user', subjectId, minSupport = 2 } = req.body || {};
+  if (!subjectId) throw new BusinessError(ERROR_CODE.VALIDATION_ERROR, 'subjectId required');
+  const patterns = await langMemE.extractPatterns({ namespace, subjectId: scopedSubjectId(req, subjectId), minSupport });
+  return success(res, { patterns, count: patterns.length });
 });

@@ -1,19 +1,36 @@
 import db from './db.js';
 
 export async function upsertEntry(data) {
-  const [result] = await db.execute(
-    `INSERT INTO ltm_entries
-      (namespace, subject_id, memory_key, content, content_hash,
-       importance, memory_type, source, tags, metadata, is_pinned, expires_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-     ON DUPLICATE KEY UPDATE
-       importance = GREATEST(importance, VALUES(importance)),
-       frequency = frequency + 1, access_count = access_count + 1,
-       last_accessed_at = NOW(), updated_at = NOW()`,
-    [data.namespace, data.subjectId, data.memoryKey, data.content, data.contentHash,
-     data.importance, data.memoryType, data.source, JSON.stringify(data.tags || []),
-     JSON.stringify(data.metadata || {}), data.isPinned ? 1 : 0, data.expiresAt || null]
-  );
+  const hasEmbedding = data.embedding !== undefined && data.embedding !== null;
+  const sql = hasEmbedding
+    ? `INSERT INTO ltm_entries
+        (namespace, subject_id, memory_key, content, content_hash,
+         importance, memory_type, source, tags, metadata, is_pinned, expires_at,
+         embedding, embedding_model)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       ON DUPLICATE KEY UPDATE
+         importance = GREATEST(importance, VALUES(importance)),
+         frequency = frequency + 1, access_count = access_count + 1,
+         embedding = COALESCE(VALUES(embedding), embedding),
+         embedding_model = COALESCE(VALUES(embedding_model), embedding_model),
+         last_accessed_at = NOW(), updated_at = NOW()`
+    : `INSERT INTO ltm_entries
+        (namespace, subject_id, memory_key, content, content_hash,
+         importance, memory_type, source, tags, metadata, is_pinned, expires_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       ON DUPLICATE KEY UPDATE
+         importance = GREATEST(importance, VALUES(importance)),
+         frequency = frequency + 1, access_count = access_count + 1,
+         last_accessed_at = NOW(), updated_at = NOW()`;
+  const params = hasEmbedding
+    ? [data.namespace, data.subjectId, data.memoryKey, data.content, data.contentHash,
+       data.importance, data.memoryType, data.source, JSON.stringify(data.tags || []),
+       JSON.stringify(data.metadata || {}), data.isPinned ? 1 : 0, data.expiresAt || null,
+       JSON.stringify(data.embedding), data.embeddingModel || 'tfidf-local']
+    : [data.namespace, data.subjectId, data.memoryKey, data.content, data.contentHash,
+       data.importance, data.memoryType, data.source, JSON.stringify(data.tags || []),
+       JSON.stringify(data.metadata || {}), data.isPinned ? 1 : 0, data.expiresAt || null];
+  const [result] = await db.execute(sql, params);
   return result.insertId;
 }
 
@@ -29,6 +46,49 @@ export async function recallEntries({ namespace, subjectId, topK = 5, memoryType
   params.push(topK);
   const [rows] = await db.execute(sql, params);
   return rows;
+}
+
+/** 余弦相似度 */
+function _cosineSimilarity(a, b) {
+  if (!a || !b) return 0;
+  let dot = 0, normA = 0, normB = 0;
+  const allKeys = new Set([...Object.keys(a), ...Object.keys(b)]);
+  for (const k of allKeys) {
+    const va = a[k] || 0, vb = b[k] || 0;
+    dot += va * vb;
+    normA += va * va;
+    normB += vb * vb;
+  }
+  if (normA === 0 || normB === 0) return 0;
+  return dot / (Math.sqrt(normA) * Math.sqrt(normB));
+}
+
+/**
+ * 基于 embedding 向量余弦相似度的语义召回
+ * @returns {Promise<Array>} 带 _similarity 字段的记忆条目
+ */
+export async function recallByEmbedding({ namespace, subjectId, embedding, topK = 5, memoryType, minImportance = 0.1 }) {
+  const candidates = await recallEntries({ namespace, subjectId, topK: 200, memoryType, minImportance });
+
+  const withEmbedding = candidates.filter(c => c.metadata);
+  const parsed = withEmbedding.map(c => {
+    let emb = null;
+    try {
+      const meta = typeof c.metadata === 'string' ? JSON.parse(c.metadata) : (c.metadata || {});
+      emb = meta._embedding || null;
+    } catch { /* ignore */ }
+    return { ...c, _embedding: emb };
+  }).filter(c => c._embedding && Object.keys(c._embedding).length > 0);
+
+  if (parsed.length === 0) return [];
+
+  const scored = parsed.map(c => ({
+    ...c,
+    _similarity: Math.round(_cosineSimilarity(embedding, c._embedding) * 10000) / 10000,
+  }));
+
+  scored.sort((a, b) => b._similarity - a._similarity);
+  return scored.slice(0, topK);
 }
 
 export async function getMemoryStats(namespace, subjectId) {

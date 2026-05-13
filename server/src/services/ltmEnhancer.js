@@ -136,7 +136,21 @@ export async function buildMemoryInjection({ userId, maxTokens = 500, contextHin
       memoryType: 'product', topK: 5, minImportance: 0.1,
     });
 
-    const allMemories = [...brandMemories, ...preferenceMemories, ...productMemories];
+    // 召回 LangMemE 自进化规则
+    let ruleMemories = [];
+    try {
+      ruleMemories = await ltm.recall({
+        namespace: 'user', subjectId: String(userId),
+        memoryType: 'rule', topK: 3, minImportance: 0.4,
+      });
+      // 记录规则命中
+      const { recordRuleHit } = await import('./langMemEvolutionService.js');
+      for (const r of ruleMemories) {
+        recordRuleHit(r.id);
+      }
+    } catch { /* langMemE 未加载时降级 */ }
+
+    const allMemories = [...ruleMemories, ...brandMemories, ...preferenceMemories, ...productMemories];
 
     if (allMemories.length === 0) return '';
 
@@ -216,5 +230,50 @@ export async function rememberConversation({ userId, productName, platform, styl
   logger.info('[LTM+] Conversation remembered', { userId, entries: tasks.length });
 }
 
+/**
+ * 记住本次 Session 情节（情节记忆）
+ */
+export async function rememberSession(sessionId, userId, session) {
+  try {
+    const events = session?.events || [];
+    const keyEvents = events
+      .filter(e => e.type === 'user.input' || e.type === 'agent.end')
+      .slice(-20);
+
+    if (keyEvents.length === 0) return;
+
+    const eventLines = keyEvents.map(e => {
+      const content = typeof e.content === 'string' ? e.content.slice(0, 150) : JSON.stringify(e.content || '').slice(0, 150);
+      return `[${e.type}] ${e.agentName || 'user'}: ${content}`;
+    });
+
+    const summary = `\u4f1a\u8bdd ${sessionId}: ${eventLines.join('; ')}`;
+
+    const duration = events.length > 0
+      ? Math.round(((events[events.length - 1].timestamp - events[0].timestamp) / 1000))
+      : 0;
+
+    await ltm.store({
+      namespace: 'user', subjectId: String(userId),
+      memoryKey: `session_${sessionId}`,
+      content: summary,
+      memoryType: 'episodic',
+      importance: 0.5,
+      source: 'session',
+      tags: ['episodic', 'session'],
+      metadata: {
+        sessionId,
+        eventCount: events.length,
+        duration,
+        agentCount: [...new Set(events.filter(e => e.agentName).map(e => e.agentName))].length,
+      },
+    });
+
+    logger.info('[LTM+] Session remembered', { sessionId, userId, events: keyEvents.length });
+  } catch (err) {
+    logger.warn('[LTM+] rememberSession failed', { error: err.message });
+  }
+}
+
 export { DECAY_STRATEGIES };
-export default { scenarioDecay, cachedRecall, buildMemoryInjection, rememberConversation };
+export default { scenarioDecay, cachedRecall, buildMemoryInjection, rememberConversation, rememberSession };

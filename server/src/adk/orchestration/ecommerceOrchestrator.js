@@ -24,6 +24,8 @@ import { BusinessError } from '../../utils/businessError.js';
 import { classifyIntent } from '../../services/intentClassifier.js';
 import { isBlocked } from '../../services/adComplianceEngine.js';
 import { wrapPrompt } from '../../services/promptWrapper.js';
+import { rememberSession } from '../../services/ltmEnhancer.js';
+import { WorkingMemory } from '../../services/workingMemory.js';
 
 // ==================== 链路1: 白底图全链路 ====================
 // 白底图 → 意图识别 → 合规校验 → 批量扩图 → 详情页全套 → 脚本分镜 → 分镜合成视频 → 配音字幕
@@ -159,6 +161,7 @@ export async function runEcommercePipeline(params = {}) {
   // ── Step 2: 创建执行上下文 ──
   const session = new Session({ userId: userId || 'anonymous' });
   const ctx = new InvocationContext({ session });
+  const wm = new WorkingMemory();
 
   // 注入全局状态
   ctx.setState('userInput', userInput);
@@ -170,6 +173,11 @@ export async function runEcommercePipeline(params = {}) {
   ctx.setState('industry', industry || '');
   ctx.setState('userId', userId);
   ctx.setState('ip', ip);
+
+  // 工作记忆: 存储当前任务上下文
+  if (productName) wm.set('product', productName, 1);
+  wm.set('platform', platform, 1);
+  if (industry) wm.set('industry', industry, 1);
   ctx.setState('videoDuration', videoDuration);
   ctx.setState('needsVoice', needsVoice);
 
@@ -192,6 +200,8 @@ export async function runEcommercePipeline(params = {}) {
   try {
     agentResults = await pipeline.runAsync(ctx);
   } catch (err) {
+    wm.set('pipeline_error', err.message, 2);
+    wm.flushToLTM(userId).catch(() => {});
     logger.error('[Orchestrator] Pipeline execution failed', {
       pipeline: pipelineKey,
       error: err.message,
@@ -208,6 +218,11 @@ export async function runEcommercePipeline(params = {}) {
     totalMs,
     intentId: intent?.intentId,
   });
+
+  // 情节记忆: 记住本次会话 + 工作记忆刷新
+  rememberSession(ctx.session.id, userId, ctx.session).catch(() => {});
+  wm.set('pipeline', pipelineKey, 2);
+  wm.flushToLTM(userId).catch(() => {});
 
   return {
     success: true,
