@@ -102,3 +102,8 @@ export function formatDateTimeLocale(iso: string): string {
 export function fmtMoney(n: number | string): string {
   return (Number(n) || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2 });
 }
+
+export function fmtNum(n: number): string {
+  if (n >= 10000) return (n / 10000).toFixed(1) + '万'
+  return n.toLocaleString('zh-CN')
+}

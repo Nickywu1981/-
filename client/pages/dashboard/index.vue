@@ -227,12 +227,14 @@
 </template>
 
 <script setup lang="ts">
+import { fmtNum } from '@/utils/format'
+
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 const { t } = useI18n()
 const { theme } = useTheme()
 const isDark = computed(() => theme.value === 'dark')
 
-const { currentTime, currentDate, start: startClock, stop: stopClock } = useDashboardClock()
+const { currentTime, currentDate, start: startClock } = useDashboardClock()
 const {
   loading, error, hasData, refresh,
   kpiCards,
@@ -245,13 +247,11 @@ const {
   bizMetrics,
   alerts,
   toggleFullscreen,
-  fmtNum,
 } = useDashboardData()
 
 const systemOnline = ref(true)
 
 onMounted(() => { startClock() })
-onUnmounted(() => { stopClock() })
 </script>
 
 <style scoped>

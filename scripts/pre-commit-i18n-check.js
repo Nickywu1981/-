@@ -18,7 +18,6 @@
 
 const fs = require('fs')
 const path = require('path')
-const { execSync } = require('child_process')
 
 // ═══ 配置 ═══
 const CONFIG = {
@@ -33,7 +32,7 @@ const CONFIG = {
 
 const args = process.argv.slice(2)
 const scanDirs = args.length > 0 ? args : CONFIG.scanDirs
-const projectRoot = execSync('git rev-parse --show-toplevel', { encoding: 'utf8' }).trim()
+const projectRoot = process.cwd()
 
 function hasChinese(str) {
   return /[\u4e00-\u9fa5]/.test(str)
@@ -41,9 +40,7 @@ function hasChinese(str) {
 
 function isInComment(trimmed) {
   return trimmed.startsWith('//') || trimmed.startsWith('<!--') ||
-    trimmed.startsWith('*') || trimmed.startsWith('/*') || trimmed.startsWith('*/') ||
-    trimmed.startsWith('#') || trimmed.startsWith('>') || trimmed.startsWith('|') ||
-    /^\w+\s*:/.test(trimmed) && trimmed.endsWith('-->')
+    trimmed.startsWith('*') || trimmed.startsWith('/*') || trimmed.startsWith('*/')
 }
 
 function isConsoleLog(line) {
