@@ -12,8 +12,8 @@ import logger from '../../utils/logger.js';
 // ==================== 工具定义 ====================
 
 const productInfoTool = new FunctionTool('extract_product_info', async (params) => {
-  const { default: detailService } = await import('../../services/detail-image.service.js');
-  return detailService.extractProductInfo(params.userId, { imageUrl: params.imageUrl });
+  const { extractProductInfo } = await import('../../services/detail-image.service.js');
+  return extractProductInfo(params.userId, { imageUrl: params.imageUrl });
 }, {
   description: '从商品图片提取产品信息（名称/品类/特征）',
   parameters: {
@@ -60,12 +60,36 @@ const modulesTool = new FunctionTool('create_detail_modules', async (params) => 
 });
 
 const sellingPointsTool = new FunctionTool('generate_selling_points', async (params) => {
-  const { default: copyService } = await import('../../services/copywritingService.js');
-  return copyService.generateSellingPoints(
-    params.productName,
-    params.platform || 'taobao',
-    params.count || 5
-  );
+  const { gatewayRoute } = await import('../../gateway/aiGatewayHub.js');
+
+  const prompt = `你是一个电商文案专家。为以下商品生成${params.count || 5}条核心卖点文案：
+
+商品名称: ${params.productName}
+目标平台: ${params.platform || 'taobao'}
+语言: zh-CN
+
+要求:
+- 每条卖点简洁有力（15-30字）
+- 突出产品核心优势
+- 符合平台风格
+- 避免夸大和违禁词
+
+返回JSON格式: { "sellingPoints": ["卖点1", "卖点2", ...] }`;
+
+  const result = await gatewayRoute({
+    mode: 'single',
+    taskType: 'text_gen',
+    params: {
+      model: 'qwen-turbo',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7,
+      maxTokens: 500,
+    },
+  });
+
+  const raw = result?.output?.choices?.[0]?.message?.content || '';
+  const jsonMatch = raw.match(/\{[\s\S]*\}/);
+  return jsonMatch ? JSON.parse(jsonMatch[0]) : { sellingPoints: [] };
 }, {
   description: '生成商品卖点文案',
   parameters: {

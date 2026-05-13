@@ -38,8 +38,8 @@ const geoCheckTool = new FunctionTool('geo_check', async (params) => {
 });
 
 const sanitizePIITool = new FunctionTool('sanitize_pii', async (params) => {
-  const { sanitizeInput } = await import('../../services/inputSanitizerService.js');
-  return sanitizeInput(params.text);
+  const { sanitizePII } = await import('../../services/inputSanitizerService.js');
+  return sanitizePII(params.text);
 }, {
   description: 'PII脱敏：自动识别并脱敏手机号/身份证/银行卡/邮箱',
   parameters: {

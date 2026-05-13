@@ -45,7 +45,11 @@ const viralAnalyzeTool = new FunctionTool('analyze_viral_video', async (params) 
 
   const raw = result?.output?.choices?.[0]?.message?.content || '';
   const jsonMatch = raw.match(/\{[\s\S]*\}/);
-  return jsonMatch ? JSON.parse(jsonMatch[0]) : { viralFormula: '分析失败，请提供更清晰的视频描述' };
+  try {
+    return jsonMatch ? JSON.parse(jsonMatch[0]) : { viralFormula: '分析失败，请提供更清晰的视频描述' };
+  } catch {
+    return { viralFormula: '分析结果解析失败' };
+  }
 }, {
   description: '反推分析爆款视频逻辑（钩子/节奏/卡点/结尾公式）',
   parameters: {
@@ -94,7 +98,11 @@ ${params.viralInsight ? `爆款参考: ${params.viralInsight}` : ''}
 
   const raw = result?.output?.choices?.[0]?.message?.content || '';
   const jsonMatch = raw.match(/\{[\s\S]*\}/);
-  return jsonMatch ? JSON.parse(jsonMatch[0]) : null;
+  try {
+    return jsonMatch ? JSON.parse(jsonMatch[0]) : null;
+  } catch {
+    return null;
+  }
 }, {
   description: '生成带货视频完整拍摄脚本（含分镜/口播/运镜/配乐建议）',
   parameters: {

@@ -6,3 +6,8 @@ export { ContentAgent } from './contentAgent.js';
 export { GuardAgent } from './guardAgent.js';
 export { VisualAgent } from './visualAgent.js';
 export { HealthAgent } from './healthAgent.js';
+export { IntentAgent } from './intentAgent.js';
+export { DetailPageAgent } from './detailAgent.js';
+export { ExpandAgent } from './expandAgent.js';
+export { ScriptStoryboardAgent } from './storyboardAgent.js';
+export { DispatchAgent } from './dispatchAgent.js';
