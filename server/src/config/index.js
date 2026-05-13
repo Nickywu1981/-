@@ -250,7 +250,17 @@ const config = {
     template: process.env.E2B_TEMPLATE || 'code-interpreter-v2',
     defaultTimeoutMs: parseInt(process.env.E2B_TIMEOUT_MS || '300000', 10),
     maxSandboxesPerUser: parseInt(process.env.E2B_MAX_PER_USER || '3', 10),
-    allowOutbound: process.env.E2B_ALLOW_OUTBOUND !== 'false', // 默认允许外连，生产建议关闭
+    allowOutbound: process.env.E2B_ALLOW_OUTBOUND !== 'false',
+    warmPoolSize: parseInt(process.env.E2B_WARM_POOL_SIZE || '0', 10),     // P3: 预热池大小
+    codeMaxByLanguage: {                                                    // P3: 按语言分级最大字符数
+      python: 50000,
+      javascript: 30000,
+      typescript: 30000,
+      bash: 10000,
+      r: 30000,
+      ruby: 30000,
+    },
+    defaultCodeMax: parseInt(process.env.E2B_CODE_MAX || '50000', 10),
   },
 
   bull: {

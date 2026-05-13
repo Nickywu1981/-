@@ -38,7 +38,18 @@ export const _cleanupTimer = setInterval(() => {
         _cleanupEntry(id, 'expired');
       }
     }
-  } catch { /* Map 迭代安全 */ }
+    // P3: 预热池中超过 30min 未被使用的沙箱自动销毁
+    for (const sandbox of WARM_POOL) {
+      // 预热池沙箱无 createAt，由外部 metric 跟踪
+      // 简化处理：每轮清理只保留 _warmPoolTarget 个
+      if (WARM_POOL.size > _warmPoolTarget) {
+        const toRemove = WARM_POOL.values().next().value;
+        WARM_POOL.delete(toRemove);
+        toRemove.kill().catch(err => logger.warn('[E2B] 预热池沙箱清理失败', { sandboxId: toRemove.sandboxId, error: err.message }));
+        logger.info('[E2B] 预热池沙箱已清理（超出目标）', { sandboxId: toRemove.sandboxId, poolSize: WARM_POOL.size });
+      }
+    }
+  } catch { /* Map/Set 迭代安全 */ }
 }, IDLE_CLEANUP_MS).unref();
 
 function _getApiKey() {
@@ -137,6 +148,59 @@ function _sanitizeStderr(stderr) {
   return sanitized;
 }
 
+// ─────────────────── P3 #14 沙箱预热池 ───────────────────
+
+const WARM_POOL = new Set();
+let _warmPoolTarget = 0;
+
+async function _fillWarmPool(count) {
+  if (count <= 0) return;
+  const apiKey = _getApiKey();
+  for (let i = 0; i < count; i++) {
+    try {
+      const sandbox = await Sandbox.create({
+        apiKey,
+        template: config.template,
+        timeoutMs: config.defaultTimeoutMs,
+        allowOutbound: config.allowOutbound ?? false,
+      });
+      WARM_POOL.add(sandbox);
+      logger.info('[E2B] 预热池沙箱就绪', { sandboxId: sandbox.sandboxId, poolSize: WARM_POOL.size });
+    } catch (err) {
+      logger.warn('[E2B] 预热池创建失败', { error: err.message, remaining: count - i - 1 });
+      break; // 连续失败则停止预热
+    }
+  }
+}
+
+export async function _initWarmPool() {
+  _warmPoolTarget = config.warmPoolSize;
+  if (_warmPoolTarget <= 0) return;
+  logger.info('[E2B] 初始化预热池', { target: _warmPoolTarget });
+  _fillWarmPool(_warmPoolTarget);
+}
+
+function _popWarmSandbox() {
+  if (WARM_POOL.size === 0) return null;
+  const sandbox = WARM_POOL.values().next().value;
+  WARM_POOL.delete(sandbox);
+  // 异步补池
+  if (WARM_POOL.size < _warmPoolTarget) {
+    setImmediate(() => _fillWarmPool(1));
+  }
+  return sandbox;
+}
+
+// ─────────────────── P3 #17 代码长度按语言分级 ───────────────────
+
+function _checkCodeLength(code, language) {
+  const lang = (language || 'python').toLowerCase();
+  const maxLen = config.codeMaxByLanguage[lang] || config.defaultCodeMax;
+  if (code.length > maxLen) {
+    throw new BusinessError(ERROR_CODE.VALIDATION_ERROR, `代码过长: ${lang} 上限 ${maxLen} 字符，当前 ${code.length} 字符`);
+  }
+}
+
 // ─────────────────── P2 #9 执行审计持久化 ───────────────────
 
 async function _logExecution({ sandboxId, userId, language, code, stdout, stderr, exitCode, elapsedMs, status, errorMsg }) {
@@ -192,6 +256,15 @@ export async function createSandbox(userId) {
     throw new BusinessError(ERROR_CODE.QUOTA_EXCEEDED, `沙箱数量已达上限 (${config.maxSandboxesPerUser})`);
   }
 
+  // P3 #14: 预热池优先
+  let sandbox = _popWarmSandbox();
+  if (sandbox) {
+    SANDBOX_STORE.set(sandbox.sandboxId, { sandbox, userId: uid, createdAt: Date.now() });
+    _persistSandboxMeta(sandbox.sandboxId, uid);
+    logger.info('[E2B] 沙箱已分配（来自预热池）', { sandboxId: sandbox.sandboxId, userId: uid, poolRemaining: WARM_POOL.size });
+    return { sandboxId: sandbox.sandboxId };
+  }
+
   const apiKey = _getApiKey();
   let sandbox;
   try {
@@ -228,6 +301,9 @@ export async function executeCode(sandboxId, userId, code, language, timeoutMs) 
 
   // P1 #2: 危险代码检测
   _auditCode(code);
+
+  // P3 #17: 按语言分级长度校验
+  _checkCodeLength(code, language);
 
   // P2 #10: 崩溃沙箱检测
   let running;

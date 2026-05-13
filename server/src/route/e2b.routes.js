@@ -11,7 +11,7 @@ import { e2bLimiter, e2bExecuteLimiter, e2bListLimiter, e2bDestroyLimiter } from
 const router = Router();
 
 const codeSchema = z.object({
-  code: z.string().min(1, '请提供代码').max(100000, '代码过长'),
+  code: z.string().min(1, '请提供代码').max(50000, '代码过长（上限50000字符）'),
   language: z.enum(['python', 'javascript', 'typescript', 'bash', 'r', 'ruby']).optional().default('python'),
 });
 

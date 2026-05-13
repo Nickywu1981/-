@@ -51,6 +51,12 @@ server.listen(port, () => {
     import('./dao/taskDao.js').then(({ recoverStuckTasks }) => recoverStuckTasks()).catch((err) => { logger.warn('[Cron] 恢复卡住任务失败', { error: err.message }); });
     import('./services/job-queue.service.js').then(({ recoverStuckJobs }) => recoverStuckJobs()).catch((err) => { logger.warn('[Cron] job_queue 恢复失败', { error: err.message }); });
   }, 5 * 60 * 1000).unref();
+
+  // E2B 孤儿沙箱清理 + 预热池初始化
+  import('./services/e2b.service.js').then(({ _startupOrphanCheck, _initWarmPool }) => {
+    _startupOrphanCheck().catch((err) => { logger.warn('[E2B] 孤儿检查失败', { error: err.message }); });
+    _initWarmPool().catch((err) => { logger.warn('[E2B] 预热池初始化失败', { error: err.message }); });
+  }).catch((err) => { logger.warn('[E2B] 加载失败', { error: err.message }); });
 });
 
 // ==================== 全局异常处理 ====================
