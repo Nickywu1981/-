@@ -4225,6 +4225,7 @@
   "admin_shell": {
     "expand_sidebar": "展开侧栏",
     "collapse_sidebar": "折叠侧栏",
+    "sidebar_label": "管理导航",
     "switch_light": "切亮色",
     "switch_dark": "切暗色",
     "notification": "通知",

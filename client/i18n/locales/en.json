@@ -4225,6 +4225,7 @@
   "admin_shell": {
     "expand_sidebar": "Expand Sidebar",
     "collapse_sidebar": "Collapse Sidebar",
+    "sidebar_label": "Admin Navigation",
     "switch_light": "Light Mode",
     "switch_dark": "Dark Mode",
     "notification": "Notifications",
