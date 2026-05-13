@@ -220,9 +220,9 @@ export async function runEcommercePipeline(params = {}) {
   });
 
   // 情节记忆: 记住本次会话 + 工作记忆刷新
-  rememberSession(ctx.session.id, userId, ctx.session).catch(() => {});
+  rememberSession(ctx.session.id, userId, ctx.session).catch(e => logger.warn('[Orchestrator] Session memory recording failed', { error: e.message }));
   wm.set('pipeline', pipelineKey, 2);
-  wm.flushToLTM(userId).catch(() => {});
+  wm.flushToLTM(userId).catch(e => logger.warn('[Orchestrator] Working memory flush failed', { error: e.message }));
 
   return {
     success: true,

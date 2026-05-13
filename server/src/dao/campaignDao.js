@@ -15,8 +15,12 @@ export default {
     return { list: rows, total, page, pageSize };
   },
 
-  async getCampaign(id) {
-    const [rows] = await pool.query('SELECT id,title,type,description,cover_url,rules,reward_type,reward_value,start_time,end_time,status,target_audience,tenant_id,sort_order,create_time,update_time FROM campaign WHERE id = ? LIMIT 1', [id]);
+  async getCampaign(id, tenantId) {
+    const sql = tenantId
+      ? 'SELECT id,title,type,description,cover_url,rules,reward_type,reward_value,start_time,end_time,status,target_audience,tenant_id,sort_order,create_time,update_time FROM campaign WHERE id = ? AND tenant_id = ? LIMIT 1'
+      : 'SELECT id,title,type,description,cover_url,rules,reward_type,reward_value,start_time,end_time,status,target_audience,tenant_id,sort_order,create_time,update_time FROM campaign WHERE id = ? LIMIT 1';
+    const params = tenantId ? [id, tenantId] : [id];
+    const [rows] = await pool.query(sql, params);
     return rows[0] || null;
   },
 

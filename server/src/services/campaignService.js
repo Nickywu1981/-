@@ -6,8 +6,8 @@ export async function listCampaigns(query) {
   return campaignDao.listCampaigns(query);
 }
 
-export async function getCampaign(id) {
-  const c = await campaignDao.getCampaign(id);
+export async function getCampaign(id, tenantId) {
+  const c = await campaignDao.getCampaign(id, tenantId);
   if (!c) throw new BusinessError(404, '活动不存在');
   return c;
 }

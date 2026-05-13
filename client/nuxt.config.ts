@@ -93,6 +93,11 @@ export default defineNuxtConfig({
   // PWA 渐进式应用配置
   pwa: {
     registerType: 'autoUpdate',
+    // 自动生成多尺寸图标
+    pwaAssets: {
+      image: 'public/favicon.svg',
+      preset: 'minimal-2023',
+    },
     manifest: {
       name: 'Movio AI — 电商AI视觉创作平台',
       short_name: 'Movio AI',
@@ -100,23 +105,72 @@ export default defineNuxtConfig({
       theme_color: '#7C3AED',
       background_color: '#ffffff',
       display: 'standalone',
+      display_override: ['standalone', 'minimal-ui'],
       start_url: '/',
+      scope: '/',
+      orientation: 'any',
       icons: [
-        { src: '/favicon.svg', sizes: 'any', type: 'image/svg+xml' },
+        { src: '/favicon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any maskable' },
       ],
-      categories: ['productivity', 'utilities'],
+      categories: ['productivity', 'utilities', 'business'],
       lang: 'zh-CN',
+      dir: 'ltr',
+      prefer_related_applications: false,
+      shortcuts: [
+        { name: '创作中心', short_name: '创作', url: '/workspace', description: '进入创作工作台' },
+        { name: '图片工具', short_name: '图片', url: '/work/image', description: 'AI图片生成' },
+        { name: '视频工具', short_name: '视频', url: '/work/video', description: 'AI视频生成' },
+      ],
     },
     workbox: {
-      globPatterns: ['**/*.{js,css,html,png,svg,ico,woff2}'],
+      globPatterns: ['**/*.{js,css,html,png,svg,ico,woff2,jpg,webp,avif}'],
+      // 导航请求离线回退
+      navigateFallback: '/offline.html',
+      navigateFallbackDenylist: [/^\/api\//, /^\/_nuxt\//],
+      // 注入自定义 SW 代码
+      sourcemap: false,
       runtimeCaching: [
+        // API GET — 网络优先 + 长期缓存 + 后台更新
         {
           urlPattern: '/api/**',
           handler: 'NetworkFirst',
           method: 'GET',
           options: {
             cacheName: 'api-cache',
-            expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 },
+            networkTimeoutSeconds: 10,
+            expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 30 },
+            backgroundSync: {
+              name: 'movio-api-queue',
+              options: { maxRetentionTime: 60 * 60 * 24 },
+            },
+          },
+        },
+        // 静态资源 — 缓存优先
+        {
+          urlPattern: /\.(?:js|css|woff2?|png|jpg|webp|avif|svg|ico)$/,
+          handler: 'CacheFirst',
+          options: {
+            cacheName: 'static-assets',
+            expiration: { maxEntries: 500, maxAgeSeconds: 60 * 60 * 24 * 7 },
+          },
+        },
+        // 图片生成结果 — 后台更新
+        {
+          urlPattern: /\/api\/.*(?:image|generate|result).*/i,
+          handler: 'StaleWhileRevalidate',
+          method: 'GET',
+          options: {
+            cacheName: 'generated-results',
+            expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 2 },
+          },
+        },
+        // 字体 — 缓存优先长过期
+        {
+          urlPattern: /\.(?:woff2?|ttf|eot|otf)$/,
+          handler: 'CacheFirst',
+          options: {
+            cacheName: 'fonts',
+            expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 365 },
           },
         },
       ],
@@ -124,6 +178,10 @@ export default defineNuxtConfig({
     client: {
       installPrompt: true,
     },
+    // 推送通知 VAPID 密钥（从环境变量读取，Phase 2 实现服务端）
+    // webPush: {
+    //   enabled: !!process.env.VAPID_PUBLIC_KEY,
+    // },
   },
 
   runtimeConfig: {

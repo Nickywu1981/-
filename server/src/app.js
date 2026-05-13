@@ -124,6 +124,7 @@ import e2bRoutes from './route/e2b.routes.js';              // E2B 云端代码�
 import ecommerceRoutes from './route/ecommerceRoutes.js';      // 电商内容智能中间层 — 统一入口
 import agentRoutes from './route/agentRoutes.js';               // 电商全能AI Agent — 6 Agent 协同 + 4 链路
 import unifiedWorkflowRoutes from './route/unifiedWorkflowRoutes.js'; // 统一工作流引擎 + 模型池 — 7条固定工作流
+import abTestRoutes from './route/abTestRoutes.js';                // A/B 实验框架 — 实验定义+指标+显著性
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -381,6 +382,7 @@ app.use('/api/agent', heavyLimiter, agentRoutes);
 
 // 统一工作流引擎 + 模型池 — 7条固定工作流 + 双模式执行 + 人工干预
 app.use('/api/workflow', unifiedWorkflowRoutes);
+app.use('/api/admin/experiments', adminLimiter, abTestRoutes);     // A/B 实验框架 (实验CRUD+结果+显著性)
 
 // ===== Phase 1: 企业/代理端 (2026-05-11) =====
 app.use('/api/enterprise/finance', paymentLimiter, financeRoutes);  // Phase 2: 财务核心

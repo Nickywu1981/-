@@ -20,7 +20,7 @@ export const listCampaigns = wrapController(async (req, res) => {
 });
 
 export const getCampaign = wrapController(async (req, res) => {
-  return success(res, await campaignService.getCampaign(Number(req.params.id)));
+  return success(res, await campaignService.getCampaign(Number(req.params.id), req.user?.entId || req.user?.tenantId));
 });
 
 export const createCampaign = wrapController(async (req, res) => {

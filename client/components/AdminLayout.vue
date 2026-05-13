@@ -133,6 +133,7 @@ const groups = reactive<NavGroup[]>([
       { key: 'site-config', route: '/admin/site-config' },
       { key: 'brand-settings', route: '/admin/brand-settings' },
       { key: 'ai-models', route: '/admin/ai-models' },
+      { key: 'ab-experiments', route: '/admin/ab-experiments' },
       { key: 'multilingual', route: '/admin/multilingual' },
       { key: 'proxy', route: '/admin/proxy' },
       { key: 'config', route: '/admin/config' },

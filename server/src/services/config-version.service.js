@@ -45,6 +45,7 @@ export function sseMiddleware(req, res) {
 
   // 心跳保活 30s
   const heartbeat = setInterval(() => send({ heartbeat: true }), 30000);
+  heartbeat.unref();
 
   const cleanup = () => {
     versionEmitter.off('version', onVersion);
