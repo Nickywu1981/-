@@ -121,7 +121,7 @@ export async function wrapPrompt(rawInput, ctx = {}) {
 
   // ── Step 3: 模板匹配 + 变量填充 ──
   try {
-    const wrapped = matchAndFill(intent.intentId, {
+    const wrapped = await matchAndFill(intent.intentId, {
       productName: ctx.variables?.productName || ctx.productName || '商品',
       ...(ctx.variables || {}),
     }, {

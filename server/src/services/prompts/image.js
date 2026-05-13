@@ -91,4 +91,45 @@ Requirements:
     params: ['productName', 'feature', 'specs', 'platform'],
     defaults: { platform: 'taobao' },
   },
+
+  white_bg: {
+    description: '白底图生成（纯白背景商品摄影）',
+    system: '你是资深电商摄影师，专精白底商品图拍摄。',
+    template: `Generate a professional e-commerce white background product photo.
+
+Product: {productName}
+Category: {category}
+Style: {style}
+
+Requirements:
+- Pure white background #FFFFFF
+- Studio lighting, no shadows on background
+- Product centered, occupies 80-90% of frame
+- Ultra high resolution, commercial quality
+- Platform: {platform}
+- Resolution: {resolution}`,
+    params: ['productName', 'category', 'style', 'platform'],
+    defaults: { style: 'clean studio', resolution: '2048x2048', platform: '通用' },
+  },
+
+  storyboard: {
+    description: '视频分镜图生成（多场景逐帧）',
+    system: '你是资深视频分镜导演，擅长商业视频画面构图与运镜设计。',
+    template: `Generate e-commerce video storyboard frames.
+
+Product: {productName}
+Scene count: {frameCount}
+Style: {style}
+Platform: {platform}
+
+Requirements:
+- Cinematic lighting, commercial quality
+- 9:16 vertical video frame aspect ratio
+- Each frame distinct composition
+- Medium to close-up shots
+- Professional product showcase
+- Resolution: 1024x1792`,
+    params: ['productName', 'frameCount', 'style', 'platform'],
+    defaults: { frameCount: 6, style: 'professional cinematic', platform: '通用' },
+  },
 };

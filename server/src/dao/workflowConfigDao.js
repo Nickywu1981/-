@@ -27,7 +27,7 @@ export async function getGlobalWorkflowConfig(workflowId) {
 }
 
 export async function upsertWorkflowConfig(workflowId, userId, config) {
-  const { mode, disabledSteps, modelBindings, extraSteps, params, tenantId } = config || {};
+  const { mode, disabledSteps, modelBindings, extraSteps, deletedSteps, stepOrder, params, tenantId } = config || {};
 
   const [existing] = await _db().query(
     'SELECT id FROM workflow_config WHERE workflow_id = ? AND user_id = ? LIMIT 1',
@@ -42,6 +42,8 @@ export async function upsertWorkflowConfig(workflowId, userId, config) {
     if (disabledSteps !== undefined) { fields.push('disabled_steps = ?'); values.push(JSON.stringify(disabledSteps)); }
     if (modelBindings !== undefined) { fields.push('model_bindings = ?'); values.push(JSON.stringify(modelBindings)); }
     if (extraSteps !== undefined) { fields.push('extra_steps = ?'); values.push(JSON.stringify(extraSteps)); }
+    if (deletedSteps !== undefined) { fields.push('deleted_steps = ?'); values.push(JSON.stringify(deletedSteps)); }
+    if (stepOrder !== undefined) { fields.push('step_order = ?'); values.push(JSON.stringify(stepOrder)); }
     if (params !== undefined) { fields.push('params = ?'); values.push(JSON.stringify(params)); }
 
     if (fields.length === 0) return null;
@@ -53,8 +55,8 @@ export async function upsertWorkflowConfig(workflowId, userId, config) {
     );
   } else {
     await _db().query(
-      `INSERT INTO workflow_config (workflow_id, user_id, tenant_id, mode, disabled_steps, model_bindings, extra_steps, params)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO workflow_config (workflow_id, user_id, tenant_id, mode, disabled_steps, model_bindings, extra_steps, deleted_steps, step_order, params)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         workflowId,
         userId,
@@ -63,6 +65,8 @@ export async function upsertWorkflowConfig(workflowId, userId, config) {
         JSON.stringify(disabledSteps || []),
         JSON.stringify(modelBindings || {}),
         JSON.stringify(extraSteps || []),
+        JSON.stringify(deletedSteps || []),
+        JSON.stringify(stepOrder || []),
         JSON.stringify(params || {}),
       ],
     );

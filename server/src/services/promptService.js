@@ -131,26 +131,34 @@ export async function adminListTemplates({ category, status, keyword, page, page
 }
 
 export async function adminSaveTemplate(body) {
+  let templateCode;
   if (body.id) {
     await promptDao.updateTemplate(body.id, body);
-    return { id: body.id };
+    const t = await promptDao.getTemplateById(body.id);
+    templateCode = t?.template_code;
+  } else {
+    templateCode = body.templateCode || `TPL_ADMIN_${Date.now()}`;
+    await promptDao.insertTemplate({
+      templateCode,
+      category: body.category,
+      title: body.title,
+      description: body.description || '',
+      content: body.content,
+      variables: body.variables || [],
+      modelType: body.modelType || 'text',
+      icon: body.icon || 'star',
+      sortOrder: body.sortOrder || 0,
+      isPublic: body.isPublic ?? 1,
+      status: body.status ?? 2,
+      creatorId: null,
+    });
   }
-  const code = body.templateCode || `TPL_ADMIN_${Date.now()}`;
-  const newId = await promptDao.insertTemplate({
-    templateCode: code,
-    category: body.category,
-    title: body.title,
-    description: body.description || '',
-    content: body.content,
-    variables: body.variables || [],
-    modelType: body.modelType || 'text',
-    icon: body.icon || 'star',
-    sortOrder: body.sortOrder || 0,
-    isPublic: body.isPublic ?? 1,
-    status: body.status ?? 2,
-    creatorId: null,
-  });
-  return { id: newId };
+  // 刷新模板引擎缓存，使编辑立即对工作流生效
+  if (templateCode) {
+    const { invalidateTemplateCache } = await import('./templateEngine.js');
+    invalidateTemplateCache(templateCode);
+  }
+  return { id: body.id };
 }
 
 export async function adminReviewTemplate(id, { status, reviewRemark }, reviewerId) {

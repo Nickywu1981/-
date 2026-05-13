@@ -9,6 +9,7 @@ import { detail } from './prompts/detail.js';
 import { video } from './prompts/video.js';
 import { voice as voiceTpl } from './prompts/voice.js';
 import { copywriting } from './prompts/copywriting.js';
+import * as promptDao from '../dao/promptDao.js';
 import logger from '../utils/logger.js';
 
 // 转义正则特殊字符，防止用户输入导致 RegExp 编译异常
@@ -21,6 +22,8 @@ const TEMPLATE_REGISTRY = {
   scene_image:    { category: 'image', tpl: image.scene_image,    defaults: image.scene_image.defaults },
   poster:         { category: 'image', tpl: image.poster,         defaults: image.poster.defaults },
   detail_image:   { category: 'image', tpl: image.detail_image,   defaults: image.detail_image.defaults },
+  white_bg:       { category: 'image', tpl: image.white_bg,       defaults: image.white_bg.defaults },
+  storyboard:     { category: 'image', tpl: image.storyboard,     defaults: image.storyboard.defaults },
 
   // 详情页类
   product_detail: { category: 'detail', tpl: detail.product_detail, defaults: detail.product_detail.defaults },
@@ -52,14 +55,91 @@ const INDUSTRY_PARAMS = {
   home:      { category: '家居', style: 'interior design', scene: 'living room / bedroom', composition: 'wide + vignette' },
 };
 
+// ── DB-backed template cache (bridges admin-edited templates to workflow engine) ──
+const _templateCache = new Map();
+const _CACHE_TTL_MS = 60_000;
+let _cacheLastFullLoad = 0;
+
+async function _loadAllFromDb() {
+  try {
+    const { list } = await promptDao.listTemplates({ status: 2, page: 1, pageSize: 200 });
+    for (const row of list) {
+      _templateCache.set(row.template_code, row);
+    }
+    _cacheLastFullLoad = Date.now();
+    logger.info(`[TemplateEngine] Loaded ${list.length} templates from DB`);
+  } catch (e) {
+    logger.warn('[TemplateEngine] Failed to load templates from DB, using hardcoded fallback', e.message);
+  }
+}
+
+async function _getDbTemplate(templateCode) {
+  if (Date.now() - _cacheLastFullLoad > _CACHE_TTL_MS) {
+    await _loadAllFromDb();
+  }
+  if (_templateCache.has(templateCode)) return _templateCache.get(templateCode);
+  try {
+    const row = await promptDao.getTemplateByCode(templateCode);
+    if (row) {
+      _templateCache.set(templateCode, row);
+      return row;
+    }
+  } catch (e) {
+    logger.warn(`[TemplateEngine] Failed to fetch template_code=${templateCode}`, e.message);
+  }
+  return null;
+}
+
+function _normalizeDbToEngine(content) {
+  return content.replace(/\{\{(\w+)\}\}/g, '{$1}');
+}
+
+/** Invalidate cache entry after admin edits a template */
+export function invalidateTemplateCache(templateCode) {
+  if (templateCode) {
+    _templateCache.delete(templateCode);
+  } else {
+    _templateCache.clear();
+    _cacheLastFullLoad = 0;
+  }
+}
+
 /**
  * 匹配模板并填充变量
  * @param {string} intentId - 意图ID (e.g. 'main_image', 'ad_video')
  * @param {object} variables - 用户/商家提供的变量
  * @param {object} [opts] - 选项 { industry, platform, brandTone }
- * @returns {{ system: string, prompt: string, intentId: string, category: string }}
+ * @returns {Promise<{ system: string, prompt: string, intentId: string, category: string }>}
  */
-export function matchAndFill(intentId, variables = {}, opts = {}) {
+export async function matchAndFill(intentId, variables = {}, opts = {}) {
+  // ── 优先查 DB 模板（后台编辑的模板实时生效）──
+  let dbOverride = null;
+  try {
+    dbOverride = await _getDbTemplate(intentId);
+  } catch (e) { /* fall through to hardcoded */ }
+
+  if (dbOverride && dbOverride.content) {
+    let dbVariables = [];
+    if (dbOverride.variables) {
+      try {
+        dbVariables = typeof dbOverride.variables === 'string'
+          ? JSON.parse(dbOverride.variables)
+          : dbOverride.variables;
+      } catch {}
+    }
+    const dbSystem = (Array.isArray(dbVariables)
+      ? dbVariables.find(v => v.name === 'system')?.default
+      : null) || '你是专业的电商内容创作专家。';
+    return {
+      system: dbSystem,
+      prompt: _normalizeDbToEngine(dbOverride.content).trim(),
+      intentId,
+      category: dbOverride.category || 'text',
+      _source: 'db',
+    };
+  }
+
+  // ── 回退硬编码 TEMPLATE_REGISTRY ──
   const entry = TEMPLATE_REGISTRY[intentId];
   if (!entry) {
     logger.warn('[TemplateEngine] unknown intent, fallback to copywriting', { intentId });
@@ -112,5 +192,5 @@ export function getModelHint(intentId) {
   }
 }
 
-export { TEMPLATE_REGISTRY, INDUSTRY_PARAMS };
-export default { matchAndFill, getModelHint };
+export { TEMPLATE_REGISTRY, INDUSTRY_PARAMS, invalidateTemplateCache };
+export default { matchAndFill, getModelHint, invalidateTemplateCache };
