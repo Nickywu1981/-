@@ -11,7 +11,11 @@ export default {
     return rows;
   },
 
-  async listAll(limit = 200) {
+  async listAll(tenantId, limit = 200) {
+    if (tenantId) {
+      const [rows] = await pool.query('SELECT ro.*, u.nickname FROM recharge_order ro LEFT JOIN user u ON ro.user_id = u.id WHERE ro.tenant_id = ? ORDER BY ro.create_time DESC LIMIT ?', [tenantId, limit]);
+      return rows;
+    }
     const [rows] = await pool.query('SELECT ro.*, u.nickname FROM recharge_order ro LEFT JOIN user u ON ro.user_id = u.id ORDER BY ro.create_time DESC LIMIT ?', [limit]);
     return rows;
   },

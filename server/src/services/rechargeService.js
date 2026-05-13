@@ -51,8 +51,8 @@ export async function listUserOrders(userId, tenantId) {
   return rechargeDao.listByUser(userId, tenantId);
 }
 
-export async function listAllOrders() {
-  return rechargeDao.listAll();
+export async function listAllOrders(tenantId) {
+  return rechargeDao.listAll(tenantId);
 }
 
 export async function refundOrder(orderNo) {
