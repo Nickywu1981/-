@@ -94,6 +94,13 @@
             </div>
           </div>
           <div class="form-group">
+            <label>{{ $t('admin_prompts.col_code') }}</label>
+            <input v-model="form.templateCode" maxlength="100" type="text"
+              placeholder="如：white_bg, storyboard, main_image"
+              :disabled="!!editing.id" />
+            <small style="color:#888; font-size:11px;">与意图ID匹配后可覆盖工作流默认模板。编辑已有模板时不可修改。</small>
+          </div>
+          <div class="form-group">
             <label>{{ $t('admin_prompts.label_content') }}</label>
             <textarea v-model="form.content" maxlength="5000" rows="8" :placeholder="$t('admin_prompts.content_placeholder')"></textarea>
           </div>
@@ -197,7 +204,7 @@ async function save() {
   try {
     const body: any = { ...form };
     if (editing.value.id) body.id = editing.value.id;
-    body.templateCode = editing.value.template_code;
+    body.templateCode = form.templateCode || editing.value.template_code;
     await $fetch('/api/admin/prompts', {
       method: 'POST',
       credentials: 'include',
