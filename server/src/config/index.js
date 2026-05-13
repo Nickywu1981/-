@@ -174,13 +174,25 @@ const config = {
     // 内容安全
     sanitizeInput: process.env.SECURITY_SANITIZE_INPUT !== 'false',
     aliyunGreenEnabled: process.env.SECURITY_ALIYUN_GREEN_ENABLED === 'true',
+    aliyunAccessKeyId: process.env.ALIYUN_ACCESS_KEY_ID || '',
+    aliyunAccessKeySecret: process.env.ALIYUN_ACCESS_KEY_SECRET || '',
+    aliyunGreenRegion: process.env.ALIYUN_GREEN_REGION || 'cn-shanghai',
+    aliyunGreenTimeoutMs: parseInt(process.env.ALIYUN_GREEN_TIMEOUT_MS || '5000', 10),
     selfBuiltWordlistEnabled: process.env.SECURITY_SELF_BUILT_WORDLIST_ENABLED !== 'false',
     outputModerationLevel: parseInt(process.env.SECURITY_OUTPUT_MODERATION_LEVEL || '5', 10),
     outputSanitize: process.env.SECURITY_OUTPUT_SANITIZE === 'true',
     // 接口安全
     signatureRequired: process.env.SECURITY_SIGNATURE_REQUIRED === 'true',
+    signatureTimeWindowMs: parseInt(process.env.SIGNATURE_TIME_WINDOW_MS || '300000', 10),
+    signatureNonceTTL: parseInt(process.env.SIGNATURE_NONCE_TTL_S || '300', 10),
+    apiAppCredentials: process.env.API_APP_CREDENTIALS || '{}',
     modelAclEnabled: process.env.SECURITY_MODEL_ACL_ENABLED === 'true',
+    modelAclPolicies: process.env.MODEL_ACL_POLICIES,
     tokenLeakProtection: process.env.SECURITY_TOKEN_LEAK_PROTECTION === 'true',
+    tokenBurstThreshold: parseInt(process.env.TOKEN_BURST_THRESHOLD || '100000', 10),
+    tokenBurstWindowMs: parseInt(process.env.TOKEN_BURST_WINDOW_MS || '300000', 10),
+    tokenMaxIpCount: parseInt(process.env.TOKEN_MAX_IP_COUNT || '3', 10),
+    tokenIpCheckWindowMs: parseInt(process.env.TOKEN_IP_CHECK_WINDOW_MS || '3600000', 10),
   },
 
   // AI Gateway 性能配置
@@ -205,18 +217,24 @@ const config = {
     rateLimiter: {
       backend: process.env.AI_RATE_LIMITER_BACKEND || 'memory',
       userQPS: parseInt(process.env.AI_RATE_LIMIT_USER_QPS || '5', 10),
+      userBurst: parseInt(process.env.AI_RATE_LIMIT_USER_BURST || '10', 10),
       ipQPS: parseInt(process.env.AI_RATE_LIMIT_IP_QPS || '20', 10),
+      ipBurst: parseInt(process.env.AI_RATE_LIMIT_IP_BURST || '30', 10),
       appQPS: parseInt(process.env.AI_RATE_LIMIT_APP_QPS || '50', 10),
+      appBurst: parseInt(process.env.AI_RATE_LIMIT_APP_BURST || '100', 10),
     },
     // 缓存
     cache: {
       backend: process.env.AI_CACHE_BACKEND || 'memory',
       ttlMs: parseInt(process.env.AI_CACHE_TTL_MS || '300000', 10),
+      maxSize: parseInt(process.env.AI_CACHE_MAX_SIZE || '1000', 10),
       semanticEnabled: process.env.AI_CACHE_SEMANTIC_ENABLED === 'true',
       semanticThreshold: parseInt(process.env.AI_CACHE_SIMHASH_THRESHOLD || '3', 10),
     },
     // 上下文
     contextCacheEnabled: process.env.CONTEXT_CACHE_ENABLED !== 'false',
+    contextCacheTTL: parseInt(process.env.CONTEXT_CACHE_TTL_MS || '600000', 10),
+    tenantTokenLimit: parseInt(process.env.AI_TENANT_TOKEN_LIMIT || '1000', 10),
   },
 
   e2b: {
@@ -280,6 +298,7 @@ const config = {
       wsUrl: process.env.EDGE_TTS_WS_URL || `wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=${process.env.EDGE_TTS_TRUSTED_TOKEN || ''}`,
       elevenLabsApiKey: process.env.ELEVENLABS_API_KEY,
       elevenLabsApiUrl: process.env.ELEVENLABS_API_URL || 'https://api.elevenlabs.io',
+      edgeTtsOrigin: process.env.EDGE_TTS_ORIGIN || 'chrome-extension://jdiccldimpdaibmpdkjnbmckianbfold',
     },
   },
 };

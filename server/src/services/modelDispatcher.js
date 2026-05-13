@@ -1,6 +1,7 @@
 import { BusinessError } from '../utils/businessError.js';
 import logger from '../utils/logger.js';
 import { canarySelect, weightedRoundRobin, checkTenantQuota, consumeTenantTokens } from './dispatchStrategyService.js';
+import { aiGatewayConfig } from '../config/index.js';
 
 /**
  * ModelDispatcher — 多模型统一调度层 (v5.0)
@@ -366,7 +367,7 @@ export async function dispatch(req, options = {}) {
 
   // 多租户配额检查
   if (options.tenantId) {
-    const tenantTokenLimit = parseInt(process.env.AI_TENANT_TOKEN_LIMIT, 10) || 1000;
+    const tenantTokenLimit = aiGatewayConfig.tenantTokenLimit;
     const quotaResult = checkTenantQuota(options.tenantId, tenantTokenLimit);
     if (!quotaResult.allowed) {
       throw new BusinessError(429, quotaResult.reason);

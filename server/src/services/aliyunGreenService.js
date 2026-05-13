@@ -6,6 +6,7 @@
  */
 import crypto from 'crypto';
 import logger from '../utils/logger.js';
+import { securityConfig } from '../config/index.js';
 
 // 阿里云 Green SDK（可选安装，未安装时降级为空操作）
 let GreenSDK = null;
@@ -20,23 +21,15 @@ async function loadSDK() {
   _sdkLoaded = true;
 }
 
-const config = {
-  enabled: process.env.SECURITY_ALIYUN_GREEN_ENABLED === 'true',
-  accessKeyId: process.env.ALIYUN_ACCESS_KEY_ID || '',
-  accessKeySecret: process.env.ALIYUN_ACCESS_KEY_SECRET || '',
-  region: process.env.ALIYUN_GREEN_REGION || 'cn-shanghai',
-  timeout: parseInt(process.env.ALIYUN_GREEN_TIMEOUT_MS || '5000', 10),
-};
-
 async function getClient() {
   await loadSDK();
-  if (!config.enabled || !config.accessKeyId) return null;
+  if (!securityConfig.aliyunGreenEnabled || !securityConfig.aliyunAccessKeyId) return null;
   if (!greenClient && GreenSDK) {
     try {
       greenClient = new GreenSDK({
-        accessKeyId: config.accessKeyId,
-        accessKeySecret: config.accessKeySecret,
-        regionId: config.region,
+        accessKeyId: securityConfig.aliyunAccessKeyId,
+        accessKeySecret: securityConfig.aliyunAccessKeySecret,
+        regionId: securityConfig.aliyunGreenRegion,
       });
       logger.info('[AliyunGreen] 客户端已初始化');
     } catch (e) {
@@ -73,7 +66,7 @@ export async function textScan(text) {
 
     const result = await Promise.race([
       client.textScan(task),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('检测超时')), config.timeout)),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('检测超时')), securityConfig.aliyunGreenTimeoutMs)),
     ]);
 
     const taskResult = result?.data?.[0];
@@ -134,7 +127,7 @@ export async function dualChannelCheck(text, selfCheckResult = { hits: [] }) {
   }
 
   // 通道2: 阿里云绿网（非阻塞，自建已拦截则跳过）
-  if (violations.length === 0 && config.enabled) {
+  if (violations.length === 0 && securityConfig.aliyunGreenEnabled) {
     try {
       const aliResult = await textScan(text);
       if (!aliResult.passed) {

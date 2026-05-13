@@ -44,7 +44,7 @@ function synthesizeEdgeTTS(voiceName, text, speed) {
   return new Promise((resolve, reject) => {
     const ws = new WebSocket(EDGE_WS_URL, {
       headers: {
-        'Origin': process.env.EDGE_TTS_ORIGIN || 'chrome-extension://jdiccldimpdaibmpdkjnbmckianbfold',
+        'Origin': adapterConfig.edgeTts.edgeTtsOrigin,
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
       },
     });

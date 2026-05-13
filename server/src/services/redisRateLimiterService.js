@@ -6,21 +6,9 @@
  * 算法: Token Bucket（令牌桶）
  */
 import logger from '../utils/logger.js';
+import { aiGatewayConfig } from '../config/index.js';
 
-// ==================== 配置 ====================
-
-const config = {
-  backend: process.env.AI_RATE_LIMITER_BACKEND || 'memory', // redis | memory
-  // 用户维度
-  userQPS: parseInt(process.env.AI_RATE_LIMIT_USER_QPS || '5', 10),
-  userBurst: parseInt(process.env.AI_RATE_LIMIT_USER_BURST || '10', 10),
-  // IP 维度
-  ipQPS: parseInt(process.env.AI_RATE_LIMIT_IP_QPS || '20', 10),
-  ipBurst: parseInt(process.env.AI_RATE_LIMIT_IP_BURST || '30', 10),
-  // 应用维度
-  appQPS: parseInt(process.env.AI_RATE_LIMIT_APP_QPS || '50', 10),
-  appBurst: parseInt(process.env.AI_RATE_LIMIT_APP_BURST || '100', 10),
-};
+const config = aiGatewayConfig.rateLimiter;
 
 // ==================== Redis 客户端（惰性初始化） ====================
 

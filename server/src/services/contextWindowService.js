@@ -13,6 +13,7 @@
 
 import db from '../dao/db.js';
 import logger from '../utils/logger.js';
+import { aiGatewayConfig } from '../config/index.js';
 
 const MODEL_TOKEN_LIMITS = {
   'gpt-4o': 128000, 'gpt-4-turbo': 128000, 'gpt-3.5-turbo': 16385,
@@ -184,8 +185,8 @@ async function saveBudgetLog(sessionId, budget, callId) {
 
 // ==================== 多轮对话上下文缓存（新增） ====================
 
-const contextCacheEnabled = process.env.CONTEXT_CACHE_ENABLED !== 'false';
-const contextCacheTTL = parseInt(process.env.CONTEXT_CACHE_TTL_MS || '600000', 10); // 10min
+const contextCacheEnabled = aiGatewayConfig.contextCacheEnabled;
+const contextCacheTTL = aiGatewayConfig.contextCacheTTL;
 
 // 内存缓存
 const sessionContextCache = new Map();

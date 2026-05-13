@@ -8,11 +8,12 @@
  * 配置来源：model_access_policies 表或 JSON 配置
  */
 import logger from '../utils/logger.js';
+import { securityConfig } from '../config/index.js';
 
 // ==================== 配置 ====================
 
 const config = {
-  enabled: process.env.SECURITY_MODEL_ACL_ENABLED === 'true',
+  enabled: securityConfig.modelAclEnabled,
 };
 
 // 模型 → 能力分类映射
@@ -42,7 +43,7 @@ const DEFAULT_POLICIES = {
 // 从 JSON 环境变量加载自定义策略
 function loadPolicies() {
   try {
-    const custom = process.env.MODEL_ACL_POLICIES;
+    const custom = securityConfig.modelAclPolicies;
     if (custom) return { ...DEFAULT_POLICIES, ...JSON.parse(custom) };
   } catch (e) {
     logger.warn(`[ModelACL] 自定义策略解析失败: ${e.message}`);

@@ -10,17 +10,9 @@
  */
 import crypto from 'crypto';
 import logger from '../utils/logger.js';
+import { aiGatewayConfig } from '../config/index.js';
 
-// ==================== 配置 ====================
-
-const config = {
-  backend: process.env.AI_CACHE_BACKEND || 'memory', // redis | memory
-  ttlMs: parseInt(process.env.AI_CACHE_TTL_MS || '300000', 10), // 5min
-  maxSize: parseInt(process.env.AI_CACHE_MAX_SIZE || '1000', 10),
-  // 语义相似度
-  semanticEnabled: process.env.AI_CACHE_SEMANTIC_ENABLED === 'true',
-  simHashThreshold: parseInt(process.env.AI_CACHE_SIMHASH_THRESHOLD || '3', 10), // 汉明距离 <= 3
-};
+const config = aiGatewayConfig.cache;
 
 // ==================== Redis 惰性初始化 ====================
 
@@ -170,7 +162,7 @@ export async function getSemantic(modelId, textInput) {
         const candidates = await redis.hgetall(`cache:simhash:${modelId}`);
         for (const [hexHash, raw] of Object.entries(candidates)) {
           const existingHash = BigInt('0x' + hexHash);
-          if (hammingDistance(hash, existingHash) <= config.simHashThreshold) {
+          if (hammingDistance(hash, existingHash) <= config.semanticThreshold) {
             return JSON.parse(raw);
           }
         }
@@ -183,7 +175,7 @@ export async function getSemantic(modelId, textInput) {
   const candidates = simHashIndex.get(indexKey) || [];
   if (candidates.length > 0) {
     for (const entry of candidates) {
-      if (hammingDistance(hash, entry.simHash || 0n) <= config.simHashThreshold) {
+      if (hammingDistance(hash, entry.simHash || 0n) <= config.semanticThreshold) {
         return entry.result;
       }
     }

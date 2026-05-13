@@ -12,20 +12,12 @@ import crypto from 'crypto';
 import logger from '../utils/logger.js';
 import { error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
-
-// ==================== 配置 ====================
-
-const config = {
-  enabled: process.env.SECURITY_SIGNATURE_REQUIRED === 'true',
-  timeWindow: parseInt(process.env.SIGNATURE_TIME_WINDOW_MS || '300000', 10), // 5min
-  nonceTTL: parseInt(process.env.SIGNATURE_NONCE_TTL_S || '300', 10), // 5min
-};
+import { securityConfig } from '../config/index.js';
 
 // AppKey → Secret 映射（生产环境从数据库/配置中心加载）
 function getAppCredentials() {
   try {
-    const raw = process.env.API_APP_CREDENTIALS || '{}';
-    return JSON.parse(raw);
+    return JSON.parse(securityConfig.apiAppCredentials);
   } catch {
     return {};
   }
@@ -52,7 +44,7 @@ async function markNonceUsed(nonce) {
   try {
     const { default: redis } = await import('../dao/redis.js');
     if (redis) {
-      await redis.setex(`signature:nonce:${nonce}`, config.nonceTTL, '1');
+      await redis.setex(`signature:nonce:${nonce}`, securityConfig.signatureNonceTTL, '1');
     }
   } catch { /* fallback to memory */ }
 }
@@ -61,7 +53,7 @@ async function markNonceUsed(nonce) {
 setInterval(() => {
   const now = Date.now();
   for (const [nonce, ts] of nonceStore) {
-    if (now - ts > config.nonceTTL * 1000) nonceStore.delete(nonce);
+    if (now - ts > securityConfig.signatureNonceTTL * 1000) nonceStore.delete(nonce);
   }
 }, 60000).unref();
 
@@ -86,7 +78,7 @@ export function generateSignature(appKey, appSecret, method, path, body = '') {
 // ==================== 中间件 ====================
 
 export async function signatureMiddleware(req, res, next) {
-  if (!config.enabled) return next();
+  if (!securityConfig.signatureRequired) return next();
 
   const appKey = req.headers['x-app-key'];
   const timestamp = req.headers['x-timestamp'];
@@ -101,7 +93,7 @@ export async function signatureMiddleware(req, res, next) {
 
   // 时间窗口检查
   const reqTime = parseInt(timestamp, 10);
-  if (isNaN(reqTime) || Math.abs(Date.now() - reqTime) > config.timeWindow) {
+  if (isNaN(reqTime) || Math.abs(Date.now() - reqTime) > securityConfig.signatureTimeWindowMs) {
     return error(res, ERROR_CODE.UNAUTHORIZED, '请求时间戳无效或已过期');
   }
 

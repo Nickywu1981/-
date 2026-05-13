@@ -16,6 +16,7 @@ import mysql from 'mysql2/promise';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { db } from '../config/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const MIGRATIONS_DIR = path.join(__dirname, '../../sql/migrations');
@@ -23,11 +24,11 @@ const STORAGE_PATH = path.join(__dirname, '../../sql/.migrations.json');
 
 function getConnection() {
   return mysql.createConnection({
-    host: process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.DB_PORT || '3306', 10),
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'ai_saas',
+    host: db.host,
+    port: db.port,
+    user: db.user,
+    password: db.password,
+    database: db.name,
     multipleStatements: true,
   });
 }
