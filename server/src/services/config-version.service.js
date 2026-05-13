@@ -4,9 +4,13 @@
  * SSE 推送配置版本号，前端监听后静默刷新
  */
 import { EventEmitter } from 'events';
+import logger from '../utils/logger.js';
 
 const versionEmitter = new EventEmitter();
 versionEmitter.setMaxListeners(200); // SSE 连接上限
+versionEmitter.on('error', (err) => {
+  logger.error('[VersionEmitter] unhandled listener error', { error: err?.message });
+});
 let currentVersion = 0;
 
 export function getCurrentVersion() {

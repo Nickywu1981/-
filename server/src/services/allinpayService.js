@@ -280,7 +280,7 @@ async function fulfillRecharge(order, conn) {
   await creditDao.updateCreditBalance(order.user_id, rechargeOrder.coin_amount, conn);
 
   // 读取最终余额写日志
-  const updated = await membershipDao.findByUserId(order.user_id);
+  const updated = await membershipDao.findByUserId(order.user_id, conn);
   const creditBefore = (updated?.credit_balance || 0) - rechargeOrder.coin_amount;
   const creditAfter = updated?.credit_balance || 0;
 

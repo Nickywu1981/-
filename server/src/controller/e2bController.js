@@ -16,6 +16,11 @@ export const createSandbox = wrapController(async (req, res) => {
 
 export const executeCode = wrapController(async (req, res) => {
   const { sandboxId } = req.params;
+  const uid = String(req.user?.id || '');
+  if (!uid) throw new BusinessError(ERROR_CODE.UNAUTHORIZED, '请先登录');
+  const owner = await e2bService.getSandboxOwner(sandboxId);
+  if (!owner) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND, '沙箱不存在或已过期');
+  if (owner !== uid) throw new BusinessError(ERROR_CODE.FORBIDDEN, '无权操作此沙箱');
   const { code, language } = req.body;
   if (!code) throw new BusinessError(ERROR_CODE.VALIDATION_ERROR, '请提供代码内容');
   const result = await e2bService.executeCode(sandboxId, code, language);
@@ -37,6 +42,11 @@ export const listSandboxes = wrapController(async (req, res) => {
 
 export const destroySandbox = wrapController(async (req, res) => {
   const { sandboxId } = req.params;
+  const uid = String(req.user?.id || '');
+  if (!uid) throw new BusinessError(ERROR_CODE.UNAUTHORIZED, '请先登录');
+  const owner = await e2bService.getSandboxOwner(sandboxId);
+  if (!owner) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND, '沙箱不存在或已过期');
+  if (owner !== uid) throw new BusinessError(ERROR_CODE.FORBIDDEN, '无权操作此沙箱');
   const result = await e2bService.destroySandbox(sandboxId);
   return success(res, result, '沙箱已销毁');
 });

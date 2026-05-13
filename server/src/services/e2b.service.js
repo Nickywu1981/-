@@ -5,7 +5,8 @@
 import { Sandbox } from 'e2b';
 import { BusinessError } from '../utils/businessError.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
-import { e2bConfig as config } from '../config/index.js';
+import { e2bConfig as config, isProduction } from '../config/index.js';
+import { getRedis } from '../dao/redis.js';
 import logger from '../utils/logger.js';
 
 const SANDBOX_STORE = new Map();       // sandboxId → { sandbox, userId, createdAt, refCount }
@@ -48,7 +49,67 @@ function _countUserSandboxes(userId) {
   return count;
 }
 
-export async function createSandbox(userId) {
+// ─────────────────── P1 #2 危险代码检测 ───────────────────
+const DANGEROUS_PATTERNS = [
+  { pattern: /\brm\s+-rf\s+\//, msg: '禁止递归删除根目录' },
+  { pattern: /\brm\s+-rf\s+\*\s*\/|rm\s+-rf\s+\/\*/, msg: '禁止危险删除操作' },
+  { pattern: /while\s*\(\s*true\s*\)|while\s*:\s*;|for\s*\(\s*;\s*;\s*\)/, msg: '检测到无限循环模式' },
+  { pattern: /\bfork\b\(\s*\)|os\.fork|subprocess\.Popen|child_process/, msg: '禁止创建子进程' },
+  { pattern: /cryptonight|stratum\+tcp|mining|mine\s*\(/, msg: '禁止挖矿脚本' },
+  { pattern: /\/dev\/tcp|nc\s+-[lL]|ncat\s+-[lL]|socat\s+/, msg: '禁止反向Shell/网络扫描' },
+  { pattern: /requests\.get\(['"]http|urllib.*urlopen|curl\s+-o/, msg: '禁止外部网络请求' },
+  { pattern: /shutil\.rmtree\s*\(\s*['"]\/|os\.remove\s*\(\s*['"]\//, msg: '禁止删除系统文件' },
+];
+
+function _auditCode(code) {
+  for (const { pattern, msg } of DANGEROUS_PATTERNS) {
+    if (pattern.test(code)) throw new BusinessError(ERROR_CODE.VALIDATION_ERROR, `代码安全拦截: ${msg}`);
+  }
+}
+
+// ─────────────────── P1 #5 Redis 持久化 ───────────────────
+const REDIS_E2B_SET = 'e2b:active_sandboxes';
+const REDIS_E2B_PREFIX = 'e2b:sandbox:';
+const REDIS_E2B_TTL = 1800; // 30min match MAX_IDLE_MS
+
+async function _persistSandboxMeta(sandboxId, userId) {
+  try {
+    const r = await getRedis();
+    if (!r) return;
+    await r.sAdd(REDIS_E2B_SET, sandboxId);
+    await r.hSet(`${REDIS_E2B_PREFIX}${sandboxId}`, { userId: String(userId), createdAt: String(Date.now()) });
+    await r.expire(`${REDIS_E2B_PREFIX}${sandboxId}`, REDIS_E2B_TTL);
+  } catch (err) {
+    logger.warn('[E2B] Redis 持久化失败', { sandboxId, error: err.message });
+  }
+}
+
+async function _removeSandboxMeta(sandboxId) {
+  try {
+    const r = await getRedis();
+    if (!r) return;
+    await r.sRem(REDIS_E2B_SET, sandboxId);
+    await r.del(`${REDIS_E2B_PREFIX}${sandboxId}`);
+  } catch { /* Redis 不可用则跳过 */ }
+}
+
+export async function _startupOrphanCheck() {
+  try {
+    const r = await getRedis();
+    if (!r) return;
+    const ids = await r.sMembers(REDIS_E2B_SET);
+    if (ids.length > 0) {
+      logger.warn('[E2B] 检测到可能孤儿沙箱，进程重启前残留', { count: ids.length, ids });
+      // 清理孤儿记录，实际沙箱会在 E2B 端超时自动回收
+      for (const id of ids) {
+        await r.sRem(REDIS_E2B_SET, id);
+        await r.del(`${REDIS_E2B_PREFIX}${id}`);
+      }
+    }
+  } catch { /* Redis 不可用则跳过 */ }
+}
+
+// ─────────────────── 核心 API ───────────────────
   const uid = String(userId);
   if (_countUserSandboxes(uid) >= config.maxSandboxesPerUser) {
     throw new BusinessError(ERROR_CODE.QUOTA_EXCEEDED, `沙箱数量已达上限 (${config.maxSandboxesPerUser})`);
@@ -141,4 +202,9 @@ export async function destroySandbox(sandboxId) {
   if (!entry) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND, '沙箱不存在或已过期');
   _cleanupEntry(sandboxId, 'user_request');
   return { sandboxId };
+}
+
+export function getSandboxOwner(sandboxId) {
+  const entry = SANDBOX_STORE.get(sandboxId);
+  return entry ? entry.userId : null;
 }
