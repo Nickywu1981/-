@@ -176,8 +176,9 @@ async function doSandboxPay() {
     } else {
       toast.error(payRes?.msg || '支付失败');
     }
-  } catch (e: any) {
-    toast.error('支付异常: ' + (e.message || ''));
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    toast.error('支付异常: ' + (msg || ''));
   } finally { paying.value = false; }
 }
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })

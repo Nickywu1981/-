@@ -8,10 +8,22 @@
  *   const { options, loading } = useAppDict('platform_list')
  *   // options = [{ item_key:'douyin', item_value:'抖音', item_extra:{ratio:'9:16',format:'mp4'} }, ...]
  */
-const cache: Record<string, any[]> = {}
 
-export function useAppDict(dictKey: string, fallbackList?: any[]) {
-  const options = ref<any[]>(cache[dictKey] || fallbackList || [])
+interface DictItem {
+  item_key: string
+  item_value: string
+  item_extra?: Record<string, unknown>
+}
+
+interface DictResponse {
+  code: number
+  data?: DictItem[]
+}
+
+const cache: Record<string, DictItem[]> = {}
+
+export function useAppDict(dictKey: string, fallbackList?: DictItem[]) {
+  const options = ref<DictItem[]>(cache[dictKey] || fallbackList || [])
   const loading = ref(!cache[dictKey])
   const apiBase = useRuntimeConfig().public.apiBase || '/api'
 
@@ -24,7 +36,7 @@ export function useAppDict(dictKey: string, fallbackList?: any[]) {
     loading.value = true
     try {
       const fetcher = import.meta.server ? useRequestFetch() : $fetch
-      const res: any = await fetcher(`${apiBase}/config/dict/${dictKey}`, { credentials: 'include' })
+      const res = await fetcher<DictResponse>(`${apiBase}/config/dict/${dictKey}`, { credentials: 'include' })
       if (res.code === 200) {
         cache[dictKey] = res.data || []
         options.value = cache[dictKey]

@@ -38,7 +38,7 @@ export function useTaskPolling() {
     error.value = ''
 
     try {
-      const res: any = await $fetch(`${apiBase}/jobs`, {
+      const res = await $fetch<{ code: number; data?: { job_id: number }; msg?: string }>(`${apiBase}/jobs`, {
         method: 'POST',
         body: { task_type: taskType, task_params: params },
         credentials: 'include',
@@ -51,10 +51,11 @@ export function useTaskPolling() {
         status.value = 'failed'
         error.value = res.msg || t('task.submit_failed')
       }
-    } catch (e: any) {
+    } catch (e: unknown) {
+      const err = e as { data?: { msg?: string }; message?: string };
       status.value = 'failed'
-      error.value = e?.data?.msg || e.message || t('task.submit_failed')
-      useToast().error(e?.data?.msg || e.message || t('task.submit_failed_retry'))
+      error.value = err?.data?.msg || err.message || t('task.submit_failed')
+      useToast().error(err?.data?.msg || err.message || t('task.submit_failed_retry'))
     } finally {
       submitting.value = false
     }
@@ -68,7 +69,7 @@ export function useTaskPolling() {
     pollTimer.value = setInterval(async () => {
       if (!_active || !jobId.value) return
       try {
-        const res: any = await $fetch(`${apiBase}/job/${jobId.value}`, { credentials: 'include' })
+        const res = await $fetch<{ code: number; data?: { status: string; progress?: number; result_data?: unknown; error_message?: string } }>(`${apiBase}/job/${jobId.value}`, { credentials: 'include' })
         if (res.code === 200) {
           status.value = res.data.status
           progress.value = res.data.progress || 0
@@ -80,8 +81,8 @@ export function useTaskPolling() {
             stopPolling()
           }
         }
-      } catch {
-        // 轮询失败不中断
+      } catch (e) {
+        console.warn('[TaskPolling] 轮询请求失败', e);
       }
     }, POLL_INTERVAL_MS)
   }

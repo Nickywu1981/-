@@ -64,7 +64,8 @@ export async function cacheGet(key) {
     }
     const val = await r.get(key);
     return val ? JSON.parse(val) : null;
-  } catch {
+  } catch (e) {
+    logger.warn('[Redis] get 降级到内存', { key, error: e.message });
     return memStore.get(key) || null;
   }
 }

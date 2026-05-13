@@ -184,8 +184,9 @@ async function doWithdraw() {
     } else {
       toast.error(res.msg || t('account_pages.distribution.withdraw_fail'))
     }
-  } catch (e: any) {
-    toast.error(e?.data?.msg || t('account_pages.distribution.withdraw_fail'))
+  } catch (e: unknown) {
+    const err = e as { data?: { msg?: string } };
+    toast.error(err?.data?.msg || t('account_pages.distribution.withdraw_fail'))
   }
   withdrawing.value = false
 }

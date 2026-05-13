@@ -1,18 +1,19 @@
 <template>
-  <div class="account-page"><h1>安全设置</h1>
-    <div class="security-section"><h3>修改密码</h3>
-      <div class="form-group"><label for="sec-current-pwd">当前密码</label><input id="sec-current-pwd" v-model="form.currentPwd" type="password" class="text-input" autocomplete="current-password" /></div>
-      <div class="form-group"><label for="sec-new-pwd">新密码</label><input id="sec-new-pwd" v-model="form.newPwd" type="password" class="text-input" autocomplete="new-password" minlength="8" /></div>
-      <div class="form-group"><label for="sec-confirm-pwd">确认新密码</label><input id="sec-confirm-pwd" v-model="form.confirmPwd" type="password" class="text-input" autocomplete="new-password" /></div>
-      <button class="btn-primary" :disabled="saving" @click="changePwd">{{ saving ? '修改中...' : '修改密码' }}</button>
+  <div class="account-page"><h1>{{ $t('account.security.page_title') }}</h1>
+    <div class="security-section"><h3>{{ $t('account.security.change_password') }}</h3>
+      <div class="form-group"><label for="sec-current-pwd">{{ $t('account.security.current_password') }}</label><input id="sec-current-pwd" v-model="form.currentPwd" type="password" class="text-input" autocomplete="current-password" /></div>
+      <div class="form-group"><label for="sec-new-pwd">{{ $t('account.security.new_password') }}</label><input id="sec-new-pwd" v-model="form.newPwd" type="password" class="text-input" autocomplete="new-password" minlength="8" /></div>
+      <div class="form-group"><label for="sec-confirm-pwd">{{ $t('account.security.confirm_password') }}</label><input id="sec-confirm-pwd" v-model="form.confirmPwd" type="password" class="text-input" autocomplete="new-password" /></div>
+      <button class="btn-primary" :disabled="saving" @click="changePwd">{{ saving ? $t('account.security.changing') : $t('account.security.change_pwd_btn') }}</button>
       <p v-if="msg" class="msg" :class="{ error: msgErr }">{{ msg }}</p>
     </div>
-    <div class="security-section"><h3>两步验证</h3><p>增强账户安全性 — 即将开放</p><button class="btn-secondary" disabled>开启两步验证</button></div>
-    <div class="security-section"><h3>登录设备</h3><p v-if="!devices.length && !devicesLoading" class="empty-hint">暂无设备记录</p><div v-if="devicesLoading" class="skeleton-line w-60"></div><ul v-else><li v-for="d in devices" :key="d.id">{{ d.device }} — {{ d.location }} — {{ d.time }}</li></ul></div>
+    <div class="security-section"><h3>{{ $t('account.security.two_factor') }}</h3><p>{{ $t('account.security.two_factor_hint') }}</p><button class="btn-secondary" disabled>{{ $t('account.security.enable_2fa') }}</button></div>
+    <div class="security-section"><h3>{{ $t('account.security.login_devices') }}</h3><p v-if="!devices.length && !devicesLoading" class="empty-hint">{{ $t('account.security.no_devices') }}</p><div v-if="devicesLoading" class="skeleton-line w-60"></div><ul v-else><li v-for="d in devices" :key="d.id">{{ d.device }} — {{ d.location }} — {{ d.time }}</li></ul></div>
   </div>
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n()
 const toast = useToast()
 const form = ref({ currentPwd: '', newPwd: '', confirmPwd: '' })
 const devices = ref<any[]>([])
@@ -24,21 +25,21 @@ onMounted(async () => {
   try {
     const data: any = await $fetch('/api/user/profile', { credentials: 'include' })
     if (data?.code === 200 && data.data?.devices) devices.value = data.data.devices
-  } catch { toast.error('加载设备记录失败') }
+  } catch { toast.error(t('account.security.load_devices_failed')) }
   finally { devicesLoading.value = false }
 })
 
 async function changePwd() {
   msg.value = ''; msgErr.value = false
-  if (!form.value.currentPwd) { msg.value = '请输入当前密码'; msgErr.value = true; return }
-  if (form.value.newPwd.length < 8) { msg.value = '新密码至少8位'; msgErr.value = true; return }
-  if (form.value.newPwd !== form.value.confirmPwd) { msg.value = '两次密码不一致'; msgErr.value = true; return }
+  if (!form.value.currentPwd) { msg.value = t('account.security.current_pwd_required'); msgErr.value = true; return }
+  if (form.value.newPwd.length < 8) { msg.value = t('account.security.pwd_min_length'); msgErr.value = true; return }
+  if (form.value.newPwd !== form.value.confirmPwd) { msg.value = t('account.security.pwd_mismatch'); msgErr.value = true; return }
   saving.value = true
   try {
     await $fetch('/api/user/change-password', { method: 'PUT', credentials: 'include', body: { oldPassword: form.value.currentPwd, newPassword: form.value.newPwd } })
-    msg.value = '密码修改成功'; msgErr.value = false
+    msg.value = t('account.security.pwd_changed'); msgErr.value = false
     form.value = { currentPwd: '', newPwd: '', confirmPwd: '' }
-  } catch(e: any) { msg.value = e?.data?.msg || '修改失败'; msgErr.value = true }
+  } catch(e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || err.message || t('account.security.change_failed'); msgErr.value = true }
   finally { saving.value = false }
 }
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })

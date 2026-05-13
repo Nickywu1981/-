@@ -117,8 +117,9 @@ async function fetchData() {
     const res: any = await $fetch(`/api/collections?${params}`)
     list.value = res.data?.list || res.data || []
     total.value = res.data?.total || 0
-  } catch (e: any) {
-    error.value = e?.data?.msg || e.message || t('account_pages.collections.create_fail')
+  } catch (e: unknown) {
+    const err = e as { data?: { msg?: string }; message?: string };
+    error.value = err?.data?.msg || err.message || t('account_pages.collections.create_fail')
   } finally { loading.value = false }
 }
 
@@ -133,8 +134,9 @@ async function createCollection() {
     form.name = ''; form.desc = ''; form.isPublic = false
     toast.success(t('account_pages.collections.create_success'))
     fetchData()
-  } catch (e: any) {
-    toast.error(e?.data?.msg || e.message || t('account_pages.collections.create_fail'))
+  } catch (e: unknown) {
+    const err = e as { data?: { msg?: string }; message?: string };
+    toast.error(err?.data?.msg || err.message || t('account_pages.collections.create_fail'))
   } finally { saving.value = false }
 }
 
@@ -154,8 +156,9 @@ async function saveEdit() {
     toast.success(t('account_pages.collections.update_success'))
     editing.value = null
     fetchData()
-  } catch (e: any) {
-    toast.error(e?.data?.msg || e.message || t('account_pages.collections.update_fail'))
+  } catch (e: unknown) {
+    const err = e as { data?: { msg?: string }; message?: string };
+    toast.error(err?.data?.msg || err.message || t('account_pages.collections.update_fail'))
   }
 }
 
@@ -165,8 +168,9 @@ async function deleteItem(item: any) {
     await $fetch(`/api/collections/${item.id}`, { method: 'DELETE' })
     toast.success(t('account_pages.collections.delete_success'))
     fetchData()
-  } catch (e: any) {
-    toast.error(e?.data?.msg || e.message || t('account_pages.collections.delete_fail'))
+  } catch (e: unknown) {
+    const err = e as { data?: { msg?: string }; message?: string };
+    toast.error(err?.data?.msg || err.message || t('account_pages.collections.delete_fail'))
   }
 }
 

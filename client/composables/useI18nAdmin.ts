@@ -2,11 +2,40 @@
  * useI18nAdmin — 后台多语言管理 composable
  * Phase 1.6: CRUD + 搜索 + 导入导出
  */
+
+interface I18nEntry {
+  key: string
+  namespace: string
+  value: string
+  updated_at?: string
+}
+
+interface I18nAdminPayload {
+  code: number
+  data?: { entries: I18nEntry[]; namespaces: string[] }
+}
+
+interface I18nLogEntry {
+  id?: string
+  action?: string
+  operator?: string
+  created_at?: string
+  old_value?: string
+  new_value?: string
+}
+
+interface I18nSearchResult {
+  trans_key: string
+  namespace: string
+  trans_value: string
+  updated_at?: string
+}
+
 export function useI18nAdmin() {
   const activeLocale = ref('zh')
   const activeNamespace = ref('')
   const searchQuery = ref('')
-  const translations = ref<{ key: string; namespace: string; value: string; updated_at?: string }[]>([])
+  const translations = ref<I18nEntry[]>([])
   const namespaces = ref<string[]>([])
   const loading = ref(false)
   const saving = ref(false)
@@ -22,20 +51,21 @@ export function useI18nAdmin() {
   const newValue = ref('')
 
   // 审计日志
-  const auditLogs = ref<any[]>([])
+  const auditLogs = ref<I18nLogEntry[]>([])
   const showLogModal = ref(false)
   const logTargetKey = ref('')
 
   async function fetch() {
     loading.value = true
     try {
-      const res: any = await $fetch(`/api/admin/i18n/${activeLocale.value}/admin`)
+      const res = await $fetch<I18nAdminPayload>(`/api/admin/i18n/${activeLocale.value}/admin`)
       translations.value = res.data?.entries || []
       namespaces.value = res.data?.namespaces || []
       pendingChanges.value.clear()
       pendingDelete.value.clear()
-    } catch (e: any) {
-      if (import.meta.dev) console.error('[i18n admin] fetch error', e)
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e)
+      if (import.meta.dev) console.error('[i18n admin] fetch error', msg)
     } finally { loading.value = false }
   }
 
@@ -69,8 +99,9 @@ export function useI18nAdmin() {
         })
       }
       await fetch()
-    } catch (e: any) {
-      if (import.meta.dev) console.error('[i18n admin] save error', e)
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e)
+      if (import.meta.dev) console.error('[i18n admin] save error', msg)
     } finally { saving.value = false }
   }
 
@@ -94,7 +125,7 @@ export function useI18nAdmin() {
 
   async function importJSON(file: File) {
     const text = await file.text()
-    let data: any
+    let data: Record<string, unknown>
     try { data = JSON.parse(text) } catch { toast.error('无效的 JSON 文件'); return }
     await $fetch(`/api/admin/i18n/${activeLocale.value}/import`, {
       method: 'POST', body: data, params: { skipEdited: '0' }, credentials: 'include',
@@ -106,9 +137,9 @@ export function useI18nAdmin() {
     logTargetKey.value = key
     showLogModal.value = true
     try {
-      const res: any = await $fetch(`/api/admin/i18n/${activeLocale.value}/logs/${encodeURIComponent(key)}`)
+      const res = await $fetch<{ code: number; data?: I18nLogEntry[] }>(`/api/admin/i18n/${activeLocale.value}/logs/${encodeURIComponent(key)}`)
       auditLogs.value = res.data || []
-    } catch { auditLogs.value = [] }
+    } catch (e) { console.warn('[i18nAdmin] 日志加载失败', e); auditLogs.value = [] }
   }
 
   const displayedTranslations = computed(() => {
@@ -137,10 +168,13 @@ export function useI18nAdmin() {
     if (!searchQuery.value.trim()) return fetch()
     loading.value = true
     try {
-      const res: any = await $fetch(`/api/admin/i18n/${activeLocale.value}/search?q=${encodeURIComponent(searchQuery.value)}`)
-      translations.value = (res.data || []).map((r: any) => ({
-        key: r.trans_key, namespace: r.namespace, value: r.trans_value, updated_at: r.updated_at,
+      const res = await $fetch<{ code: number; data?: I18nSearchResult[] }>(`/api/admin/i18n/${activeLocale.value}/search?q=${encodeURIComponent(searchQuery.value)}`)
+      translations.value = (res.data || []).map((r: I18nSearchResult) => ({
+        key: r.trans_key,
+        namespace: r.namespace,
+        value: r.trans_value,
+        updated_at: r.updated_at,
       }))
-    } catch (e: any) { /* ignore */ } finally { loading.value = false }
+    } catch { /* ignore */ } finally { loading.value = false }
   }
 }

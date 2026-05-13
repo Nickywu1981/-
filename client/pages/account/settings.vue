@@ -1,76 +1,72 @@
 <template>
   <div class="page">
     <div class="tabs">
-      <button :class="{ active: tab === 'profile' }" @click="tab = 'profile'">个人资料</button>
-      <button :class="{ active: tab === 'phone' }" @click="tab = 'phone'">手机绑定</button>
-      <button :class="{ active: tab === 'password' }" @click="tab = 'password'">修改密码</button>
+      <button :class="{ active: tab === 'profile' }" @click="tab = 'profile'">{{ $t('account.settings.tab_profile') }}</button>
+      <button :class="{ active: tab === 'phone' }" @click="tab = 'phone'">{{ $t('account.settings.tab_phone') }}</button>
+      <button :class="{ active: tab === 'password' }" @click="tab = 'password'">{{ $t('account.settings.tab_password') }}</button>
     </div>
 
     <LoadingSkeleton v-if="loading" type="form" :rows="4" />
 
     <template v-else>
-    <!-- 个人资料 -->
     <div v-if="tab === 'profile'" class="card">
       <div class="form-group">
-        <label for="prof-nickname">用户名</label>
-        <input id="prof-nickname" v-model="form.nickname" type="text" placeholder="昵称" autocomplete="nickname" />
+        <label for="prof-nickname">{{ $t('account.settings.username_label') }}</label>
+        <input id="prof-nickname" v-model="form.nickname" type="text" :placeholder="$t('account.settings.nickname_placeholder')" autocomplete="nickname" />
       </div>
       <div class="form-group">
-        <label for="prof-phone">手机号</label>
-        <input id="prof-phone" v-model="form.phone" type="tel" placeholder="选填" autocomplete="tel" inputmode="tel" />
+        <label for="prof-phone">{{ $t('account.settings.phone_label') }}</label>
+        <input id="prof-phone" v-model="form.phone" type="tel" :placeholder="$t('account.settings.phone_optional')" autocomplete="tel" inputmode="tel" />
       </div>
       <div class="form-group">
-        <label for="prof-email">邮箱</label>
-        <input id="prof-email" v-model="form.email" type="email" placeholder="选填" inputmode="email" />
+        <label for="prof-email">{{ $t('account.settings.email_label') }}</label>
+        <input id="prof-email" v-model="form.email" type="email" :placeholder="$t('account.settings.email_optional')" inputmode="email" />
       </div>
-      <button class="btn-save" :disabled="saving" @click="saveProfile">{{ saving ? '保存中...' : '保存' }}</button>
+      <button class="btn-save" :disabled="saving" @click="saveProfile">{{ saving ? $t('account.settings.saving') : $t('account.settings.save') }}</button>
       <p v-if="msg" class="msg" :class="{ error: msgErr }">{{ msg }}</p>
     </div>
 
-    <!-- 手机绑定 -->
     <div v-if="tab === 'phone'" class="card">
       <div v-if="boundPhone" class="bound-info">
-        <div class="bound-label">已绑定手机号</div>
+        <div class="bound-label">{{ $t('account.settings.bound_phone') }}</div>
         <div class="bound-phone">{{ boundPhone }}</div>
-        <button class="btn-text" @click="unbinding = true">解绑</button>
+        <button class="btn-text" @click="unbinding = true">{{ $t('account.settings.unbind') }}</button>
       </div>
       <div v-else>
         <div class="form-group">
-          <label for="bind-phone">手机号</label>
-          <input id="bind-phone" v-model="phoneForm.phone" type="text" maxlength="11" placeholder="请输入手机号" />
+          <label for="bind-phone">{{ $t('account.settings.phone_label') }}</label>
+          <input id="bind-phone" v-model="phoneForm.phone" type="text" maxlength="11" :placeholder="$t('account.settings.phone_placeholder')" />
         </div>
         <div class="form-group">
-          <label for="bind-code">验证码</label>
+          <label for="bind-code">{{ $t('account.settings.code_label') }}</label>
           <div class="code-row">
-            <input id="bind-code" v-model="phoneForm.code" type="text" maxlength="6" placeholder="6位验证码" class="code-input" />
-            <button class="btn-code" :disabled="codeCooldown > 0" @click="sendBindCode">{{ codeCooldown > 0 ? `${codeCooldown}s` : '获取验证码' }}</button>
+            <input id="bind-code" v-model="phoneForm.code" type="text" maxlength="6" :placeholder="$t('account.settings.code_placeholder')" class="code-input" />
+            <button class="btn-code" :disabled="codeCooldown > 0" @click="sendBindCode">{{ codeCooldown > 0 ? `${codeCooldown}s` : $t('account.settings.get_code') }}</button>
           </div>
         </div>
-        <button class="btn-save" :disabled="phoneSaving" @click="bindPhone">{{ phoneSaving ? '绑定中...' : '绑定手机号' }}</button>
+        <button class="btn-save" :disabled="phoneSaving" @click="bindPhone">{{ phoneSaving ? $t('account.settings.binding') : $t('account.settings.bind_phone') }}</button>
         <p v-if="phoneMsg" class="msg" :class="{ error: phoneMsgErr }">{{ phoneMsg }}</p>
       </div>
 
-      <!-- 解绑确认 -->
       <div v-if="unbinding" class="unbind-confirm">
-        <p>确定要解绑手机号吗？解绑后将无法接收任务完成短信通知。</p>
+        <p>{{ $t('account.settings.unbind_confirm') }}</p>
         <div class="unbind-actions">
-          <button class="btn-cancel" @click="unbinding = false">取消</button>
-          <button class="btn-danger" :disabled="phoneSaving" @click="unbindPhone">{{ phoneSaving ? '解绑中...' : '确认解绑' }}</button>
+          <button class="btn-cancel" @click="unbinding = false">{{ $t('account.settings.cancel') }}</button>
+          <button class="btn-danger" :disabled="phoneSaving" @click="unbindPhone">{{ phoneSaving ? $t('account.settings.unbinding') : $t('account.settings.confirm_unbind') }}</button>
         </div>
       </div>
     </div>
 
-    <!-- 修改密码 -->
     <div v-if="tab === 'password'" class="card">
       <div class="form-group">
-        <label for="pw-old">原密码</label>
-        <input id="pw-old" v-model="pw.oldPassword" type="password" placeholder="请输入原密码" autocomplete="current-password" />
+        <label for="pw-old">{{ $t('account.settings.old_password') }}</label>
+        <input id="pw-old" v-model="pw.oldPassword" type="password" :placeholder="$t('account.settings.old_password_placeholder')" autocomplete="current-password" />
       </div>
       <div class="form-group">
-        <label for="pw-new">新密码</label>
-        <input id="pw-new" v-model="pw.newPassword" type="password" placeholder="至少6位" autocomplete="new-password" />
+        <label for="pw-new">{{ $t('account.settings.new_password') }}</label>
+        <input id="pw-new" v-model="pw.newPassword" type="password" :placeholder="$t('account.settings.new_password_placeholder')" autocomplete="new-password" />
       </div>
-      <button class="btn-save" :disabled="pwSaving" @click="savePassword">{{ pwSaving ? '修改中...' : '修改密码' }}</button>
+      <button class="btn-save" :disabled="pwSaving" @click="savePassword">{{ pwSaving ? $t('account.settings.changing') : $t('account.settings.change_password') }}</button>
       <p v-if="pwMsg" class="msg" :class="{ error: pwMsgErr }">{{ pwMsg }}</p>
     </div>
     </template>
@@ -79,7 +75,7 @@
 
 <script setup lang="ts">
 
-
+const { t } = useI18n()
 
 const tab = ref('profile');
 const loading = ref(true)
@@ -106,7 +102,7 @@ onMounted(async () => {
     const res: any = await $fetch('/api/user/profile', { credentials: 'include' });
     Object.assign(form, { nickname: res.data?.nickname || '', phone: res.data?.phone || '', email: res.data?.email || '' });
     if (res.data?.phone) boundPhone.value = res.data.phone;
-  } catch { toast.error('加载用户信息失败') }
+  } catch { toast.error(t('account.settings.load_failed')) }
   finally { loading.value = false }
 });
 
@@ -114,46 +110,46 @@ async function saveProfile() {
   saving.value = true; msg.value = '';
   try {
     await $fetch('/api/user/profile', { method: 'PUT', credentials: 'include', body: { nickname: form.nickname, phone: form.phone, email: form.email } });
-    msg.value = '保存成功'; msgErr.value = false;
-  } catch (e: any) { msg.value = e?.data?.msg || '保存失败'; msgErr.value = true; }
+    msg.value = t('account.settings.save_success'); msgErr.value = false;
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || err.message || t('account.settings.save_failed'); msgErr.value = true; }
   saving.value = false;
 }
 
 async function savePassword() {
-  if (!pw.oldPassword || pw.newPassword.length < 8) { pwMsg.value = '新密码至少8位'; pwMsgErr.value = true; return; }
+  if (!pw.oldPassword || pw.newPassword.length < 8) { pwMsg.value = t('account.settings.password_min_length'); pwMsgErr.value = true; return; }
   pwSaving.value = true; pwMsg.value = '';
   try {
     await $fetch('/api/user/change-password', { method: 'PUT', credentials: 'include', body: { oldPassword: pw.oldPassword, newPassword: pw.newPassword } });
-    pwMsg.value = '密码修改成功'; pwMsgErr.value = false;
+    pwMsg.value = t('account.settings.password_changed'); pwMsgErr.value = false;
     pw.oldPassword = ''; pw.newPassword = '';
-  } catch (e: any) { pwMsg.value = e?.data?.msg || '修改失败'; pwMsgErr.value = true; }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; pwMsg.value = err?.data?.msg || err.message || t('account.settings.change_failed'); pwMsgErr.value = true; }
   pwSaving.value = false;
 }
 
 async function sendBindCode() {
   if (!phoneForm.phone || !/^1[3-9]\d{9}$/.test(phoneForm.phone)) {
-    phoneMsg.value = '请输入正确的手机号'; phoneMsgErr.value = true; return;
+    phoneMsg.value = t('account.settings.invalid_phone'); phoneMsgErr.value = true; return;
   }
   phoneMsg.value = '';
   try {
     await $fetch('/api/sms/send-code', { method: 'POST', credentials: 'include', body: { phone: phoneForm.phone, scene: 'bind' } });
-    phoneMsg.value = '验证码已发送'; phoneMsgErr.value = false;
+    phoneMsg.value = t('account.settings.code_sent'); phoneMsgErr.value = false;
     startCodeCd(60);
-  } catch (e: any) { phoneMsg.value = e?.data?.msg || '发送失败'; phoneMsgErr.value = true; }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; phoneMsg.value = err?.data?.msg || err.message || t('account.settings.send_failed'); phoneMsgErr.value = true; }
 }
 
 async function bindPhone() {
-  if (!phoneForm.phone || !phoneForm.code) { phoneMsg.value = '请填写手机号和验证码'; phoneMsgErr.value = true; return; }
+  if (!phoneForm.phone || !phoneForm.code) { phoneMsg.value = t('account.settings.fill_phone_code'); phoneMsgErr.value = true; return; }
   phoneSaving.value = true; phoneMsg.value = '';
   try {
     const verify: any = await $fetch('/api/sms/verify-code', { method: 'POST', credentials: 'include', body: { phone: phoneForm.phone, scene: 'bind', code: phoneForm.code } });
-    if (!verify.data?.valid) { phoneMsg.value = '验证码错误或已过期'; phoneMsgErr.value = true; phoneSaving.value = false; return; }
+    if (!verify.data?.valid) { phoneMsg.value = t('account.settings.code_invalid'); phoneMsgErr.value = true; phoneSaving.value = false; return; }
     await $fetch('/api/user/profile', { method: 'PUT', credentials: 'include', body: { phone: phoneForm.phone } });
     boundPhone.value = phoneForm.phone;
     form.phone = phoneForm.phone;
     phoneForm.phone = ''; phoneForm.code = '';
-    phoneMsg.value = '手机号绑定成功'; phoneMsgErr.value = false;
-  } catch (e: any) { phoneMsg.value = e?.data?.msg || '绑定失败'; phoneMsgErr.value = true; }
+    phoneMsg.value = t('account.settings.phone_bound'); phoneMsgErr.value = false;
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; phoneMsg.value = err?.data?.msg || err.message || t('account.settings.bind_failed'); phoneMsgErr.value = true; }
   phoneSaving.value = false;
 }
 
@@ -162,8 +158,8 @@ async function unbindPhone() {
   try {
     await $fetch('/api/user/profile', { method: 'PUT', credentials: 'include', body: { phone: '' } });
     boundPhone.value = ''; form.phone = ''; unbinding.value = false;
-    phoneMsg.value = '已解绑'; phoneMsgErr.value = false;
-  } catch (e: any) { phoneMsg.value = e?.data?.msg || '解绑失败'; phoneMsgErr.value = true; }
+    phoneMsg.value = t('account.settings.unbound'); phoneMsgErr.value = false;
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; phoneMsg.value = err?.data?.msg || err.message || t('account.settings.unbind_failed'); phoneMsgErr.value = true; }
   phoneSaving.value = false;
 }
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })

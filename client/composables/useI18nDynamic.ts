@@ -73,7 +73,7 @@ export function useI18nDynamic() {
       const cached = await getCached(loc)
       try { const r = await $fetch<{ version?: number }>(`/api/i18n/version`).catch(() => ({})); if (cached && r.version === cached.version) { dynamicMap.value = cached.data; ready.value = true; loading.value = false; return } } catch { /* noop */ }
 
-      const res: any = await $fetch(`/api/i18n/${loc}`)
+      const res = await $fetch<{ data?: Record<string, string>; version?: number }>(`/api/i18n/${loc}`)
       const data = res.data || res
       if (data && typeof data === 'object' && !Array.isArray(data)) {
         _lastOK.value = data
@@ -81,8 +81,9 @@ export function useI18nDynamic() {
         ready.value = true
         try { await setCache(loc, data, res.version || Date.now()) } catch { /* noop */ }
       }
-    } catch (e: any) {
-      if (!ready.value) error.value = e.message || '加载翻译失败'
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      if (!ready.value) error.value = msg || '加载翻译失败'
       // 回退到上次成功的快照
       if (_lastOK.value && Object.keys(_lastOK.value).length) dynamicMap.value = _lastOK.value
     } finally { loading.value = false }

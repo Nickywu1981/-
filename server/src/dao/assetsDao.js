@@ -4,6 +4,7 @@
  */
 import pool from './db.js';
 import { parsePagination } from '../utils/pagination.js';
+import logger from '../utils/logger.js';
 
 const IMAGE_TYPES = ['image_gen', 'image_replicate', 'batch_image_gen', 'batch_image_edit'];
 const VIDEO_TYPES = ['video_gen', 'action_migrate', 'digital_human', 'viral_replicate', 'live_clip'];
@@ -35,7 +36,7 @@ export async function listUserAssets({ userId, type, page = 1, pageSize = 20 }) 
 
   const list = rows.map(r => {
     let data = {};
-    try { data = typeof r.result_data === 'string' ? JSON.parse(r.result_data) : (r.result_data || {}); } catch { data = {}; }
+    try { data = typeof r.result_data === 'string' ? JSON.parse(r.result_data) : (r.result_data || {}); } catch (e) { logger.warn('[Assets] result_data 解析失败', { id: r.id, error: e.message }); data = {}; }
     const url = data.file_url || data.video_url || data.image_url || '';
     const isVideo = VIDEO_TYPES.includes(r.task_type);
     return { id: r.id, type: isVideo ? 'video' : 'image', task_type: r.task_type, url, meta: data, created_at: r.created_at };

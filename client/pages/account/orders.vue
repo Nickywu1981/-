@@ -46,7 +46,7 @@ async function fetchOrders() {
     const data: any = await $fetch(`/api/payment/orders?page=${page.value}&pageSize=${pageSize.value}${status}`, { credentials: 'include' })
     if (data.code === 200) { orders.value = data.data.list || []; total.value = data.data.total || 0 }
     else { error.value = data.msg || '加载失败' }
-  } catch (e: any) { error.value = e?.data?.msg || e.message || '加载失败' }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; error.value = err?.data?.msg || err.message || '加载失败' }
   finally { loading.value = false }
 }
 function goPage(p: number) { page.value = p; fetchOrders() }

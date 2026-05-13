@@ -54,8 +54,9 @@ export function useDiyAutoSave(
       })
       lastSaved.value = new Date()
       pendingChanges.value = 0
-    } catch (e: any) {
-      saveError.value = e?.data?.msg || e.message
+    } catch (e: unknown) {
+      const err = e as { data?: { msg?: string }; message?: string };
+      saveError.value = err?.data?.msg || err.message
       if (timer) clearTimeout(timer)
       timer = setTimeout(autoSave, AUTO_SAVE_INTERVAL_MS)
     } finally {

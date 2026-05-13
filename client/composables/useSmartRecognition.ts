@@ -34,8 +34,9 @@ export function useSmartRecognition() {
         category: data.category || '其他',
         features: data.features || [],
       }
-    } catch (e: any) {
-      error.value = e?.data?.message || e?.message || '识别失败'
+    } catch (e: unknown) {
+      const err = e as { data?: { message?: string }; message?: string };
+      error.value = err?.data?.message || err?.message || '识别失败'
     } finally { loading.value = false }
   }
 

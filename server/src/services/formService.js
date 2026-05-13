@@ -26,7 +26,7 @@ function sanitizeRedirectUrl(url) {
     const allowedHost = new URL(appUrl).host;
     if (parsed.host !== allowedHost) return '';
     return parsed.toString();
-  } catch { return ''; }
+  } catch { logger.warn('[Form] URL 解析失败，忽略', { url: trimmed }); return ''; }
 }
 /**
  * P2 增强表单服务 — 校验引擎 + 联动解析 + 脱敏 + 双端适配

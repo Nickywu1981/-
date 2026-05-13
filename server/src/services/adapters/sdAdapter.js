@@ -44,7 +44,7 @@ async function sdTxt2Img(input, onProgress) {
 
   return {
     base64: base64Image,
-    info: (() => { try { return data.info ? JSON.parse(data.info) : {}; } catch { return {}; } })(),
+    info: (() => { try { return data.info ? JSON.parse(data.info) : {}; } catch (e) { logger.warn('[SD] info JSON 解析失败', { error: e.message }); return {}; } })(),
     parameters: data.parameters || {},
   };
 }
@@ -76,7 +76,7 @@ async function sdImg2Img(input, onProgress) {
 
   return {
     base64: data.images?.[0] || '',
-    info: (() => { try { return data.info ? JSON.parse(data.info) : {}; } catch { return {}; } })(),
+    info: (() => { try { return data.info ? JSON.parse(data.info) : {}; } catch (e) { logger.warn('[SD] info JSON 解析失败', { error: e.message }); return {}; } })(),
   };
 }
 

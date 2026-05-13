@@ -29,7 +29,7 @@ const STORAGE_KEY = 'movio_quick_saves'
 function getSavedIds(): string[] {
   if (!import.meta.client) return []
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]') }
-  catch { return [] }
+  catch (e) { console.warn('[QuickSave] localStorage 读取失败', e); return [] }
 }
 
 function checkSaved() {

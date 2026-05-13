@@ -53,8 +53,9 @@ async function fetchTemplates() {
   try {
     const data: any = await $fetch('/api/prompts/templates', { params: { scope: 'my' }, credentials: 'include' })
     templates.value = data?.list || []
-  } catch (e: any) {
-    error.value = e?.data?.msg || '加载失败'
+  } catch (e: unknown) {
+    const err = e as { data?: { msg?: string } };
+    error.value = err?.data?.msg || '加载失败'
   } finally {
     loading.value = false
   }

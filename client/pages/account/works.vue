@@ -75,8 +75,9 @@ async function fetchWorks() {
     const res: any = await $fetch(`/api/tasks/my-works?${params.toString()}`, { credentials: 'include' })
     works.value = res.data?.list || res.data || []
     total.value = res.data?.total || 0
-  } catch (e: any) {
-    error.value = e.data?.message || '加载失败'
+  } catch (e: unknown) {
+    const err = e as { data?: { message?: string } };
+    error.value = err.data?.message || '加载失败'
   } finally { loading.value = false }
 }
 

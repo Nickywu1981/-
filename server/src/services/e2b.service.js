@@ -309,7 +309,8 @@ export async function executeCode(sandboxId, userId, code, language, timeoutMs) 
   let running;
   try {
     running = await entry.sandbox.isRunning();
-  } catch {
+  } catch (e) {
+    logger.warn('[E2B] 沙箱状态检查失败', { sandboxId, error: e.message });
     _cleanupEntry(sandboxId, 'crashed');
     throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND, '沙箱已崩溃，请重新创建');
   }
@@ -369,7 +370,8 @@ export async function getSandbox(sandboxId, userId) {
   let running;
   try {
     running = await entry.sandbox.isRunning();
-  } catch {
+  } catch (e) {
+    logger.warn('[E2B] isRunning 检测失败，降级为 false', { sandboxId, error: e.message });
     running = false;
   }
   return {
@@ -387,7 +389,8 @@ export async function listUserSandboxes(userId) {
     try {
       const running = await entry.sandbox.isRunning();
       list.push({ sandboxId: id, running, createdAt: new Date(entry.createdAt).toISOString() });
-    } catch {
+    } catch (e) {
+      logger.warn('[E2B] listSandboxes isRunning 检测失败，降级为 false', { sandboxId: id, error: e.message });
       list.push({ sandboxId: id, running: false, createdAt: new Date(entry.createdAt).toISOString() });
     }
   }

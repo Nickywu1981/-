@@ -1,15 +1,15 @@
 <template>
   <div class="profile-page">
     <div class="page-header">
-      <h1 class="page-title">个人中心</h1>
-      <NuxtLink to="/account/settings" class="settings-link">编辑资料 →</NuxtLink>
+      <h1 class="page-title">{{ $t('account.profile.page_title') }}</h1>
+      <NuxtLink to="/account/settings" class="settings-link">{{ $t('account.profile.edit_profile') }}</NuxtLink>
     </div>
 
     <LoadingSkeleton v-if="loading" type="table" :rows="3" />
 
     <div v-else-if="error" class="error-state">
       <p>{{ error }}</p>
-      <button class="retry-btn" @click="fetchProfile">重试</button>
+      <button class="retry-btn" @click="fetchProfile">{{ $t('account.profile.retry') }}</button>
     </div>
 
     <template v-else-if="profile">
@@ -18,33 +18,33 @@
           <div class="avatar">{{ (profile.nickname || profile.username || 'U')[0].toUpperCase() }}</div>
           <div class="user-info">
             <h2 class="nickname">{{ profile.nickname || profile.username }}</h2>
-            <p class="role-badge">{{ profile.role === 'admin' ? '管理员' : '普通用户' }}</p>
+            <p class="role-badge">{{ profile.role === 'admin' ? $t('account.profile.role_admin') : $t('account.profile.role_user') }}</p>
             <p class="uid">ID: {{ profile.id || profile.user_id }}</p>
           </div>
         </div>
         <div class="detail-grid">
           <div class="detail-item">
-            <span class="label">手机号</span>
-            <span class="value">{{ profile.phone || '未绑定' }}</span>
+            <span class="label">{{ $t('account.profile.phone') }}</span>
+            <span class="value">{{ profile.phone || $t('account.profile.not_bound') }}</span>
           </div>
           <div class="detail-item">
-            <span class="label">邮箱</span>
-            <span class="value">{{ profile.email || '未绑定' }}</span>
+            <span class="label">{{ $t('account.profile.email') }}</span>
+            <span class="value">{{ profile.email || $t('account.profile.not_bound') }}</span>
           </div>
           <div class="detail-item">
-            <span class="label">注册时间</span>
+            <span class="label">{{ $t('account.profile.register_time') }}</span>
             <span class="value">{{ formatDateTime(profile.create_time) }}</span>
           </div>
           <div class="detail-item">
-            <span class="label">会员等级</span>
-            <span class="value plan-name">{{ profile.plan_name || '免费版' }}</span>
+            <span class="label">{{ $t('account.profile.member_level') }}</span>
+            <span class="value plan-name">{{ profile.plan_name || $t('account.profile.free_plan') }}</span>
           </div>
           <div class="detail-item">
-            <span class="label">剩余积分</span>
+            <span class="label">{{ $t('account.profile.credits') }}</span>
             <span class="value credits">{{ profile.credits || 0 }}</span>
           </div>
           <div class="detail-item">
-            <span class="label">累计任务</span>
+            <span class="label">{{ $t('account.profile.task_count') }}</span>
             <span class="value">{{ profile.task_count || 0 }}</span>
           </div>
         </div>
@@ -53,27 +53,27 @@
       <div class="quick-actions">
         <NuxtLink to="/account/credits" class="action-card">
           <span class="action-icon">💎</span>
-          <span class="action-text">积分明细</span>
+          <span class="action-text">{{ $t('account.profile.credit_details') }}</span>
         </NuxtLink>
         <NuxtLink to="/account/works" class="action-card">
           <span class="action-icon">📋</span>
-          <span class="action-text">我的作品</span>
+          <span class="action-text">{{ $t('account.profile.my_works') }}</span>
         </NuxtLink>
         <NuxtLink to="/account/orders" class="action-card">
           <span class="action-icon">📦</span>
-          <span class="action-text">套餐订单</span>
+          <span class="action-text">{{ $t('account.profile.plan_orders') }}</span>
         </NuxtLink>
         <NuxtLink to="/account/billing" class="action-card">
           <span class="action-icon">💳</span>
-          <span class="action-text">消费账单</span>
+          <span class="action-text">{{ $t('account.profile.billing') }}</span>
         </NuxtLink>
         <NuxtLink to="/account/templates" class="action-card">
           <span class="action-icon">📄</span>
-          <span class="action-text">我的模板</span>
+          <span class="action-text">{{ $t('account.profile.my_templates') }}</span>
         </NuxtLink>
         <NuxtLink to="/account/notifications" class="action-card">
           <span class="action-icon">🔔</span>
-          <span class="action-text">消息通知</span>
+          <span class="action-text">{{ $t('account.profile.notifications') }}</span>
         </NuxtLink>
       </div>
     </template>
@@ -82,6 +82,8 @@
 
 <script setup lang="ts">
 import { formatDateTime } from '@/utils/format'
+
+const { t } = useI18n()
 
 const profile = ref<any>(null);
 const loading = ref(true);
@@ -92,7 +94,7 @@ async function fetchProfile() {
   try {
     const res: any = await $fetch('/api/user/profile', { credentials: 'include' });
     profile.value = res.data || res;
-  } catch (e: any) { error.value = '加载失败，请重试'; }
+  } catch (e: unknown) { error.value = t('account.profile.load_failed'); }
   loading.value = false;
 }
 

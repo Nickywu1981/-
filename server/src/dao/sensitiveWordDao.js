@@ -62,7 +62,7 @@ export async function checkText(text) {
     try {
       if (w.regex?.test(text)) hits.push(w);
       else if (!w.regex && text.includes(w.word)) hits.push(w);
-    } catch { if (text.includes(w.word)) hits.push(w); }
+    } catch (e) { logger.warn('[SensitiveWord] 正则匹配异常，降级为字符串匹配', { word: w.word, error: e.message }); if (text.includes(w.word)) hits.push(w); }
   }
   return { safe: hits.length === 0, hits, block: hits.some(h => h.level === 1), review: hits.some(h => h.level === 2) };
 }

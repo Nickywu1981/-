@@ -60,7 +60,7 @@ async function fetchRecords() {
       totalIn.value = data.data.totalIn || 0
       totalOut.value = data.data.totalOut || 0
     } else { error.value = data.msg || t('account_pages.credits.load_error') }
-  } catch (e: any) { error.value = e?.data?.msg || e.message || t('account_pages.credits.load_error') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; error.value = err?.data?.msg || err.message || t('account_pages.credits.load_error') }
   finally { loading.value = false }
 }
 function goPage(p: number) { page.value = p; fetchRecords() }

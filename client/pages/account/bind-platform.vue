@@ -129,8 +129,9 @@ async function doBind(platform: any) {
     } else {
       toast.error(res?.msg || t('account_pages.bind_platform.bind_error'))
     }
-  } catch (e: any) {
-    toast.error(e?.data?.msg || t('account_pages.bind_platform.bind_error'))
+  } catch (e: unknown) {
+    const err = e as { data?: { msg?: string } };
+    toast.error(err?.data?.msg || t('account_pages.bind_platform.bind_error'))
   }
   binding.value = false
 }

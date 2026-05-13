@@ -63,8 +63,9 @@ async function fetchList() {
     const res: any = await $fetch(`/api/notifications?page=${page.value}&pageSize=${pageSize}`, { credentials: 'include' })
     notifications.value = res.data?.list || []
     total.value = res.data?.total || 0
-  } catch (e: any) {
-    error.value = e?.data?.msg || e.message || '加载失败'
+  } catch (e: unknown) {
+    const err = e as { data?: { msg?: string }; message?: string };
+    error.value = err?.data?.msg || err.message || '加载失败'
   } finally {
     loading.value = false
   }

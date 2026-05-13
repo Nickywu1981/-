@@ -123,8 +123,9 @@ async function createKey() {
     showCreate.value = false
     form.description = ''
     await loadKeys()
-  } catch (e: any) {
-    msg.value = e?.data?.msg || e.message || t('account_pages.developer.create_error')
+  } catch (e: unknown) {
+    const err = e as { data?: { msg?: string }; message?: string };
+    msg.value = err?.data?.msg || err.message || t('account_pages.developer.create_error')
     msgErr.value = true
   }
   creating.value = false
@@ -134,8 +135,9 @@ async function toggleKey(k: any) {
   try {
     await api.put(`/open/keys/${k.id}/toggle`, { status: k.status === 1 ? 0 : 1 })
     await loadKeys()
-  } catch (e: any) {
-    msg.value = e?.data?.msg || e.message || t('account_pages.developer.toggle_error')
+  } catch (e: unknown) {
+    const err = e as { data?: { msg?: string }; message?: string };
+    msg.value = err?.data?.msg || err.message || t('account_pages.developer.toggle_error')
     msgErr.value = true
   }
 }
@@ -145,8 +147,9 @@ async function deleteKey(k: any) {
   try {
     await api.delete(`/open/keys/${k.id}`)
     await loadKeys()
-  } catch (e: any) {
-    msg.value = e?.data?.msg || e.message || t('account_pages.developer.delete_error')
+  } catch (e: unknown) {
+    const err = e as { data?: { msg?: string }; message?: string };
+    msg.value = err?.data?.msg || err.message || t('account_pages.developer.delete_error')
     msgErr.value = true
   }
 }

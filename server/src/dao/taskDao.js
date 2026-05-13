@@ -119,5 +119,5 @@ export async function recoverStuckTasks(timeoutMs = 15 * 60 * 1000) {
 
 function safeJson(v) {
   if (!v) return null;
-  try { return typeof v === 'string' ? JSON.parse(v) : v; } catch { return null; }
+  try { return typeof v === 'string' ? JSON.parse(v) : v; } catch (e) { logger.warn('[Task] safeJson 解析失败', { error: e.message }); return null; }
 }

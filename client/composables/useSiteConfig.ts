@@ -132,7 +132,7 @@ export function useSiteConfig(groupKey: string) {
     try {
       // SSR: useRequestFetch 绕过 Vue Router → Nitro devProxy → Express
       const fetcher = import.meta.server ? useRequestFetch() : $fetch
-      const res: any = await fetcher(`${apiBase}/config/${groupKey}`, { credentials: 'include' })
+      const res = await fetcher<{ code: number; data?: Record<string, unknown>; msg?: string }>(`${apiBase}/config/${groupKey}`, { credentials: 'include' })
       if (res.code === 200) {
         cache[groupKey] = res.data || {}
         config.value = cache[groupKey]
@@ -140,8 +140,9 @@ export function useSiteConfig(groupKey: string) {
         return
       }
       throw new Error(res.msg || '配置加载失败')
-    } catch (e: any) {
-      if (import.meta.dev) console.warn(`[useSiteConfig] ${groupKey} 加载失败, 使用降级文案`, e.message)
+    } catch (e: unknown) {
+      const err = e as { message?: string };
+      if (import.meta.dev) console.warn(`[useSiteConfig] ${groupKey} 加载失败, 使用降级文案`, err.message)
       config.value = FALLBACKS[groupKey] || {}
       isFallback.value = true
       error.value = e
