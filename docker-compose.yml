@@ -61,11 +61,11 @@ services:
       DB_HOST: mysql
       DB_PORT: "3306"
       DB_USER: ${DB_USER:-ai_saas}
-      DB_PASSWORD: ${DB_PASSWORD:-ai_saas_pass}
+      DB_PASSWORD: ${DB_PASSWORD:?生产环境必须设置DB_PASSWORD}
       DB_NAME: ai_saas
       REDIS_HOST: redis
       REDIS_PORT: "6379"
-      REDIS_PASSWORD: ${REDIS_PASSWORD:-ai_saas_redis}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?生产环境必须设置REDIS_PASSWORD}
       JWT_SECRET: ${JWT_SECRET:?生产环境必须设置JWT_SECRET}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?生产环境必须设置JWT_REFRESH_SECRET}
       ENCRYPTION_KEY: ${ENCRYPTION_KEY:?生产环境必须设置ENCRYPTION_KEY且必须为32字符}

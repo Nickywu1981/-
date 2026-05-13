@@ -14,6 +14,8 @@
  */
 import { gatewayRoute } from '../gateway/aiGatewayHub.js';
 import logger from '../utils/logger.js';
+import { BusinessError } from '../utils/businessError.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 // ==================== 意图枚举 ====================
 
@@ -161,7 +163,7 @@ async function _llmClassify(userInput, ctx) {
 
   const raw = result?.output?.choices?.[0]?.message?.content || '';
   const jsonMatch = raw.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) throw new Error('LLM 分类结果非 JSON');
+  if (!jsonMatch) throw new BusinessError(ERROR_CODE.AI_INFER_FAILED, 'LLM classification result is not valid JSON');
 
   const parsed = JSON.parse(jsonMatch[0]);
   const intentId = parsed.intent;

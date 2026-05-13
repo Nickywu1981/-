@@ -5,6 +5,8 @@
  */
 import { cacheSet, cacheDel, getRedis } from '../dao/redis.js';
 import logger from '../utils/logger.js';
+import { BusinessError } from '../utils/businessError.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 const CODE_PREFIX = 'vcode:';
 
@@ -48,7 +50,7 @@ export async function verifyCode(key, inputCode, maxAttempts = 5) {
       return { valid: false, reason: result[1] };
     }
     // Redis 不可用：回退到进程内无竞态保护逻辑（单进程安全）
-    throw new Error('Redis not ready');
+    throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, 'Redis not ready');
   } catch (e) {
     logger.warn('[CodeStore] Redis 读取失败', { key, error: e.message });
     return { valid: false, reason: 'error' };

@@ -854,7 +854,7 @@ async function _runJob(jobId, steps, mode, input) {
         taskType: input.workflowType || input.taskType,
         input,
       }).catch(e => logger.warn('[WorkflowEngine] Feedback record failed', { modelKey, error: e.message }));
-    }).catch(() => {});
+    }).catch(e => logger.debug('[WorkflowEngine] Feedback learning import failed', { error: e.message }));
   }
 
   logger.info(`[WorkflowEngine] job=${jobId} completed, ${steps.length} steps`);

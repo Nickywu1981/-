@@ -7,6 +7,8 @@
  *   3) 结构化 GEO 决策日志
  */
 import logger from '../utils/logger.js';
+import { BusinessError } from '../utils/businessError.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 import { evaluateRules } from './geoRulesService.js';
 import config from '../config/index.js';
 
@@ -41,7 +43,7 @@ export async function resolveIpToCountry(ip) {
 
   try {
     const res = await fetch(`${GEO_API}/${ip}?fields=countryCode,country,city,region`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    if (!res.ok) throw new BusinessError(ERROR_CODE.AI_TIMEOUT, `GEO API HTTP ${res.status}`);
     const data = await res.json();
     const result = {
       countryCode: data.countryCode || 'UNKNOWN',

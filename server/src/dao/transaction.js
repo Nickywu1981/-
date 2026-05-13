@@ -1,5 +1,7 @@
 import pool from './db.js';
 import logger from '../utils/logger.js';
+import { BusinessError } from '../utils/businessError.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 /**
  * 事务包装器 — 传入回调自动获得 conn，失败自动回滚
@@ -25,7 +27,7 @@ export async function withTransaction(fn, options = {}) {
         await conn.beginTransaction();
         if (isolationLevel) {
           const VALID_LEVELS = ['READ UNCOMMITTED', 'READ COMMITTED', 'REPEATABLE READ', 'SERIALIZABLE'];
-          if (!VALID_LEVELS.includes(isolationLevel)) throw new Error(`Invalid isolation level: ${isolationLevel}`);
+          if (!VALID_LEVELS.includes(isolationLevel)) throw new BusinessError(ERROR_CODE.PARAM_ERROR, `Invalid isolation level: ${isolationLevel}`);
           await conn.query(`SET TRANSACTION ISOLATION LEVEL ${isolationLevel}`);
         }
         const result = await fn(conn);

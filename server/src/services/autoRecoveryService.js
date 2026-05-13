@@ -516,7 +516,7 @@ export function startAutoRecoveryLoop(intervalMs = 60_000) {
   const _evolutionTimer = setInterval(() => {
     import('./incidentLearningService.js').then(({ evolutionTick }) => {
       evolutionTick().catch(e => logger.warn('[AutoRecovery] Evolution tick failed', { error: e.message }));
-    }).catch(() => {});
+    }).catch(e => logger.debug('[AutoRecovery] Evolution tick import failed', { error: e.message }));
   }, 6 * 3600_000);
   if (_evolutionTimer.unref) _evolutionTimer.unref();
   registerCleanup(() => clearInterval(_evolutionTimer));
@@ -525,7 +525,7 @@ export function startAutoRecoveryLoop(intervalMs = 60_000) {
   const _driftTimer = setInterval(() => {
     import('./adaptiveThresholdService.js').then(({ detectAndApplyDrift }) => {
       detectAndApplyDrift().catch(e => logger.warn('[AutoRecovery] Drift detection failed', { error: e.message }));
-    }).catch(() => {});
+    }).catch(e => logger.debug('[AutoRecovery] Evolution tick import failed', { error: e.message }));
   }, 24 * 3600_000);
   if (_driftTimer.unref) _driftTimer.unref();
   registerCleanup(() => clearInterval(_driftTimer));

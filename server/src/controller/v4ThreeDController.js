@@ -99,7 +99,7 @@ export const getDemo = wrapController(async (req, res) => {
   const filePath = path.join(uploadDir, 'demo', file);
   try {
     await fs.promises.access(filePath);
-  } catch {
+  } catch { logger.debug('[3D] Demo model file not found:', file);
     throw new BusinessError(ERROR_CODE.NOT_FOUND);
   }
   return res.sendFile(filePath);
