@@ -115,39 +115,14 @@
     </div>
 
     <!-- 版本历史 Modal -->
-    <Teleport to="body">
-      <div v-if="showVersions" class="modal-overlay" @click.self="showVersions = false">
-        <div class="modal version-modal">
-          <h3>版本历史</h3>
-          <div v-if="versionLoading" class="v-loading">加载中...</div>
-          <div v-else-if="!versions.length" class="v-empty">暂无版本记录</div>
-          <div v-else class="version-list">
-            <div v-for="(v, i) in versions" :key="v.version" class="version-item" :class="{ selected: selectedVersions.includes(i) }" @click="toggleVersionSelect(i)">
-              <div class="v-dot" :class="{ latest: i === 0 }" />
-              <div class="v-info">
-                <span class="v-version">v{{ v.version }}</span>
-                <span class="v-time">{{ v.created_at?.slice(0, 19) || '-' }}</span>
-                <span v-if="v.remark" class="v-remark">{{ v.remark }}</span>
-                <span v-if="i === 0" class="v-latest-tag">最新</span>
-              </div>
-            </div>
-          </div>
-          <div v-if="diffResult" class="diff-panel">
-            <h4>差异对比</h4>
-            <div v-for="(d, di) in diffResult" :key="di" class="diff-item" :class="d.type">
-              <span class="diff-type">{{ d.type === 'added' ? '+' : d.type === 'removed' ? '-' : '~' }}</span>
-              <span>{{ d.path }}</span>
-              <span v-if="d.aType || d.bType">({{ d.aType || '空' }} → {{ d.bType || '空' }})</span>
-            </div>
-          </div>
-          <div class="modal-actions">
-            <button v-if="selectedVersions.length === 2" class="btn btn-outline" @click="diffVersions">对比选中版本</button>
-            <button v-if="selectedVersions.length === 1 && selectedVersions[0] !== 0" class="btn btn-outline" @click="rollbackVersion">回滚到此版本</button>
-            <button class="btn-cancel" @click="showVersions = false; selectedVersions = []; diffResult = null">关闭</button>
-          </div>
-        </div>
-      </div>
-    </Teleport>
+    <VersionHistoryModal
+      v-model="showVersions"
+      :versions="versions"
+      :loading="versionLoading"
+      :diff-result="diffResult"
+      @diff="onDiffVersions"
+      @rollback="onRollbackVersion"
+    />
   </div>
 </template>
 
@@ -156,6 +131,7 @@
 const { confirm } = useConfirm()
 
 import { DIY_COMPONENTS, getComponentByCode } from '~/composables/useDiyComponents'
+import VersionHistoryModal from '~/components/diy/VersionHistoryModal.vue'
 
 
 const route = useRoute()
@@ -317,7 +293,7 @@ async function publishPage() {
 }
 
 watch(showVersions, async (val) => {
-  if (!val) { selectedVersions.value = []; diffResult.value = null; return }
+  if (!val) { diffResult.value = null; return }
   versionLoading.value = true
   try {
     const res: any = await $fetch(`/api/diy/${pageInfo.value.id}/versions`, { credentials: 'include' })
@@ -326,31 +302,22 @@ watch(showVersions, async (val) => {
   versionLoading.value = false
 })
 
-function toggleVersionSelect(i: number) {
-  const idx = selectedVersions.value.indexOf(i)
-  if (idx >= 0) { selectedVersions.value.splice(idx, 1); diffResult.value = null }
-  else if (selectedVersions.value.length < 2) { selectedVersions.value.push(i); diffResult.value = null }
-  else { selectedVersions.value = [selectedVersions.value[1], i]; diffResult.value = null }
-}
-
-async function diffVersions() {
-  if (selectedVersions.value.length !== 2) return
-  const [a, b] = selectedVersions.value.sort((x, y) => x - y)
+async function onDiffVersions(a: number, b: number) {
+  const [vA, vB] = [a, b].sort((x, y) => x - y)
   try {
     const res: any = await $fetch(`/api/diy/${pageInfo.value.id}/versions/diff`, {
-      method: 'POST', body: { versionA: versions.value[a].version, versionB: versions.value[b].version }, credentials: 'include',
+      method: 'POST', body: { versionA: versions.value[vA].version, versionB: versions.value[vB].version }, credentials: 'include',
     })
     diffResult.value = res?.data?.diff || []
   } catch { toast.error('对比失败') }
 }
 
-async function rollbackVersion() {
-  const idx = selectedVersions.value[0]
+async function onRollbackVersion(idx: number) {
   const v = versions.value[idx]
   if (!await confirm({ message: `确定回滚到版本 v${v.version}？当前未保存的更改将丢失。` })) return
   try {
     await $fetch(`/api/diy/${pageInfo.value.id}/versions/${v.version}/rollback`, { method: 'POST', credentials: 'include' })
-    showVersions.value = false; selectedVersions.value = []; diffResult.value = null
+    showVersions.value = false; diffResult.value = null
     await loadPage()
     dirty.value = false
     toast.success('已回滚')
@@ -454,30 +421,4 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 .btn-icon-btn:disabled { opacity: .3; cursor: not-allowed; }
 .btn-ghost { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 13px; }
 
-/* ── 版本历史 Modal ── */
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 5000; display: flex; align-items: center; justify-content: center; }
-.modal { background: var(--bg-card); border-radius: 12px; padding: 24px; width: 90%; max-width: 520px; max-height: 80vh; overflow-y: auto; box-shadow: 0 12px 40px rgba(0,0,0,0.15); }
-.modal h3 { font-size: 17px; font-weight: 600; margin-bottom: 16px; color: var(--text-primary); }
-.v-loading, .v-empty { text-align: center; padding: 32px; color: var(--text-muted); font-size: 14px; }
-.version-list { display: flex; flex-direction: column; gap: 2px; max-height: 320px; overflow-y: auto; margin-bottom: 16px; }
-.version-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px 12px; border-radius: 8px; cursor: pointer; transition: background .15s; border: 1px solid transparent; }
-.version-item:hover { background: var(--bg-hover); }
-.version-item.selected { background: var(--brand-light); border-color: var(--brand); }
-.v-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border); margin-top: 5px; flex-shrink: 0; }
-.v-dot.latest { background: var(--success); }
-.v-info { flex: 1; display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; }
-.v-version { font-weight: 600; font-size: 13px; color: var(--text-primary); }
-.v-time { font-size: 12px; color: var(--text-muted); }
-.v-remark { font-size: 12px; color: var(--text-secondary); }
-.v-latest-tag { padding: 0 6px; border-radius: 3px; background: var(--success); color: #fff; font-size: 10px; font-weight: 600; }
-.diff-panel { border-top: 1px solid var(--border-light); padding-top: 12px; margin-bottom: 12px; }
-.diff-panel h4 { font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--text-secondary); }
-.diff-item { display: flex; gap: 8px; padding: 4px 0; font-size: 12px; }
-.diff-item.added { color: var(--success); }
-.diff-item.removed { color: var(--danger); }
-.diff-item.modified { color: var(--warning); }
-.diff-type { font-weight: 700; width: 16px; }
-.modal-actions { display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end; }
-.btn-cancel { padding: 8px 20px; border: 1px solid var(--input-border); border-radius: 6px; background: var(--bg-card); color: var(--text-primary); cursor: pointer; font-size: 13px; }
-.btn-cancel:hover { border-color: var(--text-muted); }
 </style>

@@ -9,7 +9,7 @@
     <!-- Type Tabs -->
     <div class="type-tabs">
       <button
-        v-for="tab in tabs"
+        v-for="tab in posterTabs"
         :key="tab.key"
         :class="['tab-btn', { active: activeTab === tab.key }]"
         @click="switchTab(tab.key)"
@@ -108,41 +108,16 @@
       </div>
 
       <!-- Right: Preview Panel -->
-      <div class="preview-panel">
-        <div v-if="!results.length && !generating" class="preview-placeholder">
-          <div class="placeholder-icon">🖼️</div>
-          <p>输入描述，点击"生成海报"开始创作</p>
-        </div>
-
-        <!-- Loading State -->
-        <div v-if="generating" class="generating-state">
-          <div class="generating-skeleton"></div>
-          <p class="generating-text">{{ jobStatusText }}</p>
-        </div>
-
-        <!-- Results -->
-        <div v-if="results.length" class="results-grid">
-          <div
-            v-for="(item, idx) in results"
-            :key="idx"
-            class="result-card"
-            :style="{ aspectRatio: currentSize.ratio.replace(':', '/') }"
-          >
-            <img loading="lazy" v-if="item.url" :src="item.url" :alt="`海报结果 ${idx + 1}`" class="result-img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
-            <div v-else class="result-placeholder">生成中...</div>
-            <div class="result-actions">
-              <button class="btn-icon" title="下载" aria-label="下载海报" @click="downloadImage(item.url)">⬇</button>
-              <button class="btn-icon" title="复制" aria-label="复制海报" @click="copyImage(item.url)">📋</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Error State -->
-        <div v-if="errorMsg" class="error-state">
-          <p>{{ errorMsg }}</p>
-          <button class="btn btn-outline" @click="retry">重试</button>
-        </div>
-      </div>
+      <PosterPreviewPanel
+        :results="results"
+        :generating="generating"
+        :error="errorMsg"
+        :status-text="jobStatusText"
+        :size="currentSize"
+        @retry="retry"
+        @download="downloadImage"
+        @copy="copyImage"
+      />
     </div>
   </div>
 </template>
@@ -150,145 +125,79 @@
 <script setup lang="ts">
 
 import SmartRecognitionPanel from '~/components/shared/SmartRecognitionPanel.vue'
-;
+import PosterPreviewPanel from '~/components/work/PosterPreviewPanel.vue'
+import { posterTabs, posterTemplates, posterStyleDefaults, posterSizes } from '~/data/posterData'
 
-const { config } = useSiteConfig('page.poster');
+const { config } = useSiteConfig('page.poster')
 
-const tabs = [
-  { key: 'product', icon: '🛍️', label: '产品营销', placeholder: '描述产品特性、促销信息、目标人群...' },
-  { key: 'holiday', icon: '🎉',   label: '节日海报', placeholder: '描述节日主题、祝福语、氛围风格...' },
-  { key: 'event',   icon: '📢',   label: '活动宣传', placeholder: '描述活动内容、优惠力度、时间地点...' },
-  { key: 'private', icon: '💬',   label: '私域运营', placeholder: '描述社群活动、专属福利、品牌调性...' },
-  { key: 'xhs',     icon: '📕',   label: '小红书封面', placeholder: '描述笔记主题、风格调性、文字内容...' },
-  { key: 'wechat',  icon: '💚',   label: '公众号封面', placeholder: '描述文章主题、标题文案、视觉风格...' },
-];
-
-const TEMPLATES = {
-  product: [
-    { label: '新品首发', prompt: '3C数码新品发布会海报，科技感蓝色调，产品居中展示，光影效果，大字标题"重磅首发"' },
-    { label: '限时秒杀', prompt: '电商限时秒杀海报，红色促销风格，倒计时元素，价格醒目，紧迫感设计' },
-    { label: '爆款返场', prompt: '热销爆款返场海报，金色质感，网红种草风格，产品使用场景展示' },
-  ],
-  holiday: [
-    { label: '春节营销', prompt: '春节年货促销海报，中国红主色调，传统纹样，福字元素，温馨团圆氛围' },
-    { label: '双十一', prompt: '双十一狂欢节海报，炫酷霓虹灯光效，促销数字醒目，潮流年轻化设计' },
-    { label: '中秋团圆', prompt: '中秋节海报，月圆桂花元素，暖金色调，团圆祝福文案，典雅中国风' },
-  ],
-  event: [
-    { label: '品牌周年庆', prompt: '品牌周年庆典海报，金色质感设计，时间线展示品牌历程，感恩回馈主题' },
-    { label: '直播预告', prompt: '直播带货预告海报，产品主图居中，主播形象，时间/福利信息清晰分层' },
-    { label: '新品发布会', prompt: '新品发布会倒计时海报，极简科技风格，产品剪影悬念设计，日期醒目' },
-  ],
-  private: [
-    { label: '社群福利', prompt: '私域社群专属福利海报，温暖亲切色调，会员专属标识，扫码入群引导' },
-    { label: '会员日', prompt: '会员日专享海报，VIP尊贵感设计，专属优惠信息，品牌调性统一' },
-    { label: '朋友圈推广', prompt: '朋友圈分享海报，生活方式美学，产品场景化展示，信任背书文案' },
-  ],
-  xhs: [
-    { label: '好物分享', prompt: '小红书好物分享封面，清新自然光拍摄风，产品平铺展示，种草文案标题' },
-    { label: '穿搭LOOK', prompt: '小红书穿搭封面，时尚街拍风格，OOTD标题，高级感色调，身材友好' },
-    { label: 'VLOG封面', prompt: '小红书VLOG封面，生活方式美学，人像+文字排版，温暖治愈色调' },
-  ],
-  wechat: [
-    { label: '干货文章', prompt: '公众号干货文章封面，简洁信息图风格，标题关键词突出，专业信任感' },
-    { label: '品牌故事', prompt: '公众号品牌故事封面，高级质感摄影风，品牌色调用色，情感共鸣设计' },
-    { label: '活动推文', prompt: '公众号活动推文封面，信息层级清晰，活动主题突出，行动号召引导' },
-  ],
-};
-
-const activeTab = ref('product');
+const activeTab = ref('product')
 const { download } = useFileDownload()
-const prompt = ref('');
-const styleOverride = ref('');
-const enhancedPrompt = ref('');
-const enhancing = ref(false);
-const submitting = ref(false);
-const generating = ref(false);
-const errorMsg = ref('');
-const results = ref([]);
+const prompt = ref('')
+const styleOverride = ref('')
+const enhancedPrompt = ref('')
+const enhancing = ref(false)
+const submitting = ref(false)
+const generating = ref(false)
+const errorMsg = ref('')
+const results = ref<{ url: string }[]>([])
 
-let pollTimer = null;
+let pollTimer: ReturnType<typeof setInterval> | null = null
 
-const currentTab = computed(() => tabs.find(t => t.key === activeTab.value));
-const currentTemplates = computed(() => TEMPLATES[activeTab.value] || []);
-const currentStyle = computed(() => {
-  const m = {
-    product: '电商营销风格，突出产品卖点与优惠信息，设计感强',
-    holiday: '节日氛围浓厚，色彩鲜明，传统文化与现代设计融合',
-    event: '大型活动促销风格，信息层级清晰，视觉冲击力强',
-    private: '私域社交风格，亲切温馨，突出信任感与专属福利',
-    xhs: '小红书生活方式美学风格，清新自然，种草感强',
-    wechat: '公众号头图风格，简洁有力，适合信息流浏览',
-  };
-  return m[activeTab.value] || '';
-});
+const currentTab = computed(() => posterTabs.find(t => t.key === activeTab.value)!)
+const currentTemplates = computed(() => posterTemplates[activeTab.value] || [])
+const currentStyle = computed(() => posterStyleDefaults[activeTab.value] || '')
+const currentSize = computed(() => posterSizes[activeTab.value])
 
-const pageTitle = computed(() => config.value?.page_title || '海报与封面生成');
-
-// Size info fetched from API or fallback
-const sizeMap = {
-  product: { width: 1200, height: 1800, ratio: '2:3', label: '产品营销海报' },
-  holiday: { width: 1200, height: 1800, ratio: '2:3', label: '节日海报' },
-  event: { width: 1920, height: 1080, ratio: '16:9', label: '活动宣传海报' },
-  private: { width: 1080, height: 1920, ratio: '9:16', label: '私域运营海报' },
-  xhs: { width: 1080, height: 1440, ratio: '3:4', label: '小红书封面' },
-  wechat: { width: 900, height: 383, ratio: '2.35:1', label: '公众号封面' },
-};
-
-const currentSize = computed(() => sizeMap[activeTab.value]);
+const pageTitle = computed(() => config.value?.page_title || '海报与封面生成')
 
 const jobStatusText = computed(() => {
-  if (!generating.value) return '';
-  return 'AI 正在为您创作海报，请稍候...';
-});
+  if (!generating.value) return ''
+  return 'AI 正在为您创作海报，请稍候...'
+})
 
-function switchTab(key) {
-  activeTab.value = key;
-  resetState();
+function switchTab(key: string) {
+  activeTab.value = key
+  resetState()
 }
 
-function applyTemplate(tpl) {
-  prompt.value = tpl.prompt;
-  enhancedPrompt.value = '';
+function applyTemplate(tpl: { prompt: string }) {
+  prompt.value = tpl.prompt
+  enhancedPrompt.value = ''
 }
 
 function onPromptChange() {
-  if (enhancedPrompt.value) {
-    enhancedPrompt.value = '';
-  }
+  if (enhancedPrompt.value) enhancedPrompt.value = ''
 }
 
 async function enhancePrompt() {
-  if (!prompt.value.trim()) return;
-  enhancing.value = true;
+  if (!prompt.value.trim()) return
+  enhancing.value = true
   try {
-    const resp = await $fetch('/api/posters/enhance-prompt', {
+    const resp: any = await $fetch('/api/posters/enhance-prompt', {
       method: 'POST',
       body: { prompt: prompt.value.trim(), posterType: activeTab.value },
       credentials: 'include',
-    });
-    enhancedPrompt.value = resp.data?.enhanced_prompt || resp.enhanced_prompt || prompt.value;
+    })
+    enhancedPrompt.value = resp.data?.enhanced_prompt || resp.enhanced_prompt || prompt.value
     if (enhancedPrompt.value === prompt.value) {
-      toast.warning('润色服务暂不可用，将使用原始描述');
+      toast.warning('润色服务暂不可用，将使用原始描述')
     }
-  } catch (e) {
-    toast.error('提示词润色失败，将使用原始描述');
-    enhancedPrompt.value = prompt.value;
+  } catch {
+    toast.error('提示词润色失败，将使用原始描述')
+    enhancedPrompt.value = prompt.value
   } finally {
-    enhancing.value = false;
+    enhancing.value = false
   }
 }
 
-function discardEnhance() {
-  enhancedPrompt.value = '';
-}
+function discardEnhance() { enhancedPrompt.value = '' }
 
 async function submitTask() {
-  if (!prompt.value.trim() || submitting.value) return;
-  submitting.value = true;
-  generating.value = true;
-  errorMsg.value = '';
-  results.value = [];
+  if (!prompt.value.trim() || submitting.value) return
+  submitting.value = true
+  generating.value = true
+  errorMsg.value = ''
+  results.value = []
 
   try {
     const body = {
@@ -296,108 +205,102 @@ async function submitTask() {
       prompt: prompt.value.trim(),
       enhancedPrompt: enhancedPrompt.value || undefined,
       style: styleOverride.value.trim() || undefined,
-    };
-    const resp = await $fetch('/api/posters/generate', {
-      method: 'POST',
-      body,
-      credentials: 'include',
-    });
-    startPolling(resp.job_id);
-  } catch (e) {
-    errorMsg.value = e.data?.message || '海报生成失败，请重试';
-    generating.value = false;
+    }
+    const resp: any = await $fetch('/api/posters/generate', {
+      method: 'POST', body, credentials: 'include',
+    })
+    startPolling(resp.job_id)
+  } catch (e: any) {
+    errorMsg.value = e.data?.message || '海报生成失败，请重试'
+    generating.value = false
   } finally {
-    submitting.value = false;
+    submitting.value = false
   }
 }
 
-function startPolling(jobId) {
-  let pollCount = 0;
-  let failCount = 0;
-  const MAX_POLL = 40;
-  const MAX_FAILS = 5;
-  clearInterval(pollTimer);
+function startPolling(jobId: string) {
+  let pollCount = 0
+  let failCount = 0
+  const MAX_POLL = 40
+  const MAX_FAILS = 5
+  clearInterval(pollTimer!)
   pollTimer = setInterval(async () => {
-    pollCount++;
+    pollCount++
     if (pollCount > MAX_POLL) {
-      clearInterval(pollTimer);
-      generating.value = false;
-      errorMsg.value = '任务超时，请刷新页面查看结果';
-      return;
+      clearInterval(pollTimer!)
+      generating.value = false
+      errorMsg.value = '任务超时，请刷新页面查看结果'
+      return
     }
     try {
-      const resp = await $fetch(`/api/job/${jobId}`, { credentials: 'include' });
-      const job = resp.data || resp;
-      failCount = 0;
+      const resp: any = await $fetch(`/api/job/${jobId}`, { credentials: 'include' })
+      const job = resp.data || resp
+      failCount = 0
       if (job.status === 'completed') {
-        clearInterval(pollTimer);
-        generating.value = false;
-        results.value = (job.result?.images || job.result?.urls || []).map(u => ({ url: u }));
+        clearInterval(pollTimer!)
+        generating.value = false
+        results.value = (job.result?.images || job.result?.urls || []).map((u: string) => ({ url: u }))
         if (!results.value.length && job.result?.url) {
-          results.value = [{ url: job.result.url }];
+          results.value = [{ url: job.result.url }]
         }
       } else if (job.status === 'failed') {
-        clearInterval(pollTimer);
-        generating.value = false;
-        errorMsg.value = job.error || '生成失败';
+        clearInterval(pollTimer!)
+        generating.value = false
+        errorMsg.value = job.error || '生成失败'
       }
     } catch {
-      failCount++;
+      failCount++
       if (failCount >= MAX_FAILS) {
-        clearInterval(pollTimer);
-        generating.value = false;
-        errorMsg.value = '网络不稳定，查询任务状态失败，请刷新查看结果';
+        clearInterval(pollTimer!)
+        generating.value = false
+        errorMsg.value = '网络不稳定，查询任务状态失败，请刷新查看结果'
       }
     }
-  }, 3000);
+  }, 3000)
 }
 
-function retry() {
-  errorMsg.value = '';
-  submitTask();
+function retry() { errorMsg.value = ''; submitTask() }
+
+function downloadImage(url: string) {
+  if (!url) return
+  download(url, `poster_${activeTab.value}_${Date.now()}.png`)
 }
 
-function downloadImage(url) {
-  if (!url) return;
-  download(url, `poster_${activeTab.value}_${Date.now()}.png`);
-}
-
-async function copyImage(url) {
-  if (!url) return;
-  if (!process.client) return;
+async function copyImage(url: string) {
+  if (!url) return
+  if (!import.meta.client) return
   try {
     if (navigator.clipboard && typeof ClipboardItem !== 'undefined') {
-      const resp = await fetch(url);
-      const blob = await resp.blob();
-      await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
-      toast.success('已复制到剪贴板');
+      const resp = await fetch(url)
+      const blob = await resp.blob()
+      await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })])
+      toast.success('已复制到剪贴板')
     } else {
-      window.open(url, '_blank', 'noopener,noreferrer');
+      window.open(url, '_blank', 'noopener,noreferrer')
     }
   } catch {
-    window.open(url, '_blank', 'noopener,noreferrer');
+    window.open(url, '_blank', 'noopener,noreferrer')
   }
 }
 
 function resetState() {
-  prompt.value = '';
-  styleOverride.value = '';
-  enhancedPrompt.value = '';
-  results.value = [];
-  errorMsg.value = '';
-  generating.value = false;
-  clearInterval(pollTimer);
+  prompt.value = ''
+  styleOverride.value = ''
+  enhancedPrompt.value = ''
+  results.value = []
+  errorMsg.value = ''
+  generating.value = false
+  clearInterval(pollTimer!)
 }
 
-const toast = useToast();
+const toast = useToast()
 
-onBeforeUnmount(() => {
-  clearInterval(pollTimer);
-});
+onBeforeUnmount(() => { clearInterval(pollTimer!) })
 
 function onSmartApply(info: { productName: string; category: string; features: string[]; refUrl: string }) {
   prompt.value = `${info.productName}（${info.category}）\n核心卖点：${info.features.join('、')}\n目标风格：专业电商展示，高清细节，干净背景`
 }
+
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
@@ -448,26 +351,7 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 .enhanced-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 12px; font-weight: 600; color: var(--brand); }
 .enhanced-text { margin: 0; font-size: 13px; color: var(--text-primary); line-height: 1.6; }
 
-.preview-panel { min-height: 400px; }
-.preview-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 400px; color: var(--text-tertiary); border: 2px dashed var(--border-color); border-radius: 12px; }
-.placeholder-icon { font-size: 48px; margin-bottom: 12px; }
-
-.generating-state { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 60px 0; }
-.generating-skeleton { width: 100%; height: 300px; background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-hover) 50%, var(--bg-card) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 12px; }
-.generating-text { color: var(--text-secondary); font-size: 14px; }
-
-.results-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; }
-.result-card { position: relative; border-radius: 12px; overflow: hidden; background: var(--bg-card); border: 1px solid var(--border-color); }
-.result-img { width: 100%; height: 100%; object-fit: cover; }
-.result-placeholder { display: flex; align-items: center; justify-content: center; height: 100%; color: var(--text-tertiary); }
-.result-actions { position: absolute; bottom: 8px; right: 8px; display: flex; gap: 4px; opacity: 0; transition: opacity 0.2s; }
-.result-card:hover .result-actions { opacity: 1; }
-.btn-icon { width: 32px; height: 32px; border-radius: 6px; border: none; background: rgba(0,0,0,0.6); color: #fff; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
-
-.error-state { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 60px 0; color: var(--text-secondary); }
-
 @keyframes spin { to { transform: rotate(360deg); } }
-@keyframes shimmer { to { background-position: -200% 0; } }
 
 /* Dark mode */
 :root[data-theme="dark"] .tab-btn { background: var(--bg-card); }
