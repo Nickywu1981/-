@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const { mockSvc } = vi.hoisted(() => ({
   mockSvc: {
@@ -30,14 +30,14 @@ describe('automationController', () => {
 
   it('cancelTask succeeds', async () => {
     mockSvc.cancelTask.mockResolvedValue();
-    await ctrl.cancelTask({ params: { id: '5' }, user: { id: 1 } });
-    expect(mockSvc.cancelTask).toHaveBeenCalledWith('5', 1);
+    await ctrl.cancelTask({ params: { id: '5' }, user: { id: 1, tenantId: 1 } });
+    expect(mockSvc.cancelTask).toHaveBeenCalledWith('5', 1, 1);
   });
 
   it('executeTask triggers execution', async () => {
     mockSvc.executeTask.mockResolvedValue({ status: 'running' });
-    await ctrl.executeTask({ params: { taskId: '3' }, user: { id: 1 } });
-    expect(mockSvc.executeTask).toHaveBeenCalledWith('3', 1);
+    await ctrl.executeTask({ params: { taskId: '3' }, user: { id: 1, tenantId: 1 } });
+    expect(mockSvc.executeTask).toHaveBeenCalledWith('3', 1, 1);
   });
 
   it('listAccounts returns list', async () => {
@@ -54,7 +54,7 @@ describe('automationController', () => {
 
   it('deleteAccount succeeds', async () => {
     mockSvc.deleteAccount.mockResolvedValue();
-    await ctrl.deleteAccount({ params: { id: '2' }, user: { id: 1 } });
-    expect(mockSvc.deleteAccount).toHaveBeenCalledWith('2', 1);
+    await ctrl.deleteAccount({ params: { id: '2' }, user: { id: 1, tenantId: 1 } });
+    expect(mockSvc.deleteAccount).toHaveBeenCalledWith('2', 1, 1);
   });
 });

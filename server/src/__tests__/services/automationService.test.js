@@ -1,5 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+const { mockEncrypt } = vi.hoisted(() => {
+  return { mockEncrypt: vi.fn((_text) => 'a1b2c3:d4e5f6:a7b8c9d0e1f2') };
+});
+
 const mockDao = {
   listTasks: vi.fn(),
   createTask: vi.fn(),
@@ -13,6 +17,7 @@ const mockDao = {
   listAllTasks: vi.fn(),
 };
 
+vi.mock('../../utils/crypto.js', () => ({ encrypt: mockEncrypt }));
 vi.mock('../../dao/automationDao.js', () => ({ default: mockDao }));
 
 const {
@@ -51,7 +56,7 @@ describe('automationService', () => {
     it('throws 400 for invalid taskType', async () => {
       await expect(
         createTask('u1', 't1', { taskType: 'bad_type' }),
-      ).rejects.toMatchObject({ message: '无效的任务类型', status: 400 });
+      ).rejects.toMatchObject({ status: 4202 });
     });
 
     it('accepts all 5 valid taskTypes', async () => {
@@ -73,7 +78,7 @@ describe('automationService', () => {
     it('throws 400 when cancel returns falsy', async () => {
       mockDao.cancelTask.mockResolvedValue(false);
       await expect(cancelTask(99, 'u1')).rejects.toMatchObject({
-        message: '任务不存在或不可取消', status: 400,
+        status: 4101,
       });
     });
   });
@@ -83,7 +88,7 @@ describe('automationService', () => {
     it('throws 404 when task not found', async () => {
       mockDao.getTaskById.mockResolvedValue(null);
       await expect(executeTask(999)).rejects.toMatchObject({
-        message: '任务不存在', status: 404,
+        status: 4101,
       });
     });
 
@@ -139,19 +144,19 @@ describe('automationService', () => {
     it('throws 400 when platform is missing', async () => {
       await expect(
         createAccount('u1', 't1', { username: 'u', password: 'p' }),
-      ).rejects.toMatchObject({ message: '平台、用户名和密码不能为空', status: 400 });
+      ).rejects.toMatchObject({ status: 4201 });
     });
 
     it('throws 400 when username is missing', async () => {
       await expect(
         createAccount('u1', 't1', { platform: 'taobao', password: 'p' }),
-      ).rejects.toMatchObject({ message: '平台、用户名和密码不能为空', status: 400 });
+      ).rejects.toMatchObject({ status: 4201 });
     });
 
     it('throws 400 when password is missing', async () => {
       await expect(
         createAccount('u1', 't1', { platform: 'taobao', username: 'u' }),
-      ).rejects.toMatchObject({ message: '平台、用户名和密码不能为空', status: 400 });
+      ).rejects.toMatchObject({ status: 4201 });
     });
 
     it('AES-encrypts password before DAO call', async () => {
@@ -175,8 +180,8 @@ describe('automationService', () => {
   describe('deleteAccount', () => {
     it('delegates to DAO and returns true', async () => {
       mockDao.deleteAccount.mockResolvedValue();
-      const result = await deleteAccount(5, 'u1');
-      expect(mockDao.deleteAccount).toHaveBeenCalledWith(5, 'u1');
+      const result = await deleteAccount(5, 'u1', 't1');
+      expect(mockDao.deleteAccount).toHaveBeenCalledWith(5, 'u1', 't1');
       expect(result).toBe(true);
     });
   });
