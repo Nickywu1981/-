@@ -24,6 +24,10 @@ const publishSchema = z.object({
   price: z.number().positive().optional(),
 });
 
+const unbindSchema = z.object({
+  platform: z.enum(['taobao', 'jd', 'pdd', 'douyin', 'kuaishou', 'shopee']),
+});
+
 // GET /api/platform-publish/platforms
 router.get('/platforms', platformPublishController.getPlatforms);
 
@@ -34,7 +38,7 @@ router.get('/bindings', platformPublishController.getMyBindings);
 router.post('/bind', apiLimiter, _validate(bindSchema), platformPublishController.bindPlatform);
 
 // DELETE /api/platform-publish/unbind/:platform
-router.delete('/unbind/:platform', apiLimiter, platformPublishController.unbind);
+router.delete('/unbind/:platform', apiLimiter, _validate(unbindSchema, 'params'), platformPublishController.unbind);
 
 // POST /api/platform-publish/publish
 router.post('/publish', apiLimiter, _validate(publishSchema), platformPublishController.publish);

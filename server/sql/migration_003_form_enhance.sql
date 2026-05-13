@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS `diy_custom_field` (
   KEY `idx_form` (`form_id`),
   KEY `idx_tenant` (`tenant_id`),
   KEY `idx_sort` (`form_id`,`sort_order`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='自定义表单字段配置';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='自定义表单字段配置';
 
 -- 自定义模块表（编辑器组件模块定义）
 CREATE TABLE IF NOT EXISTS `diy_custom_module` (
@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS `diy_custom_module` (
   KEY `idx_page` (`page_id`),
   KEY `idx_tenant` (`tenant_id`),
   KEY `idx_code` (`module_code`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='DIY自定义功能模块';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='DIY自定义功能模块';
 
 -- 自定义事件/动作表
 CREATE TABLE IF NOT EXISTS `diy_custom_action` (
@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS `diy_custom_action` (
   KEY `idx_module` (`module_id`),
   KEY `idx_page` (`page_id`),
   KEY `idx_tenant` (`tenant_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='DIY自定义事件配置';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='DIY自定义事件配置';
 
 -- 表单提交记录增强
 ALTER TABLE `custom_form_submission`

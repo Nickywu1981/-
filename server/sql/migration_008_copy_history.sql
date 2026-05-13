@@ -15,4 +15,4 @@ CREATE TABLE IF NOT EXISTS `copy_history` (
   KEY `idx_user_type` (`user_id`, `type`),
   KEY `idx_tenant` (`tenant_id`),
   KEY `idx_created` (`created_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='文案生成历史';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='文案生成历史';

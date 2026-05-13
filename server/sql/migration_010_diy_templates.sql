@@ -21,4 +21,4 @@ CREATE TABLE IF NOT EXISTS `diy_template` (
   INDEX `idx_industry` (`industry`),
   INDEX `idx_status_tenant` (`status`, `tenant_id`),
   INDEX `idx_use_count` (`use_count` DESC)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='DIY页面模板库';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='DIY页面模板库';

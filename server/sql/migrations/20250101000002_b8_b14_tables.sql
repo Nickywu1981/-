@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `tenant` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `code` (`code`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='租户表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='租户表';
 
 -- DIY页面
 CREATE TABLE IF NOT EXISTS `diy_page` (
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS `diy_page` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_slug_tenant` (`slug`,`tenant_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='DIY页面';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='DIY页面';
 
 CREATE TABLE IF NOT EXISTS `diy_component` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS `diy_component` (
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_code` (`component_code`,`tenant_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='DIY组件库';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='DIY组件库';
 
 CREATE TABLE IF NOT EXISTS `diy_page_version` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS `diy_page_version` (
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `idx_page` (`page_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='DIY页面版本';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='DIY页面版本';
 
 -- 自定义表单
 CREATE TABLE IF NOT EXISTS `custom_form` (
@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS `custom_form` (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_code` (`form_code`,`tenant_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='自定义表单';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='自定义表单';
 
 CREATE TABLE IF NOT EXISTS `custom_form_submission` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS `custom_form_submission` (
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `idx_form` (`form_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='表单提交记录';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='表单提交记录';
 
 -- API代理
 CREATE TABLE IF NOT EXISTS `api_proxy_config` (
@@ -123,7 +123,7 @@ CREATE TABLE IF NOT EXISTS `api_proxy_config` (
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_code` (`proxy_code`,`tenant_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='API代理配置';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='API代理配置';
 
 -- 充值订单
 CREATE TABLE IF NOT EXISTS `recharge_order` (
@@ -143,7 +143,7 @@ CREATE TABLE IF NOT EXISTS `recharge_order` (
   `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `order_no` (`order_no`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='充值订单';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='充值订单';
 
 -- 浏览器自动化
 CREATE TABLE IF NOT EXISTS `automation_account` (
@@ -160,7 +160,7 @@ CREATE TABLE IF NOT EXISTS `automation_account` (
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `idx_user` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='自动化平台账号';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='自动化平台账号';
 
 CREATE TABLE IF NOT EXISTS `automation_task` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -178,7 +178,7 @@ CREATE TABLE IF NOT EXISTS `automation_task` (
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `idx_user` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='自动化任务';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='自动化任务';
 
 -- 提示词模板
 CREATE TABLE IF NOT EXISTS `prompt_template` (
@@ -203,7 +203,7 @@ CREATE TABLE IF NOT EXISTS `prompt_template` (
   `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `template_code` (`template_code`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='AI提示词模板';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='AI提示词模板';
 
 CREATE TABLE IF NOT EXISTS `prompt_group` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -213,7 +213,7 @@ CREATE TABLE IF NOT EXISTS `prompt_group` (
   `sort_order` int DEFAULT '0',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='提示词收藏分组';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='提示词收藏分组';
 
 CREATE TABLE IF NOT EXISTS `prompt_favorite` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -224,7 +224,7 @@ CREATE TABLE IF NOT EXISTS `prompt_favorite` (
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_user_template` (`user_id`,`template_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='提示词模板收藏';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='提示词模板收藏';
 
 -- 敏感词
 CREATE TABLE IF NOT EXISTS `sensitive_word` (
@@ -237,7 +237,7 @@ CREATE TABLE IF NOT EXISTS `sensitive_word` (
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_word` (`word`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='敏感词库';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='敏感词库';
 
 -- 积分幂等日志
 CREATE TABLE IF NOT EXISTS `credit_request_log` (
@@ -254,7 +254,7 @@ CREATE TABLE IF NOT EXISTS `credit_request_log` (
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `request_id` (`request_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='积分请求幂等日志';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='积分请求幂等日志';
 
 -- AI调用日志
 CREATE TABLE IF NOT EXISTS `ai_call_log` (
@@ -278,7 +278,7 @@ CREATE TABLE IF NOT EXISTS `ai_call_log` (
   KEY `idx_user` (`user_id`),
   KEY `idx_model` (`model_id`),
   KEY `idx_time` (`create_time`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='AI调用日志';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='AI调用日志';
 
 -- DOWN
 DROP TABLE IF EXISTS `ai_call_log`;

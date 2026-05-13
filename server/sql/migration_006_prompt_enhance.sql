@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS `prompt_usage_history` (
   PRIMARY KEY (`id`),
   KEY `idx_user_time` (`user_id`, `create_time`),
   KEY `idx_template` (`template_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='提示词使用历史';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='提示词使用历史';
 
 -- 2. 智能推荐缓存表（预计算推荐结果，避免实时重算）
 CREATE TABLE IF NOT EXISTS `prompt_recommendation` (
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `prompt_recommendation` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_user_template_type` (`user_id`, `template_id`, `rec_type`),
   KEY `idx_user_time` (`user_id`, `create_time` DESC)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='提示词推荐结果';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='提示词推荐结果';
 
 -- 3. prompt_template 增强字段
 ALTER TABLE `prompt_template`
@@ -49,4 +49,4 @@ CREATE TABLE IF NOT EXISTS `prompt_rating` (
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_user_template` (`user_id`, `template_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='提示词模板评分';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='提示词模板评分';

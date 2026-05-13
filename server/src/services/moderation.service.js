@@ -53,12 +53,13 @@ export async function moderateText(text, userId, options = {}) {
 export async function moderateImage(imageUrl, userId, options = {}) {
   const { stage = 'output', jobId = null } = options;
 
-  // TODO: W2 接入阿里云绿网图片检测
+  // 阿里云绿网图片检测未接入，采用人工审核兜底策略
+  logger.warn('[Moderation] 图片审核未接入，转人工审核', { imageUrl: String(imageUrl).substring(0, 200) });
   await insertContentAuditLog({
     userId, jobId, auditStage: stage, contentType: 'image',
-    originalText: imageUrl, riskLevel: 'safe', riskTags: [], action: 'pass',
+    originalText: imageUrl, riskLevel: 'review', riskTags: ['manual_review_required'], action: 'review',
   });
-  return { risk_level: 'safe', action: 'pass' };
+  return { risk_level: 'review', action: 'review', risk_tags: ['manual_review_required'] };
 }
 
 /**
@@ -67,10 +68,11 @@ export async function moderateImage(imageUrl, userId, options = {}) {
 export async function moderateVideo(videoUrl, userId, options = {}) {
   const { stage = 'output', jobId = null } = options;
 
-  // TODO: W2 接入阿里云绿网视频检测（截图帧审核流水线）
+  // 阿里云绿网视频检测未接入，采用人工审核兜底策略
+  logger.warn('[Moderation] 视频审核未接入，转人工审核', { videoUrl: String(videoUrl).substring(0, 200) });
   await insertContentAuditLog({
     userId, jobId, auditStage: stage, contentType: 'video',
-    originalText: videoUrl, riskLevel: 'safe', riskTags: [], action: 'pass',
+    originalText: videoUrl, riskLevel: 'review', riskTags: ['manual_review_required'], action: 'review',
   });
-  return { risk_level: 'safe', action: 'pass' };
+  return { risk_level: 'review', action: 'review', risk_tags: ['manual_review_required'] };
 }

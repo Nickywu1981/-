@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS api_proxy_whitelist (
   PRIMARY KEY (id),
   KEY idx_tenant (tenant_id),
   KEY idx_type (domain_type, status)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='API代理白名单';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='API代理白名单';
 
 -- 3. API 调用日志表增强（如已存在则新增字段）
 CREATE TABLE IF NOT EXISTS api_proxy_log (
@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS api_proxy_log (
   KEY idx_proxy (proxy_id, create_time),
   KEY idx_tenant (tenant_id, create_time),
   KEY idx_time (create_time)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='API代理调用日志';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='API代理调用日志';
 
 -- 4. 预填常用 AI/电商 API 白名单
 INSERT IGNORE INTO api_proxy_whitelist (tenant_id, domain_pattern, domain_type, description) VALUES
