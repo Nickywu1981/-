@@ -19,7 +19,7 @@ describe('userService', () => {
     it('用户名已存在抛出错误', async () => {
       userDao.findByUsername.mockResolvedValue({ id: 1, username: 'u1' });
       await expect(userService.register({ username: 'u1', password: 'p1', nickname: 'n1' }))
-        .rejects.toThrow('用户名已存在');
+        .rejects.toMatchObject({ status: 4001 });
     });
 
     it('成功注册返回用户信息', async () => {
@@ -36,21 +36,21 @@ describe('userService', () => {
     it('用户不存在抛出错误', async () => {
       userDao.findByUsername.mockResolvedValue(null);
       await expect(userService.login({ username: 'u1', password: 'p1' }))
-        .rejects.toThrow('用户名或密码错误');
+        .rejects.toMatchObject({ status: 4003 });
     });
 
     it('账号被禁用抛出错误', async () => {
       userDao.findByUsername.mockResolvedValue({ id: 1, username: 'u1', password: 'hash', status: 'disabled' });
       bcrypt.compare.mockResolvedValue(true);
       await expect(userService.login({ username: 'u1', password: 'p1' }))
-        .rejects.toThrow('账号已被禁用');
+        .rejects.toMatchObject({ status: 4006 });
     });
 
     it('密码错误抛出错误', async () => {
       userDao.findByUsername.mockResolvedValue({ id: 1, username: 'u1', password: 'hash', status: 'active' });
       bcrypt.compare.mockResolvedValue(false);
       await expect(userService.login({ username: 'u1', password: 'wrong' }))
-        .rejects.toThrow('用户名或密码错误');
+        .rejects.toMatchObject({ status: 4003 });
     });
 
     it('登录成功返回 token 和用户', async () => {
@@ -68,7 +68,7 @@ describe('userService', () => {
   describe('getProfile', () => {
     it('用户不存在抛出 404', async () => {
       userDao.findById.mockResolvedValue(null);
-      await expect(userService.getProfile(99)).rejects.toThrow('用户不存在');
+      await expect(userService.getProfile(99)).rejects.toMatchObject({ status: 4002 });
     });
 
     it('返回用户信息', async () => {
