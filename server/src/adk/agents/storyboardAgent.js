@@ -47,7 +47,8 @@ const viralAnalyzeTool = new FunctionTool('analyze_viral_video', async (params) 
   const jsonMatch = raw.match(/\{[\s\S]*\}/);
   try {
     return jsonMatch ? JSON.parse(jsonMatch[0]) : { viralFormula: '分析失败，请提供更清晰的视频描述' };
-  } catch {
+  } catch (e) {
+    logger.warn('[StoryboardAgent] Viral analysis parse failed', { error: e.message });
     return { viralFormula: '分析结果解析失败' };
   }
 }, {
@@ -100,7 +101,8 @@ ${params.viralInsight ? `爆款参考: ${params.viralInsight}` : ''}
   const jsonMatch = raw.match(/\{[\s\S]*\}/);
   try {
     return jsonMatch ? JSON.parse(jsonMatch[0]) : null;
-  } catch {
+  } catch (e) {
+    logger.warn('[StoryboardAgent] Script parse failed', { error: e.message });
     return null;
   }
 }, {
@@ -118,7 +120,7 @@ const storyboardTool = new FunctionTool('generate_storyboard_images', async (par
   const { gatewayInfer } = await import('../../gateway/aiGatewayHub.js');
 
   let scenes = [];
-  try { scenes = typeof params.scenes === 'string' ? JSON.parse(params.scenes) : (params.scenes || []); } catch {}
+  try { scenes = typeof params.scenes === 'string' ? JSON.parse(params.scenes) : (params.scenes || []); } catch (e) { logger.warn('[StoryboardAgent] Scenes parse failed', { error: e.message }); }
 
   const results = await Promise.allSettled(scenes.map(scene =>
     gatewayInfer('gpt-image-2', {

@@ -1,9 +1,9 @@
 <template>
   <Teleport to="body">
     <div v-if="visible" class="lightbox-overlay" @click.self="close" @keydown.esc="close" tabindex="0" ref="overlay">
-      <button class="lightbox-close" @click="close" aria-label="关闭">✕</button>
-      <button v-if="hasPrev" class="lightbox-nav lightbox-prev" @click.stop="prev" aria-label="上一张">‹</button>
-      <button v-if="hasNext" class="lightbox-nav lightbox-next" @click.stop="next" aria-label="下一张">›</button>
+      <button class="lightbox-close" @click="close" :aria-label="t('lightbox.close', '关闭')">✕</button>
+      <button v-if="hasPrev" class="lightbox-nav lightbox-prev" @click.stop="prev" :aria-label="t('lightbox.prev', '上一张')">‹</button>
+      <button v-if="hasNext" class="lightbox-nav lightbox-next" @click.stop="next" :aria-label="t('lightbox.next', '下一张')">›</button>
       <div class="lightbox-body" @click.stop>
         <img :src="currentSrc" :alt="currentAlt" @load="loaded = true" />
         <div v-if="currentTitle" class="lightbox-caption">{{ currentTitle }}</div>
@@ -11,7 +11,7 @@
       </div>
       <div v-if="images.length > 1" class="lightbox-thumb-strip">
         <div v-for="(img, i) in images" :key="i" class="lightbox-thumb" :class="{ active: i === index }" @click.stop="jump(i)">
-          <img :src="typeof img === 'string' ? img : img.src" :alt="`缩略图 ${i + 1}`" />
+          <img :src="typeof img === 'string' ? img : img.src" :alt="t('lightbox.thumbnail', { n: i + 1 }, `缩略图 ${i + 1}`)" />
         </div>
       </div>
     </div>
@@ -20,6 +20,8 @@
 
 <script setup lang="ts">
 interface ImageItem { src: string; alt?: string; title?: string }
+
+const { t } = useI18n();
 
 const visible = ref(false);
 const index = ref(0);

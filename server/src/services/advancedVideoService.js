@@ -32,7 +32,7 @@ async function processVoiceGen(taskId, userId, params) {
       size: `${Math.round(estimatedDuration * 16)} KB`, format: 'mp3', voiceType: params.voiceType,
       textPreview: params.text.slice(0, 50) + (params.text.length > 50 ? '...' : ''),
     }});
-  } catch (err) { await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }); }
+  } catch (err) { logger.error('[AdvancedVideo] Task failed', { taskId, error: err.message }); await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }).catch(e => logger.error('[AdvancedVideo] Status update failed', { taskId, error: e.message })); }
 }
 
 // ==================== 声音克隆 ====================
@@ -56,7 +56,7 @@ async function processVoiceClone(taskId, userId, params) {
       audioUrl: result.output?.audioUrl || `/api/audio/${taskId}_clone.mp3`, duration: estimatedDuration,
       size: `${Math.round(estimatedDuration * 16)} KB`, format: 'mp3', similarity: result.output?.similarity || '90%',
     }});
-  } catch (err) { await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }); }
+  } catch (err) { logger.error('[AdvancedVideo] Task failed', { taskId, error: err.message }); await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }).catch(e => logger.error('[AdvancedVideo] Status update failed', { taskId, error: e.message })); }
 }
 
 // ==================== 视频后期编辑 ====================
@@ -79,7 +79,7 @@ async function processVideoEdit(taskId, userId, { videoUrl, edits, bgm, subtitle
       outputUrl: result.output?.videoUrl || `/api/output/${taskId}_edited.mp4`,
       editsApplied: edits, bgmApplied: !!bgm, subtitleAdded: subtitle,
     }});
-  } catch (err) { await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }); }
+  } catch (err) { logger.error('[AdvancedVideo] Task failed', { taskId, error: err.message }); await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }).catch(e => logger.error('[AdvancedVideo] Status update failed', { taskId, error: e.message })); }
 }
 
 // ==================== AI带货脚本生成 ====================
@@ -98,7 +98,7 @@ async function processScriptGen(taskId, userId, params) {
       task: 'script_gen', productInfo: params.productInfo, scriptType: params.scriptType, lang: params.lang,
     }, { onProgress: (p) => updateTaskStatus(taskId, userId, { progress: Math.round(p * 0.95), progressMsg: '生成文案...' }) });
     await completeTask(taskId, userId, { progressMsg: '脚本生成完成', outputResult: result.output || {} });
-  } catch (err) { await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }); }
+  } catch (err) { logger.error('[AdvancedVideo] Task failed', { taskId, error: err.message }); await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }).catch(e => logger.error('[AdvancedVideo] Status update failed', { taskId, error: e.message })); }
 }
 
 // ==================== AI智能分镜 ====================
@@ -117,7 +117,7 @@ async function processShotPlan(taskId, userId, params) {
       task: 'shot_plan', productInfo: params.productInfo, videoStyle: params.videoStyle, totalDuration: params.totalDuration,
     }, { onProgress: (p) => updateTaskStatus(taskId, userId, { progress: Math.round(p * 0.95), progressMsg: '编排分镜...' }) });
     await completeTask(taskId, userId, { progressMsg: '分镜生成完成', outputResult: result.output || {} });
-  } catch (err) { await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }); }
+  } catch (err) { logger.error('[AdvancedVideo] Task failed', { taskId, error: err.message }); await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }).catch(e => logger.error('[AdvancedVideo] Status update failed', { taskId, error: e.message })); }
 }
 
 // ==================== 爆款视频风格复刻 ====================
@@ -151,7 +151,7 @@ async function processViralClone(taskId, userId, params) {
       matchScore: pipeResult.final?.matchScore || '82%',
       analysis: pipeResult.results?.[0]?.output?.analysis || {},
     }});
-  } catch (err) { await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }); }
+  } catch (err) { logger.error('[AdvancedVideo] Task failed', { taskId, error: err.message }); await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }).catch(e => logger.error('[AdvancedVideo] Status update failed', { taskId, error: e.message })); }
 }
 
 // ==================== 动作迁移批量 ====================
@@ -180,7 +180,7 @@ async function processActionBatch(taskId, userId, { actionVideoUrl, productImage
     }
     const results = settled.filter((r) => r.status === 'fulfilled').map((r) => r.value);
     await completeTask(taskId, userId, { progressMsg: '全部完成', outputResult: { videos: results, total } });
-  } catch (err) { await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }); }
+  } catch (err) { logger.error('[AdvancedVideo] Task failed', { taskId, error: err.message }); await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }).catch(e => logger.error('[AdvancedVideo] Status update failed', { taskId, error: e.message })); }
 }
 
 // ==================== 视频智能美化 ====================
@@ -200,7 +200,7 @@ async function processVideoBeautify(taskId, userId, { videoUrl, options }) {
     });
     const steps = []; if (options.enhance) steps.push('超清修复'); if (options.stabilize) steps.push('去抖动'); if (options.colorGrade) steps.push('智能调色'); if (options.sharpen) steps.push('锐化优化');
     await completeTask(taskId, userId, { progressMsg: '美化完成', outputResult: { outputUrl: result.output?.videoUrl || `/api/videos/${taskId}_beautified.mp4`, appliedSteps: steps } });
-  } catch (err) { await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }); }
+  } catch (err) { logger.error('[AdvancedVideo] Task failed', { taskId, error: err.message }); await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }).catch(e => logger.error('[AdvancedVideo] Status update failed', { taskId, error: e.message })); }
 }
 
 // ==================== 爆款视频分析 ====================
@@ -220,7 +220,7 @@ async function processViralAnalyze(taskId, userId, params) {
       onProgress: (p) => { const msg = p < 40 ? '获取视频内容...' : p < 70 ? '分析镜头语言...' : '提取模式特征...'; updateTaskStatus(taskId, userId, { progress: Math.round(p * 0.95), progressMsg: msg }); },
     });
     await completeTask(taskId, userId, { progressMsg: '分析完成', outputResult: result.output || {} });
-  } catch (err) { await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }); }
+  } catch (err) { logger.error('[AdvancedVideo] Task failed', { taskId, error: err.message }); await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }).catch(e => logger.error('[AdvancedVideo] Status update failed', { taskId, error: e.message })); }
 }
 
 // ==================== 爆款复刻生成 ====================
@@ -240,7 +240,7 @@ async function processViralReplicate(taskId, userId, params) {
       analysisResult: params.analysisResult, imageUrl: params.productImageUrl, task: 'viral_replicate',
     }, { onProgress: (p) => { const msg = p < 30 ? '套用分析模板...' : p < 55 ? '替换产品素材...' : p < 80 ? '匹配转场+色调...' : '合成渲染...'; updateTaskStatus(taskId, userId, { progress: Math.round(p * 0.95), progressMsg: msg }); }});
     await completeTask(taskId, userId, { progressMsg: '复刻完成', outputResult: result.output || {} });
-  } catch (err) { await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }); }
+  } catch (err) { logger.error('[AdvancedVideo] Task failed', { taskId, error: err.message }); await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }).catch(e => logger.error('[AdvancedVideo] Status update failed', { taskId, error: e.message })); }
 }
 
 // ==================== 任务查询 ====================

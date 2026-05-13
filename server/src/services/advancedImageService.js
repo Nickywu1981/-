@@ -7,6 +7,7 @@ import { createTask, updateTaskStatus, completeTask, getTask, listUserTasks, cou
 import { makeTaskQueries } from './taskQueryService.js';
 import * as creditService from './creditService.js';
 import { BusinessError } from '../utils/businessError.js';
+import logger from '../utils/logger.js';
 
 // ==================== 虚拟模特上身 ====================
 
@@ -33,7 +34,7 @@ async function processVirtualTryon(taskId, userId, params) {
       { id: `${taskId}_2`, style: '背面', url: result.output?.images?.[2]?.url || `/api/images/${taskId}_tryon_back.webp` },
     ];
     await completeTask(taskId, userId, { progressMsg: '完成', outputResult: { images } });
-  } catch (err) { await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }); }
+  } catch (err) { logger.error('[AdvancedImage] Task failed', { taskId, error: err.message }); await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }).catch(e => logger.error('[AdvancedImage] Status update failed', { taskId, error: e.message })); }
 }
 
 // ==================== 一键换色 ====================
@@ -55,7 +56,7 @@ async function processColorSwap(taskId, userId, params) {
 
     const images = result.output?.images || colors.map((c, i) => ({ color: c, url: `/api/images/${taskId}_color_${i}.webp` }));
     await completeTask(taskId, userId, { progressMsg: '完成', outputResult: { images } });
-  } catch (err) { await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }); }
+  } catch (err) { logger.error('[AdvancedImage] Task failed', { taskId, error: err.message }); await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }).catch(e => logger.error('[AdvancedImage] Status update failed', { taskId, error: e.message })); }
 }
 
 // ==================== AI风格转化 ====================
@@ -78,7 +79,7 @@ async function processStyleTransfer(taskId, userId, params) {
     }});
     const images = (result.output?.images || ['main', 'variant1', 'variant2']).map((s, i) => ({ id: `${taskId}_${i}`, style: params.targetStyle, variant: typeof s === 'string' ? s : s.style || `variant${i + 1}`, url: s.url || `/api/images/${taskId}_style_${i}.webp` }));
     await completeTask(taskId, userId, { progressMsg: '完成', outputResult: { images } });
-  } catch (err) { await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }); }
+  } catch (err) { logger.error('[AdvancedImage] Task failed', { taskId, error: err.message }); await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }).catch(e => logger.error('[AdvancedImage] Status update failed', { taskId, error: e.message })); }
 }
 
 // ==================== AI去褶皱 ====================
@@ -101,7 +102,7 @@ async function processWrinkleRemove(taskId, userId, params) {
       fabricType: params.fabricType,
       beforeAfter: { before: params.productImageUrl, after: result.output?.imageUrl || `/api/images/${taskId}_smooth.webp` },
     }});
-  } catch (err) { await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }); }
+  } catch (err) { logger.error('[AdvancedImage] Task failed', { taskId, error: err.message }); await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }).catch(e => logger.error('[AdvancedImage] Status update failed', { taskId, error: e.message })); }
 }
 
 // ==================== 智能扩图 ====================
@@ -127,7 +128,7 @@ async function processOutpainting(taskId, userId, params) {
       expanded: result.output?.imageUrl || `/api/images/${taskId}_outpaint.webp`,
       direction: params.direction, ratio: `${params.ratio}%`,
     }});
-  } catch (err) { await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }); }
+  } catch (err) { logger.error('[AdvancedImage] Task failed', { taskId, error: err.message }); await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }).catch(e => logger.error('[AdvancedImage] Status update failed', { taskId, error: e.message })); }
 }
 
 // ==================== 幽灵模特 ====================
@@ -152,7 +153,7 @@ async function processGhostMannequin(taskId, userId, params) {
       before: params.productImageUrl, after: result.output?.imageUrl || `/api/images/${taskId}_ghost.webp`,
       effect: params.effect, category: params.category,
     }});
-  } catch (err) { await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }); }
+  } catch (err) { logger.error('[AdvancedImage] Task failed', { taskId, error: err.message }); await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }).catch(e => logger.error('[AdvancedImage] Status update failed', { taskId, error: e.message })); }
 }
 
 // ==================== 图片翻译 ====================
@@ -186,7 +187,7 @@ async function processImageTranslate(taskId, userId, params) {
       sourceLang: params.sourceLang, targetLang: params.targetLang,
       detectedTexts: pipeResult.results?.[0]?.output?.texts || [],
     }});
-  } catch (err) { await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }); }
+  } catch (err) { logger.error('[AdvancedImage] Task failed', { taskId, error: err.message }); await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }).catch(e => logger.error('[AdvancedImage] Status update failed', { taskId, error: e.message })); }
 }
 
 // ==================== AI 模特生成 ====================
@@ -210,7 +211,7 @@ async function processModelGenerate(taskId, userId, params) {
     }});
     const images = (result.output?.images || []).map((img, i) => ({ id: `${taskId}_${i}`, type: 'model', url: (img && img.url) || `/api/images/${taskId}_model_${i}.webp` }));
     await completeTask(taskId, userId, { progressMsg: '完成', outputResult: { images } });
-  } catch (err) { await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }); }
+  } catch (err) { logger.error('[AdvancedImage] Task failed', { taskId, error: err.message }); await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }).catch(e => logger.error('[AdvancedImage] Status update failed', { taskId, error: e.message })); }
 }
 
 // ==================== 全景拍摄 ====================
@@ -236,7 +237,7 @@ async function processShotPanorama(taskId, userId, params) {
     const angles = params.mode === '360' ? 8 : 4;
     const images = (result.output?.images || Array.from({ length: angles }, (_, i) => ({ id: `${taskId}_${i}`, angle: `${Math.round(i * 360 / angles)}°`, url: `/api/images/${taskId}_pano_${i}.webp` })));
     await completeTask(taskId, userId, { progressMsg: '完成', outputResult: { images, mode: params.mode } });
-  } catch (err) { await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }); }
+  } catch (err) { logger.error('[AdvancedImage] Task failed', { taskId, error: err.message }); await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }).catch(e => logger.error('[AdvancedImage] Status update failed', { taskId, error: e.message })); }
 }
 
 // ==================== AI 换脸 ====================
@@ -259,7 +260,7 @@ async function processSwapFace(taskId, userId, params) {
       updateTaskStatus(taskId, userId, { progress: Math.round(p * 0.95), progressMsg: msg });
     }});
     await completeTask(taskId, userId, { progressMsg: '完成', outputResult: { url: result.output?.imageUrl || `/api/images/${taskId}_swap.webp` } });
-  } catch (err) { await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }); }
+  } catch (err) { logger.error('[AdvancedImage] Task failed', { taskId, error: err.message }); await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }).catch(e => logger.error('[AdvancedImage] Status update failed', { taskId, error: e.message })); }
 }
 
 // ==================== AI 文字特效 ====================
@@ -280,7 +281,7 @@ async function processTextEffect(taskId, userId, params) {
     }, { onProgress: (p) => updateTaskStatus(taskId, userId, { progress: Math.round(p * 0.95), progressMsg: `渲染 ${Math.round(p)}%...` }) });
     const images = (result.output?.images || [0, 1, 2]).map((_, i) => ({ id: `${taskId}_${i}`, effect: params.effect, url: _.url || `/api/images/${taskId}_text_${i}.webp` }));
     await completeTask(taskId, userId, { progressMsg: '完成', outputResult: { images } });
-  } catch (err) { await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }); }
+  } catch (err) { logger.error('[AdvancedImage] Task failed', { taskId, error: err.message }); await updateTaskStatus(taskId, userId, { status: 3, errorMsg: err.message }).catch(e => logger.error('[AdvancedImage] Status update failed', { taskId, error: e.message })); }
 }
 
 // ==================== 任务查询 ====================

@@ -91,7 +91,7 @@ export async function cachedRecall(opts = {}) {
         return data;
       }
     }
-  } catch (e) { /* 降级 */ }
+  } catch (e) { logger.warn('[LTM+] Redis recall failed, falling back to MySQL', { error: e.message }); }
 
   // MySQL 回源
   const data = await ltm.recall({ namespace, subjectId, topK, memoryType, minImportance });
@@ -102,7 +102,7 @@ export async function cachedRecall(opts = {}) {
     if (redis) {
       await redis.setex(cacheKey, 300, JSON.stringify(data));
     }
-  } catch (e) { /* 降级 */ }
+  } catch (e) { logger.warn('[LTM+] Redis recall failed, falling back to MySQL', { error: e.message }); }
 
   hotCache.set(cacheKey, { data, ts: Date.now() });
   return data;
@@ -148,7 +148,7 @@ export async function buildMemoryInjection({ userId, maxTokens = 500, contextHin
       for (const r of ruleMemories) {
         recordRuleHit(r.id);
       }
-    } catch { /* langMemE 未加载时降级 */ }
+    } catch { logger.warn('[LTM+] LangMemE not loaded, skipping rule memories'); }
 
     const allMemories = [...ruleMemories, ...brandMemories, ...preferenceMemories, ...productMemories];
 

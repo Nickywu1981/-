@@ -27,6 +27,8 @@
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n();
+
 const props = withDefaults(defineProps<{
   icon?: string;
   title?: string;
@@ -38,12 +40,12 @@ const props = withDefaults(defineProps<{
   size?: 'sm' | 'md' | 'lg';
 }>(), {
   icon: '📭',
-  title: '暂无数据',
+  title: () => t('empty.defaultTitle', '暂无数据'),
   description: '',
   actionLabel: '',
   actionRoute: '',
   showExample: false,
-  exampleLabel: '查看示例',
+  exampleLabel: () => t('empty.defaultExample', '查看示例'),
   size: 'md',
 });
 

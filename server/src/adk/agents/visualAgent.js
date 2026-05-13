@@ -4,6 +4,7 @@
  */
 import { LlmAgent } from '../core/agent.js';
 import { FunctionTool } from '../core/tool.js';
+import logger from '../../utils/logger.js';
 
 const imageGenTool = new FunctionTool('generate_image', async (params) => {
   const { default: service } = await import('../../services/image.service.js');
@@ -40,8 +41,13 @@ const videoGenTool = new FunctionTool('generate_video', async (params) => {
 });
 
 const batchTool = new FunctionTool('batch_generate', async (params) => {
-  const { default: service } = await import('../../services/batch.service.js');
-  return service.queue(params.skuList, params.type, params.userId);
+  try {
+    const { default: service } = await import('../../services/batch.service.js');
+    return service.queue(params.skuList, params.type, params.userId);
+  } catch (e) {
+    logger.error('[VisualAgent] batch.service.js not available', { error: e.message });
+    return { error: '批量生成服务暂不可用', taskId: null, status: 'failed' };
+  }
 }, {
   description: '批量并行生成，100 SKU 并行处理',
   parameters: {

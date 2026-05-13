@@ -814,7 +814,7 @@ async function _runJob(jobId, steps, mode, input) {
         job.status = 'failed';
         job.error = `步骤 "${step.label}" 执行失败: ${err.message}`;
         job.completedAt = new Date().toISOString();
-        wm.flushToLTM(input.userId).catch(() => {});
+        wm.flushToLTM(input.userId).catch(e => logger.warn('[WorkflowEngine] Working memory flush failed', { error: e.message }));
         return;
       }
       // 可选步骤失败 → 跳过继续
@@ -841,7 +841,19 @@ async function _runJob(jobId, steps, mode, input) {
   // 工作记忆: 记录产品信息并刷新到 LTM
   if (input.productName) wm.set('product', input.productName, 1);
   wm.set('job_result', { status: 'completed', outputKeys: Object.keys(job.output) }, 2);
-  wm.flushToLTM(input.userId).catch(() => {});
+  wm.flushToLTM(input.userId).catch(e => logger.warn('[WorkflowEngine] Working memory flush failed', { error: e.message }));
+
+  // 反馈学习: 记录每个模型的表现
+  const usedModels = [...new Set(job.stepResults.map(r => r.model).filter(m => m && m !== 'builtin'))];
+  for (const modelKey of usedModels) {
+    import('./feedbackLearningService.js').then(({ recordFeedback }) => {
+      recordFeedback({
+        jobId, modelKey, userId: input.userId, output: job.output,
+        taskType: input.workflowType || input.taskType,
+        input,
+      }).catch(e => logger.warn('[WorkflowEngine] Feedback record failed', { modelKey, error: e.message }));
+    }).catch(() => {});
+  }
 
   logger.info(`[WorkflowEngine] job=${jobId} completed, ${steps.length} steps`);
 }
