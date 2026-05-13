@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url';
 import crypto from 'crypto';
 import { error } from '../utils/response.js';
 import { BusinessError } from '../utils/businessError.js';
+import logger from '../utils/logger.js';
 import { uploadConfig } from '../config/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -16,8 +17,13 @@ const UPLOAD_DIR = path.join(__dirname, '../../uploads/images');
 let _dirReady = false;
 async function ensureUploadDir() {
   if (_dirReady) return;
-  await fs.promises.mkdir(UPLOAD_DIR, { recursive: true });
-  _dirReady = true;
+  try {
+    await fs.promises.mkdir(UPLOAD_DIR, { recursive: true });
+    _dirReady = true;
+  } catch (e) {
+    logger.error('[Upload] 上传目录创建失败', { dir: UPLOAD_DIR, error: e.message });
+    throw new BusinessError(500, '文件存储不可用');
+  }
 }
 
 // 文件头魔数签名（前 N 字节十六进制）

@@ -182,7 +182,13 @@ export async function getPublicForm(code, tenantId, { device = 'pc' } = {}) {
   if (form.end_time && new Date(form.end_time) < new Date()) throw new BusinessError(400, '表单已结束');
   if (form.submit_limit > 0 && form.submit_count >= form.submit_limit) throw new BusinessError(400, '已达提交上限');
 
-  const fields = typeof form.fields_json === 'string' ? JSON.parse(form.fields_json) : form.fields_json;
+  let fields;
+  try {
+    fields = typeof form.fields_json === 'string' ? JSON.parse(form.fields_json) : form.fields_json;
+  } catch (e) {
+    logger.error('[Form] getPublicForm JSON解析失败', { code, error: e.message });
+    throw new BusinessError(500, '表单配置数据异常');
+  }
   const deviceFields = filterFieldsByDevice(fields, device);
 
   return {
@@ -211,7 +217,13 @@ export async function submitForm(code, tenantId, userId, rawData, ip, userAgent,
     if (userCount >= form.max_submissions_per_user) throw new BusinessError(400, '您已达个人提交上限');
   }
 
-  const fields = typeof form.fields_json === 'string' ? JSON.parse(form.fields_json) : form.fields_json;
+  let fields;
+  try {
+    fields = typeof form.fields_json === 'string' ? JSON.parse(form.fields_json) : form.fields_json;
+  } catch (e) {
+    logger.error('[Form] submitForm JSON解析失败', { code, error: e.message });
+    throw new BusinessError(500, '表单配置数据异常');
+  }
 
   // 1️⃣ 联动解析 — 确定哪些字段当前可见/启用
   const visibleFields = fields.filter(f => resolveLinkage(f, rawData) && f.is_visible !== false);

@@ -94,7 +94,10 @@ export async function addFavorite(userId, templateId, groupId) {
     await pool.execute('INSERT INTO prompt_favorite (user_id, template_id, group_id) VALUES (?,?,?)', [userId, templateId, groupId || null]);
     return true;
   } catch (err) {
-    logger.warn('[promptDao] addFavorite failed:', err.message);
+    if (err?.code === 'ER_DUP_ENTRY') {
+      return 'duplicate';
+    }
+    logger.error('[promptDao] addFavorite DB错误', { error: err.message, userId, templateId });
     return false;
   }
 }

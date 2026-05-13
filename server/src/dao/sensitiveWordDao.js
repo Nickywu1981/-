@@ -1,6 +1,7 @@
 import pool from '../dao/db.js';
 import { parsePagination } from '../utils/pagination.js';
 import { als } from './context.js';
+import logger from '../utils/logger.js';
 
 function _db() { return als.getStore()?.db || pool; }
 
@@ -53,7 +54,7 @@ export async function checkText(text) {
       try {
         const escaped = w.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         return { ...w, regex: new RegExp(escaped, 'i') };
-      } catch { return { ...w, regex: null }; }
+      } catch (e) { logger.warn('[SensitiveWord] 正则表达式编译失败，降级为字符串匹配', { word: w.word, error: e.message }); return { ...w, regex: null }; }
     });
   }
   const hits = [];

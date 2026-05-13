@@ -164,7 +164,7 @@ export default {
   async listVersions(pageId, { includeAuto = false } = {}) {
     let sql = 'SELECT id, version, remark, auto_save, rollback_from, create_time FROM diy_page_version WHERE page_id = ?';
     if (!includeAuto) sql += ' AND auto_save = 0';
-    sql += ' ORDER BY version DESC';
+    sql += ' ORDER BY version DESC LIMIT 200';
     const [rows] = await pool.query(sql, [pageId]);
     return rows;
   },

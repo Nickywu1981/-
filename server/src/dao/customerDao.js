@@ -99,7 +99,7 @@ export async function createTag(tenantId, { name, color }) {
 
 export async function listTags(tenantId) {
   const [rows] = await pool.execute(
-    'SELECT id, name, color, sort_order, create_time FROM customer_tag WHERE tenant_id = ? AND is_deleted = 0 ORDER BY sort_order, id',
+    'SELECT id, name, color, sort_order, create_time FROM customer_tag WHERE tenant_id = ? AND is_deleted = 0 ORDER BY sort_order, id LIMIT 500',
     [tenantId],
   );
   return rows;

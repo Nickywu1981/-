@@ -8,7 +8,8 @@ export default {
     const params = ['published'];
     if (category) { where += ' AND category = ?'; params.push(category); }
     if (keyword) { where += ' AND (title LIKE ? OR description LIKE ?)'; params.push(`%${keyword}%`, `%${keyword}%`); }
-    const orderBy = sort === 'rating' ? 'rating DESC' : sort === 'newest' ? 'created_at DESC' : 'download_count DESC';
+    const ALLOWED_SORT = { rating: 'rating DESC', newest: 'created_at DESC', downloads: 'download_count DESC', default: 'download_count DESC' };
+    const orderBy = ALLOWED_SORT[sort] || ALLOWED_SORT.default;
     const [rows] = await db.query(
       `SELECT id, user_id, title, description, category, price, preview_images, download_count, rating, created_at
        FROM template_marketplace ${where} ORDER BY ${orderBy} LIMIT ? OFFSET ?`,

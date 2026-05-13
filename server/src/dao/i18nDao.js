@@ -7,12 +7,12 @@ import pool from './db.js';
 const COLS = 'id, locale, namespace, trans_key, trans_value, description, updated_by, created_at, updated_at';
 
 export async function getAll(locale) {
-  const [rows] = await pool.query(`SELECT ${COLS} FROM i18n_translation WHERE locale = ? ORDER BY namespace, trans_key`, [locale]);
+  const [rows] = await pool.query(`SELECT ${COLS} FROM i18n_translation WHERE locale = ? ORDER BY namespace, trans_key LIMIT 10000`, [locale]);
   return rows;
 }
 
 export async function getByNamespace(locale, namespace) {
-  const [rows] = await pool.query(`SELECT ${COLS} FROM i18n_translation WHERE locale = ? AND namespace = ? ORDER BY trans_key`, [locale, namespace]);
+  const [rows] = await pool.query(`SELECT ${COLS} FROM i18n_translation WHERE locale = ? AND namespace = ? ORDER BY trans_key LIMIT 5000`, [locale, namespace]);
   return rows;
 }
 

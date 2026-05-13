@@ -124,8 +124,16 @@ export async function handleNotify(body) {
   }
 
   // 5. 判断支付结果 + 金额校验
-  const callbackAmount = Number(body.trxamt) / 100 || Number(body.amount) || 0;
+  const rawTrxamt = Number(body.trxamt);
+  const rawAmount = Number(body.amount);
+  const callbackAmount = Number.isFinite(rawTrxamt) ? rawTrxamt / 100 : (Number.isFinite(rawAmount) ? rawAmount : 0);
   const orderAmount = Number(order.amount);
+  if (!Number.isFinite(orderAmount)) {
+    logger.error('[Allinpay] 订单金额非法', { reqsn, amount: order.amount });
+    await allinpayDao.markFailed(reqsn);
+    await allinpayDao.logNotify({ reqsn, trxid, notifyBody: JSON.stringify(body), signVerified: 1, processStatus: 2, processMsg: `订单金额非法: ${order.amount}` });
+    return false;
+  }
   if (callbackAmount > 0 && Math.abs(callbackAmount - orderAmount) > 0.01) {
     logger.error('[Allinpay] 回调金额与订单金额不匹配', { reqsn, callbackAmount, orderAmount });
     await allinpayDao.markFailed(reqsn);
@@ -215,7 +223,8 @@ async function fulfillMembership(order, conn) {
   let planType = Number(order.plan_type) || 0;
   if (!planType) {
     const allPlans = await creditDao.listActivePlans();
-    const matched = allPlans.find(p => Number(p.price) === Number(order.amount));
+    const orderAmt = Number(order.amount);
+    const matched = Number.isFinite(orderAmt) ? allPlans.find(p => Math.abs(Number(p.price) - orderAmt) < 0.01) : undefined;
     if (matched) planType = matched.plan_type;
   }
 
