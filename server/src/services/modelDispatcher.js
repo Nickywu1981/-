@@ -1,5 +1,6 @@
 import { BusinessError } from '../utils/businessError.js';
 import logger from '../utils/logger.js';
+import { canarySelect, weightedRoundRobin, checkTenantQuota, consumeTenantTokens } from './dispatchStrategyService.js';
 
 /**
  * ModelDispatcher — 多模型统一调度层 (v5.0)
@@ -209,32 +210,37 @@ export async function autoMode(taskType, input, options = {}) {
     throw new BusinessError(503, `类别 ${analysis.category} 下无可用模型`);
   }
 
+  // 金丝雀灰度：检查是否有灰度版本
+  const selectedModelId = canarySelect(ranking.best.modelId);
+
   // 简单任务: 单模型即可
   if (!analysis.needsMultiModel && analysis.complexity === 'normal') {
     try {
-      const result = await infer(ranking.best.modelId, input, {
+      const result = await infer(selectedModelId, input, {
         onProgress: options.onProgress,
         skipCache: options.skipCache,
       });
       return {
         mode: 'auto',
         matchLog: ranking.matchLog,
-        selected: ranking.best.modelId,
+        selected: selectedModelId,
         result,
       };
     } catch (err) {
-      options.degradationLog?.push({ modelId: ranking.best.modelId, error: err.message, stage: 'primary' });
-      // 降级到下一个候选
-      if (ranking.ranked[1]) {
-        const fallbackResult = await infer(ranking.ranked[1].modelId, input, {
+      options.degradationLog?.push({ modelId: selectedModelId, error: err.message, stage: 'primary' });
+      // 降级：加权轮询选择下一个候选
+      const remaining = ranking.ranked.filter(r => r.modelId !== selectedModelId).map(r => r.modelId);
+      const fallbackId = weightedRoundRobin(remaining) || ranking.ranked[1]?.modelId;
+      if (fallbackId) {
+        const fallbackResult = await infer(fallbackId, input, {
           onProgress: options.onProgress,
           skipCache: true,
         });
         return {
           mode: 'auto',
           matchLog: ranking.matchLog,
-          selected: ranking.ranked[1].modelId,
-          degradedFrom: ranking.best.modelId,
+          selected: fallbackId,
+          degradedFrom: selectedModelId,
           result: fallbackResult,
         };
       }
@@ -358,6 +364,14 @@ export async function dispatch(req, options = {}) {
   await ensureModels();
   const { mode = 'auto', taskType, input, modelId, customConfig } = req;
 
+  // 多租户配额检查
+  if (options.tenantId) {
+    const quotaResult = checkTenantQuota(options.tenantId, 1000);
+    if (!quotaResult.allowed) {
+      throw new BusinessError(429, quotaResult.reason);
+    }
+  }
+
   const startTime = Date.now();
   const degradationLog = [];
 
@@ -379,6 +393,13 @@ export async function dispatch(req, options = {}) {
     }
     result.elapsed = Date.now() - startTime;
     if (degradationLog.length > 0) result.degradationLog = degradationLog;
+
+    // 更新租户 Token 消耗
+    if (options.tenantId && result?.result) {
+      const tokensOut = result.result?.tokensOut || result.result?.usage?.output_tokens || 0;
+      if (tokensOut > 0) consumeTenantTokens(options.tenantId, tokensOut);
+    }
+
     return result;
   } catch (err) {
     // 全模型耗尽 — 附加降级链信息

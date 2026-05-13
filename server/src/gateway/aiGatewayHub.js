@@ -28,6 +28,14 @@ import { sanitizePII, sanitizeObject } from '../services/inputSanitizerService.j
 import { moderateText } from '../services/moderation.service.js';
 import { recordCall, recordCircuitBreakerTrip } from '../services/monitorService.js';
 import { getTraceContext } from '../services/traceService.js';
+import { buildErrorResponse } from '../services/outputPostProcessor.js';
+import { registerBuiltinHooks, runPreHooks, runPostHooks } from '../services/hookRegistryService.js';
+
+// 钩子注册中心开关：设置 AI_USE_HOOK_REGISTRY=true 启用可插拔钩子管线
+const USE_HOOK_REGISTRY = process.env.AI_USE_HOOK_REGISTRY === 'true';
+if (USE_HOOK_REGISTRY) {
+  registerBuiltinHooks();
+}
 
 // ==================== 统一调用上下文 ====================
 
@@ -160,17 +168,39 @@ export async function gatewayInfer(modelId, input, ctx = {}) {
   const model = listModels().find((m) => m.id === modelId);
 
   // ── Pre-invoke 安全检测 (GEO + PII脱敏 + 内容审核) ──
-  const security = await runPreInvokeSecurityChecks(modelId, input, {
-    ...context,
-    countryCode: ctx.countryCode || ctx.geo?.country || null,
-    platformCode: ctx.platformCode || ctx.taskType || null,
-  });
+  let security;
+  if (USE_HOOK_REGISTRY) {
+    const hookResult = await runPreHooks({
+      modelId, input, userId: context.userId, taskType: context.taskType,
+      countryCode: ctx.countryCode || ctx.geo?.country || null,
+      platformCode: ctx.platformCode || ctx.taskType || null,
+    });
+    if (hookResult.blocked) {
+      return {
+        modelId, output: null, elapsed: 0, retries: 0, degraded: false,
+        tokensIn: 0, tokensOut: 0, blocked: true, correlationId: context.correlationId,
+        error: buildErrorResponse(hookResult.reason || '请求被阻止', { modelId, traceId: getTraceContext()?.traceId }),
+      };
+    }
+    const modCtx = hookResult.modifiedContext;
+    security = {
+      blocked: false,
+      sanitizedInput: modCtx.input || input,
+      geoConstraints: modCtx._geoConstraints || null,
+      moderationResult: modCtx._moderationResult || null,
+    };
+  } else {
+    security = await runPreInvokeSecurityChecks(modelId, input, {
+      ...context,
+      countryCode: ctx.countryCode || ctx.geo?.country || null,
+      platformCode: ctx.platformCode || ctx.taskType || null,
+    });
+  }
   if (security.blocked) {
     return {
       modelId, output: null, elapsed: 0, retries: 0, degraded: false,
-      tokensIn: 0, tokensOut: 0, blocked: true,
-      blockReason: security.blockReason,
-      correlationId: context.correlationId,
+      tokensIn: 0, tokensOut: 0, blocked: true, correlationId: context.correlationId,
+      error: buildErrorResponse(security.blockReason, { modelId, traceId: getTraceContext()?.traceId }),
     };
   }
   const geoConstraints = security.geoConstraints;
@@ -251,6 +281,8 @@ export async function gatewayInfer(modelId, input, ctx = {}) {
 
     if (status === 'error') {
       result = { modelId, output: null, elapsed: Date.now() - start, retries: 0, degraded: triedFallback, tokensIn: 0, tokensOut: 0 };
+      const errResp = buildErrorResponse(errorMsg, { modelId, traceId: getTraceContext()?.traceId });
+      logger.error(`[Gateway] infer 失败: ${errResp.code} — ${errResp.message} (detail: ${errorMsg})`);
     }
   }
 
@@ -377,25 +409,48 @@ export async function gatewayDispatch(dispatchReq, ctx = {}) {
 
   // ── Pre-invoke 安全检测 ──
   const dispatchModelId = dispatchReq?.modelId || dispatchReq?.candidates?.[0] || 'unknown';
-  const security = await runPreInvokeSecurityChecks(dispatchModelId, dispatchReq.input || dispatchReq, {
-    ...context,
-    countryCode: ctx.countryCode || ctx.geo?.country || null,
-    platformCode: ctx.platformCode || ctx.taskType || null,
-  });
-  if (security.blocked) {
+  let dispatchSecurity;
+  if (USE_HOOK_REGISTRY) {
+    const hookResult = await runPreHooks({
+      modelId: dispatchModelId, input: dispatchReq.input || dispatchReq,
+      userId: context.userId, taskType: context.taskType,
+      countryCode: ctx.countryCode || ctx.geo?.country || null,
+      platformCode: ctx.platformCode || ctx.taskType || null,
+    });
+    if (hookResult.blocked) {
+      return {
+        mode: dispatchReq.mode || 'auto', matchLog: [], selected: null, result: null,
+        elapsed: 0, degradationLog: [], blocked: true, correlationId: context.correlationId,
+        error: buildErrorResponse(hookResult.reason || '请求被阻止', { modelId: dispatchModelId, traceId: getTraceContext()?.traceId }),
+      };
+    }
+    const modCtx = hookResult.modifiedContext;
+    dispatchSecurity = {
+      blocked: false,
+      sanitizedInput: modCtx.input || dispatchReq.input,
+      geoConstraints: modCtx._geoConstraints || null,
+      moderationResult: modCtx._moderationResult || null,
+    };
+  } else {
+    dispatchSecurity = await runPreInvokeSecurityChecks(dispatchModelId, dispatchReq.input || dispatchReq, {
+      ...context,
+      countryCode: ctx.countryCode || ctx.geo?.country || null,
+      platformCode: ctx.platformCode || ctx.taskType || null,
+    });
+  }
+  if (dispatchSecurity.blocked) {
     return {
       mode: dispatchReq.mode || 'auto', matchLog: [], selected: null, result: null,
-      elapsed: 0, degradationLog: [], blocked: true,
-      blockReason: security.blockReason,
-      correlationId: context.correlationId,
+      elapsed: 0, degradationLog: [], blocked: true, correlationId: context.correlationId,
+      error: buildErrorResponse(dispatchSecurity.blockReason, { modelId: dispatchModelId, traceId: getTraceContext()?.traceId }),
     };
   }
-  const geoConstraints = security.geoConstraints;
+  const geoConstraints = dispatchSecurity.geoConstraints;
 
   // 传入脱敏后的 input
   const safeDispatchReq = { ...dispatchReq };
-  if (security.sanitizedInput !== dispatchReq.input) {
-    safeDispatchReq.input = security.sanitizedInput;
+  if (dispatchSecurity.sanitizedInput !== dispatchReq.input) {
+    safeDispatchReq.input = dispatchSecurity.sanitizedInput;
   }
 
   try {
@@ -404,6 +459,8 @@ export async function gatewayDispatch(dispatchReq, ctx = {}) {
     status = 'error';
     errorMsg = err.message;
     result = { mode: dispatchReq.mode || 'auto', matchLog: [], selected: null, result: null, elapsed: Date.now() - start, degradationLog: [] };
+    const errResp = buildErrorResponse(errorMsg, { modelId: dispatchModelId, traceId: getTraceContext()?.traceId });
+    logger.error(`[Gateway] dispatch 失败: ${errResp.code} — ${errResp.message} (detail: ${errorMsg})`);
   }
 
   const rawUsage = result?.result;
@@ -486,23 +543,47 @@ export async function gatewayRoute(params, ctx = {}) {
   // ── Pre-invoke 安全检测 ──
   const routeModelId = params?.modelKey || 'unknown';
   const routeInput = params?.params || params;
-  const security = await runPreInvokeSecurityChecks(routeModelId, routeInput, {
-    ...context,
-    countryCode: ctx.countryCode || ctx.geo?.country || null,
-    platformCode: ctx.platformCode || ctx.taskType || null,
-  });
-  if (security.blocked) {
+  let routeSecurity;
+  if (USE_HOOK_REGISTRY) {
+    const hookResult = await runPreHooks({
+      modelId: routeModelId, input: routeInput,
+      userId: context.userId, taskType: context.taskType,
+      countryCode: ctx.countryCode || ctx.geo?.country || null,
+      platformCode: ctx.platformCode || ctx.taskType || null,
+    });
+    if (hookResult.blocked) {
+      return {
+        blocked: true, tokensIn: 0, tokensOut: 0, cost: { amount: 0, currency: 'CNY' },
+        correlationId: context.correlationId,
+        error: buildErrorResponse(hookResult.reason || '请求被阻止', { modelId: routeModelId, traceId: getTraceContext()?.traceId }),
+      };
+    }
+    const modCtx = hookResult.modifiedContext;
+    routeSecurity = {
+      blocked: false,
+      sanitizedInput: modCtx.input || routeInput,
+      geoConstraints: modCtx._geoConstraints || null,
+      moderationResult: modCtx._moderationResult || null,
+    };
+  } else {
+    routeSecurity = await runPreInvokeSecurityChecks(routeModelId, routeInput, {
+      ...context,
+      countryCode: ctx.countryCode || ctx.geo?.country || null,
+      platformCode: ctx.platformCode || ctx.taskType || null,
+    });
+  }
+  if (routeSecurity.blocked) {
     return {
-      blocked: true, blockReason: security.blockReason,
-      tokensIn: 0, tokensOut: 0, cost: { amount: 0, currency: 'CNY' },
+      blocked: true, tokensIn: 0, tokensOut: 0, cost: { amount: 0, currency: 'CNY' },
       correlationId: context.correlationId,
+      error: buildErrorResponse(routeSecurity.blockReason, { modelId: routeModelId, traceId: getTraceContext()?.traceId }),
     };
   }
-  const geoConstraints = security.geoConstraints;
+  const geoConstraints = routeSecurity.geoConstraints;
 
   // 传入脱敏后的 params
-  const safeParams = security.sanitizedInput !== routeInput
-    ? { ...params, params: security.sanitizedInput }
+  const safeParams = routeSecurity.sanitizedInput !== routeInput
+    ? { ...params, params: routeSecurity.sanitizedInput }
     : params;
 
   const router = _modelRouter;
@@ -514,6 +595,8 @@ export async function gatewayRoute(params, ctx = {}) {
     status = 'error';
     errorMsg = err.message;
     result = null;
+    const errResp = buildErrorResponse(errorMsg, { modelId: routeModelId, traceId: getTraceContext()?.traceId });
+    logger.error(`[Gateway] route 失败: ${errResp.code} — ${errResp.message} (detail: ${errorMsg})`);
   }
 
   const tokensIn = result?.usage?.input_tokens || result?.usage?.prompt_tokens || 0;
