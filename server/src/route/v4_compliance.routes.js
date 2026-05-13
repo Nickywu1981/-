@@ -11,7 +11,6 @@ import { rateLimiter } from '../middleware/rateLimiter.js';
 import * as ctrl from '../controller/v4ComplianceController.js';
 
 const router = Router();
-router.use(authMiddleware);
 router.use(rateLimiter);
 
 // ─── GET /api/compliance/targets ──────────────────────────────

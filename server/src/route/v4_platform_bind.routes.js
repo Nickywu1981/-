@@ -19,7 +19,6 @@ import { listAllPlatforms, getPlatformConfig, getPlatformsByRegion } from '../co
 
 const router = Router();
 
-router.use(authMiddleware);
 
 const bindSchema = z.object({
   platform: z.string().min(1, '请提供平台标识').max(50),

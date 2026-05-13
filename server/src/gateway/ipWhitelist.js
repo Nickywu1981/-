@@ -8,6 +8,8 @@
  * - 非白名单 IP 返回 403
  */
 
+import logger from '../utils/logger.js';
+
 // 默认静态白名单
 const DEFAULT_ADMIN_IPS = new Set([
   '127.0.0.1', '::1', '::ffff:127.0.0.1', 'localhost',
@@ -29,8 +31,8 @@ async function loadDynamicWhitelist() {
       const list = JSON.parse(raw);
       if (Array.isArray(list)) return new Set(list);
     }
-  } catch {
-    // Redis 不可用时降级为仅使用静态白名单
+  } catch (e) {
+    logger.warn('[IPWhitelist] Redis 白名单加载失败，降级为静态白名单', { error: e.message });
   }
   return new Set();
 }

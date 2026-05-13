@@ -19,7 +19,6 @@ const buildPromptSchema = z.object({
   tone: z.enum(['professional', 'casual', 'urgent', 'luxury', 'friendly']).optional(),
 });
 
-router.use(authMiddleware);
 
 router.get('/languages', getLanguages);
 router.get('/script-types', getScriptTypes);

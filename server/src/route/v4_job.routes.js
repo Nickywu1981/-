@@ -21,7 +21,6 @@ const VALID_TASK_TYPES = new Set([
 ]);
 
 const router = Router();
-router.use(authMiddleware);
 
 const VALID_TYPES_ARR = [...VALID_TASK_TYPES];
 const submitJobSchema = z.object({

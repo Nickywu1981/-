@@ -19,7 +19,6 @@ const rankingQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(10),
 });
 
-router.use(authMiddleware);
 
 router.get('/overview', adminAuth, adminLimiter, operationsController.overview);
 router.get('/tokens', adminAuth, adminLimiter, validate(daysQuerySchema, 'query'), operationsController.tokens);

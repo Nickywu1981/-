@@ -36,8 +36,6 @@ const rateSchema = z.object({
 });
 // (idParamSchema imported from validate.js)
 
-router.use(authMiddleware);
-router.use(heavyLimiter);
 
 // 模板（支持 /api/prompts 和 /api/prompts/templates）
 router.get('/', listTemplates);

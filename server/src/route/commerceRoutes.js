@@ -16,7 +16,7 @@ const orderQuerySchema = z.object({
   pageSize: z.coerce.number().int().min(1).max(200).optional().default(20),
 });
 
-router.use(authMiddleware, rateLimiter, enterpriseOnly);
+router.use(rateLimiter, enterpriseOnly);
 
 // 企业端订单列表（仅查看旗下客户订单）
 router.get('/', _validate(orderQuerySchema, 'query'), ctrl.listOrders);

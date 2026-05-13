@@ -15,7 +15,6 @@ import multer from 'multer';
 import * as ctrl from '../controller/v4UploadController.js';
 
 const router = Router();
-router.use(authMiddleware);
 
 const ALLOWED_MIMES = Object.keys({
   'image/png': true, 'image/jpeg': true, 'image/webp': true,
@@ -62,10 +61,10 @@ function _withMulter(req, res, next) {
   });
 }
 
-router.post('/simple', uploadLimiter, _withMulter, uploadQuotaGuard, magicNumberGuard, ctrl.saveSimpleFile);
-router.post('/init', uploadLimiter, _validate(initUploadSchema), ctrl.initUpload);
-router.post('/chunk', uploadLimiter, _upload.fields([{ name: 'chunk', maxCount: 1 }]), uploadQuotaGuard, magicNumberGuard, validate(chunkSchema, 'body'), ctrl.receiveChunk);
+router.post('/simple', _withMulter, uploadQuotaGuard, magicNumberGuard, ctrl.saveSimpleFile);
+router.post('/init', _validate(initUploadSchema), ctrl.initUpload);
+router.post('/chunk', _upload.fields([{ name: 'chunk', maxCount: 1 }]), uploadQuotaGuard, magicNumberGuard, validate(chunkSchema, 'body'), ctrl.receiveChunk);
 router.get('/chunks/:uploadId', ctrl.getReceivedChunks);
-router.post('/complete', uploadLimiter, _validate(completeUploadSchema), uploadQuotaGuard, ctrl.completeUpload);
+router.post('/complete', _validate(completeUploadSchema), uploadQuotaGuard, ctrl.completeUpload);
 
 export default router;

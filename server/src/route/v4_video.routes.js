@@ -12,7 +12,6 @@ import { authMiddleware } from '../middleware/auth.js';
 import * as ctrl from '../controller/v4VideoController.js';
 
 const router = Router();
-router.use(authMiddleware);
 
 const idParamSchema = z.object({ id: z.string().min(1).max(50) });
 

@@ -34,7 +34,7 @@ const batchTagSchema = z.object({
   userIds: z.array(z.number().int().positive()).min(1).max(500),
 });
 
-router.use(authMiddleware, enterpriseOnly);
+router.use(enterpriseOnly);
 router.use(rateLimiter);
 
 // 客户查询 (挂载后: GET /api/enterprise/customers)

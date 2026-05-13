@@ -38,7 +38,7 @@ export async function getGroupConfig(groupKey, userId, userRole) {
     if (cached) return JSON.parse(cached);
   } catch (e) {
     logger.warn('[Config] Redis 缓存读取失败', { groupKey, error: e.message });
-    try { await cacheDel(cacheKey); } catch { /* 静默清理 */ }
+    try { await cacheDel(cacheKey); } catch (e) { logger.warn('[Config] 损坏缓存清除失败', { groupKey, error: e.message }); }
   }
 
   if (_inflight.has(cacheKey)) return _inflight.get(cacheKey);
@@ -73,7 +73,7 @@ export async function getDict(dictKey) {
     try {
       const recheck = await cacheGet(cacheKey);
       if (recheck) return JSON.parse(recheck);
-    } catch { /* ignore */ }
+    } catch (e) { logger.warn('[Config] getDict 缓存二次检查失败', { dictKey, error: e.message }); }
 
     const items = await configDao.getDictItems(dictKey);
     try { await cacheSet(cacheKey, JSON.stringify(items), CACHE_TTL); } catch (e) { logger.warn('[Config] Dict 缓存写入失败', { dictKey, error: e.message }); }

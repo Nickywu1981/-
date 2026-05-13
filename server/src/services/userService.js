@@ -6,6 +6,7 @@ import crypto from 'crypto';
 import * as userDao from '../dao/userDao.js';
 import { jwtSecret, isProduction } from '../config/index.js';
 import { guardSQL } from '../utils/sqlGuard.js';
+import logger from '../utils/logger.js';
 import { generateTokens, refreshAccessToken as refreshTokenUtil, revokeAccessToken as revokeTokenUtil, revokeRefreshToken as revokeRefreshUtil, revokeAllUserTokens as revokeAllUtil, isTokenBlacklisted } from '../utils/jwtToken.js';
 
 const SALT_ROUNDS = 12;
@@ -127,7 +128,7 @@ export async function resetPassword(token, newPassword) {
         const ttl = Math.max(1, (payload.exp - Math.floor(Date.now() / 1000)));
         await r.set(`reset_jti:${payload.jti}`, '1', 'EX', ttl);
       }
-    } catch { /* Redis 不可用时跳过，JWT 15分钟短有效期作为兜底 */ }
+    } catch (e) { logger.warn('[User] 重置令牌 JTI 标记失败', { error: e.message }); }
   }
 
   return { success: true };

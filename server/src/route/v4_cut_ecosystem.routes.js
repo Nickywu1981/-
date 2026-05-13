@@ -10,7 +10,6 @@ import { authMiddleware } from '../middleware/auth.js';
 import * as ctrl from '../controller/v4CutEcosystemController.js';
 
 const router = Router();
-router.use(authMiddleware);
 
 const exportSchema = z.object({
   workIds: z.array(z.number().int().positive()).min(1, '请选择至少一个作品').max(50, '单次最多导出50个作品'),

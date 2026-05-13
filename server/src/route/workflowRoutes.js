@@ -17,7 +17,6 @@ import { heavyLimiter } from '../middleware/rateLimiter.js';
 import * as ctrl from '../controller/workflowController.js';
 
 const router = Router();
-router.use(heavyLimiter);
 
 const templateSchema = z.object({
   name: z.string().min(1).max(100),

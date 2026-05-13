@@ -13,7 +13,7 @@ import * as ctrl from '../controller/adminWorkspaceDiyController.js';
 const router = Router();
 
 // 所有接口均需管理员身份
-router.use(authMiddleware, adminAuth);
+router.use(adminAuth);
 
 // ─── Zod schemas ───
 const keyParamSchema = z.object({

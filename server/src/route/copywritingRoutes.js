@@ -50,13 +50,12 @@ const scriptSchema = z.object({
 
 const historyQuerySchema = z.object({ type: z.string().max(50).optional() });
 
-router.use(authMiddleware);
 
 // 生成
-router.post('/titles', heavyLimiter, validate(titleGenSchema), generateTitles);
-router.post('/description', heavyLimiter, validate(descriptionSchema), generateDescription);
-router.post('/script', heavyLimiter, validate(scriptSchema), generateScript);
-router.post('/translate', heavyLimiter, validate(translateSchema), translateProduct);
+router.post('/titles', validate(titleGenSchema), generateTitles);
+router.post('/description', validate(descriptionSchema), generateDescription);
+router.post('/script', validate(scriptSchema), generateScript);
+router.post('/translate', validate(translateSchema), translateProduct);
 
 // 参考数据
 router.get('/platforms', listPlatforms);

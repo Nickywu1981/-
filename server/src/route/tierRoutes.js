@@ -11,7 +11,6 @@ const limitQuerySchema = z.object({
   type: z.enum(['image', 'video', 'text']).optional().default('image'),
 });
 
-router.use(authMiddleware);
 router.use(rateLimiter);
 
 router.get('/my', getMyTier);

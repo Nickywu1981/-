@@ -7,7 +7,7 @@ import { z } from 'zod';
 
 const router = Router();
 
-router.use(authMiddleware, adminAuth, heavyLimiter);
+router.use(adminAuth, heavyLimiter);
 
 const userIdParamSchema = z.object({ userId: z.string().regex(/^\d+$/).transform(Number) });
 

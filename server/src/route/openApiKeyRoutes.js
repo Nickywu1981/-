@@ -11,7 +11,6 @@ import { z } from 'zod';
 import * as ctl from '../controller/openApiKeyController.js';
 
 const router = Router();
-router.use(authMiddleware);
 
 const createSchema = z.object({
   description: z.string().max(200).optional(),

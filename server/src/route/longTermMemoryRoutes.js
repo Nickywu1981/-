@@ -54,21 +54,21 @@ const consolidateSchema = z.object({
 });
 
 // 存储记忆
-router.post('/store', requireAuth, heavyLimiter, validate(storeSchema), ctrl.storeMemory);
+router.post('/store', validate(storeSchema), ctrl.storeMemory);
 
 // 批量存储
-router.post('/batch', requireAuth, heavyLimiter, validate(batchSchema), ctrl.batchStoreMemory);
+router.post('/batch', validate(batchSchema), ctrl.batchStoreMemory);
 
 // RAG 检索记忆
-router.post('/recall', requireAuth, heavyLimiter, validate(recallSchema), ctrl.recallMemory);
+router.post('/recall', validate(recallSchema), ctrl.recallMemory);
 
 // 记忆合并
-router.post('/consolidate', requireAuth, heavyLimiter, validate(consolidateSchema), ctrl.consolidateMemory);
+router.post('/consolidate', validate(consolidateSchema), ctrl.consolidateMemory);
 
 // 统计信息
-router.get('/stats', requireAuth, apiLimiter, ctrl.getMemoryStats);
+router.get('/stats', apiLimiter, ctrl.getMemoryStats);
 
 // 清理过期
-router.post('/purge', requireAuth, heavyLimiter, ctrl.purgeExpiredMemories);
+router.post('/purge', heavyLimiter, ctrl.purgeExpiredMemories);
 
 export default router;

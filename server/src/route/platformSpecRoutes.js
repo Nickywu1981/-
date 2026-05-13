@@ -31,7 +31,6 @@ router.get('/', rateLimiter, listPlatforms);
 router.get('/:id', rateLimiter, validate(idParamSchema, 'params'), getSpec);
 router.get('/platform/:code', rateLimiter, validate(codeParamSchema, 'params'), getSpecsByPlatform);
 
-router.use(authMiddleware);
 router.post('/', rateLimiter, requireRole('admin'), validate(createSchema), createSpec);
 router.post('/adapt', rateLimiter, requireRole('admin'), validate(adaptSchema), adaptImage);
 router.put('/:id', rateLimiter, requireRole('admin'), validate(idParamSchema, 'params'), validate(updateSchema), updateSpec);

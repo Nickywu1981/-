@@ -88,7 +88,7 @@ router.post('/logout', authMiddleware, enterpriseOnly, ctrl.logoutEnterprise);
 router.get('/plans', ctrl.listPlans);
 
 // ==================== 企业管理员路由 ====================
-router.use(authMiddleware, enterpriseOnly);
+router.use(enterpriseOnly);
 
 // 企业信息 — CSRF 保护所有变更操作
 router.get('/profile', ctrl.getProfile);

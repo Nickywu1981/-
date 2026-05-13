@@ -204,7 +204,7 @@ async function realCloneInfer(text, audioSampleUrl) {
         throw new BusinessError(400, '无效的音频样本路径');
       }
       let sampleBuffer;
-      try { sampleBuffer = await fs.promises.readFile(resolvedPath); } catch { /* sample file not found, skip voice cloning from sample */ }
+      try { sampleBuffer = await fs.promises.readFile(resolvedPath); } catch (e) { logger.warn('[EdgeTTS] 音频样本文件读取失败，跳过声音克隆', { path: resolvedPath, error: e.message }); }
       if (sampleBuffer) {
         const formData = new FormData();
         formData.append('files', new Blob([sampleBuffer]), 'sample.mp3');

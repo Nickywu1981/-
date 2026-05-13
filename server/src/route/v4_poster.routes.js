@@ -13,7 +13,6 @@ import { authMiddleware } from '../middleware/auth.js';
 import * as ctrl from '../controller/v4PosterController.js';
 
 const router = Router();
-router.use(authMiddleware);
 
 // ─── POST /api/posters/generate ───────────────────────────────
 const generateSchema = z.object({

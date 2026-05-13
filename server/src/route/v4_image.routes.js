@@ -12,7 +12,6 @@ import { authMiddleware } from '../middleware/auth.js';
 import * as ctrl from '../controller/v4ImageController.js';
 
 const router = Router();
-router.use(authMiddleware);
 
 const worksQuerySchema = paginationSchema.extend({
   status: z.string().optional(),

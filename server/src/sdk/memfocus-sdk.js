@@ -28,6 +28,7 @@ import * as moderationService from '../services/moderation.service.js';
 import * as videoService from '../services/videoService.js';
 import * as batchService from '../services/batchService.js';
 import * as imageService from '../services/image.service.js';
+import logger from '../utils/logger.js';
 
 // ═══════════════ 能力 1: 记忆力 ============================================
 const memory = {
@@ -65,7 +66,8 @@ const attention = {
       const result = await infer('deepseek-chat', { prompt }, { temperature: 0.1, maxTokens: 150 });
       const json = JSON.parse(typeof result === 'string' ? result : result.text || result.content || '{}');
       return { priority: json.priority || 'normal', score: json.score || 50, reason: json.reason || '' };
-    } catch {
+    } catch (e) {
+      logger.warn('[MemFocus] classify AI调用失败，降级关键词匹配', { error: e.message });
       const c = content || '';
       const critical = ['退款', '投诉', '假货', '破损', '过敏', '报警', '12315', '315'];
       const high = ['退货', '换货', '差评', '质量问题'];
@@ -100,7 +102,8 @@ ${history.slice(-6).map(h => `${h.role}: ${h.content}`).join('\n')}
       const result = await infer('deepseek-chat', { prompt }, { temperature: 0.1, maxTokens: 200 });
       const json = JSON.parse(typeof result === 'string' ? result : result.text || result.content || '{}');
       return { resolved: json.resolved || currentMessage, entity: json.entity || '', confidence: json.confidence || 0.5 };
-    } catch {
+    } catch (e) {
+      logger.warn('[MemFocus] disambiguate AI调用失败，返回原文', { error: e.message });
       return { resolved: currentMessage, entity: '', confidence: 0.3 };
     }
   },
@@ -110,7 +113,8 @@ ${history.slice(-6).map(h => `${h.role}: ${h.content}`).join('\n')}
     try {
       const result = await infer('deepseek-chat', { prompt }, { temperature: 0.3, maxTokens: 100 });
       return typeof result === 'string' ? result : result.text || result.content || '';
-    } catch {
+    } catch (e) {
+      logger.warn('[MemFocus] summarize AI调用失败，降级拼接', { error: e.message });
       return history.slice(-3).map(h => h.content).join(' | ');
     }
   },
@@ -256,8 +260,8 @@ const visual = {
 const health = {
   async check() {
     const checks = {};
-    try { checks.memory = await memoryEmbedService.getMemoryStatus() ? 'ok' : 'degraded'; } catch { checks.memory = 'down'; }
-    try { checks.ai = 'ok'; } catch { checks.ai = 'down'; }
+    try { checks.memory = await memoryEmbedService.getMemoryStatus() ? 'ok' : 'degraded'; } catch (e) { logger.warn('[MemFocus] 记忆健康检查失败', { error: e.message }); checks.memory = 'down'; }
+    try { checks.ai = 'ok'; } catch (e) { logger.warn('[MemFocus] AI健康检查失败', { error: e.message }); checks.ai = 'down'; }
     checks.uptime = process.uptime();
     checks.status = Object.values(checks).every(v => v === 'ok' || v === 'uptime') ? 'healthy' : 'degraded';
     return checks;

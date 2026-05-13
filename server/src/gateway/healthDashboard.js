@@ -9,6 +9,8 @@
  * - BullMQ 队列统计
  */
 
+import logger from '../utils/logger.js';
+
 const RATE_LIMITER_REGISTRY = [
   { name: 'apiLimiter',    tier: 'global',  description: '全局API限流 (200/min)' },
   { name: 'authLimiter',   tier: 'strict',  description: '认证限流 (10/min)' },
@@ -55,7 +57,8 @@ export async function runHealthCheck(authenticated = false) {
     } finally {
       conn.release();
     }
-  } catch {
+  } catch (e) {
+    logger.warn('[HealthDashboard] DB检查失败', { error: e.message });
     status.checks.db = false;
     status.status = 'db_down';
   }
@@ -65,7 +68,8 @@ export async function runHealthCheck(authenticated = false) {
     const { ping } = await import('../dao/redis.js');
     await ping();
     status.checks.redis = true;
-  } catch {
+  } catch (e) {
+    logger.warn('[HealthDashboard] Redis检查失败', { error: e.message });
     status.checks.redis = false;
   }
 
@@ -75,7 +79,8 @@ export async function runHealthCheck(authenticated = false) {
     for (const m of listModels()) {
       status.checks.ai[m.id] = m.health ? (await m.health()).status : 'unknown';
     }
-  } catch {
+  } catch (e) {
+    logger.warn('[HealthDashboard] AI模型检查失败', { error: e.message });
     status.checks.ai = {};
   }
 
@@ -83,7 +88,8 @@ export async function runHealthCheck(authenticated = false) {
   try {
     const { getAllQueueStats } = await import('../services/queueManager.js');
     status.queues = await getAllQueueStats();
-  } catch {
+  } catch (e) {
+    logger.warn('[HealthDashboard] 队列检查失败', { error: e.message });
     status.queues = {};
   }
 

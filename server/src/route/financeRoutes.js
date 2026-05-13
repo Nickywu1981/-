@@ -40,7 +40,7 @@ const commissionPolicySchema = z.object({
 });
 
 // ==================== 全局中间件 ====================
-router.use(authMiddleware, enterpriseOnly);
+router.use(enterpriseOnly);
 
 // ==================== 收款账户 ====================
 router.get('/bank-accounts', ctrl.listBankAccounts);

@@ -8,7 +8,6 @@ import { tierGuard } from '../middleware/tierGuard.js';
 import * as digitalHumanController from '../controller/digitalHumanController.js';
 
 const router = Router();
-router.use(authMiddleware);
 
 const createSchema = z.object({
   text: z.string().optional(),

@@ -11,7 +11,6 @@ import { validate } from '../utils/validate.js';
 import * as ctrl from '../controller/v4AssetsController.js';
 
 const router = Router();
-router.use(authMiddleware);
 router.use(rateLimiter);
 
 const listQuerySchema = z.object({

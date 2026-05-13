@@ -15,7 +15,6 @@ const collectionSchema = z.object({
 const updateCollectionSchema = collectionSchema.partial();
 
 const router = Router();
-router.use(authMiddleware);
 router.use(rateLimiter);
 router.get('/', cacheMiddleware(120), listCollections);
 router.get('/:id', cacheMiddleware(120), validate(idParamSchema, 'params'), getCollection);

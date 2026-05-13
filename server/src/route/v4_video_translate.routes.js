@@ -12,7 +12,6 @@ import { authMiddleware } from '../middleware/auth.js';
 import * as ctrl from '../controller/v4VideoTranslateController.js';
 
 const router = Router();
-router.use(authMiddleware);
 
 const baseTranslateSchema = z.object({
   videoUrl: z.string().url('请提供有效视频链接'),

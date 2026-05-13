@@ -24,7 +24,6 @@ const changePasswordSchema = z.object({
   newPassword: z.string().min(8, '新密码至少8位').max(64),
 });
 
-router.use(authMiddleware);
 
 router.get('/profile', ctrl.getProfile);
 router.get('/stats', ctrl.getStats);

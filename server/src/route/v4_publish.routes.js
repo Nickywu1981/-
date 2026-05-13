@@ -10,7 +10,6 @@ import { heavyLimiter } from '../middleware/rateLimiter.js';
 import * as ctrl from '../controller/v4PublishController.js';
 
 const router = Router();
-router.use(authMiddleware);
 
 const submitSchema = z.object({
   workId: z.number().int().positive(),

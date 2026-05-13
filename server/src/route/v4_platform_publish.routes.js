@@ -7,7 +7,6 @@ import { apiLimiter } from '../middleware/rateLimiter.js';
 
 const router = Router();
 
-router.use(authMiddleware);
 
 const bindSchema = z.object({
   platform: z.enum(['taobao', 'jd', 'pdd', 'douyin', 'kuaishou', 'shopee']),

@@ -31,7 +31,7 @@ export const getPublicConfigMap = async () => {
     try {
       const recheck = await cacheGet(cacheKey);
       if (recheck) return recheck;
-    } catch { /* ignore */ }
+    } catch (e) { logger.warn('[SiteConfig] 缓存二次检查失败', { error: e.message }); }
 
     const rows = await getPublicConfig();
     const map = {};

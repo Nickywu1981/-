@@ -21,15 +21,15 @@ function parseKey(transKey) {
 
 export async function getTranslations(locale) {
   const cacheKey = CACHE_PREFIX + locale;
-  try { const cached = await cacheGet(cacheKey); if (cached) return JSON.parse(cached); } catch { /* ignore */ }
+  try { const cached = await cacheGet(cacheKey); if (cached) return JSON.parse(cached); } catch (e) { logger.warn('[I18n] 缓存读取失败', { locale, error: e.message }); }
 
   if (_inflight.has(cacheKey)) return _inflight.get(cacheKey);
   const promise = (async () => {
-    try { const recheck = await cacheGet(cacheKey); if (recheck) return JSON.parse(recheck); } catch { /* ignore */ }
+    try { const recheck = await cacheGet(cacheKey); if (recheck) return JSON.parse(recheck); } catch (e) { logger.warn('[I18n] 缓存二次检查失败', { locale, error: e.message }); }
     const rows = await i18nDao.getAll(locale);
     const result = {};
     for (const r of rows) result[r.trans_key] = r.trans_value;
-    try { await cacheSet(cacheKey, JSON.stringify(result), CACHE_TTL); } catch { /* ignore */ }
+    try { await cacheSet(cacheKey, JSON.stringify(result), CACHE_TTL); } catch (e) { logger.warn('[I18n] 缓存写入失败', { locale, error: e.message }); }
     return result;
   })();
   _inflight.set(cacheKey, promise);
@@ -55,8 +55,8 @@ export async function setTranslation(locale, transKey, transValue, changedBy) {
   const { namespace } = parseKey(transKey);
   await i18nDao.upsert(locale, namespace, transKey, transValue, changedBy);
   await i18nDao.insertLog(locale, transKey, existing?.trans_value || '', transValue, changedBy);
-  try { await cacheDel(CACHE_PREFIX + locale); } catch { /* ignore */ }
-  try { await broadcastI18nVersion(); } catch { /* ignore */ }
+  try { await cacheDel(CACHE_PREFIX + locale); } catch (e) { logger.warn('[I18n] setTranslation 缓存清除失败', { locale, error: e.message }); }
+  try { await broadcastI18nVersion(); } catch (e) { logger.warn('[I18n] 版本广播失败', { locale, error: e.message }); }
   return { locale, key: transKey, oldValue: existing?.trans_value || '', newValue: transValue };
 }
 
@@ -71,13 +71,13 @@ export async function importTranslations(locale, entries, skipEdited = false) {
     batch.push({ namespace, key, value });
   }
   const affected = await i18nDao.upsertBatch(locale, batch);
-  try { await cacheDel(CACHE_PREFIX + locale); } catch { /* ignore */ }
+  try { await cacheDel(CACHE_PREFIX + locale); } catch (e) { logger.warn('[I18n] importTranslations 缓存清除失败', { locale, error: e.message }); }
   return { imported: batch.length, affected };
 }
 
 export async function deleteTranslation(locale, transKey) {
   await i18nDao.remove(locale, transKey);
-  try { await cacheDel(CACHE_PREFIX + locale); } catch { /* ignore */ }
+  try { await cacheDel(CACHE_PREFIX + locale); } catch (e) { logger.warn('[I18n] deleteTranslation 缓存清除失败', { locale, error: e.message }); }
 }
 
 export async function getLogs(locale, transKey) {
@@ -99,7 +99,7 @@ function _lazyInit() {
         mod._i18nVersion = () => i18nVersion;
         mod._bumpI18nVersion = () => ++i18nVersion;
       }
-    }).catch(() => { /* standalone mode, no SSE */ });
+    }).catch((e) => { logger.warn('[I18n] 版本服务加载失败，SSE广播不可用', { error: e.message }); });
   }
 }
 
@@ -111,5 +111,5 @@ export async function broadcastI18nVersion() {
     const { EventEmitter } = await import('events');
     const emitter = (await import('./config-version.service.js')).versionEmitter || new EventEmitter();
     emitter.emit('i18n-version', { version: i18nVersion });
-  } catch { /* noop */ }
+  } catch (e) { logger.warn('[I18n] SSE广播事件发送失败', { error: e.message }); }
 }

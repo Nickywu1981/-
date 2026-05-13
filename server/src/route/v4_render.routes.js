@@ -10,7 +10,6 @@ import { heavyLimiter } from '../middleware/rateLimiter.js';
 import * as ctrl from '../controller/v4RenderController.js';
 
 const router = Router();
-router.use(authMiddleware);
 
 const renderSchema = z.object({
   modelUrl: z.string().min(1, '请上传产品 3D 模型').max(2000),

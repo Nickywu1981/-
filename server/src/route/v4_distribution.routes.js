@@ -10,7 +10,6 @@ import { paymentLimiter } from '../middleware/rateLimiter.js';
 import * as ctrl from '../controller/v4DistributionController.js';
 
 const router = Router();
-router.use(authMiddleware);
 
 const withdrawSchema = z.object({
   amount: z.number().positive('提现金额必须大于0').max(100000),

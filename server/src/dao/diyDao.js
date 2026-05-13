@@ -68,7 +68,7 @@ export default {
       try {
         const cached = await redis.get(`${REDIS_KEY_PREFIX}${slug}`);
         if (cached) return JSON.parse(cached);
-      } catch (___) { /* fallback to DB */ }
+      } catch (e) { logger.warn('[DiyDao] Redis 缓存读取失败，回退DB查询', { slug, error: e.message }); }
     }
     const [rows] = await pool.query(
       'SELECT id, owner_id, title, slug, page_type, mobile_config, pc_config, meta_json, publish_time, latest_published_version FROM diy_page WHERE slug = ? AND status = 1 LIMIT 1', [slug],
@@ -78,7 +78,7 @@ export default {
     const result = { id: p.id, ownerId: p.owner_id, title: p.title, slug: p.slug, page_type: p.page_type, mobileConfig: parseJson(p.mobile_config), pcConfig: parseJson(p.pc_config), meta: parseJson(p.meta_json), publishTime: p.publish_time, version: p.latest_published_version };
     // 写入 Redis 缓存
     if (redis) {
-      try { await redis.setex(`${REDIS_KEY_PREFIX}${slug}`, REDIS_TTL, JSON.stringify(result)); } catch { /* noop */ }
+      try { await redis.setex(`${REDIS_KEY_PREFIX}${slug}`, REDIS_TTL, JSON.stringify(result)); } catch (e) { logger.warn('[DiyDao] 发布页缓存写入失败', { slug, error: e.message }); }
     }
     return result;
   },
@@ -215,14 +215,14 @@ export default {
   async cachePublishedPage(slug, data) {
     const redis = getRedis();
     if (redis) {
-      try { await redis.setex(`${REDIS_KEY_PREFIX}${slug}`, REDIS_TTL, JSON.stringify(data)); } catch { /* noop */ }
+      try { await redis.setex(`${REDIS_KEY_PREFIX}${slug}`, REDIS_TTL, JSON.stringify(data)); } catch (e) { logger.warn('[DiyDao] cachePublishedPage 缓存写入失败', { slug, error: e.message }); }
     }
   },
 
   async clearPageCache(slug) {
     const redis = getRedis();
     if (redis) {
-      try { await redis.del(`${REDIS_KEY_PREFIX}${slug}`); } catch { /* noop */ }
+      try { await redis.del(`${REDIS_KEY_PREFIX}${slug}`); } catch (e) { logger.warn('[DiyDao] clearPageCache 缓存删除失败', { slug, error: e.message }); }
     }
   },
 

@@ -51,7 +51,7 @@ const perfQuerySchema = z.object({
 });
 
 // ==================== 全局中间件 ====================
-router.use(authMiddleware, rateLimiter, enterpriseOnly);
+router.use(rateLimiter, enterpriseOnly);
 
 // ==================== 渠道关系 ====================
 

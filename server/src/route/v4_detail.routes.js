@@ -13,7 +13,6 @@ import { authMiddleware } from '../middleware/auth.js';
 import * as ctrl from '../controller/v4DetailController.js';
 
 const router = Router();
-router.use(authMiddleware);
 
 const generateSetSchema = z.object({
   product_name: z.string().min(1, '请提供商品名称').max(200),
