@@ -100,11 +100,7 @@ export const getByCategory = wrapController(async (req) => {
 });
 
 export const setGrayPercent = wrapController(async (req) => {
-  const { percent } = req.body;
-  if (typeof percent !== 'number' || percent < 0 || percent > 100) {
-    throw new BusinessError(400, '灰度百分比需在 0-100 之间');
-  }
-  return pool.setGrayPercent(req.params.key, percent);
+  return pool.setGrayPercent(req.params.key, req.body.percent);
 });
 
 export const registerModel = wrapController(async (req) => {
@@ -121,11 +117,7 @@ export const removeModel = wrapController(async (req) => {
 });
 
 export const toggleModel = wrapController(async (req) => {
-  const { enabled } = req.body;
-  if (typeof enabled !== 'boolean') {
-    throw new BusinessError(400, 'enabled 需为 boolean');
-  }
-  return pool.toggleModel(req.params.key, enabled);
+  return pool.toggleModel(req.params.key, req.body.enabled);
 });
 
 // ==================== 可配置清单 ====================
