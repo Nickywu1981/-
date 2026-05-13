@@ -307,10 +307,21 @@ export async function queryOrder(reqsn) {
   const order = await allinpayDao.getByReqsn(reqsn);
   if (!order) return null;
 
+  // 防竞态：检查 Redis 锁，callbcak 处理中时返回中间态避免脏读
+  let callbackInProgress = false;
+  try {
+    const { getRedis } = await import('../dao/redis.js');
+    const redis = getRedis();
+    if (redis) {
+      const lock = await redis.get(`notify_lock:${reqsn}`);
+      callbackInProgress = !!lock;
+    }
+  } catch { /* Redis 不可用时跳过 */ }
+
   return {
     reqsn: order.reqsn,
     trxid: order.trxid,
-    status: order.status,
+    status: callbackInProgress ? 2 : order.status,  // 2=processing
     amount: Number(order.amount),
     payChannel: order.pay_channel,
     expireTime: order.expire_time,

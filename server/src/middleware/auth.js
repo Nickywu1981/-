@@ -115,7 +115,7 @@ const PUBLIC_PREFIXES = [
   '/api/forms/public',
   '/api/enterprise/register', '/api/enterprise/login', '/api/enterprise/plans',  // Phase 1: B端公开入口
   '/api/i18n',  // 公开翻译接口（前端SSR/CSR无需登录）
-  '/uploads',
+  // '/uploads' 已移除 — 现由 authMiddleware 保护（app.js:270）
 ];
 
 const RENEW_WINDOW = 5 * 60;  // 5min: 仅临近过期时自动续期，防止被盗token无限刷新

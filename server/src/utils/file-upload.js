@@ -273,7 +273,13 @@ export async function saveSimpleFile(file) {
   // 魔数检测 — 写入前验证
   validateBufferMagic(file.buffer, extClean);
 
-  await fsp.writeFile(finalPath, file.buffer);
+  try {
+    await fsp.writeFile(finalPath, file.buffer);
+  } catch (writeErr) {
+    // 写入失败时清理残留文件
+    try { await fsp.unlink(finalPath); } catch { /* 文件可能未创建 */ }
+    throw writeErr;
+  }
 
   const fileUrl = `/uploads/${finalName}`;
   return {

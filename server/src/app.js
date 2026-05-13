@@ -266,8 +266,8 @@ app.post('/api/internal/embed', async (req, res) => {
 // 公开路由（无需认证）
 app.use('/api/geo', apiLimiter, geoRoutes);
 
-// 静态文件服务（上传目录），带缓存
-app.use('/uploads', express.static(path.join(__dirname, '../uploads'), {
+// 静态文件服务（上传目录），带认证 + 缓存
+app.use('/uploads', authMiddleware, express.static(path.join(__dirname, '../uploads'), {
   dotfiles: 'deny',
   maxAge: '7d',
   etag: true,
