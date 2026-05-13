@@ -5390,5 +5390,27 @@
     "generating": "Generating...",
     "download": "Download Poster",
     "copy": "Copy Poster"
+  },
+  "admin_layout": {
+    "close_menu": "Close Menu",
+    "open_menu": "Open Menu",
+    "switch_light": "Switch to Light Mode",
+    "switch_dark": "Switch to Dark Mode",
+    "back_workspace": "Back to Workspace"
+  },
+  "three_viewer": {
+    "loading": "Loading 3D model...",
+    "retry": "Retry",
+    "vertices": "Vertices",
+    "faces": "Faces",
+    "materials": "Materials",
+    "auto_rotate": "Auto Rotate",
+    "wireframe": "Wireframe",
+    "reset": "Reset",
+    "top": "Top View",
+    "front": "Front View",
+    "model_load_failed": "Model load failed",
+    "unknown_error": "Unknown error",
+    "engine_load_failed": "3D engine failed to load"
   }
 }

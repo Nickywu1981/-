@@ -5353,5 +5353,27 @@
     "generating": "生成中...",
     "download": "下载海报",
     "copy": "复制海报"
+  },
+  "admin_layout": {
+    "close_menu": "关闭菜单",
+    "open_menu": "打开菜单",
+    "switch_light": "切换亮色模式",
+    "switch_dark": "切换暗色模式",
+    "back_workspace": "返回工作台"
+  },
+  "three_viewer": {
+    "loading": "加载 3D 模型中...",
+    "retry": "重试",
+    "vertices": "顶点",
+    "faces": "三角面",
+    "materials": "材质",
+    "auto_rotate": "自动旋转",
+    "wireframe": "线框",
+    "reset": "复位",
+    "top": "俯视",
+    "front": "正视",
+    "model_load_failed": "模型加载失败",
+    "unknown_error": "未知错误",
+    "engine_load_failed": "3D 引擎加载失败"
   }
 }
