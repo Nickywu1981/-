@@ -183,13 +183,13 @@ export async function updateTenantReviewStatus(id, { status, approvedBy, reason,
   if (status === 'rejected' || reason) {
     fields.review_remark = reason || null;
   }
-  const [result] = await pool.query('UPDATE ?? SET ? WHERE id = ?', [TABLE.TENANT, fields, id]);
+  const [result] = await db.query('UPDATE ?? SET ? WHERE id = ?', [TABLE.TENANT, fields, id]);
   return result.affectedRows;
 }
 
 export async function insertApprovalLog(data, conn) {
   const db = conn || pool;
-  const [result] = await pool.query('INSERT INTO enterprise_approval_log SET ?', {
+  const [result] = await db.query('INSERT INTO enterprise_approval_log SET ?', {
     tenant_id: data.tenantId,
     action: data.action,
     operator_id: data.operatorId,

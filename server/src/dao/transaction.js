@@ -15,30 +15,33 @@ export async function withTransaction(fn, options = {}) {
   const conn = await pool.getConnection();
 
   let lastError = null;
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    if (attempt > 0) {
-      logger.warn('[TX] 重试事务', { attempt, cause: lastError?.message });
-      await new Promise(r => setTimeout(r, 200 * Math.pow(2, attempt)));
-    }
-    try {
-      await conn.beginTransaction();
-      if (isolationLevel) {
-        await conn.query(`SET TRANSACTION ISOLATION LEVEL ${isolationLevel}`);
+  try {
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      if (attempt > 0) {
+        logger.warn('[TX] 重试事务', { attempt, cause: lastError?.message });
+        await new Promise(r => setTimeout(r, 200 * Math.pow(2, attempt)));
       }
-      const result = await fn(conn);
-      await conn.commit();
-      return result;
-    } catch (e) {
-      lastError = e;
-      try { await conn.rollback(); } catch (_) { logger.warn('[TX] rollback 失败（连接可能已断开）'); }
-      // 死锁/锁超时可重试
-      if (e.code === 'ER_LOCK_DEADLOCK' || e.code === 'ER_LOCK_WAIT_TIMEOUT') {
-        if (attempt < maxRetries) continue;
+      try {
+        await conn.beginTransaction();
+        if (isolationLevel) {
+          await conn.query(`SET TRANSACTION ISOLATION LEVEL ${isolationLevel}`);
+        }
+        const result = await fn(conn);
+        await conn.commit();
+        return result;
+      } catch (e) {
+        lastError = e;
+        try { await conn.rollback(); } catch (_) { logger.warn('[TX] rollback 失败（连接可能已断开）'); }
+        if (e.code === 'ER_LOCK_DEADLOCK' || e.code === 'ER_LOCK_WAIT_TIMEOUT') {
+          if (attempt < maxRetries) continue;
+        }
+        throw e;
       }
-      throw e;
     }
+    throw lastError;
+  } finally {
+    conn.release();
   }
-  throw lastError;
 }
 
 /**

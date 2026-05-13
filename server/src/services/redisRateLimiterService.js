@@ -19,7 +19,7 @@ async function getRedis() {
   if (_redis) return _redis;
   if (_redisInitAttempted) return null;
   try {
-    const { default: redisModule } = await import('../utils/redis.js');
+    const { default: redisModule } = await import('../dao/redis.js');
     _redis = redisModule;
   } catch {
     logger.warn('[RedisRateLimiter] Redis 不可用，降级为内存模式');

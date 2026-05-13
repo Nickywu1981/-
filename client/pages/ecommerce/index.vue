@@ -237,7 +237,7 @@
           <div v-if="activeTab === 'final'" class="tab-content">
             <div v-if="pipelineResult.final?.content" class="final-content">
               <h4>{{ $t('ecommerce.finalOutput') }}</h4>
-              <div class="content-box" v-html="pipelineResult.final.content"></div>
+              <div class="content-box" v-html="sanitize(pipelineResult.final.content)"></div>
             </div>
             <div v-if="pipelineResult.final?.voice?.audioUrl" class="voice-player">
               <h4>{{ $t('ecommerce.voiceOutput') }}</h4>
@@ -265,6 +265,7 @@
 import { ref, reactive, onMounted, computed } from 'vue';
 
 const { $api, $t } = useNuxtApp();
+const { sanitize } = useSanitizeHtml();
 
 // 表单
 const form = reactive({
