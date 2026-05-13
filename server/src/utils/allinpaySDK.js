@@ -60,7 +60,7 @@ export function buildSignString(params) {
 async function rsaSign(signStr) {
   const privateKey = await getPrivateKey();
   if (!privateKey) throw new BusinessError(503, '商户私钥未配置');
-  const sign = crypto.createSign('RSA-SHA1');
+  const sign = crypto.createSign('RSA-SHA256');
   sign.update(signStr, 'utf-8');
   return sign.sign(privateKey, 'base64');
 }
@@ -70,7 +70,7 @@ async function rsaSign(signStr) {
 async function rsaVerify(signStr, signature) {
   const publicKey = await getPublicKey();
   if (!publicKey) throw new BusinessError(503, '通联公钥未配置');
-  const verify = crypto.createVerify('RSA-SHA1');
+  const verify = crypto.createVerify('RSA-SHA256');
   verify.update(signStr, 'utf-8');
   return verify.verify(publicKey, signature, 'base64');
 }

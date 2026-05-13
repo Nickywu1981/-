@@ -131,20 +131,29 @@ export function uploadQuotaGuard(req, res, next) {
   const files = req.file ? [req.file] : (req.files ? (Array.isArray(req.files) ? req.files : Object.values(req.files).flat()) : []);
   const estSize = files.reduce((sum, f) => sum + (f.size || 0), 0);
 
-  if (entry.total + estSize > DAILY_UPLOAD_LIMIT_MB * 1024 * 1024) {
+  // 原子预扣配额，避免 TOCTOU 竞态 — 先扣后检
+  entry.total += estSize;
+  entry.ts = Date.now();
+  tenantUploadQuota.set(key, entry);
+
+  if (entry.total > DAILY_UPLOAD_LIMIT_MB * 1024 * 1024) {
+    // 超额回退
+    entry.total -= estSize;
+    tenantUploadQuota.set(key, entry);
     return error(res, 429, `每日上传配额已用尽 (${DAILY_UPLOAD_LIMIT_MB}MB)`);
   }
 
+  // 响应失败时回退预扣配额
   let quotaDone = false;
   const done = () => {
     if (quotaDone) return;
     quotaDone = true;
-    const cur = tenantUploadQuota.get(key) || { total: 0, ts: Date.now() };
-    cur.total += estSize;
-    cur.ts = Date.now();
-    tenantUploadQuota.set(key, cur);
+    if (res.statusCode >= 400) {
+      const cur = tenantUploadQuota.get(key);
+      if (cur) { cur.total = Math.max(0, cur.total - estSize); cur.ts = Date.now(); }
+    }
   };
-  res.on('close', () => { if (res.statusCode < 400) done(); });
+  res.on('close', done);
 
   next();
 }

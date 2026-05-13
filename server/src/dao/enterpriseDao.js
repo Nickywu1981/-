@@ -13,8 +13,10 @@ const TABLE = {
 
 // ==================== 企业/租户 CRUD ====================
 
-export async function findTenantById(id) {
-  const [rows] = await pool.query('SELECT * FROM ?? WHERE id = ? AND status = 1 LIMIT 1', [TABLE.TENANT, id]);
+export async function findTenantById(id, conn, forUpdate = false) {
+  const db = conn || pool;
+  const lock = forUpdate ? ' FOR UPDATE' : '';
+  const [rows] = await db.query(`SELECT * FROM ?? WHERE id = ? AND status = 1 LIMIT 1${lock}`, [TABLE.TENANT, id]);
   return rows[0] || null;
 }
 
@@ -171,7 +173,8 @@ export async function listTenantsByReviewStatus(status, { page = 1, pageSize = 2
   return { list: rows, total, page, pageSize };
 }
 
-export async function updateTenantReviewStatus(id, { status, approvedBy, reason, reviewedAt }) {
+export async function updateTenantReviewStatus(id, { status, approvedBy, reason, reviewedAt }, conn) {
+  const db = conn || pool;
   const fields = { review_status: status, reviewed_at: reviewedAt || new Date() };
   if (status === 'approved') {
     fields.approved_at = new Date();
@@ -184,7 +187,8 @@ export async function updateTenantReviewStatus(id, { status, approvedBy, reason,
   return result.affectedRows;
 }
 
-export async function insertApprovalLog(data) {
+export async function insertApprovalLog(data, conn) {
+  const db = conn || pool;
   const [result] = await pool.query('INSERT INTO enterprise_approval_log SET ?', {
     tenant_id: data.tenantId,
     action: data.action,

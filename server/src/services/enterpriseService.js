@@ -371,68 +371,76 @@ export async function submitForReview(code) {
 }
 
 export async function approveTenant(id, { operatorId }) {
-  const tenant = await enterpriseDao.findTenantById(id);
-  if (!tenant) throw new BusinessError(ERROR_CODE.NOT_FOUND, '企业不存在');
+  return withTransaction(async (conn) => {
+    const tenant = await enterpriseDao.findTenantById(id, conn, true);
+    if (!tenant) throw new BusinessError(ERROR_CODE.NOT_FOUND, '企业不存在');
 
-  const allowed = getValidTransitions(tenant.review_status);
-  if (!allowed.includes('approved')) {
-    throw new BusinessError(ERROR_CODE.BAD_REQUEST, `当前状态 ${tenant.review_status} 不可审批通过`);
-  }
+    const allowed = getValidTransitions(tenant.review_status);
+    if (!allowed.includes('approved')) {
+      throw new BusinessError(ERROR_CODE.BAD_REQUEST, `当前状态 ${tenant.review_status} 不可审批通过`);
+    }
 
-  await enterpriseDao.updateTenantReviewStatus(id, {
-    status: 'approved', approvedBy: operatorId,
+    await enterpriseDao.updateTenantReviewStatus(id, {
+      status: 'approved', approvedBy: operatorId,
+    }, conn);
+    await enterpriseDao.insertApprovalLog({
+      tenantId: id, action: 'approve', operatorId,
+      oldStatus: tenant.review_status, newStatus: 'approved',
+    }, conn);
+    return { id, status: 'approved' };
   });
-  await enterpriseDao.insertApprovalLog({
-    tenantId: id, action: 'approve', operatorId,
-    oldStatus: tenant.review_status, newStatus: 'approved',
-  });
-  return { id, status: 'approved' };
 }
 
 export async function rejectTenant(id, { operatorId, reason }) {
-  const tenant = await enterpriseDao.findTenantById(id);
-  if (!tenant) throw new BusinessError(ERROR_CODE.NOT_FOUND, '企业不存在');
+  return withTransaction(async (conn) => {
+    const tenant = await enterpriseDao.findTenantById(id, conn, true);
+    if (!tenant) throw new BusinessError(ERROR_CODE.NOT_FOUND, '企业不存在');
 
-  const allowed = getValidTransitions(tenant.review_status);
-  if (!allowed.includes('rejected')) {
-    throw new BusinessError(ERROR_CODE.BAD_REQUEST, `当前状态 ${tenant.review_status} 不可驳回`);
-  }
-  if (!reason || reason.trim().length < 4) {
-    throw new BusinessError(ERROR_CODE.BAD_REQUEST, '驳回原因至少4个字符');
-  }
+    const allowed = getValidTransitions(tenant.review_status);
+    if (!allowed.includes('rejected')) {
+      throw new BusinessError(ERROR_CODE.BAD_REQUEST, `当前状态 ${tenant.review_status} 不可驳回`);
+    }
+    if (!reason || reason.trim().length < 4) {
+      throw new BusinessError(ERROR_CODE.BAD_REQUEST, '驳回原因至少4个字符');
+    }
 
-  await enterpriseDao.updateTenantReviewStatus(id, {
-    status: 'rejected', approvedBy: operatorId, reason: reason.trim(),
+    await enterpriseDao.updateTenantReviewStatus(id, {
+      status: 'rejected', approvedBy: operatorId, reason: reason.trim(),
+    }, conn);
+    await enterpriseDao.insertApprovalLog({
+      tenantId: id, action: 'reject', operatorId,
+      oldStatus: tenant.review_status, newStatus: 'rejected', reason: reason.trim(),
+    }, conn);
+    return { id, status: 'rejected' };
   });
-  await enterpriseDao.insertApprovalLog({
-    tenantId: id, action: 'reject', operatorId,
-    oldStatus: tenant.review_status, newStatus: 'rejected', reason: reason.trim(),
-  });
-  return { id, status: 'rejected' };
 }
 
 export async function suspendTenant(id, { operatorId, reason }) {
-  const tenant = await enterpriseDao.findTenantById(id);
-  if (!tenant) throw new BusinessError(ERROR_CODE.NOT_FOUND, '企业不存在');
-  if (tenant.review_status !== 'approved') throw new BusinessError(ERROR_CODE.BAD_REQUEST, '仅已通过企业可停用');
+  return withTransaction(async (conn) => {
+    const tenant = await enterpriseDao.findTenantById(id, conn, true);
+    if (!tenant) throw new BusinessError(ERROR_CODE.NOT_FOUND, '企业不存在');
+    if (tenant.review_status !== 'approved') throw new BusinessError(ERROR_CODE.BAD_REQUEST, '仅已通过企业可停用');
 
-  await enterpriseDao.updateTenantReviewStatus(id, { status: 'suspended' });
-  await enterpriseDao.insertApprovalLog({
-    tenantId: id, action: 'suspend', operatorId,
-    oldStatus: 'approved', newStatus: 'suspended', reason,
+    await enterpriseDao.updateTenantReviewStatus(id, { status: 'suspended' }, conn);
+    await enterpriseDao.insertApprovalLog({
+      tenantId: id, action: 'suspend', operatorId,
+      oldStatus: 'approved', newStatus: 'suspended', reason,
+    }, conn);
+    return { id, status: 'suspended' };
   });
-  return { id, status: 'suspended' };
 }
 
 export async function reinstateTenant(id, { operatorId }) {
-  const tenant = await enterpriseDao.findTenantById(id);
-  if (!tenant) throw new BusinessError(ERROR_CODE.NOT_FOUND, '企业不存在');
-  if (tenant.review_status !== 'suspended') throw new BusinessError(ERROR_CODE.BAD_REQUEST, '仅已停用企业可恢复');
+  return withTransaction(async (conn) => {
+    const tenant = await enterpriseDao.findTenantById(id, conn, true);
+    if (!tenant) throw new BusinessError(ERROR_CODE.NOT_FOUND, '企业不存在');
+    if (tenant.review_status !== 'suspended') throw new BusinessError(ERROR_CODE.BAD_REQUEST, '仅已停用企业可恢复');
 
-  await enterpriseDao.updateTenantReviewStatus(id, { status: 'approved' });
-  await enterpriseDao.insertApprovalLog({
-    tenantId: id, action: 'reinstate', operatorId,
-    oldStatus: 'suspended', newStatus: 'approved',
+    await enterpriseDao.updateTenantReviewStatus(id, { status: 'approved' }, conn);
+    await enterpriseDao.insertApprovalLog({
+      tenantId: id, action: 'reinstate', operatorId,
+      oldStatus: 'suspended', newStatus: 'approved',
+    }, conn);
+    return { id, status: 'approved' };
   });
-  return { id, status: 'approved' };
 }
