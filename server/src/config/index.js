@@ -296,7 +296,53 @@ const config = {
     },
   },
 
+  commerce: {
+    planDurations: {
+      1: parseInt(process.env.PLAN_DURATION_MONTHLY_DAYS, 10) || 30,
+      2: parseInt(process.env.PLAN_DURATION_QUARTERLY_DAYS, 10) || 90,
+      3: parseInt(process.env.PLAN_DURATION_ANNUAL_DAYS, 10) || 365,
+    },
+    dashboardLookbackDays: parseInt(process.env.COMMERCE_DASHBOARD_LOOKBACK_DAYS, 10) || 30,
+  },
+
+  csrf: {
+    tokenTTLMs: parseInt(process.env.CSRF_TOKEN_TTL_MS, 10) || 30 * 60 * 1000,
+  },
+
+  tier: {
+    free: {
+      dailyImages: parseInt(process.env.TIER_FREE_DAILY_IMAGES, 10) || 5,
+      dailyVideos: parseInt(process.env.TIER_FREE_DAILY_VIDEOS, 10) || 2,
+      maxBatch: parseInt(process.env.TIER_FREE_MAX_BATCH, 10) || 10,
+      watermark: process.env.TIER_FREE_WATERMARK !== 'false',
+      exportHd: process.env.TIER_FREE_EXPORT_HD === 'true',
+    },
+    vip: {
+      dailyImages: parseInt(process.env.TIER_VIP_DAILY_IMAGES, 10) || 100,
+      dailyVideos: parseInt(process.env.TIER_VIP_DAILY_VIDEOS, 10) || 30,
+      maxBatch: parseInt(process.env.TIER_VIP_MAX_BATCH, 10) || 50,
+      watermark: process.env.TIER_VIP_WATERMARK === 'true',
+      exportHd: process.env.TIER_VIP_EXPORT_HD !== 'false',
+    },
+    admin: {
+      dailyImages: Infinity,
+      dailyVideos: Infinity,
+      maxBatch: parseInt(process.env.TIER_ADMIN_MAX_BATCH, 10) || 100,
+      watermark: false,
+      exportHd: true,
+    },
+  },
+
   adapters: {
+    defaults: {
+      textMaxTokens: parseInt(process.env.ADAPTER_TEXT_MAX_TOKENS, 10) || 2000,
+      textTimeoutMs: parseInt(process.env.ADAPTER_TEXT_TIMEOUT_MS, 10) || 60000,
+      textStreamTimeoutMs: parseInt(process.env.ADAPTER_TEXT_STREAM_TIMEOUT_MS, 10) || 300000,
+      imageTimeoutMs: parseInt(process.env.ADAPTER_IMAGE_TIMEOUT_MS, 10) || 120000,
+      healthTimeoutMs: parseInt(process.env.ADAPTER_HEALTH_TIMEOUT_MS, 10) || 5000,
+      modelListTimeoutMs: parseInt(process.env.ADAPTER_MODEL_LIST_TIMEOUT_MS, 10) || 10000,
+      pollIntervalMs: parseInt(process.env.ADAPTER_POLL_INTERVAL_MS, 10) || 2000,
+    },
     pollIntervalMs: {
       video: parseInt(process.env.ADAPTER_VIDEO_POLL_MS, 10) || 3000,
       sd: parseInt(process.env.ADAPTER_SD_POLL_MS, 10) || 2000,
@@ -351,3 +397,6 @@ export const { ai: aiConfig } = config;
 export const { aiGateway: aiGatewayConfig } = config;
 export const { adapters: adapterConfig } = config;
 export const { allinpay: allinpayConfig } = config;
+export const { commerce: commerceConfig } = config;
+export const { csrf: csrfConfig } = config;
+export const { tier: tierConfig } = config;

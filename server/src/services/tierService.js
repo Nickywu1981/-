@@ -1,9 +1,10 @@
 import * as tierDao from '../dao/tierDao.js';
+import { tierConfig } from '../config/index.js';
 
 const TIER_LIMITS = {
-  free:  { dailyImages: 5, dailyVideos: 2, maxBatch: 10, watermark: true, exportHd: false },
-  vip:   { dailyImages: 100, dailyVideos: 30, maxBatch: 50, watermark: false, exportHd: true },
-  admin: { dailyImages: Infinity, dailyVideos: Infinity, maxBatch: 100, watermark: false, exportHd: true },
+  free:  { dailyImages: tierConfig.free.dailyImages, dailyVideos: tierConfig.free.dailyVideos, maxBatch: tierConfig.free.maxBatch, watermark: tierConfig.free.watermark, exportHd: tierConfig.free.exportHd },
+  vip:   { dailyImages: tierConfig.vip.dailyImages, dailyVideos: tierConfig.vip.dailyVideos, maxBatch: tierConfig.vip.maxBatch, watermark: tierConfig.vip.watermark, exportHd: tierConfig.vip.exportHd },
+  admin: { dailyImages: Infinity, dailyVideos: Infinity, maxBatch: tierConfig.admin.maxBatch, watermark: false, exportHd: true },
 };
 
 export async function getUserTier(userId) {

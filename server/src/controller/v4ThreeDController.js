@@ -26,30 +26,33 @@ const TEXT_STARTS = {
   '.stl': 'solid',
 };
 
-function validateMagicBytes(filePath, ext) {
+async function validateMagicBytes(filePath, ext) {
   const magic = MAGIC_BYTES[ext];
-  const fd = fs.openSync(filePath, 'r');
+  let fh;
   try {
+    fh = await fs.promises.open(filePath, 'r');
     if (magic) {
       const buf = Buffer.alloc(magic.bytes.length);
-      fs.readSync(fd, buf, 0, buf.length, magic.offset);
+      await fh.read(buf, 0, buf.length, magic.offset);
       return buf.equals(magic.bytes);
     }
     const buf = Buffer.alloc(256);
-    const n = fs.readSync(fd, buf, 0, 256, 0);
-    const head = buf.toString('utf8', 0, n).trimStart();
+    const { bytesRead } = await fh.read(buf, 0, 256, 0);
+    const head = buf.toString('utf8', 0, bytesRead).trimStart();
     if (!head) return false;
     const expected = TEXT_STARTS[ext];
     if (typeof expected === 'string') return head.startsWith(expected);
     if (Array.isArray(expected)) return expected.some(c => head.startsWith(c));
     return true;
-  } finally { fs.closeSync(fd); }
+  } finally {
+    if (fh) await fh.close();
+  }
 }
 
 export const upload = wrapController(async (req, res) => {
   if (!req.file) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '请上传 3D 模型文件');
   const ext = path.extname(req.file.originalname).toLowerCase();
-  if (!validateMagicBytes(req.file.path, ext)) {
+  if (!await validateMagicBytes(req.file.path, ext)) {
     fs.unlink(req.file.path, () => {});
     throw new BusinessError(ERROR_CODE.BAD_REQUEST, '文件格式与扩展名不匹配');
   }

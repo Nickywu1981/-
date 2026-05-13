@@ -10,10 +10,11 @@ import logger from '../../utils/logger.js';
 
 const API_KEY = adapterConfig.openai.apiKey;
 const BASE_URL = adapterConfig.openai.baseUrl;
+const DEFAULTS = adapterConfig.defaults;
 
 // ==================== 通用文本推断工厂 ====================
 
-function makeTextInfer(modelId, maxTokens = 2000, timeout = 60000) {
+function makeTextInfer(modelId, maxTokens = DEFAULTS.textMaxTokens, timeout = DEFAULTS.textTimeoutMs) {
   return async function infer(input, onProgress) {
     // 兼容字符串输入：自动包装为 { prompt }
     if (typeof input === 'string') {
@@ -64,7 +65,7 @@ function makeTextInfer(modelId, maxTokens = 2000, timeout = 60000) {
 
 // ==================== 通用文本流式推断工厂 ====================
 
-function makeTextStreamInfer(modelId, maxTokens = 2000, timeout = 300000) {
+function makeTextStreamInfer(modelId, maxTokens = DEFAULTS.textMaxTokens, timeout = DEFAULTS.textStreamTimeoutMs) {
   let malformedChunksDiscarded = 0;
   let totalChunksReceived = 0;
 
@@ -163,7 +164,7 @@ async function fetchRemoteModels() {
   try {
     const res = await fetch(`${BASE_URL}/models`, {
       headers: { Authorization: `Bearer ${API_KEY}` },
-      signal: AbortSignal.timeout(10000),
+      signal: AbortSignal.timeout(DEFAULTS.modelListTimeoutMs),
     });
     if (!res.ok) return [];
     const json = await res.json();
@@ -180,7 +181,7 @@ async function health() {
   try {
     const res = await fetch(`${BASE_URL}/models`, {
       headers: { Authorization: `Bearer ${API_KEY}` },
-      signal: AbortSignal.timeout(5000),
+      signal: AbortSignal.timeout(DEFAULTS.healthTimeoutMs),
     });
     return { status: res.ok ? 'ok' : 'error', provider: 'openai' };
   } catch {
@@ -256,7 +257,7 @@ export async function registerOpenAI() {
   let count = 0;
   for (const rm of remoteModels) {
     const id = rm.id;
-    const cap = MODEL_CAPABILITIES[id] || { maxTokens: 2000, timeout: 60000 };
+    const cap = MODEL_CAPABILITIES[id] || { maxTokens: DEFAULTS.textMaxTokens, timeout: DEFAULTS.textTimeoutMs };
 
     registerModel({
       id,

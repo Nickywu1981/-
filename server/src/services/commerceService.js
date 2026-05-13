@@ -5,7 +5,7 @@
 
 import * as creditDao from '../dao/creditDao.js';
 import * as commerceDao from '../dao/commerceDao.js';
-import { mockEnabled } from '../config/index.js';
+import { mockEnabled, commerceConfig } from '../config/index.js';
 import { BusinessError } from '../utils/businessError.js';
 import { PLAN_TYPE } from '../constants/domainStatus.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
@@ -32,9 +32,9 @@ export async function purchasePlan(userId, planType) {
     let endTime;
 
     switch (planType) {
-      case 1: endTime = new Date(now.getTime() + 30 * 86400000); break;
-      case 2: endTime = new Date(now.getTime() + 90 * 86400000); break;
-      case 3: endTime = new Date(now.getTime() + 365 * 86400000); break;
+      case 1: endTime = new Date(now.getTime() + commerceConfig.planDurations[1] * 86400000); break;
+      case 2: endTime = new Date(now.getTime() + commerceConfig.planDurations[2] * 86400000); break;
+      case 3: endTime = new Date(now.getTime() + commerceConfig.planDurations[3] * 86400000); break;
       default: endTime = null;
     }
 

@@ -8,6 +8,7 @@ import * as enterpriseDao from '../dao/enterpriseDao.js';
 import * as userDao from '../dao/userDao.js';
 import { generateAccessToken, generateRefreshToken } from '../middleware/auth.js';
 import { BusinessError } from '../utils/businessError.js';
+import { commerceConfig } from '../config/index.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import bcrypt from 'bcryptjs';
 
@@ -254,7 +255,7 @@ export async function getEnterpriseDashboard(tenantId) {
 
   // 获取最近 30 天用量
   const endDate = new Date().toISOString().slice(0, 10);
-  const startDate = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString().slice(0, 10);
+  const startDate = new Date(Date.now() - commerceConfig.dashboardLookbackDays * 24 * 3600 * 1000).toISOString().slice(0, 10);
   const usage = await enterpriseDao.getEnterpriseUsage(tenantId, { startDate, endDate });
   const totalCalls = usage.reduce((sum, r) => sum + r.call_count, 0);
   const totalCredits = usage.reduce((sum, r) => sum + (r.total_credits || 0), 0);

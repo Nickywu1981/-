@@ -39,7 +39,7 @@ export const useAuthStore = defineStore('auth', {
       const isEmail = account.includes('@')
       const body = isEmail ? { email: account, password } : { username: account, password }
       const data: any = await api.post('/auth/login', body)
-      if (data) {
+      if (data?.id) {
         this.user = data
         this.isLoggedIn = true
       }
@@ -48,7 +48,7 @@ export const useAuthStore = defineStore('auth', {
 
     async register(params: { phone?: string; email?: string; password: string; nickname?: string }) {
       const data: any = await api.post('/auth/register', params)
-      if (data) {
+      if (data?.id) {
         this.user = data
         this.isLoggedIn = true
       }
@@ -58,7 +58,7 @@ export const useAuthStore = defineStore('auth', {
     async fetchUser() {
       try {
         const data: any = await api.get('/user/profile')
-        if (data) {
+        if (data?.id) {
           this.user = data
           this.isLoggedIn = true
         }
