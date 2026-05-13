@@ -69,30 +69,30 @@ onMounted(async () => {
       form.phone = res.data.phone || ''
       form.email = res.data.email || ''
     }
-  } catch { toast.error(t('settings.load_failed')) }
+  } catch { toast.error(t('my.settings.load_failed')) }
   finally { loading.value = false }
 })
 
 const selectedTheme = ref('dark')
 const themes = [
-  { key: 'dark', label: t('settings.theme_dark'), icon: '🌙' },
-  { key: 'light', label: t('settings.theme_light'), icon: '☀️' },
-  { key: 'auto', label: t('settings.theme_auto'), icon: '🔄' },
+  { key: 'dark', label: t('my.settings.theme_dark'), icon: '🌙' },
+  { key: 'light', label: t('my.settings.theme_light'), icon: '☀️' },
+  { key: 'auto', label: t('my.settings.theme_auto'), icon: '🔄' },
 ]
 
 const notificationSettings = reactive([
-  { key: 'task_complete', label: t('settings.notif_task_complete'), desc: t('settings.notif_task_complete_desc'), enabled: true },
-  { key: 'credit_warn', label: t('settings.notif_credit_warn'), desc: t('settings.notif_credit_warn_desc'), enabled: true },
-  { key: 'marketing', label: t('settings.notif_marketing'), desc: t('settings.notif_marketing_desc'), enabled: false },
+  { key: 'task_complete', label: t('my.settings.notif_task_complete'), desc: t('my.settings.notif_task_complete_desc'), enabled: true },
+  { key: 'credit_warn', label: t('my.settings.notif_credit_warn'), desc: t('my.settings.notif_credit_warn_desc'), enabled: true },
+  { key: 'marketing', label: t('my.settings.notif_marketing'), desc: t('my.settings.notif_marketing_desc'), enabled: false },
 ])
 
 const saveProfile = async () => {
-  if (!form.nickname.trim()) { toast.warn(t('settings.nickname_required')); return }
+  if (!form.nickname.trim()) { toast.warn(t('my.settings.nickname_required')); return }
   saving.value = true
   try {
     await $fetch('/api/user/profile', { method: 'PUT', credentials: 'include', body: form })
-    toast.success(t('settings.save_success'))
-  } catch { toast.error(t('settings.save_failed')) }
+    toast.success(t('my.settings.save_success'))
+  } catch { toast.error(t('my.settings.save_failed')) }
   saving.value = false
 }
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
