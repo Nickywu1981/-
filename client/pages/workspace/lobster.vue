@@ -8,5 +8,5 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ layout: 'workspace' })
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>

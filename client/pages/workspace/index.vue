@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ layout: 'workspace' })
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 const router = useRouter()
 onMounted(() => { router.replace('/workspace/creation') })
 </script>

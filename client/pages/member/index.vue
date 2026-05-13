@@ -77,7 +77,7 @@
 <script setup lang="ts">
 
 const toast = useToast()
-definePageMeta({ layout: 'workspace' })
+definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 
 const apiBase = useRuntimeConfig().public.apiBase || '/api'
 
