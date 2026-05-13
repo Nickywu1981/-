@@ -258,7 +258,7 @@ export const getHistory = wrapController(async (req, res) => {
   const start = (page - 1) * pageSize;
   const items = filtered.slice(start, start + pageSize);
 
-  return success(res, { items, total, page, pageSize });
+  return success(res, { list: items, total, page, pageSize });
 });
 
 export const deleteHistory = wrapController(async (req, res) => {

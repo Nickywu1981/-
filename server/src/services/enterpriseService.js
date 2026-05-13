@@ -247,8 +247,10 @@ export async function removeEnterpriseUser(tenantId, id) {
 // ==================== 仪表盘 ====================
 
 export async function getEnterpriseDashboard(tenantId) {
-  const tenant = await enterpriseDao.findTenantById(tenantId);
-  const userCount = await enterpriseDao.countEnterpriseUsers(tenantId);
+  const [tenant, userCount] = await Promise.all([
+    enterpriseDao.findTenantById(tenantId),
+    enterpriseDao.countEnterpriseUsers(tenantId),
+  ]);
 
   // 获取最近 30 天用量
   const endDate = new Date().toISOString().slice(0, 10);
@@ -277,12 +279,14 @@ export async function getEnterpriseDashboard(tenantId) {
 
 export async function getEnterpriseUsageDetail(tenantId, query) {
   const { startDate, endDate, userId } = query || {};
-  const usage = await enterpriseDao.getEnterpriseUsage(tenantId, { startDate, endDate, userId });
-
   if (!userId) {
-    const byUser = await enterpriseDao.getEnterpriseUsageByUser(tenantId, { startDate, endDate });
+    const [usage, byUser] = await Promise.all([
+      enterpriseDao.getEnterpriseUsage(tenantId, { startDate, endDate, userId }),
+      enterpriseDao.getEnterpriseUsageByUser(tenantId, { startDate, endDate }),
+    ]);
     return { timeline: usage, byUser };
   }
+  const usage = await enterpriseDao.getEnterpriseUsage(tenantId, { startDate, endDate, userId });
   return { timeline: usage };
 }
 

@@ -29,6 +29,16 @@ export async function getByKey(locale, transKey) {
   return rows[0] || null;
 }
 
+export async function getByKeys(locale, keys) {
+  if (!keys.length) return [];
+  const placeholders = keys.map(() => '?').join(',');
+  const [rows] = await pool.query(
+    `SELECT ${COLS} FROM i18n_translation WHERE locale = ? AND trans_key IN (${placeholders})`,
+    [locale, ...keys],
+  );
+  return rows;
+}
+
 export async function upsert(locale, namespace, transKey, transValue, updatedBy) {
   const [result] = await pool.query(
     `INSERT INTO i18n_translation (locale, namespace, trans_key, trans_value, updated_by)

@@ -62,11 +62,14 @@ export async function setTranslation(locale, transKey, transValue, changedBy) {
 
 export async function importTranslations(locale, entries, skipEdited = false) {
   const batch = [];
+  const keys = Object.keys(entries);
+  let existingMap = new Map();
+  if (skipEdited && keys.length) {
+    const rows = await i18nDao.getByKeys(locale, keys);
+    for (const r of rows) existingMap.set(r.trans_key, true);
+  }
   for (const [key, value] of Object.entries(entries)) {
-    if (skipEdited) {
-      const existing = await i18nDao.getByKey(locale, key);
-      if (existing) continue; // 跳过已编辑的
-    }
+    if (skipEdited && existingMap.has(key)) continue;
     const { namespace } = parseKey(key);
     batch.push({ namespace, key, value });
   }

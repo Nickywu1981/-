@@ -48,7 +48,7 @@
         <form @submit.prevent="doApply"><label>{{ $t('enterprise.channels.index.inviteCode') }}</label>
           <input v-model="applyForm.agentCode" required :placeholder="$t('enterprise.channels.index.inviteCodePlaceholder')" class="input" />
           <div class="modal-actions"><button type="button" class="btn-cancel" @click="showApplyModal = false">{{ $t('enterprise.common.cancel') }}</button>
-            <button type="submit" class="btn-primary">{{ $t('enterprise.channels.index.submitApply') }}</button></div>
+            <button type="submit" class="btn-primary" :disabled="applying">{{ $t('enterprise.channels.index.submitApply') }}</button></div>
         </form>
       </div>
     </div>
@@ -59,7 +59,7 @@
         <p>{{ auditAction === 'active' ? $t('enterprise.channels.index.confirmApprove') : $t('enterprise.channels.index.confirmReject') }}</p>
         <textarea v-model="auditRemark" :placeholder="$t('enterprise.channels.index.auditRemark')" class="input" rows="3"></textarea>
         <div class="modal-actions"><button type="button" class="btn-cancel" @click="showAuditModal = false">{{ $t('enterprise.common.cancel') }}</button>
-          <button class="btn-primary" @click="doAudit">{{ $t('enterprise.common.confirm') }}</button></div>
+          <button class="btn-primary" :disabled="auditing" @click="doAudit">{{ $t('enterprise.common.confirm') }}</button></div>
       </div>
     </div>
   </div>
@@ -68,11 +68,14 @@
 <script setup>
 definePageMeta({ layout: 'enterprise' });
 import { formatDateLocale } from '~/utils/format';
+import { extractErrorMsg } from '~/composables/useApi';
 const { t } = useI18n();
 
 const toast = useToast();
 const router = useRouter();
 const loading = ref(true);
+const applying = ref(false);
+const auditing = ref(false);
 const isAgent = ref(true);
 const channels = reactive({ list: [], total: 0, page: 1, pageSize: 20 });
 const policies = ref([]);
@@ -113,12 +116,14 @@ async function loadDownstream() {
 }
 
 async function doApply() {
+  applying.value = true;
   try {
     await $fetch('/api/enterprise/channel/relations', { method: 'POST', credentials: 'include', body: applyForm });
     showApplyModal.value = false;
     applyForm.agentCode = '';
     loadChannels();
-  } catch (e) { toast.error(t('enterprise.channels.index.applyFailed') + (e.data?.message || t('enterprise.channels.index.pleaseRetry'))); }
+  } catch (e) { toast.error(extractErrorMsg(e, 'enterprise.channels.index.applyFailed')); }
+  finally { applying.value = false; }
 }
 
 function audit(id, action) {
@@ -128,6 +133,7 @@ function audit(id, action) {
 }
 
 async function doAudit() {
+  auditing.value = true;
   try {
     await $fetch(`/api/enterprise/channel/relations/${auditTargetId.value}/audit`, {
       method: 'PUT', credentials: 'include',
@@ -137,7 +143,8 @@ async function doAudit() {
     auditRemark.value = '';
     loadChannels();
     loadDownstream();
-  } catch (e) { toast.error(t('enterprise.channels.index.auditFailed') + (e.data?.message || t('enterprise.channels.index.pleaseRetry'))); }
+  } catch (e) { toast.error(extractErrorMsg(e, 'enterprise.channels.index.auditFailed')); }
+  finally { auditing.value = false; }
 }
 
 function viewDetail(id) { router.push(`/enterprise/channels/${id}`); }

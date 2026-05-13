@@ -364,10 +364,10 @@ export async function upsertFields(formId, tenantId, fields) {
 // ── 数据清理(定时任务) ──
 export async function cleanExpiredData() {
   const forms = await formDao.getFormsWithRetention();
-  for (const f of forms) {
+  await Promise.all(forms.map(f => {
     if (f.data_retention_days > 0) {
       const cutoff = new Date(Date.now() - f.data_retention_days * 86400000);
-      await formDao.deleteExpiredSubmissions(f.id, cutoff);
+      return formDao.deleteExpiredSubmissions(f.id, cutoff);
     }
-  }
+  }));
 }

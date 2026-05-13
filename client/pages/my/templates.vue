@@ -22,7 +22,7 @@
       </select>
       <div class="form-actions">
         <button class="btn-outline" @click="showForm = false">{{ $t('my.templates.cancel') }}</button>
-        <button class="btn" @click="saveTemplate">{{ $t('my.templates.save') }}</button>
+        <button class="btn" :disabled="saving" @click="saveTemplate">{{ $t('my.templates.save') }}</button>
       </div>
     </div>
 
@@ -46,6 +46,7 @@ const { t } = useI18n()
 
 const showForm = ref(false);
 const loading = ref(true);
+const saving = ref(false);
 const templates = ref<any[]>([]);
 const form = reactive({ name: '', width: 800, height: 800, platform: '' });
 const toast = useToast()
@@ -70,6 +71,7 @@ async function loadTemplates() {
 
 async function saveTemplate() {
   if (!form.name.trim()) { toast.warn(t('my.templates.name_required')); return }
+  saving.value = true
   try {
     await $fetch('/api/templates/my', { method: 'POST', credentials: 'include', body: { ...form } });
     toast.success(t('my.templates.create_success'))
@@ -77,6 +79,7 @@ async function saveTemplate() {
     Object.assign(form, { name: '', width: 800, height: 800, platform: '' });
     loadTemplates();
   } catch { toast.error(t('my.templates.save_failed')) }
+  finally { saving.value = false }
 }
 
 async function deleteTemplate(id: number) {

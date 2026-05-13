@@ -281,6 +281,18 @@ export const api = {
 
 export type { ApiResponse, PaginatedData };
 
+/**
+ * 从错误对象中提取用户可读的消息，避免暴露技术栈堆栈
+ * @param err - fetch/ApiError/Error 对象
+ * @param fallback - 默认 i18n key, default 'common.request_failed'
+ */
+export function extractErrorMsg(err: any, fallback = 'common.request_failed'): string {
+  if (err?.data?.msg && typeof err.data.msg === 'string' && err.data.msg.length < 200) return err.data.msg;
+  if (err?.message && typeof err.message === 'string' && err.message.length < 200 && !err.message.includes('at ') && !err.message.includes('stack')) return err.message;
+  const { $i18n } = useNuxtApp();
+  return $i18n?.t ? $i18n.t(fallback) : fallback;
+}
+
 let activeInstances = 0;
 
 /** Composable wrapper — 自动管理离线监听器生命周期 */

@@ -4,6 +4,7 @@
  */
 import { infer, pipeline } from './aiEngine.js';
 import { createTask, updateTaskStatus, completeTask, getTask, listUserTasks, countUserTasks } from '../dao/taskDao.js';
+import { makeTaskQueries } from './taskQueryService.js';
 import * as creditService from './creditService.js';
 import { BusinessError } from '../utils/businessError.js';
 
@@ -284,14 +285,4 @@ async function processTextEffect(taskId, userId, params) {
 
 // ==================== 任务查询 ====================
 
-export async function getTaskResult(taskId, userId) {
-  const task = await getTask(taskId, userId);
-  if (!task) throw new BusinessError(404, '任务不存在');
-  return task;
-}
-
-export async function listMyTasks(userId, { status, type, page, pageSize }) {
-  const list = await listUserTasks(userId, { status, type, page, pageSize });
-  const total = await countUserTasks(userId, { status, type });
-  return { list, total, page, pageSize };
-}
+export const { getTaskResult, listMyTasks } = makeTaskQueries({ getTask, listUserTasks, countUserTasks });

@@ -36,12 +36,8 @@ async function store({
 }
 
 async function storeBatch(entries) {
-  const results = [];
-  for (const entry of entries) {
-    const id = await store(entry);
-    if (id) results.push({ ...entry, id });
-  }
-  return results;
+  const results = await Promise.all(entries.map(entry => store(entry)));
+  return entries.filter((_, i) => results[i]).map((entry, i) => ({ ...entry, id: results[i] }));
 }
 
 async function recall({
