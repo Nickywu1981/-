@@ -15,7 +15,7 @@ onMounted(() => { router.replace('/workspace/creation') })
 <style scoped>
 .wh-redirect {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  min-height: 400px; gap: 16px; color: var(--text-muted, #999); font-size: 14px;
+  min-height: 400px; gap: 16px; color: var(--text-muted, #767676); font-size: 14px;
 }
 .wh-spinner {
   width: 28px; height: 28px; border-radius: 50%;

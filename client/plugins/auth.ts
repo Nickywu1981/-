@@ -4,6 +4,7 @@
  */
 export default defineNuxtPlugin((nuxtApp) => {
   const router = useRouter()
+  const { t } = useI18n()
   const toast = (nuxtApp.vueApp.config.globalProperties.$toast || { error: console.error, warn: console.warn }) as any
 
   // Helper: read csrf_token from document.cookie
@@ -39,16 +40,16 @@ export default defineNuxtPlugin((nuxtApp) => {
     }
     return (originalFetch as any).call(globalThis, url, opts).then((res: any) => {
       if (res?.code >= 400 && res?.code < 600) {
-        toast?.error?.(res?.msg || res?.message || '请求失败')
+        toast?.error?.(res?.msg || res?.message || t('common.request_failed'))
       }
       return res
     }).catch((err: any) => {
       if (err?.response?.status === 401) throw err // already handled by onResponseError
       if (err?.response?.status === 429) {
-        toast?.warn?.('请求过于频繁，请稍后再试')
+        toast?.warn?.(t('common.too_many_requests'))
         return null
       }
-      toast?.error?.(err?.data?.msg || err?.message || '网络异常')
+      toast?.error?.(err?.data?.msg || err?.message || t('common.network_error'))
       throw err
     })
   }

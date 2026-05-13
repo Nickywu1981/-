@@ -118,7 +118,7 @@ onMounted(async () => {
     entName.value = data?.data?.name || ''
   } catch (e: any) {
     if (e?.response?.status === 401) router.push('/enterprise/login')
-    else { if (import.meta.dev) console.error('[enterprise] 加载企业信息失败', e); toast.error(t('enterprise.nav.loadProfileFailed')) }
+    else { if (import.meta.dev) console.error('[enterprise] Failed to load profile', e); toast.error(t('enterprise.nav.loadProfileFailed')) }
   }
 })
 
@@ -179,7 +179,7 @@ watch(() => route.path, () => { mobileOpen.value = false })
   transition: all var(--transition-fast);
 }
 .ent-nav-item:hover { color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.03); }
-.ent-nav-item--active { background: rgba(107,112,255,0.12); color: #8b95ff; font-weight: var(--font-medium); }
+.ent-nav-item--active { background: rgba(91,95,227,0.12); color: #a5a9f0; font-weight: var(--font-medium); }
 
 /* ═══ Footer ═══ */
 .ent-side-footer {

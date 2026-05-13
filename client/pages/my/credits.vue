@@ -1,31 +1,31 @@
 <template>
   <div class="page">
-    <h2>积分明细</h2>
+    <h2>{{ $t('my.credits.page_title') }}</h2>
     <div class="stats-row">
       <div class="stat-card">
-        <div class="stat-card__label">剩余积分</div>
+        <div class="stat-card__label">{{ $t('my.credits.balance') }}</div>
         <div class="stat-card__value">{{ creditBalance }}</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card__label">累计获得</div>
+        <div class="stat-card__label">{{ $t('my.credits.total_earned') }}</div>
         <div class="stat-card__value green">{{ totalEarned }}</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card__label">累计消费</div>
+        <div class="stat-card__label">{{ $t('my.credits.total_spent') }}</div>
         <div class="stat-card__value spent">{{ totalSpent }}</div>
       </div>
     </div>
 
     <div class="filter-bar">
       <select v-model="filterType" class="filter-select" @change="page=1;fetchAll()">
-        <option value="">全部类型</option>
-        <option value="earn">获得</option>
-        <option value="spend">消费</option>
-        <option value="refund">退款</option>
+        <option value="">{{ $t('my.credits.filter_all') }}</option>
+        <option value="earn">{{ $t('my.credits.type_earn') }}</option>
+        <option value="spend">{{ $t('my.credits.type_spend') }}</option>
+        <option value="refund">{{ $t('my.credits.type_refund') }}</option>
       </select>
     </div>
 
-    <div v-if="loading" class="loading">加载中...</div>
+    <div v-if="loading" class="loading">{{ $t('my.credits.loading') }}</div>
     <template v-else>
       <div v-if="list.length > 0" class="list">
         <div v-for="item in list" :key="item.id" class="list-item">
@@ -39,7 +39,7 @@
           </div>
         </div>
       </div>
-      <div v-else class="empty-state">暂无积分记录</div>
+      <div v-else class="empty-state">{{ $t('my.credits.empty') }}</div>
       <Pagination v-if="total > pageSize" v-model:page="page" :total="total" :page-size="pageSize" />
     </template>
   </div>
@@ -70,11 +70,12 @@ const fetchAll = async () => {
     totalEarned.value = res?.totalEarned || 0
     totalSpent.value = res?.totalSpent || 0
   } catch (e: any) {
-    toast.error('加载失败，请刷新重试')
+    toast.error(t('my.credits.load_failed'))
   }
   loading.value = false
 }
 
+const { t } = useI18n()
 const formatTime = (t: string) => t ? new Date(t).toLocaleString('zh-CN') : ''
 
 onMounted(fetchAll)
@@ -92,15 +93,15 @@ h2 { font-size: var(--text-xl, 22px); font-weight: 600; margin-bottom: 20px; col
 .stat-card__value.spent { color: var(--danger, #EF4444); }
 .filter-bar { margin-bottom: 16px; }
 .filter-select { padding: 8px 12px; border: 1px solid var(--border, #e5e7eb); border-radius: var(--radius-sm, 6px); font-size: var(--text-sm, 13px); background: var(--card-bg, #fff); color: var(--text-primary, #1a1a2e); }
-.loading { text-align: center; padding: 40px; color: var(--text-secondary, #999); }
+.loading { text-align: center; padding: 40px; color: var(--text-secondary, #767676); }
 .list { display: flex; flex-direction: column; gap: 8px; }
 .list-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--card-bg, #fff); border-radius: var(--radius-sm, 8px); box-shadow: var(--shadow-sm, 0 1px 2px rgba(0,0,0,.04)); }
 .list-item__icon { font-size: 20px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: var(--bg, #f8f7ff); border-radius: 50%; }
 .list-item__info { flex: 1; }
 .list-item__title { font-size: var(--text-md, 14px); color: var(--text-primary, #1a1a2e); }
-.list-item__time { font-size: var(--text-xs, 12px); color: var(--text-secondary, #999); margin-top: 2px; }
+.list-item__time { font-size: var(--text-xs, 12px); color: var(--text-secondary, #767676); margin-top: 2px; }
 .list-item__amount { font-weight: 600; font-size: var(--text-md, 14px); }
 .list-item__amount.positive { color: var(--success, #10B981); }
 .list-item__amount.negative { color: var(--danger, #EF4444); }
-.empty-state { text-align: center; padding: 40px; color: var(--text-secondary, #999); }
+.empty-state { text-align: center; padding: 40px; color: var(--text-secondary, #767676); }
 </style>

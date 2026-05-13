@@ -290,7 +290,7 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 .work-card.selected { border-color: var(--brand-color); }
 .work-check {
   position: absolute; top: 6px; right: 6px; z-index: 2;
-  width: 22px; height: 22px; border-radius: 50%; border: 2px solid #ccc;
+  width: 22px; height: 22px; border-radius: 50%; border: 2px solid #767676;
   background: var(--bg-card); display: flex; align-items: center; justify-content: center;
 }
 .work-card.selected .work-check { background: var(--brand-color); border-color: var(--brand-color); }

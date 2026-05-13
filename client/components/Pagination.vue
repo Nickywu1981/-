@@ -1,10 +1,10 @@
 <template>
   <div class="pagination-bar" v-if="total > 0">
-    <span class="pg-info">{{ (page - 1) * pageSize + 1 }}-{{ Math.min(page * pageSize, total) }} / 共 {{ total }} 条</span>
+    <span class="pg-info">{{ (page - 1) * pageSize + 1 }}-{{ Math.min(page * pageSize, total) }} / {{ $t('common.pagination.total', { total }) }}</span>
     <div class="pg-btns">
-      <button :disabled="page <= 1" @click="$emit('change', page - 1)" aria-label="上一页">‹ 上一页</button>
-      <span class="pg-num" :aria-label="`当前第 ${page} 页，共 ${totalPages} 页`">{{ page }} / {{ totalPages }}</span>
-      <button :disabled="page >= totalPages" @click="$emit('change', page + 1)" aria-label="下一页">下一页 ›</button>
+      <button :disabled="page <= 1" @click="$emit('change', page - 1)" :aria-label="$t('common.pagination.prev')">{{ $t('common.pagination.prev_short') }}</button>
+      <span class="pg-num" :aria-label="$t('common.pagination.page_info', { page, total: totalPages })">{{ page }} / {{ totalPages }}</span>
+      <button :disabled="page >= totalPages" @click="$emit('change', page + 1)" :aria-label="$t('common.pagination.next')">{{ $t('common.pagination.next_short') }}</button>
     </div>
   </div>
 </template>

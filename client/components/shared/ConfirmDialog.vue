@@ -18,6 +18,7 @@
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n()
 
 interface ConfirmOptions {
   title?: string
@@ -30,8 +31,8 @@ interface ConfirmOptions {
 const visible = ref(false)
 const title = ref('')
 const message = ref('')
-const confirmText = ref('确定')
-const cancelText = ref('取消')
+const confirmText = ref(t('common.confirm'))
+const cancelText = ref(t('common.cancel'))
 const variant = ref<'danger'|'warning'|'primary'>('danger')
 const cancelBtn = ref<HTMLButtonElement>()
 const confirmBtn = ref<HTMLButtonElement>()
@@ -46,10 +47,10 @@ const variantClass = computed(() => ({
 }))
 
 async function show(opts: ConfirmOptions): Promise<boolean> {
-  title.value = opts.title || '确认操作'
+  title.value = opts.title || t('common.confirm')
   message.value = opts.message
-  confirmText.value = opts.confirmText || '确定'
-  cancelText.value = opts.cancelText || '取消'
+  confirmText.value = opts.confirmText || t('common.confirm')
+  cancelText.value = opts.cancelText || t('common.cancel')
   variant.value = opts.variant || 'danger'
   previousActiveElement = document.activeElement as HTMLElement
   visible.value = true

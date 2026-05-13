@@ -112,7 +112,7 @@ onMounted(loadData);
 
 <style scoped>
 .ent-dashboard {
-  --ed-text-primary: #1a1a2e; --ed-text-secondary: #333; --ed-text-muted: #888; --ed-text-subtle: #999;
+  --ed-text-primary: #1a1a2e; --ed-text-secondary: #333; --ed-text-muted: #767676; --ed-text-subtle: #767676;
   --ed-card-bg: #fff; --ed-card-shadow: 0 2px 8px rgba(0,0,0,0.06); --ed-border-light: #f0f0f0; --ed-brand: #667eea;
   --ed-brand-hover: #5a6fd6; --ed-chart-end: #764ba2; --ed-badge-bg: #e8f0fe; --ed-badge-text: #1a73e8;
   --ed-text-on-brand: #fff; --ed-skel-bg: #f0f0f0; --ed-chart-label: #666;

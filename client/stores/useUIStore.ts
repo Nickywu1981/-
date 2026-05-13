@@ -39,7 +39,7 @@ export const useUIStore = defineStore('ui', {
   },
 
   actions: {
-    startPageLoading(text = '加载中...') {
+    startPageLoading(text = 'Loading...') {
       this.pageLoading = true
       this.loadingText = text
     },

@@ -167,7 +167,7 @@ definePageMeta({ layout: 'enterprise' });
 <style scoped>
 .ent-users {
   --ed-text-primary: #1a1a2e; --ed-brand: #667eea; --ed-text-on-brand: #fff; --ed-card-bg: #fff;
-  --ed-card-shadow: 0 2px 8px rgba(0,0,0,0.06); --ed-border: #ddd; --ed-text-muted: #999; --ed-bg-subtle: #fafafa;
+  --ed-card-shadow: 0 2px 8px rgba(0,0,0,0.06); --ed-border: #ddd; --ed-text-muted: #767676; --ed-bg-subtle: #fafafa;
   --ed-bg-muted: #f0f0f0; --ed-danger: #e74c3c; --ed-success-bg: #e8f5e9; --ed-success: #27ae60;
   --ed-danger-bg: #fbe9e7; --ed-overlay: rgba(0,0,0,0.4); --ed-text-secondary: #666; --ed-text-label: #555;
 }

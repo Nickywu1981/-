@@ -52,4 +52,5 @@ const breadcrumbs = computed(() => useAdminBreadcrumbs(navGroups.value, t('agent
 
 const { logout: handleLogout } = useLogout()
 
+definePageMeta({ middleware: ['auth'] })
 </script>

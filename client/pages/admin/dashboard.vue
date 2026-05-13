@@ -139,12 +139,12 @@ async function renderLineChart(el: HTMLDivElement | undefined, data: { date: str
       type: 'category',
       data: data.map(d => d.date?.slice(5) || ''),
       axisLine: { lineStyle: { color: '#e5e7eb' } },
-      axisLabel: { fontSize: 11, color: '#999' },
+      axisLabel: { fontSize: 11, color: '#767676' },
     },
     yAxis: {
       type: 'value',
       splitLine: { lineStyle: { color: '#f3f4f6' } },
-      axisLabel: { fontSize: 11, color: '#999' },
+      axisLabel: { fontSize: 11, color: '#767676' },
     },
     series: [{
       type: 'line',
@@ -193,8 +193,8 @@ async function renderBarChart(el: HTMLDivElement | undefined, data: { label: str
   chart.setOption({
     tooltip: { trigger: 'axis', backgroundColor: '#fff', borderColor: '#e5e7eb', textStyle: { color: '#333', fontSize: 12 }, axisPointer: { type: 'shadow' } },
     grid: { left: 80, right: 16, top: 8, bottom: 24 },
-    xAxis: { type: 'value', splitLine: { lineStyle: { color: '#f3f4f6' } }, axisLabel: { fontSize: 11, color: '#999' } },
-    yAxis: { type: 'category', data: data.map(d => d.label), axisLine: { lineStyle: { color: '#e5e7eb' } }, axisLabel: { fontSize: 11, color: '#999' } },
+    xAxis: { type: 'value', splitLine: { lineStyle: { color: '#f3f4f6' } }, axisLabel: { fontSize: 11, color: '#767676' } },
+    yAxis: { type: 'category', data: data.map(d => d.label), axisLine: { lineStyle: { color: '#e5e7eb' } }, axisLabel: { fontSize: 11, color: '#767676' } },
     series: [{
       type: 'bar',
       data: data.map((d, i) => ({ value: d.value, itemStyle: { color: barColors[i % barColors.length], borderRadius: [0, 4, 4, 0] } })),

@@ -7,12 +7,12 @@ import { fmtNum } from '@/utils/format'
 const DASHBOARD_COLORS = ['#5b5fe3', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6']
 
 const KPI_CFG = [
-  { key: 'revenue', icon: '¥', color: '#5b5fe3', labelKey: 'kpi_revenue', format: (v: number) => fmtNum(v), unit: '元', trend: '+12.5', trendUp: true },
-  { key: 'orders', icon: '📦', color: '#10b981', labelKey: 'kpi_orders', format: (v: number) => fmtNum(v), unit: '单', trend: '+8.3', trendUp: true },
-  { key: 'users', icon: '👥', color: '#3b82f6', labelKey: 'kpi_users', format: (v: number) => fmtNum(v), unit: '人', trend: '+18.7', trendUp: true },
-  { key: 'commission', icon: '💰', color: '#f59e0b', labelKey: 'kpi_commission', format: (v: number) => fmtNum(v), unit: '元', trend: '+15.2', trendUp: true },
-  { key: 'retention', icon: '📈', color: '#8b5cf6', labelKey: 'kpi_retention', format: (v: number) => v.toFixed(1), unit: '%', trend: '+3.1', trendUp: true },
-  { key: 'avgOrder', icon: '🧾', color: '#ec4899', labelKey: 'kpi_avg_order', format: (v: number) => v.toFixed(1), unit: '元', trend: '-2.1', trendUp: false },
+  { key: 'revenue', icon: '¥', color: '#5b5fe3', labelKey: 'kpi_revenue', format: (v: number) => fmtNum(v), unitKey: 'unit_cny', trend: '+12.5', trendUp: true },
+  { key: 'orders', icon: '📦', color: '#10b981', labelKey: 'kpi_orders', format: (v: number) => fmtNum(v), unitKey: 'unit_orders', trend: '+8.3', trendUp: true },
+  { key: 'users', icon: '👥', color: '#3b82f6', labelKey: 'kpi_users', format: (v: number) => fmtNum(v), unitKey: 'unit_users', trend: '+18.7', trendUp: true },
+  { key: 'commission', icon: '💰', color: '#f59e0b', labelKey: 'kpi_commission', format: (v: number) => fmtNum(v), unitKey: 'unit_cny', trend: '+15.2', trendUp: true },
+  { key: 'retention', icon: '📈', color: '#8b5cf6', labelKey: 'kpi_retention', format: (v: number) => v.toFixed(1), unitKey: 'unit_pct', trend: '+3.1', trendUp: true },
+  { key: 'avgOrder', icon: '🧾', color: '#ec4899', labelKey: 'kpi_avg_order', format: (v: number) => v.toFixed(1), unitKey: 'unit_cny', trend: '-2.1', trendUp: false },
 ]
 
 const BIZ_METRICS_KEY_MAP: Record<string, string> = {
@@ -37,7 +37,7 @@ export function useDashboardData() {
       icon: c.icon,
       color: c.color,
       value: c.format(Number(kpi[c.key]) || 0),
-      unit: c.unit,
+      unit: t(`workspace.dashboard_overview.${c.unitKey}`),
       label: t(`workspace.dashboard_overview.${c.labelKey}`),
       trend: c.trend,
       trendUp: c.trendUp,

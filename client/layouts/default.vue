@@ -97,9 +97,9 @@
     </header>
 
     <main id="main-content" class="main" tabindex="-1">
-      <SharedErrorBoundary>
+      <ErrorBoundary>
         <slot />
-      </SharedErrorBoundary>
+      </ErrorBoundary>
     </main>
 
     <footer class="footer">
@@ -134,7 +134,7 @@
 
 <script setup lang="ts">
 useHead({
-  htmlAttrs: { lang: 'zh-CN' },
+  htmlAttrs: { lang: () => useI18n().locale.value },
   link: [{ rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
 });
 // 全局页面 SEO — 各页面自动获得对应 TDK，无需手动设置
@@ -154,40 +154,40 @@ const searchInput = ref<HTMLInputElement | null>(null);
 const { theme, toggle: toggleTheme } = useTheme();
 
 const searchIndex = [
-  { name: '做主图', path: '/work/main-image', icon: '📷', tag: '图片', kw: ['主图', '商品图', '白底图', '抠图'] },
-  { name: '去背景', path: '/work/remove-bg', icon: '🖼', tag: '图片', kw: ['去背景', '抠图', '透明底', '背景移除'] },
-  { name: '白底图', path: '/work/white-bg', icon: '⬜', tag: '图片', kw: ['白底', '白底图', '纯白背景'] },
-  { name: '做场景', path: '/work/scene', icon: '🖼', tag: '图片', kw: ['场景', '背景', '合成'] },
-  { name: '做详情', path: '/work/detail-h5', icon: '📄', tag: '图片', kw: ['详情页', 'SKU', '排版', '文案'] },
-  { name: '做视频', path: '/work/video', icon: '🎬', tag: '视频', kw: ['短视频', '带货', '商品视频', 'BGM'] },
-  { name: '做批量', path: '/work/batch', icon: '📦', tag: '批量', kw: ['批量处理', '批量抠图', '批量生成'] },
-  { name: '素材库', path: '/my/works', icon: '🗂', tag: '管理', kw: ['作品', '历史', '导出'] },
-  { name: '我的模板', path: '/my/templates', icon: '📋', tag: '管理', kw: ['模板', '预设', '复用'] },
-  { name: '我的合集', path: '/my/collections', icon: '📁', tag: '管理', kw: ['合集', '收藏', '整理'] },
-  { name: '积分明细', path: '/my/credits', icon: '💎', tag: '管理', kw: ['积分', '余额', '消费'] },
-  { name: '我的订单', path: '/my/orders', icon: '🧾', tag: '管理', kw: ['订单', '支付', '账单'] },
-  { name: '虚拟模特', path: '/work/virtual-tryon', icon: '👗', tag: '图片', kw: ['试穿', '模特', '上身'] },
-  { name: '一键换色', path: '/work/color-swap', icon: '🎨', tag: '图片', kw: ['换颜色', '多色', 'SKU色'] },
-  { name: '风格转化', path: '/work/style-transfer', icon: '🖌', tag: '图片', kw: ['风格', '水彩', '油画', '3D'] },
-  { name: '动作迁移', path: '/work/action-transfer', icon: '🕺', tag: '视频', kw: ['动作', '舞蹈', '批量换人'] },
-  { name: '人物替换', path: '/work/person-replace', icon: '🧑', tag: '视频', kw: ['换人', '替换角色'] },
-  { name: '口播数字人', path: '/work/digital-human', icon: '🎙', tag: '视频', kw: ['数字人', '口播', '讲解'] },
-  { name: '带货脚本', path: '/work/script-gen', icon: '📝', tag: '视频', kw: ['文案', '话术', '卖点'] },
-  { name: '智能分镜', path: '/work/shot-plan', icon: '🎬', tag: '视频', kw: ['分镜', '导演', '运镜'] },
-  { name: '爆款复刻', path: '/work/viral-clone', icon: '🔥', tag: '视频', kw: ['爆款', '模仿', '热门'] },
-  { name: '去褶皱', path: '/work/wrinkle-remove', icon: '👔', tag: '图片', kw: ['衣服', '平整', '面料'] },
-  { name: '图片翻译', path: '/work/image-translate', icon: '🌐', tag: '图片', kw: ['翻译', '多语言', '跨境'] },
-  { name: '我的会员', path: '/account/membership', icon: '💎', tag: '用户', kw: ['套餐', '升级', '付费'] },
-  { name: '通知中心', path: '/notifications', icon: '🔔', tag: '用户', kw: ['消息', '提醒'] },
-  { name: '个人设置', path: '/my/settings', icon: '⚙', tag: '用户', kw: ['资料', '密码', '手机'] },
-  { name: '竞品对比', path: '/compare', icon: '📊', tag: '其他', kw: ['对比', 'PK', '分析'] },
-  { name: '帮助中心', path: '/help', icon: '❓', tag: '其他', kw: ['FAQ', '教程', '使用'] },
-  { name: '提示词工坊', path: '/work/prompt-hub', icon: '💡', tag: '工具', kw: ['提示词', '模板', '推荐', '评分'] },
-  { name: '多平台分发', path: '/work/publish', icon: '📤', tag: '工具', kw: ['分发', '抖音', '快手', '平台', '发布'] },
-  { name: '分发管理', path: '/work/distribution', icon: '📡', tag: '工具', kw: ['分发', '多平台', '推送'] },
-  { name: '裁剪生态', path: '/work/cut-ecosystem', icon: '✂', tag: '工具', kw: ['裁剪', '尺寸', '平台适配', '画幅'] },
-  { name: '用量仪表盘', path: '/work/usage', icon: '📊', tag: '工具', kw: ['用量', '统计', '配额', '仪表盘'] },
-  { name: '我的收藏', path: '/my/favorites', icon: '⭐', tag: '管理', kw: ['收藏', '书签', '星标'] },
+  { name: '做主图', path: '/work/main-image', icon: '📷', tag: '图片', kw: ['主图', '商品图', '白底图', '抠图', 'main image', 'product photo', 'white bg'] },
+  { name: '去背景', path: '/work/remove-bg', icon: '🖼', tag: '图片', kw: ['去背景', '抠图', '透明底', '背景移除', 'remove background', 'transparent'] },
+  { name: '白底图', path: '/work/white-bg', icon: '⬜', tag: '图片', kw: ['白底', '白底图', '纯白背景', 'white background'] },
+  { name: '做场景', path: '/work/scene', icon: '🖼', tag: '图片', kw: ['场景', '背景', '合成', 'scene', 'background', 'composite'] },
+  { name: '做详情', path: '/work/detail-h5', icon: '📄', tag: '图片', kw: ['详情页', 'SKU', '排版', '文案', 'detail page', 'layout', 'copywriting'] },
+  { name: '做视频', path: '/work/video', icon: '🎬', tag: '视频', kw: ['短视频', '带货', '商品视频', 'BGM', 'video', 'short video', 'product video'] },
+  { name: '做批量', path: '/work/batch', icon: '📦', tag: '批量', kw: ['批量处理', '批量抠图', '批量生成', 'batch', 'bulk'] },
+  { name: '素材库', path: '/my/works', icon: '🗂', tag: '管理', kw: ['作品', '历史', '导出', 'assets', 'history', 'export'] },
+  { name: '我的模板', path: '/my/templates', icon: '📋', tag: '管理', kw: ['模板', '预设', '复用', 'template', 'preset'] },
+  { name: '我的合集', path: '/my/collections', icon: '📁', tag: '管理', kw: ['合集', '收藏', '整理', 'collection', 'favorite'] },
+  { name: '积分明细', path: '/my/credits', icon: '💎', tag: '管理', kw: ['积分', '余额', '消费', 'credits', 'balance'] },
+  { name: '我的订单', path: '/my/orders', icon: '🧾', tag: '管理', kw: ['订单', '支付', '账单', 'order', 'payment', 'billing'] },
+  { name: '虚拟模特', path: '/work/virtual-tryon', icon: '👗', tag: '图片', kw: ['试穿', '模特', '上身', 'virtual tryon', 'model', 'fitting'] },
+  { name: '一键换色', path: '/work/color-swap', icon: '🎨', tag: '图片', kw: ['换颜色', '多色', 'SKU色', 'color swap', 'recolor', 'color variant'] },
+  { name: '风格转化', path: '/work/style-transfer', icon: '🖌', tag: '图片', kw: ['风格', '水彩', '油画', '3D', 'style transfer', 'watercolor'] },
+  { name: '动作迁移', path: '/work/action-transfer', icon: '🕺', tag: '视频', kw: ['动作', '舞蹈', '批量换人', 'action transfer', 'motion', 'dance'] },
+  { name: '人物替换', path: '/work/person-replace', icon: '🧑', tag: '视频', kw: ['换人', '替换角色', 'person replace', 'swap character'] },
+  { name: '口播数字人', path: '/work/digital-human', icon: '🎙', tag: '视频', kw: ['数字人', '口播', '讲解', 'digital human', 'voiceover', 'AI presenter'] },
+  { name: '带货脚本', path: '/work/script-gen', icon: '📝', tag: '视频', kw: ['文案', '话术', '卖点', 'script', 'copywriting', 'sales pitch'] },
+  { name: '智能分镜', path: '/work/shot-plan', icon: '🎬', tag: '视频', kw: ['分镜', '导演', '运镜', 'shot plan', 'storyboard', 'camera'] },
+  { name: '爆款复刻', path: '/work/viral-clone', icon: '🔥', tag: '视频', kw: ['爆款', '模仿', '热门', 'viral clone', 'trending', 'replicate'] },
+  { name: '去褶皱', path: '/work/wrinkle-remove', icon: '👔', tag: '图片', kw: ['衣服', '平整', '面料', 'wrinkle remove', 'smooth', 'fabric'] },
+  { name: '图片翻译', path: '/work/image-translate', icon: '🌐', tag: '图片', kw: ['翻译', '多语言', '跨境', 'translate', 'multilingual', 'cross-border'] },
+  { name: '我的会员', path: '/account/membership', icon: '💎', tag: '用户', kw: ['套餐', '升级', '付费', 'membership', 'plan', 'subscription'] },
+  { name: '通知中心', path: '/notifications', icon: '🔔', tag: '用户', kw: ['消息', '提醒', 'notification', 'message', 'alert'] },
+  { name: '个人设置', path: '/my/settings', icon: '⚙', tag: '用户', kw: ['资料', '密码', '手机', 'settings', 'profile', 'password'] },
+  { name: '竞品对比', path: '/compare', icon: '📊', tag: '其他', kw: ['对比', 'PK', '分析', 'compare', 'benchmark', 'analysis'] },
+  { name: '帮助中心', path: '/help', icon: '❓', tag: '其他', kw: ['FAQ', '教程', '使用', 'help', 'tutorial', 'guide'] },
+  { name: '提示词工坊', path: '/work/prompt-hub', icon: '💡', tag: '工具', kw: ['提示词', '模板', '推荐', '评分', 'prompt', 'template', 'rating'] },
+  { name: '多平台分发', path: '/work/publish', icon: '📤', tag: '工具', kw: ['分发', '抖音', '快手', '平台', '发布', 'publish', 'distribute', 'multi-platform'] },
+  { name: '分发管理', path: '/work/distribution', icon: '📡', tag: '工具', kw: ['分发', '多平台', '推送', 'distribution', 'push'] },
+  { name: '裁剪生态', path: '/work/cut-ecosystem', icon: '✂', tag: '工具', kw: ['裁剪', '尺寸', '平台适配', '画幅', 'crop', 'resize', 'aspect ratio'] },
+  { name: '用量仪表盘', path: '/work/usage', icon: '📊', tag: '工具', kw: ['用量', '统计', '配额', '仪表盘', 'usage', 'dashboard', 'quota'] },
+  { name: '我的收藏', path: '/my/favorites', icon: '⭐', tag: '管理', kw: ['收藏', '书签', '星标', 'favorite', 'bookmark', 'star'] },
 ];
 
 const searchResults = computed(() => {

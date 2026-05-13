@@ -76,7 +76,7 @@ export function useTaskPolling() {
             result.value = res.data.result_data
             stopPolling()
           } else if (res.data.status === 'failed') {
-            error.value = res.data.error_message || '任务失败'
+            error.value = res.data.error_message || t('task.failed')
             stopPolling()
           }
         }

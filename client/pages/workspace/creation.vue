@@ -314,7 +314,7 @@ function handlePanelGenerate() {
 }
 .cc-upload-zone:hover { background: #fafaf9; }
 .cc-upload-icon { font-size: 20px; width: 32px; height: 32px; border-radius: 8px; background: #f5f3ff; display: flex; align-items: center; justify-content: center; }
-.cc-upload-label { font-size: 10px; color: #999; font-weight: 500; }
+.cc-upload-label { font-size: 10px; color: #767676; font-weight: 500; }
 
 /* 中间输入区 */
 .cc-input-main { flex: 1; padding: 14px 16px; }
@@ -356,7 +356,7 @@ function handlePanelGenerate() {
   background: #f5f3ff; color: var(--cc-brand); border-radius: 6px; font-size: 11px;
 }
 .cc-upload-remove {
-  border: none; background: none; color: #999; cursor: pointer; font-size: 12px; padding: 0;
+  border: none; background: none; color: #767676; cursor: pointer; font-size: 12px; padding: 0;
 }
 
 /* ═══ LAYER 3: 底部子功能横向长方形卡片 ═══ */
@@ -392,7 +392,7 @@ function handlePanelGenerate() {
 
 /* ═══ Dark ═══ */
 :root[data-theme="dark"] .cc, :root.dark .cc {
-  --cc-bg: #1a1a1a; --cc-brd: #2a2a2a; --cc-tx: #eee; --cc-tx2: #999; --cc-tx3: #777;
+  --cc-bg: #1a1a1a; --cc-brd: #2a2a2a; --cc-tx: #eee; --cc-tx2: #767676; --cc-tx3: #767676;
 }
 :root[data-theme="dark"] .cc-input-card, :root.dark .cc-input-card,
 :root[data-theme="dark"] .cc-sub-card, :root.dark .cc-sub-card { background: #1a1a1a; }

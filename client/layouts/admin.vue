@@ -25,6 +25,8 @@ const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
 
+const { logout: handleLogout } = useLogout()
+
 const navGroups = computed(() => [
   { key: 'overview', icon: '📊', label: t('admin.nav_overview'), open: true,
     items: [
@@ -92,10 +94,6 @@ const navGroups = computed(() => [
 ])
 
 const breadcrumbs = computed(() => useAdminBreadcrumbs(navGroups.value, t('admin.page_title'), '/admin/dashboard'))
-
-function handleLogout() {
-  router.push('/login')
-}
 
 definePageMeta({ middleware: ['auth'] })
 </script>
