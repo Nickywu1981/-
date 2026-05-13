@@ -139,9 +139,7 @@ useHead({
 });
 // 全局页面 SEO — 各页面自动获得对应 TDK，无需手动设置
 usePageSEO();
-// 全局 Toast 挂载
-const toast = ref()
-onMounted(() => { (window as any).__toast = toast.value })
+// Toast 由 Toast.vue 组件在挂载时自动注册到 window.__toast
 const { confirm } = useConfirm()
 const { t } = useI18n()
 const user = ref<any>(null);

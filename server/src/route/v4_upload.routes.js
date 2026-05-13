@@ -10,6 +10,7 @@ import { validateV4 as _validate, validate } from '../utils/validate.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
 import { uploadQuotaGuard, magicNumberGuard } from '../middleware/upload.js';
+import { authMiddleware } from '../middleware/auth.js';
 import multer from 'multer';
 import * as ctrl from '../controller/v4UploadController.js';
 
@@ -60,10 +61,10 @@ function _withMulter(req, res, next) {
   });
 }
 
-router.post('/simple', _withMulter, uploadQuotaGuard, magicNumberGuard, ctrl.saveSimpleFile);
-router.post('/init', _validate(initUploadSchema), ctrl.initUpload);
-router.post('/chunk', _upload.fields([{ name: 'chunk', maxCount: 1 }]), uploadQuotaGuard, magicNumberGuard, validate(chunkSchema, 'body'), ctrl.receiveChunk);
-router.get('/chunks/:uploadId', ctrl.getReceivedChunks);
-router.post('/complete', _validate(completeUploadSchema), uploadQuotaGuard, ctrl.completeUpload);
+router.post('/simple', authMiddleware, _withMulter, uploadQuotaGuard, magicNumberGuard, ctrl.saveSimpleFile);
+router.post('/init', authMiddleware, _validate(initUploadSchema), ctrl.initUpload);
+router.post('/chunk', authMiddleware, _upload.fields([{ name: 'chunk', maxCount: 1 }]), uploadQuotaGuard, magicNumberGuard, validate(chunkSchema, 'body'), ctrl.receiveChunk);
+router.get('/chunks/:uploadId', authMiddleware, ctrl.getReceivedChunks);
+router.post('/complete', authMiddleware, _validate(completeUploadSchema), uploadQuotaGuard, ctrl.completeUpload);
 
 export default router;

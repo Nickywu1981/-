@@ -63,6 +63,8 @@
 
 <script setup lang="ts">
 import { api } from '~/composables/useApi'
+import { useToast } from '~/composables/useToast'
+const toast = useToast()
 
 const route = useRoute()
 const router = useRouter()
@@ -124,8 +126,10 @@ onMounted(async () => {
 
 async function handleLogout() {
   try { await api.post('/enterprise/logout') } catch (e) { if (import.meta.dev) console.error('Logout error:', e) }
-  document.cookie = 'token=; path=/; max-age=0'
-  document.cookie = 'refreshToken=; path=/; max-age=0'
+  if (import.meta.client) {
+    document.cookie = 'token=; path=/; max-age=0'
+    document.cookie = 'refreshToken=; path=/; max-age=0'
+  }
   router.push('/enterprise/login')
 }
 

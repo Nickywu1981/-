@@ -7,7 +7,7 @@
  *   await submit('video_gen', { prompt: '...' })
  *   // 自动轮询直到 completed/failed
  */
-import { POLL_INTERVAL_MS } from '~/constants/ui'
+import { POLL_INTERVAL_MS, POLL_BACKOFF_MS, POLL_MAX_BACKOFF_MS } from '~/constants/ui'
 
 export function useTaskPolling() {
   const { t } = useI18n()
@@ -17,7 +17,8 @@ export function useTaskPolling() {
   const result = ref<any>(null)
   const error = ref<string>('')
   const submitting = ref(false)
-  const pollTimer = ref<NodeJS.Timeout | null>(null)
+  const pollTimer = ref<ReturnType<typeof setTimeout> | null>(null)
+  let _pollCount = 0
   const apiBase = useRuntimeConfig().public.apiBase || '/api'
 
   // -----------------------------------------------------------------------
@@ -62,36 +63,53 @@ export function useTaskPolling() {
   }
 
   // -----------------------------------------------------------------------
-  // 轮询
+  // 轮询 (指数退避)
   // -----------------------------------------------------------------------
+  function schedulePoll() {
+    if (!_active || !jobId.value) return
+    const backoff = Math.min(
+      POLL_INTERVAL_MS + _pollCount * POLL_BACKOFF_MS,
+      POLL_MAX_BACKOFF_MS,
+    )
+    pollTimer.value = setTimeout(pollOnce, backoff)
+  }
+
+  async function pollOnce() {
+    if (!_active || !jobId.value) return
+    try {
+      const res = await $fetch<{ code: number; data?: { status: string; progress?: number; result_data?: unknown; error_message?: string } }>(`${apiBase}/job/${jobId.value}`, { credentials: 'include' })
+      if (res.code === 200) {
+        status.value = res.data.status
+        progress.value = res.data.progress || 0
+        if (res.data.status === 'completed') {
+          result.value = res.data.result_data
+          _pollCount = 0
+          return
+        } else if (res.data.status === 'failed') {
+          error.value = res.data.error_message || t('task.failed')
+          _pollCount = 0
+          return
+        }
+      }
+    } catch (e) {
+      console.warn('[TaskPolling] 轮询请求失败', e);
+    }
+    _pollCount++
+    schedulePoll()
+  }
+
   function startPolling() {
     stopPolling()
-    pollTimer.value = setInterval(async () => {
-      if (!_active || !jobId.value) return
-      try {
-        const res = await $fetch<{ code: number; data?: { status: string; progress?: number; result_data?: unknown; error_message?: string } }>(`${apiBase}/job/${jobId.value}`, { credentials: 'include' })
-        if (res.code === 200) {
-          status.value = res.data.status
-          progress.value = res.data.progress || 0
-          if (res.data.status === 'completed') {
-            result.value = res.data.result_data
-            stopPolling()
-          } else if (res.data.status === 'failed') {
-            error.value = res.data.error_message || t('task.failed')
-            stopPolling()
-          }
-        }
-      } catch (e) {
-        console.warn('[TaskPolling] 轮询请求失败', e);
-      }
-    }, POLL_INTERVAL_MS)
+    _pollCount = 0
+    schedulePoll()
   }
 
   function stopPolling() {
     if (pollTimer.value) {
-      clearInterval(pollTimer.value)
+      clearTimeout(pollTimer.value)
       pollTimer.value = null
     }
+    _pollCount = 0
   }
 
   function reset() {

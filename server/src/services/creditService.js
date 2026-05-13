@@ -237,7 +237,9 @@ export async function consumeCredit(userId, action, batchCount = 1) {
 // ==================== 管理员退款 ====================
 
 export async function adminRefundCredit(recordId, remark) {
-  return creditDao.adminRefund(0, recordId, remark);
+  const result = await creditDao.adminRefund(0, recordId, remark);
+  if (!result.ok) throw new BusinessError(4101, result.msg || 'Refund failed');
+  return result;
 }
 
 export async function listConsumptionRecords(opts) {
