@@ -28,7 +28,7 @@ import { sanitizePII, sanitizeObject } from '../services/inputSanitizerService.j
 import { moderateText } from '../services/moderation.service.js';
 import { recordCall, recordCircuitBreakerTrip } from '../services/monitorService.js';
 import { getTraceContext } from '../services/traceService.js';
-import { buildErrorResponse } from '../services/outputPostProcessor.js';
+import { buildErrorResponse, postProcessOutput } from '../services/outputPostProcessor.js';
 import { registerBuiltinHooks, runPreHooks, runPostHooks } from '../services/hookRegistryService.js';
 
 // 钩子注册中心开关：设置 AI_USE_HOOK_REGISTRY=true 启用可插拔钩子管线
@@ -337,6 +337,20 @@ export async function gatewayInfer(modelId, input, ctx = {}) {
     }
   }
 
+
+	// ── 输出后处理（格式转换 + 二次脱敏）──
+	if (result.output && status === "success") {
+		try {
+			const outputFormat = ctx.outputFormat || process.env.AI_OUTPUT_FORMAT || "raw";
+			const outputSanitize = ctx.outputSanitize !== undefined ? ctx.outputSanitize : process.env.SECURITY_OUTPUT_SANITIZE === "true";
+			result.output = await postProcessOutput(
+				typeof result.output === "string" ? result.output : JSON.stringify(result.output),
+				{ format: outputFormat, sanitize: outputSanitize },
+			);
+		} catch (e) {
+			logger.warn(`[Gateway] PostProcess failed: ${e.message}`);
+		}
+	}
   await modelConfigDao.logCall({
     userId: context.userId, tenantId: context.tenantId,
     modelKey: modelId, taskType: context.taskType, inputHash: '',
@@ -498,6 +512,17 @@ export async function gatewayDispatch(dispatchReq, ctx = {}) {
       logger.warn(`[Gateway] Moderation failed: ${e.message}`);
     }
   }
+  // ── 输出后处理（格式转换 + 二次脱敏）──
+  if (result?.result && status === "success") {
+    try {
+      const outputFormat = ctx.outputFormat || process.env.AI_OUTPUT_FORMAT || "raw";
+      const outputSanitize = ctx.outputSanitize !== undefined ? ctx.outputSanitize : process.env.SECURITY_OUTPUT_SANITIZE === "true";
+      const rawOutput = typeof result.result === "string" ? result.result : JSON.stringify(result.result);
+      result.result = await postProcessOutput(rawOutput, { format: outputFormat, sanitize: outputSanitize });
+    } catch (e) {
+      logger.warn(`[Gateway] PostProcess failed: ${e.message}`);
+    }
+  }
 
   await modelConfigDao.logCall({
     userId: context.userId, tenantId: context.tenantId,
@@ -587,16 +612,61 @@ export async function gatewayRoute(params, ctx = {}) {
     : params;
 
   const router = _modelRouter;
-  let result, status = 'success', errorMsg = '';
+  let result, status = 'success', errorMsg = '', triedFallback = false;
+  const breaker = getModelBreaker(routeModelId);
 
   try {
-    result = await router.routeModel(safeParams);
+    // 熔断器检查
+    if (breaker && !breaker.isAvailable()) {
+      const fallbackModels = getFallbackModel(routeModelId);
+      if (fallbackModels.length > 0) {
+        logger.warn(`[Gateway] 模型 ${routeModelId} 已熔断，降级到 ${fallbackModels[0]}`);
+        triedFallback = true;
+        const fallbackParams = { ...safeParams, modelKey: fallbackModels[0] };
+        result = await Promise.race([
+          router.routeModel(fallbackParams),
+          timeoutPromise(TOTAL_TIMEOUT, '降级模型路由'),
+        ]);
+      } else {
+        throw new Error(`模型 ${routeModelId} 不可用且无可用降级模型，请稍后重试`);
+      }
+    } else {
+      result = await Promise.race([
+        router.routeModel(safeParams),
+        timeoutPromise(TOTAL_TIMEOUT, '模型路由'),
+      ]);
+    }
+    if (breaker) breaker.recordSuccess();
   } catch (err) {
     status = 'error';
     errorMsg = err.message;
-    result = null;
-    const errResp = buildErrorResponse(errorMsg, { modelId: routeModelId, traceId: getTraceContext()?.traceId });
-    logger.error(`[Gateway] route 失败: ${errResp.code} — ${errResp.message} (detail: ${errorMsg})`);
+    if (breaker) { breaker.recordFailure(); recordCircuitBreakerTrip(routeModelId); }
+
+    // 未降级过则尝试降级
+    if (!triedFallback) {
+      const fallbackModels = getFallbackModel(routeModelId);
+      if (fallbackModels.length > 0) {
+        try {
+          logger.warn(`[Gateway] 模型 ${routeModelId} 失败，降级到 ${fallbackModels[0]}`);
+          const fallbackParams = { ...safeParams, modelKey: fallbackModels[0] };
+          result = await Promise.race([
+            router.routeModel(fallbackParams),
+            timeoutPromise(TOTAL_TIMEOUT, '降级模型路由'),
+          ]);
+          status = 'success';
+          errorMsg = '';
+          triedFallback = true;
+        } catch (fallbackErr) {
+          errorMsg = `${err.message} | fallback: ${fallbackErr.message}`;
+        }
+      }
+    }
+
+    if (status === 'error') {
+      result = null;
+      const errResp = buildErrorResponse(errorMsg, { modelId: routeModelId, traceId: getTraceContext()?.traceId });
+      logger.error(`[Gateway] route 失败: ${errResp.code} — ${errResp.message} (detail: ${errorMsg})`);
+    }
   }
 
   const tokensIn = result?.usage?.input_tokens || result?.usage?.prompt_tokens || 0;
@@ -633,6 +703,21 @@ export async function gatewayRoute(params, ctx = {}) {
       }
     } catch (e) {
       logger.warn(`[Gateway] Moderation failed: ${e.message}`);
+    }
+  }
+
+  // ── 输出后处理（格式转换 + 二次脱敏）──
+  if (result?.response && status === 'success') {
+    try {
+      const outputFormat = ctx.outputFormat || process.env.AI_OUTPUT_FORMAT || 'raw';
+      const outputSanitize = ctx.outputSanitize !== undefined ? ctx.outputSanitize : process.env.SECURITY_OUTPUT_SANITIZE === 'true';
+      const content = result.response?.choices?.[0]?.message?.content;
+      if (content) {
+        const processed = await postProcessOutput(content, { format: outputFormat, sanitize: outputSanitize });
+        result.response.choices[0].message.content = processed;
+      }
+    } catch (e) {
+      logger.warn(`[Gateway] PostProcess failed: ${e.message}`);
     }
   }
 

@@ -62,6 +62,82 @@ function makeTextInfer(modelId, maxTokens = 2000, timeout = 60000) {
   };
 }
 
+// ==================== 通用文本流式推断工厂 ====================
+
+function makeTextStreamInfer(modelId, maxTokens = 2000, timeout = 300000) {
+  return async function* streamInfer(input, onProgress) {
+    if (typeof input === 'string') {
+      input = { prompt: input };
+    }
+    const { prompt, systemPrompt, temperature = 0.7, maxTokens: mt = maxTokens } = input;
+
+    const messages = [];
+    if (systemPrompt) messages.push({ role: 'system', content: systemPrompt });
+    messages.push({ role: 'user', content: prompt });
+
+    onProgress?.(10);
+
+    const res = await fetch(`${BASE_URL}/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${API_KEY}` },
+      body: JSON.stringify({ model: modelId, messages, temperature, max_tokens: mt, stream: true }),
+      signal: AbortSignal.timeout(timeout),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      logger.error(`[OpenAI] Stream API 请求失败 ${res.status}: ${err.error?.message || res.statusText}`);
+      throw new BusinessError(502, 'AI 服务暂时不可用，请稍后重试');
+    }
+
+    onProgress?.(30);
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    let inputTokens = 0;
+    let outputTokens = 0;
+
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed || !trimmed.startsWith('data: ')) continue;
+          const data = trimmed.slice(6);
+          if (data === '[DONE]') break;
+
+          try {
+            const json = JSON.parse(data);
+            const delta = json.choices?.[0]?.delta;
+            if (delta?.content) {
+              yield { text: delta.content };
+            }
+            if (json.usage) {
+              inputTokens = json.usage.prompt_tokens || inputTokens;
+              outputTokens = json.usage.completion_tokens || outputTokens;
+            }
+          } catch { /* skip malformed chunks */ }
+        }
+      }
+    } finally {
+      reader.releaseLock();
+    }
+
+    onProgress?.(100);
+
+    // 最后 yield 用量信息
+    yield { usage: { inputTokens, outputTokens } };
+  };
+}
+
 // ==================== 远程模型列表拉取 ====================
 
 async function fetchRemoteModels() {
@@ -149,6 +225,7 @@ export async function registerOpenAI() {
         id,
         type: 'text',
         infer: makeTextInfer(id, cap.maxTokens, cap.timeout),
+        streamInfer: makeTextStreamInfer(id, cap.maxTokens, cap.timeout),
         health,
         provider: 'openai',
       });
@@ -166,6 +243,7 @@ export async function registerOpenAI() {
       id,
       type: 'text',
       infer: makeTextInfer(id, cap.maxTokens, cap.timeout),
+        streamInfer: makeTextStreamInfer(id, cap.maxTokens, cap.timeout),
       health,
       provider: 'openai',
     });

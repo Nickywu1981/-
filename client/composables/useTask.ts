@@ -10,7 +10,7 @@ export function useTask() {
   const status = ref(-1); // -1=未提交 0=排队 1=处理中 2=完成 3=失败
   const progress = ref(0);
   const progressMsg = ref('');
-  const result = ref<any>(null);
+  const result = ref<Record<string, unknown> | null>(null);
   const errorMsg = ref('');
   const polling = ref(false);
 
@@ -31,7 +31,7 @@ export function useTask() {
       if (!polling.value) return;
       try {
         const res = await $fetch(`${baseUrl}${id}`, { credentials: 'include' });
-        const data = (res as any).data;
+        const data = (res as Record<string, unknown>).data as Record<string, unknown>;
         status.value = data.status;
         progress.value = data.progress;
         progressMsg.value = data.progress_msg;
@@ -46,8 +46,8 @@ export function useTask() {
           stopPolling();
           return;
         }
-      } catch (err: any) {
-        if (import.meta.dev) console.warn('[useTask] 轮询请求失败', err?.message || err)
+      } catch (err) {
+        if (import.meta.dev) console.warn('[useTask] 轮询请求失败', (err as Error)?.message || err)
         consecutiveFailures++;
         // 连续失败 3 次后报告错误状态
         if (consecutiveFailures >= 3) {
@@ -62,10 +62,10 @@ export function useTask() {
       if (consecutiveFailures > 3) currentInterval = POLL_BACKOFF_MS;
       else if (pollCount > 5) currentInterval = POLL_INTERVAL_MS;
 
-      if (polling.value) timer = setTimeout(doPoll, currentInterval) as any;
+      if (polling.value) timer = setTimeout(doPoll, currentInterval);
     };
 
-    timer = setTimeout(doPoll, 1000) as any;
+    timer = setTimeout(doPoll, 1000);
   }
 
   function stopPolling() {

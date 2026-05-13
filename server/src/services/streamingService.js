@@ -86,7 +86,7 @@ export async function processStreamingOutput(sourceStream, sseStream, opts = {})
             sseStream.send({ type: 'moderation_block', violations: result.violations }, 'error');
             break;
           }
-        } catch { /* 审核异常不中断流 */ }
+        } catch (e) { logger.warn('[Streaming] 审核异常不中断流:', e.message); }
       }
 
       sseStream.send(text, 'token');

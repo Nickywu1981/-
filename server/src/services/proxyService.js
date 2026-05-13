@@ -245,7 +245,7 @@ function buildHeaders(proxy) {
         const headerName = authConfig.headerName || 'X-API-Key';
         headers[headerName] = authConfig.apiKey;
       }
-    } catch { /* auth parse error */ }
+    } catch { logger.warn('[Proxy] 认证配置解析失败，使用无鉴权头'); }
   }
 
   return headers;

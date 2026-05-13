@@ -110,7 +110,7 @@ async function getStats({ namespace = 'user', subjectId }) {
 async function markAccessed(memoryId) {
   try {
     await ltmDao.markAccessed(memoryId);
-  } catch (_) { /* 静默降级 */ }
+  } catch (e) { logger.warn('[LTM] markAccessed 降级:', e.message); }
 }
 
 export { store, storeBatch, recall, applyDecay, consolidate, purgeExpired, getStats, markAccessed };
