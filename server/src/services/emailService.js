@@ -46,7 +46,9 @@ function sanitizeHtml(html) {
     .replace(/&#\d+;?/gi, '')
     .replace(/&#x[0-9a-f]+;?/gi, '')
     .replace(/javascript\s*:/gi, 'data-xss-blocked:')
-    .replace(/data\s*:\s*text\/html/gi, 'data-xss-blocked:');
+    .replace(/data\s*:\s*text\/html/gi, 'data-xss-blocked:')
+    .replace(/<style\b[^>]*>[\s\S]*?<\/\s*style\s*>/gi, '')
+    .replace(/<link\b[^>]*\/?\s*>/gi, '');
 }
 
 // ==================== 服务商抽象层 ====================
