@@ -61,7 +61,7 @@ class WsManager {
       verifyClient: ({ origin, req }) => {
         // CSWSH 防护 — 仅允许已配置的 Origin
         if (!origin || origin === 'null') return true; // 非浏览器客户端允许
-        const allowed = (process.env.CORS_ORIGIN || 'http://localhost:3000').split(',').map(s => s.trim());
+        const allowed = (config.corsOrigin || 'http://localhost:3000').split(',').map(s => s.trim());
         const ok = allowed.some(o => origin === o || origin.startsWith(o));
         if (!ok) logger.warn('[WS] 拒绝跨源连接', { origin });
         return ok;

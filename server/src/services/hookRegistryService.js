@@ -11,6 +11,7 @@
  *   registerHook('pre', 'quota-check', quotaCheckFn, 100);
  */
 import logger from '../utils/logger.js';
+import { securityConfig } from '../config/index.js';
 
 // ==================== 钩子存储 ====================
 
@@ -174,7 +175,7 @@ export function registerBuiltinHooks() {
 
   // Pre-invoke: PII 脱敏（priority=200）
   registerHook('pre', 'pii-sanitize', async (ctx) => {
-    const sanitizeEnabled = process.env.SECURITY_SANITIZE_INPUT !== 'false';
+    const sanitizeEnabled = securityConfig.sanitizeInput;
     if (!sanitizeEnabled || !ctx.input) return { blocked: false };
 
     try {
@@ -195,7 +196,7 @@ export function registerBuiltinHooks() {
 
   // Pre-invoke: 内容审核（priority=300）
   registerHook('pre', 'content-moderation', async (ctx) => {
-    const moderationEnabled = process.env.SECURITY_SELF_BUILT_WORDLIST_ENABLED !== 'false';
+    const moderationEnabled = securityConfig.selfBuiltWordlistEnabled;
     if (!moderationEnabled || !ctx.userId) return { blocked: false };
 
     try {
@@ -214,7 +215,7 @@ export function registerBuiltinHooks() {
 
   // Pre-invoke: 模型权限检查（priority=400）
   registerHook('pre', 'model-acl', async (ctx) => {
-    const aclEnabled = process.env.SECURITY_MODEL_ACL_ENABLED === 'true';
+    const aclEnabled = securityConfig.modelAclEnabled;
     if (!aclEnabled) return { blocked: false };
 
     try {
@@ -231,7 +232,7 @@ export function registerBuiltinHooks() {
 
   // Post-invoke: Token 泄漏检测（priority=500）
   registerHook('post', 'token-leak-check', async (ctx) => {
-    const enabled = process.env.SECURITY_TOKEN_LEAK_PROTECTION === 'true';
+    const enabled = securityConfig.tokenLeakProtection;
     if (!enabled || !ctx.userId) return {};
 
     try {
