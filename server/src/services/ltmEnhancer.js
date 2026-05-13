@@ -66,6 +66,17 @@ export async function scenarioDecay(namespace, subjectId, scenario = 'default') 
 
 const hotCache = new Map();
 const HOT_CACHE_TTL = 300000; // 5 min
+const HOT_CACHE_MAX = 500; // 防止无限增长
+
+// 定时清理过期缓存条目
+const _hotCacheCleanup = setInterval(() => {
+  try {
+    const cutoff = Date.now() - HOT_CACHE_TTL;
+    for (const [k, v] of hotCache) {
+      if (v.ts < cutoff) hotCache.delete(k);
+    }
+  } catch { /* 迭代安全 */ }
+}, 300_000).unref();
 
 /**
  * 带缓存的记忆召回

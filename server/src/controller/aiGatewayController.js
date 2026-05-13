@@ -141,7 +141,8 @@ export const aiGatewayController = {
 	          return;
 	        }
 	      } catch (e) {
-	        logger.warn(`[Stream] GEO 检查失败，放行: ${e.message}`);
+	        logger.error(`[Stream] GEO check failed, bypassing: ${e.message}`);
+        stream.send({ type: 'geo_check_bypassed' }, 'warning');
 	      }
 
 	      // 2. 输入 PII 自动脱敏
@@ -154,7 +155,8 @@ export const aiGatewayController = {
 	          sanitizedInput = JSON.parse(sanitizePII(str));
 	        }
 	      } catch (e) {
-	        logger.warn(`[Stream] PII 脱敏失败，使用原始输入: ${e.message}`);
+	        logger.error(`[Stream] PII sanitization failed, using raw input: ${e.message}`);
+        stream.send({ type: 'pii_sanitization_bypassed' }, 'warning');
 	      }
 
 	      // 3. 内容安全审核

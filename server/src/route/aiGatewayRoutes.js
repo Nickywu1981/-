@@ -62,8 +62,18 @@ router.get('/async/status/:taskId', authMiddleware, signatureGuard, aiGatewayCon
 router.post('/stream/infer', authMiddleware, signatureGuard, aiConcurrencyGuard, validate(inferBodySchema), aiGatewayController.streamInfer);
 
 // ── 电商管线 ──
-router.post('/pipeline/wrap', authMiddleware, signatureGuard, aiGatewayController.pipelineWrap);
-router.post('/pipeline/compliance', authMiddleware, signatureGuard, aiGatewayController.pipelineCompliance);
+const pipelineWrapSchema = z.object({
+  prompt: z.string().min(1).max(10000),
+  intentId: z.string().min(1).max(100).optional(),
+  options: z.record(z.unknown()).optional(),
+});
+const pipelineComplianceSchema = z.object({
+  text: z.string().min(1).max(10000),
+  platform: z.string().min(1).max(50).optional(),
+  countryCode: z.string().length(2).optional(),
+});
+router.post('/pipeline/wrap', authMiddleware, signatureGuard, validate(pipelineWrapSchema), aiGatewayController.pipelineWrap);
+router.post('/pipeline/compliance', authMiddleware, signatureGuard, validate(pipelineComplianceSchema), aiGatewayController.pipelineCompliance);
 
 // ── 全自动编排 ──
 const orchestrateSchema = z.object({

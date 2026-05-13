@@ -13,6 +13,7 @@ import crypto from 'node:crypto';
 import WebSocket from 'ws';
 
 import { adapterConfig } from '../../config/index.js';
+import { ERROR_CODE } from '../../constants/errorCode.js';
 
 const AUDIO_DIR = path.join(process.cwd(), 'uploads', 'audio');
 const EDGE_WS_URL = adapterConfig.edgeTts.wsUrl;
@@ -56,7 +57,7 @@ function synthesizeEdgeTTS(voiceName, text, speed) {
       if (!resolved) {
         resolved = true;
         ws.close();
-        reject(new BusinessError(504, 'Edge TTS 请求超时'));
+        reject(new BusinessError(ERROR_CODE.INTERNAL_ERROR));
       }
     }, 30000);
 
@@ -103,7 +104,7 @@ function synthesizeEdgeTTS(voiceName, text, speed) {
       if (!resolved) {
         resolved = true;
         const audioBuffer = Buffer.concat(chunks);
-        if (audioBuffer.length < 100) return reject(new BusinessError(502, 'Edge TTS 返回空音频'));
+        if (audioBuffer.length < 100) return reject(new BusinessError(ERROR_CODE.INTERNAL_ERROR));
         resolve(audioBuffer);
       }
     });
@@ -149,21 +150,8 @@ async function realTTSInfer(text, voiceType, speed) {
       metadata: { model: 'edge-tts', provider: 'Microsoft', voiceName, simulated: false },
     };
   } catch (err) {
-    logger.warn(`[EdgeTTS] 合成失败，回退到模拟: ${err.message}`);
-    // Graceful fallback
-    const duration = Math.max(1, Math.round(text.length / 4));
-    return {
-      output: {
-        audioUrl: `/api/audio/tts_${Date.now()}.mp3`,
-        duration,
-        size: `${Math.round(duration * 16)} KB`,
-        format: 'mp3',
-        voiceType,
-        voiceName,
-        textPreview: text.slice(0, 80) + (text.length > 80 ? '...' : ''),
-      },
-      metadata: { model: 'edge-tts', simulated: true, voiceName },
-    };
+    logger.error(`[EdgeTTS] Synthesis failed: ${err.message}`);
+    throw new BusinessError(ERROR_CODE.AI_INFER_FAILED, `TTS synthesis failed: ${err.message}`);
   }
 }
 
@@ -197,7 +185,7 @@ async function realCloneInfer(text, audioSampleUrl) {
     if (audioSampleUrl) {
       // 防路径遍历：拒绝含 .. 或绝对路径的输入
       if (audioSampleUrl.includes('..') || path.isAbsolute(audioSampleUrl)) {
-        throw new BusinessError(400, '无效的音频样本路径');
+        throw new BusinessError(ERROR_CODE.PARAM_INVALID);
       }
       const safePath = audioSampleUrl.replace(/^\/uploads\//, '');
       const samplePath = path.join(process.cwd(), 'uploads', safePath);
@@ -205,7 +193,7 @@ async function realCloneInfer(text, audioSampleUrl) {
       const resolvedPath = path.resolve(samplePath);
       const uploadsRoot = path.resolve(process.cwd(), 'uploads');
       if (!resolvedPath.startsWith(uploadsRoot)) {
-        throw new BusinessError(400, '无效的音频样本路径');
+        throw new BusinessError(ERROR_CODE.PARAM_INVALID);
       }
       let sampleBuffer;
       try { sampleBuffer = await fs.promises.readFile(resolvedPath); } catch (e) { logger.warn('[EdgeTTS] 音频样本文件读取失败，跳过声音克隆', { path: resolvedPath, error: e.message }); }
@@ -224,7 +212,7 @@ async function realCloneInfer(text, audioSampleUrl) {
       }
     }
 
-    if (!voiceId) throw new BusinessError(500, '无法创建克隆声音');
+    if (!voiceId) throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
 
     // Step 2: TTS with cloned voice
     const ttsResp = await fetch(`${apiBase}/v1/text-to-speech/${voiceId}`, {
@@ -234,7 +222,7 @@ async function realCloneInfer(text, audioSampleUrl) {
       signal: AbortSignal.timeout(60000),
     });
 
-    if (!ttsResp.ok) throw new BusinessError(ttsResp.status, `ElevenLabs TTS 返回 ${ttsResp.status}`);
+    if (!ttsResp.ok) throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, `ElevenLabs TTS returned ${ttsResp.status}`);
 
     const audioBuffer = Buffer.from(await ttsResp.arrayBuffer());
     const filename = `clone_${Date.now()}_${crypto.randomBytes(4).toString('hex')}.mp3`;
@@ -291,7 +279,7 @@ export async function registerEdgeTTS() {
       const text = input.text || input.prompt || '';
       const voiceType = input.voiceType || input.voice || 'sweet-female';
       const speed = input.speed || 1.0;
-      if (!text.trim()) throw new BusinessError(400, '配音文本不能为空');
+      if (!text.trim()) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
       return realTTSInfer(text, voiceType, speed);
     },
   });

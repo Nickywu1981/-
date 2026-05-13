@@ -553,13 +553,13 @@ export async function getRecoveryMetrics() {
   try {
     const { getPoolMetrics: getDBPoolMetrics } = await import('../dao/db.js');
     poolMetrics = getDBPoolMetrics();
-  } catch { /* optional */ }
+  } catch (e) { logger.warn('[AutoRecovery] DB pool metrics unavailable', { error: e.message }); }
 
   let redisMetrics = null;
   try {
     const { getRedisMetrics } = await import('../dao/redis.js');
     redisMetrics = getRedisMetrics();
-  } catch { /* optional */ }
+  } catch (e) { logger.warn('[AutoRecovery] Redis metrics unavailable', { error: e.message }); }
 
   return {
     ...recoveryMetrics,
