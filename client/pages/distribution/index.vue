@@ -6,20 +6,20 @@
 <template>
   <div class="page-container">
     <header class="page-header">
-      <h1>内容分发</h1>
-      <p>一键将作品发布到绑定的电商/社交平台</p>
+      <h1>{{ $t('contentDistribution.title') }}</h1>
+      <p>{{ $t('contentDistribution.subtitle') }}</p>
     </header>
 
-    <div v-if="loading" class="loading-state">加载中...</div>
+    <div v-if="loading" class="loading-state">{{ $t('contentDistribution.loading') }}</div>
 
     <template v-else>
 
     <!-- 已绑定平台 -->
     <div class="section">
-      <h3>已绑定平台</h3>
+      <h3>{{ $t('contentDistribution.boundPlatforms') }}</h3>
       <div v-if="boundPlatforms.length === 0" class="empty-state">
-        <p>暂未绑定任何平台</p>
-        <NuxtLink to="/account/bind-platform" class="btn btn-primary btn-sm">去绑定 →</NuxtLink>
+        <p>{{ $t('contentDistribution.noPlatforms') }}</p>
+        <NuxtLink to="/account/bind-platform" class="btn btn-primary btn-sm">{{ $t('contentDistribution.goBind') }}</NuxtLink>
       </div>
       <div v-else class="platform-list">
         <div v-for="p in boundPlatforms" :key="p.platform" class="platform-row">
@@ -28,17 +28,17 @@
             <span class="pf-name">{{ p.platform_name || p.platform }}</span>
             <span class="pf-account">{{ p.account_name || p.account_id }}</span>
           </div>
-          <span class="pf-status" :class="p.bind_type">{{ p.bind_type === 'shop' ? '店铺' : '账号' }}</span>
+          <span class="pf-status" :class="p.bind_type">{{ bindTypeLabel(p.bind_type) }}</span>
         </div>
       </div>
     </div>
 
     <!-- 待发布作品 -->
     <div class="section">
-      <h3>待分发作品</h3>
+      <h3>{{ $t('contentDistribution.pendingWorks') }}</h3>
       <div v-if="recentWorks.length === 0" class="empty-state">
-        <p>暂无作品，先去创作吧</p>
-        <NuxtLink to="/work/video" class="btn btn-primary btn-sm">去创作 →</NuxtLink>
+        <p>{{ $t('contentDistribution.noWorks') }}</p>
+        <NuxtLink to="/work/video" class="btn btn-primary btn-sm">{{ $t('contentDistribution.goCreate') }}</NuxtLink>
       </div>
       <div v-else class="works-list">
         <div v-for="work in recentWorks" :key="work.id" class="work-row">
@@ -52,11 +52,11 @@
           </div>
           <div class="work-actions">
             <select v-model="work.selectedPlatform" class="input input-sm">
-              <option value="">选择平台</option>
+              <option value="">{{ $t('contentDistribution.selectPlatform') }}</option>
               <option v-for="p in boundPlatforms" :key="p.platform" :value="p.platform">{{ p.platform_name || p.platform }}</option>
             </select>
             <button class="btn btn-primary btn-xs" :disabled="!work.selectedPlatform || publishing === work.id" @click="doPublish(work)">
-              {{ publishing === work.id ? '发布中...' : '发布' }}
+              {{ publishing === work.id ? $t('contentDistribution.publishing') : $t('contentDistribution.publish') }}
             </button>
           </div>
         </div>
@@ -65,13 +65,13 @@
 
     <!-- 发布历史 -->
     <div class="section">
-      <h3>发布历史</h3>
-      <div v-if="publishHistory.length === 0" class="empty-state">暂无发布记录</div>
+      <h3>{{ $t('contentDistribution.publishHistory') }}</h3>
+      <div v-if="publishHistory.length === 0" class="empty-state">{{ $t('contentDistribution.noHistory') }}</div>
       <div v-else class="history-list">
         <div v-for="h in publishHistory" :key="h.id" class="history-row">
           <span class="h-platform">{{ h.platform }}</span>
-          <span class="h-status" :class="h.status">{{ h.status === 'success' ? '成功' : h.status === 'failed' ? '失败' : '处理中' }}</span>
-          <span v-if="h.published_url" class="h-link"><a :href="h.published_url" target="_blank" rel="noopener noreferrer">查看 →</a></span>
+          <span class="h-status" :class="h.status">{{ statusLabel(h.status) }}</span>
+          <span v-if="h.published_url" class="h-link"><a :href="h.published_url" target="_blank" rel="noopener noreferrer">{{ $t('contentDistribution.viewLink') }}</a></span>
           <span class="h-time">{{ formatDate(h.created_at) }}</span>
         </div>
       </div>
@@ -85,6 +85,7 @@ import { formatDate } from '@/utils/format'
 
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 
+const { t } = useI18n()
 const apiBase = useRuntimeConfig().public.apiBase || '/api'
 const toast = useToast()
 
@@ -100,27 +101,39 @@ const platformIcons: Record<string, string> = {
 }
 
 function platformIcon(p: string) { return platformIcons[p] || '🔗' }
-const typeLabels: Record<string, string> = {
-  image_gen: 'AI生图', video_gen: 'AI视频', action_migrate: '动作迁移', digital_human: '数字人', viral_replicate: '爆款复刻',
+
+const typeLabelKeys: Record<string, string> = {
+  image_gen: 'contentDistribution.typeImageGen',
+  video_gen: 'contentDistribution.typeVideoGen',
+  action_migrate: 'contentDistribution.typeActionMigrate',
+  digital_human: 'contentDistribution.typeDigitalHuman',
+  viral_replicate: 'contentDistribution.typeViralReplicate',
 }
 
-function typeLabel(t: string) { return typeLabels[t] || t }
+function typeLabel(tk: string) { return typeLabelKeys[tk] ? t(typeLabelKeys[tk]) : tk }
+
+function bindTypeLabel(b: string) { return b === 'shop' ? t('contentDistribution.shop') : t('contentDistribution.account') }
+
+const statusLabelKeys: Record<string, string> = {
+  success: 'contentDistribution.statusSuccess',
+  failed: 'contentDistribution.statusFailed',
+  processing: 'contentDistribution.statusProcessing',
+}
+
+function statusLabel(s: string) { return statusLabelKeys[s] ? t(statusLabelKeys[s]) : s }
 
 onMounted(async () => {
   try {
-    // 获取绑定平台
-    const bindsRes: any = await $fetch(`${apiBase}/platforms/bindings`, { credentials: 'include' }).catch((err: any) => { toast.error('平台绑定加载失败'); if (import.meta.dev) console.warn('[distribution] 绑定平台加载失败', err?.message || err); return null })
+    const bindsRes: any = await $fetch(`${apiBase}/platforms/bindings`, { credentials: 'include' }).catch((err: any) => { toast.error(t('contentDistribution.errorBindLoad')); if (import.meta.dev) console.warn('[distribution]', err?.message || err); return null })
     if (bindsRes?.code === 200) boundPlatforms.value = bindsRes.data?.list || []
 
-    // 获取最近作品
-    const worksRes: any = await $fetch(`${apiBase}/assets/list`, { params: { page: 1, pageSize: 10 }, credentials: 'include' }).catch((err: any) => { toast.error('作品列表加载失败'); if (import.meta.dev) console.warn('[distribution] 作品列表加载失败', err?.message || err); return null })
+    const worksRes: any = await $fetch(`${apiBase}/assets/list`, { params: { page: 1, pageSize: 10 }, credentials: 'include' }).catch((err: any) => { toast.error(t('contentDistribution.errorWorksLoad')); if (import.meta.dev) console.warn('[distribution]', err?.message || err); return null })
     if (worksRes?.code === 200) {
       recentWorks.value = (worksRes.data?.list || []).map((w: any) => ({ ...w, selectedPlatform: '' }))
     }
 
-    // 发布历史 (模拟)
     publishHistory.value = []
-  } catch { toast.error('加载分发数据失败') }
+  } catch { toast.error(t('contentDistribution.errorLoad')) }
   finally { loading.value = false }
 })
 
@@ -132,14 +145,14 @@ async function doPublish(work: any) {
       method: 'POST',
       body: { work_id: work.id, platform: work.selectedPlatform, content_url: work.url },
       credentials: 'include',
-    }).catch((err: any) => { toast.error('发布失败，请重试'); if (import.meta.dev) console.warn('[distribution] 发布请求失败', err?.message || err); return null })
+    }).catch((err: any) => { toast.error(t('contentDistribution.errorPublish')); if (import.meta.dev) console.warn('[distribution]', err?.message || err); return null })
     if (res?.code === 200) {
       publishHistory.value.unshift({
         id: Date.now(), platform: work.selectedPlatform, status: 'success',
         published_url: res.data?.published_url || '', created_at: new Date().toISOString(),
       })
     }
-  } catch { toast.error('发布失败') }
+  } catch { toast.error(t('contentDistribution.errorPublishFailed')) }
   publishing.value = null
 }
 </script>

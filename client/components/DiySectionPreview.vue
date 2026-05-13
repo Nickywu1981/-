@@ -3,22 +3,22 @@
   <div v-if="section.component === 'banner_slider'" class="preview-banner">
     <div v-for="(slide, i) in (config.slides||[{}])" :key="i" class="preview-slide">
       <img v-if="slide.img" :src="slide.img" :alt="'slide '+i" loading="lazy" @error="onImgError" />
-      <span v-else>空幻灯片{{ i+1 }}</span>
+      <span v-else>{{ $t('diyPreview.emptySlide', { n: i+1 }) }}</span>
     </div>
   </div>
   <!-- 文本 -->
   <div v-else-if="section.component === 'text_block'" class="preview-text" :style="{ textAlign: config.align, fontSize: (config.fontSize||14)+'px', color: config.color }">
-    {{ config.content || '文本段落' }}
+    {{ config.content || $t('diyPreview.textParagraph') }}
   </div>
   <!-- 标题 -->
   <div v-else-if="section.component === 'title_bar'" class="preview-title" :style="{ textAlign: config.align, background: config.bgColor }">
-    <strong :style="{ fontSize: (config.fontSize||18)+'px', color: config.color }">{{ config.title || '标题' }}</strong>
+    <strong :style="{ fontSize: (config.fontSize||18)+'px', color: config.color }">{{ config.title || $t('diyPreview.title') }}</strong>
     <small v-if="config.subtitle">{{ config.subtitle }}</small>
   </div>
   <!-- 商品列表 -->
   <div v-else-if="section.component === 'product_list'" class="preview-products">
     <div class="grid" :style="gridStyle(config.columns||2, config.gap||10)">
-      <div v-for="(item, i) in (config.items?.length ? config.items : [{name:'示例商品',price:'¥99',img:''}])" :key="i" class="card">
+      <div v-for="(item, i) in (config.items?.length ? config.items : [{name: $t('diyPreview.sampleProduct'),price:'¥99',img:''}])" :key="i" class="card">
         <img :src="item.img || placeholder" :alt="item.name" loading="lazy" @error="onImgError" />
         <span>{{ item.name }}</span>
         <span v-if="config.showPrice" class="price">{{ item.price }}</span>
@@ -28,57 +28,59 @@
   <!-- 图片展示 -->
   <div v-else-if="section.component === 'image_showcase'" class="preview-gallery">
     <div class="grid" :style="gridStyle(config.columns||3, config.gap||8)">
-      <img v-for="(img, i) in (config.images?.length ? config.images : [placeholder])" :key="i" :src="img" :alt="'展示图片 '+(i+1)" :style="{ borderRadius: (config.radius||8)+'px' }" loading="lazy" @error="onImgError" />
+      <img v-for="(img, i) in (config.images?.length ? config.images : [placeholder])" :key="i" :src="img" :alt="$t('diyPreview.showcaseImage', { n: i+1 })" :style="{ borderRadius: (config.radius||8)+'px' }" loading="lazy" @error="onImgError" />
     </div>
   </div>
   <!-- 视频 -->
   <div v-else-if="section.component === 'video_player'" class="preview-video">
     <video v-if="config.src" :src="config.src" :poster="config.poster" :controls="config.controls !== false" :autoplay="config.autoplay" preload="none" class="w-full" />
-    <div v-else class="empty-media">▶ 未设置视频源</div>
+    <div v-else class="empty-media">▶ {{ $t('diyPreview.noVideoSource') }}</div>
   </div>
   <!-- 倒计时 -->
   <div v-else-if="section.component === 'countdown'" class="preview-countdown" :style="{ color: config.color, fontSize: (config.fontSize||24)+'px' }">
     <span v-if="config.title">{{ config.title }}</span>
     <strong v-if="config.endTime">{{ countdown }}</strong>
-    <span v-else>未设置结束时间</span>
+    <span v-else>{{ $t('diyPreview.noEndTime') }}</span>
   </div>
   <!-- 优惠券 -->
   <div v-else-if="section.component === 'coupon_card'" class="preview-coupon">
     <div class="coupon-card" :style="{ borderColor: config.color||'#ff6600', borderRadius: (config.radius||8)+'px' }">
-      <strong>{{ config.title || '优惠券' }}</strong>
+      <strong>{{ config.title || $t('diyPreview.coupon') }}</strong>
       <span class="amount">{{ config.amount || '¥?' }}</span>
       <span v-if="config.condition">{{ config.condition }}</span>
     </div>
   </div>
   <!-- 按钮组 -->
   <div v-else-if="section.component === 'button_group'" class="preview-buttons" :style="{ flexDirection: config.direction||'row', gap: (config.gap||12)+'px' }">
-    <span v-for="(btn, i) in (config.buttons||[{text:'按钮',color:'var(--brand)'}])" :key="i" class="btn-pill" :style="{ background: btn.color||'var(--brand)', borderRadius: (config.radius||20)+'px' }">{{ btn.text }}</span>
+    <span v-for="(btn, i) in (config.buttons||[{text: $t('diyPreview.button'), color:'var(--brand)'}])" :key="i" class="btn-pill" :style="{ background: btn.color||'var(--brand)', borderRadius: (config.radius||20)+'px' }">{{ btn.text }}</span>
   </div>
   <!-- 导航栏 -->
   <div v-else-if="section.component === 'nav_bar'" class="preview-nav" :style="{ background: config.bgColor||'var(--bg-card)', color: config.textColor||'var(--text-primary)' }">
-    <span v-for="(item, i) in (config.items||[{text:'首页',icon:'🏠'}])" :key="i" class="nav-chip" :style="{ color: config.textColor||'var(--text-primary)' }">
+    <span v-for="(item, i) in (config.items||[{text: $t('diyPreview.home'), icon:'🏠'}])" :key="i" class="nav-chip" :style="{ color: config.textColor||'var(--text-primary)' }">
       <span v-if="item.icon">{{ item.icon }}</span> {{ item.text }}
     </span>
   </div>
   <!-- 热区图片 -->
   <div v-else-if="section.component === 'hotzone_image'" class="preview-hotzone" :style="{ borderRadius: (config.radius||8)+'px' }">
-    <img v-if="config.src" :src="config.src" :alt="config.alt || '热区图片'" loading="lazy" @error="onImgError" :style="{ borderRadius: (config.radius||8)+'px' }" />
-    <div v-else class="empty-media">未设置图片</div>
-    <span v-if="(config.zones||[]).length" class="zone-badge">{{ config.zones.length }}个热区</span>
+    <img v-if="config.src" :src="config.src" :alt="config.alt || $t('diyPreview.hotzoneImage')" loading="lazy" @error="onImgError" :style="{ borderRadius: (config.radius||8)+'px' }" />
+    <div v-else class="empty-media">{{ $t('diyPreview.noImage') }}</div>
+    <span v-if="(config.zones||[]).length" class="zone-badge">{{ $t('diyPreview.zoneCount', { n: config.zones.length }) }}</span>
   </div>
   <!-- 表单容器 -->
   <div v-else-if="section.component === 'form_container'" class="preview-form" :style="{ background: config.bgColor||'var(--bg-card)', borderRadius: (config.radius||8)+'px', padding: (config.padding||16)+'px' }">
-    <div v-for="(field, i) in (config.fields||[{label:'示例字段'}])" :key="i" class="form-field">
+    <div v-for="(field, i) in (config.fields||[{label: $t('diyPreview.sampleField')}])" :key="i" class="form-field">
       <label v-if="field.label" :style="{ fontSize: '12px', color: 'var(--text-muted)' }">{{ field.label }}</label>
-      <div class="field-mock">{{ field.placeholder || '请输入' }}</div>
+      <div class="field-mock">{{ field.placeholder || $t('diyPreview.pleaseEnter') }}</div>
     </div>
-    <div class="submit-mock">{{ config.submitText || '提交' }}</div>
+    <div class="submit-mock">{{ config.submitText || $t('diyPreview.submit') }}</div>
   </div>
   <!-- 未知 -->
   <div v-else class="preview-unknown">{{ section.component }}</div>
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n()
+
 const props = withDefaults(defineProps<{ section: { component: string; config?: Record<string, any>; visible?: boolean } }>(), {
   section: () => ({ component: 'unknown' }),
 })
@@ -88,11 +90,11 @@ const placeholder = '/placeholder.svg'
 const countdown = computed(() => {
   if (!config.value.endTime) return ''
   const diff = new Date(config.value.endTime).getTime() - Date.now()
-  if (diff <= 0) return '已结束'
+  if (diff <= 0) return t('diyPreview.ended')
   const d = Math.floor(diff / 86400000)
   const h = Math.floor((diff % 86400000) / 3600000)
   const m = Math.floor((diff % 3600000) / 60000)
-  return `${d}天 ${h}时 ${m}分`
+  return t('diyPreview.countdownFormat', { d, h, m })
 })
 
 function gridStyle(cols: number, gap: number) {
