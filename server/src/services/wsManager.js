@@ -76,8 +76,7 @@ class WsManager {
         ws.isAlive = false;
         try { ws.ping(); } catch { ws.terminate(); }
       });
-    }, heartbeatMs);
-    this.wss.on('close', () => clearInterval(interval));
+    }, heartbeatMs).unref();
 
     this.wss.on('connection', async (socket, req) => {
       socket.isAlive = true;

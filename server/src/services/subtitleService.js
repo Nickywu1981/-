@@ -14,6 +14,7 @@ import path from 'path';
 import fs from 'fs';
 import os from 'os';
 import logger from '../utils/logger.js';
+import { BusinessError } from '../utils/businessError.js';
 
 const execFileP = promisify(execFile);
 const fsWriteFile = promisify(fs.writeFile);
@@ -152,7 +153,7 @@ export async function burnSubtitles(videoUrl, scenes, opts = {}) {
   }
 
   const outputDir = opts.outputDir || os.tmpdir();
-  await fsMkdir(outputDir, { recursive: true }).catch(() => {});
+  await fsMkdir(outputDir, { recursive: true }).catch(e => { throw new BusinessError(500, '输出目录创建失败', { outputDir, reason: e.message }); });
 
   const srtPath = path.join(outputDir, `subtitle_${Date.now()}.srt`);
   await fsWriteFile(srtPath, srtContent, 'utf-8');

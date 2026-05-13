@@ -343,7 +343,7 @@ export async function executeCode(sandboxId, userId, code, language, timeoutMs) 
     });
   } catch (err) {
     logger.error('[E2B] 代码执行失败', { sandboxId, userId: String(userId), language: lang, codeLength: code.length, error: err.message });
-    _logExecution({ sandboxId, userId: String(userId), language: lang, code, stderr: err.message, exitCode: null, elapsedMs: Date.now() - t0, status: 0, errorMsg: err.message }).catch(() => {});
+    _logExecution({ sandboxId, userId: String(userId), language: lang, code, stderr: err.message, exitCode: null, elapsedMs: Date.now() - t0, status: 0, errorMsg: err.message }).catch(e => logger.error('[E2B] 审计日志写入失败', e.message));
     _maybeCheckAlerts(); // P2 #12
     throw _normalizeE2bError(err, sandboxId); // P2 #11
   }
@@ -352,7 +352,7 @@ export async function executeCode(sandboxId, userId, code, language, timeoutMs) 
   logger.info('[E2B] 代码执行完成', { sandboxId, userId: String(userId), language: lang, elapsedMs: elapsed, exitCode: result.exitCode });
 
   // P2 #9: 审计日志（成功）
-  _logExecution({ sandboxId, userId: String(userId), language: lang, code, stdout: result.stdout, stderr: result.stderr, exitCode: result.exitCode, elapsedMs: elapsed, status: 1 }).catch(() => {});
+  _logExecution({ sandboxId, userId: String(userId), language: lang, code, stdout: result.stdout, stderr: result.stderr, exitCode: result.exitCode, elapsedMs: elapsed, status: 1 }).catch(e => logger.error('[E2B] 审计日志写入失败', e.message));
 
   return {
     stdout: (result.stdout || '').slice(0, 100000),

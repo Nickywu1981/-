@@ -30,10 +30,14 @@ export default defineNuxtRouteMiddleware(async (to) => {
       userRole = data?.data?.role || ''
     }
   } catch (e: unknown) {
-    if (e?.response?.status === 401 || e?.statusCode === 401) {
+    const err = e as { statusCode?: number; response?: { status?: number }; data?: { code?: number }; cause?: unknown }
+    // 401/403 → 跳转登录
+    if (err?.statusCode === 401 || err?.response?.status === 401 || err?.data?.code === 401 ||
+        err?.statusCode === 403 || err?.response?.status === 403 || err?.data?.code === 403) {
       return navigateTo(`/login?redirect=${encodeURIComponent(to.fullPath)}`)
     }
-    return navigateTo(`/login?redirect=${encodeURIComponent(to.fullPath)}`)
+    // 网络错误/服务不可用 → 放行，避免服务抖动导致全员掉线
+    console.warn('[auth] API unreachable, allowing navigation:', (err as Error)?.message || err)
   }
 
   if (!isAuthenticated) {
