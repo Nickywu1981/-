@@ -16,7 +16,7 @@
     <EmptyState v-else icon="📐" title="暂无尺寸模板" description="添加电商平台图片尺寸预设" action-label="新建尺寸" @action="openCreate" />
 
     <Teleport to="body">
-      <div v-if="showModal" class="modal-overlay" @click.self="showModal=false">
+      <div v-if="showModal" class="modal-overlay" @click.self="showModal=false" @keydown.escape="showModal=false">
         <div class="modal">
           <h3>{{ editing ? '编辑尺寸' : '新建尺寸' }}</h3>
           <div class="form-grid">

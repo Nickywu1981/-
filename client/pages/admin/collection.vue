@@ -13,7 +13,7 @@
     <EmptyState v-else icon="🖼️" title="暂无作品集" description="创建您的第一个作品集" action-label="新建作品集" @action="openCreate" />
 
     <Teleport to="body">
-      <div v-if="showModal" class="modal-overlay" @click.self="showModal=false">
+      <div v-if="showModal" class="modal-overlay" @click.self="showModal=false" @keydown.escape="showModal=false">
         <div class="modal">
           <h3>{{ editing ? '编辑作品集' : '新建作品集' }}</h3>
           <div class="form-group"><label>名称</label><input v-model="editForm.name" maxlength="100" class="input" placeholder="作品集名称" /></div>

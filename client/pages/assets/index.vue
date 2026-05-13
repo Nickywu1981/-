@@ -44,7 +44,7 @@
     </div>
 
     <Teleport to="body">
-      <div v-if="previewItem" class="preview-overlay" @click.self="previewItem = null">
+      <div v-if="previewItem" class="preview-overlay" @click.self="previewItem = null" @keydown.escape="previewItem = null">
         <div class="preview-box">
           <button class="preview-close" @click="previewItem = null" :aria-label="$t('assets.close_preview')">✕</button>
           <video v-if="previewItem.type === 'video'" :src="previewItem.url" class="preview-media" controls />

@@ -48,7 +48,7 @@
 
     <!-- Detail Modal -->
     <Teleport to="body">
-      <div v-if="showDetail" class="modal-overlay" @click.self="showDetail=false">
+      <div v-if="showDetail" class="modal-overlay" @click.self="showDetail=false" @keydown.escape="showDetail=false">
         <div class="modal">
           <h3>{{ detail?.name }}</h3>
           <div class="detail-imgs">
@@ -79,7 +79,7 @@
 
     <!-- Create Modal -->
     <Teleport to="body">
-      <div v-if="showCreate" class="modal-overlay" @click.self="showCreate=false">
+      <div v-if="showCreate" class="modal-overlay" @click.self="showCreate=false" @keydown.escape="showCreate=false">
         <div class="modal">
           <h3>{{ $t('template.create') || '新建模板' }}</h3>
           <div class="form-group"><label>{{ $t('template.name')||'名称' }}</label><input v-model="form.name" class="input" /></div>

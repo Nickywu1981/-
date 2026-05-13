@@ -42,7 +42,7 @@
 
     <!-- 支付弹窗 -->
     <Teleport to="body">
-      <div v-if="showPayModal" class="pay-overlay" @click.self="closePayModal">
+      <div v-if="showPayModal" class="pay-overlay" @click.self="closePayModal" @keydown.escape="closePayModal">
         <div class="pay-modal">
           <h3>确认支付</h3>
           <div class="pay-info">

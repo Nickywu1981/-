@@ -16,7 +16,7 @@
     <EmptyState v-else icon="📝" title="暂无表单模板" description="创建第一个自定义表单" action-label="新建表单" @action="openCreate" />
 
     <Teleport to="body">
-      <div v-if="showModal" class="modal-overlay" @click.self="showModal=false">
+      <div v-if="showModal" class="modal-overlay" @click.self="showModal=false" @keydown.escape="showModal=false">
         <div class="modal">
           <h3>{{ editing ? '编辑表单' : '新建表单' }}</h3>
           <div class="form-group"><label>名称</label><input v-model="editForm.name" maxlength="100" class="input" /></div>
