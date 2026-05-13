@@ -1,26 +1,26 @@
 <template>
   <div class="compare-page">
     <div class="compare-hero">
-      <h2>Movio AI vs 传统工具</h2>
-      <p>全维度对比，看看 Movio AI 能为你省多少时间和成本</p>
+      <h2>{{ $t('competitive.hero_title') }}</h2>
+      <p>{{ $t('competitive.hero_subtitle') }}</p>
     </div>
 
     <div class="stats-row">
       <div class="stat-card">
         <span class="stat-value">10x</span>
-        <span class="stat-label">效率提升</span>
+        <span class="stat-label">{{ $t('competitive.stats.efficiency') }}</span>
       </div>
       <div class="stat-card">
         <span class="stat-value">80%</span>
-        <span class="stat-label">成本节省</span>
+        <span class="stat-label">{{ $t('competitive.stats.cost_saving') }}</span>
       </div>
       <div class="stat-card">
         <span class="stat-value">13+</span>
-        <span class="stat-label">平台覆盖</span>
+        <span class="stat-label">{{ $t('competitive.stats.platform_coverage') }}</span>
       </div>
       <div class="stat-card">
         <span class="stat-value">0</span>
-        <span class="stat-label">学习门槛</span>
+        <span class="stat-label">{{ $t('competitive.stats.learning_barrier') }}</span>
       </div>
     </div>
 
@@ -28,28 +28,28 @@
       <table class="compare-table">
         <thead>
           <tr>
-            <th>对比维度</th>
+            <th>{{ $t('competitive.table.dimension') }}</th>
             <th class="col-us">
-              <span class="th-badge">Movio AI</span>
+              <span class="th-badge">{{ $t('competitive.table.us') }}</span>
             </th>
             <th class="col-them">
-              <span class="th-badge secondary">传统方式</span>
+              <span class="th-badge secondary">{{ $t('competitive.table.them') }}</span>
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="row in rows" :key="row.label">
+          <tr v-for="row in rows" :key="row.key">
             <td class="label-cell">
               <span class="dim-icon">{{ row.icon }}</span>
-              {{ row.label }}
+              {{ $t(row.labelKey) }}
             </td>
             <td class="us-cell">
               <span class="check">✓</span>
-              {{ row.us }}
+              {{ $t(row.usKey) }}
             </td>
             <td class="them-cell">
               <span class="cross">✗</span>
-              {{ row.them }}
+              {{ $t(row.themKey) }}
             </td>
           </tr>
         </tbody>
@@ -57,29 +57,29 @@
     </div>
 
     <div class="cta-section">
-      <h3>开始免费使用 Movio AI</h3>
-      <p>每天 20 点算力免费体验全部功能</p>
-      <NuxtLink to="/register" class="cta-btn">免费注册 →</NuxtLink>
+      <h3>{{ $t('competitive.cta.title') }}</h3>
+      <p>{{ $t('competitive.cta.subtitle') }}</p>
+      <NuxtLink to="/register" class="cta-btn">{{ $t('competitive.cta.button') }}</NuxtLink>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 const rows = [
-  { icon: '🖼️', label: '图片处理', us: '抠图/主图/场景/详情页全流程AI自动化', them: 'Photoshop/美图秀秀，需手动操作' },
-  { icon: '🎬', label: '视频生成', us: '图片→带货视频，自动字幕/BGM/特效', them: 'Premiere/剪映，需手动剪辑' },
-  { icon: '📱', label: '平台适配', us: '13平台一键尺寸适配（淘宝/抖音/亚马逊等）', them: '需手动调整每个平台尺寸' },
-  { icon: '⚡', label: '批量处理', us: '拖文件夹→AI批量处理→ZIP下载', them: '逐张处理，耗时长' },
-  { icon: '👗', label: 'AI虚拟模特', us: '服装上身虚拟模特，多肤色/体型可选', them: '需实拍模特，成本高周期长' },
-  { icon: '🏃', label: '动作迁移', us: '人物图+动作视频→AI精准动作迁移', them: '需专业视频拍摄团队' },
-  { icon: '🎙️', label: '数字人口播', us: '输入文案→选形象+语音→AI生成口播视频', them: '需真人出镜录制' },
-  { icon: '✍️', label: '智能脚本', us: 'AI自动生成带货/种草/直播脚本', them: '需人工撰写' },
-  { icon: '🎯', label: '分镜生成', us: '输入产品→AI生成专业拍摄分镜方案', them: '需导演/摄影师编排' },
-  { icon: '🔥', label: '爆款分析', us: '分析爆款视频结构→套用你的产品', them: '需人工分析模仿' },
-  { icon: '🌙', label: '夜间托管', us: '夜间自动批量处理，6折优惠', them: '不支持' },
-  { icon: '📋', label: '模板复用', us: '保存参数为模板，一键复刻', them: '每次需重新设置' },
-  { icon: '💰', label: '价格成本', us: '月卡¥29起，按需灵活付费', them: 'Adobe ¥248/月 + 外包费用' },
-  { icon: '📚', label: '学习成本', us: '自然语言输入，零学习门槛', them: '需专业软件学习，成本高' },
+  { key: 'image_processing',  icon: '🖼️', labelKey: 'competitive.rows.image_processing.label',  usKey: 'competitive.rows.image_processing.us',  themKey: 'competitive.rows.image_processing.them' },
+  { key: 'video_generation',  icon: '🎬', labelKey: 'competitive.rows.video_generation.label',  usKey: 'competitive.rows.video_generation.us',  themKey: 'competitive.rows.video_generation.them' },
+  { key: 'platform_adaptation', icon: '📱', labelKey: 'competitive.rows.platform_adaptation.label', usKey: 'competitive.rows.platform_adaptation.us', themKey: 'competitive.rows.platform_adaptation.them' },
+  { key: 'batch_processing',  icon: '⚡', labelKey: 'competitive.rows.batch_processing.label',  usKey: 'competitive.rows.batch_processing.us',  themKey: 'competitive.rows.batch_processing.them' },
+  { key: 'ai_model',       icon: '👗', labelKey: 'competitive.rows.ai_model.label',       usKey: 'competitive.rows.ai_model.us',       themKey: 'competitive.rows.ai_model.them' },
+  { key: 'motion_transfer', icon: '🏃', labelKey: 'competitive.rows.motion_transfer.label',  usKey: 'competitive.rows.motion_transfer.us',  themKey: 'competitive.rows.motion_transfer.them' },
+  { key: 'digital_avatar',  icon: '🎙️', labelKey: 'competitive.rows.digital_avatar.label',  usKey: 'competitive.rows.digital_avatar.us',  themKey: 'competitive.rows.digital_avatar.them' },
+  { key: 'smart_script',    icon: '✍️', labelKey: 'competitive.rows.smart_script.label',    usKey: 'competitive.rows.smart_script.us',    themKey: 'competitive.rows.smart_script.them' },
+  { key: 'storyboard',    icon: '🎯', labelKey: 'competitive.rows.storyboard.label',      usKey: 'competitive.rows.storyboard.us',      themKey: 'competitive.rows.storyboard.them' },
+  { key: 'trend_analysis',  icon: '🔥', labelKey: 'competitive.rows.trend_analysis.label',  usKey: 'competitive.rows.trend_analysis.us',  themKey: 'competitive.rows.trend_analysis.them' },
+  { key: 'night_batch',    icon: '🌙', labelKey: 'competitive.rows.night_batch.label',      usKey: 'competitive.rows.night_batch.us',      themKey: 'competitive.rows.night_batch.them' },
+  { key: 'template_reuse',  icon: '📋', labelKey: 'competitive.rows.template_reuse.label',  usKey: 'competitive.rows.template_reuse.us',  themKey: 'competitive.rows.template_reuse.them' },
+  { key: 'pricing',       icon: '💰', labelKey: 'competitive.rows.pricing.label',         usKey: 'competitive.rows.pricing.us',         themKey: 'competitive.rows.pricing.them' },
+  { key: 'learning_curve',  icon: '📚', labelKey: 'competitive.rows.learning_curve.label',  usKey: 'competitive.rows.learning_curve.us',  themKey: 'competitive.rows.learning_curve.them' },
 ]
 
 definePageMeta({ layout: 'landing' })

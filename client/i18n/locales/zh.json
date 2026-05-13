@@ -5058,5 +5058,41 @@
     "download": "下载",
     "retry": "重试",
     "etaMinutes": "预计剩余 {mins} 分钟"
+  },
+  "competitive": {
+    "hero_title": "Movio AI vs 传统工具",
+    "hero_subtitle": "全维度对比，看看 Movio AI 能为你省多少时间和成本",
+    "stats": {
+      "efficiency": "效率提升",
+      "cost_saving": "成本节省",
+      "platform_coverage": "平台覆盖",
+      "learning_barrier": "学习门槛"
+    },
+    "table": {
+      "dimension": "对比维度",
+      "us": "Movio AI",
+      "them": "传统方式"
+    },
+    "rows": {
+      "image_processing": { "label": "图片处理", "us": "抠图/主图/场景/详情页全流程AI自动化", "them": "Photoshop/美图秀秀，需手动操作" },
+      "video_generation": { "label": "视频生成", "us": "图片→带货视频，自动字幕/BGM/特效", "them": "Premiere/剪映，需手动剪辑" },
+      "platform_adaptation": { "label": "平台适配", "us": "13平台一键尺寸适配（淘宝/抖音/亚马逊等）", "them": "需手动调整每个平台尺寸" },
+      "batch_processing": { "label": "批量处理", "us": "拖文件夹→AI批量处理→ZIP下载", "them": "逐张处理，耗时长" },
+      "ai_model": { "label": "AI虚拟模特", "us": "服装上身虚拟模特，多肤色/体型可选", "them": "需实拍模特，成本高周期长" },
+      "motion_transfer": { "label": "动作迁移", "us": "人物图+动作视频→AI精准动作迁移", "them": "需专业视频拍摄团队" },
+      "digital_avatar": { "label": "数字人口播", "us": "输入文案→选形象+语音→AI生成口播视频", "them": "需真人出镜录制" },
+      "smart_script": { "label": "智能脚本", "us": "AI自动生成带货/种草/直播脚本", "them": "需人工撰写" },
+      "storyboard": { "label": "分镜生成", "us": "输入产品→AI生成专业拍摄分镜方案", "them": "需导演/摄影师编排" },
+      "trend_analysis": { "label": "爆款分析", "us": "分析爆款视频结构→套用你的产品", "them": "需人工分析模仿" },
+      "night_batch": { "label": "夜间托管", "us": "夜间自动批量处理，6折优惠", "them": "不支持" },
+      "template_reuse": { "label": "模板复用", "us": "保存参数为模板，一键复刻", "them": "每次需重新设置" },
+      "pricing": { "label": "价格成本", "us": "月卡¥29起，按需灵活付费", "them": "Adobe ¥248/月 + 外包费用" },
+      "learning_curve": { "label": "学习成本", "us": "自然语言输入，零学习门槛", "them": "需专业软件学习，成本高" }
+    },
+    "cta": {
+      "title": "开始免费使用 Movio AI",
+      "subtitle": "每天 20 点算力免费体验全部功能",
+      "button": "免费注册 →"
+    }
   }
 }

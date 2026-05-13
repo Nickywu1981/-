@@ -5095,5 +5095,41 @@
     "download": "Download",
     "retry": "Retry",
     "etaMinutes": "Estimated {mins} min remaining"
+  },
+  "competitive": {
+    "hero_title": "Movio AI vs Traditional Tools",
+    "hero_subtitle": "Full comparison — see how much time and cost Movio AI saves you",
+    "stats": {
+      "efficiency": "Efficiency Boost",
+      "cost_saving": "Cost Savings",
+      "platform_coverage": "Platform Coverage",
+      "learning_barrier": "Zero Learning Curve"
+    },
+    "table": {
+      "dimension": "Dimension",
+      "us": "Movio AI",
+      "them": "Traditional"
+    },
+    "rows": {
+      "image_processing": { "label": "Image Processing", "us": "Full AI pipeline: cutout, main image, scene, detail page", "them": "Photoshop/Meitu — manual operation" },
+      "video_generation": { "label": "Video Generation", "us": "Image → product video with auto captions/BGM/VFX", "them": "Premiere/CapCut — manual editing" },
+      "platform_adaptation": { "label": "Platform Adaptation", "us": "One-click resize for 13 platforms (Taobao, TikTok, Amazon...)", "them": "Manually adjust dimensions per platform" },
+      "batch_processing": { "label": "Batch Processing", "us": "Drag folder → AI batch → ZIP download", "them": "Process one by one — time-consuming" },
+      "ai_model": { "label": "AI Virtual Model", "us": "Garment try-on with diverse skin tones & body types", "them": "Real model photoshoot — high cost, long cycle" },
+      "motion_transfer": { "label": "Motion Transfer", "us": "Character image + motion video → precise AI transfer", "them": "Requires professional video shoot team" },
+      "digital_avatar": { "label": "Digital Avatars", "us": "Input script → pick avatar + voice → AI talking video", "them": "Requires real person recording" },
+      "smart_script": { "label": "Smart Scripts", "us": "AI auto-generates product review / livestream scripts", "them": "Manual copywriting required" },
+      "storyboard": { "label": "Storyboard Gen", "us": "Input product → AI generates professional storyboard", "them": "Needs director/photographer planning" },
+      "trend_analysis": { "label": "Trend Analysis", "us": "Analyze viral video structure → apply to your product", "them": "Manual analysis & imitation" },
+      "night_batch": { "label": "Night Batch", "us": "Auto batch processing overnight — 40% off", "them": "Not supported" },
+      "template_reuse": { "label": "Template Reuse", "us": "Save parameters as templates — one-click replay", "them": "Reconfigure every time" },
+      "pricing": { "label": "Pricing", "us": "From ¥29/month, flexible pay-as-you-go", "them": "Adobe ¥248/month + outsourcing costs" },
+      "learning_curve": { "label": "Learning Curve", "us": "Natural language input — zero learning barrier", "them": "Requires professional software training" }
+    },
+    "cta": {
+      "title": "Start Using Movio AI for Free",
+      "subtitle": "20 free credits daily — try all features",
+      "button": "Get Started Free →"
+    }
   }
 }
