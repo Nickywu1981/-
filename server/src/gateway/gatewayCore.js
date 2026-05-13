@@ -33,6 +33,7 @@ function _genCorrelationId() {
 // ==================== 熔断器 + 超时 ====================
 
 const modelBreakers = new Map();
+export { modelBreakers };
 const BREAKER_CONFIG = {
   enabled: aiGatewayConfig.circuitBreaker.enabled,
   failureThreshold: aiGatewayConfig.circuitBreaker.failureCount,

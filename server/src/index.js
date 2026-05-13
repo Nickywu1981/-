@@ -58,6 +58,16 @@ server.listen(port, () => {
     _startupOrphanCheck().catch((err) => { logger.warn('[E2B] 孤儿检查失败', { error: err.message }); });
     _initWarmPool().catch((err) => { logger.warn('[E2B] 预热池初始化失败', { error: err.message }); });
   }).catch((err) => { logger.warn('[E2B] 加载失败', { error: err.message }); });
+
+  // 自愈引擎: 定时断路器自愈 + 模型自恢复 + 自适应限流
+  import('./services/autoRecoveryService.js').then(({ startAutoRecoveryLoop }) => {
+    startAutoRecoveryLoop(60_000);
+  }).catch((err) => { logger.warn('[AutoRecovery] 启动失败', { error: err.message }); });
+
+  // 反馈学习: 周期性评分反馈 → 模型权重调整 (每1小时)
+  import('./services/feedbackLearningService.js').then(({ startFeedbackLoop }) => {
+    startFeedbackLoop(3600_000);
+  }).catch((err) => { logger.warn('[Feedback] 启动失败', { error: err.message }); });
 });
 
 // ==================== 全局异常处理 ====================

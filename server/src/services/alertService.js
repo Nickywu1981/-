@@ -11,38 +11,68 @@ import logger from '../utils/logger.js';
 const DEFAULT_RULES = [
   {
     id: 'success_rate_low',
-    name: '调用成功率过低',
+    name: '\u8c03\u7528\u6210\u529f\u7387\u8fc7\u4f4e',
     check: (stats) => stats.successRate < 80,
-    message: (stats) => `AI 调用成功率低于 80%: 当前 ${stats.successRate}%`,
-    cooldownMs: 5 * 60 * 1000, // 5分钟冷却
+    message: (stats) => `AI \u8c03\u7528\u6210\u529f\u7387\u4f4e\u4e8e 80%: \u5f53\u524d ${stats.successRate}%`,
+    cooldownMs: 5 * 60 * 1000,
+    action: async () => {
+      const { runRecoveryCycle } = await import('./autoRecoveryService.js');
+      await runRecoveryCycle();
+    },
   },
   {
     id: 'latency_high',
-    name: '平均响应延迟过高',
-    check: (stats) => stats.avgLatencyMs > 30000, // 30秒
-    message: (stats) => `AI 平均响应延迟超过 30s: 当前 ${(stats.avgLatencyMs / 1000).toFixed(1)}s`,
+    name: '\u5e73\u5747\u54cd\u5e94\u5ef6\u8fdf\u8fc7\u9ad8',
+    check: (stats) => stats.avgLatencyMs > 30000,
+    message: (stats) => `AI \u5e73\u5747\u54cd\u5e94\u5ef6\u8fdf\u8d85\u8fc7 30s: \u5f53\u524d ${(stats.avgLatencyMs / 1000).toFixed(1)}s`,
     cooldownMs: 3 * 60 * 1000,
+    action: async () => {
+      const { runRecoveryCycle } = await import('./autoRecoveryService.js');
+      await runRecoveryCycle();
+    },
   },
   {
     id: 'error_rate_spike',
-    name: '错误率突增',
-    check: (stats) => stats.calls > 10 && (100 - stats.successRate) > 30, // 错误率 > 30%
-    message: (stats) => `错误率突增至 ${(100 - stats.successRate).toFixed(1)}%，最近 ${stats.period} 共 ${stats.calls} 次调用`,
+    name: '\u9519\u8bef\u7387\u7a81\u589e',
+    check: (stats) => stats.calls > 10 && (100 - stats.successRate) > 30,
+    message: (stats) => `\u9519\u8bef\u7387\u7a81\u589e\u81f3 ${(100 - stats.successRate).toFixed(1)}%\uff0c\u6700\u8fd1 ${stats.period} \u5171 ${stats.calls} \u6b21\u8c03\u7528`,
     cooldownMs: 5 * 60 * 1000,
+    action: async () => {
+      const { runRecoveryCycle } = await import('./autoRecoveryService.js');
+      await runRecoveryCycle();
+    },
   },
   {
     id: 'circuit_breaker_frequent',
-    name: '频繁熔断',
+    name: '\u9891\u7e41\u7194\u65ad',
     check: (stats) => stats.circuitBreakerTrips > 10,
-    message: (stats) => `熔断器 ${stats.period} 内触发 ${stats.circuitBreakerTrips} 次，模型可能不稳定`,
+    message: (stats) => `\u7194\u65ad\u5668 ${stats.period} \u5185\u89e6\u53d1 ${stats.circuitBreakerTrips} \u6b21\uff0c\u6a21\u578b\u53ef\u80fd\u4e0d\u7a33\u5b9a`,
     cooldownMs: 10 * 60 * 1000,
+    action: async (stats) => {
+      try {
+        const { getModelBreaker } = await import('../gateway/gatewayCore.js');
+        const { getPool, updateModel } = await import('./modelPoolService.js');
+        const pool = await getPool();
+        for (const model of pool) {
+          const breaker = getModelBreaker(model.model_key);
+          if (breaker && breaker.getState() === 'open' && model.pool_weight > 1) {
+            await updateModel(model.model_key, { pool_weight: Math.max(1, Math.floor(model.pool_weight * 0.7)) });
+            logger.warn('[Alert] Frequent breaker: reduced weight', { modelKey: model.model_key, newWeight: Math.max(1, Math.floor(model.pool_weight * 0.7)) });
+          }
+        }
+      } catch (e) { logger.warn('[Alert] breaker_frequent action failed', { error: e.message }); }
+    },
   },
   {
     id: 'rate_limit_high',
-    name: '限流拦截率高',
+    name: '\u9650\u6d41\u62e6\u622a\u7387\u9ad8',
     check: (stats) => stats.rateLimitBlocks > 50,
-    message: (stats) => `限流拦截 ${stats.period} 内 ${stats.rateLimitBlocks} 次，建议扩容配额`,
+    message: (stats) => `\u9650\u6d41\u62e6\u622a ${stats.period} \u5185 ${stats.rateLimitBlocks} \u6b21\uff0c\u5efa\u8bae\u6269\u5bb9\u914d\u989d`,
     cooldownMs: 10 * 60 * 1000,
+    action: async () => {
+      const { runRecoveryCycle } = await import('./autoRecoveryService.js');
+      await runRecoveryCycle();
+    },
   },
 ];
 

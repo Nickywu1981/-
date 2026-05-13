@@ -92,8 +92,20 @@ const FALLBACK_CHAIN = {
   'iclight-v2':      ['bg-postprocess'],
 };
 
+// 运行时降级链覆盖（可被 dispatchStrategyService 或 autoRecovery 动态更新）
+let RUNTIME_FALLBACK_CHAIN = { ...FALLBACK_CHAIN };
+
+export function updateFallbackChain(modelId, chain = []) {
+  RUNTIME_FALLBACK_CHAIN[modelId] = chain;
+  logger.info('[AIEngine] Fallback chain updated', { modelId, chain });
+}
+
+export function getFallbackChain(modelId) {
+  return RUNTIME_FALLBACK_CHAIN[modelId] || FALLBACK_CHAIN[modelId] || [];
+}
+
 export function getFallbackModel(modelId) {
-  return FALLBACK_CHAIN[modelId] || [];
+  return getFallbackChain(modelId);
 }
 
 // ==================== 统一推理管线（增强版） ====================

@@ -129,18 +129,68 @@ const MODEL_CAPABILITIES = {
   'deepseek-v4-flash': { capability: 60, cost: 90, latency: 85, accuracy: 68 },
 };
 
-export function scoreModel(modelId, taskCategory, healthData = {}) {
+// 评分缓存 (避免每次调用都查询 monitor)
+let _scoreCache = null;
+let _scoreCacheTs = 0;
+const SCORE_CACHE_TTL = 60_000;
+
+function _getMonitorScores() {
+  // 从缓存读取（由 refreshScoreCache 或自愈引擎异步刷新）
+  if (!_scoreCache || Date.now() - _scoreCacheTs > SCORE_CACHE_TTL) {
+    _scoreCache = {};
+  }
+  return _scoreCache;
+}
+
+/** 刷新监控评分缓存（由自愈引擎周期性调用） */
+export async function refreshScoreCache() {
+  try {
+    const { getModelBreakdown } = await import('./monitorService.js');
+    const breakdown = getModelBreakdown();
+    _scoreCache = {};
+    for (const b of breakdown) {
+      _scoreCache[b.modelId] = {
+        calls: b.calls,
+        successRate: parseFloat(b.successRate) / 100,
+        avgLatencyMs: b.avgLatencyMs,
+      };
+    }
+    _scoreCacheTs = Date.now();
+  } catch { /* monitorService 未加载，缓存保持空，使用静态基线 */ }
+  return _scoreCache;
+}
+
+export function scoreModel(modelId, taskCategory, healthData = {}, monitorData = null) {
   const caps = MODEL_CAPABILITIES[modelId] || { capability: 50, cost: 50, latency: 50, accuracy: 50 };
-  const available = (healthData[modelId]?.status !== 'error') ? 100 : 0;
+
+  // 实时监控数据
+  const perf = monitorData || _getMonitorScores()[modelId] || {};
+  const successRate = perf.calls > 10 ? (perf.successRate || 1) : 1;
+  const avgLatency = perf.avgLatencyMs || caps.latency;
+
+  // 可用性: 健康状态 + 断路器状态
+  const breakerOpen = healthData[modelId]?.breakerState === 'open' ? 0 : 1;
+  const healthy = (healthData[modelId]?.status !== 'error') ? 100 : 0;
+  const available = healthy * breakerOpen;
+
+  // 能力分: 静态基线 × 实时成功率
+  const capability = caps.capability * successRate;
+
+  // 延迟分: 归一化到 0-100 (越低越好)
+  const latencyScore = Math.max(0, 100 - (avgLatency / 100));
 
   const score =
     available * MATCH_WEIGHTS.availability +
-    caps.capability * MATCH_WEIGHTS.capability +
+    capability * MATCH_WEIGHTS.capability +
     caps.cost * MATCH_WEIGHTS.cost +
-    caps.latency * MATCH_WEIGHTS.latency +
+    latencyScore * MATCH_WEIGHTS.latency +
     caps.accuracy * MATCH_WEIGHTS.accuracy;
 
-  return { modelId, score: Math.round(score), details: { available, ...caps } };
+  return {
+    modelId,
+    score: Math.round(score),
+    details: { available, capability, cost: caps.cost, latency: latencyScore, accuracy: caps.accuracy, successRate },
+  };
 }
 
 export function rankModels(candidates, taskCategory, healthData) {
