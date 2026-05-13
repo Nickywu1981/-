@@ -1,9 +1,10 @@
 export function useToast() {
   const _toast = ref<any>(null)
   const _queue: Array<{ type: string; msg: string }> = []
+  const MAX_QUEUE = 100
   function _emit(type: string, msg: string) {
     if (_toast.value) { try { (_toast.value as any)[type](msg) } catch { /* toast unavailable */ } }
-    else { _queue.push({ type, msg }) }
+    else if (_queue.length < MAX_QUEUE) { _queue.push({ type, msg }) }
   }
   onMounted(() => {
     _toast.value = (window as any).__toast

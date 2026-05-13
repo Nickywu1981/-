@@ -54,4 +54,11 @@ router.get('/monitor/timeseries', authMiddleware, signatureGuard, aiGatewayContr
 router.get('/monitor/top-users', authMiddleware, signatureGuard, aiGatewayController.topUsers);
 router.get('/monitor/alerts', authMiddleware, signatureGuard, aiGatewayController.alertRules);
 
+// ── 异步任务 ──
+router.post('/async/submit', authMiddleware, signatureGuard, aiConcurrencyGuard, validate(inferBodySchema), aiGatewayController.asyncSubmit);
+router.get('/async/status/:taskId', authMiddleware, signatureGuard, aiGatewayController.asyncStatus);
+
+// ── SSE 流式 ──
+router.post('/stream/infer', authMiddleware, signatureGuard, aiConcurrencyGuard, validate(inferBodySchema), aiGatewayController.streamInfer);
+
 export default router;

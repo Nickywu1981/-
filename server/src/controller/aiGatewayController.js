@@ -6,6 +6,7 @@ import { wrapController } from '../utils/wrapController.js';
 import { gatewayInfer, gatewayDispatch, gatewayRoute, getGatewayStats, getGatewayPricing } from '../gateway/aiGatewayHub.js';
 import { getDashboardSummary, getModelBreakdown, getTimeSeries, getTopUsers } from '../services/monitorService.js';
 import { checkAlerts, getAlertRules } from '../services/alertService.js';
+import { submitAsyncTask, getTaskStatus as _getTaskStatus, createSSEStream } from '../services/streamingService.js';
 import logger from '../utils/logger.js';
 
 export const aiGatewayController = {
@@ -88,5 +89,63 @@ export const aiGatewayController = {
     const stats = getDashboardSummary(1);
     const alerts = checkAlerts(stats);
     return { rules: getAlertRules(), lastCheck: alerts };
+  }),
+
+  // ── 异步任务 ──
+  asyncSubmit: wrapController(async (req) => {
+    const { modelId, input, taskType } = req.body;
+    const taskId = submitAsyncTask({
+      modelId, input, taskType,
+      userId: req.user?.id,
+    });
+    return { taskId, status: 'queued' };
+  }),
+
+  asyncStatus: wrapController(async (req) => {
+    const { taskId } = req.params;
+    return _getTaskStatus(taskId);
+  }),
+
+  // ── SSE 流式输出 ──
+  streamInfer: wrapController(async (req, res) => {
+    const { modelId, input } = req.body;
+    const stream = createSSEStream(res);
+
+    try {
+      const result = await gatewayInfer(modelId, input, {
+        userId: req.user?.id,
+        tenantId: req.tenantId,
+        taskType: req.body.taskType || 'unknown',
+        source: req.body.source || 'consumer',
+        correlationId: req.headers['x-correlation-id'] || null,
+      });
+
+      if (result.blocked) {
+        stream.error(result.blockReason, 400);
+        return;
+      }
+
+      // 流式发送结果（模拟逐段输出）
+      const output = typeof result.output === 'string'
+        ? result.output
+        : JSON.stringify(result.output);
+
+      const chunks = output.match(/.{1,50}/g) || [output];
+      for (const chunk of chunks) {
+        stream.send(chunk, 'token');
+        // 模拟间隔（生产环境由模型真正流式返回）
+        await new Promise(r => setTimeout(r, 10));
+      }
+
+      stream.send({
+        tokensIn: result.tokensIn,
+        tokensOut: result.tokensOut,
+        cost: result.cost,
+      }, 'meta');
+
+      stream.done();
+    } catch (err) {
+      stream.error(err.message);
+    }
   }),
 };

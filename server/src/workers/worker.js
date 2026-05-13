@@ -229,6 +229,16 @@ async function poll() {
   }
 }
 
+// 全局异常捕获 — 防止未处理异常导致进程静默崩溃
+process.on('uncaughtException', (err) => {
+  logger.error('[Worker] 未捕获异常，进程即将退出', { message: err.message, stack: err.stack });
+  running = false;
+  setTimeout(() => process.exit(1), 5000);
+});
+process.on('unhandledRejection', (reason) => {
+  logger.error('[Worker] 未处理的 Promise 拒绝', { message: reason?.message || String(reason) });
+});
+
 // 优雅退出
 process.on('SIGTERM', () => {
   logger.info('[Worker] SIGTERM received, shutting down...');

@@ -8,7 +8,8 @@ import { ERROR_CODE } from '../constants/errorCode.js';
 import * as e2bService from '../services/e2b.service.js';
 
 export const createSandbox = wrapController(async (req, res) => {
-  const userId = req.user?.id || 0;
+  const userId = req.user?.id;
+  if (!userId) throw new BusinessError(ERROR_CODE.UNAUTHORIZED, '请先登录');
   const result = await e2bService.createSandbox(userId);
   return success(res, result, '沙箱创建成功');
 });
@@ -28,7 +29,8 @@ export const getSandbox = wrapController(async (req, res) => {
 });
 
 export const listSandboxes = wrapController(async (req, res) => {
-  const userId = req.user?.id || 0;
+  const userId = req.user?.id;
+  if (!userId) throw new BusinessError(ERROR_CODE.UNAUTHORIZED, '请先登录');
   const result = await e2bService.listUserSandboxes(userId);
   return success(res, result);
 });

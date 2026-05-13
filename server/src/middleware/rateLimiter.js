@@ -7,6 +7,7 @@
 import rateLimit from 'express-rate-limit';
 import { error } from '../utils/response.js';
 import { rateLimitConfig } from '../config/index.js';
+import logger from '../utils/logger.js';
 
 const windowMs = rateLimitConfig.windowMs;
 const max = rateLimitConfig.max;
@@ -184,7 +185,7 @@ export function aiTokenBucketLimiter(req, res, next) {
       next();
     }).catch(err => {
       // 限流服务异常时放行（避免阻塞正常流量）
-      console.warn('[RateLimiter] TokenBucket check failed:', err.message);
+      logger.warn('[RateLimiter] TokenBucket check failed:', err.message);
       next();
     });
   }).catch(() => next());

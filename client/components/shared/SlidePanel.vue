@@ -100,6 +100,14 @@
 <script setup lang="ts">
 const { t } = useI18n()
 
+let genInterval: ReturnType<typeof setInterval> | null = null
+
+function clearGenInterval() {
+  if (genInterval) { clearInterval(genInterval); genInterval = null; }
+}
+
+onBeforeUnmount(() => clearGenInterval())
+
 const props = defineProps<{
   modelValue: boolean
   title?: string
@@ -145,9 +153,10 @@ async function handleGenerate() {
   progress.value = 0
   emit('generate', { ...paramValues.value })
   await new Promise<void>(resolve => {
-    const iv = setInterval(() => {
+    clearGenInterval()
+    genInterval = setInterval(() => {
       progress.value += Math.random() * 10 + 5
-      if (progress.value >= 100) { progress.value = 100; clearInterval(iv); resolve() }
+      if (progress.value >= 100) { progress.value = 100; clearGenInterval(); resolve() }
     }, 400)
   })
   generating.value = false
@@ -156,12 +165,14 @@ async function handleGenerate() {
 
 function handleDownload() { /* TODO: real download */ }
 function handleReuse() {
+  clearGenInterval()
   files.value = []
   showResult.value = false
   generating.value = false
   initParamValues()
 }
 function handleClose() {
+  clearGenInterval()
   emit('update:modelValue', false)
   setTimeout(() => {
     files.value = []

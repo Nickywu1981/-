@@ -21,7 +21,7 @@ const REFRESH_SECRET = (() => {
     if (!jwtConfig.secret || jwtConfig.secret === 'dev-secret') {
       throw new Error('JWT_REFRESH_SECRET 未设置且 JWT_SECRET 无效，无法生成 refresh token');
     }
-    console.warn('[JWT] 开发环境 REFRESH_SECRET 派生自 JWT_SECRET，生产环境必须独立设置 JWT_REFRESH_SECRET');
+    logger.warn('[JWT] 开发环境 REFRESH_SECRET 派生自 JWT_SECRET，生产环境必须独立设置 JWT_REFRESH_SECRET');
     return jwtConfig.secret + '_refresh_dev_only';
   }
   throw new Error('JWT_REFRESH_SECRET 必须在非开发环境通过环境变量设置');

@@ -2,7 +2,7 @@
  * 新手引导 Composable — 6 步走完核心工作流
  * 使用: const guide = useOnboarding(); 在 onMounted 中调用 guide.checkAndShow()
  */
-export default function useOnboarding() {
+export function useOnboarding() {
   const steps = [
     { title: '欢迎来到 Movio AI', desc: '一站式电商视觉创作平台，从主图到视频，一个工具搞定全部图文素材。', target: '', position: 'center' as const },
     { title: '第1步：生成主图', desc: '上传商品照片，AI 自动抠图、换白底、精修细节，生成高质量商品主图。', target: '', icon: '🖼️' },
