@@ -5,8 +5,13 @@
  * - 多维度指标聚合（模型成功率、Token消耗、成本、延迟）
  * - 限流/熔断触发计数
  * - 为 Dashboard + 告警 提供数据源
+ * - Redis 持久化快照（进程重启不丢失）
  */
 import logger from '../utils/logger.js';
+import { cacheGet, cacheSet } from '../dao/redis.js';
+
+const REDIS_SNAPSHOT_KEY = 'ai:monitor:snapshot';
+const SNAPSHOT_INTERVAL_MS = 60_000; // 每 60 秒持久化一次
 
 // ==================== 内存指标存储 ====================
 
@@ -179,4 +184,69 @@ export function getTopUsers(limit = 10) {
     .slice(0, limit);
 }
 
-export default { recordCall, recordCircuitBreakerTrip, recordRateLimitBlock, getDashboardSummary, getModelBreakdown, getTimeSeries, getTopUsers };
+// ==================== Redis 持久化 ====================
+
+let _restored = false;
+
+/**
+ * 从 Redis 恢复上次快照
+ */
+async function restoreFromRedis() {
+  if (_restored) return;
+  try {
+    const snapshot = await cacheGet(REDIS_SNAPSHOT_KEY);
+    if (snapshot && typeof snapshot === 'object') {
+      // 仅恢复核心指标，避免覆盖运行中的增量数据
+      if (snapshot.totalCalls) metrics.totalCalls = snapshot.totalCalls;
+      if (snapshot.totalSuccess) metrics.totalSuccess = snapshot.totalSuccess;
+      if (snapshot.totalError) metrics.totalError = snapshot.totalError;
+      if (snapshot.totalTokensIn) metrics.totalTokensIn = snapshot.totalTokensIn;
+      if (snapshot.totalTokensOut) metrics.totalTokensOut = snapshot.totalTokensOut;
+      if (snapshot.totalCost) metrics.totalCost = snapshot.totalCost;
+      if (snapshot.byModel && typeof snapshot.byModel === 'object') {
+        Object.assign(metrics.byModel, snapshot.byModel);
+      }
+      if (snapshot.byUser && typeof snapshot.byUser === 'object') {
+        Object.assign(metrics.byUser, snapshot.byUser);
+      }
+      logger.info('[Monitor] Redis 快照恢复完成', {
+        totalCalls: metrics.totalCalls,
+        models: Object.keys(metrics.byModel).length,
+        users: Object.keys(metrics.byUser).length,
+      });
+    }
+  } catch (e) {
+    logger.warn(`[Monitor] Redis 快照恢复失败: ${e.message}`);
+  }
+  _restored = true;
+}
+
+/**
+ * 持久化当前指标到 Redis
+ */
+async function saveSnapshot() {
+  try {
+    const snapshot = {
+      timestamp: Date.now(),
+      totalCalls: metrics.totalCalls,
+      totalSuccess: metrics.totalSuccess,
+      totalError: metrics.totalError,
+      totalTokensIn: metrics.totalTokensIn,
+      totalTokensOut: metrics.totalTokensOut,
+      totalCost: metrics.totalCost,
+      byModel: metrics.byModel,
+      byUser: metrics.byUser,
+    };
+    await cacheSet(REDIS_SNAPSHOT_KEY, snapshot, 7200); // TTL 2 小时
+  } catch (e) {
+    logger.warn(`[Monitor] Redis 快照保存失败: ${e.message}`);
+  }
+}
+
+// 启动时自动恢复
+restoreFromRedis();
+
+// 定时持久化快照
+const _snapshotTimer = setInterval(saveSnapshot, SNAPSHOT_INTERVAL_MS).unref();
+
+export default { recordCall, recordCircuitBreakerTrip, recordRateLimitBlock, getDashboardSummary, getModelBreakdown, getTimeSeries, getTopUsers, restoreFromRedis, saveSnapshot };

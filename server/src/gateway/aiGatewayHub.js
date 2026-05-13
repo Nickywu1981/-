@@ -407,6 +407,22 @@ export async function gatewayInfer(modelId, input, ctx = {}) {
     }
   }
 
+  // ── Post-invoke 钩子（输出审核 + Token泄漏检测）──
+  if (USE_HOOK_REGISTRY && status === 'success') {
+    try {
+      const postCtx = await runPostHooks({
+        modelId, userId: context.userId, taskType: context.taskType,
+        output: result.output || null,
+        tokensIn: effectiveTokensIn, tokensOut: effectiveTokensOut, cost, latencyMs,
+      });
+      if (postCtx.output !== undefined && result.output !== undefined) {
+        result.output = postCtx.output;
+      }
+    } catch (e) {
+      logger.warn(`[Gateway] Post-hook 执行异常: ${e.message}`);
+    }
+  }
+
   return {
     ...result, tokensIn: effectiveTokensIn, tokensOut: effectiveTokensOut,
     cost, correlationId: context.correlationId,
@@ -552,6 +568,24 @@ export async function gatewayDispatch(dispatchReq, ctx = {}) {
     status, tokensIn, tokensOut,
     cost, latencyMs,
   });
+
+  // ── Post-invoke 钩子（输出审核 + Token泄漏检测）──
+  if (USE_HOOK_REGISTRY && status === 'success') {
+    try {
+      const postCtx = await runPostHooks({
+        modelId, userId: context.userId, taskType: context.taskType,
+        output: result.output || (result.result || null),
+        tokensIn, tokensOut, cost, latencyMs,
+      });
+      // 钩子可修改最终输出
+      if (postCtx.output !== undefined) {
+        if (result.output !== undefined) result.output = postCtx.output;
+        else if (result.result !== undefined) result.result = postCtx.output;
+      }
+    } catch (e) {
+      logger.warn(`[Gateway] Post-hook 执行异常: ${e.message}`);
+    }
+  }
 
   return { ...result, tokensIn, tokensOut, cost, correlationId: context.correlationId };
 }
@@ -746,6 +780,26 @@ export async function gatewayRoute(params, ctx = {}) {
     status, tokensIn, tokensOut,
     cost, latencyMs,
   });
+
+  // ── Post-invoke 钩子（输出审核 + Token泄漏检测）──
+  if (USE_HOOK_REGISTRY && status === 'success') {
+    try {
+      const postCtx = await runPostHooks({
+        modelId: modelKey, userId: context.userId, taskType: context.taskType,
+        output: result?.response?.choices?.[0]?.message?.content || (result?.output || null),
+        tokensIn, tokensOut, cost, latencyMs,
+      });
+      if (postCtx.output !== undefined) {
+        if (result?.response?.choices?.[0]?.message) {
+          result.response.choices[0].message.content = postCtx.output;
+        } else if (result?.output !== undefined) {
+          result.output = postCtx.output;
+        }
+      }
+    } catch (e) {
+      logger.warn(`[Gateway] Post-hook 执行异常: ${e.message}`);
+    }
+  }
 
   return { ...(result || {}), tokensIn, tokensOut, cost, correlationId: context.correlationId };
 }

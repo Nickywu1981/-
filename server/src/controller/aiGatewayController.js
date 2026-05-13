@@ -4,12 +4,15 @@
  */
 import { wrapController } from '../utils/wrapController.js';
 import { gatewayInfer, gatewayDispatch, gatewayRoute, getGatewayStats, getGatewayPricing } from '../gateway/aiGatewayHub.js';
-import { getDashboardSummary, getModelBreakdown, getTimeSeries, getTopUsers } from '../services/monitorService.js';
+import { getDashboardSummary, getModelBreakdown, getTimeSeries, getTopUsers, recordCall } from '../services/monitorService.js';
 import { checkAlerts, getAlertRules } from '../services/alertService.js';
 import { submitAsyncTask, getTaskStatus as _getTaskStatus, createSSEStream, processStreamingOutput } from '../services/streamingService.js';
 import { streamInfer } from '../services/aiEngine.js';
 import { moderateText } from '../services/moderation.service.js';
 import { moderateOutput } from '../services/outputModerationService.js';
+import { evaluateRules } from '../services/geoRulesService.js';
+import { sanitizePII } from '../services/inputSanitizerService.js';
+import { getTraceContext } from '../services/traceService.js';
 import logger from '../utils/logger.js';
 
 export const aiGatewayController = {
@@ -112,19 +115,59 @@ export const aiGatewayController = {
 
 	  streamInfer: wrapController(async (req, res) => {
 	    const { modelId, input } = req.body;
+	    const traceCtx = getTraceContext();
+	    res.setHeader('X-Trace-Id', traceCtx?.traceId || 'unknown');
 	    const stream = createSSEStream(res);
+	    const start = Date.now();
+	    let status = 'success';
+	    let totalChars = 0;
 
 	    try {
-	      // Pre-invoke: 快速输入安全检查
+	      // ── Pre-invoke 安全管线: GEO + PII + 内容审核 ──
 	      const textInput = typeof input === 'string' ? input : JSON.stringify(input);
-	      const preCheck = await moderateText(textInput, req.user?.id, { stage: 'input' });
+
+	      // 1. GEO 地域合规检查
+	      try {
+	        const geoResult = await evaluateRules(
+	          req.body.countryCode || req.geo?.country || null,
+	          req.body.platformCode || null,
+	        );
+	        if (geoResult.blockedModels?.includes(modelId)) {
+	          stream.error('该模型在您所在地区不可用，请更换模型重试', 403);
+	          status = 'blocked';
+	          return;
+	        }
+	      } catch (e) {
+	        logger.warn(`[Stream] GEO 检查失败，放行: ${e.message}`);
+	      }
+
+	      // 2. 输入 PII 自动脱敏
+	      let sanitizedInput = input;
+	      try {
+	        if (typeof sanitizedInput === 'string') {
+	          sanitizedInput = sanitizePII(sanitizedInput);
+	        } else if (typeof sanitizedInput === 'object' && sanitizedInput) {
+	          const str = JSON.stringify(sanitizedInput);
+	          sanitizedInput = JSON.parse(sanitizePII(str));
+	        }
+	      } catch (e) {
+	        logger.warn(`[Stream] PII 脱敏失败，使用原始输入: ${e.message}`);
+	      }
+
+	      // 3. 内容安全审核
+	      const preCheck = await moderateText(
+	        typeof sanitizedInput === 'string' ? sanitizedInput : JSON.stringify(sanitizedInput),
+	        req.user?.id,
+	        { stage: 'input' },
+	      );
 	      if (preCheck.action === 'block') {
 	        stream.error('内容包含违规信息，请修改后重试', 400);
+	        status = 'blocked';
 	        return;
 	      }
 
-	      // 创建真实流式源（优先原生 streaming，不支持时自动降级模拟）
-	      const sourceStream = streamInfer(modelId, input, {
+	      // ── 真实流式推理（优先原生 streaming，不支持时自动降级模拟）──
+	      const sourceStream = streamInfer(modelId, sanitizedInput, {
 	        onProgress: (p) => logger.debug(`[Stream] ${modelId} progress: ${p}%`),
 	      });
 
@@ -136,18 +179,34 @@ export const aiGatewayController = {
 	          try {
 	            const result = await moderateOutput(accumulatedText, { level: 5, enableAliyun: false });
 	            return { passed: result.passed, violations: result.violations };
-	          } catch {
+	          } catch (e) {
+	            logger.warn(`[Stream] 审核服务异常，放行: ${e.message}`);
 	            return { passed: true };
 	          }
 	        },
 	      });
 
+	      totalChars = accumulated?.length || 0;
 	      if (blocked) {
+	        status = 'blocked';
 	        logger.warn(`[Stream] 输出审核拦截: model=${modelId} user=${req.user?.id}`);
 	      }
 	    } catch (err) {
+	      status = 'error';
 	      logger.error(`[Stream] 流式推理失败: ${err.message}`);
 	      stream.error(err.message);
+	    } finally {
+	      // ── 监控指标记录（Post-invoke）──
+	      try {
+	        recordCall({
+	          modelId, userId: req.user?.id,
+	          status, tokensIn: 0, tokensOut: Math.ceil(totalChars / 4), // 粗略估算
+	          cost: { amount: 0, currency: 'CNY', pricingId: null },
+	          latencyMs: Date.now() - start,
+	        });
+	      } catch (e) {
+	        logger.warn(`[Stream] 监控记录失败: ${e.message}`);
+	      }
 	    }
 	  }),
 };
