@@ -176,6 +176,7 @@ const config = {
     aliyunGreenEnabled: process.env.SECURITY_ALIYUN_GREEN_ENABLED === 'true',
     selfBuiltWordlistEnabled: process.env.SECURITY_SELF_BUILT_WORDLIST_ENABLED !== 'false',
     outputModerationLevel: parseInt(process.env.SECURITY_OUTPUT_MODERATION_LEVEL || '5', 10),
+    outputSanitize: process.env.SECURITY_OUTPUT_SANITIZE === 'true',
     // 接口安全
     signatureRequired: process.env.SECURITY_SIGNATURE_REQUIRED === 'true',
     modelAclEnabled: process.env.SECURITY_MODEL_ACL_ENABLED === 'true',
@@ -188,6 +189,10 @@ const config = {
     singleRequestTimeoutMs: parseInt(process.env.AI_SINGLE_REQUEST_TIMEOUT_MS || '120000', 10),
     totalTimeoutMs: parseInt(process.env.AI_TOTAL_TIMEOUT_MS || '300000', 10),
     streamingTimeoutMs: parseInt(process.env.AI_STREAMING_TIMEOUT_MS || '600000', 10),
+    // 钩子注册中心
+    useHookRegistry: process.env.AI_USE_HOOK_REGISTRY === 'true',
+    // 输出
+    outputFormat: process.env.AI_OUTPUT_FORMAT || 'raw',
     // 熔断
     circuitBreaker: {
       enabled: process.env.AI_CIRCUIT_BREAKER_ENABLED !== 'false',
@@ -278,4 +283,5 @@ export const { e2b: e2bConfig } = config;
 export const { bull: bullConfig } = config;
 export const appUrl = config.appUrl;
 export const { ai: aiConfig } = config;
+export const { aiGateway: aiGatewayConfig } = config;
 export const { adapters: adapterConfig } = config;

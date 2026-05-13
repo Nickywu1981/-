@@ -30,9 +30,10 @@ import { recordCall, recordCircuitBreakerTrip } from '../services/monitorService
 import { getTraceContext } from '../services/traceService.js';
 import { buildErrorResponse, postProcessOutput } from '../services/outputPostProcessor.js';
 import { registerBuiltinHooks, runPreHooks, runPostHooks } from '../services/hookRegistryService.js';
+import { aiGatewayConfig, securityConfig } from '../config/index.js';
 
-// 钩子注册中心开关：设置 AI_USE_HOOK_REGISTRY=true 启用可插拔钩子管线
-const USE_HOOK_REGISTRY = process.env.AI_USE_HOOK_REGISTRY === 'true';
+// 钩子注册中心开关
+const USE_HOOK_REGISTRY = aiGatewayConfig.useHookRegistry;
 if (USE_HOOK_REGISTRY) {
   registerBuiltinHooks();
 }
@@ -57,17 +58,17 @@ function _genCorrelationId() {
 
 const modelBreakers = new Map();
 const BREAKER_CONFIG = {
-  enabled: process.env.AI_CIRCUIT_BREAKER_ENABLED !== 'false',
-  failureThreshold: parseInt(process.env.AI_BREAKER_FAILURE_COUNT || '5', 10),
-  cooldownMs: parseInt(process.env.AI_BREAKER_COOLDOWN_MS || '60000', 10),
+  enabled: aiGatewayConfig.circuitBreaker.enabled,
+  failureThreshold: aiGatewayConfig.circuitBreaker.failureCount,
+  cooldownMs: aiGatewayConfig.circuitBreaker.cooldownMs,
   useErrorRate: true,
-  errorRateThreshold: parseFloat(process.env.AI_BREAKER_ERROR_RATE || '0.5'),
-  windowDuration: parseInt(process.env.AI_BREAKER_WINDOW_MS || '120000', 10),
+  errorRateThreshold: aiGatewayConfig.circuitBreaker.errorRate,
+  windowDuration: aiGatewayConfig.circuitBreaker.windowMs,
 };
 
-const SINGLE_REQUEST_TIMEOUT = parseInt(process.env.AI_SINGLE_REQUEST_TIMEOUT_MS || '120000', 10);
-const TOTAL_TIMEOUT = parseInt(process.env.AI_TOTAL_TIMEOUT_MS || '300000', 10);
-const STREAMING_TIMEOUT = parseInt(process.env.AI_STREAMING_TIMEOUT_MS || '600000', 10);
+const SINGLE_REQUEST_TIMEOUT = aiGatewayConfig.singleRequestTimeoutMs;
+const TOTAL_TIMEOUT = aiGatewayConfig.totalTimeoutMs;
+const STREAMING_TIMEOUT = aiGatewayConfig.streamingTimeoutMs;
 
 function getModelBreaker(modelId) {
   if (!BREAKER_CONFIG.enabled) return null;
@@ -118,8 +119,7 @@ async function runPreInvokeSecurityChecks(modelId, input, context) {
   }
 
   // 2. PII 敏感信息脱敏
-  const sanitizeEnabled = process.env.SECURITY_SANITIZE_INPUT !== 'false';
-  if (sanitizeEnabled) {
+  if (securityConfig.sanitizeInput) {
     try {
       if (typeof input === 'string') {
         const { sanitized, maskedCount } = sanitizePII(input);
@@ -136,8 +136,7 @@ async function runPreInvokeSecurityChecks(modelId, input, context) {
   }
 
   // 3. 内容安全审核（敏感词/违禁词检测）
-  const moderationEnabled = process.env.SECURITY_SELF_BUILT_WORDLIST_ENABLED !== 'false';
-  if (moderationEnabled && context.userId) {
+  if (securityConfig.selfBuiltWordlistEnabled && context.userId) {
     try {
       const textToCheck = typeof input === 'string' ? input : JSON.stringify(input);
       const modResult = await moderateText(textToCheck, context.userId, { stage: 'input' });
@@ -319,7 +318,7 @@ export async function gatewayInfer(modelId, input, ctx = {}) {
       const reviewLevel = geoConstraints?.reviewLevel || 5;
       const blockedTerms = geoConstraints?.outputConstraints?.forbiddenTerms || [];
       const requiredPatterns = geoConstraints?.outputConstraints?.requiredPatterns || null;
-      const enableAliyun = process.env.SECURITY_ALIYUN_GREEN_ENABLED === 'true';
+      const enableAliyun = securityConfig.aliyunGreenEnabled;
       const modResult = await moderateOutput(textOutput, { level: reviewLevel, blockedTerms, requiredPatterns, enableAliyun });
       moderationResult = JSON.stringify(modResult);
       // 应用脱敏后的输出
@@ -341,8 +340,8 @@ export async function gatewayInfer(modelId, input, ctx = {}) {
 	// ── 输出后处理（格式转换 + 二次脱敏）──
 	if (result.output && status === "success") {
 		try {
-			const outputFormat = ctx.outputFormat || process.env.AI_OUTPUT_FORMAT || "raw";
-			const outputSanitize = ctx.outputSanitize !== undefined ? ctx.outputSanitize : process.env.SECURITY_OUTPUT_SANITIZE === "true";
+			const outputFormat = ctx.outputFormat || aiGatewayConfig.outputFormat;
+			const outputSanitize = ctx.outputSanitize !== undefined ? ctx.outputSanitize : securityConfig.outputSanitize;
 			result.output = await postProcessOutput(
 				typeof result.output === "string" ? result.output : JSON.stringify(result.output),
 				{ format: outputFormat, sanitize: outputSanitize },
@@ -513,7 +512,7 @@ export async function gatewayDispatch(dispatchReq, ctx = {}) {
       const reviewLevel = geoConstraints?.reviewLevel || 5;
       const blockedTerms = geoConstraints?.outputConstraints?.forbiddenTerms || [];
       const requiredPatterns = geoConstraints?.outputConstraints?.requiredPatterns || null;
-      const enableAliyun = process.env.SECURITY_ALIYUN_GREEN_ENABLED === 'true';
+      const enableAliyun = securityConfig.aliyunGreenEnabled;
       const modResult = await moderateOutput(textOutput, { level: reviewLevel, blockedTerms, requiredPatterns, enableAliyun });
       moderationResult = JSON.stringify(modResult);
       if (modResult.sanitizedOutput) {
@@ -531,8 +530,8 @@ export async function gatewayDispatch(dispatchReq, ctx = {}) {
   // ── 输出后处理（格式转换 + 二次脱敏）──
   if (result?.result && status === "success") {
     try {
-      const outputFormat = ctx.outputFormat || process.env.AI_OUTPUT_FORMAT || "raw";
-      const outputSanitize = ctx.outputSanitize !== undefined ? ctx.outputSanitize : process.env.SECURITY_OUTPUT_SANITIZE === "true";
+      const outputFormat = ctx.outputFormat || aiGatewayConfig.outputFormat;
+      const outputSanitize = ctx.outputSanitize !== undefined ? ctx.outputSanitize : securityConfig.outputSanitize;
       const rawOutput = typeof result.result === "string" ? result.result : JSON.stringify(result.result);
       result.result = await postProcessOutput(rawOutput, { format: outputFormat, sanitize: outputSanitize });
     } catch (e) {
@@ -722,7 +721,7 @@ export async function gatewayRoute(params, ctx = {}) {
       const reviewLevel = geoConstraints?.reviewLevel || 5;
       const blockedTerms = geoConstraints?.outputConstraints?.forbiddenTerms || [];
       const requiredPatterns = geoConstraints?.outputConstraints?.requiredPatterns || null;
-      const enableAliyun = process.env.SECURITY_ALIYUN_GREEN_ENABLED === 'true';
+      const enableAliyun = securityConfig.aliyunGreenEnabled;
       const modResult = await moderateOutput(textOutput, { level: reviewLevel, blockedTerms, requiredPatterns, enableAliyun });
       moderationResult = JSON.stringify(modResult);
       if (modResult.sanitizedOutput) {
@@ -743,8 +742,8 @@ export async function gatewayRoute(params, ctx = {}) {
   // ── 输出后处理（格式转换 + 二次脱敏）──
   if (result?.response && status === 'success') {
     try {
-      const outputFormat = ctx.outputFormat || process.env.AI_OUTPUT_FORMAT || 'raw';
-      const outputSanitize = ctx.outputSanitize !== undefined ? ctx.outputSanitize : process.env.SECURITY_OUTPUT_SANITIZE === 'true';
+      const outputFormat = ctx.outputFormat || aiGatewayConfig.outputFormat;
+      const outputSanitize = ctx.outputSanitize !== undefined ? ctx.outputSanitize : securityConfig.outputSanitize;
       const content = result.response?.choices?.[0]?.message?.content;
       if (content) {
         const processed = await postProcessOutput(content, { format: outputFormat, sanitize: outputSanitize });
