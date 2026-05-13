@@ -15,6 +15,7 @@
  */
 import { executeWorkflow, resumeJob } from './unifiedWorkflowEngine.js';
 import logger from '../utils/logger.js';
+import { BusinessError } from '../utils/businessError.js';
 
 // ==================== 链步骤元数据(向后兼容) ====================
 
@@ -88,7 +89,7 @@ export async function orchestrate(params = {}) {
   const workflowId = _mapToWorkflowId(params);
 
   if (!workflowId) {
-    throw new Error(`无法自动匹配工作流: inputType=${inputType}, 请手动指定 chain`);
+    throw new BusinessError(400, `无法自动匹配工作流: inputType=${inputType}, 请手动指定 chain`);
   }
 
   logger.info(`[Orchestrator] delegating to engine: workflow=${workflowId} inputType=${inputType}`);
@@ -140,7 +141,7 @@ export async function orchestrate(params = {}) {
  */
 export async function resumeOrchestration(chainState, resumeFromStep, overrides = {}, ctx = {}) {
   if (!chainState?.chainId) {
-    throw new Error('chainState.chainId 必填');
+    throw new BusinessError(400, 'chainState.chainId 必填');
   }
 
   const jobId = chainState.chainId.startsWith('wf_') ? chainState.chainId : chainState.chainId;

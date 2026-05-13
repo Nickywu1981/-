@@ -1,102 +1,71 @@
 /**
  * 统一工作流引擎 + 模型池 管理控制器
- *
- * API 端点:
- *   工作流执行:
- *     POST /api/workflow/execute       — 执行工作流
- *     GET  /api/workflow/jobs           — 作业列表
- *     GET  /api/workflow/job/:id        — 作业详情/进度
- *     POST /api/workflow/job/:id/pause  — 人工暂停
- *     POST /api/workflow/job/:id/resume — 人工恢复(可提交修改)
- *     POST /api/workflow/job/:id/cancel — 取消
- *
- *   工作流配置:
- *     GET  /api/workflow/definitions             — 7条工作流定义列表
- *     GET  /api/workflow/definition/:id           — 单条工作流详情
- *     GET  /api/workflow/definition/:id/steps     — 可绑定模型的步骤列表
- *     PUT  /api/workflow/definition/:id/config    — 配置工作流(步骤开关/模型绑定)
- *
- *   模型池管理:
- *     GET    /api/admin/model-pool               — 模型池状态
- *     GET    /api/admin/model-pool/stats          — 模型池统计
- *     GET    /api/admin/model-pool/category/:cat  — 按类别查询
- *     PUT    /api/admin/model-pool/:key/gray      — 设置灰度百分比
  */
 import * as engine from '../services/unifiedWorkflowEngine.js';
 import * as pool from '../services/modelPoolService.js';
 import { listWorkflows, getWorkflow, getBindableSteps } from '../services/workflowDefinitions.js';
 import * as wfConfigDao from '../dao/workflowConfigDao.js';
+import { wrapController } from '../utils/wrapController.js';
+import { BusinessError } from '../utils/businessError.js';
 import logger from '../utils/logger.js';
 
 // ==================== 工作流执行 ====================
 
-export async function executeWorkflow(req, res) {
+export const executeWorkflow = wrapController(async (req) => {
   const { workflowId, mode, input, overrides } = req.body;
-  const result = await engine.executeWorkflow({
+  return engine.executeWorkflow({
     workflowId,
     mode: mode || 'auto',
-    input: {
-      ...input,
-      userId: req.user?.id,
-      ip: req.ip,
-    },
+    input: { ...input, userId: req.user?.id, ip: req.ip },
     overrides: overrides || {},
   });
-  res.json({ success: true, data: result });
-}
+});
 
-export async function listJobs(req, res) {
+export const listJobs = wrapController(async (req) => {
   const { limit, offset } = req.query;
-  const result = engine.listJobs(req.user?.id, {
+  return engine.listJobs(req.user?.id, {
     limit: parseInt(limit) || 50,
     offset: parseInt(offset) || 0,
   });
-  res.json({ success: true, data: result });
-}
+});
 
-export async function getJob(req, res) {
-  const result = engine.getJob(req.params.id);
-  res.json({ success: true, data: result });
-}
+export const getJob = wrapController(async (req) => {
+  return engine.getJob(req.params.id);
+});
 
-export async function pauseJob(req, res) {
-  const result = engine.pauseJob(req.params.id);
-  res.json({ success: true, data: result });
-}
+export const pauseJob = wrapController(async (req) => {
+  return engine.pauseJob(req.params.id);
+});
 
-export async function resumeJob(req, res) {
+export const resumeJob = wrapController(async (req) => {
   const { modifiedContext } = req.body || {};
-  const result = await engine.resumeJob(req.params.id, modifiedContext);
-  res.json({ success: true, data: result });
-}
+  return engine.resumeJob(req.params.id, modifiedContext);
+});
 
-export async function cancelJob(req, res) {
-  const result = engine.cancelJob(req.params.id);
-  res.json({ success: true, data: result });
-}
+export const cancelJob = wrapController(async (req) => {
+  return engine.cancelJob(req.params.id);
+});
 
 // ==================== 工作流配置 ====================
 
-export async function getDefinitions(req, res) {
-  const workflows = listWorkflows();
-  res.json({ success: true, data: workflows });
-}
+export const getDefinitions = wrapController(async () => {
+  return listWorkflows();
+});
 
-export async function getDefinition(req, res) {
+export const getDefinition = wrapController(async (req) => {
   const wf = getWorkflow(req.params.id);
-  if (!wf) return res.status(404).json({ success: false, message: '工作流不存在' });
-  res.json({ success: true, data: wf });
-}
+  if (!wf) throw new BusinessError(404, '工作流不存在');
+  return wf;
+});
 
-export async function getBindableSteps_(req, res) {
+export const getBindableSteps_ = wrapController(async (req) => {
   const steps = getBindableSteps(req.params.id);
-  if (!steps.length) return res.status(404).json({ success: false, message: '工作流不存在或无绑定步骤' });
-  res.json({ success: true, data: steps });
-}
+  if (!steps.length) throw new BusinessError(404, '工作流不存在或无绑定步骤');
+  return steps;
+});
 
-export async function configureWorkflow(req, res) {
+export const configureWorkflow = wrapController(async (req) => {
   const { disabledSteps, modelBindings, extraSteps, params, mode } = req.body || {};
-
   const config = {
     workflowId: req.params.id,
     disabledSteps: disabledSteps || [],
@@ -105,117 +74,96 @@ export async function configureWorkflow(req, res) {
     params: params || {},
     mode: mode || 'auto',
   };
-
-  // 持久化到 workflow_config 表
-  const saved = await wfConfigDao.upsertWorkflowConfig(
-    req.params.id,
-    req.user?.id,
-    config,
-  );
-
+  const saved = await wfConfigDao.upsertWorkflowConfig(req.params.id, req.user?.id, config);
   logger.info('[WorkflowConfig] Persisted', { workflowId: req.params.id, userId: req.user?.id });
+  return saved || config;
+});
 
-  res.json({ success: true, data: saved || config });
-}
-
-export async function getWorkflowConfig(req, res) {
+export const getWorkflowConfig = wrapController(async (req) => {
   const wf = getWorkflow(req.params.id);
-  if (!wf) return res.status(404).json({ success: false, message: '工作流不存在' });
-
-  const config = await wfConfigDao.getWorkflowConfig(req.params.id, req.user?.id);
-  res.json({ success: true, data: config });
-}
+  if (!wf) throw new BusinessError(404, '工作流不存在');
+  return wfConfigDao.getWorkflowConfig(req.params.id, req.user?.id);
+});
 
 // ==================== 模型池管理 ====================
 
-export async function getModelPool(req, res) {
-  const poolData = await pool.getPool();
-  res.json({ success: true, data: poolData });
-}
+export const getModelPool = wrapController(async () => {
+  return pool.getPool();
+});
 
-export async function getPoolStats(req, res) {
-  const stats = await pool.getPoolStats();
-  res.json({ success: true, data: stats });
-}
+export const getPoolStats = wrapController(async () => {
+  return pool.getPoolStats();
+});
 
-export async function getByCategory(req, res) {
-  const models = await pool.listEnabledByCategory(req.params.category);
-  res.json({ success: true, data: models });
-}
+export const getByCategory = wrapController(async (req) => {
+  return pool.listEnabledByCategory(req.params.category);
+});
 
-export async function setGrayPercent(req, res) {
+export const setGrayPercent = wrapController(async (req) => {
   const { percent } = req.body;
   if (typeof percent !== 'number' || percent < 0 || percent > 100) {
-    return res.status(400).json({ success: false, message: '灰度百分比需在 0-100 之间' });
+    throw new BusinessError(400, '灰度百分比需在 0-100 之间');
   }
-  const result = await pool.setGrayPercent(req.params.key, percent);
-  res.json({ success: true, data: result });
-}
+  return pool.setGrayPercent(req.params.key, percent);
+});
 
-export async function registerModel(req, res) {
-  const result = await pool.registerModel(req.body);
-  res.status(201).json({ success: true, data: result });
-}
+export const registerModel = wrapController(async (req) => {
+  return pool.registerModel(req.body);
+});
 
-export async function updateModel(req, res) {
-  const result = await pool.updateModel(req.params.key, req.body);
-  res.json({ success: true, data: result });
-}
+export const updateModel = wrapController(async (req) => {
+  return pool.updateModel(req.params.key, req.body);
+});
 
-export async function removeModel(req, res) {
+export const removeModel = wrapController(async (req) => {
   await pool.removeModel(req.params.key);
-  res.json({ success: true, data: { removed: req.params.key } });
-}
+  return { removed: req.params.key };
+});
 
-export async function toggleModel(req, res) {
+export const toggleModel = wrapController(async (req) => {
   const { enabled } = req.body;
   if (typeof enabled !== 'boolean') {
-    return res.status(400).json({ success: false, message: 'enabled 需为 boolean' });
+    throw new BusinessError(400, 'enabled 需为 boolean');
   }
-  const result = await pool.toggleModel(req.params.key, enabled);
-  res.json({ success: true, data: result });
-}
+  return pool.toggleModel(req.params.key, enabled);
+});
 
 // ==================== 可配置清单 ====================
 
-export async function getConfigOptions(req, res) {
+export const getConfigOptions = wrapController(async () => {
   const [poolStats, workflows] = await Promise.all([
     pool.getPoolStats(),
     listWorkflows(),
   ]);
-
-  res.json({
-    success: true,
-    data: {
-      modelPool: poolStats,
-      workflows,
-      options: {
-        industries: [
-          { key: 'clothing', label: '服装' },
-          { key: 'beauty', label: '美妆' },
-          { key: '3c_digital', label: '3C数码' },
-          { key: 'food', label: '食品' },
-          { key: 'home', label: '家居' },
-        ],
-        platforms: [
-          { key: 'taobao', label: '淘宝/天猫' },
-          { key: 'douyin', label: '抖音' },
-          { key: 'jd', label: '京东' },
-          { key: 'kuaishou', label: '快手' },
-        ],
-        styles: [
-          { key: 'professional', label: '专业商务' },
-          { key: 'minimalist', label: '极简风' },
-          { key: 'lifestyle', label: '生活方式' },
-          { key: 'trendy', label: '潮流时尚' },
-        ],
-        videoDuration: [15, 30, 60],
-        storyboardCount: [5, 6, 7, 8],
-        modes: [
-          { key: 'auto', label: '智能自动 — 系统自动选最优模型' },
-          { key: 'custom', label: '自定义 — 手动指定每步模型和参数' },
-        ],
-      },
+  return {
+    modelPool: poolStats,
+    workflows,
+    options: {
+      industries: [
+        { key: 'clothing', label: '服装' },
+        { key: 'beauty', label: '美妆' },
+        { key: '3c_digital', label: '3C数码' },
+        { key: 'food', label: '食品' },
+        { key: 'home', label: '家居' },
+      ],
+      platforms: [
+        { key: 'taobao', label: '淘宝/天猫' },
+        { key: 'douyin', label: '抖音' },
+        { key: 'jd', label: '京东' },
+        { key: 'kuaishou', label: '快手' },
+      ],
+      styles: [
+        { key: 'professional', label: '专业商务' },
+        { key: 'minimalist', label: '极简风' },
+        { key: 'lifestyle', label: '生活方式' },
+        { key: 'trendy', label: '潮流时尚' },
+      ],
+      videoDuration: [15, 30, 60],
+      storyboardCount: [5, 6, 7, 8],
+      modes: [
+        { key: 'auto', label: '智能自动 — 系统自动选最优模型' },
+        { key: 'custom', label: '自定义 — 手动指定每步模型和参数' },
+      ],
     },
-  });
-}
+  };
+});
