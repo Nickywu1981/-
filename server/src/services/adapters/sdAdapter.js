@@ -106,7 +106,7 @@ async function replicateInfer(input, onProgress) {
 
   // 轮询等待结果
   for (let i = 0; i < 60; i++) {
-    await new Promise((r) => setTimeout(r, 2000));
+    await new Promise((r) => setTimeout(r, config.adapters.pollIntervalMs.sd));
     onProgress?.(20 + i);
 
     const pollRes = await fetch(pollUrl, {

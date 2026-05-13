@@ -6,7 +6,14 @@ import { success } from '../utils/response.js';
 import { BusinessError } from '../utils/businessError.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import logger from '../utils/logger.js';
+import { isProduction } from '../config/index.js';
 import * as modelRouter from '../services/model-router.service.js';
+
+function _safeMsg(err) {
+  if (!err) return '模型执行失败';
+  if (isProduction) return '模型执行失败';
+  return String(err.message || err).slice(0, 200);
+}
 import { gatewayRoute } from '../gateway/aiGatewayHub.js';
 
 const testHistory = [];
@@ -78,7 +85,7 @@ export const testSingle = wrapController(async (req, res) => {
       category,
       prompt,
       duration_ms: Date.now() - start,
-      error: err.message || '测试执行失败',
+      error: _safeMsg(err),
       created_at: new Date().toISOString(),
     };
     _addHistory(entry);
@@ -118,7 +125,7 @@ export const testMixed = wrapController(async (req, res) => {
       category,
       prompt,
       duration_ms: Date.now() - start,
-      error: err.message || '测试执行失败',
+      error: _safeMsg(err),
       created_at: new Date().toISOString(),
     };
     _addHistory(entry);
@@ -147,8 +154,8 @@ export const testCustom = wrapController(async (req, res) => {
         return { modelKey, r };
       } catch (err) {
         logger.warn('[TestWorkbench] 并行步骤执行失败', { model_key: modelKey, error: err.message });
-        steps.push({ model_key: modelKey, duration_ms: Date.now() - stepStart, error: err.message || '模型执行失败', success: false });
-        return { modelKey, error: err.message || '模型执行失败' };
+        steps.push({ model_key: modelKey, duration_ms: Date.now() - stepStart, error: _safeMsg(err), success: false });
+        return { modelKey, error: _safeMsg(err) };
       }
     });
     await Promise.allSettled(promises);
@@ -171,7 +178,7 @@ export const testCustom = wrapController(async (req, res) => {
         steps.push({ model_key: modelKey, duration_ms: Date.now() - stepStart, result: finalResult, success: true, order: steps.length + 1 });
       } catch (err) {
         logger.warn('[TestWorkbench] 顺序步骤执行失败', { model_key: modelKey, error: err.message });
-        steps.push({ model_key: modelKey, duration_ms: Date.now() - stepStart, error: err.message || '模型执行失败', success: false, order: steps.length + 1 });
+        steps.push({ model_key: modelKey, duration_ms: Date.now() - stepStart, error: _safeMsg(err), success: false, order: steps.length + 1 });
         break;
       }
     }
@@ -212,14 +219,14 @@ export const testCompare = wrapController(async (req, res) => {
       return { model_key: modelKey, duration_ms: Date.now() - stepStart, result, success: true };
     } catch (err) {
       logger.warn('[TestWorkbench] 对比测试执行失败', { model_key: modelKey, error: err.message });
-      return { model_key: modelKey, duration_ms: Date.now() - stepStart, error: err.message || '模型执行失败', success: false };
+      return { model_key: modelKey, duration_ms: Date.now() - stepStart, error: _safeMsg(err), success: false };
     }
   });
 
   const results = await Promise.allSettled(promises);
   for (const r of results) {
     if (r.status === 'fulfilled') comparisons.push(r.value);
-    else comparisons.push({ error: r.reason?.message || 'Unknown error', success: false });
+    else comparisons.push({ error: _safeMsg(r.reason), success: false });
   }
 
   const entry = {

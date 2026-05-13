@@ -76,7 +76,7 @@ const providers = {
         });
         const info = await Promise.race([
           transporter.sendMail({ from: cfg.from || cfg.user, to: email, subject, html: content }),
-          new Promise((_, reject) => setTimeout(() => reject(new BusinessError(504, 'SMTP 发送超时')), 30000)),
+          new Promise((_, reject) => setTimeout(() => reject(new BusinessError(504, 'SMTP 发送超时')), config.email.smtp.timeoutMs)),
         ]);
         return { success: true, messageId: info.messageId };
       } catch (e) {

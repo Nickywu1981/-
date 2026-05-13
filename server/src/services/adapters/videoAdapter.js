@@ -81,7 +81,7 @@ async function pollVideoTask(taskId, onProgress, timeoutMs = 600000) {
       onProgress?.(progress);
     }
 
-    await new Promise((r) => setTimeout(r, 3000));
+    await new Promise((r) => setTimeout(r, adapterConfig.pollIntervalMs.video));
   }
 
   throw new BusinessError(504, '视频生成超时');

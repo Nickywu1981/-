@@ -14,7 +14,7 @@ import { success, error as sendError } from './utils/response.js';
 import { BusinessError } from './utils/businessError.js';
 import { z } from 'zod';
 import { ERROR_CODE } from './constants/errorCode.js';
-import { corsOrigin, aiConfig, isProduction } from './config/index.js';
+import { corsOrigin, aiConfig, isProduction, requestTimeoutMs } from './config/index.js';
 
 // =====================================================
 // 四层架构 - 网关层 + 中台层 集成 (Phase 0-A, 2026-05-11)
@@ -159,7 +159,7 @@ app.use(cookieParser());
 
 // 全局请求超时 (防止慢连接资源耗尽)
 app.use((req, _res, next) => {
-  req.setTimeout(30000, () => {
+  req.setTimeout(requestTimeoutMs, () => {
     if (!_res.headersSent) _res.status(408).json({ code: 408, msg: '请求超时' });
     req.destroy();
   });

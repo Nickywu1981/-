@@ -100,6 +100,7 @@ const config = {
       user: process.env.SMTP_USER || '',
       pass: process.env.SMTP_PASS || '',
       from: process.env.SMTP_FROM || '',
+      timeoutMs: parseInt(process.env.SMTP_TIMEOUT_MS, 10) || 30000,
     },
   },
 
@@ -128,6 +129,7 @@ const config = {
     concurrencyMax: parseInt(process.env.RATE_LIMIT_CONCURRENCY_MAX, 10) || 6,
     aiConcurrencyMax: parseInt(process.env.RATE_LIMIT_AI_CONCURRENCY_MAX, 10) || 3,
     verifyMax: parseInt(process.env.RATE_LIMIT_VERIFY_MAX, 10) || 5,
+    e2bMax: parseInt(process.env.RATE_LIMIT_E2B_MAX, 10) || 5,
   },
 
   jwtRefreshSecret: (() => {
@@ -152,6 +154,9 @@ const config = {
     sampleRate: parseFloat(process.env.LOG_SAMPLE_RATE || '1.0'),
     slowQueryMs: parseInt(process.env.SLOW_QUERY_MS, 10) || 1000,
   },
+
+  // 请求超时
+  requestTimeoutMs: parseInt(process.env.REQUEST_TIMEOUT_MS, 10) || 60000,
 
   get aiTimeoutMs() {
     return parseInt(process.env.AI_TIMEOUT_MS, 10) || 300000;
@@ -278,6 +283,10 @@ const config = {
   },
 
   adapters: {
+    pollIntervalMs: {
+      video: parseInt(process.env.ADAPTER_VIDEO_POLL_MS, 10) || 3000,
+      sd: parseInt(process.env.ADAPTER_SD_POLL_MS, 10) || 2000,
+    },
     claude: {
       apiKey: process.env.CLAUDE_API_KEY || '',
       baseUrl: process.env.CLAUDE_BASE_URL || 'https://api.anthropic.com/v1',
@@ -317,6 +326,7 @@ export const { rateLimit: rateLimitConfig } = config;
 export const corsOrigin = config.corsOrigin;
 export const { log: logConfig } = config;
 export const aiTimeoutMs = config.aiTimeoutMs;
+export const requestTimeoutMs = config.requestTimeoutMs;
 export const { worker: workerConfig } = config;
 export const { upload: uploadConfig } = config;
 export const { security: securityConfig } = config;
