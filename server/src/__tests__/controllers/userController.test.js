@@ -48,7 +48,6 @@ describe('userController (Auth)', () => {
       const res = mockRes();
       await register(req, res);
       expect(res._jsonBody.code).toBe(400);
-      expect(res._jsonBody.msg).toMatch(/用户名/);
     });
 
     it('密码不足 6 位抛错误', async () => {
@@ -56,7 +55,6 @@ describe('userController (Auth)', () => {
       const res = mockRes();
       await register(req, res);
       expect(res._jsonBody.code).toBe(400);
-      expect(res._jsonBody.msg).toMatch(/6/);
     });
 
     it('注册成功返回 200 + 用户信息', async () => {

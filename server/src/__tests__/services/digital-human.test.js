@@ -20,7 +20,7 @@ beforeEach(() => {
 describe('digital-human service', () => {
   describe('createDigitalHuman', () => {
     it('should throw if neither text nor audioUrl provided', async () => {
-      await expect(createDigitalHuman('user-1', {})).rejects.toThrow('请提供口播文本或音频');
+      await expect(createDigitalHuman('user-1', {})).rejects.toMatchObject({ status: 4201 });
     });
 
     it('should submit job with text input', async () => {
@@ -50,7 +50,7 @@ describe('digital-human service', () => {
 
     it('should block on text moderation reject', async () => {
       moderateText.mockResolvedValueOnce({ action: 'block' });
-      await expect(createDigitalHuman('user-1', { text: '违规内容' })).rejects.toThrow('包含违规内容');
+      await expect(createDigitalHuman('user-1', { text: '违规内容' })).rejects.toMatchObject({ status: 4401 });
     });
 
     it('should skip moderation if no text provided (audio only)', async () => {

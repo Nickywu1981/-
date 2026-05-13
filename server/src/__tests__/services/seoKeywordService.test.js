@@ -53,7 +53,7 @@ describe('seoKeywordService', () => {
     });
 
     it('should throw for invalid platform', () => {
-      expect(() => getPlatformKeywords('nonexistent')).toThrow('不支持的平台');
+      expect(() => getPlatformKeywords('nonexistent')).toThrow('Unsupported platform: nonexistent');
     });
   });
 
@@ -90,7 +90,7 @@ describe('seoKeywordService', () => {
       await expect(embedSEOKeywords({
         productName: 'test',
         platformCode: 'unsupported',
-      })).rejects.toThrow('不支持的平台');
+      })).rejects.toMatchObject({ status: 4202 });
     });
 
     it('should respect keyword density requirements for pinduoduo (very_high)', async () => {

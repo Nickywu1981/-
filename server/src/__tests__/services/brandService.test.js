@@ -32,7 +32,7 @@ describe('brandService', () => {
 
   describe('saveBrandSettings', () => {
     it('无有效字段抛出错误', async () => {
-      await expect(brandService.saveBrandSettings(1, { invalid: 1 })).rejects.toThrow('没有需要更新的字段');
+      await expect(brandService.saveBrandSettings(1, { invalid: 1 })).rejects.toMatchObject({ status: 4201 });
     });
 
     it('过滤非法字段并调用 upsert', async () => {
