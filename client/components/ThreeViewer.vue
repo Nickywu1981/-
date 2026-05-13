@@ -198,7 +198,7 @@ function loadModel(url: string) {
       }
     },
     (err: Error) => {
-      const msg = `模型加载失败: ${err?.message || '未知错误'}`;
+      const msg = `${t('three_viewer.model_load_failed')}: ${err?.message || t('three_viewer.unknown_error')}`;
       error.value = msg;
       loading.value = false;
       emit('error', msg);
