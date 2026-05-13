@@ -214,7 +214,7 @@ export function extractScenesForSubtitle(scriptContent, totalDuration = 30) {
       const srtContent = generateSrt(parsed, { totalDuration });
       return { scenes: parsed, srtContent };
     }
-  } catch {}
+  } catch (e) { logger.debug('[Subtitle] JSON parse failed, falling back to sentence split', { error: e.message }); }
 
   // 纯文本: 按句号/换行分割为伪分镜
   const sentences = scriptContent

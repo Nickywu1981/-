@@ -165,7 +165,7 @@ app.use(cookieParser());
 // 全局请求超时 (防止慢连接资源耗尽)
 app.use((req, _res, next) => {
   req.setTimeout(requestTimeoutMs, () => {
-    if (!_res.headersSent) _res.status(408).json({ code: 408, msg: '请求超时' });
+    if (!_res.headersSent) _res.status(408).json({ code: 408, msg: 'Request timeout' });
     req.destroy();
   });
   next();
@@ -227,6 +227,31 @@ app.get('/api/health', optionalAuth, async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+	// K8s 存活探测 — 仅检查进程存活
+	app.get('/healthz', (_req, res) => {
+	  res.status(200).send('OK');
+	});
+
+	// K8s 就绪探测 — 检查 DB + Redis 连通性
+	app.get('/readyz', async (_req, res) => {
+	  try {
+	    const db = await import('./dao/db.js');
+	    const conn = await db.default.getConnection();
+	    await conn.query('SELECT 1');
+	    conn.release();
+
+	    const { ping } = await import('./dao/redis.js');
+	    await ping();
+
+	    res.status(200).send('OK');
+	  } catch (e) {
+	    logger.warn('[Readyz] health check failed', { error: e.message });
+	    res.status(503).send('Not Ready');
+	  }
+	});
+
+
+
 // 网关路由地图端点 (Phase 0-A, 2026-05-11) — 需管理员认证
 app.get('/api/gateway/routes', authMiddleware, adminAuth, (req, res) => {
   return success(res, generateRouteMap(), 'ok');
@@ -239,11 +264,11 @@ app.get('/api/metrics', metricsEndpoint);
 const embedSchema = z.object({ texts: z.array(z.string().min(1).max(8000)).min(1).max(100) });
 app.post('/api/internal/embed', async (req, res) => {
   if (req.ip !== '127.0.0.1' && req.ip !== '::1' && req.ip !== '::ffff:127.0.0.1') {
-    return sendError(res, ERROR_CODE.FORBIDDEN, '仅限内部调用');
+    return sendError(res, ERROR_CODE.FORBIDDEN, 'Internal use only');
   }
   try {
     const parsed = embedSchema.safeParse(req.body);
-    if (!parsed.success) return sendError(res, ERROR_CODE.BAD_REQUEST, parsed.error.errors[0]?.message || '参数校验失败');
+    if (!parsed.success) return sendError(res, ERROR_CODE.BAD_REQUEST, parsed.error.errors[0]?.message || 'Validation failed');
     const { texts } = parsed.data;
     const apiKey = aiConfig.apiKey;
     const baseUrl = aiConfig.baseUrl.replace(/\/+$/, '');
@@ -264,7 +289,7 @@ app.post('/api/internal/embed', async (req, res) => {
     const data = await fetchRes.json();
     return success(res, { vectors: data.data.map(d => d.embedding), model: data.model }, 'ok');
   } catch (e) {
-    return sendError(res, ERROR_CODE.INTERNAL_ERROR, e.status ? e.message : '嵌入服务异常');
+    return sendError(res, ERROR_CODE.INTERNAL_ERROR, e.status ? e.message : 'Embedding service error');
   }
 });
 
@@ -383,7 +408,8 @@ app.use('/api/agent', heavyLimiter, agentRoutes);
 
 // 统一工作流引擎 + 模型池 — 7条固定工作流 + 双模式执行 + 人工干预
 app.use('/api/workflow', unifiedWorkflowRoutes);
-app.use('/api/admin/experiments', adminLimiter, abTestRoutes);     // A/B 实验框架 (实验CRUD+结果+显著性)
+app.use('/api/admin/experiments', adminLimiter, abTestRoutes);     // A/B 实验框架
+app.use('/api/admin/healing', adminLimiter, healingRoutes);                // L5 自愈系统管理     // A/B 实验框架 (实验CRUD+结果+显著性)
 
 // ===== Phase 1: 企业/代理端 (2026-05-11) =====
 app.use('/api/enterprise/finance', paymentLimiter, financeRoutes);  // Phase 2: 财务核心
@@ -402,7 +428,7 @@ app.use((_req, res) => {
   if (!_req.path.startsWith('/_nuxt') && !_req.path.startsWith('/__webpack')) {
     logger.warn('[404] 未匹配路由', { method: _req.method, path: _req.path });
   }
-  sendError(res, ERROR_CODE.NOT_FOUND, '接口不存在');
+  sendError(res, ERROR_CODE.NOT_FOUND, 'Not found');
 });
 
 // 全局异常捕获
@@ -414,22 +440,22 @@ app.use((err, _req, res, _next) => {
   // Multer 文件上传异常 → 统一转为 4xx 业务错误
   if (err.name === 'MulterError') {
     const multerMessages = {
-      LIMIT_FILE_SIZE: '文件大小超过限制',
-      LIMIT_FILE_COUNT: '文件数量超过限制',
-      LIMIT_UNEXPECTED_FILE: '上传字段名不匹配',
-      LIMIT_FIELD_KEY: '字段名过长',
-      LIMIT_FIELD_VALUE: '字段值过长',
-      LIMIT_FIELD_COUNT: '字段数量过多',
-      LIMIT_PART_COUNT: '分段数量过多',
+      LIMIT_FILE_SIZE: 'File size exceeds limit',
+      LIMIT_FILE_COUNT: 'File count exceeds limit',
+      LIMIT_UNEXPECTED_FILE: 'Upload field name mismatch',
+      LIMIT_FIELD_KEY: 'Field name too long',
+      LIMIT_FIELD_VALUE: 'Field value too long',
+      LIMIT_FIELD_COUNT: 'Too many fields',
+      LIMIT_PART_COUNT: 'Too many parts',
     };
-    const msg = multerMessages[err.code] || `文件上传错误: ${err.message}`;
+    const msg = multerMessages[err.code] || `Upload error: ${err.message}`;
     return sendError(res, ERROR_CODE.BAD_REQUEST, msg);
   }
 
   if (err instanceof BusinessError) {
     return sendError(res, err.status, err.message);
   }
-  sendError(res, ERROR_CODE.INTERNAL_ERROR, '服务器内部错误');
+  sendError(res, ERROR_CODE.INTERNAL_ERROR, 'Internal server error');
 });
 
 export default app;

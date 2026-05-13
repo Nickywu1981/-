@@ -61,7 +61,7 @@ export async function extractFrames(videoUrl, opts = {}) {
         '-of', 'csv=p=0', videoUrl,
       ], { timeout: 15000 });
       duration = parseFloat(stdout.trim()) || 30;
-    } catch {}
+    } catch (e) { logger.warn('[VideoAnalysis] ffprobe duration failed, using default 30s', { error: e.message }); }
 
     const interval = Math.max(1, duration / frameCount);
 

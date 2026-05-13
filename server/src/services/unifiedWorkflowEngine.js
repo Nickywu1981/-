@@ -49,7 +49,7 @@ function _parseScenes(ctx) {
     const parsed = JSON.parse(raw);
     if (parsed.scenes?.length) return parsed.scenes;
     if (Array.isArray(parsed)) return parsed;
-  } catch {}
+  } catch (e) { logger.debug('[Workflow] _parseScenes JSON parse failed', { error: e.message }); }
   const lines = raw.split(/\n{2,}/).filter(l => l.trim());
   if (lines.length >= 3) return lines.map((visual, i) => ({ number: i + 1, visual: visual.slice(0, 200) }));
   return null;
@@ -60,7 +60,7 @@ function _parseViralInsight(text) {
   try {
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (jsonMatch) return JSON.parse(jsonMatch[0]);
-  } catch {}
+  } catch (e) { logger.debug('[Workflow] _parseViralInsight JSON parse failed', { error: e.message }); }
   return null;
 }
 
