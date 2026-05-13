@@ -25,6 +25,7 @@
 import * as engine from '../services/unifiedWorkflowEngine.js';
 import * as pool from '../services/modelPoolService.js';
 import { listWorkflows, getWorkflow, getBindableSteps } from '../services/workflowDefinitions.js';
+import * as wfConfigDao from '../dao/workflowConfigDao.js';
 import logger from '../utils/logger.js';
 
 // ==================== 工作流执行 ====================
@@ -94,19 +95,34 @@ export async function getBindableSteps_(req, res) {
 }
 
 export async function configureWorkflow(req, res) {
-  const { disabledSteps, modelBindings, extraSteps } = req.body || {};
+  const { disabledSteps, modelBindings, extraSteps, params, mode } = req.body || {};
 
-  // 存储配置到数据库 (TODO: 持久化到 workflow_config 表)
   const config = {
     workflowId: req.params.id,
     disabledSteps: disabledSteps || [],
     modelBindings: modelBindings || {},
     extraSteps: extraSteps || [],
-    updatedAt: new Date().toISOString(),
+    params: params || {},
+    mode: mode || 'auto',
   };
 
-  logger.info('[WorkflowConfig] Updated', config);
+  // 持久化到 workflow_config 表
+  const saved = await wfConfigDao.upsertWorkflowConfig(
+    req.params.id,
+    req.user?.id,
+    config,
+  );
 
+  logger.info('[WorkflowConfig] Persisted', { workflowId: req.params.id, userId: req.user?.id });
+
+  res.json({ success: true, data: saved || config });
+}
+
+export async function getWorkflowConfig(req, res) {
+  const wf = getWorkflow(req.params.id);
+  if (!wf) return res.status(404).json({ success: false, message: '工作流不存在' });
+
+  const config = await wfConfigDao.getWorkflowConfig(req.params.id, req.user?.id);
   res.json({ success: true, data: config });
 }
 
@@ -133,6 +149,30 @@ export async function setGrayPercent(req, res) {
     return res.status(400).json({ success: false, message: '灰度百分比需在 0-100 之间' });
   }
   const result = await pool.setGrayPercent(req.params.key, percent);
+  res.json({ success: true, data: result });
+}
+
+export async function registerModel(req, res) {
+  const result = await pool.registerModel(req.body);
+  res.status(201).json({ success: true, data: result });
+}
+
+export async function updateModel(req, res) {
+  const result = await pool.updateModel(req.params.key, req.body);
+  res.json({ success: true, data: result });
+}
+
+export async function removeModel(req, res) {
+  await pool.removeModel(req.params.key);
+  res.json({ success: true, data: { removed: req.params.key } });
+}
+
+export async function toggleModel(req, res) {
+  const { enabled } = req.body;
+  if (typeof enabled !== 'boolean') {
+    return res.status(400).json({ success: false, message: 'enabled 需为 boolean' });
+  }
+  const result = await pool.toggleModel(req.params.key, enabled);
   res.json({ success: true, data: result });
 }
 

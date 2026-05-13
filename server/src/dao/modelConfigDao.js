@@ -8,7 +8,7 @@ import pool from './db.js';
 
 function _db() { return als.getStore()?.db || pool; }
 
-const COLS = 'id, model_key, display_name, vendor, category, endpoint, api_key_enc, model_id, max_tokens, priority, enabled, rate_limit_rpm, rate_limit_rpd, concurrency_max, breaker_threshold, breaker_cooldown_s, moderation_enabled, moderation_action, blocked_words, created_at, updated_at';
+const COLS = 'id, model_key, display_name, vendor, category, endpoint, api_key_enc, model_id, max_tokens, priority, enabled, rate_limit_rpm, rate_limit_rpd, concurrency_max, breaker_threshold, breaker_cooldown_s, moderation_enabled, moderation_action, blocked_words, pool_enabled, pool_weight, gray_percent, quota_daily, quota_tenant, task_type, created_at, updated_at';
 
 // ============ 模型配置 CRUD ============
 
@@ -37,15 +37,15 @@ export async function getByVendorAndCategory(vendor, category) {
 
 export async function create(data) {
   const [result] = await _db().query(
-    `INSERT INTO ai_model_config (model_key, display_name, vendor, category, endpoint, api_key_enc, model_id, max_tokens, priority, enabled, rate_limit_rpm, rate_limit_rpd, concurrency_max, breaker_threshold, breaker_cooldown_s, moderation_enabled, moderation_action, blocked_words)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [data.model_key, data.display_name, data.vendor, data.category, data.endpoint, data.api_key_enc, data.model_id || '', data.max_tokens || 4096, data.priority || 0, data.enabled ?? 1, data.rate_limit_rpm || 60, data.rate_limit_rpd || 1000, data.concurrency_max || 5, data.breaker_threshold || 5, data.breaker_cooldown_s || 60, data.moderation_enabled ?? 1, data.moderation_action || 'block', data.blocked_words || null],
+    `INSERT INTO ai_model_config (model_key, display_name, vendor, category, endpoint, api_key_enc, model_id, max_tokens, priority, enabled, rate_limit_rpm, rate_limit_rpd, concurrency_max, breaker_threshold, breaker_cooldown_s, moderation_enabled, moderation_action, blocked_words, pool_enabled, pool_weight, gray_percent, quota_daily, quota_tenant, task_type)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [data.model_key, data.display_name, data.vendor, data.category, data.endpoint, data.api_key_enc, data.model_id || '', data.max_tokens || 4096, data.priority || 0, data.enabled ?? 1, data.rate_limit_rpm || 60, data.rate_limit_rpd || 1000, data.concurrency_max || 5, data.breaker_threshold || 5, data.breaker_cooldown_s || 60, data.moderation_enabled ?? 1, data.moderation_action || 'block', data.blocked_words || null, data.pool_enabled ?? 1, data.pool_weight || 1, data.gray_percent || 0, data.quota_daily || 0, data.quota_tenant || 0, data.task_type || ''],
   );
   return { id: result.insertId, ...data };
 }
 
 export async function update(modelKey, data) {
-  const allowed = ['display_name', 'vendor', 'category', 'endpoint', 'api_key_enc', 'model_id', 'max_tokens', 'priority', 'enabled', 'rate_limit_rpm', 'rate_limit_rpd', 'concurrency_max', 'breaker_threshold', 'breaker_cooldown_s', 'moderation_enabled', 'moderation_action', 'blocked_words'];
+  const allowed = ['display_name', 'vendor', 'category', 'endpoint', 'api_key_enc', 'model_id', 'max_tokens', 'priority', 'enabled', 'rate_limit_rpm', 'rate_limit_rpd', 'concurrency_max', 'breaker_threshold', 'breaker_cooldown_s', 'moderation_enabled', 'moderation_action', 'blocked_words', 'pool_enabled', 'pool_weight', 'gray_percent', 'quota_daily', 'quota_tenant', 'task_type'];
   const fields = [];
   const params = [];
   for (const [k, v] of Object.entries(data)) {

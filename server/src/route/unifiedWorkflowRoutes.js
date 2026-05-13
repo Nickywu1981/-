@@ -46,6 +46,9 @@ router.get('/definition/:id/steps', authMiddleware, ctrl.getBindableSteps_);
 // PUT /api/workflow/definition/:id/config — 配置工作流(步骤开关/模型绑定/增删节点)
 router.put('/definition/:id/config', authMiddleware, requireRole('admin'), ctrl.configureWorkflow);
 
+// GET /api/workflow/definition/:id/config — 读取已保存的工作流配置
+router.get('/definition/:id/config', authMiddleware, ctrl.getWorkflowConfig);
+
 // GET /api/workflow/config-options — 可自定义配置清单
 router.get('/config-options', authMiddleware, ctrl.getConfigOptions);
 
@@ -59,6 +62,18 @@ router.get('/admin/model-pool/stats', authMiddleware, requireRole('admin'), ctrl
 
 // GET /api/admin/model-pool/category/:category — 按类别查询
 router.get('/admin/model-pool/category/:category', authMiddleware, ctrl.getByCategory);
+
+// POST /api/admin/model-pool — 注册新模型
+router.post('/admin/model-pool', adminLimiter, authMiddleware, requireRole('admin'), ctrl.registerModel);
+
+// PUT /api/admin/model-pool/:key — 更新模型
+router.put('/admin/model-pool/:key', adminLimiter, authMiddleware, requireRole('admin'), ctrl.updateModel);
+
+// DELETE /api/admin/model-pool/:key — 删除模型
+router.delete('/admin/model-pool/:key', adminLimiter, authMiddleware, requireRole('admin'), ctrl.removeModel);
+
+// PATCH /api/admin/model-pool/:key/toggle — 启停模型
+router.patch('/admin/model-pool/:key/toggle', adminLimiter, authMiddleware, requireRole('admin'), ctrl.toggleModel);
 
 // PUT /api/admin/model-pool/:key/gray — 灰度百分比
 router.put('/admin/model-pool/:key/gray', adminLimiter, authMiddleware, requireRole('admin'), ctrl.setGrayPercent);

@@ -151,7 +151,7 @@ export const WORKFLOW_DEFINITIONS = {
       { order: 2, key: 'compliance_check',    label: '合规校验',          category: 'text',  taskType: 'compliance',   enabled: true, required: true,  allowModel: false, timeout: 10_000 },
       { order: 3, key: 'prompt_wrap',         label: '提示词封装',        category: 'text',  taskType: 'prompt_wrap',  enabled: true, required: true,  allowModel: false, timeout: 10_000 },
       { order: 4, key: 'text_prepare',        label: '文案预处理',        category: 'text',  taskType: 'text_prep',    enabled: true, required: true,  allowModel: false, timeout: 5_000 },
-      { order: 5, key: 'voice_synthesis',     label: '语音模型配音',      category: 'voice', taskType: 'tts',          enabled: true, required: true,  allowModel: true,  timeout: 120_000 },
+      { order: 5, key: 'voice_dub',            label: '语音模型配音',      category: 'voice', taskType: 'tts',          enabled: true, required: true,  allowModel: true,  timeout: 120_000 },
       { order: 6, key: 'audio_mix',           label: '音频合成',          category: 'audio', taskType: 'audio_mix',    enabled: false,required: false, allowModel: true,  timeout: 60_000 },
       { order: 7, key: 'noise_reduce',        label: '降噪规整',          category: 'audio', taskType: 'denoise',      enabled: true, required: false, allowModel: true,  timeout: 60_000 },
       { order: 8, key: 'pack_export',         label: '输出',              category: 'text',  taskType: 'export',       enabled: true, required: true,  allowModel: false, timeout: 10_000 },
