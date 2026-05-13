@@ -18,7 +18,8 @@ import { securityConfig } from '../config/index.js';
 function getAppCredentials() {
   try {
     return JSON.parse(securityConfig.apiAppCredentials);
-  } catch {
+  } catch (e) {
+    logger.warn('[Signature] API AppCredentials 解析失败，签名校验将全部拒绝', { error: e.message });
     return {};
   }
 }

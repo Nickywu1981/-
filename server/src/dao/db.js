@@ -9,7 +9,8 @@ async function loadMockStore() {
   if (mockStore) return mockStore;
   try {
     mockStore = (await import('../mock/store.js')).default;
-  } catch {
+  } catch (e) {
+    logger.warn('[DB] Mock store 加载失败，降级为空存储', { error: e.message });
     mockStore = {};
   }
   return mockStore;
