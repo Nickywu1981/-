@@ -6,7 +6,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { validate } from '../utils/validate.js';
 import * as ctrl from '../controller/e2bController.js';
-import { e2bLimiter, e2bExecuteLimiter } from '../middleware/rateLimiter.js';
+import { e2bLimiter, e2bExecuteLimiter, e2bListLimiter, e2bDestroyLimiter } from '../middleware/rateLimiter.js';
 
 const router = Router();
 
@@ -21,8 +21,8 @@ const sandboxIdSchema = z.object({
 
 router.post('/sandbox', e2bLimiter, ctrl.createSandbox);
 router.post('/sandbox/:sandboxId/execute', e2bExecuteLimiter, validate(codeSchema), validate(sandboxIdSchema, 'params'), ctrl.executeCode);
-router.get('/sandbox/:sandboxId', validate(sandboxIdSchema, 'params'), ctrl.getSandbox);
-router.get('/sandboxes', ctrl.listSandboxes);
-router.delete('/sandbox/:sandboxId', validate(sandboxIdSchema, 'params'), ctrl.destroySandbox);
+router.get('/sandbox/:sandboxId', e2bListLimiter, validate(sandboxIdSchema, 'params'), ctrl.getSandbox);
+router.get('/sandboxes', e2bListLimiter, ctrl.listSandboxes);
+router.delete('/sandbox/:sandboxId', e2bDestroyLimiter, validate(sandboxIdSchema, 'params'), ctrl.destroySandbox);
 
 export default router;

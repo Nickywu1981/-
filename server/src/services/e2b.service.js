@@ -1,14 +1,19 @@
 /**
- * Movio AI v4.2 — E2B Cloud Sandbox Service
+ * Movio AI v4.3 — E2B Cloud Sandbox Service
  * 云端代码执行沙箱：创建/执行/销毁/配额管理
  * v4.2: 归属校验 + 危险代码检测 + stderr脱敏 + Redis防孤儿化
+ * v4.3: 网络隔离 + 审计持久化 + BusinessError标准化 + 告警对接
  */
 import { Sandbox } from 'e2b';
+import crypto from 'crypto';
 import { BusinessError } from '../utils/businessError.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { e2bConfig as config, isProduction } from '../config/index.js';
 import { getRedis } from '../dao/redis.js';
+import pool from '../dao/db.js';
 import logger from '../utils/logger.js';
+import { checkAlerts } from './alertService.js';
+import { getDashboardSummary } from './monitorService.js';
 
 const SANDBOX_STORE = new Map();       // sandboxId → { sandbox, userId, createdAt }
 const IDLE_CLEANUP_MS = 10 * 60 * 1000; // 10 分钟空闲清理
@@ -132,6 +137,53 @@ function _sanitizeStderr(stderr) {
   return sanitized;
 }
 
+// ─────────────────── P2 #9 执行审计持久化 ───────────────────
+
+async function _logExecution({ sandboxId, userId, language, code, stdout, stderr, exitCode, elapsedMs, status, errorMsg }) {
+  try {
+    const codeHash = crypto.createHash('sha256').update(code || '').digest('hex').slice(0, 16);
+    await pool.query(
+      'INSERT INTO e2b_execution_log (sandbox_id, user_id, language, code_hash, stdout_len, stderr_len, exit_code, elapsed_ms, status, error_msg, create_time) VALUES (?,?,?,?,?,?,?,?,?,?,NOW())',
+      [sandboxId, userId, language || 'python', codeHash, (stdout || '').length, (stderr || '').length, exitCode ?? null, elapsedMs || 0, status, errorMsg || null],
+    );
+  } catch (err) {
+    logger.warn('[E2B] 审计日志写入失败', { sandboxId, error: err.message });
+  }
+}
+
+// ─────────────────── P2 #11 错误标准化 ───────────────────
+
+function _normalizeE2bError(err, sandboxId) {
+  const msg = (err?.message || '').toLowerCase();
+  if (msg.includes('timeout')) {
+    return new BusinessError(ERROR_CODE.INTERNAL_ERROR, '代码执行超时，请简化代码或增加超时时间');
+  }
+  if (msg.includes('quota') || msg.includes('rate limit')) {
+    return new BusinessError(ERROR_CODE.QUOTA_EXCEEDED, 'E2B 沙箱配额已用尽，请稍后重试');
+  }
+  if (msg.includes('not found') || msg.includes('not running')) {
+    return new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND, `沙箱 ${sandboxId} 不存在或已停止`);
+  }
+  if (msg.includes('api key') || msg.includes('unauthorized')) {
+    return new BusinessError(ERROR_CODE.INTERNAL_ERROR, 'E2B 服务配置异常，请联系管理员');
+  }
+  return new BusinessError(ERROR_CODE.INTERNAL_ERROR, '沙箱执行异常，请稍后重试');
+}
+
+// ─────────────────── P2 #12 告警 ───────────────────
+
+let _lastAlertCheck = 0;
+const ALERT_CHECK_INTERVAL_MS = 60_000;
+
+function _maybeCheckAlerts() {
+  const now = Date.now();
+  if (now - _lastAlertCheck < ALERT_CHECK_INTERVAL_MS) return;
+  _lastAlertCheck = now;
+  setImmediate(() => {
+    try { checkAlerts(getDashboardSummary()); } catch { /* 告警非关键路径 */ }
+  });
+}
+
 // ═══════════════════ 核心 API ═══════════════════
 
 export async function createSandbox(userId) {
@@ -147,10 +199,13 @@ export async function createSandbox(userId) {
       apiKey,
       template: config.template,
       timeoutMs: config.defaultTimeoutMs,
+      allowOutbound: config.allowOutbound ?? false, // P2 #6: 网络隔离
     });
   } catch (err) {
     logger.error('[E2B] 沙箱创建失败', { userId: uid, template: config.template, error: err.message });
-    throw err;
+    // P2 #12: 告警 — 创建失败可能表示 E2B 服务异常
+    _maybeCheckAlerts();
+    throw _normalizeE2bError(err, null); // P2 #11: 标准化错误
   }
 
   SANDBOX_STORE.set(sandbox.sandboxId, {
@@ -211,11 +266,16 @@ export async function executeCode(sandboxId, userId, code, language, timeoutMs) 
     });
   } catch (err) {
     logger.error('[E2B] 代码执行失败', { sandboxId, userId: String(userId), language: lang, codeLength: code.length, error: err.message });
-    throw err;
+    _logExecution({ sandboxId, userId: String(userId), language: lang, code, stderr: err.message, exitCode: null, elapsedMs: Date.now() - t0, status: 0, errorMsg: err.message }).catch(() => {});
+    _maybeCheckAlerts(); // P2 #12
+    throw _normalizeE2bError(err, sandboxId); // P2 #11
   }
 
   const elapsed = Date.now() - t0;
   logger.info('[E2B] 代码执行完成', { sandboxId, userId: String(userId), language: lang, elapsedMs: elapsed, exitCode: result.exitCode });
+
+  // P2 #9: 审计日志（成功）
+  _logExecution({ sandboxId, userId: String(userId), language: lang, code, stdout: result.stdout, stderr: result.stderr, exitCode: result.exitCode, elapsedMs: elapsed, status: 1 }).catch(() => {});
 
   return {
     stdout: (result.stdout || '').slice(0, 100000),

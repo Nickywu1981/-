@@ -22,6 +22,8 @@ const PAYMENT_MAX = rateLimitConfig.paymentMax;
 const ADMIN_MAX = rateLimitConfig.adminMax;
 const E2B_MAX = rateLimitConfig.e2bMax;
 const E2B_EXECUTE_MAX = rateLimitConfig.e2bExecuteMax;
+const E2B_READ_MAX = rateLimitConfig.e2bReadMax;
+const E2B_DELETE_MAX = rateLimitConfig.e2bDeleteMax;
 
 // ==================== 并发控制 ====================
 
@@ -189,6 +191,28 @@ export const e2bExecuteLimiter = rateLimit({
   validate: { xForwardedForHeader: false },
   store: new RedisRateLimitStore(60000),
   message: { code: 429, msg: '代码执行过于频繁，请稍后再试', data: null },
+});
+
+/** E2B 沙箱读取限流 — 查询沙箱状态/列表 */
+export const e2bListLimiter = rateLimit({
+  windowMs: 60000,
+  max: E2B_READ_MAX,
+  standardHeaders: true,
+  legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
+  store: new RedisRateLimitStore(60000),
+  message: { code: 429, msg: '请求过于频繁，请稍后再试', data: null },
+});
+
+/** E2B 沙箱删除限流 — 销毁操作 */
+export const e2bDestroyLimiter = rateLimit({
+  windowMs: 60000,
+  max: E2B_DELETE_MAX,
+  standardHeaders: true,
+  legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
+  store: new RedisRateLimitStore(60000),
+  message: { code: 429, msg: '删除操作过于频繁，请稍后再试', data: null },
 });
 
 /** 通用限流器 —— 用于读密集型路由的通用保护 */

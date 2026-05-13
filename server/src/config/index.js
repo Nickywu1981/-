@@ -131,6 +131,8 @@ const config = {
     verifyMax: parseInt(process.env.RATE_LIMIT_VERIFY_MAX, 10) || 5,
     e2bMax: parseInt(process.env.RATE_LIMIT_E2B_MAX, 10) || 5,
     e2bExecuteMax: parseInt(process.env.RATE_LIMIT_E2B_EXECUTE_MAX, 10) || 10,
+    e2bReadMax: parseInt(process.env.RATE_LIMIT_E2B_READ_MAX, 10) || 30,
+    e2bDeleteMax: parseInt(process.env.RATE_LIMIT_E2B_DELETE_MAX, 10) || 10,
   },
 
   jwtRefreshSecret: (() => {
@@ -248,6 +250,7 @@ const config = {
     template: process.env.E2B_TEMPLATE || 'code-interpreter-v2',
     defaultTimeoutMs: parseInt(process.env.E2B_TIMEOUT_MS || '300000', 10),
     maxSandboxesPerUser: parseInt(process.env.E2B_MAX_PER_USER || '3', 10),
+    allowOutbound: process.env.E2B_ALLOW_OUTBOUND !== 'false', // 默认允许外连，生产建议关闭
   },
 
   bull: {
