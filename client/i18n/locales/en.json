@@ -838,7 +838,71 @@
     "id": "ID",
     "item_unit": "items",
     "all_status": "All Statuses",
-    "all_audit": "All Audit"
+    "all_audit": "All Audit",
+    "seconds": "s"
+  },
+  "ecommerce": {
+    "title": "AI E-Commerce Content Creation",
+    "subtitle": "Images + Detail Pages + Videos + Copy, all-in-one AI generation",
+    "input": {
+      "title": "Enter Your Creative Brief",
+      "requirement": "Brief Description",
+      "placeholder": "Describe your product info and creative needs...",
+      "productName": "Product Name",
+      "productNameHint": "Enter product name for precise template matching",
+      "reference": "Reference Material",
+      "uploadHint": "Upload a product reference image, AI will generate poster copy automatically"
+    },
+    "config": {
+      "platform": "Target Platform",
+      "industry": "Select Industry",
+      "autoDetect": "Auto Detect",
+      "style": "Visual Style",
+      "voice": "Voiceover",
+      "voiceOff": "Voiceover Off",
+      "voiceOn": "Voiceover On",
+      "advanced": "Advanced Settings",
+      "videoDuration": "Video Duration",
+      "storyboardCount": "Storyboard Count",
+      "scenes": "Scenes"
+    },
+    "generating": "Generating...",
+    "generate": "Generate",
+    "intent": {
+      "detected": "Detected Intent"
+    },
+    "empty": {
+      "title": "Start Your Creation",
+      "description": "Enter product info and creative needs, AI will auto-detect intent and generate results",
+      "noMaterials": "No materials yet"
+    },
+    "flow": {
+      "intent": "Intent Analysis",
+      "compliance": "Compliance Check",
+      "expand": "Image Expansion",
+      "detail": "Detail Page",
+      "storyboard": "Script & Storyboard",
+      "dispatch": "Content Generation"
+    },
+    "compliance": {
+      "passed": "Compliance Check Passed"
+    },
+    "actions": {
+      "retouch": "Refine",
+      "regenerate": "Regenerate",
+      "edit": "Edit",
+      "newProject": "New Project",
+      "export": "Export"
+    },
+    "sellingPoints": "Key Selling Points",
+    "viralFormula": "Viral Formula",
+    "scriptTitle": "Video Script",
+    "hook": "Hook (First 3s)",
+    "sceneScripts": "Scene Scripts",
+    "finalOutput": "Final Output",
+    "voiceOutput": "Voice Output",
+    "videoStatus": "Video Status",
+    "videoProcessing": "Compositing video..."
   },
   "admin_nav": {
     "groups": {

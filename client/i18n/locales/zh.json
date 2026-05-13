@@ -838,7 +838,71 @@
     "id": "ID",
     "item_unit": "项",
     "all_status": "全部状态",
-    "all_audit": "全部审核"
+    "all_audit": "全部审核",
+    "seconds": "秒"
+  },
+  "ecommerce": {
+    "title": "AI 电商内容创作",
+    "subtitle": "图片 + 详情页 + 视频 + 文案，一站式智能生成",
+    "input": {
+      "title": "输入创作需求",
+      "requirement": "需求描述",
+      "placeholder": "描述你的产品信息和创作需求...",
+      "productName": "商品名称",
+      "productNameHint": "输入商品名称以精准匹配模板",
+      "reference": "参考素材",
+      "uploadHint": "上传商品参考图，AI 自动生成海报描述文案"
+    },
+    "config": {
+      "platform": "目标平台",
+      "industry": "选择行业",
+      "autoDetect": "自动检测",
+      "style": "画面风格",
+      "voice": "配音开关",
+      "voiceOff": "关闭配音",
+      "voiceOn": "开启配音",
+      "advanced": "高级设置",
+      "videoDuration": "视频时长",
+      "storyboardCount": "分镜数量",
+      "scenes": "场景数"
+    },
+    "generating": "生成中...",
+    "generate": "开始生成",
+    "intent": {
+      "detected": "识别意图"
+    },
+    "empty": {
+      "title": "开始你的创作",
+      "description": "输入产品信息和创作需求，AI 将自动识别意图并生成结果",
+      "noMaterials": "暂无创作素材"
+    },
+    "flow": {
+      "intent": "意图识别",
+      "compliance": "合规校验",
+      "expand": "素材扩图",
+      "detail": "详情页生成",
+      "storyboard": "脚本分镜",
+      "dispatch": "内容生成"
+    },
+    "compliance": {
+      "passed": "合规校验通过"
+    },
+    "actions": {
+      "retouch": "微调优化",
+      "regenerate": "重新生成",
+      "edit": "编辑",
+      "newProject": "新项目",
+      "export": "导出"
+    },
+    "sellingPoints": "核心卖点",
+    "viralFormula": "爆款公式",
+    "scriptTitle": "视频脚本",
+    "hook": "前3秒钩子",
+    "sceneScripts": "分镜脚本",
+    "finalOutput": "最终输出",
+    "voiceOutput": "配音输出",
+    "videoStatus": "视频状态",
+    "videoProcessing": "视频合成中..."
   },
   "admin_nav": {
     "groups": {
