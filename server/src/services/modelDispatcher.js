@@ -110,7 +110,7 @@ export function analyzeTask(taskType, input) {
   };
 }
 
-import { getDefaultModel } from './aiEngine.js';
+// getDefaultModel 已在 line 19 导入，此处不再重复 import
 
 // ==================== ModelMatcher — 五维评分匹配 ====================
 

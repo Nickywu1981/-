@@ -56,6 +56,7 @@ export const saveConfig = async (key, value, type, description, userId) => {
   const old = await getByKey(key);
   const oldValue = old?.config_value ?? null;
   await upsert(key, value, type, description);
+  try { await clearPublicCache(); } catch (e) { logger.warn('[SiteConfig] 缓存清除失败', { error: e.message }); }
   try {
     await insertLog({
       configKey: key,
@@ -70,6 +71,7 @@ export const deleteConfig = async (id, userId) => {
   const row = await getByKey(id);
   const result = await remove(id);
   if (result && row) {
+    try { await clearPublicCache(); } catch (e) { logger.warn('[SiteConfig] 缓存清除失败', { error: e.message }); }
     try {
       await insertLog({
         configKey: typeof row === 'object' ? row.config_key : id,
@@ -86,6 +88,7 @@ export const deleteConfigByKey = async (key, userId) => {
   const old = await getByKey(key);
   const result = await removeByKey(key);
   if (result && old) {
+    try { await clearPublicCache(); } catch (e) { logger.warn('[SiteConfig] 缓存清除失败', { error: e.message }); }
     try {
       await insertLog({ configKey: key, oldValue: old.config_value, newValue: null, changedBy: userId || null });
     } catch (err) { logger.warn('[SiteConfig] audit log insert failed', { key, error: err.message }); }

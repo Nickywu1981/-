@@ -176,7 +176,7 @@ export async function sendVerificationCode(email, scene = 'login') {
     };
     const fallback = fallbacks[templateCode] || { subject: '【AI电商工具箱】验证码', content: '<p>验证码：{code}</p>' };
     subject = renderTemplate(fallback.subject, { code });
-    html = renderTemplate(fallback.content, { code });
+    html = sanitizeHtml(renderTemplate(fallback.content, { code }));
   }
 
   const provider = getProvider();

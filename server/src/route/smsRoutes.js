@@ -41,8 +41,8 @@ const smsTemplateUpdateSchema = smsTemplateSchema.partial().omit({ template_code
 router.post('/send-code', codeLimiter, validate(sendCodeSchema), sendVerificationCode);
 router.post('/verify-code', verifyLimiter, validate(verifyCodeSchema), verifyCode);
 
-// 登录用户 — 手动触发通知短信
-router.post('/send', authMiddleware, codeLimiter, validate(sendNotificationSchema), sendNotification);
+// 管理后台 — 手动触发通知短信（需管理员权限，防止短信滥用）
+router.post('/send', authMiddleware, adminAuth, codeLimiter, validate(sendNotificationSchema), sendNotification);
 
 // 管理后台 — 模板管理 + 日志
 router.get('/templates', authMiddleware, adminAuth, listTemplates);
