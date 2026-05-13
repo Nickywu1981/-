@@ -61,7 +61,7 @@ export async function exportMultiSize(params) {
   if (!imageUrl) throw new BusinessError(400, 'imageUrl 为必填参数');
 
   // 下载原图
-  const resp = await fetch(imageUrl);
+  const resp = await fetch(imageUrl, { signal: AbortSignal.timeout(30000) });
   if (!resp.ok) throw new BusinessError(400, `下载图片失败: HTTP ${resp.status}`);
   const sourceBuffer = Buffer.from(await resp.arrayBuffer());
 

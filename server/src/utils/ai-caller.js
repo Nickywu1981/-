@@ -42,6 +42,7 @@ export async function call(endpoint, apiKey, params, options = {}) {
       });
 
       clearTimeout(timeout);
+      try { controller.abort(); } catch { /* signal already aborted */ }
 
       if (!response.ok) {
         const errorBody = await response.text();
@@ -58,6 +59,7 @@ export async function call(endpoint, apiKey, params, options = {}) {
       return result;
     } catch (err) {
       if (timeout) clearTimeout(timeout);
+      try { controller.abort(); } catch { /* signal already aborted */ }
       lastError = err;
 
       if (breaker instanceof CircuitBreaker) {

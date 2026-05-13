@@ -142,7 +142,7 @@ async function processLongImageJob(job, params) {
       });
       const imgUrl = genResult?.images?.[0]?.url || genResult?.file_url || genResult?.url;
       if (imgUrl) {
-        const resp = await fetch(imgUrl);
+        const resp = await fetch(imgUrl, { signal: AbortSignal.timeout(30000) });
         if (!resp.ok) throw new BusinessError(500, `下载场景图失败: HTTP ${resp.status}`);
         const buf = Buffer.from(await resp.arrayBuffer());
         imageBuffers.push(buf);

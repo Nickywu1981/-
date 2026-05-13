@@ -170,7 +170,7 @@ const config = {
     notifyConcurrency: parseInt(process.env.BULL_NOTIFY_CONCURRENCY || '10', 10),
   },
 
-  appUrl: process.env.APP_URL || 'https://movio.ai',
+  appUrl: process.env.APP_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : ''),
 
   geoIpApiUrl: process.env.GEOIP_API_URL || 'https://ip-api.com/json',
 
