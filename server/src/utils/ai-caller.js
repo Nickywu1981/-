@@ -7,6 +7,7 @@ import { CircuitBreaker } from './circuit-breaker.js';
 import { BusinessError } from './businessError.js';
 import { aiTimeoutMs } from '../config/index.js';
 import logger from './logger.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 const DEFAULT_TIMEOUT = aiTimeoutMs;
 const DEFAULT_RETRIES = 3;
@@ -24,7 +25,7 @@ export async function call(endpoint, apiKey, params, options = {}) {
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     // 熔断器检查（阻断请求而非仅记录）
     if (breaker instanceof CircuitBreaker && !breaker.isAvailable()) {
-      throw new BusinessError(503, `[${modelName || 'AI'}] 熔断器已开启，请稍后重试`);
+      throw new BusinessError(ERROR_CODE.EC_RATE_HEAVY, `[${modelName || "AI"}] Circuit breaker open,`);
     }
 
     let timeout;
@@ -48,13 +49,13 @@ export async function call(endpoint, apiKey, params, options = {}) {
       if (!response.ok) {
         const errorBody = await response.text();
         logger.error(`[${modelName || 'AI'}] upstream error`, { status: response.status, error: errorBody.substring(0, 200) });
-        throw new BusinessError(502, 'AI 服务暂时不可用，请稍后重试');
+        throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
       }
 
       const MAX_AI_RESPONSE_SIZE = 10 * 1024 * 1024; // 10MB
       const contentLength = parseInt(response.headers.get('content-length') || '0', 10);
       if (contentLength > MAX_AI_RESPONSE_SIZE) {
-        throw new BusinessError(502, 'AI 服务响应异常（响应体过大）');
+        throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
       }
       const result = await response.json();
 

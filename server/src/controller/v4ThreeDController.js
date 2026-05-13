@@ -50,11 +50,11 @@ async function validateMagicBytes(filePath, ext) {
 }
 
 export const upload = wrapController(async (req, res) => {
-  if (!req.file) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '请上传 3D 模型文件');
+  if (!req.file) throw new BusinessError(ERROR_CODE.BAD_REQUEST);
   const ext = path.extname(req.file.originalname).toLowerCase();
   if (!await validateMagicBytes(req.file.path, ext)) {
     fs.unlink(req.file.path, () => {});
-    throw new BusinessError(ERROR_CODE.BAD_REQUEST, '文件格式与扩展名不匹配');
+    throw new BusinessError(ERROR_CODE.BAD_REQUEST);
   }
   const url = `/uploads/3d/${req.file.filename}`;
   logger.info(`[3D] 模型上传: ${req.file.filename} → ${url}`);
@@ -95,12 +95,12 @@ const DEMO_MODELS = {
 
 export const getDemo = wrapController(async (req, res) => {
   const file = DEMO_MODELS[req.validated.key];
-  if (!file) throw new BusinessError(ERROR_CODE.NOT_FOUND, '示例模型不存在');
+  if (!file) throw new BusinessError(ERROR_CODE.NOT_FOUND);
   const filePath = path.join(uploadDir, 'demo', file);
   try {
     await fs.promises.access(filePath);
   } catch {
-    throw new BusinessError(ERROR_CODE.NOT_FOUND, '示例模型文件不存在');
+    throw new BusinessError(ERROR_CODE.NOT_FOUND);
   }
   return res.sendFile(filePath);
 });

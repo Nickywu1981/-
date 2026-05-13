@@ -6,6 +6,7 @@ import { CircuitBreaker } from '../utils/circuit-breaker.js';
 import { aiCaller } from '../utils/ai-caller.js';
 import { BusinessError } from '../utils/businessError.js';
 import * as modelConfigDao from '../dao/modelConfigDao.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 let modelInstances = {};
 const TASK_MODEL_MAP = {
@@ -67,7 +68,7 @@ function getModelInstance(modelKey, registry) {
 async function singleMode(modelKey, params) {
   const registry = await loadRegistry();
   const model = getModelInstance(modelKey, registry);
-  if (!model || !model.endpoint) throw new BusinessError(400, `模型 ${modelKey} 不可用`);
+  if (!model || !model.endpoint) throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, `Model ${modelKey} unavailable`);
 
   const start = Date.now();
   let status = 'success';
@@ -100,7 +101,7 @@ async function mixedMode(taskType, params) {
     .filter(k => { const m = getModelInstance(k, registry); return m && m.breaker.isAvailable(); });
 
   if (candidates.length === 0) {
-    throw new BusinessError(503, '所有可用模型暂不可用，请稍后重试');
+    throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
   }
 
   return singleMode(candidates[0], params);
@@ -130,7 +131,7 @@ export async function routeModel({ mode = 'mixed', taskType, modelKey, customMod
 
 export function resetBreaker(modelKey) {
   const instance = modelInstances[modelKey];
-  if (!instance) throw new BusinessError(404, `模型 ${modelKey} 不存在`);
+  if (!instance) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND, `Model ${modelKey} not found`);
   instance.breaker.state = 'half-open';
   instance.breaker.failureCount = 0;
   return { modelKey, newState: 'half-open', message: '熔断器已重置为半开状态' };

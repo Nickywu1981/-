@@ -11,6 +11,7 @@ import { error } from '../utils/response.js';
 import { BusinessError } from '../utils/businessError.js';
 import logger from '../utils/logger.js';
 import { uploadConfig } from '../config/index.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const UPLOAD_DIR = path.join(__dirname, '../../uploads/images');
@@ -23,7 +24,7 @@ async function ensureUploadDir() {
     _dirReady = true;
   } catch (e) {
     logger.error('[Upload] 上传目录创建失败', { dir: UPLOAD_DIR, error: e.message });
-    throw new BusinessError(500, '文件存储不可用');
+    throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
   }
 }
 
@@ -85,7 +86,7 @@ function fileFilter(_req, file, cb) {
   if (allowed.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new BusinessError(400, `不支持的文件类型: ${file.mimetype}`), false);
+    cb(new BusinessError(ERROR_CODE.PARAM_INVALID, `Unsupported file type: ${file.mimetype}`), false);
   }
 }
 

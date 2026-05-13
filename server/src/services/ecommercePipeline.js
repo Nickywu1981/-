@@ -18,6 +18,7 @@ import { wrapPrompt } from './promptWrapper.js';
 import { geoGuard } from './geoGuardService.js';
 import { buildMemoryInjection, rememberConversation } from './ltmEnhancer.js';
 import { gatewayDispatch } from '../gateway/aiGatewayHub.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 // ==================== 管道主入口 ====================
 
@@ -45,7 +46,7 @@ export async function processMerchantRequest(req = {}) {
   const pipelineLog = { steps: [] };
 
   if (!userInput || !userInput.trim()) {
-    throw new BusinessError(400, '请输入需求描述');
+    throw new BusinessError(ERROR_CODE.PARAM_MISSING);
   }
 
   // ── Step 0: GEO 地域守卫 (P2) ──
@@ -79,7 +80,7 @@ export async function processMerchantRequest(req = {}) {
   });
 
   if (wrapResult.blocked) {
-    const err = new BusinessError(422, wrapResult.blockReason || '内容不合规');
+    const err = new BusinessError(ERROR_CODE.CONTENT_MODERATION, wrapResult.blockReason || 'Content non-compliant');
     err.compliance = wrapResult.compliance;
     throw err;
   }
@@ -136,7 +137,7 @@ export async function processMerchantRequest(req = {}) {
     });
   } catch (err) {
     logger.error('[Pipeline] Gateway dispatch failed', err.message);
-    throw new BusinessError(502, `模型调度失败: ${err.message}`);
+    throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, `Model dispatch failed: ${err.message}`);
   }
   pipelineLog.steps.push({ step: 'dispatch', model: result?.model, ms: Date.now() - pipelineStart });
   pipelineLog.steps.push({ step: 'postprocess', totalMs: Date.now() - pipelineStart });

@@ -12,6 +12,7 @@ import { isProduction } from '../config/index.js';
 import logger from '../utils/logger.js';
 
 import * as creditDao from '../dao/creditDao.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 let PLANS_CACHE = null;
 let PLANS_CACHE_TS = 0;
@@ -39,7 +40,7 @@ async function getPlansFromDB() {
     return await loadPlansFromDB();
   } catch (e) {
     logger.error('[Payment] 加载套餐失败', { error: e.message });
-    throw new BusinessError(503, '会员套餐信息暂时不可用，请稍后再试');
+    throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
   }
 }
 
@@ -53,9 +54,9 @@ export async function getPlans() {
 export async function createPaymentOrder(userId, { planType, payChannel = 'wechat' }) {
   const dbPlans = await getPlansFromDB();
   const plan = dbPlans[planType];
-  if (!plan) throw new BusinessError(400, '无效套餐');
+  if (!plan) throw new BusinessError(ERROR_CODE.PARAM_INVALID);
 
-  if (!['wechat', 'alipay', 'unionpay'].includes(payChannel)) throw new BusinessError(400, '支付方式仅支持 wechat / alipay / unionpay');
+  if (!['wechat', 'alipay', 'unionpay'].includes(payChannel)) throw new BusinessError(ERROR_CODE.PARAM_INVALID);
 
   const result = await allinpayService.createUnifiedOrder({
     userId,
@@ -81,12 +82,12 @@ export async function createPaymentOrder(userId, { planType, payChannel = 'wecha
 // ==================== 沙箱支付（仅沙箱模式可用） ====================
 
 export async function sandboxPay(orderId) {
-  if (isProduction) throw new BusinessError(403, '沙箱支付不可在生产环境使用');
-  if (!allinpayConfig.isSandbox) throw new BusinessError(403, '沙箱支付仅开发环境可用');
+  if (isProduction) throw new BusinessError(ERROR_CODE.FORBIDDEN);
+  if (!allinpayConfig.isSandbox) throw new BusinessError(ERROR_CODE.FORBIDDEN);
 
   const order = await allinpayService.queryOrder(orderId);
-  if (!order) throw new BusinessError(404, '订单不存在');
-  if (order.status !== ORDER_STATUS.PENDING) throw new BusinessError(400, `订单状态异常: ${order.status}`);
+  if (!order) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
+  if (order.status !== ORDER_STATUS.PENDING) throw new BusinessError(ERROR_CODE.PAY_ORDER_EXPIRED, `Order status abnormal: ${order.status}`);
 
   // 模拟回调
   const mockBody = {
@@ -104,7 +105,7 @@ export async function sandboxPay(orderId) {
 
 export async function getOrder(reqsn) {
   const order = await allinpayService.queryOrder(reqsn);
-  if (!order) throw new BusinessError(404, '订单不存在');
+  if (!order) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   return order;
 }
 

@@ -8,6 +8,7 @@ import logger from '../utils/logger.js';
  * W1 使用 MySQL 轮询 (后续可选 Redis Queue/RabbitMQ)
  */
 import db from '../dao/db.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 /**
  * 提交任务
@@ -36,7 +37,7 @@ export async function getJobStatus(jobId, userId) {
       'SELECT id, user_id, task_type, status, progress, result_data, error_message, retry_count, created_at, started_at, completed_at FROM job_queue WHERE id = ? AND user_id = ?',
       [jobId, userId],
     );
-    if (rows.length === 0) throw new BusinessError(404, '任务不存在');
+    if (rows.length === 0) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
     return rows[0];
   } finally {
     conn.release();
@@ -147,9 +148,9 @@ export async function cancelJob(jobId, userId) {
       'SELECT id, status FROM job_queue WHERE id = ? AND user_id = ? FOR UPDATE',
       [jobId, userId],
     );
-    if (rows.length === 0) throw new BusinessError(404, '任务不存在');
+    if (rows.length === 0) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
     if (!['queued', 'processing'].includes(rows[0].status)) {
-      throw new BusinessError(400, `当前状态 ${rows[0].status} 不可取消`);
+      throw new BusinessError(ERROR_CODE.PARAM_ERROR, `Status ${rows[0].status} cannot be cancelled`);
     }
     await conn.query(
       "UPDATE job_queue SET status = 'cancelled', completed_at = NOW() WHERE id = ?",
@@ -175,9 +176,9 @@ export async function retryJob(jobId, userId) {
       'SELECT id, status FROM job_queue WHERE id = ? AND user_id = ?',
       [jobId, userId],
     );
-    if (rows.length === 0) throw new BusinessError(404, '任务不存在');
+    if (rows.length === 0) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
     if (!['failed', 'cancelled'].includes(rows[0].status)) {
-      throw new BusinessError(400, `当前状态 ${rows[0].status} 不可重试`);
+      throw new BusinessError(ERROR_CODE.PARAM_ERROR, `Status ${rows[0].status} cannot be retried`);
     }
     await conn.query(
       "UPDATE job_queue SET status = 'queued', retry_count = 0, error_message = NULL, completed_at = NULL WHERE id = ?",

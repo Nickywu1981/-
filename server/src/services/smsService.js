@@ -13,6 +13,7 @@ import { renderTemplate, generateCode } from '../utils/templateHelpers.js';
 import { registerInterval } from '../utils/shutdownRegistry.js';
 import logger from '../utils/logger.js';
 import * as codeStore from './codeStore.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 // 兜底: Redis 不可用时降级为进程内 Map
 const CODE_CACHE = new Map();
@@ -40,9 +41,9 @@ const providers = {
     async send(_payload) {
       const cfg = config.sms?.providers?.aliyun || {};
       if (!cfg.accessKeyId || !cfg.accessKeySecret) {
-        throw new BusinessError(503, '阿里云短信密钥未配置');
+        throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
       }
-      throw new BusinessError(503, '阿里云短信SDK未集成，请联系管理员');
+      throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
     },
   },
 
@@ -50,9 +51,9 @@ const providers = {
     async send(_payload) {
       const cfg = config.sms?.providers?.tencent || {};
       if (!cfg.secretId || !cfg.secretKey) {
-        throw new BusinessError(503, '腾讯云短信密钥未配置');
+        throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
       }
-      throw new BusinessError(503, '腾讯云短信SDK未集成，请联系管理员');
+      throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
     },
   },
 };

@@ -28,14 +28,14 @@ export const markAllRead = wrapController(async (req, res) => {
 
 export const sendNotification = wrapController(async (req, res) => {
     const { userId, type, title, content } = req.body;
-    if (!userId || !title || !content) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '缺少必要参数');
+    if (!userId || !title || !content) throw new BusinessError(ERROR_CODE.BAD_REQUEST);
     const id = await notificationService.sendToUser({ userId, type: type || 'system', title, content });
     return success(res, { id }, '发送成功');
   });
 
 export const deleteNotification = wrapController(async (req, res) => {
     const ok = await notificationService.deleteById(req.params.id, req.user.id);
-    if (!ok) throw new BusinessError(ERROR_CODE.NOT_FOUND, '通知不存在');
+    if (!ok) throw new BusinessError(ERROR_CODE.NOT_FOUND);
     return success(res, {}, '已删除');
   });
 

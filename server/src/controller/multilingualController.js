@@ -15,7 +15,7 @@ export const getScriptTypes = wrapController(async (_req, res) => {
 export const buildPrompt = wrapController(async (req, res) => {
     const { product, language, scriptType, platform, tone } = req.body;
     if (!product || !language || !scriptType) {
-      throw new BusinessError(ERROR_CODE.BAD_REQUEST, '缺少必要参数：product, language, scriptType');
+      throw new BusinessError(ERROR_CODE.BAD_REQUEST);
     }
     const result = multilingualService.buildMultilingualPrompt({ product, language, scriptType, platform, tone });
     return success(res, result);

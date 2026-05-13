@@ -3,6 +3,7 @@ import { BusinessError } from '../utils/businessError.js';
 import { CREDIT_RECORD_STATUS } from '../constants/domainStatus.js';
 import db from '../dao/db.js';
 import logger from '../utils/logger.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 // 操作消耗点数额
 const CONSUMPTION_RULES = {
@@ -51,7 +52,7 @@ export async function freezeCredit(userId, requestId, action, batchCount = 1, is
     const membership = await creditDao.getMembershipForUpdate(conn, userId);
     if (!membership) {
       await conn.rollback();
-      throw new BusinessError(403, '会员信息不存在');
+      throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
     }
 
     const plan = await creditDao.getPlanByType(membership.plan_type);
@@ -60,27 +61,27 @@ export async function freezeCredit(userId, requestId, action, batchCount = 1, is
     const monthlyUsed = await creditDao.getMonthlyUsedCredits(userId, conn);
     if (plan && plan.daily_limit > 0 && dailyUsed + consumedAmount > plan.daily_limit) {
       await conn.rollback();
-      throw new BusinessError(4103, '超出每日消费上限');
+      throw new BusinessError(ERROR_CODE.QUOTA_EXCEEDED);
     }
     if (plan && plan.monthly_limit > 0 && monthlyUsed + consumedAmount > plan.monthly_limit) {
       await conn.rollback();
-      throw new BusinessError(4103, '超出每月消费上限');
+      throw new BusinessError(ERROR_CODE.QUOTA_EXCEEDED);
     }
     if (plan && plan.batch_limit > 0 && batchCount > plan.batch_limit) {
       await conn.rollback();
-      throw new BusinessError(4103, `单次批量上限为 ${plan.batch_limit} 张`);
+      throw new BusinessError(ERROR_CODE.QUOTA_EXCEEDED, `Batch limit: ${plan.batch_limit} images`);
     }
 
     const creditBefore = membership.credit_balance;
     if (creditBefore < consumedAmount) {
       await conn.rollback();
-      throw new BusinessError(4103, '点数不足，请升级会员');
+      throw new BusinessError(ERROR_CODE.QUOTA_EXCEEDED);
     }
 
     const ok = await creditDao.updateCreditBalance(userId, -consumedAmount, conn);
     if (!ok) {
       await conn.rollback();
-      throw new BusinessError(500, '扣费失败');
+      throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
     }
 
     const creditAfter = creditBefore - consumedAmount;
@@ -113,7 +114,7 @@ export async function confirmCharge(requestId) {
     const record = await creditDao.getConsumptionByRequestIdForUpdate(conn, requestId);
     if (!record) {
       await conn.rollback();
-      throw new BusinessError(404, '预扣记录不存在');
+      throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
     }
     if (record.status === CREDIT_RECORD_STATUS.CONFIRMED) {
       await conn.rollback();
@@ -144,7 +145,7 @@ export async function rollbackCharge(requestId, remark = '') {
     const record = await creditDao.getConsumptionByRequestIdForUpdate(conn, requestId);
     if (!record) {
       await conn.rollback();
-      throw new BusinessError(404, '预扣记录不存在');
+      throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
     }
     if (record.status === CREDIT_RECORD_STATUS.ROLLED_BACK) {
       await conn.rollback();
@@ -179,7 +180,7 @@ export async function consumeCredit(userId, action, batchCount = 1) {
     const membership = await creditDao.getMembershipForUpdate(conn, userId);
     if (!membership) {
       await conn.rollback();
-      throw new BusinessError(403, '会员信息不存在');
+      throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
     }
 
     const plan = await creditDao.getPlanByType(membership.plan_type);
@@ -187,20 +188,20 @@ export async function consumeCredit(userId, action, batchCount = 1) {
     if (plan) {
       if (plan.batch_limit > 0 && batchCount > plan.batch_limit) {
         await conn.rollback();
-        throw new BusinessError(4103, `单次批量上限为 ${plan.batch_limit} 张`);
+        throw new BusinessError(ERROR_CODE.QUOTA_EXCEEDED, `Batch limit: ${plan.batch_limit} images`);
       }
       if (plan.daily_limit > 0) {
         const dailyUsed = await creditDao.getDailyUsedCredits(userId, conn);
         if (dailyUsed + consumed > plan.daily_limit) {
           await conn.rollback();
-          throw new BusinessError(4103, '超出每日消费上限');
+          throw new BusinessError(ERROR_CODE.QUOTA_EXCEEDED);
         }
       }
       if (plan.monthly_limit > 0) {
         const monthlyUsed = await creditDao.getMonthlyUsedCredits(userId, conn);
         if (monthlyUsed + consumed > plan.monthly_limit) {
           await conn.rollback();
-          throw new BusinessError(4103, '超出每月消费上限');
+          throw new BusinessError(ERROR_CODE.QUOTA_EXCEEDED);
         }
       }
     }
@@ -208,13 +209,13 @@ export async function consumeCredit(userId, action, batchCount = 1) {
     const creditBefore = membership.credit_balance;
     if (creditBefore < consumed) {
       await conn.rollback();
-      throw new BusinessError(4103, '点数不足');
+      throw new BusinessError(ERROR_CODE.QUOTA_EXCEEDED);
     }
 
     const ok = await creditDao.updateCreditBalance(userId, -consumed, conn);
     if (!ok) {
       await conn.rollback();
-      throw new BusinessError(500, '扣费失败');
+      throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
     }
 
     const creditAfter = creditBefore - consumed;
@@ -281,7 +282,7 @@ export async function checkIn(userId) {
     const todayRow = await creditDao.getCheckInByDate(userId, today, conn);
     if (todayRow) {
       await conn.rollback();
-      throw new BusinessError(409, '今日已签到');
+      throw new BusinessError(ERROR_CODE.RESOURCE_DUPLICATE);
     }
 
     const prevRow = await creditDao.getLastCheckIn(userId);
@@ -356,7 +357,7 @@ export async function shareReward(userId) {
     const membership = await creditDao.getMembershipForUpdate(conn, userId);
     if (!membership) {
       await conn.rollback();
-      throw new BusinessError(404, '会员不存在');
+      throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
     }
 
     const creditBefore = membership.credit_balance;

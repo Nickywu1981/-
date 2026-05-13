@@ -7,6 +7,7 @@
 
 import { BusinessError } from '../utils/businessError.js';
 import logger from '../utils/logger.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 // ==================== 白底图生成 ====================
 
@@ -15,7 +16,7 @@ import logger from '../utils/logger.js';
  */
 export async function generateWhiteBg(params) {
   const { imageUrl, productName = '', size = '1024x1024' } = params;
-  if (!imageUrl) throw new BusinessError(400, 'imageUrl 为必填参数');
+  if (!imageUrl) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
 
   const prompt = `professional e-commerce product photography, pure white background #FFFFFF, studio lighting, product centered, high resolution commercial photography, isolated product shot${productName ? `, product: ${productName}` : ''}`;
 
@@ -52,7 +53,7 @@ export async function generateWhiteBg(params) {
         fallback: true,
       };
     } catch (e2) {
-      throw new BusinessError(500, '白底图生成失败，请稍后重试');
+      throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
     }
   }
 }
@@ -64,8 +65,8 @@ export async function generateWhiteBg(params) {
  */
 export async function replaceBackground(params) {
   const { imageUrl, bgPrompt, productName = '', size = '1024x1024' } = params;
-  if (!imageUrl) throw new BusinessError(400, 'imageUrl 为必填参数');
-  if (!bgPrompt) throw new BusinessError(400, 'bgPrompt 为必填参数（背景描述）');
+  if (!imageUrl) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
+  if (!bgPrompt) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
 
   const prompt = `professional product photography, ${bgPrompt}, ${productName}, commercial quality, realistic lighting, 8k`;
 
@@ -86,7 +87,7 @@ export async function replaceBackground(params) {
     };
   } catch (e) {
     logger.error('[BgRemoval] 背景替换失败', { error: e.message });
-    throw new BusinessError(500, '背景替换失败，请稍后重试');
+    throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
   }
 }
 
@@ -96,7 +97,7 @@ export async function replaceBackground(params) {
  * 批量生成白底图
  */
 export async function batchWhiteBg(imageUrls, productName = '') {
-  if (!imageUrls?.length) throw new BusinessError(400, '至少需要一张图片');
+  if (!imageUrls?.length) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
 
   const results = [];
   for (let i = 0; i < imageUrls.length; i++) {

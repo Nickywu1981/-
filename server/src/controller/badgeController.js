@@ -12,7 +12,7 @@ export const listBadges = wrapController(async (req, res) => {
 
 export const getBadge = wrapController(async (req, res) => {
     const badge = await badgeService.getBadgeById(req.params.id);
-    if (!badge) throw new BusinessError(ERROR_CODE.NOT_FOUND, '标签不存在');
+    if (!badge) throw new BusinessError(ERROR_CODE.NOT_FOUND);
     return success(res, badge);
 });
 
@@ -29,12 +29,12 @@ export const createBadge = wrapController(async (req, res) => {
 
 export const updateBadge = wrapController(async (req, res) => {
     const ok = await badgeService.updateBadge(req.params.id, req.body);
-    if (!ok) throw new BusinessError(ERROR_CODE.NOT_FOUND, '勋章不存在');
+    if (!ok) throw new BusinessError(ERROR_CODE.NOT_FOUND);
     return success(res, null, '更新成功');
 });
 
 export const deleteBadge = wrapController(async (req, res) => {
     const ok = await badgeService.deleteBadge(req.params.id);
-    if (!ok) throw new BusinessError(ERROR_CODE.NOT_FOUND, '勋章不存在');
+    if (!ok) throw new BusinessError(ERROR_CODE.NOT_FOUND);
     return success(res, null, '删除成功');
 });

@@ -7,6 +7,7 @@ import { registerModel } from '../aiEngine.js';
 import { BusinessError } from '../../utils/businessError.js';
 import { adapterConfig } from '../../config/index.js';
 import logger from '../../utils/logger.js';
+import { ERROR_CODE } from '../../constants/errorCode.js';
 
 const API_KEY = adapterConfig.openai.apiKey;
 const BASE_URL = adapterConfig.openai.baseUrl;
@@ -14,7 +15,7 @@ const BASE_URL = adapterConfig.openai.baseUrl;
 // ==================== gpt-image-2 txt2img ====================
 
 async function gptImageTxt2Img(input, onProgress) {
-  if (!API_KEY) throw new BusinessError(503, 'OPENAI_API_KEY 未配置，gpt-image-2 不可用');
+  if (!API_KEY) throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
 
   const {
     prompt, negativePrompt = '', size = '1024x1024', n = 1,
@@ -45,7 +46,7 @@ async function gptImageTxt2Img(input, onProgress) {
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     logger.error(`[GptImage] API 请求失败 ${res.status}: ${err.error?.message || res.statusText}`);
-    throw new BusinessError(502, '图片生成服务暂时不可用，请稍后重试');
+    throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
   }
 
   onProgress?.(70);

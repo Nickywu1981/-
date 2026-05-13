@@ -15,7 +15,7 @@ export const listOrders = wrapController(async (req, res) => {
 
 export const getOrderDetail = wrapController(async (req, res) => {
   const order = await commerceDao.getEnterpriseOrderById(req.params.id, req.tenantId);
-  if (!order) throw new BusinessError(ERROR_CODE.NOT_FOUND, '订单不存在');
+  if (!order) throw new BusinessError(ERROR_CODE.NOT_FOUND);
   return success(res, order);
 });
 

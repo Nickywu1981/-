@@ -20,6 +20,6 @@ export const checkCompliance = wrapController(async (req, res) => {
 export const getRules = wrapController(async (req, res) => {
   const rules = complianceService.getPlatformCompliance(req.params.code)
     || complianceService.getRegionCompliance(req.params.code);
-  if (!rules) throw new BusinessError(ERROR_CODE.NOT_FOUND, '未找到合规规则');
+  if (!rules) throw new BusinessError(ERROR_CODE.NOT_FOUND);
   return success(res, rules);
 });

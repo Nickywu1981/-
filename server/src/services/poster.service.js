@@ -8,6 +8,7 @@ import { BusinessError } from '../utils/businessError.js';
 import { submitJob } from './job-queue.service.js';
 import * as moderationService from './moderation.service.js';
 import db from '../dao/db.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 const POSTER_SIZES = {
   product:    { width: 1200, height: 1800, ratio: '2:3', label: '产品营销海报' },
@@ -36,7 +37,7 @@ export async function generatePoster(userId, { posterType, prompt, enhancedPromp
 
   const auditResult = await moderationService.moderateText(finalPrompt, userId, { stage: 'input' });
   if (auditResult.action === 'block') {
-    throw new BusinessError(422, '提示词包含违规内容，请修改后重试');
+    throw new BusinessError(ERROR_CODE.CONTENT_MODERATION);
   }
 
   return submitJob(userId, `poster_${posterType}`, {

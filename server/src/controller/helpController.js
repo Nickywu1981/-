@@ -14,7 +14,7 @@ export const getFaqs = wrapController(async (req, res) => {
 
 export const getFaqById = wrapController(async (req, res) => {
     const faq = await helpService.getFaqById(req.params.id);
-    if (!faq) throw new BusinessError(ERROR_CODE.NOT_FOUND, 'FAQ不存在');
+    if (!faq) throw new BusinessError(ERROR_CODE.NOT_FOUND);
     success(res, faq);
 });
 

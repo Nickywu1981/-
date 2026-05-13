@@ -13,6 +13,7 @@ import * as dao from '../dao/abExperimentDao.js';
 import * as modelPoolService from './modelPoolService.js';
 import { BusinessError } from '../utils/businessError.js';
 import logger from '../utils/logger.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 // 运行中实验缓存 (避免每次请求都查数据库)
 const _activeCache = new Map();
@@ -22,17 +23,17 @@ const CACHE_TTL = 30_000; // 30s
 
 export async function createExperiment(data) {
   if (!data.variants || data.variants.length < 2) {
-    throw new BusinessError(400, '至少需要2个变体才能创建实验');
+    throw new BusinessError(ERROR_CODE.PARAM_MISSING);
   }
   if (!data.metrics || data.metrics.length === 0) {
-    throw new BusinessError(400, '至少需要1个指标');
+    throw new BusinessError(ERROR_CODE.PARAM_MISSING);
   }
   return dao.create(data);
 }
 
 export async function getExperiment(id) {
   const exp = await dao.getById(id);
-  if (!exp) throw new BusinessError(404, '实验不存在');
+  if (!exp) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   return exp;
 }
 
@@ -42,13 +43,13 @@ export async function listExperiments(status) {
 
 export async function updateExperiment(id, data) {
   const exp = await dao.getById(id);
-  if (!exp) throw new BusinessError(404, '实验不存在');
+  if (!exp) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   if (exp.status === 'running') {
     // 运行中只允许暂停或修改有限字段
     const allowed = ['description'];
     for (const k of Object.keys(data)) {
       if (!allowed.includes(k)) {
-        throw new BusinessError(400, `运行中的实验不可修改 ${k}，请先暂停`);
+        throw new BusinessError(ERROR_CODE.PARAM_ERROR, `Running experiment, cannot modify ${k}, pause first`);
       }
     }
   }
@@ -59,15 +60,15 @@ export async function updateExperiment(id, data) {
 
 export async function deleteExperiment(id) {
   const ok = await dao.remove(id);
-  if (!ok) throw new BusinessError(404, '实验不存在');
+  if (!ok) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   _activeCache.delete('all');
   return true;
 }
 
 export async function startExperiment(id) {
   const exp = await dao.getById(id);
-  if (!exp) throw new BusinessError(404, '实验不存在');
-  if (exp.status === 'running') throw new BusinessError(400, '实验已在运行中');
+  if (!exp) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
+  if (exp.status === 'running') throw new BusinessError(ERROR_CODE.PARAM_ERROR);
   await dao.update(id, { status: 'running', startAt: new Date() });
   _activeCache.delete('all');
   return dao.getById(id);
@@ -75,8 +76,8 @@ export async function startExperiment(id) {
 
 export async function pauseExperiment(id) {
   const exp = await dao.getById(id);
-  if (!exp) throw new BusinessError(404, '实验不存在');
-  if (exp.status !== 'running') throw new BusinessError(400, '实验非运行状态');
+  if (!exp) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
+  if (exp.status !== 'running') throw new BusinessError(ERROR_CODE.PARAM_ERROR);
   await dao.update(id, { status: 'paused' });
   _activeCache.delete('all');
   return dao.getById(id);
@@ -231,7 +232,7 @@ function _regBeta(x, a, b) {
 
 export async function getExperimentResults(experimentId, days = 7) {
   const exp = await dao.getById(experimentId);
-  if (!exp) throw new BusinessError(404, '实验不存在');
+  if (!exp) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
 
   const stats = await dao.getEventStats(experimentId, days);
 

@@ -4,6 +4,7 @@
 import * as wfDao from '../dao/workflowDao.js';
 import logger from '../utils/logger.js';
 import { BusinessError } from '../utils/businessError.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 // ─── 模板操作 ───
 export async function listTemplates(filter) {
@@ -32,8 +33,8 @@ export async function deleteTemplate(id) {
 // ─── 作业执行 ───
 export async function executeWorkflow(templateId, userId, inputData) {
   const template = await getTemplate(templateId);
-  if (!template) throw new BusinessError(404, '模板不存在');
-  if (template.status !== 'published') throw new BusinessError(400, '模板未发布');
+  if (!template) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
+  if (template.status !== 'published') throw new BusinessError(ERROR_CODE.PARAM_INVALID);
 
   const jobId = await wfDao.createJob({
     templateId: template.id,
@@ -66,9 +67,9 @@ export async function listJobs(userId, pagination) {
 
 export async function cancelJob(id) {
   const job = await wfDao.getJob(id);
-  if (!job) throw new BusinessError(404, '作业不存在');
+  if (!job) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   if (!['pending', 'running'].includes(job.status)) {
-    throw new BusinessError(400, '仅可取消等待/运行中的作业');
+    throw new BusinessError(ERROR_CODE.PARAM_ERROR);
   }
   return wfDao.updateJobStatus(id, { status: 'cancelled' });
 }
@@ -121,7 +122,7 @@ async function executeStep(step, context) {
   const withTimeout = (promise) => {
     return Promise.race([
       promise,
-      new Promise((_, reject) => setTimeout(() => reject(new BusinessError(504, `步骤执行超时: ${step.type}`)), stepTimeout)),
+      new Promise((_, reject) => setTimeout(() => reject(new BusinessError(ERROR_CODE.INTERNAL_ERROR, `Step timeout: ${step.type}`)), stepTimeout)),
     ]);
   };
 
@@ -181,7 +182,7 @@ async function executeStep(step, context) {
     }
 
     default:
-      throw new BusinessError(400, `不支持的步骤类型: ${step.type}`);
+      throw new BusinessError(ERROR_CODE.PARAM_INVALID, `Unsupported step type: ${step.type}`);
   }
 }
 

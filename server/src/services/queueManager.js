@@ -19,6 +19,7 @@
 import logger from '../utils/logger.js';
 import { BusinessError } from '../utils/businessError.js';
 import { redisConfig, bullConfig } from '../config/index.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 let Queue, Worker;
 let bullmqAvailable = false;
@@ -66,8 +67,8 @@ const workerInstances = new Map();
 // ==================== 队列初始化 ====================
 
 export function getQueue(name) {
-  if (!QUEUES[name]) throw new BusinessError(500, `未定义的队列: ${name}`);
-  if (!redisAvailable) throw new BusinessError(503, `Redis 不可用: ${name}`);
+  if (!QUEUES[name]) throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, `Undefined queue: ${name}`);
+  if (!redisAvailable) throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, `Redis unavailable: ${name}`);
 
   if (!queueInstances.has(name)) {
     queueInstances.set(name, new Queue(name, {
@@ -91,7 +92,7 @@ export function registerWorker(name, processor) {
   if (!redisAvailable) {
     return null;
   }
-  if (!QUEUES[name]) throw new BusinessError(500, `未定义的队列: ${name}`);
+  if (!QUEUES[name]) throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, `Undefined queue: ${name}`);
   if (workerInstances.has(name)) return workerInstances.get(name);
 
   const worker = new Worker(name, processor, {

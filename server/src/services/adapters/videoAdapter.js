@@ -7,6 +7,7 @@ import { registerModel } from '../aiEngine.js';
 import { BusinessError } from '../../utils/businessError.js';
 import { adapterConfig } from '../../config/index.js';
 import logger from '../../utils/logger.js';
+import { ERROR_CODE } from '../../constants/errorCode.js';
 
 const API_KEY = adapterConfig.openai.apiKey;
 const BASE_URL = adapterConfig.openai.baseUrl;
@@ -40,7 +41,7 @@ async function submitVideoTask(modelId, input) {
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     logger.error(`[Video] ${modelId} 提交失败 ${res.status}: ${err.error?.message || res.statusText}`);
-    throw new BusinessError(502, '视频生成服务暂时不可用，请稍后重试');
+    throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
   }
 
   return res.json();
@@ -61,7 +62,7 @@ async function pollVideoTask(taskId, onProgress, timeoutMs = 600000) {
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       logger.error(`[Video] 轮询失败 ${res.status}: ${err.error?.message || res.statusText}`);
-      throw new BusinessError(502, '视频生成查询失败，请稍后重试');
+      throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
     }
 
     const data = await res.json();
@@ -72,7 +73,7 @@ async function pollVideoTask(taskId, onProgress, timeoutMs = 600000) {
     }
 
     if (data.status === 'failed') {
-      throw new BusinessError(500, `视频生成失败: ${data.error || '未知错误'}`);
+      throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND, `Video generation failed: ${data.error || "unknown error"}`);
     }
 
     const progress = data.progress || 0;
@@ -84,14 +85,14 @@ async function pollVideoTask(taskId, onProgress, timeoutMs = 600000) {
     await new Promise((r) => setTimeout(r, adapterConfig.pollIntervalMs.video));
   }
 
-  throw new BusinessError(504, '视频生成超时');
+  throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
 }
 
 // ==================== 通用视频推断工厂 ====================
 
 function makeVideoInfer(modelId) {
   return async function infer(input, onProgress) {
-    if (!API_KEY) throw new BusinessError(503, 'OPENAI_API_KEY 未配置，视频模型不可用');
+    if (!API_KEY) throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
 
     onProgress?.(5);
 
@@ -110,7 +111,7 @@ function makeVideoInfer(modelId) {
           mode: 'sync',
         };
       }
-      throw new BusinessError(500, `${modelId} 未返回任务ID`);
+      throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, `${modelId} returned no task ID`);
     }
 
     const result = await pollVideoTask(taskId, (p) => onProgress?.(10 + p * 0.9), 600000);

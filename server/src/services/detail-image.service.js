@@ -10,13 +10,14 @@ import * as moderationService from './moderation.service.js';
 import db from '../dao/db.js';
 import { gatewayInfer } from '../gateway/aiGatewayHub.js';
 import logger from '../utils/logger.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 /**
  * 从参考图提取商品信息（AI视觉分析）
  * 返回商品名称、品类、核心特征清单
  */
 export async function extractProductInfo(userId, { imageUrl }) {
-  if (!imageUrl) throw new BusinessError(400, '请提供参考图片URL');
+  if (!imageUrl) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
 
   const prompt = `Analyze this product image and return a JSON object with the following fields (respond in Chinese):
 {
@@ -44,12 +45,12 @@ Rules:
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       logger.warn('[extractProductInfo] AI response not valid JSON:', text.slice(0, 200));
-      throw new BusinessError(500, 'AI分析结果解析失败，请重试');
+      throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
     }
 
     const parsed = JSON.parse(jsonMatch[0]);
     if (!parsed.productName || !parsed.features?.length) {
-      throw new BusinessError(500, 'AI未能识别到足够的商品信息，请换一张清晰的商品图');
+      throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
     }
 
     return {
@@ -60,7 +61,7 @@ Rules:
   } catch (err) {
     if (err instanceof BusinessError) throw err;
     logger.error('[extractProductInfo] failed:', err.message);
-    throw new BusinessError(500, '商品信息提取失败，请稍后重试');
+    throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
   }
 }
 
@@ -68,12 +69,12 @@ Rules:
  * 详情图套图一键生成
  */
 export async function generateDetailSet(userId, { productName, productImages, highlights, template = 'standard' }) {
-  if (!productName) throw new BusinessError(400, '请提供商品名称');
-  if (!productImages || productImages.length === 0) throw new BusinessError(400, '请提供至少一张商品图');
+  if (!productName) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
+  if (!productImages || productImages.length === 0) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
 
   const auditResult = await moderationService.moderateText(productName, userId, { stage: 'input' });
   if (auditResult.action === 'block') {
-    throw new BusinessError(422, '内容包含违规信息');
+    throw new BusinessError(ERROR_CODE.CONTENT_MODERATION);
   }
 
   return submitJob(userId, 'detail_set_gen', {
@@ -106,13 +107,13 @@ export async function replicateDetail(userId, { referenceUrl, productName, produ
  * @param {number} [params.width] - 输出宽度
  */
 export async function generateLongImage(userId, { productName, scenes, platform, style, width = 750 }) {
-  if (!productName) throw new BusinessError(400, '请提供商品名称');
-  if (!scenes || scenes.length === 0) throw new BusinessError(400, '至少1个场景');
-  if (scenes.length > 20) throw new BusinessError(400, '最多20个场景');
+  if (!productName) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
+  if (!scenes || scenes.length === 0) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
+  if (scenes.length > 20) throw new BusinessError(ERROR_CODE.QUOTA_EXCEEDED);
 
   const auditResult = await moderationService.moderateText(productName, userId, { stage: 'input' });
   if (auditResult.action === 'block') {
-    throw new BusinessError(422, '内容包含违规信息');
+    throw new BusinessError(ERROR_CODE.CONTENT_MODERATION);
   }
 
   return submitJob(userId, 'detail_long_image', {

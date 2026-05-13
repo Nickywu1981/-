@@ -15,7 +15,7 @@ export const listTemplates = wrapController(async (req, res) => {
 
 export const getTemplateDetail = wrapController(async (req, res) => {
     const t = await promptService.useTemplate(req.user.id, +req.params.id);
-    if (!t) throw new BusinessError(ERROR_CODE.NOT_FOUND, '模板不存在');
+    if (!t) throw new BusinessError(ERROR_CODE.NOT_FOUND);
     success(res, t);
 });
 

@@ -11,7 +11,7 @@ export const listAllPlatforms = wrapController(async (_req, res) => {
 
 export const getPlatformConfig = wrapController(async (req, res) => {
     const config = platformDetailService.getPlatformConfig(req.params.code);
-    if (!config) throw new BusinessError(ERROR_CODE.NOT_FOUND, '平台不存在');
+    if (!config) throw new BusinessError(ERROR_CODE.NOT_FOUND);
     return success(res, config);
 });
 

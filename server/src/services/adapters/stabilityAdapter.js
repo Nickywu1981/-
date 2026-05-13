@@ -9,6 +9,7 @@ import { registerModel } from '../aiEngine.js';
 import { BusinessError } from '../../utils/businessError.js';
 import { adapterConfig } from '../../config/index.js';
 import logger from '../../utils/logger.js';
+import { ERROR_CODE } from '../../constants/errorCode.js';
 
 const API_KEY = adapterConfig.stability.apiKey;
 const BASE_URL = adapterConfig.stability.baseUrl;
@@ -16,7 +17,7 @@ const BASE_URL = adapterConfig.stability.baseUrl;
 // ==================== SDXL txt2img ====================
 
 async function stabilityTxt2Img(input, onProgress) {
-  if (!API_KEY) throw new BusinessError(503, 'STABILITY_API_KEY 未配置');
+  if (!API_KEY) throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
 
   const { prompt, negativePrompt = '', width = 1024, height = 1024, steps = 30, cfgScale = 7, seed = 0, stylePreset } = input;
 
@@ -44,7 +45,7 @@ async function stabilityTxt2Img(input, onProgress) {
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     logger.error(`[Stability] API 请求失败 ${res.status}: ${err.message || res.statusText}`);
-    throw new BusinessError(502, `Stability AI 服务暂时不可用，请稍后重试`);
+    throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, `Stability AI service unavailable,`);
   }
 
   onProgress?.(70);
@@ -63,7 +64,7 @@ async function stabilityTxt2Img(input, onProgress) {
 // ==================== img2img ====================
 
 async function stabilityImg2Img(input, onProgress) {
-  if (!API_KEY) throw new BusinessError(503, 'STABILITY_API_KEY 未配置');
+  if (!API_KEY) throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
 
   const { prompt, initImage, negativePrompt = '', width = 1024, height = 1024, strength = 0.7 } = input;
 
@@ -94,7 +95,7 @@ async function stabilityImg2Img(input, onProgress) {
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     logger.error(`[Stability] API 请求失败 ${res.status}: ${err.message || res.statusText}`);
-    throw new BusinessError(502, 'Stability AI 服务暂时不可用，请稍后重试');
+    throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
   }
 
   onProgress?.(80);

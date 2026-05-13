@@ -22,27 +22,27 @@ const BLOCKED_PROTOCOLS = ['ftp:', 'file:', 'gopher:', 'dict:'];
 
 export function validateExternalUrl(urlStr, label = 'URL') {
   if (!urlStr || typeof urlStr !== 'string') {
-    throw new BusinessError(ERROR_CODE.VALIDATION_ERROR, `${label} 无效`);
+    throw new BusinessError(ERROR_CODE.VALIDATION_ERROR, `${label} is invalid`);
   }
 
   let parsed;
   try {
     parsed = new URL(urlStr);
   } catch {
-    throw new BusinessError(ERROR_CODE.VALIDATION_ERROR, `${label} 格式不正确`);
+    throw new BusinessError(ERROR_CODE.VALIDATION_ERROR, `${label} has invalid format`);
   }
 
   if (BLOCKED_PROTOCOLS.includes(parsed.protocol)) {
-    throw new BusinessError(ERROR_CODE.VALIDATION_ERROR, `${label} 协议不受支持`);
+    throw new BusinessError(ERROR_CODE.VALIDATION_ERROR, `${label} uses unsupported protocol`);
   }
 
   if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
-    throw new BusinessError(ERROR_CODE.VALIDATION_ERROR, `${label} 仅支持 http/https`);
+    throw new BusinessError(ERROR_CODE.VALIDATION_ERROR, `${label} only supports http/https`);
   }
 
   const hostname = parsed.hostname;
   if (BLOCKED_HOSTS.some((re) => re.test(hostname))) {
-    throw new BusinessError(ERROR_CODE.VALIDATION_ERROR, `${label} 指向受限制的地址`);
+    throw new BusinessError(ERROR_CODE.VALIDATION_ERROR, `${label} points to a restricted address`);
   }
 
   return parsed;

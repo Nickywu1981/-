@@ -56,6 +56,6 @@ export const getPerformance = wrapController(async (req) => {
 export const getPerformanceSummary = wrapController(async (req) => {
   const query = req.validated || req.query;
   const { startDate, endDate } = query;
-  if (!startDate || !endDate) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '请提供统计起止日期');
+  if (!startDate || !endDate) throw new BusinessError(ERROR_CODE.BAD_REQUEST);
   return channelService.getPerformanceSummary(req.tenantId, startDate, endDate);
 });

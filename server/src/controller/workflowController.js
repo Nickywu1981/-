@@ -43,7 +43,7 @@ export const deleteTemplate = wrapController(async (req, res) => {
 export const execute = wrapController(async (req, res) => {
   const { templateId, inputData } = req.body;
   const uid = req.user?.id;
-  if (!uid) throw new BusinessError(ERROR_CODE.UNAUTHORIZED, '请先登录');
+  if (!uid) throw new BusinessError(ERROR_CODE.UNAUTHORIZED);
   const jobId = await wfService.executeWorkflow(templateId, uid, inputData || {});
   logger.info(`[Workflow] execute template=${templateId} job=${jobId}`);
   return success(res, { jobId }, '工作流已启动');
@@ -58,7 +58,7 @@ export const getJob = wrapController(async (req, res) => {
 export const listMyJobs = wrapController(async (req, res) => {
   const { page = 1, pageSize = 20 } = req.query;
   const uid = req.user?.id;
-  if (!uid) throw new BusinessError(ERROR_CODE.UNAUTHORIZED, '请先登录');
+  if (!uid) throw new BusinessError(ERROR_CODE.UNAUTHORIZED);
   const result = await wfService.listJobs(uid, { page: Number(page), pageSize: Number(pageSize) });
   return listResult(res, result);
 });

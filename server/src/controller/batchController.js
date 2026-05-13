@@ -8,10 +8,10 @@ import { parsePagination } from '../utils/pagination.js';
 export const submitBatchTask = wrapController(async (req, res) => {
     const { imageUrls, operation, platform, style, nightMode } = req.body;
     if (!imageUrls || !imageUrls.length) {
-      throw new BusinessError(ERROR_CODE.PARAM_MISSING, '请上传至少一张图片');
+      throw new BusinessError(ERROR_CODE.PARAM_MISSING);
     }
     if (!operation) {
-      throw new BusinessError(ERROR_CODE.PARAM_MISSING, '请选择操作类型');
+      throw new BusinessError(ERROR_CODE.PARAM_MISSING);
     }
     const data = await batchService.submitBatchTask(req.user.id, { imageUrls, operation, platform, style, nightMode });
     const msg = nightMode ? '夜间托管任务已提交，凌晨2点自动执行（6折优惠）' : '批量任务已提交';
@@ -21,7 +21,7 @@ export const submitBatchTask = wrapController(async (req, res) => {
 export const redoBatchTask = wrapController(async (req, res) => {
     const { taskId } = req.body;
     if (!taskId) {
-      throw new BusinessError(ERROR_CODE.PARAM_MISSING, '请提供源任务ID');
+      throw new BusinessError(ERROR_CODE.PARAM_MISSING);
     }
     const data = await batchService.redoBatchTask(req.user.id, taskId);
     return success(res, data, '已复刻批量任务');

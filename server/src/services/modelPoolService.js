@@ -205,7 +205,7 @@ export async function autoSelect(category, taskType, options = {}) {
 export async function getModelConfig(modelKey) {
   const pool = await getPool();
   const model = pool.find(m => m.model_key === modelKey);
-  if (!model) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND, `模型 ${modelKey} 不存在`);
+  if (!model) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND, `Model ${modelKey} not found`);
   if (!model.enabled) throw new BusinessError(ERROR_CODE.PARAM_INVALID, `Model ${modelKey} disabled`);
   return model;
 }

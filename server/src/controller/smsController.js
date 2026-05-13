@@ -9,9 +9,9 @@ import { ERROR_CODE } from '../constants/errorCode.js';
 
 export const sendVerificationCode = wrapController(async (req, res) => {
     const { phone, scene } = req.body;
-    if (!phone || !scene) throw new BusinessError(ERROR_CODE.PARAM_MISSING, '手机号和场景不能为空');
+    if (!phone || !scene) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
     if (!['register', 'login', 'reset_password', 'bind'].includes(scene)) {
-      throw new BusinessError(ERROR_CODE.PARAM_INVALID, '不支持的短信场景');
+      throw new BusinessError(ERROR_CODE.PARAM_INVALID);
     }
     const result = await smsService.sendVerificationCode({ phone, scene });
     if (!result.success) throw new BusinessError(ERROR_CODE.BAD_REQUEST, result.msg);
@@ -22,7 +22,7 @@ export const sendVerificationCode = wrapController(async (req, res) => {
 
 export const verifyCode = wrapController(async (req, res) => {
     const { phone, scene, code } = req.body;
-    if (!phone || !scene || !code) throw new BusinessError(ERROR_CODE.PARAM_MISSING, '参数不完整');
+    if (!phone || !scene || !code) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
     const result = await smsService.verifyCode(phone, scene, code);
     if (!result.valid) throw new BusinessError(ERROR_CODE.BAD_REQUEST, result.reason);
     return success(res, {}, '验证通过');
@@ -63,7 +63,7 @@ export const listLogs = wrapController(async (req, res) => {
 
 export const sendNotification = wrapController(async (req, res) => {
     const { phone, scene, templateCode, params } = req.body;
-    if (!phone || (!scene && !templateCode)) throw new BusinessError(ERROR_CODE.PARAM_MISSING, '参数不完整');
+    if (!phone || (!scene && !templateCode)) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
     const result = await smsService.sendNotification(phone, { scene, templateCode, params });
     if (!result.success) throw new BusinessError(ERROR_CODE.BAD_REQUEST, result.msg);
     return success(res, {}, result.msg);

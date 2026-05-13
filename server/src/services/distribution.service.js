@@ -7,6 +7,7 @@ import { appUrl } from '../config/index.js';
  * 分销关系 / 佣金计算 / 提现 / 团队数据
  */
 import db from '../dao/db.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 // 分销佣金比例
 const COMMISSION_RATES = {
@@ -21,7 +22,7 @@ export async function getMyInviteCode(userId) {
   const conn = await db.getConnection();
   try {
     const [rows] = await conn.query('SELECT invite_code, nickname FROM `users` WHERE id = ?', [userId]);
-    if (rows.length === 0) throw new BusinessError(404, '用户不存在');
+    if (rows.length === 0) throw new BusinessError(ERROR_CODE.USER_NOT_FOUND);
     return { invite_code: rows[0].invite_code, nickname: rows[0].nickname };
   } finally {
     conn.release();
@@ -78,7 +79,7 @@ export async function getMyTeam(userId, { page = 1, pageSize = 20 } = {}) {
 export async function settleCommission(consumerId, orderId, orderAmount) {
   const safeAmount = Number(orderAmount);
   if (!Number.isFinite(safeAmount) || safeAmount <= 0) {
-    throw new BusinessError(400, '无效的订单金额');
+    throw new BusinessError(ERROR_CODE.PARAM_INVALID);
   }
   const conn = await db.getConnection();
   try {
@@ -164,7 +165,7 @@ export async function getCommissionBalance(userId) {
 // 佣金提现
 // ============================================================
 export async function withdrawCommission(userId, amount) {
-  if (amount <= 0) throw new BusinessError(400, '提现金额必须大于0');
+  if (amount <= 0) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
 
   const conn = await db.getConnection();
   try {
@@ -179,7 +180,7 @@ export async function withdrawCommission(userId, amount) {
 
     const availableAmount = Number(balance.available) || 0;
     const requestAmount = Number(amount) || 0;
-    if (availableAmount < requestAmount) throw new BusinessError(400, '可提现余额不足');
+    if (availableAmount < requestAmount) throw new BusinessError(ERROR_CODE.QUOTA_EXCEEDED);
 
     // 逐笔扣减
     let remaining = requestAmount;
@@ -200,7 +201,7 @@ export async function withdrawCommission(userId, amount) {
       }
     }
     const actualWithdrawn = parseFloat((requestAmount - remaining).toFixed(2));
-    if (actualWithdrawn <= 0) throw new BusinessError(400, '无可提取的佣金');
+    if (actualWithdrawn <= 0) throw new BusinessError(ERROR_CODE.QUOTA_EXCEEDED);
     if (withdrawIds.length > 0) {
       await conn.query(
         `UPDATE distributor_commission SET status = 'withdrawn', settled_at = NOW() WHERE id IN (${withdrawIds.map(() => '?').join(',')})`,
@@ -306,7 +307,7 @@ export function getPromoAssets() { return PROMO_ASSETS; }
 
 export async function getMyPromoLink(userId) {
   const [[user]] = await db.query('SELECT invite_code FROM `users` WHERE id = ?', [userId]);
-  if (!user) throw new BusinessError(404, '用户不存在');
+  if (!user) throw new BusinessError(ERROR_CODE.USER_NOT_FOUND);
   const baseUrl = appUrl;
   const inviteUrl = `${baseUrl}/register?ref=${user.invite_code}`;
   return { invite_code: user.invite_code, invite_url: inviteUrl, assets: PROMO_ASSETS };

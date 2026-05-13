@@ -29,15 +29,15 @@ export const listAllUsers = wrapController(async (req, res) => {
 
 export const updateUserStatus = wrapController(async (req, res) => {
     const { status } = req.body;
-    if (![0, 1].includes(status)) throw new BusinessError(ERROR_CODE.PARAM_INVALID, '状态值无效（0启用/1禁用）');
+    if (![0, 1].includes(status)) throw new BusinessError(ERROR_CODE.PARAM_INVALID);
     await commerce.updateUserStatus(req.params.userId, status, req.user?.tenantId);
     return success(res, {}, '用户状态已更新');
   });
 
 export const batchUpdateUserStatus = wrapController(async (req, res) => {
     const { ids, status } = req.body;
-    if (!Array.isArray(ids) || ids.length === 0) throw new BusinessError(ERROR_CODE.PARAM_INVALID, 'ids 必须为非空数组');
-    if (![0, 1].includes(status)) throw new BusinessError(ERROR_CODE.PARAM_INVALID, '状态值无效（0启用/1禁用）');
+    if (!Array.isArray(ids) || ids.length === 0) throw new BusinessError(ERROR_CODE.PARAM_INVALID);
+    if (![0, 1].includes(status)) throw new BusinessError(ERROR_CODE.PARAM_INVALID);
     const result = await commerce.batchUpdateUserStatus(ids, status, req.user?.tenantId);
     return success(res, { affected: result.affected }, `已${status === 1 ? '禁用' : '启用'} ${result.affected} 个用户`);
   });
@@ -83,7 +83,7 @@ export const listAllOrders = wrapController(async (req, res) => {
 
 export const checkContentRisk = wrapController(async (req, res) => {
     const { content, type } = req.body;
-    if (!content || !type) throw new BusinessError(ERROR_CODE.PARAM_MISSING, 'content 和 type 为必填');
+    if (!content || !type) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
     const result = await sensitiveWordService.checkText(content);
     return success(res, { blocked: result.block || result.review, hits: result.hits });
   });
@@ -95,7 +95,7 @@ export const listSensitiveWords = wrapController(async (req, res) => {
 
 export const addSensitiveWord = wrapController(async (req, res) => {
     const { word } = req.body;
-    if (!word) throw new BusinessError(ERROR_CODE.PARAM_MISSING, '请输入敏感词');
+    if (!word) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
     await sensitiveWordService.addSensitiveWord(req.body.word, req.body.category, req.body.level);
     return success(res, {}, '已添加');
   });
@@ -150,7 +150,7 @@ export const listCreditRecords = wrapController(async (req, res) => {
 
 export const refundCredit = wrapController(async (req, res) => {
     const { recordId, remark } = req.body;
-    if (!recordId) throw new BusinessError(ERROR_CODE.PARAM_MISSING, '缺少记录ID');
+    if (!recordId) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
     await creditService.adminRefundCredit(recordId, remark || '管理员退款');
     return success(res, {}, '已退还');
   });
@@ -180,7 +180,7 @@ export const listAllNotifications = wrapController(async (req, res) => {
 
 export const sendNotification = wrapController(async (req, res) => {
     const { userId, type, title, content } = req.body;
-    if (!userId || !title || !content) throw new BusinessError(ERROR_CODE.PARAM_MISSING, '用户ID、标题和内容为必填');
+    if (!userId || !title || !content) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
     const id = await notificationService.sendToUser({ userId, type: type || 'system', title, content });
     return success(res, { id }, '通知已发送');
   });

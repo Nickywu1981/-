@@ -21,7 +21,7 @@ export async function getPlans() {
 
 export async function purchasePlan(userId, planType) {
   const plan = await creditDao.getPlanByType(planType);
-  if (!plan || !plan.status) throw new BusinessError(400, '套餐不存在或已下架');
+  if (!plan || !plan.status) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
 
   const conn = await db.getConnection();
   try {
@@ -198,13 +198,13 @@ export async function getAllPlans() {
 
 export async function updatePlan(planId, data) {
   const updated = await commerceDao.updatePlan(planId, data);
-  if (!updated) throw new BusinessError(400, '没有可更新的字段');
+  if (!updated) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
   return updated;
 }
 
 export async function createPlan(data) {
   const { name, price, credits, duration_days, plan_type } = data;
-  if (!name) throw new BusinessError(400, '套餐名称不能为空');
+  if (!name) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
   const id = await commerceDao.createPlan({ name, price, credits, duration_days, plan_type, description: data.description, status: data.status });
   return { id };
 }
@@ -240,8 +240,8 @@ export async function listAllOrders({ page = 1, pageSize = 20, userId, planType 
 // ==================== 批量操作 ====================
 
 export async function batchUpdateUserStatus(ids, status, tenantId) {
-  if (!Array.isArray(ids) || ids.length === 0) throw new BusinessError(400, '请选择用户');
-  if (![0, 1].includes(status)) throw new BusinessError(400, '状态值无效（0启用/1禁用）');
+  if (!Array.isArray(ids) || ids.length === 0) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
+  if (![0, 1].includes(status)) throw new BusinessError(ERROR_CODE.PARAM_INVALID);
   const affected = await commerceDao.batchUpdateUserStatus(ids, status, tenantId);
   return { affected };
 }
@@ -250,10 +250,10 @@ export async function batchUpdateUserStatus(ids, status, tenantId) {
 
 export async function retryTask(taskId, tenantId) {
   const task = await commerceDao.getTaskById(taskId);
-  if (!task) throw new BusinessError(404, '任务不存在');
-  if (![3, 4].includes(task.status)) throw new BusinessError(400, '只有失败/异常任务才能重试');
+  if (!task) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
+  if (![3, 4].includes(task.status)) throw new BusinessError(ERROR_CODE.PARAM_ERROR);
   const maxRetries = 3;
-  if (task.retry_count >= maxRetries) throw new BusinessError(400, '已达最大重试次数');
+  if (task.retry_count >= maxRetries) throw new BusinessError(ERROR_CODE.PARAM_ERROR);
   await commerceDao.updateTaskStatusDirect(taskId, {
     status: 6, progress: 0,
     progress_msg: `重试中(${task.retry_count + 1}/3)`,
@@ -262,21 +262,21 @@ export async function retryTask(taskId, tenantId) {
 
 export async function pauseTask(taskId, tenantId) {
   const task = await commerceDao.getTaskById(taskId);
-  if (!task) throw new BusinessError(404, '任务不存在');
-  if (![1].includes(task.status)) throw new BusinessError(400, '只能暂停处理中的任务');
+  if (!task) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
+  if (![1].includes(task.status)) throw new BusinessError(ERROR_CODE.PARAM_ERROR);
   await commerceDao.updateTaskStatusDirect(taskId, { status: 5 }, tenantId);
 }
 
 export async function resumeTask(taskId, tenantId) {
   const task = await commerceDao.getTaskById(taskId);
-  if (!task) throw new BusinessError(404, '任务不存在');
-  if (![5].includes(task.status)) throw new BusinessError(400, '只能恢复已暂停的任务');
+  if (!task) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
+  if (![5].includes(task.status)) throw new BusinessError(ERROR_CODE.PARAM_ERROR);
   await commerceDao.updateTaskStatusDirect(taskId, { status: 1 }, tenantId);
 }
 
 export async function cancelTask(taskId, tenantId) {
   const task = await commerceDao.getTaskById(taskId);
-  if (!task) throw new BusinessError(404, '任务不存在');
-  if (![0, 1, 5].includes(task.status)) throw new BusinessError(400, '只能取消待处理/处理中/已暂停的任务');
+  if (!task) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
+  if (![0, 1, 5].includes(task.status)) throw new BusinessError(ERROR_CODE.PARAM_ERROR);
   await commerceDao.updateTaskStatusDirect(taskId, { status: 4, progress_msg: '已取消' }, tenantId);
 }

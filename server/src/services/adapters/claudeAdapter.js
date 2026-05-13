@@ -8,6 +8,7 @@ import { registerModel } from '../aiEngine.js';
 import { BusinessError } from '../../utils/businessError.js';
 import { adapterConfig } from '../../config/index.js';
 import logger from '../../utils/logger.js';
+import { ERROR_CODE } from '../../constants/errorCode.js';
 
 const API_KEY = adapterConfig.claude.apiKey;
 const BASE_URL = adapterConfig.claude.baseUrl;
@@ -44,7 +45,7 @@ async function claudeSonnetInfer(input, onProgress) {
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     logger.error(`[Claude] API 请求失败 ${res.status}: ${err.error?.message || res.statusText}`);
-    throw new BusinessError(502, 'Claude AI 服务暂时不可用，请稍后重试');
+    throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
   }
 
   onProgress?.(80);
@@ -88,7 +89,7 @@ async function claudeHaikuInfer(input, onProgress) {
     signal: AbortSignal.timeout(30000),
   });
 
-  if (!res.ok) throw new BusinessError(502, `Claude API 错误 ${res.status}`);
+  if (!res.ok) throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, `Claude API error ${res.status}`);
 
   onProgress?.(80);
 

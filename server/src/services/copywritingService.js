@@ -2,6 +2,7 @@ import { copywriting, SUPPORTED_LANGUAGES } from './prompts/copywriting.js';
 import { infer } from './aiEngine.js';
 import { BusinessError } from '../utils/businessError.js';
 import * as copywritingDao from '../dao/copywritingDao.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 // 平台规则配置
 const PLATFORM_RULES = {
@@ -55,7 +56,7 @@ function buildDescriptionPrompt({ productName, features, specs, platform = 'taob
 }
 
 export async function generateTitles(userId, params) {
-  if (!params.productName) throw new BusinessError(400, '商品名称不能为空');
+  if (!params.productName) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
   const prompt = buildTitlePrompt(params);
   const modelId = params.model || 'deepseek-v4-flash';
   const startTime = Date.now();
@@ -72,7 +73,7 @@ export async function generateTitles(userId, params) {
 }
 
 export async function generateDescription(userId, params) {
-  if (!params.productName) throw new BusinessError(400, '商品名称不能为空');
+  if (!params.productName) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
   const prompt = buildDescriptionPrompt(params);
   const modelId = params.model || 'deepseek-v4-flash';
   const startTime = Date.now();
@@ -89,7 +90,7 @@ export async function generateDescription(userId, params) {
 }
 
 export async function translateProduct(userId, { productName, description, features, sourceLang = 'zh-CN', targetLang = 'en', model: modelId = 'deepseek-v4-flash' }) {
-  if (!productName) throw new BusinessError(400, '商品名称不能为空');
+  if (!productName) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
   const prompt = copywriting.translate.template
     .replace('{productName}', productName)
     .replace('{description}', description || '')
@@ -129,7 +130,7 @@ function buildScriptPrompt({ productName, platform = 'douyin', duration = 30, st
 }
 
 export async function generateScript(userId, params) {
-  if (!params.productName) throw new BusinessError(400, '商品名称不能为空');
+  if (!params.productName) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
   const prompt = buildScriptPrompt(params);
   const modelId = params.model || 'deepseek-v4-flash';
   const startTime = Date.now();
@@ -147,7 +148,7 @@ export async function generateScript(userId, params) {
 
 export async function deleteRecord(id, userId) {
   const ok = await copywritingDao.deleteHistory(id, userId);
-  if (!ok) throw new BusinessError(404, '记录不存在或无权删除');
+  if (!ok) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
 }
 
 export function getPlatforms() {

@@ -9,10 +9,10 @@ import logger from '../utils/logger.js';
 export const register = wrapController(async (req, res) => {
     const { username, password, nickname } = req.body;
     if (!username || !password) {
-      throw new BusinessError(ERROR_CODE.BAD_REQUEST, '用户名和密码不能为空');
+      throw new BusinessError(ERROR_CODE.BAD_REQUEST);
     }
     if (password.length < 6) {
-      throw new BusinessError(ERROR_CODE.BAD_REQUEST, '密码长度不能少于6位');
+      throw new BusinessError(ERROR_CODE.BAD_REQUEST);
     }
     const user = await userService.register({ username, password, nickname });
     return success(res, user, '注册成功');
@@ -22,7 +22,7 @@ export const login = wrapController(async (req, res) => {
     const { username, account, email, password } = req.body;
     const loginId = username || account || email;
     if (!loginId || !password) {
-      throw new BusinessError(ERROR_CODE.BAD_REQUEST, '用户名和密码不能为空');
+      throw new BusinessError(ERROR_CODE.BAD_REQUEST);
     }
     const data = await userService.login({ username: loginId, password });
     return success(res, data, '登录成功');
@@ -41,21 +41,21 @@ export const updateProfile = wrapController(async (req, res) => {
 
 export const changePassword = wrapController(async (req, res) => {
     const { oldPassword, newPassword } = req.body;
-    if (!oldPassword || !newPassword) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '旧密码和新密码不能为空');
+    if (!oldPassword || !newPassword) throw new BusinessError(ERROR_CODE.BAD_REQUEST);
     await userService.changePassword(req.user.id, { oldPassword, newPassword });
     return success(res, {}, '密码修改成功');
   });
 
 export const forgotPassword = wrapController(async (req, res) => {
     const { username } = req.body;
-    if (!username) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '请输入用户名');
+    if (!username) throw new BusinessError(ERROR_CODE.BAD_REQUEST);
     const data = await userService.forgotPassword(username);
     return success(res, data);
   });
 
 export const resetPassword = wrapController(async (req, res) => {
     const { token, newPassword } = req.body;
-    if (!token || !newPassword) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '缺少必填参数');
+    if (!token || !newPassword) throw new BusinessError(ERROR_CODE.BAD_REQUEST);
     await userService.resetPassword(token, newPassword);
     return success(res, {}, '密码重置成功');
   });
@@ -69,9 +69,9 @@ export const getStats = wrapController(async (req, res) => {
 
 export const refreshToken = wrapController(async (req, res) => {
     const { refreshToken: token } = req.body;
-    if (!token) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '缺少 refreshToken');
+    if (!token) throw new BusinessError(ERROR_CODE.BAD_REQUEST);
     const tokens = await userService.refreshAccessToken(token);
-    if (!tokens) throw new BusinessError(ERROR_CODE.UNAUTHORIZED, 'refreshToken 无效或已过期');
+    if (!tokens) throw new BusinessError(ERROR_CODE.UNAUTHORIZED);
     return success(res, tokens, '令牌刷新成功');
   });
 

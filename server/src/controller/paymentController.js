@@ -17,7 +17,7 @@ export const getPlans = wrapController(async (_req, res, next) => {
 export const createOrder = wrapController(async (req, res) => {
     const { planType, payChannel = 'wechat' } = req.body;
     if (!planType || ![1, 2, 3].includes(planType)) {
-      throw new BusinessError(ERROR_CODE.PARAM_INVALID, '请选择有效套餐（1=月卡/2=季卡/3=年卡）');
+      throw new BusinessError(ERROR_CODE.PARAM_INVALID);
     }
     const data = await payment.createPaymentOrder(req.user.id, { planType, payChannel });
     return success(res, data, '订单创建成功');
@@ -34,7 +34,7 @@ export const getOrderStatus = wrapController(async (req, res) => {
 
 export const checkPaymentResult = wrapController(async (req, res) => {
     const data = await allinpayService.queryOrder(req.params.reqsn);
-    if (!data) throw new BusinessError(ERROR_CODE.PAY_ORDER_NOT_FOUND, '订单不存在');
+    if (!data) throw new BusinessError(ERROR_CODE.PAY_ORDER_NOT_FOUND);
     return success(res, data);
   });
 

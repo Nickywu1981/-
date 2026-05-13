@@ -13,7 +13,7 @@ import membershipDao from '../dao/membershipDao.js';
 
 export const getProfile = wrapController(async (req, res) => {
   const user = await userDao.findById(req.user.id);
-  if (!user) throw new BusinessError(ERROR_CODE.NOT_FOUND, '用户不存在');
+  if (!user) throw new BusinessError(ERROR_CODE.NOT_FOUND);
 
   const m = await membershipDao.findByUserId(req.user.id);
 
@@ -46,7 +46,7 @@ export const updateProfile = wrapController(async (req, res) => {
   if (phone !== undefined) fields.phone = phone || null;
   if (email !== undefined) fields.email = email || null;
 
-  if (Object.keys(fields).length === 0) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '无更新字段');
+  if (Object.keys(fields).length === 0) throw new BusinessError(ERROR_CODE.BAD_REQUEST);
 
   await userDao.updateUser(req.user.id, fields);
   return success(res, {}, '资料已更新');
@@ -56,10 +56,10 @@ export const changePassword = wrapController(async (req, res) => {
   const { oldPassword, newPassword } = req.validated;
 
   const user = await userDao.findById(req.user.id);
-  if (!user) throw new BusinessError(ERROR_CODE.NOT_FOUND, '用户不存在');
+  if (!user) throw new BusinessError(ERROR_CODE.NOT_FOUND);
 
   const valid = await bcrypt.compare(oldPassword, user.password);
-  if (!valid) throw new BusinessError(ERROR_CODE.PARAM_INVALID, '原密码不正确');
+  if (!valid) throw new BusinessError(ERROR_CODE.PARAM_INVALID);
 
   const hash = await bcrypt.hash(newPassword, SALT_ROUNDS);
   await userDao.updatePassword(req.user.id, hash);
@@ -73,7 +73,7 @@ export const changePassword = wrapController(async (req, res) => {
 export const toggleAutoRenew = wrapController(async (req, res) => {
   const m = await membershipDao.findByUserId(req.user.id);
   if (!m || m.plan_type === 'free' || m.plan_type === 0) {
-    throw new BusinessError(ERROR_CODE.BAD_REQUEST, '仅付费会员支持自动续费');
+    throw new BusinessError(ERROR_CODE.BAD_REQUEST);
   }
   await membershipDao.setAutoRenew(req.user.id, req.validated.autoRenew);
   return success(res, { autoRenew: req.validated.autoRenew }, '自动续费已' + (req.validated.autoRenew ? '开启' : '关闭'));

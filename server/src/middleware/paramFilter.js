@@ -67,7 +67,7 @@ export default function paramFilter(req, _res, next) {
 
   // Injection scan — reject suspicious input
   if (scanForInjection(req.body) || scanForInjection(req.query)) {
-    return next(new BusinessError(ERROR_CODE.BAD_REQUEST, '请求参数包含非法字符'));
+    return next(new BusinessError(ERROR_CODE.BAD_REQUEST, 'Request contains illegal characters'));
   }
 
   next();

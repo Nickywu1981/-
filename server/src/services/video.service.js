@@ -8,6 +8,7 @@ import { BusinessError } from '../utils/businessError.js';
 import { submitJob } from './job-queue.service.js';
 import * as moderationService from './moderation.service.js';
 import db from '../dao/db.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 // ============================================================
 // 视频生成
@@ -17,7 +18,7 @@ export async function generateVideo(userId, { prompt, duration = 15, ratio = '9:
 
   const auditResult = await moderationService.moderateText(finalPrompt, userId, { stage: 'input' });
   if (auditResult.action === 'block') {
-    throw new BusinessError(422, '提示词包含违规内容');
+    throw new BusinessError(ERROR_CODE.CONTENT_MODERATION);
   }
 
   return submitJob(userId, 'video_gen', {
@@ -33,7 +34,7 @@ export async function generateVideo(userId, { prompt, duration = 15, ratio = '9:
 // ============================================================
 export async function imageToVideo(userId, { imageUrl, prompt, duration = 15, ratio = '9:16' }) {
   const auditResult = await moderationService.moderateText(prompt || '', userId, { stage: 'input' });
-  if (auditResult.action === 'block') throw new BusinessError(422, '内容包含违规信息');
+  if (auditResult.action === 'block') throw new BusinessError(ERROR_CODE.CONTENT_MODERATION);
 
   return submitJob(userId, 'image_to_video', {
     image_url: imageUrl,
@@ -47,8 +48,8 @@ export async function imageToVideo(userId, { imageUrl, prompt, duration = 15, ra
 // 多图合成视频
 // ============================================================
 export async function multiImageToVideo(userId, { images, prompt, duration = 30, ratio = '9:16', transition = 'fade' }) {
-  if (!images || images.length < 2) throw new BusinessError(400, '至少需要2张图片');
-  if (images.length > 20) throw new BusinessError(400, '最多20张图片');
+  if (!images || images.length < 2) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
+  if (images.length > 20) throw new BusinessError(ERROR_CODE.QUOTA_EXCEEDED);
 
   return submitJob(userId, 'multi_image_to_video', {
     images,           // [{ url }]
@@ -109,7 +110,7 @@ export async function productAdVideo(userId, { productName, productImages, highl
 // ============================================================
 export async function generateStoryboard(userId, { prompt, sceneCount = 5 }) {
   const auditResult = await moderationService.moderateText(prompt, userId, { stage: 'input' });
-  if (auditResult.action === 'block') throw new BusinessError(422, '内容包含违规信息');
+  if (auditResult.action === 'block') throw new BusinessError(ERROR_CODE.CONTENT_MODERATION);
 
   return submitJob(userId, 'storyboard_gen', {
     prompt,
@@ -127,7 +128,7 @@ export async function getVideoJobStatus(jobId, userId) {
       'SELECT id, user_id, task_type, status, progress, result_data, error_message, retry_count, created_at, started_at, completed_at FROM job_queue WHERE id = ? AND user_id = ?',
       [jobId, userId],
     );
-    if (rows.length === 0) throw new BusinessError(404, '任务不存在');
+    if (rows.length === 0) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
     return rows[0];
   } finally {
     conn.release();

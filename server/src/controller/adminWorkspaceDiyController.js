@@ -17,7 +17,7 @@ export const getAll = wrapController(async (_req, res) => {
 
 export const getByKey = wrapController(async (req, res) => {
   const row = await getConfigByKey(req.params.key);
-  if (!row) throw new BusinessError(ERROR_CODE.NOT_FOUND, '配置项不存在');
+  if (!row) throw new BusinessError(ERROR_CODE.NOT_FOUND);
   return success(res, row);
 });
 
@@ -31,7 +31,7 @@ export const update = wrapController(async (req, res) => {
 
 export const reset = wrapController(async (req, res) => {
   const row = await getConfigByKey(req.params.key);
-  if (!row) throw new BusinessError(ERROR_CODE.NOT_FOUND, '配置项不存在');
+  if (!row) throw new BusinessError(ERROR_CODE.NOT_FOUND);
   await deleteConfigByKey(req.params.key);
   logger.info(`[workspace-diy] ${req.params.key} 已重置为默认值 by ${req.user?.username || 'admin'}`);
   return success(res, { message: `${req.params.key} 已重置为默认值` });

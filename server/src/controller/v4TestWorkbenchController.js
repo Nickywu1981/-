@@ -263,7 +263,7 @@ export const getHistory = wrapController(async (req, res) => {
 
 export const deleteHistory = wrapController(async (req, res) => {
   const idx = testHistory.findIndex(h => h.id === req.params.id);
-  if (idx === -1) throw new BusinessError(ERROR_CODE.NOT_FOUND, '记录不存在');
+  if (idx === -1) throw new BusinessError(ERROR_CODE.NOT_FOUND);
   testHistory.splice(idx, 1);
   return success(res, { deleted: true });
 });

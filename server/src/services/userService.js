@@ -8,6 +8,7 @@ import { jwtSecret } from '../config/index.js';
 import { guardSQL } from '../utils/sqlGuard.js';
 import logger from '../utils/logger.js';
 import { generateTokens, refreshAccessToken as refreshTokenUtil, revokeAccessToken as revokeTokenUtil, revokeRefreshToken as revokeRefreshUtil, revokeAllUserTokens as revokeAllUtil, isTokenBlacklisted } from '../utils/jwtToken.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 const SALT_ROUNDS = 12;
 
@@ -16,7 +17,7 @@ export async function register({ username, password, nickname }) {
   guardSQL(nickname, 'nickname');
 
   const existing = await userDao.findByUsername(username);
-  if (existing) throw new BusinessError(400, '用户名已存在');
+  if (existing) throw new BusinessError(ERROR_CODE.USER_EXISTS);
 
   const hashed = await bcrypt.hash(password, SALT_ROUNDS);
   const userId = await userDao.insertUser({ username, password: hashed, nickname: nickname || username });
@@ -33,8 +34,8 @@ export async function login({ username, password }) {
   const hash = user ? user.password : dummyHash;
   const match = await bcrypt.compare(password, hash);
 
-  if (!user || !match) throw new BusinessError(401, '用户名或密码错误');
-  if (user.status !== USER_STATUS.ACTIVE) throw new BusinessError(403, '账号已被禁用，请联系客服');
+  if (!user || !match) throw new BusinessError(ERROR_CODE.PASSWORD_WRONG);
+  if (user.status !== USER_STATUS.ACTIVE) throw new BusinessError(ERROR_CODE.ACCOUNT_DISABLED);
 
   await userDao.updateLastLogin(user.id);
 
@@ -65,7 +66,7 @@ export async function login({ username, password }) {
 
 export async function getProfile(userId) {
   const user = await userDao.findById(userId);
-  if (!user) throw new BusinessError(404, '用户不存在');
+  if (!user) throw new BusinessError(ERROR_CODE.USER_NOT_FOUND);
   return user;
 }
 
@@ -75,20 +76,20 @@ export async function updateProfile(userId, { nickname, phone, email, avatar }) 
   if (phone !== undefined) fields.phone = phone;
   if (email !== undefined) fields.email = email;
   if (avatar !== undefined) fields.avatar = avatar;
-  if (Object.keys(fields).length === 0) throw new BusinessError(400, '没有可更新的字段');
+  if (Object.keys(fields).length === 0) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
   await userDao.updateUser(userId, fields);
   return userDao.findById(userId);
 }
 
 export async function changePassword(userId, { oldPassword, newPassword }) {
-  if (!oldPassword || !newPassword || newPassword.length < 6) throw new BusinessError(400, '新密码长度不能少于6位');
+  if (!oldPassword || !newPassword || newPassword.length < 6) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
   const user = await userDao.findById(userId);
-  if (!user) throw new BusinessError(404, '用户不存在');
+  if (!user) throw new BusinessError(ERROR_CODE.USER_NOT_FOUND);
 
   // 需要查出密码hash
   const full = await userDao.findByUsername(user.username);
   const match = await bcrypt.compare(oldPassword, full.password);
-  if (!match) throw new BusinessError(400, '原密码错误');
+  if (!match) throw new BusinessError(ERROR_CODE.PASSWORD_WRONG);
 
   const hashed = await bcrypt.hash(newPassword, SALT_ROUNDS);
   await userDao.updatePassword(userId, hashed);
@@ -106,14 +107,14 @@ export async function forgotPassword(username) {
 }
 
 export async function resetPassword(token, newPassword) {
-  if (!newPassword || newPassword.length < 6) throw new BusinessError(400, '新密码长度不能少于6位');
+  if (!newPassword || newPassword.length < 6) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
   let payload;
-  try { payload = jwt.verify(token, jwtSecret); } catch { throw new BusinessError(400, '重置链接已过期或无效'); }
-  if (payload.purpose !== 'reset') throw new BusinessError(400, '无效的重置令牌');
+  try { payload = jwt.verify(token, jwtSecret); } catch { throw new BusinessError(ERROR_CODE.TOKEN_EXPIRED); }
+  if (payload.purpose !== 'reset') throw new BusinessError(ERROR_CODE.TOKEN_INVALID);
 
   // 防止重放：吊销已使用的重置 token
   if (payload.jti && await isTokenBlacklisted(token)) {
-    throw new BusinessError(400, '重置链接已被使用');
+    throw new BusinessError(ERROR_CODE.TOKEN_EXPIRED);
   }
 
   const hashed = await bcrypt.hash(newPassword, SALT_ROUNDS);
@@ -147,14 +148,14 @@ export async function getUserStats(userId, _tenantId = 0) {
 
 export async function adminUpdateUser(userId, fields) {
   const user = await userDao.findById(userId);
-  if (!user) throw new BusinessError(404, '用户不存在');
+  if (!user) throw new BusinessError(ERROR_CODE.USER_NOT_FOUND);
 
   const allowed = {};
   if (fields.nickname !== undefined) allowed.nickname = fields.nickname;
   if (fields.email !== undefined) allowed.email = fields.email;
   if (fields.role !== undefined) allowed.role = fields.role;
 
-  if (Object.keys(allowed).length === 0) throw new BusinessError(400, '无更新字段');
+  if (Object.keys(allowed).length === 0) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
   await userDao.updateUser(userId, allowed);
   return userDao.findById(userId);
 }

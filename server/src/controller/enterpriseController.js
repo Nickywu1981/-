@@ -70,14 +70,14 @@ export const logoutEnterprise = wrapController(async (req, res) => {
 
 export const getProfile = wrapController(async (req, res) => {
   const tenantId = req.tenantId;
-  if (!tenantId) throw new BusinessError(ERROR_CODE.FORBIDDEN, '无企业权限');
+  if (!tenantId) throw new BusinessError(ERROR_CODE.FORBIDDEN);
   const profile = await enterpriseService.getEnterpriseProfile(tenantId, req.user?.id);
   return success(res, profile);
 });
 
 export const updateProfile = wrapController(async (req, res) => {
   const tenantId = req.tenantId;
-  if (!tenantId) throw new BusinessError(ERROR_CODE.FORBIDDEN, '无企业权限');
+  if (!tenantId) throw new BusinessError(ERROR_CODE.FORBIDDEN);
   const profile = await enterpriseService.updateEnterpriseProfile(tenantId, req.validated || req.body);
   audit(req, 'enterprise.updateProfile', tenantId, '更新企业信息');
   return success(res, profile, '更新成功');
@@ -109,7 +109,7 @@ export const addUser = wrapController(async (req, res) => {
 export const updateUser = wrapController(async (req, res) => {
   const tenantId = req.tenantId;
   const id = parseInt(req.params.id, 10);
-  if (!id || id < 1) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '无效的子账号ID');
+  if (!id || id < 1) throw new BusinessError(ERROR_CODE.BAD_REQUEST);
   const data = req.validated || req.body;
   await enterpriseService.updateEnterpriseUser(tenantId, id, data);
   audit(req, 'enterprise.updateUser', id, `更新子账号: ${id}`);
@@ -119,7 +119,7 @@ export const updateUser = wrapController(async (req, res) => {
 export const removeUser = wrapController(async (req, res) => {
   const tenantId = req.tenantId;
   const id = parseInt(req.params.id, 10);
-  if (!id || id < 1) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '无效的子账号ID');
+  if (!id || id < 1) throw new BusinessError(ERROR_CODE.BAD_REQUEST);
   await enterpriseService.removeEnterpriseUser(tenantId, id);
   audit(req, 'enterprise.removeUser', id, `移除子账号: ${id}`);
   return success(res, null, '移除成功');

@@ -6,6 +6,7 @@ import { BusinessError } from '../utils/businessError.js';
  * 积分赚取 / 消费 / 兑换 / 账户管理（乐观锁防超扣）
  */
 import db from '../dao/db.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 // ── 乐观锁重试工具（版本冲突时自动重试，最大 3 次指数退避）──
 async function withOptimisticRetry(fn, maxRetries = 3) {
@@ -55,7 +56,7 @@ async function getOrCreateAccount(conn, userId) {
 // 赚取积分（带乐观锁）
 // ============================================================
 export async function earnPoints(userId, { amount, businessType, businessId, remark = '' }) {
-  if (amount <= 0) throw new BusinessError(400, '积分数量必须大于0');
+  if (amount <= 0) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
 
   return withOptimisticRetry(async () => {
     const conn = await db.getConnection();
@@ -69,7 +70,7 @@ export async function earnPoints(userId, { amount, businessType, businessId, rem
          WHERE user_id = ? AND version = ?`,
         [amount, amount, userId, account.version],
       );
-      if (result.affectedRows === 0) throw new BusinessError(409, '积分更新冲突，请重试');
+      if (result.affectedRows === 0) throw new BusinessError(ERROR_CODE.RESOURCE_DUPLICATE);
 
       const newBalance = account.balance + amount;
 
@@ -94,7 +95,7 @@ export async function earnPoints(userId, { amount, businessType, businessId, rem
 // 消费积分（带乐观锁防超扣）
 // ============================================================
 export async function spendPoints(userId, { amount, businessType, businessId, remark = '' }) {
-  if (amount <= 0) throw new BusinessError(400, '积分数量必须大于0');
+  if (amount <= 0) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
 
   return withOptimisticRetry(async () => {
     const conn = await db.getConnection();
@@ -102,14 +103,14 @@ export async function spendPoints(userId, { amount, businessType, businessId, re
       await conn.beginTransaction();
 
       const account = await getOrCreateAccount(conn, userId);
-      if (account.balance < amount) throw new BusinessError(400, '积分不足');
+      if (account.balance < amount) throw new BusinessError(ERROR_CODE.QUOTA_EXCEEDED);
 
       const [result] = await conn.query(
         `UPDATE points_account SET balance = balance - ?, total_spent = total_spent + ?, version = version + 1
          WHERE user_id = ? AND version = ? AND balance >= ?`,
         [amount, amount, userId, account.version, amount],
       );
-      if (result.affectedRows === 0) throw new BusinessError(409, '积分更新冲突或余额不足，请重试');
+      if (result.affectedRows === 0) throw new BusinessError(ERROR_CODE.RESOURCE_DUPLICATE);
 
       const newBalance = account.balance - amount;
 
@@ -136,7 +137,7 @@ export async function spendPoints(userId, { amount, businessType, businessId, re
 export async function redeemPointsForCredits(userId, pointsAmount) {
   const rates = POINT_RULES.redeem_credits;
   const creditAmount = rates[pointsAmount];
-  if (!creditAmount) throw new BusinessError(400, `不支持该兑换档位，可选: ${Object.keys(rates).join(', ')}`);
+  if (!creditAmount) throw new BusinessError(ERROR_CODE.PARAM_INVALID, `Unsupported exchange tier, options: ${Object.keys(rates).join(", ")}`);
 
   return withOptimisticRetry(async () => {
     const conn = await db.getConnection();
@@ -144,14 +145,14 @@ export async function redeemPointsForCredits(userId, pointsAmount) {
       await conn.beginTransaction();
 
       const account = await getOrCreateAccount(conn, userId);
-      if (account.balance < pointsAmount) throw new BusinessError(400, '积分不足');
+      if (account.balance < pointsAmount) throw new BusinessError(ERROR_CODE.QUOTA_EXCEEDED);
 
       const [result] = await conn.query(
         `UPDATE points_account SET balance = balance - ?, total_spent = total_spent + ?, version = version + 1
          WHERE user_id = ? AND version = ? AND balance >= ?`,
         [pointsAmount, pointsAmount, userId, account.version, pointsAmount],
       );
-      if (result.affectedRows === 0) throw new BusinessError(409, '兑换失败，请重试');
+      if (result.affectedRows === 0) throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
 
       const newBalance = account.balance - pointsAmount;
 
@@ -167,7 +168,7 @@ export async function redeemPointsForCredits(userId, pointsAmount) {
       );
       if (membership.affectedRows === 0) {
         await conn.rollback();
-        throw new BusinessError(404, '会员账户不存在');
+        throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
       }
 
       await conn.commit();
@@ -242,7 +243,7 @@ export async function awardPointsForTask(userId, taskType, taskId) {
     );
     if (result.affectedRows === 0) {
       await conn.rollback();
-      throw new BusinessError(409, '积分更新冲突，请重试');
+      throw new BusinessError(ERROR_CODE.RESOURCE_DUPLICATE);
     }
 
     const newBalance = account.balance + points;

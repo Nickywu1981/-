@@ -6,6 +6,7 @@ import { BusinessError } from '../utils/businessError.js';
  * 长视频智能精剪 / 多余片段删减 / 人声杂音优化 / 自动字幕校对
  */
 import { submitJob } from './job-queue.service.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 /**
  * 长视频智能精剪 — 自动识别高光片段
@@ -24,7 +25,7 @@ export async function smartClipLiveVideo(userId, { videoUrl, duration = 60, clip
  * 长视频智能精剪 — 手动指定剪切点
  */
 export async function smartClipWithRegions(userId, { videoUrl, clipRegions }) {
-  if (!clipRegions || clipRegions.length === 0) throw new BusinessError(400, '请指定至少一个剪切区间');
+  if (!clipRegions || clipRegions.length === 0) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
   return submitJob(userId, 'live_clip', {
     video_url: videoUrl,
     clip_regions: clipRegions, // [{ start: 125.0, end: 180.0 }, ...]

@@ -1,5 +1,6 @@
 import * as customerDao from '../dao/customerDao.js';
 import { BusinessError } from '../utils/businessError.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 export async function getCustomerList(tenantId, query) {
   const { page = 1, pageSize = 20, keyword, status, tagId, startDate, endDate } = query;
@@ -13,7 +14,7 @@ export async function getCustomerList(tenantId, query) {
 
 export async function getCustomerDetail(tenantId, userId) {
   const customer = await customerDao.getCustomerDetail(tenantId, userId);
-  if (!customer) throw new BusinessError(404, '客户不存在');
+  if (!customer) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   return customer;
 }
 
@@ -34,20 +35,20 @@ export async function listTags(tenantId) {
 
 export async function updateTag(tenantId, tagId, data) {
   const ok = await customerDao.updateTag(tenantId, tagId, data);
-  if (!ok) throw new BusinessError(404, '标签不存在');
+  if (!ok) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   return customerDao.getTagById(tenantId, tagId);
 }
 
 export async function deleteTag(tenantId, tagId) {
   const ok = await customerDao.deleteTag(tenantId, tagId);
-  if (!ok) throw new BusinessError(404, '标签不存在');
+  if (!ok) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
 }
 
 // ==================== 打标/取消打标 ====================
 
 export async function tagCustomer(tenantId, tagId, userId) {
   const tag = await customerDao.getTagById(tenantId, tagId);
-  if (!tag) throw new BusinessError(404, '标签不存在');
+  if (!tag) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   await customerDao.tagCustomer(tagId, userId);
 }
 
@@ -57,6 +58,6 @@ export async function untagCustomer(tenantId, tagId, userId) {
 
 export async function batchTagCustomers(tenantId, tagId, userIds) {
   const tag = await customerDao.getTagById(tenantId, tagId);
-  if (!tag) throw new BusinessError(404, '标签不存在');
+  if (!tag) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   await customerDao.batchTagCustomers(tagId, userIds);
 }

@@ -56,7 +56,7 @@ export const login = wrapController(async (req, res) => {
 export const loginByCode = wrapController(async (req, res) => {
   const { phone, email, username, code } = req.validated;
   if (!phone && !email && !username) {
-    throw new BusinessError(ERROR_CODE.VALIDATION_ERROR, '请提供手机号、邮箱或用户名');
+    throw new BusinessError(ERROR_CODE.VALIDATION_ERROR);
   }
   const result = await authService.loginByCode({ phone, email, username, code });
   setTokenCookie(req, res, result.token);
@@ -86,7 +86,7 @@ export const logout = wrapController(async (req, res) => {
 
 export const getMe = wrapController(async (req, res) => {
   const user = await findById(req.user.id);
-  if (!user) throw new BusinessError(ERROR_CODE.UNAUTHORIZED, '用户不存在');
+  if (!user) throw new BusinessError(ERROR_CODE.UNAUTHORIZED);
   return success(res, {
     id: user.id,
     username: user.username,

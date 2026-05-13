@@ -1,5 +1,6 @@
 import dao from '../dao/platformSpecDao.js';
 import { BusinessError } from '../utils/businessError.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 export async function listAll(req) {
   return dao.listAll(req);
@@ -57,17 +58,17 @@ export async function getAdaptSpec(platformCode, req) {
 
 export async function adaptImage(inputPath, platformCode, outputDir) {
   if (!inputPath || !platformCode || !outputDir) {
-    throw new BusinessError(400, 'inputPath, platformCode, outputDir 均为必填');
+    throw new BusinessError(ERROR_CODE.PARAM_MISSING);
   }
 
   const fs = await import('fs');
   try { await fs.promises.access(inputPath); } catch {
-    throw new BusinessError(404, `输入文件不存在: ${inputPath}`);
+    throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND, `Input file not found: ${inputPath}`);
   }
 
   const specData = await getAdaptSpec(platformCode, {});
   if (!specData || !specData.specs || Object.keys(specData.specs).length === 0) {
-    throw new BusinessError(404, `未找到平台规格: ${platformCode}`);
+    throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND, `Platform spec not found: ${platformCode}`);
   }
 
   // 取第一个规格进行适配
@@ -83,7 +84,7 @@ export async function adaptImage(inputPath, platformCode, outputDir) {
   try {
     sharp = (await import('sharp')).default;
   } catch {
-    throw new BusinessError(500, '图片处理模块未安装，请联系管理员');
+    throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
   }
   const ext = 'jpg';
   const baseName = path.basename(inputPath, path.extname(inputPath));
@@ -96,7 +97,7 @@ export async function adaptImage(inputPath, platformCode, outputDir) {
       .toFormat(ext)
       .toFile(outputPath);
   } catch (sharpErr) {
-    throw new BusinessError(500, '图片处理失败，请稍后重试');
+    throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
   }
 
   const stats = await fs.promises.stat(outputPath);

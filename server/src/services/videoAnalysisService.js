@@ -15,6 +15,7 @@ import fs from 'fs';
 import os from 'os';
 import logger from '../utils/logger.js';
 import { BusinessError } from '../utils/businessError.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 const execFileP = promisify(execFile);
 const fsMkdir = promisify(fs.mkdir);
@@ -48,7 +49,7 @@ export async function extractFrames(videoUrl, opts = {}) {
   const frameCount = opts.frameCount || 8;
   const outputDir = opts.outputDir || os.tmpdir();
   const sessionDir = path.join(outputDir, `frames_${Date.now()}`);
-  await fsMkdir(sessionDir, { recursive: true }).catch(e => { throw new BusinessError(500, '临时目录创建失败', { sessionDir, reason: e.message }); });
+  await fsMkdir(sessionDir, { recursive: true }).catch(e => { throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, 'Temp directory creation failed', { sessionDir, reason: e.message }); });
 
   try {
     await execFileP('ffmpeg', ['-version'], { timeout: 3000 });

@@ -6,6 +6,7 @@ import { BusinessError } from '../utils/businessError.js';
  */
 import { submitJob } from './job-queue.service.js';
 import db from '../dao/db.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 /**
  * 爆款视频分析
@@ -39,7 +40,7 @@ export async function getViralAnalysis(jobId, userId) {
       'SELECT id, status, progress, result_data, created_at FROM job_queue WHERE id = ? AND user_id = ? AND task_type = ?',
       [jobId, userId, 'viral_analysis'],
     );
-    if (rows.length === 0) throw new BusinessError(404, '分析任务不存在');
+    if (rows.length === 0) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
     return rows[0];
   } finally {
     conn.release();

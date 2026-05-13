@@ -21,7 +21,7 @@ export const handleCallback = wrapController(async (req, res) => {
 
 export const checkPaymentResult = wrapController(async (req) => {
     const data = await allinpayService.queryOrder(req.params.reqsn);
-    if (!data) throw new BusinessError(ERROR_CODE.NOT_FOUND, '订单不存在');
+    if (!data) throw new BusinessError(ERROR_CODE.NOT_FOUND);
     return data;
 });
 

@@ -2,6 +2,7 @@ import { BusinessError } from '../utils/businessError.js';
 import { PROMPT_STATUS } from '../constants/domainStatus.js';
 import * as promptDao from '../dao/promptDao.js';
 import logger from '../utils/logger.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 // ==================== 变量解析引擎 ====================
 
@@ -70,7 +71,7 @@ export async function createTemplate(userId, data) {
 
 export async function submitForReview(userId, id) {
   const t = await promptDao.getTemplateById(id);
-  if (!t || t.creator_id !== userId) throw new BusinessError(404, '模板不存在');
+  if (!t || t.creator_id !== userId) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   await promptDao.updateStatus(id, 1, null, '');  // 0→1 待审核
 }
 
@@ -87,9 +88,9 @@ function deriveIntentId(templateCode) {
 /** 一键复制官方模板为用户私有副本 */
 export async function copyOfficialTemplate(userId, templateId) {
   const source = await promptDao.getTemplateById(templateId);
-  if (!source) throw new BusinessError(404, '模板不存在');
+  if (!source) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   if (!source.is_public || source.status !== 2) {
-    throw new BusinessError(400, '只能复制已上架的官方模板');
+    throw new BusinessError(ERROR_CODE.PARAM_ERROR);
   }
 
   const intentId = deriveIntentId(source.template_code);
@@ -132,7 +133,7 @@ export async function copyOfficialTemplate(userId, templateId) {
 export async function updateMyTemplate(userId, templateId, data) {
   const t = await promptDao.getTemplateById(templateId);
   if (!t || t.creator_id !== userId || t.is_public) {
-    throw new BusinessError(403, '只能编辑自己的私有模板');
+    throw new BusinessError(ERROR_CODE.PARAM_ERROR);
   }
   const allowed = { title: data.title, content: data.content, description: data.description, tags: data.tags, variables: data.variables, category: data.category };
   const clean = Object.fromEntries(Object.entries(allowed).filter(([, v]) => v !== undefined));
@@ -145,7 +146,7 @@ export async function updateMyTemplate(userId, templateId, data) {
 /** 提交私有模板申请收录为官方模板 */
 export async function submitToOfficial(userId, templateId) {
   const t = await promptDao.getTemplateById(templateId);
-  if (!t || t.creator_id !== userId) throw new BusinessError(404, '模板不存在');
+  if (!t || t.creator_id !== userId) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   await promptDao.updateStatus(templateId, 1, null, '');  // → 待审核
   logger.info('[Prompt] User submitted template for review', { id: templateId, userId, templateCode: t.template_code });
   return { submitted: true };
@@ -153,7 +154,7 @@ export async function submitToOfficial(userId, templateId) {
 
 /** 批量标记模板（默认/热门/精选） */
 export async function adminBatchMarkTemplates(ids, marking, action) {
-  if (!['default', 'hot', 'featured'].includes(marking)) throw new BusinessError(400, '标记类型无效');
+  if (!['default', 'hot', 'featured'].includes(marking)) throw new BusinessError(ERROR_CODE.PARAM_INVALID);
 
   const templates = await promptDao.getTemplatesByIds(ids);
   for (const t of templates) {
@@ -180,7 +181,7 @@ export async function useTemplate(userId, id) {
 
 export async function fillAndPreview(userId, templateId, values = {}) {
   const t = await useTemplate(userId, templateId);
-  if (!t) throw new BusinessError(404, '模板不存在');
+  if (!t) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   let variables = t.variables;
   if (typeof variables === 'string') {
     try { variables = JSON.parse(variables); }
@@ -344,7 +345,7 @@ export async function getRecommendations(userId, { limit = 12 }) {
 // ==================== 评分 ====================
 
 export async function rateTemplate(userId, templateId, score) {
-  if (score < 1 || score > 5) throw new BusinessError(400, '评分需在1-5之间');
+  if (score < 1 || score > 5) throw new BusinessError(ERROR_CODE.PARAM_INVALID);
   await promptDao.upsertRating(userId, templateId, score);
   const rating = await promptDao.getAverageRating(templateId);
   return { score, avgScore: Math.round(rating.avg_score * 10) / 10, ratingCount: rating.rating_count };

@@ -26,17 +26,17 @@ export async function registerEnterprise({
   // 校验 code 唯一性
   const existing = await enterpriseDao.findTenantByCode(code);
   if (existing) {
-    throw new BusinessError(ERROR_CODE.BAD_REQUEST, '企业编码已被使用');
+    throw new BusinessError(ERROR_CODE.BAD_REQUEST);
   }
 
   // 校验域名唯一性 + 格式（防 XSS）
   if (domain) {
     if (/[<>"'\s]/.test(domain) || /^javascript:/i.test(domain)) {
-      throw new BusinessError(ERROR_CODE.BAD_REQUEST, '域名格式无效');
+      throw new BusinessError(ERROR_CODE.BAD_REQUEST);
     }
     const domainTenant = await enterpriseDao.findTenantByDomain(domain);
     if (domainTenant) {
-      throw new BusinessError(ERROR_CODE.BAD_REQUEST, '域名已被使用');
+      throw new BusinessError(ERROR_CODE.BAD_REQUEST);
     }
   }
 
@@ -88,23 +88,23 @@ export async function loginEnterprise({ account, password }) {
     ? await userDao.findByEmail(account)
     : await userDao.findByPhone(account);
   if (!user) {
-    throw new BusinessError(ERROR_CODE.UNAUTHORIZED, '账号不存在');
+    throw new BusinessError(ERROR_CODE.UNAUTHORIZED);
   }
 
   const match = await bcrypt.compare(password, user.password);
   if (!match) {
-    throw new BusinessError(ERROR_CODE.UNAUTHORIZED, '密码错误');
+    throw new BusinessError(ERROR_CODE.UNAUTHORIZED);
   }
 
   // 查找用户所属企业（不限 tenant_id）
   const enterpriseUser = await enterpriseDao.findEnterpriseUserByUserId(user.id);
   if (!enterpriseUser) {
-    throw new BusinessError(ERROR_CODE.FORBIDDEN, '该账号未关联任何企业');
+    throw new BusinessError(ERROR_CODE.FORBIDDEN);
   }
 
   const tenant = await enterpriseDao.findTenantById(enterpriseUser.tenant_id);
   if (!tenant || tenant.status !== 1) {
-    throw new BusinessError(ERROR_CODE.FORBIDDEN, '企业已被禁用或不存在');
+    throw new BusinessError(ERROR_CODE.FORBIDDEN);
   }
 
   // 签发 JWT（含企业端标识）
@@ -147,7 +147,7 @@ export async function loginEnterprise({ account, password }) {
 
 export async function getEnterpriseProfile(tenantId, userId) {
   const tenant = await enterpriseDao.findTenantById(tenantId);
-  if (!tenant) throw new BusinessError(ERROR_CODE.NOT_FOUND, '企业不存在');
+  if (!tenant) throw new BusinessError(ERROR_CODE.NOT_FOUND);
 
   const userCount = await enterpriseDao.countEnterpriseUsers(tenantId);
   let whiteLabel = {};
@@ -203,7 +203,7 @@ export async function addEnterpriseUser(tenantId, { phone, email, nickname, pass
   const count = await enterpriseDao.countEnterpriseUsers(tenantId);
   const tenant = await enterpriseDao.findTenantById(tenantId);
   if (tenant && count >= tenant.max_users) {
-    throw new BusinessError(ERROR_CODE.BAD_REQUEST, `已达到企业子账号上限 (${tenant.max_users}人)`);
+    throw new BusinessError(ERROR_CODE.BAD_REQUEST, `Enterprise sub-account limit reached (${tenant.max_users})`);
   }
 
   // 查找或创建用户
@@ -212,7 +212,7 @@ export async function addEnterpriseUser(tenantId, { phone, email, nickname, pass
   if (!user && email) user = await userDao.findByEmail(email);
 
   if (!user) {
-    if (!password) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '新建账号需要提供密码');
+    if (!password) throw new BusinessError(ERROR_CODE.BAD_REQUEST);
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
     const username = phone || email;
     const userId = await userDao.insertUser({
@@ -226,7 +226,7 @@ export async function addEnterpriseUser(tenantId, { phone, email, nickname, pass
 
   // 检查是否已加入该企业
   const existing = await enterpriseDao.findEnterpriseUser(tenantId, user.id);
-  if (existing) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '该用户已是企业成员');
+  if (existing) throw new BusinessError(ERROR_CODE.BAD_REQUEST);
 
   return enterpriseDao.addEnterpriseUser({ tenantId, userId: user.id, role });
 }
@@ -234,14 +234,14 @@ export async function addEnterpriseUser(tenantId, { phone, email, nickname, pass
 export async function updateEnterpriseUser(tenantId, id, data) {
   // 跨租户防护：验证该用户属于当前租户
   const eu = await enterpriseDao.findEnterpriseUser(tenantId, id);
-  if (!eu) throw new BusinessError(ERROR_CODE.NOT_FOUND, '子账号不存在');
+  if (!eu) throw new BusinessError(ERROR_CODE.NOT_FOUND);
   return enterpriseDao.updateEnterpriseUser(id, tenantId, data);
 }
 
 export async function removeEnterpriseUser(tenantId, id) {
   // 跨租户防护：验证该用户属于当前租户
   const eu = await enterpriseDao.findEnterpriseUser(tenantId, id);
-  if (!eu) throw new BusinessError(ERROR_CODE.NOT_FOUND, '子账号不存在');
+  if (!eu) throw new BusinessError(ERROR_CODE.NOT_FOUND);
   return enterpriseDao.removeEnterpriseUser(id, tenantId);
 }
 
@@ -295,7 +295,7 @@ export async function getEnterpriseUsageDetail(tenantId, query) {
 
 export async function getWhiteLabel(tenantId) {
   const tenant = await enterpriseDao.findTenantById(tenantId);
-  if (!tenant) throw new BusinessError(ERROR_CODE.NOT_FOUND, '企业不存在');
+  if (!tenant) throw new BusinessError(ERROR_CODE.NOT_FOUND);
   if (!tenant.white_label) return {};
   try {
     return typeof tenant.white_label === 'string' ? JSON.parse(tenant.white_label) : tenant.white_label;
@@ -312,12 +312,12 @@ export async function updateWhiteLabel(tenantId, data) {
   }
   // 验证主色格式
   if (whiteLabel.primaryColor && !/^#[0-9a-fA-F]{6}$/.test(whiteLabel.primaryColor)) {
-    throw new BusinessError(ERROR_CODE.BAD_REQUEST, '主色格式无效，需要 #RRGGBB');
+    throw new BusinessError(ERROR_CODE.BAD_REQUEST);
   }
   // 验证域名格式（防 XSS）
   if (whiteLabel.domain) {
     if (/[<>"'\s]/.test(whiteLabel.domain) || /^javascript:/i.test(whiteLabel.domain)) {
-      throw new BusinessError(ERROR_CODE.BAD_REQUEST, '域名格式无效');
+      throw new BusinessError(ERROR_CODE.BAD_REQUEST);
     }
   }
   await enterpriseDao.updateTenant(tenantId, { white_label: whiteLabel });
@@ -364,8 +364,8 @@ export async function getApprovalLogs(tenantId, query) {
 
 export async function submitForReview(code) {
   const tenant = await enterpriseDao.findTenantByCode(code);
-  if (!tenant) throw new BusinessError(ERROR_CODE.NOT_FOUND, '企业不存在');
-  if (tenant.review_status !== 'pending') throw new BusinessError(ERROR_CODE.BAD_REQUEST, '当前状态不可提交审核');
+  if (!tenant) throw new BusinessError(ERROR_CODE.NOT_FOUND);
+  if (tenant.review_status !== 'pending') throw new BusinessError(ERROR_CODE.BAD_REQUEST);
 
   await enterpriseDao.updateTenantReviewStatus(tenant.id, { status: 'under_review' });
   await enterpriseDao.insertApprovalLog({
@@ -378,11 +378,11 @@ export async function submitForReview(code) {
 export async function approveTenant(id, { operatorId }) {
   return withTransaction(async (conn) => {
     const tenant = await enterpriseDao.findTenantById(id, conn, true);
-    if (!tenant) throw new BusinessError(ERROR_CODE.NOT_FOUND, '企业不存在');
+    if (!tenant) throw new BusinessError(ERROR_CODE.NOT_FOUND);
 
     const allowed = getValidTransitions(tenant.review_status);
     if (!allowed.includes('approved')) {
-      throw new BusinessError(ERROR_CODE.BAD_REQUEST, `当前状态 ${tenant.review_status} 不可审批通过`);
+      throw new BusinessError(ERROR_CODE.BAD_REQUEST, `Status ${tenant.review_status} cannot be approved`);
     }
 
     await enterpriseDao.updateTenantReviewStatus(id, {
@@ -399,14 +399,14 @@ export async function approveTenant(id, { operatorId }) {
 export async function rejectTenant(id, { operatorId, reason }) {
   return withTransaction(async (conn) => {
     const tenant = await enterpriseDao.findTenantById(id, conn, true);
-    if (!tenant) throw new BusinessError(ERROR_CODE.NOT_FOUND, '企业不存在');
+    if (!tenant) throw new BusinessError(ERROR_CODE.NOT_FOUND);
 
     const allowed = getValidTransitions(tenant.review_status);
     if (!allowed.includes('rejected')) {
-      throw new BusinessError(ERROR_CODE.BAD_REQUEST, `当前状态 ${tenant.review_status} 不可驳回`);
+      throw new BusinessError(ERROR_CODE.BAD_REQUEST, `Status ${tenant.review_status} cannot be rejected`);
     }
     if (!reason || reason.trim().length < 4) {
-      throw new BusinessError(ERROR_CODE.BAD_REQUEST, '驳回原因至少4个字符');
+      throw new BusinessError(ERROR_CODE.BAD_REQUEST);
     }
 
     await enterpriseDao.updateTenantReviewStatus(id, {
@@ -423,8 +423,8 @@ export async function rejectTenant(id, { operatorId, reason }) {
 export async function suspendTenant(id, { operatorId, reason }) {
   return withTransaction(async (conn) => {
     const tenant = await enterpriseDao.findTenantById(id, conn, true);
-    if (!tenant) throw new BusinessError(ERROR_CODE.NOT_FOUND, '企业不存在');
-    if (tenant.review_status !== 'approved') throw new BusinessError(ERROR_CODE.BAD_REQUEST, '仅已通过企业可停用');
+    if (!tenant) throw new BusinessError(ERROR_CODE.NOT_FOUND);
+    if (tenant.review_status !== 'approved') throw new BusinessError(ERROR_CODE.BAD_REQUEST);
 
     await enterpriseDao.updateTenantReviewStatus(id, { status: 'suspended' }, conn);
     await enterpriseDao.insertApprovalLog({
@@ -438,8 +438,8 @@ export async function suspendTenant(id, { operatorId, reason }) {
 export async function reinstateTenant(id, { operatorId }) {
   return withTransaction(async (conn) => {
     const tenant = await enterpriseDao.findTenantById(id, conn, true);
-    if (!tenant) throw new BusinessError(ERROR_CODE.NOT_FOUND, '企业不存在');
-    if (tenant.review_status !== 'suspended') throw new BusinessError(ERROR_CODE.BAD_REQUEST, '仅已停用企业可恢复');
+    if (!tenant) throw new BusinessError(ERROR_CODE.NOT_FOUND);
+    if (tenant.review_status !== 'suspended') throw new BusinessError(ERROR_CODE.BAD_REQUEST);
 
     await enterpriseDao.updateTenantReviewStatus(id, { status: 'approved' }, conn);
     await enterpriseDao.insertApprovalLog({

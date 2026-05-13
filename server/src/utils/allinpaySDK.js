@@ -10,6 +10,7 @@ import allinpayConfig from '../config/allinpay.js';
 import { isProduction } from '../config/index.js';
 import logger from './logger.js';
 import { BusinessError } from './businessError.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 // ==================== 密钥缓存 ====================
 
@@ -59,7 +60,7 @@ export function buildSignString(params) {
 
 async function rsaSign(signStr) {
   const privateKey = await getPrivateKey();
-  if (!privateKey) throw new BusinessError(503, '商户私钥未配置');
+  if (!privateKey) throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
   const sign = crypto.createSign('RSA-SHA256');
   sign.update(signStr, 'utf-8');
   return sign.sign(privateKey, 'base64');
@@ -69,7 +70,7 @@ async function rsaSign(signStr) {
 
 async function rsaVerify(signStr, signature) {
   const publicKey = await getPublicKey();
-  if (!publicKey) throw new BusinessError(503, '通联公钥未配置');
+  if (!publicKey) throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
   const verify = crypto.createVerify('RSA-SHA256');
   verify.update(signStr, 'utf-8');
   return verify.verify(publicKey, signature, 'base64');
@@ -155,13 +156,13 @@ export async function unifiedOrder(params) {
     });
   } catch (err) {
     logger.error('[Allinpay] 统一下单网络错误', { message: err.message });
-    throw new BusinessError(502, '支付网关连接失败，请稍后重试');
+    throw new BusinessError(ERROR_CODE.PAY_CHANNEL_ERROR);
   }
 
   const MAX_RESPONSE_SIZE = 1024 * 1024; // 1MB — 支付响应不应超过此值
   const contentLength = parseInt(res.headers.get('content-length') || '0', 10);
   if (contentLength > MAX_RESPONSE_SIZE) {
-    throw new BusinessError(502, '支付网关响应异常（响应体过大）');
+    throw new BusinessError(ERROR_CODE.PAY_CHANNEL_ERROR);
   }
   const raw = await res.text();
   let result;
@@ -169,13 +170,13 @@ export async function unifiedOrder(params) {
     result = JSON.parse(raw);
   } catch {
     logger.error('[Allinpay] 统一下单响应解析失败', { reqsn: postData.reqsn, contentType: res.headers.get('content-type') });
-    throw new BusinessError(502, '支付网关响应异常');
+    throw new BusinessError(ERROR_CODE.PAY_CHANNEL_ERROR);
   }
 
   logger.info('[Allinpay] 统一下单响应', { retcode: result.retcode, retmsg: result.retmsg, trxid: result.trxid, reqsn: postData.reqsn });
 
   if (result.retcode !== 'SUCCESS') {
-    throw new BusinessError(502, result.retmsg || '支付下单失败');
+    throw new BusinessError(ERROR_CODE.PAY_CHANNEL_ERROR, result.retmsg || 'Payment order creation failed');
   }
 
   const respSign = result.sign;
@@ -183,11 +184,11 @@ export async function unifiedOrder(params) {
     const verifyStr = buildSignString(result);
     if (!(await rsaVerify(verifyStr, respSign))) {
       logger.error('[Allinpay] 响应验签失败，拒绝响应', { reqsn: postData.reqsn });
-      throw new BusinessError(502, '支付网关签名验证失败');
+      throw new BusinessError(ERROR_CODE.PAY_SIGN_FAILED);
     }
   } else if (!(await isMockMode())) {
     logger.error('[Allinpay] 响应缺少 sign 字段', { reqsn: postData.reqsn });
-    throw new BusinessError(502, '支付网关响应缺少签名');
+    throw new BusinessError(ERROR_CODE.PAY_CHANNEL_ERROR);
   }
 
   return {

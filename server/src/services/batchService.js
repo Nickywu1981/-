@@ -11,6 +11,7 @@ import { BusinessError } from '../utils/businessError.js';
 import { BATCH_TASK_STATUS } from '../constants/domainStatus.js';
 import { bullConfig } from '../config/index.js';
 import logger from '../utils/logger.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 const BATCH_CONCURRENCY = bullConfig.batchConcurrency || 5;
 
@@ -25,7 +26,7 @@ function safeMsg(err) {
 
 export async function submitBatchTask(userId, { imageUrls, operation, platform, style, nightMode = false }) {
   const batchSize = imageUrls?.length || 0;
-  if (batchSize === 0) throw new BusinessError(400, '请上传至少一张图片');
+  if (batchSize === 0) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
 
   const creditMap = { cutout: 'cutout', main_image: 'enhance', scene: 'scene', img2video: 'img2video' };
   const action = creditMap[operation] || operation;
@@ -116,7 +117,7 @@ export async function processNightBatchJobs() {
 // ==================== 批量模板 ====================
 
 export async function saveBatchTemplate(userId, { name, operation, platform, style, nightMode, imageCount }) {
-  if (!name || !operation) throw new BusinessError(400, '模板名称和操作类型为必填');
+  if (!name || !operation) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
   return batchTemplateDao.insertTemplate(userId, { name, operation, platform, style, nightMode, imageCount });
 }
 
@@ -124,7 +125,7 @@ export async function listBatchTemplates(userId) { return batchTemplateDao.listT
 
 export async function deleteBatchTemplate(userId, templateId) {
   const t = await batchTemplateDao.getTemplate(templateId, userId);
-  if (!t) throw new BusinessError(404, '模板不存在');
+  if (!t) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   await batchTemplateDao.deleteTemplate(templateId, userId);
 }
 
@@ -132,7 +133,7 @@ export async function deleteBatchTemplate(userId, templateId) {
 
 export async function redoBatchTask(userId, sourceTaskId) {
   const source = await getTask(sourceTaskId, userId);
-  if (!source) throw new BusinessError(404, '源任务不存在');
+  if (!source) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   const { imageUrls, operation, platform, style, nightMode } = source.input_params || {};
   return submitBatchTask(userId, { imageUrls, operation, platform, style, nightMode });
 }
@@ -147,8 +148,8 @@ export async function listBatchHistory(userId, { page = 1, pageSize = 10 }) {
 
 export async function getBatchZipUrl(taskId, userId) {
   const task = await getTask(taskId, userId);
-  if (!task || task.type !== 'batch') throw new BusinessError(404, '任务不存在或非批量任务');
-  if (task.status !== BATCH_TASK_STATUS.COMPLETED) throw new BusinessError(400, '任务未完成，无法下载');
+  if (!task || task.type !== 'batch') throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
+  if (task.status !== BATCH_TASK_STATUS.COMPLETED) throw new BusinessError(ERROR_CODE.PARAM_ERROR);
   return { zipUrl: `/api/batch/${taskId}/download`, total: task.output_result?.total || 0, estimatedSize: `${Math.round((task.output_result?.total || 0) * 0.5)}MB` };
 }
 
@@ -156,7 +157,7 @@ export async function getBatchZipUrl(taskId, userId) {
 
 export async function getTaskResult(taskId, userId) {
   const task = await getTask(taskId, userId);
-  if (!task) throw new BusinessError(404, '任务不存在');
+  if (!task) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   return task;
 }
 

@@ -8,6 +8,7 @@ import { BusinessError } from '../utils/businessError.js';
 import { submitJob } from './job-queue.service.js';
 import * as moderationService from './moderation.service.js';
 import videoTranslateDao from '../dao/videoTranslateDao.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 /**
  * 视频语音翻译 (语音翻译成其他语言配音)
@@ -22,7 +23,7 @@ export async function translateVoice(userId, {
     `voice_translate:${sourceLang}→${targetLang}`, userId, { stage: 'input' },
   );
   if (audit.action === 'block') {
-    throw new BusinessError(422, '翻译请求包含违规参数');
+    throw new BusinessError(ERROR_CODE.CONTENT_MODERATION);
   }
 
   return submitJob(userId, 'video_voice_translate', {
@@ -63,7 +64,7 @@ export async function translateFace(userId, {
     `face_translate:${sourceLang}→${targetLang}`, userId, { stage: 'input' },
   );
   if (audit.action === 'block') {
-    throw new BusinessError(422, '面容翻译请求包含违规参数');
+    throw new BusinessError(ERROR_CODE.CONTENT_MODERATION);
   }
 
   return submitJob(userId, 'video_face_translate', {

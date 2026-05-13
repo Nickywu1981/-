@@ -7,6 +7,7 @@ import { registerModel } from '../aiEngine.js';
 import { BusinessError } from '../../utils/businessError.js';
 import { adapterConfig } from '../../config/index.js';
 import logger from '../../utils/logger.js';
+import { ERROR_CODE } from '../../constants/errorCode.js';
 
 const API_KEY = adapterConfig.openai.apiKey;
 const BASE_URL = adapterConfig.openai.baseUrl;
@@ -43,7 +44,7 @@ function makeTextInfer(modelId, maxTokens = DEFAULTS.textMaxTokens, timeout = DE
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       logger.error(`[OpenAI] API 请求失败 ${res.status}: ${err.error?.message || res.statusText}`);
-      throw new BusinessError(502, 'AI 服务暂时不可用，请稍后重试');
+      throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
     }
 
     onProgress?.(80);
@@ -91,7 +92,7 @@ function makeTextStreamInfer(modelId, maxTokens = DEFAULTS.textMaxTokens, timeou
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       logger.error(`[OpenAI] Stream API 请求失败 ${res.status}: ${err.error?.message || res.statusText}`);
-      throw new BusinessError(502, 'AI 服务暂时不可用，请稍后重试');
+      throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
     }
 
     onProgress?.(30);
@@ -207,7 +208,7 @@ export async function getEmbedding(text, modelId = 'text-embedding-3-small') {
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     logger.error(`[OpenAI] Embedding API 请求失败 ${res.status}: ${err.error?.message || res.statusText}`);
-    throw new BusinessError(502, 'Embedding 服务暂时不可用，请稍后重试');
+    throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
   }
 
   const data = await res.json();

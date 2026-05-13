@@ -8,6 +8,7 @@ import { registerModel } from '../aiEngine.js';
 import { BusinessError } from '../../utils/businessError.js';
 import config from '../../config/index.js';
 import logger from '../../utils/logger.js';
+import { ERROR_CODE } from '../../constants/errorCode.js';
 
 const SD_API_URL = config.adapters.sd.apiUrl;
 const REPLICATE_API_KEY = config.adapters.sd.replicateKey;
@@ -33,7 +34,7 @@ async function sdTxt2Img(input, onProgress) {
     signal: AbortSignal.timeout(180000),
   });
 
-  if (!res.ok) throw new BusinessError(502, `SD API 错误 ${res.status}`);
+  if (!res.ok) throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, `SD API error ${res.status}`);
 
   onProgress?.(60);
 
@@ -66,7 +67,7 @@ async function sdImg2Img(input, onProgress) {
     signal: AbortSignal.timeout(180000),
   });
 
-  if (!res.ok) throw new BusinessError(502, `SD img2img API 错误 ${res.status}`);
+  if (!res.ok) throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, `SD img2img API error ${res.status}`);
 
   onProgress?.(60);
 
@@ -83,7 +84,7 @@ async function sdImg2Img(input, onProgress) {
 // ==================== Replicate 降级方案 ====================
 
 async function replicateInfer(input, onProgress) {
-  if (!REPLICATE_API_KEY) throw new BusinessError(503, 'REPLICATE_API_KEY 未配置');
+  if (!REPLICATE_API_KEY) throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
 
   const { prompt, model = 'stability-ai/sdxl', negativePrompt = '', width = 1024, height = 1024 } = input;
 
@@ -99,7 +100,7 @@ async function replicateInfer(input, onProgress) {
     }),
   });
 
-  if (!createRes.ok) throw new BusinessError(502, `Replicate API 错误 ${createRes.status}`);
+  if (!createRes.ok) throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, `Replicate API error ${createRes.status}`);
 
   const prediction = await createRes.json();
   const pollUrl = prediction.urls?.get || prediction.urls?.cancel;
@@ -120,11 +121,11 @@ async function replicateInfer(input, onProgress) {
       return { imageUrl: pollData.output?.[0] || '', provider: 'replicate' };
     }
     if (pollData.status === 'failed') {
-      throw new BusinessError(502, 'Replicate 生成失败: ' + (pollData.error || 'unknown'));
+      throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, 'Replicate generation failed: ' + (pollData.error || 'unknown'));
     }
   }
 
-  throw new BusinessError(504, 'Replicate 生成超时');
+  throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
 }
 
 // ==================== 健康检查 ====================

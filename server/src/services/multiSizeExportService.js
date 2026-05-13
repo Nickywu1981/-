@@ -8,6 +8,7 @@
 import { saveSimpleFile } from '../utils/file-upload.js';
 import { BusinessError } from '../utils/businessError.js';
 import logger from '../utils/logger.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 // ==================== 平台尺寸预设 ====================
 
@@ -58,7 +59,7 @@ export async function exportMultiSize(params) {
     customSizes = [], format = 'png', quality = 90,
   } = params;
 
-  if (!imageUrl) throw new BusinessError(400, 'imageUrl 为必填参数');
+  if (!imageUrl) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
 
   // SSRF 防护 — 校验 URL 不指向内网
   const { validateExternalUrl } = await import('../utils/ssrfGuard.js');
@@ -66,7 +67,7 @@ export async function exportMultiSize(params) {
 
   // 下载原图
   const resp = await fetch(imageUrl, { signal: AbortSignal.timeout(30000) });
-  if (!resp.ok) throw new BusinessError(400, `下载图片失败: HTTP ${resp.status}`);
+  if (!resp.ok) throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, `Image download failed: HTTP ${resp.status}`);
   const sourceBuffer = Buffer.from(await resp.arrayBuffer());
 
   // 合并预设 + 自定义尺寸
@@ -75,7 +76,7 @@ export async function exportMultiSize(params) {
     ...customSizes.map((s, i) => ({ key: `custom_${i}`, ...s })),
   ];
 
-  if (!allSizes.length) throw new BusinessError(400, '至少需要一种输出尺寸');
+  if (!allSizes.length) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
 
   // 批量缩放 + 保存（并行处理）
   const sharp = (await import('sharp')).default;
@@ -128,7 +129,7 @@ export async function exportMultiSize(params) {
 // ==================== 批量多尺寸 ====================
 
 export async function batchExportMultiSize(imageUrls, sizeKeys) {
-  if (!imageUrls?.length) throw new BusinessError(400, '至少需要一张图片');
+  if (!imageUrls?.length) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
 
   const tasks = imageUrls.map(async (url) => {
     try {

@@ -1,5 +1,6 @@
 import * as brandDao from '../dao/brandDao.js';
 import { BusinessError } from '../utils/businessError.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 export async function getBrandSettings(userId) {
   const row = await brandDao.getBrand(userId);
@@ -19,6 +20,6 @@ export async function saveBrandSettings(userId, data) {
   for (const key of allowed) {
     if (data[key] !== undefined) sanitized[key] = data[key];
   }
-  if (Object.keys(sanitized).length === 0) throw new BusinessError(400, '没有需要更新的字段');
+  if (Object.keys(sanitized).length === 0) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
   return brandDao.upsertBrand(userId, sanitized);
 }

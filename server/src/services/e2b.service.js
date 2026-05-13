@@ -54,7 +54,7 @@ export const _cleanupTimer = setInterval(() => {
 
 function _getApiKey() {
   const key = config.apiKey;
-  if (!key) throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, 'E2B 服务未配置 API Key');
+  if (!key) throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
   return key;
 }
 
@@ -81,7 +81,7 @@ const DANGEROUS_PATTERNS = [
 
 function _auditCode(code) {
   for (const { pattern, msg } of DANGEROUS_PATTERNS) {
-    if (pattern.test(code)) throw new BusinessError(ERROR_CODE.VALIDATION_ERROR, `代码安全拦截: ${msg}`);
+    if (pattern.test(code)) throw new BusinessError(ERROR_CODE.VALIDATION_ERROR, `Code security blocked: ${msg}`);
   }
 }
 
@@ -129,9 +129,9 @@ export async function _startupOrphanCheck() {
 
 // ─────────────────── P0 #1 归属校验 ───────────────────
 function _checkOwnership(entry, userId) {
-  if (!userId) throw new BusinessError(ERROR_CODE.UNAUTHORIZED, '请先登录');
+  if (!userId) throw new BusinessError(ERROR_CODE.UNAUTHORIZED);
   if (entry.userId !== String(userId)) {
-    throw new BusinessError(ERROR_CODE.FORBIDDEN, '无权操作此沙箱');
+    throw new BusinessError(ERROR_CODE.FORBIDDEN);
   }
 }
 
@@ -197,7 +197,7 @@ function _checkCodeLength(code, language) {
   const lang = (language || 'python').toLowerCase();
   const maxLen = config.codeMaxByLanguage[lang] || config.defaultCodeMax;
   if (code.length > maxLen) {
-    throw new BusinessError(ERROR_CODE.VALIDATION_ERROR, `代码过长: ${lang} 上限 ${maxLen} 字符，当前 ${code.length} 字符`);
+    throw new BusinessError(ERROR_CODE.VALIDATION_ERROR, `Code too long: ${lang} max ${maxLen} chars, current ${code.length} chars`);
   }
 }
 
@@ -220,18 +220,18 @@ async function _logExecution({ sandboxId, userId, language, code, stdout, stderr
 function _normalizeE2bError(err, sandboxId) {
   const msg = (err?.message || '').toLowerCase();
   if (msg.includes('timeout')) {
-    return new BusinessError(ERROR_CODE.INTERNAL_ERROR, '代码执行超时，请简化代码或增加超时时间');
+    return new BusinessError(ERROR_CODE.INTERNAL_ERROR, 'Code execution timeout, simplify code or increase timeout');
   }
   if (msg.includes('quota') || msg.includes('rate limit')) {
-    return new BusinessError(ERROR_CODE.QUOTA_EXCEEDED, 'E2B 沙箱配额已用尽，请稍后重试');
+    return new BusinessError(ERROR_CODE.QUOTA_EXCEEDED, 'E2B sandbox quota exhausted');
   }
   if (msg.includes('not found') || msg.includes('not running')) {
-    return new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND, `沙箱 ${sandboxId} 不存在或已停止`);
+    return new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND, `Sandbox ${sandboxId} not found or stopped`);
   }
   if (msg.includes('api key') || msg.includes('unauthorized')) {
-    return new BusinessError(ERROR_CODE.INTERNAL_ERROR, 'E2B 服务配置异常，请联系管理员');
+    return new BusinessError(ERROR_CODE.INTERNAL_ERROR, 'E2B service configuration error');
   }
-  return new BusinessError(ERROR_CODE.INTERNAL_ERROR, '沙箱执行异常，请稍后重试');
+  return new BusinessError(ERROR_CODE.INTERNAL_ERROR, 'Sandbox execution error');
 }
 
 // ─────────────────── P2 #12 告警 ───────────────────
@@ -253,7 +253,7 @@ function _maybeCheckAlerts() {
 export async function createSandbox(userId) {
   const uid = String(userId);
   if (_countUserSandboxes(uid) >= config.maxSandboxesPerUser) {
-    throw new BusinessError(ERROR_CODE.QUOTA_EXCEEDED, `沙箱数量已达上限 (${config.maxSandboxesPerUser})`);
+    throw new BusinessError(ERROR_CODE.QUOTA_EXCEEDED, `Sandbox limit reached (${config.maxSandboxesPerUser})`);
   }
 
   // P3 #14: 预热池优先
@@ -266,7 +266,6 @@ export async function createSandbox(userId) {
   }
 
   const apiKey = _getApiKey();
-  let sandbox;
   try {
     sandbox = await Sandbox.create({
       apiKey,
@@ -296,7 +295,7 @@ export async function createSandbox(userId) {
 export async function executeCode(sandboxId, userId, code, language, timeoutMs) {
   // P0: 归属校验
   const entry = SANDBOX_STORE.get(sandboxId);
-  if (!entry) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND, '沙箱不存在或已过期');
+  if (!entry) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   _checkOwnership(entry, userId);
 
   // P1 #2: 危险代码检测
@@ -312,11 +311,11 @@ export async function executeCode(sandboxId, userId, code, language, timeoutMs) 
   } catch (e) {
     logger.warn('[E2B] 沙箱状态检查失败', { sandboxId, error: e.message });
     _cleanupEntry(sandboxId, 'crashed');
-    throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND, '沙箱已崩溃，请重新创建');
+    throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   }
   if (!running) {
     _cleanupEntry(sandboxId, 'stopped');
-    throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND, '沙箱已停止，请重新创建');
+    throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   }
 
   const lang = (language || 'python').toLowerCase();
@@ -365,7 +364,7 @@ export async function executeCode(sandboxId, userId, code, language, timeoutMs) 
 
 export async function getSandbox(sandboxId, userId) {
   const entry = SANDBOX_STORE.get(sandboxId);
-  if (!entry) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND, '沙箱不存在或已过期');
+  if (!entry) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   _checkOwnership(entry, userId);
   let running;
   try {
@@ -399,7 +398,7 @@ export async function listUserSandboxes(userId) {
 
 export async function destroySandbox(sandboxId, userId) {
   const entry = SANDBOX_STORE.get(sandboxId);
-  if (!entry) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND, '沙箱不存在或已过期');
+  if (!entry) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   _checkOwnership(entry, userId);
   _cleanupEntry(sandboxId, 'user_request');
   return { sandboxId };

@@ -21,11 +21,11 @@ export async function listBankAccounts(tenantId) {
 export async function addBankAccount(tenantId, data) {
   const { accountType, accountName, accountNo, bankName, bankBranch, isDefault } = data;
   if (!accountType || !accountName || !accountNo) {
-    throw new BusinessError(ERROR_CODE.BAD_REQUEST, '账户类型/户名/账号为必填项');
+    throw new BusinessError(ERROR_CODE.BAD_REQUEST);
   }
   // 核验手机号/银行卡号格式
   if (accountType === 'bank' && accountNo.length < 10) {
-    throw new BusinessError(ERROR_CODE.BAD_REQUEST, '银行卡号格式不正确');
+    throw new BusinessError(ERROR_CODE.BAD_REQUEST);
   }
   return financeDao.addBankAccount(tenantId, { accountType, accountName, accountNo, bankName, bankBranch, isDefault });
 }
@@ -33,7 +33,7 @@ export async function addBankAccount(tenantId, data) {
 export async function removeBankAccount(tenantId, id) {
   const account = await financeDao.findBankAccountById(id, tenantId);
   if (!account) {
-    throw new BusinessError(ERROR_CODE.NOT_FOUND, '收款账户不存在');
+    throw new BusinessError(ERROR_CODE.NOT_FOUND);
   }
   return financeDao.removeBankAccount(id, tenantId);
 }
@@ -52,7 +52,7 @@ export async function listSettlements(tenantId, query) {
 
 export async function getSettlementDetail(id) {
   const detail = await financeDao.getSettlementDetail(id);
-  if (!detail) throw new BusinessError(ERROR_CODE.NOT_FOUND, '结算记录不存在');
+  if (!detail) throw new BusinessError(ERROR_CODE.NOT_FOUND);
   return detail;
 }
 
@@ -77,20 +77,20 @@ export async function createWithdrawal(tenantId, userId, data) {
   const safeAmount = Number(amount);
 
   if (!safeAmount || safeAmount <= 0) {
-    throw new BusinessError(ERROR_CODE.BAD_REQUEST, '提现金额必须大于0');
+    throw new BusinessError(ERROR_CODE.BAD_REQUEST);
   }
 
   // Validate policy + bank account before acquiring DB lock
   const policy = await getCommissionPolicy(tenantId);
   const minAmount = policy?.min_withdrawal || 100;
   if (safeAmount < minAmount) {
-    throw new BusinessError(ERROR_CODE.BAD_REQUEST, `最低提现金额为 ¥${minAmount}`);
+    throw new BusinessError(ERROR_CODE.BAD_REQUEST, `Minimum withdrawal amount: ¥${minAmount}`);
   }
 
   if (bankAccountId) {
     const account = await financeDao.findBankAccountById(bankAccountId, tenantId);
     if (!account) {
-      throw new BusinessError(ERROR_CODE.BAD_REQUEST, '收款账户不存在');
+      throw new BusinessError(ERROR_CODE.BAD_REQUEST);
     }
   }
 
@@ -98,7 +98,7 @@ export async function createWithdrawal(tenantId, userId, data) {
   const { balance, conn } = await financeDao.lockTenantBalance(tenantId);
   try {
     if (balance < safeAmount) {
-      throw new BusinessError(ERROR_CODE.BAD_REQUEST, `余额不足，当前可用余额 ¥${balance}`);
+      throw new BusinessError(ERROR_CODE.BAD_REQUEST, `Insufficient balance, available: ¥${balance}`);
     }
 
     const fee = Math.round(safeAmount * 0.006 * 100) / 100;
@@ -145,7 +145,7 @@ export async function createWithdrawal(tenantId, userId, data) {
 
 export async function getWithdrawalDetail(id) {
   const detail = await financeDao.getWithdrawalById(id);
-  if (!detail) throw new BusinessError(ERROR_CODE.NOT_FOUND, '提现记录不存在');
+  if (!detail) throw new BusinessError(ERROR_CODE.NOT_FOUND);
   return detail;
 }
 

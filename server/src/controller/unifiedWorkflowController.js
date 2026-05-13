@@ -9,6 +9,7 @@ import { wrapController } from '../utils/wrapController.js';
 import { BusinessError } from '../utils/businessError.js';
 import logger from '../utils/logger.js';
 import { INDUSTRY_LIST } from '../services/industryConfig.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 // ==================== 工作流执行 ====================
 
@@ -55,13 +56,13 @@ export const getDefinitions = wrapController(async () => {
 
 export const getDefinition = wrapController(async (req) => {
   const wf = getWorkflow(req.params.id);
-  if (!wf) throw new BusinessError(404, '工作流不存在');
+  if (!wf) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   return wf;
 });
 
 export const getBindableSteps_ = wrapController(async (req) => {
   const steps = getBindableSteps(req.params.id);
-  if (!steps.length) throw new BusinessError(404, '工作流不存在或无绑定步骤');
+  if (!steps.length) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   return steps;
 });
 
@@ -84,7 +85,7 @@ export const configureWorkflow = wrapController(async (req) => {
 
 export const getWorkflowConfig = wrapController(async (req) => {
   const wf = getWorkflow(req.params.id);
-  if (!wf) throw new BusinessError(404, '工作流不存在');
+  if (!wf) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   return wfConfigDao.getWorkflowConfig(req.params.id, req.user?.id);
 });
 

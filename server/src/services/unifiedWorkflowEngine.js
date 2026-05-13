@@ -29,6 +29,7 @@ const jobStore = new Map();
 
 // ==================== 行业场景映射 (来自集中配置) ====================
 import { INDUSTRY_SCENES } from './industryConfig.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 const MULTI_ANGLES = ['front', 'side_left', 'side_right', 'back', '45_degree', 'detail_closeup'];
 const DETAIL_DIMENSIONS = ['material_texture', 'craftsmanship_detail', 'size_comparison', 'feature_highlight'];
@@ -152,7 +153,7 @@ const STEP_EXECUTORS = {
         ...(ctx.extra || {}),
       },
     });
-    if (result.blocked) throw new BusinessError(422, result.blockReason || '内容不合规');
+    if (result.blocked) throw new BusinessError(ERROR_CODE.CONTENT_MODERATION, result.blockReason || 'Content non-compliant');
     return { wrappedPrompt: result.wrapped, intentId: result.intent?.intentId };
   },
 
@@ -619,7 +620,7 @@ export async function executeWorkflow(params = {}) {
 
   // 验证工作流
   const wf = getWorkflow(workflowId);
-  if (!wf) throw new BusinessError(400, `工作流不存在: ${workflowId}`);
+  if (!wf) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND, `Workflow not found: ${workflowId}`);
 
   // 从数据库加载已保存的配置(请求覆盖优先)
   let overrides = { ...reqOverrides };
@@ -662,7 +663,7 @@ export async function executeWorkflow(params = {}) {
     const hasStoryboard = activeSteps.some(s => s.key === 'storyboard_gen');
     const hasVideo = activeSteps.some(s => s.key === 'video_compose');
     if (hasVideo && (!hasScript || !hasStoryboard)) {
-      throw new BusinessError(400, '视频类工作流禁止跳过脚本/分镜步骤直接生成视频');
+      throw new BusinessError(ERROR_CODE.PARAM_ERROR);
     }
   }
 
@@ -671,7 +672,7 @@ export async function executeWorkflow(params = {}) {
     const requiredKeys = new Set(wf.steps.filter(s => s.required).map(s => s.key));
     const deletedRequired = overrides.deletedSteps.filter(k => requiredKeys.has(k));
     if (deletedRequired.length > 0) {
-      throw new BusinessError(400, `必填步骤不可删除: ${deletedRequired.join(', ')}`);
+      throw new BusinessError(ERROR_CODE.PARAM_ERROR, `Required steps cannot be deleted: ${deletedRequired.join(", ")}`);
     }
   }
 
@@ -680,7 +681,7 @@ export async function executeWorkflow(params = {}) {
     const validKeys = new Set(steps.map(s => s.key));
     const invalidKeys = overrides.stepOrder.filter(k => !validKeys.has(k));
     if (invalidKeys.length > 0) {
-      throw new BusinessError(400, `stepOrder 包含未知步骤: ${invalidKeys.join(', ')}`);
+      throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND, `stepOrder contains unknown steps: ${invalidKeys.join(", ")}`);
     }
   }
 
@@ -755,7 +756,7 @@ async function _runJob(jobId, steps, mode, input) {
         const { checkQuota } = await import('./modelPoolService.js');
         const quotaResult = await checkQuota(stepModel.model_key, input.userId);
         if (!quotaResult.allowed) {
-          throw new BusinessError(429, quotaResult.reason || '模型配额已用完');
+          throw new BusinessError(ERROR_CODE.QUOTA_EXCEEDED, quotaResult.reason || 'Model quota exhausted');
         }
         ctx._stepModel = stepModel;
       }
@@ -863,7 +864,7 @@ async function _runJob(jobId, steps, mode, input) {
 
 export function getJob(jobId) {
   const job = jobStore.get(jobId);
-  if (!job) throw new BusinessError(404, '作业不存在');
+  if (!job) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   return job;
 }
 
@@ -878,8 +879,8 @@ export function listJobs(userId, { limit = 50, offset = 0 } = {}) {
 /** 人工暂停 */
 export function pauseJob(jobId) {
   const job = jobStore.get(jobId);
-  if (!job) throw new BusinessError(404, '作业不存在');
-  if (job.status !== 'running') throw new BusinessError(400, '仅运行中的作业可暂停');
+  if (!job) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
+  if (job.status !== 'running') throw new BusinessError(ERROR_CODE.PARAM_ERROR);
   job.status = 'paused';
   return { jobId, status: 'paused' };
 }
@@ -887,8 +888,8 @@ export function pauseJob(jobId) {
 /** 人工恢复 */
 export async function resumeJob(jobId, modifiedContext = {}) {
   const job = jobStore.get(jobId);
-  if (!job) throw new BusinessError(404, '作业不存在');
-  if (job.status !== 'paused') throw new BusinessError(400, '仅暂停的作业可恢复');
+  if (!job) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
+  if (job.status !== 'paused') throw new BusinessError(ERROR_CODE.PARAM_ERROR);
 
   // 合并人工修改的上下文
   const input = { ...job.input, ...modifiedContext };
@@ -909,9 +910,9 @@ export async function resumeJob(jobId, modifiedContext = {}) {
 /** 取消 */
 export function cancelJob(jobId) {
   const job = jobStore.get(jobId);
-  if (!job) throw new BusinessError(404, '作业不存在');
+  if (!job) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   if (!['running', 'paused', 'pending'].includes(job.status)) {
-    throw new BusinessError(400, '当前状态不可取消');
+    throw new BusinessError(ERROR_CODE.PARAM_ERROR);
   }
   job.status = 'cancelled';
   job.completedAt = new Date().toISOString();

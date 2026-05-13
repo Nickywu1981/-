@@ -7,6 +7,7 @@ import { BusinessError } from '../utils/businessError.js';
 import db from '../dao/db.js';
 import path from 'path';
 import logger from '../utils/logger.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 // CapCut / Jianying 项目文件模板
 function buildJianyingDraft({ assets, projectName, ratio = '9:16' }) {
@@ -54,7 +55,7 @@ export default {
   // 生成剪映项目文件
   // ============================================================
   async exportJianyingDraft(userId, { workIds, projectName, ratio }) {
-    if (!workIds?.length) throw new BusinessError(400, '请选择至少一个作品');
+    if (!workIds?.length) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
 
     const conn = await db.getConnection();
     let works;
@@ -69,7 +70,7 @@ export default {
       conn.release();
     }
 
-    if (!works.length) throw new BusinessError(404, '未找到已完成的作品');
+    if (!works.length) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
 
     const assets = works.map(w => {
       let data = {};

@@ -30,9 +30,9 @@ function checkBufferMagic(buffer, mimeType) {
 const UPLOAD_ID_REGEX = /^[a-f0-9]{32}$/;
 
 export const saveSimpleFile = wrapController(async (req, res) => {
-  if (!req.file) throw new BusinessError(ERROR_CODE.VALIDATION_ERROR, '请选择文件');
+  if (!req.file) throw new BusinessError(ERROR_CODE.VALIDATION_ERROR);
   if (!checkBufferMagic(req.file.buffer, req.file.mimetype)) {
-    throw new BusinessError(ERROR_CODE.VALIDATION_ERROR, '文件内容与类型不匹配');
+    throw new BusinessError(ERROR_CODE.VALIDATION_ERROR);
   }
   const result = await uploadService.saveSimpleFile(req.file);
   return success(res, result, '上传成功');
@@ -48,10 +48,10 @@ export const receiveChunk = wrapController(async (req, res) => {
   const { upload_id, chunk_index } = req.body;
   const chunkFile = req.files?.chunk?.[0];
   if (!chunkFile) {
-    throw new BusinessError(ERROR_CODE.VALIDATION_ERROR, '缺少分片文件');
+    throw new BusinessError(ERROR_CODE.VALIDATION_ERROR);
   }
   if (!checkBufferMagic(chunkFile.buffer, chunkFile.mimetype)) {
-    throw new BusinessError(ERROR_CODE.VALIDATION_ERROR, '文件内容与类型不匹配');
+    throw new BusinessError(ERROR_CODE.VALIDATION_ERROR);
   }
   const result = await uploadService.receiveChunk(upload_id, chunk_index, chunkFile.buffer);
   return success(res, result);
@@ -59,7 +59,7 @@ export const receiveChunk = wrapController(async (req, res) => {
 
 export const getReceivedChunks = wrapController(async (req, res) => {
   if (!UPLOAD_ID_REGEX.test(req.params.uploadId)) {
-    throw new BusinessError(ERROR_CODE.VALIDATION_ERROR, 'uploadId 格式不正确');
+    throw new BusinessError(ERROR_CODE.VALIDATION_ERROR);
   }
   const result = await uploadService.getReceivedChunks(req.params.uploadId);
   return success(res, result);

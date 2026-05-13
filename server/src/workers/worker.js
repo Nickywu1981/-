@@ -13,6 +13,7 @@ import * as jobQueueService from '../services/job-queue.service.js';
 import { onChildJobComplete } from '../services/unifiedQueueService.js';
 import { gatewayInfer } from '../gateway/aiGatewayHub.js';
 import { saveSimpleFile } from '../utils/file-upload.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 // 启动配置校验
 validateStartupConfig();
@@ -144,7 +145,7 @@ async function processLongImageJob(job, params) {
       const imgUrl = genResult?.images?.[0]?.url || genResult?.file_url || genResult?.url;
       if (imgUrl) {
         const resp = await fetch(imgUrl, { signal: AbortSignal.timeout(30000) });
-        if (!resp.ok) throw new BusinessError(500, `下载场景图失败: HTTP ${resp.status}`);
+        if (!resp.ok) throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, `Scene download failed: HTTP ${resp.status}`);
         const buf = Buffer.from(await resp.arrayBuffer());
         imageBuffers.push(buf);
       }

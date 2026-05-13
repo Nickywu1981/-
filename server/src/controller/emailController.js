@@ -6,9 +6,9 @@ import { ERROR_CODE } from '../constants/errorCode.js';
 
 export const sendVerificationCode = wrapController(async (req, res) => {
     const { email, scene } = req.body;
-    if (!email || !scene) throw new BusinessError(ERROR_CODE.PARAM_MISSING, '邮箱和场景不能为空');
+    if (!email || !scene) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
     if (!['register', 'login', 'reset_password', 'bind'].includes(scene)) {
-      throw new BusinessError(ERROR_CODE.PARAM_INVALID, '不支持的邮件场景');
+      throw new BusinessError(ERROR_CODE.PARAM_INVALID);
     }
     const result = await emailService.sendVerificationCode(email, scene);
     return success(res, { expireMinutes: result.expireMinutes }, '验证码已发送');
@@ -16,7 +16,7 @@ export const sendVerificationCode = wrapController(async (req, res) => {
 
 export const verifyCode = wrapController(async (req, res) => {
     const { email, code } = req.body;
-    if (!email || !code) throw new BusinessError(ERROR_CODE.PARAM_MISSING, '参数不完整');
+    if (!email || !code) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
     await emailService.verifyCode(email, code);
     return success(res, {}, '验证通过');
   });

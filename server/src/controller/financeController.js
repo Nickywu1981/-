@@ -23,7 +23,7 @@ export const addBankAccount = wrapController(async (req, res) => {
 
 export const removeBankAccount = wrapController(async (req, res) => {
   const id = parseInt(req.params.id, 10);
-  if (!id || id < 1) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '无效的账户ID');
+  if (!id || id < 1) throw new BusinessError(ERROR_CODE.BAD_REQUEST);
   await financeService.removeBankAccount(req.tenantId, id);
   return success(res, null, '收款账户已解绑');
 });
@@ -55,7 +55,7 @@ export const listSettlements = wrapController(async (req, res) => {
 
 export const getSettlementDetail = wrapController(async (req, res) => {
   const id = parseInt(req.params.id, 10);
-  if (!id || id < 1) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '无效的结算ID');
+  if (!id || id < 1) throw new BusinessError(ERROR_CODE.BAD_REQUEST);
   const detail = await financeService.getSettlementDetail(id);
   return success(res, detail);
 });
@@ -99,7 +99,7 @@ export const createWithdrawal = wrapController(async (req, res) => {
 
 export const getWithdrawalDetail = wrapController(async (req, res) => {
   const id = parseInt(req.params.id, 10);
-  if (!id || id < 1) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '无效的提现ID');
+  if (!id || id < 1) throw new BusinessError(ERROR_CODE.BAD_REQUEST);
   const detail = await financeService.getWithdrawalDetail(id);
   return success(res, detail);
 });

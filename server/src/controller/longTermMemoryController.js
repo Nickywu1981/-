@@ -10,7 +10,7 @@ import logger from '../utils/logger.js';
 function scopedSubjectId(req, explicitId) {
   const userId = String(req.user?.id || req.user?.userId);
   if (explicitId && explicitId !== userId) {
-    throw new BusinessError(ERROR_CODE.FORBIDDEN, '无权操作他人的记忆数据');
+    throw new BusinessError(ERROR_CODE.FORBIDDEN);
   }
   return userId;
 }

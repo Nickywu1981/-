@@ -1,5 +1,6 @@
 import * as sizeTemplateDao from '../dao/sizeTemplateDao.js';
 import { BusinessError } from '../utils/businessError.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 /**
  * 获取平台列表 + 分组尺寸
@@ -35,22 +36,22 @@ export async function getSizesByPlatform(platform) {
 // ==================== 用户自定义模板 ====================
 
 export async function createUserTemplate(userId, { name, width, height, platform = '' }) {
-  if (!name || !width || !height) throw new BusinessError(400, '模板名称、宽度、高度不能为空');
-  if (width < 1 || height < 0) throw new BusinessError(400, '尺寸参数不合法');
+  if (!name || !width || !height) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
+  if (width < 1 || height < 0) throw new BusinessError(ERROR_CODE.PARAM_INVALID);
   const templateId = await sizeTemplateDao.insertUserTemplate({ userId, name, width, height, platform });
   return { id: templateId, name, width, height, platform };
 }
 
 export async function updateUserTemplate(userId, templateId, data) {
   const exist = await sizeTemplateDao.getUserTemplateById(templateId, userId);
-  if (!exist) throw new BusinessError(404, '模板不存在');
+  if (!exist) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   const updated = await sizeTemplateDao.updateUserTemplate(templateId, userId, data);
   return { success: updated };
 }
 
 export async function deleteUserTemplate(userId, templateId) {
   const exist = await sizeTemplateDao.getUserTemplateById(templateId, userId);
-  if (!exist) throw new BusinessError(404, '模板不存在');
+  if (!exist) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   await sizeTemplateDao.deleteUserTemplate(templateId, userId);
   return { success: true };
 }

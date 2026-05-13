@@ -31,14 +31,14 @@ export const deleteForm = wrapController(async (req, res) => {
 
 // ── 公开接口 ──
 export const getPublicForm = wrapController(async (req, res) => {
-    if (!req.tenantId) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '租户信息缺失');
+    if (!req.tenantId) throw new BusinessError(ERROR_CODE.BAD_REQUEST);
     const device = req.query.device || req.headers['x-device-type'] || 'pc';
     const form = await formService.getPublicForm(req.params.code, req.tenantId, { device });
     success(res, form);
 });
 
 export const submitForm = wrapController(async (req, res) => {
-    if (!req.tenantId) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '租户信息缺失');
+    if (!req.tenantId) throw new BusinessError(ERROR_CODE.BAD_REQUEST);
     const deviceType = req.headers['x-device-type'] || 'pc';
     const data = await formService.submitForm(
       req.params.code, req.tenantId, req.user?.userId,

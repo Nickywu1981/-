@@ -11,7 +11,7 @@ export const listPlatforms = wrapController(async (req, res) => {
 
 export const getSpec = wrapController(async (req, res) => {
     const data = await svc.getById(req.params.id, req);
-    if (!data) throw new BusinessError(ERROR_CODE.NOT_FOUND, '规格不存在');
+    if (!data) throw new BusinessError(ERROR_CODE.NOT_FOUND);
     return success(res, data);
   });
 
@@ -27,13 +27,13 @@ export const createSpec = wrapController(async (req, res) => {
 
 export const updateSpec = wrapController(async (req, res) => {
     const ok = await svc.update(req.params.id, req.body, req);
-    if (!ok) throw new BusinessError(ERROR_CODE.NOT_FOUND, '规格不存在');
+    if (!ok) throw new BusinessError(ERROR_CODE.NOT_FOUND);
     return success(res, null, '更新成功');
   });
 
 export const deleteSpec = wrapController(async (req, res) => {
     const ok = await svc.remove(req.params.id, req);
-    if (!ok) throw new BusinessError(ERROR_CODE.NOT_FOUND, '规格不存在');
+    if (!ok) throw new BusinessError(ERROR_CODE.NOT_FOUND);
     return success(res, null, '删除成功');
   });
 

@@ -65,14 +65,14 @@ async function validateFileMagic(filePath, ext) {
 
   if (!matchMagic(buf, ext)) {
     await fsp.unlink(filePath);
-    throw new BusinessError(ERROR_CODE.BAD_REQUEST, `文件内容与声明的类型 (${ext}) 不匹配`);
+    throw new BusinessError(ERROR_CODE.BAD_REQUEST, `File content does not match declared type (${ext})`);
   }
 }
 
 // 内存版本（用于 multer buffer）
 function validateBufferMagic(buffer, ext) {
   if (!matchMagic(buffer, ext)) {
-    throw new BusinessError(ERROR_CODE.BAD_REQUEST, `文件内容与声明的类型 (${ext}) 不匹配`);
+    throw new BusinessError(ERROR_CODE.BAD_REQUEST, `File content does not match declared type (${ext})`);
   }
 }
 
@@ -136,7 +136,7 @@ export async function initUpload({ fileName, fileSize, fileType }) {
   const allowedTypes = uploadConfig.allowedTypes;
   const fileExt = ext.replace('.', '').toLowerCase();
   if (!allowedTypes.includes(fileExt)) {
-    throw new BusinessError(ERROR_CODE.BAD_REQUEST, `不支持的文件格式: ${fileExt}`);
+    throw new BusinessError(ERROR_CODE.BAD_REQUEST, `Unsupported file format: ${fileExt}`);
   }
 
   // 记录上传元信息
@@ -156,7 +156,7 @@ export async function initUpload({ fileName, fileSize, fileType }) {
  */
 export async function receiveChunk(uploadId, chunkIndex, chunkBuffer) {
   const metaPath = path.join(CHUNK_DIR, `${uploadId}.json`);
-  try { await fsp.access(metaPath); } catch { throw new BusinessError(ERROR_CODE.NOT_FOUND, '上传会话不存在或已过期'); }
+  try { await fsp.access(metaPath); } catch { throw new BusinessError(ERROR_CODE.NOT_FOUND); }
 
   const chunkDir = path.join(CHUNK_DIR, uploadId);
   try { await fsp.access(chunkDir); } catch { await fsp.mkdir(chunkDir, { recursive: true }); }
@@ -168,7 +168,7 @@ export async function receiveChunk(uploadId, chunkIndex, chunkBuffer) {
   const meta = await withChunkLock(uploadId, async () => {
     const raw = await fsp.readFile(metaPath, 'utf8');
     let m;
-    try { m = JSON.parse(raw); } catch { throw new BusinessError(ERROR_CODE.BAD_REQUEST, '上传元数据损坏'); }
+    try { m = JSON.parse(raw); } catch { throw new BusinessError(ERROR_CODE.BAD_REQUEST); }
     if (!m.receivedChunks.includes(chunkIndex)) {
       m.receivedChunks.push(chunkIndex);
       await fsp.writeFile(metaPath, JSON.stringify(m));
@@ -195,12 +195,12 @@ export async function getReceivedChunks(uploadId) {
  */
 export async function completeUpload(uploadId) {
   const metaPath = path.join(CHUNK_DIR, `${uploadId}.json`);
-  try { await fsp.access(metaPath); } catch { throw new BusinessError(ERROR_CODE.NOT_FOUND, '上传会话不存在'); }
+  try { await fsp.access(metaPath); } catch { throw new BusinessError(ERROR_CODE.NOT_FOUND); }
 
   let meta;
-  try { meta = JSON.parse(await fsp.readFile(metaPath, 'utf8')); } catch { throw new BusinessError(ERROR_CODE.BAD_REQUEST, '上传元数据损坏，请重新上传'); }
+  try { meta = JSON.parse(await fsp.readFile(metaPath, 'utf8')); } catch { throw new BusinessError(ERROR_CODE.BAD_REQUEST); }
   if (meta.receivedChunks.length < meta.totalChunks) {
-    throw new BusinessError(ERROR_CODE.BAD_REQUEST, `分片不完整 (${meta.receivedChunks.length}/${meta.totalChunks})`);
+    throw new BusinessError(ERROR_CODE.BAD_REQUEST, `Incomplete chunk (${meta.receivedChunks.length}/${meta.totalChunks})`);
   }
 
   // 合并分片
@@ -244,7 +244,7 @@ export async function completeUpload(uploadId) {
     await validateFileMagic(finalPath, extClean);
   } catch {
     await fsp.unlink(finalPath).catch(err => logger.warn('[FileUpload] 魔数校验清理失败:', err.message)); // 清理问题文件
-    throw new BusinessError(ERROR_CODE.BAD_REQUEST, `文件内容与声明的类型 (${extClean}) 不匹配，已删除`);
+    throw new BusinessError(ERROR_CODE.BAD_REQUEST, `File content does not match type (${extClean}), deleted`);
   }
 
   const fileUrl = `/uploads/${finalName}`;
@@ -265,7 +265,7 @@ export async function saveSimpleFile(file) {
   const timestamp = Date.now();
   // MIME 类型 → 安全扩展名（不信任用户提供的 originalname）
   const ext = MIME_TO_SAFE_EXT[file.mimetype];
-  if (!ext) throw new BusinessError(ERROR_CODE.VALIDATION_ERROR, `不支持的文件类型: ${file.mimetype}`);
+  if (!ext) throw new BusinessError(ERROR_CODE.VALIDATION_ERROR, `Unsupported file type: ${file.mimetype}`);
   const extClean = ext.replace('.', '').toLowerCase();
   const finalName = `${timestamp}_${crypto.randomBytes(8).toString('hex')}${ext}`;
   const finalPath = path.join(UPLOAD_DIR, finalName);

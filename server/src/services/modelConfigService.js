@@ -2,6 +2,7 @@ import * as modelConfigDao from '../dao/modelConfigDao.js';
 import { BusinessError } from '../utils/businessError.js';
 import { encrypt } from '../utils/crypto.js';
 import { invalidateCache } from './model-router.service.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 function _maskApiKey(row) {
   if (!row) return row;
@@ -22,13 +23,13 @@ export async function list(includeDisabled = false) {
 
 export async function getByKey(modelKey) {
   const row = await modelConfigDao.getByKey(modelKey);
-  if (!row) throw new BusinessError(404, '模型不存在');
+  if (!row) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   return _maskApiKey(row);
 }
 
 export async function create(data) {
   const existing = await modelConfigDao.getByKey(data.model_key);
-  if (existing) throw new BusinessError(409, '模型标识已存在');
+  if (existing) throw new BusinessError(ERROR_CODE.RESOURCE_DUPLICATE);
   const { api_key, ...rest } = data;
   const result = await modelConfigDao.create({ ...rest, api_key_enc: encrypt(api_key) });
   invalidateCache();
@@ -40,21 +41,21 @@ export async function update(modelKey, data) {
   const updateData = { ...rest };
   if (api_key) updateData.api_key_enc = encrypt(api_key);
   const result = await modelConfigDao.update(modelKey, updateData);
-  if (!result) throw new BusinessError(404, '模型不存在');
+  if (!result) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   invalidateCache();
   return _maskApiKey(result);
 }
 
 export async function remove(modelKey) {
   const ok = await modelConfigDao.remove(modelKey);
-  if (!ok) throw new BusinessError(404, '模型不存在');
+  if (!ok) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   invalidateCache();
   return true;
 }
 
 export async function toggle(modelKey, enabled) {
   const ok = await modelConfigDao.toggle(modelKey, enabled);
-  if (!ok) throw new BusinessError(404, '模型不存在');
+  if (!ok) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   invalidateCache();
   return { model_key: modelKey, enabled };
 }

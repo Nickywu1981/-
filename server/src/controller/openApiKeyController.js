@@ -28,7 +28,7 @@ export const toggleKey = wrapController(async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
     const result = await openApiKeyService.toggleKey(parseInt(id), req.user.tenantId || 1, status);
-    if (!result.ok) throw new BusinessError(ERROR_CODE.NOT_FOUND, 'API Key 不存在');
+    if (!result.ok) throw new BusinessError(ERROR_CODE.NOT_FOUND);
     success(res, result);
 });
 
@@ -38,13 +38,13 @@ export const updateKey = wrapController(async (req, res) => {
     const result = await openApiKeyService.updateKey(parseInt(id), req.user.tenantId || 1, {
       description, rateLimit, dailyLimit,
     });
-    if (!result.ok) throw new BusinessError(ERROR_CODE.NOT_FOUND, 'API Key 不存在');
+    if (!result.ok) throw new BusinessError(ERROR_CODE.NOT_FOUND);
     success(res, result);
 });
 
 export const deleteKey = wrapController(async (req, res) => {
     const { id } = req.params;
     const result = await openApiKeyService.deleteKey(parseInt(id), req.user.tenantId || 1);
-    if (!result.ok) throw new BusinessError(ERROR_CODE.NOT_FOUND, 'API Key 不存在');
+    if (!result.ok) throw new BusinessError(ERROR_CODE.NOT_FOUND);
     success(res, result);
 });

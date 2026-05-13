@@ -6,6 +6,7 @@
  */
 import db from '../dao/db.js';
 import { BusinessError } from '../utils/businessError.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 // 13 平台发布规格
 const PLATFORM_PUBLISH_SPECS = {
@@ -37,13 +38,13 @@ export function getPublishPlatforms() {
  */
 export async function submitPublish(userId, workId, platforms, options = {}) {
   if (!platforms || platforms.length === 0) {
-    throw new BusinessError(400, '请至少选择一个目标平台');
+    throw new BusinessError(ERROR_CODE.PARAM_MISSING);
   }
 
   // 验证平台合法性
   const invalid = platforms.filter(p => !PLATFORM_PUBLISH_SPECS[p]);
   if (invalid.length > 0) {
-    throw new BusinessError(400, `不支持的平台: ${invalid.join(', ')}`);
+    throw new BusinessError(ERROR_CODE.PARAM_INVALID, `Unsupported platforms: ${invalid.join(", ")}`);
   }
 
   const conn = await db.getConnection();
@@ -53,7 +54,7 @@ export async function submitPublish(userId, workId, platforms, options = {}) {
       'SELECT id, file_url, file_type, file_size FROM assets WHERE id = ? AND user_id = ?',
       [workId, userId],
     );
-    if (!asset) throw new BusinessError(404, '作品不存在');
+    if (!asset) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
 
     await conn.beginTransaction();
 
@@ -110,7 +111,7 @@ export async function getPublishBatch(batchId, userId) {
        ORDER BY pr.created_at DESC`,
       [batchId, userId],
     );
-    if (rows.length === 0) throw new BusinessError(404, '分发批次不存在');
+    if (rows.length === 0) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
     return { batchId, records: rows };
   } finally {
     conn.release();
@@ -127,9 +128,9 @@ export async function retryPublish(recordId, userId) {
       'SELECT * FROM publish_record WHERE id = ? AND user_id = ? LIMIT 1',
       [recordId, userId],
     );
-    if (!record) throw new BusinessError(404, '发布记录不存在');
+    if (!record) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
     if (!['failed', 'error'].includes(record.status)) {
-      throw new BusinessError(400, `当前状态 ${record.status} 不可重发`);
+      throw new BusinessError(ERROR_CODE.PARAM_ERROR, `Status ${record.status} cannot be resent`);
     }
 
     await conn.query(

@@ -6,6 +6,7 @@ import { withTransaction } from '../dao/transaction.js';
 import logger from '../utils/logger.js';
 import { BusinessError } from '../utils/businessError.js';
 import { RECHARGE_PAY_STATUS } from '../constants/domainStatus.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 export function getRates() {
   return [
@@ -19,8 +20,8 @@ export function getRates() {
 
 export async function createOrder(userId, tenantId, clientIp, { amount, payChannel }) {
   const rates = rechargeDao.COIN_RATES;
-  if (!amount || !rates[String(amount)]) throw new BusinessError(400, '无效的充值金额');
-  if (!['wechat', 'alipay', 'unionpay'].includes(payChannel)) throw new BusinessError(400, '支付方式无效');
+  if (!amount || !rates[String(amount)]) throw new BusinessError(ERROR_CODE.PARAM_INVALID);
+  if (!['wechat', 'alipay', 'unionpay'].includes(payChannel)) throw new BusinessError(ERROR_CODE.PARAM_INVALID);
 
   const orderNo = 'RC' + Date.now() + crypto.randomBytes(4).toString('hex');
   const coinAmount = rates[String(amount)];
@@ -59,7 +60,7 @@ export async function refundOrder(orderNo) {
   await withTransaction(async (conn) => {
     const order = await rechargeDao.lockByOrderNo(orderNo, conn);
     if (!order || order.pay_status !== RECHARGE_PAY_STATUS.PAID) {
-      throw new BusinessError(404, '订单不存在或未支付');
+      throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
     }
 
     await rechargeDao.markRefunded(orderNo, conn);

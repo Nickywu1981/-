@@ -483,7 +483,7 @@ export function registerExtension(name, handler) {
     extensionHooks[name] = handler;
     logger.info(`[ModelDispatcher] Phase 3 扩展 ${name} 已注册`);
   } else {
-    throw new BusinessError(ERROR_CODE.PARAM_ERROR, `Unknown extension: ${name}. 可用: ${Object.keys(extensionHooks).join(', ')}`);
+    throw new BusinessError(ERROR_CODE.PARAM_ERROR, `Unknown extension: ${name}. Available: ${Object.keys(extensionHooks).join(", ")}`);
   }
 }
 

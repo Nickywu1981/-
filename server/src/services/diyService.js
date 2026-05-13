@@ -41,7 +41,7 @@ const STATE_MACHINE = {
 function checkStateTransition(currentStatus, targetStatus) {
   const rule = STATE_MACHINE[currentStatus];
   if (!rule || !rule.allow.includes(targetStatus)) {
-    throw new BusinessError(ERROR_CODE.BAD_REQUEST, `页面状态为「${DIY_PAGE_STATUS_LABEL[currentStatus] || currentStatus}」，不允许此操作`);
+    throw new BusinessError(ERROR_CODE.BAD_REQUEST, `Page status is "${DIY_PAGE_STATUS_LABEL[currentStatus] || currentStatus}", operation not allowed`);
   }
   return rule.msg[targetStatus];
 }
@@ -77,20 +77,20 @@ export default {
 
   async createPage(tenantId, ownerId, { title, slug, pageType, accessType, mobileConfig, pcConfig, metaJson }) {
     const sanitizedTitle = title?.replace(/<[^>]*>/g, '') || '';
-    if (!sanitizedTitle.trim() || !slug?.trim()) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '标题和标识不能为空');
+    if (!sanitizedTitle.trim() || !slug?.trim()) throw new BusinessError(ERROR_CODE.BAD_REQUEST);
     const exists = await diyDao.getPageBySlug(slug, tenantId);
-    if (exists) throw new BusinessError(ERROR_CODE.BAD_REQUEST, `页面标识 "${slug}" 已被使用`);
+    if (exists) throw new BusinessError(ERROR_CODE.BAD_REQUEST, `Page slug "${slug}" already in use`);
     return diyDao.createPageWithVersion({ tenantId, ownerId: ownerId || 0, title: sanitizedTitle, slug, pageType: pageType || 'mobile', accessType: accessType || 'public', mobileConfig: mobileConfig || { sections: [] }, pcConfig: pcConfig || { sections: [] }, metaJson });
   },
 
   async updatePage(id, tenantId, fields) {
     const exist = await diyDao.getPageById(id, tenantId);
-    if (!exist) throw new BusinessError(ERROR_CODE.NOT_FOUND, '页面不存在');
+    if (!exist) throw new BusinessError(ERROR_CODE.NOT_FOUND);
     if (fields.title !== undefined) fields.title = fields.title.replace(/<[^>]*>/g, '');
     const slugChanged = fields.slug && fields.slug !== exist.slug;
     if (slugChanged) {
       const collision = await diyDao.getPageBySlug(fields.slug, tenantId);
-      if (collision) throw new BusinessError(ERROR_CODE.BAD_REQUEST, `页面标识 "${fields.slug}" 已被使用`);
+      if (collision) throw new BusinessError(ERROR_CODE.BAD_REQUEST, `Page slug "${fields.slug}" already in use`);
     }
     await diyDao.updatePage(id, tenantId, fields);
     if (slugChanged && exist.status === 1) await diyDao.clearPageCache(exist.slug);
@@ -101,10 +101,10 @@ export default {
 
   async publishPage(id, tenantId) {
     const page = await diyDao.getPageById(id, tenantId);
-    if (!page) throw new BusinessError(ERROR_CODE.NOT_FOUND, '页面不存在');
+    if (!page) throw new BusinessError(ERROR_CODE.NOT_FOUND);
     const msg = checkStateTransition(page.status, 1);
     const issues = validateBeforePublish(page);
-    if (issues.length) throw new BusinessError(ERROR_CODE.BAD_REQUEST, `发布校验未通过: ${issues.join('; ')}`);
+    if (issues.length) throw new BusinessError(ERROR_CODE.BAD_REQUEST, `Publish validation failed: ${issues.join("; ")}`);
     await diyDao.publishWithVersion(id, tenantId, page.mobile_config, page.pc_config, page.slug);
     page.status = 1;
     page.publish_time = new Date().toISOString();
@@ -118,7 +118,7 @@ export default {
 
   async unpublishPage(id, tenantId) {
     const page = await diyDao.getPageById(id, tenantId);
-    if (!page) throw new BusinessError(ERROR_CODE.NOT_FOUND, '页面不存在');
+    if (!page) throw new BusinessError(ERROR_CODE.NOT_FOUND);
     const msg = checkStateTransition(page.status, 2);
     await diyDao.unpublishPage(id, tenantId);
     await diyDao.clearPageCache(page.slug);
@@ -127,10 +127,10 @@ export default {
 
   async republishPage(id, tenantId) {
     const page = await diyDao.getPageById(id, tenantId);
-    if (!page) throw new BusinessError(ERROR_CODE.NOT_FOUND, '页面不存在');
+    if (!page) throw new BusinessError(ERROR_CODE.NOT_FOUND);
     const msg = checkStateTransition(page.status, 1);
     const issues = validateBeforePublish(page);
-    if (issues.length) throw new BusinessError(ERROR_CODE.BAD_REQUEST, `发布校验未通过: ${issues.join('; ')}`);
+    if (issues.length) throw new BusinessError(ERROR_CODE.BAD_REQUEST, `Publish validation failed: ${issues.join("; ")}`);
     await diyDao.republishPage(id, tenantId);
     page.status = 1;
     page.publish_time = new Date().toISOString();
@@ -144,7 +144,7 @@ export default {
 
   async softDeletePage(id, tenantId) {
     const page = await diyDao.getPageById(id, tenantId);
-    if (!page) throw new BusinessError(ERROR_CODE.NOT_FOUND, '页面不存在');
+    if (!page) throw new BusinessError(ERROR_CODE.NOT_FOUND);
     checkStateTransition(page.status, 3);
     if (page.status === DIY_PAGE_STATUS.PUBLISHED) await diyDao.clearPageCache(page.slug);
     await diyDao.softDeletePage(id, tenantId);
@@ -153,16 +153,16 @@ export default {
 
   async restorePage(id, tenantId) {
     const page = await diyDao.getPageById(id, tenantId);
-    if (!page) throw new BusinessError(ERROR_CODE.NOT_FOUND, '页面不存在');
-    if (page.status !== DIY_PAGE_STATUS.TRASH) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '仅回收站中的页面可恢复');
+    if (!page) throw new BusinessError(ERROR_CODE.NOT_FOUND);
+    if (page.status !== DIY_PAGE_STATUS.TRASH) throw new BusinessError(ERROR_CODE.BAD_REQUEST);
     await diyDao.restorePage(id, tenantId);
     return { msg: '已恢复至草稿状态' };
   },
 
   async hardDeletePage(id, tenantId) {
     const page = await diyDao.getPageById(id, tenantId);
-    if (!page) throw new BusinessError(ERROR_CODE.NOT_FOUND, '页面不存在');
-    if (page.status !== DIY_PAGE_STATUS.TRASH) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '仅回收站中的页面可彻底删除');
+    if (!page) throw new BusinessError(ERROR_CODE.NOT_FOUND);
+    if (page.status !== DIY_PAGE_STATUS.TRASH) throw new BusinessError(ERROR_CODE.BAD_REQUEST);
     if (page.status === 1) await diyDao.clearPageCache(page.slug);
     await diyDao.hardDeletePage(id, tenantId); // 内部已用 withTransaction 保护
     return { msg: '页面已彻底删除，不可恢复' };
@@ -172,7 +172,7 @@ export default {
 
   async clonePage(id, tenantId) {
     const src = await diyDao.getPageById(id, tenantId);
-    if (!src) throw new BusinessError(ERROR_CODE.NOT_FOUND, '源页面不存在');
+    if (!src) throw new BusinessError(ERROR_CODE.NOT_FOUND);
     return diyDao.cloneWithVersion(src, tenantId);
   },
 
@@ -180,34 +180,34 @@ export default {
 
   async saveVersion(pageId, tenantId, mobileConfig, pcConfig, remark, { autoSave = false } = {}) {
     const page = await diyDao.getPageById(pageId, tenantId);
-    if (!page) throw new BusinessError(ERROR_CODE.NOT_FOUND, '页面不存在');
+    if (!page) throw new BusinessError(ERROR_CODE.NOT_FOUND);
     const v = await diyDao.saveVersion(pageId, mobileConfig, pcConfig, { remark: remark || (autoSave ? '自动保存' : '手动保存'), autoSave });
     return { version: v };
   },
 
   async listVersions(pageId, tenantId, { includeAuto = false } = {}) {
     const page = await diyDao.getPageById(pageId, tenantId);
-    if (!page) throw new BusinessError(ERROR_CODE.NOT_FOUND, '页面不存在');
+    if (!page) throw new BusinessError(ERROR_CODE.NOT_FOUND);
     return diyDao.listVersions(pageId, { includeAuto });
   },
 
   async getVersion(pageId, version, tenantId) {
     const page = await diyDao.getPageById(pageId, tenantId);
-    if (!page) throw new BusinessError(ERROR_CODE.NOT_FOUND, '页面不存在');
+    if (!page) throw new BusinessError(ERROR_CODE.NOT_FOUND);
     return diyDao.getVersion(pageId, version);
   },
 
   async rollbackVersion(pageId, version, tenantId) {
     const page = await diyDao.getPageById(pageId, tenantId);
-    if (!page) throw new BusinessError(ERROR_CODE.NOT_FOUND, '页面不存在');
+    if (!page) throw new BusinessError(ERROR_CODE.NOT_FOUND);
     const src = await diyDao.getVersion(pageId, version);
-    if (!src) throw new BusinessError(ERROR_CODE.NOT_FOUND, '版本不存在');
+    if (!src) throw new BusinessError(ERROR_CODE.NOT_FOUND);
     return diyDao.rollbackWithVersion(pageId, tenantId, src);
   },
 
   async getLatestAutoVersion(pageId, tenantId) {
     const page = await diyDao.getPageById(pageId, tenantId);
-    if (!page) throw new BusinessError(ERROR_CODE.NOT_FOUND, '页面不存在');
+    if (!page) throw new BusinessError(ERROR_CODE.NOT_FOUND);
     return diyDao.getLatestAutoVersion(pageId);
   },
 

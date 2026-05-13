@@ -13,7 +13,7 @@ import logger from '../utils/logger.js';
 
 function _requireUserId(req) {
   const userId = req.user?.id;
-  if (!userId) throw new BusinessError(ERROR_CODE.UNAUTHORIZED, '请先登录');
+  if (!userId) throw new BusinessError(ERROR_CODE.UNAUTHORIZED);
   return userId;
 }
 
@@ -54,7 +54,7 @@ export const executeCode = wrapController(async (req, res) => {
   const userId = _requireUserId(req);
   const { sandboxId } = req.params;
   const { code, language } = req.body;
-  if (!code) throw new BusinessError(ERROR_CODE.VALIDATION_ERROR, '请提供代码内容');
+  if (!code) throw new BusinessError(ERROR_CODE.VALIDATION_ERROR);
   const t0 = Date.now();
   try {
     const result = await e2bService.executeCode(sandboxId, userId, code, language);

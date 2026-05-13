@@ -9,6 +9,7 @@ import { registerInterval } from '../utils/shutdownRegistry.js';
 import logger from '../utils/logger.js';
 import * as emailTemplateDao from '../dao/emailTemplateDao.js';
 import * as codeStore from './codeStore.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 const CODE_CACHE = new Map(); // key: email, value: { code, expires, attempts }
 const EMAIL_SEND_LOG = new Map(); // key: email, value: [timestamp, ...]
@@ -66,7 +67,7 @@ const providers = {
   smtp: {
     async send({ email, subject, content }) {
       const cfg = config.email?.smtp || {};
-      if (!cfg.host) throw new BusinessError(503, 'SMTP 未配置');
+      if (!cfg.host) throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
       // 动态导入 nodemailer（生产按需安装）
       try {
         const nodemailer = await import('nodemailer');
@@ -78,12 +79,12 @@ const providers = {
         });
         const info = await Promise.race([
           transporter.sendMail({ from: cfg.from || cfg.user, to: email, subject, html: content }),
-          new Promise((_, reject) => setTimeout(() => reject(new BusinessError(504, 'SMTP 发送超时')), config.email.smtp.timeoutMs)),
+          new Promise((_, reject) => setTimeout(() => reject(new BusinessError(ERROR_CODE.INTERNAL_ERROR, 'SMTP send timeout')), config.email.smtp.timeoutMs)),
         ]);
         return { success: true, messageId: info.messageId };
       } catch (e) {
         logger.error(`[Email] SMTP 发送失败: ${e.message}`);
-        throw new BusinessError(502, '邮件发送失败，请稍后重试');
+        throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
       }
     },
   },
@@ -92,9 +93,9 @@ const providers = {
     async send(_payload) {
       const cfg = config.email?.sendgrid || {};
       if (!cfg.apiKey) {
-        throw new BusinessError(503, 'SendGrid 密钥未配置');
+        throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
       }
-      throw new BusinessError(503, 'SendGrid SDK 未集成，请联系管理员');
+      throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
     },
   },
 };
@@ -108,21 +109,21 @@ function getProvider() {
 
 export async function sendVerificationCode(email, scene = 'login') {
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    throw new BusinessError(400, '请输入有效邮箱地址');
+    throw new BusinessError(ERROR_CODE.PARAM_MISSING);
   }
 
   // 频率控制：60秒内不可重复发送
   const cached = CODE_CACHE.get(email);
   if (cached && Date.now() - cached.lastSent < 60000) {
-    throw new BusinessError(429, '发送过于频繁，请60秒后再试');
+    throw new BusinessError(ERROR_CODE.EC_RATE_CODE);
   }
 
   // 小时/日频率控制
   const now = Date.now();
   const sends = (EMAIL_SEND_LOG.get(email) || []).filter(t => now - t < 86400000);
   const hourSends = sends.filter(t => now - t < 3600000).length;
-  if (hourSends >= 5) throw new BusinessError(429, '该邮箱1小时内发送次数已达上限');
-  if (sends.length >= 10) throw new BusinessError(429, '该邮箱24小时内发送次数已达上限');
+  if (hourSends >= 5) throw new BusinessError(ERROR_CODE.QUOTA_EXCEEDED);
+  if (sends.length >= 10) throw new BusinessError(ERROR_CODE.QUOTA_EXCEEDED);
   sends.push(now);
   EMAIL_SEND_LOG.set(email, sends);
 
@@ -142,7 +143,7 @@ export async function sendVerificationCode(email, scene = 'login') {
 
   const templateCode = templateCodeMap[scene];
   if (!templateCode) {
-    throw new BusinessError(400, '不支持的邮件场景');
+    throw new BusinessError(ERROR_CODE.PARAM_INVALID);
   }
 
   // 从数据库读取模板，失败则降级为内置模板
@@ -153,7 +154,7 @@ export async function sendVerificationCode(email, scene = 'login') {
       subject = renderTemplate(template.subject, { code });
       html = sanitizeHtml(renderTemplate(template.content, { code }));
     } else {
-      throw new BusinessError(404, '模板未找到');
+      throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
     }
   } catch (e) {
     logger.warn('[Email] 模板查询失败，降级使用内置模板', { templateCode, error: e.message });
@@ -186,7 +187,7 @@ export async function sendVerificationCode(email, scene = 'login') {
     await provider.send({ email, subject, content: html });
   } catch (e) {
     logger.error('[Email] 发送失败', { email: email.replace(/(.{1,2}).*(@.*)/, '$1***$2'), error: e.message });
-    throw new BusinessError(502, '邮件发送失败，请稍后重试');
+    throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
   }
 
   return { success: true, expireMinutes: 5 };
@@ -208,10 +209,10 @@ export async function verifyCode(email, code) {
   }
   // Redis 不可用降级为进程内 Map
   const cached = CODE_CACHE.get(email);
-  if (!cached) throw new BusinessError(400, '请先获取验证码');
-  if (cached.attempts >= 5) { CODE_CACHE.delete(email); throw new BusinessError(429, '验证码错误次数过多，请重新获取'); }
-  if (Date.now() > cached.expires) { CODE_CACHE.delete(email); throw new BusinessError(400, '验证码已过期，请重新获取'); }
-  if (cached.code !== String(code)) { cached.attempts++; throw new BusinessError(400, '验证码错误'); }
+  if (!cached) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
+  if (cached.attempts >= 5) { CODE_CACHE.delete(email); throw new BusinessError(ERROR_CODE.EC_RATE_VERIFY); }
+  if (Date.now() > cached.expires) { CODE_CACHE.delete(email); throw new BusinessError(ERROR_CODE.PARAM_INVALID); }
+  if (cached.code !== String(code)) { cached.attempts++; throw new BusinessError(ERROR_CODE.PARAM_INVALID); }
   CODE_CACHE.delete(email);
   CODE_CACHE.set(`verified:email:${email}`, { time: Date.now() });
   return true;
@@ -237,13 +238,13 @@ export async function listTemplates() {
 
 export async function updateTemplate(id, fields) {
   const data = await emailTemplateDao.updateTemplate(id, fields);
-  if (!data) throw new BusinessError(400, '没有可更新的字段');
+  if (!data) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
   return data;
 }
 
 export async function createTemplate(fields) {
   if (!fields.template_code || !fields.name || !fields.content) {
-    throw new BusinessError(400, '模板编码、名称和内容不能为空');
+    throw new BusinessError(ERROR_CODE.PARAM_MISSING);
   }
   const id = await emailTemplateDao.insertTemplate(fields);
   return { id };

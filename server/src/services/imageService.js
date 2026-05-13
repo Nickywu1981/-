@@ -7,6 +7,7 @@ import { createTask, updateTaskStatus, completeTask, getTask, listUserTasks, cou
 import * as creditService from './creditService.js';
 import { BusinessError } from '../utils/businessError.js';
 import { uploadConfig } from '../config/index.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 // ==================== 主图生成管线 ====================
 
@@ -231,7 +232,7 @@ async function processRetouch(taskId, userId, params) {
 
 export async function submitBatchTask(userId, { imageUrls, operation, platform, style }) {
   const batchSize = imageUrls?.length || 0;
-  if (batchSize === 0) throw new BusinessError(400, '请上传至少一张图片');
+  if (batchSize === 0) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
 
   const creditMap = { cutout: 'cutout', main_image: 'enhance', scene: 'scene' };
   const action = creditMap[operation] || operation;
@@ -364,7 +365,7 @@ async function processWhiteBg(taskId, userId, params) {
 
 export async function getTaskResult(taskId, userId) {
   const task = await getTask(taskId, userId);
-  if (!task) throw new BusinessError(404, '任务不存在');
+  if (!task) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   return task;
 }
 

@@ -8,6 +8,7 @@ import { wrapController } from '../utils/wrapController.js';
 import { success, error, Errors } from '../utils/response.js';
 import { BusinessError } from '../utils/businessError.js';
 import logger from '../utils/logger.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 // ==================== 全链路生成 ====================
 
@@ -64,7 +65,7 @@ export const uploadReference = wrapController(async (req) => {
   const { type } = req.body;
 
   if (!file) {
-    throw new BusinessError(400, '请上传参考文件');
+    throw new BusinessError(ERROR_CODE.PARAM_MISSING);
   }
 
   const url = `/uploads/${file.filename}`;

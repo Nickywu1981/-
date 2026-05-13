@@ -20,7 +20,7 @@ export const listCollections = wrapController(async (req, res) => {
 
 export const getCollection = wrapController(async (req, res) => {
     const item = await collectionService.getById(req.params.id, req.user.id);
-    if (!item) throw new BusinessError(ERROR_CODE.NOT_FOUND, '合集不存在');
+    if (!item) throw new BusinessError(ERROR_CODE.NOT_FOUND);
     return success(res, item);
 });
 
@@ -31,12 +31,12 @@ export const createCollection = wrapController(async (req, res) => {
 
 export const updateCollection = wrapController(async (req, res) => {
     const ok = await collectionService.update(req.params.id, req.user.id, safeBody(req.body));
-    if (!ok) throw new BusinessError(ERROR_CODE.NOT_FOUND, '合集不存在');
+    if (!ok) throw new BusinessError(ERROR_CODE.NOT_FOUND);
     return success(res, null, '更新成功');
 });
 
 export const deleteCollection = wrapController(async (req, res) => {
     const ok = await collectionService.remove(req.params.id, req.user.id);
-    if (!ok) throw new BusinessError(ERROR_CODE.NOT_FOUND, '合集不存在');
+    if (!ok) throw new BusinessError(ERROR_CODE.NOT_FOUND);
     return success(res, null, '删除成功');
 });

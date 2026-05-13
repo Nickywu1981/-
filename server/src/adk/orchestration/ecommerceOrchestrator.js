@@ -26,6 +26,7 @@ import { isBlocked } from '../../services/adComplianceEngine.js';
 import { wrapPrompt } from '../../services/promptWrapper.js';
 import { rememberSession } from '../../services/ltmEnhancer.js';
 import { WorkingMemory } from '../../services/workingMemory.js';
+import { ERROR_CODE } from '../../constants/errorCode.js';
 
 // ==================== 链路1: 白底图全链路 ====================
 // 白底图 → 意图识别 → 合规校验 → 批量扩图 → 详情页全套 → 脚本分镜 → 分镜合成视频 → 配音字幕
@@ -122,7 +123,7 @@ export async function runEcommercePipeline(params = {}) {
   } = params;
 
   if (!userInput || !userInput.trim()) {
-    throw new BusinessError(400, '请输入需求描述');
+    throw new BusinessError(ERROR_CODE.PARAM_MISSING);
   }
 
   // ── Step 0: 前置合规快速拦截 ──
@@ -145,7 +146,7 @@ export async function runEcommercePipeline(params = {}) {
   });
 
   if (wrapResult.blocked) {
-    throw new BusinessError(422, wrapResult.blockReason || '内容不合规');
+    throw new BusinessError(ERROR_CODE.CONTENT_MODERATION, wrapResult.blockReason || 'Content non-compliant');
   }
 
   // ── Step 1: 自动意图识别 → 选择链路 ──
@@ -206,7 +207,7 @@ export async function runEcommercePipeline(params = {}) {
       pipeline: pipelineKey,
       error: err.message,
     });
-    throw new BusinessError(502, `Agent链路执行失败: ${err.message}`);
+    throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, `Agent chain execution failed: ${err.message}`);
   }
 
   // ── Step 4: 收集输出 ──
@@ -263,7 +264,7 @@ export async function rerunSingleAgent(agentName, params) {
   };
 
   const agent = agentMap[agentName];
-  if (!agent) throw new BusinessError(400, `未知Agent: ${agentName}`);
+  if (!agent) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND, `Unknown agent: ${agentName}`);
 
   return agent.runAsync(ctx);
 }

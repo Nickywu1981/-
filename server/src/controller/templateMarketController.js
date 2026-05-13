@@ -17,16 +17,16 @@ export const search = wrapController(async (req, res) => {
 
 export const detail = wrapController(async (req, res) => {
   const tpl = await templateMarketDao.getById(+req.params.id);
-  if (!tpl) throw new BusinessError(ERROR_CODE.NOT_FOUND, '模板不存在');
+  if (!tpl) throw new BusinessError(ERROR_CODE.NOT_FOUND);
   return success(res, tpl);
 });
 
 export const download = wrapController(async (req, res) => {
   const tpl = await templateMarketDao.getById(+req.params.id);
-  if (!tpl) throw new BusinessError(ERROR_CODE.NOT_FOUND, '模板不存在');
+  if (!tpl) throw new BusinessError(ERROR_CODE.NOT_FOUND);
   if (tpl.price > 0) {
     const purchased = await templateMarketDao.hasPurchased(req.userId, tpl.id);
-    if (!purchased) throw new BusinessError(ERROR_CODE.PAYMENT_REQUIRED, '请先购买此模板');
+    if (!purchased) throw new BusinessError(ERROR_CODE.PAYMENT_REQUIRED);
   }
   await templateMarketDao.incrementDownload(tpl.id);
   return success(res, { download_url: tpl.preview_images }, '下载成功');
@@ -34,8 +34,8 @@ export const download = wrapController(async (req, res) => {
 
 export const purchase = wrapController(async (req, res) => {
   const tpl = await templateMarketDao.getById(+req.params.id);
-  if (!tpl) throw new BusinessError(ERROR_CODE.NOT_FOUND, '模板不存在');
-  if (tpl.price === 0) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '免费模板无需购买');
+  if (!tpl) throw new BusinessError(ERROR_CODE.NOT_FOUND);
+  if (tpl.price === 0) throw new BusinessError(ERROR_CODE.BAD_REQUEST);
   await templateMarketDao.recordPurchase(req.userId, tpl.id, tpl.price);
   return success(res, null, '购买成功');
 });

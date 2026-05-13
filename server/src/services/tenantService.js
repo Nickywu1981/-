@@ -1,5 +1,6 @@
 import tenantDao from '../dao/tenantDao.js';
 import { BusinessError } from '../utils/businessError.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 export async function listTenants() {
   const result = await tenantDao.list();
@@ -8,16 +9,16 @@ export async function listTenants() {
 
 export async function getTenantById(id) {
   const t = await tenantDao.findById(id);
-  if (!t) throw new BusinessError(404, '租户不存在');
+  if (!t) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   return t;
 }
 
 export async function createTenant(data) {
   const { name, code } = data;
-  if (!name || !code) throw new BusinessError(400, '租户名称和编码不能为空');
+  if (!name || !code) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
 
   const exist = await tenantDao.findByCode(code);
-  if (exist) throw new BusinessError(400, '租户编码已存在');
+  if (exist) throw new BusinessError(ERROR_CODE.RESOURCE_DUPLICATE);
 
   const insertId = await tenantDao.create(data);
   return tenantDao.findById(insertId);
@@ -29,24 +30,24 @@ export async function updateTenant(id, data) {
   for (const k of fields) {
     if (data[k] !== undefined) updates[k] = data[k];
   }
-  if (!Object.keys(updates).length) throw new BusinessError(400, '无有效更新字段');
+  if (!Object.keys(updates).length) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
 
   const ok = await tenantDao.update(id, updates);
-  if (!ok) throw new BusinessError(404, '租户不存在');
+  if (!ok) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   return tenantDao.findById(id);
 }
 
 export async function deleteTenant(id) {
   const ok = await tenantDao.delete(id);
-  if (!ok) throw new BusinessError(404, '租户不存在');
+  if (!ok) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   return true;
 }
 
 export async function reviewTenant(id, { reviewStatus, reviewRemark }, reviewedBy) {
   if (!['approved', 'rejected'].includes(reviewStatus)) {
-    throw new BusinessError(400, '审核状态仅可为 approved 或 rejected');
+    throw new BusinessError(ERROR_CODE.PARAM_INVALID);
   }
   const ok = await tenantDao.review(id, { reviewStatus, reviewRemark, reviewedBy });
-  if (!ok) throw new BusinessError(404, '租户不存在');
+  if (!ok) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   return tenantDao.findById(id);
 }

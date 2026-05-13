@@ -191,7 +191,7 @@ export async function infer(modelId, input, options = {}) {
       // 超时控制
       let timeoutId;
       const timeoutPromise = new Promise((_, reject) => {
-        timeoutId = setTimeout(() => reject(new BusinessError(504, `AI调用超时: ${currentModelId}`)), INFER_CONFIG.timeoutMs);
+        timeoutId = setTimeout(() => reject(new BusinessError(ERROR_CODE.INTERNAL_ERROR, `AI call timeout: ${currentModelId}`)), INFER_CONFIG.timeoutMs);
       });
 
       const result = await Promise.race([
