@@ -23,6 +23,8 @@ import { dispatch as _dispatch } from '../services/modelDispatcher.js';
 import * as _modelRouter from '../services/model-router.service.js';
 import { manageContextWindow, saveBudgetLog } from '../services/contextWindowService.js';
 import * as ltmService from '../services/longTermMemoryService.js';
+import { sanitizePII, sanitizeObject } from '../services/inputSanitizerService.js';
+import { moderateText } from '../services/moderation.service.js';
 
 // ==================== 统一调用上下文 ====================
 
@@ -38,6 +40,78 @@ function normalizeContext(ctx) {
 
 function _genCorrelationId() {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+// ==================== Pre-invoke 安全检测 ====================
+
+/**
+ * 统一 pre-invoke 安全检查管线
+ * GEO 规则 → PII 脱敏 → 内容安全审核
+ * @returns {{ blocked: boolean, blockReason?: string, sanitizedInput: any, geoConstraints: object|null, moderationResult: object|null }}
+ */
+async function runPreInvokeSecurityChecks(modelId, input, context) {
+  const result = {
+    blocked: false,
+    blockReason: null,
+    sanitizedInput: input,
+    geoConstraints: null,
+    moderationResult: null,
+  };
+
+  // 1. GEO 规则检查
+  const countryCode = context.countryCode || context.geo?.country || null;
+  const platformCode = context.platformCode || context.taskType || null;
+  if (countryCode) {
+    try {
+      const { evaluateRules } = await import('../services/geoRulesService.js');
+      const geoConstraints = await evaluateRules(countryCode, platformCode);
+      result.geoConstraints = geoConstraints;
+      if (geoConstraints?.blockedModels?.includes(modelId)) {
+        result.blocked = true;
+        result.blockReason = `Model ${modelId} is not available in your region`;
+        return result;
+      }
+    } catch (e) {
+      logger.warn(`[Gateway] GEO evaluation failed: ${e.message}`);
+    }
+  }
+
+  // 2. PII 敏感信息脱敏
+  const sanitizeEnabled = process.env.SECURITY_SANITIZE_INPUT !== 'false';
+  if (sanitizeEnabled) {
+    try {
+      if (typeof input === 'string') {
+        const { sanitized, maskedCount } = sanitizePII(input);
+        if (maskedCount > 0) {
+          result.sanitizedInput = sanitized;
+          logger.info(`[Gateway] PII 脱敏: ${maskedCount} 处 (user=${context.userId})`);
+        }
+      } else if (typeof input === 'object' && input !== null) {
+        result.sanitizedInput = sanitizeObject(input);
+      }
+    } catch (e) {
+      logger.warn(`[Gateway] PII sanitization failed: ${e.message}`);
+    }
+  }
+
+  // 3. 内容安全审核（敏感词/违禁词检测）
+  const moderationEnabled = process.env.SECURITY_SELF_BUILT_WORDLIST_ENABLED !== 'false';
+  if (moderationEnabled && context.userId) {
+    try {
+      const textToCheck = typeof input === 'string' ? input : JSON.stringify(input);
+      const modResult = await moderateText(textToCheck, context.userId, { stage: 'input' });
+      result.moderationResult = modResult;
+      if (modResult.action === 'block') {
+        result.blocked = true;
+        result.blockReason = '内容包含违规信息，请修改后重试';
+        return result;
+      }
+    } catch (e) {
+      logger.warn(`[Gateway] Content moderation failed: ${e.message}`);
+    }
+  }
+
+  return result;
 }
 
 // ==================== 核心方法 ====================
