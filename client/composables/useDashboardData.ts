@@ -58,7 +58,7 @@ export function useDashboardData() {
 
   const trendRawValues = computed(() => {
     const trendArr = d.value.trend || []
-    return trendArr.map((p: any) => Number(p[trendTabKey.value]) || 0)
+    return trendArr.map((p: Record<string, unknown>) => Number(p[trendTabKey.value]) || 0)
   })
 
   const trendPoints = computed(() => {
@@ -74,7 +74,7 @@ export function useDashboardData() {
   const trendLine = computed(() => {
     const pts = trendPoints.value
     const parts = [`M${pts[0].x},${pts[0].y}`]
-    pts.slice(1).forEach((p: any, i: number) => {
+    pts.slice(1).forEach((p: { x: number; y: number }, i: number) => {
       parts.push(`C${(pts[i].x + p.x) / 2},${pts[i].y} ${(pts[i].x + p.x) / 2},${p.y} ${p.x},${p.y}`)
     })
     return parts.join(' ')
@@ -89,12 +89,12 @@ export function useDashboardData() {
     const trendArr = d.value.trend || []
     if (!trendArr.length) return ['1日', '15日', '30日']
     const step = Math.max(1, Math.floor(trendArr.length / 9))
-    return trendArr.filter((_: any, i: number) => i % step === 0).slice(0, 10).map((p: any) => p.date || '')
+    return trendArr.filter((_: Record<string, unknown>, i: number) => i % step === 0).slice(0, 10).map((p: Record<string, unknown>) => p.date as string || '')
   })
 
   const miniTrendLine = computed(() => {
     const trendArr = d.value.trend || []
-    const vals = trendArr.length ? trendArr.map((p: any) => Number(p.users) || 0) : [20, 25, 22, 30, 28, 35, 32, 40, 38, 45, 42, 50, 48, 52]
+    const vals = trendArr.length ? trendArr.map((p: Record<string, unknown>) => Number(p.users) || 0) : [20, 25, 22, 30, 28, 35, 32, 40, 38, 45, 42, 50, 48, 52]
     if (!vals.length) return 'M0,52'
     const maxV = Math.max(...vals, 1)
     const parts = ['M0,52']
@@ -107,7 +107,7 @@ export function useDashboardData() {
   // ── Channel Data ──
   const channelData = computed(() => {
     const channels = d.value.channels || []
-    return channels.map((ch: any, i: number) => ({
+    return channels.map((ch: Record<string, unknown>, i: number) => ({
       name: ch.name,
       pct: ch.pct,
       color: DASHBOARD_COLORS[i % DASHBOARD_COLORS.length],
@@ -119,7 +119,7 @@ export function useDashboardData() {
 
   // ── Commission Data ──
   const commissionData = computed(() => d.value.commission || [])
-  const maxCommission = computed(() => Math.max(...commissionData.value.map((item: any) => item.amount), 1))
+  const maxCommission = computed(() => Math.max(...commissionData.value.map((item: Record<string, unknown>) => item.amount as number), 1))
 
   // ── User Growth ──
   const userGrowthTotal = computed(() => Number(d.value.kpi?.users) || 0)
@@ -127,7 +127,7 @@ export function useDashboardData() {
   const userGrowthRate = computed(() => Number(d.value.kpi?.retention) || 0)
 
   // ── Top Features ──
-  const topFeatures = computed(() => (d.value.topFeatures || []).map((f: any) => ({
+  const topFeatures = computed(() => (d.value.topFeatures || []).map((f: Record<string, unknown>) => ({
     name: f.name,
     count: typeof f.count === 'number' ? fmtNum(f.count) : f.count,
   })))
@@ -135,7 +135,7 @@ export function useDashboardData() {
   // ── Business Metrics ──
   const bizMetrics = computed(() => {
     const m = d.value.metrics || {}
-    return Object.entries(m).map(([key, val]: [string, any]) => {
+    return Object.entries(m).map(([key, val]: [string, unknown]) => {
       let display = String(val || '—')
       if (typeof val === 'number') {
         if (key === 'conversion' || key === 'churn' || key === 'satisfaction') display = val.toFixed(1) + '%'
