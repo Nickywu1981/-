@@ -196,7 +196,7 @@ export async function getSessionContext(sessionId) {
 
   try {
     // 尝试 Redis
-    const { default: redis } = await import('../utils/redis.js').catch(() => ({ default: null }));
+    const { default: redis } = await import('../dao/redis.js').catch(() => ({ default: null }));
     if (redis) {
       const raw = await redis.get(`ctx:session:${sessionId}`);
       if (raw) return JSON.parse(raw);
@@ -216,7 +216,7 @@ export async function setSessionContext(sessionId, data) {
   if (!contextCacheEnabled || !sessionId) return;
 
   try {
-    const { default: redis } = await import('../utils/redis.js').catch(() => ({ default: null }));
+    const { default: redis } = await import('../dao/redis.js').catch(() => ({ default: null }));
     if (redis) {
       await redis.setex(`ctx:session:${sessionId}`, Math.ceil(contextCacheTTL / 1000), JSON.stringify(data));
       return;

@@ -38,7 +38,7 @@ async function isNonceUsed(nonce) {
   if (nonceStore.has(nonce)) return true;
   // 尝试 Redis
   try {
-    const { default: redis } = await import('../utils/redis.js');
+    const { default: redis } = await import('../dao/redis.js');
     if (redis) {
       const exists = await redis.get(`signature:nonce:${nonce}`);
       return !!exists;
@@ -50,7 +50,7 @@ async function isNonceUsed(nonce) {
 async function markNonceUsed(nonce) {
   nonceStore.set(nonce, Date.now());
   try {
-    const { default: redis } = await import('../utils/redis.js');
+    const { default: redis } = await import('../dao/redis.js');
     if (redis) {
       await redis.setex(`signature:nonce:${nonce}`, config.nonceTTL, '1');
     }
@@ -85,7 +85,7 @@ export function generateSignature(appKey, appSecret, method, path, body = '') {
 
 // ==================== 中间件 ====================
 
-export function signatureMiddleware(req, res, next) {
+export async function signatureMiddleware(req, res, next) {
   if (!config.enabled) return next();
 
   const appKey = req.headers['x-app-key'];
@@ -113,7 +113,8 @@ export function signatureMiddleware(req, res, next) {
   }
 
   // Nonce 防重放
-  isNonceUsed(nonce).then(used => {
+  try {
+    const used = await isNonceUsed(nonce);
     if (used) {
       return error(res, ERROR_CODE.UNAUTHORIZED, '请求已使用 (nonce 重复)');
     }
@@ -131,10 +132,10 @@ export function signatureMiddleware(req, res, next) {
     markNonceUsed(nonce);
     logger.info(`[Signature] 验证通过: appKey=${appKey}, path=${req.path}`);
     next();
-  }).catch(err => {
+  } catch (err) {
     logger.error(`[Signature] Nonce check failed: ${err.message}`);
     error(res, ERROR_CODE.INTERNAL_ERROR, '签名校验服务暂不可用');
-  });
+  }
 }
 
 export default signatureMiddleware;
