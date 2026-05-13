@@ -102,7 +102,7 @@ export default defineNuxtConfig({
       name: 'Movio AI — 电商AI视觉创作平台',
       short_name: 'Movio AI',
       description: '电商图片+视频AI一体化创作平台，抠图/场景/主图/视频/详情页/虚拟模特',
-      theme_color: '#7C3AED',
+      theme_color: '#5b5fe3',
       background_color: '#ffffff',
       display: 'standalone',
       display_override: ['standalone', 'minimal-ui'],
