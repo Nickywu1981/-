@@ -9,7 +9,7 @@
     <div v-if="mobileOpen" class="ash-overlay" @click="mobileOpen = false" />
 
     <!-- ═══ 左侧导航 ═══ -->
-    <aside class="ash-side" :class="{ 'ash-side--open': mobileOpen }">
+    <aside class="ash-side" :class="{ 'ash-side--open': mobileOpen }" role="navigation" :aria-label="t('admin_shell.sidebar_label')">
       <!-- Logo 区 -->
       <div class="ash-brand">
         <div class="ash-brand-icon" :style="{ background: accentColor }">{{ brandInitial }}</div>
@@ -25,7 +25,7 @@
       <!-- 导航分组 -->
       <nav class="ash-nav">
         <template v-for="group in navGroups" :key="group.key">
-          <button class="ash-nav-group" @click="toggleGroup(group.key)" :class="{ 'ash-nav-group--open': group.open }">
+          <button class="ash-nav-group" @click="toggleGroup(group.key)" :class="{ 'ash-nav-group--open': group.open }" :aria-expanded="group.open">
             <span class="ash-nav-group-icon">{{ group.icon }}</span>
             <span class="ash-nav-group-label">{{ group.label }}</span>
             <svg class="ash-nav-group-chevron" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 0.5L5 4.5L9 0.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -37,6 +37,7 @@
               :to="item.route"
               class="ash-nav-item"
               :class="{ 'ash-nav-item--active': isActive(item.route) }"
+              :aria-current="isActive(item.route) ? 'page' : undefined"
               @click="mobileOpen = false"
             >
               <span v-if="item.badge" class="ash-nav-badge">{{ item.badge }}</span>
@@ -78,11 +79,11 @@
         <div class="ash-topbar-right">
           <slot name="topbar-actions" />
           <!-- 通知 -->
-          <button class="ash-icon-btn" :title="t('admin_shell.notification')">
+          <button class="ash-icon-btn" :title="t('admin_shell.notification')" :aria-label="t('admin_shell.notification')">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2a4 4 0 0 0-4 4v2l-1 2h10l-1-2V6a4 4 0 0 0-4-4z" stroke="currentColor" stroke-width="1.2"/><path d="M6 13a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
           </button>
           <!-- 用户 -->
-          <div class="ash-user" @click="userOpen = !userOpen">
+          <div class="ash-user" @click="userOpen = !userOpen" role="button" :aria-expanded="userOpen" aria-haspopup="true" tabindex="0" @keydown.enter="userOpen = !userOpen" @keydown.space.prevent="userOpen = !userOpen">
             <span class="ash-avatar" :style="{ background: accentColor }">{{ userInitial }}</span>
             <span class="ash-username">{{ userName }}</span>
           </div>
