@@ -5,53 +5,53 @@
 -->
 <template>
   <div class="pe-root">
-    <button class="pe-trigger" @click="toggle" aria-label="提示词润色">
+    <button class="pe-trigger" @click="toggle" :aria-label="$t('promptEnhancer.triggerAria')">
       <span class="pe-icon">✨</span>
-      <span>提示词润色</span>
+      <span>{{ $t('promptEnhancer.triggerLabel') }}</span>
       <span v-if="enhancing" class="pe-spin">⏳</span>
     </button>
 
     <div v-if="open" class="pe-panel">
       <div class="pe-header">
-        <span>✍ 润色提示词 ({{ typeLabel }})</span>
-        <button class="pe-close" @click="open = false" aria-label="关闭面板">✕</button>
+        <span>✍ {{ $t('promptEnhancer.panelHeader', { type: typeLabel }) }}</span>
+        <button class="pe-close" @click="open = false" :aria-label="$t('promptEnhancer.closeAria')">✕</button>
       </div>
 
       <div class="pe-body">
         <label class="pe-label">
-          你的原始提示词
+          {{ $t('promptEnhancer.yourPrompt') }}
           <textarea
             v-model="draft"
             class="pe-textarea"
             rows="3"
-            placeholder="输入你想表达的内容，AI 帮你优化成专业提示词..."
+            :placeholder="$t('promptEnhancer.promptPlaceholder')"
           ></textarea>
         </label>
 
         <div v-if="enhanced" class="pe-result">
           <div class="pe-result-header">
-            <span>✨ 润色后</span>
-            <button class="pe-apply" @click="apply" aria-label="应用润色结果">
-              {{ applied ? '✅ 已应用' : '📥 应用' }}
+            <span>{{ $t('promptEnhancer.enhancedResult') }}</span>
+            <button class="pe-apply" @click="apply" :aria-label="$t('promptEnhancer.applyAria')">
+              {{ applied ? $t('promptEnhancer.applied') : $t('promptEnhancer.apply') }}
             </button>
           </div>
           <div class="pe-output">{{ enhanced }}</div>
           <div class="pe-diff-hint" v-if="draft && enhanced !== draft">
             <details>
-              <summary>查看对比</summary>
+              <summary>{{ $t('promptEnhancer.compare') }}</summary>
               <div class="pe-compare">
-                <div class="pe-before"><span>润色前</span>{{ draft }}</div>
-                <div class="pe-after"><span>润色后</span>{{ enhanced }}</div>
+                <div class="pe-before"><span>{{ $t('promptEnhancer.beforeEnhance') }}</span>{{ draft }}</div>
+                <div class="pe-after"><span>{{ $t('promptEnhancer.afterEnhance') }}</span>{{ enhanced }}</div>
               </div>
             </details>
           </div>
         </div>
 
         <div class="pe-actions">
-          <button class="pe-btn pe-btn-run" :disabled="enhancing || !draft.trim()" @click="run" aria-label="开始润色">
-            {{ enhancing ? '润色中...' : '🚀 开始润色' }}
+          <button class="pe-btn pe-btn-run" :disabled="enhancing || !draft.trim()" @click="run" :aria-label="$t('promptEnhancer.startEnhanceAria')">
+            {{ enhancing ? $t('promptEnhancer.enhancing') : $t('promptEnhancer.startEnhance') }}
           </button>
-          <button v-if="open" class="pe-btn pe-btn-ghost" @click="open = false" aria-label="关闭面板">关闭</button>
+          <button v-if="open" class="pe-btn pe-btn-ghost" @click="open = false" :aria-label="$t('promptEnhancer.closeAria')">{{ $t('promptEnhancer.close') }}</button>
         </div>
       </div>
     </div>
@@ -59,6 +59,8 @@
 </template>
 
 <script setup lang="ts">
+
+const { t } = useI18n()
 
 const props = defineProps<{
   modelValue: string
@@ -77,8 +79,9 @@ const applied = ref(false)
 const enhancing = ref(false)
 
 const typeLabel = computed(() => {
-  const map: Record<string, string> = { image:'图片', video:'视频', detail:'详情图', poster:'海报', social:'社媒' }
-  return map[props.type || 'image'] || '通用'
+  const keyMap: Record<string, string> = { image:'promptEnhancer.typeImage', video:'promptEnhancer.typeVideo', detail:'promptEnhancer.typeDetail', poster:'promptEnhancer.typePoster', social:'promptEnhancer.typeSocial' }
+  const key = keyMap[props.type || 'image'] || 'promptEnhancer.typeGeneric'
+  return t(key)
 })
 
 function toggle() {

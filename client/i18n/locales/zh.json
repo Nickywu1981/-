@@ -4947,5 +4947,39 @@
       "preview_btn": "预览",
       "generate_success": "生成成功"
     }
+  },
+  "promptEnhancer": {
+    "triggerAria": "提示词润色",
+    "triggerLabel": "提示词润色",
+    "panelHeader": "✍ 润色提示词 ({type})",
+    "closeAria": "关闭面板",
+    "yourPrompt": "你的原始提示词",
+    "promptPlaceholder": "输入你想表达的内容，AI 帮你优化成专业提示词...",
+    "enhancedResult": "✨ 润色后",
+    "applyAria": "应用润色结果",
+    "applied": "✅ 已应用",
+    "apply": "📥 应用",
+    "compare": "查看对比",
+    "beforeEnhance": "润色前",
+    "afterEnhance": "润色后",
+    "startEnhanceAria": "开始润色",
+    "enhancing": "润色中...",
+    "startEnhance": "🚀 开始润色",
+    "close": "关闭",
+    "typeImage": "图片",
+    "typeVideo": "视频",
+    "typeDetail": "详情图",
+    "typePoster": "海报",
+    "typeSocial": "社媒",
+    "typeGeneric": "通用"
+  },
+  "taskProgress": {
+    "queued": "排队中，请稍候...",
+    "processing": "处理中...",
+    "completed": "处理完成",
+    "failed": "处理失败",
+    "download": "下载",
+    "retry": "重试",
+    "etaMinutes": "预计剩余 {mins} 分钟"
   }
 }

@@ -264,7 +264,7 @@ app.post('/api/internal/embed', async (req, res) => {
 });
 
 // 公开路由（无需认证）
-app.use('/api/geo', apiLimiter, geoRoutes);
+app.use('/api/geo', geoRoutes);
 
 // 静态文件服务（上传目录），带认证 + 缓存
 app.use('/uploads', authMiddleware, express.static(path.join(__dirname, '../uploads'), {
@@ -284,7 +284,7 @@ app.use('/uploads', authMiddleware, express.static(path.join(__dirname, '../uplo
 // v4.1 路由 (2026-05-08)
 // v4.1 路由 (2026-05-08) — 认证限流 10次/分钟
 app.use('/api/auth', authLimiter, authRoutes);
-app.use('/api/config', apiLimiter, configPublicRouter);
+app.use('/api/config', configPublicRouter);
 app.use('/api/admin/config', adminLimiter, configAdminRouter);
 app.use('/api/images', heavyLimiter, imageRoutesV4);
 app.use('/api/ai/gateway', aiConcurrencyGuard, heavyLimiter, aiGatewayRoutes);  // Token 集约化中台 — 必须在 /api/ai 守卫之前
@@ -303,14 +303,14 @@ app.use('/api/assets', heavyLimiter, assetsRoutesV4);
 app.use('/api/compliance', heavyLimiter, complianceRoutesV4);
 app.use('/api/platforms', heavyLimiter, platformBindRoutesV4);
 app.use('/api/publish', heavyLimiter, publishRoutesV4);
-app.use('/api/users', apiLimiter, userRoutes);  // must precede /api/user to avoid prefix match
+app.use('/api/users', userRoutes);  // must precede /api/user to avoid prefix match
 app.use('/api/user', heavyLimiter, userRoutesV4);
 app.use('/api/upload', uploadLimiter, uploadRoutesV4);
 app.use('/api/open/keys', adminLimiter, openApiKeyRoutes);
-app.use('/api/open', apiLimiter, openApiRoutes);
+app.use('/api/open', openApiRoutes);
 app.use('/api/copywriting', heavyLimiter, copywritingRoutes);
-app.use('/api/templates', apiLimiter, sizeTemplateRoutes);
-app.use('/api/brand', apiLimiter, brandRoutes);
+app.use('/api/templates', sizeTemplateRoutes);
+app.use('/api/brand', brandRoutes);
 app.use('/api/batch', heavyLimiter, batchRoutes);
 app.use('/api/advanced', heavyLimiter, advancedImageRoutes);
 app.use('/api/adv-video', heavyLimiter, advancedVideoRoutes);
@@ -325,35 +325,35 @@ app.use('/api/model', heavyLimiter, modelGenerateRoutesV4);
 app.use('/api/render', heavyLimiter, renderRoutesV4);
 app.use('/api/voice', heavyLimiter, voiceRoutesV4);
 app.use('/api/3d', heavyLimiter, d3RoutesV4);
-app.use('/api/notifications', apiLimiter, notificationRoutes);
+app.use('/api/notifications', notificationRoutes);
 app.use('/api/sms', codeLimiter, smsRoutes);
 app.use('/api/email', codeLimiter, emailRoutes);
 app.use('/api/prompts', heavyLimiter, promptRoutes);
 app.use('/api/credits', heavyLimiter, creditRoutes);
-app.use('/api/tenants', apiLimiter, tenantRoutes);
+app.use('/api/tenants', tenantRoutes);
 app.use('/api/diy', heavyLimiter, diyRoutes);
-app.use('/api/forms', apiLimiter, formRoutes);
+app.use('/api/forms', formRoutes);
 app.use('/api/proxy', heavyLimiter, proxyRoutes);
 app.use('/api/recharge', paymentLimiter, rechargeRoutes);
 app.use('/api/allinpay', paymentLimiter, allinpayRoutes);
 app.use('/api/automation', heavyLimiter, automationRoutes);
 app.use('/api/admin/audit-logs', adminLimiter, auditLogRoutes);
 app.use('/api/tasks', heavyLimiter, taskRoutes);
-app.use('/api/help', apiLimiter, helpRoutes);
+app.use('/api/help', helpRoutes);
 app.use('/api/collections', heavyLimiter, collectionRoutes);
 app.use('/api/admin/site-config', adminLimiter, siteConfigAdminRouter);
 app.use('/api/admin/workspace-diy', adminLimiter, adminWorkspaceDiyRoutes);
 app.use('/api/admin/geo-rules', adminLimiter, geoRuleAdminRouter);
-app.use('/api/site-config/public', apiLimiter, siteConfigPublicRouter);
+app.use('/api/site-config/public', siteConfigPublicRouter);
 app.use('/api/badges', adminLimiter, badgeRoutes);
-app.use('/api/tier', apiLimiter, tierRoutes);
+app.use('/api/tier', tierRoutes);
 app.use('/api/admin/abuse', adminLimiter, abuseRoutes);
-app.use('/api/multilingual', apiLimiter, multilingualRoutes);
-app.use('/api/i18n', apiLimiter, i18nPublicRoutes);
+app.use('/api/multilingual', multilingualRoutes);
+app.use('/api/i18n', i18nPublicRoutes);
 app.use('/api/admin/i18n', adminLimiter, i18nAdminRoutes);
 app.use('/api/analytics', adminLimiter, analyticsRoutes);
-app.use('/api/dashboard', authMiddleware, apiLimiter, dashboardRoutes);  // 运营看板概览
-app.use('/api/platform-specs', apiLimiter, platformSpecRoutes);
+app.use('/api/dashboard', authMiddleware, dashboardRoutes);  // 运营看板概览
+app.use('/api/platform-specs', platformSpecRoutes);
 app.use('/api/compare', heavyLimiter, compareRoutes);
 app.use('/api/seo-keywords', heavyLimiter, seoKeywordRoutes);
 app.use('/api/fab', heavyLimiter, fabRoutes);
@@ -362,8 +362,8 @@ app.use('/api/ltm', heavyLimiter, longTermMemoryRoutes); // Phase 15: 长期记�
 app.use('/api/background-removal', heavyLimiter, bgRouter);
 app.use('/api/multi-size', heavyLimiter, msRouter);
 app.use('/api/digital-human', heavyLimiter, digitalHumanRoutesV4);
-app.use('/api/platform-publish', apiLimiter, platformPublishRoutesV4);
-app.use('/api/template-market', apiLimiter, templateMarketRoutesV4);
+app.use('/api/platform-publish', platformPublishRoutesV4);
+app.use('/api/template-market', templateMarketRoutesV4);
 app.use('/api/sdk', heavyLimiter, sdkRoutes);
 app.use('/api/adk', heavyLimiter, adkRoutes);
 
@@ -372,13 +372,13 @@ app.use('/api/e2b', heavyLimiter, e2bRoutes);
 
 // ===== Phase 1: 企业/代理端 (2026-05-11) =====
 app.use('/api/enterprise/finance', paymentLimiter, financeRoutes);  // Phase 2: 财务核心
-app.use('/api/enterprise/customers', apiLimiter, customerRoutes); // Phase 7: 客户管理
+app.use('/api/enterprise/customers', customerRoutes); // Phase 7: 客户管理
 app.use('/api/enterprise/channel', adminLimiter, channelRoutes);    // Phase 8: 渠道管理
 app.use('/api/enterprise/commerce', adminLimiter, commerceRoutes);  // Phase 8: 商品订单
-app.use('/api/enterprise', apiLimiter, enterpriseRoutes);
+app.use('/api/enterprise', enterpriseRoutes);
 app.use('/api/admin/campaign', adminLimiter, campaignRoutes);        // Phase 11: 运营活动+优惠券+公告
 app.use('/api/admin', adminRoutes);                                   // 管理后台统一路由 (自带 auth+adminAuth)
-app.use('/api/ai-assistant', authMiddleware, apiLimiter, aiAssistantRoutes);  // Phase 13: AI 助手 (FAQ/审核/数据分析)
+app.use('/api/ai-assistant', authMiddleware, aiAssistantRoutes);  // Phase 13: AI 助手 (FAQ/审核/数据分析)
 app.use('/api/workflows', authMiddleware, heavyLimiter, workflowRoutes);       // Phase 14: 工作流引擎 (模板/执行/作业)
 app.use('/api/ops', adminLimiter, operationsRoutes);                  // Phase 12: 跨租户运营看板
 

@@ -4984,5 +4984,39 @@
       "preview_btn": "Preview",
       "generate_success": "Generation successful"
     }
+  },
+  "promptEnhancer": {
+    "triggerAria": "Prompt Enhancer",
+    "triggerLabel": "Prompt Enhancer",
+    "panelHeader": "✍ Enhance Prompt ({type})",
+    "closeAria": "Close Panel",
+    "yourPrompt": "Your Original Prompt",
+    "promptPlaceholder": "Describe what you want, AI will help optimize it into a professional prompt...",
+    "enhancedResult": "✨ Enhanced",
+    "applyAria": "Apply Enhanced Result",
+    "applied": "✅ Applied",
+    "apply": "📥 Apply",
+    "compare": "Compare",
+    "beforeEnhance": "Before",
+    "afterEnhance": "After",
+    "startEnhanceAria": "Start Enhancement",
+    "enhancing": "Enhancing...",
+    "startEnhance": "🚀 Enhance",
+    "close": "Close",
+    "typeImage": "Image",
+    "typeVideo": "Video",
+    "typeDetail": "Detail Image",
+    "typePoster": "Poster",
+    "typeSocial": "Social Media",
+    "typeGeneric": "General"
+  },
+  "taskProgress": {
+    "queued": "Queued, please wait...",
+    "processing": "Processing...",
+    "completed": "Completed",
+    "failed": "Failed",
+    "download": "Download",
+    "retry": "Retry",
+    "etaMinutes": "Estimated {mins} min remaining"
   }
 }

@@ -59,8 +59,10 @@
 
 <script setup lang="ts">
 
+const { t } = useI18n()
+
 const props = defineProps({
-  status: { type: String, default: 'idle' }, // idle | queued | processing | completed | failed
+  status: { type: String, default: 'idle' },
   progress: { type: Number, default: 0 },
   errorMessage: { type: String, default: '' },
   showDownload: { type: Boolean, default: false },
@@ -69,17 +71,17 @@ const props = defineProps({
 
 defineEmits<{ download: []; retry: [] }>()
 
-const queueText = computed(() => props.status === 'queued' ? '排队中，请稍候...' : '')
-const processingText = computed(() => '处理中...')
-const completedText = computed(() => '处理完成')
-const failedText = computed(() => '处理失败')
-const downloadBtnText = computed(() => '下载')
-const retryBtnText = computed(() => '重试')
+const queueText = computed(() => props.status === 'queued' ? t('taskProgress.queued') : '')
+const processingText = computed(() => t('taskProgress.processing'))
+const completedText = computed(() => t('taskProgress.completed'))
+const failedText = computed(() => t('taskProgress.failed'))
+const downloadBtnText = computed(() => t('taskProgress.download'))
+const retryBtnText = computed(() => t('taskProgress.retry'))
 
 const etaText = computed(() => {
   if (props.etaSeconds <= 0) return ''
   const mins = Math.ceil(props.etaSeconds / 60)
-  return `预计剩余 ${mins} 分钟`
+  return t('taskProgress.etaMinutes', { mins })
 })
 </script>
 
