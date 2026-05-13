@@ -1,7 +1,7 @@
 <template>
   <Teleport to="body">
     <Transition name="onboard-fade">
-      <div v-if="guide.isVisible.value" class="onboard-overlay" role="dialog" aria-label="新手指引" @click.self="guide.skip()">
+      <div v-if="guide.isVisible.value" class="onboard-overlay" role="dialog" :aria-label="$t('onboarding.dialog_label')" @click.self="guide.skip()">
         <div class="onboard-card" @click.stop>
           <div class="onboard-step">{{ guide.currentStep.value + 1 }} / {{ guide.steps.length }}</div>
           <div class="onboard-icon">{{ guide.steps[guide.currentStep.value]?.icon || '✨' }}</div>
@@ -11,10 +11,10 @@
             <span v-for="(_s, i) in guide.steps" :key="i" class="dot" :class="{ active: i <= guide.currentStep.value }" />
           </div>
           <div class="onboard-actions">
-            <button class="btn-skip" @click="guide.skip()">跳过</button>
-            <button v-if="guide.currentStep.value > 0" class="btn-secondary" @click="guide.prev()">上一步</button>
+            <button class="btn-skip" @click="guide.skip()">{{ $t('onboarding.skip') }}</button>
+            <button v-if="guide.currentStep.value > 0" class="btn-secondary" @click="guide.prev()">{{ $t('onboarding.prev') }}</button>
             <button class="btn-primary" @click="guide.next()">
-              {{ guide.currentStep.value < guide.steps.length - 1 ? '下一步' : '开始使用' }}
+              {{ guide.currentStep.value < guide.steps.length - 1 ? $t('onboarding.next') : $t('onboarding.start') }}
             </button>
           </div>
         </div>

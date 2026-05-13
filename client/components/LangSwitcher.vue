@@ -1,6 +1,6 @@
 <template>
   <div class="lsw">
-    <button class="lsw-btn" @click="open = !open" :aria-label="'切换语言'">
+    <button class="lsw-btn" @click="open = !open" :aria-label="$t('lang.switch')">
       <span>{{ currentFlag }}</span>
       <span class="lsw-code">{{ locale.toUpperCase() }}</span>
       <span class="lsw-arrow">▾</span>

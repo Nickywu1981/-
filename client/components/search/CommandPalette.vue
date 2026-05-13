@@ -2,7 +2,7 @@
   <Teleport to="body">
     <Transition name="palette-fade">
       <div v-if="visible" class="palette-overlay" @click.self="close">
-        <div class="palette-dialog" role="dialog" aria-label="搜索功能">
+        <div class="palette-dialog" role="dialog" :aria-label="$t('cmd_palette.dialog_label')">
           <!-- Search input -->
           <div class="palette-search">
             <span class="palette-search-icon">🔍</span>
@@ -12,7 +12,7 @@
               type="text"
               :placeholder="placeholder"
               class="palette-input"
-              aria-label="搜索功能"
+              :aria-label="$t('cmd_palette.search')"
               @keydown="onKeydown"
               @input="onInput"
             />
@@ -34,8 +34,8 @@
               >
                 <span class="palette-item-icon">{{ item.icon }}</span>
                 <div class="palette-item-content">
-                  <span class="palette-item-name">{{ item.name }}</span>
-                  <span class="palette-item-desc">{{ item.description }}</span>
+                  <span class="palette-item-name">{{ resolveToolDisplay(t, item).name }}</span>
+                  <span class="palette-item-desc">{{ resolveToolDisplay(t, item).description }}</span>
                 </div>
                 <span class="palette-item-category">{{ group.label }}</span>
                 <kbd class="palette-item-shortcut" v-if="getFlatIndex(gidx, idx) < 3">{{ getFlatIndex(gidx, idx) + 1 }}</kbd>
@@ -46,13 +46,13 @@
           <!-- No results -->
           <div v-else-if="query.length > 0" class="palette-empty">
             <span class="palette-empty-icon">🔎</span>
-            <p>未找到"{{ query }}"相关功能</p>
-            <p class="palette-empty-hint">试试其他关键词，如"抠图"、"视频"、"批量"</p>
+            <p>{{ $t('cmd_palette.no_results', { query }) }}</p>
+            <p class="palette-empty-hint">{{ $t('cmd_palette.no_results_hint') }}</p>
           </div>
 
           <!-- Default state -->
           <div v-else class="palette-default">
-            <p class="palette-default-title">快速导航</p>
+            <p class="palette-default-title">{{ $t('cmd_palette.quick_nav') }}</p>
             <div class="palette-hot-links">
               <button v-for="link in hotLinks" :key="link.id" class="palette-hot-btn" @click="select(link)">
                 <span>{{ link.icon }}</span>
@@ -63,9 +63,9 @@
 
           <!-- Footer -->
           <div class="palette-footer">
-            <span><kbd>↑↓</kbd> 导航</span>
-            <span><kbd>↵</kbd> 进入</span>
-            <span><kbd>ESC</kbd> 关闭</span>
+            <span><kbd>↑↓</kbd> {{ $t('cmd_palette.nav') }}</span>
+            <span><kbd>↵</kbd> {{ $t('cmd_palette.enter') }}</span>
+            <span><kbd>ESC</kbd> {{ $t('cmd_palette.close') }}</span>
           </div>
         </div>
       </div>
@@ -74,17 +74,17 @@
 </template>
 
 <script setup lang="ts">
-import { toolIndex, categoryLabels } from '~/composables/toolIndex';
+import { toolIndex, resolveToolDisplay, resolveCategoryLabel } from '~/composables/toolIndex';
 
 interface ToolItem {
   id: string;
-  name: string;
   keywords: string[];
   route: string;
   icon: string;
   category: string;
-  description: string;
 }
+
+const { t } = useI18n()
 
 const visible = ref(false);
 const query = ref('');
@@ -93,20 +93,21 @@ const inputRef = ref<HTMLInputElement | null>(null);
 const resultsRef = ref<HTMLElement | null>(null);
 const itemRefs = ref<Record<string, HTMLElement>>({});
 
-const placeholder = '搜索功能... 输入"抠图"、 "视频"、 "批量"';
+const placeholder = computed(() => t('cmd_palette.placeholder'));
 
-const hotLinks = [
-  { id: 'remove-bg', name: '智能抠图', icon: '✂️', route: '/work/remove-bg' },
-  { id: 'white-bg', name: '白底图', icon: '⬜', route: '/work/white-bg' },
-  { id: 'scene', name: '场景生成', icon: '🏞️', route: '/work/scene' },
-  { id: 'video', name: '图生视频', icon: '🎬', route: '/work/video' },
-  { id: 'batch', name: '批量处理', icon: '📦', route: '/work/batch' },
-  { id: 'main-image', name: '主图制作', icon: '📷', route: '/work/main-image' },
-] as ToolItem[];
+const hotLinks = computed(() => [
+  { id: 'remove-bg', route: '/work/remove-bg', icon: '✂️' },
+  { id: 'white-bg', route: '/work/white-bg', icon: '⬜' },
+  { id: 'scene', route: '/work/scene', icon: '🏞️' },
+  { id: 'video', route: '/work/video', icon: '🎬' },
+  { id: 'batch', route: '/work/batch', icon: '📦' },
+  { id: 'main-image', route: '/work/main-image', icon: '📷' },
+].map(link => ({ ...link, name: resolveToolDisplay(t, toolIndex.find(ti => ti.id === link.id)!).name })))
 
 // Fuzzy match scoring
-function scoreItem(item: ToolItem, q: string): number {
-  const nameLow = item.name.toLowerCase();
+function scoreItem(item: typeof toolIndex[number], q: string): number {
+  const display = resolveToolDisplay(t, item)
+  const nameLow = display.name.toLowerCase();
   const kwLow = item.keywords.map(k => k.toLowerCase());
   if (nameLow === q) return 100;
   if (nameLow.startsWith(q)) return 80;
@@ -121,7 +122,7 @@ const filtered = computed(() => {
   const q = query.value.trim().toLowerCase();
   if (!q) return [];
   return toolIndex
-    .map(item => ({ item, score: scoreItem(item as any, q) }))
+    .map(item => ({ item, score: scoreItem(item, q) }))
     .filter(({ score }) => score > 0)
     .sort((a, b) => b.score - a.score)
     .slice(0, 12)
@@ -129,7 +130,7 @@ const filtered = computed(() => {
 });
 
 const grouped = computed(() => {
-  const map = new Map<string, ToolItem[]>();
+  const map = new Map<string, typeof toolIndex[number][]>();
   for (const item of filtered.value) {
     const key = item.category;
     if (!map.has(key)) map.set(key, []);
@@ -137,7 +138,7 @@ const grouped = computed(() => {
   }
   return Array.from(map.entries()).map(([category, items]) => ({
     category,
-    label: categoryLabels[category as keyof typeof categoryLabels] || category,
+    label: resolveCategoryLabel(t, category),
     items,
   }));
 });

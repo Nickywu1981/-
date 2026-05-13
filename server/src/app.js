@@ -125,6 +125,7 @@ import ecommerceRoutes from './route/ecommerceRoutes.js';      // 电商内容�
 import agentRoutes from './route/agentRoutes.js';               // 电商全能AI Agent — 6 Agent 协同 + 4 链路
 import unifiedWorkflowRoutes from './route/unifiedWorkflowRoutes.js'; // 统一工作流引擎 + 模型池 — 7条固定工作流
 import abTestRoutes from './route/abTestRoutes.js';                // A/B 实验框架 — 实验定义+指标+显著性
+import healingRoutes from './route/healingRoutes.js';                // L5 自愈系统管理 — 事件/模式/策略/阈值/预测
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 

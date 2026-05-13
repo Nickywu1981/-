@@ -5074,20 +5074,76 @@
       "them": "传统方式"
     },
     "rows": {
-      "image_processing": { "label": "图片处理", "us": "抠图/主图/场景/详情页全流程AI自动化", "them": "Photoshop/美图秀秀，需手动操作" },
-      "video_generation": { "label": "视频生成", "us": "图片→带货视频，自动字幕/BGM/特效", "them": "Premiere/剪映，需手动剪辑" },
-      "platform_adaptation": { "label": "平台适配", "us": "13平台一键尺寸适配（淘宝/抖音/亚马逊等）", "them": "需手动调整每个平台尺寸" },
-      "batch_processing": { "label": "批量处理", "us": "拖文件夹→AI批量处理→ZIP下载", "them": "逐张处理，耗时长" },
-      "ai_model": { "label": "AI虚拟模特", "us": "服装上身虚拟模特，多肤色/体型可选", "them": "需实拍模特，成本高周期长" },
-      "motion_transfer": { "label": "动作迁移", "us": "人物图+动作视频→AI精准动作迁移", "them": "需专业视频拍摄团队" },
-      "digital_avatar": { "label": "数字人口播", "us": "输入文案→选形象+语音→AI生成口播视频", "them": "需真人出镜录制" },
-      "smart_script": { "label": "智能脚本", "us": "AI自动生成带货/种草/直播脚本", "them": "需人工撰写" },
-      "storyboard": { "label": "分镜生成", "us": "输入产品→AI生成专业拍摄分镜方案", "them": "需导演/摄影师编排" },
-      "trend_analysis": { "label": "爆款分析", "us": "分析爆款视频结构→套用你的产品", "them": "需人工分析模仿" },
-      "night_batch": { "label": "夜间托管", "us": "夜间自动批量处理，6折优惠", "them": "不支持" },
-      "template_reuse": { "label": "模板复用", "us": "保存参数为模板，一键复刻", "them": "每次需重新设置" },
-      "pricing": { "label": "价格成本", "us": "月卡¥29起，按需灵活付费", "them": "Adobe ¥248/月 + 外包费用" },
-      "learning_curve": { "label": "学习成本", "us": "自然语言输入，零学习门槛", "them": "需专业软件学习，成本高" }
+      "image_processing": {
+        "label": "图片处理",
+        "us": "抠图/主图/场景/详情页全流程AI自动化",
+        "them": "Photoshop/美图秀秀，需手动操作"
+      },
+      "video_generation": {
+        "label": "视频生成",
+        "us": "图片→带货视频，自动字幕/BGM/特效",
+        "them": "Premiere/剪映，需手动剪辑"
+      },
+      "platform_adaptation": {
+        "label": "平台适配",
+        "us": "13平台一键尺寸适配（淘宝/抖音/亚马逊等）",
+        "them": "需手动调整每个平台尺寸"
+      },
+      "batch_processing": {
+        "label": "批量处理",
+        "us": "拖文件夹→AI批量处理→ZIP下载",
+        "them": "逐张处理，耗时长"
+      },
+      "ai_model": {
+        "label": "AI虚拟模特",
+        "us": "服装上身虚拟模特，多肤色/体型可选",
+        "them": "需实拍模特，成本高周期长"
+      },
+      "motion_transfer": {
+        "label": "动作迁移",
+        "us": "人物图+动作视频→AI精准动作迁移",
+        "them": "需专业视频拍摄团队"
+      },
+      "digital_avatar": {
+        "label": "数字人口播",
+        "us": "输入文案→选形象+语音→AI生成口播视频",
+        "them": "需真人出镜录制"
+      },
+      "smart_script": {
+        "label": "智能脚本",
+        "us": "AI自动生成带货/种草/直播脚本",
+        "them": "需人工撰写"
+      },
+      "storyboard": {
+        "label": "分镜生成",
+        "us": "输入产品→AI生成专业拍摄分镜方案",
+        "them": "需导演/摄影师编排"
+      },
+      "trend_analysis": {
+        "label": "爆款分析",
+        "us": "分析爆款视频结构→套用你的产品",
+        "them": "需人工分析模仿"
+      },
+      "night_batch": {
+        "label": "夜间托管",
+        "us": "夜间自动批量处理，6折优惠",
+        "them": "不支持"
+      },
+      "template_reuse": {
+        "label": "模板复用",
+        "us": "保存参数为模板，一键复刻",
+        "them": "每次需重新设置"
+      },
+      "pricing": {
+        "label": "价格成本",
+        "us": "月卡¥29起，按需灵活付费",
+        "them": "Adobe ¥248/月 + 外包费用"
+      },
+      "learning_curve": {
+        "label": "学习成本",
+        "us": "自然语言输入，零学习门槛",
+        "them": "需专业软件学习，成本高"
+      }
     },
     "cta": {
       "title": "开始免费使用 Movio AI",
@@ -5168,5 +5224,134 @@
     "submit": "提交",
     "ended": "已结束",
     "countdownFormat": "{d}天 {h}时 {m}分"
+  },
+  "cmd_palette": {
+    "dialog_label": "搜索功能",
+    "search": "搜索功能",
+    "placeholder": "搜索功能... 输入关键词快速跳转",
+    "quick_nav": "快速导航",
+    "no_results": "未找到 \"{query}\" 相关功能",
+    "no_results_hint": "试试其他关键词",
+    "nav": "导航",
+    "enter": "进入",
+    "close": "关闭",
+    "cat_image": "图片处理",
+    "cat_video": "视频创作",
+    "cat_special": "特色工具",
+    "tool_remove_bg_name": "智能抠图",
+    "tool_remove_bg_desc": "AI 一键移除图片背景，5秒出图",
+    "tool_white_bg_name": "白底图",
+    "tool_white_bg_desc": "生成电商平台标准白底商品图",
+    "tool_scene_name": "场景生成",
+    "tool_scene_desc": "AI 生成商品场景图，室内外风格任选",
+    "tool_main_image_name": "主图制作",
+    "tool_main_image_desc": "多平台尺寸主图生成，适配各电商平台",
+    "tool_batch_name": "批量处理",
+    "tool_batch_desc": "一次上传批量处理，支持多种操作组合",
+    "tool_color_swap_name": "换色",
+    "tool_color_swap_desc": "商品换色，一键生成多色SKU展示图",
+    "tool_color_change_name": "改色",
+    "tool_color_change_desc": "精确调整商品颜色，保留质感和阴影",
+    "tool_style_transfer_name": "风格迁移",
+    "tool_style_transfer_desc": "将图片转换为指定艺术风格",
+    "tool_retouch_name": "图片精修",
+    "tool_retouch_desc": "AI 自动精修，磨皮美颜提升质感",
+    "tool_outpaint_name": "智能扩图",
+    "tool_outpaint_desc": "图片智能外扩，AI 补全画面边界",
+    "tool_image_translate_name": "图片翻译",
+    "tool_image_translate_desc": "图片中文字智能翻译，多语种版本",
+    "tool_text_effect_name": "文字特效",
+    "tool_text_effect_desc": "AI 生成艺术文字效果",
+    "tool_model_generate_name": "AI 模特生成",
+    "tool_model_generate_desc": "生成虚拟模特展示商品上身效果",
+    "tool_swap_face_name": "换脸",
+    "tool_swap_face_desc": "智能人脸替换，更换模特面孔",
+    "tool_person_replace_name": "人物替换",
+    "tool_person_replace_desc": "图片中人物智能替换",
+    "tool_wrinkle_remove_name": "去褶皱",
+    "tool_wrinkle_remove_desc": "服装去褶皱，让商品更有质感",
+    "tool_3d_preview_name": "3D 预览",
+    "tool_3d_preview_desc": "上传 3D 模型文件，360° 交互预览",
+    "tool_video_name": "图生视频",
+    "tool_video_desc": "单张图片生成产品展示短视频",
+    "tool_video_edit_name": "视频编辑",
+    "tool_video_edit_desc": "AI 智能视频编辑，加字幕/BGM/特效",
+    "tool_digital_human_name": "数字人",
+    "tool_digital_human_desc": "AI 数字人口播视频生成",
+    "tool_action_transfer_name": "动作迁移",
+    "tool_action_transfer_desc": "参考视频动作迁移到商品图",
+    "tool_shot_plan_name": "智能分镜",
+    "tool_shot_plan_desc": "AI 智能分镜脚本生成",
+    "tool_storyboard_name": "分镜脚本",
+    "tool_storyboard_desc": "短视频拍摄分镜脚本一键生成",
+    "tool_shot_panorama_name": "全景视频",
+    "tool_shot_panorama_desc": "商品全景展示视频制作",
+    "tool_voice_gen_name": "AI 配音",
+    "tool_voice_gen_desc": "AI 语音合成，多语种多音色",
+    "tool_voice_clone_name": "声音克隆",
+    "tool_voice_clone_desc": "一键克隆你的声音，专属配音",
+    "tool_script_gen_name": "脚本生成",
+    "tool_script_gen_desc": "AI 生成短视频脚本，支持9语种",
+    "tool_detail_h5_name": "详情页H5",
+    "tool_detail_h5_desc": "AI 生成移动端商品详情页",
+    "tool_platform_detail_name": "多平台详情",
+    "tool_platform_detail_desc": "一键生成适配多平台规格的详情图",
+    "tool_virtual_tryon_name": "虚拟试衣",
+    "tool_virtual_tryon_desc": "AI 虚拟试衣，模特换装展示",
+    "tool_ghost_mannequin_name": "幽灵模特",
+    "tool_ghost_mannequin_desc": "消除真人模特，保留服装形状",
+    "tool_viral_clone_name": "爆款克隆",
+    "tool_viral_clone_desc": "分析爆款风格，生成相似素材",
+    "tool_viral_replicate_name": "爆款复刻",
+    "tool_viral_replicate_desc": "爆款商品图风格一键复刻",
+    "tool_compliance_check_name": "合规检测",
+    "tool_compliance_check_desc": "电商广告合规检测，避免违规",
+    "tool_prompt_hub_name": "提示词工坊",
+    "tool_prompt_hub_desc": "AI智能推荐提示词，150+模板，评分历史",
+    "tool_publish_name": "多平台分发",
+    "tool_publish_desc": "一键分发作品到多个电商/社媒平台",
+    "tool_distribution_name": "分发管理",
+    "tool_distribution_desc": "管理多平台分发记录和发布状态",
+    "tool_cut_ecosystem_name": "裁剪生态",
+    "tool_cut_ecosystem_desc": "多平台画幅适配，智能裁剪导出",
+    "tool_usage_name": "用量仪表盘",
+    "tool_usage_desc": "查看API用量、积分消耗和配额使用情况",
+    "tool_favorites_name": "我的收藏",
+    "tool_favorites_desc": "查看和管理收藏的作品和模板"
+  },
+  "onboarding": {
+    "dialog_label": "新手指引",
+    "skip": "跳过",
+    "prev": "上一步",
+    "next": "下一步",
+    "start": "开始使用",
+    "welcome_title": "欢迎来到 Movio AI",
+    "welcome_desc": "一站式电商视觉创作平台，从主图到视频，一个工具搞定全部图文素材。",
+    "step1_title": "第1步：生成主图",
+    "step1_desc": "上传商品照片，AI 自动抠图、换白底、精修细节，生成高质量商品主图。",
+    "step2_title": "第2步：场景图",
+    "step2_desc": "选择场景模板或上传参考图，AI 将商品融入场景，生成营销级场景图。",
+    "step3_title": "第3步：详情页",
+    "step3_desc": "基于主图和场景图，AI 自动生成完整商品详情页文案+图文排版。",
+    "step4_title": "第4步：短视频",
+    "step4_desc": "用图片生成营销短视频，支持批量动作迁移、口播数字人等多种玩法。",
+    "start_title": "开始创作",
+    "start_desc": "在左侧导航栏选择功能模块，或点击下方快捷入口开始您的第一次创作。"
+  },
+  "smart_recognition": {
+    "recognizing": "识别中...",
+    "start_recognize": "开始识别",
+    "category": "品类",
+    "features_hint": "每行一个核心特征"
+  },
+  "lang": {
+    "switch": "切换语言"
+  },
+  "poster_preview": {
+    "placeholder": "输入描述，点击\"生成海报\"开始创作",
+    "result_alt": "海报结果 {idx}",
+    "generating": "生成中...",
+    "download": "下载海报",
+    "copy": "复制海报"
   }
 }

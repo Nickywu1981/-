@@ -3,7 +3,7 @@
     <!-- Placeholder -->
     <div v-if="!results.length && !generating && !error" class="preview-placeholder">
       <div class="placeholder-icon">🖼️</div>
-      <p>输入描述，点击"生成海报"开始创作</p>
+      <p>{{ $t('poster_preview.placeholder') }}</p>
     </div>
 
     <!-- Loading -->
@@ -24,14 +24,14 @@
           v-if="item.url"
           loading="lazy"
           :src="item.url"
-          :alt="`海报结果 ${idx + 1}`"
+          :alt="$t('poster_preview.result_alt', { idx: idx + 1 })"
           class="result-img"
           @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }"
         />
-        <div v-else class="result-placeholder">生成中...</div>
+        <div v-else class="result-placeholder">{{ $t('poster_preview.generating') }}</div>
         <div class="result-actions">
-          <button class="btn-icon" title="下载" aria-label="下载海报" @click="$emit('download', item.url)">⬇</button>
-          <button class="btn-icon" title="复制" aria-label="复制海报" @click="$emit('copy', item.url)">📋</button>
+          <button class="btn-icon" :title="$t('poster_preview.download')" :aria-label="$t('poster_preview.download')" @click="$emit('download', item.url)">⬇</button>
+          <button class="btn-icon" :title="$t('poster_preview.copy')" :aria-label="$t('poster_preview.copy')" @click="$emit('copy', item.url)">📋</button>
         </div>
       </div>
     </div>

@@ -3918,7 +3918,7 @@
       "kpi_commission": "Total Commission",
       "kpi_retention": "Monthly Retention",
       "kpi_avg_order": "Avg Order Value",
-      "unit_cny": "\u00a5",
+      "unit_cny": "¥",
       "unit_orders": "orders",
       "unit_users": "users",
       "unit_pct": "%",
@@ -5111,20 +5111,76 @@
       "them": "Traditional"
     },
     "rows": {
-      "image_processing": { "label": "Image Processing", "us": "Full AI pipeline: cutout, main image, scene, detail page", "them": "Photoshop/Meitu — manual operation" },
-      "video_generation": { "label": "Video Generation", "us": "Image → product video with auto captions/BGM/VFX", "them": "Premiere/CapCut — manual editing" },
-      "platform_adaptation": { "label": "Platform Adaptation", "us": "One-click resize for 13 platforms (Taobao, TikTok, Amazon...)", "them": "Manually adjust dimensions per platform" },
-      "batch_processing": { "label": "Batch Processing", "us": "Drag folder → AI batch → ZIP download", "them": "Process one by one — time-consuming" },
-      "ai_model": { "label": "AI Virtual Model", "us": "Garment try-on with diverse skin tones & body types", "them": "Real model photoshoot — high cost, long cycle" },
-      "motion_transfer": { "label": "Motion Transfer", "us": "Character image + motion video → precise AI transfer", "them": "Requires professional video shoot team" },
-      "digital_avatar": { "label": "Digital Avatars", "us": "Input script → pick avatar + voice → AI talking video", "them": "Requires real person recording" },
-      "smart_script": { "label": "Smart Scripts", "us": "AI auto-generates product review / livestream scripts", "them": "Manual copywriting required" },
-      "storyboard": { "label": "Storyboard Gen", "us": "Input product → AI generates professional storyboard", "them": "Needs director/photographer planning" },
-      "trend_analysis": { "label": "Trend Analysis", "us": "Analyze viral video structure → apply to your product", "them": "Manual analysis & imitation" },
-      "night_batch": { "label": "Night Batch", "us": "Auto batch processing overnight — 40% off", "them": "Not supported" },
-      "template_reuse": { "label": "Template Reuse", "us": "Save parameters as templates — one-click replay", "them": "Reconfigure every time" },
-      "pricing": { "label": "Pricing", "us": "From ¥29/month, flexible pay-as-you-go", "them": "Adobe ¥248/month + outsourcing costs" },
-      "learning_curve": { "label": "Learning Curve", "us": "Natural language input — zero learning barrier", "them": "Requires professional software training" }
+      "image_processing": {
+        "label": "Image Processing",
+        "us": "Full AI pipeline: cutout, main image, scene, detail page",
+        "them": "Photoshop/Meitu — manual operation"
+      },
+      "video_generation": {
+        "label": "Video Generation",
+        "us": "Image → product video with auto captions/BGM/VFX",
+        "them": "Premiere/CapCut — manual editing"
+      },
+      "platform_adaptation": {
+        "label": "Platform Adaptation",
+        "us": "One-click resize for 13 platforms (Taobao, TikTok, Amazon...)",
+        "them": "Manually adjust dimensions per platform"
+      },
+      "batch_processing": {
+        "label": "Batch Processing",
+        "us": "Drag folder → AI batch → ZIP download",
+        "them": "Process one by one — time-consuming"
+      },
+      "ai_model": {
+        "label": "AI Virtual Model",
+        "us": "Garment try-on with diverse skin tones & body types",
+        "them": "Real model photoshoot — high cost, long cycle"
+      },
+      "motion_transfer": {
+        "label": "Motion Transfer",
+        "us": "Character image + motion video → precise AI transfer",
+        "them": "Requires professional video shoot team"
+      },
+      "digital_avatar": {
+        "label": "Digital Avatars",
+        "us": "Input script → pick avatar + voice → AI talking video",
+        "them": "Requires real person recording"
+      },
+      "smart_script": {
+        "label": "Smart Scripts",
+        "us": "AI auto-generates product review / livestream scripts",
+        "them": "Manual copywriting required"
+      },
+      "storyboard": {
+        "label": "Storyboard Gen",
+        "us": "Input product → AI generates professional storyboard",
+        "them": "Needs director/photographer planning"
+      },
+      "trend_analysis": {
+        "label": "Trend Analysis",
+        "us": "Analyze viral video structure → apply to your product",
+        "them": "Manual analysis & imitation"
+      },
+      "night_batch": {
+        "label": "Night Batch",
+        "us": "Auto batch processing overnight — 40% off",
+        "them": "Not supported"
+      },
+      "template_reuse": {
+        "label": "Template Reuse",
+        "us": "Save parameters as templates — one-click replay",
+        "them": "Reconfigure every time"
+      },
+      "pricing": {
+        "label": "Pricing",
+        "us": "From ¥29/month, flexible pay-as-you-go",
+        "them": "Adobe ¥248/month + outsourcing costs"
+      },
+      "learning_curve": {
+        "label": "Learning Curve",
+        "us": "Natural language input — zero learning barrier",
+        "them": "Requires professional software training"
+      }
     },
     "cta": {
       "title": "Start Using Movio AI for Free",
@@ -5205,5 +5261,134 @@
     "submit": "Submit",
     "ended": "Ended",
     "countdownFormat": "{d}d {h}h {m}m"
+  },
+  "cmd_palette": {
+    "dialog_label": "Search",
+    "search": "Search",
+    "placeholder": "Search tools... Type to jump",
+    "quick_nav": "Quick Navigation",
+    "no_results": "No results for \"{query}\"",
+    "no_results_hint": "Try other keywords",
+    "nav": "Navigate",
+    "enter": "Open",
+    "close": "Close",
+    "cat_image": "Image",
+    "cat_video": "Video",
+    "cat_special": "Special",
+    "tool_remove_bg_name": "Background Removal",
+    "tool_remove_bg_desc": "AI removes image backgrounds in 5 seconds",
+    "tool_white_bg_name": "White Background",
+    "tool_white_bg_desc": "Generate e-commerce standard white background images",
+    "tool_scene_name": "Scene Generation",
+    "tool_scene_desc": "AI places your product into realistic scenes",
+    "tool_main_image_name": "Main Image",
+    "tool_main_image_desc": "Multi-platform main image generation",
+    "tool_batch_name": "Batch Processing",
+    "tool_batch_desc": "Upload and process images in batch",
+    "tool_color_swap_name": "Color Swap",
+    "tool_color_swap_desc": "Generate multi-color SKU display images",
+    "tool_color_change_name": "Color Adjust",
+    "tool_color_change_desc": "Precise color adjustment preserving texture",
+    "tool_style_transfer_name": "Style Transfer",
+    "tool_style_transfer_desc": "Transform images into artistic styles",
+    "tool_retouch_name": "Image Retouch",
+    "tool_retouch_desc": "AI auto retouching for enhanced quality",
+    "tool_outpaint_name": "AI Outpaint",
+    "tool_outpaint_desc": "Smart image expansion with AI completion",
+    "tool_image_translate_name": "Image Translate",
+    "tool_image_translate_desc": "Smart Chinese text translation in images",
+    "tool_text_effect_name": "Text Effects",
+    "tool_text_effect_desc": "AI generated artistic text effects",
+    "tool_model_generate_name": "AI Model",
+    "tool_model_generate_desc": "Generate virtual models wearing your products",
+    "tool_swap_face_name": "Face Swap",
+    "tool_swap_face_desc": "Intelligent face replacement for models",
+    "tool_person_replace_name": "Person Replace",
+    "tool_person_replace_desc": "Smart person replacement in images",
+    "tool_wrinkle_remove_name": "Wrinkle Removal",
+    "tool_wrinkle_remove_desc": "Remove clothing wrinkles for better quality",
+    "tool_3d_preview_name": "3D Preview",
+    "tool_3d_preview_desc": "Upload 3D models for 360° interactive preview",
+    "tool_video_name": "Image to Video",
+    "tool_video_desc": "Turn a single image into a product showcase video",
+    "tool_video_edit_name": "Video Editing",
+    "tool_video_edit_desc": "AI smart video editing with captions, BGM, effects",
+    "tool_digital_human_name": "Digital Human",
+    "tool_digital_human_desc": "AI digital human spokesperson videos",
+    "tool_action_transfer_name": "Motion Transfer",
+    "tool_action_transfer_desc": "Transfer reference video motion to product images",
+    "tool_shot_plan_name": "Smart Storyboard",
+    "tool_shot_plan_desc": "AI intelligent storyboard script generation",
+    "tool_storyboard_name": "Storyboard",
+    "tool_storyboard_desc": "One-click short video storyboard generation",
+    "tool_shot_panorama_name": "360° Video",
+    "tool_shot_panorama_desc": "Product panorama showcase video creation",
+    "tool_voice_gen_name": "AI Voiceover",
+    "tool_voice_gen_desc": "AI speech synthesis, multilingual and multi-voice",
+    "tool_voice_clone_name": "Voice Clone",
+    "tool_voice_clone_desc": "Clone your voice in one click for custom voiceovers",
+    "tool_script_gen_name": "Script Generator",
+    "tool_script_gen_desc": "AI generates short video scripts in 9 languages",
+    "tool_detail_h5_name": "Detail Page H5",
+    "tool_detail_h5_desc": "AI generates mobile product detail pages",
+    "tool_platform_detail_name": "Multi-Platform Detail",
+    "tool_platform_detail_desc": "One-click multi-platform detail image generation",
+    "tool_virtual_tryon_name": "Virtual Try-On",
+    "tool_virtual_tryon_desc": "AI virtual try-on with model outfit display",
+    "tool_ghost_mannequin_name": "Ghost Mannequin",
+    "tool_ghost_mannequin_desc": "Remove real models while preserving clothing shape",
+    "tool_viral_clone_name": "Trend Clone",
+    "tool_viral_clone_desc": "Analyze trending styles and generate similar assets",
+    "tool_viral_replicate_name": "Trend Replicate",
+    "tool_viral_replicate_desc": "One-click replication of trending product image style",
+    "tool_compliance_check_name": "Compliance Check",
+    "tool_compliance_check_desc": "E-commerce ad compliance detection",
+    "tool_prompt_hub_name": "Prompt Hub",
+    "tool_prompt_hub_desc": "AI recommended prompts, 150+ templates, ratings & history",
+    "tool_publish_name": "Multi-Platform Publish",
+    "tool_publish_desc": "One-click publish to multiple e-commerce/social platforms",
+    "tool_distribution_name": "Distribution Mgmt",
+    "tool_distribution_desc": "Manage multi-platform distribution records and status",
+    "tool_cut_ecosystem_name": "Crop Ecosystem",
+    "tool_cut_ecosystem_desc": "Multi-platform aspect ratio adaptation and smart crop export",
+    "tool_usage_name": "Usage Dashboard",
+    "tool_usage_desc": "View API usage, credit consumption and quota status",
+    "tool_favorites_name": "My Favorites",
+    "tool_favorites_desc": "View and manage favorited works and templates"
+  },
+  "onboarding": {
+    "dialog_label": "Getting Started",
+    "skip": "Skip",
+    "prev": "Previous",
+    "next": "Next",
+    "start": "Get Started",
+    "welcome_title": "Welcome to Movio AI",
+    "welcome_desc": "All-in-one e-commerce visual creation platform. From product images to videos, one tool handles all your creative assets.",
+    "step1_title": "Step 1: Product Images",
+    "step1_desc": "Upload product photos, AI auto removes background, applies white background, and retouches for high-quality product images.",
+    "step2_title": "Step 2: Scene Images",
+    "step2_desc": "Choose a scene template or upload a reference. AI places your product into the scene for marketing-grade visuals.",
+    "step3_title": "Step 3: Detail Pages",
+    "step3_desc": "Based on product and scene images, AI auto generates complete product detail pages with copy and layout.",
+    "step4_title": "Step 4: Short Videos",
+    "step4_desc": "Generate marketing short videos from images with batch motion transfer, digital human spokespersons, and more.",
+    "start_title": "Start Creating",
+    "start_desc": "Select a feature module from the left sidebar or click a shortcut below to begin your first creation."
+  },
+  "smart_recognition": {
+    "recognizing": "Recognizing...",
+    "start_recognize": "Start Recognition",
+    "category": "Category",
+    "features_hint": "One key feature per line"
+  },
+  "lang": {
+    "switch": "Switch Language"
+  },
+  "poster_preview": {
+    "placeholder": "Enter a description and click \"Generate Poster\" to start",
+    "result_alt": "Poster Result {idx}",
+    "generating": "Generating...",
+    "download": "Download Poster",
+    "copy": "Copy Poster"
   }
 }

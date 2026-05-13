@@ -11,26 +11,26 @@
       </slot>
 
       <div v-if="refUrl" class="preview-row">
-        <img :src="refUrl" alt="参考图" class="ref-preview" />
+	        <img :src="refUrl" alt="Reference" class="ref-preview" />
         <button class="btn btn-primary" :disabled="loading" @click="extract">
-          {{ loading ? '识别中...' : '开始识别' }}
+	          {{ loading ? $t('smart_recognition.recognizing') : $t('smart_recognition.start_recognize') }}
         </button>
       </div>
 
       <div v-if="result" class="smart-result">
         <div class="input-group">
-          <label>{{ nameLabel }}</label>
+	          <label>{{ nameLabel }}</label>
           <input v-model="result.productName" type="text" class="input" maxlength="200" />
         </div>
         <div class="input-group">
-          <label>品类</label>
+	          <label>{{ $t('smart_recognition.category') }}</label>
           <select v-model="result.category" class="input">
             <option v-for="c in CATEGORIES" :key="c" :value="c">{{ c }}</option>
           </select>
         </div>
         <div class="input-group">
           <label>{{ featuresLabel }}</label>
-          <textarea v-model="featuresText" class="input" rows="4" maxlength="2000" placeholder="每行一个核心特征" />
+	          <textarea v-model="featuresText" class="input" rows="4" maxlength="2000" :placeholder="$t('smart_recognition.features_hint')" />
         </div>
 
         <slot name="extra-options" :result="result" :features="featuresText" />
@@ -58,11 +58,11 @@ const props = withDefaults(defineProps<{
   confirmLabel?: string
   toggleLabel?: string
 }>(), {
-  hint: '上传一张商品参考图，AI 自动识别产品信息',
-  nameLabel: '产品名称及品类（可修改）',
-  featuresLabel: '核心特征清单（可修改，每行一个）',
-  confirmLabel: '确认并应用',
-  toggleLabel: '+ 智能识别',
+	  hint: 'Upload a reference image, AI will identify product info',
+	  nameLabel: 'Product name & category (editable)',
+	  featuresLabel: 'Key features (editable, one per line)',
+	  confirmLabel: 'Confirm & Apply',
+	  toggleLabel: '+ Smart Recognize',
 })
 
 const emit = defineEmits<{
@@ -73,7 +73,7 @@ const { refUrl, loading, error, result, featuresText, setRefImage, extract, rese
 const collapsed = ref(true)
 const submitReady = computed(() => !!(result.value?.productName && featuresText.value.trim()))
 
-const CATEGORIES = ['女装', '男装', '鞋靴', '箱包', '美妆', '3C数码', '家居', '食品', '运动户外', '母婴', '珠宝配饰', '汽车用品', '其他']
+	const CATEGORIES = ['Womenswear', 'Menswear', 'Shoes', 'Bags', 'Beauty', 'Electronics', 'Home', 'Food', 'Sports', 'Baby', 'Jewelry', 'Auto', 'Other' ]
 
 function onUpload(files: any[]) {
   if (files.length > 0) { setRefImage(files[0].url); collapsed.value = false }

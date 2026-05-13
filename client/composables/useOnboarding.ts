@@ -1,16 +1,26 @@
 /**
- * 新手引导 Composable — 6 步走完核心工作流
- * 使用: const guide = useOnboarding(); 在 onMounted 中调用 guide.checkAndShow()
+ * Onboarding guide composable — 6-step walkthrough using i18n keys
+ * Usage: const guide = useOnboarding(); in onMounted call guide.checkAndShow()
  */
 export function useOnboarding() {
-  const steps = [
-    { title: '欢迎来到 Movio AI', desc: '一站式电商视觉创作平台，从主图到视频，一个工具搞定全部图文素材。', target: '', position: 'center' as const },
-    { title: '第1步：生成主图', desc: '上传商品照片，AI 自动抠图、换白底、精修细节，生成高质量商品主图。', target: '', icon: '🖼️' },
-    { title: '第2步：场景图', desc: '选择场景模板或上传参考图，AI 将商品融入场景，生成营销级场景图。', target: '', icon: '🏞️' },
-    { title: '第3步：详情页', desc: '基于主图和场景图，AI 自动生成完整商品详情页文案+图文排版。', target: '', icon: '📄' },
-    { title: '第4步：短视频', desc: '用图片生成营销短视频，支持批量动作迁移、口播数字人等多种玩法。', target: '', icon: '🎬' },
-    { title: '开始创作', desc: '在左侧导航栏选择功能模块，或点击下方快捷入口开始您的第一次创作。', target: '', icon: '🚀' },
+  const { t } = useI18n()
+
+  const stepKeys = [
+    { key: 'welcome',     target: '', position: 'center' as const, icon: '✨' },
+    { key: 'step1',       target: '', icon: '🖼️' },
+    { key: 'step2',       target: '', icon: '🏞️' },
+    { key: 'step3',       target: '', icon: '📄' },
+    { key: 'step4',       target: '', icon: '🎬' },
+    { key: 'start',       target: '', icon: '🚀' },
   ]
+
+  const steps = computed(() =>
+    stepKeys.map(s => ({
+      ...s,
+      title: t(`onboarding.${s.key}_title`),
+      desc: t(`onboarding.${s.key}_desc`),
+    }))
+  )
 
   const isVisible = ref(false)
   const currentStep = ref(0)
@@ -36,7 +46,7 @@ export function useOnboarding() {
   }
 
   const next = () => {
-    if (currentStep.value < steps.length - 1) currentStep.value++
+    if (currentStep.value < steps.value.length - 1) currentStep.value++
     else { markSeen() }
   }
 

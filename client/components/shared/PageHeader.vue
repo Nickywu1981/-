@@ -7,7 +7,7 @@
   <div class="page-header">
     <div class="ph-left">
       <button v-if="backRoute" class="ph-back" @click="goBack">
-        ← {{ backLabel || '返回' }}
+        ← {{ backLabel || 'Back' }}
       </button>
       <div>
         <h1 class="ph-title">{{ title }}</h1>

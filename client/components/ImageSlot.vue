@@ -23,7 +23,7 @@ interface Props {
   emptyText?: string
   size?: 'sm' | 'md'
 }
-withDefaults(defineProps<Props>(), { emptyText: '暂无图片', size: 'md' })
+withDefaults(defineProps<Props>(), { emptyText: 'No image', size: 'md' })
 defineEmits<{ click: [] }>()
 
 const loaded = ref(false)

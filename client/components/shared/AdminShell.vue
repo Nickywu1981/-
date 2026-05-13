@@ -113,11 +113,11 @@ const props = withDefaults(defineProps<{
 }>(), {
   brandName: 'Movio 管理',
   brandSubtitle: 'Admin Console',
-  accentColor: '#4f5cf6',
+  accentColor: '#5b5fe3',
   navGroups: () => [],
   breadcrumbs: () => [],
   backRoute: '',
-  backLabel: '返回首页',
+  backLabel: 'Back to Home',
 })
 
 const emit = defineEmits<{ logout: [] }>()
