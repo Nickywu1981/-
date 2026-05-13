@@ -58,7 +58,7 @@ router.get('/csrf-token', setCsrfCookie, (_req, res) => success(res, null, 'ok')
 // 需要认证
 router.get('/profile', authMiddleware, profile);
 router.put('/profile', authMiddleware, validate(updateProfileSchema), updateProfile);
-router.put('/password', authMiddleware, validate(changePasswordSchema), changePassword);
+router.put('/password', authLimiter, authMiddleware, validate(changePasswordSchema), changePassword);
 router.get('/stats', authMiddleware, getStats);
 
 // JWT 双令牌 — refresh 使用 refreshTokenMiddleware 校验 httpOnly cookie

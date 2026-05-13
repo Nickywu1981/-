@@ -17,7 +17,7 @@
           <div class="ash-brand-name">{{ brandName }}</div>
           <div class="ash-brand-sub">{{ brandSubtitle }}</div>
         </div>
-        <button class="ash-collapse-btn" @click="collapsed = !collapsed" :title="collapsed ? t('admin_shell.expand_sidebar') : t('admin_shell.collapse_sidebar')">
+        <button class="ash-collapse-btn" @click="collapsed = !collapsed" :title="collapsed ? t('admin_shell.expand_sidebar') : t('admin_shell.collapse_sidebar')" :aria-label="collapsed ? t('admin_shell.expand_sidebar') : t('admin_shell.collapse_sidebar')">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 3L9 7L5 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
         </button>
       </div>
@@ -49,7 +49,7 @@
 
       <!-- 侧栏底部 -->
       <div class="ash-side-footer">
-        <button class="ash-theme-btn" @click="toggleTheme" :title="isDark ? t('admin_shell.switch_light') : t('admin_shell.switch_dark')">
+        <button class="ash-theme-btn" @click="toggleTheme" :title="isDark ? t('admin_shell.switch_light') : t('admin_shell.switch_dark')" :aria-label="isDark ? t('admin_shell.switch_light') : t('admin_shell.switch_dark')">
           {{ isDark ? '☀️' : '🌙' }}
         </button>
         <NuxtLink v-if="backRoute" :to="backRoute" class="ash-back-link">
@@ -83,7 +83,7 @@
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2a4 4 0 0 0-4 4v2l-1 2h10l-1-2V6a4 4 0 0 0-4-4z" stroke="currentColor" stroke-width="1.2"/><path d="M6 13a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
           </button>
           <!-- 用户 -->
-          <div class="ash-user" @click="userOpen = !userOpen" role="button" :aria-expanded="userOpen" aria-haspopup="true" tabindex="0" @keydown.enter="userOpen = !userOpen" @keydown.space.prevent="userOpen = !userOpen">
+          <div class="ash-user" @click="userOpen = !userOpen" role="button" :aria-label="t('admin_shell.user_menu')" :aria-expanded="userOpen" aria-haspopup="true" tabindex="0" @keydown.enter="userOpen = !userOpen" @keydown.space.prevent="userOpen = !userOpen">
             <span class="ash-avatar" :style="{ background: accentColor }">{{ userInitial }}</span>
             <span class="ash-username">{{ userName }}</span>
           </div>

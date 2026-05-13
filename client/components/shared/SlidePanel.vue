@@ -51,6 +51,7 @@
                 :key="i"
                 v-model="paramValues[i]"
                 class="sp-sel"
+                :aria-label="p.label || `参数 ${i + 1}`"
               >
                 <option v-for="(o, j) in p.options" :key="j" :value="o">{{ o }}</option>
               </select>

@@ -82,7 +82,7 @@ router.post('/register', authLimiter, _validate(registerSchema), ctrl.registerEn
 router.post('/login', authLimiter, _validate(loginSchema), ctrl.loginEnterprise);
 
 // 企业退出 — 吊销所有 token
-router.post('/logout', enterpriseOnly, ctrl.logoutEnterprise);
+router.post('/logout', authLimiter, enterpriseOnly, ctrl.logoutEnterprise);
 
 // 企业套餐列表（公开查看）
 router.get('/plans', ctrl.listPlans);

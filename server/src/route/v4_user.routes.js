@@ -5,7 +5,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { validateV4 as _validate } from '../utils/validate.js';
-import { heavyLimiter } from '../middleware/rateLimiter.js';
+import { heavyLimiter, authLimiter } from '../middleware/rateLimiter.js';
 import * as ctrl from '../controller/v4UserController.js';
 
 const router = Router();
@@ -27,7 +27,7 @@ const changePasswordSchema = z.object({
 router.get('/profile', ctrl.getProfile);
 router.get('/stats', ctrl.getStats);
 router.put('/profile', heavyLimiter, _validate(updateProfileSchema), ctrl.updateProfile);
-router.put('/change-password', heavyLimiter, _validate(changePasswordSchema), ctrl.changePassword);
+router.put('/change-password', authLimiter, heavyLimiter, _validate(changePasswordSchema), ctrl.changePassword);
 router.put('/membership/auto-renew', heavyLimiter, _validate(z.object({
   autoRenew: z.boolean(),
 })), ctrl.toggleAutoRenew);
