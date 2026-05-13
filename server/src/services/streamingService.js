@@ -13,39 +13,55 @@ import logger from '../utils/logger.js';
 
 /**
  * 创建 SSE 流式响应
- * 用法（Express Controller）:
- *   const stream = createSSEStream(res);
- *   stream.send({ type: 'token', data: 'Hello' });
- *   stream.done();
+ * @param {object} res - Express response
+ * @param {object} [req] - Express request（用于检测客户端断开）
  */
-export function createSSEStream(res) {
+export function createSSEStream(res, req) {
+  let clientDisconnected = false;
+
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
     'Connection': 'keep-alive',
-    'X-Accel-Buffering': 'no', // 禁用 nginx 缓冲
+    'X-Accel-Buffering': 'no',
   });
+
+  req?.on('close', () => {
+    clientDisconnected = true;
+    if (!res.writableEnded) res.end();
+  });
+
+  function safeWrite(data) {
+    if (res.writableEnded || clientDisconnected) return false;
+    const ok = res.write(data);
+    // 高水位 backpressure: 未能刷新到内核缓冲区时，暂停事件循环让 drain 触发
+    if (!ok && !clientDisconnected) {
+      logger.debug('[SSE] 缓冲区已满，等待客户端消费');
+    }
+    return ok;
+  }
 
   return {
     send(data, event = 'message') {
-      if (res.writableEnded) return;
+      if (res.writableEnded || clientDisconnected) return;
       const payload = typeof data === 'string' ? data : JSON.stringify(data);
-      res.write(`event: ${event}\ndata: ${payload}\n\n`);
+      safeWrite(`event: ${event}\ndata: ${payload}\n\n`);
     },
 
     error(message, code = 500) {
-      if (res.writableEnded) return;
-      res.write(`event: error\ndata: ${JSON.stringify({ message, code })}\n\n`);
+      if (res.writableEnded || clientDisconnected) return;
+      safeWrite(`event: error\ndata: ${JSON.stringify({ message, code })}\n\n`);
       res.end();
     },
 
     done() {
-      if (!res.writableEnded) {
-        res.write('event: done\ndata: [DONE]\n\n');
+      if (!res.writableEnded && !clientDisconnected) {
+        safeWrite('event: done\ndata: [DONE]\n\n');
         res.end();
       }
     },
 
+    get isDisconnected() { return clientDisconnected; },
     get raw() { return res; },
   };
 }
@@ -71,13 +87,14 @@ export async function processStreamingOutput(sourceStream, sseStream, opts = {})
 
   try {
     for await (const chunk of sourceStream) {
+      // 客户端已断开 → 停止从源流消费（避免浪费 AI 推理资源）
+      if (sseStream.isDisconnected) break;
       if (blocked) break;
 
       const text = typeof chunk === 'string' ? chunk : chunk?.content || chunk?.text || '';
       accumulated += text;
       chunkIndex++;
 
-      // 边输出边审核（每 N 块检查一次）
       if (moderator && chunkIndex % moderateInterval === 0) {
         try {
           const result = await moderator(accumulated);
@@ -93,12 +110,14 @@ export async function processStreamingOutput(sourceStream, sseStream, opts = {})
       onChunk?.(text, chunkIndex);
     }
   } catch (err) {
-    logger.error(`[Streaming] 流式处理异常: ${err.message}`);
-    sseStream.error('流式输出中断');
+    if (!sseStream.isDisconnected) {
+      logger.error(`[Streaming] 流式处理异常: ${err.message}`);
+      sseStream.error('流式输出中断');
+    }
     return { accumulated, blocked, error: err.message };
   }
 
-  if (!blocked) {
+  if (!blocked && !sseStream.isDisconnected) {
     sseStream.done();
   }
 

@@ -117,7 +117,7 @@ export const aiGatewayController = {
 	    const { modelId, input } = req.body;
 	    const traceCtx = getTraceContext();
 	    res.setHeader('X-Trace-Id', traceCtx?.traceId || 'unknown');
-	    const stream = createSSEStream(res);
+	    const stream = createSSEStream(res, req);
 	    const start = Date.now();
 	    let status = 'success';
 	    let totalChars = 0;
