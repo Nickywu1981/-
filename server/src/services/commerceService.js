@@ -89,12 +89,17 @@ export async function getBillingHistory(userId, { page = 1, pageSize = 20 }) {
 
 export async function getDashboardStats() {
   if (mockEnabled) {
+    const dates = Array.from({length: 7}, (_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() - 6 + i);
+      return d.toISOString().slice(0, 10);
+    });
     return {
       userCount: 5, taskCount: 22, todayTaskCount: 3, paidUserCount: 4, totalRevenue: 326,
       trends: {
-        tasks: [{date:'2026-04-30',value:3},{date:'2026-05-01',value:5},{date:'2026-05-02',value:2},{date:'2026-05-03',value:4},{date:'2026-05-04',value:3},{date:'2026-05-05',value:2},{date:'2026-05-06',value:3}],
-        users: [{date:'2026-04-30',value:0},{date:'2026-05-01',value:1},{date:'2026-05-02',value:0},{date:'2026-05-03',value:0},{date:'2026-05-04',value:1},{date:'2026-05-05',value:0},{date:'2026-05-06',value:0}],
-        revenue: [{date:'2026-04-30',value:69},{date:'2026-05-01',value:0},{date:'2026-05-02',value:29},{date:'2026-05-03',value:0},{date:'2026-05-04',value:199},{date:'2026-05-05',value:29},{date:'2026-05-06',value:0}],
+        tasks: dates.map((d, i) => ({ date: d, value: [3,5,2,4,3,2,3][i] })),
+        users: dates.map((d, i) => ({ date: d, value: [0,1,0,0,1,0,0][i] })),
+        revenue: dates.map((d, i) => ({ date: d, value: [69,0,29,0,199,29,0][i] })),
       },
     };
   }

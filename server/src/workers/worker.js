@@ -254,18 +254,13 @@ process.on('SIGINT', () => {
 async function waitForJobs() {
   if (activeJobIds.size <= 0) return;
   logger.info(`[Worker] Waiting for ${activeJobIds.size} in-flight job(s)...`);
-  const deadline = Date.now() + 30000; // 30s 硬超时
-  await new Promise(resolve => {
-    const check = setInterval(() => {
-      if (activeJobIds.size <= 0 || Date.now() >= deadline) {
-        clearInterval(check);
-        if (activeJobIds.size > 0) {
-          logger.warn(`[Worker] Timeout waiting for ${activeJobIds.size} job(s), force exit`);
-        }
-        resolve();
-      }
-    }, 500);
-  });
+  const deadline = Date.now() + 30000;
+  while (activeJobIds.size > 0 && Date.now() < deadline) {
+    await new Promise(r => setTimeout(r, 200)); // yield to event loop, let jobs finish
+  }
+  if (activeJobIds.size > 0) {
+    logger.warn(`[Worker] Timeout waiting for ${activeJobIds.size} job(s), force exit`);
+  }
 }
 
 // 定期扫描卡住任务（Worker 崩溃后残留 processing 状态）

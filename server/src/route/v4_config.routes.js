@@ -6,6 +6,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { validateV4 as _validate } from '../utils/validate.js';
 import { authMiddleware } from '../middleware/auth.js';
+import { optionalAuth } from '../middleware/auth.js';
 import { sseMiddleware } from '../services/config-version.service.js';
 import { requireRole } from '../middleware/rbac.js';
 import { rateLimiter } from '../middleware/rateLimiter.js';
@@ -33,7 +34,7 @@ router.get('/:group', authMiddleware, rateLimiter, ctrl.getGroupConfig);
 router.get('/dict/:dictKey', rateLimiter, ctrl.getDict);
 
 // GET /api/config/version/stream — SSE 配置版本推送
-router.get('/version/stream', rateLimiter, sseMiddleware);
+router.get('/version/stream', optionalAuth, rateLimiter, sseMiddleware);
 
 // ===============================
 // Admin Config Routes (需 admin 权限)

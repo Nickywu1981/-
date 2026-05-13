@@ -16,7 +16,7 @@
  */
 import { Router } from 'express';
 import { z } from 'zod';
-import { adminAuth } from '../middleware/auth.js';
+import { adminAuth, optionalAuth } from '../middleware/auth.js';
 import * as i18nService from '../services/i18n.service.js';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
@@ -80,7 +80,7 @@ publicRouter.get('/:locale/:namespace', async (req, res) => {
   }
 });
 
-publicRouter.get('/version/stream', (req, res) => {
+publicRouter.get('/version/stream', optionalAuth, (req, res) => {
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
