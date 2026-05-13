@@ -62,7 +62,7 @@ export async function refundOrder(orderNo) {
       throw new BusinessError(404, '订单不存在或未支付');
     }
 
-    await rechargeDao.markRefunded(orderNo);
+    await rechargeDao.markRefunded(orderNo, conn);
     await creditDao.updateCreditBalance(order.user_id, -order.coin_amount, conn);
     await creditDao.insertConsumptionLog({
       userId: order.user_id, type: 3, action: 'refund',

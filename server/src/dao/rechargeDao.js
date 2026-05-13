@@ -40,8 +40,9 @@ export default {
     return r.affectedRows;
   },
 
-  async markRefunded(orderNo) {
-    const [r] = await pool.query('UPDATE recharge_order SET pay_status = 3 WHERE order_no = ? AND pay_status = 1', [orderNo]);
+  async markRefunded(orderNo, conn) {
+    const db = conn || pool;
+    const [r] = await db.query('UPDATE recharge_order SET pay_status = 3 WHERE order_no = ? AND pay_status = 1', [orderNo]);
     return r.affectedRows;
   },
 

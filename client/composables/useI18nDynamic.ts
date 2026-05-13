@@ -57,6 +57,7 @@ const loading = ref(false)
 const ready = ref(false)
 const error = ref<string | null>(null)
 let sseSource: EventSource | null = null
+let sseRefCount = 0
 
 export function useI18nDynamic() {
   const { t, locale } = useI18n()
@@ -110,19 +111,20 @@ export function useI18nDynamic() {
     refresh()
   }
 
-  // SSE 订阅
-  if (import.meta.client && !sseSource) {
-    try {
-      sseSource = new EventSource('/api/i18n/version/stream')
-      sseSource.onmessage = (event) => {
-        try { const { version } = JSON.parse(event.data); if (version) refresh() } catch { /* ignore */ }
-      }
-    } catch { /* SSE not available */ }
-  }
-
+  // SSE 订阅 — 引用计数，仅首个实例建连，末尾实例断连
   if (import.meta.client) {
+    sseRefCount++
+    if (!sseSource) {
+      try {
+        sseSource = new EventSource('/api/i18n/version/stream')
+        sseSource.onmessage = (event) => {
+          try { const { version } = JSON.parse(event.data); if (version) refresh() } catch { /* ignore */ }
+        }
+      } catch { /* SSE not available */ }
+    }
     onUnmounted(() => {
-      if (sseSource) { sseSource.close(); sseSource = null; }
+      sseRefCount--
+      if (sseRefCount <= 0 && sseSource) { sseSource.close(); sseSource = null; sseRefCount = 0 }
     })
   }
 

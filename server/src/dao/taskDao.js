@@ -85,7 +85,8 @@ export async function updateTaskStatus(taskId, userId, { status, progress, progr
   }
   if (fields.length === 0) return 0;
   params.push(taskId, userId);
-  const [r] = await pool().execute(`UPDATE task SET ${fields.join(', ')} WHERE id = ? AND user_id = ?`, params);
+  const statusGuard = status !== undefined ? ' AND status NOT IN (2, 4)' : '';
+  const [r] = await pool().execute(`UPDATE task SET ${fields.join(', ')} WHERE id = ? AND user_id = ?${statusGuard}`, params);
   return r.affectedRows;
 }
 

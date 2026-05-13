@@ -43,6 +43,7 @@ export async function purchasePlan(userId, planType) {
         endTime = new Date(currentEnd.getTime() + (endTime.getTime() - now.getTime()));
       }
       await commerceDao.renewMembership(userId, planType, endTime);
+      await creditDao.updateCreditBalance(userId, plan.credits, conn);
     } else {
       await commerceDao.updateMembership(userId, planType, plan.credits, endTime);
     }

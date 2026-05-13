@@ -39,8 +39,6 @@ export function useI18nAdmin() {
     } finally { loading.value = false }
   }
 
-  // 新键弹窗
-  const showAddModal = ref(false)
   function cancelEdit() {
     editingKey.value = null
     pendingChanges.value.delete(editingKey.value!)

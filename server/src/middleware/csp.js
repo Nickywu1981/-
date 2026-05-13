@@ -6,8 +6,8 @@
  * - Referrer-Policy: strict-origin-when-cross-origin
  */
 export default function cspMiddleware(req, res, next) {
-  // Strict-Transport-Security (仅 HTTPS)
-  if (req.secure || req.headers['x-forwarded-proto'] === 'https') {
+  // Strict-Transport-Security (生产环境无条件设置，开发/测试仅 HTTPS)
+  if (process.env.NODE_ENV === 'production' || req.secure || req.headers['x-forwarded-proto'] === 'https') {
     res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   }
   // Content-Security-Policy
@@ -36,6 +36,9 @@ export default function cspMiddleware(req, res, next) {
 
   // 跨域 Referrer 策略
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+
+  // 权限策略 — 禁用敏感设备 API
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=()');
 
   next();
 }
