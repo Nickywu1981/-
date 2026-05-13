@@ -22,6 +22,7 @@ export default {
   },
 
   async deleteFaq(id) {
-    return helpDao.deleteFaq(id);
+    const affected = await helpDao.deleteFaq(id);
+    if (affected === 0) throw new BusinessError(4101, 'Resource not found');
   },
 };

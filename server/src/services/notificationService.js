@@ -1,4 +1,5 @@
 import * as notificationDao from '../dao/notificationDao.js';
+import { BusinessError } from '../utils/businessError.js';
 
 /**
  * 发送通知 — 供其他 Service 内部调用
@@ -42,5 +43,6 @@ export async function sendToUser({ userId, type = 'system', title, content }) {
 }
 
 export async function deleteById(id, userId) {
-  return notificationDao.deleteNotification(id, userId);
+  const deleted = await notificationDao.deleteNotification(id, userId);
+  if (!deleted) throw new BusinessError(4101, 'Notification not found');
 }

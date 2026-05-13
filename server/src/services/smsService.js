@@ -223,7 +223,8 @@ export async function createTemplate(fields) {
 }
 
 export async function deleteTemplate(id) {
-  return smsTemplateDao.deleteTemplate(id);
+  const affected = await smsTemplateDao.deleteTemplate(id);
+  if (affected === 0) throw new BusinessError(4101, 'Resource not found');
 }
 
 // ==================== 日志查询 ====================

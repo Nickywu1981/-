@@ -204,11 +204,13 @@ export async function createPlan(data) {
 }
 
 export async function deletePlan(planId) {
-  await commerceDao.deletePlan(planId);
+  const affected = await commerceDao.deletePlan(planId);
+  if (affected === 0) throw new BusinessError(4101, 'Resource not found');
 }
 
 export async function deleteOrder(orderId, tenantId) {
-  await commerceDao.deletePaymentOrder(orderId, tenantId);
+  const affected = await commerceDao.deletePaymentOrder(orderId, tenantId);
+  if (affected === 0) throw new BusinessError(4101, 'Resource not found');
 }
 
 // ==================== 内容审核 ====================
