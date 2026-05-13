@@ -1,28 +1,28 @@
 <template>
   <div class="page">
-    <h2>我的尺寸模板</h2>
-    <button class="btn" @click="showForm = true">+ 新建模板</button>
+    <h2>{{ $t('my.templates.page_title') }}</h2>
+    <button class="btn" @click="showForm = true">{{ $t('my.templates.new_template') }}</button>
 
     <LoadingSkeleton v-if="loading" type="card" :rows="3" />
 
     <template v-else>
     <div v-if="showForm" class="form-card">
-      <label for="tmpl-name">模板名称</label>
-      <input id="tmpl-name" v-model="form.name" placeholder="模板名称（如：拼多多活动图）" />
-      <label for="tmpl-width">宽度 (px)</label>
+      <label for="tmpl-name">{{ $t('my.templates.name_label') }}</label>
+      <input id="tmpl-name" v-model="form.name" :placeholder="$t('my.templates.name_placeholder')" />
+      <label for="tmpl-width">{{ $t('my.templates.width_label') }}</label>
       <div class="size-row">
-        <input id="tmpl-width" v-model.number="form.width" type="number" placeholder="宽度 px" /> ×
-        <label for="tmpl-height" class="sr-only">高度 (px)</label>
-        <input id="tmpl-height" v-model.number="form.height" type="number" placeholder="高度 px" />
+        <input id="tmpl-width" v-model.number="form.width" type="number" :placeholder="$t('my.templates.width_placeholder')" /> ×
+        <label for="tmpl-height" class="sr-only">{{ $t('my.templates.height_label') }}</label>
+        <input id="tmpl-height" v-model.number="form.height" type="number" :placeholder="$t('my.templates.height_placeholder')" />
       </div>
-      <label for="tmpl-platform">关联平台</label>
+      <label for="tmpl-platform">{{ $t('my.templates.platform_label') }}</label>
       <select id="tmpl-platform" v-model="form.platform">
-        <option value="">不关联平台</option>
+        <option value="">{{ $t('my.templates.platform_none') }}</option>
         <option v-for="p in platforms" :key="p.code" :value="p.code">{{ p.name }}</option>
       </select>
       <div class="form-actions">
-        <button class="btn-outline" @click="showForm = false">取消</button>
-        <button class="btn" @click="saveTemplate">保存</button>
+        <button class="btn-outline" @click="showForm = false">{{ $t('my.templates.cancel') }}</button>
+        <button class="btn" @click="saveTemplate">{{ $t('my.templates.save') }}</button>
       </div>
     </div>
 
@@ -30,18 +30,19 @@
       <div v-for="t in templates" :key="t.id" class="card">
         <div class="card-size">{{ t.width }} × {{ t.height }}</div>
         <div class="card-name">{{ t.name }}</div>
-        <div class="card-platform">{{ t.platform || '通用' }}</div>
-        <button class="btn-del" @click="deleteTemplate(t.id)">删除</button>
+        <div class="card-platform">{{ t.platform || $t('my.templates.platform_generic') }}</div>
+        <button class="btn-del" @click="deleteTemplate(t.id)">{{ $t('my.templates.delete') }}</button>
       </div>
     </div>
 
-    <div v-if="!templates.length && !showForm" class="empty">还没有自定义模板，新建一个吧</div>
+    <div v-if="!templates.length && !showForm" class="empty">{{ $t('my.templates.empty') }}</div>
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
 
+const { t } = useI18n()
 
 const showForm = ref(false);
 const loading = ref(true);
@@ -51,8 +52,11 @@ const toast = useToast()
 const { confirm } = useConfirm()
 
 const platforms = [
-  { code: 'taobao', name: '淘宝' }, { code: 'pdd', name: '拼多多' }, { code: 'douyin', name: '抖音' },
-  { code: 'amazon', name: '亚马逊' }, { code: 'tiktok', name: 'TikTok' },
+  { code: 'taobao', name: t('my.templates.platform_taobao') },
+  { code: 'pdd', name: t('my.templates.platform_pdd') },
+  { code: 'douyin', name: t('my.templates.platform_douyin') },
+  { code: 'amazon', name: t('my.templates.platform_amazon') },
+  { code: 'tiktok', name: 'TikTok' },
 ];
 
 async function loadTemplates() {
@@ -60,28 +64,28 @@ async function loadTemplates() {
   try {
     const res = await $fetch('/api/templates/my', { credentials: 'include' });
     templates.value = (res as any).data?.list || [];
-  } catch { toast.error('加载模板失败') }
+  } catch { toast.error(t('my.templates.load_failed')) }
   finally { loading.value = false }
 }
 
 async function saveTemplate() {
-  if (!form.name.trim()) { toast.warn('请输入模板名称'); return }
+  if (!form.name.trim()) { toast.warn(t('my.templates.name_required')); return }
   try {
     await $fetch('/api/templates/my', { method: 'POST', credentials: 'include', body: { ...form } });
-    toast.success('模板创建成功')
+    toast.success(t('my.templates.create_success'))
     showForm.value = false;
     Object.assign(form, { name: '', width: 800, height: 800, platform: '' });
     loadTemplates();
-  } catch { toast.error('保存模板失败') }
+  } catch { toast.error(t('my.templates.save_failed')) }
 }
 
 async function deleteTemplate(id: number) {
-  if (!await confirm({ message: '确定删除该模板？此操作不可恢复', variant: 'danger' })) return;
+  if (!await confirm({ message: t('my.templates.delete_confirm'), variant: 'danger' })) return;
   try {
     await $fetch(`/api/templates/my/${id}`, { method: 'DELETE', credentials: 'include' });
-    toast.success('模板已删除')
+    toast.success(t('my.templates.delete_success'))
     loadTemplates();
-  } catch { toast.error('删除模板失败') }
+  } catch { toast.error(t('my.templates.delete_failed')) }
 }
 
 onMounted(() => loadTemplates());
