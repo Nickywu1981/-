@@ -99,7 +99,7 @@ export async function adaptImage(inputPath, platformCode, outputDir) {
     throw new BusinessError(500, '图片处理失败，请稍后重试');
   }
 
-  const stats = fs.statSync(outputPath);
+  const stats = await fs.promises.stat(outputPath);
 
   return {
     outputPath,

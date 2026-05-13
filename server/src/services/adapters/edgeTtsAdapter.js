@@ -7,6 +7,7 @@ import { registerModel } from '../aiEngine.js';
 import logger from '../../utils/logger.js';
 import { BusinessError } from '../../utils/businessError.js';
 import fs from 'node:fs';
+import fsp from 'node:fs/promises';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import WebSocket from 'ws';
@@ -25,8 +26,11 @@ const EDGE_TTS_VOICES = {
   'cute-female': 'zh-CN-XiaoshuangNeural',
 };
 
-function ensureAudioDir() {
-  if (!fs.existsSync(AUDIO_DIR)) fs.mkdirSync(AUDIO_DIR, { recursive: true });
+let _audioDirReady = false;
+async function ensureAudioDir() {
+  if (_audioDirReady) return;
+  await fsp.mkdir(AUDIO_DIR, { recursive: true });
+  _audioDirReady = true;
 }
 
 function dateToTimestamp() {
@@ -119,7 +123,7 @@ function escapeXml(s) {
 }
 
 async function realTTSInfer(text, voiceType, speed) {
-  ensureAudioDir();
+  await ensureAudioDir();
   const voiceName = EDGE_TTS_VOICES[voiceType] || EDGE_TTS_VOICES['sweet-female'];
   const startTime = Date.now();
   logger.info(`[EdgeTTS] 开始合成: voice=${voiceType}(${voiceName}), chars=${text.length}, speed=${speed}`);
@@ -182,7 +186,7 @@ async function realCloneInfer(text, audioSampleUrl) {
     };
   }
 
-  ensureAudioDir();
+  await ensureAudioDir();
   const startTime = Date.now();
   logger.info(`[VoiceClone] 开始克隆: sample=${audioSampleUrl?.slice(-30)}, chars=${text?.length || 0}`);
 

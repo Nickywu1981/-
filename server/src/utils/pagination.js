@@ -37,7 +37,10 @@ export function parsePagination(query = {}, opts = {}) {
     rawPageSize > 0 && rawPageSize <= maxPageSize ? rawPageSize : defaultPageSize;
 
   let sort = query.sort?.trim() || defaultSort;
-  if (allowedSortFields && !allowedSortFields.includes(sort)) {
+  // 无白名单时强制使用默认排序，防止 SQL 注入
+  if (!allowedSortFields) {
+    sort = defaultSort;
+  } else if (!allowedSortFields.includes(sort)) {
     sort = defaultSort;
   }
 
@@ -80,6 +83,7 @@ export async function paginatedQuery({ query, opts }, countFn, listFn) {
  */
 export function paginationSQL(pager, allowedSortFields = null) {
   let sort = pager.sort;
+  // 必须有白名单才允许非默认排序字段，防止 SQL 注入
   if (!allowedSortFields || !allowedSortFields.includes(sort)) {
     sort = 'id';
   }
