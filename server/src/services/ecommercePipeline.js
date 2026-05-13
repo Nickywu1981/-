@@ -14,10 +14,10 @@ import { BusinessError } from '../utils/businessError.js';
 import { classifyIntent } from './intentClassifier.js';
 import { checkCompliance, isBlocked } from './adComplianceEngine.js';
 import { getTemplate, fillTemplate } from './prompts/ecommerceTemplates.js';
+import { resolveIpToCountry, geoGuard } from './geoGuardService.js';
+import { buildMemoryInjection, rememberConversation } from './ltmEnhancer.js';
 import {
-  gatewayInfer,
   gatewayDispatch,
-  gatewayRoute,
 } from '../gateway/aiGatewayHub.js';
 
 // ==================== 管道主入口 ====================
@@ -35,6 +35,7 @@ import {
  * @param {string} [req.industry]     行业 (clothing|beauty|3c_digital|food|home)
  * @param {string} [req.language]     语言
  * @param {string} [req.tone]         风格
+ * @param {string} [req.ip]            客户端 IP（用于 GEO 地域守卫）
  * @param {object} [req.extra]        额外模板变量
  * @param {object} [req.ctx]          上下文 { userId, tenantId }
  * @returns {object} { intent, compliance, wrappedPrompt, result, meta }
@@ -46,6 +47,22 @@ export async function processMerchantRequest(req = {}) {
 
   if (!userInput || !userInput.trim()) {
     throw new BusinessError(400, '请输入需求描述');
+  }
+
+  // ──────── Step 0: GEO 地域守卫 (P2) ────────
+  let geo = null;
+  if (req.ip) {
+    try {
+      const guardResult = await geoGuard(req.ip, null, platform);
+      if (guardResult.blocked) {
+        throw new BusinessError(451, guardResult.blockReason);
+      }
+      geo = guardResult.geo;
+      pipelineLog.steps.push({ step: 'geo', country: geo.countryCode, ms: Date.now() - pipelineStart });
+    } catch (err) {
+      if (err instanceof BusinessError) throw err;
+      logger.warn('[Pipeline] GEO guard skipped', err.message);
+    }
   }
 
   // ──────── Step 1: 意图识别 ────────
@@ -100,6 +117,24 @@ export async function processMerchantRequest(req = {}) {
   const wrapped = fillTemplate(templatePack.template, templateVars);
   pipelineLog.steps.push({ step: 'wrap', promptLength: wrapped.systemPrompt.length, ms: Date.now() - pipelineStart });
 
+  // ──────── Step 4.5: 长记忆智能注入 (P2) ────────
+  let memoryInjected = '';
+  if (ctx?.userId) {
+    try {
+      memoryInjected = await buildMemoryInjection({
+        userId: ctx.userId,
+        maxTokens: 500,
+        contextHint: `${intent.label} | ${productName || ''} | ${platform}`,
+      });
+      if (memoryInjected) {
+        wrapped.systemPrompt = memoryInjected + '\n\n' + wrapped.systemPrompt;
+        pipelineLog.steps.push({ step: 'memory', injected: true, ms: Date.now() - pipelineStart });
+      }
+    } catch (err) {
+      logger.warn('[Pipeline] Memory injection skipped', err.message);
+    }
+  }
+
   // ──────── Step 5: 网关预检 + 模型调度 ────────
   logger.info('[Pipeline] Step 5: Gateway dispatch', {
     category: templatePack.category,
@@ -135,6 +170,17 @@ export async function processMerchantRequest(req = {}) {
   // ──────── Step 6: 输出后处理 ────────
   // (已由 gatewayHub post-invoke 完成: 输出审核 + postProcessOutput + buildErrorResponse)
   pipelineLog.steps.push({ step: 'postprocess', ms: Date.now() - pipelineStart, totalMs: Date.now() - pipelineStart });
+
+  // ──────── Step 7: 记忆本轮对话 (P2) ────────
+  if (ctx?.userId) {
+    rememberConversation({
+      userId: ctx.userId,
+      productName,
+      platform,
+      style: req.tone,
+      keyDecisions: [`通过${intent.label}管道生成了内容`],
+    }).catch(err => logger.warn('[Pipeline] Remember failed', err.message));
+  }
 
   logger.info('[Pipeline] Complete', {
     intentId: intent.intentId,

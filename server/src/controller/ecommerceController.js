@@ -25,6 +25,7 @@ export async function generate(req, res) {
     language,
     tone,
     extra,
+    ip: req.ip || req.headers['x-forwarded-for'] || req.connection?.remoteAddress,
     ctx: { userId, tenantId: req.tenantId },
   });
 
