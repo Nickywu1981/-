@@ -5,7 +5,7 @@ export function useTheme() {
     theme.value = t;
     if (import.meta.client) {
       document.documentElement.setAttribute('data-theme', t);
-      localStorage.setItem('app-theme', t);
+      try { localStorage.setItem('app-theme', t); } catch { /* storage unavailable */ }
     }
   }
 
@@ -15,7 +15,8 @@ export function useTheme() {
 
   // 初始化：读取 localStorage 或系统偏好
   if (import.meta.client) {
-    const saved = localStorage.getItem('app-theme') as 'light' | 'dark' | null;
+    let saved: string | null = null;
+    try { saved = localStorage.getItem('app-theme'); } catch { /* storage unavailable */ }
     if (saved) {
       apply(saved);
     } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {

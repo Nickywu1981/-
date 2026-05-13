@@ -18,11 +18,11 @@ export function useOnboarding() {
 
   const hasSeenGuide = () => {
     if (import.meta.server) return true
-    return localStorage.getItem('movio_onboarding_done') === '1'
+    try { return localStorage.getItem('movio_onboarding_done') === '1' } catch { return false }
   }
 
   const markSeen = () => {
-    if (!import.meta.server) localStorage.setItem('movio_onboarding_done', '1')
+    if (!import.meta.server) { try { localStorage.setItem('movio_onboarding_done', '1') } catch { /* storage full or private mode */ } }
     dismissed.value = true
     isVisible.value = false
   }

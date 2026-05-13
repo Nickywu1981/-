@@ -3,6 +3,13 @@ import { defineStore } from 'pinia'
 type ThemeMode = 'light' | 'dark' | 'system'
 type LayoutDensity = 'compact' | 'default' | 'comfortable'
 
+function safeGetItem(key: string): string | null {
+  try { return localStorage.getItem(key); } catch { return null; }
+}
+function safeSetItem(key: string, value: string) {
+  try { localStorage.setItem(key, value); } catch { /* storage unavailable */ }
+}
+
 interface SettingsState {
   theme: ThemeMode
   locale: string
@@ -12,8 +19,8 @@ interface SettingsState {
 
 export const useSettingsStore = defineStore('settings', {
   state: (): SettingsState => ({
-    theme: (process.client ? localStorage.getItem('app-theme') : null) as ThemeMode || 'system',
-    locale: (process.client ? localStorage.getItem('app-locale') : null) || 'zh-CN',
+    theme: (process.client ? safeGetItem('app-theme') : null) as ThemeMode || 'system',
+    locale: (process.client ? safeGetItem('app-locale') : null) || 'zh-CN',
     sidebarCollapsed: false,
     layoutDensity: 'default',
   }),
@@ -39,7 +46,7 @@ export const useSettingsStore = defineStore('settings', {
     setTheme(mode: ThemeMode) {
       this.theme = mode
       if (process.client) {
-        localStorage.setItem('app-theme', mode)
+        safeSetItem('app-theme', mode)
         document.documentElement.classList.toggle('dark', this.isDark)
       }
     },
@@ -50,7 +57,7 @@ export const useSettingsStore = defineStore('settings', {
 
     setLocale(locale: string) {
       this.locale = locale
-      if (process.client) localStorage.setItem('app-locale', locale)
+      if (process.client) safeSetItem('app-locale', locale)
     },
 
     setDensity(d: LayoutDensity) {
