@@ -9,7 +9,10 @@ import * as creditService from './creditService.js';
 import wsManager from './wsManager.js';
 import { BusinessError } from '../utils/businessError.js';
 import { BATCH_TASK_STATUS } from '../constants/domainStatus.js';
+import { bullConfig } from '../config/index.js';
 import logger from '../utils/logger.js';
+
+const BATCH_CONCURRENCY = bullConfig.batchConcurrency || 5;
 
 const MODEL_MAP = { cutout: 'stable-diffusion-img2img', main_image: 'stable-diffusion-img2img', scene: 'stable-diffusion-xl', enhance: 'stable-diffusion-img2img', white_bg: 'stable-diffusion-img2img', img2video: 'stable-diffusion-xl' };
 
@@ -62,13 +65,35 @@ async function processBatch(taskId, userId) {
     await updateTaskStatus(taskId, userId, { status: 1, progress: 0, progressMsg: `0/${total} 处理中...`, workerId: process.pid.toString() });
 
     const model = MODEL_MAP[operation] || 'stable-diffusion-img2img';
-    const results = [];
-    for (let i = 0; i < total; i++) {
-      const imgResult = await infer(model, { imageUrl: imageUrls[i], task: operation, platform: task.input_params?.platform, style: task.input_params?.style });
-      results.push({ original: imageUrls[i], result: imgResult.output?.imageUrl || `/api/images/${taskId}_${i}.webp`, format: 'webp' });
-      const progress = Math.round(((i + 1) / total) * 100);
-      await updateTaskStatus(taskId, userId, { progress, progressMsg: `${i + 1}/${total} 完成` });
+    const results = new Array(total);
+    let completed = 0;
+
+    // 受控并发执行（避免同时启动全部任务导致 GPU/RAM 打满）
+    async function runOne(i) {
+      try {
+        const imgResult = await infer(model, {
+          imageUrl: imageUrls[i],
+          task: operation,
+          platform: task.input_params?.platform,
+          style: task.input_params?.style,
+        });
+        results[i] = { original: imageUrls[i], result: imgResult.output?.imageUrl || `/api/images/${taskId}_${i}.webp`, format: 'webp' };
+      } catch (err) {
+        results[i] = { original: imageUrls[i], error: safeMsg(err), format: 'error' };
+        logger.warn(`[Batch] item ${i} failed: ${safeMsg(err)}`);
+      }
+      completed++;
+      const progress = Math.round((completed / total) * 100);
+      await updateTaskStatus(taskId, userId, { progress, progressMsg: `${completed}/${total} 完成` });
       wsManager.pushProgress(taskId, progress, 'processing');
+    }
+
+    for (let i = 0; i < total; i += BATCH_CONCURRENCY) {
+      const chunk = [];
+      for (let j = i; j < Math.min(i + BATCH_CONCURRENCY, total); j++) {
+        chunk.push(runOne(j));
+      }
+      await Promise.all(chunk);
     }
 
     await completeTask(taskId, userId, { progressMsg: '全部完成', outputResult: { results, total, batchId: taskId, zipUrl: `/api/batch/${taskId}/download`, estimatedZipSize: `${Math.round(total * 0.5)}MB` } });
