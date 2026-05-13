@@ -121,6 +121,22 @@ const STEP_EXECUTORS = {
     return { voiceUrl: result?.output?.audioUrl || result?.url };
   },
 
+  // alias: workflowDefinitions.js 'voice_audio' flow uses 'voice_synthesis' key
+  voice_synthesis: async (ctx) => {
+    const model = ctx._stepModel || {};
+    const text = ctx.scriptContent || ctx.userInput || '';
+    const result = await gatewayDispatch({
+      mode: 'single',
+      taskType: 'tts',
+      params: {
+        model: model.model_key || 'edge-tts',
+        messages: [{ role: 'user', content: text.slice(0, 500) }],
+        voice: ctx.voice || 'zh-CN-XiaoxiaoNeural',
+      },
+    }, { taskType: 'tts', source: 'workflow' });
+    return { voiceUrl: result?.output?.audioUrl || result?.url };
+  },
+
   // ── 后处理 ──
   text_prepare: async (ctx) => ({
     preparedText: (ctx.userInput || '').replace(/\n{3,}/g, '\n\n').trim(),

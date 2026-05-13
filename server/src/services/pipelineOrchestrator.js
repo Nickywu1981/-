@@ -20,6 +20,7 @@ import { generateDetailPage } from './detailPageAgent.js';
 import { generateScriptAndStoryboard, analyzeViralAndClone } from './scriptStoryboardAgent.js';
 import { composeVideo, generateContent } from './contentOrchestrator.js';
 import logger from '../utils/logger.js';
+import { BusinessError } from '../utils/businessError.js';
 
 // ==================== 链步骤定义 ====================
 
@@ -450,7 +451,7 @@ async function _runCustomChain(stepIds, params, steps, outputs, ctx) {
     video_compose: async () => {
       const storyboardResult = outputs.script_storyboard || outputs.viral_analyze;
       if (!storyboardResult?.storyboard || storyboardResult.storyboard.length === 0) {
-        throw new Error('视频合成需要分镜表，请先生成脚本分镜');
+        throw new BusinessError(422, '视频合成需要分镜表，请先生成脚本分镜');
       }
       return await composeVideo({
         storyboard: storyboardResult.storyboard,

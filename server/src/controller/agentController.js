@@ -4,11 +4,14 @@
  */
 import { runEcommercePipeline, rerunSingleAgent } from '../adk/orchestration/ecommerceOrchestrator.js';
 import { INTENT_TYPES } from '../services/intentClassifier.js';
+import { wrapController } from '../utils/wrapController.js';
+import { success, error, Errors } from '../utils/response.js';
+import { BusinessError } from '../utils/businessError.js';
 import logger from '../utils/logger.js';
 
 // ==================== 全链路生成 ====================
 
-export async function generate(req, res) {
+export const generate = wrapController(async (req) => {
   const { userInput, productName, imageUrl, referenceVideoUrl, platform, industry, videoDuration, needsVoice, extra } = req.body;
   const userId = req.user?.id;
 
@@ -32,12 +35,12 @@ export async function generate(req, res) {
     intentId: result.intent?.id,
   });
 
-  res.json({ success: true, data: result });
-}
+  return result;
+});
 
 // ==================== 人工微调 ====================
 
-export async function tweakAgent(req, res) {
+export const tweakAgent = wrapController(async (req) => {
   const { agentName } = req.params;
   const { state, userId } = req.body;
 
@@ -51,38 +54,34 @@ export async function tweakAgent(req, res) {
     },
   });
 
-  res.json({ success: true, data: { agentName, result } });
-}
+  return { agentName, result };
+});
 
 // ==================== 参考上传 ====================
 
-export async function uploadReference(req, res) {
-  // 由 multer 中间件处理文件上传，此处处理后续逻辑
+export const uploadReference = wrapController(async (req) => {
   const file = req.file;
-  const { type } = req.body; // image | video
+  const { type } = req.body;
 
   if (!file) {
-    return res.status(400).json({ success: false, message: '请上传参考文件' });
+    throw new BusinessError(400, '请上传参考文件');
   }
 
   const url = `/uploads/${file.filename}`;
 
   logger.info('[EcommerceController] Reference uploaded', { type, url });
 
-  res.json({
-    success: true,
-    data: {
-      url,
-      type: type || 'image',
-      filename: file.originalname,
-      size: file.size,
-    },
-  });
-}
+  return {
+    url,
+    type: type || 'image',
+    filename: file.originalname,
+    size: file.size,
+  };
+});
 
 // ==================== 查询接口 ====================
 
-export async function listIntents(req, res) {
+export const listIntents = wrapController(async () => {
   const intents = Object.entries(INTENT_TYPES).map(([key, val]) => ({
     key,
     id: val.id,
@@ -90,35 +89,30 @@ export async function listIntents(req, res) {
     label: val.label,
   }));
 
-  res.json({ success: true, data: intents });
-}
+  return intents;
+});
 
-export async function listIndustries(req, res) {
-  const industries = [
+export const listIndustries = wrapController(async () => {
+  return [
     { key: 'clothing', label: '服装' },
     { key: 'beauty', label: '美妆' },
     { key: '3c_digital', label: '3C数码' },
     { key: 'food', label: '食品' },
     { key: 'home', label: '家居' },
   ];
+});
 
-  res.json({ success: true, data: industries });
-}
-
-export async function getPipelineStatus(req, res) {
+export const getPipelineStatus = wrapController(async (req) => {
   const { taskId } = req.params;
 
-  // 从任务队列查询状态
   const { getTaskStatus } = await import('../services/taskService.js');
-  const status = await getTaskStatus(taskId);
-
-  res.json({ success: true, data: status });
-}
+  return await getTaskStatus(taskId);
+});
 
 // ==================== 配置清单 ====================
 
-export async function getConfig(req, res) {
-  const config = {
+export const getConfig = wrapController(async () => {
+  return {
     industries: [
       { key: 'clothing', label: '服装' },
       { key: 'beauty', label: '美妆' },
@@ -154,6 +148,4 @@ export async function getConfig(req, res) {
       { key: 'claude-sonnet-4-6', label: 'Claude Sonnet' },
     ],
   };
-
-  res.json({ success: true, data: config });
-}
+});

@@ -5,7 +5,8 @@
  * /api/admin/model-pool/* — 模型池管理
  */
 import { Router } from 'express';
-import { authMiddleware, requireRole } from '../middleware/auth.js';
+import { authMiddleware } from '../middleware/auth.js';
+import { requireRole } from '../middleware/rbac.js';
 import { adminLimiter, heavyLimiter } from '../middleware/rateLimiter.js';
 import * as ctrl from '../controller/unifiedWorkflowController.js';
 
