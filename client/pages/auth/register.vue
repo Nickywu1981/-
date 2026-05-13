@@ -6,36 +6,36 @@
   <div class="auth-page">
     <div class="auth-card">
       <div class="auth-header">
-        <h1>{{ config.page_title || '注册 Movio AI' }}</h1>
-        <p>{{ config.subtitle || '开启您的AI电商创作之旅' }}</p>
+        <h1>{{ config.page_title || 'Register Movio AI' }}</h1>
+        <p>{{ config.subtitle || 'Start your AI e-commerce journey' }}</p>
       </div>
 
       <form @submit.prevent="handleRegister">
         <div class="input-group">
-          <label for="reg-phone">{{ config.phone_label || '手机号' }}</label>
-          <input id="reg-phone" v-model="phone" type="tel" class="input" placeholder="请输入手机号" maxlength="11" autocomplete="tel" inputmode="tel" />
+          <label for="reg-phone">{{ config.phone_label || 'Phone' }}</label>
+          <input id="reg-phone" v-model="phone" type="tel" class="input" placeholder="Enter phone number" maxlength="11" autocomplete="tel" inputmode="tel" />
         </div>
 
         <div class="input-group">
-          <label for="reg-email">{{ config.email_label || '邮箱' }}</label>
-          <input id="reg-email" v-model="email" type="email" class="input" placeholder="选填" autocomplete="email" inputmode="email" />
+          <label for="reg-email">{{ config.email_label || 'Email' }}</label>
+          <input id="reg-email" v-model="email" type="email" class="input" placeholder="Optional" autocomplete="email" inputmode="email" />
         </div>
 
         <div class="input-group">
-          <label for="reg-password">{{ config.password_label || '密码' }}</label>
-          <input id="reg-password" v-model="password" type="password" class="input" placeholder="请输入密码" required autocomplete="new-password" />
-          <p class="hint">{{ config.password_hint || '8-20位，含字母+数字+特殊字符' }}</p>
+          <label for="reg-password">{{ config.password_label || 'Password' }}</label>
+          <input id="reg-password" v-model="password" type="password" class="input" placeholder="Enter password" required autocomplete="new-password" />
+          <p class="hint">{{ config.password_hint || '8-20 chars, letters + numbers + special chars' }}</p>
         </div>
 
         <div class="input-group">
-          <label for="reg-invite">{{ config.invite_label || '邀请码（选填）' }}</label>
-          <input id="reg-invite" v-model="inviteCode" type="text" class="input" placeholder="请输入邀请码" maxlength="8" autocomplete="off" />
+          <label for="reg-invite">{{ config.invite_label || 'Invite Code (optional)' }}</label>
+          <input id="reg-invite" v-model="inviteCode" type="text" class="input" placeholder="Enter invite code" maxlength="8" autocomplete="off" />
         </div>
 
-        <p class="agreement">{{ config.agreement || '注册即表示同意《用户协议》和《隐私政策》' }}</p>
+        <p class="agreement">{{ config.agreement || 'By registering you agree to the Terms and Privacy Policy' }}</p>
 
         <button type="submit" class="btn btn-primary btn-block" :disabled="loading">
-          {{ loading ? '注册中...' : (config.btn_submit || '注册') }}
+          {{ loading ? 'Registering...' : (config.btn_submit || 'Register') }}
         </button>
 
         <p v-if="errorMsg" class="error-msg">{{ errorMsg }}</p>
@@ -44,7 +44,7 @@
 
       <div class="auth-footer">
         <NuxtLink to="/login">
-          {{ config.btn_to_login || '已有账号？去登录' }}
+          {{ config.btn_to_login || 'Already have an account? Log in' }}
         </NuxtLink>
       </div>
     </div>
@@ -73,11 +73,11 @@ async function handleRegister() {
   successMsg.value = ''
 
   if (!phone.value && !email.value) {
-    errorMsg.value = '请至少填写手机号或邮箱'
+    errorMsg.value = 'Please enter phone or email'
     return
   }
   if (!password.value || password.value.length < 8) {
-    errorMsg.value = '密码至少8位'
+    errorMsg.value = 'Password must be at least 8 characters'
     return
   }
 
@@ -94,13 +94,13 @@ async function handleRegister() {
       credentials: 'include',
     })
     if (res.code === 200) {
-      successMsg.value = '注册成功，正在跳转...'
+      successMsg.value = 'Registration successful, redirecting...'
       navTimer.value = setTimeout(() => navigateTo('/workspace'), 1000)
     } else {
-      errorMsg.value = res.msg || '注册失败'
+      errorMsg.value = res.msg || 'Registration failed'
     }
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
-    errorMsg.value = err?.data?.msg || '注册失败，请重试'
+    errorMsg.value = err?.data?.msg || 'Registration failed, please retry'
   } finally {
     loading.value = false
   }

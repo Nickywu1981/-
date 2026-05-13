@@ -38,7 +38,7 @@ export function sqlGuardMiddleware(req, res, next) {
     next();
   } catch (err) {
     if (err.sqlGuard) {
-      return sendError(res, ERROR_CODE.BAD_REQUEST, '请求参数包含非法字符');
+      return sendError(res, ERROR_CODE.BAD_REQUEST, 'Request contains invalid characters');
     }
     next(err);
   }

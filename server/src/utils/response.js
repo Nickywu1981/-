@@ -5,7 +5,7 @@
 
 import { ERROR_MSG } from '../constants/errorCode.js';
 
-const DEFAULT_ERROR_MSG = '服务异常';
+const DEFAULT_ERROR_MSG = 'Internal server error';
 
 /**
  * 成功响应
