@@ -97,6 +97,15 @@
             </select>
           </div>
           <div v-if="isVideoWf" class="param">
+            <label>投流平台</label>
+            <select v-model="params.adPlatform" @change="saveConfig">
+              <option value="qianchuan">巨量千川(抖音)</option>
+              <option value="ocean_engine">巨量引擎(字节全系)</option>
+              <option value="magnetic">磁力金牛(快手)</option>
+              <option value="alimama">阿里妈妈(淘宝/天猫)</option>
+            </select>
+          </div>
+          <div v-if="isVideoWf" class="param">
             <label>视频时长(秒)</label>
             <select v-model="params.videoDuration" @change="saveConfig">
               <option :value="15">15s</option><option :value="30">30s</option><option :value="60">60s</option>
@@ -113,6 +122,14 @@
             <select v-model="params.voice" @change="saveConfig">
               <option value="zh-CN-XiaoxiaoNeural">晓晓(女)</option>
               <option value="zh-CN-YunxiNeural">云希(男)</option>
+              <option value="zh-CN-XiaoyiNeural">晓依(女)</option>
+              <option value="zh-CN-YunjianNeural">云健(男)</option>
+            </select>
+          </div>
+          <div v-if="isVoiceWf" class="param">
+            <label>语速</label>
+            <select v-model="params.voiceSpeed" @change="saveConfig">
+              <option :value="0.8">0.8x 慢速</option><option :value="1.0">1.0x 标准</option><option :value="1.2">1.2x 快速</option><option :value="1.5">1.5x 极速</option>
             </select>
           </div>
         </div>
@@ -131,7 +148,7 @@ const selectedWf = ref(null);
 const wfMode = ref('auto');
 const modelPool = ref([]);
 const modelBindings = reactive({});
-const params = reactive({ industry: '', style: 'professional', videoDuration: 30, storyboardCount: 6, voice: 'zh-CN-XiaoxiaoNeural' });
+const params = reactive({ industry: '', style: 'professional', videoDuration: 30, storyboardCount: 6, voice: 'zh-CN-XiaoxiaoNeural', voiceSpeed: 1.0, adPlatform: 'qianchuan' });
 
 const categories = [
   { key: 'image', label: '文生图' }, { key: 'video', label: '文生视频' },

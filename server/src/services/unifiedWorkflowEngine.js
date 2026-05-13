@@ -50,6 +50,15 @@ function _parseScenes(ctx) {
   return null;
 }
 
+function _parseViralInsight(text) {
+  if (!text) return null;
+  try {
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (jsonMatch) return JSON.parse(jsonMatch[0]);
+  } catch {}
+  return null;
+}
+
 async function _singleImageGen(ctx, prompt, taskType, size = '1024x1024') {
   const model = ctx._stepModel || {};
   const result = await gatewayInfer(model.model_key || 'gpt-image-2', prompt, {
@@ -170,7 +179,34 @@ const STEP_EXECUTORS = {
   copywriting_gen:    _textGenStep('copywriting', '生成电商营销文案'),
   script_gen:         _textGenStep('script', '生成带货视频脚本（含前3秒钩子+5-8镜分镜）'),
   selling_points_gen: _textGenStep('selling_points', '提炼商品核心卖点'),
-  viral_analyze:      _textGenStep('viral_analyze', '反推拆解爆款视频逻辑'),
+  viral_analyze: async (ctx) => {
+    // 基础: LLM文本拆解 (通过 gatewayDispatch)
+    const textResult = await _textGenStep('viral_analyze', '反推拆解爆款视频逻辑')(ctx);
+
+    // 增强: 如有参考视频URL → 帧提取+结构分析
+    let videoAnalysis = null;
+    if (ctx.referenceVideoUrl) {
+      try {
+        const { extractFrames, analyzeVideoStructure } = await import('./videoAnalysisService.js');
+        const frameResult = await extractFrames(ctx.referenceVideoUrl, { frameCount: 8 });
+        if (frameResult.frames.length > 0) {
+          videoAnalysis = analyzeVideoStructure({
+            frames: frameResult.frames,
+            viralInsight: _parseViralInsight(textResult.textContent),
+          }, { duration: frameResult.duration });
+        }
+      } catch (e) {
+        logger.warn('[WorkflowEngine] Video frame analysis failed:', e.message);
+      }
+    }
+
+    return {
+      textContent: textResult.textContent,
+      scriptContent: textResult.scriptContent,
+      videoAnalysis,
+      framesExtracted: videoAnalysis?.structure?.scenes?.length || 0,
+    };
+  },
   script_polish:      _textGenStep('polish', '精炼规整文案输出'),
 
   // ── 详情页 ──
@@ -184,13 +220,50 @@ const STEP_EXECUTORS = {
   // ── 视频 ──
   video_compose: async (ctx) => {
     const model = ctx._stepModel || {};
+    // 按投流平台自动调整视频参数
+    const { adaptVideoParams } = await import('./platformAdAdapter.js');
+    const adapted = adaptVideoParams(ctx);
+
     const result = await gatewayInfer(model.model_key || 'kling-v1', {
       images: ctx.storyboardUrls || [],
       prompt: ctx.scriptContent || ctx.userInput,
-      duration: ctx.videoDuration || 30,
-      ratio: '9:16',
+      duration: adapted.duration,
+      ratio: adapted.aspectRatio,
+      resolution: adapted.resolution,
+      platform: adapted.platform,
     }, { taskType: 'video_compose', source: 'workflow' });
-    return { videoUrl: result?.url || result?.videoUrl, taskId: result?.taskId };
+
+    const videoUrl = result?.url || result?.videoUrl;
+    ctx.videoUrl = videoUrl;
+
+    // 字幕叠加 (有脚本分镜时自动生成)
+    let subtitleResult = null;
+    if (videoUrl && ctx.scriptContent) {
+      try {
+        const { burnSubtitles, extractScenesForSubtitle } = await import('./subtitleService.js');
+        const { scenes } = extractScenesForSubtitle(ctx.scriptContent, adapted.duration);
+        if (scenes.length > 0) {
+          subtitleResult = await burnSubtitles(videoUrl, scenes, {
+            platform: adapted.platform,
+            duration: adapted.duration,
+          });
+          if (subtitleResult.subtitledUrl && subtitleResult.method === 'ffmpeg_burn') {
+            ctx.videoUrl = subtitleResult.subtitledUrl;
+          }
+        }
+      } catch (e) {
+        logger.warn('[WorkflowEngine] Subtitle burn failed:', e.message);
+      }
+    }
+
+    return {
+      videoUrl: ctx.videoUrl,
+      taskId: result?.taskId,
+      platform: adapted.platformName,
+      aspectRatio: adapted.aspectRatio,
+      resolution: adapted.resolution,
+      subtitle: subtitleResult ? { method: subtitleResult.method, srtContent: subtitleResult.srtContent } : null,
+    };
   },
 
   // ── 配音 ──
@@ -202,11 +275,16 @@ const STEP_EXECUTORS = {
       taskType: 'tts',
       params: {
         model: model.model_key || 'edge-tts',
-        messages: [{ role: 'user', content: text.slice(0, 500) }],
+        messages: [{ role: 'user', content: text.slice(0, 800) }],
         voice: ctx.voice || 'zh-CN-XiaoxiaoNeural',
+        speed: ctx.voiceSpeed || 1.0,
       },
     }, { taskType: 'tts', source: 'workflow' });
-    return { voiceUrl: result?.output?.audioUrl || result?.url };
+    return {
+      voiceUrl: result?.output?.audioUrl || result?.url,
+      voice: ctx.voice || 'zh-CN-XiaoxiaoNeural',
+      speed: ctx.voiceSpeed || 1.0,
+    };
   },
 
   // ── 后处理 ──
@@ -259,12 +337,68 @@ const STEP_EXECUTORS = {
 
   // ── 打包 ──
   pack_export: async (ctx) => {
-    const assets = {};
-    if (ctx.imageUrls) assets.images = ctx.imageUrls;
-    if (ctx.videoUrl) assets.video = ctx.videoUrl;
-    if (ctx.voiceUrl) assets.voice = ctx.voiceUrl;
-    if (ctx.detailModules) assets.detailModules = ctx.detailModules;
-    return { package: assets, totalAssets: Object.keys(assets).length };
+    const manifest = {
+      exportedAt: new Date().toISOString(),
+      jobId: ctx._jobId,
+      productName: ctx.productName || '未命名',
+      platform: ctx.platform,
+      industry: ctx.industry,
+      assets: {
+        images: (ctx.imageUrls || []).map((url, i) => ({ index: i, type: 'image', url, label: `image_${i + 1}` })),
+        video: ctx.videoUrl ? [{ type: 'video', url: ctx.videoUrl, label: 'main_video' }] : [],
+        voice: ctx.voiceUrl ? [{ type: 'audio', url: ctx.voiceUrl, label: 'voice_dub' }] : [],
+        bgm: ctx.bgmUrl ? [{ type: 'audio', url: ctx.bgmUrl, label: 'bgm' }] : [],
+        detailHtml: ctx.detailHtml ? [{ type: 'html', content: ctx.detailHtml, label: 'detail_page' }] : [],
+        detailModules: (ctx.detailModules || []).map((m, i) => ({ index: i, type: 'module', key: m.key, url: m.url })),
+        layout: ctx.layout ? [{ type: 'layout', data: ctx.layout, label: 'auto_layout' }] : [],
+        frames: ctx.frames ? [{ type: 'storyboard', data: ctx.frames, label: 'storyboard_frames' }] : [],
+      },
+    };
+
+    const allAssets = [
+      ...manifest.assets.images,
+      ...manifest.assets.video,
+      ...manifest.assets.voice,
+      ...manifest.assets.bgm,
+    ];
+    const totalFiles = allAssets.length;
+
+    // 尝试ZIP打包 (需 archiver 依赖)
+    let zipUrl = null;
+    try {
+      const archiver = await import('archiver').catch(() => null);
+      if (archiver?.default) {
+        const path = await import('path');
+        const fs = await import('fs');
+        const os = await import('os');
+        const { default: archiverDefault } = archiver;
+
+        const outputDir = os.tmpdir();
+        const zipFile = path.join(outputDir, `export_${ctx._jobId || Date.now()}.zip`);
+        const output = fs.createWriteStream(zipFile);
+        const archive = archiverDefault('zip', { zlib: { level: 9 } });
+
+        await new Promise((resolve, reject) => {
+          output.on('close', resolve);
+          archive.on('error', reject);
+          archive.pipe(output);
+          archive.append(JSON.stringify(manifest, null, 2), { name: 'manifest.json' });
+          archive.finalize();
+        });
+
+        zipUrl = zipFile;
+      }
+    } catch (e) {
+      logger.info('[WorkflowEngine] archiver not available, using manifest-only export');
+    }
+
+    return {
+      package: manifest,
+      manifestJson: JSON.stringify(manifest),
+      zipUrl,
+      totalAssets: totalFiles,
+      totalFiles,
+    };
   },
 };
 
