@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { listTemplates, getTemplateDetail, createTemplate, submitForReview, fillAndPreview, listFavorites, toggleFavorite, listGroups, createGroup, renameGroup, deleteGroup, getRecommendations, recordUsage, usageHistory, rateTemplate, getTemplateRating } from '../controller/promptController.js';
+import { listTemplates, getTemplateDetail, createTemplate, submitForReview, fillAndPreview, listFavorites, toggleFavorite, listGroups, createGroup, renameGroup, deleteGroup, getRecommendations, recordUsage, usageHistory, rateTemplate, getTemplateRating, copyOfficialTemplate, updateMyTemplate, submitToOfficial, listMyPrivateTemplates, listTemplatesByIntent } from '../controller/promptController.js';
 
 import { validate, idParamSchema } from '../utils/validate.js';
 import { z } from 'zod';
@@ -32,6 +32,15 @@ const recordUsageSchema = z.object({
 });
 const rateSchema = z.object({
   score: z.coerce.number().int().min(1, '最低1分').max(5, '最高5分'),
+});
+
+const updateMyTemplateSchema = z.object({
+  title: z.string().min(1).max(200).optional(),
+  content: z.string().min(1).max(5000).optional(),
+  description: z.string().max(500).optional(),
+  tags: z.string().max(500).optional(),
+  variables: z.any().optional(),
+  category: z.string().max(50).optional(),
 });
 // (idParamSchema imported from validate.js)
 
@@ -67,5 +76,12 @@ router.post('/:id/use', validate(idParamSchema, 'params'), validate(recordUsageS
 // 评分
 router.post('/:id/rate', validate(idParamSchema, 'params'), validate(rateSchema), rateTemplate);
 router.get('/:id/rating', validate(idParamSchema, 'params'), getTemplateRating);
+
+// 3层模板库 — 用户端
+router.post('/templates/:id/copy', validate(idParamSchema, 'params'), copyOfficialTemplate);
+router.put('/templates/:id', validate(idParamSchema, 'params'), validate(updateMyTemplateSchema), updateMyTemplate);
+router.post('/templates/:id/submit-official', validate(idParamSchema, 'params'), submitToOfficial);
+router.get('/my-templates', listMyPrivateTemplates);
+router.get('/by-intent/:intentId', listTemplatesByIntent);
 
 export default router;

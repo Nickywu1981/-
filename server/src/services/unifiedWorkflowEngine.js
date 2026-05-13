@@ -84,6 +84,7 @@ async function _wrapStepPrompt(ctx, intentId) {
     industry: ctx.industry,
     platform: ctx.platform,
     brandTone: ctx.brandTone,
+    userId: ctx.userId,
   };
   const wrapped = await matchAndFill(intentId, variables, opts);
   ctx._lastStepWrapper = wrapped;

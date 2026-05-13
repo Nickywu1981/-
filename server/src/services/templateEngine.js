@@ -106,7 +106,25 @@ export function invalidateTemplateCache(templateCode) {
  * @returns {Promise<{ system: string, prompt: string, intentId: string, category: string }>}
  */
 export async function matchAndFill(intentId, variables = {}, opts = {}) {
-  // ── 优先查 DB 模板（后台编辑的模板实时生效）──
+  const userId = opts.userId;
+
+  // ── 第1层: 用户私有模板 ──
+  if (userId) {
+    const userCode = `${intentId}_u_${userId}`;
+    try {
+      const userTpl = await _getDbTemplate(userCode);
+      if (userTpl && userTpl.content) {
+        let dbVariables = [];
+        if (userTpl.variables) {
+          try { dbVariables = typeof userTpl.variables === 'string' ? JSON.parse(userTpl.variables) : userTpl.variables; } catch {}
+        }
+        const dbSystem = (Array.isArray(dbVariables) ? dbVariables.find(v => v.name === 'system')?.default : null) || '你是专业的电商内容创作专家。';
+        return { system: dbSystem, prompt: _normalizeDbToEngine(userTpl.content).trim(), intentId, category: userTpl.category || 'text', _source: 'user_private' };
+      }
+    } catch (e) { /* fall through */ }
+  }
+
+  // ── 第2层: 系统官方 DB 模板 ──
   let dbOverride = null;
   try {
     dbOverride = await _getDbTemplate(intentId);
@@ -129,11 +147,11 @@ export async function matchAndFill(intentId, variables = {}, opts = {}) {
       prompt: _normalizeDbToEngine(dbOverride.content).trim(),
       intentId,
       category: dbOverride.category || 'text',
-      _source: 'db',
+      _source: 'official',
     };
   }
 
-  // ── 回退硬编码 TEMPLATE_REGISTRY ──
+  // ── 第3层: 硬编码 TEMPLATE_REGISTRY ──
   const entry = TEMPLATE_REGISTRY[intentId];
   if (!entry) {
     logger.warn('[TemplateEngine] unknown intent, fallback to copywriting', { intentId });
@@ -166,9 +184,43 @@ export async function matchAndFill(intentId, variables = {}, opts = {}) {
 
   const system = tpl.system || '你是专业的电商内容创作专家。';
 
-  logger.info('[TemplateEngine] template matched', { intentId, category, industry: opts.industry });
+  logger.info('[TemplateEngine] template matched', { intentId, category, industry: opts.industry, _source: 'hardcoded' });
 
-  return { system, prompt: filled.trim(), intentId, category };
+  return { system, prompt: filled.trim(), intentId, category, _source: 'hardcoded' };
+}
+
+/**
+ * 获取指定意图的所有可用模板（给前端选择器用）
+ * @param {string} intentId
+ * @param {number} [userId]
+ */
+export async function getAvailableTemplatesForIntent(intentId, userId) {
+  const result = [];
+  // 用户私有模板
+  if (userId) {
+    const userCode = `${intentId}_u_${userId}`;
+    try {
+      const userTpl = await _getDbTemplate(userCode);
+      if (userTpl) result.push({ ...userTpl, _source: 'user_private', template_code: userCode });
+    } catch { /* fall through */ }
+  }
+  // 系统官方模板
+  try {
+    const official = await _getDbTemplate(intentId);
+    if (official) result.push({ ...official, _source: 'official' });
+  } catch { /* fall through */ }
+  // 硬编码兜底（永远可用）
+  const entry = TEMPLATE_REGISTRY[intentId];
+  if (entry) {
+    result.push({
+      template_code: intentId,
+      category: entry.category,
+      title: `[内置] ${intentId}`,
+      content: entry.tpl.template,
+      _source: 'hardcoded',
+    });
+  }
+  return result;
 }
 
 /**
@@ -186,5 +238,5 @@ export function getModelHint(intentId) {
   }
 }
 
-export { TEMPLATE_REGISTRY, INDUSTRY_PARAMS, invalidateTemplateCache };
-export default { matchAndFill, getModelHint, invalidateTemplateCache };
+export { TEMPLATE_REGISTRY, INDUSTRY_PARAMS, invalidateTemplateCache, getAvailableTemplatesForIntent };
+export default { matchAndFill, getModelHint, invalidateTemplateCache, getAvailableTemplatesForIntent };

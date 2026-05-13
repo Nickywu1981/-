@@ -5,6 +5,10 @@
         <h1>提示词工坊</h1>
         <p class="subtitle">AI 智能推荐 + 150+ 精品模板，一键填写即出图</p>
       </div>
+      <div class="header-tabs">
+        <button :class="['header-tab', { active: activeTab === 'official' }]" @click="switchTab('official')">官方模板</button>
+        <button :class="['header-tab', { active: activeTab === 'my' }]" @click="switchTab('my')">我的模板</button>
+      </div>
     </div>
 
     <!-- 智能推荐区 -->
@@ -23,7 +27,10 @@
           <p class="card-desc">{{ t.description || t.content?.slice(0, 80) }}</p>
           <div class="card-meta">
             <span>{{ t.usage_count || 0 }} 次使用</span>
-            <button class="btn-sm" @click.stop="useTemplate(t)">立即使用</button>
+            <div class="card-btns">
+              <button class="btn-sm" @click.stop="useTemplate(t)">立即使用</button>
+              <button class="btn-sm outline" @click.stop="copyTemplate(t)">复制到我的</button>
+            </div>
           </div>
         </div>
       </div>
@@ -103,6 +110,7 @@
 
 <script setup lang="ts">
 const activeCat = ref('all')
+const activeTab = ref('official')
 const loading = ref(true)
 const detail = ref<any>(null)
 const myRating = ref(0)
@@ -166,6 +174,20 @@ const doRate = async (score: number) => {
 }
 
 const toast = useToast()
+const navigateTo = (await import('nuxt/app')).navigateTo
+
+function switchTab(tab: string) {
+  activeTab.value = tab
+  if (tab === 'my') navigateTo('/work/my-templates')
+}
+
+async function copyTemplate(t: any) {
+  try {
+    const r = await $fetch(`/api/prompts/templates/${t.id}/copy`, { method: 'POST', credentials: 'include' })
+    toast.success((r as any).updated ? '已更新副本' : '已复制为我的模板')
+  } catch (e: any) { toast.error('复制失败: ' + (e?.data?.msg || e.message)) }
+}
+
 const doFill = async () => {
   if (!detail.value) return
   try {
@@ -181,3 +203,14 @@ const doFill = async () => {
 onMounted(fetchAll)
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
+
+<style scoped>
+.header-tabs { display: flex; gap: 0; margin-top: 12px; }
+.header-tab { padding: 6px 18px; border: 1px solid var(--input-border); background: var(--bg-card); color: var(--text-secondary); cursor: pointer; font-size: 13px; transition: all var(--transition-fast); }
+.header-tab:first-child { border-radius: var(--radius-sm) 0 0 var(--radius-sm); }
+.header-tab:last-child { border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.header-tab.active { background: var(--brand); color: var(--text-on-brand); border-color: var(--brand); }
+.card-btns { display: flex; gap: 6px; }
+.btn-sm.outline { background: transparent; border: 1px solid var(--brand); color: var(--brand); }
+.btn-sm.outline:hover { background: var(--brand); color: var(--text-on-brand); }
+</style>

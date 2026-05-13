@@ -35,6 +35,21 @@ export async function getTemplateByCode(code) {
   return rows[0] || null;
 }
 
+export async function listTemplatesByCodes(codes) {
+  if (!codes || !codes.length) return [];
+  const placeholders = codes.map(() => '?').join(',');
+  const [rows] = await pool.query(
+    `SELECT * FROM prompt_template WHERE template_code IN (${placeholders})`,
+    codes,
+  );
+  return rows;
+}
+
+export async function updateTemplateCode(id, newCode) {
+  const [r] = await pool.execute('UPDATE prompt_template SET template_code = ? WHERE id = ?', [newCode, id]);
+  return r.affectedRows;
+}
+
 export async function insertTemplate({ templateCode, category, title, description, content, variables, modelType, icon, sortOrder, isPublic, status, creatorId }) {
   const [r] = await pool.execute(
     'INSERT INTO prompt_template (template_code, category, title, description, content, variables, model_type, icon, sort_order, is_public, status, creator_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
@@ -44,7 +59,7 @@ export async function insertTemplate({ templateCode, category, title, descriptio
 }
 
 export async function updateTemplate(id, fields) {
-  const allowed = ['title', 'content', 'category', 'tags', 'variables', 'is_public', 'status', 'reviewer_id', 'review_remark'];
+  const allowed = ['title', 'content', 'category', 'tags', 'variables', 'is_public', 'status', 'reviewer_id', 'review_remark', 'description', 'template_code'];
   const sets = [];
   const params = [];
   for (const [k, v] of Object.entries(fields)) {

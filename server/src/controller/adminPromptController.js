@@ -29,3 +29,18 @@ export const adminDeleteTemplate = wrapController(async (req, res) => {
     await promptService.adminDeleteTemplate(+req.params.id);
     success(res, null, '已删除');
 });
+
+// 审核队列
+export const adminReviewQueue = wrapController(async (req, res) => {
+    const { keyword } = req.query;
+    const { page, pageSize } = parsePagination(req.query);
+    const r = await promptService.adminReviewQueue({ page, pageSize, keyword });
+    listResult(res, r);
+});
+
+// 批量标记（默认/热门/精选）
+export const adminBatchMark = wrapController(async (req, res) => {
+    const { ids, marking, action } = req.body;
+    const result = await promptService.adminBatchMarkTemplates(ids, marking, action);
+    success(res, result, `已${action === 'add' ? '添加' : '移除'}${marking}标记`);
+});

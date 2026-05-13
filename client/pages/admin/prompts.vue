@@ -2,6 +2,11 @@
   <AdminLayout>
     <h2 class="ptitle">{{ $t('admin_prompts.page_title') }}</h2>
 
+    <div class="tabs">
+      <button :class="['tab', { active: activeTab === 'all' }]" @click="switchTab('all')">全部模板</button>
+      <button :class="['tab', { active: activeTab === 'review' }]" @click="switchTab('review')">审核队列</button>
+    </div>
+
     <div class="toolbar">
       <input v-model="keyword" type="text" :placeholder="$t('admin_prompts.search_placeholder')" @keyup.enter="fetchData" />
       <select v-model="filterCategory" class="sel" @change="fetchData">
@@ -13,6 +18,10 @@
         <option value="copy">{{ $t('admin_prompts.category_copy') }}</option>
         <option value="viral-clone">{{ $t('admin_prompts.category_viral_clone') }}</option>
       </select>
+      <select v-model="filterIndustry" class="sel" @change="fetchData">
+        <option value="">全部行业</option>
+        <option v-for="ind in industryOptions" :key="ind.key" :value="ind.key">{{ ind.label }}</option>
+      </select>
       <select v-model="filterStatus" class="sel" @change="fetchData">
         <option value="">{{ $t('admin_prompts.all_statuses') }}</option>
         <option value="0">{{ $t('admin_prompts.status_draft') }}</option>
@@ -20,7 +29,7 @@
         <option value="2">{{ $t('admin_prompts.status_active') }}</option>
         <option value="3">{{ $t('admin_prompts.status_offline') }}</option>
       </select>
-      <button class="btn btn-primary" @click="openCreate">{{ $t('admin_prompts.new_template') }}</button>
+      <button v-if="activeTab === 'all'" class="btn btn-primary" @click="openCreate">{{ $t('admin_prompts.new_template') }}</button>
     </div>
 
     <LoadingSkeleton v-if="loading" type="table" :rows="5" :cols="8" />
@@ -33,6 +42,8 @@
           <th>{{ $t('admin_prompts.col_code') }}</th>
           <th>{{ $t('admin_prompts.col_title') }}</th>
           <th>{{ $t('admin_prompts.col_category') }}</th>
+          <th>行业/标签</th>
+          <th>来源</th>
           <th>{{ $t('common.status') }}</th>
           <th>{{ $t('admin_prompts.col_usage') }}</th>
           <th>{{ $t('admin_prompts.col_create_time') }}</th>
@@ -45,6 +56,8 @@
           <td class="mono">{{ t.template_code }}</td>
           <td>{{ t.title }}</td>
           <td><span class="category-tag">{{ categoryLabel(t.category) }}</span></td>
+          <td><span class="tags-cell">{{ (t.tags || '').split(',').filter(Boolean).slice(0,3).join(', ') || '-' }}</span></td>
+          <td><span class="source-tag" :class="t.is_public ? 'official' : 'user'">{{ t.is_public ? '官方' : (t.creator_name || '用户') }}</span></td>
           <td><span class="status-tag" :class="statusClass(t.status)">{{ statusLabel(t.status) }}</span></td>
           <td>{{ t.usage_count }}</td>
           <td>{{ t.create_time?.slice(0, 10) }}</td>
@@ -54,6 +67,9 @@
             <button v-if="t.status === 1" class="btn-sm danger" @click="review(t.id, 3)">{{ $t('admin_prompts.reject') }}</button>
             <button v-if="t.status === 2" class="btn-sm warn" @click="review(t.id, 3)">{{ $t('admin_prompts.unpublish') }}</button>
             <button v-if="t.status === 3" class="btn-sm" @click="review(t.id, 2)">{{ $t('admin_prompts.publish') }}</button>
+            <button v-if="!hasMark(t, 'hot')" class="btn-sm" @click="batchMark([t.id], 'hot', 'add')">热门</button>
+            <button v-if="hasMark(t, 'hot')" class="btn-sm warn" @click="batchMark([t.id], 'hot', 'remove')">取消热门</button>
+            <button v-if="!hasMark(t, 'default')" class="btn-sm" @click="batchMark([t.id], 'default', 'add')">默认</button>
             <button class="btn-sm danger" @click="confirmDelete(t)">{{ $t('common.delete') }}</button>
           </td>
         </tr>
@@ -96,9 +112,17 @@
           <div class="form-group">
             <label>{{ $t('admin_prompts.col_code') }}</label>
             <input v-model="form.templateCode" maxlength="100" type="text"
-              placeholder="如：white_bg, storyboard, main_image"
-              :disabled="!!editing.id" />
+              :placeholder="editing.id ? '' : '如：white_bg, main_image, ad_video'"
+              :disabled="!!editing.id"
+              :list="'intent-list'" />
+            <datalist id="intent-list">
+              <option v-for="i in intentIdList" :key="i" :value="i" />
+            </datalist>
             <small style="color:#888; font-size:11px;">与意图ID匹配后可覆盖工作流默认模板。编辑已有模板时不可修改。</small>
+          </div>
+          <div class="form-group">
+            <label>行业/标签（逗号分隔）</label>
+            <input v-model="form.tags" maxlength="256" type="text" placeholder="如：服装,美妆,默认,热门" />
           </div>
           <div class="form-group">
             <label>{{ $t('admin_prompts.label_content') }}</label>
@@ -155,37 +179,64 @@ const pageSize = 20;
 const keyword = ref('');
 const filterStatus = ref('');
 const filterCategory = ref('');
+const filterIndustry = ref('');
+const activeTab = ref('all');
 const loading = ref(false);
 const showModal = ref(false);
+
+const intentIdList = ['white_bg', 'main_image', 'scene_image', 'poster', 'detail_image', 'storyboard', 'product_detail', 'infographic', 'main_video', 'ad_video', 'action_migrate', 'video_clone', 'copywriting', 'description', 'script', 'selling_points', 'translate', 'voice'];
+
+const industryOptions = [
+  { key: 'clothing', label: '服装' }, { key: 'beauty', label: '美妆' }, { key: '3c_digital', label: '3C数码' },
+  { key: 'electronics', label: '电子产品' }, { key: 'food', label: '食品' }, { key: 'home', label: '家居' },
+  { key: 'outdoor', label: '户外' }, { key: 'mother_baby', label: '母婴' }, { key: 'medical', label: '医疗' },
+  { key: 'auto', label: '汽车' }, { key: 'pet', label: '宠物' }, { key: 'education', label: '教育' },
+  { key: 'jewelry', label: '珠宝' }, { key: 'sports', label: '运动' }, { key: 'toy', label: '玩具' },
+  { key: 'book', label: '图书' }, { key: 'office', label: '办公' }, { key: 'travel', label: '旅游' },
+  { key: 'wedding', label: '婚庆' }, { key: 'cross_border', label: '跨境电商' },
+];
 
 const editing = ref<any>({});
 const form = reactive({
   title: '', description: '', category: 'main_image', content: '', icon: 'star',
   modelType: 'text', sortOrder: 0, isPublic: true, status: 2,
-  templateCode: '',
+  templateCode: '', tags: '',
 });
 
 onMounted(() => { fetchData(); });
 
+function switchTab(tab: string) {
+  activeTab.value = tab;
+  page.value = 1;
+  fetchData();
+}
+
 async function fetchData() {
   loading.value = true;
   try {
+    const baseUrl = activeTab.value === 'review' ? '/api/admin/prompts/review-queue' : '/api/admin/prompts';
     const params = new URLSearchParams({ page: String(page.value), pageSize: String(pageSize) });
     if (keyword.value) params.set('keyword', keyword.value);
-    if (filterStatus.value) params.set('status', filterStatus.value);
-    if (filterCategory.value) params.set('category', filterCategory.value);
-    const res = await $fetch(`/api/admin/prompts?${params}`, { credentials: 'include' });
-    list.value = (res as any).data?.list || [];
-    total.value = (res as any).data?.total || 0;
+    if (activeTab.value !== 'review' && filterStatus.value) params.set('status', filterStatus.value);
+    if (activeTab.value !== 'review' && filterCategory.value) params.set('category', filterCategory.value);
+    const res = await $fetch(`${baseUrl}?${params}`, { credentials: 'include' });
+    const data = (res as any).data || res as any;
+    let items = data.list || [];
+    total.value = data.total || 0;
+    // 客户端按行业过滤（tags 包含 filterIndustry）
+    if (filterIndustry.value) {
+      items = items.filter((t: any) => (t.tags || '').includes(filterIndustry.value));
+      total.value = items.length;
+    }
+    list.value = items;
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(t('admin_prompts.load_failed') + ': ' + (err?.data?.msg || err.message || t('admin_prompts.network_error'))); } finally { loading.value = false; }
-
 }
 
 function onPageChange(p: number) { page.value = p; fetchData(); }
 
 function openCreate() {
   editing.value = {};
-  Object.assign(form, { title: '', description: '', category: 'main_image', content: '', icon: 'star', modelType: 'text', sortOrder: 0, isPublic: true, status: 2, templateCode: '' });
+  Object.assign(form, { title: '', description: '', category: 'main_image', content: '', icon: 'star', modelType: 'text', sortOrder: 0, isPublic: true, status: 2, templateCode: '', tags: '' });
   showModal.value = true;
 }
 
@@ -195,7 +246,7 @@ function openEdit(t: any) {
     title: t.title, description: t.description || '', category: t.category,
     content: t.content, icon: t.icon, modelType: t.model_type, sortOrder: t.sort_order,
     isPublic: !!t.is_public, status: t.status,
-    templateCode: t.template_code || '',
+    templateCode: t.template_code || '', tags: t.tags || '',
   });
   showModal.value = true;
 }
@@ -213,6 +264,21 @@ async function save() {
     showModal.value = false;
     fetchData();
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(t('admin_prompts.save_failed') + ': ' + (err?.data?.msg || err.message || t('admin_prompts.network_error'))); }
+}
+
+function hasMark(t: any, mark: string) {
+  return (t.tags || '').split(',').map((s: string) => s.trim()).includes(mark);
+}
+
+async function batchMark(ids: number[], marking: string, action: string) {
+  try {
+    await $fetch('/api/admin/prompts/batch-mark', {
+      method: 'PUT',
+      credentials: 'include',
+      body: JSON.stringify({ ids, marking, action }),
+    });
+    fetchData();
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error('标记操作失败: ' + (err?.data?.msg || err.message)); }
 }
 
 async function review(id: number, status: number) {
@@ -264,6 +330,10 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 
 <style scoped>
 .ptitle { font-size: 20px; font-weight: 700; margin-bottom: 20px; color: var(--text-primary); }
+.tabs { display: flex; gap: 0; margin-bottom: 16px; border-bottom: 2px solid var(--table-border); }
+.tab { padding: 8px 20px; border: none; background: none; color: var(--text-muted); cursor: pointer; font-size: 14px; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: color var(--transition-fast), border-color var(--transition-fast); }
+.tab:hover { color: var(--text-primary); }
+.tab.active { color: var(--brand); border-bottom-color: var(--brand); font-weight: 600; }
 .toolbar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
 .toolbar input { padding: 6px 12px; border: 1px solid var(--input-border); border-radius: var(--radius-sm); width: 200px; font-size: 13px; background: var(--bg-input); color: var(--text-primary); outline: none; transition: border-color var(--transition-fast), box-shadow var(--transition-fast); }
 .toolbar input:focus { border-color: var(--input-focus-border); box-shadow: var(--focus-ring); }
@@ -288,6 +358,10 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 tr:hover td { background: var(--table-row-hover); }
 .mono { font-family: monospace; font-size: 12px; }
 .category-tag { font-size: 12px; padding: 2px 8px; border-radius: var(--badge-radius); background: var(--status-processing-bg); color: var(--status-processing-text); }
+.tags-cell { font-size: 12px; color: var(--text-secondary); max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.source-tag { font-size: 12px; padding: 2px 8px; border-radius: var(--badge-radius); }
+.source-tag.official { background: var(--status-done-bg); color: var(--status-done-text); }
+.source-tag.user { background: var(--status-pending-bg); color: var(--status-pending-text); }
 .status-tag { font-size: 12px; padding: 2px 8px; border-radius: var(--badge-radius); }
 .status-tag.draft { background: var(--bg-hover); color: var(--text-muted); }
 .status-tag.pending { background: var(--status-pending-bg); color: var(--status-pending-text); }

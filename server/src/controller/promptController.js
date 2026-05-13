@@ -98,3 +98,32 @@ export const getTemplateRating = wrapController(async (req, res) => {
     const rating = await promptService.getRating(req.user.id, +req.params.id);
     success(res, rating);
 });
+
+// ==================== 3层模板库 — 用户端 ====================
+export const copyOfficialTemplate = wrapController(async (req, res) => {
+    const result = await promptService.copyOfficialTemplate(req.user.id, +req.params.id);
+    success(res, result, result.updated ? '已更新副本' : '已复制为我的模板');
+});
+
+export const updateMyTemplate = wrapController(async (req, res) => {
+    await promptService.updateMyTemplate(req.user.id, +req.params.id, req.body);
+    success(res, null, '保存成功');
+});
+
+export const submitToOfficial = wrapController(async (req, res) => {
+    await promptService.submitToOfficial(req.user.id, +req.params.id);
+    success(res, null, '已提交审核，运营审核通过后将收录为官方模板');
+});
+
+export const listMyPrivateTemplates = wrapController(async (req, res) => {
+    const { category, keyword } = req.query;
+    const { page, pageSize } = parsePagination(req.query);
+    const result = await promptService.listMyTemplates(req.user.id, { category, keyword, page, pageSize });
+    listResult(res, result);
+});
+
+export const listTemplatesByIntent = wrapController(async (req, res) => {
+    const { getAvailableTemplatesForIntent } = await import('../services/templateEngine.js');
+    const result = await getAvailableTemplatesForIntent(req.params.intentId, req.user?.id);
+    success(res, result);
+});

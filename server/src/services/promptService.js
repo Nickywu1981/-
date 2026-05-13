@@ -1,6 +1,7 @@
 import { BusinessError } from '../utils/businessError.js';
 import { PROMPT_STATUS } from '../constants/domainStatus.js';
 import * as promptDao from '../dao/promptDao.js';
+import logger from '../utils/logger.js';
 
 // ==================== 变量解析引擎 ====================
 
@@ -72,6 +73,106 @@ export async function submitForReview(userId, id) {
   if (!t || t.creator_id !== userId) throw new BusinessError(404, '模板不存在');
   await promptDao.updateStatus(id, 1, null, '');  // 0→1 待审核
 }
+
+// ==================== 3层模板库 — 用户私有模板管理 ====================
+
+/** 从 template_code 中提取基础 intentId（去除 TPL_ 前缀和 _u_xxx 后缀） */
+function deriveIntentId(templateCode) {
+  let base = templateCode;
+  const userIdx = base.indexOf('_u_');
+  if (userIdx !== -1) base = base.substring(0, userIdx);
+  return base;
+}
+
+/** 一键复制官方模板为用户私有副本 */
+export async function copyOfficialTemplate(userId, templateId) {
+  const source = await promptDao.getTemplateById(templateId);
+  if (!source) throw new BusinessError(404, '模板不存在');
+  if (!source.is_public || source.status !== 2) {
+    throw new BusinessError(400, '只能复制已上架的官方模板');
+  }
+
+  const intentId = deriveIntentId(source.template_code);
+  const userCode = `${intentId}_u_${userId}`;
+
+  const existing = await promptDao.getTemplateByCode(userCode);
+  if (existing) {
+    // 已有副本 → 更新为最新官方内容
+    await promptDao.updateTemplate(existing.id, {
+      title: source.title + ' (我的副本)',
+      content: source.content,
+      description: source.description,
+      tags: source.tags,
+      variables: source.variables,
+      category: source.category,
+    });
+    const { invalidateTemplateCache } = await import('./templateEngine.js');
+    invalidateTemplateCache(userCode);
+    return { id: existing.id, templateCode: userCode, updated: true };
+  }
+
+  const id = await promptDao.insertTemplate({
+    templateCode: userCode,
+    category: source.category || 'text',
+    title: source.title + ' (我的副本)',
+    description: source.description || '',
+    content: source.content,
+    variables: source.variables || [],
+    modelType: source.model_type || 'text',
+    icon: source.icon || 'star',
+    sortOrder: 0,
+    isPublic: false,
+    status: 0,  // 草稿
+    creatorId: userId,
+  });
+  return { id, templateCode: userCode, created: true };
+}
+
+/** 编辑自己的私有模板 */
+export async function updateMyTemplate(userId, templateId, data) {
+  const t = await promptDao.getTemplateById(templateId);
+  if (!t || t.creator_id !== userId || t.is_public) {
+    throw new BusinessError(403, '只能编辑自己的私有模板');
+  }
+  const allowed = { title: data.title, content: data.content, description: data.description, tags: data.tags, variables: data.variables, category: data.category };
+  const clean = Object.fromEntries(Object.entries(allowed).filter(([, v]) => v !== undefined));
+  await promptDao.updateTemplate(templateId, clean);
+  const { invalidateTemplateCache } = await import('./templateEngine.js');
+  invalidateTemplateCache(t.template_code);
+  return { id: templateId, updated: true };
+}
+
+/** 提交私有模板申请收录为官方模板 */
+export async function submitToOfficial(userId, templateId) {
+  const t = await promptDao.getTemplateById(templateId);
+  if (!t || t.creator_id !== userId) throw new BusinessError(404, '模板不存在');
+  await promptDao.updateStatus(templateId, 1, null, '');  // → 待审核
+  logger.info('[Prompt] User submitted template for review', { id: templateId, userId, templateCode: t.template_code });
+  return { submitted: true };
+}
+
+/** 批量标记模板（默认/热门/精选） */
+export async function adminBatchMarkTemplates(ids, marking, action) {
+  if (!['default', 'hot', 'featured'].includes(marking)) throw new BusinessError(400, '标记类型无效');
+
+  for (const id of ids) {
+    const t = await promptDao.getTemplateById(id);
+    if (!t) continue;
+    const tags = (t.tags || '').split(',').map(s => s.trim()).filter(Boolean);
+    const updated = action === 'add'
+      ? [...new Set([...tags, marking])]
+      : tags.filter(tag => tag !== marking);
+    await promptDao.updateTemplate(id, { tags: updated.join(',') });
+  }
+  return { affected: ids.length };
+}
+
+/** 审核队列：列出 status=1 的待审模板 */
+export async function adminReviewQueue({ page, pageSize, keyword } = {}) {
+  return promptDao.listTemplates({ status: 1, keyword, page, pageSize });
+}
+
+// ==================== 模板使用 ====================
 
 export async function useTemplate(userId, id) {
   await promptDao.incrUsageCount(id);
@@ -163,7 +264,35 @@ export async function adminSaveTemplate(body) {
 
 export async function adminReviewTemplate(id, { status, reviewRemark }, reviewerId) {
   await promptDao.updateStatus(id, status, reviewerId, reviewRemark || '');
-  return status === PROMPT_STATUS.PUBLISHED ? '已上架' : '已驳回';
+
+  if (status === PROMPT_STATUS.PUBLISHED) {
+    const t = await promptDao.getTemplateById(id);
+    // 用户提交的模板审核通过 → 收录为官方模板
+    if (t && t.template_code && t.template_code.includes('_u_')) {
+      const intentId = deriveIntentId(t.template_code);
+      const existingOfficial = await promptDao.getTemplateByCode(intentId);
+      if (existingOfficial) {
+        // 覆盖已有官方模板
+        await promptDao.updateTemplate(existingOfficial.id, {
+          title: t.title,
+          content: t.content,
+          description: t.description || '',
+          tags: t.tags || '',
+          variables: t.variables,
+        });
+        invalidateTemplateCache(intentId);
+      } else {
+        // 新建官方模板入口
+        await promptDao.updateTemplateCode(id, intentId);
+        await promptDao.updateTemplate(id, { is_public: 1, creator_id: null });
+        invalidateTemplateCache(intentId);
+      }
+      invalidateTemplateCache(t.template_code); // 清除旧的用户 code 缓存
+      logger.info('[Prompt] User template promoted to official', { id, intentId, oldCode: t.template_code });
+    }
+    return '已上架';
+  }
+  return status === PROMPT_STATUS.REJECTED ? '已驳回' : '已更新';
 }
 
 export async function adminDeleteTemplate(id) {

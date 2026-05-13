@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { getDashboardStats, listAllUsers, updateUserStatus, batchUpdateUserStatus, listAllTasks, listAllPlans, updatePlan, createPlan, deletePlan, getOperationLogs, checkContentRisk, approveTask, rejectTask, listAllOrders, deleteOrder, listCreditRecords, refundCredit, listSensitiveWords, addSensitiveWord, deleteSensitiveWord, retryTask, pauseTask, resumeTask, cancelTask, listAllNotifications, sendNotification, deleteNotification, updateUser } from '../controller/adminController.js';
-import { adminListTemplates, adminSaveTemplate, adminReviewTemplate, adminDeleteTemplate } from '../controller/adminPromptController.js';
+import { adminListTemplates, adminSaveTemplate, adminReviewTemplate, adminDeleteTemplate, adminReviewQueue, adminBatchMark } from '../controller/adminPromptController.js';
 import { listPending, getApprovalStats, getApprovalLogs, approve, reject, suspend, reinstate } from '../controller/enterpriseController.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { adminLimiter } from '../middleware/rateLimiter.js';
@@ -78,6 +78,12 @@ const adminPromptSchema = z.object({
   status: z.coerce.number().int().min(0).max(2).optional(),
 });
 
+const batchMarkSchema = z.object({
+  ids: z.array(z.coerce.number().int().positive()).min(1).max(100),
+  marking: z.enum(['default', 'hot', 'featured']),
+  action: z.enum(['add', 'remove']),
+});
+
 router.use(adminLimiter, authMiddleware, adminAuth);
 
 // 看板
@@ -115,6 +121,8 @@ router.get('/prompts', validate(paginationSchema, 'query'), adminListTemplates);
 router.post('/prompts', validate(adminPromptSchema), adminSaveTemplate);
 router.put('/prompts/:id/review', validate(idParamSchema, 'params'), validate(promptReviewSchema), adminReviewTemplate);
 router.delete('/prompts/:id', validate(idParamSchema, 'params'), adminDeleteTemplate);
+router.get('/prompts/review-queue', validate(paginationSchema, 'query'), adminReviewQueue);
+router.put('/prompts/batch-mark', validate(batchMarkSchema), adminBatchMark);
 // 积分
 router.get('/credits', validate(paginationSchema, 'query'), listCreditRecords);
 router.post('/credits/refund', validate(refundSchema), refundCredit);

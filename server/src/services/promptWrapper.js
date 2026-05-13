@@ -128,6 +128,7 @@ export async function wrapPrompt(rawInput, ctx = {}) {
       industry: ctx.industry,
       platform: ctx.platform,
       brandTone: ctx.brandTone,
+      userId: ctx.userId,
     });
     result.wrapped = wrapped;
     logger.info('[PromptWrapper] template matched', { intentId: intent.intentId, category: wrapped.category });
