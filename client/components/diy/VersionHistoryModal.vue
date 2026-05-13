@@ -1,6 +1,6 @@
 <template>
   <Teleport to="body">
-    <div v-if="modelValue" class="modal-overlay" @click.self="$emit('update:modelValue', false)">
+    <div v-if="modelValue" class="modal-overlay" @click.self="$emit('update:modelValue', false)" @keydown.escape="close">
       <div class="modal version-modal">
         <h3>版本历史</h3>
         <div v-if="loading" class="v-loading">加载中...</div>

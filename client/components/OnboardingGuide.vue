@@ -1,7 +1,7 @@
 <template>
   <Teleport to="body">
     <Transition name="onboard-fade">
-      <div v-if="guide.isVisible.value" class="onboard-overlay" role="dialog" :aria-label="$t('onboarding.dialog_label')" @click.self="guide.skip()">
+      <div v-if="guide.isVisible.value" class="onboard-overlay" role="dialog" :aria-label="$t('onboarding.dialog_label')" @click.self="guide.skip()" @keydown.escape="guide.skip()">
         <div class="onboard-card" @click.stop>
           <div class="onboard-step">{{ guide.currentStep.value + 1 }} / {{ guide.steps.length }}</div>
           <div class="onboard-icon">{{ guide.steps[guide.currentStep.value]?.icon || '✨' }}</div>
