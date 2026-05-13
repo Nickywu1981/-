@@ -51,6 +51,11 @@ export async function call(endpoint, apiKey, params, options = {}) {
         throw new BusinessError(502, 'AI 服务暂时不可用，请稍后重试');
       }
 
+      const MAX_AI_RESPONSE_SIZE = 10 * 1024 * 1024; // 10MB
+      const contentLength = parseInt(response.headers.get('content-length') || '0', 10);
+      if (contentLength > MAX_AI_RESPONSE_SIZE) {
+        throw new BusinessError(502, 'AI 服务响应异常（响应体过大）');
+      }
       const result = await response.json();
 
       // 成功 → 重置熔断器

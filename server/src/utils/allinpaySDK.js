@@ -158,6 +158,11 @@ export async function unifiedOrder(params) {
     throw new BusinessError(502, '支付网关连接失败，请稍后重试');
   }
 
+  const MAX_RESPONSE_SIZE = 1024 * 1024; // 1MB — 支付响应不应超过此值
+  const contentLength = parseInt(res.headers.get('content-length') || '0', 10);
+  if (contentLength > MAX_RESPONSE_SIZE) {
+    throw new BusinessError(502, '支付网关响应异常（响应体过大）');
+  }
   const raw = await res.text();
   let result;
   try {
