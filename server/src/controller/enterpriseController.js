@@ -7,7 +7,7 @@ import { success } from '../utils/response.js';
 import logger from '../utils/logger.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { BusinessError } from '../utils/businessError.js';
-import { isProduction } from '../config/index.js';
+import { cookieSecure } from '../utils/cookieHelper.js';
 import { wrapController } from '../utils/wrapController.js';
 import { revokeAllUserTokens } from '../utils/jwtToken.js';
 import * as enterpriseService from '../services/enterpriseService.js';
@@ -41,13 +41,13 @@ export const loginEnterprise = wrapController(async (req, res) => {
   // 设置 cookie
   res.cookie('token', result.accessToken, {
     httpOnly: true,
-    secure: isProduction,
+    secure: cookieSecure(req),
     sameSite: 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
   res.cookie('refreshToken', result.refreshToken, {
     httpOnly: true,
-    secure: isProduction,
+    secure: cookieSecure(req),
     sameSite: 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
@@ -61,8 +61,8 @@ export const logoutEnterprise = wrapController(async (req, res) => {
   if (userId) {
     await revokeAllUserTokens(userId);
   }
-  res.clearCookie('token', { httpOnly: true, secure: isProduction, sameSite: 'lax', path: '/' });
-  res.clearCookie('refreshToken', { httpOnly: true, secure: isProduction, sameSite: 'lax', path: '/' });
+  res.clearCookie('token', { httpOnly: true, secure: cookieSecure(req), sameSite: 'lax', path: '/' });
+  res.clearCookie('refreshToken', { httpOnly: true, secure: cookieSecure(req), sameSite: 'lax', path: '/' });
   return success(res, null, '已退出登录');
 });
 

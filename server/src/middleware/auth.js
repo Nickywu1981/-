@@ -13,6 +13,7 @@ import crypto from 'crypto';
 import config, { jwtSecret, jwtRefreshSecret, isProduction } from '../config/index.js';
 import { isTokenBlacklisted } from '../utils/jwtToken.js';
 import { error as sendError } from '../utils/response.js';
+import { cookieSecure } from '../utils/cookieHelper.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import logger from '../utils/logger.js';
 
@@ -197,7 +198,7 @@ export async function authMiddleware(req, res, next) {
       : 15 * 60 * 1000;
     res.cookie('token', newToken, {
       httpOnly: true,
-      secure: isProduction,
+      secure: cookieSecure(req),
       sameSite: 'lax',
       maxAge: accessMaxAge,
     });
