@@ -105,48 +105,65 @@ async function runJob(jobId, steps, inputData) {
 }
 
 // ─── 步骤执行器（对接真实 AI 模型） ───
+const STEP_TIMEOUTS = {
+  generate_text: 5 * 60 * 1000,
+  generate_image: 5 * 60 * 1000,
+  generate_voice: 3 * 60 * 1000,
+  generate_video: 10 * 60 * 1000,
+  export: 60 * 1000,
+  default: 5 * 60 * 1000,
+};
+
 async function executeStep(step, context) {
   const { gatewayInfer } = await import('../gateway/aiGatewayHub.js');
+  const stepTimeout = STEP_TIMEOUTS[step.type] || STEP_TIMEOUTS.default;
+
+  const withTimeout = (promise) => {
+    return Promise.race([
+      promise,
+      new Promise((_, reject) => setTimeout(() => reject(new BusinessError(504, `步骤执行超时: ${step.type}`)), stepTimeout)),
+    ]);
+  };
 
   switch (step.type) {
     case 'generate_text': {
       const textPrompt = step.prompt || `为商品 "${context.product_name || context.topic || '未指定'}" 生成电商营销文案`;
-      const result = await gatewayInfer('gpt-4o-mini', {
+      const result = await withTimeout(gatewayInfer('gpt-4o-mini', {
         prompt: textPrompt,
         systemPrompt: '你是资深电商文案专家，输出吸引人的营销文案。',
         temperature: 0.8,
-      }, { userId: context.userId, tenantId: context.tenantId, taskType: 'text_gen', source: 'workflow' });
+      }, { userId: context.userId, tenantId: context.tenantId, taskType: 'text_gen', source: 'workflow' }));
       return { copy_text: result?.text || result?.output?.text || '' };
     }
 
     case 'generate_image': {
       const imgPrompt = step.prompt || `professional e-commerce product photography of ${context.product_name || 'product'}, studio lighting, white background, 8k`;
-      const result = await gatewayInfer('gpt-image-2', {
+      const result = await withTimeout(gatewayInfer('gpt-image-2', {
         prompt: imgPrompt,
         size: step.size || '1024x1024',
         n: step.n || 1,
-      }, { userId: context.userId, tenantId: context.tenantId, taskType: 'image_gen', source: 'workflow' });
+      }, { userId: context.userId, tenantId: context.tenantId, taskType: 'image_gen', source: 'workflow' }));
       const urls = (result?.images || []).map((img) => img.url).filter(Boolean);
       return { image_urls: urls.length ? urls : [result?.file_url || result?.url].filter(Boolean) };
     }
 
     case 'generate_voice': {
       const voiceText = step.text || context.copy_text || '欢迎使用AI电商工具箱';
-      const result = await gatewayInfer('edge-tts', {
+      const result = await withTimeout(gatewayInfer('edge-tts', {
         text: voiceText,
         voice: step.voice || 'zh-CN-XiaoxiaoNeural',
-      }, { userId: context.userId, tenantId: context.tenantId, taskType: 'tts', source: 'workflow' });
+      }, { userId: context.userId, tenantId: context.tenantId, taskType: 'tts', source: 'workflow' }));
       return { audio_url: result?.audioUrl || result?.url || '' };
     }
 
     case 'generate_video': {
       const videoPrompt = step.prompt || `product showcase video of ${context.product_name || 'product'}, cinematic quality`;
-      const result = await gatewayInfer('seedance', {
+      const result = await withTimeout(gatewayInfer('seedance', {
         prompt: videoPrompt,
         imageUrl: context.image_urls?.[0] || step.imageUrl,
         duration: step.duration || 5,
         resolution: step.resolution || '1080p',
-      }, { userId: context.userId, tenantId: context.tenantId, taskType: 'video_gen', source: 'workflow' });
+      }, { userId: context.userId, tenantId: context.tenantId, taskType: 'video_gen', source: 'workflow' }));
       return { video_url: result?.videoUrl || result?.output?.video_url || '' };
     }
 
