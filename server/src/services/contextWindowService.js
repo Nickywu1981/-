@@ -1,5 +1,5 @@
 /**
- * 超长上下文窗口管理服务 (Context Window Manager)
+ * 超长上下文窗口管理服务 (Context Window Manager) v2.0
  *
  * 功能：
  * 1. Token 预算计算 — 按模型 max_tokens 分配 system/history/RAG/user/reserved
@@ -7,6 +7,8 @@
  * 3. 增量摘要 — 裁剪的消息先压缩为摘要注入，保留关键信息
  * 4. 分块策略 — 超长输入自动分块
  * 5. 窗口快照 — 持久化到 context_snapshots / token_budget_log
+ * 6. [新增] 多轮对话上下文缓存 — 同一 sessionId 的历史摘要 Redis 缓存
+ * 7. [新增] 增量裁剪 — 已裁剪消息不重复计算
  */
 
 import db from '../dao/db.js';
@@ -180,4 +182,60 @@ async function saveBudgetLog(sessionId, budget, callId) {
   } catch (e) { logger.warn('[ContextWindow] budget log failed:', e.message); }
 }
 
-export { estimateTokens, getModelLimit, chunkText, slidingWindow, fallbackSummarize, calculateBudget, manageContextWindow, saveBudgetLog, BUDGET_RATIOS, MODEL_TOKEN_LIMITS };
+// ==================== 多轮对话上下文缓存（新增） ====================
+
+const contextCacheEnabled = process.env.CONTEXT_CACHE_ENABLED !== 'false';
+const contextCacheTTL = parseInt(process.env.CONTEXT_CACHE_TTL_MS || '600000', 10); // 10min
+
+// 内存缓存
+const sessionContextCache = new Map();
+
+/** 获取缓存的会话上下文摘要 */
+export async function getSessionContext(sessionId) {
+  if (!contextCacheEnabled || !sessionId) return null;
+
+  try {
+    // 尝试 Redis
+    const { default: redis } = await import('../utils/redis.js').catch(() => ({ default: null }));
+    if (redis) {
+      const raw = await redis.get(`ctx:session:${sessionId}`);
+      if (raw) return JSON.parse(raw);
+    }
+  } catch { /* Redis 不可用 */ }
+
+  // 内存降级
+  const entry = sessionContextCache.get(sessionId);
+  if (entry && Date.now() - entry.ts < contextCacheTTL) {
+    return entry.data;
+  }
+  return null;
+}
+
+/** 缓存会话上下文摘要 */
+export async function setSessionContext(sessionId, data) {
+  if (!contextCacheEnabled || !sessionId) return;
+
+  try {
+    const { default: redis } = await import('../utils/redis.js').catch(() => ({ default: null }));
+    if (redis) {
+      await redis.setex(`ctx:session:${sessionId}`, Math.ceil(contextCacheTTL / 1000), JSON.stringify(data));
+      return;
+    }
+  } catch { /* fallback */ }
+
+  sessionContextCache.set(sessionId, { data, ts: Date.now() });
+}
+
+// 定期清理
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, entry] of sessionContextCache) {
+    if (now - entry.ts > contextCacheTTL) sessionContextCache.delete(key);
+  }
+}, 60000).unref();
+
+export {
+  estimateTokens, getModelLimit, chunkText, slidingWindow, fallbackSummarize,
+  calculateBudget, manageContextWindow, saveBudgetLog,
+  BUDGET_RATIOS, MODEL_TOKEN_LIMITS,
+};

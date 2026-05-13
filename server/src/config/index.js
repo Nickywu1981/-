@@ -161,6 +161,47 @@ const config = {
 
   security: {
     encryptionKey: process.env.ENCRYPTION_KEY || '',
+    // 内容安全
+    sanitizeInput: process.env.SECURITY_SANITIZE_INPUT !== 'false',
+    aliyunGreenEnabled: process.env.SECURITY_ALIYUN_GREEN_ENABLED === 'true',
+    selfBuiltWordlistEnabled: process.env.SECURITY_SELF_BUILT_WORDLIST_ENABLED !== 'false',
+    outputModerationLevel: parseInt(process.env.SECURITY_OUTPUT_MODERATION_LEVEL || '5', 10),
+    // 接口安全
+    signatureRequired: process.env.SECURITY_SIGNATURE_REQUIRED === 'true',
+    modelAclEnabled: process.env.SECURITY_MODEL_ACL_ENABLED === 'true',
+    tokenLeakProtection: process.env.SECURITY_TOKEN_LEAK_PROTECTION === 'true',
+  },
+
+  // AI Gateway 性能配置
+  aiGateway: {
+    // 超时
+    singleRequestTimeoutMs: parseInt(process.env.AI_SINGLE_REQUEST_TIMEOUT_MS || '120000', 10),
+    totalTimeoutMs: parseInt(process.env.AI_TOTAL_TIMEOUT_MS || '300000', 10),
+    streamingTimeoutMs: parseInt(process.env.AI_STREAMING_TIMEOUT_MS || '600000', 10),
+    // 熔断
+    circuitBreaker: {
+      enabled: process.env.AI_CIRCUIT_BREAKER_ENABLED !== 'false',
+      failureCount: parseInt(process.env.AI_BREAKER_FAILURE_COUNT || '5', 10),
+      cooldownMs: parseInt(process.env.AI_BREAKER_COOLDOWN_MS || '60000', 10),
+      errorRate: parseFloat(process.env.AI_BREAKER_ERROR_RATE || '0.5'),
+      windowMs: parseInt(process.env.AI_BREAKER_WINDOW_MS || '120000', 10),
+    },
+    // 限流
+    rateLimiter: {
+      backend: process.env.AI_RATE_LIMITER_BACKEND || 'memory',
+      userQPS: parseInt(process.env.AI_RATE_LIMIT_USER_QPS || '5', 10),
+      ipQPS: parseInt(process.env.AI_RATE_LIMIT_IP_QPS || '20', 10),
+      appQPS: parseInt(process.env.AI_RATE_LIMIT_APP_QPS || '50', 10),
+    },
+    // 缓存
+    cache: {
+      backend: process.env.AI_CACHE_BACKEND || 'memory',
+      ttlMs: parseInt(process.env.AI_CACHE_TTL_MS || '300000', 10),
+      semanticEnabled: process.env.AI_CACHE_SEMANTIC_ENABLED === 'true',
+      semanticThreshold: parseInt(process.env.AI_CACHE_SIMHASH_THRESHOLD || '3', 10),
+    },
+    // 上下文
+    contextCacheEnabled: process.env.CONTEXT_CACHE_ENABLED !== 'false',
   },
 
   e2b: {

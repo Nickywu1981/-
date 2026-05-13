@@ -88,6 +88,20 @@ const UPLOAD_DIR = path.join(__dirname, '../../uploads');
 const CHUNK_DIR = path.join(UPLOAD_DIR, '.chunks');
 const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
 
+// MIME 类型 → 安全扩展名（不信任用户提供的 originalname）
+const MIME_TO_SAFE_EXT = {
+  'image/jpeg': '.jpg',
+  'image/png': '.png',
+  'image/webp': '.webp',
+  'image/gif': '.gif',
+  'image/bmp': '.bmp',
+  'video/mp4': '.mp4',
+  'video/quicktime': '.mov',
+  'video/x-msvideo': '.avi',
+  'video/webm': '.webm',
+  'application/pdf': '.pdf',
+};
+
 // 确保目录存在
 await Promise.all([UPLOAD_DIR, CHUNK_DIR].map(async (dir) => {
   try { await fsp.access(dir); } catch { await fsp.mkdir(dir, { recursive: true }); }
@@ -229,7 +243,8 @@ export async function completeUpload(uploadId) {
  */
 export async function saveSimpleFile(file) {
   const timestamp = Date.now();
-  const ext = path.extname(file.originalname);
+  // 优先用 MIME 类型推断扩展名，不信任用户 originalname
+  const ext = MIME_TO_SAFE_EXT[file.mimetype] || path.extname(file.originalname) || '.bin';
   const extClean = ext.replace('.', '').toLowerCase();
   const finalName = `${timestamp}_${crypto.randomBytes(8).toString('hex')}${ext}`;
   const finalPath = path.join(UPLOAD_DIR, finalName);

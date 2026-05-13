@@ -2,6 +2,7 @@
  * Movio AI — Rate Limiter Middleware
  *
  * 统一限流器定义，被 app.js 及所有路由文件引用。
+ * v4.2: 增加多维度令牌桶限流 (AI 专用)
  */
 import rateLimit from 'express-rate-limit';
 import { error } from '../utils/response.js';
@@ -158,3 +159,33 @@ export const adminLimiter = rateLimit({
 
 /** 通用限流器 —— 用于读密集型路由的通用保护 */
 export const rateLimiter = apiLimiter;
+
+// ==================== AI 多维度令牌桶限流（新增） ====================
+
+/**
+ * AI 专用多维度限流中间件
+ * 同时检查 user / ip / app 三个维度的令牌桶
+ * 返回 Header: X-RateLimit-Remaining, X-RateLimit-Reset
+ */
+export function aiTokenBucketLimiter(req, res, next) {
+  const userId = req.user?.id || null;
+  const ip = req.ip || req.connection?.remoteAddress?.replace(/^::ffff:/, '') || 'unknown';
+  const appId = req.headers['x-app-key'] || null;
+
+  import('../services/redisRateLimiterService.js').then(({ multiCheck }) => {
+    multiCheck(userId, ip, appId).then(result => {
+      res.setHeader('X-RateLimit-Remaining', result.remaining);
+
+      if (!result.allowed) {
+        res.setHeader('X-RateLimit-Reset', Math.ceil(Date.now() / 1000) + 60);
+        return error(res, 429, result.blockedReasons.join('; ') || '请求过于频繁，请稍后再试');
+      }
+
+      next();
+    }).catch(err => {
+      // 限流服务异常时放行（避免阻塞正常流量）
+      console.warn('[RateLimiter] TokenBucket check failed:', err.message);
+      next();
+    });
+  }).catch(() => next());
+}

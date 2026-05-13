@@ -85,24 +85,26 @@ publicRouter.get('/version/stream', (req, res) => {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
     Connection: 'keep-alive',
+    'X-Accel-Buffering': 'no', // 禁用 nginx 缓冲
   });
   res.write(`data: ${JSON.stringify({ version: i18nService.getI18nVersion() })}\n\n`);
+
+  // 心跳保活，防止 Express 30s 超时断开
+  const heartbeat = setInterval(() => res.write(': heartbeat\n\n'), 25000);
 
   const onVersion = (data) => res.write(`data: ${JSON.stringify(data)}\n\n`);
   import('../services/config-version.service.js').then(mod => {
     if (mod.versionEmitter) mod.versionEmitter.on('i18n-version', onVersion);
   }).catch(err => { logger.error('[i18n] SSE versionEmitter on', { error: err.message }); });
 
-  req.on('close', () => {
+  const cleanup = () => {
+    clearInterval(heartbeat);
     import('../services/config-version.service.js').then(mod => {
       if (mod.versionEmitter) mod.versionEmitter.off('i18n-version', onVersion);
     }).catch(err => { logger.error('[i18n] SSE versionEmitter off', { error: err.message }); });
-  });
-  res.on('error', () => {
-    import('../services/config-version.service.js').then(mod => {
-      if (mod.versionEmitter) mod.versionEmitter.off('i18n-version', onVersion);
-    }).catch(err => { logger.error('[i18n] SSE versionEmitter off', { error: err.message }); });
-  });
+  };
+  req.on('close', cleanup);
+  res.on('error', cleanup);
 });
 
 // ===================== 管理路由（需 adminAuth） =====================

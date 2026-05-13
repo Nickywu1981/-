@@ -9,12 +9,13 @@
  *  - route(params, ctx)             → 委托 modelRouter.routeModel()
  *
  * 生命周期钩子 (每一条路径都经过):
- *  pre-invoke  → 提取上下文 + 查定价 + [Phase2: 配额检查/预算冻结]
- *  invoke      → 委托执行引擎
- *  post-invoke → Token 归一化 + 成本计算 + 统一日志 + 聚合统计 + [Phase2: 扣费]
+ *  pre-invoke  → GEO检查 + PII脱敏 + 内容审核 + 定价查询 + 上下文窗口
+ *  invoke      → 委托执行引擎（超时控制 + 熔断降级）
+ *  post-invoke → Token 归一化 + 成本计算 + 输出审核 + 统一日志 + 聚合统计 + 长期记忆
  */
 import logger from '../utils/logger.js';
-import { infer, listModels } from '../services/aiEngine.js';
+import { CircuitBreaker } from '../utils/circuit-breaker.js';
+import { infer, listModels, getFallbackModel } from '../services/aiEngine.js';
 import { extractUsage, estimateTokens } from '../services/tokenMeteringService.js';
 import * as tokenPricingDao from '../dao/tokenPricingDao.js';
 import * as tokenStatsDao from '../dao/tokenStatsDao.js';
@@ -40,6 +41,36 @@ function normalizeContext(ctx) {
 
 function _genCorrelationId() {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+// ==================== 熔断器 + 超时 ====================
+
+const modelBreakers = new Map();
+const BREAKER_CONFIG = {
+  enabled: process.env.AI_CIRCUIT_BREAKER_ENABLED !== 'false',
+  failureThreshold: parseInt(process.env.AI_BREAKER_FAILURE_COUNT || '5', 10),
+  cooldownMs: parseInt(process.env.AI_BREAKER_COOLDOWN_MS || '60000', 10),
+  useErrorRate: true,
+  errorRateThreshold: parseFloat(process.env.AI_BREAKER_ERROR_RATE || '0.5'),
+  windowDuration: parseInt(process.env.AI_BREAKER_WINDOW_MS || '120000', 10),
+};
+
+const SINGLE_REQUEST_TIMEOUT = parseInt(process.env.AI_SINGLE_REQUEST_TIMEOUT_MS || '120000', 10);
+const TOTAL_TIMEOUT = parseInt(process.env.AI_TOTAL_TIMEOUT_MS || '300000', 10);
+const STREAMING_TIMEOUT = parseInt(process.env.AI_STREAMING_TIMEOUT_MS || '600000', 10);
+
+function getModelBreaker(modelId) {
+  if (!BREAKER_CONFIG.enabled) return null;
+  if (!modelBreakers.has(modelId)) {
+    modelBreakers.set(modelId, new CircuitBreaker(BREAKER_CONFIG));
+  }
+  return modelBreakers.get(modelId);
+}
+
+function timeoutPromise(ms, label) {
+  return new Promise((_, reject) =>
+    setTimeout(() => reject(new Error(`${label} 超时 (${ms}ms)`)), ms),
+  );
 }
 
 // ==================== Pre-invoke 安全检测 ====================
@@ -123,37 +154,33 @@ export async function gatewayInfer(modelId, input, ctx = {}) {
   const context = normalizeContext(ctx);
   const start = Date.now();
 
-  // GEO 规则检查 — 若模型在请求来源国被封禁则提前拒绝
-  let geoConstraints = null;
-  try {
-    const countryCode = ctx.countryCode || ctx.geo?.country || context.source?.geo?.country || null;
-    const platformCode = ctx.platformCode || ctx.taskType || null;
-    if (countryCode) {
-      const { evaluateRules } = await import('../services/geoRulesService.js');
-      geoConstraints = await evaluateRules(countryCode, platformCode);
-      if (geoConstraints?.blockedModels?.includes(modelId)) {
-        return {
-          modelId, output: null, elapsed: 0, retries: 0, degraded: false,
-          tokensIn: 0, tokensOut: 0, blocked: true,
-          blockReason: `Model ${modelId} is not available in your region`,
-          correlationId: context.correlationId,
-        };
-      }
-    }
-  } catch (e) {
-    logger.warn(`[Gateway] GEO evaluation failed: ${e.message}`);
-  }
-
   const pricing = await tokenPricingDao.getActiveByKey(modelId);
   const model = listModels().find((m) => m.id === modelId);
 
+  // ── Pre-invoke 安全检测 (GEO + PII脱敏 + 内容审核) ──
+  const security = await runPreInvokeSecurityChecks(modelId, input, {
+    ...context,
+    countryCode: ctx.countryCode || ctx.geo?.country || null,
+    platformCode: ctx.platformCode || ctx.taskType || null,
+  });
+  if (security.blocked) {
+    return {
+      modelId, output: null, elapsed: 0, retries: 0, degraded: false,
+      tokensIn: 0, tokensOut: 0, blocked: true,
+      blockReason: security.blockReason,
+      correlationId: context.correlationId,
+    };
+  }
+  const geoConstraints = security.geoConstraints;
+  const sanitizedInput = security.sanitizedInput;
+
   // ── 上下文窗口管理（Pre-invoke）──
   let cwResult = null;
-  if (ctx.enableContextWindow !== false && typeof input === 'string') {
+  if (ctx.enableContextWindow !== false && typeof sanitizedInput === 'string') {
     try {
       cwResult = await manageContextWindow({
         modelId,
-        userInput: input,
+        userInput: sanitizedInput,
         historyMessages: ctx.historyMessages || [],
         ragContent: ctx.ragContent || '',
         sessionId: ctx.sessionId,
@@ -168,13 +195,61 @@ export async function gatewayInfer(modelId, input, ctx = {}) {
     }
   }
 
-  let result, status = 'success', errorMsg = '';
+  let result, status = 'success', errorMsg = '', triedFallback = false;
+  const breaker = getModelBreaker(modelId);
+
   try {
-    result = await infer(modelId, input, { onProgress: ctx.onProgress, maxRetries: ctx.maxRetries, skipCache: ctx.skipCache });
+    // 熔断器检查
+    if (breaker && !breaker.isAvailable()) {
+      // 尝试降级模型
+      const fallbacks = getFallbackModel(modelId);
+      if (fallbacks.length > 0) {
+        logger.warn(`[Gateway] 模型 ${modelId} 已熔断，降级到 ${fallbacks[0]}`);
+        triedFallback = true;
+        result = await Promise.race([
+          infer(fallbacks[0], sanitizedInput, { onProgress: ctx.onProgress, maxRetries: 1, skipCache: true }),
+          timeoutPromise(TOTAL_TIMEOUT, '降级模型调用'),
+        ]);
+      } else {
+        throw new Error(`模型 ${modelId} 不可用且无可用降级模型，请稍后重试`);
+      }
+    } else {
+      // 正常调用（总超时兜底）
+      result = await Promise.race([
+        infer(modelId, sanitizedInput, { onProgress: ctx.onProgress, maxRetries: ctx.maxRetries, skipCache: ctx.skipCache }),
+        timeoutPromise(TOTAL_TIMEOUT, '模型调用'),
+      ]);
+    }
+
+    if (breaker) breaker.recordSuccess();
   } catch (err) {
     status = 'error';
     errorMsg = err.message;
-    result = { modelId, output: null, elapsed: Date.now() - start, retries: 0, degraded: false, tokensIn: 0, tokensOut: 0 };
+
+    if (breaker) breaker.recordFailure();
+
+    // 未降级过则尝试降级
+    if (!triedFallback) {
+      const fallbacks = getFallbackModel(modelId);
+      if (fallbacks.length > 0) {
+        try {
+          logger.warn(`[Gateway] 模型 ${modelId} 失败，降级到 ${fallbacks[0]}`);
+          result = await Promise.race([
+            infer(fallbacks[0], sanitizedInput, { onProgress: ctx.onProgress, maxRetries: 1, skipCache: true }),
+            timeoutPromise(TOTAL_TIMEOUT, '降级模型调用'),
+          ]);
+          status = 'success';
+          errorMsg = '';
+          triedFallback = true;
+        } catch (fallbackErr) {
+          errorMsg = `${err.message} | fallback: ${fallbackErr.message}`;
+        }
+      }
+    }
+
+    if (status === 'error') {
+      result = { modelId, output: null, elapsed: Date.now() - start, retries: 0, degraded: triedFallback, tokensIn: 0, tokensOut: 0 };
+    }
   }
 
   const tokensIn = result.tokensIn || 0;
@@ -201,7 +276,7 @@ export async function gatewayInfer(modelId, input, ctx = {}) {
 
   const latencyMs = result.elapsed || (Date.now() - start);
 
-  // 输出审核 — 替换硬编码 null
+  // 输出审核 — 后置过滤 + PII二次脱敏 + 高风险拦截
   let moderationResult = null;
   if (result.output && status === 'success') {
     try {
@@ -210,7 +285,19 @@ export async function gatewayInfer(modelId, input, ctx = {}) {
       const reviewLevel = geoConstraints?.reviewLevel || 5;
       const blockedTerms = geoConstraints?.outputConstraints?.forbiddenTerms || [];
       const requiredPatterns = geoConstraints?.outputConstraints?.requiredPatterns || null;
-      moderationResult = JSON.stringify(await moderateOutput(textOutput, { level: reviewLevel, blockedTerms, requiredPatterns }));
+      const enableAliyun = process.env.SECURITY_ALIYUN_GREEN_ENABLED === 'true';
+      const modResult = await moderateOutput(textOutput, { level: reviewLevel, blockedTerms, requiredPatterns, enableAliyun });
+      moderationResult = JSON.stringify(modResult);
+      // 应用脱敏后的输出
+      if (modResult.sanitizedOutput) {
+        result.output = modResult.sanitizedOutput;
+      }
+      // 高风险输出拦截
+      if (!modResult.passed && modResult.riskLevel === 'high') {
+        status = 'blocked';
+        errorMsg = '输出包含违规内容，已被拦截';
+        result.output = null;
+      }
     } catch (e) {
       logger.warn(`[Gateway] Moderation failed: ${e.message}`);
     }
@@ -279,21 +366,31 @@ export async function gatewayDispatch(dispatchReq, ctx = {}) {
   const start = Date.now();
   let result, status = 'success', errorMsg = '';
 
-  // GEO 规则检查
-  let geoConstraints = null;
-  try {
-    const countryCode = ctx.countryCode || ctx.geo?.country || null;
-    const platformCode = ctx.platformCode || ctx.taskType || null;
-    if (countryCode) {
-      const { evaluateRules } = await import('../services/geoRulesService.js');
-      geoConstraints = await evaluateRules(countryCode, platformCode);
-    }
-  } catch (e) {
-    logger.warn(`[Gateway] GEO evaluation failed: ${e.message}`);
+  // ── Pre-invoke 安全检测 ──
+  const dispatchModelId = dispatchReq?.modelId || dispatchReq?.candidates?.[0] || 'unknown';
+  const security = await runPreInvokeSecurityChecks(dispatchModelId, dispatchReq.input || dispatchReq, {
+    ...context,
+    countryCode: ctx.countryCode || ctx.geo?.country || null,
+    platformCode: ctx.platformCode || ctx.taskType || null,
+  });
+  if (security.blocked) {
+    return {
+      mode: dispatchReq.mode || 'auto', matchLog: [], selected: null, result: null,
+      elapsed: 0, degradationLog: [], blocked: true,
+      blockReason: security.blockReason,
+      correlationId: context.correlationId,
+    };
+  }
+  const geoConstraints = security.geoConstraints;
+
+  // 传入脱敏后的 input
+  const safeDispatchReq = { ...dispatchReq };
+  if (security.sanitizedInput !== dispatchReq.input) {
+    safeDispatchReq.input = security.sanitizedInput;
   }
 
   try {
-    result = await _dispatch(dispatchReq);
+    result = await _dispatch(safeDispatchReq);
   } catch (err) {
     status = 'error';
     errorMsg = err.message;
@@ -311,14 +408,26 @@ export async function gatewayDispatch(dispatchReq, ctx = {}) {
     ? await tokenPricingDao.calculateCost(modelId, tokensIn, tokensOut, 1)
     : { amount: 0, currency: 'CNY', pricingId: null, details: null };
 
-  // 输出审核
+  // 输出审核 — 后置过滤 + PII二次脱敏 + 高风险拦截
   let moderationResult = null;
   if (result?.result && status === 'success') {
     try {
       const { moderateOutput } = await import('../services/outputModerationService.js');
       const textOutput = typeof result.result === 'string' ? result.result : JSON.stringify(result.result);
       const reviewLevel = geoConstraints?.reviewLevel || 5;
-      moderationResult = JSON.stringify(await moderateOutput(textOutput, { level: reviewLevel }));
+      const blockedTerms = geoConstraints?.outputConstraints?.forbiddenTerms || [];
+      const requiredPatterns = geoConstraints?.outputConstraints?.requiredPatterns || null;
+      const enableAliyun = process.env.SECURITY_ALIYUN_GREEN_ENABLED === 'true';
+      const modResult = await moderateOutput(textOutput, { level: reviewLevel, blockedTerms, requiredPatterns, enableAliyun });
+      moderationResult = JSON.stringify(modResult);
+      if (modResult.sanitizedOutput) {
+        result.result = modResult.sanitizedOutput;
+      }
+      if (!modResult.passed && modResult.riskLevel === 'high') {
+        status = 'blocked';
+        errorMsg = '输出包含违规内容，已被拦截';
+        result.result = null;
+      }
     } catch (e) {
       logger.warn(`[Gateway] Moderation failed: ${e.message}`);
     }
@@ -358,24 +467,33 @@ export async function gatewayRoute(params, ctx = {}) {
   const context = normalizeContext(ctx);
   const start = Date.now();
 
-  // GEO 规则检查
-  let geoConstraints = null;
-  try {
-    const countryCode = ctx.countryCode || ctx.geo?.country || null;
-    const platformCode = ctx.platformCode || ctx.taskType || null;
-    if (countryCode) {
-      const { evaluateRules } = await import('../services/geoRulesService.js');
-      geoConstraints = await evaluateRules(countryCode, platformCode);
-    }
-  } catch (e) {
-    logger.warn(`[Gateway] GEO evaluation failed: ${e.message}`);
+  // ── Pre-invoke 安全检测 ──
+  const routeModelId = params?.modelKey || 'unknown';
+  const routeInput = params?.params || params;
+  const security = await runPreInvokeSecurityChecks(routeModelId, routeInput, {
+    ...context,
+    countryCode: ctx.countryCode || ctx.geo?.country || null,
+    platformCode: ctx.platformCode || ctx.taskType || null,
+  });
+  if (security.blocked) {
+    return {
+      blocked: true, blockReason: security.blockReason,
+      tokensIn: 0, tokensOut: 0, cost: { amount: 0, currency: 'CNY' },
+      correlationId: context.correlationId,
+    };
   }
+  const geoConstraints = security.geoConstraints;
+
+  // 传入脱敏后的 params
+  const safeParams = security.sanitizedInput !== routeInput
+    ? { ...params, params: security.sanitizedInput }
+    : params;
 
   const router = _modelRouter;
   let result, status = 'success', errorMsg = '';
 
   try {
-    result = await router.routeModel(params);
+    result = await router.routeModel(safeParams);
   } catch (err) {
     status = 'error';
     errorMsg = err.message;
@@ -392,14 +510,28 @@ export async function gatewayRoute(params, ctx = {}) {
     ? await tokenPricingDao.calculateCost(modelKey, tokensIn, tokensOut, 1)
     : { amount: 0, currency: 'CNY', pricingId: null, details: null };
 
-  // 输出审核
+  // 输出审核 — 后置过滤 + PII二次脱敏 + 高风险拦截
   let moderationResult = null;
   if (result?.response && status === 'success') {
     try {
       const { moderateOutput } = await import('../services/outputModerationService.js');
       const textOutput = result.response?.choices?.[0]?.message?.content || JSON.stringify(result.response);
       const reviewLevel = geoConstraints?.reviewLevel || 5;
-      moderationResult = JSON.stringify(await moderateOutput(textOutput, { level: reviewLevel }));
+      const blockedTerms = geoConstraints?.outputConstraints?.forbiddenTerms || [];
+      const requiredPatterns = geoConstraints?.outputConstraints?.requiredPatterns || null;
+      const enableAliyun = process.env.SECURITY_ALIYUN_GREEN_ENABLED === 'true';
+      const modResult = await moderateOutput(textOutput, { level: reviewLevel, blockedTerms, requiredPatterns, enableAliyun });
+      moderationResult = JSON.stringify(modResult);
+      if (modResult.sanitizedOutput) {
+        if (result.response?.choices?.[0]?.message) {
+          result.response.choices[0].message.content = modResult.sanitizedOutput;
+        }
+      }
+      if (!modResult.passed && modResult.riskLevel === 'high') {
+        status = 'blocked';
+        errorMsg = '输出包含违规内容，已被拦截';
+        result.response = null;
+      }
     } catch (e) {
       logger.warn(`[Gateway] Moderation failed: ${e.message}`);
     }

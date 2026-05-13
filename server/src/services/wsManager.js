@@ -1,9 +1,15 @@
 import { WebSocketServer } from 'ws';
 import { parse } from 'url';
 import jwt from 'jsonwebtoken';
+import { z } from 'zod';
 import config from '../config/index.js';
 import logger from '../utils/logger.js';
 import { isTokenBlacklisted } from '../utils/jwtToken.js';
+
+const wsMessageSchema = z.discriminatedUnion('type', [
+  z.object({ type: z.literal('subscribe_task'), taskId: z.string().min(1).max(64) }),
+  z.object({ type: z.literal('unsubscribe_task'), taskId: z.string().min(1).max(64) }),
+]);
 
 const JWT_SECRET = config.jwt.secret;
 
@@ -48,7 +54,19 @@ class WsManager {
     if (this.wss) {
       this.wss.close();
     }
-    this.wss = new WebSocketServer({ server, path: '/ws', maxPayload: 64 * 1024 });
+    this.wss = new WebSocketServer({
+      server,
+      path: '/ws',
+      maxPayload: 64 * 1024,
+      verifyClient: ({ origin, req }) => {
+        // CSWSH 防护 — 仅允许已配置的 Origin
+        if (!origin || origin === 'null') return true; // 非浏览器客户端允许
+        const allowed = (process.env.CORS_ORIGIN || 'http://localhost:3000').split(',').map(s => s.trim());
+        const ok = allowed.some(o => origin === o || origin.startsWith(o));
+        if (!ok) logger.warn('[WS] 拒绝跨源连接', { origin });
+        return ok;
+      },
+    });
 
     // 心跳检测：可通过 WS_HEARTBEAT_MS 配置间隔
     const heartbeatMs = config.ws?.heartbeatIntervalMs || 30000;
@@ -138,12 +156,16 @@ class WsManager {
     });
   }
 
-  _handle(socket, msg) {
+  _handle(socket, rawMsg) {
+    let msg;
+    try { msg = wsMessageSchema.parse(rawMsg); }
+    catch (e) {
+      socket.send(JSON.stringify({ type: 'error', message: '无效消息格式', details: e instanceof z.ZodError ? e.issues : undefined }));
+      return;
+    }
     const userId = this.socketUsers.get(socket);
     switch (msg.type) {
       case 'subscribe_task': {
-        if (!msg.taskId) break;
-        // Enforce task ownership: only the task owner can subscribe
         const owner = this.taskOwners.get(msg.taskId);
         if (owner && owner !== userId) {
           socket.send(JSON.stringify({ type: 'error', message: '无权订阅此任务' }));
@@ -155,7 +177,6 @@ class WsManager {
         break;
       }
       case 'unsubscribe_task': {
-        if (!msg.taskId) break;
         const room = this.taskRooms.get(msg.taskId);
         if (room) {
           room.delete(socket);

@@ -133,7 +133,7 @@ export const _cacheCleanupTimer = setInterval(() => {
 export async function infer(modelId, input, options = {}) {
   const { onProgress, maxRetries = INFER_CONFIG.maxRetries, skipCache = false } = options;
 
-  // 缓存检查
+  // 精确匹配缓存检查
   if (INFER_CONFIG.enableCache && !skipCache) {
     const cacheKey = `${modelId}:${JSON.stringify(input)}`;
     const cached = inferenceCache.get(cacheKey);
@@ -141,6 +141,20 @@ export async function infer(modelId, input, options = {}) {
       onProgress?.(100);
       return { ...cached.result, fromCache: true };
     }
+  }
+
+  // 语义相似度缓存检查（仅文本类模型）
+  if (INFER_CONFIG.enableCache && !skipCache && typeof input === 'string') {
+    try {
+      const { getSemantic, recordHit, recordMiss } = await import('./semanticCacheService.js');
+      const semanticCached = await getSemantic(modelId, input);
+      if (semanticCached) {
+        recordHit(true);
+        onProgress?.(100);
+        return { ...semanticCached, fromCache: true, fromSemanticCache: true };
+      }
+      recordMiss();
+    } catch { /* semantic cache unavailable */ }
   }
 
   const startTime = Date.now();
@@ -197,6 +211,12 @@ export async function infer(modelId, input, options = {}) {
             if (v.timestamp < oldestTs) { oldestTs = v.timestamp; oldestKey = k; }
           }
           if (oldestKey) inferenceCache.delete(oldestKey);
+        }
+        // 语义缓存存储（文本类模型）
+        if (typeof input === 'string') {
+          import('./semanticCacheService.js').then(({ setSemantic }) => {
+            setSemantic(modelId, input, output).catch(() => {});
+          }).catch(() => {});
         }
       }
 

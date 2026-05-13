@@ -36,6 +36,9 @@ export async function submitBatchTask(userId, { imageUrls, operation, platform, 
 
   if (nightMode) return { taskId, nightMode: true, estimatedCost: calcCost(action, batchSize, discountMultiplier, batchMultiplier) };
 
+  // 注册任务归属，防止其他用户通过 WebSocket 订阅他人任务
+  wsManager.registerTaskOwner(taskId, userId);
+
   setImmediate(() => processBatch(taskId, userId).catch(err =>
     logger.error('[Batch] setImmediate error:', err.message)
   ));

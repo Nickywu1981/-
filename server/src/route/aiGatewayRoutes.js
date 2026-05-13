@@ -6,10 +6,14 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { authMiddleware } from '../middleware/auth.js';
 import { aiConcurrencyGuard } from '../middleware/rateLimiter.js';
+import { signatureMiddleware } from '../middleware/signature.middleware.js';
 import { validate } from '../utils/validate.js';
 import { aiGatewayController } from '../controller/aiGatewayController.js';
 
 const router = Router();
+
+// 可选签名校验 — 通过环境变量 SECURITY_SIGNATURE_REQUIRED=true 启用
+const signatureGuard = signatureMiddleware;
 
 const inferBodySchema = z.object({
   modelId: z.string().min(1, 'modelId 必填').max(50),
@@ -37,10 +41,10 @@ const routeBodySchema = z.object({
   source: z.enum(['consumer', 'enterprise', 'agent', 'open_api', 'internal']).optional(),
 }).passthrough();
 
-router.post('/infer', authMiddleware, aiConcurrencyGuard, validate(inferBodySchema), aiGatewayController.infer);
-router.post('/dispatch', authMiddleware, aiConcurrencyGuard, validate(dispatchBodySchema), aiGatewayController.dispatch);
-router.post('/route', authMiddleware, aiConcurrencyGuard, validate(routeBodySchema), aiGatewayController.route);
-router.get('/stats/tokens', authMiddleware, aiGatewayController.statsTokens);
-router.get('/pricing', authMiddleware, aiGatewayController.pricing);
+router.post('/infer', authMiddleware, signatureGuard, aiConcurrencyGuard, validate(inferBodySchema), aiGatewayController.infer);
+router.post('/dispatch', authMiddleware, signatureGuard, aiConcurrencyGuard, validate(dispatchBodySchema), aiGatewayController.dispatch);
+router.post('/route', authMiddleware, signatureGuard, aiConcurrencyGuard, validate(routeBodySchema), aiGatewayController.route);
+router.get('/stats/tokens', authMiddleware, signatureGuard, aiGatewayController.statsTokens);
+router.get('/pricing', authMiddleware, signatureGuard, aiGatewayController.pricing);
 
 export default router;
