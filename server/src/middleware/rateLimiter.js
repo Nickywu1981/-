@@ -8,6 +8,7 @@ import rateLimit from 'express-rate-limit';
 import { error } from '../utils/response.js';
 import { rateLimitConfig } from '../config/index.js';
 import logger from '../utils/logger.js';
+import { RedisRateLimitStore } from './redisRateLimitStore.js';
 
 const windowMs = rateLimitConfig.windowMs;
 const max = rateLimitConfig.max;
@@ -83,6 +84,7 @@ export const apiLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   validate: { xForwardedForHeader: false },
+  store: new RedisRateLimitStore(windowMs),
   message: { code: 429, msg: '请求过于频繁，请稍后再试', data: null },
 });
 
@@ -93,6 +95,7 @@ export const authLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   validate: { xForwardedForHeader: false },
+  store: new RedisRateLimitStore(60000),
   message: { code: 429, msg: '操作过于频繁，请1分钟后再试', data: null },
 });
 
@@ -103,6 +106,7 @@ export const codeLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   validate: { xForwardedForHeader: false },
+  store: new RedisRateLimitStore(60000),
   message: { code: 429, msg: '验证码已发送，请60秒后再试', data: null },
 });
 
@@ -115,6 +119,7 @@ export const verifyLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   validate: { xForwardedForHeader: false },
+  store: new RedisRateLimitStore(60000),
   message: { code: 429, msg: '验证次数过多，请60秒后再试', data: null },
 });
 
@@ -125,6 +130,7 @@ export const heavyLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   validate: { xForwardedForHeader: false },
+  store: new RedisRateLimitStore(60000),
   message: { code: 429, msg: 'AI生成请求过于频繁，请稍后再试', data: null },
 });
 
@@ -135,6 +141,7 @@ export const uploadLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   validate: { xForwardedForHeader: false },
+  store: new RedisRateLimitStore(60000),
   message: { code: 429, msg: '上传请求过于频繁，请稍后再试', data: null },
 });
 
@@ -145,6 +152,7 @@ export const paymentLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   validate: { xForwardedForHeader: false },
+  store: new RedisRateLimitStore(60000),
   message: { code: 429, msg: '支付请求过于频繁，请稍后再试', data: null },
 });
 
@@ -155,6 +163,7 @@ export const adminLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   validate: { xForwardedForHeader: false },
+  store: new RedisRateLimitStore(60000),
   message: { code: 429, msg: '管理操作过于频繁，请稍后再试', data: null },
 });
 
