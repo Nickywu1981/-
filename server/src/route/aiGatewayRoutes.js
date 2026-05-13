@@ -65,4 +65,13 @@ router.post('/stream/infer', authMiddleware, signatureGuard, aiConcurrencyGuard,
 router.post('/pipeline/wrap', authMiddleware, signatureGuard, aiGatewayController.pipelineWrap);
 router.post('/pipeline/compliance', authMiddleware, signatureGuard, aiGatewayController.pipelineCompliance);
 
+// ── 全自动编排 ──
+router.post('/pipeline/orchestrate', authMiddleware, signatureGuard, aiConcurrencyGuard, aiGatewayController.pipelineOrchestrate);
+router.post('/pipeline/resume', authMiddleware, signatureGuard, aiGatewayController.pipelineResume);
+
+// ── 人工微调 ──
+router.post('/pipeline/adjust', authMiddleware, signatureGuard, aiGatewayController.pipelineAdjust);
+router.post('/pipeline/regenerate', authMiddleware, signatureGuard, aiConcurrencyGuard, aiGatewayController.pipelineRegenerate);
+router.post('/pipeline/reference', authMiddleware, signatureGuard, aiGatewayController.pipelineUploadReference);
+
 export default router;

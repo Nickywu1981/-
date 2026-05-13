@@ -15,6 +15,7 @@ import { sanitizePII } from '../services/inputSanitizerService.js';
 import { getTraceContext } from '../services/traceService.js';
 import { wrapPrompt, quickComplianceCheck } from '../services/promptWrapper.js';
 import { checkCompliance } from '../services/adComplianceEngine.js';
+import { orchestrate, resumeOrchestration } from '../services/pipelineOrchestrator.js';
 import logger from '../utils/logger.js';
 
 export const aiGatewayController = {
@@ -238,5 +239,88 @@ export const aiGatewayController = {
       industry: industry || null,
     });
     return { code: 200, data: result };
+  }),
+
+  // ── 全自动编排 ──
+  pipelineOrchestrate: wrapController(async (req) => {
+    const { input, platform, industry, brandTone, productName, sellingPoints, specs, audioConfig, shotCount, duration, chain, pausePoints, overrides } = req.body;
+    if (!input) {
+      return { code: 400, message: 'input 必填（图片URL/视频URL/文字/对象）' };
+    }
+    const result = await orchestrate({
+      input,
+      platform: platform || 'taobao',
+      industry: industry || null,
+      brandTone: brandTone || null,
+      productName: productName || null,
+      sellingPoints: sellingPoints || [],
+      specs: specs || {},
+      audioConfig: audioConfig || {},
+      shotCount: shotCount || 6,
+      duration: duration || 30,
+      chain: chain || null,
+      pausePoints: pausePoints || null,
+      overrides: overrides || {},
+      ctx: {
+        userId: req.user?.id,
+        tenantId: req.tenantId,
+        source: 'orchestrator',
+        sourceChain: 'orchestrator',
+      },
+    });
+    return { code: result.summary?.success ? 200 : 206, data: result };
+  }),
+
+  pipelineResume: wrapController(async (req) => {
+    const { chainState, resumeFrom, overrides } = req.body;
+    if (!chainState || !resumeFrom) {
+      return { code: 400, message: 'chainState 和 resumeFrom 必填' };
+    }
+    const result = await resumeOrchestration(chainState, resumeFrom, overrides || {}, {
+      userId: req.user?.id,
+      tenantId: req.tenantId,
+      source: 'orchestrator',
+      sourceChain: 'orchestrator',
+    });
+    return { code: result.summary?.success ? 200 : 206, data: result };
+  }),
+
+  // ── 人工微调接口 ──
+  pipelineAdjust: wrapController(async (req) => {
+    const { chainId, stepId, adjustments } = req.body;
+    if (!chainId || !stepId || !adjustments) {
+      return { code: 400, message: 'chainId、stepId、adjustments 必填' };
+    }
+    logger.info(`[Pipeline] manual adjustment: chain=${chainId} step=${stepId}`, adjustments);
+    return {
+      code: 200,
+      data: { chainId, stepId, status: 'adjusted', adjustments, timestamp: new Date().toISOString() },
+    };
+  }),
+
+  pipelineRegenerate: wrapController(async (req) => {
+    const { chainState, stepId, overrides } = req.body;
+    if (!chainState || !stepId) {
+      return { code: 400, message: 'chainState 和 stepId 必填' };
+    }
+    const result = await resumeOrchestration(chainState, stepId, overrides || {}, {
+      userId: req.user?.id,
+      tenantId: req.tenantId,
+      source: 'orchestrator',
+      sourceChain: 'orchestrator',
+    });
+    return { code: 200, data: result };
+  }),
+
+  pipelineUploadReference: wrapController(async (req) => {
+    const { referenceUrl, referenceType, chainId } = req.body;
+    if (!referenceUrl) {
+      return { code: 400, message: 'referenceUrl 必填' };
+    }
+    logger.info(`[Pipeline] reference uploaded: chain=${chainId} type=${referenceType} url=${referenceUrl}`);
+    return {
+      code: 200,
+      data: { chainId, referenceUrl, referenceType: referenceType || 'auto', status: 'received', timestamp: new Date().toISOString() },
+    };
   }),
 };

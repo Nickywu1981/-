@@ -30,6 +30,7 @@ import { getTraceContext } from '../services/traceService.js';
 import { buildErrorResponse, postProcessOutput } from '../services/outputPostProcessor.js';
 import { registerBuiltinHooks, runPreHooks, runPostHooks } from '../services/hookRegistryService.js';
 import { wrapPrompt } from '../services/promptWrapper.js';
+import { blockDirectVideoGeneration } from '../services/pipelineOrchestrator.js';
 import { aiGatewayConfig, securityConfig, ecommercePipelineConfig } from '../config/index.js';
 
 // 钩子注册中心开关
@@ -119,6 +120,15 @@ async function runBusinessPipeline(input, ctx = {}) {
         blockReason: wrapResult.blockReason || '内容不符合平台合规要求',
         wrapResult,
       };
+    }
+
+    // 视频直生成阻断：无分镜表则拒绝
+    const intentId = wrapResult.intent?.intentId;
+    if (intentId) {
+      const videoBlock = blockDirectVideoGeneration(intentId, ctx);
+      if (videoBlock.blocked) {
+        return { blocked: true, blockReason: videoBlock.reason, wrapResult };
+      }
     }
 
     return { blocked: false, wrapResult };
