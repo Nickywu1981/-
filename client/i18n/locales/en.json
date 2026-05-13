@@ -5380,7 +5380,12 @@
     "recognizing": "Recognizing...",
     "start_recognize": "Start Recognition",
     "category": "Category",
-    "features_hint": "One key feature per line"
+    "features_hint": "One key feature per line",
+    "hint": "Upload a reference image, AI will identify product info",
+    "name_label": "Product name & category (editable)",
+    "features_label": "Key features (editable, one per line)",
+    "confirm_label": "Confirm & Apply",
+    "toggle_label": "+ Smart Recognize"
   },
   "lang": {
     "switch": "Switch Language"

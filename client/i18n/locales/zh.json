@@ -5343,7 +5343,12 @@
     "recognizing": "识别中...",
     "start_recognize": "开始识别",
     "category": "品类",
-    "features_hint": "每行一个核心特征"
+    "features_hint": "每行一个核心特征",
+    "hint": "上传参考图，AI将自动识别商品信息",
+    "name_label": "商品名称与品类（可编辑）",
+    "features_label": "核心特征（可编辑，每行一个）",
+    "confirm_label": "确认并应用",
+    "toggle_label": "+ 智能识别"
   },
   "lang": {
     "switch": "切换语言"

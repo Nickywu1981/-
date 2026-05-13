@@ -155,16 +155,15 @@ export async function submitToOfficial(userId, templateId) {
 export async function adminBatchMarkTemplates(ids, marking, action) {
   if (!['default', 'hot', 'featured'].includes(marking)) throw new BusinessError(400, '标记类型无效');
 
-  for (const id of ids) {
-    const t = await promptDao.getTemplateById(id);
-    if (!t) continue;
+  const templates = await promptDao.getTemplatesByIds(ids);
+  for (const t of templates) {
     const tags = (t.tags || '').split(',').map(s => s.trim()).filter(Boolean);
     const updated = action === 'add'
       ? [...new Set([...tags, marking])]
       : tags.filter(tag => tag !== marking);
-    await promptDao.updateTemplate(id, { tags: updated.join(',') });
+    await promptDao.updateTemplate(t.id, { tags: updated.join(',') });
   }
-  return { affected: ids.length };
+  return { affected: templates.length };
 }
 
 /** 审核队列：列出 status=1 的待审模板 */

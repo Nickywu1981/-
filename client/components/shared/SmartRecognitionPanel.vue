@@ -5,7 +5,7 @@
 <template>
   <div class="smart-panel">
     <div v-if="!collapsed" class="smart-body">
-      <p class="hint">{{ hint }}</p>
+      <p class="hint">{{ _hint }}</p>
       <slot name="upload" :onUpload="onUpload">
         <AppMediaUpload accept="image" :multiple="false" :max-size="20" :max-count="1" @uploaded="onUpload" />
       </slot>
@@ -19,7 +19,7 @@
 
       <div v-if="result" class="smart-result">
         <div class="input-group">
-	          <label>{{ nameLabel }}</label>
+	          <label>{{ _nameLabel }}</label>
           <input v-model="result.productName" type="text" class="input" maxlength="200" />
         </div>
         <div class="input-group">
@@ -29,14 +29,14 @@
           </select>
         </div>
         <div class="input-group">
-          <label>{{ featuresLabel }}</label>
+          <label>{{ _featuresLabel }}</label>
 	          <textarea v-model="featuresText" class="input" rows="4" maxlength="2000" :placeholder="$t('smart_recognition.features_hint')" />
         </div>
 
         <slot name="extra-options" :result="result" :features="featuresText" />
 
         <button class="btn btn-primary btn-lg" style="margin-top:12px" :disabled="!submitReady" @click="onConfirm">
-          {{ confirmLabel }}
+          {{ _confirmLabel }}
         </button>
       </div>
 
@@ -44,7 +44,7 @@
     </div>
 
     <button v-else class="btn btn-secondary btn-sm" @click="collapsed = false">
-      {{ toggleLabel }}
+      {{ _toggleLabel }}
     </button>
   </div>
 </template>
@@ -58,22 +58,29 @@ const props = withDefaults(defineProps<{
   confirmLabel?: string
   toggleLabel?: string
 }>(), {
-	  hint: 'Upload a reference image, AI will identify product info',
-	  nameLabel: 'Product name & category (editable)',
-	  featuresLabel: 'Key features (editable, one per line)',
-	  confirmLabel: 'Confirm & Apply',
-	  toggleLabel: '+ Smart Recognize',
+  hint: '',
+  nameLabel: '',
+  featuresLabel: '',
+  confirmLabel: '',
+  toggleLabel: '',
 })
 
 const emit = defineEmits<{
   confirm: [info: { productName: string; category: string; features: string[]; refUrl: string }]
 }>()
 
+const { t } = useI18n()
 const { refUrl, loading, error, result, featuresText, setRefImage, extract, reset } = useSmartRecognition()
 const collapsed = ref(true)
 const submitReady = computed(() => !!(result.value?.productName && featuresText.value.trim()))
 
-	const CATEGORIES = ['Womenswear', 'Menswear', 'Shoes', 'Bags', 'Beauty', 'Electronics', 'Home', 'Food', 'Sports', 'Baby', 'Jewelry', 'Auto', 'Other' ]
+const _hint = computed(() => props.hint || t('smart_recognition.hint'))
+const _nameLabel = computed(() => props.nameLabel || t('smart_recognition.name_label'))
+const _featuresLabel = computed(() => props.featuresLabel || t('smart_recognition.features_label'))
+const _confirmLabel = computed(() => props.confirmLabel || t('smart_recognition.confirm_label'))
+const _toggleLabel = computed(() => props.toggleLabel || t('smart_recognition.toggle_label'))
+
+const CATEGORIES = ['Womenswear', 'Menswear', 'Shoes', 'Bags', 'Beauty', 'Electronics', 'Home', 'Food', 'Sports', 'Baby', 'Jewelry', 'Auto', 'Other' ]
 
 function onUpload(files: any[]) {
   if (files.length > 0) { setRefImage(files[0].url); collapsed.value = false }

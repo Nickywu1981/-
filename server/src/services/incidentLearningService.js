@@ -123,7 +123,11 @@ const EVOLUTION_THRESHOLDS = {
   L3: { nextLevel: 'L3+', activationCount: 10, successRate: 0.85, totalCount: 50 },
 };
 
+const _evolvingStrategies = new Set(); // per-strategy lock to prevent race
+
 export async function evolveStrategy(strategyId) {
+  if (_evolvingStrategies.has(strategyId)) return { evolved: false, reason: 'Already being evolved' };
+  _evolvingStrategies.add(strategyId);
   try {
     const strategy = await dao.getStrategy(strategyId);
     if (!strategy) return null;
@@ -176,6 +180,8 @@ export async function evolveStrategy(strategyId) {
   } catch (err) {
     logger.error('[IncidentLearning] Evolve strategy failed:', err.message);
     return null;
+  } finally {
+    _evolvingStrategies.delete(strategyId);
   }
 }
 

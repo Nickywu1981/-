@@ -23,6 +23,8 @@ const _managedThresholds = {
   earlyWarningErrorRate: { value: 0.05, baseline: null, updatedAt: null },
 };
 
+let _driftLock = false;
+
 // ==================== 统计工具 ====================
 
 function percentile(sorted, p) {
@@ -118,8 +120,11 @@ export function setThreshold(key, value) {
 // ==================== 漂移检测与自动采纳 ====================
 
 export async function detectAndApplyDrift() {
-  const baseline = await learnBaseline(7);
-  if (!baseline) return null;
+  if (_driftLock) return null;
+  _driftLock = true;
+  try {
+    const baseline = await learnBaseline(7);
+    if (!baseline) return null;
 
   const changes = [];
 
@@ -154,6 +159,9 @@ export async function detectAndApplyDrift() {
   }
 
   return { changes, baseline };
+  } finally {
+    _driftLock = false;
+  }
 }
 
 // ==================== 异常检测 ====================

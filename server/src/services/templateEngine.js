@@ -56,12 +56,21 @@ let _cacheLastFullLoad = 0;
 
 async function _loadAllFromDb() {
   try {
-    const { list } = await promptDao.listTemplates({ status: 2, page: 1, pageSize: 200 });
-    for (const row of list) {
-      _templateCache.set(row.template_code, row);
+    _templateCache.clear();
+    let page = 1;
+    const pageSize = 200;
+    let totalLoaded = 0;
+    while (true) {
+      const { list, total } = await promptDao.listTemplates({ status: 2, page, pageSize });
+      for (const row of list) {
+        _templateCache.set(row.template_code, row);
+      }
+      totalLoaded += list.length;
+      if (list.length < pageSize || totalLoaded >= total) break;
+      page++;
     }
     _cacheLastFullLoad = Date.now();
-    logger.info(`[TemplateEngine] Loaded ${list.length} templates from DB`);
+    logger.info(`[TemplateEngine] Loaded ${totalLoaded} templates from DB`);
   } catch (e) {
     logger.warn('[TemplateEngine] Failed to load templates from DB, using hardcoded fallback', e.message);
   }

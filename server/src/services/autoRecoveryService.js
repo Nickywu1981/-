@@ -318,6 +318,12 @@ async function _detectEarlyWarning() {
       }
     }
 
+    // 清理已移除模型的预警状态
+    const currentIds = new Set(breakdown.map(m => m.modelId).filter(Boolean));
+    for (const key of _earlyWarningState.keys()) {
+      if (!currentIds.has(key)) _earlyWarningState.delete(key);
+    }
+
     // DB 连接池排队检测
     try {
       const { getPoolMetrics } = await import('../dao/db.js');
@@ -376,7 +382,7 @@ async function _predictiveHealing() {
       _ewmaState.set(model.modelId, { ewmaLatency, ewmaErrorRate });
 
       // 预测 5 分钟后故障概率
-      const trendLatency = (ewmaLatency - prev.ewmaLatency) / prev.ewmaLatency;
+      const trendLatency = prev.ewmaLatency > 0 ? (ewmaLatency - prev.ewmaLatency) / prev.ewmaLatency : 0;
       const trendError = ewmaErrorRate - prev.ewmaErrorRate;
       const failureProbability = Math.min(1, Math.max(0,
         (ewmaErrorRate * 0.5) + (ewmaLatency > 3000 ? 0.3 : 0) + (trendLatency > 0.1 ? 0.2 : 0) + (trendError > 0.05 ? 0.2 : 0)
@@ -404,6 +410,12 @@ async function _predictiveHealing() {
           }
         } catch (e) { logger.debug('[AutoRecovery] early-warning weight reduce failed', { error: e.message }); }
       }
+    }
+
+    // 清理已移除模型的 EWMA 状态
+    const currentIds = new Set(breakdown.map(m => m.modelId).filter(Boolean));
+    for (const key of _ewmaState.keys()) {
+      if (!currentIds.has(key)) _ewmaState.delete(key);
     }
   } catch (e) { logger.warn('[AutoRecovery] Predictive healing failed', { error: e.message }); }
 }

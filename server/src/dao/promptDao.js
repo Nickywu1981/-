@@ -30,6 +30,16 @@ export async function getTemplateById(id) {
   return rows[0] || null;
 }
 
+export async function getTemplatesByIds(ids) {
+  if (!ids || !ids.length) return [];
+  const placeholders = ids.map(() => '?').join(',');
+  const [rows] = await pool.query(
+    `SELECT * FROM prompt_template WHERE id IN (${placeholders})`,
+    ids,
+  );
+  return rows;
+}
+
 export async function getTemplateByCode(code) {
   const [rows] = await pool.execute('SELECT * FROM prompt_template WHERE template_code = ? LIMIT 1', [code]);
   return rows[0] || null;
