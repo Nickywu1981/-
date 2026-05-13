@@ -76,7 +76,7 @@ async function parseToken(header) {
     if (err.name === 'TokenExpiredError') {
       return { payload: null, expired: true };
     }
-    if (process.env.NODE_ENV !== 'production') {
+    if (!isProduction) {
       logger.warn('[Auth] JWT 解析异常', { message: err.message, name: err.name });
     }
     return { payload: null, expired: false };

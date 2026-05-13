@@ -5,9 +5,11 @@
  * - X-Frame-Options: DENY
  * - Referrer-Policy: strict-origin-when-cross-origin
  */
+import { isProduction } from '../config/index.js';
+
 export default function cspMiddleware(req, res, next) {
   // Strict-Transport-Security (生产环境无条件设置，开发/测试仅 HTTPS)
-  if (process.env.NODE_ENV === 'production' || req.secure || req.headers['x-forwarded-proto'] === 'https') {
+  if (isProduction || req.secure || req.headers['x-forwarded-proto'] === 'https') {
     res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   }
   // Content-Security-Policy

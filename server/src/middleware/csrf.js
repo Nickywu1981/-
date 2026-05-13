@@ -9,6 +9,7 @@ import crypto from 'crypto';
 import { error as sendError } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { cookieSecure } from '../utils/cookieHelper.js';
+import { isProduction } from '../config/index.js';
 
 // CSRF Token 有效期（30分钟）
 const TOKEN_TTL = 30 * 60 * 1000;
