@@ -47,7 +47,7 @@ export async function call(endpoint, apiKey, params, options = {}) {
 
       if (!response.ok) {
         const errorBody = await response.text();
-        logger.warn(`[${modelName || 'AI'}] upstream error`, { status: response.status, error: errorBody.substring(0, 200) });
+        logger.error(`[${modelName || 'AI'}] upstream error`, { status: response.status, error: errorBody.substring(0, 200) });
         throw new BusinessError(502, 'AI 服务暂时不可用，请稍后重试');
       }
 

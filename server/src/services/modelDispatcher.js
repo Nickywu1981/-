@@ -30,7 +30,7 @@ async function ensureModels() {
     const { registerAllAdapters } = await import('./adapters/index.js');
     registerAllAdapters();
   } catch (e) {
-    logger.warn('[ModelDispatcher] 无法自动注册 Adapter:', e.message);
+    logger.error('[ModelDispatcher] 无法自动注册 Adapter:', e.message);
   }
   _modelsReady = true;
 }

@@ -60,7 +60,7 @@ export const listMyJobs = wrapController(async (req, res) => {
   const uid = req.user?.id;
   if (!uid) throw new BusinessError(ERROR_CODE.UNAUTHORIZED, '请先登录');
   const result = await wfService.listJobs(uid, { page: Number(page), pageSize: Number(pageSize) });
-  return listResult(res, result.list, result.total, result.page, result.pageSize);
+  return listResult(res, result);
 });
 
 export const cancelJob = wrapController(async (req, res) => {

@@ -115,7 +115,7 @@ async function health() {
     });
     return { status: res.ok ? 'ok' : 'error', provider: 'anthropic' };
   } catch (err) {
-    logger.warn('[ClaudeAdapter] 健康检查失败', { error: err.message });
+    logger.error('[ClaudeAdapter] 健康检查失败', { error: err.message });
     return { status: 'unavailable', provider: 'anthropic' };
   }
 }

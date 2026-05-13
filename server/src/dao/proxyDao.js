@@ -92,7 +92,7 @@ export default {
 
   async checkWhitelist(tenantId, url) {
     let hostname;
-    try { hostname = new URL(url).hostname; } catch { return []; }
+    try { hostname = new URL(url).hostname; } catch { logger.warn('[Proxy] 白名单检测 URL 解析失败', { url: String(url).substring(0, 100) }); return []; }
     const [rows] = await pool.query(
       `SELECT id FROM api_proxy_whitelist
        WHERE (tenant_id = 0 OR tenant_id = ?) AND status = 1

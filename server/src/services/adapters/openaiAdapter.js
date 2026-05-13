@@ -136,7 +136,7 @@ function makeTextStreamInfer(modelId, maxTokens = 2000, timeout = 300000) {
     } finally {
       reader.releaseLock();
       if (malformedChunksDiscarded > 0) {
-        logger.warn('[OpenAI] SSE 流中丢弃畸形 chunk', {
+        logger.error('[OpenAI] SSE 流中丢弃畸形 chunk', {
           model: modelId,
           discarded: malformedChunksDiscarded,
           total: totalChunksReceived,
@@ -169,7 +169,7 @@ async function fetchRemoteModels() {
     const json = await res.json();
     return json.data || [];
   } catch {
-    logger.warn('[AI] 远程模型列表拉取失败');
+    logger.error('[AI] 远程模型列表拉取失败');
     return [];
   }
 }
@@ -184,7 +184,7 @@ async function health() {
     });
     return { status: res.ok ? 'ok' : 'error', provider: 'openai' };
   } catch {
-    logger.warn('[AI] OpenAI 健康检查失败');
+    logger.error('[AI] OpenAI 健康检查失败');
     return { status: 'unavailable', provider: 'openai' };
   }
 }

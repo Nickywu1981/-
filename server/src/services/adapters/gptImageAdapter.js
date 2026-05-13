@@ -101,7 +101,7 @@ async function health() {
     });
     return { status: res.ok ? 'ok' : 'error', provider: 'gpt-image-2' };
   } catch (err) {
-    logger.warn('[AI] GPT Image 健康检查失败', { error: err.message });
+    logger.error('[AI] GPT Image 健康检查失败', { error: err.message });
     return { status: 'unavailable', provider: 'gpt-image-2' };
   }
 }

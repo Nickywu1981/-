@@ -34,7 +34,7 @@ const client = createClient({
   password: redisConfig.password || undefined,
 });
 
-client.on('error', (err) => { logger.warn('[Redis] 连接错误', { error: err.message }); });
+client.on('error', (err) => { logger.error('[Redis] 连接错误', { error: err.message }); });
 
 let triedConnect = false;
 
@@ -47,7 +47,7 @@ export async function getRedis() {
       logger.info('[Redis] 连接成功');
       return client;
     } catch (err) {
-      logger.warn('[Redis] 初始连接失败，将依赖内置 retryStrategy 自动重连', { error: err.message });
+      logger.error('[Redis] 初始连接失败，将依赖内置 retryStrategy 自动重连', { error: err.message });
       // 客户端内置 reconnectStrategy 会持续重试，isReady 变为 true 时自动恢复
     }
   }
@@ -95,7 +95,7 @@ export async function ping() {
     if (!r) throw new BusinessError(503, 'Redis not available');
     await r.ping();
     return true;
-  } catch { throw new BusinessError(503, 'Redis ping failed'); }
+  } catch (e) { logger.warn('[Redis] ping 失败', { error: e.message }); throw new BusinessError(503, 'Redis ping failed'); }
 }
 
 export async function quit() {

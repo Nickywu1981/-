@@ -79,6 +79,6 @@ export async function bootstrapWorkers() {
 
     logger.info('[Worker] 全部 4 个 Worker 已就绪');
   } catch (err) {
-    logger.warn('[Worker] 启动失败（Redis 可能未运行）:', err.message);
+    logger.error('[Worker] 启动失败（Redis 可能未运行）:', err.message);
   }
 }

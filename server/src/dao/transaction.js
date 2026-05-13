@@ -30,7 +30,7 @@ export async function withTransaction(fn, options = {}) {
       return result;
     } catch (e) {
       lastError = e;
-      try { await conn.rollback(); } catch (_) { /* conn可能已断开 */ }
+      try { await conn.rollback(); } catch (_) { logger.warn('[TX] rollback 失败（连接可能已断开）'); }
       // 死锁/锁超时可重试
       if (e.code === 'ER_LOCK_DEADLOCK' || e.code === 'ER_LOCK_WAIT_TIMEOUT') {
         if (attempt < maxRetries) continue;

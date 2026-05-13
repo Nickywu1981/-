@@ -168,7 +168,7 @@ export async function unifiedOrder(params) {
   try {
     result = JSON.parse(raw);
   } catch {
-    logger.error('[Allinpay] 统一下单响应解析失败', { raw });
+    logger.error('[Allinpay] 统一下单响应解析失败', { reqsn: postData.reqsn, contentType: res.headers.get('content-type') });
     throw new BusinessError(502, '支付网关响应异常');
   }
 

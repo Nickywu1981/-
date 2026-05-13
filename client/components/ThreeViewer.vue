@@ -2,7 +2,7 @@
   <div class="three-viewer-container" ref="containerRef">
     <canvas ref="canvasRef" class="viewer-canvas" />
     <div class="viewer-controls">
-      <button v-for="ctrl in controls" :key="ctrl.key" class="ctrl-btn" :class="{ active: ctrl.active }" :title="ctrl.label" @click="ctrl.action">
+      <button v-for="ctrl in controls" :key="ctrl.key" class="ctrl-btn" :class="{ active: ctrl.active }" :title="ctrl.label" :aria-label="ctrl.label" @click="ctrl.action">
         <span class="ctrl-icon">{{ ctrl.icon }}</span>
         <span class="ctrl-label">{{ ctrl.label }}</span>
       </button>
@@ -13,7 +13,7 @@
     </div>
     <div v-if="error" class="viewer-overlay error">
       <p>{{ error }}</p>
-      <button @click="retry">重试</button>
+      <button @click="retry" aria-label="重试加载">重试</button>
     </div>
     <div class="viewer-info" v-if="modelInfo">
       <span>顶点: {{ modelInfo.vertices }}</span>
@@ -320,7 +320,7 @@ onBeforeUnmount(() => {
   gap: 2px;
   background: transparent;
   border: 1px solid transparent;
-  color: #aaa;
+  color: #767676;
   padding: 6px 10px;
   border-radius: 8px;
   cursor: pointer;
@@ -340,7 +340,7 @@ onBeforeUnmount(() => {
   justify-content: center;
   background: rgba(26, 26, 46, 0.85);
   z-index: 20;
-  color: #ccc;
+  color: #767676;
   gap: 12px;
 }
 .viewer-overlay.error { color: #ff6b6b; }
@@ -372,7 +372,7 @@ onBeforeUnmount(() => {
   padding: 6px 12px;
   border-radius: 6px;
   font-size: 12px;
-  color: #aaa;
+  color: #767676;
   z-index: 10;
 }
 </style>

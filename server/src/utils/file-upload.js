@@ -97,7 +97,7 @@ async function withChunkLock(uploadId, fn) {
     await _chunkLocks.get(uploadId);
   }
   const p = fn();
-  _chunkLocks.set(uploadId, p.catch(() => {}).then(() => _chunkLocks.delete(uploadId)));
+  _chunkLocks.set(uploadId, p.catch((err) => { logger.warn('[Upload] 分片写入异常', { uploadId, error: err.message }); }).then(() => _chunkLocks.delete(uploadId)));
   try {
     return await p;
   } finally {

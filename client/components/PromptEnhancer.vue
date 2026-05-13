@@ -5,7 +5,7 @@
 -->
 <template>
   <div class="pe-root">
-    <button class="pe-trigger" @click="toggle">
+    <button class="pe-trigger" @click="toggle" aria-label="提示词润色">
       <span class="pe-icon">✨</span>
       <span>提示词润色</span>
       <span v-if="enhancing" class="pe-spin">⏳</span>
@@ -31,7 +31,7 @@
         <div v-if="enhanced" class="pe-result">
           <div class="pe-result-header">
             <span>✨ 润色后</span>
-            <button class="pe-apply" @click="apply">
+            <button class="pe-apply" @click="apply" aria-label="应用润色结果">
               {{ applied ? '✅ 已应用' : '📥 应用' }}
             </button>
           </div>
@@ -48,10 +48,10 @@
         </div>
 
         <div class="pe-actions">
-          <button class="pe-btn pe-btn-run" :disabled="enhancing || !draft.trim()" @click="run">
+          <button class="pe-btn pe-btn-run" :disabled="enhancing || !draft.trim()" @click="run" aria-label="开始润色">
             {{ enhancing ? '润色中...' : '🚀 开始润色' }}
           </button>
-          <button v-if="open" class="pe-btn pe-btn-ghost" @click="open = false">关闭</button>
+          <button v-if="open" class="pe-btn pe-btn-ghost" @click="open = false" aria-label="关闭面板">关闭</button>
         </div>
       </div>
     </div>
