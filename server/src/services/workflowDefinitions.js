@@ -186,7 +186,24 @@ export function getWorkflowSteps(workflowId, overrides = {}) {
 
   let steps = [...wf.steps];
 
-  // 应用步骤开关覆盖
+  // 1. 删除步骤（不可删除必填步骤）
+  if (overrides.deletedSteps?.length) {
+    const deletedSet = new Set(overrides.deletedSteps);
+    steps = steps.filter(s => !(deletedSet.has(s.key) && !s.required));
+  }
+
+  // 2. 步骤重排（stepOrder 中列出的步骤按指定顺序前置，未列出的保持原序置尾）
+  if (overrides.stepOrder?.length) {
+    const orderMap = new Map(overrides.stepOrder.map((key, i) => [key, i]));
+    steps.sort((a, b) => {
+      const aPos = orderMap.has(a.key) ? orderMap.get(a.key) : 9999;
+      const bPos = orderMap.has(b.key) ? orderMap.get(b.key) : 9999;
+      if (aPos !== bPos) return aPos - bPos;
+      return a.order - b.order;
+    });
+  }
+
+  // 3. 应用步骤开关覆盖
   if (overrides.disabledSteps) {
     steps = steps.map(s => ({
       ...s,
@@ -194,7 +211,7 @@ export function getWorkflowSteps(workflowId, overrides = {}) {
     }));
   }
 
-  // 应用模型绑定覆盖
+  // 4. 应用模型绑定覆盖
   if (overrides.modelBindings) {
     steps = steps.map(s => ({
       ...s,
