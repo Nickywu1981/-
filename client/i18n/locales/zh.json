@@ -902,7 +902,17 @@
     "finalOutput": "最终输出",
     "voiceOutput": "配音输出",
     "videoStatus": "视频状态",
-    "videoProcessing": "视频合成中..."
+    "videoProcessing": "视频合成中...",
+    "resultTabs": {
+      "materials": "素材",
+      "detail": "详情页",
+      "storyboard": "脚本分镜",
+      "final": "最终输出"
+    },
+    "errors": {
+      "generateFailed": "生成失败",
+      "unknown": "未知错误"
+    }
   },
   "admin_nav": {
     "groups": {

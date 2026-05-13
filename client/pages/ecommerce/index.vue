@@ -293,21 +293,21 @@ const config = ref({
   storyboardCounts: [5, 6, 7, 8], voiceOptions: [], modelOptions: [],
 });
 
-const pipelineSteps = [
-  { key: 'intent', icon: '1', label: '意图' },
-  { key: 'compliance', icon: '2', label: '合规' },
-  { key: 'expand', icon: '3', label: '扩图' },
-  { key: 'detail', icon: '4', label: '详情' },
-  { key: 'storyboard', icon: '5', label: '分镜' },
-  { key: 'dispatch', icon: '6', label: '生成' },
-];
+const pipelineSteps = computed(() => [
+  { key: 'intent', icon: '1', label: $t('ecommerce.flow.intent') },
+  { key: 'compliance', icon: '2', label: $t('ecommerce.flow.compliance') },
+  { key: 'expand', icon: '3', label: $t('ecommerce.flow.expand') },
+  { key: 'detail', icon: '4', label: $t('ecommerce.flow.detail') },
+  { key: 'storyboard', icon: '5', label: $t('ecommerce.flow.storyboard') },
+  { key: 'dispatch', icon: '6', label: $t('ecommerce.flow.dispatch') },
+]);
 
-const resultTabs = [
-  { key: 'materials', label: '素材' },
-  { key: 'detail', label: '详情页' },
-  { key: 'storyboard', label: '脚本分镜' },
-  { key: 'final', label: '最终输出' },
-];
+const resultTabs = computed(() => [
+  { key: 'materials', label: $t('ecommerce.resultTabs.materials') },
+  { key: 'detail', label: $t('ecommerce.resultTabs.detail') },
+  { key: 'storyboard', label: $t('ecommerce.resultTabs.storyboard') },
+  { key: 'final', label: $t('ecommerce.resultTabs.final') },
+]);
 
 onMounted(async () => {
   try {
@@ -324,7 +324,7 @@ async function startGeneration() {
   pipelineResult.value = null;
 
   const stepInterval = setInterval(() => {
-    if (currentStep.value < pipelineSteps.length - 1) currentStep.value++;
+    if (currentStep.value < pipelineSteps.value.length - 1) currentStep.value++;
   }, 800);
 
   try {
@@ -345,9 +345,9 @@ async function startGeneration() {
 
     pipelineResult.value = res?.data || res;
     detectedIntent.value = pipelineResult.value?.intent?.label || null;
-    currentStep.value = pipelineSteps.length - 1;
+    currentStep.value = pipelineSteps.value.length - 1;
   } catch (err) {
-    alert('生成失败: ' + (err.message || '未知错误'));
+    alert($t('ecommerce.errors.generateFailed') + ': ' + (err.message || $t('ecommerce.errors.unknown')));
   } finally {
     clearInterval(stepInterval);
     generating.value = false;

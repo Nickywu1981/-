@@ -902,7 +902,17 @@
     "finalOutput": "Final Output",
     "voiceOutput": "Voice Output",
     "videoStatus": "Video Status",
-    "videoProcessing": "Compositing video..."
+    "videoProcessing": "Compositing video...",
+    "resultTabs": {
+      "materials": "Materials",
+      "detail": "Detail Page",
+      "storyboard": "Storyboard",
+      "final": "Final Output"
+    },
+    "errors": {
+      "generateFailed": "Generation failed",
+      "unknown": "Unknown error"
+    }
   },
   "admin_nav": {
     "groups": {
