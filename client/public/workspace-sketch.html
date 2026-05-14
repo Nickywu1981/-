@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=1200"><title>Workspace Sketch</title>
+<style>
+  :root {
+    --brand: #5b5fe3; --brand-light: #f0f0fd; --brand-soft: #a5a2f2;
+    --bg-page: #f6f6f8; --bg-card: #ffffff; --bg-sidebar: #0d0f18;
+    --tx: #171717; --tx2: #6b6b70; --tx3: #9d9da3; --tx4: #c8c8cd;
+    --brd: #ebebea; --brd2: #e4e4e6;
+    --radius-sm: 6px; --radius: 8px; --radius-lg: 12px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+    background: #e8e8eb; display: flex; justify-content: center; padding: 20px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .sketch {
+    width: 1200px; height: 760px; background: var(--bg-page); border-radius: 16px;
+    overflow: hidden; display: flex; box-shadow: 0 4px 32px rgba(0,0,0,.12);
+  }
+
+  /* ═══ Sidebar ═══ */
+  .side {
+    width: 200px; min-width: 200px; background: var(--bg-sidebar); color: #b8bac8;
+    display: flex; flex-direction: column; font-size: 13px;
+  }
+  .side-logo {
+    display: flex; align-items: center; gap: 10px; padding: 16px 14px 12px;
+  }
+  .side-logo-mark {
+    width: 28px; height: 28px; background: linear-gradient(135deg, #5b5fe3, #7c7ff0);
+    border-radius: 7px; display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 14px; font-weight: 700; flex-shrink: 0;
+  }
+  .side-logo-text { font-size: 15px; font-weight: 600; color: #e8eaf0; letter-spacing: -.02em; }
+  .side-fold {
+    margin-left: auto; color: #5d6380; cursor: pointer; font-size: 12px;
+    width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+    border-radius: 6px; border: none; background: none;
+  }
+  .side-fold:hover { background: rgba(255,255,255,.06); }
+  .side-nav { display: flex; flex-direction: column; gap: 1px; padding: 8px 8px 0; }
+  .side-nav-item {
+    display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px;
+    cursor: pointer; transition: all .12s; color: #8b90a5; text-decoration: none;
+  }
+  .side-nav-item:hover { background: rgba(255,255,255,.04); color: #c8cbd8; }
+  .side-nav-item.sel {
+    background: linear-gradient(135deg, #5b5fe3, #7c7ff0); color: #fff;
+    box-shadow: 0 2px 8px rgba(91,95,227,.3);
+  }
+  .side-nav-item .ico { font-size: 16px; width: 22px; text-align: center; flex-shrink: 0; }
+  .side-nav-item .badge {
+    margin-left: auto; font-size: 10px; min-width: 18px; height: 18px; border-radius: 9px;
+    background: rgba(255,255,255,.12); color: #8b90a5;
+    display: flex; align-items: center; justify-content: center; padding: 0 5px;
+  }
+  .side-nav-item.sel .badge { background: rgba(255,255,255,.2); color: rgba(255,255,255,.8); }
+  .side-nav-item .tag {
+    margin-left: auto; font-size: 9px; padding: 1px 5px; border-radius: 4px;
+    background: rgba(255,255,255,.1); color: #8b90a5;
+  }
+  .side-nav-item.sel .tag { background: rgba(255,255,255,.2); color: rgba(255,255,255,.8); }
+  .side-nav-item.off { opacity: .4; cursor: default; }
+  .side-nav-item.off:hover { background: none; color: #8b90a5; }
+  .side-divider { margin: 6px 14px; border-top: 1px solid rgba(255,255,255,.06); }
+  .side-footer {
+    margin-top: auto; padding: 10px 14px; border-top: 1px solid rgba(255,255,255,.06);
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .side-user { display: flex; align-items: center; gap: 8px; }
+  .side-av {
+    width: 26px; height: 26px; border-radius: 50%; background: #2a2d3d;
+    display: flex; align-items: center; justify-content: center; font-size: 11px; color: #8b90a5;
+    flex-shrink: 0;
+  }
+  .side-uname { font-size: 13px; }
+  .side-points { font-size: 11px; color: #5d6380; padding-left: 34px; }
+
+  /* ═══ Main ═══ */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* ═══ Topbar ═══ */
+  .top {
+    height: 56px; display: flex; align-items: center; gap: 14px; padding: 0 20px;
+    background: rgba(255,255,255,.78); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--brd); flex-shrink: 0;
+  }
+  .top-ham {
+    display: none; flex-direction: column; gap: 4px; padding: 8px; border-radius: 6px;
+    border: none; background: none; cursor: pointer;
+  }
+  .top-ham span { width: 18px; height: 2px; background: var(--tx); border-radius: 1px; }
+  .top-title { font-size: 15px; font-weight: 600; color: var(--tx); letter-spacing: -.03em; flex: 1; }
+  .top-btn {
+    padding: 6px 14px; border-radius: 7px; font-size: 12px; color: var(--tx2);
+    background: none; border: 1px solid var(--brd); cursor: pointer; transition: all .15s;
+  }
+  .top-btn:hover { background: #f5f5f4; color: var(--tx); }
+
+  /* ═══ Content ═══ */
+  .content { flex: 1; padding: 20px 24px; overflow-y: auto; display: flex; gap: 20px; }
+
+  /* ═══ Center column ═══ */
+  .center-col { flex: 1; min-width: 0; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+  .tab {
+    padding: 7px 16px; border-radius: 20px; font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: all .15s; border: none; background: #fff; color: var(--tx);
+    box-shadow: 0 1px 2px rgba(0,0,0,.04);
+  }
+  .tab:hover { background: var(--brand-light); color: var(--brand); }
+  .tab.sel { background: linear-gradient(135deg, #5b5fe3, #7c7ff0); color: #fff; box-shadow: 0 2px 8px rgba(91,95,227,.25); }
+
+  /* Input Card */
+  .input-card {
+    background: #fff; border: 1.5px solid var(--brd); border-radius: 14px;
+    padding: 16px 18px; box-shadow: 0 2px 12px rgba(0,0,0,.04); margin-bottom: 20px;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .input-card:focus-within {
+    border-color: var(--brand-soft); box-shadow: 0 0 0 3px rgba(91,95,227,.06), 0 4px 16px rgba(0,0,0,.06);
+  }
+  .input-card-top { display: flex; gap: 14px; align-items: stretch; margin-bottom: 14px; }
+  .upload-zone {
+    width: 80px; min-height: 80px; border: 1.5px dashed #d4d2f0; border-radius: 10px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 4px; cursor: pointer; transition: all .15s; background: #fafafe;
+  }
+  .upload-zone:hover { border-color: var(--brand); background: var(--brand-light); }
+  .upload-icon { font-size: 22px; }
+  .upload-label { font-size: 11px; color: var(--tx3); }
+  .input-area { flex: 1; }
+  .input-textarea {
+    width: 100%; height: 80px; border: 1px solid var(--brd2); border-radius: 8px;
+    padding: 12px 14px; font-size: 14px; font-family: inherit; color: var(--tx);
+    resize: none; outline: none; background: #fafaf9;
+  }
+  .input-textarea::placeholder { color: var(--tx4); }
+  .input-textarea:focus { border-color: var(--brand-soft); background: #fff; }
+  .input-card-bottom { display: flex; align-items: center; gap: 10px; justify-content: space-between; }
+  .param-row { display: flex; gap: 8px; }
+  .param-sel {
+    padding: 6px 28px 6px 10px; border: 1px solid var(--brd); border-radius: 6px;
+    font-size: 12px; font-family: inherit; color: var(--tx); background: #fafaf9;
+    cursor: pointer; outline: none; appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='8' height='5' viewBox='0 0 8 5' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L4 4L7 1' stroke='%239d9da3' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 8px center;
+  }
+  .param-sel:focus { border-color: var(--brand-soft); }
+  .gen-btn {
+    padding: 10px 28px; border: none; border-radius: 10px;
+    background: linear-gradient(135deg, #5b5fe3 0%, #7c7ff0 100%);
+    color: #fff; font-size: 14px; font-weight: 600; font-family: inherit;
+    cursor: pointer; transition: all .2s; box-shadow: 0 2px 10px rgba(91,95,227,.25);
+  }
+  .gen-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 18px rgba(91,95,227,.35); }
+  .gen-btn:active { transform: translateY(0); }
+
+  /* Tools */
+  .tools-header { margin-bottom: 12px; }
+  .tools-title { font-size: 15px; font-weight: 600; color: var(--tx); }
+  .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .tool-card {
+    background: #fff; border: 1px solid var(--brd); border-radius: 11px;
+    padding: 16px 14px; cursor: pointer; transition: all .2s;
+    display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px;
+  }
+  .tool-card:hover {
+    border-color: var(--brand); transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(91,95,227,.1);
+  }
+  .tool-card-icon { font-size: 28px; width: 44px; height: 44px; border-radius: 10px; background: var(--brand-light); display: flex; align-items: center; justify-content: center; }
+  .tool-card-name { font-size: 13px; font-weight: 600; color: var(--tx); }
+  .tool-card-desc { font-size: 11px; color: var(--tx3); }
+
+  /* ═══ Right panel ═══ */
+  .right-panel {
+    width: 260px; min-width: 260px; background: #fff; border-radius: 14px;
+    border: 1px solid var(--brd); box-shadow: 0 2px 12px rgba(0,0,0,.04);
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  .rp-header {
+    padding: 14px 16px; border-bottom: 1px solid var(--brd);
+    font-size: 14px; font-weight: 600; color: var(--tx);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .rp-body { flex: 1; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .rp-preview {
+    flex: 1; background: #fafaf9; border: 1px solid var(--brd); border-radius: 10px;
+    display: flex; align-items: center; justify-content: center; color: var(--tx4); font-size: 13px;
+    min-height: 180px;
+  }
+  .rp-info { font-size: 12px; color: var(--tx3); line-height: 1.6; }
+  .rp-actions { display: flex; gap: 8px; padding-top: 8px; }
+  .rp-btn {
+    flex: 1; padding: 8px; border-radius: 8px; border: 1px solid var(--brd);
+    background: #fff; font-size: 12px; font-family: inherit; cursor: pointer; color: var(--tx2);
+    transition: all .15s;
+  }
+  .rp-btn:hover { background: #f5f5f4; }
+  .rp-btn.primary { background: var(--brand); color: #fff; border-color: var(--brand); font-weight: 500; }
+  .rp-btn.primary:hover { background: #4f53d4; }
+</style>
+</head>
+<body style="position:relative">
+<div class="sketch" style="position:relative">
+
+  <!-- ═══ Sidebar ═══ -->
+  <div class="side">
+    <div class="side-logo">
+      <div class="side-logo-mark">M</div>
+      <div class="side-logo-text">Movio AI</div>
+      <button class="side-fold">◀</button>
+    </div>
+    <nav class="side-nav">
+      <div class="side-nav-item"><span class="ico">💬</span>Global AI 对话<span class="badge">3</span></div>
+      <div class="side-nav-item sel"><span class="ico">✨</span>创作中心</div>
+      <div class="side-nav-item"><span class="ico">🤖</span>智能体</div>
+      <div class="side-nav-item"><span class="ico">🔀</span>工作流</div>
+      <div class="side-nav-item"><span class="ico">🦞</span>龙虾</div>
+      <div class="side-nav-item"><span class="ico">📋</span>历史记录</div>
+    </nav>
+    <div class="side-divider"></div>
+    <nav class="side-nav">
+      <div class="side-nav-item off"><span class="ico">📊</span>数据分析<span class="tag">开发中</span></div>
+      <div class="side-nav-item off"><span class="ico">📈</span>营销工具<span class="tag">开发中</span></div>
+    </nav>
+    <div class="side-footer">
+      <div class="side-user">
+        <div class="side-av">U</div>
+        <div class="side-uname">UserName</div>
+      </div>
+      <div class="side-points">积分 1,280</div>
+    </div>
+  </div>
+
+  <!-- ═══ Main ═══ -->
+  <div class="main">
+    <header class="top">
+      <button class="top-ham"><span></span><span></span><span></span></button>
+      <div class="top-title">创作中心</div>
+      <button class="top-btn">管理后台</button>
+      <button class="top-btn">退出</button>
+    </header>
+
+    <div class="content">
+      <div class="center-col">
+
+        <!-- 板块标签 -->
+        <div class="tabs">
+          <button class="tab sel">🖼️ 图片生成</button>
+          <button class="tab">🎬 视频生成</button>
+          <button class="tab">🎨 变色调</button>
+          <button class="tab">✂️ 去背景</button>
+          <button class="tab">📐 图片扩图</button>
+        </div>
+
+        <!-- 输入卡片 -->
+        <div class="input-card">
+          <div class="input-card-top">
+            <div class="upload-zone">
+              <div class="upload-icon">📎</div>
+              <div class="upload-label">上传素材</div>
+            </div>
+            <div class="input-area">
+              <textarea class="input-textarea" placeholder="描述你想要生成的内容，支持中英文混合输入... 按 Enter 快速生成"></textarea>
+            </div>
+          </div>
+          <div class="input-card-bottom">
+            <div class="param-row">
+              <select class="param-sel"><option>风格</option></select>
+              <select class="param-sel"><option>比例 1:1</option></select>
+              <select class="param-sel"><option>数量 4</option></select>
+              <select class="param-sel"><option>模型</option></select>
+            </div>
+            <button class="gen-btn">🚀 开始生成</button>
+          </div>
+        </div>
+
+        <!-- 快速工具 -->
+        <div class="tools-header"><div class="tools-title">⚡ 快速工具</div></div>
+        <div class="tools-grid">
+          <div class="tool-card">
+            <div class="tool-card-icon">📐</div>
+            <div class="tool-card-name">图片扩图</div>
+            <div class="tool-card-desc">智能扩展画布尺寸</div>
+          </div>
+          <div class="tool-card">
+            <div class="tool-card-icon">🎨</div>
+            <div class="tool-card-name">变色调</div>
+            <div class="tool-card-desc">一键批量换色方案</div>
+          </div>
+          <div class="tool-card">
+            <div class="tool-card-icon">🔍</div>
+            <div class="tool-card-name">智能识别</div>
+            <div class="tool-card-desc">AI 自动商品分析</div>
+          </div>
+          <div class="tool-card">
+            <div class="tool-card-icon">📦</div>
+            <div class="tool-card-name">批量处理</div>
+            <div class="tool-card-desc">多图并发生成</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right SlidePanel -->
+      <div class="right-panel">
+        <div class="rp-header">📋 结果面板</div>
+        <div class="rp-body">
+          <div class="rp-preview">生成结果将显示在此处</div>
+          <div class="rp-info">
+            <div style="color:#171717;font-weight:500;margin-bottom:4px">提示</div>
+            点击「开始生成」后，AI 将处理您的请求。结果会在此面板中展示。
+          </div>
+          <div class="rp-actions">
+            <button class="rp-btn">📥 下载</button>
+            <button class="rp-btn primary">🔄 重新生成</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 标注 -->
+  <div style="position:absolute;left:210px;top:70px;color:#e85d3f;font-size:10px;font-weight:600;pointer-events:none;">
+    ← 6 项平级导航<br><span style="color:#888">无分类标签，Global Chat 同层级</span>
+  </div>
+  <div style="position:absolute;left:210px;top:172px;color:#e85d3f;font-size:10px;font-weight:600;pointer-events:none;">
+    ← 创作中心高亮选中<br><span style="color:#888">品牌色渐变 + 阴影</span>
+  </div>
+  <div style="position:absolute;left:210px;top:230px;color:#888;font-size:10px;font-weight:600;pointer-events:none;">
+    ← 分割线<br><span style="color:#888">开发中模块下沉</span>
+  </div>
+  <div style="position:absolute;right:268px;top:220px;color:#e85d3f;font-size:10px;font-weight:600;pointer-events:none;text-align:right;">
+    SlidePanel →<br><span style="color:#888">260px 结果展示</span>
+  </div>
+</div>
+</body>
+</html>

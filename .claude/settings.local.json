@@ -22,7 +22,10 @@
       "Bash(grep -rn '\\\\$t\\(' '--include=*.vue' '--include=*.ts' '--include=*.js' -l)",
       "Bash(grep -rn '\\\\$t\\(\\\\|useI18n\\\\|i18n\\\\|from.*i18n\\\\|dt\\(' '--include=*.vue' '--include=*.ts' '--include=*.js' -l)",
       "Bash(grep -l '\\\\$t\\(\\\\|useI18n\\\\|from.*i18n\\\\|dt\\(' pages/admin/model-pool.vue pages/admin/kb-management.vue pages/agent/dashboard.vue components/common/AppMediaUpload.vue components/diy/VersionHistoryModal.vue)",
-      "Bash(git -C \"I:/智能体助手项目\" diff --name-only)"
+      "Bash(git -C \"I:/智能体助手项目\" diff --name-only)",
+      "Bash(find server/src -name \"*.js\" -not -path \"*/node_modules/*\" -not -path \"*/__tests__/*\" -exec wc -l {} \\\\;)",
+      "Bash(npm audit *)",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\);process.stdin.on\\('end',\\(\\)=>{try{const j=JSON.parse\\(d\\);console.log\\('vulns:',JSON.stringify\\(j.metadata?.vulnerabilities||{}\\)\\);const high=[];for\\(const[k,v]of Object.entries\\(j.vulnerabilities||{}\\)\\){if\\(v.severity==='high'||v.severity==='critical'\\) high.push\\(k+' \\('+v.severity+'\\)'\\)} console.log\\('high/critical:',high.length?high.join\\(', '\\):'none'\\)}catch\\(e\\){console.log\\('parse error:',e.message.slice\\(0,100\\)\\)}}\\)\")"
     ]
   },
   "hooks": {
