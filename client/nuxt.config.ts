@@ -25,9 +25,7 @@ export default defineNuxtConfig({
         { 'http-equiv': 'X-UA-Compatible', content: 'IE=edge' },
         // XSS 防护
         { 'http-equiv': 'X-XSS-Protection', content: '1; mode=block' },
-        // 仅允许同源框架
-        { 'http-equiv': 'X-Frame-Options', content: 'SAMEORIGIN' },
-        // 禁止 MIME 嗅探
+// 禁止 MIME 嗅探
         { 'http-equiv': 'X-Content-Type-Options', content: 'nosniff' },
         // Referrer 策略
         { name: 'referrer', content: 'strict-origin-when-cross-origin' },
