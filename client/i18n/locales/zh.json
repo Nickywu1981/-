@@ -4373,6 +4373,16 @@
         "本月收入情况",
         "图片生成统计"
       ]
+    },
+    "faq": {
+      "title": "AI 智能客服",
+      "subtitle": "快速解答常见问题，输入关键词获取答案",
+      "welcome": "👋 你好！我是 Movio AI 助手",
+      "welcome_hint": "试试问我：如何充值积分 / 支持哪些格式 / API怎么对接",
+      "placeholder": "输入问题...",
+      "send": "发送",
+      "no_results": "抱歉，未找到相关答案。请尝试其他关键词，或联系人工客服。",
+      "service_unavailable": "服务暂不可用，请稍后再试。"
     }
   },
   "assets": {
@@ -6440,5 +6450,51 @@
     "索引令牌": "索引令牌",
     "知识块": "知识块",
     "模型": "模型"
+  },
+  "agent": {
+    "withdraw": {
+      "title": "提现申请",
+      "subtitle": "可提余额 ¥{balance}",
+      "apply_btn": "+ 申请提现",
+      "record_title": "提现记录",
+      "col_id": "申请编号",
+      "col_amount": "金额",
+      "col_account": "账户",
+      "col_date": "申请时间",
+      "col_status": "状态",
+      "status_arrived": "已到账",
+      "status_reviewing": "审核中"
+    },
+    "team": {
+      "title": "团队管理",
+      "subtitle": "成员 {n} 人",
+      "invite_btn": "+ 邀请成员",
+      "member_title": "团队成员",
+      "col_member": "成员",
+      "col_role": "角色",
+      "col_customers": "客户数",
+      "col_commission": "贡献佣金",
+      "col_joined": "加入时间",
+      "col_status": "状态",
+      "role_channel_mgr": "渠道经理",
+      "role_sales_rep": "销售代表",
+      "status_active": "活跃",
+      "status_paused": "暂停"
+    }
+  },
+  "finance": {
+    "billing": {
+      "title": "账单管理",
+      "subtitle": "周期性账单、对账记录、结算单",
+      "generate_btn": "生成月度账单",
+      "col_period": "账单周期",
+      "col_orders": "总订单数",
+      "col_amount": "总金额",
+      "col_commission": "佣金支出",
+      "col_net": "净收入",
+      "col_status": "状态",
+      "status_settled": "已结算",
+      "status_pending": "待结算"
+    }
   }
 }

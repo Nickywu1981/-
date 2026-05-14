@@ -3,30 +3,31 @@
   <div class="pg ai-chat-container">
     <div class="page-header">
       <div>
-        <h1 class="page-header-title">AI 智能客服</h1>
-        <p class="page-header-subtitle">快速解答常见问题，输入关键词获取答案</p>
+        <h1 class="page-header-title">{{ $t('ai_assistant.faq.title') }}</h1>
+        <p class="page-header-subtitle">{{ $t('ai_assistant.faq.subtitle') }}</p>
       </div>
     </div>
 
     <div class="chat-panel">
       <div class="chat-messages" ref="msgBox">
         <div v-if="messages.length === 0" class="chat-welcome">
-          <p>👋 你好！我是 Movio AI 助手</p>
-          <small>试试问我：如何充值积分 / 支持哪些格式 / API怎么对接</small>
+          <p>{{ $t('ai_assistant.faq.welcome') }}</p>
+          <small>{{ $t('ai_assistant.faq.welcome_hint') }}</small>
         </div>
         <div v-for="(m, i) in messages" :key="i" :class="['chat-msg', m.role]">
           <div class="chat-bubble">{{ m.content }}</div>
         </div>
       </div>
       <div class="chat-input-row">
-        <input v-model="query" class="chat-input" placeholder="输入问题..." @keyup.enter="ask" />
-        <button class="btn btn-gradient btn-sm" @click="ask" :disabled="loading">发送</button>
+        <input v-model="query" class="chat-input" :placeholder="$t('ai_assistant.faq.placeholder')" @keyup.enter="ask" />
+        <button class="btn btn-gradient btn-sm" @click="ask" :disabled="loading">{{ $t('ai_assistant.faq.send') }}</button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n()
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 
 const query = ref('')
@@ -45,10 +46,10 @@ async function ask() {
     if (results.length) {
       results.forEach((r: any) => messages.value.push({ role: 'assistant', content: `📌 ${r.question}\n\n${r.answer}` }))
     } else {
-      messages.value.push({ role: 'assistant', content: '抱歉，未找到相关答案。请尝试其他关键词，或联系人工客服。' })
+      messages.value.push({ role: 'assistant', content: t('ai_assistant.faq.no_results') })
     }
   } catch {
-    messages.value.push({ role: 'assistant', content: '服务暂不可用，请稍后再试。' })
+    messages.value.push({ role: 'assistant', content: t('ai_assistant.faq.service_unavailable') })
   } finally { loading.value = false }
 }
 </script>
