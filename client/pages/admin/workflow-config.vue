@@ -1,8 +1,8 @@
 <template>
   <div class="admin-workflow-config">
     <header class="page-header">
-      <h1>工作流配置管理</h1>
-      <p>7条固定工作流 — 步骤开关/模型绑定/参数调整/双模式切换</p>
+      <h1>{{ $t('admin_workflow_config.page_title') }}</h1>
+      <p>{{ $t('admin_workflow_config.page_desc') }}</p>
     </header>
 
     <!-- 工作流列表 -->
@@ -11,8 +11,8 @@
         <h3>{{ wf.name }}</h3>
         <p>{{ wf.description }}</p>
         <div class="wf-meta">
-          <span>{{ wf.stepsCount }} 步骤</span>
-          <span>{{ wf.requiredSteps }} 必填</span>
+          <span>{{ $t('admin_workflow_config.steps_count', { n: wf.stepsCount }) }}</span>
+          <span>{{ $t('admin_workflow_config.required_count', { n: wf.requiredSteps }) }}</span>
           <span class="cat-tag">{{ wf.category }}</span>
         </div>
       </div>
@@ -21,19 +21,19 @@
     <!-- 步骤配置详情 -->
     <div v-if="selectedWf" class="wf-detail">
       <div class="detail-header">
-        <h2>{{ selectedWf.name }} — 步骤配置</h2>
+        <h2>{{ selectedWf.name }} {{ $t('admin_workflow_config.step_config_title') }}</h2>
         <div class="mode-switch">
-          <label>运行模式：</label>
+          <label>{{ $t('admin_workflow_config.run_mode') }}</label>
           <select v-model="wfMode">
-            <option value="auto">智能自动</option>
-            <option value="custom">自定义</option>
+            <option value="auto">{{ $t('admin_workflow_config.mode_auto') }}</option>
+            <option value="custom">{{ $t('admin_workflow_config.mode_custom') }}</option>
           </select>
         </div>
       </div>
 
       <!-- 强制规则提示 -->
       <div v-if="selectedWf.forceVideoRule" class="rule-alert">
-        视频铁则：必须先脚本→分镜→再合成视频，禁止跳过
+        {{ $t('admin_workflow_config.force_video_rule') }}
       </div>
 
       <!-- 步骤列表 -->
@@ -43,8 +43,8 @@
           <div class="step-info">
             <div class="step-label">
               {{ step.label }}
-              <span v-if="step.required" class="required-badge">必填</span>
-              <span v-if="!step.required" class="optional-badge">可选</span>
+              <span v-if="step.required" class="required-badge">{{ $t('admin_workflow_config.required_badge') }}</span>
+              <span v-if="!step.required" class="optional-badge">{{ $t('admin_workflow_config.optional_badge') }}</span>
             </div>
             <div class="step-meta">{{ step.category }} / {{ step.taskType }}</div>
           </div>
@@ -53,29 +53,29 @@
             <label class="toggle" v-if="!step.required">
               <input type="checkbox" v-model="step.enabled" @change="saveConfig" />
               <span class="toggle-slider"></span>
-              {{ step.enabled ? '开启' : '关闭' }}
+              {{ step.enabled ? $t('admin_workflow_config.toggle_on') : $t('admin_workflow_config.toggle_off') }}
             </label>
 
             <!-- 排序按钮 -->
             <div class="reorder-btns">
               <button class="btn-reorder" @click.stop="moveStep(step.key, -1)"
-                :disabled="selectedWf.steps.indexOf(step) === 0" title="上移">▲</button>
+                :disabled="selectedWf.steps.indexOf(step) === 0" :title="$t('admin_workflow_config.move_up')">▲</button>
               <button class="btn-reorder" @click.stop="moveStep(step.key, 1)"
-                :disabled="selectedWf.steps.indexOf(step) === selectedWf.steps.length - 1" title="下移">▼</button>
+                :disabled="selectedWf.steps.indexOf(step) === selectedWf.steps.length - 1" :title="$t('admin_workflow_config.move_down')">▼</button>
             </div>
 
-            <!-- 删除按钮 (非必填步骤) -->
+            <!-- 删除按钮 (非{{ $t('admin_workflow_config.required_badge') }}步骤) -->
             <button v-if="!step.required" class="btn-delete-step" @click.stop="deleteStep(step.key)"
-              title="从该工作流中移除此步骤">✕</button>
+              :title="$t('admin_workflow_config.remove_step')">✕</button>
 
-            <!-- 模型绑定(仅自定义模式) -->
+            <!-- 模型绑定(仅{{ $t('admin_workflow_config.mode_custom') }}模式) -->
             <select
               v-if="step.allowModel && wfMode === 'custom'"
               v-model="modelBindings[step.key]"
               @change="saveConfig"
               class="model-select"
             >
-              <option value="auto">自动选择</option>
+              <option value="auto">{{ $t('admin_workflow_config.auto_select') }}</option>
               <optgroup :label="cat.label" v-for="cat in categories" :key="cat.key">
                 <option v-for="m in getModelsByCategory(cat.key)" :key="m.model_key" :value="m.model_key">
                   {{ m.display_name }} ({{ m.vendor }})
@@ -85,7 +85,7 @@
 
             <!-- 自动模式显示 -->
             <span v-if="step.allowModel && wfMode === 'auto'" class="auto-model-hint">
-              自动: {{ getAutoModelForStep(step) }}
+              {{ $t('admin_workflow_config.auto_model') }}: {{ getAutoModelForStep(step) }}
             </span>
           </div>
         </div>
@@ -93,67 +93,69 @@
 
       <!-- 参数配置 -->
       <div class="params-section">
-        <h3>默认参数</h3>
+        <h3>{{ $t('admin_workflow_config.default_params') }}</h3>
         <div class="params-grid">
           <div class="param">
-            <label>行业</label>
+            <label>{{ $t('admin_workflow_config.label_industry') }}</label>
             <select v-model="params.industry" @change="saveConfig">
-              <option value="">自动检测</option>
+              <option value="">{{ $t('admin_workflow_config.auto_detect') }}</option>
               <option v-for="ind in industries" :key="ind.key" :value="ind.key">{{ ind.label }}</option>
             </select>
           </div>
           <div class="param">
-            <label>风格</label>
+            <label>{{ $t('admin_workflow_config.label_style') }}</label>
             <select v-model="params.style" @change="saveConfig">
               <option v-for="s in styles" :key="s.key" :value="s.key">{{ s.label }}</option>
             </select>
           </div>
           <div v-if="isVideoWf" class="param">
-            <label>投流平台</label>
+            <label>{{ $t('admin_workflow_config.label_ad_platform') }}</label>
             <select v-model="params.adPlatform" @change="saveConfig">
-              <option value="qianchuan">巨量千川(抖音)</option>
-              <option value="ocean_engine">巨量引擎(字节全系)</option>
-              <option value="magnetic">磁力金牛(快手)</option>
-              <option value="alimama">阿里妈妈(淘宝/天猫)</option>
+              <option value="qianchuan">{{ $t('admin_workflow_config.platform_qianchuan') }}</option>
+              <option value="ocean_engine">{{ $t('admin_workflow_config.platform_ocean_engine') }}</option>
+              <option value="magnetic">{{ $t('admin_workflow_config.platform_magnetic') }}</option>
+              <option value="alimama">{{ $t('admin_workflow_config.platform_alimama') }}</option>
             </select>
           </div>
           <div v-if="isVideoWf" class="param">
-            <label>视频时长(秒)</label>
+            <label>{{ $t('admin_workflow_config.label_video_duration') }}</label>
             <select v-model="params.videoDuration" @change="saveConfig">
               <option :value="15">15s</option><option :value="30">30s</option><option :value="60">60s</option>
             </select>
           </div>
           <div v-if="isVideoWf" class="param">
-            <label>分镜数量</label>
+            <label>{{ $t('admin_workflow_config.label_storyboard_count') }}</label>
             <select v-model="params.storyboardCount" @change="saveConfig">
               <option :value="5">5</option><option :value="6">6</option><option :value="7">7</option><option :value="8">8</option>
             </select>
           </div>
           <div v-if="isVoiceWf" class="param">
-            <label>配音音色</label>
+            <label>{{ $t('admin_workflow_config.label_voice') }}</label>
             <select v-model="params.voice" @change="saveConfig">
-              <option value="zh-CN-XiaoxiaoNeural">晓晓(女)</option>
-              <option value="zh-CN-YunxiNeural">云希(男)</option>
-              <option value="zh-CN-XiaoyiNeural">晓依(女)</option>
-              <option value="zh-CN-YunjianNeural">云健(男)</option>
+              <option value="zh-CN-XiaoxiaoNeural">{{ $t('admin_workflow_config.voice_xiaoxiao') }}</option>
+              <option value="zh-CN-YunxiNeural">{{ $t('admin_workflow_config.voice_yunxi') }}</option>
+              <option value="zh-CN-XiaoyiNeural">{{ $t('admin_workflow_config.voice_xiaoyi') }}</option>
+              <option value="zh-CN-YunjianNeural">{{ $t('admin_workflow_config.voice_yunjian') }}</option>
             </select>
           </div>
           <div v-if="isVoiceWf" class="param">
-            <label>语速</label>
+            <label>{{ $t('admin_workflow_config.label_speed') }}</label>
             <select v-model="params.voiceSpeed" @change="saveConfig">
-              <option :value="0.8">0.8x 慢速</option><option :value="1.0">1.0x 标准</option><option :value="1.2">1.2x 快速</option><option :value="1.5">1.5x 极速</option>
+              <option :value="0.8">{{ $t('admin_workflow_config.speed_slow') }}</option><option :value="1.0">{{ $t('admin_workflow_config.speed_normal') }}</option><option :value="1.2">{{ $t('admin_workflow_config.speed_fast') }}</option><option :value="1.5">{{ $t('admin_workflow_config.speed_ultra') }}</option>
             </select>
           </div>
         </div>
       </div>
 
-      <button class="btn-save" @click="saveConfig">保存配置</button>
+      <button class="btn-save" @click="saveConfig">{{ $t('admin_workflow_config.save_config') }}</button>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue';
+
+const { t } = useI18n();
 
 const workflows = ref([]);
 const selectedWf = ref(null);
@@ -163,16 +165,16 @@ const modelBindings = reactive({});
 const params = reactive({ industry: '', style: 'professional', videoDuration: 30, storyboardCount: 6, voice: 'zh-CN-XiaoxiaoNeural', voiceSpeed: 1.0, adPlatform: 'qianchuan' });
 
 const categories = [
-  { key: 'image', label: '文生图' }, { key: 'video', label: '文生视频' },
-  { key: 'text', label: '大语言模型' }, { key: 'voice', label: '语音合成' }, { key: 'audio', label: '音频处理' },
+  { key: 'image', label: t('admin_workflow_config.cat_image') }, { key: 'video', label: t('admin_workflow_config.cat_video') },
+  { key: 'text', label: t('admin_workflow_config.cat_text') }, { key: 'voice', label: t('admin_workflow_config.cat_voice') }, { key: 'audio', label: t('admin_workflow_config.cat_audio') },
 ];
 const industries = [
-  { key: 'clothing', label: '服装' }, { key: 'beauty', label: '美妆' },
-  { key: '3c_digital', label: '3C数码' }, { key: 'food', label: '食品' }, { key: 'home', label: '家居' },
+  { key: 'clothing', label: t('admin_workflow_config.industry_clothing') }, { key: 'beauty', label: t('admin_workflow_config.industry_beauty') },
+  { key: '3c_digital', label: t('admin_workflow_config.industry_3c') }, { key: 'food', label: t('admin_workflow_config.industry_food') }, { key: 'home', label: t('admin_workflow_config.industry_home') },
 ];
 const styles = [
-  { key: 'professional', label: '专业商务' }, { key: 'minimalist', label: '极简风' },
-  { key: 'lifestyle', label: '生活方式' }, { key: 'trendy', label: '潮流时尚' },
+  { key: 'professional', label: t('admin_workflow_config.style_professional') }, { key: 'minimalist', label: t('admin_workflow_config.style_minimalist') },
+  { key: 'lifestyle', label: t('admin_workflow_config.style_lifestyle') }, { key: 'trendy', label: t('admin_workflow_config.style_trendy') },
 ];
 
 const isVideoWf = computed(() => selectedWf.value?.category === 'video' || selectedWf.value?.id === 'white_bg_full');
@@ -182,7 +184,7 @@ function getModelsByCategory(cat) { return modelPool.value.filter(m => m.categor
 function getAutoModelForStep(step) {
   const models = modelPool.value.filter(m => m.category === step.category && m.enabled === 1);
   const best = models.sort((a, b) => (b.pool_weight || 1) - (a.pool_weight || 1))[0];
-  return best?.display_name || '无可用模型';
+  return best?.display_name || '{{ $t('admin_workflow_config.no_model') }}';
 }
 
 async function selectWorkflow(id) {
@@ -248,9 +250,9 @@ async function saveConfig() {
         params: { ...params },
       },
     });
-    alert('配置已保存');
+    alert(t('admin_workflow_config.save_success'));
   } catch (e) {
-    alert('保存失败: ' + (e.message || '未知错误'));
+    alert(t('admin_workflow_config.save_fail') + ': ' + (e.message || 'Unknown error'));
   }
 }
 
