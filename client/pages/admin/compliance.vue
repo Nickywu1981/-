@@ -1,17 +1,17 @@
 <template>
   <AdminLayout>
-    <h2 class="ptitle">跨境合规检查</h2>
+    <h2 class="ptitle">{{ $t('admin_compliance.跨境合规检查') }}</h2>
     <div class="toolbar">
-      <input v-model="checkContent" class="input-search" placeholder="输入要检查的商品文案/描述..." @keyup.enter="doCheck" />
+      <input v-model="checkContent" class="input-search" :placeholder="$t('admin_compliance.输入要检查的商品文案_描述')" @keyup.enter="doCheck" />
       <select v-model="checkPlatform" class="sel">
-        <option value="">选择平台</option>
+        <option value="">{{ $t('admin_compliance.选择平台') }}</option>
         <option v-for="t in targets" :key="t.code" :value="t.code">{{ t.name }}</option>
       </select>
-      <button class="btn btn-primary" :disabled="!checkContent||!checkPlatform" @click="doCheck">检查合规</button>
+      <button class="btn btn-primary" :disabled="!checkContent||!checkPlatform" @click="doCheck">{{ $t('admin_compliance.检查合规') }}</button>
     </div>
 
     <div class="rules-section" v-if="targets.length">
-      <h3>平台合规概览</h3>
+      <h3>{{ $t('admin_compliance.平台合规概览') }}</h3>
       <div class="rules-grid">
         <div v-for="t in targets" :key="t.code" class="rule-card" @click="viewRules(t)">
           <span class="rule-name">{{ t.name }}</span>
@@ -29,13 +29,13 @@
           {{ issue.desc || issue.message }}
         </li>
       </ul>
-      <p v-else>未发现问题</p>
+      <p v-else>{{ $t('admin_compliance.未发现问题') }}</p>
     </div>
 
     <div v-if="rulesDetail" class="rules-detail">
       <h3>{{ rulesDetail.name }} 合规规则 <button class="btn-close" aria-label="关闭规则详情" @click="rulesDetail=null">✕</button></h3>
-      <div v-if="rulesDetail.imageRules?.length"><h4>图片规则</h4><ul><li v-for="r in rulesDetail.imageRules" :key="r.id">{{ r.desc }}</li></ul></div>
-      <div v-if="rulesDetail.textRules?.length"><h4>文案规则</h4><ul><li v-for="r in rulesDetail.textRules" :key="r.id">{{ r.desc }}</li></ul></div>
+      <div v-if="rulesDetail.imageRules?.length"><h4>{{ $t('admin_compliance.图片规则') }}</h4><ul><li v-for="r in rulesDetail.imageRules" :key="r.id">{{ r.desc }}</li></ul></div>
+      <div v-if="rulesDetail.textRules?.length"><h4>{{ $t('admin_compliance.文案规则') }}</h4><ul><li v-for="r in rulesDetail.textRules" :key="r.id">{{ r.desc }}</li></ul></div>
     </div>
   </AdminLayout>
 </template>

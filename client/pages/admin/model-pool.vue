@@ -1,8 +1,8 @@
 <template>
   <div class="admin-model-pool">
     <header class="page-header">
-      <h1>全局统一模型池</h1>
-      <p>统一管理文生图/文生视频/LLM/TTS/音频模型 — 权重/灰度/配额/熔断</p>
+      <h1>{{ $t('admin_model_pool.全局统一模型池') }}</h1>
+      <p>{{ $t('admin_model_pool.统一管理文生图_文生视频_llm_tts_音频模型_权重_灰度_配额_熔断') }}</p>
     </header>
 
     <!-- 统计卡片 -->
@@ -26,7 +26,7 @@
     <table class="model-table" v-if="filteredModels.length">
       <thead>
         <tr>
-          <th>模型标识</th><th>{{ $t('common.name') }}</th><th>厂商</th><th>类别</th><th>权重</th><th>灰度%</th><th>{{ $t('common.status') }}</th><th>{{ $t('common.actions') }}</th>
+          <th>{{ $t('admin_model_pool.模型标识') }}</th><th>{{ $t('common.name') }}</th><th>{{ $t('admin_model_pool.厂商') }}</th><th>{{ $t('admin_model_pool.类别') }}</th><th>{{ $t('admin_model_pool.权重') }}</th><th>{{ $t('admin_model_pool.灰度') }}</th><th>{{ $t('common.status') }}</th><th>{{ $t('common.actions') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -44,7 +44,7 @@
         </tr>
       </tbody>
     </table>
-    <div v-else class="empty">暂无模型</div>
+    <div v-else class="empty">{{ $t('admin_model_pool.暂无模型') }}</div>
   </div>
 </template>
 
@@ -126,18 +126,18 @@ onMounted(refreshPool);
 
 .model-table { width: 100%; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
 .model-table th, .model-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border-light); font-size: 13px; }
-.model-table th { background: #fafafa; font-weight: 600; }
+.model-table th { background: var(--bg-page); font-weight: 600; }
 tr.disabled { opacity: 0.5; }
 
 .cat-tag { padding: 2px 8px; border-radius: 4px; font-size: 11px; }
-.cat-tag.image { background: #e3f2fd; color: #1565c0; }
+.cat-tag.image { background: var(--info-bg); color: var(--info); }
 .cat-tag.video { background: var(--danger-light); color: #c62828; }
-.cat-tag.text { background: var(--success-light); color: #2e7d32; }
+.cat-tag.text { background: var(--success-light); color: var(--success); }
 .cat-tag.voice { background: #fff3e0; color: #e65100; }
 .cat-tag.audio { background: #f3e5f5; color: #7b1fa2; }
 
 .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
-.status-dot.on { background: #4caf50; }
+.status-dot.on { background: var(--success); }
 .status-dot.off { background: #ccc; }
 
 .btn-sm { padding: 4px 10px; background: var(--bg-hover); border: 1px solid var(--border-light); border-radius: 4px; cursor: pointer; font-size: 12px; }

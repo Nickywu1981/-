@@ -1,6 +1,6 @@
 <template>
   <AdminLayout>
-    <h2 class="ptitle">会员等级管理</h2>
+    <h2 class="ptitle">{{ $t('admin_tier.会员等级管理') }}</h2>
     <LoadingSkeleton v-if="loading" type="card" :rows="4" />
     <template v-else-if="tierData">
       <div class="tier-overview">
@@ -29,19 +29,19 @@
         </div>
       </div>
       <div class="section">
-        <h3>用量查询</h3>
+        <h3>{{ $t('admin_tier.用量查询') }}</h3>
         <div class="check-row">
-          <select v-model="checkType" class="sel"><option value="image">图片</option><option value="video">视频</option><option value="text">文案</option></select>
+          <select v-model="checkType" class="sel"><option value="image">{{ $t('admin_tier.图片') }}</option><option value="video">{{ $t('admin_tier.视频') }}</option><option value="text">{{ $t('admin_tier.文案') }}</option></select>
           <button class="btn-primary" :disabled="checkingLimit" @click="doCheckLimit">{{ checkingLimit ? '查询中...' : '查询' }}</button>
         </div>
         <div v-if="limitResult" class="limit-result">
-          <div class="limit-item"><span>已用</span><strong>{{ limitResult.used || 0 }}</strong></div>
-          <div class="limit-item"><span>上限</span><strong>{{ limitResult.limit === -1 ? '∞' : limitResult.limit }}</strong></div>
-          <div class="limit-item"><span>剩余</span><strong :class="{ warn: limitResult.remaining < 10 }">{{ limitResult.remaining === -1 ? '∞' : limitResult.remaining }}</strong></div>
+          <div class="limit-item"><span>{{ $t('admin_tier.已用') }}</span><strong>{{ limitResult.used || 0 }}</strong></div>
+          <div class="limit-item"><span>{{ $t('admin_tier.上限') }}</span><strong>{{ limitResult.limit === -1 ? '∞' : limitResult.limit }}</strong></div>
+          <div class="limit-item"><span>{{ $t('admin_tier.剩余') }}</span><strong :class="{ warn: limitResult.remaining < 10 }">{{ limitResult.remaining === -1 ? '∞' : limitResult.remaining }}</strong></div>
         </div>
       </div>
     </template>
-    <EmptyState v-else icon="⭐" title="暂无会员数据" description="请先登录后查看会员等级信息" />
+    <EmptyState v-else icon="⭐" :title="$t('admin_tier.暂无会员数据')" description="请先登录后查看会员等级信息" />
   </AdminLayout>
 </template>
 <script setup lang="ts">

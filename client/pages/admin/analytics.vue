@@ -1,19 +1,19 @@
 <template>
   <AdminLayout>
-    <h2 class="ptitle">数据统计分析</h2>
+    <h2 class="ptitle">{{ $t('admin_analytics.数据统计分析') }}</h2>
     <LoadingSkeleton v-if="loading" type="table" :rows="4" :cols="4" />
     <template v-else-if="stats">
       <div class="stats-row">
-        <div class="stat-card"><span class="stat-val">{{ fmtNum(stats.userCount) }}</span><span class="stat-lbl">总用户数</span></div>
-        <div class="stat-card"><span class="stat-val">{{ fmtNum(stats.taskCount) }}</span><span class="stat-lbl">总任务数</span></div>
-        <div class="stat-card"><span class="stat-val">{{ fmtNum(stats.todayTaskCount) }}</span><span class="stat-lbl">今日任务</span></div>
-        <div class="stat-card"><span class="stat-val">{{ fmtNum(stats.paidUserCount) }}</span><span class="stat-lbl">付费用户</span></div>
-        <div class="stat-card"><span class="stat-val">&yen;{{ fmtNum(stats.totalRevenue) }}</span><span class="stat-lbl">总收入</span></div>
+        <div class="stat-card"><span class="stat-val">{{ fmtNum(stats.userCount) }}</span><span class="stat-lbl">{{ $t('admin_analytics.总用户数') }}</span></div>
+        <div class="stat-card"><span class="stat-val">{{ fmtNum(stats.taskCount) }}</span><span class="stat-lbl">{{ $t('admin_analytics.总任务数') }}</span></div>
+        <div class="stat-card"><span class="stat-val">{{ fmtNum(stats.todayTaskCount) }}</span><span class="stat-lbl">{{ $t('admin_analytics.今日任务') }}</span></div>
+        <div class="stat-card"><span class="stat-val">{{ fmtNum(stats.paidUserCount) }}</span><span class="stat-lbl">{{ $t('admin_analytics.付费用户') }}</span></div>
+        <div class="stat-card"><span class="stat-val">&yen;{{ fmtNum(stats.totalRevenue) }}</span><span class="stat-lbl">{{ $t('admin_analytics.总收入') }}</span></div>
       </div>
       <div class="chart-grid">
-        <div class="chart-box"><h3>任务趋势 (7天)</h3><VChart v-if="taskOption" :option="taskOption" autoresize /></div>
-        <div class="chart-box"><h3>用户增长 (7天)</h3><VChart v-if="userOption" :option="userOption" autoresize /></div>
-        <div class="chart-box"><h3>收入趋势 (7天)</h3><VChart v-if="revenueOption" :option="revenueOption" autoresize /></div>
+        <div class="chart-box"><h3>{{ $t('admin_analytics.任务趋势_7天') }}</h3><VChart v-if="taskOption" :option="taskOption" autoresize /></div>
+        <div class="chart-box"><h3>{{ $t('admin_analytics.用户增长_7天') }}</h3><VChart v-if="userOption" :option="userOption" autoresize /></div>
+        <div class="chart-box"><h3>{{ $t('admin_analytics.收入趋势_7天') }}</h3><VChart v-if="revenueOption" :option="revenueOption" autoresize /></div>
       </div>
     </template>
     <div v-else class="empty">加载统计数据{{ $t('common.failed') }}</div>

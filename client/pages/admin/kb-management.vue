@@ -2,7 +2,7 @@
   <AdminLayout>
     <div class="page">
       <div class="page-header">
-        <h1>知识库管理</h1>
+        <h1>{{ $t('admin_kb_management.知识库管理') }}</h1>
         <p>管理 Movio AI 项目知识库，支持语义{{ $t('common.search') }}和 LLM RAG 检索</p>
       </div>
 
@@ -10,27 +10,27 @@
       <div class="stats-grid" v-if="status">
         <div class="stat-card">
           <div class="stat-value">{{ status.vectorStore?.chunks || 0 }}</div>
-          <div class="stat-label">知识块</div>
+          <div class="stat-label">{{ $t('admin_kb_management.知识块') }}</div>
         </div>
         <div class="stat-card">
           <div class="stat-value">{{ status.vectorStore?.dimension || 0 }}</div>
-          <div class="stat-label">向量维度</div>
+          <div class="stat-label">{{ $t('admin_kb_management.向量维度') }}</div>
         </div>
         <div class="stat-card">
           <div class="stat-value">{{ status.vectorStore?.model || 'none' }}</div>
-          <div class="stat-label">模型</div>
+          <div class="stat-label">{{ $t('admin_kb_management.模型') }}</div>
         </div>
         <div class="stat-card">
           <div class="stat-value">{{ status.tokenIndex?.tokens || 0 }}</div>
-          <div class="stat-label">索引令牌</div>
+          <div class="stat-label">{{ $t('admin_kb_management.索引令牌') }}</div>
         </div>
       </div>
 
       <!-- 搜索测试 -->
       <div class="search-section">
-        <h3>RAG 检索测试</h3>
+        <h3>{{ $t('admin_kb_management.rag_检索测试') }}</h3>
         <div class="search-bar">
-          <input v-model="query" class="input" placeholder="输入查询文本，如「编码规范」「用户认证流程」" @keyup.enter="search" />
+          <input v-model="query" class="input" :placeholder="$t('admin_kb_management.输入查询文本_如_编码规范_用户认证流程')" @keyup.enter="search" />
           <button class="btn btn-primary" :disabled="searching" @click="search">{{ searching ? '搜索中...' : '搜索' }}</button>
         </div>
 
@@ -44,7 +44,7 @@
             <pre>{{ ragResult.context }}</pre>
           </div>
           <div v-if="ragResult.sources?.length" class="sources">
-            <strong>来源文件:</strong>
+            <strong>{{ $t('admin_kb_management.来源文件') }}</strong>
             <ul><li v-for="s in ragResult.sources" :key="s">{{ s }}</li></ul>
           </div>
         </div>

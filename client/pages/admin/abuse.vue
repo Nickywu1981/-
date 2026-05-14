@@ -1,20 +1,20 @@
 <template>
   <AdminLayout>
-    <h2 class="ptitle">滥用监控</h2>
+    <h2 class="ptitle">{{ $t('admin_abuse.滥用监控') }}</h2>
 
     <div class="toolbar">
-      <input v-model="filterUserId" type="number" placeholder="按用户ID筛选" @keyup.enter="fetchData" />
-      <button class="btn" @click="fetchData">查询</button>
+      <input v-model="filterUserId" type="number" :placeholder="$t('admin_abuse.按用户id筛选')" @keyup.enter="fetchData" />
+      <button class="btn" @click="fetchData">{{ $t('admin_abuse.查询') }}</button>
     </div>
 
     <div class="stats-row">
       <div class="stat-card">
         <span class="stat-num">{{ totalRecords }}</span>
-        <span class="stat-label">总记录数</span>
+        <span class="stat-label">{{ $t('admin_abuse.总记录数') }}</span>
       </div>
       <div class="stat-card warn">
         <span class="stat-num">{{ abuseCount }}</span>
-        <span class="stat-label">疑似滥用IP数</span>
+        <span class="stat-label">{{ $t('admin_abuse.疑似滥用ip数') }}</span>
       </div>
     </div>
 
@@ -23,7 +23,7 @@
     <div class="table-wrap" v-else-if="list.length">
     <table class="table">
       <thead>
-        <tr><th>ID</th><th>用户ID</th><th>API路径</th><th>IP地址</th><th>User-Agent</th><th>{{ $t('common.time') }}</th><th>{{ $t('common.actions') }}</th></tr>
+        <tr><th>ID</th><th>{{ $t('admin_abuse.用户id') }}</th><th>{{ $t('admin_abuse.api路径') }}</th><th>{{ $t('admin_abuse.ip地址') }}</th><th>User-Agent</th><th>{{ $t('common.time') }}</th><th>{{ $t('common.actions') }}</th></tr>
       </thead>
       <tbody>
         <tr v-for="r in list" :key="r.id" :class="{ 'row-suspect': isBotUA(r.user_agent) }">
@@ -45,7 +45,7 @@
     </div>
 
     <Pagination v-if="total > pageSize" :page="page" :page-size="pageSize" :total="total" @change="onPageChange" />
-    <div v-if="!list.length && !loading" class="empty">暂无滥用记录</div>
+    <div v-if="!list.length && !loading" class="empty">{{ $t('admin_abuse.暂无滥用记录') }}</div>
 
     <Teleport to="body">
       <div class="modal-overlay" v-if="showCheckModal" @click.self="showCheckModal = false" @keydown.escape="showCheckModal = false">
@@ -53,9 +53,9 @@
           <h3>用户 #{{ checkUserId }} 滥用检测</h3>
           <div class="check-result" :class="checkResult?.error ? '' : (checkResult?.abusing ? 'abusing' : 'normal')">
             <p v-if="checkResult?.error" class="check-error">❌ 请求{{ $t('common.failed') }}，请稍后重试</p>
-            <p v-else-if="checkResult === null">检测中...</p>
-            <p v-else-if="checkResult.abusing">⚠️ 该用户存在高频滥用行为（60秒内超过30次调用）</p>
-            <p v-else>✅ 该用户调用频率正常</p>
+            <p v-else-if="checkResult === null">{{ $t('admin_abuse.检测中') }}</p>
+            <p v-else-if="checkResult.abusing">{{ $t('admin_abuse.该用户存在高频滥用行为_60秒内超过30次调用') }}</p>
+            <p v-else>{{ $t('admin_abuse.该用户调用频率正常') }}</p>
           </div>
           <div class="modal-actions">
             <button class="btn" @click="showCheckModal = false">{{ $t('common.close') }}</button>

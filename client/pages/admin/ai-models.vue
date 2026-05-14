@@ -2,7 +2,7 @@
   <AdminLayout>
     <div class="admin-page">
       <div class="page-header">
-        <h1>AI 模型监控</h1>
+        <h1>{{ $t('admin_ai_models.ai_模型监控') }}</h1>
         <button class="refresh-btn" :class="{ spinning: loading }" :disabled="loading" @click="fetchStatus">↻ {{ $t('common.refresh') }}</button>
       </div>
 
@@ -13,7 +13,7 @@
       <div v-else-if="error" class="error-state">
         <span class="error-icon">⚠️</span>
         <p>{{ error }}</p>
-        <button class="retry-btn" @click="fetchStatus">重试</button>
+        <button class="retry-btn" @click="fetchStatus">{{ $t('admin_ai_models.重试') }}</button>
       </div>
 
       <template v-else>
