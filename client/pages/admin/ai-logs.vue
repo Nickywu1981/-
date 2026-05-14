@@ -77,7 +77,8 @@
   </AdminLayout>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts">const { t } = useI18n()
+
 
 const list = ref<any[]>([])
 const total = ref(0)
@@ -107,7 +108,7 @@ async function fetchData() {
     list.value = res.data?.list || []
     total.value = res.data?.total || 0
     if (res.data?.stats) Object.assign(stats, res.data.stats)
-  } catch (e: unknown) { error.value = '加载失败'; toast.error('加载失败') } finally { loading.value = false }
+  } catch (e: unknown) { error.value = t('common.loadFail'); toast.error(t('common.loadFail')) } finally { loading.value = false }
 }
 
 function onPageChange(p: number) { page.value = p; fetchData() }

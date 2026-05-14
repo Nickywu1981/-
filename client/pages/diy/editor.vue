@@ -132,6 +132,7 @@ const { confirm } = useConfirm()
 
 import { DIY_COMPONENTS, getComponentByCode } from '~/composables/useDiyComponents'
 import VersionHistoryModal from '~/components/diy/VersionHistoryModal.vue'
+const { t } = useI18n()
 
 
 const route = useRoute()
@@ -259,7 +260,7 @@ async function savePage() {
     }
     await $fetch(`/api/diy/${pageInfo.value.id}`, { method: 'PUT', body, credentials: 'include' })
     dirty.value = false
-    toast.success('保存成功')
+    toast.success(t('common.success_save'))
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error('保存失败: ' + (err?.data?.msg || err.message)) }
   finally { saving.value = false }
 }

@@ -31,7 +31,8 @@
     </Teleport>
   </AdminLayout>
 </template>
-<script setup lang="ts">
+<script setup lang="ts">const { t } = useI18n()
+
 
 const { confirm } = useConfirm()
 
@@ -47,7 +48,7 @@ async function fetchData() {
     if (filterType.value) params.set('type', filterType.value)
     const data: any = await $fetch(`/api/forms/admin?${params}`, { credentials: 'include' })
     list.value = data?.data?.list || data?.data || []
-  } catch(e) { toast.error('加载失败') }
+  } catch(e) { toast.error(t('common.loadFail')) }
   loading.value = false
 }
 

@@ -55,7 +55,8 @@
   </AdminLayout>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts">const { t } = useI18n()
+
 const { confirm } = useConfirm();
 const toast = useToast();
 const rules = ref<any[]>([]);
@@ -118,10 +119,10 @@ async function save() {
   try {
     if (editingId.value) {
       await $fetch(`/api/admin/geo-rules/${editingId.value}`, { method: 'PUT', credentials: 'include', body });
-      toast.success('更新成功');
+      toast.success(t('common.success_update'));
     } else {
       await $fetch('/api/admin/geo-rules', { method: 'POST', credentials: 'include', body });
-      toast.success('创建成功');
+      toast.success(t('common.success_create'));
     }
     cancelForm();
     fetchRules();
@@ -133,7 +134,7 @@ async function remove(id: number) {
   if (!await confirm({ message: '确定删除该 GEO 规则？' })) return;
   try {
     await $fetch(`/api/admin/geo-rules/${id}`, { method: 'DELETE', credentials: 'include' });
-    toast.success('已删除');
+    toast.success(t('common.delete_success'));
     fetchRules();
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '删除失败'); }
 }

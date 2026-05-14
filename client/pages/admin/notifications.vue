@@ -64,6 +64,7 @@
 
 <script setup lang="ts">
 import type { ApiResponse } from '~/composables/useApi'
+const { t } = useI18n()
 
 const { confirm } = useConfirm()
 
@@ -91,7 +92,7 @@ async function fetch() {
       list.value = data.data.list || []
       total.value = data.data.total || 0
     }
-  } catch (e: unknown) { toast.error('加载失败') } finally { loading.value = false }
+  } catch (e: unknown) { toast.error(t('common.loadFail')) } finally { loading.value = false }
 }
 
 function search() { page.value = 1; fetch() }
@@ -110,9 +111,9 @@ async function doDelete(n: any) {
   if (!await confirm({ message: `确定删除通知 #${n.id}？`} )) return
   try {
     const data = await $fetch(`/api/notifications/${n.id}`, { method: 'DELETE', credentials: 'include' }) as ApiResponse
-    if (data?.code === 200) { toast.success('已删除'); fetch() }
+    if (data?.code === 200) { toast.success(t('common.delete_success')); fetch() }
     else { toast.error(data?.msg || '删除失败') }
-  } catch (e: unknown) { toast.error('删除失败') }
+  } catch (e: unknown) { toast.error(t('common.failed_delete')) }
 }
 
 onMounted(fetch)

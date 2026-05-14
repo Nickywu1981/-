@@ -69,6 +69,7 @@
 
 <script setup lang="ts">
 import type { ApiResponse } from '~/composables/useApi'
+const { t } = useI18n()
 
 const list = ref<any[]>([])
 const total = ref(0)
@@ -97,7 +98,7 @@ async function fetch() {
       list.value = data.data.list || []
       total.value = data.data.total || 0
     }
-  } catch (e: unknown) { toast.error('加载失败') } finally { loading.value = false }
+  } catch (e: unknown) { toast.error(t('common.loadFail')) } finally { loading.value = false }
 }
 
 function search() { page.value = 1; fetch() }

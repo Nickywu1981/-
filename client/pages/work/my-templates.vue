@@ -152,7 +152,7 @@ async function confirmDelete(t: any) {
   if (!await confirm({ message: `确认删除"${t.title}"吗？删除后工作流将回退到官方模板。` })) return
   try {
     await $fetch(`/api/admin/prompts/${t.id}`, { method: 'DELETE', credentials: 'include' })
-    toast.success('已删除')
+    toast.success(t('common.delete_success'))
     fetchData()
   } catch (e: any) {
     toast.error('删除失败: ' + (e?.data?.msg || e.message))

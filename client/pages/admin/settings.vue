@@ -45,6 +45,7 @@
 </template>
 <script setup lang="ts">
 import { truncate } from '@/utils/format';
+const { t } = useI18n()
 
 const toast = useToast()
 const loading = ref(true), saving = ref(false)
@@ -87,7 +88,7 @@ onMounted(async () => {
         else otherConfigs.value.push(c)
       }
     }
-  } catch(e) { toast.error('加载失败') }
+  } catch(e) { toast.error(t('common.loadFail')) }
   loading.value = false
 })
 

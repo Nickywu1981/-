@@ -39,7 +39,8 @@
     </Teleport>
   </AdminLayout>
 </template>
-<script setup lang="ts">
+<script setup lang="ts">const { t } = useI18n()
+
 
 const { confirm } = useConfirm()
 
@@ -56,7 +57,7 @@ async function fetchData() {
     let items = data?.data?.list || data?.data || []
     if (filterPlatform.value) items = items.filter((i: any) => i.platform === filterPlatform.value)
     list.value = items
-  } catch(e) { toast.error('加载失败') }
+  } catch(e) { toast.error(t('common.loadFail')) }
   loading.value = false
 }
 

@@ -26,7 +26,8 @@
     </div>
   </AdminLayout>
 </template>
-<script setup lang="ts">
+<script setup lang="ts">const { t } = useI18n()
+
 
 const toast = useToast()
 const loading = ref(true), saving = ref(false)
@@ -37,7 +38,7 @@ onMounted(async () => {
   try {
     const data: any = await $fetch('/api/brand', { credentials: 'include' })
     if (data?.code === 200 && data.data) Object.assign(form, data.data)
-  } catch(e) { toast.error('加载失败') }
+  } catch(e) { toast.error(t('common.loadFail')) }
   loading.value = false
 })
 

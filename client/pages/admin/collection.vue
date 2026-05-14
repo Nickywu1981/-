@@ -33,7 +33,8 @@
     </Teleport>
   </AdminLayout>
 </template>
-<script setup lang="ts">
+<script setup lang="ts">const { t } = useI18n()
+
 
 const { confirm } = useConfirm()
 
@@ -52,7 +53,7 @@ async function fetchData() {
     list.value = data?.data?.list || data?.data || []
     if (!Array.isArray(list.value)) list.value = []
     total.value = data?.data?.total || 0
-  } catch(e) { toast.error('加载失败') }
+  } catch(e) { toast.error(t('common.loadFail')) }
   loading.value = false
 }
 

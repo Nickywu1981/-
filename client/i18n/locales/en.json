@@ -902,7 +902,14 @@
     "view": "View",
     "warning": "Warning",
     "all_categories": "All Categories",
-    "add_model_pool": "Model Pool"
+    "add_model_pool": "Model Pool",
+    "success_create": "Created Successfully",
+    "failed_create": "Create Failed",
+    "success_update": "Updated Successfully",
+    "failed_update": "Update Failed",
+    "failed_submit": "Submission Failed",
+    "failed_upload": "Upload Failed",
+    "login_required": "Please Login First"
   },
   "ecommerce": {
     "title": "AI E-Commerce Content Creation",

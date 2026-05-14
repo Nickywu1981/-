@@ -65,7 +65,8 @@
   </AdminLayout>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts">const { t } = useI18n()
+
 
 const { confirm } = useConfirm()
 
@@ -109,7 +110,7 @@ async function save(item: any) {
       body: { value: editValue.value, type: item.config_type, description: item.description }
     });
     item.config_value = editValue.value;
-    toast.success('保存成功');
+    toast.success(t('common.success_save'));
     editingId.value = null;
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
     toast.error(err?.data?.msg || err.message || '保存失败');
@@ -136,7 +137,7 @@ async function deleteConfig(item: any) {
   if (!await confirm({ message: `确定删除配置 "${item.config_key}"？`} )) return;
   try {
     await $fetch(`/api/admin/site-config/${item.id}`, { method: 'DELETE', credentials: 'include' });
-    toast.success('已删除');
+    toast.success(t('common.delete_success'));
     fetchConfig();
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || '删除失败'); }
 }

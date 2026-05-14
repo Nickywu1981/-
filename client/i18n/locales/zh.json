@@ -902,7 +902,14 @@
     "view": "查看",
     "warning": "警告",
     "all_categories": "全部类别",
-    "add_model_pool": "模型池"
+    "add_model_pool": "模型池",
+    "success_create": "创建成功",
+    "failed_create": "创建失败",
+    "success_update": "更新成功",
+    "failed_update": "更新失败",
+    "failed_submit": "提交失败",
+    "failed_upload": "上传失败",
+    "login_required": "请先登录"
   },
   "ecommerce": {
     "title": "AI 电商内容创作",

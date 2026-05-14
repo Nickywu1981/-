@@ -85,7 +85,8 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts">const { t } = useI18n()
+
 
 const { confirm } = useConfirm()
 
@@ -133,7 +134,7 @@ async function publishPage(id) {
 async function deletePage(id) {
   if (!await confirm({ message: '确认删除？' })) return
   try { await $fetch(`/api/diy/${id}/soft-delete`, { method: 'POST' }); loadPages() }
-  catch (e) { toast.error('删除失败') }
+  catch (e) { toast.error(t('common.failed_delete')) }
 }
 
 onMounted(loadPages)

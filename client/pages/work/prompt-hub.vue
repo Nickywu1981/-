@@ -130,6 +130,7 @@ const filtered = computed(() => {
 })
 
 import { formatDate } from '@/utils/format'
+const { t } = useI18n()
 
 const fetchAll = async () => {
   loading.value = true
@@ -156,11 +157,11 @@ const openDetail = (t: any) => {
     if (r.myScore) myRating.value = r.myScore
     detail.value.avg_score = r.avgScore
     detail.value.rating_count = r.ratingCount
-  }).catch(() => toast.error('加载失败'))
+  }).catch(() => toast.error(t('common.loadFail')))
 }
 
 const useTemplate = (t: any) => {
-  $fetch(`/api/prompts/${t.id}/use`, { method: 'POST', body: { modelType: 'text' }, credentials: 'include' }).catch(() => toast.error('加载失败'))
+  $fetch(`/api/prompts/${t.id}/use`, { method: 'POST', body: { modelType: 'text' }, credentials: 'include' }).catch(() => toast.error(t('common.loadFail')))
   openDetail(t)
 }
 
