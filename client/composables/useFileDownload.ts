@@ -6,7 +6,7 @@
  *   downloadBlob(blob, 'export.csv')
  */
 export function useFileDownload() {
-  let revokeTimer: ReturnType<typeof setTimeout> | null = null;
+  const blobUrls: string[] = []
 
   function trigger(url: string, filename: string) {
     if (!import.meta.client) return
@@ -22,13 +22,18 @@ export function useFileDownload() {
 
   function downloadBlob(blob: Blob, filename: string) {
     const url = URL.createObjectURL(blob)
+    blobUrls.push(url)
     trigger(url, filename)
-    if (revokeTimer) clearTimeout(revokeTimer)
-    revokeTimer = setTimeout(() => { URL.revokeObjectURL(url); revokeTimer = null; }, 1000)
+    setTimeout(() => {
+      URL.revokeObjectURL(url)
+      const idx = blobUrls.indexOf(url)
+      if (idx !== -1) blobUrls.splice(idx, 1)
+    }, 1000)
   }
 
   onUnmounted(() => {
-    if (revokeTimer) { clearTimeout(revokeTimer); revokeTimer = null; }
+    blobUrls.forEach(u => URL.revokeObjectURL(u))
+    blobUrls.length = 0
   })
 
   return { download, downloadBlob }

@@ -92,7 +92,7 @@ export function useTaskPolling() {
         }
       }
     } catch (e) {
-      console.warn('[TaskPolling] 轮询请求失败', e);
+      if (import.meta.dev) console.warn('[TaskPolling] 轮询请求失败', e);
     }
     _pollCount++
     schedulePoll()
