@@ -1174,6 +1174,33 @@
       "ai-logs": "AI Call Logs"
     }
   },
+  "chat": {
+    "entry_aria": "Open AI Chat Assistant",
+    "entry_title": "AI Chat Assistant",
+    "entry_label": "AI Chat",
+    "panel_title": "AI Creation Assistant",
+    "welcome_title": "Hello, I'm Movio AI Creation Assistant",
+    "welcome_desc": "I can help you generate product images, write copy, analyze videos, and translate content. Try the quick commands below~",
+    "input_placeholder": "Describe what you need, e.g. \"Generate a white dress product image\"...",
+    "send": "Send",
+    "attach": "Attach",
+    "clear": "Clear Chat",
+    "close": "Close",
+    "positive_prompt": "Positive Prompt",
+    "negative_prompt": "Negative Prompt",
+    "quick_main_image": "Product Image",
+    "quick_scene": "Scene Image",
+    "quick_remove_bg": "Remove BG",
+    "quick_copywriting": "Copywriting",
+    "quick_video_clone": "Viral Clone",
+    "quick_translate": "Translate",
+    "mode_chat": "Chat",
+    "mode_image": "Image",
+    "mode_video": "Video",
+    "mode_ecommerce": "E-commerce",
+    "blocked_title": "Content Blocked",
+    "error_network": "Network error, please check your connection and retry"
+  },
   "admin": {
     "page_title": "Admin Panel",
     "brand_name": "Movio Admin",

@@ -126,6 +126,7 @@ import agentRoutes from './route/agentRoutes.js';               // 电商全能A
 import unifiedWorkflowRoutes from './route/unifiedWorkflowRoutes.js'; // 统一工作流引擎 + 模型池 — 7条固定工作流
 import abTestRoutes from './route/abTestRoutes.js';                // A/B 实验框架 — 实验定义+指标+显著性
 import healingRoutes from './route/healingRoutes.js';                // L5 自愈系统管理 — 事件/模式/策略/阈值/预测
+import chatRoutes from './route/chatRoutes.js';                       // Phase 1.5: 全局 AI 对话模块
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -420,6 +421,7 @@ app.use('/api/enterprise', enterpriseRoutes);
 app.use('/api/admin/campaign', adminLimiter, campaignRoutes);        // Phase 11: 运营活动+优惠券+公告
 app.use('/api/admin', adminRoutes);                                   // 管理后台统一路由 (自带 auth+adminAuth)
 app.use('/api/ai-assistant', authMiddleware, aiAssistantRoutes);  // Phase 13: AI 助手 (FAQ/审核/数据分析)
+app.use('/api/chat', authMiddleware, heavyLimiter, chatRoutes);    // Phase 1.5: 全局 AI 对话模块
 app.use('/api/workflows', authMiddleware, heavyLimiter, workflowRoutes);       // Phase 14: 工作流引擎 (模板/执行/作业)
 app.use('/api/ops', adminLimiter, operationsRoutes);                  // Phase 12: 跨租户运营看板
 

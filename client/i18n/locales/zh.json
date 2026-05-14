@@ -1173,6 +1173,33 @@
       "ai-logs": "AI 调用日志"
     }
   },
+  "chat": {
+    "entry_aria": "打开 AI 对话助手",
+    "entry_title": "AI 对话助手",
+    "entry_label": "AI 对话",
+    "panel_title": "AI 创作助手",
+    "welcome_title": "你好，我是 Movio AI 创作助手",
+    "welcome_desc": "我可以帮你生成商品图、写文案、分析视频、翻译内容。试试下面的快捷指令吧～",
+    "input_placeholder": "输入你的需求，比如"帮我生成一张连衣裙主图"...",
+    "send": "发送",
+    "attach": "添加附件",
+    "clear": "清空对话",
+    "close": "关闭",
+    "positive_prompt": "正向提示词",
+    "negative_prompt": "反向提示词",
+    "quick_main_image": "生成主图",
+    "quick_scene": "生成场景图",
+    "quick_remove_bg": "去背景",
+    "quick_copywriting": "写带货文案",
+    "quick_video_clone": "爆款复刻",
+    "quick_translate": "跨境翻译",
+    "mode_chat": "普通对话",
+    "mode_image": "图片模式",
+    "mode_video": "视频模式",
+    "mode_ecommerce": "电商创作",
+    "blocked_title": "内容被拦截",
+    "error_network": "网络异常，请检查连接后重试"
+  },
   "admin": {
     "page_title": "管理后台",
     "brand_name": "Movio 总控",

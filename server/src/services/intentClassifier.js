@@ -41,6 +41,12 @@ export const INTENT_TYPES = {
   SCRIPT:         { id: 'script',         category: 'text',   label: '带货脚本' },
   SELLING_POINTS: { id: 'selling_points', category: 'text',   label: '卖点提炼' },
   VOICE:          { id: 'voice',          category: 'text',   label: '语音配音' },
+
+  // 对话+综合类（Phase 1.5 扩展）
+  CHAT:           { id: 'chat',           category: 'chat',   label: '通用问答' },
+  TRANSLATE:      { id: 'translate',      category: 'text',   label: '跨境翻译' },
+  COMPLIANCE:     { id: 'compliance',     category: 'chat',   label: '合规检查' },
+  ANALYSE_IMAGE:  { id: 'analyse_image',  category: 'chat',   label: '图片分析' },
 };
 
 // ==================== 关键词快速匹配 ====================
@@ -60,6 +66,11 @@ const KEYWORD_MAP = [
   { intent: 'script',         kw: ['脚本','带货脚本','视频脚本','剧本','直播脚本','口播','话术','台词','主播','讲解'] },
   { intent: 'selling_points', kw: ['卖点提炼','卖点','提炼','亮点','优势提炼','核心卖点','产品特点','差异化','总结卖点','优势亮点'] },
   { intent: 'voice',          kw: ['配音','语音','旁白','解说','音频','朗读','播音','画外音','口播配音','配音生成'] },
+  // 对话+综合类（Phase 1.5 扩展 ~30 关键词）
+  { intent: 'chat',          kw: ['帮助','怎么用','怎么操作','教我用','功能', '能做什么','有什么功能','可以做什么','使用方法','使用教程','帮助文档','不会用','怎么弄','如何','怎么','怎样'] },
+  { intent: 'translate',     kw: ['翻译','英文','日文','韩文','西班牙语','多语言','跨境翻译','多语种','翻译成','英文版','日文版','国际化','本地化','translate','localization'] },
+  { intent: 'compliance',    kw: ['合规','合规检查','敏感词','违禁词','广告法','审核','检查文案','检测违规','是否合规','有没有违规','能用吗合规','风险','排查'] },
+  { intent: 'analyse_image', kw: ['分析这张图','图片分析','图里有什么','解析图片','看图','这张图','图片里','图中','分析图','理解图片'] },
 ];
 
 // 关键词→意图 索引缓存
@@ -143,6 +154,7 @@ async function _llmClassify(userInput, ctx) {
 详情页类: product_detail(商品详情页) | infographic(信息图)
 视频类: main_video(主图视频) | ad_video(投流视频) | action_migrate(动作迁移) | video_clone(视频复刻)
 文案语音类: copywriting(营销文案) | script(带货脚本) | selling_points(卖点提炼) | voice(语音配音)
+对话综合类: chat(通用问答/功能引导/使用方法) | translate(跨境翻译/多语种) | compliance(合规检查/敏感词检测) | analyse_image(图片内容分析)
 
 用户输入："${userInput.slice(0, 500)}"
 当前平台：${platform}

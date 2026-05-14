@@ -17,6 +17,9 @@
         </button>
       </div>
 
+      <!-- 全局 AI 对话入口 (Phase 1.5) -->
+      <GlobalAIChat />
+
       <nav class="wsl-nav" role="navigation" :aria-label="t('workspace.nav_main_label')">
         <NuxtLink
           v-for="item in navItems"
