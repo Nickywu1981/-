@@ -3,10 +3,10 @@
     <div class="page">
       <div class="page-header">
         <div>
-          <h1>A/B 实验管理</h1>
-          <p>管理实验全生命周期：创建→启动→分析→完成</p>
+          <h1>{{ $t('admin_ab.page_title') }}</h1>
+          <p>{{ $t('admin_ab.page_desc') }}</p>
         </div>
-        <button class="btn btn-primary" @click="showCreate = true">+ 新建实验</button>
+        <button class="btn btn-primary" @click="showCreate = true">{{ $t('admin_ab.create_btn') }}</button>
       </div>
 
       <!-- 状态筛选 -->
@@ -25,39 +25,39 @@
               <span :class="['badge', 'badge-' + exp.status]">{{ statusLabel(exp.status) }}</span>
             </div>
             <div class="exp-meta">
-              <span>{{ exp.variants?.length || 0 }} 变体</span>
-              <span>{{ exp.metrics?.length || 0 }} 指标</span>
+              <span>{{ exp.variants?.length || 0 }} {{ $t('admin_ab.variant') }}</span>
+              <span>{{ exp.metrics?.length || 0 }} {{ $t('admin_ab.col_metric') }}</span>
               <span>{{ exp.target_type }}</span>
             </div>
           </div>
           <div class="exp-actions" @click.stop>
-            <button v-if="exp.status === 'draft' || exp.status === 'paused'" class="btn btn-sm" @click="startExp(exp.id)">▶ 启动</button>
-            <button v-if="exp.status === 'running'" class="btn btn-sm" @click="pauseExp(exp.id)">⏸ 暂停</button>
-            <button v-if="exp.status === 'running' || exp.status === 'paused'" class="btn btn-sm" @click="completeExp(exp.id)">✓ 完成</button>
+            <button v-if="exp.status === 'draft' || exp.status === 'paused'" class="btn btn-sm" @click="startExp(exp.id)">{{ $t('admin_ab.start_btn') }}</button>
+            <button v-if="exp.status === 'running'" class="btn btn-sm" @click="pauseExp(exp.id)">{{ $t('admin_ab.pause_btn') }}</button>
+            <button v-if="exp.status === 'running' || exp.status === 'paused'" class="btn btn-sm" @click="completeExp(exp.id)">{{ $t('admin_ab.complete_btn') }}</button>
           </div>
         </div>
       </div>
-      <div v-else class="empty">暂无实验，点击"+ 新建实验"开始</div>
+      <div v-else class="empty">{{ $t('admin_ab.empty_hint') }}</div>
 
       <!-- 选中实验 → 结果显示 -->
       <div v-if="selected" class="results-section">
-        <h2>{{ selected.name }} — 实验结果</h2>
+        <h2>{{ selected.name }}{{ $t('admin_ab.results_suffix') }}</h2>
         <div class="result-actions">
           <select v-model="resultsDays" @change="loadResults" class="input">
-            <option value="1">最近1天</option>
-            <option value="3">最近3天</option>
-            <option value="7">最近7天</option>
-            <option value="14">最近14天</option>
-            <option value="30">最近30天</option>
+            <option value="1">{{ $t('admin_ab.days_1') }}</option>
+            <option value="3">{{ $t('admin_ab.days_3') }}</option>
+            <option value="7">{{ $t('admin_ab.days_7') }}</option>
+            <option value="14">{{ $t('admin_ab.days_14') }}</option>
+            <option value="30">{{ $t('admin_ab.days_30') }}</option>
           </select>
-          <button class="btn" @click="loadResults">刷新</button>
+          <button class="btn" @click="loadResults">{{ $t('admin_ab.refresh') }}</button>
         </div>
 
         <!-- 指标对比 -->
         <div v-if="results" class="result-grid">
           <!-- 变体汇总 -->
           <table class="data-table">
-            <thead><tr><th>变体</th><th v-for="m in selected.metrics" :key="m.metricId">{{ m.name }}</th></tr></thead>
+            <thead><tr><th>{{ $t('admin_ab.variant') }}</th><th v-for="m in selected.metrics" :key="m.metricId">{{ m.name }}</th></tr></thead>
             <tbody>
             <tr v-for="v in results.variants" :key="v.variantId">
               <td><strong>{{ v.label }}</strong></td>
@@ -70,9 +70,9 @@
 
           <!-- 显著性 -->
           <div class="comparisons">
-            <h3>显著性分析</h3>
+            <h3>{{ $t('admin_ab.comparison_title') }}</h3>
             <table class="data-table" v-if="results.comparisons.length > 0">
-              <thead><tr><th>指标</th><th>优胜变体</th><th>对比变体</th><th>优胜均值</th><th>对比均值</th><th>p值</th><th>显著</th></tr></thead>
+              <thead><tr><th>{{ $t('admin_ab.col_metric') }}</th><th>{{ $t('admin_ab.col_winner') }}</th><th>{{ $t('admin_ab.col_compared') }}</th><th>{{ $t('admin_ab.col_winner_mean') }}</th><th>{{ $t('admin_ab.col_compared_mean') }}</th><th>{{ $t('admin_ab.col_pvalue') }}</th><th>{{ $t('admin_ab.col_significant') }}</th></tr></thead>
               <tbody>
               <tr v-for="c in results.comparisons" :key="`${c.metricId}-${c.comparedVariant}`">
                 <td>{{ c.metric }}</td>
@@ -81,11 +81,11 @@
                 <td>{{ c.bestMean }}</td>
                 <td>{{ c.otherMean }}</td>
                 <td :class="{ 'p-sig': c.significant }">{{ c.pValue }}</td>
-                <td>{{ c.significant ? '✅ 显著' : '—' }}</td>
+                <td>{{ c.significant ? '✅ ' + $t('admin_ab.significant_yes') : '—' }}</td>
               </tr>
               </tbody>
             </table>
-            <p v-else class="hint">暂无足够数据计算显著性</p>
+            <p v-else class="hint">{{ $t('admin_ab.no_data_hint') }}</p>
           </div>
         </div>
       </div>
@@ -93,50 +93,50 @@
       <!-- 创建/编辑弹窗 -->
       <div v-if="showCreate" class="modal-mask" @click.self="showCreate = false" @keydown.escape="showCreate = false">
         <div class="modal">
-          <h2>新建 A/B 实验</h2>
+          <h2>{{ $t('admin_ab.modal_create') }}</h2>
           <div class="form-group">
-            <label>实验名称</label><input v-model="form.name" class="input" placeholder="如：DeepSeek vs Qwen 转化率对比" />
+            <label>{{ $t('admin_ab.label_name') }}</label><input v-model="form.name" class="input" :placeholder="$t('admin_ab.placeholder_name')" />
           </div>
           <div class="form-group">
-            <label>描述</label><textarea v-model="form.description" class="input" rows="2" placeholder="实验目的和假设..." />
+            <label>{{ $t('admin_ab.label_desc') }}</label><textarea v-model="form.description" class="input" rows="2" :placeholder="$t('admin_ab.placeholder_desc')" />
           </div>
           <div class="form-group">
-            <label>目标类型</label>
+            <label>{{ $t('admin_ab.label_target_type') }}</label>
             <select v-model="form.targetType" class="input">
-              <option value="model">模型对比</option>
-              <option value="template">模板对比</option>
-              <option value="prompt">提示词对比</option>
-              <option value="full_workflow">全工作流对比</option>
+              <option value="model">{{ $t('admin_ab.target_model') }}</option>
+              <option value="template">{{ $t('admin_ab.target_template') }}</option>
+              <option value="prompt">{{ $t('admin_ab.target_prompt') }}</option>
+              <option value="full_workflow">{{ $t('admin_ab.target_full_workflow') }}</option>
             </select>
           </div>
           <div class="form-group">
-            <label>变体配置</label>
+            <label>{{ $t('admin_ab.label_variants') }}</label>
             <div v-for="(v, i) in form.variants" :key="i" class="variant-row">
-              <input v-model="v.variantId" class="input input-sm" placeholder="变体ID" />
-              <input v-model="v.modelKey" class="input input-sm" placeholder="模型Key" />
-              <input v-model="v.description" class="input input-sm" placeholder="描述" />
-              <input v-model.number="v.weight" class="input input-sm" type="number" placeholder="权重" style="width:64px" />
+              <input v-model="v.variantId" class="input input-sm" :placeholder="$t('admin_ab.placeholder_variant_id')" />
+              <input v-model="v.modelKey" class="input input-sm" :placeholder="$t('admin_ab.placeholder_model_key')" />
+              <input v-model="v.description" class="input input-sm" :placeholder="$t('admin_ab.placeholder_desc_short')" />
+              <input v-model.number="v.weight" class="input input-sm" type="number" :placeholder="$t('admin_ab.placeholder_weight')" style="width:64px" />
               <button v-if="i >= 2" class="btn btn-sm" @click="form.variants.splice(i, 1)">✕</button>
             </div>
-            <button class="btn" @click="form.variants.push({variantId:'',modelKey:'',description:'',weight:50})">+ 添加变体</button>
+            <button class="btn" @click="form.variants.push({variantId:'',modelKey:'',description:'',weight:50})">{{ $t('admin_ab.add_variant') }}</button>
           </div>
           <div class="form-group">
-            <label>指标定义</label>
+            <label>{{ $t('admin_ab.label_metrics') }}</label>
             <div v-for="(m, i) in form.metrics" :key="i" class="metric-row">
-              <input v-model="m.metricId" class="input input-sm" placeholder="指标ID" />
-              <input v-model="m.name" class="input input-sm" placeholder="指标名称" />
+              <input v-model="m.metricId" class="input input-sm" :placeholder="$t('admin_ab.placeholder_metric_id')" />
+              <input v-model="m.name" class="input input-sm" :placeholder="$t('admin_ab.placeholder_metric_name')" />
               <select v-model="m.type" class="input input-sm">
-                <option value="conversion">转化率</option>
-                <option value="quality">质量分</option>
-                <option value="latency">延迟</option>
+                <option value="conversion">{{ $t('admin_ab.metric_conversion') }}</option>
+                <option value="quality">{{ $t('admin_ab.metric_quality') }}</option>
+                <option value="latency">{{ $t('admin_ab.metric_latency') }}</option>
               </select>
               <button v-if="i >= 1" class="btn btn-sm" @click="form.metrics.splice(i, 1)">✕</button>
             </div>
-            <button class="btn" @click="form.metrics.push({metricId:'',name:'',type:'conversion'})">+ 添加指标</button>
+            <button class="btn" @click="form.metrics.push({metricId:'',name:'',type:'conversion'})">{{ $t('admin_ab.add_metric') }}</button>
           </div>
           <div class="modal-actions">
-            <button class="btn" @click="showCreate = false">取消</button>
-            <button class="btn btn-primary" :disabled="saving" @click="create">{{ saving ? '保存中...' : '创建实验' }}</button>
+            <button class="btn" @click="showCreate = false">{{ $t('admin_ab.cancel') }}</button>
+            <button class="btn btn-primary" :disabled="saving" @click="create">{{ saving ? $t('admin_ab.saving') : $t('admin_ab.create_submit') }}</button>
           </div>
         </div>
       </div>
@@ -146,6 +146,7 @@
 
 <script setup lang="ts">
 const toast = useToast();
+const { t } = useI18n();
 
 const experiments = ref<any[]>([]);
 const selected = ref<any>(null);
@@ -154,14 +155,14 @@ const resultsDays = ref(7);
 const filterStatus = ref('');
 const showCreate = ref(false);
 const saving = ref(false);
-const statuses = [{ key: '', label: '全部' }, { key: 'running', label: '运行中' }, { key: 'draft', label: '草稿' }, { key: 'paused', label: '已暂停' }, { key: 'completed', label: '已完成' }];
+const statuses = [{ key: '', label: t('admin_ab.status_all') }, { key: 'running', label: t('admin_ab.status_running') }, { key: 'draft', label: t('admin_ab.status_draft') }, { key: 'paused', label: t('admin_ab.status_paused') }, { key: 'completed', label: t('admin_ab.status_completed') }];
 
 const form = ref({ name: '', description: '', targetType: 'model', variants: [
-  { variantId: 'control', modelKey: '', description: '对照组', weight: 50 },
-  { variantId: 'treatment', modelKey: '', description: '实验组', weight: 50 },
+  { variantId: 'control', modelKey: '', description: t('admin_ab.control_group'), weight: 50 },
+  { variantId: 'treatment', modelKey: '', description: t('admin_ab.treatment_group'), weight: 50 },
 ], metrics: [
-  { metricId: 'success_rate', name: '成功率', type: 'conversion' },
-  { metricId: 'latency', name: '平均延迟', type: 'latency' },
+  { metricId: 'success_rate', name: t('admin_ab.metric_success_rate'), type: 'conversion' },
+  { metricId: 'latency', name: t('admin_ab.metric_avg_latency'), type: 'latency' },
 ]});
 
 const filteredExps = computed(() => {
@@ -170,7 +171,7 @@ const filteredExps = computed(() => {
 });
 
 function statusLabel(s: string) {
-  const map: Record<string, string> = { draft: '草稿', running: '运行中', paused: '已暂停', completed: '已完成' };
+  const map: Record<string, string> = { draft: t('admin_ab.status_draft'), running: t('admin_ab.status_running'), paused: t('admin_ab.status_paused'), completed: t('admin_ab.status_completed') };
   return map[s] || s;
 }
 
@@ -185,7 +186,7 @@ async function fetchExperiments() {
   try {
     const data: any = await $fetch('/api/admin/experiments' + (filterStatus.value ? `?status=${filterStatus.value}` : ''), { credentials: 'include' });
     experiments.value = data.data || [];
-  } catch (e: any) { toast.error(e?.data?.msg || '获取实验列表失败'); }
+  } catch (e: any) { toast.error(e?.data?.msg || t('admin_ab.toast_load_fail')); }
 }
 
 async function selectExperiment(exp: any) { selected.value = exp; await loadResults(); }
@@ -195,18 +196,18 @@ async function loadResults() {
   try {
     const data: any = await $fetch(`/api/admin/experiments/${selected.value.id}/results?days=${resultsDays.value}`, { credentials: 'include' });
     results.value = data.data;
-  } catch (e: any) { toast.error(e?.data?.msg || '获取实验数据失败'); }
+  } catch (e: any) { toast.error(e?.data?.msg || t('admin_ab.toast_data_fail')); }
 }
 
 async function create() {
-  if (!form.value.name.trim()) return toast.error('请输入实验名称');
+  if (!form.value.name.trim()) return toast.error(t('admin_ab.toast_enter_name'));
   saving.value = true;
   try {
     await $fetch('/api/admin/experiments', { method: 'POST', credentials: 'include', body: form.value });
-    toast.success('实验创建成功');
+    toast.success(t('admin_ab.toast_create_success'));
     showCreate.value = false;
     fetchExperiments();
-  } catch (e: any) { toast.error(e?.data?.msg || '创建失败'); }
+  } catch (e: any) { toast.error(e?.data?.msg || t('admin_ab.toast_create_fail')); }
   finally { saving.value = false; }
 }
 
@@ -217,9 +218,9 @@ async function completeExp(id: number) { await action(id, 'complete'); }
 async function action(id: number, action: string) {
   try {
     await $fetch(`/api/admin/experiments/${id}/${action}`, { method: 'POST', credentials: 'include' });
-    toast.success(`操作成功`);
+    toast.success(t('admin_ab.toast_action_success'));
     fetchExperiments();
-  } catch (e: any) { toast.error(e?.data?.msg || '操作失败'); }
+  } catch (e: any) { toast.error(e?.data?.msg || t('admin_ab.toast_action_fail')); }
 }
 
 onMounted(fetchExperiments);
