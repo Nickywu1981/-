@@ -3,26 +3,26 @@
   <div class="pg">
     <div class="page-header">
       <div>
-        <h1 class="page-header-title">配额管理</h1>
-        <p class="page-header-subtitle">总分配 {{ totalQuota }} Token</p>
+        <h1 class="page-header-title">{{ $t('gateway.quota_title') }}</h1>
+        <p class="page-header-subtitle">{{ $t('gateway.quota_subtitle', { n: totalQuota }) }}</p>
       </div>
       <div class="page-header-actions">
-        <button class="btn btn-gradient btn-sm" @click="showAllocate = true">+ 分配配额</button>
+        <button class="btn btn-gradient btn-sm" @click="showAllocate = true">{{ $t('gateway.quota_btn_allocate') }}</button>
       </div>
     </div>
 
     <div class="stat-grid" style="margin-bottom:var(--space-6)">
-      <div class="stat-card"><div class="stat-card-value">12M</div><div class="stat-card-label">总配额</div></div>
-      <div class="stat-card"><div class="stat-card-value">3.2M</div><div class="stat-card-label">已使用</div></div>
-      <div class="stat-card"><div class="stat-card-value">26.7%</div><div class="stat-card-label">使用率</div></div>
+      <div class="stat-card"><div class="stat-card-value">12M</div><div class="stat-card-label">{{ $t('gateway.quota_stat_total') }}</div></div>
+      <div class="stat-card"><div class="stat-card-value">3.2M</div><div class="stat-card-label">{{ $t('gateway.quota_stat_used') }}</div></div>
+      <div class="stat-card"><div class="stat-card-value">26.7%</div><div class="stat-card-label">{{ $t('gateway.quota_stat_rate') }}</div></div>
     </div>
 
     <div class="chart-card">
-      <div class="chart-card-header"><span class="chart-card-title">租户配额</span></div>
+      <div class="chart-card-header"><span class="chart-card-title">{{ $t('gateway.quota_chart_title') }}</span></div>
       <div class="chart-card-body" style="padding:0">
         <div class="table-container" style="border:none;border-radius:0">
           <table class="data-table">
-            <thead><tr><th>租户</th><th>配额</th><th>已用</th><th>使用率</th><th>到期日</th><th>状态</th></tr></thead>
+            <thead><tr><th>{{ $t('gateway.quota_col_tenant') }}</th><th>{{ $t('gateway.quota_col_quota') }}</th><th>{{ $t('gateway.quota_col_used') }}</th><th>{{ $t('gateway.quota_col_rate') }}</th><th>{{ $t('gateway.quota_col_expiry') }}</th><th>{{ $t('gateway.quota_col_status') }}</th></tr></thead>
             <tbody>
               <tr v-for="q in quotas" :key="q.tenant">
                 <td>{{ q.tenant }}</td><td>{{ q.quota }}</td><td>{{ q.used }}</td>

@@ -3,20 +3,20 @@
   <div class="pg">
     <div class="page-header">
       <div>
-        <h1 class="page-header-title">限流策略</h1>
-        <p class="page-header-subtitle">rateLimiter / heavyLimiter / authLimiter / adminLimiter 策略配置</p>
+        <h1 class="page-header-title">{{ $t('gateway.rate_limit_title') }}</h1>
+        <p class="page-header-subtitle">{{ $t('gateway.rate_limit_subtitle') }}</p>
       </div>
-      <button class="btn btn-secondary btn-sm">应用变更</button>
+      <button class="btn btn-secondary btn-sm">{{ $t('gateway.rate_limit_btn_apply') }}</button>
     </div>
 
     <div class="card">
       <table class="data-table">
-        <thead><tr><th>策略名称</th><th>类型</th><th>QPS 限制</th><th>突发容量</th><th>适用路由数</th><th>状态</th></tr></thead>
+        <thead><tr><th>{{ $t('gateway.rate_limit_col_name') }}</th><th>{{ $t('gateway.rate_limit_col_type') }}</th><th>{{ $t('gateway.rate_limit_col_qps') }}</th><th>{{ $t('gateway.rate_limit_col_burst') }}</th><th>{{ $t('gateway.rate_limit_col_route_count') }}</th><th>{{ $t('gateway.rate_limit_col_status') }}</th></tr></thead>
         <tbody>
           <tr v-for="l in limits" :key="l.name">
             <td><strong>{{ l.name }}</strong></td><td>{{ l.type }}</td><td>{{ l.qps }}</td><td>{{ l.burst }}</td>
             <td>{{ l.routeCount }}</td>
-            <td><span class="badge badge-success">{{ l.enabled ? '启用' : '禁用' }}</span></td>
+            <td><span class="badge badge-success">{{ l.enabled ? $t('gateway.rate_limit_status_enabled') : $t('gateway.rate_limit_status_disabled') }}</span></td>
           </tr>
         </tbody>
       </table>
