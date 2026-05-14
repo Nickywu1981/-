@@ -29,7 +29,7 @@
       />
 
       <div class="input-group" style="margin-top:16px">
-        <label>{{ $t('work_pages.video.prompt_label') }}<label>
+        <label>{{ $t('work_pages.video.prompt_label') }}</label>
         <textarea v-model="prompt" class="input prompt-input" rows="3" :placeholder="$t('work_pages.video.prompt_placeholder')" maxlength="2000"></textarea>
         <div class="prompt-actions">
           <PromptEnhancer v-model="prompt" type="video" @enhanced="onPromptEnhanced" />
@@ -41,13 +41,13 @@
 
       <div class="options-row">
         <div class="option">
-          <label>{{ $t('work_pages.video.ratio_label') }}<label>
+          <label>{{ $t('work_pages.video.ratio_label') }}</label>
           <select v-model="ratio" class="input">
             <option v-for="r in ratioOptions" :key="r.item_key" :value="r.item_key">{{ r.item_value }}</option>
           </select>
         </div>
         <div class="option">
-          <label>{{ $t('work_pages.video.duration_label') }}<label>
+          <label>{{ $t('work_pages.video.duration_label') }}</label>
           <select v-model="duration" class="input">
             <option v-for="opt in durationOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
@@ -63,7 +63,7 @@
       <div v-if="resultUrl" class="result-preview">
         <video :src="resultUrl" class="result-video" controls />
         <div class="result-actions">
-          <button class="btn btn-primary btn-sm" @click="downloadResult">{{ $t('work_pages.video.download_btn') }}<button>
+          <button class="btn btn-primary btn-sm" @click="downloadResult">{{ $t('work_pages.video.download_btn') }}</button>
           <button class="btn btn-secondary btn-sm" @click="copyToClipboard(resultUrl)">{{ $t('work_pages.video.copy_link') }}</button>
         </div>
       </div>
@@ -72,7 +72,7 @@
     <!-- 一键成片 (商品广告) -->
     <div v-if="activeTab === 'productAd'" class="work-panel">
       <div class="input-group">
-        <label>{{ $t('work_pages.video.product_name') }}<label>
+        <label>{{ $t('work_pages.video.product_name') }}</label>
         <input v-model="productName" type="text" class="input" :placeholder="$t('work_pages.video.product_name_placeholder')" maxlength="200" />
       </div>
 

@@ -55,7 +55,7 @@
             <el-button type="primary" :loading="titleGenning" @click="doGenerateTitles" :icon="MagicStick">
               {{ titleGenning ? $t('work_pages.copywriting.gen_running') : $t('work_pages.copywriting.gen_title_btn') }}
             </el-button>
-            <el-button @click="titleForm = getDefaultTitleForm()">{{ $t('work_pages.copywriting.reset') }}<el-button>
+            <el-button @click="titleForm = getDefaultTitleForm()">{{ $t('work_pages.copywriting.reset') }}</el-button>
           </el-form-item>
         </el-form>
 
@@ -74,7 +74,7 @@
             <div class="result-row">
               <span class="result-index">{{ i + 1 }}</span>
               <span class="result-text">{{ t }}</span>
-              <el-button size="small" type="primary" plain @click="copyText(t)">{{ $t('work_pages.copywriting.copy') }}<el-button>
+              <el-button size="small" type="primary" plain @click="copyText(t)">{{ $t('work_pages.copywriting.copy') }}</el-button>
             </div>
           </el-card>
         </div>
@@ -122,7 +122,7 @@
           <el-card shadow="hover" class="desc-result-card">
             <div class="desc-content">{{ descResultRaw }}</div>
             <div class="desc-actions">
-              <el-button type="primary" size="small" @click="copyText(descResultRaw)">{{ $t('work_pages.copywriting.copy_full') }}<el-button>
+              <el-button type="primary" size="small" @click="copyText(descResultRaw)">{{ $t('work_pages.copywriting.copy_full') }}</el-button>
             </div>
           </el-card>
         </div>
@@ -170,7 +170,7 @@
           <el-card shadow="hover">
             <div class="desc-content">{{ transResult }}</div>
             <div class="desc-actions">
-              <el-button type="primary" size="small" @click="copyText(transResult)">{{ $t('work_pages.copywriting.copy_trans') }}<el-button>
+              <el-button type="primary" size="small" @click="copyText(transResult)">{{ $t('work_pages.copywriting.copy_trans') }}</el-button>
             </div>
           </el-card>
         </div>
@@ -205,7 +205,7 @@
           <el-table-column prop="created_at" :label="$t('work_pages.copywriting.time')" width="170" />
           <el-table-column :label="$t('work_pages.copywriting.operation')" width="80">
             <template #default="{ row }">
-              <el-button size="small" type="danger" text @click="deleteRecord(row.id)">{{ $t('work_pages.copywriting.delete') }}<el-button>
+              <el-button size="small" type="danger" text @click="deleteRecord(row.id)">{{ $t('work_pages.copywriting.delete') }}</el-button>
             </template>
           </el-table-column>
         </el-table>

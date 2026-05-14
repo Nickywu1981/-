@@ -178,6 +178,7 @@ export async function listGeneratedVideos(userId, { page = 1, pageSize = 20 }) {
   const { offset } = parsePagination({ page, pageSize });
   const [rows] = await pool.query(
     'SELECT id, user_id, task_id, type, platform, original_url, result_url, thumbnail_url, duration, width, height, file_size, has_bgm, has_subtitle, params_json, create_time FROM ?? WHERE user_id = ? ORDER BY create_time DESC LIMIT ? OFFSET ?',
+    ['generated_video', userId, pageSize, offset],
   );
   const [[{ total }]] = await pool.query(
     'SELECT COUNT(*) AS total FROM ?? WHERE user_id = ?',

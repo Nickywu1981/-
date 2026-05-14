@@ -43,11 +43,14 @@ export async function list(options = {}) {
   }));
 }
 
+const ALLOWED_COLUMNS = ['name', 'description', 'type', 'target_type', 'target_id', 'status', 'variants', 'metrics', 'start_time', 'end_time'];
+
 export async function update(id, data) {
   const sets = [];
   const params = [];
   for (const [k, v] of Object.entries(data)) {
     const col = k.replace(/[A-Z]/g, m => '_' + m.toLowerCase());
+    if (!ALLOWED_COLUMNS.includes(col)) continue;
     if (['variants', 'metrics'].includes(col)) {
       sets.push(`${col} = ?`);
       params.push(JSON.stringify(v));
