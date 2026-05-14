@@ -117,6 +117,16 @@ export function useAIChat() {
               if (lastEventType === 'session' || parsed.sessionId) {
                 sessionId.value = parsed.sessionId || sessionId.value
               }
+              // server error events use event type, not data.type
+              if (lastEventType === 'error') {
+                if (messages.value[aiMsgIdx]) {
+                  messages.value[aiMsgIdx].content = `❌ ${parsed.message || '处理失败'}`
+                  messages.value[aiMsgIdx].streaming = false
+                }
+                streaming.value = false
+                lastEventType = ''
+                continue
+              }
               handleSSEEvent(parsed, aiMsgIdx)
             } catch {
               if (messages.value[aiMsgIdx]) {

@@ -59,6 +59,9 @@ export async function handleMessage({ res, req, message, sessionId, mode, attach
   }
 
   try {
+    // ── Step 0: 回传 sessionId 给客户端 ──
+    sse.send({ type: 'session', sessionId: sid });
+
     // ── Step 1: 合规前置拦截 ──
     sse.send({ type: 'status', status: 'checking', message: '正在检查内容合规...' });
 
@@ -171,11 +174,8 @@ export async function handleMessage({ res, req, message, sessionId, mode, attach
       },
     });
 
-    // 边输出边审核
+    // processStreamingOutput 自动将每个 chunk 作为 token 事件发送，无需 onChunk 重复发送
     await processStreamingOutput(sourceStream, sse, {
-      onChunk: (chunk, index) => {
-        sse.send({ type: 'chunk', content: chunk, index });
-      },
       moderateInterval: 5,
     });
 
