@@ -1,31 +1,31 @@
 <template>
-  <WorkLayout title="声音克隆" subtitle="AI 语音合成与音色克隆" :steps="steps" :current-step="currentStep">
+  <WorkLayout :title="$t('work_pages.voice_clone.title')" :subtitle="$t('work_pages.voice_clone.subtitle')" :steps="steps" :current-step="currentStep">
       <div class="ws-section">
-        <div class="ws-section__title">上传音频样本</div>
-        <div class="ws-section__desc">上传 10-60 秒清晰人声，AI 将学习并克隆该音色</div>
+        <div class="ws-section__title">{{ $t('work_pages.voice_clone.section_audio_title') }}</div>
+        <div class="ws-section__desc">{{ $t('work_pages.voice_clone.section_audio_desc') }}</div>
         <div class="ws-upload-area" @dragover.prevent @drop.prevent="handleDrop" @click="triggerUpload">
           <div v-if="!audioFileName" class="ws-upload-area__inner">
             <div class="ws-upload-area__icon">🎙️</div>
-            <div class="ws-upload-area__text">点击上传或拖拽音频文件</div>
-            <div class="ws-upload-area__hint">支持 MP3 / WAV / M4A，时长 10s-60s</div>
+            <div class="ws-upload-area__text">{{ $t('work_pages.voice_clone.upload_hint') }}</div>
+            <div class="ws-upload-area__hint">{{ $t('work_pages.voice_clone.format_hint') }}</div>
           </div>
           <div v-else class="ws-upload-area__inner">
             <div class="ws-upload-area__icon">🎵</div>
             <div class="ws-upload-area__text">{{ audioFileName }}</div>
-            <div class="ws-upload-area__hint">点击重新选择</div>
+            <div class="ws-upload-area__hint">{{ $t('work_pages.voice_clone.re_select') }}</div>
           </div>
           <input ref="fileInput" type="file" accept="audio/*" hidden @change="handleFile" />
         </div>
-        <div v-if="uploading" class="ws-uploading">⏳ 上传中...</div>
-        <div v-else-if="uploadedUrl" class="ws-uploaded">✓ 已上传</div>
+        <div v-if="uploading" class="ws-uploading">{{ $t('work_pages.voice_clone.uploading') }}</div>
+        <div v-else-if="uploadedUrl" class="ws-uploaded">{{ $t('work_pages.voice_clone.uploaded') }}</div>
       </div>
       <div class="ws-section">
-        <div class="ws-section__title">输入文本</div>
-        <textarea class="ws-textarea" v-model="text" placeholder="输入需要朗读的文本内容..." rows="5" maxlength="1000"></textarea>
-        <div class="ws-hint">{{ text.length }} / 500 字符</div>
+        <div class="ws-section__title">{{ $t('work_pages.voice_clone.section_text_title') }}</div>
+        <textarea class="ws-textarea" v-model="text" :placeholder="$t('work_pages.voice_clone.text_placeholder')" rows="5" maxlength="1000"></textarea>
+        <div class="ws-hint">{{ text.length }} / 500 {{ $t('work_pages.voice_clone.char_count') }}</div>
       </div>
       <div class="ws-section">
-        <div class="ws-section__title">音色预设</div>
+        <div class="ws-section__title">{{ $t('work_pages.voice_clone.section_preset_title') }}</div>
         <div class="voice-preset-grid">
           <div v-for="v in presets" :key="v.id" class="voice-preset" :class="{ active: selectedPreset === v.id }" @click="selectedPreset = v.id">
             <div class="voice-preset__icon">{{ v.icon }}</div>
@@ -35,21 +35,21 @@
         </div>
       </div>
       <div class="ws-actions">
-        <div class="ws-cost">预计消耗 <strong>5</strong> 积分</div>
-        <button class="ws-btn ws-btn--primary ws-btn--lg" :disabled="!uploadedUrl || !text.trim() || submitting" @click="handleGenerate">{{ submitting ? '生成中...' : '开始生成' }}</button>
+        <div class="ws-cost">{{ $t('work_pages.voice_clone.cost_hint') }} <strong>5</strong> {{ $t('work_pages.voice_clone.credits') }}</div>
+        <button class="ws-btn ws-btn--primary ws-btn--lg" :disabled="!uploadedUrl || !text.trim() || submitting" @click="handleGenerate">{{ submitting ? $t('work_pages.voice_clone.generating') : $t('work_pages.voice_clone.start_generate') }}</button>
       </div>
       <div class="ws-section">
-        <div class="ws-section__title">生成结果</div>
+        <div class="ws-section__title">{{ $t('work_pages.voice_clone.section_result') }}</div>
         <div v-if="task.polling.value" class="progress-box">
-          <div class="spinner" /><p>AI 正在克隆音色并合成...</p>
+          <div class="spinner" /><p>{{ $t('work_pages.voice_clone.processing_hint') }}</p>
           <div class="bar"><div class="bar-fill" :style="{ width: task.progress.value + '%' }" /></div>
         </div>
         <div v-else-if="task.status.value === 2" class="ws-result">
           <audio v-if="task.result.value" class="ws-audio" controls :src="task.result.value"></audio>
-          <div class="ws-result__meta"><span>音色：{{ presets.find(p=>p.id===selectedPreset)?.name || '自定义克隆' }}</span></div>
+          <div class="ws-result__meta"><span>{{ $t('work_pages.voice_clone.section_preset_title') }}：{{ presets.find(p=>p.id===selectedPreset)?.name || $t('work_pages.voice_clone.custom_clone') }}</span></div>
         </div>
-        <div v-else-if="task.status.value === 3" class="error-box"><p>{{ task.errorMsg.value || '生成失败' }}</p><button class="ws-btn ws-btn--primary" @click="handleRedo">重试</button></div>
-        <div v-else class="ws-placeholder"><div class="ws-placeholder__icon">🔊</div><div class="ws-placeholder__text">生成后的音频将显示在这里</div></div>
+        <div v-else-if="task.status.value === 3" class="error-box"><p>{{ task.errorMsg.value || $t('work_pages.voice_clone.generate_failed') }}</p><button class="ws-btn ws-btn--primary" @click="handleRedo">{{ $t('work_pages.voice_clone.retry') }}</button></div>
+        <div v-else class="ws-placeholder"><div class="ws-placeholder__icon">🔊</div><div class="ws-placeholder__text">{{ $t('work_pages.voice_clone.placeholder_text') }}</div></div>
       </div>
       </WorkLayout>
 </template>
@@ -57,7 +57,7 @@
 <script setup lang="ts">const { t } = useI18n()
 
 
-const steps = ['上传音频', '选择音色', '生成音频']
+const steps = computed(() => [t('work_pages.voice_clone.step_audio'), t('work_pages.voice_clone.step_preset'), t('work_pages.voice_clone.step_generate')])
 const toast = useToast()
 const currentStep = ref(0)
 const audioFileName = ref('')
@@ -69,12 +69,12 @@ const submitting = ref(false)
 const task = useTask()
 const fileInput = ref<HTMLInputElement>()
 
-const presets = [
-  { id: 'gentle-female', icon: '👩', name: '温柔女声', desc: '清晰温柔的中文女声' },
-  { id: 'professional-male', icon: '👨', name: '专业男声', desc: '沉稳大气的播音男声' },
-  { id: 'lively-female', icon: '👧', name: '活泼女声', desc: '轻快活力的年轻女声' },
-  { id: 'deep-male', icon: '🧔', name: '深沉男声', desc: '浑厚低沉的磁性男声' },
-]
+const presets = computed(() => [
+  { id: 'gentle-female', icon: '👩', name: t('work_pages.voice_clone.preset_gentle_female'), desc: t('work_pages.voice_clone.preset_gentle_female_desc') },
+  { id: 'professional-male', icon: '👨', name: t('work_pages.voice_clone.preset_professional_male'), desc: t('work_pages.voice_clone.preset_professional_male_desc') },
+  { id: 'lively-female', icon: '👧', name: t('work_pages.voice_clone.preset_lively_female'), desc: t('work_pages.voice_clone.preset_lively_female_desc') },
+  { id: 'deep-male', icon: '🧔', name: t('work_pages.voice_clone.preset_deep_male'), desc: t('work_pages.voice_clone.preset_deep_male_desc') },
+])
 
 function triggerUpload() { fileInput.value?.click() }
 

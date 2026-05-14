@@ -1,8 +1,8 @@
 <template>
-  <WorkLayout :steps="['输入卖点', '选类型+语言', '生成脚本']" :current-step="step">
+  <WorkLayout :steps="steps" :current-step="step">
     <div v-if="step === 0" class="upload-section">
       <h3>{{ $t('work_pages.script_gen_input_title') }}</h3>
-      <textarea v-model="productInfo" class="input-area" placeholder="描述你的产品卖点信息...&#10;&#10;如：秋季新款长袖连衣裙，高支棉面料亲肤透气，收腰A字版型遮肉显高，适合日常通勤约会，限时特惠99元" rows="6" maxlength="2000" />
+      <textarea v-model="productInfo" class="input-area" :placeholder="$t('work_pages.script_gen_input_placeholder')" rows="6" maxlength="2000" />
       <div class="quick-inputs">
         <button v-for="q in quickInputs" :key="q.label" class="quick-btn" @click="productInfo = q.text">{{ q.label }}</button>
       </div>
@@ -34,9 +34,7 @@
       <div class="platform-row">
         <select v-model="selectedPlatform" class="select">
           <option value="">{{ $t('work_pages.script_gen_platform_any') }}</option>
-          <option value="taobao">淘宝</option><option value="douyin">抖音</option>
-          <option value="amazon">亚马逊</option><option value="tiktok">TikTok Shop</option>
-          <option value="shopee">Shopee</option><option value="lazada">Lazada</option>
+          <option v-for="p in platforms" :key="p.value" :value="p.value">{{ $t(p.labelKey) }}</option>
         </select>
       </div>
 
@@ -99,6 +97,7 @@ import PromptEnhancer from '~/components/PromptEnhancer.vue'
 const { t } = useI18n()
 const toast = useToast()
 
+const steps = computed(() => [t('work_pages.script_gen_step_input'), t('work_pages.script_gen_step_type'), t('work_pages.script_gen_step_gen')])
 const step = ref(0);
 const productInfo = ref('');
 const selectedType = ref('short_video');
@@ -115,19 +114,28 @@ const languages = ref([
   { code: 'ar', name: 'العربية', flag: '🇸🇦' },
 ]);
 
+const platforms = [
+  { value: 'taobao', labelKey: 'work_pages.script_gen_platform_taobao' },
+  { value: 'douyin', labelKey: 'work_pages.script_gen_platform_douyin' },
+  { value: 'amazon', labelKey: 'work_pages.script_gen_platform_amazon' },
+  { value: 'tiktok', labelKey: 'work_pages.script_gen_platform_tiktok' },
+  { value: 'shopee', labelKey: 'work_pages.script_gen_platform_shopee' },
+  { value: 'lazada', labelKey: 'work_pages.script_gen_platform_lazada' },
+];
+
 const selectedLangLabel = computed(() => languages.value.find(l => l.code === selectedLang.value)?.name || '');
 
-const scriptTypes = [
-  { id: 'short_video', name: '短视频口播', desc: '15-30s带货口播', icon: '📱' },
-  { id: 'live_stream', name: '直播脚本', desc: '分段直播话术', icon: '📺' },
-  { id: 'social_post', name: '种草文案', desc: '小红书/抖音图文', icon: '📝' },
-];
+const scriptTypes = computed(() => [
+  { id: 'short_video', name: t('work_pages.script_gen_type_short_video'), desc: t('work_pages.script_gen_type_short_video_desc'), icon: '📱' },
+  { id: 'live_stream', name: t('work_pages.script_gen_type_live'), desc: t('work_pages.script_gen_type_live_desc'), icon: '📺' },
+  { id: 'social_post', name: t('work_pages.script_gen_type_social'), desc: t('work_pages.script_gen_type_social_desc'), icon: '📝' },
+]);
 
-const quickInputs = [
-  { label: '服装类', text: '秋季新款长袖连衣裙，高支棉面料亲肤透气，收腰A字版型遮肉显高，限时特惠99元' },
-  { label: '电子类', text: '真无线降噪耳机，40dB深度降噪，续航30h超长待机，IPX5防水运动可用，券后只要299' },
-  { label: '家居类', text: '便携迷你筋膜枪，4档力度调节，静音马达低噪音，办公室居家随时放松，第二件半价' },
-];
+const quickInputs = computed(() => [
+  { label: t('work_pages.script_gen_quick_clothing'), text: t('work_pages.script_gen_quick_clothing_text') },
+  { label: t('work_pages.script_gen_quick_electronics'), text: t('work_pages.script_gen_quick_electronics_text') },
+  { label: t('work_pages.script_gen_quick_home'), text: t('work_pages.script_gen_quick_home_text') },
+]);
 
 async function loadLanguages() {
   try {

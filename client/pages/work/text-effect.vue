@@ -1,18 +1,18 @@
 <template>
-  <WorkLayout title="文字特效" :steps="['输入文字', '选特效', '生成']" :current-step="step">
+  <WorkLayout :title="$t('work_pages.text_effect.title')" :steps="steps" :current-step="step">
     <div v-if="step === 0" class="step-content">
-      <h3 class="step-title">输入文字内容</h3>
-      <p class="step-desc">输入要生成特效的文字，选择特效风格后 AI 自动渲染</p>
-      <textarea v-model="text" placeholder="请输入要添加特效的文字，例如：限时特卖..." rows="5" class="text-input" maxlength="100" />
-      <p class="char-count">{{ text.length }}/100</p>
+      <h3 class="step-title">{{ $t('work_pages.text_effect.input_title') }}</h3>
+      <p class="step-desc">{{ $t('work_pages.text_effect.input_desc') }}</p>
+      <textarea v-model="text" :placeholder="$t('work_pages.text_effect.input_placeholder')" rows="5" class="text-input" maxlength="100" />
+      <p class="char-count">{{ $t('work_pages.text_effect.char_count', { n: text.length }) }}</p>
       <div v-if="text.trim()" class="actions">
         <PromptEnhancer mode="image" :initial-prompt="text" @applied="(v) => text = v" />
-        <button class="btn-primary" @click="step = 1">下一步：选择特效 →</button></div>
+        <button class="btn-primary" @click="step = 1">{{ $t('work_pages.text_effect.next_effect') }}</button></div>
     </div>
 
     <div v-else-if="step === 1" class="step-content">
-      <h3 class="step-title">选择文字特效</h3>
-      <p class="step-desc">6 种特效风格可选，每种风格适配不同的营销场景</p>
+      <h3 class="step-title">{{ $t('work_pages.text_effect.effect_title') }}</h3>
+      <p class="step-desc">{{ $t('work_pages.text_effect.effect_desc') }}</p>
       <div class="effect-grid">
         <button v-for="e in effects" :key="e.id" class="effect-card" :class="{ active: selectedEffect === e.id }" @click="selectedEffect = e.id">
           <span class="effect-icon">{{ e.icon }}</span>
@@ -20,24 +20,24 @@
           <span class="effect-desc">{{ e.desc }}</span>
         </button>
       </div>
-      <div class="cost-badge"><span class="cost-icon">⚡</span> 成本：2 积分/次</div>
+      <div class="cost-badge"><span class="cost-icon">⚡</span> {{ $t('work_pages.text_effect.cost_hint') }}</div>
       <div class="actions">
-        <button class="btn-outline" @click="step = 0">← 返回</button>
-        <button class="btn-primary" @click="submitTask" :disabled="!selectedEffect || processing">生成特效</button>
+        <button class="btn-outline" @click="step = 0">{{ $t('work_pages.text_effect.back') }}</button>
+        <button class="btn-primary" @click="submitTask" :disabled="!selectedEffect || processing">{{ $t('work_pages.text_effect.generate') }}</button>
       </div>
     </div>
 
     <div v-else class="step-content result-step">
       <div v-if="processing" class="processing-card">
         <span class="spinner" />
-        <h4>AI 正在渲染文字特效</h4>
-        <p class="hint">预计耗时 3-8 秒，请耐心等待</p>
+        <h4>{{ $t('work_pages.text_effect.processing_title') }}</h4>
+        <p class="hint">{{ $t('work_pages.text_effect.processing_hint') }}</p>
       </div>
       <div v-if="resultUrl && !processing" class="result-display">
         <img loading="lazy" :src="resultUrl" alt="result" class="result-image" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
         <div class="result-actions">
-          <button class="btn-primary" @click="downloadImage">下载图片</button>
-          <button class="btn-outline" @click="resetAll">重新生成</button>
+          <button class="btn-primary" @click="downloadImage">{{ $t('work_pages.text_effect.download') }}</button>
+          <button class="btn-outline" @click="resetAll">{{ $t('work_pages.text_effect.regenerate') }}</button>
         </div>
       </div>
     </div>
@@ -49,16 +49,17 @@
 import PromptEnhancer from '~/components/PromptEnhancer.vue'
 const { t } = useI18n()
 
+const steps = computed(() => [t('work_pages.text_effect.step_input'), t('work_pages.text_effect.step_effect'), t('work_pages.text_effect.step_generate')])
 const step = ref(0); const text = ref(''); const selectedEffect = ref('neon')
 const processing = ref(false); const resultUrl = ref('')
-const effects = [
-  { id: 'neon', name: '霓虹灯', icon: '💡', desc: '赛博朋克风格夜间营销' },
-  { id: 'gold', name: '金属质感', icon: '✨', desc: '高端奢华品牌专属' },
-  { id: 'fire', name: '火焰特效', icon: '🔥', desc: '促销活动爆款文案' },
-  { id: 'ice', name: '冰晶效果', icon: '❄️', desc: '数码家电清凉感' },
-  { id: '3d', name: '立体浮雕', icon: '🧊', desc: '3D 立体视觉冲击' },
-  { id: 'shadow', name: '投影阴影', icon: '🌑', desc: '简约高级品牌质感' },
-]
+const effects = computed(() => [
+  { id: 'neon', name: t('work_pages.text_effect.effect_neon'), icon: '💡', desc: t('work_pages.text_effect.effect_neon_desc') },
+  { id: 'gold', name: t('work_pages.text_effect.effect_gold'), icon: '✨', desc: t('work_pages.text_effect.effect_gold_desc') },
+  { id: 'fire', name: t('work_pages.text_effect.effect_fire'), icon: '🔥', desc: t('work_pages.text_effect.effect_fire_desc') },
+  { id: 'ice', name: t('work_pages.text_effect.effect_ice'), icon: '❄️', desc: t('work_pages.text_effect.effect_ice_desc') },
+  { id: '3d', name: t('work_pages.text_effect.effect_3d'), icon: '🧊', desc: t('work_pages.text_effect.effect_3d_desc') },
+  { id: 'shadow', name: t('work_pages.text_effect.effect_shadow'), icon: '🌑', desc: t('work_pages.text_effect.effect_shadow_desc') },
+])
 const toast = useToast()
 async function submitTask() {
   processing.value = true; step.value = 2

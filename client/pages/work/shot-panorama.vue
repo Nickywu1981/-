@@ -1,25 +1,25 @@
 <template>
-  <WorkLayout title="全景拍摄" :steps="['上传图片', '选择模式', '生成']" :current-step="step">
+  <WorkLayout :title="$t('work_pages.shot_panorama.title')" :steps="steps" :current-step="step">
     <div v-if="step === 0" class="step-content">
-      <h3 class="step-title">上传产品图片</h3>
-      <p class="step-desc">上传产品图，AI 生成 360° 全景展示效果，支持旋转 / 扩展 / 转盘三种模式</p>
+      <h3 class="step-title">{{ $t('work_pages.shot_panorama.upload_title') }}</h3>
+      <p class="step-desc">{{ $t('work_pages.shot_panorama.upload_desc') }}</p>
       <div class="dropzone" :class="{ 'has-file': previewUrl }" @dragover.prevent @drop.prevent="handleDrop">
         <template v-if="!previewUrl">
           <span class="dz-icon">📷</span>
-          <p class="dz-label">拖拽或点击上传产品图片</p>
-          <p class="dz-hint">建议白色/纯色背景产品图，效果最佳</p>
+          <p class="dz-label">{{ $t('work_pages.shot_panorama.drop_label') }}</p>
+          <p class="dz-hint">{{ $t('work_pages.shot_panorama.drop_hint') }}</p>
           <input ref="fileInput" type="file" accept="image/*" hidden @change="handleFile" />
-          <button class="btn-outline-sm" @click="fileInput?.click()">选择图片</button>
+          <button class="btn-outline-sm" @click="fileInput?.click()">{{ $t('work_pages.shot_panorama.select_image') }}</button>
         </template>
         <img loading="lazy" v-else :src="previewUrl" alt="preview" class="preview-img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
       </div>
-      <p v-if="uploading" class="upload-status"><span class="spinner-sm" /> 上传中...</p>
-      <button v-if="uploadedUrl" class="btn-primary" @click="step = 1">下一步：选择模式 →</button>
+      <p v-if="uploading" class="upload-status"><span class="spinner-sm" /> {{ $t('work_pages.shot_panorama.uploading') }}</p>
+      <button v-if="uploadedUrl" class="btn-primary" @click="step = 1">{{ $t('work_pages.shot_panorama.next_mode') }}</button>
     </div>
 
     <div v-else-if="step === 1" class="step-content">
-      <h3 class="step-title">选择全景模式</h3>
-      <p class="step-desc">3 种全景展示模式，适配不同的电商展示场景</p>
+      <h3 class="step-title">{{ $t('work_pages.shot_panorama.mode_title') }}</h3>
+      <p class="step-desc">{{ $t('work_pages.shot_panorama.mode_desc') }}</p>
       <div class="mode-grid">
         <button v-for="m in modes" :key="m.id" class="mode-card" :class="{ active: selectedMode === m.id }" @click="selectedMode = m.id">
           <span class="mode-icon">{{ m.icon }}</span>
@@ -27,25 +27,25 @@
           <span class="mode-desc">{{ m.desc }}</span>
         </button>
       </div>
-      <div class="cost-badge"><span class="cost-icon">⚡</span> 成本：6 积分/次</div>
+      <div class="cost-badge"><span class="cost-icon">⚡</span> {{ $t('work_pages.shot_panorama.cost_hint') }}</div>
       <div class="actions">
-        <button class="btn-outline" @click="step = 0">← 返回</button>
-        <button class="btn-primary" @click="submitTask">生成全景</button>
+        <button class="btn-outline" @click="step = 0">{{ $t('work_pages.shot_panorama.back') }}</button>
+        <button class="btn-primary" @click="submitTask">{{ $t('work_pages.shot_panorama.generate') }}</button>
       </div>
     </div>
 
     <div v-else class="step-content result-step">
       <div v-if="processing" class="processing-card">
         <span class="spinner" />
-        <h4>AI 正在生成全景展示</h4>
-        <p class="hint">多角度合成处理中，预计 8-20 秒</p>
+        <h4>{{ $t('work_pages.shot_panorama.processing_title') }}</h4>
+        <p class="hint">{{ $t('work_pages.shot_panorama.processing_hint') }}</p>
       </div>
       <div v-if="resultUrl && !processing" class="result-display">
         <img loading="lazy" :src="resultUrl" alt="result" class="result-image" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
-        <p class="result-hint">全景图已生成，可用于商品详情页 360° 展示模块</p>
+        <p class="result-hint">{{ $t('work_pages.shot_panorama.result_hint') }}</p>
         <div class="result-actions">
-          <button class="btn-primary" @click="downloadImage">下载图片</button>
-          <button class="btn-outline" @click="resetAll">重新生成</button>
+          <button class="btn-primary" @click="downloadImage">{{ $t('work_pages.shot_panorama.download') }}</button>
+          <button class="btn-outline" @click="resetAll">{{ $t('work_pages.shot_panorama.regenerate') }}</button>
         </div>
       </div>
     </div>
@@ -56,15 +56,16 @@
 
 const { createBlobUrl, revoke } = useBlobUrl()
 
+const steps = computed(() => [t('work_pages.shot_panorama.step_upload'), t('work_pages.shot_panorama.step_mode'), t('work_pages.shot_panorama.step_generate')])
 const step = ref(0); const previewUrl = ref(''); const uploadedUrl = ref('')
 const uploading = ref(false); const processing = ref(false); const resultUrl = ref('')
 const selectedMode = ref('360_spin')
 const fileInput = ref<HTMLInputElement | null>(null)
-const modes = [
-  { id: '360_spin', name: '360°旋转', icon: '🔄', desc: '多角度合成连续旋转图' },
-  { id: 'pano_expand', name: '全景扩展', icon: '🌐', desc: 'AI 智能画面外扩' },
-  { id: '3d_turntable', name: '3D转盘', icon: '🎠', desc: '立体转盘展示效果' },
-]
+const modes = computed(() => [
+  { id: '360_spin', name: t('work_pages.shot_panorama.mode_360_spin'), icon: '🔄', desc: t('work_pages.shot_panorama.mode_360_spin_desc') },
+  { id: 'pano_expand', name: t('work_pages.shot_panorama.mode_pano_expand'), icon: '🌐', desc: t('work_pages.shot_panorama.mode_pano_expand_desc') },
+  { id: '3d_turntable', name: t('work_pages.shot_panorama.mode_3d_turntable'), icon: '🎠', desc: t('work_pages.shot_panorama.mode_3d_turntable_desc') },
+])
 const toast = useToast()
 async function handleFile(e: Event) {
   const file = (e.target as HTMLInputElement).files?.[0]
