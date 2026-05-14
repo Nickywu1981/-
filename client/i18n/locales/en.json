@@ -8195,14 +8195,6 @@
     "rollbackTo": "Rollback to This Version",
     "close": "Close"
   },
-  "quickSave": {
-    "saved": "Saved",
-    "saveToCollection": "Save to Collection",
-    "save": "Save",
-    "unsaved": "Removed from collection",
-    "saveSuccess": "Saved",
-    "operationFailed": "Operation failed"
-  },
   "autoSave": {
     "justSaved": "Just saved",
     "secondsAgo": "{n}s ago",

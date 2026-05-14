@@ -1180,7 +1180,7 @@
     "panel_title": "AI 创作助手",
     "welcome_title": "你好，我是 Movio AI 创作助手",
     "welcome_desc": "我可以帮你生成商品图、写文案、分析视频、翻译内容。试试下面的快捷指令吧～",
-    "input_placeholder": "输入你的需求，比如"帮我生成一张连衣裙主图"...",
+    "input_placeholder": "输入你的需求，比如「帮我生成一张连衣裙主图」...",
     "send": "发送",
     "attach": "添加附件",
     "clear": "清空对话",
@@ -8012,14 +8012,6 @@
     "compareSelected": "对比选中版本",
     "rollbackTo": "回滚到此版本",
     "close": "关闭"
-  },
-  "quickSave": {
-    "saved": "已收藏",
-    "saveToCollection": "收藏到合集",
-    "save": "收藏",
-    "unsaved": "已取消收藏",
-    "saveSuccess": "已收藏",
-    "operationFailed": "操作失败"
   },
   "autoSave": {
     "justSaved": "刚刚保存",

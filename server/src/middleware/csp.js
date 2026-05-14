@@ -13,6 +13,10 @@ export default function cspMiddleware(req, res, next) {
     res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   }
   // Content-Security-Policy
+  // NOTE: 'unsafe-inline' on script-src/style-src is REQUIRED for SPA mode:
+  //   - Nuxt client-side hydration injects inline scripts
+  //   - Vue <style scoped> + :style bindings generate inline styles at runtime
+  //   Removal requires SSR + CSP nonce pipeline (planned for post-MVP)
   res.setHeader(
     'Content-Security-Policy',
     [

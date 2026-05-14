@@ -1,4 +1,4 @@
-import pool from '../dao/db.js';
+import pool from './db.js';
 
 export async function insertTemplate(userId, { name, operation, platform, style, nightMode, imageCount }) {
   const [res] = await pool.execute(

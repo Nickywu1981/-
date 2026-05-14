@@ -1,4 +1,4 @@
-import pool from '../dao/db.js';
+import pool from './db.js';
 import { parsePagination } from '../utils/pagination.js';
 import { als } from './context.js';
 import logger from '../utils/logger.js';

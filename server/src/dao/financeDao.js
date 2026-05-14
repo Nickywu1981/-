@@ -4,7 +4,7 @@
  * Phase 2: 财务核心 (2026-05-11)
  * 表: bank_account, settlement_batch, settlement_detail, withdrawal_order, account_ledger, commission_policy
  */
-import pool from '../dao/db.js';
+import pool from './db.js';
 import { parsePagination } from '../utils/pagination.js';
 import logger from '../utils/logger.js';
 
