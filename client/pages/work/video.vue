@@ -19,7 +19,7 @@
     <!-- 图生视频 -->
     <div v-if="activeTab === 'img2video'" class="work-panel">
       <AppMediaUpload accept="image" :multiple="true" :max-size="20" :max-count="9" @uploaded="onImagesUploaded" />
-      <p v-if="images.length" class="hint">已选择 {{ images.length }} 张图片{{ images.length === 1 ? ' → 单图生视频' : ' → 多图合成视频' }}</p>
+      <p v-if="images.length" class="hint">{{ $t('work_pages.video.images_hint', { n: images.length, suffix: images.length === 1 ? $t('work_pages.video.hint_single_suffix') : $t('work_pages.video.hint_multi_suffix') }) }}</p>
 
       <SmartRecognitionPanel
         v-if="images.length"
@@ -49,10 +49,7 @@
         <div class="option">
           <label>{{ $t('work_pages.video.duration_label') }}<label>
           <select v-model="duration" class="input">
-            <option :value="10">10秒</option>
-            <option :value="15">15秒</option>
-            <option :value="30">30秒</option>
-            <option :value="60">60秒</option>
+            <option v-for="opt in durationOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
         </div>
       </div>
@@ -67,7 +64,7 @@
         <video :src="resultUrl" class="result-video" controls />
         <div class="result-actions">
           <button class="btn btn-primary btn-sm" @click="downloadResult">{{ $t('work_pages.video.download_btn') }}<button>
-          <button class="btn btn-secondary btn-sm" @click="copyToClipboard(resultUrl)">复制链接</button>
+          <button class="btn btn-secondary btn-sm" @click="copyToClipboard(resultUrl)">{{ $t('work_pages.video.copy_link') }}</button>
         </div>
       </div>
     </div>
@@ -82,31 +79,27 @@
       <AppMediaUpload accept="image" :multiple="true" :max-size="20" :max-count="9" @uploaded="onProductImagesUploaded" />
 
       <div class="input-group" style="margin-top:16px">
-        <label>卖点（每行一个）</label>
-        <textarea v-model="highlightsText" class="input" rows="3" placeholder="限时特惠 买一送一&#10;进口面料 亲肤透气&#10;7天无理由退换" maxlength="2000"></textarea>
+        <label>{{ $t('work_pages.video.product_ad_highlights_label') }}</label>
+        <textarea v-model="highlightsText" class="input" rows="3" :placeholder="$t('work_pages.video.product_ad_highlights_placeholder')" maxlength="2000"></textarea>
       </div>
 
       <div class="options-row">
         <div class="option">
-          <label>视频风格</label>
+          <label>{{ $t('work_pages.video.product_ad_style_label') }}</label>
           <select v-model="adStyle" class="input">
-            <option value="fast">快节奏带货</option>
-            <option value="elegant">优雅展示</option>
-            <option value="story">故事种草</option>
+            <option v-for="opt in adStyleOptions" :key="opt.value" :value="opt.value">{{ $t(opt.nameKey) }}</option>
           </select>
         </div>
         <div class="option">
-          <label>时长</label>
+          <label>{{ $t('work_pages.video.product_ad_duration_label') }}</label>
           <select v-model="adDuration" class="input">
-            <option :value="15">15秒</option>
-            <option :value="30">30秒</option>
-            <option :value="60">60秒</option>
+            <option v-for="opt in adDurationOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
         </div>
       </div>
 
       <button class="btn btn-primary btn-lg" :disabled="!productName || adTaskStatus === 'processing'" @click="doProductAd">
-        {{ adTaskStatus === 'processing' ? $t('work_pages.video.generating') : '一键成片' }}
+        {{ adTaskStatus === 'processing' ? $t('work_pages.video.generating') : $t('work_pages.video.product_ad_btn') }}
       </button>
 
       <AppTaskProgress v-if="adTaskStatus !== 'idle'" :status="adTaskStatus" :progress="adProgress" @retry="doProductAd" />
@@ -116,17 +109,17 @@
     <div v-if="activeTab === 'replaceChar'" class="work-panel">
       <div class="two-col-upload">
         <div class="upload-col">
-          <label>原始视频</label>
+          <label>{{ $t('work_pages.video.replace_char_source_label') }}</label>
           <AppMediaUpload accept="video" :multiple="false" :max-size="200" :max-count="1" @uploaded="onVideoUploaded" />
         </div>
         <div class="upload-col">
-          <label>替换目标人物图片</label>
+          <label>{{ $t('work_pages.video.replace_char_target_label') }}</label>
           <AppMediaUpload accept="image" :multiple="false" :max-size="20" :max-count="1" @uploaded="onTargetPersonUploaded" />
         </div>
       </div>
 
       <button class="btn btn-primary btn-lg" style="margin-top:20px" :disabled="!sourceVideo || !targetImage || repTaskStatus === 'processing'" @click="doReplaceChar">
-        {{ repTaskStatus === 'processing' ? '处理中...' : '替换角色' }}
+        {{ repTaskStatus === 'processing' ? $t('work_pages.video.replace_char_processing') : $t('work_pages.video.replace_char_btn') }}
       </button>
 
       <AppTaskProgress v-if="repTaskStatus !== 'idle'" :status="repTaskStatus" :progress="repProgress" @retry="doReplaceChar" />
@@ -135,28 +128,25 @@
     <!-- 分镜生成 -->
     <div v-if="activeTab === 'storyboard'" class="work-panel">
       <div class="input-group">
-        <label>视频创意描述</label>
-        <textarea v-model="storyPrompt" class="input prompt-input" rows="4" placeholder="描述你想要拍摄的视频内容..." maxlength="2000"></textarea>
+        <label>{{ $t('work_pages.video.storyboard_prompt_label') }}</label>
+        <textarea v-model="storyPrompt" class="input prompt-input" rows="4" :placeholder="$t('work_pages.video.storyboard_prompt_placeholder')" maxlength="2000"></textarea>
       </div>
       <div class="option" style="max-width:200px;margin-bottom:16px">
-        <label>分镜数量</label>
+        <label>{{ $t('work_pages.video.storyboard_count_label') }}</label>
         <select v-model="sceneCount" class="input">
-          <option :value="3">3 镜</option>
-          <option :value="5">5 镜</option>
-          <option :value="8">8 镜</option>
-          <option :value="12">12 镜</option>
+          <option v-for="opt in sceneCountOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
         </select>
       </div>
       <button class="btn btn-primary btn-lg" :disabled="!storyPrompt || sbTaskStatus === 'processing'" @click="doStoryboard">
-        {{ sbTaskStatus === 'processing' ? $t('work_pages.video.generating') : '生成分镜' }}
+        {{ sbTaskStatus === 'processing' ? $t('work_pages.video.generating') : $t('work_pages.video.storyboard_btn') }}
       </button>
 
       <AppTaskProgress v-if="sbTaskStatus !== 'idle'" :status="sbTaskStatus" :progress="sbProgress" @retry="doStoryboard" />
 
       <div v-if="storyboardResult" class="storyboard-result">
-        <h3>分镜脚本</h3>
+        <h3>{{ $t('work_pages.video.storyboard_result_title') }}</h3>
         <div v-for="(scene, i) in storyboardResult" :key="i" class="scene-card">
-          <span class="scene-num">镜{{ Number(i) + 1 }}</span>
+          <span class="scene-num">{{ $t('work_pages.video.storyboard_scene_num', { n: Number(i) + 1 }) }}</span>
           <p>{{ scene.description || scene }}</p>
         </div>
       </div>
@@ -165,9 +155,9 @@
     <!-- 视频包装 -->
     <div v-if="activeTab === 'package'" class="work-panel">
       <AppMediaUpload accept="video" :multiple="false" :max-size="200" :max-count="1" @uploaded="onPkgVideoUploaded" />
-      <p class="hint">上传视频进行自动包装：添加字幕、转场、特效、片头片尾</p>
+      <p class="hint">{{ $t('work_pages.video.package_hint') }}</p>
       <button class="btn btn-primary btn-lg" style="margin-top:16px" :disabled="!pkgVideo || pkgTaskStatus === 'processing'" @click="doPackage">
-        {{ pkgTaskStatus === 'processing' ? '包装中...' : '开始包装' }}
+        {{ pkgTaskStatus === 'processing' ? $t('work_pages.video.package_processing') : $t('work_pages.video.package_btn') }}
       </button>
       <AppTaskProgress v-if="pkgTaskStatus !== 'idle'" :status="pkgTaskStatus" :progress="pkgProgress" @retry="doPackage" />
     </div>
@@ -186,20 +176,28 @@ import SmartRecognitionPanel from '~/components/shared/SmartRecognitionPanel.vue
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 
 function onSmartApply(info: { productName: string; category: string; features: string[]; refUrl: string }) {
-  prompt.value = `${info.productName}（${info.category}），核心特征：${info.features.join('、')}。产品旋转展示，柔和灯光，快节奏转场`
+  prompt.value = t('work_pages.video.smart_prompt_template', { name: info.productName, category: info.category, features: info.features.join(t('work_pages.video.feature_separator')) })
 }
 
 const { configs } = useAppPage({ configs: ['page.video.header'] })
 const { options: ratioOptions } = useAppDict('video_ratio')
 const headerCfg = computed(() => configs.value['page.video.header'] || {})
 
+const durationOptions = computed(() => [10, 15, 30, 60].map(n => ({ value: n, label: t('work_pages.video.seconds_value', { n }) })))
+const adDurationOptions = computed(() => [15, 30, 60].map(n => ({ value: n, label: t('work_pages.video.seconds_value', { n }) })))
+const sceneCountOptions = computed(() => [3, 5, 8, 12].map(n => ({ value: n, label: t('work_pages.video.storyboard_scenes_value', { n }) })))
+const adStyleOptions = [
+  { value: 'fast', nameKey: 'work_pages.video.product_ad_style_fast' },
+  { value: 'elegant', nameKey: 'work_pages.video.product_ad_style_elegant' },
+  { value: 'story', nameKey: 'work_pages.video.product_ad_style_story' },
+]
 const activeTab = ref('img2video')
 const tabs = [
   { key: 'img2video', label: t('work_pages.video.tab_img2video') },
   { key: 'productAd', label: t('work_pages.video.tab_oneshot') },
   { key: 'replaceChar', label: t('work_pages.video.tab_avatar') },
-  { key: 'storyboard', label: '分镜生成' },
-  { key: 'package', label: '视频包装' },
+  { key: 'storyboard', label: t('work_pages.video.tab_storyboard') },
+  { key: 'package', label: t('work_pages.video.tab_package') },
 ]
 
 // ---- 图生视频 ----
