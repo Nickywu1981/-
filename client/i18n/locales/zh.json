@@ -2736,6 +2736,8 @@
         "statusRefunded": "已退款",
         "statusCancelled": "已取消",
         "searchPlaceholder": "搜索订单号/客户名/手机号",
+        "filterStatus": "按状态筛选",
+        "searchLabel": "搜索订单",
         "orderNo": "订单号",
         "customer": "客户",
         "amount": "金额",

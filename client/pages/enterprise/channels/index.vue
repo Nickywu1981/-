@@ -45,8 +45,8 @@
     <!-- 申请弹窗 -->
     <div class="modal-overlay" v-if="showApplyModal" @click.self="showApplyModal = false">
       <div class="modal"><h3>{{ $t('enterprise.channels.index.applyTitle') }}</h3>
-        <form @submit.prevent="doApply"><label>{{ $t('enterprise.channels.index.inviteCode') }}</label>
-          <input v-model="applyForm.agentCode" required :placeholder="$t('enterprise.channels.index.inviteCodePlaceholder')" class="input" />
+        <form @submit.prevent="doApply"><label :for="'apply-code-' + _uid">{{ $t('enterprise.channels.index.inviteCode') }}</label>
+          <input v-model="applyForm.agentCode" required :placeholder="$t('enterprise.channels.index.inviteCodePlaceholder')" class="input" :id="'apply-code-' + _uid" />
           <div class="modal-actions"><button type="button" class="btn-cancel" @click="showApplyModal = false">{{ $t('enterprise.common.cancel') }}</button>
             <button type="submit" class="btn-primary" :disabled="applying">{{ $t('enterprise.channels.index.submitApply') }}</button></div>
         </form>

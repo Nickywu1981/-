@@ -44,8 +44,9 @@
       <div class="chart-bar-wrap">
         <div class="chart-bar" v-for="item in usage" :key="item.date"
           :style="{ height: barHeight(item.call_count) + '%' }"
-          :title="`${item.date}: ${item.call_count}`">
-          <span class="bar-label">{{ item.call_count }}</span>
+          role="img"
+          :aria-label="`${item.date}: ${item.call_count} ${$t('enterprise.dashboard.calls')}`">
+          <span class="bar-label" aria-hidden="true">{{ item.call_count }}</span>
         </div>
       </div>
       <div class="chart-legend">

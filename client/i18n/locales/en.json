@@ -2831,6 +2831,8 @@
         "statusRefunded": "Refunded",
         "statusCancelled": "Cancelled",
         "searchPlaceholder": "Search order/customer/phone",
+        "filterStatus": "Filter by status",
+        "searchLabel": "Search orders",
         "orderNo": "Order No.",
         "customer": "Customer",
         "amount": "Amount",

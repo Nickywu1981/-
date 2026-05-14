@@ -10,7 +10,7 @@
     <!-- 左侧导航 -->
     <aside class="ent-side" :class="{ 'ent-side--open': mobileOpen }">
       <div class="ent-brand">
-        <div class="ent-brand-icon">E</div>
+        <div class="ent-brand-icon" aria-hidden="true">E</div>
         <div class="ent-brand-text">
           <div class="ent-brand-name">{{ entName || $t('enterprise.nav.pageTitle') }}</div>
           <div class="ent-brand-sub">{{ $t('enterprise.nav.brand_subtitle') }}</div>
@@ -19,10 +19,10 @@
 
       <nav class="ent-nav">
         <template v-for="group in navGroups" :key="group.key">
-          <button class="ent-nav-group" @click="group.open = !group.open" :class="{ 'ent-nav-group--open': group.open }">
-            <span class="ent-nav-group-icon">{{ group.icon }}</span>
+          <button class="ent-nav-group" @click="group.open = !group.open" :class="{ 'ent-nav-group--open': group.open }" :aria-expanded="group.open" :aria-label="group.label">
+            <span class="ent-nav-group-icon" aria-hidden="true">{{ group.icon }}</span>
             <span class="ent-nav-group-label">{{ group.label }}</span>
-            <svg class="ent-nav-group-chevron" width="10" height="6" viewBox="0 0 10 6"><path d="M1 0.5L5 4.5L9 0.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <svg class="ent-nav-group-chevron" width="10" height="6" viewBox="0 0 10 6" aria-hidden="true"><path d="M1 0.5L5 4.5L9 0.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
           </button>
           <div v-show="group.open" class="ent-nav-items">
             <NuxtLink
@@ -38,8 +38,8 @@
       </nav>
 
       <div class="ent-side-footer">
-        <button class="ent-theme-btn" @click="toggleTheme" :title="isDark ? t('admin_shell.switch_light') : t('admin_shell.switch_dark')">{{ isDark ? '☀️' : '🌙' }}</button>
-        <button class="ent-logout" @click="handleLogout">{{ t('admin_shell.logout') }}</button>
+        <button class="ent-theme-btn" @click="toggleTheme" :aria-label="isDark ? t('admin_shell.switch_light') : t('admin_shell.switch_dark')">{{ isDark ? '☀️' : '🌙' }}</button>
+        <button class="ent-logout" @click="handleLogout" :aria-label="t('admin_shell.logout')">{{ t('admin_shell.logout') }}</button>
       </div>
     </aside>
 

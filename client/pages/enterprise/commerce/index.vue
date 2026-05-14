@@ -12,7 +12,7 @@
 
     <!-- 筛选栏 -->
     <div class="filter-bar">
-      <select v-model="filters.status" @change="loadOrders" class="input">
+      <select v-model="filters.status" @change="loadOrders" class="input" :aria-label="$t('enterprise.commerce.index.filterStatus')">
         <option value="">{{ $t('enterprise.commerce.index.allStatus') }}</option>
         <option value="pending">{{ $t('enterprise.commerce.index.statusPendingPay') }}</option>
         <option value="paid">{{ $t('enterprise.commerce.index.statusPaid') }}</option>
@@ -21,7 +21,7 @@
         <option value="refunded">{{ $t('enterprise.commerce.index.statusRefunded') }}</option>
         <option value="cancelled">{{ $t('enterprise.commerce.index.statusCancelled') }}</option>
       </select>
-      <input v-model="filters.keyword" :placeholder="$t('enterprise.commerce.index.searchPlaceholder')" @change="debounceSearch" class="input" />
+      <input v-model="filters.keyword" :placeholder="$t('enterprise.commerce.index.searchPlaceholder')" @change="debounceSearch" class="input" :aria-label="$t('enterprise.commerce.index.searchLabel')" />
     </div>
 
     <!-- 订单列表 -->
