@@ -3480,6 +3480,7 @@
       "download": "⬇ 下载",
       "reuse": "🔄 复用",
       "close_result": "关闭",
+      "param_index": "参数 {i}",
       "progress_pct": "生成中... {pct}%",
       "prompt_label": "创作需求",
       "generate_error": "生成失败，请重试",
@@ -4545,8 +4546,11 @@
     "switch_light": "切亮色",
     "switch_dark": "切暗色",
     "notification": "通知",
+    "notification": "通知",
     "logout": "退出登录",
-    "back": "返回"
+    "back": "返回",
+    "brand_name": "Movio 管理",
+    "back_home": "返回首页"
   },
   "error": {
     "404_title": "页面不存在",
@@ -8097,7 +8101,11 @@
     "sectionColor": "选择颜色 (点击添加)",
     "sectionSize": "尺码范围",
     "selectedCount": "已选 {n} 个SKU组合",
-    "clear": "清空"
+    "clear": "清空",
+    "sizes": {
+      "oneSize": "均码"
+    },
+    "more": "更多"
   },
   "batchPreview": {
     "generateFailed": "生成失败",

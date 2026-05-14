@@ -27,7 +27,7 @@ const colors = ref([
   { label: t('skuSelector.colors.beige'), hex: '#D4A574' },
 ])
 
-const sizes = ref(['XS', 'S', 'M', 'L', 'XL', 'XXL', '均码'])
+const sizes = ref([...'XS,S,M,L,XL,XXL'.split(','), t('skuSelector.sizes.oneSize')])
 
 const skuMatrix = ref<SkuRow[]>([])
 const selectedAngle = ref<'front' | 'back' | 'side' | 'detail' | 'top'>('front')
@@ -107,7 +107,7 @@ const clearAll = () => {
         <span class="ss-sku-text">{{ s.color }} / {{ s.size }}</span>
         <button class="ss-sku-rm" @click="removeSku(s.id)">×</button>
       </div>
-      <div v-if="skuMatrix.length > 12" class="ss-sku-more">+{{ skuMatrix.length - 12 }} 更多</div>
+      <div v-if="skuMatrix.length > 12" class="ss-sku-more">+{{ skuMatrix.length - 12 }} {{ t('skuSelector.more') }}</div>
     </div>
   </div>
 </template>

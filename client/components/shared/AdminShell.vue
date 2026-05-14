@@ -14,7 +14,7 @@
       <div class="ash-brand">
         <div class="ash-brand-icon" :style="{ background: accentColor }">{{ brandInitial }}</div>
         <div class="ash-brand-text">
-          <div class="ash-brand-name">{{ brandName }}</div>
+          <div class="ash-brand-name">{{ displayBrandName }}</div>
           <div class="ash-brand-sub">{{ brandSubtitle }}</div>
         </div>
         <button class="ash-collapse-btn" @click="collapsed = !collapsed" :title="collapsed ? t('admin_shell.expand_sidebar') : t('admin_shell.collapse_sidebar')" :aria-label="collapsed ? t('admin_shell.expand_sidebar') : t('admin_shell.collapse_sidebar')">
@@ -54,7 +54,7 @@
         </button>
         <NuxtLink v-if="backRoute" :to="backRoute" class="ash-back-link">
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M7 2L3 6L7 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-          {{ backLabel }}
+          {{ displayBackLabel }}
         </NuxtLink>
       </div>
     </aside>
@@ -104,6 +104,8 @@
 <script setup lang="ts">
 import { useEventListener } from '@vueuse/core'
 
+const { t } = useI18n()
+
 const props = withDefaults(defineProps<{
   brandName?: string
   brandSubtitle?: string
@@ -113,13 +115,13 @@ const props = withDefaults(defineProps<{
   backRoute?: string
   backLabel?: string
 }>(), {
-  brandName: 'Movio 管理',
+  brandName: '',
   brandSubtitle: 'Admin Console',
   accentColor: '#5b5fe3',
   navGroups: () => [],
   breadcrumbs: () => [],
   backRoute: '',
-  backLabel: 'Back to Home',
+  backLabel: '',
 })
 
 const emit = defineEmits<{ logout: [] }>()
@@ -129,14 +131,15 @@ type NavGroup = { key: string; icon: string; label: string; open: boolean; items
 
 const route = useRoute()
 const { theme, toggle: toggleTheme } = useTheme()
-const { t } = useI18n()
+const displayBrandName = computed(() => props.brandName || t('admin_shell.brand_name'))
+const displayBackLabel = computed(() => props.backLabel || t('admin_shell.back_home'))
 const isDark = computed(() => theme.value === 'dark')
 const collapsed = ref(false)
 const mobileOpen = ref(false)
 const userOpen = ref(false)
 const userName = ref('Admin')
 const userInitial = computed(() => userName.value.charAt(0).toUpperCase())
-const brandInitial = computed(() => props.brandName.charAt(0))
+const brandInitial = computed(() => displayBrandName.value.charAt(0))
 const isMobile = ref(false)
 
 function isActive(itemRoute: string) { return route.path === itemRoute || (itemRoute !== '/' && route.path.startsWith(itemRoute)) }

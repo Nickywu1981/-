@@ -3576,6 +3576,7 @@
       "download": "⬇ Download",
       "reuse": "🔄 Reuse",
       "close_result": "Close",
+      "param_index": "Parameter {i}",
       "progress_pct": "Generating... {pct}%",
       "prompt_label": "Creative Brief",
       "generate_error": "Generation failed, please retry",
@@ -4645,8 +4646,11 @@
     "switch_light": "Light Mode",
     "switch_dark": "Dark Mode",
     "notification": "Notifications",
+    "notification": "Notifications",
     "logout": "Logout",
-    "back": "Back"
+    "back": "Back",
+    "brand_name": "Movio Admin",
+    "back_home": "Back to Home"
   },
   "error": {
     "404_title": "Page Not Found",
@@ -8279,7 +8283,11 @@
     "sectionColor": "Select Color (click to add)",
     "sectionSize": "Size Range",
     "selectedCount": "{n} SKU combinations selected",
-    "clear": "Clear"
+    "clear": "Clear",
+    "sizes": {
+      "oneSize": "One Size"
+    },
+    "more": "more"
   },
   "batchPreview": {
     "generateFailed": "Generation failed",

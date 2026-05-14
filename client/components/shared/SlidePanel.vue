@@ -51,7 +51,7 @@
                 :key="i"
                 v-model="paramValues[i]"
                 class="sp-sel"
-                :aria-label="p.label || `参数 ${i + 1}`"
+                :aria-label="p.label || t('workspace.slide_panel.param_index', { i: i + 1 })"
               >
                 <option v-for="(o, j) in p.options" :key="j" :value="o">{{ o }}</option>
               </select>
@@ -59,7 +59,7 @@
           </div>
 
           <!-- Generate Button -->
-          <button v-if="showGenerate" class="sp-gen" @click="handleGenerate" aria-label="开始生成">
+          <button v-if="showGenerate" class="sp-gen" @click="handleGenerate" :aria-label="t('workspace.slide_panel.generate_btn')">
             {{ t('workspace.slide_panel.generate_btn') }}
           </button>
 
@@ -87,9 +87,9 @@
               <div class="sp-result-meta">1080×1920 · 15s · MP4</div>
             </div>
             <div class="sp-result-actions">
-              <button class="sp-result-btn primary" @click="handleDownload" aria-label="下载结果">{{ t('workspace.slide_panel.download') }}</button>
-              <button class="sp-result-btn" @click="handleReuse" aria-label="重新使用">{{ t('workspace.slide_panel.reuse') }}</button>
-              <button class="sp-result-btn" @click="handleClose" aria-label="关闭结果">{{ t('workspace.slide_panel.close_result') }}</button>
+              <button class="sp-result-btn primary" @click="handleDownload" :aria-label="t('workspace.slide_panel.download')">{{ t('workspace.slide_panel.download') }}</button>
+              <button class="sp-result-btn" @click="handleReuse" :aria-label="t('workspace.slide_panel.reuse')">{{ t('workspace.slide_panel.reuse') }}</button>
+              <button class="sp-result-btn" @click="handleClose" :aria-label="t('workspace.slide_panel.close_result')">{{ t('workspace.slide_panel.close_result') }}</button>
             </div>
           </div>
         </div>
