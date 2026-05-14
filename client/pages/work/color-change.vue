@@ -1,20 +1,20 @@
 <template>
-  <WorkLayout title="颜色替换" :steps="['上传图片', '选择颜色', '生成']" :current-step="step">
+  <WorkLayout :title="$t('work_pages.color_change.title')" :steps="steps" :current-step="step">
     <div v-if="step === 0" class="upload-section">
       <div class="dropzone" @dragover.prevent @drop.prevent="handleDrop">
         <p class="dz-icon">🎨</p>
-        <p>上传商品图片进行颜色替换</p>
-        <p class="hint">精准识别商品区域，替换为指定颜色</p>
+        <p>{{ $t('work_pages.color_change.drop_title') }}</p>
+        <p class="hint">{{ $t('work_pages.color_change.drop_hint') }}</p>
         <input ref="fileInput" type="file" accept="image/*" hidden @change="handleFile" />
-        <button class="btn-outline" @click="fileInput?.click()">选择图片</button>
+        <button class="btn-outline" @click="fileInput?.click()">{{ $t('work_pages.color_change.select_image') }}</button>
       </div>
       <div v-if="previewUrl" class="preview-box"><img loading="lazy" :src="previewUrl" alt="preview" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" /></div>
-      <p v-if="uploading" class="hint uploading">⏳ 上传中...</p>
-      <p v-else-if="uploadedUrl" class="hint uploaded">✓ 已上传</p>
-      <button v-if="previewUrl" class="btn" @click="step = 1">下一步：选择颜色</button>
+      <p v-if="uploading" class="hint uploading">{{ $t('work_pages.color_change.uploading') }}</p>
+      <p v-else-if="uploadedUrl" class="hint uploaded">{{ $t('work_pages.color_change.uploaded') }}</p>
+      <button v-if="previewUrl" class="btn" @click="step = 1">{{ $t('work_pages.color_change.next_color') }}</button>
     </div>
     <div v-else-if="step === 1" class="select-section">
-      <h3>选择目标颜色</h3>
+      <h3>{{ $t('work_pages.color_change.select_color') }}</h3>
       <div class="color-picker">
         <input v-model="targetColor" type="color" />
         <span>{{ targetColor }}</span>
@@ -22,21 +22,21 @@
       <div class="preset-colors">
         <button v-for="c in presetColors" :key="c.value" class="color-swatch" :style="{ background: c.value }" :class="{ active: targetColor === c.value }" @click="targetColor = c.value" :title="c.name" />
       </div>
-      <p class="cost-hint">成本：3 点/次</p>
+      <p class="cost-hint">{{ $t('work_pages.color_change.cost_hint') }}</p>
       <div class="actions">
-        <button class="btn-outline" @click="step = 0">返回</button>
-        <button class="btn" @click="submitTask">开始替换</button>
+        <button class="btn-outline" @click="step = 0">{{ $t('work_pages.color_change.back') }}</button>
+        <button class="btn" @click="submitTask">{{ $t('work_pages.color_change.start_replace') }}</button>
       </div>
     </div>
     <div v-else class="result-section">
-      <div v-if="processing" class="processing"><span class="spinner" /> 处理中...</div>
+      <div v-if="processing" class="processing"><span class="spinner" /> {{ $t('work_pages.color_change.processing') }}</div>
       <div v-else-if="resultUrl">
         <img loading="lazy" :src="resultUrl" alt="result" class="result-image" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
-        <button class="btn" @click="downloadImage">下载</button>
+        <button class="btn" @click="downloadImage">{{ $t('work_pages.color_change.download') }}</button>
       </div>
       <div v-else class="empty-result">
-        <p>暂无替换结果</p>
-        <button class="btn-outline" @click="step = 1">重新配置颜色</button>
+        <p>{{ $t('work_pages.color_change.no_result') }}</p>
+        <button class="btn-outline" @click="step = 1">{{ $t('work_pages.color_change.reconfigure_color') }}</button>
       </div>
     </div>
   </WorkLayout>
@@ -46,6 +46,7 @@
 
 const { createBlobUrl, revoke } = useBlobUrl()
 
+const steps = computed(() => [t('work_pages.color_change.step_upload'), t('work_pages.color_change.step_color'), t('work_pages.color_change.step_generate')])
 const step = ref(0)
 const previewUrl = ref('')
 const uploadedUrl = ref('')
@@ -55,12 +56,16 @@ const resultUrl = ref('')
 const targetColor = ref('#7C3AED')
 const fileInput = ref<HTMLInputElement | null>(null)
 
-const presetColors = [
-  { name: '经典红', value: '#DC2626' }, { name: '活力橙', value: '#EA580C' },
-  { name: '阳光黄', value: '#CA8A04' }, { name: '森林绿', value: '#16A34A' },
-  { name: '海洋蓝', value: '#2563EB' }, { name: '皇家紫', value: '#7C3AED' },
-  { name: '玫瑰粉', value: '#DB2777' }, { name: '经典黑', value: '#171717' },
-]
+const presetColors = computed(() => [
+  { name: t('work_pages.color_change.preset_red'), value: '#DC2626' },
+  { name: t('work_pages.color_change.preset_orange'), value: '#EA580C' },
+  { name: t('work_pages.color_change.preset_yellow'), value: '#CA8A04' },
+  { name: t('work_pages.color_change.preset_green'), value: '#16A34A' },
+  { name: t('work_pages.color_change.preset_blue'), value: '#2563EB' },
+  { name: t('work_pages.color_change.preset_purple'), value: '#7C3AED' },
+  { name: t('work_pages.color_change.preset_pink'), value: '#DB2777' },
+  { name: t('work_pages.color_change.preset_black'), value: '#171717' },
+])
 
 const toast = useToast()
 async function handleFile(e: Event) {
@@ -90,7 +95,7 @@ async function submitTask() {
     const res: any = await $fetch('/api/advanced/color-swap', { method: 'POST', body: { image_url: uploadedUrl.value, target_color: targetColor.value } })
     resultUrl.value = res.data?.result_url || res.result_url
   } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
-    toast.error(e?.data?.msg || e?.message || '颜色替换失败，请重试')
+    toast.error(e?.data?.msg || e?.message || t('work_pages.color_change.replace_failed'))
     step.value = 1
   } finally { processing.value = false }
 }

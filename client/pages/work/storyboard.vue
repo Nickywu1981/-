@@ -1,5 +1,5 @@
 <template>
-  <WorkLayout :title="$t('work_pages.storyboard_title')" sub:title="$t('work_pages.storyboard_subtitle')" :steps="['输入脚本', '选择风格', '生成分镜']" :current-step="currentStep">
+  <WorkLayout :title="$t('work_pages.storyboard_title')" sub:title="$t('work_pages.storyboard_subtitle')" :steps="steps" :current-step="currentStep">
     <!-- Step 0-1: Input & Style -->
     <div v-if="currentStep < 2" class="ws-section">
       <div class="ws-section__title">{{ $t('work_pages.storyboard_script_title') }}</div>
@@ -42,7 +42,7 @@
             <img loading="lazy" v-if="s.image" :src="s.image" :alt="$t('work_pages.storyboard_img_alt')" class="story-card__img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
             <div v-else class="story-card__placeholder">🎬</div>
             <div class="story-card__info">
-              <div class="story-card__time">{{ s.duration || '3' }}s</div>
+              <div class="story-card__time">{{ s.duration || '3' }}{{ $t('work_pages.storyboard_duration_suffix') }}</div>
               <div class="story-card__desc">{{ s.description }}</div>
               <div class="story-card__camera">{{ s.camera || $t('work_pages.shot_camera_mid_fallback') }}</div>
             </div>
@@ -64,23 +64,24 @@ import PromptEnhancer from '~/components/PromptEnhancer.vue'
 const { t } = useI18n()
 
 
+const steps = computed(() => [t('work_pages.storyboard_step_input'), t('work_pages.storyboard_step_style'), t('work_pages.storyboard_step_generate')])
 const currentStep = ref(0)
 
 const scriptText = ref('')
 const selectedStyle = ref('modern')
 
-const styles = [
-  { id: 'modern', name: '现代简约', icon: '🏠' },
-  { id: 'cinematic', name: '电影质感', icon: '🎬' },
-  { id: 'anime', name: '二次元', icon: '🎨' },
-  { id: 'realistic', name: '写实风格', icon: '📷' },
-  { id: 'minimal', name: '极简白底', icon: '⬜' },
-]
+const styles = computed(() => [
+  { id: 'modern', name: t('work_pages.storyboard_style_modern'), icon: '🏠' },
+  { id: 'cinematic', name: t('work_pages.storyboard_style_cinematic'), icon: '🎬' },
+  { id: 'anime', name: t('work_pages.storyboard_style_anime'), icon: '🎨' },
+  { id: 'realistic', name: t('work_pages.storyboard_style_realistic'), icon: '📷' },
+  { id: 'minimal', name: t('work_pages.storyboard_style_minimal'), icon: '⬜' },
+])
 
-const quickTemplates = [
-  { label: '电商产品', text: '第一幕：产品360度旋转展示，突出材质和细节\n第二幕：模特使用场景，展示实际效果\n第三幕：产品卖点文字弹出，限时优惠信息\n第四幕：品牌LOGO + 购买链接' },
-  { label: '美食教程', text: '第一幕：食材整齐排列，特写新鲜食材\n第二幕：烹饪过程，关键步骤慢动作\n第三幕：成品摆盘，诱人特写\n第四幕：试吃表情 + 详细食谱' },
-]
+const quickTemplates = computed(() => [
+  { label: t('work_pages.storyboard_quick_ecommerce'), text: '第一幕：产品360度旋转展示，突出材质和细节\n第二幕：模特使用场景，展示实际效果\n第三幕：产品卖点文字弹出，限时优惠信息\n第四幕：品牌LOGO + 购买链接' },
+  { label: t('work_pages.storyboard_quick_food'), text: '第一幕：食材整齐排列，特写新鲜食材\n第二幕：烹饪过程，关键步骤慢动作\n第三幕：成品摆盘，诱人特写\n第四幕：试吃表情 + 详细食谱' },
+])
 
 // Task integration
 const task = useTask()

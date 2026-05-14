@@ -2,8 +2,8 @@
   <div class="poster-page">
     <!-- Header -->
     <div class="page-header">
-      <h1 class="page-title">{{ pageTitle }}</h1>
-      <p class="page-desc">AI 智能生成营销海报与社媒封面，支持多种风格与尺寸适配</p>
+      <h1 class="page-title">{{ $t('work_pages.poster.title') }}</h1>
+      <p class="page-desc">{{ $t('work_pages.poster.subtitle') }}</p>
     </div>
 
     <!-- Type Tabs -->
@@ -15,7 +15,7 @@
         @click="switchTab(tab.key)"
       >
         <span class="tab-icon">{{ tab.icon }}</span>
-        <span class="tab-label">{{ tab.label }}</span>
+        <span class="tab-label">{{ $t(tab.labelKey) }}</span>
       </button>
     </div>
 
@@ -24,16 +24,16 @@
       <!-- Left: Input Panel -->
       <div class="input-panel">
         <SmartRecognitionPanel
-          hint="上传商品参考图，AI 自动生成海报描述文案"
-          confirm-label="确认并生成描述"
+          :hint="$t('work_pages.poster.smart_hint')"
+          :confirm-label="$t('work_pages.poster.smart_confirm')"
           @confirm="onSmartApply"
         />
         <div class="panel-section">
-          <label class="section-label">海报描述</label>
+          <label class="section-label">{{ $t('work_pages.poster.section_desc') }}</label>
           <textarea
             v-model="prompt"
             class="prompt-input"
-            :placeholder="currentTab.placeholder"
+            :placeholder="$t(currentTab.phKey)"
             rows="5"
             maxlength="4000"
             @input="onPromptChange"
@@ -43,17 +43,17 @@
 
         <!-- Size Info -->
         <div class="panel-section">
-          <label class="section-label">尺寸规格</label>
+          <label class="section-label">{{ $t('work_pages.poster.section_size') }}</label>
           <div class="size-info">
             <span class="size-badge">{{ currentSize.width }}×{{ currentSize.height }}</span>
-            <span class="size-ratio">比例 {{ currentSize.ratio }}</span>
-            <span class="size-label">{{ currentSize.label }}</span>
+            <span class="size-ratio">{{ $t('work_pages.poster.size_ratio') }} {{ currentSize.ratio }}</span>
+            <span class="size-label">{{ $t(currentSize.labelKey) }}</span>
           </div>
         </div>
 
         <!-- Style Override -->
         <div class="panel-section">
-          <label class="section-label">风格偏好 <span class="optional">(可选)</span></label>
+          <label class="section-label">{{ $t('work_pages.poster.section_style') }} <span class="optional">{{ $t('work_pages.poster.style_optional') }}</span></label>
           <input
             v-model="styleOverride"
             class="style-input"
@@ -64,15 +64,15 @@
 
         <!-- Templates -->
         <div class="panel-section">
-          <label class="section-label">快速模板</label>
+          <label class="section-label">{{ $t('work_pages.poster.section_templates') }}</label>
           <div class="template-chips">
             <button
               v-for="tpl in currentTemplates"
-              :key="tpl.label"
+              :key="tpl.labelKey"
               class="tpl-chip"
               @click="applyTemplate(tpl)"
             >
-              {{ tpl.label }}
+              {{ $t(tpl.labelKey) }}
             </button>
           </div>
         </div>
@@ -85,7 +85,7 @@
             @click="enhancePrompt"
           >
             <span v-if="enhancing" class="spinner"></span>
-            {{ enhancing ? '润色中...' : '✨ AI 润色' }}
+            {{ enhancing ? $t('work_pages.poster.enhancing') : $t('work_pages.poster.btn_enhance') }}
           </button>
           <button
             class="btn btn-primary"
@@ -93,15 +93,15 @@
             @click="submitTask"
           >
             <span v-if="submitting" class="spinner"></span>
-            {{ submitting ? '生成中...' : '🎨 生成海报' }}
+            {{ submitting ? $t('work_pages.poster.generating') : $t('work_pages.poster.btn_generate') }}
           </button>
         </div>
 
         <!-- Enhanced Prompt Preview -->
         <div v-if="enhancedPrompt && enhancedPrompt !== prompt" class="enhanced-preview">
           <div class="enhanced-header">
-            <span>✨ 润色结果</span>
-            <button class="btn-text" @click="discardEnhance">还原</button>
+            <span>{{ $t('work_pages.poster.enhanced_title') }}</span>
+            <button class="btn-text" @click="discardEnhance">{{ $t('work_pages.poster.btn_revert') }}</button>
           </div>
           <p class="enhanced-text">{{ enhancedPrompt }}</p>
         </div>
@@ -112,7 +112,7 @@
         :results="results"
         :generating="generating"
         :error="errorMsg"
-        :status-text="jobStatusText"
+        :status-text="statusText"
         :size="currentSize"
         @retry="retry"
         @download="downloadImage"
@@ -149,11 +149,9 @@ const currentTemplates = computed(() => posterTemplates[activeTab.value] || [])
 const currentStyle = computed(() => posterStyleDefaults[activeTab.value] || '')
 const currentSize = computed(() => posterSizes[activeTab.value])
 
-const pageTitle = computed(() => config.value?.page_title || '海报与封面生成')
-
-const jobStatusText = computed(() => {
+const statusText = computed(() => {
   if (!generating.value) return ''
-  return 'AI 正在为您创作海报，请稍候...'
+  return t('work_pages.poster.status_text')
 })
 
 function switchTab(key: string) {
@@ -181,7 +179,7 @@ async function enhancePrompt() {
     })
     enhancedPrompt.value = resp.data?.enhanced_prompt || resp.enhanced_prompt || prompt.value
     if (enhancedPrompt.value === prompt.value) {
-      toast.warning('润色服务暂不可用，将使用原始描述')
+      toast.warning(t('work_pages.poster.enhance_unavailable'))
     }
   } catch {
     toast.error(t('common.prompt_polish_failed'))
@@ -212,7 +210,7 @@ async function submitTask() {
     })
     startPolling(resp.job_id)
   } catch (e: unknown) {
-    errorMsg.value = e.data?.message || '海报生成失败，请重试'
+    errorMsg.value = (e as any)?.data?.message || t('work_pages.poster.generate_failed')
     generating.value = false
   } finally {
     submitting.value = false
@@ -230,7 +228,7 @@ function startPolling(jobId: string) {
     if (pollCount > MAX_POLL) {
       clearInterval(pollTimer!)
       generating.value = false
-      errorMsg.value = '任务超时，请刷新页面查看结果'
+      errorMsg.value = t('work_pages.poster.job_timeout')
       return
     }
     try {
@@ -247,14 +245,14 @@ function startPolling(jobId: string) {
       } else if (job.status === 'failed') {
         clearInterval(pollTimer!)
         generating.value = false
-        errorMsg.value = job.error || '生成失败'
+        errorMsg.value = job.error || t('work_pages.poster.gen_failed')
       }
     } catch {
       failCount++
       if (failCount >= MAX_FAILS) {
         clearInterval(pollTimer!)
         generating.value = false
-        errorMsg.value = '网络不稳定，查询任务状态失败，请刷新查看结果'
+        errorMsg.value = t('work_pages.poster.network_error')
       }
     }
   }, 3000)

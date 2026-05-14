@@ -1,39 +1,39 @@
 <template>
-  <WorkLayout :steps="['上传服装', '选模特', '生成']" :current-step="step">
+  <WorkLayout :title="$t('work_pages.virtual_tryon.title')" :steps="steps" :current-step="step">
     <div v-if="step === 0" class="upload-section">
       <div class="dropzone" @dragover.prevent @drop.prevent="handleDrop">
         <p class="dz-icon">👕</p>
-        <p>上传服装平铺图</p>
-        <p class="hint">T恤/衬衫/连衣裙/外套/裤子 — AI自动识别款式</p>
+        <p>{{ $t('work_pages.virtual_tryon.drop_title') }}</p>
+        <p class="hint">{{ $t('work_pages.virtual_tryon.drop_hint') }}</p>
         <input ref="fileInput" type="file" accept="image/*" hidden @change="handleFile" />
-        <button class="btn-outline" @click="fileInput?.click()">选择图片</button>
+        <button class="btn-outline" @click="fileInput?.click()">{{ $t('work_pages.virtual_tryon.select_image') }}</button>
       </div>
       <div v-if="previewUrl" class="preview-box">
-        <img loading="lazy" :src="previewUrl" alt="上传预览" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+        <img loading="lazy" :src="previewUrl" :alt="$t('work_pages.virtual_tryon.preview_alt')" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
       </div>
-      <p v-if="uploading" class="hint uploading">⏳ 上传中...</p>
-      <p v-else-if="uploadedUrl" class="hint uploaded">✓ 已上传</p>
-      <button v-if="previewUrl" class="btn" @click="step = 1">下一步：选模特</button>
+      <p v-if="uploading" class="hint uploading">{{ $t('work_pages.virtual_tryon.uploading') }}</p>
+      <p v-else-if="uploadedUrl" class="hint uploaded">{{ $t('work_pages.virtual_tryon.uploaded') }}</p>
+      <button v-if="previewUrl" class="btn" @click="step = 1">{{ $t('work_pages.virtual_tryon.next_model') }}</button>
     </div>
 
     <div v-else-if="step === 1" class="select-section">
-      <h3>选择模特参数</h3>
-      <h4>肤色</h4>
+      <h3>{{ $t('work_pages.virtual_tryon.select_model') }}</h3>
+      <h4>{{ $t('work_pages.virtual_tryon.skin_tone') }}</h4>
       <div class="opt-row">
         <button v-for="s in skinTones" :key="s.value" class="opt-btn" :class="{ active: selectedSkin === s.value }" @click="selectedSkin = s.value">{{ s.label }}</button>
       </div>
-      <h4>体型</h4>
+      <h4>{{ $t('work_pages.virtual_tryon.body_type') }}</h4>
       <div class="opt-row">
         <button v-for="b in bodyTypes" :key="b.value" class="opt-btn" :class="{ active: selectedBody === b.value }" @click="selectedBody = b.value">{{ b.label }}</button>
       </div>
-      <h4>穿搭风格</h4>
+      <h4>{{ $t('work_pages.virtual_tryon.style_title') }}</h4>
       <div class="opt-row">
-        <button v-for="st in styles" :key="st" class="opt-btn" :class="{ active: selectedStyle === st }" @click="selectedStyle = st">{{ st }}</button>
+        <button v-for="st in styles" :key="st.value" class="opt-btn" :class="{ active: selectedStyle === st.value }" @click="selectedStyle = st.value">{{ st.label }}</button>
       </div>
-      <p class="cost-hint">成本：8 点/次</p>
+      <p class="cost-hint">{{ $t('work_pages.virtual_tryon.cost_hint') }}</p>
       <div class="actions">
-        <button class="btn-outline" @click="step = 0">返回</button>
-        <button class="btn" @click="submitTask">开始生成</button>
+        <button class="btn-outline" @click="step = 0">{{ $t('work_pages.virtual_tryon.back') }}</button>
+        <button class="btn" @click="submitTask">{{ $t('work_pages.virtual_tryon.start_generate') }}</button>
       </div>
     </div>
 
@@ -43,17 +43,17 @@
         <div class="bar"><div class="bar-fill" :style="{ width: task.progress.value + '%' }" /></div>
       </div>
       <div v-else-if="task.status.value === 2">
-        <h3>虚拟模特效果</h3>
+        <h3>{{ $t('work_pages.virtual_tryon.complete_title') }}</h3>
         <div class="image-grid">
           <div v-for="img in (task.result.value?.images || [])" :key="img.id" class="result-card">
-            <img loading="lazy" v-if="img.url" :src="img.url" :alt="img.style || '试衣结果'" class="result-img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+            <img loading="lazy" v-if="img.url" :src="img.url" :alt="img.style || $t('work_pages.virtual_tryon.result_alt')" class="result-img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
             <div v-else class="result-img" />
             <span class="result-label">{{ img.style }}</span>
           </div>
         </div>
-        <div class="actions"><button class="btn-outline" @click="handleRedo">再做一次</button></div>
+        <div class="actions"><button class="btn-outline" @click="handleRedo">{{ $t('work_pages.virtual_tryon.redo_btn') }}</button></div>
       </div>
-      <div v-else-if="task.status.value === 3" class="error-box"><p>{{ task.errorMsg.value }}</p><button class="btn" @click="handleRedo">重试</button></div>
+      <div v-else-if="task.status.value === 3" class="error-box"><p>{{ task.errorMsg.value }}</p><button class="btn" @click="handleRedo">{{ $t('work_pages.virtual_tryon.retry_btn') }}</button></div>
     </div>
   </WorkLayout>
 </template>
@@ -62,6 +62,7 @@
 
 const { createBlobUrl, revoke } = useBlobUrl()
 
+const steps = computed(() => [t('work_pages.virtual_tryon.step_upload'), t('work_pages.virtual_tryon.step_model'), t('work_pages.virtual_tryon.step_generate')])
 const step = ref(0);
 const previewUrl = ref('');
 const uploadedUrl = ref('');
@@ -74,15 +75,26 @@ const toast = useToast()
 const fileInput = ref<HTMLInputElement | null>(null)
 const task = useTask();
 
-const skinTones = [
-  { value: 'fair', label: '白皙' }, { value: 'natural', label: '自然' },
-  { value: 'wheat', label: '小麦' }, { value: 'dark', label: '深色' },
-];
-const bodyTypes = [
-  { value: 'slim', label: '纤细' }, { value: 'standard', label: '标准' },
-  { value: 'curvy', label: '丰满' }, { value: 'muscular', label: '肌肉' },
-];
-const styles = ['休闲', '商务', '甜美', '运动', '街头', '韩系'];
+const skinTones = computed(() => [
+  { value: 'fair', label: t('work_pages.virtual_tryon.skin_fair') },
+  { value: 'natural', label: t('work_pages.virtual_tryon.skin_natural') },
+  { value: 'wheat', label: t('work_pages.virtual_tryon.skin_wheat') },
+  { value: 'dark', label: t('work_pages.virtual_tryon.skin_dark') },
+]);
+const bodyTypes = computed(() => [
+  { value: 'slim', label: t('work_pages.virtual_tryon.body_slim') },
+  { value: 'standard', label: t('work_pages.virtual_tryon.body_standard') },
+  { value: 'curvy', label: t('work_pages.virtual_tryon.body_curvy') },
+  { value: 'muscular', label: t('work_pages.virtual_tryon.body_muscular') },
+]);
+const styles = computed(() => [
+  { value: 'casual', label: t('work_pages.virtual_tryon.style_casual') },
+  { value: 'business', label: t('work_pages.virtual_tryon.style_business') },
+  { value: 'sweet', label: t('work_pages.virtual_tryon.style_sweet') },
+  { value: 'sport', label: t('work_pages.virtual_tryon.style_sport') },
+  { value: 'street', label: t('work_pages.virtual_tryon.style_street') },
+  { value: 'korean', label: t('work_pages.virtual_tryon.style_korean') },
+]);
 
 async function uploadFile(file: File) {
   uploading.value = true;
