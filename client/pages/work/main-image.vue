@@ -1,59 +1,59 @@
 <template>
-  <WorkLayout :steps="['上传商品图', '选平台', '选风格', '生成']" :current-step="step">
+  <WorkLayout :steps="stepLabels" :current-step="step">
     <!-- Step 1: 上传 -->
     <div v-if="step === 0" class="upload-section">
       <div class="dropzone" @dragover.prevent @drop.prevent="handleDrop">
         <p class="dz-icon">📷</p>
-        <p>拖拽商品图到此处 或 点击上传</p>
-        <p class="dz-hint">支持 JPG / PNG / WebP，建议 800×800 以上</p>
+        <p>{{ $t('work_pages.main_image_drop_hint') }}</p>
+        <p class="dz-hint">{{ $t('work_pages.main_image_drop_format') }}</p>
         <input ref="fileInput" type="file" accept="image/*" hidden @change="handleFile" />
-        <button class="btn-outline" @click="fileInput?.click()">选择文件</button>
+        <button class="btn-outline" @click="fileInput?.click()">{{ $t('work_pages.main_image_select_file') }}</button>
       </div>
       <div v-if="previewUrl" class="preview">
-        <img loading="lazy" :src="previewUrl" alt="预览" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
-        <p v-if="uploading" class="uploading-hint">上传中...</p>
-        <p v-else-if="uploadedUrl" class="uploaded-hint">已上传 ✓</p>
+        <img loading="lazy" :src="previewUrl" :alt="$t('work_pages.main_image_preview')" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+        <p v-if="uploading" class="uploading-hint">{{ $t('work_pages.main_image_uploading') }}</p>
+        <p v-else-if="uploadedUrl" class="uploaded-hint">{{ $t('work_pages.main_image_uploaded') }} ✓</p>
       </div>
       <SmartRecognitionPanel
         v-if="uploadedUrl"
-        hint="AI 可基于此参考图智能识别产品名称、品类、核心特征，自动填充后续步骤"
-        confirm-label="确认并继续"
+        :hint="$t('work_pages.main_image_smart_hint')"
+        :confirm-label="$t('work_pages.main_image_confirm_continue')"
         @confirm="onSmartApply"
       />
-      <button v-if="uploadedUrl" class="btn" @click="step = 1">下一步：选平台</button>
+      <button v-if="uploadedUrl" class="btn" @click="step = 1">{{ $t('work_pages.main_image_next_platform') }}</button>
     </div>
 
     <!-- Step 2: 选平台 -->
     <div v-else-if="step === 1" class="select-section">
-      <h3>选择目标平台</h3>
+      <h3>{{ $t('work_pages.main_image_select_platform') }}</h3>
       <div class="platform-grid">
         <button v-for="p in platforms" :key="p.code" class="plat-card" :class="{ active: selectedPlatform === p.code }" @click="selectedPlatform = p.code">
           {{ p.name }}
         </button>
       </div>
       <div class="actions">
-        <button class="btn-outline" @click="step = 0">返回</button>
-        <button class="btn" :disabled="!selectedPlatform" @click="step = 2">下一步：选风格</button>
+        <button class="btn-outline" @click="step = 0">{{ $t('work_pages.main_image_goback') }}</button>
+        <button class="btn" :disabled="!selectedPlatform" @click="step = 2">{{ $t('work_pages.main_image_next_style') }}</button>
       </div>
     </div>
 
     <!-- Step 3: 选风格 -->
     <div v-else-if="step === 2" class="select-section">
-      <h3>选择主图风格</h3>
+      <h3>{{ $t('work_pages.main_image_select_style') }}</h3>
       <div class="style-grid">
         <button v-for="s in styles" :key="s.id" class="style-card" :class="{ active: selectedStyle === s.id }" @click="selectedStyle = s.id">
           <div class="style-preview">{{ s.preview }}</div>
-          <span>{{ s.name }}</span>
+          <span>{{ $t(s.nameKey) }}</span>
         </button>
       </div>
       <div class="actions">
-        <button class="btn-outline" @click="step = 1">返回</button>
-        <button class="btn" :disabled="!selectedStyle" @click="submitTask">开始生成</button>
+        <button class="btn-outline" @click="step = 1">{{ $t('work_pages.main_image_goback') }}</button>
+        <button class="btn" :disabled="!selectedStyle" @click="submitTask">{{ $t('work_pages.main_image_start_generate') }}</button>
       </div>
 
       <!-- 提示词润色 -->
       <div class="enhance-section">
-        <p class="enhance-label">不确定怎么描述？让 AI 帮你优化</p>
+        <p class="enhance-label">{{ $t('work_pages.main_image_prompt_help') }}</p>
         <PromptEnhancer mode="image" :initial-prompt="stylePrompt" @applied="(v) => stylePrompt = v" />
       </div>
     </div>
@@ -66,22 +66,22 @@
         <div class="bar"><div class="bar-fill" :style="{ width: task.progress.value + '%' }" /></div>
       </div>
       <div v-else-if="task.status.value === 2" class="result-images">
-        <h3>生成完成 — 3张不同风格</h3>
+        <h3>{{ $t('work_pages.main_image_done_title') }}</h3>
         <div class="image-grid">
           <div v-for="img in task.result.value?.images" :key="img.id" class="result-card">
             <img loading="lazy" :src="img.url" :alt="img.style" class="result-img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
             <span class="img-label">{{ img.style }}</span>
-            <button class="btn-sm">下载</button>
+            <button class="btn-sm">{{ $t('work_pages.main_image_download') }}</button>
           </div>
         </div>
         <div class="actions">
-          <button class="btn-outline" @click="handleRedo">重新生成</button>
-          <NuxtLink to="/my/works" class="btn">去素材库查看</NuxtLink>
+          <button class="btn-outline" @click="handleRedo">{{ $t('work_pages.main_image_redo') }}</button>
+          <NuxtLink to="/my/works" class="btn">{{ $t('work_pages.main_image_goto_lib') }}</NuxtLink>
         </div>
       </div>
       <div v-else-if="task.status.value === 3" class="error-box">
-        <p class="error-msg">{{ task.errorMsg.value || '生成失败，请重试' }}</p>
-        <button class="btn" @click="handleRedo">重新生成</button>
+        <p class="error-msg">{{ task.errorMsg.value || $t('common.failed_generate_retry') }}</p>
+        <button class="btn" @click="handleRedo">{{ $t('work_pages.main_image_redo') }}</button>
       </div>
     </div>
   </WorkLayout>
@@ -103,6 +103,7 @@ const selectedPlatform = ref('');
 const selectedStyle = ref('');
 const stylePrompt = ref('');
 const task = useTask();
+const stepLabels = computed(() => [t('work_pages.main_image_step_upload'), t('work_pages.main_image_step_platform'), t('work_pages.main_image_step_style'), t('work_pages.main_image_step_generate')]);
 
 const platforms = [
   { code: 'taobao', name: '淘宝' }, { code: 'pdd', name: '拼多多' }, { code: 'douyin', name: '抖音' },
@@ -112,9 +113,9 @@ const platforms = [
 ];
 
 const styles = [
-  { id: 'simple', name: '简约白底', preview: '⬜' },
-  { id: 'luxury', name: '高级轻奢', preview: '✨' },
-  { id: 'promo', name: '活动促销', preview: '🏷' },
+  { id: 'simple', nameKey: 'work_pages.main_image_style_simple', preview: '⬜' },
+  { id: 'luxury', nameKey: 'work_pages.main_image_style_luxury', preview: '✨' },
+  { id: 'promo', nameKey: 'work_pages.main_image_style_promo', preview: '🏷' },
 ];
 
 async function uploadFile(file: File) {
