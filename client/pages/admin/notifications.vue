@@ -1,17 +1,17 @@
 <template>
   <AdminLayout>
-    <h2 class="ptitle">通知中心管理</h2>
+    <h2 class="ptitle">{{ $t('common.notification_manage') }}</h2>
 
     <div class="filters">
-      <input v-model="filterUserId" type="text" placeholder="用户ID" @keyup.enter="search" />
+      <input v-model="filterUserId" type="text" :placeholder="$t('common.user_id')" @keyup.enter="search" />
       <select v-model="filterType" @change="search">
-        <option value="">全部{{ $t('common.type') }}</option>
-        <option value="system">系统通知</option>
-        <option value="task">任务通知</option>
-        <option value="credit">积分通知</option>
+        <option value="">{{ $t('common.all') }}{{ $t('common.type') }}</option>
+        <option value="system">{{ $t('common.platform_notification') }}</option>
+        <option value="task">{{ $t('common.task_notification') }}</option>
+        <option value="credit">{{ $t('common.credit_notification') }}</option>
       </select>
       <button class="btn" @click="search">{{ $t('common.search') }}</button>
-      <button class="btn btn-send" @click="sendDialog.open = true">+ 发送通知</button>
+      <button class="btn btn-send" @click="sendDialog.open = true">+ {{ $t('common.notification_send') }}</button>
     </div>
 
     <LoadingSkeleton v-if="loading" type="table" :rows="5" :cols="7" />
@@ -20,7 +20,7 @@
       <table class="table">
         <thead>
           <tr>
-            <th>ID</th><th>用户</th><th>{{ $t('common.type') }}</th><th>标题</th><th>内容</th><th>{{ $t('common.status') }}</th><th>{{ $t('common.time') }}</th><th>{{ $t('common.actions') }}</th>
+            <th>ID</th><th>{{ $t('common.user') }}</th><th>{{ $t('common.type') }}</th><th>{{ $t('common.title_label') }}</th><th>{{ $t('common.content') }}</th><th>{{ $t('common.status') }}</th><th>{{ $t('common.time') }}</th><th>{{ $t('common.actions') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -30,32 +30,32 @@
             <td><span class="badge" :class="'nf-' + n.type">{{ typeLabel(n.type) }}</span></td>
             <td class="fw6">{{ n.title }}</td>
             <td class="content-cell">{{ n.content }}</td>
-            <td>{{ n.is_read ? '已读' : '未读' }}</td>
+            <td>{{ n.is_read ? $t('common.read') : $t('common.unread') }}</td>
             <td>{{ n.create_time?.slice(0, 16) }}</td>
             <td><button class="btn-sm btn-del" @click="doDelete(n)">{{ $t('common.delete') }}</button></td>
           </tr>
         </tbody>
       </table>
     </div>
-    <div v-if="!list.length && !loading" class="empty">暂无通知</div>
+    <div v-if="!list.length && !loading" class="empty">{{ $t('common.notification_empty') }}</div>
 
     <Pagination :page="page" :page-size="pageSize" :total="total" @change="onPageChange" />
 
     <!-- Send Dialog -->
     <div v-if="sendDialog.open" class="modal-overlay" @click.self="sendDialog.open = false" @keydown.escape="sendDialog.open = false">
       <div class="modal-box">
-        <h4>发送通知</h4>
-        <input v-model="sendDialog.userId" type="number" min="1" placeholder="用户ID *" />
+        <h4>{{ $t('common.notification_send') }}</h4>
+        <input v-model="sendDialog.userId" type="number" min="1" :placeholder="$t('common.user_id') + ' *'" />
         <select v-model="sendDialog.type">
-          <option value="system">系统通知</option>
-          <option value="task">任务通知</option>
-          <option value="credit">积分通知</option>
+          <option value="system">{{ $t('common.platform_notification') }}</option>
+          <option value="task">{{ $t('common.task_notification') }}</option>
+          <option value="credit">{{ $t('common.credit_notification') }}</option>
         </select>
-        <input v-model="sendDialog.title" maxlength="100" type="text" placeholder="通知标题 *" />
-        <textarea v-model="sendDialog.content" maxlength="5000" placeholder="通知内容 *" rows="3"></textarea>
+        <input v-model="sendDialog.title" maxlength="100" type="text" :placeholder="$t('common.title_label') + ' *'" />
+        <textarea v-model="sendDialog.content" maxlength="5000" :placeholder="$t('common.content') + ' *'" rows="3"></textarea>
         <div class="modal-actions">
           <button class="btn-cancel" @click="sendDialog.open = false">{{ $t('common.cancel') }}</button>
-          <button class="btn" @click="confirmSend">发送</button>
+          <button class="btn" @click="confirmSend">{{ $t('common.send') }}</button>
         </div>
       </div>
     </div>
@@ -79,7 +79,7 @@ const toast = useToast()
 
 const sendDialog = reactive({ open: false, userId: '', type: 'system', title: '', content: '' })
 
-function typeLabel(t: string) { return t === 'system' ? '系统' : t === 'task' ? '任务' : t === 'credit' ? '积分' : t }
+function typeLabel(typeVal: string) { return typeVal === 'system' ? t('common.platform_notification') : typeVal === 'task' ? t('common.task_notification') : typeVal === 'credit' ? t('common.credit_notification') : typeVal }
 
 async function fetch() {
   loading.value = true

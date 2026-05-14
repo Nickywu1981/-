@@ -1032,7 +1032,13 @@
     "auth_method_label": "[EN] 鉴权方式",
     "request_method_label": "[EN] 请求方法",
     "timeout_label": "[EN] 超时(ms)",
-    "method_label": "[EN] 方法"
+    "method_label": "[EN] 方法",
+    "notification_manage": "[EN] 通知中心管理",
+    "notification_send": "[EN] 发送通知",
+    "notification_empty": "[EN] 暂无通知",
+    "platform_notification": "[EN] 系统通知",
+    "task_notification": "[EN] 任务通知",
+    "credit_notification": "[EN] 积分通知"
   },
   "ecommerce": {
     "title": "AI E-Commerce Content Creation",
