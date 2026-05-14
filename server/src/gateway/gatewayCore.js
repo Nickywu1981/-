@@ -12,6 +12,7 @@ import { sanitizePII, sanitizeObject } from '../services/inputSanitizerService.j
 import { moderateText } from '../services/moderation.service.js';
 import { wrapPrompt } from '../services/promptWrapper.js';
 import { blockDirectVideoGeneration } from '../services/pipelineOrchestrator.js';
+import { postProcessOutput } from '../services/outputPostProcessor.js';
 import { aiGatewayConfig, securityConfig, ecommercePipelineConfig } from '../config/index.js';
 
 // ==================== 上下文标准化 ====================
@@ -201,4 +202,67 @@ export async function runPreInvokeSecurityChecks(modelId, input, context) {
   }
 
   return result;
+}
+
+// ==================== 输出审核 + 后处理 (三条路径共用) ====================
+
+/**
+ * 统一输出审核与后处理管线
+ * 供 gatewayInfer / gatewayDispatch / gatewayRoute 三条路径共用
+ *
+ * @param {object} accessors - { getOutput, setOutput, clearOutput }
+ * @param {object} geoConstraints - GEO 规则约束
+ * @param {object} ctx - 原始请求上下文 (outputFormat/outputSanitize)
+ * @returns {{ moderationResult: string|null, status: 'success'|'blocked', errorMsg: string }}
+ */
+export async function runOutputModerationAndPostProcess(accessors, geoConstraints, ctx = {}) {
+  const { getOutput, setOutput, clearOutput } = accessors;
+  let moderationResult = null;
+  let status = 'success';
+  let errorMsg = '';
+
+  // ── 输出审核 (敏感词 + 阿里云绿网 + GEO禁止词 + PII二次脱敏) ──
+  const rawOutput = getOutput();
+  if (rawOutput != null && status === 'success') {
+    try {
+      const { moderateOutput } = await import('../services/outputModerationService.js');
+      const textOutput = typeof rawOutput === 'string' ? rawOutput : JSON.stringify(rawOutput);
+      const reviewLevel = geoConstraints?.reviewLevel || 5;
+      const blockedTerms = geoConstraints?.outputConstraints?.forbiddenTerms || [];
+      const requiredPatterns = geoConstraints?.outputConstraints?.requiredPatterns || null;
+      const enableAliyun = securityConfig.aliyunGreenEnabled;
+      const modResult = await moderateOutput(textOutput, { level: reviewLevel, blockedTerms, requiredPatterns, enableAliyun });
+
+      try { moderationResult = JSON.stringify(modResult); } catch { moderationResult = null; }
+
+      if (modResult.sanitizedOutput) {
+        setOutput(modResult.sanitizedOutput);
+      }
+      if (!modResult.passed && modResult.riskLevel === 'high') {
+        status = 'blocked';
+        errorMsg = '输出包含违规内容，已被拦截';
+        clearOutput();
+      }
+    } catch (e) {
+      logger.warn(`[Gateway] Moderation failed: ${e.message}`);
+    }
+  }
+
+  // ── 输出后处理 (格式转换 + 二次脱敏) ──
+  const currentOutput = getOutput();
+  if (currentOutput != null && status === 'success') {
+    try {
+      const outputFormat = ctx.outputFormat || aiGatewayConfig.outputFormat;
+      const outputSanitize = ctx.outputSanitize !== undefined ? ctx.outputSanitize : securityConfig.outputSanitize;
+      const processed = await postProcessOutput(
+        typeof currentOutput === 'string' ? currentOutput : JSON.stringify(currentOutput),
+        { format: outputFormat, sanitize: outputSanitize },
+      );
+      setOutput(processed);
+    } catch (e) {
+      logger.warn(`[Gateway] PostProcess failed: ${e.message}`);
+    }
+  }
+
+  return { moderationResult, status, errorMsg };
 }

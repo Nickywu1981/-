@@ -17,7 +17,7 @@ import logger from '../utils/logger.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { BusinessError } from '../utils/businessError.js';
 import { infer, listModels, getFallbackModel } from '../services/aiEngine.js';
-import { extractUsage, estimateTokens } from '../services/tokenMeteringService.js';
+import { estimateTokens } from '../services/tokenMeteringService.js';
 import * as tokenPricingDao from '../dao/tokenPricingDao.js';
 import * as tokenStatsDao from '../dao/tokenStatsDao.js';
 import * as modelConfigDao from '../dao/modelConfigDao.js';
@@ -27,18 +27,17 @@ import { manageContextWindow, saveBudgetLog } from '../services/contextWindowSer
 import * as ltmService from '../services/longTermMemoryService.js';
 import { recordCall, recordCircuitBreakerTrip } from '../services/monitorService.js';
 import { getTraceContext } from '../services/traceService.js';
-import { buildErrorResponse, postProcessOutput } from '../services/outputPostProcessor.js';
+import { buildErrorResponse } from '../services/outputPostProcessor.js';
 import { registerBuiltinHooks, runPreHooks, runPostHooks } from '../services/hookRegistryService.js';
-import { aiGatewayConfig } from '../config/index.js';
+import { aiGatewayConfig, securityConfig } from '../config/index.js';
 import {
   normalizeContext,
   getModelBreaker,
   timeoutPromise,
   runBusinessPipeline,
   runPreInvokeSecurityChecks,
-  SINGLE_REQUEST_TIMEOUT,
+  runOutputModerationAndPostProcess,
   TOTAL_TIMEOUT,
-  STREAMING_TIMEOUT,
 } from './gatewayCore.js';
 
 // 钩子注册中心开关
@@ -229,47 +228,18 @@ export async function gatewayInfer(modelId, input, ctx = {}) {
 
   const latencyMs = result.elapsed || (Date.now() - start);
 
-  // 输出审核 — 后置过滤 + PII二次脱敏 + 高风险拦截
+  // ── 输出审核 + 后处理 (共用管线) ──
   let moderationResult = null;
-  if (result.output && status === 'success') {
-    try {
-      const { moderateOutput } = await import('../services/outputModerationService.js');
-      const textOutput = typeof result.output === 'string' ? result.output : JSON.stringify(result.output);
-      const reviewLevel = geoConstraints?.reviewLevel || 5;
-      const blockedTerms = geoConstraints?.outputConstraints?.forbiddenTerms || [];
-      const requiredPatterns = geoConstraints?.outputConstraints?.requiredPatterns || null;
-      const enableAliyun = securityConfig.aliyunGreenEnabled;
-      const modResult = await moderateOutput(textOutput, { level: reviewLevel, blockedTerms, requiredPatterns, enableAliyun });
-      moderationResult = JSON.stringify(modResult);
-      // 应用脱敏后的输出
-      if (modResult.sanitizedOutput) {
-        result.output = modResult.sanitizedOutput;
-      }
-      // 高风险输出拦截
-      if (!modResult.passed && modResult.riskLevel === 'high') {
-        status = 'blocked';
-        errorMsg = '输出包含违规内容，已被拦截';
-        result.output = null;
-      }
-    } catch (e) {
-      logger.warn(`[Gateway] Moderation failed: ${e.message}`);
-    }
+  {
+    const mod = await runOutputModerationAndPostProcess({
+      getOutput: () => result.output,
+      setOutput: (v) => { result.output = v; },
+      clearOutput: () => { result.output = null; },
+    }, geoConstraints, ctx);
+    moderationResult = mod.moderationResult;
+    if (mod.status !== 'success') { status = mod.status; errorMsg = mod.errorMsg; }
   }
 
-
-	// ── 输出后处理（格式转换 + 二次脱敏）──
-	if (result.output && status === "success") {
-		try {
-			const outputFormat = ctx.outputFormat || aiGatewayConfig.outputFormat;
-			const outputSanitize = ctx.outputSanitize !== undefined ? ctx.outputSanitize : securityConfig.outputSanitize;
-			result.output = await postProcessOutput(
-				typeof result.output === "string" ? result.output : JSON.stringify(result.output),
-				{ format: outputFormat, sanitize: outputSanitize },
-			);
-		} catch (e) {
-			logger.warn(`[Gateway] PostProcess failed: ${e.message}`);
-		}
-	}
   await modelConfigDao.logCall({
     userId: context.userId, tenantId: context.tenantId,
     modelKey: modelId, taskType: context.taskType, inputHash: '',
@@ -450,40 +420,17 @@ export async function gatewayDispatch(dispatchReq, ctx = {}) {
     ? await tokenPricingDao.calculateCost(modelId, tokensIn, tokensOut, 1)
     : { amount: 0, currency: 'CNY', pricingId: null, details: null };
 
-  // 输出审核 — 后置过滤 + PII二次脱敏 + 高风险拦截
+  // ── 输出审核 + 后处理 (共用管线) ──
+  // dispatcher 返回 { mode, matchLog, selected, result }，实际文本在 result.result.output
   let moderationResult = null;
-  if (result?.result && status === 'success') {
-    try {
-      const { moderateOutput } = await import('../services/outputModerationService.js');
-      const textOutput = typeof result.result === 'string' ? result.result : JSON.stringify(result.result);
-      const reviewLevel = geoConstraints?.reviewLevel || 5;
-      const blockedTerms = geoConstraints?.outputConstraints?.forbiddenTerms || [];
-      const requiredPatterns = geoConstraints?.outputConstraints?.requiredPatterns || null;
-      const enableAliyun = securityConfig.aliyunGreenEnabled;
-      const modResult = await moderateOutput(textOutput, { level: reviewLevel, blockedTerms, requiredPatterns, enableAliyun });
-      moderationResult = JSON.stringify(modResult);
-      if (modResult.sanitizedOutput) {
-        result.result = modResult.sanitizedOutput;
-      }
-      if (!modResult.passed && modResult.riskLevel === 'high') {
-        status = 'blocked';
-        errorMsg = '输出包含违规内容，已被拦截';
-        result.result = null;
-      }
-    } catch (e) {
-      logger.warn(`[Gateway] Moderation failed: ${e.message}`);
-    }
-  }
-  // ── 输出后处理（格式转换 + 二次脱敏）──
-  if (result?.result && status === "success") {
-    try {
-      const outputFormat = ctx.outputFormat || aiGatewayConfig.outputFormat;
-      const outputSanitize = ctx.outputSanitize !== undefined ? ctx.outputSanitize : securityConfig.outputSanitize;
-      const rawOutput = typeof result.result === "string" ? result.result : JSON.stringify(result.result);
-      result.result = await postProcessOutput(rawOutput, { format: outputFormat, sanitize: outputSanitize });
-    } catch (e) {
-      logger.warn(`[Gateway] PostProcess failed: ${e.message}`);
-    }
+  {
+    const mod = await runOutputModerationAndPostProcess({
+      getOutput: () => result?.result?.output || null,
+      setOutput: (v) => { if (result?.result) result.result.output = v; },
+      clearOutput: () => { if (result?.result) result.result.output = null; },
+    }, geoConstraints, ctx);
+    moderationResult = mod.moderationResult;
+    if (mod.status !== 'success') { status = mod.status; errorMsg = mod.errorMsg; }
   }
 
   await modelConfigDao.logCall({
@@ -520,13 +467,16 @@ export async function gatewayDispatch(dispatchReq, ctx = {}) {
     try {
       const postCtx = await runPostHooks({
         modelId, userId: context.userId, taskType: context.taskType,
-        output: result.output || (result.result || null),
+        // dispatcher 包装: result.result 是 infer() 返回值，其中 .output 是实际文本
+        output: (result.result && typeof result.result === 'object' ? result.result.output : result.result) || null,
         tokensIn, tokensOut, cost, latencyMs,
       });
-      // 钩子可修改最终输出
       if (postCtx.output !== undefined) {
-        if (result.output !== undefined) result.output = postCtx.output;
-        else if (result.result !== undefined) result.result = postCtx.output;
+        if (result.result && typeof result.result === 'object') {
+          result.result.output = postCtx.output;
+        } else {
+          result.result = postCtx.output;
+        }
       }
     } catch (e) {
       logger.warn(`[Gateway] Post-hook 执行异常: ${e.message}`);
@@ -685,46 +635,16 @@ export async function gatewayRoute(params, ctx = {}) {
     ? await tokenPricingDao.calculateCost(modelKey, tokensIn, tokensOut, 1)
     : { amount: 0, currency: 'CNY', pricingId: null, details: null };
 
-  // 输出审核 — 后置过滤 + PII二次脱敏 + 高风险拦截
+  // ── 输出审核 + 后处理 (共用管线) ──
   let moderationResult = null;
-  if (result?.response && status === 'success') {
-    try {
-      const { moderateOutput } = await import('../services/outputModerationService.js');
-      const textOutput = result.response?.choices?.[0]?.message?.content || JSON.stringify(result.response);
-      const reviewLevel = geoConstraints?.reviewLevel || 5;
-      const blockedTerms = geoConstraints?.outputConstraints?.forbiddenTerms || [];
-      const requiredPatterns = geoConstraints?.outputConstraints?.requiredPatterns || null;
-      const enableAliyun = securityConfig.aliyunGreenEnabled;
-      const modResult = await moderateOutput(textOutput, { level: reviewLevel, blockedTerms, requiredPatterns, enableAliyun });
-      moderationResult = JSON.stringify(modResult);
-      if (modResult.sanitizedOutput) {
-        if (result.response?.choices?.[0]?.message) {
-          result.response.choices[0].message.content = modResult.sanitizedOutput;
-        }
-      }
-      if (!modResult.passed && modResult.riskLevel === 'high') {
-        status = 'blocked';
-        errorMsg = '输出包含违规内容，已被拦截';
-        result.response = null;
-      }
-    } catch (e) {
-      logger.warn(`[Gateway] Moderation failed: ${e.message}`);
-    }
-  }
-
-  // ── 输出后处理（格式转换 + 二次脱敏）──
-  if (result?.response && status === 'success') {
-    try {
-      const outputFormat = ctx.outputFormat || aiGatewayConfig.outputFormat;
-      const outputSanitize = ctx.outputSanitize !== undefined ? ctx.outputSanitize : securityConfig.outputSanitize;
-      const content = result.response?.choices?.[0]?.message?.content;
-      if (content) {
-        const processed = await postProcessOutput(content, { format: outputFormat, sanitize: outputSanitize });
-        result.response.choices[0].message.content = processed;
-      }
-    } catch (e) {
-      logger.warn(`[Gateway] PostProcess failed: ${e.message}`);
-    }
+  {
+    const mod = await runOutputModerationAndPostProcess({
+      getOutput: () => result?.response?.choices?.[0]?.message?.content || null,
+      setOutput: (v) => { if (result?.response?.choices?.[0]?.message) result.response.choices[0].message.content = v; },
+      clearOutput: () => { result.response = null; },
+    }, geoConstraints, ctx);
+    moderationResult = mod.moderationResult;
+    if (mod.status !== 'success') { status = mod.status; errorMsg = mod.errorMsg; }
   }
 
   // 追加 Gateway 层日志（含成本字段）— model-router 已写基础行，此行补全成本核算
