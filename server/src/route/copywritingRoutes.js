@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { generateTitles, generateDescription, generateScript, translateProduct, listPlatforms, listLanguages, listHistory, deleteHistory } from '../controller/copywritingController.js';
 
+import { authMiddleware } from '../middleware/auth.js';
 import { validate } from '../utils/validate.js';
 import { z } from 'zod';
 
@@ -51,17 +52,17 @@ const historyQuerySchema = z.object({ type: z.string().max(50).optional() });
 
 
 // 生成
-router.post('/titles', validate(titleGenSchema), generateTitles);
-router.post('/description', validate(descriptionSchema), generateDescription);
-router.post('/script', validate(scriptSchema), generateScript);
-router.post('/translate', validate(translateSchema), translateProduct);
+router.post('/titles', authMiddleware, validate(titleGenSchema), generateTitles);
+router.post('/description', authMiddleware, validate(descriptionSchema), generateDescription);
+router.post('/script', authMiddleware, validate(scriptSchema), generateScript);
+router.post('/translate', authMiddleware, validate(translateSchema), translateProduct);
 
 // 参考数据
-router.get('/platforms', listPlatforms);
-router.get('/languages', listLanguages);
+router.get('/platforms', authMiddleware, listPlatforms);
+router.get('/languages', authMiddleware, listLanguages);
 
 // 历史
-router.get('/history', validate(historyQuerySchema, 'query'), listHistory);
-router.delete('/history/:id', validate(z.object({ id: z.string().regex(/^\d+$/).transform(Number) }), 'params'), deleteHistory);
+router.get('/history', authMiddleware, validate(historyQuerySchema, 'query'), listHistory);
+router.delete('/history/:id', authMiddleware, validate(z.object({ id: z.string().regex(/^\d+$/).transform(Number) }), 'params'), deleteHistory);
 
 export default router;

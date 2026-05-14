@@ -20,7 +20,7 @@ const runSchema = z.object({
 
 // ==================== A2A 兼容端点 ====================
 
-router.get('/agents', ctrl.getAgents);
+router.get('/agents', authMiddleware, ctrl.getAgents);
 
 // A2A 标准 /run 端点
 router.post('/run/:agentName', authMiddleware, heavyLimiter, validate(runSchema), ctrl.runAgent);

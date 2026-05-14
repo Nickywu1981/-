@@ -20,6 +20,8 @@ const TENANT_TABLES = new Set([
   'prompt_template', 'prompt_group', 'prompt_favorite',
   'sensitive_word', 'user', 'credit_request_log', 'ai_call_log',
   'enterprise_user',
+  'channel_relation', 'commission_policy', 'channel_performance',
+  'campaign',
 ]);
 
 /** 从 SQL 里提取表名 */

@@ -13,6 +13,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { validate, numericParamSchema } from '../utils/validate.js';
+import { authMiddleware } from '../middleware/auth.js';
 
 import * as ctrl from '../controller/workflowController.js';
 
@@ -37,14 +38,14 @@ const executeSchema = z.object({
 
 const idParamSchema = numericParamSchema('id');
 
-router.get('/templates', ctrl.listTemplates);
-router.get('/templates/:id', ctrl.getTemplate);
-router.post('/templates', validate(templateSchema), ctrl.createTemplate);
-router.put('/templates/:id', validate(templateSchema.partial()), ctrl.updateTemplate);
-router.delete('/templates/:id', validate(idParamSchema, 'params'), ctrl.deleteTemplate);
-router.post('/execute', validate(executeSchema), ctrl.execute);
-router.get('/jobs', ctrl.listMyJobs);
-router.get('/jobs/:id', ctrl.getJob);
-router.post('/jobs/:id/cancel', validate(idParamSchema, 'params'), ctrl.cancelJob);
+router.get('/templates', authMiddleware, ctrl.listTemplates);
+router.get('/templates/:id', authMiddleware, ctrl.getTemplate);
+router.post('/templates', authMiddleware, validate(templateSchema), ctrl.createTemplate);
+router.put('/templates/:id', authMiddleware, validate(templateSchema.partial()), ctrl.updateTemplate);
+router.delete('/templates/:id', authMiddleware, validate(idParamSchema, 'params'), ctrl.deleteTemplate);
+router.post('/execute', authMiddleware, validate(executeSchema), ctrl.execute);
+router.get('/jobs', authMiddleware, ctrl.listMyJobs);
+router.get('/jobs/:id', authMiddleware, ctrl.getJob);
+router.post('/jobs/:id/cancel', authMiddleware, validate(idParamSchema, 'params'), ctrl.cancelJob);
 
 export default router;

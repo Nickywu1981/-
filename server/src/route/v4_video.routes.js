@@ -7,6 +7,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { validateV4 as _validate, validate, paginationSchema } from '../utils/validate.js';
 import { tierGuard } from '../middleware/tierGuard.js';
+import { authMiddleware } from '../middleware/auth.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 import * as ctrl from '../controller/v4VideoController.js';
 
@@ -143,44 +144,44 @@ const subtitleFixSchema = z.object({
 // ============================================================
 // 视频生成
 // ============================================================
-router.post('/generate', heavyLimiter, _validate(generateSchema), tierGuard('video'), ctrl.generateVideo);
-router.post('/image-to-video', heavyLimiter, _validate(imageToVideoSchema), tierGuard('video'), ctrl.imageToVideo);
-router.post('/multi-image-to-video', heavyLimiter, _validate(multiImageSchema), tierGuard('video'), ctrl.multiImageToVideo);
-router.post('/package', heavyLimiter, tierGuard('video'), _validate(packageSchema), ctrl.autoPackageVideo);
-router.post('/replace-character', heavyLimiter, _validate(replaceCharSchema), tierGuard('video'), ctrl.replaceCharacter);
-router.post('/product-ad', heavyLimiter, _validate(productAdSchema), tierGuard('video'), ctrl.productAdVideo);
-router.post('/storyboard', heavyLimiter, tierGuard('video'), _validate(storyboardSchema), ctrl.generateStoryboard);
+router.post('/generate', authMiddleware, heavyLimiter, _validate(generateSchema), tierGuard('video'), ctrl.generateVideo);
+router.post('/image-to-video', authMiddleware, heavyLimiter, _validate(imageToVideoSchema), tierGuard('video'), ctrl.imageToVideo);
+router.post('/multi-image-to-video', authMiddleware, heavyLimiter, _validate(multiImageSchema), tierGuard('video'), ctrl.multiImageToVideo);
+router.post('/package', authMiddleware, heavyLimiter, tierGuard('video'), _validate(packageSchema), ctrl.autoPackageVideo);
+router.post('/replace-character', authMiddleware, heavyLimiter, _validate(replaceCharSchema), tierGuard('video'), ctrl.replaceCharacter);
+router.post('/product-ad', authMiddleware, heavyLimiter, _validate(productAdSchema), tierGuard('video'), ctrl.productAdVideo);
+router.post('/storyboard', authMiddleware, heavyLimiter, tierGuard('video'), _validate(storyboardSchema), ctrl.generateStoryboard);
 
 // ============================================================
 // 动作迁移 (杀手功能)
 // ============================================================
-router.post('/action-migrate', heavyLimiter, _validate(actionMigrateSchema), tierGuard('video'), ctrl.migrateAction);
-router.post('/action-migrate/batch', heavyLimiter, _validate(batchActionMigrateSchema), tierGuard('video'), ctrl.batchMigrateAction);
-router.get('/action-migrate/batch/:id/progress', validate(idParamSchema, 'params'), ctrl.getBatchMigrateProgress);
+router.post('/action-migrate', authMiddleware, heavyLimiter, _validate(actionMigrateSchema), tierGuard('video'), ctrl.migrateAction);
+router.post('/action-migrate/batch', authMiddleware, heavyLimiter, _validate(batchActionMigrateSchema), tierGuard('video'), ctrl.batchMigrateAction);
+router.get('/action-migrate/batch/:id/progress', authMiddleware, validate(idParamSchema, 'params'), ctrl.getBatchMigrateProgress);
 
 // ============================================================
 // 爆款视频
 // ============================================================
-router.post('/viral/analyze', heavyLimiter, tierGuard('video'), _validate(viralAnalyzeSchema), ctrl.analyzeViralVideo);
-router.post('/viral/replicate', heavyLimiter, _validate(viralReplicateSchema), tierGuard('video'), ctrl.replicateViralVideo);
+router.post('/viral/analyze', authMiddleware, heavyLimiter, tierGuard('video'), _validate(viralAnalyzeSchema), ctrl.analyzeViralVideo);
+router.post('/viral/replicate', authMiddleware, heavyLimiter, _validate(viralReplicateSchema), tierGuard('video'), ctrl.replicateViralVideo);
 
 // ============================================================
 // 数字人
 // ============================================================
-router.post('/digital-human', heavyLimiter, _validate(digitalHumanSchema), tierGuard('video'), ctrl.createDigitalHuman);
+router.post('/digital-human', authMiddleware, heavyLimiter, _validate(digitalHumanSchema), tierGuard('video'), ctrl.createDigitalHuman);
 
 // ============================================================
 // 长视频精剪
 // ============================================================
-router.post('/smart-clip', heavyLimiter, _validate(smartClipSchema), tierGuard('video'), ctrl.smartClipLiveVideo);
-router.post('/remove-redundant', heavyLimiter, _validate(removeRedundantSchema), tierGuard('video'), ctrl.removeRedundantSegments);
-router.post('/optimize-audio', heavyLimiter, _validate(optimizeAudioSchema), tierGuard('video'), ctrl.optimizeAudio);
-router.post('/subtitle-fix', heavyLimiter, tierGuard('video'), _validate(subtitleFixSchema), ctrl.subtitleCorrection);
+router.post('/smart-clip', authMiddleware, heavyLimiter, _validate(smartClipSchema), tierGuard('video'), ctrl.smartClipLiveVideo);
+router.post('/remove-redundant', authMiddleware, heavyLimiter, _validate(removeRedundantSchema), tierGuard('video'), ctrl.removeRedundantSegments);
+router.post('/optimize-audio', authMiddleware, heavyLimiter, _validate(optimizeAudioSchema), tierGuard('video'), ctrl.optimizeAudio);
+router.post('/subtitle-fix', authMiddleware, heavyLimiter, tierGuard('video'), _validate(subtitleFixSchema), ctrl.subtitleCorrection);
 
 // ============================================================
 // 作品管理
 // ============================================================
-router.get('/works', validate(worksQuerySchema, 'query'), ctrl.getVideoWorks);
-router.get('/job/:id', validate(idParamSchema, 'params'), ctrl.getVideoJobStatus);
+router.get('/works', authMiddleware, validate(worksQuerySchema, 'query'), ctrl.getVideoWorks);
+router.get('/job/:id', authMiddleware, validate(idParamSchema, 'params'), ctrl.getVideoJobStatus);
 
 export default router;

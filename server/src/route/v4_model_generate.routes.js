@@ -5,6 +5,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { validateV4 as _validate } from '../utils/validate.js';
+import { authMiddleware } from '../middleware/auth.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 import * as ctrl from '../controller/v4ModelGenerateController.js';
 
@@ -18,6 +19,6 @@ const generateSchema = z.object({
   count: z.number().int().min(1).max(4).optional(),
 });
 
-router.post('/generate', heavyLimiter, _validate(generateSchema), ctrl.generate);
+router.post('/generate', authMiddleware, heavyLimiter, _validate(generateSchema), ctrl.generate);
 
 export default router;

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { listTemplates, getTemplateDetail, createTemplate, submitForReview, fillAndPreview, listFavorites, toggleFavorite, listGroups, createGroup, renameGroup, deleteGroup, getRecommendations, recordUsage, usageHistory, rateTemplate, getTemplateRating, copyOfficialTemplate, updateMyTemplate, submitToOfficial, listMyPrivateTemplates, listTemplatesByIntent } from '../controller/promptController.js';
 
+import { authMiddleware } from '../middleware/auth.js';
 import { validate, idParamSchema } from '../utils/validate.js';
 import { z } from 'zod';
 
@@ -46,42 +47,42 @@ const updateMyTemplateSchema = z.object({
 
 
 // 模板（支持 /api/prompts 和 /api/prompts/templates）
-router.get('/', listTemplates);
-router.get('/templates', listTemplates);
+router.get('/', authMiddleware, listTemplates);
+router.get('/templates', authMiddleware, listTemplates);
 const submitReviewSchema = z.object({
   id: z.coerce.number().int().positive('模板ID无效'),
 });
-router.get('/templates/:id', validate(idParamSchema, 'params'), getTemplateDetail);
-router.post('/templates', validate(createTemplateSchema), createTemplate);
-router.post('/templates/:id/submit-review', validate(submitReviewSchema, 'params'), submitForReview);
-router.post('/templates/:id/fill', validate(idParamSchema, 'params'), validate(fillSchema), fillAndPreview);
+router.get('/templates/:id', authMiddleware, validate(idParamSchema, 'params'), getTemplateDetail);
+router.post('/templates', authMiddleware, validate(createTemplateSchema), createTemplate);
+router.post('/templates/:id/submit-review', authMiddleware, validate(submitReviewSchema, 'params'), submitForReview);
+router.post('/templates/:id/fill', authMiddleware, validate(idParamSchema, 'params'), validate(fillSchema), fillAndPreview);
 
 // 收藏
-router.get('/favorites', listFavorites);
-router.post('/favorites/toggle', validate(toggleFavoriteSchema), toggleFavorite);
+router.get('/favorites', authMiddleware, listFavorites);
+router.post('/favorites/toggle', authMiddleware, validate(toggleFavoriteSchema), toggleFavorite);
 
 // 分组
-router.get('/groups', listGroups);
-router.post('/groups', validate(groupSchema), createGroup);
-router.put('/groups/:id', validate(idParamSchema, 'params'), validate(groupSchema), renameGroup);
-router.delete('/groups/:id', validate(idParamSchema, 'params'), deleteGroup);
+router.get('/groups', authMiddleware, listGroups);
+router.post('/groups', authMiddleware, validate(groupSchema), createGroup);
+router.put('/groups/:id', authMiddleware, validate(idParamSchema, 'params'), validate(groupSchema), renameGroup);
+router.delete('/groups/:id', authMiddleware, validate(idParamSchema, 'params'), deleteGroup);
 
 // 智能推荐
-router.get('/recommendations', getRecommendations);
+router.get('/recommendations', authMiddleware, getRecommendations);
 
 // 使用历史
-router.get('/usage-history', usageHistory);
-router.post('/:id/use', validate(idParamSchema, 'params'), validate(recordUsageSchema), recordUsage);
+router.get('/usage-history', authMiddleware, usageHistory);
+router.post('/:id/use', authMiddleware, validate(idParamSchema, 'params'), validate(recordUsageSchema), recordUsage);
 
 // 评分
-router.post('/:id/rate', validate(idParamSchema, 'params'), validate(rateSchema), rateTemplate);
-router.get('/:id/rating', validate(idParamSchema, 'params'), getTemplateRating);
+router.post('/:id/rate', authMiddleware, validate(idParamSchema, 'params'), validate(rateSchema), rateTemplate);
+router.get('/:id/rating', authMiddleware, validate(idParamSchema, 'params'), getTemplateRating);
 
 // 3层模板库 — 用户端
-router.post('/templates/:id/copy', validate(idParamSchema, 'params'), copyOfficialTemplate);
-router.put('/templates/:id', validate(idParamSchema, 'params'), validate(updateMyTemplateSchema), updateMyTemplate);
-router.post('/templates/:id/submit-official', validate(idParamSchema, 'params'), submitToOfficial);
-router.get('/my-templates', listMyPrivateTemplates);
-router.get('/by-intent/:intentId', validate(z.object({ intentId: z.string().min(1).max(100) }), 'params'), listTemplatesByIntent);
+router.post('/templates/:id/copy', authMiddleware, validate(idParamSchema, 'params'), copyOfficialTemplate);
+router.put('/templates/:id', authMiddleware, validate(idParamSchema, 'params'), validate(updateMyTemplateSchema), updateMyTemplate);
+router.post('/templates/:id/submit-official', authMiddleware, validate(idParamSchema, 'params'), submitToOfficial);
+router.get('/my-templates', authMiddleware, listMyPrivateTemplates);
+router.get('/by-intent/:intentId', authMiddleware, validate(z.object({ intentId: z.string().min(1).max(100) }), 'params'), listTemplatesByIntent);
 
 export default router;

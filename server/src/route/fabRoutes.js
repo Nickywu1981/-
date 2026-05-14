@@ -18,6 +18,6 @@ const fabSchema = z.object({
 });
 
 router.post('/generate', heavyLimiter, authMiddleware, validate(fabSchema), ctrl.generateFAB);
-router.get('/templates', ctrl.getTemplates);
+router.get('/templates', authMiddleware, ctrl.getTemplates);
 
 export default router;
