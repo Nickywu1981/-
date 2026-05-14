@@ -78,11 +78,6 @@
       </button>
     </div>
 
-    <!-- 断点续传提示 -->
-    <div v-if="hasResume" class="resume-banner">
-      {{ $t('mediaUpload.resumeHint') }}
-      <button class="btn-resume" @click="resumeUpload">{{ $t('mediaUpload.btnResume') }}</button>
-    </div>
   </div>
 </template>
 
@@ -123,7 +118,6 @@ const formatHint = computed(() => {
 
 // 状态
 const isDragging = ref(false)
-const hasResume = ref(false)
 const fileInput = ref<HTMLInputElement>()
 const uploading = ref(false)
 const uploadHint = computed(() => fileList.value.length === 0)
@@ -254,11 +248,6 @@ async function uploadFile(item: FileItem): Promise<{ url: string }> {
   return { url: completeRes.data.cdn_url || completeRes.data.file_url }
 }
 
-async function resumeUpload() {
-  hasResume.value = false
-  await startUpload()
-}
-
 // 工具
 function formatSize(bytes: number): string {
   if (bytes < 1024) return bytes + ' B'
@@ -304,6 +293,4 @@ function formatSize(bytes: number): string {
 .status.pending { color: var(--cfg-text-muted, #9ca3af); font-size: 12px; }
 .btn-remove { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--cfg-text-muted, #9ca3af); padding: 0 4px; }
 .upload-actions { margin-top: 16px; }
-.resume-banner { margin-top: 12px; padding: 12px; background: var(--warning-border); border-radius: 8px; font-size: 14px; display: flex; align-items: center; gap: 8px; justify-content: space-between; }
-.btn-resume { padding: 4px 12px; background: var(--cfg-warning, #F59E0B); color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; }
 </style>

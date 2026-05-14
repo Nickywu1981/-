@@ -12,6 +12,7 @@ const toast = useToast()
 interface SkuRow { id: string; color: string; colorHex: string; size: string; angle: string }
 
 const step = ref<'config' | 'processing' | 'done'>('config')
+const submitting = ref(false)
 const imageUrl = ref('')
 const skus = ref<SkuRow[]>([])
 const selectedPlatforms = ref<string[]>(['taobao', 'douyin'])
@@ -65,7 +66,8 @@ onUnmounted(() => {
 })
 
 const submit = async () => {
-  if (!canSubmit.value) return
+  if (!canSubmit.value || submitting.value) return
+  submitting.value = true
   step.value = 'processing'
   results.value = []
 
@@ -91,6 +93,7 @@ const submit = async () => {
     }, 2000)
   } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
     step.value = 'config'
+    submitting.value = false
     toast.error(e?.data?.msg || t('work_pages.batch_sku_image.submit_failed'))
   }
 }

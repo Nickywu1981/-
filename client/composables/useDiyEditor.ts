@@ -43,9 +43,9 @@ export function useDiyEditor() {
   function addSection(comp: DiyComponent, insertIdx = -1): number {
     pushHistory()
     const config = structuredClone(comp.default_config || {})
-    config.id = Date.now().toString(36)
+    config.id = crypto.randomUUID()
     const section: DiySection = {
-      id: 's' + Date.now(),
+      id: 's' + crypto.randomUUID(),
       component: comp.component_code,
       config,
       locked: false,
@@ -62,8 +62,8 @@ export function useDiyEditor() {
     if (idx < 0 || idx >= sections.value.length) return
     pushHistory()
     const clone = structuredClone(sections.value[idx])
-    clone.id = 's' + Date.now()
-    clone.config.id = Date.now().toString(36)
+    clone.id = 's' + crypto.randomUUID()
+    clone.config.id = crypto.randomUUID()
     sections.value.splice(idx + 1, 0, clone)
     selectedIdxs.value = [idx + 1]
   }
@@ -122,7 +122,7 @@ export function useDiyEditor() {
     if (!clipboard.value) return
     pushHistory()
     const clone = structuredClone(clipboard.value)
-    clone.id = 's' + Date.now()
+    clone.id = 's' + crypto.randomUUID()
     const idx = insertIdx >= 0 ? insertIdx : sections.value.length
     sections.value.splice(idx, 0, clone)
     selectedIdxs.value = [idx]

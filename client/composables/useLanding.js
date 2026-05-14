@@ -94,6 +94,8 @@ export async function useLanding() {
     if (entranceObserver) entranceObserver.disconnect();
   }
 
+  onUnmounted(() => { destroyEntranceObserver(); scrollTicking = false; })
+
   // ── FAQ ──
   const faqOpen = ref(-1);
   function toggleFaq(i: number) { faqOpen.value = faqOpen.value === i ? -1 : i; }

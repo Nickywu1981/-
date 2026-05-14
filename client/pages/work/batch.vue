@@ -147,6 +147,7 @@ const toast = useToast()
 const { t } = useI18n()
 
 const step = ref(0);
+const submitting = ref(false);
 const previews = ref<string[]>([]);
 const uploadedUrls = ref<string[]>([]);
 const uploading = ref(false);
@@ -268,6 +269,8 @@ async function saveTemplate() {
 }
 
 async function submitTask() {
+  if (submitting.value) return
+  submitting.value = true
   step.value = 3;
   try {
     const res = await $fetch('/api/batch/submit', {
@@ -280,7 +283,7 @@ async function submitTask() {
   } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
     toast.error(e?.data?.msg || e?.message || t('work_pages.batch.submit_failed'));
     step.value = 2;
-  }
+  } finally { submitting.value = false }
 }
 function handleRedo() { task.reset(); previews.value.forEach(u => revoke(u)); previews.value = []; uploadedUrls.value = []; }
 

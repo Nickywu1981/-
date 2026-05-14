@@ -45,7 +45,7 @@ async function ask() {
   if (!q || loading.value) return
   loading.value = true
   try {
-    const res = await $fetch('/api/ai-assistant/data', { method: 'POST', body: { question: q } })
+    const res = await $fetch('/api/ai-assistant/data', { method: 'POST', credentials: 'include', body: { question: q } })
     answer.value = (res as any).data
   } catch { answer.value = { answer: t('ai_assistant.data.service_unavailable') }
   } finally { loading.value = false }

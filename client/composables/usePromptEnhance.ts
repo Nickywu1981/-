@@ -12,6 +12,8 @@ export function usePromptEnhance() {
       const endpoint = type === 'poster' ? '/api/posters/enhance-prompt' : '/api/images/enhance-prompt'
       const result = await useApi().post<{ enhancedPrompt: string }>(endpoint, { prompt })
       return result?.enhancedPrompt || prompt
+    } catch {
+      return prompt
     } finally {
       enhancing.value = false
     }

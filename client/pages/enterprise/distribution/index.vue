@@ -70,7 +70,7 @@ async function loadInviteCode() {
   try {
     const r = await $fetch('/api/distribution/invite-code', { credentials: 'include' });
     inviteCode.value = r.data?.code || '-';
-  } catch (e) { }
+  } catch (e) { console.warn('[distribution] loadInviteCode failed', e) }
 }
 async function loadTeam() {
   try {

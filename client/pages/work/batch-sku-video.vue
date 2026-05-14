@@ -43,7 +43,7 @@ const addImage = () => {
 const removeImage = (i: number) => productImages.value.splice(i, 1)
 
 const submit = async () => {
-  if (!productImages.value.length) return
+  if (!productImages.value.length || loading.value) return
   loading.value = true; taskId.value = ''; results.value = []
 
   try {

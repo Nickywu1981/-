@@ -236,8 +236,8 @@ const languages = ref({});
 onMounted(async () => {
   try {
     const [p, l] = await Promise.all([
-      $fetch('/api/copywriting/platforms'),
-      $fetch('/api/copywriting/languages'),
+      $fetch('/api/copywriting/platforms', { credentials: 'include' }),
+      $fetch('/api/copywriting/languages', { credentials: 'include' }),
     ]);
     platforms.value = p?.data || {};
     languages.value = l?.data || {};
@@ -256,7 +256,7 @@ async function doGenerateTitles() {
   if (!titleForm.productName) return ElMessage.warning($t('work_pages.copywriting.product_name_required'));
   titleGenning.value = true;
   try {
-    const r = await $fetch('/api/copywriting/titles', { method: 'POST', body: titleForm });
+    const r = await $fetch('/api/copywriting/titles', { method: 'POST', credentials: 'include', body: titleForm });
     titleResults.value = r?.data?.titles || [];
     titleMeta.value = { model: r?.data?.model, latency: r?.data?.latency };
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; ElMessage.error(err?.data?.msg || e?.message || $t('work_pages.copywriting.generate_failed')); }
@@ -272,7 +272,7 @@ async function doGenerateDesc() {
   if (!descForm.productName) return ElMessage.warning($t('work_pages.copywriting.product_name_required'));
   descGenning.value = true;
   try {
-    const r = await $fetch('/api/copywriting/description', { method: 'POST', body: descForm });
+    const r = await $fetch('/api/copywriting/description', { method: 'POST', credentials: 'include', body: descForm });
     descResultRaw.value = r?.data?.description || '';
     descMeta.value = { model: r?.data?.model };
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; ElMessage.error(err?.data?.msg || e?.message || $t('work_pages.copywriting.generate_failed')); }
@@ -288,7 +288,7 @@ async function doTranslate() {
   if (!transForm.productName || !transForm.targetLang) return ElMessage.warning($t('work_pages.copywriting.trans_fields_required'));
   transRunning.value = true;
   try {
-    const r = await $fetch('/api/copywriting/translate', { method: 'POST', body: transForm });
+    const r = await $fetch('/api/copywriting/translate', { method: 'POST', credentials: 'include', body: transForm });
     transResult.value = r?.data?.translation || '';
     transMeta.value = { model: r?.data?.model };
   } catch (e) { ElMessage.error(e?.data?.msg || $t('work_pages.copywriting.translate_failed')); }
@@ -304,7 +304,7 @@ const historyPage = ref(1);
 async function loadHistory() {
   historyLoading.value = true;
   try {
-    const r = await $fetch(`/api/copywriting/history?type=${historyType.value}&page=${historyPage.value}&pageSize=20`);
+    const r = await $fetch(`/api/copywriting/history?type=${historyType.value}&page=${historyPage.value}&pageSize=20`, { credentials: 'include' });
     historyList.value = r?.data?.list || [];
     historyTotal.value = r?.data?.total || 0;
   } catch { toast.warn($t('work_pages.copywriting.history_load_failed')) }
@@ -312,7 +312,7 @@ async function loadHistory() {
 }
 async function deleteRecord(id) {
   try {
-    await $fetch(`/api/copywriting/history/${id}`, { method: 'DELETE' });
+    await $fetch(`/api/copywriting/history/${id}`, { method: 'DELETE', credentials: 'include' });
     ElMessage.success($t('work_pages.copywriting.delete_success'));
     loadHistory();
   } catch { ElMessage.error($t('work_pages.copywriting.delete_failed')); }

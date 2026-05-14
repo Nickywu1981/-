@@ -98,7 +98,7 @@ const isAgent = ref(false)
 async function loadData() {
   loading.value = true; loadError.value = ''
   try {
-    const data = await $fetch('/api/enterprise/finance/dashboard')
+    const data = await $fetch('/api/enterprise/finance/dashboard', { credentials: 'include' })
     dashboard.value = data as any
     isAgent.value = !!(data as any).earnings
   } catch (e: unknown) {

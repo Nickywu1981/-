@@ -99,7 +99,7 @@ async function fetch() {
     if (level.value) p.set('level', level.value)
     if (dateStart.value) p.set('dateStart', dateStart.value)
     if (dateEnd.value) p.set('dateEnd', dateEnd.value)
-    const res: any = await $fetch(`/api/admin/logs?${p}`)
+    const res: any = await $fetch(`/api/admin/logs?${p}`, { credentials: 'include' })
     list.value = res.data?.list || []
     total.value = res.data?.total || 0
     stats.value = res.data?.stats || null

@@ -50,6 +50,7 @@ definePageMeta({ layout: 'user-workspace', middleware: ['auth'] });
 
 const { t } = useI18n()
 const { confirm } = useConfirm()
+const toast = useToast()
 const tags = ref([]);
 const loading = ref(true);
 const showAdd = ref(false);
@@ -61,7 +62,7 @@ const $api = (url, opts) => $fetch(url, { baseURL: '/api/enterprise/customers', 
 
 async function loadTags() {
   loading.value = true;
-  try { tags.value = await $api('/tags'); } catch (e) { /* ignore */ }
+  try { tags.value = await $api('/tags'); } catch (e) { toast.error(t('enterprise.customers.tags.loadFailed')) }
   loading.value = false;
 }
 
@@ -89,15 +90,12 @@ async function submitForm() {
     }
     closeModal();
     loadTags();
-  } catch (e) { /* ignore */ }
-}
-
-async function handleDelete(t) {
+  } catch (e) { toast.error(t('enterprise.customers.tags.saveFailed')) }(t) {
   if (!(await confirm({ message: t('enterprise.customers.tags.confirmDelete', { name: t.name }) }))) return;
   try {
     await $api(`/tags/${t.id}`, { method: 'DELETE' });
     loadTags();
-  } catch (e) { /* ignore */ }
+  } catch (e) { toast.error(t('enterprise.customers.tags.deleteFailed')) }
 }
 
 onMounted(loadTags);

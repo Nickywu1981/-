@@ -147,7 +147,7 @@ export function useDashboardData() {
   })
 
   // ── Alerts ──
-  const alerts = ['ℹ 数据看板已对接后台实时接口，数据每 30 秒自动刷新']
+  const alerts = [t('workspace.dashboard_overview.auto_refresh_info')]
 
   // ── Fullscreen ──
   function toggleFullscreen() {
