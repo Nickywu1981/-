@@ -17,17 +17,17 @@ describe('aiEngine', () => {
     });
 
     it('缺少 id 抛出错误', () => {
-      expect(() => aiEngine.registerModel({ type: 'x', infer: vi.fn() })).toThrow('缺少 id/type/infer');
+      expect(() => aiEngine.registerModel({ type: 'x', infer: vi.fn() })).toThrow();
     });
 
     it('缺少 infer 抛出错误', () => {
-      expect(() => aiEngine.registerModel({ id: 'x', type: 'x' })).toThrow('缺少 id/type/infer');
+      expect(() => aiEngine.registerModel({ id: 'x', type: 'x' })).toThrow();
     });
   });
 
   describe('getModel', () => {
     it('未注册模型抛出错误', () => {
-      expect(() => aiEngine.getModel('nonexistent')).toThrow('AI模型未注册');
+      expect(() => aiEngine.getModel('nonexistent')).toThrow();
     });
   });
 

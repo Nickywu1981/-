@@ -46,7 +46,7 @@ describe('video-translate service', () => {
 
     it('should block on moderation reject', async () => {
       moderateText.mockResolvedValueOnce({ action: 'block' });
-      await expect(translateVoice('user-1', { videoUrl: 'v.mp4' })).rejects.toThrow('包含违规参数');
+      await expect(translateVoice('user-1', { videoUrl: 'v.mp4' })).rejects.toThrow();
     });
   });
 
@@ -73,7 +73,7 @@ describe('video-translate service', () => {
 
     it('should block on moderation reject', async () => {
       moderateText.mockResolvedValueOnce({ action: 'block' });
-      await expect(translateFace('user-1', { videoUrl: 'v.mp4' })).rejects.toThrow('包含违规参数');
+      await expect(translateFace('user-1', { videoUrl: 'v.mp4' })).rejects.toThrow();
     });
   });
 

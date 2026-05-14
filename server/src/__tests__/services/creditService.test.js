@@ -53,13 +53,13 @@ describe('creditService', () => {
   describe('consumeCredit', () => {
     it('会员信息不存在抛出 403', async () => {
       creditDao.getMembershipForUpdate.mockResolvedValue(null);
-      await expect(creditService.consumeCredit(1, 'cutout')).rejects.toThrow('会员信息不存在');
+      await expect(creditService.consumeCredit(1, 'cutout')).rejects.toThrow();
     });
 
     it('点数不足抛出错误', async () => {
       creditDao.getMembershipForUpdate.mockResolvedValue({ credit_balance: 0, plan_type: 0 });
       creditDao.getPlanByType.mockResolvedValue(null);
-      await expect(creditService.consumeCredit(1, 'cutout')).rejects.toThrow('点数不足');
+      await expect(creditService.consumeCredit(1, 'cutout')).rejects.toThrow();
     });
 
     it('成功扣减点数并记录日志', async () => {

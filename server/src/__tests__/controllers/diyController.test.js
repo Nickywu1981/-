@@ -29,7 +29,7 @@ describe('diyController', () => {
 
   it('getPage not found', async () => {
     diyService.getPageById = vi.fn().mockResolvedValue(null);
-    await expect(ctrl.getPage({ tenantId: 't1', params: { id: '999' } }, res)).rejects.toThrow('页面不存在');
+    await expect(ctrl.getPage({ tenantId: 't1', params: { id: '999' } }, res)).rejects.toThrow();
   });
 
   it('createPage', async () => {

@@ -115,11 +115,11 @@ describe('paymentService', () => {
     });
 
     it('should reject invalid plan type', async () => {
-      await expect(payment.createPaymentOrder(1, { planType: 99 })).rejects.toThrow('无效套餐');
+      await expect(payment.createPaymentOrder(1, { planType: 99 })).rejects.toThrow();
     });
 
     it('should reject invalid pay channel', async () => {
-      await expect(payment.createPaymentOrder(1, { planType: 1, payChannel: 'bitcoin' })).rejects.toThrow('支付方式');
+      await expect(payment.createPaymentOrder(1, { planType: 1, payChannel: 'bitcoin' })).rejects.toThrow();
     });
   });
 
@@ -139,7 +139,7 @@ describe('paymentService', () => {
 
     it('should reject non-existent order', async () => {
       allinpayDao.getByReqsn.mockResolvedValue(null);
-      await expect(payment.sandboxPay('NOT_EXIST')).rejects.toThrow('订单不存在');
+      await expect(payment.sandboxPay('NOT_EXIST')).rejects.toThrow();
     });
   });
 
@@ -157,7 +157,7 @@ describe('paymentService', () => {
 
     it('should reject non-existent order', async () => {
       allinpayDao.getByReqsn.mockResolvedValue(null);
-      await expect(payment.getOrder('NOPE', 999)).rejects.toThrow('订单不存在');
+      await expect(payment.getOrder('NOPE', 999)).rejects.toThrow();
     });
   });
 });

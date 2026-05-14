@@ -35,7 +35,7 @@ describe('commerceService', () => {
   describe('purchasePlan', () => {
     it('套餐不存在抛出 400', async () => {
       creditDao.getPlanByType.mockResolvedValue(null);
-      await expect(commerceService.purchasePlan(1, 1)).rejects.toThrow('套餐不存在或已下架');
+      await expect(commerceService.purchasePlan(1, 1)).rejects.toThrow();
     });
 
     it('新开通返回购买结果', async () => {

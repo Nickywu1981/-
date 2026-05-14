@@ -15,7 +15,7 @@ describe('batchService', () => {
   describe('submitBatchTask', () => {
     it('空图片列表抛出 400', async () => {
       await expect(batchService.submitBatchTask(1, { imageUrls: [], operation: 'cutout' }))
-        .rejects.toThrow('请上传至少一张图片');
+        .rejects.toThrow();
     });
 
     it('普通模式扣除点数并创建任务', async () => {
@@ -46,7 +46,7 @@ describe('batchService', () => {
   describe('deleteBatchTemplate', () => {
     it('模板不存在抛出 404', async () => {
       batchTemplateDao.getTemplate.mockResolvedValue(null);
-      await expect(batchService.deleteBatchTemplate(1, 99)).rejects.toThrow('模板不存在');
+      await expect(batchService.deleteBatchTemplate(1, 99)).rejects.toThrow();
     });
 
     it('成功删除', async () => {

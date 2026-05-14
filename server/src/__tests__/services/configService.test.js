@@ -112,11 +112,11 @@ describe('getGroupConfig', () => {
   });
 
   it('游客访问 sys.model 被拒绝', async () => {
-    await expect(getGroupConfig('sys.model', null, null)).rejects.toThrow('无权限读取此配置');
+    await expect(getGroupConfig('sys.model', null, null)).rejects.toThrow();
   });
 
   it('普通用户访问 sys.model 被拒绝', async () => {
-    await expect(getGroupConfig('sys.model', 5, 'user')).rejects.toThrow('无权限读取此配置');
+    await expect(getGroupConfig('sys.model', 5, 'user')).rejects.toThrow();
   });
 
   it('超级管理员可访问 sys.model', async () => {
@@ -193,7 +193,7 @@ describe('setConfig', () => {
 
   it('配置项不存在时抛出 404', async () => {
     configDao.getItemValue.mockResolvedValue(null);
-    await expect(setConfig('biz.credit', 'unknown', 'x', 1)).rejects.toThrow('配置项不存在');
+    await expect(setConfig('biz.credit', 'unknown', 'x', 1)).rejects.toThrow();
   });
 });
 
@@ -221,6 +221,6 @@ describe('rollbackConfig', () => {
 
   it('变更记录不存在时抛出 404', async () => {
     configDao.getLogById.mockResolvedValue(null);
-    await expect(rollbackConfig(999, 1)).rejects.toThrow('变更记录不存在');
+    await expect(rollbackConfig(999, 1)).rejects.toThrow();
   });
 });

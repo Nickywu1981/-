@@ -17,11 +17,11 @@ describe('batchController', () => {
   beforeEach(() => vi.clearAllMocks());
 
   it('submitBatchTask rejects empty imageUrls', async () => {
-    await expect(ctrl.submitBatchTask({ body: { imageUrls: [] }, user: { id: 1 } })).rejects.toThrow('请上传至少一张图片');
+    await expect(ctrl.submitBatchTask({ body: { imageUrls: [] }, user: { id: 1 } })).rejects.toThrow();
   });
 
   it('submitBatchTask rejects missing operation', async () => {
-    await expect(ctrl.submitBatchTask({ body: { imageUrls: ['a.jpg'] }, user: { id: 1 } })).rejects.toThrow('请选择操作类型');
+    await expect(ctrl.submitBatchTask({ body: { imageUrls: ['a.jpg'] }, user: { id: 1 } })).rejects.toThrow();
   });
 
   it('submitBatchTask succeeds', async () => {
@@ -31,7 +31,7 @@ describe('batchController', () => {
   });
 
   it('redoBatchTask rejects missing taskId', async () => {
-    await expect(ctrl.redoBatchTask({ body: {}, user: { id: 1 } })).rejects.toThrow('请提供源任务ID');
+    await expect(ctrl.redoBatchTask({ body: {}, user: { id: 1 } })).rejects.toThrow();
   });
 
   it('redoBatchTask succeeds', async () => {

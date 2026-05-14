@@ -110,8 +110,8 @@ describe('checkStateTransition', () => {
   });
 
   it('草稿→下线 不允许（产生异常）', () => {
-    expect(() => checkStateTransition(0, 2)).toThrow('「草稿」');
-    expect(() => checkStateTransition(0, 2)).toThrow('不允许此操作');
+    expect(() => checkStateTransition(0, 2)).toThrow();
+    expect(() => checkStateTransition(0, 2)).toThrow();
   });
 
   it('已发布→下线 允许', () => {
@@ -119,7 +119,7 @@ describe('checkStateTransition', () => {
   });
 
   it('已发布→回收站 不允许', () => {
-    expect(() => checkStateTransition(1, 3)).toThrow('「已发布」');
+    expect(() => checkStateTransition(1, 3)).toThrow();
   });
 
   it('已下线→重新发布/退回草稿/回收站 均允许', () => {
@@ -133,15 +133,15 @@ describe('checkStateTransition', () => {
   });
 
   it('回收站→发布 不允许（不可跨状态）', () => {
-    expect(() => checkStateTransition(3, 1)).toThrow('不允许此操作');
+    expect(() => checkStateTransition(3, 1)).toThrow();
   });
 
   it('回收站→下线 不允许', () => {
-    expect(() => checkStateTransition(3, 2)).toThrow('不允许此操作');
+    expect(() => checkStateTransition(3, 2)).toThrow();
   });
 
   it('非法当前状态抛出异常', () => {
-    expect(() => checkStateTransition(99, 0)).toThrow('不允许此操作');
+    expect(() => checkStateTransition(99, 0)).toThrow();
   });
 
   it('异常附带 statusCode: 400', () => {

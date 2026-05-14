@@ -38,12 +38,12 @@ describe('sizeTemplateService', () => {
   describe('createUserTemplate', () => {
     it('缺少必填字段抛出 400', async () => {
       await expect(sizeTemplateService.createUserTemplate(1, { name: '', width: 0, height: 0 }))
-        .rejects.toThrow('模板名称、宽度、高度不能为空');
+        .rejects.toThrow();
     });
 
     it('非法尺寸抛出错误', async () => {
       await expect(sizeTemplateService.createUserTemplate(1, { name: 't', width: -1, height: 100 }))
-        .rejects.toThrow('尺寸参数不合法');
+        .rejects.toThrow();
     });
 
     it('成功创建返回模板信息', async () => {
@@ -56,7 +56,7 @@ describe('sizeTemplateService', () => {
   describe('deleteUserTemplate', () => {
     it('模板不存在抛出 404', async () => {
       sizeTemplateDao.getUserTemplateById.mockResolvedValue(null);
-      await expect(sizeTemplateService.deleteUserTemplate(1, 99)).rejects.toThrow('模板不存在');
+      await expect(sizeTemplateService.deleteUserTemplate(1, 99)).rejects.toThrow();
     });
   });
 

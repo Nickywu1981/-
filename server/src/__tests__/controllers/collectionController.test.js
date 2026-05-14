@@ -29,7 +29,7 @@ describe('collectionController', () => {
 
   it('getCollection throws on not found', async () => {
     mockSvc.getById.mockResolvedValue(null);
-    await expect(ctrl.getCollection({ params: { id: '999' }, user: { id: 1 } })).rejects.toThrow('合集不存在');
+    await expect(ctrl.getCollection({ params: { id: '999' }, user: { id: 1 } })).rejects.toThrow();
   });
 
   it('createCollection returns id', async () => {

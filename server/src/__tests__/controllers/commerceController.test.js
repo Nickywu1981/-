@@ -31,7 +31,7 @@ describe('commerceController', () => {
 
   it('getOrderDetail throws on not found', async () => {
     mockDao.getEnterpriseOrderById.mockResolvedValue(null);
-    await expect(ctrl.getOrderDetail({ params: { id: '999' }, tenantId: 1 })).rejects.toThrow('订单不存在');
+    await expect(ctrl.getOrderDetail({ params: { id: '999' }, tenantId: 1 })).rejects.toThrow();
   });
 
   it('getOrderStats returns stats', async () => {

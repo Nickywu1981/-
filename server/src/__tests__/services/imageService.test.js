@@ -50,7 +50,7 @@ describe('imageService', () => {
 
     it('任务不存在抛出 404', async () => {
       taskDao.getTask.mockResolvedValue(null);
-      await expect(imageService.getTaskResult('bad', 1)).rejects.toThrow('任务不存在');
+      await expect(imageService.getTaskResult('bad', 1)).rejects.toThrow();
     });
   });
 

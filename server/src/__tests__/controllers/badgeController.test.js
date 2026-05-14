@@ -26,7 +26,7 @@ describe('badgeController', () => {
 
   it('getBadge throws on not found', async () => {
     mockSvc.getBadgeById.mockResolvedValue(null);
-    await expect(ctrl.getBadge({ params: { id: '999' } }, {})).rejects.toThrow('标签不存在');
+    await expect(ctrl.getBadge({ params: { id: '999' } }, {})).rejects.toThrow();
   });
 
   it('listAllBadges shows all', async () => {

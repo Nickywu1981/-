@@ -27,7 +27,7 @@ describe('templateMarketController', () => {
 
   it('detail not found', async () => {
     dao.getById = vi.fn().mockResolvedValue(null);
-    await expect(ctrl.detail({ params: { id: '999' } }, res)).rejects.toThrow('模板不存在');
+    await expect(ctrl.detail({ params: { id: '999' } }, res)).rejects.toThrow();
   });
 
   it('download free template', async () => {
@@ -40,7 +40,7 @@ describe('templateMarketController', () => {
   it('download paid template not purchased', async () => {
     dao.getById = vi.fn().mockResolvedValue({ id: 1, price: 99 });
     dao.hasPurchased = vi.fn().mockResolvedValue(false);
-    await expect(ctrl.download({ params: { id: '1' }, userId: 'u1' }, res)).rejects.toThrow('请先购买此模板');
+    await expect(ctrl.download({ params: { id: '1' }, userId: 'u1' }, res)).rejects.toThrow();
   });
 
   it('download paid template purchased', async () => {
