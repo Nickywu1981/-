@@ -38,21 +38,21 @@
     <!-- 作品选择 -->
     <section class="works-section">
       <div class="section-header">
-        <h3>{{ $t('work_pages.cut_ecosystem_ext.select_works') }}<h3>
+        <h3>{{ $t('work_pages.cut_ecosystem.select_works') }}<h3>
         <div class="filter-row">
           <select v-model="filterType" @change="loadWorks">
-            <option value="">{{ $t('work_pages.cut_ecosystem_ext.all_types') }}<option>
-            <option v-for="t in taskTypes" :key="t.value" :value="t.value">{{ t.label }}</option>
+            <option value="">{{ $t('work_pages.cut_ecosystem.all_types') }}<option>
+            <option v-for="t in taskTypes" :key="t.value" :value="t.value">{{ $t(t.labelKey) }}</option>
           </select>
         </div>
       </div>
 
-      <div v-if="loading" class="loading-state">{{ $t('work_pages.cut_ecosystem_ext.loading') }}<div>
+      <div v-if="loading" class="loading-state">{{ $t('work_pages.cut_ecosystem.loading') }}<div>
 
       <div v-else-if="works.length === 0" class="empty-state">
         <div class="empty-icon">📭</div>
-        <p>{{ $t('work_pages.cut_ecosystem_ext.no_works') }}<p>
-        <router-link to="/workspace" class="btn-primary">{{ $t('work_pages.cut_ecosystem_ext.go_create') }}<router-link>
+        <p>{{ $t('work_pages.cut_ecosystem.no_works') }}<p>
+        <router-link to="/workspace" class="btn-primary">{{ $t('work_pages.cut_ecosystem.go_create') }}<router-link>
       </div>
 
       <div v-else class="works-grid">
@@ -70,9 +70,9 @@
             <div v-else class="thumb-placeholder">{{ w.type === 'video' ? '🎬' : '🖼️' }}</div>
           </div>
           <div class="work-info">
-            <div class="work-title">{{ w.title || '未命名' }}</div>
+            <div class="work-title">{{ w.title || $t('work_pages.cut_ecosystem.untitled') }}</div>
             <div class="work-meta">
-              <span :class="['type-tag', w.type]">{{ w.type === 'video' ? $t('work_pages.cut_ecosystem_ext.video_tag') : '图片' }}</span>
+              <span :class="['type-tag', w.type]">{{ w.type === 'video' ? $t('work_pages.cut_ecosystem.video_tag') : $t('work_pages.cut_ecosystem.image_tag') }}</span>
               <span class="work-date">{{ formatDate(w.create_time) }}</span>
             </div>
           </div>
@@ -80,16 +80,16 @@
       </div>
 
       <div v-if="works.length > 0" class="pagination">
-        <button :disabled="page <= 1" @click="page--; loadWorks()">{{ $t('work_pages.cut_ecosystem_ext.prev_page') }}<button>
-        <span>第 {{ page }} / {{ totalPages }} 页</span>
-        <button :disabled="page >= totalPages" @click="page++; loadWorks()">{{ $t('work_pages.cut_ecosystem_ext.next_page') }}<button>
+        <button :disabled="page <= 1" @click="page--; loadWorks()">{{ $t('work_pages.cut_ecosystem.prev_page') }}<button>
+        <span>{{ $t('work_pages.cut_ecosystem.page_of', { page, total: totalPages }) }}</span>
+        <button :disabled="page >= totalPages" @click="page++; loadWorks()">{{ $t('work_pages.cut_ecosystem.next_page') }}<button>
       </div>
     </section>
 
     <!-- 项目名称 -->
     <section v-if="selectedIds.length > 0" class="config-section">
-      <label>{{ $t('work_pages.cut_ecosystem_ext.project_name') }}<label>
-      <input v-model="projectName" class="input" :placeholder="$t('work_pages.cut_ecosystem_ext.project_placeholder')" maxlength="100" />
+      <label>{{ $t('work_pages.cut_ecosystem.project_name') }}<label>
+      <input v-model="projectName" class="input" :placeholder="$t('work_pages.cut_ecosystem.project_placeholder')" maxlength="100" />
     </section>
 
     <!-- 操作按钮 -->
@@ -99,32 +99,32 @@
         class="btn-primary btn-lg"
         @click="exportDraft('jianying')"
       >
-        {{ exporting === 'jianying' ? '导出中...' : '导出为剪映项目' }}
+        {{ exporting === 'jianying' ? $t('work_pages.cut_ecosystem.exporting') : $t('work_pages.cut_ecosystem.export_jy') }}
       </button>
       <button
         :disabled="selectedIds.length === 0 || exporting"
         class="btn-secondary btn-lg"
         @click="exportDraft('capcut')"
       >
-        {{ exporting === 'capcut' ? '导出中...' : '导出为 CapCut 项目' }}
+        {{ exporting === 'capcut' ? $t('work_pages.cut_ecosystem.exporting') : $t('work_pages.cut_ecosystem.export_cc') }}
       </button>
     </section>
 
     <!-- 导出结果 -->
     <section v-if="draftResult" class="result-section">
       <div class="result-card">
-        <h3>{{ $t('work_pages.cut_ecosystem_ext.export_success') }}<h3>
+        <h3>{{ $t('work_pages.cut_ecosystem.export_success') }}<h3>
         <div class="result-info">
-          <div><strong>目标平台:</strong> {{ draftResult.platform === 'jianying' ? '剪映' : 'CapCut' }}</div>
-          <div><strong>包含素材:</strong> {{ draftResult?.assets?.length ?? 0 }} 个</div>
-          <div><strong>项目名称:</strong> {{ draftResult?.draft?.draft_name || '-' }}</div>
+          <div><strong>{{ $t('work_pages.cut_ecosystem.target_platform_label') }}</strong> {{ draftResult.platform === 'jianying' ? $t('work_pages.cut_ecosystem.platform_jy_name') : $t('work_pages.cut_ecosystem.platform_cc_name') }}</div>
+          <div><strong>{{ $t('work_pages.cut_ecosystem.assets_count') }}</strong> {{ draftResult?.assets?.length ?? 0 }} 个</div>
+          <div><strong>{{ $t('work_pages.cut_ecosystem.project_name_label') }}</strong> {{ draftResult?.draft?.draft_name || '-' }}</div>
         </div>
         <div class="result-actions">
-          <button class="btn-primary" @click="downloadDraft">{{ $t('work_pages.cut_ecosystem_ext.download_project') }}<button>
-          <button class="btn-text" @click="draftResult = null">{{ $t('work_pages.cut_ecosystem_ext.close') }}<button>
+          <button class="btn-primary" @click="downloadDraft">{{ $t('work_pages.cut_ecosystem.download_project') }}<button>
+          <button class="btn-text" @click="draftResult = null">{{ $t('work_pages.cut_ecosystem.close') }}<button>
         </div>
         <details class="draft-preview">
-          <summary>{{ $t('work_pages.cut_ecosystem_ext.preview_json') }}<summary>
+          <summary>{{ $t('work_pages.cut_ecosystem.preview_json') }}<summary>
           <pre>{{ JSON.stringify(draftResult.draft, null, 2) }}</pre>
         </details>
       </div>
@@ -154,18 +154,18 @@ const filterType = ref('')
 const { downloadBlob } = useFileDownload()
 
 const platforms = [
-  { key: 'jianying', name: t('work_pages.cut_ecosystem_ext.platform_jy_name'), icon: '✂️', desc: t('work_pages.cut_ecosystem_ext.platform_jy_desc') },
-  { key: 'capcut', name: t('work_pages.cut_ecosystem_ext.platform_cc_name'), icon: '🌍', desc: t('work_pages.cut_ecosystem_ext.platform_cc_desc') },
+  { key: 'jianying', name: t('work_pages.cut_ecosystem.platform_jy_name'), icon: '✂️', desc: t('work_pages.cut_ecosystem.platform_jy_desc') },
+  { key: 'capcut', name: t('work_pages.cut_ecosystem.platform_cc_name'), icon: '🌍', desc: t('work_pages.cut_ecosystem.platform_cc_desc') },
 ]
 
 const taskTypes = [
-  { value: 'video_gen', label: '视频生成' },
-  { value: 'action_migrate', label: '动作迁移' },
-  { value: 'digital_human', label: '数字人' },
-  { value: 'viral_replicate', label: '爆款复刻' },
-  { value: 'live_clip', label: '长视频精剪' },
-  { value: 'image_gen', label: '图片生成' },
-  { value: 'detail_gen', label: '详情图' },
+  { value: 'video_gen', labelKey: 'work_pages.cut_ecosystem.type_video_gen' },
+  { value: 'action_migrate', labelKey: 'work_pages.cut_ecosystem.type_action_migrate' },
+  { value: 'digital_human', labelKey: 'work_pages.cut_ecosystem.type_digital_human' },
+  { value: 'viral_replicate', labelKey: 'work_pages.cut_ecosystem.type_viral_replicate' },
+  { value: 'live_clip', labelKey: 'work_pages.cut_ecosystem.type_live_clip' },
+  { value: 'image_gen', labelKey: 'work_pages.cut_ecosystem.type_image_gen' },
+  { value: 'detail_gen', labelKey: 'work_pages.cut_ecosystem.type_detail_gen' },
 ]
 
 const ratios = ref([])
@@ -179,19 +179,19 @@ async function loadRatios() {
   try {
     const res = await api.get('/cut-ecosystem/ratios')
     ratios.value = res
-  } catch { toast.warn($t('work_pages.cut_ecosystem_ext.load_ratios_failed')) }
+  } catch { toast.warn(t('work_pages.cut_ecosystem.load_ratios_failed')) }
 }
 
 async function loadWorks() {
   loading.value = true
   try {
-    const params = { page: page.value, pageSize }
+    const params: Record<string, string | number> = { page: page.value, pageSize }
     if (filterType.value) params.type = filterType.value
     const res = await api.get('/cut-ecosystem/works', { params })
     works.value = res.list || []
     totalPages.value = Math.max(1, Math.ceil((res.total || 0) / pageSize))
   } catch (e) {
-    toast.error($t('work_pages.cut_ecosystem_ext.load_works_failed'))
+    toast.error(t('work_pages.cut_ecosystem.load_works_failed'))
   } finally {
     loading.value = false
   }
@@ -204,7 +204,7 @@ function toggleWork(work) {
   } else if (selectedIds.value.length < 50) {
     selectedIds.value.push(work.id)
   } else {
-    toast.warn($t('work_pages.cut_ecosystem_ext.max_select'))
+    toast.warn(t('work_pages.cut_ecosystem.max_select'))
   }
 }
 
@@ -220,12 +220,13 @@ async function exportDraft(platform) {
     const res = await api.post('/cut-ecosystem/export/' + platform, body)
     if (res) {
       draftResult.value = res
-      toast.success(`$t('work_pages.cut_ecosystem_ext.export_done', { name: ${platform === 'jianying' ? '剪映' : 'CapCut'}项目文件`)
+      const platformName = platform === 'jianying' ? t('work_pages.cut_ecosystem.platform_jy_name') : t('work_pages.cut_ecosystem.platform_cc_name')
+      toast.success(t('work_pages.cut_ecosystem.export_done', { name: platformName }))
     } else {
-      toast.error($t('work_pages.cut_ecosystem_ext.export_failed'))
+      toast.error(t('work_pages.cut_ecosystem.export_failed'))
     }
   } catch (e) {
-    toast.error($t('work_pages.cut_ecosystem_ext.export_request_failed'))
+    toast.error(t('work_pages.cut_ecosystem.export_request_failed'))
   } finally {
     exporting.value = null
   }

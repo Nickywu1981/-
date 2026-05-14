@@ -1,22 +1,22 @@
 <template>
-  <WorkLayout title="智能扩图" subtitle="AI 智能扩展图片边缘，自动补全构图" :steps="steps" :current-step="currentStep">
+  <WorkLayout :title="$t('work_pages.outpainting.title')" :subtitle="$t('work_pages.outpainting.subtitle')" :steps="steps" :current-step="currentStep">
       <div class="ws-section">
-        <div class="ws-section__title">上传需要扩图的图片</div>
-        <div class="ws-section__desc">AI 智能分析画面内容，自然扩展边缘区域</div>
+        <div class="ws-section__title">{{ $t('work_pages.outpainting.upload_title') }}</div>
+        <div class="ws-section__desc">{{ $t('work_pages.outpainting.upload_desc') }}</div>
         <div class="ws-upload-area" @dragover.prevent @drop.prevent="handleDrop" @click="triggerUpload">
           <div v-if="!previewUrl" class="ws-upload-area__inner">
             <div class="ws-upload-area__icon">↔</div>
-            <div class="ws-upload-area__text">点击上传或拖拽图片到此处</div>
-            <div class="ws-upload-area__hint">支持 JPG / PNG / WebP，最大 20MB</div>
+            <div class="ws-upload-area__text">{{ $t('work_pages.outpainting.upload_hint') }}</div>
+            <div class="ws-upload-area__hint">{{ $t('work_pages.outpainting.upload_format_hint') }}</div>
           </div>
-          <img loading="lazy" v-else :src="previewUrl" alt="上传预览" class="ws-upload-area__preview" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+          <img loading="lazy" v-else :src="previewUrl" :alt="$t('work_pages.outpainting.upload_preview_alt')" class="ws-upload-area__preview" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
           <input ref="fileInput" type="file" accept="image/*" hidden @change="handleFile" />
         </div>
-        <div v-if="uploading" class="ws-uploading">⏳ 上传中...</div>
-        <div v-else-if="uploadedUrl" class="ws-uploaded">✓ 已上传</div>
+        <div v-if="uploading" class="ws-uploading">⏳ {{ $t('work_pages.outpainting.uploading') }}</div>
+        <div v-else-if="uploadedUrl" class="ws-uploaded">✓ {{ $t('work_pages.outpainting.uploaded') }}</div>
       </div>
       <div class="ws-section">
-        <div class="ws-section__title">扩图方向</div>
+        <div class="ws-section__title">{{ $t('work_pages.outpainting.direction_title') }}</div>
         <div class="direction-grid">
           <div v-for="d in directions" :key="d.id" class="direction-card" :class="{ active: selectedDirection === d.id }" @click="selectedDirection = d.id">
             <div class="direction-card__icon">{{ d.icon }}</div>
@@ -25,40 +25,40 @@
         </div>
       </div>
       <div class="ws-section">
-        <div class="ws-section__title">扩展比例</div>
+        <div class="ws-section__title">{{ $t('work_pages.outpainting.ratio_title') }}</div>
         <div class="ws-slider-row">
           <input type="range" v-model="ratio" min="10" max="50" step="5" class="ws-range" />
           <span class="ws-range-val">{{ ratio }}%</span>
         </div>
       </div>
       <div class="ws-actions">
-        <div class="ws-cost">预计消耗 <strong>3</strong> 积分</div>
-        <button class="ws-btn ws-btn--primary ws-btn--lg" :disabled="!uploadedUrl || submitting" @click="submitOutpaint">{{ submitting ? '提交中...' : '开始扩图' }}</button>
+        <div class="ws-cost">{{ $t('work_pages.outpainting.cost_prefix') }} <strong>3</strong> {{ $t('work_pages.outpainting.cost_unit') }}</div>
+        <button class="ws-btn ws-btn--primary ws-btn--lg" :disabled="!uploadedUrl || submitting" @click="submitOutpaint">{{ submitting ? $t('work_pages.outpainting.submitting') : $t('work_pages.outpainting.submit_btn') }}</button>
       </div>
       <div class="ws-section">
-        <div class="ws-section__title">扩图结果</div>
+        <div class="ws-section__title">{{ $t('work_pages.outpainting.result_title') }}</div>
         <div v-if="task.polling.value" class="progress-box">
-          <div class="spinner" /><p>{{ task.progressMsg.value || 'AI 正在扩图...' }}</p>
+          <div class="spinner" /><p>{{ task.progressMsg.value || $t('work_pages.outpainting.generating') }}</p>
           <div class="bar"><div class="bar-fill" :style="{ width: task.progress.value + '%' }" /></div>
         </div>
         <div v-else-if="task.status.value === 2" class="result-compare">
           <div class="result-compare__item">
-            <div class="result-compare__label">原始图片</div>
-            <img loading="lazy" v-if="uploadedUrl" :src="uploadedUrl" alt="原图" class="result-compare__img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+            <div class="result-compare__label">{{ $t('work_pages.outpainting.original_img') }}</div>
+            <img loading="lazy" v-if="uploadedUrl" :src="uploadedUrl" :alt="$t('work_pages.outpainting.original_alt')" class="result-compare__img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
             <div v-else class="result-compare__img placeholder" />
           </div>
           <div class="result-compare__divider">
             <div class="result-compare__arrow">→</div>
-            <div class="result-compare__badge">AI 扩图</div>
+            <div class="result-compare__badge">{{ $t('work_pages.outpainting.ai_expand_badge') }}</div>
           </div>
           <div class="result-compare__item">
-            <div class="result-compare__label">扩展后</div>
-            <img loading="lazy" v-if="task.result.value" :src="task.result.value" alt="扩图结果" class="result-compare__img after" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+            <div class="result-compare__label">{{ $t('work_pages.outpainting.expanded_label') }}</div>
+            <img loading="lazy" v-if="task.result.value" :src="task.result.value" :alt="$t('work_pages.outpainting.expanded_alt')" class="result-compare__img after" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
             <div v-else class="result-compare__img placeholder" />
           </div>
         </div>
-        <div v-else-if="task.status.value === 3" class="error-box"><p>{{ task.errorMsg.value || '任务失败' }}</p><button class="ws-btn ws-btn--primary" @click="handleRedo">重试</button></div>
-        <div v-else class="ws-placeholder"><div class="ws-placeholder__icon">↔</div><div class="ws-placeholder__text">扩图结果将显示在这里</div></div>
+        <div v-else-if="task.status.value === 3" class="error-box"><p>{{ task.errorMsg.value || $t('work_pages.outpainting.task_failed') }}</p><button class="ws-btn ws-btn--primary" @click="handleRedo">{{ $t('work_pages.outpainting.retry_btn') }}</button></div>
+        <div v-else class="ws-placeholder"><div class="ws-placeholder__icon">↔</div><div class="ws-placeholder__text">{{ $t('work_pages.outpainting.result_placeholder') }}</div></div>
       </div>
       </WorkLayout>
 </template>
@@ -68,7 +68,7 @@
 const { createBlobUrl, revoke } = useBlobUrl()
 const toast = useToast()
 
-const steps = ['上传图片', '扩图设置', '查看结果']
+const steps = computed(() => [t('work_pages.outpainting.step_upload'), t('work_pages.outpainting.step_settings'), t('work_pages.outpainting.step_result')])
 const currentStep = ref(0)
 const previewUrl = ref('')
 const uploadedUrl = ref('')
@@ -79,13 +79,13 @@ const ratio = ref(30)
 const task = useTask()
 const fileInput = ref<HTMLInputElement>()
 
-const directions = [
-  { id: 'all', icon: '🔲', name: '四周扩展' },
-  { id: 'up', icon: '⬆', name: '向上扩展' },
-  { id: 'down', icon: '⬇', name: '向下扩展' },
-  { id: 'left', icon: '⬅', name: '向左扩展' },
-  { id: 'right', icon: '➡', name: '向右扩展' },
-]
+const directions = computed(() => [
+  { id: 'all', icon: '🔲', name: t('work_pages.outpainting.dir_all') },
+  { id: 'up', icon: '⬆', name: t('work_pages.outpainting.dir_up') },
+  { id: 'down', icon: '⬇', name: t('work_pages.outpainting.dir_down') },
+  { id: 'left', icon: '⬅', name: t('work_pages.outpainting.dir_left') },
+  { id: 'right', icon: '➡', name: t('work_pages.outpainting.dir_right') },
+])
 
 function triggerUpload() { fileInput.value?.click() }
 

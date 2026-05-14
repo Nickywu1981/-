@@ -27,7 +27,7 @@
       <div class="form-row">
         <label class="form-label">{{ $t('work_pages.video_translate.video_url') }}<label>
         <input v-model="videoUrl" class="input" :placeholder="$t('work_pages.video_translate.video_url_placeholder')" maxlength="500" />
-        <AppMediaUpload v-model="videoUrl" accept="video/*" label="上传视频" class="mt-2" />
+        <AppMediaUpload v-model="videoUrl" accept="video/*" :label="$t('work_pages.video_translate.upload_video')" class="mt-2" />
       </div>
 
       <div class="options-row">
@@ -49,10 +49,10 @@
         <div class="option">
           <label>{{ $t('work_pages.video_translate.voice_style') }}<label>
           <select v-model="voiceType" class="input">
-            <option value="natural">自然音色</option>
-            <option value="professional">专业播音</option>
-            <option value="casual">休闲风格</option>
-            <option value="formal">正式风格</option>
+            <option value="natural">{{ $t('work_pages.video_translate.voice_natural') }}</option>
+            <option value="professional">{{ $t('work_pages.video_translate.voice_professional') }}</option>
+            <option value="casual">{{ $t('work_pages.video_translate.voice_casual') }}</option>
+            <option value="formal">{{ $t('work_pages.video_translate.voice_formal') }}</option>
           </select>
         </div>
       </div>
@@ -61,54 +61,54 @@
         <div class="option">
           <label>{{ $t('work_pages.video_translate.subtitle_style') }}<label>
           <select v-model="subtitleStyle" class="input">
-            <option value="default">默认样式</option>
-            <option value="minimal">极简白字</option>
-            <option value="colorful">彩色字幕</option>
-            <option value="stroke">描边字幕</option>
+            <option value="default">{{ $t('work_pages.video_translate.subtitle_default') }}</option>
+            <option value="minimal">{{ $t('work_pages.video_translate.subtitle_minimal') }}</option>
+            <option value="colorful">{{ $t('work_pages.video_translate.subtitle_colorful') }}</option>
+            <option value="stroke">{{ $t('work_pages.video_translate.subtitle_stroke') }}</option>
           </select>
         </div>
       </div>
 
       <div v-if="activeTab === 'face'" class="options-row">
         <div class="option">
-          <label>数字人风格</label>
+          <label>{{ $t('work_pages.video_translate.avatar_style_label') }}<label>
           <select v-model="avatarStyle" class="input">
-            <option value="original">保留原貌</option>
-            <option value="cartoon">卡通风格</option>
-            <option value="realistic">写实风格</option>
-            <option value="anime">动漫风格</option>
+            <option value="original">{{ $t('work_pages.video_translate.avatar_original') }}</option>
+            <option value="cartoon">{{ $t('work_pages.video_translate.avatar_cartoon') }}</option>
+            <option value="realistic">{{ $t('work_pages.video_translate.avatar_realistic') }}</option>
+            <option value="anime">{{ $t('work_pages.video_translate.avatar_anime') }}</option>
           </select>
         </div>
       </div>
 
       <button class="btn btn-primary btn-lg" :disabled="!videoUrl || submitting" @click="doSubmit">
-        {{ submitting ? '提交中...' : tabCfg?.actionLabel || $t('work_pages.video_translate.generate_btn') }}
+        {{ submitting ? $t('work_pages.video_translate.submitting') : tabCfg?.actionLabel || $t('work_pages.video_translate.generate_btn') }}
       </button>
 
       <AppTaskProgress v-if="jobId" :job-id="jobId" @completed="onCompleted" @failed="onFailed" />
       <div v-if="resultUrl" class="result-preview">
         <video v-if="activeTab === 'voice' || activeTab === 'face'" :src="resultUrl" controls style="max-width:100%"></video>
         <div v-else class="subtitle-preview">
-          <p>字幕翻译完成</p>
-          <a :href="resultUrl" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">下载字幕文件</a>
+          <p>{{ $t('work_pages.video_translate.subtitle_done') }}</p>
+          <a :href="resultUrl" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">{{ $t('work_pages.video_translate.download_srt') }}</a>
         </div>
         <div class="result-actions">
-          <button class="btn btn-secondary" @click="downloadResult">下载</button>
-          <button class="btn btn-ghost" @click="reset">重新翻译</button>
+          <button class="btn btn-secondary" @click="downloadResult">{{ $t('work_pages.video_translate.download_btn') }}</button>
+          <button class="btn btn-ghost" @click="reset">{{ $t('work_pages.video_translate.retranslate_btn') }}</button>
         </div>
       </div>
     </div>
 
     <section class="works-section">
-      <h2>翻译历史</h2>
+      <h2>{{ $t('work_pages.video_translate.history_title') }}</h2>
       <div class="works-filter">
         <select v-model="historyType" class="input" @change="loadHistory">
-          <option value="">全部类型</option>
+          <option value="">{{ $t('work_pages.video_translate.filter_all') }}</option>
           <option v-for="t in tabs" :key="t.key" :value="`video_${t.key}_translate`">{{ t.label }}</option>
         </select>
       </div>
-      <div v-if="loadingHistory" class="loading">加载中...</div>
-      <div v-else-if="!history.length" class="empty">暂无翻译记录</div>
+      <div v-if="loadingHistory" class="loading">{{ $t('work_pages.video_translate.loading_history') }}</div>
+      <div v-else-if="!history.length" class="empty">{{ $t('work_pages.video_translate.no_history') }}</div>
       <div v-else class="history-list">
         <div v-for="h in history" :key="h.id" class="history-item">
           <div class="history-info">
@@ -119,13 +119,13 @@
             <span class="meta-status" :class="h.status">{{ h.status }}</span>
             <span class="meta-time">{{ formatDateTime(h.create_time) }}</span>
           </div>
-          <button v-if="h.result_url" class="btn btn-sm btn-secondary" @click="download(h.result_url)">下载</button>
+          <button v-if="h.result_url" class="btn btn-sm btn-secondary" @click="download(h.result_url)">{{ $t('work_pages.video_translate.download_btn') }}</button>
         </div>
       </div>
       <div v-if="totalHistory > hLimit" class="pagination">
-        <button :disabled="hPage <= 1" @click="hPage--; loadHistory()">上一页</button>
+        <button :disabled="hPage <= 1" @click="hPage--; loadHistory()">{{ $t('work_pages.video_translate.prev_page') }}</button>
         <span>{{ hPage }} / {{ Math.ceil(totalHistory / hLimit) }}</span>
-        <button :disabled="hPage >= Math.ceil(totalHistory / hLimit)" @click="hPage++; loadHistory()">下一页</button>
+        <button :disabled="hPage >= Math.ceil(totalHistory / hLimit)" @click="hPage++; loadHistory()">{{ $t('work_pages.video_translate.next_page') }}</button>
       </div>
     </section>
   </div>
@@ -138,9 +138,9 @@ import { formatDateTime } from '@/utils/format'
 const { config: headerCfg } = useSiteConfig('page.video_translate');
 
 const tabs = [
-  { key: 'voice', icon: '🎙️', label: t('work_pages.video_translate.tab_voice'), actionLabel: '开始语音翻译' },
-  { key: 'subtitles', icon: '📝', label: t('work_pages.video_translate.tab_subtitles'), actionLabel: '开始字幕翻译' },
-  { key: 'face', icon: '🧑', label: t('work_pages.video_translate.tab_face'), actionLabel: '开始面容翻译' },
+  { key: 'voice', icon: '🎙️', label: t('work_pages.video_translate.tab_voice'), actionLabel: t('work_pages.video_translate.tab_action_voice') },
+  { key: 'subtitles', icon: '📝', label: t('work_pages.video_translate.tab_subtitles'), actionLabel: t('work_pages.video_translate.tab_action_subtitles') },
+  { key: 'face', icon: '🧑', label: t('work_pages.video_translate.tab_face'), actionLabel: t('work_pages.video_translate.tab_action_face') },
 ];
 
 const activeTab = ref('voice');
@@ -165,8 +165,10 @@ const totalHistory = ref(0);
 const tabCfg = computed(() => tabs.find(t => t.key === activeTab.value));
 
 function typeLabel(type) {
-  const m = {
-    video_voice_translate: '语音翻译', video_subtitle_translate: '字幕翻译', video_face_translate: '面容翻译',
+  const m: Record<string, string> = {
+    video_voice_translate: t('work_pages.video_translate.type_voice'),
+    video_subtitle_translate: t('work_pages.video_translate.type_subtitles'),
+    video_face_translate: t('work_pages.video_translate.type_face'),
   };
   return m[type] || type;
 }
@@ -174,16 +176,16 @@ function typeLabel(type) {
 async function doSubmit() {
   submitting.value = true;
   const endpoints = { voice: '/api/video-translate/voice', subtitles: '/api/video-translate/subtitles', face: '/api/video-translate/face' };
-  const body = { videoUrl: videoUrl.value, sourceLang: sourceLang.value, targetLang: targetLang.value };
+  const body: Record<string, string> = { videoUrl: videoUrl.value, sourceLang: sourceLang.value, targetLang: targetLang.value };
   if (activeTab.value === 'voice') body.voiceType = voiceType.value;
   if (activeTab.value === 'subtitles') body.subtitleStyle = subtitleStyle.value;
   if (activeTab.value === 'face') body.avatarStyle = avatarStyle.value;
   try {
     const data = await $fetch(endpoints[activeTab.value], { method: 'POST', body, credentials: 'include' });
     jobId.value = data.data?.job_id;
-    useToast().success('翻译任务已提交');
+    useToast().success(t('work_pages.video_translate.submit_success'));
   } catch (e) {
-    useToast().error(e.data?.message || '翻译提交失败');
+    useToast().error(e.data?.message || t('work_pages.video_translate.submit_failed'));
   } finally {
     submitting.value = false;
   }
@@ -202,7 +204,7 @@ async function loadHistory() {
     const data = await $fetch<{ data?: { rows?: unknown[]; total?: number } }>(`/api/video-translate/works?${params}`, { credentials: 'include' });
     history.value = data.data?.rows || data.data || [];
     totalHistory.value = data.data?.total || 0;
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; useToast().error(err?.data?.msg || e?.message || '加载历史记录失败') } finally { loadingHistory.value = false; }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; useToast().error(err?.data?.msg || e?.message || t('work_pages.video_translate.history_load_failed')) } finally { loadingHistory.value = false; }
 }
 
 const { download } = useFileDownload()
