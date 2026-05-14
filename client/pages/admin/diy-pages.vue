@@ -187,7 +187,7 @@ async function deleteItem(id: number) {
     await $fetch(`/api/diy/${id}/hard-delete`, { method: 'DELETE', credentials: 'include' })
     selectedIds.value = selectedIds.value.filter(i => i !== id)
     fetchData()
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('common.delete_failed')) }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('common.failed_delete')) }
 }
 
 async function batchPublish() {

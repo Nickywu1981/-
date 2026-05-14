@@ -176,32 +176,32 @@ async function save() {
   try {
     const res: any = await $fetch('/api/automation/tasks', { method: 'POST', body: form.value })
     if (res?.code === 200 || res?.code === 0) { toast.success(t('admin_automation.task_created')); modalOpen.value = false; fetchData() }
-    else { toast.error(res?.msg || t('common.save_failed')) }
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('common.save_failed')) } finally { saving.value = false }
+    else { toast.error(res?.msg || t('common.failed_save')) }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('common.failed_save')) } finally { saving.value = false }
 }
 
 async function execute(t: any) {
   try {
     const res: any = await $fetch(`/api/automation/admin/execute/${t.id}`, { method: 'POST' })
     if (res?.code === 200 || res?.code === 0) { t.status = 1; toast.success(t('admin_automation.task_executing')) }
-    else { toast.error(res?.msg || t('common.save_failed')) }
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('common.save_failed')) }
+    else { toast.error(res?.msg || t('common.failed_save')) }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('common.failed_save')) }
 }
 
 async function cancel(t: any) {
   try {
     const res: any = await $fetch(`/api/automation/tasks/${t.id}/cancel`, { method: 'POST' })
     if (res?.code === 200 || res?.code === 0) { t.status = 4; toast.success(t('admin_automation.task_cancelled')) }
-    else { toast.error(res?.msg || t('common.save_failed')) }
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('common.save_failed')) }
+    else { toast.error(res?.msg || t('common.failed_save')) }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('common.failed_save')) }
 }
 
 async function retryTask(t: any) {
   try {
     const res: any = await $fetch(`/api/automation/admin/execute/${t.id}`, { method: 'POST' })
     if (res?.code === 200 || res?.code === 0) { t.status = 1; toast.success(t('admin_automation.task_retried')); fetchData() }
-    else { toast.error(res?.msg || t('common.save_failed')) }
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('common.save_failed')) }
+    else { toast.error(res?.msg || t('common.failed_save')) }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('common.failed_save')) }
 }
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>

@@ -178,14 +178,14 @@ async function save() {
     const method = isEdit.value ? 'PUT' : 'POST'
     const res: any = await $fetch(url, { method, body: form.value })
     if (res?.code === 200 || res?.code === 0) {
-      toast.success(t('common.save_success'))
+      toast.success(t('common.success_save'))
       modalOpen.value = false
       fetchData()
     } else {
-      toast.error(res?.msg || t('common.save_failed'))
+      toast.error(res?.msg || t('common.failed_save'))
     }
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
-    toast.error(err?.data?.msg || err.message || t('common.save_failed'))
+    toast.error(err?.data?.msg || err.message || t('common.failed_save'))
   } finally {
     saving.value = false
   }
@@ -199,10 +199,10 @@ async function delTenant(id: number) {
       toast.success(t('common.delete_success'))
       fetchData()
     } else {
-      toast.error(res?.msg || t('common.delete_failed'))
+      toast.error(res?.msg || t('common.failed_delete'))
     }
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
-    toast.error(err?.data?.msg || err.message || t('common.delete_failed'))
+    toast.error(err?.data?.msg || err.message || t('common.failed_delete'))
   }
 }
 
@@ -211,13 +211,13 @@ async function toggleStatus(t: any) {
   try {
     const res: any = await $fetch(`/api/tenants/${t.id}`, { method: 'PUT', body: { status: newStatus } })
     if (res?.code === 200 || res?.code === 0) {
-      toast.success(t('common.save_success'))
+      toast.success(t('common.success_save'))
       fetchData()
     } else {
-      toast.error(res?.msg || t('common.save_failed'))
+      toast.error(res?.msg || t('common.failed_save'))
     }
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
-    toast.error(err?.data?.msg || err.message || t('common.save_failed'))
+    toast.error(err?.data?.msg || err.message || t('common.failed_save'))
   }
 }
 
@@ -251,14 +251,14 @@ async function doReview(decision: string) {
       body: { decision, remark: reviewRemark.value },
     })
     if (res?.code === 200 || res?.code === 0) {
-      toast.success(t('common.save_success'))
+      toast.success(t('common.success_save'))
       reviewModal.value = false
       fetchData()
     } else {
-      toast.error(res?.msg || t('common.save_failed'))
+      toast.error(res?.msg || t('common.failed_save'))
     }
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
-    toast.error(err?.data?.msg || err.message || t('common.save_failed'))
+    toast.error(err?.data?.msg || err.message || t('common.failed_save'))
   } finally {
     reviewing.value = false
   }

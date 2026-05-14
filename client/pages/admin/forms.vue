@@ -212,10 +212,10 @@ async function delForm(id: number) {
       toast.success(t('admin_forms.form_deleted'))
       fetchData()
     } else {
-      toast.error(res?.msg || t('common.delete_failed'))
+      toast.error(res?.msg || t('common.failed_delete'))
     }
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
-    toast.error(err?.data?.msg || err.message || t('common.delete_failed'))
+    toast.error(err?.data?.msg || err.message || t('common.failed_delete'))
   }
 }
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })

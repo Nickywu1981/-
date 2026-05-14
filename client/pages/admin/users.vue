@@ -179,8 +179,8 @@ async function saveEdit() {
     const data = await $fetch(`/api/admin/users/${editForm.value.id}`, { method: 'PUT', credentials: 'include', body: editForm.value })
     const res = data as any
     if (res?.code === 200) { toast.success(t('admin_users.user_updated')); editOpen.value = false; fetchData() }
-    else { toast.error(res?.msg || t('common.save_failed')) }
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('common.save_failed')) } finally { saving.value = false }
+    else { toast.error(res?.msg || t('common.failed_save')) }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('common.failed_save')) } finally { saving.value = false }
 }
 
 function exportCSV() {
