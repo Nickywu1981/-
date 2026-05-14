@@ -4930,7 +4930,10 @@
       "cat_beauty": "美妆",
       "cat_home": "家居",
       "cat_digital": "数码",
-      "cat_food": "食品"
+      "cat_food": "食品",
+      "style_modern": "现代",
+      "style_minimal": "简约",
+      "style_brand": "品牌"
     },
     "compliance": {
       "step_target": "选目标市场",
@@ -6809,7 +6812,11 @@
     "size_templates": {
       "title": "电商平台尺寸模板",
       "subtitle": "一键套用各大平台的图片尺寸标准，再也不用担心传错尺寸被拒",
-      "detail_title": " — 尺寸详情"
+      "detail_title": " — 尺寸详情",
+      "platform_taobao": "淘宝",
+      "platform_jd": "京东",
+      "platform_pdd": "拼多多",
+      "platform_amazon": "Amazon"
     },
     "main_image_platform_taobao": "淘宝",
     "main_image_platform_pdd": "拼多多",

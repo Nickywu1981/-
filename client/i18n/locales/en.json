@@ -5046,7 +5046,10 @@
       "cat_beauty": "Beauty",
       "cat_home": "Home",
       "cat_digital": "Digital",
-      "cat_food": "Food"
+      "cat_food": "Food",
+      "style_modern": "Modern",
+      "style_minimal": "Minimal",
+      "style_brand": "Brand"
     },
     "compliance": {
       "step_target": "Select Market",
@@ -6977,9 +6980,13 @@
       "output_filename": "[EN] output_{id}.png"
     },
     "size_templates": {
-      "title": "[EN] 电商平台尺寸模板",
-      "subtitle": "[EN] 一键套用各大平台的图片尺寸标准，再也不用担心传错尺寸被拒",
-      "detail_title": "[EN]  — 尺寸详情"
+      "title": "E-commerce Size Templates",
+      "subtitle": "One-click apply platform image size standards, no more rejections for wrong dimensions",
+      "detail_title": " — Size Details",
+      "platform_taobao": "Taobao",
+      "platform_jd": "JD.com",
+      "platform_pdd": "Pinduoduo",
+      "platform_amazon": "Amazon"
     },
     "main_image_platform_taobao": "[EN] 淘宝",
     "main_image_platform_pdd": "[EN] 拼多多",
