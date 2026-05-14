@@ -73,7 +73,7 @@ async function loadUsage() {
   finally { loading.value = false; }
 }
 
-definePageMeta({ layout: 'user-workspace' });
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] });
 </script>
 
 <style scoped>

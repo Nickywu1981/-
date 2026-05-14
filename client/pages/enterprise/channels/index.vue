@@ -66,7 +66,7 @@
 </template>
 
 <script setup>
-definePageMeta({ layout: 'user-workspace' });
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] });
 import { formatDateLocale } from '~/utils/format';
 import { extractErrorMsg } from '~/composables/useApi';
 const { t } = useI18n();

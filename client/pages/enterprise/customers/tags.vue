@@ -46,7 +46,7 @@
 </template>
 
 <script setup>
-definePageMeta({ layout: 'user-workspace' });
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] });
 
 const { t } = useI18n()
 const { confirm } = useConfirm()

@@ -106,7 +106,7 @@ function barHeight(count) {
   return Math.max((count / max) * 100, 4);
 }
 
-definePageMeta({ layout: 'user-workspace' });
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] });
 
 onMounted(loadData);
 </script>

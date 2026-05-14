@@ -10,9 +10,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   if (publicPaths.includes(to.path) || to.path.startsWith('/legal/')) return
 
-  // 开发模式：后端 DB 不可用时直接放行，方便查看页面 UI
-  if (import.meta.dev) return
-
   let isAuthenticated = false
   let userRole = ''
 
@@ -31,12 +28,20 @@ export default defineNuxtRouteMiddleware(async (to) => {
     }
   } catch (e: unknown) {
     const err = e as { statusCode?: number; response?: { status?: number }; data?: { code?: number }; cause?: unknown }
-    // 401/403 → 跳转登录
     if (err?.statusCode === 401 || err?.response?.status === 401 || err?.data?.code === 401 ||
         err?.statusCode === 403 || err?.response?.status === 403 || err?.data?.code === 403) {
       return navigateTo(`/login?redirect=${encodeURIComponent(to.fullPath)}`)
     }
-    // 网络错误/服务不可用 → 放行，避免服务抖动导致全员掉线
+    // dev mode: backend unavailable → allow UI preview (non-protected pages only)
+    if (import.meta.dev) {
+      console.info('[auth] dev mode — backend unavailable, previewing UI as anonymous')
+      // still block admin/gateway/ops in dev unless explicitly allowed
+      if (to.path.startsWith('/admin') || to.path.startsWith('/gateway') || to.path.startsWith('/ops') || to.path.startsWith('/finance')) {
+        console.warn(`[auth] dev mode — blocking unauthenticated access to ${to.path}`)
+        return navigateTo(`/login?redirect=${encodeURIComponent(to.fullPath)}`)
+      }
+      return
+    }
     console.warn('[auth] API unreachable, allowing navigation:', (err as Error)?.message || err)
   }
 
@@ -44,8 +49,14 @@ export default defineNuxtRouteMiddleware(async (to) => {
     return navigateTo(`/login?redirect=${encodeURIComponent(to.fullPath)}`)
   }
 
-  if (to.path.startsWith('/admin')) {
-    if (!['admin', 'super_admin'].includes(userRole)) {
+  const protectedPrefixes: [string, string[]][] = [
+    ['/admin',     ['admin', 'super_admin']],
+    ['/gateway',   ['admin', 'super_admin']],
+    ['/ops',       ['admin', 'super_admin', 'ops', 'finance']],
+    ['/finance',   ['admin', 'super_admin', 'finance']],
+  ]
+  for (const [prefix, allowed] of protectedPrefixes) {
+    if (to.path.startsWith(prefix) && !allowed.includes(userRole)) {
       return navigateTo('/error?code=403')
     }
   }

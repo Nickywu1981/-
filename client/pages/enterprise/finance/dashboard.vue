@@ -110,5 +110,5 @@ async function loadData() {
 
 onMounted(() => loadData())
 
-definePageMeta({ layout: 'user-workspace' })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>

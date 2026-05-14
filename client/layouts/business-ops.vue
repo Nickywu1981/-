@@ -14,7 +14,7 @@
           <NuxtLink to="/admin/enterprises" class="nav-item" active-class="active">
             <i class="icon-building"></i> 企业管理
           </NuxtLink>
-          <NuxtLink to="/ops/agents" class="nav-item" active-class="active">
+          <NuxtLink to="/ops/users" class="nav-item" active-class="active">
             <i class="icon-user-check"></i> 代理管理
           </NuxtLink>
           <NuxtLink to="/admin/orders" class="nav-item" active-class="active">

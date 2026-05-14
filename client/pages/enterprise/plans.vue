@@ -48,7 +48,7 @@ const planLabel = computed(() => {
   return p?.name || currentPlan.value || t('enterprise.plans.unknown');
 });
 
-definePageMeta({ layout: 'user-workspace' });
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] });
 </script>
 
 <style scoped>

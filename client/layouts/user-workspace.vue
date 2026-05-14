@@ -19,19 +19,19 @@
           <NuxtLink to="/work/my-templates" class="nav-item" active-class="active">
             <i class="icon-layout"></i> 模板库
           </NuxtLink>
-          <NuxtLink to="/work/canvas" class="nav-item" active-class="active">
+          <NuxtLink to="/work/diy-pages" class="nav-item" active-class="active">
             <i class="icon-grid"></i> DIY 编辑器
           </NuxtLink>
         </div>
         <div class="nav-group">
           <p class="nav-label">我的</p>
-          <NuxtLink to="/work/projects" class="nav-item" active-class="active">
+          <NuxtLink to="/work/output" class="nav-item" active-class="active">
             <i class="icon-folder"></i> 项目
           </NuxtLink>
           <NuxtLink to="/assets" class="nav-item" active-class="active">
             <i class="icon-hard-drive"></i> 素材库
           </NuxtLink>
-          <NuxtLink to="/work/settings" class="nav-item" active-class="active">
+          <NuxtLink to="/work/usage" class="nav-item" active-class="active">
             <i class="icon-settings"></i> 账户设置
           </NuxtLink>
         </div>
@@ -68,10 +68,10 @@
         </div>
         <div class="nav-group">
           <p class="nav-label">我的</p>
-          <NuxtLink to="/work/projects" class="nav-item" active-class="active">
+          <NuxtLink to="/work/output" class="nav-item" active-class="active">
             <i class="icon-folder"></i> 项目
           </NuxtLink>
-          <NuxtLink to="/agent/settings" class="nav-item" active-class="active">
+          <NuxtLink to="/agent/dashboard" class="nav-item" active-class="active">
             <i class="icon-settings"></i> 设置
           </NuxtLink>
         </div>
@@ -93,7 +93,7 @@
         </div>
         <div class="nav-group">
           <p class="nav-label">企业空间</p>
-          <NuxtLink to="/enterprise/workspace" class="nav-item" active-class="active">
+          <NuxtLink to="/enterprise/dashboard" class="nav-item" active-class="active">
             <i class="icon-grid"></i> 协作工作区
           </NuxtLink>
           <NuxtLink to="/enterprise/users" class="nav-item" active-class="active">
@@ -108,7 +108,7 @@
         </div>
         <div class="nav-group">
           <p class="nav-label">我的</p>
-          <NuxtLink to="/work/projects" class="nav-item" active-class="active">
+          <NuxtLink to="/work/output" class="nav-item" active-class="active">
             <i class="icon-folder"></i> 项目
           </NuxtLink>
           <NuxtLink to="/enterprise/settings" class="nav-item" active-class="active">

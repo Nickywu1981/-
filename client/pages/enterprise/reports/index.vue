@@ -47,7 +47,7 @@
 </template>
 
 <script setup>
-definePageMeta({ layout: 'user-workspace' });
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] });
 const toast = useToast();
 const { t } = useI18n();
 

@@ -26,19 +26,17 @@
           <NuxtLink to="/gateway/routes" class="nav-item" active-class="active">
             <i class="icon-shuffle"></i> 调度策略
           </NuxtLink>
-          <NuxtLink to="/gateway/hooks" class="nav-item" active-class="active">
-            <i class="icon-zap"></i> Hook 注册
-          </NuxtLink>
+          <!-- 预留 /gateway/hooks Hook注册页待开发 -->
         </div>
         <div class="nav-group">
           <p class="nav-label">安全与审计</p>
-          <NuxtLink to="/admin/security" class="nav-item" active-class="active">
+          <NuxtLink to="/admin/settings" class="nav-item" active-class="active">
             <i class="icon-shield"></i> WAF / 密钥
           </NuxtLink>
-          <NuxtLink to="/admin/audit" class="nav-item" active-class="active">
+          <NuxtLink to="/admin/logs" class="nav-item" active-class="active">
             <i class="icon-file-text"></i> 审计日志
           </NuxtLink>
-          <NuxtLink to="/admin/system" class="nav-item" active-class="active">
+          <NuxtLink to="/admin/settings" class="nav-item" active-class="active">
             <i class="icon-settings"></i> 系统参数
           </NuxtLink>
         </div>

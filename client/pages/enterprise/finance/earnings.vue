@@ -82,7 +82,7 @@ async function loadData() {
 
 function statusLabel(s) { const m = { settled: t('enterprise.finance.earnings.statusSettled'), pending: t('enterprise.finance.earnings.statusPending'), withdrawn: t('enterprise.finance.earnings.statusWithdrawn'), cancelled: t('enterprise.finance.earnings.statusCancelled') }; return m[s] || s; }
 
-definePageMeta({ layout: 'user-workspace' });
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] });
 </script>
 
 <style scoped>

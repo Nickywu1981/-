@@ -50,7 +50,7 @@ async function loadData() {
   } catch (e) { toast.error(t('enterprise.finance.settlement.loadError')); }
 }
 
-definePageMeta({ layout: 'user-workspace' });
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] });
 </script>
 
 <style scoped>

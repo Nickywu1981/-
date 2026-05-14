@@ -101,7 +101,7 @@ async function handleSave() {
   } finally { saving.value = false; }
 }
 
-definePageMeta({ layout: 'user-workspace' });
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] });
 </script>
 
 <style scoped>
