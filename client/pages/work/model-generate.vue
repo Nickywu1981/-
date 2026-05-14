@@ -1,25 +1,25 @@
 <template>
-  <WorkLayout title="AI模特生成" :steps="['上传服装图', '选模特', '生成']" :current-step="step">
+  <WorkLayout :title="$t('work_pages.model_generate.title')" :steps="steps" :current-step="step">
     <div v-if="step === 0" class="step-content">
-      <h3 class="step-title">上传服装平铺图</h3>
-      <p class="step-desc">上传服装平铺/挂拍照片，AI 自动识别版型并生成真人模特试穿效果</p>
+      <h3 class="step-title">{{ $t('work_pages.model_generate.upload_title') }}</h3>
+      <p class="step-desc">{{ $t('work_pages.model_generate.upload_desc') }}</p>
       <div class="dropzone" :class="{ 'has-file': previewUrl }" @dragover.prevent @drop.prevent="handleDrop">
         <template v-if="!previewUrl">
           <span class="dz-icon">👤</span>
-          <p class="dz-label">拖拽或点击上传服装图片</p>
-          <p class="dz-hint">支持 JPG / PNG / WebP，建议 800×800 以上</p>
+          <p class="dz-label">{{ $t('work_pages.model_generate.drop_label') }}</p>
+          <p class="dz-hint">{{ $t('work_pages.model_generate.drop_hint') }}</p>
           <input ref="fileInput" type="file" accept="image/*" hidden @change="handleFile" />
-          <button class="btn-outline-sm" @click="fileInput?.click()">选择图片</button>
+          <button class="btn-outline-sm" @click="fileInput?.click()">{{ $t('work_pages.model_generate.select_image') }}</button>
         </template>
         <img loading="lazy" v-else :src="previewUrl" alt="preview" class="preview-img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
       </div>
-      <p v-if="uploading" class="upload-status"><span class="spinner-sm" /> 上传中...</p>
-      <button v-if="uploadedUrl" class="btn-primary" @click="step = 1">下一步：选择模特 →</button>
+      <p v-if="uploading" class="upload-status"><span class="spinner-sm" /> {{ $t('work_pages.model_generate.uploading') }}</p>
+      <button v-if="uploadedUrl" class="btn-primary" @click="step = 1">{{ $t('work_pages.model_generate.next_select_model') }}</button>
     </div>
 
     <div v-else-if="step === 1" class="step-content">
-      <h3 class="step-title">选择模特风格</h3>
-      <p class="step-desc">4 种模特风格可选，AI 将自动匹配合适的肤色与体型</p>
+      <h3 class="step-title">{{ $t('work_pages.model_generate.select_model_title') }}</h3>
+      <p class="step-desc">{{ $t('work_pages.model_generate.select_model_desc') }}</p>
       <div class="model-grid">
         <button v-for="m in models" :key="m.id" class="model-card" :class="{ active: selectedModel === m.id }" @click="selectedModel = m.id">
           <span class="model-icon">{{ m.icon }}</span>
@@ -27,28 +27,28 @@
           <span class="model-desc">{{ m.desc }}</span>
         </button>
       </div>
-      <div class="cost-badge"><span class="cost-icon">⚡</span> 成本：10 积分/次</div>
+      <div class="cost-badge"><span class="cost-icon">⚡</span> {{ $t('work_pages.model_generate.cost_badge') }}</div>
       <div class="actions">
-        <button class="btn-outline" @click="step = 0">← 返回</button>
-        <button class="btn-primary" @click="submitTask">开始生成</button>
+        <button class="btn-outline" @click="step = 0">{{ $t('work_pages.model_generate.back_btn') }}</button>
+        <button class="btn-primary" @click="submitTask">{{ $t('work_pages.model_generate.start_btn') }}</button>
       </div>
     </div>
 
     <div v-else class="step-content result-step">
       <div v-if="processing" class="processing-card">
         <span class="spinner" />
-        <h4>AI 正在生成模特试穿效果</h4>
-        <p class="hint">预计耗时 10-30 秒，请耐心等待</p>
+        <h4>{{ $t('work_pages.model_generate.processing_title') }}</h4>
+        <p class="hint">{{ $t('work_pages.model_generate.processing_hint') }}</p>
       </div>
       <div v-if="resultUrl && !processing" class="result-display">
         <div class="compare-row">
-          <div class="compare-item"><p class="compare-label">原图</p><img loading="lazy" :src="previewUrl" alt="original" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" /></div>
+          <div class="compare-item"><p class="compare-label">{{ $t('work_pages.model_generate.original_img') }}</p><img loading="lazy" :src="previewUrl" alt="original" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" /></div>
           <span class="compare-arrow">→</span>
-          <div class="compare-item"><p class="compare-label">试穿效果</p><img loading="lazy" :src="resultUrl" alt="result" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" /></div>
+          <div class="compare-item"><p class="compare-label">{{ $t('work_pages.model_generate.result_label') }}</p><img loading="lazy" :src="resultUrl" alt="result" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" /></div>
         </div>
         <div class="result-actions">
-          <button class="btn-primary" @click="downloadImage">下载图片</button>
-          <button class="btn-outline" @click="resetAll">重新生成</button>
+          <button class="btn-primary" @click="downloadImage">{{ $t('work_pages.model_generate.download_btn') }}</button>
+          <button class="btn-outline" @click="resetAll">{{ $t('work_pages.model_generate.redo_btn') }}</button>
         </div>
       </div>
     </div>
@@ -59,17 +59,18 @@
 
 const { createBlobUrl, revoke } = useBlobUrl()
 
+const steps = computed(() => [t('work_pages.model_generate.step_upload'), t('work_pages.model_generate.step_select_model'), t('work_pages.model_generate.step_generate')])
 const step = ref(0)
 const previewUrl = ref(''); const uploadedUrl = ref(''); const uploading = ref(false)
 const processing = ref(false); const resultUrl = ref('')
 const selectedModel = ref('asian_female')
 const fileInput = ref<HTMLInputElement | null>(null)
-const models = [
-  { id: 'asian_female', name: '亚洲女性', icon: '👩', desc: '自然肤色优雅气质' },
-  { id: 'asian_male', name: '亚洲男性', icon: '👨', desc: '阳光活力商务范' },
-  { id: 'western_female', name: '欧美女性', icon: '👩‍🦰', desc: '高挑气场时尚感' },
-  { id: 'western_male', name: '欧美男性', icon: '👨‍🦰', desc: '健硕硬朗稳重感' },
-]
+const models = computed(() => [
+  { id: 'asian_female', name: t('work_pages.model_generate.model_asian_female'), icon: '👩', desc: t('work_pages.model_generate.model_asian_female_desc') },
+  { id: 'asian_male', name: t('work_pages.model_generate.model_asian_male'), icon: '👨', desc: t('work_pages.model_generate.model_asian_male_desc') },
+  { id: 'western_female', name: t('work_pages.model_generate.model_western_female'), icon: '👩‍🦰', desc: t('work_pages.model_generate.model_western_female_desc') },
+  { id: 'western_male', name: t('work_pages.model_generate.model_western_male'), icon: '👨‍🦰', desc: t('work_pages.model_generate.model_western_male_desc') },
+])
 
 const toast = useToast()
 async function handleFile(e: Event) {

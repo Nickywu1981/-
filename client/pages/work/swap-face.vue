@@ -1,60 +1,60 @@
 <template>
-  <WorkLayout title="AI换脸" :steps="['上传底图', '上传人脸', '生成']" :current-step="step">
+  <WorkLayout :title="$t('work_pages.swap_face.title')" :steps="steps" :current-step="step">
     <div v-if="step === 0" class="step-content">
-      <h3 class="step-title">上传底图（将被替换脸部）</h3>
-      <p class="step-desc">上传商品模特图，AI 将精准替换为指定人物脸部，保留原图光影和色调</p>
+      <h3 class="step-title">{{ $t('work_pages.swap_face.base_title') }}</h3>
+      <p class="step-desc">{{ $t('work_pages.swap_face.base_desc') }}</p>
       <div class="dropzone" :class="{ 'has-file': previewUrl }" @dragover.prevent @drop.prevent="handleDrop">
         <template v-if="!previewUrl">
           <span class="dz-icon">😊</span>
-          <p class="dz-label">拖拽或点击上传底图</p>
-          <p class="dz-hint">支持商品模特图、人物照片</p>
+          <p class="dz-label">{{ $t('work_pages.swap_face.drop_label') }}</p>
+          <p class="dz-hint">{{ $t('work_pages.swap_face.drop_hint') }}</p>
           <input ref="fileInput" type="file" accept="image/*" hidden @change="handleFile" />
-          <button class="btn-outline-sm" @click="fileInput?.click()">选择底图</button>
+          <button class="btn-outline-sm" @click="fileInput?.click()">{{ $t('work_pages.swap_face.select_base') }}</button>
         </template>
         <img loading="lazy" v-else :src="previewUrl" alt="preview" class="preview-img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
       </div>
-      <p v-if="uploading" class="upload-status"><span class="spinner-sm" /> 上传中...</p>
-      <button v-if="uploadedUrl" class="btn-primary" @click="step = 1">下一步：上传目标人脸 →</button>
+      <p v-if="uploading" class="upload-status"><span class="spinner-sm" /> {{ $t('work_pages.swap_face.uploading') }}</p>
+      <button v-if="uploadedUrl" class="btn-primary" @click="step = 1">{{ $t('work_pages.swap_face.next_face') }}</button>
     </div>
 
     <div v-else-if="step === 1" class="step-content">
-      <h3 class="step-title">上传目标人脸图片</h3>
-      <p class="step-desc">清晰正面照效果最佳，AI 自动检测人脸关键点并精准替换</p>
+      <h3 class="step-title">{{ $t('work_pages.swap_face.face_title') }}</h3>
+      <p class="step-desc">{{ $t('work_pages.swap_face.face_desc') }}</p>
       <div class="dropzone" :class="{ 'has-file': facePreviewUrl }" @dragover.prevent @drop.prevent="handleFaceDrop">
         <template v-if="!facePreviewUrl">
           <span class="dz-icon">👤</span>
-          <p class="dz-label">拖拽或点击上传人脸照片</p>
-          <p class="dz-hint">清晰正面照效果最佳</p>
+          <p class="dz-label">{{ $t('work_pages.swap_face.face_drop_label') }}</p>
+          <p class="dz-hint">{{ $t('work_pages.swap_face.face_drop_hint') }}</p>
           <input ref="faceInput" type="file" accept="image/*" hidden @change="handleFaceFile" />
-          <button class="btn-outline-sm" @click="faceInput?.click()">选择人脸</button>
+          <button class="btn-outline-sm" @click="faceInput?.click()">{{ $t('work_pages.swap_face.select_face') }}</button>
         </template>
         <img loading="lazy" v-else :src="facePreviewUrl" alt="face" class="preview-img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
       </div>
-      <div class="cost-badge"><span class="cost-icon">⚡</span> 成本：8 积分/次</div>
+      <div class="cost-badge"><span class="cost-icon">⚡</span> {{ $t('work_pages.swap_face.cost_badge') }}</div>
       <div class="actions">
-        <button class="btn-outline" @click="step = 0">← 返回</button>
-        <button v-if="faceUploadedUrl" class="btn-primary" @click="submitTask">开始换脸</button>
-        <button v-else class="btn-primary" disabled>请先上传人脸图片</button>
+        <button class="btn-outline" @click="step = 0">{{ $t('work_pages.swap_face.back_btn') }}</button>
+        <button v-if="faceUploadedUrl" class="btn-primary" @click="submitTask">{{ $t('work_pages.swap_face.start_swap') }}</button>
+        <button v-else class="btn-primary" disabled>{{ $t('work_pages.swap_face.upload_face_first') }}</button>
       </div>
     </div>
 
     <div v-else class="step-content result-step">
       <div v-if="processing" class="processing-card">
         <span class="spinner" />
-        <h4>AI 正在处理换脸</h4>
-        <p class="hint">面部融合 + 光影匹配处理中，预计 10-20 秒</p>
+        <h4>{{ $t('work_pages.swap_face.processing_title') }}</h4>
+        <p class="hint">{{ $t('work_pages.swap_face.processing_hint') }}</p>
       </div>
       <div v-if="resultUrl && !processing" class="result-display">
         <div class="compare-row">
-          <div class="compare-item"><p class="compare-label">原底图</p><img loading="lazy" :src="previewUrl" alt="original" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" /></div>
+          <div class="compare-item"><p class="compare-label">{{ $t('work_pages.swap_face.original_base') }}</p><img loading="lazy" :src="previewUrl" alt="original" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" /></div>
           <span class="compare-arrow">+</span>
-          <div class="compare-item"><p class="compare-label">目标人脸</p><img loading="lazy" :src="facePreviewUrl" alt="face" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" /></div>
+          <div class="compare-item"><p class="compare-label">{{ $t('work_pages.swap_face.target_face') }}</p><img loading="lazy" :src="facePreviewUrl" alt="face" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" /></div>
           <span class="compare-arrow">→</span>
-          <div class="compare-item"><p class="compare-label">换脸结果</p><img loading="lazy" :src="resultUrl" alt="result" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" /></div>
+          <div class="compare-item"><p class="compare-label">{{ $t('work_pages.swap_face.swap_result') }}</p><img loading="lazy" :src="resultUrl" alt="result" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" /></div>
         </div>
         <div class="result-actions">
-          <button class="btn-primary" @click="downloadImage">下载图片</button>
-          <button class="btn-outline" @click="resetAll">重新换脸</button>
+          <button class="btn-primary" @click="downloadImage">{{ $t('work_pages.swap_face.download_btn') }}</button>
+          <button class="btn-outline" @click="resetAll">{{ $t('work_pages.swap_face.re_swap') }}</button>
         </div>
       </div>
     </div>
@@ -65,6 +65,7 @@
 
 const { createBlobUrl, revoke } = useBlobUrl()
 
+const steps = computed(() => [t('work_pages.swap_face.step_upload_base'), t('work_pages.swap_face.step_upload_face'), t('work_pages.swap_face.step_generate')])
 const step = ref(0)
 const previewUrl = ref(''); const uploadedUrl = ref(''); const uploading = ref(false)
 const facePreviewUrl = ref(''); const faceUploadedUrl = ref('')
@@ -143,7 +144,7 @@ async function submitTask() {
     const res: any = await $fetch('/api/advanced/swap-face', { method: 'POST', body: { base_url: uploadedUrl.value, face_url: faceUploadedUrl.value } })
     resultUrl.value = res.data?.result_url || res.result_url
   } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
-    toast.error(e?.data?.msg || e?.message || '换脸失败，请重试')
+    toast.error(e?.data?.msg || e?.message || t('work_pages.swap_face.failed'))
     step.value = 1
   } finally { processing.value = false }
 }
