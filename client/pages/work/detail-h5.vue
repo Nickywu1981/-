@@ -171,11 +171,11 @@ const templatesList = computed(() => [
   { id: 'spec', name: t('work_pages.detail_h5.template_spec'), style: t('work_pages.detail_h5.template_spec_style') },
   { id: 'promo', name: t('work_pages.detail_h5.template_promo'), style: t('work_pages.detail_h5.template_promo_style') },
 ]);
-const platforms = [
-  { code: 'taobao', name: '淘宝' }, { code: 'pdd', name: '拼多多' }, { code: 'douyin', name: '抖音' },
-  { code: 'amazon', name: '亚马逊' }, { code: 'tiktok', name: 'TikTok Shop' },
+const platforms = computed(() => [
+  { code: 'taobao', name: t('work_pages.main_image_platform_taobao') }, { code: 'pdd', name: t('work_pages.main_image_platform_pdd') }, { code: 'douyin', name: t('work_pages.main_image_platform_douyin') },
+  { code: 'amazon', name: t('work_pages.main_image_platform_amazon') }, { code: 'tiktok', name: 'TikTok Shop' },
   { code: 'shopee', name: 'Shopee' }, { code: 'lazada', name: 'Lazada' },
-];
+]);
 
 const allUploaded = computed(() => skuList.value.length > 0 && skuList.value.every(s => s.uploaded));
 const categoryLabel = computed(() => categories.value.find(c => c.id === selectedCategory.value)?.name || t('work_pages.detail_h5.none_selected'));

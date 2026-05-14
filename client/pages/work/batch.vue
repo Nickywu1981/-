@@ -173,10 +173,10 @@ const operations = computed(() => [
   { id: 'scene', name: t('work_pages.batch.op_scene'), icon: '🖼', cost: '2' },
   { id: 'img2video', name: t('work_pages.batch.op_video'), icon: '🎬', cost: '10' },
 ]);
-const platforms = [
-  { code: 'taobao', name: '淘宝' }, { code: 'pdd', name: '拼多多' }, { code: 'douyin', name: '抖音' },
-  { code: 'amazon', name: '亚马逊' }, { code: 'tiktok', name: 'TikTok Shop' },
-];
+const platforms = computed(() => [
+  { code: 'taobao', name: t('work_pages.main_image_platform_taobao') }, { code: 'pdd', name: t('work_pages.main_image_platform_pdd') }, { code: 'douyin', name: t('work_pages.main_image_platform_douyin') },
+  { code: 'amazon', name: t('work_pages.main_image_platform_amazon') }, { code: 'tiktok', name: 'TikTok Shop' },
+]);
 
 const operationLabel = computed(() => operations.value.find((o) => o.id === selectedOp.value)?.name || selectedOp.value);
 const baseCost = computed(() => {
