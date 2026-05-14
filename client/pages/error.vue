@@ -42,11 +42,11 @@ const states = computed(() => ({
 }));
 
 const code = computed(() => error?.statusCode || 404);
-const s = computed(() => states[code.value] || states[404]);
-const icon = computed(() => s.value.icon);
-const title = computed(() => s.value.title);
-const desc = computed(() => s.value.desc);
-const backLabel = computed(() => s.value.back);
+const state = computed(() => states.value[code.value] || states.value[404]);
+const icon = computed(() => state.value.icon);
+const title = computed(() => state.value.title);
+const desc = computed(() => state.value.desc);
+const backLabel = computed(() => state.value.back);
 
 function goBack() {
   if (!process.client) return
