@@ -155,6 +155,8 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue';
 
+definePageMeta({ layout: 'platform-admin', middleware: ['auth'] })
+
 const { t } = useI18n();
 
 const workflows = ref([]);

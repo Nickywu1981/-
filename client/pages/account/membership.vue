@@ -100,6 +100,8 @@
 
 <script setup lang="ts">
 
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
+
 const currentPlan = ref<any>(null);
 const autoRenew = ref(false);
 const toast = useToast()

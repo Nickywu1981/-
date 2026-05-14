@@ -264,6 +264,8 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue';
 
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
+
 const { $api, $t } = useNuxtApp();
 const { sanitize } = useSanitizeHtml();
 

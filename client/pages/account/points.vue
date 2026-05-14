@@ -86,6 +86,8 @@
 
 <script setup lang="ts">
 
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
+
 import { formatDateTime } from '@/utils/format'
 
 const toast = useToast()

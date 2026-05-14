@@ -51,6 +51,8 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 
+definePageMeta({ layout: 'platform-admin', middleware: ['auth'] })
+
 const models = ref([]);
 const filterCategory = ref('');
 const categories = [
