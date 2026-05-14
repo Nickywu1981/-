@@ -1,6 +1,12 @@
 import pool from './db.js';
 import { parsePagination } from '../utils/pagination.js';
 
+const TYPE_GROUPS = {
+  image: ['main_image', 'scene', 'detail_h5', 'virtual_tryon', 'color_swap', 'style_transfer', 'wrinkle_remove', 'image_translate'],
+  video: ['img2video', 'multi2video', 'video_packaging', 'action_transfer', 'person_replace', 'digital_human', 'action_batch', 'video_beautify', 'script_gen', 'shot_plan', 'viral_clone'],
+  batch: ['batch'],
+};
+
 // ==================== 会员套餐更新 ====================
 
 export async function updateMembership(userId, planType, credits, endTime, conn) {
@@ -67,56 +73,11 @@ export async function getDashboardStats() {
     ),
   ]);
 
-  // 任务类型分布（饼图）
-  const [taskDistribution] = await pool.execute(
-    `SELECT t.type, COUNT(*) AS count FROM task t
-     WHERE t.create_time >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
-     GROUP BY t.type ORDER BY count DESC`,
-  );
-  const typeLabelMap = {
-    main_image: '主图', scene: '场景', detail_h5: '详情页', virtual_tryon: '虚拟试穿',
-    color_swap: '换色', style_transfer: '风格迁移', image_translate: '图片翻译',
-    img2video: '图生视频', multi2video: '多图生视频', video_packaging: '视频打包',
-    action_transfer: '动作迁移', person_replace: '人物替换', digital_human: '数字人',
-    action_batch: '批量动作', video_beautify: '视频美化', batch: '批量任务', other: '其他',
-  };
-  const colorPalette = ['#3B82F6', '#22C55E', '#F59E0B', '#7C3AED', '#EC4899', '#06B6D4', '#F97316', '#8B5CF6', '#14B8A6', '#E11D48'];
-  const dist = (taskDistribution || []).map((r, i) => ({
-    label: typeLabelMap[r.type] || r.type || '其他',
-    value: Number(r.count),
-    color: colorPalette[i % colorPalette.length],
-  }));
-
-  // 热门功能（30天任务类型 Top 5）
-  const popularFeatures = (taskDistribution || []).slice(0, 5).map(r => ({
-    label: typeLabelMap[r.type] || r.type || '其他',
-    value: Number(r.count),
-  }));
-
-  // 模型用量分布（30天）
-  const [modelUsage] = await pool.execute(
-    `SELECT model_name, COUNT(*) AS count, COALESCE(SUM(total_tokens), 0) AS tokens
-     FROM ai_call_log WHERE create_time >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
-     GROUP BY model_name ORDER BY tokens DESC`,
-  );
-  const modelColorMap = { 'gpt-4o': '#7C3AED', 'gpt-4o-mini': '#A78BFA', 'claude': '#3B82F6', 'claude-3': '#60A5FA',
-    'gpt-image-2': '#22C55E', 'sd': '#F97316', 'stability': '#F59E0B', 'sd-xl': '#EC4899',
-    'cogvideo': '#06B6D4', 'seedance': '#8B5CF6', 'edge-tts': '#14B8A6',
-  };
-  const models = (modelUsage || []).map(r => ({
-    label: r.model_name || 'unknown',
-    value: Number(r.count),
-    tokens: Number(r.tokens),
-    color: modelColorMap[r.model_name] || '#94A3B8',
-  }));
-
   return {
     userCount, taskCount, todayTaskCount, paidUserCount, totalRevenue: Math.abs(totalRevenue),
     taskTrend, userTrend, revenueTrend,
-    taskDistribution: dist.length ? dist : undefined,
-    popularFeatures: popularFeatures.length ? popularFeatures : undefined,
-    modelUsage: models.length ? models : undefined,
   };
+}
 }
 
 // ==================== 用户管理 ====================
@@ -255,12 +216,7 @@ export async function listAllTasks({ offset, pageSize, userId, status, type, typ
   if (status !== undefined && status !== '') { sql += ' AND t.status = ?'; params.push(Number(status)); }
   if (type) { sql += ' AND t.type = ?'; params.push(type); }
   if (typeGroup) {
-    const groups = {
-      image: ['main_image', 'scene', 'detail_h5', 'virtual_tryon', 'color_swap', 'style_transfer', 'wrinkle_remove', 'image_translate'],
-      video: ['img2video', 'multi2video', 'video_packaging', 'action_transfer', 'person_replace', 'digital_human', 'action_batch', 'video_beautify', 'script_gen', 'shot_plan', 'viral_clone'],
-      batch: ['batch'],
-    };
-    const types = groups[typeGroup];
+    const types = TYPE_GROUPS[typeGroup];
     if (types) { sql += ` AND t.type IN (${types.map(() => '?').join(',')})`; params.push(...types); }
   }
   if (reviewStatus !== undefined && reviewStatus !== '') { sql += ' AND t.review_status = ?'; params.push(Number(reviewStatus)); }
@@ -275,12 +231,7 @@ export async function listAllTasks({ offset, pageSize, userId, status, type, typ
   if (status !== undefined && status !== '') { countSql += ' AND t.status = ?'; countParams.push(Number(status)); }
   if (type) { countSql += ' AND t.type = ?'; countParams.push(type); }
   if (typeGroup) {
-    const groups = {
-      image: ['main_image', 'scene', 'detail_h5', 'virtual_tryon', 'color_swap', 'style_transfer', 'wrinkle_remove', 'image_translate'],
-      video: ['img2video', 'multi2video', 'video_packaging', 'action_transfer', 'person_replace', 'digital_human', 'action_batch', 'video_beautify', 'script_gen', 'shot_plan', 'viral_clone'],
-      batch: ['batch'],
-    };
-    const types = groups[typeGroup];
+    const types = TYPE_GROUPS[typeGroup];
     if (types) { countSql += ` AND t.type IN (${types.map(() => '?').join(',')})`; countParams.push(...types); }
   }
   if (reviewStatus !== undefined && reviewStatus !== '') { countSql += ' AND t.review_status = ?'; countParams.push(Number(reviewStatus)); }
@@ -383,12 +334,6 @@ export async function listAllOrders({ offset, pageSize, userId, planType }) {
   let sql = `
     SELECT cr.id, cr.user_id, u.username, u.nickname, cr.action, cr.credit_before, cr.credit_after,
            cr.consumed, cr.remark, cr.create_time,
-           CASE cr.action
-             WHEN 'purchase_plan_1' THEN '月卡'
-             WHEN 'purchase_plan_2' THEN '季卡'
-             WHEN 'purchase_plan_3' THEN '年卡'
-             ELSE ''
-           END AS plan_name,
            CAST(SUBSTRING_INDEX(cr.action, '_', -1) AS UNSIGNED) AS plan_type
     FROM consumption_record cr
     LEFT JOIN user u ON u.id = cr.user_id

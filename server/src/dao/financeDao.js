@@ -174,8 +174,9 @@ export async function listWithdrawals(tenantId, { page = 1, pageSize = 20, statu
   return { list: rows, total, page, pageSize };
 }
 
-export async function createWithdrawal(data) {
-  const [result] = await pool.query('INSERT INTO withdrawal_order SET ?', {
+export async function createWithdrawal(data, conn) {
+  const db = conn || pool;
+  const [result] = await db.query('INSERT INTO withdrawal_order SET ?', {
     order_no: data.orderNo,
     tenant_id: data.tenantId,
     user_id: data.userId,
