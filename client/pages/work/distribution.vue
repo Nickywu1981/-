@@ -115,7 +115,7 @@ const onFiles = (e: Event) => {
 const toast = useToast()
 
 const publish = async () => {
-  if (!form.title) return toast.warn('请输入标题')
+  if (!form.title) return toast.warn(t('common.enter_title'))
   submitting.value = true
   try {
     const fd = new FormData()

@@ -96,7 +96,7 @@ async function uploadFile(file: File) {
 async function onFileChange(e: Event) {
   const file = (e.target as HTMLInputElement).files?.[0]
   if (!file) return
-  if (file.size > 10 * 1024 * 1024) { toast.error('图片不能超过10MB'); return }
+  if (file.size > 10 * 1024 * 1024) { toast.error(t('common.image_size_limit')); return }
   try {
     const url = await uploadFile(file)
     previewUrl.value = url

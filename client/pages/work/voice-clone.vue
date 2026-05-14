@@ -99,8 +99,8 @@ function handleDrop(e: DragEvent) {
 }
 
 async function handleGenerate() {
-  if (!uploadedUrl.value) { toast.warn('请上传音频样本'); return }
-  if (!text.value.trim()) { toast.warn('请输入文本内容'); return }
+  if (!uploadedUrl.value) { toast.warn(t('common.upload_audio_sample')); return }
+  if (!text.value.trim()) { toast.warn(t('common.enter_text_content')); return }
   submitting.value = true
   try {
     const res: any = await $fetch('/api/adv-video/voice-clone', {

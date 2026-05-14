@@ -55,7 +55,7 @@ const logoInput = ref<HTMLInputElement | null>(null)
 const logoUploading = ref(false)
 
 const saveSettings = async () => {
-  if (!form.brandName.trim()) { toast.warn('请输入品牌名称'); return }
+  if (!form.brandName.trim()) { toast.warn(t('common.enter_brand_name')); return }
   task.status = 1
   task.progressMsg = '保存中...'
   errorMsg.value = ''

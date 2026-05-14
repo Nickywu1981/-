@@ -142,10 +142,10 @@ function processFile(filePath) {
     const esc = escapeRegExp(chinese);
 
     const toastPatterns = [
-      new RegExp(`(toast\\.(?:error|success|warning|info)\\()'${esc}'(\\))`, 'g'),
-      new RegExp(`(toast\\.(?:error|success|warning|info)\\()"${esc}"(\\))`, 'g'),
-      new RegExp(`(useToast\\(\\)\\.(?:error|success|warning|info)\\()'${esc}'(\\))`, 'g'),
-      new RegExp(`(useToast\\(\\)\\.(?:error|success|warning|info)\\()"${esc}"(\\))`, 'g'),
+      new RegExp(`(toast\\.(?:error|success|warn(?:ing)?|info)\\()'${esc}'(\\))`, 'g'),
+      new RegExp(`(toast\\.(?:error|success|warn(?:ing)?|info)\\()"${esc}"(\\))`, 'g'),
+      new RegExp(`(useToast\\(\\)\\.(?:error|success|warn(?:ing)?|info)\\()'${esc}'(\\))`, 'g'),
+      new RegExp(`(useToast\\(\\)\\.(?:error|success|warn(?:ing)?|info)\\()"${esc}"(\\))`, 'g'),
     ];
 
     for (const pattern of toastPatterns) {

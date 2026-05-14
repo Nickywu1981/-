@@ -88,7 +88,7 @@ async function handleDrop(e: DragEvent) {
 }
 
 async function submitTask() {
-  if (!uploadedUrl.value) { toast.warn('请先上传图片'); return; }
+  if (!uploadedUrl.value) { toast.warn(t('common.upload_image_first')); return; }
   step.value = 2;
   try {
     const res = await $fetch('/api/advanced/style-transfer', {

@@ -123,7 +123,7 @@ async function handleDrop(e: DragEvent, type: string) {
 }
 
 async function submitTask() {
-  if (!uploadedRefUrl.value || !uploadedProductUrl.value) { toast.warn('请先上传素材'); return; }
+  if (!uploadedRefUrl.value || !uploadedProductUrl.value) { toast.warn(t('common.upload_material_first')); return; }
   if (submitting.value) return;
   submitting.value = true; step.value = 2;
   try {

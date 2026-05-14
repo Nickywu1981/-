@@ -141,7 +141,7 @@ async function handleDrop(e: DragEvent, type: string) {
 }
 
 async function submitTask() {
-  if (!uploadedSourceUrl.value || !uploadedTargetUrl.value) { toast.warn('请先上传图片'); return }
+  if (!uploadedSourceUrl.value || !uploadedTargetUrl.value) { toast.warn(t('common.upload_image_first')); return }
   currentStep.value = 2
   try {
     const res = await $fetch('/api/videos/person-replace', {

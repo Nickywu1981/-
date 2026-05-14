@@ -126,7 +126,7 @@ async function handleDrop(e: DragEvent) {
 }
 
 async function submitRetouch() {
-  if (!uploadedUrl.value) { toast.warn('请先上传图片'); return }
+  if (!uploadedUrl.value) { toast.warn(t('common.upload_image_first')); return }
   submitting.value = true
   try {
     const res: any = await $fetch('/api/images/retouch', {

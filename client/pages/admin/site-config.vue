@@ -118,7 +118,7 @@ async function save(item: any) {
 }
 
 async function addConfig() {
-  if (!newConfig.key || !newConfig.value) return toast.warn('键名和值不能为空');
+  if (!newConfig.key || !newConfig.value) return toast.warn(t('common.key_value_required'));
   adding.value = true;
   try {
     await $fetch('/api/admin/site-config', {

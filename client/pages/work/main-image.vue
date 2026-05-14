@@ -153,7 +153,7 @@ async function handleDrop(e: DragEvent) {
 }
 
 async function submitTask() {
-  if (!uploadedUrl.value) { toast.warn('请先上传图片'); return; }
+  if (!uploadedUrl.value) { toast.warn(t('common.upload_image_first')); return; }
   try {
     const res = await $fetch('/api/images/main-image', {
       method: 'POST',

@@ -50,7 +50,7 @@ function downloadItem(item: any) {
 
 function exportAll() {
   const downloadable = items.value.filter(i => i.result_url)
-  if (!downloadable.length) { toast.warn('没有可下载的作品'); return }
+  if (!downloadable.length) { toast.warn(t('common.no_downloadable_works')); return }
   toast.info(`正在导出 ${downloadable.length} 个文件...`)
   downloadable.forEach((item, i) => {
     const tid = setTimeout(() => downloadItem(item), i * 300)

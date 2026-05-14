@@ -88,7 +88,7 @@ const toast = useToast()
 const submitting = ref(false)
 
 async function submitTask() {
-  if (!scriptText.value.trim()) { toast.warn('请输入脚本内容'); return }
+  if (!scriptText.value.trim()) { toast.warn(t('common.enter_script_content')); return }
   currentStep.value = 2
   submitting.value = true
   try {

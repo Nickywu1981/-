@@ -99,7 +99,7 @@ function search() { page.value = 1; fetch() }
 function onPageChange(p: number) { page.value = p; fetch() }
 
 async function confirmSend() {
-  if (!sendDialog.userId || !sendDialog.title || !sendDialog.content) { toast.warn('请填写完整信息'); return }
+  if (!sendDialog.userId || !sendDialog.title || !sendDialog.content) { toast.warn(t('common.fill_all_fields')); return }
   try {
     const data = await $fetch('/api/notifications/send', { method: 'POST', credentials: 'include', body: { userId: +sendDialog.userId, type: sendDialog.type, title: sendDialog.title, content: sendDialog.content } }) as ApiResponse
     if (data?.code === 200) { toast.success(t('common.sent')); sendDialog.open = false; fetch() }

@@ -938,7 +938,17 @@
     "confirm_delete_named": "确定删除 \"{name}\"？",
     "confirm_delete_order": "确认删除订单 #{id}？此操作不可撤销。",
     "confirm_rollback_version": "确定回滚到版本 v{version}？当前未保存的更改将丢失。",
-    "upload_image_first": "请先上传图片"
+    "upload_image_first": "请先上传图片",
+    "enter_brand_name": "请输入品牌名称",
+    "enter_script_content": "请输入脚本内容",
+    "enter_voice_text": "请输入配音文案",
+    "enter_text_content": "请输入文本内容",
+    "upload_audio_sample": "请上传音频样本",
+    "upload_material_first": "请先上传素材",
+    "fill_all_fields": "请填写完整信息",
+    "no_downloadable_works": "没有可下载的作品",
+    "key_value_required": "键名和值不能为空",
+    "image_size_limit": "图片不能超过10MB"
   },
   "ecommerce": {
     "title": "AI 电商内容创作",

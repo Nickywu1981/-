@@ -66,7 +66,7 @@ const voices = [
 ]
 
 async function handleGenerate() {
-  if (!text.value.trim()) { toast.warn('请输入配音文案'); return }
+  if (!text.value.trim()) { toast.warn(t('common.enter_voice_text')); return }
   submitting.value = true
   try {
     const res: any = await $fetch('/api/adv-video/voice-gen', {

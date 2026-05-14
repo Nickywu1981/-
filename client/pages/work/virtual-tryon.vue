@@ -101,7 +101,7 @@ async function handleDrop(e: DragEvent) {
 }
 
 async function submitTask() {
-  if (!uploadedUrl.value) { toast.warn('请先上传图片'); return; }
+  if (!uploadedUrl.value) { toast.warn(t('common.upload_image_first')); return; }
   if (submitting.value) return;
   submitting.value = true;
   step.value = 2;
