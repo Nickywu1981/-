@@ -198,7 +198,7 @@ function exportCSV() {
   downloadBlob(blob, `${t('admin_users.page_title')}_${new Date().toISOString().slice(0, 10)}.csv`)
   toast.success(t('admin_users.export_success'))
 }
-definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'platform-admin', middleware: ['auth'] })
 </script>
 
 <style scoped>

@@ -113,7 +113,7 @@ async function fetchData() {
 
 function onPageChange(p: number) { page.value = p; fetchData() }
 function openDetail(log: any) { detail.value = log }
-definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'platform-admin', middleware: ['auth'] })
 </script>
 
 <style scoped>

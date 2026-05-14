@@ -135,7 +135,7 @@ async function refund(o: any) {
     else { toast.error(res?.msg || t('admin_recharge.refund_failed')) }
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('admin_recharge.refund_failed')) }
 }
-definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'platform-admin', middleware: ['auth'] })
 </script>
 
 <style scoped>

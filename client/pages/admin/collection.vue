@@ -84,7 +84,7 @@ async function deleteItem(id: number) {
 }
 
 onMounted(fetchData)
-definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'platform-admin', middleware: ['auth'] })
 </script>
 <style scoped>
 h2 { font-size: 22px; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; }

@@ -7,5 +7,5 @@
 <script setup lang="ts">
 
 await navigateTo('/admin/dashboard', { replace: true })
-definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'platform-admin', middleware: ['auth'] })
 </script>

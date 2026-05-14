@@ -153,7 +153,7 @@ import { useConfirm } from '~/composables/useConfirm'
 const { t } = useI18n()
 const { confirm } = useConfirm()
 
-definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'platform-admin', middleware: ['auth'] })
 
 const activeTab = ref('nav')
 const loading = ref(false)

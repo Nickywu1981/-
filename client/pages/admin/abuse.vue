@@ -129,7 +129,7 @@ async function checkUser(userId: number) {
 function isBotUA(ua: string) {
   return /python|curl|wget|scrapy|selenium|headless/i.test(ua || '');
 }
-definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'platform-admin', middleware: ['auth'] })
 </script>
 
 <style scoped>

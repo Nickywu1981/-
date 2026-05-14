@@ -71,7 +71,7 @@ async function fetch() {
 }
 function onPageChange(p: number) { page.value = p; fetch() }
 onMounted(fetch)
-definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'platform-admin', middleware: ['auth'] })
 </script>
 
 <style scoped>

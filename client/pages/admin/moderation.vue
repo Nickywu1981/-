@@ -150,7 +150,7 @@ function reviewText(s: number) {
   if (s === 2) return t('admin_moderation.status_rejected');
   return t('admin_moderation.status_pending');
 }
-definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'platform-admin', middleware: ['auth'] })
 </script>
 
 <style scoped>

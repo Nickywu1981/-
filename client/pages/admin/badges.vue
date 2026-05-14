@@ -206,7 +206,7 @@ function categoryLabel(c: string) {
   };
   return map[c] || c;
 }
-definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'platform-admin', middleware: ['auth'] })
 </script>
 
 <style scoped>

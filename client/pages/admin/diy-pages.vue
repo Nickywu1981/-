@@ -217,7 +217,7 @@ async function batchDelete() {
     selectedIds.value = []; fetchData()
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('admin_diy_pages.batch_delete_failed')) }
 }
-definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'platform-admin', middleware: ['auth'] })
 </script>
 
 <style scoped>

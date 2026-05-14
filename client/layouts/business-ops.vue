@@ -38,7 +38,7 @@
           <NuxtLink to="/finance/reconciliation" class="nav-item" active-class="active">
             <i class="icon-bar-chart"></i> 分账对账
           </NuxtLink>
-          <NuxtLink to="/finance/commissions" class="nav-item" active-class="active">
+          <NuxtLink to="/finance/commission-detail" class="nav-item" active-class="active">
             <i class="icon-dollar-sign"></i> 佣金结算
           </NuxtLink>
           <NuxtLink to="/ops/moderation" class="nav-item" active-class="active">

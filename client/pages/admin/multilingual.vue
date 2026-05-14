@@ -161,7 +161,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'platform-admin', middleware: ['auth'] })
 
 const { t } = useI18n()
 

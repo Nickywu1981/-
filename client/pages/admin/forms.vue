@@ -218,7 +218,7 @@ async function delForm(id: number) {
     toast.error(err?.data?.msg || err.message || t('common.failed_delete'))
   }
 }
-definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'platform-admin', middleware: ['auth'] })
 </script>
 
 <style scoped>

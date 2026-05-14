@@ -99,7 +99,7 @@ async function resetBreaker(modelId: string) {
 }
 
 onMounted(fetchStatus)
-definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'platform-admin', middleware: ['auth'] })
 </script>
 
 <style scoped>
