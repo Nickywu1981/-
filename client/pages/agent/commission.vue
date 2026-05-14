@@ -3,37 +3,37 @@
   <div class="pg">
     <div class="page-header">
       <div>
-        <h1 class="page-header-title">佣金明细</h1>
-        <p class="page-header-subtitle">实时分润明细、历史收益趋势</p>
+        <h1 class="page-header-title">{{ $t('agent.commission.title') }}</h1>
+        <p class="page-header-subtitle">{{ $t('agent.commission.subtitle') }}</p>
       </div>
       <div class="page-header-actions">
-        <button class="btn btn-secondary btn-sm">导出报表</button>
+        <button class="btn btn-secondary btn-sm">{{ $t('agent.commission.export_btn') }}</button>
       </div>
     </div>
 
     <div class="stat-grid">
       <div class="stat-card">
         <div class="stat-card-value">¥8,420</div>
-        <div class="stat-card-label">本月佣金</div>
-        <div class="stat-card-trend up">↑ 12% vs 上月</div>
+        <div class="stat-card-label">{{ $t('agent.commission.stat_month') }}</div>
+        <div class="stat-card-trend up">{{ $t('agent.commission.trend_vs_last_month') }}</div>
       </div>
       <div class="stat-card">
         <div class="stat-card-value">¥52,180</div>
-        <div class="stat-card-label">累计佣金</div>
+        <div class="stat-card-label">{{ $t('agent.commission.stat_total') }}</div>
       </div>
       <div class="stat-card">
         <div class="stat-card-value">¥3,150</div>
-        <div class="stat-card-label">待结算</div>
+        <div class="stat-card-label">{{ $t('agent.commission.stat_pending') }}</div>
       </div>
       <div class="stat-card">
         <div class="stat-card-value">¥5,270</div>
-        <div class="stat-card-label">已提现</div>
+        <div class="stat-card-label">{{ $t('agent.commission.stat_withdrawn') }}</div>
       </div>
     </div>
 
     <div class="card" style="margin-top: var(--space-6)">
       <table class="data-table">
-        <thead><tr><th>时间</th><th>来源客户</th><th>业务类型</th><th>订单金额</th><th>分润比例</th><th>佣金</th><th>状态</th></tr></thead>
+        <thead><tr><th>{{ $t('agent.commission.col_time') }}</th><th>{{ $t('agent.commission.col_customer') }}</th><th>{{ $t('agent.commission.col_type') }}</th><th>{{ $t('agent.commission.col_amount') }}</th><th>{{ $t('agent.commission.col_rate') }}</th><th>{{ $t('agent.commission.col_commission') }}</th><th>{{ $t('agent.commission.col_status') }}</th></tr></thead>
         <tbody>
           <tr v-for="c in commissions" :key="c.id">
             <td>{{ c.time }}</td>
@@ -42,7 +42,7 @@
             <td>¥{{ c.amount }}</td>
             <td>{{ c.rate }}%</td>
             <td><strong>¥{{ c.commission }}</strong></td>
-            <td><span class="badge" :class="c.settled ? 'badge-success' : 'badge-warning'">{{ c.settled ? '已结算' : '待结算' }}</span></td>
+            <td><span class="badge" :class="c.settled ? 'badge-success' : 'badge-warning'">{{ c.settled ? $t('agent.commission.status_settled') : $t('agent.commission.status_pending') }}</span></td>
           </tr>
         </tbody>
       </table>

@@ -3,15 +3,15 @@
   <div class="pg">
     <div class="page-header">
       <div>
-        <h1 class="page-header-title">客户管理</h1>
-        <p class="page-header-subtitle">名下客户列表、详情、标签分组</p>
+        <h1 class="page-header-title">{{ $t('agent.customers.title') }}</h1>
+        <p class="page-header-subtitle">{{ $t('agent.customers.subtitle') }}</p>
       </div>
-      <input class="search-input w-220" v-model="search" placeholder="搜索客户..." />
+      <input class="search-input w-220" v-model="search" :placeholder="$t('agent.customers.search_placeholder')" />
     </div>
 
     <div class="card">
       <table class="data-table">
-        <thead><tr><th>客户</th><th>手机号</th><th>注册时间</th><th>累计消费</th><th>订单数</th><th>标签</th></tr></thead>
+        <thead><tr><th>{{ $t('agent.customers.col_customer') }}</th><th>{{ $t('agent.customers.col_phone') }}</th><th>{{ $t('agent.customers.col_date') }}</th><th>{{ $t('agent.customers.col_spent') }}</th><th>{{ $t('agent.customers.col_orders') }}</th><th>{{ $t('agent.customers.col_tags') }}</th></tr></thead>
         <tbody>
           <tr v-for="c in filteredCustomers" :key="c.id">
             <td><strong>{{ c.name }}</strong></td>

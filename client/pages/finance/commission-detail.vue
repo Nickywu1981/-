@@ -3,26 +3,26 @@
   <div class="pg">
     <div class="page-header">
       <div>
-        <h1 class="page-header-title">分佣明细</h1>
-        <p class="page-header-subtitle">代理分佣记录、打款状态</p>
+        <h1 class="page-header-title">{{ $t('finance.commission_detail.title') }}</h1>
+        <p class="page-header-subtitle">{{ $t('finance.commission_detail.subtitle') }}</p>
       </div>
       <div class="page-header-actions">
         <select v-model="month" class="select-sm">
           <option value="2026-05">2026-05</option><option value="2026-04">2026-04</option><option value="2026-03">2026-03</option>
         </select>
-        <button class="btn btn-secondary btn-sm">批量打款</button>
+        <button class="btn btn-secondary btn-sm">{{ $t('finance.commission_detail.batch_pay_btn') }}</button>
       </div>
     </div>
 
     <div class="card">
       <table class="data-table">
-        <thead><tr><th>代理</th><th>等级</th><th>订单数</th><th>业绩金额</th><th>分润比例</th><th>佣金</th><th>打款状态</th></tr></thead>
+        <thead><tr><th>{{ $t('finance.commission_detail.col_agent') }}</th><th>{{ $t('finance.commission_detail.col_level') }}</th><th>{{ $t('finance.commission_detail.col_orders') }}</th><th>{{ $t('finance.commission_detail.col_revenue') }}</th><th>{{ $t('finance.commission_detail.col_rate') }}</th><th>{{ $t('finance.commission_detail.col_commission') }}</th><th>{{ $t('finance.commission_detail.col_status') }}</th></tr></thead>
         <tbody>
           <tr v-for="d in details" :key="d.id">
             <td>{{ d.agent }}</td><td>{{ d.level }}</td><td>{{ d.orders }}</td>
             <td>¥{{ d.revenue.toLocaleString() }}</td><td>{{ d.rate }}%</td>
             <td><strong>¥{{ d.commission.toLocaleString() }}</strong></td>
-            <td><span class="badge" :class="d.paid ? 'badge-success' : 'badge-warning'">{{ d.paid ? '已打款' : '待打款' }}</span></td>
+            <td><span class="badge" :class="d.paid ? 'badge-success' : 'badge-warning'">{{ d.paid ? $t('finance.commission_detail.status_paid') : $t('finance.commission_detail.status_pending') }}</span></td>
           </tr>
         </tbody>
       </table>
