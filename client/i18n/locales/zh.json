@@ -748,6 +748,21 @@
     "close": "关闭",
     "loadFail": "加载失败",
     "processing": "处理中...",
+    "select_file": "选择文件",
+    "next_step": "下一步",
+    "start_generate": "开始生成",
+    "queued": "排队中...",
+    "result_title": "生成结果",
+    "upload_hint": "请上传文件开始",
+    "original_label": "原图",
+    "after_label": "结果",
+    "redo": "重新生成",
+    "failed_upload": "上传失败，请重试",
+    "failed_task": "任务执行失败",
+    "failed_process": "处理失败，请重试",
+    "missing_required": "请填写必填项",
+    "cost_points": "{count} 积分",
+    "uploading": "上传中...",
     "saving": "保存中...",
     "request_failed": "请求失败",
     "too_many_requests": "请求过于频繁，请稍后再试",
@@ -7931,5 +7946,50 @@
     "prev_page": "上一页",
     "next_page": "下一页",
     "load_failed": "加载失败"
+  },
+  "mediaUpload": {
+    "dragHint": "拖拽文件到此处或点击选择",
+    "btnUpload": "开始上传",
+    "uploading": "上传中...",
+    "uploadSuccess": "上传成功",
+    "uploadError": "上传失败，请重试",
+    "partialError": "部分文件上传失败，请重试",
+    "resumeHint": "检测到未完成的上传，是否继续？",
+    "btnResume": "继续上传",
+    "pending": "等待中",
+    "removeFile": "移除文件",
+    "maxSize": "最大 {size}MB",
+    "maxCount": "最多 {count} 个文件",
+    "imageFormats": "图片 (JPG/PNG/WebP)",
+    "videoFormats": "视频 (MP4/MOV/WebM)",
+    "fileTooLarge": "文件 {name} 超过大小限制"
+  },
+  "versionHistory": {
+    "title": "版本历史",
+    "loading": "加载中...",
+    "empty": "暂无版本记录",
+    "latest": "最新",
+    "diffTitle": "差异对比",
+    "emptyValue": "空",
+    "compareSelected": "对比选中版本",
+    "rollbackTo": "回滚到此版本",
+    "close": "关闭"
+  },
+  "quickSave": {
+    "saved": "已收藏",
+    "saveToCollection": "收藏到合集",
+    "save": "收藏",
+    "unsaved": "已取消收藏",
+    "saveSuccess": "已收藏",
+    "operationFailed": "操作失败"
+  },
+  "autoSave": {
+    "justSaved": "刚刚保存",
+    "secondsAgo": "{n}秒前",
+    "minutesAgo": "{n}分钟前"
+  },
+  "smartRecognition": {
+    "otherCategory": "其他",
+    "recognitionFailed": "识别失败"
   }
 }

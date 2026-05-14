@@ -749,6 +749,21 @@
     "close": "Close",
     "loadFail": "Failed to load",
     "processing": "Processing...",
+    "select_file": "Select File",
+    "next_step": "Next Step",
+    "start_generate": "Start Generate",
+    "queued": "Queued...",
+    "result_title": "Result",
+    "upload_hint": "Upload a file to start",
+    "original_label": "Original",
+    "after_label": "Result",
+    "redo": "Redo",
+    "failed_upload": "Upload failed, please retry",
+    "failed_task": "Task failed",
+    "failed_process": "Process failed, please retry",
+    "missing_required": "Please fill in required fields",
+    "cost_points": "{count} Credits",
+    "uploading": "Uploading...",
     "saving": "[EN] 保存中...",
     "request_failed": "Request failed",
     "too_many_requests": "Too many requests, please try again later",
@@ -8113,5 +8128,50 @@
     "prev_page": "Previous",
     "next_page": "Next",
     "load_failed": "Load failed"
+  },
+  "mediaUpload": {
+    "dragHint": "Drag files here or click to select",
+    "btnUpload": "Upload",
+    "uploading": "Uploading...",
+    "uploadSuccess": "Upload successful",
+    "uploadError": "Upload failed, please retry",
+    "partialError": "Some files failed to upload, please retry",
+    "resumeHint": "Incomplete upload detected, resume?",
+    "btnResume": "Resume",
+    "pending": "Pending",
+    "removeFile": "Remove file",
+    "maxSize": "Max {size}MB",
+    "maxCount": "Max {count} files",
+    "imageFormats": "Images (JPG/PNG/WebP)",
+    "videoFormats": "Videos (MP4/MOV/WebM)",
+    "fileTooLarge": "File {name} exceeds size limit"
+  },
+  "versionHistory": {
+    "title": "Version History",
+    "loading": "Loading...",
+    "empty": "No version records",
+    "latest": "Latest",
+    "diffTitle": "Diff Comparison",
+    "emptyValue": "Empty",
+    "compareSelected": "Compare Selected",
+    "rollbackTo": "Rollback to This Version",
+    "close": "Close"
+  },
+  "quickSave": {
+    "saved": "Saved",
+    "saveToCollection": "Save to Collection",
+    "save": "Save",
+    "unsaved": "Removed from collection",
+    "saveSuccess": "Saved",
+    "operationFailed": "Operation failed"
+  },
+  "autoSave": {
+    "justSaved": "Just saved",
+    "secondsAgo": "{n}s ago",
+    "minutesAgo": "{n}min ago"
+  },
+  "smartRecognition": {
+    "otherCategory": "Other",
+    "recognitionFailed": "Recognition failed"
   }
 }

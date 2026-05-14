@@ -32,7 +32,7 @@
         <svg class="upload-icon" viewBox="0 0 24 24" width="48" height="48">
           <path fill="currentColor" d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z" opacity="0.6"/>
         </svg>
-        <p class="hint-text">{{ config.drag_hint || '拖拽文件到此处或点击选择' }}</p>
+        <p class="hint-text">{{ $t('mediaUpload.dragHint') }}</p>
         <p class="hint-extra">
           {{ formatHint }}
         </p>
@@ -55,14 +55,14 @@
         <!-- 状态标记 -->
         <span v-if="file.status === 'done'" class="status done">✓</span>
         <span v-else-if="file.status === 'error'" class="status error">✗</span>
-        <span v-else-if="file.status === 'pending'" class="status pending">等待中</span>
+        <span v-else-if="file.status === 'pending'" class="status pending">{{ $t('mediaUpload.pending') }}</span>
 
         <!-- 移除按钮 -->
         <button
           v-if="file.status !== 'uploading'"
           class="btn-remove"
           @click.stop="removeFile(idx)"
-          aria-label="移除文件"
+          :aria-label="$t('mediaUpload.removeFile')"
         >×</button>
       </div>
     </div>
@@ -74,14 +74,14 @@
         :disabled="uploading"
         @click="startUpload"
       >
-        {{ uploading ? (config.uploading || '上传中...') : (config.btn_upload || '开始上传') }}
+        {{ uploading ? $t('mediaUpload.uploading') : $t('mediaUpload.btnUpload') }}
       </button>
     </div>
 
     <!-- 断点续传提示 -->
     <div v-if="hasResume" class="resume-banner">
-      {{ config.resume_hint || '检测到未完成的上传，是否继续？' }}
-      <button class="btn-resume" @click="resumeUpload">继续上传</button>
+      {{ $t('mediaUpload.resumeHint') }}
+      <button class="btn-resume" @click="resumeUpload">{{ $t('mediaUpload.btnResume') }}</button>
     </div>
   </div>
 </template>
@@ -89,6 +89,7 @@
 <script setup lang="ts">
 
 const toast = useToast()
+const { t } = useI18n()
 
 const props = defineProps({
   accept: { type: String as PropType<'image' | 'video' | 'all'>, default: 'all' },
@@ -105,16 +106,6 @@ const CHUNK_SIZE = 5 * 1024 * 1024 // 5MB
 
 const apiBase = useRuntimeConfig().public.apiBase || '/api'
 
-// 配置文案 (从 useSiteConfig 读取，这里用 computed 合并)
-const config = computed(() => ({
-  drag_hint: '拖拽文件到此处或点击选择',
-  btn_upload: '开始上传',
-  uploading: '上传中...',
-  upload_success: '上传成功',
-  upload_error: '上传失败，请重试',
-  resume_hint: '检测到未完成的上传，是否继续？',
-}))
-
 const acceptMime = computed(() => {
   if (props.accept === 'image') return 'image/jpeg,image/png,image/webp'
   if (props.accept === 'video') return 'video/mp4,video/mov,video/webm'
@@ -123,10 +114,10 @@ const acceptMime = computed(() => {
 
 const formatHint = computed(() => {
   const parts: string[] = []
-  if (props.accept === 'image' || props.accept === 'all') parts.push('图片 (JPG/PNG/WebP)')
-  if (props.accept === 'video' || props.accept === 'all') parts.push('视频 (MP4/MOV/WebM)')
-  parts.push(`最大 ${props.maxSize}MB`)
-  if (props.multiple) parts.push(`最多 ${props.maxCount} 个文件`)
+  if (props.accept === 'image' || props.accept === 'all') parts.push(t('mediaUpload.imageFormats'))
+  if (props.accept === 'video' || props.accept === 'all') parts.push(t('mediaUpload.videoFormats'))
+  parts.push(t('mediaUpload.maxSize', { size: props.maxSize }))
+  if (props.multiple) parts.push(t('mediaUpload.maxCount', { count: props.maxCount }))
   return parts.join(' · ')
 })
 
@@ -172,7 +163,7 @@ function addFiles(files: File[]) {
   for (const file of files) {
     if (fileList.value.length >= props.maxCount) break
     if (file.size > props.maxSize * 1024 * 1024) {
-      toast.warn(`文件 ${file.name} 超过大小限制`)
+      toast.warn(t('mediaUpload.fileTooLarge', { name: file.name }))
       continue
     }
     fileList.value.push({
@@ -210,7 +201,7 @@ async function startUpload() {
       const e = err as { message?: string };
       if (import.meta.dev) console.error('[AppMediaUpload] 上传失败', e?.message || err)
       item.status = 'error'
-      if (!hasNotified) { toast.error('部分文件上传失败，请重试'); hasNotified = true }
+      if (!hasNotified) { toast.error(t('mediaUpload.partialError')); hasNotified = true }
     }
   }
 

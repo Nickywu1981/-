@@ -46,12 +46,14 @@ export function formatRelative(iso: string): string {
   return dayjs(iso).locale(getLocale()).fromNow();
 }
 
-export function formatDuration(seconds: number): string {
-  if (seconds < 60) return `${seconds}秒`;
-  if (seconds < 3600) return `${Math.floor(seconds / 60)}分${seconds % 60}秒`;
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  return `${h}时${m}分`;
+export function formatDuration(seconds: number, locale?: string): string {
+  const loc = locale || getLocale()
+  const isZh = loc === 'zh-cn'
+  if (seconds < 60) return isZh ? `${seconds}秒` : `${seconds}s`
+  if (seconds < 3600) return isZh ? `${Math.floor(seconds / 60)}分${seconds % 60}秒` : `${Math.floor(seconds / 60)}m${seconds % 60}s`
+  const h = Math.floor(seconds / 3600)
+  const m = Math.floor((seconds % 3600) / 60)
+  return isZh ? `${h}时${m}分` : `${h}h${m}m`
 }
 
 export function isToday(iso: string): boolean {
@@ -103,7 +105,8 @@ export function fmtMoney(n: number | string): string {
   return (Number(n) || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2 });
 }
 
-export function fmtNum(n: number): string {
-  if (n >= 10000) return (n / 10000).toFixed(1) + '万'
-  return n.toLocaleString('zh-CN')
+export function fmtNum(n: number, locale?: string): string {
+  const loc = locale || getLocale()
+  if (n >= 10000) return loc === 'zh-cn' ? (n / 10000).toFixed(1) + '万' : (n / 1000).toFixed(1) + 'K'
+  return n.toLocaleString(loc === 'zh-cn' ? 'zh-CN' : 'en-US')
 }

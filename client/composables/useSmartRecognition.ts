@@ -3,6 +3,7 @@
  * 复用于：图片/视频/文案/海报 各创作页面
  */
 export function useSmartRecognition() {
+  const { t } = useI18n()
   const refUrl = ref('')
   const loading = ref(false)
   const error = ref('')
@@ -31,12 +32,12 @@ export function useSmartRecognition() {
       })
       result.value = {
         productName: data.productName || '',
-        category: data.category || '其他',
+        category: data.category || t('smartRecognition.otherCategory'),
         features: data.features || [],
       }
     } catch (e: unknown) {
       const err = e as { data?: { message?: string }; message?: string };
-      error.value = err?.data?.message || err?.message || '识别失败'
+      error.value = err?.data?.message || err?.message || t('smartRecognition.recognitionFailed')
     } finally { loading.value = false }
   }
 

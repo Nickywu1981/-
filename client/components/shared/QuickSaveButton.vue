@@ -3,11 +3,11 @@
     class="quick-save-btn"
     :class="{ saved: isSaved, saving }"
     :disabled="saving || disabled"
-    :title="isSaved ? '已收藏' : '收藏到合集'"
+    :title="isSaved ? $t('quickSave.saved') : $t('quickSave.saveToCollection')"
     @click="toggle"
   >
     <span class="icon">{{ isSaved ? '❤️' : '🤍' }}</span>
-    <span class="label">{{ isSaved ? '已收藏' : '收藏' }}</span>
+    <span class="label">{{ isSaved ? $t('quickSave.saved') : $t('quickSave.save') }}</span>
   </button>
 </template>
 
@@ -21,6 +21,7 @@ const props = withDefaults(defineProps<{
 }>(), { workType: 'image', workTitle: '', disabled: false })
 
 const toast = useToast()
+const { t } = useI18n()
 const isSaved = ref(false)
 const saving = ref(false)
 
@@ -46,15 +47,15 @@ async function toggle() {
       const idx = ids.indexOf(props.workId)
       if (idx !== -1) ids.splice(idx, 1)
       isSaved.value = false
-      toast.success('已取消收藏')
+      toast.success(t('quickSave.unsaved'))
     } else {
       ids.unshift(props.workId)
       isSaved.value = true
-      toast.success('已收藏')
+      toast.success(t('quickSave.saveSuccess'))
     }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(ids.slice(0, 200)))
   } catch (e: unknown) {
-    toast.error('操作失败')
+    toast.error(t('quickSave.operationFailed'))
   } finally { saving.value = false }
 }
 

@@ -2,9 +2,9 @@
   <Teleport to="body">
     <div v-if="modelValue" class="modal-overlay" @click.self="$emit('update:modelValue', false)" @keydown.escape="close">
       <div class="modal version-modal">
-        <h3>版本历史</h3>
-        <div v-if="loading" class="v-loading">加载中...</div>
-        <div v-else-if="!versions.length" class="v-empty">暂无版本记录</div>
+        <h3>{{ $t('versionHistory.title') }}</h3>
+        <div v-if="loading" class="v-loading">{{ $t('versionHistory.loading') }}</div>
+        <div v-else-if="!versions.length" class="v-empty">{{ $t('versionHistory.empty') }}</div>
         <div v-else class="version-list">
           <div
             v-for="(v, i) in versions"
@@ -18,16 +18,16 @@
               <span class="v-version">v{{ v.version }}</span>
               <span class="v-time">{{ v.created_at?.slice(0, 19) || '-' }}</span>
               <span v-if="v.remark" class="v-remark">{{ v.remark }}</span>
-              <span v-if="i === 0" class="v-latest-tag">最新</span>
+              <span v-if="i === 0" class="v-latest-tag">{{ $t('versionHistory.latest') }}</span>
             </div>
           </div>
         </div>
         <div v-if="diffResult" class="diff-panel">
-          <h4>差异对比</h4>
+          <h4>{{ $t('versionHistory.diffTitle') }}</h4>
           <div v-for="(d, di) in diffResult" :key="di" class="diff-item" :class="d.type">
             <span class="diff-type">{{ d.type === 'added' ? '+' : d.type === 'removed' ? '-' : '~' }}</span>
             <span>{{ d.path }}</span>
-            <span v-if="d.aType || d.bType">({{ d.aType || '空' }} → {{ d.bType || '空' }})</span>
+            <span v-if="d.aType || d.bType">({{ d.aType || $t('versionHistory.emptyValue') }} → {{ d.bType || $t('versionHistory.emptyValue') }})</span>
           </div>
         </div>
         <div class="modal-actions">
@@ -35,13 +35,13 @@
             v-if="selected.length === 2"
             class="btn btn-outline"
             @click="$emit('diff', selected[0], selected[1])"
-          >对比选中版本</button>
+          >{{ $t('versionHistory.compareSelected') }}</button>
           <button
             v-if="selected.length === 1 && selected[0] !== 0"
             class="btn btn-outline"
             @click="$emit('rollback', selected[0])"
-          >回滚到此版本</button>
-          <button class="btn-cancel" @click="close">关闭</button>
+          >{{ $t('versionHistory.rollbackTo') }}</button>
+          <button class="btn-cancel" @click="close">{{ $t('versionHistory.close') }}</button>
         </div>
       </div>
     </div>

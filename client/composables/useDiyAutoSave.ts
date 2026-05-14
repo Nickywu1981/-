@@ -33,6 +33,7 @@ export function useDiyAutoSave(
 
   let timer: ReturnType<typeof setTimeout> | null = null
   let unwatch: (() => void) | null = null
+  const { t } = useI18n()
 
   function resetTimer() {
     if (timer) clearTimeout(timer)
@@ -93,9 +94,9 @@ export function useDiyAutoSave(
   function formatLastSaved(): string {
     if (!lastSaved.value) return ''
     const diff = Date.now() - lastSaved.value.getTime()
-    if (diff < 10000) return '刚刚保存'
-    if (diff < 60000) return `${Math.floor(diff / 1000)}秒前`
-    return `${Math.floor(diff / 60000)}分钟前`
+    if (diff < 10000) return t('autoSave.justSaved')
+    if (diff < 60000) return t('autoSave.secondsAgo', { n: Math.floor(diff / 1000) })
+    return t('autoSave.minutesAgo', { n: Math.floor(diff / 60000) })
   }
 
   onBeforeUnmount(() => stop())
