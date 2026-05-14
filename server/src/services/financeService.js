@@ -106,7 +106,7 @@ export async function createWithdrawal(tenantId, userId, data) {
     const orderNo = `WD${Date.now()}${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
 
     // 插入提现单
-    await financeDao.createWithdrawal({
+    const wdResultId = await financeDao.createWithdrawal({
       orderNo,
       tenantId,
       userId,
@@ -133,7 +133,7 @@ export async function createWithdrawal(tenantId, userId, data) {
     });
 
     await conn.commit();
-    return { id: wdResult.insertId, orderNo, amount: safeAmount, fee, actualAmount };
+    return { id: wdResultId, orderNo, amount: safeAmount, fee, actualAmount };
   } catch (e) {
     await conn.rollback();
     throw e;
