@@ -15,7 +15,7 @@ export const getPlans = wrapController(async (_req, res, next) => {
 // ==================== 创建支付订单（通联聚合支付） ====================
 
 export const createOrder = wrapController(async (req, res) => {
-    const { planType, payChannel = 'wechat' } = req.validated;
+    const { planType, payChannel = 'wechat' } = req.body;
     if (!planType || ![1, 2, 3].includes(planType)) {
       throw new BusinessError(ERROR_CODE.PARAM_INVALID);
     }

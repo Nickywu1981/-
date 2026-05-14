@@ -10,7 +10,7 @@ export const getRates = wrapController(async () => {
 });
 
 export const createOrder = wrapController(async (req) => {
-    const { amount, channel } = req.validated;
+    const { amount, channel } = req.body;
     return rechargeService.createOrder(req.user.id, req.tenantId, req.ip, { amount, payChannel: channel || 'wechat' });
 });
 
