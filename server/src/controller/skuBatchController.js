@@ -1,0 +1,47 @@
+/**
+ * SKU Batch Controller — 多SKU批量生成控制器
+ * 职责：参数委托，不写业务逻辑
+ */
+import { success } from '../utils/response.js';
+import { BusinessError } from '../utils/businessError.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
+import * as skuBatchService from '../services/skuBatchImageService.js';
+import logger from '../utils/logger.js';
+
+export async function batchGenerateImages(req, res) {
+  try {
+    const task = await skuBatchService.submitImageBatch(req.body, req.user?.id || req.user?.userId);
+    res.json(success({ taskId: task.id, estimatedCount: task.totalCount, status: task.status }));
+  } catch (err) {
+    logger.error('[SKUBatch] image batch failed', err.message);
+    if (err instanceof BusinessError) {
+      res.status(err.statusCode || 400).json({ code: err.code, msg: err.message });
+    } else {
+      res.status(500).json({ code: ERROR_CODE.AI_INFER_FAILED, msg: '批量生成任务提交失败' });
+    }
+  }
+}
+
+export async function batchGenerateVideos(req, res) {
+  try {
+    const task = await skuBatchService.submitVideoBatch(req.body, req.user?.id || req.user?.userId);
+    res.json(success({ taskId: task.id, estimatedCount: task.totalCount, status: task.status }));
+  } catch (err) {
+    logger.error('[SKUBatch] video batch failed', err.message);
+    if (err instanceof BusinessError) {
+      res.status(err.statusCode || 400).json({ code: err.code, msg: err.message });
+    } else {
+      res.status(500).json({ code: ERROR_CODE.AI_INFER_FAILED, msg: '批量视频生成任务提交失败' });
+    }
+  }
+}
+
+export async function getBatchStatus(req, res) {
+  try {
+    const status = await skuBatchService.getTaskStatus(req.params.id);
+    res.json(success(status));
+  } catch (err) {
+    logger.error('[SKUBatch] get status failed', err.message);
+    res.status(404).json({ code: ERROR_CODE.NOT_FOUND, msg: '任务不存在' });
+  }
+}
