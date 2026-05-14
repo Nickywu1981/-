@@ -136,9 +136,9 @@ const fetchAll = async () => {
   loading.value = true
   try {
     const [rec, temps, hist] = await Promise.all([
-      $fetch('/api/prompts/recommendations', { credentials: 'include' }).catch((err: any) => { toast.error('推荐加载失败'); if (import.meta.dev) console.warn('[prompt-hub] 推荐加载失败', err?.message || err); return { list: [] } }),
-      $fetch('/api/prompts?page=1&pageSize=60', { credentials: 'include' }).catch((err: any) => { toast.error('模板加载失败'); if (import.meta.dev) console.warn('[prompt-hub] 模板加载失败', err?.message || err); return { list: [] } }),
-      $fetch('/api/prompts/usage-history?page=1&pageSize=10', { credentials: 'include' }).catch((err: any) => { toast.error('历史加载失败'); if (import.meta.dev) console.warn('[prompt-hub] 历史加载失败', err?.message || err); return { list: [] } }),
+      $fetch('/api/prompts/recommendations', { credentials: 'include' }).catch((err: any) => { toast.error(t('common.failed_load_recommendations')); if (import.meta.dev) console.warn('[prompt-hub] 推荐加载失败', err?.message || err); return { list: [] } }),
+      $fetch('/api/prompts?page=1&pageSize=60', { credentials: 'include' }).catch((err: any) => { toast.error(t('common.failed_load_templates')); if (import.meta.dev) console.warn('[prompt-hub] 模板加载失败', err?.message || err); return { list: [] } }),
+      $fetch('/api/prompts/usage-history?page=1&pageSize=10', { credentials: 'include' }).catch((err: any) => { toast.error(t('common.failed_load_history')); if (import.meta.dev) console.warn('[prompt-hub] 历史加载失败', err?.message || err); return { list: [] } }),
     ])
     recommendations.value = (rec as any).list || []
     templates.value = (temps as any).list || []
@@ -171,7 +171,7 @@ const doRate = async (score: number) => {
     await $fetch(`/api/prompts/${detail.value.id}/rate`, { method: 'POST', body: { score }, credentials: 'include' })
     myRating.value = score
     fetchAll()
-  } catch { toast.warn('评分失败') }
+  } catch { toast.warn(t('common.failed_rate')) }
 }
 
 const toast = useToast()

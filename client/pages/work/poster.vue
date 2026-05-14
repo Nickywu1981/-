@@ -184,7 +184,7 @@ async function enhancePrompt() {
       toast.warning('润色服务暂不可用，将使用原始描述')
     }
   } catch {
-    toast.error('提示词润色失败，将使用原始描述')
+    toast.error(t('common.prompt_polish_failed'))
     enhancedPrompt.value = prompt.value
   } finally {
     enhancing.value = false

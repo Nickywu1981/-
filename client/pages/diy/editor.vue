@@ -237,7 +237,7 @@ async function loadPage() {
   try {
     const res: any = await $fetch(`/api/diy/${id}`, { credentials: 'include' })
     const data = res?.data
-    if (!data) { toast.error('页面数据为空'); return }
+    if (!data) { toast.error(t('common.page_data_empty')); return }
     pageInfo.value = data
     const isPC = res.data.page_type === 'pc'
     const mCfg = res.data.mobile_config || { sections: [] }
@@ -246,7 +246,7 @@ async function loadPage() {
     pcSections.value = pCfg.sections || []
     previewMode.value = isPC ? 'pc' : 'mobile'
     editor.loadFromConfig(isPC ? pCfg : mCfg)
-  } catch { toast.error('加载页面失败') }
+  } catch { toast.error(t('common.failed_load_page')) }
 }
 
 async function savePage() {
@@ -278,8 +278,8 @@ async function saveVersion() {
     if (remark) body.remark = remark
     await $fetch(`/api/diy/${pageInfo.value.id}/versions`, { method: 'POST', body, credentials: 'include' })
     dirty.value = false
-    toast.success('版本已保存')
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error('保存版本失败: ' + (err?.data?.msg || err.message)) }
+    toast.success(t('common.version_saved'))
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(t('common.failed_save_version') + ' : ') + (err?.data?.msg || err.message)) }
   finally { saving.value = false }
 }
 
@@ -288,7 +288,7 @@ async function publishPage() {
   try {
     await $fetch(`/api/diy/${pageInfo.value.id}/publish`, { method: 'POST', credentials: 'include' })
     dirty.value = false
-    toast.success('发布成功！访问地址：/diy/preview?slug=' + pageInfo.value.slug)
+    toast.success(t('common.success_publish') + ' ' + t('common.visit_url') + ' /diy/preview?slug=' +  pageInfo.value.slug)
   } catch (e) { toast.error(t('common.failed_submit') + ' : ' +  (e?.data?.msg || e.message)) }
   finally { publishing.value = false }
 }
@@ -299,7 +299,7 @@ watch(showVersions, async (val) => {
   try {
     const res: any = await $fetch(`/api/diy/${pageInfo.value.id}/versions`, { credentials: 'include' })
     versions.value = res?.data || []
-  } catch { toast.error('加载版本历史失败') }
+  } catch { toast.error(t('common.failed_load_version_history')) }
   versionLoading.value = false
 })
 
@@ -310,7 +310,7 @@ async function onDiffVersions(a: number, b: number) {
       method: 'POST', body: { versionA: versions.value[vA].version, versionB: versions.value[vB].version }, credentials: 'include',
     })
     diffResult.value = res?.data?.diff || []
-  } catch { toast.error('对比失败') }
+  } catch { toast.error(t('common.failed_compare')) }
 }
 
 async function onRollbackVersion(idx: number) {
@@ -321,8 +321,8 @@ async function onRollbackVersion(idx: number) {
     showVersions.value = false; diffResult.value = null
     await loadPage()
     dirty.value = false
-    toast.success('已回滚')
-  } catch { toast.error('回滚失败') }
+    toast.success(t('common.rolled_back'))
+  } catch { toast.error(t('common.failed_rollback')) }
 }
 
 // 自动保存
@@ -345,9 +345,9 @@ onMounted(async () => {
       const isPC = pageInfo.value.page_type === 'pc'
       const config = recovered.mobile_config || recovered.pc_config || recovered.mobileConfig || recovered.pcConfig
       editor.loadFromConfig(isPC ? (recovered.pc_config || recovered.mobile_config) : (recovered.mobile_config || recovered.pc_config))
-      toast.info('检测到未保存的更改，已自动恢复')
+      toast.info(t('common.unsaved_changes_restored'))
     } catch {
-      toast.warn('恢复数据格式异常，已加载最新服务端版本')
+      toast.warn(t('common.recovery_format_error'))
       await loadPage()
     }
     return

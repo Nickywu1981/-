@@ -161,7 +161,7 @@ async function doEnhance() {
     })
     enhancedPrompt.value = res.prompt || res.enhancedPrompt
   } catch (e) {
-    toast.error('提示词优化失败: ' + (e.message || t('common.unknown_error')))
+    toast.error(t('common.failed_optimize_prompt') + ' : ') + (e.message || t('common.unknown_error')))
   } finally {
     enhancing.value = false
   }

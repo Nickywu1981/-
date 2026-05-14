@@ -114,7 +114,7 @@ function exportLogs() {
   list.value.forEach(l => csv.push(`${l.id},${l.user_id},"${l.action}","${l.level || 'INFO'}","${l.detail || ''}",${l.ip || ''},"${l.create_time}"`))
   const blob = new Blob(['\uFEFF' + csv.join('\n')], { type: 'text/csv;charset=utf-8' })
   downloadBlob(blob, `logs-${new Date().toISOString().slice(0,10)}.csv`)
-  toast.success('CSV 已导出')
+  toast.success(t('common.csv_exported'))
 }
 
 onMounted(fetch)

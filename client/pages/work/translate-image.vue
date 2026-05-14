@@ -121,7 +121,7 @@ async function startTranslate() {
     })
     resultUrl.value = res.data?.outputUrl || res.data?.url || ''
     taskId.value = res.data?.taskId || ''
-    toast.success('翻译完成')
+    toast.success(t('common.translation_complete'))
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('common.failed_translate')) }
   finally { translating.value = false }
 }

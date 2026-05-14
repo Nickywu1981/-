@@ -26,7 +26,8 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts">const { t } = useI18n()
+
 
 const route = useRoute()
 const page = ref(null)
@@ -48,7 +49,7 @@ async function loadPage() {
     const config = isPC ? (res?.data?.pcConfig || res?.data?.mobileConfig) : (res?.data?.mobileConfig || res?.data?.pcConfig)
     sections.value = config?.sections || []
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
-    error.value = '页面加载失败: ' + (err?.data?.msg || err.message)
+    error.value = t('common.failed_load_page') + ' : ' + (err?.data?.msg || err.message)
   } finally { loading.value = false }
 }
 

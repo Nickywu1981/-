@@ -45,6 +45,7 @@
 
 <script lang="ts" setup>
 import { formatDateTime } from '@/utils/format'
+const { t } = useI18n()
 
 const notifications = ref<any[]>([])
 const loading = ref(true)
@@ -76,14 +77,14 @@ async function readOne(item: any) {
   try {
     await $fetch(`/api/notifications/${item.id}/read`, { method: 'PUT' })
     item.is_read = 1
-  } catch { toast.error('标记已读失败') }
+  } catch { toast.error(t('common.failed_mark_read')) }
 }
 
 async function markAll() {
   try {
     await $fetch('/api/notifications/read-all', { method: 'PUT' })
     notifications.value.forEach((n: any) => n.is_read = 1)
-  } catch { toast.error('全部标为已读失败') }
+  } catch { toast.error(t('common.failed_mark_all_read')) }
 }
 
 onMounted(fetchList)

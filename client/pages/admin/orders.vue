@@ -104,7 +104,7 @@ async function fetch() {
       list.value = data.data.list || []
       total.value = data.data.total || 0
     }
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error('加载订单失败: ' + (err?.data?.msg || err.message)) } finally { loading.value = false }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(t('common.failed_load_orders') + ' : ' + (err?.data?.msg || err.message)) } finally { loading.value = false }
 }
 
 function search() { page.value = 1; fetch() }
@@ -117,7 +117,7 @@ async function confirmDelete(o: any) {
     await $fetch(`/api/admin/orders/${o.id}`, { method: 'DELETE', credentials: 'include' })
     list.value = list.value.filter(item => item.id !== o.id)
     total.value--
-    toast.success('订单已删除')
+    toast.success(t('common.delete_success'))
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(t('common.failed_delete') + ' : ' +  (err?.data?.msg || err.message)) }
 }
 

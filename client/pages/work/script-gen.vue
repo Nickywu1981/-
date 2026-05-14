@@ -134,7 +134,7 @@ async function loadLanguages() {
     const res = await $fetch('/api/multilingual/languages', { credentials: 'include' });
     const data = (res as any).data;
     if (data?.length) languages.value = data;
-  } catch { toast.warn('加载语言列表失败') }
+  } catch { toast.warn(t('common.failed_load_languages')) }
 }
 
 async function submitTask() {

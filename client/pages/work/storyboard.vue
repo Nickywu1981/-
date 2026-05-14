@@ -94,7 +94,7 @@ async function submitTask() {
   try {
     const res: any = await $fetch('/api/adv-video/shot-plan', { method: 'POST', body: { script: scriptText.value, style: selectedStyle.value } })
     if (res.data?.task_id) task.pollTask(res.data.task_id, '/api/adv-video/shot-plan/')
-    else { toast.error('任务创建失败'); currentStep.value = 1; submitting.value = false; return }
+    else { toast.error(t('common.failed_create')); currentStep.value = 1; submitting.value = false; return }
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('common.failed_submit')); currentStep.value = 1 }
   finally { submitting.value = false }
 }

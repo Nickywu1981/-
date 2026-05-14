@@ -113,7 +113,7 @@ async function loadPages() {
     if (filter.keyword) params.set('keyword', filter.keyword)
     const res = await $fetch(`/api/diy?${params}`)
     pages.value = res.data?.list || []
-  } catch (e) { toast.error('加载页面列表失败') }
+  } catch (e) { toast.error(t('common.failed_load_page_list')) }
   finally { loading.value = false }
 }
 

@@ -141,7 +141,7 @@ async function delProxy(id: number) {
   if (!await confirm({ message: t('common.confirm_delete')} )) return
   try {
     const res: any = await $fetch(`/api/proxy/${id}`, { method: 'DELETE' })
-    if (res?.code === 200 || res?.code === 0) { toast.success('代理已删除'); fetchData() }
+    if (res?.code === 200 || res?.code === 0) { toast.success(t('common.delete_success')); fetchData() }
     else { toast.error(res?.msg || t('common.failed_delete')) }
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('common.failed_delete')) }
 }

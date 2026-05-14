@@ -278,7 +278,7 @@ async function batchMark(ids: number[], marking: string, action: string) {
       body: JSON.stringify({ ids, marking, action }),
     });
     fetchData();
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error('标记操作失败: ' + (err?.data?.msg || err.message)); }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(t('common.failed') + ' : ' + (err?.data?.msg || err.message)); }
 }
 
 async function review(id: number, status: number) {

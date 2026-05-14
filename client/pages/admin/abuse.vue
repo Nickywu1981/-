@@ -122,7 +122,7 @@ async function checkUser(userId: number) {
     checkResult.value = (res as any).data || { abusing: false };
   } catch {
     checkResult.value = { abusing: false, error: true };
-    toast.error('滥用检测请求失败');
+    toast.error(t('common.failed_abuse_check'));
   } finally { checking.value = false; }
 }
 

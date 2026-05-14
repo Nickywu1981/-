@@ -239,7 +239,7 @@ async function loadWorks() {
     works.value = data.data?.rows || data.data || [];
     totalWorks.value = data.data?.total || 0;
   } catch (e) {
-    toast.error('作品列表加载失败，请刷新重试')
+    toast.error(t('common.failed_load_works_retry'))
   } finally {
     loadingWorks.value = false;
   }

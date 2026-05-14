@@ -74,7 +74,8 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts">const { t } = useI18n()
+
 
 const toast = useToast()
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
@@ -107,7 +108,7 @@ onMounted(async () => {
     if ((pointsRes as any).code === 200) pointsBalance.value = (pointsRes as any).data?.balance || 0
     if ((statsRes as any)?.code === 200) stats.value = (statsRes as any).data
     else stats.value = { todayTasks: '-', totalTasks: '-', thisMonthConsumed: '-' }
-  } catch { toast.error('加载会员信息失败') }
+  } catch { toast.error(t('common.failed_load_member')) }
 })
 </script>
 

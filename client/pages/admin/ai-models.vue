@@ -94,7 +94,7 @@ async function resetBreaker(modelId: string) {
     })
     await fetchStatus()
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
-    toast.error('重置失败: ' + (err?.data?.msg || err.message || t('common.network_error')))
+    toast.error(t('common.failed_reset') + ' : ' + (err?.data?.msg || err.message || t('common.network_error')))
   }
 }
 

@@ -42,7 +42,8 @@
     </div>
   </WorkLayout>
 </template>
-<script setup lang="ts">
+<script setup lang="ts">const { t } = useI18n()
+
 
 const toast = useToast()
 
@@ -63,7 +64,7 @@ const saveSettings = async () => {
     const res: any = await $fetch('/api/brand', { method: 'PUT', body: { name: form.brandName, logo: form.logoUrl, watermarkType: form.watermarkType, watermarkText: form.watermarkText, watermarkPosition: form.watermarkPosition, watermarkOpacity: form.watermarkOpacity, badges: form.badges } })
     if (res?.code === 200 || res?.success || res?.data) {
       task.status = 2
-      toast.success('品牌配置已保存')
+      toast.success(t('common.brand_config_saved'))
     } else {
       task.status = 0
       errorMsg.value = (res as any)?.msg || '保存失败，请重试'
@@ -85,7 +86,7 @@ const onLogoChange = async (e: Event) => {
     const fd = new FormData(); fd.append('file', file)
     const res: any = await $fetch('/api/upload/image', { method: 'POST', body: fd })
     form.logoUrl = res.data?.url || res.url || ''
-    if (form.logoUrl) toast.success('Logo 上传成功')
+    if (form.logoUrl) toast.success(t('common.logo_upload_success'))
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
     toast.error(err?.data?.msg || 'Logo 上传失败')
   } finally { logoUploading.value = false }
