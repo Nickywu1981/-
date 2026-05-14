@@ -13,6 +13,14 @@ export async function findWorksByIds(workIds, userId) {
   return rows;
 }
 
+export async function listByCategory(userId, categoryPrefix, { limit = 20, offset = 0 } = {}) {
+  const [rows] = await pool.query(
+    'SELECT * FROM user_works WHERE user_id = ? AND task_category LIKE ? ORDER BY create_time DESC LIMIT ? OFFSET ?',
+    [userId, categoryPrefix, limit, offset],
+  );
+  return rows;
+}
+
 export async function findExportableWorks(userId, { page = 1, pageSize = 20, type } = {}) {
   let where = 'user_id = ? AND status = 2';
   const params = [userId];

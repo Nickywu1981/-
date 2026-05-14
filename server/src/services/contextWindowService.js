@@ -11,7 +11,7 @@
  * 7. [新增] 增量裁剪 — 已裁剪消息不重复计算
  */
 
-import db from '../dao/db.js';
+import * as contextDao from '../dao/contextDao.js';
 import logger from '../utils/logger.js';
 import { aiGatewayConfig } from '../config/index.js';
 
@@ -154,32 +154,36 @@ async function manageContextWindow({
 
 async function saveContextSnapshot(sessionId, budget, messageCount, strategy, modelId) {
   try {
-    await db.execute(
-      `INSERT INTO context_snapshots
-        (session_id, total_tokens, model_max_tokens, utilization_pct,
-         chunk_count, summary_tokens, pruned_tokens, message_count, strategy)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [sessionId, budget.budget_total - budget.remaining_tokens, budget.budget_total,
-       budget.budget_total > 0 ? ((budget.budget_total - budget.remaining_tokens) / budget.budget_total * 100).toFixed(2) : 0,
-       budget.chunk_count || 1, budget.rag_tokens || 0, budget.pruned_tokens || 0, messageCount, strategy]
-    );
+    await contextDao.insertContextSnapshot({
+      sessionId,
+      totalTokens: budget.budget_total - budget.remaining_tokens,
+      modelMaxTokens: budget.budget_total,
+      utilizationPct: budget.budget_total > 0 ? ((budget.budget_total - budget.remaining_tokens) / budget.budget_total * 100).toFixed(2) : 0,
+      chunkCount: budget.chunk_count || 1,
+      summaryTokens: budget.rag_tokens || 0,
+      prunedTokens: budget.pruned_tokens || 0,
+      messageCount,
+      strategy,
+    });
   } catch (e) { logger.warn('[ContextWindow] snapshot failed:', e.message); }
 }
 
 async function saveBudgetLog(sessionId, budget, callId) {
   if (!sessionId) return;
   try {
-    await db.execute(
-      `INSERT INTO token_budget_log
-        (session_id, call_id, budget_total, system_prompt_tokens,
-         history_tokens, rag_tokens, user_input_tokens, reserved_tokens,
-         remaining_tokens, overflow_truncated, compression_ratio)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [sessionId, callId || null, budget.budget_total, budget.system_prompt_tokens,
-       budget.history_tokens, budget.rag_tokens, budget.user_input_tokens,
-       budget.reserved_tokens, budget.remaining_tokens,
-       budget.pruned_tokens || 0, budget.compression_ratio || null]
-    );
+    await contextDao.insertTokenBudgetLog({
+      sessionId,
+      callId: callId || null,
+      budgetTotal: budget.budget_total,
+      systemPromptTokens: budget.system_prompt_tokens,
+      historyTokens: budget.history_tokens,
+      ragTokens: budget.rag_tokens,
+      userInputTokens: budget.user_input_tokens,
+      reservedTokens: budget.reserved_tokens,
+      remainingTokens: budget.remaining_tokens,
+      overflowTruncated: budget.pruned_tokens || 0,
+      compressionRatio: budget.compression_ratio || null,
+    });
   } catch (e) { logger.warn('[ContextWindow] budget log failed:', e.message); }
 }
 

@@ -7,7 +7,7 @@ import { BusinessError } from '../utils/businessError.js';
  */
 import { submitJob } from './job-queue.service.js';
 import * as moderationService from './moderation.service.js';
-import db from '../dao/db.js';
+import * as worksDao from '../dao/worksDao.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
 const POSTER_SIZES = {
@@ -70,10 +70,8 @@ export function getPosterStyles() {
  */
 export async function getUserPosters(userId, { type, page = 1, limit = 20 } = {}) {
   const offset = (page - 1) * limit;
-  const sql = 'SELECT * FROM user_works WHERE user_id = ? AND task_category LIKE ? ORDER BY create_time DESC LIMIT ? OFFSET ?';
   const prefix = type ? `poster_${type}` : 'poster_%';
-  const [rows] = await db.query(sql, [userId, prefix, limit, offset]);
-  return rows;
+  return worksDao.listByCategory(userId, prefix, { limit, offset });
 }
 
 export { POSTER_SIZES, POSTER_STYLES };
