@@ -85,7 +85,7 @@ export async function deleteWorkflowConfig(workflowId, userId) {
 
 export async function listUserConfigs(userId) {
   const [rows] = await _db().query(
-    'SELECT * FROM workflow_config WHERE user_id = ? ORDER BY updated_at DESC',
+    'SELECT * FROM workflow_config WHERE user_id = ? ORDER BY updated_at DESC LIMIT 200',
     [userId],
   );
   return rows;

@@ -86,7 +86,7 @@ export async function getStrategies(incidentType) {
   let sql = 'SELECT * FROM healing_strategies WHERE is_active = 1';
   const params = [];
   if (incidentType) { sql += ' AND incident_type = ?'; params.push(incidentType); }
-  sql += ' ORDER BY strategy_level DESC, success_rate DESC';
+  sql += ' ORDER BY strategy_level DESC, success_rate DESC LIMIT 500';
   const [rows] = await db.execute(sql, params);
   return rows.map(r => ({ ...r, actionTemplate: safeJSON(r.action_template) }));
 }

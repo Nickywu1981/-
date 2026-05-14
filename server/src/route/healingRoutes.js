@@ -3,12 +3,26 @@
  * 端点: /api/admin/healing/*
  */
 import { Router } from 'express';
+import { z } from 'zod';
 import { authMiddleware, adminAuth } from '../middleware/auth.js';
 import { success, error as sendError } from '../utils/response.js';
+import { BusinessError } from '../utils/businessError.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 import logger from '../utils/logger.js';
 
 const router = Router();
 router.use(authMiddleware, adminAuth);
+
+// Zod schemas
+const evolveSchema = z.object({
+  strategyId: z.string().min(1),
+});
+const setThresholdSchema = z.object({
+  value: z.number().min(0),
+});
+const baselineSchema = z.object({
+  days: z.number().int().min(1).max(365).optional(),
+});
 
 // GET /api/admin/healing/incidents — 事件列表
 router.get('/incidents', async (req, res, next) => {
@@ -66,9 +80,11 @@ router.get('/thresholds', async (req, res, next) => {
 
 // PUT /api/admin/healing/thresholds/:key — 手动调整阈值
 router.put('/thresholds/:key', (req, res, next) => {
+  const parsed = setThresholdSchema.safeParse(req.body);
+  if (!parsed.success) throw new BusinessError(ERROR_CODE.VALIDATION_ERROR, parsed.error.issues[0]?.message);
   try {
     import('../services/adaptiveThresholdService.js').then(({ setThreshold, getThreshold }) => {
-      setThreshold(req.params.key, req.body.value);
+      setThreshold(req.params.key, parsed.data.value);
       success(res, getThreshold(req.params.key));
     }).catch(next);
   } catch (e) { next(e); }
@@ -76,9 +92,11 @@ router.put('/thresholds/:key', (req, res, next) => {
 
 // GET /api/admin/healing/thresholds/baseline — 触发基线学习
 router.post('/thresholds/baseline', async (req, res, next) => {
+  const parsed = baselineSchema.safeParse(req.body);
+  if (!parsed.success) throw new BusinessError(ERROR_CODE.VALIDATION_ERROR, parsed.error.issues[0]?.message);
   try {
     const { learnBaseline } = await import('../services/adaptiveThresholdService.js');
-    const baseline = await learnBaseline(req.body.days || 7);
+    const baseline = await learnBaseline(parsed.data.days || 7);
     success(res, baseline);
   } catch (e) { next(e); }
 });

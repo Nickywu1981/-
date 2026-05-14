@@ -117,8 +117,14 @@ export async function resetPassword({ phone, email, newPassword, code }) {
   const passwordHash = await bcrypt.hash(newPassword, 12);
   await userDao.updatePassword(user.id, passwordHash);
 
+  // Revoke all existing tokens (Redis). This is best-effort — if Redis is
+  // unavailable, old tokens remain valid until their natural TTL expiry.
   const { revokeAllUserTokens } = await import('../utils/jwtToken.js');
-  await revokeAllUserTokens(user.id);
+  try {
+    await revokeAllUserTokens(user.id);
+  } catch (e) {
+    logger.error('[Auth] Token revocation failed after password reset', { userId: user.id, error: e.message });
+  }
 
   logger.info('[Auth] Password reset successful', { userId: user.id });
   return { code: ERROR_CODE.PASSWORD_RESET_OK, message: 'Password reset successful' };

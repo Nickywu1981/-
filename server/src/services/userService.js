@@ -119,7 +119,14 @@ export async function resetPassword(token, newPassword) {
 
   const hashed = await bcrypt.hash(newPassword, SALT_ROUNDS);
   await userDao.updatePassword(payload.userId, hashed);
-  await revokeAllUtil(payload.userId);
+
+  // Revoke all existing tokens (Redis). This is best-effort — if Redis is
+  // unavailable, old tokens remain valid until their natural TTL expiry.
+  try {
+    await revokeAllUtil(payload.userId);
+  } catch (e) {
+    logger.error('[User] Token revocation failed after password reset', { userId: payload.userId, error: e.message });
+  }
 
   // 标记重置 token 为已使用（防止重放）
   if (payload.jti) {
