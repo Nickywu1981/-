@@ -54,7 +54,7 @@ services:
     container_name: ai-saas-server
     restart: unless-stopped
     ports:
-      - "${SERVER_PORT:-3001}:3001"
+      - "127.0.0.1:${SERVER_PORT:-3001}:3001"
     environment:
       NODE_ENV: ${NODE_ENV:-development}
       PORT: "3001"

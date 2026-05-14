@@ -28,22 +28,22 @@ const BATCH_CACHE_TTL = 3600; // 1小时
 // 内存缓存作为 Redis 不可用时的降级
 const memFallback = new Map();
 
-async function cacheGet(key) {
+async function cacheGetLocal(key) {
   try {
-    const val = await getCache(key);
+    const val = await cacheGet(key);
     if (val) return val;
   } catch (e) {
-    logger.warn('[UnifiedQueue] Redis 读取失败，降级内存', { key, error: e.message });
+    logger.warn('[UnifiedQueue] Redis read fallback to memory', { key, error: e.message });
   }
   return memFallback.get(key) || null;
 }
 
-async function cacheSet(key, value, ttl = BATCH_CACHE_TTL) {
-  memFallback.set(key, value); // 始终写内存降级
+async function cacheSetLocal(key, value, ttl = BATCH_CACHE_TTL) {
+  memFallback.set(key, value);
   try {
-    await setCache(key, value, ttl);
+    await cacheSet(key, value, ttl);
   } catch (e) {
-    logger.warn('[UnifiedQueue] Redis 写入失败，仅内存缓存', { key, error: e.message });
+    logger.warn('[UnifiedQueue] Redis write fallback to memory', { key, error: e.message });
   }
 }
 
@@ -107,7 +107,7 @@ export async function submitBatchTask(userId, params) {
   }
 
   // 更新父任务子任务列表
-  await cacheSet(batchKey(batchId), {
+  await cacheSetLocal(batchKey(batchId), {
     total: items.length,
     completed: 0,
     failed: 0,
@@ -141,7 +141,7 @@ export async function submitBatchTask(userId, params) {
  */
 export async function onChildJobComplete(batchId, childJobId, status, result) {
   const key = batchKey(batchId);
-  const batch = await cacheGet(key);
+  const batch = await cacheGetLocal(key);
   if (!batch) return;
 
   if (status === 'completed') batch.completed++;
@@ -210,7 +210,7 @@ export async function submitTask(userId, mode, params) {
 
 export async function getBatchProgress(batchId) {
   const key = batchKey(batchId);
-  return cacheGet(key);
+  return cacheGetLocal(key);
 }
 
 // ==================== 夜间批量处理 ====================

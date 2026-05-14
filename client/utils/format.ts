@@ -11,7 +11,7 @@ const localeMap: Record<string, string> = { zh: 'zh-cn', en: 'en', es: 'es' };
 function getLocale(): string {
   if (typeof window === 'undefined') return 'zh-cn';
   try {
-    const settings = localStorage.getItem('app-settings');
+    const settings = window.localStorage.getItem('app-settings');
     if (settings) {
       const { locale } = JSON.parse(settings);
       return localeMap[locale] || 'zh-cn';

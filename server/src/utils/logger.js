@@ -63,7 +63,7 @@ const logger = createLogger({
       : format.combine(format.json()),
   ),
   transports: [
-    new transports.Console({ level: isDev ? 'debug' : 'warn' }),
+    new transports.Console({ level: process.env.CONSOLE_LOG_LEVEL || (isDev ? 'debug' : 'info') }),
     ...(isDev ? [] : [
       new transports.File({ filename: path.join(LOG_DIR, 'error.log'), level: 'error', maxsize: 10 * 1024 * 1024, maxFiles: 14 }),
       new transports.File({ filename: path.join(LOG_DIR, 'combined.log'), maxsize: 10 * 1024 * 1024, maxFiles: 30 }),

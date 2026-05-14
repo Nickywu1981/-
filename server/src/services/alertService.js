@@ -53,13 +53,17 @@ const DEFAULT_RULES = [
         const { getModelBreaker } = await import('../gateway/gatewayCore.js');
         const { getPool, updateModel } = await import('./modelPoolService.js');
         const pool = await getPool();
+        const reductions = [];
         for (const model of pool) {
           const breaker = getModelBreaker(model.model_key);
           if (breaker && breaker.getState() === 'open' && model.pool_weight > 1) {
-            await updateModel(model.model_key, { pool_weight: Math.max(1, Math.floor(model.pool_weight * 0.7)) });
-            logger.warn('[Alert] Frequent breaker: reduced weight', { modelKey: model.model_key, newWeight: Math.max(1, Math.floor(model.pool_weight * 0.7)) });
+            reductions.push({ key: model.model_key, weight: Math.max(1, Math.floor(model.pool_weight * 0.7)) });
           }
         }
+        await Promise.all(reductions.map(r => {
+          logger.warn('[Alert] Frequent breaker: reduced weight', { modelKey: r.key, newWeight: r.weight });
+          return updateModel(r.key, { pool_weight: r.weight });
+        }));
       } catch (e) { logger.warn('[Alert] breaker_frequent action failed', { error: e.message }); }
     },
   },

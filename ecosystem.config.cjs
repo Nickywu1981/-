@@ -36,6 +36,8 @@ module.exports = {
       out_file: './logs/server-out.log',
       merge_logs: true,
       log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+      max_size: '10M',
+      max_file: 30,
     },
     {
       name: 'movio-worker',
@@ -60,6 +62,8 @@ module.exports = {
       out_file: './logs/worker-out.log',
       merge_logs: true,
       log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+      max_size: '10M',
+      max_file: 30,
     },
     {
       name: 'movio-client',
@@ -85,6 +89,8 @@ module.exports = {
       out_file: './logs/client-out.log',
       merge_logs: true,
       log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+      max_size: '10M',
+      max_file: 30,
     },
   ],
 };
