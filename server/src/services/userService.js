@@ -100,10 +100,10 @@ export async function changePassword(userId, { oldPassword, newPassword }) {
 export async function forgotPassword(username) {
   guardSQL(username, 'username');
   const user = await userDao.findByUsername(username);
-  if (!user) return { message: '如果账号存在，重置链接已发送至注册邮箱' };
+  if (!user) return { code: ERROR_CODE.RESET_LINK_SENT, message: 'If the account exists, a reset link has been sent' };
   const resetToken = jwt.sign({ userId: user.id, purpose: 'reset', jti: crypto.randomUUID() }, jwtSecret, { expiresIn: '15m' });
-  // TODO: 集成邮件服务发送重置链接，当前通过管理员手动处理
-  return { message: '如果账号存在，重置链接已发送至注册邮箱' };
+  // TODO: integrate email service to send reset link; currently admin handles manually
+  return { code: ERROR_CODE.RESET_LINK_SENT, message: 'If the account exists, a reset link has been sent' };
 }
 
 export async function resetPassword(token, newPassword) {

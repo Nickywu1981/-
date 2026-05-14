@@ -120,8 +120,8 @@ export async function resetPassword({ phone, email, newPassword, code }) {
   const { revokeAllUserTokens } = await import('../utils/jwtToken.js');
   await revokeAllUserTokens(user.id);
 
-  logger.info('[Auth] 密码重置成功', { userId: user.id });
-  return { message: '密码重置成功' };
+  logger.info('[Auth] Password reset successful', { userId: user.id });
+  return { code: ERROR_CODE.PASSWORD_RESET_OK, message: 'Password reset successful' };
 }
 
 export async function getUserProfile(userId) {

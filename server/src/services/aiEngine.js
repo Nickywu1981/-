@@ -341,7 +341,7 @@ function getDefaultResponse(modelId, input, errorMsg) {
   if (type === 'image') {
     return {
       imageUrl: input.imageUrl || input.image_url || '',
-      message: '图片处理服务暂时不可用，已返回原图',
+      message: 'AI image service unavailable, original returned',
       fallback: true,
       reason: errorMsg,
     };

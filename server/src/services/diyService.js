@@ -148,7 +148,7 @@ export default {
     checkStateTransition(page.status, 3);
     if (page.status === DIY_PAGE_STATUS.PUBLISHED) await diyDao.clearPageCache(page.slug);
     await diyDao.softDeletePage(id, tenantId);
-    return { msg: '已移入回收站' };
+    return { code: ERROR_CODE.DIYPAGE_TRASHED, msg: 'Page moved to trash' };
   },
 
   async restorePage(id, tenantId) {
@@ -156,7 +156,7 @@ export default {
     if (!page) throw new BusinessError(ERROR_CODE.NOT_FOUND);
     if (page.status !== DIY_PAGE_STATUS.TRASH) throw new BusinessError(ERROR_CODE.BAD_REQUEST);
     await diyDao.restorePage(id, tenantId);
-    return { msg: '已恢复至草稿状态' };
+    return { code: ERROR_CODE.DIYPAGE_RESTORED, msg: 'Page restored to draft' };
   },
 
   async hardDeletePage(id, tenantId) {
@@ -165,7 +165,7 @@ export default {
     if (page.status !== DIY_PAGE_STATUS.TRASH) throw new BusinessError(ERROR_CODE.BAD_REQUEST);
     if (page.status === 1) await diyDao.clearPageCache(page.slug);
     await diyDao.hardDeletePage(id, tenantId); // 内部已用 withTransaction 保护
-    return { msg: '页面已彻底删除，不可恢复' };
+    return { code: ERROR_CODE.DIYPAGE_DELETED, msg: 'Page permanently deleted' };
   },
 
   // ========== 克隆 ==========

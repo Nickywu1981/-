@@ -81,6 +81,36 @@ export const ERROR_CODE = {
   EC_RATE_E2B_EXEC: 4040,    // E2B 代码执行频率限制
   EC_RATE_E2B_READ: 4041,    // E2B 读取频率限制
   EC_RATE_E2B_DELETE: 4042,  // E2B 删除频率限制
+
+  // 业务 - SMS/通知
+  SMS_PHONE_INVALID: 4501,    // 手机号格式不正确
+  SMS_CODE_COOLDOWN: 4502,    // 验证码冷却中
+  SMS_HOURLY_LIMIT: 4503,     // 小时发送频率超限
+  SMS_DAILY_LIMIT: 4504,      // 每日发送次数上限
+  SMS_SCENE_INVALID: 4505,    // 发送场景不支持
+  SMS_TEMPLATE_MISSING: 4506, // 短信模板未配置
+  SMS_SEND_FAILED: 4507,      // 短信发送失败
+  SMS_CODE_SENT: 4508,        // 验证码已发送
+
+  // 业务 - 渠道
+  CHANNEL_APPLY_SUBMITTED: 4601,  // 渠道申请已提交
+  CHANNEL_AUDIT_DONE: 4602,       // 渠道审核完成
+  CHANNEL_POLICY_CREATED: 4603,   // 分润政策创建成功
+  CHANNEL_POLICY_UPDATED: 4604,   // 分润政策更新成功
+
+  // 业务 - 用户操作反馈
+  DIYPAGE_TRASHED: 4701,      // 页面已移入回收站
+  DIYPAGE_RESTORED: 4702,     // 页面已恢复
+  DIYPAGE_DELETED: 4703,      // 页面已彻底删除
+  PASSWORD_RESET_OK: 4704,    // 密码重置成功
+  RESET_LINK_SENT: 4705,      // 重置链接已发送
+
+  // 业务 - AI 降级
+  AI_FALLBACK_ORIGINAL: 5003, // AI处理不可用，已返回原图
+
+  // 业务 - 任务进度
+  TASK_RETRYING: 4801,        // 任务重试中
+  TASK_CANCELLED: 4802,       // 任务已取消
 };
 
 /**
@@ -155,6 +185,30 @@ export const ERROR_MSG = {
   [ERROR_CODE.EC_RATE_E2B_EXEC]: 'Too many code execution requests',
   [ERROR_CODE.EC_RATE_E2B_READ]: 'Too many read requests',
   [ERROR_CODE.EC_RATE_E2B_DELETE]: 'Too many delete requests',
+
+  [ERROR_CODE.SMS_PHONE_INVALID]: 'Invalid phone number format',
+  [ERROR_CODE.SMS_CODE_COOLDOWN]: 'Code already sent, please wait',
+  [ERROR_CODE.SMS_HOURLY_LIMIT]: 'Hourly limit exceeded',
+  [ERROR_CODE.SMS_DAILY_LIMIT]: 'Daily limit exceeded',
+  [ERROR_CODE.SMS_SCENE_INVALID]: 'Unsupported scenario',
+  [ERROR_CODE.SMS_TEMPLATE_MISSING]: 'SMS template not configured',
+  [ERROR_CODE.SMS_SEND_FAILED]: 'SMS send failed',
+  [ERROR_CODE.SMS_CODE_SENT]: 'Verification code sent',
+
+  [ERROR_CODE.CHANNEL_APPLY_SUBMITTED]: 'Application submitted',
+  [ERROR_CODE.CHANNEL_AUDIT_DONE]: 'Audit completed',
+  [ERROR_CODE.CHANNEL_POLICY_CREATED]: 'Commission policy created',
+  [ERROR_CODE.CHANNEL_POLICY_UPDATED]: 'Commission policy updated',
+
+  [ERROR_CODE.DIYPAGE_TRASHED]: 'Page moved to trash',
+  [ERROR_CODE.DIYPAGE_RESTORED]: 'Page restored to drafts',
+  [ERROR_CODE.DIYPAGE_DELETED]: 'Page permanently deleted',
+  [ERROR_CODE.PASSWORD_RESET_OK]: 'Password reset successful',
+  [ERROR_CODE.RESET_LINK_SENT]: 'Reset link sent if account exists',
+
+  [ERROR_CODE.AI_FALLBACK_ORIGINAL]: 'AI service unavailable, original returned',
+  [ERROR_CODE.TASK_RETRYING]: 'Task retrying',
+  [ERROR_CODE.TASK_CANCELLED]: 'Task cancelled',
 };
 
 /**
@@ -228,4 +282,28 @@ export const FRONTEND_I18N_KEY = {
   [ERROR_CODE.EC_RATE_E2B_EXEC]: 'e2b_exec',
   [ERROR_CODE.EC_RATE_E2B_READ]: 'e2b_read',
   [ERROR_CODE.EC_RATE_E2B_DELETE]: 'e2b_delete',
+
+  [ERROR_CODE.SMS_PHONE_INVALID]: 'phone_invalid',
+  [ERROR_CODE.SMS_CODE_COOLDOWN]: 'code_cooldown',
+  [ERROR_CODE.SMS_HOURLY_LIMIT]: 'hourly_limit',
+  [ERROR_CODE.SMS_DAILY_LIMIT]: 'daily_limit',
+  [ERROR_CODE.SMS_SCENE_INVALID]: 'scene_invalid',
+  [ERROR_CODE.SMS_TEMPLATE_MISSING]: 'template_missing',
+  [ERROR_CODE.SMS_SEND_FAILED]: 'send_failed',
+  [ERROR_CODE.SMS_CODE_SENT]: 'code_sent',
+
+  [ERROR_CODE.CHANNEL_APPLY_SUBMITTED]: 'apply_submitted',
+  [ERROR_CODE.CHANNEL_AUDIT_DONE]: 'audit_done',
+  [ERROR_CODE.CHANNEL_POLICY_CREATED]: 'policy_created',
+  [ERROR_CODE.CHANNEL_POLICY_UPDATED]: 'policy_updated',
+
+  [ERROR_CODE.DIYPAGE_TRASHED]: 'page_trashed',
+  [ERROR_CODE.DIYPAGE_RESTORED]: 'page_restored',
+  [ERROR_CODE.DIYPAGE_DELETED]: 'page_deleted',
+  [ERROR_CODE.PASSWORD_RESET_OK]: 'password_reset_ok',
+  [ERROR_CODE.RESET_LINK_SENT]: 'reset_link_sent',
+
+  [ERROR_CODE.AI_FALLBACK_ORIGINAL]: 'ai_fallback_original',
+  [ERROR_CODE.TASK_RETRYING]: 'task_retrying',
+  [ERROR_CODE.TASK_CANCELLED]: 'task_cancelled',
 };

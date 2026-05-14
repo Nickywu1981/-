@@ -38,7 +38,8 @@ describe('channelController', () => {
   it('auditChannel completes', async () => {
     mockSvc.auditChannel.mockResolvedValue();
     const r = await ctrl.auditChannel({ params: { id: '1' }, tenantId: 1, body: { status: 'approved' } });
-    expect(r.message).toBe('审核完成');
+    expect(r.message).toBe('Audit completed');
+    expect(r.code).toBe(4602);
   });
 
   it('getDownstreamAgents returns list', async () => {

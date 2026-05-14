@@ -110,20 +110,20 @@ export async function checkVerified(phone) {
 
 export async function sendVerificationCode({ phone, scene }) {
   if (!phone || !/^1[3-9]\d{9}$/.test(phone)) {
-    return { success: false, msg: '手机号格式不正确' };
+    return { code: ERROR_CODE.SMS_PHONE_INVALID, success: false, msg: 'Invalid phone number format' };
   }
 
   const key = cacheKey(phone, scene);
   const existing = CODE_CACHE.get(key);
   if (existing && Date.now() - existing.time < 60000) {
-    return { success: false, msg: '验证码已发送，请60秒后重试' };
+    return { code: ERROR_CODE.SMS_CODE_COOLDOWN, success: false, msg: 'Code already sent, please wait 60s' };
   }
 
   const hourlyCount = await smsLogDao.countByPhoneLastHour(phone);
-  if (hourlyCount >= 5) return { success: false, msg: '发送频率过高，请稍后再试' };
+  if (hourlyCount >= 5) return { code: ERROR_CODE.SMS_HOURLY_LIMIT, success: false, msg: 'Hourly limit exceeded' };
 
   const dailyCount = await smsLogDao.countByPhoneToday(phone);
-  if (dailyCount >= 10) return { success: false, msg: '今日发送次数已达上限' };
+  if (dailyCount >= 10) return { code: ERROR_CODE.SMS_DAILY_LIMIT, success: false, msg: 'Daily limit exceeded' };
 
   const templateCodeMap = {
     register: 'sms_register_code',
@@ -132,10 +132,10 @@ export async function sendVerificationCode({ phone, scene }) {
     bind: 'sms_bind_code',
   };
   const templateCode = templateCodeMap[scene];
-  if (!templateCode) return { success: false, msg: '不支持的发送场景' };
+  if (!templateCode) return { code: ERROR_CODE.SMS_SCENE_INVALID, success: false, msg: 'Unsupported scenario' };
 
   const template = await smsTemplateDao.findByCode(templateCode);
-  if (!template) return { success: false, msg: '短信模板未配置' };
+  if (!template) return { code: ERROR_CODE.SMS_TEMPLATE_MISSING, success: false, msg: 'SMS template not configured' };
 
   const code = generateCode(6);
   const content = renderTemplate(template.content, { code });
@@ -162,7 +162,7 @@ export async function sendVerificationCode({ phone, scene }) {
       provider: config.sms?.provider || 'mock',
     });
 
-    return { success: true, msg: '验证码已发送', expire: 300 };
+    return { code: ERROR_CODE.SMS_CODE_SENT, success: true, msg: 'Verification code sent', expire: 300 };
   } catch (e) {
     logger.error('[SMS] sendVerificationCode failed', { error: e.message });
     await smsLogDao.insertLog({
@@ -173,7 +173,7 @@ export async function sendVerificationCode({ phone, scene }) {
       result: false,
       provider: config.sms?.provider || 'mock',
     });
-    return { success: false, msg: '短信发送失败，请稍后重试' };
+    return { code: ERROR_CODE.SMS_SEND_FAILED, success: false, msg: 'SMS send failed' };
   }
 }
 
@@ -184,7 +184,7 @@ export async function sendNotification(phone, { scene, templateCode, params }) {
     ? await smsTemplateDao.findByCode(templateCode)
     : await smsTemplateDao.findByCode(scene);
 
-  if (!template) return { success: false, msg: '短信模板未配置' };
+  if (!template) return { code: ERROR_CODE.SMS_TEMPLATE_MISSING, success: false, msg: 'SMS template not configured' };
 
   const content = renderTemplate(template.content, params || {});
   const provider = getProvider();
@@ -200,14 +200,14 @@ export async function sendNotification(phone, { scene, templateCode, params }) {
       templateCode: template.template_code, phone, params,
       content, result: true, provider: config.sms?.provider || 'mock',
     });
-    return { success: true, msg: '发送成功' };
+    return { code: ERROR_CODE.SMS_CODE_SENT, success: true, msg: 'Sent successfully' };
   } catch (e) {
     logger.error('[SMS] sendNotification failed', { error: e.message });
     await smsLogDao.insertLog({
       templateCode: template.template_code, phone, params,
       content, result: false, provider: config.sms?.provider || 'mock',
     });
-    return { success: false, msg: '发送失败' };
+    return { code: ERROR_CODE.SMS_SEND_FAILED, success: false, msg: 'Send failed' };
   }
 }
 

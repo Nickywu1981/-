@@ -16,13 +16,13 @@ export const getChannelDetail = wrapController(async (req) => {
 export const applyChannel = wrapController(async (req) => {
   const body = req.validated || req.body;
   const id = await channelService.applyChannel(req.tenantId, body);
-  return { id, message: '申请已提交，等待审核' };
+  return { id, code: ERROR_CODE.CHANNEL_APPLY_SUBMITTED, message: 'Application submitted, pending review' };
 });
 
 export const auditChannel = wrapController(async (req) => {
   const body = req.validated || req.body;
   await channelService.auditChannel(req.tenantId, req.params.id, body);
-  return { message: '审核完成' };
+  return { code: ERROR_CODE.CHANNEL_AUDIT_DONE, message: 'Audit completed' };
 });
 
 export const getDownstreamAgents = wrapController(async (req) => {
@@ -36,13 +36,13 @@ export const listPolicies = wrapController(async (req) => {
 export const createPolicy = wrapController(async (req) => {
   const body = req.validated || req.body;
   const id = await channelService.createPolicy(req.tenantId, body);
-  return { id, message: '分润政策创建成功' };
+  return { id, code: ERROR_CODE.CHANNEL_POLICY_CREATED, message: 'Commission policy created' };
 });
 
 export const updatePolicy = wrapController(async (req) => {
   const body = req.validated || req.body;
   await channelService.updatePolicy(req.tenantId, req.params.id, body);
-  return { message: '分润政策更新成功' };
+  return { code: ERROR_CODE.CHANNEL_POLICY_UPDATED, message: 'Commission policy updated' };
 });
 
 export const getPerformance = wrapController(async (req) => {

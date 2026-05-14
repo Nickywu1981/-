@@ -256,7 +256,7 @@ export async function retryTask(taskId, tenantId) {
   if (task.retry_count >= maxRetries) throw new BusinessError(ERROR_CODE.PARAM_ERROR);
   await commerceDao.updateTaskStatusDirect(taskId, {
     status: 6, progress: 0,
-    progress_msg: `重试中(${task.retry_count + 1}/3)`,
+    progress_msg: `Retrying (${task.retry_count + 1}/3)`,
   }, tenantId);
 }
 
@@ -278,5 +278,5 @@ export async function cancelTask(taskId, tenantId) {
   const task = await commerceDao.getTaskById(taskId);
   if (!task) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   if (![0, 1, 5].includes(task.status)) throw new BusinessError(ERROR_CODE.PARAM_ERROR);
-  await commerceDao.updateTaskStatusDirect(taskId, { status: 4, progress_msg: '已取消' }, tenantId);
+  await commerceDao.updateTaskStatusDirect(taskId, { status: 4, progress_msg: 'Cancelled' }, tenantId);
 }
