@@ -1,21 +1,21 @@
 <template>
-  <WorkLayout :steps="['上传产品', '选颜色', '生成']" :current-step="step">
+  <WorkLayout :title="$t('work_pages.color_swap.title')" :steps="steps" :current-step="step">
     <div v-if="step === 0" class="upload-section">
       <div class="dropzone" @dragover.prevent @drop.prevent="handleDrop">
         <p class="dz-icon">👗</p>
-        <p>上传服装/鞋包/配饰产品图</p>
-        <p class="hint">AI自动识别可换色区域，保留褶皱纹理细节</p>
+        <p>{{ $t('work_pages.color_swap.drop_title') }}</p>
+        <p class="hint">{{ $t('work_pages.color_swap.drop_hint') }}</p>
         <input ref="fileInput" type="file" accept="image/*" hidden @change="handleFile" />
-        <button class="btn-outline" @click="fileInput?.click()">选择图片</button>
+        <button class="btn-outline" @click="fileInput?.click()">{{ $t('work_pages.color_swap.select_image') }}</button>
       </div>
-      <div v-if="previewUrl" class="preview-box"><img loading="lazy" :src="previewUrl" alt="颜色替换预览" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" /></div>
-      <p v-if="uploading" class="hint uploading">⏳ 上传中...</p>
-      <p v-else-if="uploadedUrl" class="hint uploaded">✓ 已上传</p>
-      <button v-if="previewUrl" class="btn" @click="step = 1">下一步：选颜色</button>
+      <div v-if="previewUrl" class="preview-box"><img loading="lazy" :src="previewUrl" :alt="$t('work_pages.color_swap.preview_alt')" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" /></div>
+      <p v-if="uploading" class="hint uploading">{{ $t('work_pages.color_swap.uploading') }}</p>
+      <p v-else-if="uploadedUrl" class="hint uploaded">{{ $t('work_pages.color_swap.uploaded') }}</p>
+      <button v-if="previewUrl" class="btn" @click="step = 1">{{ $t('work_pages.color_swap.next_color') }}</button>
     </div>
 
     <div v-else-if="step === 1" class="select-section">
-      <h3>选择目标颜色</h3>
+      <h3>{{ $t('work_pages.color_swap.select_color') }}</h3>
       <div class="palette-grid">
         <button v-for="c in presetColors" :key="c.value" class="color-btn" :class="{ active: selectedColors.includes(c.value) }" @click="toggleColor(c.value)">
           <span class="color-swatch" :style="{ background: c.value }" />
@@ -24,16 +24,16 @@
       </div>
       <div class="custom-color">
         <input v-model="customColor" type="color" />
-        <input v-model="customColorHex" placeholder="#FF0000" class="color-hex" maxlength="20" />
-        <button class="btn-outline-sm" @click="addCustomColor">添加</button>
+        <input v-model="customColorHex" :placeholder="$t('work_pages.color_swap.custom_color_placeholder')" class="color-hex" maxlength="20" />
+        <button class="btn-outline-sm" @click="addCustomColor">{{ $t('work_pages.color_swap.add_color') }}</button>
       </div>
       <div v-if="selectedColors.length" class="selected-colors">
         <span v-for="c in selectedColors" :key="c" class="tag" :style="{ background: c }">{{ c }}</span>
       </div>
-      <p class="cost-hint">成本：3 点/次 · {{ selectedColors.length || 3 }} 色</p>
+      <p class="cost-hint">{{ $t('work_pages.color_swap.cost_hint', { n: selectedColors.length || 3 }) }}</p>
       <div class="actions">
-        <button class="btn-outline" @click="step = 0">返回</button>
-        <button class="btn" @click="submitTask">开始换色</button>
+        <button class="btn-outline" @click="step = 0">{{ $t('work_pages.color_swap.back') }}</button>
+        <button class="btn" @click="submitTask">{{ $t('work_pages.color_swap.start_swap') }}</button>
       </div>
     </div>
 
@@ -43,16 +43,16 @@
         <div class="bar"><div class="bar-fill" :style="{ width: task.progress.value + '%' }" /></div>
       </div>
       <div v-else-if="task.status.value === 2">
-        <h3>换色完成</h3>
+        <h3>{{ $t('work_pages.color_swap.complete_title') }}</h3>
         <div class="image-grid">
           <div v-for="img in (task.result.value?.images || [])" :key="img.color" class="result-card">
             <img loading="lazy" :src="img.url || img.image_url" :alt="img.color" class="result-img" @error="(e) => { (e.target as HTMLImageElement).style.display = 'none' }" />
             <span class="result-label" :style="{ background: img.color }">{{ img.color }}</span>
           </div>
         </div>
-        <div class="actions"><button class="btn-outline" @click="handleRedo">再做一次</button></div>
+        <div class="actions"><button class="btn-outline" @click="handleRedo">{{ $t('work_pages.color_swap.redo_btn') }}</button></div>
       </div>
-      <div v-else-if="task.status.value === 3" class="error-box"><p>{{ task.errorMsg.value }}</p><button class="btn" @click="handleRedo">重试</button></div>
+      <div v-else-if="task.status.value === 3" class="error-box"><p>{{ task.errorMsg.value }}</p><button class="btn" @click="handleRedo">{{ $t('work_pages.color_swap.retry_btn') }}</button></div>
     </div>
   </WorkLayout>
 </template>
@@ -61,6 +61,7 @@
 
 const { createBlobUrl, revoke } = useBlobUrl()
 
+const steps = computed(() => [t('work_pages.color_swap.step_upload'), t('work_pages.color_swap.step_color'), t('work_pages.color_swap.step_generate')])
 const step = ref(0);
 const previewUrl = ref('');
 const uploadedUrl = ref('');
@@ -72,12 +73,20 @@ const toast = useToast()
 const fileInput = ref<HTMLInputElement | null>(null)
 const task = useTask();
 
-const presetColors = [
-  { value: '#FF0000', label: '红色' }, { value: '#FF6600', label: '橙色' }, { value: '#FFD700', label: '金色' },
-  { value: '#00FF00', label: '绿色' }, { value: '#0080FF', label: '蓝色' }, { value: '#8000FF', label: '紫色' },
-  { value: '#FF69B4', label: '粉色' }, { value: '#000000', label: '黑色' }, { value: '#FFFFFF', label: '白色' },
-  { value: '#808080', label: '灰色' }, { value: '#8B4513', label: '棕色' }, { value: '#F5F5DC', label: '米色' },
-];
+const presetColors = computed(() => [
+  { value: '#FF0000', label: t('work_pages.color_swap.color_red') },
+  { value: '#FF6600', label: t('work_pages.color_swap.color_orange') },
+  { value: '#FFD700', label: t('work_pages.color_swap.color_gold') },
+  { value: '#00FF00', label: t('work_pages.color_swap.color_green') },
+  { value: '#0080FF', label: t('work_pages.color_swap.color_blue') },
+  { value: '#8000FF', label: t('work_pages.color_swap.color_purple') },
+  { value: '#FF69B4', label: t('work_pages.color_swap.color_pink') },
+  { value: '#000000', label: t('work_pages.color_swap.color_black') },
+  { value: '#FFFFFF', label: t('work_pages.color_swap.color_white') },
+  { value: '#808080', label: t('work_pages.color_swap.color_gray') },
+  { value: '#8B4513', label: t('work_pages.color_swap.color_brown') },
+  { value: '#F5F5DC', label: t('work_pages.color_swap.color_beige') },
+]);
 
 function toggleColor(c: string) {
   const i = selectedColors.value.indexOf(c);

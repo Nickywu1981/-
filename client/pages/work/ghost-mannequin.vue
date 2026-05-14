@@ -9,11 +9,11 @@
             <div class="ws-upload-area__text">{{ $t('work_pages.ghost_mannequin_upload_placeholder') }}</div>
             <div class="ws-upload-area__hint">{{ $t('work_pages.ghost_mannequin_upload_hint') }}</div>
           </div>
-          <img loading="lazy" v-else :src="previewUrl" alt="上传预览" class="ws-upload-area__preview" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+          <img loading="lazy" v-else :src="previewUrl" :alt="$t('work_pages.ghost_mannequin_image_before_alt')" class="ws-upload-area__preview" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
           <input ref="fileInput" type="file" accept="image/*" hidden @change="handleFile" />
         </div>
-        <div v-if="uploading" class="ws-uploading">⏳ 上传中...</div>
-        <div v-else-if="uploadedUrl" class="ws-uploaded">✓ 已上传</div>
+        <div v-if="uploading" class="ws-uploading">{{ $t('work_pages.ghost_mannequin_uploading') }}</div>
+        <div v-else-if="uploadedUrl" class="ws-uploaded">{{ $t('work_pages.ghost_mannequin_uploaded') }}</div>
       </div>
       <div class="ws-section">
         <div class="ws-section__title">{{ $t('work_pages.ghost_mannequin_effect_title') }}</div>
@@ -28,23 +28,23 @@
       <div class="ws-section">
         <div class="ws-section__title">{{ $t('work_pages.ghost_mannequin_category_title') }}</div>
         <div class="tag-row">
-          <span v-for="c in categories" :key="c" class="ws-tag" :class="{ active: selectedCategory === c }" @click="selectedCategory = c">{{ c }}</span>
+          <span v-for="c in categories" :key="c.value" class="ws-tag" :class="{ active: selectedCategory === c.value }" @click="selectedCategory = c.value">{{ c.label }}</span>
         </div>
       </div>
       <div class="ws-actions">
         <div class="ws-cost">{{ $t('work_pages.ghost_mannequin_cost') }} <strong>4</strong> {{ $t('work_pages.ghost_mannequin_cost_unit') }}</div>
-        <button class="ws-btn ws-btn--primary ws-btn--lg" :disabled="!uploadedUrl || submitting" @click="handleGenerate">{{ submitting ? '提交中...' : '开始生成' }}</button>
+        <button class="ws-btn ws-btn--primary ws-btn--lg" :disabled="!uploadedUrl || submitting" @click="handleGenerate">{{ submitting ? $t('work_pages.ghost_mannequin_btn_submitting') : $t('work_pages.ghost_mannequin_btn_start') }}</button>
       </div>
       <div class="ws-section">
         <div class="ws-section__title">{{ $t('work_pages.result_section_title') }}</div>
         <div v-if="task.polling.value" class="progress-box">
-          <div class="spinner" /><p>{{ task.progressMsg.value || 'AI 正在处理...' }}</p>
+          <div class="spinner" /><p>{{ task.progressMsg.value || $t('work_pages.ghost_mannequin_processing') }}</p>
           <div class="bar"><div class="bar-fill" :style="{ width: task.progress.value + '%' }" /></div>
         </div>
         <div v-else-if="task.status.value === 2" class="result-compare">
           <div class="result-compare__item">
             <div class="result-compare__label">{{ $t('work_pages.ghost_mannequin_before_label') }}</div>
-            <img loading="lazy" v-if="uploadedUrl" :src="uploadedUrl" alt="原图" class="result-compare__img before" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+            <img loading="lazy" v-if="uploadedUrl" :src="uploadedUrl" :alt="$t('work_pages.ghost_mannequin_image_before_alt')" class="result-compare__img before" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
             <div v-else class="result-compare__img before" />
           </div>
           <div class="result-compare__divider">
@@ -53,11 +53,11 @@
           </div>
           <div class="result-compare__item">
             <div class="result-compare__label">{{ $t('work_pages.ghost_mannequin_after_label') }}</div>
-            <img loading="lazy" v-if="task.result.value" :src="task.result.value" alt="生成结果" class="result-compare__img after" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+            <img loading="lazy" v-if="task.result.value" :src="task.result.value" :alt="$t('work_pages.ghost_mannequin_image_after_alt')" class="result-compare__img after" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
             <div v-else class="result-compare__img after" />
           </div>
         </div>
-        <div v-else-if="task.status.value === 3" class="error-box"><p>{{ task.errorMsg.value || '任务失败' }}</p><button class="ws-btn ws-btn--primary" @click="handleRedo">{{ $t('work_pages.ghost_mannequin_btn_retry') }}</button></div>
+        <div v-else-if="task.status.value === 3" class="error-box"><p>{{ task.errorMsg.value || $t('work_pages.ghost_mannequin_error') }}</p><button class="ws-btn ws-btn--primary" @click="handleRedo">{{ $t('work_pages.ghost_mannequin_btn_retry') }}</button></div>
         <div v-else class="ws-placeholder"><div class="ws-placeholder__icon">✨</div><div class="ws-placeholder__text">{{ $t('work_pages.ghost_mannequin_result_placeholder') }}</div></div>
       </div>
       </WorkLayout>
@@ -68,7 +68,7 @@
 const { createBlobUrl, revoke } = useBlobUrl()
 const toast = useToast()
 
-const steps = ['上传图片', '选择效果', '生成展示']
+const steps = computed(() => [t('work_pages.ghost_mannequin_step_upload'), t('work_pages.ghost_mannequin_step_effect'), t('work_pages.ghost_mannequin_step_generate')])
 const currentStep = ref(0)
 const previewUrl = ref('')
 const uploadedUrl = ref('')
@@ -79,14 +79,21 @@ const selectedCategory = ref('tops')
 const task = useTask()
 const fileInput = ref<HTMLInputElement>()
 
-const effects = [
-  { id: 'floating', preview: '👕', name: '立体悬浮', desc: '3D 立体悬浮展示，带自然阴影' },
-  { id: 'flat', preview: '📐', name: '平铺展示', desc: '干净利落的平铺陈列效果' },
-  { id: 'rotate3d', preview: '🔄', name: '3D 旋转', desc: '360° 缓慢旋转展示' },
-  { id: 'dynamic', preview: '💨', name: '动态飘动', desc: '模拟微风吹拂自然飘动' },
-]
+const effects = computed(() => [
+  { id: 'floating', preview: '👕', name: t('work_pages.ghost_mannequin_effect_floating'), desc: t('work_pages.ghost_mannequin_effect_floating_desc') },
+  { id: 'flat', preview: '📐', name: t('work_pages.ghost_mannequin_effect_flat'), desc: t('work_pages.ghost_mannequin_effect_flat_desc') },
+  { id: 'rotate3d', preview: '🔄', name: t('work_pages.ghost_mannequin_effect_rotate3d'), desc: t('work_pages.ghost_mannequin_effect_rotate3d_desc') },
+  { id: 'dynamic', preview: '💨', name: t('work_pages.ghost_mannequin_effect_dynamic'), desc: t('work_pages.ghost_mannequin_effect_dynamic_desc') },
+])
 
-const categories = ['上衣', '裤装', '裙装', '外套', '内衣', '运动服']
+const categories = computed(() => [
+  { value: 'tops', label: t('work_pages.ghost_mannequin_cat_tops') },
+  { value: 'pants', label: t('work_pages.ghost_mannequin_cat_pants') },
+  { value: 'skirts', label: t('work_pages.ghost_mannequin_cat_skirts') },
+  { value: 'outerwear', label: t('work_pages.ghost_mannequin_cat_outerwear') },
+  { value: 'underwear', label: t('work_pages.ghost_mannequin_cat_underwear') },
+  { value: 'sportswear', label: t('work_pages.ghost_mannequin_cat_sportswear') },
+])
 
 function triggerUpload() { fileInput.value?.click() }
 

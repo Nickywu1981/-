@@ -3,11 +3,11 @@
       <div class="ws-section">
         <div class="ws-section__title">{{ $t('work_pages.voice_gen_input_title') }}</div>
         <textarea class="ws-textarea" v-model="text" :placeholder="$t('work_pages.voice_gen_input_placeholder')" rows="5" maxlength="1000"></textarea>
-        <div class="ws-hint">{{ text.length }} / 1000 字符 · 支持中/英/日/韩多语种</div>
+        <div class="ws-hint">{{ text.length }} / 1000 {{ $t('work_pages.voice_gen_input_hint_suffix') }}</div>
         <PromptEnhancer v-if="text.trim()" mode="script" :initial-prompt="text" @applied="(v) => text = v" />
       </div>
       <div class="ws-section">
-        <div class="ws-section__title">{{ $t('work_pages.voice_gen_step_select') }}</div>
+        <div class="ws-section__title">{{ $t('work_pages.voice_gen_voice_title') }}</div>
         <div class="voice-grid">
           <div v-for="v in voices" :key="v.id" class="voice-card" :class="{ active: selectedVoice === v.id }" @click="selectedVoice = v.id">
             <div class="voice-card__icon">{{ v.icon }}</div>
@@ -25,7 +25,7 @@
       </div>
       <div class="ws-actions">
         <div class="ws-cost">{{ $t('work_pages.voice_gen_cost') }} <strong>3</strong> {{ $t('work_pages.voice_gen_cost_unit') }}</div>
-        <button class="ws-btn ws-btn--primary ws-btn--lg" :disabled="!text.trim() || submitting" @click="handleGenerate">{{ submitting ? '生成中...' : '开始生成' }}</button>
+        <button class="ws-btn ws-btn--primary ws-btn--lg" :disabled="!text.trim() || submitting" @click="handleGenerate">{{ submitting ? $t('work_pages.voice_gen_btn_generating') : $t('work_pages.voice_gen_btn_start') }}</button>
       </div>
       <div class="ws-section">
         <div class="ws-section__title">{{ $t('work_pages.result_section_title') }}</div>
@@ -35,9 +35,9 @@
         </div>
         <div v-else-if="task.status.value === 2" class="ws-audio-box">
           <audio v-if="task.result.value" controls class="w-full"><source :src="task.result.value" /></audio>
-          <div class="ws-audio-meta">音色：{{ voices.find(v=>v.id===selectedVoice)?.name }} · 语速：{{ speed }}x</div>
+          <div class="ws-audio-meta">{{ $t('work_pages.voice_gen_result_meta') }}{{ voices.find(v=>v.id===selectedVoice)?.name }}{{ $t('work_pages.voice_gen_result_meta_speed') }}{{ speed }}x</div>
         </div>
-        <div v-else-if="task.status.value === 3" class="error-box"><p>{{ task.errorMsg.value || '生成失败' }}</p><button class="ws-btn ws-btn--primary" @click="handleRedo">{{ $t('work_pages.voice_gen_btn_retry') }}</button></div>
+        <div v-else-if="task.status.value === 3" class="error-box"><p>{{ task.errorMsg.value || $t('work_pages.voice_gen_generate_failed') }}</p><button class="ws-btn ws-btn--primary" @click="handleRedo">{{ $t('work_pages.voice_gen_btn_retry') }}</button></div>
         <div v-else class="ws-placeholder"><div class="ws-placeholder__icon">🔊</div><div class="ws-placeholder__text">{{ $t('work_pages.voice_gen_result_placeholder') }}</div></div>
       </div>
       </WorkLayout>
@@ -48,7 +48,7 @@ import PromptEnhancer from '~/components/PromptEnhancer.vue'
 const { t } = useI18n()
 const toast = useToast()
 
-const steps = ['输入文案', '选择音色', '生成语音']
+const steps = computed(() => [t('work_pages.voice_gen_step_input'), t('work_pages.voice_gen_step_select'), t('work_pages.voice_gen_step_generate')])
 const currentStep = ref(0)
 const text = ref('')
 const speed = ref(1.0)
@@ -56,14 +56,14 @@ const selectedVoice = ref('sweet-female')
 const submitting = ref(false)
 const task = useTask()
 
-const voices = [
-  { id: 'sweet-female', icon: '👩', name: '甜美女声', style: '温柔亲切·带货推荐' },
-  { id: 'magnetic-male', icon: '👨', name: '磁性男声', style: '沉稳大气·品牌旁白' },
-  { id: 'cute-child', icon: '👧', name: '可爱童声', style: '活泼轻快·趣味配音' },
-  { id: 'steady-news', icon: '🎙', name: '沉稳播报', style: '专业清晰·资讯播报' },
-  { id: 'lively-sales', icon: '💁', name: '活泼带货', style: '热情激昂·直播带货' },
-  { id: 'gentle-heal', icon: '🌸', name: '温柔治愈', style: '安静舒缓·情感叙述' },
-]
+const voices = computed(() => [
+  { id: 'sweet-female', icon: '👩', name: t('work_pages.voice_gen_voice_sweet_female'), style: t('work_pages.voice_gen_voice_sweet_female_style') },
+  { id: 'magnetic-male', icon: '👨', name: t('work_pages.voice_gen_voice_magnetic_male'), style: t('work_pages.voice_gen_voice_magnetic_male_style') },
+  { id: 'cute-child', icon: '👧', name: t('work_pages.voice_gen_voice_cute_child'), style: t('work_pages.voice_gen_voice_cute_child_style') },
+  { id: 'steady-news', icon: '🎙', name: t('work_pages.voice_gen_voice_steady_news'), style: t('work_pages.voice_gen_voice_steady_news_style') },
+  { id: 'lively-sales', icon: '💁', name: t('work_pages.voice_gen_voice_lively_sales'), style: t('work_pages.voice_gen_voice_lively_sales_style') },
+  { id: 'gentle-heal', icon: '🌸', name: t('work_pages.voice_gen_voice_gentle_heal'), style: t('work_pages.voice_gen_voice_gentle_heal_style') },
+])
 
 async function handleGenerate() {
   if (!text.value.trim()) { toast.warn(t('common.enter_voice_text')); return }
