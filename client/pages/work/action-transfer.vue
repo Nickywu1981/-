@@ -22,12 +22,12 @@
         <div class="upload-col">
           <label>{{ $t('work_pages.action_transfer.source_video') }}<label>
           <AppMediaUpload accept="video" :multiple="false" :max-size="200" :max-count="1" @uploaded="onSourceVideoUploaded" />
-          <p v-if="sourceVideoUrl" class="hint ok">✓ 已选择</p>
+          <p v-if="sourceVideoUrl" class="hint ok">{{ $t('work_pages.action_transfer.source_selected') }}</p>
         </div>
         <div class="upload-col">
           <label>{{ $t('work_pages.action_transfer.target_image') }}<label>
           <AppMediaUpload accept="image" :multiple="false" :max-size="20" :max-count="1" @uploaded="onTargetImageUploaded" />
-          <p v-if="targetImageUrl" class="hint ok">✓ 已选择</p>
+          <p v-if="targetImageUrl" class="hint ok">{{ $t('work_pages.action_transfer.source_selected') }}</p>
         </div>
       </div>
 
@@ -35,11 +35,8 @@
         <div class="option">
           <label>{{ $t('work_pages.action_transfer.action_style') }}<label>
           <select v-model="actionStyle" class="input">
-            <option value="">自动识别</option>
-            <option value="dance">热舞带货</option>
-            <option value="showcase">产品展示</option>
-            <option value="catwalk">模特走秀</option>
-            <option value="gesture">手势引导</option>
+            <option value="">{{ $t('work_pages.action_transfer.style_auto') }}</option>
+            <option v-for="opt in actionStyleOptions" :key="opt.value" :value="opt.value">{{ $t(opt.nameKey) }}</option>
           </select>
         </div>
       </div>
@@ -72,11 +69,7 @@
               <label>{{ $t('action.clothing_style') || $t('work_pages.action_transfer.clothing_style') }}</label>
               <select v-model="clothingStyle" class="input">
                 <option value="">{{ $t('action.clothing_auto') || $t('work_pages.action_transfer.clothing_auto') }}</option>
-                <option value="casual">休闲</option>
-                <option value="formal">正式</option>
-                <option value="sport">运动</option>
-                <option value="fashion">时尚</option>
-                <option value="vintage">复古</option>
+                <option v-for="opt in clothingStyleOptions" :key="opt.value" :value="opt.value">{{ $t(opt.nameKey) }}</option>
               </select>
             </div>
             <div class="option">
@@ -101,30 +94,27 @@
             <input v-model="bgmUrl" class="input" :placeholder="$t('action.bgm_hint') || 'https://...'" />
           </div>
           <div class="option" style="margin-top:12px">
-            <label>{{ $t('action.volume') || '音量' }}: {{ Math.round(volume * 100) }}%</label>
+            <label>{{ $t('work_pages.action_transfer.volume_label') }}: {{ Math.round(volume * 100) }}%</label>
             <input type="range" v-model.number="volume" min="0" max="1" step="0.05" class="slider" />
           </div>
           <div class="option" style="margin-top:12px">
-            <label>{{ $t('action.voiceover_text') || 'AI 配音文字（可选）' }}</label>
-            <input v-model="voiceoverText" class="input" :placeholder="$t('action.voiceover_hint') || '输入AI配音文案，如不填则不配音'" />
+            <label>{{ $t('work_pages.action_transfer.voiceover_text_label') }}</label>
+            <input v-model="voiceoverText" class="input" :placeholder="$t('work_pages.action_transfer.voiceover_hint')" />
           </div>
           <div class="option" style="margin-top:12px" v-if="voiceoverText">
-            <label>{{ $t('action.voiceover_type') || '配音声线' }}</label>
+            <label>{{ $t('work_pages.action_transfer.voiceover_type_label') }}</label>
             <select v-model="voiceoverType" class="input">
               <option value="">{{ $t('action.voice_auto') || $t('work_pages.action_transfer.clothing_auto') }}</option>
-              <option value="female_sweet">甜美女生</option>
-              <option value="female_gentle">温柔女生</option>
-              <option value="male_deep">醇厚男声</option>
-              <option value="male_young">活力男声</option>
+              <option v-for="opt in voiceoverTypeOptions" :key="opt.value" :value="opt.value">{{ $t(opt.nameKey) }}</option>
             </select>
           </div>
         </div>
       </div>
 
-      <div class="cost-hint">成本：30 点/次</div>
+      <div class="cost-hint">{{ $t('work_pages.action_transfer.cost_hint') }}</div>
 
       <button class="btn btn-primary btn-lg" :disabled="!sourceVideoUrl || !targetImageUrl || taskStatus === 'processing' || taskStatus === 'queued'" @click="doMigrate">
-        {{ taskStatus === 'processing' ? '迁移中...' : taskStatus === 'queued' ? '排队中...' : '开始动作迁移' }}
+        {{ taskStatus === 'processing' ? $t('work_pages.action_transfer.migrating') : taskStatus === 'queued' ? $t('work_pages.action_transfer.queued') : $t('work_pages.action_transfer.start_migrate') }}
       </button>
 
       <AppTaskProgress v-if="taskStatus !== 'idle'" :status="taskStatus" :progress="taskProgress" :error-message="taskError" :show-download="taskStatus === 'completed'" @retry="doMigrate" @download="downloadResult" />
@@ -132,8 +122,8 @@
       <div v-if="resultUrl" class="result-preview">
         <video :src="resultUrl" class="result-video" controls />
         <div class="result-actions">
-          <button class="btn btn-primary btn-sm" @click="downloadResult">下载</button>
-          <button class="btn btn-secondary btn-sm" @click="copyToClipboard(resultUrl)">复制链接</button>
+          <button class="btn btn-primary btn-sm" @click="downloadResult">{{ $t('common.download') }}</button>
+          <button class="btn btn-secondary btn-sm" @click="copyToClipboard(resultUrl)">{{ $t('work_pages.action_transfer.copy_link') }}</button>
         </div>
       </div>
     </div>
@@ -141,28 +131,28 @@
     <!-- 批量动作迁移 -->
     <div v-if="activeTab === 'batch'" class="work-panel">
       <div class="batch-section">
-        <label>源视频（最多10个）</label>
+        <label>{{ $t('work_pages.action_transfer.batch_source_label') }}</label>
         <AppMediaUpload accept="video" :multiple="true" :max-size="200" :max-count="10" @uploaded="onBatchVideosUploaded" />
-        <p class="hint">已选 {{ batchSourceVideos.length }} 个视频</p>
+        <p class="hint">{{ $t('work_pages.action_transfer.batch_source_hint', { n: batchSourceVideos.length }) }}</p>
       </div>
       <div class="batch-section" style="margin-top:20px">
-        <label>目标人物图片（最多20张）</label>
+        <label>{{ $t('work_pages.action_transfer.batch_target_label') }}</label>
         <AppMediaUpload accept="image" :multiple="true" :max-size="20" :max-count="20" @uploaded="onBatchImagesUploaded" />
-        <p class="hint">已选 {{ batchTargetImages.length }} 张图片</p>
+        <p class="hint">{{ $t('work_pages.action_transfer.batch_target_hint', { n: batchTargetImages.length }) }}</p>
       </div>
 
       <div v-if="batchSourceVideos.length && batchTargetImages.length" class="batch-summary">
-        将生成 {{ batchSourceVideos.length }} × {{ batchTargetImages.length }} = {{ batchSourceVideos.length * batchTargetImages.length }} 个迁移任务
+        {{ $t('work_pages.action_transfer.batch_summary', { v: batchSourceVideos.length, i: batchTargetImages.length, t: batchSourceVideos.length * batchTargetImages.length }) }}
       </div>
 
       <button class="btn btn-primary btn-lg" style="margin-top:16px" :disabled="!batchSourceVideos.length || !batchTargetImages.length || batchStatus === 'processing'" @click="doBatchMigrate">
-        {{ batchStatus === 'processing' ? '批量迁移中...' : '开始批量迁移' }}
+        {{ batchStatus === 'processing' ? $t('work_pages.action_transfer.batch_migrating') : $t('work_pages.action_transfer.batch_start') }}
       </button>
 
       <AppTaskProgress v-if="batchStatus !== 'idle'" :status="batchStatus" :progress="batchProgress" @retry="doBatchMigrate" />
 
       <div v-if="batchChildren.length > 0" class="batch-progress-list">
-        <h4>子任务进度</h4>
+        <h4>{{ $t('work_pages.action_transfer.batch_subtask_title') }}</h4>
         <div v-for="child in batchChildren" :key="child.id" class="child-row">
           <span class="child-status" :class="child.status">{{ statusLabel(child.status) }}</span>
           <div class="child-bar"><div class="child-bar-fill" :style="{ width: (child.progress || 0) + '%' }" /></div>
@@ -184,6 +174,25 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 const { configs } = useAppPage({ configs: ['page.action_migrate.header'] })
 const headerCfg = computed(() => configs.value['page.action_migrate.header'] || {})
 
+const actionStyleOptions = [
+  { value: 'dance', nameKey: 'work_pages.action_transfer.style_dance' },
+  { value: 'showcase', nameKey: 'work_pages.action_transfer.style_showcase' },
+  { value: 'catwalk', nameKey: 'work_pages.action_transfer.style_catwalk' },
+  { value: 'gesture', nameKey: 'work_pages.action_transfer.style_gesture' },
+]
+const clothingStyleOptions = [
+  { value: 'casual', nameKey: 'work_pages.action_transfer.clothing_casual' },
+  { value: 'formal', nameKey: 'work_pages.action_transfer.clothing_formal' },
+  { value: 'sport', nameKey: 'work_pages.action_transfer.clothing_sport' },
+  { value: 'fashion', nameKey: 'work_pages.action_transfer.clothing_fashion' },
+  { value: 'vintage', nameKey: 'work_pages.action_transfer.clothing_vintage' },
+]
+const voiceoverTypeOptions = [
+  { value: 'female_sweet', nameKey: 'work_pages.action_transfer.voice_female_sweet' },
+  { value: 'female_gentle', nameKey: 'work_pages.action_transfer.voice_female_gentle' },
+  { value: 'male_deep', nameKey: 'work_pages.action_transfer.voice_male_deep' },
+  { value: 'male_young', nameKey: 'work_pages.action_transfer.voice_male_young' },
+]
 const activeTab = ref('single')
 const tabs = [
   { key: 'single', label: t('work_pages.action_transfer.tab_single') },
@@ -269,7 +278,7 @@ watch(batchResult, (v) => {
 })
 
 function statusLabel(s: string) {
-  const map: Record<string, string> = { queued: '排队', processing: '处理中', completed: '完成', failed: '失败' }
+  const map: Record<string, string> = { queued: t('work_pages.action_transfer.status_queued'), processing: t('work_pages.action_transfer.status_processing'), completed: t('work_pages.action_transfer.status_completed'), failed: t('work_pages.action_transfer.status_failed') }
   return map[s] || s
 }
 
