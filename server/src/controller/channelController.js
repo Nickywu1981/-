@@ -14,13 +14,13 @@ export const getChannelDetail = wrapController(async (req) => {
 });
 
 export const applyChannel = wrapController(async (req) => {
-  const body = req.validated || req.body;
+  const body = req.validated;
   const id = await channelService.applyChannel(req.tenantId, body);
   return { id, code: ERROR_CODE.CHANNEL_APPLY_SUBMITTED, message: 'Application submitted, pending review' };
 });
 
 export const auditChannel = wrapController(async (req) => {
-  const body = req.validated || req.body;
+  const body = req.validated;
   await channelService.auditChannel(req.tenantId, req.params.id, body);
   return { code: ERROR_CODE.CHANNEL_AUDIT_DONE, message: 'Audit completed' };
 });
@@ -34,13 +34,13 @@ export const listPolicies = wrapController(async (req) => {
 });
 
 export const createPolicy = wrapController(async (req) => {
-  const body = req.validated || req.body;
+  const body = req.validated;
   const id = await channelService.createPolicy(req.tenantId, body);
   return { id, code: ERROR_CODE.CHANNEL_POLICY_CREATED, message: 'Commission policy created' };
 });
 
 export const updatePolicy = wrapController(async (req) => {
-  const body = req.validated || req.body;
+  const body = req.validated;
   await channelService.updatePolicy(req.tenantId, req.params.id, body);
   return { code: ERROR_CODE.CHANNEL_POLICY_UPDATED, message: 'Commission policy updated' };
 });

@@ -69,8 +69,8 @@ export default function paramFilter(req, _res, next) {
     req.params = sanitize(req.params);
   }
 
-  // Injection scan — reject suspicious input
-  if (scanForInjection(req.body) || scanForInjection(req.query)) {
+  // Injection scan — reject suspicious input (covers body, query, params)
+  if (scanForInjection(req.body) || scanForInjection(req.query) || scanForInjection(req.params)) {
     return next(new BusinessError(ERROR_CODE.BAD_REQUEST, 'Request contains illegal characters'));
   }
 

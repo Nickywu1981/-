@@ -3,6 +3,8 @@ import logger from '../utils/logger.js';
 import { BusinessError } from '../utils/businessError.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
+const VALID_ISOLATION_LEVELS = ['READ UNCOMMITTED', 'READ COMMITTED', 'REPEATABLE READ', 'SERIALIZABLE'];
+
 /**
  * 事务包装器 — 传入回调自动获得 conn，失败自动回滚
  *
@@ -13,7 +15,7 @@ import { ERROR_CODE } from '../constants/errorCode.js';
  *   });
  */
 export async function withTransaction(fn, options = {}) {
-  const { isolationLevel, maxRetries = 0 } = options;
+  const { isolationLevel: rawLevel, maxRetries = 0 } = options;
   const conn = await pool.getConnection();
 
   let lastError = null;
@@ -25,9 +27,9 @@ export async function withTransaction(fn, options = {}) {
       }
       try {
         await conn.beginTransaction();
-        if (isolationLevel) {
-          const VALID_LEVELS = ['READ UNCOMMITTED', 'READ COMMITTED', 'REPEATABLE READ', 'SERIALIZABLE'];
-          if (!VALID_LEVELS.includes(isolationLevel)) throw new BusinessError(ERROR_CODE.PARAM_ERROR, `Invalid isolation level: ${isolationLevel}`);
+        if (rawLevel) {
+          const isolationLevel = VALID_ISOLATION_LEVELS.find(l => l === rawLevel.toUpperCase());
+          if (!isolationLevel) throw new BusinessError(ERROR_CODE.PARAM_ERROR, `Invalid isolation level: ${rawLevel}`);
           await conn.query(`SET TRANSACTION ISOLATION LEVEL ${isolationLevel}`);
         }
         const result = await fn(conn);

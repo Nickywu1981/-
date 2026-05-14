@@ -17,7 +17,7 @@ export const listBankAccounts = wrapController(async (req, res) => {
 });
 
 export const addBankAccount = wrapController(async (req, res) => {
-  const id = await financeService.addBankAccount(req.tenantId, req.validated || req.body);
+  const id = await financeService.addBankAccount(req.tenantId, req.validated);
   return success(res, { id }, '收款账户已绑定');
 });
 
@@ -88,7 +88,7 @@ export const listWithdrawals = wrapController(async (req, res) => {
 });
 
 export const createWithdrawal = wrapController(async (req, res) => {
-  const { amount, bankAccountId } = req.validated || req.body;
+  const { amount, bankAccountId } = req.validated;
   const result = await financeService.createWithdrawal(
     req.tenantId,
     req.user?.id || req.user?.userId,
@@ -112,7 +112,7 @@ export const getCommissionPolicy = wrapController(async (req, res) => {
 });
 
 export const updateCommissionPolicy = wrapController(async (req, res) => {
-  const data = req.validated || req.body;
+  const data = req.validated;
   const policy = await financeService.updateCommissionPolicy(req.tenantId, data);
   return success(res, policy, '分润政策已更新');
 });

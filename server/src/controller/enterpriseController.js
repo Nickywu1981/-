@@ -28,14 +28,14 @@ function audit(req, action, targetId, targetTitle) {
 // ==================== 企业入驻/登录 ====================
 
 export const registerEnterprise = wrapController(async (req, res) => {
-  const data = req.validated || req.body;
+  const data = req.validated;
   const result = await enterpriseService.registerEnterprise(data);
   audit(req, 'enterprise.register', result.tenantId, `企业入驻: ${data.name}`);
   return success(res, result, '企业入驻成功');
 });
 
 export const loginEnterprise = wrapController(async (req, res) => {
-  const { account, password } = req.validated || req.body;
+  const { account, password } = req.validated;
   const result = await enterpriseService.loginEnterprise({ account, password: String(password) });
 
   // 设置 cookie
@@ -78,7 +78,7 @@ export const getProfile = wrapController(async (req, res) => {
 export const updateProfile = wrapController(async (req, res) => {
   const tenantId = req.tenantId;
   if (!tenantId) throw new BusinessError(ERROR_CODE.FORBIDDEN);
-  const profile = await enterpriseService.updateEnterpriseProfile(tenantId, req.validated || req.body);
+  const profile = await enterpriseService.updateEnterpriseProfile(tenantId, req.validated);
   audit(req, 'enterprise.updateProfile', tenantId, '更新企业信息');
   return success(res, profile, '更新成功');
 });
@@ -100,7 +100,7 @@ export const listUsers = wrapController(async (req, res) => {
 
 export const addUser = wrapController(async (req, res) => {
   const tenantId = req.tenantId;
-  const { phone, email, nickname, password, role } = req.validated || req.body;
+  const { phone, email, nickname, password, role } = req.validated;
   const id = await enterpriseService.addEnterpriseUser(tenantId, { phone, email, nickname, password, role });
   audit(req, 'enterprise.addUser', id, `添加子账号: ${phone}`);
   return success(res, { id }, '子账号创建成功');
@@ -110,7 +110,7 @@ export const updateUser = wrapController(async (req, res) => {
   const tenantId = req.tenantId;
   const id = parseInt(req.params.id, 10);
   if (!id || id < 1) throw new BusinessError(ERROR_CODE.BAD_REQUEST);
-  const data = req.validated || req.body;
+  const data = req.validated;
   await enterpriseService.updateEnterpriseUser(tenantId, id, data);
   audit(req, 'enterprise.updateUser', id, `更新子账号: ${id}`);
   return success(res, null, '更新成功');
@@ -152,7 +152,7 @@ export const getWhiteLabel = wrapController(async (req, res) => {
 
 export const updateWhiteLabel = wrapController(async (req, res) => {
   const tenantId = req.tenantId;
-  const whiteLabel = await enterpriseService.updateWhiteLabel(tenantId, req.validated || req.body);
+  const whiteLabel = await enterpriseService.updateWhiteLabel(tenantId, req.validated);
   audit(req, 'enterprise.updateWhiteLabel', tenantId, '更新白标配置');
   return success(res, whiteLabel, '白标配置已更新');
 });
