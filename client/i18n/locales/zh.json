@@ -6660,7 +6660,15 @@
       "title": "电商平台尺寸模板",
       "subtitle": "一键套用各大平台的图片尺寸标准，再也不用担心传错尺寸被拒",
       "detail_title": " — 尺寸详情"
-    }
+    },
+    "main_image_platform_taobao": "淘宝",
+    "main_image_platform_pdd": "拼多多",
+    "main_image_platform_douyin": "抖音",
+    "main_image_platform_xiaohongshu": "小红书",
+    "main_image_platform_sph": "视频号",
+    "main_image_platform_amazon": "亚马逊",
+    "main_image_platform_mercado": "美客多",
+    "cut_ecosystem_items_unit": "个"
   },
   "promptEnhancer": {
     "triggerAria": "提示词润色",

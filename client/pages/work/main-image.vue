@@ -105,12 +105,12 @@ const stylePrompt = ref('');
 const task = useTask();
 const stepLabels = computed(() => [t('work_pages.main_image_step_upload'), t('work_pages.main_image_step_platform'), t('work_pages.main_image_step_style'), t('work_pages.main_image_step_generate')]);
 
-const platforms = [
-  { code: 'taobao', name: '淘宝' }, { code: 'pdd', name: '拼多多' }, { code: 'douyin', name: '抖音' },
-  { code: 'xiaohongshu', name: '小红书' }, { code: 'sph', name: '视频号' }, { code: 'amazon', name: '亚马逊' },
+const platforms = computed(() => [
+  { code: 'taobao', name: t('work_pages.main_image_platform_taobao') }, { code: 'pdd', name: t('work_pages.main_image_platform_pdd') }, { code: 'douyin', name: t('work_pages.main_image_platform_douyin') },
+  { code: 'xiaohongshu', name: t('work_pages.main_image_platform_xiaohongshu') }, { code: 'sph', name: t('work_pages.main_image_platform_sph') }, { code: 'amazon', name: t('work_pages.main_image_platform_amazon') },
   { code: 'temu', name: 'Temu' }, { code: 'shein', name: 'Shein' }, { code: 'tiktok', name: 'TikTok Shop' },
-  { code: 'mercado', name: '美客多' }, { code: 'ozon', name: 'Ozon' }, { code: 'shopee', name: 'Shopee' }, { code: 'lazada', name: 'Lazada' },
-];
+  { code: 'mercado', name: t('work_pages.main_image_platform_mercado') }, { code: 'ozon', name: 'Ozon' }, { code: 'shopee', name: 'Shopee' }, { code: 'lazada', name: 'Lazada' },
+]);
 
 const styles = [
   { id: 'simple', nameKey: 'work_pages.main_image_style_simple', preview: '⬜' },

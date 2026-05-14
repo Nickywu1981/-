@@ -116,7 +116,7 @@
         <h3>{{ $t('work_pages.cut_ecosystem.export_success') }}<h3>
         <div class="result-info">
           <div><strong>{{ $t('work_pages.cut_ecosystem.target_platform_label') }}</strong> {{ draftResult.platform === 'jianying' ? $t('work_pages.cut_ecosystem.platform_jy_name') : $t('work_pages.cut_ecosystem.platform_cc_name') }}</div>
-          <div><strong>{{ $t('work_pages.cut_ecosystem.assets_count') }}</strong> {{ draftResult?.assets?.length ?? 0 }} 个</div>
+          <div><strong>{{ $t('work_pages.cut_ecosystem.assets_count') }}</strong> {{ draftResult?.assets?.length ?? 0 }} {{ $t('work_pages.cut_ecosystem.items_unit') }}</div>
           <div><strong>{{ $t('work_pages.cut_ecosystem.project_name_label') }}</strong> {{ draftResult?.draft?.draft_name || '-' }}</div>
         </div>
         <div class="result-actions">
