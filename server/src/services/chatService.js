@@ -17,10 +17,12 @@ import { classifyIntent } from './intentClassifier.js';
 import { checkCompliance } from './adComplianceEngine.js';
 import { wrapPrompt } from './promptWrapper.js';
 import { injectReversePrompt } from './promptParser.js';
-import { createSSEStream, processStreamingOutput } from './streamingService.js';
+import { createSSEStream } from './streamingService.js';
 import { gatewayRoute } from '../gateway/aiGatewayHub.js';
 import { SessionStore } from '../adk/core/sessionStore.js';
 import logger from '../utils/logger.js';
+
+const sessionStore = new SessionStore();
 
 // 意图 → 后端路由映射 (复用现有 v4 接口)
 const INTENT_ROUTE_MAP = {
@@ -53,7 +55,7 @@ export async function handleMessage({ res, req, message, sessionId, mode, attach
 
   // 恢复或创建 session
   const sid = sessionId || `chat_${userId}_${Date.now()}`;
-  let session = sessionId ? await SessionStore.get(sessionId) : null;
+  let session = sessionId ? await sessionStore.get(sessionId) : null;
   if (!session) {
     session = { id: sid, userId, messages: [], createdAt: new Date().toISOString() };
   }
@@ -67,7 +69,7 @@ export async function handleMessage({ res, req, message, sessionId, mode, attach
 
     const complianceResult = checkCompliance(message, { platform: '通用', strict: true });
     if (!complianceResult.passed) {
-      const blockers = complianceResult.violations.filter(v => v.level === 'block');
+      const blockers = complianceResult.violations.filter(v => v.action === 'block');
       if (blockers.length > 0) {
         sse.send({
           type: 'blocked',
@@ -160,7 +162,7 @@ export async function handleMessage({ res, req, message, sessionId, mode, attach
       sse.send({ type: 'status', status: 'generating', message: '正在调用 AI 生成...' });
     }
 
-    const sourceStream = await gatewayRoute({
+    const aiResult = await gatewayRoute({
       mode: 'single',
       taskType: route.taskType,
       params: {
@@ -174,10 +176,19 @@ export async function handleMessage({ res, req, message, sessionId, mode, attach
       },
     });
 
-    // processStreamingOutput 自动将每个 chunk 作为 token 事件发送，无需 onChunk 重复发送
-    await processStreamingOutput(sourceStream, sse, {
-      moderateInterval: 5,
-    });
+    // gatewayRoute 返回完整结果，非流式；提取文本并按字符分块发送以模拟流式体验
+    const fullText = aiResult?.response?.choices?.[0]?.message?.content
+      || aiResult?.output?.text
+      || aiResult?.output
+      || '';
+    const chunkSize = 8;
+    for (let i = 0; i < fullText.length; i += chunkSize) {
+      if (sse.isDisconnected) break;
+      const chunk = fullText.slice(i, i + chunkSize);
+      sse.send(chunk, 'token');
+      // 小延迟模拟流式节奏
+      await new Promise(r => setTimeout(r, 20));
+    }
 
     // ── Step 5: 保存会话历史 ──
     session.messages.push({ role: 'user', content: message, timestamp: new Date().toISOString() });
@@ -186,7 +197,7 @@ export async function handleMessage({ res, req, message, sessionId, mode, attach
     if (session.messages.length > 50) {
       session.messages = session.messages.slice(-50);
     }
-    await SessionStore.set(sid, session);
+    await sessionStore.set(sid, session);
 
     sse.done();
   } catch (err) {
