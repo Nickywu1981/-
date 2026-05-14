@@ -14,17 +14,22 @@ import { uploadConfig } from '../config/index.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const UPLOAD_DIR = path.join(__dirname, '../../uploads/images');
+const UPLOAD_BASE_DIR = path.join(__dirname, '../../uploads');
+
+/** 构建租户隔离上传目录: uploads/{tenantId}/images/ */
+function getTenantUploadDir(tenantId) {
+  const tid = tenantId || 0;
+  return path.join(UPLOAD_BASE_DIR, String(tid), 'images');
+}
 
 let _dirReady = false;
-async function ensureUploadDir() {
-  if (_dirReady) return;
-  try {
-    await fs.promises.mkdir(UPLOAD_DIR, { recursive: true });
+async function ensureUploadDir(subdir) {
+  if (!_dirReady) {
+    await fs.promises.mkdir(UPLOAD_BASE_DIR, { recursive: true });
     _dirReady = true;
-  } catch (e) {
-    logger.error('[Upload] 上传目录创建失败', { dir: UPLOAD_DIR, error: e.message });
-    throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
+  }
+  if (subdir) {
+    await fs.promises.mkdir(subdir, { recursive: true });
   }
 }
 
@@ -74,13 +79,15 @@ async function checkMagicNumber(filePath, mimeType) {
 }
 
 const storage = multer.diskStorage({
-  destination: async (_req, _file, cb) => {
-    await ensureUploadDir();
-    cb(null, UPLOAD_DIR);
+  destination: async (req, _file, cb) => {
+    const dir = getTenantUploadDir(req.tenantId);
+    await ensureUploadDir(dir);
+    cb(null, dir);
   },
   filename: (_req, file, cb) => {
     const ext = MIME_TO_EXT[file.mimetype] || '.png';
-    const name = `${Date.now()}_${crypto.randomBytes(4).toString('hex')}${ext}`;
+    const tid = _req.tenantId || 0;
+    const name = `${tid}_${Date.now()}_${crypto.randomBytes(4).toString('hex')}${ext}`;
     cb(null, name);
   },
 });

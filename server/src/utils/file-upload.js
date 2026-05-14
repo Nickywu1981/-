@@ -89,6 +89,11 @@ const UPLOAD_DIR = path.join(__dirname, '../../uploads');
 const CHUNK_DIR = path.join(UPLOAD_DIR, '.chunks');
 const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
 
+/** 构建租户隔离目标路径: uploads/{tenantId}/{subdir}/{filename} */
+export function tenantPath(tenantId = 0, ...parts) {
+  return path.join(UPLOAD_DIR, String(tenantId), ...parts);
+}
+
 // 分片写入互斥锁 — 防止并发 receiveChunk 导致分片记录丢失
 const _chunkLocks = new Map();
 
@@ -193,7 +198,7 @@ export async function getReceivedChunks(uploadId) {
 /**
  * 完成上传 → 合并分片 → 返回最终文件路径
  */
-export async function completeUpload(uploadId) {
+export async function completeUpload(uploadId, tenantId = 0) {
   const metaPath = path.join(CHUNK_DIR, `${uploadId}.json`);
   try { await fsp.access(metaPath); } catch { throw new BusinessError(ERROR_CODE.NOT_FOUND); }
 
@@ -208,7 +213,9 @@ export async function completeUpload(uploadId) {
   const timestamp = Date.now();
   const ext = path.extname(meta.fileName);
   const finalName = `${timestamp}_${uploadId.substring(0, 8)}${ext}`;
-  const finalPath = path.join(UPLOAD_DIR, finalName);
+  const tenantDir = path.join(UPLOAD_DIR, String(tenantId), 'files');
+  await fsp.mkdir(tenantDir, { recursive: true });
+  const finalPath = path.join(tenantDir, finalName);
 
   await new Promise((resolve, reject) => {
     const writeStream = fs.createWriteStream(finalPath);
@@ -247,7 +254,7 @@ export async function completeUpload(uploadId) {
     throw new BusinessError(ERROR_CODE.BAD_REQUEST, `File content does not match type (${extClean}), deleted`);
   }
 
-  const fileUrl = `/uploads/${finalName}`;
+  const fileUrl = `/uploads/${tenantId}/files/${finalName}`;
   return {
     file_url: fileUrl,
     file_name: meta.fileName,
@@ -261,14 +268,16 @@ export async function completeUpload(uploadId) {
 /**
  * 接收 multer 上传的文件并保存到 uploads 目录
  */
-export async function saveSimpleFile(file) {
+export async function saveSimpleFile(file, tenantId = 0) {
   const timestamp = Date.now();
   // MIME 类型 → 安全扩展名（不信任用户提供的 originalname）
   const ext = MIME_TO_SAFE_EXT[file.mimetype];
   if (!ext) throw new BusinessError(ERROR_CODE.VALIDATION_ERROR, `Unsupported file type: ${file.mimetype}`);
   const extClean = ext.replace('.', '').toLowerCase();
   const finalName = `${timestamp}_${crypto.randomBytes(8).toString('hex')}${ext}`;
-  const finalPath = path.join(UPLOAD_DIR, finalName);
+  const tenantDir = path.join(UPLOAD_DIR, String(tenantId), 'files');
+  await fsp.mkdir(tenantDir, { recursive: true });
+  const finalPath = path.join(tenantDir, finalName);
 
   // 魔数检测 — 写入前验证
   validateBufferMagic(file.buffer, extClean);
@@ -281,7 +290,7 @@ export async function saveSimpleFile(file) {
     throw writeErr;
   }
 
-  const fileUrl = `/uploads/${finalName}`;
+  const fileUrl = `/uploads/${tenantId}/files/${finalName}`;
   return {
     file_url: fileUrl,
     file_name: file.originalname,
