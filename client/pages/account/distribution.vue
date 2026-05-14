@@ -110,6 +110,7 @@ import { formatDateTime, copyToClipboard } from '@/utils/format'
 
 const { t } = useI18n()
 const toast = useToast()
+const { confirm } = useConfirm()
 const { configs } = useAppPage({ configs: ['page.distribution.header'] })
 const headerCfg = computed(() => configs.value['page.distribution.header'] || {})
 
@@ -161,7 +162,8 @@ async function fetchCommissions() {
   try {
     const res: any = await $fetch(`${apiBase}/distribution/history`, { credentials: 'include', params: { page: commPage.value, pageSize: 20 } })
     if (res.code === 200) {
-      commissionList.value = res.data.list || []
+      const newItems = res.data.list || []
+      commissionList.value = commPage.value > 1 ? [...commissionList.value, ...newItems] : newItems
       commTotal.value = res.data.total || 0
     }
   } catch { toast.error(t('account_pages.distribution.load_history_error')) }
@@ -170,6 +172,7 @@ async function fetchCommissions() {
 
 async function doWithdraw() {
   if (!balance.value?.available || balance.value.available <= 0) return
+  if (!await confirm({ message: t('account_pages.distribution.confirm_withdraw', { amount: balance.value.available }) })) return
   withdrawing.value = true
   try {
     const res: any = await $fetch(`${apiBase}/distribution/withdraw`, {

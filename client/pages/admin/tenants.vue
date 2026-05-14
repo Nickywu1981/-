@@ -140,7 +140,7 @@ async function fetchData() {
     const params = new URLSearchParams({ page: String(page.value), pageSize: String(pageSize), keyword: keyword.value })
     if (filterStatus.value !== '') params.set('status', filterStatus.value)
     if (filterReviewStatus.value) params.set('reviewStatus', filterReviewStatus.value)
-    const res: any = await $fetch(`/api/tenants?${params.toString()}`)
+    const res: any = await $fetch(`/api/tenants?${params.toString()}`, { credentials: 'include' })
     if (res?.code === 200) {
       list.value = res.data?.list || []
       total.value = res.data?.total || 0
@@ -176,7 +176,7 @@ async function save() {
   try {
     const url = isEdit.value ? `/api/tenants/${form.value.id}` : '/api/tenants'
     const method = isEdit.value ? 'PUT' : 'POST'
-    const res: any = await $fetch(url, { method, body: form.value })
+    const res: any = await $fetch(url, { method, body: form.value, credentials: 'include' })
     if (res?.code === 200 || res?.code === 0) {
       toast.success(t('common.success_save'))
       modalOpen.value = false
@@ -194,7 +194,7 @@ async function save() {
 async function delTenant(id: number) {
   if (!await confirm({ message: t('common.confirm_delete'), variant: 'danger' })) return
   try {
-    const res: any = await $fetch(`/api/tenants/${id}`, { method: 'DELETE' })
+    const res: any = await $fetch(`/api/tenants/${id}`, { method: 'DELETE', credentials: 'include' })
     if (res?.code === 200 || res?.code === 0) {
       toast.success(t('common.delete_success'))
       fetchData()
@@ -209,7 +209,7 @@ async function delTenant(id: number) {
 async function toggleStatus(t: any) {
   const newStatus = t.status === 1 ? 0 : 1
   try {
-    const res: any = await $fetch(`/api/tenants/${t.id}`, { method: 'PUT', body: { status: newStatus } })
+    const res: any = await $fetch(`/api/tenants/${t.id}`, { method: 'PUT', body: { status: newStatus }, credentials: 'include' })
     if (res?.code === 200 || res?.code === 0) {
       toast.success(t('common.success_save'))
       fetchData()
@@ -249,6 +249,7 @@ async function doReview(decision: string) {
     const res: any = await $fetch(`/api/tenants/${reviewTarget.value.id}/review`, {
       method: 'POST',
       body: { decision, remark: reviewRemark.value },
+      credentials: 'include',
     })
     if (res?.code === 200 || res?.code === 0) {
       toast.success(t('common.success_save'))

@@ -10,11 +10,8 @@ export function usePromptEnhance() {
     enhancing.value = true
     try {
       const endpoint = type === 'poster' ? '/api/posters/enhance-prompt' : '/api/images/enhance-prompt'
-      const { data, error } = await useApi().post<{ enhancedPrompt: string }>(endpoint, { prompt })
-      if (error.value || !data.value) {
-        throw new Error(error.value?.message || t('promptEnhancer.enhanceFailed'))
-      }
-      return data.value.enhancedPrompt || prompt
+      const result = await useApi().post<{ enhancedPrompt: string }>(endpoint, { prompt })
+      return result?.enhancedPrompt || prompt
     } finally {
       enhancing.value = false
     }

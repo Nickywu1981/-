@@ -226,7 +226,6 @@ async function fetchData() {
     // 客户端按行业过滤（tags 包含 filterIndustry）
     if (filterIndustry.value) {
       items = items.filter((t: any) => (t.tags || '').includes(filterIndustry.value));
-      total.value = items.length;
     }
     list.value = items;
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(t('admin_prompts.load_failed') + ': ' + (err?.data?.msg || err.message || t('admin_prompts.network_error'))); } finally { loading.value = false; }

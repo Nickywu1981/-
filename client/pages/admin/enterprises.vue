@@ -132,6 +132,7 @@ definePageMeta({ layout: 'platform-admin', middleware: ['auth'] });
 
 const { $api } = useNuxtApp();
 const { t } = useI18n();
+const { confirm } = useConfirm();
 
 const tenants = ref([]);
 const stats = ref({ pending: 0, under_review: 0, approved: 0, rejected: 0 });
@@ -183,7 +184,10 @@ function typeLabel(t) { return TYPE_MAP[t] || t; }
 function actionClass(a) { if (a === 'approve' || a === 'reinstate') return 'badge-success'; if (a === 'reject') return 'badge-danger'; if (a === 'suspend') return 'badge-warning'; return 'badge-default'; }
 function actionLabel(a) { return ACTION_MAP[a] || a; }
 function formatTime(t) { return t ? new Date(t).toLocaleString('zh-CN') : '-'; }
-function showToast(msg, type = 'success') { toast.msg = msg; toast.type = type; setTimeout(() => { toast.msg = ''; }, 3000); }
+let toastTimer: ReturnType<typeof setTimeout> | null = null
+function showToast(msg, type = 'success') { toast.msg = msg; toast.type = type; if (toastTimer) clearTimeout(toastTimer); toastTimer = setTimeout(() => { toast.msg = ''; }, 3000); }
+
+onUnmounted(() => { if (toastTimer) clearTimeout(toastTimer) })
 
 async function fetchStats() {
   loading.stats = true;
@@ -209,6 +213,7 @@ async function fetchList() {
 }
 
 async function doApprove(tenant) {
+  if (!await confirm({ message: t('admin.enterprises.confirm_approve') })) return
   try {
     await $api(`/admin/enterprises/${tenant.id}/approve`, { method: 'POST' });
     showToast(`「${tenant.name}」${t('admin.enterprises.approved')}`);
@@ -241,6 +246,7 @@ async function doSuspend() {
 }
 
 async function doReinstate(tenant) {
+  if (!await confirm({ message: t('admin.enterprises.confirm_reinstate') })) return
   try {
     await $api(`/admin/enterprises/${tenant.id}/reinstate`, { method: 'POST' });
     showToast(`「${tenant.name}」${t('admin.enterprises.reinstated_msg')}`);

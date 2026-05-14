@@ -92,6 +92,21 @@ onMounted(async () => {
   loading.value = false
 })
 
+async function saveGeoSettings() {
+  saving.value = true; geoSavedMsg.value = ''
+  const revKeyMap = Object.fromEntries(Object.entries(geoKeyMap).map(([k, v]) => [v, k]))
+  const items = (Object.keys(geo) as (keyof typeof geo)[]).map(field => ({
+    key: revKeyMap[field], value: String(geo[field] || ''), type: 'text', description: `GEO: ${field}`,
+  }))
+  try {
+    for (const item of items) {
+      await $fetch(`/api/admin/site-config/${encodeURIComponent(item.key)}`, { method: 'PUT', credentials: 'include', body: { config_value: item.value, config_type: item.type, description: item.description } })
+    }
+    showGeoMsg(t('admin_settings.设置已保存'))
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('common.failed_save')) }
+  saving.value = false
+}
+
 async function saveSettings() {
   saving.value = true; savedMsg.value = ''
   const items = [

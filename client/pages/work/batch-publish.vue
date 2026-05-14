@@ -31,17 +31,11 @@ const submit = async () => {
   loading.value = true
   results.value = []
   try {
-    const res = await fetch('/api/publish/submit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({
-        workId: workId.value,
-        platforms: selectedPlatforms.value,
-      }),
+    const data = await useApi().post('/publish/submit', {
+      workId: workId.value,
+      platforms: selectedPlatforms.value,
     })
-    const data = await res.json()
-    if (data.code === 0) {
+    if (data?.code === 0 || data) {
       results.value = selectedPlatforms.value.map(p => ({ platform: p, status: 'done' }))
     } else {
       results.value = selectedPlatforms.value.map(p => ({ platform: p, status: 'failed' }))

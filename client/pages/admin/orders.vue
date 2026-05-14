@@ -17,6 +17,12 @@
 
     <LoadingSkeleton v-if="loading" type="table" :rows="5" :cols="8" />
 
+    <div v-else-if="error" class="error-state">
+      <span class="error-icon">⚠️</span>
+      <p>{{ error }}</p>
+      <button class="retry-btn" @click="fetch">{{ $t('common.retry') }}</button>
+    </div>
+
     <div class="table-wrap" v-else-if="list.length">
       <table class="table">
         <thead>
@@ -89,12 +95,13 @@ const planType = ref('')
 const loading = ref(true)
 const detailOpen = ref(false)
 const detail = ref<any>({})
+const error = ref('')
 
 const planLabels: Record<string, string> = { '1': t('common.month_card'), '2': t('common.quarter_card'), '3': t('common.year_card') }
 function planLabel(t: number | string) { return planLabels[String(t)] || t('common.unknown') }
 
 async function fetch() {
-  loading.value = true
+  loading.value = true; error.value = ''
   try {
     const params = new URLSearchParams({ page: String(page.value), pageSize: String(pageSize) })
     if (userId.value) params.set('userId', userId.value)
@@ -104,7 +111,7 @@ async function fetch() {
       list.value = data.data.list || []
       total.value = data.data.total || 0
     }
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(t('common.failed_load_orders') + ' : ' + (err?.data?.msg || err.message)) } finally { loading.value = false }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; error.value = err?.data?.msg || err.message || t('common.failed_load_orders'); toast.error(error.value) } finally { loading.value = false }
 }
 
 function search() { page.value = 1; fetch() }

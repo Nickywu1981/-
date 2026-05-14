@@ -142,7 +142,7 @@ function progress(t: any) { if (t.status === 2) return 100; if (t.status === 3) 
 async function fetchData() {
   loading.value = true; error.value = ''
   try {
-    const res: any = await $fetch('/api/admin/tasks', { params: { page: page.value, pageSize, status: status.value, typeGroup: typeGroup.value, userId: userId.value } })
+    const res: any = await $fetch('/api/admin/tasks', { params: { page: page.value, pageSize, status: status.value, typeGroup: typeGroup.value, userId: userId.value }, credentials: 'include' })
     if (res?.code === 200) { list.value = res.data?.list || []; total.value = res.data?.total || 0 }
     else { throw new Error(res?.msg || t('admin_tasks.fetch_failed')) }
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; error.value = err?.data?.msg || err.message || t('admin_tasks.load_failed'); toast.error(error.value) } finally { loading.value = false }
@@ -154,7 +154,7 @@ function openDetail(t: any) { detail.value = t; detailOpen.value = true }
 
 async function retryTask(t: any) {
   try {
-    const res: any = await $fetch(`/api/admin/tasks/${t.id}/retry`, { method: 'POST' })
+    const res: any = await $fetch(`/api/admin/tasks/${t.id}/retry`, { method: 'POST', credentials: 'include' })
     if (res?.code === 200) { toast.success(t('admin_tasks.retry_success')); fetchData() }
     else { toast.error(res?.msg || t('admin_tasks.retry_failed')) }
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('admin_tasks.retry_failed')) }
@@ -163,7 +163,7 @@ async function retryTask(t: any) {
 async function cancelTask(t: any) {
   if (!await confirm({ message: t('admin_tasks.confirm_cancel') })) return
   try {
-    const res: any = await $fetch(`/api/admin/tasks/${t.id}/cancel`, { method: 'POST' })
+    const res: any = await $fetch(`/api/admin/tasks/${t.id}/cancel`, { method: 'POST', credentials: 'include' })
     if (res?.code === 200) { toast.success(t('admin_tasks.cancel_success')); fetchData() }
     else { toast.error(res?.msg || t('admin_tasks.cancel_failed')) }
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('admin_tasks.cancel_failed')) }

@@ -69,27 +69,20 @@ const submit = async () => {
   results.value = []
 
   try {
-    const res = await fetch('/api/sku-batch/image', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({
-        imageUrl: imageUrl.value,
-        skus: skus.value.map(s => ({ color: s.color, colorHex: s.colorHex, size: s.size, angle: s.angle })),
-        platforms: selectedPlatforms.value,
-        types: selectedTypes.value,
-        quality: quality.value,
-      }),
+    const api = useApi()
+    const data = await api.post('/sku-batch/image', {
+      imageUrl: imageUrl.value,
+      skus: skus.value.map(s => ({ color: s.color, colorHex: s.colorHex, size: s.size, angle: s.angle })),
+      platforms: selectedPlatforms.value,
+      types: selectedTypes.value,
+      quality: quality.value,
     })
-    const data = await res.json()
-    taskId.value = data.data?.taskId
+    taskId.value = data?.taskId
 
     pollTimer = setInterval(async () => {
-      const statusRes = await fetch(`/api/sku-batch/${taskId.value}`, { credentials: 'include' })
-      const statusData = await statusRes.json()
-      const task = statusData.data
-      results.value = task.results || []
-      if (task.status === 'done' || task.status === 'failed') {
+      const task = await api.get(`/sku-batch/${taskId.value}`)
+      results.value = task?.results || []
+      if (task?.status === 'done' || task?.status === 'failed') {
         clearInterval(pollTimer!)
         pollTimer = null
         step.value = 'done'

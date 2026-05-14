@@ -125,6 +125,8 @@ const parsedMeta = computed(() => {
 let debounceTimer: ReturnType<typeof setTimeout>
 function onKeywordInput() { clearTimeout(debounceTimer); debounceTimer = setTimeout(search, 350) }
 
+onUnmounted(() => { clearTimeout(debounceTimer) })
+
 onMounted(search)
 async function search() {
   loading.value = true; error.value = ''

@@ -119,7 +119,7 @@ const earnTasks = [
 
 async function fetchAccount() {
   try {
-    const res: any = await $fetch(`${apiBase}/points/account`)
+    const res: any = await $fetch(`${apiBase}/points/account`, { credentials: 'include' })
     if (res.code === 200) account.value = res.data
   } catch { toast.error(t('my.account.points.load_failed')) }
 }
@@ -127,9 +127,14 @@ async function fetchAccount() {
 async function fetchTransactions() {
   loadingTx.value = true
   try {
-    const res: any = await $fetch(`${apiBase}/points/transactions`, { params: { page: txPage.value, pageSize: 20 } })
+    const res: any = await $fetch(`${apiBase}/points/transactions`, { params: { page: txPage.value, pageSize: 20 }, credentials: 'include' })
     if (res.code === 200) {
-      transactions.value = res.data.list || []
+      const newItems = res.data.list || []
+      if (txPage.value > 1) {
+        transactions.value = [...transactions.value, ...newItems]
+      } else {
+        transactions.value = newItems
+      }
       txTotal.value = res.data.total || 0
     }
   } catch { toast.error(t('my.account.points.load_tx_failed')) }

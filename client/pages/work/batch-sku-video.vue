@@ -46,27 +46,21 @@ const submit = async () => {
   loading.value = true; taskId.value = ''; results.value = []
 
   try {
-    const res = await fetch('/api/sku-batch/video', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({
-        productImages: productImages.value,
-        skus: [{ color: '默认' }],
-        platforms: selectedPlatforms.value,
-        duration: duration.value,
-        style: style.value,
-      }),
+    const api = useApi()
+    const data = await api.post('/sku-batch/video', {
+      productImages: productImages.value,
+      skus: [{ color: '默认' }],
+      platforms: selectedPlatforms.value,
+      duration: duration.value,
+      style: style.value,
     })
-    const data = await res.json()
-    taskId.value = data.data?.taskId
-    totalCount.value = data.data?.estimatedCount || selectedPlatforms.value.length
+    taskId.value = data?.taskId
+    totalCount.value = data?.estimatedCount || selectedPlatforms.value.length
 
     pollTimer.value = setInterval(async () => {
-      const sr = await fetch(`/api/sku-batch/${taskId.value}`, { credentials: 'include' })
-      const sd = await sr.json()
-      results.value = sd.data?.results || []
-      if (sd.data?.status === 'done' || sd.data?.status === 'failed') {
+      const task = await api.get(`/sku-batch/${taskId.value}`)
+      results.value = task?.results || []
+      if (task?.status === 'done' || task?.status === 'failed') {
         clearInterval(pollTimer.value)
         loading.value = false
       }

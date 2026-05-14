@@ -238,7 +238,7 @@ function onSmartRefUploaded(files: any[]) { if (files.length > 0) { smartRefUrl.
 async function doExtractInfo() {
   smartLoading.value = true; smartError.value = '';
   try {
-    const data = await $fetch('/api/detail/extract-product-info', { method: 'POST', body: { image_url: smartRefUrl.value } })
+    const data = await $fetch('/api/detail/extract-product-info', { method: 'POST', credentials: 'include', body: { image_url: smartRefUrl.value } })
     smartResult.value = { productName: data.productName || '', category: data.category || t('categories.other'), features: data.features || [] }
   } catch (e: unknown) {
     smartError.value = e?.data?.message || e?.message || t('work_pages.detail_index.recognize_failed')

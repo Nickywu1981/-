@@ -20,12 +20,12 @@
     <div v-if="activeTab === 'single'" class="work-panel">
       <div class="two-col-upload">
         <div class="upload-col">
-          <label>{{ $t('work_pages.action_transfer.source_video') }}<label>
+          <label>{{ $t('work_pages.action_transfer.source_video') }}</label>
           <AppMediaUpload accept="video" :multiple="false" :max-size="200" :max-count="1" @uploaded="onSourceVideoUploaded" />
           <p v-if="sourceVideoUrl" class="hint ok">{{ $t('work_pages.action_transfer.source_selected') }}</p>
         </div>
         <div class="upload-col">
-          <label>{{ $t('work_pages.action_transfer.target_image') }}<label>
+          <label>{{ $t('work_pages.action_transfer.target_image') }}</label>
           <AppMediaUpload accept="image" :multiple="false" :max-size="20" :max-count="1" @uploaded="onTargetImageUploaded" />
           <p v-if="targetImageUrl" class="hint ok">{{ $t('work_pages.action_transfer.source_selected') }}</p>
         </div>
@@ -33,7 +33,7 @@
 
       <div class="options-row" style="margin-top:20px">
         <div class="option">
-          <label>{{ $t('work_pages.action_transfer.action_style') }}<label>
+          <label>{{ $t('work_pages.action_transfer.action_style') }}</label>
           <select v-model="actionStyle" class="input">
             <option value="">{{ $t('work_pages.action_transfer.style_auto') }}</option>
             <option v-for="opt in actionStyleOptions" :key="opt.value" :value="opt.value">{{ $t(opt.nameKey) }}</option>

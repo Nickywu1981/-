@@ -70,6 +70,7 @@
 import { formatDateTime } from '@/utils/format'
 
 const { t } = useI18n()
+const { confirm } = useConfirm()
 
 const filter = reactive({ status: '', type: '' as string });
 const list = ref<any[]>([]);
@@ -99,7 +100,7 @@ async function fetchList() {
 function onPageChange(p: number) { page.value = p; fetchList(); }
 
 async function approve(item: any) {
-  if (!(await confirmDialog(t('admin_moderation.confirm_approve')))) return
+  if (!(await confirm({ message: t('admin_moderation.confirm_approve') }))) return
   reviewing.value = true;
   try {
     await $fetch(`/api/admin/tasks/${item.id}/approve`, { method: 'POST', credentials: 'include' });
@@ -109,7 +110,7 @@ async function approve(item: any) {
 }
 
 async function reject(item: any) {
-  if (!(await confirmDialog(t('admin_moderation.confirm_reject')))) return
+  if (!(await confirm({ message: t('admin_moderation.confirm_reject') }))) return
   reviewing.value = true;
   try {
     await $fetch(`/api/admin/tasks/${item.id}/reject`, { method: 'POST', credentials: 'include' });

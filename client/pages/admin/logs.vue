@@ -25,6 +25,12 @@
 
     <LoadingSkeleton v-if="loading" type="table" :rows="6" :cols="7" />
 
+    <div v-else-if="error" class="error-state">
+      <span class="error-icon">⚠️</span>
+      <p>{{ error }}</p>
+      <button class="retry-btn" @click="fetch">{{ $t('common.retry') }}</button>
+    </div>
+
     <template v-else-if="list.length">
     <div class="table-wrap">
     <table class="table">
@@ -80,11 +86,12 @@ const dateEnd = ref('')
 const loading = ref(true)
 const detail = ref<any>(null)
 const stats = ref<any>(null)
+const error = ref('')
 const { downloadBlob } = useFileDownload()
 const toast = useToast()
 
 async function fetch() {
-  loading.value = true
+  loading.value = true; error.value = ''
   try {
     const p = new URLSearchParams({ page: String(page.value), pageSize: String(pageSize) })
     if (userId.value) p.set('userId', userId.value)
@@ -96,7 +103,7 @@ async function fetch() {
     list.value = res.data?.list || []
     total.value = res.data?.total || 0
     stats.value = res.data?.stats || null
-  } catch (e: unknown) { toast.error(t('common.loadFail')) } finally { loading.value = false }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; error.value = err?.data?.msg || err.message || t('common.loadFail'); toast.error(error.value) } finally { loading.value = false }
 }
 
 function onPageChange(p: number) { page.value = p; fetch() }

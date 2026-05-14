@@ -178,8 +178,13 @@ async function savePlan(plan: any) {
 }
 
 async function toggleStatus(plan: any) {
-  plan.status = plan.status ? 0 : 1;
-  await savePlan(plan);
+  const oldStatus = plan.status
+  plan.status = plan.status ? 0 : 1
+  try {
+    await savePlan(plan)
+  } catch {
+    plan.status = oldStatus
+  }
 }
 
 function openCreate() { newPlan.value = { name: '', plan_type: 1, price: 0, original_price: 0, credits: 100, daily_credits: 10, batch_limit: 10, save_days: 30, watermark_free: 0, hd_export: 0, brand_kit: 0, priority_queue: 0, status: 1 }; showCreate.value = true; }
