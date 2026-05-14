@@ -17,19 +17,22 @@ const submit = async () => {
   if (!sourceVideo.value || !productImage.value) return
   loading.value = true; error.value = ''; result.value = null
   try {
-    const res = await fetch('/api/sku-batch/video', {
+    const res = await fetch('/api/videos/action-migrate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
       body: JSON.stringify({
-        productImages: [productImage.value],
-        skus: [{ color: '默认' }],
-        platforms: ['douyin'],
-        duration: duration.value,
-        style: style.value,
+        source_video_url: sourceVideo.value,
+        target_person_image: productImage.value,
+        options: {
+          duration: duration.value,
+          style: style.value,
+        },
+        enhanced_options: {},
       }),
     })
     const data = await res.json()
+    if (data.code !== 0) throw new Error(data.msg || '请求失败')
     result.value = data.data
   } catch (err: any) {
     error.value = err.message || '请求失败'
@@ -72,7 +75,7 @@ const submit = async () => {
       </button>
 
       <div v-if="result" class="am-result">
-        <div class="am-status">任务已提交 ({{ result.estimatedCount }} 个视频)</div>
+        <div class="am-status">任务已提交 (Job ID: {{ result.job_id }})</div>
       </div>
       <div v-if="error" class="am-error">{{ error }}</div>
     </div>
