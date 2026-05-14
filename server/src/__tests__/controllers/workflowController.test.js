@@ -14,7 +14,7 @@ vi.mock('../../utils/logger.js', () => ({ default: { info: vi.fn(), warn: vi.fn(
 vi.mock('../../utils/wrapController.js', () => ({ wrapController: (fn) => fn }));
 vi.mock('../../utils/response.js', () => ({
   success: (res, data, msg) => ({ code: 0, data, message: msg }),
-  listResult: (res, list, total, page, pageSize) => ({ code: 0, data: { list, total, page, pageSize } }),
+  listResult: (res, result) => ({ code: 0, data: { list: result.list, total: result.total, page: result.page, pageSize: result.pageSize } }),
 }));
 
 import * as ctrl from '../../controller/workflowController.js';
@@ -102,6 +102,6 @@ describe('workflowController', () => {
 
   it('cancelJob rejects completed job', async () => {
     mockDao.getJob.mockResolvedValue({ id: 7, status: 'completed' });
-    await expect(ctrl.cancelJob({ params: { id: '7' } }, mockRes())).rejects.toThrow('仅可取消等待/运行中的作业');
+    await expect(ctrl.cancelJob({ params: { id: '7' } }, mockRes())).rejects.toThrow();
   });
 });

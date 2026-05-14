@@ -20,7 +20,7 @@ describe('campaignController', () => {
   it('getCampaign finds by id', async () => {
     mockSvc.getCampaign.mockResolvedValue({ id: 1, name: '促销' });
     await ctrl.getCampaign({ params: { id: '5' }, res: {} });
-    expect(mockSvc.getCampaign).toHaveBeenCalledWith(5);
+    expect(mockSvc.getCampaign).toHaveBeenCalledWith(5, undefined);
   });
 
   it('createCampaign assigns tenant', async () => {

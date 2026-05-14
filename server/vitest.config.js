@@ -1,6 +1,12 @@
-process.env.ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'exactly-32-byte-encryption-key!!';
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+process.env.NODE_ENV = 'test';
+process.env.ENCRYPTION_KEY = 'aes256-test-key-exactly-32byte!!';
 
 export default {
+  envDir: __dirname,
   test: {
     include: ['src/__tests__/**/*.test.{js,mjs}'],
     exclude: ['src/__tests__/route/core.test.js', 'src/__tests__/contract.test.js'],
@@ -10,7 +16,7 @@ export default {
     globals: true,
     setupFiles: ['./vitest.setup.js'],
     env: {
-      ENCRYPTION_KEY: 'exactly-32-byte-encryption-key!!',
+      ENCRYPTION_KEY: 'aes256-test-key-exactly-32byte!!',
     },
   },
 };
