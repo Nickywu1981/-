@@ -111,7 +111,7 @@ async function loadPages() {
     if (filter.pageType) params.set('pageType', filter.pageType)
     if (filter.status !== '') params.set('status', filter.status)
     if (filter.keyword) params.set('keyword', filter.keyword)
-    const res = await $fetch(`/api/diy?${params}`)
+    const res = await $fetch(`/api/diy?${params}`, { credentials: 'include' })
     pages.value = res.data?.list || []
   } catch (e) { toast.error(t('common.failed_load_page_list')) }
   finally { loading.value = false }
@@ -119,7 +119,7 @@ async function loadPages() {
 
 async function createPage() {
   try {
-    await $fetch('/api/diy', { method: 'POST', body: form })
+    await $fetch('/api/diy', { method: 'POST', credentials: 'include', body: form })
     showCreate.value = false
     form.title = ''; form.slug = ''; form.pageType = 'mobile'
     loadPages()
@@ -127,13 +127,13 @@ async function createPage() {
 }
 
 async function publishPage(id) {
-  try { await $fetch(`/api/diy/${id}/publish`, { method: 'POST' }); loadPages() }
+  try { await $fetch(`/api/diy/${id}/publish`, { method: 'POST', credentials: 'include' }); loadPages() }
   catch (e) { toast.error(t('common.failed_submit')) }
 }
 
 async function deletePage(id) {
   if (!await confirm({ message: t('common.confirm_delete') })) return
-  try { await $fetch(`/api/diy/${id}/soft-delete`, { method: 'POST' }); loadPages() }
+  try { await $fetch(`/api/diy/${id}/soft-delete`, { method: 'POST', credentials: 'include' }); loadPages() }
   catch (e) { toast.error(t('common.failed_delete')) }
 }
 

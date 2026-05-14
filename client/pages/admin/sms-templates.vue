@@ -122,7 +122,7 @@ async function fetchTemplates() {
     if (filterProvider.value) params.set('provider', filterProvider.value);
     params.set('page', String(currentPage.value));
     params.set('pageSize', String(pageSize.value));
-    const res: any = await $fetch(`/api/sms/templates?${params}`);
+    const res: any = await $fetch(`/api/sms/templates?${params}`, { credentials: 'include' });
     templates.value = res.data?.list || res.data || [];
     total.value = res.data?.total || templates.value.length;
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('admin_sms_templates.load_failed')) }
@@ -134,6 +134,7 @@ async function saveTpl(tpl: any) {
   try {
     await $fetch(`/api/sms/templates/${tpl.id}`, {
       method: 'PUT',
+      credentials: 'include',
       body: { name: tpl.name, content: tpl.content, provider_template_id: tpl.provider_template_id, provider: tpl.provider, status: tpl.status, remark: tpl.remark },
     });
     showMsg(t('admin_sms_templates.saved'));
@@ -148,7 +149,7 @@ function openCreate() { newTpl.value = { template_code: '', name: '', content: '
 async function createTpl() {
   creating.value = true;
   try {
-    await $fetch('/api/sms/templates', { method: 'POST', body: newTpl.value });
+    await $fetch('/api/sms/templates', { method: 'POST', credentials: 'include', body: newTpl.value });
     showCreate.value = false; showMsg(t('admin_sms_templates.template_created'));
     fetchTemplates();
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || t('admin_sms_templates.create_failed'); }
@@ -160,7 +161,7 @@ function confirmDelete(tpl: any) { deleteTarget.value = tpl; showDelete.value = 
 async function doDelete() {
   if (!deleteTarget.value) return; deleting.value = true;
   try {
-    await $fetch(`/api/sms/templates/${deleteTarget.value.id}`, { method: 'DELETE' });
+    await $fetch(`/api/sms/templates/${deleteTarget.value.id}`, { method: 'DELETE', credentials: 'include' });
     showDelete.value = false; showMsg(t('admin_sms_templates.template_deleted'));
     fetchTemplates();
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || t('admin_sms_templates.delete_failed'); }

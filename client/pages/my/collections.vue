@@ -34,7 +34,7 @@
 
     <div v-else class="empty">{{ $t('my_pages.collections.empty') }}</div>
 
-    <Pagination v-if="total > 20" v-model:page="page" :total="total" :page-size="20" @update:page="fetchData" />
+    <Pagination v-if="total > 20" :page="page" :total="total" :page-size="20" @change="(p) => { page = p; fetchData(); }" />
   </div>
 </template>
 

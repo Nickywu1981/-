@@ -152,12 +152,13 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue';
 
 definePageMeta({ layout: 'platform-admin', middleware: ['auth'] })
 
 const { t } = useI18n();
+const toast = useToast();
 
 const workflows = ref([]);
 const selectedWf = ref(null);
@@ -192,8 +193,8 @@ function getAutoModelForStep(step) {
 async function selectWorkflow(id) {
   try {
     const [defRes, configRes] = await Promise.all([
-      $fetch(`/api/workflow/definition/${id}`),
-      $fetch(`/api/workflow/definition/${id}/config`),
+      $fetch(`/api/workflow/definition/${id}`, { credentials: 'include' }),
+      $fetch(`/api/workflow/definition/${id}/config`, { credentials: 'include' }),
     ]);
     if (defRes?.data) {
       selectedWf.value = defRes.data;
@@ -227,7 +228,7 @@ async function selectWorkflow(id) {
       }
     }
     // 加载模型池
-    const poolRes = await $fetch('/api/admin/model-pool');
+    const poolRes = await $fetch('/api/admin/model-pool', { credentials: 'include' });
     if (poolRes?.data) modelPool.value = poolRes.data;
   } catch (e) { /* ignore */ }
 }
@@ -243,18 +244,20 @@ async function saveConfig() {
 
     await $fetch(`/api/workflow/definition/${selectedWf.value.id}/config`, {
       method: 'PUT',
+      credentials: 'include',
       body: {
         mode: wfMode.value,
-        disabledSteps: selectedWf.value.steps.filter(s => !s.enabled).map(s => s.key),
+        disabled_steps: selectedWf.value.steps.filter(s => !s.enabled).map(s => s.key),
         modelBindings: Object.fromEntries(Object.entries(modelBindings).filter(([, v]) => v !== 'auto')),
         deletedSteps,
         stepOrder: selectedWf.value.steps.map(s => s.key),
         params: { ...params },
       },
     });
-    alert(t('admin_workflow_config.save_success'));
-  } catch (e) {
-    alert(t('admin_workflow_config.save_fail') + ': ' + (e.message || 'Unknown error'));
+    toast.success(t('admin_workflow_config.save_success'));
+  } catch (e: unknown) {
+    const err = e as { data?: { msg?: string }; message?: string };
+    toast.error(t('admin_workflow_config.save_fail') + ': ' + (err?.data?.msg || err?.message || 'Unknown error'));
   }
 }
 
@@ -277,7 +280,7 @@ function deleteStep(stepKey) {
 
 onMounted(async () => {
   try {
-    const res = await $fetch('/api/workflow/definitions');
+    const res = await $fetch('/api/workflow/definitions', { credentials: 'include' });
     if (res?.data) workflows.value = res.data;
   } catch {}
 });

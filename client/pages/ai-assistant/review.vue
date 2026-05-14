@@ -47,7 +47,7 @@ async function review() {
   if (!text.value.trim()) return
   loading.value = true
   try {
-    const res = await $fetch('/api/ai-assistant/review', { method: 'POST', body: { text: text.value } })
+    const res = await $fetch('/api/ai-assistant/review', { method: 'POST', credentials: 'include', body: { text: text.value } })
     result.value = (res as any).data
   } catch { result.value = { pass: false, score: 0, issues: [{ level: 'block', reason: $t('ai_assistant.review.service_error') }] }
   } finally { loading.value = false }

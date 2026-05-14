@@ -98,7 +98,7 @@ async function fetchAssets() {
   loading.value = true
   try {
     const filter = activeFilter.value === 'all' ? undefined : activeFilter.value
-    const res: any = await $fetch(`${apiBase}/assets/list`, { params: { page: page.value, pageSize, type: filter } })
+    const res: any = await $fetch(`${apiBase}/assets/list`, { credentials: 'include', params: { page: page.value, pageSize, type: filter } })
     if (res.code === 200) {
       items.value = res.data.list || []
       total.value = res.data.total || 0

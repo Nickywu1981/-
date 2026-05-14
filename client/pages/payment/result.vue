@@ -85,6 +85,7 @@ async function mockPay(result: 'success' | 'fail') {
   try {
     await $fetch('/api/allinpay/notify', {
       method: 'POST',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
         reqsn,
@@ -106,7 +107,7 @@ function startPoll() {
   pollTimer = setInterval(async () => {
     pollCount++
     try {
-      const res: any = await $fetch(`/api/payment/result/${reqsn}`)
+      const res: any = await $fetch(`/api/payment/result/${reqsn}`, { credentials: 'include' })
       const data = res.data
       if (data && data.status === 1) {
         status.value = 'success'

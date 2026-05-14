@@ -160,7 +160,7 @@ async function fetchData() {
     const params = new URLSearchParams({ page: String(page.value), pageSize: String(pageSize), keyword: keyword.value })
     if (filterStatus.value) params.set('status', filterStatus.value)
     if (filterType.value) params.set('taskType', filterType.value)
-    const res: any = await $fetch(`/api/automation/tasks?${params.toString()}`)
+    const res: any = await $fetch(`/api/automation/tasks?${params.toString()}`, { credentials: 'include' })
     if (res?.code === 200) { list.value = res.data?.list || []; total.value = res.data?.total || 0 }
     else { list.value = res.data || []; total.value = list.value.length }
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; error.value = err?.data?.msg || err.message || t('common.loadFail'); toast.error(error.value) } finally { loading.value = false }
@@ -174,7 +174,7 @@ function openDetail(t: any) { detail.value = t; detailOpen.value = true }
 async function save() {
   saving.value = true
   try {
-    const res: any = await $fetch('/api/automation/tasks', { method: 'POST', body: form.value })
+    const res: any = await $fetch('/api/automation/tasks', { method: 'POST', credentials: 'include', body: form.value })
     if (res?.code === 200 || res?.code === 0) { toast.success(t('admin_automation.task_created')); modalOpen.value = false; fetchData() }
     else { toast.error(res?.msg || t('common.failed_save')) }
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('common.failed_save')) } finally { saving.value = false }
@@ -182,7 +182,7 @@ async function save() {
 
 async function execute(t: any) {
   try {
-    const res: any = await $fetch(`/api/automation/admin/execute/${t.id}`, { method: 'POST' })
+    const res: any = await $fetch(`/api/automation/admin/execute/${t.id}`, { method: 'POST', credentials: 'include' })
     if (res?.code === 200 || res?.code === 0) { t.status = 1; toast.success(t('admin_automation.task_executing')) }
     else { toast.error(res?.msg || t('common.failed_save')) }
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('common.failed_save')) }
@@ -190,7 +190,7 @@ async function execute(t: any) {
 
 async function cancel(t: any) {
   try {
-    const res: any = await $fetch(`/api/automation/tasks/${t.id}/cancel`, { method: 'POST' })
+    const res: any = await $fetch(`/api/automation/tasks/${t.id}/cancel`, { method: 'POST', credentials: 'include' })
     if (res?.code === 200 || res?.code === 0) { t.status = 4; toast.success(t('admin_automation.task_cancelled')) }
     else { toast.error(res?.msg || t('common.failed_save')) }
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('common.failed_save')) }
@@ -198,7 +198,7 @@ async function cancel(t: any) {
 
 async function retryTask(t: any) {
   try {
-    const res: any = await $fetch(`/api/automation/admin/execute/${t.id}`, { method: 'POST' })
+    const res: any = await $fetch(`/api/automation/admin/execute/${t.id}`, { method: 'POST', credentials: 'include' })
     if (res?.code === 200 || res?.code === 0) { t.status = 1; toast.success(t('admin_automation.task_retried')); fetchData() }
     else { toast.error(res?.msg || t('common.failed_save')) }
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('common.failed_save')) }

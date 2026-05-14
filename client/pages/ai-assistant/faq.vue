@@ -41,7 +41,7 @@ async function ask() {
   query.value = ''
   loading.value = true
   try {
-    const res = await $fetch('/api/ai-assistant/faq', { method: 'POST', body: { question: q } })
+    const res = await $fetch('/api/ai-assistant/faq', { method: 'POST', credentials: 'include', body: { question: q } })
     const results = (res as any).data?.results || []
     if (results.length) {
       results.forEach((r: any) => messages.value.push({ role: 'assistant', content: `📌 ${r.question}\n\n${r.answer}` }))

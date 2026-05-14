@@ -55,6 +55,7 @@
 
 <script setup lang="ts">
 const toast = useToast();
+const { t } = useI18n();
 const query = ref('');
 const searching = ref(false);
 const searchError = ref('');

@@ -104,7 +104,7 @@ async function fetchData() {
     if (filterModel.value) p.set('modelId', filterModel.value)
     if (dateStart.value) p.set('dateStart', dateStart.value)
     if (dateEnd.value) p.set('dateEnd', dateEnd.value)
-    const res: any = await $fetch(`/api/admin/ai-logs?${p}`)
+    const res: any = await $fetch(`/api/admin/ai-logs?${p}`, { credentials: 'include' })
     list.value = res.data?.list || []
     total.value = res.data?.total || 0
     if (res.data?.stats) Object.assign(stats, res.data.stats)

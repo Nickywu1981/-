@@ -114,7 +114,7 @@ async function handleSmsLogin() {
   loading.value = true; msg.value = '';
   try {
     await $fetch('/api/sms/verify-code', { method: 'POST', credentials: 'include', body: { phone: smsPhone.value, scene: 'login', code: smsCode.value } });
-    await api.post('/auth/login-by-code', { phone: smsPhone.value });
+    await $fetch('/api/auth/login-by-code', { method: 'POST', credentials: 'include', body: { phone: smsPhone.value } });
     await useAuthStore().fetchUser();
     navigateTo('/workspace');
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || t('auth.login_network_error'); msgErr.value = true; }
@@ -136,7 +136,7 @@ async function handleEmailLogin() {
   loading.value = true; msg.value = '';
   try {
     await $fetch('/api/email/verify-code', { method: 'POST', credentials: 'include', body: { email: emailAddr.value, code: emailCode.value } });
-    await api.post('/auth/login-by-code', { email: emailAddr.value });
+    await $fetch('/api/auth/login-by-code', { method: 'POST', credentials: 'include', body: { email: emailAddr.value } });
     await useAuthStore().fetchUser();
     navigateTo('/workspace');
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || t('auth.login_network_error'); msgErr.value = true; }

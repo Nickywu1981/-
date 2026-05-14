@@ -38,21 +38,21 @@
     <!-- 作品选择 -->
     <section class="works-section">
       <div class="section-header">
-        <h3>{{ $t('work_pages.cut_ecosystem.select_works') }}<h3>
+        <h3>{{ $t('work_pages.cut_ecosystem.select_works') }}</h3>
         <div class="filter-row">
           <select v-model="filterType" @change="loadWorks">
-            <option value="">{{ $t('work_pages.cut_ecosystem.all_types') }}<option>
+            <option value="">{{ $t('work_pages.cut_ecosystem.all_types') }}</option>
             <option v-for="t in taskTypes" :key="t.value" :value="t.value">{{ $t(t.labelKey) }}</option>
           </select>
         </div>
       </div>
 
-      <div v-if="loading" class="loading-state">{{ $t('work_pages.cut_ecosystem.loading') }}<div>
+      <div v-if="loading" class="loading-state">{{ $t('work_pages.cut_ecosystem.loading') }}</div>
 
       <div v-else-if="works.length === 0" class="empty-state">
         <div class="empty-icon">📭</div>
-        <p>{{ $t('work_pages.cut_ecosystem.no_works') }}<p>
-        <router-link to="/workspace" class="btn-primary">{{ $t('work_pages.cut_ecosystem.go_create') }}<router-link>
+        <p>{{ $t('work_pages.cut_ecosystem.no_works') }}</p>
+        <router-link to="/workspace" class="btn-primary">{{ $t('work_pages.cut_ecosystem.go_create') }}</router-link>
       </div>
 
       <div v-else class="works-grid">
@@ -80,15 +80,15 @@
       </div>
 
       <div v-if="works.length > 0" class="pagination">
-        <button :disabled="page <= 1" @click="page--; loadWorks()">{{ $t('work_pages.cut_ecosystem.prev_page') }}<button>
+        <button :disabled="page <= 1" @click="page--; loadWorks()">{{ $t('work_pages.cut_ecosystem.prev_page') }}</button>
         <span>{{ $t('work_pages.cut_ecosystem.page_of', { page, total: totalPages }) }}</span>
-        <button :disabled="page >= totalPages" @click="page++; loadWorks()">{{ $t('work_pages.cut_ecosystem.next_page') }}<button>
+        <button :disabled="page >= totalPages" @click="page++; loadWorks()">{{ $t('work_pages.cut_ecosystem.next_page') }}</button>
       </div>
     </section>
 
     <!-- 项目名称 -->
     <section v-if="selectedIds.length > 0" class="config-section">
-      <label>{{ $t('work_pages.cut_ecosystem.project_name') }}<label>
+      <label>{{ $t('work_pages.cut_ecosystem.project_name') }}</label>
       <input v-model="projectName" class="input" :placeholder="$t('work_pages.cut_ecosystem.project_placeholder')" maxlength="100" />
     </section>
 
@@ -113,18 +113,18 @@
     <!-- 导出结果 -->
     <section v-if="draftResult" class="result-section">
       <div class="result-card">
-        <h3>{{ $t('work_pages.cut_ecosystem.export_success') }}<h3>
+        <h3>{{ $t('work_pages.cut_ecosystem.export_success') }}</h3>
         <div class="result-info">
           <div><strong>{{ $t('work_pages.cut_ecosystem.target_platform_label') }}</strong> {{ draftResult.platform === 'jianying' ? $t('work_pages.cut_ecosystem.platform_jy_name') : $t('work_pages.cut_ecosystem.platform_cc_name') }}</div>
           <div><strong>{{ $t('work_pages.cut_ecosystem.assets_count') }}</strong> {{ draftResult?.assets?.length ?? 0 }} {{ $t('work_pages.cut_ecosystem.items_unit') }}</div>
           <div><strong>{{ $t('work_pages.cut_ecosystem.project_name_label') }}</strong> {{ draftResult?.draft?.draft_name || '-' }}</div>
         </div>
         <div class="result-actions">
-          <button class="btn-primary" @click="downloadDraft">{{ $t('work_pages.cut_ecosystem.download_project') }}<button>
-          <button class="btn-text" @click="draftResult = null">{{ $t('work_pages.cut_ecosystem.close') }}<button>
+          <button class="btn-primary" @click="downloadDraft">{{ $t('work_pages.cut_ecosystem.download_project') }}</button>
+          <button class="btn-text" @click="draftResult = null">{{ $t('work_pages.cut_ecosystem.close') }}</button>
         </div>
         <details class="draft-preview">
-          <summary>{{ $t('work_pages.cut_ecosystem.preview_json') }}<summary>
+          <summary>{{ $t('work_pages.cut_ecosystem.preview_json') }}</summary>
           <pre>{{ JSON.stringify(draftResult.draft, null, 2) }}</pre>
         </details>
       </div>

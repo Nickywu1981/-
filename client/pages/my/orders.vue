@@ -24,7 +24,7 @@
         </div>
       </div>
       <div v-else class="empty-state">{{ $t('my.orders.empty') }}</div>
-      <Pagination v-if="total > pageSize" v-model:page="page" :total="total" :page-size="pageSize" />
+      <Pagination v-if="total > pageSize" :page="page" :total="total" :page-size="pageSize" @change="(p) => { page = p; fetchAll(); }" />
     </template>
   </div>
 </template>

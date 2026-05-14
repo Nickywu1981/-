@@ -56,6 +56,10 @@ import { extractErrorMsg } from '~/composables/useApi'
 const { t } = useI18n()
 const { confirm } = useConfirm()
 
+function onImgError(e: Event) {
+  (e.target as HTMLImageElement).src = '/images/placeholder.png'
+}
+
 const activeTab = ref('all')
 const page = ref(1)
 const pageSize = 12

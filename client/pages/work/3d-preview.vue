@@ -123,7 +123,7 @@ async function processFile(file: File) {
 
   uploading.value = true;
   try {
-    const res = await $fetch('/api/3d/upload', { method: 'POST', body: formData });
+    const res = await $fetch('/api/3d/upload', { method: 'POST', credentials: 'include', body: formData });
     currentModel.value = { url: res.url || createBlobUrl(file), name: file.name, size: file.size };
   } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
     if (import.meta.dev) console.warn('[3d-preview] ' + t('work_pages.d3_preview.upload_error_log'), e?.message || err)

@@ -48,11 +48,12 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 
 definePageMeta({ layout: 'platform-admin', middleware: ['auth'] })
 
+const toast = useToast()
 const models = ref([]);
 const filterCategory = ref('');
 const categories = [
@@ -78,35 +79,35 @@ function categoryLabel(cat) {
 
 async function refreshPool() {
   try {
-    const res = await $fetch('/api/admin/model-pool');
+    const res = await $fetch('/api/admin/model-pool', { credentials: 'include' });
     if (res?.data) models.value = res.data.map(m => ({ ...m, pool_weight: m.pool_weight || 1, gray_percent: m.gray_percent || 0 }));
-  } catch (e) { /* ignore */ }
+  } catch (e) { toast.error('Failed to load model pool') }
 }
 
 async function updateWeight(model) {
   try {
     await $fetch(`/api/admin/models/config/${model.model_key}`, {
-      method: 'PUT', body: { pool_weight: model.pool_weight },
+      method: 'PUT', credentials: 'include', body: { pool_weight: model.pool_weight },
     });
     refreshPool();
-  } catch (e) { /* ignore */ }
+  } catch (e) { toast.error('Failed to load model pool') }
 }
 
 async function updateGray(model) {
   try {
     await $fetch(`/api/admin/model-pool/${model.model_key}/gray`, {
-      method: 'PUT', body: { percent: model.gray_percent || 0 },
+      method: 'PUT', credentials: 'include', body: { percent: model.gray_percent || 0 },
     });
-  } catch (e) { /* ignore */ }
+  } catch (e) { toast.error('Failed to load model pool') }
 }
 
 async function toggleModel(model) {
   try {
     await $fetch(`/api/admin/models/config/${model.model_key}/toggle`, {
-      method: 'PATCH', body: { enabled: !model.enabled },
+      method: 'PATCH', credentials: 'include', body: { enabled: !model.enabled },
     });
     refreshPool();
-  } catch (e) { /* ignore */ }
+  } catch (e) { toast.error('Failed to load model pool') }
 }
 
 onMounted(refreshPool);

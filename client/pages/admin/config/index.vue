@@ -202,7 +202,7 @@ const changeLogs = ref<any[]>([])
 // 加载分组列表
 async function loadGroups() {
   try {
-    const res: any = await $fetch(`${apiBase}/admin/config/groups`)
+    const res: any = await $fetch(`${apiBase}/admin/config/groups`, { credentials: 'include' })
     if (res.code === 200) groups.value = res.data || []
   } catch { ElMessage.error(t('admin_config.load_groups_failed')) }
 }
@@ -213,7 +213,7 @@ async function selectGroup(groupKey: string) {
   showLogs.value = false
   saveStatus.value = {}
   try {
-    const res: any = await $fetch(`${apiBase}/config/${groupKey}`)
+    const res: any = await $fetch(`${apiBase}/config/${groupKey}`, { credentials: 'include' })
     if (res.code === 200) {
       configItems.value = Object.entries(res.data || {}).map(([key, val]) => ({
         item_key: key,
@@ -222,7 +222,7 @@ async function selectGroup(groupKey: string) {
         default_val: val,
       }))
       // 从完整数据加载 (admin API)
-      const adminRes: any = await $fetch(`${apiBase}/admin/config/items/${groupKey}`)
+      const adminRes: any = await $fetch(`${apiBase}/admin/config/items/${groupKey}`, { credentials: 'include' })
       if (adminRes.code === 200 && adminRes.data) {
         configItems.value = adminRes.data || []
       }
@@ -242,7 +242,7 @@ async function selectGroup(groupKey: string) {
 // 加载变更日志
 async function loadLogs() {
   try {
-    const res: any = await $fetch(`${apiBase}/admin/config/logs/${activeGroup.value}`)
+    const res: any = await $fetch(`${apiBase}/admin/config/logs/${activeGroup.value}`, { credentials: 'include' })
     if (res.code === 200) changeLogs.value = res.data || []
   } catch { ElMessage.error(t('admin_config.load_logs_failed')) }
 }
@@ -254,6 +254,7 @@ async function saveItem(itemKey: string) {
   try {
     const res: any = await $fetch(`${apiBase}/admin/config`, {
       method: 'POST',
+      credentials: 'include',
       body: { group_key: activeGroup.value, item_key: itemKey, item_value: editValues.value[itemKey] },
     })
     if (res.code === 200) {
@@ -285,6 +286,7 @@ async function rollback(logId: number) {
   try {
     const res: any = await $fetch(`${apiBase}/admin/config/rollback`, {
       method: 'POST',
+      credentials: 'include',
       body: { log_id: logId },
     })
     if (res.code === 200) {

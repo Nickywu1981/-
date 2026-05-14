@@ -153,7 +153,10 @@ function redoTask(item: any) {
   navigateTo(`/work/${item.type === 'main_image' ? 'main-image' : item.type === 'scene' ? 'scene' : item.type.replace(/_/g, '-')}`)
 }
 
-function viewDetail(_item: any) {}
+function viewDetail(item: any) {
+  const route = item.type === 'main_image' ? 'main-image' : item.type === 'scene' ? 'scene' : item.type.replace(/_/g, '-')
+  navigateTo(`/work/${route}?taskId=${item.id}`)
+}
 
 onMounted(fetchAll)
 definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })

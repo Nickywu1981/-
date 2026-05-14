@@ -123,7 +123,7 @@ async function fetchTemplates() {
     if (filterProvider.value) params.set('provider', filterProvider.value);
     params.set('page', String(currentPage.value));
     params.set('pageSize', String(pageSize.value));
-    const res: any = await $fetch(`/api/email/templates?${params}`);
+    const res: any = await $fetch(`/api/email/templates?${params}`, { credentials: 'include' });
     templates.value = res.data?.list || res.data || [];
     total.value = res.data?.total || templates.value.length;
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('common.loadFail')) }
@@ -135,6 +135,7 @@ async function saveTpl(tpl: any) {
   try {
     await $fetch(`/api/email/templates/${tpl.id}`, {
       method: 'PUT',
+      credentials: 'include',
       body: { name: tpl.name, subject: tpl.subject, content: tpl.content, provider_template_id: tpl.provider_template_id, provider: tpl.provider, status: tpl.status, remark: tpl.remark },
     });
     showMsg(t('common.saved'));
@@ -149,7 +150,7 @@ function openCreate() { newTpl.value = { template_code: '', name: '', subject: '
 async function createTpl() {
   creating.value = true;
   try {
-    await $fetch('/api/email/templates', { method: 'POST', body: newTpl.value });
+    await $fetch('/api/email/templates', { method: 'POST', credentials: 'include', body: newTpl.value });
     showCreate.value = false; showMsg(t('common.template_created'));
     fetchTemplates();
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || t('common.failed_create'); }
@@ -161,7 +162,7 @@ function confirmDelete(tpl: any) { deleteTarget.value = tpl; showDelete.value = 
 async function doDelete() {
   if (!deleteTarget.value) return; deleting.value = true;
   try {
-    await $fetch(`/api/email/templates/${deleteTarget.value.id}`, { method: 'DELETE' });
+    await $fetch(`/api/email/templates/${deleteTarget.value.id}`, { method: 'DELETE', credentials: 'include' });
     showDelete.value = false; showMsg(t('common.template_deleted'));
     fetchTemplates();
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || t('common.failed_delete'); }

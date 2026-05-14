@@ -120,7 +120,7 @@ async function fetchData() {
     const params = new URLSearchParams({ page: String(page.value), pageSize: String(pageSize.value) })
     if (category.value) params.set('category', category.value)
     if (search.value) params.set('keyword', search.value)
-    const res: any = await $fetch(`/api/prompts?${params}`)
+    const res: any = await $fetch(`/api/prompts?${params}`, { credentials: 'include' })
     list.value = res.data?.list || []
     total.value = res.data?.total || 0
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };

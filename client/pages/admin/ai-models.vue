@@ -90,6 +90,7 @@ async function resetBreaker(modelId: string) {
   try {
     await $fetch('/api/admin/models/reset-breaker', {
       method: 'POST',
+      credentials: 'include',
       body: { model_id: modelId },
     })
     await fetchStatus()

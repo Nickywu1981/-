@@ -208,7 +208,7 @@ function handleImport(e: Event) {
 
 async function exportJSON() {
   try {
-    const res: any = await $fetch(`/api/admin/i18n/${activeLocale.value}/export`)
+    const res: any = await $fetch(`/api/admin/i18n/${activeLocale.value}/export`, { credentials: 'include' })
     const blob = new Blob([JSON.stringify(res, null, 2)], { type: 'application/json' })
     const a = document.createElement('a')
     a.href = URL.createObjectURL(blob)

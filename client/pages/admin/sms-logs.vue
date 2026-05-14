@@ -63,6 +63,7 @@ async function fetch() {
   loading.value = true
   try {
     const res: any = await $fetch('/api/sms/logs', {
+      credentials: 'include',
       params: { page: page.value, pageSize, phone: phone.value, result: result.value, startDate: startDate.value, endDate: endDate.value },
     })
     list.value = res.data?.list || []

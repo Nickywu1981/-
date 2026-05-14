@@ -106,7 +106,7 @@ async function fetchData() {
   try {
     const params = new URLSearchParams({ page: String(page.value), pageSize: String(pageSize), keyword: keyword.value })
     if (filterStatus.value) params.set('status', filterStatus.value)
-    const res: any = await $fetch(`/api/proxy?${params.toString()}`)
+    const res: any = await $fetch(`/api/proxy?${params.toString()}`, { credentials: 'include' })
     if (res?.code === 200) { list.value = res.data?.list || []; total.value = res.data?.total || 0 }
     else { list.value = res.data || []; total.value = list.value.length }
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; error.value = err?.data?.msg || err.message || t('common.loadFail'); toast.error(error.value) } finally { loading.value = false }
@@ -122,7 +122,7 @@ async function save() {
   try {
     const url = isEdit.value ? `/api/proxy/${form.value.id}` : '/api/proxy'
     const method = isEdit.value ? 'PUT' : 'POST'
-    const res: any = await $fetch(url, { method, body: form.value })
+    const res: any = await $fetch(url, { method, credentials: 'include', body: form.value })
     if (res?.code === 200 || res?.code === 0) { toast.success(isEdit.value ? t('common.success_update') : t('common.success_create')); modalOpen.value = false; fetchData() }
     else { toast.error(res?.msg || t('common.failed_save')) }
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('common.failed_save')) } finally { saving.value = false }
@@ -131,7 +131,7 @@ async function save() {
 async function toggleStatus(p: any) {
   const newStatus = p.status === 1 ? 0 : 1
   try {
-    const res: any = await $fetch(`/api/proxy/${p.id}`, { method: 'PUT', body: { status: newStatus } })
+    const res: any = await $fetch(`/api/proxy/${p.id}`, { method: 'PUT', credentials: 'include', body: { status: newStatus } })
     if (res?.code === 200 || res?.code === 0) { p.status = newStatus; toast.success(newStatus === 1 ? t('common.success_enable') : t('common.success_disable')) }
     else { toast.error(res?.msg || t('common.failed')) }
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('common.failed')) }
@@ -140,7 +140,7 @@ async function toggleStatus(p: any) {
 async function delProxy(id: number) {
   if (!await confirm({ message: t('common.confirm_delete')} )) return
   try {
-    const res: any = await $fetch(`/api/proxy/${id}`, { method: 'DELETE' })
+    const res: any = await $fetch(`/api/proxy/${id}`, { method: 'DELETE', credentials: 'include' })
     if (res?.code === 200 || res?.code === 0) { toast.success(t('common.delete_success')); fetchData() }
     else { toast.error(res?.msg || t('common.failed_delete')) }
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('common.failed_delete')) }
