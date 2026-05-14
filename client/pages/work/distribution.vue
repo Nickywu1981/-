@@ -2,14 +2,14 @@
   <div class="distribution-page">
     <div class="page-header">
       <div>
-        <h1>多平台一键分发</h1>
-        <p class="subtitle">13 个主流平台，内容一键推送，批量追踪</p>
+        <h1>{{ $t('work_pages.distribution_page_title') }}</h1>
+        <p class="subtitle">{{ $t('work_pages.distribution_subtitle') }}</p>
       </div>
     </div>
 
     <!-- 平台选择 -->
     <div class="section">
-      <h2>选择目标平台</h2>
+      <h2>{{ $t('work_pages.distribution_platform_title') }}</h2>
       <div class="platform-grid">
         <label v-for="p in platforms" :key="p.id" class="platform-card" :class="{ selected: selected.includes(p.id) }">
           <input type="checkbox" :value="p.id" v-model="selected" class="platform-check" />
@@ -22,24 +22,24 @@
 
     <!-- 内容配置 -->
     <div class="section" v-if="selected.length > 0">
-      <h2>内容配置</h2>
+      <h2>{{ $t('work_pages.distribution_content_title') }}</h2>
       <div class="form-group">
-        <label>标题</label>
-        <input v-model="form.title" class="input" placeholder="输入发布标题" maxlength="200" required />
+        <label>{{ $t('work_pages.distribution_label_title') }}</label>
+        <input v-model="form.title" class="input" :placeholder="$t('work_pages.distribution_placeholder_title')" maxlength="200" required />
       </div>
       <div class="form-group">
-        <label>描述</label>
-        <textarea v-model="form.description" class="input" rows="3" placeholder="输入描述文案（支持 #话题标签）" maxlength="2000" />
+        <label>{{ $t('work_pages.distribution_label_description') }}</label>
+        <textarea v-model="form.description" class="input" rows="3" :placeholder="$t('work_pages.distribution_placeholder_description')" maxlength="2000" />
       </div>
       <div class="form-group">
-        <label>图片素材</label>
+        <label>{{ $t('work_pages.distribution_label_images') }}</label>
         <input type="file" accept="image/*" multiple @change="onFiles" class="input" />
-        <span class="hint">支持多图，自动适配各平台尺寸</span>
+        <span class="hint">{{ $t('work_pages.distribution_images_hint') }}</span>
       </div>
       <div class="form-group">
-        <label>定时发布</label>
+        <label>{{ $t('work_pages.distribution_label_schedule') }}</label>
         <input v-model="form.scheduledAt" type="datetime-local" class="input" />
-        <span class="hint">留空则立即发布</span>
+        <span class="hint">{{ $t('work_pages.distribution_schedule_hint') }}</span>
       </div>
     </div>
 
@@ -49,19 +49,19 @@
         <button class="btn-primary" :disabled="submitting" @click="publish">
           {{ submitting ? '发布中...' : `一键发布到 ${selected.length} 个平台` }}
         </button>
-        <button class="btn-outline" @click="saveDraft">保存草稿</button>
+        <button class="btn-outline" @click="saveDraft">{{ $t('work_pages.distribution_btn_draft') }}</button>
       </div>
     </div>
 
     <!-- 发布历史 -->
     <div class="section">
-      <h2>发布记录</h2>
+      <h2>{{ $t('work_pages.distribution_history_title') }}</h2>
       <LoadingSkeleton v-if="loading" type="list" :rows="3" />
-      <div v-else-if="history.length === 0" class="empty-hint">暂无发布记录</div>
+      <div v-else-if="history.length === 0" class="empty-hint">{{ $t('work_pages.distribution_history_empty') }}</div>
       <div v-else class="table-wrap">
         <table class="history-table">
           <thead>
-            <tr><th>内容</th><th>平台</th><th>状态</th><th>时间</th><th>操作</th></tr>
+            <tr><th>{{ $t('work_pages.distribution_table_content') }}</th><th>{{ $t('work_pages.distribution_table_platform') }}</th><th>{{ $t('work_pages.distribution_table_status') }}</th><th>{{ $t('work_pages.distribution_table_time') }}</th><th>{{ $t('work_pages.distribution_table_actions') }}</th></tr>
           </thead>
           <tbody>
             <tr v-for="h in history" :key="h.id">
@@ -69,7 +69,7 @@
               <td>{{ h.platforms?.join(', ') || '-' }}</td>
               <td><span class="status-tag" :class="h.status">{{ statusLabel(h.status) }}</span></td>
               <td>{{ formatDateTime(h.createdAt) }}</td>
-              <td><button v-if="h.status === 'failed'" class="btn-sm" @click="retry(h.id)">重试</button></td>
+              <td><button v-if="h.status === 'failed'" class="btn-sm" @click="retry(h.id)">{{ $t('work_pages.distribution_btn_retry') }}</button></td>
             </tr>
           </tbody>
         </table>

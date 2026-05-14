@@ -1,28 +1,28 @@
 <template>
-  <WorkLayout title="人物替换" subtitle="AI 智能替换模特/人物，保留服装细节" :steps="steps" :current-step="currentStep">
+  <WorkLayout :title="$t('work_pages.person_replace_title')" sub:title="$t('work_pages.person_replace_subtitle')" :steps="steps" :current-step="currentStep">
       <div class="ws-section">
-        <div class="ws-section__title">上传素材</div>
+        <div class="ws-section__title">{{ $t('work_pages.person_replace_step_upload') }}</div>
         <div class="dual-upload">
           <div class="dual-upload__col">
-            <div class="dual-upload__label">产品/服装图</div>
+            <div class="dual-upload__label">{{ $t('work_pages.person_replace_upload_product') }}</div>
             <div class="ws-upload-area" @dragover.prevent @drop.prevent="(e: DragEvent) => handleDrop(e, 'source')">
               <div class="ws-upload-area__icon" v-if="!sourceUrl">👕</div>
               <img loading="lazy" v-else :src="sourceUrl" alt="原图" class="ws-upload-area__preview" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
               <div class="ws-upload-area__text">{{ sourceUrl ? '点击更换' : '上传产品图' }}</div>
               <input ref="sourceInput" type="file" accept="image/*" hidden @change="(e: Event) => handleFile(e, 'source')" />
-              <button class="ws-btn ws-btn--secondary ws-btn--sm" type="button" @click="sourceInput?.click()">选择图片</button>
+              <button class="ws-btn ws-btn--secondary ws-btn--sm" type="button" @click="sourceInput?.click()">{{ $t('work_pages.person_replace_btn_select') }}</button>
             </div>
             <div class="upload-status" v-if="uploadingSrc">⏳ 上传中...</div>
             <div class="upload-status ok" v-else-if="uploadedSourceUrl">✓ 已上传</div>
           </div>
           <div class="dual-upload__col">
-            <div class="dual-upload__label">目标人物图</div>
+            <div class="dual-upload__label">{{ $t('work_pages.person_replace_upload_person') }}</div>
             <div class="ws-upload-area" @dragover.prevent @drop.prevent="(e: DragEvent) => handleDrop(e, 'target')">
               <div class="ws-upload-area__icon" v-if="!targetUrl">🧑</div>
               <img loading="lazy" v-else :src="targetUrl" alt="目标人物" class="ws-upload-area__preview" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
               <div class="ws-upload-area__text">{{ targetUrl ? '点击更换' : '上传人物图' }}</div>
               <input ref="targetInput" type="file" accept="image/*" hidden @change="(e: Event) => handleFile(e, 'target')" />
-              <button class="ws-btn ws-btn--secondary ws-btn--sm" type="button" @click="targetInput?.click()">选择图片</button>
+              <button class="ws-btn ws-btn--secondary ws-btn--sm" type="button" @click="targetInput?.click()">{{ $t('work_pages.person_replace_btn_select') }}</button>
             </div>
             <div class="upload-status" v-if="uploadingTgt">⏳ 上传中...</div>
             <div class="upload-status ok" v-else-if="uploadedTargetUrl">✓ 已上传</div>
@@ -30,35 +30,35 @@
         </div>
       </div>
       <div class="ws-section" v-if="sourceUrl && targetUrl">
-        <div class="ws-section__title">参数设置</div>
+        <div class="ws-section__title">{{ $t('work_pages.person_replace_params_title') }}</div>
         <div class="param-group">
-          <div class="param-group__label">肤色</div>
+          <div class="param-group__label">{{ $t('work_pages.person_replace_skin') }}</div>
           <div class="param-row">
             <span v-for="s in skinTones" :key="s" class="ws-tag" :class="{ active: selectedSkin === s }" @click="selectedSkin = s">{{ s }}</span>
           </div>
         </div>
         <div class="param-group">
-          <div class="param-group__label">体型</div>
+          <div class="param-group__label">{{ $t('work_pages.person_replace_body') }}</div>
           <div class="param-row">
             <span v-for="b in bodyTypes" :key="b" class="ws-tag" :class="{ active: selectedBody === b }" @click="selectedBody = b">{{ b }}</span>
           </div>
         </div>
         <div class="param-group">
-          <div class="param-group__label">穿搭风格</div>
+          <div class="param-group__label">{{ $t('work_pages.person_replace_style') }}</div>
           <div class="param-row">
             <span v-for="st in styles" :key="st" class="ws-tag" :class="{ active: selectedStyle === st }" @click="selectedStyle = st">{{ st }}</span>
           </div>
         </div>
       </div>
       <div class="ws-actions">
-        <div class="ws-cost">预计消耗 <strong>6</strong> 积分</div>
-        <button class="ws-btn ws-btn--primary ws-btn--lg" :disabled="!sourceUrl || !targetUrl" @click="submitTask">开始生成</button>
+        <div class="ws-cost">{{ $t('work_pages.person_replace_cost') }} <strong>6</strong> {{ $t('work_pages.person_replace_cost_unit') }}</div>
+        <button class="ws-btn ws-btn--primary ws-btn--lg" :disabled="!sourceUrl || !targetUrl" @click="submitTask">{{ $t('work_pages.person_replace_btn_start') }}</button>
       </div>
       <div class="ws-section">
-        <div class="ws-section__title">生成结果</div>
+        <div class="ws-section__title">{{ $t('work_pages.person_replace_step_result') }}</div>
         <div class="ws-placeholder" v-if="task.status.value === 0">
           <div class="ws-placeholder__icon">✨</div>
-          <div class="ws-placeholder__text">人物替换结果将显示在这里</div>
+          <div class="ws-placeholder__text">{{ $t('work_pages.person_replace_result_placeholder') }}</div>
         </div>
         <div class="progress-box" v-else-if="task.polling.value">
           <div class="spinner" />
@@ -69,18 +69,18 @@
         </div>
         <div class="result-compare" v-else-if="task.status.value === 2">
           <div class="result-compare__item">
-            <div class="result-compare__label">替换前</div>
+            <div class="result-compare__label">{{ $t('work_pages.person_replace_before') }}</div>
             <div class="result-compare__img" />
           </div>
           <div class="result-compare__arrow">→</div>
           <div class="result-compare__item">
-            <div class="result-compare__label">替换后</div>
+            <div class="result-compare__label">{{ $t('work_pages.person_replace_after') }}</div>
             <div class="result-compare__img after" />
           </div>
         </div>
         <div class="ws-error" v-else-if="task.status.value === 3">
           <p>{{ task.errorMsg.value || '生成失败' }}</p>
-          <button class="ws-btn ws-btn--primary" @click="handleRedo">重试</button>
+          <button class="ws-btn ws-btn--primary" @click="handleRedo">{{ $t('work_pages.person_replace_btn_retry') }}</button>
         </div>
       </div>
       </WorkLayout>

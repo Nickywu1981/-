@@ -13,7 +13,7 @@
     <div class="work-panel">
       <!-- 口播文案 -->
       <div class="input-group">
-        <label>口播文案</label>
+        <label>{{ $t('work_pages.digital_human_script_label') }}</label>
         <textarea v-model="script" class="input prompt-input" rows="6" placeholder="请输入口播文案...&#10;&#10;如：这款秋季新品连衣裙，采用高支棉面料，亲肤透气不起球。限时特惠只要99元！&#10;&#10;约5字/秒，30秒口播约150字" maxlength="2000"></textarea>
         <div class="enhance-row">
           <PromptEnhancer mode="script" :initial-prompt="script" @applied="(v) => script = v" />
@@ -28,13 +28,13 @@
 
       <!-- 音频上传 (可选) -->
       <div class="input-group" style="margin-top:20px">
-        <label>或上传音频文件（可选，不传则用AI语音合成）</label>
+        <label>{{ $t('work_pages.digital_human_audio_label') }}</label>
         <AppMediaUpload accept="all" :multiple="false" :max-size="50" :max-count="1" @uploaded="onAudioUploaded" />
-        <p v-if="audioUrl" class="hint ok">✓ 已上传音频</p>
+        <p v-if="audioUrl" class="hint ok">{{ $t('work_pages.digital_human_audio_uploaded') }}</p>
       </div>
 
       <!-- 形象选择 -->
-      <h3 class="section-title">选择数字人形象</h3>
+      <h3 class="section-title">{{ $t('work_pages.digital_human_avatar_title') }}</h3>
       <div class="avatar-grid">
         <button v-for="a in avatars" :key="a.id" class="avatar-card" :class="{ active: selectedAvatar === a.id }" @click="selectedAvatar = a.id">
           <span class="avatar-icon">{{ a.icon }}</span>
@@ -43,7 +43,7 @@
       </div>
 
       <!-- 背景 -->
-      <h3 class="section-title">选择背景</h3>
+      <h3 class="section-title">{{ $t('work_pages.digital_human_bg_title') }}</h3>
       <div class="bg-row">
         <button v-for="bg in backgrounds" :key="bg.id" class="bg-btn" :class="{ active: selectedBg === bg.id }" @click="selectedBg = bg.id">
           {{ bg.name }}
@@ -61,8 +61,8 @@
       <div v-if="resultUrl" class="result-preview">
         <video :src="resultUrl" class="result-video" controls />
         <div class="result-actions">
-          <button class="btn btn-primary btn-sm" @click="downloadResult">下载</button>
-          <button class="btn btn-secondary btn-sm" @click="copyToClipboard(resultUrl)">复制链接</button>
+          <button class="btn btn-primary btn-sm" @click="downloadResult">{{ $t('work_pages.digital_human_download') }}</button>
+          <button class="btn btn-secondary btn-sm" @click="copyToClipboard(resultUrl)">{{ $t('work_pages.digital_human_copy_link') }}</button>
         </div>
       </div>
     </div>

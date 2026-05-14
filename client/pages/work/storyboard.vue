@@ -1,17 +1,17 @@
 <template>
-  <WorkLayout title="智能分镜生成" subtitle="AI 脚本→分镜画面→配音→字幕全流程" :steps="['输入脚本', '选择风格', '生成分镜']" :current-step="currentStep">
+  <WorkLayout :title="$t('work_pages.storyboard_title')" sub:title="$t('work_pages.storyboard_subtitle')" :steps="['输入脚本', '选择风格', '生成分镜']" :current-step="currentStep">
     <!-- Step 0-1: Input & Style -->
     <div v-if="currentStep < 2" class="ws-section">
-      <div class="ws-section__title">输入视频脚本</div>
-      <div class="ws-section__desc">粘贴文案脚本，AI 自动拆分为分镜画面</div>
+      <div class="ws-section__title">{{ $t('work_pages.storyboard_script_title') }}</div>
+      <div class="ws-section__desc">{{ $t('work_pages.storyboard_script_desc') }}</div>
       <textarea v-model="scriptText" class="input-area" placeholder="粘贴你的视频脚本...&#10;&#10;如：第一幕：清晨阳光洒进卧室，女主起床伸懒腰&#10;第二幕：走到厨房，打开冰箱拿出一瓶牛奶&#10;第三幕：喝牛奶特写，满足的笑容" rows="8" maxlength="5000" />
       <div class="quick-tags">
-        <span class="tag-label">快捷模板：</span>
+        <span class="tag-label">{{ $t('work_pages.storyboard_quick_templates') }}</span>
         <button v-for="t in quickTemplates" :key="t.label" class="tag-btn" @click="scriptText = t.text">{{ t.label }}</button>
       </div>
       <PromptEnhancer v-if="scriptText.trim()" mode="script" :initial-prompt="scriptText" @applied="(v) => scriptText = v" />
       <div class="ws-section">
-        <div class="ws-section__title">画面风格</div>
+        <div class="ws-section__title">{{ $t('work_pages.storyboard_style_title') }}</div>
         <div class="style-chips">
           <button v-for="s in styles" :key="s.id" class="style-chip" :class="{ active: selectedStyle === s.id }" @click="selectedStyle = s.id">
             <span class="style-chip__icon">{{ s.icon }}</span>
@@ -28,14 +28,14 @@
     <div v-else>
       <div v-if="submitting && !task.polling.value" class="progress-box">
         <div class="spinner" />
-        <p>正在提交任务...</p>
+        <p>{{ $t('work_pages.storyboard_processing') }}</p>
       </div>
       <div v-else-if="task.polling.value" class="progress-box">
         <div class="spinner" />
         <p>{{ task.progressMsg.value }}</p>
       </div>
       <div v-else-if="task.status.value === 2" class="result-box">
-        <h3>分镜生成完成</h3>
+        <h3>{{ $t('work_pages.storyboard_done') }}</h3>
         <div class="storyboard-grid" v-if="task.result.value?.scenes">
           <div v-for="(s, i) in task.result.value.scenes" :key="i" class="story-card">
             <div class="story-card__number">#{{ Number(i) + 1 }}</div>
@@ -48,12 +48,12 @@
             </div>
           </div>
         </div>
-        <div v-else class="empty-state">暂无分镜数据</div>
-        <button class="btn-outline" style="margin-top:16px" @click="handleReset">重新生成</button>
+        <div v-else class="empty-state">{{ $t('work_pages.storyboard_empty') }}</div>
+        <button class="btn-outline" style="margin-top:16px" @click="handleReset">{{ $t('work_pages.storyboard_btn_reset') }}</button>
       </div>
       <div v-else-if="task.status.value === 3" class="error-box">
         <p class="error-msg">{{ task.errorMsg.value || '分镜生成失败，请重试' }}</p>
-        <button class="btn" @click="handleReset">重新生成</button>
+        <button class="btn" @click="handleReset">{{ $t('work_pages.storyboard_btn_reset') }}</button>
       </div>
     </div>
   </WorkLayout>

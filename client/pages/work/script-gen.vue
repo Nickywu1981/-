@@ -1,19 +1,19 @@
 <template>
   <WorkLayout :steps="['输入卖点', '选类型+语言', '生成脚本']" :current-step="step">
     <div v-if="step === 0" class="upload-section">
-      <h3>输入产品卖点信息</h3>
+      <h3>{{ $t('work_pages.script_gen_input_title') }}</h3>
       <textarea v-model="productInfo" class="input-area" placeholder="描述你的产品卖点信息...&#10;&#10;如：秋季新款长袖连衣裙，高支棉面料亲肤透气，收腰A字版型遮肉显高，适合日常通勤约会，限时特惠99元" rows="6" maxlength="2000" />
       <div class="quick-inputs">
         <button v-for="q in quickInputs" :key="q.label" class="quick-btn" @click="productInfo = q.text">{{ q.label }}</button>
       </div>
-      <button v-if="productInfo.trim()" class="btn" @click="step = 1">下一步：选脚本类型</button>
+      <button v-if="productInfo.trim()" class="btn" @click="step = 1">{{ $t('work_pages.script_gen_btn_next') }}</button>
 
       <!-- 提示词润色 -->
       <PromptEnhancer v-if="productInfo.trim()" mode="script" :initial-prompt="productInfo" @applied="(v) => productInfo = v" />
     </div>
 
     <div v-else-if="step === 1" class="select-section">
-      <h3>选择脚本类型</h3>
+      <h3>{{ $t('work_pages.script_gen_type_title') }}</h3>
       <div class="type-grid">
         <button v-for="t in scriptTypes" :key="t.id" class="type-card" :class="{ active: selectedType === t.id }" @click="selectedType = t.id">
           <span class="type-icon">{{ t.icon }}</span>
@@ -22,7 +22,7 @@
         </button>
       </div>
 
-      <h3>选择目标语言</h3>
+      <h3>{{ $t('work_pages.script_gen_lang_title') }}</h3>
       <div class="lang-grid">
         <button v-for="l in languages" :key="l.code" class="lang-card" :class="{ active: selectedLang === l.code }" @click="selectedLang = l.code">
           <span class="lang-flag">{{ l.flag }}</span>
@@ -30,10 +30,10 @@
         </button>
       </div>
 
-      <h3>目标平台（可选）</h3>
+      <h3>{{ $t('work_pages.script_gen_platform_title') }}</h3>
       <div class="platform-row">
         <select v-model="selectedPlatform" class="select">
-          <option value="">通用</option>
+          <option value="">{{ $t('work_pages.script_gen_platform_any') }}</option>
           <option value="taobao">淘宝</option><option value="douyin">抖音</option>
           <option value="amazon">亚马逊</option><option value="tiktok">TikTok Shop</option>
           <option value="shopee">Shopee</option><option value="lazada">Lazada</option>
@@ -41,14 +41,14 @@
       </div>
 
       <div class="actions">
-        <button class="btn-outline" @click="step = 0">返回</button>
-        <button class="btn" @click="submitTask" :disabled="submitting">生成脚本</button>
+        <button class="btn-outline" @click="step = 0">{{ $t('work_pages.script_gen_btn_back') }}</button>
+        <button class="btn" @click="submitTask" :disabled="submitting">{{ $t('work_pages.script_gen_step_gen') }}</button>
       </div>
     </div>
 
     <div v-else class="result-section">
       <div v-if="submitting" class="progress-box">
-        <div class="spinner" /><p>正在提交任务...</p>
+        <div class="spinner" /><p>{{ $t('work_pages.script_gen_processing') }}</p>
       </div>
       <div v-else-if="task.polling.value" class="progress-box">
         <div class="spinner" /><p>{{ task.progressMsg.value }}</p>
@@ -84,11 +84,11 @@
           </div>
         </div>
         <div class="actions">
-          <button class="btn-outline" @click="handleRedo">再生成一个</button>
-          <button class="btn">复制脚本</button>
+          <button class="btn-outline" @click="handleRedo">{{ $t('work_pages.script_gen_btn_redo') }}</button>
+          <button class="btn">{{ $t('work_pages.script_gen_btn_copy') }}</button>
         </div>
       </div>
-      <div v-else-if="task.status.value === 3" class="error-box"><p>{{ task.errorMsg.value }}</p><button class="btn" @click="handleRedo">重试</button></div>
+      <div v-else-if="task.status.value === 3" class="error-box"><p>{{ task.errorMsg.value }}</p><button class="btn" @click="handleRedo">{{ $t('work_pages.script_gen_btn_retry') }}</button></div>
     </div>
   </WorkLayout>
 </template>

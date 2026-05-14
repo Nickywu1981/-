@@ -1,30 +1,30 @@
 <template>
   <WorkLayout :steps="['输入产品', '选风格', '生成分镜']" :current-step="step">
     <div v-if="step === 0" class="upload-section">
-      <h3>输入产品信息</h3>
+      <h3>{{ $t('work_pages.shot_plan_input_title') }}</h3>
       <textarea v-model="productInfo" class="input-area" placeholder="描述你的产品和拍摄需求...&#10;&#10;如：女士长袖衬衫，经典翻领设计，纯棉面料舒适透气，适合通勤穿搭" rows="5" maxlength="2000" />
       <div v-if="productInfo.trim()" class="quick-inputs">
         <button v-for="q in quickInputs" :key="q.label" class="quick-btn" @click="productInfo = q.text">{{ q.label }}</button>
       </div>
       <PromptEnhancer v-if="productInfo.trim()" mode="script" :initial-prompt="productInfo" @applied="(v) => productInfo = v" />
-      <button v-if="productInfo.trim()" class="btn" @click="step = 1">下一步：选风格</button>
+      <button v-if="productInfo.trim()" class="btn" @click="step = 1">{{ $t('work_pages.shot_plan_btn_next') }}</button>
     </div>
 
     <div v-else-if="step === 1" class="select-section">
-      <h3>选择视频风格</h3>
+      <h3>{{ $t('work_pages.shot_plan_style_title') }}</h3>
       <div class="style-grid">
         <button v-for="s in styles" :key="s.id" class="style-card" :class="{ active: selectedStyle === s.id }" @click="selectedStyle = s.id">
           <span class="style-icon">{{ s.icon }}</span>
           <span>{{ s.name }}</span>
         </button>
       </div>
-      <h4>视频时长</h4>
+      <h4>{{ $t('work_pages.shot_plan_duration_title') }}</h4>
       <div class="dur-row">
         <button v-for="d in durations" :key="d" class="dur-btn" :class="{ active: selectedDuration === d }" @click="selectedDuration = d">{{ d }}s</button>
       </div>
       <div class="actions">
-        <button class="btn-outline" @click="step = 0">返回</button>
-        <button class="btn" @click="submitTask">生成分镜</button>
+        <button class="btn-outline" @click="step = 0">{{ $t('work_pages.shot_plan_btn_back') }}</button>
+        <button class="btn" @click="submitTask">{{ $t('work_pages.shot_plan_step_gen') }}</button>
       </div>
     </div>
 
@@ -33,7 +33,7 @@
         <div class="spinner" /><p>{{ task.progressMsg.value }}</p>
       </div>
       <div v-else-if="task.status.value === 2">
-        <h3>分镜脚本</h3>
+        <h3>{{ $t('work_pages.shot_plan_done_title') }}</h3>
         <div class="shot-output">
           <h4>{{ task.result.value?.title }}</h4>
           <p class="duration-total">总时长：{{ task.result.value?.totalDuration }}</p>
@@ -52,16 +52,16 @@
             </div>
           </div>
           <div v-if="task.result.value?.tips" class="tips-box">
-            <h5>拍摄建议</h5>
+            <h5>{{ $t('work_pages.shot_plan_tips_title') }}</h5>
             <ul><li v-for="t in task.result.value.tips" :key="t">{{ t }}</li></ul>
           </div>
         </div>
         <div class="actions">
-          <button class="btn-outline" @click="handleRedo">再生成</button>
-          <button class="btn">复制分镜</button>
+          <button class="btn-outline" @click="handleRedo">{{ $t('work_pages.shot_plan_btn_redo') }}</button>
+          <button class="btn">{{ $t('work_pages.shot_plan_btn_copy') }}</button>
         </div>
       </div>
-      <div v-else-if="task.status.value === 3" class="error-box"><p>{{ task.errorMsg.value }}</p><button class="btn" @click="handleRedo">重试</button></div>
+      <div v-else-if="task.status.value === 3" class="error-box"><p>{{ task.errorMsg.value }}</p><button class="btn" @click="handleRedo">{{ $t('work_pages.shot_plan_btn_retry') }}</button></div>
     </div>
   </WorkLayout>
 </template>

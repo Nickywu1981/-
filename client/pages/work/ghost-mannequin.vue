@@ -1,13 +1,13 @@
 <template>
-  <WorkLayout title="幽灵模特" subtitle="AI 去假模 → 立体悬浮展示，无需真人拍摄" :steps="steps" :current-step="currentStep">
+  <WorkLayout :title="$t('work_pages.ghost_mannequin_title')" sub:title="$t('work_pages.ghost_mannequin_subtitle')" :steps="steps" :current-step="currentStep">
       <div class="ws-section">
-        <div class="ws-section__title">上传假人模特图</div>
-        <div class="ws-section__desc">上传穿在假模上的服装图，AI 自动去除假模，生成立体悬浮展示效果</div>
+        <div class="ws-section__title">{{ $t('work_pages.ghost_mannequin_upload_title') }}</div>
+        <div class="ws-section__desc">{{ $t('work_pages.ghost_mannequin_upload_desc') }}</div>
         <div class="ws-upload-area" @dragover.prevent @drop.prevent="handleDrop" @click="triggerUpload">
           <div v-if="!previewUrl" class="ws-upload-area__inner">
             <div class="ws-upload-area__icon">👻</div>
-            <div class="ws-upload-area__text">点击上传或拖拽假模服装图</div>
-            <div class="ws-upload-area__hint">支持 JPG / PNG / WebP，最大 20MB</div>
+            <div class="ws-upload-area__text">{{ $t('work_pages.ghost_mannequin_upload_placeholder') }}</div>
+            <div class="ws-upload-area__hint">{{ $t('work_pages.ghost_mannequin_upload_hint') }}</div>
           </div>
           <img loading="lazy" v-else :src="previewUrl" alt="上传预览" class="ws-upload-area__preview" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
           <input ref="fileInput" type="file" accept="image/*" hidden @change="handleFile" />
@@ -16,7 +16,7 @@
         <div v-else-if="uploadedUrl" class="ws-uploaded">✓ 已上传</div>
       </div>
       <div class="ws-section">
-        <div class="ws-section__title">展示效果</div>
+        <div class="ws-section__title">{{ $t('work_pages.ghost_mannequin_effect_title') }}</div>
         <div class="effect-grid">
           <div v-for="e in effects" :key="e.id" class="effect-card" :class="{ active: selectedEffect === e.id }" @click="selectedEffect = e.id">
             <div class="effect-card__preview">{{ e.preview }}</div>
@@ -26,13 +26,13 @@
         </div>
       </div>
       <div class="ws-section">
-        <div class="ws-section__title">服装类别</div>
+        <div class="ws-section__title">{{ $t('work_pages.ghost_mannequin_category_title') }}</div>
         <div class="tag-row">
           <span v-for="c in categories" :key="c" class="ws-tag" :class="{ active: selectedCategory === c }" @click="selectedCategory = c">{{ c }}</span>
         </div>
       </div>
       <div class="ws-actions">
-        <div class="ws-cost">预计消耗 <strong>4</strong> 积分</div>
+        <div class="ws-cost">{{ $t('work_pages.ghost_mannequin_cost') }} <strong>4</strong> {{ $t('work_pages.ghost_mannequin_cost_unit') }}</div>
         <button class="ws-btn ws-btn--primary ws-btn--lg" :disabled="!uploadedUrl || submitting" @click="handleGenerate">{{ submitting ? '提交中...' : '开始生成' }}</button>
       </div>
       <div class="ws-section">
@@ -43,22 +43,22 @@
         </div>
         <div v-else-if="task.status.value === 2" class="result-compare">
           <div class="result-compare__item">
-            <div class="result-compare__label">处理前（假模）</div>
+            <div class="result-compare__label">{{ $t('work_pages.ghost_mannequin_before_label') }}</div>
             <img loading="lazy" v-if="uploadedUrl" :src="uploadedUrl" alt="原图" class="result-compare__img before" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
             <div v-else class="result-compare__img before" />
           </div>
           <div class="result-compare__divider">
             <div class="result-compare__arrow">→</div>
-            <div class="result-compare__badge">AI 去除假模</div>
+            <div class="result-compare__badge">{{ $t('work_pages.ghost_mannequin_ai_badge') }}</div>
           </div>
           <div class="result-compare__item">
-            <div class="result-compare__label">处理后（立体展示）</div>
+            <div class="result-compare__label">{{ $t('work_pages.ghost_mannequin_after_label') }}</div>
             <img loading="lazy" v-if="task.result.value" :src="task.result.value" alt="生成结果" class="result-compare__img after" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
             <div v-else class="result-compare__img after" />
           </div>
         </div>
-        <div v-else-if="task.status.value === 3" class="error-box"><p>{{ task.errorMsg.value || '任务失败' }}</p><button class="ws-btn ws-btn--primary" @click="handleRedo">重试</button></div>
-        <div v-else class="ws-placeholder"><div class="ws-placeholder__icon">✨</div><div class="ws-placeholder__text">幽灵模特展示图将显示在这里</div></div>
+        <div v-else-if="task.status.value === 3" class="error-box"><p>{{ task.errorMsg.value || '任务失败' }}</p><button class="ws-btn ws-btn--primary" @click="handleRedo">{{ $t('work_pages.ghost_mannequin_btn_retry') }}</button></div>
+        <div v-else class="ws-placeholder"><div class="ws-placeholder__icon">✨</div><div class="ws-placeholder__text">{{ $t('work_pages.ghost_mannequin_result_placeholder') }}</div></div>
       </div>
       </WorkLayout>
 </template>

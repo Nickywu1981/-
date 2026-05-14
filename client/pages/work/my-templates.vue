@@ -1,17 +1,17 @@
 <template>
   <WorkLayout>
-    <h2 class="ptitle">我的提示词模板</h2>
+    <h2 class="ptitle">{{ $t('work_pages.my_templates_title') }}</h2>
 
     <div class="toolbar">
       <select v-model="filterCategory" class="sel" @change="fetchData">
-        <option value="">全部分类</option>
-        <option value="image">图片类</option>
-        <option value="text">文案类</option>
-        <option value="video">视频类</option>
-        <option value="voice">语音类</option>
+        <option value="">{{ $t('work_pages.my_templates_all') }}</option>
+        <option value="image">{{ $t('work_pages.my_templates_cat_image') }}</option>
+        <option value="text">{{ $t('work_pages.my_templates_cat_text') }}</option>
+        <option value="video">{{ $t('work_pages.my_templates_cat_video') }}</option>
+        <option value="voice">{{ $t('work_pages.my_templates_cat_voice') }}</option>
       </select>
-      <input v-model="keyword" type="text" placeholder="搜索我的模板..." @keyup.enter="fetchData" />
-      <button class="btn btn-primary" @click="goBrowse">去官方模板库复制</button>
+      <input v-model="keyword" type="text" :placeholder="$t('work_pages.my_templates_search_placeholder')" @keyup.enter="fetchData" />
+      <button class="btn btn-primary" @click="goBrowse">{{ $t('work_pages.my_templates_btn_browse') }}</button>
     </div>
 
     <LoadingSkeleton v-if="loading" type="cards" :count="4" />
@@ -27,16 +27,16 @@
         <p class="card-tags" v-if="t.tags">{{ (t.tags || '').split(',').filter(Boolean).slice(0,3).join(' · ') }}</p>
         <p class="card-meta">更新于 {{ (t.update_time || t.create_time || '').slice(0, 10) }}</p>
         <div class="card-actions">
-          <button class="btn-sm btn-primary" @click="openEdit(t)">编辑</button>
-          <button v-if="t.status === 0" class="btn-sm success" @click="submitTemplate(t.id)">提交收录</button>
-          <button class="btn-sm danger" @click="confirmDelete(t)">删除</button>
+          <button class="btn-sm btn-primary" @click="openEdit(t)">{{ $t('work_pages.my_templates_btn_edit') }}</button>
+          <button v-if="t.status === 0" class="btn-sm success" @click="submitTemplate(t.id)">{{ $t('work_pages.my_templates_btn_submit') }}</button>
+          <button class="btn-sm danger" @click="confirmDelete(t)">{{ $t('work_pages.my_templates_btn_delete') }}</button>
         </div>
       </div>
     </div>
 
     <div v-if="!loading && !list.length" class="empty">
-      <p>还没有私有模板</p>
-      <button class="btn btn-primary" @click="goBrowse">去官方模板库一键复制</button>
+      <p>{{ $t('work_pages.my_templates_empty') }}</p>
+      <button class="btn btn-primary" @click="goBrowse">{{ $t('work_pages.my_templates_empty_action') }}</button>
     </div>
 
     <Pagination v-if="total > pageSize" :page="page" :page-size="pageSize" :total="total" @change="onPageChange" />
@@ -45,26 +45,26 @@
     <Teleport to="body">
       <div class="modal-overlay" v-if="showModal" @click.self="showModal = false" @keydown.escape="showModal = false">
         <div class="modal">
-          <h3>编辑模板</h3>
+          <h3>{{ $t('work_pages.my_templates_modal_title') }}</h3>
           <div class="form-group">
-            <label>标题</label>
+            <label>{{ $t('work_pages.my_templates_label_title') }}</label>
             <input v-model="editForm.title" maxlength="100" type="text" />
           </div>
           <div class="form-group">
-            <label>内容（支持 {{变量名}} 占位符）</label>
-            <textarea v-model="editForm.content" maxlength="5000" rows="6" placeholder="输入提示词模板内容..."></textarea>
+            <label>{{ $t('work_pages.my_templates_label_content') }}</label>
+            <textarea v-model="editForm.content" maxlength="5000" rows="6" :placeholder="$t('work_pages.my_templates_placeholder_content')"></textarea>
           </div>
           <div class="form-group">
-            <label>行业/风格标签（逗号分隔）</label>
-            <input v-model="editForm.tags" maxlength="256" type="text" placeholder="如：服装,抖音,简约" />
+            <label>{{ $t('work_pages.my_templates_label_tags') }}</label>
+            <input v-model="editForm.tags" maxlength="256" type="text" :placeholder="$t('work_pages.my_templates_placeholder_tags')" />
           </div>
           <div class="form-group">
-            <label>描述</label>
-            <input v-model="editForm.description" maxlength="500" type="text" placeholder="简短描述模板用途" />
+            <label>{{ $t('work_pages.my_templates_label_desc') }}</label>
+            <input v-model="editForm.description" maxlength="500" type="text" :placeholder="$t('work_pages.my_templates_placeholder_desc')" />
           </div>
           <div class="modal-actions">
-            <button class="btn" @click="showModal = false">取消</button>
-            <button class="btn btn-primary" @click="saveEdit">保存</button>
+            <button class="btn" @click="showModal = false">{{ $t('work_pages.my_templates_btn_cancel') }}</button>
+            <button class="btn btn-primary" @click="saveEdit">{{ $t('work_pages.my_templates_btn_save') }}</button>
           </div>
         </div>
       </div>

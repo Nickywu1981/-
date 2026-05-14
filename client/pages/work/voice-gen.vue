@@ -1,13 +1,13 @@
 <template>
-  <WorkLayout title="语音生成" subtitle="AI 配音/TTS 语音合成" :steps="steps" :current-step="currentStep">
+  <WorkLayout :title="$t('work_pages.voice_gen_title')" sub:title="$t('work_pages.voice_gen_subtitle')" :steps="steps" :current-step="currentStep">
       <div class="ws-section">
-        <div class="ws-section__title">输入配音文案</div>
-        <textarea class="ws-textarea" v-model="text" placeholder="输入需要配音的文案内容..." rows="5" maxlength="1000"></textarea>
+        <div class="ws-section__title">{{ $t('work_pages.voice_gen_input_title') }}</div>
+        <textarea class="ws-textarea" v-model="text" :placeholder="$t('work_pages.voice_gen_input_placeholder')" rows="5" maxlength="1000"></textarea>
         <div class="ws-hint">{{ text.length }} / 1000 字符 · 支持中/英/日/韩多语种</div>
         <PromptEnhancer v-if="text.trim()" mode="script" :initial-prompt="text" @applied="(v) => text = v" />
       </div>
       <div class="ws-section">
-        <div class="ws-section__title">选择音色</div>
+        <div class="ws-section__title">{{ $t('work_pages.voice_gen_step_select') }}</div>
         <div class="voice-grid">
           <div v-for="v in voices" :key="v.id" class="voice-card" :class="{ active: selectedVoice === v.id }" @click="selectedVoice = v.id">
             <div class="voice-card__icon">{{ v.icon }}</div>
@@ -17,28 +17,28 @@
         </div>
       </div>
       <div class="ws-section">
-        <div class="ws-section__title">语速</div>
+        <div class="ws-section__title">{{ $t('work_pages.voice_gen_speed_title') }}</div>
         <div class="ws-slider-row">
           <input type="range" v-model="speed" min="0.5" max="2" step="0.1" class="ws-range" />
           <span class="ws-range-val">{{ speed }}x</span>
         </div>
       </div>
       <div class="ws-actions">
-        <div class="ws-cost">预计消耗 <strong>3</strong> 积分</div>
+        <div class="ws-cost">{{ $t('work_pages.voice_gen_cost') }} <strong>3</strong> {{ $t('work_pages.voice_gen_cost_unit') }}</div>
         <button class="ws-btn ws-btn--primary ws-btn--lg" :disabled="!text.trim() || submitting" @click="handleGenerate">{{ submitting ? '生成中...' : '开始生成' }}</button>
       </div>
       <div class="ws-section">
         <div class="ws-section__title">生成结果</div>
         <div v-if="task.polling.value" class="progress-box">
-          <div class="spinner" /><p>AI 正在合成语音...</p>
+          <div class="spinner" /><p>{{ $t('work_pages.voice_gen_processing') }}</p>
           <div class="bar"><div class="bar-fill" :style="{ width: task.progress.value + '%' }" /></div>
         </div>
         <div v-else-if="task.status.value === 2" class="ws-audio-box">
           <audio v-if="task.result.value" controls class="w-full"><source :src="task.result.value" /></audio>
           <div class="ws-audio-meta">音色：{{ voices.find(v=>v.id===selectedVoice)?.name }} · 语速：{{ speed }}x</div>
         </div>
-        <div v-else-if="task.status.value === 3" class="error-box"><p>{{ task.errorMsg.value || '生成失败' }}</p><button class="ws-btn ws-btn--primary" @click="handleRedo">重试</button></div>
-        <div v-else class="ws-placeholder"><div class="ws-placeholder__icon">🔊</div><div class="ws-placeholder__text">生成后的语音将显示在这里</div></div>
+        <div v-else-if="task.status.value === 3" class="error-box"><p>{{ task.errorMsg.value || '生成失败' }}</p><button class="ws-btn ws-btn--primary" @click="handleRedo">{{ $t('work_pages.voice_gen_btn_retry') }}</button></div>
+        <div v-else class="ws-placeholder"><div class="ws-placeholder__icon">🔊</div><div class="ws-placeholder__text">{{ $t('work_pages.voice_gen_result_placeholder') }}</div></div>
       </div>
       </WorkLayout>
 </template>
