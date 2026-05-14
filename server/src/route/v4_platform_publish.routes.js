@@ -1,10 +1,12 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { validateV4 as _validate } from '../utils/validate.js';
+import { authMiddleware } from '../middleware/auth.js';
 import * as platformPublishController from '../controller/platformPublishController.js';
 import { apiLimiter } from '../middleware/rateLimiter.js';
 
 const router = Router();
+router.use(authMiddleware);
 
 
 const bindSchema = z.object({
