@@ -98,7 +98,7 @@ function _normalizeDbToEngine(content) {
 }
 
 /** Invalidate cache entry after admin edits a template */
-export function invalidateTemplateCache(templateCode) {
+function invalidateTemplateCache(templateCode) {
   if (templateCode) {
     _templateCache.delete(templateCode);
   } else {
@@ -203,7 +203,7 @@ export async function matchAndFill(intentId, variables = {}, opts = {}) {
  * @param {string} intentId
  * @param {number} [userId]
  */
-export async function getAvailableTemplatesForIntent(intentId, userId) {
+async function getAvailableTemplatesForIntent(intentId, userId) {
   const result = [];
   // 用户私有模板
   if (userId) {
@@ -247,5 +247,4 @@ export function getModelHint(intentId) {
   }
 }
 
-export { TEMPLATE_REGISTRY, INDUSTRY_PARAMS, invalidateTemplateCache, getAvailableTemplatesForIntent };
 export default { matchAndFill, getModelHint, invalidateTemplateCache, getAvailableTemplatesForIntent };

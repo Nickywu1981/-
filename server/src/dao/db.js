@@ -250,7 +250,7 @@ const pool = new Proxy(contextAwarePool, {
 
 // ==================== 连接池指标 ====================
 
-export function getPoolMetrics() {
+function getPoolMetrics() {
   return {
     active: realPool._allConnections?.length || 0,
     idle: realPool._freeConnections?.length || 0,
@@ -269,7 +269,7 @@ export function getPoolMetrics() {
  * @param {number} maxRetries - 最大重试次数 (默认3)
  * @returns {Promise<Array>} [rows, fields]
  */
-export async function executeWithRetry(fn, sql, params = [], maxRetries = 3) {
+async function executeWithRetry(fn, sql, params = [], maxRetries = 3) {
   let lastErr;
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
