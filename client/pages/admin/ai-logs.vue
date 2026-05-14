@@ -12,12 +12,12 @@
 
     <div class="toolbar">
       <select v-model="filterStatus" class="sel" @change="fetchData">
-        <option value="">全部{{ $t('common.status') }}</option>
+        <option value="">{{ $t('admin_ai_logs.全部状态') }}</option>
         <option value="1">{{ $t('common.success') }}</option>
         <option value="0">{{ $t('common.failed') }}</option>
       </select>
       <select v-model="filterModel" class="sel" @change="fetchData">
-        <option value="">{{ $t('common.all') }}模型</option>
+        <option value="">{{ $t('admin_ai_logs.全部模型') }}</option>
         <option value="gpt-4o">GPT-4o</option>
         <option value="dall-e-3">DALL-E 3</option>
         <option value="sora">Sora</option>
@@ -68,7 +68,7 @@
             <div class="di"><span class="dl">{{ $t('common.time') }}</span><span class="dv">{{ detail.create_time }}</span></div>
             <div class="di full"><span class="dl">{{ $t('admin_ai_logs.输入内容') }}</span><pre class="pre">{{ detail.prompt_text || '-' }}</pre></div>
             <div class="di full" v-if="detail.response_text"><span class="dl">{{ $t('admin_ai_logs.输出内容') }}</span><pre class="pre">{{ detail.response_text }}</pre></div>
-            <div class="di full" v-if="detail.error_msg"><span class="dl">{{ $t('common.error') }}信息</span><pre class="pre err">{{ detail.error_msg }}</pre></div>
+            <div class="di full" v-if="detail.error_msg"><span class="dl">{{ $t('admin_ai_logs.错误信息') }}</span><pre class="pre err">{{ detail.error_msg }}</pre></div>
           </div>
           <button class="modal-close" @click="detail = null">{{ $t('common.close') }}</button>
         </div>

@@ -7519,7 +7519,9 @@
     "右上": "[EN] 右上",
     "左下": "[EN] 左下",
     "右下": "[EN] 右下",
-    "居中": "[EN] 居中"
+    "居中": "[EN] 居中",
+    "水印透明度": "Watermark Opacity",
+    "保存成功": "Saved successfully"
   },
   "admin_model_pool": {
     "统一管理文生图_文生视频_llm_tts_音频模型_权重_灰度_配额_熔断": "[EN] 统一管理文生图/文生视频/LLM/TTS/音频模型 — 权重/灰度/配额/熔断",
@@ -7557,7 +7559,15 @@
     "正常_closed_请求正常通过": "[EN] 正常 (closed) — 请求正常通过",
     "未知_unknown_未初始化": "[EN] 未知 (unknown) — 未初始化",
     "ai_模型监控": "[EN] AI 模型监控",
-    "重试": "[EN] 重试"
+    "重试": "Retry",
+    "失败 {n} 次": "{n} failure(s)",
+    "重置熔断器": "Reset Breaker",
+    "正常 (closed) — 请求正常通过": "Normal (closed) — requests pass through",
+    "熔断 (open) — 60秒冷却，拒绝请求": "Open — 60s cooldown, requests rejected",
+    "半开 (half-open) — 试探性恢复中": "Half-open — probing recovery",
+    "未知 (unknown) — 未初始化": "Unknown — not initialized",
+    "获取模型状态失败": "Failed to get model status",
+    "网络错误": "Network error"
   },
   "admin_ai_logs": {
     "ai_调用日志": "[EN] AI 调用日志",
@@ -7572,7 +7582,10 @@
     "模型": "[EN] 模型",
     "输入": "[EN] 输入",
     "输出": "[EN] 输出",
-    "耗时": "[EN] 耗时"
+    "耗时": "[EN] 耗时",
+    "全部状态": "All Statuses",
+    "全部模型": "All Models",
+    "错误信息": "Error Info"
   },
   "admin_size_templates": {
     "如_主图_详情图": "[EN] 如：主图、详情图",
@@ -7612,7 +7625,10 @@
     "文案": "[EN] 文案",
     "已用": "[EN] 已用",
     "上限": "[EN] 上限",
-    "剩余": "[EN] 剩余"
+    "剩余": "[EN] 剩余",
+    "查询中": "Checking...",
+    "查询": "Check",
+    "请先登录后查看会员等级信息": "Please log in to view membership tier info"
   },
   "admin_kb_management": {
     "输入查询文本_如_编码规范_用户认证流程": "[EN] 输入查询文本，如「编码规范」「用户认证流程」",
@@ -7622,7 +7638,10 @@
     "向量维度": "[EN] 向量维度",
     "索引令牌": "[EN] 索引令牌",
     "知识块": "[EN] 知识块",
-    "模型": "[EN] 模型"
+    "模型": "[EN] 模型",
+    "管理 Movio AI 项目知识库，支持语义搜索和 LLM RAG 检索": "Manage Movio AI project knowledge base with semantic search and LLM RAG retrieval",
+    "共 {total} 块中命中 {hit} 条 · 模型: {model}": "{hit} hits / {total} chunks · Model: {model}",
+    "搜索失败": "Search failed"
   },
   "agent": {
     "withdraw": {
@@ -8061,5 +8080,25 @@
     "refund_info": "Record #{id}, spent {consumed} credits",
     "refund_reason_placeholder": "Refund reason (optional)",
     "refund_failed": "Refund failed"
+  },
+  "admin_settings": {
+    "保存 GEO 设置": "Save GEO Settings",
+    "保存设置": "Save Settings",
+    "设置已保存": "Settings saved"
+  },
+  "admin_site_config": {
+    "JSON 值": "JSON value",
+    "文本值": "Text value",
+    "添加失败": "Add failed"
+  },
+  "admin_logs": {
+    "全部级别": "All Levels",
+    "开始日期": "Start Date",
+    "结束日期": "End Date"
+  },
+  "admin_sms_logs": {
+    "全部结果": "All Results",
+    "成功": "Success",
+    "失败": "Failed"
   }
 }

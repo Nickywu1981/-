@@ -16,7 +16,7 @@
           <option value="json">json</option>
         </select>
         <input v-model="newConfig.description" maxlength="500" :placeholder="$t('common.description')" class="input" />
-        <textarea v-model="newConfig.value" maxlength="2000" :placeholder="newConfig.type === 'json' ? 'JSON 值' : '文本值'" class="input textarea" :rows="newConfig.type === 'json' ? 6 : 2" />
+        <textarea v-model="newConfig.value" maxlength="2000" :placeholder="newConfig.type === 'json' ? $t('admin_site_config.JSON 值') : $t('admin_site_config.文本值')" class="input textarea" :rows="newConfig.type === 'json' ? 6 : 2" />
         <button class="btn btn-primary" :disabled="adding" @click="addConfig">{{ adding ? $t('common.adding') : $t('common.success_create') }}</button>
       </div>
 
@@ -55,7 +55,7 @@
             />
             <input v-else v-model="editValue" maxlength="2000" class="input" />
             <div class="edit-actions">
-              <button class="btn btn-primary btn-sm" :disabled="saving" @click="save(item)">{{ saving ? '保存中...' : '保存' }}</button>
+              <button class="btn btn-primary btn-sm" :disabled="saving" @click="save(item)">{{ saving ? $t('common.saving') : $t('common.save') }}</button>
               <button class="btn btn-sm" @click="cancelEdit">{{ $t('common.cancel') }}</button>
             </div>
           </template>
@@ -88,7 +88,7 @@ async function fetchConfig() {
     const data: any = await $fetch('/api/admin/site-config', { credentials: 'include' });
     configs.value = data.data || data;
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
-    loadError.value = err?.data?.msg || err.message || '加载失败';
+    loadError.value = err?.data?.msg || err.message || t('common.loadFail');
   } finally { loading.value = false; }
 }
 
@@ -129,7 +129,7 @@ async function addConfig() {
     showAddForm.value = false;
     newConfig.key = ''; newConfig.value = ''; newConfig.description = '';
     fetchConfig();
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || '添加失败'); }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('admin_site_config.添加失败')); }
   finally { adding.value = false; }
 }
 

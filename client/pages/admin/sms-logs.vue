@@ -4,9 +4,9 @@
     <div class="filters">
       <input v-model="phone" type="text" :placeholder="$t('common.phone_label')" @keyup.enter="fetch" />
       <select v-model="result" @change="fetch">
-        <option value="">{{ $t('common.all') }}结果</option>
-        <option value="1">发送{{ $t('common.success') }}</option>
-        <option value="0">发送{{ $t('common.failed') }}</option>
+        <option value="">{{ $t('admin_sms_logs.全部结果') }}</option>
+        <option value="1">{{ $t('admin_sms_logs.成功') }}</option>
+        <option value="0">{{ $t('admin_sms_logs.失败') }}</option>
       </select>
       <input v-model="startDate" type="date" @change="fetch" />
       <input v-model="endDate" type="date" @change="fetch" />
@@ -27,7 +27,7 @@
           <td class="mono">{{ l.template_code }}</td>
           <td>{{ maskPhone(l.phone) }}</td>
           <td class="content-cell">{{ l.content }}</td>
-          <td><span class="badge" :class="l.result ? 'ok' : 'fail'">{{ l.result ? '成功' : '失败' }}</span></td>
+          <td><span class="badge" :class="l.result ? 'ok' : 'fail'">{{ l.result ? $t('admin_sms_logs.成功') : $t('admin_sms_logs.失败') }}</span></td>
           <td>{{ l.provider }}</td>
           <td class="time">{{ l.create_time }}</td>
         </tr>

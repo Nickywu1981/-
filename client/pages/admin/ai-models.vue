@@ -25,7 +25,7 @@
             </div>
             <div class="card-mid">
               <span :class="['breaker-badge', m.state]">{{ stateLabel(m.state) }}</span>
-              <span v-if="m.failedCount > 0" class="fail-count">失败 {{ m.failedCount }} 次</span>
+              <span v-if="m.failedCount > 0" class="fail-count">{{ $t('admin_ai_models.失败 {n} 次', { n: m.failedCount }) }}</span>
             </div>
             <div class="card-actions">
               <button
@@ -33,7 +33,7 @@
                 :disabled="m.state === 'closed'"
                 @click="resetBreaker(key)"
               >
-                {{ $t('common.reset') }}熔断器
+                {{ $t('admin_ai_models.重置熔断器') }}
               </button>
             </div>
           </div>
@@ -42,10 +42,10 @@
         <div class="info-box">
           <h3>{{ $t('common.reset_cb') }}{{ $t('common.status') }}{{ $t('common.description') }}</h3>
           <div class="legend">
-            <span><span class="dot closed" /> 正常 (closed) — 请求正常通过</span>
-            <span><span class="dot open" /> 熔断 (open) — 60秒冷却，拒绝请求</span>
-            <span><span class="dot half-open" /> 半开 (half-open) — 试探性恢复中</span>
-            <span><span class="dot unknown" /> 未知 (unknown) — 未初始化</span>
+            <span><span class="dot closed" /> {{ $t('admin_ai_models.正常 (closed) — 请求正常通过') }}</span>
+            <span><span class="dot open" /> {{ $t('admin_ai_models.熔断 (open) — 60秒冷却，拒绝请求') }}</span>
+            <span><span class="dot half-open" /> {{ $t('admin_ai_models.半开 (half-open) — 试探性恢复中') }}</span>
+            <span><span class="dot unknown" /> {{ $t('admin_ai_models.未知 (unknown) — 未初始化') }}</span>
           </div>
         </div>
       </template>
@@ -77,10 +77,10 @@ async function fetchStatus() {
     if (d?.code === 200) {
       models.value = d.data || {}
     } else {
-      error.value = d?.msg || '获取模型状态失败'
+      error.value = d?.msg || t('admin_ai_models.获取模型状态失败')
     }
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
-    error.value = err?.data?.msg || err.message || '网络错误'
+    error.value = err?.data?.msg || err.message || t('admin_ai_models.网络错误')
   } finally {
     loading.value = false
   }

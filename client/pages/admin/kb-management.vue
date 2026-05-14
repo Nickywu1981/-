@@ -3,7 +3,7 @@
     <div class="page">
       <div class="page-header">
         <h1>{{ $t('admin_kb_management.知识库管理') }}</h1>
-        <p>管理 Movio AI 项目知识库，支持语义{{ $t('common.search') }}和 LLM RAG 检索</p>
+        <p>{{ $t('admin_kb_management.管理 Movio AI 项目知识库，支持语义搜索和 LLM RAG 检索') }}</p>
       </div>
 
       <!-- KB 状态卡片 -->
@@ -38,7 +38,7 @@
 
         <div v-if="ragResult" class="search-results">
           <div class="result-meta">
-            共 {{ ragResult.totalChunks }} 块中命中 {{ ragResult.hitCount }} 条 · 模型: {{ ragResult.model }}
+            {{ $t('admin_kb_management.共 {total} 块中命中 {hit} 条 · 模型: {model}', { total: ragResult.totalChunks, hit: ragResult.hitCount, model: ragResult.model }) }}
           </div>
           <div v-if="ragResult.context" class="context-block">
             <pre>{{ ragResult.context }}</pre>
@@ -80,7 +80,7 @@ async function search() {
     });
     ragResult.value = data.data || data;
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
-    searchError.value = err?.data?.msg || err.message || '搜索失败';
+    searchError.value = err?.data?.msg || err.message || t('admin_kb_management.搜索失败');
   } finally { searching.value = false; }
 }
 

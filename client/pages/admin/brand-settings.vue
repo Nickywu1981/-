@@ -12,7 +12,7 @@
       <div class="section">
         <h3>{{ $t('common.watermark') }}{{ $t('common.settings') }}</h3>
         <div class="form-group"><label class="switch-label"><input v-model="form.watermark_enabled" type="checkbox" /><span>{{ $t('common.statusEnabled') }}{{ $t('common.watermark') }}</span></label></div>
-        <div class="form-group"><label>水印透明度 ({{ form.watermark_opacity }}%)</label><input v-model.number="form.watermark_opacity" type="range" min="10" max="100" class="range-input" /></div>
+        <div class="form-group"><label>{{ $t('admin_brand_settings.水印透明度') }} ({{ form.watermark_opacity }}%)</label><input v-model.number="form.watermark_opacity" type="range" min="10" max="100" class="range-input" /></div>
         <div class="form-group"><label>{{ $t('admin_brand_settings.水印位置') }}</label>
           <select v-model="form.watermark_position" class="input">
             <option value="tl">{{ $t('admin_brand_settings.左上') }}</option><option value="tr">{{ $t('admin_brand_settings.右上') }}</option>
@@ -46,7 +46,7 @@ async function save() {
   saving.value = true; savedMsg.value = ''
   try {
     const data: any = await $fetch('/api/brand', { method: 'PUT', credentials: 'include', body: form })
-    showMsg(data?.msg || '保存成功')
+    showMsg(data?.msg || t('admin_brand_settings.保存成功'))
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('common.failed_save')) }
   saving.value = false
 }

@@ -24,7 +24,7 @@
         <div class="form-group"><label>{{ $t('admin_settings.联系邮箱') }}</label><input v-model="geo.email" maxlength="100" class="input" placeholder="support@movio.ai" /></div>
         <div class="form-group"><label>Logo URL</label><input v-model="geo.logo" maxlength="300" class="input" placeholder="https://movio.ai/logo.png" /></div>
         <div class="save-row" style="margin-top:12px">
-          <button class="btn-save" :disabled="saving" @click="saveGeoSettings">{{ saving ? '保存中...' : '保存 GEO 设置' }}</button>
+          <button class="btn-save" :disabled="saving" @click="saveGeoSettings">{{ saving ? $t('common.saving') : $t('admin_settings.保存 GEO 设置') }}</button>
           <span v-if="geoSavedMsg" class="saved-msg">{{ geoSavedMsg }}</span>
         </div>
       </div>
@@ -37,7 +37,7 @@
         </div>
       </div>
       <div class="save-row">
-        <button class="btn-save" :disabled="saving" @click="saveSettings">{{ saving ? '保存中...' : '保存设置' }}</button>
+        <button class="btn-save" :disabled="saving" @click="saveSettings">{{ saving ? $t('common.saving') : $t('admin_settings.保存设置') }}</button>
         <span v-if="savedMsg" class="saved-msg">{{ savedMsg }}</span>
       </div>
     </div>
@@ -105,7 +105,7 @@ async function saveSettings() {
       const key = encodeURIComponent(item.key)
       await $fetch(`/api/admin/site-config/${key}`, { method: 'PUT', credentials: 'include', body: { config_value: item.value, config_type: item.type, description: item.description } })
     }
-    showMsg('设置已保存')
+    showMsg(t('admin_settings.设置已保存'))
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('common.failed_save')) }
   saving.value = false
 }

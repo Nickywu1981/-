@@ -32,7 +32,7 @@
         <h3>{{ $t('admin_tier.用量查询') }}</h3>
         <div class="check-row">
           <select v-model="checkType" class="sel"><option value="image">{{ $t('admin_tier.图片') }}</option><option value="video">{{ $t('admin_tier.视频') }}</option><option value="text">{{ $t('admin_tier.文案') }}</option></select>
-          <button class="btn-primary" :disabled="checkingLimit" @click="doCheckLimit">{{ checkingLimit ? '查询中...' : '查询' }}</button>
+          <button class="btn-primary" :disabled="checkingLimit" @click="doCheckLimit">{{ checkingLimit ? $t('admin_tier.查询中') : $t('admin_tier.查询') }}</button>
         </div>
         <div v-if="limitResult" class="limit-result">
           <div class="limit-item"><span>{{ $t('admin_tier.已用') }}</span><strong>{{ limitResult.used || 0 }}</strong></div>
@@ -41,7 +41,7 @@
         </div>
       </div>
     </template>
-    <EmptyState v-else icon="⭐" :title="$t('admin_tier.暂无会员数据')" description="请先登录后查看会员等级信息" />
+    <EmptyState v-else icon="⭐" :title="$t('admin_tier.暂无会员数据')" :description="$t('admin_tier.请先登录后查看会员等级信息')" />
   </AdminLayout>
 </template>
 <script setup lang="ts">const { t } = useI18n()

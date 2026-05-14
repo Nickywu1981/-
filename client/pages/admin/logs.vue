@@ -12,13 +12,13 @@
       <input v-model="userId" type="text" :placeholder="$t('common.user_id')" @keyup.enter="fetch" />
       <input v-model="action" type="text" :placeholder="$t('common.operation_type')" @keyup.enter="fetch" />
       <select v-model="level" @change="fetch">
-        <option value="">{{ $t('common.all') }}级别</option>
+        <option value="">{{ $t('admin_logs.全部级别') }}</option>
         <option value="info">INFO</option>
         <option value="warn">WARN</option>
         <option value="error">ERROR</option>
       </select>
-      <input v-model="dateStart" type="date" @change="fetch" title="开始日期" />
-      <input v-model="dateEnd" type="date" @change="fetch" title="结束日期" />
+      <input v-model="dateStart" type="date" @change="fetch" :title="$t('admin_logs.开始日期')" />
+      <input v-model="dateEnd" type="date" @change="fetch" :title="$t('admin_logs.结束日期')" />
       <button @click="fetch">{{ $t('common.search') }}</button>
       <button class="btn-export" @click="exportLogs">{{ $t('common.export') }}CSV</button>
     </div>
