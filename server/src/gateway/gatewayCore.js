@@ -73,6 +73,20 @@ export function timeoutPromise(ms, label) {
 // ==================== Step 0: 业务管线 (强制) ====================
 
 /**
+ * 从各种输入形态中提取纯文本，供业务管线分析。
+ * 支持: 纯字符串 | { prompt } | { text } | { messages: [{role, content}] }
+ */
+function _extractText(input) {
+  if (typeof input === 'string') return input
+  if (!input || typeof input !== 'object') return ''
+  if (input.messages) {
+    const userMsg = input.messages.find(m => m.role === 'user')
+    return userMsg?.content || ''
+  }
+  return input.prompt || input.text || ''
+}
+
+/**
  * 电商业务中间层管线 — 所有商家请求必经之路
  * 意图识别 → 合规校验 → 模板匹配 → 提示词封装
  *
@@ -88,7 +102,7 @@ export async function runBusinessPipeline(input, ctx = {}) {
 
   try {
     const wrapResult = await wrapPrompt(
-      typeof input === 'string' ? input : (input?.prompt || input?.text || ''),
+      _extractText(input),
       {
         userId: ctx.userId,
         platform: ctx.platform || ctx.platformCode || 'taobao',

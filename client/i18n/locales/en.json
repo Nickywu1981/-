@@ -5281,7 +5281,44 @@
       "type_viral_replicate": "[EN] 爆款复刻",
       "type_live_clip": "[EN] 长视频精剪",
       "type_image_gen": "[EN] 图片生成",
-      "type_detail_gen": "[EN] 详情图"
+      "type_detail_gen": "Detail Image"
+    },
+    "action_migrate": {
+      "name": "Action Migration",
+      "source_video_url": "Source Action Video URL",
+      "source_video_placeholder": "Enter reference action video URL...",
+      "target_product_url": "Target Product Image URL",
+      "target_product_placeholder": "Enter product image URL...",
+      "duration_seconds": "Duration (sec)",
+      "style": "Style",
+      "style_ecommerce": "Professional E-commerce",
+      "style_casual": "Casual Showcase",
+      "submit": "Start Action Migration",
+      "generating": "Generating...",
+      "job_submitted": "Task Submitted (Job ID: {id})"
+    },
+    "batch_sku_video": {
+      "name": "Multi-SKU Batch Video",
+      "product_image_url": "Product Image URL",
+      "image_url_placeholder": "Enter image URL...",
+      "add": "Add",
+      "duration_seconds": "Duration (sec)",
+      "style": "Style",
+      "style_showcase": "Product Showcase",
+      "style_story": "Storytelling",
+      "style_review": "Unboxing Review",
+      "target_platforms": "Target Platforms",
+      "start_batch": "Start Batch Video Generation",
+      "generating_progress": "Generating ({n}/{total})..."
+    },
+    "batch_publish": {
+      "name": "Batch Publish Manager",
+      "target_platforms": "Target Platforms",
+      "content_links": "Content / Product Links",
+      "content_url_placeholder": "Enter content or product URL...",
+      "add": "Add",
+      "publishing": "Publishing...",
+      "publish_to_n": "Publish to {n} Platforms"
     },
     "video": {
       "title": "AI Video Studio",

@@ -395,7 +395,7 @@ export async function gatewayDispatch(dispatchReq, ctx = {}) {
 
   // 传入脱敏后的 input
   const safeDispatchReq = { ...dispatchReq };
-  if (dispatchSecurity.sanitizedInput !== dispatchReq.input) {
+  if (dispatchSecurity.sanitizedInput !== effectiveDispatchInput) {
     safeDispatchReq.input = dispatchSecurity.sanitizedInput;
   }
 
@@ -563,9 +563,21 @@ export async function gatewayRoute(params, ctx = {}) {
   const geoConstraints = routeSecurity.geoConstraints;
 
   // 传入脱敏后的 params
-  const safeParams = routeSecurity.sanitizedInput !== routeInput
-    ? { ...params, params: routeSecurity.sanitizedInput }
-    : params;
+  let safeParams = params;
+  if (routeSecurity.sanitizedInput !== effectiveRouteInput) {
+    const rawParams = params?.params || params;
+    if (typeof rawParams === 'string') {
+      safeParams = { ...params, params: routeSecurity.sanitizedInput };
+    } else {
+      // 结构化输入：仅更新 messages 中的用户消息内容，保留 model/temperature 等字段
+      const userMsgIdx = rawParams?.messages?.findIndex(m => m.role === 'user');
+      if (userMsgIdx >= 0) {
+        const updatedMessages = [...rawParams.messages];
+        updatedMessages[userMsgIdx] = { ...updatedMessages[userMsgIdx], content: routeSecurity.sanitizedInput };
+        safeParams = { ...params, params: { ...rawParams, messages: updatedMessages } };
+      }
+    }
+  }
 
   const router = _modelRouter;
   let result, status = 'success', errorMsg = '', triedFallback = false;

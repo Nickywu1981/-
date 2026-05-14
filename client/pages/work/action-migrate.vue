@@ -32,10 +32,10 @@ const submit = async () => {
       }),
     })
     const data = await res.json()
-    if (data.code !== 0) throw new Error(data.msg || '请求失败')
+    if (data.code !== 0) throw new Error(data.msg || t('request_failed'))
     result.value = data.data
   } catch (err: any) {
-    error.value = err.message || '请求失败'
+    error.value = err.message || t('request_failed')
   } finally {
     loading.value = false
   }
@@ -43,39 +43,39 @@ const submit = async () => {
 </script>
 
 <template>
-  <WorkLayout :title="'动作迁移'">
+  <WorkLayout :title="t('work_pages.action_migrate.name')">
     <div class="am-root">
       <div class="am-grid">
         <div class="am-field">
-          <label class="am-label">源动作视频 URL</label>
-          <input v-model="sourceVideo" class="am-input" placeholder="输入参考动作视频URL..." />
+          <label class="am-label">{{ t('work_pages.action_migrate.source_video_url') }}</label>
+          <input v-model="sourceVideo" class="am-input" :placeholder="t('work_pages.action_migrate.source_video_placeholder')" />
         </div>
         <div class="am-field">
-          <label class="am-label">目标商品图 URL</label>
-          <input v-model="productImage" class="am-input" placeholder="输入商品图片URL..." />
+          <label class="am-label">{{ t('work_pages.action_migrate.target_product_url') }}</label>
+          <input v-model="productImage" class="am-input" :placeholder="t('work_pages.action_migrate.target_product_placeholder')" />
         </div>
       </div>
 
       <div class="am-row">
         <div class="am-field">
-          <label class="am-label">时长 (秒)</label>
+          <label class="am-label">{{ t('work_pages.action_migrate.duration_seconds') }}</label>
           <input v-model.number="duration" type="number" min="5" max="60" class="am-input" />
         </div>
         <div class="am-field">
-          <label class="am-label">风格</label>
+          <label class="am-label">{{ t('work_pages.action_migrate.style') }}</label>
           <select v-model="style" class="am-input">
-            <option value="ecommerce">专业电商带货</option>
-            <option value="casual">休闲展示</option>
+            <option value="ecommerce">{{ t('work_pages.action_migrate.style_ecommerce') }}</option>
+            <option value="casual">{{ t('work_pages.action_migrate.style_casual') }}</option>
           </select>
         </div>
       </div>
 
       <button class="am-submit" :disabled="!sourceVideo || !productImage || loading" @click="submit">
-        {{ loading ? '生成中...' : '开始动作迁移' }}
+        {{ loading ? t('work_pages.action_migrate.generating') : t('work_pages.action_migrate.submit') }}
       </button>
 
       <div v-if="result" class="am-result">
-        <div class="am-status">任务已提交 (Job ID: {{ result.job_id }})</div>
+        <div class="am-status">{{ t('work_pages.action_migrate.job_submitted', { id: result.job_id }) }}</div>
       </div>
       <div v-if="error" class="am-error">{{ error }}</div>
     </div>

@@ -82,13 +82,13 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <WorkLayout :title="'多SKU批量视频'">
+  <WorkLayout :title="t('work_pages.batch_sku_video.name')">
     <div class="bsv-root">
       <div class="bsv-field">
-        <label class="bsv-label">商品图片 URL</label>
+        <label class="bsv-label">{{ t('work_pages.batch_sku_video.product_image_url') }}</label>
         <div class="bsv-add-row">
-          <input v-model="imageInput" class="bsv-input" placeholder="输入图片URL..." @keydown.enter="addImage" />
-          <button class="bsv-add-btn" @click="addImage">添加</button>
+          <input v-model="imageInput" class="bsv-input" :placeholder="t('work_pages.batch_sku_video.image_url_placeholder')" @keydown.enter="addImage" />
+          <button class="bsv-add-btn" @click="addImage">{{ t('work_pages.batch_sku_video.add') }}</button>
         </div>
         <div class="bsv-images">
           <div v-for="(img, i) in productImages" :key="i" class="bsv-img-tag">
@@ -100,28 +100,28 @@ onUnmounted(() => {
 
       <div class="bsv-row">
         <div class="bsv-field">
-          <label class="bsv-label">时长 (秒)</label>
+          <label class="bsv-label">{{ t('work_pages.batch_sku_video.duration_seconds') }}</label>
           <input v-model.number="duration" type="number" min="5" max="60" class="bsv-input" />
         </div>
         <div class="bsv-field">
-          <label class="bsv-label">风格</label>
+          <label class="bsv-label">{{ t('work_pages.batch_sku_video.style') }}</label>
           <select v-model="style" class="bsv-input">
-            <option value="showcase">产品展示</option>
-            <option value="story">剧情带货</option>
-            <option value="review">开箱测评</option>
+            <option value="showcase">{{ t('work_pages.batch_sku_video.style_showcase') }}</option>
+            <option value="story">{{ t('work_pages.batch_sku_video.style_story') }}</option>
+            <option value="review">{{ t('work_pages.batch_sku_video.style_review') }}</option>
           </select>
         </div>
       </div>
 
       <div class="bsv-field">
-        <label class="bsv-label">目标平台</label>
+        <label class="bsv-label">{{ t('work_pages.batch_sku_video.target_platforms') }}</label>
         <div class="bsv-chips">
           <button v-for="p in allPlatforms" :key="p.id" class="bsv-chip" :class="{ sel: selectedPlatforms.includes(p.id) }" @click="togglePlatform(p.id)">{{ p.label }}</button>
         </div>
       </div>
 
       <button class="bsv-submit" :disabled="!productImages.length || loading" @click="submit">
-        {{ loading ? `生成中 (${results.length}/${totalCount})...` : '开始批量生成视频' }}
+        {{ loading ? t('work_pages.batch_sku_video.generating_progress', { n: results.length, total: totalCount }) : t('work_pages.batch_sku_video.start_batch') }}
       </button>
 
       <div v-if="results.length" class="bsv-results">

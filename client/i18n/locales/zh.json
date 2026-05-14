@@ -5167,6 +5167,43 @@
       "type_image_gen": "图片生成",
       "type_detail_gen": "详情图"
     },
+    "action_migrate": {
+      "name": "动作迁移",
+      "source_video_url": "源动作视频 URL",
+      "source_video_placeholder": "输入参考动作视频URL...",
+      "target_product_url": "目标商品图 URL",
+      "target_product_placeholder": "输入商品图片URL...",
+      "duration_seconds": "时长 (秒)",
+      "style": "风格",
+      "style_ecommerce": "专业电商带货",
+      "style_casual": "休闲展示",
+      "submit": "开始动作迁移",
+      "generating": "生成中...",
+      "job_submitted": "任务已提交 (Job ID: {id})"
+    },
+    "batch_sku_video": {
+      "name": "多SKU批量视频",
+      "product_image_url": "商品图片 URL",
+      "image_url_placeholder": "输入图片URL...",
+      "add": "添加",
+      "duration_seconds": "时长 (秒)",
+      "style": "风格",
+      "style_showcase": "产品展示",
+      "style_story": "剧情带货",
+      "style_review": "开箱测评",
+      "target_platforms": "目标平台",
+      "start_batch": "开始批量生成视频",
+      "generating_progress": "生成中 ({n}/{total})..."
+    },
+    "batch_publish": {
+      "name": "批量发布管理",
+      "target_platforms": "目标平台",
+      "content_links": "内容 / 商品链接",
+      "content_url_placeholder": "输入内容或商品URL...",
+      "add": "添加",
+      "publishing": "发布中...",
+      "publish_to_n": "一键发布到 {n} 个平台"
+    },
     "video": {
       "title": "AI 视频创作中心",
       "subtitle": "图生视频 · 多图合成 · 一键成片 · AI视频包装",

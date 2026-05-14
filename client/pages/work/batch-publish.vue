@@ -51,20 +51,20 @@ const submit = async () => {
 </script>
 
 <template>
-  <WorkLayout :title="'批量发布管理'">
+  <WorkLayout :title="t('work_pages.batch_publish.name')">
     <div class="bpn-root">
       <div class="bpn-field">
-        <label class="bpn-label">目标平台</label>
+        <label class="bpn-label">{{ t('work_pages.batch_publish.target_platforms') }}</label>
         <div class="bpn-chips">
           <button v-for="p in allPlatforms" :key="p.id" class="bpn-chip" :class="{ sel: selectedPlatforms.includes(p.id) }" @click="togglePlatform(p.id)">{{ p.label }}</button>
         </div>
       </div>
 
       <div class="bpn-field">
-        <label class="bpn-label">内容 / 商品链接</label>
+        <label class="bpn-label">{{ t('work_pages.batch_publish.content_links') }}</label>
         <div class="bpn-add-row">
-          <input v-model="urlInput" class="bpn-input" placeholder="输入内容或商品URL..." @keydown.enter="addUrl" />
-          <button class="bpn-add-btn" @click="addUrl">添加</button>
+          <input v-model="urlInput" class="bpn-input" :placeholder="t('work_pages.batch_publish.content_url_placeholder')" @keydown.enter="addUrl" />
+          <button class="bpn-add-btn" @click="addUrl">{{ t('work_pages.batch_publish.add') }}</button>
         </div>
         <div class="bpn-list">
           <div v-for="(url, i) in contentUrls" :key="i" class="bpn-item">
@@ -75,7 +75,7 @@ const submit = async () => {
       </div>
 
       <button class="bpn-submit" :disabled="!selectedPlatforms.length || !contentUrls.length || loading" @click="submit">
-        {{ loading ? '发布中...' : `一键发布到 ${selectedPlatforms.length} 个平台` }}
+        {{ loading ? t('work_pages.batch_publish.publishing') : t('work_pages.batch_publish.publish_to_n', { n: selectedPlatforms.length }) }}
       </button>
 
       <div v-if="results.length" class="bpn-results">
