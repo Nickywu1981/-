@@ -2,7 +2,7 @@
 
 > **编写组**：G3 UI 设计组（UI-Designer 🔴主 / Doc-Writer 🟡辅）
 > **审核组**：G1 架构规划组（Architect）
-> **版本**：v1.7 | **日期**：2026-05-14
+> **版本**：v1.8 | **日期**：2026-05-15
 
 ---
 
@@ -445,3 +445,112 @@ unified 为更精细多层阴影（符合现代设计系统惯例），theme.css
 | **总计** | **30** | **20** | **5** | **8** | **63** |
 
 **63 项问题，G3 已自行修复 16 项，47 项待跨组处理。**
+
+### 10.10 第九轮 — 组件深层审计 + 全局配置 (2026-05-15)
+
+#### 扫描范围
+
+`components/` 14 个子目录 33 个硬编码文件、`composables/`（空目录）、`utils/format.ts`、`nuxt.config.ts`、`app.vue` CSS 加载链
+
+#### 🔴 P0：`--cfg-*` 死 token 前缀（新发现类别）
+
+4 个组件引用了 **30+ 处 `--cfg-*` CSS 变量**，但该前缀在项目的 5 个 CSS 文件中**从未定义**：
+
+| 组件 | 引用数 | 典型 fallback（Tailwind） |
+|------|:--:|------|
+| `components/common/AppMediaUpload.vue` | 15 | `#4F46E5`/`#10B981`/`#EF4444`/`#374151`/`#9ca3af`/`#e5e7eb`/`#d1d5db`/`#f9fafb` |
+| `components/common/AppTaskProgress.vue` | 9 | 同上 + `#F59E0B`/`#eef2ff` |
+| `components/shared/SmartRecognitionPanel.vue` | 4 | `#fafbfc`/`#1e1f22` |
+| `components/PromptEnhancer.vue` | 6 | Material Design 蓝 `#90caf9`/`#1565c0`/`#e3f2fd` |
+
+> **根因**：这 4 个组件从另一套 `--cfg-*` token 体系的项目直接复制而来，token 定义未同步迁移。所有 `var(--cfg-xxx, #fallback)` 始终穿透到硬编码 fallback，CSS 变量层完全失效。
+
+#### 🔴 P0：PromptEnhancer.vue — Material Design 独立色系
+
+`PromptEnhancer.vue:180-184` 亮色模式的 `--brand` / `--brand-light` / `--brand-lighter` fallback 全部引用 **Material Design Blue 色系**：
+- `#90caf9` (Blue 200) / `#e3f2fd` (Blue 50) / `#bbdefb` (Blue 100) / `#1565c0` (Blue 800) / `#42a5f5` (Blue 400)
+
+暗黑模式 (`:185-186`) 正确使用 `rgba(91,95,227,...)` = `#5b5fe3`。亮/暗分裂式正确色 vs 错误色。
+
+#### 🔴 P0：ThreeViewer.vue — **第四套独立品牌色**
+
+`components/ThreeViewer.vue` 3D 场景全部使用 `#6c5ce7`：
+- L335 `.ctrl-btn.active { color: #6c5ce7; border-color: #6c5ce7; background: rgba(108,92,231,0.15); }`
+- L352 `background: #6c5ce7;`
+- L363 `border-top-color: #6c5ce7;`
+- L83 `new THREE.Color('#1a1a2e')` — 独立深色背景
+
+与正 确品牌色 `#5b5fe3` 差异 ΔE≈8，与旧 `#7C3AED` 差异 ΔE≈14。形成项目内**第四套独立品牌色**。
+
+#### 🔴 P0：ConfirmDialog.vue — Tailwind blue-500 品牌 fallback
+
+`ConfirmDialog.vue:107` `.btn-primary { background: var(--brand, #3b82f6); }`
+- `#3b82f6` = Tailwind blue-500，与品牌色 `#5b5fe3` 色调完全不同
+
+#### 🔴 P0：StatsCard.vue — Element UI blue accent fallback
+
+`StatsCard.vue:7` `borderTopColor: color || 'var(--accent, #409eff)'`
+- `#409eff` = Element UI 默认主题色，`--accent` token 全局未定义 → 始终穿透到 Element 蓝
+
+#### 🔴 P0：GlobalAIChat.vue + QuickCommands.vue — Indigo-500 fallback
+
+- `GlobalAIChat.vue:59-60` `var(--brand-alpha, rgba(99,102,241,0.06))` → `rgb(99,102,241)` = Tailwind Indigo-500
+- `QuickCommands.vue:53` 同上 `rgba(99,102,241,0.06)` fallback
+
+#### 🟡 P1：组件层重度硬编码（6 组件 / 25+ 处）
+
+| 组件 | 硬编码数 | 典型值 |
+|------|:--:|------|
+| `SlidePanel.vue` | 6 | `#5b5fe3`×2, `#4a4ed6`, `#f0f0ef`, `#1a1a1a`, `#2a2a2a` |
+| `PageHeader.vue` | 5 | `#303133`/`#6b7280`/`#b0b5bd`/`#4d5054`（Element UI 灰度） |
+| `ComingSoonPlaceholder.vue` | 8 | `#171717`/`#6b6b70`/`#9d9da3`/`#f3f4f6`/`#7d7d83`/`#2a2a2a` |
+| `PromptPreview.vue` | 5 | `#16a34a`/`#dc2626`（独立绿/红色） |
+| `QuickSaveButton.vue` | 3 | `#ec4899`/`#fdf2f8`（独立粉色） |
+| `DiySectionPreview.vue` | 1 | `#ff6600` |
+
+#### 🟡 P1：暗黑模式 3 文件使用独立深色值
+
+- `SlidePanel.vue:276` `background: #1a1a1a`（vs token `--bg-card: #141724`）
+- `ComingSoonPlaceholder.vue:63` `background: #2a2a2a`（vs token `--bg-tag: #1e2030`）
+- `SmartRecognitionPanel.vue:105` `background: #1e1f22` — 第三套暗色
+
+#### 🟢 P2：Nuxt CSS 数组与 app.vue 双通道加载
+
+`nuxt.config.ts` CSS 数组包含 4 个文件，`app.vue` `import` 额外加载 `main.css` + `theme.css`。双通道加载无冲突但增加认知负担——维护者可能误以为 nuxt.config 数组是完整清单。
+
+#### 🟢 P3：PromptEnhancer.vue @keyframes pe-spin 重复
+
+`@keyframes pe-spin { to { transform: rotate(360deg); } }` 与 `animations.css` 的 `anim-spin` 完全一致，应复用。
+
+#### ✅ 通过项（第九轮）
+
+| 资产 | 状态 |
+|------|:--:|
+| `nuxt.config.ts` theme-color / PWA theme_color | `#5b5fe3` 正确 |
+| `nuxt.config.ts` PWA 配置完整度 | 优秀（缓存策略齐全） |
+| `app.vue` 全局错误边界 | 正确使用 `var(--brand)` + `var(--text-muted)` |
+| `utils/format.ts` | 零硬编码色值 |
+| `components/landing/LandingFooter.vue` | 仅 `rgba(0,0,0,...)` overlay → 低风险 |
+| `components/diy/VersionHistoryModal.vue` | 正确使用 `var(--bg-card)` |
+| `components/search/CommandPalette.vue` | 正确使用 `var(--brand-rgb)` |
+| `components/admin/test-workbench/` | 仅功能色硬编码 + `rgba(var(--brand-rgb)...)` 正确 |
+
+#### 第九轮增量统计
+
+| 优先级 | 新增 | 说明 |
+|:--:|:--:|------|
+| P0 | 17 | `--cfg-*`死前缀(14) + 独立品牌色(3类) |
+| P1 | 7 | 组件层重度硬编码(6) + 暗黑独立色(1) |
+| P2 | 1 | Nuxt 双通道加载 |
+| P3 | 1 | pe-spin 重复 keyframe |
+| **合计** | **26** | |
+
+### 10.11 九轮累计全景
+
+| 优先级 | P0 | P1 | P2 | P3 | 合计 |
+|:--:|:--:|:--:|:--:|:--:|:--:|
+| R1-R8 累计 | 30 | 20 | 5 | 8 | 63 |
+| R9 新增 | 17 | 7 | 1 | 1 | 26 |
+| **总计** | **47** | **27** | **6** | **9** | **89** |
+
+**89 项问题，G3 已自行修复 16 项，73 项待跨组处理。**
