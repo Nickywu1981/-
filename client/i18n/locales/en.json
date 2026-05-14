@@ -1083,77 +1083,22 @@
     "confirmed": "[EN] 已确认"
   },
   "ecommerce": {
-    "title": "AI E-Commerce Content Creation",
-    "subtitle": "Images + Detail Pages + Videos + Copy, all-in-one AI generation",
-    "input": {
-      "title": "Enter Your Creative Brief",
-      "requirement": "Brief Description",
-      "placeholder": "Describe your product info and creative needs...",
-      "productName": "Product Name",
-      "productNameHint": "Enter product name for precise template matching",
-      "reference": "Reference Material",
-      "uploadHint": "Upload a product reference image, AI will generate poster copy automatically"
-    },
-    "config": {
-      "platform": "Target Platform",
-      "industry": "Select Industry",
-      "autoDetect": "Auto Detect",
-      "style": "Visual Style",
-      "voice": "Voiceover",
-      "voiceOff": "Voiceover Off",
-      "voiceOn": "Voiceover On",
-      "advanced": "Advanced Settings",
-      "videoDuration": "Video Duration",
-      "storyboardCount": "Storyboard Count",
-      "scenes": "Scenes"
-    },
-    "generating": "Generating...",
-    "generate": "Generate",
-    "intent": {
-      "detected": "Detected Intent"
-    },
-    "empty": {
-      "title": "Start Your Creation",
-      "description": "Enter product info and creative needs, AI will auto-detect intent and generate results",
-      "noMaterials": "No materials yet"
-    },
-    "flow": {
-      "intent": "Intent Analysis",
-      "compliance": "Compliance Check",
-      "expand": "Image Expansion",
-      "detail": "Detail Page",
-      "storyboard": "Script & Storyboard",
-      "dispatch": "Content Generation"
-    },
-    "compliance": {
-      "passed": "Compliance Check Passed"
-    },
-    "actions": {
-      "retouch": "Refine",
-      "regenerate": "Regenerate",
-      "edit": "Edit",
-      "newProject": "New Project",
-      "export": "Export"
-    },
-    "sellingPoints": "Key Selling Points",
-    "viralFormula": "Viral Formula",
-    "scriptTitle": "Video Script",
-    "hook": "Hook (First 3s)",
-    "sceneScripts": "Scene Scripts",
-    "finalOutput": "Final Output",
-    "voiceOutput": "Voice Output",
-    "videoStatus": "Video Status",
-    "videoProcessing": "Compositing video...",
-    "resultTabs": {
-      "materials": "Materials",
-      "detail": "Detail Page",
-      "storyboard": "Storyboard",
-      "final": "Final Output"
-    },
-    "errors": {
-      "generateFailed": "Generation failed",
-      "unknown": "Unknown error"
-    }
+    "title": "[EN] 电商工具",
+    "subtitle": "[EN] 一键生成商品主图、白底图、详情页",
+    "tab_main_image": "[EN] 商品主图",
+    "tab_white_bg": "[EN] 白底图",
+    "tab_detail": "[EN] 详情页",
+    "tab_video": "[EN] 商品视频",
+    "upload_hint": "[EN] 上传商品图片",
+    "prompt_label": "[EN] 商品描述",
+    "prompt_placeholder": "[EN] 描述商品特点、材质、使用场景...",
+    "generate_btn": "[EN] 生成商品图",
+    "generating": "[EN] 生成中...",
+    "result_alt": "[EN] 商品图",
+    "download_btn": "[EN] 下载",
+    "batch_title": "[EN] 批量生成",
+    "batch_upload_hint": "[EN] 上传多张商品图批量处理",
+    "batch_count": "[EN] 已选择 {n} 张图片"
   },
   "admin_nav": {
     "groups": {
@@ -3177,14 +3122,20 @@
     "platform": "Target Platform"
   },
   "diy": {
-    "title": "Page Builder",
-    "editor": "Visual Editor",
-    "templates": "Templates",
-    "pages": "Page Manager",
-    "forms": "Form Builder",
-    "components": "Components",
-    "saveDraft": "Save Draft",
-    "publishPage": "Publish"
+    "title": "[EN] DIY 设计",
+    "subtitle": "[EN] 自由创作，拖拽编辑，实时预览",
+    "new_project": "[EN] + 新建项目",
+    "my_projects": "[EN] 我的项目",
+    "col_name": "[EN] 项目名称",
+    "col_updated": "[EN] 最后更新",
+    "col_status": "[EN] 状态",
+    "status_draft": "[EN] 草稿",
+    "status_published": "[EN] 已发布",
+    "edit_btn": "[EN] 编辑",
+    "delete_btn": "[EN] 删除",
+    "no_projects": "[EN] 暂无项目，点击上方按钮创建",
+    "templates_title": "[EN] 设计模板",
+    "use_template": "[EN] 使用此模板"
   },
   "account": {
     "title": "Account",
@@ -6010,6 +5961,42 @@
       "style_private": "[EN] 私域社交风格，亲切温馨",
       "style_xhs": "[EN] 小红书生活方式美学，清新自然",
       "style_wechat": "[EN] 公众号头图风格，简洁有力"
+    },
+    "social": {
+      "title": "[EN] 社媒图文封面",
+      "subtitle": "[EN] 小红书封面 · 公众号封面 · AI智能生成 · 多平台适配",
+      "prompt_label": "[EN] 文案描述",
+      "prompt_placeholder": "[EN] 描述封面主题和想要的风格...",
+      "enhance_btn": "[EN] ✨ AI 优化",
+      "enhancing": "[EN] 优化中...",
+      "upload_ref": "[EN] 📷 上传参考图",
+      "style_label": "[EN] 风格偏好",
+      "style_natural": "[EN] 自然清新",
+      "style_lifestyle": "[EN] 生活方式",
+      "style_minimal": "[EN] 极简高级",
+      "style_vibrant": "[EN] 活力色彩",
+      "style_warm": "[EN] 温暖治愈",
+      "spec_label": "[EN] 规格",
+      "generate_btn": "[EN] 生成封面",
+      "generating": "[EN] 生成中...",
+      "empty_hint": "[EN] 输入文案生成社媒封面",
+      "img_generating": "[EN] 图片生成中...",
+      "download_btn": "[EN] 下载",
+      "regen_btn": "[EN] 重新生成",
+      "history_title": "[EN] 生成历史",
+      "type_xhs": "[EN] 小红书封面",
+      "type_xhs_desc": "[EN] 生活方式美学",
+      "type_xhs_placeholder": "[EN] 描述封面主题、氛围和想传达的感觉...",
+      "type_wechat": "[EN] 公众号封面",
+      "type_wechat_desc": "[EN] 信息流头图",
+      "type_wechat_placeholder": "[EN] 描述公众号文章主题和封面视觉方向...",
+      "loading_understanding": "[EN] 正在理解文案...",
+      "loading_generating": "[EN] 正在生成封面...",
+      "loading_optimizing": "[EN] 正在优化细节...",
+      "loading_finishing": "[EN] 即将完成...",
+      "result_alt": "[EN] 生成封面",
+      "label_xhs_short": "[EN] 小红书",
+      "label_wechat_short": "[EN] 公众号"
     }
   },
   "promptEnhancer": {
@@ -6856,5 +6843,28 @@
       "status_paid": "[EN] 已打款",
       "status_pending": "[EN] 待打款"
     }
+  },
+  "member": {
+    "title": "[EN] 会员中心",
+    "subtitle": "[EN] 管理您的会员等级、积分与权益",
+    "current_tier": "[EN] 当前等级",
+    "points_balance": "[EN] 积分余额",
+    "expire_date": "[EN] 有效期至",
+    "upgrade_btn": "[EN] 升级会员",
+    "benefits_title": "[EN] 会员权益",
+    "points_history": "[EN] 积分记录",
+    "col_date": "[EN] 日期",
+    "col_desc": "[EN] 描述",
+    "col_points": "[EN] 积分变动",
+    "col_balance": "[EN] 余额",
+    "no_points": "[EN] 暂无积分记录",
+    "tier_free": "[EN] 免费版",
+    "tier_pro": "[EN] 专业版",
+    "tier_enterprise": "[EN] 企业版",
+    "benefit_1": "[EN] 每月 {n} 次 AI 生成",
+    "benefit_2": "[EN] 高清无水印导出",
+    "benefit_3": "[EN] 优先客服支持",
+    "benefit_4": "[EN] API 访问权限",
+    "per_month": "[EN] /月"
   }
 }

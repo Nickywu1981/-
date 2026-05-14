@@ -1082,77 +1082,22 @@
     "confirmed": "已确认"
   },
   "ecommerce": {
-    "title": "AI 电商内容创作",
-    "subtitle": "图片 + 详情页 + 视频 + 文案，一站式智能生成",
-    "input": {
-      "title": "输入创作需求",
-      "requirement": "需求描述",
-      "placeholder": "描述你的产品信息和创作需求...",
-      "productName": "商品名称",
-      "productNameHint": "输入商品名称以精准匹配模板",
-      "reference": "参考素材",
-      "uploadHint": "上传商品参考图，AI 自动生成海报描述文案"
-    },
-    "config": {
-      "platform": "目标平台",
-      "industry": "选择行业",
-      "autoDetect": "自动检测",
-      "style": "画面风格",
-      "voice": "配音开关",
-      "voiceOff": "关闭配音",
-      "voiceOn": "开启配音",
-      "advanced": "高级设置",
-      "videoDuration": "视频时长",
-      "storyboardCount": "分镜数量",
-      "scenes": "场景数"
-    },
+    "title": "电商工具",
+    "subtitle": "一键生成商品主图、白底图、详情页",
+    "tab_main_image": "商品主图",
+    "tab_white_bg": "白底图",
+    "tab_detail": "详情页",
+    "tab_video": "商品视频",
+    "upload_hint": "上传商品图片",
+    "prompt_label": "商品描述",
+    "prompt_placeholder": "描述商品特点、材质、使用场景...",
+    "generate_btn": "生成商品图",
     "generating": "生成中...",
-    "generate": "开始生成",
-    "intent": {
-      "detected": "识别意图"
-    },
-    "empty": {
-      "title": "开始你的创作",
-      "description": "输入产品信息和创作需求，AI 将自动识别意图并生成结果",
-      "noMaterials": "暂无创作素材"
-    },
-    "flow": {
-      "intent": "意图识别",
-      "compliance": "合规校验",
-      "expand": "素材扩图",
-      "detail": "详情页生成",
-      "storyboard": "脚本分镜",
-      "dispatch": "内容生成"
-    },
-    "compliance": {
-      "passed": "合规校验通过"
-    },
-    "actions": {
-      "retouch": "微调优化",
-      "regenerate": "重新生成",
-      "edit": "编辑",
-      "newProject": "新项目",
-      "export": "导出"
-    },
-    "sellingPoints": "核心卖点",
-    "viralFormula": "爆款公式",
-    "scriptTitle": "视频脚本",
-    "hook": "前3秒钩子",
-    "sceneScripts": "分镜脚本",
-    "finalOutput": "最终输出",
-    "voiceOutput": "配音输出",
-    "videoStatus": "视频状态",
-    "videoProcessing": "视频合成中...",
-    "resultTabs": {
-      "materials": "素材",
-      "detail": "详情页",
-      "storyboard": "脚本分镜",
-      "final": "最终输出"
-    },
-    "errors": {
-      "generateFailed": "生成失败",
-      "unknown": "未知错误"
-    }
+    "result_alt": "商品图",
+    "download_btn": "下载",
+    "batch_title": "批量生成",
+    "batch_upload_hint": "上传多张商品图批量处理",
+    "batch_count": "已选择 {n} 张图片"
   },
   "admin_nav": {
     "groups": {
@@ -3069,14 +3014,20 @@
     "platform": "目标平台"
   },
   "diy": {
-    "title": "页面搭建",
-    "editor": "可视化编辑器",
-    "templates": "模板库",
-    "pages": "页面管理",
-    "forms": "表单搭建",
-    "components": "组件库",
-    "saveDraft": "保存草稿",
-    "publishPage": "发布"
+    "title": "DIY 设计",
+    "subtitle": "自由创作，拖拽编辑，实时预览",
+    "new_project": "+ 新建项目",
+    "my_projects": "我的项目",
+    "col_name": "项目名称",
+    "col_updated": "最后更新",
+    "col_status": "状态",
+    "status_draft": "草稿",
+    "status_published": "已发布",
+    "edit_btn": "编辑",
+    "delete_btn": "删除",
+    "no_projects": "暂无项目，点击上方按钮创建",
+    "templates_title": "设计模板",
+    "use_template": "使用此模板"
   },
   "account": {
     "title": "账户中心",
@@ -5419,6 +5370,7 @@
     "digital_human_script_label": "口播文案",
     "digital_human_script_placeholder": "请输入口播文案...",
     "digital_human_word_count_suffix": "字 · 约",
+    "digital_human_word_count_sec": "秒",
     "digital_human_audio_label": "或上传音频文件（可选，不传则用AI语音合成）",
     "digital_human_audio_uploaded": "✓ 已上传音频",
     "digital_human_avatar_title": "选择数字人形象",
@@ -5816,6 +5768,42 @@
       "style_private": "私域社交风格，亲切温馨",
       "style_xhs": "小红书生活方式美学，清新自然",
       "style_wechat": "公众号头图风格，简洁有力"
+    },
+    "social": {
+      "title": "社媒图文封面",
+      "subtitle": "小红书封面 · 公众号封面 · AI智能生成 · 多平台适配",
+      "prompt_label": "文案描述",
+      "prompt_placeholder": "描述封面主题和想要的风格...",
+      "enhance_btn": "✨ AI 优化",
+      "enhancing": "优化中...",
+      "upload_ref": "📷 上传参考图",
+      "style_label": "风格偏好",
+      "style_natural": "自然清新",
+      "style_lifestyle": "生活方式",
+      "style_minimal": "极简高级",
+      "style_vibrant": "活力色彩",
+      "style_warm": "温暖治愈",
+      "spec_label": "规格",
+      "generate_btn": "生成封面",
+      "generating": "生成中...",
+      "empty_hint": "输入文案生成社媒封面",
+      "img_generating": "图片生成中...",
+      "download_btn": "下载",
+      "regen_btn": "重新生成",
+      "history_title": "生成历史",
+      "type_xhs": "小红书封面",
+      "type_xhs_desc": "生活方式美学",
+      "type_xhs_placeholder": "描述封面主题、氛围和想传达的感觉...",
+      "type_wechat": "公众号封面",
+      "type_wechat_desc": "信息流头图",
+      "type_wechat_placeholder": "描述公众号文章主题和封面视觉方向...",
+      "loading_understanding": "正在理解文案...",
+      "loading_generating": "正在生成封面...",
+      "loading_optimizing": "正在优化细节...",
+      "loading_finishing": "即将完成...",
+      "result_alt": "生成封面",
+      "label_xhs_short": "小红书",
+      "label_wechat_short": "公众号"
     }
   },
   "promptEnhancer": {
@@ -6649,5 +6637,28 @@
       "status_paid": "已打款",
       "status_pending": "待打款"
     }
+  },
+  "member": {
+    "title": "会员中心",
+    "subtitle": "管理您的会员等级、积分与权益",
+    "current_tier": "当前等级",
+    "points_balance": "积分余额",
+    "expire_date": "有效期至",
+    "upgrade_btn": "升级会员",
+    "benefits_title": "会员权益",
+    "points_history": "积分记录",
+    "col_date": "日期",
+    "col_desc": "描述",
+    "col_points": "积分变动",
+    "col_balance": "余额",
+    "no_points": "暂无积分记录",
+    "tier_free": "免费版",
+    "tier_pro": "专业版",
+    "tier_enterprise": "企业版",
+    "benefit_1": "每月 {n} 次 AI 生成",
+    "benefit_2": "高清无水印导出",
+    "benefit_3": "优先客服支持",
+    "benefit_4": "API 访问权限",
+    "per_month": "/月"
   }
 }

@@ -6,20 +6,20 @@
 <template>
   <div class="work-page">
     <header class="work-header">
-      <h1>{{ headerCfg.title || 'AI 数字人口播' }}</h1>
-      <p>{{ headerCfg.subtitle || '文本/音频驱动 — 选择形象+语音+背景 — 一键生成口播视频' }}</p>
+      <h1>{{ headerCfg.title || $t('work_pages.digital_human_title') }}</h1>
+      <p>{{ headerCfg.subtitle || $t('work_pages.digital_human_subtitle') }}</p>
     </header>
 
     <div class="work-panel">
       <!-- 口播文案 -->
       <div class="input-group">
         <label>{{ $t('work_pages.digital_human_script_label') }}</label>
-        <textarea v-model="script" class="input prompt-input" rows="6" placeholder="请输入口播文案...&#10;&#10;如：这款秋季新品连衣裙，采用高支棉面料，亲肤透气不起球。限时特惠只要99元！&#10;&#10;约5字/秒，30秒口播约150字" maxlength="2000"></textarea>
+        <textarea v-model="script" class="input prompt-input" rows="6" :placeholder="$t('work_pages.digital_human_script_placeholder')" maxlength="2000"></textarea>
         <div class="enhance-row">
           <PromptEnhancer mode="script" :initial-prompt="script" @applied="(v) => script = v" />
         </div>
 
-        <div class="word-count">{{ script.length }} 字 · 约 {{ Math.ceil(script.length / 5) }} 秒</div>
+        <div class="word-count">{{ script.length }} {{ $t('work_pages.digital_human_word_count_suffix') }} {{ Math.ceil(script.length / 5) }} {{ $t('work_pages.digital_human_word_count_sec') }}</div>
       </div>
 
       <div class="quick-scripts">
@@ -38,7 +38,7 @@
       <div class="avatar-grid">
         <button v-for="a in avatars" :key="a.id" class="avatar-card" :class="{ active: selectedAvatar === a.id }" @click="selectedAvatar = a.id">
           <span class="avatar-icon">{{ a.icon }}</span>
-          <span class="avatar-name">{{ a.name }}</span>
+          <span class="avatar-name">{{ $t('work_pages.digital_human_avatar_' + a.id) }}</span>
         </button>
       </div>
 
@@ -46,14 +46,14 @@
       <h3 class="section-title">{{ $t('work_pages.digital_human_bg_title') }}</h3>
       <div class="bg-row">
         <button v-for="bg in backgrounds" :key="bg.id" class="bg-btn" :class="{ active: selectedBg === bg.id }" @click="selectedBg = bg.id">
-          {{ bg.name }}
+          {{ $t('work_pages.digital_human_bg_' + bg.id) }}
         </button>
       </div>
 
-      <div class="cost-hint">成本：15 点/次</div>
+      <div class="cost-hint">{{ $t('work_pages.digital_human_cost') }}{{ costValue }} {{ $t('work_pages.digital_human_cost_unit') }}</div>
 
       <button class="btn btn-primary btn-lg" :disabled="!script.trim() || submitting" @click="doCreate">
-        <span v-if="submitting" class="spinner" /> {{ submitting ? '提交中...' : taskStatus === 'processing' ? '生成中...' : taskStatus === 'queued' ? '排队中...' : '生成口播视频' }}
+        <span v-if="submitting" class="spinner" /> {{ submitting ? $t('work_pages.digital_human_btn_submitting') : taskStatus === 'processing' ? $t('work_pages.digital_human_btn_generating') : taskStatus === 'queued' ? $t('work_pages.digital_human_btn_queued') : $t('work_pages.digital_human_btn_submit') }}
       </button>
 
       <AppTaskProgress v-if="taskStatus !== 'idle'" :status="taskStatus" :progress="taskProgress" :error-message="taskError" :show-download="taskStatus === 'completed'" @retry="doCreate" @download="downloadResult" />
@@ -89,6 +89,8 @@ const submitting = ref(false)
 const resultUrl = computed(() => result.value?.video_url || result.value?.file_url || '')
 const { download } = useFileDownload()
 
+const costValue = ref(15)
+
 const quickTemplates = [
   '这款新品首发，限时特惠只要99元，点击下方链接立即抢购！',
   '大家好，今天给大家推荐一款超好用的清洁神器，顽固污渍一抹就干净！',
@@ -96,19 +98,19 @@ const quickTemplates = [
 ]
 
 const avatars = [
-  { id: 'default', name: '职场女性', icon: '👩‍💼' },
-  { id: 'casual_female', name: '休闲女生', icon: '👩' },
-  { id: 'business_man', name: '商务男士', icon: '👨‍💼' },
-  { id: 'casual_male', name: '休闲男生', icon: '👨' },
-  { id: 'senior_female', name: '知性女性', icon: '👩‍🏫' },
-  { id: 'fashion_male', name: '时尚潮男', icon: '🕺' },
+  { id: 'default', icon: '👩‍💼' },
+  { id: 'casual_female', icon: '👩' },
+  { id: 'business_man', icon: '👨‍💼' },
+  { id: 'casual_male', icon: '👨' },
+  { id: 'senior_female', icon: '👩‍🏫' },
+  { id: 'fashion_male', icon: '🕺' },
 ]
 
 const backgrounds = [
-  { id: 'studio', name: '录播棚' },
-  { id: 'white', name: '纯白背景' },
-  { id: 'office', name: '商务办公' },
-  { id: 'living', name: '温馨家居' },
+  { id: 'studio' },
+  { id: 'white' },
+  { id: 'office' },
+  { id: 'living' },
 ]
 
 function onAudioUploaded(files: any[]) { if (files.length > 0) audioUrl.value = files[0].url }
@@ -140,26 +142,25 @@ function downloadResult() { if (resultUrl.value) download(resultUrl.value, 'digi
 
 .input-group { margin-bottom: 16px; }
 .input-group label { display: block; font-size: var(--cfg-font-size-sm); color: var(--cfg-text-secondary); margin-bottom: 6px; }
-.prompt-input { font-size: var(--cfg-font-size-md); min-height: 120px; }
+.prompt-input { font-size: var(--cfg-font-size-base); min-height: 120px; }
+.enhance-row { margin-top: 8px; }
 .word-count { font-size: var(--cfg-font-size-xs); color: var(--cfg-text-muted); margin-top: 6px; }
 .hint.ok { font-size: var(--cfg-font-size-xs); color: var(--cfg-success); margin-top: 6px; }
+.quick-scripts { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
 
-.quick-scripts { display: flex; gap: 8px; flex-wrap: wrap; }
-.section-title { font-size: var(--cfg-font-size-base); font-weight: var(--cfg-font-weight-semibold); margin: 24px 0 12px; color: var(--cfg-text-primary); }
+.section-title { font-size: var(--cfg-font-size-base); margin: 20px 0 12px; font-weight: var(--cfg-font-weight-semibold); }
 
-.avatar-grid { display: flex; gap: 12px; flex-wrap: wrap; }
-.avatar-card { padding: 16px 12px; border: 2px solid var(--cfg-border); border-radius: var(--cfg-radius-base); background: var(--cfg-bg-primary); cursor: pointer; text-align: center; min-width: 100px; transition: border-color var(--cfg-transition-fast), background var(--cfg-transition-fast); }
-.avatar-card:hover { border-color: var(--cfg-primary); }
-.avatar-card.active { border-color: var(--cfg-primary); background: var(--cfg-bg-brand-light); }
-.avatar-icon { font-size: 28px; display: block; margin-bottom: 6px; }
-.avatar-name { font-size: var(--cfg-font-size-sm); font-weight: var(--cfg-font-weight-medium); color: var(--cfg-text-primary); }
+.avatar-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.avatar-card { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 16px 8px; border: 2px solid var(--cfg-border); border-radius: var(--cfg-radius-base); background: var(--cfg-bg-primary); cursor: pointer; transition: border-color var(--cfg-transition-fast); }
+.avatar-card.active { border-color: var(--cfg-primary); background: var(--cfg-bg-tertiary); }
+.avatar-icon { font-size: 32px; }
+.avatar-name { font-size: var(--cfg-font-size-sm); color: var(--cfg-text-secondary); font-weight: var(--cfg-font-weight-medium); }
 
-.bg-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
-.bg-btn { padding: 8px 16px; border: 1px solid var(--cfg-border); border-radius: var(--cfg-radius-sm); background: var(--cfg-bg-primary); cursor: pointer; font-size: var(--cfg-font-size-sm); transition: border-color var(--cfg-transition-fast), background var(--cfg-transition-fast), color var(--cfg-transition-fast); }
-.bg-btn:hover { border-color: var(--cfg-primary); }
+.bg-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.bg-btn { padding: 6px 16px; border: 1px solid var(--cfg-border); border-radius: var(--cfg-radius-sm); background: var(--cfg-bg-primary); cursor: pointer; font-size: var(--cfg-font-size-sm); }
 .bg-btn.active { background: var(--cfg-primary); color: #fff; border-color: var(--cfg-primary); }
 
-.cost-hint { font-size: var(--cfg-font-size-sm); color: var(--cfg-warning); margin-bottom: 16px; font-weight: var(--cfg-font-weight-medium); }
+.cost-hint { font-size: var(--cfg-font-size-sm); color: var(--cfg-warning); margin: 16px 0; }
 
 .result-preview { margin-top: 24px; }
 .result-video { width: 100%; max-height: 480px; border-radius: var(--cfg-radius-base); border: 1px solid var(--cfg-border); }

@@ -6,8 +6,8 @@
 <template>
   <div class="work-page">
     <header class="work-header">
-      <h1>{{ headerCfg?.title || '社媒图文封面' }}</h1>
-      <p>{{ headerCfg?.subtitle || '小红书封面 · 公众号封面 · AI智能生成 · 多平台适配' }}</p>
+      <h1>{{ headerCfg?.title || $t('work_pages.social.title') }}</h1>
+      <p>{{ headerCfg?.subtitle || $t('work_pages.social.subtitle') }}</p>
     </header>
 
     <!-- 平台类型选择 -->
@@ -20,8 +20,8 @@
         @click="activeType = t.key"
       >
         <span class="type-icon">{{ t.icon }}</span>
-        <span class="type-label">{{ t.label }}</span>
-        <span class="type-desc">{{ t.desc }}</span>
+        <span class="type-label">{{ $t(t.labelKey) }}</span>
+        <span class="type-desc">{{ $t(t.descKey) }}</span>
         <span class="type-size">{{ t.sizeText }}</span>
       </button>
     </div>
@@ -30,21 +30,21 @@
       <!-- 左侧输入 -->
       <div class="input-section">
         <div class="prompt-area">
-          <label class="area-label">文案描述</label>
+          <label class="area-label">{{ $t('work_pages.social.prompt_label') }}</label>
           <textarea
             v-model="prompt"
             class="input prompt-input"
             rows="4"
-            :placeholder="activeTypeCfg?.placeholder || '描述封面主题和想要的风格...'"
+            :placeholder="activeTypeCfg?.placeholder || $t('work_pages.social.prompt_placeholder')"
             maxlength="4000"
           />
           <div class="prompt-toolbar">
             <PromptEnhancer v-model="prompt" type="social" @enhanced="onPromptEnhanced" />
             <button class="btn btn-ghost btn-sm" :disabled="enhancing" @click="doEnhance">
-              {{ enhancing ? '优化中...' : '✨ AI 优化' }}
+              {{ enhancing ? $t('work_pages.social.enhancing') : $t('work_pages.social.enhance_btn') }}
             </button>
             <label class="btn btn-ghost btn-sm">
-              📷 上传参考图
+              {{ $t('work_pages.social.upload_ref') }}
               <input type="file" accept="image/*" hidden @change="onRefImage" />
             </label>
             <span v-if="refImage" class="ref-name">{{ refImage.name }}</span>
@@ -53,25 +53,21 @@
         </div>
 
         <div class="style-select">
-          <label class="area-label">风格偏好</label>
+          <label class="area-label">{{ $t('work_pages.social.style_label') }}</label>
           <select v-model="style" class="input">
-            <option value="natural">自然清新</option>
-            <option value="lifestyle">生活方式</option>
-            <option value="minimal">极简高级</option>
-            <option value="vibrant">活力色彩</option>
-            <option value="warm">温暖治愈</option>
+            <option v-for="s in styleOptions" :key="s.value" :value="s.value">{{ $t(s.nameKey) }}</option>
           </select>
         </div>
 
         <div class="size-select">
-          <label class="area-label">规格</label>
+          <label class="area-label">{{ $t('work_pages.social.spec_label') }}</label>
           <select v-model="activeType" class="input">
-            <option v-for="t in types" :key="t.key" :value="t.key">{{ t.label }} ({{ t.sizeText }})</option>
+            <option v-for="t in types" :key="t.key" :value="t.key">{{ $t(t.labelKey) }} ({{ t.sizeText }})</option>
           </select>
         </div>
 
         <button class="btn btn-primary btn-lg w-full" :disabled="submitting || !prompt" @click="doSubmit">
-          <span v-if="submitting" class="spinner" /> {{ submitting ? '生成中...' : '生成封面' }}
+          <span v-if="submitting" class="spinner" /> {{ submitting ? $t('work_pages.social.generating') : $t('work_pages.social.generate_btn') }}
         </button>
       </div>
 
@@ -79,7 +75,7 @@
       <div class="preview-section">
         <div v-if="!result && !submitting" class="empty-state">
           <span class="empty-icon">🖼️</span>
-          <p>输入文案生成社媒封面</p>
+          <p>{{ $t('work_pages.social.empty_hint') }}</p>
         </div>
         <div v-else-if="submitting" class="loading-state">
           <div class="loading-bar" />
@@ -87,22 +83,22 @@
         </div>
         <div v-else-if="result" class="result-view">
           <div class="result-image" :style="{ aspectRatio: activeTypeCfg?.ratio || '3:4' }">
-            <img loading="lazy" v-if="result.imageUrl" :src="result.imageUrl" alt="生成封面" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
-            <div v-else class="placeholder-img">图片生成中...</div>
+            <img loading="lazy" v-if="result.imageUrl" :src="result.imageUrl" :alt="$t('work_pages.social.result_alt')" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+            <div v-else class="placeholder-img">{{ $t('work_pages.social.img_generating') }}</div>
           </div>
           <div class="result-meta">
-            <span>{{ activeTypeCfg?.label }} | {{ result.width }}x{{ result.height }}</span>
+            <span>{{ $t(activeTypeCfg?.labelKey || '') }} | {{ result.width }}x{{ result.height }}</span>
           </div>
           <div class="result-actions">
-            <button class="btn btn-sm" @click="doDownload">下载</button>
-            <button class="btn btn-sm btn-ghost" @click="doRerun">重新生成</button>
+            <button class="btn btn-sm" @click="doDownload">{{ $t('work_pages.social.download_btn') }}</button>
+            <button class="btn btn-sm btn-ghost" @click="doRerun">{{ $t('work_pages.social.regen_btn') }}</button>
           </div>
         </div>
       </div>
     </div>
 
     <div v-if="history.length" class="history-section">
-      <h3>生成历史</h3>
+      <h3>{{ $t('work_pages.social.history_title') }}</h3>
       <div class="history-grid">
         <button
           v-for="(item, i) in history"
@@ -112,7 +108,7 @@
         >
           <img loading="lazy" v-if="item.imageUrl" :src="item.imageUrl" alt="" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
           <span v-else class="placeholder-img" />
-          <span class="history-label">{{ item.posterType === 'xhs' ? '小红书' : '公众号' }}</span>
+          <span class="history-label">{{ item.posterType === 'xhs' ? $t('work_pages.social.label_xhs_short') : $t('work_pages.social.label_wechat_short') }}</span>
         </button>
       </div>
     </div>
@@ -127,11 +123,17 @@ const { t } = useI18n()
 const { config: headerCfg } = useSiteConfig('page.social')
 const toast = useToast()
 
-
+const styleOptions = [
+  { value: 'natural', nameKey: 'work_pages.social.style_natural' },
+  { value: 'lifestyle', nameKey: 'work_pages.social.style_lifestyle' },
+  { value: 'minimal', nameKey: 'work_pages.social.style_minimal' },
+  { value: 'vibrant', nameKey: 'work_pages.social.style_vibrant' },
+  { value: 'warm', nameKey: 'work_pages.social.style_warm' },
+]
 
 const types = [
-  { key: 'xhs', icon: '📕', label: '小红书封面', desc: '生活方式美学', sizeText: '1080×1440', ratio: '3:4', placeholder: '描述封面主题、氛围和想传达的感觉...' },
-  { key: 'wechat', icon: '💬', label: '公众号封面', desc: '信息流头图', sizeText: '900×383', ratio: '2.35:1', placeholder: '描述公众号文章主题和封面视觉方向...' },
+  { key: 'xhs', icon: '📕', labelKey: 'work_pages.social.type_xhs', descKey: 'work_pages.social.type_xhs_desc', sizeText: '1080×1440', ratio: '3:4', placeholder: t('work_pages.social.type_xhs_placeholder') },
+  { key: 'wechat', icon: '💬', labelKey: 'work_pages.social.type_wechat', descKey: 'work_pages.social.type_wechat_desc', sizeText: '900×383', ratio: '2.35:1', placeholder: t('work_pages.social.type_wechat_placeholder') },
 ]
 
 const activeType = ref('xhs')
@@ -143,11 +145,16 @@ const enhancing = ref(false)
 const submitting = ref(false)
 const result = ref(null)
 const history = ref([])
-const loadingText = ref('正在生成封面...')
+const loadingText = ref(t('work_pages.social.loading_generating'))
 
-const activeTypeCfg = computed(() => types.find(t => t.key === activeType.value))
+const activeTypeCfg = computed(() => types.find(ty => ty.key === activeType.value))
 
-const loadingTexts = ['正在理解文案...', '正在生成封面...', '正在优化细节...', '即将完成...']
+const loadingTexts = computed(() => [
+  t('work_pages.social.loading_understanding'),
+  t('work_pages.social.loading_generating'),
+  t('work_pages.social.loading_optimizing'),
+  t('work_pages.social.loading_finishing'),
+])
 let loadingTimer = null
 
 async function doEnhance() {
@@ -161,7 +168,7 @@ async function doEnhance() {
     })
     enhancedPrompt.value = res.prompt || res.enhancedPrompt
   } catch (e) {
-    toast.error(t('common.failed_optimize_prompt') + ' : ') + (e.message || t('common.unknown_error')))
+    toast.error(t('common.failed_optimize_prompt') + ' : ' + (e.message || t('common.unknown_error')))
   } finally {
     enhancing.value = false
   }
@@ -180,9 +187,10 @@ function doSubmit() {
   submitting.value = true
   result.value = null
   enhancedPrompt.value = ''
-  loadingText.value = loadingTexts[0]
+  const texts = loadingTexts.value
+  loadingText.value = texts[0]
   let i = 0
-  const timer = setInterval(() => { i = (i + 1) % loadingTexts.length; loadingText.value = loadingTexts[i] }, 2500)
+  const timer = setInterval(() => { i = (i + 1) % texts.length; loadingText.value = texts[i] }, 2500)
   loadingTimer = timer
 
   $fetch('/api/posters/generate', {
