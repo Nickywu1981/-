@@ -10,7 +10,7 @@ export const listTasks = wrapController(async (req, res) => {
 });
 
 export const createTask = wrapController(async (req, res) => {
-    const data = await automationService.createTask(req.user.id, req.tenantId, req.body);
+    const data = await automationService.createTask(req.user.id, req.tenantId, req.validated);
     success(res, data, '任务已创建');
 });
 
@@ -33,7 +33,7 @@ export const listAccounts = wrapController(async (req, res) => {
 });
 
 export const createAccount = wrapController(async (req, res) => {
-    const data = await automationService.createAccount(req.user.id, req.tenantId, req.body);
+    const data = await automationService.createAccount(req.user.id, req.tenantId, req.validated);
     success(res, data, '账号已添加');
 });
 

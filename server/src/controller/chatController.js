@@ -47,5 +47,5 @@ export async function getSuggestions(req, res) {
     { id: 'translate', label: '跨境翻译', icon: 'globe', prompt: '将这段产品描述翻译成英文和日文' },
     { id: 'compliance', label: '合规检查', icon: 'shield', prompt: '帮我检查这段文案是否合规' },
   ];
-  res.json(success(suggestions));
+  return success(res, suggestions);
 }
