@@ -64,5 +64,3 @@ export async function getAdaptSpec(platformCode, _req) {
   );
   return rows;
 }
-
-export default { listAll, getById, listByPlatform, create, update, remove, getAdaptSpec };
