@@ -1,31 +1,31 @@
 <template>
-  <WorkLayout :steps="['上传图片', '选风格', '生成']" :current-step="step">
+  <WorkLayout :title="$t('work_pages.style_transfer.title')" :steps="steps" :current-step="step">
     <div v-if="step === 0" class="upload-section">
       <div class="dropzone" @dragover.prevent @drop.prevent="handleDrop">
         <p class="dz-icon">🎨</p>
-        <p>上传产品图进行AI风格转化</p>
-        <p class="hint">保留商品特征，转换整体风格</p>
+        <p>{{ $t('work_pages.style_transfer.drop_title') }}</p>
+        <p class="hint">{{ $t('work_pages.style_transfer.drop_hint') }}</p>
         <input ref="fileInput" type="file" accept="image/*" hidden @change="handleFile" />
-        <button class="btn-outline" @click="fileInput?.click()">选择图片</button>
+        <button class="btn-outline" @click="fileInput?.click()">{{ $t('work_pages.style_transfer.select_image') }}</button>
       </div>
-      <div v-if="previewUrl" class="preview-box"><img loading="lazy" :src="previewUrl" alt="风格迁移预览" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" /></div>
-      <p v-if="uploading" class="hint uploading">⏳ 上传中...</p>
-      <p v-else-if="uploadedUrl" class="hint uploaded">✓ 已上传</p>
-      <button v-if="previewUrl" class="btn" @click="step = 1">下一步：选风格</button>
+      <div v-if="previewUrl" class="preview-box"><img loading="lazy" :src="previewUrl" :alt="$t('work_pages.style_transfer.preview_alt')" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" /></div>
+      <p v-if="uploading" class="hint uploading">{{ $t('work_pages.style_transfer.uploading') }}</p>
+      <p v-else-if="uploadedUrl" class="hint uploaded">{{ $t('work_pages.style_transfer.uploaded') }}</p>
+      <button v-if="previewUrl" class="btn" @click="step = 1">{{ $t('work_pages.style_transfer.next_step') }}</button>
     </div>
 
     <div v-else-if="step === 1" class="select-section">
-      <h3>选择目标风格</h3>
+      <h3>{{ $t('work_pages.style_transfer.select_style_title') }}</h3>
       <div class="style-grid">
         <button v-for="s in styles" :key="s.id" class="style-card" :class="{ active: selectedStyle === s.id }" @click="selectedStyle = s.id">
           <span class="style-icon">{{ s.icon }}</span>
           <span>{{ s.name }}</span>
         </button>
       </div>
-      <p class="cost-hint">成本：5 点/次</p>
+      <p class="cost-hint">{{ $t('work_pages.style_transfer.cost_hint') }}</p>
       <div class="actions">
-        <button class="btn-outline" @click="step = 0">返回</button>
-        <button class="btn" @click="submitTask">开始转化</button>
+        <button class="btn-outline" @click="step = 0">{{ $t('work_pages.style_transfer.back_btn') }}</button>
+        <button class="btn" @click="submitTask">{{ $t('work_pages.style_transfer.start_btn') }}</button>
       </div>
     </div>
 
@@ -35,16 +35,16 @@
         <div class="bar"><div class="bar-fill" :style="{ width: task.progress.value + '%' }" /></div>
       </div>
       <div v-else-if="task.status.value === 2">
-        <h3>风格转化完成</h3>
+        <h3>{{ $t('work_pages.style_transfer.complete_title') }}</h3>
         <div class="image-grid">
           <div v-for="img in (task.result.value?.images || [])" :key="img.id" class="result-card">
             <img loading="lazy" :src="img.url || img.image_url" :alt="img.variant" class="result-img" @error="(e) => { (e.target as HTMLImageElement).style.display = 'none' }" />
             <span>{{ img.variant }}</span>
           </div>
         </div>
-        <div class="actions"><button class="btn-outline" @click="handleRedo">再做一次</button></div>
+        <div class="actions"><button class="btn-outline" @click="handleRedo">{{ $t('work_pages.style_transfer.redo_btn') }}</button></div>
       </div>
-      <div v-else-if="task.status.value === 3" class="error-box"><p>{{ task.errorMsg.value }}</p><button class="btn" @click="handleRedo">重试</button></div>
+      <div v-else-if="task.status.value === 3" class="error-box"><p>{{ task.errorMsg.value }}</p><button class="btn" @click="handleRedo">{{ $t('work_pages.style_transfer.retry_btn') }}</button></div>
     </div>
   </WorkLayout>
 </template>
@@ -53,6 +53,7 @@
 
 const { createBlobUrl, revoke } = useBlobUrl()
 
+const steps = computed(() => [t('work_pages.style_transfer.step_upload'), t('work_pages.style_transfer.step_select'), t('work_pages.style_transfer.step_generate')])
 const step = ref(0);
 const previewUrl = ref('');
 const uploadedUrl = ref('');
@@ -62,14 +63,14 @@ const toast = useToast()
 const fileInput = ref<HTMLInputElement | null>(null)
 const task = useTask();
 
-const styles = [
-  { id: 'vintage', name: '复古风', icon: '📻' },
-  { id: 'guochao', name: '国潮风', icon: '🏮' },
-  { id: 'illustration', name: '插画风', icon: '🎨' },
-  { id: 'watercolor', name: '水彩风', icon: '🖌' },
-  { id: 'cyberpunk', name: '赛博朋克', icon: '🤖' },
-  { id: 'minimalist', name: '极简主义', icon: '◻' },
-];
+const styles = computed(() => [
+  { id: 'vintage', name: t('work_pages.style_transfer.style_vintage'), icon: '📻' },
+  { id: 'guochao', name: t('work_pages.style_transfer.style_guochao'), icon: '🏮' },
+  { id: 'illustration', name: t('work_pages.style_transfer.style_illustration'), icon: '🎨' },
+  { id: 'watercolor', name: t('work_pages.style_transfer.style_watercolor'), icon: '🖌' },
+  { id: 'cyberpunk', name: t('work_pages.style_transfer.style_cyberpunk'), icon: '🤖' },
+  { id: 'minimalist', name: t('work_pages.style_transfer.style_minimalist'), icon: '◻' },
+]);
 
 async function uploadFile(file: File) {
   uploading.value = true;

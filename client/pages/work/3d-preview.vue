@@ -1,15 +1,15 @@
 <template>
-  <WorkLayout title="3D 商品预览" subtitle="上传模型文件，360°交互预览">
+  <WorkLayout :title="$t('work_pages.d3_preview.title')" :subtitle="$t('work_pages.d3_preview.subtitle')">
     <div class="d3-workspace">
       <!-- Upload Section -->
       <div class="upload-section" v-if="!currentModel">
         <div class="upload-card" @click="triggerUpload" @dragover.prevent @drop.prevent="onDrop">
           <div class="upload-icon">🧊</div>
-          <p v-if="uploading">上传中...</p>
+          <p v-if="uploading">{{ $t('work_pages.d3_preview.uploading') }}</p>
           <template v-else>
-          <p>拖拽 3D 模型到此处</p>
-          <span>支持 GLB / GLTF / FBX / OBJ，最大 50MB</span>
-          <button class="btn-upload">选择文件</button>
+          <p>{{ $t('work_pages.d3_preview.drag_hint') }}</p>
+          <span>{{ $t('work_pages.d3_preview.file_formats') }}</span>
+          <button class="btn-upload">{{ $t('work_pages.d3_preview.select_file') }}</button>
           </template>
         </div>
         <input ref="fileInput" type="file" accept=".glb,.gltf,.fbx,.obj,.stl" class="hidden-input" @change="onFileChange" />
@@ -24,24 +24,24 @@
             <span class="model-size">{{ formatSize(currentModel.size) }}</span>
           </div>
           <div class="toolbar-right">
-            <label class="bg-label">背景:</label>
+            <label class="bg-label">{{ $t('work_pages.d3_preview.bg_label') }}</label>
             <button v-for="bg in bgColors" :key="bg.value" class="bg-swatch" :class="{ active: activeBg === bg.value }" :style="{ background: bg.value }" @click="activeBg = bg.value" />
-            <button class="btn-export" @click="captureScreenshot">📸 截图</button>
-            <button class="btn-upload-new" @click="resetUpload">更换模型</button>
+            <button class="btn-export" @click="captureScreenshot">{{ $t('work_pages.d3_preview.screenshot_btn') }}</button>
+            <button class="btn-upload-new" @click="resetUpload">{{ $t('work_pages.d3_preview.change_model') }}</button>
           </div>
         </div>
 
         <ThreeViewer ref="viewerRef" :modelUrl="currentModel.url" :bgColor="activeBg" :autoRotate="true" @loaded="onModelLoaded" @error="onViewerError" />
 
         <div class="lighting-presets">
-          <span class="preset-label">光照预设:</span>
+          <span class="preset-label">{{ $t('work_pages.d3_preview.lighting_presets') }}</span>
           <button v-for="p in lightingPresets" :key="p.key" class="preset-btn" :class="{ active: activePreset === p.key }" @click="activePreset = p.key">{{ p.label }}</button>
         </div>
       </div>
 
       <!-- Demo Models -->
       <div class="demo-section" v-if="!currentModel">
-        <h3>或使用示例模型体验</h3>
+        <h3>{{ $t('work_pages.d3_preview.demo_title') }}</h3>
         <div class="demo-grid">
           <div v-for="demo in demoModels" :key="demo.key" class="demo-card" @click="loadDemo(demo)">
             <div class="demo-icon">{{ demo.icon }}</div>
@@ -54,11 +54,11 @@
       <!-- Screenshot Modal -->
       <div v-if="screenshotUrl" class="screenshot-modal" @click="screenshotUrl = ''">
         <div class="screenshot-content" @click.stop>
-          <h3>截图预览</h3>
-          <img loading="lazy" :src="screenshotUrl" alt="3D截图预览" class="screenshot-img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+          <h3>{{ $t('work_pages.d3_preview.screenshot_title') }}</h3>
+          <img loading="lazy" :src="screenshotUrl" :alt="$t('work_pages.d3_preview.screenshot_alt')" class="screenshot-img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
           <div class="screenshot-actions">
-            <a :href="screenshotUrl" download="3d-screenshot.png" class="btn-download">下载图片</a>
-            <button class="btn-close" @click="screenshotUrl = ''">关闭</button>
+            <a :href="screenshotUrl" download="3d-screenshot.png" class="btn-download">{{ $t('work_pages.d3_preview.download_btn') }}</a>
+            <button class="btn-close" @click="screenshotUrl = ''">{{ $t('work_pages.d3_preview.close_btn') }}</button>
           </div>
         </div>
       </div>
@@ -66,7 +66,8 @@
   </WorkLayout>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts">const { t } = useI18n()
+
 const { createBlobUrl, revoke } = useBlobUrl()
 import ThreeViewer from '~/components/ThreeViewer.vue';
 
@@ -84,19 +85,19 @@ const bgColors = [
   { value: '#e8f4f8' }, { value: '#fff8e1' }, { value: '#000000' },
 ];
 
-const lightingPresets = [
-  { key: 'studio', label: '影棚光' },
-  { key: 'soft', label: '柔光' },
-  { key: 'dramatic', label: '戏剧光' },
-  { key: 'rim', label: '轮廓光' },
-];
+const lightingPresets = computed(() => [
+  { key: 'studio', label: t('work_pages.d3_preview.preset_studio') },
+  { key: 'soft', label: t('work_pages.d3_preview.preset_soft') },
+  { key: 'dramatic', label: t('work_pages.d3_preview.preset_dramatic') },
+  { key: 'rim', label: t('work_pages.d3_preview.preset_rim') },
+]);
 
-const demoModels = [
-  { key: 'shoe', icon: '👟', name: '运动鞋', desc: '经典运动鞋 3D 模型' },
-  { key: 'watch', icon: '⌚', name: '手表', desc: '金属表盘展示' },
-  { key: 'bag', icon: '👜', name: '手提包', desc: '皮质手提包展示' },
-  { key: 'bottle', icon: '🧴', name: '香水瓶', desc: '玻璃材质渲染' },
-];
+const demoModels = computed(() => [
+  { key: 'shoe', icon: '👟', name: t('work_pages.d3_preview.demo_shoe'), desc: t('work_pages.d3_preview.demo_shoe_desc') },
+  { key: 'watch', icon: '⌚', name: t('work_pages.d3_preview.demo_watch'), desc: t('work_pages.d3_preview.demo_watch_desc') },
+  { key: 'bag', icon: '👜', name: t('work_pages.d3_preview.demo_bag'), desc: t('work_pages.d3_preview.demo_bag_desc') },
+  { key: 'bottle', icon: '🧴', name: t('work_pages.d3_preview.demo_bottle'), desc: t('work_pages.d3_preview.demo_bottle_desc') },
+]);
 
 function triggerUpload() { fileInput.value?.click(); }
 
@@ -114,8 +115,8 @@ async function processFile(file: File) {
   uploadError.value = '';
   const allowed = ['.glb', '.gltf', '.fbx', '.obj', '.stl'];
   const ext = '.' + file.name.split('.').pop()?.toLowerCase();
-  if (!allowed.includes(ext)) { uploadError.value = '不支持的格式，请上传 GLB/GLTF/FBX/OBJ/STL 文件'; return; }
-  if (file.size > 50 * 1024 * 1024) { uploadError.value = '文件超过 50MB 限制'; return; }
+  if (!allowed.includes(ext)) { uploadError.value = t('work_pages.d3_preview.format_error'); return; }
+  if (file.size > 50 * 1024 * 1024) { uploadError.value = t('work_pages.d3_preview.size_error'); return; }
 
   const formData = new FormData();
   formData.append('model', file);
@@ -125,12 +126,12 @@ async function processFile(file: File) {
     const res = await $fetch('/api/3d/upload', { method: 'POST', body: formData });
     currentModel.value = { url: res.url || createBlobUrl(file), name: file.name, size: file.size };
   } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
-    if (import.meta.dev) console.warn('[3d-preview] 模型上传失败，使用本地预览', e?.message || err)
+    if (import.meta.dev) console.warn('[3d-preview] ' + t('work_pages.d3_preview.upload_error_log'), e?.message || err)
     currentModel.value = { url: createBlobUrl(file), name: file.name, size: file.size };
   } finally { uploading.value = false }
 }
 
-function loadDemo(demo: typeof demoModels[number]) {
+function loadDemo(demo: typeof demoModels.value[number]) {
   currentModel.value = {
     url: `/api/3d/demo/${demo.key}`,
     name: demo.name,
