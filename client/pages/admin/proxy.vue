@@ -1,16 +1,16 @@
 <template>
   <AdminLayout>
     <div class="page-header">
-      <h1>API代理配置</h1>
-      <button class="btn-primary" @click="openCreate">+ 新建代理</button>
+      <h1>{{ $t('common.proxy_manage') }}</h1>
+      <button class="btn-primary" @click="openCreate">+ {{ $t('common.proxy_new') }}</button>
     </div>
 
     <div class="toolbar">
-      <input v-model="keyword" type="text" placeholder="搜索名称 / 编码 / URL" @keyup.enter="search" />
+      <input v-model="keyword" type="text" :placeholder="$t('common.proxy_search_placeholder')" @keyup.enter="search" />
       <select v-model="filterStatus" class="sel" @change="search">
-        <option value="">全部{{ $t('common.status') }}</option>
+        <option value="">{{ $t('common.all') }}{{ $t('common.status') }}</option>
         <option value="1">{{ $t('common.statusEnabled') }}</option>
-        <option value="0">停用</option>
+        <option value="0">{{ $t('common.banned') }}</option>
       </select>
       <button class="btn" @click="search">{{ $t('common.search') }}</button>
     </div>
@@ -20,23 +20,23 @@
     <div v-else-if="error" class="error-state">
       <span class="error-icon">⚠️</span>
       <p>{{ error }}</p>
-      <button class="retry-btn" @click="fetchData">重试</button>
+      <button class="retry-btn" @click="fetchData">{{ $t('common.retry') }}</button>
     </div>
 
     <template v-else-if="list.length">
       <div class="table-wrap">
         <table>
-          <thead><tr><th>ID</th><th>{{ $t('common.name') }}</th><th>编码</th><th>上游URL</th><th>方法</th><th>鉴权</th><th>超时</th><th>{{ $t('common.status') }}</th><th>{{ $t('common.actions') }}</th></tr></thead>
+          <thead><tr><th>ID</th><th>{{ $t('common.name') }}</th><th>{{ $t('common.code') }}</th><th>{{ $t('common.upstream_url_label') }}</th><th>{{ $t('common.method_label') }}</th><th>{{ $t('common.auth_method_label') }}</th><th>{{ $t('common.timeout_label') }}</th><th>{{ $t('common.status') }}</th><th>{{ $t('common.actions') }}</th></tr></thead>
           <tbody>
             <tr v-for="p in list" :key="p.id">
               <td>{{ p.id }}</td><td>{{ p.name }}</td><td>{{ p.proxy_code }}</td>
               <td class="url-cell">{{ p.upstream_url }}</td>
               <td>{{ p.method }}</td><td>{{ p.auth_type }}</td>
               <td>{{ p.timeout_ms }}ms</td>
-              <td><span :class="p.status===1?'badge-ok':'badge-off'">{{ p.status===1?'启用':'停用' }}</span></td>
+              <td><span :class="p.status===1?'badge-ok':'badge-off'">{{ p.status===1 ? $t('common.enable') : $t('common.banned') }}</span></td>
               <td class="actions">
                 <button class="btn-sm" @click="openEdit(p)">{{ $t('common.edit') }}</button>
-                <button class="btn-sm" @click="toggleStatus(p)">{{ p.status===1?'停用':'启用' }}</button>
+                <button class="btn-sm" @click="toggleStatus(p)">{{ p.status===1 ? $t('common.banned') : $t('common.enable') }}</button>
                 <button class="btn-sm danger" @click="delProxy(p.id)">{{ $t('common.delete') }}</button>
               </td>
             </tr>
@@ -45,34 +45,34 @@
       </div>
       <Pagination :page="page" :page-size="pageSize" :total="total" @change="onPageChange" />
     </template>
-    <div v-else class="empty">暂无代理配置</div>
+    <div v-else class="empty">{{ $t('common.proxy_empty') }}</div>
 
     <Teleport to="body">
       <div v-if="modalOpen" class="modal-overlay" @click.self="modalOpen = false" @keydown.escape="modalOpen = false">
         <div class="modal">
-          <h3>{{ isEdit ? '编辑代理' : '新建代理' }}</h3>
+          <h3>{{ isEdit ? $t('common.proxy_edit') : $t('common.proxy_new') }}</h3>
           <div class="form-grid">
-            <label>{{ $t('common.name') }} <input v-model="form.name" maxlength="100" placeholder="代理名称" /></label>
-            <label>编码 <input v-model="form.proxy_code" maxlength="50" placeholder="唯一标识" /></label>
-            <label class="full">上游URL <input v-model="form.upstream_url" maxlength="500" placeholder="https://api.example.com/v1" /></label>
-            <label>请求方法
+            <label>{{ $t('common.name') }} <input v-model="form.name" maxlength="100" :placeholder="$t('common.proxy_name_placeholder')" /></label>
+            <label>{{ $t('common.code') }} <input v-model="form.proxy_code" maxlength="50" :placeholder="$t('common.proxy_code_placeholder')" /></label>
+            <label class="full">{{ $t('common.upstream_url_label') }} <input v-model="form.upstream_url" maxlength="500" placeholder="https://api.example.com/v1" /></label>
+            <label>{{ $t('common.request_method_label') }}
               <select v-model="form.method">
                 <option value="GET">GET</option><option value="POST">POST</option><option value="PUT">PUT</option><option value="DELETE">DELETE</option><option value="PATCH">PATCH</option>
               </select>
             </label>
-            <label>鉴权方式
+            <label>{{ $t('common.auth_method_label') }}
               <select v-model="form.auth_type">
-                <option value="none">无</option><option value="api_key">API Key</option><option value="bearer">Bearer Token</option><option value="basic">Basic Auth</option>
+                <option value="none">{{ $t('common.none') }}</option><option value="api_key">API Key</option><option value="bearer">Bearer Token</option><option value="basic">Basic Auth</option>
               </select>
             </label>
-            <label>超时(ms) <input v-model.number="form.timeout_ms" type="number" min="1" /></label>
+            <label>{{ $t('common.timeout_label') }} <input v-model.number="form.timeout_ms" type="number" min="1" /></label>
             <label>{{ $t('common.status') }}
-              <select v-model="form.status"><option :value="1">{{ $t('common.statusEnabled') }}</option><option :value="0">停用</option></select>
+              <select v-model="form.status"><option :value="1">{{ $t('common.statusEnabled') }}</option><option :value="0">{{ $t('common.banned') }}</option></select>
             </label>
           </div>
           <div class="modal-actions">
             <button class="btn-cancel" @click="modalOpen = false">{{ $t('common.cancel') }}</button>
-            <button class="btn-save" :disabled="saving" @click="save">{{ saving ? '保存中...' : '保存' }}</button>
+            <button class="btn-save" :disabled="saving" @click="save">{{ saving ? $t('common.saving') : $t('common.save') }}</button>
           </div>
         </div>
       </div>
@@ -109,7 +109,7 @@ async function fetchData() {
     const res: any = await $fetch(`/api/proxy?${params.toString()}`)
     if (res?.code === 200) { list.value = res.data?.list || []; total.value = res.data?.total || 0 }
     else { list.value = res.data || []; total.value = list.value.length }
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; error.value = err?.data?.msg || err.message || '加载失败'; toast.error(error.value) } finally { loading.value = false }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; error.value = err?.data?.msg || err.message || t('common.loadFail'); toast.error(error.value) } finally { loading.value = false }
 }
 
 function search() { page.value = 1; fetchData() }
@@ -123,7 +123,7 @@ async function save() {
     const url = isEdit.value ? `/api/proxy/${form.value.id}` : '/api/proxy'
     const method = isEdit.value ? 'PUT' : 'POST'
     const res: any = await $fetch(url, { method, body: form.value })
-    if (res?.code === 200 || res?.code === 0) { toast.success(isEdit.value ? '代理已更新' : '代理已创建'); modalOpen.value = false; fetchData() }
+    if (res?.code === 200 || res?.code === 0) { toast.success(isEdit.value ? t('common.success_update') : t('common.success_create')); modalOpen.value = false; fetchData() }
     else { toast.error(res?.msg || t('common.failed_save')) }
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('common.failed_save')) } finally { saving.value = false }
 }
@@ -132,7 +132,7 @@ async function toggleStatus(p: any) {
   const newStatus = p.status === 1 ? 0 : 1
   try {
     const res: any = await $fetch(`/api/proxy/${p.id}`, { method: 'PUT', body: { status: newStatus } })
-    if (res?.code === 200 || res?.code === 0) { p.status = newStatus; toast.success(newStatus === 1 ? '已启用' : '已停用') }
+    if (res?.code === 200 || res?.code === 0) { p.status = newStatus; toast.success(newStatus === 1 ? t('common.success_enable') : t('common.success_disable')) }
     else { toast.error(res?.msg || t('common.failed')) }
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('common.failed')) }
 }

@@ -1,30 +1,30 @@
 <template>
   <AdminLayout>
-    <h2 class="ptitle">表单模板管理</h2>
+    <h2 class="ptitle">{{ $t('common.form_template_manage') }}</h2>
     <div class="toolbar">
       <select v-model="filterType" class="sel" @change="fetchData">
-        <option value="">全部{{ $t('common.type') }}</option>
+        <option value="">{{ $t('common.all') }}{{ $t('common.type') }}</option>
         <option value="feedback">用户反馈</option><option value="survey">问卷调查</option><option value="contact">联系我们</option>
       </select>
-      <button class="btn btn-primary" @click="openCreate">+ 新建表单</button>
+      <button class="btn btn-primary" @click="openCreate">+ {{ $t('common.form_new') }}</button>
     </div>
     <LoadingSkeleton v-if="loading" type="table" :rows="5" :cols="7" />
     <div class="table-wrap" v-else-if="list.length">
-    <table class="table"><thead><tr><th>ID</th><th>{{ $t('common.name') }}</th><th>编码</th><th>{{ $t('common.status') }}</th><th>{{ $t('common.create') }}时间</th><th>{{ $t('common.actions') }}</th></tr></thead>
-    <tbody><tr v-for="f in list" :key="f.id"><td>{{ f.id }}</td><td>{{ f.name || f.title }}</td><td><code>{{ f.code }}</code></td><td><span :class="f.status===1?'badge-success':'badge-danger'">{{ f.status===1?'启用':'停用' }}</span></td><td>{{ f.created_at?.slice(0,10) }}</td><td><button class="btn-sm" @click="openEdit(f)">{{ $t('common.edit') }}</button><button class="btn-sm btn-danger" @click="deleteItem(f.id)">{{ $t('common.delete') }}</button></td></tr></tbody></table>
+    <table class="table"><thead><tr><th>ID</th><th>{{ $t('common.name') }}</th><th>{{ $t('common.code') }}</th><th>{{ $t('common.status') }}</th><th>{{ $t('common.create') }}{{ $t('common.mode_label') }}</th><th>{{ $t('common.actions') }}</th></tr></thead>
+    <tbody><tr v-for="f in list" :key="f.id"><td>{{ f.id }}</td><td>{{ f.name || f.title }}</td><td><code>{{ f.code }}</code></td><td><span :class="f.status===1?'badge-success':'badge-danger'">{{ f.status===1 ? $t('common.enable') : $t('common.banned') }}</span></td><td>{{ f.created_at?.slice(0,10) }}</td><td><button class="btn-sm" @click="openEdit(f)">{{ $t('common.edit') }}</button><button class="btn-sm btn-danger" @click="deleteItem(f.id)">{{ $t('common.delete') }}</button></td></tr></tbody></table>
     </div>
-    <EmptyState v-else icon="📝" title="暂无表单模板" description="创建第一个自定义表单" action-label="新建表单" @action="openCreate" />
+    <EmptyState v-else icon="📝" :title="$t('common.form_empty_title')" :description="$t('common.form_empty_desc')" :action-label="$t('common.form_new')" @action="openCreate" />
 
     <Teleport to="body">
       <div v-if="showModal" class="modal-overlay" @click.self="showModal=false" @keydown.escape="showModal=false">
         <div class="modal">
-          <h3>{{ editing ? '编辑表单' : '新建表单' }}</h3>
+          <h3>{{ editing ? $t('common.form_edit') : $t('common.form_new') }}</h3>
           <div class="form-group"><label>{{ $t('common.name') }}</label><input v-model="editForm.name" maxlength="100" class="input" /></div>
-          <div class="form-group"><label>编码</label><input v-model="editForm.code" maxlength="50" class="input" :disabled="!!editing" /></div>
+          <div class="form-group"><label>{{ $t('common.code') }}</label><input v-model="editForm.code" maxlength="50" class="input" :disabled="!!editing" /></div>
           <div class="form-group"><label>{{ $t('common.description') }}</label><textarea v-model="editForm.description" maxlength="500" class="input" rows="2" /></div>
           <div class="modal-actions">
             <button class="btn-cancel" @click="showModal=false">{{ $t('common.cancel') }}</button>
-            <button class="btn-save" :disabled="saving" @click="saveForm">{{ saving?'保存中...':'保存' }}</button>
+            <button class="btn-save" :disabled="saving" @click="saveForm">{{ saving ? $t('common.saving') : $t('common.save') }}</button>
           </div>
         </div>
       </div>
