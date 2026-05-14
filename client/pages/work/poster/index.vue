@@ -6,8 +6,8 @@
 <template>
   <div class="work-page">
     <header class="work-header">
-      <h1>{{ headerCfg?.title || '海报 & 社媒封面创作' }}</h1>
-      <p>{{ headerCfg?.subtitle || 'AI 智能生成营销海报 · 社媒封面 · 多规格适配' }}</p>
+      <h1>{{ headerCfg?.title || $t('work_pages.poster_index.title') }}</h1>
+      <p>{{ headerCfg?.subtitle || $t('work_pages.poster_index.subtitle') }}</p>
     </header>
 
     <!-- 类型选择卡片 -->
@@ -20,7 +20,7 @@
         @click="activeType = t.key"
       >
         <span class="type-icon">{{ t.icon }}</span>
-        <span class="type-label">{{ t.label }}</span>
+        <span class="type-label">{{ $t(t.nameKey) }}</span>
         <span class="type-size">{{ t.sizeText }}</span>
       </button>
     </div>
@@ -28,23 +28,23 @@
     <div class="work-panel">
       <!-- 提示词输入 -->
       <div class="prompt-area">
-        <label class="area-label">{{ activeTypeCfg?.label }}描述</label>
+        <label class="area-label">{{ $t('work_pages.poster_index.prompt_label', { type: $t(activeTypeCfg?.nameKey || '') }) }}</label>
         <textarea
           v-model="prompt"
           class="input prompt-input"
           rows="4"
-          :placeholder="activeTypeCfg?.placeholder || '描述您想要的画面效果...'"
+          :placeholder="$t('work_pages.poster_index.prompt_placeholder')"
           maxlength="4000"
         ></textarea>
         <div class="prompt-actions">
           <PromptEnhancer v-model="prompt" type="poster" @enhanced="onPromptEnhanced" />
           <button class="btn btn-ghost btn-sm" :disabled="enhancing" @click="doEnhance">
-            {{ enhancing ? '优化中...' : '✨ AI 优化提示词' }}
+            {{ enhancing ? $t('work_pages.poster_index.enhancing') : $t('work_pages.poster_index.enhance_btn') }}
           </button>
-          <span v-if="enhancedPrompt" class="enhanced-hint">已优化</span>
+          <span v-if="enhancedPrompt" class="enhanced-hint">{{ $t('work_pages.poster_index.enhanced') }}</span>
         </div>
         <div v-if="enhancedPrompt" class="enhanced-preview">
-          <span class="preview-label">优化后:</span>
+          <span class="preview-label">{{ $t('work_pages.poster_index.enhanced_label') }}</span>
           <p>{{ enhancedPrompt }}</p>
         </div>
       </div>
@@ -52,14 +52,14 @@
       <!-- 风格选择 -->
       <div class="options-row" v-if="activeStyleCfg">
         <div class="option">
-          <label>设计风格</label>
+          <label>{{ $t('work_pages.poster_index.style_label') }}</label>
           <select v-model="customStyle" class="input">
             <option value="">{{ activeStyleCfg }}</option>
             <option v-for="s in styleOptions" :key="s.item_key" :value="s.item_value">{{ s.item_value }}</option>
           </select>
         </div>
         <div class="option">
-          <label>规格</label>
+          <label>{{ $t('work_pages.poster_index.spec_label') }}</label>
           <input class="input" :value="activeTypeCfg?.sizeText" disabled />
         </div>
       </div>
@@ -69,7 +69,7 @@
         :disabled="!prompt || submitting"
         @click="doGenerate"
       >
-        {{ submitting ? '提交中...' : '生成' + activeTypeCfg?.label }}
+        {{ submitting ? $t('work_pages.poster_index.submitting') : $t('work_pages.poster_index.generate_btn', { type: $t(activeTypeCfg?.nameKey || '') }) }}
       </button>
 
       <AppTaskProgress
@@ -81,23 +81,23 @@
       <div v-if="resultUrl" class="result-preview">
         <img loading="lazy" :src="resultUrl" :alt="activeTypeCfg?.label" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
         <div class="result-actions">
-          <button class="btn btn-secondary" @click="downloadResult">下载</button>
-          <button class="btn btn-ghost" @click="reset">重新生成</button>
+          <button class="btn btn-secondary" @click="downloadResult">{{ $t('work_pages.poster_index.download_btn') }}</button>
+          <button class="btn btn-ghost" @click="reset">{{ $t('work_pages.poster_index.regen_btn') }}</button>
         </div>
       </div>
     </div>
 
     <!-- 作品列表 -->
     <section class="works-section">
-      <h2>我的作品</h2>
+      <h2>{{ $t('work_pages.poster_index.my_works') }}</h2>
       <div class="works-filter">
         <select v-model="filterType" class="input" @change="loadWorks">
-          <option value="">全部类型</option>
-          <option v-for="t in types" :key="t.key" :value="t.key">{{ t.label }}</option>
+          <option value="">{{ $t('work_pages.poster_index.all_types') }}</option>
+          <option v-for="t in types" :key="t.key" :value="t.key">{{ $t(t.nameKey) }}</option>
         </select>
       </div>
-      <div v-if="loadingWorks" class="loading">加载中...</div>
-      <div v-else-if="!works.length" class="empty">暂无作品，快去创作吧</div>
+      <div v-if="loadingWorks" class="loading">{{ $t('work_pages.poster_index.loading') }}</div>
+      <div v-else-if="!works.length" class="empty">{{ $t('work_pages.poster_index.empty_works') }}</div>
       <div v-else class="works-grid">
         <div v-for="w in works" :key="w.id" class="work-card">
           <img :src="w.thumbnail_url || w.result_url" :alt="w.poster_type" loading="lazy" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
@@ -106,14 +106,14 @@
             <span class="meta-status" :class="w.status">{{ w.status }}</span>
           </div>
           <div class="work-actions">
-            <button class="btn btn-sm btn-secondary" @click="download(w.result_url)">下载</button>
+            <button class="btn btn-sm btn-secondary" @click="download(w.result_url)">{{ $t('work_pages.poster_index.download_btn') }}</button>
           </div>
         </div>
       </div>
       <div v-if="totalWorks > limit" class="pagination">
-        <button :disabled="page <= 1" @click="page--; loadWorks()">上一页</button>
+        <button :disabled="page <= 1" @click="page--; loadWorks()">{{ $t('work_pages.poster_index.prev_page') }}</button>
         <span>{{ page }} / {{ Math.ceil(totalWorks / limit) }}</span>
-        <button :disabled="page >= Math.ceil(totalWorks / limit)" @click="page++; loadWorks()">下一页</button>
+        <button :disabled="page >= Math.ceil(totalWorks / limit)" @click="page++; loadWorks()">{{ $t('work_pages.poster_index.next_page') }}</button>
       </div>
     </section>
   </div>
@@ -130,12 +130,12 @@ const { config: headerCfg } = useSiteConfig('page.poster');
 const toast = useToast()
 
 const types = [
-  { key: 'product', icon: '🛍️', label: '产品营销海报', sizeText: '1200×1800 (2:3)' },
-  { key: 'holiday', icon: '🎉', label: '节日海报', sizeText: '1200×1800 (2:3)' },
-  { key: 'event', icon: '📢', label: '活动宣传海报', sizeText: '1920×1080 (16:9)' },
-  { key: 'private', icon: '💬', label: '私域运营海报', sizeText: '1080×1920 (9:16)' },
-  { key: 'xhs', icon: '📕', label: '小红书封面', sizeText: '1080×1440 (3:4)' },
-  { key: 'wechat', icon: '💬', label: '公众号封面', sizeText: '900×383 (2.35:1)' },
+  { key: 'product', icon: '🛍️', nameKey: 'work_pages.poster_index.type_product', sizeText: '1200×1800 (2:3)' },
+  { key: 'holiday', icon: '🎉', nameKey: 'work_pages.poster_index.type_holiday', sizeText: '1200×1800 (2:3)' },
+  { key: 'event', icon: '📢', nameKey: 'work_pages.poster_index.type_event', sizeText: '1920×1080 (16:9)' },
+  { key: 'private', icon: '💬', nameKey: 'work_pages.poster_index.type_private', sizeText: '1080×1920 (9:16)' },
+  { key: 'xhs', icon: '📕', nameKey: 'work_pages.poster_index.type_xhs', sizeText: '1080×1440 (3:4)' },
+  { key: 'wechat', icon: '💬', nameKey: 'work_pages.poster_index.type_wechat', sizeText: '900×383 (2.35:1)' },
 ];
 
 const activeType = ref('product');
@@ -157,19 +157,20 @@ const totalWorks = ref(0);
 
 const activeTypeCfg = computed(() => types.find(t => t.key === activeType.value));
 const activeStyleCfg = computed(() => {
-  const m = {
-    product: '电商营销风格，突出产品卖点与优惠信息',
-    holiday: '节日氛围浓厚，色彩鲜明，传统与现代融合',
-    event: '大型活动促销风格，信息层级清晰',
-    private: '私域社交风格，亲切温馨',
-    xhs: '小红书生活方式美学，清新自然',
-    wechat: '公众号头图风格，简洁有力',
+  const m: Record<string, string> = {
+    product: t('work_pages.poster_index.style_product'),
+    holiday: t('work_pages.poster_index.style_holiday'),
+    event: t('work_pages.poster_index.style_event'),
+    private: t('work_pages.poster_index.style_private'),
+    xhs: t('work_pages.poster_index.style_xhs'),
+    wechat: t('work_pages.poster_index.style_wechat'),
   };
   return m[activeType.value] || '';
 });
 
-function typeLabel(type) {
-  return types.find(t => t.key === type)?.label || type;
+function typeLabel(typeVal: string) {
+  const found = types.find(t => t.key === typeVal);
+  return found ? t(found.nameKey) : typeVal;
 }
 
 async function doEnhance() {
@@ -183,7 +184,7 @@ async function doEnhance() {
     });
     enhancedPrompt.value = data.data?.enhancedPrompt || data.data?.prompt;
   } catch (e) {
-    useToast().error(e.data?.message || '提示词增强失败');
+    useToast().error(e.data?.message || t('work_pages.poster_index.enhance_failed'));
   } finally {
     enhancing.value = false;
   }
@@ -206,7 +207,7 @@ async function doGenerate() {
       credentials: 'include',
     });
     jobId.value = data.data?.job_id;
-    useToast().success('任务已提交');
+    useToast().success(t('work_pages.poster_index.task_submitted'));
   } catch (e) {
     useToast().error(e.data?.message || t('common.failed_generate'));
   } finally { submitting.value = false; }
@@ -218,7 +219,7 @@ function onCompleted({ resultUrl: url }) {
   loadWorks();
 }
 function onFailed({ error: err }) {
-  useToast().error(err || '任务失败');
+  useToast().error(err || t('work_pages.poster_index.task_failed'));
   submitting.value = false;
   jobId.value = null;
 }
@@ -255,7 +256,7 @@ onMounted(async () => {
     if (styles.custom_options) {
       styleOptions.value = styles.custom_options.map((s, i) => ({ item_key: `s${i}`, item_value: s }));
     }
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; useToast().error(err?.data?.msg || e?.message || '加载海报样式失败') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; useToast().error(err?.data?.msg || e?.message || t('work_pages.poster_index.load_styles_failed')) }
   loadWorks();
 });
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
