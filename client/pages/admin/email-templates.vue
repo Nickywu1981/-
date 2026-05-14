@@ -1,17 +1,17 @@
 <template>
   <AdminLayout>
     <div class="page-header">
-      <h2 class="ptitle">邮件模板管理</h2>
-      <button class="btn btn--primary" @click="openCreate"><span class="btn-icon">+</span> 新建模板</button>
+      <h2 class="ptitle">{{ $t('common.email_template_manage') }}</h2>
+      <button class="btn btn--primary" @click="openCreate"><span class="btn-icon">+</span> {{ $t('common.create') }}{{ $t('common.template_label') }}</button>
     </div>
 
     <div class="toolbar">
       <div class="search-box">
         <span class="search-icon">🔍</span>
-        <input v-model="searchQuery" placeholder="搜索模板名称/编码..." class="search-input" @input="onSearch" />
+        <input v-model="searchQuery" :placeholder="$t('common.email_search_placeholder')" class="search-input" @input="onSearch" />
       </div>
       <select v-model="filterProvider" class="filter-select" @change="fetchTemplates">
-        <option value="">{{ $t('common.all') }}服务商</option>
+        <option value="">{{ $t('common.all') }}{{ $t('common.email_provider') }}</option>
         <option value="mock">Mock(开发)</option>
         <option value="smtp">SMTP</option>
         <option value="sendgrid">SendGrid</option>
@@ -19,22 +19,22 @@
     </div>
 
     <div v-if="isLoading" class="loading-state"><LoadingSkeleton :rows="3" /></div>
-    <div v-else-if="!templates.length" class="empty-state">暂无邮件模板，点击"新建模板"{{ $t('common.create') }}</div>
+    <div v-else-if="!templates.length" class="empty-state">{{ $t('common.noData') }}{{ $t('common.template_label') }}，{{ $t('common.click_create') }}{{ $t('common.create') }}</div>
     <div v-else class="tpl-grid">
       <div v-for="tpl in templates" :key="tpl.id" class="tpl-card" :class="{ disabled: !tpl.status }">
         <div class="tpl-header">
           <span class="tpl-code">{{ tpl.template_code }}</span>
           <div class="tpl-actions">
-            <button class="act-btn toggle-btn" :class="{ off: !tpl.status }" :aria-label="tpl.status ? '已启用，点击禁用' : '已禁用，点击启用'" @click="toggleStatus(tpl)" :title="tpl.status ? '禁用' : '启用'">{{ tpl.status ? '🟢' : '🔴' }}</button>
-            <button class="act-btn del-btn" aria-label="删除模板" @click="confirmDelete(tpl)" :title="$t('common.delete')">🗑</button>
+            <button class="act-btn toggle-btn" :class="{ off: !tpl.status }" :aria-label="tpl.status ? $t('common.enabled_click_disable') : $t('common.disabled_click_enable')" @click="toggleStatus(tpl)" :title="tpl.status ? $t('common.disable') : $t('common.enable')">{{ tpl.status ? '🟢' : '🔴' }}</button>
+            <button class="act-btn del-btn" :aria-label="$t('common.delete') + ' ' + $t('common.template_label')" @click="confirmDelete(tpl)" :title="$t('common.delete')">🗑</button>
           </div>
         </div>
         <div class="tpl-body">
-          <div class="row"><span>模板{{ $t('common.name') }}:</span> <input v-model="tpl.name" maxlength="100" /></div>
-          <div class="row"><span>邮件主题:</span> <input v-model="tpl.subject" maxlength="200" /></div>
-          <div class="row"><span>HTML内容:</span> <textarea v-model="tpl.content" maxlength="5000" rows="4"></textarea></div>
-          <div class="row"><span>服务商ID:</span> <input v-model="tpl.provider_template_id" maxlength="100" placeholder="接入后填写" /></div>
-          <div class="row"><span>服务商:</span>
+          <div class="row"><span>{{ $t('common.template_label') }}{{ $t('common.name') }}:</span> <input v-model="tpl.name" maxlength="100" /></div>
+          <div class="row"><span>{{ $t('common.email_subject') }}:</span> <input v-model="tpl.subject" maxlength="200" /></div>
+          <div class="row"><span>{{ $t('common.email_content') }}:</span> <textarea v-model="tpl.content" maxlength="5000" rows="4"></textarea></div>
+          <div class="row"><span>{{ $t('common.email_provider_id') }}:</span> <input v-model="tpl.provider_template_id" maxlength="100" :placeholder="$t('common.enter_after_access')" /></div>
+          <div class="row"><span>{{ $t('common.email_provider') }}:</span>
             <select v-model="tpl.provider">
               <option value="mock">Mock(开发)</option>
               <option value="smtp">SMTP</option>
@@ -44,7 +44,7 @@
           <div class="row"><span>{{ $t('common.remark') }}:</span> <input v-model="tpl.remark" maxlength="500" /></div>
         </div>
         <div class="tpl-footer">
-          <button class="btn-save" :disabled="saving === tpl.id" @click="saveTpl(tpl)">{{ saving === tpl.id ? '保存中...' : '保存' }}</button>
+          <button class="btn-save" :disabled="saving === tpl.id" @click="saveTpl(tpl)">{{ saving === tpl.id ? $t('common.saving') : $t('common.save') }}</button>
         </div>
       </div>
     </div>
@@ -54,14 +54,14 @@
     <!-- Create Modal -->
     <div v-if="showCreate" class="modal-overlay" @click.self="showCreate = false" @keydown.escape="showCreate = false">
       <div class="modal">
-        <div class="modal-header"><h3>新建邮件模板</h3><button class="modal-close" aria-label="关闭" @click="showCreate = false">✕</button></div>
+        <div class="modal-header"><h3>{{ $t('common.email_new_template') }}</h3><button class="modal-close" :aria-label="$t('common.close')" @click="showCreate = false">✕</button></div>
         <div class="modal-body">
-          <div class="row"><span>模板编码:</span> <input v-model="newTpl.template_code" maxlength="50" placeholder="如 EMAIL_WELCOME" /></div>
-          <div class="row"><span>模板{{ $t('common.name') }}:</span> <input v-model="newTpl.name" maxlength="100" placeholder="如 欢迎邮件" /></div>
-          <div class="row"><span>邮件主题:</span> <input v-model="newTpl.subject" maxlength="200" placeholder="如 欢迎加入AI电商工具箱" /></div>
-          <div class="row"><span>HTML内容:</span> <textarea v-model="newTpl.content" maxlength="5000" rows="4" placeholder="支持HTML格式，可使用{code}{task_type}等占位符"></textarea></div>
-          <div class="row"><span>服务商ID:</span> <input v-model="newTpl.provider_template_id" maxlength="100" placeholder="接入后填写" /></div>
-          <div class="row"><span>服务商:</span>
+          <div class="row"><span>{{ $t('common.email_template_code') }}:</span> <input v-model="newTpl.template_code" maxlength="50" placeholder="如 EMAIL_WELCOME" /></div>
+          <div class="row"><span>{{ $t('common.template_label') }}{{ $t('common.name') }}:</span> <input v-model="newTpl.name" maxlength="100" placeholder="如 欢迎邮件" /></div>
+          <div class="row"><span>{{ $t('common.email_subject') }}:</span> <input v-model="newTpl.subject" maxlength="200" placeholder="如 欢迎加入AI电商工具箱" /></div>
+          <div class="row"><span>{{ $t('common.email_content') }}:</span> <textarea v-model="newTpl.content" maxlength="5000" rows="4" placeholder="支持HTML格式，可使用{code}{task_type}等占位符"></textarea></div>
+          <div class="row"><span>{{ $t('common.email_provider_id') }}:</span> <input v-model="newTpl.provider_template_id" maxlength="100" :placeholder="$t('common.enter_after_access')" /></div>
+          <div class="row"><span>{{ $t('common.email_provider') }}:</span>
             <select v-model="newTpl.provider">
               <option value="mock">Mock(开发)</option><option value="smtp">SMTP</option><option value="sendgrid">SendGrid</option>
             </select>
@@ -70,7 +70,7 @@
         </div>
         <div class="modal-footer">
           <button class="btn-cancel" @click="showCreate = false">{{ $t('common.cancel') }}</button>
-          <button class="btn-confirm" :disabled="creating" @click="createTpl">{{ creating ? '创建中...' : '确认创建' }}</button>
+          <button class="btn-confirm" :disabled="creating" @click="createTpl">{{ creating ? $t('common.creating') : $t('common.confirm_create') }}</button>
         </div>
       </div>
     </div>
@@ -78,11 +78,11 @@
     <!-- Delete Confirm -->
     <div v-if="showDelete" class="modal-overlay" @click.self="showDelete = false" @keydown.escape="showDelete = false">
       <div class="modal modal-sm">
-        <div class="modal-header"><h3>确认{{ $t('common.delete') }}</h3></div>
-        <div class="modal-body"><p>确定要删除模板「{{ deleteTarget?.name }}」吗？</p></div>
+        <div class="modal-header"><h3>{{ $t('common.confirm_label') }}{{ $t('common.delete') }}</h3></div>
+        <div class="modal-body"><p>{{ $t('common.email_delete_confirm', { name: deleteTarget?.name }) }}</p></div>
         <div class="modal-footer">
           <button class="btn-cancel" @click="showDelete = false">{{ $t('common.cancel') }}</button>
-          <button class="btn-confirm btn-danger" :disabled="deleting" @click="doDelete">{{ deleting ? '删除中...' : '确认删除' }}</button>
+          <button class="btn-confirm btn-danger" :disabled="deleting" @click="doDelete">{{ deleting ? $t('common.deleting') : $t('common.confirm_delete') }}</button>
         </div>
       </div>
     </div>
@@ -137,8 +137,8 @@ async function saveTpl(tpl: any) {
       method: 'PUT',
       body: { name: tpl.name, subject: tpl.subject, content: tpl.content, provider_template_id: tpl.provider_template_id, provider: tpl.provider, status: tpl.status, remark: tpl.remark },
     });
-    showMsg('已保存');
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || '保存失败'; }
+    showMsg(t('common.saved'));
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || t('common.failed_save'); }
   saving.value = 0;
 }
 
@@ -150,9 +150,9 @@ async function createTpl() {
   creating.value = true;
   try {
     await $fetch('/api/email/templates', { method: 'POST', body: newTpl.value });
-    showCreate.value = false; showMsg('模板已创建');
+    showCreate.value = false; showMsg(t('common.template_created'));
     fetchTemplates();
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || '创建失败'; }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || t('common.failed_create'); }
   creating.value = false;
 }
 
@@ -162,9 +162,9 @@ async function doDelete() {
   if (!deleteTarget.value) return; deleting.value = true;
   try {
     await $fetch(`/api/email/templates/${deleteTarget.value.id}`, { method: 'DELETE' });
-    showDelete.value = false; showMsg('模板已删除');
+    showDelete.value = false; showMsg(t('common.template_deleted'));
     fetchTemplates();
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || '删除失败'; }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || t('common.failed_delete'); }
   deleting.value = false;
 }
 
