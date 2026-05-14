@@ -1,35 +1,41 @@
 <template>
-  <WorkLayout title="产品渲染" subtitle="3D 产品建模与场景渲染">
+  <WorkLayout :title="$t('work_pages.product_render.title')" :subtitle="$t('work_pages.product_render.subtitle')">
     <div class="render-workspace">
       <div class="upload-section">
         <div class="upload-card" @click="triggerUpload">
           <div class="upload-icon">📦</div>
-          <p>{{ uploadedFile ? uploadedFile.name : '上传产品图' }}</p>
-          <span>支持 JPG/PNG，最大 20MB</span>
-          <button class="btn-upload">选择文件</button>
+          <p>{{ uploadedFile ? uploadedFile.name : $t('work_pages.product_render.upload_placeholder') }}</p>
+          <span>{{ $t('work_pages.product_render.upload_hint') }}</span>
+          <button class="btn-upload">{{ $t('work_pages.product_render.select_file') }}</button>
         </div>
         <input ref="fileInput" type="file" accept="image/jpeg,image/png" class="hidden-input" @change="onFileChange" />
       </div>
       <div class="render-options">
-        <h3>渲染模式</h3>
+        <h3>{{ $t('work_pages.product_render.render_mode') }}</h3>
         <div class="option-grid">
           <button v-for="m in modes" :key="m.key" class="option-card" :class="{selected: activeMode === m.key}" @click="activeMode = m.key">{{ m.label }}</button>
         </div>
       </div>
       <button class="btn-generate" :disabled="!uploadedFile || processing" @click="startRender">
-        {{ processing ? '渲染中...' : '开始渲染' }}
+        {{ processing ? $t('work_pages.product_render.rendering') : $t('work_pages.product_render.start_render') }}
       </button>
       <div class="result-area" v-if="resultUrl">
-        <h3>渲染结果</h3>
-        <img loading="lazy" :src="resultUrl" alt="渲染结果" class="result-img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+        <h3>{{ $t('work_pages.product_render.result_title') }}</h3>
+        <img loading="lazy" :src="resultUrl" :alt="$t('work_pages.product_render.result_img_alt')" class="result-img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
       </div>
-      <div v-else class="result-area"><p>渲染结果将在此显示</p></div>
+      <div v-else class="result-area"><p>{{ $t('work_pages.product_render.result_placeholder') }}</p></div>
       <p v-if="errorMsg" class="error-msg">{{ errorMsg }}</p>
     </div>
   </WorkLayout>
 </template>
-<script setup lang="ts">
-const modes = [{ key:'studio',label:'影棚渲染' },{ key:'scene',label:'场景渲染' },{ key:'clay',label:'白模渲染' },{ key:'exploded',label:'爆炸图' }]
+<script setup lang="ts">const { t } = useI18n()
+
+const modes = computed(() => [
+  { key:'studio', label: t('work_pages.product_render.mode_studio') },
+  { key:'scene', label: t('work_pages.product_render.mode_scene') },
+  { key:'clay', label: t('work_pages.product_render.mode_clay') },
+  { key:'exploded', label: t('work_pages.product_render.mode_exploded') },
+])
 const activeMode = ref('studio')
 const uploadedFile = ref<File | null>(null)
 const fileInput = ref<HTMLInputElement>()
@@ -45,7 +51,7 @@ async function startRender() {
     const fd = new FormData(); fd.append('image', uploadedFile.value); fd.append('mode', activeMode.value)
     const data: any = await $fetch('/api/advanced/model-generate', { method: 'POST', body: fd, credentials: 'include' })
     resultUrl.value = data?.data?.url || data?.data?.result_url || ''
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; errorMsg.value = err?.data?.msg || '渲染失败' }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; errorMsg.value = err?.data?.msg || t('work_pages.product_render.error_render_failed') }
   finally { processing.value = false }
 }
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })

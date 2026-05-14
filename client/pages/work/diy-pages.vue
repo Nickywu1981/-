@@ -1,20 +1,20 @@
 <template>
   <div class="diy-page">
-    <h1>DIY 模板库</h1>
-    <p class="subtitle">30+ 行业模板，一键创建电商页面</p>
+    <h1>{{ $t('work_pages.diy_pages.title') }}</h1>
+    <p class="subtitle">{{ $t('work_pages.diy_pages.subtitle') }}</p>
 
     <div class="filter-bar">
       <select v-model="selectedIndustry" class="sel" @change="loadTemplates">
-        <option value="">全部行业</option>
+        <option value="">{{ $t('work_pages.diy_pages.filter_all_industry') }}</option>
         <option v-for="ind in industries" :key="ind" :value="ind">{{ ind }}</option>
       </select>
       <select v-model="selectedPageType" class="sel" @change="loadTemplates">
-        <option value="">全部类型</option>
-        <option value="mobile">移动端</option>
-        <option value="pc">PC端</option>
-        <option value="h5">H5</option>
+        <option value="">{{ $t('work_pages.diy_pages.filter_all_type') }}</option>
+        <option value="mobile">{{ $t('work_pages.diy_pages.filter_mobile') }}</option>
+        <option value="pc">{{ $t('work_pages.diy_pages.filter_pc') }}</option>
+        <option value="h5">{{ $t('work_pages.diy_pages.filter_h5') }}</option>
       </select>
-      <input v-model="keyword" class="input-search" placeholder="搜索模板..." @keyup.enter="loadTemplates" maxlength="100" />
+      <input v-model="keyword" class="input-search" :placeholder="$t('work_pages.diy_pages.search_placeholder')" @keyup.enter="loadTemplates" maxlength="100" />
     </div>
 
     <LoadingSkeleton v-if="loading" type="card" :rows="3" />
@@ -22,7 +22,7 @@
       <div v-for="tpl in templates" :key="tpl.id" class="diy-card" @click="useTemplate(tpl)">
         <div class="diy-card__preview" :style="{ background: tpl.thumbnail ? `url(${tpl.thumbnail}) center/cover` : '#F5F3FF' }">
           <span v-if="!tpl.thumbnail" class="diy-card__icon">📄</span>
-          <span v-if="tpl.is_official" class="diy-card__badge">官方</span>
+          <span v-if="tpl.is_official" class="diy-card__badge">{{ $t('work_pages.diy_pages.badge_official') }}</span>
         </div>
         <div class="diy-card__info">
           <div class="diy-card__name">{{ tpl.title }}</div>
@@ -30,20 +30,21 @@
             <span class="tag">{{ tpl.industry }}</span>
             <span class="tag">{{ tpl.page_type }}</span>
           </div>
-          <div class="diy-card__desc">{{ tpl.description || '暂无描述' }}</div>
-          <div class="diy-card__meta">使用 {{ tpl.use_count || 0 }} 次</div>
+          <div class="diy-card__desc">{{ tpl.description || $t('work_pages.diy_pages.desc_empty') }}</div>
+          <div class="diy-card__meta">{{ $t('work_pages.diy_pages.usage_count', { n: tpl.use_count || 0 }) }}</div>
         </div>
       </div>
     </div>
-    <div v-else class="empty">暂无匹配模板</div>
+    <div v-else class="empty">{{ $t('work_pages.diy_pages.empty_templates') }}</div>
 
     <div class="diy-create">
-      <button class="btn btn-outline" @click="createNew">+ 创建空白页面</button>
+      <button class="btn btn-outline" @click="createNew">{{ $t('work_pages.diy_pages.create_blank') }}</button>
     </div>
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts">const { t } = useI18n()
+
 const templates = ref<any[]>([])
 const industries = ref<string[]>([])
 const loading = ref(true)
@@ -61,7 +62,7 @@ async function loadIndustries() {
   try {
     const data: any = await $fetch('/api/diy/templates/industries', { credentials: 'include' })
     industries.value = data?.data || []
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.warn(err?.data?.msg || '加载行业失败') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.warn(err?.data?.msg || t('work_pages.diy_pages.error_load_industries')) }
 }
 
 async function loadTemplates() {
@@ -74,7 +75,7 @@ async function loadTemplates() {
     const qs = params.toString()
     const data: any = await $fetch(`/api/diy/templates${qs ? '?' + qs : ''}`, { credentials: 'include' })
     templates.value = data?.data?.list || []
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '加载模板失败') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('work_pages.diy_pages.error_load_templates')) }
   loading.value = false
 }
 

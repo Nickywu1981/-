@@ -2,13 +2,13 @@
   <NuxtLayout name="workspace">
     <div class="usage-dashboard">
       <header class="page-header">
-        <h1>用量仪表盘</h1>
-        <button class="refresh-btn" :class="{ spinning: loading }" :disabled="loading" @click="fetchAll">刷新</button>
+        <h1>{{ $t('work_pages.usage.title') }}</h1>
+        <button class="refresh-btn" :class="{ spinning: loading }" :disabled="loading" @click="fetchAll">{{ $t('work_pages.usage.refresh') }}</button>
       </header>
 
       <div v-if="error" class="error-state">
         <p>{{ error }}</p>
-        <button class="retry-btn" @click="fetchAll">重试</button>
+        <button class="retry-btn" @click="fetchAll">{{ $t('work_pages.usage.retry') }}</button>
       </div>
 
       <template v-else>
@@ -22,21 +22,21 @@
 
         <section class="chart-section">
           <div class="chart-card" style="flex:2">
-            <h3>按模型用量分布</h3>
+            <h3>{{ $t('work_pages.usage.chart_by_model') }}</h3>
             <div ref="modelChartRef" class="chart-box"/>
           </div>
           <div class="chart-card" style="flex:1">
-            <h3>按任务类型分布</h3>
+            <h3>{{ $t('work_pages.usage.chart_by_type') }}</h3>
             <div ref="typeChartRef" class="chart-box"/>
           </div>
         </section>
 
         <section class="recent-section">
-          <h3>最近使用记录</h3>
+          <h3>{{ $t('work_pages.usage.recent_title') }}</h3>
           <table class="table">
-            <thead><tr><th>时间</th><th>模型</th><th>任务</th><th>状态</th><th>耗时</th></tr></thead>
+            <thead><tr><th>{{ $t('work_pages.usage.th_time') }}</th><th>{{ $t('work_pages.usage.th_model') }}</th><th>{{ $t('work_pages.usage.th_task') }}</th><th>{{ $t('work_pages.usage.th_status') }}</th><th>{{ $t('work_pages.usage.th_duration') }}</th></tr></thead>
             <tbody>
-              <tr v-if="recent.length===0"><td colspan="5" class="empty">暂无使用记录</td></tr>
+              <tr v-if="recent.length===0"><td colspan="5" class="empty">{{ $t('work_pages.usage.empty_records') }}</td></tr>
               <tr v-for="item in recent" :key="item.id">
                 <td class="time">{{ formatDateTime(item.timestamp) }}</td>
                 <td class="mono">{{ item.model }}</td>
@@ -54,6 +54,7 @@
 
 <script setup lang="ts">
 import { formatDateTime } from '@/utils/format'
+const { t } = useI18n()
 
 let echarts: any = null
 async function _loadEcharts() {
@@ -82,10 +83,10 @@ const byType = reactive<Record<string,number>>({})
 const recent = ref<any[]>([])
 
 const statCards = computed(() => [
-  { label: 'AI 调用总次数', value: stats.aiTotal, sub: '', highlight: true },
-  { label: '剩余积分', value: stats.creditBalance, sub: '', highlight: false },
-  { label: '已用积分', value: stats.creditUsed, sub: '', highlight: false },
-  { label: '当前套餐', value: stats.planName, sub: stats.resetDate ? `下月 ${stats.resetDate} 重置` : '', highlight: false },
+  { label: t('work_pages.usage.stat_ai_total'), value: stats.aiTotal, sub: '', highlight: true },
+  { label: t('work_pages.usage.stat_credit_balance'), value: stats.creditBalance, sub: '', highlight: false },
+  { label: t('work_pages.usage.stat_credit_used'), value: stats.creditUsed, sub: '', highlight: false },
+  { label: t('work_pages.usage.stat_plan'), value: stats.planName || t('work_pages.usage.plan_free'), sub: stats.resetDate ? t('work_pages.usage.plan_reset_prefix') + stats.resetDate + t('work_pages.usage.plan_reset_suffix') : '', highlight: false },
 ])
 
 async function initChart(el: HTMLDivElement | undefined) {
@@ -113,7 +114,7 @@ async function fetchAll() {
       const c = creditR.data
       stats.creditBalance = c?.balance ?? 0
       stats.creditUsed = c?.used ?? 0
-      stats.planName = c?.planName || '免费版'
+      stats.planName = c?.planName || ''
       stats.resetDate = c?.resetDate || ''
     }
     if (taskR?.code === 200) {
@@ -148,7 +149,7 @@ async function fetchAll() {
       }
     })
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
-    error.value = err?.data?.msg || err.message || '加载失败'
+    error.value = err?.data?.msg || err.message || t('work_pages.usage.error_load_failed')
   } finally { loading.value = false }
 }
 

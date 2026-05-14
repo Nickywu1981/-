@@ -7,7 +7,6 @@
       </div>
     </div>
 
-    <!-- 平台选择 -->
     <div class="section">
       <h2>{{ $t('work_pages.distribution_platform_title') }}</h2>
       <div class="platform-grid">
@@ -15,12 +14,11 @@
           <input type="checkbox" :value="p.id" v-model="selected" class="platform-check" />
           <span class="platform-icon">{{ p.icon }}</span>
           <span class="platform-name">{{ p.name }}</span>
-          <span class="platform-status" :class="{ connected: p.connected }">{{ p.connected ? '已授权' : '待授权' }}</span>
+          <span class="platform-status" :class="{ connected: p.connected }">{{ p.connected ? $t('work_pages.distribution_platform_connected') : $t('work_pages.distribution_platform_disconnected') }}</span>
         </label>
       </div>
     </div>
 
-    <!-- 内容配置 -->
     <div class="section" v-if="selected.length > 0">
       <h2>{{ $t('work_pages.distribution_content_title') }}</h2>
       <div class="form-group">
@@ -43,17 +41,15 @@
       </div>
     </div>
 
-    <!-- 发布操作 -->
     <div class="section" v-if="selected.length > 0">
       <div class="action-bar">
         <button class="btn-primary" :disabled="submitting" @click="publish">
-          {{ submitting ? '发布中...' : `一键发布到 ${selected.length} 个平台` }}
+          {{ submitting ? $t('work_pages.distribution_btn_publishing') : $t('work_pages.distribution_btn_publish_to', { n: selected.length }) }}
         </button>
         <button class="btn-outline" @click="saveDraft">{{ $t('work_pages.distribution_btn_draft') }}</button>
       </div>
     </div>
 
-    <!-- 发布历史 -->
     <div class="section">
       <h2>{{ $t('work_pages.distribution_history_title') }}</h2>
       <LoadingSkeleton v-if="loading" type="list" :rows="3" />
@@ -82,21 +78,21 @@
 import { formatDateTime } from '@/utils/format'
 const { t } = useI18n()
 
-const platforms = [
-  { id: 'taobao', name: '淘宝', icon: '🛒', connected: true },
-  { id: 'jd', name: '京东', icon: '🐶', connected: true },
-  { id: 'pdd', name: '拼多多', icon: '🔻', connected: true },
-  { id: 'douyin', name: '抖音', icon: '🎵', connected: false },
-  { id: 'kuaishou', name: '快手', icon: '▶️', connected: false },
-  { id: 'xiaohongshu', name: '小红书', icon: '📕', connected: false },
-  { id: 'wechat', name: '视频号', icon: '💬', connected: false },
-  { id: 'bilibili', name: 'B站', icon: '📺', connected: false },
+const platforms = computed(() => [
+  { id: 'taobao', name: t('work_pages.distribution_platform_taobao'), icon: '🛒', connected: true },
+  { id: 'jd', name: t('work_pages.distribution_platform_jd'), icon: '🐶', connected: true },
+  { id: 'pdd', name: t('work_pages.distribution_platform_pdd'), icon: '🔻', connected: true },
+  { id: 'douyin', name: t('work_pages.distribution_platform_douyin'), icon: '🎵', connected: false },
+  { id: 'kuaishou', name: t('work_pages.distribution_platform_kuaishou'), icon: '▶️', connected: false },
+  { id: 'xiaohongshu', name: t('work_pages.distribution_platform_xiaohongshu'), icon: '📕', connected: false },
+  { id: 'wechat', name: t('work_pages.distribution_platform_wechat'), icon: '💬', connected: false },
+  { id: 'bilibili', name: t('work_pages.distribution_platform_bilibili'), icon: '📺', connected: false },
   { id: 'amazon', name: 'Amazon', icon: '📦', connected: false },
   { id: 'shopee', name: 'Shopee', icon: '🦐', connected: false },
   { id: 'lazada', name: 'Lazada', icon: '🛍️', connected: false },
   { id: 'ebay', name: 'eBay', icon: '🛒', connected: false },
   { id: 'shopify', name: 'Shopify', icon: '🏪', connected: false },
-]
+])
 
 const selected = ref<string[]>([])
 const submitting = ref(false)
@@ -105,7 +101,7 @@ const history = ref<any[]>([])
 const form = reactive({ title: '', description: '', scheduledAt: '', files: [] as File[] })
 
 const statusLabel = (s: string) =>
-  ({ pending: '等待中', processing: '发布中', success: '已发布', failed: '失败' }[s] || s)
+  ({ pending: t('work_pages.distribution_status_pending'), processing: t('work_pages.distribution_status_processing'), success: t('work_pages.distribution_status_success'), failed: t('work_pages.distribution_status_failed') }[s] || s)
 
 const onFiles = (e: Event) => {
   const files = (e.target as HTMLInputElement).files
@@ -125,10 +121,10 @@ const publish = async () => {
     if (form.scheduledAt) fd.append('scheduledAt', form.scheduledAt)
     form.files.forEach(f => fd.append('files', f))
     await $fetch('/api/publish/submit', { method: 'POST', body: fd })
-    toast.success(t('common.success_publish'))
+    toast.success(t('work_pages.distribution_success_publish'))
     fetchHistory()
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
-    toast.error(err?.data?.msg || err.message || '发布失败')
+    toast.error(err?.data?.msg || err.message || t('work_pages.distribution_error_publish_failed'))
   } finally {
     submitting.value = false
   }
@@ -142,12 +138,12 @@ const saveDraft = async () => {
     })
     toast.success(t('common.draft_saved'))
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
-    toast.error(err?.data?.msg || err.message || '保存草稿失败，请稍后重试')
+    toast.error(err?.data?.msg || err.message || t('work_pages.distribution_error_draft_failed'))
   }
 }
 
 const retry = async (id: number) => {
-  try { await $fetch(`/api/publish/retry/${id}`, { method: 'POST' }); fetchHistory() } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.warn(err?.data?.msg || err.message || '重试分发失败，请稍后重试') }
+  try { await $fetch(`/api/publish/retry/${id}`, { method: 'POST' }); fetchHistory() } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.warn(err?.data?.msg || err.message || t('work_pages.distribution_error_retry_failed')) }
 }
 
 const fetchHistory = async () => {
@@ -156,7 +152,7 @@ const fetchHistory = async () => {
     const res: any = await $fetch('/api/distribution/history', { credentials: 'include' })
     history.value = res?.list || res?.data || []
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
-    toast.error(err?.data?.msg || e?.message || '加载分发历史失败')
+    toast.error(err?.data?.msg || e?.message || t('work_pages.distribution_error_load_failed'))
   } finally {
     loading.value = false
   }
