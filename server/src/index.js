@@ -68,6 +68,16 @@ server.listen(port, () => {
   import('./services/feedbackLearningService.js').then(({ startFeedbackLoop }) => {
     startFeedbackLoop(3600_000);
   }).catch((err) => { logger.warn('[Feedback] 启动失败', { error: err.message }); });
+
+  // L5 自愈种子策略: 首次运行时初始化默认6种策略
+  import('./services/incidentLearningService.js').then(({ seedDefaultStrategies }) => {
+    seedDefaultStrategies().catch((err) => { logger.warn('[IncidentLearning] 种子策略初始化失败', { error: err.message }); });
+  }).catch((err) => { logger.warn('[IncidentLearning] 加载失败', { error: err.message }); });
+
+  // L5 自适应阈值: 启动时学习一次基线
+  import('./services/adaptiveThresholdService.js').then(({ learnBaseline }) => {
+    learnBaseline(7).catch((err) => { logger.warn('[AdaptiveThreshold] 基线学习失败', { error: err.message }); });
+  }).catch((err) => { logger.warn('[AdaptiveThreshold] 加载失败', { error: err.message }); });
 });
 
 // ==================== 全局异常处理 ====================
