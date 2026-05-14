@@ -5,7 +5,7 @@
       "cron": "3 9 * * *",
       "prompt": "运行 node server/scripts/audit-rules.js 审计 CLAUDE.md 数据是否过期。如果输出显示 diffs 不为空，立即用 Edit 工具更新 CLAUDE.md 中对应的数字（页面数/路由数/控制器数/Zod覆盖率等），并更新 MEMORY.md 中相关数据。完成后输出「规则自检完成: X 处已更新」。",
       "createdAt": 1778164719770,
-      "lastFiredAt": 1778468108432,
+      "lastFiredAt": 1778707964131,
       "recurring": true
     }
   ]
