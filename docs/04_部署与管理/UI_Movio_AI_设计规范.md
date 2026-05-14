@@ -2,7 +2,7 @@
 
 > **编写组**：G3 UI 设计组（UI-Designer 🔴主 / Doc-Writer 🟡辅）
 > **审核组**：G1 架构规划组（Architect）
-> **版本**：v1.8 | **日期**：2026-05-15
+> **版本**：v1.9 | **日期**：2026-05-15
 
 ---
 
@@ -554,3 +554,100 @@ unified 为更精细多层阴影（符合现代设计系统惯例），theme.css
 | **总计** | **47** | **27** | **6** | **9** | **89** |
 
 **89 项问题，G3 已自行修复 16 项，73 项待跨组处理。**
+
+### 10.12 第十轮 — 暗黑模式组件级覆盖率 + 表单一致性 + 死代码审计 (2026-05-15)
+
+**审计范围**：全 5 个 CSS 文件暗黑模式 token 完整度、11 页/5 组件内联暗黑覆盖一致性、unified 组件类使用率、表单元素跨组件一致性
+
+---
+
+**① 暗黑模式 Badge/Tag 语义色完全缺失（P0 — 新增 1 项）**
+
+`--color-success-50/700`、`--color-warning-50/700`、`--color-danger-50/700`、`--color-info-50/700` 在 `:root` 块定义为亮色值（如 `#ecfdf5` / `#059669`），但在 unified 和 theme.css 两个 `[data-theme="dark"]` 块中**均未覆盖**。
+
+后果：
+- `.badge-success` 等类在暗黑模式下显示亮绿底色 + 深绿文字 → 视觉断裂
+- `stat-card-trend` 使用 `--color-success-500` / `--color-danger-500`，暗黑模式下色值不变（`#10b981`/`#ef4444`），对比度勉强但缺乏暗黑适配
+
+修复方向：在 theme.css 的 `[data-theme="dark"]` 块中追加语义色暗黑变体。
+
+**② 暗黑模式覆盖碎片化：8 处页面/组件自写 `[data-theme="dark"]`，值不一致（P0 — 新增 1 项）**
+
+| 文件 | 自写暗黑背景色 | 正确值 `var(--bg-surface)` |
+|------|:--:|:--:|
+| `creation.vue` | `#1a1a1a` | `#141724` |
+| `SlidePanel.vue` | `#1a1a1a` / `#222` | `#141724` |
+| `SmartRecognitionPanel.vue` | `#1e1f22` | `#141724` |
+| `review.vue` | `var(--bg-card, #1a1a1a)` | `var(--bg-card, #141724)` |
+| `data.vue` | `var(--bg-card, #1a1a1a)` | `var(--bg-card, #141724)` |
+| `ComingSoonPlaceholder.vue` | `#2a2a2a` / `#7d7d83` | `#1e2235` / `#5d6380` |
+| `PromptEnhancer.vue` | `var(--bg-card, #1e1e1e)` | `var(--bg-card, #141724)` |
+| `index.vue:748` (landing) | 独立 `[data-theme="dark"]` | 待复查 |
+
+同一暗黑模式下，页面间表面色不一致（`#1a1a1a` vs `#141724` vs `#1e1f22`），产生视觉割裂。
+
+**③ 暗黑模式双块 16 token 缺口（P1 — 新增 1 项）**
+
+| unified `[data-theme="dark"]` 有但 theme.css 缺 | 风险 |
+|------|------|
+| `--bg-surface`, `--bg-surface-hover`, `--bg-surface-raised` | card/modal/stat-card 关键底色 |
+| `--bg-tooltip`, `--text-placeholder`, `--text-link-hover` | 工具提示/占位符/链接悬停 |
+| `--border-default`, `--border-strong`, `--border-brand` | 输入框/卡片/品牌边框 |
+| `--gradient-brand-subtle`, `--gradient-hero` | Subtle 渐变/Hero 渐变 |
+| `--shadow-xs`, `--shadow-brand-glow` | 细节阴影/品牌辉光 |
+| `--sidebar-bg-hover`, `--sidebar-bg-active`, `--sidebar-border` | 侧边栏交互态 |
+| `--header-bg`, `--header-border` | 顶栏 |
+| `--input-bg`, `--input-focus-shadow` | 输入框背景/焦点辉光 |
+| `--card-shadow-hover` | 卡片悬停阴影 |
+
+> 当前未崩的原因是 unified 先加载、theme.css 后加载但不覆盖这些变量名。一旦加载顺序调整或合并双块，16 个 token 全部回退到亮色值。
+
+**④ 双背景 Token 命名冲突（P2 — 新增 1 项）**
+
+- unified 使用 `--bg-app`（暗黑 = `#0a0c14`）
+- theme.css 使用 `--bg-page`（暗黑 = `#0a0c14`）
+- 两者值相同但 token 名不同，各组件各自引用其中之一
+
+**⑤ CSS 死代码：24 个工具类零引用（P3 — 新增 1 项）**
+
+| 文件 | 死类 | 行号 |
+|------|------|:--:|
+| unified | `.text-display`, `.text-body-lg`, `.text-body`, `.text-body-sm`, `.text-caption` | 326-334 |
+| unified | `.card-flat` | 418 |
+| unified | `.badge-neutral`, `.badge-brand` | 432-433 |
+| unified | `.tag` | 435 |
+| unified | `.select` | 393 |
+| unified | `.label`, `.hint`, `.error-text` | 405-407 |
+| unified | `.empty-state-icon`, `.empty-state-title`, `.empty-state-desc` | 498-500 |
+| unified | `.flex`, `.flex-col`, `.items-center`, `.justify-between` | 511-514 |
+| theme.css | `.dot-pattern`, `.dot-pattern-subtle`, `.gradient-mesh` | 403/408/413 |
+
+> `.flex` / `.flex-col` / `.items-center` / `.justify-between` 被 Tailwind 同名字段完全覆盖（项目启用 Tailwind），CSS 定义属徒增文件体积。
+
+**⑥ 表单类碎片化：7 种互不兼容的 select 类名（P2 — 新增 1 项）**
+
+统一 `.select` 类 0 引用。各页面自创：
+`tw-select` / `tw-select-sm` (Tailwind) / `pay-select` / `filter-select` / `pipeline-select` / `bsi-select` / `class="input" on <select>`
+
+其中 `ab-experiments.vue` 在 `<select>` 上使用 `class="input"` — 缺少 `appearance:none` + 下拉箭头 SVG → 浏览器原生渲染，与其他表单视觉不一致。
+
+---
+
+| 优先级 | 本轮新增 | 说明 |
+|:--:|:--:|------|
+| P0 | 2 | Badge 暗黑语义色缺失 + 8 处暗黑覆盖碎片化 |
+| P1 | 1 | 16 token 缺口 (unified dark vs theme dark) |
+| P2 | 2 | `--bg-app`/`--bg-page` 双命名 + 7 种 select 碎片化 |
+| P3 | 1 | 24 个零引用 CSS 类 |
+
+### 10.13 十轮累计全景
+
+| 优先级 | 旧累计 | R10 新增 | 总计 |
+|:--:|:--:|:--:|:--:|
+| P0 | 47 | 2 | **49** |
+| P1 | 27 | 1 | **28** |
+| P2 | 6 | 2 | **8** |
+| P3 | 9 | 1 | **10** |
+| **合计** | **89** | **6** | **95** |
+
+**95 项问题，G3 已自行修复 16 项，79 项待跨组处理。**
