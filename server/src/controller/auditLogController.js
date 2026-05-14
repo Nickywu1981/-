@@ -3,7 +3,7 @@
  */
 import { wrapController } from '../utils/wrapController.js';
 import { listResult } from '../utils/response.js';
-import auditLogDao from '../dao/auditLogDao.js';
+import * as auditLogDao from '../dao/auditLogDao.js';
 import { parsePagination } from '../utils/pagination.js';
 
 export const list = wrapController(async (req, res) => {

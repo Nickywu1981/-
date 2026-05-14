@@ -1,6 +1,6 @@
 import { BusinessError } from '../utils/businessError.js';
 import { PROXY_FLAG, CIRCUIT_STATUS } from '../constants/domainStatus.js';
-import proxyDao from '../dao/proxyDao.js';
+import * as proxyDao from '../dao/proxyDao.js';
 import { encrypt, decrypt } from '../utils/crypto.js';
 import logger from '../utils/logger.js';
 import { URL } from 'url';
