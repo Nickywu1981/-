@@ -90,5 +90,3 @@ export async function listUserConfigs(userId) {
   );
   return rows;
 }
-
-export default { getWorkflowConfig, getGlobalWorkflowConfig, upsertWorkflowConfig, deleteWorkflowConfig, listUserConfigs };

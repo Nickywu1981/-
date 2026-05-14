@@ -105,5 +105,3 @@ function safeJSON(v) {
   if (typeof v === 'object') return v;
   try { return JSON.parse(v); } catch (e) { logger.warn('[HealingIncidentDao] safeJSON parse failed', { raw: String(v).substring(0, 100), error: e.message }); return null; }
 }
-
-export default { createIncident, listIncidents, getIncidentStats, getPatternClusters, upsertStrategy, getStrategies, getStrategy };
