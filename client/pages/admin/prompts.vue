@@ -325,7 +325,7 @@ function statusClass(s: number) {
   const map: Record<number, string> = { 0: 'draft', 1: 'pending', 2: 'active', 3: 'banned' };
   return map[s] || '';
 }
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

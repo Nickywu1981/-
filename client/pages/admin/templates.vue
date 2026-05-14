@@ -107,7 +107,7 @@
 
 <script setup lang="ts">const { t } = useI18n()
 
-definePageMeta({ layout: 'admin' })
+definePageMeta({ layout: 'platform-admin' })
 
 const toast = useToast()
 const list = ref<any[]>([]), loading = ref(true), error = ref('')

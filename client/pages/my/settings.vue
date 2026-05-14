@@ -95,5 +95,5 @@ const saveProfile = async () => {
   } catch { toast.error(t('my.settings.save_failed')) }
   saving.value = false
 }
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>

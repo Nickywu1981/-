@@ -40,5 +40,5 @@ const models = [
   { name: 'Claude 3.5', calls: '5,400', tokens: '380,000', cost: '2,280', pct: '30.4%' },
   { name: 'Gemini Pro', calls: '2,100', tokens: '250,800', cost: '990', pct: '20.0%' },
 ]
-definePageMeta({ layout: 'gateway', middleware: ['auth'] })
+definePageMeta({ layout: 'platform-admin', middleware: ['auth'] })
 </script>

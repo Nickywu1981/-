@@ -46,5 +46,5 @@ const quotas = [
   { tenant: '深圳美妆工作室', quota: '2M', used: '0.6M', pct: '30%', expiry: '2027-03-15', status: '正常', statusType: 'success' },
   { tenant: '广州服饰批发', quota: '3M', used: '2.5M', pct: '83%', expiry: '2026-12-01', status: '配额不足', statusType: 'danger' },
 ]
-definePageMeta({ layout: 'gateway', middleware: ['auth'] })
+definePageMeta({ layout: 'platform-admin', middleware: ['auth'] })
 </script>

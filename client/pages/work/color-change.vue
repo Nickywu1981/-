@@ -5,5 +5,5 @@
 <script setup lang="ts">
 import { colorChangeConfig } from '@/components/work/configs/color-change'
 import WorkPipeline from '@/components/work/pipeline/WorkPipeline.vue'
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>

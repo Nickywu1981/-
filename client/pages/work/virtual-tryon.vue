@@ -5,5 +5,5 @@
 <script setup lang="ts">
 import { virtualTryonConfig } from '@/components/work/configs/image-batch1'
 import WorkPipeline from '@/components/work/pipeline/WorkPipeline.vue'
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>

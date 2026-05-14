@@ -72,7 +72,7 @@
 </template>
 
 <script setup>
-definePageMeta({ layout: 'enterprise' });
+definePageMeta({ layout: 'user-workspace' });
 import { formatDateTimeLocale } from '~/utils/format';
 
 const { t } = useI18n()

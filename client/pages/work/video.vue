@@ -173,7 +173,7 @@ import { copyToClipboard } from '@/utils/format'
 import PromptEnhancer from '~/components/PromptEnhancer.vue'
 import SmartRecognitionPanel from '~/components/shared/SmartRecognitionPanel.vue'
 
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 
 function onSmartApply(info: { productName: string; category: string; features: string[]; refUrl: string }) {
   prompt.value = t('work_pages.video.smart_prompt_template', { name: info.productName, category: info.category, features: info.features.join(t('work_pages.video.feature_separator')) })

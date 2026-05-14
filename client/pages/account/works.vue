@@ -99,7 +99,7 @@ function goPage(p: number) { page.value = p; fetchWorks() }
 function previewWork(w: any) { preview.value = w }
 
 onMounted(() => { fetchWorks() })
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

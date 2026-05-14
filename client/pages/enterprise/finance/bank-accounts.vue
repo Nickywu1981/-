@@ -109,7 +109,7 @@ async function handleRemove(acc) {
 const typeLabels = { bank: t('enterprise.finance.bankAccounts.typeBank'), wechat: t('enterprise.finance.bankAccounts.typeWechat'), alipay: t('enterprise.finance.bankAccounts.typeAlipay') };
 function typeLabel(type) { return typeLabels[type] || type; }
 
-definePageMeta({ layout: 'enterprise' });
+definePageMeta({ layout: 'user-workspace' });
 </script>
 
 <style scoped>

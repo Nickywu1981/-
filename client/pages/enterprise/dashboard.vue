@@ -106,7 +106,7 @@ function barHeight(count) {
   return Math.max((count / max) * 100, 4);
 }
 
-definePageMeta({ layout: 'enterprise' });
+definePageMeta({ layout: 'user-workspace' });
 
 onMounted(loadData);
 </script>

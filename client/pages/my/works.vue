@@ -156,7 +156,7 @@ function redoTask(item: any) {
 function viewDetail(_item: any) {}
 
 onMounted(fetchAll)
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

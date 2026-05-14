@@ -66,5 +66,5 @@ const flows = [
   { id: 'L2026050802', type: '佣金支出', amount: '5,996', counterparty: '代理-张代理', date: '2026-05-08', status: '已对账', statusType: 'success' },
   { id: 'L2026050901', type: '退款', amount: '1,499', counterparty: '义乌小商品城', date: '2026-05-09', status: '待处理', statusType: 'warning' },
 ]
-definePageMeta({ layout: 'finance', middleware: ['auth'] })
+definePageMeta({ layout: 'business-ops', middleware: ['auth'] })
 </script>

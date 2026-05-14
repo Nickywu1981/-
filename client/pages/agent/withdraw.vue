@@ -38,5 +38,5 @@ const records = [
   { id: 'W20260415', amount: '8,500', account: '招商银行 6225****8891', date: '2026-04-15', statusType: 'success', statusKey: 'agent.withdraw.status_arrived' },
   { id: 'W20260510', amount: '15,000', account: '招商银行 6225****8891', date: '2026-05-10', statusType: 'warning', statusKey: 'agent.withdraw.status_reviewing' },
 ]
-definePageMeta({ layout: 'agent', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>

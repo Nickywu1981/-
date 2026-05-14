@@ -209,7 +209,7 @@ async function doDelete() {
 function onSearch() { currentPage.value = 1; fetchPlans(); }
 
 onMounted(fetchPlans);
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

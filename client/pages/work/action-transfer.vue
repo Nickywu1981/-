@@ -169,7 +169,7 @@ const { t } = useI18n()
 
 import { copyToClipboard } from '@/utils/format'
 
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 
 const { configs } = useAppPage({ configs: ['page.action_migrate.header'] })
 const headerCfg = computed(() => configs.value['page.action_migrate.header'] || {})

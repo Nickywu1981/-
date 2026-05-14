@@ -15,7 +15,7 @@
 </template>
 
 <script setup>
-definePageMeta({ layout: 'enterprise' });
+definePageMeta({ layout: 'user-workspace' });
 const { t } = useI18n();
 const stats = ref({});
 const loading = ref(true);

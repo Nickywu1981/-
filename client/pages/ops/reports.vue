@@ -35,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ layout: 'ops', middleware: ['auth'] })
+definePageMeta({ layout: 'business-ops', middleware: ['auth'] })
 
 const { t } = useI18n()
 const metrics = reactive([

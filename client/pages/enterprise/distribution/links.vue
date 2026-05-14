@@ -16,7 +16,7 @@
 </template>
 
 <script setup>
-definePageMeta({ layout: 'enterprise' });
+definePageMeta({ layout: 'user-workspace' });
 const toast = useToast();
 const { t } = useI18n();
 

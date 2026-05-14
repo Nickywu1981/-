@@ -5,5 +5,5 @@
 <script setup lang="ts">
 import { colorSwapConfig } from '@/components/work/configs/image-batch2'
 import WorkPipeline from '@/components/work/pipeline/WorkPipeline.vue'
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>

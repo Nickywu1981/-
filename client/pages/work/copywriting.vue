@@ -329,7 +329,7 @@ function onSmartApply(info: { productName: string; category: string; features: s
   titleForm.category = info.category
   titleForm.sellingPoints = info.features.join('、')
 }
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

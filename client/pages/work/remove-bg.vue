@@ -11,5 +11,5 @@
 import { removeBgConfig } from '@/components/work/configs/remove-bg'
 import WorkPipeline from '@/components/work/pipeline/WorkPipeline.vue'
 
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>

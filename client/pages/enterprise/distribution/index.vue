@@ -52,7 +52,7 @@
 </template>
 
 <script setup>
-definePageMeta({ layout: 'enterprise' });
+definePageMeta({ layout: 'user-workspace' });
 import { formatDateLocale } from '~/utils/format';
 
 const inviteCode = ref('');

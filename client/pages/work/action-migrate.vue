@@ -2,7 +2,7 @@
 /** action-migrate — 动作迁移页面 */
 import { ref } from 'vue'
 
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 const { t } = useI18n()
 
 const sourceVideo = ref('')

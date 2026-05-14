@@ -259,7 +259,7 @@ onMounted(async () => {
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; useToast().error(err?.data?.msg || e?.message || t('work_pages.poster_index.load_styles_failed')) }
   loadWorks();
 });
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

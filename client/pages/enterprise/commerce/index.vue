@@ -50,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ layout: 'enterprise' });
+definePageMeta({ layout: 'user-workspace' });
 import { formatDateLocale } from '~/utils/format';
 
 const { t } = useI18n()

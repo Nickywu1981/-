@@ -74,7 +74,7 @@ const customers = [
   { name: '成都食品电商', plan: '专业版季卡', spent: '2,999', commission: '600', date: '2026-04-25', statusKey: 'agent.team.status_paused', statusType: 'neutral' },
 ]
 
-definePageMeta({ layout: 'agent', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

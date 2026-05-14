@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 
 const text = ref('')
 const loading = ref(false)

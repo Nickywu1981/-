@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ layout: 'agent', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 
 const search = ref('')
 

@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ layout: 'finance', middleware: ['auth'] })
+definePageMeta({ layout: 'business-ops', middleware: ['auth'] })
 const month = ref('2026-05')
 
 const details = reactive([

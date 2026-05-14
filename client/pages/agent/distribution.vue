@@ -35,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ layout: 'agent', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 
 const stats = reactive([
   { labelKey: 'agent.distribution.stat_active', value: 12 },

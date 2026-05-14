@@ -87,7 +87,7 @@ const platformIcons: Record<string, string> = {
   taobao: '🛒', douyin: '🎵', pdd: '📦', kuaishou: '📱',
   xiaohongshu: '📕', tiktok: '🎬', shopee: '🛍', amazon: '📊',
 }
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>
 
 <script setup lang="ts">

@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ layout: 'ops', middleware: ['auth'] })
+definePageMeta({ layout: 'business-ops', middleware: ['auth'] })
 
 const coupons = reactive([
   { id: 1, name: '新用户专享券', type: '满减', value: 10, issued: 2400, redeemed: 720, rate: 30, status: '生效中' },

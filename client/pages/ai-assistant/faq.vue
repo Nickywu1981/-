@@ -28,7 +28,7 @@
 
 <script setup lang="ts">
 const { t } = useI18n()
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 
 const query = ref('')
 const loading = ref(false)

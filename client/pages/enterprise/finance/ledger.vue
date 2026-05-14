@@ -72,7 +72,7 @@ async function loadData() {
 
 function typeLabel(ty) { const m = { revenue: t('enterprise.finance.ledger.typeRevenue'), commission: t('enterprise.finance.ledger.typeCommission'), withdrawal: t('enterprise.finance.ledger.typeWithdrawal'), refund: t('enterprise.finance.ledger.typeRefund'), adjustment: t('enterprise.finance.ledger.typeAdjustment') }; return m[ty] || ty; }
 
-definePageMeta({ layout: 'enterprise' });
+definePageMeta({ layout: 'user-workspace' });
 </script>
 
 <style scoped>

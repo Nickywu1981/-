@@ -2,7 +2,7 @@
 /** batch-sku-video — 多SKU批量视频生成 */
 import { ref, computed, onUnmounted } from 'vue'
 
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 const { t } = useI18n()
 
 const productImages = ref<string[]>([])

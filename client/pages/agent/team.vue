@@ -38,5 +38,5 @@ const members = [
   { name: '王芳', email: 'wangfang@example.com', roleKey: 'agent.team.role_sales_rep', customers: 56, commission: '18,900', joined: '2025-02-15', statusKey: 'agent.team.status_active', statusType: 'success' },
   { name: '赵强', email: 'zhaoqiang@example.com', roleKey: 'agent.team.role_sales_rep', customers: 32, commission: '9,100', joined: '2025-11-01', statusKey: 'agent.team.status_paused', statusType: 'warning' },
 ]
-definePageMeta({ layout: 'agent', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>

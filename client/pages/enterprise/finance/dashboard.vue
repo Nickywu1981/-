@@ -110,5 +110,5 @@ async function loadData() {
 
 onMounted(() => loadData())
 
-definePageMeta({ layout: 'enterprise' })
+definePageMeta({ layout: 'user-workspace' })
 </script>

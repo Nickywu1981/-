@@ -238,7 +238,7 @@ function downloadDraft() {
   const blob = new Blob([json], { type: 'application/json' })
   downloadBlob(blob, `${draftResult.value.draft.draft_name || 'movio-draft'}.json`)
 }
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

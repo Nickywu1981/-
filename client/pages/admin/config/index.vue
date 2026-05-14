@@ -163,7 +163,7 @@
 <script setup lang="ts">
 import { ElMessage } from 'element-plus'
 
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 
 const { t } = useI18n()
 const apiBase = '/api'

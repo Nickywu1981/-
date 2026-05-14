@@ -42,7 +42,7 @@ async function changePwd() {
   } catch(e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || err.message || t('account.security.change_failed'); msgErr.value = true }
   finally { saving.value = false }
 }
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

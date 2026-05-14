@@ -60,5 +60,5 @@ const services = [
 ]
 const rateLimits = [{ route: '/api/ai/generate', count: 245, time: '14:32' }, { route: '/api/user/profile', count: 89, time: '14:28' }, { route: '/api/work/create', count: 67, time: '14:15' }]
 
-definePageMeta({ layout: 'gateway', middleware: ['auth'] })
+definePageMeta({ layout: 'platform-admin', middleware: ['auth'] })
 </script>

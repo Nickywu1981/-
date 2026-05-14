@@ -78,7 +78,7 @@
 
 
 const toast = useToast()
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 
 const apiBase = useRuntimeConfig().public.apiBase || '/api'
 

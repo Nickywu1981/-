@@ -162,7 +162,7 @@ async function unbindPhone() {
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; phoneMsg.value = err?.data?.msg || err.message || t('account.settings.unbind_failed'); phoneMsgErr.value = true; }
   phoneSaving.value = false;
 }
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

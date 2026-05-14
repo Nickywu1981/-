@@ -250,7 +250,7 @@ function downloadBoth() {
     download(img.src, img.alt || 'compare.png')
   })
 }
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>
 <style scoped>
 .compare-tool { max-width: 1200px; margin: 0 auto; padding: 24px; }

@@ -123,7 +123,7 @@
 <script setup lang="ts">
 type SubCard = { id?: string; icon: string; title: string; desc: string; route?: string; category?: string }
 
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 const { t, tm } = useI18n()
 
 // ═══ State ═══

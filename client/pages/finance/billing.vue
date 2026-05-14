@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ layout: 'finance', middleware: ['auth'] })
+definePageMeta({ layout: 'business-ops', middleware: ['auth'] })
 
 const bills = reactive([
   { id: 1, period: '2026-04', orderCount: 412, totalAmount: 23450, commission: 3520, netIncome: 19930, settled: true },

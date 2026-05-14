@@ -51,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ layout: 'agent', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 
 const commissions = reactive([
   { id: 1, time: '2026-05-10', customer: '张**', type: '会员套餐', amount: 299, rate: 30, commission: 89.7, settled: true },

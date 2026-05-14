@@ -263,7 +263,7 @@ async function doReview(decision: string) {
     reviewing.value = false
   }
 }
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

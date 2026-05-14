@@ -155,7 +155,7 @@ async function deleteKey(k: any) {
 }
 
 onMounted(loadKeys)
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

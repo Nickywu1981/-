@@ -38,5 +38,5 @@ const invoices = [
   { id: 'IV20260501002', title: '深圳美妆工作室', amount: '8,999', invoiceType: '增值税普通发票', date: '2026-05-07', statusKey: 'finance.invoices.status_issued', statusType: 'success' },
   { id: 'IV20260510001', title: '广州服饰批发有限公司', amount: '29,980', invoiceType: '增值税专用发票', date: '2026-05-10', statusKey: 'finance.invoices.status_pending', statusType: 'warning' },
 ]
-definePageMeta({ layout: 'finance', middleware: ['auth'] })
+definePageMeta({ layout: 'business-ops', middleware: ['auth'] })
 </script>

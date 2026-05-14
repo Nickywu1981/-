@@ -64,7 +64,7 @@ async function fetchRecords() {
   finally { loading.value = false }
 }
 function goPage(p: number) { page.value = p; fetchRecords() }
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

@@ -224,7 +224,7 @@ async function action(id: number, action: string) {
 }
 
 onMounted(fetchExperiments);
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

@@ -161,7 +161,7 @@ function closeModal() { showAdd.value = false; showEdit.value = false; modalErro
 
 function roleLabel(r) { const m = { enterprise_admin: t('enterprise.users.roleAdmin'), enterprise_operator: t('enterprise.users.roleOperator'), enterprise_viewer: t('enterprise.users.roleViewer') }; return m[r] || r; }
 
-definePageMeta({ layout: 'enterprise' });
+definePageMeta({ layout: 'user-workspace' });
 </script>
 
 <style scoped>

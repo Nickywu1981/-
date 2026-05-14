@@ -5,5 +5,5 @@
 <script setup lang="ts">
 import { distributionConfig } from '@/components/work/configs/simple-batch'
 import WorkPipeline from '@/components/work/pipeline/WorkPipeline.vue'
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>

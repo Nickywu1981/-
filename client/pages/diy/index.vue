@@ -139,7 +139,7 @@ async function deletePage(id) {
 
 onMounted(loadPages)
 onUnmounted(() => { if (keywordTimer) clearTimeout(keywordTimer) })
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

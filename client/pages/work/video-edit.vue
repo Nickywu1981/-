@@ -5,5 +5,5 @@
 <script setup lang="ts">
 import { videoEditConfig } from '@/components/work/configs/media-batch'
 import WorkPipeline from '@/components/work/pipeline/WorkPipeline.vue'
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>

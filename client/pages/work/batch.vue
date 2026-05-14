@@ -286,7 +286,7 @@ function handleRedo() { task.reset(); previews.value.forEach(u => revoke(u)); pr
 
 onMounted(() => { loadTemplates(); loadHistory(); });
 onUnmounted(() => { previews.value.forEach(u => revoke(u)) });
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

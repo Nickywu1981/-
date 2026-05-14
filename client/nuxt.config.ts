@@ -189,6 +189,26 @@ export default defineNuxtConfig({
     },
   },
 
+  // 方案D 三端路由 → Layout 自动映射
+  // 端1: platform-admin (admin+gateway) | 端2: business-ops (ops+finance) | 端3: user-workspace (其余)
+  // landing 保留独立 layout（营销页无需鉴权）
+  hooks: {
+    'pages:extend'(pages: any[]) {
+      for (const page of pages) {
+        const p = page.path || ''
+        if (p.startsWith('/landing') || p === '/') {
+          page.meta = { ...page.meta, layout: 'landing' }
+        } else if (p.startsWith('/admin') || p.startsWith('/gateway')) {
+          page.meta = { ...page.meta, layout: 'platform-admin' }
+        } else if (p.startsWith('/ops') || p.startsWith('/finance')) {
+          page.meta = { ...page.meta, layout: 'business-ops' }
+        } else {
+          page.meta = { ...page.meta, layout: 'user-workspace' }
+        }
+      }
+    },
+  },
+
   nitro: {
     devProxy: {
       '/api': {

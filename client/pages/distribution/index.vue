@@ -83,7 +83,7 @@
 <script setup lang="ts">
 import { formatDate } from '@/utils/format'
 
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 
 const { t } = useI18n()
 const apiBase = useRuntimeConfig().public.apiBase || '/api'

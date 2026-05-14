@@ -229,7 +229,7 @@
 <script setup lang="ts">
 import { fmtNum } from '@/utils/format'
 
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 const { t } = useI18n()
 const { theme } = useTheme()
 const isDark = computed(() => theme.value === 'dark')

@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ layout: 'gateway', middleware: ['auth'] })
+definePageMeta({ layout: 'platform-admin', middleware: ['auth'] })
 
 const routes = reactive([
   { path: '/api/v4/image/generate', method: 'POST', upstream: 'ai-engine-1', weight: 60, limiter: 'heavyLimiter' },

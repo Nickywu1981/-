@@ -2,7 +2,7 @@
 /** batch-publish — 批量发布管理页面 */
 import { ref } from 'vue'
 
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 const { t } = useI18n()
 
 const selectedPlatforms = ref<string[]>(['taobao', 'douyin'])

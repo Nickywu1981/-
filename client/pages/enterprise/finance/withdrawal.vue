@@ -132,7 +132,7 @@ const statusLabels = {
 };
 function statusLabel(s) { return statusLabels[s] || s; }
 
-definePageMeta({ layout: 'enterprise' });
+definePageMeta({ layout: 'user-workspace' });
 </script>
 
 <style scoped>

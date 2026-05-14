@@ -32,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ layout: 'ops', middleware: ['auth'] })
+definePageMeta({ layout: 'business-ops', middleware: ['auth'] })
 
 const campaigns = reactive([
   { id: 1, name: '五一会员特惠', type: '促销', start: '2026-05-01', end: '2026-05-15', participants: 1240, revenue: 5800, active: true },

@@ -53,7 +53,7 @@ function goBack() {
   if (code.value === 500) location.reload();
   else window.history.back();
 }
-definePageMeta({ layout: 'default' })
+definePageMeta({ layout: 'landing' })
 </script>
 
 <style scoped>

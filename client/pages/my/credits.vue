@@ -79,7 +79,7 @@ const { t } = useI18n()
 const formatTime = (t: string) => t ? new Date(t).toLocaleString('zh-CN') : ''
 
 onMounted(fetchAll)
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

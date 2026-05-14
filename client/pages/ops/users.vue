@@ -44,5 +44,5 @@ const users = [
   { name: '林小美', email: 'linxm@163.com', plan: '专业版年卡', spent: '8,999', registered: '2026-03-20', lastActive: '2026-05-11', status: '活跃', statusType: 'success' },
   { name: '黄志强', email: 'hzq@example.com', plan: '基础版', spent: '1,499', registered: '2026-04-01', lastActive: '2026-05-01', status: '流失风险', statusType: 'warning' },
 ]
-definePageMeta({ layout: 'ops', middleware: ['auth'] })
+definePageMeta({ layout: 'business-ops', middleware: ['auth'] })
 </script>

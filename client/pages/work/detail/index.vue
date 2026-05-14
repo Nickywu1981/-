@@ -194,7 +194,7 @@ const { t } = useI18n()
 
 import PromptEnhancer from '~/components/PromptEnhancer.vue'
 
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 
 const { configs } = useAppPage({ configs: ['page.detail.header'] })
 const { options: templateOptions } = useAppDict('detail_template')

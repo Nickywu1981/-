@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ layout: 'gateway', middleware: ['auth'] })
+definePageMeta({ layout: 'platform-admin', middleware: ['auth'] })
 
 const limits = reactive([
   { name: 'rateLimiter', type: '令牌桶', qps: '100', burst: '200', routeCount: 35, enabled: true },

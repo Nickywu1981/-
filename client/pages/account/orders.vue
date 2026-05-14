@@ -53,7 +53,7 @@ async function fetchOrders() {
 function goPage(p: number) { page.value = p; fetchOrders() }
 function statusClass(s: string) { const m: Record<string,string> = { paid:'badge-ok', refunded:'badge-warn', cancelled:'badge-err' }; return m[s] || '' }
 function statusLabel(s: string) { const m: Record<string,string> = { paid: t('account.orders.status_paid'), pending: t('account.orders.status_pending'), refunded: t('account.orders.status_refunded'), cancelled: t('account.orders.status_cancelled') }; return m[s] || s }
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

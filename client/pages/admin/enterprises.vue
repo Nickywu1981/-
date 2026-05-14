@@ -128,7 +128,7 @@
 </template>
 
 <script setup>
-definePageMeta({ layout: 'admin' });
+definePageMeta({ layout: 'platform-admin' });
 
 const { $api } = useNuxtApp();
 const { t } = useI18n();

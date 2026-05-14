@@ -88,7 +88,7 @@ async function deleteCollection(id: number) {
 
 const { t } = useI18n()
 onMounted(fetchData)
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>

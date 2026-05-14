@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ layout: 'gateway', middleware: ['auth'] })
+definePageMeta({ layout: 'platform-admin', middleware: ['auth'] })
 const search = ref('')
 
 const logs = reactive([

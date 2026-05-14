@@ -39,5 +39,5 @@ const campaigns = [
   { id: 2, name: '推荐返佣双倍季', participants: '1,850', conversion: '22.3%', newCustomers: '412', progress: '60%', dateRange: '2026-04-15 ~ 2026-06-15', status: '进行中', statusType: 'success' },
   { id: 3, name: '新用户首单立减', participants: '980', conversion: '15.8%', newCustomers: '155', progress: '40%', dateRange: '2026-05-01 ~ 2026-05-31', status: '已结束', statusType: 'neutral' },
 ]
-definePageMeta({ layout: 'ops', middleware: ['auth'] })
+definePageMeta({ layout: 'business-ops', middleware: ['auth'] })
 </script>

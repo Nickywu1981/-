@@ -4,7 +4,7 @@ import { ref, computed, onUnmounted } from 'vue'
 import SkuSelector from '~/components/work/batch-sku/SkuSelector.vue'
 import BatchPreview from '~/components/work/batch-sku/BatchPreview.vue'
 
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 
 const { t } = useI18n()
 

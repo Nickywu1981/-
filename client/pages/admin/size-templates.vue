@@ -93,7 +93,7 @@ async function deleteItem(id: number) {
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('common.failed_delete')) }
 }
 onMounted(fetchData)
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>
 <style scoped>
 h2 { font-size: 22px; font-weight: 700; color: var(--text-primary); margin-bottom: 20px; }
