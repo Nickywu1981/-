@@ -52,8 +52,8 @@ const autoSaveSchema = z.object({
   ),
 });
 const diffSchema = z.object({
-  versionA: z.string().min(1).max(50),
-  versionB: z.string().min(1).max(50),
+  versionA: z.coerce.number().int().positive('版本号必须为正整数'),
+  versionB: z.coerce.number().int().positive('版本号必须为正整数'),
 });
 
 // 路由参数校验 schemas

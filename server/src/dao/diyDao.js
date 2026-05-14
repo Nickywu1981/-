@@ -60,25 +60,28 @@ export default {
     return rows[0] || null;
   },
 
-  // 公开页面按 slug 查询，依赖 slug 全局唯一性（建议 DB 层加 UNIQUE(slug) 约束）
-  async getPublishedPage(slug) {
+  // 公开页面按 slug 查询（依赖 DB 层 UNIQUE(slug) 约束防止跨租户碰撞；约束就绪前取最新发布）
+  async getPublishedPage(slug, tenantId) {
     // 先查 Redis
     const redis = getRedis();
+    const cacheKey = tenantId ? `${REDIS_KEY_PREFIX}${tenantId}:${slug}` : `${REDIS_KEY_PREFIX}${slug}`;
     if (redis) {
       try {
-        const cached = await redis.get(`${REDIS_KEY_PREFIX}${slug}`);
+        const cached = await redis.get(cacheKey);
         if (cached) return JSON.parse(cached);
       } catch (e) { logger.warn('[DiyDao] Redis 缓存读取失败，回退DB查询', { slug, error: e.message }); }
     }
-    const [rows] = await pool.query(
-      'SELECT id, owner_id, title, slug, page_type, mobile_config, pc_config, meta_json, publish_time, latest_published_version FROM diy_page WHERE slug = ? AND status = 1 LIMIT 1', [slug],
-    );
+    let sql = 'SELECT id, owner_id, title, slug, page_type, mobile_config, pc_config, meta_json, publish_time, latest_published_version FROM diy_page WHERE slug = ? AND status = 1';
+    const params = [slug];
+    if (tenantId) { sql += ' AND tenant_id = ?'; params.push(tenantId); }
+    sql += ' ORDER BY publish_time DESC LIMIT 1';
+    const [rows] = await pool.query(sql, params);
     if (!rows[0]) return null;
     const p = rows[0];
-    const result = { id: p.id, ownerId: p.owner_id, title: p.title, slug: p.slug, page_type: p.page_type, mobileConfig: parseJson(p.mobile_config), pcConfig: parseJson(p.pc_config), meta: parseJson(p.meta_json), publishTime: p.publish_time, version: p.latest_published_version };
+    const result = { id: p.id, ownerId: p.owner_id, title: p.title, slug: p.slug, page_type: p.page_type, mobileConfig: parseJson(p.mobile_config), pcConfig: parseJson(p.pc_config), meta: parseJson(p.meta_json), publishTime: p.publish_time, version: p.latest_published_version, tenantId: p.tenant_id };
     // 写入 Redis 缓存
     if (redis) {
-      try { await redis.setex(`${REDIS_KEY_PREFIX}${slug}`, REDIS_TTL, JSON.stringify(result)); } catch (e) { logger.warn('[DiyDao] 发布页缓存写入失败', { slug, error: e.message }); }
+      try { await redis.setex(cacheKey, REDIS_TTL, JSON.stringify(result)); } catch (e) { logger.warn('[DiyDao] 发布页缓存写入失败', { slug, error: e.message }); }
     }
     return result;
   },
@@ -283,6 +286,11 @@ export default {
         `INSERT INTO diy_page_version (page_id, version, mobile_config, pc_config, remark, auto_save) VALUES ${versionValues.join(', ')}`,
         versionParams,
       );
+      // 批量更新 latest_published_version
+      await conn.query(
+        `UPDATE diy_page SET latest_published_version = (SELECT COALESCE(MAX(dv.version),0) FROM diy_page_version dv WHERE dv.page_id = diy_page.id) WHERE id IN (${pageIds.map(() => '?').join(',')})`,
+        pageIds,
+      );
       return pageIds.map(id => ({ id, success: true, msg: '发布成功' }));
     });
   },
@@ -312,12 +320,12 @@ export default {
   /** 发布页面（事务：状态更新 + 版本插入） */
   async publishWithVersion(id, tenantId, mobileConfig, pcConfig, slug) {
     return withTransaction(async (conn) => {
-      await conn.query('UPDATE diy_page SET status = 1, publish_time = NOW() WHERE id = ? AND tenant_id = ?', [id, tenantId]);
       const [[{ v }]] = await conn.query('SELECT COALESCE(MAX(version),0)+1 as v FROM diy_page_version WHERE page_id = ? FOR UPDATE', [id]);
       await conn.query(
         'INSERT INTO diy_page_version (page_id, version, mobile_config, pc_config, remark, auto_save) VALUES (?, ?, ?, ?, ?, 0)',
         [id, v, JSON.stringify(mobileConfig), JSON.stringify(pcConfig), '发布'],
       );
+      await conn.query('UPDATE diy_page SET status = 1, publish_time = NOW(), latest_published_version = ? WHERE id = ? AND tenant_id = ?', [v, id, tenantId]);
       return v;
     });
   },

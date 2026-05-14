@@ -4,7 +4,6 @@
  * - 崩溃恢复检测
  * - 保存状态指示器
  */
-import { AUTO_SAVE_INTERVAL_MS } from '~/constants/ui'
 import type { DiySection } from '~/types/diy'
 
 interface AutoSaveState {
@@ -15,7 +14,7 @@ interface AutoSaveState {
   recovered: Ref<boolean>
   formatLastSaved: () => string
   autoSave: () => Promise<void>
-  checkRecovery: () => Promise<{ id: number; config_json: { sections: DiySection[] } } | null>
+  checkRecovery: () => Promise<{ sections: DiySection[] } | null>
   start: () => void
   stop: () => void
 }
@@ -23,7 +22,8 @@ interface AutoSaveState {
 export function useDiyAutoSave(
   pageId: Ref<number | null>,
   getSections: () => DiySection[],
-  { delay = 30000 } = {},
+  previewMode?: Ref<'mobile' | 'pc'>,
+  { delay = 3000 } = {},
 ): AutoSaveState {
   const lastSaved = ref<Date | null>(null)
   const saving = ref(false)
@@ -46,7 +46,10 @@ export function useDiyAutoSave(
     saveError.value = null
     try {
       const sections = getSections()
-      const body: Record<string, any> = { mobileConfig: { sections: structuredClone(sections) }, pcConfig: { sections: structuredClone(sections) } }
+      const cfg = { sections: structuredClone(sections) }
+      const body: Record<string, any> = previewMode?.value === 'pc'
+        ? { pcConfig: cfg }
+        : { mobileConfig: cfg }
       await $fetch(`/api/diy/${pageId.value}/versions/auto-save`, {
         method: 'POST',
         body,
@@ -58,7 +61,7 @@ export function useDiyAutoSave(
       const err = e as { data?: { msg?: string }; message?: string };
       saveError.value = err?.data?.msg || err.message
       if (timer) clearTimeout(timer)
-      timer = setTimeout(autoSave, AUTO_SAVE_INTERVAL_MS)
+      timer = setTimeout(autoSave, delay)
     } finally {
       saving.value = false
     }

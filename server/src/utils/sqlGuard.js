@@ -25,16 +25,21 @@ export function guardSQL(value, fieldName = 'unknown') {
   return value;
 }
 
+function scanValues(obj, prefix = '') {
+  if (obj === null || obj === undefined) return;
+  if (typeof obj === 'string') { guardSQL(obj, prefix); return; }
+  if (Array.isArray(obj)) { obj.forEach((v, i) => scanValues(v, `${prefix}[${i}]`)); return; }
+  if (typeof obj === 'object') {
+    for (const [key, value] of Object.entries(obj)) {
+      scanValues(value, prefix ? `${prefix}.${key}` : key);
+    }
+  }
+}
+
 export function sqlGuardMiddleware(req, res, next) {
   try {
-    for (const [key, value] of Object.entries(req.query)) {
-      guardSQL(value, `query.${key}`);
-    }
-    if (req.body && typeof req.body === 'object') {
-      for (const [key, value] of Object.entries(req.body)) {
-        guardSQL(value, `body.${key}`);
-      }
-    }
+    scanValues(req.query, 'query');
+    if (req.body && typeof req.body === 'object') scanValues(req.body, 'body');
     next();
   } catch (err) {
     if (err.sqlGuard) {

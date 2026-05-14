@@ -329,6 +329,7 @@ async function onRollbackVersion(idx: number) {
 const autoSave = useDiyAutoSave(
   computed(() => pageInfo.value?.id),
   () => editor.toConfigJson(),
+  previewMode,
 )
 autoSave.start()
 

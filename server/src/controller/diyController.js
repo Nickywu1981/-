@@ -70,7 +70,7 @@ export const hardDeletePage = wrapController(async (req, res) => {
 // ==================== 公开访问 ====================
 
 export const getPublishedPage = wrapController(async (req, res) => {
-  const page = await diyService.getPublishedPage(req.params.slug);
+  const page = await diyService.getPublishedPage(req.params.slug, req.tenantId);
   if (!page) throw new BusinessError(ERROR_CODE.NOT_FOUND);
   return success(res, page);
 });

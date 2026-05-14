@@ -20,6 +20,9 @@ const INJECTION_PATTERNS = [
   /exec(\s|\+)+(s|x)p\w+/i,
 ];
 
+// 原型污染危险 key
+const DANGEROUS_KEYS = ['__proto__', 'constructor', 'prototype'];
+
 function sanitize(value) {
   if (typeof value === 'string') {
     return value.trim();
@@ -30,6 +33,7 @@ function sanitize(value) {
   if (value && typeof value === 'object') {
     const cleaned = {};
     for (const [k, v] of Object.entries(value)) {
+      if (DANGEROUS_KEYS.includes(k)) continue;
       cleaned[k] = sanitize(v);
     }
     return cleaned;

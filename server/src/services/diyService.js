@@ -21,12 +21,13 @@ function validateBeforePublish(page) {
 
   for (const s of allSections) {
     const type = s.type || s.component;
-    if (s.props?.images && s.props.images.some((img) => !img)) issues.push(`"${type}"组件存在空图片链接`);
-    if (s.props?.bgImage && !s.props.bgImage.trim()) issues.push(`"${type}"组件背景图为空`);
-    if (type === 'ctaButton' && (!s.props?.text || !s.props.text.trim())) issues.push('CTA按钮文案不能为空');
-    if (type === 'form_container' && (!s.props?.submitText || !s.props.submitText.trim())) issues.push('表单提交按钮文案不能为空');
-    if (type === 'form_container' && (!s.props?.fields || s.props.fields.length === 0)) issues.push('表单组件至少需要一个字段');
-    if (type === 'countdown' && !s.props?.endTime) issues.push('倒计时组件需设置结束时间');
+    const cfg = s.config || s.props || {};
+    if (cfg.images && Array.isArray(cfg.images) && cfg.images.some((img) => !img)) issues.push(`"${type}"组件存在空图片链接`);
+    if (cfg.bgImage && !cfg.bgImage.trim()) issues.push(`"${type}"组件背景图为空`);
+    if (type === 'ctaButton' && (!cfg.text || !cfg.text.trim())) issues.push('CTA按钮文案不能为空');
+    if (type === 'form_container' && (!cfg.submitText || !cfg.submitText.trim())) issues.push('表单提交按钮文案不能为空');
+    if (type === 'form_container' && (!cfg.fields || cfg.fields.length === 0)) issues.push('表单组件至少需要一个字段');
+    if (type === 'countdown' && !cfg.endTime) issues.push('倒计时组件需设置结束时间');
   }
   return issues;
 }
@@ -69,8 +70,8 @@ export default {
 
   async listPages(tenantId, query) { return diyDao.listPages(tenantId, query); },
   async getPageById(id, tenantId) { return diyDao.getPageById(id, tenantId); },
-  async getPublishedPage(slug) {
-    const page = await diyDao.getPublishedPage(slug);
+  async getPublishedPage(slug, tenantId) {
+    const page = await diyDao.getPublishedPage(slug, tenantId);
     if (page) await diyDao.updateAccessCount(slug).catch((e) => { logger.warn('更新访问计数失败:', e.message); });
     return page;
   },
@@ -214,7 +215,19 @@ export default {
   // ========== 批量操作 ==========
 
   async batchPublish(ids, tenantId) {
-    return diyDao.batchPublishWithVersions(ids, tenantId);
+    const pages = await diyDao.getPagesByIds(ids, tenantId);
+    const errors = [];
+    const validIds = [];
+    for (const p of pages) {
+      if (!p) { errors.push({ id: null, success: false, error: '页面不存在' }); continue; }
+      if (p.status !== 0 && p.status !== 2) { errors.push({ id: p.id, success: false, error: `页面状态不允许发布（当前状态: ${DIY_PAGE_STATUS_LABEL[p.status] || p.status}）` }); continue; }
+      const issues = validateBeforePublish(p);
+      if (issues.length) { errors.push({ id: p.id, success: false, error: issues.join('; ') }); continue; }
+      validIds.push(p.id);
+    }
+    if (!validIds.length) return errors;
+    const results = await diyDao.batchPublishWithVersions(validIds, tenantId);
+    return [...results, ...errors];
   },
 
   async batchUnpublish(ids, tenantId) {
