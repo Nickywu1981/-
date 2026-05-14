@@ -102,7 +102,7 @@ process.on('unhandledRejection', (reason) => {
 let shuttingDown = false;
 let forceExitTimer = null;
 
-function gracefulShutdown(signal) {
+async function gracefulShutdown(signal) {
   if (shuttingDown) return;
   shuttingDown = true;
 
