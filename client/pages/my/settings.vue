@@ -69,7 +69,7 @@ onMounted(async () => {
       form.phone = res.data.phone || ''
       form.email = res.data.email || ''
     }
-  } catch { toast.error(t('my.settings.load_failed')) }
+  } catch (e: unknown) { console.warn('[settings] load failed', e); toast.error(t('my.settings.load_failed')) }
   finally { loading.value = false }
 })
 
@@ -92,7 +92,7 @@ const saveProfile = async () => {
   try {
     await $fetch('/api/user/profile', { method: 'PUT', credentials: 'include', body: form })
     toast.success(t('my.settings.save_success'))
-  } catch { toast.error(t('my.settings.save_failed')) }
+  } catch (e: unknown) { console.warn('[settings] save failed', e); toast.error(t('my.settings.save_failed')) }
   saving.value = false
 }
 definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })

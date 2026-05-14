@@ -31,7 +31,7 @@
         <div class="card-size">{{ t.width }} × {{ t.height }}</div>
         <div class="card-name">{{ t.name }}</div>
         <div class="card-platform">{{ t.platform || $t('my.templates.platform_generic') }}</div>
-        <button class="btn-del" @click="deleteTemplate(t.id)">{{ $t('my.templates.delete') }}</button>
+        <button class="btn-del" :disabled="deleting" @click="deleteTemplate(t.id)">{{ $t('my.templates.delete') }}</button>
       </div>
     </div>
 
@@ -57,7 +57,7 @@ const platforms = [
   { code: 'pdd', name: t('my.templates.platform_pdd') },
   { code: 'douyin', name: t('my.templates.platform_douyin') },
   { code: 'amazon', name: t('my.templates.platform_amazon') },
-  { code: 'tiktok', name: 'TikTok' },
+  { code: 'tiktok', name: t('my.templates.platform_tiktok') },
 ];
 
 async function loadTemplates() {
@@ -82,13 +82,17 @@ async function saveTemplate() {
   finally { saving.value = false }
 }
 
+const deleting = ref(false)
+
 async function deleteTemplate(id: number) {
-  if (!await confirm({ message: t('my.templates.delete_confirm'), variant: 'danger' })) return;
+  if (deleting.value || !await confirm({ message: t('my.templates.delete_confirm'), variant: 'danger' })) return;
+  deleting.value = true
   try {
     await $fetch(`/api/templates/my/${id}`, { method: 'DELETE', credentials: 'include' });
     toast.success(t('my.templates.delete_success'))
     loadTemplates();
   } catch { toast.error(t('my.templates.delete_failed')) }
+  finally { deleting.value = false }
 }
 
 onMounted(() => loadTemplates());

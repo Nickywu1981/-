@@ -230,7 +230,7 @@ async function selectWorkflow(id) {
     // 加载模型池
     const poolRes = await $fetch('/api/admin/model-pool', { credentials: 'include' });
     if (poolRes?.data) modelPool.value = poolRes.data;
-  } catch (e) { /* ignore */ }
+  } catch (e) { console.warn('[workflow-config] selectWorkflow failed', e) }
 }
 
 async function saveConfig() {
@@ -282,7 +282,7 @@ onMounted(async () => {
   try {
     const res = await $fetch('/api/workflow/definitions', { credentials: 'include' });
     if (res?.data) workflows.value = res.data;
-  } catch {}
+  } catch (e) { console.warn('[workflow-config] load definitions failed', e) }
 });
 </script>
 

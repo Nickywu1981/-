@@ -28,7 +28,7 @@
         <div class="card-name">{{ c.name }}</div>
         <div class="card-desc">{{ c.description || $t('my_pages.collections.no_desc') }}</div>
         <div class="card-meta">{{ c.item_count || 0 }} {{ $t('common.item_unit') }} · {{ c.is_public ? $t('my_pages.collections.public') : $t('my_pages.collections.private') }}</div>
-        <button class="btn-del" @click="deleteCollection(c.id)">{{ $t('my_pages.collections.delete') }}</button>
+        <button class="btn-del" :disabled="deleting" @click="deleteCollection(c.id)">{{ $t('my_pages.collections.delete') }}</button>
       </div>
     </div>
 
@@ -77,13 +77,17 @@ async function saveCollection() {
   saving.value = false
 }
 
+const deleting = ref(false)
+
 async function deleteCollection(id: number) {
-  if (!await confirm({ message: t('my_pages.collections.delete_confirm') })) return
+  if (deleting.value || !await confirm({ message: t('my_pages.collections.delete_confirm') })) return
+  deleting.value = true
   try {
     await $fetch(`/api/collections/${id}`, { method: 'DELETE', credentials: 'include' })
     toast.success(t('my_pages.collections.deleted'))
     fetchData()
   } catch { toast.error(t('my_pages.collections.delete_failed')) }
+  finally { deleting.value = false }
 }
 
 const { t } = useI18n()

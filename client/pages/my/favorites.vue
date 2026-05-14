@@ -93,7 +93,7 @@ const removeFavorite = async (id: number) => {
     await $fetch(`/api/collections/${id}`, { credentials: 'include', method: 'DELETE' })
     items.value = items.value.filter(i => i.id !== id)
     total.value--
-  } catch { /* 全局拦截器已 toast 提示 */ }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('my.favorites.unfavorite_failed')) }
 }
 
 watch(page, fetchFavorites)

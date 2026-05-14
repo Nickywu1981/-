@@ -7,6 +7,7 @@ import BatchPreview from '~/components/work/batch-sku/BatchPreview.vue'
 definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 
 const { t } = useI18n()
+const toast = useToast()
 
 interface SkuRow { id: string; color: string; colorHex: string; size: string; angle: string }
 
@@ -88,9 +89,9 @@ const submit = async () => {
         step.value = 'done'
       }
     }, 2000)
-  } catch (err) {
+  } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
     step.value = 'config'
-    alert(t('work_pages.batch_sku_image.submit_failed'))
+    toast.error(e?.data?.msg || t('work_pages.batch_sku_image.submit_failed'))
   }
 }
 </script>

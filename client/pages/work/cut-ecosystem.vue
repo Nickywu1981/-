@@ -209,6 +209,7 @@ function toggleWork(work) {
 }
 
 async function exportDraft(platform) {
+  if (exporting.value) return
   exporting.value = platform
   draftResult.value = null
   try {

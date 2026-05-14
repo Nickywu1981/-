@@ -81,9 +81,7 @@ const tabs = computed(() => [
   { key: 'batch', label: t('my_pages.works.tab_batch') },
 ])
 
-const imageTypes = ['main_image', 'scene', 'detail_h5', 'virtual_tryon', 'color_swap', 'style_transfer', 'wrinkle_remove', 'image_translate']
-const videoTypes = ['img2video', 'multi2video', 'video_packaging', 'action_transfer', 'person_replace', 'digital_human', 'script_gen', 'shot_plan', 'viral_clone', 'action_batch', 'video_beautify']
-const batchTypes = ['batch']
+const toast = useToast()
 
 const filteredList = computed(() => allTasks.value)
 

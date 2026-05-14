@@ -4,6 +4,7 @@ import { ref } from 'vue'
 
 definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 const { t } = useI18n()
+const toast = useToast()
 
 const selectedPlatforms = ref<string[]>(['taobao', 'douyin'])
 const workId = ref<number | null>(null)
@@ -40,7 +41,8 @@ const submit = async () => {
     } else {
       results.value = selectedPlatforms.value.map(p => ({ platform: p, status: 'failed' }))
     }
-  } catch {
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
+    toast.error(err?.data?.msg || t('work_pages.batch_publish.publish_failed'))
     results.value = selectedPlatforms.value.map(p => ({ platform: p, status: 'failed' }))
   }
   loading.value = false

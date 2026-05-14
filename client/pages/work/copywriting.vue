@@ -307,7 +307,7 @@ async function loadHistory() {
     const r = await $fetch(`/api/copywriting/history?type=${historyType.value}&page=${historyPage.value}&pageSize=20`);
     historyList.value = r?.data?.list || [];
     historyTotal.value = r?.data?.total || 0;
-  } catch { toast.warn($t('work_pages.copywriting.config_load_failed')) }
+  } catch { toast.warn($t('work_pages.copywriting.history_load_failed')) }
   finally { historyLoading.value = false; }
 }
 async function deleteRecord(id) {

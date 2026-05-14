@@ -194,7 +194,7 @@ async function fetchWorks() {
   try {
     const res: any = await $fetch('/api/tasks/my-works', { credentials: 'include', params: { pageSize: 50 } })
     works.value = res?.data?.list || []
-  } catch { works.value = [] }
+  } catch (e: unknown) { console.warn('[compare] fetch works failed', e); works.value = [] }
   worksLoading.value = false
 }
 

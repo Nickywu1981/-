@@ -16,9 +16,6 @@
   </footer>
 </template>
 
-<script setup>
-defineProps({
-  siteName: { type: String, required: true },
-  currentYear: { type: Number, required: true },
-});
+<script setup lang="ts">
+defineProps<{ siteName: string; currentYear: number }>()
 </script>

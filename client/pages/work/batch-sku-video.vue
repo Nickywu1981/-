@@ -4,6 +4,7 @@ import { ref, computed, onUnmounted } from 'vue'
 
 definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 const { t } = useI18n()
+const toast = useToast()
 
 const productImages = ref<string[]>([])
 const imageInput = ref('')
@@ -65,7 +66,8 @@ const submit = async () => {
         loading.value = false
       }
     }, 2000)
-  } catch {
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
+    toast.error(err?.data?.msg || t('work_pages.batch_sku_video.submit_failed'))
     loading.value = false
   }
 }
