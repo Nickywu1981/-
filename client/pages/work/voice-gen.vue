@@ -28,7 +28,7 @@
         <button class="ws-btn ws-btn--primary ws-btn--lg" :disabled="!text.trim() || submitting" @click="handleGenerate">{{ submitting ? '生成中...' : '开始生成' }}</button>
       </div>
       <div class="ws-section">
-        <div class="ws-section__title">生成结果</div>
+        <div class="ws-section__title">{{ $t('work_pages.result_section_title') }}</div>
         <div v-if="task.polling.value" class="progress-box">
           <div class="spinner" /><p>{{ $t('work_pages.voice_gen_processing') }}</p>
           <div class="bar"><div class="bar-fill" :style="{ width: task.progress.value + '%' }" /></div>

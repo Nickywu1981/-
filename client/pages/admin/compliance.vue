@@ -15,14 +15,14 @@
       <div class="rules-grid">
         <div v-for="t in targets" :key="t.code" class="rule-card" @click="viewRules(t)">
           <span class="rule-name">{{ t.name }}</span>
-          <span class="rule-counts">🖼 {{ t.imageRuleCount }} 规则 · 📝 {{ t.textRuleCount }} 规则</span>
-          <button class="btn-sm">{{ $t('common.view') }}规则</button>
+          <span class="rule-counts">🖼 {{ t.imageRuleCount }} {{ $t('common.rules_text') }} · 📝 {{ t.textRuleCount }} {{ $t('common.rules_text') }}</span>
+          <button class="btn-sm">{{ $t('common.view') }}{{ $t('common.rules_text') }}</button>
         </div>
       </div>
     </div>
 
     <div v-if="checkResult" class="check-result" :class="checkResult.passed ? 'passed' : 'failed'">
-      <h3>检查结果：{{ checkResult.passed ? '✅ 通过' : '❌ 存在问题' }}</h3>
+      <h3>{{ $t('common.check_result_label') }}{{ checkResult.passed ? '✅ ' + $t('common.passed') : '❌ ' + $t('common.has_issues') }}</h3>
       <ul v-if="checkResult.issues?.length">
         <li v-for="(issue, i) in checkResult.issues" :key="i">
           <span :class="'sev-'+issue.severity">{{ issue.severity }}</span>

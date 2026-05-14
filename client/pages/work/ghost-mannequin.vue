@@ -36,7 +36,7 @@
         <button class="ws-btn ws-btn--primary ws-btn--lg" :disabled="!uploadedUrl || submitting" @click="handleGenerate">{{ submitting ? '提交中...' : '开始生成' }}</button>
       </div>
       <div class="ws-section">
-        <div class="ws-section__title">生成结果</div>
+        <div class="ws-section__title">{{ $t('work_pages.result_section_title') }}</div>
         <div v-if="task.polling.value" class="progress-box">
           <div class="spinner" /><p>{{ task.progressMsg.value || 'AI 正在处理...' }}</p>
           <div class="bar"><div class="bar-fill" :style="{ width: task.progress.value + '%' }" /></div>

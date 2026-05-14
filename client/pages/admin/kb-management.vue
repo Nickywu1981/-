@@ -31,7 +31,7 @@
         <h3>{{ $t('admin_kb_management.rag_检索测试') }}</h3>
         <div class="search-bar">
           <input v-model="query" class="input" :placeholder="$t('admin_kb_management.输入查询文本_如_编码规范_用户认证流程')" @keyup.enter="search" />
-          <button class="btn btn-primary" :disabled="searching" @click="search">{{ searching ? '搜索中...' : '搜索' }}</button>
+          <button class="btn btn-primary" :disabled="searching" @click="search">{{ searching ? $t('common.searching') : $t('common.search_text') }}</button>
         </div>
 
         <div v-if="searchError" class="error">{{ searchError }}</div>

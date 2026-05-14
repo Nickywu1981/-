@@ -16,10 +16,10 @@
     <!-- 操作栏 -->
     <div class="toolbar">
       <select v-model="filterCategory">
-        <option value="">{{ $t('common.all') }}类别</option>
+        <option value="">{{ $t('common.all_categories') }}</option>
         <option v-for="cat in categories" :key="cat.key" :value="cat.key">{{ cat.label }}</option>
       </select>
-      <button class="btn-primary" @click="refreshPool">{{ $t('common.refresh') }}模型池</button>
+      <button class="btn-primary" @click="refreshPool">{{ $t('common.refresh') }}{{ $t('common.add_model_pool') }}</button>
     </div>
 
     <!-- 模型列表 -->
@@ -37,9 +37,9 @@
           <td><span class="cat-tag" :class="m.category">{{ categoryLabel(m.category) }}</span></td>
           <td><input type="number" v-model.number="m.pool_weight" min="1" max="100" style="width:60px" @change="updateWeight(m)" /></td>
           <td><input type="range" v-model.number="m.gray_percent" min="0" max="100" @change="updateGray(m)" /> {{ m.gray_percent || 0 }}%</td>
-          <td><span :class="['status-dot', m.enabled ? 'on' : 'off']"></span> {{ m.enabled ? '启用' : '禁用' }}</td>
+          <td><span :class="['status-dot', m.enabled ? 'on' : 'off']"></span> {{ m.enabled ? $t('common.statusEnabled') : $t('common.statusDisabled') }}</td>
           <td>
-            <button class="btn-sm" @click="toggleModel(m)">{{ m.enabled ? '禁用' : '启用' }}</button>
+            <button class="btn-sm" @click="toggleModel(m)">{{ m.enabled ? $t('common.statusDisabled') : $t('common.statusEnabled') }}</button>
           </td>
         </tr>
       </tbody>

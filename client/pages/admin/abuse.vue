@@ -37,7 +37,7 @@
           <td class="ua-cell" :title="r.user_agent">{{ truncate(r.user_agent, 40) }}</td>
           <td>{{ r.create_time?.slice(0, 19) }}</td>
           <td class="actions">
-            <button class="btn-sm" :disabled="checking" @click="checkUser(r.user_id)">{{ checking ? '检测中...' : '检测该用户' }}</button>
+            <button class="btn-sm" :disabled="checking" @click="checkUser(r.user_id)">{{ checking ? $t('common.checking') : $t('common.detect_user') }}</button>
           </td>
         </tr>
       </tbody>

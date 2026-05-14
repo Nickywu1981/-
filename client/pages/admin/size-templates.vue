@@ -18,7 +18,7 @@
     <Teleport to="body">
       <div v-if="showModal" class="modal-overlay" @click.self="showModal=false" @keydown.escape="showModal=false">
         <div class="modal">
-          <h3>{{ editing ? '编辑尺寸' : '新建尺寸' }}</h3>
+          <h3>{{ editing ? $t('common.edit_size_title') : $t('common.new_size_title') }}</h3>
           <div class="form-grid">
             <label>{{ $t('common.name') }} <input v-model="editForm.name" maxlength="100" class="input" /></label>
             <label>平台

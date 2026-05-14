@@ -40,7 +40,7 @@
         </div>
 
         <div class="info-box">
-          <h3>熔断器{{ $t('common.status') }}说明</h3>
+          <h3>{{ $t('common.reset_cb') }}{{ $t('common.status') }}{{ $t('common.description') }}</h3>
           <div class="legend">
             <span><span class="dot closed" /> 正常 (closed) — 请求正常通过</span>
             <span><span class="dot open" /> 熔断 (open) — 60秒冷却，拒绝请求</span>

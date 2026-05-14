@@ -4,7 +4,7 @@
     <div v-if="currentStep < 2" class="ws-section">
       <div class="ws-section__title">{{ $t('work_pages.storyboard_script_title') }}</div>
       <div class="ws-section__desc">{{ $t('work_pages.storyboard_script_desc') }}</div>
-      <textarea v-model="scriptText" class="input-area" placeholder="粘贴你的视频脚本...&#10;&#10;如：第一幕：清晨阳光洒进卧室，女主起床伸懒腰&#10;第二幕：走到厨房，打开冰箱拿出一瓶牛奶&#10;第三幕：喝牛奶特写，满足的笑容" rows="8" maxlength="5000" />
+      <textarea v-model="scriptText" class="input-area" :placeholder="$t('work_pages.storyboard_script_placeholder')" rows="8" maxlength="5000" />
       <div class="quick-tags">
         <span class="tag-label">{{ $t('work_pages.storyboard_quick_templates') }}</span>
         <button v-for="t in quickTemplates" :key="t.label" class="tag-btn" @click="scriptText = t.text">{{ t.label }}</button>
@@ -20,7 +20,7 @@
         </div>
       </div>
       <button class="btn" :disabled="!scriptText.trim() || submitting" @click="submitTask">
-        {{ submitting ? '提交中...' : '生成分镜' }}
+        {{ submitting ? $t('work_pages.submitting') : $t('work_pages.submit_btn') }}
       </button>
     </div>
 
@@ -39,12 +39,12 @@
         <div class="storyboard-grid" v-if="task.result.value?.scenes">
           <div v-for="(s, i) in task.result.value.scenes" :key="i" class="story-card">
             <div class="story-card__number">#{{ Number(i) + 1 }}</div>
-            <img loading="lazy" v-if="s.image" :src="s.image" alt="分镜预览" class="story-card__img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+            <img loading="lazy" v-if="s.image" :src="s.image" :alt="$t('work_pages.storyboard_img_alt')" class="story-card__img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
             <div v-else class="story-card__placeholder">🎬</div>
             <div class="story-card__info">
               <div class="story-card__time">{{ s.duration || '3' }}s</div>
               <div class="story-card__desc">{{ s.description }}</div>
-              <div class="story-card__camera">{{ s.camera || '中景' }}</div>
+              <div class="story-card__camera">{{ s.camera || $t('work_pages.shot_camera_mid_fallback') }}</div>
             </div>
           </div>
         </div>
@@ -52,7 +52,7 @@
         <button class="btn-outline" style="margin-top:16px" @click="handleReset">{{ $t('work_pages.storyboard_btn_reset') }}</button>
       </div>
       <div v-else-if="task.status.value === 3" class="error-box">
-        <p class="error-msg">{{ task.errorMsg.value || '分镜生成失败，请重试' }}</p>
+        <p class="error-msg">{{ task.errorMsg.value || $t('work_pages.storyboard_error') }}</p>
         <button class="btn" @click="handleReset">{{ $t('work_pages.storyboard_btn_reset') }}</button>
       </div>
     </div>

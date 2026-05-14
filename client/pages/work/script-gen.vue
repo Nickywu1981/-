@@ -54,30 +54,30 @@
         <div class="spinner" /><p>{{ task.progressMsg.value }}</p>
       </div>
       <div v-else-if="task.status.value === 2">
-        <h3>脚本生成完成 <span class="lang-badge">{{ selectedLangLabel }}</span></h3>
+        <h3>{{ $t('work_pages.script_gen_done_title') }} <span class="lang-badge">{{ selectedLangLabel }}</span></h3>
         <div class="script-output" v-if="task.result.value">
           <div v-if="task.result.value.title" class="script-card">
             <h4>{{ task.result.value.title }}</h4>
             <template v-if="task.result.value.hooks">
-              <h5>📌 开头钩子（3选1）</h5>
+              <h5>📌 {{ $t('work_pages.script_gen_hook_title') }}</h5>
               <p v-for="(h, i) in task.result.value.hooks" :key="i" class="hook-line">{{ h }}</p>
             </template>
             <template v-if="task.result.value.body">
-              <h5>📝 正文</h5>
+              <h5>📝 {{ $t('work_pages.script_gen_body_title') }}</h5>
               <p class="body-text">{{ task.result.value.body }}</p>
             </template>
             <template v-if="task.result.value.cta">
-              <h5>💰 转化引导</h5>
+              <h5>💰 {{ $t('work_pages.script_gen_cta_title') }}</h5>
               <p class="cta-text">{{ task.result.value.cta }}</p>
             </template>
             <template v-if="task.result.value.sections">
-              <h5>📋 直播分段脚本</h5>
+              <h5>📋 {{ $t('work_pages.script_gen_sections_title') }}</h5>
               <div v-for="s in task.result.value.sections" :key="s.time" class="section-item">
                 <strong>{{ s.time }}</strong> — {{ s.content }} <em>({{ s.tip }})</em>
               </div>
             </template>
             <template v-if="task.result.value.captions">
-              <h5>📱 种草文案</h5>
+              <h5>📱 {{ $t('work_pages.script_gen_captions_title') }}</h5>
               <p v-for="c in task.result.value.captions" :key="c" class="caption-line">{{ c }}</p>
               <p class="hashtags">{{ task.result.value.hashtags }}</p>
             </template>

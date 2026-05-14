@@ -42,7 +42,7 @@
           <td>{{ log.id }}</td><td>{{ log.user_id }}</td><td class="model">{{ log.model_name }}</td>
           <td>{{ log.prompt_tokens || '-' }}</td><td>{{ log.response_tokens || '-' }}</td>
           <td>{{ log.duration_ms ? log.duration_ms + 'ms' : '-' }}</td>
-          <td><span :class="log.status===1?'s-ok':'s-fail'">{{ log.status===1?'成功':'失败' }}</span></td>
+          <td><span :class="log.status===1?'s-ok':'s-fail'">{{ log.status===1 ? $t('common.status_success') : $t('common.status_failed') }}</span></td>
           <td><button class="btn-sm" @click="openDetail(log)">{{ $t('common.details') }}</button></td>
           <td class="time">{{ log.create_time?.slice(0,16) }}</td>
         </tr>
@@ -56,7 +56,7 @@
     <Teleport to="body">
       <div v-if="detail" class="modal-overlay" @click.self="detail = null" @keydown.escape="detail = null">
         <div class="modal-card">
-          <h3>AI 调用详情 #{{ detail.id }}</h3>
+          <h3>{{ $t('common.ai_call_detail') }} #{{ detail.id }}</h3>
           <div class="dg">
             <div class="di"><span class="dl">{{ $t('admin_ai_logs.模型') }}</span><span class="dv">{{ detail.model_name }}</span></div>
             <div class="di"><span class="dl">{{ $t('admin_ai_logs.用户id') }}</span><span class="dv">{{ detail.user_id }}</span></div>
@@ -64,7 +64,7 @@
             <div class="di"><span class="dl">{{ $t('admin_ai_logs.输入token') }}</span><span class="dv">{{ detail.prompt_tokens }}</span></div>
             <div class="di"><span class="dl">{{ $t('admin_ai_logs.输出token') }}</span><span class="dv">{{ detail.response_tokens }}</span></div>
             <div class="di"><span class="dl">{{ $t('admin_ai_logs.耗时') }}</span><span class="dv">{{ detail.duration_ms }}ms</span></div>
-            <div class="di"><span class="dl">结果{{ $t('common.type') }}</span><span class="dv">{{ detail.result_type || '-' }}</span></div>
+            <div class="di"><span class="dl">{{ $t('common.result') }}{{ $t('common.type') }}</span><span class="dv">{{ detail.result_type || '-' }}</span></div>
             <div class="di"><span class="dl">{{ $t('common.time') }}</span><span class="dv">{{ detail.create_time }}</span></div>
             <div class="di full"><span class="dl">{{ $t('admin_ai_logs.输入内容') }}</span><pre class="pre">{{ detail.prompt_text || '-' }}</pre></div>
             <div class="di full" v-if="detail.response_text"><span class="dl">{{ $t('admin_ai_logs.输出内容') }}</span><pre class="pre">{{ detail.response_text }}</pre></div>
