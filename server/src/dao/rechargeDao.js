@@ -48,7 +48,7 @@ export async function markRefunded(orderNo, conn) {
 }
 
 export async function lockByOrderNo(orderNo, conn) {
-  const [[order]] = await conn.query('SELECT * FROM recharge_order WHERE order_no = ? LIMIT 1 FOR UPDATE', [orderNo]);
+  const [[order]] = await conn.query('SELECT id, tenant_id, user_id, order_no, amount, coin_amount, pay_channel, pay_status, trade_no, pay_time, client_ip, expire_time, create_time, update_time FROM recharge_order WHERE order_no = ? LIMIT 1 FOR UPDATE', [orderNo]);
   return order || null;
 }
 

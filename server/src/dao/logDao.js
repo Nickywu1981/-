@@ -67,7 +67,7 @@ export async function listOperationLogs({ userId, action, page = 1, pageSize = 2
   const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
   const { offset } = parsePagination({ page, pageSize });
   const [rows] = await pool.query(
-    `SELECT * FROM ?? ${where} ORDER BY create_time DESC LIMIT ? OFFSET ?`,
+    `SELECT id, user_id, action, target_type, target_id, detail, ip, user_agent, create_time FROM ?? ${where} ORDER BY create_time DESC LIMIT ? OFFSET ?`,
     ['operation_log', ...params, pageSize, offset],
   );
   const [[{ total }]] = await pool.query(
@@ -154,7 +154,7 @@ export async function insertGeneratedImage({ userId, taskId, type, platform, ori
 export async function listGeneratedImages(userId, { page = 1, pageSize = 20 }) {
   const { offset } = parsePagination({ page, pageSize });
   const [rows] = await pool.query(
-    'SELECT * FROM ?? WHERE user_id = ? ORDER BY create_time DESC LIMIT ? OFFSET ?',
+    'SELECT id, user_id, task_id, type, platform, original_url, result_url, thumbnail_url, width, height, file_size, format, params_json, create_time FROM ?? WHERE user_id = ? ORDER BY create_time DESC LIMIT ? OFFSET ?',
     ['generated_image', userId, pageSize, offset],
   );
   const [[{ total }]] = await pool.query(
@@ -177,8 +177,7 @@ export async function insertGeneratedVideo({ userId, taskId, type, platform, ori
 export async function listGeneratedVideos(userId, { page = 1, pageSize = 20 }) {
   const { offset } = parsePagination({ page, pageSize });
   const [rows] = await pool.query(
-    'SELECT * FROM ?? WHERE user_id = ? ORDER BY create_time DESC LIMIT ? OFFSET ?',
-    ['generated_video', userId, pageSize, offset],
+    'SELECT id, user_id, task_id, type, platform, original_url, result_url, thumbnail_url, duration, width, height, file_size, has_bgm, has_subtitle, params_json, create_time FROM ?? WHERE user_id = ? ORDER BY create_time DESC LIMIT ? OFFSET ?',
   );
   const [[{ total }]] = await pool.query(
     'SELECT COUNT(*) AS total FROM ?? WHERE user_id = ?',

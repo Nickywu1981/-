@@ -16,18 +16,18 @@ const TABLE = {
 export async function findTenantById(id, conn, forUpdate = false) {
   const db = conn || pool;
   const lock = forUpdate ? ' FOR UPDATE' : '';
-  const [rows] = await db.query(`SELECT * FROM ?? WHERE id = ? AND status = 1 LIMIT 1${lock}`, [TABLE.TENANT, id]);
+  const [rows] = await db.query(`SELECT id, name, code, type, parent_tenant_id, logo, domain, white_label, plan_type, status, review_status, contact_name, contact_phone, contact_email, address, max_users, quota_images, quota_video, balance, commission_rate, expire_time, qualification_docs, create_time, update_time FROM ?? WHERE id = ? AND status = 1 LIMIT 1${lock}`, [TABLE.TENANT, id]);
   return rows[0] || null;
 }
 
 export async function findTenantByCode(code) {
-  const [rows] = await pool.query('SELECT * FROM ?? WHERE code = ? AND status = 1 LIMIT 1', [TABLE.TENANT, code]);
+  const [rows] = await pool.query('SELECT id, name, code, type, parent_tenant_id, logo, domain, white_label, plan_type, status, review_status, contact_name, contact_phone, contact_email, address, max_users, quota_images, quota_video, balance, commission_rate, expire_time, qualification_docs, create_time, update_time FROM ?? WHERE code = ? AND status = 1 LIMIT 1', [TABLE.TENANT, code]);
   return rows[0] || null;
 }
 
 export async function findTenantByDomain(domain) {
   const [rows] = await pool.query(
-    'SELECT * FROM ?? WHERE JSON_EXTRACT(white_label, "$.domain") = ? AND status = 1 LIMIT 1',
+    'SELECT id, name, code, type, parent_tenant_id, logo, domain, white_label, plan_type, status, review_status, contact_name, contact_phone, contact_email, address, max_users, quota_images, quota_video, balance, commission_rate, expire_time, qualification_docs, create_time, update_time FROM ?? WHERE JSON_EXTRACT(white_label, "$.domain") = ? AND status = 1 LIMIT 1',
     [TABLE.TENANT, domain],
   );
   return rows[0] || null;
@@ -85,7 +85,7 @@ export async function listTenants({ page = 1, pageSize = 20, type, status, keywo
   const [countResult] = await pool.query(`SELECT COUNT(*) AS total FROM ?? WHERE ${where}`, [TABLE.TENANT, ...params]);
   const total = countResult[0].total;
   const { offset } = parsePagination({ page, pageSize });
-  const [rows] = await pool.query(`SELECT * FROM ?? WHERE ${where} ORDER BY create_time DESC LIMIT ? OFFSET ?`, [TABLE.TENANT, ...params, pageSize, offset]);
+  const [rows] = await pool.query(  const [rows] = await pool.query(`SELECT id, name, code, type, parent_tenant_id, logo, domain, white_label, plan_type, status, review_status, contact_name, contact_phone, contact_email, address, max_users, quota_images, quota_video, balance, commission_rate, expire_time, qualification_docs, create_time, update_time FROM ?? WHERE ${where} ORDER BY create_time DESC LIMIT ? OFFSET ?`, [TABLE.TENANT, ...params, pageSize, offset]);
   return { list: rows, total, page, pageSize };
 }
 
@@ -93,7 +93,7 @@ export async function listTenants({ page = 1, pageSize = 20, type, status, keywo
 
 export async function findEnterpriseUser(tenantId, userId) {
   const [rows] = await pool.query(
-    'SELECT * FROM ?? WHERE tenant_id = ? AND user_id = ? AND is_deleted = 0 LIMIT 1',
+    'SELECT id, tenant_id, user_id, role, permissions, status, is_deleted, create_time, update_time FROM ?? WHERE tenant_id = ? AND user_id = ? AND is_deleted = 0 LIMIT 1',
     [TABLE.ENTERPRISE_USER, tenantId, userId],
   );
   return rows[0] || null;
@@ -101,7 +101,7 @@ export async function findEnterpriseUser(tenantId, userId) {
 
 export async function findEnterpriseUserByUserId(userId) {
   const [rows] = await pool.query(
-    'SELECT * FROM ?? WHERE user_id = ? AND is_deleted = 0 LIMIT 1',
+    'SELECT id, tenant_id, user_id, role, permissions, status, is_deleted, create_time, update_time FROM ?? WHERE user_id = ? AND is_deleted = 0 LIMIT 1',
     [TABLE.ENTERPRISE_USER, userId],
   );
   return rows[0] || null;
@@ -169,7 +169,7 @@ export async function listTenantsByReviewStatus(status, { page = 1, pageSize = 2
   const [countResult] = await pool.query(`SELECT COUNT(*) AS total FROM ?? WHERE ${where}`, [TABLE.TENANT, ...params]);
   const total = countResult[0].total;
   const { offset } = parsePagination({ page, pageSize });
-  const [rows] = await pool.query(`SELECT * FROM ?? WHERE ${where} ORDER BY create_time DESC LIMIT ? OFFSET ?`, [TABLE.TENANT, ...params, pageSize, offset]);
+  const [rows] = await pool.query(  const [rows] = await pool.query(`SELECT id, name, code, type, parent_tenant_id, logo, domain, white_label, plan_type, status, review_status, contact_name, contact_phone, contact_email, address, max_users, quota_images, quota_video, balance, commission_rate, expire_time, qualification_docs, create_time, update_time FROM ?? WHERE ${where} ORDER BY create_time DESC LIMIT ? OFFSET ?`, [TABLE.TENANT, ...params, pageSize, offset]);
   return { list: rows, total, page, pageSize };
 }
 
