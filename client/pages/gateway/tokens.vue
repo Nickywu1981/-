@@ -3,23 +3,23 @@
   <div class="pg">
     <div class="page-header">
       <div>
-        <h1 class="page-header-title">Token 消耗统计</h1>
-        <p class="page-header-subtitle">今日消耗 {{ todayTokens }}</p>
+        <h1 class="page-header-title">{{ $t('gateway.tokens_title') }}</h1>
+        <p class="page-header-subtitle">{{ $t('gateway.tokens_subtitle', { n: todayTokens }) }}</p>
       </div>
     </div>
 
     <div class="stat-grid" style="margin-bottom:var(--space-6)">
-      <div class="stat-card"><div class="stat-card-value">1,250,800</div><div class="stat-card-label">本月 Token</div><div class="stat-card-trend up">↑ 18%</div></div>
-      <div class="stat-card"><div class="stat-card-value">¥8,230</div><div class="stat-card-label">本月费用</div><div class="stat-card-trend up">↑ 12%</div></div>
-      <div class="stat-card"><div class="stat-card-value">0.0065</div><div class="stat-card-label">均价/Token</div></div>
+      <div class="stat-card"><div class="stat-card-value">1,250,800</div><div class="stat-card-label">{{ $t('gateway.tokens_stat_month_tokens') }}</div><div class="stat-card-trend up">↑ 18%</div></div>
+      <div class="stat-card"><div class="stat-card-value">¥8,230</div><div class="stat-card-label">{{ $t('gateway.tokens_stat_month_cost') }}</div><div class="stat-card-trend up">↑ 12%</div></div>
+      <div class="stat-card"><div class="stat-card-value">0.0065</div><div class="stat-card-label">{{ $t('gateway.tokens_stat_avg_price') }}</div></div>
     </div>
 
     <div class="chart-card">
-      <div class="chart-card-header"><span class="chart-card-title">消耗明细</span></div>
+      <div class="chart-card-header"><span class="chart-card-title">{{ $t('gateway.tokens_detail_title') }}</span></div>
       <div class="chart-card-body" style="padding:0">
         <div class="table-container" style="border:none;border-radius:0">
           <table class="data-table">
-            <thead><tr><th>模型</th><th>调用次数</th><th>Token 消耗</th><th>费用</th><th>占比</th></tr></thead>
+            <thead><tr><th>{{ $t('gateway.tokens_col_model') }}</th><th>{{ $t('gateway.tokens_col_calls') }}</th><th>{{ $t('gateway.tokens_col_tokens') }}</th><th>{{ $t('gateway.tokens_col_cost') }}</th><th>{{ $t('gateway.tokens_col_pct') }}</th></tr></thead>
             <tbody>
               <tr v-for="m in models" :key="m.name">
                 <td>{{ m.name }}</td><td>{{ m.calls }}</td><td>{{ m.tokens }}</td><td>¥{{ m.cost }}</td>

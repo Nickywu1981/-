@@ -3,15 +3,15 @@
   <div class="pg">
     <div class="page-header">
       <div>
-        <h1 class="page-header-title">访问日志</h1>
-        <p class="page-header-subtitle">实时 API 调用日志、错误监控</p>
+        <h1 class="page-header-title">{{ $t('gateway.access_log_title') }}</h1>
+        <p class="page-header-subtitle">{{ $t('gateway.access_log_subtitle') }}</p>
       </div>
-      <input class="search-input" v-model="search" placeholder="搜索路径或 IP..." style="width:240px" />
+      <input class="search-input" v-model="search" :placeholder="$t('gateway.access_log_search')" style="width:240px" />
     </div>
 
     <div class="card">
       <table class="data-table">
-        <thead><tr><th>时间</th><th>方法</th><th>路径</th><th>状态码</th><th>耗时</th><th>IP</th><th>User-Agent</th></tr></thead>
+        <thead><tr><th>{{ $t('gateway.access_log_col_time') }}</th><th>{{ $t('gateway.access_log_col_method') }}</th><th>{{ $t('gateway.access_log_col_path') }}</th><th>{{ $t('gateway.access_log_col_status') }}</th><th>{{ $t('gateway.access_log_col_duration') }}</th><th>{{ $t('gateway.access_log_col_ip') }}</th><th>{{ $t('gateway.access_log_col_ua') }}</th></tr></thead>
         <tbody>
           <tr v-for="log in filteredLogs" :key="log.id">
             <td>{{ log.time }}</td><td><span class="badge badge-info">{{ log.method }}</span></td>
