@@ -1,7 +1,7 @@
 <template>
   <div class="size-templates-page">
-    <h1>电商平台尺寸模板</h1>
-    <p class="subtitle">一键套用各大平台的图片尺寸标准，再也不用担心传错尺寸被拒</p>
+    <h1>{{ $t('work_pages.size_templates.title') }}</h1>
+    <p class="subtitle">{{ $t('work_pages.size_templates.subtitle') }}</p>
     <LoadingSkeleton v-if="loading" type="card" :rows="4" />
     <div v-else-if="platformSizes.length" class="platform-grid">
       <div v-for="p in platformSizes" :key="p.platform" class="platform-card" @click="selectPlatform(p)">
@@ -12,7 +12,7 @@
       </div>
     </div>
     <div v-if="selected" class="selected-platform">
-      <h2>{{ selected.icon || '📐' }} {{ selected.platform }} — 尺寸详情</h2>
+      <h2>{{ selected.icon || '📐' }} {{ selected.platform }}{{ $t('work_pages.size_templates.detail_title') }}</h2>
       <div class="size-detail-grid">
         <div v-for="s in (selected.sizes || [])" :key="s.name" class="size-detail-card" @click="useTemplate(s)">
           <div class="size-label">{{ s.name }}</div>

@@ -25,7 +25,7 @@
         <h3 class="card-title">{{ t.title }}</h3>
         <p class="card-code monospace">{{ t.template_code }}</p>
         <p class="card-tags" v-if="t.tags">{{ (t.tags || '').split(',').filter(Boolean).slice(0,3).join(' · ') }}</p>
-        <p class="card-meta">更新于 {{ (t.update_time || t.create_time || '').slice(0, 10) }}</p>
+        <p class="card-meta">{{ $t('work_pages.my_templates_updated_prefix') }}{{ (t.update_time || t.create_time || '').slice(0, 10) }}</p>
         <div class="card-actions">
           <button class="btn-sm btn-primary" @click="openEdit(t)">{{ $t('work_pages.my_templates_btn_edit') }}</button>
           <button v-if="t.status === 0" class="btn-sm success" @click="submitTemplate(t.id)">{{ $t('work_pages.my_templates_btn_submit') }}</button>
@@ -41,7 +41,6 @@
 
     <Pagination v-if="total > pageSize" :page="page" :page-size="pageSize" :total="total" @change="onPageChange" />
 
-    <!-- 编辑弹窗 -->
     <Teleport to="body">
       <div class="modal-overlay" v-if="showModal" @click.self="showModal = false" @keydown.escape="showModal = false">
         <div class="modal">
@@ -160,11 +159,27 @@ async function confirmDelete(tmpl: any) {
 }
 
 function categoryLabel(c: string) {
-  const map: Record<string, string> = { image: '图片类', text: '文案类', video: '视频类', voice: '语音类', detail: '详情页', main_image: '主图', scene: '场景图', copy: '文案', script: '脚本', 'viral-clone': '爆款复刻' }
+  const map: Record<string, string> = {
+    image: t('work_pages.my_templates_category_image'),
+    text: t('work_pages.my_templates_category_text'),
+    video: t('work_pages.my_templates_category_video'),
+    voice: t('work_pages.my_templates_category_voice'),
+    detail: t('work_pages.my_templates_category_detail'),
+    main_image: t('work_pages.my_templates_category_main_image'),
+    scene: t('work_pages.my_templates_category_scene'),
+    copy: t('work_pages.my_templates_category_copy'),
+    script: t('work_pages.my_templates_category_script'),
+    'viral-clone': t('work_pages.my_templates_category_viral_clone'),
+  }
   return map[c] || c
 }
 function statusLabel(s: number) {
-  const map: Record<number, string> = { 0: '草稿', 1: '待审核', 2: '已收录', 3: '已驳回' }
+  const map: Record<number, string> = {
+    0: t('work_pages.my_templates_status_draft'),
+    1: t('work_pages.my_templates_status_pending'),
+    2: t('work_pages.my_templates_status_approved'),
+    3: t('work_pages.my_templates_status_rejected'),
+  }
   return map[s] || String(s)
 }
 function statusClass(s: number) {

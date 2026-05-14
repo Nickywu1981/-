@@ -1,23 +1,23 @@
 <template>
-  <WorkLayout title="作品输出" subtitle="批量导出与发布">
+  <WorkLayout :title="$t('work_pages.output.title')" :subtitle="$t('work_pages.output.subtitle')">
     <LoadingSkeleton v-if="loading" type="card" :rows="4" />
     <template v-else-if="items.length">
       <div class="output-list">
         <div v-for="item in items" :key="item.id" class="output-item">
           <div class="item-info">
-            <span class="name">{{ item.name || item.task_code || `任务 #${item.id}` }}</span>
-            <span class="type-tag">{{ item.type || item.task_type || '图片' }}</span>
+            <span class="name">{{ item.name || item.task_code || $t('work_pages.output.task_label', { id: item.id }) }}</span>
+            <span class="type-tag">{{ item.type || item.task_type || $t('work_pages.output.type_default') }}</span>
             <span class="status-tag" :class="statusClass(item.status)">{{ statusLabel(item.status) }}</span>
           </div>
           <div class="item-actions">
             <span class="item-date">{{ item.create_time?.slice(0,10) || '-' }}</span>
-            <button v-if="item.result_url" class="btn-sm" @click="downloadItem(item)">下载</button>
+            <button v-if="item.result_url" class="btn-sm" @click="downloadItem(item)">{{ $t('work_pages.output.download') }}</button>
           </div>
         </div>
       </div>
-      <button class="btn-export" @click="exportAll">全部导出</button>
+      <button class="btn-export" @click="exportAll">{{ $t('work_pages.output.export_all') }}</button>
     </template>
-    <div v-else class="empty">暂无作品，完成创作后作品将显示在此</div>
+    <div v-else class="empty">{{ $t('work_pages.output.empty') }}</div>
   </WorkLayout>
 </template>
 <script setup lang="ts">const { t } = useI18n()
@@ -28,7 +28,7 @@ const toast = useToast()
 const { download } = useFileDownload()
 
 function statusLabel(s: string) {
-  return { pending:'排队中', processing:'处理中', completed:'已完成', failed:'失败', cancelled:'已取消' }[s] || s || '未知'
+  return { pending: t('work_pages.output.status_pending'), processing: t('work_pages.output.status_processing'), completed: t('work_pages.output.status_completed'), failed: t('work_pages.output.status_failed'), cancelled: t('work_pages.output.status_cancelled') }[s] || s || t('work_pages.output.status_unknown')
 }
 function statusClass(s: string) {
   return { completed:'done', processing:'proc', failed:'fail', pending:'pend', cancelled:'cancel' }[s] || ''
@@ -45,13 +45,13 @@ onMounted(async () => {
 
 function downloadItem(item: any) {
   if (!item.result_url) return
-  download(item.result_url, item.name || `output_${item.id}.png`)
+  download(item.result_url, item.name || t('work_pages.output.output_filename', { id: item.id }))
 }
 
 function exportAll() {
   const downloadable = items.value.filter(i => i.result_url)
   if (!downloadable.length) { toast.warn(t('common.no_downloadable_works')); return }
-  toast.info(`正在导出 ${downloadable.length} 个文件...`)
+  toast.info(t('work_pages.output.exporting', { n: downloadable.length }))
   downloadable.forEach((item, i) => {
     const tid = setTimeout(() => downloadItem(item), i * 300)
     _timeoutIds.push(tid)

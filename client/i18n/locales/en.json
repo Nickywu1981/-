@@ -5066,7 +5066,8 @@
       "dimensions_exists": "Available",
       "dimensions_none": "-",
       "work_label": "Task #{id}",
-      "load_failed": "Failed to load configuration"
+      "load_failed": "Failed to load configuration",
+      "preview_alt": "[EN] 预览"
     },
     "cut_ecosystem": {
       "title": "Jianying/CapCut Integration",
@@ -5496,7 +5497,7 @@
     "my_templates_status_draft": "Draft",
     "my_templates_status_pending": "Pending Review",
     "my_templates_status_approved": "Approved",
-    "my_templates_status_rejected": "Rejected",
+    "my_templates_status_rejected": "[EN] 已驳回",
     "my_templates_cat_detail": "Detail Page",
     "my_templates_cat_main_image": "Main Image",
     "my_templates_cat_scene": "Scene Image",
@@ -6809,6 +6810,39 @@
       "create_blank": "[EN] + 创建空白页面",
       "error_load_industries": "[EN] 加载行业失败",
       "error_load_templates": "[EN] 加载模板失败"
+    },
+    "my_templates_category_image": "[EN] 图片类",
+    "my_templates_category_text": "[EN] 文案类",
+    "my_templates_category_video": "[EN] 视频类",
+    "my_templates_category_voice": "[EN] 语音类",
+    "my_templates_category_detail": "[EN] 详情页",
+    "my_templates_category_main_image": "[EN] 主图",
+    "my_templates_category_scene": "[EN] 场景图",
+    "my_templates_category_copy": "[EN] 文案",
+    "my_templates_category_script": "[EN] 脚本",
+    "my_templates_category_viral_clone": "[EN] 爆款复刻",
+    "my_templates_updated_prefix": "[EN] 更新于 ",
+    "output": {
+      "title": "[EN] 作品输出",
+      "subtitle": "[EN] 批量导出与发布",
+      "type_default": "[EN] 图片",
+      "status_pending": "[EN] 排队中",
+      "status_processing": "[EN] 处理中",
+      "status_completed": "[EN] 已完成",
+      "status_failed": "[EN] 失败",
+      "status_cancelled": "[EN] 已取消",
+      "status_unknown": "[EN] 未知",
+      "download": "[EN] 下载",
+      "export_all": "[EN] 全部导出",
+      "empty": "[EN] 暂无作品，完成创作后作品将显示在此",
+      "exporting": "[EN] 正在导出 {n} 个文件...",
+      "task_label": "[EN] 任务 #{id}",
+      "output_filename": "[EN] output_{id}.png"
+    },
+    "size_templates": {
+      "title": "[EN] 电商平台尺寸模板",
+      "subtitle": "[EN] 一键套用各大平台的图片尺寸标准，再也不用担心传错尺寸被拒",
+      "detail_title": "[EN]  — 尺寸详情"
     }
   },
   "promptEnhancer": {

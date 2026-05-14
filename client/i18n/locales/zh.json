@@ -4937,7 +4937,8 @@
       "dimensions_exists": "已有",
       "dimensions_none": "-",
       "work_label": "任务 #{id}",
-      "load_failed": "加载配置失败"
+      "load_failed": "加载配置失败",
+      "preview_alt": "预览"
     },
     "cut_ecosystem": {
       "title": "剪映/CapCut 生态对接",
@@ -6626,6 +6627,39 @@
       "create_blank": "+ 创建空白页面",
       "error_load_industries": "加载行业失败",
       "error_load_templates": "加载模板失败"
+    },
+    "my_templates_category_image": "图片类",
+    "my_templates_category_text": "文案类",
+    "my_templates_category_video": "视频类",
+    "my_templates_category_voice": "语音类",
+    "my_templates_category_detail": "详情页",
+    "my_templates_category_main_image": "主图",
+    "my_templates_category_scene": "场景图",
+    "my_templates_category_copy": "文案",
+    "my_templates_category_script": "脚本",
+    "my_templates_category_viral_clone": "爆款复刻",
+    "my_templates_updated_prefix": "更新于 ",
+    "output": {
+      "title": "作品输出",
+      "subtitle": "批量导出与发布",
+      "type_default": "图片",
+      "status_pending": "排队中",
+      "status_processing": "处理中",
+      "status_completed": "已完成",
+      "status_failed": "失败",
+      "status_cancelled": "已取消",
+      "status_unknown": "未知",
+      "download": "下载",
+      "export_all": "全部导出",
+      "empty": "暂无作品，完成创作后作品将显示在此",
+      "exporting": "正在导出 {n} 个文件...",
+      "task_label": "任务 #{id}",
+      "output_filename": "output_{id}.png"
+    },
+    "size_templates": {
+      "title": "电商平台尺寸模板",
+      "subtitle": "一键套用各大平台的图片尺寸标准，再也不用担心传错尺寸被拒",
+      "detail_title": " — 尺寸详情"
     }
   },
   "promptEnhancer": {

@@ -5,42 +5,39 @@
       <p>{{ $t('work_pages.compare.subtitle') }}</p>
     </header>
 
-    <!-- 模式切换 -->
     <div class="mode-bar">
       <button v-for="m in modes" :key="m.key" class="mode-btn" :class="{ active: mode === m.key }" @click="mode = m.key">
         {{ m.icon }} {{ m.label }}
       </button>
     </div>
 
-    <!-- 双图并排模式 -->
     <div v-if="mode === 'side'" class="side-panel">
       <div class="compare-row">
         <div class="compare-col">
           <div class="col-label">{{ $t('work_pages.compare.original_label') }}</div>
-          <ImageSlot :src="original.src" :alt="original.alt" :title="original.title" :empty-text="$t('work_pages.compare_ext.pick_hint_original')" @click="openPicker('original')" />
-          <button class="pick-btn" @click="openPicker('original')">{{ $t('work_pages.compare.select_original') }}<button>
+          <ImageSlot :src="original.src" :alt="original.alt" :title="original.title" :empty-text="$t('work_pages.compare.pick_hint_original')" @click="openPicker('original')" />
+          <button class="pick-btn" @click="openPicker('original')">{{ $t('work_pages.compare.select_original') }}</button>
         </div>
         <div class="compare-col">
           <div class="col-label">{{ $t('work_pages.compare.variant_label') }}</div>
-          <ImageSlot :src="variant.src" :alt="variant.alt" :title="variant.title" :empty-text="$t('work_pages.compare_ext.pick_hint_variant')" @click="openPicker('variant')" />
-          <button class="pick-btn" @click="openPicker('variant')">{{ $t('work_pages.compare.select_variant') }}<button>
+          <ImageSlot :src="variant.src" :alt="variant.alt" :title="variant.title" :empty-text="$t('work_pages.compare.pick_hint_variant')" @click="openPicker('variant')" />
+          <button class="pick-btn" @click="openPicker('variant')">{{ $t('work_pages.compare.select_variant') }}</button>
         </div>
       </div>
       <div class="compare-actions">
-        <button class="btn btn-ghost" @click="downloadBoth">{{ $t('work_pages.compare.download_both') }}<button>
+        <button class="btn btn-ghost" @click="downloadBoth">{{ $t('work_pages.compare.download_both') }}</button>
         <span class="ratio-hint" v-if="original.src && variant.src">{{ $t('work_pages.compare.dimensions') }}: {{ originalDims }} / {{ variantDims }}</span>
       </div>
     </div>
 
-    <!-- 滑动覆盖对比模式 -->
     <div v-else-if="mode === 'slider'" class="slider-panel">
       <div class="slider-compare" ref="sliderRef" @mousemove="onSliderMove" @touchmove.prevent="onSliderTouch" @mouseleave="sliding = false" @mouseup="sliding = false">
-        <img loading="lazy" v-if="variant.src" :src="variant.src" class="slider-bg" alt="生成图" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
-        <img loading="lazy" v-if="original.src" :src="original.src" class="slider-fg" alt="原图" :style="{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+        <img loading="lazy" v-if="variant.src" :src="variant.src" class="slider-bg" :alt="$t('work_pages.compare.variant_label')" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+        <img loading="lazy" v-if="original.src" :src="original.src" class="slider-fg" :alt="$t('work_pages.compare.original_label')" :style="{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
         <div v-if="original.src && variant.src" class="slider-line" :style="{ left: sliderPos + '%' }">
           <div class="slider-handle">⟷</div>
         </div>
-        <div v-if="!original.src || !variant.src" class="slider-empty">{{ $t('work_pages.compare_ext.pick_empty') }}</div>
+        <div v-if="!original.src || !variant.src" class="slider-empty">{{ $t('work_pages.compare.pick_empty') }}</div>
       </div>
       <div class="slider-labels">
         <span>{{ $t('work_pages.compare.original_label') }}</span>
@@ -48,67 +45,64 @@
         <span>{{ $t('work_pages.compare.variant_label') }}</span>
       </div>
       <div class="compare-actions">
-        <button class="pick-btn" @click="openPicker('original')">{{ $t('work_pages.compare_ext.replace_original') }}<button>
-        <button class="pick-btn" @click="openPicker('variant')">{{ $t('work_pages.compare_ext.replace_variant') }}<button>
+        <button class="pick-btn" @click="openPicker('original')">{{ $t('work_pages.compare.replace_original') }}</button>
+        <button class="pick-btn" @click="openPicker('variant')">{{ $t('work_pages.compare.replace_variant') }}</button>
       </div>
     </div>
 
-    <!-- 多图网格对比模式 -->
     <div v-else class="grid-panel">
       <div class="grid-header">
-        <span>{{ $t('work_pages.compare_ext.max_six') }}<span>
-        <button class="btn btn-ghost btn-sm" @click="addGridSlot" :disabled="gridSlots.length >= 6">{{ $t('work_pages.compare_ext.add_image') }}<button>
+        <span>{{ $t('work_pages.compare.max_six') }}</span>
+        <button class="btn btn-ghost btn-sm" @click="addGridSlot" :disabled="gridSlots.length >= 6">{{ $t('work_pages.compare.add_image') }}</button>
       </div>
       <div class="grid-compare" :style="{ gridTemplateColumns: `repeat(${gridCols}, 1fr)` }">
         <div v-for="(slot, i) in gridSlots" :key="i" class="grid-col">
-          <ImageSlot :src="slot.src" :alt="slot.alt" :title="slot.label" :empty-text="$t('work_pages.compare_ext.pick_hint_click')" size="sm" @click="openGridPicker(i)" />
+          <ImageSlot :src="slot.src" :alt="slot.alt" :title="slot.label" :empty-text="$t('work_pages.compare.pick_hint_click')" size="sm" @click="openGridPicker(i)" />
           <div class="grid-meta">
-            <input v-model="slot.label" class="label-input" :placeholder="$t('work_pages.compare_ext.label_placeholder')" maxlength="50" />
-            <button class="btn-remove" @click="removeGridSlot(i)" title="移除" aria-label="移除">✕</button>
+            <input v-model="slot.label" class="label-input" :placeholder="$t('work_pages.compare.label_placeholder')" maxlength="50" />
+            <button class="btn-remove" @click="removeGridSlot(i)" :title="$t('work_pages.compare.remove')" :aria-label="$t('work_pages.compare.remove')">✕</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 图片选择弹窗 -->
     <Teleport to="body">
       <div v-if="pickerOpen" class="picker-overlay" @click.self="pickerOpen = false" @keydown.escape="pickerOpen = false">
         <div class="picker-modal">
           <div class="picker-header">
-            <h3>{{ pickerTarget === 'original' ? '选择原图' : pickerTarget === 'variant' ? '选择生成图' : '选择图片' }}</h3>
-            <button class="picker-close" @click="pickerOpen = false" aria-label="关闭">✕</button>
+            <h3>{{ pickerTitle }}</h3>
+            <button class="picker-close" @click="pickerOpen = false" :aria-label="$t('work_pages.compare.close')">✕</button>
           </div>
           <div class="picker-tabs">
-            <button class="tab-btn" :class="{ active: pickerTab === 'works' }" @click="pickerTab = 'works'">{{ $t('work_pages.compare_ext.my_works') }}<button>
-            <button class="tab-btn" :class="{ active: pickerTab === 'upload' }" @click="pickerTab = 'upload'">{{ $t('work_pages.compare_ext.upload_new') }}<button>
+            <button class="tab-btn" :class="{ active: pickerTab === 'works' }" @click="pickerTab = 'works'">{{ $t('work_pages.compare.my_works') }}</button>
+            <button class="tab-btn" :class="{ active: pickerTab === 'upload' }" @click="pickerTab = 'upload'">{{ $t('work_pages.compare.upload_new') }}</button>
           </div>
           <div v-if="pickerTab === 'works'" class="picker-body">
             <LoadingSkeleton v-if="worksLoading" type="card" :rows="4" />
-            <div v-else-if="!works.length" class="empty">{{ $t('work_pages.compare_ext.no_works') }}<div>
+            <div v-else-if="!works.length" class="empty">{{ $t('work_pages.compare.no_works') }}</div>
             <div v-else class="works-grid">
               <div v-for="w in works" :key="w.id" class="work-card" :class="{ selected: pickerSelected === w.id }" @click="pickerSelected = w.id">
-                <img loading="lazy" :src="w.result_url || w.output_result?.images?.[0]?.url" :alt="w.task_code || `#${w.id}`" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
-                <span class="work-label">{{ w.task_code || `任务 #${w.id}` }}</span>
+                <img loading="lazy" :src="w.result_url || w.output_result?.images?.[0]?.url" :alt="w.task_code || $t('work_pages.compare.work_label', { id: w.id })" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+                <span class="work-label">{{ w.task_code || $t('work_pages.compare.work_label', { id: w.id }) }}</span>
               </div>
             </div>
           </div>
           <div v-else class="picker-body upload-tab">
             <div class="dropzone" @dragover.prevent @drop.prevent="handleUploadDrop" @click="uploadInput?.click()">
-              <p>{{ $t('work_pages.compare_ext.drag_upload') }}<p>
+              <p>{{ $t('work_pages.compare.drag_upload') }}</p>
               <input ref="uploadInput" type="file" accept="image/*" hidden @change="handleUploadFile" />
             </div>
-            <img loading="lazy" v-if="uploadPreview" :src="uploadPreview" class="upload-preview" alt="预览" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+            <img loading="lazy" v-if="uploadPreview" :src="uploadPreview" class="upload-preview" :alt="$t('work_pages.compare.preview_alt')" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
             <p v-if="uploadingMsg" class="hint">{{ uploadingMsg }}</p>
           </div>
           <div class="picker-footer">
-            <button class="btn btn-ghost" @click="pickerOpen = false">{{ $t('work_pages.compare_ext.cancel') }}<button>
-            <button class="btn btn-primary" :disabled="!pickerSelected && !uploadedUrl" @click="confirmPicker">{{ $t('work_pages.compare_ext.confirm') }}<button>
+            <button class="btn btn-ghost" @click="pickerOpen = false">{{ $t('work_pages.compare.cancel') }}</button>
+            <button class="btn btn-primary" :disabled="!pickerSelected && !uploadedUrl" @click="confirmPicker">{{ $t('work_pages.compare.confirm') }}</button>
           </div>
         </div>
       </div>
     </Teleport>
 
-    <!-- 图片灯箱 -->
     <ImageLightbox ref="lightboxRef" />
   </div>
 </template>
@@ -121,19 +115,17 @@ const toast = useToast()
 const { t } = useI18n()
 
 const mode = ref<'side' | 'slider' | 'grid'>('side')
-const modes = [
-  { key: 'side' as const, label: '并排对比', icon: '⇆' },
-  { key: 'slider' as const, label: '滑动覆盖', icon: '⟷' },
-  { key: 'grid' as const, label: '多图网格', icon: '⊞' },
-]
+const modes = computed(() => [
+  { key: 'side' as const, label: t('work_pages.compare.modes_side'), icon: '⇆' },
+  { key: 'slider' as const, label: t('work_pages.compare.modes_slider'), icon: '⟷' },
+  { key: 'grid' as const, label: t('work_pages.compare.modes_grid'), icon: '⊞' },
+])
 
-// --- Image slots ---
 const original = reactive({ src: '', alt: '', title: '' })
 const variant = reactive({ src: '', alt: '', title: '' })
-const originalDims = computed(() => original.src ? $t('work_pages.compare_ext.dimensions_exists') : '-')
-const variantDims = computed(() => variant.src ? $t('work_pages.compare_ext.dimensions_exists') : '-')
+const originalDims = computed(() => original.src ? t('work_pages.compare.dimensions_exists') : '-')
+const variantDims = computed(() => variant.src ? t('work_pages.compare.dimensions_exists') : '-')
 
-// --- Slider ---
 const sliderPos = ref(50)
 const sliding = ref(false)
 const sliderRef = ref<HTMLElement | null>(null)
@@ -148,19 +140,23 @@ function onSliderTouch(e: TouchEvent) {
   sliderPos.value = Math.max(0, Math.min(100, ((e.touches[0].clientX - rect.left) / rect.width) * 100))
 }
 
-// --- Grid ---
 const gridSlots = reactive<{ src: string; alt: string; label: string }[]>([])
 const gridCols = computed(() => Math.min(gridSlots.length || 1, 3))
 function addGridSlot() { if (gridSlots.length < 6) gridSlots.push({ src: '', alt: '', label: '' }) }
 function removeGridSlot(i: number) { gridSlots.splice(i, 1) }
 
-// --- Picker ---
 const pickerOpen = ref(false)
 const pickerTarget = ref<'original' | 'variant' | number>('original')
 const pickerTab = ref<'works' | 'upload'>('works')
 const pickerSelected = ref('')
 const gridPickerIndex = ref(-1)
 const { download } = useFileDownload()
+
+const pickerTitle = computed(() =>
+  pickerTarget.value === 'original' ? t('work_pages.compare.pick_original') :
+  pickerTarget.value === 'variant' ? t('work_pages.compare.pick_variant') :
+  t('work_pages.compare.pick_image')
+)
 
 const works = ref<any[]>([])
 const worksLoading = ref(false)
@@ -213,12 +209,12 @@ function confirmPicker() {
   if (!url) return
 
   if (pickerTarget.value === 'original') {
-    original.src = url; original.alt = '原图'; original.title = '原图'
+    original.src = url; original.alt = t('work_pages.compare.original_label'); original.title = t('work_pages.compare.original_label')
   } else if (pickerTarget.value === 'variant') {
-    variant.src = url; variant.alt = '生成图'; variant.title = '生成图'
+    variant.src = url; variant.alt = t('work_pages.compare.variant_label'); variant.title = t('work_pages.compare.variant_label')
   } else if (typeof pickerTarget.value === 'number') {
     const i = pickerTarget.value as number
-    if (gridSlots[i]) { gridSlots[i].src = url; gridSlots[i].alt = `图片 ${i + 1}` }
+    if (gridSlots[i]) { gridSlots[i].src = url; gridSlots[i].alt = `${t('work_pages.compare.pick_image')} ${i + 1}` }
   }
   pickerOpen.value = false
 }
@@ -227,25 +223,25 @@ async function handleUploadFile(e: Event) {
   const f = (e.target as HTMLInputElement).files?.[0]
   if (!f) return
   uploadPreview.value = createBlobUrl(f)
-  uploadingMsg.value = $t('work_pages.compare_ext.uploading')
+  uploadingMsg.value = t('work_pages.compare.uploading')
   const fd = new FormData(); fd.append('file', f)
   try {
     const res: any = await $fetch('/api/upload/image', { method: 'POST', credentials: 'include', body: fd })
     uploadedUrl.value = res.data?.url
-    uploadingMsg.value = $t('work_pages.compare_ext.upload_done')
+    uploadingMsg.value = t('work_pages.compare.upload_done')
     pickerSelected.value = ''
-  } catch { uploadingMsg.value = $t('work_pages.compare_ext.upload_failed') }
+  } catch { uploadingMsg.value = t('work_pages.compare.upload_failed') }
 }
 
 function handleUploadDrop(e: DragEvent) {
   const f = e.dataTransfer?.files?.[0]
   if (!f) return
   uploadPreview.value = createBlobUrl(f)
-  uploadingMsg.value = $t('work_pages.compare_ext.uploading')
+  uploadingMsg.value = t('work_pages.compare.uploading')
   const fd = new FormData(); fd.append('file', f)
   $fetch('/api/upload/image', { method: 'POST', credentials: 'include', body: fd })
-    .then((res: any) => { uploadedUrl.value = res.data?.url; uploadingMsg.value = $t('work_pages.compare_ext.upload_done'); pickerSelected.value = '' })
-    .catch((e: any) => { uploadingMsg.value = $t('work_pages.compare_ext.upload_failed'); toast.error(e?.data?.msg || $t('work_pages.compare_ext.upload_failed')) })
+    .then((res: any) => { uploadedUrl.value = res.data?.url; uploadingMsg.value = t('work_pages.compare.upload_done'); pickerSelected.value = '' })
+    .catch((e: any) => { uploadingMsg.value = t('work_pages.compare.upload_failed'); toast.error(e?.data?.msg || t('work_pages.compare.upload_failed')) })
 }
 
 function downloadBoth() {
@@ -262,13 +258,11 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 .compare-header h1 { font-size: 24px; font-weight: 700; color: var(--text-primary); }
 .compare-header p { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
 
-/* Mode bar */
 .mode-bar { display: flex; justify-content: center; gap: 8px; margin-bottom: 24px; }
 .mode-btn { padding: 8px 20px; border: 1px solid var(--border-light); border-radius: var(--radius-md); background: var(--bg-card); color: var(--text-secondary); cursor: pointer; font-size: 14px; transition: border-color 0.15s, color 0.15s, background 0.15s; }
 .mode-btn:hover { border-color: var(--brand); color: var(--brand); }
 .mode-btn.active { background: var(--brand); color: #fff; border-color: var(--brand); }
 
-/* Side-by-side */
 .compare-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
 .compare-col { display: flex; flex-direction: column; gap: 8px; }
 .col-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); text-align: center; }
@@ -277,7 +271,6 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 .compare-actions { display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 12px; }
 .ratio-hint { font-size: 12px; color: var(--text-muted); }
 
-/* Slider */
 .slider-panel { display: flex; flex-direction: column; align-items: center; }
 .slider-compare { position: relative; width: 100%; max-width: 800px; aspect-ratio: 1; border-radius: var(--radius-lg); overflow: hidden; cursor: col-resize; background: var(--bg-hover); }
 .slider-bg, .slider-fg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
@@ -288,7 +281,6 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 .slider-labels { display: flex; align-items: center; gap: 12px; margin-top: 12px; font-size: 13px; color: var(--text-secondary); }
 .slider-range { flex: 1; max-width: 300px; accent-color: var(--brand); }
 
-/* Grid */
 .grid-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-size: 14px; color: var(--text-secondary); }
 .grid-compare { display: grid; gap: 16px; }
 .grid-col { display: flex; flex-direction: column; gap: 6px; }
@@ -297,7 +289,6 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 .btn-remove { padding: 2px 8px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; font-size: 14px; }
 .btn-remove:hover { color: var(--danger); }
 
-/* Picker modal */
 .picker-overlay { position: fixed; inset: 0; z-index: 9000; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; }
 .picker-modal { background: var(--bg-card); border-radius: var(--radius-xl); width: 90vw; max-width: 700px; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; }
 .picker-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--border-light); }
@@ -321,7 +312,6 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 .upload-preview { max-width: 300px; max-height: 300px; object-fit: contain; border-radius: var(--radius-md); }
 .hint { font-size: 13px; color: var(--text-muted); }
 
-/* Buttons */
 .btn { padding: 8px 20px; border-radius: var(--radius-md); border: none; font-size: 14px; cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s, opacity 0.15s; }
 .btn-primary { background: var(--brand); color: #fff; }
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
