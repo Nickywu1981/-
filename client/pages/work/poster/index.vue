@@ -122,6 +122,7 @@
 <script setup lang="ts">
 
 import PromptEnhancer from '~/components/PromptEnhancer.vue'
+const { t } = useI18n()
 
 ;
 
@@ -207,7 +208,7 @@ async function doGenerate() {
     jobId.value = data.data?.job_id;
     useToast().success('任务已提交');
   } catch (e) {
-    useToast().error(e.data?.message || '生成失败');
+    useToast().error(e.data?.message || t('common.failed_generate'));
   } finally { submitting.value = false; }
 }
 

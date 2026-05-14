@@ -261,7 +261,7 @@ async function savePage() {
     await $fetch(`/api/diy/${pageInfo.value.id}`, { method: 'PUT', body, credentials: 'include' })
     dirty.value = false
     toast.success(t('common.success_save'))
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error('保存失败: ' + (err?.data?.msg || err.message)) }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(t('common.failed_save') + ' : ' +  (err?.data?.msg || err.message)) }
   finally { saving.value = false }
 }
 
@@ -289,7 +289,7 @@ async function publishPage() {
     await $fetch(`/api/diy/${pageInfo.value.id}/publish`, { method: 'POST', credentials: 'include' })
     dirty.value = false
     toast.success('发布成功！访问地址：/diy/preview?slug=' + pageInfo.value.slug)
-  } catch (e) { toast.error('发布失败: ' + (e?.data?.msg || e.message)) }
+  } catch (e) { toast.error(t('common.failed_submit') + ' : ' +  (e?.data?.msg || e.message)) }
   finally { publishing.value = false }
 }
 

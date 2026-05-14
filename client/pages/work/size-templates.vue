@@ -23,7 +23,8 @@
     </div>
   </div>
 </template>
-<script setup lang="ts">
+<script setup lang="ts">const { t } = useI18n()
+
 const platformSizes = ref<any[]>([])
 const toast = useToast()
 const selected = ref<any>(null)
@@ -35,7 +36,7 @@ onMounted(async () => {
     const data: any = await $fetch('/api/templates/platforms', { credentials: 'include' })
     platformSizes.value = data?.data || []
     if (!Array.isArray(platformSizes.value)) platformSizes.value = []
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || e?.message || '加载失败') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || e?.message || t('common.loadFail')) }
   loading.value = false
 })
 

@@ -937,7 +937,8 @@
     "confirm_delete_id": "确定删除 #{id}？",
     "confirm_delete_named": "确定删除 \"{name}\"？",
     "confirm_delete_order": "确认删除订单 #{id}？此操作不可撤销。",
-    "confirm_rollback_version": "确定回滚到版本 v{version}？当前未保存的更改将丢失。"
+    "confirm_rollback_version": "确定回滚到版本 v{version}？当前未保存的更改将丢失。",
+    "upload_image_first": "请先上传图片"
   },
   "ecommerce": {
     "title": "AI 电商内容创作",

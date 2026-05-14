@@ -49,7 +49,8 @@
   </WorkLayout>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts">const { t } = useI18n()
+
 const { createBlobUrl, revoke } = useBlobUrl()
 
 const step = ref(0);
@@ -73,7 +74,7 @@ const styles = [
 async function uploadFile(file: File) {
   uploading.value = true;
   const formData = new FormData(); formData.append('file', file);
-  try { const res: any = await $fetch('/api/upload/image', { method: 'POST', credentials: 'include', body: formData }); uploadedUrl.value = res.data?.url; } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '上传失败'); }
+  try { const res: any = await $fetch('/api/upload/image', { method: 'POST', credentials: 'include', body: formData }); uploadedUrl.value = res.data?.url; } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('common.failed_upload')); }
   uploading.value = false;
 }
 
@@ -96,7 +97,7 @@ async function submitTask() {
     });
     task.pollTask((res as any).data.taskId, '/api/advanced/tasks/');
   } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
-    toast.error(e?.data?.msg || e?.message || '任务提交失败，请重试');
+    toast.error(e?.data?.msg || e?.message || t('common.failed_submit_retry'));
     step.value = 1;
   }
 }

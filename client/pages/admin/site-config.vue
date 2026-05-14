@@ -113,7 +113,7 @@ async function save(item: any) {
     toast.success(t('common.success_save'));
     editingId.value = null;
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
-    toast.error(err?.data?.msg || err.message || '保存失败');
+    toast.error(err?.data?.msg || err.message || t('common.failed_save'));
   } finally { saving.value = false; }
 }
 
@@ -139,7 +139,7 @@ async function deleteConfig(item: any) {
     await $fetch(`/api/admin/site-config/${item.id}`, { method: 'DELETE', credentials: 'include' });
     toast.success(t('common.delete_success'));
     fetchConfig();
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || '删除失败'); }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('common.failed_delete')); }
 }
 
 function formatJson(val: string) {

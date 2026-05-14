@@ -190,7 +190,7 @@ async function doSubmit() {
 }
 
 function onCompleted({ resultUrl: url }) { resultUrl.value = url; submitting.value = false; loadHistory(); }
-function onFailed({ error: err }: { error: string }) { useToast().error(err || '翻译失败'); submitting.value = false; jobId.value = null; }
+function onFailed({ error: err }: { error: string }) { useToast().error(err || t('common.failed_translate')); submitting.value = false; jobId.value = null; }
 function downloadResult() { if (resultUrl.value) download(resultUrl.value); }
 function reset() { jobId.value = null; resultUrl.value = null; }
 

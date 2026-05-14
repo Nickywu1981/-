@@ -94,6 +94,7 @@
 <script setup lang="ts">
 
 import AdminLayout from '~/components/AdminLayout.vue';
+const { t } = useI18n()
 
 const templates = ref<any[]>([]);
 const saving = ref(0);
@@ -125,7 +126,7 @@ async function fetchTemplates() {
     const res: any = await $fetch(`/api/email/templates?${params}`);
     templates.value = res.data?.list || res.data || [];
     total.value = res.data?.total || templates.value.length;
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '加载失败') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('common.loadFail')) }
   isLoading.value = false;
 }
 

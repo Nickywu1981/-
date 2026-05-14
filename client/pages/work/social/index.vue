@@ -122,6 +122,7 @@
 <script setup lang="ts">
 
 import PromptEnhancer from '~/components/PromptEnhancer.vue'
+const { t } = useI18n()
 
 const { config: headerCfg } = useSiteConfig('page.social')
 const toast = useToast()
@@ -160,7 +161,7 @@ async function doEnhance() {
     })
     enhancedPrompt.value = res.prompt || res.enhancedPrompt
   } catch (e) {
-    toast.error('提示词优化失败: ' + (e.message || '未知错误'))
+    toast.error('提示词优化失败: ' + (e.message || t('common.unknown_error')))
   } finally {
     enhancing.value = false
   }
@@ -197,7 +198,7 @@ function doSubmit() {
       result.value = { ...res, posterType: activeType.value }
       history.value.unshift({ ...res, posterType: activeType.value })
     })
-    .catch((e) => { toast.error('生成失败: ' + (e?.data?.msg || e.message || '未知错误')) })
+    .catch((e) => { toast.error(t('common.failed_generate') + ' : ' +  (e?.data?.msg || e.message || t('common.unknown_error'))) })
     .finally(() => { submitting.value = false; if (loadingTimer === timer) { clearInterval(loadingTimer); loadingTimer = null; } })
 }
 

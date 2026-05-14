@@ -100,7 +100,8 @@
   </WorkLayout>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts">const { t } = useI18n()
+
 const { createBlobUrl, revoke } = useBlobUrl()
 
 interface PreviewItem { url: string; uploadedUrl: string; role: string; uploaded: boolean }
@@ -187,7 +188,7 @@ async function submitTask() {
       },
     });
     task.pollTask((res as any).data.taskId);
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '提交失败，请重试'); step.value = 2; }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('common.failed_submit_retry')); step.value = 2; }
 }
 
 function handleRedo() { task.reset(); step.value = 0; previews.value = []; selectedPlatform.value = ''; selectedTemplate.value = ''; }

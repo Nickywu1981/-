@@ -92,6 +92,7 @@ const { createBlobUrl, revoke } = useBlobUrl()
 
 import PromptEnhancer from '~/components/PromptEnhancer.vue'
 import SmartRecognitionPanel from '~/components/shared/SmartRecognitionPanel.vue'
+const { t } = useI18n()
 
 const toast = useToast()
 const step = ref(0);
@@ -128,7 +129,7 @@ async function uploadFile(file: File) {
     });
     uploadedUrl.value = res.data?.url;
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
-    toast.error(err?.data?.msg || '上传失败，请重试');
+    toast.error(err?.data?.msg || t('common.failed_upload_retry'));
   }
   uploading.value = false;
 }
@@ -162,7 +163,7 @@ async function submitTask() {
     step.value = 3;
     task.pollTask((res as any).data.taskId);
   } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
-    toast.error(e?.data?.msg || e?.message || '任务提交失败，请重试');
+    toast.error(e?.data?.msg || e?.message || t('common.failed_submit_retry'));
   }
 }
 

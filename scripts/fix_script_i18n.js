@@ -178,6 +178,57 @@ function processFile(filePath) {
     }
   }
 
+  // --- 3. Fallback Chinese in error chains: || '上传失败' ---
+  const FALLBACK_MAP = {
+    '上传失败': 'common.failed_upload',
+    '加载失败': 'common.loadFail',
+    '保存失败': 'common.failed_save',
+    '提交失败': 'common.failed_submit',
+    '删除失败': 'common.failed_delete',
+    '网络错误': 'common.network_error',
+    '操作失败': 'common.failed',
+    '生成失败': 'common.failed_generate',
+    '发送失败': 'common.failed_send',
+    '翻译失败': 'common.failed_translate',
+    '任务提交失败，请重试': 'common.failed_submit_retry',
+    '生成失败，请重试': 'common.failed_generate_retry',
+    '提交失败，请重试': 'common.failed_submit_retry',
+    '上传失败，请重试': 'common.failed_upload_retry',
+    '请先上传图片': 'common.upload_image_first',
+    '请输入标题': 'common.enter_title',
+    '未知错误': 'common.unknown_error',
+  };
+
+  for (const [chinese, i18nKey] of Object.entries(FALLBACK_MAP)) {
+    const esc = escapeRegExp(chinese);
+    const fbRe = new RegExp(`\\|\\|\\s*'${esc}'(\\s*[\\)\\,])`, 'g');
+    scriptContent = scriptContent.replace(fbRe, (m, s) => {
+      needsUseI18n = true; hasChanges = true; totalFixes++;
+      return `|| t('${i18nKey}')${s}`;
+    });
+    const fbReDbl = new RegExp(`\\|\\|\\s*"${esc}"(\\s*[\\)\\,])`, 'g');
+    scriptContent = scriptContent.replace(fbReDbl, (m, s) => {
+      needsUseI18n = true; hasChanges = true; totalFixes++;
+      return `|| t('${i18nKey}')${s}`;
+    });
+  }
+
+  // --- 4. String concat: '加载失败: ' + → t('common.loadFail') + ' : ' + ---
+  for (const [chinese, i18nKey] of Object.entries(STRING_MAP)) {
+    if (!chinese.endsWith(': ')) continue;
+    const esc = escapeRegExp(chinese);
+    const concatRe = new RegExp(`'${esc}'\\s*\\+`, 'g');
+    scriptContent = scriptContent.replace(concatRe, () => {
+      needsUseI18n = true; hasChanges = true; totalFixes++;
+      return `t('${i18nKey}') + ' : ' + `;
+    });
+    const concatReDbl = new RegExp(`"${esc}"\\s*\\+`, 'g');
+    scriptContent = scriptContent.replace(concatReDbl, () => {
+      needsUseI18n = true; hasChanges = true; totalFixes++;
+      return `t('${i18nKey}') + ' : ' + `;
+    });
+  }
+
   if (!hasChanges) return;
 
   // Add useI18n if needed and not already present

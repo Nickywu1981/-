@@ -84,7 +84,7 @@ async function fetchRules() {
   try {
     const data: any = await $fetch('/api/admin/geo-rules', { credentials: 'include' });
     rules.value = data.data || data;
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '加载失败'); }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('common.loadFail')); }
   finally { loading.value = false; }
 }
 
@@ -126,7 +126,7 @@ async function save() {
     }
     cancelForm();
     fetchRules();
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '保存失败'); }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('common.failed_save')); }
   finally { saving.value = false; }
 }
 
@@ -136,7 +136,7 @@ async function remove(id: number) {
     await $fetch(`/api/admin/geo-rules/${id}`, { method: 'DELETE', credentials: 'include' });
     toast.success(t('common.delete_success'));
     fetchRules();
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '删除失败'); }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('common.failed_delete')); }
 }
 
 onMounted(fetchRules);

@@ -82,7 +82,7 @@ async function saveTemplate() {
     }
     showModal.value = false
     fetchData()
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '保存失败') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('common.failed_save')) }
   saving.value = false
 }
 async function deleteItem(id: number) {
@@ -90,7 +90,7 @@ async function deleteItem(id: number) {
   try {
     await $fetch(`/api/templates/my/${id}`, { method: 'DELETE', credentials: 'include' })
     fetchData()
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '删除失败') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('common.failed_delete')) }
 }
 onMounted(fetchData)
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })

@@ -68,6 +68,7 @@
 
 <script setup lang="ts">
 import PromptEnhancer from '~/components/PromptEnhancer.vue'
+const { t } = useI18n()
 
 
 const step = ref(0);
@@ -100,7 +101,7 @@ async function submitTask() {
     });
     task.pollTask((res as any).data.taskId, '/api/adv-video/tasks/');
   } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
-    toast.error(e?.data?.msg || e?.message || '任务提交失败，请重试');
+    toast.error(e?.data?.msg || e?.message || t('common.failed_submit_retry'));
     step.value = 1;
   }
 }

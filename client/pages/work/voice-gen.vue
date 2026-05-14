@@ -45,6 +45,7 @@
 
 <script setup lang="ts">
 import PromptEnhancer from '~/components/PromptEnhancer.vue'
+const { t } = useI18n()
 const toast = useToast()
 
 const steps = ['输入文案', '选择音色', '生成语音']
@@ -74,7 +75,7 @@ async function handleGenerate() {
     })
     currentStep.value = 2
     task.pollTask(res.data?.taskId, '/api/adv-video/tasks/')
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '提交失败') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('common.failed_submit')) }
   finally { submitting.value = false }
 }
 

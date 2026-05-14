@@ -61,7 +61,8 @@
   </WorkLayout>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts">const { t } = useI18n()
+
 const { createBlobUrl, revoke } = useBlobUrl()
 
 const step = ref(0)
@@ -84,7 +85,7 @@ async function handleFile(e: Event) {
     const res: any = await $fetch('/api/upload/image', { method: 'POST', body: fd })
     uploadedUrl.value = res.data?.url || res.url
   } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
-    toast.error(e?.data?.msg || e?.message || '上传失败')
+    toast.error(e?.data?.msg || e?.message || t('common.failed_upload'))
     previewUrl.value = ''
   } finally { uploading.value = false }
 }
@@ -99,7 +100,7 @@ async function handleFaceFile(e: Event) {
     const res: any = await $fetch('/api/upload/image', { method: 'POST', body: fd })
     faceUploadedUrl.value = res.data?.url || res.url
   } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
-    toast.error(e?.data?.msg || e?.message || '上传失败')
+    toast.error(e?.data?.msg || e?.message || t('common.failed_upload'))
     facePreviewUrl.value = ''
   }
 }
@@ -116,7 +117,7 @@ async function handleDrop(e: DragEvent) {
     const res: any = await $fetch('/api/upload/image', { method: 'POST', body: fd })
     uploadedUrl.value = res.data?.url || res.url
   } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
-    toast.error(e?.data?.msg || e?.message || '上传失败')
+    toast.error(e?.data?.msg || e?.message || t('common.failed_upload'))
     previewUrl.value = ''
   } finally { uploading.value = false }
 }
@@ -132,7 +133,7 @@ async function handleFaceDrop(e: DragEvent) {
     const res: any = await $fetch('/api/upload/image', { method: 'POST', body: fd })
     faceUploadedUrl.value = res.data?.url || res.url
   } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
-    toast.error(e?.data?.msg || e?.message || '上传失败')
+    toast.error(e?.data?.msg || e?.message || t('common.failed_upload'))
     facePreviewUrl.value = ''
   }
 }

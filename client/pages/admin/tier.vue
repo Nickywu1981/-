@@ -44,7 +44,8 @@
     <EmptyState v-else icon="⭐" :title="$t('admin_tier.暂无会员数据')" description="请先登录后查看会员等级信息" />
   </AdminLayout>
 </template>
-<script setup lang="ts">
+<script setup lang="ts">const { t } = useI18n()
+
 
 const loading = ref(true), tierData = ref<any>(null), exportPerms = ref<any>(null)
 const checkType = ref('image'), limitResult = ref<any>(null), checkingLimit = ref(false)
@@ -65,7 +66,7 @@ onMounted(async () => {
     ])
     if (tRes?.code === 200) tierData.value = tRes.data
     if (pRes?.code === 200) exportPerms.value = pRes.data
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '加载失败') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('common.loadFail')) }
   loading.value = false
 })
 
@@ -74,7 +75,7 @@ async function doCheckLimit() {
   try {
     const data: any = await $fetch(`/api/tier/check-limit?type=${checkType.value}`, { credentials: 'include' })
     if (data?.code === 200) limitResult.value = data.data
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '加载失败') } finally { checkingLimit.value = false; }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('common.loadFail')) } finally { checkingLimit.value = false; }
 }
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>

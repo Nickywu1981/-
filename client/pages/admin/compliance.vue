@@ -39,7 +39,8 @@
     </div>
   </AdminLayout>
 </template>
-<script setup lang="ts">
+<script setup lang="ts">const { t } = useI18n()
+
 
 const targets = ref<any[]>([])
 const loading = ref(true)
@@ -53,7 +54,7 @@ async function fetchTargets() {
   try {
     const data: any = await $fetch('/api/compliance/targets', { credentials: 'include' })
     targets.value = data?.data || []
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '加载失败') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('common.loadFail')) }
   finally { loading.value = false }
 }
 
@@ -72,7 +73,7 @@ async function viewRules(target: any) {
   try {
     const data: any = await $fetch(`/api/compliance/rules/${target.code}`, { credentials: 'include' })
     rulesDetail.value = data?.data || target
-  } catch (e: unknown) { toast.error(e?.message || '加载失败') }
+  } catch (e: unknown) { toast.error(e?.message || t('common.loadFail')) }
 }
 
 onMounted(fetchTargets)

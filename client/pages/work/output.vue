@@ -20,7 +20,8 @@
     <div v-else class="empty">暂无作品，完成创作后作品将显示在此</div>
   </WorkLayout>
 </template>
-<script setup lang="ts">
+<script setup lang="ts">const { t } = useI18n()
+
 const items = ref<any[]>([])
 const loading = ref(true)
 const toast = useToast()
@@ -38,7 +39,7 @@ onMounted(async () => {
     const data: any = await $fetch('/api/tasks/my-works', { credentials: 'include' })
     items.value = data?.data?.list || data?.data || []
     if (!Array.isArray(items.value)) items.value = []
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || e?.message || '加载失败') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || e?.message || t('common.loadFail')) }
   loading.value = false
 })
 

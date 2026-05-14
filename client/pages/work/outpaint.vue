@@ -63,7 +63,8 @@
       </WorkLayout>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts">const { t } = useI18n()
+
 const { createBlobUrl, revoke } = useBlobUrl()
 const toast = useToast()
 
@@ -94,7 +95,7 @@ async function uploadFile(file: File) {
   try {
     const res: any = await $fetch('/api/upload/image', { method: 'POST', credentials: 'include', body: formData })
     uploadedUrl.value = res.data?.url
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '上传失败') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('common.failed_upload')) }
   uploading.value = false
 }
 
@@ -118,7 +119,7 @@ async function submitOutpaint() {
     })
     currentStep.value = 2
     task.pollTask(res.data?.taskId, '/api/advanced/tasks/')
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '提交失败') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('common.failed_submit')) }
   submitting.value = false
 }
 

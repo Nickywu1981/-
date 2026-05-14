@@ -124,8 +124,8 @@ async function save() {
     const method = isEdit.value ? 'PUT' : 'POST'
     const res: any = await $fetch(url, { method, body: form.value })
     if (res?.code === 200 || res?.code === 0) { toast.success(isEdit.value ? '代理已更新' : '代理已创建'); modalOpen.value = false; fetchData() }
-    else { toast.error(res?.msg || '保存失败') }
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || '保存失败') } finally { saving.value = false }
+    else { toast.error(res?.msg || t('common.failed_save')) }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('common.failed_save')) } finally { saving.value = false }
 }
 
 async function toggleStatus(p: any) {
@@ -133,8 +133,8 @@ async function toggleStatus(p: any) {
   try {
     const res: any = await $fetch(`/api/proxy/${p.id}`, { method: 'PUT', body: { status: newStatus } })
     if (res?.code === 200 || res?.code === 0) { p.status = newStatus; toast.success(newStatus === 1 ? '已启用' : '已停用') }
-    else { toast.error(res?.msg || '操作失败') }
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || '操作失败') }
+    else { toast.error(res?.msg || t('common.failed')) }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('common.failed')) }
 }
 
 async function delProxy(id: number) {
@@ -142,8 +142,8 @@ async function delProxy(id: number) {
   try {
     const res: any = await $fetch(`/api/proxy/${id}`, { method: 'DELETE' })
     if (res?.code === 200 || res?.code === 0) { toast.success('代理已删除'); fetchData() }
-    else { toast.error(res?.msg || '删除失败') }
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || '删除失败') }
+    else { toast.error(res?.msg || t('common.failed_delete')) }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('common.failed_delete')) }
 }
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>

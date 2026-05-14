@@ -20,7 +20,8 @@
   </AdminLayout>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts">const { t } = useI18n()
+
 let VChart: any = null
 
 async function _loadVChart() {
@@ -51,7 +52,7 @@ onMounted(async () => {
     await _loadVChart()
     const data: any = await $fetch('/api/admin/stats', { credentials: 'include' })
     if (data?.code === 200) stats.value = data.data
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '加载失败') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('common.loadFail')) }
   loading.value = false
 })
 

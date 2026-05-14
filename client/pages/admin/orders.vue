@@ -118,7 +118,7 @@ async function confirmDelete(o: any) {
     list.value = list.value.filter(item => item.id !== o.id)
     total.value--
     toast.success('订单已删除')
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error('删除失败: ' + (err?.data?.msg || err.message)) }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(t('common.failed_delete') + ' : ' +  (err?.data?.msg || err.message)) }
 }
 
 onMounted(fetch)

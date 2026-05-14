@@ -107,7 +107,7 @@ async function fetchData() {
     list.value = (res as any).data?.list || []
     total.value = (res as any).data?.total || 0
   } catch (e: any) {
-    toast.error('加载失败: ' + (e?.data?.msg || e.message || '网络错误'))
+    toast.error(t('common.loadFail') + ' : ' +  (e?.data?.msg || e.message || t('common.network_error')))
   } finally { loading.value = false }
 }
 
@@ -133,7 +133,7 @@ async function saveEdit() {
     toast.success(t('common.saved_realtime'))
     fetchData()
   } catch (e: any) {
-    toast.error('保存失败: ' + (e?.data?.msg || e.message))
+    toast.error(t('common.failed_save') + ' : ' +  (e?.data?.msg || e.message))
   }
 }
 
@@ -144,7 +144,7 @@ async function submitTemplate(id: number) {
     toast.success(t('common.submitted_review'))
     fetchData()
   } catch (e: any) {
-    toast.error('提交失败: ' + (e?.data?.msg || e.message))
+    toast.error(t('common.failed_submit') + ' : ' +  (e?.data?.msg || e.message))
   }
 }
 
@@ -155,7 +155,7 @@ async function confirmDelete(tmpl: any) {
     toast.success(t('common.delete_success'))
     fetchData()
   } catch (e: any) {
-    toast.error('删除失败: ' + (e?.data?.msg || e.message))
+    toast.error(t('common.failed_delete') + ' : ' +  (e?.data?.msg || e.message))
   }
 }
 

@@ -47,6 +47,7 @@
 <script setup lang="ts">
 
 import PromptEnhancer from '~/components/PromptEnhancer.vue'
+const { t } = useI18n()
 
 const step = ref(0); const text = ref(''); const selectedEffect = ref('neon')
 const processing = ref(false); const resultUrl = ref('')
@@ -65,7 +66,7 @@ async function submitTask() {
     const res: any = await $fetch('/api/advanced/text-effect', { method: 'POST', body: { text: text.value, effect: selectedEffect.value } })
     resultUrl.value = res.data?.result_url || res.result_url
   } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
-    toast.error(e?.data?.msg || e?.message || '生成失败，请重试')
+    toast.error(e?.data?.msg || e?.message || t('common.failed_generate_retry'))
     step.value = 1
   } finally { processing.value = false }
 }

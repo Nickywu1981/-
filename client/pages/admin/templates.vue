@@ -105,7 +105,8 @@
   </AdminLayout>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts">const { t } = useI18n()
+
 definePageMeta({ layout: 'admin' })
 
 const toast = useToast()
@@ -131,7 +132,7 @@ async function search() {
     const q = new URLSearchParams({ category: category.value, keyword: keyword.value, sort: sort.value, page: '1', pageSize: '40' })
     const res: any = await $fetch(`/api/template-market/search?${q}`, { credentials: 'include' })
     list.value = res?.data?.list || res?.list || []
-  } catch (e: unknown) { error.value = e?.data?.msg || e.message || ($t('common.loadFail')||'加载失败') }
+  } catch (e: unknown) { error.value = e?.data?.msg || e.message || ($t('common.loadFail')|| t('common.loadFail')) }
   loading.value = false
 }
 

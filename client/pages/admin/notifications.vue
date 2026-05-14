@@ -103,7 +103,7 @@ async function confirmSend() {
   try {
     const data = await $fetch('/api/notifications/send', { method: 'POST', credentials: 'include', body: { userId: +sendDialog.userId, type: sendDialog.type, title: sendDialog.title, content: sendDialog.content } }) as ApiResponse
     if (data?.code === 200) { toast.success(t('common.sent')); sendDialog.open = false; fetch() }
-    else { toast.error(data?.msg || '发送失败') }
+    else { toast.error(data?.msg || t('common.failed_send')) }
   } catch (e: unknown) { toast.error(t('common.failed_send')) }
 }
 
@@ -112,7 +112,7 @@ async function doDelete(n: any) {
   try {
     const data = await $fetch(`/api/notifications/${n.id}`, { method: 'DELETE', credentials: 'include' }) as ApiResponse
     if (data?.code === 200) { toast.success(t('common.delete_success')); fetch() }
-    else { toast.error(data?.msg || '删除失败') }
+    else { toast.error(data?.msg || t('common.failed_delete')) }
   } catch (e: unknown) { toast.error(t('common.failed_delete')) }
 }
 

@@ -186,7 +186,7 @@ async function copyTemplate(t: any) {
   try {
     const r = await $fetch(`/api/prompts/templates/${t.id}/copy`, { method: 'POST', credentials: 'include' })
     toast.success((r as any).updated ? '已更新副本' : '已复制为我的模板')
-  } catch (e: any) { toast.error('复制失败: ' + (e?.data?.msg || e.message)) }
+  } catch (e: any) { toast.error(t('common.failed_copy') + ' : ' +  (e?.data?.msg || e.message)) }
 }
 
 const doFill = async () => {
@@ -198,7 +198,7 @@ const doFill = async () => {
     })
     toast.success((r as any).filled || '生成成功')
     detail.value = null
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || '生成失败') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('common.failed_generate')) }
 }
 
 onMounted(fetchAll)
