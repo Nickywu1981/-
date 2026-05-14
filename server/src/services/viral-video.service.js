@@ -7,6 +7,7 @@ import { BusinessError } from '../utils/businessError.js';
 import { submitJob } from './job-queue.service.js';
 import { findJobById } from '../dao/jobQueueDao.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
+import { injectReversePrompt } from './promptParser.js';
 
 /**
  * 爆款视频分析
@@ -19,14 +20,25 @@ export async function analyzeViralVideo(userId, { videoUrl, platform = 'douyin' 
 }
 
 /**
- * 爆款视频复刻生成
+ * 爆款视频复刻生成 — 自动生成正向+反向提示词 (Phase 3.5 合规优化)
  */
 export async function replicateViralVideo(userId, { analysisJobId, productName, productImages, customPrompt }) {
+  // 合规硬约束注入：强制追加正向合规声明 + 反向避坑词
+  const basePrompt = customPrompt || `Create a viral e-commerce short video featuring ${productName || 'the product'}, with trending transitions and engaging pacing`;
+  const { positive, negative } = injectReversePrompt({
+    prompt: basePrompt,
+    intentId: 'video_clone',
+    category: 'video',
+  });
+
   return submitJob(userId, 'viral_replicate', {
     analysis_job_id: analysisJobId,
     product_name: productName,
     product_images: productImages || [],
-    custom_prompt: customPrompt,
+    custom_prompt: positive,
+    negative_prompt: negative,
+    // 标记合规处理以确保下游可审计
+    compliance_injected: true,
   }, { priority: 4 });
 }
 
