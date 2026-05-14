@@ -1,11 +1,11 @@
 <template>
   <div class="account-page">
-    <h2>我的作品</h2>
+    <h2>{{ $t('account.works.title') }}</h2>
     <div class="tabs">
       <button v-for="t in tabs" :key="t.key" :class="{ active: activeTab === t.key }" @click="activeTab = t.key; fetchWorks()">{{ t.label }}</button>
     </div>
     <div v-if="loading" class="skeleton"><div v-for="i in 8" :key="i" class="skel-card" /></div>
-    <div v-else-if="error" class="error-msg">{{ error }} <button @click="fetchWorks">重试</button></div>
+    <div v-else-if="error" class="error-msg">{{ error }} <button @click="fetchWorks">{{ $t('account.works.retry') }}</button></div>
     <div v-else-if="works.length" class="works-grid">
       <div v-for="w in works" :key="w.id" class="work-card" @click="previewWork(w)">
         <div class="work-thumb">
@@ -19,14 +19,14 @@
         </div>
       </div>
     </div>
-    <div v-else class="empty">还没有作品，去工作台开始创作吧</div>
+    <div v-else class="empty">{{ $t('account.works.empty') }}</div>
     <Pagination v-if="total > pageSize" :page="page" :total="total" :page-size="pageSize" @change="goPage" />
 
     <!-- Preview Modal -->
     <Teleport to="body">
       <div v-if="preview" class="preview-overlay" @click.self="preview = null" @keydown.escape="preview = null">
         <div class="preview-modal">
-          <button class="close-btn" @click="preview = null" aria-label="关闭">✕</button>
+          <button class="close-btn" @click="preview = null" :aria-label="$t('account.works.close')">✕</button>
           <img v-if="preview.output_url" :src="preview.output_url" :alt="preview.task_type" loading="lazy" @error="e => (e.target as HTMLImageElement).style.display='none'" />
           <div class="preview-meta">
             <span>{{ typeLabel(preview.task_type) }}</span>
@@ -41,7 +41,7 @@
 <script setup lang="ts">
 import { formatDateTime } from '@/utils/format';
 
-
+const { t } = useI18n()
 const works = ref<any[]>([])
 const loading = ref(true)
 const error = ref('')
@@ -52,17 +52,31 @@ const pageSize = 20
 const preview = ref<any>(null)
 
 const tabs = [
-  { key: 'all', label: '全部' },
-  { key: 'image', label: '图片' },
-  { key: 'video', label: '视频' },
+  { key: 'all', label: t('account.works.tab_all') },
+  { key: 'image', label: t('account.works.tab_image') },
+  { key: 'video', label: t('account.works.tab_video') },
 ]
 
 const typeMap: Record<string,string> = {
-  'remove-bg':'抠图','white-bg':'白底图','scene':'场景图','retouch':'精修','outpaint':'扩图',
-  'virtual-tryon':'虚拟试穿','color-swap':'换色','style-transfer':'风格迁移','ghost-mannequin':'幽灵模特',
-  'wrinkle-remove':'去褶皱','video':'视频','batch':'批量','voice-gen':'语音','voice-clone':'克隆',
-  'video-edit':'视频编辑','script':'脚本','storyboard':'分镜','viral-clone':'爆款复刻',
-  'image':'图片',
+  'remove-bg': t('account.works.type_remove_bg'),
+  'white-bg': t('account.works.type_white_bg'),
+  'scene': t('account.works.type_scene'),
+  'retouch': t('account.works.type_retouch'),
+  'outpaint': t('account.works.type_outpaint'),
+  'virtual-tryon': t('account.works.type_virtual_tryon'),
+  'color-swap': t('account.works.type_color_swap'),
+  'style-transfer': t('account.works.type_style_transfer'),
+  'ghost-mannequin': t('account.works.type_ghost_mannequin'),
+  'wrinkle-remove': t('account.works.type_wrinkle_remove'),
+  'video': t('account.works.type_video'),
+  'batch': t('account.works.type_batch'),
+  'voice-gen': t('account.works.type_voice_gen'),
+  'voice-clone': t('account.works.type_voice_clone'),
+  'video-edit': t('account.works.type_video_edit'),
+  'script': t('account.works.type_script'),
+  'storyboard': t('account.works.type_storyboard'),
+  'viral-clone': t('account.works.type_viral_clone'),
+  'image': t('account.works.type_image'),
 }
 
 function typeLabel(t: string) { return typeMap[t] || t }
@@ -77,7 +91,7 @@ async function fetchWorks() {
     total.value = res.data?.total || 0
   } catch (e: unknown) {
     const err = e as { data?: { message?: string } };
-    error.value = err.data?.message || '加载失败'
+    error.value = err.data?.message || t('account.works.load_failed')
   } finally { loading.value = false }
 }
 

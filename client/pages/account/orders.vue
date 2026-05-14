@@ -1,14 +1,14 @@
 <template>
   <div class="account-page">
-    <h2>我的订单</h2>
+    <h2>{{ $t('account.orders.title') }}</h2>
     <div class="tabs">
       <button v-for="t in tabs" :key="t.key" :class="{ active: activeTab === t.key }" @click="activeTab = t.key; fetchOrders()">{{ t.label }}</button>
     </div>
     <div v-if="loading" class="skeleton"><div v-for="i in 5" :key="i" class="skel-row" /></div>
-    <div v-else-if="error" class="error-msg">{{ error }} <button @click="fetchOrders">重试</button></div>
+    <div v-else-if="error" class="error-msg">{{ error }} <button @click="fetchOrders">{{ $t('account.orders.retry') }}</button></div>
     <div v-else-if="orders.length" class="table-wrap">
       <table class="orders-table">
-        <thead><tr><th>订单号</th><th>套餐</th><th>金额</th><th>状态</th><th>时间</th></tr></thead>
+        <thead><tr><th>{{ $t('account.orders.col_order_no') }}</th><th>{{ $t('account.orders.col_plan') }}</th><th>{{ $t('account.orders.col_amount') }}</th><th>{{ $t('account.orders.col_status') }}</th><th>{{ $t('account.orders.col_time') }}</th></tr></thead>
         <tbody>
           <tr v-for="o in orders" :key="o.id">
             <td class="order-no">{{ o.order_no || o.id }}</td>
@@ -20,7 +20,7 @@
         </tbody>
       </table>
     </div>
-    <div v-else class="empty">暂无订单记录</div>
+    <div v-else class="empty">{{ $t('account.orders.empty') }}</div>
     <Pagination v-if="total > pageSize" :page="page" :total="total" :page-size="pageSize" @change="goPage" />
   </div>
 </template>
@@ -28,6 +28,7 @@
 <script setup lang="ts">
 import { formatDateTime } from '@/utils/format'
 
+const { t } = useI18n()
 const orders = ref<any[]>([])
 const loading = ref(true)
 const error = ref('')
@@ -35,7 +36,7 @@ const page = ref(1)
 const total = ref(0)
 const pageSize = ref(20)
 const activeTab = ref('all')
-const tabs = [{ key: 'all', label: '全部' }, { key: 'paid', label: '已支付' }, { key: 'refunded', label: '已退款' }, { key: 'cancelled', label: '已取消' }]
+const tabs = [{ key: 'all', label: t('account.orders.tab_all') }, { key: 'paid', label: t('account.orders.tab_paid') }, { key: 'refunded', label: t('account.orders.tab_refunded') }, { key: 'cancelled', label: t('account.orders.tab_cancelled') }]
 
 onMounted(() => { fetchOrders() })
 
@@ -45,13 +46,13 @@ async function fetchOrders() {
     const status = activeTab.value === 'all' ? '' : `&status=${activeTab.value}`
     const data: any = await $fetch(`/api/payment/orders?page=${page.value}&pageSize=${pageSize.value}${status}`, { credentials: 'include' })
     if (data.code === 200) { orders.value = data.data.list || []; total.value = data.data.total || 0 }
-    else { error.value = data.msg || '加载失败' }
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; error.value = err?.data?.msg || err.message || '加载失败' }
+    else { error.value = data.msg || t('account.orders.load_failed') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; error.value = err?.data?.msg || err.message || t('account.orders.load_failed') }
   finally { loading.value = false }
 }
 function goPage(p: number) { page.value = p; fetchOrders() }
 function statusClass(s: string) { const m: Record<string,string> = { paid:'badge-ok', refunded:'badge-warn', cancelled:'badge-err' }; return m[s] || '' }
-function statusLabel(s: string) { const m: Record<string,string> = { paid:'已支付', pending:'待支付', refunded:'已退款', cancelled:'已取消' }; return m[s] || s }
+function statusLabel(s: string) { const m: Record<string,string> = { paid: t('account.orders.status_paid'), pending: t('account.orders.status_pending'), refunded: t('account.orders.status_refunded'), cancelled: t('account.orders.status_cancelled') }; return m[s] || s }
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
