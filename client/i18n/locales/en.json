@@ -8315,5 +8315,11 @@
     "chinese": "中文",
     "english": "English",
     "spanish": "Español"
+  },
+  "roles": {
+    "admin": "Administrator",
+    "ops": "Operations",
+    "finance": "Finance",
+    "auditor": "Auditor"
   }
 }

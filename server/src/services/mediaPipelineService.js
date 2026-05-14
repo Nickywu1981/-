@@ -10,7 +10,6 @@
 
 import { execFile } from 'child_process';
 import { promisify } from 'util';
-import fs from 'fs';
 import fsp from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -110,9 +109,10 @@ export async function watermark(inputPath, { text, position = 'southeast', fontS
   const sharp = (await import('sharp')).default;
   const metadata = await sharp(inputPath).metadata();
 
+  const escapedText = text.replace(/[<>&"']/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;' })[c]);
   const svgText = `<svg width="${metadata.width}" height="${metadata.height}">
     <text x="50%" y="90%" font-size="${fontSize}" fill="white" fill-opacity="${opacity}"
-          font-family="Arial" text-anchor="middle">${text}</text>
+          font-family="Arial" text-anchor="middle">${escapedText}</text>
   </svg>`;
 
   const out = outputName(inputPath, 'wm');
@@ -171,7 +171,6 @@ export async function videoTranscode(inputPath, { crf = 23, preset = 'medium', m
   const vf = maxWidth ? `scale=${maxWidth}:-2` : null;
   const args = ['-i', inputPath, '-c:v', 'libx264', '-crf', String(crf), '-preset', preset, '-c:a', 'aac', '-movflags', '+faststart'];
   if (vf) args.push('-vf', vf);
-  args.push(out);
   await execFileP('ffmpeg', [...args, out], { timeout: 300000 });
   return out;
 }

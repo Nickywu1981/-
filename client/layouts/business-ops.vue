@@ -60,10 +60,22 @@
 </template>
 
 <script setup lang="ts">
-const { user } = useAuth()
+import { computed } from 'vue'
+import { useAuthStore } from '@/stores/useAuthStore'
+import { useI18n } from 'vue-i18n'
+
+const auth = useAuthStore()
+const user = computed(() => auth.user)
+const { t } = useI18n()
+
 const currentRoleLabel = computed(() => {
-  const role = user.value?.activeRole || user.value?.role
-  const map: Record<string, string> = { admin: '管理员', ops: '运营', finance: '财务', auditor: '审核员' }
-  return map[role] || role || ''
+  const role = user.value?.role
+  const map: Record<string, string> = {
+    admin: t('roles.admin'),
+    ops: t('roles.ops'),
+    finance: t('roles.finance'),
+    auditor: t('roles.auditor'),
+  }
+  return map[role || ''] || role || ''
 })
 </script>

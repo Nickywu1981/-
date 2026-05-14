@@ -57,5 +57,9 @@
 </template>
 
 <script setup lang="ts">
-const { user } = useAuth()
+import { computed } from 'vue'
+import { useAuthStore } from '@/stores/useAuthStore'
+
+const auth = useAuthStore()
+const user = computed(() => auth.user)
 </script>

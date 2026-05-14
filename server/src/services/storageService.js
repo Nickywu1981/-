@@ -11,10 +11,8 @@
  *   const url = await getUrl(remoteKey);
  */
 
-import fs from 'fs';
 import fsp from 'fs/promises';
 import path from 'path';
-import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import logger from '../utils/logger.js';
 import { uploadConfig } from '../config/index.js';

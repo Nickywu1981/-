@@ -8,6 +8,11 @@
  */
 
 import swaggerJsdoc from 'swagger-jsdoc';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import logger from '../utils/logger.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const options = {
   definition: {
@@ -77,8 +82,8 @@ const options = {
     ],
   },
   apis: [
-    './src/route/*.js',
-    './src/route/v4_*.js',
+    path.join(__dirname, '../route/*.js'),
+    path.join(__dirname, '../route/v4_*.js'),
   ],
 };
 
@@ -89,6 +94,7 @@ export function getSpec() {
   try {
     _spec = swaggerJsdoc(options);
   } catch (err) {
+    logger.error('[Swagger] 文档生成失败', err.message);
     _spec = { openapi: '3.0.3', info: options.definition.info, paths: {}, components: options.definition.components, tags: options.definition.tags };
   }
   return _spec;

@@ -142,23 +142,20 @@
 </template>
 
 <script setup lang="ts">
-const { user, switchRole: apiSwitchRole } = useAuth()
-const activeRole = ref('user')
+import { ref, computed } from 'vue'
+import { useAuthStore } from '@/stores/useAuthStore'
 
-const roles = computed(() => user.value?.roles || [])
-const hasAgentRole = computed(() => roles.value.includes('agent'))
-const hasEnterpriseRole = computed(() => roles.value.includes('enterprise'))
+const auth = useAuthStore()
+const user = computed(() => auth.user)
+
+const activeRole = ref(user.value?.role || 'user')
+
+const hasAgentRole = computed(() => user.value?.role === 'agent')
+const hasEnterpriseRole = computed(() => user.value?.role === 'enterprise')
 const showRoleSwitcher = computed(() => hasAgentRole.value || hasEnterpriseRole.value)
 
-onMounted(() => {
-  if (user.value?.activeRole) {
-    activeRole.value = user.value.activeRole
-  }
-})
-
-const switchRole = async (role: string) => {
+function switchRole(role: string) {
   activeRole.value = role
-  await apiSwitchRole(role)
   navigateTo('/work')
 }
 </script>
