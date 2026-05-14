@@ -3,7 +3,7 @@
  *
  * 从 index.vue(935行) 提取, 减少页面文件体积
  */
-export function useLanding() {
+export async function useLanding() {
   const { t, locale } = useI18n();
   const route = useRoute();
 

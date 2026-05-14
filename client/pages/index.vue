@@ -275,7 +275,7 @@ const {
   activeTab,
   tabs, memfocusCards, steps, useCases, faqs, platforms, cards,
   filteredCards, countForTab: getTabCount, displayPlans,
-} = useLanding();
+} = await useLanding();
 
 const currentYear = new Date().getFullYear();
 
