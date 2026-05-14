@@ -1,74 +1,74 @@
 <template>
-  <WorkLayout title="智能抠图" subtitle="AI 精准识别主体，一键去除背景" :steps="steps" :current-step="currentStep">
+  <WorkLayout :title="$t('work_pages.remove_bg_title')" :subtitle="$t('work_pages.remove_bg_subtitle')" :steps="steps" :current-step="currentStep">
     <!-- Input mode: no task running -->
     <div v-if="taskStatus === -1">
       <div class="upload-section">
         <div class="dropzone" @dragover.prevent @drop.prevent="handleDrop">
           <p class="dz-icon">🖼️</p>
-          <p>拖拽或点击上传商品图片</p>
-          <p class="hint">支持 JPG / PNG / WebP，最大 20MB</p>
+          <p>{{ $t('work_pages.remove_bg_drop_text') }}</p>
+          <p class="hint">{{ $t('work_pages.remove_bg_drop_hint') }}</p>
           <input ref="fileInput" type="file" accept="image/*" hidden @change="handleFile" />
-          <button class="btn-outline" @click="fileInput?.click()">选择图片</button>
+          <button class="btn-outline" @click="fileInput?.click()">{{ $t('work_pages.remove_bg_select_image') }}</button>
         </div>
         <div v-if="previewUrl" class="preview-box">
-          <img loading="lazy" :src="previewUrl" alt="预览" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
-          <button class="preview-remove" @click="clearImage" aria-label="清除图片">✕</button>
+          <img loading="lazy" :src="previewUrl" :alt="$t('work_pages.remove_bg_preview_alt')" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+          <button class="preview-remove" @click="clearImage" :aria-label="$t('work_pages.remove_bg_clear_image')">✕</button>
         </div>
         <p v-if="uploadErr" class="msg msg-error">{{ uploadErr }}</p>
-        <p v-if="uploading" class="msg">上传中...</p>
+        <p v-if="uploading" class="msg">{{ $t('work_pages.remove_bg_uploading') }}</p>
         <div v-if="previewUrl" class="actions">
-          <div class="cost-badge">预计消耗 <strong>2</strong> 积分</div>
-          <button class="btn btn-brand" @click="currentStep = 1">下一步：选择背景</button>
+          <div class="cost-badge">{{ $t('work_pages.remove_bg_cost', { count: 2 }) }}</div>
+          <button class="btn btn-brand" @click="currentStep = 1">{{ $t('work_pages.remove_bg_next_bg') }}</button>
         </div>
       </div>
 
       <div v-if="currentStep >= 1" class="param-section">
-        <h3 class="param-title">选择输出背景</h3>
+        <h3 class="param-title">{{ $t('work_pages.remove_bg_bg_title') }}</h3>
         <div class="bg-grid">
           <button v-for="bg in bgOptions" :key="bg.id" class="bg-card" :class="{ active: selectedBg === bg.id }" @click="selectedBg = bg.id">
             <span class="bg-preview" :style="{ background: bg.css }" />
-            <span class="bg-label">{{ bg.label }}</span>
-            <span v-if="bg.id === 'transparent'" class="bg-badge">推荐</span>
+            <span class="bg-label">{{ $t(bg.nameKey) }}</span>
+            <span v-if="bg.id === 'transparent'" class="bg-badge">{{ $t('work_pages.remove_bg_recommended') }}</span>
           </button>
         </div>
         <div class="actions">
-          <button class="btn-outline" @click="currentStep = 0">返回</button>
+          <button class="btn-outline" @click="currentStep = 0">{{ $t('common.back') }}</button>
           <button class="btn btn-brand" :disabled="processing" @click="startRemoveBg">
-            <span v-if="processing" class="spinner" /> {{ processing ? '处理中...' : '开始去背景' }}
+            <span v-if="processing" class="spinner" /> {{ processing ? $t('work_pages.remove_bg_processing') : $t('work_pages.remove_bg_start') }}
           </button>
         </div>
       </div>
 
       <div v-if="!previewUrl" class="empty-hint">
         <span class="empty-icon">🖼️</span>
-        <p>上传商品图片，AI 自动识别主体并去除背景</p>
+        <p>{{ $t('work_pages.remove_bg_empty_hint') }}</p>
       </div>
     </div>
 
     <!-- Result -->
     <div v-else-if="taskStatus === 2" class="result-section">
-      <h3 class="result-title">去背景完成</h3>
+      <h3 class="result-title">{{ $t('work_pages.remove_bg_result_title') }}</h3>
       <div class="compare-row">
         <div class="compare-card">
-          <span class="compare-label">原图</span>
-          <img loading="lazy" :src="uploadedUrl" class="compare-img" alt="原图" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+          <span class="compare-label">{{ $t('work_pages.remove_bg_original_label') }}</span>
+          <img loading="lazy" :src="uploadedUrl" class="compare-img" :alt="$t('work_pages.remove_bg_original_alt')" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
         </div>
         <span class="compare-arrow">→</span>
         <div class="compare-card">
-          <span class="compare-label">去背景后</span>
-          <img loading="lazy" :src="resultUrl" class="compare-img" alt="结果" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+          <span class="compare-label">{{ $t('work_pages.remove_bg_after_label') }}</span>
+          <img loading="lazy" :src="resultUrl" class="compare-img" :alt="$t('work_pages.remove_bg_after_alt')" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
         </div>
       </div>
       <div class="actions">
-        <button class="btn btn-brand" @click="downloadResult">下载 PNG</button>
-        <button class="btn-outline" @click="resetAll">重新处理</button>
+        <button class="btn btn-brand" @click="downloadResult">{{ $t('work_pages.remove_bg_download_png') }}</button>
+        <button class="btn-outline" @click="resetAll">{{ $t('work_pages.remove_bg_redo') }}</button>
       </div>
     </div>
 
     <!-- Progress -->
     <div v-else-if="taskStatus === 0 || taskStatus === 1" class="progress-section">
       <div class="spinner-lg" />
-      <p>{{ progressMsg || '排队中...' }}</p>
+      <p>{{ progressMsg || $t('work_pages.remove_bg_queued') }}</p>
       <div class="progress-bar"><div class="progress-fill" :style="{ width: progress + '%' }" /></div>
       <p class="progress-pct">{{ progress }}%</p>
     </div>
@@ -76,14 +76,14 @@
     <!-- Error -->
     <div v-else-if="taskStatus === 3" class="error-section">
       <p class="error-icon">!</p>
-      <p>{{ errorMsg || '处理失败' }}</p>
-      <button class="btn-outline" @click="startRemoveBg">重试</button>
+      <p>{{ errorMsg || $t('work_pages.remove_bg_failed_process') }}</p>
+      <button class="btn-outline" @click="startRemoveBg">{{ $t('common.retry') }}</button>
     </div>
 
     <!-- Fallback -->
     <div v-else class="empty-hint">
       <span class="empty-icon">🖼️</span>
-      <p>上传商品图片，AI 自动识别主体并去除背景</p>
+      <p>{{ $t('work_pages.remove_bg_empty_hint') }}</p>
     </div>
   </WorkLayout>
 </template>
@@ -91,7 +91,7 @@
 <script setup lang="ts">
 const { createBlobUrl, revoke } = useBlobUrl()
 
-const steps = ['上传图片', '选择背景', '下载结果']
+const steps = computed(() => [t('work_pages.remove_bg_step_upload'), t('work_pages.remove_bg_step_bg'), t('work_pages.remove_bg_step_download')])
 const currentStep = ref(0)
 const previewUrl = ref('')
 const uploadedUrl = ref('')
@@ -114,9 +114,9 @@ let pollCount = 0
 let consecutiveFailures = 0
 
 const bgOptions = [
-  { id: 'transparent', label: '透明底', css: 'linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%) 0 0 / 20px 20px, #fff' },
-  { id: 'white', label: '纯白底', css: '#ffffff' },
-  { id: 'gray', label: '浅灰底', css: '#e5e7eb' },
+  { id: 'transparent', nameKey: 'work_pages.remove_bg_bg_transparent', css: 'linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%) 0 0 / 20px 20px, #fff' },
+  { id: 'white', nameKey: 'work_pages.remove_bg_bg_white', css: '#ffffff' },
+  { id: 'gray', nameKey: 'work_pages.remove_bg_bg_gray', css: '#e5e7eb' },
 ]
 
 function handleDrop(e: DragEvent) {
@@ -141,7 +141,7 @@ async function uploadFile(file: File) {
     })
     uploadedUrl.value = res.data?.url || previewUrl.value
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
-    uploadErr.value = err?.data?.msg || '上传失败'
+    uploadErr.value = err?.data?.msg || t('work_pages.remove_bg_failed_upload')
   } finally { uploading.value = false }
 }
 
@@ -175,7 +175,7 @@ async function startRemoveBg() {
     processing.value = false
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
     taskStatus.value = 3
-    errorMsg.value = err?.data?.msg || '处理失败'
+    errorMsg.value = err?.data?.msg || t('work_pages.remove_bg_failed_process')
     processing.value = false
   }
 }
@@ -199,7 +199,7 @@ function startPolling(taskId: string) {
         stopPolling()
         return
       } else if (d.status === 3) {
-        errorMsg.value = d.error_msg || '任务失败'
+        errorMsg.value = d.error_msg || t('work_pages.remove_bg_failed_task')
         stopPolling()
         return
       }
@@ -225,6 +225,7 @@ function resetAll() {
 }
 
 onUnmounted(() => stopPolling())
+const { t } = useI18n()
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
 
