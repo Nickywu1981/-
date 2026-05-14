@@ -295,7 +295,7 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 .grid-meta { display: flex; align-items: center; gap: 6px; }
 .label-input { flex: 1; padding: 4px 8px; border: 1px solid var(--border-light); border-radius: var(--radius-sm); background: var(--bg-card); color: var(--text-primary); font-size: 12px; }
 .btn-remove { padding: 2px 8px; border: none; background: transparent; color: var(--text-muted); cursor: pointer; font-size: 14px; }
-.btn-remove:hover { color: #e53e3e; }
+.btn-remove:hover { color: var(--danger); }
 
 /* Picker modal */
 .picker-overlay { position: fixed; inset: 0; z-index: 9000; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; }

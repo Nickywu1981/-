@@ -42,7 +42,7 @@ function goBack() { router.back() }
   background: none; border: 1px solid #b0b5bd; color: #4d5054; padding: 4px 12px;
   border-radius: 6px; cursor: pointer; font-size: 13px; white-space: nowrap; margin-top: 4px;
 }
-.ph-back:hover { border-color: #409eff; color: #409eff; }
+.ph-back:hover { border-color: var(--info); color: var(--info); }
 .ph-title { margin: 0; font-size: 22px; font-weight: 700; color: #303133; }
 .ph-subtitle { margin: 4px 0 0; font-size: 14px; color: #6b7280; }
 .ph-actions { display: flex; gap: 8px; align-items: center; }

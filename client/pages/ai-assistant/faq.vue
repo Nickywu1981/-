@@ -57,7 +57,7 @@ async function ask() {
 .ai-chat-container { max-width: 700px; margin: 0 auto; }
 .chat-panel { border: 1px solid var(--border-color, #e4e7ed); border-radius: 12px; overflow: hidden; }
 .chat-messages { min-height: 400px; max-height: 500px; overflow-y: auto; padding: 16px; background: var(--bg-input); }
-.chat-welcome { text-align: center; padding: 60px 20px; color: #909399; }
+.chat-welcome { text-align: center; padding: 60px 20px; color: var(--text-muted); }
 .chat-welcome p { font-size: 18px; margin: 0 0 8px; }
 .chat-msg { margin-bottom: 12px; display: flex; }
 .chat-msg.user { justify-content: flex-end; }

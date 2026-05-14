@@ -107,22 +107,84 @@ const MAPPINGS = [
   ['background', '#fff3cd', 'var(--warning-light)'],
   ['background', '#dcfce7', 'var(--success-light)'],
 
-  // ── Additional colors from second-pass analysis ──
+  // ── Third pass: comprehensive additions ──
+  // text/secondary colors
   ['color', '#9ca3af', 'var(--text-muted)'],
   ['color', '#909399', 'var(--text-muted)'],
+  ['color', '#64748b', 'var(--text-secondary)'],
+  ['color', '#b0b0b5', 'var(--text-muted)'],
+  ['color', '#8e8e93', 'var(--text-muted)'],
+  ['color', '#7a7a80', 'var(--text-muted)'],
+  ['color', '#e5e5e5', 'var(--text-muted)'],
+
+  // info/blue
   ['color', '#409eff', 'var(--info)'],
-  ['color', '#f56c6c', 'var(--danger)'],
+  ['color', '#1565c0', 'var(--info)'],
   ['color', '#F56C6C', 'var(--danger)'],
+  ['color', '#f56c6c', 'var(--danger)'],
+  ['color', '#e53e3e', 'var(--danger)'],
+  ['color', '#E53E3E', 'var(--danger)'],
+  ['color', '#2e7d32', 'var(--success)'],
+  ['color', '#4caf50', 'var(--success)'],
+
+  // border additions
   ['border-color', '#ccc', 'var(--border-light)'],
   ['border-color', '#eee', 'var(--border-light)'],
-  ['color', '#94e2d5', 'var(--success)'],
+  ['border-color', '#d1d5db', 'var(--border-light)'],
+  ['border-color', '#d9d9d7', 'var(--border-light)'],
+  ['border-color', '#c5c5c2', 'var(--border-light)'],
+  ['border-color', '#e5e5e2', 'var(--border-light)'],
+
+  // background additions
+  ['background', '#fafafa', 'var(--bg-page)'],
+  ['background-color', '#fafafa', 'var(--bg-page)'],
+  ['background', '#f9f9f9', 'var(--bg-input)'],
+  ['background-color', '#f9f9f9', 'var(--bg-input)'],
+  ['background', '#f3f4f6', 'var(--bg-hover)'],
+  ['background-color', '#f3f4f6', 'var(--bg-hover)'],
+  ['background', '#e3f2fd', 'var(--info-bg)'],
+  ['background-color', '#e3f2fd', 'var(--info-bg)'],
+  ['background', '#fff9c4', 'var(--warning-light)'],
+  ['background-color', '#fff9c4', 'var(--warning-light)'],
+  ['background', '#f0efed', 'var(--bg-hover)'],
+  ['background-color', '#f0efed', 'var(--bg-hover)'],
+
+  // brand/special backgrounds
   ['background', '#94e2d5', 'var(--success-light)'],
   ['background-color', '#94e2d5', 'var(--success-light)'],
+  ['background', '#4caf50', 'var(--success)'],
+  ['background-color', '#4caf50', 'var(--success)'],
+  ['background', '#e53e3e', 'var(--danger)'],
+  ['background-color', '#e53e3e', 'var(--danger)'],
+  ['background', '#ddd', 'var(--bg-hover)'],
+  ['background-color', '#ddd', 'var(--bg-hover)'],
+
+  // SVG
   ['fill', '#9ca3af', 'var(--text-muted)'],
   ['fill', '#909399', 'var(--text-muted)'],
+  ['fill', '#64748b', 'var(--text-secondary)'],
+  ['fill', '#999', 'var(--text-muted)'],
   ['stroke', '#9ca3af', 'var(--text-muted)'],
   ['stroke', '#ccc', 'var(--border-light)'],
   ['stroke', '#eee', 'var(--border-light)'],
+  ['stroke', '#d1d5db', 'var(--border-light)'],
+  ['stroke', '#e5e5e2', 'var(--border-light)'],
+
+  // color with success/warning/info
+  ['color', '#94e2d5', 'var(--success)'],
+  ['color', '#f59e0b', 'var(--warning)'],
+  ['color', '#F59E0B', 'var(--warning)'],
+  ['color', '#3b82f6', 'var(--info)'],
+  ['color', '#3B82F6', 'var(--info)'],
+
+  // #ddd in border shorthand
+  ['border', '#e2e8f0', 'var(--border-light)'],
+  ['border', '#d1d5db', 'var(--border-light)'],
+  ['border', '#d9d9d7', 'var(--border-light)'],
+  ['border-bottom', '#e2e8f0', 'var(--border-light)'],
+  ['border-bottom', '#d1d5db', 'var(--border-light)'],
+  ['border-top', '#e2e8f0', 'var(--border-light)'],
+  ['border-top', '#d1d5db', 'var(--border-light)'],
 ];
 
 // Patterns to skip (keep hex in these contexts)

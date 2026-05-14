@@ -309,7 +309,7 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 .work-meta { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; }
 .meta-type { font-size: 12px; font-weight: 600; }
 .meta-status { font-size: 11px; padding: 2px 8px; border-radius: 10px; }
-.meta-status.completed { background: #e6f7e6; color: #2e7d32; }
+.meta-status.completed { background: #e6f7e6; color: var(--success); }
 .meta-status.processing { background: #fff3e0; color: #e65100; }
 .meta-status.failed { background: var(--danger-light); color: #c62828; }
 .work-actions { padding: 0 12px 12px; }

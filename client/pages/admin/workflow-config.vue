@@ -303,7 +303,7 @@ onMounted(async () => {
 .rule-alert { background: var(--warning-light); padding: 10px 16px; border-radius: 6px; font-size: 13px; color: #856404; margin-bottom: 16px; }
 
 .steps-list { display: flex; flex-direction: column; gap: 8px; }
-.step-row { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 8px; background: #fafafa; border: 1px solid var(--border-light); }
+.step-row { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 8px; background: var(--bg-page); border: 1px solid var(--border-light); }
 .step-row.required { border-left: 3px solid #e53e3e; }
 .step-row.disabled { opacity: 0.4; }
 .step-order { width: 28px; height: 28px; border-radius: 50%; background: var(--brand); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
@@ -311,12 +311,12 @@ onMounted(async () => {
 .step-label { font-size: 14px; font-weight: 500; }
 .step-meta { font-size: 12px; color: #999; }
 .required-badge { background: var(--danger-light); color: #c62828; padding: 1px 6px; border-radius: 3px; font-size: 10px; margin-left: 6px; }
-.optional-badge { background: var(--success-light); color: #2e7d32; padding: 1px 6px; border-radius: 3px; font-size: 10px; margin-left: 6px; }
+.optional-badge { background: var(--success-light); color: var(--success); padding: 1px 6px; border-radius: 3px; font-size: 10px; margin-left: 6px; }
 .step-controls { display: flex; align-items: center; gap: 12px; }
 
 .toggle { display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; }
 .toggle-slider { width: 32px; height: 16px; background: #ccc; border-radius: 8px; position: relative; }
-.toggle input:checked + .toggle-slider { background: #4caf50; }
+.toggle input:checked + .toggle-slider { background: var(--success); }
 
 .model-select { padding: 4px 8px; border: 1px solid var(--border-light); border-radius: 4px; font-size: 12px; width: 180px; }
 .auto-model-hint { font-size: 11px; color: var(--brand); }
@@ -331,11 +331,11 @@ onMounted(async () => {
 
 .btn-delete-step {
   width: 24px; height: 24px; border-radius: 50%; border: 1px solid #e53e3e;
-  background: #fff; color: #e53e3e; cursor: pointer; font-size: 13px;
+  background: #fff; color: var(--danger); cursor: pointer; font-size: 13px;
   display: inline-flex; align-items: center; justify-content: center;
   padding: 0; line-height: 1; flex-shrink: 0;
 }
-.btn-delete-step:hover { background: #e53e3e; color: #fff; }
+.btn-delete-step:hover { background: var(--danger); color: #fff; }
 .reorder-btns { display: flex; flex-direction: column; gap: 2px; }
 .btn-reorder {
   width: 22px; height: 16px; border: 1px solid var(--border-light); background: var(--bg-hover);
