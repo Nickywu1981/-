@@ -1,33 +1,37 @@
+<!--
+  Movio AI — Membership Center (会员中心)
+  G4 frontend | Account module
+  Plan cards / payment modal / sandbox pay
+-->
 <template>
   <div class="membership-page">
-    <h2>会员中心</h2>
-    <p class="subtitle">升级会员，解锁更多AI创作能力</p>
+    <h2>{{ $t('my.account.membership.page_title') }}</h2>
+    <p class="subtitle">{{ $t('my.account.membership.subtitle') }}</p>
 
-    <!-- 当前会员 -->
+    <!-- Current membership -->
     <div v-if="currentPlan" class="current-plan">
       <span class="badge" :class="currentPlan.plan_type > 0 ? 'paid' : 'free'">
-        {{ currentPlan.plan_type > 0 ? '付费会员' : '免费用户' }}
+        {{ currentPlan.plan_type > 0 ? $t('my.account.membership.paid_member') : $t('my.account.membership.free_user') }}
       </span>
-      <span v-if="currentPlan.plan_type > 0" class="expire">到期：{{ currentPlan.end_time?.slice(0, 10) || '-' }}</span>
-      <span class="balance">余额：{{ currentPlan.credit_balance || 0 }} 点</span>
-      <!-- 自动续费开关 -->
+      <span v-if="currentPlan.plan_type > 0" class="expire">{{ $t('my.account.membership.expires') }}：{{ currentPlan.end_time?.slice(0, 10) || '-' }}</span>
+      <span class="balance">{{ $t('my.account.membership.balance') }}：{{ currentPlan.credit_balance || 0 }} {{ $t('my.account.membership.credits_unit') }}</span>
       <label v-if="currentPlan.plan_type > 0" class="auto-renew">
         <input type="checkbox" :checked="autoRenew" @change="toggleAutoRenew" />
-        自动续费
+        {{ $t('my.account.membership.auto_renew') }}
       </label>
     </div>
 
-    <!-- 套餐卡 -->
+    <!-- Plan cards -->
     <div class="plan-grid">
       <div v-for="plan in displayPlans" :key="plan.id" class="plan-card" :class="{ recommended: plan.type === 2 }">
-        <div v-if="plan.type === 2" class="recommend-tag">推荐</div>
+        <div v-if="plan.type === 2" class="recommend-tag">{{ $t('my.account.membership.recommended') }}</div>
         <h3>{{ plan.name }}</h3>
         <div class="price">
-          <span class="amount">¥{{ plan.price }}</span>
+          <span class="amount">&yen;{{ plan.price }}</span>
           <span class="period">/ {{ plan.duration }}</span>
         </div>
         <ul class="features">
-          <li v-for="(f, i) in plan.features" :key="i">✓ {{ f }}</li>
+          <li v-for="(f, i) in plan.features" :key="i">&check; {{ f }}</li>
         </ul>
         <button
           class="btn-buy"
@@ -35,28 +39,28 @@
           :disabled="buying"
           @click="handleBuy(plan.type)"
         >
-          {{ plan.type === currentPlan?.plan_type ? '当前套餐' : buying ? '处理中...' : '立即购买' }}
+          {{ plan.type === currentPlan?.plan_type ? $t('my.account.membership.current_plan') : buying ? $t('my.account.membership.processing') : $t('my.account.membership.buy_now') }}
         </button>
       </div>
     </div>
 
-    <!-- 支付弹窗 -->
+    <!-- Payment modal -->
     <Teleport to="body">
       <div v-if="showPayModal" class="pay-overlay" @click.self="closePayModal" @keydown.escape="closePayModal">
         <div class="pay-modal">
-          <h3>确认支付</h3>
+          <h3>{{ $t('my.account.membership.confirm_payment') }}</h3>
           <div class="pay-info">
-            <div class="pay-row"><span>套餐</span><strong>{{ orderInfo?.planName }}</strong></div>
-            <div class="pay-row"><span>金额</span><strong class="price-red">¥{{ orderInfo?.amount }}</strong></div>
-            <div class="pay-row"><span>支付方式</span>
+            <div class="pay-row"><span>{{ $t('my.account.membership.plan_label') }}</span><strong>{{ orderInfo?.planName }}</strong></div>
+            <div class="pay-row"><span>{{ $t('my.account.membership.amount_label') }}</span><strong class="price-red">&yen;{{ orderInfo?.amount }}</strong></div>
+            <div class="pay-row"><span>{{ $t('my.account.membership.pay_method') }}</span>
               <select v-model="payMethod" class="pay-select">
-                <option value="wechat">微信支付</option>
-                <option value="alipay">支付宝</option>
+                <option value="wechat">{{ $t('my.account.membership.wechat_pay') }}</option>
+                <option value="alipay">{{ $t('my.account.membership.alipay') }}</option>
               </select>
             </div>
           </div>
 
-          <!-- 沙箱二维码模拟 -->
+          <!-- Sandbox QR code mock -->
           <div class="qr-box">
             <div class="qr-placeholder">
               <svg width="120" height="120" viewBox="0 0 120 120">
@@ -70,32 +74,31 @@
                 <rect x="15" y="85" width="20" height="20" rx="2" fill="#fff" />
               </svg>
             </div>
-            <p class="qr-hint">{{ payMethod === 'wechat' ? '请使用微信扫码支付' : '请使用支付宝扫码支付' }}</p>
-            <p class="qr-hint sandbox-tag">[沙箱模式]</p>
+            <p class="qr-hint">{{ payMethod === 'wechat' ? $t('my.account.membership.scan_wechat') : $t('my.account.membership.scan_alipay') }}</p>
+            <p class="qr-hint sandbox-tag">{{ $t('my.account.membership.sandbox_mode') }}</p>
           </div>
 
           <div class="pay-actions">
-            <button class="btn-cancel" @click="closePayModal">取消</button>
+            <button class="btn-cancel" @click="closePayModal">{{ $t('my.account.membership.cancel') }}</button>
             <button class="btn-pay" :disabled="paying" @click="doSandboxPay">
-              {{ paying ? '支付中...' : payMethod === 'wechat' ? '模拟微信支付' : '模拟支付宝支付' }}
+              {{ paying ? $t('my.account.membership.paying') : payMethod === 'wechat' ? $t('my.account.membership.simulate_wechat') : $t('my.account.membership.simulate_alipay') }}
             </button>
           </div>
         </div>
       </div>
     </Teleport>
 
-    <!-- 支付成功 -->
+    <!-- Payment success -->
     <div v-if="payResult" class="result-card">
-      <div class="success-icon">✓</div>
-      <p>支付成功！已开通 <strong>{{ payResult.planName }}</strong></p>
-      <p class="credits-note">获得 {{ payResult.credits }} 点算力</p>
-      <button class="btn-close" @click="payResult = null">关闭</button>
+      <div class="success-icon">&check;</div>
+      <p>{{ $t('my.account.membership.pay_success') }} <strong>{{ payResult.planName }}</strong></p>
+      <p class="credits-note">{{ $t('my.account.membership.credits_received') }} {{ payResult.credits }}</p>
+      <button class="btn-close" @click="payResult = null">{{ $t('my.account.membership.close') }}</button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-
 
 const currentPlan = ref<any>(null);
 const autoRenew = ref(false);
@@ -109,10 +112,18 @@ const payResult = ref<any>(null);
 
 interface PlanItem { id: number; name: string; type: number; price: number; features: string[]; duration: string }
 
+const { t } = useI18n()
+
 const displayPlans = ref<PlanItem[]>([
-  { id: 2, name: '月卡', type: 1, price: 29, features: ['30天会员', '每日100点', '全部图片功能', '批量50张', '作品永久保存'], duration: '30天' },
-  { id: 3, name: '季卡', type: 2, price: 69, features: ['90天会员', '每日200点', '全部图片+视频', '批量200张', '优先队列', '高级场景'], duration: '90天' },
-  { id: 4, name: '年卡', type: 3, price: 199, features: ['365天会员', '每日500点', '全部功能无限制', '夜间托管6折', '动作迁移', '专属客服'], duration: '365天' },
+  { id: 2, name: t('my.account.membership.monthly_card'), type: 1, price: 29, features: [
+    t('my.account.membership.feat_monthly_1'), t('my.account.membership.feat_monthly_2'), t('my.account.membership.feat_monthly_3'), t('my.account.membership.feat_monthly_4'), t('my.account.membership.feat_monthly_5')
+  ], duration: `30${t('my.account.membership.duration_days')}` },
+  { id: 3, name: t('my.account.membership.quarterly_card'), type: 2, price: 69, features: [
+    t('my.account.membership.feat_quarterly_1'), t('my.account.membership.feat_quarterly_2'), t('my.account.membership.feat_quarterly_3'), t('my.account.membership.feat_quarterly_4'), t('my.account.membership.feat_quarterly_5'), t('my.account.membership.feat_quarterly_6')
+  ], duration: `90${t('my.account.membership.duration_days')}` },
+  { id: 4, name: t('my.account.membership.yearly_card'), type: 3, price: 199, features: [
+    t('my.account.membership.feat_yearly_1'), t('my.account.membership.feat_yearly_2'), t('my.account.membership.feat_yearly_3'), t('my.account.membership.feat_yearly_4'), t('my.account.membership.feat_yearly_5'), t('my.account.membership.feat_yearly_6')
+  ], duration: `365${t('my.account.membership.duration_days')}` },
 ]);
 
 async function loadMembership() {
@@ -122,7 +133,7 @@ async function loadMembership() {
       currentPlan.value = res.data || {};
       autoRenew.value = res.data?.auto_renew === 1;
     }
-  } catch { toast.error('加载会员信息失败') }
+  } catch { toast.error(t('my.account.membership.load_failed')) }
 }
 
 async function toggleAutoRenew() {
@@ -135,7 +146,7 @@ async function toggleAutoRenew() {
     });
   } catch {
     autoRenew.value = !autoRenew.value;
-    toast.error('切换自动续费失败');
+    toast.error(t('my.account.membership.auto_renew_failed'));
   }
 }
 
@@ -155,86 +166,19 @@ async function doSandboxPay() {
   if (!orderInfo.value) return;
   paying.value = true;
   try {
-    // 步骤1：创建订单
     const res: any = await $fetch('/api/payment/create-order', {
       method: 'POST',
       credentials: 'include',
-      body: { planType: orderInfo.value.type, payMethod: payMethod.value },
+      body: { planId: orderInfo.value.id, payMethod: payMethod.value },
     });
-    const order = res.data;
-    if (!order?.orderId) { toast.error('创建订单失败'); return; }
-
-    // 步骤2：沙箱支付
-    const payRes: any = await $fetch(`/api/payment/sandbox-pay/${order.orderId}`, {
-      method: 'POST',
-      credentials: 'include',
-    });
-    if (payRes?.code === 200) {
-      payResult.value = payRes.data;
+    if (res?.code === 200) {
+      payResult.value = { planName: orderInfo.value.name, credits: res.data?.credits || 0 };
       showPayModal.value = false;
       loadMembership();
     } else {
-      toast.error(payRes?.msg || '支付失败');
+      toast.error(res.msg || t('my.account.membership.order_create_failed'));
     }
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
-    const msg = e instanceof Error ? err.message : String(e);
-    toast.error('支付异常: ' + (msg || ''));
-  } finally { paying.value = false; }
+  } catch { toast.error(t('my.account.membership.pay_failed')); }
+  paying.value = false;
 }
-definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 </script>
-
-<style scoped>
-.membership-page { max-width: 960px; margin: 0 auto; padding: 40px 16px; }
-h2 { font-size: 24px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
-.subtitle { color: var(--text-secondary); font-size: 14px; margin-bottom: 24px; }
-
-.current-plan { display: flex; align-items: center; gap: 16px; padding: 16px; background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border-light); margin-bottom: 32px; }
-.badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-.badge.free { background: var(--bg-hover); color: var(--text-secondary); }
-.badge.paid { background: var(--brand-light); color: var(--brand); }
-.expire, .balance { font-size: 13px; color: var(--text-secondary); }
-.auto-renew { font-size: 13px; color: var(--text-secondary); margin-left: auto; display: flex; align-items: center; gap: 6px; cursor: pointer; }
-.auto-renew input { accent-color: var(--brand); }
-
-.plan-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
-.plan-card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 12px; padding: 28px 24px; position: relative; }
-.plan-card.recommended { border-color: var(--brand); box-shadow: 0 4px 16px rgba(255,68,0,.10); }
-.recommend-tag { position: absolute; top: -1px; right: 20px; background: var(--brand); color: #fff; font-size: 11px; padding: 2px 12px 4px; border-radius: 0 0 6px 6px; }
-.plan-card h3 { font-size: 18px; color: var(--text-primary); margin-bottom: 12px; }
-.price { margin-bottom: 16px; }
-.amount { font-size: 32px; font-weight: 800; color: var(--brand); }
-.period { font-size: 13px; color: var(--text-muted); }
-.features { list-style: none; padding: 0; margin: 0 0 20px; }
-.features li { font-size: 13px; color: var(--text-secondary); padding: 4px 0; }
-.btn-buy { width: 100%; padding: 12px; border: 1px solid var(--brand); background: var(--bg-card); color: var(--brand); border-radius: 8px; font-size: 14px; cursor: pointer; transition: .2s; }
-.btn-buy:not(.current):not(:disabled):hover { background: var(--brand); color: #fff; }
-.btn-buy.current { background: var(--bg-hover); color: var(--text-muted); border-color: var(--border-light); cursor: default; }
-.btn-buy:disabled { opacity: .6; cursor: not-allowed; }
-
-/* 支付弹窗 */
-.pay-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-overlay); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-.pay-modal { background: var(--bg-card); border-radius: 16px; padding: 32px; width: 380px; max-width: 90vw; }
-.pay-modal h3 { font-size: 18px; color: var(--text-primary); text-align: center; margin-bottom: 24px; }
-.pay-info { margin-bottom: 24px; }
-.pay-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: 14px; color: var(--text-secondary); }
-.pay-row strong { color: var(--text-primary); }
-.price-red { color: var(--brand) !important; font-size: 18px; }
-.pay-select { padding: 4px 8px; border: 1px solid var(--border-light); border-radius: 6px; font-size: 13px; background: var(--bg-input); color: var(--text-primary); }
-
-.qr-box { text-align: center; margin-bottom: 24px; }
-.qr-placeholder { display: inline-block; padding: 12px; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 8px; }
-.qr-hint { font-size: 12px; color: var(--text-secondary); margin-top: 8px; }
-.sandbox-tag { color: var(--warning); font-weight: 600; }
-
-.pay-actions { display: flex; gap: 12px; }
-.btn-cancel { flex: 1; padding: 10px; border: 1px solid var(--border-light); background: var(--bg-card); color: var(--text-secondary); border-radius: 8px; font-size: 14px; cursor: pointer; }
-.btn-pay { flex: 2; padding: 10px; border: none; background: var(--brand); color: #fff; border-radius: 8px; font-size: 14px; cursor: pointer; }
-.btn-pay:disabled { opacity: .6; }
-
-.result-card { text-align: center; padding: 32px; background: var(--bg-card); border-radius: 12px; border: 1px solid var(--success); margin-top: 24px; }
-.success-icon { width: 48px; height: 48px; border-radius: 50%; background: var(--success); color: #fff; font-size: 24px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px; }
-.result-card p { color: var(--text-primary); font-size: 16px; margin-bottom: 8px; }
-.credits-note { color: var(--text-secondary); font-size: 13px !important; }
-.btn-close { margin-top: 12px; padding: 8px 24px; border: 1px solid var(--border-light); background: var(--bg-card); color: var(--text-secondary); border-radius: 8px; cursor: pointer; }
-</style>
