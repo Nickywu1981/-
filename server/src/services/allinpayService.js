@@ -6,10 +6,10 @@
  */
 import crypto from 'crypto';
 import { withTransaction } from '../dao/transaction.js';
-import allinpayDao from '../dao/allinpayDao.js';
+import * as allinpayDao from '../dao/allinpayDao.js';
 import * as allinpaySDK from '../utils/allinpaySDK.js';
 import membershipDao from '../dao/membershipDao.js';
-import rechargeDao from '../dao/rechargeDao.js';
+import * as rechargeDao from '../dao/rechargeDao.js';
 import * as creditDao from '../dao/creditDao.js';
 import * as notificationService from './notificationService.js';
 import { settleCommission } from './distribution.service.js';

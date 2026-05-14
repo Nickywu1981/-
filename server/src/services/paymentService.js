@@ -6,7 +6,7 @@
 import { ORDER_STATUS } from '../constants/domainStatus.js';
 import { BusinessError } from '../utils/businessError.js';
 import * as allinpayService from '../services/allinpayService.js';
-import allinpayDao from '../dao/allinpayDao.js';
+import * as allinpayDao from '../dao/allinpayDao.js';
 import allinpayConfig from '../config/allinpay.js';
 import { isProduction } from '../config/index.js';
 import logger from '../utils/logger.js';

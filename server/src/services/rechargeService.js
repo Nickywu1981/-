@@ -1,4 +1,4 @@
-import rechargeDao from '../dao/rechargeDao.js';
+import * as rechargeDao from '../dao/rechargeDao.js';
 import * as allinpayService from '../services/allinpayService.js';
 import * as creditDao from '../dao/creditDao.js';
 import crypto from 'crypto';

@@ -17,14 +17,12 @@ vi.mock('../../dao/db.js', () => ({
   },
 }));
 vi.mock('../../dao/allinpayDao.js', () => ({
-  default: {
-    create: vi.fn().mockResolvedValue(1),
-    getByReqsn: vi.fn().mockResolvedValue(null),
-    markPaid: vi.fn().mockResolvedValue(1),
-    markFailed: vi.fn().mockResolvedValue(undefined),
-    logNotify: vi.fn().mockResolvedValue(undefined),
-    isCallbackProcessed: vi.fn().mockResolvedValue(false),
-  },
+  create: vi.fn().mockResolvedValue(1),
+  getByReqsn: vi.fn().mockResolvedValue(null),
+  markPaid: vi.fn().mockResolvedValue(1),
+  markFailed: vi.fn().mockResolvedValue(undefined),
+  logNotify: vi.fn().mockResolvedValue(undefined),
+  isCallbackProcessed: vi.fn().mockResolvedValue(false),
 }));
 vi.mock('../../dao/membershipDao.js', () => ({
   default: {
@@ -62,7 +60,7 @@ vi.mock('../../dao/creditDao.js', () => ({
 }));
 
 import * as payment from '../../services/paymentService.js';
-import allinpayDao from '../../dao/allinpayDao.js';
+import * as allinpayDao from '../../dao/allinpayDao.js';
 import * as allinpaySDK from '../../utils/allinpaySDK.js';
 import db from '../../dao/db.js';
 

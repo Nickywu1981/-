@@ -1,4 +1,4 @@
-import campaignDao from '../dao/campaignDao.js';
+import * as campaignDao from '../dao/campaignDao.js';
 import { BusinessError } from '../utils/businessError.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
