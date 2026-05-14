@@ -10,82 +10,82 @@ import { registerInterval, runShutdown } from './utils/shutdownRegistry.js';
 
 const { port, env } = serverConfig;
 
-// 启动前配置校验
+// Pre-startup config validation
 await validateStartupConfig();
 
-// 启动前运行时连接检查 (MySQL / Redis / MinIO)
+// Pre-startup runtime connection check (MySQL / Redis / MinIO)
 await validateRuntimeConnections();
 
-// 注册 AI 模型适配器（启动时自动加载）
+// Register AI model adapters (auto-loaded at startup)
 await registerAllAdapters();
 
 const server = createServer(app);
 
-// WebSocket 实时进度
+// WebSocket real-time progress
 wsManager.attach(server);
 
-// BullMQ Worker 启动（非阻塞，Redis 不可用时降级）
-import('./services/workerBootstrap.js').then(({ bootstrapWorkers }) => bootstrapWorkers()).catch((err) => { logger.warn('[Worker] 启动失败，队列将降级', { error: err.message }); });
+// BullMQ Worker startup (non-blocking, degrades when Redis unavailable)
+import('./services/workerBootstrap.js').then(({ bootstrapWorkers }) => bootstrapWorkers()).catch((err) => { logger.warn('[Worker] Startup failed, queue will degrade', { error: err.message }); });
 
 let cleanupTimer = null;
 let recoverTimer = null;
 
 server.on('error', (err) => {
   if (err.code === 'EADDRINUSE') {
-    logger.error(`端口 ${port} 已被占用，请先释放端口再启动服务`, { code: err.code });
+    logger.error(`Port ${port} already in use, release the port before restarting`, { code: err.code });
     process.exit(1);
   }
-  logger.error('服务器启动错误', { message: err.message, code: err.code });
+  logger.error('Server startup error', { message: err.message, code: err.code });
   process.exit(1);
 });
 
 server.listen(port, () => {
-  logger.info(`${env} 模式 — http://localhost:${port}  |  WebSocket /ws  |  BullMQ Workers`);
+  logger.info(`${env} mode — http://localhost:${port}  |  WebSocket /ws  |  BullMQ Workers`);
 
-  // 定时清理废弃上传 (每 30 分钟)
+  // Periodic cleanup of stale uploads (every 30 min)
   cleanupTimer = registerInterval(() => {
-    import('./utils/file-upload.js').then(({ cleanupStaleUploads }) => cleanupStaleUploads()).catch((err) => { logger.warn('[Cleanup] 加载失败', { error: err.message }); });
+    import('./utils/file-upload.js').then(({ cleanupStaleUploads }) => cleanupStaleUploads()).catch((err) => { logger.warn('[Cleanup] Load failed', { error: err.message }); });
   }, 30 * 60 * 1000);
 
-  // 定时恢复卡住的任务 (每 5 分钟)
+  // Periodic stuck-task recovery (every 5 min)
   recoverTimer = registerInterval(() => {
-    import('./dao/taskDao.js').then(({ recoverStuckTasks }) => recoverStuckTasks()).catch((err) => { logger.warn('[Cron] 恢复卡住任务失败', { error: err.message }); });
-    import('./services/job-queue.service.js').then(({ recoverStuckJobs }) => recoverStuckJobs()).catch((err) => { logger.warn('[Cron] job_queue 恢复失败', { error: err.message }); });
+    import('./dao/taskDao.js').then(({ recoverStuckTasks }) => recoverStuckTasks()).catch((err) => { logger.warn('[Cron] Stuck task recovery failed', { error: err.message }); });
+    import('./services/job-queue.service.js').then(({ recoverStuckJobs }) => recoverStuckJobs()).catch((err) => { logger.warn('[Cron] job_queue recovery failed', { error: err.message }); });
   }, 5 * 60 * 1000);
 
-  // E2B 孤儿沙箱清理 + 预热池初始化
+  // E2B orphan sandbox cleanup + warm pool init
   import('./services/e2b.service.js').then(({ _startupOrphanCheck, _initWarmPool }) => {
-    _startupOrphanCheck().catch((err) => { logger.warn('[E2B] 孤儿检查失败', { error: err.message }); });
-    _initWarmPool().catch((err) => { logger.warn('[E2B] 预热池初始化失败', { error: err.message }); });
-  }).catch((err) => { logger.warn('[E2B] 加载失败', { error: err.message }); });
+    _startupOrphanCheck().catch((err) => { logger.warn('[E2B] Orphan check failed', { error: err.message }); });
+    _initWarmPool().catch((err) => { logger.warn('[E2B] Warm pool init failed', { error: err.message }); });
+  }).catch((err) => { logger.warn('[E2B] Load failed', { error: err.message }); });
 
-  // 自愈引擎: 定时断路器自愈 + 模型自恢复 + 自适应限流
+  // Self-healing engine: periodic circuit-breaker recovery + model auto-recovery + adaptive rate limiting
   import('./services/autoRecoveryService.js').then(({ startAutoRecoveryLoop }) => {
     startAutoRecoveryLoop(60_000);
-  }).catch((err) => { logger.warn('[AutoRecovery] 启动失败', { error: err.message }); });
+  }).catch((err) => { logger.warn('[AutoRecovery] Startup failed', { error: err.message }); });
 
-  // 反馈学习: 周期性评分反馈 → 模型权重调整 (每1小时)
+  // Feedback learning: periodic scoring feedback → model weight adjustment (every 1h)
   import('./services/feedbackLearningService.js').then(({ startFeedbackLoop }) => {
     startFeedbackLoop(3600_000);
-  }).catch((err) => { logger.warn('[Feedback] 启动失败', { error: err.message }); });
+  }).catch((err) => { logger.warn('[Feedback] Startup failed', { error: err.message }); });
 
-  // L5 自愈种子策略: 首次运行时初始化默认6种策略
+  // L5 self-healing seed strategies: initialize 6 default strategies on first run
   import('./services/incidentLearningService.js').then(({ seedDefaultStrategies }) => {
-    seedDefaultStrategies().catch((err) => { logger.warn('[IncidentLearning] 种子策略初始化失败', { error: err.message }); });
-  }).catch((err) => { logger.warn('[IncidentLearning] 加载失败', { error: err.message }); });
+    seedDefaultStrategies().catch((err) => { logger.warn('[IncidentLearning] Seed strategy init failed', { error: err.message }); });
+  }).catch((err) => { logger.warn('[IncidentLearning] Load failed', { error: err.message }); });
 
-  // L5 自适应阈值: 启动时学习一次基线
+  // L5 adaptive threshold: learn baseline once on startup
   import('./services/adaptiveThresholdService.js').then(({ learnBaseline }) => {
-    learnBaseline(7).catch((err) => { logger.warn('[AdaptiveThreshold] 基线学习失败', { error: err.message }); });
-  }).catch((err) => { logger.warn('[AdaptiveThreshold] 加载失败', { error: err.message }); });
+    learnBaseline(7).catch((err) => { logger.warn('[AdaptiveThreshold] Baseline learning failed', { error: err.message }); });
+  }).catch((err) => { logger.warn('[AdaptiveThreshold] Load failed', { error: err.message }); });
 });
 
-// ==================== 全局异常处理 ====================
+// ==================== Global exception handlers ====================
 
 process.on('uncaughtException', (err) => {
   const logEntry = { message: err.message };
   if (!isProduction) logEntry.stack = err.stack?.split('\n').slice(0, 3).join('\n');
-  logger.error('未捕获异常', logEntry);
+  logger.error('Uncaught exception', logEntry);
   gracefulShutdown('uncaughtException');
 });
 
@@ -93,11 +93,11 @@ process.on('unhandledRejection', (reason) => {
   const msg = reason instanceof Error ? reason.message : String(reason);
   const logEntry = { message: msg };
   if (!isProduction) logEntry.stack = reason?.stack?.split('\n').slice(0, 3).join('\n');
-  logger.error('未处理的 Promise 拒绝', logEntry);
-  // unhandledRejection 不触发 shutdown — 与 uncaughtException 不同，进程状态仍可恢复
+  logger.error('Unhandled promise rejection', logEntry);
+  // unhandledRejection does not trigger shutdown — unlike uncaughtException, process state is still recoverable
 });
 
-// ==================== 优雅关闭 ====================
+// ==================== Graceful shutdown ====================
 
 let shuttingDown = false;
 let forceExitTimer = null;
@@ -106,47 +106,47 @@ function gracefulShutdown(signal) {
   if (shuttingDown) return;
   shuttingDown = true;
 
-  logger.info(`收到 ${signal}，开始优雅关闭...`);
+  logger.info(`Received ${signal}, starting graceful shutdown...`);
   const isCrash = signal === 'uncaughtException' || signal === 'unhandledRejection';
   const exitCode = isCrash ? 1 : 0;
 
-  // 清理所有注册的定时器与资源
+  // Clean up all registered timers and resources
   await runShutdown();
 
   server.close(() => {
     (async () => {
-    logger.info('HTTP/WS 服务已停止');
+    logger.info('HTTP/WS server stopped');
 
-    // 关闭 DB 连接池
+    // Close DB connection pool
     try {
       const db = await import('./dao/db.js');
       await db.default.end();
-      logger.info('DB 连接池已关闭');
-    } catch (e) { logger.warn('DB 关闭失败', { message: e.message }); }
+      logger.info('DB pool closed');
+    } catch (e) { logger.warn('DB close failed', { message: e.message }); }
 
-    // 关闭 BullMQ
+    // Close BullMQ
     try {
       const qm = await import('./services/queueManager.js');
       await qm.closeAll();
-      logger.info('BullMQ 队列已关闭');
-    } catch (e) { logger.warn('BullMQ 关闭失败', { message: e.message }); }
+      logger.info('BullMQ queues closed');
+    } catch (e) { logger.warn('BullMQ close failed', { message: e.message }); }
 
-    // 关闭 Redis
+    // Close Redis
     try {
       const { quit } = await import('./dao/redis.js');
       await quit();
-      logger.info('Redis 已关闭');
-    } catch (e) { logger.warn('Redis 关闭失败', { message: e.message }); }
+      logger.info('Redis closed');
+    } catch (e) { logger.warn('Redis close failed', { message: e.message }); }
 
     if (forceExitTimer) { clearTimeout(forceExitTimer); forceExitTimer = null; }
     // eslint-disable-next-line no-process-exit
     process.exit(exitCode);
-    })().catch((e) => { logger.error('优雅关闭失败', { message: e.message }); process.exit(1); });
+    })().catch((e) => { logger.error('Graceful shutdown failed', { message: e.message }); process.exit(1); });
   });
 
-  // 10秒强制退出
+  // Force exit after 10 seconds
   forceExitTimer = setTimeout(() => {
-    logger.error('强制退出');
+    logger.error('Force exit triggered');
     // eslint-disable-next-line no-process-exit
     process.exit(1);
   }, 10000);
