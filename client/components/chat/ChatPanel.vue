@@ -28,6 +28,12 @@ const msgList = ref<HTMLElement>()
 const fileInput = ref<HTMLInputElement>()
 const attachments = ref<Array<{ type: 'image' | 'video' | 'link', url: string, name?: string }>>([])
 
+const handleClear = () => {
+  clear()
+  clearAttachments()
+  input.value = ''
+}
+
 const scrollToBottom = () => {
   nextTick(() => {
     if (msgList.value) msgList.value.scrollTop = msgList.value.scrollHeight
@@ -107,7 +113,7 @@ onUnmounted(() => {
         <div class="cp-hd">
           <h3 class="cp-title">{{ t('chat.panel_title') }}</h3>
           <div class="cp-hd-actions">
-            <button class="cp-btn-icon" :title="t('chat.clear')" :aria-label="t('chat.clear')" @click="clear">🗑</button>
+            <button class="cp-btn-icon" :title="t('chat.clear')" :aria-label="t('chat.clear')" @click="handleClear">🗑</button>
             <button class="cp-btn-icon cp-close" :aria-label="t('chat.close')" @click="emit('update:modelValue', false)">✕</button>
           </div>
         </div>
