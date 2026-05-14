@@ -1,66 +1,66 @@
 <template>
-  <WorkLayout title="图片精修" subtitle="AI 自动美化：亮度+对比度+锐化+色彩增强" :steps="steps" :current-step="currentStep">
+  <WorkLayout :title="$t('work_pages.retouch_title')" :subtitle="$t('work_pages.retouch_subtitle')" :steps="steps" :current-step="currentStep">
       <div class="ws-section">
-        <div class="ws-section__title">上传商品图片</div>
-        <div class="ws-section__desc">AI 自动检测并优化图片质量</div>
+        <div class="ws-section__title">{{ $t('work_pages.retouch_upload_title') }}</div>
+        <div class="ws-section__desc">{{ $t('work_pages.retouch_upload_desc') }}</div>
         <div class="ws-upload-area" @dragover.prevent @drop.prevent="handleDrop" @click="triggerUpload">
           <div v-if="!previewUrl" class="ws-upload-area__inner">
             <div class="ws-upload-area__icon">✨</div>
-            <div class="ws-upload-area__text">点击上传或拖拽图片到此处</div>
-            <div class="ws-upload-area__hint">支持 JPG / PNG / WebP，最大 20MB</div>
+            <div class="ws-upload-area__text">{{ $t('work_pages.retouch_upload_text') }}</div>
+            <div class="ws-upload-area__hint">{{ $t('work_pages.retouch_upload_hint') }}</div>
           </div>
-          <img loading="lazy" v-else :src="previewUrl" alt="上传预览" class="ws-upload-area__preview" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+          <img loading="lazy" v-else :src="previewUrl" :alt="$t('work_pages.retouch_upload_preview')" class="ws-upload-area__preview" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
           <input ref="fileInput" type="file" accept="image/*" hidden @change="handleFile" />
         </div>
-        <div v-if="uploading" class="ws-uploading">⏳ 上传中...</div>
-        <div v-else-if="uploadedUrl" class="ws-uploaded">✓ 已上传</div>
+        <div v-if="uploading" class="ws-uploading">⏳ {{ $t('work_pages.retouch_uploading') }}</div>
+        <div v-else-if="uploadedUrl" class="ws-uploaded">✓ {{ $t('work_pages.retouch_uploaded') }}</div>
       </div>
       <div class="ws-section">
-        <div class="ws-section__title">精修选项</div>
+        <div class="ws-section__title">{{ $t('work_pages.retouch_options_title') }}</div>
         <div class="tag-row">
-          <span v-for="f in features" :key="f.id" class="ws-tag" :class="{ active: selectedFeatures.includes(f.id) }" @click="toggleFeature(f.id)">{{ f.icon }} {{ f.name }}</span>
+          <span v-for="f in features" :key="f.id" class="ws-tag" :class="{ active: selectedFeatures.includes(f.id) }" @click="toggleFeature(f.id)">{{ f.icon }} {{ $t(f.nameKey) }}</span>
         </div>
       </div>
       <div class="ws-section">
-        <div class="ws-section__title">精修强度</div>
+        <div class="ws-section__title">{{ $t('work_pages.retouch_strength_title') }}</div>
         <div class="level-row">
-          <span v-for="l in levels" :key="l.id" class="level-chip" :class="{ active: selectedLevel === l.id }" @click="selectedLevel = l.id">{{ l.name }}</span>
+          <span v-for="l in levels" :key="l.id" class="level-chip" :class="{ active: selectedLevel === l.id }" @click="selectedLevel = l.id">{{ $t(l.nameKey) }}</span>
         </div>
       </div>
       <div class="ws-actions">
-        <div class="ws-cost">预计消耗 <strong>2</strong> 积分</div>
-        <button class="ws-btn ws-btn--primary ws-btn--lg" :disabled="!uploadedUrl || submitting" @click="submitRetouch">{{ submitting ? '提交中...' : '开始精修' }}</button>
+        <div class="ws-cost">{{ $t('work_pages.retouch_cost', { count: 2 }) }}</div>
+        <button class="ws-btn ws-btn--primary ws-btn--lg" :disabled="!uploadedUrl || submitting" @click="submitRetouch">{{ submitting ? $t('work_pages.retouch_submitting') : $t('work_pages.retouch_submit') }}</button>
       </div>
       <div class="ws-section">
-        <div class="ws-section__title">精修结果</div>
+        <div class="ws-section__title">{{ $t('work_pages.retouch_result_title') }}</div>
         <div v-if="task.polling.value" class="progress-box">
           <div class="spinner" />
-          <p>{{ task.progressMsg.value || 'AI 正在精修...' }}</p>
+          <p>{{ task.progressMsg.value || $t('work_pages.retouch_progress_text') }}</p>
           <div class="bar"><div class="bar-fill" :style="{ width: task.progress.value + '%' }" /></div>
         </div>
         <div v-else-if="task.status.value === 2" class="result-compare">
           <div class="result-compare__item">
-            <div class="result-compare__label">原始图片</div>
-            <img loading="lazy" v-if="uploadedUrl" :src="uploadedUrl" alt="原图" class="result-compare__img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+            <div class="result-compare__label">{{ $t('work_pages.retouch_original_label') }}</div>
+            <img loading="lazy" v-if="uploadedUrl" :src="uploadedUrl" :alt="$t('work_pages.retouch_original_alt')" class="result-compare__img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
             <div v-else class="result-compare__img placeholder" />
           </div>
           <div class="result-compare__divider">
             <div class="result-compare__arrow">→</div>
-            <div class="result-compare__badge">AI 精修</div>
+            <div class="result-compare__badge">{{ $t('work_pages.retouch_ai_badge') }}</div>
           </div>
           <div class="result-compare__item">
-            <div class="result-compare__label">精修后</div>
-            <img loading="lazy" v-if="task.result.value" :src="task.result.value" alt="精修结果" class="result-compare__img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+            <div class="result-compare__label">{{ $t('work_pages.retouch_after_label') }}</div>
+            <img loading="lazy" v-if="task.result.value" :src="task.result.value" :alt="$t('work_pages.retouch_after_alt')" class="result-compare__img" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
             <div v-else class="result-compare__img placeholder" />
           </div>
         </div>
         <div v-else-if="task.status.value === 3" class="error-box">
-          <p>{{ task.errorMsg.value || '任务失败' }}</p>
-          <button class="ws-btn ws-btn--primary" @click="handleRedo">重试</button>
+          <p>{{ task.errorMsg.value || $t('common.failed') }}</p>
+          <button class="ws-btn ws-btn--primary" @click="handleRedo">{{ $t('common.retry') }}</button>
         </div>
         <div v-else class="ws-placeholder">
           <div class="ws-placeholder__icon">✨</div>
-          <div class="ws-placeholder__text">精修结果将显示在这里</div>
+          <div class="ws-placeholder__text">{{ $t('work_pages.retouch_result_empty') }}</div>
         </div>
       </div>
       </WorkLayout>
@@ -71,7 +71,7 @@
 const { createBlobUrl, revoke } = useBlobUrl()
 const toast = useToast()
 
-const steps = ['上传图片', '精修处理', '查看结果']
+const steps = computed(() => [t('work_pages.retouch_step_upload'), t('work_pages.retouch_step_process'), t('work_pages.retouch_step_result')])
 const currentStep = ref(0)
 const previewUrl = ref('')
 const uploadedUrl = ref('')
@@ -83,18 +83,18 @@ const task = useTask()
 const fileInput = ref<HTMLInputElement>()
 
 const features = [
-  { id: 'beautify', icon: '💄', name: '一键美化' },
-  { id: 'contrast', icon: '☀', name: '色彩增强' },
-  { id: 'sharpen', icon: '🔍', name: '锐化细节' },
-  { id: 'denoise', icon: '🧹', name: '去噪降噪' },
-  { id: 'lighting', icon: '💡', name: '光影优化' },
-  { id: 'bokeh', icon: '📸', name: '背景虚化' },
+  { id: 'beautify', icon: '💄', nameKey: 'work_pages.retouch_feature_beautify' },
+  { id: 'contrast', icon: '☀', nameKey: 'work_pages.retouch_feature_contrast' },
+  { id: 'sharpen', icon: '🔍', nameKey: 'work_pages.retouch_feature_sharpen' },
+  { id: 'denoise', icon: '🧹', nameKey: 'work_pages.retouch_feature_denoise' },
+  { id: 'lighting', icon: '💡', nameKey: 'work_pages.retouch_feature_lighting' },
+  { id: 'bokeh', icon: '📸', nameKey: 'work_pages.retouch_feature_bokeh' },
 ]
 
 const levels = [
-  { id: 'light', name: '轻度' },
-  { id: 'standard', name: '标准' },
-  { id: 'heavy', name: '深度' },
+  { id: 'light', nameKey: 'work_pages.retouch_level_light' },
+  { id: 'standard', nameKey: 'work_pages.retouch_level_standard' },
+  { id: 'heavy', nameKey: 'work_pages.retouch_level_heavy' },
 ]
 
 function toggleFeature(id: string) {
