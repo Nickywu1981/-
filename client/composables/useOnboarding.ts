@@ -37,13 +37,16 @@ export function useOnboarding() {
     isVisible.value = false
   }
 
+  let _timer: ReturnType<typeof setTimeout> | null = null
+
   const checkAndShow = () => {
     if (import.meta.server) return
     if (!hasSeenGuide()) {
-      const timer = setTimeout(() => { isVisible.value = true }, 800)
-      onUnmounted(() => clearTimeout(timer))
+      _timer = setTimeout(() => { isVisible.value = true }, 800)
     }
   }
+
+  onUnmounted(() => { if (_timer) clearTimeout(_timer) })
 
   const next = () => {
     if (currentStep.value < steps.value.length - 1) currentStep.value++

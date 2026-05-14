@@ -31,7 +31,7 @@
 
 <script setup lang="ts">
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const loading = ref(true)
 const list = ref<any[]>([])
@@ -70,7 +70,7 @@ const viewDetail = (item: any) => {
   toast.info(`${t('my.orders.detail_title')}${item.order_no || item.id}\n${t('my.orders.detail_amount')}¥${item.amount || item.price}\n${t('my.orders.detail_status')}${statusLabel(item.status)}`)
 }
 
-const formatTime = (t: string) => t ? new Date(t).toLocaleString('zh-CN') : ''
+const formatTime = (t: string) => t ? new Date(t).toLocaleString(locale.value) : ''
 
 onMounted(fetchAll)
 definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })

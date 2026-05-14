@@ -75,8 +75,8 @@ const fetchAll = async () => {
   loading.value = false
 }
 
-const { t } = useI18n()
-const formatTime = (t: string) => t ? new Date(t).toLocaleString('zh-CN') : ''
+const { t, locale } = useI18n()
+const formatTime = (t: string) => t ? new Date(t).toLocaleString(locale.value) : ''
 
 onMounted(fetchAll)
 definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })

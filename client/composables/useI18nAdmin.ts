@@ -120,23 +120,27 @@ export function useI18nAdmin() {
 
   async function addKey() {
     if (!newKey.value || !newValue.value) return
-    await $fetch(`/api/admin/i18n/${activeLocale.value}`, {
-      method: 'POST', body: { key: newKey.value, value: newValue.value }, credentials: 'include',
-    })
-    newKey.value = ''
-    newValue.value = ''
-    showAddModal.value = false
-    await fetch()
+    try {
+      await $fetch(`/api/admin/i18n/${activeLocale.value}`, {
+        method: 'POST', body: { key: newKey.value, value: newValue.value }, credentials: 'include',
+      })
+      newKey.value = ''
+      newValue.value = ''
+      showAddModal.value = false
+      await fetch()
+    } catch { useToast().error('Failed to add translation key') }
   }
 
   async function importJSON(file: File) {
-    const text = await file.text()
-    let data: Record<string, unknown>
-    try { data = JSON.parse(text) } catch { useToast().error('无效的 JSON 文件'); return }
-    await $fetch(`/api/admin/i18n/${activeLocale.value}/import`, {
-      method: 'POST', body: data, params: { skipEdited: '0' }, credentials: 'include',
-    })
-    await fetch()
+    try {
+      const text = await file.text()
+      let data: Record<string, unknown>
+      try { data = JSON.parse(text) } catch { useToast().error('无效的 JSON 文件'); return }
+      await $fetch(`/api/admin/i18n/${activeLocale.value}/import`, {
+        method: 'POST', body: data, params: { skipEdited: '0' }, credentials: 'include',
+      })
+      await fetch()
+    } catch { useToast().error('Failed to import translations') }
   }
 
   async function showLogs(key: string) {

@@ -156,7 +156,7 @@ onUnmounted(() => {
           <div v-for="(a, i) in attachments" :key="i" class="cp-attach-tag">
             <span>{{ a.type === 'image' ? '🖼' : a.type === 'video' ? '🎬' : '🔗' }}</span>
             <span class="cp-attach-name">{{ a.name || a.url.slice(0, 30) }}</span>
-            <button class="cp-attach-rm" @click="removeAttachment(i)">✕</button>
+            <button class="cp-attach-rm" :aria-label="$t('common.remove')" @click="removeAttachment(i)">✕</button>
           </div>
         </div>
 

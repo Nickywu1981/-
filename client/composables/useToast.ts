@@ -26,6 +26,8 @@ export function useToast() {
     }
   })
 
+  onUnmounted(() => { _toast.value = null })
+
   return {
     success: (msg: string) => _emit('success', msg),
     error: (msg: string) => _emit('error', msg),

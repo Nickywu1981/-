@@ -94,7 +94,7 @@
       <div class="publish-history">
         <h3>
           {{ $t('work_pages.publish.history_title') }}
-          <button class="btn-refresh" @click="loadHistory" :disabled="loadingHistory">🔄</button>
+          <button class="btn-refresh" :aria-label="$t('common.refresh')" @click="loadHistory" :disabled="loadingHistory">🔄</button>
         </h3>
 
         <!-- 统计条 -->

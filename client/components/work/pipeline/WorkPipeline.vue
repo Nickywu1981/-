@@ -21,7 +21,7 @@
             <div v-if="uploadState(field.key).previewUrl" class="preview-box">
               <audio v-if="field.upload?.accept?.includes('audio')" :src="uploadState(field.key).previewUrl" controls class="upload-preview" />
               <img v-else :src="uploadState(field.key).previewUrl" alt="preview" @error="(e) => { (e.target as HTMLImageElement).src = PLACEHOLDER }" />
-              <button class="preview-remove" type="button" @click="clearUpload(field.key)">✕</button>
+              <button class="preview-remove" type="button" :aria-label="$t('common.remove')" @click="clearUpload(field.key)">✕</button>
             </div>
             <p v-if="uploadState(field.key).error" class="msg msg-error">{{ uploadState(field.key).error }}</p>
             <p v-if="uploadState(field.key).uploading" class="msg">{{ $t('common.uploading') }}</p>
@@ -42,7 +42,7 @@
             </div>
             <div v-if="uploadState(field.key).previewUrl" class="preview-box">
               <video :src="uploadState(field.key).previewUrl" controls class="upload-preview" />
-              <button class="preview-remove" type="button" @click="clearUpload(field.key)">✕</button>
+              <button class="preview-remove" type="button" :aria-label="$t('common.remove')" @click="clearUpload(field.key)">✕</button>
             </div>
             <p v-if="uploadState(field.key).error" class="msg msg-error">{{ uploadState(field.key).error }}</p>
             <p v-if="uploadState(field.key).uploading" class="msg">{{ $t('common.uploading') }}</p>

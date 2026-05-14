@@ -105,7 +105,7 @@ const clearAll = () => {
       <div v-for="s in skuMatrix.slice(0, 12)" :key="s.id" class="ss-sku-mini">
         <span class="ss-sku-swatch" :style="{ background: s.colorHex }" />
         <span class="ss-sku-text">{{ s.color }} / {{ s.size }}</span>
-        <button class="ss-sku-rm" @click="removeSku(s.id)">×</button>
+        <button class="ss-sku-rm" :aria-label="$t('common.remove')" @click="removeSku(s.id)">×</button>
       </div>
       <div v-if="skuMatrix.length > 12" class="ss-sku-more">+{{ skuMatrix.length - 12 }} {{ t('skuSelector.more') }}</div>
     </div>

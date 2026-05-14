@@ -92,7 +92,7 @@ onUnmounted(() => {
         <div class="bsv-images">
           <div v-for="(img, i) in productImages" :key="i" class="bsv-img-tag">
             <img :src="img" class="bsv-thumb" />
-            <button class="bsv-img-rm" @click="removeImage(i)">×</button>
+            <button class="bsv-img-rm" :aria-label="$t('common.remove')" @click="removeImage(i)">×</button>
           </div>
         </div>
       </div>
