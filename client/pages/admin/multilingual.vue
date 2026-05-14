@@ -2,19 +2,19 @@
   <AdminLayout>
     <div class="i18n-admin">
       <div class="i18n-header">
-        <h2>多语言翻译管理</h2>
+        <h2>{{ $t('admin_multilingual.page_title') }}</h2>
         <div class="i18n-actions">
           <span class="i18n-pending" v-if="pendingCount > 0">
-            {{ pendingCount }} 项待保存
+            {{ pendingCount }} {{ $t('admin_multilingual.pending_suffix') }}
           </span>
           <button class="i18n-btn primary" :disabled="saving" @click="saveAll">
-            {{ saving ? '保存中...' : '保存全部' }}
+            {{ saving ? $t('admin_multilingual.saving') : $t('admin_multilingual.save_all') }}
           </button>
           <label class="i18n-btn">
-            📥 导入 JSON
+            📥 {{ $t('admin_multilingual.import_json') }}
             <input type="file" accept=".json" hidden @change="handleImport" />
           </label>
-          <button class="i18n-btn" @click="exportJSON">📤 导出 JSON</button>
+          <button class="i18n-btn" @click="exportJSON">📤 {{ $t('admin_multilingual.export_json') }}</button>
         </div>
       </div>
 
@@ -26,41 +26,41 @@
             :key="loc"
             :class="['i18n-locale-btn', { active: activeLocale === loc }]"
             @click="switchLocale(loc)"
-          >{{ loc === 'zh' ? '🇨🇳 中文' : loc === 'en' ? '🇺🇸 English' : '🇪🇸 Español' }}</button>
+          >{{ localeLabel(loc) }}</button>
         </div>
         <div class="i18n-filters">
           <select v-model="activeNamespace" class="i18n-select">
-            <option value="">全部命名空间</option>
+            <option value="">{{ $t('admin_multilingual.all_namespaces') }}</option>
             <option v-for="ns in namespaces" :key="ns" :value="ns">{{ ns }}</option>
           </select>
           <div class="i18n-search">
             <input
               v-model="searchQuery"
               type="text"
-              placeholder="搜索 key 或内容..."
+              :placeholder="$t('admin_multilingual.search_key_placeholder')"
               class="i18n-search-input"
               @input="doSearch"
             />
           </div>
         </div>
-        <button class="i18n-btn sm" @click="showAddModal = true">+ 新增 key</button>
+        <button class="i18n-btn sm" @click="showAddModal = true">+ {{ $t('admin_multilingual.add_key') }}</button>
       </div>
 
       <!-- 统计 -->
       <div class="i18n-stats">
-        共 {{ displayedTranslations.length }} 条翻译
+        {{ $t('admin_multilingual.total_translations', { n: displayedTranslations.length }) }}
       </div>
 
       <!-- 翻译列表 -->
-      <div v-if="loading" class="i18n-loading">加载中...</div>
+      <div v-if="loading" class="i18n-loading">{{ $t('admin_multilingual.loading') }}</div>
       <div v-else class="i18n-table-wrap">
         <table class="i18n-table">
           <thead>
             <tr>
-              <th class="col-ns">命名空间</th>
-              <th class="col-key">Key</th>
-              <th class="col-val">翻译文本</th>
-              <th class="col-act">操作</th>
+              <th class="col-ns">{{ $t('admin_multilingual.col_namespace') }}</th>
+              <th class="col-key">{{ $t('admin_multilingual.col_key') }}</th>
+              <th class="col-val">{{ $t('admin_multilingual.col_value') }}</th>
+              <th class="col-act">{{ $t('admin_multilingual.col_actions') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -73,8 +73,8 @@
               <td class="col-key"><code class="key-code">{{ item.key }}</code></td>
               <td class="col-val">
                 <template v-if="pendingDelete.has(item.key)">
-                  <span class="deleted-mark">已标记删除</span>
-                  <button class="i18n-link" @click="unmarkDelete(item.key)">撤销</button>
+                  <span class="deleted-mark">{{ $t('admin_multilingual.marked_deleted') }}</span>
+                  <button class="i18n-link" @click="unmarkDelete(item.key)">{{ $t('admin_multilingual.undo') }}</button>
                 </template>
                 <template v-else-if="editingKey === item.key">
                   <div class="edit-row">
@@ -87,9 +87,9 @@
                       @keydown.enter.ctrl="setEditValue(item.key, editValue)"
                     ></textarea>
                     <div class="edit-actions">
-                      <button class="i18n-btn sm primary" @click="setEditValue(item.key, editValue)">确认</button>
-                      <button class="i18n-btn sm" @click="cancelEdit">取消</button>
-                      <small>Ctrl+Enter 快捷提交</small>
+                      <button class="i18n-btn sm primary" @click="setEditValue(item.key, editValue)">{{ $t('admin_multilingual.confirm') }}</button>
+                      <button class="i18n-btn sm" @click="cancelEdit">{{ $t('admin_multilingual.cancel') }}</button>
+                      <small>{{ $t('admin_multilingual.ctrl_enter_hint') }}</small>
                     </div>
                   </div>
                 </template>
@@ -103,9 +103,9 @@
               </td>
               <td class="col-act">
                 <template v-if="!pendingDelete.has(item.key)">
-                  <button class="i18n-link" @click="beginEdit(item)">编辑</button>
-                  <button class="i18n-link danger" @click="markDelete(item.key)">删除</button>
-                  <button class="i18n-link" @click="showLogs(item.key)">历史</button>
+                  <button class="i18n-link" @click="beginEdit(item)">{{ $t('admin_multilingual.edit') }}</button>
+                  <button class="i18n-link danger" @click="markDelete(item.key)">{{ $t('admin_multilingual.delete') }}</button>
+                  <button class="i18n-link" @click="showLogs(item.key)">{{ $t('admin_multilingual.history') }}</button>
                 </template>
               </td>
             </tr>
@@ -117,16 +117,16 @@
       <Teleport to="body">
         <div v-if="showAddModal" class="modal-overlay" @click.self="showAddModal = false" @keydown.escape="showAddModal = false">
           <div class="modal-card">
-            <h3>新增翻译</h3>
+            <h3>{{ $t('admin_multilingual.new_translation') }}</h3>
             <div class="modal-form">
-              <label>Key (如 common.save)</label>
-              <input v-model="newKey" type="text" placeholder="命名空间.key" class="modal-input" />
-              <label>翻译文本</label>
-              <textarea v-model="newValue" rows="3" placeholder="输入翻译内容..." class="modal-input"></textarea>
+              <label>{{ $t('admin_multilingual.key_hint') }}</label>
+              <input v-model="newKey" type="text" :placeholder="$t('admin_multilingual.key_placeholder')" class="modal-input" />
+              <label>{{ $t('admin_multilingual.translate_text') }}</label>
+              <textarea v-model="newValue" rows="3" :placeholder="$t('admin_multilingual.translate_placeholder')" class="modal-input"></textarea>
             </div>
             <div class="modal-actions">
-              <button class="i18n-btn" @click="showAddModal = false">取消</button>
-              <button class="i18n-btn primary" @click="addKey">确认新增</button>
+              <button class="i18n-btn" @click="showAddModal = false">{{ $t('admin_multilingual.cancel') }}</button>
+              <button class="i18n-btn primary" @click="addKey">{{ $t('admin_multilingual.confirm_add') }}</button>
             </div>
           </div>
         </div>
@@ -136,22 +136,22 @@
       <Teleport to="body">
         <div v-if="showLogModal" class="modal-overlay" @click.self="showLogModal = false" @keydown.escape="showLogModal = false">
           <div class="modal-card wide">
-            <h3>变更历史 — {{ logTargetKey }}</h3>
+            <h3>{{ $t('admin_multilingual.change_history') }} — {{ logTargetKey }}</h3>
             <table v-if="auditLogs.length" class="log-table">
               <thead>
-                <tr><th>时间</th><th>旧值</th><th>新值</th></tr>
+                <tr><th>{{ $t('admin_multilingual.col_time') }}</th><th>{{ $t('admin_multilingual.col_old_value') }}</th><th>{{ $t('admin_multilingual.col_new_value') }}</th></tr>
               </thead>
               <tbody>
                 <tr v-for="log in auditLogs" :key="log.id">
                   <td class="log-time">{{ formatTime(log.changed_at) }}</td>
-                  <td class="log-old">{{ log.old_value || '(空)' }}</td>
-                  <td class="log-new">{{ log.new_value || '(空)' }}</td>
+                  <td class="log-old">{{ log.old_value || $t('admin_multilingual.empty_value') }}</td>
+                  <td class="log-new">{{ log.new_value || $t('admin_multilingual.empty_value') }}</td>
                 </tr>
               </tbody>
             </table>
-            <div v-else class="empty-state">暂无变更记录</div>
+            <div v-else class="empty-state">{{ $t('admin_multilingual.no_changes') }}</div>
             <div class="modal-actions">
-              <button class="i18n-btn" @click="showLogModal = false">关闭</button>
+              <button class="i18n-btn" @click="showLogModal = false">{{ $t('admin_multilingual.close') }}</button>
             </div>
           </div>
         </div>
@@ -162,6 +162,14 @@
 
 <script setup lang="ts">
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
+
+const { t } = useI18n()
+
+const localeFlagMap: Record<string, string> = { zh: '🇨🇳', en: '🇺🇸', es: '🇪🇸' }
+const localeKeyMap: Record<string, string> = { zh: 'locale_zh', en: 'locale_en', es: 'locale_es' }
+function localeLabel(loc: string) {
+  return (localeFlagMap[loc] || '') + ' ' + t(`admin_multilingual.${localeKeyMap[loc] || 'locale_en'}`)
+}
 
 const {
   activeLocale, activeNamespace, searchQuery,
