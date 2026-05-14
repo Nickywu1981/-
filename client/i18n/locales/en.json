@@ -1515,7 +1515,7 @@
     "status_active": "Active",
     "status_offline": "Offline",
     "new_template": "+ New Template",
-    "col_code": "Code",
+    "col_code": "Template Code",
     "col_title": "Title",
     "col_category": "Category",
     "col_usage": "Usage",
@@ -1552,11 +1552,29 @@
     "delete_confirm": "Confirm delete \"{title}\"? This action is irreversible.",
     "load_failed": "Load failed",
     "save_failed": "Save failed",
-    "review_failed": "Operation failed",
+    "review_failed": "Review failed",
     "delete_failed": "Delete failed",
     "op_failed": "Operation failed",
     "network_error": "Network error",
-    "admin_operation": "Admin operation"
+    "admin_operation": "Admin operation",
+    "review_queue": "Review Queue",
+    "tab_templates": "Templates",
+    "all_industry": "All Industries",
+    "all_statuses": "All Statuses",
+    "col_industry_tags": "Industry/Tags",
+    "col_source": "Source",
+    "col_create_time": "Created",
+    "source_official": "Official",
+    "source_user": "User",
+    "mark_hot": "Hot",
+    "mark_default": "Default",
+    "unmark_hot": "Unmark Hot",
+    "label_desc": "Description",
+    "label_tags": "Industry/Tags (comma separated)",
+    "label_status": "Status",
+    "tags_placeholder": "e.g. fashion,beauty,default,hot",
+    "code_placeholder": "e.g. white_bg, main_image, ad_video",
+    "template_code_hint": "Matching an intent ID overrides the workflow default template. Cannot be modified when editing an existing template."
   },
   "admin_forms": {
     "page_title": "Form Management",
@@ -4653,7 +4671,13 @@
     "sortRate": "Rating",
     "sortDown": "Downloads",
     "metaJson": "Metadata JSON",
-    "previewUrl": "Preview URL"
+    "previewUrl": "Preview URL",
+    "allCat": "All Categories",
+    "created": "Created",
+    "cat_ecommerce": "E-commerce",
+    "cat_social": "Social",
+    "cat_brand": "Brand",
+    "cat_event": "Event"
   },
   "my_pages": {
     "collections": {
@@ -7553,12 +7577,20 @@
   "admin_size_templates": {
     "如_主图_详情图": "[EN] 如：主图、详情图",
     "尺寸模板管理": "[EN] 尺寸模板管理",
-    "新建尺寸": "[EN] + 新建尺寸",
+    "新建尺寸": "New Size",
     "宽度_px": "[EN] 宽度(px)",
     "高度_px": "[EN] 高度(px)",
     "暂无尺寸模板": "[EN] 暂无尺寸模板",
     "宽度": "[EN] 宽度",
-    "高度": "[EN] 高度"
+    "高度": "[EN] 高度",
+    "平台": "Platform",
+    "分类": "Category",
+    "通用": "General",
+    "宽度(px)": "Width(px)",
+    "高度(px)": "Height(px)",
+    "添加电商平台图片尺寸预设": "Add e-commerce platform image size presets",
+    "保存中": "Saving...",
+    "保存": "Save"
   },
   "admin_abuse": {
     "该用户存在高频滥用行为_60秒内超过30次调用": "[EN] ⚠️ 该用户存在高频滥用行为（60秒内超过30次调用）",
@@ -7995,5 +8027,39 @@
     "activities_label_new_customers": "New Customers",
     "activities_status_active": "Active",
     "activities_status_ended": "Ended"
+  },
+  "admin_geo_rules": {
+    "page_title": "GEO Rules",
+    "page_subtitle": "Configure model restrictions, language suggestions, and review levels by country/region. Higher priority matches first.",
+    "rule_name": "Rule Name",
+    "country_code": "Country Code",
+    "platform_code": "Platform Code",
+    "force_locale": "Force Locale",
+    "auto": "Auto",
+    "review_level": "Review Level",
+    "priority": "Priority",
+    "country": "Country",
+    "language": "Language",
+    "none": "None",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "saving": "Saving...",
+    "save": "Save",
+    "confirm_delete": "Delete this rule?"
+  },
+  "admin_credits": {
+    "page_title": "Credits & Spending",
+    "filter_all_type": "All Types",
+    "filter_all_status": "All Statuses",
+    "filter_recharge": "Recharge",
+    "filter_consume": "Consume",
+    "filter_confirmed": "Confirmed",
+    "filter_frozen": "Frozen",
+    "filter_refunded": "Refunded",
+    "btn_refund": "Refund",
+    "confirm_refund_title": "Confirm Refund",
+    "refund_info": "Record #{id}, spent {consumed} credits",
+    "refund_reason_placeholder": "Refund reason (optional)",
+    "refund_failed": "Refund failed"
   }
 }

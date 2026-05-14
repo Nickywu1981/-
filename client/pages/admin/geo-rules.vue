@@ -2,8 +2,8 @@
   <AdminLayout>
     <div class="page">
       <div class="page-header">
-        <h1>GEO 规则管理</h1>
-        <p>按国家/地区配置模型限制、语言建议、审核级别。优先级越高越优先匹配。</p>
+        <h1>{{ $t('admin_geo_rules.page_title') }}</h1>
+        <p>{{ $t('admin_geo_rules.page_subtitle') }}</p>
         <button class="btn btn-primary" @click="openCreate">{{ showForm ? $t('common.cancel') : '+ ' + $t('common.geo_new_rule') }}</button>
       </div>
 
@@ -11,18 +11,18 @@
       <div v-if="showForm" class="form-card">
         <h3>{{ editingId ? $t('common.geo_edit_rule') : $t('common.geo_new_rule') }}</h3>
         <div class="form-grid">
-          <label>规则{{ $t('common.name') }} <input v-model="form.rule_name" maxlength="100" class="input" :placeholder="$t('common.example') || '如：欧盟合规规则'" /></label>
-          <label>国家代码 <input v-model="form.country_codes_str" class="input" :placeholder="'逗号分隔: CN,US,JP'" /></label>
-          <label>平台代码 <input v-model="form.platform_codes_str" class="input" :placeholder="'逗号分隔: amazon,temu (可选)'" /></label>
-          <label>强制语言 <select v-model="form.locale" class="input"><option value="">自动</option><option value="zh">zh</option><option value="en">en</option><option value="es">es</option></select></label>
+          <label>{{ $t('admin_geo_rules.rule_name') }} <input v-model="form.rule_name" maxlength="100" class="input" :placeholder="$t('common.example') || '如：欧盟合规规则'" /></label>
+          <label>{{ $t('admin_geo_rules.country_code') }} <input v-model="form.country_codes_str" class="input" :placeholder="'逗号分隔: CN,US,JP'" /></label>
+          <label>{{ $t('admin_geo_rules.platform_code') }} <input v-model="form.platform_codes_str" class="input" :placeholder="'逗号分隔: amazon,temu (可选)'" /></label>
+          <label>{{ $t('admin_geo_rules.force_locale') }} <select v-model="form.locale" class="input"><option value="">{{ $t('admin_geo_rules.auto') }}</option><option value="zh">zh</option><option value="en">en</option><option value="es">es</option></select></label>
           <label>{{ $t('common.statusDisabled') }}模型 <input v-model="form.blocked_models_str" class="input" placeholder="逗号分隔: dall-e-3 (可选)" /></label>
-          <label>审核级别 {{ form.review_level }} <input v-model.number="form.review_level" type="range" min="0" max="5" class="range" /></label>
-          <label>优先级 <input v-model.number="form.priority" type="number" min="0" max="100" class="input" /></label>
+          <label>{{ $t('admin_geo_rules.review_level') }} {{ form.review_level }} <input v-model.number="form.review_level" type="range" min="0" max="5" class="range" /></label>
+          <label>{{ $t('admin_geo_rules.priority') }} <input v-model.number="form.priority" type="number" min="0" max="100" class="input" /></label>
           <label>{{ $t('common.statusEnabled') }} <input v-model="form.enabled" type="checkbox" :true-value="1" :false-value="0" /></label>
         </div>
         <label>{{ $t('common.description') }} <input v-model="form.description" maxlength="500" class="input" :placeholder="$t('common.geo_rule_desc_placeholder')" /></label>
         <div class="form-actions">
-          <button class="btn btn-primary" :disabled="saving" @click="save">{{ saving ? '保存中...' : '保存' }}</button>
+          <button class="btn btn-primary" :disabled="saving" @click="save">{{ saving ? $t('admin_geo_rules.saving') : $t('admin_geo_rules.save') }}</button>
           <button class="btn" @click="cancelForm">{{ $t('common.cancel') }}</button>
         </div>
       </div>
@@ -31,17 +31,17 @@
       <div v-else class="table-wrap">
         <table>
           <thead><tr>
-            <th>规则{{ $t('common.name') }}</th><th>国家</th><th>语言</th><th>{{ $t('common.statusDisabled') }}模型</th><th>审核级别</th><th>优先级</th><th>{{ $t('common.status') }}</th><th>{{ $t('common.actions') }}</th>
+            <th>{{ $t('admin_geo_rules.rule_name') }}</th><th>{{ $t('admin_geo_rules.country') }}</th><th>{{ $t('admin_geo_rules.language') }}</th><th>{{ $t('common.statusDisabled') }} {{ $t('common.model') }}</th><th>{{ $t('admin_geo_rules.review_level') }}</th><th>{{ $t('admin_geo_rules.priority') }}</th><th>{{ $t('common.status') }}</th><th>{{ $t('common.actions') }}</th>
           </tr></thead>
           <tbody>
             <tr v-for="r in rules" :key="r.id">
               <td><strong>{{ r.rule_name }}</strong></td>
               <td>{{ fmtArr(r.country_codes) }}</td>
-              <td>{{ r.locale || '自动' }}</td>
-              <td>{{ fmtArr(r.blocked_models) || '无' }}</td>
+              <td>{{ r.locale || $t('admin_geo_rules.auto') }}</td>
+              <td>{{ fmtArr(r.blocked_models) || $t('admin_geo_rules.none') }}</td>
               <td>{{ r.review_level }}</td>
               <td>{{ r.priority }}</td>
-              <td><span :class="['badge', r.enabled ? 'on' : 'off']">{{ r.enabled ? '启用' : '禁用' }}</span></td>
+              <td><span :class="['badge', r.enabled ? 'on' : 'off']">{{ r.enabled ? $t('admin_geo_rules.enabled') : $t('admin_geo_rules.disabled') }}</span></td>
               <td class="actions">
                 <button class="btn btn-sm" @click="openEdit(r)">{{ $t('common.edit') }}</button>
                 <button class="btn btn-sm btn-danger" @click="remove(r.id)">{{ $t('common.delete') }}</button>

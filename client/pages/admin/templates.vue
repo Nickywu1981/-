@@ -1,20 +1,20 @@
 <template>
   <AdminLayout>
-    <h2 class="ptitle">{{ $t('template.market') || '设计模板市场' }}</h2>
+    <h2 class="ptitle">{{ $t('template.market') }}</h2>
 
     <div class="toolbar">
       <select v-model="category" class="sel" @change="search">
-        <option value="">{{ $t('template.allCat') || '全部分类' }}</option>
-        <option value="ecommerce">电商</option><option value="social">社交</option>
-        <option value="brand">品牌</option><option value="event">活动</option>
+        <option value="">{{ $t('template.allCat') }}</option>
+        <option value="ecommerce">{{ $t('template.cat_ecommerce') }}</option><option value="social">{{ $t('template.cat_social') }}</option>
+        <option value="brand">{{ $t('template.cat_brand') }}</option><option value="event">{{ $t('template.cat_event') }}</option>
       </select>
-      <input v-model="keyword" class="input-search" :placeholder="$t('template.searchPh') || '搜索模板...'" @input="onKeywordInput" />
+      <input v-model="keyword" class="input-search" :placeholder="$t('template.searchPh')" @input="onKeywordInput" />
       <select v-model="sort" class="sel" @change="search">
-        <option value="newest">{{ $t('template.sortNew') || '最新' }}</option>
-        <option value="download_count">{{ $t('template.sortDown') || '下载最多' }}</option>
-        <option value="rating">{{ $t('template.sortRate') || '评分最高' }}</option>
+        <option value="newest">{{ $t('template.sortNew') }}</option>
+        <option value="download_count">{{ $t('template.sortDown') }}</option>
+        <option value="rating">{{ $t('template.sortRate') }}</option>
       </select>
-      <button class="btn-brand" @click="openCreate">{{ $t('template.create') || '+ 新建模板' }}</button>
+      <button class="btn-brand" @click="openCreate">{{ $t('template.create') }}</button>
     </div>
 
     <div v-if="loading" class="card-grid">
@@ -24,10 +24,10 @@
     <div v-else-if="error" class="error-state">
       <span class="error-icon">!</span>
       <p>{{ error }}</p>
-      <button class="retry-btn" @click="search">{{ $t('common.retry') || '重试' }}</button>
+      <button class="retry-btn" @click="search">{{ $t('common.retry') }}</button>
     </div>
 
-    <div v-else-if="!list.length" class="empty">{{ $t('template.empty') || '暂无模板' }}</div>
+    <div v-else-if="!list.length" class="empty">{{ $t('template.empty') }}</div>
 
     <div v-else class="card-grid">
       <div v-for="t in list" :key="t.id" class="card" @click="openDetail(t)">
@@ -37,10 +37,10 @@
           <h3 class="card-name">{{ t.name }}</h3>
           <div class="card-meta">
             <span class="stars">{{ '★'.repeat(Math.round(t.rating||0)) + '☆'.repeat(5-Math.round(t.rating||0)) }}</span>
-            <span class="downloads">{{ t.download_count || 0 }} {{ $t('template.downloads') || '下载' }}</span>
+            <span class="downloads">{{ t.download_count || 0 }} {{ $t('template.downloads') }}</span>
           </div>
           <div class="card-footer">
-            <span class="price" :class="{ free: !t.price }">{{ t.price ? '¥'+t.price : ($t('template.free')||'免费') }}</span>
+            <span class="price" :class="{ free: !t.price }">{{ t.price ? '¥'+t.price : $t('template.free') }}</span>
           </div>
         </div>
       </div>
@@ -59,18 +59,18 @@
             <span v-for="(v,k) in parsedMeta" :key="k" class="meta-tag">{{ k }}: {{ v }}</span>
           </div>
           <div class="detail-stats">
-            <span>{{ detail?.download_count || 0 }} {{ $t('template.downloads') || '下载' }}</span>
+            <span>{{ detail?.download_count || 0 }} {{ $t('template.downloads') }}</span>
             <span>{{ '★'.repeat(Math.round(detail?.rating||0)) }}</span>
             <span v-if="detail?.price">¥{{ detail.price }}</span>
-            <span v-else class="free-label">{{ $t('template.free')||'免费' }}</span>
+            <span v-else class="free-label">{{ $t('template.free') }}</span>
           </div>
           <div class="modal-actions">
-            <button class="btn-cancel" @click="showDetail=false">{{ $t('common.close')||'关闭' }}</button>
+            <button class="btn-cancel" @click="showDetail=false">{{ $t('common.close') }}</button>
             <button v-if="detail?.price" class="btn-save" :disabled="acting" @click="purchase(detail)">
-              {{ acting ? ($t('common.processing')||'...') : ($t('template.buy')||'购买') }}
+              {{ acting ? $t('common.processing') : $t('template.buy') }}
             </button>
             <button v-else class="btn-save" :disabled="acting" @click="download(detail)">
-              {{ acting ? ($t('common.processing')||'...') : ($t('template.download')||'下载') }}
+              {{ acting ? $t('common.processing') : $t('template.download') }}
             </button>
           </div>
         </div>
@@ -81,22 +81,22 @@
     <Teleport to="body">
       <div v-if="showCreate" class="modal-overlay" @click.self="showCreate=false" @keydown.escape="showCreate=false">
         <div class="modal">
-          <h3>{{ $t('template.create') || '新建模板' }}</h3>
-          <div class="form-group"><label>{{ $t('template.name')||'名称' }}</label><input v-model="form.name" class="input" /></div>
-          <div class="form-group"><label>{{ $t('template.cat')||'分类' }}</label>
+          <h3>{{ $t('template.create') }}</h3>
+          <div class="form-group"><label>{{ $t('template.name') }}</label><input v-model="form.name" class="input" /></div>
+          <div class="form-group"><label>{{ $t('template.cat') }}</label>
             <select v-model="form.category" class="input">
-              <option value="ecommerce">电商</option><option value="social">社交</option>
-              <option value="brand">品牌</option><option value="event">活动</option>
+              <option value="ecommerce">{{ $t('template.cat_ecommerce') }}</option><option value="social">{{ $t('template.cat_social') }}</option>
+              <option value="brand">{{ $t('template.cat_brand') }}</option><option value="event">{{ $t('template.cat_event') }}</option>
             </select>
           </div>
-          <div class="form-group"><label>{{ $t('template.desc')||'描述' }}</label><textarea v-model="form.description" class="input" rows="3" /></div>
-          <div class="form-group"><label>{{ $t('template.previewUrl')||'预览图URL(逗号分隔)' }}</label><input v-model="form.preview_images" class="input" placeholder="https://a.jpg,https://b.jpg" /></div>
-          <div class="form-group"><label>{{ $t('template.price')||'价格(0=免费)' }}</label><input v-model.number="form.price" type="number" class="input" min="0" step="0.01" /></div>
-          <div class="form-group"><label>{{ $t('template.metaJson')||'Meta JSON' }}</label><textarea v-model="form.meta" class="input" rows="2" placeholder='{"size":"1080x1080"}' /></div>
+          <div class="form-group"><label>{{ $t('template.desc') }}</label><textarea v-model="form.description" class="input" rows="3" /></div>
+          <div class="form-group"><label>{{ $t('template.previewUrl') }}</label><input v-model="form.preview_images" class="input" placeholder="https://a.jpg,https://b.jpg" /></div>
+          <div class="form-group"><label>{{ $t('template.price') }}</label><input v-model.number="form.price" type="number" class="input" min="0" step="0.01" /></div>
+          <div class="form-group"><label>{{ $t('template.metaJson') }}</label><textarea v-model="form.meta" class="input" rows="2" placeholder='{"size":"1080x1080"}' /></div>
           <div class="modal-actions">
-            <button class="btn-cancel" @click="showCreate=false">{{ $t('common.cancel')||'取消' }}</button>
+            <button class="btn-cancel" @click="showCreate=false">{{ $t('common.cancel') }}</button>
             <button class="btn-save" :disabled="saving" @click="doCreate">
-              {{ saving?($t('common.saving')||'保存中...'):($t('common.save')||'保存') }}
+              {{ saving ? $t('common.saving') : $t('common.save') }}
             </button>
           </div>
         </div>
@@ -132,7 +132,7 @@ async function search() {
     const q = new URLSearchParams({ category: category.value, keyword: keyword.value, sort: sort.value, page: '1', pageSize: '40' })
     const res: any = await $fetch(`/api/template-market/search?${q}`, { credentials: 'include' })
     list.value = res?.data?.list || res?.list || []
-  } catch (e: unknown) { error.value = e?.data?.msg || e.message || ($t('common.loadFail')|| t('common.loadFail')) }
+  } catch (e: unknown) { error.value = e?.data?.msg || e.message || t('common.loadFail') }
   loading.value = false
 }
 
@@ -143,17 +143,17 @@ async function openDetail(t: any) {
 
 async function download(t: any) {
   acting.value = true
-  try { await $fetch(`/api/template-market/${t.id}/download`, { method: 'POST', credentials: 'include' }); toast.success($t('template.dlOk')||'下载成功') }
+  try { await $fetch(`/api/template-market/${t.id}/download`, { method: 'POST', credentials: 'include' }); toast.success(t('template.dlOk')) }
 catch (e: unknown){
-    const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || ($t('template.dlFail')||'下载失败')) }
+    const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('template.dlFail')) }
   acting.value = false
 }
 
 async function purchase(t: any) {
   acting.value = true
-  try { await $fetch(`/api/template-market/${t.id}/purchase`, { method: 'POST', credentials: 'include' }); toast.success($t('template.buyOk')||'购买成功'); search() }
+  try { await $fetch(`/api/template-market/${t.id}/purchase`, { method: 'POST', credentials: 'include' }); toast.success(t('template.buyOk')); search() }
 catch (e: unknown){
-    const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || ($t('template.buyFail')||'购买失败')) }
+    const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('template.buyFail')) }
   acting.value = false
 }
 
@@ -171,8 +171,8 @@ async function doCreate() {
       price: form.price, meta: (() => { try { return JSON.parse(form.meta) } catch { return {} } })()
     }
     await $fetch('/api/template-market/create', { method: 'POST', credentials: 'include', body: JSON.stringify(body) })
-    showCreate.value = false; search(); toast.success($t('template.created')||'创建成功')
-  } catch (e: unknown) { toast.error(e?.data?.msg || ($t('template.createFail')||'创建失败')) }
+    showCreate.value = false; search(); toast.success(t('template.created'))
+  } catch (e: unknown) { toast.error(e?.data?.msg || t('template.createFail')) }
   saving.value = false
 }
 </script>

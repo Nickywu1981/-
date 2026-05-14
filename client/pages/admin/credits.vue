@@ -1,19 +1,19 @@
 <template>
   <AdminLayout>
-    <h2 class="ptitle">{{ $t('common.credit_manage') }}</h2>
+    <h2 class="ptitle">{{ $t('admin_credits.page_title') }}</h2>
 
     <div class="filters">
       <input v-model="filterUserId" type="text" :placeholder="$t('common.user_id')" @keyup.enter="search" />
       <select v-model="filterType" @change="search">
-        <option value="">全部{{ $t('common.type') }}</option>
-        <option value="1">充值</option>
-        <option value="2">消费</option>
+        <option value="">{{ $t('admin_credits.filter_all_type') }}</option>
+        <option value="1">{{ $t('admin_credits.filter_recharge') }}</option>
+        <option value="2">{{ $t('admin_credits.filter_consume') }}</option>
       </select>
       <select v-model="filterStatus" @change="search">
-        <option value="">全部{{ $t('common.status') }}</option>
-        <option value="1">已{{ $t('common.confirm') }}</option>
-        <option value="0">冻结中</option>
-        <option value="2">已退款</option>
+        <option value="">{{ $t('admin_credits.filter_all_status') }}</option>
+        <option value="1">{{ $t('admin_credits.filter_confirmed') }}</option>
+        <option value="0">{{ $t('admin_credits.filter_frozen') }}</option>
+        <option value="2">{{ $t('admin_credits.filter_refunded') }}</option>
       </select>
       <button class="btn" @click="search">{{ $t('common.search') }}</button>
     </div>
@@ -24,7 +24,7 @@
       <table class="table">
         <thead>
           <tr>
-            <th>ID</th><th>用户ID</th><th>{{ $t('common.type') }}</th><th>{{ $t('common.actions') }}</th><th>{{ $t('common.before_change') }}</th><th>{{ $t('common.after_change') }}</th>
+            <th>ID</th><th>{{ $t('common.user_id') }}</th><th>{{ $t('common.type') }}</th><th>{{ $t('common.actions') }}</th><th>{{ $t('common.before_change') }}</th><th>{{ $t('common.after_change') }}</th>
             <th>{{ $t('common.consume_label') }}</th><th>{{ $t('common.status') }}</th><th>{{ $t('common.remark') }}</th><th>{{ $t('common.time') }}</th><th>{{ $t('common.actions') }}</th>
           </tr>
         </thead>
@@ -41,7 +41,7 @@
             <td class="remark">{{ r.remark || '-' }}</td>
             <td>{{ r.create_time?.slice(0, 16) }}</td>
             <td>
-              <button v-if="r.status === 1" class="btn-sm btn-refund" @click="doRefund(r)">退款</button>
+              <button v-if="r.status === 1" class="btn-sm btn-refund" @click="doRefund(r)">{{ $t('admin_credits.btn_refund') }}</button>
               <span v-else class="muted">-</span>
             </td>
           </tr>
@@ -55,12 +55,12 @@
     <!-- Refund Dialog -->
     <div v-if="refundDialog.open" class="modal-overlay" @click.self="refundDialog.open = false" @keydown.escape="refundDialog.open = false">
       <div class="modal-box">
-        <h4>{{ $t('common.confirm') }}退款</h4>
-        <p class="modal-info">记录 #{{ refundDialog.record?.id }}，消耗 {{ refundDialog.record?.consumed }} 点</p>
-        <input v-model="refundDialog.remark" maxlength="500" type="text" :placeholder="$t('common.credit_refund_reason')" @keyup.enter="confirmRefund" />
+        <h4>{{ $t('admin_credits.confirm_refund_title') }}</h4>
+        <p class="modal-info">{{ $t('admin_credits.refund_info', { id: refundDialog.record?.id, consumed: refundDialog.record?.consumed }) }}</p>
+        <input v-model="refundDialog.remark" maxlength="500" type="text" :placeholder="$t('admin_credits.refund_reason_placeholder')" @keyup.enter="confirmRefund" />
         <div class="modal-actions">
           <button class="btn-cancel" @click="refundDialog.open = false">{{ $t('common.cancel') }}</button>
-          <button class="btn btn-refund" @click="confirmRefund">{{ $t('common.confirm') }}退款</button>
+          <button class="btn btn-refund" @click="confirmRefund">{{ $t('admin_credits.confirm_refund_title') }}</button>
         </div>
       </div>
     </div>
@@ -114,7 +114,7 @@ async function confirmRefund() {
   try {
     const data = await $fetch('/api/credits/admin/refund', { method: 'POST', credentials: 'include', body: { recordId: refundDialog.record.id, remark: refundDialog.remark || t('common.admin_refund_label') } }) as ApiResponse
     if (data?.code === 200) { toast.success(t('common.success_refund')); refundDialog.open = false; fetch() }
-    else { toast.error(data?.msg || '退款失败') }
+    else { toast.error(data?.msg || t('admin_credits.refund_failed')) }
   } catch (e: unknown) { toast.error(t('common.failed_refund')) }
 }
 

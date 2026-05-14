@@ -11,9 +11,9 @@
     <LoadingSkeleton v-if="loading" type="table" :rows="5" :cols="7" />
     <div class="table-wrap" v-else-if="list.length">
     <table class="table"><thead><tr><th>ID</th><th>{{ $t('common.name') }}</th><th>{{ $t('admin_size_templates.平台') }}</th><th>{{ $t('admin_size_templates.宽度') }}</th><th>{{ $t('admin_size_templates.高度') }}</th><th>{{ $t('admin_size_templates.分类') }}</th><th>{{ $t('common.actions') }}</th></tr></thead>
-    <tbody><tr v-for="s in list" :key="s.id"><td>{{ s.id }}</td><td>{{ s.name }}</td><td>{{ s.platform }}</td><td>{{ s.width }}px</td><td>{{ s.height }}px</td><td>{{ s.category || '通用' }}</td><td><button class="btn-sm" @click="openEdit(s)">{{ $t('common.edit') }}</button><button class="btn-sm btn-danger" @click="deleteItem(s.id)">{{ $t('common.delete') }}</button></td></tr></tbody></table>
+    <tbody><tr v-for="s in list" :key="s.id"><td>{{ s.id }}</td><td>{{ s.name }}</td><td>{{ s.platform }}</td><td>{{ s.width }}px</td><td>{{ s.height }}px</td><td>{{ s.category || $t('admin_size_templates.通用') }}</td><td><button class="btn-sm" @click="openEdit(s)">{{ $t('common.edit') }}</button><button class="btn-sm btn-danger" @click="deleteItem(s.id)">{{ $t('common.delete') }}</button></td></tr></tbody></table>
     </div>
-    <EmptyState v-else icon="📐" :title="$t('admin_size_templates.暂无尺寸模板')" description="添加电商平台图片尺寸预设" action-label="新建尺寸" @action="openCreate" />
+    <EmptyState v-else icon="📐" :title="$t('admin_size_templates.暂无尺寸模板')" :description="$t('admin_size_templates.添加电商平台图片尺寸预设')" :action-label="$t('admin_size_templates.新建尺寸')" @action="openCreate" />
 
     <Teleport to="body">
       <div v-if="showModal" class="modal-overlay" @click.self="showModal=false" @keydown.escape="showModal=false">
@@ -21,18 +21,18 @@
           <h3>{{ editing ? $t('common.edit_size_title') : $t('common.new_size_title') }}</h3>
           <div class="form-grid">
             <label>{{ $t('common.name') }} <input v-model="editForm.name" maxlength="100" class="input" /></label>
-            <label>平台
+            <label>{{ $t('admin_size_templates.平台') }}
               <select v-model="editForm.platform" class="input">
                 <option v-for="p in platforms" :key="p" :value="p">{{ p }}</option>
               </select>
             </label>
-            <label>宽度(px) <input v-model.number="editForm.width" type="number" min="1" class="input" /></label>
-            <label>高度(px) <input v-model.number="editForm.height" type="number" min="1" class="input" /></label>
-            <label>分类 <input v-model="editForm.category" maxlength="100" class="input" :placeholder="$t('admin_size_templates.如_主图_详情图')" /></label>
+            <label>{{ $t('admin_size_templates.宽度(px)') }} <input v-model.number="editForm.width" type="number" min="1" class="input" /></label>
+            <label>{{ $t('admin_size_templates.高度(px)') }} <input v-model.number="editForm.height" type="number" min="1" class="input" /></label>
+            <label>{{ $t('admin_size_templates.分类') }} <input v-model="editForm.category" maxlength="100" class="input" :placeholder="$t('admin_size_templates.如_主图_详情图')" /></label>
           </div>
           <div class="modal-actions">
             <button class="btn-cancel" @click="showModal=false">{{ $t('common.cancel') }}</button>
-            <button class="btn-save" :disabled="saving" @click="saveTemplate">{{ saving?'保存中...':'保存' }}</button>
+            <button class="btn-save" :disabled="saving" @click="saveTemplate">{{ saving ? $t('admin_size_templates.保存中') : $t('admin_size_templates.保存') }}</button>
           </div>
         </div>
       </div>

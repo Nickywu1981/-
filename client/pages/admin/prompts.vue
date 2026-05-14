@@ -3,8 +3,8 @@
     <h2 class="ptitle">{{ $t('admin_prompts.page_title') }}</h2>
 
     <div class="tabs">
-      <button :class="['tab', { active: activeTab === 'all' }]" @click="switchTab('all')">{{ $t('common.all') }}模板</button>
-      <button :class="['tab', { active: activeTab === 'review' }]" @click="switchTab('review')">审核队列</button>
+      <button :class="['tab', { active: activeTab === 'all' }]" @click="switchTab('all')">{{ $t('common.all') }}{{ $t('admin_prompts.tab_templates') }}</button>
+      <button :class="['tab', { active: activeTab === 'review' }]" @click="switchTab('review')">{{ $t('admin_prompts.review_queue') }}</button>
     </div>
 
     <div class="toolbar">
@@ -19,7 +19,7 @@
         <option value="viral-clone">{{ $t('admin_prompts.category_viral_clone') }}</option>
       </select>
       <select v-model="filterIndustry" class="sel" @change="fetchData">
-        <option value="">{{ $t('common.all') }}行业</option>
+        <option value="">{{ $t('admin_prompts.all_industry') }}</option>
         <option v-for="ind in industryOptions" :key="ind.key" :value="ind.key">{{ ind.label }}</option>
       </select>
       <select v-model="filterStatus" class="sel" @change="fetchData">
@@ -42,8 +42,8 @@
           <th>{{ $t('admin_prompts.col_code') }}</th>
           <th>{{ $t('admin_prompts.col_title') }}</th>
           <th>{{ $t('admin_prompts.col_category') }}</th>
-          <th>行业/标签</th>
-          <th>来源</th>
+          <th>{{ $t('admin_prompts.col_industry_tags') }}</th>
+          <th>{{ $t('admin_prompts.col_source') }}</th>
           <th>{{ $t('common.status') }}</th>
           <th>{{ $t('admin_prompts.col_usage') }}</th>
           <th>{{ $t('admin_prompts.col_create_time') }}</th>
@@ -57,7 +57,7 @@
           <td>{{ t.title }}</td>
           <td><span class="category-tag">{{ categoryLabel(t.category) }}</span></td>
           <td><span class="tags-cell">{{ (t.tags || '').split(',').filter(Boolean).slice(0,3).join(', ') || '-' }}</span></td>
-          <td><span class="source-tag" :class="t.is_public ? 'official' : 'user'">{{ t.is_public ? '官方' : (t.creator_name || '用户') }}</span></td>
+          <td><span class="source-tag" :class="t.is_public ? 'official' : 'user'">{{ t.is_public ? $t('admin_prompts.source_official') : (t.creator_name || $t('admin_prompts.source_user')) }}</span></td>
           <td><span class="status-tag" :class="statusClass(t.status)">{{ statusLabel(t.status) }}</span></td>
           <td>{{ t.usage_count }}</td>
           <td>{{ t.create_time?.slice(0, 10) }}</td>
@@ -67,9 +67,9 @@
             <button v-if="t.status === 1" class="btn-sm danger" @click="review(t.id, 3)">{{ $t('admin_prompts.reject') }}</button>
             <button v-if="t.status === 2" class="btn-sm warn" @click="review(t.id, 3)">{{ $t('admin_prompts.unpublish') }}</button>
             <button v-if="t.status === 3" class="btn-sm" @click="review(t.id, 2)">{{ $t('admin_prompts.publish') }}</button>
-            <button v-if="!hasMark(t, 'hot')" class="btn-sm" @click="batchMark([t.id], 'hot', 'add')">热门</button>
-            <button v-if="hasMark(t, 'hot')" class="btn-sm warn" @click="batchMark([t.id], 'hot', 'remove')">{{ $t('common.cancel') }}热门</button>
-            <button v-if="!hasMark(t, 'default')" class="btn-sm" @click="batchMark([t.id], 'default', 'add')">默认</button>
+            <button v-if="!hasMark(t, 'hot')" class="btn-sm" @click="batchMark([t.id], 'hot', 'add')">{{ $t('admin_prompts.mark_hot') }}</button>
+            <button v-if="hasMark(t, 'hot')" class="btn-sm warn" @click="batchMark([t.id], 'hot', 'remove')">{{ $t('admin_prompts.unmark_hot') }}</button>
+            <button v-if="!hasMark(t, 'default')" class="btn-sm" @click="batchMark([t.id], 'default', 'add')">{{ $t('admin_prompts.mark_default') }}</button>
             <button class="btn-sm danger" @click="confirmDelete(t)">{{ $t('common.delete') }}</button>
           </td>
         </tr>
@@ -112,17 +112,17 @@
           <div class="form-group">
             <label>{{ $t('admin_prompts.col_code') }}</label>
             <input v-model="form.templateCode" maxlength="100" type="text"
-              :placeholder="editing.id ? '' : '如：white_bg, main_image, ad_video'"
+              :placeholder="editing.id ? '' : $t('admin_prompts.code_placeholder')"
               :disabled="!!editing.id"
               :list="'intent-list'" />
             <datalist id="intent-list">
               <option v-for="i in intentIdList" :key="i" :value="i" />
             </datalist>
-            <small style="color:#888; font-size:11px;">与意图ID匹配后可覆盖工作流默认模板。{{ $t('common.edit') }}已有模板时不可修改。</small>
+            <small style="color:#888; font-size:11px;">{{ $t('admin_prompts.template_code_hint') }}</small>
           </div>
           <div class="form-group">
-            <label>行业/标签（逗号分隔）</label>
-            <input v-model="form.tags" maxlength="256" type="text" placeholder="如：服装,美妆,默认,热门" />
+            <label>{{ $t('admin_prompts.label_tags') }}</label>
+            <input v-model="form.tags" maxlength="256" type="text" :placeholder="$t('admin_prompts.tags_placeholder')" />
           </div>
           <div class="form-group">
             <label>{{ $t('admin_prompts.label_content') }}</label>
