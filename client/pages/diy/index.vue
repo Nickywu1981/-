@@ -1,28 +1,28 @@
 <template>
   <div class="diy-page-list">
     <div class="page-header">
-      <h1>页面管理</h1>
+      <h1>{{ $t('diy.title') }}</h1>
       <div class="header-actions">
-        <button class="btn btn-outline" @click="navigateTo('/work/diy-pages')" aria-label="从模板创建页面">从模板创建</button>
-        <button class="btn btn-primary" @click="showCreate = true" aria-label="新建页面">+ 新建页面</button>
+        <button class="btn btn-outline" @click="navigateTo('/work/diy-pages')" :aria-label="$t('diy.from_template')">{{ $t('diy.from_template') }}</button>
+        <button class="btn btn-primary" @click="showCreate = true" :aria-label="$t('diy.new_project')">{{ $t('diy.new_project') }}</button>
       </div>
     </div>
 
     <!-- 筛选栏 -->
     <div class="filter-bar">
       <select v-model="filter.pageType" @change="loadPages">
-        <option value="">全部类型</option>
-        <option value="mobile">移动端</option>
-        <option value="pc">PC端</option>
-        <option value="h5">H5</option>
+        <option value="">{{ $t('diy.filter_all_types') }}</option>
+        <option value="mobile">{{ $t('diy.type_mobile') }}</option>
+        <option value="pc">{{ $t('diy.type_pc') }}</option>
+        <option value="h5">{{ $t('diy.type_h5') }}</option>
       </select>
       <select v-model="filter.status" @change="loadPages">
-        <option value="">全部状态</option>
-        <option value="0">草稿</option>
-        <option value="1">已发布</option>
+        <option value="">{{ $t('diy.filter_all_status') }}</option>
+        <option value="0">{{ $t('diy.status_draft') }}</option>
+        <option value="1">{{ $t('diy.status_published') }}</option>
       </select>
-      <input v-model="filter.keyword" placeholder="搜索页面..." @input="onKeywordInput" />
-      <button class="btn btn-outline" @click="loadPages">搜索</button>
+      <input v-model="filter.keyword" :placeholder="$t('diy.search_placeholder')" @input="onKeywordInput" />
+      <button class="btn btn-outline" @click="loadPages">{{ $t('diy.search_btn') }}</button>
     </div>
 
     <!-- 页面列表 -->
@@ -36,12 +36,12 @@
         </div>
       </div>
     </div>
-    <div v-else-if="!pages.length" class="empty">暂无页面，点击上方按钮创建</div>
+    <div v-else-if="!pages.length" class="empty">{{ $t('diy.no_projects') }}</div>
     <div v-else class="page-grid">
       <div v-for="p in pages" :key="p.id" class="page-card">
         <div class="card-preview" :class="p.page_type">
           <span class="type-badge">{{ p.page_type.toUpperCase() }}</span>
-          <span class="status-badge" :class="p.status === 1 ? 'published' : 'draft'">{{ p.status === 1 ? '已发布' : '草稿' }}</span>
+          <span class="status-badge" :class="p.status === 1 ? 'published' : 'draft'">{{ p.status === 1 ? $t('diy.status_published') : $t('diy.status_draft') }}</span>
         </div>
         <div class="card-body">
           <h3>{{ p.title }}</h3>
@@ -49,9 +49,9 @@
           <p class="time">{{ p.update_time }}</p>
         </div>
         <div class="card-actions">
-          <NuxtLink :to="`/diy/editor?id=${p.id}`" class="btn btn-sm btn-outline" aria-label="编辑页面">编辑</NuxtLink>
-          <button v-if="p.status !== 1" class="btn btn-sm btn-primary" @click="publishPage(p.id)" aria-label="发布页面">发布</button>
-          <button class="btn btn-sm btn-danger" @click="deletePage(p.id)" aria-label="删除页面">删除</button>
+          <NuxtLink :to="`/diy/editor?id=${p.id}`" class="btn btn-sm btn-outline" :aria-label="$t('diy.edit_btn')">{{ $t('diy.edit_btn') }}</NuxtLink>
+          <button v-if="p.status !== 1" class="btn btn-sm btn-primary" @click="publishPage(p.id)" :aria-label="$t('diy.publish_btn')">{{ $t('diy.publish_btn') }}</button>
+          <button class="btn btn-sm btn-danger" @click="deletePage(p.id)" :aria-label="$t('diy.delete_btn')">{{ $t('diy.delete_btn') }}</button>
         </div>
       </div>
     </div>
@@ -59,26 +59,26 @@
     <!-- 新建弹窗 -->
     <div v-if="showCreate" class="modal-overlay" @click.self="showCreate = false">
       <div class="modal">
-        <h2>新建页面</h2>
+        <h2>{{ $t('diy.modal_title') }}</h2>
         <div class="form-group">
-          <label>页面标题</label>
-          <input v-model="form.title" placeholder="如：双11活动页" />
+          <label>{{ $t('diy.label_title') }}</label>
+          <input v-model="form.title" :placeholder="$t('diy.placeholder_title')" />
         </div>
         <div class="form-group">
-          <label>页面标识 (slug)</label>
-          <input v-model="form.slug" placeholder="如：double-11" />
+          <label>{{ $t('diy.label_slug') }}</label>
+          <input v-model="form.slug" :placeholder="$t('diy.placeholder_slug')" />
         </div>
         <div class="form-group">
-          <label>页面类型</label>
+          <label>{{ $t('diy.label_page_type') }}</label>
           <select v-model="form.pageType">
-            <option value="mobile">移动端</option>
-            <option value="pc">PC端</option>
-            <option value="h5">H5</option>
+            <option value="mobile">{{ $t('diy.type_mobile') }}</option>
+            <option value="pc">{{ $t('diy.type_pc') }}</option>
+            <option value="h5">{{ $t('diy.type_h5') }}</option>
           </select>
         </div>
         <div class="modal-actions">
-          <button class="btn btn-outline" @click="showCreate = false">取消</button>
-          <button class="btn btn-primary" @click="createPage" :disabled="!form.title||!form.slug">创建</button>
+          <button class="btn btn-outline" @click="showCreate = false">{{ $t('diy.cancel_btn') }}</button>
+          <button class="btn btn-primary" @click="createPage" :disabled="!form.title||!form.slug">{{ $t('diy.create_btn') }}</button>
         </div>
       </div>
     </div>
