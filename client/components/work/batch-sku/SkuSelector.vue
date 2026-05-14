@@ -17,21 +17,19 @@ interface SkuRow {
 const { t } = useI18n()
 
 const colors = ref([
-  { label: '白色', hex: '#FFFFFF' },
-  { label: '黑色', hex: '#000000' },
-  { label: '红色', hex: '#DC2626' },
-  { label: '蓝色', hex: '#2563EB' },
-  { label: '绿色', hex: '#16A34A' },
-  { label: '粉色', hex: '#EC4899' },
-  { label: '灰色', hex: '#6B7280' },
-  { label: '米色', hex: '#D4A574' },
+  { label: t('skuSelector.colors.white'), hex: '#FFFFFF' },
+  { label: t('skuSelector.colors.black'), hex: '#000000' },
+  { label: t('skuSelector.colors.red'), hex: '#DC2626' },
+  { label: t('skuSelector.colors.blue'), hex: '#2563EB' },
+  { label: t('skuSelector.colors.green'), hex: '#16A34A' },
+  { label: t('skuSelector.colors.pink'), hex: '#EC4899' },
+  { label: t('skuSelector.colors.gray'), hex: '#6B7280' },
+  { label: t('skuSelector.colors.beige'), hex: '#D4A574' },
 ])
 
 const sizes = ref(['XS', 'S', 'M', 'L', 'XL', 'XXL', '均码'])
 
 const skuMatrix = ref<SkuRow[]>([])
-const customColor = ref('')
-const customSize = ref('')
 const selectedAngle = ref<'front' | 'back' | 'side' | 'detail' | 'top'>('front')
 
 const totalSkus = computed(() => skuMatrix.value.length)
@@ -69,16 +67,16 @@ const clearAll = () => {
 <template>
   <div class="ss-root">
     <div class="ss-section">
-      <label class="ss-label">角度</label>
+      <label class="ss-label">{{ t('skuSelector.sectionAngle') }}</label>
       <div class="ss-chips">
         <button v-for="a in (['front','back','side','detail','top'] as const)" :key="a" class="ss-chip" :class="{ sel: selectedAngle === a }" @click="selectedAngle = a">
-          {{ a === 'front' ? '正面' : a === 'back' ? '背面' : a === 'side' ? '侧面' : a === 'detail' ? '细节' : '俯视' }}
+          {{ a === 'front' ? t('skuSelector.angles.front') : a === 'back' ? t('skuSelector.angles.back') : a === 'side' ? t('skuSelector.angles.side') : a === 'detail' ? t('skuSelector.angles.detail') : t('skuSelector.angles.top') }}
         </button>
       </div>
     </div>
 
     <div class="ss-section">
-      <label class="ss-label">选择颜色 (点击添加)</label>
+      <label class="ss-label">{{ t('skuSelector.sectionColor') }}</label>
       <div class="ss-colors">
         <button
           v-for="c in colors" :key="c.hex"
@@ -92,15 +90,15 @@ const clearAll = () => {
     </div>
 
     <div class="ss-section">
-      <label class="ss-label">尺码范围</label>
+      <label class="ss-label">{{ t('skuSelector.sectionSize') }}</label>
       <div class="ss-sizes">
         <span v-for="sz in sizes" :key="sz" class="ss-size-tag">{{ sz }}</span>
       </div>
     </div>
 
     <div v-if="totalSkus > 0" class="ss-summary">
-      <span>已选 <strong>{{ totalSkus }}</strong> 个SKU组合</span>
-      <button class="ss-clear" @click="clearAll">清空</button>
+      <span>{{ t('skuSelector.selectedCount', { n: totalSkus }) }}</span>
+      <button class="ss-clear" @click="clearAll">{{ t('skuSelector.clear') }}</button>
     </div>
 
     <div v-if="skuMatrix.length > 12" class="ss-matrix-preview">

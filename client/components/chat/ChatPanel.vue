@@ -34,13 +34,26 @@ const scrollToBottom = () => {
   })
 }
 
+const clearAttachments = () => {
+  for (const a of attachments.value) {
+    if (a.url.startsWith('blob:')) URL.revokeObjectURL(a.url)
+  }
+  attachments.value = []
+}
+
+const removeAttachment = (i: number) => {
+  const a = attachments.value[i]
+  if (a && a.url.startsWith('blob:')) URL.revokeObjectURL(a.url)
+  attachments.value.splice(i, 1)
+}
+
 const handleSend = async () => {
   const text = input.value.trim()
   if (!text || streaming.value) return
 
   input.value = ''
   await send(text, attachments.value)
-  attachments.value = []
+  clearAttachments()
   emit('messageSent')
   scrollToBottom()
 }
@@ -79,6 +92,7 @@ watch(() => messages.length, scrollToBottom)
 
 onUnmounted(() => {
   clear()
+  clearAttachments()
 })
 </script>
 
@@ -136,7 +150,7 @@ onUnmounted(() => {
           <div v-for="(a, i) in attachments" :key="i" class="cp-attach-tag">
             <span>{{ a.type === 'image' ? '🖼' : a.type === 'video' ? '🎬' : '🔗' }}</span>
             <span class="cp-attach-name">{{ a.name || a.url.slice(0, 30) }}</span>
-            <button class="cp-attach-rm" @click="attachments.splice(i, 1)">✕</button>
+            <button class="cp-attach-rm" @click="removeAttachment(i)">✕</button>
           </div>
         </div>
 
