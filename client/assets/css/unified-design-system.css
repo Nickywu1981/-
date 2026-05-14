@@ -344,6 +344,8 @@ body {
   transition: all var(--transition-fast);
   user-select: none; outline: none;
 }
+.btn:focus { box-shadow: var(--focus-ring); }
+.btn:focus:not(:focus-visible) { box-shadow: none; }
 .btn:focus-visible { box-shadow: var(--focus-ring); }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
 
@@ -519,21 +521,16 @@ body {
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes fadeInScale { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
-@keyframes slideInLeft { from { opacity: 0; transform: translateX(-16px); } to { opacity: 1; transform: translateX(0); } }
-@keyframes slideInRight { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
-@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-@keyframes countUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes glowPulse { 0%, 100% { box-shadow: 0 0 12px rgba(91,95,227,0.15); } 50% { box-shadow: 0 0 32px rgba(91,95,227,0.35); } }
-@keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes slide-in-left { from { opacity: 0; transform: translateX(-16px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes slide-in-right { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes count-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
 /* ═══ 入场动画工具类 ═══ */
 .anim-fade-in { animation: fadeIn var(--transition-slow) ease-out both; }
 .anim-fade-up { animation: fadeInUp var(--transition-slow) ease-out both; }
 .anim-scale { animation: fadeInScale var(--transition-slow) ease-out both; }
-.anim-slide-left { animation: slideInLeft var(--transition-slow) ease-out both; }
-.anim-slide-right { animation: slideInRight var(--transition-slow) ease-out both; }
+.anim-slide-left { animation: slide-in-left var(--transition-slow) ease-out both; }
+.anim-slide-right { animation: slide-in-right var(--transition-slow) ease-out both; }
 
 /* 交错延迟 */
 .delay-100 { animation-delay: 0.1s; }
@@ -541,14 +538,6 @@ body {
 .delay-300 { animation-delay: 0.3s; }
 .delay-400 { animation-delay: 0.4s; }
 .delay-500 { animation-delay: 0.5s; }
-
-/* ================================================
-   16. Nuxt 页面过渡
-   ================================================ */
-.page-enter-active { transition: opacity 0.2s ease-out, transform 0.25s ease-out; }
-.page-leave-active { transition: opacity 0.12s ease-in, transform 0.15s ease-in; }
-.page-enter-from { opacity: 0; transform: translateY(8px); }
-.page-leave-to { opacity: 0; transform: translateY(-4px); }
 
 /* ================================================
    17. 大屏数据可视化专用
@@ -615,4 +604,15 @@ body {
   .page-header { margin-bottom: var(--space-4); }
   .page-header-title { font-size: var(--text-xl); }
   .card { padding: var(--space-4); }
+}
+
+/* ================================================
+   19. prefers-reduced-motion (a11y)
+   ================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

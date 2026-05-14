@@ -6,6 +6,7 @@
 
 :root {
   /* Brand color scale — warm indigo */
+  --brand-rgb: 91, 95, 227;
   --color-brand-50: #f0f0fd;
   --color-brand-100: #e0dffb;
   --color-brand-200: #c4c2f7;
@@ -23,29 +24,27 @@
   /* Semantics */
   --text-link: var(--color-brand-600);
   --text-link-hover: var(--color-brand-700);
-  --border-brand: var(--color-brand-200);
-
-  /* Sidebar */
   --sidebar-text-active: var(--color-brand-600);
   --sidebar-bg-active: var(--color-brand-50);
 
-  /* Focus + input */
-  --focus-ring: 0 0 0 3px rgba(91,95,227,0.2);
+  /* Focus + input (via brand RGB for alpha blending) */
+  --focus-ring: 0 0 0 3px rgba(var(--brand-rgb), 0.2);
   --input-focus-border: var(--color-brand-400);
-  --input-focus-shadow: 0 0 0 3px rgba(91,95,227,0.1), 0 0 0 1px var(--color-brand-400);
+  --input-focus-shadow: 0 0 0 3px rgba(var(--brand-rgb), 0.1), 0 0 0 1px var(--color-brand-400);
 
   /* Shadows */
-  --shadow-brand: 0 0 0 4px rgba(91,95,227,0.12);
-  --shadow-brand-glow: 0 0 24px rgba(91,95,227,0.15);
+  --shadow-brand: 0 0 0 4px rgba(var(--brand-rgb), 0.12);
+  --shadow-brand-glow: 0 0 28px rgba(var(--brand-rgb), 0.15);
 }
 
 /* Dark theme overrides */
-[data-theme="dark"], .dark {
+.dark, [data-theme="dark"] {
+  --brand-rgb: 139, 149, 255;
   --text-link: #8b95ff;
   --text-link-hover: #a5acff;
   --sidebar-text-active: #8b95ff;
-  --sidebar-bg-active: rgba(91,95,227,0.12);
-  --gradient-brand: linear-gradient(135deg, #5b5fe3 0%, #7c7ff0 50%, #a78bfa 100%);
-  --shadow-brand: 0 0 0 4px rgba(91,95,227,0.15);
-  --shadow-brand-glow: 0 0 28px rgba(91,95,227,0.2);
+  --sidebar-bg-active: rgba(var(--brand-rgb), 0.12);
+  --gradient-brand: linear-gradient(135deg, #6b78ff 0%, #9b5cff 50%, #c084fc 100%);
+  --shadow-brand: 0 0 0 4px rgba(var(--brand-rgb), 0.15);
+  --shadow-brand-glow: 0 0 28px rgba(var(--brand-rgb), 0.2);
 }

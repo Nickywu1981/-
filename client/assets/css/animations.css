@@ -10,32 +10,32 @@
 }
 
 /* ── 基础关键帧 ── */
-@keyframes animFadeIn  { from { opacity: 0; } to { opacity: 1; } }
-@keyframes animFadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes animFadeInDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes animFadeInLeft { from { opacity: 0; transform: translateX(-16px); } to { opacity: 1; transform: translateX(0); } }
-@keyframes animFadeInRight { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
-@keyframes animScaleIn { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
-@keyframes animSlideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-@keyframes animShimmer {
+@keyframes anim-fade-in  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes anim-fade-in-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes anim-fade-in-down { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes anim-fade-in-left { from { opacity: 0; transform: translateX(-16px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes anim-fade-in-right { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes anim-scale-in { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
+@keyframes anim-slide-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes anim-shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
-@keyframes animSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-@keyframes animPulse {
+@keyframes anim-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes anim-pulse {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.04); }
 }
 
 /* ── 工具类 ── */
-.anim-fade-in        { animation: animFadeIn var(--anim-duration-normal) var(--anim-ease-default) both; }
-.anim-fade-in-up     { animation: animFadeInUp var(--anim-duration-normal) var(--anim-ease-default) both; }
-.anim-fade-in-down   { animation: animFadeInDown var(--anim-duration-normal) var(--anim-ease-default) both; }
-.anim-fade-in-left   { animation: animFadeInLeft var(--anim-duration-normal) var(--anim-ease-default) both; }
-.anim-fade-in-right  { animation: animFadeInRight var(--anim-duration-normal) var(--anim-ease-default) both; }
-.anim-scale-in       { animation: animScaleIn var(--anim-duration-normal) var(--anim-ease-bounce) both; }
-.anim-spin           { animation: animSpin 1s linear infinite; }
-.anim-pulse          { animation: animPulse 2s var(--anim-ease-default) infinite; }
+.anim-fade-in        { animation: anim-fade-in var(--anim-duration-normal) var(--anim-ease-default) both; }
+.anim-fade-in-up     { animation: anim-fade-in-up var(--anim-duration-normal) var(--anim-ease-default) both; }
+.anim-fade-in-down   { animation: anim-fade-in-down var(--anim-duration-normal) var(--anim-ease-default) both; }
+.anim-fade-in-left   { animation: anim-fade-in-left var(--anim-duration-normal) var(--anim-ease-default) both; }
+.anim-fade-in-right  { animation: anim-fade-in-right var(--anim-duration-normal) var(--anim-ease-default) both; }
+.anim-scale-in       { animation: anim-scale-in var(--anim-duration-normal) var(--anim-ease-bounce) both; }
+.anim-spin           { animation: anim-spin 1s linear infinite; }
+.anim-pulse          { animation: anim-pulse 2s var(--anim-ease-default) infinite; }
 
 /* ── 页面过渡 ── */
 .page-enter-active,
@@ -49,7 +49,7 @@
 /* ── 列表交错入场 ── */
 .stagger-list > * {
   opacity: 0;
-  animation: animFadeInUp var(--anim-duration-slow) var(--anim-ease-default) forwards;
+  animation: anim-fade-in-up var(--anim-duration-slow) var(--anim-ease-default) forwards;
 }
 .stagger-list > *:nth-child(1)  { animation-delay: 0ms; }
 .stagger-list > *:nth-child(2)  { animation-delay: 50ms; }
@@ -64,9 +64,9 @@
 
 /* ── 骨架屏闪光 ── */
 .skeleton-shimmer {
-  background: linear-gradient(90deg, var(--el-fill-color-light) 25%, var(--el-fill-color) 50%, var(--el-fill-color-light) 75%);
+  background: linear-gradient(90deg, var(--skeleton-bg, #eaecf2) 25%, var(--skeleton-shimmer-1, #f1f3f8) 50%, var(--skeleton-bg, #eaecf2) 75%);
   background-size: 200% 100%;
-  animation: animShimmer 2s infinite;
+  animation: anim-shimmer 2s infinite;
 }
 
 /* ── 减少动效偏好 ── */

@@ -34,6 +34,7 @@
 
   /* 品牌色 — 暖靛蓝 #5b5fe3 */
   --brand: #5b5fe3;
+  --brand-rgb: 91, 95, 227;
   --brand-hover: #4a4ed6;
   --brand-soft: #a5a2f2;
   --brand-light: #f5f3ff;
@@ -41,15 +42,15 @@
   --brand-light-alt: #eeecff;
   --brand-darkest: #2d3091;
   --brand-gradient: linear-gradient(135deg, #5b5fe3 0%, #7c7ff0 50%, #a78bfa 100%);
-  --brand-glow: 0 0 20px rgba(91,95,227,.25);
-  --brand-alpha-08: rgba(91,95,227,.08);
-  --brand-alpha-10: rgba(91,95,227,.10);
-  --brand-alpha-12: rgba(91,95,227,.12);
-  --brand-alpha-15: rgba(91,95,227,.15);
-  --brand-alpha-20: rgba(91,95,227,.20);
-  --brand-alpha-25: rgba(91,95,227,.25);
-  --brand-alpha-30: rgba(91,95,227,.30);
-  --brand-alpha-35: rgba(91,95,227,.35);
+  --brand-glow: 0 0 20px rgba(var(--brand-rgb),.25);
+  --brand-alpha-08: rgba(var(--brand-rgb),.08);
+  --brand-alpha-10: rgba(var(--brand-rgb),.10);
+  --brand-alpha-12: rgba(var(--brand-rgb),.12);
+  --brand-alpha-15: rgba(var(--brand-rgb),.15);
+  --brand-alpha-20: rgba(var(--brand-rgb),.20);
+  --brand-alpha-25: rgba(var(--brand-rgb),.25);
+  --brand-alpha-30: rgba(var(--brand-rgb),.30);
+  --brand-alpha-35: rgba(var(--brand-rgb),.35);
 
   /* 边框补充 */
   --border-muted: #ebebea;
@@ -69,7 +70,7 @@
   --shadow-sm: 0 1px 2px rgba(15, 18, 30, 0.04);
   --shadow-card: 0 1px 3px rgba(15, 18, 30, 0.05), 0 1px 2px rgba(15, 18, 30, 0.03);
   --shadow-dropdown: 0 8px 24px rgba(15, 18, 30, 0.08);
-  --shadow-glow: 0 0 24px rgba(91,95,227,.12);
+  --shadow-glow: 0 0 24px rgba(var(--brand-rgb),.12);
 
   /* 标签/徽章 */
   --tag-bg: #f5f5f4;
@@ -102,7 +103,7 @@
   /* ================================================
      4. 交互状态
      ================================================ */
-  --focus-ring: 0 0 0 3px rgba(91,95,227,.18);
+  --focus-ring: 0 0 0 3px rgba(var(--brand-rgb),.18);
   --input-focus-border: #a5a2f2;
   --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-base: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -174,9 +175,9 @@
   --bg-tertiary: #fafaf9;
   --border: #ebebea;
   --card-bg: #ffffff;
-  --brand-alpha: rgba(91,95,227,.08);
+  --brand-alpha: rgba(var(--brand-rgb),.08);
   --brand-bg: #f5f3ff;
-  --brand-border: rgba(91,95,227,.12);
+  --brand-border: rgba(var(--brand-rgb),.12);
   --danger-bg: #fef2f2;
   --info: #3b82f6;
   --info-bg: #eff6ff;
@@ -185,7 +186,7 @@
   --warning-bg: #fffbeb;
   --radius: 10px;
   --shadow: 0 1px 3px rgba(15, 18, 30, 0.05);
-  --shadow-brand: 0 4px 16px rgba(91,95,227,.12);
+  --shadow-brand: 0 4px 16px rgba(var(--brand-rgb),.12);
   --shadow-lg: 0 12px 32px rgba(15, 18, 30, 0.08);
   --shadow-md: 0 6px 16px rgba(15, 18, 30, 0.06);
   --shadow-xl: 0 20px 48px rgba(15, 18, 30, 0.10);
@@ -226,17 +227,18 @@
   --border-card: #1e2235;
 
   --brand: #8b95ff;
+  --brand-rgb: 107, 120, 255;
   --brand-soft: #5d65c8;
   --brand-light: #1a1d35;
   --brand-light-alt: #1e2240;
   --brand-hover: #a5acff;
   --brand-gradient: linear-gradient(135deg, #6b78ff 0%, #9b5cff 50%, #c084fc 100%);
-  --brand-glow: 0 0 28px rgba(107, 120, 255, 0.3);
+  --brand-glow: 0 0 28px rgba(var(--brand-rgb), 0.3);
 
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.25);
   --shadow-dropdown: 0 8px 24px rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 0 28px rgba(107, 120, 255, 0.15);
+  --shadow-glow: 0 0 28px rgba(var(--brand-rgb), 0.15);
 
   --tag-bg: #1a1d35;
   --badge-bg: #1a1d35;
@@ -253,6 +255,8 @@
   --table-border: #1e2235;
   --input-border: #1e2235;
   --input-placeholder: #5d6380;
+  --input-focus-border: #6b78ff;
+  --focus-ring: 0 0 0 3px rgba(var(--brand-rgb), 0.25);
   --modal-overlay: rgba(0, 0, 0, 0.7);
   --modal-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   --z-modal: 5000;
@@ -294,12 +298,17 @@
   --bg-tertiary: #141724;
   --border: #1e2235;
   --card-bg: #141724;
-  --brand-alpha-10: rgba(107, 120, 255, 0.08);
-  --brand-alpha-15: rgba(107, 120, 255, 0.10);
-  --brand-alpha-35: rgba(107, 120, 255, 0.15);
-  --brand-alpha: rgba(107, 120, 255, 0.08);
-  --brand-bg: rgba(107, 120, 255, 0.06);
-  --brand-border: rgba(107, 120, 255, 0.10);
+  --brand-alpha-08: rgba(var(--brand-rgb), 0.08);
+  --brand-alpha-10: rgba(var(--brand-rgb), 0.10);
+  --brand-alpha-12: rgba(var(--brand-rgb), 0.12);
+  --brand-alpha-15: rgba(var(--brand-rgb), 0.15);
+  --brand-alpha-20: rgba(var(--brand-rgb), 0.20);
+  --brand-alpha-25: rgba(var(--brand-rgb), 0.25);
+  --brand-alpha-30: rgba(var(--brand-rgb), 0.30);
+  --brand-alpha-35: rgba(var(--brand-rgb), 0.35);
+  --brand-alpha: rgba(var(--brand-rgb), 0.08);
+  --brand-bg: rgba(var(--brand-rgb), 0.06);
+  --brand-border: rgba(var(--brand-rgb), 0.10);
   --border-muted: #1e2235;
   --danger-bg: rgba(239, 68, 68, 0.1);
   --info: #60a5fa;
@@ -309,7 +318,7 @@
   --warning-bg: rgba(245, 158, 11, 0.1);
   --radius: 10px;
   --shadow: 0 1px 3px rgba(0,0,0,0.3);
-  --shadow-brand: 0 4px 16px rgba(107, 120, 255, 0.1);
+  --shadow-brand: 0 4px 16px rgba(var(--brand-rgb), 0.1);
   --shadow-lg: 0 12px 32px rgba(0,0,0,0.4);
   --shadow-md: 0 6px 16px rgba(0,0,0,0.3);
   --shadow-xl: 0 20px 48px rgba(0,0,0,0.5);
@@ -397,14 +406,14 @@ body {
 }
 
 .dot-pattern-subtle {
-  background-image: radial-gradient(circle, rgba(91,95,227,0.06) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(var(--brand-rgb),0.06) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
 .gradient-mesh {
   background:
-    radial-gradient(ellipse 80% 60% at 20% 20%, rgba(91,95,227,0.04) 0%, transparent 50%),
-    radial-gradient(ellipse 60% 80% at 80% 80%, rgba(124,58,237,0.03) 0%, transparent 50%),
+    radial-gradient(ellipse 80% 60% at 20% 20%, rgba(var(--brand-rgb),0.04) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 80% at 80% 80%, rgba(var(--brand-rgb),0.03) 0%, transparent 50%),
     var(--bg-page);
 }
 
@@ -428,18 +437,18 @@ body {
   --ws-accent-hover: #4a4ed6;
   --ws-accent-light: #f5f3ff;
   --ws-accent-gradient: linear-gradient(135deg, #5b5fe3 0%, #7c7ff0 50%, #a78bfa 100%);
-  --ws-accent-glow: 0 0 20px rgba(91,95,227,.2);
+  --ws-accent-glow: 0 0 20px rgba(var(--brand-rgb),.2);
   --ws-bg: #fafaf9;
   --ws-card: #ffffff;
   --ws-card-hover-shadow: 0 8px 24px rgba(15, 18, 30, 0.08);
-  --ws-dot-color: rgba(91,95,227,.04);
+  --ws-dot-color: rgba(var(--brand-rgb),.04);
   --ws-sidebar-bg: #ffffff;
   --ws-sidebar-hover: #f5f5f4;
   --ws-sidebar-active: #f5f3ff;
   --ws-sidebar-width: 200px;
   --ws-tab-active-bg: #f5f3ff;
   --ws-tab-hover-bg: #f5f5f4;
-  --ws-input-focus-shadow: 0 0 0 3px rgba(91,95,227,.10), 0 0 24px rgba(91,95,227,.06);
+  --ws-input-focus-shadow: 0 0 0 3px rgba(var(--brand-rgb),.10), 0 0 24px rgba(var(--brand-rgb),.06);
   --ws-header-height: 56px;
 }
 
@@ -448,26 +457,18 @@ body {
   --ws-accent-hover: #a5acff;
   --ws-accent-light: #1a1d35;
   --ws-accent-gradient: linear-gradient(135deg, #6b78ff 0%, #9b5cff 50%, #c084fc 100%);
-  --ws-accent-glow: 0 0 28px rgba(107, 120, 255, 0.25);
+  --ws-accent-glow: 0 0 28px rgba(var(--brand-rgb), 0.25);
   --ws-bg: #0a0c14;
   --ws-card: #141724;
-  --ws-card-hover-shadow: 0 8px 28px rgba(0, 0, 0, 0.3), 0 0 24px rgba(107, 120, 255, 0.06);
-  --ws-dot-color: rgba(107, 120, 255, 0.04);
+  --ws-card-hover-shadow: 0 8px 28px rgba(0, 0, 0, 0.3), 0 0 24px rgba(var(--brand-rgb), 0.06);
+  --ws-dot-color: rgba(var(--brand-rgb), 0.04);
   --ws-sidebar-bg: #0d0f18;
   --ws-sidebar-hover: #141724;
   --ws-sidebar-active: #1a1d35;
   --ws-tab-hover-bg: #141724;
-  --ws-input-focus-shadow: 0 0 0 3px rgba(107, 120, 255, 0.12), 0 0 28px rgba(107, 120, 255, 0.08);
+  --ws-input-focus-shadow: 0 0 0 3px rgba(var(--brand-rgb), 0.12), 0 0 28px rgba(var(--brand-rgb), 0.08);
   --ws-header-height: 56px;
 }
-
-/* ================================================
-   14. Nuxt 页面过渡动画
-   ================================================ */
-.page-enter-active { transition: opacity 0.2s cubic-bezier(0.22, 1, 0.36, 1), transform 0.25s cubic-bezier(0.22, 1, 0.36, 1); }
-.page-leave-active { transition: opacity 0.12s ease-in, transform 0.15s ease-in; }
-.page-enter-from { opacity: 0; transform: translateY(8px); }
-.page-leave-to { opacity: 0; transform: translateY(-4px); }
 
 .layout-enter-active { transition: opacity 0.25s cubic-bezier(0.22, 1, 0.36, 1); }
 .layout-leave-active { transition: opacity 0.15s ease-in; }

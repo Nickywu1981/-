@@ -86,7 +86,7 @@ input, textarea, select {
   position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
   padding: 10px 24px; background: var(--bg-tooltip); color: var(--text-primary);
   border-radius: var(--radius-md); font-size: 13px;
-  box-shadow: var(--shadow-lg); z-index: 2000; animation: var(--slide-up);
+  box-shadow: var(--shadow-lg); z-index: 2000; animation: anim-slide-up 0.3s ease-out;
 }
 
 /* ================================================
@@ -94,3 +94,19 @@ input, textarea, select {
    ================================================ */
 .ws-cost { font-size: 0.9rem; color: var(--text-secondary); }
 .ws-cost strong { color: var(--brand); }
+
+/* ================================================
+   Accessibility Utilities
+   ================================================ */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
