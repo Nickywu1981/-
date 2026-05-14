@@ -119,7 +119,7 @@ function handleAction() {
 }
 .empty-action--primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 2px 12px rgba(124,58,237,0.35);
+  box-shadow: 0 2px 12px rgba(var(--brand-rgb), 0.35);
 }
 .empty-action--secondary {
   background: var(--bg-hover);

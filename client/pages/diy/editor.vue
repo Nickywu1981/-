@@ -27,7 +27,7 @@
         <div class="component-list">
           <div v-for="cat in componentCats" :key="cat.key" class="comp-category">
             <h4>{{ cat.label }}</h4>
-            <div v-for="comp in componentsByCat[cat.key]" :key="comp.component_code" class="comp-item" draggable="true" @dragstart="onDragStart($event, comp)" @dragend="dragOverIdx = -1">
+            <div v-for="comp in componentsByCat[cat.key]" :key="comp.component_code" class="comp-item" draggable="true" @dragstart="onDragStart($event, comp)" @dragend="dragOverIdx = -1" @dblclick="editor.addSection(comp); dirty=true" :title="comp.name + ' — ' + $t('diy.editor_dblclick_insert')">
               <span class="comp-icon">{{ comp.icon || '◆' }}</span>
               <span>{{ comp.name }}</span>
             </div>
@@ -37,7 +37,8 @@
 
       <!-- 中间：画布 -->
       <div class="center-canvas" :class="{ 'canvas-pc': previewMode === 'pc' }" @dragover.prevent @drop="onDrop" @click="selectedIdxs = []">
-        <div v-if="!sections.length" class="canvas-placeholder">
+        <div v-if="pageLoading" class="canvas-placeholder">{{ $t('common.loading') }}...</div>
+        <div v-else-if="!sections.length" class="canvas-placeholder">
           {{ $t('diy.editor_canvas_placeholder') }}
         </div>
         <div v-for="(sec, idx) in sections" :key="sec.id" class="canvas-section" :class="{ selected: idx === selectedIdx }" :style="{ order: idx }" @click.stop="selectSection(idx)" draggable="true" @dragstart="onSectionDragStart($event, idx)" @dragover.prevent="onSectionDragOver($event, idx)" @drop.stop="onSectionDrop($event, idx)">
@@ -147,6 +148,7 @@ const rightTab = ref('props')
 const dirty = ref(false)
 const publishing = ref(false)
 const saving = ref(false)
+const pageLoading = ref(false)
 
 // 双端独立配置存储
 const mobileSections = ref<any[]>([])
@@ -183,7 +185,14 @@ const currentProps = computed(() => {
   const comp = getComponentByCode(sections.value[idx].component)
   return comp?.props || []
 })
-function markDirty() { dirty.value = true }
+// 属性编辑 undo: 首次编辑时捕获前置状态，后续编辑 800ms 内不再重复 push
+let propEditTimer: ReturnType<typeof setTimeout> | null = null
+function markDirty() {
+  dirty.value = true
+  if (!propEditTimer) editor.pushHistory()
+  if (propEditTimer) clearTimeout(propEditTimer)
+  propEditTimer = setTimeout(() => { propEditTimer = null }, 800)
+}
 
 function onKeydown(e: KeyboardEvent) {
   const ctrl = e.ctrlKey || e.metaKey
@@ -193,7 +202,14 @@ function onKeydown(e: KeyboardEvent) {
   if (ctrl && e.key === 'z' && !e.shiftKey) { e.preventDefault(); editor.undo(); dirty.value = true }
   else if (ctrl && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) { e.preventDefault(); editor.redo(); dirty.value = true }
   else if (ctrl && e.key === 's') { e.preventDefault(); savePage() }
+  else if (!inInput && ctrl && e.key === 'c') { e.preventDefault(); if (selectedIdx.value >= 0) editor.copySection(selectedIdx.value) }
+  else if (!inInput && ctrl && e.key === 'v') { e.preventDefault(); editor.pasteSection(selectedIdx.value + 1); dirty.value = true }
+  else if (!inInput && ctrl && e.key === 'd') { e.preventDefault(); if (selectedIdx.value >= 0) editor.duplicateSection(selectedIdx.value); dirty.value = true }
+  else if (!inInput && ctrl && e.key === 'a') { e.preventDefault(); editor.selectAll() }
+  else if (!inInput && e.key === 'Escape') { editor.clearSelection() }
   else if (!inInput && (e.key === 'Delete' || e.key === 'Backspace')) { e.preventDefault(); editor.removeSelected(); dirty.value = true }
+  else if (!inInput && e.key === 'ArrowUp') { e.preventDefault(); if (selectedIdx.value > 0) { editor.moveSection(selectedIdx.value, -1); dirty.value = true } }
+  else if (!inInput && e.key === 'ArrowDown') { e.preventDefault(); if (selectedIdx.value < sections.value.length - 1) { editor.moveSection(selectedIdx.value, 1); dirty.value = true } }
 }
 
 function selectSection(idx: number) { editor.selectSection(idx) }
@@ -234,6 +250,7 @@ function onLayerDrop(e: DragEvent, targetIdx: number) {
 async function loadPage() {
   const id = route.query.id
   if (!id) { navigateTo('/diy'); return }
+  pageLoading.value = true
   try {
     const res: any = await $fetch(`/api/diy/${id}`, { credentials: 'include' })
     const data = res?.data
@@ -247,6 +264,7 @@ async function loadPage() {
     previewMode.value = isPC ? 'pc' : 'mobile'
     editor.loadFromConfig(isPC ? pCfg : mCfg)
   } catch { toast.error(t('common.failed_load_page')) }
+  finally { pageLoading.value = false }
 }
 
 async function savePage() {
@@ -279,7 +297,7 @@ async function saveVersion() {
     await $fetch(`/api/diy/${pageInfo.value.id}/versions`, { method: 'POST', body, credentials: 'include' })
     dirty.value = false
     toast.success(t('common.version_saved'))
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(t('common.failed_save_version') + ' : ') + (err?.data?.msg || err.message)) }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(t('common.failed_save_version') + ': ' + (err?.data?.msg || err.message)) }
   finally { saving.value = false }
 }
 

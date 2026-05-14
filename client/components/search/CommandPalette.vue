@@ -258,7 +258,7 @@ watch(() => useRoute().path, close);
   transition: background 0.1s;
 }
 .palette-item:hover, .palette-item.active { background: var(--bg-hover); }
-.palette-item.active { background: rgba(124,58,237,0.08); }
+.palette-item.active { background: rgba(var(--brand-rgb), 0.08); }
 .palette-item-icon { font-size: 20px; flex-shrink: 0; width: 28px; text-align: center; }
 .palette-item-content { flex: 1; min-width: 0; }
 .palette-item-name { font-size: 14px; color: var(--text-primary); font-weight: 500; display: block; }
@@ -283,7 +283,7 @@ watch(() => useRoute().path, close);
   background: var(--bg-page); color: var(--text-primary); font-size: 13px;
   cursor: pointer; transition: border-color var(--transition-fast), background var(--transition-fast);
 }
-.palette-hot-btn:hover { border-color: var(--brand); background: rgba(124,58,237,0.06); }
+.palette-hot-btn:hover { border-color: var(--brand); background: rgba(var(--brand-rgb), 0.06); }
 
 /* Footer */
 .palette-footer {

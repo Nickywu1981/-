@@ -114,7 +114,7 @@ function formatDuration(ms: number) {
   cursor: pointer; transition: border-color var(--transition-fast), background var(--transition-fast);
   font-size: 12px;
 }
-.history-item:hover { border-color: var(--brand); background: rgba(124,58,237,0.03); }
+.history-item:hover { border-color: var(--brand); background: rgba(var(--brand-rgb), 0.03); }
 .history-item.error { border-left: 2px solid #ef4444; }
 .hi-type { min-width: 70px; }
 .hi-model { font-weight: 600; min-width: 80px; }

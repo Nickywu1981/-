@@ -1,5 +1,10 @@
 <template>
   <div class="work-page">
+    <!-- 页面标题 -->
+    <div v-if="title" class="work-header">
+      <h1 class="work-title">{{ title }}</h1>
+      <p v-if="subtitle" class="work-subtitle">{{ subtitle }}</p>
+    </div>
     <!-- 步骤条 -->
     <div class="steps-bar" v-if="st.length">
       <template v-for="(s, i) in st" :key="i">
@@ -20,13 +25,17 @@
 </template>
 
 <script setup lang="ts">
-const p = defineProps<{ steps?: string[]; currentStep?: number }>();
+const p = defineProps<{ title?: string; subtitle?: string; steps?: string[]; currentStep?: number }>();
 const cs = computed(() => p.currentStep ?? 0);
 const st = computed(() => p.steps ?? []);
 </script>
 
 <style scoped>
 .work-page { max-width: 960px; margin: 0 auto; padding: 36px 20px 48px; color: var(--text-primary); }
+
+.work-header { text-align: center; margin-bottom: 36px; }
+.work-title { font-size: 24px; font-weight: 700; color: var(--text-primary); margin: 0 0 8px; letter-spacing: -0.02em; }
+.work-subtitle { font-size: 14px; color: var(--text-muted); margin: 0; }
 
 /* ── 步骤条 ── */
 .steps-bar { display: flex; align-items: center; justify-content: center; margin-bottom: 44px; }

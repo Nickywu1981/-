@@ -80,5 +80,5 @@ definePageMeta({ layout: 'default' })
   color: var(--text-on-brand); font-size: 14px; text-decoration: none; display: inline-block; font-weight: 600;
   transition: opacity var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
 }
-.btn-home:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(124,58,237,0.3); }
+.btn-home:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(var(--brand-rgb), 0.3); }
 </style>

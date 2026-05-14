@@ -1,23 +1,15 @@
 import { BusinessError } from '../utils/businessError.js';
 import { USER_STATUS } from '../constants/domainStatus.js';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import * as userDao from '../dao/userDao.js';
-import { jwtSecret as JWT_SECRET, jwtExpiresIn as JWT_EXPIRES } from '../config/index.js';
+import { generateAccessToken } from '../middleware/auth.js';
+import { jwtExpiresIn } from '../config/index.js';
 
 const SALT_ROUNDS = 12;
 import * as smsService from './smsService.js';
 import * as emailService from './emailService.js';
 import logger from '../utils/logger.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
-
-function generateToken(user) {
-  return jwt.sign(
-    { userId: user.id, role: user.role, nickname: user.nickname, tenantId: user.tenantId || 0 },
-    JWT_SECRET,
-    { expiresIn: JWT_EXPIRES },
-  );
-}
 
 export async function register({ phone, email, password, nickname, inviteCode: _inviteCode }) {
   const username = phone || email || '';
@@ -35,12 +27,12 @@ export async function register({ phone, email, password, nickname, inviteCode: _
   logger.info('[Auth] 注册成功', { userId });
 
   const user = { id: userId, role: 'free', nickname: nickname || '', tenantId: 0 };
-  const token = generateToken(user);
+  const token = generateAccessToken(user);
 
   return {
     user: { id: userId, nickname: nickname || '', role: 'free' },
     token,
-    token_expires_in: JWT_EXPIRES,
+    token_expires_in: jwtExpiresIn,
   };
 }
 
@@ -59,12 +51,12 @@ export async function login({ phone, email, username, password }) {
 
   await userDao.updateLastLogin(user.id);
 
-  const token = generateToken(user);
+  const token = generateAccessToken(user);
   logger.info('[Auth] 登录成功', { userId: user.id });
   return {
     user: { id: user.id, nickname: user.nickname, role: user.role },
     token,
-    token_expires_in: JWT_EXPIRES,
+    token_expires_in: jwtExpiresIn,
   };
 }
 
@@ -92,12 +84,12 @@ export async function loginByCode({ phone, email, username, code }) {
 
   await userDao.updateLastLogin(user.id);
 
-  const token = generateToken(user);
+  const token = generateAccessToken(user);
   logger.info('[Auth] 验证码登录成功', { userId: user.id });
   return {
     user: { id: user.id, nickname: user.nickname, role: user.role },
     token,
-    token_expires_in: JWT_EXPIRES,
+    token_expires_in: jwtExpiresIn,
   };
 }
 
@@ -114,7 +106,7 @@ export async function resetPassword({ phone, email, newPassword, code }) {
   const user = phone ? await userDao.findByPhone(phone) : await userDao.findByEmail(email);
   if (!user) throw new BusinessError(ERROR_CODE.PARAM_ERROR);
 
-  const passwordHash = await bcrypt.hash(newPassword, 12);
+  const passwordHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
   await userDao.updatePassword(user.id, passwordHash);
 
   // Revoke all existing tokens (Redis). This is best-effort — if Redis is

@@ -136,6 +136,6 @@ function formatResult(r: any) {
 .step-body, .step-error { padding: 10px 12px; }
 .step-body pre { max-height: 250px; margin: 0; }
 .step-error { color: var(--danger); font-size: 12px; }
-.final-result { margin-top: 14px; padding: 14px; background: rgba(124,58,237,0.05); border: 1px solid rgba(124,58,237,0.2); border-radius: var(--radius-md); }
+.final-result { margin-top: 14px; padding: 14px; background: rgba(var(--brand-rgb), 0.05); border: 1px solid rgba(var(--brand-rgb), 0.2); border-radius: var(--radius-md); }
 .final-result h4 { margin: 0 0 8px; font-size: 14px; }
 </style>
