@@ -1,32 +1,32 @@
 <template>
   <AdminLayout>
-    <h2 class="ptitle">作品集管理</h2>
+    <h2 class="ptitle">{{ $t('common.collection_manage') }}</h2>
     <div class="toolbar">
-      <button class="btn-primary" @click="openCreate">+ 新建作品集</button>
+      <button class="btn-primary" @click="openCreate">+ {{ $t('common.collection_new') }}</button>
     </div>
     <LoadingSkeleton v-if="loading" type="table" :rows="5" :cols="6" />
     <div class="table-wrap" v-else-if="list.length">
-    <table class="table"><thead><tr><th>ID</th><th>{{ $t('common.name') }}</th><th>{{ $t('common.type') }}</th><th>{{ $t('common.create') }}时间</th><th>{{ $t('common.actions') }}</th></tr></thead>
+    <table class="table"><thead><tr><th>ID</th><th>{{ $t('common.name') }}</th><th>{{ $t('common.type') }}</th><th>{{ $t('common.create') }}{{ $t('common.mode_label') }}</th><th>{{ $t('common.actions') }}</th></tr></thead>
     <tbody><tr v-for="c in list" :key="c.id"><td>{{ c.id }}</td><td>{{ c.name }}</td><td><span class="type-tag">{{ typeLabel(c.type) }}</span></td><td>{{ c.created_at?.slice(0,10) || '-' }}</td><td><button class="btn-sm" @click="openEdit(c)">{{ $t('common.edit') }}</button><button class="btn-sm btn-danger" @click="deleteItem(c.id)">{{ $t('common.delete') }}</button></td></tr></tbody></table>
     </div>
     <Pagination v-if="total > pageSize" :page="page" :page-size="pageSize" :total="total" @change="onPageChange" />
-    <EmptyState v-else icon="🖼️" title="暂无作品集" description="创建您的第一个作品集" action-label="新建作品集" @action="openCreate" />
+    <EmptyState v-else icon="🖼️" :title="$t('common.collection_empty_title')" :description="$t('common.collection_empty_desc')" :action-label="$t('common.collection_new')" @action="openCreate" />
 
     <Teleport to="body">
       <div v-if="showModal" class="modal-overlay" @click.self="showModal=false" @keydown.escape="showModal=false">
         <div class="modal">
-          <h3>{{ editing ? '编辑作品集' : '新建作品集' }}</h3>
-          <div class="form-group"><label>{{ $t('common.name') }}</label><input v-model="editForm.name" maxlength="100" class="input" placeholder="作品集名称" /></div>
+          <h3>{{ editing ? $t('common.collection_edit') : $t('common.collection_new') }}</h3>
+          <div class="form-group"><label>{{ $t('common.name') }}</label><input v-model="editForm.name" maxlength="100" class="input" :placeholder="$t('common.collection_name_placeholder')" /></div>
           <div class="form-group"><label>{{ $t('common.type') }}</label>
             <select v-model="editForm.type" class="input">
-              <option value="">请选择{{ $t('common.type') }}</option>
+              <option value="">{{ $t('common.please_select') }}{{ $t('common.type') }}</option>
               <option value="image">图片</option><option value="video">视频</option>
               <option value="template">模板</option><option value="prompt">提示词</option>
             </select>
           </div>
           <div class="modal-actions">
             <button class="btn-cancel" @click="showModal=false">{{ $t('common.cancel') }}</button>
-            <button class="btn-save" :disabled="saving" @click="save">{{ saving?'保存中...':'保存' }}</button>
+            <button class="btn-save" :disabled="saving" @click="save">{{ saving ? $t('common.saving') : $t('common.save') }}</button>
           </div>
         </div>
       </div>
@@ -43,7 +43,7 @@ const list = ref<any[]>([]), total = ref(0), page = ref(1), pageSize = 20, loadi
 const showModal = ref(false), editing = ref<any>(null), saving = ref(false)
 const editForm = reactive({ name: '', type: 'image' })
 
-function typeLabel(t: string) { return { image:'图片', video:'视频', template:'模板', prompt:'提示词' }[t] || t }
+function typeLabel(type: string) { const labels: Record<string, string> = { image: t('common.image_label'), video: t('common.video_label'), template: t('common.template_label'), prompt: t('common.prompt_label') }; return labels[type] || type }
 
 async function fetchData() {
   loading.value = true

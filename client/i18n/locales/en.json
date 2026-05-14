@@ -1005,7 +1005,17 @@
     "saved": "[EN] 已保存",
     "template_created": "[EN] 模板已创建",
     "template_deleted": "[EN] 模板已删除",
-    "confirm_label": "[EN] 确认"
+    "confirm_label": "[EN] 确认",
+    "collection_manage": "[EN] 作品集管理",
+    "collection_new": "[EN] 新建作品集",
+    "collection_edit": "[EN] 编辑作品集",
+    "collection_name_placeholder": "[EN] 作品集名称",
+    "collection_empty_title": "[EN] 暂无作品集",
+    "collection_empty_desc": "[EN] 创建您的第一个作品集",
+    "mode_label": "[EN] 时间",
+    "image_label": "[EN] 图片",
+    "video_label": "[EN] 视频",
+    "prompt_label": "[EN] 提示词"
   },
   "ecommerce": {
     "title": "AI E-Commerce Content Creation",

@@ -1005,7 +1005,17 @@
     "saved": "已保存",
     "template_created": "模板已创建",
     "template_deleted": "模板已删除",
-    "confirm_label": "确认"
+    "confirm_label": "确认",
+    "collection_manage": "作品集管理",
+    "collection_new": "新建作品集",
+    "collection_edit": "编辑作品集",
+    "collection_name_placeholder": "作品集名称",
+    "collection_empty_title": "暂无作品集",
+    "collection_empty_desc": "创建您的第一个作品集",
+    "mode_label": "时间",
+    "image_label": "图片",
+    "video_label": "视频",
+    "prompt_label": "提示词"
   },
   "ecommerce": {
     "title": "AI 电商内容创作",
