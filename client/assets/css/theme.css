@@ -316,6 +316,26 @@
   --success-bg: rgba(16, 185, 129, 0.1);
   --text-tertiary: #5d6380;
   --warning-bg: rgba(245, 158, 11, 0.1);
+  --text-tertiary: #5d6380;
+
+  /* 语义色暗黑适配 — Badge/Tag/Stat 组件 */
+  --color-success-50: rgba(16, 185, 129, 0.12);
+  --color-success-500: #34d399;
+  --color-success-700: #6ee7b7;
+  --color-warning-50: rgba(245, 158, 11, 0.12);
+  --color-warning-500: #fbbf24;
+  --color-warning-700: #fcd34d;
+  --color-danger-50: rgba(239, 68, 68, 0.12);
+  --color-danger-500: #f87171;
+  --color-danger-700: #fca5a5;
+  --color-info-50: rgba(59, 130, 246, 0.12);
+  --color-info-500: #60a5fa;
+  --color-info-700: #93bbfd;
+  --color-gray-50: #1a1d35;
+  --color-gray-600: #8b90a5;
+  --color-brand-50: rgba(var(--brand-rgb), 0.10);
+  --color-brand-700: #a5acff;
+
   --radius: 10px;
   --shadow: 0 1px 3px rgba(0,0,0,0.3);
   --shadow-brand: 0 4px 16px rgba(var(--brand-rgb), 0.1);
