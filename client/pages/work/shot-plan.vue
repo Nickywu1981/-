@@ -1,8 +1,8 @@
 <template>
-  <WorkLayout :steps="['输入产品', '选风格', '生成分镜']" :current-step="step">
+  <WorkLayout :title="$t('work_pages.shot_plan_title')" :steps="steps" :current-step="step">
     <div v-if="step === 0" class="upload-section">
       <h3>{{ $t('work_pages.shot_plan_input_title') }}</h3>
-      <textarea v-model="productInfo" class="input-area" placeholder="描述你的产品和拍摄需求...&#10;&#10;如：女士长袖衬衫，经典翻领设计，纯棉面料舒适透气，适合通勤穿搭" rows="5" maxlength="2000" />
+      <textarea v-model="productInfo" class="input-area" :placeholder="$t('work_pages.shot_plan_input_placeholder')" rows="5" maxlength="2000" />
       <div v-if="productInfo.trim()" class="quick-inputs">
         <button v-for="q in quickInputs" :key="q.label" class="quick-btn" @click="productInfo = q.text">{{ q.label }}</button>
       </div>
@@ -36,11 +36,11 @@
         <h3>{{ $t('work_pages.shot_plan_done_title') }}</h3>
         <div class="shot-output">
           <h4>{{ task.result.value?.title }}</h4>
-          <p class="duration-total">总时长：{{ task.result.value?.totalDuration }}</p>
+          <p class="duration-total">{{ $t('work_pages.shot_plan_total_duration_prefix') }}{{ task.result.value?.totalDuration }}</p>
           <div class="shot-list">
             <div v-for="s in (task.result.value?.shots || [])" :key="s.id" class="shot-item">
               <div class="shot-header">
-                <span class="shot-num">镜{{ s.id }}</span>
+                <span class="shot-num">{{ $t('work_pages.shot_plan_shot_prefix') }}{{ s.id }}</span>
                 <span class="shot-scene">{{ s.scene }}</span>
                 <span class="shot-dur">{{ s.duration }}</span>
               </div>
@@ -71,6 +71,7 @@ import PromptEnhancer from '~/components/PromptEnhancer.vue'
 const { t } = useI18n()
 
 
+const steps = computed(() => [t('work_pages.shot_plan_step_product'), t('work_pages.shot_plan_step_style'), t('work_pages.shot_plan_step_gen')])
 const step = ref(0);
 const toast = useToast()
 const productInfo = ref('');
@@ -78,19 +79,19 @@ const selectedStyle = ref('带货');
 const selectedDuration = ref(30);
 const task = useTask();
 
-const styles = [
-  { id: '带货', name: '带货转化', icon: '💰' },
-  { id: '种草', name: '种草测评', icon: '🌱' },
-  { id: '开箱', name: '开箱体验', icon: '📦' },
-  { id: '科普', name: '科普干货', icon: '📚' },
-];
+const styles = computed(() => [
+  { id: '带货', name: t('work_pages.shot_plan_style_sales'), icon: '💰' },
+  { id: '种草', name: t('work_pages.shot_plan_style_review'), icon: '🌱' },
+  { id: '开箱', name: t('work_pages.shot_plan_style_unbox'), icon: '📦' },
+  { id: '科普', name: t('work_pages.shot_plan_style_edu'), icon: '📚' },
+]);
 const durations = [15, 30, 60];
 
-const quickInputs = [
-  { label: '服装', text: '女士长袖衬衫，经典翻领设计，纯棉面料舒适透气，适合通勤穿搭' },
-  { label: '美妆', text: '哑光唇釉，雾面质感不拔干，持久12小时不沾杯，6色可选' },
-  { label: '电子', text: '无线降噪耳机，40dB深度降噪，30h续航，快速充电10分钟用3小时' },
-];
+const quickInputs = computed(() => [
+  { label: t('work_pages.shot_plan_quick_clothing'), text: '女士长袖衬衫，经典翻领设计，纯棉面料舒适透气，适合通勤穿搭' },
+  { label: t('work_pages.shot_plan_quick_beauty'), text: '哑光唇釉，雾面质感不拔干，持久12小时不沾杯，6色可选' },
+  { label: t('work_pages.shot_plan_quick_electronics'), text: '无线降噪耳机，40dB深度降噪，30h续航，快速充电10分钟用3小时' },
+]);
 
 async function submitTask() {
   step.value = 2;

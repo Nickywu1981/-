@@ -1,28 +1,28 @@
 <template>
-  <WorkLayout :steps="['上传服装', '去褶皱', '对比']" :current-step="step">
+  <WorkLayout :title="$t('work_pages.wrinkle_remove.title')" :steps="steps" :current-step="step">
     <div v-if="step === 0" class="upload-section">
       <div class="dropzone" @dragover.prevent @drop.prevent="handleDrop">
         <p class="dz-icon">👔</p>
-        <p>上传带褶皱的服装图</p>
-        <p class="hint">AI自动识别褶皱区域，保留材质纹理</p>
+        <p>{{ $t('work_pages.wrinkle_remove.drop_title') }}</p>
+        <p class="hint">{{ $t('work_pages.wrinkle_remove.drop_hint') }}</p>
         <input ref="fileInput" type="file" accept="image/*" hidden @change="handleFile" />
-        <button class="btn-outline" @click="fileInput?.click()">选择图片</button>
+        <button class="btn-outline" @click="fileInput?.click()">{{ $t('work_pages.wrinkle_remove.select_image') }}</button>
       </div>
-      <div v-if="previewUrl" class="preview-box"><img loading="lazy" :src="previewUrl" alt="去皱预览" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" /></div>
-      <p v-if="uploading" class="hint uploading">⏳ 上传中...</p>
-      <p v-else-if="uploadedUrl" class="hint uploaded">✓ 已上传</p>
-      <button v-if="previewUrl" class="btn" @click="step = 1">下一步：选材质</button>
+      <div v-if="previewUrl" class="preview-box"><img loading="lazy" :src="previewUrl" :alt="$t('work_pages.wrinkle_remove.preview_alt')" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" /></div>
+      <p v-if="uploading" class="hint uploading">{{ $t('work_pages.wrinkle_remove.uploading') }}</p>
+      <p v-else-if="uploadedUrl" class="hint uploaded">{{ $t('work_pages.wrinkle_remove.uploaded') }}</p>
+      <button v-if="previewUrl" class="btn" @click="step = 1">{{ $t('work_pages.wrinkle_remove.next_fabric') }}</button>
     </div>
 
     <div v-else-if="step === 1" class="select-section">
-      <h3>选择面料材质</h3>
+      <h3>{{ $t('work_pages.wrinkle_remove.select_fabric') }}</h3>
       <div class="fabric-grid">
-        <button v-for="f in fabrics" :key="f" class="fabric-btn" :class="{ active: selectedFabric === f }" @click="selectedFabric = f">{{ f }}</button>
+        <button v-for="f in fabrics" :key="f.id" class="fabric-btn" :class="{ active: selectedFabric === f.id }" @click="selectedFabric = f.id">{{ f.label }}</button>
       </div>
-      <p class="cost-hint">成本：3 点/次</p>
+      <p class="cost-hint">{{ $t('work_pages.wrinkle_remove.cost_hint') }}</p>
       <div class="actions">
-        <button class="btn-outline" @click="step = 0">返回</button>
-        <button class="btn" @click="submitTask">开始去褶皱</button>
+        <button class="btn-outline" @click="step = 0">{{ $t('work_pages.wrinkle_remove.back') }}</button>
+        <button class="btn" @click="submitTask">{{ $t('work_pages.wrinkle_remove.start_wrinkle_remove') }}</button>
       </div>
     </div>
 
@@ -32,15 +32,15 @@
         <div class="bar"><div class="bar-fill" :style="{ width: task.progress.value + '%' }" /></div>
       </div>
       <div v-else-if="task.status.value === 2">
-        <h3>去褶皱完成</h3>
+        <h3>{{ $t('work_pages.wrinkle_remove.complete_title') }}</h3>
         <div class="compare-row">
-          <div class="compare-card"><span class="label">处理前</span><div class="compare-img" /></div>
+          <div class="compare-card"><span class="label">{{ $t('work_pages.wrinkle_remove.before_label') }}</span><div class="compare-img" /></div>
           <div class="compare-arrow">→</div>
-          <div class="compare-card"><span class="label">处理后</span><div class="compare-img" /></div>
+          <div class="compare-card"><span class="label">{{ $t('work_pages.wrinkle_remove.after_label') }}</span><div class="compare-img" /></div>
         </div>
-        <div class="actions"><button class="btn-outline" @click="handleRedo">再做一次</button></div>
+        <div class="actions"><button class="btn-outline" @click="handleRedo">{{ $t('work_pages.wrinkle_remove.redo_btn') }}</button></div>
       </div>
-      <div v-else-if="task.status.value === 3" class="error-box"><p>{{ task.errorMsg.value }}</p><button class="btn" @click="handleRedo">重试</button></div>
+      <div v-else-if="task.status.value === 3" class="error-box"><p>{{ task.errorMsg.value }}</p><button class="btn" @click="handleRedo">{{ $t('work_pages.wrinkle_remove.retry_btn') }}</button></div>
     </div>
   </WorkLayout>
 </template>
@@ -50,6 +50,7 @@
 const { createBlobUrl, revoke } = useBlobUrl()
 const toast = useToast()
 
+const steps = computed(() => [t('work_pages.wrinkle_remove.step_upload'), t('work_pages.wrinkle_remove.step_fabric'), t('work_pages.wrinkle_remove.step_generate')])
 const step = ref(0);
 const previewUrl = ref('');
 const uploadedUrl = ref('');
@@ -58,7 +59,16 @@ const selectedFabric = ref('auto');
 const fileInput = ref<HTMLInputElement | null>(null)
 const task = useTask();
 
-const fabrics = ['auto', '棉', '麻', '丝', '毛', '化纤', '牛仔', '针织'];
+const fabrics = computed(() => [
+  { id: 'auto', label: t('work_pages.wrinkle_remove.fabric_auto') },
+  { id: 'cotton', label: t('work_pages.wrinkle_remove.fabric_cotton') },
+  { id: 'linen', label: t('work_pages.wrinkle_remove.fabric_linen') },
+  { id: 'silk', label: t('work_pages.wrinkle_remove.fabric_silk') },
+  { id: 'wool', label: t('work_pages.wrinkle_remove.fabric_wool') },
+  { id: 'polyester', label: t('work_pages.wrinkle_remove.fabric_polyester') },
+  { id: 'denim', label: t('work_pages.wrinkle_remove.fabric_denim') },
+  { id: 'knit', label: t('work_pages.wrinkle_remove.fabric_knit') },
+]);
 
 async function uploadFile(file: File) {
   uploading.value = true;

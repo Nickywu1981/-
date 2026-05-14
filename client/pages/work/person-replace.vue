@@ -1,5 +1,5 @@
 <template>
-  <WorkLayout :title="$t('work_pages.person_replace_title')" sub:title="$t('work_pages.person_replace_subtitle')" :steps="steps" :current-step="currentStep">
+  <WorkLayout :title="$t('work_pages.person_replace_title')" :subtitle="$t('work_pages.person_replace_subtitle')" :steps="steps" :current-step="currentStep">
       <div class="ws-section">
         <div class="ws-section__title">{{ $t('work_pages.person_replace_step_upload') }}</div>
         <div class="dual-upload">
@@ -7,25 +7,25 @@
             <div class="dual-upload__label">{{ $t('work_pages.person_replace_upload_product') }}</div>
             <div class="ws-upload-area" @dragover.prevent @drop.prevent="(e: DragEvent) => handleDrop(e, 'source')">
               <div class="ws-upload-area__icon" v-if="!sourceUrl">👕</div>
-              <img loading="lazy" v-else :src="sourceUrl" alt="原图" class="ws-upload-area__preview" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
-              <div class="ws-upload-area__text">{{ sourceUrl ? '点击更换' : '上传产品图' }}</div>
+              <img loading="lazy" v-else :src="sourceUrl" :alt="$t('work_pages.person_replace_alt_source')" class="ws-upload-area__preview" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+              <div class="ws-upload-area__text">{{ sourceUrl ? $t('work_pages.person_replace_click_change') : $t('work_pages.person_replace_upload_product_text') }}</div>
               <input ref="sourceInput" type="file" accept="image/*" hidden @change="(e: Event) => handleFile(e, 'source')" />
               <button class="ws-btn ws-btn--secondary ws-btn--sm" type="button" @click="sourceInput?.click()">{{ $t('work_pages.person_replace_btn_select') }}</button>
             </div>
-            <div class="upload-status" v-if="uploadingSrc">⏳ 上传中...</div>
-            <div class="upload-status ok" v-else-if="uploadedSourceUrl">✓ 已上传</div>
+            <div class="upload-status" v-if="uploadingSrc">{{ $t('work_pages.person_replace_uploading') }}</div>
+            <div class="upload-status ok" v-else-if="uploadedSourceUrl">{{ $t('work_pages.person_replace_uploaded') }}</div>
           </div>
           <div class="dual-upload__col">
             <div class="dual-upload__label">{{ $t('work_pages.person_replace_upload_person') }}</div>
             <div class="ws-upload-area" @dragover.prevent @drop.prevent="(e: DragEvent) => handleDrop(e, 'target')">
               <div class="ws-upload-area__icon" v-if="!targetUrl">🧑</div>
-              <img loading="lazy" v-else :src="targetUrl" alt="目标人物" class="ws-upload-area__preview" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
-              <div class="ws-upload-area__text">{{ targetUrl ? '点击更换' : '上传人物图' }}</div>
+              <img loading="lazy" v-else :src="targetUrl" :alt="$t('work_pages.person_replace_alt_target')" class="ws-upload-area__preview" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+              <div class="ws-upload-area__text">{{ targetUrl ? $t('work_pages.person_replace_click_change') : $t('work_pages.person_replace_upload_person_text') }}</div>
               <input ref="targetInput" type="file" accept="image/*" hidden @change="(e: Event) => handleFile(e, 'target')" />
               <button class="ws-btn ws-btn--secondary ws-btn--sm" type="button" @click="targetInput?.click()">{{ $t('work_pages.person_replace_btn_select') }}</button>
             </div>
-            <div class="upload-status" v-if="uploadingTgt">⏳ 上传中...</div>
-            <div class="upload-status ok" v-else-if="uploadedTargetUrl">✓ 已上传</div>
+            <div class="upload-status" v-if="uploadingTgt">{{ $t('work_pages.person_replace_uploading') }}</div>
+            <div class="upload-status ok" v-else-if="uploadedTargetUrl">{{ $t('work_pages.person_replace_uploaded') }}</div>
           </div>
         </div>
       </div>
@@ -34,19 +34,19 @@
         <div class="param-group">
           <div class="param-group__label">{{ $t('work_pages.person_replace_skin') }}</div>
           <div class="param-row">
-            <span v-for="s in skinTones" :key="s" class="ws-tag" :class="{ active: selectedSkin === s }" @click="selectedSkin = s">{{ s }}</span>
+            <span v-for="s in skinTones" :key="s.key" class="ws-tag" :class="{ active: selectedSkin === s.key }" @click="selectedSkin = s.key">{{ s.label }}</span>
           </div>
         </div>
         <div class="param-group">
           <div class="param-group__label">{{ $t('work_pages.person_replace_body') }}</div>
           <div class="param-row">
-            <span v-for="b in bodyTypes" :key="b" class="ws-tag" :class="{ active: selectedBody === b }" @click="selectedBody = b">{{ b }}</span>
+            <span v-for="b in bodyTypes" :key="b.key" class="ws-tag" :class="{ active: selectedBody === b.key }" @click="selectedBody = b.key">{{ b.label }}</span>
           </div>
         </div>
         <div class="param-group">
           <div class="param-group__label">{{ $t('work_pages.person_replace_style') }}</div>
           <div class="param-row">
-            <span v-for="st in styles" :key="st" class="ws-tag" :class="{ active: selectedStyle === st }" @click="selectedStyle = st">{{ st }}</span>
+            <span v-for="st in styleOptions" :key="st.key" class="ws-tag" :class="{ active: selectedStyle === st.key }" @click="selectedStyle = st.key">{{ st.label }}</span>
           </div>
         </div>
       </div>
@@ -79,7 +79,7 @@
           </div>
         </div>
         <div class="ws-error" v-else-if="task.status.value === 3">
-          <p>{{ task.errorMsg.value || '生成失败' }}</p>
+          <p>{{ task.errorMsg.value || $t('work_pages.person_replace_error_generate_failed') }}</p>
           <button class="ws-btn ws-btn--primary" @click="handleRedo">{{ $t('work_pages.person_replace_btn_retry') }}</button>
         </div>
       </div>
@@ -91,7 +91,7 @@
 const { createBlobUrl, revoke } = useBlobUrl()
 const toast = useToast()
 
-const steps = ['上传素材', '设置参数', '生成结果']
+const steps = computed(() => [t('work_pages.person_replace_step_upload'), t('work_pages.person_replace_step_params'), t('work_pages.person_replace_step_result')])
 const currentStep = ref(0)
 const sourceUrl = ref('')
 const targetUrl = ref('')
@@ -99,16 +99,32 @@ const uploadedSourceUrl = ref('')
 const uploadedTargetUrl = ref('')
 const uploadingSrc = ref(false)
 const uploadingTgt = ref(false)
-const selectedSkin = ref('自然')
-const selectedBody = ref('标准')
-const selectedStyle = ref('休闲')
+const selectedSkin = ref('natural')
+const selectedBody = ref('standard')
+const selectedStyle = ref('casual')
 const sourceInput = ref<HTMLInputElement | null>(null)
 const targetInput = ref<HTMLInputElement | null>(null)
 const task = useTask()
 
-const skinTones = ['白皙', '自然', '小麦', '深色']
-const bodyTypes = ['纤细', '标准', '丰满', '肌肉']
-const styles = ['休闲', '商务', '甜美', '运动', '街头']
+const skinTones = computed(() => [
+  { key: 'fair', label: t('work_pages.person_replace_skin_fair') },
+  { key: 'natural', label: t('work_pages.person_replace_skin_natural') },
+  { key: 'wheat', label: t('work_pages.person_replace_skin_wheat') },
+  { key: 'dark', label: t('work_pages.person_replace_skin_dark') },
+])
+const bodyTypes = computed(() => [
+  { key: 'slim', label: t('work_pages.person_replace_body_slim') },
+  { key: 'standard', label: t('work_pages.person_replace_body_standard') },
+  { key: 'curvy', label: t('work_pages.person_replace_body_plump') },
+  { key: 'muscular', label: t('work_pages.person_replace_body_muscular') },
+])
+const styleOptions = computed(() => [
+  { key: 'casual', label: t('work_pages.person_replace_style_casual') },
+  { key: 'business', label: t('work_pages.person_replace_style_business') },
+  { key: 'sweet', label: t('work_pages.person_replace_style_sweet') },
+  { key: 'sporty', label: t('work_pages.person_replace_style_sporty') },
+  { key: 'street', label: t('work_pages.person_replace_style_street') },
+])
 
 async function uploadFile(file: File, type: string) {
   if (type === 'source') uploadingSrc.value = true
