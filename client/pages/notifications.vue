@@ -1,19 +1,19 @@
 <template>
   <div class="page">
     <div class="header-bar">
-      <h2>通知中心</h2>
-      <button v-if="unreadCount > 0" class="btn-text" @click="markAllRead">全部已读</button>
+      <h2>{{ $t('notifications.title') }}</h2>
+      <button v-if="unreadCount > 0" class="btn-text" @click="markAllRead">{{ $t('notifications.mark_all_read') }}</button>
     </div>
 
-    <div v-if="loading" class="loading">加载中...</div>
+    <div v-if="loading" class="loading">{{ $t('common.loading') }}</div>
 
     <div v-else-if="error" class="error-state">
       <p>{{ error }}</p>
-      <button class="btn-retry" @click="fetch()">重试</button>
+      <button class="btn-retry" @click="fetch()">{{ $t('common.retry') }}</button>
     </div>
 
     <div v-else-if="list.length === 0" class="empty">
-      <p>暂无通知</p>
+      <p>{{ $t('notifications.empty') }}</p>
     </div>
 
     <div v-else class="list">
@@ -35,15 +35,16 @@
     </div>
 
     <div v-if="total > pageSize" class="pager">
-      <button :disabled="page <= 1" @click="page--; fetch()">上一页</button>
+      <button :disabled="page <= 1" @click="page--; fetch()">{{ $t('notifications.prev_page') }}</button>
       <span>{{ page }} / {{ Math.ceil(total / pageSize) }}</span>
-      <button :disabled="page >= Math.ceil(total / pageSize)" @click="page++; fetch()">下一页</button>
+      <button :disabled="page >= Math.ceil(total / pageSize)" @click="page++; fetch()">{{ $t('notifications.next_page') }}</button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 
+const { t } = useI18n()
 const list = ref<any[]>([]);
 const total = ref(0);
 const page = ref(1);
@@ -63,7 +64,7 @@ async function fetch() {
     const res: any = await $fetch('/api/notifications', { credentials: 'include', params: { page: page.value, pageSize: pageSize.value } });
     list.value = res.data?.list || [];
     total.value = res.data?.total || 0;
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; error.value = err?.data?.msg || err.message || '加载失败'; }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; error.value = err?.data?.msg || err.message || t('notifications.load_failed'); }
   finally { loading.value = false; }
 }
 

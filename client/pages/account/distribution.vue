@@ -67,7 +67,7 @@
         <div v-if="teamList.length > 0" class="team-list">
           <div v-for="member in teamList" :key="member.id" class="team-row">
             <span class="member-avatar">{{ member.nickname?.charAt(0) || '?' }}</span>
-            <span class="member-name">{{ member.nickname || '用户' + member.user_id }}</span>
+            <span class="member-name">{{ member.nickname || $t('common.user') + member.user_id }}</span>
             <span class="member-level" :class="member.level === 1 ? 'level1' : 'level2'">
               {{ member.level === 1 ? $t('account_pages.distribution.direct_tag') : $t('account_pages.distribution.indirect_tag') }}
             </span>
@@ -90,7 +90,7 @@
               </span>
             </div>
             <div class="comm-meta">
-              <span class="comm-order">订单 ¥{{ c.order_amount }} · {{ c.consumer_name || '用户' + c.consumer_id }}</span>
+              <span class="comm-order">订单 ¥{{ c.order_amount }} · {{ c.consumer_name || $t('common.user') + c.consumer_id }}</span>
               <span class="comm-status" :class="c.status">{{ statusLabel(c.status) }}</span>
               <span class="comm-time">{{ formatDateTime(c.created_at) }}</span>
             </div>

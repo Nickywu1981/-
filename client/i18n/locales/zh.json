@@ -3095,7 +3095,10 @@
     "editor_delete_layer": "删除",
     "editor_delete_layer_label": "删除图层",
     "editor_click_to_view_props": "点击画布或图层面板中的组件查看属性",
-    "editor_version_remark": "版本备注 (可选):"
+    "editor_version_remark": "版本备注 (可选):",
+    "preview_default_title": "预览",
+    "preview_mobile": "移动端预览",
+    "preview_pc": "PC端预览"
   },
   "account": {
     "title": "账户中心",
@@ -7918,5 +7921,13 @@
     "全部结果": "全部结果",
     "成功": "成功",
     "失败": "失败"
+  },
+  "notifications": {
+    "title": "通知中心",
+    "mark_all_read": "全部已读",
+    "empty": "暂无通知",
+    "prev_page": "上一页",
+    "next_page": "下一页",
+    "load_failed": "加载失败"
   }
 }

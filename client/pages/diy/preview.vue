@@ -7,14 +7,14 @@
     </div>
     <div v-else-if="error" class="error-state">
       <p>{{ error }}</p>
-      <button class="btn btn-outline" @click="retry">重试</button>
+      <button class="btn btn-outline" @click="retry">{{ $t('common.retry') }}</button>
     </div>
     <div v-else class="preview-container" :class="pageType">
       <div class="page-title-bar">
-        <span>{{ page?.title || '预览' }}</span>
+        <span>{{ page?.title || $t('diy.preview_default_title') }}</span>
         <div class="device-switch">
-          <button :class="{ active: viewMode === 'mobile' }" @click="viewMode = 'mobile'" aria-label="移动端预览">📱</button>
-          <button :class="{ active: viewMode === 'pc' }" @click="viewMode = 'pc'" aria-label="PC端预览">🖥️</button>
+          <button :class="{ active: viewMode === 'mobile' }" @click="viewMode = 'mobile'" :aria-label="$t('diy.preview_mobile')">📱</button>
+          <button :class="{ active: viewMode === 'pc' }" @click="viewMode = 'pc'" :aria-label="$t('diy.preview_pc')">🖥️</button>
         </div>
       </div>
       <div class="canvas-frame" :class="viewMode">

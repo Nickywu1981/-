@@ -3192,7 +3192,10 @@
     "editor_delete_layer": "Delete",
     "editor_delete_layer_label": "Delete layer",
     "editor_click_to_view_props": "Click a component on the canvas or in the layers panel to view its properties",
-    "editor_version_remark": "Version note (optional):"
+    "editor_version_remark": "Version note (optional):",
+    "preview_default_title": "Preview",
+    "preview_mobile": "Mobile preview",
+    "preview_pc": "Desktop preview"
   },
   "account": {
     "title": "Account",
@@ -8100,5 +8103,13 @@
     "全部结果": "All Results",
     "成功": "Success",
     "失败": "Failed"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "mark_all_read": "Mark All Read",
+    "empty": "No notifications",
+    "prev_page": "Previous",
+    "next_page": "Next",
+    "load_failed": "Load failed"
   }
 }
