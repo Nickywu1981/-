@@ -6,8 +6,8 @@
 <template>
   <div class="work-page">
     <header class="work-header">
-      <h1>{{ headerCfg.title || 'AI 长视频精剪' }}</h1>
-      <p>{{ headerCfg.subtitle || '智能识别高光片段 · 自动去冗余 · 杂音优化 · 字幕校对' }}</p>
+      <h1>{{ headerCfg.title || $t('work_pages.video_edit_title') }}</h1>
+      <p>{{ headerCfg.subtitle || $t('work_pages.video_edit_subtitle') }}</p>
     </header>
 
     <div class="work-tabs">
@@ -19,45 +19,37 @@
     <!-- 智能精剪 -->
     <div v-if="activeTab === 'smartClip'" class="work-panel">
       <AppMediaUpload accept="video" :multiple="false" :max-size="500" :max-count="1" @uploaded="onClipVideoUploaded" />
-      <p class="hint">上传长视频，AI自动识别高光片段进行精剪</p>
+      <p class="hint">{{ $t('work_pages.video_edit_hint_smart_clip') }}</p>
 
       <div class="options-row" style="margin-top:16px">
         <div class="option">
-          <label>目标时长 (秒)</label>
+          <label>{{ $t('work_pages.video_edit_duration_label') }}</label>
           <select v-model="clipDuration" class="input">
-            <option :value="30">30秒</option>
-            <option :value="60">60秒</option>
-            <option :value="120">120秒</option>
-            <option :value="300">300秒</option>
+            <option v-for="opt in durationOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
         </div>
         <div class="option">
-          <label>剪辑数量</label>
+          <label>{{ $t('work_pages.video_edit_clip_count_label') }}</label>
           <select v-model="clipCount" class="input">
-            <option :value="1">1段</option>
-            <option :value="3">3段</option>
-            <option :value="5">5段</option>
-            <option :value="10">10段</option>
+            <option v-for="opt in clipCountOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
           </select>
         </div>
         <div class="option">
-          <label>风格</label>
+          <label>{{ $t('work_pages.video_edit_style_label') }}</label>
           <select v-model="clipStyle" class="input">
-            <option value="fast">快节奏</option>
-            <option value="smooth">流畅叙事</option>
-            <option value="highlight">高光合集</option>
+            <option v-for="opt in styleOptions" :key="opt.value" :value="opt.value">{{ $t(opt.nameKey) }}</option>
           </select>
         </div>
       </div>
 
       <div class="input-group">
-        <label>手动指定剪切区间（可选，JSON格式）</label>
+        <label>{{ $t('work_pages.video_edit_manual_regions_label') }}</label>
         <textarea v-model="clipRegionsText" class="input" rows="3" placeholder='[{"start": 10, "end": 30}, {"start": 60, "end": 90}]' maxlength="2000"></textarea>
         <PromptEnhancer v-if="clipRegionsText.trim()" mode="video" :initial-prompt="clipRegionsText" @applied="(v) => clipRegionsText = v" />
       </div>
 
       <button class="btn btn-primary btn-lg" :disabled="!clipVideo || clipStatus === 'processing'" @click="doSmartClip">
-        {{ clipStatus === 'processing' ? '精剪中...' : '开始精剪' }}
+        {{ clipStatus === 'processing' ? $t('work_pages.video_edit_clipping') : $t('work_pages.video_edit_btn_smart_clip') }}
       </button>
       <AppTaskProgress v-if="clipStatus !== 'idle'" :status="clipStatus" :progress="clipProgress" @retry="doSmartClip" />
     </div>
@@ -65,19 +57,17 @@
     <!-- 去冗余 -->
     <div v-if="activeTab === 'removeRedundant'" class="work-panel">
       <AppMediaUpload accept="video" :multiple="false" :max-size="500" :max-count="1" @uploaded="onRedundantVideoUploaded" />
-      <p class="hint">自动检测并删除静音段和重复段</p>
+      <p class="hint">{{ $t('work_pages.video_edit_hint_redundant') }}</p>
 
       <div class="option" style="max-width:300px;margin:16px 0">
-        <label>相似度阈值</label>
+        <label>{{ $t('work_pages.video_edit_similarity_label') }}</label>
         <select v-model="threshold" class="input">
-          <option :value="0.7">宽松 (0.7)</option>
-          <option :value="0.8">标准 (0.8)</option>
-          <option :value="0.9">严格 (0.9)</option>
+          <option v-for="opt in thresholdOptions" :key="opt.value" :value="opt.value">{{ $t(opt.nameKey) }}</option>
         </select>
       </div>
 
       <button class="btn btn-primary btn-lg" :disabled="!redundantVideo || redundantStatus === 'processing'" @click="doRemoveRedundant">
-        {{ redundantStatus === 'processing' ? '处理中...' : '去冗余' }}
+        {{ redundantStatus === 'processing' ? $t('work_pages.video_edit_processing') : $t('work_pages.video_edit_btn_remove_redundant') }}
       </button>
       <AppTaskProgress v-if="redundantStatus !== 'idle'" :status="redundantStatus" :progress="redundantProgress" @retry="doRemoveRedundant" />
     </div>
@@ -85,19 +75,17 @@
     <!-- 杂音优化 -->
     <div v-if="activeTab === 'audioOptimize'" class="work-panel">
       <AppMediaUpload accept="video" :multiple="false" :max-size="500" :max-count="1" @uploaded="onAudioVideoUploaded" />
-      <p class="hint">对人声进行降噪优化，提升音频清晰度</p>
+      <p class="hint">{{ $t('work_pages.video_edit_hint_audio') }}</p>
 
       <div class="option" style="max-width:300px;margin:16px 0">
-        <label>优化级别</label>
+        <label>{{ $t('work_pages.video_edit_optimize_level_label') }}</label>
         <select v-model="audioLevel" class="input">
-          <option value="light">轻度</option>
-          <option value="standard">标准</option>
-          <option value="aggressive">强力</option>
+          <option v-for="opt in audioLevelOptions" :key="opt.value" :value="opt.value">{{ $t(opt.nameKey) }}</option>
         </select>
       </div>
 
       <button class="btn btn-primary btn-lg" :disabled="!audioVideo || audioStatus === 'processing'" @click="doOptimizeAudio">
-        {{ audioStatus === 'processing' ? '优化中...' : '优化杂音' }}
+        {{ audioStatus === 'processing' ? $t('work_pages.video_edit_optimizing') : $t('work_pages.video_edit_btn_optimize_audio') }}
       </button>
       <AppTaskProgress v-if="audioStatus !== 'idle'" :status="audioStatus" :progress="audioProgress" @retry="doOptimizeAudio" />
     </div>
@@ -105,20 +93,17 @@
     <!-- 字幕校对 -->
     <div v-if="activeTab === 'subtitleFix'" class="work-panel">
       <AppMediaUpload accept="video" :multiple="false" :max-size="500" :max-count="1" @uploaded="onSubtitleVideoUploaded" />
-      <p class="hint">AI自动识别视频语音并生成精确字幕</p>
+      <p class="hint">{{ $t('work_pages.video_edit_hint_subtitle') }}</p>
 
       <div class="option" style="max-width:300px;margin:16px 0">
-        <label>源语言</label>
+        <label>{{ $t('work_pages.video_edit_source_lang_label') }}</label>
         <select v-model="subtitleLang" class="input">
-          <option value="zh">中文</option>
-          <option value="en">英文</option>
-          <option value="ja">日文</option>
-          <option value="ko">韩文</option>
+          <option v-for="opt in langOptions" :key="opt.value" :value="opt.value">{{ $t(opt.nameKey) }}</option>
         </select>
       </div>
 
       <button class="btn btn-primary btn-lg" :disabled="!subtitleVideo || subStatus === 'processing'" @click="doSubtitleFix">
-        {{ subStatus === 'processing' ? '校对中...' : '字幕校对' }}
+        {{ subStatus === 'processing' ? $t('work_pages.video_edit_correcting') : $t('work_pages.video_edit_btn_subtitle_fix') }}
       </button>
       <AppTaskProgress v-if="subStatus !== 'idle'" :status="subStatus" :progress="subProgress" @retry="doSubtitleFix" />
     </div>
@@ -130,18 +115,43 @@
 
 import PromptEnhancer from '~/components/PromptEnhancer.vue'
 
+const { t } = useI18n()
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 
 const { configs } = useAppPage({ configs: ['page.video_edit.header'] })
 const headerCfg = computed(() => configs.value['page.video_edit.header'] || {})
 
 const activeTab = ref('smartClip')
-const tabs = [
-  { key: 'smartClip', label: '智能精剪' },
-  { key: 'removeRedundant', label: '去冗余' },
-  { key: 'audioOptimize', label: '杂音优化' },
-  { key: 'subtitleFix', label: '字幕校对' },
+
+const durationOptions = computed(() => [30, 60, 120, 300].map(n => ({ value: n, label: t('work_pages.video_edit_seconds_value', { n }) })))
+const clipCountOptions = computed(() => [1, 3, 5, 10].map(n => ({ value: n, label: t('work_pages.video_edit_clips_value', { n }) })))
+const styleOptions = [
+  { value: 'fast', nameKey: 'work_pages.video_edit_style_fast' },
+  { value: 'smooth', nameKey: 'work_pages.video_edit_style_smooth' },
+  { value: 'highlight', nameKey: 'work_pages.video_edit_style_highlight' },
 ]
+const thresholdOptions = [
+  { value: 0.7, nameKey: 'work_pages.video_edit_threshold_loose' },
+  { value: 0.8, nameKey: 'work_pages.video_edit_threshold_standard' },
+  { value: 0.9, nameKey: 'work_pages.video_edit_threshold_strict' },
+]
+const audioLevelOptions = [
+  { value: 'light', nameKey: 'work_pages.video_edit_audio_light' },
+  { value: 'standard', nameKey: 'work_pages.video_edit_audio_standard' },
+  { value: 'aggressive', nameKey: 'work_pages.video_edit_audio_aggressive' },
+]
+const langOptions = [
+  { value: 'zh', nameKey: 'work_pages.video_edit_lang_zh' },
+  { value: 'en', nameKey: 'work_pages.video_edit_lang_en' },
+  { value: 'ja', nameKey: 'work_pages.video_edit_lang_ja' },
+  { value: 'ko', nameKey: 'work_pages.video_edit_lang_ko' },
+]
+const tabs = computed(() => [
+  { key: 'smartClip', label: t('work_pages.video_edit_tab_smart_clip') },
+  { key: 'removeRedundant', label: t('work_pages.video_edit_tab_remove_redundant') },
+  { key: 'audioOptimize', label: t('work_pages.video_edit_tab_audio_optimize') },
+  { key: 'subtitleFix', label: t('work_pages.video_edit_tab_subtitle_fix') },
+])
 
 // ---- 智能精剪 ----
 const clipVideo = ref('')
