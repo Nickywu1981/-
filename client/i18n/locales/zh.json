@@ -6858,6 +6858,7 @@
     "triggerAria": "提示词润色",
     "triggerLabel": "提示词润色",
     "panelHeader": "✍ 润色提示词 ({type})",
+    "complianceWarnings": "{n} 条合规提醒",
     "closeAria": "关闭面板",
     "yourPrompt": "你的原始提示词",
     "promptPlaceholder": "输入你想表达的内容，AI 帮你优化成专业提示词...",
@@ -7171,7 +7172,10 @@
     "toggle_label": "+ 智能识别"
   },
   "lang": {
-    "switch": "切换语言"
+    "switch": "切换语言",
+    "chinese": "中文",
+    "english": "English",
+    "spanish": "Español"
   },
   "poster_preview": {
     "placeholder": "输入描述，点击\"生成海报\"开始创作",
@@ -8025,5 +8029,57 @@
   "smartRecognition": {
     "otherCategory": "其他",
     "recognitionFailed": "识别失败"
+  },
+  "skuSelector": {
+    "colors": {
+      "white": "白色",
+      "black": "黑色",
+      "red": "红色",
+      "blue": "蓝色",
+      "green": "绿色",
+      "pink": "粉色",
+      "gray": "灰色",
+      "beige": "米色"
+    },
+    "angles": {
+      "front": "正面",
+      "back": "背面",
+      "side": "侧面",
+      "detail": "细节",
+      "top": "俯视"
+    },
+    "sectionAngle": "角度",
+    "sectionColor": "选择颜色 (点击添加)",
+    "sectionSize": "尺码范围",
+    "selectedCount": "已选 {n} 个SKU组合",
+    "clear": "清空"
+  },
+  "batchPreview": {
+    "generateFailed": "生成失败",
+    "types": {
+      "main": "主图",
+      "white_bg": "白底图",
+      "scene": "场景图",
+      "render": "渲染图"
+    }
+  },
+  "platforms": {
+    "taobao": "淘宝",
+    "pinduoduo": "拼多多",
+    "douyin": "抖音",
+    "xiaohongshu": "小红书",
+    "amazon": "Amazon",
+    "shopee": "Shopee",
+    "lazada": "Lazada",
+    "temu": "Temu",
+    "shein": "Shein",
+    "tiktok": "TikTok",
+    "youtube": "YouTube"
+  },
+  "lang": {
+    "switch": "切换语言",
+    "chinese": "中文",
+    "english": "English",
+    "spanish": "Español"
   }
 }

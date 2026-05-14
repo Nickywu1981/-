@@ -7028,6 +7028,7 @@
     "triggerAria": "Prompt Enhancer",
     "triggerLabel": "Prompt Enhancer",
     "panelHeader": "✍ Enhance Prompt ({type})",
+    "complianceWarnings": "{n} compliance warnings",
     "closeAria": "Close Panel",
     "yourPrompt": "Your Original Prompt",
     "promptPlaceholder": "Describe what you want, AI will help optimize it into a professional prompt...",
@@ -7344,7 +7345,10 @@
     "toggle_label": "+ Smart Recognize"
   },
   "lang": {
-    "switch": "Switch Language"
+    "switch": "Switch Language",
+    "chinese": "中文",
+    "english": "English",
+    "spanish": "Español"
   },
   "poster_preview": {
     "placeholder": "Enter a description and click \"Generate Poster\" to start",
@@ -8207,5 +8211,57 @@
   "smartRecognition": {
     "otherCategory": "Other",
     "recognitionFailed": "Recognition failed"
+  },
+  "skuSelector": {
+    "colors": {
+      "white": "White",
+      "black": "Black",
+      "red": "Red",
+      "blue": "Blue",
+      "green": "Green",
+      "pink": "Pink",
+      "gray": "Gray",
+      "beige": "Beige"
+    },
+    "angles": {
+      "front": "Front",
+      "back": "Back",
+      "side": "Side",
+      "detail": "Detail",
+      "top": "Top"
+    },
+    "sectionAngle": "Angle",
+    "sectionColor": "Select Color (click to add)",
+    "sectionSize": "Size Range",
+    "selectedCount": "{n} SKU combinations selected",
+    "clear": "Clear"
+  },
+  "batchPreview": {
+    "generateFailed": "Generation failed",
+    "types": {
+      "main": "Main Image",
+      "white_bg": "White Background",
+      "scene": "Scene",
+      "render": "Render"
+    }
+  },
+  "platforms": {
+    "taobao": "Taobao",
+    "pinduoduo": "Pinduoduo",
+    "douyin": "Douyin",
+    "xiaohongshu": "Xiaohongshu",
+    "amazon": "Amazon",
+    "shopee": "Shopee",
+    "lazada": "Lazada",
+    "temu": "Temu",
+    "shein": "Shein",
+    "tiktok": "TikTok",
+    "youtube": "YouTube"
+  },
+  "lang": {
+    "switch": "Switch Language",
+    "chinese": "中文",
+    "english": "English",
+    "spanish": "Español"
   }
 }

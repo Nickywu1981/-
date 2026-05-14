@@ -25,13 +25,13 @@ const progress = computed(() =>
 )
 
 const platformLabels: Record<string, string> = {
-  taobao: '淘宝', pinduoduo: '拼多多', douyin: '抖音', xiaohongshu: '小红书',
-  amazon: 'Amazon', shopee: 'Shopee', lazada: 'Lazada', temu: 'Temu', shein: 'Shein',
-  tiktok_shop: 'TikTok', tiktok: 'TikTok', youtube: 'YouTube',
+  taobao: t('platforms.taobao'), pinduoduo: t('platforms.pinduoduo'), douyin: t('platforms.douyin'), xiaohongshu: t('platforms.xiaohongshu'),
+  amazon: t('platforms.amazon'), shopee: t('platforms.shopee'), lazada: t('platforms.lazada'), temu: t('platforms.temu'), shein: t('platforms.shein'),
+  tiktok_shop: t('platforms.tiktok'), tiktok: t('platforms.tiktok'), youtube: t('platforms.youtube'),
 }
 
 const typeLabels: Record<string, string> = {
-  main: '主图', white_bg: '白底图', scene: '场景图', render: '渲染图',
+  main: t('batchPreview.types.main'), white_bg: t('batchPreview.types.white_bg'), scene: t('batchPreview.types.scene'), render: t('batchPreview.types.render'),
 }
 </script>
 
@@ -54,7 +54,7 @@ const typeLabels: Record<string, string> = {
           <span class="bp-size-tag">{{ r.size?.width }}×{{ r.size?.height }}</span>
         </div>
         <div v-else-if="r.status === 'failed'" class="bp-error">
-          ⚠️ 生成失败
+          {{ t('batchPreview.generateFailed') }}
         </div>
         <div v-else class="bp-pending">
           <span class="bp-spinner" />

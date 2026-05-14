@@ -37,7 +37,7 @@
 
         <!-- 合规警告 -->
         <div v-if="complianceWarnings.length" class="pe-compliance-warn">
-          <div class="pe-comp-header">⚠ {{ complianceWarnings.length }} 条合规提醒</div>
+          <div class="pe-comp-header">{{ $t('promptEnhancer.complianceWarnings', { n: complianceWarnings.length }) }}</div>
           <div v-for="w in complianceWarnings.slice(0, 3)" :key="w.matched" class="pe-comp-item">
             "{{ w.matched }}" — {{ w.suggestion }}
           </div>

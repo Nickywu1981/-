@@ -29,9 +29,9 @@ const open = ref(false)
 
 interface LocaleOption { code: string; name: string; flag: string }
 const locales: LocaleOption[] = [
-  { code: 'zh', name: '中文', flag: '🇨🇳' },
-  { code: 'en', name: 'English', flag: '🇺🇸' },
-  { code: 'es', name: 'Español', flag: '🇪🇸' },
+  { code: 'zh', name: t('lang.chinese'), flag: '🇨🇳' },
+  { code: 'en', name: t('lang.english'), flag: '🇺🇸' },
+  { code: 'es', name: t('lang.spanish'), flag: '🇪🇸' },
 ]
 
 const currentFlag = computed(() => locales.find(l => l.code === locale.value)?.flag || '🌐')
