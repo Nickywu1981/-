@@ -4,23 +4,23 @@
       <div class="page-header">
         <h1>GEO 规则管理</h1>
         <p>按国家/地区配置模型限制、语言建议、审核级别。优先级越高越优先匹配。</p>
-        <button class="btn btn-primary" @click="openCreate">{{ showForm ? '取消' : '+ 新增规则' }}</button>
+        <button class="btn btn-primary" @click="openCreate">{{ showForm ? $t('common.cancel') : '+ ' + $t('common.geo_new_rule') }}</button>
       </div>
 
       <!-- Create/Edit Form -->
       <div v-if="showForm" class="form-card">
-        <h3>{{ editingId ? '编辑规则' : '新增规则' }}</h3>
+        <h3>{{ editingId ? $t('common.geo_edit_rule') : $t('common.geo_new_rule') }}</h3>
         <div class="form-grid">
-          <label>规则{{ $t('common.name') }} <input v-model="form.rule_name" maxlength="100" class="input" placeholder="如：欧盟合规规则" /></label>
-          <label>国家代码 <input v-model="form.country_codes_str" class="input" placeholder="逗号分隔: CN,US,JP" /></label>
-          <label>平台代码 <input v-model="form.platform_codes_str" class="input" placeholder="逗号分隔: amazon,temu (可选)" /></label>
+          <label>规则{{ $t('common.name') }} <input v-model="form.rule_name" maxlength="100" class="input" :placeholder="$t('common.example') || '如：欧盟合规规则'" /></label>
+          <label>国家代码 <input v-model="form.country_codes_str" class="input" :placeholder="'逗号分隔: CN,US,JP'" /></label>
+          <label>平台代码 <input v-model="form.platform_codes_str" class="input" :placeholder="'逗号分隔: amazon,temu (可选)'" /></label>
           <label>强制语言 <select v-model="form.locale" class="input"><option value="">自动</option><option value="zh">zh</option><option value="en">en</option><option value="es">es</option></select></label>
           <label>{{ $t('common.statusDisabled') }}模型 <input v-model="form.blocked_models_str" class="input" placeholder="逗号分隔: dall-e-3 (可选)" /></label>
           <label>审核级别 {{ form.review_level }} <input v-model.number="form.review_level" type="range" min="0" max="5" class="range" /></label>
           <label>优先级 <input v-model.number="form.priority" type="number" min="0" max="100" class="input" /></label>
           <label>{{ $t('common.statusEnabled') }} <input v-model="form.enabled" type="checkbox" :true-value="1" :false-value="0" /></label>
         </div>
-        <label>{{ $t('common.description') }} <input v-model="form.description" maxlength="500" class="input" placeholder="规则说明" /></label>
+        <label>{{ $t('common.description') }} <input v-model="form.description" maxlength="500" class="input" :placeholder="$t('common.geo_rule_desc_placeholder')" /></label>
         <div class="form-actions">
           <button class="btn btn-primary" :disabled="saving" @click="save">{{ saving ? '保存中...' : '保存' }}</button>
           <button class="btn" @click="cancelForm">{{ $t('common.cancel') }}</button>
@@ -47,7 +47,7 @@
                 <button class="btn btn-sm btn-danger" @click="remove(r.id)">{{ $t('common.delete') }}</button>
               </td>
             </tr>
-            <tr v-if="rules.length === 0"><td colspan="8" class="empty">暂无 GEO 规则</td></tr>
+            <tr v-if="rules.length === 0"><td colspan="8" class="empty">{{ $t('common.geo_empty') }}</td></tr>
           </tbody>
         </table>
       </div>

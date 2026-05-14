@@ -1,16 +1,16 @@
 <template>
   <AdminLayout>
     <div class="page-header">
-      <h2 class="ptitle">套餐订单管理</h2>
+      <h2 class="ptitle">{{ $t('common.order_manage') }}</h2>
     </div>
 
     <div class="filters">
-      <input v-model="userId" type="text" placeholder="用户ID" @keyup.enter="search" />
+      <input v-model="userId" type="text" :placeholder="$t('common.user_id')" @keyup.enter="search" />
       <select v-model="planType" @change="search">
-        <option value="">{{ $t('common.all') }}套餐</option>
-        <option value="1">月卡</option>
-        <option value="2">季卡</option>
-        <option value="3">年卡</option>
+        <option value="">{{ $t('common.all') }}{{ $t('common.plan_label') }}</option>
+        <option value="1">{{ $t('common.month_card') }}</option>
+        <option value="2">{{ $t('common.quarter_card') }}</option>
+        <option value="3">{{ $t('common.year_card') }}</option>
       </select>
       <button class="btn" @click="search">{{ $t('common.search') }}</button>
     </div>
@@ -21,8 +21,8 @@
       <table class="table">
         <thead>
           <tr>
-            <th>ID</th><th>用户</th><th>套餐</th><th>变动前</th><th>变动后</th>
-            <th>获增点数</th><th>{{ $t('common.remark') }}</th><th>购买{{ $t('common.time') }}</th><th>{{ $t('common.actions') }}</th>
+            <th>ID</th><th>{{ $t('common.user') }}</th><th>{{ $t('common.plan_label') }}</th><th>{{ $t('common.before_change') }}</th><th>{{ $t('common.after_change') }}</th>
+            <th>{{ $t('common.earned_points') }}</th><th>{{ $t('common.remark') }}</th><th>{{ $t('common.purchase_time') }}</th><th>{{ $t('common.actions') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -43,7 +43,7 @@
         </tbody>
       </table>
     </div>
-    <div v-if="!list.length && !loading" class="empty">暂无订单数据</div>
+    <div v-if="!list.length && !loading" class="empty">{{ $t('common.order_empty') }}</div>
 
     <Pagination :page="page" :page-size="pageSize" :total="total" @change="onPageChange" />
 
@@ -52,19 +52,19 @@
       <div v-if="detailOpen" class="modal-overlay" @click.self="detailOpen = false" @keydown.escape="detailOpen = false">
         <div class="modal">
           <div class="modal-header">
-            <h3>订单详情 #{{ detail.id }}</h3>
+            <h3>{{ $t('common.order_detail', { id: detail.id }) }}</h3>
             <button class="modal-close" aria-label="关闭" @click="detailOpen = false">✕</button>
           </div>
           <div class="modal-body">
             <div class="detail-grid">
-              <div class="detail-item"><span class="dl">订单ID</span><span class="dv mono">{{ detail.id }}</span></div>
-              <div class="detail-item"><span class="dl">用户</span><span class="dv">{{ detail.nickname || detail.username || '-' }}</span></div>
-              <div class="detail-item"><span class="dl">套餐</span><span class="dv">{{ planLabel(detail.plan_type) }}</span></div>
-              <div class="detail-item"><span class="dl">变动前积分</span><span class="dv">{{ detail.credit_before }}</span></div>
-              <div class="detail-item"><span class="dl">变动后积分</span><span class="dv">{{ detail.credit_after }}</span></div>
-              <div class="detail-item"><span class="dl">获增点数</span><span class="dv earn">+{{ Math.abs(detail.consumed) }} 点</span></div>
+              <div class="detail-item"><span class="dl">{{ $t('common.order_label') }}ID</span><span class="dv mono">{{ detail.id }}</span></div>
+              <div class="detail-item"><span class="dl">{{ $t('common.user') }}</span><span class="dv">{{ detail.nickname || detail.username || '-' }}</span></div>
+              <div class="detail-item"><span class="dl">{{ $t('common.plan_label') }}</span><span class="dv">{{ planLabel(detail.plan_type) }}</span></div>
+              <div class="detail-item"><span class="dl">{{ $t('common.before_credits') }}</span><span class="dv">{{ detail.credit_before }}</span></div>
+              <div class="detail-item"><span class="dl">{{ $t('common.after_credits') }}</span><span class="dv">{{ detail.credit_after }}</span></div>
+              <div class="detail-item"><span class="dl">{{ $t('common.earned_points') }}</span><span class="dv earn">+{{ Math.abs(detail.consumed) }} 点</span></div>
               <div class="detail-item"><span class="dl">{{ $t('common.remark') }}</span><span class="dv">{{ detail.remark || '-' }}</span></div>
-              <div class="detail-item"><span class="dl">购买{{ $t('common.time') }}</span><span class="dv">{{ formatDateTime(detail.create_time) }}</span></div>
+              <div class="detail-item"><span class="dl">{{ $t('common.purchase_time') }}</span><span class="dv">{{ formatDateTime(detail.create_time) }}</span></div>
             </div>
           </div>
         </div>
@@ -90,8 +90,8 @@ const loading = ref(true)
 const detailOpen = ref(false)
 const detail = ref<any>({})
 
-const planLabels: Record<string, string> = { '1': '月卡', '2': '季卡', '3': '年卡' }
-function planLabel(t: number | string) { return planLabels[String(t)] || '未知' }
+const planLabels: Record<string, string> = { '1': t('common.month_card'), '2': t('common.quarter_card'), '3': t('common.year_card') }
+function planLabel(t: number | string) { return planLabels[String(t)] || t('common.unknown') }
 
 async function fetch() {
   loading.value = true

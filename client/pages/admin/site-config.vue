@@ -2,28 +2,28 @@
   <AdminLayout>
     <div class="page">
       <div class="page-header">
-        <h1>站点配置</h1>
-        <p>控制用户端页面{{ $t('common.name') }}、功能、内容，修改后用户端立即生效</p>
-        <button class="btn btn-primary" @click="showAddForm = !showAddForm">{{ showAddForm ? '取消' : '+ 新增配置' }}</button>
+        <h1>{{ $t('common.site_config') || '站点配置' }}</h1>
+        <p>{{ $t('common.site_config_title_desc') }}</p>
+        <button class="btn btn-primary" @click="showAddForm = !showAddForm">{{ showAddForm ? $t('common.cancel') : '+ ' + $t('common.add_config') }}</button>
       </div>
 
       <!-- Add form -->
       <div v-if="showAddForm" class="add-form">
-        <input v-model="newConfig.key" maxlength="50" placeholder="配置键名 (如 hero_title)" class="input" />
+        <input v-model="newConfig.key" maxlength="50" :placeholder="$t('common.config_key_placeholder')" class="input" />
         <select v-model="newConfig.type" class="input sel">
-          <option value="">请选择{{ $t('common.type') }}</option>
+          <option value="">{{ $t('common.please_select') }}{{ $t('common.type') }}</option>
           <option value="text">text</option>
           <option value="json">json</option>
         </select>
-        <input v-model="newConfig.description" maxlength="500" placeholder="描述说明" class="input" />
+        <input v-model="newConfig.description" maxlength="500" :placeholder="$t('common.description')" class="input" />
         <textarea v-model="newConfig.value" maxlength="2000" :placeholder="newConfig.type === 'json' ? 'JSON 值' : '文本值'" class="input textarea" :rows="newConfig.type === 'json' ? 6 : 2" />
-        <button class="btn btn-primary" :disabled="adding" @click="addConfig">{{ adding ? '添加中...' : '确认添加' }}</button>
+        <button class="btn btn-primary" :disabled="adding" @click="addConfig">{{ adding ? $t('common.adding') : $t('common.success_create') }}</button>
       </div>
 
       <div v-if="loading" class="loading">{{ $t('common.loading') }}</div>
       <div v-else-if="loadError" class="error">
         <p>{{ loadError }}</p>
-        <button class="btn btn-primary" @click="fetchConfig">重试</button>
+        <button class="btn btn-primary" @click="fetchConfig">{{ $t('common.retry') }}</button>
       </div>
 
       <div v-else class="config-grid">

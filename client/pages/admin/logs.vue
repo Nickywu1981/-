@@ -3,14 +3,14 @@
     <h2 class="ptitle">{{ $t('common.actions') }}日志</h2>
 
     <div class="stats-row" v-if="stats">
-      <div class="stat"><span class="sv">{{ stats.total || 0 }}</span><span class="sl">总日志</span></div>
+      <div class="stat"><span class="sv">{{ stats.total || 0 }}</span><span class="sl">{{ $t('common.log_total') }}</span></div>
       <div class="stat"><span class="sv err">{{ stats.errors || 0 }}</span><span class="sl">{{ $t('common.error') }}</span></div>
       <div class="stat"><span class="sv warn">{{ stats.warns || 0 }}</span><span class="sl">{{ $t('common.warning') }}</span></div>
     </div>
 
     <div class="filters">
-      <input v-model="userId" type="text" placeholder="用户ID" @keyup.enter="fetch" />
-      <input v-model="action" type="text" placeholder="操作类型" @keyup.enter="fetch" />
+      <input v-model="userId" type="text" :placeholder="$t('common.user_id')" @keyup.enter="fetch" />
+      <input v-model="action" type="text" :placeholder="$t('common.operation_type')" @keyup.enter="fetch" />
       <select v-model="level" @change="fetch">
         <option value="">{{ $t('common.all') }}级别</option>
         <option value="info">INFO</option>
@@ -28,7 +28,7 @@
     <template v-else-if="list.length">
     <div class="table-wrap">
     <table class="table">
-      <thead><tr><th>ID</th><th>用户ID</th><th>{{ $t('common.actions') }}</th><th>级别</th><th>{{ $t('common.details') }}</th><th>IP</th><th>{{ $t('common.time') }}</th></tr></thead>
+      <thead><tr><th>ID</th><th>{{ $t('common.user_id') }}</th><th>{{ $t('common.actions') }}</th><th>{{ $t('common.level') }}</th><th>{{ $t('common.details') }}</th><th>IP</th><th>{{ $t('common.time') }}</th></tr></thead>
       <tbody>
         <tr v-for="l in list" :key="l.id" @click="openDetail(l)" class="clickable">
           <td>{{ l.id }}</td>
@@ -44,16 +44,16 @@
     </div>
     <Pagination :page="page" :page-size="pageSize" :total="total" @change="onPageChange" />
     </template>
-    <div v-else-if="!loading" class="empty">暂无日志</div>
+    <div v-else-if="!loading" class="empty">{{ $t('common.log_empty') }}</div>
 
     <Teleport to="body">
       <div v-if="detail" class="modal-overlay" @click.self="detail = null" @keydown.escape="detail = null">
         <div class="modal-card">
-          <h3>日志详情 #{{ detail.id }}</h3>
+          <h3>{{ $t('common.log_detail', { id: detail.id }) }}</h3>
           <div class="detail-grid">
-            <div class="d-item"><span class="dl">用户ID</span><span class="dv">{{ detail.user_id }}</span></div>
+            <div class="d-item"><span class="dl">{{ $t('common.user_id') }}</span><span class="dv">{{ detail.user_id }}</span></div>
             <div class="d-item"><span class="dl">{{ $t('common.actions') }}</span><span class="dv">{{ detail.action }}</span></div>
-            <div class="d-item"><span class="dl">级别</span><span class="dv"><span :class="levelBadge(detail.level)">{{ detail.level || 'INFO' }}</span></span></div>
+            <div class="d-item"><span class="dl">{{ $t('common.level') }}</span><span class="dv"><span :class="levelBadge(detail.level)">{{ detail.level || 'INFO' }}</span></span></div>
             <div class="d-item"><span class="dl">IP</span><span class="dv mono">{{ detail.ip || '-' }}</span></div>
             <div class="d-item"><span class="dl">{{ $t('common.time') }}</span><span class="dv">{{ detail.create_time }}</span></div>
             <div class="d-item full"><span class="dl">{{ $t('common.details') }}</span><pre class="dv-pre">{{ detail.detail || detail.remark || '-' }}</pre></div>

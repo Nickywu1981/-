@@ -1,9 +1,9 @@
 <template>
   <AdminLayout>
-    <h2 class="ptitle">积分消费管理</h2>
+    <h2 class="ptitle">{{ $t('common.credit_manage') }}</h2>
 
     <div class="filters">
-      <input v-model="filterUserId" type="text" placeholder="用户ID" @keyup.enter="search" />
+      <input v-model="filterUserId" type="text" :placeholder="$t('common.user_id')" @keyup.enter="search" />
       <select v-model="filterType" @change="search">
         <option value="">全部{{ $t('common.type') }}</option>
         <option value="1">充值</option>
@@ -24,15 +24,15 @@
       <table class="table">
         <thead>
           <tr>
-            <th>ID</th><th>用户ID</th><th>{{ $t('common.type') }}</th><th>{{ $t('common.actions') }}</th><th>变动前</th><th>变动后</th>
-            <th>消耗</th><th>{{ $t('common.status') }}</th><th>{{ $t('common.remark') }}</th><th>{{ $t('common.time') }}</th><th>{{ $t('common.actions') }}</th>
+            <th>ID</th><th>用户ID</th><th>{{ $t('common.type') }}</th><th>{{ $t('common.actions') }}</th><th>{{ $t('common.before_change') }}</th><th>{{ $t('common.after_change') }}</th>
+            <th>{{ $t('common.consume_label') }}</th><th>{{ $t('common.status') }}</th><th>{{ $t('common.remark') }}</th><th>{{ $t('common.time') }}</th><th>{{ $t('common.actions') }}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="r in list" :key="r.id">
             <td>{{ r.id }}</td>
             <td>{{ r.user_id }}</td>
-            <td><span class="badge" :class="r.type === 1 ? 'type-recharge' : 'type-spend'">{{ r.type === 1 ? '充值' : '消费' }}</span></td>
+            <td><span class="badge" :class="r.type === 1 ? 'type-recharge' : 'type-spend'">{{ r.type === 1 ? t('common.recharge_label') : t('common.consume_label') }}</span></td>
             <td>{{ r.action || '-' }}</td>
             <td>{{ r.credit_before }}</td>
             <td>{{ r.credit_after }}</td>
@@ -48,7 +48,7 @@
         </tbody>
       </table>
     </div>
-    <div v-if="!list.length && !loading" class="empty">暂无积分记录</div>
+    <div v-if="!list.length && !loading" class="empty">{{ $t('common.credit_empty') }}</div>
 
     <Pagination :page="page" :page-size="pageSize" :total="total" @change="onPageChange" />
 
@@ -57,7 +57,7 @@
       <div class="modal-box">
         <h4>{{ $t('common.confirm') }}退款</h4>
         <p class="modal-info">记录 #{{ refundDialog.record?.id }}，消耗 {{ refundDialog.record?.consumed }} 点</p>
-        <input v-model="refundDialog.remark" maxlength="500" type="text" placeholder="退款原因（选填）" @keyup.enter="confirmRefund" />
+        <input v-model="refundDialog.remark" maxlength="500" type="text" :placeholder="$t('common.credit_refund_reason')" @keyup.enter="confirmRefund" />
         <div class="modal-actions">
           <button class="btn-cancel" @click="refundDialog.open = false">{{ $t('common.cancel') }}</button>
           <button class="btn btn-refund" @click="confirmRefund">{{ $t('common.confirm') }}退款</button>
@@ -84,7 +84,7 @@ const toast = useToast()
 const refundDialog = reactive({ open: false, record: null as any, remark: '' })
 
 function statusClass(s: number) { return s === 1 ? 'status-done' : s === 0 ? 'status-freeze' : 'status-refund' }
-function statusText(s: number) { return s === 1 ? '已确认' : s === 0 ? '冻结中' : '已退款' }
+function statusText(s: number) { return s === 1 ? t('common.confirmed') : s === 0 ? t('common.frozen_label') : t('common.refunded_label') }
 
 async function fetch() {
   loading.value = true
@@ -112,7 +112,7 @@ function doRefund(record: any) {
 
 async function confirmRefund() {
   try {
-    const data = await $fetch('/api/credits/admin/refund', { method: 'POST', credentials: 'include', body: { recordId: refundDialog.record.id, remark: refundDialog.remark || '管理员退款' } }) as ApiResponse
+    const data = await $fetch('/api/credits/admin/refund', { method: 'POST', credentials: 'include', body: { recordId: refundDialog.record.id, remark: refundDialog.remark || t('common.admin_refund_label') } }) as ApiResponse
     if (data?.code === 200) { toast.success(t('common.success_refund')); refundDialog.open = false; fetch() }
     else { toast.error(data?.msg || '退款失败') }
   } catch (e: unknown) { toast.error(t('common.failed_refund')) }

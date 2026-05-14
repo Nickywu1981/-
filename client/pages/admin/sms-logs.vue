@@ -1,8 +1,8 @@
 <template>
   <AdminLayout>
-    <h2 class="ptitle">短信发送日志</h2>
+    <h2 class="ptitle">{{ $t('common.sms_log_manage') }}</h2>
     <div class="filters">
-      <input v-model="phone" type="text" placeholder="手机号" @keyup.enter="fetch" />
+      <input v-model="phone" type="text" :placeholder="$t('common.phone_label')" @keyup.enter="fetch" />
       <select v-model="result" @change="fetch">
         <option value="">{{ $t('common.all') }}结果</option>
         <option value="1">发送{{ $t('common.success') }}</option>
@@ -19,7 +19,7 @@
     <div class="table-wrap">
     <table class="table">
       <thead><tr>
-        <th>ID</th><th>模板编码</th><th>手机号</th><th>内容</th><th>结果</th><th>服务商</th><th>{{ $t('common.time') }}</th>
+        <th>ID</th><th>{{ $t('common.code') }}</th><th>{{ $t('common.phone_label') }}</th><th>{{ $t('common.content') }}</th><th>{{ $t('common.result_label') }}</th><th>{{ $t('common.email_provider') }}</th><th>{{ $t('common.time') }}</th>
       </tr></thead>
       <tbody>
         <tr v-for="l in list" :key="l.id">
@@ -36,7 +36,7 @@
     </div>
     <Pagination :page="page" :page-size="pageSize" :total="total" @change="onPageChange" />
     </template>
-    <div v-else-if="!loading" class="empty">暂无发送日志</div>
+    <div v-else-if="!loading" class="empty">{{ $t('common.sms_log_empty') }}</div>
   </AdminLayout>
 </template>
 
