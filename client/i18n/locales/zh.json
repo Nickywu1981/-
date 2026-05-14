@@ -3074,8 +3074,24 @@
     "security": "安全设置",
     "billing": "账单",
     "subscription": "订阅管理",
-    "notifications": "消息通知",
-    "settings": "设置"
+    "notifications": {
+      "title": "通知中心",
+      "mark_all_read": "全部已读",
+      "retry": "重试",
+      "empty": "暂无通知",
+      "load_failed": "加载失败"
+    },
+    "settings": "设置",
+    "templates": {
+      "title": "我的模板",
+      "count": "共 {n} 个模板",
+      "retry": "重试",
+      "empty": "暂无模板",
+      "empty_desc": "前往工作台创建你的第一个模板",
+      "go_workspace": "去工作台",
+      "use": "使用",
+      "load_failed": "加载失败"
+    }
   },
   "workspace": {
     "greeting": "欢迎使用 Movio AI",

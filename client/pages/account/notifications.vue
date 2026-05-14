@@ -2,8 +2,8 @@
   <ClientOnly>
     <div class="notif-page">
       <div class="notif-header">
-        <h2>通知中心</h2>
-        <button v-if="notifications.length" class="btn-mark-all" @click="markAll">全部已读</button>
+        <h2>{{ $t('account.notifications.title') }}</h2>
+        <button v-if="notifications.length" class="btn-mark-all" @click="markAll">{{ $t('account.notifications.mark_all_read') }}</button>
       </div>
 
       <div v-if="loading" class="notif-loading">
@@ -12,12 +12,12 @@
 
       <div v-else-if="error" class="notif-error">
         <p>{{ error }}</p>
-        <button class="btn-retry" @click="fetchList">重试</button>
+        <button class="btn-retry" @click="fetchList">{{ $t('account.notifications.retry') }}</button>
       </div>
 
       <div v-else-if="!notifications.length" class="notif-empty">
         <span class="notif-empty-icon">🔔</span>
-        <p>暂无通知</p>
+        <p>{{ $t('account.notifications.empty') }}</p>
       </div>
 
       <div v-else class="notif-list">
@@ -66,7 +66,7 @@ async function fetchList() {
     total.value = res.data?.total || 0
   } catch (e: unknown) {
     const err = e as { data?: { msg?: string }; message?: string };
-    error.value = err?.data?.msg || err.message || '加载失败'
+    error.value = err?.data?.msg || err.message || t('account.notifications.load_failed')
   } finally {
     loading.value = false
   }

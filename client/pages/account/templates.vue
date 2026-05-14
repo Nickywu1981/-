@@ -1,8 +1,8 @@
 <template>
   <div class="account-templates">
     <div class="templates-header">
-      <h2>我的模板</h2>
-      <span class="templates-count">共 {{ templates.length }} 个模板</span>
+      <h2>{{ $t('account.templates.title') }}</h2>
+      <span class="templates-count">{{ $t('account.templates.count', { n: templates.length }) }}</span>
     </div>
 
     <div v-if="loading" class="loading-state">
@@ -11,14 +11,14 @@
 
     <div v-else-if="error" class="error-state">
       <p>{{ error }}</p>
-      <button class="btn-primary" @click="fetchTemplates">重试</button>
+      <button class="btn-primary" @click="fetchTemplates">{{ $t('account.templates.retry') }}</button>
     </div>
 
     <div v-else-if="templates.length === 0" class="empty-state">
       <div class="empty-icon">📁</div>
-      <p>暂无模板</p>
-      <span>前往工作台创建你的第一个模板</span>
-      <NuxtLink to="/workspace" class="btn-primary">去工作台</NuxtLink>
+      <p>{{ $t('account.templates.empty') }}</p>
+      <span>{{ $t('account.templates.empty_desc') }}</span>
+      <NuxtLink to="/workspace" class="btn-primary">{{ $t('account.templates.go_workspace') }}</NuxtLink>
     </div>
 
     <div v-else class="templates-grid">
@@ -33,7 +33,7 @@
         </div>
         <div class="card-footer">
           <span class="card-date">{{ tpl.create_time ? new Date(tpl.create_time).toLocaleDateString() : '-' }}</span>
-          <button class="btn-use" @click="$router.push('/workspace')">使用</button>
+          <button class="btn-use" @click="$router.push('/workspace')">{{ $t('account.templates.use') }}</button>
         </div>
       </div>
     </div>
@@ -43,6 +43,7 @@
 <script setup lang="ts">
 
 
+const { t } = useI18n()
 const loading = ref(true)
 const error = ref('')
 const templates = ref<any[]>([])
@@ -55,7 +56,7 @@ async function fetchTemplates() {
     templates.value = data?.list || []
   } catch (e: unknown) {
     const err = e as { data?: { msg?: string } };
-    error.value = err?.data?.msg || '加载失败'
+    error.value = err?.data?.msg || t('account.templates.load_failed')
   } finally {
     loading.value = false
   }

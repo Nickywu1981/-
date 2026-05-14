@@ -3183,8 +3183,24 @@
     "billing": "Billing",
     "subscription": "Subscription",
     "credits": "Credits",
-    "notifications": "Notifications",
-    "settings": "Settings"
+    "notifications": {
+      "title": "Notifications",
+      "mark_all_read": "Mark all read",
+      "retry": "Retry",
+      "empty": "No notifications",
+      "load_failed": "Failed to load"
+    },
+    "settings": "Settings",
+    "templates": {
+      "title": "My Templates",
+      "count": "{n} templates",
+      "retry": "Retry",
+      "empty": "No templates yet",
+      "empty_desc": "Go to Workspace to create your first template",
+      "go_workspace": "Go to Workspace",
+      "use": "Use",
+      "load_failed": "Failed to load"
+    }
   },
   "workspace": {
     "greeting": "Welcome to Movio AI",
