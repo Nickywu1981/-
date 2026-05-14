@@ -37,7 +37,8 @@ export async function listByTenant(tenantId, opts = {}) {
 
 export async function getById(id, tenantId) {
   const [rows] = await pool.query(
-    `SELECT * FROM ${TABLE} WHERE id = ? AND tenant_id = ? AND is_deleted = 0 LIMIT 1`,
+    `SELECT id, api_key, description, status, rate_limit, daily_limit, tenant_id, create_time, update_time
+     FROM ${TABLE} WHERE id = ? AND tenant_id = ? AND is_deleted = 0 LIMIT 1`,
     [id, tenantId],
   );
   return rows?.[0] || null;
@@ -45,7 +46,8 @@ export async function getById(id, tenantId) {
 
 export async function getByApiKey(apiKey) {
   const [rows] = await pool.query(
-    `SELECT * FROM ${TABLE} WHERE api_key = ? AND is_deleted = 0 LIMIT 1`,
+    `SELECT id, api_key, description, status, rate_limit, daily_limit, tenant_id, create_time, update_time
+     FROM ${TABLE} WHERE api_key = ? AND is_deleted = 0 LIMIT 1`,
     [apiKey],
   );
   return rows?.[0] || null;

@@ -16,13 +16,13 @@ export async function listConfigs(tenantId) {
 }
 
 export async function getById(id, tenantId) {
-  const [rows] = await pool.query('SELECT * FROM api_proxy_config WHERE id = ? AND tenant_id = ? LIMIT 1', [id, tenantId]);
+  const [rows] = await pool.query('SELECT id, tenant_id, name, proxy_code, upstream_url, method, auth_type, auth_config, encrypt_auth, headers_json, rate_limit_rpm, circuit_break_count, circuit_break_window, circuit_status, circuit_fail_count, pass_body, body_max_bytes, timeout_ms, retry_count, cache_ttl, status, create_time, update_time FROM api_proxy_config WHERE id = ? AND tenant_id = ? LIMIT 1', [id, tenantId]);
   return rows[0] || null;
 }
 
 export async function getByCode(code, tenantId) {
   const [rows] = await pool.query(
-    'SELECT * FROM api_proxy_config WHERE proxy_code = ? AND tenant_id = ? AND status = 1 LIMIT 1',
+    'SELECT id, tenant_id, name, proxy_code, upstream_url, method, auth_type, auth_config, encrypt_auth, headers_json, rate_limit_rpm, circuit_break_count, circuit_break_window, circuit_status, circuit_fail_count, pass_body, body_max_bytes, timeout_ms, retry_count, cache_ttl, status, create_time, update_time FROM api_proxy_config WHERE proxy_code = ? AND tenant_id = ? AND status = 1 LIMIT 1',
     [code, tenantId],
   );
   return rows[0] || null;
@@ -85,7 +85,7 @@ export async function remove(id, tenantId) {
 
 export async function listWhitelist(tenantId) {
   const [rows] = await pool.query(
-    'SELECT * FROM api_proxy_whitelist WHERE tenant_id IN (0, ?) AND status = 1 ORDER BY domain_type, domain_pattern LIMIT 1000',
+    'SELECT id, tenant_id, domain_pattern, domain_type, description, status, created_by, create_time, update_time FROM api_proxy_whitelist WHERE tenant_id IN (0, ?) AND status = 1 ORDER BY domain_type, domain_pattern LIMIT 1000',
     [tenantId],
   );
   return rows;
@@ -190,7 +190,7 @@ export async function listLogs({ tenantId, proxyId, startTime, endTime, status, 
   const [countRows] = await pool.query(`SELECT COUNT(*) AS total FROM api_proxy_log WHERE ${where}`, vals);
   const { offset } = parsePagination({ page, pageSize });
   const [rows] = await pool.query(
-    `SELECT * FROM api_proxy_log WHERE ${where} ORDER BY create_time DESC LIMIT ?, ?`,
+    `SELECT id, tenant_id, proxy_id, user_id, request_url, request_method, response_status, duration_ms, retry_used, error_msg, client_ip, create_time FROM api_proxy_log WHERE ${where} ORDER BY create_time DESC LIMIT ?, ?`,
     [...vals, offset, pageSize],
   );
   return { rows, total: countRows[0].total, page, pageSize };
