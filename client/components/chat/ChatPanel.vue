@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /** ChatPanel — 全局 AI 对话面板，SlidePanel 风格，内嵌完整对话交互 */
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch, nextTick, onUnmounted } from 'vue'
 import ChatMessage from './ChatMessage.vue'
 import PromptPreview from './PromptPreview.vue'
 import QuickCommands from './QuickCommands.vue'
@@ -75,7 +75,11 @@ const handleFileUpload = (e: Event) => {
 }
 
 watch(() => props.modelValue, (v) => { if (v) scrollToBottom() })
-watch(messages, scrollToBottom, { deep: true })
+watch(() => messages.length, scrollToBottom)
+
+onUnmounted(() => {
+  clear()
+})
 </script>
 
 <template>

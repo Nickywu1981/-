@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /** batch-sku-image — 多SKU批量生成独立页面 */
-import { ref, computed } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 import SkuSelector from '~/components/work/batch-sku/SkuSelector.vue'
 import BatchPreview from '~/components/work/batch-sku/BatchPreview.vue'
 
@@ -50,6 +50,12 @@ const handleSkuUpdate = (s: SkuRow[]) => { skus.value = s }
 
 const canSubmit = computed(() => imageUrl.value && skus.value.length > 0 && selectedPlatforms.value.length > 0 && selectedTypes.value.length > 0)
 
+let pollTimer: ReturnType<typeof setInterval> | null = null
+
+onUnmounted(() => {
+  if (pollTimer) clearInterval(pollTimer)
+})
+
 const submit = async () => {
   if (!canSubmit.value) return
   step.value = 'processing'
@@ -71,14 +77,14 @@ const submit = async () => {
     const data = await res.json()
     taskId.value = data.data?.taskId
 
-    // Poll for results
-    const poll = setInterval(async () => {
+    pollTimer = setInterval(async () => {
       const statusRes = await fetch(`/api/sku-batch/${taskId.value}`, { credentials: 'include' })
       const statusData = await statusRes.json()
       const task = statusData.data
       results.value = task.results || []
       if (task.status === 'done' || task.status === 'failed') {
-        clearInterval(poll)
+        clearInterval(pollTimer!)
+        pollTimer = null
         step.value = 'done'
       }
     }, 2000)

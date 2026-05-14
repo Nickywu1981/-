@@ -42,6 +42,7 @@ const INTENT_ROUTE_MAP = {
   chat:           { taskType: 'chat',       endpoint: null },
   translate:      { taskType: 'text_gen',   endpoint: '/api/copywriting/generate' },
   compliance:     { taskType: 'text_gen',   endpoint: null },
+  analyse_image:  { taskType: 'chat',       endpoint: null },
 };
 
 /**

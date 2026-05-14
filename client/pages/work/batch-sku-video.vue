@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /** batch-sku-video — 多SKU批量视频生成 */
-import { ref, computed } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 
 definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 const { t } = useI18n()
@@ -72,6 +72,13 @@ const submit = async () => {
     loading.value = false
   }
 }
+
+onUnmounted(() => {
+  if (pollTimer.value) {
+    clearInterval(pollTimer.value)
+    pollTimer.value = undefined
+  }
+})
 </script>
 
 <template>

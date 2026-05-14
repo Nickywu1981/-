@@ -7,7 +7,7 @@
  *  - 管理本地消息列表和提示词预览状态
  *  - 会话管理 (sessionId 持久化)
  */
-import { ref, reactive } from 'vue'
+import { ref, reactive, onUnmounted } from 'vue'
 
 export interface ChatMessage {
   role: 'user' | 'assistant' | 'system'
@@ -28,6 +28,11 @@ export function useAIChat() {
   const prompts = reactive<PromptState>({ positive: '', negative: '' })
 
   let abortController: AbortController | null = null
+
+  onUnmounted(() => {
+    abortController?.abort()
+    streaming.value = false
+  })
 
   async function send(
     text: string,
@@ -79,6 +84,7 @@ export function useAIChat() {
 
       const decoder = new TextDecoder()
       let buffer = ''
+      let lastEventType = ''
 
       while (true) {
         const { done, value } = await reader.read()
@@ -89,18 +95,15 @@ export function useAIChat() {
         buffer = lines.pop() || ''
 
         for (const line of lines) {
-          if (!line.startsWith('event: ') && !line.startsWith('data: ')) continue
+          if (!line || line.startsWith(':')) continue
 
-          const eventMatch = line.match(/^event: (.+)$/)
-          const dataMatch = line.match(/^data: (.+)$/)
-
-          if (eventMatch) {
-            // event type line — wait for data
+          if (line.startsWith('event: ')) {
+            lastEventType = line.slice(7).trim()
             continue
           }
 
-          if (dataMatch) {
-            const data = dataMatch[1]
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6)
 
             if (data === '[DONE]') {
               streaming.value = false
@@ -110,13 +113,18 @@ export function useAIChat() {
 
             try {
               const parsed = JSON.parse(data)
+              // session_id assignment from server
+              if (lastEventType === 'session' || parsed.sessionId) {
+                sessionId.value = parsed.sessionId || sessionId.value
+              }
               handleSSEEvent(parsed, aiMsgIdx)
             } catch {
-              // Plain text chunk — append to assistant message
               if (messages.value[aiMsgIdx]) {
                 messages.value[aiMsgIdx].content += data
               }
             }
+            // reset after processing
+            lastEventType = ''
           }
         }
       }

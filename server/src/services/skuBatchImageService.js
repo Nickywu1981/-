@@ -33,6 +33,20 @@ const PLATFORM_VIDEO_SPECS = {
 
 // 内存任务存储 (生产应换 Redis)
 const taskStore = new Map();
+const TASK_TTL_MS = 60 * 60 * 1000; // 1 小时自动清理
+
+// 每 10 分钟清理过期任务
+const cleanupTimer = setInterval(() => {
+  const now = Date.now();
+  for (const [id, task] of taskStore) {
+    const createdAt = new Date(task.createdAt).getTime();
+    if (now - createdAt > TASK_TTL_MS) {
+      taskStore.delete(id);
+    }
+  }
+}, 10 * 60 * 1000);
+
+if (cleanupTimer.unref) cleanupTimer.unref(); // 不阻止进程退出
 
 /**
  * 提交批量图片生成任务
