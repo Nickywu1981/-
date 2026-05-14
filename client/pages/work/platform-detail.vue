@@ -1,29 +1,29 @@
 <template>
-  <WorkLayout :steps="['选平台', '选模板', '上传产品图', '生成']" :current-step="step">
+  <WorkLayout :steps="stepLabels" :current-step="step">
     <!-- Step 0: 选平台 -->
     <div v-if="step === 0" class="select-section">
-      <h3>选择目标平台</h3>
+      <h3>{{ $t('work_pages.platform_detail_title') }}</h3>
       <div class="region-tabs">
-        <button v-for="r in regions" :key="r.code" class="region-tab" :class="{ active: activeRegion === r.code }" @click="activeRegion = r.code">{{ r.label }}</button>
+        <button v-for="r in regions" :key="r.code" class="region-tab" :class="{ active: activeRegion === r.code }" @click="activeRegion = r.code">{{ $t(r.nameKey) }}</button>
       </div>
       <div class="platform-grid">
         <button v-for="p in filteredPlatforms" :key="p.code" class="platform-card" :class="{ active: selectedPlatform === p.code }" @click="selectedPlatform = p.code">
           <span class="pf-name">{{ p.name }}</span>
-          <span class="pf-count">{{ p.templateCount }} 套模板</span>
+          <span class="pf-count">{{ $t('work_pages.platform_detail_template_count', { n: p.templateCount }) }}</span>
           <span class="pf-region">{{ p.region }}</span>
         </button>
       </div>
       <div class="actions">
-        <button class="btn" :disabled="!selectedPlatform" @click="step = 1">下一步：选模板</button>
+        <button class="btn" :disabled="!selectedPlatform" @click="step = 1">{{ $t('work_pages.platform_detail_next_tmpl') }}</button>
       </div>
     </div>
 
     <!-- Step 1: 选模板 -->
     <div v-else-if="step === 1" class="select-section">
-      <h3>{{ platformName }} — 选择详情页模板</h3>
+      <h3>{{ $t('work_pages.platform_detail_tmpl_title', { name: platformName }) }}</h3>
       <div v-if="platformConfig" class="platform-specs">
-        <span class="spec-item">📐 {{ platformConfig.specs.maxWidth }}x{{ platformConfig.specs.maxHeight || '不限高' }}px</span>
-        <span class="spec-item">📦 最大 {{ (platformConfig.specs.maxSizeKB / 1024).toFixed(1) }}MB</span>
+        <span class="spec-item">📐 {{ platformConfig.specs.maxWidth }}x{{ platformConfig.specs.maxHeight || $t('work_pages.platform_detail_unlimited_height') }}px</span>
+        <span class="spec-item">📦 {{ $t('work_pages.platform_detail_max_size', { size: (platformConfig.specs.maxSizeKB / 1024).toFixed(1) }) }}</span>
         <span class="spec-item">🌐 {{ platformConfig.defaultLang }}</span>
       </div>
 
@@ -39,42 +39,41 @@
         </button>
       </div>
 
-      <h4 v-if="platformConfig" class="section-subtitle">详情页将包含以下板块</h4>
+      <h4 v-if="platformConfig" class="section-subtitle">{{ $t('work_pages.platform_detail_sections_hint') }}</h4>
       <div v-if="platformConfig" class="section-pills">
         <span v-for="s in platformConfig.sections" :key="s" class="section-pill">{{ s }}</span>
       </div>
 
       <div class="actions">
-        <button class="btn-outline" @click="step = 0">返回</button>
-        <button class="btn" :disabled="!selectedTemplate" @click="step = 2">下一步：上传产品图</button>
+        <button class="btn-outline" @click="step = 0">{{ $t('common.back') }}</button>
+        <button class="btn" :disabled="!selectedTemplate" @click="step = 2">{{ $t('work_pages.platform_detail_next_upload') }}</button>
       </div>
     </div>
 
     <!-- Step 2: 上传产品图 -->
     <div v-else-if="step === 2" class="upload-section">
-      <h3>上传产品图片</h3>
+      <h3>{{ $t('work_pages.platform_detail_upload_title') }}</h3>
       <div class="dropzone" @dragover.prevent @drop.prevent="handleDrop">
         <p class="dz-icon">📷</p>
-        <p>拖拽产品图片到此处</p>
-        <p class="hint">建议上传多角度图片（白底图、场景图、细节图）</p>
+        <p>{{ $t('work_pages.platform_detail_drop_text') }}</p>
+        <p class="hint">{{ $t('work_pages.platform_detail_drop_hint') }}</p>
         <input ref="fileInput" type="file" accept="image/*" multiple hidden @change="handleFiles" />
-        <button class="btn-outline" @click="fileInput?.click()">选择图片</button>
+        <button class="btn-outline" @click="fileInput?.click()">{{ $t('work_pages.platform_detail_select_image') }}</button>
       </div>
 
       <div v-if="previews.length" class="preview-grid">
         <div v-for="(p, i) in previews" :key="i" class="preview-item">
-          <img loading="lazy" :src="p.url" alt="平台预览" class="preview-thumb" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+          <img loading="lazy" :src="p.url" :alt="$t('work_pages.platform_detail_upload_preview')" class="preview-thumb" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
           <select v-model="p.role" class="role-select">
-            <option value="main">主图</option><option value="detail">细节图</option>
-            <option value="scene">场景图</option><option value="size">尺寸图</option>
+            <option v-for="opt in roleOptions" :key="opt.value" :value="opt.value">{{ $t(opt.nameKey) }}</option>
           </select>
-          <button class="remove-btn" @click="removeImage(i)" aria-label="移除图片">✕</button>
+          <button class="remove-btn" @click="removeImage(i)" :aria-label="$t('work_pages.platform_detail_remove_image')">✕</button>
         </div>
       </div>
 
       <div class="actions">
-        <button class="btn-outline" @click="step = 1">返回</button>
-        <button class="btn" :disabled="!previews.length || !allUploaded" @click="submitTask">开始生成详情页</button>
+        <button class="btn-outline" @click="step = 1">{{ $t('common.back') }}</button>
+        <button class="btn" :disabled="!previews.length || !allUploaded" @click="submitTask">{{ $t('work_pages.platform_detail_start_generate') }}</button>
       </div>
     </div>
 
@@ -85,16 +84,16 @@
         <div class="bar"><div class="bar-fill" :style="{ width: task.progress.value + '%' }" /></div>
       </div>
       <div v-else-if="task.status.value === 2">
-        <h3>{{ platformName }} 详情页生成完成</h3>
-        <p class="result-hint">已按照 {{ platformName }} 规范生成详情页，包含 {{ platformConfig?.sections.length || 0 }} 个板块</p>
+        <h3>{{ $t('work_pages.platform_detail_result_title', { name: platformName }) }}</h3>
+        <p class="result-hint">{{ $t('work_pages.platform_detail_result_desc', { name: platformName, count: platformConfig?.sections.length || 0 }) }}</p>
         <div class="actions">
-          <button class="btn">📥 下载详情页</button>
-          <button class="btn-outline" @click="handleRedo">重新生成</button>
+          <button class="btn">{{ $t('work_pages.platform_detail_download_btn') }}</button>
+          <button class="btn-outline" @click="handleRedo">{{ $t('work_pages.platform_detail_regen') }}</button>
         </div>
       </div>
       <div v-else-if="task.status.value === 3" class="error-box">
-        <p>{{ task.errorMsg.value || '生成失败' }}</p>
-        <button class="btn" @click="handleRedo()">重试</button>
+        <p>{{ task.errorMsg.value || $t('work_pages.platform_detail_failed_generate') }}</p>
+        <button class="btn" @click="handleRedo()">{{ $t('common.retry') }}</button>
       </div>
     </div>
   </WorkLayout>
@@ -106,6 +105,18 @@ const { createBlobUrl, revoke } = useBlobUrl()
 
 interface PreviewItem { url: string; uploadedUrl: string; role: string; uploaded: boolean }
 
+const stepLabels = computed(() => [
+  t('work_pages.platform_detail_step_select_platform'),
+  t('work_pages.platform_detail_step_select_tmpl'),
+  t('work_pages.platform_detail_step_upload'),
+  t('work_pages.platform_detail_step_generate'),
+])
+const roleOptions = [
+  { value: 'main', nameKey: 'work_pages.platform_detail_role_main' },
+  { value: 'detail', nameKey: 'work_pages.platform_detail_role_detail' },
+  { value: 'scene', nameKey: 'work_pages.platform_detail_role_scene' },
+  { value: 'size', nameKey: 'work_pages.platform_detail_role_size' },
+]
 const step = ref(0);
 const selectedPlatform = ref('');
 const selectedTemplate = ref('');
@@ -117,9 +128,12 @@ const task = useTask();
 const toast = useToast();
 
 const regions = [
-  { code: 'all', label: '全部' }, { code: 'cn', label: '🇨🇳 国内' },
-  { code: 'global', label: '🌍 全球' }, { code: 'sea', label: '🌏 东南亚' },
-  { code: 'latam', label: '🌎 拉美' }, { code: 'cis', label: '🇷🇺 独联体' },
+  { code: 'all', nameKey: 'work_pages.platform_detail_region_all' },
+  { code: 'cn', nameKey: 'work_pages.platform_detail_region_cn' },
+  { code: 'global', nameKey: 'work_pages.platform_detail_region_global' },
+  { code: 'sea', nameKey: 'work_pages.platform_detail_region_sea' },
+  { code: 'latam', nameKey: 'work_pages.platform_detail_region_latam' },
+  { code: 'cis', nameKey: 'work_pages.platform_detail_region_cis' },
 ];
 
 const filteredPlatforms = computed(() =>
@@ -143,7 +157,7 @@ async function loadPlatforms() {
       p._config = (detail as any).data;
     }
     platforms.value = list;
-  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || '加载平台失败') }
+  } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || t('work_pages.platform_detail_failed_load')) }
 }
 
 async function uploadSingle(file: File): Promise<string> {
