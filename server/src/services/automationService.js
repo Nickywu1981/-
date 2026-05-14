@@ -1,4 +1,4 @@
-import automationDao from '../dao/automationDao.js';
+import * as automationDao from '../dao/automationDao.js';
 import { encrypt } from '../utils/crypto.js';
 import { BusinessError } from '../utils/businessError.js';
 import { ERROR_CODE } from '../constants/errorCode.js';

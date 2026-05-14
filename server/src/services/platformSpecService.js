@@ -1,4 +1,4 @@
-import dao from '../dao/platformSpecDao.js';
+import * as dao from '../dao/platformSpecDao.js';
 import { BusinessError } from '../utils/businessError.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 

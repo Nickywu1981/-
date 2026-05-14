@@ -2,15 +2,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock外部依赖
 vi.mock('../../dao/configDao.js', () => ({
-  default: {
-    getItemsByGroup: vi.fn(),
-    getItemValue: vi.fn(),
-    updateItemValue: vi.fn(),
-    insertLog: vi.fn(),
-    getLogById: vi.fn(),
-    listLogs: vi.fn(),
-    getDictItems: vi.fn(),
-  },
+  getItemsByGroup: vi.fn(),
+  getItemValue: vi.fn(),
+  updateItemValue: vi.fn(),
+  insertLog: vi.fn(),
+  getLogById: vi.fn(),
+  listLogs: vi.fn(),
+  getDictItems: vi.fn(),
 }));
 vi.mock('../../dao/redis.js', () => ({ cacheGet: vi.fn(), cacheSet: vi.fn(), cacheDel: vi.fn() }));
 vi.mock('../../dao/db.js', () => ({ default: { execute: vi.fn(), query: vi.fn() } }));
@@ -21,7 +19,7 @@ vi.mock('../../utils/businessError.js', () => ({
 }));
 vi.mock('../config-version.service.js', () => ({ broadcastVersion: vi.fn() }));
 
-import configDao from '../../dao/configDao.js';
+import * as configDao from '../../dao/configDao.js';
 import { cacheGet, cacheSet, cacheDel } from '../../dao/redis.js';
 import {
   getGroupConfig, getDict, setConfig, rollbackConfig,

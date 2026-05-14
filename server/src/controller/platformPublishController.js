@@ -1,4 +1,4 @@
-import platformPublishDao from '../dao/platformPublishDao.js';
+import * as platformPublishDao from '../dao/platformPublishDao.js';
 import { success } from '../utils/response.js';
 import { encrypt } from '../utils/crypto.js';
 import { wrapController } from '../utils/wrapController.js';

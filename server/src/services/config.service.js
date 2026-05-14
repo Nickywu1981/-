@@ -7,7 +7,7 @@ import logger from '../utils/logger.js';
  * 配置读取(三级权限) + 写入 + 变更日志 + Redis缓存 + 回滚
  * P0-4: 重构为 configDao，移除全部裸SQL
  */
-import configDao from '../dao/configDao.js';
+import * as configDao from '../dao/configDao.js';
 import { cacheGet, cacheSet, cacheDel } from '../dao/redis.js';
 import { broadcastVersion } from './config-version.service.js';
 import { ERROR_CODE } from '../constants/errorCode.js';

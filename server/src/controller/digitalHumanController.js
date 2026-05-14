@@ -1,4 +1,4 @@
-import digitalHumanDao from '../dao/digitalHumanDao.js';
+import * as digitalHumanDao from '../dao/digitalHumanDao.js';
 import * as digitalHumanService from '../services/digital-human.service.js';
 import { success } from '../utils/response.js';
 import { wrapController } from '../utils/wrapController.js';

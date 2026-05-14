@@ -31,7 +31,7 @@ function sanitizeRedirectUrl(url) {
 /**
  * P2 增强表单服务 — 校验引擎 + 联动解析 + 脱敏 + 双端适配
  */
-import formDao from '../dao/formDao.js';
+import * as formDao from '../dao/formDao.js';
 import logger from '../utils/logger.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 

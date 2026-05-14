@@ -7,7 +7,7 @@ import { BusinessError } from '../utils/businessError.js';
  */
 import { submitJob } from './job-queue.service.js';
 import * as moderationService from './moderation.service.js';
-import videoTranslateDao from '../dao/videoTranslateDao.js';
+import * as videoTranslateDao from '../dao/videoTranslateDao.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
 /**

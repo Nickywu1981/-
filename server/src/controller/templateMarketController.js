@@ -1,4 +1,4 @@
-import templateMarketDao from '../dao/templateMarketDao.js';
+import * as templateMarketDao from '../dao/templateMarketDao.js';
 import { success } from '../utils/response.js';
 import { BusinessError } from '../utils/businessError.js';
 import { ERROR_CODE } from '../constants/errorCode.js';

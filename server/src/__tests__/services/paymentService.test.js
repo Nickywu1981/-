@@ -25,16 +25,12 @@ vi.mock('../../dao/allinpayDao.js', () => ({
   isCallbackProcessed: vi.fn().mockResolvedValue(false),
 }));
 vi.mock('../../dao/membershipDao.js', () => ({
-  default: {
-    findByUserId: vi.fn().mockResolvedValue(null),
-    upsert: vi.fn().mockResolvedValue(undefined),
-  },
+  findByUserId: vi.fn().mockResolvedValue(null),
+  upsert: vi.fn().mockResolvedValue(undefined),
 }));
 vi.mock('../../dao/rechargeDao.js', () => ({
-  default: {
-    getByOrderNo: vi.fn().mockResolvedValue(null),
-    markPaid: vi.fn().mockResolvedValue(undefined),
-  },
+  getByOrderNo: vi.fn().mockResolvedValue(null),
+  markPaid: vi.fn().mockResolvedValue(undefined),
 }));
 vi.mock('../../utils/allinpaySDK.js', () => ({
   unifiedOrder: vi.fn().mockResolvedValue({ payUrl: 'https://sandbox.allinpay.com/pay/test', trxid: 'TXN_TEST' }),
