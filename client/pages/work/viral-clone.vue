@@ -1,51 +1,51 @@
 <template>
-  <WorkLayout :steps="['上传爆款', '上传产品', '复刻生成']" :current-step="step">
+  <WorkLayout :steps="steps" :current-step="step">
     <div v-if="step === 0" class="upload-section">
-      <h3>上传爆款参考视频 + 自家产品图</h3>
+      <h3>{{ $t('work_pages.viral_clone.subtitle') }}</h3>
       <div class="row">
         <div class="upload-col">
-          <h4>爆款参考视频</h4>
+          <h4>{{ $t('work_pages.viral_clone.ref_video_title') }}</h4>
           <div class="dropzone" @dragover.prevent @drop.prevent="(e) => handleDrop(e, 'ref')">
             <p v-if="!refVideoUrl" class="dz-icon">🎬</p>
             <video v-else :src="refVideoUrl" class="preview-media" controls />
-            <p>{{ refVideoUrl ? '点击更换' : '上传爆款视频' }}</p>
+            <p>{{ refVideoUrl ? $t('work_pages.viral_clone.click_change') : $t('work_pages.viral_clone.upload_ref_video') }}</p>
             <input ref="refInput" type="file" accept="video/*" hidden @change="(e) => handleFile(e, 'ref')" />
-            <button class="btn-outline" @click="refInput?.click()">选择视频</button>
+            <button class="btn-outline" @click="refInput?.click()">{{ $t('work_pages.viral_clone.select_video') }}</button>
           </div>
-          <p v-if="uploadingRef" class="status">⏳ 上传中...</p>
-          <p v-else-if="uploadedRefUrl" class="status ok">✓ 已上传</p>
+          <p v-if="uploadingRef" class="status">⏳ {{ $t('work_pages.viral_clone.uploading') }}</p>
+          <p v-else-if="uploadedRefUrl" class="status ok">✓ {{ $t('work_pages.viral_clone.uploaded') }}</p>
         </div>
         <div class="upload-col">
-          <h4>自家产品图</h4>
+          <h4>{{ $t('work_pages.viral_clone.product_img_title') }}</h4>
           <div class="dropzone" @dragover.prevent @drop.prevent="(e) => handleDrop(e, 'product')">
             <p v-if="!productImageUrl" class="dz-icon">📷</p>
-            <img loading="lazy" v-else :src="productImageUrl" alt="产品图" class="preview-media" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
-            <p>{{ productImageUrl ? '点击更换' : '上传产品图' }}</p>
+            <img loading="lazy" v-else :src="productImageUrl" :alt="$t('work_pages.viral_clone.product_alt')" class="preview-media" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+            <p>{{ productImageUrl ? $t('work_pages.viral_clone.click_change') : $t('work_pages.viral_clone.upload_product_img') }}</p>
             <input ref="imgInput" type="file" accept="image/*" hidden @change="(e) => handleFile(e, 'product')" />
-            <button class="btn-outline" @click="imgInput?.click()">选择图片</button>
+            <button class="btn-outline" @click="imgInput?.click()">{{ $t('work_pages.viral_clone.select_image') }}</button>
           </div>
-          <p v-if="uploadingProd" class="status">⏳ 上传中...</p>
-          <p v-else-if="uploadedProductUrl" class="status ok">✓ 已上传</p>
+          <p v-if="uploadingProd" class="status">⏳ {{ $t('work_pages.viral_clone.uploading') }}</p>
+          <p v-else-if="uploadedProductUrl" class="status ok">✓ {{ $t('work_pages.viral_clone.uploaded') }}</p>
         </div>
       </div>
-      <button v-if="refVideoUrl && productImageUrl" class="btn" @click="step = 1">下一步：确认参数</button>
+      <button v-if="refVideoUrl && productImageUrl" class="btn" @click="step = 1">{{ $t('work_pages.viral_clone.next_step') }}</button>
     </div>
 
     <div v-else-if="step === 1" class="select-section">
-      <h3>确认复刻参数</h3>
+      <h3>{{ $t('work_pages.viral_clone.confirm_params') }}</h3>
       <div class="summary-box">
-        <div class="summary-row"><span>参考视频</span><strong>已上传 ✓</strong></div>
-        <div class="summary-row"><span>产品图片</span><strong>已上传 ✓</strong></div>
-        <div class="summary-row"><span>复刻强度</span><strong>{{ matchStrength * 100 }}%</strong></div>
+        <div class="summary-row"><span>{{ $t('work_pages.viral_clone.ref_video_label') }}</span><strong>{{ $t('work_pages.viral_clone.uploaded_ok') }}</strong></div>
+        <div class="summary-row"><span>{{ $t('work_pages.viral_clone.product_img_label') }}</span><strong>{{ $t('work_pages.viral_clone.uploaded_ok') }}</strong></div>
+        <div class="summary-row"><span>{{ $t('work_pages.viral_clone.match_strength_label') }}</span><strong>{{ matchStrength * 100 }}%</strong></div>
       </div>
       <label class="slider-label">
-        复刻强度: {{ matchStrength * 100 }}%
+        {{ $t('work_pages.viral_clone.match_strength') }} {{ matchStrength * 100 }}%
         <input v-model.number="matchStrength" type="range" min="0.3" max="1" step="0.1" class="slider" />
       </label>
-      <p class="cost-hint">成本：20 点/次 · 预估60秒</p>
+      <p class="cost-hint">{{ $t('work_pages.viral_clone.cost_hint') }}</p>
       <div class="actions">
-        <button class="btn-outline" @click="step = 0">返回</button>
-        <button class="btn" @click="submitTask" :disabled="submitting">开始复刻</button>
+        <button class="btn-outline" @click="step = 0">{{ $t('work_pages.viral_clone.back_btn') }}</button>
+        <button class="btn" @click="submitTask" :disabled="submitting">{{ $t('work_pages.viral_clone.start_btn') }}</button>
       </div>
     </div>
 
@@ -55,22 +55,22 @@
         <div class="bar"><div class="bar-fill" :style="{ width: task.progress.value + '%' }" /></div>
       </div>
       <div v-else-if="task.status.value === 2">
-        <h3>爆款复刻完成</h3>
-        <div class="video-placeholder">▶ 视频预览区域</div>
+        <h3>{{ $t('work_pages.viral_clone.complete_title') }}</h3>
+        <div class="video-placeholder">▶ {{ $t('work_pages.viral_clone.video_preview') }}</div>
         <div v-if="task.result.value?.analysis" class="analysis-box">
-          <h4>分析报告</h4>
-          <p>匹配度：{{ task.result.value.matchScore }}</p>
-          <p>节奏：{{ task.result.value.analysis.tempo }}</p>
-          <p>色调：{{ task.result.value.analysis.dominantColor }}</p>
-          <p>平均镜头：{{ task.result.value.analysis.avgShotLength }}</p>
+          <h4>{{ $t('work_pages.viral_clone.analysis_report') }}</h4>
+          <p>{{ $t('work_pages.viral_clone.match_score_label') }}{{ task.result.value.matchScore }}</p>
+          <p>{{ $t('work_pages.viral_clone.tempo_label') }}{{ task.result.value.analysis.tempo }}</p>
+          <p>{{ $t('work_pages.viral_clone.color_label') }}{{ task.result.value.analysis.dominantColor }}</p>
+          <p>{{ $t('work_pages.viral_clone.avg_shot_label') }}{{ task.result.value.analysis.avgShotLength }}</p>
         </div>
         <div class="actions">
-          <button class="btn-outline" @click="handleRedo">再做一次</button>
-          <button class="btn">下载视频</button>
+          <button class="btn-outline" @click="handleRedo">{{ $t('work_pages.viral_clone.redo_btn') }}</button>
+          <button class="btn">{{ $t('work_pages.viral_clone.download_btn') }}</button>
         </div>
       </div>
-      <div v-else-if="task.status.value === 3" class="error-box"><p>{{ task.errorMsg.value }}</p><button class="btn" @click="handleRedo">重试</button></div>
-      <div v-else class="progress-box"><div class="spinner" /><p>准备中...</p></div>
+      <div v-else-if="task.status.value === 3" class="error-box"><p>{{ task.errorMsg.value }}</p><button class="btn" @click="handleRedo">{{ $t('work_pages.viral_clone.retry_btn') }}</button></div>
+      <div v-else class="progress-box"><div class="spinner" /><p>{{ $t('work_pages.viral_clone.preparing') }}</p></div>
     </div>
   </WorkLayout>
 </template>
@@ -80,6 +80,7 @@
 const { createBlobUrl, revoke } = useBlobUrl()
 const toast = useToast()
 
+const steps = computed(() => [t('work_pages.viral_clone.step_upload'), t('work_pages.viral_clone.step_product'), t('work_pages.viral_clone.step_generate')])
 const step = ref(0);
 const refVideoUrl = ref('');
 const productImageUrl = ref('');

@@ -2,22 +2,22 @@
   <div class="marketplace-page">
     <div class="page-header">
       <div>
-        <h1>提示词模板市场</h1>
-        <p class="subtitle">精选优质模板，一键套用生成</p>
+        <h1>{{ $t('work_pages.marketplace.title') }}</h1>
+        <p class="subtitle">{{ $t('work_pages.marketplace.subtitle') }}</p>
       </div>
       <div class="header-actions">
         <div class="search-box">
           <span class="search-icon">🔍</span>
-          <input v-model="search" placeholder="搜索模板..." @input="onSearch" maxlength="200" />
+          <input v-model="search" :placeholder="$t('work_pages.marketplace.search_placeholder')" @input="onSearch" maxlength="200" />
         </div>
         <select v-model="category" class="filter-select" @change="onFilter">
-          <option value="">全部分类</option>
-          <option value="ecommerce">电商主图</option>
-          <option value="scene">场景生成</option>
-          <option value="portrait">人像精修</option>
-          <option value="video">视频脚本</option>
-          <option value="copywriting">文案生成</option>
-          <option value="social">社交媒体</option>
+          <option value="">{{ $t('work_pages.marketplace.filter_all') }}</option>
+          <option value="ecommerce">{{ $t('work_pages.marketplace.cat_ecommerce') }}</option>
+          <option value="scene">{{ $t('work_pages.marketplace.cat_scene') }}</option>
+          <option value="portrait">{{ $t('work_pages.marketplace.cat_portrait') }}</option>
+          <option value="video">{{ $t('work_pages.marketplace.cat_video') }}</option>
+          <option value="copywriting">{{ $t('work_pages.marketplace.cat_copywriting') }}</option>
+          <option value="social">{{ $t('work_pages.marketplace.cat_social') }}</option>
         </select>
       </div>
     </div>
@@ -27,7 +27,7 @@
     <div v-else-if="error" class="error-state">
       <span class="error-icon">⚠️</span>
       <p>{{ error }}</p>
-      <button class="btn-outline" @click="fetchData">重试</button>
+      <button class="btn-outline" @click="fetchData">{{ $t('work_pages.marketplace.retry_btn') }}</button>
     </div>
 
     <div v-else class="template-grid">
@@ -37,7 +37,7 @@
             <span class="preview-icon">{{ tpl.icon || '✨' }}</span>
           </div>
           <span class="badge-cat">{{ catLabel(tpl.category) }}</span>
-          <span v-if="tpl.is_hot" class="badge-hot">🔥 热门</span>
+          <span v-if="tpl.is_hot" class="badge-hot">🔥 {{ $t('work_pages.marketplace.badge_hot') }}</span>
           <span v-if="tpl.is_new" class="badge-new">NEW</span>
         </div>
         <div class="card-body">
@@ -48,8 +48,8 @@
           </div>
         </div>
         <div class="card-footer">
-          <span class="usage-count">{{ tpl.usage_count || 0 }} 次使用</span>
-          <button class="btn-use" @click.stop="useTemplate(tpl)">使用模板</button>
+          <span class="usage-count">{{ tpl.usage_count || 0 }} {{ $t('work_pages.marketplace.usage_count') }}</span>
+          <button class="btn-use" @click.stop="useTemplate(tpl)">{{ $t('work_pages.marketplace.use_template') }}</button>
         </div>
       </div>
     </div>
@@ -57,26 +57,25 @@
     <Pagination v-if="total > pageSize" :page="page" :total="total" :page-size="pageSize"
       @update:page="(p: number) => { page = p; fetchData() }" />
 
-    <!-- Preview Modal -->
     <div v-if="previewing" class="modal-overlay" @click.self="previewing = null" @keydown.escape="previewing = null">
       <div class="modal modal-lg">
         <div class="modal-header">
           <h3>{{ previewing.name }}</h3>
-          <button class="btn-close" @click="previewing = null" aria-label="关闭">✕</button>
+          <button class="btn-close" @click="previewing = null" :aria-label="$t('work_pages.marketplace.close_btn')">✕</button>
         </div>
         <div class="preview-meta">
-          <span class="meta-item">分类：{{ catLabel(previewing.category) }}</span>
-          <span class="meta-item">使用：{{ previewing.usage_count || 0 }} 次</span>
+          <span class="meta-item">{{ $t('work_pages.marketplace.meta_category') }}{{ catLabel(previewing.category) }}</span>
+          <span class="meta-item">{{ $t('work_pages.marketplace.meta_usage') }}{{ previewing.usage_count || 0 }} {{ $t('work_pages.marketplace.usage_count') }}</span>
         </div>
         <div class="preview-content">
-          <label class="field-label">提示词模板</label>
+          <label class="field-label">{{ $t('work_pages.marketplace.field_prompt') }}</label>
           <pre class="prompt-preview">{{ previewing.prompt_template }}</pre>
-          <label class="field-label">使用说明</label>
-          <p class="usage-note">{{ previewing.usage_note || '根据实际场景替换模板中的变量' }}</p>
+          <label class="field-label">{{ $t('work_pages.marketplace.field_usage_note') }}</label>
+          <p class="usage-note">{{ previewing.usage_note || $t('work_pages.marketplace.usage_default') }}</p>
         </div>
         <div class="modal-actions">
-          <button class="btn-outline" @click="previewing = null">关闭</button>
-          <button class="btn-primary" @click="useTemplate(previewing!)">使用此模板</button>
+          <button class="btn-outline" @click="previewing = null">{{ $t('work_pages.marketplace.close_btn') }}</button>
+          <button class="btn-primary" @click="useTemplate(previewing!)">{{ $t('work_pages.marketplace.use_this_template') }}</button>
         </div>
       </div>
     </div>
@@ -97,12 +96,18 @@ const category = ref('')
 const previewing: Ref<any | null> = ref(null)
 let searchTimer: ReturnType<typeof setTimeout> | null = null
 
-const catLabels: Record<string, string> = {
-  ecommerce: '电商主图', scene: '场景生成', portrait: '人像精修',
-  video: '视频脚本', copywriting: '文案生成', social: '社交媒体',
-}
+const { t } = useI18n()
 
-function catLabel(c: string) { return catLabels[c] || c }
+const catLabelMap = computed(() => ({
+  ecommerce: t('work_pages.marketplace.cat_ecommerce'),
+  scene: t('work_pages.marketplace.cat_scene'),
+  portrait: t('work_pages.marketplace.cat_portrait'),
+  video: t('work_pages.marketplace.cat_video'),
+  copywriting: t('work_pages.marketplace.cat_copywriting'),
+  social: t('work_pages.marketplace.cat_social'),
+}))
+
+function catLabel(c: string) { return catLabelMap.value[c] || c }
 function gradFromName(name: string) {
   const hash = name.split('').reduce((a, c) => a + c.charCodeAt(0), 0)
   const hues = ['#7C3AED', '#3B82F6', '#EC4899', '#F59E0B', '#22C55E', '#06B6D4']
@@ -119,7 +124,7 @@ async function fetchData() {
     list.value = res.data?.list || []
     total.value = res.data?.total || 0
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
-    error.value = err?.data?.msg || err.message || '加载失败'
+    error.value = err?.data?.msg || err.message || t('common.loadFail')
     toast.error(error.value)
   } finally { loading.value = false }
 }
@@ -135,7 +140,7 @@ function useTemplate(tpl: any) {
   }
   const target = routes[tpl.category] || '/workspace'
   navigateTo(`${target}?templateId=${tpl.id}`)
-  toast.success(`已加载模板：${tpl.name}`)
+  toast.success(t('work_pages.marketplace.loaded_template') + tpl.name)
 }
 
 function onSearch() {

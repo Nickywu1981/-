@@ -1,69 +1,69 @@
 <template>
-  <WorkLayout title="图片翻译" description="AI 识别图片中的文字并翻译成目标语言">
+  <WorkLayout :title="$t('work_pages.translate_image.title')" :description="$t('work_pages.translate_image.description')">
     <div class="translate-workspace">
       <div class="upload-zone" @dragover.prevent @drop.prevent="onDrop">
         <input ref="fileInput" type="file" accept="image/*" hidden @change="onFileChange" />
         <div class="zone-content" @click="fileInput?.click()">
           <span class="zone-icon">🌐</span>
-          <h3>上传含文字的图片</h3>
-          <p>支持 JPG/PNG/WebP，最大 10MB</p>
-          <button class="btn-upload">选择图片</button>
+          <h3>{{ $t('work_pages.translate_image.upload_heading') }}</h3>
+          <p>{{ $t('work_pages.translate_image.upload_desc') }}</p>
+          <button class="btn-upload">{{ $t('work_pages.translate_image.select_btn') }}</button>
         </div>
       </div>
 
       <div class="options-bar" v-if="previewUrl">
         <label>
-          源语言：
+          {{ $t('work_pages.translate_image.source_lang_label') }}
           <select v-model="sourceLang" class="select-sm">
-            <option value="auto">自动检测</option>
-            <option value="zh">中文</option>
-            <option value="en">英语</option>
-            <option value="ja">日语</option>
-            <option value="ko">韩语</option>
+            <option value="auto">{{ $t('work_pages.translate_image.auto_detect') }}</option>
+            <option value="zh">{{ $t('work_pages.translate_image.lang_zh') }}</option>
+            <option value="en">{{ $t('work_pages.translate_image.lang_en') }}</option>
+            <option value="ja">{{ $t('work_pages.translate_image.lang_ja') }}</option>
+            <option value="ko">{{ $t('work_pages.translate_image.lang_ko') }}</option>
           </select>
         </label>
         <label>
-          目标语言：
+          {{ $t('work_pages.translate_image.target_lang_label') }}
           <select v-model="targetLang" class="select-sm">
-            <option value="en">英语</option>
-            <option value="zh">中文</option>
-            <option value="ja">日语</option>
-            <option value="ko">韩语</option>
-            <option value="fr">法语</option>
-            <option value="de">德语</option>
-            <option value="es">西班牙语</option>
-            <option value="ar">阿拉伯语</option>
+            <option value="en">{{ $t('work_pages.translate_image.lang_en') }}</option>
+            <option value="zh">{{ $t('work_pages.translate_image.lang_zh') }}</option>
+            <option value="ja">{{ $t('work_pages.translate_image.lang_ja') }}</option>
+            <option value="ko">{{ $t('work_pages.translate_image.lang_ko') }}</option>
+            <option value="fr">{{ $t('work_pages.translate_image.lang_fr') }}</option>
+            <option value="de">{{ $t('work_pages.translate_image.lang_de') }}</option>
+            <option value="es">{{ $t('work_pages.translate_image.lang_es') }}</option>
+            <option value="ar">{{ $t('work_pages.translate_image.lang_ar') }}</option>
           </select>
         </label>
         <button class="btn-primary" :disabled="translating" @click="startTranslate">
-          {{ translating ? '翻译中...' : '开始翻译' }}
+          {{ translating ? $t('work_pages.translate_image.translating') : $t('work_pages.translate_image.start_translate') }}
         </button>
       </div>
 
       <div class="preview-area" v-if="previewUrl">
         <div class="preview-card">
-          <img loading="lazy" :src="previewUrl" alt="原图" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
-          <span class="label-badge">原图</span>
+          <img loading="lazy" :src="previewUrl" :alt="$t('work_pages.translate_image.original_alt')" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+          <span class="label-badge">{{ $t('work_pages.translate_image.original_img') }}</span>
         </div>
         <div class="preview-card" v-if="resultUrl">
-          <img loading="lazy" :src="resultUrl" alt="翻译结果" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
-          <span class="label-badge result">翻译结果</span>
+          <img loading="lazy" :src="resultUrl" :alt="$t('work_pages.translate_image.translated_alt')" @error="(e) => { (e.target as HTMLImageElement).src = '/images/placeholder.png' }" />
+          <span class="label-badge result">{{ $t('work_pages.translate_image.translated_img') }}</span>
         </div>
       </div>
 
       <div v-if="resultUrl" class="result-actions">
-        <button class="btn-primary" @click="downloadResult">下载结果</button>
-        <button class="btn-outline" @click="resetAll">重新翻译</button>
-        <QuickSaveButton :work-id="taskId" work-type="translate" :work-url="resultUrl" work-title="图片翻译" />
+        <button class="btn-primary" @click="downloadResult">{{ $t('work_pages.translate_image.download_result') }}</button>
+        <button class="btn-outline" @click="resetAll">{{ $t('work_pages.translate_image.retranslate') }}</button>
+        <QuickSaveButton :work-id="taskId" work-type="translate" :work-url="resultUrl" :work-title="$t('work_pages.translate_image.title')" />
       </div>
     </div>
 
     <EmptyState
       v-if="!previewUrl"
       icon="🌐"
-      title="图片翻译"
-      description="智能识别图片中的文字区域，自动翻译为目标语言并保留原有排版风格"
-      action-label="上传图片开始"
+      :title="$t('work_pages.translate_image.title')"
+      :description="$t('work_pages.translate_image.description')"
+      :action-label="$t('work_pages.translate_image.empty_action')"
       @action="fileInput?.click()"
     />
   </WorkLayout>
