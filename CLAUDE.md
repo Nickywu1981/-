@@ -291,7 +291,7 @@ main (生产)
 - **Zod 校验 85/91 已覆盖**
 - **E2E 测试**: 13 个 Playwright spec
 - **服务端测试**: 按模块分目录 (controllers/dao/middleware/route/services/utils/constants)
-- 品牌色: `#7C3AED`，CSS 变量 100% 覆盖
+- 品牌色: `#5b5fe3`（暖靛蓝），CSS 变量 100% 覆盖
 
 ---
 

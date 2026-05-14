@@ -5,7 +5,23 @@
       "Bash(npx eslint *)",
       "Bash(npm ls *)",
       "Bash(node server/scripts/audit-rules.js *)",
-      "WebFetch(domain:prodoc.allinpay.com)"
+      "WebFetch(domain:prodoc.allinpay.com)",
+      "Bash(git -C \"I:/智能体助手项目\" log --oneline -20)",
+      "Bash(node --check \"I:/智能体助手项目/server/src/route/workflowRoutes.js\")",
+      "Bash(node --check \"I:/智能体助手项目/server/src/route/promptRoutes.js\")",
+      "Bash(node --check \"I:/智能体助手项目/server/src/route/v4_image.routes.js\")",
+      "Bash(node --check \"I:/智能体助手项目/server/src/route/v4_video.routes.js\")",
+      "Bash(node --check \"I:/智能体助手项目/server/src/dao/tenantPool.js\")",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(python3 -c ' *)",
+      "Bash(node -e ' *)",
+      "Bash(npx nuxi *)",
+      "Bash(npx nuxt *)",
+      "Bash(node -e \"const zh=require\\('./i18n/locales/zh.json'\\); const en=require\\('./i18n/locales/en.json'\\); function countKeys\\(obj,prefix=''\\){let c=0; for\\(const k in obj\\){const path=prefix?prefix+'.'+k:k; if\\(typeof obj[k]==='object'&&obj[k]!==null&&!Array.isArray\\(obj[k]\\)\\){c+=countKeys\\(obj[k],path\\)}else{c++}} return c}; console.log\\('zh keys:', countKeys\\(zh\\)\\); console.log\\('en keys:', countKeys\\(en\\)\\)\")",
+      "Bash(grep -rn '\\\\$t\\(' '--include=*.vue' '--include=*.ts' '--include=*.js' -l)",
+      "Bash(grep -rn '\\\\$t\\(\\\\|useI18n\\\\|i18n\\\\|from.*i18n\\\\|dt\\(' '--include=*.vue' '--include=*.ts' '--include=*.js' -l)",
+      "Bash(grep -l '\\\\$t\\(\\\\|useI18n\\\\|from.*i18n\\\\|dt\\(' pages/admin/model-pool.vue pages/admin/kb-management.vue pages/agent/dashboard.vue components/common/AppMediaUpload.vue components/diy/VersionHistoryModal.vue)"
     ]
   },
   "hooks": {
