@@ -3,26 +3,26 @@
   <div class="pg">
     <div class="page-header">
       <div>
-        <h1 class="page-header-title">用户管理</h1>
-        <p class="page-header-subtitle">总用户 {{ totalUsers }}</p>
+        <h1 class="page-header-title">{{ $t('ops.users_title') }}</h1>
+        <p class="page-header-subtitle">{{ $t('ops.users_subtitle', { n: totalUsers }) }}</p>
       </div>
       <div class="page-header-actions">
-        <input class="input" placeholder="搜索用户..." style="width:200px" />
+        <input class="input" :placeholder="$t('ops.users_search_placeholder')" style="width:200px" />
       </div>
     </div>
 
     <div class="stat-grid" style="margin-bottom:var(--space-6)">
-      <div class="stat-card"><div class="stat-card-value">5,280</div><div class="stat-card-label">总用户</div><div class="stat-card-trend up">↑ 8.5%</div></div>
-      <div class="stat-card"><div class="stat-card-value">1,245</div><div class="stat-card-label">本周新增</div></div>
-      <div class="stat-card"><div class="stat-card-value">73.2%</div><div class="stat-card-label">活跃率</div></div>
+      <div class="stat-card"><div class="stat-card-value">5,280</div><div class="stat-card-label">{{ $t('ops.users_stat_total') }}</div><div class="stat-card-trend up">↑ 8.5%</div></div>
+      <div class="stat-card"><div class="stat-card-value">1,245</div><div class="stat-card-label">{{ $t('ops.users_stat_week_new') }}</div></div>
+      <div class="stat-card"><div class="stat-card-value">73.2%</div><div class="stat-card-label">{{ $t('ops.users_stat_active_rate') }}</div></div>
     </div>
 
     <div class="chart-card">
-      <div class="chart-card-header"><span class="chart-card-title">用户列表</span></div>
+      <div class="chart-card-header"><span class="chart-card-title">{{ $t('ops.users_chart_title') }}</span></div>
       <div class="chart-card-body" style="padding:0">
         <div class="table-container" style="border:none;border-radius:0">
           <table class="data-table">
-            <thead><tr><th>用户</th><th>套餐</th><th>消费</th><th>注册时间</th><th>最后活跃</th><th>状态</th></tr></thead>
+            <thead><tr><th>{{ $t('ops.users_col_user') }}</th><th>{{ $t('ops.users_col_plan') }}</th><th>{{ $t('ops.users_col_spent') }}</th><th>{{ $t('ops.users_col_registered') }}</th><th>{{ $t('ops.users_col_last_active') }}</th><th>{{ $t('ops.users_col_status') }}</th></tr></thead>
             <tbody>
               <tr v-for="u in users" :key="u.name">
                 <td><strong>{{ u.name }}</strong><br><small style="color:var(--text-tertiary)">{{ u.email }}</small></td>

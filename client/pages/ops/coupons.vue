@@ -3,22 +3,22 @@
   <div class="pg">
     <div class="page-header">
       <div>
-        <h1 class="page-header-title">优惠券管理</h1>
-        <p class="page-header-subtitle">创建/发放/核销优惠券，统计使用效果</p>
+        <h1 class="page-header-title">{{ $t('ops.coupons_title') }}</h1>
+        <p class="page-header-subtitle">{{ $t('ops.coupons_subtitle') }}</p>
       </div>
-      <button class="btn btn-gradient btn-sm">+ 创建优惠券</button>
+      <button class="btn btn-gradient btn-sm">{{ $t('ops.coupons_btn_add') }}</button>
     </div>
 
     <div class="stat-grid">
-      <div class="stat-card"><div class="stat-card-value">15</div><div class="stat-card-label">券模板</div></div>
-      <div class="stat-card"><div class="stat-card-value">4,820</div><div class="stat-card-label">发放数</div></div>
-      <div class="stat-card"><div class="stat-card-value">1,256</div><div class="stat-card-label">已核销</div></div>
-      <div class="stat-card"><div class="stat-card-value">26.1%</div><div class="stat-card-label">核销率</div></div>
+      <div class="stat-card"><div class="stat-card-value">15</div><div class="stat-card-label">{{ $t('ops.coupons_stat_templates') }}</div></div>
+      <div class="stat-card"><div class="stat-card-value">4,820</div><div class="stat-card-label">{{ $t('ops.coupons_stat_issued') }}</div></div>
+      <div class="stat-card"><div class="stat-card-value">1,256</div><div class="stat-card-label">{{ $t('ops.coupons_stat_redeemed') }}</div></div>
+      <div class="stat-card"><div class="stat-card-value">26.1%</div><div class="stat-card-label">{{ $t('ops.coupons_stat_rate') }}</div></div>
     </div>
 
     <div class="card" style="margin-top: var(--space-6)">
       <table class="data-table">
-        <thead><tr><th>券名称</th><th>类型</th><th>面额</th><th>发放量</th><th>核销量</th><th>核销率</th><th>状态</th></tr></thead>
+        <thead><tr><th>{{ $t('ops.coupons_col_name') }}</th><th>{{ $t('ops.coupons_col_type') }}</th><th>{{ $t('ops.coupons_col_value') }}</th><th>{{ $t('ops.coupons_col_issued') }}</th><th>{{ $t('ops.coupons_col_redeemed') }}</th><th>{{ $t('ops.coupons_col_rate') }}</th><th>{{ $t('ops.coupons_col_status') }}</th></tr></thead>
         <tbody>
           <tr v-for="c in coupons" :key="c.id">
             <td><strong>{{ c.name }}</strong></td><td>{{ c.type }}</td><td>¥{{ c.value }}</td>

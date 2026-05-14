@@ -3,27 +3,27 @@
   <div class="pg">
     <div class="page-header">
       <div>
-        <h1 class="page-header-title">营销活动</h1>
-        <p class="page-header-subtitle">创建和管理促销、拉新、裂变活动</p>
+        <h1 class="page-header-title">{{ $t('ops.campaigns_title') }}</h1>
+        <p class="page-header-subtitle">{{ $t('ops.campaigns_subtitle') }}</p>
       </div>
-      <button class="btn btn-gradient btn-sm">+ 新建活动</button>
+      <button class="btn btn-gradient btn-sm">{{ $t('ops.campaigns_btn_add') }}</button>
     </div>
 
     <div class="stat-grid">
-      <div class="stat-card"><div class="stat-card-value">8</div><div class="stat-card-label">进行中</div></div>
-      <div class="stat-card"><div class="stat-card-value">3,240</div><div class="stat-card-label">参与人次</div></div>
-      <div class="stat-card"><div class="stat-card-value">¥12,580</div><div class="stat-card-label">活动转化</div></div>
-      <div class="stat-card"><div class="stat-card-value">16.8%</div><div class="stat-card-label">平均转化率</div></div>
+      <div class="stat-card"><div class="stat-card-value">8</div><div class="stat-card-label">{{ $t('ops.campaigns_stat_active') }}</div></div>
+      <div class="stat-card"><div class="stat-card-value">3,240</div><div class="stat-card-label">{{ $t('ops.campaigns_stat_participants') }}</div></div>
+      <div class="stat-card"><div class="stat-card-value">¥12,580</div><div class="stat-card-label">{{ $t('ops.campaigns_stat_revenue') }}</div></div>
+      <div class="stat-card"><div class="stat-card-value">16.8%</div><div class="stat-card-label">{{ $t('ops.campaigns_stat_avg_rate') }}</div></div>
     </div>
 
     <div class="card" style="margin-top: var(--space-6)">
       <table class="data-table">
-        <thead><tr><th>活动名称</th><th>类型</th><th>开始时间</th><th>结束时间</th><th>参与人数</th><th>转化金额</th><th>状态</th></tr></thead>
+        <thead><tr><th>{{ $t('ops.campaigns_col_name') }}</th><th>{{ $t('ops.campaigns_col_type') }}</th><th>{{ $t('ops.campaigns_col_start') }}</th><th>{{ $t('ops.campaigns_col_end') }}</th><th>{{ $t('ops.campaigns_col_participants') }}</th><th>{{ $t('ops.campaigns_col_revenue') }}</th><th>{{ $t('ops.campaigns_col_status') }}</th></tr></thead>
         <tbody>
           <tr v-for="c in campaigns" :key="c.id">
             <td><strong>{{ c.name }}</strong></td><td>{{ c.type }}</td><td>{{ c.start }}</td><td>{{ c.end }}</td>
             <td>{{ c.participants }}</td><td>¥{{ c.revenue.toLocaleString() }}</td>
-            <td><span class="badge" :class="c.active ? 'badge-success' : 'badge-secondary'">{{ c.active ? '进行中' : '已结束' }}</span></td>
+            <td><span class="badge" :class="c.active ? 'badge-success' : 'badge-secondary'">{{ c.active ? $t('ops.campaigns_status_active') : $t('ops.campaigns_status_ended') }}</span></td>
           </tr>
         </tbody>
       </table>

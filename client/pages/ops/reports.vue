@@ -3,14 +3,14 @@
   <div class="pg">
     <div class="page-header">
       <div>
-        <h1 class="page-header-title">运营报表</h1>
-        <p class="page-header-subtitle">日周月运营数据、用户增长、业务转化趋势</p>
+        <h1 class="page-header-title">{{ $t('ops.reports_title') }}</h1>
+        <p class="page-header-subtitle">{{ $t('ops.reports_subtitle') }}</p>
       </div>
-      <button class="btn btn-secondary btn-sm">导出报表</button>
+      <button class="btn btn-secondary btn-sm">{{ $t('ops.reports_btn_export') }}</button>
     </div>
 
     <div class="card" style="margin-top:0">
-      <div class="chart-card-header"><span class="chart-card-title">本周核心指标</span></div>
+      <div class="chart-card-header"><span class="chart-card-title">{{ $t('ops.reports_chart_title') }}</span></div>
       <div class="stat-grid" style="margin-top: var(--space-2)">
         <div v-for="m in metrics" :key="m.label" class="stat-card">
           <div class="stat-card-value">{{ m.value }}</div>
@@ -22,7 +22,7 @@
 
     <div class="card" style="margin-top: var(--space-6)">
       <table class="data-table">
-        <thead><tr><th>日期</th><th>新增用户</th><th>活跃用户</th><th>订单量</th><th>收入</th><th>转化率</th></tr></thead>
+        <thead><tr><th>{{ $t('ops.reports_col_date') }}</th><th>{{ $t('ops.reports_col_new_users') }}</th><th>{{ $t('ops.reports_col_active_users') }}</th><th>{{ $t('ops.reports_col_orders') }}</th><th>{{ $t('ops.reports_col_revenue') }}</th><th>{{ $t('ops.reports_col_conversion') }}</th></tr></thead>
         <tbody>
           <tr v-for="r in dailyReports" :key="r.date">
             <td>{{ r.date }}</td><td>{{ r.newUsers }}</td><td>{{ r.activeUsers }}</td><td>{{ r.orders }}</td>
@@ -37,11 +37,12 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'ops', middleware: ['auth'] })
 
+const { t } = useI18n()
 const metrics = reactive([
-  { label: '日活用户', value: '1,842', change: '8.5%', up: true },
-  { label: '新增注册', value: '126', change: '12%', up: true },
-  { label: '订单量', value: '342', change: '3.2%', up: false },
-  { label: '收入', value: '¥8,420', change: '15%', up: true },
+  { label: t('ops.reports_metric_dau'), value: '1,842', change: '8.5%', up: true },
+  { label: t('ops.reports_metric_new_reg'), value: '126', change: '12%', up: true },
+  { label: t('ops.reports_metric_orders'), value: '342', change: '3.2%', up: false },
+  { label: t('ops.reports_metric_revenue'), value: '¥8,420', change: '15%', up: true },
 ])
 
 const dailyReports = reactive([

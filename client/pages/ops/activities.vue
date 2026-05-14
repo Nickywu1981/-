@@ -3,11 +3,11 @@
   <div class="pg">
     <div class="page-header">
       <div>
-        <h1 class="page-header-title">活动管理</h1>
-        <p class="page-header-subtitle">进行中 {{ activeCampaigns }} 个</p>
+        <h1 class="page-header-title">{{ $t('ops.activities_title') }}</h1>
+        <p class="page-header-subtitle">{{ $t('ops.activities_subtitle', { n: activeCampaigns }) }}</p>
       </div>
       <div class="page-header-actions">
-        <button class="btn btn-gradient btn-sm" @click="showCreate = true">+ 新建活动</button>
+        <button class="btn btn-gradient btn-sm" @click="showCreate = true">{{ $t('ops.activities_btn_add') }}</button>
       </div>
     </div>
 
@@ -19,9 +19,9 @@
         </div>
         <div class="chart-card-body">
           <div style="display:flex;justify-content:space-between;margin-bottom:8px">
-            <div><small style="color:var(--text-tertiary)">参与人数</small><br><strong>{{ c.participants }}</strong></div>
-            <div><small style="color:var(--text-tertiary)">转化率</small><br><strong>{{ c.conversion }}</strong></div>
-            <div><small style="color:var(--text-tertiary)">新增客户</small><br><strong>{{ c.newCustomers }}</strong></div>
+            <div><small style="color:var(--text-tertiary)">{{ $t('ops.activities_label_participants') }}</small><br><strong>{{ c.participants }}</strong></div>
+            <div><small style="color:var(--text-tertiary)">{{ $t('ops.activities_label_conversion') }}</small><br><strong>{{ c.conversion }}</strong></div>
+            <div><small style="color:var(--text-tertiary)">{{ $t('ops.activities_label_new_customers') }}</small><br><strong>{{ c.newCustomers }}</strong></div>
           </div>
           <div class="progress-bar"><div class="progress-fill" :style="{width:c.progress}"></div></div>
           <small style="color:var(--text-tertiary)">{{ c.dateRange }}</small>

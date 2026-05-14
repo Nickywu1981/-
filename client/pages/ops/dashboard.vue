@@ -1,7 +1,7 @@
 <!-- 运营后台仪表盘 -->
 <template>
   <div class="pg">
-    <PageHeader title="运营看板" subtitle="核心运营数据一览" />
+    <PageHeader :title="$t('ops.dashboard_title')" :subtitle="$t('ops.dashboard_subtitle')" />
 
     <div class="stat-grid">
       <StatsCard v-for="kpi in kpis" :key="kpi.key" :value="kpi.value" :label="kpi.label" :trend="kpi.change" :trend-up="kpi.up" />
@@ -9,15 +9,15 @@
 
     <div class="dashboard-grid" style="margin-top: var(--space-6)">
       <div class="chart-card col-6">
-        <div class="chart-card-header"><span class="chart-card-title">DAU / MAU</span></div>
-        <div class="chart-card-body" style="min-height:220px;display:flex;align-items:center;justify-content:center;color:var(--text-tertiary);">📈 活跃用户趋势 — 待接入</div>
+        <div class="chart-card-header"><span class="chart-card-title">{{ $t('ops.dashboard_chart_dau') }}</span></div>
+        <div class="chart-card-body" style="min-height:220px;display:flex;align-items:center;justify-content:center;color:var(--text-tertiary);">{{ $t('ops.dashboard_placeholder_active_users') }}</div>
       </div>
       <div class="chart-card col-6">
-        <div class="chart-card-header"><span class="chart-card-title">转化漏斗</span></div>
-        <div class="chart-card-body" style="min-height:220px;display:flex;align-items:center;justify-content:center;color:var(--text-tertiary);">📊 漏斗图 — 待接入</div>
+        <div class="chart-card-header"><span class="chart-card-title">{{ $t('ops.dashboard_chart_funnel') }}</span></div>
+        <div class="chart-card-body" style="min-height:220px;display:flex;align-items:center;justify-content:center;color:var(--text-tertiary);">{{ $t('ops.dashboard_placeholder_funnel') }}</div>
       </div>
       <div class="chart-card col-6">
-        <div class="chart-card-header"><span class="chart-card-title">进行中活动</span></div>
+        <div class="chart-card-header"><span class="chart-card-title">{{ $t('ops.dashboard_chart_campaigns') }}</span></div>
         <div class="chart-card-body">
           <div v-for="c in campaigns" :key="c.name" style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border-light);">
             <div><div style="font-size:14px;font-weight:500;">{{ c.name }}</div><div style="font-size:12px;color:var(--text-tertiary);">{{ c.date }}</div></div>
@@ -26,8 +26,8 @@
         </div>
       </div>
       <div class="chart-card col-6">
-        <div class="chart-card-header"><span class="chart-card-title">内容发布统计</span></div>
-        <div class="chart-card-body" style="min-height:220px;display:flex;align-items:center;justify-content:center;color:var(--text-tertiary);">📊 内容统计 — 待接入</div>
+        <div class="chart-card-header"><span class="chart-card-title">{{ $t('ops.dashboard_chart_content') }}</span></div>
+        <div class="chart-card-body" style="min-height:220px;display:flex;align-items:center;justify-content:center;color:var(--text-tertiary);">{{ $t('ops.dashboard_placeholder_content') }}</div>
       </div>
     </div>
   </div>
@@ -37,11 +37,12 @@
 import PageHeader from '~/components/shared/PageHeader.vue'
 import StatsCard from '~/components/shared/StatsCard.vue'
 
+const { t } = useI18n()
 const kpis = [
-  { key: 'dau', value: '8,429', label: '日活跃用户', change: '+12.5%', up: true },
-  { key: 'mau', value: '45,280', label: '月活跃用户', change: '+18.2%', up: true },
-  { key: 'conversion', value: '4.8%', label: '付费转化率', change: '+0.3%', up: true },
-  { key: 'revenue', value: '¥284,960', label: '本月营收', change: '+8.1%', up: true },
+  { key: 'dau', value: '8,429', label: t('ops.dashboard_kpi_dau'), change: '+12.5%', up: true },
+  { key: 'mau', value: '45,280', label: t('ops.dashboard_kpi_mau'), change: '+18.2%', up: true },
+  { key: 'conversion', value: '4.8%', label: t('ops.dashboard_kpi_conversion'), change: '+0.3%', up: true },
+  { key: 'revenue', value: '¥284,960', label: t('ops.dashboard_kpi_revenue'), change: '+8.1%', up: true },
 ]
 
 const campaigns = [
