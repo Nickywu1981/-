@@ -106,6 +106,23 @@ const MAPPINGS = [
   ['background', '#fce4ec', 'var(--danger-light)'],
   ['background', '#fff3cd', 'var(--warning-light)'],
   ['background', '#dcfce7', 'var(--success-light)'],
+
+  // ── Additional colors from second-pass analysis ──
+  ['color', '#9ca3af', 'var(--text-muted)'],
+  ['color', '#909399', 'var(--text-muted)'],
+  ['color', '#409eff', 'var(--info)'],
+  ['color', '#f56c6c', 'var(--danger)'],
+  ['color', '#F56C6C', 'var(--danger)'],
+  ['border-color', '#ccc', 'var(--border-light)'],
+  ['border-color', '#eee', 'var(--border-light)'],
+  ['color', '#94e2d5', 'var(--success)'],
+  ['background', '#94e2d5', 'var(--success-light)'],
+  ['background-color', '#94e2d5', 'var(--success-light)'],
+  ['fill', '#9ca3af', 'var(--text-muted)'],
+  ['fill', '#909399', 'var(--text-muted)'],
+  ['stroke', '#9ca3af', 'var(--text-muted)'],
+  ['stroke', '#ccc', 'var(--border-light)'],
+  ['stroke', '#eee', 'var(--border-light)'],
 ];
 
 // Patterns to skip (keep hex in these contexts)
