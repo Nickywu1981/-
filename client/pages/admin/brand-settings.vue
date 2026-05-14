@@ -5,13 +5,13 @@
     <div v-else class="form-wrap">
       <div class="section">
         <h3>品牌信息</h3>
-        <div class="form-group"><label>品牌名称</label><input v-model="form.brand_name" maxlength="100" class="input" placeholder="如：Movio AI" /></div>
+        <div class="form-group"><label>品牌{{ $t('common.name') }}</label><input v-model="form.brand_name" maxlength="100" class="input" placeholder="如：Movio AI" /></div>
         <div class="form-group"><label>Logo URL</label><input v-model="form.logo_url" maxlength="500" class="input" placeholder="https://..." /></div>
         <div class="form-group"><label>品牌主色</label><div class="color-row"><input v-model="form.primary_color" type="color" class="color-picker" /><code class="color-code">{{ form.primary_color }}</code></div></div>
       </div>
       <div class="section">
-        <h3>水印设置</h3>
-        <div class="form-group"><label class="switch-label"><input v-model="form.watermark_enabled" type="checkbox" /><span>启用水印</span></label></div>
+        <h3>水印{{ $t('common.settings') }}</h3>
+        <div class="form-group"><label class="switch-label"><input v-model="form.watermark_enabled" type="checkbox" /><span>{{ $t('common.statusEnabled') }}水印</span></label></div>
         <div class="form-group"><label>水印透明度 ({{ form.watermark_opacity }}%)</label><input v-model.number="form.watermark_opacity" type="range" min="10" max="100" class="range-input" /></div>
         <div class="form-group"><label>水印位置</label>
           <select v-model="form.watermark_position" class="input">

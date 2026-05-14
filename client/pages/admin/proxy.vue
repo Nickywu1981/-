@@ -8,11 +8,11 @@
     <div class="toolbar">
       <input v-model="keyword" type="text" placeholder="搜索名称 / 编码 / URL" @keyup.enter="search" />
       <select v-model="filterStatus" class="sel" @change="search">
-        <option value="">全部状态</option>
-        <option value="1">启用</option>
+        <option value="">全部{{ $t('common.status') }}</option>
+        <option value="1">{{ $t('common.statusEnabled') }}</option>
         <option value="0">停用</option>
       </select>
-      <button class="btn" @click="search">搜索</button>
+      <button class="btn" @click="search">{{ $t('common.search') }}</button>
     </div>
 
     <LoadingSkeleton v-if="loading" type="table" :rows="5" :cols="9" />
@@ -26,7 +26,7 @@
     <template v-else-if="list.length">
       <div class="table-wrap">
         <table>
-          <thead><tr><th>ID</th><th>名称</th><th>编码</th><th>上游URL</th><th>方法</th><th>鉴权</th><th>超时</th><th>状态</th><th>操作</th></tr></thead>
+          <thead><tr><th>ID</th><th>{{ $t('common.name') }}</th><th>编码</th><th>上游URL</th><th>方法</th><th>鉴权</th><th>超时</th><th>{{ $t('common.status') }}</th><th>{{ $t('common.actions') }}</th></tr></thead>
           <tbody>
             <tr v-for="p in list" :key="p.id">
               <td>{{ p.id }}</td><td>{{ p.name }}</td><td>{{ p.proxy_code }}</td>
@@ -35,9 +35,9 @@
               <td>{{ p.timeout_ms }}ms</td>
               <td><span :class="p.status===1?'badge-ok':'badge-off'">{{ p.status===1?'启用':'停用' }}</span></td>
               <td class="actions">
-                <button class="btn-sm" @click="openEdit(p)">编辑</button>
+                <button class="btn-sm" @click="openEdit(p)">{{ $t('common.edit') }}</button>
                 <button class="btn-sm" @click="toggleStatus(p)">{{ p.status===1?'停用':'启用' }}</button>
-                <button class="btn-sm danger" @click="delProxy(p.id)">删除</button>
+                <button class="btn-sm danger" @click="delProxy(p.id)">{{ $t('common.delete') }}</button>
               </td>
             </tr>
           </tbody>
@@ -52,7 +52,7 @@
         <div class="modal">
           <h3>{{ isEdit ? '编辑代理' : '新建代理' }}</h3>
           <div class="form-grid">
-            <label>名称 <input v-model="form.name" maxlength="100" placeholder="代理名称" /></label>
+            <label>{{ $t('common.name') }} <input v-model="form.name" maxlength="100" placeholder="代理名称" /></label>
             <label>编码 <input v-model="form.proxy_code" maxlength="50" placeholder="唯一标识" /></label>
             <label class="full">上游URL <input v-model="form.upstream_url" maxlength="500" placeholder="https://api.example.com/v1" /></label>
             <label>请求方法
@@ -66,12 +66,12 @@
               </select>
             </label>
             <label>超时(ms) <input v-model.number="form.timeout_ms" type="number" min="1" /></label>
-            <label>状态
-              <select v-model="form.status"><option :value="1">启用</option><option :value="0">停用</option></select>
+            <label>{{ $t('common.status') }}
+              <select v-model="form.status"><option :value="1">{{ $t('common.statusEnabled') }}</option><option :value="0">停用</option></select>
             </label>
           </div>
           <div class="modal-actions">
-            <button class="btn-cancel" @click="modalOpen = false">取消</button>
+            <button class="btn-cancel" @click="modalOpen = false">{{ $t('common.cancel') }}</button>
             <button class="btn-save" :disabled="saving" @click="save">{{ saving ? '保存中...' : '保存' }}</button>
           </div>
         </div>

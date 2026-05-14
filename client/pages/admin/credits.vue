@@ -5,17 +5,17 @@
     <div class="filters">
       <input v-model="filterUserId" type="text" placeholder="用户ID" @keyup.enter="search" />
       <select v-model="filterType" @change="search">
-        <option value="">全部类型</option>
+        <option value="">全部{{ $t('common.type') }}</option>
         <option value="1">充值</option>
         <option value="2">消费</option>
       </select>
       <select v-model="filterStatus" @change="search">
-        <option value="">全部状态</option>
-        <option value="1">已确认</option>
+        <option value="">全部{{ $t('common.status') }}</option>
+        <option value="1">已{{ $t('common.confirm') }}</option>
         <option value="0">冻结中</option>
         <option value="2">已退款</option>
       </select>
-      <button class="btn" @click="search">搜索</button>
+      <button class="btn" @click="search">{{ $t('common.search') }}</button>
     </div>
 
     <LoadingSkeleton v-if="loading" type="table" :rows="5" :cols="10" />
@@ -24,8 +24,8 @@
       <table class="table">
         <thead>
           <tr>
-            <th>ID</th><th>用户ID</th><th>类型</th><th>操作</th><th>变动前</th><th>变动后</th>
-            <th>消耗</th><th>状态</th><th>备注</th><th>时间</th><th>操作</th>
+            <th>ID</th><th>用户ID</th><th>{{ $t('common.type') }}</th><th>{{ $t('common.actions') }}</th><th>变动前</th><th>变动后</th>
+            <th>消耗</th><th>{{ $t('common.status') }}</th><th>{{ $t('common.remark') }}</th><th>{{ $t('common.time') }}</th><th>{{ $t('common.actions') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -55,12 +55,12 @@
     <!-- Refund Dialog -->
     <div v-if="refundDialog.open" class="modal-overlay" @click.self="refundDialog.open = false" @keydown.escape="refundDialog.open = false">
       <div class="modal-box">
-        <h4>确认退款</h4>
+        <h4>{{ $t('common.confirm') }}退款</h4>
         <p class="modal-info">记录 #{{ refundDialog.record?.id }}，消耗 {{ refundDialog.record?.consumed }} 点</p>
         <input v-model="refundDialog.remark" maxlength="500" type="text" placeholder="退款原因（选填）" @keyup.enter="confirmRefund" />
         <div class="modal-actions">
-          <button class="btn-cancel" @click="refundDialog.open = false">取消</button>
-          <button class="btn btn-refund" @click="confirmRefund">确认退款</button>
+          <button class="btn-cancel" @click="refundDialog.open = false">{{ $t('common.cancel') }}</button>
+          <button class="btn btn-refund" @click="confirmRefund">{{ $t('common.confirm') }}退款</button>
         </div>
       </div>
     </div>

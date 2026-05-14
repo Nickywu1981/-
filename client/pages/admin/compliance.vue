@@ -16,7 +16,7 @@
         <div v-for="t in targets" :key="t.code" class="rule-card" @click="viewRules(t)">
           <span class="rule-name">{{ t.name }}</span>
           <span class="rule-counts">🖼 {{ t.imageRuleCount }} 规则 · 📝 {{ t.textRuleCount }} 规则</span>
-          <button class="btn-sm">查看规则</button>
+          <button class="btn-sm">{{ $t('common.view') }}规则</button>
         </div>
       </div>
     </div>

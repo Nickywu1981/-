@@ -3,7 +3,7 @@
     <h2 class="ptitle">{{ $t('admin_prompts.page_title') }}</h2>
 
     <div class="tabs">
-      <button :class="['tab', { active: activeTab === 'all' }]" @click="switchTab('all')">全部模板</button>
+      <button :class="['tab', { active: activeTab === 'all' }]" @click="switchTab('all')">{{ $t('common.all') }}模板</button>
       <button :class="['tab', { active: activeTab === 'review' }]" @click="switchTab('review')">审核队列</button>
     </div>
 
@@ -19,7 +19,7 @@
         <option value="viral-clone">{{ $t('admin_prompts.category_viral_clone') }}</option>
       </select>
       <select v-model="filterIndustry" class="sel" @change="fetchData">
-        <option value="">全部行业</option>
+        <option value="">{{ $t('common.all') }}行业</option>
         <option v-for="ind in industryOptions" :key="ind.key" :value="ind.key">{{ ind.label }}</option>
       </select>
       <select v-model="filterStatus" class="sel" @change="fetchData">
@@ -68,7 +68,7 @@
             <button v-if="t.status === 2" class="btn-sm warn" @click="review(t.id, 3)">{{ $t('admin_prompts.unpublish') }}</button>
             <button v-if="t.status === 3" class="btn-sm" @click="review(t.id, 2)">{{ $t('admin_prompts.publish') }}</button>
             <button v-if="!hasMark(t, 'hot')" class="btn-sm" @click="batchMark([t.id], 'hot', 'add')">热门</button>
-            <button v-if="hasMark(t, 'hot')" class="btn-sm warn" @click="batchMark([t.id], 'hot', 'remove')">取消热门</button>
+            <button v-if="hasMark(t, 'hot')" class="btn-sm warn" @click="batchMark([t.id], 'hot', 'remove')">{{ $t('common.cancel') }}热门</button>
             <button v-if="!hasMark(t, 'default')" class="btn-sm" @click="batchMark([t.id], 'default', 'add')">默认</button>
             <button class="btn-sm danger" @click="confirmDelete(t)">{{ $t('common.delete') }}</button>
           </td>
@@ -118,7 +118,7 @@
             <datalist id="intent-list">
               <option v-for="i in intentIdList" :key="i" :value="i" />
             </datalist>
-            <small style="color:#888; font-size:11px;">与意图ID匹配后可覆盖工作流默认模板。编辑已有模板时不可修改。</small>
+            <small style="color:#888; font-size:11px;">与意图ID匹配后可覆盖工作流默认模板。{{ $t('common.edit') }}已有模板时不可修改。</small>
           </div>
           <div class="form-group">
             <label>行业/标签（逗号分隔）</label>

@@ -16,15 +16,15 @@
         </div>
       </div>
       <div class="section" v-if="exportPerms">
-        <h3>导出权限</h3>
+        <h3>{{ $t('common.export') }}权限</h3>
         <div class="perm-cards">
           <div class="perm-card" :class="{ on: exportPerms.exportHd }">
             <span class="perm-icon">{{ exportPerms.exportHd ? '✅' : '❌' }}</span>
-            <span>高清导出</span>
+            <span>高清{{ $t('common.export') }}</span>
           </div>
           <div class="perm-card" :class="{ on: exportPerms.noWatermark }">
             <span class="perm-icon">{{ exportPerms.noWatermark ? '✅' : '❌' }}</span>
-            <span>无水印导出</span>
+            <span>无水印{{ $t('common.export') }}</span>
           </div>
         </div>
       </div>

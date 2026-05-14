@@ -23,7 +23,7 @@
     <div class="table-wrap" v-else-if="list.length">
     <table class="table">
       <thead>
-        <tr><th>ID</th><th>用户ID</th><th>API路径</th><th>IP地址</th><th>User-Agent</th><th>时间</th><th>操作</th></tr>
+        <tr><th>ID</th><th>用户ID</th><th>API路径</th><th>IP地址</th><th>User-Agent</th><th>{{ $t('common.time') }}</th><th>{{ $t('common.actions') }}</th></tr>
       </thead>
       <tbody>
         <tr v-for="r in list" :key="r.id" :class="{ 'row-suspect': isBotUA(r.user_agent) }">
@@ -52,13 +52,13 @@
         <div class="modal">
           <h3>用户 #{{ checkUserId }} 滥用检测</h3>
           <div class="check-result" :class="checkResult?.error ? '' : (checkResult?.abusing ? 'abusing' : 'normal')">
-            <p v-if="checkResult?.error" class="check-error">❌ 请求失败，请稍后重试</p>
+            <p v-if="checkResult?.error" class="check-error">❌ 请求{{ $t('common.failed') }}，请稍后重试</p>
             <p v-else-if="checkResult === null">检测中...</p>
             <p v-else-if="checkResult.abusing">⚠️ 该用户存在高频滥用行为（60秒内超过30次调用）</p>
             <p v-else>✅ 该用户调用频率正常</p>
           </div>
           <div class="modal-actions">
-            <button class="btn" @click="showCheckModal = false">关闭</button>
+            <button class="btn" @click="showCheckModal = false">{{ $t('common.close') }}</button>
           </div>
         </div>
       </div>

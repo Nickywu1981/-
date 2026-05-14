@@ -1,26 +1,26 @@
 <template>
   <AdminLayout>
-    <h2 class="ptitle">操作日志</h2>
+    <h2 class="ptitle">{{ $t('common.actions') }}日志</h2>
 
     <div class="stats-row" v-if="stats">
       <div class="stat"><span class="sv">{{ stats.total || 0 }}</span><span class="sl">总日志</span></div>
-      <div class="stat"><span class="sv err">{{ stats.errors || 0 }}</span><span class="sl">错误</span></div>
-      <div class="stat"><span class="sv warn">{{ stats.warns || 0 }}</span><span class="sl">警告</span></div>
+      <div class="stat"><span class="sv err">{{ stats.errors || 0 }}</span><span class="sl">{{ $t('common.error') }}</span></div>
+      <div class="stat"><span class="sv warn">{{ stats.warns || 0 }}</span><span class="sl">{{ $t('common.warning') }}</span></div>
     </div>
 
     <div class="filters">
       <input v-model="userId" type="text" placeholder="用户ID" @keyup.enter="fetch" />
       <input v-model="action" type="text" placeholder="操作类型" @keyup.enter="fetch" />
       <select v-model="level" @change="fetch">
-        <option value="">全部级别</option>
+        <option value="">{{ $t('common.all') }}级别</option>
         <option value="info">INFO</option>
         <option value="warn">WARN</option>
         <option value="error">ERROR</option>
       </select>
       <input v-model="dateStart" type="date" @change="fetch" title="开始日期" />
       <input v-model="dateEnd" type="date" @change="fetch" title="结束日期" />
-      <button @click="fetch">搜索</button>
-      <button class="btn-export" @click="exportLogs">导出CSV</button>
+      <button @click="fetch">{{ $t('common.search') }}</button>
+      <button class="btn-export" @click="exportLogs">{{ $t('common.export') }}CSV</button>
     </div>
 
     <LoadingSkeleton v-if="loading" type="table" :rows="6" :cols="7" />
@@ -28,7 +28,7 @@
     <template v-else-if="list.length">
     <div class="table-wrap">
     <table class="table">
-      <thead><tr><th>ID</th><th>用户ID</th><th>操作</th><th>级别</th><th>详情</th><th>IP</th><th>时间</th></tr></thead>
+      <thead><tr><th>ID</th><th>用户ID</th><th>{{ $t('common.actions') }}</th><th>级别</th><th>{{ $t('common.details') }}</th><th>IP</th><th>{{ $t('common.time') }}</th></tr></thead>
       <tbody>
         <tr v-for="l in list" :key="l.id" @click="openDetail(l)" class="clickable">
           <td>{{ l.id }}</td>
@@ -52,13 +52,13 @@
           <h3>日志详情 #{{ detail.id }}</h3>
           <div class="detail-grid">
             <div class="d-item"><span class="dl">用户ID</span><span class="dv">{{ detail.user_id }}</span></div>
-            <div class="d-item"><span class="dl">操作</span><span class="dv">{{ detail.action }}</span></div>
+            <div class="d-item"><span class="dl">{{ $t('common.actions') }}</span><span class="dv">{{ detail.action }}</span></div>
             <div class="d-item"><span class="dl">级别</span><span class="dv"><span :class="levelBadge(detail.level)">{{ detail.level || 'INFO' }}</span></span></div>
             <div class="d-item"><span class="dl">IP</span><span class="dv mono">{{ detail.ip || '-' }}</span></div>
-            <div class="d-item"><span class="dl">时间</span><span class="dv">{{ detail.create_time }}</span></div>
-            <div class="d-item full"><span class="dl">详情</span><pre class="dv-pre">{{ detail.detail || detail.remark || '-' }}</pre></div>
+            <div class="d-item"><span class="dl">{{ $t('common.time') }}</span><span class="dv">{{ detail.create_time }}</span></div>
+            <div class="d-item full"><span class="dl">{{ $t('common.details') }}</span><pre class="dv-pre">{{ detail.detail || detail.remark || '-' }}</pre></div>
           </div>
-          <button class="modal-close" @click="detail = null">关闭</button>
+          <button class="modal-close" @click="detail = null">{{ $t('common.close') }}</button>
         </div>
       </div>
     </Teleport>

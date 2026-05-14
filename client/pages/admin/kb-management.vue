@@ -3,7 +3,7 @@
     <div class="page">
       <div class="page-header">
         <h1>知识库管理</h1>
-        <p>管理 Movio AI 项目知识库，支持语义搜索和 LLM RAG 检索</p>
+        <p>管理 Movio AI 项目知识库，支持语义{{ $t('common.search') }}和 LLM RAG 检索</p>
       </div>
 
       <!-- KB 状态卡片 -->

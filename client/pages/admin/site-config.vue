@@ -3,7 +3,7 @@
     <div class="page">
       <div class="page-header">
         <h1>站点配置</h1>
-        <p>控制用户端页面名称、功能、内容，修改后用户端立即生效</p>
+        <p>控制用户端页面{{ $t('common.name') }}、功能、内容，修改后用户端立即生效</p>
         <button class="btn btn-primary" @click="showAddForm = !showAddForm">{{ showAddForm ? '取消' : '+ 新增配置' }}</button>
       </div>
 
@@ -11,7 +11,7 @@
       <div v-if="showAddForm" class="add-form">
         <input v-model="newConfig.key" maxlength="50" placeholder="配置键名 (如 hero_title)" class="input" />
         <select v-model="newConfig.type" class="input sel">
-          <option value="">请选择类型</option>
+          <option value="">请选择{{ $t('common.type') }}</option>
           <option value="text">text</option>
           <option value="json">json</option>
         </select>
@@ -20,7 +20,7 @@
         <button class="btn btn-primary" :disabled="adding" @click="addConfig">{{ adding ? '添加中...' : '确认添加' }}</button>
       </div>
 
-      <div v-if="loading" class="loading">加载中...</div>
+      <div v-if="loading" class="loading">{{ $t('common.loading') }}</div>
       <div v-else-if="loadError" class="error">
         <p>{{ loadError }}</p>
         <button class="btn btn-primary" @click="fetchConfig">重试</button>
@@ -40,8 +40,8 @@
           <template v-if="editingId !== item.id">
             <div v-if="item.config_type === 'text'" class="value-display">{{ item.config_value }}</div>
             <pre v-else class="value-display json">{{ formatJson(item.config_value) }}</pre>
-            <button class="btn btn-sm" @click="startEdit(item)">编辑</button>
-            <button class="btn btn-sm btn-danger" @click="deleteConfig(item)">删除</button>
+            <button class="btn btn-sm" @click="startEdit(item)">{{ $t('common.edit') }}</button>
+            <button class="btn btn-sm btn-danger" @click="deleteConfig(item)">{{ $t('common.delete') }}</button>
           </template>
 
           <!-- Editing state -->
@@ -56,7 +56,7 @@
             <input v-else v-model="editValue" maxlength="2000" class="input" />
             <div class="edit-actions">
               <button class="btn btn-primary btn-sm" :disabled="saving" @click="save(item)">{{ saving ? '保存中...' : '保存' }}</button>
-              <button class="btn btn-sm" @click="cancelEdit">取消</button>
+              <button class="btn btn-sm" @click="cancelEdit">{{ $t('common.cancel') }}</button>
             </div>
           </template>
         </div>

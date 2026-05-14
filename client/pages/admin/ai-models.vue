@@ -3,7 +3,7 @@
     <div class="admin-page">
       <div class="page-header">
         <h1>AI 模型监控</h1>
-        <button class="refresh-btn" :class="{ spinning: loading }" :disabled="loading" @click="fetchStatus">↻ 刷新</button>
+        <button class="refresh-btn" :class="{ spinning: loading }" :disabled="loading" @click="fetchStatus">↻ {{ $t('common.refresh') }}</button>
       </div>
 
       <div v-if="loading" class="stats-grid">
@@ -33,14 +33,14 @@
                 :disabled="m.state === 'closed'"
                 @click="resetBreaker(key)"
               >
-                重置熔断器
+                {{ $t('common.reset') }}熔断器
               </button>
             </div>
           </div>
         </div>
 
         <div class="info-box">
-          <h3>熔断器状态说明</h3>
+          <h3>熔断器{{ $t('common.status') }}说明</h3>
           <div class="legend">
             <span><span class="dot closed" /> 正常 (closed) — 请求正常通过</span>
             <span><span class="dot open" /> 熔断 (open) — 60秒冷却，拒绝请求</span>

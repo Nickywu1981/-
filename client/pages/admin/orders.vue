@@ -7,12 +7,12 @@
     <div class="filters">
       <input v-model="userId" type="text" placeholder="用户ID" @keyup.enter="search" />
       <select v-model="planType" @change="search">
-        <option value="">全部套餐</option>
+        <option value="">{{ $t('common.all') }}套餐</option>
         <option value="1">月卡</option>
         <option value="2">季卡</option>
         <option value="3">年卡</option>
       </select>
-      <button class="btn" @click="search">搜索</button>
+      <button class="btn" @click="search">{{ $t('common.search') }}</button>
     </div>
 
     <LoadingSkeleton v-if="loading" type="table" :rows="5" :cols="8" />
@@ -22,7 +22,7 @@
         <thead>
           <tr>
             <th>ID</th><th>用户</th><th>套餐</th><th>变动前</th><th>变动后</th>
-            <th>获增点数</th><th>备注</th><th>购买时间</th><th>操作</th>
+            <th>获增点数</th><th>{{ $t('common.remark') }}</th><th>购买{{ $t('common.time') }}</th><th>{{ $t('common.actions') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -36,8 +36,8 @@
             <td class="remark-cell" :title="o.remark">{{ o.remark || '-' }}</td>
             <td class="time">{{ formatDateTime(o.create_time) }}</td>
             <td class="actions">
-              <button class="btn-sm" @click="openDetail(o)">详情</button>
-              <button class="btn-sm danger" @click="confirmDelete(o)">删除</button>
+              <button class="btn-sm" @click="openDetail(o)">{{ $t('common.details') }}</button>
+              <button class="btn-sm danger" @click="confirmDelete(o)">{{ $t('common.delete') }}</button>
             </td>
           </tr>
         </tbody>
@@ -63,8 +63,8 @@
               <div class="detail-item"><span class="dl">变动前积分</span><span class="dv">{{ detail.credit_before }}</span></div>
               <div class="detail-item"><span class="dl">变动后积分</span><span class="dv">{{ detail.credit_after }}</span></div>
               <div class="detail-item"><span class="dl">获增点数</span><span class="dv earn">+{{ Math.abs(detail.consumed) }} 点</span></div>
-              <div class="detail-item"><span class="dl">备注</span><span class="dv">{{ detail.remark || '-' }}</span></div>
-              <div class="detail-item"><span class="dl">购买时间</span><span class="dv">{{ formatDateTime(detail.create_time) }}</span></div>
+              <div class="detail-item"><span class="dl">{{ $t('common.remark') }}</span><span class="dv">{{ detail.remark || '-' }}</span></div>
+              <div class="detail-item"><span class="dl">购买{{ $t('common.time') }}</span><span class="dv">{{ formatDateTime(detail.create_time) }}</span></div>
             </div>
           </div>
         </div>

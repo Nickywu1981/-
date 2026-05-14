@@ -4,13 +4,13 @@
     <div class="filters">
       <input v-model="phone" type="text" placeholder="手机号" @keyup.enter="fetch" />
       <select v-model="result" @change="fetch">
-        <option value="">全部结果</option>
-        <option value="1">发送成功</option>
-        <option value="0">发送失败</option>
+        <option value="">{{ $t('common.all') }}结果</option>
+        <option value="1">发送{{ $t('common.success') }}</option>
+        <option value="0">发送{{ $t('common.failed') }}</option>
       </select>
       <input v-model="startDate" type="date" @change="fetch" />
       <input v-model="endDate" type="date" @change="fetch" />
-      <button @click="fetch">搜索</button>
+      <button @click="fetch">{{ $t('common.search') }}</button>
     </div>
 
     <LoadingSkeleton v-if="loading" type="table" :rows="5" :cols="7" />
@@ -19,7 +19,7 @@
     <div class="table-wrap">
     <table class="table">
       <thead><tr>
-        <th>ID</th><th>模板编码</th><th>手机号</th><th>内容</th><th>结果</th><th>服务商</th><th>时间</th>
+        <th>ID</th><th>模板编码</th><th>手机号</th><th>内容</th><th>结果</th><th>服务商</th><th>{{ $t('common.time') }}</th>
       </tr></thead>
       <tbody>
         <tr v-for="l in list" :key="l.id">

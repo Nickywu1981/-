@@ -16,7 +16,7 @@
         <div class="chart-box"><h3>收入趋势 (7天)</h3><VChart v-if="revenueOption" :option="revenueOption" autoresize /></div>
       </div>
     </template>
-    <div v-else class="empty">加载统计数据失败</div>
+    <div v-else class="empty">加载统计数据{{ $t('common.failed') }}</div>
   </AdminLayout>
 </template>
 

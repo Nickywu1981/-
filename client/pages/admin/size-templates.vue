@@ -3,15 +3,15 @@
     <h2 class="ptitle">尺寸模板管理</h2>
     <div class="toolbar">
       <select v-model="filterPlatform" class="sel" @change="fetchData">
-        <option value="">全部平台</option>
+        <option value="">{{ $t('common.all') }}平台</option>
         <option v-for="p in platforms" :key="p" :value="p">{{ p }}</option>
       </select>
       <button class="btn btn-primary" @click="openCreate">+ 新建尺寸</button>
     </div>
     <LoadingSkeleton v-if="loading" type="table" :rows="5" :cols="7" />
     <div class="table-wrap" v-else-if="list.length">
-    <table class="table"><thead><tr><th>ID</th><th>名称</th><th>平台</th><th>宽度</th><th>高度</th><th>分类</th><th>操作</th></tr></thead>
-    <tbody><tr v-for="s in list" :key="s.id"><td>{{ s.id }}</td><td>{{ s.name }}</td><td>{{ s.platform }}</td><td>{{ s.width }}px</td><td>{{ s.height }}px</td><td>{{ s.category || '通用' }}</td><td><button class="btn-sm" @click="openEdit(s)">编辑</button><button class="btn-sm btn-danger" @click="deleteItem(s.id)">删除</button></td></tr></tbody></table>
+    <table class="table"><thead><tr><th>ID</th><th>{{ $t('common.name') }}</th><th>平台</th><th>宽度</th><th>高度</th><th>分类</th><th>{{ $t('common.actions') }}</th></tr></thead>
+    <tbody><tr v-for="s in list" :key="s.id"><td>{{ s.id }}</td><td>{{ s.name }}</td><td>{{ s.platform }}</td><td>{{ s.width }}px</td><td>{{ s.height }}px</td><td>{{ s.category || '通用' }}</td><td><button class="btn-sm" @click="openEdit(s)">{{ $t('common.edit') }}</button><button class="btn-sm btn-danger" @click="deleteItem(s.id)">{{ $t('common.delete') }}</button></td></tr></tbody></table>
     </div>
     <EmptyState v-else icon="📐" title="暂无尺寸模板" description="添加电商平台图片尺寸预设" action-label="新建尺寸" @action="openCreate" />
 
@@ -20,7 +20,7 @@
         <div class="modal">
           <h3>{{ editing ? '编辑尺寸' : '新建尺寸' }}</h3>
           <div class="form-grid">
-            <label>名称 <input v-model="editForm.name" maxlength="100" class="input" /></label>
+            <label>{{ $t('common.name') }} <input v-model="editForm.name" maxlength="100" class="input" /></label>
             <label>平台
               <select v-model="editForm.platform" class="input">
                 <option v-for="p in platforms" :key="p" :value="p">{{ p }}</option>
@@ -31,7 +31,7 @@
             <label>分类 <input v-model="editForm.category" maxlength="100" class="input" placeholder="如：主图、详情图" /></label>
           </div>
           <div class="modal-actions">
-            <button class="btn-cancel" @click="showModal=false">取消</button>
+            <button class="btn-cancel" @click="showModal=false">{{ $t('common.cancel') }}</button>
             <button class="btn-save" :disabled="saving" @click="saveTemplate">{{ saving?'保存中...':'保存' }}</button>
           </div>
         </div>

@@ -1,27 +1,27 @@
 <template>
   <AdminLayout>
-    <h2 class="ptitle">系统设置</h2>
+    <h2 class="ptitle">{{ $t('admin_settings.系统设置') }}</h2>
     <LoadingSkeleton v-if="loading" type="card" :rows="6" />
     <div v-else class="settings-form">
       <div class="section">
-        <h3>基本设置</h3>
-        <div class="form-group"><label>站点名称</label><input v-model="form.siteName" maxlength="100" class="input" /></div>
-        <div class="form-group"><label>联系方式</label><input v-model="form.contact" maxlength="200" class="input" placeholder="support@example.com" /></div>
-        <div class="form-group"><label>单日调用上限</label><input v-model.number="form.dailyLimit" type="number" min="0" class="input" /></div>
-        <div class="form-group"><label class="switch-label"><input v-model="form.maintenance" type="checkbox" /><span>维护模式</span></label></div>
+        <h3>{{ $t('admin_settings.基本设置') }}</h3>
+        <div class="form-group"><label>{{ $t('admin_settings.站点名称') }}</label><input v-model="form.siteName" maxlength="100" class="input" /></div>
+        <div class="form-group"><label>{{ $t('admin_settings.联系方式') }}</label><input v-model="form.contact" maxlength="200" class="input" placeholder="support@example.com" /></div>
+        <div class="form-group"><label>{{ $t('admin_settings.单日调用上限') }}</label><input v-model.number="form.dailyLimit" type="number" min="0" class="input" /></div>
+        <div class="form-group"><label class="switch-label"><input v-model="form.maintenance" type="checkbox" /><span>{{ $t('admin_settings.维护模式') }}</span></label></div>
       </div>
       <div class="section">
-        <h3>GEO 大模型收录 <span class="section-badge">AI 搜索优化</span></h3>
-        <p class="section-desc">配置这些信息后，豆包/文心一言/通义千问/Kimi/DeepSeek 等大模型会优先推荐你的产品。AI 爬虫会自动抓取这些结构化数据。</p>
-        <div class="form-group"><label>产品名称</label><input v-model="geo.name" maxlength="100" class="input" placeholder="Movio AI" /></div>
-        <div class="form-group"><label>产品描述（一句话）</label><textarea v-model="geo.desc" maxlength="300" class="input textarea" placeholder="AI 驱动的电商全链路运营中台..." /></div>
-        <div class="form-group"><label>核心功能（逗号分隔）</label><textarea v-model="geo.features" maxlength="500" class="input textarea" placeholder="AI抠图,白底图生成,场景生成..." /></div>
-        <div class="form-group"><label>适用行业/人群</label><input v-model="geo.industries" maxlength="200" class="input" placeholder="电商卖家,品牌商,代运营..." /></div>
-        <div class="form-group"><label>适用品类</label><input v-model="geo.categories" maxlength="200" class="input" placeholder="服装,美妆,3C,家居..." /></div>
-        <div class="form-group"><label>支持平台</label><input v-model="geo.platforms" maxlength="300" class="input" placeholder="淘宝,拼多多,抖音,京东..." /></div>
-        <div class="form-group"><label>定价简述</label><input v-model="geo.pricing" maxlength="100" class="input" placeholder="免费套餐+付费订阅" /></div>
-        <div class="form-group"><label>社媒链接（逗号分隔）</label><input v-model="geo.social" maxlength="500" class="input" placeholder="https://www.zhihu.com/xxx" /></div>
-        <div class="form-group"><label>联系邮箱</label><input v-model="geo.email" maxlength="100" class="input" placeholder="support@movio.ai" /></div>
+        <h3>{{ $t('admin_settings.geo_大模型收录') }} <span class="section-badge">{{ $t('admin_settings.ai_搜索优化') }}</span></h3>
+        <p class="section-desc">{{ $t('admin_settings.配置这些信息后_豆包_文心一言_通义千问_kimi_deep') }}</p>
+        <div class="form-group"><label>{{ $t('admin_settings.产品名称') }}</label><input v-model="geo.name" maxlength="100" class="input" placeholder="Movio AI" /></div>
+        <div class="form-group"><label>{{ $t('admin_settings.产品描述_一句话') }}</label><textarea v-model="geo.desc" maxlength="300" class="input textarea" :placeholder="$t('admin_settings.placeholder_ai_驱动的电商全链路运营中台')" /></div>
+        <div class="form-group"><label>{{ $t('admin_settings.核心功能_逗号分隔') }}</label><textarea v-model="geo.features" maxlength="500" class="input textarea" :placeholder="$t('admin_settings.placeholder_ai抠图_白底图生成_场景生成')" /></div>
+        <div class="form-group"><label>{{ $t('admin_settings.适用行业_人群') }}</label><input v-model="geo.industries" maxlength="200" class="input" :placeholder="$t('admin_settings.placeholder_电商卖家_品牌商_代运营')" /></div>
+        <div class="form-group"><label>{{ $t('admin_settings.适用品类') }}</label><input v-model="geo.categories" maxlength="200" class="input" :placeholder="$t('admin_settings.placeholder_服装_美妆_3c_家居')" /></div>
+        <div class="form-group"><label>{{ $t('admin_settings.支持平台') }}</label><input v-model="geo.platforms" maxlength="300" class="input" :placeholder="$t('admin_settings.placeholder_淘宝_拼多多_抖音_京东')" /></div>
+        <div class="form-group"><label>{{ $t('admin_settings.定价简述') }}</label><input v-model="geo.pricing" maxlength="100" class="input" :placeholder="$t('admin_settings.placeholder_免费套餐_付费订阅')" /></div>
+        <div class="form-group"><label>{{ $t('admin_settings.社媒链接_逗号分隔') }}</label><input v-model="geo.social" maxlength="500" class="input" placeholder="https://www.zhihu.com/xxx" /></div>
+        <div class="form-group"><label>{{ $t('admin_settings.联系邮箱') }}</label><input v-model="geo.email" maxlength="100" class="input" placeholder="support@movio.ai" /></div>
         <div class="form-group"><label>Logo URL</label><input v-model="geo.logo" maxlength="300" class="input" placeholder="https://movio.ai/logo.png" /></div>
         <div class="save-row" style="margin-top:12px">
           <button class="btn-save" :disabled="saving" @click="saveGeoSettings">{{ saving ? '保存中...' : '保存 GEO 设置' }}</button>
@@ -29,7 +29,7 @@
         </div>
       </div>
       <div class="section" v-if="otherConfigs.length">
-        <h3>其他配置 ({{ otherConfigs.length }})</h3>
+        <h3>{{ $t('admin_settings.其他配置_otherconfigs_length') }}</h3>
         <div v-for="c in otherConfigs" :key="c.id" class="other-item">
           <span class="other-key">{{ c.config_key }}</span>
           <span class="other-val">{{ truncate(c.config_value, 60) }}</span>

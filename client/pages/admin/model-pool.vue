@@ -16,17 +16,17 @@
     <!-- 操作栏 -->
     <div class="toolbar">
       <select v-model="filterCategory">
-        <option value="">全部类别</option>
+        <option value="">{{ $t('common.all') }}类别</option>
         <option v-for="cat in categories" :key="cat.key" :value="cat.key">{{ cat.label }}</option>
       </select>
-      <button class="btn-primary" @click="refreshPool">刷新模型池</button>
+      <button class="btn-primary" @click="refreshPool">{{ $t('common.refresh') }}模型池</button>
     </div>
 
     <!-- 模型列表 -->
     <table class="model-table" v-if="filteredModels.length">
       <thead>
         <tr>
-          <th>模型标识</th><th>名称</th><th>厂商</th><th>类别</th><th>权重</th><th>灰度%</th><th>状态</th><th>操作</th>
+          <th>模型标识</th><th>{{ $t('common.name') }}</th><th>厂商</th><th>类别</th><th>权重</th><th>灰度%</th><th>{{ $t('common.status') }}</th><th>{{ $t('common.actions') }}</th>
         </tr>
       </thead>
       <tbody>

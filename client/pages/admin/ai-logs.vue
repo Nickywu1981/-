@@ -4,20 +4,20 @@
 
     <div class="stats-row">
       <div class="stat"><span class="sv">{{ stats.totalCalls || 0 }}</span><span class="sl">总调用</span></div>
-      <div class="stat"><span class="sv ok">{{ stats.successCalls || 0 }}</span><span class="sl">成功</span></div>
-      <div class="stat"><span class="sv err">{{ stats.failCalls || 0 }}</span><span class="sl">失败</span></div>
+      <div class="stat"><span class="sv ok">{{ stats.successCalls || 0 }}</span><span class="sl">{{ $t('common.success') }}</span></div>
+      <div class="stat"><span class="sv err">{{ stats.failCalls || 0 }}</span><span class="sl">{{ $t('common.failed') }}</span></div>
       <div class="stat"><span class="sv">{{ stats.totalTokens ? (stats.totalTokens / 1000).toFixed(1) + 'K' : '-' }}</span><span class="sl">总Token</span></div>
       <div class="stat"><span class="sv">{{ stats.avgDuration || '-' }}ms</span><span class="sl">平均耗时</span></div>
     </div>
 
     <div class="toolbar">
       <select v-model="filterStatus" class="sel" @change="fetchData">
-        <option value="">全部状态</option>
-        <option value="1">成功</option>
-        <option value="0">失败</option>
+        <option value="">全部{{ $t('common.status') }}</option>
+        <option value="1">{{ $t('common.success') }}</option>
+        <option value="0">{{ $t('common.failed') }}</option>
       </select>
       <select v-model="filterModel" class="sel" @change="fetchData">
-        <option value="">全部模型</option>
+        <option value="">{{ $t('common.all') }}模型</option>
         <option value="gpt-4o">GPT-4o</option>
         <option value="dall-e-3">DALL-E 3</option>
         <option value="sora">Sora</option>
@@ -25,7 +25,7 @@
       </select>
       <input v-model="dateStart" type="date" @change="fetchData" title="开始日期" />
       <input v-model="dateEnd" type="date" @change="fetchData" title="结束日期" />
-      <button class="btn btn-refresh" @click="fetchData">刷新</button>
+      <button class="btn btn-refresh" @click="fetchData">{{ $t('common.refresh') }}</button>
     </div>
 
     <LoadingSkeleton v-if="loading" type="table" :rows="5" :cols="8" />
@@ -35,7 +35,7 @@
     <div class="table-wrap" v-else-if="list.length">
     <table class="table">
       <thead>
-        <tr><th>ID</th><th>用户</th><th>模型</th><th>输入</th><th>输出</th><th>耗时</th><th>状态</th><th>操作</th><th>时间</th></tr>
+        <tr><th>ID</th><th>用户</th><th>模型</th><th>输入</th><th>输出</th><th>耗时</th><th>{{ $t('common.status') }}</th><th>{{ $t('common.actions') }}</th><th>{{ $t('common.time') }}</th></tr>
       </thead>
       <tbody>
         <tr v-for="log in list" :key="log.id">
@@ -43,7 +43,7 @@
           <td>{{ log.prompt_tokens || '-' }}</td><td>{{ log.response_tokens || '-' }}</td>
           <td>{{ log.duration_ms ? log.duration_ms + 'ms' : '-' }}</td>
           <td><span :class="log.status===1?'s-ok':'s-fail'">{{ log.status===1?'成功':'失败' }}</span></td>
-          <td><button class="btn-sm" @click="openDetail(log)">详情</button></td>
+          <td><button class="btn-sm" @click="openDetail(log)">{{ $t('common.details') }}</button></td>
           <td class="time">{{ log.create_time?.slice(0,16) }}</td>
         </tr>
       </tbody>
@@ -51,7 +51,7 @@
     </div>
 
     <Pagination v-if="total>pageSize" :page="page" :page-size="pageSize" :total="total" @change="onPageChange" />
-    <div v-if="!list.length && !loading" class="empty">暂无数据</div>
+    <div v-if="!list.length && !loading" class="empty">{{ $t('common.noData') }}</div>
 
     <Teleport to="body">
       <div v-if="detail" class="modal-overlay" @click.self="detail = null" @keydown.escape="detail = null">
@@ -60,17 +60,17 @@
           <div class="dg">
             <div class="di"><span class="dl">模型</span><span class="dv">{{ detail.model_name }}</span></div>
             <div class="di"><span class="dl">用户ID</span><span class="dv">{{ detail.user_id }}</span></div>
-            <div class="di"><span class="dl">状态</span><span class="dv"><span :class="detail.status===1?'s-ok':'s-fail'">{{ detail.status===1?'成功':'失败' }}</span></span></div>
+            <div class="di"><span class="dl">{{ $t('common.status') }}</span><span class="dv"><span :class="detail.status===1?'s-ok':'s-fail'">{{ detail.status===1?'成功':'失败' }}</span></span></div>
             <div class="di"><span class="dl">输入Token</span><span class="dv">{{ detail.prompt_tokens }}</span></div>
             <div class="di"><span class="dl">输出Token</span><span class="dv">{{ detail.response_tokens }}</span></div>
             <div class="di"><span class="dl">耗时</span><span class="dv">{{ detail.duration_ms }}ms</span></div>
-            <div class="di"><span class="dl">结果类型</span><span class="dv">{{ detail.result_type || '-' }}</span></div>
-            <div class="di"><span class="dl">时间</span><span class="dv">{{ detail.create_time }}</span></div>
+            <div class="di"><span class="dl">结果{{ $t('common.type') }}</span><span class="dv">{{ detail.result_type || '-' }}</span></div>
+            <div class="di"><span class="dl">{{ $t('common.time') }}</span><span class="dv">{{ detail.create_time }}</span></div>
             <div class="di full"><span class="dl">输入内容</span><pre class="pre">{{ detail.prompt_text || '-' }}</pre></div>
             <div class="di full" v-if="detail.response_text"><span class="dl">输出内容</span><pre class="pre">{{ detail.response_text }}</pre></div>
-            <div class="di full" v-if="detail.error_msg"><span class="dl">错误信息</span><pre class="pre err">{{ detail.error_msg }}</pre></div>
+            <div class="di full" v-if="detail.error_msg"><span class="dl">{{ $t('common.error') }}信息</span><pre class="pre err">{{ detail.error_msg }}</pre></div>
           </div>
-          <button class="modal-close" @click="detail = null">关闭</button>
+          <button class="modal-close" @click="detail = null">{{ $t('common.close') }}</button>
         </div>
       </div>
     </Teleport>
