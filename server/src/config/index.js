@@ -177,6 +177,37 @@ const config = {
     cdnBaseUrl: process.env.CDN_BASE_URL || '',
   },
 
+  // 云存储后端配置 (storageService)
+  storage: {
+    backend: process.env.STORAGE_BACKEND || 'local',
+    cos: {
+      secretId: process.env.COS_SECRET_ID || '',
+      secretKey: process.env.COS_SECRET_KEY || '',
+      bucket: process.env.COS_BUCKET || '',
+      region: process.env.COS_REGION || 'ap-guangzhou',
+    },
+    oss: {
+      accessKeyId: process.env.OSS_ACCESS_KEY_ID || '',
+      accessKeySecret: process.env.OSS_ACCESS_KEY_SECRET || '',
+      bucket: process.env.OSS_BUCKET || '',
+      endpoint: process.env.OSS_ENDPOINT || '',
+    },
+    s3: {
+      accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
+      secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
+      bucket: process.env.S3_BUCKET || '',
+      region: process.env.S3_REGION || 'us-east-1',
+      endpoint: process.env.S3_ENDPOINT || '',
+    },
+    minio: {
+      accessKey: process.env.MINIO_ACCESS_KEY || '',
+      secretKey: process.env.MINIO_SECRET_KEY || '',
+      bucket: process.env.MINIO_BUCKET || '',
+      endpoint: process.env.MINIO_ENDPOINT || 'http://localhost:9000',
+      useSSL: process.env.MINIO_USE_SSL === 'true',
+    },
+  },
+
   security: {
     encryptionKey: process.env.ENCRYPTION_KEY || '',
     // 内容安全
@@ -401,6 +432,7 @@ export const aiTimeoutMs = config.aiTimeoutMs;
 export const requestTimeoutMs = config.requestTimeoutMs;
 export const { worker: workerConfig } = config;
 export const { upload: uploadConfig } = config;
+export const { storage: storageConfig } = config;
 export const { security: securityConfig } = config;
 export const { ecommercePipeline: ecommercePipelineConfig } = config;
 export const { e2b: e2bConfig } = config;
