@@ -2,14 +2,14 @@
   <div class="favorites-page">
     <div class="page-header">
       <div>
-        <h1>我的收藏</h1>
-        <p class="subtitle">{{ total }} 个收藏项</p>
+        <h1>{{ $t('my.favorites.title') }}</h1>
+        <p class="subtitle">{{ $t('my.favorites.count', { n: total }) }}</p>
       </div>
       <div class="header-actions">
-        <button class="btn-outline" @click="activeTab = 'all'" :class="{ active: activeTab === 'all' }">全部</button>
-        <button class="btn-outline" @click="activeTab = 'image'" :class="{ active: activeTab === 'image' }">图片</button>
-        <button class="btn-outline" @click="activeTab = 'video'" :class="{ active: activeTab === 'video' }">视频</button>
-        <button class="btn-outline" @click="activeTab = 'prompt'" :class="{ active: activeTab === 'prompt' }">提示词</button>
+        <button class="btn-outline" @click="activeTab = 'all'" :class="{ active: activeTab === 'all' }">{{ $t('my.favorites.tab_all') }}</button>
+        <button class="btn-outline" @click="activeTab = 'image'" :class="{ active: activeTab === 'image' }">{{ $t('my.favorites.tab_image') }}</button>
+        <button class="btn-outline" @click="activeTab = 'video'" :class="{ active: activeTab === 'video' }">{{ $t('my.favorites.tab_video') }}</button>
+        <button class="btn-outline" @click="activeTab = 'prompt'" :class="{ active: activeTab === 'prompt' }">{{ $t('my.favorites.tab_prompt') }}</button>
       </div>
     </div>
 
@@ -18,13 +18,13 @@
     <div v-else-if="error" class="error-state">
       <span class="error-icon">⚠️</span>
       <p>{{ error }}</p>
-      <button class="btn-outline" @click="fetchFavorites">重试</button>
+      <button class="btn-outline" @click="fetchFavorites">{{ $t('my.favorites.retry') }}</button>
     </div>
 
     <div v-else-if="filtered.length === 0" class="empty-state">
       <span class="empty-icon">💾</span>
-      <p>还没有收藏任何内容</p>
-      <NuxtLink to="/workbench" class="btn-primary">去发现</NuxtLink>
+      <p>{{ $t('my.favorites.empty') }}</p>
+      <NuxtLink to="/workbench" class="btn-primary">{{ $t('my.favorites.go_discover') }}</NuxtLink>
     </div>
 
     <div v-else class="favorites-grid">
@@ -32,7 +32,7 @@
         <div class="card-preview">
           <img v-if="item.thumbnail" :src="item.thumbnail" :alt="item.title" @error="onImgError" />
           <span v-else class="card-placeholder">{{ item.type === 'video' ? '🎬' : '🖼️' }}</span>
-          <button class="card-remove" title="取消收藏" aria-label="取消收藏" @click.stop="removeFavorite(item.id)">×</button>
+          <button class="card-remove" :title="$t('my.favorites.unfavorite')" :aria-label="$t('my.favorites.unfavorite')" @click.stop="removeFavorite(item.id)">×</button>
         </div>
         <div class="card-body">
           <span class="card-type">{{ typeLabel(item.type) }}</span>
@@ -43,9 +43,9 @@
     </div>
 
     <div v-if="total > pageSize" class="pagination">
-      <button :disabled="page === 1" @click="page--">上一页</button>
+      <button :disabled="page === 1" @click="page--">{{ $t('my.favorites.prev_page') }}</button>
       <span>{{ page }} / {{ Math.ceil(total / pageSize) }}</span>
-      <button :disabled="page >= Math.ceil(total / pageSize)" @click="page++">下一页</button>
+      <button :disabled="page >= Math.ceil(total / pageSize)" @click="page++">{{ $t('my.favorites.next_page') }}</button>
     </div>
   </div>
 </template>
@@ -69,7 +69,7 @@ const filtered = computed(() => {
   return items.value.filter((i: any) => i.type === activeTab.value)
 })
 
-const typeLabel = (t: string) => ({ image: '图片', video: '视频', prompt: '提示词' }[t] || t)
+const typeLabel = (type: string) => ({ image: t('my.favorites.type_image'), video: t('my.favorites.type_video'), prompt: t('my.favorites.type_prompt') }[type] || type)
 
 const fetchFavorites = async () => {
   loading.value = true

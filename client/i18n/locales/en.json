@@ -3145,7 +3145,36 @@
     "placeholder_slug": "[EN] 如：double-11",
     "label_page_type": "[EN] 页面类型",
     "cancel_btn": "[EN] 取消",
-    "create_btn": "[EN] 创建"
+    "create_btn": "[EN] 创建",
+    "editor_back": "← Back",
+    "editor_untitled": "Untitled Page",
+    "editor_undo": "Undo",
+    "editor_undo_hint": "Undo Ctrl+Z",
+    "editor_redo": "Redo",
+    "editor_redo_hint": "Redo Ctrl+Y",
+    "editor_preview_pc": "Switch to PC preview",
+    "editor_preview_mobile": "Switch to mobile preview",
+    "editor_saving": "Saving...",
+    "editor_save_version": "Save Version",
+    "editor_save": "Save",
+    "editor_version_history": "Version History",
+    "editor_publish": "Publish",
+    "editor_component_library": "Components",
+    "editor_tab_props": "Properties",
+    "editor_tab_layers": "Layers",
+    "editor_props_config": "Properties",
+    "editor_prop_component_type": "Component Type",
+    "editor_canvas_placeholder": "Drag components here to start building your page",
+    "editor_move_up": "Move up",
+    "editor_move_down": "Move down",
+    "editor_delete_section": "Delete section",
+    "editor_layers_empty": "No layers yet, drag components from the left",
+    "editor_hide": "Hide",
+    "editor_show": "Show",
+    "editor_delete_layer": "Delete",
+    "editor_delete_layer_label": "Delete layer",
+    "editor_click_to_view_props": "Click a component on the canvas or in the layers panel to view its properties",
+    "editor_version_remark": "Version note (optional):"
   },
   "account": {
     "title": "Account",
@@ -7727,5 +7756,24 @@
     "stat_total_tasks": "[EN] 累计任务",
     "stat_month_consumed": "[EN] 本月消耗点数",
     "stats_load_failed": "[EN] 用户统计加载失败"
+  },
+  "my": {
+    "favorites": {
+      "title": "My Favorites",
+      "count": "{n} favorites",
+      "tab_all": "All",
+      "tab_image": "Images",
+      "tab_video": "Videos",
+      "tab_prompt": "Prompts",
+      "retry": "Retry",
+      "empty": "No favorites yet",
+      "go_discover": "Discover",
+      "unfavorite": "Remove",
+      "prev_page": "Prev",
+      "next_page": "Next",
+      "type_image": "Image",
+      "type_video": "Video",
+      "type_prompt": "Prompt"
+    }
   }
 }

@@ -3,27 +3,27 @@
     <!-- 顶部操作栏 -->
     <div class="editor-toolbar">
       <div class="toolbar-left">
-        <button class="btn btn-ghost" @click="$router.back()">← 返回</button>
-        <span class="page-title">{{ pageInfo.title || '未命名页面' }}</span>
+        <button class="btn btn-ghost" @click="$router.back()">{{ $t('diy.editor_back') }}</button>
+        <span class="page-title">{{ pageInfo.title || $t('diy.editor_untitled') }}</span>
         <span class="page-type">({{ pageInfo.page_type }})</span>
       </div>
       <div class="toolbar-right">
-        <button class="btn btn-icon-btn" :disabled="undoStack.length === 0" @click="editor.undo(); dirty=true" title="撤销" aria-label="撤销 Ctrl+Z">↩</button>
-        <button class="btn btn-icon-btn" :disabled="redoStack.length === 0" @click="editor.redo(); dirty=true" title="重做" aria-label="重做 Ctrl+Y">↪</button>
-        <button class="btn btn-outline btn-sm" @click="previewMode = previewMode === 'mobile' ? 'pc' : 'mobile'" :title="previewMode === 'mobile' ? '切换到PC预览' : '切换到移动端预览'" :aria-label="previewMode === 'mobile' ? '切换到PC预览' : '切换到移动端预览'">
+        <button class="btn btn-icon-btn" :disabled="undoStack.length === 0" @click="editor.undo(); dirty=true" :title="$t('diy.editor_undo')" :aria-label="$t('diy.editor_undo_hint')">↩</button>
+        <button class="btn btn-icon-btn" :disabled="redoStack.length === 0" @click="editor.redo(); dirty=true" :title="$t('diy.editor_redo')" :aria-label="$t('diy.editor_redo_hint')">↪</button>
+        <button class="btn btn-outline btn-sm" @click="previewMode = previewMode === 'mobile' ? 'pc' : 'mobile'" :title="previewMode === 'mobile' ? $t('diy.editor_preview_pc') : $t('diy.editor_preview_mobile')" :aria-label="previewMode === 'mobile' ? $t('diy.editor_preview_pc') : $t('diy.editor_preview_mobile')">
           {{ previewMode === 'mobile' ? '📱' : '🖥' }}
         </button>
-        <button class="btn btn-outline" :disabled="saving" @click="saveVersion">{{ saving ? '保存中...' : '保存版本' }}</button>
-        <button class="btn btn-outline" :disabled="saving" @click="savePage">{{ saving ? '保存中...' : '保存' }}</button>
-        <button class="btn btn-outline" @click="showVersions = true">版本历史</button>
-        <button class="btn btn-primary" @click="publishPage" :disabled="publishing">发布</button>
+        <button class="btn btn-outline" :disabled="saving" @click="saveVersion">{{ saving ? $t('diy.editor_saving') : $t('diy.editor_save_version') }}</button>
+        <button class="btn btn-outline" :disabled="saving" @click="savePage">{{ saving ? $t('diy.editor_saving') : $t('diy.editor_save') }}</button>
+        <button class="btn btn-outline" @click="showVersions = true">{{ $t('diy.editor_version_history') }}</button>
+        <button class="btn btn-primary" @click="publishPage" :disabled="publishing">{{ $t('diy.editor_publish') }}</button>
       </div>
     </div>
 
     <div class="editor-body">
       <!-- 左侧：组件库 -->
       <div class="left-panel">
-        <h3>组件库</h3>
+        <h3>{{ $t('diy.editor_component_library') }}</h3>
         <div class="component-list">
           <div v-for="cat in componentCats" :key="cat.key" class="comp-category">
             <h4>{{ cat.label }}</h4>
@@ -38,15 +38,15 @@
       <!-- 中间：画布 -->
       <div class="center-canvas" :class="{ 'canvas-pc': previewMode === 'pc' }" @dragover.prevent @drop="onDrop" @click="selectedIdxs = []">
         <div v-if="!sections.length" class="canvas-placeholder">
-          从左侧拖拽组件到这里开始搭建页面
+          {{ $t('diy.editor_canvas_placeholder') }}
         </div>
         <div v-for="(sec, idx) in sections" :key="sec.id" class="canvas-section" :class="{ selected: idx === selectedIdx }" :style="{ order: idx }" @click.stop="selectSection(idx)" draggable="true" @dragstart="onSectionDragStart($event, idx)" @dragover.prevent="onSectionDragOver($event, idx)" @drop.stop="onSectionDrop($event, idx)">
           <div class="section-toolbar">
             <span class="section-label">{{ getCompName(sec.component) }}</span>
             <div>
-              <button class="btn-icon" @click.stop="moveSection(idx, -1)" :disabled="idx===0" aria-label="上移区块">↑</button>
-              <button class="btn-icon" @click.stop="moveSection(idx, 1)" :disabled="idx===sections.length-1" aria-label="下移区块">↓</button>
-              <button class="btn-icon btn-danger" @click.stop="removeSection(idx)" aria-label="删除区块">✕</button>
+              <button class="btn-icon" @click.stop="moveSection(idx, -1)" :disabled="idx===0" :aria-label="$t('diy.editor_move_up')">↑</button>
+              <button class="btn-icon" @click.stop="moveSection(idx, 1)" :disabled="idx===sections.length-1" :aria-label="$t('diy.editor_move_down')">↓</button>
+              <button class="btn-icon btn-danger" @click.stop="removeSection(idx)" :aria-label="$t('diy.editor_delete_section')">✕</button>
             </div>
           </div>
           <div class="section-preview">
@@ -60,15 +60,15 @@
       <!-- 右侧：属性面板 + 图层面板 -->
       <div class="right-panel">
         <div class="panel-tabs">
-          <button :class="{ active: rightTab === 'props' }" @click="rightTab = 'props'">属性</button>
-          <button :class="{ active: rightTab === 'layers' }" @click="rightTab = 'layers'">图层 ({{ sections.length }})</button>
+          <button :class="{ active: rightTab === 'props' }" @click="rightTab = 'props'">{{ $t('diy.editor_tab_props') }}</button>
+          <button :class="{ active: rightTab === 'layers' }" @click="rightTab = 'layers'">{{ $t('diy.editor_tab_layers') }} ({{ sections.length }})</button>
         </div>
 
         <!-- 属性 Tab -->
         <div v-if="rightTab === 'props' && selectedIdx >= 0 && sections[selectedIdx]">
-          <h3>属性配置</h3>
+          <h3>{{ $t('diy.editor_props_config') }}</h3>
           <div class="prop-group">
-            <label>组件类型</label>
+            <label>{{ $t('diy.editor_prop_component_type') }}</label>
             <span class="prop-static">{{ getCompName(sections[selectedIdx].component) }}</span>
           </div>
 
@@ -88,7 +88,7 @@
 
         <!-- 图层 Tab -->
         <div v-if="rightTab === 'layers'" class="layers-panel">
-          <div v-if="!sections.length" class="empty-hint">暂无图层，从左侧拖入组件</div>
+          <div v-if="!sections.length" class="empty-hint">{{ $t('diy.editor_layers_empty') }}</div>
           <div v-for="(sec, idx) in sections" :key="sec.id"
                class="layer-item"
                :class="{ selected: idx === selectedIdx, hidden: !sec.visible }"
@@ -100,16 +100,16 @@
             <div class="layer-handle">⋮⋮</div>
             <span class="layer-icon">{{ getCompIcon(sec.component) }}</span>
             <span class="layer-name">{{ getCompName(sec.component) || sec.component }}</span>
-            <button class="layer-visibility" @click.stop="sec.visible = !sec.visible" :title="sec.visible ? '隐藏' : '显示'">
+            <button class="layer-visibility" @click.stop="sec.visible = !sec.visible" :title="sec.visible ? $t('diy.editor_hide') : $t('diy.editor_show')">
               {{ sec.visible ? '👁' : '👁‍🗨' }}
             </button>
-            <button class="layer-delete" @click.stop="removeSection(idx)" title="删除" aria-label="删除图层">✕</button>
+            <button class="layer-delete" @click.stop="removeSection(idx)" :title="$t('diy.editor_delete_layer')" :aria-label="$t('diy.editor_delete_layer_label')">✕</button>
           </div>
         </div>
 
         <!-- 无选中提示 -->
         <div v-if="rightTab === 'props' && (selectedIdx < 0 || !sections[selectedIdx])" class="empty-hint">
-          <p>点击画布或图层面板中的组件查看属性</p>
+          <p>{{ $t('diy.editor_click_to_view_props') }}</p>
         </div>
       </div>
     </div>
@@ -266,7 +266,7 @@ async function savePage() {
 }
 
 async function saveVersion() {
-  const remark = prompt('版本备注 (可选):')
+  const remark = prompt(t('diy.editor_version_remark'))
   saving.value = true
   try {
     if (previewMode.value === 'mobile') mobileSections.value = structuredClone(sections.value)

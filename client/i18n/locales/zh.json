@@ -3037,7 +3037,36 @@
     "placeholder_slug": "如：double-11",
     "label_page_type": "页面类型",
     "cancel_btn": "取消",
-    "create_btn": "创建"
+    "create_btn": "创建",
+    "editor_back": "← 返回",
+    "editor_untitled": "未命名页面",
+    "editor_undo": "撤销",
+    "editor_undo_hint": "撤销 Ctrl+Z",
+    "editor_redo": "重做",
+    "editor_redo_hint": "重做 Ctrl+Y",
+    "editor_preview_pc": "切换到PC预览",
+    "editor_preview_mobile": "切换到移动端预览",
+    "editor_saving": "保存中...",
+    "editor_save_version": "保存版本",
+    "editor_save": "保存",
+    "editor_version_history": "版本历史",
+    "editor_publish": "发布",
+    "editor_component_library": "组件库",
+    "editor_tab_props": "属性",
+    "editor_tab_layers": "图层",
+    "editor_props_config": "属性配置",
+    "editor_prop_component_type": "组件类型",
+    "editor_canvas_placeholder": "从左侧拖拽组件到这里开始搭建页面",
+    "editor_move_up": "上移区块",
+    "editor_move_down": "下移区块",
+    "editor_delete_section": "删除区块",
+    "editor_layers_empty": "暂无图层，从左侧拖入组件",
+    "editor_hide": "隐藏",
+    "editor_show": "显示",
+    "editor_delete_layer": "删除",
+    "editor_delete_layer_label": "删除图层",
+    "editor_click_to_view_props": "点击画布或图层面板中的组件查看属性",
+    "editor_version_remark": "版本备注 (可选):"
   },
   "account": {
     "title": "账户中心",
@@ -7531,5 +7560,24 @@
     "stat_total_tasks": "累计任务",
     "stat_month_consumed": "本月消耗点数",
     "stats_load_failed": "用户统计加载失败"
+  },
+  "my": {
+    "favorites": {
+      "title": "我的收藏",
+      "count": "{n} 个收藏项",
+      "tab_all": "全部",
+      "tab_image": "图片",
+      "tab_video": "视频",
+      "tab_prompt": "提示词",
+      "retry": "重试",
+      "empty": "还没有收藏任何内容",
+      "go_discover": "去发现",
+      "unfavorite": "取消收藏",
+      "prev_page": "上一页",
+      "next_page": "下一页",
+      "type_image": "图片",
+      "type_video": "视频",
+      "type_prompt": "提示词"
+    }
   }
 }
