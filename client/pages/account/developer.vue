@@ -180,7 +180,7 @@ h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; color: var(--text-pr
 .btn-sm { padding: 6px 14px; font-size: 12px; border-radius: var(--radius-sm); border: 1px solid var(--input-border); background: var(--bg-card); color: var(--text-secondary); cursor: pointer; }
 .btn-sm:hover { border-color: var(--brand); color: var(--brand); }
 .btn-sm.danger { color: var(--danger); border-color: var(--danger); }
-.btn-sm.danger:hover { background: #fee2e2; }
+.btn-sm.danger:hover { background: var(--danger-light); }
 .create-form { border: 1px dashed var(--input-border); border-radius: var(--radius-md); padding: 18px; margin-bottom: 20px; }
 .new-key-box { background: #fefce8; border: 1px solid #facc15; border-radius: var(--radius-md); padding: 18px; margin-bottom: 20px; }
 .new-key-warn { font-size: 13px; color: #92400e; font-weight: 600; margin-bottom: 12px; }
@@ -196,7 +196,7 @@ h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; color: var(--text-pr
 .key-meta { font-size: 11px; color: var(--text-muted); }
 .key-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .status-badge { padding: 2px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; }
-.status-badge.active { background: #dcfce7; color: #166534; }
+.status-badge.active { background: var(--success-light); color: #166534; }
 .status-badge.inactive { background: #f1f5f9; color: #94a3b8; }
 .doc-box { background: #f8fafc; border-radius: var(--radius-md); padding: 16px; font-size: 12px; }
 .doc-box p { color: var(--text-secondary); margin-bottom: 10px; }

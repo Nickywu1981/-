@@ -58,7 +58,7 @@ function handleReserve() {
 
 /* Dark mode */
 :root[data-theme="dark"] .wp-card h2, :root.dark .wp-card h2 { color: #e5e5e5; }
-:root[data-theme="dark"] .wp-card p, :root.dark .wp-card p { color: #9d9da3; }
+:root[data-theme="dark"] .wp-card p, :root.dark .wp-card p { color: var(--text-muted); }
 :root[data-theme="dark"] .wp-detail, :root.dark .wp-detail { color: #7d7d83 !important; }
 :root[data-theme="dark"] .wp-progress-bar, :root.dark .wp-progress-bar { background: #2a2a2a; }
 </style>

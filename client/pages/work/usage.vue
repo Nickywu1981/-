@@ -181,10 +181,10 @@ h1 { font-size: 22px; font-weight: 700; color: var(--text-primary); }
 .table td { padding: 10px 12px; border-bottom: 1px solid var(--table-border); color: var(--text-primary); }
 .empty { text-align: center; color: var(--text-muted); padding: 20px; }
 .badge { padding: 2px 10px; border-radius: 10px; font-size: 11px; font-weight: 500; }
-.badge.done { background: #DCFCE7; color: #16A34A; }
-.badge.processing { background: #DBEAFE; color: #2563EB; }
-.badge.pending { background: #FEF3C7; color: #D97706; }
-.badge.fail { background: #FEE2E2; color: #DC2626; }
+.badge.done { background: var(--success-light); color: #16A34A; }
+.badge.processing { background: var(--info-bg); color: #2563EB; }
+.badge.pending { background: var(--warning-border); color: #D97706; }
+.badge.fail { background: var(--danger-light); color: var(--danger); }
 .mono { font-family: monospace; font-size: 12px; color: var(--text-muted); }
 .time { color: var(--text-muted); font-size: 12px; }
 .error-state { text-align: center; padding: 60px 20px; }

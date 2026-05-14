@@ -287,10 +287,10 @@ onMounted(() => { fetchStats(); fetchList(); });
 .time { font-size: 0.8rem; color: var(--text-secondary); white-space: nowrap; }
 
 .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 500; }
-.badge-success { background: #d1fae5; color: #065f46; }
-.badge-danger { background: #fee2e2; color: #991b1b; }
-.badge-warning { background: #fef3c7; color: #92400e; }
-.badge-info { background: #dbeafe; color: #1e40af; }
+.badge-success { background: var(--success-light); color: #065f46; }
+.badge-danger { background: var(--danger-light); color: #991b1b; }
+.badge-warning { background: var(--warning-border); color: #92400e; }
+.badge-info { background: var(--info-bg); color: #1e40af; }
 .badge-accent { background: #f3e8ff; color: #6b21a8; }
 .badge-default { background: var(--bg-secondary); color: var(--text-secondary); }
 
@@ -319,8 +319,8 @@ onMounted(() => { fetchStats(); fetchList(); });
 .loading-state, .error-state, .empty-state { text-align: center; padding: 48px 0; color: var(--text-secondary); }
 .error-state { color: var(--error-color); }
 .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; border-radius: 8px; font-size: 0.875rem; z-index: 2000; }
-.toast.success { background: #d1fae5; color: #065f46; }
-.toast.error { background: #fee2e2; color: #991b1b; }
+.toast.success { background: var(--success-light); color: #065f46; }
+.toast.error { background: var(--danger-light); color: #991b1b; }
 
 @media (max-width: 768px) {
   .stats-row { grid-template-columns: repeat(2, 1fr); }

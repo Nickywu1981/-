@@ -242,10 +242,10 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 .exp-meta { font-size: 12px; color: var(--text-tertiary); display: flex; gap: 12px; }
 .exp-actions { display: flex; gap: 6px; flex-shrink: 0; }
 .badge { font-size: 11px; padding: 2px 8px; border-radius: 12px; font-weight: 500; }
-.badge-draft { background: #e2e8f0; color: #475569; }
-.badge-running { background: #dcfce7; color: #166534; }
-.badge-paused { background: #fef3c7; color: #92400e; }
-.badge-completed { background: #dbeafe; color: #1e40af; }
+.badge-draft { background: var(--bg-hover); color: #475569; }
+.badge-running { background: var(--success-light); color: #166534; }
+.badge-paused { background: var(--warning-border); color: #92400e; }
+.badge-completed { background: var(--info-bg); color: #1e40af; }
 .results-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-top: 8px; }
 .results-section h2 { margin: 0 0 12px; font-size: 18px; }
 .result-actions { display: flex; gap: 8px; margin-bottom: 16px; }

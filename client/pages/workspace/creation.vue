@@ -312,9 +312,9 @@ function handlePanelGenerate() {
   justify-content: center; gap: 4px; border-right: 1px solid #f0f0ef;
   cursor: pointer; transition: background .15s; flex-shrink: 0;
 }
-.cc-upload-zone:hover { background: #fafaf9; }
-.cc-upload-icon { font-size: 20px; width: 32px; height: 32px; border-radius: 8px; background: #f5f3ff; display: flex; align-items: center; justify-content: center; }
-.cc-upload-label { font-size: 10px; color: #767676; font-weight: 500; }
+.cc-upload-zone:hover { background: var(--bg-page); }
+.cc-upload-icon { font-size: 20px; width: 32px; height: 32px; border-radius: 8px; background: var(--brand-light); display: flex; align-items: center; justify-content: center; }
+.cc-upload-label { font-size: 10px; color: var(--text-secondary); font-weight: 500; }
 
 /* 中间输入区 */
 .cc-input-main { flex: 1; padding: 14px 16px; }
@@ -331,7 +331,7 @@ function handlePanelGenerate() {
 }
 .cc-param-row { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; min-width: 0; }
 .cc-param-sel {
-  background: #f5f5f4; border: 1px solid #ebebea; border-radius: 7px;
+  background: var(--bg-hover); border: 1px solid var(--border-light); border-radius: 7px;
   padding: 7px 28px 7px 10px; font-size: 12.5px; color: #555; cursor: pointer;
   outline: none; font-family: inherit; min-width: 90px;
   appearance: none; -webkit-appearance: none;
@@ -353,10 +353,10 @@ function handlePanelGenerate() {
 .cc-upload-preview { padding: 0 16px 10px; display: flex; gap: 6px; flex-wrap: wrap; }
 .cc-upload-tag {
   display: flex; align-items: center; gap: 4px; padding: 3px 8px 3px 10px;
-  background: #f5f3ff; color: var(--cc-brand); border-radius: 6px; font-size: 11px;
+  background: var(--brand-light); color: var(--cc-brand); border-radius: 6px; font-size: 11px;
 }
 .cc-upload-remove {
-  border: none; background: none; color: #767676; cursor: pointer; font-size: 12px; padding: 0;
+  border: none; background: none; color: var(--text-secondary); cursor: pointer; font-size: 12px; padding: 0;
 }
 
 /* ═══ LAYER 3: 底部子功能横向长方形卡片 ═══ */
@@ -384,7 +384,7 @@ function handlePanelGenerate() {
 
 .cc-sub-card-icon {
   font-size: 22px; width: 40px; height: 40px; border-radius: 8px;
-  background: #f5f3ff; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  background: var(--brand-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
 .cc-sub-card-info { min-width: 0; }
 .cc-sub-card-name { font-size: 13.5px; font-weight: 500; color: var(--cc-tx); }

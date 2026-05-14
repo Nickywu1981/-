@@ -231,7 +231,7 @@ const customParallel = defineModel<boolean>('customParallel', { default: false }
 .tw-params { margin-top: 4px; margin-bottom: 14px; }
 .tw-params summary { font-size: 12px; color: var(--text-muted); cursor: pointer; }
 .tw-params textarea { margin-top: 6px; }
-.param-error { color: #ef4444; font-size: 12px; }
+.param-error { color: var(--danger); font-size: 12px; }
 
 .tw-actions { display: flex; gap: 10px; }
 .btn-run { padding: 10px 28px; background: var(--brand); color: #fff; border: none; border-radius: var(--radius-md); font-size: 14px; font-weight: 600; cursor: pointer; transition: filter var(--transition-fast); display: flex; align-items: center; gap: 8px; }

@@ -136,11 +136,11 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 .breaker-badge {
   font-size: 12px; font-weight: 500; padding: 3px 10px; border-radius: 20px;
 }
-.breaker-badge.closed { background: #DCFCE7; color: #16A34A; }
-.breaker-badge.open { background: #FEE2E2; color: #DC2626; }
-.breaker-badge.half-open { background: #FEF3C7; color: #D97706; }
+.breaker-badge.closed { background: var(--success-light); color: #16A34A; }
+.breaker-badge.open { background: var(--danger-light); color: var(--danger); }
+.breaker-badge.half-open { background: var(--warning-border); color: #D97706; }
 .breaker-badge.unknown { background: #F1F5F9; color: #94A3B8; }
-.fail-count { font-size: 12px; color: #DC2626; }
+.fail-count { font-size: 12px; color: var(--danger); }
 
 .card-actions { display: flex; gap: 8px; }
 .btn-sm {

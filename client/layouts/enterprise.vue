@@ -201,7 +201,7 @@ watch(() => route.path, () => { mobileOpen.value = false })
   background: none; color: rgba(255,255,255,0.5); font-size: 12px; cursor: pointer;
   transition: all var(--transition-fast); font-family: var(--font-sans);
 }
-.ent-logout:hover { border-color: rgba(239,68,68,0.4); color: #ef4444; }
+.ent-logout:hover { border-color: rgba(239,68,68,0.4); color: var(--danger); }
 
 /* ═══ Body ═══ */
 .ent-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }

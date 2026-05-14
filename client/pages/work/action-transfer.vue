@@ -310,9 +310,9 @@ function downloadResult() { if (resultUrl.value) download(resultUrl.value, 'acti
 .child-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
 .child-status { font-size: var(--cfg-font-size-xs); padding: 2px 8px; border-radius: var(--cfg-radius-sm); }
 .child-status.queued { background: var(--cfg-bg-tertiary); color: var(--cfg-text-secondary); }
-.child-status.processing { background: #dbeafe; color: var(--cfg-primary); }
-.child-status.completed { background: #d1fae5; color: var(--cfg-success); }
-.child-status.failed { background: #fee2e2; color: var(--cfg-error); }
+.child-status.processing { background: var(--info-bg); color: var(--cfg-primary); }
+.child-status.completed { background: var(--success-light); color: var(--cfg-success); }
+.child-status.failed { background: var(--danger-light); color: var(--cfg-error); }
 .child-bar { flex: 1; height: 6px; background: var(--cfg-bg-tertiary); border-radius: 3px; overflow: hidden; }
 .child-bar-fill { height: 100%; background: var(--cfg-primary); border-radius: 3px; transition: width 0.3s; }
 .child-pct { font-size: var(--cfg-font-size-xs); color: var(--cfg-text-muted); min-width: 36px; text-align: right; }

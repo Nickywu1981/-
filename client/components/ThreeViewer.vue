@@ -324,7 +324,7 @@ onBeforeUnmount(() => {
   gap: 2px;
   background: transparent;
   border: 1px solid transparent;
-  color: #767676;
+  color: var(--text-secondary);
   padding: 6px 10px;
   border-radius: 8px;
   cursor: pointer;
@@ -344,7 +344,7 @@ onBeforeUnmount(() => {
   justify-content: center;
   background: rgba(26, 26, 46, 0.85);
   z-index: 20;
-  color: #767676;
+  color: var(--text-secondary);
   gap: 12px;
 }
 .viewer-overlay.error { color: #ff6b6b; }
@@ -376,7 +376,7 @@ onBeforeUnmount(() => {
   padding: 6px 12px;
   border-radius: 6px;
   font-size: 12px;
-  color: #767676;
+  color: var(--text-secondary);
   z-index: 10;
 }
 </style>

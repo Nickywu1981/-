@@ -293,7 +293,7 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 .camp-title { font-size: 15px; font-weight: 700; color: var(--text-primary); }
 .camp-badge { font-size: 11px; padding: 2px 8px; border-radius: 10px; }
 .camp-badge.active { background: #e6f7e6; color: #52c41a; }
-.camp-badge.ended { background: #f5f5f5; color: #767676; }
+.camp-badge.ended { background: var(--bg-hover); color: var(--text-secondary); }
 .camp-desc { font-size: 13px; color: var(--text-secondary); margin: 0 0 10px; }
 .camp-progress { font-size: 12px; color: var(--text-secondary); }
 .mini-bar { height: 6px; background: var(--bg-hover); border-radius: 3px; margin-top: 4px; overflow: hidden; }

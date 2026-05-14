@@ -368,5 +368,5 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
   cursor: pointer; transition: border-color var(--transition-fast), color var(--transition-fast);
 }
 :deep(.btn-mini:hover) { border-color: var(--brand); color: var(--brand); }
-:deep(.btn-mini.danger:hover) { border-color: #ef4444; color: #ef4444; }
+:deep(.btn-mini.danger:hover) { border-color: var(--danger); color: var(--danger); }
 </style>

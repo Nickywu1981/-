@@ -313,6 +313,6 @@ function formatSize(bytes: number): string {
 .status.pending { color: var(--cfg-text-muted, #9ca3af); font-size: 12px; }
 .btn-remove { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--cfg-text-muted, #9ca3af); padding: 0 4px; }
 .upload-actions { margin-top: 16px; }
-.resume-banner { margin-top: 12px; padding: 12px; background: #fef3c7; border-radius: 8px; font-size: 14px; display: flex; align-items: center; gap: 8px; justify-content: space-between; }
+.resume-banner { margin-top: 12px; padding: 12px; background: var(--warning-border); border-radius: 8px; font-size: 14px; display: flex; align-items: center; gap: 8px; justify-content: space-between; }
 .btn-resume { padding: 4px 12px; background: var(--cfg-warning, #F59E0B); color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; }
 </style>

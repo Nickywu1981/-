@@ -168,8 +168,8 @@ onMounted(() => fetchBindings())
 .bd-platform { font-size: var(--cfg-font-size-base); font-weight: var(--cfg-font-weight-medium); color: var(--cfg-text-primary); }
 .bd-account { font-size: var(--cfg-font-size-xs); color: var(--cfg-text-muted); }
 .bd-type { font-size: var(--cfg-font-size-xs); padding: 2px 8px; border-radius: var(--cfg-radius-full); }
-.bd-type.shop { background: #dbeafe; color: #2563EB; }
-.bd-type.account { background: #fef3c7; color: #D97706; }
+.bd-type.shop { background: var(--info-bg); color: #2563EB; }
+.bd-type.account { background: var(--warning-border); color: #D97706; }
 
 .bind-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
 .bind-card { padding: 16px; border: 1px solid var(--cfg-border); border-radius: var(--cfg-radius-base); background: var(--cfg-bg-primary); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }

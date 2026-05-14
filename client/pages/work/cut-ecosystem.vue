@@ -305,7 +305,7 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 .work-title { font-size: 13px; font-weight: 500; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .work-meta { display: flex; align-items: center; gap: 8px; }
 .type-tag { font-size: 10px; padding: 1px 6px; border-radius: 4px; background: var(--bg-hover); }
-.type-tag.video { background: #e8f4fd; color: #1a73e8; }
+.type-tag.video { background: #e8f4fd; color: var(--brand); }
 .type-tag.image { background: #fce8e6; color: #d93025; }
 .work-date { font-size: 11px; color: var(--text-muted); }
 

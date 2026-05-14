@@ -124,7 +124,7 @@ onMounted(async () => {
 }
 .plan-badge { padding: 4px 12px; border-radius: var(--cfg-radius-full); font-size: var(--cfg-font-size-sm); font-weight: var(--cfg-font-weight-semibold); }
 .plan-badge.free { background: var(--cfg-bg-tertiary); color: var(--cfg-text-secondary); }
-.plan-badge.paid { background: #d1fae5; color: #059669; }
+.plan-badge.paid { background: var(--success-light); color: #059669; }
 .expire-text { margin-left: 12px; font-size: var(--cfg-font-size-sm); color: var(--cfg-text-muted); }
 
 .assets-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }

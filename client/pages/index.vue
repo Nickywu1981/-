@@ -306,7 +306,7 @@ onUnmounted(() => {
   --lp-text-muted: #b0b0b5;
   --lp-text-tertiary: #8e8e93;
   --lp-card-bg: #fff;
-  --lp-border: #ebebea;
+  --lp-border: var(--border-light);
   --lp-border-hover: #d9d9d7;
   --lp-border-strong: #c5c5c2;
   --lp-bg-subtle: #f5f5f4;

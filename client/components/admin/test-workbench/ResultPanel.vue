@@ -116,7 +116,7 @@ function formatResult(r: any) {
 }
 .result-error-block {
   padding: 12px; background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2);
-  border-radius: var(--radius-md); color: #ef4444; font-size: 13px;
+  border-radius: var(--radius-md); color: var(--danger); font-size: 13px;
 }
 .compare-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
 .compare-card { border: 1px solid var(--border-light); border-radius: var(--radius-md); overflow: hidden; }
@@ -124,7 +124,7 @@ function formatResult(r: any) {
 .compare-dur { font-size: 11px; color: var(--text-muted); padding: 0 12px; }
 .compare-body { padding: 0 12px 12px; }
 .compare-body pre { max-height: 300px; margin: 0; }
-.compare-error { padding: 16px; color: #ef4444; font-size: 13px; }
+.compare-error { padding: 16px; color: var(--danger); font-size: 13px; }
 .pipeline-steps { display: flex; flex-direction: column; gap: 10px; }
 .pipeline-step { border: 1px solid var(--border-light); border-radius: var(--radius-md); overflow: hidden; }
 .pipeline-step.step-ok { border-left: 3px solid #22c55e; }
@@ -135,7 +135,7 @@ function formatResult(r: any) {
 .step-dur { color: var(--text-muted); margin-left: auto; }
 .step-body, .step-error { padding: 10px 12px; }
 .step-body pre { max-height: 250px; margin: 0; }
-.step-error { color: #ef4444; font-size: 12px; }
+.step-error { color: var(--danger); font-size: 12px; }
 .final-result { margin-top: 14px; padding: 14px; background: rgba(124,58,237,0.05); border: 1px solid rgba(124,58,237,0.2); border-radius: var(--radius-md); }
 .final-result h4 { margin: 0 0 8px; font-size: 14px; }
 </style>

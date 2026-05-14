@@ -311,7 +311,7 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 .meta-status { font-size: 11px; padding: 2px 8px; border-radius: 10px; }
 .meta-status.completed { background: #e6f7e6; color: #2e7d32; }
 .meta-status.processing { background: #fff3e0; color: #e65100; }
-.meta-status.failed { background: #fce4ec; color: #c62828; }
+.meta-status.failed { background: var(--danger-light); color: #c62828; }
 .work-actions { padding: 0 12px 12px; }
 .loading, .empty { text-align: center; color: var(--text-tertiary); padding: 40px; }
 .pagination { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 16px; }

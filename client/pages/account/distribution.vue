@@ -263,8 +263,8 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 .member-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--cfg-bg-tertiary); display: flex; align-items: center; justify-content: center; font-size: var(--cfg-font-size-sm); font-weight: var(--cfg-font-weight-semibold); color: var(--cfg-text-secondary); flex-shrink: 0; }
 .member-name { flex: 1; font-size: var(--cfg-font-size-base); color: var(--cfg-text-primary); }
 .member-level { font-size: var(--cfg-font-size-xs); padding: 2px 8px; border-radius: var(--cfg-radius-full); }
-.member-level.level1 { background: #dbeafe; color: #2563EB; }
-.member-level.level2 { background: #fef3c7; color: #D97706; }
+.member-level.level1 { background: var(--info-bg); color: #2563EB; }
+.member-level.level2 { background: var(--warning-border); color: #D97706; }
 .member-date { font-size: var(--cfg-font-size-xs); color: var(--cfg-text-muted); }
 
 .empty-state { padding: 40px; text-align: center; color: var(--cfg-text-muted); font-size: var(--cfg-font-size-base); }
@@ -275,15 +275,15 @@ definePageMeta({ layout: 'workspace', middleware: ['auth'] })
 .comm-info { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
 .comm-amount { font-size: var(--cfg-font-size-base); font-weight: var(--cfg-font-weight-semibold); color: var(--cfg-primary); }
 .comm-level { font-size: var(--cfg-font-size-xs); padding: 1px 6px; border-radius: var(--cfg-radius-sm); }
-.comm-level.level1 { background: #dbeafe; color: #2563EB; }
-.comm-level.level2 { background: #fef3c7; color: #D97706; }
+.comm-level.level1 { background: var(--info-bg); color: #2563EB; }
+.comm-level.level2 { background: var(--warning-border); color: #D97706; }
 .comm-meta { display: flex; justify-content: space-between; align-items: center; }
 .comm-order { font-size: var(--cfg-font-size-xs); color: var(--cfg-text-muted); }
 .comm-status { font-size: var(--cfg-font-size-xs); padding: 2px 8px; border-radius: var(--cfg-radius-full); }
-.comm-status.pending { background: #fef3c7; color: #D97706; }
-.comm-status.settled { background: #d1fae5; color: #059669; }
+.comm-status.pending { background: var(--warning-border); color: #D97706; }
+.comm-status.settled { background: var(--success-light); color: #059669; }
 .comm-status.withdrawn { background: #e0e7ff; color: #4F46E5; }
-.comm-status.cancelled { background: #fee2e2; color: #DC2626; }
+.comm-status.cancelled { background: var(--danger-light); color: var(--danger); }
 .comm-time { font-size: var(--cfg-font-size-xs); color: var(--cfg-text-muted); }
 
 .load-more { text-align: center; margin-top: 12px; }
