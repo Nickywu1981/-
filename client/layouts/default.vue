@@ -166,9 +166,7 @@ const searchIndex = [
   { name: '我的订单', path: '/my/orders', icon: '🧾', tag: '管理', kw: ['订单', '支付', '账单', 'order', 'payment', 'billing'] },
   { name: '虚拟模特', path: '/work/virtual-tryon', icon: '👗', tag: '图片', kw: ['试穿', '模特', '上身', 'virtual tryon', 'model', 'fitting'] },
   { name: '一键换色', path: '/work/color-swap', icon: '🎨', tag: '图片', kw: ['换颜色', '多色', 'SKU色', 'color swap', 'recolor', 'color variant'] },
-  { name: '风格转化', path: '/work/style-transfer', icon: '🖌', tag: '图片', kw: ['风格', '水彩', '油画', '3D', 'style transfer', 'watercolor'] },
   { name: '动作迁移', path: '/work/action-transfer', icon: '🕺', tag: '视频', kw: ['动作', '舞蹈', '批量换人', 'action transfer', 'motion', 'dance'] },
-  { name: '人物替换', path: '/work/person-replace', icon: '🧑', tag: '视频', kw: ['换人', '替换角色', 'person replace', 'swap character'] },
   { name: '口播数字人', path: '/work/digital-human', icon: '🎙', tag: '视频', kw: ['数字人', '口播', '讲解', 'digital human', 'voiceover', 'AI presenter'] },
   { name: '带货脚本', path: '/work/script-gen', icon: '📝', tag: '视频', kw: ['文案', '话术', '卖点', 'script', 'copywriting', 'sales pitch'] },
   { name: '智能分镜', path: '/work/shot-plan', icon: '🎬', tag: '视频', kw: ['分镜', '导演', '运镜', 'shot plan', 'storyboard', 'camera'] },
@@ -183,7 +181,6 @@ const searchIndex = [
   { name: '提示词工坊', path: '/work/prompt-hub', icon: '💡', tag: '工具', kw: ['提示词', '模板', '推荐', '评分', 'prompt', 'template', 'rating'] },
   { name: '多平台分发', path: '/work/publish', icon: '📤', tag: '工具', kw: ['分发', '抖音', '快手', '平台', '发布', 'publish', 'distribute', 'multi-platform'] },
   { name: '分发管理', path: '/work/distribution', icon: '📡', tag: '工具', kw: ['分发', '多平台', '推送', 'distribution', 'push'] },
-  { name: '裁剪生态', path: '/work/cut-ecosystem', icon: '✂', tag: '工具', kw: ['裁剪', '尺寸', '平台适配', '画幅', 'crop', 'resize', 'aspect ratio'] },
   { name: '用量仪表盘', path: '/work/usage', icon: '📊', tag: '工具', kw: ['用量', '统计', '配额', '仪表盘', 'usage', 'dashboard', 'quota'] },
   { name: '我的收藏', path: '/my/favorites', icon: '⭐', tag: '管理', kw: ['收藏', '书签', '星标', 'favorite', 'bookmark', 'star'] },
 ];
@@ -247,7 +244,7 @@ onMounted(checkAuth);
 /* Skip-to-content — visually hidden until focused */
 .skip-link {
   position: absolute; top: -100px; left: 16px; z-index: 10000;
-  background: var(--brand, #3b82f6); color: #fff; padding: 10px 20px;
+  background: var(--brand, #5b5fe3); color: #fff; padding: 10px 20px;
   border-radius: 0 0 8px 8px; font-size: 14px; text-decoration: none;
 }
 .skip-link:focus { top: 0; }
@@ -307,7 +304,7 @@ onMounted(checkAuth);
   font-weight: 600; font-size: 13px;
   transition: transform var(--transition-fast), box-shadow var(--transition-fast), opacity var(--transition-fast);
 }
-.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 2px 12px rgba(124,58,237,0.35); }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 2px 12px rgba(var(--brand-rgb), 0.35); }
 
 /* Theme toggle */
 .theme-btn {
@@ -387,7 +384,7 @@ onMounted(checkAuth);
   animation: fadeIn var(--transition-fast) ease-out;
 }
 .search-input::placeholder { color: var(--text-muted); }
-.search-input:focus { box-shadow: 0 0 0 3px rgba(124,58,237,0.15); }
+.search-input:focus { box-shadow: 0 0 0 3px rgba(var(--brand-rgb), 0.15); }
 
 .search-dropdown {
   position: absolute; right: 0; top: calc(100% + 8px);
@@ -445,7 +442,7 @@ onMounted(checkAuth);
   border-radius: 12px; font-size: 16px; background: var(--bg-input); color: var(--text-primary);
   outline: none; margin-bottom: 16px;
 }
-.mobile-search-input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(124,58,237,0.12); }
+.mobile-search-input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(var(--brand-rgb), 0.12); }
 .mobile-search-cancel {
   display: block; width: 100%; padding: 12px; border: none;
   border-radius: 10px; background: var(--bg-hover); color: var(--text-secondary);

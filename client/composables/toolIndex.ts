@@ -11,16 +11,11 @@ export const toolIndex = [
   { id: 'batch',           keywords: ['batch', '批量', '批处理', '批量抠图'],               route: '/work/batch',            icon: 'files',           category: 'image' },
   { id: 'color-swap',      keywords: ['color swap', '换色', '变色', '颜色替换'],             route: '/work/color-swap',       icon: 'brush',           category: 'image' },
   { id: 'color-change',    keywords: ['color change', '改色', '调色'],                     route: '/work/color-change',     icon: 'color-filter',    category: 'image' },
-  { id: 'style-transfer',  keywords: ['style transfer', '风格', '画风', '风格转换'],          route: '/work/style-transfer',   icon: 'magic-stick',     category: 'image' },
   { id: 'retouch',         keywords: ['retouch', '精修', '美颜', '修图'],                   route: '/work/retouch',          icon: 'edit',            category: 'image' },
   { id: 'outpaint',        keywords: ['outpaint', '扩图', '外扩', '扩展'],                  route: '/work/outpaint',         icon: 'full-screen',     category: 'image' },
   { id: 'image-translate', keywords: ['translate', '翻译', '图片翻译', '多语言'],              route: '/work/image-translate',  icon: 'translate',       category: 'image' },
-  { id: 'text-effect',     keywords: ['text effect', '文字', '特效', '字体'],               route: '/work/text-effect',      icon: 'font-color',      category: 'image' },
   { id: 'model-generate',  keywords: ['model', 'AI模特', '虚拟模特', '模特图'],              route: '/work/model-generate',   icon: 'user',            category: 'image' },
-  { id: 'swap-face',       keywords: ['face swap', '换脸', '人脸替换'],                    route: '/work/swap-face',        icon: 'smile',           category: 'image' },
-  { id: 'person-replace',  keywords: ['person replace', '人物', '替换', '换人'],             route: '/work/person-replace',   icon: 'user-filled',     category: 'image' },
   { id: 'wrinkle-remove',  keywords: ['wrinkle', '去皱', '褶皱', '平整'],                   route: '/work/wrinkle-remove',   icon: 'iron',            category: 'image' },
-  { id: '3d-preview',      keywords: ['3d', '三维', '模型', 'GLB', 'GLTF', '360旋转'],        route: '/work/3d-preview',       icon: 'box',             category: 'image' },
 
   // ===== Video =====
   { id: 'video',           keywords: ['video', '视频', '视频生成', '图生视频', '短视频'],        route: '/work/video',            icon: 'video-camera',        category: 'video' },
@@ -45,7 +40,6 @@ export const toolIndex = [
   { id: 'prompt-hub',      keywords: ['prompt', '提示词', '模板', '推荐', '评分'],              route: '/work/prompt-hub',       icon: 'magic-stick',     category: 'special' },
   { id: 'publish',         keywords: ['publish', '分发', '发布', '多平台', '抖音', '快手'],       route: '/work/publish',          icon: 'promotion',       category: 'special' },
   { id: 'distribution',    keywords: ['distribution', '分发管理', '推送', '发布记录'],          route: '/work/distribution',     icon: 'connection',      category: 'special' },
-  { id: 'cut-ecosystem',   keywords: ['cut', '裁剪', '尺寸', '画幅', '适配'],                  route: '/work/cut-ecosystem',    icon: 'scissor',         category: 'special' },
   { id: 'usage',           keywords: ['usage', 'dashboard', '用量', '统计', '配额'],          route: '/work/usage',            icon: 'data-line',       category: 'special' },
   { id: 'favorites',       keywords: ['favorites', '收藏', '书签', '星标'],                  route: '/my/favorites',          icon: 'star-filled',     category: 'special' },
 ];

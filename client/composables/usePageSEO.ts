@@ -53,11 +53,6 @@ const pageSEOMap: Record<string, { title: string; description: string; keywords?
     description: '精准调色工具，HSL颜色调整，保留材质纹理和阴影细节',
     keywords: '改色,调色,商品改色,精准调色,颜色调整',
   },
-  '/work/style-transfer': {
-    title: '风格迁移',
-    description: 'AI风格迁移，将商品图转为水彩/油画/3D/插画/动漫等多种艺术风格',
-    keywords: '风格迁移,AI风格,图片风格转换,艺术风格,滤镜效果',
-  },
   '/work/retouch': {
     title: '图片精修',
     description: 'AI自动精修商品图，提亮/磨皮/去瑕疵/增强质感，专业级修图效果',
@@ -73,25 +68,10 @@ const pageSEOMap: Record<string, { title: string; description: string; keywords?
     description: '图片文字智能翻译，保留原排版风格，支持20+语种，跨境电商必备',
     keywords: '图片翻译,文字翻译,跨境电商,多语言图,图片本地化',
   },
-  '/work/text-effect': {
-    title: '文字特效',
-    description: 'AI文字特效生成，3D/霓虹/金属/火焰/发光等风格，电商海报必备',
-    keywords: '文字特效,AI字体,艺术字,电商文字,字体设计',
-  },
   '/work/model-generate': {
     title: 'AI模特生成',
     description: 'AI虚拟模特生成，多种肤色/年龄/风格，穿版展示商品上身效果',
     keywords: 'AI模特,虚拟模特,模特生成,商品模特,穿版图',
-  },
-  '/work/swap-face': {
-    title: 'AI换脸',
-    description: '智能人脸替换，更换模特面孔，保留发型/光影/肤色一致性',
-    keywords: 'AI换脸,人脸替换,换模特脸,face swap,智能换脸',
-  },
-  '/work/person-replace': {
-    title: '人物替换',
-    description: '图片人物智能替换，更换模特/角色，保持场景一致性',
-    keywords: '人物替换,换人,模特替换,角色替换,person replace',
   },
   '/work/wrinkle-remove': {
     title: '去褶皱',
@@ -222,12 +202,6 @@ const pageSEOMap: Record<string, { title: string; description: string; keywords?
   '/my/notifications': { title: '消息通知', description: '查看系统通知', keywords: '通知,消息' },
 
   // ===== DIY =====
-  '/diy': { title: 'DIY页面', description: '自定义 Landing Page 搭建工具', keywords: 'DIY,页面搭建,自定义页面' },
-  '/diy/editor': { title: 'DIY编辑器', description: '拖拽式页面编辑器', keywords: '编辑器,页面编辑,可视化编辑' },
-  '/diy/preview': { title: 'DIY预览', description: '预览自定义页面效果', keywords: '预览,页面预览' },
-
-  // ===== 法律 =====
-  '/legal/privacy': { title: '隐私政策', description: 'Movio AI 隐私政策与数据保护声明', keywords: '隐私政策,数据保护,个人信息' },
   '/legal/terms': { title: '服务条款', description: 'Movio AI 用户服务协议', keywords: '服务条款,用户协议,使用协议' },
 
   // ===== 管理后台 =====
@@ -244,8 +218,6 @@ const pageSEOMap: Record<string, { title: string; description: string; keywords?
   '/admin/sms-logs': { title: '短信日志', description: '查看短信发送记录', keywords: '' },
   '/admin/sms-templates': { title: '短信模板', description: '管理短信模板', keywords: '' },
   '/admin/tenants': { title: '租户管理', description: '管理多租户', keywords: '' },
-  '/admin/diy': { title: 'DIY管理', description: '管理DIY页面模板', keywords: '' },
-  '/admin/forms': { title: '表单管理', description: '管理自定义表单', keywords: '' },
   '/admin/proxy': { title: 'API代理', description: '管理API代理配置', keywords: '' },
   '/admin/recharge': { title: '充值管理', description: '管理充值订单', keywords: '' },
   '/admin/automation': { title: '自动化管理', description: '管理浏览器自动化任务', keywords: '' },
