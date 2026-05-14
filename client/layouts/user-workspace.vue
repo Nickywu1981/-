@@ -16,7 +16,7 @@
           <NuxtLink to="/work/video" class="nav-item" active-class="active">
             <i class="icon-video"></i> 视频合成
           </NuxtLink>
-          <NuxtLink to="/work/templates" class="nav-item" active-class="active">
+          <NuxtLink to="/work/my-templates" class="nav-item" active-class="active">
             <i class="icon-layout"></i> 模板库
           </NuxtLink>
           <NuxtLink to="/work/canvas" class="nav-item" active-class="active">
@@ -28,7 +28,7 @@
           <NuxtLink to="/work/projects" class="nav-item" active-class="active">
             <i class="icon-folder"></i> 项目
           </NuxtLink>
-          <NuxtLink to="/work/assets" class="nav-item" active-class="active">
+          <NuxtLink to="/assets" class="nav-item" active-class="active">
             <i class="icon-hard-drive"></i> 素材库
           </NuxtLink>
           <NuxtLink to="/work/settings" class="nav-item" active-class="active">
@@ -47,22 +47,22 @@
           <NuxtLink to="/work/video" class="nav-item" active-class="active">
             <i class="icon-video"></i> 视频合成
           </NuxtLink>
-          <NuxtLink to="/work/templates" class="nav-item" active-class="active">
+          <NuxtLink to="/work/my-templates" class="nav-item" active-class="active">
             <i class="icon-layout"></i> 模板库
           </NuxtLink>
         </div>
         <div class="nav-group">
           <p class="nav-label">代理管理</p>
-          <NuxtLink to="/agent/downstream" class="nav-item" active-class="active">
+          <NuxtLink to="/agent/team" class="nav-item" active-class="active">
             <i class="icon-users"></i> 下级管理
           </NuxtLink>
-          <NuxtLink to="/agent/commissions" class="nav-item" active-class="active">
+          <NuxtLink to="/agent/commission" class="nav-item" active-class="active">
             <i class="icon-dollar-sign"></i> 佣金看板
           </NuxtLink>
           <NuxtLink to="/agent/withdraw" class="nav-item" active-class="active">
             <i class="icon-credit-card"></i> 提现
           </NuxtLink>
-          <NuxtLink to="/agent/promo" class="nav-item" active-class="active">
+          <NuxtLink to="/agent/distribution" class="nav-item" active-class="active">
             <i class="icon-share"></i> 推广链接
           </NuxtLink>
         </div>
@@ -87,7 +87,7 @@
           <NuxtLink to="/work/video" class="nav-item" active-class="active">
             <i class="icon-video"></i> 视频合成
           </NuxtLink>
-          <NuxtLink to="/work/templates" class="nav-item" active-class="active">
+          <NuxtLink to="/work/my-templates" class="nav-item" active-class="active">
             <i class="icon-layout"></i> 模板库
           </NuxtLink>
         </div>
@@ -96,10 +96,10 @@
           <NuxtLink to="/enterprise/workspace" class="nav-item" active-class="active">
             <i class="icon-grid"></i> 协作工作区
           </NuxtLink>
-          <NuxtLink to="/enterprise/members" class="nav-item" active-class="active">
+          <NuxtLink to="/enterprise/users" class="nav-item" active-class="active">
             <i class="icon-users"></i> 成员管理
           </NuxtLink>
-          <NuxtLink to="/enterprise/brand" class="nav-item" active-class="active">
+          <NuxtLink to="/enterprise/whitelabel" class="nav-item" active-class="active">
             <i class="icon-bookmark"></i> 品牌素材
           </NuxtLink>
           <NuxtLink to="/enterprise/usage" class="nav-item" active-class="active">

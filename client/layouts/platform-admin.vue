@@ -20,10 +20,10 @@
         </div>
         <div class="nav-group">
           <p class="nav-label">底层网关</p>
-          <NuxtLink to="/gateway/models" class="nav-item" active-class="active">
+          <NuxtLink to="/gateway/dashboard" class="nav-item" active-class="active">
             <i class="icon-cpu"></i> 模型供应商
           </NuxtLink>
-          <NuxtLink to="/gateway/dispatch" class="nav-item" active-class="active">
+          <NuxtLink to="/gateway/routes" class="nav-item" active-class="active">
             <i class="icon-shuffle"></i> 调度策略
           </NuxtLink>
           <NuxtLink to="/gateway/hooks" class="nav-item" active-class="active">

@@ -11,13 +11,13 @@
           <NuxtLink to="/ops/users" class="nav-item" active-class="active">
             <i class="icon-users"></i> 用户管理
           </NuxtLink>
-          <NuxtLink to="/ops/enterprises" class="nav-item" active-class="active">
+          <NuxtLink to="/admin/enterprises" class="nav-item" active-class="active">
             <i class="icon-building"></i> 企业管理
           </NuxtLink>
           <NuxtLink to="/ops/agents" class="nav-item" active-class="active">
             <i class="icon-user-check"></i> 代理管理
           </NuxtLink>
-          <NuxtLink to="/ops/orders" class="nav-item" active-class="active">
+          <NuxtLink to="/admin/orders" class="nav-item" active-class="active">
             <i class="icon-shopping-cart"></i> 订单管理
           </NuxtLink>
         </div>
@@ -26,10 +26,10 @@
           <NuxtLink to="/ops/activities" class="nav-item" active-class="active">
             <i class="icon-gift"></i> 活动配置
           </NuxtLink>
-          <NuxtLink to="/ops/templates" class="nav-item" active-class="active">
+          <NuxtLink to="/admin/templates" class="nav-item" active-class="active">
             <i class="icon-layout"></i> 模板市场
           </NuxtLink>
-          <NuxtLink to="/ops/gateway" class="nav-item" active-class="active">
+          <NuxtLink to="/gateway/dashboard" class="nav-item" active-class="active">
             <i class="icon-toggle-right"></i> 业务开关
           </NuxtLink>
         </div>
@@ -41,7 +41,7 @@
           <NuxtLink to="/finance/commission-detail" class="nav-item" active-class="active">
             <i class="icon-dollar-sign"></i> 佣金结算
           </NuxtLink>
-          <NuxtLink to="/ops/moderation" class="nav-item" active-class="active">
+          <NuxtLink to="/admin/moderation" class="nav-item" active-class="active">
             <i class="icon-eye"></i> 内容审核
           </NuxtLink>
         </div>
