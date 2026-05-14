@@ -28,5 +28,3 @@ export async function list({ userId, action, targetType, targetId, page = 1, pag
   );
   return { list: rows, total, page, pageSize };
 }
-
-export default { insert, list };

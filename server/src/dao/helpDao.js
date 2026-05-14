@@ -9,38 +9,36 @@ function pickAllowed(data, allowed) {
   return out;
 }
 
-export default {
-  async listFaqs({ keyword, page = 1, pageSize = 50 } = {}) {
-    const { offset } = parsePagination({ page, pageSize });
-    let where = 'WHERE status = 1';
-    const params = [];
-    if (keyword) {
-      where += ' AND (question LIKE ? OR answer LIKE ?)';
-      params.push(`%${keyword}%`, `%${keyword}%`);
-    }
-    params.push(pageSize, offset);
-    const [rows] = await pool.query(`SELECT * FROM help_faq ${where} ORDER BY sort ASC, id DESC LIMIT ? OFFSET ?`, params);
-    const [[{ total }]] = await pool.query(`SELECT COUNT(*) as total FROM help_faq ${where}`, params);
-    return { list: rows, total };
-  },
+export async function listFaqs({ keyword, page = 1, pageSize = 50 } = {}) {
+  const { offset } = parsePagination({ page, pageSize });
+  let where = 'WHERE status = 1';
+  const params = [];
+  if (keyword) {
+    where += ' AND (question LIKE ? OR answer LIKE ?)';
+    params.push(`%${keyword}%`, `%${keyword}%`);
+  }
+  params.push(pageSize, offset);
+  const [rows] = await pool.query(`SELECT * FROM help_faq ${where} ORDER BY sort ASC, id DESC LIMIT ? OFFSET ?`, params);
+  const [[{ total }]] = await pool.query(`SELECT COUNT(*) as total FROM help_faq ${where}`, params);
+  return { list: rows, total };
+}
 
-  async getFaqById(id) {
-    const [rows] = await pool.query('SELECT * FROM help_faq WHERE id = ? LIMIT 1', [id]);
-    return rows[0] || null;
-  },
+export async function getFaqById(id) {
+  const [rows] = await pool.query('SELECT * FROM help_faq WHERE id = ? LIMIT 1', [id]);
+  return rows[0] || null;
+}
 
-  async insertFaq(data) {
-    const [result] = await pool.query('INSERT INTO help_faq SET ?', pickAllowed(data, FAQ_COLS));
-    return result.insertId;
-  },
+export async function insertFaq(data) {
+  const [result] = await pool.query('INSERT INTO help_faq SET ?', pickAllowed(data, FAQ_COLS));
+  return result.insertId;
+}
 
-  async updateFaq(id, data) {
-    const [result] = await pool.query('UPDATE help_faq SET ? WHERE id = ?', [pickAllowed(data, FAQ_COLS), id]);
-    return result.affectedRows;
-  },
+export async function updateFaq(id, data) {
+  const [result] = await pool.query('UPDATE help_faq SET ? WHERE id = ?', [pickAllowed(data, FAQ_COLS), id]);
+  return result.affectedRows;
+}
 
-  async deleteFaq(id) {
-    const [result] = await pool.query('DELETE FROM help_faq WHERE id = ?', [id]);
-    return result.affectedRows;
-  },
-};
+export async function deleteFaq(id) {
+  const [result] = await pool.query('DELETE FROM help_faq WHERE id = ?', [id]);
+  return result.affectedRows;
+}

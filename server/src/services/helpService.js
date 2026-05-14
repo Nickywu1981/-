@@ -1,4 +1,4 @@
-import helpDao from '../dao/helpDao.js';
+import * as helpDao from '../dao/helpDao.js';
 import { BusinessError } from '../utils/businessError.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 

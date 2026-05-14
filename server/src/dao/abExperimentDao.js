@@ -92,5 +92,3 @@ export async function getEventStats(experimentId, days = 7) {
   );
   return rows;
 }
-
-export default { create, getById, list, update, remove, logEvent, getEventStats };

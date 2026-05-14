@@ -1,4 +1,4 @@
-import tenantDao from '../dao/tenantDao.js';
+import * as tenantDao from '../dao/tenantDao.js';
 import { BusinessError } from '../utils/businessError.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
@@ -38,7 +38,7 @@ export async function updateTenant(id, data) {
 }
 
 export async function deleteTenant(id) {
-  const ok = await tenantDao.delete(id);
+  const ok = await tenantDao.remove(id);
   if (!ok) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
   return true;
 }
