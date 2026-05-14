@@ -177,9 +177,10 @@ export async function handleMessage({ res, req, message, sessionId, mode, attach
     });
 
     // gatewayRoute 返回完整结果，非流式；提取文本并按字符分块发送以模拟流式体验
-    const fullText = aiResult?.response?.choices?.[0]?.message?.content
+    const fullText = typeof aiResult?.output === 'string' ? aiResult.output
+      : aiResult?.response?.choices?.[0]?.message?.content
       || aiResult?.output?.text
-      || aiResult?.output
+      || JSON.stringify(aiResult?.output)
       || '';
     const chunkSize = 8;
     for (let i = 0; i < fullText.length; i += chunkSize) {
@@ -192,7 +193,7 @@ export async function handleMessage({ res, req, message, sessionId, mode, attach
 
     // ── Step 5: 保存会话历史 ──
     session.messages.push({ role: 'user', content: message, timestamp: new Date().toISOString() });
-    session.messages.push({ role: 'assistant', content: '[generated]', intentId: intent.intentId, timestamp: new Date().toISOString() });
+    session.messages.push({ role: 'assistant', content: fullText, intentId: intent.intentId, timestamp: new Date().toISOString() });
     // 只保留最近 50 条消息
     if (session.messages.length > 50) {
       session.messages = session.messages.slice(-50);

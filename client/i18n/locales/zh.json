@@ -1198,6 +1198,8 @@
     "mode_video": "视频模式",
     "mode_ecommerce": "电商创作",
     "blocked_title": "内容被拦截",
+    "content_blocked": "⚠️ 内容被拦截：{reason}",
+    "service_unavailable": "抱歉，对话服务暂时不可用，请稍后重试。",
     "error_network": "网络异常，请检查连接后重试"
   },
   "admin": {
@@ -5195,12 +5197,26 @@
       "start_batch": "开始批量生成视频",
       "generating_progress": "生成中 ({n}/{total})..."
     },
+    "batch_sku_image": {
+      "name": "多SKU批量生成",
+      "upload_image_label": "上传商品原图 URL",
+      "image_url_placeholder": "输入商品图片URL...",
+      "image_hint": "支持 jpg/png/webp，建议 2000×2000 以上",
+      "select_platforms": "选择目标平台",
+      "select_types": "选择生成类型",
+      "quality": "质量",
+      "quality_standard": "标准（快速）",
+      "quality_high": "高清（较慢）",
+      "total_count": "总计: {count} 张图 ({sku} SKU × {plat} 平台 × {type} 类型)",
+      "start_batch": "开始批量生成",
+      "regenerate": "重新生成",
+      "submit_failed": "提交失败，请重试"
+    },
     "batch_publish": {
       "name": "批量发布管理",
       "target_platforms": "目标平台",
-      "content_links": "内容 / 商品链接",
-      "content_url_placeholder": "输入内容或商品URL...",
-      "add": "添加",
+      "work_id": "作品 ID",
+      "work_id_placeholder": "输入要发布的作品ID...",
       "publishing": "发布中...",
       "publish_to_n": "一键发布到 {n} 个平台"
     },

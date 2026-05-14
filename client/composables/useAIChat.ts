@@ -22,6 +22,7 @@ export interface PromptState {
 }
 
 export function useAIChat() {
+  const { t } = useI18n()
   const messages = ref<ChatMessage[]>([])
   const streaming = ref(false)
   const sessionId = ref<string | null>(null)
@@ -120,7 +121,7 @@ export function useAIChat() {
               // server error events use event type, not data.type
               if (lastEventType === 'error') {
                 if (messages.value[aiMsgIdx]) {
-                  messages.value[aiMsgIdx].content = `❌ ${parsed.message || '处理失败'}`
+                  messages.value[aiMsgIdx].content = `❌ ${parsed.message || t('common.failed_process')}`
                   messages.value[aiMsgIdx].streaming = false
                 }
                 streaming.value = false
@@ -145,7 +146,7 @@ export function useAIChat() {
       if (err.name === 'AbortError') return
       streaming.value = false
       if (messages.value[aiMsgIdx]) {
-        messages.value[aiMsgIdx].content = '抱歉，对话服务暂时不可用，请稍后重试。'
+        messages.value[aiMsgIdx].content = t('chat.service_unavailable')
         messages.value[aiMsgIdx].streaming = false
       }
     }
@@ -167,14 +168,14 @@ export function useAIChat() {
         break
       case 'blocked':
         if (messages.value[aiMsgIdx]) {
-          messages.value[aiMsgIdx].content = `⚠️ 内容被拦截：${data.reason}`
+          messages.value[aiMsgIdx].content = t('chat.content_blocked', { reason: data.reason })
           messages.value[aiMsgIdx].streaming = false
         }
         streaming.value = false
         break
       case 'error':
         if (messages.value[aiMsgIdx]) {
-          messages.value[aiMsgIdx].content = `❌ ${data.message || '处理失败'}`
+          messages.value[aiMsgIdx].content = `❌ ${data.message || t('common.failed_process')}`
           messages.value[aiMsgIdx].streaming = false
         }
         streaming.value = false

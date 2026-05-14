@@ -22,16 +22,23 @@ const taskId = ref('')
 const totalCount = computed(() => skus.value.length * selectedPlatforms.value.length * selectedTypes.value.length)
 
 const allPlatforms = [
-  { id: 'taobao', label: '淘宝' }, { id: 'pinduoduo', label: '拼多多' },
-  { id: 'douyin', label: '抖音' }, { id: 'xiaohongshu', label: '小红书' },
-  { id: 'amazon', label: 'Amazon' }, { id: 'shopee', label: 'Shopee' },
-  { id: 'lazada', label: 'Lazada' }, { id: 'temu', label: 'Temu' },
-  { id: 'shein', label: 'Shein' }, { id: 'tiktok_shop', label: 'TikTok Shop' },
+  { id: 'taobao', label: t('platforms.taobao') || '淘宝' },
+  { id: 'pinduoduo', label: t('platforms.pinduoduo') || '拼多多' },
+  { id: 'douyin', label: t('platforms.douyin') || '抖音' },
+  { id: 'xiaohongshu', label: t('platforms.xiaohongshu') || '小红书' },
+  { id: 'amazon', label: 'Amazon' },
+  { id: 'shopee', label: 'Shopee' },
+  { id: 'lazada', label: 'Lazada' },
+  { id: 'temu', label: 'Temu' },
+  { id: 'shein', label: 'Shein' },
+  { id: 'tiktok_shop', label: 'TikTok Shop' },
 ]
 
 const allTypes = [
-  { id: 'main', label: '主图' }, { id: 'white_bg', label: '白底图' },
-  { id: 'scene', label: '场景图' }, { id: 'render', label: '渲染图' },
+  { id: 'main', label: t('batchPreview.types.main') },
+  { id: 'white_bg', label: t('batchPreview.types.white_bg') },
+  { id: 'scene', label: t('batchPreview.types.scene') },
+  { id: 'render', label: t('batchPreview.types.render') },
 ]
 
 const togglePlatform = (id: string) => {
@@ -90,57 +97,56 @@ const submit = async () => {
     }, 2000)
   } catch (err) {
     step.value = 'config'
-    alert('提交失败，请重试')
+    alert(t('work_pages.batch_sku_image.submit_failed'))
   }
 }
 </script>
 
 <template>
-  <WorkLayout :title="t('work_pages.batch_sku_image_name') || '多SKU批量生成'">
+  <WorkLayout :title="t('work_pages.batch_sku_image.name')">
     <!-- Step 1: Config -->
     <div v-if="step === 'config'" class="bsi-config">
       <div class="bsi-section">
-        <label class="bsi-label">上传商品原图 URL</label>
-        <input v-model="imageUrl" class="bsi-input" placeholder="输入商品图片URL..." />
-        <span class="bsi-hint">支持 jpg/png/webp，建议 2000×2000 以上</span>
+        <label class="bsi-label">{{ t('work_pages.batch_sku_image.upload_image_label') }}</label>
+        <input v-model="imageUrl" class="bsi-input" :placeholder="t('work_pages.batch_sku_image.image_url_placeholder')" />
+        <span class="bsi-hint">{{ t('work_pages.batch_sku_image.image_hint') }}</span>
       </div>
 
       <SkuSelector @update="handleSkuUpdate" />
 
       <div class="bsi-section">
-        <label class="bsi-label">选择目标平台</label>
+        <label class="bsi-label">{{ t('work_pages.batch_sku_image.select_platforms') }}</label>
         <div class="bsi-chips">
           <button v-for="p in allPlatforms" :key="p.id" class="bsi-chip" :class="{ sel: selectedPlatforms.includes(p.id) }" @click="togglePlatform(p.id)">{{ p.label }}</button>
         </div>
       </div>
 
       <div class="bsi-section">
-        <label class="bsi-label">选择生成类型</label>
+        <label class="bsi-label">{{ t('work_pages.batch_sku_image.select_types') }}</label>
         <div class="bsi-chips">
           <button v-for="tp in allTypes" :key="tp.id" class="bsi-chip" :class="{ sel: selectedTypes.includes(tp.id) }" @click="toggleType(tp.id)">{{ tp.label }}</button>
         </div>
       </div>
 
       <div class="bsi-section">
-        <label class="bsi-label">质量</label>
+        <label class="bsi-label">{{ t('work_pages.batch_sku_image.quality') }}</label>
         <select v-model="quality" class="bsi-select">
-          <option value="standard">标准（快速）</option>
-          <option value="high">高清（较慢）</option>
+          <option value="standard">{{ t('work_pages.batch_sku_image.quality_standard') }}</option>
+          <option value="high">{{ t('work_pages.batch_sku_image.quality_high') }}</option>
         </select>
       </div>
 
       <div class="bsi-summary">
-        总计: <strong>{{ totalCount }}</strong> 张图
-        ({{ skus.length }} SKU × {{ selectedPlatforms.length }} 平台 × {{ selectedTypes.length }} 类型)
+        {{ t('work_pages.batch_sku_image.total_count', { count: totalCount, sku: skus.length, plat: selectedPlatforms.length, type: selectedTypes.length }) }}
       </div>
 
-      <button class="bsi-submit" :disabled="!canSubmit" @click="submit">开始批量生成</button>
+      <button class="bsi-submit" :disabled="!canSubmit" @click="submit">{{ t('work_pages.batch_sku_image.start_batch') }}</button>
     </div>
 
     <!-- Step 2: Processing / Done -->
     <div v-else>
       <BatchPreview :results="results" :total-count="totalCount" :completed-count="results.filter((r: any) => r.status === 'done').length" />
-      <button v-if="step === 'done'" class="bsi-submit" @click="step = 'config'">重新生成</button>
+      <button v-if="step === 'done'" class="bsi-submit" @click="step = 'config'">{{ t('work_pages.batch_sku_image.regenerate') }}</button>
     </div>
   </WorkLayout>
 </template>

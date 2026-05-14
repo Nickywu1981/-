@@ -18,9 +18,12 @@ const duration = ref(15)
 const style = ref<'showcase' | 'story' | 'review'>('showcase')
 
 const allPlatforms = [
-  { id: 'taobao', label: '淘宝' }, { id: 'douyin', label: '抖音' },
-  { id: 'pinduoduo', label: '拼多多' }, { id: 'xiaohongshu', label: '小红书' },
-  { id: 'tiktok', label: 'TikTok' }, { id: 'youtube', label: 'YouTube' },
+  { id: 'taobao', label: t('platforms.taobao') || '淘宝' },
+  { id: 'douyin', label: t('platforms.douyin') || '抖音' },
+  { id: 'pinduoduo', label: t('platforms.pinduoduo') || '拼多多' },
+  { id: 'xiaohongshu', label: t('platforms.xiaohongshu') || '小红书' },
+  { id: 'tiktok', label: 'TikTok' },
+  { id: 'youtube', label: 'YouTube' },
 ]
 
 const togglePlatform = (id: string) => {
