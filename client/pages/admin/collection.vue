@@ -76,7 +76,7 @@ async function save() {
 }
 
 async function deleteItem(id: number) {
-  if (!await confirm({ message: '确定删除?'} )) return
+  if (!await confirm({ message: t('common.confirm_delete')} )) return
   try {
     await $fetch(`/api/collections/${id}`, { method: 'DELETE', credentials: 'include' })
     fetchData()

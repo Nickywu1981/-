@@ -131,7 +131,7 @@ async function save() {
 }
 
 async function remove(id: number) {
-  if (!await confirm({ message: '确定删除该 GEO 规则？' })) return;
+  if (!await confirm({ message: t('common.confirm_delete_item') })) return;
   try {
     await $fetch(`/api/admin/geo-rules/${id}`, { method: 'DELETE', credentials: 'include' });
     toast.success(t('common.delete_success'));

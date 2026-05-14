@@ -53,6 +53,7 @@
 <script setup lang="ts">
 import { formatDate } from '@/utils/format'
 import { extractErrorMsg } from '~/composables/useApi'
+const { t } = useI18n()
 const { confirm } = useConfirm()
 
 const activeTab = ref('all')
@@ -83,7 +84,7 @@ const fetchFavorites = async () => {
 }
 
 const removeFavorite = async (id: number) => {
-  if (!await confirm({ message: '确定取消收藏？', variant: 'warning' })) return;
+  if (!await confirm({ message: t('common.confirm_unfavorite'), variant: 'warning' })) return;
   try {
     await $fetch(`/api/collections/${id}`, { credentials: 'include', method: 'DELETE' })
     items.value = items.value.filter(i => i.id !== id)

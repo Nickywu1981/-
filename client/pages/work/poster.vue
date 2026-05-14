@@ -127,6 +127,7 @@
 import SmartRecognitionPanel from '~/components/shared/SmartRecognitionPanel.vue'
 import PosterPreviewPanel from '~/components/work/PosterPreviewPanel.vue'
 import { posterTabs, posterTemplates, posterStyleDefaults, posterSizes } from '~/data/posterData'
+const { t } = useI18n()
 
 const { config } = useSiteConfig('page.poster')
 
@@ -274,7 +275,7 @@ async function copyImage(url: string) {
       const resp = await fetch(url)
       const blob = await resp.blob()
       await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })])
-      toast.success('已复制到剪贴板')
+      toast.success(t('common.copied'))
     } else {
       window.open(url, '_blank', 'noopener,noreferrer')
     }

@@ -130,7 +130,7 @@ async function saveEdit() {
       body: JSON.stringify({ ...editForm }),
     })
     showModal.value = false
-    toast.success('保存成功，工作流实时生效')
+    toast.success(t('common.saved_realtime'))
     fetchData()
   } catch (e: any) {
     toast.error('保存失败: ' + (e?.data?.msg || e.message))
@@ -138,20 +138,20 @@ async function saveEdit() {
 }
 
 async function submitTemplate(id: number) {
-  if (!await confirm({ message: '确认提交此模板给运营审核吗？审核通过后将收录为官方模板，全平台商家可用。' })) return
+  if (!await confirm({ message: t('common.confirm_submit_review') })) return
   try {
     await $fetch(`/api/prompts/templates/${id}/submit-official`, { method: 'POST', credentials: 'include' })
-    toast.success('已提交审核')
+    toast.success(t('common.submitted_review'))
     fetchData()
   } catch (e: any) {
     toast.error('提交失败: ' + (e?.data?.msg || e.message))
   }
 }
 
-async function confirmDelete(t: any) {
-  if (!await confirm({ message: `确认删除"${t.title}"吗？删除后工作流将回退到官方模板。` })) return
+async function confirmDelete(tmpl: any) {
+  if (!await confirm({ message: t('work_pages.my_templates_confirm_delete') })) return
   try {
-    await $fetch(`/api/admin/prompts/${t.id}`, { method: 'DELETE', credentials: 'include' })
+    await $fetch(`/api/admin/prompts/${tmpl.id}`, { method: 'DELETE', credentials: 'include' })
     toast.success(t('common.delete_success'))
     fetchData()
   } catch (e: any) {

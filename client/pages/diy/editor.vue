@@ -315,7 +315,7 @@ async function onDiffVersions(a: number, b: number) {
 
 async function onRollbackVersion(idx: number) {
   const v = versions.value[idx]
-  if (!await confirm({ message: `确定回滚到版本 v${v.version}？当前未保存的更改将丢失。` })) return
+  if (!await confirm({ message: t('common.confirm_rollback_version', { version: v.version }) })) return
   try {
     await $fetch(`/api/diy/${pageInfo.value.id}/versions/${v.version}/rollback`, { method: 'POST', credentials: 'include' })
     showVersions.value = false; diffResult.value = null

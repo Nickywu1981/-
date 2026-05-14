@@ -102,13 +102,13 @@ async function confirmSend() {
   if (!sendDialog.userId || !sendDialog.title || !sendDialog.content) { toast.warn('请填写完整信息'); return }
   try {
     const data = await $fetch('/api/notifications/send', { method: 'POST', credentials: 'include', body: { userId: +sendDialog.userId, type: sendDialog.type, title: sendDialog.title, content: sendDialog.content } }) as ApiResponse
-    if (data?.code === 200) { toast.success('已发送'); sendDialog.open = false; fetch() }
+    if (data?.code === 200) { toast.success(t('common.sent')); sendDialog.open = false; fetch() }
     else { toast.error(data?.msg || '发送失败') }
-  } catch (e: unknown) { toast.error('发送失败') }
+  } catch (e: unknown) { toast.error(t('common.failed_send')) }
 }
 
 async function doDelete(n: any) {
-  if (!await confirm({ message: `确定删除通知 #${n.id}？`} )) return
+  if (!await confirm({ message: t('common.confirm_delete_id', { id: n.id })} )) return
   try {
     const data = await $fetch(`/api/notifications/${n.id}`, { method: 'DELETE', credentials: 'include' }) as ApiResponse
     if (data?.code === 200) { toast.success(t('common.delete_success')); fetch() }

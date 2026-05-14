@@ -80,6 +80,7 @@
 
 <script setup lang="ts">
 import { formatDateTime } from '@/utils/format'
+const { t } = useI18n()
 
 const platforms = [
   { id: 'taobao', name: '淘宝', icon: '🛒', connected: true },
@@ -124,7 +125,7 @@ const publish = async () => {
     if (form.scheduledAt) fd.append('scheduledAt', form.scheduledAt)
     form.files.forEach(f => fd.append('files', f))
     await $fetch('/api/publish/submit', { method: 'POST', body: fd })
-    toast.success('发布成功！')
+    toast.success(t('common.success_publish'))
     fetchHistory()
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
     toast.error(err?.data?.msg || err.message || '发布失败')
@@ -139,7 +140,7 @@ const saveDraft = async () => {
       method: 'POST',
       body: { title: form.title, description: form.description, platforms: selected.value },
     })
-    toast.success('草稿已保存')
+    toast.success(t('common.draft_saved'))
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
     toast.error(err?.data?.msg || err.message || '保存草稿失败，请稍后重试')
   }

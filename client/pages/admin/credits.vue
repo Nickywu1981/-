@@ -113,9 +113,9 @@ function doRefund(record: any) {
 async function confirmRefund() {
   try {
     const data = await $fetch('/api/credits/admin/refund', { method: 'POST', credentials: 'include', body: { recordId: refundDialog.record.id, remark: refundDialog.remark || '管理员退款' } }) as ApiResponse
-    if (data?.code === 200) { toast.success('退款成功'); refundDialog.open = false; fetch() }
+    if (data?.code === 200) { toast.success(t('common.success_refund')); refundDialog.open = false; fetch() }
     else { toast.error(data?.msg || '退款失败') }
-  } catch (e: unknown) { toast.error('退款失败') }
+  } catch (e: unknown) { toast.error(t('common.failed_refund')) }
 }
 
 onMounted(fetch)

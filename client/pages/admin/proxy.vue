@@ -80,7 +80,8 @@
   </AdminLayout>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts">const { t } = useI18n()
+
 
 const { confirm } = useConfirm()
 
@@ -137,7 +138,7 @@ async function toggleStatus(p: any) {
 }
 
 async function delProxy(id: number) {
-  if (!await confirm({ message: '确认删除该代理配置？'} )) return
+  if (!await confirm({ message: t('common.confirm_delete')} )) return
   try {
     const res: any = await $fetch(`/api/proxy/${id}`, { method: 'DELETE' })
     if (res?.code === 200 || res?.code === 0) { toast.success('代理已删除'); fetchData() }

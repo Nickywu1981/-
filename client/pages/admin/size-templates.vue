@@ -86,7 +86,7 @@ async function saveTemplate() {
   saving.value = false
 }
 async function deleteItem(id: number) {
-  if (!await confirm({ message: '确定删除?'} )) return
+  if (!await confirm({ message: t('common.confirm_delete')} )) return
   try {
     await $fetch(`/api/templates/my/${id}`, { method: 'DELETE', credentials: 'include' })
     fetchData()

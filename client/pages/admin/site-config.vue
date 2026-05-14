@@ -125,7 +125,7 @@ async function addConfig() {
       method: 'POST', credentials: 'include',
       body: { key: newConfig.key, value: newConfig.value, type: newConfig.type, description: newConfig.description }
     });
-    toast.success('添加成功');
+    toast.success(t('common.success_add'));
     showAddForm.value = false;
     newConfig.key = ''; newConfig.value = ''; newConfig.description = '';
     fetchConfig();
@@ -134,7 +134,7 @@ async function addConfig() {
 }
 
 async function deleteConfig(item: any) {
-  if (!await confirm({ message: `确定删除配置 "${item.config_key}"？`} )) return;
+  if (!await confirm({ message: t('common.confirm_delete_named', { name: item.config_key })} )) return;
   try {
     await $fetch(`/api/admin/site-config/${item.id}`, { method: 'DELETE', credentials: 'include' });
     toast.success(t('common.delete_success'));

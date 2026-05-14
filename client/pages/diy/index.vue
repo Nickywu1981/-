@@ -128,11 +128,11 @@ async function createPage() {
 
 async function publishPage(id) {
   try { await $fetch(`/api/diy/${id}/publish`, { method: 'POST' }); loadPages() }
-  catch (e) { toast.error('发布失败') }
+  catch (e) { toast.error(t('common.failed_submit')) }
 }
 
 async function deletePage(id) {
-  if (!await confirm({ message: '确认删除？' })) return
+  if (!await confirm({ message: t('common.confirm_delete') })) return
   try { await $fetch(`/api/diy/${id}/soft-delete`, { method: 'POST' }); loadPages() }
   catch (e) { toast.error(t('common.failed_delete')) }
 }
