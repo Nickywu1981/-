@@ -7,7 +7,7 @@ import { BusinessError } from '../utils/businessError.js';
  */
 import { submitJob } from './job-queue.service.js';
 import * as moderationService from './moderation.service.js';
-import db from '../dao/db.js';
+import { findUserJobsByTypes } from '../dao/jobQueueDao.js';
 import { gatewayInfer } from '../gateway/aiGatewayHub.js';
 import logger from '../utils/logger.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
@@ -125,27 +125,11 @@ export async function generateLongImage(userId, { productName, scenes, platform,
   }, { priority: 6 });
 }
 
+const DETAIL_TASK_TYPES = ['detail_set_gen', 'detail_replicate', 'detail_long_image'];
+
 /**
  * 详情图作品查询
  */
 export async function getDetailWorks(userId, { page = 1, pageSize = 20 } = {}) {
-  const conn = await db.getConnection();
-  try {
-    const [countRows] = await conn.query(
-      "SELECT COUNT(*) as total FROM job_queue WHERE user_id = ? AND task_type IN ('detail_set_gen','detail_replicate','detail_long_image')",
-      [userId],
-    );
-    const total = countRows[0].total;
-
-    const [rows] = await conn.query(
-      `SELECT id, task_type, status, progress, result_data, created_at, completed_at
-       FROM job_queue WHERE user_id = ? AND task_type IN ('detail_set_gen','detail_replicate','detail_long_image')
-       ORDER BY created_at DESC LIMIT ? OFFSET ?`,
-      [userId, pageSize, (page - 1) * pageSize],
-    );
-
-    return { list: rows, total, page, pageSize };
-  } finally {
-    conn.release();
-  }
+  return findUserJobsByTypes(userId, DETAIL_TASK_TYPES, { page, pageSize });
 }

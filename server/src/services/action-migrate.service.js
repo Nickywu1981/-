@@ -8,7 +8,7 @@ import { BusinessError } from '../utils/businessError.js';
  */
 import { submitJob } from './job-queue.service.js';
 import * as moderationService from './moderation.service.js';
-import db from '../dao/db.js';
+import { findJobById, findChildJobsByBatchId } from '../dao/jobQueueDao.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
 function buildEnhancedOptions({
@@ -94,27 +94,15 @@ export async function batchMigrateAction(userId, {
  * 获取动作迁移任务进度 (含子任务)
  */
 export async function getBatchMigrateProgress(jobId, userId) {
-  const conn = await db.getConnection();
-  try {
-    const [parent] = await conn.query(
-      'SELECT id, status, progress, result_data FROM job_queue WHERE id = ? AND user_id = ?',
-      [jobId, userId],
-    );
-    if (parent.length === 0) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
+  const parent = await findJobById(jobId, userId);
+  if (!parent) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
 
-    // 查询子任务进度
-    const [children] = await conn.query(
-      "SELECT id, status, progress, result_data FROM job_queue WHERE task_type = 'action_migrate' AND JSON_EXTRACT(task_params, '$.batch_id') = ?",
-      [String(jobId)],
-    );
+  const children = await findChildJobsByBatchId(jobId);
 
-    return {
-      ...parent[0],
-      sub_tasks: children,
-      completed_count: children.filter(c => c.status === 'completed').length,
-      total_count: children.length,
-    };
-  } finally {
-    conn.release();
-  }
+  return {
+    ...parent,
+    sub_tasks: children,
+    completed_count: children.filter(c => c.status === 'completed').length,
+    total_count: children.length,
+  };
 }

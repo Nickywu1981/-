@@ -234,7 +234,9 @@ export async function rejectTask(taskId, tenantId) {
 export async function listAllOrders({ page = 1, pageSize = 20, userId, planType }) {
   const offset = (page - 1) * pageSize;
   const { list, total } = await commerceDao.listAllOrders({ offset, pageSize, userId, planType });
-  return { list, total, page, pageSize };
+  const PLAN_LABELS = { 1: '月卡', 2: '季卡', 3: '年卡' };
+  const mapped = list.map(row => ({ ...row, plan_name: PLAN_LABELS[row.plan_type] || '' }));
+  return { list: mapped, total, page, pageSize };
 }
 
 // ==================== 批量操作 ====================

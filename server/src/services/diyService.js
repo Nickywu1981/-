@@ -7,7 +7,7 @@ import logger from '../utils/logger.js';
  * 完整状态机 / 双端配置 / 自动+手动版本 / Redis缓存 / 克隆 / 批量操作 / 发布校验
  * v7: 事务保护 + N+1批量查询优化
  */
-import diyDao from '../dao/diyDao.js';
+import * as diyDao from '../dao/diyDao.js';
 
 // 发布前校验规则
 function validateBeforePublish(page) {
@@ -72,7 +72,7 @@ export default {
   async getPageById(id, tenantId) { return diyDao.getPageById(id, tenantId); },
   async getPublishedPage(slug, tenantId) {
     const page = await diyDao.getPublishedPage(slug, tenantId);
-    if (page) await diyDao.updateAccessCount(slug).catch((e) => { logger.warn('更新访问计数失败:', e.message); });
+    if (page) await diyDao.updateAccessCount(slug, tenantId).catch((e) => { logger.warn('更新访问计数失败:', e.message); });
     return page;
   },
 
@@ -94,7 +94,7 @@ export default {
       if (collision) throw new BusinessError(ERROR_CODE.BAD_REQUEST, `Page slug "${fields.slug}" already in use`);
     }
     await diyDao.updatePage(id, tenantId, fields);
-    if (slugChanged && exist.status === 1) await diyDao.clearPageCache(exist.slug);
+    if (slugChanged && exist.status === 1) await diyDao.clearPageCache(exist.slug, tenantId);
     return diyDao.getPageById(id, tenantId);
   },
 
@@ -113,7 +113,7 @@ export default {
       id: page.id, title: page.title, slug: page.slug, page_type: page.page_type,
       mobileConfig: page.mobile_config, pcConfig: page.pc_config, meta: page.meta_json,
       publishTime: page.publish_time, ownerId: page.owner_id,
-    });
+    }, tenantId);
     return { page, msg };
   },
 
@@ -122,7 +122,7 @@ export default {
     if (!page) throw new BusinessError(ERROR_CODE.NOT_FOUND);
     const msg = checkStateTransition(page.status, 2);
     await diyDao.unpublishPage(id, tenantId);
-    await diyDao.clearPageCache(page.slug);
+    await diyDao.clearPageCache(page.slug, tenantId);
     return { msg };
   },
 
@@ -139,7 +139,7 @@ export default {
       id: page.id, title: page.title, slug: page.slug, page_type: page.page_type,
       mobileConfig: page.mobile_config, pcConfig: page.pc_config, meta: page.meta_json,
       publishTime: page.publish_time, ownerId: page.owner_id,
-    });
+    }, tenantId);
     return { page, msg };
   },
 
@@ -203,7 +203,9 @@ export default {
     if (!page) throw new BusinessError(ERROR_CODE.NOT_FOUND);
     const src = await diyDao.getVersion(pageId, version);
     if (!src) throw new BusinessError(ERROR_CODE.NOT_FOUND);
-    return diyDao.rollbackWithVersion(pageId, tenantId, src);
+    const result = await diyDao.rollbackWithVersion(pageId, tenantId, src);
+    if (page.status === 1) await diyDao.clearPageCache(page.slug, tenantId).catch((e) => { logger.warn('回滚缓存清理失败:', e.message); });
+    return result;
   },
 
   async getLatestAutoVersion(pageId, tenantId) {
@@ -227,28 +229,60 @@ export default {
     }
     if (!validIds.length) return errors;
     const results = await diyDao.batchPublishWithVersions(validIds, tenantId);
+    // 预热已发布页面的缓存
+    for (const p of pages) {
+      if (validIds.includes(p.id)) {
+        await diyDao.cachePublishedPage(p.slug, {
+          id: p.id, title: p.title, slug: p.slug, page_type: p.page_type,
+          mobileConfig: p.mobile_config, pcConfig: p.pc_config, meta: p.meta_json,
+          publishTime: new Date().toISOString(), ownerId: p.owner_id,
+        }, tenantId).catch((e) => { logger.warn('批量发布缓存写入失败:', e.message); });
+      }
+    }
     return [...results, ...errors];
   },
 
   async batchUnpublish(ids, tenantId) {
     const pages = await diyDao.getPagesByIds(ids, tenantId);
-    for (const p of pages) {
-      if (p) await diyDao.clearPageCache(p.slug).catch((e) => { logger.warn('清除页面缓存失败:', e.message); });
+    const pageMap = new Map(pages.filter(Boolean).map(p => [p.id, p]));
+    const errors = [];
+    const validIds = [];
+    for (const id of ids) {
+      const numId = Number(id);
+      if (!pageMap.has(numId)) { errors.push({ id: numId, success: false, error: '页面不存在或不属于当前租户' }); continue; }
+      const p = pageMap.get(numId);
+      if (p.status !== DIY_PAGE_STATUS.PUBLISHED) { errors.push({ id: numId, success: false, error: `页面状态不允许下线（当前状态: ${DIY_PAGE_STATUS_LABEL[p.status] || p.status}）` }); continue; }
+      validIds.push(numId);
     }
-    await diyDao.batchUpdateStatus(ids.filter(Number), tenantId, DIY_PAGE_STATUS.OFFLINE);
-    return { count: ids.length };
+    if (!validIds.length) return errors;
+    for (const id of validIds) {
+      const p = pageMap.get(id);
+      await diyDao.clearPageCache(p.slug, tenantId).catch((e) => { logger.warn('清除页面缓存失败:', e.message); });
+    }
+    await diyDao.batchUpdateStatus(validIds, tenantId, DIY_PAGE_STATUS.OFFLINE);
+    const successResults = validIds.map(id => ({ id, success: true, msg: '下线成功' }));
+    return [...successResults, ...errors];
   },
 
   async batchDelete(ids, tenantId) {
-    // 批量查询替代 N+1 逐条查询
     const pages = await diyDao.getPagesByIds(ids, tenantId);
-    for (const p of pages) {
-      if (p && p.status === DIY_PAGE_STATUS.PUBLISHED) {
-        await diyDao.clearPageCache(p.slug).catch((e) => { logger.warn('清除页面缓存失败:', e.message); });
+    const pageMap = new Map(pages.filter(Boolean).map(p => [p.id, p]));
+    const errors = [];
+    const validIds = [];
+    for (const id of ids) {
+      const numId = Number(id);
+      if (!pageMap.has(numId)) { errors.push({ id: numId, success: false, error: '页面不存在或不属于当前租户' }); continue; }
+      const p = pageMap.get(numId);
+      try { checkStateTransition(p.status, 3); } catch (e) { errors.push({ id: numId, success: false, error: e.message }); continue; }
+      if (p.status === DIY_PAGE_STATUS.PUBLISHED) {
+        await diyDao.clearPageCache(p.slug, tenantId).catch((e) => { logger.warn('清除页面缓存失败:', e.message); });
       }
+      validIds.push(numId);
     }
-    await diyDao.batchUpdateStatus(ids.filter(Number), tenantId, 3);
-    return { count: ids.length };
+    if (!validIds.length) return errors;
+    await diyDao.batchUpdateStatus(validIds, tenantId, 3);
+    const successResults = validIds.map(id => ({ id, success: true, msg: '已移入回收站' }));
+    return [...successResults, ...errors];
   },
 
   // ========== 组件库 ==========
@@ -262,4 +296,24 @@ export default {
   async getTemplateById(id) { return diyDao.getTemplateById(id); },
   async incrementTemplateUse(id) { return diyDao.incrementTemplateUse(id); },
   async listTemplateIndustries() { return diyDao.listTemplateIndustries(); },
+
+  async useTemplate(id, tenantId, ownerId) {
+    const tpl = await diyDao.getTemplateById(id);
+    if (!tpl) throw new BusinessError(ERROR_CODE.NOT_FOUND, '模板不存在');
+    if (!tpl.mobile_config && !tpl.pc_config) throw new BusinessError(ERROR_CODE.BAD_REQUEST, '模板配置数据为空');
+    const baseSlug = tpl.title ? tpl.title.replace(/[^a-z0-9\u4e00-\u9fa5]+/gi, '-').replace(/^-+|-+$/g, '').toLowerCase().slice(0, 60) : 'template-page';
+    const slug = `${baseSlug}-${Date.now().toString(36)}`;
+    const page = await diyDao.createPageWithVersion({
+      tenantId, ownerId: ownerId || 0,
+      title: tpl.title + '（从模板创建）',
+      slug,
+      pageType: tpl.page_type || 'mobile',
+      accessType: 'private',
+      mobileConfig: tpl.mobile_config || { sections: [] },
+      pcConfig: tpl.pc_config || { sections: [] },
+      metaJson: { templateId: id, templateTitle: tpl.title },
+    });
+    await diyDao.incrementTemplateUse(id).catch((e) => { logger.warn('模板使用计数更新失败:', e.message); });
+    return page;
+  },
 };

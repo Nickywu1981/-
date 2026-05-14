@@ -131,15 +131,17 @@ export const batchPublish = wrapController(async (req, res) => {
 export const batchUnpublish = wrapController(async (req, res) => {
   const { ids } = req.body;
   if (!Array.isArray(ids) || !ids.length) throw new BusinessError(ERROR_CODE.PARAM_ERROR);
-  const result = await diyService.batchUnpublish(ids, req.tenantId);
-  return success(res, null, `已下线${result.count}个页面`);
+  const results = await diyService.batchUnpublish(ids, req.tenantId);
+  const successCount = results.filter(r => r.success).length;
+  return success(res, results, `成功${successCount}个，失败${results.length - successCount}个`);
 });
 
 export const batchDelete = wrapController(async (req, res) => {
   const { ids } = req.body;
   if (!Array.isArray(ids) || !ids.length) throw new BusinessError(ERROR_CODE.PARAM_ERROR);
-  const result = await diyService.batchDelete(ids, req.tenantId);
-  return success(res, null, `已将${result.count}个页面移入回收站`);
+  const results = await diyService.batchDelete(ids, req.tenantId);
+  const successCount = results.filter(r => r.success).length;
+  return success(res, results, `成功${successCount}个，失败${results.length - successCount}个`);
 });
 
 // ==================== 组件库 ====================
@@ -173,8 +175,8 @@ export const getTemplate = wrapController(async (req, res) => {
 });
 
 export const useTemplate = wrapController(async (req, res) => {
-  await diyService.incrementTemplateUse(req.params.id);
-  return success(res, null, 'ok');
+  const page = await diyService.useTemplate(req.params.id, req.tenantId, req.user?.id);
+  return success(res, page, '已从模板创建页面');
 });
 
 export const listTemplateIndustries = wrapController(async (req, res) => {

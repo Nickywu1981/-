@@ -3,7 +3,7 @@
  */
 import { wrapController } from '../utils/wrapController.js';
 import { success } from '../utils/response.js';
-import cutEcosystemService from '../services/cutEcosystemService.js';
+import * as cutEcosystemService from '../services/cutEcosystemService.js';
 
 export const exportJianying = wrapController(async (req, res) => {
   const result = await cutEcosystemService.exportJianyingDraft(req.user.id, req.validated);

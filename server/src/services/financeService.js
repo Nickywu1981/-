@@ -105,17 +105,16 @@ export async function createWithdrawal(tenantId, userId, data) {
     const actualAmount = safeAmount - fee;
     const orderNo = `WD${Date.now()}${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
 
-    // 插入提现单 (uses raw conn for transactional atomicity)
-    const [wdResult] = await conn.query('INSERT INTO withdrawal_order SET ?', {
-      order_no: orderNo,
-      tenant_id: tenantId,
-      user_id: userId,
+    // 插入提现单
+    await financeDao.createWithdrawal({
+      orderNo,
+      tenantId,
+      userId,
       amount: safeAmount,
       fee,
-      actual_amount: actualAmount,
-      bank_account_id: bankAccountId || null,
-      status: 'pending_review',
-    });
+      actualAmount,
+      bankAccountId: bankAccountId || null,
+    }, conn);
 
     // 更新余额
     const newBalance = balance - safeAmount;

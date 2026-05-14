@@ -10,7 +10,7 @@ import { BusinessError } from '../utils/businessError.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { e2bConfig as config, isProduction } from '../config/index.js';
 import { getRedis } from '../dao/redis.js';
-import pool from '../dao/db.js';
+import * as e2bDao from '../dao/e2bDao.js';
 import logger from '../utils/logger.js';
 import { checkAlerts } from './alertService.js';
 import { getDashboardSummary } from './monitorService.js';
@@ -206,10 +206,11 @@ function _checkCodeLength(code, language) {
 async function _logExecution({ sandboxId, userId, language, code, stdout, stderr, exitCode, elapsedMs, status, errorMsg }) {
   try {
     const codeHash = crypto.createHash('sha256').update(code || '').digest('hex').slice(0, 16);
-    await pool.query(
-      'INSERT INTO e2b_execution_log (sandbox_id, user_id, language, code_hash, stdout_len, stderr_len, exit_code, elapsed_ms, status, error_msg, create_time) VALUES (?,?,?,?,?,?,?,?,?,?,NOW())',
-      [sandboxId, userId, language || 'python', codeHash, (stdout || '').length, (stderr || '').length, exitCode ?? null, elapsedMs || 0, status, errorMsg || null],
-    );
+    await e2bDao.insertExecutionLog({
+      sandboxId, userId: String(userId), language: language || 'python', codeHash,
+      stdoutLen: (stdout || '').length, stderrLen: (stderr || '').length,
+      exitCode: exitCode ?? null, elapsedMs: elapsedMs || 0, status, errorMsg: errorMsg || null,
+    });
   } catch (err) {
     logger.warn('[E2B] 审计日志写入失败', { sandboxId, error: err.message });
   }

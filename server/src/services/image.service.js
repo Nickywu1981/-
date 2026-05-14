@@ -8,7 +8,7 @@ import { BusinessError } from '../utils/businessError.js';
  */
 import { submitJob } from './job-queue.service.js';
 import * as moderationService from './moderation.service.js';
-import db from '../dao/db.js';
+import { findUserJobsByTypes } from '../dao/jobQueueDao.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
 /**
@@ -102,28 +102,11 @@ export async function batchReplaceImage(userId, { images, newBackground, newScen
   }, { priority: 4 });
 }
 
+const IMAGE_TASK_TYPES = ['image_gen', 'image_replicate', 'batch_image_gen', 'batch_image_edit', 'batch_image_replace'];
+
 /**
  * 图片作品查询
  */
 export async function getImageWorks(userId, { page = 1, pageSize = 20, status } = {}) {
-  const conn = await db.getConnection();
-  try {
-    let where = "WHERE user_id = ? AND task_type IN ('image_gen','image_replicate','batch_image_gen','batch_image_edit','batch_image_replace')";
-    const params = [userId];
-
-    if (status) { where += ' AND status = ?'; params.push(status); }
-
-    const [countRows] = await conn.query(`SELECT COUNT(*) as total FROM job_queue ${where}`, params);
-    const total = countRows[0].total;
-
-    const [rows] = await conn.query(
-      `SELECT id, task_type, status, progress, result_data, error_message, created_at, completed_at
-       FROM job_queue ${where} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
-      [...params, pageSize, (page - 1) * pageSize],
-    );
-
-    return { list: rows, total, page, pageSize };
-  } finally {
-    conn.release();
-  }
+  return findUserJobsByTypes(userId, IMAGE_TASK_TYPES, { status, page, pageSize });
 }

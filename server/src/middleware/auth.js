@@ -32,6 +32,7 @@ export function generateAccessToken(user) {
     {
       userId: user.userId || user.id,
       role: user.role || 'user',
+      nickname: user.nickname || '',
       tenantId: user.tenantId || 0,
       aud: user.audience || 'consumer',                // Phase 0-A: 多端标识
       entId: user.entId || null,                       // Phase 0-A: 企业ID
@@ -241,7 +242,7 @@ export function editorAuth(req, res, next) {
 
 /** 超级管理员认证 */
 export function superAdminAuth(req, res, next) {
-  if (!hasRole(req.user, 'super_admin')) {
+  if (!req.user || !hasRole(req.user, 'super_admin')) {
     return sendError(res, ERROR_CODE.EC_AUTH_005);
   }
   next();

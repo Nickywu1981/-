@@ -65,7 +65,11 @@ async function checkMagicNumber(filePath, mimeType) {
       if (buf[offset + i] !== expected[i]) return false;
     }
     return true;
-  } catch { return false; }
+  } catch (err) {
+    // 文件读取异常（权限/IO错误）≠ 魔数不匹配，不应误删文件
+    logger.error('[Upload] 魔数检测失败（文件读取异常）', { filePath, mimeType, error: err.message });
+    return { readError: true };
+  }
   finally { if (fh) await fh.close(); }
 }
 
@@ -101,9 +105,16 @@ export async function magicNumberGuard(req, res, next) {
   if (!req.file && !req.files) return next();
   const files = req.files ? (Array.isArray(req.files) ? req.files : Object.values(req.files).flat()) : [req.file];
   for (const f of files) {
-    if (!(await checkMagicNumber(f.path, f.mimetype))) {
-      fs.unlink(f.path, () => {}); // 删除恶意文件
+    const result = await checkMagicNumber(f.path, f.mimetype);
+    if (result === false) {
+      fs.unlink(f.path, (err) => {
+        if (err) logger.error('[Upload] 删除恶意文件失败', { path: f.path, error: err.message });
+      });
       return error(res, 400, '文件内容与扩展名不匹配，已拒绝');
+    }
+    if (result && result.readError) {
+      // 文件无法读取但保留，记录告警由人工审核
+      logger.warn('[Upload] 魔数检测跳过（文件不可读），保留文件待人工审核', { path: f.path, mimeType: f.mimetype });
     }
   }
   next();

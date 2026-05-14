@@ -7,7 +7,7 @@ import { BusinessError } from '../utils/businessError.js';
  */
 import { submitJob } from './job-queue.service.js';
 import * as moderationService from './moderation.service.js';
-import db from '../dao/db.js';
+import { findJobById, findUserJobsByTypes } from '../dao/jobQueueDao.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
 // ============================================================
@@ -122,50 +122,22 @@ export async function generateStoryboard(userId, { prompt, sceneCount = 5 }) {
 // 视频任务进度查询
 // ============================================================
 export async function getVideoJobStatus(jobId, userId) {
-  const conn = await db.getConnection();
-  try {
-    const [rows] = await conn.query(
-      'SELECT id, user_id, task_type, status, progress, result_data, error_message, retry_count, created_at, started_at, completed_at FROM job_queue WHERE id = ? AND user_id = ?',
-      [jobId, userId],
-    );
-    if (rows.length === 0) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
-    return rows[0];
-  } finally {
-    conn.release();
-  }
+  const job = await findJobById(jobId, userId);
+  if (!job) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
+  return job;
 }
 
 // ============================================================
 // 视频作品管理
 // ============================================================
+const VIDEO_TASK_TYPES = [
+  'video_gen', 'image_to_video', 'multi_image_to_video', 'video_package',
+  'character_replace', 'action_migrate', 'batch_action_migrate',
+  'digital_human', 'storyboard_gen', 'product_ad_video',
+  'live_clip', 'live_cut', 'live_noise_fix', 'live_subtitle_fix',
+  'viral_analysis', 'viral_replicate',
+];
+
 export async function getVideoWorks(userId, { page = 1, pageSize = 20, status, taskType } = {}) {
-  const conn = await db.getConnection();
-  try {
-    const videoTypes = [
-      'video_gen', 'image_to_video', 'multi_image_to_video', 'video_package',
-      'character_replace', 'action_migrate', 'batch_action_migrate',
-      'digital_human', 'storyboard_gen', 'product_ad_video',
-      'live_clip', 'live_cut', 'live_noise_fix', 'live_subtitle_fix',
-      'viral_analysis', 'viral_replicate',
-    ];
-
-    let where = 'WHERE user_id = ? AND task_type IN (?)';
-    const params = [userId, videoTypes];
-
-    if (status) { where += ' AND status = ?'; params.push(status); }
-    if (taskType) { where = where.replace('task_type IN (?)', 'task_type = ?'); params[1] = taskType; }
-
-    const [countRows] = await conn.query(`SELECT COUNT(*) as total FROM job_queue ${where}`, params);
-    const total = countRows[0].total;
-
-    const [rows] = await conn.query(
-      `SELECT id, task_type, status, progress, result_data, error_message, created_at, completed_at
-       FROM job_queue ${where} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
-      [...params, pageSize, (page - 1) * pageSize],
-    );
-
-    return { list: rows, total, page, pageSize };
-  } finally {
-    conn.release();
-  }
+  return findUserJobsByTypes(userId, taskType ? [taskType] : VIDEO_TASK_TYPES, { status, page, pageSize });
 }

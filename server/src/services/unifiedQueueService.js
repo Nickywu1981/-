@@ -234,7 +234,7 @@ export async function processNightBatchJobs() {
 
 export async function getQueueStats() {
   const stats = await jobQueueService.getQueueStats();
-  const activeBatches = batchProgressCache.size;
+  const activeBatches = memFallback.size;
   return { ...stats, activeBatches };
 }
 

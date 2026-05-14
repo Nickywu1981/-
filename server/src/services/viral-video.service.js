@@ -5,7 +5,7 @@ import { BusinessError } from '../utils/businessError.js';
  * G5 后端开发 | W3
  */
 import { submitJob } from './job-queue.service.js';
-import db from '../dao/db.js';
+import { findJobById } from '../dao/jobQueueDao.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
 /**
@@ -34,15 +34,7 @@ export async function replicateViralVideo(userId, { analysisJobId, productName, 
  * 获取分析结果
  */
 export async function getViralAnalysis(jobId, userId) {
-  const conn = await db.getConnection();
-  try {
-    const [rows] = await conn.query(
-      'SELECT id, status, progress, result_data, created_at FROM job_queue WHERE id = ? AND user_id = ? AND task_type = ?',
-      [jobId, userId, 'viral_analysis'],
-    );
-    if (rows.length === 0) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
-    return rows[0];
-  } finally {
-    conn.release();
-  }
+  const job = await findJobById(jobId, userId);
+  if (!job || job.task_type !== 'viral_analysis') throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
+  return job;
 }
