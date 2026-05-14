@@ -6,6 +6,7 @@ import { BusinessError } from '../utils/businessError.js';
  * 积分赚取 / 消费 / 兑换 / 账户管理（乐观锁防超扣）
  */
 import db from '../dao/db.js';
+import * as pointsDao from '../dao/pointsDao.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
 // ── 乐观锁重试工具（版本冲突时自动重试，最大 3 次指数退避）──
@@ -25,32 +26,19 @@ async function withOptimisticRetry(fn, maxRetries = 3) {
 
 // 积分规则
 const POINT_RULES = {
-  register: 100,        // 注册奖励
-  daily_checkin: 10,    // 每日签到
-  checkin_streak_bonus: 5, // 连续签到额外
-  image_gen: 2,         // 生图
-  video_gen: 5,         // 生视频
-  action_migrate: 10,   // 动作迁移
-  digital_human: 8,     // 数字人
-  viral_replicate: 8,   // 爆款复刻
-  share_product: 5,     // 分享作品
-  invite_register: 50,  // 邀请注册
-  invite_purchase: 200, // 邀请首购
-  redeem_credits: { 100: 10, 500: 60, 1000: 150 }, // 积分兑换点数 (积分:点数)
+  register: 100,
+  daily_checkin: 10,
+  checkin_streak_bonus: 5,
+  image_gen: 2,
+  video_gen: 5,
+  action_migrate: 10,
+  digital_human: 8,
+  viral_replicate: 8,
+  share_product: 5,
+  invite_register: 50,
+  invite_purchase: 200,
+  redeem_credits: { 100: 10, 500: 60, 1000: 150 },
 };
-
-// ============================================================
-// 获取/创建积分账户
-// ============================================================
-async function getOrCreateAccount(conn, userId) {
-  const [rows] = await conn.query('SELECT * FROM points_account WHERE user_id = ? LIMIT 1', [userId]);
-  if (rows.length > 0) return rows[0];
-  await conn.query(
-    'INSERT INTO points_account (user_id, balance, total_earned, total_spent, frozen) VALUES (?, 0, 0, 0, 0)',
-    [userId],
-  );
-  return { user_id: userId, balance: 0, total_earned: 0, total_spent: 0, frozen: 0, version: 1 };
-}
 
 // ============================================================
 // 赚取积分（带乐观锁）
@@ -62,23 +50,15 @@ export async function earnPoints(userId, { amount, businessType, businessId, rem
     const conn = await db.getConnection();
     try {
       await conn.beginTransaction();
-
-      const account = await getOrCreateAccount(conn, userId);
-
-      const [result] = await conn.query(
-        `UPDATE points_account SET balance = balance + ?, total_earned = total_earned + ?, version = version + 1
-         WHERE user_id = ? AND version = ?`,
-        [amount, amount, userId, account.version],
-      );
-      if (result.affectedRows === 0) throw new BusinessError(ERROR_CODE.RESOURCE_DUPLICATE);
+      const account = await pointsDao.getOrCreateAccount(conn, userId);
+      const affected = await pointsDao.addBalance(conn, userId, amount, account.version);
+      if (affected === 0) throw new BusinessError(ERROR_CODE.RESOURCE_DUPLICATE);
 
       const newBalance = account.balance + amount;
-
-      await conn.query(
-        `INSERT INTO points_transaction (user_id, trans_type, amount, balance_after, business_type, business_id, remark)
-         VALUES (?, 'earn', ?, ?, ?, ?, ?)`,
-        [userId, amount, newBalance, businessType, businessId || null, remark],
-      );
+      await pointsDao.insertTransaction(conn, {
+        userId, transType: 'earn', amount, balanceAfter: newBalance,
+        businessType, businessId, remark,
+      });
 
       await conn.commit();
       return { user_id: userId, balance: newBalance, earned: amount };
@@ -101,24 +81,17 @@ export async function spendPoints(userId, { amount, businessType, businessId, re
     const conn = await db.getConnection();
     try {
       await conn.beginTransaction();
-
-      const account = await getOrCreateAccount(conn, userId);
+      const account = await pointsDao.getOrCreateAccount(conn, userId);
       if (account.balance < amount) throw new BusinessError(ERROR_CODE.QUOTA_EXCEEDED);
 
-      const [result] = await conn.query(
-        `UPDATE points_account SET balance = balance - ?, total_spent = total_spent + ?, version = version + 1
-         WHERE user_id = ? AND version = ? AND balance >= ?`,
-        [amount, amount, userId, account.version, amount],
-      );
-      if (result.affectedRows === 0) throw new BusinessError(ERROR_CODE.RESOURCE_DUPLICATE);
+      const affected = await pointsDao.deductBalance(conn, userId, amount, account.version);
+      if (affected === 0) throw new BusinessError(ERROR_CODE.RESOURCE_DUPLICATE);
 
       const newBalance = account.balance - amount;
-
-      await conn.query(
-        `INSERT INTO points_transaction (user_id, trans_type, amount, balance_after, business_type, business_id, remark)
-         VALUES (?, 'spend', ?, ?, ?, ?, ?)`,
-        [userId, -amount, newBalance, businessType, businessId || null, remark],
-      );
+      await pointsDao.insertTransaction(conn, {
+        userId, transType: 'spend', amount: -amount, balanceAfter: newBalance,
+        businessType, businessId, remark,
+      });
 
       await conn.commit();
       return { user_id: userId, balance: newBalance, spent: amount };
@@ -143,30 +116,20 @@ export async function redeemPointsForCredits(userId, pointsAmount) {
     const conn = await db.getConnection();
     try {
       await conn.beginTransaction();
-
-      const account = await getOrCreateAccount(conn, userId);
+      const account = await pointsDao.getOrCreateAccount(conn, userId);
       if (account.balance < pointsAmount) throw new BusinessError(ERROR_CODE.QUOTA_EXCEEDED);
 
-      const [result] = await conn.query(
-        `UPDATE points_account SET balance = balance - ?, total_spent = total_spent + ?, version = version + 1
-         WHERE user_id = ? AND version = ? AND balance >= ?`,
-        [pointsAmount, pointsAmount, userId, account.version, pointsAmount],
-      );
-      if (result.affectedRows === 0) throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
+      const affected = await pointsDao.deductBalance(conn, userId, pointsAmount, account.version);
+      if (affected === 0) throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
 
       const newBalance = account.balance - pointsAmount;
+      await pointsDao.insertTransaction(conn, {
+        userId, transType: 'spend', amount: -pointsAmount, balanceAfter: newBalance,
+        businessType: 'redeem_credits', remark: `兑换${creditAmount}点数`,
+      });
 
-      await conn.query(
-        `INSERT INTO points_transaction (user_id, trans_type, amount, balance_after, business_type, remark)
-         VALUES (?, 'spend', ?, ?, 'redeem_credits', ?)`,
-        [userId, -pointsAmount, newBalance, `兑换${creditAmount}点数`],
-      );
-
-      const [membership] = await conn.query(
-        'UPDATE user_membership SET credit_balance = credit_balance + ? WHERE user_id = ?',
-        [creditAmount, userId],
-      );
-      if (membership.affectedRows === 0) {
+      const membershipAffected = await pointsDao.addMembershipCredits(conn, userId, creditAmount);
+      if (membershipAffected === 0) {
         await conn.rollback();
         throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
       }
@@ -186,30 +149,15 @@ export async function redeemPointsForCredits(userId, pointsAmount) {
 // 查询积分账户
 // ============================================================
 export async function getPointsAccount(userId) {
-  const conn = await db.getConnection();
-  try {
-    const [rows] = await conn.query('SELECT user_id, balance, total_earned, total_spent, frozen FROM points_account WHERE user_id = ?', [userId]);
-    return rows.length > 0 ? rows[0] : { user_id: userId, balance: 0, total_earned: 0, total_spent: 0, frozen: 0 };
-  } finally {
-    conn.release();
-  }
+  const account = await pointsDao.getAccount(userId);
+  return account || { user_id: userId, balance: 0, total_earned: 0, total_spent: 0, frozen: 0 };
 }
 
 // ============================================================
 // 积分流水
 // ============================================================
 export async function getPointsTransactions(userId, { page = 1, pageSize = 20 } = {}) {
-  const conn = await db.getConnection();
-  try {
-    const [[{ total }]] = await conn.query('SELECT COUNT(*) as total FROM points_transaction WHERE user_id = ?', [userId]);
-    const [rows] = await conn.query(
-      'SELECT id, trans_type, amount, balance_after, business_type, remark, created_at FROM points_transaction WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?',
-      [userId, pageSize, (page - 1) * pageSize],
-    );
-    return { list: rows, total, page, pageSize };
-  } finally {
-    conn.release();
-  }
+  return pointsDao.getTransactions(userId, { page, pageSize });
 }
 
 // ============================================================
@@ -219,41 +167,28 @@ export async function awardPointsForTask(userId, taskType, taskId) {
   const points = POINT_RULES[taskType] || 0;
   if (points <= 0) return null;
 
-  // 防重：同一任务只奖励一次 — 检查+写入在同一事务中
   const conn = await db.getConnection();
   try {
     await conn.beginTransaction();
 
-    const [existing] = await conn.query(
-      'SELECT id FROM points_transaction WHERE user_id = ? AND business_type = ? AND business_id = ? FOR UPDATE',
-      [userId, taskType, taskId],
-    );
+    const existing = await pointsDao.findTransactionByBusiness(conn, userId, taskType, taskId);
     if (existing.length > 0) {
       await conn.rollback();
-      return null; // 已奖励
+      return null;
     }
 
-    const account = await getOrCreateAccount(conn, userId);
-
-    // 乐观锁更新
-    const [result] = await conn.query(
-      `UPDATE points_account SET balance = balance + ?, total_earned = total_earned + ?, version = version + 1
-       WHERE user_id = ? AND version = ?`,
-      [points, points, userId, account.version],
-    );
-    if (result.affectedRows === 0) {
+    const account = await pointsDao.getOrCreateAccount(conn, userId);
+    const affected = await pointsDao.addBalance(conn, userId, points, account.version);
+    if (affected === 0) {
       await conn.rollback();
       throw new BusinessError(ERROR_CODE.RESOURCE_DUPLICATE);
     }
 
     const newBalance = account.balance + points;
-
-    // 记录流水
-    await conn.query(
-      `INSERT INTO points_transaction (user_id, trans_type, amount, balance_after, business_type, business_id, remark)
-       VALUES (?, 'earn', ?, ?, ?, ?, ?)`,
-      [userId, points, newBalance, taskType, taskId, `完成${taskType}任务`],
-    );
+    await pointsDao.insertTransaction(conn, {
+      userId, transType: 'earn', amount: points, balanceAfter: newBalance,
+      businessType: taskType, businessId: taskId, remark: `完成${taskType}任务`,
+    });
 
     await conn.commit();
     return { user_id: userId, balance: newBalance, earned: points };

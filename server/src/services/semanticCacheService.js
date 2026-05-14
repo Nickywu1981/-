@@ -83,7 +83,7 @@ function hammingDistance(a, b) {
 // ==================== 内存缓存 ====================
 
 const memoryStore = new Map();
-const simHashIndex = new Map(); // simHash hex → [{ key, result, timestamp }]
+const simHashIndex = new Map(); // modelId → [{ simHash, result, timestamp }]
 
 function pruneMemoryStore() {
   const now = Date.now();
@@ -94,6 +94,12 @@ function pruneMemoryStore() {
     const entries = [...memoryStore.entries()].sort((a, b) => a[1].timestamp - b[1].timestamp);
     const toDelete = entries.slice(0, entries.length - config.maxSize);
     for (const [key] of toDelete) memoryStore.delete(key);
+  }
+  // simHashIndex 过期清理
+  for (const [modelId, entries] of simHashIndex) {
+    const filtered = entries.filter(e => now - e.timestamp <= config.ttlMs);
+    if (filtered.length === 0) simHashIndex.delete(modelId);
+    else simHashIndex.set(modelId, filtered);
   }
 }
 
@@ -170,14 +176,11 @@ export async function getSemantic(modelId, textInput) {
     }
   }
 
-  // 内存
-  const indexKey = `${modelId}:${hash.toString(16)}`;
-  const candidates = simHashIndex.get(indexKey) || [];
-  if (candidates.length > 0) {
-    for (const entry of candidates) {
-      if (hammingDistance(hash, entry.simHash || 0n) <= config.semanticThreshold) {
-        return entry.result;
-      }
+  // 内存 — 按 modelId 分组，遍历所有候选 simHash
+  const candidates = simHashIndex.get(modelId) || [];
+  for (const entry of candidates) {
+    if (hammingDistance(hash, entry.simHash) <= config.semanticThreshold) {
+      return entry.result;
     }
   }
 
@@ -205,12 +208,11 @@ export async function setSemantic(modelId, textInput, result) {
     }
   }
 
-  // 内存
-  const indexKey = `${modelId}:${hash.toString(16)}`;
-  if (!simHashIndex.has(indexKey)) {
-    simHashIndex.set(indexKey, []);
+  // 内存 — 按 modelId 分组
+  if (!simHashIndex.has(modelId)) {
+    simHashIndex.set(modelId, []);
   }
-  simHashIndex.get(indexKey).push({ simHash: hash, result, timestamp: Date.now() });
+  simHashIndex.get(modelId).push({ simHash: hash, result, timestamp: Date.now() });
 }
 
 // ==================== 缓存统计 ====================

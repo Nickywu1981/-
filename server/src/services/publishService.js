@@ -5,6 +5,7 @@
  * 流程: 作品选择 → 平台勾选 → 内容适配 → 提交分发 → 状态追踪 → 失败重试
  */
 import db from '../dao/db.js';
+import * as publishDao from '../dao/publishDao.js';
 import { BusinessError } from '../utils/businessError.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
@@ -29,19 +30,9 @@ export function getPublishPlatforms() {
   return Object.entries(PLATFORM_PUBLISH_SPECS).map(([key, val]) => ({ key, ...val }));
 }
 
-/**
- * 提交一键分发任务
- * @param {number} userId
- * @param {string} workId      — 作品ID (assets 表)
- * @param {string[]} platforms — 目标平台列表
- * @param {object} options     — { title, description, tags, scheduleAt }
- */
 export async function submitPublish(userId, workId, platforms, options = {}) {
-  if (!platforms || platforms.length === 0) {
-    throw new BusinessError(ERROR_CODE.PARAM_MISSING);
-  }
+  if (!platforms || platforms.length === 0) throw new BusinessError(ERROR_CODE.PARAM_MISSING);
 
-  // 验证平台合法性
   const invalid = platforms.filter(p => !PLATFORM_PUBLISH_SPECS[p]);
   if (invalid.length > 0) {
     throw new BusinessError(ERROR_CODE.PARAM_INVALID, `Unsupported platforms: ${invalid.join(", ")}`);
@@ -49,46 +40,31 @@ export async function submitPublish(userId, workId, platforms, options = {}) {
 
   const conn = await db.getConnection();
   try {
-    // 验证作品存在
-    const [[asset]] = await conn.query(
-      'SELECT id, file_url, file_type, file_size FROM assets WHERE id = ? AND user_id = ?',
-      [workId, userId],
-    );
+    const asset = await publishDao.validateAsset(conn, workId, userId);
     if (!asset) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
 
     await conn.beginTransaction();
 
-    // 批量创建发布记录（单条 INSERT 多 VALUES，避免 N+1）
     const batchId = `PUB_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     const status = options.scheduleAt ? 'scheduled' : 'pending';
-    const values = platforms.map(() => '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').join(', ');
-    const params = [];
-    for (const platform of platforms) {
+    const records = platforms.map(platform => {
       const spec = PLATFORM_PUBLISH_SPECS[platform];
-      params.push(
-        batchId, userId, workId, platform, spec.name, status,
-        options.title || '', options.description || '',
-        JSON.stringify(options.tags || []), asset.file_url,
-        options.scheduleAt || null,
-      );
-    }
+      return {
+        batchId, userId, assetId: workId, platform, platformName: spec.name, status,
+        title: options.title || '', description: options.description || '',
+        tags: options.tags || [], contentUrl: asset.file_url,
+        scheduledAt: options.scheduleAt || null,
+      };
+    });
 
-    const [result] = await conn.query(
-      `INSERT INTO publish_record (batch_id, user_id, asset_id, platform, platform_name, status,
-         title, description, tags, content_url, scheduled_at)
-       VALUES ${values}`,
-      params,
-    );
+    const firstInsertId = await publishDao.insertRecords(conn, records);
 
-    const records = [];
-    const firstInsertId = result.insertId;
-    for (let i = 0; i < platforms.length; i++) {
-      const spec = PLATFORM_PUBLISH_SPECS[platforms[i]];
-      records.push({ id: firstInsertId + i, platform: platforms[i], platformName: spec.name, status });
-    }
+    const result = platforms.map((platform, i) => ({
+      id: firstInsertId + i, platform, platformName: PLATFORM_PUBLISH_SPECS[platform].name, status,
+    }));
 
     await conn.commit();
-    return { batchId, totalPlatforms: platforms.length, records };
+    return { batchId, totalPlatforms: platforms.length, records: result };
   } catch (err) {
     await conn.rollback();
     throw err;
@@ -97,104 +73,29 @@ export async function submitPublish(userId, workId, platforms, options = {}) {
   }
 }
 
-/**
- * 获取分发批次详情
- */
 export async function getPublishBatch(batchId, userId) {
-  const conn = await db.getConnection();
-  try {
-    const [rows] = await conn.query(
-      `SELECT pr.*, a.file_url, a.file_type, a.thumbnail_url
-       FROM publish_record pr
-       LEFT JOIN assets a ON a.id = pr.asset_id
-       WHERE pr.batch_id = ? AND pr.user_id = ?
-       ORDER BY pr.created_at DESC`,
-      [batchId, userId],
-    );
-    if (rows.length === 0) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
-    return { batchId, records: rows };
-  } finally {
-    conn.release();
-  }
+  const rows = await publishDao.findBatchByBatchId(batchId, userId);
+  if (rows.length === 0) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
+  return { batchId, records: rows };
 }
 
-/**
- * 重发失败的平台
- */
 export async function retryPublish(recordId, userId) {
-  const conn = await db.getConnection();
-  try {
-    const [[record]] = await conn.query(
-      'SELECT * FROM publish_record WHERE id = ? AND user_id = ? LIMIT 1',
-      [recordId, userId],
-    );
-    if (!record) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
-    if (!['failed', 'error'].includes(record.status)) {
-      throw new BusinessError(ERROR_CODE.PARAM_ERROR, `Status ${record.status} cannot be resent`);
-    }
-
-    await conn.query(
-      'UPDATE publish_record SET status = ?, retry_count = retry_count + 1, error_msg = NULL, updated_at = NOW() WHERE id = ?',
-      ['pending', recordId],
-    );
-    return { id: recordId, platform: record.platform, status: 'pending', retryCount: record.retry_count + 1 };
-  } finally {
-    conn.release();
+  const record = await publishDao.findRecordById(recordId, userId);
+  if (!record) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
+  if (!['failed', 'error'].includes(record.status)) {
+    throw new BusinessError(ERROR_CODE.PARAM_ERROR, `Status ${record.status} cannot be resent`);
   }
+
+  await publishDao.updateStatusToPending(recordId);
+  return { id: recordId, platform: record.platform, status: 'pending', retryCount: record.retry_count + 1 };
 }
 
-/**
- * 分发历史 (支持按状态/平台筛选)
- */
 export async function listPublishHistory(userId, { page = 1, pageSize = 20, status, platform } = {}) {
-  const conn = await db.getConnection();
-  try {
-    const conditions = ['pr.user_id = ?'];
-    const params = [userId];
-
-    if (status) { conditions.push('pr.status = ?'); params.push(status); }
-    if (platform) { conditions.push('pr.platform = ?'); params.push(platform); }
-
-    const where = conditions.join(' AND ');
-
-    const [[{ total }]] = await conn.query(
-      `SELECT COUNT(*) as total FROM publish_record pr WHERE ${where}`,
-      params,
-    );
-    const [rows] = await conn.query(
-      `SELECT pr.*, a.file_url, a.thumbnail_url, a.file_type
-       FROM publish_record pr
-       LEFT JOIN assets a ON a.id = pr.asset_id
-       WHERE ${where}
-       ORDER BY pr.created_at DESC LIMIT ? OFFSET ?`,
-      [...params, pageSize, (page - 1) * pageSize],
-    );
-    return { list: rows, total, page, pageSize };
-  } finally {
-    conn.release();
-  }
+  return publishDao.listHistory(userId, { page, pageSize, status, platform });
 }
 
-/**
- * 分发概览统计 (仪表盘用)
- */
 export async function getPublishStats(userId) {
-  const conn = await db.getConnection();
-  try {
-    const [[stats]] = await conn.query(
-      `SELECT
-         COUNT(*) as total,
-         SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) as success,
-         SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) as failed,
-         SUM(CASE WHEN status = 'pending' OR status = 'processing' THEN 1 ELSE 0 END) as inProgress,
-         SUM(CASE WHEN status = 'scheduled' THEN 1 ELSE 0 END) as scheduled
-       FROM publish_record WHERE user_id = ?`,
-      [userId],
-    );
-    return stats;
-  } finally {
-    conn.release();
-  }
+  return publishDao.getStats(userId);
 }
 
 export { PLATFORM_PUBLISH_SPECS };

@@ -4,7 +4,7 @@ import { canarySelect, weightedRoundRobin, checkTenantQuota, consumeTenantTokens
 import { aiGatewayConfig } from '../config/index.js';
 
 /**
- * ModelDispatcher — 多模型统一调度层 (v5.0)
+ * ModelDispatcher — 多模型统一调度层 (v5.1)
  * G1 Architect | 整合 aiEngine + model-router 双系统
  *
  * 三种模式:
@@ -12,12 +12,15 @@ import { aiGatewayConfig } from '../config/index.js';
  *   custom → 用户配 pipeline（模型+排序+优先级+降级链）→ serial/parallel 执行
  *   single → 单一模型直接调用，走 aiEngine.infer() 管线
  *
- * 模型按 text / image / video 三大类专项管理，同类内匹配，防止错配
+ * 子模块: modelCategories / modelMatcher / resultAggregator
  * Phase 3 扩展点: CostRouter / StreamingManager / TenantModelACL
  */
 
 import { infer, pipeline, registerModel, getModel, listModels, getFallbackModel, healthCheck, getUsageStats, clearCache, getCacheSize } from './aiEngine.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
+import { categorizeModels, getModelsByCategory, getCategories, getTaskCategory } from './modelCategories.js';
+import { analyzeTask, rankModels, scoreModel, getHealthData, refreshScoreCache } from './modelMatcher.js';
+import { aggregateResults } from './resultAggregator.js';
 
 // ==================== 惰性初始化 ====================
 
@@ -36,216 +39,6 @@ async function ensureModels() {
   _modelsReady = true;
 }
 
-// ==================== 模型分类管理 ====================
-
-const MODEL_CATEGORIES = ['text', 'image', 'video', 'audio'];
-
-const categoryMap = new Map();
-
-export function categorizeModels() {
-  categoryMap.clear();
-  for (const cat of MODEL_CATEGORIES) categoryMap.set(cat, []);
-
-  const all = listModels();
-  for (const m of all) {
-    const cat = m.type || m.category || 'text';
-    if (categoryMap.has(cat)) {
-      categoryMap.get(cat).push(m);
-    }
-  }
-  return Object.fromEntries(categoryMap);
-}
-
-export function getModelsByCategory(category) {
-  if (!categoryMap.has(category)) categorizeModels();
-  return categoryMap.get(category) || [];
-}
-
-export function getCategories() {
-  return Object.fromEntries(
-    MODEL_CATEGORIES.map((cat) => [cat, getModelsByCategory(cat).map((m) => m.id)]),
-  );
-}
-
-// ==================== 任务类型 → 类别映射 ====================
-
-const TASK_CATEGORY_MAP = {
-  // text
-  text_gen: 'text', script_gen: 'text', title_gen: 'text', translate: 'text',
-  compliance_check: 'text', caption_gen: 'text', seo_text: 'text',
-  // image
-  cutout: 'image', cutout_hq: 'image', bg_white: 'image', scene_gen: 'image',
-  image_enhance: 'image', img_expand: 'image', ghost_mannequin: 'image',
-  poster_gen: 'image', color_swap: 'image', style_transfer: 'image',
-  virtual_tryon: 'image', watermark: 'image',
-  // video
-  img2video: 'video', multi2video: 'video', video_edit: 'video',
-  video_packaging: 'video', action_transfer: 'video', person_replace: 'video',
-  digital_human: 'video', voice_gen: 'audio', voice_clone: 'audio', tts: 'audio',
-};
-
-export function getTaskCategory(taskType) {
-  return TASK_CATEGORY_MAP[taskType] || 'text';
-}
-
-// ==================== TaskAnalyzer — 任务分析器 ====================
-
-export function analyzeTask(taskType, input) {
-  const category = getTaskCategory(taskType);
-  const candidates = getModelsByCategory(category);
-  const preferred = getDefaultModel(taskType);
-
-  // 检查是否需要多模型协同
-  const needsMultiModel =
-    taskType === 'compliance_check' || // 合规需要多模型投票
-    taskType === 'poster_gen' ||        // 海报=文案+图片
-    taskType === 'video_packaging';      // 视频包装=字幕+配乐+贴纸
-
-  return {
-    taskType,
-    category,
-    candidates: candidates.map((m) => m.id),
-    preferred,
-    needsMultiModel,
-    complexity: input?.quality === 'high' ? 'high' : 'normal',
-  };
-}
-
-// getDefaultModel 已在 line 19 导入，此处不再重复 import
-
-// ==================== ModelMatcher — 五维评分匹配 ====================
-
-const MATCH_WEIGHTS = {
-  availability: 0.35,
-  capability: 0.25,
-  cost: 0.20,
-  latency: 0.10,
-  accuracy: 0.10,
-};
-
-const MODEL_CAPABILITIES = {
-  'gpt-5.5': { capability: 95, cost: 55, latency: 65, accuracy: 93 },
-  'claude-opus-4-7': { capability: 92, cost: 50, latency: 60, accuracy: 94 },
-  'deepseek-v4-pro': { capability: 82, cost: 70, latency: 70, accuracy: 84 },
-  'deepseek-v4-flash': { capability: 60, cost: 90, latency: 85, accuracy: 68 },
-};
-
-// 评分缓存 (避免每次调用都查询 monitor)
-let _scoreCache = null;
-let _scoreCacheTs = 0;
-const SCORE_CACHE_TTL = 60_000;
-
-function _getMonitorScores() {
-  // 返回缓存（由 refreshScoreCache 或自愈引擎异步刷新）
-  // 注意：缓存过期后不清空，等待 refreshScoreCache 更新，避免短时间返回空对象导致所有模型评分=100%
-  return _scoreCache || {};
-}
-
-/** 刷新监控评分缓存（由自愈引擎周期性调用） */
-export async function refreshScoreCache() {
-  try {
-    const { getModelBreakdown } = await import('./monitorService.js');
-    const breakdown = getModelBreakdown();
-    _scoreCache = {};
-    for (const b of breakdown) {
-      _scoreCache[b.modelId] = {
-        calls: b.calls,
-        successRate: parseFloat(b.successRate) / 100,
-        avgLatencyMs: b.avgLatencyMs,
-      };
-    }
-    _scoreCacheTs = Date.now();
-  } catch { /* monitorService 未加载，缓存保持空，使用静态基线 */ }
-  return _scoreCache;
-}
-
-export function scoreModel(modelId, taskCategory, healthData = {}, monitorData = null) {
-  const caps = MODEL_CAPABILITIES[modelId] || { capability: 50, cost: 50, latency: 50, accuracy: 50 };
-
-  // 实时监控数据
-  const perf = monitorData || _getMonitorScores()[modelId] || {};
-  const successRate = perf.calls > 10 ? (perf.successRate || 1) : 1;
-  const avgLatency = perf.avgLatencyMs || caps.latency;
-
-  // 可用性: 健康状态 + 断路器状态
-  const breakerOpen = healthData[modelId]?.breakerState === 'open' ? 0 : 1;
-  const healthy = (healthData[modelId]?.status !== 'error') ? 100 : 0;
-  const available = healthy * breakerOpen;
-
-  // 能力分: 静态基线 × 实时成功率
-  const capability = caps.capability * successRate;
-
-  // 延迟分: 归一化到 0-100 (越低越好)
-  const latencyScore = Math.max(0, 100 - (avgLatency / 100));
-
-  const score =
-    available * MATCH_WEIGHTS.availability +
-    capability * MATCH_WEIGHTS.capability +
-    caps.cost * MATCH_WEIGHTS.cost +
-    latencyScore * MATCH_WEIGHTS.latency +
-    caps.accuracy * MATCH_WEIGHTS.accuracy;
-
-  return {
-    modelId,
-    score: Math.round(score),
-    details: { available, capability, cost: caps.cost, latency: latencyScore, accuracy: caps.accuracy, successRate },
-  };
-}
-
-export function rankModels(candidates, taskCategory, healthData) {
-  const scores = candidates.map((id) => scoreModel(id, taskCategory, healthData));
-  scores.sort((a, b) => b.score - a.score);
-
-  return {
-    ranked: scores,
-    best: scores[0] || null,
-    matchLog: scores.map((s) =>
-      `${s.modelId}: ${s.score}分 (可用${s.details.available} 能力${s.details.capability} 成本${s.details.cost})`,
-    ),
-  };
-}
-
-// ==================== ResultAggregator — 结果聚合器 ====================
-
-export function aggregateResults(results, taskType) {
-  if (!results || results.length === 0) return null;
-  if (results.length === 1) return results[0];
-
-  const aggregated = {
-    taskType,
-    modelCount: results.length,
-    models: results.map((r) => r.modelId || 'unknown'),
-    primary: results[0]?.output || results[0],
-    secondary: results.slice(1).map((r) => r?.output || r),
-    mergedAt: new Date().toISOString(),
-  };
-
-  // 合规检查 → 多数投票
-  if (taskType === 'compliance_check' && results.length >= 3) {
-    const votes = results.map((r) => r?.output?.decision || r?.output?.pass);
-    const passCount = votes.filter((v) => v === true || v === 'pass').length;
-    aggregated.voteResult = passCount >= 2 ? 'pass' : 'reject';
-    aggregated.voteDetail = { pass: passCount, total: votes.length };
-  }
-
-  return aggregated;
-}
-
-// ==================== 健康数据获取 ====================
-
-let cachedHealthData = null;
-let healthCacheTime = 0;
-const HEALTH_CACHE_TTL = 30000;
-
-async function getHealthData() {
-  if (cachedHealthData && Date.now() - healthCacheTime < HEALTH_CACHE_TTL) {
-    return cachedHealthData;
-  }
-  cachedHealthData = await healthCheck();
-  healthCacheTime = Date.now();
-  return cachedHealthData;
-}
-
 // ==================== 三种调度模式 ====================
 
 /**
@@ -260,7 +53,6 @@ export async function autoMode(taskType, input, options = {}) {
     throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, `No models available for ${analysis.category}`);
   }
 
-  // 金丝雀灰度：检查是否有灰度版本
   const selectedModelId = canarySelect(ranking.best.modelId);
 
   // 简单任务: 单模型即可
@@ -278,7 +70,6 @@ export async function autoMode(taskType, input, options = {}) {
       };
     } catch (err) {
       options.degradationLog?.push({ modelId: selectedModelId, error: err.message, stage: 'primary' });
-      // 降级：加权轮询选择下一个候选
       const remaining = ranking.ranked.filter(r => r.modelId !== selectedModelId).map(r => r.modelId);
       const fallbackId = weightedRoundRobin(remaining) || ranking.ranked[1]?.modelId;
       if (fallbackId) {
@@ -404,17 +195,16 @@ export async function singleMode(modelId, input, options = {}) {
 /**
  * @param {object} req
  * @param {'auto'|'custom'|'single'} req.mode
- * @param {string} req.taskType - 任务类型
- * @param {object} req.input - 任务参数
- * @param {string} [req.modelId] - single 模式的模型ID
- * @param {object} [req.customConfig] - custom 模式的配置
+ * @param {string} req.taskType
+ * @param {object} req.input
+ * @param {string} [req.modelId]
+ * @param {object} [req.customConfig]
  * @param {object} [options]
  */
 export async function dispatch(req, options = {}) {
   await ensureModels();
   const { mode = 'auto', taskType, input, modelId, customConfig } = req;
 
-  // 多租户配额检查
   if (options.tenantId) {
     const tenantTokenLimit = aiGatewayConfig.tenantTokenLimit;
     const quotaResult = checkTenantQuota(options.tenantId, tenantTokenLimit);
@@ -445,7 +235,6 @@ export async function dispatch(req, options = {}) {
     result.elapsed = Date.now() - startTime;
     if (degradationLog.length > 0) result.degradationLog = degradationLog;
 
-    // 更新租户 Token 消耗
     if (options.tenantId && result?.result) {
       const tokensOut = result.result?.tokensOut || result.result?.usage?.output_tokens || 0;
       if (tokensOut > 0) consumeTenantTokens(options.tenantId, tokensOut);
@@ -453,7 +242,6 @@ export async function dispatch(req, options = {}) {
 
     return result;
   } catch (err) {
-    // 全模型耗尽 — 附加降级链信息
     if (degradationLog.length > 0) {
       const attempted = degradationLog.map(d => d.modelId).filter(Boolean);
       const reasons = degradationLog.map(d => `${d.modelId || '?'}: ${d.error || 'unknown'}`);
@@ -463,7 +251,7 @@ export async function dispatch(req, options = {}) {
   }
 }
 
-// ==================== 多阶段管线（复用 aiEngine） ====================
+// ==================== 多阶段管线 ====================
 
 export async function pipelineDispatch(stages, input, onStageProgress) {
   return pipeline(stages, input, onStageProgress);
@@ -518,6 +306,7 @@ export default {
   getTaskCategory,
   registerExtension,
   extensionHooks,
+  refreshScoreCache,
   // 透传 aiEngine
   infer,
   pipeline,
