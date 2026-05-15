@@ -5581,7 +5581,7 @@
     "my_templates_empty_action": "去官方模板库一键复制",
     "my_templates_updated": "更新于 ",
     "my_templates_modal_title": "编辑模板",
-    "my_templates_label_content": "内容（支持 {变量名} 占位符）",
+    "my_templates_label_content": "内容（支持「变量名」占位符）",
     "my_templates_placeholder_content": "输入提示词模板内容...",
     "my_templates_label_tags": "行业/风格标签（逗号分隔）",
     "my_templates_placeholder_tags": "如：服装,抖音,简约",
