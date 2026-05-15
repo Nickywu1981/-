@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-> Movio AI 电商视觉创作平台 — 最后一次全量审计: 2026-05-14
+> Movio AI 电商视觉创作平台 — 最后一次全量审计: 2026-05-15
 
 ---
 
@@ -130,15 +130,15 @@ Page → Component → Composable/Store → API Layer(useApi.ts) → Middleware
 │   │   ├── assets/               # 素材库
 │   │   └── legal/                # 法律页面
 │   ├── components/               # 通用组件
-│   ├── composables/              # 组合式函数 (~30个)
+│   ├── composables/              # 组合式函数 (28个)
 │   ├── stores/                   # Pinia 状态管理 (auth/settings/ui)
 │   └── assets/css/               # 全局样式+CSS 变量主题
 ├── server/                       # Express 后端
 │   └── src/
 │       ├── controller/           # 92 个控制器
-│       ├── services/             # 130+ 业务服务 + adapters/
-│       ├── dao/                  # 数据访问层
-│       ├── route/                # 93 条路由文件 (85/93 Zod 覆盖)
+│       ├── services/             # 155 业务服务 + adapters/
+│       ├── dao/                  # 69 个 DAO
+│       ├── route/                # 93 条路由 (90/93 Zod 文件覆盖, 447/697 端点)
 │       ├── middleware/           # 17 个中间件
 │       ├── gateway/              # AI Gateway Hub
 │       ├── adk/                  # Agent Development Kit
@@ -149,7 +149,7 @@ Page → Component → Composable/Store → API Layer(useApi.ts) → Middleware
 │       ├── config/               # 配置文件
 │       └── __tests__/            # 测试 (按模块分目录)
 ├── scripts/                      # 运维脚本 (10个)
-├── e2e/                          # Playwright E2E 测试 (13个)
+├── e2e/                          # Playwright E2E 测试 (16个: 13根 + 3 client)
 ├── docs/                         # 项目文档 (4大类 + kb + archive)
 ├── docker/                       # Docker 部署配置
 └── decisions/                    # 架构决策记录
@@ -285,12 +285,15 @@ main (生产)
 
 ## 当前项目状态
 
-- **208 个前端页面**全部 200 OK
-- **93 条后端路由**全部在线
-- **92 个控制器**零内联 SQL
-- **Zod 校验 85/93 已覆盖**
-- **E2E 测试**: 13 个 Playwright spec
-- **服务端测试**: 按模块分目录 (controllers/dao/middleware/route/services/utils/constants)
+- **212 个前端页面**全部 200 OK
+- **93 条路由** (697 端点: 310 GET / 290 POST / 53 PUT / 42 DELETE / 2 PATCH)
+- **92 个控制器**零内联 SQL, 83/92 使用 wrapController 统一兜底
+- **Zod 文件覆盖 90/93** (96.8%), 端点覆盖 447/697 (64.1%)
+- **155 个 Service** (2 待清理), **69 个 DAO**, **17 个中间件**
+- **数据库 124 表**, 33 迁移文件
+- **116 测试文件**: 后端 97 / 前端 3 / E2E 16
+- **i18n**: zh-CN + en-US (116 key), UI 硬编码中文已清零
+- **三端架构已落地**: platform-admin(53页) / business-ops(12页) / user-workspace(145页)
 - 品牌色: `#5b5fe3`（暖靛蓝），CSS 变量 100% 覆盖
 
 ---
