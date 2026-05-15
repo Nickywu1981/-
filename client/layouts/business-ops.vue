@@ -14,7 +14,7 @@
           <NuxtLink to="/ops/enterprises" class="nav-item" active-class="active">
             <i class="icon-building"></i> {{ t('business_ops_nav.enterprise_manage') }}
           </NuxtLink>
-          <NuxtLink to="/ops/users" class="nav-item" active-class="active">
+          <NuxtLink to="/ops/agents" class="nav-item" active-class="active">
             <i class="icon-user-check"></i> {{ t('business_ops_nav.agent_manage') }}
           </NuxtLink>
           <NuxtLink to="/finance/orders" class="nav-item" active-class="active">

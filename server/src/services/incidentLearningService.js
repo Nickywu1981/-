@@ -147,9 +147,11 @@ export async function evolveStrategy(strategyId) {
       };
     }
 
-    // 升级到下一级
+    // 升级到下一级（使用新 strategyId 保留旧记录）
+    const newStrategyId = `${strategyId}_L${threshold.nextLevel}_${Date.now()}`;
     await dao.upsertStrategy({
       ...strategy,
+      strategyId: newStrategyId,
       strategyLevel: threshold.nextLevel,
       successCount: 0,   // 新级别重新计数
       totalCount: 0,
@@ -158,8 +160,8 @@ export async function evolveStrategy(strategyId) {
       evolvedFrom: strategyId,
     });
 
-    // 旧策略标记为非活跃
-    await dao.upsertStrategy({ ...strategy, isActive: false });
+    // 旧策略标记为非活跃（仅更新 isActive，不覆盖其他字段）
+    await dao.upsertStrategy({ strategyId, strategyLevel: strategy.strategy_level || 'L1', isActive: false });
 
     logger.info('[IncidentLearning] Strategy evolved', {
       strategyId, from: strategy.strategyLevel, to: threshold.nextLevel,

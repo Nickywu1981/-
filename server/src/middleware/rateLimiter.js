@@ -91,6 +91,7 @@ export const apiLimiter = rateLimit({
   legacyHeaders: false,
   validate: { xForwardedForHeader: false },
   store: new RedisRateLimitStore(windowMs),
+  skip: (req) => req.path === '/healthz' || req.path === '/readyz' || req.path === '/api/health',
   message: { code: ERROR_CODE.EC_RATE_GENERAL, msg: '', data: null },
 });
 

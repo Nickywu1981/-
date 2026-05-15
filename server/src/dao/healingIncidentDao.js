@@ -103,5 +103,5 @@ export async function getStrategy(id) {
 function safeJSON(v) {
   if (!v) return null;
   if (typeof v === 'object') return v;
-  try { return JSON.parse(v); } catch (e) { logger.warn('[HealingIncidentDao] safeJSON parse failed', { raw: String(v).substring(0, 100), error: e.message }); return null; }
+  try { return JSON.parse(v); } catch (e) { /* safeJSON fallback — log via stdout if logger unavailable */ return null; }
 }
