@@ -67,7 +67,7 @@ import copywritingRoutes from './route/copywritingRoutes.js';
 // =====================================================
 // v4.1 中间件 + 路由 (2026-05-08 引入)
 // =====================================================
-import { authMiddleware, adminAuth } from './middleware/auth.js';
+import { authMiddleware, adminAuth, requirePortalAdmin, requirePortalOps } from './middleware/auth.js';
 import { auditLogMiddleware } from './middleware/audit-log.middleware.js';
 import authRoutes from './route/v4_auth.routes.js';
 import { configPublicRouter, configAdminRouter } from './route/v4_config.routes.js';
@@ -326,6 +326,15 @@ app.use('/uploads', authMiddleware, express.static(path.join(__dirname, '../uplo
 // v4.1 路由 (2026-05-08) — 认证限流 10次/分钟
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/config', configPublicRouter);
+
+// ========================= 三端分端守卫 (Decision 025) =========================
+// 平台总后台: 仅 aud=admin token 可访问
+app.use('/api/admin', requirePortalAdmin);
+app.use('/api/gateway', requirePortalAdmin);
+// 运营业务后台: 仅 aud=ops token 可访问
+app.use('/api/ops', requirePortalOps);
+app.use('/api/finance', requirePortalOps);
+
 app.use('/api/admin/config', adminLimiter, configAdminRouter);
 app.use('/api/images', heavyLimiter, imageRoutesV4);
 app.use('/api/ai/gateway', aiConcurrencyGuard, heavyLimiter, aiGatewayRoutes);  // Token 集约化中台 — 必须在 /api/ai 守卫之前

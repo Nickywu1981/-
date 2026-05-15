@@ -275,6 +275,24 @@ export function requireAgent(req, res, next) {
   next();
 }
 
+// ========================= 三端分端守卫 (Decision 025) =========================
+
+/** 平台总后台守卫：仅 aud=admin 可访问 /api/admin/* /api/gateway/* */
+export function requirePortalAdmin(req, res, next) {
+  if (!req.user || req.user.audience !== 'admin') {
+    return sendError(res, ERROR_CODE.EC_AUTH_011);
+  }
+  next();
+}
+
+/** 运营业务后台守卫：仅 aud=ops 可访问 /api/ops/* /api/finance/* */
+export function requirePortalOps(req, res, next) {
+  if (!req.user || req.user.audience !== 'ops') {
+    return sendError(res, ERROR_CODE.EC_AUTH_012);
+  }
+  next();
+}
+
 export { ROLES };
 
 // ========================= Refresh Token 中间件 =========================

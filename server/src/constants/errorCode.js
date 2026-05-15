@@ -62,6 +62,8 @@ export const ERROR_CODE = {
   EC_AUTH_008: 4015,         // 仅代理端可用
   EC_AUTH_009: 4016,         // 未提供有效认证令牌
   EC_AUTH_010: 4017,         // Token 已失效(黑名单)
+  EC_AUTH_011: 4018,         // 仅限平台总后台 (aud=admin)
+  EC_AUTH_012: 4019,         // 仅限运营业务后台 (aud=ops)
 
   // 业务 - CSRF (csrf.js)
   EC_CSRF_001: 4020,         // CSRF Token 缺失
@@ -168,6 +170,8 @@ export const ERROR_MSG = {
   [ERROR_CODE.EC_AUTH_008]: 'Agent users only',
   [ERROR_CODE.EC_AUTH_009]: 'No valid auth token provided',
   [ERROR_CODE.EC_AUTH_010]: 'Token revoked (blacklisted)',
+  [ERROR_CODE.EC_AUTH_011]: 'Platform admin portal only (aud=admin)',
+  [ERROR_CODE.EC_AUTH_012]: 'Business ops portal only (aud=ops)',
 
   [ERROR_CODE.EC_CSRF_001]: 'CSRF token missing',
   [ERROR_CODE.EC_CSRF_002]: 'CSRF token mismatch',
@@ -265,6 +269,8 @@ export const FRONTEND_I18N_KEY = {
   [ERROR_CODE.EC_AUTH_008]: 'agent_only',
   [ERROR_CODE.EC_AUTH_009]: 'no_token',
   [ERROR_CODE.EC_AUTH_010]: 'token_revoked',
+  [ERROR_CODE.EC_AUTH_011]: 'portal_admin_required',
+  [ERROR_CODE.EC_AUTH_012]: 'portal_ops_required',
 
   [ERROR_CODE.EC_CSRF_001]: 'csrf_missing',
   [ERROR_CODE.EC_CSRF_002]: 'csrf_mismatch',

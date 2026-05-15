@@ -7,6 +7,20 @@ import { jwtExpiresIn } from '../config/index.js';
 
 const SALT_ROUNDS = 12;
 import * as smsService from './smsService.js';
+
+/**
+ * 根据用户角色映射到三端 audience (Decision 025)
+ * admin/super_admin → admin (平台总后台)
+ * ops_admin/ops_viewer/finance → ops (运营业务后台)
+ * enterprise → enterprise (企业端)
+ * 其余 → consumer (统一用户工作台)
+ */
+function getAudience(role) {
+  if (['admin', 'super_admin'].includes(role)) return 'admin';
+  if (['ops_admin', 'ops_viewer', 'finance'].includes(role)) return 'ops';
+  if (role === 'enterprise') return 'enterprise';
+  return 'consumer';
+}
 import * as emailService from './emailService.js';
 import logger from '../utils/logger.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
@@ -26,7 +40,7 @@ export async function register({ phone, email, password, nickname, inviteCode: _
 
   logger.info('[Auth] 注册成功', { userId });
 
-  const user = { id: userId, role: 'free', nickname: nickname || '', tenantId: 0 };
+  const user = { id: userId, role: 'free', nickname: nickname || '', tenantId: 0, audience: getAudience('free') };
   const token = generateAccessToken(user);
 
   return {
@@ -51,6 +65,7 @@ export async function login({ phone, email, username, password }) {
 
   await userDao.updateLastLogin(user.id);
 
+  user.audience = getAudience(user.role);  // Decision 025: 三端按角色映射
   const token = generateAccessToken(user);
   logger.info('[Auth] 登录成功', { userId: user.id });
   return {
@@ -84,6 +99,7 @@ export async function loginByCode({ phone, email, username, code }) {
 
   await userDao.updateLastLogin(user.id);
 
+  user.audience = getAudience(user.role);  // Decision 025
   const token = generateAccessToken(user);
   logger.info('[Auth] 验证码登录成功', { userId: user.id });
   return {
