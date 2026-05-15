@@ -24,6 +24,8 @@ export const ORDER_STATUS = {
 export const RECHARGE_PAY_STATUS = {
   UNPAID: 0,
   PAID: 1,
+  FAILED: 2,
+  REFUNDED: 3,
 };
 
 // ========== 积分消费记录状态 ==========

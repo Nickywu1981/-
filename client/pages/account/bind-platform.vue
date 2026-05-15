@@ -175,14 +175,14 @@ onMounted(() => fetchBindings())
 .bind-card { padding: 16px; border: 1px solid var(--border-color, #e5e7eb); border-radius: var(--radius-md, 8px); background: var(--bg-card, #ffffff); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .bind-icon { font-size: 28px; flex-shrink: 0; }
 .bind-info { flex: 1; min-width: 120px; }
-.bind-name { font-size: var(--cfg-font-size-base); font-weight: var(--cfg-font-weight-semibold); color: var(--cfg-text-primary); display: block; }
-.bind-desc { font-size: var(--cfg-font-size-xs); color: var(--cfg-text-muted); }
+.bind-name { font-size: var(--text-base, 1rem); font-weight: 600; color: var(--text-primary, #1f2937); display: block; }
+.bind-desc { font-size: var(--text-xs, 0.75rem); color: var(--text-muted, #9ca3af); }
 
 .bind-form { width: 100%; margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.input-sm { padding: 6px 10px; font-size: var(--cfg-font-size-sm); flex: 1; min-width: 100px; }
+.input-sm { padding: 6px 10px; font-size: var(--text-sm, 0.875rem); flex: 1; min-width: 100px; }
 .bind-form-actions { display: flex; gap: 6px; }
 
-.info-box { background: var(--cfg-bg-tertiary); border-radius: var(--cfg-radius-base); padding: 16px 20px; }
-.info-box h4 { font-size: var(--cfg-font-size-base); margin: 0 0 10px; color: var(--cfg-text-primary); }
-.info-box ul { margin: 0; padding-left: 20px; font-size: var(--cfg-font-size-sm); color: var(--cfg-text-secondary); line-height: 1.8; }
+.info-box { background: var(--bg-tertiary, #f3f4f6); border-radius: var(--radius-md, 8px); padding: 16px 20px; }
+.info-box h4 { font-size: var(--text-base, 1rem); margin: 0 0 10px; color: var(--text-primary, #1f2937); }
+.info-box ul { margin: 0; padding-left: 20px; font-size: var(--text-sm, 0.875rem); color: var(--text-secondary, #6b7280); line-height: 1.8; }
 </style>

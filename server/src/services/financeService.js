@@ -103,7 +103,7 @@ export async function createWithdrawal(tenantId, userId, data) {
 
     const fee = Math.round(safeAmount * 0.006 * 100) / 100;
     const actualAmount = safeAmount - fee;
-    const orderNo = `WD${Date.now()}${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
+    const orderNo = `WD${Date.now()}${crypto.randomBytes(8).toString('hex').toUpperCase()}`;
 
     // 插入提现单
     const wdResultId = await financeDao.createWithdrawal({

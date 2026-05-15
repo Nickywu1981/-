@@ -125,7 +125,7 @@ export async function unifiedOrder(params) {
     appid: allinpayConfig.appid,
     version: '12',
     charset: 'UTF-8',
-    randomstr: crypto.randomBytes(4).toString('hex'),
+    randomstr: crypto.randomBytes(8).toString('hex'),
     trxamt: String(params.trxamt),
     reqsn: params.reqsn,
     paytype,

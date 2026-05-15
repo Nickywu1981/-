@@ -13,10 +13,13 @@ import { z } from 'zod';
 import { validateV4 as _validate, validate, idParamSchema } from '../utils/validate.js';
 import { heavyLimiter, rateLimiter } from '../middleware/rateLimiter.js';
 import { cacheMiddleware } from '../middleware/cache.js';
+import { authMiddleware } from '../middleware/auth.js';
 import * as bindCtrl from '../controller/v4PlatformBindController.js';
 import { listAllPlatforms, getPlatformConfig, getPlatformsByRegion } from '../controller/platformDetailController.js';
 
 const router = Router();
+
+router.use(authMiddleware);
 
 
 const bindSchema = z.object({

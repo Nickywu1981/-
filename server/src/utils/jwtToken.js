@@ -149,7 +149,7 @@ export async function isTokenBlacklisted(token) {
       const revokedAt = await r.get(`user_revoke:${payload.id}`);
       if (revokedAt && payload.iat && payload.iat < Number(revokedAt)) return true;
     }
-  } catch (e) { logger.warn('[JWT] 解码失败, 按未列入黑名单处理', { message: e.message }); }
+  } catch (e) { logger.warn('[JWT] 解码失败, 按已列入黑名单处理(fail-closed)', { message: e.message }); return true; }
   return false;
 }
 

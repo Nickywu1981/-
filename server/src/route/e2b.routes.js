@@ -7,8 +7,11 @@ import { z } from 'zod';
 import { validate } from '../utils/validate.js';
 import * as ctrl from '../controller/e2bController.js';
 import { e2bLimiter, e2bExecuteLimiter, e2bListLimiter, e2bDestroyLimiter } from '../middleware/rateLimiter.js';
+import { authMiddleware } from '../middleware/auth.js';
 
 const router = Router();
+
+router.use(authMiddleware);
 
 const codeSchema = z.object({
   code: z.string().min(1, '请提供代码').max(50000, '代码过长（上限50000字符）'),
