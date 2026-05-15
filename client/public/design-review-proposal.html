@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>工作台改版 — G3 UI 评审方案</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Inter','PingFang SC','Microsoft YaHei',sans-serif; background:#f5f5f5; color:#171717; }
+
+/* ═══ Page Shell ═══ */
+.page { max-width:1280px; margin:0 auto; padding:32px 24px; }
+
+h1 { font-size:22px; font-weight:700; margin-bottom:4px; }
+.subtitle { font-size:13px; color:#6b6b70; margin-bottom:32px; }
+
+h2 { font-size:16px; font-weight:600; margin:28px 0 16px; padding-bottom:8px; border-bottom:2px solid #5b5fe3; display:flex; align-items:center; gap:8px; }
+.tag { font-size:11px; padding:2px 8px; border-radius:4px; font-weight:600; }
+.tag-go { background:#e8f5e9; color:#2e7d32; }
+.tag-eval { background:#fff3e0; color:#e65100; }
+.tag-no { background:#ffebee; color:#c62828; }
+
+/* ═══ TOPBAR SKETCH ═══ */
+.topbar-frame {
+  background:#fff; border-radius:12px; border:1px solid #e5e5e5; overflow:hidden; margin-bottom:8px;
+}
+.topbar {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 20px; background:rgba(255,255,255,.85); backdrop-filter:blur(12px);
+  border-bottom:1px solid #ebebea;
+}
+.topbar-left { display:flex; align-items:center; gap:8px; }
+.topbar-right { display:flex; align-items:center; gap:8px; }
+
+.btn { display:inline-flex; align-items:center; gap:5px; padding:7px 14px; border-radius:8px; font-size:12.5px; font-weight:500; cursor:pointer; border:1px solid transparent; transition:all .15s; font-family:inherit; white-space:nowrap; }
+.btn-icon { width:28px; height:28px; border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:14px; cursor:pointer; border:1px solid transparent; transition:all .15s; background:none; }
+
+.btn-primary { background:#5b5fe3; color:#fff; font-weight:600; border-color:#5b5fe3; }
+.btn-primary:hover { background:#4a4ed6; transform:translateY(-1px); box-shadow:0 4px 12px rgba(91,95,227,.3); }
+.btn-accent { background:linear-gradient(135deg,#f97316,#f59e0b); color:#fff; font-weight:600; }
+.btn-accent:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(249,115,22,.3); }
+.btn-outline { background:#fff; border-color:#d4d4d4; color:#555; }
+.btn-outline:hover { border-color:#5b5fe3; color:#5b5fe3; }
+.btn-ghost { background:none; color:#6b6b70; }
+.btn-ghost:hover { background:#f5f5f5; color:#171717; }
+
+.avatar-dropdown {
+  display:flex; align-items:center; gap:8px; cursor:pointer; padding:4px 10px 4px 4px;
+  border-radius:24px; border:1px solid transparent; transition:all .15s;
+}
+.avatar-dropdown:hover { border-color:#e5e5e5; background:#fafafa; }
+.avatar-circle { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,#5b5fe3,#a5a9f0); color:#fff; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600; }
+
+.divider-v { width:1px; height:20px; background:#e5e5e5; margin:0 4px; }
+
+.label-row { display:flex; align-items:center; gap:6px; padding:10px 20px; font-size:11px; }
+.label-row span { display:flex; align-items:center; gap:3px; }
+.label-pri { color:#5b5fe3; font-weight:600; }
+.label-accent { color:#f97316; font-weight:600; }
+.label-ghost { color:#888; }
+
+/* ═══ CREATION CENTER SKETCH ═══ */
+.creation-frame {
+  background:#fff; border-radius:12px; border:1px solid #e5e5e5; overflow:hidden; margin-bottom:8px;
+}
+.creation-body { display:flex; min-height:420px; padding:24px 28px; gap:16px; }
+.creation-main { flex:1; min-width:0; }
+.creation-tabs { display:flex; gap:8px; margin-bottom:16px; }
+.creation-tab {
+  padding:10px 18px; border-radius:10px; font-size:13.5px; font-weight:500;
+  border:1.5px solid #ebebea; background:#fff; color:#8a8a8a;
+}
+.creation-tab.sel { background:#5b5fe3; border-color:#5b5fe3; color:#fff; font-weight:600; }
+
+.input-card { border:1.5px solid #ebebea; border-radius:12px; overflow:hidden; margin-bottom:24px; }
+.input-card:focus-within { border-color:#5b5fe3; box-shadow:0 0 0 3px rgba(91,95,227,.06); }
+
+/* BEFORE: upload outside */
+.upload-outside { display:flex; border-bottom:1px solid #f0f0ef; }
+.upload-zone-out {
+  width:68px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:4px; border-right:1px solid #f0f0ef; background:#fafafa; flex-shrink:0;
+}
+.upload-zone-out .icon { font-size:20px; }
+.upload-zone-out .label { font-size:10px; color:#888; }
+.textarea-out { flex:1; padding:14px 16px; }
+.textarea-out textarea { width:100%; border:none; resize:none; font-size:15px; outline:none; min-height:60px; }
+
+/* AFTER: upload inside */
+.input-top-new { position:relative; padding:0; }
+.textarea-new {
+  width:100%; border:none; resize:none; font-size:15px; line-height:1.7; outline:none;
+  min-height:90px; padding:38px 16px 14px 16px; font-family:inherit; background:none;
+}
+.upload-inline {
+  position:absolute; top:8px; left:12px;
+  display:flex; align-items:center; gap:6px;
+  padding:4px 10px; border-radius:6px; background:rgba(91,95,227,.08);
+  font-size:12px; color:#5b5fe3; cursor:pointer; transition:all .15s;
+}
+.upload-inline:hover { background:rgba(91,95,227,.14); }
+
+.input-bottom { display:flex; align-items:center; justify-content:space-between; padding:8px 16px 14px; border-top:1px solid #f0f0ef; }
+.params { display:flex; gap:8px; }
+.param { padding:7px 28px 7px 10px; border-radius:7px; border:1px solid #e5e5e5; font-size:12px; background:#f8f8f8; }
+.gen-btn { padding:10px 28px; border-radius:9px; font-size:14px; font-weight:600; border:none; background:#5b5fe3; color:#fff; cursor:pointer; }
+
+/* ═══ RIGHT PANEL ═══ */
+.panel-fixed {
+  width:260px; flex-shrink:0; border-left:1px solid #ebebea; background:#fafafa; border-radius:0 12px 12px 0;
+  display:flex; flex-direction:column; margin:-24px -28px -24px 0;
+}
+.panel-hd { padding:16px; border-bottom:1px solid #ebebea; font-weight:600; font-size:13.5px; display:flex; align-items:center; justify-content:space-between; }
+.panel-body { flex:1; padding:16px; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.panel-placeholder { text-align:center; color:#c8c8c8; font-size:12.5px; line-height:1.8; }
+
+.panel-collapsed { width:40px; flex-shrink:0; border-left:1px solid #ebebea; background:#fafafa; border-radius:0 12px 12px 0; margin:-24px -28px -24px 0; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all .2s; }
+.panel-collapsed:hover { background:#f0f0ef; }
+.panel-toggle-icon { font-size:16px; color:#888; }
+
+/* ═══ COMPARISON TABLE ═══ */
+table { width:100%; border-collapse:collapse; font-size:13px; margin:8px 0 20px; }
+th { background:#fafafa; padding:10px 12px; text-align:left; font-weight:600; font-size:12px; color:#6b6b70; border-bottom:2px solid #e5e5e5; }
+td { padding:10px 12px; border-bottom:1px solid #f0f0ef; vertical-align:top; }
+tr:hover td { background:#fafafa; }
+
+.vote { display:inline-block; width:20px; height:20px; border-radius:50%; text-align:center; line-height:20px; font-size:12px; font-weight:700; }
+.vote-yes { background:#e8f5e9; color:#2e7d32; }
+.vote-no { background:#ffebee; color:#c62828; }
+.vote-maybe { background:#fff3e0; color:#e65100; }
+
+.note { font-size:12px; color:#888; padding:8px 12px; background:#f5f5f5; border-radius:6px; margin:4px 0 12px; }
+
+/* ═══ BADGE ═══ */
+.badge-new { display:inline-block; padding:1px 6px; border-radius:3px; background:#5b5fe3; color:#fff; font-size:10px; font-weight:600; margin-left:4px; }
+
+/* two cols */
+.cols { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:8px; }
+.cols-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:8px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>用户工作台 & 创作中心 — 改版综合评审</h1>
+<p class="subtitle">G3 UI设计组 · 需求评估 · <span style="color:#5b5fe3">2026-05-15</span></p>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- SECTION 1: TOPBAR REDESIGN -->
+<!-- ════════════════════════════════════════════════ -->
+<h2><span>一、顶栏改版</span><span class="tag tag-go">建议全部落地</span></h2>
+
+<div class="topbar-frame">
+  <!-- BEFORE -->
+  <div class="label-row">
+    <span class="label-ghost">当前：</span>
+    <span style="color:#888">[角色切换]</span>
+    <span style="color:#888;margin-left:auto">用户名</span>
+  </div>
+  <div class="topbar" style="border-top:1px dashed #e5e5e5;">
+    <div class="topbar-left">
+      <span class="btn btn-ghost" style="font-size:11px">👤 个人</span>
+      <span class="btn btn-ghost" style="font-size:11px">🤝 代理</span>
+    </div>
+    <div style="font-size:13px;color:#888;">UserName</div>
+  </div>
+
+  <!-- AFTER -->
+  <div class="label-row" style="margin-top:24px;border-top:1px solid #ebebea;padding-top:16px;">
+    <span class="label-pri">改版后：</span>
+    <span>ⓘ 购买会员</span>
+    <span>🎁 免费领积分</span>
+    <span style="color:#888">💬 客服</span>
+    <span>❓ 帮助</span>
+    <span>🔔 通知</span>
+    <span class="label-accent">[管理后台]</span>
+    <span style="margin-left:auto">👤 头像+用户名 ▾</span>
+  </div>
+  <div class="topbar">
+    <div class="topbar-left">
+      <!-- 角色切换 -->
+      <span class="btn btn-ghost" style="font-size:11px">👤 个人</span>
+      <span class="btn btn-ghost" style="font-size:11px">🤝 代理</span>
+      <span class="divider-v"></span>
+    </div>
+    <div class="topbar-right">
+      <!-- ① 购买会员 — 主CTA -->
+      <span class="btn btn-primary">💎 购买会员</span>
+      <!-- ② 免费领积分 — 次CTA -->
+      <span class="btn btn-accent">🎁 免费领积分</span>
+      <span class="divider-v"></span>
+      <!-- ③ 在线客服 -->
+      <span class="btn-icon btn-ghost" title="在线客服">💬</span>
+      <!-- ④ 帮助 -->
+      <span class="btn-icon btn-ghost" title="帮助">❓</span>
+      <!-- ⑤ 通知 -->
+      <span class="btn-icon btn-ghost" title="通知">🔔<span style="position:absolute;top:-2px;right:-2px;width:8px;height:8px;border-radius:50%;background:#ef4444;border:2px solid #fff;"></span></span>
+      <span class="divider-v"></span>
+      <!-- ⑥ 管理后台 isAdmin -->
+      <span class="btn btn-outline" style="font-size:11px;color:#5b5fe3;border-color:#5b5fe3;">⚙ 管理后台</span>
+      <span class="divider-v"></span>
+      <!-- ⑦ 头像下拉 -->
+      <span class="avatar-dropdown">
+        <span class="avatar-circle">U</span>
+        <span style="font-size:13px;font-weight:500;">UserName ▾</span>
+      </span>
+    </div>
+  </div>
+</div>
+
+<h3 style="font-size:14px;margin-top:16px;">逐项评估</h3>
+<table>
+<tr><th style="width:15%">需求</th><th style="width:6%">落地</th><th style="width:30%">评审意见</th><th style="width:30%">实现建议</th><th>风险</th></tr>
+
+<tr>
+  <td>① 购买会员</td>
+  <td><span class="vote vote-yes">✓</span></td>
+  <td>商业转化核心入口，必须突出。<br>放顶栏右侧黄金位，视觉权重最高。</td>
+  <td>品牌主色实心按钮 <code>#5b5fe3</code>，白色文字。<br>图标 💎 + "购买会员"，padding 略大于其他按钮。<br>页面框架先搭，套餐/价格预留 Skeleton 占位。</td>
+  <td style="font-size:12px">无</td>
+</tr>
+
+<tr>
+  <td>② 免费领积分</td>
+  <td><span class="vote vote-yes">✓</span></td>
+  <td>拉新裂变关键入口。<br>视觉权重仅次于会员按钮。</td>
+  <td>暖橙渐变按钮 <code>#f97316→#f59e0b</code>，与主色区分。<br>独立邀请页框架，规则说明区后台配置预留。</td>
+  <td style="font-size:12px">两个CTA相邻颜色都突出可能互相干扰</td>
+</tr>
+
+<tr>
+  <td>③ 在线客服</td>
+  <td><span class="vote vote-yes">✓</span></td>
+  <td>辅助功能，图标入口即可。<br>无需按钮样式，避免顶栏过于拥挤。</td>
+  <td>icon-only，hover 显示 tooltip。<br>点击弹出 Modal，内嵌企业微信二维码占位。<br>二维码/企业号资源通过后台配置读取。</td>
+  <td style="font-size:12px">无</td>
+</tr>
+
+<tr>
+  <td>④ 帮助 + ⑤ 通知</td>
+  <td><span class="vote vote-yes">✓</span></td>
+  <td>保留原有设计，icon-only。<br>通知加未读红点。</td>
+  <td>复用现有 icon-button 样式。<br>帮助→帮助中心页 / 通知→通知下拉面板。</td>
+  <td style="font-size:12px">无</td>
+</tr>
+
+<tr>
+  <td>⑥ 管理后台</td>
+  <td><span class="vote vote-yes">✓</span></td>
+  <td><code>v-if="isAdmin"</code>，普通用户不渲染。</td>
+  <td>outline 样式 <code>border-color:#5b5fe3</code>，低调但不隐藏。<br>文案区分：超管="管理后台"，租户管理员="企业管理"。</td>
+  <td style="font-size:12px">需区分超管 vs 企业管理员 vs 代理管理</td>
+</tr>
+
+<tr>
+  <td>⑦ 头像+用户名下拉</td>
+  <td><span class="vote vote-yes">✓</span></td>
+  <td>替换原独立退出按钮。<br>业界标准模式（GitHub/Notion/Linear）。</td>
+  <td>圆形头像(32px) + 用户名 + ▾。<br>下拉菜单：个人中心 / 我的会员 / 我的积分 / 账号设置 / ── / 退出登录。<br>纯前端交互，不涉及后端。</td>
+  <td style="font-size:12px">无</td>
+</tr>
+
+<tr>
+  <td>按钮间距与顺序</td>
+  <td><span class="vote vote-yes">✓</span></td>
+  <td colspan="2">从左至右：角色切换 | 会员(品牌色) 积分(暖橙) | 💬 ❓ 🔔 | 管理后台(isAdmin) | 头像下拉。<br>用 <code>1px divider</code> 分隔功能组，间距 8px。</td>
+  <td style="font-size:12px">无</td>
+</tr>
+</table>
+
+<div class="note">
+  <strong>G3 结论：需求一全部落地。</strong> 按钮颜色方案 — 会员=品牌主色实心 <code>#5b5fe3</code>，积分=暖橙渐变 <code>#f97316→#f59e0b</code>，客服/帮助/通知=ghost图标，管理后台=outline。<br>
+  <strong>唯一需确认：</strong>管理后台按钮角色区分 — 超管="管理后台"跳转 /admin，企业管理员="企业管理"跳转 /enterprise/dashboard。建议后端在 /api/auth/me 返回 adminType 字段。
+</div>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- SECTION 2: SLIDEPANEL -->
+<!-- ════════════════════════════════════════════════ -->
+<h2><span>二、创作中心右侧面板</span><span class="tag tag-eval">推荐方案2</span></h2>
+
+<div class="cols">
+  <div class="creation-frame">
+    <div class="label-row"><span style="font-weight:600;">方案1：固定常驻</span><span style="color:#888">始终显示</span></div>
+    <div class="creation-body">
+      <div class="creation-main">
+        <div class="creation-tabs">
+          <span class="creation-tab">🖼️ 图片</span>
+          <span class="creation-tab sel">🎬 视频</span>
+          <span class="creation-tab">📄 详情</span>
+        </div>
+        <div class="input-card">
+          <div class="input-top-new">
+            <div class="upload-inline">📎 上传参考图</div>
+            <textarea class="textarea-new" placeholder="描述你想要生成的内容...">生成一段15秒的产品展示视频，突出产品质感与使用场景</textarea>
+          </div>
+          <div class="input-bottom">
+            <div class="params">
+              <span class="param">时长: 15s ▾</span>
+              <span class="param">比例: 9:16 ▾</span>
+              <span class="param">风格: 现代 ▾</span>
+            </div>
+            <span class="gen-btn">🚀 开始生成</span>
+          </div>
+        </div>
+      </div>
+      <div class="panel-fixed">
+        <div class="panel-hd">📋 结果预览</div>
+        <div class="panel-body">
+          <div class="panel-placeholder">
+            <div style="font-size:36px;margin-bottom:8px;">📭</div>
+            暂无生成结果<br>输入提示词并点击生成
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="creation-frame">
+    <div class="label-row"><span style="font-weight:600;">方案2：可折叠展开</span><span class="badge-new">推荐</span><span style="color:#888;margin-left:auto">默认收起</span></div>
+    <div class="creation-body">
+      <div class="creation-main">
+        <div class="creation-tabs">
+          <span class="creation-tab">🖼️ 图片</span>
+          <span class="creation-tab sel">🎬 视频</span>
+          <span class="creation-tab">📄 详情</span>
+        </div>
+        <div class="input-card">
+          <div class="input-top-new">
+            <div class="upload-inline">📎 上传参考图</div>
+            <textarea class="textarea-new" placeholder="描述你想要生成的内容...">生成一段15秒的产品展示视频，突出产品质感与使用场景</textarea>
+          </div>
+          <div class="input-bottom">
+            <div class="params">
+              <span class="param">时长: 15s ▾</span>
+              <span class="param">比例: 9:16 ▾</span>
+              <span class="param">风格: 现代 ▾</span>
+            </div>
+            <span class="gen-btn">🚀 开始生成</span>
+          </div>
+        </div>
+      </div>
+      <div class="panel-collapsed" style="flex-direction:column;gap:6px;">
+        <span class="panel-toggle-icon" style="font-size:11px;color:#888;">◀<br>展<br>开</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3 style="font-size:14px;margin-top:16px;">双方案对比矩阵</h3>
+<table>
+<tr><th>维度</th><th>方案1：固定常驻</th><th>方案2：可折叠 ⭐推荐</th></tr>
+<tr>
+  <td><strong>界面整洁度</strong></td>
+  <td>❌ 始终占用 260px 横向空间，创作区被压缩</td>
+  <td>✅ 收起时仅 40px 触发条，创作区全宽 1120px</td>
+</tr>
+<tr>
+  <td><strong>操作便捷性</strong></td>
+  <td>✅ 结果即时可见，无需额外操作</td>
+  <td>✅ 生成任务完成时自动滑出 + 手动点击展开/收起</td>
+</tr>
+<tr>
+  <td><strong>PC 端适配</strong></td>
+  <td>⚠ 1440px 以下屏幕创作区过窄</td>
+  <td>✅ 小屏全宽创作，大屏展开面板</td>
+</tr>
+<tr>
+  <td><strong>用户心智</strong></td>
+  <td>一般：空白面板占位无信息量</td>
+  <td>✅ 无任务时隐藏=无干扰；有结果时自动展示</td>
+</tr>
+<tr>
+  <td><strong>开发成本</strong></td>
+  <td>低 — 删除现有 SlidePanel Teleport 即可</td>
+  <td>中 — SlidePanel 改造成 inline collapsible + 监听生成状态自动展开</td>
+</tr>
+<tr>
+  <td><strong>综合</strong></td>
+  <td style="color:#888">保守方案</td>
+  <td style="color:#5b5fe3;font-weight:600;">最优方案 ✓</td>
+</tr>
+</table>
+
+<div class="note">
+  <strong>G3 结论：推荐方案2。</strong> 理由 — 创作中心以"输入"为核心任务，空闲时右侧面板无信息量，固定占用 260px 浪费屏幕且干扰注意力。折叠模式兼顾整洁与效率：空闲时收起，生成完成自动滑出，支持手动 toggle。
+</div>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- SECTION 3: UPLOAD ICON -->
+<!-- ════════════════════════════════════════════════ -->
+<h2><span>三、上传参考图 UI</span><span class="tag tag-go">建议落地</span></h2>
+
+<div class="cols">
+  <div>
+    <div class="creation-frame">
+      <div class="label-row"><span style="font-weight:600;">当前：独立上传区</span> <span style="color:#c62828;font-size:11px">视觉不协调</span></div>
+      <div class="input-card" style="margin:0 20px 20px;">
+        <div class="upload-outside">
+          <div class="upload-zone-out">
+            <div class="icon">📎</div>
+            <div class="label">上传素材</div>
+          </div>
+          <div class="textarea-out">
+            <textarea placeholder="描述你想要生成的内容..."></textarea>
+          </div>
+        </div>
+      </div>
+      <div style="padding:0 20px 16px;font-size:11.5px;color:#888;line-height:1.8;">
+        <span style="color:#c62828;">✗</span> 上传区+输入区间隔 1px 分割线<br>
+        <span style="color:#c62828;">✗</span> 68px 左侧区域只有图标+4个字<br>
+        <span style="color:#c62828;">✗</span> 视觉上像是两个组件拼在一起<br>
+        <span style="color:#c62828;">✗</span> 拖拽区域仅 68px 宽，命中面积小
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="creation-frame">
+      <div class="label-row"><span style="font-weight:600;">改版：内嵌上传</span> <span style="color:#2e7d32;font-size:11px">紧凑美观</span></div>
+      <div class="input-card" style="margin:0 20px 20px;">
+        <div class="input-top-new">
+          <div class="upload-inline">📎 上传参考图</div>
+          <textarea class="textarea-new" style="padding:38px 16px 14px 16px;" placeholder="描述你想要生成的内容..."></textarea>
+        </div>
+      </div>
+      <div style="padding:0 20px 16px;font-size:11.5px;color:#888;line-height:1.8;">
+        <span style="color:#2e7d32;">✓</span> 上传按钮内嵌 textarea 左上角<br>
+        <span style="color:#2e7d32;">✓</span> 视觉上是一个整体组件<br>
+        <span style="color:#2e7d32;">✓</span> 参考 Notion/Linear 的内联附件模式<br>
+        <span style="color:#2e7d32;">✓</span> 拖拽可扩展至整个输入卡片区域
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <strong>G3 结论：建议落地。</strong> 理由 — 当前横向分割将一个操作（"带参考图的创作"）拆成两个视觉区域，认知负担高。内嵌方案让上传成为文本输入的附属操作，视觉紧凑且符合主流编辑器习惯（Notion、飞书、Linear）。拖拽区域可从 68px 扩展到整个 textarea，命中面积显著增大。
+</div>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- FINAL SUMMARY -->
+<!-- ════════════════════════════════════════════════ -->
+<h2><span>综合结论</span></h2>
+
+<table>
+<tr><th style="width:8%">需求</th><th style="width:8%">决策</th><th>理由</th><th style="width:25%">实现要点</th></tr>
+<tr>
+  <td><strong>一、顶栏改版</strong></td>
+  <td><span class="vote vote-yes">✓</span> 全部落地</td>
+  <td>商业转化+拉新刚需，交互模式业界成熟</td>
+  <td>
+    ① 会员按钮 = <code>#5b5fe3</code> 实心，视觉权重最高<br>
+    ② 积分按钮 = <code>#f97316→#f59e0b</code> 暖橙渐变<br>
+    ③ 客服/帮助/通知 = ghost icon<br>
+    ④ 管理后台 = outline，<code>v-if="isAdmin"</code><br>
+    ⑤ 头像下拉 = 圆形头像 + 5 项菜单<br>
+    页面框架先搭，后台配置预留
+  </td>
+</tr>
+<tr>
+  <td><strong>二、右侧面板</strong></td>
+  <td><span class="vote vote-yes">✓</span> 方案2</td>
+  <td>整洁度+专注度+屏幕利用率全面优于固定模式</td>
+  <td>
+    折叠态 40px 触发条 | 展开态 260px<br>
+    生成完成自动展开 | 手动 toggle<br>
+    <code>@watch(generating)</code> → 自动展开<br>
+    改造现有 SlidePanel：Teleport→inline collapsible
+  </td>
+</tr>
+<tr>
+  <td><strong>三、上传图标</strong></td>
+  <td><span class="vote vote-yes">✓</span> 落地</td>
+  <td>紧凑美观，符合主流编辑器习惯</td>
+  <td>
+    上传按钮 <code>position:absolute</code> 内嵌 textarea 左上角<br>
+    移除独立 <code>.cc-upload-zone</code> 68px 列<br>
+    拖拽区域扩展到整个输入卡片
+  </td>
+</tr>
+</table>
+
+<div class="note" style="margin-top:16px;background:rgba(91,95,227,.08);border-left:3px solid #5b5fe3;">
+  <strong>G3 最终建议：三项需求全部落地。</strong><br>
+  可简化的点：① 帮助按钮可合并到头像下拉菜单中（"帮助中心"条目），节省 1 个图标位。<br>
+  需其他组配合：G4 负责前端实现、G5 负责路由/页面框架、G6 负责 /api/auth/me 补 adminType 字段。
+</div>
+
+</div>
+</body>
+</html>
