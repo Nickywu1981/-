@@ -90,11 +90,13 @@ const cache: Record<string, any> = {}
 
 // ── SSE 连接池：所有 useSiteConfig 调用共享一个 EventSource ──
 let sharedEventSource: EventSource | null = null;
+let sseRefCount = 0;
 const sseListeners = new Map<string, () => void>();
 
 function ensureSSE() {
   if (sharedEventSource || import.meta.server) return;
   try {
+    sseRefCount++;
     sharedEventSource = new EventSource('/api/config/version/stream');
     sharedEventSource.onmessage = (e) => {
       let data: any
@@ -108,7 +110,8 @@ function ensureSSE() {
 }
 
 function teardownSSE() {
-  if (sharedEventSource && sseListeners.size === 0) {
+  sseRefCount = Math.max(0, sseRefCount - 1)
+  if (sseRefCount === 0 && sharedEventSource) {
     sharedEventSource.close();
     sharedEventSource = null;
   }

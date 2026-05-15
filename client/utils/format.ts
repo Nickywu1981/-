@@ -93,16 +93,16 @@ export async function copyToClipboard(text: string): Promise<boolean> {
   }
 }
 
-export function formatDateLocale(iso: string): string {
-  return iso ? new Date(iso).toLocaleDateString('zh-CN') : '-';
+export function formatDateLocale(iso: string, locale = 'zh-CN'): string {
+  return iso ? new Date(iso).toLocaleDateString(locale) : '-';
 }
 
-export function formatDateTimeLocale(iso: string): string {
-  return iso ? new Date(iso).toLocaleString('zh-CN') : '-';
+export function formatDateTimeLocale(iso: string, locale = 'zh-CN'): string {
+  return iso ? new Date(iso).toLocaleString(locale) : '-';
 }
 
-export function fmtMoney(n: number | string): string {
-  return (Number(n) || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2 });
+export function fmtMoney(n: number | string, locale = 'zh-CN'): string {
+  return (Number(n) || 0).toLocaleString(locale, { minimumFractionDigits: 2 });
 }
 
 export function fmtNum(n: number, locale?: string): string {

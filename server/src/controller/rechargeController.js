@@ -16,7 +16,8 @@ export const createOrder = wrapController(async (req) => {
 
 export const handleCallback = wrapController(async (req, res) => {
     await rechargeService.handleCallback(req.params.channel, req.body);
-    res.send('success');
+    // 支付平台回调要求返回纯文本 'success'，与 allinpayNotifyController 保持一致
+    res.type('text/plain').send('success');
 });
 
 export const checkPaymentResult = wrapController(async (req) => {

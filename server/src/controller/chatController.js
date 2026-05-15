@@ -51,6 +51,6 @@ export async function getSuggestions(req, res) {
   return success(res, suggestions);
   } catch (err) {
     logger.error('[Chat] getSuggestions failed', err.message);
-    error(res, ERROR_CODE.INTERNAL_ERROR || 500);
+    error(res, ERROR_CODE.INTERNAL_ERROR);
   }
 }
