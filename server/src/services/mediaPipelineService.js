@@ -26,6 +26,24 @@ async function ensureTempDir() {
   if (!_dirReady) { await fsp.mkdir(TEMP_DIR, { recursive: true }); _dirReady = true; }
 }
 
+/** 清理超过 30 分钟的 pipeline 临时文件 */
+export async function cleanupPipelineTemp() {
+  try {
+    const files = await fsp.readdir(TEMP_DIR);
+    const now = Date.now();
+    const maxAge = 30 * 60 * 1000; // 30 min
+    let cleaned = 0;
+    for (const f of files) {
+      const fp = path.join(TEMP_DIR, f);
+      try {
+        const stat = await fsp.stat(fp);
+        if (now - stat.mtimeMs > maxAge) { await fsp.unlink(fp); cleaned++; }
+      } catch { /* already gone */ }
+    }
+    if (cleaned) logger.info(`[Pipeline] 清理 ${cleaned} 个临时文件`);
+  } catch { /* dir may not exist */ }
+}
+
 // ==================== 工具函数 ====================
 
 let _sharpAvailable = null;

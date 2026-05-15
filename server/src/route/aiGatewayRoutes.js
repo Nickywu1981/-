@@ -5,7 +5,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { authMiddleware } from '../middleware/auth.js';
-import { aiConcurrencyGuard } from '../middleware/rateLimiter.js';
 import { signatureMiddleware } from '../middleware/signature.middleware.js';
 import { validate } from '../utils/validate.js';
 import { aiGatewayController } from '../controller/aiGatewayController.js';
@@ -41,9 +40,10 @@ const routeBodySchema = z.object({
   source: z.enum(['consumer', 'enterprise', 'agent', 'open_api', 'internal']).optional(),
 }).passthrough();
 
-router.post('/infer', authMiddleware, signatureGuard, aiConcurrencyGuard, validate(inferBodySchema), aiGatewayController.infer);
-router.post('/dispatch', authMiddleware, signatureGuard, aiConcurrencyGuard, validate(dispatchBodySchema), aiGatewayController.dispatch);
-router.post('/route', authMiddleware, signatureGuard, aiConcurrencyGuard, validate(routeBodySchema), aiGatewayController.route);
+// aiConcurrencyGuard 由 app.js mount-level 统一应用，router 内不再重复
+router.post('/infer', authMiddleware, signatureGuard, validate(inferBodySchema), aiGatewayController.infer);
+router.post('/dispatch', authMiddleware, signatureGuard, validate(dispatchBodySchema), aiGatewayController.dispatch);
+router.post('/route', authMiddleware, signatureGuard, validate(routeBodySchema), aiGatewayController.route);
 router.get('/stats/tokens', authMiddleware, signatureGuard, aiGatewayController.statsTokens);
 router.get('/pricing', authMiddleware, signatureGuard, aiGatewayController.pricing);
 
@@ -55,11 +55,11 @@ router.get('/monitor/top-users', authMiddleware, signatureGuard, aiGatewayContro
 router.get('/monitor/alerts', authMiddleware, signatureGuard, aiGatewayController.alertRules);
 
 // ── 异步任务 ──
-router.post('/async/submit', authMiddleware, signatureGuard, aiConcurrencyGuard, validate(inferBodySchema), aiGatewayController.asyncSubmit);
+router.post('/async/submit', authMiddleware, signatureGuard, validate(inferBodySchema), aiGatewayController.asyncSubmit);
 router.get('/async/status/:taskId', authMiddleware, signatureGuard, aiGatewayController.asyncStatus);
 
 // ── SSE 流式 ──
-router.post('/stream/infer', authMiddleware, signatureGuard, aiConcurrencyGuard, validate(inferBodySchema), aiGatewayController.streamInfer);
+router.post('/stream/infer', authMiddleware, signatureGuard, validate(inferBodySchema), aiGatewayController.streamInfer);
 
 // ── 电商管线 ──
 const pipelineWrapSchema = z.object({
@@ -85,7 +85,7 @@ const resumeSchema = z.object({
   pipelineId: z.string().min(1).max(100),
   stepIndex: z.coerce.number().int().min(0).optional(),
 });
-router.post('/pipeline/orchestrate', authMiddleware, signatureGuard, aiConcurrencyGuard, validate(orchestrateSchema), aiGatewayController.pipelineOrchestrate);
+router.post('/pipeline/orchestrate', authMiddleware, signatureGuard, validate(orchestrateSchema), aiGatewayController.pipelineOrchestrate);
 router.post('/pipeline/resume', authMiddleware, signatureGuard, validate(resumeSchema), aiGatewayController.pipelineResume);
 
 // ── 人工微调 ──
@@ -105,7 +105,7 @@ const referenceSchema = z.object({
   refType: z.enum(['image', 'video', 'sketch', 'style']).optional(),
 });
 router.post('/pipeline/adjust', authMiddleware, signatureGuard, validate(adjustSchema), aiGatewayController.pipelineAdjust);
-router.post('/pipeline/regenerate', authMiddleware, signatureGuard, aiConcurrencyGuard, validate(regenerateSchema), aiGatewayController.pipelineRegenerate);
+router.post('/pipeline/regenerate', authMiddleware, signatureGuard, validate(regenerateSchema), aiGatewayController.pipelineRegenerate);
 router.post('/pipeline/reference', authMiddleware, signatureGuard, validate(referenceSchema), aiGatewayController.pipelineUploadReference);
 
 export default router;

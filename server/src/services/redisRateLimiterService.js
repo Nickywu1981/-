@@ -123,9 +123,18 @@ async function redisTryConsume(key, qps, burst, count = 1) {
       reset: result[2],
     };
   } catch (e) {
-    logger.warn(`[RedisRateLimiter] Redis 异常: ${e.message}, 降级通过`);
-    return { allowed: true, remaining: 0, reset: 0 };
+    logger.error(`[RedisRateLimiter] Redis 异常，启用进程内降级限流 (5/min): ${e.message}`);
+    // fail-closed: fallback to strict in-memory limit to prevent complete bypass
+    const _k = `${bucketKey}:fallback`;
+    if (!_fallbackCache) { globalThis.__rateLimitFallback = new Map(); _fallbackCache = globalThis.__rateLimitFallback; }
+    const entry = _fallbackCache.get(_k) || { count: 0, ts: now };
+    if (now - entry.ts > 60000) { entry.count = 0; entry.ts = now; }
+    entry.count++;
+    _fallbackCache.set(_k, entry);
+    return { allowed: entry.count <= 5, remaining: Math.max(0, 5 - entry.count), reset: entry.ts + 60000 };
   }
+}
+let _fallbackCache = null;
 }
 
 // ==================== 多维度入口 ====================

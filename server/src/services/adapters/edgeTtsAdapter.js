@@ -265,6 +265,29 @@ async function realCloneInfer(text, audioSampleUrl) {
   }
 }
 
+/**
+ * 清理过期 TTS 音频文件 (超过 1 小时)
+ */
+export async function cleanupTtsAudio() {
+  try {
+    const files = await fsp.readdir(AUDIO_DIR);
+    const now = Date.now();
+    const maxAge = 60 * 60 * 1000; // 1 hour
+    let cleaned = 0;
+    for (const f of files) {
+      const fp = path.join(AUDIO_DIR, f);
+      try {
+        const stat = await fsp.stat(fp);
+        if (now - stat.mtimeMs > maxAge) {
+          await fsp.unlink(fp);
+          cleaned++;
+        }
+      } catch { /* file may already be deleted */ }
+    }
+    if (cleaned) logger.info(`[EdgeTTS] 清理 ${cleaned} 个过期音频文件`);
+  } catch { /* AUDIO_DIR may not exist yet */ }
+}
+
 export async function registerEdgeTTS() {
   registerModel({
     id: 'edge-tts',

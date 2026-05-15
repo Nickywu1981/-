@@ -108,7 +108,11 @@ export async function openApiRateLimit(req, res, next) {
   if (!key) return next();
 
   const r = await getRedis();
-  if (!r) return next();
+  if (!r) {
+    // fail-closed: Redis 不可用时拒绝所有 Open API 请求，避免无鉴权限流
+    logger.error('[openApi] Redis 不可用，Open API 请求被拒绝');
+    return error(res, 503, 'Service temporarily unavailable');
+  }
 
   const limitKey = `open_api_rate:${key.api_key}`;
   const current = await r.incr(limitKey);

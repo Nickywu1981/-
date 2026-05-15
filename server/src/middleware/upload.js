@@ -18,8 +18,12 @@ const UPLOAD_BASE_DIR = path.join(__dirname, '../../uploads');
 
 /** 构建租户隔离上传目录: uploads/{tenantId}/images/ */
 function getTenantUploadDir(tenantId) {
-  const tid = tenantId || 0;
-  return path.join(UPLOAD_BASE_DIR, String(tid), 'images');
+  const tid = String(tenantId || 0);
+  // 防止路径遍历: 拒绝含 .. 或 / 的租户ID
+  if (tid.includes('..') || tid.includes('/') || tid.includes('\\')) {
+    throw new Error(`Invalid tenantId: ${tid}`);
+  }
+  return path.join(UPLOAD_BASE_DIR, tid, 'images');
 }
 
 let _dirReady = false;

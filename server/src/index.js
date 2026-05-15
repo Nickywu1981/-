@@ -56,6 +56,8 @@ server.listen(port, () => {
   // Periodic cleanup of stale uploads (every 30 min)
   cleanupTimer = registerInterval(() => {
     import('./utils/file-upload.js').then(({ cleanupStaleUploads }) => cleanupStaleUploads()).catch((err) => { logger.warn('[Cleanup] Load failed', { error: err.message }); });
+    import('./services/mediaPipelineService.js').then(({ cleanupPipelineTemp }) => cleanupPipelineTemp()).catch((err) => { logger.warn('[Cleanup] Pipeline temp cleanup failed', { error: err.message }); });
+    import('./services/adapters/edgeTtsAdapter.js').then(({ cleanupTtsAudio }) => cleanupTtsAudio()).catch((err) => { logger.warn('[Cleanup] TTS cleanup failed', { error: err.message }); });
   }, 30 * 60 * 1000);
 
   // Periodic stuck-task recovery (every 5 min)
