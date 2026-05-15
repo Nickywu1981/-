@@ -39,7 +39,7 @@ export async function createUnifiedOrder({ userId, orderType, businessId, amount
     throw new BusinessError(ERROR_CODE.PARAM_INVALID);
   }
 
-  const reqsn = `MOV${Date.now()}${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
+  const reqsn = `MOV${Date.now()}${crypto.randomBytes(8).toString('hex').toUpperCase()}`;
   const trxamt = Math.round(amount * 100); // 元转分
   const expireTime = new Date(Date.now() + 30 * 60 * 1000);
 

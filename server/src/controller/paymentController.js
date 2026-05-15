@@ -41,7 +41,7 @@ export const checkPaymentResult = wrapController(async (req, res) => {
 // ==================== 沙箱支付（仅开发环境） ====================
 
 export const sandboxPay = wrapController(async (req, res) => {
-    const data = await payment.sandboxPay(req.params.reqsn);
+    const data = await payment.sandboxPay(req.params.reqsn, req.user.id);
     return success(res, data, '支付成功，会员已开通');
   });
 

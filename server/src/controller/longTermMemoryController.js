@@ -16,7 +16,7 @@ function scopedSubjectId(req, explicitId) {
 }
 
 export const storeMemory = wrapController(async (req, res) => {
-  const d = req.validated;
+  const d = req.body;
   const id = await ltmService.store({
     namespace: d.namespace, subjectId: scopedSubjectId(req, d.subjectId),
     memoryKey: d.memoryKey || `auto_${Date.now()}`,
@@ -28,13 +28,13 @@ export const storeMemory = wrapController(async (req, res) => {
 });
 
 export const batchStoreMemory = wrapController(async (req, res) => {
-  const entries = req.validated.entries.map(e => ({ ...e, subjectId: scopedSubjectId(req, e.subjectId) }));
+  const entries = req.body.entries.map(e => ({ ...e, subjectId: scopedSubjectId(req, e.subjectId) }));
   const results = await ltmService.storeBatch(entries);
   return success(res, { stored: results.length, items: results });
 });
 
 export const recallMemory = wrapController(async (req, res) => {
-  const d = req.validated;
+  const d = req.body;
   const memories = await ltmService.recall({ ...d, subjectId: scopedSubjectId(req, d.subjectId) });
 
   for (const m of memories) {
@@ -45,7 +45,7 @@ export const recallMemory = wrapController(async (req, res) => {
 });
 
 export const consolidateMemory = wrapController(async (req, res) => {
-  const d = req.validated;
+  const d = req.body;
   await ltmService.applyDecay({ namespace: d.namespace, subjectId: scopedSubjectId(req, d.subjectId) });
   const result = await ltmService.consolidate(d);
   return success(res, result || { message: 'Nothing to consolidate' });

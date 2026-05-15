@@ -29,7 +29,7 @@ export const retryPublish = wrapController(async (req, res) => {
 });
 
 export const listPublishHistory = wrapController(async (req, res) => {
-  const { page, pageSize, status, platform } = req.validated;
+  const { page, pageSize, status, platform } = req.query;
   const result = await publishService.listPublishHistory(req.user.id, { page, pageSize, status, platform });
   return success(res, result);
 });

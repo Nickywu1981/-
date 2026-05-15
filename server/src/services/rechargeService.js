@@ -23,7 +23,7 @@ export async function createOrder(userId, tenantId, clientIp, { amount, payChann
   if (!amount || !rates[String(amount)]) throw new BusinessError(ERROR_CODE.PARAM_INVALID);
   if (!['wechat', 'alipay', 'unionpay'].includes(payChannel)) throw new BusinessError(ERROR_CODE.PARAM_INVALID);
 
-  const orderNo = 'RC' + Date.now() + crypto.randomBytes(4).toString('hex');
+  const orderNo = 'RC' + Date.now() + crypto.randomBytes(8).toString('hex');
   const coinAmount = rates[String(amount)];
 
   // 创建充值订单
@@ -64,7 +64,8 @@ export async function refundOrder(orderNo) {
     }
 
     await rechargeDao.markRefunded(orderNo, conn);
-    await creditDao.updateCreditBalance(order.user_id, -order.coin_amount, conn);
+    const deducted = await creditDao.updateCreditBalance(order.user_id, -order.coin_amount, conn);
+    if (!deducted) throw new BusinessError(ERROR_CODE.EC_SYS_003, '退款扣币失败，用户余额不足');
     await creditDao.insertConsumptionLog({
       userId: order.user_id, type: 3, action: 'refund',
       creditBefore: null, creditAfter: null, consumed: -order.coin_amount,

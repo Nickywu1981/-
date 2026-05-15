@@ -25,7 +25,7 @@ export const getSupportedLangs = wrapController(async (_req, res) => {
 });
 
 export const getUserTranslateHistory = wrapController(async (req, res) => {
-  const { type, page, limit } = req.validated;
+  const { type, page, limit } = req.query;
   const rows = await translateService.getUserTranslateHistory(req.user.id, { type, page, limit });
   return success(res, rows);
 });

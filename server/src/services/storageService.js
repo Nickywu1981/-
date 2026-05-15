@@ -86,9 +86,13 @@ export function buildKey({ tenantId = 0, folder = 'files', filename }) {
   return `${tenantId}/${folder}/${datePrefix}/${filename}`;
 }
 
-/** 本地绝对路径 */
+/** 本地绝对路径 — 含路径穿越防护 */
 export function localPath(key) {
-  return path.join(LOCAL_UPLOAD_DIR, key);
+  const resolved = path.resolve(LOCAL_UPLOAD_DIR, key);
+  if (!resolved.startsWith(LOCAL_UPLOAD_DIR + path.sep) && resolved !== LOCAL_UPLOAD_DIR) {
+    throw new Error('Path traversal blocked');
+  }
+  return resolved;
 }
 
 // ==================== 本地存储后端 ====================

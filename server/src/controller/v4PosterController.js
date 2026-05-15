@@ -25,7 +25,7 @@ export const getSizes = wrapController(async (_req, res) => {
 });
 
 export const getUserPosters = wrapController(async (req, res) => {
-  const { type, page, limit } = req.validated;
+  const { type, page, limit } = req.query;
   const rows = await posterService.getUserPosters(req.user.id, { type, page, limit });
   return success(res, rows);
 });

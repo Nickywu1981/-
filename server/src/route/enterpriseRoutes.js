@@ -102,7 +102,7 @@ router.delete('/users/:id', roleGuard('enterprise_admin'), _validate(idParamSche
 
 // 仪表盘 & 用量（读操作无需 CSRF）
 router.get('/dashboard', ctrl.getDashboard);
-router.get('/usage', _validate(usageQuerySchema), ctrl.getUsage);
+router.get('/usage', _validate(usageQuerySchema, 'query'), ctrl.getUsage);
 
 // 白标配置
 router.get('/whitelabel', ctrl.getWhiteLabel);

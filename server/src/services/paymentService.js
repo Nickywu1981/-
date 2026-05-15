@@ -81,12 +81,13 @@ export async function createPaymentOrder(userId, { planType, payChannel = 'wecha
 
 // ==================== 沙箱支付（仅沙箱模式可用） ====================
 
-export async function sandboxPay(orderId) {
+export async function sandboxPay(orderId, userId) {
   if (isProduction) throw new BusinessError(ERROR_CODE.FORBIDDEN);
   if (!allinpayConfig.isSandbox) throw new BusinessError(ERROR_CODE.FORBIDDEN);
 
   const order = await allinpayService.queryOrder(orderId);
   if (!order) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
+  if (String(order.user_id) !== String(userId)) throw new BusinessError(ERROR_CODE.FORBIDDEN, 'Order does not belong to current user');
   if (order.status !== ORDER_STATUS.PENDING) throw new BusinessError(ERROR_CODE.PAY_ORDER_EXPIRED, `Order status abnormal: ${order.status}`);
 
   // 模拟回调
