@@ -63,14 +63,14 @@ async function ask() {
 .hint-chip {
   padding: 4px 12px; border-radius: 20px; font-size: 13px; cursor: pointer; transition: background .2s;
   background: var(--brand-light, #ecf5ff);
-  color: var(--color-brand-500, #409eff);
+  color: var(--brand, #5b5fe3);
 }
 .hint-chip:hover { background: var(--brand-lighter, #d9ecff); }
 
 .answer-box {
   font-size: 15px; line-height: 1.8; padding: 12px; border-radius: 8px; margin-bottom: 12px;
   background: var(--brand-lightest, #f0f9ff);
-  border-left: 3px solid var(--color-brand-500, #409eff);
+  border-left: 3px solid var(--brand, #5b5fe3);
   color: var(--text-primary, #303133);
 }
 

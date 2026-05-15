@@ -277,7 +277,7 @@ onMounted(() => { fetchStats(); fetchList(); });
 .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
 .stat-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: center; }
 .stat-card.pending { border-left: 4px solid #f59e0b; }
-.stat-card.reviewing { border-left: 4px solid #3b82f6; }
+.stat-card.reviewing { border-left: 4px solid var(--brand, #5b5fe3); }
 .stat-card.approved { border-left: 4px solid #10b981; }
 .stat-card.rejected { border-left: 4px solid #ef4444; }
 .stat-val { display: block; font-size: 2rem; font-weight: 700; color: var(--text-primary); }

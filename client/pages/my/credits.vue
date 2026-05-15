@@ -88,7 +88,7 @@ h2 { font-size: var(--text-xl, 22px); font-weight: 600; margin-bottom: 20px; col
 .stats-row { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
 .stat-card { flex: 1; min-width: 160px; padding: 16px; background: var(--card-bg, #fff); border-radius: var(--radius-md, 10px); box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,.06)); }
 .stat-card__label { font-size: var(--text-sm, 13px); color: var(--text-secondary, #666); margin-bottom: 6px; }
-.stat-card__value { font-size: var(--text-xl, 22px); font-weight: 700; color: var(--brand, #7C3AED); }
+.stat-card__value { font-size: var(--text-xl, 22px); font-weight: 700; color: var(--brand, #5b5fe3); }
 .stat-card__value.green { color: var(--success, #10B981); }
 .stat-card__value.spent { color: var(--danger, #EF4444); }
 .filter-bar { margin-bottom: 16px; }

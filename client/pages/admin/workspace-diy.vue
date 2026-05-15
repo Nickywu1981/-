@@ -304,7 +304,7 @@ onMounted(loadAll)
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 .item-row:hover {
-  border-color: var(--brand, #409eff);
+  border-color: var(--brand, #5b5fe3);
   box-shadow: 0 2px 8px rgba(91, 95, 227, 0.12);
 }
 .item-row.hidden {

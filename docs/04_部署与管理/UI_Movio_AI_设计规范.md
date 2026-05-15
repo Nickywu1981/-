@@ -2,7 +2,7 @@
 
 > **编写组**：G3 UI 设计组（UI-Designer 🔴主 / Doc-Writer 🟡辅）
 > **审核组**：G1 架构规划组（Architect）
-> **版本**：v1.14 | **日期**：2026-05-15
+> **版本**：v1.15 | **日期**：2026-05-15
 
 ---
 
@@ -982,4 +982,55 @@ R11 标记 `user-workspace.vue` 等 3 个 layout "CSS 完全缺失" — **本例
 
 ---
 
-> **文档版本**：v1.14 | **最后更新**：2026-05-15 | **审计轮次**：15 轮 | **G3 自修复**：75 项
+> **文档版本**：v1.15 | **最后更新**：2026-05-15 | **审计轮次**：16 轮 | **G3 自修复**：91 项
+
+### 10.46 R16 — 全站 charts/管理后台/`@keyframes spin` 深度扫荡
+
+**审查范围**：`platform-admin.vue` / `business-ops.vue`（Layout CSS DRY）、47 个 `pages/admin/*`、6 个 `pages/gateway/*`、6 个 `pages/ops/*`、6 个 `pages/finance/*`、auth 页面（`login.vue`/`register.vue`/`reset-password.vue`）、全站 `@keyframes spin` 重复定义
+
+#### R16 修复（16 项，9 文件）
+
+| 文件 | 修复 |
+|------|------|
+| `admin/dashboard.vue` | 5 处 `#7C3AED` → `#5b5fe3`（pieColors/barColors/colors/revenue/a/b 数据） |
+| `admin/analytics.vue` | 1 处 `#7C3AED` → `#5b5fe3`（task trend） |
+| `admin/workspace-diy.vue` | 3 处 `#409eff` fallback → `#5b5fe3` |
+| `admin/enterprises.vue` | 1 处 `#3b82f6` → `var(--brand, #5b5fe3)` |
+| `member/index.vue` | 1 处 `#7C3AED` → `#5b5fe3`（渐变终点） |
+| `my/collections.vue` | 1 处 `#7C3AED, #A78BFA` → `#5b5fe3, #8b95ff`（渐变回退） |
+| `my/credits.vue` | 1 处 `#7C3AED` → `#5b5fe3`（品牌色回退） |
+| `ai-assistant/review.vue` | 1 处 `--color-brand-500, #409eff` → `--brand, #5b5fe3` |
+| `ai-assistant/data.vue` | 2 处 ditto |
+
+#### R16 新发现（跨组）
+
+| 优先级 | 问题 | 详请 |
+|:--:|------|------|
+| **P1** | **`@keyframes spin` 重复定义 10 次** | `animations.css` 已有 `anim-spin`，10 个文件各自重定义 `spin`：login/admin-dashboard/admin-ai-models/WorkLayout/workspace-index/ecommerce/social/ThreeViewer/payment-result/ConfigPanel |
+| **P1** | **Layout CSS 95% 重复** | `platform-admin.vue` 与 `business-ops.vue` 的 sidebar/nav/topbar/content 4 块 CSS 几乎逐字相同 (~120 行)，应提取为 `admin-shared.css` 或 composable layout |
+| **P1** | **Admin pages 零 aria-live** | 47 个 admin 页面零 `role="alert"`/`aria-live` 区域，dashboard 动态数据刷新后无播报 |
+| **P3** | **admin/brand-settings.vue 表单默认值** | `primary_color: '#7C3AED'` 为品牌色设置表单初始值，非 UI 渲染 → 低优先级 |
+
+#### 模范页面
+
+| 资产 | 通过项 |
+|------|------|
+| `login.vue` | `sr-only` label × 6、`role="alert"` `aria-live="assertive"`、`autocomplete` 属性、`:focus` + `:hover` + `:disabled` 三态完整、`@media (max-width:480px)` 响应式、`prefers-reduced-motion` 通过 `animations.css` 继承 |
+| gateway/ops/finance pages | 三套布局共 18 个页面全量清洁，零旧品牌色/硬编码色值 |
+
+### 10.47 本轮累计
+
+| 优先级 | R15 累计 | R16 新增 | R16 修复 | 总计 |
+|:--:|:--:|:--:|:--:|:--:|
+| P0 | 43 | 0 | -16 | **27** |
+| P1 | 15 | 3 | 0 | **18** |
+| P2 | 3 | 0 | 0 | **3** |
+| P3 | 16 | 1 | 0 | **17** |
+| **合计** | **65** | **4** | **-16** | **49** |
+
+### 里程碑
+
+- **全站 `#7C3AED` 图表色归零** — 最后残留 `admin/dashboard.vue` + `admin/analytics.vue` 6 处图表色全部迁移 `#5b5fe3`
+- **全站 `#409eff` Element Plus 蓝 fallback 归零** — R15→R16 间 5 处全部清除
+- **全站 `#3b82f6` Tailwind 蓝 fallback 归零** — `admin/enterprises.vue` 最后 1 处清除
+- **gateway/ops/finance 三套后台全清洁** — 18 pages 零品牌色残留

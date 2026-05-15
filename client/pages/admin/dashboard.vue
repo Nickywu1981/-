@@ -165,7 +165,7 @@ async function renderLineChart(el: HTMLDivElement | undefined, data: { date: str
 async function renderPieChart(el: HTMLDivElement | undefined, data: { label: string; value: number; color: string }[]) {
   const chart = initChart(el)
   if (!chart) return
-  const pieColors = ['#3B82F6', '#22C55E', '#F59E0B', '#EF4444', '#7C3AED', '#EC4899', '#06B6D4', '#84CC16']
+  const pieColors = ['#3B82F6', '#22C55E', '#F59E0B', '#EF4444', '#5b5fe3', '#EC4899', '#06B6D4', '#84CC16']
   chart.setOption({
     tooltip: { trigger: 'item', backgroundColor: '#fff', borderColor: '#e5e7eb', textStyle: { color: '#333', fontSize: 12 } },
     legend: { bottom: 0, textStyle: { fontSize: 11, color: '#666' } },
@@ -189,7 +189,7 @@ async function renderPieChart(el: HTMLDivElement | undefined, data: { label: str
 async function renderBarChart(el: HTMLDivElement | undefined, data: { label: string; value: number }[]) {
   const chart = initChart(el)
   if (!chart) return
-  const barColors = ['#3B82F6', '#22C55E', '#F59E0B', '#7C3AED', '#EC4899']
+  const barColors = ['#3B82F6', '#22C55E', '#F59E0B', '#5b5fe3', '#EC4899']
   chart.setOption({
     tooltip: { trigger: 'axis', backgroundColor: '#fff', borderColor: '#e5e7eb', textStyle: { color: '#333', fontSize: 12 }, axisPointer: { type: 'shadow' } },
     grid: { left: 80, right: 16, top: 8, bottom: 24 },
@@ -206,7 +206,7 @@ async function renderBarChart(el: HTMLDivElement | undefined, data: { label: str
 async function renderModelChart(el: HTMLDivElement | undefined, data: { label: string; value: number; color: string }[]) {
   const chart = initChart(el)
   if (!chart) return
-  const colors = ['#7C3AED', '#3B82F6', '#22C55E', '#F59E0B', '#EC4899']
+  const colors = ['#5b5fe3', '#3B82F6', '#22C55E', '#F59E0B', '#EC4899']
   chart.setOption({
     tooltip: { trigger: 'item', backgroundColor: '#fff', borderColor: '#e5e7eb', textStyle: { color: '#333', fontSize: 12 } },
     legend: { bottom: 0, textStyle: { fontSize: 11, color: '#666' } },
@@ -247,12 +247,12 @@ async function fetchAll() {
       await nextTick(async () => {
         await renderLineChart(taskChart.value, trends?.tasks || [], '#3B82F6')
         await renderLineChart(userChart.value, trends?.users || [], '#22C55E')
-        await renderLineChart(revenueChart.value, trends?.revenue || [], '#7C3AED')
+        await renderLineChart(revenueChart.value, trends?.revenue || [], '#5b5fe3')
         await renderPieChart(pieChart.value, sVal.data?.taskDistribution || [
           { label: t('admin_dashboard.fb_main_image'), value: 35, color: '#3B82F6' },
           { label: t('admin_dashboard.fb_scene'), value: 18, color: '#22C55E' },
           { label: t('admin_dashboard.fb_video'), value: 22, color: '#F59E0B' },
-          { label: t('admin_dashboard.fb_detail'), value: 12, color: '#7C3AED' },
+          { label: t('admin_dashboard.fb_detail'), value: 12, color: '#5b5fe3' },
           { label: t('admin_dashboard.fb_other'), value: 13, color: '#EC4899' },
         ])
         await renderBarChart(barChart.value, sVal.data?.popularFeatures || [
@@ -263,7 +263,7 @@ async function fetchAll() {
           { label: t('admin_dashboard.fb_white_bg'), value: 43 },
         ])
         await renderModelChart(modelChart.value, sVal.data?.modelUsage || [
-          { label: 'GPT-4o', value: 45, color: '#7C3AED' },
+          { label: 'GPT-4o', value: 45, color: '#5b5fe3' },
           { label: 'Claude', value: 25, color: '#3B82F6' },
           { label: 'SD XL', value: 20, color: '#22C55E' },
           { label: t('admin_dashboard.fb_other_model'), value: 10, color: '#F59E0B' },

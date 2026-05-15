@@ -98,7 +98,7 @@ definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 <style scoped>
 .page { max-width: 900px; margin: 0 auto; padding: 24px; }
 h2 { font-size: 20px; font-weight: 600; color: var(--text-primary); margin-bottom: 16px; }
-.btn { padding: 8px 20px; border-radius: 8px; background: var(--brand-gradient, linear-gradient(135deg, #7C3AED, #A78BFA)); color: #fff; border: none; cursor: pointer; transition: opacity .2s, transform .2s; }
+.btn { padding: 8px 20px; border-radius: 8px; background: var(--brand-gradient, linear-gradient(135deg, #5b5fe3, #8b95ff)); color: #fff; border: none; cursor: pointer; transition: opacity .2s, transform .2s; }
 .btn:hover { opacity: .9; transform: translateY(-1px); }
 .btn:disabled { opacity: .6; }
 .btn-outline { padding: 8px 20px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-secondary); cursor: pointer; }

@@ -66,7 +66,7 @@ async function review() {
   background: var(--bg-input, #fff);
   color: var(--text-primary, #303133);
 }
-.review-textarea:focus { border-color: var(--color-brand-500, #409eff); }
+.review-textarea:focus { border-color: var(--brand, #5b5fe3); }
 
 .review-result-header { margin-bottom: 12px; }
 

@@ -130,7 +130,7 @@ onMounted(async () => {
 
 .assets-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
 .asset-card { padding: 24px; border-radius: var(--cfg-radius-lg); text-align: center; }
-.asset-card.credits { background: linear-gradient(135deg, #4F46E5, #7C3AED); color: #fff; }
+.asset-card.credits { background: linear-gradient(135deg, #4F46E5, #5b5fe3); color: #fff; }
 .asset-card.points { background: linear-gradient(135deg, #F59E0B, #EF4444); color: #fff; }
 .asset-label { font-size: var(--cfg-font-size-sm); opacity: 0.85; display: block; margin-bottom: 4px; }
 .asset-value { font-size: 36px; font-weight: var(--cfg-font-weight-bold); display: block; margin-bottom: 8px; }

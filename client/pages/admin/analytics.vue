@@ -78,7 +78,7 @@ function makeOption(data: any[], color: string) {
   }
 }
 
-const taskOption = computed(() => stats.value?.trends?.tasks ? makeOption(stats.value.trends.tasks, '#7C3AED') : null)
+const taskOption = computed(() => stats.value?.trends?.tasks ? makeOption(stats.value.trends.tasks, '#5b5fe3') : null)
 const userOption = computed(() => stats.value?.trends?.users ? makeOption(stats.value.trends.users, '#3B82F6') : null)
 const revenueOption = computed(() => stats.value?.trends?.revenue ? makeOption(stats.value.trends.revenue, '#10B981') : null)
 definePageMeta({ layout: 'platform-admin', middleware: ['auth'] })
