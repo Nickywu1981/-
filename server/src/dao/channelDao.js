@@ -116,14 +116,14 @@ export async function findDownstreamAgents(tenantId, { limit = 200 } = {}) {
 
 export async function listPolicies(tenantId, { limit = 200 } = {}) {
   const [rows] = await pool.query(
-    'SELECT * FROM ?? WHERE tenant_id = ? ORDER BY created_at DESC LIMIT ?',
+    'SELECT id, tenant_id, name, target_level, commission_rate, min_revenue, max_cap, product_types, settlement_cycle, status, effective_from, effective_to, created_at, updated_at FROM ?? WHERE tenant_id = ? ORDER BY created_at DESC LIMIT ?',
     [TABLE.POLICY, tenantId, limit],
   );
   return rows;
 }
 
 export async function getPolicyById(id, tenantId) {
-  const [rows] = await pool.query('SELECT * FROM ?? WHERE id = ? AND tenant_id = ? LIMIT 1', [TABLE.POLICY, id, tenantId]);
+  const [rows] = await pool.query('SELECT id, tenant_id, name, target_level, commission_rate, min_revenue, max_cap, product_types, settlement_cycle, status, effective_from, effective_to, created_at, updated_at FROM ?? WHERE id = ? AND tenant_id = ? LIMIT 1', [TABLE.POLICY, id, tenantId]);
   return rows[0] || null;
 }
 
@@ -169,7 +169,7 @@ export async function getPerformance(tenantId, { startDate, endDate, childTenant
 
   const { offset } = parsePagination({ page, pageSize });
   const [rows] = await pool.query(
-    `SELECT cp.*, t.name AS child_name
+    `SELECT cp.id, cp.tenant_id, cp.child_tenant_id, cp.stat_date, cp.order_count, cp.order_amount, cp.commission, cp.new_customers, cp.token_usage, cp.created_at, t.name AS child_name
      FROM ?? cp LEFT JOIN ?? t ON cp.child_tenant_id = t.id
      WHERE ${conditions.join(' AND ')}
      ORDER BY cp.stat_date DESC LIMIT ? OFFSET ?`,

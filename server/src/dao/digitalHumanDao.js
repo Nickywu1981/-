@@ -13,7 +13,7 @@ export async function createJob(userId, { text, audioUrl, avatarStyle, backgroun
 export async function findByUser(userId, { page = 1, limit = 20 } = {}) {
   const { offset } = parsePagination({ page, pageSize: limit });
   const [rows] = await db.query(
-    'SELECT * FROM digital_human_jobs WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?',
+    'SELECT id, user_id, text, audio_url, avatar_style, background, output_url, status, priority, created_at, updated_at FROM digital_human_jobs WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?',
     [userId, limit, offset],
   );
   const [[{ total }]] = await db.query(

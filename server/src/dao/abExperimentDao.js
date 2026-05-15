@@ -18,7 +18,7 @@ export async function create(experiment) {
 }
 
 export async function getById(id) {
-  const [rows] = await db.execute('SELECT * FROM ab_experiments WHERE id = ?', [id]);
+  const [rows] = await db.execute('SELECT id, name, description, status, variants, metrics, target_type, start_at, end_at, created_by, created_at, updated_at FROM ab_experiments WHERE id = ?', [id]);
   if (rows.length === 0) return null;
   const row = rows[0];
   return {
@@ -30,7 +30,7 @@ export async function getById(id) {
 
 export async function list(options = {}) {
   const { status, limit = 50, offset = 0 } = options;
-  let sql = 'SELECT * FROM ab_experiments WHERE 1=1';
+  let sql = 'SELECT id, name, description, status, variants, metrics, target_type, start_at, end_at, created_by, created_at, updated_at FROM ab_experiments WHERE 1=1';
   const params = [];
   if (status) { sql += ' AND status = ?'; params.push(status); }
   sql += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';

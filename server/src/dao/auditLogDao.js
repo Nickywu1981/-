@@ -23,7 +23,7 @@ export async function list({ userId, action, targetType, targetId, page = 1, pag
 
   const [[{ total }]] = await pool.query(`SELECT COUNT(*) as total FROM ${TABLE} WHERE ${where.join(' AND ')}`, params);
   const [rows] = await pool.query(
-    `SELECT * FROM ${TABLE} WHERE ${where.join(' AND ')} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+    `SELECT id, user_id, action, target_type, target_id, target_title, details, ip, user_agent, created_at FROM ${TABLE} WHERE ${where.join(' AND ')} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
     [...params, pageSize, offset],
   );
   return { list: rows, total, page, pageSize };

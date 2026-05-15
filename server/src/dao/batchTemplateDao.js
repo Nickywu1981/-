@@ -19,7 +19,7 @@ export async function listTemplates(userId) {
 
 export async function getTemplate(id, userId) {
   const [rows] = await pool.execute(
-    'SELECT * FROM user_batch_template WHERE id = ? AND user_id = ? AND is_deleted = 0 LIMIT 1',
+    'SELECT id, user_id, name, operation, platform, style, night_mode, image_count, create_time, update_time, is_deleted FROM user_batch_template WHERE id = ? AND user_id = ? AND is_deleted = 0 LIMIT 1',
     [id, userId],
   );
   return rows[0] || null;

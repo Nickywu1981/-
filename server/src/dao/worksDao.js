@@ -15,7 +15,7 @@ export async function findWorksByIds(workIds, userId) {
 
 export async function listByCategory(userId, categoryPrefix, { limit = 20, offset = 0 } = {}) {
   const [rows] = await pool.query(
-    'SELECT * FROM user_works WHERE user_id = ? AND task_category LIKE ? ORDER BY create_time DESC LIMIT ? OFFSET ?',
+    'SELECT id, user_id, task_category, task_type, title, thumbnail_url, result_data, status, create_time FROM user_works WHERE user_id = ? AND task_category LIKE ? ORDER BY create_time DESC LIMIT ? OFFSET ?',
     [userId, categoryPrefix, limit, offset],
   );
   return rows;

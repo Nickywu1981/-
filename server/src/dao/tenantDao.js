@@ -12,7 +12,7 @@ export async function list({ page = 1, pageSize = 20, status, planType, keyword,
   const [countRows] = await pool.query(`SELECT COUNT(*) as total FROM tenant ${where}`, params);
   const { offset } = parsePagination({ page, pageSize });
   params.push(offset, pageSize);
-  const [rows] = await pool.query(`SELECT * FROM tenant ${where} ORDER BY create_time DESC LIMIT ?, ?`, params);
+  const [rows] = await pool.query(`SELECT id, name, code, logo, domain, plan_type, review_status, status, contact_name, contact_phone, contact_email, address, max_users, quota_images, quota_video, expire_time, create_time, update_time FROM tenant ${where} ORDER BY create_time DESC LIMIT ?, ?`, params);
   return { list: rows, total: countRows[0].total, page, pageSize };
 }
 

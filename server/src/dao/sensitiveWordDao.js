@@ -30,7 +30,7 @@ export async function listSensitiveWords({ keyword, page = 1, pageSize = 50 }) {
   const params = keyword ? [`%${keyword}%`] : [];
   const { offset } = parsePagination({ page, pageSize });
   params.push(offset, pageSize);
-  const [rows] = await _db().query(`SELECT * FROM sensitive_word ${cond} ORDER BY create_time DESC LIMIT ?, ?`, params);
+  const [rows] = await _db().query(`SELECT id, tenant_id, word, category, level, status, create_time FROM sensitive_word ${cond} ORDER BY create_time DESC LIMIT ?, ?`, params);
   const countParams = keyword ? [`%${keyword}%`] : [];
   const [[{ total }]] = await _db().query(`SELECT COUNT(*) AS total FROM sensitive_word ${cond}`, countParams);
   return { list: rows, total };

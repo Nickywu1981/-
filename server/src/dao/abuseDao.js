@@ -35,7 +35,7 @@ export async function listAbuseRecords({ page = 1, pageSize = 20, userId } = {})
   const total = countResult[0].total;
   const { offset } = parsePagination({ page, pageSize });
   const [rows] = await pool.query(
-    `SELECT * FROM ${table} ${where} ORDER BY id DESC LIMIT ? OFFSET ?`,
+    `SELECT id, user_id, api_path, ip, user_agent, create_time FROM ${table} ${where} ORDER BY id DESC LIMIT ? OFFSET ?`,
     [...params, pageSize, offset],
   );
   return { list: rows, total, page, pageSize };

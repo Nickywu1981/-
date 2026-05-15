@@ -12,7 +12,7 @@ export async function createJob(userId, taskType, { videoUrl, sourceLang, target
 
 export async function findByUser(userId, { taskType, page = 1, limit = 20 } = {}) {
   const { offset } = parsePagination({ page, pageSize: limit });
-  let sql = 'SELECT * FROM video_translate_jobs WHERE user_id = ?';
+  let sql = 'SELECT id, user_id, task_type, video_url, source_lang, target_lang, extra_config, output_url, status, progress, error_msg, created_at, updated_at FROM video_translate_jobs WHERE user_id = ?';
   const params = [userId];
   if (taskType) { sql += ' AND task_type = ?'; params.push(taskType); }
   sql += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';

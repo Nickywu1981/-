@@ -9,7 +9,7 @@ export async function listTemplates() {
 
 export async function findByCode(templateCode) {
   const [rows] = await pool.execute(
-    'SELECT * FROM email_template WHERE template_code = ? AND status = 1 LIMIT 1',
+    'SELECT id, template_code, name, subject, content, provider_template_id, provider, status, remark, create_time FROM email_template WHERE template_code = ? AND status = 1 LIMIT 1',
     [templateCode],
   );
   return rows[0] || null;
@@ -25,7 +25,7 @@ export async function updateTemplate(id, fields) {
   if (sets.length === 0) return null;
   params.push(id);
   await pool.execute(`UPDATE email_template SET ${sets.join(', ')} WHERE id = ?`, params);
-  const [rows] = await pool.execute('SELECT * FROM email_template WHERE id = ? LIMIT 1', [id]);
+  const [rows] = await pool.execute('SELECT id, template_code, name, subject, content, provider_template_id, provider, status, remark, create_time FROM email_template WHERE id = ? LIMIT 1', [id]);
   return rows[0] || null;
 }
 

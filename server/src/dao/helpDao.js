@@ -18,13 +18,13 @@ export async function listFaqs({ keyword, page = 1, pageSize = 50 } = {}) {
     params.push(`%${keyword}%`, `%${keyword}%`);
   }
   params.push(pageSize, offset);
-  const [rows] = await pool.query(`SELECT * FROM help_faq ${where} ORDER BY sort ASC, id DESC LIMIT ? OFFSET ?`, params);
+  const [rows] = await pool.query(`SELECT id, question, answer, category, sort, status, tenant_id, created_at, updated_at FROM help_faq ${where} ORDER BY sort ASC, id DESC LIMIT ? OFFSET ?`, params);
   const [[{ total }]] = await pool.query(`SELECT COUNT(*) as total FROM help_faq ${where}`, params);
   return { list: rows, total };
 }
 
 export async function getFaqById(id) {
-  const [rows] = await pool.query('SELECT * FROM help_faq WHERE id = ? LIMIT 1', [id]);
+  const [rows] = await pool.query('SELECT id, question, answer, category, sort, status, tenant_id, created_at, updated_at FROM help_faq WHERE id = ? LIMIT 1', [id]);
   return rows[0] || null;
 }
 

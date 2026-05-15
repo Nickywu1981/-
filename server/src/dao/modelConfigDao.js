@@ -57,7 +57,7 @@ export async function update(modelKey, data) {
     `UPDATE ai_model_config SET ${fields.join(', ')} WHERE model_key = ?`, params,
   );
   if (result.affectedRows === 0) return null;
-  const [rows] = await _db().query('SELECT * FROM ai_model_config WHERE model_key = ? LIMIT 1', [modelKey]);
+  const [rows] = await _db().query(`SELECT ${COLS} FROM ai_model_config WHERE model_key = ? LIMIT 1`, [modelKey]);
   return rows[0] || null;
 }
 
@@ -110,7 +110,7 @@ export async function queryCallLogs({ userId, modelKey, status, days = 7, offset
   conditions.push('created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)');
   params.push(parseInt(days, 10) || 7);
   const [rows] = await _db().query(
-    `SELECT * FROM ai_call_log WHERE ${conditions.join(' AND ')} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+    `SELECT id, user_id, tenant_id, model_key, task_type, input_hash, status, latency_ms, tokens_in, tokens_out, error_msg, moderation_result, cost_amount, cost_currency, pricing_id, cost_details, correlation_id, source, created_at FROM ai_call_log WHERE ${conditions.join(' AND ')} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
     [...params, parseInt(limit, 10), parseInt(offset, 10)],
   );
   const [[{ total }]] = await _db().query(

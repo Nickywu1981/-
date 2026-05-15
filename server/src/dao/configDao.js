@@ -33,7 +33,7 @@ export async function insertLog(data) {
 }
 
 export async function getLogById(id) {
-  const [rows] = await pool.execute('SELECT * FROM sys_config_log WHERE id = ? LIMIT 1', [id]);
+  const [rows] = await pool.execute('SELECT id, group_key, item_key, old_value, new_value, changed_by, created_at FROM sys_config_log WHERE id = ? LIMIT 1', [id]);
   return rows[0] || null;
 }
 

@@ -78,7 +78,7 @@ export async function insertLog(locale, transKey, oldValue, newValue, changedBy)
 
 export async function listLogs(locale, transKey, limit = 50) {
   const [rows] = await pool.query(
-    'SELECT * FROM i18n_translation_log WHERE locale = ? AND trans_key = ? ORDER BY changed_at DESC LIMIT ?',
+    'SELECT id, locale, trans_key, old_value, new_value, changed_by, changed_at FROM i18n_translation_log WHERE locale = ? AND trans_key = ? ORDER BY changed_at DESC LIMIT ?',
     [locale, transKey, limit],
   );
   return rows;

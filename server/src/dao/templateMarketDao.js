@@ -21,7 +21,7 @@ export async function search({ category, keyword, sort = 'download_count', page 
 }
 
 export async function getById(id) {
-  const [rows] = await db.query('SELECT * FROM template_marketplace WHERE id = ? LIMIT 1', [id]);
+  const [rows] = await db.query('SELECT id, user_id, title, description, category, price, preview_images, download_count, rating, status, created_at, updated_at FROM template_marketplace WHERE id = ? LIMIT 1', [id]);
   return rows[0] || null;
 }
 
