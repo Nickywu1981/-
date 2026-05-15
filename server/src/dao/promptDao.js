@@ -18,7 +18,7 @@ export async function listTemplates({ category, status, keyword, isPublic, creat
   const limit = parseInt(pageSize, 10);
 
   const [rows] = await pool.query(
-    `SELECT t.*, u.nickname AS creator_name FROM prompt_template t LEFT JOIN user u ON t.creator_id = u.id ${where} ORDER BY t.sort_order DESC, t.usage_count DESC LIMIT ?, ?`,
+    `SELECT t.id, t.tenant_id, t.template_code, t.category, t.title, t.description, t.content, t.variables, t.tags, t.model_type, t.icon, t.sort_order, t.is_public, t.status, t.usage_count, t.creator_id, t.reviewer_id, t.review_remark, t.create_time, t.update_time, u.nickname AS creator_name FROM prompt_template t LEFT JOIN user u ON t.creator_id = u.id ${where} ORDER BY t.sort_order DESC, t.usage_count DESC LIMIT ?, ?`,
     [...params, offset, limit],
   );
   const [[{ total }]] = await pool.query(`SELECT COUNT(*) AS total FROM prompt_template t ${where}`, params);
@@ -26,7 +26,7 @@ export async function listTemplates({ category, status, keyword, isPublic, creat
 }
 
 export async function getTemplateById(id) {
-  const [rows] = await pool.execute('SELECT t.*, u.nickname AS creator_name FROM prompt_template t LEFT JOIN user u ON t.creator_id = u.id WHERE t.id = ?', [id]);
+  const [rows] = await pool.execute('SELECT t.id, t.tenant_id, t.template_code, t.category, t.title, t.description, t.content, t.variables, t.tags, t.model_type, t.icon, t.sort_order, t.is_public, t.status, t.usage_count, t.creator_id, t.reviewer_id, t.review_remark, t.create_time, t.update_time, u.nickname AS creator_name FROM prompt_template t LEFT JOIN user u ON t.creator_id = u.id WHERE t.id = ?', [id]);
   return rows[0] || null;
 }
 
