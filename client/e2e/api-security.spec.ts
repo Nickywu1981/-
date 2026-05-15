@@ -29,7 +29,7 @@ test.describe('Security — SQL 注入防护', () => {
 
   test('查询参数 SQL 注入不500', async ({ request }) => {
     const endpoints = [
-      '/api/v4/works?page=1%27%20OR%20%271%27%3D%271',
+      '/api/works?page=1%27%20OR%20%271%27%3D%271',
       '/api/copywriting/history?type=%27%3B%20DROP%20TABLE%20users%3B--',
       '/api/advanced-image/tasks?status=%27%20UNION%20SELECT%20*%20FROM%20users--',
     ];
@@ -178,15 +178,15 @@ test.describe('Security — 认证与授权', () => {
       '/api/advanced-image/virtual-tryon',
       '/api/advanced-video/img2video',
       '/api/copywriting/generate-titles',
-      '/api/v4/video/generate',
-      '/api/v4/image/generate',
-      '/api/v4/poster/generate',
-      '/api/v4/detail/generate-set',
-      '/api/v4/digital-human/create',
-      '/api/v4/voice/generate',
-      '/api/v4/video-translate/voice',
-      '/api/v4/model-generate/generate',
-      '/api/v4/render/product',
+      '/api/video/generate',
+      '/api/image/generate',
+      '/api/poster/generate',
+      '/api/detail/generate-set',
+      '/api/digital-human/create',
+      '/api/voice/generate',
+      '/api/video-translate/voice',
+      '/api/model-generate/generate',
+      '/api/render/product',
     ];
 
     for (const path of protectedPaths) {

@@ -9,7 +9,7 @@ const { mockSvc } = vi.hoisted(() => ({
 
 vi.mock('../../services/automationService.js', () => mockSvc);
 vi.mock('../../utils/wrapController.js', () => ({ wrapController: (fn) => fn }));
-vi.mock('../../utils/response.js', () => ({ success: (r, d, m) => ({ code: 0, data: d, message: m }) }));
+vi.mock('../../utils/response.js', () => ({ success: (r, d, m) => ({ code: 200, data: d, message: m }) }));
 
 import * as ctrl from '../../controller/automationController.js';
 

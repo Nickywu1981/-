@@ -8,7 +8,7 @@ const { mockSvc } = vi.hoisted(() => ({
 
 vi.mock('../../services/aiAssistantService.js', () => mockSvc);
 vi.mock('../../utils/wrapController.js', () => ({ wrapController: (fn) => fn }));
-vi.mock('../../utils/response.js', () => ({ success: (r, d) => ({ code: 0, data: d }) }));
+vi.mock('../../utils/response.js', () => ({ success: (r, d) => ({ code: 200, data: d }) }));
 vi.mock('../../utils/logger.js', () => ({ default: { info: vi.fn(), warn: vi.fn(), error: vi.fn() } }));
 
 import * as ctrl from '../../controller/aiAssistantController.js';

@@ -17,8 +17,8 @@ test.describe('核心 API — 功能验证', () => {
 
   test('创作类 API 列表可访问', async ({ request }) => {
     const endpoints = [
-      '/api/v4/image/generate-options',
-      '/api/v4/upload/presign',
+      '/api/image/generate-options',
+      '/api/upload/presign',
     ];
     for (const endpoint of endpoints) {
       const res = await request.get(`http://localhost:3001${endpoint}`, {

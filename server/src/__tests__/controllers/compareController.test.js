@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 
 vi.mock('../../utils/wrapController.js', () => ({ wrapController: (fn) => fn }));
-vi.mock('../../utils/response.js', () => ({ success: (r, d) => ({ code: 0, data: d }) }));
+vi.mock('../../utils/response.js', () => ({ success: (r, d) => ({ code: 200, data: d }) }));
 
 import * as ctrl from '../../controller/compareController.js';
 

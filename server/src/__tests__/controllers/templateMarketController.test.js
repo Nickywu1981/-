@@ -1,7 +1,7 @@
 import { vi, describe, it, expect } from 'vitest';
 
 vi.mock('../../dao/templateMarketDao.js');
-vi.mock('../../utils/response.js', () => ({ success: (res, data) => ({ code: 0, data }) }));
+vi.mock('../../utils/response.js', () => ({ success: (res, data) => ({ code: 200, data }) }));
 vi.mock('../../utils/wrapController.js', () => ({ wrapController: fn => fn }));
 vi.mock('../../utils/businessError.js', () => ({ BusinessError: class extends Error { constructor(c, m) { super(m); this.code = c; } } }));
 vi.mock('../../constants/errorCode.js', () => ({ ERROR_CODE: { NOT_FOUND: 'NOT_FOUND', PAYMENT_REQUIRED: 'PAYMENT_REQUIRED' } }));
@@ -16,13 +16,13 @@ describe('templateMarketController', () => {
   it('search', async () => {
     dao.search = vi.fn().mockResolvedValue({ list: [], total: 0 });
     const r = await ctrl.search({ query: { category: '电商' } }, res);
-    expect(r.code).toBe(0);
+    expect(r.code).toBe(200);
   });
 
   it('detail exists', async () => {
     dao.getById = vi.fn().mockResolvedValue({ id: 1, title: '模板1' });
     const r = await ctrl.detail({ params: { id: '1' } }, res);
-    expect(r.code).toBe(0);
+    expect(r.code).toBe(200);
   });
 
   it('detail not found', async () => {
@@ -34,7 +34,7 @@ describe('templateMarketController', () => {
     dao.getById = vi.fn().mockResolvedValue({ id: 1, price: 0 });
     dao.recordDownload = vi.fn().mockResolvedValue(true);
     const r = await ctrl.download({ params: { id: '1' }, userId: 'u1' }, res);
-    expect(r.code).toBe(0);
+    expect(r.code).toBe(200);
   });
 
   it('download paid template not purchased', async () => {
@@ -48,6 +48,6 @@ describe('templateMarketController', () => {
     dao.hasPurchased = vi.fn().mockResolvedValue(true);
     dao.recordDownload = vi.fn().mockResolvedValue(true);
     const r = await ctrl.download({ params: { id: '1' }, userId: 'u1' }, res);
-    expect(r.code).toBe(0);
+    expect(r.code).toBe(200);
   });
 });

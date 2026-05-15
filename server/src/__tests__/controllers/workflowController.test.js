@@ -13,8 +13,8 @@ vi.mock('../../dao/workflowDao.js', () => mockDao);
 vi.mock('../../utils/logger.js', () => ({ default: { info: vi.fn(), warn: vi.fn(), error: vi.fn() } }));
 vi.mock('../../utils/wrapController.js', () => ({ wrapController: (fn) => fn }));
 vi.mock('../../utils/response.js', () => ({
-  success: (res, data, msg) => ({ code: 0, data, message: msg }),
-  listResult: (res, result) => ({ code: 0, data: { list: result.list, total: result.total, page: result.page, pageSize: result.pageSize } }),
+  success: (res, data, msg) => ({ code: 200, data, message: msg }),
+  listResult: (res, result) => ({ code: 200, data: { list: result.list, total: result.total, page: result.page, pageSize: result.pageSize } }),
 }));
 
 import * as ctrl from '../../controller/workflowController.js';
@@ -27,7 +27,7 @@ describe('workflowController', () => {
   it('listTemplates returns list', async () => {
     mockDao.listTemplates.mockResolvedValue([{ id: 1, name: 'A', steps: '[]' }]);
     const result = await ctrl.listTemplates({ query: {} }, mockRes());
-    expect(result.code).toBe(0);
+    expect(result.code).toBe(200);
     expect(result.data).toHaveLength(1);
   });
 

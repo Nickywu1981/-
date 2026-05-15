@@ -8,7 +8,7 @@ const { mockDao } = vi.hoisted(() => ({
 
 vi.mock('../../dao/commerceDao.js', () => mockDao);
 vi.mock('../../utils/wrapController.js', () => ({ wrapController: (fn) => fn }));
-vi.mock('../../utils/response.js', () => ({ success: (r, d) => ({ code: 0, data: d }) }));
+vi.mock('../../utils/response.js', () => ({ success: (r, d) => ({ code: 200, data: d }) }));
 vi.mock('../../utils/businessError.js', () => ({ BusinessError: class extends Error { constructor(code, msg) { super(msg); this.code = code; } } }));
 vi.mock('../../constants/errorCode.js', () => ({ ERROR_CODE: { NOT_FOUND: 'NOT_FOUND' } }));
 

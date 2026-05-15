@@ -6,7 +6,7 @@ const { mockSvc } = vi.hoisted(() => ({
 
 vi.mock('../../services/batchService.js', () => mockSvc);
 vi.mock('../../utils/wrapController.js', () => ({ wrapController: (fn) => fn }));
-vi.mock('../../utils/response.js', () => ({ success: (r, d, m) => ({ code: 0, data: d, message: m }), listResult: (r, d) => ({ code: 0, data: d }) }));
+vi.mock('../../utils/response.js', () => ({ success: (r, d, m) => ({ code: 200, data: d, message: m }), listResult: (r, d) => ({ code: 200, data: d }) }));
 vi.mock('../../utils/businessError.js', () => ({ BusinessError: class extends Error { constructor(code, msg) { super(msg); this.code = code; } } }));
 vi.mock('../../constants/errorCode.js', () => ({ ERROR_CODE: { PARAM_MISSING: 'PARAM_MISSING', NOT_FOUND: 'NOT_FOUND' } }));
 vi.mock('../../utils/pagination.js', () => ({ parsePagination: (q, opts) => ({ page: +(q.page || 1), pageSize: +(q.pageSize || opts.defaultPageSize) }) }));

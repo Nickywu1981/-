@@ -2,8 +2,8 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 vi.mock('../../utils/wrapController.js', () => ({ wrapController: (fn) => fn }));
 vi.mock('../../utils/response.js', () => ({
-  success: (_res, data, msg) => ({ code: 0, data, message: msg }),
-  listResult: (_res, list, total, page, pageSize) => ({ code: 0, data: { list, total, page, pageSize } }),
+  success: (_res, data, msg) => ({ code: 200, data, message: msg }),
+  listResult: (_res, list, total, page, pageSize) => ({ code: 200, data: { list, total, page, pageSize } }),
 }));
 vi.mock('../../utils/logger.js', () => ({
   default: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
@@ -19,7 +19,7 @@ describe('memoryEmbedController', () => {
   it('embed returns vector', async () => {
     svc.embed.mockResolvedValue({ vector: [0.1, 0.2], tokens: 10 });
     const r = await embed({ body: { text: 'test' } }, {});
-    expect(r.code).toBe(0);
+    expect(r.code).toBe(200);
   });
 
   it('search default topK=5', async () => {

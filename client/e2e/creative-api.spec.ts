@@ -6,38 +6,38 @@ const BASE = 'http://localhost:3001';
 test.describe('Creative — 图片创作 API', () => {
 
   test.describe('v4 Image (image.service)', () => {
-    test('GET /api/v4/image/generate-options 返回配置', async ({ request }) => {
-      const res = await request.get(`${BASE}/api/v4/image/generate-options`, { failOnStatusCode: false });
+    test('GET /api/image/generate-options 返回配置', async ({ request }) => {
+      const res = await request.get(`${BASE}/api/image/generate-options`, { failOnStatusCode: false });
       expect(res.status()).toBeLessThan(500);
     });
 
-    test('POST /api/v4/image/generate 需认证', async ({ request }) => {
-      const res = await request.post(`${BASE}/api/v4/image/generate`, { data: { prompt: 'test' } });
+    test('POST /api/image/generate 需认证', async ({ request }) => {
+      const res = await request.post(`${BASE}/api/image/generate`, { data: { prompt: 'test' } });
       expect([401, 403]).toContain(res.status());
     });
 
-    test('POST /api/v4/image/generate 缺参数不500', async ({ request }) => {
-      const res = await request.post(`${BASE}/api/v4/image/generate`, { data: {} });
+    test('POST /api/image/generate 缺参数不500', async ({ request }) => {
+      const res = await request.post(`${BASE}/api/image/generate`, { data: {} });
       expect(res.status()).toBeLessThan(500);
     });
 
-    test('POST /api/v4/image/replicate-main 需认证', async ({ request }) => {
-      const res = await request.post(`${BASE}/api/v4/image/replicate-main`, { data: {} });
+    test('POST /api/image/replicate-main 需认证', async ({ request }) => {
+      const res = await request.post(`${BASE}/api/image/replicate-main`, { data: {} });
       expect(res.status()).toBeLessThan(500);
     });
 
-    test('POST /api/v4/image/batch-generate 需认证', async ({ request }) => {
-      const res = await request.post(`${BASE}/api/v4/image/batch-generate`, { data: { prompts: ['a', 'b'] } });
+    test('POST /api/image/batch-generate 需认证', async ({ request }) => {
+      const res = await request.post(`${BASE}/api/image/batch-generate`, { data: { prompts: ['a', 'b'] } });
       expect(res.status()).toBeLessThan(500);
     });
 
-    test('POST /api/v4/image/batch-edit 需认证', async ({ request }) => {
-      const res = await request.post(`${BASE}/api/v4/image/batch-edit`, { data: {} });
+    test('POST /api/image/batch-edit 需认证', async ({ request }) => {
+      const res = await request.post(`${BASE}/api/image/batch-edit`, { data: {} });
       expect(res.status()).toBeLessThan(500);
     });
 
-    test('POST /api/v4/image/prompt-enhance 增强提示词', async ({ request }) => {
-      const res = await request.post(`${BASE}/api/v4/image/prompt-enhance`, {
+    test('POST /api/image/prompt-enhance 增强提示词', async ({ request }) => {
+      const res = await request.post(`${BASE}/api/image/prompt-enhance`, {
         data: { prompt: 'a red dress', type: 'image' },
       });
       expect(res.status()).toBeLessThan(500);
@@ -85,58 +85,58 @@ test.describe('Creative — 图片创作 API', () => {
   });
 
   test.describe('Poster (poster.service)', () => {
-    test('POST /api/v4/poster/generate 需认证', async ({ request }) => {
-      const res = await request.post(`${BASE}/api/v4/poster/generate`, {
+    test('POST /api/poster/generate 需认证', async ({ request }) => {
+      const res = await request.post(`${BASE}/api/poster/generate`, {
         data: { posterType: 'product', prompt: 'test' },
       });
       expect(res.status()).toBeLessThan(500);
     });
 
-    test('GET /api/v4/poster/sizes 返回尺寸配置', async ({ request }) => {
-      const res = await request.get(`${BASE}/api/v4/poster/sizes`, { failOnStatusCode: false });
+    test('GET /api/poster/sizes 返回尺寸配置', async ({ request }) => {
+      const res = await request.get(`${BASE}/api/poster/sizes`, { failOnStatusCode: false });
       expect(res.status()).toBeLessThan(500);
     });
 
-    test('GET /api/v4/poster/styles 返回风格配置', async ({ request }) => {
-      const res = await request.get(`${BASE}/api/v4/poster/styles`, { failOnStatusCode: false });
+    test('GET /api/poster/styles 返回风格配置', async ({ request }) => {
+      const res = await request.get(`${BASE}/api/poster/styles`, { failOnStatusCode: false });
       expect(res.status()).toBeLessThan(500);
     });
 
-    test('GET /api/v4/poster/works 需认证', async ({ request }) => {
-      const res = await request.get(`${BASE}/api/v4/poster/works`);
+    test('GET /api/poster/works 需认证', async ({ request }) => {
+      const res = await request.get(`${BASE}/api/poster/works`);
       expect(res.status()).toBeLessThan(500);
     });
   });
 
   test.describe('Detail Image (detail-image.service)', () => {
-    test('POST /api/v4/detail/generate-set 需认证', async ({ request }) => {
-      const res = await request.post(`${BASE}/api/v4/detail/generate-set`, {
+    test('POST /api/detail/generate-set 需认证', async ({ request }) => {
+      const res = await request.post(`${BASE}/api/detail/generate-set`, {
         data: { product_name: 'test', product_images: ['a.jpg'] },
       });
       expect(res.status()).toBeLessThan(500);
     });
 
-    test('POST /api/v4/detail/replicate 需认证', async ({ request }) => {
-      const res = await request.post(`${BASE}/api/v4/detail/replicate`, {
+    test('POST /api/detail/replicate 需认证', async ({ request }) => {
+      const res = await request.post(`${BASE}/api/detail/replicate`, {
         data: { reference_url: 'a.jpg', product_name: 'test', product_images: ['b.jpg'] },
       });
       expect(res.status()).toBeLessThan(500);
     });
 
-    test('GET /api/v4/detail/works 需认证', async ({ request }) => {
-      const res = await request.get(`${BASE}/api/v4/detail/works`);
+    test('GET /api/detail/works 需认证', async ({ request }) => {
+      const res = await request.get(`${BASE}/api/detail/works`);
       expect(res.status()).toBeLessThan(500);
     });
   });
 
   test.describe('Model Generate & Render (v4)', () => {
-    test('POST /api/v4/model-generate/generate 需认证', async ({ request }) => {
-      const res = await request.post(`${BASE}/api/v4/model-generate/generate`, { data: { imageUrl: 'test.jpg' } });
+    test('POST /api/model-generate/generate 需认证', async ({ request }) => {
+      const res = await request.post(`${BASE}/api/model-generate/generate`, { data: { imageUrl: 'test.jpg' } });
       expect(res.status()).toBeLessThan(500);
     });
 
-    test('POST /api/v4/render/product 需认证', async ({ request }) => {
-      const res = await request.post(`${BASE}/api/v4/render/product`, { data: { productImageUrl: 'test.jpg' } });
+    test('POST /api/render/product 需认证', async ({ request }) => {
+      const res = await request.post(`${BASE}/api/render/product`, { data: { productImageUrl: 'test.jpg' } });
       expect(res.status()).toBeLessThan(500);
     });
   });
@@ -146,34 +146,34 @@ test.describe('Creative — 图片创作 API', () => {
 test.describe('Creative — 视频创作 API', () => {
 
   test.describe('v4 Video (video.service)', () => {
-    test('POST /api/v4/video/generate 需认证', async ({ request }) => {
-      const res = await request.post(`${BASE}/api/v4/video/generate`, { data: { prompt: 'test' } });
+    test('POST /api/video/generate 需认证', async ({ request }) => {
+      const res = await request.post(`${BASE}/api/video/generate`, { data: { prompt: 'test' } });
       expect(res.status()).toBeLessThan(500);
     });
 
-    test('POST /api/v4/video/image-to-video 需认证', async ({ request }) => {
-      const res = await request.post(`${BASE}/api/v4/video/image-to-video`, {
+    test('POST /api/video/image-to-video 需认证', async ({ request }) => {
+      const res = await request.post(`${BASE}/api/video/image-to-video`, {
         data: { imageUrl: 'test.jpg' },
       });
       expect(res.status()).toBeLessThan(500);
     });
 
-    test('POST /api/v4/video/multi-image-to-video 需认证', async ({ request }) => {
-      const res = await request.post(`${BASE}/api/v4/video/multi-image-to-video`, {
+    test('POST /api/video/multi-image-to-video 需认证', async ({ request }) => {
+      const res = await request.post(`${BASE}/api/video/multi-image-to-video`, {
         data: { images: [{ url: 'a.jpg' }, { url: 'b.jpg' }] },
       });
       expect(res.status()).toBeLessThan(500);
     });
 
-    test('POST /api/v4/video/auto-package 需认证', async ({ request }) => {
-      const res = await request.post(`${BASE}/api/v4/video/auto-package`, {
+    test('POST /api/video/auto-package 需认证', async ({ request }) => {
+      const res = await request.post(`${BASE}/api/video/auto-package`, {
         data: { videoUrl: 'test.mp4' },
       });
       expect(res.status()).toBeLessThan(500);
     });
 
-    test('POST /api/v4/video/prompt-enhance 增强提示词', async ({ request }) => {
-      const res = await request.post(`${BASE}/api/v4/video/prompt-enhance`, {
+    test('POST /api/video/prompt-enhance 增强提示词', async ({ request }) => {
+      const res = await request.post(`${BASE}/api/video/prompt-enhance`, {
         data: { prompt: 'a product showcase', type: 'video' },
       });
       expect(res.status()).toBeLessThan(500);
@@ -204,50 +204,50 @@ test.describe('Creative — 视频创作 API', () => {
   });
 
   test.describe('Digital Human', () => {
-    test('POST /api/v4/digital-human/create 需认证', async ({ request }) => {
-      const res = await request.post(`${BASE}/api/v4/digital-human/create`, {
+    test('POST /api/digital-human/create 需认证', async ({ request }) => {
+      const res = await request.post(`${BASE}/api/digital-human/create`, {
         data: { text: '你好，欢迎选购' },
       });
       expect(res.status()).toBeLessThan(500);
     });
 
-    test('POST /api/v4/digital-human/create 空body不500', async ({ request }) => {
-      const res = await request.post(`${BASE}/api/v4/digital-human/create`, { data: {} });
+    test('POST /api/digital-human/create 空body不500', async ({ request }) => {
+      const res = await request.post(`${BASE}/api/digital-human/create`, { data: {} });
       expect(res.status()).toBeLessThan(500);
     });
   });
 
   test.describe('Viral Video & Live Clip', () => {
-    test('POST /api/v4/video/analyze-viral 需认证', async ({ request }) => {
-      const res = await request.post(`${BASE}/api/v4/video/analyze-viral`, {
+    test('POST /api/video/analyze-viral 需认证', async ({ request }) => {
+      const res = await request.post(`${BASE}/api/video/analyze-viral`, {
         data: { videoUrl: 'https://example.com/v.mp4', platform: 'douyin' },
       });
       expect(res.status()).toBeLessThan(500);
     });
 
-    test('POST /api/v4/video/smart-clip 需认证', async ({ request }) => {
-      const res = await request.post(`${BASE}/api/v4/video/smart-clip`, {
+    test('POST /api/video/smart-clip 需认证', async ({ request }) => {
+      const res = await request.post(`${BASE}/api/video/smart-clip`, {
         data: { videoUrl: 'test.mp4' },
       });
       expect(res.status()).toBeLessThan(500);
     });
 
-    test('POST /api/v4/video/remove-redundant 需认证', async ({ request }) => {
-      const res = await request.post(`${BASE}/api/v4/video/remove-redundant`, {
+    test('POST /api/video/remove-redundant 需认证', async ({ request }) => {
+      const res = await request.post(`${BASE}/api/video/remove-redundant`, {
         data: { videoUrl: 'test.mp4' },
       });
       expect(res.status()).toBeLessThan(500);
     });
 
-    test('POST /api/v4/video/optimize-audio 需认证', async ({ request }) => {
-      const res = await request.post(`${BASE}/api/v4/video/optimize-audio`, {
+    test('POST /api/video/optimize-audio 需认证', async ({ request }) => {
+      const res = await request.post(`${BASE}/api/video/optimize-audio`, {
         data: { videoUrl: 'test.mp4', level: 'standard' },
       });
       expect(res.status()).toBeLessThan(500);
     });
 
-    test('POST /api/v4/video/subtitle-correction 需认证', async ({ request }) => {
-      const res = await request.post(`${BASE}/api/v4/video/subtitle-correction`, {
+    test('POST /api/video/subtitle-correction 需认证', async ({ request }) => {
+      const res = await request.post(`${BASE}/api/video/subtitle-correction`, {
         data: { videoUrl: 'test.mp4' },
       });
       expect(res.status()).toBeLessThan(500);
@@ -255,29 +255,29 @@ test.describe('Creative — 视频创作 API', () => {
   });
 
   test.describe('Video Translation', () => {
-    test('POST /api/v4/video-translate/voice 需认证', async ({ request }) => {
-      const res = await request.post(`${BASE}/api/v4/video-translate/voice`, {
+    test('POST /api/video-translate/voice 需认证', async ({ request }) => {
+      const res = await request.post(`${BASE}/api/video-translate/voice`, {
         data: { videoUrl: 'test.mp4', targetLang: 'en' },
       });
       expect(res.status()).toBeLessThan(500);
     });
 
-    test('POST /api/v4/video-translate/subtitles 需认证', async ({ request }) => {
-      const res = await request.post(`${BASE}/api/v4/video-translate/subtitles`, {
+    test('POST /api/video-translate/subtitles 需认证', async ({ request }) => {
+      const res = await request.post(`${BASE}/api/video-translate/subtitles`, {
         data: { videoUrl: 'test.mp4', targetLang: 'en' },
       });
       expect(res.status()).toBeLessThan(500);
     });
 
-    test('POST /api/v4/video-translate/face 需认证', async ({ request }) => {
-      const res = await request.post(`${BASE}/api/v4/video-translate/face`, {
+    test('POST /api/video-translate/face 需认证', async ({ request }) => {
+      const res = await request.post(`${BASE}/api/video-translate/face`, {
         data: { videoUrl: 'test.mp4', targetLang: 'en' },
       });
       expect(res.status()).toBeLessThan(500);
     });
 
-    test('GET /api/v4/video-translate/langs 返回支持语言', async ({ request }) => {
-      const res = await request.get(`${BASE}/api/v4/video-translate/langs`, { failOnStatusCode: false });
+    test('GET /api/video-translate/langs 返回支持语言', async ({ request }) => {
+      const res = await request.get(`${BASE}/api/video-translate/langs`, { failOnStatusCode: false });
       expect(res.status()).toBeLessThan(500);
     });
   });
@@ -337,20 +337,20 @@ test.describe('Creative — 文案/语音 API', () => {
   });
 
   test.describe('Voice (TTS & Clone)', () => {
-    test('POST /api/v4/voice/generate 需认证', async ({ request }) => {
-      const res = await request.post(`${BASE}/api/v4/voice/generate`, {
+    test('POST /api/voice/generate 需认证', async ({ request }) => {
+      const res = await request.post(`${BASE}/api/voice/generate`, {
         data: { text: '你好世界', voice: 'sweet-female', speed: 1.0 },
       });
       expect(res.status()).toBeLessThan(500);
     });
 
-    test('POST /api/v4/voice/generate 空文本不500', async ({ request }) => {
-      const res = await request.post(`${BASE}/api/v4/voice/generate`, { data: { text: '', voice: 'sweet-female' } });
+    test('POST /api/voice/generate 空文本不500', async ({ request }) => {
+      const res = await request.post(`${BASE}/api/voice/generate`, { data: { text: '', voice: 'sweet-female' } });
       expect(res.status()).toBeLessThan(500);
     });
 
-    test('POST /api/v4/voice/clone 需认证', async ({ request }) => {
-      const res = await request.post(`${BASE}/api/v4/voice/clone`, {
+    test('POST /api/voice/clone 需认证', async ({ request }) => {
+      const res = await request.post(`${BASE}/api/voice/clone`, {
         data: { sampleUrl: 'https://example.com/voice.mp3', text: '你好' },
       });
       expect(res.status()).toBeLessThan(500);
@@ -362,27 +362,27 @@ test.describe('Creative — 文案/语音 API', () => {
 test.describe('Creative — 其他创作 API', () => {
 
   test.describe('3D Models', () => {
-    test('GET /api/v4/3d/models 返回模型列表', async ({ request }) => {
-      const res = await request.get(`${BASE}/api/v4/3d/models`, { failOnStatusCode: false });
+    test('GET /api/3d/models 返回模型列表', async ({ request }) => {
+      const res = await request.get(`${BASE}/api/3d/models`, { failOnStatusCode: false });
       expect(res.status()).toBeLessThan(500);
     });
 
-    test('GET /api/v4/3d/demo 返回示例配置', async ({ request }) => {
-      const res = await request.get(`${BASE}/api/v4/3d/demo`, { failOnStatusCode: false });
+    test('GET /api/3d/demo 返回示例配置', async ({ request }) => {
+      const res = await request.get(`${BASE}/api/3d/demo`, { failOnStatusCode: false });
       expect(res.status()).toBeLessThan(500);
     });
   });
 
   test.describe('Cut Ecosystem (剪映导出)', () => {
-    test('POST /api/v4/cut/export-jianying 需认证', async ({ request }) => {
-      const res = await request.post(`${BASE}/api/v4/cut/export-jianying`, {
+    test('POST /api/cut/export-jianying 需认证', async ({ request }) => {
+      const res = await request.post(`${BASE}/api/cut/export-jianying`, {
         data: { workIds: [1, 2], projectName: 'test' },
       });
       expect(res.status()).toBeLessThan(500);
     });
 
-    test('POST /api/v4/cut/export-jianying 空workIds不500', async ({ request }) => {
-      const res = await request.post(`${BASE}/api/v4/cut/export-jianying`, { data: {} });
+    test('POST /api/cut/export-jianying 空workIds不500', async ({ request }) => {
+      const res = await request.post(`${BASE}/api/cut/export-jianying`, { data: {} });
       expect(res.status()).toBeLessThan(500);
     });
   });
@@ -390,18 +390,18 @@ test.describe('Creative — 其他创作 API', () => {
 
 // ─── 作品管理类 API ───
 test.describe('Creative — 作品管理 API', () => {
-  test('GET /api/v4/works 需认证', async ({ request }) => {
-    const res = await request.get(`${BASE}/api/v4/works`);
+  test('GET /api/works 需认证', async ({ request }) => {
+    const res = await request.get(`${BASE}/api/works`);
     expect(res.status()).toBeLessThan(500);
   });
 
-  test('GET /api/v4/image/works 需认证', async ({ request }) => {
-    const res = await request.get(`${BASE}/api/v4/image/works`);
+  test('GET /api/image/works 需认证', async ({ request }) => {
+    const res = await request.get(`${BASE}/api/image/works`);
     expect(res.status()).toBeLessThan(500);
   });
 
-  test('GET /api/v4/video/works 需认证', async ({ request }) => {
-    const res = await request.get(`${BASE}/api/v4/video/works`);
+  test('GET /api/video/works 需认证', async ({ request }) => {
+    const res = await request.get(`${BASE}/api/video/works`);
     expect(res.status()).toBeLessThan(500);
   });
 });

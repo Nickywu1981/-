@@ -2,8 +2,8 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 vi.mock('../../utils/wrapController.js', () => ({ wrapController: (fn) => fn }));
 vi.mock('../../utils/response.js', () => ({
-  success: (_res, data, msg) => ({ code: 0, data, message: msg }),
-  listResult: (_res, list, total, page, pageSize) => ({ code: 0, data: { list, total, page, pageSize } }),
+  success: (_res, data, msg) => ({ code: 200, data, message: msg }),
+  listResult: (_res, list, total, page, pageSize) => ({ code: 200, data: { list, total, page, pageSize } }),
 }));
 vi.mock('../../utils/logger.js', () => ({
   default: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
@@ -33,7 +33,7 @@ describe('financeController', () => {
   it('listBankAccounts returns list', async () => {
     financeService.listBankAccounts.mockResolvedValue([{ id: 1, bankName: '招商银行' }]);
     const r = await listBankAccounts(mockReq(), {});
-    expect(r.code).toBe(0);
+    expect(r.code).toBe(200);
     expect(r.data).toHaveLength(1);
   });
 
@@ -51,7 +51,7 @@ describe('financeController', () => {
     financeService.removeBankAccount.mockResolvedValue();
     const r = await removeBankAccount(mockReq({ params: { id: '1' } }), {});
     expect(financeService.removeBankAccount).toHaveBeenCalledWith('t1', 1);
-    expect(r.code).toBe(0);
+    expect(r.code).toBe(200);
   });
 
   it('listLedger default pagination', async () => {
@@ -64,7 +64,7 @@ describe('financeController', () => {
   it('listSettlements returns page', async () => {
     financeService.listSettlements.mockResolvedValue({ rows: [], total: 0 });
     const r = await listSettlements(mockReq(), {});
-    expect(r.code).toBe(0);
+    expect(r.code).toBe(200);
   });
 
   it('getSettlementDetail invalid id throws', async () => {

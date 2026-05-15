@@ -643,21 +643,21 @@ test.describe('链路8: 电商管线 — 图片/视频/文案', () => {
   });
 
   test('8.2 图片生成选项', async ({ request }) => {
-    const res = await request.get(`${BASE}/api/v4/image/generate-options`, {
+    const res = await request.get(`${BASE}/api/image/generate-options`, {
       failOnStatusCode: false,
     });
     expect(res.status()).toBeLessThan(500);
   });
 
   test('8.3 上传预签名 URL', async ({ request }) => {
-    const res = await request.get(`${BASE}/api/v4/upload/presign`, {
+    const res = await request.get(`${BASE}/api/upload/presign`, {
       failOnStatusCode: false,
     });
     expect(res.status()).toBeLessThan(500);
   });
 
   test('8.4 设计模板市场', async ({ request }) => {
-    const res = await request.get(`${BASE}/api/v4/template/market`, {
+    const res = await request.get(`${BASE}/api/template/market`, {
       failOnStatusCode: false,
     });
     expect(res.status()).toBeLessThan(500);

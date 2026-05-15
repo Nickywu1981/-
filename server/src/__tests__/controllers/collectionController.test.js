@@ -6,7 +6,7 @@ const { mockSvc } = vi.hoisted(() => ({
 
 vi.mock('../../services/collectionService.js', () => mockSvc);
 vi.mock('../../utils/wrapController.js', () => ({ wrapController: (fn) => fn }));
-vi.mock('../../utils/response.js', () => ({ success: (r, d, m) => ({ code: 0, data: d, message: m }) }));
+vi.mock('../../utils/response.js', () => ({ success: (r, d, m) => ({ code: 200, data: d, message: m }) }));
 vi.mock('../../utils/businessError.js', () => ({ BusinessError: class extends Error { constructor(code, msg) { super(msg); this.code = code; } } }));
 vi.mock('../../constants/errorCode.js', () => ({ ERROR_CODE: { NOT_FOUND: 'NOT_FOUND' } }));
 

@@ -2,8 +2,8 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 vi.mock('../../utils/wrapController.js', () => ({ wrapController: (fn) => fn }));
 vi.mock('../../utils/response.js', () => ({
-  success: (_res, data, msg) => ({ code: 0, data, message: msg }),
-  listResult: (_res, list, total, page, pageSize) => ({ code: 0, data: { list, total, page, pageSize } }),
+  success: (_res, data, msg) => ({ code: 200, data, message: msg }),
+  listResult: (_res, list, total, page, pageSize) => ({ code: 200, data: { list, total, page, pageSize } }),
 }));
 vi.mock('../../utils/logger.js', () => ({
   default: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
@@ -33,7 +33,7 @@ describe('advancedImageController', () => {
   it('submitVirtualTryon success', async () => {
     advService.submitVirtualTryon.mockResolvedValue({ taskId: 't1' });
     const r = await submitVirtualTryon(mockReq({ body: { productImageUrl: 'url' } }), {});
-    expect(r.code).toBe(0);
+    expect(r.code).toBe(200);
   });
 
   it('submitStyleTransfer missing targetStyle throws', async () => {
@@ -53,18 +53,18 @@ describe('advancedImageController', () => {
   it('listMyTasks returns page', async () => {
     advService.listMyTasks.mockResolvedValue({ rows: [], total: 0 });
     const r = await listMyTasks(mockReq({ query: { page: '1', pageSize: '20' } }), {});
-    expect(r.code).toBe(0);
+    expect(r.code).toBe(200);
   });
 
   it('submitOutpainting success', async () => {
     advService.submitOutpainting.mockResolvedValue({ taskId: 't5' });
     const r = await submitOutpainting(mockReq({ body: { productImageUrl: 'url' } }), {});
-    expect(r.code).toBe(0);
+    expect(r.code).toBe(200);
   });
 
   it('submitGhostMannequin success', async () => {
     advService.submitGhostMannequin.mockResolvedValue({ taskId: 't6' });
     const r = await submitGhostMannequin(mockReq({ body: { productImageUrl: 'url' } }), {});
-    expect(r.code).toBe(0);
+    expect(r.code).toBe(200);
   });
 });
