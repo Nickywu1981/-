@@ -1,6 +1,8 @@
 export default [
   {
-    ignores: ['node_modules/**', 'dist/**', '.nuxt/**', '.output/**', 'coverage/**', '**.vue', '**.ts', '**.tsx'],
+    // Only lint JS/MJS — Vue/TS files need vue-eslint-parser + @typescript-eslint (TODO)
+    files: ['**/*.js', '**/*.mjs'],
+    ignores: ['node_modules/**', 'dist/**', '.nuxt/**', '.output/**', 'coverage/**'],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',

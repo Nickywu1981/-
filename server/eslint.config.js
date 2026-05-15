@@ -49,6 +49,10 @@ export default [
       'no-path-concat': 'error',
       'no-process-exit': 'warn',
       'no-throw-literal': 'error',
+      'no-eval': 'error',
+      'no-implied-eval': 'error',
+      'no-new-func': 'error',
+      'no-process-exit': 'error',
     },
   },
 ];

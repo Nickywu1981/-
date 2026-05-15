@@ -52,15 +52,12 @@
   <url><loc>https://movio.ai/register</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://movio.ai/help</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://movio.ai/compare</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://movio.ai/forgot-password</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://movio.ai/auth/reset-password</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
   <url><loc>https://movio.ai/notifications</loc><changefreq>monthly</changefreq><priority>0.3</priority></url>
 
   <!-- 法律页面 -->
-  <url><loc>https://movio.ai/privacy</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
-  <url><loc>https://movio.ai/terms</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
-  <url><loc>https://movio.ai/legal/privacy</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
+<url><loc>https://movio.ai/legal/privacy</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
   <url><loc>https://movio.ai/legal/terms</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
 
   <!-- 错误页面 -->
-  <url><loc>https://movio.ai/error</loc><changefreq>yearly</changefreq><priority>0.1</priority></url>
 </urlset>

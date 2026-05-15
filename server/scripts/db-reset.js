@@ -5,6 +5,11 @@
  */
 import { execSync } from 'child_process';
 
+if (process.env.NODE_ENV === 'production') {
+  console.error('❌ db:reset is destructive and must NOT run in production.');
+  process.exit(1);
+}
+
 console.log('Resetting database...');
 execSync('node src/dao/migrate.js reset', { stdio: 'inherit', cwd: process.cwd() });
 execSync('node scripts/run-seed.js', { stdio: 'inherit', cwd: process.cwd() });

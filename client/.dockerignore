@@ -4,3 +4,16 @@ dist
 .output
 .nuxt
 *.log
+.env
+.env.*
+.env.local
+.env.production
+Dockerfile*
+docker-compose*.yml
+*.md
+.gitignore
+.editorconfig
+coverage
+playwright-report
+test-results
+.npmrc

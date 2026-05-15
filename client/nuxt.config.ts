@@ -23,9 +23,7 @@ export default defineNuxtConfig({
         { name: 'description', content: 'Movio AI — 电商AI SaaS，抠图/场景/主图/视频/详情页/虚拟模特，一个工具搞定电商全部图文视频素材' },
         { name: 'theme-color', content: '#5b5fe3' },
         { 'http-equiv': 'X-UA-Compatible', content: 'IE=edge' },
-        // XSS 防护
-        { 'http-equiv': 'X-XSS-Protection', content: '1; mode=block' },
-// 禁止 MIME 嗅探
+        // 禁止 MIME 嗅探
         { 'http-equiv': 'X-Content-Type-Options', content: 'nosniff' },
         // Referrer 策略
         { name: 'referrer', content: 'strict-origin-when-cross-origin' },
@@ -38,7 +36,6 @@ export default defineNuxtConfig({
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
         { rel: 'manifest', href: '/manifest.json' },
         // 预连接外部 CDN / API
-        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'dns-prefetch', href: '//cdn.jsdelivr.net' },
       ],
       script: [
@@ -239,11 +236,7 @@ export default defineNuxtConfig({
         scss: { additionalData: '' },
       },
     },
-    resolve: {
-      alias: {
-        '@shared': '../shared',
-      },
-    },
+    resolve: {},
     build: {
       // 大依赖拆分，避免单一超大 chunk
       rollupOptions: {
