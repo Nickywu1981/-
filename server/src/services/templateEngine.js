@@ -182,10 +182,11 @@ export async function matchAndFill(intentId, variables = {}, opts = {}) {
     language: variables.language || defaults.language || 'zh-CN',
   };
 
-  // 填充模板变量 {varName}
+  // 填充模板变量 {varName}，对变量值做基本反注入转义
   let filled = tpl.template;
   for (const [key, val] of Object.entries(merged)) {
-    filled = filled.replace(new RegExp(`\\{${escapeRegex(key)}\\}`, 'g'), String(val ?? ''));
+    const safe = String(val ?? '').replace(/[{}]/g, '');
+    filled = filled.replace(new RegExp(`\\{${escapeRegex(key)}\\}`, 'g'), safe);
   }
 
   // 清理未填充的占位符

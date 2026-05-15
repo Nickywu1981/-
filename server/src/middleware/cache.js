@@ -39,7 +39,10 @@ export function cacheMiddleware(ttl = 300, keyFn) {
       }
 
       let resolveInflight;
-      inflight.set(cacheKey, new Promise(r => { resolveInflight = r; }));
+      const inflightPromise = new Promise(r => { resolveInflight = r; });
+      inflight.set(cacheKey, inflightPromise);
+      // 10s 超时防止挂起的请求永久阻塞缓存键
+      const inflightTimeout = setTimeout(() => { inflight.delete(cacheKey); resolveInflight(); }, 10_000);
 
       const originalJson = res.json.bind(res);
       res.json = function (body) {
@@ -51,6 +54,7 @@ export function cacheMiddleware(ttl = 300, keyFn) {
       };
       const restore = () => {
         res.json = originalJson;
+        clearTimeout(inflightTimeout);
         inflight.delete(cacheKey);
         if (resolveInflight) resolveInflight();
       };

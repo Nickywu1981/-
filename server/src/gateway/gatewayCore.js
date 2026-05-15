@@ -145,8 +145,8 @@ export async function runBusinessPipeline(input, ctx = {}) {
 
     return { blocked: false, wrapResult };
   } catch (e) {
-    logger.warn('[Gateway] Business pipeline crashed, allowing raw prompt through — this bypasses template wrapping', { error: e.message, stack: e.stack?.substring(0, 300) });
-    return { blocked: false, wrapResult: null, pipelineCrashed: true };
+    logger.error('[Gateway] Business pipeline crashed, blocking request to prevent raw prompt bypass', { error: e.message, stack: e.stack?.substring(0, 300) });
+    return { blocked: true, wrapResult: null, pipelineCrashed: true };
   }
 }
 

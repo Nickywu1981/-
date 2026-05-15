@@ -419,8 +419,8 @@ app.use('/api/multi-size', heavyLimiter, msRouter);
 app.use('/api/digital-human', heavyLimiter, digitalHumanRoutesV4);
 app.use('/api/platform-publish', platformPublishRoutesV4);
 app.use('/api/template-market', templateMarketRoutesV4);
-app.use('/api/sdk', heavyLimiter, sdkRoutes);
-app.use('/api/adk', heavyLimiter, adkRoutes);
+app.use('/api/sdk', sdkRoutes);
+app.use('/api/adk', adkRoutes);
 
 // E2B 云端代码沙箱
 app.use('/api/e2b', heavyLimiter, e2bRoutes);
