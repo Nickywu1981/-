@@ -234,62 +234,62 @@ definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>
 
 <style scoped>
-.page-container { max-width: 800px; margin: 0 auto; padding: var(--cfg-spacing-xl) var(--cfg-spacing-base); }
+.page-container { max-width: 800px; margin: 0 auto; padding: var(--space-8, 32px)) var(--space-4, 16px)); }
 .page-header { text-align: center; margin-bottom: 32px; }
-.page-header h1 { font-size: var(--cfg-font-size-2xl); margin: 0 0 8px 0; }
-.page-header p { color: var(--cfg-text-muted); margin: 0; }
+.page-header h1 { font-size: var(--text-2xl, 1.5rem)); margin: 0 0 8px 0; }
+.page-header p { color: var(--text-muted, #9ca3af)); margin: 0; }
 
-.invite-card { background: linear-gradient(135deg, #F59E0B, #EF4444); border-radius: var(--cfg-radius-lg); padding: 24px; color: #fff; margin-bottom: 24px; }
+.invite-card { background: linear-gradient(135deg, #F59E0B, #EF4444); border-radius: var(--radius-lg, 12px)); padding: 24px; color: #fff; margin-bottom: 24px; }
 .invite-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-.invite-label { font-size: var(--cfg-font-size-sm); opacity: 0.85; }
-.invite-code { font-size: 36px; font-weight: var(--cfg-font-weight-bold); letter-spacing: 4px; text-align: center; margin: 12px 0; font-family: monospace; }
-.invite-link { display: flex; align-items: center; gap: 8px; font-size: var(--cfg-font-size-xs); opacity: 0.85; flex-wrap: wrap; }
-.invite-link code { background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: var(--cfg-radius-sm); word-break: break-all; }
+.invite-label { font-size: var(--text-sm, 0.875rem)); opacity: 0.85; }
+.invite-code { font-size: 36px; font-weight: 700); letter-spacing: 4px; text-align: center; margin: 12px 0; font-family: monospace; }
+.invite-link { display: flex; align-items: center; gap: 8px; font-size: var(--text-xs, 0.75rem)); opacity: 0.85; flex-wrap: wrap; }
+.invite-link code { background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: var(--radius-sm, 4px)); word-break: break-all; }
 
 .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
-.stat-card { padding: 16px; text-align: center; border: 1px solid var(--cfg-border); border-radius: var(--cfg-radius-base); background: var(--cfg-bg-primary); }
-.stat-label { font-size: var(--cfg-font-size-xs); color: var(--cfg-text-muted); display: block; margin-bottom: 4px; }
-.stat-value { font-size: var(--cfg-font-size-xl); font-weight: var(--cfg-font-weight-bold); color: var(--cfg-text-primary); }
-.stat-value.available { color: var(--cfg-primary); }
+.stat-card { padding: 16px; text-align: center; border: 1px solid var(--border-color, #e5e7eb)); border-radius: var(--radius-md, 8px)); background: var(--bg-card, #ffffff)); }
+.stat-label { font-size: var(--text-xs, 0.75rem)); color: var(--text-muted, #9ca3af)); display: block; margin-bottom: 4px; }
+.stat-value { font-size: var(--text-xl, 1.25rem)); font-weight: 700); color: var(--text-primary, #1f2937)); }
+.stat-value.available { color: var(--brand, #5b5fe3)); }
 
 .withdraw-section { text-align: center; margin-bottom: 28px; }
 
 .section { margin-bottom: 28px; }
-.section h3 { font-size: var(--cfg-font-size-lg); margin: 0 0 16px; color: var(--cfg-text-primary); }
+.section h3 { font-size: var(--text-lg, 1.125rem)); margin: 0 0 16px; color: var(--text-primary, #1f2937)); }
 
 .team-stats { display: flex; gap: 24px; margin-bottom: 16px; }
 .team-stat { text-align: center; }
-.team-stat-val { font-size: var(--cfg-font-size-2xl); font-weight: var(--cfg-font-weight-bold); color: var(--cfg-primary); display: block; }
-.team-stat-label { font-size: var(--cfg-font-size-xs); color: var(--cfg-text-muted); }
+.team-stat-val { font-size: var(--text-2xl, 1.5rem)); font-weight: 700); color: var(--brand, #5b5fe3)); display: block; }
+.team-stat-label { font-size: var(--text-xs, 0.75rem)); color: var(--text-muted, #9ca3af)); }
 
-.team-list { border: 1px solid var(--cfg-border); border-radius: var(--cfg-radius-base); overflow: hidden; }
-.team-row { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--cfg-border); background: var(--cfg-bg-primary); }
+.team-list { border: 1px solid var(--border-color, #e5e7eb)); border-radius: var(--radius-md, 8px)); overflow: hidden; }
+.team-row { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--border-color, #e5e7eb)); background: var(--bg-card, #ffffff)); }
 .team-row:last-child { border-bottom: none; }
-.member-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--cfg-bg-tertiary); display: flex; align-items: center; justify-content: center; font-size: var(--cfg-font-size-sm); font-weight: var(--cfg-font-weight-semibold); color: var(--cfg-text-secondary); flex-shrink: 0; }
-.member-name { flex: 1; font-size: var(--cfg-font-size-base); color: var(--cfg-text-primary); }
-.member-level { font-size: var(--cfg-font-size-xs); padding: 2px 8px; border-radius: var(--cfg-radius-full); }
+.member-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--bg-tertiary, #f3f4f6)); display: flex; align-items: center; justify-content: center; font-size: var(--text-sm, 0.875rem)); font-weight: 600); color: var(--text-secondary, #6b7280)); flex-shrink: 0; }
+.member-name { flex: 1; font-size: var(--text-base, 1rem)); color: var(--text-primary, #1f2937)); }
+.member-level { font-size: var(--text-xs, 0.75rem)); padding: 2px 8px; border-radius: var(--radius-full, 9999px)); }
 .member-level.level1 { background: var(--info-bg); color: #2563EB; }
 .member-level.level2 { background: var(--warning-border); color: #D97706; }
-.member-date { font-size: var(--cfg-font-size-xs); color: var(--cfg-text-muted); }
+.member-date { font-size: var(--text-xs, 0.75rem)); color: var(--text-muted, #9ca3af)); }
 
-.empty-state { padding: 40px; text-align: center; color: var(--cfg-text-muted); font-size: var(--cfg-font-size-base); }
+.empty-state { padding: 40px; text-align: center; color: var(--text-muted, #9ca3af)); font-size: var(--text-base, 1rem)); }
 
-.comm-list { border: 1px solid var(--cfg-border); border-radius: var(--cfg-radius-base); overflow: hidden; }
-.comm-row { padding: 12px 16px; border-bottom: 1px solid var(--cfg-border); background: var(--cfg-bg-primary); }
+.comm-list { border: 1px solid var(--border-color, #e5e7eb)); border-radius: var(--radius-md, 8px)); overflow: hidden; }
+.comm-row { padding: 12px 16px; border-bottom: 1px solid var(--border-color, #e5e7eb)); background: var(--bg-card, #ffffff)); }
 .comm-row:last-child { border-bottom: none; }
 .comm-info { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
-.comm-amount { font-size: var(--cfg-font-size-base); font-weight: var(--cfg-font-weight-semibold); color: var(--cfg-primary); }
-.comm-level { font-size: var(--cfg-font-size-xs); padding: 1px 6px; border-radius: var(--cfg-radius-sm); }
+.comm-amount { font-size: var(--text-base, 1rem)); font-weight: 600); color: var(--brand, #5b5fe3)); }
+.comm-level { font-size: var(--text-xs, 0.75rem)); padding: 1px 6px; border-radius: var(--radius-sm, 4px)); }
 .comm-level.level1 { background: var(--info-bg); color: #2563EB; }
 .comm-level.level2 { background: var(--warning-border); color: #D97706; }
 .comm-meta { display: flex; justify-content: space-between; align-items: center; }
-.comm-order { font-size: var(--cfg-font-size-xs); color: var(--cfg-text-muted); }
-.comm-status { font-size: var(--cfg-font-size-xs); padding: 2px 8px; border-radius: var(--cfg-radius-full); }
+.comm-order { font-size: var(--text-xs, 0.75rem)); color: var(--text-muted, #9ca3af)); }
+.comm-status { font-size: var(--text-xs, 0.75rem)); padding: 2px 8px; border-radius: var(--radius-full, 9999px)); }
 .comm-status.pending { background: var(--warning-border); color: #D97706; }
 .comm-status.settled { background: var(--success-light); color: #059669; }
 .comm-status.withdrawn { background: #e0e7ff; color: #4F46E5; }
 .comm-status.cancelled { background: var(--danger-light); color: var(--danger); }
-.comm-time { font-size: var(--cfg-font-size-xs); color: var(--cfg-text-muted); }
+.comm-time { font-size: var(--text-xs, 0.75rem)); color: var(--text-muted, #9ca3af)); }
 
 .load-more { text-align: center; margin-top: 12px; }
 </style>
