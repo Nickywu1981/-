@@ -5,7 +5,7 @@
 export default defineNuxtPlugin((nuxtApp) => {
   const router = useRouter()
   const { t } = useI18n()
-  const toast = (nuxtApp.vueApp.config.globalProperties.$toast || { error: console.error, warn: console.warn }) as any
+  const getToast = () => (nuxtApp.vueApp.config.globalProperties.$toast || { error: console.error, warn: console.warn }) as any
 
   // Helper: read csrf_token from document.cookie
   function getCsrfToken(): string | null {
@@ -40,16 +40,16 @@ export default defineNuxtPlugin((nuxtApp) => {
     }
     return (originalFetch as any).call(globalThis, url, opts).then((res: any) => {
       if (res?.code >= 400 && res?.code < 600) {
-        toast?.error?.(res?.msg || res?.message || t('common.request_failed'))
+        getToast()?.error?.(res?.msg || res?.message || t('common.request_failed'))
       }
       return res
     }).catch((err: unknown) => {
       if (err?.response?.status === 401) throw err // already handled by onResponseError
       if (err?.response?.status === 429) {
-        toast?.warn?.(t('common.too_many_requests'))
+        getToast()?.warn?.(t('common.too_many_requests'))
         return null
       }
-      toast?.error?.(err?.data?.msg || err?.message || t('common.network_error'))
+      getToast()?.error?.(err?.data?.msg || err?.message || t('common.network_error'))
       throw err
     })
   }

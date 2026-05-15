@@ -34,14 +34,14 @@ export async function getTemplatesByIds(ids) {
   if (!ids || !ids.length) return [];
   const placeholders = ids.map(() => '?').join(',');
   const [rows] = await pool.query(
-    `SELECT id, tenant_id, template_code, category, title, description, content, variables, model_type, icon, sort_order, is_public, status, usage_count, creator_id, reviewer_id, review_remark, create_time, update_time FROM prompt_template WHERE id IN (${placeholders})`,
+    `SELECT id, tenant_id, template_code, category, title, description, content, variables, tags, model_type, icon, sort_order, is_public, status, usage_count, creator_id, reviewer_id, review_remark, create_time, update_time FROM prompt_template WHERE id IN (${placeholders})`,
     ids,
   );
   return rows;
 }
 
 export async function getTemplateByCode(code) {
-  const [rows] = await pool.execute('SELECT id, tenant_id, template_code, category, title, description, content, variables, model_type, icon, sort_order, is_public, status, usage_count, creator_id, reviewer_id, review_remark, create_time, update_time FROM prompt_template WHERE template_code = ? LIMIT 1', [code]);
+  const [rows] = await pool.execute('SELECT id, tenant_id, template_code, category, title, description, content, variables, tags, model_type, icon, sort_order, is_public, status, usage_count, creator_id, reviewer_id, review_remark, create_time, update_time FROM prompt_template WHERE template_code = ? LIMIT 1', [code]);
   return rows[0] || null;
 }
 
@@ -49,7 +49,7 @@ export async function listTemplatesByCodes(codes) {
   if (!codes || !codes.length) return [];
   const placeholders = codes.map(() => '?').join(',');
   const [rows] = await pool.query(
-    `SELECT id, tenant_id, template_code, category, title, description, content, variables, model_type, icon, sort_order, is_public, status, usage_count, creator_id, reviewer_id, review_remark, create_time, update_time FROM prompt_template WHERE template_code IN (${placeholders})`,
+    `SELECT id, tenant_id, template_code, category, title, description, content, variables, tags, model_type, icon, sort_order, is_public, status, usage_count, creator_id, reviewer_id, review_remark, create_time, update_time FROM prompt_template WHERE template_code IN (${placeholders})`,
     codes,
   );
   return rows;
