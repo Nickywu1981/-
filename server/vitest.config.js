@@ -9,7 +9,7 @@ export default {
   envDir: __dirname,
   test: {
     include: ['src/__tests__/**/*.test.{js,mjs}'],
-    exclude: ['src/__tests__/route/core.test.js', 'src/__tests__/contract.test.js'],
+    exclude: ['src/__tests__/route/core.test.js', 'src/__tests__/contract.test.js', 'src/__tests__/load/**', 'src/__tests__/concurrency/**'],
     testTimeout: 5000,
     mockReset: true,
     restoreMocks: true,

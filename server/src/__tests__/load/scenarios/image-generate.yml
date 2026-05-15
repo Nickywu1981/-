@@ -1,0 +1,36 @@
+# 图片生成接口负载测试
+# 用法: artillery run -c ../artillery.config.yml image-generate.yml
+config:
+  target: "http://localhost:3001"
+  phases:
+    - name: "warmup"
+      duration: 5
+      arrivalRate: 1
+    - name: "ramp"
+      duration: 15
+      arrivalRate: 3
+    - name: "sustain"
+      duration: 30
+      arrivalRate: 3
+  processor: "../processors/image-processor.js"
+  ensure:
+    thresholds:
+      - http.response_time.p99: 10000
+
+# 注意: 图片生成是 AI 重负载接口，需要有效的 Bearer token
+# 实际运行时需先获取 token 设置到环境变量或通过 before 流程注入
+scenarios:
+  - name: "ImageGenerate"
+    flow:
+      - post:
+          url: "/api/images/generate"
+          headers:
+            Authorization: "Bearer {{ $processEnvironment.IMAGE_TEST_TOKEN }}"
+            Content-Type: "application/json"
+          json:
+            prompt: "{{ prompt }}"
+            size: "1024x1024"
+            num_images: 1
+          expect:
+            - statusCode: [200, 429, 401]
+            - contentType: json

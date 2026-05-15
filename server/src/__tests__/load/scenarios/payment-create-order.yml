@@ -1,0 +1,41 @@
+# 支付创建订单负载测试
+# 用法: artillery run -c ../artillery.config.yml payment-create-order.yml
+config:
+  target: "http://localhost:3001"
+  phases:
+    - name: "ramp"
+      duration: 20
+      arrivalRate: 5
+    - name: "sustain"
+      duration: 30
+      arrivalRate: 5
+  ensure:
+    thresholds:
+      - http.response_time.p99: 5000
+
+scenarios:
+  - name: "GetPlans"
+    weight: 40
+    flow:
+      - get:
+          url: "/api/payment/plans"
+          expect:
+            - statusCode: 200
+            - contentType: json
+            - json: "$.code"
+              equals: 0
+
+  - name: "CreateOrder"
+    weight: 60
+    flow:
+      - post:
+          url: "/api/payment/create-order"
+          headers:
+            Authorization: "Bearer {{ $processEnvironment.PAYMENT_TEST_TOKEN }}"
+            Content-Type: "application/json"
+          json:
+            planType: 1
+            payChannel: "wechat"
+          expect:
+            - statusCode: [200, 429, 401]
+            - contentType: json

@@ -1,0 +1,37 @@
+# 健康检查基线性能测试
+# 用法: artillery run -c ../artillery.config.yml health-baseline.yml
+config:
+  target: "http://localhost:3001"
+  phases:
+    - name: "warmup"
+      duration: 5
+      arrivalRate: 10
+    - name: "ramp"
+      duration: 20
+      arrivalRate: 50
+    - name: "sustain"
+      duration: 30
+      arrivalRate: 100
+  ensure:
+    thresholds:
+      - http.response_time.p99: 500
+      - http.response_time.p95: 200
+      - http.response_time.median: 100
+
+scenarios:
+  - name: "HealthCheck"
+    flow:
+      - get:
+          url: "/api/health"
+          expect:
+            - statusCode: 200
+            - contentType: json
+            - json: "$.code"
+              equals: 0
+
+  - name: "Metrics"
+    flow:
+      - get:
+          url: "/api/metrics"
+          expect:
+            - statusCode: 200

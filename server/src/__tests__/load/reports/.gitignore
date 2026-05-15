@@ -1,0 +1,3 @@
+# Artillery 负载测试报告输出（HTML/JSON），不纳入版本控制
+*.html
+*.json

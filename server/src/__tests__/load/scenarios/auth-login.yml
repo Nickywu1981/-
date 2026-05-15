@@ -1,0 +1,58 @@
+# 登录接口压力测试
+# 用法: artillery run -c ../artillery.config.yml auth-login.yml
+config:
+  target: "http://localhost:3001"
+  phases:
+    - name: "warmup"
+      duration: 10
+      arrivalRate: 2
+    - name: "ramp"
+      duration: 20
+      arrivalRate: 5
+    - name: "sustain"
+      duration: 30
+      arrivalRate: 5
+  processor: "../processors/auth-processor.js"
+  ensure:
+    thresholds:
+      - http.response_time.p99: 3000
+
+before:
+  flow:
+    - log: "Starting auth load test..."
+
+scenarios:
+  - name: "AuthLogin"
+    weight: 70
+    flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            username: "{{ username }}"
+            password: "{{ password }}"
+          expect:
+            - statusCode: [200, 429]
+            - contentType: json
+          capture:
+            - json: "$.data.token"
+              as: "accessToken"
+      - get:
+          url: "/api/auth/me"
+          headers:
+            Authorization: "Bearer {{ accessToken }}"
+          ifTrue: "accessToken"
+          expect:
+            - statusCode: 200
+
+  - name: "AuthLoginInvalid"
+    weight: 30
+    flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            username: "no_such_user_{{ $randomNumber(10000, 99999) }}"
+            password: "wrong_password"
+          expect:
+            - statusCode: 200
+            - json: "$.code"
+              equals: 10002
