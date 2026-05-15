@@ -2,7 +2,7 @@
 
 > **编写组**：G3 UI 设计组（UI-Designer 🔴主 / Doc-Writer 🟡辅）
 > **审核组**：G1 架构规划组（Architect）
-> **版本**：v1.16 | **日期**：2026-05-15
+> **版本**：v1.17 | **日期**：2026-05-15
 
 ---
 
@@ -1056,9 +1056,76 @@ R11 标记 `user-workspace.vue` 等 3 个 layout "CSS 完全缺失" — **本例
 | P3 | 17 | 0 | 0 | **17** |
 | **合计** | **49** | **5** | **0** | **54** |
 
+### 10.51 R18 — 纵深审计：CSS变量/Plugins/Stores/ARIA/SEO
+
+#### 10.51.1 死 CSS 变量普查（99 个定义但零引用）
+
+| 分类 | 数量 | 典型 token | 成因 |
+|------|:--:|------|------|
+| 旧工作台布局 | 15 | `--ws-accent`/`--ws-bg`/`--ws-card`/`--ws-*` | `workspace.vue`→`user-workspace.vue` 重命名，仅 `WorkLayout.vue` 仍引用 2 个 |
+| 图表色系 | 8 | `--color-chart-1~8` | R16 图表迁移至直接品牌色后，unified 中定义不再使用 |
+| Portal 色 | 7 | `--color-portal-*` | 预留的多门户主题色，从未被消费 |
+| 侧边栏 | 11 | `--sidebar-bg`/`--sidebar-text`/`--sidebar-*` | 仅在 `responsive.css` 自身引用，Vue 模板用硬编码 |
+| 状态色 | 8 | `--status-active-*`/`--status-banned-*`/`--status-draft-*`/`--status-refund-*` | 定义完整但 StatusBadge 改用别套 |
+| 品牌变体 | 7 | `--brand-alpha-*`/`--brand-darkest`/`--brand-glow` | 旧品牌色扩展，新品牌 `#5b5fe3` 未使用 |
+| 间距/圆角/阴影 | 6 | `--space-10/12/20`/`--radius-2xl`/`--shadow-brand`/`--shadow-xs` | 定义但各组件用具体值 |
+| 响应式断点 | 5 | `--bp-xs/sm/md/lg/xl` | 定义于 `responsive.css`，媒体查询直接用数值 |
+| Z-Index | 3 | `--z-sticky`/`--z-overlay`/`--z-dropdown` | 各组件内联 z-index 值 |
+| 杂项 | 29 | `--header-*`/`--hero-*`/`--gradient-*`/`--skeleton-*`/`--toolbar-*`/`--chart-text`/`--font-normal`/`--text-on-dark`/`--text-link-hover`/`--badge-bg`/`--border-brand`/`--border-muted`/`--bg-av`/`--content-padding`/`--section-gap`/`--focus-ring-offset` | 设计系统预留但未被组件消费 |
+
+> **G3 建议**：分两阶段清理——① 确认无引用后删除旧工作台 `--ws-*` 15 个（P1）；② 其余 84 个需架构组确认是否保留为设计系统预留（P3）
+
+#### 10.51.2 Plugins & Stores 审计
+
+| 文件 | 结论 |
+|------|------|
+| `element-plus.ts` | 清洁 — 按需 CSS 加载 (14 组件，~150KB)，i18n locale 同步 |
+| `auth.ts` | 清洁 — httpOnly cookie + CSRF token 注入 + 401 redirect + fetch 拦截 + HMR teardown |
+| `error-handler.ts` | 清洁 — Vue/Nuxt 双钩子全局错误捕获 + toast 通知 |
+| `toast.client.ts` | 清洁 — 薄封装 fallback 到 `console.*` |
+| `i18n-dynamic.client.ts` | 清洁 — 单一副作用触发 |
+| `geo-locale.client.ts` | 清洁 — IP 检测 + localStorage 优先级链 + 安全 try/catch |
+| `pinia.ts` | 清洁 — 标准 Pinia 注入 |
+| `useUIStore.ts` | 清洁 — 四态 toast/modal 管理 + 定时器清理 |
+| `useSettingsStore.ts` | 清洁 — 主题三态(light/dark/system) + `localStorage` 安全读写 + `prefers-color-scheme` 监听 + 布局密度 |
+
+#### 10.51.3 ARIA 可及性覆盖率
+
+| 指标 | 现状 |
+|------|------|
+| `role` 属性 | 9 文件（alert/dialog/tablist/navigation/progressbar/button） |
+| `aria-label` | ~15 文件（按钮/输入框为主） |
+| `aria-expanded` | **0** — 可折叠控件无展开状态暴露 |
+| `aria-controls` | **0** — 无控件关联关系 |
+| `aria-describedby` | **0** — 无描述关联 |
+| `aria-live` | 2 处（Toast + login 错误消息） |
+| `aria-modal` | 2 处（客服弹窗 + SlidePanel） |
+| skip-link | **0** — 无键盘绕过导航 |
+| focus-trap | **0** — 弹窗/模态框无焦点锁定 |
+
+#### 10.51.4 SEO 与页面过渡
+
+| 指标 | 现状 |
+|------|------|
+| `useSeoMeta` | **0 页面** |
+| `useHead` | 1 处（`JsonLd.vue` 结构化数据） |
+| `pageTransition` | **0** |
+| `layoutTransition` | **0** |
+| `definePageMeta` | ~50 页面（仅 layout + middleware，无 SEO 字段） |
+
+#### 10.51.5 累计趋势
+
+| 优先级 | R17 | R18 新增 | R18 修复 | 总计 |
+|:--:|:--:|:--:|:--:|:--:|
+| P0 | 27 | 0 | 0 | **27** |
+| P1 | 22 | 4 | 0 | **26** |
+| P2 | 4 | 5 | 0 | **9** |
+| P3 | 17 | 3 | 0 | **20** |
+| **合计** | **54** | **12** | **0** | **66** |
+
 ### 里程碑
 
-- **`--cfg-*` 死 token 前缀全量归零** — 项目上线以来最大规模 token 标准化，消除第六套私有 token 体系
-- **`#4F46E5` Indigo-600 fallback 归零** — `AppTaskProgress.vue` 最后 2 处
-- **`#3B82F6` Tailwind blue-500 fallback 归零** — `ai-models.vue` 最后 3 处
-- **G3 自修累计 91 → 127 项**
+- **Plugins (7) + Stores (2) 全线清洁** — 零问题，异常处理/清理机制完善
+- **99 死 CSS 变量定位完成** — 含 15 个旧工作台 `--ws-*` 可安全删除
+- **ARIA 覆盖率量化** — 9 role / 15 aria-label / 0 aria-expanded/controls/describedby
+- **SEO 缺口量化** — 0 useSeoMeta / 0 pageTransition
