@@ -18,6 +18,8 @@
     "db:migrate:status": "node src/dao/migrate.js pending",
     "db:migrate:history": "node src/dao/migrate.js executed",
     "db:seed": "node scripts/run-seed.js",
+    "gen-skill": "node ../scripts/gen-skill.js --auto",
+    "gen-skill:dry": "node ../scripts/gen-skill.js --auto --dry-run",
     "db:reset": "node scripts/db-reset.js",
     "worker": "node src/workers/worker.js"
   },
