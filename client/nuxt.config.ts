@@ -69,7 +69,7 @@ export default defineNuxtConfig({
     ],
     defaultLocale: 'zh',
     strategy: 'prefix_except_default',
-    langDir: 'i18n/locales',
+    langDir: 'locales',
     // 浏览器语言自动检测 + IP 回退
     detectBrowserLanguage: {
       useCookie: true,
