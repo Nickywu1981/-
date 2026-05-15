@@ -146,7 +146,7 @@
 </template>
 
 <script setup lang="ts">
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElButton, ElCollapseTransition, ElAlert, ElTabs, ElTabPane, ElInput, ElSwitch } from 'element-plus'
 import draggable from 'vuedraggable'
 import { useConfirm } from '~/composables/useConfirm'
 

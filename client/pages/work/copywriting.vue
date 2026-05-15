@@ -216,7 +216,7 @@
 </template>
 
 <script setup lang="ts">
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElTabs, ElTabPane, ElForm, ElFormItem, ElRow, ElCol, ElInput, ElInputNumber, ElSelect, ElOption, ElButton, ElAlert, ElTag, ElCard, ElTable, ElTableColumn, ElPagination } from 'element-plus';
 const toast = useToast()
 const { t } = useI18n()
 import { MagicStick } from '@element-plus/icons-vue';
