@@ -6,21 +6,25 @@
     <button class="eb-btn eb-btn-primary" @click="reloadPage">{{ $t('error_boundary.reload') }}</button>
   </div>
   <template v-else>
-    <NuxtLayout>
-      <NuxtPage />
-    </NuxtLayout>
-    <Toast />
-    <ConfirmDialog ref="confirmDialogRef" />
-    <JsonLd />
+    <ElConfigProvider :locale="$elLocale">
+      <NuxtLayout>
+        <NuxtPage />
+      </NuxtLayout>
+      <Toast />
+      <ConfirmDialog ref="confirmDialogRef" />
+      <JsonLd />
+    </ElConfigProvider>
   </template>
 </template>
 
 <script setup lang="ts">
 import '~/assets/css/main.css'
 import '~/assets/css/theme.css'
+import { ElConfigProvider } from 'element-plus'
 
 const appError = ref('')
 const confirmDialogRef = ref()
+const { $elLocale } = useNuxtApp()
 
 usePageSEO()
 
