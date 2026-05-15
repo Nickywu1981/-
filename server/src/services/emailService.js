@@ -5,7 +5,7 @@
 import config from '../config/index.js';
 import { BusinessError } from '../utils/businessError.js';
 import { renderTemplate, generateCode } from '../utils/templateHelpers.js';
-import { registerInterval } from '../utils/shutdownRegistry.js';
+import { registerTimer } from '../utils/shutdownRegistry.js';
 import logger from '../utils/logger.js';
 import * as emailTemplateDao from '../dao/emailTemplateDao.js';
 import * as codeStore from './codeStore.js';
@@ -29,7 +29,7 @@ export const _emailCleanupTimer = setInterval(() => {
   }
   } catch (err) { logger.warn('[Email] cleanup interval error', { error: err.message }); }
 }, 300000).unref();
-registerInterval(_emailCleanupTimer);
+registerTimer(_emailCleanupTimer);
 
 // ==================== HTML 模板消毒 ====================
 

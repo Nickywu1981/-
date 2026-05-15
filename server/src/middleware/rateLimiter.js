@@ -7,7 +7,7 @@
 import rateLimit from 'express-rate-limit';
 import { error } from '../utils/response.js';
 import { rateLimitConfig } from '../config/index.js';
-import { registerInterval } from '../utils/shutdownRegistry.js';
+import { registerTimer } from '../utils/shutdownRegistry.js';
 import logger from '../utils/logger.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { RedisRateLimitStore } from './redisRateLimitStore.js';
@@ -48,7 +48,7 @@ export const _concurrencyCleanupTimer = setInterval(() => {
   }
   } catch { /* Map 迭代安全，兜底防护 */ }
 }, CONCURRENCY_TTL_MS).unref();
-registerInterval(_concurrencyCleanupTimer);
+registerTimer(_concurrencyCleanupTimer);
 function getConcurrencyKey(req) {
   const ip = req.ip || req.connection?.remoteAddress;
   if (!ip) return `anon_${Math.random().toString(36).slice(2, 8)}`;

@@ -16,6 +16,12 @@ const cleanupFns = [];
 
 let shutdownCalled = false;
 
+/** 注册已有定时器（由外部 setInterval/setTimeout 创建）用于自动清理 */
+export function registerTimer(id) {
+  if (shutdownCalled || !id) return;
+  timers.add(id);
+}
+
 /** 注册可自动清理的 setInterval */
 export function registerInterval(fn, ms) {
   if (shutdownCalled) return null;

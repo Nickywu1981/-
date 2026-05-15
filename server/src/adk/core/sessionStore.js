@@ -3,7 +3,7 @@
  * 优先 Redis 持久化，不可用时自动降级到内存 Map
  */
 import { cacheGet, cacheSet, cacheDel } from '../../dao/redis.js';
-import { registerInterval } from '../../utils/shutdownRegistry.js';
+import { registerTimer } from '../../utils/shutdownRegistry.js';
 import logger from '../../utils/logger.js';
 
 const PREFIX = 'adk:sess:';
@@ -74,7 +74,7 @@ export class SessionStore {
     if (this._cleanupTimer && typeof this._cleanupTimer.unref === 'function') {
       this._cleanupTimer.unref();
     }
-    registerInterval(this._cleanupTimer);
+    registerTimer(this._cleanupTimer);
     return this;
   }
 

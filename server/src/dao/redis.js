@@ -2,7 +2,7 @@ import { createClient } from 'redis';
 import config from '../config/index.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { BusinessError } from '../utils/businessError.js';
-import { registerInterval } from '../utils/shutdownRegistry.js';
+import { registerTimer } from '../utils/shutdownRegistry.js';
 import logger from '../utils/logger.js';
 const redisConfig = config.redis;
 
@@ -25,7 +25,7 @@ export const _memCleanupTimer = setInterval(() => {
   }
   } catch { /* Map 迭代安全，兜底防护 */ }
 }, 60000).unref();
-registerInterval(_memCleanupTimer);
+registerTimer(_memCleanupTimer);
 
 const client = createClient({
   socket: {
@@ -215,7 +215,7 @@ export function startHealthPing(intervalMs = 30000) {
     }
   }, intervalMs);
   if (_healthTimer.unref) _healthTimer.unref();
-  registerInterval(_healthTimer);
+  registerTimer(_healthTimer);
   logger.info('[Redis] 健康探活已启动', { intervalMs });
 }
 
