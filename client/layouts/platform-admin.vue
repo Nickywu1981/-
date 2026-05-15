@@ -36,9 +36,6 @@
           <NuxtLink to="/admin/logs" class="nav-item" active-class="active">
             <i class="icon-file-text"></i> {{ t('platform_admin_nav.audit_log') }}
           </NuxtLink>
-          <NuxtLink to="/admin/settings" class="nav-item" active-class="active">
-            <i class="icon-settings"></i> {{ t('platform_admin_nav.system_params') }}
-          </NuxtLink>
         </div>
       </nav>
     </aside>
@@ -63,3 +60,52 @@ const { t } = useI18n()
 const auth = useAuthStore()
 const user = computed(() => auth.user)
 </script>
+
+<style scoped>
+.platform-admin-layout {
+  display: flex; min-height: 100vh; background: var(--bg-page);
+}
+.sidebar {
+  width: 240px; min-width: 240px; background: var(--bg-card);
+  border-right: 1px solid var(--border, #e5e5e5);
+  display: flex; flex-direction: column; padding: 0;
+}
+.sidebar-header {
+  padding: 20px 20px 12px; border-bottom: 1px solid var(--border, #e5e5e5);
+}
+.logo { font-size: 16px; font-weight: 700; color: var(--text-primary); margin: 0; }
+.badge {
+  display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 4px;
+  background: var(--bg-accent); color: var(--brand); margin-top: 4px;
+}
+.nav { flex: 1; overflow-y: auto; padding: 12px 0; }
+.nav-group { padding: 0 12px; margin-bottom: 8px; }
+.nav-label {
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  color: var(--text-muted); padding: 8px 8px 4px; margin: 0;
+  letter-spacing: 0.5px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+  border-radius: 8px; font-size: 14px; color: var(--text-secondary);
+  text-decoration: none; transition: background .15s, color .15s;
+}
+.nav-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+.nav-item.active { background: var(--bg-accent); color: var(--brand); font-weight: 600; }
+.nav-item i { font-size: 16px; width: 20px; text-align: center; }
+.main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 24px; background: var(--bg-header); border-bottom: 1px solid var(--border, #e5e5e5);
+  backdrop-filter: blur(8px);
+}
+.env-badge { font-size: 12px; color: var(--text-muted); }
+.user-info { font-size: 13px; color: var(--text-secondary); }
+.content { flex: 1; padding: 24px; overflow-y: auto; }
+
+@media print {
+  .sidebar, .topbar { display: none; }
+  .main { display: block; }
+  .content { padding: 0; overflow: visible; }
+}
+</style>
