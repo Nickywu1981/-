@@ -137,14 +137,6 @@ function teardownSSE() {
   }
 }
 
-function teardownSSE() {
-  sseRefCount = Math.max(0, sseRefCount - 1)
-  if (sseRefCount === 0 && sharedEventSource) {
-    sharedEventSource.close();
-    sharedEventSource = null;
-  }
-}
-
 export function useSiteConfig(groupKey: string) {
   const config = ref<Record<string, string>>(cache[groupKey] || {})
   const loading = ref(!cache[groupKey])

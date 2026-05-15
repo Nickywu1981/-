@@ -1,14 +1,15 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 
-// Mock the API module before useAuthStore imports it
+const mockApi = {
+  get: vi.fn(() => Promise.resolve({})),
+  post: vi.fn(() => Promise.resolve({})),
+  put: vi.fn(() => Promise.resolve({})),
+  delete: vi.fn(() => Promise.resolve({})),
+};
+
 vi.mock('@/composables/useApi', () => ({
-  api: {
-    get: vi.fn(() => Promise.resolve({})),
-    post: vi.fn(() => Promise.resolve({})),
-    put: vi.fn(() => Promise.resolve({})),
-    delete: vi.fn(() => Promise.resolve({})),
-  },
+  api: mockApi,
 }));
 
 import { useAuthStore } from '../../stores/useAuthStore';
@@ -17,6 +18,10 @@ describe('useAuthStore', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
     vi.stubGlobal('window', { location: { href: '/' } });
+    mockApi.post.mockReset();
+    mockApi.get.mockReset();
+    mockApi.post.mockResolvedValue({});
+    mockApi.get.mockResolvedValue({});
   });
 
   it('initializes with default state', () => {
@@ -75,23 +80,31 @@ describe('useAuthStore', () => {
       store.user = { id: 1, nickname: 'Test', credits: 50 };
       store.isLoggedIn = true;
 
-      await store.logout().catch(() => {});
+      await store.logout();
 
       expect(store.user).toBeNull();
       expect(store.isLoggedIn).toBe(false);
     });
 
-    it('login uses email field for email-like accounts', () => {
+    it('login calls API with email field for email-like accounts', async () => {
       const store = useAuthStore();
-      const accountWithAt = 'user@example.com';
-      const isEmail = accountWithAt.includes('@');
-      expect(isEmail).toBe(true);
+      mockApi.post.mockResolvedValue({ id: 1, nickname: 'Alice' });
+
+      const result = await store.login('user@example.com', 'password123');
+
+      expect(mockApi.post).toHaveBeenCalledWith('/auth/login', { email: 'user@example.com', password: 'password123' });
+      expect(result).toEqual({ id: 1, nickname: 'Alice' });
+      expect(store.user).toEqual({ id: 1, nickname: 'Alice' });
+      expect(store.isLoggedIn).toBe(true);
     });
 
-    it('login uses phone field for non-email accounts', () => {
-      const phoneNumber = '13800138000';
-      const isEmail = phoneNumber.includes('@');
-      expect(isEmail).toBe(false);
+    it('login calls API with username field for non-email accounts', async () => {
+      const store = useAuthStore();
+      mockApi.post.mockResolvedValue({ id: 2 });
+
+      await store.login('phoneuser', 'password456');
+
+      expect(mockApi.post).toHaveBeenCalledWith('/auth/login', { username: 'phoneuser', password: 'password456' });
     });
   });
 });

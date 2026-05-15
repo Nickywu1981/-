@@ -86,11 +86,11 @@ export default defineNuxtConfig({
   // PWA 渐进式应用配置
   pwa: {
     registerType: 'autoUpdate',
-    // 自动生成多尺寸图标
-    pwaAssets: {
-      image: 'public/favicon.svg',
-      preset: 'minimal-2023',
-    },
+    // 自动生成多尺寸图标（需 @vite-pwa/assets-generator，暂禁用）
+    // pwaAssets: {
+    //   image: 'public/favicon.svg',
+    //   preset: 'minimal-2023',
+    // },
     manifest: {
       name: 'Movio AI — 电商AI视觉创作平台',
       short_name: 'Movio AI',
@@ -244,5 +244,5 @@ export default defineNuxtConfig({
         },
       },
     },
-});
+}});
 
