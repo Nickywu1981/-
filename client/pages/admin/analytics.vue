@@ -21,6 +21,7 @@
 </template>
 
 <script setup lang="ts">const { t } = useI18n()
+import { fmtNum } from '@/utils/format'
 
 let VChart: any = null
 
@@ -45,7 +46,6 @@ async function _loadVChart() {
 const loading = ref(true), stats = ref<any>(null)
 const toast = useToast()
 
-function fmtNum(n: number) { return n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(n || 0) }
 
 onMounted(async () => {
   try {

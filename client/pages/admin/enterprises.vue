@@ -54,7 +54,7 @@
               <td>{{ t.contact_name || '-' }}</td>
               <td>{{ t.contact_phone || '-' }}</td>
               <td><span class="badge" :class="statusClass(t.review_status)">{{ statusLabel(t.review_status) }}</span></td>
-              <td class="time">{{ formatTime(t.create_time) }}</td>
+              <td class="time">{{ formatDateTimeLocale(t.create_time) }}</td>
               <td class="actions">
                 <button v-if="t.review_status === 'pending' || t.review_status === 'under_review'"
                   class="btn btn-sm btn-success" @click="doApprove(t)">{{ $t('admin.enterprises.approve_btn') }}</button>
@@ -84,7 +84,7 @@
             <div class="log-header">
               <span class="badge" :class="actionClass(l.action)">{{ actionLabel(l.action) }}</span>
               <span class="log-op">{{ l.operator_name || $t('common.id')+':'+l.operator_id }}</span>
-              <span class="log-time">{{ formatTime(l.create_time) }}</span>
+              <span class="log-time">{{ formatDateTimeLocale(l.create_time) }}</span>
             </div>
             <div class="log-detail">
               {{ l.old_status }} → {{ l.new_status }}
@@ -133,6 +133,7 @@ definePageMeta({ layout: 'platform-admin', middleware: ['auth'] });
 const { $api } = useNuxtApp();
 const { t } = useI18n();
 const { confirm } = useConfirm();
+import { formatDateTimeLocale } from '@/utils/format';
 
 const tenants = ref([]);
 const stats = ref({ pending: 0, under_review: 0, approved: 0, rejected: 0 });
@@ -183,7 +184,6 @@ function typeClass(t) { return t === 'agent' ? 'badge-accent' : t === 'partner' 
 function typeLabel(t) { return TYPE_MAP[t] || t; }
 function actionClass(a) { if (a === 'approve' || a === 'reinstate') return 'badge-success'; if (a === 'reject') return 'badge-danger'; if (a === 'suspend') return 'badge-warning'; return 'badge-default'; }
 function actionLabel(a) { return ACTION_MAP[a] || a; }
-function formatTime(t) { return t ? new Date(t).toLocaleString('zh-CN') : '-'; }
 let toastTimer: ReturnType<typeof setTimeout> | null = null
 function showToast(msg, type = 'success') { toast.msg = msg; toast.type = type; if (toastTimer) clearTimeout(toastTimer); toastTimer = setTimeout(() => { toast.msg = ''; }, 3000); }
 

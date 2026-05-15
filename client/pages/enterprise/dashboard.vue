@@ -18,10 +18,10 @@
     <!-- 统计卡片 -->
     <div class="stats-grid">
       <StatsCard :value="dashboard.stats?.userCount || 0" :label="$t('enterprise.dashboard.subAccounts')" />
-      <StatsCard :value="formatNumber(dashboard.stats?.totalCalls30d || 0)" :label="$t('enterprise.dashboard.calls30d')" />
-      <StatsCard :value="formatNumber(dashboard.stats?.totalCredits30d || 0)" :label="$t('enterprise.dashboard.credits30d')" />
-      <StatsCard :value="formatNumber(dashboard.stats?.quotaImages || 0)" :label="$t('enterprise.dashboard.imageQuota')" />
-      <StatsCard :value="formatNumber(dashboard.stats?.quotaVideo || 0)" :label="$t('enterprise.dashboard.videoQuota')" />
+      <StatsCard :value="fmtNum(dashboard.stats?.totalCalls30d || 0, 'en')" :label="$t('enterprise.dashboard.calls30d')" />
+      <StatsCard :value="fmtNum(dashboard.stats?.totalCredits30d || 0, 'en')" :label="$t('enterprise.dashboard.credits30d')" />
+      <StatsCard :value="fmtNum(dashboard.stats?.quotaImages || 0, 'en')" :label="$t('enterprise.dashboard.imageQuota')" />
+      <StatsCard :value="fmtNum(dashboard.stats?.quotaVideo || 0, 'en')" :label="$t('enterprise.dashboard.videoQuota')" />
       <StatsCard :value="'¥' + (dashboard.enterprise?.balance || 0)" :label="$t('enterprise.dashboard.accountBalance')" color="#67c23a" />
     </div>
 
@@ -60,6 +60,7 @@
 <script setup lang="ts">
 import PageHeader from '~/components/shared/PageHeader.vue'
 import StatsCard from '~/components/shared/StatsCard.vue'
+import { fmtNum } from '@/utils/format'
 const { t } = useI18n();
 const dashboard = ref({ stats: {}, enterprise: {} });
 const enterprise = ref({});
@@ -93,12 +94,6 @@ async function loadData() {
   } finally {
     loading.value = false;
   }
-}
-
-function formatNumber(n) {
-  if (n >= 10000) return (n / 10000).toFixed(1) + 'w';
-  if (n >= 1000) return (n / 1000).toFixed(1) + 'k';
-  return String(n);
 }
 
 function barHeight(count) {

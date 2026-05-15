@@ -32,7 +32,7 @@
           <div class="list-item__icon">{{ item.type === 'earn' ? '💰' : item.type === 'refund' ? '↩' : '💸' }}</div>
           <div class="list-item__info">
             <div class="list-item__title">{{ item.description }}</div>
-            <div class="list-item__time">{{ formatTime(item.create_time) }}</div>
+            <div class="list-item__time">{{ formatDateTimeLocale(item.create_time, locale) }}</div>
           </div>
           <div class="list-item__amount" :class="item.type === 'spend' ? 'negative' : 'positive'">
             {{ item.type === 'spend' ? '-' : '+' }}{{ item.amount }}
@@ -46,6 +46,7 @@
 </template>
 
 <script setup lang="ts">
+import { formatDateTimeLocale } from '@/utils/format'
 
 
 const loading = ref(true)
@@ -76,7 +77,6 @@ const fetchAll = async () => {
 }
 
 const { t, locale } = useI18n()
-const formatTime = (t: string) => t ? new Date(t).toLocaleString(locale.value) : ''
 
 onMounted(fetchAll)
 definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })

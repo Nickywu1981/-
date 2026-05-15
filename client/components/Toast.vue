@@ -34,7 +34,7 @@ function remove(id: number) {
 
 const exposed = { success: (m: string) => add(m, 'success'), error: (m: string) => add(m, 'error', 5000), warn: (m: string) => add(m, 'warn', 4000), info: (m: string) => add(m, 'info') }
 defineExpose(exposed)
-onMounted(() => { (window as any).__toast = exposed })
+onMounted(() => { window.__toast = exposed })
 onUnmounted(() => { for (const timer of timers.values()) clearTimeout(timer); timers.clear() })
 </script>
 

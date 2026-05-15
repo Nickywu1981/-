@@ -19,7 +19,7 @@ export function useToast() {
   }
 
   onMounted(() => {
-    _toast.value = (window as any).__toast ?? null
+    _toast.value = window.__toast ?? null
     if (_toast.value && _queue.length) {
       const q = _queue.splice(0)
       q.forEach(({ type, msg }) => { try { _toast.value![type](msg) } catch { /* skip */ } })

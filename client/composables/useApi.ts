@@ -78,13 +78,13 @@ function translateErrorCode(code: number, serverMsg: string): string {
   return serverMsg || 'Request failed';
 }
 
-interface ApiResponse<T = any> {
+interface ApiResponse<T = unknown> {
   code: number;
   msg: string;
   data: T;
 }
 
-interface PaginatedData<T = any> {
+interface PaginatedData<T = unknown> {
   list: T[];
   total: number;
   page: number;
@@ -94,8 +94,8 @@ interface PaginatedData<T = any> {
 export class ApiError extends Error {
   code: number
   status: number
-  data: any
-  constructor(message: string, code = 500, status = 500, data?: any) {
+  data: unknown
+  constructor(message: string, code = 500, status = 500, data?: unknown) {
     super(message)
     this.name = 'ApiError'
     this.code = code
@@ -153,14 +153,14 @@ const DEFAULT_TIMEOUT_MS = 30000;
 
 interface RequestOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
-  body?: any
-  params?: Record<string, any>
+  body?: unknown
+  params?: Record<string, unknown>
   timeout?: number
   signal?: AbortSignal
 }
 
 /** 通用 API 请求封装（含 CSRF + 超时 + 重试 + 离线检测 + 401 重定向锁） */
-async function request<T = any>(
+async function request<T = unknown>(
   url: string,
   options: RequestOptions = {},
   retries = 0,
@@ -266,16 +266,16 @@ function anySignal(signals: AbortSignal[]): AbortSignal {
 
 /** API 方法快捷调用 */
 export const api = {
-  get: <T = any>(url: string, params?: Record<string, any>, opts?: Omit<RequestOptions, 'method' | 'params'>) =>
+  get: <T = unknown>(url: string, params?: Record<string, unknown>, opts?: Omit<RequestOptions, 'method' | 'params'>) =>
     request<T>(url, { ...opts, params }),
 
-  post: <T = any>(url: string, body?: any, opts?: Omit<RequestOptions, 'method' | 'body'>) =>
+  post: <T = unknown>(url: string, body?: unknown, opts?: Omit<RequestOptions, 'method' | 'body'>) =>
     request<T>(url, { ...opts, method: 'POST', body }),
 
-  put: <T = any>(url: string, body?: any, opts?: Omit<RequestOptions, 'method' | 'body'>) =>
+  put: <T = unknown>(url: string, body?: unknown, opts?: Omit<RequestOptions, 'method' | 'body'>) =>
     request<T>(url, { ...opts, method: 'PUT', body }),
 
-  delete: <T = any>(url: string, opts?: Omit<RequestOptions, 'method'>) =>
+  delete: <T = unknown>(url: string, opts?: Omit<RequestOptions, 'method'>) =>
     request<T>(url, { ...opts, method: 'DELETE', ...opts }),
 };
 
@@ -286,9 +286,10 @@ export type { ApiResponse, PaginatedData };
  * @param err - fetch/ApiError/Error 对象
  * @param fallback - 默认 i18n key, default 'common.request_failed'
  */
-export function extractErrorMsg(err: any, fallback = 'common.request_failed'): string {
-  if (err?.data?.msg && typeof err.data.msg === 'string' && err.data.msg.length < 200) return err.data.msg;
-  if (err?.message && typeof err.message === 'string' && err.message.length < 200 && !err.message.includes('at ') && !err.message.includes('stack')) return err.message;
+export function extractErrorMsg(err: unknown, fallback = 'common.request_failed'): string {
+  const e = err as Partial<ApiError> & { message?: string; data?: { msg?: string } } | undefined
+  if (e?.data?.msg && typeof e.data.msg === 'string' && e.data.msg.length < 200) return e.data.msg;
+  if (e?.message && typeof e.message === 'string' && e.message.length < 200 && !e.message.includes('at ') && !e.message.includes('stack')) return e.message;
   const { $i18n } = useNuxtApp();
   return $i18n?.t ? $i18n.t(fallback) : fallback;
 }

@@ -2,7 +2,6 @@
  * 电商内容智能中间层 Controller
  * 统一入口 — 覆盖图片/详情页/视频/文案语音四大类
  */
-import { BusinessError } from '../utils/businessError.js';
 import { wrapController } from '../utils/wrapController.js';
 import { processMerchantRequest } from '../services/ecommercePipeline.js';
 import { INTENT_TYPES } from '../services/intentClassifier.js';

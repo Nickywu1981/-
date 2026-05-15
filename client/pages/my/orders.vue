@@ -18,7 +18,7 @@
             <div class="order-card__amount">¥{{ item.amount || item.price }}</div>
           </div>
           <div class="order-card__footer">
-            <span class="order-card__time">{{ formatTime(item.create_time) }}</span>
+            <span class="order-card__time">{{ formatDateTimeLocale(item.create_time, locale) }}</span>
             <button v-if="item.status === 'paid'" class="btn-xs" @click="viewDetail(item)">{{ $t('my.orders.view_detail') }}</button>
           </div>
         </div>
@@ -30,6 +30,7 @@
 </template>
 
 <script setup lang="ts">
+import { formatDateTimeLocale } from '@/utils/format'
 
 const { t, locale } = useI18n()
 
@@ -69,8 +70,6 @@ const toast = useToast()
 const viewDetail = (item: any) => {
   toast.info(`${t('my.orders.detail_title')}${item.order_no || item.id}\n${t('my.orders.detail_amount')}¥${item.amount || item.price}\n${t('my.orders.detail_status')}${statusLabel(item.status)}`)
 }
-
-const formatTime = (t: string) => t ? new Date(t).toLocaleString(locale.value) : ''
 
 onMounted(fetchAll)
 definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })

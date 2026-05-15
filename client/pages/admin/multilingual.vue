@@ -143,7 +143,7 @@
               </thead>
               <tbody>
                 <tr v-for="log in auditLogs" :key="log.id">
-                  <td class="log-time">{{ formatTime(log.changed_at) }}</td>
+                  <td class="log-time">{{ formatDateTimeLocale(log.changed_at) }}</td>
                   <td class="log-old">{{ log.old_value || $t('admin_multilingual.empty_value') }}</td>
                   <td class="log-new">{{ log.new_value || $t('admin_multilingual.empty_value') }}</td>
                 </tr>
@@ -161,6 +161,7 @@
 </template>
 
 <script setup lang="ts">
+import { formatDateTimeLocale } from '@/utils/format'
 definePageMeta({ layout: 'platform-admin', middleware: ['auth'] })
 
 const { t } = useI18n()
@@ -216,11 +217,6 @@ async function exportJSON() {
     a.click()
     URL.revokeObjectURL(a.href)
   } catch (e: unknown) { /* ignore */ }
-}
-
-function formatTime(dt: string) {
-  if (!dt) return ''
-  return new Date(dt).toLocaleString('zh-CN')
 }
 
 onMounted(() => { fetch() })

@@ -10,8 +10,8 @@ import { isProduction } from '../config/index.js';
 import * as modelRouter from '../services/model-router.service.js';
 
 function _safeMsg(err) {
-  if (!err) return '模型执行失败';
-  if (isProduction) return '模型执行失败';
+  if (!err) return 'AI inference failed';
+  if (isProduction) return 'AI inference failed';
   return String(err.message || err).slice(0, 200);
 }
 import { gatewayRoute } from '../gateway/aiGatewayHub.js';

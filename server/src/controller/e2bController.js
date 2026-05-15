@@ -4,7 +4,7 @@
  * v4.3: 监控埋点接入 + 错误响应标准化
  */
 import { wrapController } from '../utils/wrapController.js';
-import { success, error } from '../utils/response.js';
+import { success } from '../utils/response.js';
 import { BusinessError } from '../utils/businessError.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import * as e2bService from '../services/e2b.service.js';
