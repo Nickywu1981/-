@@ -6,6 +6,8 @@
  */
 import { gatewayRoute } from '../gateway/aiGatewayHub.js';
 import logger from '../utils/logger.js';
+import { BusinessError } from '../utils/businessError.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 // 平台尺寸映射
 const PLATFORM_SIZES = {
@@ -216,7 +218,7 @@ async function processVideoBatch(taskId, params) {
  */
 export function getTaskStatus(taskId) {
   const task = taskStore.get(taskId);
-  if (!task) throw new Error('TASK_NOT_FOUND');
+  if (!task) throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND, 'Task not found');
   return {
     id: task.id,
     type: task.type,

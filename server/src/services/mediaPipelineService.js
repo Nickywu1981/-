@@ -14,6 +14,8 @@ import fsp from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import logger from '../utils/logger.js';
+import { BusinessError } from '../utils/businessError.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 
 const execFileP = promisify(execFile);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -59,7 +61,7 @@ function outputName(inputPath, suffix) {
  */
 export async function crop(inputPath, opts = {}) {
   await ensureTempDir();
-  if (!(await ensureSharp())) throw new Error('sharp unavailable');
+  if (!(await ensureSharp())) throw new BusinessError(ERROR_CODE.AI_INFER_FAILED, 'sharp unavailable');
   const sharp = (await import('sharp')).default;
   const out = outputName(inputPath, `crop_${opts.width || 0}x${opts.height || 0}`);
   await sharp(inputPath).extract({
@@ -77,7 +79,7 @@ export async function crop(inputPath, opts = {}) {
  */
 export async function resize(inputPath, { width, height, fit = 'inside' }) {
   await ensureTempDir();
-  if (!(await ensureSharp())) throw new Error('sharp unavailable');
+  if (!(await ensureSharp())) throw new BusinessError(ERROR_CODE.AI_INFER_FAILED, 'sharp unavailable');
   const sharp = (await import('sharp')).default;
   const out = outputName(inputPath, `${width}x${height}`);
   await sharp(inputPath).resize(width, height, { fit, withoutEnlargement: true }).toFile(out);
@@ -91,7 +93,7 @@ export async function resize(inputPath, { width, height, fit = 'inside' }) {
  */
 export async function compress(inputPath, { quality = 80, format = 'jpeg' } = {}) {
   await ensureTempDir();
-  if (!(await ensureSharp())) throw new Error('sharp unavailable');
+  if (!(await ensureSharp())) throw new BusinessError(ERROR_CODE.AI_INFER_FAILED, 'sharp unavailable');
   const sharp = (await import('sharp')).default;
   const out = outputName(inputPath, `q${quality}`);
   await sharp(inputPath)[format]({ quality }).toFile(out);
@@ -105,7 +107,7 @@ export async function compress(inputPath, { quality = 80, format = 'jpeg' } = {}
  */
 export async function watermark(inputPath, { text, position = 'southeast', fontSize = 24, opacity = 0.3 } = {}) {
   await ensureTempDir();
-  if (!(await ensureSharp())) throw new Error('sharp unavailable');
+  if (!(await ensureSharp())) throw new BusinessError(ERROR_CODE.AI_INFER_FAILED, 'sharp unavailable');
   const sharp = (await import('sharp')).default;
   const metadata = await sharp(inputPath).metadata();
 
@@ -128,7 +130,7 @@ export async function watermark(inputPath, { text, position = 'southeast', fontS
  */
 export async function convert(inputPath, { to = 'webp', quality = 85 } = {}) {
   await ensureTempDir();
-  if (!(await ensureSharp())) throw new Error('sharp unavailable');
+  if (!(await ensureSharp())) throw new BusinessError(ERROR_CODE.AI_INFER_FAILED, 'sharp unavailable');
   const sharp = (await import('sharp')).default;
   const ext = path.extname(inputPath);
   const base = path.basename(inputPath, ext);
@@ -139,7 +141,7 @@ export async function convert(inputPath, { to = 'webp', quality = 85 } = {}) {
 
 /** 获取图片元信息 */
 export async function imageMetadata(inputPath) {
-  if (!(await ensureSharp())) throw new Error('sharp unavailable');
+  if (!(await ensureSharp())) throw new BusinessError(ERROR_CODE.AI_INFER_FAILED, 'sharp unavailable');
   const sharp = (await import('sharp')).default;
   return sharp(inputPath).metadata();
 }
@@ -152,7 +154,7 @@ export async function imageMetadata(inputPath) {
  */
 export async function videoThumbnail(inputPath, { atSeconds = 1, width = 480 } = {}) {
   await ensureTempDir();
-  if (!(await ensureFfmpeg())) throw new Error('ffmpeg unavailable');
+  if (!(await ensureFfmpeg())) throw new BusinessError(ERROR_CODE.AI_INFER_FAILED, 'ffmpeg unavailable');
   const out = `${outputName(inputPath, 'thumb')}.jpg`.replace(/\.[^.]+$/, '.jpg');
   await execFileP('ffmpeg', [
     '-ss', String(atSeconds), '-i', inputPath,
@@ -166,7 +168,7 @@ export async function videoThumbnail(inputPath, { atSeconds = 1, width = 480 } =
  */
 export async function videoTranscode(inputPath, { crf = 23, preset = 'medium', maxWidth } = {}) {
   await ensureTempDir();
-  if (!(await ensureFfmpeg())) throw new Error('ffmpeg unavailable');
+  if (!(await ensureFfmpeg())) throw new BusinessError(ERROR_CODE.AI_INFER_FAILED, 'ffmpeg unavailable');
   const out = outputName(inputPath, 'transcoded');
   const vf = maxWidth ? `scale=${maxWidth}:-2` : null;
   const args = ['-i', inputPath, '-c:v', 'libx264', '-crf', String(crf), '-preset', preset, '-c:a', 'aac', '-movflags', '+faststart'];
@@ -182,7 +184,7 @@ export async function videoTranscode(inputPath, { crf = 23, preset = 'medium', m
  */
 export async function videoTrim(inputPath, { startSeconds = 0, durationSeconds = 30 } = {}) {
   await ensureTempDir();
-  if (!(await ensureFfmpeg())) throw new Error('ffmpeg unavailable');
+  if (!(await ensureFfmpeg())) throw new BusinessError(ERROR_CODE.AI_INFER_FAILED, 'ffmpeg unavailable');
   const out = outputName(inputPath, 'trim');
   await execFileP('ffmpeg', [
     '-ss', String(startSeconds), '-i', inputPath,
@@ -197,7 +199,7 @@ export async function videoTrim(inputPath, { startSeconds = 0, durationSeconds =
  */
 export async function videoWatermark(inputPath, { watermarkPath, position = 'southeast' } = {}) {
   await ensureTempDir();
-  if (!(await ensureFfmpeg())) throw new Error('ffmpeg unavailable');
+  if (!(await ensureFfmpeg())) throw new BusinessError(ERROR_CODE.AI_INFER_FAILED, 'ffmpeg unavailable');
   const out = outputName(inputPath, 'wm');
   const posMap = { southeast: 'W-w-10:H-h-10', northwest: '10:10', center: '(W-w)/2:(H-h)/2' };
   await execFileP('ffmpeg', [
@@ -232,7 +234,7 @@ export async function processImage(inputPath, operations = []) {
       case 'compress':  currentPath = await compress(currentPath, params); break;
       case 'watermark': currentPath = await watermark(currentPath, params); break;
       case 'convert':   currentPath = await convert(currentPath, params); break;
-      default: throw new Error(`Unknown image operation: ${opName}`);
+      default: throw new BusinessError(ERROR_CODE.PARAM_INVALID, `Unknown image operation: ${opName}`);
     }
     results.push({ op: opName, output: currentPath });
   }
@@ -258,7 +260,7 @@ export async function processVideo(inputPath, operations = []) {
       case 'transcode': currentPath = await videoTranscode(currentPath, params); break;
       case 'trim':      currentPath = await videoTrim(currentPath, params); break;
       case 'watermark': currentPath = await videoWatermark(currentPath, params); break;
-      default: throw new Error(`Unknown video operation: ${opName}`);
+      default: throw new BusinessError(ERROR_CODE.PARAM_INVALID, `Unknown video operation: ${opName}`);
     }
     results.push({ op: opName, output: currentPath });
   }

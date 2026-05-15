@@ -15,6 +15,8 @@ import fsp from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import logger from '../utils/logger.js';
+import { BusinessError } from '../utils/businessError.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 import { uploadConfig } from '../config/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -138,7 +140,7 @@ async function getCosClient() {
 
 async function cosUpload(sourcePath, key) {
   const client = await getCosClient();
-  if (!client) throw new Error('COS unavailable');
+  if (!client) throw new BusinessError(ERROR_CODE.SERVICE_UNAVAILABLE, 'COS unavailable');
   const cfg = getBackendConfig().cos;
   const body = await fsp.readFile(sourcePath);
   return new Promise((resolve, reject) => {
@@ -202,7 +204,7 @@ async function getS3Client() {
 
 async function s3Upload(sourcePath, key) {
   const client = await getS3Client();
-  if (!client) throw new Error('S3 unavailable');
+  if (!client) throw new BusinessError(ERROR_CODE.SERVICE_UNAVAILABLE, 'S3 unavailable');
   const { PutObjectCommand } = await import('@aws-sdk/client-s3');
   const cfg = getBackendConfig().s3;
   const body = await fsp.readFile(sourcePath);

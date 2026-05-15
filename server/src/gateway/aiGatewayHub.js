@@ -596,7 +596,7 @@ export async function gatewayRoute(params, ctx = {}) {
           timeoutPromise(TOTAL_TIMEOUT, '降级模型路由'),
         ]);
       } else {
-        throw new Error(`模型 ${routeModelId} 不可用且无可用降级模型，请稍后重试`);
+        throw new BusinessError(ERROR_CODE.MODEL_UNAVAILABLE, `Model ${routeModelId} unavailable and no fallback`);
       }
     } else {
       result = await Promise.race([

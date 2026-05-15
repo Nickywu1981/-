@@ -13,7 +13,12 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{ error?: any }>();
+interface ErrorProp {
+  statusCode?: number
+  message?: string
+  url?: string
+}
+const props = defineProps<{ error?: ErrorProp }>();
 const { $t } = useNuxtApp();
 
 const title = computed(() => {
