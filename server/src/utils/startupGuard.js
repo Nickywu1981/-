@@ -40,8 +40,8 @@ export async function validateStartupConfig() {
   // P1: ENCRYPTION_KEY present and valid
   if (!process.env.ENCRYPTION_KEY) {
     errors.push('ENCRYPTION_KEY 环境变量未设置');
-  } else if (Buffer.from(process.env.ENCRYPTION_KEY, 'utf8').length !== 32) {
-    errors.push(`ENCRYPTION_KEY 长度必须为 32 字节（当前: ${Buffer.from(process.env.ENCRYPTION_KEY, 'utf8').length})`);
+  } else if (Buffer.byteLength(process.env.ENCRYPTION_KEY, 'utf8') !== 32) {
+    errors.push(`ENCRYPTION_KEY 长度必须为 32 字节（当前: ${Buffer.byteLength(process.env.ENCRYPTION_KEY, 'utf8')})`);
   }
 
   // P1: JWT_SECRET not a known placeholder
@@ -63,6 +63,22 @@ export async function validateStartupConfig() {
   }
 
   // P1: CSRF_SECRET 已移除 — csrf.js 使用 crypto.randomBytes 动态生成，不使用环境变量
+
+  // P1: External AI API keys in production
+  if (isProd) {
+    const aiProviderKeys = [
+      { key: 'CLAUDE_API_KEY', name: 'Claude' },
+      { key: 'E2B_API_KEY', name: 'E2B 代码沙箱' },
+      { key: 'STABILITY_API_KEY', name: 'Stability AI' },
+      { key: 'REPLICATE_API_KEY', name: 'Replicate' },
+    ];
+    for (const { key, name } of aiProviderKeys) {
+      const val = process.env[key] || '';
+      if (!val || ['CHANGE_ME', 'your-', 'sk-your-'].some(p => val.startsWith(p))) {
+        warnings.push(`生产环境未设置有效的 ${key}（${name}），相关功能将不可用`);
+      }
+    }
+  }
 
   // P1: ALLINPAY payment keys in production
   if (isProd) {

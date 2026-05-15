@@ -49,7 +49,7 @@ export async function settleCommission(consumerId, orderId, orderAmount) {
   try {
     await conn.beginTransaction();
 
-    const relation = await distDao.getRelationByUser(consumerId);
+    const relation = await distDao.getRelationByUser(consumerId, conn);
     if (!relation) {
       await conn.commit();
       return [];

@@ -2,11 +2,11 @@
 import mysql from 'mysql2/promise'
 
 const pool = mysql.createPool({
-  host: 'localhost',
-  port: 3306,
-  user: 'root',
-  password: 'root123',
-  database: 'ai_saas',
+  host: process.env.DB_HOST || 'localhost',
+  port: parseInt(process.env.DB_PORT, 10) || 3306,
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME || 'ai_saas',
   charset: 'utf8mb4',
 })
 

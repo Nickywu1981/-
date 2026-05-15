@@ -18,7 +18,7 @@ export async function upsert(userId, data, conn) {
        end_time = VALUES(end_time)`,
     [userId, data.plan_type ?? 0, data.credit_balance || 0, data.end_time || null],
   );
-  return findByUserId(userId);
+  return findByUserId(userId, conn);
 }
 
 export async function setAutoRenew(userId, autoRenew) {

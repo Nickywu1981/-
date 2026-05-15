@@ -195,8 +195,9 @@ export async function getCheckInByDate(userId, date, conn) {
   return rows[0] || null;
 }
 
-export async function getLastCheckIn(userId) {
-  const [rows] = await pool.execute(
+export async function getLastCheckIn(userId, conn) {
+  const db = conn || pool;
+  const [rows] = await db.execute(
     'SELECT check_date, streak FROM check_ins WHERE user_id = ? ORDER BY check_date DESC LIMIT 1',
     [userId],
   );

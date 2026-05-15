@@ -53,8 +53,9 @@ export async function getLevelCounts(userId) {
   return { level1_count: Number(level1_count) || 0, level2_count: Number(level2_count) || 0 };
 }
 
-export async function getRelationByUser(consumerId) {
-  const [rows] = await pool.query(
+export async function getRelationByUser(consumerId, conn) {
+  const db = conn || pool;
+  const [rows] = await db.query(
     'SELECT parent_id, grandparent_id, level FROM distributor_relation WHERE user_id = ? LIMIT 1',
     [consumerId],
   );

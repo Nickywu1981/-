@@ -96,6 +96,7 @@ publicRouter.get('/version/stream', optionalAuth, (req, res) => {
 
   // 心跳保活，防止 Express 30s 超时断开
   const heartbeat = setInterval(() => res.write(': heartbeat\n\n'), 25000);
+  heartbeat.unref();
 
   const onVersion = (data) => res.write(`data: ${JSON.stringify(data)}\n\n`);
   import('../services/config-version.service.js').then(mod => {

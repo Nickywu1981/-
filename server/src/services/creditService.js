@@ -285,7 +285,7 @@ export async function checkIn(userId) {
       throw new BusinessError(ERROR_CODE.RESOURCE_DUPLICATE);
     }
 
-    const prevRow = await creditDao.getLastCheckIn(userId);
+    const prevRow = await creditDao.getLastCheckIn(userId, conn);
     let streak = 1;
     if (prevRow) {
       const prevDate = new Date(prevRow.check_date);

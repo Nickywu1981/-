@@ -312,7 +312,7 @@ export async function queryOrder(reqsn) {
   let callbackInProgress = false;
   try {
     const { getRedis } = await import('../dao/redis.js');
-    const redis = getRedis();
+    const redis = await getRedis();
     if (redis) {
       const lock = await redis.get(`notify_lock:${reqsn}`);
       callbackInProgress = !!lock;

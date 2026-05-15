@@ -99,7 +99,11 @@ async function processBatch(taskId, userId) {
 
     await completeTask(taskId, userId, { progressMsg: '全部完成', outputResult: { results, total, batchId: taskId, zipUrl: `/api/batch/${taskId}/download`, estimatedZipSize: `${Math.round(total * 0.5)}MB` } });
     wsManager.pushTaskComplete(taskId, { results, total });
-  } catch (err) { await updateTaskStatus(taskId, userId, { status: 3, errorMsg: safeMsg(err) }); }
+    wsManager.unregisterTask(taskId);
+  } catch (err) {
+    await updateTaskStatus(taskId, userId, { status: 3, errorMsg: safeMsg(err) });
+    wsManager.unregisterTask(taskId);
+  }
 }
 
 // ==================== 夜间批量托管 ====================

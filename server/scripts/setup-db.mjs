@@ -124,7 +124,10 @@ async function runSeeds(conn) {
 // ==================== 管理员账户 ====================
 async function ensureAdmin(conn) {
   const SALT = bcrypt.genSaltSync(10);
-  const ADMIN_PASS = process.env.ADMIN_PASSWORD || 'admin123';
+  const ADMIN_PASS = process.env.ADMIN_PASSWORD || (() => {
+    console.warn('[setup-db] ADMIN_PASSWORD 未设置，使用默认密码（生产环境必须通过环境变量设置！）');
+    return 'admin123';
+  })();
   const hash = bcrypt.hashSync(ADMIN_PASS, SALT);
 
   const [rows] = await conn.query('SELECT id FROM user WHERE username = ?', ['admin']);
@@ -140,7 +143,7 @@ async function ensureAdmin(conn) {
        VALUES ('admin', ?, '超级管理员', 'super_admin', 1, NOW())`,
       [hash]
     );
-    log.ok('管理员账户已创建 (admin / admin123)');
+    log.ok('管理员账户已创建 (admin / ******)');
   }
 
   // ensure admin membership

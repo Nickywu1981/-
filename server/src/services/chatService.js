@@ -158,23 +158,31 @@ export async function handleMessage({ res, req, message, sessionId, mode, attach
     });
 
     // ── Step 4: 路由分发 + SSE 流式输出 ──
+    if (sse.isDisconnected) {
+      sse.end();
+      return;
+    }
     if (route.endpoint) {
       sse.send({ type: 'status', status: 'generating', message: '正在调用 AI 生成...' });
     }
 
-    const aiResult = await gatewayRoute({
-      mode: 'single',
-      taskType: route.taskType,
-      params: {
-        model: wrappedPrompt.modelHint?.provider || 'qwen-turbo',
-        messages: [
-          { role: 'system', content: wrappedPrompt.wrapped?.system || '你是专业的电商内容创作专家。' },
-          { role: 'user', content: wrappedPrompt.wrapped?.prompt || message },
-        ],
-        temperature: 0.7,
-        max_tokens: 1024,
-      },
-    });
+    const AI_TIMEOUT_MS = 120000;
+    const aiResult = await Promise.race([
+      gatewayRoute({
+        mode: 'single',
+        taskType: route.taskType,
+        params: {
+          model: wrappedPrompt.modelHint?.provider || 'qwen-turbo',
+          messages: [
+            { role: 'system', content: wrappedPrompt.wrapped?.system || '你是专业的电商内容创作专家。' },
+            { role: 'user', content: wrappedPrompt.wrapped?.prompt || message },
+          ],
+          temperature: 0.7,
+          max_tokens: 1024,
+        },
+      }),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('AI 调用超时')), AI_TIMEOUT_MS)),
+    ]);
 
     // gatewayRoute 返回完整结果，非流式；提取文本并按字符分块发送以模拟流式体验
     const fullText = typeof aiResult?.output === 'string' ? aiResult.output
