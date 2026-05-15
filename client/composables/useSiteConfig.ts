@@ -91,22 +91,50 @@ const cache: Record<string, any> = {}
 // ── SSE 连接池：所有 useSiteConfig 调用共享一个 EventSource ──
 let sharedEventSource: EventSource | null = null;
 let sseRefCount = 0;
+let sseReconnectTimer: ReturnType<typeof setTimeout> | null = null;
+let sseRetries = 0;
+const MAX_SSE_RETRIES = 5;
 const sseListeners = new Map<string, () => void>();
 
 function ensureSSE() {
   if (sharedEventSource || import.meta.server) return;
   try {
     sseRefCount++;
-    sharedEventSource = new EventSource('/api/config/version/stream');
-    sharedEventSource.onmessage = (e) => {
-      let data: any
-      try { data = JSON.parse(e.data) } catch { return }
-      if (data.version && !data.heartbeat) {
-        // 通知所有注册的监听器（各自清缓存 + 刷新）
-        sseListeners.forEach(fn => fn());
-      }
-    };
+
+    function connect() {
+      sharedEventSource = new EventSource('/api/config/version/stream');
+      sharedEventSource.onmessage = (e) => {
+        let data: any
+        try { data = JSON.parse(e.data) } catch { return }
+        if (data.version && !data.heartbeat) {
+          sseRetries = 0;
+          sseListeners.forEach(fn => fn());
+        }
+      };
+      sharedEventSource.onerror = () => {
+        sharedEventSource?.close();
+        sharedEventSource = null;
+        if (sseRetries < MAX_SSE_RETRIES) {
+          const delay = Math.min(1000 * Math.pow(2, sseRetries), 30000);
+          sseRetries++;
+          sseReconnectTimer = setTimeout(connect, delay);
+        }
+      };
+    }
+    connect();
   } catch { /* SSE not available */ }
+}
+
+function teardownSSE() {
+  sseRefCount = Math.max(0, sseRefCount - 1)
+  if (sseRefCount === 0) {
+    if (sseReconnectTimer) { clearTimeout(sseReconnectTimer); sseReconnectTimer = null; }
+    sseRetries = 0;
+    if (sharedEventSource) {
+      sharedEventSource.close();
+      sharedEventSource = null;
+    }
+  }
 }
 
 function teardownSSE() {

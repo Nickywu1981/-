@@ -76,15 +76,21 @@ async function fetchUnread() {
 }
 
 async function readOne(item: any) {
+  const prevRead = item.is_read
+  const prevCount = unreadCount.value
   item.is_read = 1;
   unreadCount.value = Math.max(0, unreadCount.value - 1);
-  try { await $fetch(`/api/notifications/${item.id}/read`, { credentials: 'include', method: 'PUT' }); } catch { /* optimistic */ }
+  try { await $fetch(`/api/notifications/${item.id}/read`, { credentials: 'include', method: 'PUT' }); }
+  catch { item.is_read = prevRead; unreadCount.value = prevCount; }
 }
 
 async function markAllRead() {
+  const prevItems = list.value.map((n: any) => n.is_read)
+  const prevCount = unreadCount.value
   list.value.forEach((n: any) => (n.is_read = 1));
   unreadCount.value = 0;
-  try { await $fetch('/api/notifications/read-all', { credentials: 'include', method: 'PUT' }); } catch { /* optimistic */ }
+  try { await $fetch('/api/notifications/read-all', { credentials: 'include', method: 'PUT' }); }
+  catch { list.value.forEach((n: any, i: number) => (n.is_read = prevItems[i])); unreadCount.value = prevCount; }
 }
 
 onMounted(() => { Promise.all([fetch(), fetchUnread()]).catch((e: unknown) => console.error('[Notifications] Load failed:', e)); });

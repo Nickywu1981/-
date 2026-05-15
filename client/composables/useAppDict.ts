@@ -20,16 +20,18 @@ interface DictResponse {
   data?: DictItem[]
 }
 
-const cache: Record<string, DictItem[]> = {}
+const cache: Record<string, { data: DictItem[]; ts: number }> = {}
+const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
 
 export function useAppDict(dictKey: string, fallbackList?: DictItem[]) {
-  const options = ref<DictItem[]>(cache[dictKey] || fallbackList || [])
-  const loading = ref(!cache[dictKey])
+  const options = ref<DictItem[]>(cache[dictKey]?.data || fallbackList || [])
+  const loading = ref(!cache[dictKey]?.data)
   const apiBase = useRuntimeConfig().public.apiBase || '/api'
 
   async function fetchDict() {
-    if (cache[dictKey]) {
-      options.value = cache[dictKey]
+    const cached = cache[dictKey]
+    if (cached && Date.now() - cached.ts < CACHE_TTL) {
+      options.value = cached.data
       loading.value = false
       return
     }
@@ -38,8 +40,8 @@ export function useAppDict(dictKey: string, fallbackList?: DictItem[]) {
       const fetcher = import.meta.server ? useRequestFetch() : $fetch
       const res = await fetcher<DictResponse>(`${apiBase}/config/dict/${dictKey}`, { credentials: 'include' })
       if (res.code === 200) {
-        cache[dictKey] = res.data || []
-        options.value = cache[dictKey]
+        cache[dictKey] = { data: res.data || [], ts: Date.now() }
+        options.value = cache[dictKey].data
       }
     } catch (e) {
       if (import.meta.dev) console.warn(`[useAppDict] ${dictKey} 加载失败`, e)

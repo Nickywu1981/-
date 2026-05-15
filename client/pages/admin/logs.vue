@@ -116,9 +116,15 @@ function levelBadge(l: string) {
   return 'badge-info'
 }
 
+function escapeCSV(v: unknown): string {
+  const s = String(v ?? '')
+  if (/^[=+\-@]/.test(s)) return `'${s}`
+  return s.replace(/"/g, '""')
+}
+
 function exportLogs() {
   const csv = ['ID,用户ID,操作,级别,详情,IP,时间']
-  list.value.forEach(l => csv.push(`${l.id},${l.user_id},"${l.action}","${l.level || 'INFO'}","${l.detail || ''}",${l.ip || ''},"${l.create_time}"`))
+  list.value.forEach(l => csv.push([l.id, l.user_id, l.action, l.level || 'INFO', l.detail || '', l.ip || '', l.create_time].map(c => `"${escapeCSV(c)}"`).join(',')))
   const blob = new Blob(['\uFEFF' + csv.join('\n')], { type: 'text/csv;charset=utf-8' })
   downloadBlob(blob, `logs-${new Date().toISOString().slice(0,10)}.csv`)
   toast.success(t('common.csv_exported'))

@@ -50,6 +50,7 @@
 definePageMeta({ layout: 'user-workspace', middleware: ['auth'] });
 const toast = useToast();
 const { t } = useI18n();
+const { downloadBlob } = useFileDownload();
 
 const period = ref('daily');
 const loading = ref(false);
@@ -95,15 +96,18 @@ async function loadStats() {
 
 function switchPeriod(p) { period.value = p; loadStats(); }
 
+function escapeCSV(v: unknown): string {
+  const s = String(v ?? '')
+  if (/^[=+\-@]/.test(s)) return `'${s}`
+  return s.replace(/"/g, '""')
+}
+
 function exportReport() {
   const csv = [[t('enterprise.reports.date'), t('enterprise.reports.orders'), t('enterprise.reports.revenue'), t('enterprise.reports.refund'), t('enterprise.reports.net')]]
     .concat(stats.value.map(d => [d.date, d.orders, d.revenue, d.refund, d.net]))
-    .map(row => row.join(',')).join('\n');
+    .map(row => row.map(c => escapeCSV(c)).join(',')).join('\n');
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = `report_${dateRange.value.start}_${dateRange.value.end}.csv`;
-  a.click(); URL.revokeObjectURL(url);
+  downloadBlob(blob, `report_${dateRange.value.start}_${dateRange.value.end}.csv`);
 }
 </script>
 

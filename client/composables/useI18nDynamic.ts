@@ -58,6 +58,9 @@ const ready = ref(false)
 const error = ref<string | null>(null)
 let sseSource: EventSource | null = null
 let sseRefCount = 0
+let sseReconnectTimer: ReturnType<typeof setTimeout> | null = null
+let sseRetries = 0
+const MAX_SSE_RETRIES = 5
 
 export function useI18nDynamic() {
   const { t, locale } = useI18n()
@@ -117,15 +120,31 @@ export function useI18nDynamic() {
     sseRefCount++
     if (!sseSource) {
       try {
-        sseSource = new EventSource('/api/i18n/version/stream')
-        sseSource.onmessage = (event) => {
-          try { const { version } = JSON.parse(event.data); if (version) refresh() } catch { /* ignore */ }
+        function connectI18nSSE() {
+          sseSource = new EventSource('/api/i18n/version/stream')
+          sseSource.onmessage = (event) => {
+            try { const { version } = JSON.parse(event.data); if (version) { sseRetries = 0; refresh() } } catch { /* ignore */ }
+          }
+          sseSource.onerror = () => {
+            sseSource?.close()
+            sseSource = null
+            if (sseRetries < MAX_SSE_RETRIES) {
+              const delay = Math.min(1000 * Math.pow(2, sseRetries), 30000)
+              sseRetries++
+              sseReconnectTimer = setTimeout(connectI18nSSE, delay)
+            }
+          }
         }
+        connectI18nSSE()
       } catch { /* SSE not available */ }
     }
     onUnmounted(() => {
       sseRefCount--
-      if (sseRefCount <= 0 && sseSource) { sseSource.close(); sseSource = null; sseRefCount = 0 }
+      if (sseRefCount === 0) {
+        if (sseReconnectTimer) { clearTimeout(sseReconnectTimer); sseReconnectTimer = null }
+        sseRetries = 0
+        if (sseSource) { sseSource.close(); sseSource = null }
+      }
     })
   }
 

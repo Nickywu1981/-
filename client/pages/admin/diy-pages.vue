@@ -192,6 +192,7 @@ async function deleteItem(id: number) {
 
 async function batchPublish() {
   if (!selectedIds.value.length) return
+  if (!await confirm({ message: t('admin_diy_pages.batch_publish_confirm', { count: selectedIds.value.length }) })) return
   try {
     await $fetch('/api/diy/batch/publish', { method: 'POST', credentials: 'include', body: { ids: selectedIds.value } })
     toast.success(t('admin_diy_pages.batch_publish_success', { count: selectedIds.value.length }))
@@ -201,6 +202,7 @@ async function batchPublish() {
 
 async function batchUnpublish() {
   if (!selectedIds.value.length) return
+  if (!await confirm({ message: t('admin_diy_pages.batch_unpublish_confirm', { count: selectedIds.value.length }) })) return
   try {
     await $fetch('/api/diy/batch/unpublish', { method: 'POST', credentials: 'include', body: { ids: selectedIds.value } })
     toast.success(t('admin_diy_pages.batch_unpublish_success', { count: selectedIds.value.length }))

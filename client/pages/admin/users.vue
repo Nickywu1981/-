@@ -166,9 +166,10 @@ async function batchToggleStatus(status: number) {
     const ids = [...selectedIds.value]
     const data = await $fetch('/api/admin/users/batch-status', { method: 'PUT', credentials: 'include', body: { ids, status } })
     const res = data as any
-    if (res?.code === 200) { toast.success(status === 1 ? t('admin_users.batch_disabled_msg', { count: ids.length }) : t('admin_users.batch_enabled_msg', { count: ids.length })); selectedIds.value = new Set(); fetchData() }
+    if (res?.code === 200) { toast.success(status === 1 ? t('admin_users.batch_disabled_msg', { count: ids.length }) : t('admin_users.batch_enabled_msg', { count: ids.length })); fetchData() }
     else { toast.error(res?.msg || t('common.fail')) }
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('common.fail')) }
+  finally { selectedIds.value = new Set() }
 }
 
 function openEdit(u: any) { editForm.value = { ...u }; editOpen.value = true }
@@ -183,6 +184,12 @@ async function saveEdit() {
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(err?.data?.msg || err.message || t('common.failed_save')) } finally { saving.value = false }
 }
 
+function escapeCSV(v: unknown): string {
+  const s = String(v ?? '')
+  if (/^[=+\-@]/.test(s)) return `'${s}`
+  return s.replace(/"/g, '""')
+}
+
 function exportCSV() {
   const headers = [t('common.id'), t('admin_users.col_username'), t('admin_users.col_nickname'), t('admin_users.col_phone'), t('admin_users.col_plan'), t('admin_users.col_balance'), t('admin_users.col_status'), t('admin_users.col_register_time')]
   const planLabels: Record<number, string> = { 0: t('admin_users.plan_free'), 1: t('admin_users.plan_monthly'), 2: t('admin_users.plan_quarterly'), 3: t('admin_users.plan_yearly') }
@@ -193,7 +200,7 @@ function exportCSV() {
     u.credit_balance ?? 0, statusLabels[u.status] ?? '',
     u.create_time?.slice(0, 10) || '',
   ])
-  const csv = [headers.join(','), ...rows.map(r => r.map(c => `"${c}"`).join(','))].join('\n')
+  const csv = [headers.join(','), ...rows.map(r => r.map(c => `"${escapeCSV(c)}"`).join(','))].join('\n')
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' })
   downloadBlob(blob, `${t('admin_users.page_title')}_${new Date().toISOString().slice(0, 10)}.csv`)
   toast.success(t('admin_users.export_success'))

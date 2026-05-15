@@ -76,6 +76,7 @@ export const useAuthStore = defineStore('auth', {
       } catch { /* best-effort */ }
       this.user = null
       this.isLoggedIn = false
+      try { window.dispatchEvent(new CustomEvent('auth:logout')) } catch { /* noop */ }
       await navigateTo('/')
     },
   },
