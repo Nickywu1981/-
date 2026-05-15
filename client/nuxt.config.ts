@@ -123,7 +123,17 @@ export default defineNuxtConfig({
       // 注入自定义 SW 代码
       sourcemap: false,
       runtimeCaching: [
-        // API GET — 网络优先 + 长期缓存 + 后台更新
+        // 图片生成结果 — 短缓存 (必须在 /api/** 规则之前)
+        {
+          urlPattern: /\/api\/.*(?:image|generate|result).*/i,
+          handler: 'StaleWhileRevalidate',
+          method: 'GET',
+          options: {
+            cacheName: 'generated-results',
+            expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 2 },
+          },
+        },
+        // API GET — 网络优先 + 长期缓存
         {
           urlPattern: '/api/**',
           handler: 'NetworkFirst',
@@ -132,29 +142,15 @@ export default defineNuxtConfig({
             cacheName: 'api-cache',
             networkTimeoutSeconds: 10,
             expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 30 },
-            backgroundSync: {
-              name: 'movio-api-queue',
-              options: { maxRetentionTime: 60 * 60 * 24 },
-            },
           },
         },
-        // 静态资源 — 缓存优先
+        // 静态资源 — 缓存优先 (不含 woff2, 由下方字体规则处理)
         {
-          urlPattern: /\.(?:js|css|woff2?|png|jpg|webp|avif|svg|ico)$/,
+          urlPattern: /\.(?:js|css|png|jpg|webp|avif|svg|ico)$/,
           handler: 'CacheFirst',
           options: {
             cacheName: 'static-assets',
             expiration: { maxEntries: 500, maxAgeSeconds: 60 * 60 * 24 * 7 },
-          },
-        },
-        // 图片生成结果 — 后台更新
-        {
-          urlPattern: /\/api\/.*(?:image|generate|result).*/i,
-          handler: 'StaleWhileRevalidate',
-          method: 'GET',
-          options: {
-            cacheName: 'generated-results',
-            expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 2 },
           },
         },
         // 字体 — 缓存优先长过期

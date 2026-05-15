@@ -46,7 +46,7 @@
   </style>
   <script>
     window.addEventListener('online', () => location.reload());
-    setInterval(() => { if (navigator.onLine) location.reload(); }, 5000);
+    const pollTimer = setInterval(() => { if (navigator.onLine) { clearInterval(pollTimer); location.reload(); } }, 5000);
   </script>
 </head>
 <body>

@@ -55,7 +55,7 @@
         <textarea v-model="sendDialog.content" maxlength="5000" :placeholder="$t('common.content') + ' *'" rows="3"></textarea>
         <div class="modal-actions">
           <button class="btn-cancel" @click="sendDialog.open = false">{{ $t('common.cancel') }}</button>
-          <button class="btn" @click="confirmSend">{{ $t('common.send') }}</button>
+          <button class="btn" :disabled="sending" @click="confirmSend">{{ sending ? $t('common.sending') : $t('common.send') }}</button>
         </div>
       </div>
     </div>
@@ -95,16 +95,20 @@ async function fetch() {
   } catch (e: unknown) { toast.error(t('common.loadFail')) } finally { loading.value = false }
 }
 
+const sending = ref(false)
+
 function search() { page.value = 1; fetch() }
 function onPageChange(p: number) { page.value = p; fetch() }
 
 async function confirmSend() {
   if (!sendDialog.userId || !sendDialog.title || !sendDialog.content) { toast.warn(t('common.fill_all_fields')); return }
+  sending.value = true
   try {
     const data = await $fetch('/api/notifications/send', { method: 'POST', credentials: 'include', body: { userId: +sendDialog.userId, type: sendDialog.type, title: sendDialog.title, content: sendDialog.content } }) as ApiResponse
     if (data?.code === 200) { toast.success(t('common.sent')); sendDialog.open = false; fetch() }
     else { toast.error(data?.msg || t('common.failed_send')) }
   } catch (e: unknown) { toast.error(t('common.failed_send')) }
+  finally { sending.value = false }
 }
 
 async function doDelete(n: any) {

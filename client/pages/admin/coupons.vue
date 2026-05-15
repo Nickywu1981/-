@@ -51,11 +51,11 @@
             <option value="percent">{{ $t('admin_coupons.type_option_percent') }}</option>
           </select>
         </label>
-        <label>{{ $t('admin_coupons.label_value') }} <input v-model.number="form.value" class="input" type="number" step="0.01" /></label>
-        <label>{{ $t('admin_coupons.label_min_amount') }} <input v-model.number="form.min_order_amount" class="input" type="number" step="0.01" /></label>
-        <label v-if="form.type === 'percent'">{{ $t('admin_coupons.label_max_discount') }} <input v-model.number="form.max_discount" class="input" type="number" step="0.01" /></label>
-        <label>{{ $t('admin_coupons.label_total_qty') }} <input v-model.number="form.total_quantity" class="input" type="number" /></label>
-        <label>{{ $t('admin_coupons.label_per_user_limit') }} <input v-model.number="form.per_user_limit" class="input" type="number" /></label>
+        <label>{{ $t('admin_coupons.label_value') }} <input v-model.number="form.value" class="input" type="number" step="0.01" min="0" /></label>
+        <label>{{ $t('admin_coupons.label_min_amount') }} <input v-model.number="form.min_order_amount" class="input" type="number" step="0.01" min="0" /></label>
+        <label v-if="form.type === 'percent'">{{ $t('admin_coupons.label_max_discount') }} <input v-model.number="form.max_discount" class="input" type="number" step="0.01" min="0" /></label>
+        <label>{{ $t('admin_coupons.label_total_qty') }} <input v-model.number="form.total_quantity" class="input" type="number" min="0" /></label>
+        <label>{{ $t('admin_coupons.label_per_user_limit') }} <input v-model.number="form.per_user_limit" class="input" type="number" min="1" /></label>
         <label>{{ $t('admin_coupons.label_start_time') }} <input v-model="form.start_time" class="input" type="datetime-local" /></label>
         <label>{{ $t('admin_coupons.label_end_time') }} <input v-model="form.end_time" class="input" type="datetime-local" /></label>
         <label>{{ $t('admin_coupons.label_status') }}
