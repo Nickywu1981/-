@@ -118,7 +118,7 @@
         <!-- 展开态 -->
         <template v-else>
           <div class="cc-panel-hd">
-            <h3 class="cc-panel-title">结果预览</h3>
+            <h3 class="cc-panel-title">{{ t('workspace.slide_panel.result_preview') }}</h3>
             <button
               class="cc-panel-collapse"
               @click="panelExpanded = false"
@@ -134,13 +134,13 @@
 
             <!-- 提示词 -->
             <div v-if="prompt" class="cc-panel-prompt">
-              <div class="cc-panel-label">提示词</div>
+              <div class="cc-panel-label">{{ t('workspace.slide_panel.prompt_label') }}</div>
               <div class="cc-panel-text">{{ prompt }}</div>
             </div>
 
             <!-- 参数调整 -->
             <div v-if="panelParams.length" class="cc-panel-params">
-              <span class="cc-panel-label">参数</span>
+              <span class="cc-panel-label">{{ t('workspace.slide_panel.param_label') }}</span>
               <div class="cc-panel-param-row">
                 <select
                   v-for="(p, i) in panelParams"
@@ -165,10 +165,10 @@
               </div>
               <div class="cc-panel-progress-pct">{{ progress }}%</div>
               <div class="cc-panel-steps">
-                <span :class="{ done: progress >= 25 }">上传</span>
-                <span :class="{ done: progress >= 50 }">分析</span>
-                <span :class="{ done: progress >= 75 }">生成</span>
-                <span :class="{ done: progress >= 100 }">完成</span>
+                <span :class="{ done: progress >= 25 }">{{ t('workspace.slide_panel.step_upload_short') }}</span>
+                <span :class="{ done: progress >= 50 }">{{ t('workspace.slide_panel.step_analyze_short') }}</span>
+                <span :class="{ done: progress >= 75 }">{{ t('workspace.slide_panel.step_generate_short') }}</span>
+                <span :class="{ done: progress >= 100 }">{{ t('workspace.slide_panel.step_done_short') }}</span>
               </div>
             </div>
 
@@ -182,7 +182,7 @@
             <!-- 结果区 -->
             <div v-if="hasResult" class="cc-panel-result">
               <slot name="result">
-                <div class="cc-panel-result-done">🎉 生成完成</div>
+                <div class="cc-panel-result-done">{{ t('workspace.slide_panel.generation_complete') }}</div>
               </slot>
             </div>
           </div>

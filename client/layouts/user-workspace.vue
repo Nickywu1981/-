@@ -139,28 +139,28 @@
         <div class="topbar-right">
           <!-- 购买会员 -->
           <button class="tb-btn tb-btn-primary" @click="navigateTo('/member')">
-            💎 购买会员
+            💎 {{ t('workspace.topbar.buy_membership') }}
           </button>
 
           <!-- 免费领积分 -->
           <button class="tb-btn tb-btn-accent" @click="navigateTo('/invite')">
-            🎁 免费领积分
+            🎁 {{ t('workspace.topbar.free_credits') }}
           </button>
 
           <span class="tb-divider" />
 
           <!-- 在线客服 -->
-          <button class="tb-btn-icon" title="在线客服" @click="showCsModal = true">
+          <button class="tb-btn-icon" :title="t('workspace.topbar.customer_service')" @click="showCsModal = true">
             💬
           </button>
 
           <!-- 帮助 -->
-          <button class="tb-btn-icon" title="帮助" @click="navigateTo('/help')">
+          <button class="tb-btn-icon" :title="t('workspace.topbar.help')" @click="navigateTo('/help')">
             ❓
           </button>
 
           <!-- 通知 -->
-          <button class="tb-btn-icon tb-notify" title="通知" @click="navigateTo('/notifications')">
+          <button class="tb-btn-icon tb-notify" :title="t('workspace.topbar.notifications')" @click="navigateTo('/notifications')">
             🔔
             <span v-if="unreadCount > 0" class="tb-notify-dot">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
           </button>
@@ -169,7 +169,7 @@
 
           <!-- 管理后台 (仅管理员) -->
           <button v-if="isAdmin" class="tb-btn tb-btn-outline" @click="navigateTo('/admin')">
-            ⚙ 管理后台
+            ⚙ {{ t('workspace.admin_panel') }}
           </button>
 
           <span v-if="isAdmin" class="tb-divider" />
@@ -186,12 +186,12 @@
             <!-- 下拉菜单 -->
             <Transition name="tb-drop">
               <div v-if="showUserMenu" class="tb-dropdown">
-                <button class="tb-drop-item" @click.stop="navigateTo('/profile')">👤 个人中心</button>
-                <button class="tb-drop-item" @click.stop="navigateTo('/member')">💎 我的会员</button>
-                <button class="tb-drop-item" @click.stop="navigateTo('/credits')">🪙 我的积分</button>
-                <button class="tb-drop-item" @click.stop="navigateTo('/settings')">⚙ 账号设置</button>
+                <button class="tb-drop-item" @click.stop="navigateTo('/profile')">👤 {{ t('workspace.topbar.personal_center') }}</button>
+                <button class="tb-drop-item" @click.stop="navigateTo('/member')">💎 {{ t('workspace.topbar.my_membership') }}</button>
+                <button class="tb-drop-item" @click.stop="navigateTo('/credits')">🪙 {{ t('workspace.topbar.my_credits') }}</button>
+                <button class="tb-drop-item" @click.stop="navigateTo('/settings')">⚙ {{ t('workspace.topbar.account_settings') }}</button>
                 <div class="tb-drop-sep" />
-                <button class="tb-drop-item tb-drop-danger" @click.stop="handleLogout">🚪 退出登录</button>
+                <button class="tb-drop-item tb-drop-danger" @click.stop="handleLogout">🚪 {{ t('workspace.exit_login') }}</button>
               </div>
             </Transition>
           </div>

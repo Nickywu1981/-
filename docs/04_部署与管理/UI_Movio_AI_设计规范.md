@@ -2,7 +2,7 @@
 
 > **编写组**：G3 UI 设计组（UI-Designer 🔴主 / Doc-Writer 🟡辅）
 > **审核组**：G1 架构规划组（Architect）
-> **版本**：v1.12 | **日期**：2026-05-15
+> **版本**：v1.13 | **日期**：2026-05-15
 
 ---
 
@@ -839,4 +839,86 @@ R11 标记 `user-workspace.vue` 等 3 个 layout "CSS 完全缺失" — **本例
 
 ---
 
-> **文档版本**：v1.12 | **最后更新**：2026-05-15 | **审计轮次**：13 轮 | **G3 自修复**：45 项
+## 十四、第十四轮审计 — P1 硬编码中文 i18n 清零 + 旧 Token 普查 + 残留页面审计
+
+**审计日期**：2026-05-15  
+**范围**：`user-workspace.vue` 11 处硬编码中文、`creation.vue` 8 处硬编码中文、全站旧 CSS token 普查、剩余未审计页面
+
+### 10.33 user-workspace.vue 硬编码中文 i18n 化（P1，R14 修复 11 项）
+
+新增 `workspace.topbar.*` 9 个 i18n key（zh+en双语），复用既有 key 2 个：
+
+| 位置 | 原文 | 改为 |
+|------|------|------|
+| `:142` | `💎 购买会员` | `💎 {{ t('workspace.topbar.buy_membership') }}` |
+| `:147` | `🎁 免费领积分` | `🎁 {{ t('workspace.topbar.free_credits') }}` |
+| `:153` | `title="在线客服"` | `:title="t('workspace.topbar.customer_service')"` |
+| `:158` | `title="帮助"` | `:title="t('workspace.topbar.help')"` |
+| `:163` | `title="通知"` | `:title="t('workspace.topbar.notifications')"` |
+| `:172` | `⚙ 管理后台` | `⚙ {{ t('workspace.admin_panel') }}` |
+| `:189` | `👤 个人中心` | `👤 {{ t('workspace.topbar.personal_center') }}` |
+| `:190` | `💎 我的会员` | `💎 {{ t('workspace.topbar.my_membership') }}` |
+| `:191` | `🪙 我的积分` | `🪙 {{ t('workspace.topbar.my_credits') }}` |
+| `:192` | `⚙ 账号设置` | `⚙ {{ t('workspace.topbar.account_settings') }}` |
+| `:194` | `🚪 退出登录` | `🚪 {{ t('workspace.exit_login') }}` |
+
+新增 i18n 文件键值：`zh.json` + `en.json` 各 `workspace.topbar` 段 9 个 key。
+
+### 10.34 creation.vue 硬编码中文 i18n 化（P1，R14 修复 8 项）
+
+新增 `workspace.slide_panel.result_preview` + `generation_complete` + 4 个 `_short` 步骤 key：
+
+| 位置 | 原文 | 改为 |
+|------|------|------|
+| `:121` | `结果预览` | `{{ t('workspace.slide_panel.result_preview') }}` |
+| `:137` | `提示词` | `{{ t('workspace.slide_panel.prompt_label') }}` |
+| `:143` | `参数` | `{{ t('workspace.slide_panel.param_label') }}` |
+| `:168` | `上传` | `{{ t('workspace.slide_panel.step_upload_short') }}` |
+| `:169` | `分析` | `{{ t('workspace.slide_panel.step_analyze_short') }}` |
+| `:170` | `生成` | `{{ t('workspace.slide_panel.step_generate_short') }}` |
+| `:171` | `完成` | `{{ t('workspace.slide_panel.step_done_short') }}` |
+| `:185` | `🎉 生成完成` | `{{ t('workspace.slide_panel.generation_complete') }}` |
+
+### 10.35 旧 CSS Token 普查
+
+| Token | 定义位置 | 使用文件数 | 状态 |
+|------|------|:--:|------|
+| `--tx` / `--tx2` / `--tx3` | `theme.css:22-24` (亮+暗) | 2 文件 10 处 | **P3 待迁移** → `--text-primary/secondary/muted` |
+| `--text-tertiary` | `theme.css:185` / `unified-design-system.css:86` | 25+ 文件 | **有效 token**，是设计系统正式成员 |
+
+待迁移文件：
+- `ComingSoonPlaceholder.vue:45-51` — 4 处 `var(--tx,...)` / `var(--tx2,...)` / `var(--tx3,...)`
+- `workspace/assistant.vue:49,53,87,91,100,101` — 6 处 `var(--tx,...)` / `var(--tx2,...)`
+
+### 10.36 剩余页面审计摘要
+
+| 文件 | 状态 | 备注 |
+|------|:--:|------|
+| `enterprise/dashboard.vue` | ✅ 三态完整 | skeleton+error+content，全 i18n，有 aria |
+| `admin/moderation.vue` | ⚠️ 缺 error 态 | 加载+空态正常，审核模态窗有 Teleport |
+| `account/billing.vue` | ✅ | 使用 `--text-tertiary`（有效 token） |
+| `account/credits.vue` | ✅ | 使用 `--text-tertiary`（有效 token） |
+| `agent/dashboard.vue` | ✅ | 使用 `--text-tertiary`（有效 token） |
+
+### 10.37 新增待处理项
+
+| 优先级 | 问题 | 位置 |
+|:--:|------|------|
+| P3 | `--tx`/`--tx2`/`--tx3` 旧 token 10 处迁移 | `ComingSoonPlaceholder.vue:45-51` + `assistant.vue:49-101` |
+| P3 | `#67c23a` 硬编码绿色 | `enterprise/dashboard.vue:25` StatsCard color prop |
+
+### 10.38 本轮累计
+
+| 优先级 | R13 累计 | R14 新增 | R14 修复 | 总计 |
+|:--:|:--:|:--:|:--:|:--:|
+| P0 | 46 | 0 | 0 | **46** |
+| P1 | 31 | 0 | -19 | **12** |
+| P2 | 0 | 0 | 0 | **0** |
+| P3 | 13 | 2 | 0 | **15** |
+| **合计** | **78** | **2** | **-19** | **61** |
+
+**61 项问题，G3 已自行修复 64 项（含超额修复），P1/P2 大幅削减。**
+
+---
+
+> **文档版本**：v1.13 | **最后更新**：2026-05-15 | **审计轮次**：14 轮 | **G3 自修复**：64 项
