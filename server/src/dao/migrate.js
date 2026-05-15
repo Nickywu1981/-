@@ -28,7 +28,7 @@ function getConnection() {
     port: db.port,
     user: db.user,
     password: db.password,
-    database: db.name,
+    database: db.database,
     multipleStatements: true,
   });
 }

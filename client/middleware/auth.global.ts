@@ -40,12 +40,12 @@ export default defineNuxtRouteMiddleware(async (to) => {
         err?.statusCode === 403 || err?.response?.status === 403 || err?.data?.code === 403) {
       return navigateTo(`/login?redirect=${encodeURIComponent(to.fullPath)}`)
     }
-    // dev mode: backend unavailable → allow UI preview (non-protected pages only)
-    if (import.meta.dev) {
-      console.info('[auth] dev mode — backend unavailable, previewing UI as anonymous')
+    // dev mode: backend unavailable → allow UI preview ONLY when explicitly opted in
+    if (import.meta.dev && import.meta.env?.VITE_DEV_AUTH_BYPASS === 'true') {
+      console.info('[auth] dev-bypass enabled via VITE_DEV_AUTH_BYPASS — backend unavailable, previewing UI as anonymous')
       // still block admin/gateway/ops in dev unless explicitly allowed
-      if (to.path.startsWith('/admin') || to.path.startsWith('/gateway') || to.path.startsWith('/ops') || to.path.startsWith('/finance')) {
-        console.warn(`[auth] dev mode — blocking unauthenticated access to ${to.path}`)
+      if (to.path.startsWith('/admin') || to.path.startsWith('/gateway') || to.path.startsWith('/ops') || to.path.startsWith('/finance') || to.path.startsWith('/enterprise')) {
+        console.warn(`[auth] dev-bypass — blocking unauthenticated access to ${to.path}`)
         return navigateTo(`/login?redirect=${encodeURIComponent(to.fullPath)}`)
       }
       return

@@ -65,9 +65,22 @@ export function cleanStaleBreakers(activeModelIds) {
 }
 
 export function timeoutPromise(ms, label) {
-  return new Promise((_, reject) =>
-    setTimeout(() => reject(new Error(`${label} 超时 (${ms}ms)`)), ms),
-  );
+  let timer;
+  const promise = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new Error(`${label} 超时 (${ms}ms)`)), ms);
+    timer.unref(); // 不阻止进程退出；调用方应在 race 后 clearTimeout(timer)
+  });
+  promise._timer = timer;
+  return promise;
+}
+
+/**
+ * Promise.race with automatic timeout cleanup.
+ * Clears the timeout timer when either side resolves, preventing timer leaks.
+ */
+export function raceWithTimeout(mainPromise, ms, label) {
+  const timeout = timeoutPromise(ms, label);
+  return Promise.race([mainPromise, timeout]).finally(() => clearTimeout(timeout._timer));
 }
 
 // ==================== Step 0: 业务管线 (强制) ====================

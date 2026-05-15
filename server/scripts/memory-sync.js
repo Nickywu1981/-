@@ -101,7 +101,7 @@ const gt = {
   adapters: countFiles(resolve(root, 'server/src/services/adapters'), '.js'),
   models: (() => {
     try {
-      const models = JSON.parse(sh('node -e "const m=require(\'./server/src/services/modelDispatcher.js\');console.log(JSON.stringify(Object.keys(m.listModels?m.listModels():{})))"'));
+      const models = JSON.parse(sh('node --input-type=module -e "const m = await import(\'./server/src/services/modelDispatcher.js\'); console.log(JSON.stringify(Object.keys(m.listModels?m.listModels():{})))"'));
       return models || [];
     } catch { return []; }
   })(),

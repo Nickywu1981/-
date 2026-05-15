@@ -32,7 +32,7 @@ export function encrypt(text) {
 export function decrypt(encryptedText) {
   if (!encryptedText) return '';
   const parts = encryptedText.split(':');
-  if (parts.length !== 3) return encryptedText; // 旧格式兼容
+  if (parts.length !== 3) throw new Error('解密失败：数据格式无效，非加密数据或密钥不匹配');
   const iv = Buffer.from(parts[0], 'hex');
   const authTag = Buffer.from(parts[1], 'hex');
   const decipher = crypto.createDecipheriv(ALGORITHM, getSecretKey(), iv);

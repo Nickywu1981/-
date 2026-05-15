@@ -5,6 +5,9 @@
  */
 import { Router } from 'express';
 import multer from 'multer';
+import path from 'path';
+import crypto from 'crypto';
+import { fileURLToPath } from 'url';
 import { authMiddleware } from '../middleware/auth.js';
 import { e2bLimiter } from '../middleware/rateLimiter.js';
 import { validate } from '../utils/validate.js';
@@ -12,7 +15,17 @@ import { z } from 'zod';
 import * as ctrl from '../controller/agentController.js';
 
 const router = Router();
-const upload = multer({ dest: 'uploads/references/', limits: { fileSize: 100 * 1024 * 1024 } }); // 100MB
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const ALLOWED_MIME = ['image/jpeg','image/png','image/webp','image/gif','image/svg+xml','video/mp4','video/webm','video/quicktime','image/avif','image/bmp','image/tiff'];
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: path.resolve(__dirname, '../../uploads/references/'),
+    filename: (_req, file, cb) => cb(null, `${crypto.randomUUID()}${path.extname(file.originalname)}`),
+  }),
+  limits: { fileSize: 100 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => cb(null, ALLOWED_MIME.includes(file.mimetype)),
+});
 
 // ===== Zod Schemas =====
 
