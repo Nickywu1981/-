@@ -185,10 +185,10 @@ function handleClose() {
 </script>
 
 <style scoped>
-.sp-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 200; }
+.sp-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 3000; }
 .sp-panel {
   position: fixed; top: 0; right: 0; bottom: 0; width: 480px; max-width: 100vw;
-  background: #fff; z-index: 201; display: flex; flex-direction: column;
+  background: #fff; z-index: 3001; display: flex; flex-direction: column;
   box-shadow: -8px 0 32px rgba(0,0,0,0.12); outline: none;
 }
 

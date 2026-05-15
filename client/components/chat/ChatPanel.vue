@@ -194,14 +194,14 @@ onUnmounted(() => {
 
 <style scoped>
 .cp-overlay {
-  position: fixed; inset: 0; z-index: 1100;
+  position: fixed; inset: 0; z-index: 3000;
   background: rgba(0,0,0,0.3);
 }
 .cp-panel {
   position: fixed;
   top: 0; left: 260px; bottom: 0;
   width: 420px;
-  z-index: 1101;
+  z-index: 3001;
   display: flex; flex-direction: column;
   background: var(--bg-page);
   border-right: 1px solid var(--border-light);

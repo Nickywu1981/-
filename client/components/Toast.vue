@@ -39,7 +39,7 @@ onUnmounted(() => { for (const timer of timers.values()) clearTimeout(timer); ti
 </script>
 
 <style scoped>
-.toast-container { position: fixed; top: 70px; right: 20px; z-index: var(--cfg-z-toast, 1070); display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+.toast-container { position: fixed; top: 70px; right: 20px; z-index: var(--cfg-z-toast, 6000); display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
 .toast-item {
   display: flex; align-items: center; gap: 10px; padding: 10px 16px;
   border-radius: var(--radius-lg); font-size: 14px;
