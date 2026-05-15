@@ -142,16 +142,18 @@
 </template>
 
 <script setup lang="ts">
+import type { TestCategory, ModelMap, AvailableModel, ModelsByCategoryFn } from '~/types/test-workbench'
+
 const props = withDefaults(defineProps<{
   activeTab: string
   paramsError: string
   running: boolean
   canRun: boolean
   runButtonLabel: string
-  categories: Array<{ key: string; label: string; icon: string }>
-  modelMap: Record<string, any>
-  availableModels: any[]
-  modelsByCategory: (cat: string) => any[]
+  categories: TestCategory[]
+  modelMap: ModelMap
+  availableModels: AvailableModel[]
+  modelsByCategory: ModelsByCategoryFn
   selectedSequence: string[]
   compareModels: string[]
 }>(), {
@@ -160,10 +162,10 @@ const props = withDefaults(defineProps<{
   running: false,
   canRun: false,
   runButtonLabel: 'Run',
-  categories: () => [],
+  categories: () => [] as TestCategory[],
   modelMap: () => ({}),
-  availableModels: () => [],
-  modelsByCategory: () => () => [],
+  availableModels: () => [] as AvailableModel[],
+  modelsByCategory: () => (() => []) as ModelsByCategoryFn,
   selectedSequence: () => [],
   compareModels: () => [],
 })

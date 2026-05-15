@@ -39,7 +39,7 @@
         </span>
         <span class="hi-model">{{ h.model_key || h.task_type || h.model_sequence?.join(' → ') }}</span>
         <span class="hi-prompt">{{ truncate(h.prompt, 60) }}</span>
-        <span class="hi-dur">{{ formatDuration(h.duration_ms) }}</span>
+        <span class="hi-dur">{{ formatDurationMs(h.duration_ms) }}</span>
         <span class="hi-status">{{ h.error ? '❌' : '✅' }}</span>
         <span class="hi-time">{{ formatTime(h.created_at) }}</span>
         <button class="hi-delete" :aria-label="$t('test_workbench.delete_history')" @click.stop="$emit('deleteHistoryItem', h.id)">🗑</button>
@@ -55,8 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { truncate } from '@/utils/format'
-import { formatDateTime } from '@/utils/format'
+import { truncate, formatDateTime, formatDurationMs } from '@/utils/format'
 
 interface HistoryItem {
   id: string
@@ -101,12 +100,6 @@ function goPage(page: number) {
 }
 
 const formatTime = (iso: string) => iso ? formatDateTime(iso, 'HH:mm:ss') : ''
-
-function formatDuration(ms: number) {
-  if (!ms) return '0ms'
-  if (ms < 1000) return ms + 'ms'
-  return (ms / 1000).toFixed(2) + 's'
-}
 </script>
 
 <style scoped>

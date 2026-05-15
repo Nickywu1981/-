@@ -64,6 +64,13 @@ export function formatDuration(seconds: number, locale?: string): string {
   return isZh ? `${h}时${m}分` : `${h}h${m}m`
 }
 
+/** Millisecond-based duration formatting (for API latency displays) */
+export function formatDurationMs(ms: number): string {
+  if (!ms) return '0ms'
+  if (ms < 1000) return ms + 'ms'
+  return (ms / 1000).toFixed(2) + 's'
+}
+
 export function isToday(iso: string): boolean {
   return dayjs(iso).isSame(dayjs(), 'day');
 }

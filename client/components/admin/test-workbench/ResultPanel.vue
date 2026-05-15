@@ -5,7 +5,7 @@
         <span v-if="lastResult.error">{{ $t('test_workbench.test_failed') }}</span>
         <span v-else>{{ $t('test_workbench.test_success') }}</span>
         <span class="result-meta">
-          {{ lastResult.type }} · {{ formatDuration(lastResult.duration_ms) }}
+          {{ lastResult.type }} · {{ formatDurationMs(lastResult.duration_ms) }}
           · {{ formatTime(lastResult.created_at) }}
         </span>
       </h3>
@@ -20,7 +20,7 @@
       <div class="compare-grid">
         <div v-for="c in lastResult.comparisons" :key="c.model_key" class="compare-card">
           <div class="compare-label">{{ modelMap[c.model_key]?.name || c.model_key }}</div>
-          <div class="compare-dur">{{ formatDuration(c.duration_ms) }}</div>
+          <div class="compare-dur">{{ formatDurationMs(c.duration_ms) }}</div>
           <div v-if="c.success" class="compare-body">
             <pre class="result-json">{{ formatResult(c.result) }}</pre>
           </div>
@@ -40,7 +40,7 @@
           <div class="step-header">
             <span class="step-order">{{ $t('test_workbench.step_prefix') }}{{ step.order ?? Number(i) + 1 }}</span>
             <span class="step-model">{{ modelMap[step.model_key]?.name || step.model_key }}</span>
-            <span class="step-dur">{{ formatDuration(step.duration_ms) }}</span>
+            <span class="step-dur">{{ formatDurationMs(step.duration_ms) }}</span>
             <span class="step-status">{{ step.success ? '✅' : '❌' }}</span>
           </div>
           <div v-if="step.success" class="step-body">
@@ -70,12 +70,13 @@
 </template>
 
 <script setup lang="ts">
-import { formatDateTime } from '@/utils/format'
+import { formatDateTime, formatDurationMs } from '@/utils/format'
+import type { TestResult, ModelMap } from '~/types/test-workbench'
 
 const props = defineProps<{
-  lastResult: any
+  lastResult: TestResult | null
   running: boolean
-  modelMap: Record<string, any>
+  modelMap: ModelMap
 }>()
 
 defineEmits<{
@@ -85,13 +86,7 @@ defineEmits<{
 
 const formatTime = (iso: string) => iso ? formatDateTime(iso, 'HH:mm:ss') : ''
 
-function formatDuration(ms: number) {
-  if (!ms) return '0ms'
-  if (ms < 1000) return ms + 'ms'
-  return (ms / 1000).toFixed(2) + 's'
-}
-
-function formatResult(r: any) {
+function formatResult(r: unknown) {
   if (typeof r === 'string') return r
   return JSON.stringify(r, null, 2)
 }
