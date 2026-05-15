@@ -9,13 +9,14 @@
 import { BaseAgent } from '../core/agent.js';
 import { FunctionTool } from '../core/tool.js';
 import logger from '../../utils/logger.js';
+import { callLlmAndParseJson } from '../tools/ai/gateway-llm-call.js';
+import { batchImageGen } from '../tools/ai/gateway-image-batch.js';
 
 // ==================== 工具定义 ====================
 
 const viralAnalyzeTool = new FunctionTool('analyze_viral_video', async (params) => {
-  const { gatewayRoute } = await import('../../gateway/aiGatewayHub.js');
-
-  const prompt = `你是一个爆款视频分析专家。分析以下视频内容，提取爆款公式：
+  const result = await callLlmAndParseJson({
+    userPrompt: `你是一个爆款视频分析专家。分析以下视频内容，提取爆款公式：
 
 视频描述/链接: ${params.videoUrl || params.videoDescription || '未提供'}
 
@@ -30,27 +31,11 @@ const viralAnalyzeTool = new FunctionTool('analyze_viral_video', async (params) 
   "estimatedDuration": "预估时长(秒)",
   "musicStyle": "配乐风格",
   "viralFormula": "爆款公式一句话总结"
-}`;
-
-  const result = await gatewayRoute({
-    mode: 'single',
-    taskType: 'text_gen',
-    params: {
-      model: 'qwen-turbo',
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.3,
-      maxTokens: 800,
-    },
+}`,
+    temperature: 0.3,
+    maxTokens: 800,
   });
-
-  const raw = result?.output?.choices?.[0]?.message?.content || '';
-  const jsonMatch = raw.match(/\{[\s\S]*\}/);
-  try {
-    return jsonMatch ? JSON.parse(jsonMatch[0]) : { viralFormula: '分析失败，请提供更清晰的视频描述' };
-  } catch (e) {
-    logger.warn('[StoryboardAgent] Viral analysis parse failed', { error: e.message });
-    return { viralFormula: '分析结果解析失败' };
-  }
+  return result || { viralFormula: '分析失败，请提供更清晰的视频描述' };
 }, {
   description: '反推分析爆款视频逻辑（钩子/节奏/卡点/结尾公式）',
   parameters: {
@@ -60,9 +45,8 @@ const viralAnalyzeTool = new FunctionTool('analyze_viral_video', async (params) 
 });
 
 const scriptTool = new FunctionTool('generate_shooting_script', async (params) => {
-  const { gatewayRoute } = await import('../../gateway/aiGatewayHub.js');
-
-  const prompt = `你是一个带货视频脚本专家。为以下商品生成完整带货脚本：
+  const result = await callLlmAndParseJson({
+    userPrompt: `你是一个带货视频脚本专家。为以下商品生成完整带货脚本：
 
 商品: ${params.productName || '未指定'}
 卖点: ${params.sellingPoints || '高品质'}
@@ -84,27 +68,12 @@ ${params.viralInsight ? `爆款参考: ${params.viralInsight}` : ''}
   "musicHint": "推荐配乐类型"
 }
 
-规则：scenes至少5个，最多8个，每个scene的时长均匀分配。前3秒必须有强钩子。`;
-
-  const result = await gatewayRoute({
-    mode: 'single',
-    taskType: 'text_gen',
-    params: {
-      model: 'deepseek-v4-pro',
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.7,
-      maxTokens: 2000,
-    },
+规则：scenes至少5个，最多8个，每个scene的时长均匀分配。前3秒必须有强钩子。`,
+    model: 'deepseek-v4-pro',
+    temperature: 0.7,
+    maxTokens: 2000,
   });
-
-  const raw = result?.output?.choices?.[0]?.message?.content || '';
-  const jsonMatch = raw.match(/\{[\s\S]*\}/);
-  try {
-    return jsonMatch ? JSON.parse(jsonMatch[0]) : null;
-  } catch (e) {
-    logger.warn('[StoryboardAgent] Script parse failed', { error: e.message });
-    return null;
-  }
+  return result;
 }, {
   description: '生成带货视频完整拍摄脚本（含分镜/口播/运镜/配乐建议）',
   parameters: {
@@ -117,24 +86,23 @@ ${params.viralInsight ? `爆款参考: ${params.viralInsight}` : ''}
 });
 
 const storyboardTool = new FunctionTool('generate_storyboard_images', async (params) => {
-  const { gatewayInfer } = await import('../../gateway/aiGatewayHub.js');
-
   let scenes = [];
   try { scenes = typeof params.scenes === 'string' ? JSON.parse(params.scenes) : (params.scenes || []); } catch (e) { logger.warn('[StoryboardAgent] Scenes parse failed', { error: e.message }); }
 
-  const results = await Promise.allSettled(scenes.map(scene =>
-    gatewayInfer('gpt-image-2', {
-      prompt: `e-commerce video storyboard frame, scene ${scene.number}: ${scene.visual}, ${scene.camera || 'medium shot'}, cinematic lighting, 9:16 vertical video frame, commercial quality`,
-      size: '1024x1792',
-    }, { taskType: 'image_gen', source: 'storyboard' })
-  ));
+  const items = scenes.map(scene => ({
+    key: `scene_${scene.number || scene.key || Math.random()}`,
+    label: `分镜${scene.number || ''}`,
+    prompt: `e-commerce video storyboard frame, scene ${scene.number}: ${scene.visual}, ${scene.camera || 'medium shot'}, cinematic lighting, 9:16 vertical video frame, commercial quality`,
+    size: '1024x1792',
+  }));
 
+  const result = await batchImageGen(items, { source: 'storyboard' });
   return {
     type: 'storyboard_frames',
-    frames: results.map((r, i) => ({
+    frames: result.images.map((img, i) => ({
       sceneNumber: scenes[i]?.number || i + 1,
       description: scenes[i]?.visual || '',
-      url: r.status === 'fulfilled' ? (r.value?.images?.[0]?.url || r.value?.url) : null,
+      url: img.url,
     })),
   };
 }, {

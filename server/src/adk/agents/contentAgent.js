@@ -4,6 +4,7 @@
  */
 import { LlmAgent } from '../core/agent.js';
 import { FunctionTool } from '../core/tool.js';
+import { generateSellingPoints } from '../tools/services/copywriting-tools.js';
 
 const titleGenTool = new FunctionTool('generate_titles', async (params) => {
   const { default: service } = await import('../../services/copywritingService.js');
@@ -18,8 +19,7 @@ const titleGenTool = new FunctionTool('generate_titles', async (params) => {
 });
 
 const sellingPointTool = new FunctionTool('generate_selling_points', async (params) => {
-  const { default: service } = await import('../../services/copywritingService.js');
-  return service.generateSellingPoints(params.productName, params.platform, params.count || 5);
+  return generateSellingPoints(params);
 }, {
   description: '生成卖点文案，突出转化关键词',
   parameters: {

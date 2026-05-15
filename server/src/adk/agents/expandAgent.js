@@ -8,6 +8,7 @@
 import { BaseAgent } from '../core/agent.js';
 import { FunctionTool } from '../core/tool.js';
 import logger from '../../utils/logger.js';
+import { batchImageGen } from '../tools/ai/gateway-image-batch.js';
 
 // ==================== 工具定义 ====================
 
@@ -28,27 +29,19 @@ const whiteBgTool = new FunctionTool('generate_white_bg', async (params) => {
 });
 
 const multiAngleTool = new FunctionTool('expand_angles', async (params) => {
-  const { gatewayInfer } = await import('../../gateway/aiGatewayHub.js');
   const angles = ['front', 'side_left', 'side_right', 'back', '45_degree', 'detail_closeup'];
   const count = params.count || 4;
   const selected = angles.slice(0, count);
 
-  const results = await Promise.allSettled(selected.map(angle =>
-    gatewayInfer('gpt-image-2', {
-      prompt: `professional e-commerce product photography, ${angle} view, pure white background #FFFFFF, studio lighting, product centered, ultra high resolution, commercial quality${params.productName ? `, product: ${params.productName}` : ''}`,
-      size: params.size || '1024x1024',
-    }, { taskType: 'image_gen', source: 'expand_angles' })
-  ));
+  const items = selected.map(angle => ({
+    key: angle,
+    label: angle,
+    prompt: `professional e-commerce product photography, ${angle} view, pure white background #FFFFFF, studio lighting, product centered, ultra high resolution, commercial quality${params.productName ? `, product: ${params.productName}` : ''}`,
+    size: params.size || '1024x1024',
+  }));
 
-  return {
-    type: 'multi_angle',
-    angles: selected,
-    images: results.map((r, i) => ({
-      angle: selected[i],
-      url: r.status === 'fulfilled' ? (r.value?.images?.[0]?.url || r.value?.url) : null,
-      status: r.status,
-    })),
-  };
+  const result = await batchImageGen(items, { source: 'expand_angles' });
+  return { type: 'multi_angle', angles: selected, images: result.images.map((img, i) => ({ angle: selected[i], ...img })) };
 }, {
   description: '白底图→多角度图（正面/侧面/背面/45°）',
   parameters: {
@@ -59,25 +52,17 @@ const multiAngleTool = new FunctionTool('expand_angles', async (params) => {
 });
 
 const sceneTool = new FunctionTool('expand_scenes', async (params) => {
-  const { gatewayInfer } = await import('../../gateway/aiGatewayHub.js');
   const scenes = params.scenes || ['modern_living_room', 'minimalist_studio', 'outdoor_natural'];
 
-  const results = await Promise.allSettled(scenes.map(scene =>
-    gatewayInfer('gpt-image-2', {
-      prompt: `professional e-commerce lifestyle photography, ${params.productName || 'product'} in ${scene.replace(/_/g, ' ')}, natural lighting, commercial quality, realistic setting`,
-      size: params.size || '1024x1024',
-    }, { taskType: 'image_gen', source: 'expand_scenes' })
-  ));
+  const items = scenes.map(scene => ({
+    key: scene,
+    label: scene,
+    prompt: `professional e-commerce lifestyle photography, ${params.productName || 'product'} in ${scene.replace(/_/g, ' ')}, natural lighting, commercial quality, realistic setting`,
+    size: params.size || '1024x1024',
+  }));
 
-  return {
-    type: 'scene_images',
-    scenes,
-    images: results.map((r, i) => ({
-      scene: scenes[i],
-      url: r.status === 'fulfilled' ? (r.value?.images?.[0]?.url || r.value?.url) : null,
-      status: r.status,
-    })),
-  };
+  const result = await batchImageGen(items, { source: 'expand_scenes' });
+  return { type: 'scene_images', scenes, images: result.images.map((img, i) => ({ scene: scenes[i], ...img })) };
 }, {
   description: '生成多场景使用图（客厅/工作室/户外等）',
   parameters: {
@@ -88,24 +73,17 @@ const sceneTool = new FunctionTool('expand_scenes', async (params) => {
 });
 
 const detailShotTool = new FunctionTool('expand_detail_shots', async (params) => {
-  const { gatewayInfer } = await import('../../gateway/aiGatewayHub.js');
   const details = ['material_texture', 'craftsmanship_detail', 'size_comparison', 'feature_highlight'];
 
-  const results = await Promise.allSettled(details.map(d =>
-    gatewayInfer('gpt-image-2', {
-      prompt: `extreme close-up e-commerce product photography, ${d.replace(/_/g, ' ')}, ${params.productName || 'product'}, macro lens, ultra detailed, studio lighting, pure white background`,
-      size: params.size || '1024x1024',
-    }, { taskType: 'image_gen', source: 'expand_details' })
-  ));
+  const items = details.map(d => ({
+    key: d,
+    label: d,
+    prompt: `extreme close-up e-commerce product photography, ${d.replace(/_/g, ' ')}, ${params.productName || 'product'}, macro lens, ultra detailed, studio lighting, pure white background`,
+    size: params.size || '1024x1024',
+  }));
 
-  return {
-    type: 'detail_shots',
-    details,
-    images: results.map((r, i) => ({
-      detail: details[i],
-      url: r.status === 'fulfilled' ? (r.value?.images?.[0]?.url || r.value?.url) : null,
-    })),
-  };
+  const result = await batchImageGen(items, { source: 'expand_details' });
+  return { type: 'detail_shots', details, images: result.images.map((img, i) => ({ detail: details[i], ...img })) };
 }, {
   description: '生成卖点细节图（材质/工艺/尺寸/功能亮点）',
   parameters: {
