@@ -222,7 +222,7 @@ export async function verifyCode(email, code) {
   return true;
 }
 
-export async function checkVerified(email) {
+/** @unused — 无路由/中间件调用此函数，验证状态写入后未被消费 */
   const key = `verified:email:${email}`;
   try {
     const result = await codeStore.verifyCode(key, '1', 1);

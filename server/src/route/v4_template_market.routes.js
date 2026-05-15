@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { validateV4 as _validate, idParamSchema } from '../utils/validate.js';
 import { authMiddleware } from '../middleware/auth.js';
 import * as templateMarketController from '../controller/templateMarketController.js';
-import { paymentLimiter, heavyLimiter } from '../middleware/rateLimiter.js';
+import { paymentLimiter, heavyLimiter, rateLimiter } from '../middleware/rateLimiter.js';
 
 const router = Router();
 
@@ -16,7 +16,7 @@ const createSchema = z.object({
 });
 
 // GET /api/template-market/search
-router.get('/search', templateMarketController.search);
+router.get('/search', rateLimiter, templateMarketController.search);
 
 // GET /api/template-market/:id
 router.get('/:id', _validate(idParamSchema, 'params'), templateMarketController.detail);

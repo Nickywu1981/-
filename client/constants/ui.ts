@@ -1,7 +1,7 @@
 /**
  * UI 常量 — 消除全项目散落的魔法数字
  *
- * 使用: import { POLL_INTERVAL, TOAST_DURATION, Z_INDEX } from '~/constants/ui'
+ * 使用: import { POLL_INTERVAL_MS, TOAST_DURATION_MS, Z_INDEX } from '~/constants/ui'
  */
 export const POLL_INITIAL_MS = 1000
 export const POLL_INTERVAL_MS = 3000

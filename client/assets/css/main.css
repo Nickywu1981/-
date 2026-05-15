@@ -110,3 +110,35 @@ input, textarea, select {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ================================================
+   Navigation Icons — CSS content fallback for sidebar <i> elements
+   Minimal approach: Unicode symbols as pseudo-elements.
+   TODO: migrate to @element-plus/icons-vue for full SVG fidelity
+   ================================================ */
+.nav-item i[class^="icon-"]::before { display: inline-block; }
+.icon-users::before      { content: "👥"; }
+.icon-building::before    { content: "🏢"; }
+.icon-user-check::before  { content: "✅"; }
+.icon-shopping-cart::before { content: "🛒"; }
+.icon-gift::before        { content: "🎁"; }
+.icon-layout::before      { content: "📐"; }
+.icon-toggle-right::before{ content: "⚙️"; }
+.icon-bar-chart::before   { content: "📊"; }
+.icon-dollar-sign::before { content: "💰"; }
+.icon-eye::before         { content: "👁️"; }
+.icon-dashboard::before   { content: "📋"; }
+.icon-cpu::before         { content: "🖥️"; }
+.icon-shuffle::before     { content: "🔀"; }
+.icon-shield::before      { content: "🛡️"; }
+.icon-file-text::before   { content: "📄"; }
+.icon-image::before       { content: "🖼️"; }
+.icon-video::before       { content: "🎬"; }
+.icon-grid::before        { content: "⊞"; }
+.icon-folder::before      { content: "📁"; }
+.icon-hard-drive::before  { content: "💾"; }
+.icon-settings::before    { content: "⚙️"; }
+.icon-credit-card::before { content: "💳"; }
+.icon-share::before       { content: "🔗"; }
+.icon-bookmark::before    { content: "🔖"; }
+.icon-activity::before    { content: "📈"; }

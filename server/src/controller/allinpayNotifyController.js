@@ -1,4 +1,5 @@
 import * as allinpayService from '../services/allinpayService.js';
+import { isProduction } from '../config/index.js';
 import logger from '../utils/logger.js';
 
 /**
@@ -15,7 +16,7 @@ export async function handleNotify(req, res) {
 
     res.type('text/plain').send(ok ? 'success' : 'fail');
   } catch (err) {
-    logger.error('[Allinpay] 回调处理异常', { reqsn: req.body?.reqsn, trxid: req.body?.trxid, error: err.message, ...(process.env.NODE_ENV !== 'production' && { stack: err.stack }) });
+    logger.error('[Allinpay] 回调处理异常', { reqsn: req.body?.reqsn, trxid: req.body?.trxid, error: err.message, ...(!isProduction && { stack: err.stack }) });
     res.type('text/plain').send('fail');
   }
 }

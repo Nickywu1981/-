@@ -246,6 +246,7 @@
 import type { PageConfig, PipelineState, FieldConfig } from './types'
 import { assertValidConfig } from './validators'
 import PromptEnhancer from '~/components/PromptEnhancer.vue'
+import { POLL_INITIAL_MS, POLL_BACKOFF_MS } from '~/constants/ui'
 
 const props = defineProps<{ config: PageConfig }>()
 
@@ -424,9 +425,7 @@ function clearUpload(key: string) {
 let pollTimer: ReturnType<typeof setTimeout> | null = null
 let pollCount = 0
 let consecutiveFailures = 0
-const POLL_INITIAL_MS = 1000
-const POLL_INTERVAL_MS = 2000
-const POLL_BACKOFF_MS = 5000
+const POLL_INTERVAL_MS = props.config.api.pollIntervalMs ?? 2000
 
 function startPolling(taskId: string) {
   stopPolling()

@@ -18,6 +18,10 @@ const INJECTION_PATTERNS = [
   /drop\s+table/i,
   /alter\s+table/i,
   /exec(\s|\+)+(s|x)p\w+/i,
+  /sleep\s*\(/i,
+  /benchmark\s*\(/i,
+  /information_schema\./i,
+  /waitfor\s+delay/i,
 ];
 
 // 原型污染危险 key

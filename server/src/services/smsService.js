@@ -99,6 +99,7 @@ export async function verifyCode(phone, scene, code) {
   return { valid: false, reason: result.reason === 'max_attempts' ? '尝试次数过多，请重新获取验证码' : result.reason === 'not_found' ? '验证码不存在或已过期' : '验证码错误' };
 }
 
+/** @unused — 无路由/中间件调用此函数，验证状态写入后未被消费 */
 export async function checkVerified(phone) {
   const key = `verified:sms:${phone}`;
   try {

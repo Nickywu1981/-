@@ -16,8 +16,8 @@ const updateCollectionSchema = collectionSchema.partial();
 
 const router = Router();
 router.use(rateLimiter);
-router.get('/', cacheMiddleware(120), listCollections);
-router.get('/:id', cacheMiddleware(120), validate(idParamSchema, 'params'), getCollection);
+router.get('/', authMiddleware, cacheMiddleware(120), listCollections);
+router.get('/:id', authMiddleware, cacheMiddleware(120), validate(idParamSchema, 'params'), getCollection);
 router.post('/', adminAuth, validate(collectionSchema), createCollection);
 router.put('/:id', adminAuth, validate(idParamSchema, 'params'), validate(updateCollectionSchema), updateCollection);
 router.delete('/:id', adminAuth, validate(idParamSchema, 'params'), deleteCollection);

@@ -8,6 +8,10 @@ const DANGEROUS_PATTERNS = [
   /('.*\bOR\b.*')/i,
   /(--)/,
   /(\/\*.*\*\/)/,
+  /sleep\s*\(/i,
+  /benchmark\s*\(/i,
+  /information_schema\./i,
+  /waitfor\s+delay/i,
 ];
 
 export function guardSQL(value, fieldName = 'unknown') {
