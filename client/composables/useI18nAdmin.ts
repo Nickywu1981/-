@@ -60,7 +60,7 @@ export function useI18nAdmin() {
   async function fetch() {
     loading.value = true
     try {
-      const res = await $fetch<I18nAdminPayload>(`/api/admin/i18n/${activeLocale.value}/admin`)
+      const res = await $fetch<I18nAdminPayload>(`/api/admin/i18n/${activeLocale.value}`)
       translations.value = res.data?.entries || []
       namespaces.value = res.data?.namespaces || []
       pendingChanges.value.clear()
@@ -162,18 +162,6 @@ export function useI18nAdmin() {
 
   const pendingCount = computed(() => pendingChanges.value.size + pendingDelete.value.size)
 
-  return {
-    activeLocale, activeNamespace, searchQuery,
-    translations, namespaces, loading, saving, editingKey,
-    pendingChanges, pendingDelete, pendingCount,
-    showAddModal, newKey, newValue,
-    auditLogs, showLogModal, logTargetKey,
-    displayedTranslations,
-    fetch, doSearch, startEdit, cancelEdit, setEditValue,
-    saveAll, markDelete, unmarkDelete, isPending,
-    addKey, importJSON, showLogs,
-  }
-
   let searchTimer: ReturnType<typeof setTimeout> | null = null
 
   function doSearch() {
@@ -194,4 +182,16 @@ export function useI18nAdmin() {
   }
 
   onBeforeUnmount(() => { if (searchTimer) clearTimeout(searchTimer) })
+
+  return {
+    activeLocale, activeNamespace, searchQuery,
+    translations, namespaces, loading, saving, editingKey,
+    pendingChanges, pendingDelete, pendingCount,
+    showAddModal, newKey, newValue,
+    auditLogs, showLogModal, logTargetKey,
+    displayedTranslations,
+    fetch, doSearch, startEdit, cancelEdit, setEditValue,
+    saveAll, markDelete, unmarkDelete, isPending,
+    addKey, importJSON, showLogs,
+  }
 }

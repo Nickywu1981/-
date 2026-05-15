@@ -21,10 +21,10 @@ const querySchema = z.object({
 router.post('/track', authMiddleware, apiLimiter, validate(trackSchema), track);
 
 // 数据查询（仅管理员）
-router.get('/funnel', authMiddleware, adminAuth, validate(querySchema), funnel);
+router.get('/funnel', authMiddleware, adminAuth, validate(querySchema, 'query'), funnel);
 router.get('/active', authMiddleware, adminAuth, active);
-router.get('/top-tools', authMiddleware, adminAuth, validate(querySchema), topTools);
-router.get('/trend', authMiddleware, adminAuth, validate(querySchema), trend);
-router.get('/conversion', authMiddleware, adminAuth, validate(querySchema), conversionFunnel);
+router.get('/top-tools', authMiddleware, adminAuth, validate(querySchema, 'query'), topTools);
+router.get('/trend', authMiddleware, adminAuth, validate(querySchema, 'query'), trend);
+router.get('/conversion', authMiddleware, adminAuth, validate(querySchema, 'query'), conversionFunnel);
 
 export default router;

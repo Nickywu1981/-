@@ -27,7 +27,7 @@ export function useDashboardData() {
   const error = computed(() => fetchError.value?.message || null)
   const hasData = computed(() => !!apiData.value?.kpi)
 
-  const d = computed(() => apiData.value || {})
+  const d = computed(() => (apiData.value as Record<string, unknown>)?.data as Record<string, unknown> || {})
 
   // ── KPI Cards ──
   const kpiCards = computed(() => {

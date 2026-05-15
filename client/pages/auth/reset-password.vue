@@ -109,7 +109,7 @@ async function handleReset() {
   loading.value = true
   try {
     const { phone, email, isEmail } = getAccountInfo()
-    const body = { phone: phone || undefined, email: email || undefined, new_password: newPassword.value }
+    const body = { phone: phone || undefined, email: email || undefined, new_password: newPassword.value, code: code.value }
     const res: any = await $fetch('/api/auth/reset-password', { method: 'POST', body, credentials: 'include' })
     if (res.code === 200) {
       successMsg.value = t('auth.reset_success')

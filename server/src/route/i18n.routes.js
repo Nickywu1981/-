@@ -17,6 +17,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { adminAuth, optionalAuth } from '../middleware/auth.js';
+import { apiLimiter } from '../middleware/rateLimiter.js';
 import * as i18nService from '../services/i18n.service.js';
 import { success, error } from '../utils/response.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
@@ -62,6 +63,7 @@ const importBodySchema = z.record(z.string().min(1).max(200), z.string().max(500
 // ===================== 公开路由 =====================
 
 const publicRouter = Router();
+publicRouter.use(apiLimiter);
 
 publicRouter.get('/:locale', async (req, res) => {
   try {

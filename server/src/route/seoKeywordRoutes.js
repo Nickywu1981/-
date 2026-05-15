@@ -22,7 +22,7 @@ const listSchema = z.object({
   platformCode: z.string().min(1).max(30).optional(),
 });
 
-router.get('/', validate(listSchema), ctrl.listPlatforms);
+router.get('/', validate(listSchema, 'query'), ctrl.listPlatforms);
 router.get('/keywords', ctrl.getKeywords);
 router.post('/embed', heavyLimiter, authMiddleware, validate(embedSchema), ctrl.embedKeywords);
 

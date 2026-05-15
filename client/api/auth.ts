@@ -11,7 +11,7 @@ export const authApi = {
     api.post('/auth/logout'),
 
   profile: () =>
-    api.get('/auth/profile'),
+    api.get('/auth/me'),
 
   refreshToken: () =>
     api.post('/auth/refresh'),

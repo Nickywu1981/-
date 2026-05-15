@@ -31,6 +31,12 @@ const generateSchema = z.object({
 const tweakAgentSchema = z.object({
   agentParams: z.object({}).passthrough().optional().default({}),
   context: z.object({}).passthrough().optional().default({}),
+  state: z.object({}).passthrough().optional(),
+  userId: z.number().int().positive().optional(),
+});
+
+const uploadRefSchema = z.object({
+  type: z.string().max(50).optional(),
 });
 
 // ==================== 全链路生成 ====================
@@ -43,7 +49,7 @@ router.post('/tweak/:agentName', authMiddleware, validate(tweakAgentSchema), ctr
 
 // ==================== 参考上传 ====================
 // POST /api/agent/upload-reference — 上传参考图/参考视频
-router.post('/upload-reference', authMiddleware, upload.single('file'), ctrl.uploadReference);
+router.post('/upload-reference', authMiddleware, upload.single('file'), validate(uploadRefSchema), ctrl.uploadReference);
 
 // ==================== 查询接口 ====================
 // GET /api/agent/intents — 支持的意图列表
