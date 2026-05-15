@@ -36,7 +36,7 @@ const submit = async () => {
       workId: workId.value,
       platforms: selectedPlatforms.value,
     })
-    if (data?.code === 0 || data) {
+    if (data) {
       results.value = selectedPlatforms.value.map(p => ({ platform: p, status: 'done' }))
     } else {
       results.value = selectedPlatforms.value.map(p => ({ platform: p, status: 'failed' }))

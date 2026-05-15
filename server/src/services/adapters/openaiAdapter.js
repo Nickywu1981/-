@@ -221,7 +221,6 @@ export async function getEmbedding(text, modelId = 'text-embedding-3-small') {
 
 const MODEL_CAPABILITIES = {
   // 文本大模型 — 最长上下文 + 最高质量
-  'gpt-5.5': { maxTokens: 8000, timeout: 120000 },
   'claude-opus-4-7': { maxTokens: 8000, timeout: 120000 },
   'deepseek-v4-pro': { maxTokens: 4000, timeout: 90000 },
   'deepseek-v4-flash': { maxTokens: 2000, timeout: 30000 },

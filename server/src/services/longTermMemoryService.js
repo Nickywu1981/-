@@ -137,7 +137,7 @@ async function consolidate({
     try {
       const { infer } = await import('./aiEngine.js');
       const prompt = `合并以下${rows.length}条相关记忆为一条简洁摘要（保留关键事实，去掉冗余）：\n${rows.map((r, i) => `${i + 1}. ${r.content.slice(0, 300)}`).join('\n')}\n只返回合并后的一段文字，不超过300字。`;
-      const result = await infer('deepseek-chat', [{ role: 'user', content: prompt }], { temperature: 0.3, maxTokens: 400 });
+      const result = await infer('deepseek-v4-flash', [{ role: 'user', content: prompt }], { temperature: 0.3, maxTokens: 400 });
       consolidated = (typeof result === 'string' ? result : result?.text || result?.content || '').trim();
       if (!consolidated) throw new BusinessError(ERROR_CODE.AI_INFER_FAILED, 'empty AI response');
     } catch (aiErr) {

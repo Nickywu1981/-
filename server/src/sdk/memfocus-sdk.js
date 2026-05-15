@@ -63,7 +63,7 @@ const attention = {
 消息内容: ${content || ''}`;
 
     try {
-      const result = await infer('deepseek-chat', { prompt }, { temperature: 0.1, maxTokens: 150 });
+      const result = await infer('deepseek-v4-flash', { prompt }, { temperature: 0.1, maxTokens: 150 });
       const json = JSON.parse(typeof result === 'string' ? result : result.text || result.content || '{}');
       return { priority: json.priority || 'normal', score: json.score || 50, reason: json.reason || '' };
     } catch (e) {
@@ -99,7 +99,7 @@ ${history.slice(-6).map(h => `${h.role}: ${h.content}`).join('\n')}
 只返回JSON：{"resolved":"客户指...","entity":"商品/属性","confidence":0.0-1.0}`;
 
     try {
-      const result = await infer('deepseek-chat', { prompt }, { temperature: 0.1, maxTokens: 200 });
+      const result = await infer('deepseek-v4-flash', { prompt }, { temperature: 0.1, maxTokens: 200 });
       const json = JSON.parse(typeof result === 'string' ? result : result.text || result.content || '{}');
       return { resolved: json.resolved || currentMessage, entity: json.entity || '', confidence: json.confidence || 0.5 };
     } catch (e) {
@@ -111,7 +111,7 @@ ${history.slice(-6).map(h => `${h.role}: ${h.content}`).join('\n')}
   async summarize(history = []) {
     const prompt = `一句话总结客服对话核心:\n${history.map(h => `${h.role}: ${h.content}`).join('\n')}`;
     try {
-      const result = await infer('deepseek-chat', { prompt }, { temperature: 0.3, maxTokens: 100 });
+      const result = await infer('deepseek-v4-flash', { prompt }, { temperature: 0.3, maxTokens: 100 });
       return typeof result === 'string' ? result : result.text || result.content || '';
     } catch (e) {
       logger.warn('[MemFocus] summarize AI调用失败，降级拼接', { error: e.message });

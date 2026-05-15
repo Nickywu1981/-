@@ -14,5 +14,5 @@ export const authApi = {
     api.get('/auth/me'),
 
   refreshToken: () =>
-    api.post('/auth/refresh'),
+    api.post('/users/refresh'),
 }

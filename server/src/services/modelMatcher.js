@@ -10,7 +10,6 @@ const MATCH_WEIGHTS = {
 };
 
 const MODEL_CAPABILITIES = {
-  'gpt-5.5': { capability: 95, cost: 55, latency: 65, accuracy: 93 },
   'claude-opus-4-7': { capability: 92, cost: 50, latency: 60, accuracy: 94 },
   'deepseek-v4-pro': { capability: 82, cost: 70, latency: 70, accuracy: 84 },
   'deepseek-v4-flash': { capability: 60, cost: 90, latency: 85, accuracy: 68 },

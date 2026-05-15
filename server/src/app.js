@@ -264,12 +264,14 @@ app.get('/api/gateway/routes', authMiddleware, adminAuth, (req, res) => {
 // Prometheus 指标端点（需认证）
 app.get('/api/metrics', authMiddleware, adminAuth, metricsEndpoint);
 
-// OpenAPI/Swagger 文档
-app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(getSwaggerSpec(), {
-  customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: 'Movio AI API Docs',
-}));
-app.get('/api/docs.json', (_req, res) => res.json(getSwaggerSpec()));
+// OpenAPI/Swagger 文档（仅非生产环境）
+if (process.env.NODE_ENV !== 'production') {
+  app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(getSwaggerSpec(), {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'Movio AI API Docs',
+  }));
+  app.get('/api/docs.json', (_req, res) => res.json(getSwaggerSpec()));
+}
 
 // 内部 Embedding 端点（仅 localhost，脚本调用）
 const embedSchema = z.object({ texts: z.array(z.string().min(1).max(8000)).min(1).max(100) });

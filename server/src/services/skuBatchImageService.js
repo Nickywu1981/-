@@ -187,7 +187,7 @@ async function processVideoBatch(taskId, params) {
           mode: 'single',
           taskType: 'video_gen',
           params: {
-            model: 'cogvideox',
+            model: 'cogvideo',
             messages: [{ role: 'user', content: `生成${actualDuration}秒电商带货短视频，风格:${style}，规格:${spec.aspect}，商品颜色:${sku.color || '默认'}` }],
             image_url: productImages[0],
             duration: actualDuration,
