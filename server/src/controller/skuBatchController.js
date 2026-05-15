@@ -2,7 +2,7 @@
  * SKU Batch Controller — 多SKU批量生成控制器
  * 职责：参数委托，不写业务逻辑
  */
-import { success } from '../utils/response.js';
+import { success, error } from '../utils/response.js';
 import { BusinessError } from '../utils/businessError.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import * as skuBatchService from '../services/skuBatchImageService.js';
@@ -15,9 +15,9 @@ export async function batchGenerateImages(req, res) {
   } catch (err) {
     logger.error('[SKUBatch] image batch failed', err.message);
     if (err instanceof BusinessError) {
-      res.status(err.statusCode || 400).json({ code: err.code, msg: err.message });
+      error(res, err.code, err.message);
     } else {
-      res.status(500).json({ code: ERROR_CODE.AI_INFER_FAILED, msg: '批量生成任务提交失败' });
+      error(res, ERROR_CODE.AI_INFER_FAILED);
     }
   }
 }
@@ -29,9 +29,9 @@ export async function batchGenerateVideos(req, res) {
   } catch (err) {
     logger.error('[SKUBatch] video batch failed', err.message);
     if (err instanceof BusinessError) {
-      res.status(err.statusCode || 400).json({ code: err.code, msg: err.message });
+      error(res, err.code, err.message);
     } else {
-      res.status(500).json({ code: ERROR_CODE.AI_INFER_FAILED, msg: '批量视频生成任务提交失败' });
+      error(res, ERROR_CODE.AI_INFER_FAILED);
     }
   }
 }
@@ -42,6 +42,6 @@ export async function getBatchStatus(req, res) {
     success(res, status);
   } catch (err) {
     logger.error('[SKUBatch] get status failed', err.message);
-    res.status(404).json({ code: ERROR_CODE.NOT_FOUND, msg: '任务不存在' });
+    error(res, ERROR_CODE.NOT_FOUND);
   }
 }

@@ -15,12 +15,14 @@
   </template>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import '~/assets/css/main.css'
 import '~/assets/css/theme.css'
 
 const appError = ref('')
 const confirmDialogRef = ref()
+
+usePageSEO()
 
 // 注册全局确认对话框到 useConfirm
 import { registerConfirmDialog } from '~/composables/useConfirm'

@@ -45,7 +45,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 definePageMeta({ layout: 'user-workspace', middleware: ['auth'] });
 
 const { t } = useI18n()
@@ -90,7 +90,10 @@ async function submitForm() {
     }
     closeModal();
     loadTags();
-  } catch (e) { toast.error(t('enterprise.customers.tags.saveFailed')) }(t) {
+  } catch (e) { toast.error(t('enterprise.customers.tags.saveFailed')) }
+}
+
+async function handleDelete(t) {
   if (!(await confirm({ message: t('enterprise.customers.tags.confirmDelete', { name: t.name }) }))) return;
   try {
     await $api(`/tags/${t.id}`, { method: 'DELETE' });

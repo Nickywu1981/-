@@ -2,7 +2,7 @@
  * Chat Controller — 对话模块控制器
  * 职责：参数校验委托 + 响应格式统一，不写业务逻辑
  */
-import { success } from '../utils/response.js';
+import { success, error } from '../utils/response.js';
 import { BusinessError } from '../utils/businessError.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import * as chatService from '../services/chatService.js';
@@ -28,16 +28,17 @@ export async function sendMessage(req, res) {
     logger.error('[Chat] sendMessage failed', err.message);
     if (!res.headersSent) {
       if (err instanceof BusinessError) {
-        res.status(err.statusCode || 400).json({ code: err.code, msg: err.message });
+        error(res, err.code, err.message);
       } else {
-        res.status(500).json({ code: ERROR_CODE.AI_INFER_FAILED, msg: '对话服务暂时不可用' });
+        error(res, ERROR_CODE.AI_INFER_FAILED);
       }
     }
   }
 }
 
 export async function getSuggestions(req, res) {
-  const suggestions = [
+  try {
+    const suggestions = [
     { id: 'main_image', label: '生成商品主图', icon: 'image', prompt: '帮我生成一张白色连衣裙的主图，简约风格' },
     { id: 'scene_image', label: '生成场景图', icon: 'image', prompt: '把这张产品图放到咖啡厅场景中' },
     { id: 'remove_bg', label: '去除背景', icon: 'cut', prompt: '帮我去掉这张图的背景' },
@@ -48,4 +49,8 @@ export async function getSuggestions(req, res) {
     { id: 'compliance', label: '合规检查', icon: 'shield', prompt: '帮我检查这段文案是否合规' },
   ];
   return success(res, suggestions);
+  } catch (err) {
+    logger.error('[Chat] getSuggestions failed', err.message);
+    error(res, ERROR_CODE.INTERNAL_ERROR || 500);
+  }
 }

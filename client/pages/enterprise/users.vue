@@ -92,7 +92,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { formatDateLocale } from '~/utils/format';
 const { t } = useI18n();
 const toast = useToast();

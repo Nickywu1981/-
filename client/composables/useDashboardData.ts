@@ -168,6 +168,5 @@ export function useDashboardData() {
     bizMetrics,
     alerts,
     toggleFullscreen,
-    apiData,
   }
 }

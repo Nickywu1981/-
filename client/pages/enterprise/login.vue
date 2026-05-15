@@ -29,7 +29,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 const { t } = useI18n();
 const account = ref('');
 const password = ref('');

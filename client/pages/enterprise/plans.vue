@@ -26,7 +26,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 const toast = useToast();
 const { t } = useI18n();
 const plans = ref([]);

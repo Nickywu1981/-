@@ -80,7 +80,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 definePageMeta({ layout: 'user-workspace', middleware: ['auth'] });
 import { formatDateLocale } from '~/utils/format';
 const { t } = useI18n();

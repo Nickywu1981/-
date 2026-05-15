@@ -15,7 +15,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 definePageMeta({ layout: 'user-workspace', middleware: ['auth'] });
 const toast = useToast();
 const { t } = useI18n();

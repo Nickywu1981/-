@@ -53,7 +53,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 const { t } = useI18n();
 const toast = useToast();
 const profile = ref({});

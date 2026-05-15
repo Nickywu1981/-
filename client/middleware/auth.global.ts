@@ -5,10 +5,10 @@
 export default defineNuxtRouteMiddleware(async (to) => {
   const publicPaths = [
     '/', '/login', '/register', '/auth/register',
-    '/auth/reset-password', '/help', '/compare', '/legal/terms', '/legal/privacy',
+    '/auth/reset-password', '/forgot-password', '/help', '/compare', '/legal/terms', '/legal/privacy', '/error',
   ]
 
-  if (publicPaths.includes(to.path) || to.path.startsWith('/legal/')) return
+  if (publicPaths.includes(to.path) || to.path.startsWith('/legal/') || to.path.startsWith('/help/')) return
 
   let isAuthenticated = false
   let userRole = ''

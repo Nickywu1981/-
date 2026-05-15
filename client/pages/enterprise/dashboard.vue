@@ -57,7 +57,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import PageHeader from '~/components/shared/PageHeader.vue'
 import StatsCard from '~/components/shared/StatsCard.vue'
 const { t } = useI18n();
