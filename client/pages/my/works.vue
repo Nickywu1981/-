@@ -81,8 +81,6 @@ const tabs = computed(() => [
   { key: 'batch', label: t('my_pages.works.tab_batch') },
 ])
 
-const toast = useToast()
-
 const filteredList = computed(() => allTasks.value)
 
 function typeLabel(tp: string) {

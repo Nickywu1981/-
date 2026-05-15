@@ -4,7 +4,7 @@
  */
 export default defineNuxtPlugin((nuxtApp) => {
   const router = useRouter()
-  const { t } = useI18n()
+  const t = (key: string, options?: any) => (nuxtApp as any).$i18n.t(key, options)
   const getToast = () => (nuxtApp.vueApp.config.globalProperties.$toast || { error: console.error, warn: console.warn }) as any
 
   // Helper: read csrf_token from document.cookie

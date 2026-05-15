@@ -3,7 +3,7 @@
  * Note: $fetch wrapper merged into auth.ts to avoid dual-wrapper conflict
  */
 export default defineNuxtPlugin((nuxtApp) => {
-  const { t } = useI18n()
+  const t = (key: string, options?: any) => (nuxtApp as any).$i18n.t(key, options)
   const getToast = () => (nuxtApp.vueApp.config.globalProperties.$toast || null) as any
 
   // Vue 应用级错误（组件渲染 / 生命周期 / watch 回调）

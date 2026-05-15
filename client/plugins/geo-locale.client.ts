@@ -14,8 +14,8 @@ function normalizeLocale(raw: string): SupportedLocale | null {
   return SUPPORTED_LOCALES.includes(prefix as SupportedLocale) ? prefix as SupportedLocale : null;
 }
 
-export default defineNuxtPlugin(async () => {
-  const { locale } = useI18n()
+export default defineNuxtPlugin(async (nuxtApp) => {
+  const locale = (nuxtApp as any).$i18n.locale
 
   // 已有手动选择 → 跳过自动检测
   if (typeof window !== 'undefined' && safeGet('lang')) return

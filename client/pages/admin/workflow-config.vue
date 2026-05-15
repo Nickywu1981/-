@@ -187,7 +187,7 @@ function getModelsByCategory(cat) { return modelPool.value.filter(m => m.categor
 function getAutoModelForStep(step) {
   const models = modelPool.value.filter(m => m.category === step.category && m.enabled === 1);
   const best = models.sort((a, b) => (b.pool_weight || 1) - (a.pool_weight || 1))[0];
-  return best?.display_name || '{{ $t('admin_workflow_config.no_model') }}';
+  return best?.display_name || t('admin_workflow_config.no_model');
 }
 
 async function selectWorkflow(id) {
