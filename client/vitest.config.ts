@@ -20,8 +20,8 @@ export default defineConfig({
         if (id.includes('node_modules')) return
         // Don't transform test files or mock files
         if (id.includes('__tests__') || id.includes('test/mocks')) return
-        // Only transform composables and components (they use Nuxt auto-imports)
-        if (!id.includes('composables') && !id.includes('components')) return
+        // Only transform composables, components, and stores (they use Nuxt auto-imports)
+        if (!id.includes('composables') && !id.includes('components') && !id.includes('stores')) return
 
         const autoImports: Record<string, string[]> = {
           'vue': ['ref', 'computed', 'watch', 'watchEffect', 'onMounted', 'onUnmounted', 'reactive', 'toRef', 'toRefs', 'nextTick', 'PropType'],

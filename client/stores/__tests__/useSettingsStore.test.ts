@@ -87,7 +87,7 @@ describe('useSettingsStore', () => {
 
   it('setTheme(system) reads matchMedia and applies correct class', () => {
     const store = useSettingsStore()
-    matchMediaMock.mockReturnValueOnce({
+    matchMediaMock.mockReturnValue({
       matches: true,
       media: '(prefers-color-scheme: dark)',
       addEventListener: vi.fn(),
@@ -96,7 +96,8 @@ describe('useSettingsStore', () => {
     store.setTheme('system')
     expect(store.theme).toBe('system')
     expect(classListMock.toggle).toHaveBeenCalledWith('dark', true)
-    expect(setAttrMock).toHaveBeenCalledWith('data-theme', 'system')
+    // When matchMedia.matches is true, data-theme is 'dark'
+    expect(setAttrMock).toHaveBeenCalledWith('data-theme', 'dark')
   })
 
   it('toggleSidebar toggles sidebarCollapsed', () => {
@@ -138,23 +139,28 @@ describe('useSettingsStore', () => {
 
     it('isDark reads matchMedia when theme is system', () => {
       const store = useSettingsStore()
-      matchMediaMock.mockReturnValueOnce({
+      // Start from a different theme to force getter recomputation
+      store.theme = 'light'
+
+      // Dark OS preference
+      matchMediaMock.mockReturnValue({
         matches: true,
         media: '(prefers-color-scheme: dark)',
         addEventListener: vi.fn(),
         removeEventListener: vi.fn(),
       })
-      store.setTheme('system')
+      store.theme = 'system'
       expect(store.isDark).toBe(true)
 
-      // Light OS preference
-      matchMediaMock.mockReturnValueOnce({
+      // Light OS preference — toggle theme to force recomputation
+      matchMediaMock.mockReturnValue({
         matches: false,
         media: '(prefers-color-scheme: dark)',
         addEventListener: vi.fn(),
         removeEventListener: vi.fn(),
       })
-      store.setTheme('system')
+      store.theme = 'light'
+      store.theme = 'system'
       expect(store.isDark).toBe(false)
     })
 

@@ -1,18 +1,26 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 
-const mockApi = {
-  get: vi.fn(() => Promise.resolve({})),
-  post: vi.fn(() => Promise.resolve({})),
-  put: vi.fn(() => Promise.resolve({})),
-  delete: vi.fn(() => Promise.resolve({})),
-};
-
+// Mock the API module before useAuthStore imports it
+// Use inline factory to avoid top-level variable TDZ issues with vi.mock hoisting
 vi.mock('@/composables/useApi', () => ({
-  api: mockApi,
+  api: {
+    get: vi.fn(() => Promise.resolve({})),
+    post: vi.fn(() => Promise.resolve({})),
+    put: vi.fn(() => Promise.resolve({})),
+    delete: vi.fn(() => Promise.resolve({})),
+  },
 }));
 
 import { useAuthStore } from '../../stores/useAuthStore';
+// After vi.mock hoisting, this import yields the mocked api object
+import { api } from '@/composables/useApi';
+const mockApi = api as unknown as {
+  get: ReturnType<typeof vi.fn>;
+  post: ReturnType<typeof vi.fn>;
+  put: ReturnType<typeof vi.fn>;
+  delete: ReturnType<typeof vi.fn>;
+};
 
 describe('useAuthStore', () => {
   beforeEach(() => {
