@@ -55,8 +55,8 @@
   <url><loc>https://movio.ai/auth/reset-password</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
   <url><loc>https://movio.ai/notifications</loc><changefreq>monthly</changefreq><priority>0.3</priority></url>
 
-  <!-- 法律页面 -->
-<url><loc>https://movio.ai/legal/privacy</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
+   <!-- 法律页面 -->
+  <url><loc>https://movio.ai/legal/privacy</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
   <url><loc>https://movio.ai/legal/terms</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
 
   <!-- 错误页面 -->

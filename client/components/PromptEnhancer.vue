@@ -177,11 +177,11 @@ function apply() {
 .pe-root { display: inline-flex; position: relative; }
 .pe-trigger {
   display: inline-flex; align-items: center; gap: 6px;
-  padding: 6px 14px; border-radius: 6px; border: 1px dashed var(--brand, #90caf9);
-  background: var(--brand-light, #e3f2fd); color: var(--brand, #1565c0); font-size: 13px; font-weight: 500;
+  padding: 6px 14px; border-radius: 6px; border: 1px dashed var(--brand, #5b5fe3);
+  background: var(--brand-light, #f5f3ff); color: var(--brand, #5b5fe3); font-size: 13px; font-weight: 500;
   cursor: pointer; transition: background .15s, border-color .15s;
 }
-.pe-trigger:hover { background: var(--brand-lighter, #bbdefb); border-color: var(--brand, #42a5f5); }
+.pe-trigger:hover { background: var(--brand-lighter, #eeecff); border-color: var(--brand, #5b5fe3); }
 [data-theme="dark"] .pe-trigger { background: rgba(91,95,227,.12); color: #a5b4fc; border-color: rgba(91,95,227,.3); }
 [data-theme="dark"] .pe-trigger:hover { background: rgba(91,95,227,.2); }
 .pe-icon { font-size: 16px; }

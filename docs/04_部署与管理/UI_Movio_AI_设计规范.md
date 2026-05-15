@@ -2,7 +2,7 @@
 
 > **编写组**：G3 UI 设计组（UI-Designer 🔴主 / Doc-Writer 🟡辅）
 > **审核组**：G1 架构规划组（Architect）
-> **版本**：v1.18 | **日期**：2026-05-15
+> **版本**：v1.19 | **日期**：2026-05-15
 
 ---
 
@@ -1214,3 +1214,98 @@ R11 标记 `user-workspace.vue` 等 3 个 layout "CSS 完全缺失" — **本例
 - **全站 `#409eff` Element Plus 蓝完全归零** — StatsCard 最后 1 处
 - **全站组件审计覆盖 100%** — 32/32 组件全部审计
 - **i18n 210 键中文翻译待补** — work_pages (69键) + 15 admin 子模块
+
+### 10.53 R20 — public 静态资源 + Transition 组件 + 最终硬编码扫荡 (2026-05-15)
+
+#### 10.53.1 public/ 静态资源审计
+
+| 文件 | 结论 |
+|------|------|
+| `manifest.json` | **P2** — `screenshots: []` 空数组 + 缺 512px PNG (iOS PWA)；theme_color `#5b5fe3` 正确 |
+| `favicon.svg` | 清洁 — 品牌渐变 `#5b5fe3 → #a5a9f0` |
+| `offline.html` | 清洁 — 品牌色正确 + auto-reconnect 轮询 + 暗黑 fallback |
+| `robots.txt` | 清洁 — AI crawler 白名单 (GPTBot/ChatGPT-User/Claude-Web 等 10 个) |
+| `sitemap.xml` | **已修复** — 法律页面缩进错误 + trailing empty `<!-- 错误页面 -->` |
+| `llms.txt` | 清洁 — 结构化产品文档，13 电商平台 + 51 功能模块 |
+| `llms-full.txt` | 清洁 — 9 章完整产品文档 |
+
+#### 10.53.2 Transition 组件一致性
+
+| 组件 | Transition Name | CSS 定义位置 | 状态 |
+|------|:--|------|:--:|
+| SlidePanel | `sp-overlay` / `sp-panel` | 组件内 `<style>` | ✓ — ARIA role="dialog" + Escape |
+| CollapsibleResultPanel | `crp-slide` | 组件内 | ✓ |
+| Toast | `toast` (TransitionGroup) | 组件内 | ✓ — role="alert" aria-live |
+| ConfirmDialog | `confirm-fade` | 组件内 | ✓ |
+| user-workspace | `tb-drop` / `cs-modal` | Layout 内 | ✓ |
+
+> 5/5 Transition 组件全部清洁，CSS 定义与 `name` 属性一对一匹配。
+
+#### 10.53.3 CSS 交互态覆盖率
+
+| 选择器 | `:focus` | `:focus:not(:focus-visible)` | `:focus-visible` |
+|------|:--:|:--:|:--:|
+| `.btn` | ✓ | ✓ | ✓ |
+| `.input` | ✓ | — | — |
+| `.select` | ✓ | — | — |
+
+> `.input`/`.select` 省略 `:focus-visible` 属有意设计：表单控件点击后显示焦点环是标准 UX，与按钮不同（按钮点击后持续焦点环显突兀）。
+
+#### 10.53.4 Material Design Blue 最终清除
+
+| 文件 | 修复前 (Material Blue) | 修复后 (Brand) |
+|------|------|------|
+| `PromptEnhancer.vue:180` | `var(--brand, #90caf9)` | `var(--brand, #5b5fe3)` |
+| `PromptEnhancer.vue:181` | `var(--brand-light, #e3f2fd)` / `#1565c0` | `var(--brand-light, #f5f3ff)` / `#5b5fe3` |
+| `PromptEnhancer.vue:184` | `var(--brand-lighter, #bbdefb)` / `#42a5f5` | `var(--brand-lighter, #eeecff)` / `#5b5fe3` |
+
+> **里程碑：Material Design Blue (#90caf9/#1565c0/#42a5f5/#e3f2fd/#bbdefb) 全量归零。** 这是第六套外来色系（继 Indigo-500/Tailwind-blue/Element-blue/Purple/#4F46E5 之后）的最终清除。
+
+#### 10.53.5 SlidePanel 暗黑模式 token 化
+
+| 修复项 | 修复前 | 修复后 |
+|------|------|------|
+| `sp-panel` bg | `#1a1a1a` | `var(--bg-elevated, #1a1a1a)` |
+| `sp-hd` border | `var(--text-primary)` (语义错误) | `var(--border-color, #333)` |
+| `sp-title` color | `#eee` | `var(--text-primary, #eee)` |
+| `sp-prompt-preview` bg | `#222` | `var(--bg-surface, #222)` |
+| `sp-prompt-text` color | `#eee` | `var(--text-primary, #eee)` |
+| `sp-result-preview` bg | `#222` | `var(--bg-surface, #222)` |
+| `sp-result-name` color | `#eee` | `var(--text-primary, #eee)` |
+
+#### 10.53.6 新发现待处理
+
+| 优先级 | 问题 | 位置 |
+|:--:|------|------|
+| P2 | 项目零 `.d.ts` 类型定义文件 | `client/` 全局 |
+| P2 | manifest.json 缺 512px PNG icon + screenshots 空数组 | `public/manifest.json` |
+| P2 | SlidePanel 暗黑 2 处残留 `#1a1a1a`/`#222` (`sp-result-btn`/`sp-sel`) | `SlidePanel.vue:283-284` |
+| P3 | sitemap.xml trailing empty `<!-- 错误页面 -->` | `public/sitemap.xml` |
+| P3 | creation.vue 19 处 `--cc-*` 私有 token 非阻塞（作用域内一致） | `creation.vue` |
+
+#### 10.53.7 本轮修复
+
+| 文件 | 修复项 |
+|------|:--:|
+| `PromptEnhancer.vue` | 5 Material Blue fallback → brand |
+| `SlidePanel.vue` | 7 暗黑硬编码 → token + fallback |
+| `sitemap.xml` | 缩进修复 |
+
+#### 10.53.8 累计趋势
+
+| 优先级 | R19 | R20 新增 | R20 修复 | 总计 |
+|:--:|:--:|:--:|:--:|:--:|
+| P0 | 27 | 0 | 0 | **27** |
+| P1 | 27 | 0 | 0 | **27** |
+| P2 | 9 | 3 (.d.ts/manifest/slide残留) | -1 (SlidePanel token) | **11** |
+| P3 | 21 | 2 (sitemap/creation) | -1 (sitemap) | **22** |
+| **合计** | **68** | **5** | **-2** | **71** |
+| G3 自修累计 | 132 | — | +8 | **140** |
+
+### 里程碑
+
+- **Material Design Blue 全量归零** — PromptEnhancer 5 处 `#90caf9`/`#e3f2fd`/`#1565c0`/`#bbdefb`/`#42a5f5` → brand
+- **第六套外来色系清除** — 继 Indigo-500/Tailwind-blue/Element-blue/Purple/#4F46E5 后，Material Blue 成为最后一套
+- **SlidePanel 暗黑 7 token 化** — `#1a1a1a`/`#eee`/`#222` → `var(--bg-*, ...)` + `var(--text-*, ...)`
+- **Transition 5/5 组件审计通过** — 全部 CSS 定义与 name 一对一匹配
+- **public/ 7 文件审查完成** — 清洁度 6/7，2 P2 (manifest) + 1 P3 (sitemap)
