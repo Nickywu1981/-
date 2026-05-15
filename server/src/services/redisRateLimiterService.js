@@ -135,7 +135,6 @@ async function redisTryConsume(key, qps, burst, count = 1) {
   }
 }
 let _fallbackCache = null;
-}
 
 // ==================== 多维度入口 ====================
 
