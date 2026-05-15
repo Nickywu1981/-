@@ -7,7 +7,7 @@ import { InvocationContext } from './invocationContext.js';
 import { Event } from './event.js';
 import { SessionStore } from './sessionStore.js';
 import { compactContext } from '../services/contextCompactionService.js';
-import { augmentSystemPrompt } from '../services/skillLoaderService.js';
+import { augmentSystemPrompt, autoAbstractSkill } from '../services/skillLoaderService.js';
 import { injectA2A } from '../services/agentMessageBus.js';
 import logger from '../../utils/logger.js';
 
@@ -76,7 +76,24 @@ export class Runner {
     // 8) 执行
     const result = await this.rootAgent.runAsync(ctx);
 
-    // 9) 持久化 session (Redis with Map fallback)
+    // 9) L1 技能自动抽象 — 工具调用 ≥5 次自动生成 .skill 文件
+    const toolCalls = session.events.filter(e => e.type === 'agent.tool_call').length
+      + session.events.filter(e => e.type === 'agent.tool_result').length;
+    if (toolCalls >= 5 && input.query) {
+      // 从 Query 中提取任务模式标识（取前 60 字符作为模式 key）
+      const taskPattern = input.query.slice(0, 60).replace(/\n/g, ' ').trim();
+      autoAbstractSkill(taskPattern, toolCalls, {
+        description: `从 ${toolCalls} 次工具调用中自动抽象`,
+        tags: ['auto', 'learned'],
+        promptSnippet: `## ${taskPattern}\n\n自动抽象技能。\n\n累计工具调用: ${toolCalls}\n原始任务: ${input.query.slice(0, 200)}`,
+      }).then(r => {
+        if (r.abstracted) {
+          logger.info(`[Runner] L1 auto-abstracted new skill: ${r.skillName}`);
+        }
+      }).catch(() => {});
+    }
+
+    // 10) 持久化 session (Redis with Map fallback)
     await this.sessionService.set(sessionId, session);
 
     return { sessionId, result, events: session.events.length };
