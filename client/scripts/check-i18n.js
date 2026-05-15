@@ -6,7 +6,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const EXCLUDE_DIRS = ['node_modules', 'dist', '.nuxt', '.output', 'coverage', 'e2e', 'locales', 'data', 'scripts']
 const EXCLUDE_FILES = ['usePageSEO.ts', 'posterData.ts', 'useDiyComponents.ts', 'useSiteConfig.ts',
   'terms.vue', 'privacy.vue', 'JsonLd.vue', 'simple-batch.ts', 'useAppDict.ts', 'useApi.ts',
-  'ComingSoonPlaceholder.vue', 'toolIndex.ts']
+  'ComingSoonPlaceholder.vue']
 
 const CHINESE_RE = /[\u4e00-\u9fff]+/
 
