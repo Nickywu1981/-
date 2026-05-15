@@ -18,6 +18,11 @@ const TOKEN_TTL = csrfConfig.tokenTTLMs;
  * 应在登录成功 / 访问首页时调用
  */
 export function setCsrfCookie(req, res, next) {
+  // 跳过健康探针，避免浪费 crypto.randomBytes 生成无用 cookie
+  if (req.path === '/healthz' || req.path === '/readyz' || req.path === '/api/health') {
+    return next();
+  }
+
   // 复用已有有效 cookie，避免每次请求重新生成（crypto 开销）
   const existingToken = req.cookies?.csrf_token;
   if (existingToken && existingToken.length === 64) {

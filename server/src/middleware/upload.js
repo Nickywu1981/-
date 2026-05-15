@@ -38,14 +38,15 @@ async function ensureUploadDir(subdir) {
 }
 
 // 文件头魔数签名（前 N 字节十六进制）
+// 注: 完整统一签名定义见 utils/file-upload.js MAGIC_SIGNATURES
 const MAGIC_SIGNATURES = {
-  'image/png':      { bytes: [0x89, 0x50, 0x4E, 0x47] },
+  'image/png':      { bytes: [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A] }, // 完整 8-byte PNG 签名
   'image/jpeg':     { bytes: [0xFF, 0xD8, 0xFF] },
-  'image/webp':     { bytes: [0x52, 0x49, 0x46, 0x46] }, // RIFF
+  'image/webp':     { bytes: [0x52, 0x49, 0x46, 0x46, null, null, null, null, 0x57, 0x45, 0x42, 0x50] }, // RIFF....WEBP (12 bytes)
   'image/gif':      { bytes: [0x47, 0x49, 0x46, 0x38] }, // GIF8
   'image/avif':     { bytes: [0x66, 0x74, 0x79, 0x70, 0x61, 0x76, 0x69, 0x66], offset: 4 }, // ftypavif
-  'video/mp4':      { bytes: [0x66, 0x74, 0x79, 0x70], offset: 4 }, // ftyp box
-  'video/quicktime':{ bytes: [0x66, 0x74, 0x79, 0x70], offset: 4 }, // ftyp box (MOV)
+  'video/mp4':      { bytes: [0x66, 0x74, 0x79, 0x70], offset: 4 }, // ftyp box — generic ISOBMFF
+  'video/quicktime':{ bytes: [0x66, 0x74, 0x79, 0x70, 0x71, 0x74], offset: 4 }, // ftypqt — MOV specific
 };
 
 // MIME 类型 → 安全扩展名（不信任用户提供的 originalname）
