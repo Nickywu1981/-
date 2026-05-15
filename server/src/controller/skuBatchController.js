@@ -15,7 +15,7 @@ export async function batchGenerateImages(req, res) {
   } catch (err) {
     logger.error('[SKUBatch] image batch failed', err.message);
     if (err instanceof BusinessError) {
-      error(res, err.code, err.message);
+      error(res, err.status, err.message);
     } else {
       error(res, ERROR_CODE.AI_INFER_FAILED);
     }
@@ -29,7 +29,7 @@ export async function batchGenerateVideos(req, res) {
   } catch (err) {
     logger.error('[SKUBatch] video batch failed', err.message);
     if (err instanceof BusinessError) {
-      error(res, err.code, err.message);
+      error(res, err.status, err.message);
     } else {
       error(res, ERROR_CODE.AI_INFER_FAILED);
     }
@@ -42,6 +42,10 @@ export async function getBatchStatus(req, res) {
     success(res, status);
   } catch (err) {
     logger.error('[SKUBatch] get status failed', err.message);
-    error(res, ERROR_CODE.NOT_FOUND);
+    if (err instanceof BusinessError) {
+      error(res, err.status, err.message);
+    } else {
+      error(res, ERROR_CODE.NOT_FOUND);
+    }
   }
 }

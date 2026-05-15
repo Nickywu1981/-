@@ -89,7 +89,8 @@ export const testSingle = wrapController(async (req, res) => {
       created_at: new Date().toISOString(),
     };
     _addHistory(entry);
-    throw err;
+    // 将原始错误转译为 BusinessError，使客户端获取有意义的消息而非泛用 Internal Server Error
+    throw new BusinessError(ERROR_CODE.AI_INFER_FAILED, _safeMsg(err));
   }
 });
 
@@ -129,7 +130,8 @@ export const testMixed = wrapController(async (req, res) => {
       created_at: new Date().toISOString(),
     };
     _addHistory(entry);
-    throw err;
+    // 将原始错误转译为 BusinessError，使客户端获取有意义的消息
+    throw new BusinessError(ERROR_CODE.AI_INFER_FAILED, _safeMsg(err));
   }
 });
 

@@ -3,6 +3,8 @@
  * 所有大模型/AI 调用统一通过 /api/ai/gateway/* 入口
  */
 import { wrapController } from '../utils/wrapController.js';
+import { BusinessError } from '../utils/businessError.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 import { gatewayInfer, gatewayDispatch, gatewayRoute, getGatewayStats, getGatewayPricing } from '../gateway/aiGatewayHub.js';
 import { getDashboardSummary, getModelBreakdown, getTimeSeries, getTopUsers, recordCall } from '../services/monitorService.js';
 import { checkAlerts, getAlertRules } from '../services/alertService.js';
@@ -17,6 +19,7 @@ import { wrapPrompt, quickComplianceCheck } from '../services/promptWrapper.js';
 import { checkCompliance } from '../services/adComplianceEngine.js';
 import { orchestrate, resumeOrchestration } from '../services/pipelineOrchestrator.js';
 import logger from '../utils/logger.js';
+import { isProduction } from '../config/index.js';
 
 export const aiGatewayController = {
 
@@ -136,7 +139,7 @@ export const aiGatewayController = {
 	          req.body.platformCode || null,
 	        );
 	        if (geoResult.blockedModels?.includes(modelId)) {
-	          stream.error('该模型在您所在地区不可用，请更换模型重试', 403);
+	          stream.error('该模型在您所在地区不可用，请更换模型重试', ERROR_CODE.FORBIDDEN);
 	          status = 'blocked';
 	          return;
 	        }
@@ -166,7 +169,7 @@ export const aiGatewayController = {
 	        { stage: 'input' },
 	      );
 	      if (preCheck.action === 'block') {
-	        stream.error('内容包含违规信息，请修改后重试', 400);
+	        stream.error('内容包含违规信息，请修改后重试', ERROR_CODE.CONTENT_MODERATION);
 	        status = 'blocked';
 	        return;
 	      }
@@ -199,7 +202,7 @@ export const aiGatewayController = {
 	    } catch (err) {
 	      status = 'error';
 	      logger.error(`[Stream] 流式推理失败: ${err.message}`);
-	      stream.error(err.message);
+	      stream.error(isProduction ? '流式推理失败' : err.message, ERROR_CODE.AI_INFER_FAILED);
 	    } finally {
 	      // ── 监控指标记录（Post-invoke）──
 	      try {
@@ -219,7 +222,7 @@ export const aiGatewayController = {
   pipelineWrap: wrapController(async (req) => {
     const { input, platform, industry, brandTone, variables } = req.body;
     if (!input || typeof input !== 'string' || !input.trim()) {
-      return { code: 400, message: 'input 必填且不能为空' };
+      throw new BusinessError(ERROR_CODE.PARAM_MISSING, 'input 必填且不能为空');
     }
     const result = await wrapPrompt(input, {
       userId: req.user?.id,
@@ -228,26 +231,29 @@ export const aiGatewayController = {
       brandTone: brandTone || null,
       variables: variables || {},
     });
-    return { code: result.blocked ? 422 : 200, data: result };
+    if (result.blocked) {
+      throw new BusinessError(ERROR_CODE.PUBLISH_VALIDATION, '内容不符合发布规范');
+    }
+    return result;
   }),
 
   pipelineCompliance: wrapController(async (req) => {
     const { text, platform, industry } = req.body;
     if (!text || typeof text !== 'string') {
-      return { code: 400, message: 'text 必填' };
+      throw new BusinessError(ERROR_CODE.PARAM_MISSING, 'text 必填');
     }
     const result = checkCompliance(text, {
       platform: platform || 'taobao',
       industry: industry || null,
     });
-    return { code: 200, data: result };
+    return result;
   }),
 
   // ── 全自动编排 ──
   pipelineOrchestrate: wrapController(async (req) => {
     const { input, platform, industry, brandTone, productName, sellingPoints, specs, audioConfig, shotCount, duration, chain, pausePoints, overrides } = req.body;
     if (!input) {
-      return { code: 400, message: 'input 必填（图片URL/视频URL/文字/对象）' };
+      throw new BusinessError(ERROR_CODE.PARAM_MISSING, 'input 必填（图片URL/视频URL/文字/对象）');
     }
     const result = await orchestrate({
       input,
@@ -270,13 +276,13 @@ export const aiGatewayController = {
         sourceChain: 'orchestrator',
       },
     });
-    return { code: result.summary?.success ? 200 : 206, data: result };
+    return result;
   }),
 
   pipelineResume: wrapController(async (req) => {
     const { chainState, resumeFrom, overrides } = req.body;
     if (!chainState || !resumeFrom) {
-      return { code: 400, message: 'chainState 和 resumeFrom 必填' };
+      throw new BusinessError(ERROR_CODE.PARAM_MISSING, 'chainState 和 resumeFrom 必填');
     }
     const result = await resumeOrchestration(chainState, resumeFrom, overrides || {}, {
       userId: req.user?.id,
@@ -284,26 +290,23 @@ export const aiGatewayController = {
       source: 'orchestrator',
       sourceChain: 'orchestrator',
     });
-    return { code: result.summary?.success ? 200 : 206, data: result };
+    return result;
   }),
 
   // ── 人工微调接口 ──
   pipelineAdjust: wrapController(async (req) => {
     const { chainId, stepId, adjustments } = req.body;
     if (!chainId || !stepId || !adjustments) {
-      return { code: 400, message: 'chainId、stepId、adjustments 必填' };
+      throw new BusinessError(ERROR_CODE.PARAM_MISSING, 'chainId、stepId、adjustments 必填');
     }
     logger.info(`[Pipeline] manual adjustment: chain=${chainId} step=${stepId}`, adjustments);
-    return {
-      code: 200,
-      data: { chainId, stepId, status: 'adjusted', adjustments, timestamp: new Date().toISOString() },
-    };
+    return { chainId, stepId, status: 'adjusted', adjustments, timestamp: new Date().toISOString() };
   }),
 
   pipelineRegenerate: wrapController(async (req) => {
     const { chainState, stepId, overrides } = req.body;
     if (!chainState || !stepId) {
-      return { code: 400, message: 'chainState 和 stepId 必填' };
+      throw new BusinessError(ERROR_CODE.PARAM_MISSING, 'chainState 和 stepId 必填');
     }
     const result = await resumeOrchestration(chainState, stepId, overrides || {}, {
       userId: req.user?.id,
@@ -311,18 +314,15 @@ export const aiGatewayController = {
       source: 'orchestrator',
       sourceChain: 'orchestrator',
     });
-    return { code: 200, data: result };
+    return result;
   }),
 
   pipelineUploadReference: wrapController(async (req) => {
     const { referenceUrl, referenceType, chainId } = req.body;
     if (!referenceUrl) {
-      return { code: 400, message: 'referenceUrl 必填' };
+      throw new BusinessError(ERROR_CODE.PARAM_MISSING, 'referenceUrl 必填');
     }
     logger.info(`[Pipeline] reference uploaded: chain=${chainId} type=${referenceType} url=${referenceUrl}`);
-    return {
-      code: 200,
-      data: { chainId, referenceUrl, referenceType: referenceType || 'auto', status: 'received', timestamp: new Date().toISOString() },
-    };
+    return { chainId, referenceUrl, referenceType: referenceType || 'auto', status: 'received', timestamp: new Date().toISOString() };
   }),
 };

@@ -5,7 +5,7 @@
 import { runEcommercePipeline, rerunSingleAgent } from '../adk/orchestration/ecommerceOrchestrator.js';
 import { INTENT_TYPES } from '../services/intentClassifier.js';
 import { wrapController } from '../utils/wrapController.js';
-import { success, error, Errors } from '../utils/response.js';
+import { success, error } from '../utils/response.js';
 import { BusinessError } from '../utils/businessError.js';
 import logger from '../utils/logger.js';
 import { ERROR_CODE } from '../constants/errorCode.js';

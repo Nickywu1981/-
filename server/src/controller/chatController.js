@@ -28,7 +28,7 @@ export async function sendMessage(req, res) {
     logger.error('[Chat] sendMessage failed', err.message);
     if (!res.headersSent) {
       if (err instanceof BusinessError) {
-        error(res, err.code, err.message);
+        error(res, err.status, err.message);
       } else {
         error(res, ERROR_CODE.AI_INFER_FAILED);
       }
