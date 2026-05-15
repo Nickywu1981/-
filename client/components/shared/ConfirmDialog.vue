@@ -102,9 +102,9 @@ defineExpose({ show })
 .btn-confirm {
   padding: 8px 20px; border-radius: 8px; border: none; color: #fff; cursor: pointer; font-size: 14px;
 }
-.btn-danger { background: #e74c3c; }
-.btn-warning { background: #f39c12; }
-.btn-primary { background: var(--brand, #3b82f6); }
+.btn-danger { background: var(--danger, #dc2626); }
+.btn-warning { background: var(--warning, #f59e0b); }
+.btn-primary { background: var(--brand, #5b5fe3); }
 
 .confirm-fade-enter-active, .confirm-fade-leave-active { transition: opacity .2s ease; }
 .confirm-fade-enter-from, .confirm-fade-leave-to { opacity: 0; }

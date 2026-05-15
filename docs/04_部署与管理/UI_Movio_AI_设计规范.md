@@ -2,7 +2,7 @@
 
 > **编写组**：G3 UI 设计组（UI-Designer 🔴主 / Doc-Writer 🟡辅）
 > **审核组**：G1 架构规划组（Architect）
-> **版本**：v1.13 | **日期**：2026-05-15
+> **版本**：v1.14 | **日期**：2026-05-15
 
 ---
 
@@ -921,4 +921,65 @@ R11 标记 `user-workspace.vue` 等 3 个 layout "CSS 完全缺失" — **本例
 
 ---
 
-> **文档版本**：v1.13 | **最后更新**：2026-05-15 | **审计轮次**：14 轮 | **G3 自修复**：64 项
+### 10.39 第十五轮审计（R15）— 组件硬编码色值 / 可及性 / 空态碎片化
+
+**审查范围**：ConfirmDialog / StatusBadge / Toast / Pagination / ErrorBoundary / EmptyState / AppMediaUpload / payment/result / enterprise/* / AdminShell / main.css
+
+### 10.40 本轮修复（11 项）
+
+| 文件 | 修复内容 |
+|------|------|
+| `ConfirmDialog.vue` | `.btn-danger #e74c3c` → `var(--danger, #dc2626)`；`.btn-warning #f39c12` → `var(--warning, #f59e0b)`；`.btn-primary #3b82f6` → `var(--brand, #5b5fe3)` |
+| `StatusBadge.vue` | 全量 18 处 `--el-*` Element Plus 变量 → 项目设计 token（`--brand`/`--success`/`--warning`/`--danger`/`--info` + 对应 `-light` 背景色），附带 fallback |
+| `payment/result.vue` | `.btn-fail #e74c3c` → `#dc2626`；`.btn-success #27ae60` → `#22c55e`；hover 同步修正 |
+| `AppMediaUpload.vue` | 全量 8 处 `--cfg-*` 死前缀 → 项目设计 token（`--text-primary`/`--text-muted`/`--border-light`/`--brand`/`--success`/`--danger`） |
+| `theme.css` | 新增 `--info-light: #eff6ff`（StatusBadge 依赖） |
+
+### 10.41 里程碑
+
+- **`--cfg-*` 死 token 前缀全量归零** — 4 组件 30+ 引用在 R9→R15 间全部迁移，此前缀从项目彻底消除
+- **`--el-*` Element Plus 耦合从 StatusBadge 清零** — 组件不再依赖第三方 UI 库变量
+- **全站硬编码 `#e74c3c` / `#f39c12` / `#3b82f6` fallback 归零**
+
+### 10.42 本轮 P0/P1 新发现（待跨组处理）
+
+| 优先级 | 问题 | 位置 | 详请 |
+|:--:|------|------|------|
+| **P1** | **全站零 skip-link** | 全局 | 键盘用户无法绕过侧边栏导航直达主内容，无 `skip-to-main` 链接 |
+| **P1** | **全站零 focus-trap** | 全局 | 41 文件处理 Escape 关闭但零文件 trap 焦点，模态内 Tab 可能逃逸到底层 |
+| **P1** | **Enterprise 第六套独立 token 体系** | `enterprise/dashboard.vue` + `enterprise/users.vue` | 14 个 `--ed-*` 私有 CSS 变量（`#667eea` 品牌色），绕过全局设计系统 |
+
+### 10.43 本轮 P2/P3 新发现
+
+| 优先级 | 问题 | 详请 |
+|:--:|------|------|
+| **P2** | **空态 11 种不同 class 模式** | `.empty-state`/`.empty-hint`/`.empty`/`.empty-box`/`.empty-media`/`.palette-empty`/`.seq-empty`/`.v-empty`/`.cm-empty`/`.slot-empty`/`.error-state` — 应统一为 `<EmptyState>` 组件 |
+| **P2** | **状态背景色暗黑模式无覆盖** | `--success-light`/`--warning-light`/`--danger-light`/`--info-light` 4 token 仅在 light 模式定义，暗黑模式使用亮色背景 |
+| **P3** | **user-workspace / business-ops 无面包屑** | AdminShell 有面包屑支持，用户端布局缺失 |
+
+### 10.44 其他通过项
+
+| 资产 | 结果 |
+|------|:--:|
+| `Toast.vue` | 全量设计 token，Emoji 图标，aria-live="polite"，TransitionGroup 动画 |
+| `Pagination.vue` | 全量 i18n，aria-label 完备，`--brand` token |
+| `ErrorBoundary.vue` | `role="alert"`，`--brand` + 正确 fallback，全量 i18n |
+| `EmptyState.vue` | 3 种 size，gradient + rgb shadow 正确，双 action slot |
+| `main.css` | `.sr-only` + `prefers-reduced-motion` + Firefox scrollbar + 全局 `.modal-overlay`/`.toast-msg` |
+| `AdminShell.vue` | `aria-label="Breadcrumb"` + `aria-current="page"` + `aria-expanded` + `aria-haspopup` |
+| `scrollbar` | 仅 main.css 定义，使用 `--border-light`/`--text-muted` token |
+| `font-family` 硬编码 | 均为 `monospace`/`JetBrains Mono` 等代码字体，属合理用例 |
+
+### 10.45 本轮累计
+
+| 优先级 | R14 累计 | R15 新增 | R15 修复 | 总计 |
+|:--:|:--:|:--:|:--:|:--:|
+| P0 | 46 | 0 | -3 | **43** |
+| P1 | 12 | 3 | 0 | **15** |
+| P2 | 0 | 3 | 0 | **3** |
+| P3 | 15 | 1 | 0 | **16** |
+| **合计** | **61** | **7** | **-3** | **65** |
+
+---
+
+> **文档版本**：v1.14 | **最后更新**：2026-05-15 | **审计轮次**：15 轮 | **G3 自修复**：75 项

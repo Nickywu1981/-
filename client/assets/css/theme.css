@@ -65,6 +65,7 @@
   --warning-light: #fffbeb;
   --warning-border: #fef3c7;
   --danger-light: #fef2f2;
+  --info-light: #eff6ff;
 
   /* 阴影 */
   --shadow-sm: 0 1px 2px rgba(15, 18, 30, 0.04);

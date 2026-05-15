@@ -283,14 +283,14 @@ function formatSize(bytes: number): string {
   border: 1px solid var(--cfg-border, #e5e7eb);
 }
 .file-info { flex: 1; display: flex; justify-content: space-between; align-items: center; min-width: 0; }
-.file-name { font-size: 14px; color: var(--cfg-text-primary, #374151); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.file-size { font-size: 12px; color: var(--cfg-text-muted, #9ca3af); flex-shrink: 0; margin-left: 8px; }
-.progress-bar { flex: 1; height: 6px; background: var(--cfg-border, #e5e7eb); border-radius: 3px; overflow: hidden; max-width: 120px; }
-.progress-fill { height: 100%; background: var(--cfg-primary, #4F46E5); border-radius: 3px; transition: width 0.3s; }
+.file-name { font-size: 14px; color: var(--text-primary, #1a1a2e); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.file-size { font-size: 12px; color: var(--text-muted, #767676); flex-shrink: 0; margin-left: 8px; }
+.progress-bar { flex: 1; height: 6px; background: var(--border-light, #e5e7eb); border-radius: 3px; overflow: hidden; max-width: 120px; }
+.progress-fill { height: 100%; background: var(--brand, #5b5fe3); border-radius: 3px; transition: width 0.3s; }
 .status { font-size: 14px; font-weight: 600; flex-shrink: 0; }
-.status.done { color: var(--cfg-success, #10B981); }
-.status.error { color: var(--cfg-error, #EF4444); }
-.status.pending { color: var(--cfg-text-muted, #9ca3af); font-size: 12px; }
-.btn-remove { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--cfg-text-muted, #9ca3af); padding: 0 4px; }
+.status.done { color: var(--success, #22c55e); }
+.status.error { color: var(--danger, #dc2626); }
+.status.pending { color: var(--text-muted, #767676); font-size: 12px; }
+.btn-remove { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--text-muted, #767676); padding: 0 4px; }
 .upload-actions { margin-top: 16px; }
 </style>

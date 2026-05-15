@@ -185,7 +185,7 @@ definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
   border-radius: 50%;
 }
 .success .icon { color: #fff; background: var(--success); }
-.fail .icon { color: #fff; background: var(--danger, #e74c3c); }
+.fail .icon { color: #fff; background: var(--danger, #dc2626); }
 .result-card h2 { font-size: 1.5rem; color: var(--text-primary); margin-bottom: var(--space-2); }
 .result-card p { color: var(--text-secondary); margin-bottom: var(--space-6); }
 .spinner {
@@ -218,9 +218,9 @@ definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
   font-weight: 600;
   cursor: pointer;
 }
-.btn-success { background: var(--success, #27ae60); }
-.btn-success:hover { background: #219a52; }
+.btn-success { background: var(--success, #22c55e); }
+.btn-success:hover { background: #16a34a; }
 .btn-success:disabled, .btn-fail:disabled { opacity: .5; cursor: not-allowed; }
-.btn-fail { background: var(--danger, #e74c3c); }
+.btn-fail { background: var(--danger, #dc2626); }
 .btn-fail:hover { background: #c0392b; }
 </style>
