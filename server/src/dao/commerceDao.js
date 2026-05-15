@@ -78,7 +78,6 @@ export async function getDashboardStats() {
     taskTrend, userTrend, revenueTrend,
   };
 }
-}
 
 // ==================== 用户管理 ====================
 

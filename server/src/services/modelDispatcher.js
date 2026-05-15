@@ -318,6 +318,8 @@ export {
   getUsageStats,
   clearCache,
   getCacheSize,
+  getCategories,
+  getModelsByCategory,
 };
 
 export default {

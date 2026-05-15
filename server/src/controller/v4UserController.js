@@ -9,7 +9,7 @@ import { success } from '../utils/response.js';
 import { BusinessError } from '../utils/businessError.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import * as userDao from '../dao/userDao.js';
-import membershipDao from '../dao/membershipDao.js';
+import * as membershipDao from '../dao/membershipDao.js';
 
 export const getProfile = wrapController(async (req, res) => {
   const user = await userDao.findById(req.user.id);

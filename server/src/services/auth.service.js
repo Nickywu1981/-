@@ -63,8 +63,6 @@ function getAudience(role) {
   return 'consumer';
 }
 import * as emailService from './emailService.js';
-import logger from '../utils/logger.js';
-import { ERROR_CODE } from '../constants/errorCode.js';
 
 export async function register({ phone, email, password, nickname, inviteCode: _inviteCode }) {
   const username = phone || email || '';

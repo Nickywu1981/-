@@ -1,7 +1,7 @@
 /**
  * 共享任务查询工厂 — 消除 advancedImageService / advancedVideoService 中的重复代码
  */
-import { BusinessError } from '../utils/response.js';
+import { BusinessError } from '../utils/businessError.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
 export function makeTaskQueries({ getTask, listUserTasks, countUserTasks }) {

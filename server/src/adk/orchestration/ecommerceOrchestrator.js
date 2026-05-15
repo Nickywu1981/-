@@ -11,7 +11,7 @@
  * 视频铁律：禁止一键直出，必须先脚本→分镜→合成
  */
 import { SequentialAgent, ParallelAgent } from './index.js';
-import { intentAgent } from '../agents/intentAgent.js';
+import { IntentAgent } from '../agents/intentAgent.js';
 import { GuardAgent } from '../agents/guardAgent.js';
 import { expandAgent } from '../agents/expandAgent.js';
 import { detailPageAgent } from '../agents/detailAgent.js';
@@ -35,7 +35,7 @@ const whiteBgPipeline = new SequentialAgent({
   name: 'white_bg_pipeline',
   description: '白底图全链路：扩图→详情→脚本→分镜→视频合成→配音',
   subAgents: [
-    intentAgent,
+    IntentAgent,
     GuardAgent,
     expandAgent,
     detailPageAgent,
@@ -51,7 +51,7 @@ const productImagePipeline = new SequentialAgent({
   name: 'product_image_pipeline',
   description: '普通产品图链路：扩图→详情→脚本分镜→视频→配音',
   subAgents: [
-    intentAgent,
+    IntentAgent,
     GuardAgent,
     expandAgent,
     detailPageAgent,
@@ -67,7 +67,7 @@ const viralClonePipeline = new SequentialAgent({
   name: 'viral_clone_pipeline',
   description: '爆款复刻链路：拆解爆款→脚本分镜→画面生成→视频合成',
   subAgents: [
-    intentAgent,
+    IntentAgent,
     GuardAgent,
     scriptStoryboardAgent,   // 先做爆款分析
     expandAgent,              // 生成匹配画面
@@ -82,7 +82,7 @@ const generalTextImagePipeline = new SequentialAgent({
   name: 'general_text_image_pipeline',
   description: '通用图文链路：意图→合规→模板→封装→生成→后处理',
   subAgents: [
-    intentAgent,
+    IntentAgent,
     GuardAgent,
     contentDispatchAgent,
   ],
@@ -255,7 +255,7 @@ export async function rerunSingleAgent(agentName, params) {
   Object.entries(params.state || {}).forEach(([k, v]) => ctx.setState(k, v));
 
   const agentMap = {
-    intent: intentAgent,
+    intent: IntentAgent,
     guard: GuardAgent,
     expand: expandAgent,
     detail: detailPageAgent,
