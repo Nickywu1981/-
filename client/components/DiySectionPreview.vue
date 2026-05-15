@@ -89,8 +89,9 @@ const placeholder = '/placeholder.svg'
 
 const countdown = computed(() => {
   if (!config.value.endTime) return ''
-  const diff = new Date(config.value.endTime).getTime() - Date.now()
-  if (diff <= 0) return t('diyPreview.ended')
+  const ts = new Date(config.value.endTime).getTime()
+  if (isNaN(ts) || ts <= Date.now()) return t('diyPreview.ended')
+  const diff = ts - Date.now()
   const d = Math.floor(diff / 86400000)
   const h = Math.floor((diff % 86400000) / 3600000)
   const m = Math.floor((diff % 3600000) / 60000)

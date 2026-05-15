@@ -8,14 +8,14 @@ export async function useLanding() {
   const route = useRoute();
 
   // ── Auth ──
-  const user = ref<any>(null);
+  const user = ref(null);
   async function checkAuth() {
-    try { const res: any = await $fetch('/api/user/profile', { credentials: 'include' }); user.value = res.data; } catch { user.value = null; }
+    try { const res = await $fetch('/api/user/profile', { credentials: 'include' }); user.value = res.data; } catch { user.value = null; }
   }
 
   // ── Site config ──
   const { data: siteConfig } = await useAsyncData('site-config-home', () =>
-    $fetch<any>('/api/site-config/public').catch((err: any) => { if (import.meta.dev) console.warn('[home] site config load failed, using defaults', err?.message || err); return {}; })
+    $fetch('/api/site-config/public').catch((err) => { if (import.meta.dev) console.warn('[home] site config load failed, using defaults', err?.message || err); return {}; })
   );
 
   const siteName = computed(() => siteConfig.value?.site_name || 'Movio AI');
@@ -33,7 +33,7 @@ export async function useLanding() {
   const activeSection = ref('');
   const mobileOpen = ref(false);
 
-  function scrollTo(id: string) {
+  function scrollTo(id) {
     if (!process.client) return;
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -44,9 +44,10 @@ export async function useLanding() {
   }
 
   let scrollTicking = false;
+  let rafId = null;
   const handleScroll = () => {
     if (!scrollTicking) {
-      requestAnimationFrame(() => {
+      rafId = requestAnimationFrame(() => {
         const y = window.scrollY;
         scrolled.value = y > 50;
         showBackTop.value = y > 600;
@@ -62,14 +63,15 @@ export async function useLanding() {
         }
         if (!found) activeSection.value = '';
         scrollTicking = false;
+        rafId = null;
       });
       scrollTicking = true;
     }
   };
 
   // ── Entrance animation ──
-  const animatedEls = ref<Set<Element>>(new Set());
-  let entranceObserver: IntersectionObserver | null = null;
+  const animatedEls = ref(new Set());
+  let entranceObserver = null;
 
   function setupEntranceObserver() {
     if (process.client && window.IntersectionObserver) {
@@ -81,7 +83,7 @@ export async function useLanding() {
           }
         });
       }, { threshold: 0.12, rootMargin: '0px 0px -32px 0px' });
-      document.querySelectorAll('.lp-card, .lp-mf-card, .lp-step, .lp-case, .lp-plan, .lp-faq-it').forEach(el => entranceObserver!.observe(el));
+      document.querySelectorAll('.lp-card, .lp-mf-card, .lp-step, .lp-case, .lp-plan, .lp-faq-it').forEach(el => entranceObserver.observe(el));
       setTimeout(() => {
         document.querySelectorAll('.lp-card, .lp-mf-card, .lp-step, .lp-case, .lp-plan, .lp-faq-it').forEach(el => {
           if (!animatedEls.value.has(el)) { el.classList.add('lp-in'); }
@@ -94,11 +96,11 @@ export async function useLanding() {
     if (entranceObserver) entranceObserver.disconnect();
   }
 
-  onUnmounted(() => { destroyEntranceObserver(); scrollTicking = false; })
+  onUnmounted(() => { if (rafId) cancelAnimationFrame(rafId); destroyEntranceObserver(); scrollTicking = false; })
 
   // ── FAQ ──
   const faqOpen = ref(-1);
-  function toggleFaq(i: number) { faqOpen.value = faqOpen.value === i ? -1 : i; }
+  function toggleFaq(i) { faqOpen.value = faqOpen.value === i ? -1 : i; }
 
   // ── Tabs ──
   const activeTab = ref('all');
@@ -111,30 +113,30 @@ export async function useLanding() {
     { key: 'ai', label: t('landing.features_tab_ai'), icon: '◆' },
   ]);
 
-  const memfocusCards = computed(() => t('landing.memfocus_cards') as any[]);
-  const steps = computed(() => t('landing.steps') as any[]);
-  const useCases = computed(() => t('landing.use_cases') as any[]);
-  const faqs = computed(() => t('landing.faqs') as any[]);
-  const platforms = computed(() => t('landing.platforms') as string[]);
+  const memfocusCards = computed(() => t('landing.memfocus_cards'));
+  const steps = computed(() => t('landing.steps'));
+  const useCases = computed(() => t('landing.use_cases'));
+  const faqs = computed(() => t('landing.faqs'));
+  const platforms = computed(() => t('landing.platforms'));
   const cards = computed(() => {
-    const fromI18n = t('landing.feature_cards') as any[];
+    const fromI18n = t('landing.feature_cards');
     if (Array.isArray(fromI18n) && fromI18n.length) return fromI18n;
     return [];
   });
 
   const filteredCards = computed(() =>
-    activeTab.value === 'all' ? cards.value : cards.value.filter((c: any) => c.category === activeTab.value)
+    activeTab.value === 'all' ? cards.value : cards.value.filter((c) => c.category === activeTab.value)
   );
 
-  function countForTab(key: string) {
+  function countForTab(key) {
     if (key === 'all') return cards.value.length;
-    return cards.value.filter((c: any) => c.category === key).length;
+    return cards.value.filter((c) => c.category === key).length;
   }
 
   const plans = computed(() => {
-    const raw = t('landing.plans') as any[];
+    const raw = t('landing.plans');
     if (Array.isArray(raw) && raw.length) return raw;
-    const fallback = t('landing.plans_fallback') as any[];
+    const fallback = t('landing.plans_fallback');
     return Array.isArray(fallback) && fallback.length ? fallback : [];
   });
 

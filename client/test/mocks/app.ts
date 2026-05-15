@@ -1,3 +1,5 @@
+import { ref } from 'vue'
+
 // Mock #app for vitest (Nuxt internal module)
 export const useRuntimeConfig = () => ({
   public: {
@@ -15,4 +17,6 @@ export const useRoute = () => ({
   query: {},
   params: {},
 });
-export const useNuxtApp = () => ({});
+export const useNuxtApp = () => ({
+  $i18n: { t: (key: string) => key, locale: ref('zh-CN') },
+});
