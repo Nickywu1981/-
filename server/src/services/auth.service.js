@@ -1,11 +1,52 @@
 import { BusinessError } from '../utils/businessError.js';
+import { ERROR_CODE } from '../constants/errorCode.js';
 import { USER_STATUS } from '../constants/domainStatus.js';
 import bcrypt from 'bcryptjs';
 import * as userDao from '../dao/userDao.js';
 import { generateAccessToken } from '../middleware/auth.js';
 import { jwtExpiresIn } from '../config/index.js';
+import logger from '../utils/logger.js';
 
 const SALT_ROUNDS = 12;
+
+// ── 账号级爆破防护 ──
+const loginFailures = new Map();
+const MAX_FAILURES = 5;
+const LOCKOUT_MINUTES = 15;
+
+function checkLockout(identifier) {
+  const record = loginFailures.get(identifier);
+  if (!record) return;
+  if (record.lockedUntil && Date.now() < record.lockedUntil) {
+    const remaining = Math.ceil((record.lockedUntil - Date.now()) / 60000);
+    throw new BusinessError(ERROR_CODE.TOO_MANY_REQUESTS, `账号已锁定，${remaining}分钟后重试`);
+  }
+  if (record.lockedUntil && Date.now() >= record.lockedUntil) {
+    loginFailures.delete(identifier);
+  }
+}
+
+function recordLoginFailure(identifier) {
+  const now = Date.now();
+  const record = loginFailures.get(identifier) || { count: 0, firstAttempt: now };
+  record.count++;
+  if (record.count >= MAX_FAILURES) {
+    record.lockedUntil = now + LOCKOUT_MINUTES * 60 * 1000;
+    logger.warn('[Auth] 账号锁定', { identifier: identifier.substring(0, 20), cnt: record.count });
+  }
+  loginFailures.set(identifier, record);
+}
+
+function clearLoginFailures(identifier) {
+  loginFailures.delete(identifier);
+}
+
+setInterval(() => {
+  const now = Date.now();
+  for (const [k, v] of loginFailures) {
+    if (v.lockedUntil && now >= v.lockedUntil) loginFailures.delete(k);
+  }
+}, 30 * 60 * 1000);
 import * as smsService from './smsService.js';
 
 /**
@@ -60,9 +101,13 @@ export async function login({ phone, email, username, password }) {
   const DUMMY = '$2a$12$abcdefghijklmnopqrstuvabcdefghijklmnopqrstuv34567890123';
   const validPassword = await bcrypt.compare(password, user ? user.password : DUMMY);
 
-  if (!user || !validPassword) throw new BusinessError(ERROR_CODE.PASSWORD_WRONG);
+  if (!user || !validPassword) {
+    recordLoginFailure(identifier);
+    throw new BusinessError(ERROR_CODE.PASSWORD_WRONG);
+  }
   if (user.status !== USER_STATUS.ACTIVE) throw new BusinessError(ERROR_CODE.ACCOUNT_DISABLED);
 
+  clearLoginFailures(identifier);
   await userDao.updateLastLogin(user.id);
 
   user.audience = getAudience(user.role);  // Decision 025: 三端按角色映射

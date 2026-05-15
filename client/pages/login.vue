@@ -98,13 +98,20 @@ const msgErr = ref(false);
 const { countdown: smsCountdown, start: startSmsCd } = useCountdown(60)
 const { countdown: emailCountdown, start: startEmailCd } = useCountdown(60)
 
+function safeRedirect(path: unknown): string {
+  if (typeof path !== 'string' || !path) return '/workspace'
+  // 仅允许站内相对路径，拦截 //evil.com 等绝对 URL 钓鱼跳转
+  if (!path.startsWith('/') || path.startsWith('//') || path.startsWith('\\\\')) return '/workspace'
+  return path
+}
+
 async function handlePasswordLogin() {
   loading.value = true; msg.value = '';
   try {
     const authStore = useAuthStore()
     await authStore.login(username.value, password.value)
     await authStore.fetchUser()
-    await navigateTo((route.query.redirect as string) || '/workspace')
+    await navigateTo(safeRedirect(route.query.redirect))
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || t('auth.login_network_error'); msgErr.value = true; }
   finally { loading.value = false; }
 }
@@ -116,7 +123,7 @@ async function handleSmsLogin() {
     await $fetch('/api/sms/verify-code', { method: 'POST', credentials: 'include', body: { phone: smsPhone.value, scene: 'login', code: smsCode.value } });
     await $fetch('/api/auth/login-by-code', { method: 'POST', credentials: 'include', body: { phone: smsPhone.value, code: smsCode.value } });
     await useAuthStore().fetchUser();
-    await navigateTo((route.query.redirect as string) || '/workspace');
+    await navigateTo(safeRedirect(route.query.redirect));
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || t('auth.login_network_error'); msgErr.value = true; }
   finally { loading.value = false; }
 }
@@ -138,7 +145,7 @@ async function handleEmailLogin() {
     await $fetch('/api/email/verify-code', { method: 'POST', credentials: 'include', body: { email: emailAddr.value, code: emailCode.value } });
     await $fetch('/api/auth/login-by-code', { method: 'POST', credentials: 'include', body: { email: emailAddr.value, code: emailCode.value } });
     await useAuthStore().fetchUser();
-    await navigateTo((route.query.redirect as string) || '/workspace');
+    await navigateTo(safeRedirect(route.query.redirect));
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || t('auth.login_network_error'); msgErr.value = true; }
   finally { loading.value = false; }
 }

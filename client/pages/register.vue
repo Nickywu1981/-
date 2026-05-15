@@ -84,6 +84,12 @@ const msgErr = ref(false);
 const { countdown: smsCountdown, start: startSmsCd } = useCountdown(60)
 const { countdown: emailCountdown, start: startEmailCd } = useCountdown(60)
 
+function safeRedirect(path: unknown): string {
+  if (typeof path !== 'string' || !path) return '/workspace'
+  if (!path.startsWith('/') || path.startsWith('//') || path.startsWith('\\\\')) return '/workspace'
+  return path
+}
+
 function randomPassword() {
   const arr = new Uint8Array(12);
   crypto.getRandomValues(arr);
@@ -98,7 +104,7 @@ async function handleRegister() {
                          : { phone: username.value, password: password.value, nickname: nickname.value }
     const authStore = useAuthStore()
     await authStore.register(body)
-    await navigateTo((route.query.redirect as string) || '/workspace')
+    await navigateTo(safeRedirect(route.query.redirect))
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || err.message || t('auth.register_failed'); msgErr.value = true; }
   finally { loading.value = false; }
 }
@@ -114,7 +120,7 @@ async function handleSmsRegister() {
       credentials: 'include',
     });
     await useAuthStore().fetchUser();
-    await navigateTo((route.query.redirect as string) || '/workspace');
+    await navigateTo(safeRedirect(route.query.redirect));
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || t('auth.register_failed'); msgErr.value = true; }
   finally { loading.value = false; }
 }
@@ -140,7 +146,7 @@ async function handleEmailRegister() {
       credentials: 'include',
     });
     await useAuthStore().fetchUser();
-    await navigateTo((route.query.redirect as string) || '/workspace');
+    await navigateTo(safeRedirect(route.query.redirect));
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || t('auth.register_failed'); msgErr.value = true; }
   finally { loading.value = false; }
 }

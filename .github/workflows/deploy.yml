@@ -14,7 +14,6 @@ on:
 
 env:
   NODE_VERSION: '20'
-  PNPM_VERSION: '9'
 
 jobs:
   build-and-deploy:
@@ -24,35 +23,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+          cache: 'npm'
           cache-dependency-path: |
-            client/pnpm-lock.yaml
-            server/pnpm-lock.yaml
+            client/package-lock.json
+            server/package-lock.json
 
       # ── Server build ──
       - name: Install server deps
         working-directory: server
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - name: Run server tests
         working-directory: server
-        run: pnpm test
+        run: npm test
 
       # ── Client build ──
       - name: Install client deps
         working-directory: client
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - name: Generate Nuxt static
         working-directory: client
-        run: pnpm build
+        run: npm run build
         env:
           NODE_ENV: production
 
@@ -60,7 +55,7 @@ jobs:
       - name: Package server
         run: |
           mkdir -p dist/server
-          cp -r server/src server/package.json server/pnpm-lock.yaml dist/server/
+          cp -r server/src server/package.json server/package-lock.json dist/server/
           echo "{}" > dist/server/src/config/env.json
 
       - name: Package client
