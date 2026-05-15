@@ -18,7 +18,8 @@ export async function getNotifications(userId, { page = 1, pageSize = 20 }) {
 }
 
 export async function markAsRead(notificationId, userId) {
-  await notificationDao.markAsRead(notificationId, userId);
+  const affected = await notificationDao.markAsRead(notificationId, userId);
+  if (affected === 0) throw new BusinessError(ERROR_CODE.NOT_FOUND);
 }
 
 export async function markAllAsRead(userId) {

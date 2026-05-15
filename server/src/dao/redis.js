@@ -93,7 +93,7 @@ export async function cacheSet(key, value, ttl = 300) {
       memStore.set(key, { _v: value, _ts: Date.now() }); evictOldest(); return;
     }
     await r.set(key, JSON.stringify(value), { EX: ttl });
-  } catch (e) { logger.warn('[Redis] set 降级到内存', { key, error: e.message }); memStore.set(key, { _v: value, _ts: Date.now() }); evictOldest(); }
+  } catch (e) { logger.warn('[Redis] set 降级到内存', { key, error: e.message }); const v = typeof value === 'string' ? value : JSON.stringify(value); if (Buffer.byteLength(v, 'utf8') <= 512 * 1024) { memStore.set(key, { _v: value, _ts: Date.now() }); evictOldest(); } }
 }
 
 export async function cacheDel(key) {

@@ -136,7 +136,7 @@ services:
     container_name: ai-saas-client
     restart: unless-stopped
     ports:
-      - "${CLIENT_PORT:-3000}:3000"
+      - "127.0.0.1:${CLIENT_PORT:-3000}:3000"
     environment:
       NODE_ENV: ${NODE_ENV:-development}
       NUXT_PUBLIC_API_BASE: http://localhost:3001/api

@@ -12,6 +12,8 @@ import * as codeStore from './codeStore.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
 const CODE_CACHE = new Map(); // key: email, value: { code, expires, attempts }
+// WARNING: Per-process Map — rate limits are bypassable across PM2 cluster workers.
+// A full fix requires Redis-backed atomic counters (INCR + EXPIRE).
 const EMAIL_SEND_LOG = new Map(); // key: email, value: [timestamp, ...]
 
 // 定期清理过期验证码和发送日志，防止内存泄漏
@@ -84,7 +86,9 @@ const providers = {
         return { success: true, messageId: info.messageId };
       } catch (e) {
         logger.error(`[Email] SMTP 发送失败: ${e.message}`);
-        throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
+        // Preserve original error type for upstream handling (auth/timeout/recipient)
+        if (e instanceof BusinessError) throw e;
+        throw new BusinessError(ERROR_CODE.INTERNAL_ERROR, `SMTP: ${e.message?.slice(0, 200) || 'unknown error'}`);
       }
     },
   },
@@ -214,7 +218,7 @@ export async function verifyCode(email, code) {
   if (Date.now() > cached.expires) { CODE_CACHE.delete(email); throw new BusinessError(ERROR_CODE.PARAM_INVALID); }
   if (cached.code !== String(code)) { cached.attempts++; throw new BusinessError(ERROR_CODE.PARAM_INVALID); }
   CODE_CACHE.delete(email);
-  CODE_CACHE.set(`verified:email:${email}`, { time: Date.now() });
+  CODE_CACHE.set(`verified:email:${email}`, { time: Date.now(), expires: Date.now() + 300000 });
   return true;
 }
 

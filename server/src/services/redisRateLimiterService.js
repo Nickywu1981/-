@@ -15,12 +15,12 @@ const config = aiGatewayConfig.rateLimiter;
 let _redis = null;
 let _redisInitAttempted = false;
 
-async function getRedis() {
+async function getRedisClient() {
   if (_redis) return _redis;
   if (_redisInitAttempted) return null;
   try {
-    const { default: redisModule } = await import('../dao/redis.js');
-    _redis = redisModule;
+    const { getRedis } = await import('../dao/redis.js');
+    _redis = await getRedis();
   } catch {
     logger.warn('[RedisRateLimiter] Redis 不可用，降级为内存模式');
   }
@@ -75,7 +75,7 @@ setInterval(() => {
 // ==================== Redis Token Bucket ====================
 
 async function redisTryConsume(key, qps, burst, count = 1) {
-  const redis = await getRedis();
+  const redis = await getRedisClient();
   if (!redis) {
     // 降级为内存模式
     const bucket = getMemoryBucket(key, qps, burst);

@@ -16,12 +16,18 @@ import * as codeStore from './codeStore.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
 // 兜底: Redis 不可用时降级为进程内 Map
+// WARNING: Per-process Map — rate limits are bypassable across PM2 cluster workers.
 const CODE_CACHE = new Map();
+const SMS_SEND_LOG = new Map(); // key: phone, value: [timestamp, ...]
 export const _smsCleanupTimer = setInterval(() => {
   try {
   const now = Date.now();
   for (const [key, entry] of CODE_CACHE) {
     if (entry.expires < now) CODE_CACHE.delete(key);
+  }
+  for (const [key, timestamps] of SMS_SEND_LOG) {
+    SMS_SEND_LOG.set(key, timestamps.filter((t) => now - t < 86400000));
+    if (SMS_SEND_LOG.get(key)?.length === 0) SMS_SEND_LOG.delete(key);
   }
   } catch (err) { logger.warn('[SMS] cleanup interval error', { error: err.message }); }
 }, 300000).unref();
@@ -180,6 +186,20 @@ export async function sendVerificationCode({ phone, scene }) {
 // ==================== 通知类短信 ====================
 
 export async function sendNotification(phone, { scene, templateCode, params }) {
+  // 格式校验
+  if (!phone || !/^\+?[\d\- ]{7,20}$/.test(phone)) {
+    return { code: ERROR_CODE.PARAM_INVALID, success: false, msg: 'Invalid phone number' };
+  }
+
+  // 频率控制：每小时 10 条、每日 30 条
+  const now = Date.now();
+  const sends = (SMS_SEND_LOG.get(phone) || []).filter(t => now - t < 86400000);
+  const hourSends = sends.filter(t => now - t < 3600000).length;
+  if (hourSends >= 10) return { code: ERROR_CODE.QUOTA_EXCEEDED, success: false, msg: 'Hourly notification limit exceeded' };
+  if (sends.length >= 30) return { code: ERROR_CODE.QUOTA_EXCEEDED, success: false, msg: 'Daily notification limit exceeded' };
+  sends.push(now);
+  SMS_SEND_LOG.set(phone, sends);
+
   const template = templateCode
     ? await smsTemplateDao.findByCode(templateCode)
     : await smsTemplateDao.findByCode(scene);

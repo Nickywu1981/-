@@ -55,7 +55,7 @@ async function scanAndDel(redis, pattern) {
   do {
     const [nextCursor, keys] = await redis.scan(cursor, 'MATCH', pattern, 'COUNT', 200);
     cursor = parseInt(nextCursor, 10);
-    if (keys.length) await redis.del(keys);
+    if (keys.length) await redis.unlink(keys);
   } while (cursor !== 0);
 }
 
