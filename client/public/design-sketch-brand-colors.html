@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>品牌色四歧路 · Movio AI</title>
+<style>
+  :root {
+    --bg: #0a0c14; --card: #141724; --border: #1f2240;
+    --text-1: #ccc; --text-2: #8890b0; --text-3: #556;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--text-1); padding: 24px; }
+  h1 { font-size: 16px; margin-bottom: 4px; }
+  h2 { font-size: 10px; color: var(--text-3); font-weight: 400; margin-bottom: 24px; }
+  .brands { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+  .brand-card { background: var(--card); border-radius: 10px; padding: 20px; text-align: center; border: 1px solid var(--border); }
+  .brand-card.current { border-color: #5b5fe3; border-width: 2px; }
+  .swatch { width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 12px; }
+  .brand-card h3 { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .brand-card .code { font-size: 18px; font-weight: 800; margin-bottom: 6px; font-family: 'SF Mono', 'Consolas', monospace; }
+  .brand-card .desc { font-size: 10px; color: var(--text-2); margin-bottom: 8px; }
+  .brand-card .files { font-size: 9px; color: var(--text-3); margin-bottom: 8px; line-height: 1.6; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 9px; font-weight: 600; }
+  .badge.ok { background: rgba(72,187,120,.15); color: #48bb78; }
+  .badge.err { background: rgba(245,101,101,.15); color: #f56565; }
+  .badge.warn { background: rgba(236,201,75,.15); color: #ecc94b; }
+  .matrix { background: var(--card); border-radius: 10px; padding: 16px; border: 1px solid var(--border); }
+  .matrix h3 { font-size: 11px; color: var(--text-2); margin-bottom: 12px; }
+  table { width: 100%; border-collapse: collapse; font-size: 10px; }
+  th, td { padding: 8px 12px; text-align: center; border: 1px solid var(--border); }
+  th { color: var(--text-2); font-weight: 500; background: rgba(255,255,255,.02); }
+  td { color: var(--text-3); }
+  td.bad { color: #f56565; font-weight: 600; }
+  td.mid { color: #ecc94b; }
+  td.good { color: #48bb78; }
+</style>
+</head>
+<body>
+
+<h1>🎨 品牌色四歧路 — 当前项目存在 4 套互不兼容的品牌色</h1>
+<h2>ΔE 色差矩阵 (CIE76) · 值越大差异越明显，ΔE &lt; 2 为人眼不可分辨</h2>
+
+<div class="brands">
+  <div class="brand-card current">
+    <div class="swatch" style="background:#5b5fe3;box-shadow:0 6px 24px rgba(91,95,227,.4)"></div>
+    <h3 style="color:#5b5fe3">暖靛蓝</h3>
+    <div class="code" style="color:#5b5fe3">#5b5fe3</div>
+    <div class="desc">CSS 全线使用 · 正确品牌色</div>
+    <div class="files">design-tokens.css<br>theme.css<br>unified-design-system<br>manifest.json<br>favicon.svg</div>
+    <span class="badge ok">✓ 标准色</span>
+  </div>
+
+  <div class="brand-card">
+    <div class="swatch" style="background:#7C3AED;box-shadow:0 6px 24px rgba(124,58,237,.4)"></div>
+    <h3 style="color:#7C3AED">紫罗兰</h3>
+    <div class="code" style="color:#7C3AED">#7C3AED</div>
+    <div class="desc">旧品牌色 · 14 文件残留</div>
+    <div class="files">9 pages/ 文件<br>2 error.vue<br>3 layouts/ 残留<br>ΔE≈18 (差异最大)</div>
+    <span class="badge err">P0 清理中</span>
+  </div>
+
+  <div class="brand-card">
+    <div class="swatch" style="background:#667eea;box-shadow:0 6px 24px rgba(102,126,234,.4)"></div>
+    <h3 style="color:#667eea">靛蓝</h3>
+    <div class="code" style="color:#667eea">#667eea</div>
+    <div class="desc">Enterprise 3 页面独立色</div>
+    <div class="files">enterprises.vue<br>enterprise/*.vue<br>ΔE≈12 (中等差异)<br>独立未收敛</div>
+    <span class="badge warn">需确认意图</span>
+  </div>
+
+  <div class="brand-card">
+    <div class="swatch" style="background:#6c5ce7;box-shadow:0 6px 24px rgba(108,92,231,.4)"></div>
+    <h3 style="color:#6c5ce7">深紫</h3>
+    <div class="code" style="color:#6c5ce7">#6c5ce7</div>
+    <div class="desc">ThreeViewer 3D 组件唯一色</div>
+    <div class="files">ThreeViewer.vue<br>ΔE≈8 (最接近但仍偏差)<br>完全孤立</div>
+    <span class="badge err">P0 待修复</span>
+  </div>
+</div>
+
+<div class="matrix">
+  <h3>📐 ΔE 色差矩阵 (CIE76)</h3>
+  <table>
+    <tr>
+      <th></th>
+      <th style="color:#5b5fe3">#5b5fe3<br>标准色</th>
+      <th style="color:#7C3AED">#7C3AED<br>旧色</th>
+      <th style="color:#667eea">#667eea<br>Enterprise</th>
+      <th style="color:#6c5ce7">#6c5ce7<br>3D组件</th>
+    </tr>
+    <tr>
+      <td style="color:var(--text-2)">#5b5fe3</td>
+      <td class="good">0</td>
+      <td class="bad">18.2</td>
+      <td class="mid">11.7</td>
+      <td class="mid">7.6</td>
+    </tr>
+    <tr>
+      <td style="color:var(--text-2)">#7C3AED</td>
+      <td class="bad">18.2</td>
+      <td class="good">0</td>
+      <td class="mid">14.1</td>
+      <td class="mid">12.3</td>
+    </tr>
+    <tr>
+      <td style="color:var(--text-2)">#667eea</td>
+      <td class="mid">11.7</td>
+      <td class="mid">14.1</td>
+      <td class="good">0</td>
+      <td class="good">3.8</td>
+    </tr>
+    <tr>
+      <td style="color:var(--text-2)">#6c5ce7</td>
+      <td class="mid">7.6</td>
+      <td class="mid">12.3</td>
+      <td class="good">3.8</td>
+      <td class="good">0</td>
+    </tr>
+  </table>
+  <div style="margin-top:12px;font-size:9px;color:var(--text-3);display:flex;gap:16px">
+    <span>🟢 ΔE &lt; 5 — 人眼几乎不可分辨</span>
+    <span>🟡 ΔE 5~15 — 可感知差异</span>
+    <span>🔴 ΔE &gt; 15 — 明显不同颜色</span>
+  </div>
+</div>
+
+</body>
+</html>
