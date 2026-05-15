@@ -2,47 +2,47 @@
   <div class="business-ops-layout">
     <aside class="sidebar">
       <div class="sidebar-header">
-        <h1 class="logo">Movio AI</h1>
-        <span class="badge">运营后台</span>
+        <h1 class="logo">{{ t('business_ops_nav.brand_name') }}</h1>
+        <span class="badge">{{ t('business_ops_nav.badge') }}</span>
       </div>
       <nav class="nav">
         <div class="nav-group">
-          <p class="nav-label">业务管理</p>
+          <p class="nav-label">{{ t('business_ops_nav.section_biz_manage') }}</p>
           <NuxtLink to="/ops/users" class="nav-item" active-class="active">
-            <i class="icon-users"></i> 用户管理
+            <i class="icon-users"></i> {{ t('business_ops_nav.user_manage') }}
           </NuxtLink>
           <NuxtLink to="/admin/enterprises" class="nav-item" active-class="active">
-            <i class="icon-building"></i> 企业管理
+            <i class="icon-building"></i> {{ t('business_ops_nav.enterprise_manage') }}
           </NuxtLink>
           <NuxtLink to="/ops/users" class="nav-item" active-class="active">
-            <i class="icon-user-check"></i> 代理管理
+            <i class="icon-user-check"></i> {{ t('business_ops_nav.agent_manage') }}
           </NuxtLink>
           <NuxtLink to="/admin/orders" class="nav-item" active-class="active">
-            <i class="icon-shopping-cart"></i> 订单管理
+            <i class="icon-shopping-cart"></i> {{ t('business_ops_nav.order_manage') }}
           </NuxtLink>
         </div>
         <div class="nav-group">
-          <p class="nav-label">运营配置</p>
+          <p class="nav-label">{{ t('business_ops_nav.section_ops_config') }}</p>
           <NuxtLink to="/ops/activities" class="nav-item" active-class="active">
-            <i class="icon-gift"></i> 活动配置
+            <i class="icon-gift"></i> {{ t('business_ops_nav.activity_config') }}
           </NuxtLink>
           <NuxtLink to="/admin/templates" class="nav-item" active-class="active">
-            <i class="icon-layout"></i> 模板市场
+            <i class="icon-layout"></i> {{ t('business_ops_nav.template_market') }}
           </NuxtLink>
           <NuxtLink to="/gateway/dashboard" class="nav-item" active-class="active">
-            <i class="icon-toggle-right"></i> 业务开关
+            <i class="icon-toggle-right"></i> {{ t('business_ops_nav.biz_switch') }}
           </NuxtLink>
         </div>
         <div class="nav-group">
-          <p class="nav-label">财务与审核</p>
+          <p class="nav-label">{{ t('business_ops_nav.section_finance_audit') }}</p>
           <NuxtLink to="/finance/reconciliation" class="nav-item" active-class="active">
-            <i class="icon-bar-chart"></i> 分账对账
+            <i class="icon-bar-chart"></i> {{ t('business_ops_nav.reconciliation') }}
           </NuxtLink>
           <NuxtLink to="/finance/commission-detail" class="nav-item" active-class="active">
-            <i class="icon-dollar-sign"></i> 佣金结算
+            <i class="icon-dollar-sign"></i> {{ t('business_ops_nav.commission_settlement') }}
           </NuxtLink>
           <NuxtLink to="/admin/moderation" class="nav-item" active-class="active">
-            <i class="icon-eye"></i> 内容审核
+            <i class="icon-eye"></i> {{ t('business_ops_nav.content_moderation') }}
           </NuxtLink>
         </div>
       </nav>

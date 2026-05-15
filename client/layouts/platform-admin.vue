@@ -2,50 +2,50 @@
   <div class="platform-admin-layout">
     <aside class="sidebar">
       <div class="sidebar-header">
-        <h1 class="logo">Movio AI</h1>
-        <span class="badge">总后台</span>
+        <h1 class="logo">{{ t('platform_admin_nav.brand_name') }}</h1>
+        <span class="badge">{{ t('platform_admin_nav.badge') }}</span>
       </div>
       <nav class="nav">
         <div class="nav-group">
-          <p class="nav-label">系统管控</p>
+          <p class="nav-label">{{ t('platform_admin_nav.section_system_control') }}</p>
           <NuxtLink to="/admin/dashboard" class="nav-item" active-class="active">
-            <i class="icon-dashboard"></i> 总览面板
+            <i class="icon-dashboard"></i> {{ t('platform_admin_nav.overview_dashboard') }}
           </NuxtLink>
           <NuxtLink to="/admin/users" class="nav-item" active-class="active">
-            <i class="icon-users"></i> 租户管理
+            <i class="icon-users"></i> {{ t('platform_admin_nav.tenant_manage') }}
           </NuxtLink>
           <NuxtLink to="/admin/tenants" class="nav-item" active-class="active">
-            <i class="icon-building"></i> 租户开关
+            <i class="icon-building"></i> {{ t('platform_admin_nav.tenant_switch') }}
           </NuxtLink>
         </div>
         <div class="nav-group">
-          <p class="nav-label">底层网关</p>
+          <p class="nav-label">{{ t('platform_admin_nav.section_gateway') }}</p>
           <NuxtLink to="/gateway/dashboard" class="nav-item" active-class="active">
-            <i class="icon-cpu"></i> 模型供应商
+            <i class="icon-cpu"></i> {{ t('platform_admin_nav.model_provider') }}
           </NuxtLink>
           <NuxtLink to="/gateway/routes" class="nav-item" active-class="active">
-            <i class="icon-shuffle"></i> 调度策略
+            <i class="icon-shuffle"></i> {{ t('platform_admin_nav.dispatch_strategy') }}
           </NuxtLink>
           <!-- 预留 /gateway/hooks Hook注册页待开发 -->
         </div>
         <div class="nav-group">
-          <p class="nav-label">安全与审计</p>
+          <p class="nav-label">{{ t('platform_admin_nav.section_security_audit') }}</p>
           <NuxtLink to="/admin/settings" class="nav-item" active-class="active">
-            <i class="icon-shield"></i> WAF / 密钥
+            <i class="icon-shield"></i> {{ t('platform_admin_nav.waf_secrets') }}
           </NuxtLink>
           <NuxtLink to="/admin/logs" class="nav-item" active-class="active">
-            <i class="icon-file-text"></i> 审计日志
+            <i class="icon-file-text"></i> {{ t('platform_admin_nav.audit_log') }}
           </NuxtLink>
           <NuxtLink to="/admin/settings" class="nav-item" active-class="active">
-            <i class="icon-settings"></i> 系统参数
+            <i class="icon-settings"></i> {{ t('platform_admin_nav.system_params') }}
           </NuxtLink>
         </div>
       </nav>
     </aside>
     <main class="main">
       <header class="topbar">
-        <span class="env-badge">🔒 内网环境</span>
-        <span class="user-info">{{ user?.username || '超管' }}</span>
+        <span class="env-badge">🔒 {{ t('platform_admin_nav.env_intranet') }}</span>
+        <span class="user-info">{{ user?.username || t('platform_admin_nav.super_admin_fallback') }}</span>
       </header>
       <div class="content">
         <slot />
@@ -57,7 +57,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useAuthStore } from '@/stores/useAuthStore'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const auth = useAuthStore()
 const user = computed(() => auth.user)
 </script>

@@ -24,10 +24,25 @@
 </template>
 
 <script setup lang="ts">
+import type {
+  WebGLRenderer,
+  Scene,
+  PerspectiveCamera,
+  Object3D,
+  Mesh,
+  Color,
+  Vector3,
+  Box3,
+  GridHelper,
+  AmbientLight,
+  DirectionalLight,
+} from 'three'
+import type { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import type { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
-let _THREE: any = null;
-let _OrbitControls: any = null;
-let _GLTFLoader: any = null;
+let _THREE: typeof import('three') | null = null
+let _OrbitControls: typeof OrbitControls | null = null
+let _GLTFLoader: typeof GLTFLoader | null = null
 
 const props = defineProps<{
   modelUrl?: string;
@@ -46,11 +61,11 @@ const canvasRef = ref<HTMLCanvasElement>();
 const loading = ref(false);
 const error = ref('');
 
-let renderer: any = null;
-let scene: any = null;
-let camera: any = null;
-let orbitControls: any = null;
-let model: any = null;
+let renderer: WebGLRenderer | null = null
+let scene: Scene | null = null
+let camera: PerspectiveCamera | null = null
+let orbitControls: OrbitControls | null = null
+let model: Object3D | null = null
 let animationId = 0;
 let autoRotateActive = props.autoRotate !== false;
 
@@ -134,10 +149,10 @@ function loadModel(url: string) {
   // Remove existing model
   if (model) {
     scene.remove(model);
-    model.traverse((child: _THREE.Object3D) => {
-      if ((child as _THREE.Mesh).geometry) (child as _THREE.Mesh).geometry.dispose();
-      if ((child as _THREE.Mesh).material) {
-        const mat = (child as _THREE.Mesh).material;
+    model.traverse((child: Object3D) => {
+      if ((child as Mesh).geometry) (child as Mesh).geometry.dispose();
+      if ((child as Mesh).material) {
+        const mat = (child as Mesh).material;
         if (Array.isArray(mat)) mat.forEach((m) => m.dispose());
         else mat.dispose();
       }
@@ -162,8 +177,8 @@ function loadModel(url: string) {
       model.scale.setScalar(scale);
       model.position.sub(center.multiplyScalar(scale));
 
-      model.traverse((child: _THREE.Object3D) => {
-        if ((child as _THREE.Mesh).isMesh) {
+      model.traverse((child: Object3D) => {
+        if ((child as Mesh).isMesh) {
           child.castShadow = true;
           child.receiveShadow = true;
         }
@@ -174,14 +189,14 @@ function loadModel(url: string) {
       // Count vertices, faces, materials
       let vertices = 0, faces = 0;
       const materials = new Set<string>();
-      model.traverse((child: _THREE.Object3D) => {
-        if ((child as _THREE.Mesh).isMesh) {
-          const geom = (child as _THREE.Mesh).geometry;
+      model.traverse((child: Object3D) => {
+        if ((child as Mesh).isMesh) {
+          const geom = (child as Mesh).geometry;
           if (geom) {
             vertices += geom.attributes.position?.count || 0;
             faces += geom.index ? geom.index.count / 3 : (geom.attributes.position?.count || 0) / 3;
           }
-          const mat = (child as _THREE.Mesh).material;
+          const mat = (child as Mesh).material;
           if (Array.isArray(mat)) mat.forEach((m) => materials.add(m.name || m.type));
           else materials.add(mat.name || mat.type);
         }
@@ -215,9 +230,9 @@ function toggleRotate() {
 function toggleWireframe() {
   controls.value[1].active = !controls.value[1].active;
   if (model) {
-    model.traverse((child: _THREE.Object3D) => {
-      if ((child as _THREE.Mesh).isMesh) {
-        const mat = (child as _THREE.Mesh).material;
+    model.traverse((child: Object3D) => {
+      if ((child as Mesh).isMesh) {
+        const mat = (child as Mesh).material;
         if (Array.isArray(mat)) mat.forEach((m) => (m.wireframe = controls.value[1].active));
         else mat.wireframe = controls.value[1].active;
       }
