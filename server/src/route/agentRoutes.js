@@ -17,7 +17,7 @@ import * as ctrl from '../controller/agentController.js';
 const router = Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const ALLOWED_MIME = ['image/jpeg','image/png','image/webp','image/gif','image/svg+xml','video/mp4','video/webm','video/quicktime','image/avif','image/bmp','image/tiff'];
+const ALLOWED_MIME = ['image/jpeg','image/png','image/webp','image/gif','video/mp4','video/webm','video/quicktime','image/avif','image/bmp','image/tiff'];
 const upload = multer({
   storage: multer.diskStorage({
     destination: path.resolve(__dirname, '../../uploads/references/'),

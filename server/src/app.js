@@ -317,6 +317,9 @@ app.use('/uploads', authMiddleware, express.static(path.join(__dirname, '../uplo
   lastModified: true,
   setHeaders(res, filepath) {
     res.setHeader('X-Content-Type-Options', 'nosniff');
+    if (/\.svg$/i.test(filepath)) {
+      res.setHeader('Content-Disposition', 'attachment');
+    }
     if (/\.(jpg|jpeg|png|gif|webp|svg|mp4|webm|mov)$/i.test(filepath)) {
       res.setHeader('Cache-Control', 'public, max-age=604800, immutable');
     }

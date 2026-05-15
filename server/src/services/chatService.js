@@ -160,7 +160,7 @@ export async function handleMessage({ res, req, message, sessionId, mode, attach
 
     // ── Step 4: 路由分发 + SSE 流式输出 ──
     if (sse.isDisconnected) {
-      sse.end();
+      sse.done();
       return;
     }
     if (route.endpoint) {
