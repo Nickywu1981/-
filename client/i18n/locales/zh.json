@@ -3320,9 +3320,7 @@
       "personal_center": "个人中心",
       "my_membership": "我的会员",
       "my_credits": "我的积分",
-      "account_settings": "账号设置",
-      "cs_title": "在线客服",
-      "cs_qr_placeholder": "客服二维码"
+      "account_settings": "账号设置"
     },
     "creation_placeholder_video": "描述你想要的视频内容，例如：夏季新品连衣裙展示，模特在海边场景，柔光滤镜",
     "creation_placeholder_image": "描述你想要的图片内容，例如：白色T恤平铺图，简约纯色背景",
