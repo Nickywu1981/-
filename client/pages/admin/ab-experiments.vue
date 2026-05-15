@@ -116,7 +116,7 @@
               <input v-model="v.modelKey" class="input input-sm" :placeholder="$t('admin_ab.placeholder_model_key')" />
               <input v-model="v.description" class="input input-sm" :placeholder="$t('admin_ab.placeholder_desc_short')" />
               <input v-model.number="v.weight" class="input input-sm" type="number" :placeholder="$t('admin_ab.placeholder_weight')" style="width:64px" />
-              <button v-if="i >= 2" class="btn btn-sm" @click="form.variants.splice(i, 1)">✕</button>
+              <button v-if="i >= 2" class="btn btn-sm" :aria-label="$t('common.remove')" @click="form.variants.splice(i, 1)">✕</button>
             </div>
             <button class="btn" @click="form.variants.push({variantId:'',modelKey:'',description:'',weight:50})">{{ $t('admin_ab.add_variant') }}</button>
           </div>
@@ -130,7 +130,7 @@
                 <option value="quality">{{ $t('admin_ab.metric_quality') }}</option>
                 <option value="latency">{{ $t('admin_ab.metric_latency') }}</option>
               </select>
-              <button v-if="i >= 1" class="btn btn-sm" @click="form.metrics.splice(i, 1)">✕</button>
+              <button v-if="i >= 1" class="btn btn-sm" :aria-label="$t('common.remove')" @click="form.metrics.splice(i, 1)">✕</button>
             </div>
             <button class="btn" @click="form.metrics.push({metricId:'',name:'',type:'conversion'})">{{ $t('admin_ab.add_metric') }}</button>
           </div>
@@ -186,7 +186,7 @@ async function fetchExperiments() {
   try {
     const data: any = await $fetch('/api/admin/experiments' + (filterStatus.value ? `?status=${filterStatus.value}` : ''), { credentials: 'include' });
     experiments.value = data.data || [];
-  } catch (e: any) { toast.error(e?.data?.msg || t('admin_ab.toast_load_fail')); }
+  } catch (e: unknown) { toast.error((e as { data?: { msg?: string } })?.data?.msg || t('admin_ab.toast_load_fail')); }
 }
 
 async function selectExperiment(exp: any) { selected.value = exp; await loadResults(); }
@@ -196,7 +196,7 @@ async function loadResults() {
   try {
     const data: any = await $fetch(`/api/admin/experiments/${selected.value.id}/results?days=${resultsDays.value}`, { credentials: 'include' });
     results.value = data.data;
-  } catch (e: any) { toast.error(e?.data?.msg || t('admin_ab.toast_data_fail')); }
+  } catch (e: unknown) { toast.error((e as { data?: { msg?: string } })?.data?.msg || t('admin_ab.toast_data_fail')); }
 }
 
 async function create() {
@@ -207,7 +207,7 @@ async function create() {
     toast.success(t('admin_ab.toast_create_success'));
     showCreate.value = false;
     fetchExperiments();
-  } catch (e: any) { toast.error(e?.data?.msg || t('admin_ab.toast_create_fail')); }
+  } catch (e: unknown) { toast.error((e as { data?: { msg?: string } })?.data?.msg || t('admin_ab.toast_create_fail')); }
   finally { saving.value = false; }
 }
 
@@ -220,7 +220,7 @@ async function action(id: number, action: string) {
     await $fetch(`/api/admin/experiments/${id}/${action}`, { method: 'POST', credentials: 'include' });
     toast.success(t('admin_ab.toast_action_success'));
     fetchExperiments();
-  } catch (e: any) { toast.error(e?.data?.msg || t('admin_ab.toast_action_fail')); }
+  } catch (e: unknown) { toast.error((e as { data?: { msg?: string } })?.data?.msg || t('admin_ab.toast_action_fail')); }
 }
 
 onMounted(fetchExperiments);

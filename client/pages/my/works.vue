@@ -125,14 +125,14 @@ async function fetchAll() {
   try {
     const endpoints: Promise<any>[] = []
     if (activeTab.value === 'all' || activeTab.value === 'image') {
-      endpoints.push($fetch('/api/images/tasks', { params: { page: page.value, pageSize }, credentials: 'include' }).catch((err: any) => { if (import.meta.dev) console.warn('[my-works] image tasks failed', err?.message || err); return { list: [], total: 0 } }))
+      endpoints.push($fetch('/api/images/tasks', { params: { page: page.value, pageSize }, credentials: 'include' }).catch((err: unknown) => { if (import.meta.dev) console.warn('[my-works] image tasks failed', (err as { message?: string })?.message || err); return { list: [], total: 0 } }))
     }
     if (activeTab.value === 'all' || activeTab.value === 'video') {
-      endpoints.push($fetch('/api/videos/tasks', { params: { page: page.value, pageSize }, credentials: 'include' }).catch((err: any) => { if (import.meta.dev) console.warn('[my-works] video tasks failed', err?.message || err); return { list: [], total: 0 } }))
+      endpoints.push($fetch('/api/videos/tasks', { params: { page: page.value, pageSize }, credentials: 'include' }).catch((err: unknown) => { if (import.meta.dev) console.warn('[my-works] video tasks failed', (err as { message?: string })?.message || err); return { list: [], total: 0 } }))
     }
     if (activeTab.value === 'all' || activeTab.value === 'batch') {
-      endpoints.push($fetch('/api/advanced/tasks', { params: { page: page.value, pageSize }, credentials: 'include' }).catch((err: any) => { if (import.meta.dev) console.warn('[my-works] advanced tasks failed', err?.message || err); return { list: [], total: 0 } }))
-      endpoints.push($fetch('/api/adv-video/tasks', { params: { page: page.value, pageSize }, credentials: 'include' }).catch((err: any) => { if (import.meta.dev) console.warn('[my-works] adv-video tasks failed', err?.message || err); return { list: [], total: 0 } }))
+      endpoints.push($fetch('/api/advanced/tasks', { params: { page: page.value, pageSize }, credentials: 'include' }).catch((err: unknown) => { if (import.meta.dev) console.warn('[my-works] advanced tasks failed', (err as { message?: string })?.message || err); return { list: [], total: 0 } }))
+      endpoints.push($fetch('/api/adv-video/tasks', { params: { page: page.value, pageSize }, credentials: 'include' }).catch((err: unknown) => { if (import.meta.dev) console.warn('[my-works] adv-video tasks failed', (err as { message?: string })?.message || err); return { list: [], total: 0 } }))
     }
 
     const results = await Promise.all(endpoints)

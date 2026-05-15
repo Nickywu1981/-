@@ -105,8 +105,9 @@ async function fetchData() {
     const res = await $fetch(`/api/prompts/my-templates?${params}`, { credentials: 'include' })
     list.value = (res as any).data?.list || []
     total.value = (res as any).data?.total || 0
-  } catch (e: any) {
-    toast.error(t('common.loadFail') + ' : ' +  (e?.data?.msg || e.message || t('common.network_error')))
+  } catch (e: unknown) {
+    const m = e as { data?: { msg?: string }; message?: string }
+    toast.error(t('common.loadFail') + ' : ' +  (m.data?.msg || m.message || t('common.network_error')))
   } finally { loading.value = false }
 }
 
@@ -131,8 +132,9 @@ async function saveEdit() {
     showModal.value = false
     toast.success(t('common.saved_realtime'))
     fetchData()
-  } catch (e: any) {
-    toast.error(t('common.failed_save') + ' : ' +  (e?.data?.msg || e.message))
+  } catch (e: unknown) {
+    const m = e as { data?: { msg?: string }; message?: string }
+    toast.error(t('common.failed_save') + ' : ' +  (m.data?.msg || m.message))
   }
 }
 
@@ -142,8 +144,9 @@ async function submitTemplate(id: number) {
     await $fetch(`/api/prompts/templates/${id}/submit-official`, { method: 'POST', credentials: 'include' })
     toast.success(t('common.submitted_review'))
     fetchData()
-  } catch (e: any) {
-    toast.error(t('common.failed_submit') + ' : ' +  (e?.data?.msg || e.message))
+  } catch (e: unknown) {
+    const m = e as { data?: { msg?: string }; message?: string }
+    toast.error(t('common.failed_submit') + ' : ' +  (m.data?.msg || m.message))
   }
 }
 
@@ -153,8 +156,9 @@ async function confirmDelete(tmpl: any) {
     await $fetch(`/api/admin/prompts/${tmpl.id}`, { method: 'DELETE', credentials: 'include' })
     toast.success(t('common.delete_success'))
     fetchData()
-  } catch (e: any) {
-    toast.error(t('common.failed_delete') + ' : ' +  (e?.data?.msg || e.message))
+  } catch (e: unknown) {
+    const m = e as { data?: { msg?: string }; message?: string }
+    toast.error(t('common.failed_delete') + ' : ' +  (m.data?.msg || m.message))
   }
 }
 

@@ -244,7 +244,7 @@ function handleUploadDrop(e: DragEvent) {
   const fd = new FormData(); fd.append('file', f)
   $fetch('/api/upload/image', { method: 'POST', credentials: 'include', body: fd })
     .then((res: any) => { uploadedUrl.value = res.data?.url; uploadingMsg.value = t('work_pages.compare.upload_done'); pickerSelected.value = '' })
-    .catch((e: any) => { uploadingMsg.value = t('work_pages.compare.upload_failed'); toast.error(e?.data?.msg || t('work_pages.compare.upload_failed')) })
+    .catch((e: unknown) => { uploadingMsg.value = t('work_pages.compare.upload_failed'); toast.error((e as { data?: { msg?: string } })?.data?.msg || t('work_pages.compare.upload_failed')) })
     .finally(() => { if (uploadPreview.value) { revoke(uploadPreview.value); uploadPreview.value = '' } })
 }
 

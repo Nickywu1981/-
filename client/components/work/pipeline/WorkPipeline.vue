@@ -160,7 +160,7 @@
       <!-- Single Image -->
       <div v-if="config.ui.resultMode === 'single-image'" class="result-section">
         <h3>{{ $t(label('resultTitle')) }}</h3>
-        <img v-if="resultImageUrl" :src="resultImageUrl" class="result-image" @error="(e) => { (e.target as HTMLImageElement).src = PLACEHOLDER }" />
+        <img v-if="resultImageUrl" :src="resultImageUrl" alt="Result image" class="result-image" @error="(e) => { (e.target as HTMLImageElement).src = PLACEHOLDER }" />
         <div class="actions">
           <button class="btn btn-brand" type="button" @click="downloadResult">{{ $t(label('download')) }}</button>
           <button class="btn-outline" type="button" @click="resetAll">{{ $t(label('redo')) }}</button>
@@ -173,12 +173,12 @@
         <div class="compare-row">
           <div class="compare-card">
             <span class="compare-label">{{ $t(label('originalLabel')) }}</span>
-            <img :src="firstUploadedUrl" class="compare-img" @error="(e) => { (e.target as HTMLImageElement).src = PLACEHOLDER }" />
+            <img :src="firstUploadedUrl" alt="Original image" class="compare-img" @error="(e) => { (e.target as HTMLImageElement).src = PLACEHOLDER }" />
           </div>
           <span class="compare-arrow">→</span>
           <div class="compare-card">
             <span class="compare-label">{{ $t(label('afterLabel')) }}</span>
-            <img :src="resultImageUrl" class="compare-img" @error="(e) => { (e.target as HTMLImageElement).src = PLACEHOLDER }" />
+            <img :src="resultImageUrl" alt="Processed result" class="compare-img" @error="(e) => { (e.target as HTMLImageElement).src = PLACEHOLDER }" />
           </div>
         </div>
         <div class="actions">
@@ -192,7 +192,7 @@
         <h3>{{ $t(label('resultTitle')) }}</h3>
         <div class="image-grid">
           <div v-for="(img, i) in resultImages" :key="i" class="result-card">
-            <img :src="img" @error="(e) => { (e.target as HTMLImageElement).src = PLACEHOLDER }" />
+            <img :src="img" alt="Gallery image" @error="(e) => { (e.target as HTMLImageElement).src = PLACEHOLDER }" />
             <button class="btn-outline" type="button" style="margin:8px;" @click="downloadUrl(img, `result-${i}.png`)">{{ $t(label('download')) }}</button>
           </div>
         </div>

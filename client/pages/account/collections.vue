@@ -38,8 +38,8 @@
           <p class="card-desc" v-if="item.description">{{ item.description }}</p>
         </div>
         <div class="card-actions">
-          <button class="btn-icon" :title="$t('account_pages.collections.edit')" @click.stop="startEdit(item)">✏</button>
-          <button class="btn-icon" :title="$t('account_pages.collections.share')" @click.stop="shareCollection(item)">🔗</button>
+          <button class="btn-icon" :title="$t('account_pages.collections.edit')" :aria-label="$t('account_pages.collections.edit')" @click.stop="startEdit(item)">✏</button>
+          <button class="btn-icon" :title="$t('account_pages.collections.share')" :aria-label="$t('account_pages.collections.share')" @click.stop="shareCollection(item)">🔗</button>
           <button class="btn-icon danger" :title="$t('account_pages.collections.delete')" :aria-label="$t('account_pages.collections.delete')" @click.stop="deleteItem(item)">🗑</button>
         </div>
       </div>

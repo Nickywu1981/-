@@ -142,8 +142,8 @@ export function useAIChat() {
 
       streaming.value = false
       if (messages.value[aiMsgIdx]) messages.value[aiMsgIdx].streaming = false
-    } catch (err: any) {
-      if (err.name === 'AbortError') return
+    } catch (err: unknown) {
+      if ((err as { name?: string }).name === 'AbortError') return
       streaming.value = false
       if (messages.value[aiMsgIdx]) {
         messages.value[aiMsgIdx].content = t('chat.service_unavailable')

@@ -101,7 +101,7 @@ onMounted(async () => {
     const [profileRes, pointsRes, statsRes] = await Promise.all([
       $fetch(`${apiBase}/user/profile`, { credentials: 'include' }),
       $fetch(`${apiBase}/points/account`, { credentials: 'include' }),
-      $fetch(`${apiBase}/user/stats`, { credentials: 'include' }).catch((err: any) => { if (import.meta.dev) console.warn(t('member.stats_load_failed'), err?.message || err); return null }),
+      $fetch(`${apiBase}/user/stats`, { credentials: 'include' }).catch((err: unknown) => { if (import.meta.dev) console.warn(t('member.stats_load_failed'), (err as { message?: string })?.message || err); return null }),
     ])
 
     if ((profileRes as any).code === 200) profile.value = (profileRes as any).data

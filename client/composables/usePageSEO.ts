@@ -237,7 +237,8 @@ export function usePageSEO(overrides?: { title?: string; description?: string; k
   const route = useRoute();
   const path = route.path;
   const { appUrl } = useRuntimeConfig().public;
-  const hostname = new URL(appUrl).hostname;
+  let hostname = '';
+  try { hostname = new URL(appUrl).hostname; } catch { hostname = 'localhost'; }
 
   // 匹配路由（精确匹配 → 前缀匹配 → 默认值）
   let config: { title: string; description: string; keywords?: string } | undefined = pageSEOMap[path];

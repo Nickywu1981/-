@@ -124,10 +124,10 @@ function statusLabel(s: string) { return statusLabelKeys[s] ? t(statusLabelKeys[
 
 onMounted(async () => {
   try {
-    const bindsRes: any = await $fetch(`${apiBase}/platforms/bindings`, { credentials: 'include' }).catch((err: any) => { toast.error(t('contentDistribution.errorBindLoad')); if (import.meta.dev) console.warn('[distribution]', err?.message || err); return null })
+    const bindsRes: any = await $fetch(`${apiBase}/platforms/bindings`, { credentials: 'include' }).catch((err: unknown) => { toast.error(t('contentDistribution.errorBindLoad')); if (import.meta.dev) console.warn('[distribution]', (err as { message?: string })?.message || err); return null })
     if (bindsRes?.code === 200) boundPlatforms.value = bindsRes.data?.list || []
 
-    const worksRes: any = await $fetch(`${apiBase}/assets/list`, { params: { page: 1, pageSize: 10 }, credentials: 'include' }).catch((err: any) => { toast.error(t('contentDistribution.errorWorksLoad')); if (import.meta.dev) console.warn('[distribution]', err?.message || err); return null })
+    const worksRes: any = await $fetch(`${apiBase}/assets/list`, { params: { page: 1, pageSize: 10 }, credentials: 'include' }).catch((err: unknown) => { toast.error(t('contentDistribution.errorWorksLoad')); if (import.meta.dev) console.warn('[distribution]', (err as { message?: string })?.message || err); return null })
     if (worksRes?.code === 200) {
       recentWorks.value = (worksRes.data?.list || []).map((w: any) => ({ ...w, selectedPlatform: '' }))
     }
@@ -145,7 +145,7 @@ async function doPublish(work: any) {
       method: 'POST',
       body: { work_id: work.id, platform: work.selectedPlatform, content_url: work.url },
       credentials: 'include',
-    }).catch((err: any) => { toast.error(t('contentDistribution.errorPublish')); if (import.meta.dev) console.warn('[distribution]', err?.message || err); return null })
+    }).catch((err: unknown) => { toast.error(t('contentDistribution.errorPublish')); if (import.meta.dev) console.warn('[distribution]', (err as { message?: string })?.message || err); return null })
     if (res?.code === 200) {
       publishHistory.value.unshift({
         id: Date.now(), platform: work.selectedPlatform, status: 'success',

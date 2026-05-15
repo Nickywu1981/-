@@ -34,8 +34,8 @@ const submit = async () => {
     const data = await res.json()
     if (data.code !== 0) throw new Error(data.msg || t('request_failed'))
     result.value = data.data
-  } catch (err: any) {
-    error.value = err.message || t('request_failed')
+  } catch (err: unknown) {
+    error.value = (err as { message?: string }).message || t('request_failed')
   } finally {
     loading.value = false
   }
