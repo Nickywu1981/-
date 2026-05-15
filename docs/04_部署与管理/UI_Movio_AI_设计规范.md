@@ -2,7 +2,7 @@
 
 > **编写组**：G3 UI 设计组（UI-Designer 🔴主 / Doc-Writer 🟡辅）
 > **审核组**：G1 架构规划组（Architect）
-> **版本**：v1.9 | **日期**：2026-05-15
+> **版本**：v1.10 | **日期**：2026-05-15
 
 ---
 
@@ -651,3 +651,54 @@ unified 为更精细多层阴影（符合现代设计系统惯例），theme.css
 | **合计** | **89** | **6** | **95** |
 
 **95 项问题，G3 已自行修复 16 项，79 项待跨组处理。**
+
+---
+
+## 十一、第十一轮审计 — Nuxt 构建层 + Layout CSS + 打印样式
+
+**审计日期**：2026-05-15  
+**范围**：`nuxt.config.ts`、`app.vue` 加载链、4 个 layouts CSS 定义、Element Plus 按需加载、打印样式
+
+### 10.15 Layout CSS 完全缺失（P0 新增 3 项）
+`user-workspace.vue`、`platform-admin.vue`、`business-ops.vue` 三个核心布局均**无 `<style>` 块**，使用的全部 CSS 类名在项目 6 个 CSS 文件中**零定义**：
+
+| 类名 | 使用位置 | CSS 定义 |
+|------|------|:--:|
+| `.user-workspace-layout` | user-workspace:2 | ❌ |
+| `.platform-admin-layout` | platform-admin:2 | ❌ |
+| `.business-ops-layout` | business-ops:2 | ❌ |
+| `.sidebar` | 3 个 layout | ❌ |
+| `.nav-item` | 3 个 layout | ❌ |
+| `.nav-group` | 3 个 layout | ❌ |
+| `.nav-label` | 3 个 layout | ❌ |
+| `.topbar` | 3 个 layout | ❌ |
+| `.role-btn` / `.role-switcher` | user-workspace:125 | ❌ |
+
+`--sidebar-*` token 已在 unified 中被定义（亮+暗），但无任何 CSS 规则消费它们。布局完全依赖浏览器默认渲染。
+
+### 10.16 platform-admin 重复路由（P0）
+`platform-admin.vue:33` 和 `:39` 均指向 `/admin/settings`，分别标注"WAF/密钥"和"系统参数" — 同一 URL，第二个链接永远不生效。
+
+### 10.17 business-ops 跨布局路由（P0）
+`business-ops.vue` 侧边栏含 5 条 `/admin/*` 和 1 条 `/gateway/*` 路由，但 `nuxt.config.ts:201-203` 将 `/admin/*` 和 `/gateway/*` 映射到 `platform-admin` 布局。点击这些链接会导致**布局全局切换**而非在同一侧边栏内导航。
+
+### 10.18 无打印样式（P1 新增 1 项）
+项目零 `@media print` 定义。打印任意页面渲染完整交互式 UI（侧边栏、顶栏、按钮均可见），无任何打印优化。
+
+### 10.19 Element Plus 全量 CSS 加载（P2 新增 1 项）
+`plugins/element-plus.ts` 导入完整 `element-plus/dist/index.css`（~200KB），但项目仅使用 `ElMessage` + `ElConfigProvider` 两个组件。按需加载可节省约 80%。
+
+### 10.20 CSS 加载顺序隐患（P2 新增 1 项）
+`theme.css` 在 `app.vue` 最后加载，覆盖前 5 个文件所有同名属性。nuxt.config CSS 数组中修改 token 会被 theme.css 静默覆盖。
+
+### 10.21 本轮累计
+
+| 优先级 | 旧累计 | R11 新增 | 总计 |
+|:--:|:--:|:--:|:--:|
+| P0 | 49 | 3 | **52** |
+| P1 | 28 | 1 | **29** |
+| P2 | 8 | 2 | **10** |
+| P3 | 10 | 0 | **10** |
+| **合计** | **95** | **6** | **101** |
+
+**101 项问题，G3 已自行修复 16 项，85 项待跨组处理。**
