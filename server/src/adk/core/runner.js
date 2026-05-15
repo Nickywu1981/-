@@ -6,6 +6,10 @@ import { Session } from './session.js';
 import { InvocationContext } from './invocationContext.js';
 import { Event } from './event.js';
 import { SessionStore } from './sessionStore.js';
+import { compactContext } from '../services/contextCompactionService.js';
+import { augmentSystemPrompt } from '../services/skillLoaderService.js';
+import { injectA2A } from '../services/agentMessageBus.js';
+import logger from '../../utils/logger.js';
 
 export class Runner {
   /**
@@ -41,7 +45,23 @@ export class Runner {
       }
     }
 
-    // 4) 构建 InvocationContext (注入 services)
+    // 4) Context Compaction — 自动触发 (借鉴 OpenClaw 记忆巩固)
+    if (session.events && session.events.length > 30) {
+      const { compressed, compactedCount } = await compactContext(session);
+      if (compressed) {
+        logger.info(`[Runner] Session ${sessionId}: compacted ${compactedCount} events`);
+      }
+    }
+
+    // 5) Skill 惰性加载 — 按需注入相关 Skill 到 Prompt (借鉴 OpenClaw)
+    if (input.query && !input.context?.systemPrompt) {
+      const augmented = augmentSystemPrompt(input.query, input.context?.systemPrompt || '');
+      if (augmented) {
+        session.state.set('_lazySkills', augmented);
+      }
+    }
+
+    // 6) 构建 InvocationContext (注入 services)
     const ctx = new InvocationContext({
       session,
       agentName: this.rootAgent.name,
@@ -50,10 +70,13 @@ export class Runner {
     if (this.memoryService) ctx.services.memory = this.memoryService;
     if (this.artifactService) ctx.services.artifact = this.artifactService;
 
-    // 5) 执行
+    // 7) A2A 消息通信注入 (借鉴 OpenClaw)
+    injectA2A(ctx);
+
+    // 8) 执行
     const result = await this.rootAgent.runAsync(ctx);
 
-    // 6) 持久化 session (Redis with Map fallback)
+    // 9) 持久化 session (Redis with Map fallback)
     await this.sessionService.set(sessionId, session);
 
     return { sessionId, result, events: session.events.length };
