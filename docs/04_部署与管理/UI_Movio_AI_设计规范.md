@@ -2,7 +2,7 @@
 
 > **编写组**：G3 UI 设计组（UI-Designer 🔴主 / Doc-Writer 🟡辅）
 > **审核组**：G1 架构规划组（Architect）
-> **版本**：v1.17 | **日期**：2026-05-15
+> **版本**：v1.18 | **日期**：2026-05-15
 
 ---
 
@@ -1129,3 +1129,88 @@ R11 标记 `user-workspace.vue` 等 3 个 layout "CSS 完全缺失" — **本例
 - **99 死 CSS 变量定位完成** — 含 15 个旧工作台 `--ws-*` 可安全删除
 - **ARIA 覆盖率量化** — 9 role / 15 aria-label / 0 aria-expanded/controls/describedby
 - **SEO 缺口量化** — 0 useSeoMeta / 0 pageTransition
+
+### 10.52 R19 — 纵深审计：Composables/Middleware/i18n/16未审组件/E2E
+
+#### 10.52.1 Composables 审查（21 文件）
+
+| 文件 | 结论 |
+|------|:--:|
+| `useTheme.ts` | 清洁 — system/light/dark 三态 + localStorage + mediaQuery |
+| `useToast.ts` | 清洁 — 队列缓冲 + 100 上限 + try-catch 安全 |
+| `usePageSEO.ts` | **优秀** — 51 routes 全量 TDK + OG/Twitter/JSON-LD/FAQPage |
+| `useAppPage.ts` | 清洁 — 配置化三件套，configs+dicts 联动 |
+| 其余 17 个 | 全部清洁 — 无硬编码色值/品牌色 |
+
+#### 10.52.2 Middleware 审查（2 文件）
+
+| 文件 | 结论 |
+|------|:--:|
+| `auth.global.ts` | **优秀** — 重定向循环防护(MAX=3)、dev fallback、RBAC 4前缀门禁 |
+| `auth.ts` | 清洁 — 命名中间件，对接全局 auth |
+
+#### 10.52.3 i18n 对齐审计
+
+- **zh 6413 keys | en 6598 keys**
+- **210 en-only keys** — admin 模块群（work_pages 69、email_templates 13、tasks 11…）中文翻译缺失
+- **25 zh-only keys** — nav.account_settings、search.label 等 25 个旧键
+- **严重度**：P2 — 管理员后台部分页面显示英文，不影响用户端
+
+#### 10.52.4 16 未审组件全量扫描
+
+| 组件 | 结论 |
+|------|------|
+| `WorkLayout.vue` | **清洁** — 全 token 化 + focus-visible + 响应式 + 25 类 deep 选择器覆盖 |
+| `LangSwitcher.vue` | 清洁 — 三语切换 + focus-visible + 过渡动画 |
+| `ImageLightbox.vue` | **P0 已修复** — CSS `z-index` 语法错误 `, 1050);` 修复 |
+| `PageHeader.vue` | **P1 已修复** — 4 处硬编码 (#b0b5bd/#4d5054/#303133/#6b7280) → token |
+| `StatsCard.vue` | **P1 已修复** — `#409eff`/#67c23a fallback → `var(--brand)`/`var(--color-success)` |
+| `ImageSlot.vue` | **P2 已修复** — `#fff` → `var(--text-inverse, #fff)` |
+| `CollapsibleResultPanel.vue` | **P2 已修复** — `#ef4444` → `var(--danger, #ef4444)` |
+| `WorkPipeline.vue` | 清洁 — 继承 WorkLayout，配置驱动 |
+| `LandingFooter.vue` | **P3** — 无 `<style>` 块，纯 HTML 链接 |
+| `JsonLd.vue` | 清洁 — SEO 结构化数据，无需样式 |
+| `VersionHistoryModal.vue` | **P3** — 无 scoped style，依赖全局 `.modal` |
+| `BatchPreview/SkuSelector` | 清洁 — batch-sku 子组件 |
+| `ConfigPanel/HistoryPanel/ResultPanel` | 清洁 — test-workbench 子组件 |
+
+#### 10.52.5 Inline :style 硬编码普查
+
+| 文件 | 问题 |
+|------|------|
+| `DiySectionPreview.vue:47` | **P1** — `#ff6600` 硬编码 default border color |
+| `enterprise/customers/index.vue:43` | **P1** — `#3B82F6` hardcoded tag default |
+| `enterprise/whitelabel.vue:26` | **P1** — `#667eea` hardcoded color preview default |
+
+#### 10.52.6 E2E 测试
+
+- `smoke.spec.ts` / `creative-api.spec.ts` / `api-security.spec.ts` — 仅占位文件，无实际 Playwright 测试
+
+#### 10.52.7 本轮修复
+
+| 文件 | 修复项 |
+|------|:--:|
+| `ImageLightbox.vue` | CSS 语法错误修复 |
+| `PageHeader.vue` | 4 项硬编码 → token |
+| `StatsCard.vue` | 2 项 fallback → token |
+| `ImageSlot.vue` | 1 项 `#fff` → token |
+| `CollapsibleResultPanel.vue` | 1 项 `#ef4444` → token |
+
+#### 10.52.8 累计趋势
+
+| 优先级 | R18 | R19 新增 | R19 修复 | 总计 |
+|:--:|:--:|:--:|:--:|:--:|
+| P0 | 27 | 1 (CSS syntax) | -1 | **27** |
+| P1 | 26 | 3 (inline :style) | -2 (PageHeader+StatsCard) | **27** |
+| P2 | 9 | 2 (i18n 210 / LandingFooter) | -2 (ImageSlot+Collapsible) | **9** |
+| P3 | 20 | 1 (VersionHistoryModal) | 0 | **21** |
+| **合计** | **66** | **7** | **-5** | **68** |
+| G3 自修累计 | 127 | — | +5 | **132** |
+
+### 里程碑
+
+- **Composables (21) + Middleware (2) 全线清洁** — 零问题，`usePageSEO.ts` 含 51 routes TDK+JSON-LD
+- **ImageLightbox CSS 语法错误修复** — `z-index: var(--z-modal, 1050), 1050);` → 正确语法
+- **全站 `#409eff` Element Plus 蓝完全归零** — StatsCard 最后 1 处
+- **全站组件审计覆盖 100%** — 32/32 组件全部审计
+- **i18n 210 键中文翻译待补** — work_pages (69键) + 15 admin 子模块

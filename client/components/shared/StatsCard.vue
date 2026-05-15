@@ -4,7 +4,7 @@
   适用: Dashboard KPI 卡片、数据概览
 -->
 <template>
-  <div class="stat-card" :style="{ borderTopColor: color || 'var(--accent, #409eff)' }">
+  <div class="stat-card" :style="{ borderTopColor: color || 'var(--brand)' }">
     <div class="stat-card-top">
       <span v-if="icon" class="stat-card-icon">{{ icon }}</span>
       <span class="stat-card-value">{{ value }}</span>
@@ -43,6 +43,6 @@ defineProps<{
 .stat-card-value { font-size: 28px; font-weight: 700; color: var(--text-primary); }
 .stat-card-label { font-size: 13px; color: var(--text-muted); }
 .stat-card-trend { font-size: 12px; margin-top: 6px; }
-.stat-card-trend.up { color: var(--color-success, #67c23a); }
+.stat-card-trend.up { color: var(--color-success); }
 .stat-card-trend.down { color: var(--danger); }
 </style>

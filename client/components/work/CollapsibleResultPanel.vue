@@ -76,7 +76,7 @@ function toggle() {
 .crp-toggle:hover { background: var(--bg-hover); color: var(--brand); }
 .crp-toggle-dot {
   position: absolute; top: 8px; right: 4px;
-  width: 7px; height: 7px; border-radius: 50%; background: #ef4444;
+  width: 7px; height: 7px; border-radius: 50%; background: var(--danger, #ef4444);
 }
 
 .crp-panel {

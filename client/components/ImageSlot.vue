@@ -35,5 +35,5 @@ const loaded = ref(false)
 .slot-sm { aspect-ratio: 4/3; }
 .slot-img { width: 100%; height: 100%; object-fit: contain; }
 .slot-empty { color: var(--text-muted); font-size: 14px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-.slot-title { position: absolute; bottom: 0; left: 0; right: 0; padding: 6px 10px; background: rgba(0,0,0,0.6); color: #fff; font-size: 12px; text-align: center; }
+.slot-title { position: absolute; bottom: 0; left: 0; right: 0; padding: 6px 10px; background: rgba(0,0,0,0.6); color: var(--text-inverse, #fff); font-size: 12px; text-align: center; }
 </style>

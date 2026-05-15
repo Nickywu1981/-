@@ -39,11 +39,11 @@ function goBack() { router.back() }
 }
 .ph-left { display: flex; align-items: flex-start; gap: 12px; }
 .ph-back {
-  background: none; border: 1px solid #b0b5bd; color: #4d5054; padding: 4px 12px;
+  background: none; border: 1px solid var(--border-light); color: var(--text-secondary); padding: 4px 12px;
   border-radius: 6px; cursor: pointer; font-size: 13px; white-space: nowrap; margin-top: 4px;
 }
-.ph-back:hover { border-color: var(--info); color: var(--info); }
-.ph-title { margin: 0; font-size: 22px; font-weight: 700; color: #303133; }
-.ph-subtitle { margin: 4px 0 0; font-size: 14px; color: #6b7280; }
+.ph-back:hover { border-color: var(--brand); color: var(--brand); }
+.ph-title { margin: 0; font-size: 22px; font-weight: 700; color: var(--text-primary); }
+.ph-subtitle { margin: 4px 0 0; font-size: 14px; color: var(--text-muted); }
 .ph-actions { display: flex; gap: 8px; align-items: center; }
 </style>
