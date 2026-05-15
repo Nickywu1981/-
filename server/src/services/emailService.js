@@ -222,6 +222,39 @@ export async function verifyCode(email, code) {
   return true;
 }
 
+// ==================== 密码重置链接 ====================
+
+export async function sendResetEmail(email, resetToken) {
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    throw new BusinessError(ERROR_CODE.PARAM_MISSING);
+  }
+
+  const resetUrl = `${config.baseUrl || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
+
+  let subject, html;
+  try {
+    const template = await emailTemplateDao.findByCode('email_reset_password');
+    if (template) {
+      subject = renderTemplate(template.subject, { resetUrl, code: '' });
+      html = sanitizeHtml(renderTemplate(template.content, { resetUrl, code: '' }));
+    } else {
+      throw new BusinessError(ERROR_CODE.RESOURCE_NOT_FOUND);
+    }
+  } catch {
+    subject = '【AI电商工具箱】密码重置';
+    html = sanitizeHtml(`<h2>AI电商工具箱</h2><p>您正在重置密码，点击以下链接完成重置（15分钟内有效）：</p><p><a href="${resetUrl}">${resetUrl}</a></p>`);
+  }
+
+  const provider = getProvider();
+  try {
+    const result = await provider.send({ email, subject, content: html });
+    return result;
+  } catch (e) {
+    logger.error('[Email] 重置链接发送失败', { email: email.replace(/(.{1,2}).*(@.*)/, '$1***$2'), error: e.message });
+    throw new BusinessError(ERROR_CODE.INTERNAL_ERROR);
+  }
+}
+
 // ==================== 模板管理（后台） ====================
 
 export async function listTemplates() {

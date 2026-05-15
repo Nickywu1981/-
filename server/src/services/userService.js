@@ -9,6 +9,7 @@ import { guardSQL } from '../utils/sqlGuard.js';
 import logger from '../utils/logger.js';
 import { generateTokens, refreshAccessToken as refreshTokenUtil, revokeAccessToken as revokeTokenUtil, revokeRefreshToken as revokeRefreshUtil, revokeAllUserTokens as revokeAllUtil, isTokenBlacklisted } from '../utils/jwtToken.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
+import { sendResetEmail } from './emailService.js';
 
 const SALT_ROUNDS = 12;
 
@@ -102,7 +103,12 @@ export async function forgotPassword(username) {
   const user = await userDao.findByUsername(username);
   if (!user) return { code: ERROR_CODE.RESET_LINK_SENT, message: 'If the account exists, a reset link has been sent' };
   const resetToken = jwt.sign({ userId: user.id, purpose: 'reset', jti: crypto.randomUUID() }, jwtSecret, { expiresIn: '15m' });
-  // TODO: integrate email service to send reset link; currently admin handles manually
+  // 异步发送重置邮件，不阻塞响应（失败仅记日志不影响安全：token 未泄露）
+  if (user.email) {
+    sendResetEmail(user.email, resetToken).catch(e =>
+      logger.warn('[User] 重置邮件发送失败', { userId: user.id, error: e.message })
+    );
+  }
   return { code: ERROR_CODE.RESET_LINK_SENT, message: 'If the account exists, a reset link has been sent' };
 }
 
