@@ -83,12 +83,16 @@ const submit = async () => {
     taskId.value = data?.taskId
 
     pollTimer = setInterval(async () => {
-      const task = await api.get(`/sku-batch/${taskId.value}`)
-      results.value = task?.results || []
-      if (task?.status === 'done' || task?.status === 'failed') {
-        clearInterval(pollTimer!)
-        pollTimer = null
-        step.value = 'done'
+      try {
+        const task = await api.get(`/sku-batch/${taskId.value}`)
+        results.value = task?.results || []
+        if (task?.status === 'done' || task?.status === 'failed') {
+          clearInterval(pollTimer!)
+          pollTimer = null
+          step.value = 'done'
+        }
+      } catch {
+        // keep polling
       }
     }, 2000)
   } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };

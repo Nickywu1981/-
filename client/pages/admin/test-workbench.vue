@@ -81,7 +81,7 @@
 import ConfigPanel from '~/components/admin/test-workbench/ConfigPanel.vue'
 import ResultPanel from '~/components/admin/test-workbench/ResultPanel.vue'
 import HistoryPanel from '~/components/admin/test-workbench/HistoryPanel.vue'
-import { copyToClipboard, truncate } from '@/utils/format'
+import { copyToClipboard } from '@/utils/format'
 
 const { confirm } = useConfirm()
 const { t } = useI18n()

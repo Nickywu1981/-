@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /** batch-sku-video — 多SKU批量视频生成 */
-import { ref, computed, onUnmounted } from 'vue'
+import { ref, onUnmounted } from 'vue'
 
 definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 const { t } = useI18n()
@@ -59,11 +59,15 @@ const submit = async () => {
     totalCount.value = data?.estimatedCount || selectedPlatforms.value.length
 
     pollTimer.value = setInterval(async () => {
-      const task = await api.get(`/sku-batch/${taskId.value}`)
-      results.value = task?.results || []
-      if (task?.status === 'done' || task?.status === 'failed') {
-        clearInterval(pollTimer.value)
-        loading.value = false
+      try {
+        const task = await api.get(`/sku-batch/${taskId.value}`)
+        results.value = task?.results || []
+        if (task?.status === 'done' || task?.status === 'failed') {
+          clearInterval(pollTimer.value)
+          loading.value = false
+        }
+      } catch {
+        // keep polling
       }
     }, 2000)
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string };
