@@ -261,8 +261,8 @@ app.get('/api/gateway/routes', authMiddleware, adminAuth, (req, res) => {
   return success(res, generateRouteMap(), 'ok');
 });
 
-// Prometheus 指标端点
-app.get('/api/metrics', metricsEndpoint);
+// Prometheus 指标端点（需认证）
+app.get('/api/metrics', authMiddleware, adminAuth, metricsEndpoint);
 
 // OpenAPI/Swagger 文档
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(getSwaggerSpec(), {

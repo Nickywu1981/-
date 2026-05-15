@@ -54,7 +54,10 @@ const batchSchema = z.object({
   entries: z.array(singleEntrySchema).min(1).max(1000),
 });
 
-const importBodySchema = z.record(z.string().min(1).max(200), z.string().max(5000));
+const importBodySchema = z.record(z.string().min(1).max(200), z.string().max(5000)).refine(
+  (obj) => Object.keys(obj).length <= 5000,
+  { message: '单次导入最多 5000 条翻译' }
+);
 
 // ===================== 公开路由 =====================
 

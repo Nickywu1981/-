@@ -97,7 +97,7 @@ router.get('/ping', sdkController.ping);
 router.post('/memory/search', heavyLimiter, authMiddleware, validate(memorySearchSchema), sdkController.memorySearch);
 router.post('/memory/embed', heavyLimiter, authMiddleware, validate(memoryEmbedSchema), sdkController.memoryEmbed);
 router.get('/memory/list/:userId', authMiddleware, validate(userIdParamSchema, 'params'), sdkController.memoryList);
-router.get('/memory/status', sdkController.memoryStatus);
+router.get('/memory/status', authMiddleware, sdkController.memoryStatus);
 router.post('/memory/rag', heavyLimiter, authMiddleware, validate(memorySearchSchema), sdkController.memoryRag);
 
 // ── 判断力 ──

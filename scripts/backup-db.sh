@@ -12,9 +12,12 @@ BACKUP_DIR="${BACKUP_DIR:-./backups}"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 BACKUP_FILE="${BACKUP_DIR}/ai_saas_${TIMESTAMP}.sql.gz"
 
-# ---- 加载环境变量 ----
+# ---- 加载环境变量（逐行读取，避免 xargs 切分/注入） ----
 if [ -f .env ]; then
-  export $(grep -v '^#' .env | grep -v '^$' | xargs)
+  while IFS='=' read -r key value; do
+    [[ -z "$key" || "$key" =~ ^[[:space:]]*# ]] && continue
+    export "$key=$value" 2>/dev/null || true
+  done < .env
 fi
 
 DB_HOST="${DB_HOST:-localhost}"
@@ -27,18 +30,26 @@ mkdir -p "$BACKUP_DIR"
 
 echo "[$(date)] Starting backup of ${DB_NAME}..."
 
-# ---- 执行备份 ----
+# ---- 执行备份（--defaults-extra-file 避免密码暴露在 ps 命令行） ----
+TMP_MY_CNF=$(mktemp)
+chmod 600 "$TMP_MY_CNF"
+cat > "$TMP_MY_CNF" << CNFEOF
+[client]
+host=${DB_HOST}
+port=${DB_PORT}
+user=${DB_USER}
+password=${DB_PASSWORD}
+CNFEOF
+
 mysqldump \
-  --host="${DB_HOST}" \
-  --port="${DB_PORT}" \
-  --user="${DB_USER}" \
-  --password="${DB_PASSWORD}" \
+  --defaults-extra-file="${TMP_MY_CNF}" \
   --single-transaction \
   --routines \
   --triggers \
   --events \
   --set-gtid-purged=OFF \
   "${DB_NAME}" | gzip > "${BACKUP_FILE}"
+rm -f "$TMP_MY_CNF"
 
 echo "[$(date)] Backup saved: ${BACKUP_FILE} ($(du -h "${BACKUP_FILE}" | cut -f1))"
 
