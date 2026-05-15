@@ -5,11 +5,11 @@
 <template>
   <div class="al">
     <!-- 移动端汉堡 -->
-    <button class="al-ham" @click="open = !open" :aria-label="open ? $t('admin_layout.close_menu') : $t('admin_layout.open_menu')">{{ open ? '✕' : '☰' }}</button>
+    <button class="al-ham" @click="open = !open" :aria-label="open ? $t('admin_layout.close_menu') : $t('admin_layout.open_menu')" :aria-expanded="open">{{ open ? '✕' : '☰' }}</button>
 
     <!-- 左侧分组导航 -->
     <aside class="al-side" :class="{ on: open }">
-      <div class="al-logo" @click="$router.push('/admin/dashboard')">
+      <div class="al-logo" role="button" tabindex="0" @click="$router.push('/admin/dashboard')" @keydown.enter.prevent="$router.push('/admin/dashboard')" @keydown.space.prevent="$router.push('/admin/dashboard')">
         <span class="al-logo-dot"></span>
         {{ brandName }}
       </div>
@@ -18,7 +18,12 @@
         <template v-for="g in groups" :key="g.key">
           <div
             class="al-grp-hd"
+            role="button"
+            tabindex="0"
+            :aria-expanded="g.open"
             @click="g.open = !g.open"
+            @keydown.enter.prevent="g.open = !g.open"
+            @keydown.space.prevent="g.open = !g.open"
           >
             <span class="al-grp-ic">{{ g.icon }}</span>
             <span class="al-grp-lbl">{{ $t('admin_nav.groups.' + g.key) }}</span>
@@ -44,7 +49,7 @@
     </aside>
 
     <!-- 遮罩 -->
-    <div v-if="open" class="al-mask" @click="open = false" />
+    <div v-if="open" class="al-mask" role="dialog" aria-modal="true" @click="open = false" @keydown.escape="open = false" />
 
     <!-- 右侧主区域 -->
     <main class="al-main">

@@ -32,7 +32,7 @@
           <td class="mono">{{ r.api_path }}</td>
           <td>
             <span class="ip-tag" :class="{ suspect: ipCounts[r.ip] > 3 }">{{ r.ip }}</span>
-            <span v-if="ipCounts[r.ip] > 3" class="ip-warn">高频</span>
+            <span v-if="ipCounts[r.ip] > 3" class="ip-warn">{{ $t('admin_abuse.高频') }}</span>
           </td>
           <td class="ua-cell" :title="r.user_agent">{{ truncate(r.user_agent, 40) }}</td>
           <td>{{ r.create_time?.slice(0, 19) }}</td>

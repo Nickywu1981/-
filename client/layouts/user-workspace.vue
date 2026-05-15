@@ -150,17 +150,17 @@
           <span class="tb-divider" />
 
           <!-- 在线客服 -->
-          <button class="tb-btn-icon" :title="t('workspace.topbar.customer_service')" @click="showCsModal = true">
+          <button class="tb-btn-icon" :title="t('workspace.topbar.customer_service')" aria-label="在线客服" @click="showCsModal = true">
             💬
           </button>
 
           <!-- 帮助 -->
-          <button class="tb-btn-icon" :title="t('workspace.topbar.help')" @click="navigateTo('/help')">
+          <button class="tb-btn-icon" :title="t('workspace.topbar.help')" aria-label="帮助" @click="navigateTo('/help')">
             ❓
           </button>
 
           <!-- 通知 -->
-          <button class="tb-btn-icon tb-notify" :title="t('workspace.topbar.notifications')" @click="navigateTo('/notifications')">
+          <button class="tb-btn-icon tb-notify" :title="t('workspace.topbar.notifications')" aria-label="通知" @click="navigateTo('/notifications')">
             🔔
             <span v-if="unreadCount > 0" class="tb-notify-dot">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
           </button>
@@ -175,7 +175,7 @@
           <span v-if="isAdmin" class="tb-divider" />
 
           <!-- 头像下拉 -->
-          <div class="tb-user-menu" @click.stop="toggleUserMenu">
+          <div class="tb-user-menu" role="button" tabindex="0" @click.stop="toggleUserMenu" @keydown.enter.prevent="toggleUserMenu" @keydown.space.prevent="toggleUserMenu">
             <div class="tb-avatar">
               <img v-if="user?.avatar" :src="user.avatar" class="tb-avatar-img" alt="" />
               <span v-else class="tb-avatar-text">{{ (user?.nickname || user?.username || 'U')[0].toUpperCase() }}</span>
@@ -329,6 +329,9 @@ onUnmounted(() => document.removeEventListener('click', closeUserMenu))
   border: 1px solid transparent; transition: all .15s; font-family: inherit;
   white-space: nowrap; line-height: 1.4;
 }
+.tb-btn:focus-visible {
+  outline: 2px solid #5b5fe3; outline-offset: 2px;
+}
 .tb-btn-primary {
   background: #5b5fe3; color: #fff; font-weight: 600; border-color: #5b5fe3;
 }
@@ -357,7 +360,7 @@ onUnmounted(() => document.removeEventListener('click', closeUserMenu))
 }
 
 .tb-btn-icon {
-  width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center;
+  width: 44px; height: 44px; border-radius: 8px; display: flex; align-items: center;
   justify-content: center; font-size: 15px; cursor: pointer; border: none;
   background: transparent; color: #6b6b70; transition: all .15s; position: relative;
 }
@@ -388,7 +391,7 @@ onUnmounted(() => document.removeEventListener('click', closeUserMenu))
 }
 
 .tb-avatar {
-  width: 32px; height: 32px; border-radius: 50%; overflow: hidden;
+  width: 44px; height: 44px; border-radius: 50%; overflow: hidden;
   background: linear-gradient(135deg, #5b5fe3, #a5a9f0); flex-shrink: 0;
 }
 .tb-avatar-img { width: 100%; height: 100%; object-fit: cover; }
@@ -436,7 +439,7 @@ onUnmounted(() => document.removeEventListener('click', closeUserMenu))
 }
 .cs-hd h3 { margin: 0; font-size: 16px; font-weight: 600; color: var(--text-primary); }
 .cs-close {
-  width: 28px; height: 28px; border: none; border-radius: 6px; background: none;
+  width: 44px; height: 44px; border: none; border-radius: 6px; background: none;
   font-size: 16px; cursor: pointer; color: var(--text-secondary);
 }
 .cs-close:hover { background: var(--bg-hover); }

@@ -63,10 +63,10 @@ const error = ref('')
 const models = ref<Record<string, any>>({})
 
 const categoryLabel = (c: string) =>
-  ({ video: '视频', image: '图片', text: '文本', custom: '自定义' })[c] || c
+  ({ video: t('admin_ai_models.视频'), image: t('admin_ai_models.图片'), text: t('admin_ai_models.文本'), custom: t('admin_ai_models.自定义') })[c] || c
 
 const stateLabel = (s: string) =>
-  ({ closed: '正常', open: '已熔断', 'half-open': '半开恢复', unknown: '未初始化' })[s] || s
+  ({ closed: t('admin_ai_models.正常'), open: t('admin_ai_models.已熔断'), 'half-open': t('admin_ai_models.半开恢复'), unknown: t('admin_ai_models.未初始化') })[s] || s
 
 async function fetchStatus() {
   loading.value = true
