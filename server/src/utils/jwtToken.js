@@ -84,6 +84,15 @@ export async function refreshAccessToken(refreshToken) {
     if (blacklisted) return null;
   }
 
+  // 原子抢占：SETNX 防止并发 refresh 重复颁发 token
+  if (r && payload.jti) {
+    const claimed = await r.set(`rt_refreshing:${payload.jti}`, '1', 'EX', 10, 'NX');
+    if (!claimed) {
+      logger.warn('[JWT] refresh race detected, rejecting', { userId: payload.id });
+      return null;
+    }
+  }
+
   // 颁发新 token pair，同时吊销旧 refresh token
   // 从 DB 获取最新角色信息，避免刷新后角色过期（动态 import 避免测试 mock 链断裂）
   let username = ''; let role = 'user';

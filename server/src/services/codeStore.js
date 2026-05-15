@@ -7,12 +7,17 @@ import { cacheSet, cacheDel, getRedis } from '../dao/redis.js';
 import logger from '../utils/logger.js';
 import { BusinessError } from '../utils/businessError.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
+import crypto from 'crypto';
 
 const CODE_PREFIX = 'vcode:';
 
+function hashKey(plain) {
+  return crypto.createHash('sha256').update(plain).digest('hex').substring(0, 16);
+}
+
 export async function saveCode(key, code, ttlSeconds = 300) {
   try {
-    await cacheSet(CODE_PREFIX + key, JSON.stringify({ code, attempts: 0 }), ttlSeconds);
+    await cacheSet(CODE_PREFIX + hashKey(key), JSON.stringify({ code, attempts: 0 }), ttlSeconds);
     return true;
   } catch (e) {
     logger.warn('[CodeStore] Redis 写入失败，降级不可用', { key, error: e.message });
@@ -45,7 +50,7 @@ export async function verifyCode(key, inputCode, maxAttempts = 5) {
   try {
     const r = await getRedis();
     if (r && r.isReady) {
-      const result = await r.eval(VERIFY_LUA, { keys: [CODE_PREFIX + key], arguments: [String(inputCode), String(maxAttempts)] });
+      const result = await r.eval(VERIFY_LUA, { keys: [CODE_PREFIX + hashKey(key)], arguments: [String(inputCode), String(maxAttempts)] });
       if (result[0] === 1) return { valid: true };
       return { valid: false, reason: result[1] };
     }

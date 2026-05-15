@@ -1,6 +1,9 @@
 import { cacheGet, cacheSet, getRedis } from '../dao/redis.js';
 import logger from '../utils/logger.js';
 
+// 进程内互斥锁，防止缓存击穿（并发请求同时触发缓存重建）
+const inflight = new Map();
+
 /**
  * Redis 缓存中间件
  * 自动缓存 GET 请求响应，支持自定义 TTL 和 key 生成策略
@@ -25,6 +28,19 @@ export function cacheMiddleware(ttl = 300, keyFn) {
         return res.json(cached);
       }
 
+      // 缓存击穿保护：相同 key 的并发请求排队等待第一个请求完成
+      if (inflight.has(cacheKey)) {
+        await inflight.get(cacheKey);
+        const retryCached = await cacheGet(cacheKey);
+        if (retryCached) {
+          res.setHeader('X-Cache', 'HIT');
+          return res.json(retryCached);
+        }
+      }
+
+      let resolveInflight;
+      inflight.set(cacheKey, new Promise(r => { resolveInflight = r; }));
+
       const originalJson = res.json.bind(res);
       res.json = function (body) {
         if (res.statusCode === 200 && body?.code === 200) {
@@ -33,7 +49,11 @@ export function cacheMiddleware(ttl = 300, keyFn) {
         res.setHeader('X-Cache', 'MISS');
         return originalJson(body);
       };
-      const restore = () => { res.json = originalJson; };
+      const restore = () => {
+        res.json = originalJson;
+        inflight.delete(cacheKey);
+        if (resolveInflight) resolveInflight();
+      };
       res.on('finish', restore);
       res.on('close', restore);
       res.on('error', restore);

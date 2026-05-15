@@ -1,6 +1,7 @@
 -- ============================================
 -- 预设数据 + 种子数据（完整版）
--- 执行方式: mysql -u root -proot123 --default-character-set=utf8mb4 < seed_all.sql
+-- 执行方式: mysql -u $DB_USER -p$DB_PASSWORD --default-character-set=utf8mb4 < seed_all.sql
+-- 或通过 npm run db:seed (推荐)
 -- ============================================
 
 USE ai_saas;
