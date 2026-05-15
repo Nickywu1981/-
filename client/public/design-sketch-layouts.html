@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>三套Layout对比 · Movio AI</title>
+<style>
+  :root {
+    --bg: #0a0c14; --card: #141724; --border: #1f2240;
+    --brand: #5b5fe3; --brand-alpha: rgba(91,95,227,.12);
+    --text-1: #ccc; --text-2: #8890b0; --text-3: #556;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--text-1); padding: 24px; }
+  h1 { font-size: 16px; margin-bottom: 6px; }
+  h2 { font-size: 10px; color: var(--text-3); font-weight: 400; margin-bottom: 20px; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .layout-card { background: var(--card); border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
+  .card-head { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .card-head .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot.green { background: #48bb78; }
+  .dot.red { background: #f56565; }
+  .dot.yellow { background: #ecc94b; }
+  .card-body { display: flex; height: 360px; }
+  .nav-col { width: 110px; background: #0d0f18; padding: 8px; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
+  .nav-logo {
+    padding: 8px 6px; border-radius: 6px; margin-bottom: 6px;
+    background: linear-gradient(135deg, var(--brand), #8b95ff);
+    color: #fff; font-size: 11px; font-weight: 700; text-align: center;
+  }
+  .nav-item {
+    padding: 7px 8px; border-radius: 5px; font-size: 10px;
+    color: var(--text-2); transition: all .12s;
+  }
+  .nav-item.active { background: var(--brand-alpha); color: var(--brand); font-weight: 600; }
+  .nav-item.muted { color: var(--text-3); }
+  .nav-divider { height: 1px; background: var(--border); margin: 6px 4px; }
+  .content-col { flex: 1; display: flex; flex-direction: column; }
+  .topbar-row { height: 36px; background: rgba(255,255,255,.03); display: flex; align-items: center; padding: 0 10px; font-size: 10px; color: var(--text-2); justify-content: space-between; }
+  .main-area { flex: 1; margin: 6px; border-radius: 6px; border: 1px dashed rgba(255,255,255,.06); display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--text-3); flex-direction: column; gap: 4px; }
+  .issue-tag { font-size: 8px; padding: 3px 8px; border-radius: 4px; margin-top: 4px; }
+  .issue-tag.p0 { background: rgba(245,101,101,.15); color: #f56565; border: 1px solid rgba(245,101,101,.2); }
+  .issue-tag.p1 { background: rgba(236,201,75,.15); color: #ecc94b; border: 1px solid rgba(236,201,75,.2); }
+</style>
+</head>
+<body>
+
+<h1>三套核心 Layout 对比 · 审计第 11 轮</h1>
+<h2>标注了已发现的 P0 缺陷（重复路由 / 跨布局链接 / CSS 零定义）</h2>
+
+<div class="grid">
+
+  <!-- 1. user-workspace -->
+  <div class="layout-card">
+    <div class="card-head"><span class="dot green"></span> user-workspace.vue · 用户工作台</div>
+    <div class="card-body">
+      <div class="nav-col">
+        <div class="nav-logo">M Movio AI</div>
+        <div class="nav-item">💬 Global AI 对话</div>
+        <div class="nav-item active">✨ 创作中心</div>
+        <div class="nav-item">🤖 智能体</div>
+        <div class="nav-item">🔀 工作流</div>
+        <div class="nav-item">🦞 龙虾</div>
+        <div class="nav-item">📋 历史记录</div>
+        <div class="nav-divider"></div>
+        <div class="nav-item muted">📊 数据分析</div>
+        <div class="nav-item muted">📈 营销工具</div>
+      </div>
+      <div class="content-col">
+        <div class="topbar-row"><span>创作中心</span><span style="color:var(--brand)">管理后台</span></div>
+        <div class="main-area">
+          主内容区 · 6 路由
+          <span class="issue-tag p0">P0: .sidebar .nav-item 类名零 CSS 定义</span>
+          <span class="issue-tag p0">P0: --sidebar-* token 无规则消费</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. platform-admin -->
+  <div class="layout-card">
+    <div class="card-head"><span class="dot red"></span> platform-admin.vue · 平台管理后台</div>
+    <div class="card-body">
+      <div class="nav-col">
+        <div class="nav-logo">M 平台管理</div>
+        <div class="nav-item active">📊 仪表板</div>
+        <div class="nav-item">👥 用户管理</div>
+        <div class="nav-item">🏢 租户管理</div>
+        <div class="nav-item">💳 订阅管理</div>
+        <div class="nav-item">🔒 安全中心</div>
+        <div class="nav-item">📜 审计日志</div>
+        <div class="nav-divider"></div>
+        <div class="nav-item">🛡 WAF/密钥</div>
+        <div class="nav-item">⚙ 系统参数</div>
+      </div>
+      <div class="content-col">
+        <div class="topbar-row"><span>仪表板</span><span>管理员</span></div>
+        <div class="main-area">
+          管理后台路由
+          <span class="issue-tag p0">P0: /admin/settings 出现 2 次!</span>
+          <span class="issue-tag p0">P0: WAF/密钥 + 系统参数重复</span>
+          <span class="issue-tag p1">P1: CSS 类名零定义</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. business-ops -->
+  <div class="layout-card">
+    <div class="card-head"><span class="dot yellow"></span> business-ops.vue · 业务运营后台</div>
+    <div class="card-body">
+      <div class="nav-col">
+        <div class="nav-logo">M 业务运营</div>
+        <div class="nav-item active">📢 活动管理</div>
+        <div class="nav-item">🎫 优惠券</div>
+        <div class="nav-item">📤 推送通知</div>
+        <div class="nav-item">👥 用户分群</div>
+        <div class="nav-item">📈 数据分析</div>
+        <div class="nav-item">✔ 审批中心</div>
+        <div class="nav-item">📣 公告管理</div>
+      </div>
+      <div class="content-col">
+        <div class="topbar-row"><span>活动管理</span><span>运营</span></div>
+        <div class="main-area">
+          运营管理路由
+          <span class="issue-tag p0">P0: 含 5 条 /admin/* 跨布局链接</span>
+          <span class="issue-tag p0">P0: 含 1 条 /gateway/* 跨布局</span>
+          <span class="issue-tag p1">P1: 点击跳到其他 layout 而非同栏</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

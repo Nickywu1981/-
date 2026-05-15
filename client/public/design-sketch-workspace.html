@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Movio AI - 工作台设计草图</title>
+<style>
+  :root {
+    --brand: #5b5fe3;
+    --brand-light: #8b95ff;
+    --brand-alpha: rgba(91, 95, 227, 0.15);
+    --bg-root: #0d0f18;
+    --bg-page: #141724;
+    --bg-card: #1a1d2e;
+    --bg-input: #0d0f18;
+    --border: #1f2240;
+    --text-1: #e0e2f0;
+    --text-2: #8890b0;
+    --text-3: #556;
+    --radius: 8px;
+    --radius-sm: 6px;
+    --sidebar-w: 200px;
+    --topbar-h: 48px;
+    --panel-w: 260px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, sans-serif; background: #0a0c14; color: var(--text-1); height: 100vh; display: flex; }
+  /* 侧边栏 */
+  .sidebar {
+    width: var(--sidebar-w); min-width: var(--sidebar-w); background: var(--bg-root);
+    display: flex; flex-direction: column; border-right: 1px solid var(--border);
+    padding: 12px 8px;
+  }
+  .sb-logo {
+    display: flex; align-items: center; gap: 8px; padding: 8px 6px; margin-bottom: 8px;
+    background: linear-gradient(135deg, var(--brand), var(--brand-light)); border-radius: var(--radius);
+    color: #fff; font-size: 13px; font-weight: 700;
+    justify-content: space-between;
+  }
+  .sb-logo span:first-child { display: flex; align-items: center; gap: 6px; }
+  .sb-logo .collapse { font-size: 10px; opacity: .8; }
+  .sb-nav { display: flex; flex-direction: column; gap: 1px; flex: 1; }
+  .sb-nav-item {
+    display: flex; align-items: center; gap: 8px; padding: 9px 10px; border-radius: var(--radius-sm);
+    color: var(--text-2); font-size: 12px; cursor: pointer; transition: all .15s;
+  }
+  .sb-nav-item:hover { background: rgba(255,255,255,.04); color: var(--text-1); }
+  .sb-nav-item.active { background: var(--brand-alpha); color: var(--brand); font-weight: 600; }
+  .sb-nav-item.muted { color: var(--text-3); }
+  .sb-badge { margin-left: auto; background: #e53e3e; color: #fff; font-size: 10px; padding: 1px 6px; border-radius: 10px; font-weight: 600; }
+  .sb-divider { height: 1px; background: var(--border); margin: 8px 4px; }
+  .sb-user { display: flex; align-items: center; gap: 8px; padding: 8px 6px; border-top: 1px solid var(--border); margin-top: auto; font-size: 11px; color: var(--text-2); }
+  .sb-user .avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--brand); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; }
+
+  /* 主区域 */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  /* 顶栏 */
+  .topbar {
+    height: var(--topbar-h); display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; background: rgba(20, 23, 36, 0.85); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border); font-size: 12px; color: var(--text-2);
+  }
+  .topbar-title { font-weight: 600; color: var(--text-1); font-size: 13px; }
+  .topbar-right { display: flex; align-items: center; gap: 16px; font-size: 11px; }
+  .topbar-admin { color: var(--brand); font-weight: 600; cursor: pointer; }
+
+  /* 内容区 */
+  .content { flex: 1; display: flex; overflow: hidden; }
+  .workspace { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+  /* 板块标签 */
+  .tabs { display: flex; gap: 8px; }
+  .tab { padding: 7px 16px; border-radius: 20px; font-size: 11px; color: var(--text-3); cursor: pointer; transition: all .15s; }
+  .tab:hover { color: var(--text-2); }
+  .tab.active { background: var(--brand-alpha); color: var(--brand); font-weight: 600; }
+
+  /* AI 输入卡 */
+  .input-card {
+    background: var(--bg-card); border: 1px dashed var(--border); border-radius: var(--radius);
+    padding: 16px; display: flex; flex-direction: column; gap: 12px;
+  }
+  .upload-zone { display: flex; align-items: center; gap: 10px; font-size: 11px; color: var(--text-3); }
+  .upload-icon {
+    width: 36px; height: 36px; border-radius: var(--radius-sm); background: var(--brand-alpha);
+    display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--brand);
+  }
+  .prompt-input {
+    width: 100%; min-height: 90px; background: var(--bg-input); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); color: var(--text-2); font-size: 12px; padding: 10px;
+    resize: vertical; font-family: inherit;
+  }
+  .prompt-input::placeholder { color: var(--text-3); }
+
+  /* 参数栏 */
+  .params { display: flex; gap: 12px; align-items: center; }
+  .param { display: flex; align-items: center; gap: 4px; padding: 6px 14px; background: var(--bg-card); border-radius: var(--radius-sm); font-size: 11px; color: var(--text-2); cursor: pointer; }
+  .param::after { content: '▾'; font-size: 8px; color: var(--text-3); }
+  .btn-generate {
+    margin-left: auto; background: linear-gradient(135deg, var(--brand), var(--brand-light));
+    color: #fff; font-size: 12px; font-weight: 600; padding: 8px 24px; border-radius: var(--radius-sm);
+    cursor: pointer; border: none; display: flex; align-items: center; gap: 6px;
+  }
+
+  /* 快速工具 */
+  .section-label { font-size: 10px; color: var(--text-3); font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+  .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .tool-card {
+    background: var(--bg-card); border-radius: var(--radius); padding: 14px 10px;
+    text-align: center; font-size: 11px; color: var(--text-2); cursor: pointer; transition: all .15s;
+  }
+  .tool-card:hover { background: var(--brand-alpha); color: var(--brand); }
+  .tool-card .icon { font-size: 20px; margin-bottom: 6px; }
+
+  /* 右侧面板 */
+  .panel {
+    width: var(--panel-w); min-width: var(--panel-w); background: var(--bg-root);
+    border-left: 1px solid var(--border); padding: 14px 10px; display: flex; flex-direction: column; gap: 8px;
+  }
+  .panel-title { font-size: 11px; color: var(--text-2); font-weight: 600; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .panel-preview {
+    flex: 1; background: var(--bg-card); border-radius: var(--radius); border: 1px dashed var(--border);
+    display: flex; align-items: center; justify-content: center; color: var(--text-3); font-size: 11px;
+  }
+  .panel-hint { background: var(--bg-card); border-radius: var(--radius-sm); padding: 8px; font-size: 10px; color: var(--text-3); }
+  .panel-actions { display: flex; gap: 6px; }
+  .panel-btn { flex: 1; padding: 6px; background: var(--bg-card); border-radius: var(--radius-sm); text-align: center; font-size: 9px; color: var(--text-3); cursor: pointer; }
+</style>
+</head>
+<body>
+
+<!-- 侧边栏 -->
+<aside class="sidebar">
+  <div class="sb-logo"><span>M</span> Movio AI <span class="collapse">◀</span></div>
+  <nav class="sb-nav">
+    <a class="sb-nav-item">💬 Global AI 对话 <span class="sb-badge">3</span></a>
+    <a class="sb-nav-item active">✨ 创作中心</a>
+    <a class="sb-nav-item">🤖 智能体</a>
+    <a class="sb-nav-item">🔀 工作流</a>
+    <a class="sb-nav-item">🦞 龙虾</a>
+    <a class="sb-nav-item">📋 历史记录</a>
+    <div class="sb-divider"></div>
+    <a class="sb-nav-item muted">📊 数据分析</a>
+    <a class="sb-nav-item muted">📈 营销工具</a>
+  </nav>
+  <div class="sb-user">
+    <div class="avatar">U</div>
+    <div>UserName<br><span style="font-size:9px;color:var(--text-3)">积分 1,280</span></div>
+  </div>
+</aside>
+
+<!-- 主区域 -->
+<div class="main">
+  <header class="topbar">
+    <span class="topbar-title">创作中心</span>
+    <div class="topbar-right">
+      <span>帮助</span>
+      <span>通知</span>
+      <span class="topbar-admin">管理后台</span>
+      <span>退出</span>
+    </div>
+  </header>
+
+  <div class="content">
+    <main class="workspace">
+      <!-- 板块标签 -->
+      <div class="tabs">
+        <span class="tab active">🖼 图片生成</span>
+        <span class="tab">🎬 视频生成</span>
+        <span class="tab">🎨 变色调</span>
+        <span class="tab">✂ 去背景</span>
+        <span class="tab">📐 扩图</span>
+      </div>
+
+      <!-- AI 输入卡 -->
+      <div class="input-card">
+        <div class="upload-zone">
+          <div class="upload-icon">📎</div>
+          <span>上传参考图或拖拽文件到此处 · JPG/PNG/WebP</span>
+        </div>
+        <textarea class="prompt-input" placeholder="描述你想要生成的内容，例如：一位穿着汉服的少女站在樱花树下，柔光，4K 画质..."></textarea>
+        <div class="params">
+          <span class="param">风格</span>
+          <span class="param">比例 16:9</span>
+          <span class="param">数量 4</span>
+          <button class="btn-generate">🚀 开始生成</button>
+        </div>
+      </div>
+
+      <!-- 快速工具 -->
+      <div class="section-label">⚡ 快速工具</div>
+      <div class="tools-grid">
+        <div class="tool-card"><div class="icon">📐</div>智能扩图</div>
+        <div class="tool-card"><div class="icon">🎨</div>AI 变色</div>
+        <div class="tool-card"><div class="icon">🔍</div>智能识别</div>
+        <div class="tool-card"><div class="icon">📦</div>批量处理</div>
+      </div>
+    </main>
+
+    <!-- 右侧面板 -->
+    <aside class="panel">
+      <div class="panel-title">📋 结果预览</div>
+      <div class="panel-preview">
+        生成结果<br>将在此展示
+      </div>
+      <div class="panel-hint">💡 AI 提示优化建议：添加"4K"、"高清"等关键词提升画质</div>
+      <div class="panel-actions">
+        <div class="panel-btn">📥 下载</div>
+        <div class="panel-btn">⚡ 重生成</div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+</body>
+</html>
