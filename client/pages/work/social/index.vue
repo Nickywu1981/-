@@ -281,6 +281,5 @@ definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 .btn-sm { padding: 6px 12px; font-size: 13px; }
 .btn-lg { padding: 14px 24px; font-size: 16px; }
 .w-full { width: 100%; }
-.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid transparent; border-top-color: #fff; border-radius: 50%; animation: spin .6s linear infinite; vertical-align: middle; margin-right: 6px; }
-@keyframes spin { to { transform: rotate(360deg); } }
+.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid transparent; border-top-color: #fff; border-radius: 50%; animation: anim-spin .6s linear infinite; vertical-align: middle; margin-right: 6px; }
 </style>

@@ -193,10 +193,9 @@ definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
   border: 4px solid var(--border-light);
   border-top-color: var(--brand);
   border-radius: 50%;
-  animation: spin .8s linear infinite;
+  animation: anim-spin .8s linear infinite;
   margin: 0 auto var(--space-4);
 }
-@keyframes spin { to { transform: rotate(360deg); } }
 .actions { margin-top: var(--space-4); }
 .btn-primary {
   padding: var(--space-3) var(--space-8);

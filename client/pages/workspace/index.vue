@@ -21,7 +21,6 @@ onMounted(() => { router.replace('/workspace/creation') })
   width: 28px; height: 28px; border-radius: 50%;
   border: 3px solid var(--border-light, #ebebea);
   border-top-color: var(--color-brand-600, #5b5fe3);
-  animation: spin .6s linear infinite;
+  animation: anim-spin .6s linear infinite;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
 </style>

@@ -223,9 +223,8 @@ input::placeholder { color: var(--input-placeholder); }
 
 .spinner-sm {
   width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3);
-  border-top-color: var(--white); border-radius: 50%; animation: spin 0.6s linear infinite;
+  border-top-color: var(--white); border-radius: 50%; animation: anim-spin 0.6s linear infinite;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
 
 .msg { margin-top: 12px; font-size: 13px; text-align: center; color: var(--success); }
 .msg.error { color: var(--danger); }

@@ -312,8 +312,7 @@ definePageMeta({ layout: 'platform-admin', middleware: ['auth'] })
 }
 .refresh-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
 .refresh-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-.refresh-btn.spinning { animation: spin 0.8s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
+.refresh-btn.spinning { animation: anim-spin 0.8s linear infinite; }
 
 /* ---- 统计卡片 ---- */
 .stats-grid {

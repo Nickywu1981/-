@@ -240,6 +240,5 @@ const customParallel = defineModel<boolean>('customParallel', { default: false }
 .btn-run:hover:not(:disabled) { filter: brightness(1.1); }
 .btn-run:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn-clear { padding: 10px 20px; border: 1px solid var(--border-light); border-radius: var(--radius-md); background: var(--bg-page); color: var(--text-secondary); cursor: pointer; font-size: 13px; }
-.spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
+.spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: anim-spin 0.7s linear infinite; }
 </style>

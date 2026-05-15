@@ -266,7 +266,7 @@ onMounted(() => { startClock() })
 }
 .dvs-spinner {
   width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--color-brand-500);
-  border-radius: 50%; animation: spin 0.8s linear infinite;
+  border-radius: 50%; animation: anim-spin 0.8s linear infinite;
 }
 .dvs-error-icon, .dvs-empty-icon { font-size: 40px; }
 .dvs-retry-btn {

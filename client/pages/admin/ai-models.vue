@@ -114,8 +114,7 @@ definePageMeta({ layout: 'platform-admin', middleware: ['auth'] })
 }
 .refresh-btn:hover { border-color: var(--brand, #5b5fe3); color: var(--brand, #5b5fe3); }
 .refresh-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.refresh-btn.spinning { animation: spin 0.8s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
+.refresh-btn.spinning { animation: anim-spin 0.8s linear infinite; }
 
 .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; margin-bottom: 24px; }
 

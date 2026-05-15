@@ -433,8 +433,7 @@ function exportAll() { /* TODO: download all assets as ZIP */ }
   font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 8px;
 }
 .generate-btn:disabled { background: #ccc; cursor: not-allowed; }
-.spinner { width: 18px; height: 18px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin .8s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
+.spinner { width: 18px; height: 18px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: anim-spin .8s linear infinite; }
 
 .intent-badge { margin-top: 12px; padding: 8px 12px; background: var(--success-light); border-radius: 6px; font-size: 13px; color: var(--success); text-align: center; }
 

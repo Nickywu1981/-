@@ -122,9 +122,8 @@ const st = computed(() => p.steps ?? []);
 :deep(.spinner) {
   width: 44px; height: 44px; border: 3px solid var(--border-light);
   border-top-color: var(--brand); border-radius: 50%; margin: 0 auto 20px;
-  animation: spin 0.8s linear infinite;
+  animation: anim-spin 0.8s linear infinite;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
 :deep(.bar) { height: 6px; background: var(--bg-hover); border-radius: 3px; overflow: hidden; max-width: 360px; margin: 16px auto 0; }
 :deep(.bar-fill) { height: 100%; border-radius: 3px; background: var(--brand-gradient); transition: width 0.3s; }
 

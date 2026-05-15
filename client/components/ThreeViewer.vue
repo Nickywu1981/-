@@ -377,9 +377,8 @@ onBeforeUnmount(() => {
   border: 3px solid #333;
   border-top-color: #6c5ce7;
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  animation: anim-spin 0.8s linear infinite;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
 .viewer-info {
   position: absolute;
   top: 10px;
