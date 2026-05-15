@@ -163,9 +163,7 @@ const content = {
   },
 
   generateSellingPoints(userId, params = {}) {
-    return copywritingService.generateCopy
-      ? copywritingService.generateCopy({ type: 'selling_point', userId, ...params })
-      : this.generateTitles(userId, params); // fallback
+    return this.generateTitles(userId, { ...params, mode: 'selling_points' }); // fallback to titles with mode hint
   },
 
   generateDescription(userId, params = {}) {
@@ -173,9 +171,7 @@ const content = {
   },
 
   generateSeeding(userId, params = {}) {
-    return copywritingService.generateCopy
-      ? copywritingService.generateCopy({ type: 'seeding', userId, ...params })
-      : this.generateTitles(userId, params); // fallback
+    return this.generateTitles(userId, { ...params, mode: 'seeding' }); // fallback to titles with mode hint
   },
 
   generateScript(userId, params = {}) {
@@ -206,7 +202,7 @@ const guard = {
   },
 
   async checkImage(imageUrl, options = {}) {
-    return moderationService.checkImage ? moderationService.checkImage(imageUrl, options) : { passed: true };
+    return moderationService.moderateImage ? moderationService.moderateImage(imageUrl, undefined, options) : { passed: true };
   },
 
   async fullAudit({ text, imageUrls = [], platform } = {}) {
@@ -252,7 +248,7 @@ const visual = {
   },
 
   processImage(userId, params = {}) {
-    return imageService.submitMainImage(userId, params);
+    return imageService.replicateMainImage(userId, params);
   },
 };
 

@@ -23,7 +23,7 @@ export const sdkController = {
 
   memoryList: wrapController(async (req) => memfocus.memory.list(req.params.userId, req.query)),
 
-  memoryStatus: wrapController(() => memfocus.memory.getStatus()),
+  memoryStatus: wrapController(() => memfocus.memory.stats()),
 
   memoryRag: wrapController(async (req) => {
     const { query, topK = 5 } = req.body;

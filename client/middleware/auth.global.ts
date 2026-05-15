@@ -6,12 +6,13 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const publicPaths = [
     '/', '/login', '/register', '/auth/register',
     '/auth/reset-password', '/forgot-password', '/help', '/compare', '/legal/terms', '/legal/privacy', '/error',
+    '/enterprise/login', '/enterprise/register',
   ]
 
   // Redirect-loop guard: track consecutive auth failures per session to break infinite redirect chains
   const REDIRECT_KEY = '_auth_redirect_count'
   const MAX_REDIRECTS = 3
-  if (to.path === '/login' || to.path.startsWith('/auth/reset-password')) {
+  if (to.path === '/login' || to.path.startsWith('/auth/reset-password') || to.path === '/enterprise/login' || to.path === '/enterprise/register') {
     try { sessionStorage.removeItem(REDIRECT_KEY) } catch {}
   }
 
