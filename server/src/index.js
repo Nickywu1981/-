@@ -38,9 +38,6 @@ const server = createServer(app);
 // WebSocket real-time progress
 wsManager.attach(server);
 
-// BullMQ Worker startup (non-blocking, degrades when Redis unavailable)
-import('./services/workerBootstrap.js').then(({ bootstrapWorkers }) => bootstrapWorkers()).catch((err) => { logger.warn('[Worker] Startup failed, queue will degrade', { error: err.message }); });
-
 let cleanupTimer = null;
 let recoverTimer = null;
 
@@ -120,13 +117,6 @@ async function gracefulShutdown(signal) {
       await db.default.end();
       logger.info('DB pool closed');
     } catch (e) { logger.warn('DB close failed', { message: e.message }); }
-
-    // Close BullMQ
-    try {
-      const qm = await import('./services/queueManager.js');
-      await qm.closeAll();
-      logger.info('BullMQ queues closed');
-    } catch (e) { logger.warn('BullMQ close failed', { message: e.message }); }
 
     // Close Redis
     try {
