@@ -2,7 +2,7 @@
 
 > **编写组**：G3 UI 设计组（UI-Designer 🔴主 / Doc-Writer 🟡辅）
 > **审核组**：G1 架构规划组（Architect）
-> **版本**：v1.15 | **日期**：2026-05-15
+> **版本**：v1.16 | **日期**：2026-05-15
 
 ---
 
@@ -1018,19 +1018,47 @@ R11 标记 `user-workspace.vue` 等 3 个 layout "CSS 完全缺失" — **本例
 | `login.vue` | `sr-only` label × 6、`role="alert"` `aria-live="assertive"`、`autocomplete` 属性、`:focus` + `:hover` + `:disabled` 三态完整、`@media (max-width:480px)` 响应式、`prefers-reduced-motion` 通过 `animations.css` 继承 |
 | gateway/ops/finance pages | 三套布局共 18 个页面全量清洁，零旧品牌色/硬编码色值 |
 
-### 10.47 本轮累计
+### 10.48 R17 — `--cfg-*` 死 token 前缀全量归零
 
-| 优先级 | R15 累计 | R16 新增 | R16 修复 | 总计 |
+**224 处跨 24 文件 → 0**。三阶段清零：
+1. R15-R16：67 处手动逐文件替换（`ConfirmDialog`/`StatusBadge`/`AppMediaUpload`/`payment/result`）
+2. R17 手动：30 处（`AppTaskProgress`/`PromptEnhancer`/`SmartRecognitionPanel`/`Toast`/`bind-platform`/`ai-models`/`distribution`/`credits`）
+3. R17 脚本批量：408 + 36 处边角（14 个同模板文件）
+
+| 死 token | 替换为 | 数量 |
+|------|------|:--:|
+| `--cfg-primary` | `--brand, #5b5fe3` | ~40 |
+| `--cfg-border` | `--border-color, #e5e7eb` | ~80 |
+| `--cfg-text-*` (4 变体) | `--text-*` | ~120 |
+| `--cfg-bg-*` (3 变体) | `--bg-*` | ~60 |
+| `--cfg-font-size-*` (6 变体) | `--text-*` | ~80 |
+| `--cfg-radius-*` (4 变体) | `--radius-*` | ~60 |
+| `--cfg-font-weight-*` (3 变体) | 直接数值 `400/500/600/700` | ~30 |
+| `--cfg-transition-fast`/`--cfg-shadow-lg`/`--cfg-font-mono`/`--cfg-z-*`/`--cfg-warning*` | 对应 token | ~36 |
+
+### 10.49 本轮新发现（跨组）
+
+| 优先级 | 发现 | 详情 |
+|:--:|------|------|
+| **P1** | `.anim-fade-in` keyframes 冲突 | `animations.css:31` 用 `@keyframes anim-fade-in`，`unified:528` 用 `@keyframes fadeIn`，同名类不同动画。虽当前零引用，加载顺序一变即崩 |
+| **P1** | 8 种 spinner 类名 | `.spinner`/`.spinner-sm`/`.bp-spinner`/`.dvs-spinner`/`.wh-spinner`/`.loading-spin`/`.loading-spinner`/`.pe-spin` 跨 17 文件 |
+| **P1** | inline skeleton 不一致 | `credits.vue` + `works.vue` 手写 skeleton 未用 `<LoadingSkeleton>` |
+| **P1** | KB_INDEX 断裂链接 | 3 处 URL 编码中文路径 / Windows 路径混用 |
+| **P2** | `@keyframes spin` 多文件重复 | 10+ 文件各自定义，应统一到 animations.css |
+
+### 10.50 累计趋势
+
+| 优先级 | R16 | R17 新增 | R17 修复 | 总计 |
 |:--:|:--:|:--:|:--:|:--:|
-| P0 | 43 | 0 | -16 | **27** |
-| P1 | 15 | 3 | 0 | **18** |
-| P2 | 3 | 0 | 0 | **3** |
-| P3 | 16 | 1 | 0 | **17** |
-| **合计** | **65** | **4** | **-16** | **49** |
+| P0 | 27 | 0 | 0 | **27** |
+| P1 | 18 | 4 | 0 | **22** |
+| P2 | 3 | 1 | 0 | **4** |
+| P3 | 17 | 0 | 0 | **17** |
+| **合计** | **49** | **5** | **0** | **54** |
 
 ### 里程碑
 
-- **全站 `#7C3AED` 图表色归零** — 最后残留 `admin/dashboard.vue` + `admin/analytics.vue` 6 处图表色全部迁移 `#5b5fe3`
-- **全站 `#409eff` Element Plus 蓝 fallback 归零** — R15→R16 间 5 处全部清除
-- **全站 `#3b82f6` Tailwind 蓝 fallback 归零** — `admin/enterprises.vue` 最后 1 处清除
-- **gateway/ops/finance 三套后台全清洁** — 18 pages 零品牌色残留
+- **`--cfg-*` 死 token 前缀全量归零** — 项目上线以来最大规模 token 标准化，消除第六套私有 token 体系
+- **`#4F46E5` Indigo-600 fallback 归零** — `AppTaskProgress.vue` 最后 2 处
+- **`#3B82F6` Tailwind blue-500 fallback 归零** — `ai-models.vue` 最后 3 处
+- **G3 自修累计 91 → 127 项**
