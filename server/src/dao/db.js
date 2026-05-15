@@ -1,5 +1,5 @@
-import mysql from 'mysql2/promise';
-import { db as dbConfig, mockEnabled } from '../config/index.js';
+import { mockEnabled } from '../config/index.js';
+import { realPool } from './poolCore.js';
 import { tenantPool, adminPool } from './tenantPool.js';
 import { getContextDB } from './context.js';
 import logger from '../utils/logger.js';
@@ -147,31 +147,6 @@ const RETRYABLE_CODES = new Set([
 ]);
 
 // Real MySQL pool (lazy - won't connect until first query)
-const realPool = mysql.createPool({
-  host: dbConfig.host,
-  port: dbConfig.port,
-  user: dbConfig.user,
-  password: dbConfig.password,
-  database: dbConfig.database,
-  waitForConnections: true,
-  connectionLimit: dbConfig.connectionLimit || 20,
-  queueLimit: 100,
-  acquireTimeout: 10000,
-  enableKeepAlive: true,
-  keepAliveInitialDelay: 10000,
-  idleTimeout: 60000,
-  dateStrings: true,
-  connectTimeout: 3000, // fail fast if no MySQL
-});
-
-// 连接验证：每次从池中取出连接时执行 SELECT 1 健康探测
-realPool.on('acquire', (conn) => {
-  conn.query('SELECT 1').catch((e) => { logger.warn('[DB] Health check SELECT 1 failed, connection may be dead', { error: e.message }); });
-});
-
-// Prevent unhandled pool-level errors from crashing the process
-realPool.on('error', (err) => { logger.error('[DB] Pool error', { error: err.message }); });
-
 // Proxy pool: tries real DB first, falls back to mock
 const realPoolProxy = new Proxy(realPool, {
   get(target, prop) {

@@ -6,7 +6,7 @@
  *
  * 使用方式：const db = tenantPool.wrap(req); 后续 db.query(sql, params) 自动注入 tenant_id
  */
-import { realPool } from './db.js';
+import { realPool } from './poolCore.js';
 
 /**
  * 有 tenant_id 列的表白名单
