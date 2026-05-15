@@ -58,8 +58,20 @@
 import { truncate } from '@/utils/format'
 import { formatDateTime } from '@/utils/format'
 
+interface HistoryItem {
+  id: string
+  error?: boolean
+  type: string
+  model_key?: string
+  task_type?: string
+  model_sequence?: string[]
+  prompt: string
+  duration_ms: number
+  created_at: string
+}
+
 const props = withDefaults(defineProps<{
-  historyList: any[]
+  historyList: HistoryItem[]
   historyLoading: boolean
   historyPageSize: number
   historyTotal: number
@@ -75,7 +87,7 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{
   'loadHistory': []
   'clearHistory': []
-  'viewHistory': [h: any]
+  'viewHistory': [h: HistoryItem]
   'deleteHistoryItem': [id: string]
 }>()
 

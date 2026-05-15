@@ -26,7 +26,7 @@
               <div
                 v-for="(item, idx) in group.items"
                 :key="item.id"
-                :ref="(el: any) => setItemRef(el, item.id)"
+                :ref="(el: Element | null) => setItemRef(el, item.id)"
                 class="palette-item"
                 :class="{ active: activeIdx === getFlatIndex(gidx, idx) }"
                 @click="select(item)"
@@ -151,7 +151,7 @@ function getFlatIndex(gidx: number, idx: number): number {
 
 const totalItems = computed(() => filtered.value.length);
 
-function setItemRef(el: any, id: string) {
+function setItemRef(el: Element | null, id: string) {
   if (el) itemRefs.value[id] = el;
 }
 

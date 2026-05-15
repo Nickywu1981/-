@@ -29,7 +29,7 @@ const fetched = ref(false)
 onMounted(async () => {
   if (fetched.value) return
   try {
-    const res: any = await $fetch('/api/site-config/public', { credentials: 'omit' })
+    const res = await $fetch<{ data?: { list?: Array<{ config_key: string; config_value: string }> } }>('/api/site-config/public', { credentials: 'omit' })
     const list = res?.data?.list || res?.data || []
 
     if (Array.isArray(list)) {

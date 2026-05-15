@@ -49,11 +49,24 @@
 </template>
 
 <script setup lang="ts">
+interface VersionItem {
+  version: number
+  created_at?: string
+  remark?: string
+}
+
+interface DiffItem {
+  type: 'added' | 'removed' | 'modified'
+  path: string
+  aType?: string
+  bType?: string
+}
+
 const props = withDefaults(defineProps<{
   modelValue: boolean
-  versions: any[]
+  versions: VersionItem[]
   loading: boolean
-  diffResult: any[] | null
+  diffResult: DiffItem[] | null
 }>(), {
   modelValue: false,
   versions: () => [],
