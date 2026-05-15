@@ -5,7 +5,7 @@ import { URL } from 'url';
 import { BusinessError } from './businessError.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
-const BLOCKED_HOSTS = [
+export const BLOCKED_HOSTS = [
   /^localhost$/i,
   /^127\.\d+\.\d+\.\d+$/,
   /^10\.\d+\.\d+\.\d+$/,

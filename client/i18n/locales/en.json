@@ -2175,6 +2175,11 @@
       "enabled": "Enabled",
       "disabled": "Disabled"
     },
+    "cs": {
+      "title": "Customer Service",
+      "desc": "Scan the QR code to add our customer service on WeChat for 1-on-1 support",
+      "qr_placeholder": "Customer Service QR Code"
+    },
     "dashboard": {
       "title": "Dashboard",
       "subAccounts": "Sub-Accounts",
@@ -3440,6 +3445,8 @@
     "creation_quick_tools": "{tab} · Quick Tools",
     "redirect_creation": "Redirecting to Creation Center...",
     "creation_upload_hint": "Drag or click to upload assets",
+    "creation_no_result": "No results yet",
+    "creation_empty_hint": "Enter a prompt and click Generate",
     "creation_param_label": "Parameters",
     "creation_options": {
       "duration": {

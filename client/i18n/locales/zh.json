@@ -2080,6 +2080,11 @@
       "enabled": "已启用",
       "disabled": "已禁用"
     },
+    "cs": {
+      "title": "在线客服",
+      "desc": "扫码添加客服微信，获取一对一专属服务",
+      "qr_placeholder": "客服二维码"
+    },
     "dashboard": {
       "title": "工作台",
       "subAccounts": "子账号数",
@@ -3344,6 +3349,8 @@
     "creation_quick_tools": "{tab} · 快捷工具",
     "redirect_creation": "跳转至创作中心...",
     "creation_upload_hint": "拖拽或点击上传素材",
+    "creation_no_result": "暂无生成结果",
+    "creation_empty_hint": "输入提示词并点击生成",
     "creation_param_label": "参数设置",
     "creation_options": {
       "duration": {

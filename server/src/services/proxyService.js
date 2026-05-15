@@ -3,21 +3,13 @@ import { PROXY_FLAG, CIRCUIT_STATUS } from '../constants/domainStatus.js';
 import * as proxyDao from '../dao/proxyDao.js';
 import { encrypt, decrypt } from '../utils/crypto.js';
 import logger from '../utils/logger.js';
+import { validateExternalUrl, BLOCKED_HOSTS } from '../utils/ssrfGuard.js';
 import { URL } from 'url';
 import dns from 'dns/promises';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
-// ==================== SSRF 防护 ====================
-
-const BLOCKED_HOST_PATTERNS = [
-  /^localhost$/i, /^127\./, /^0\.0\.0\.0$/,
-  /^10\./, /^172\.(1[6-9]|2\d|3[01])\./, /^192\.168\./,
-  /^169\.254\./, /^100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\./,
-  /^::1$/, /^fc00:/, /^fe80:/,
-];
-
 function isBlockedHost(hostname) {
-  return BLOCKED_HOST_PATTERNS.some(p => p.test(hostname));
+  return BLOCKED_HOSTS.some(p => p.test(hostname));
 }
 
 // ==================== 配置管理 ====================

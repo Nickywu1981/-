@@ -1,13 +1,13 @@
 <!--
-  Movio AI v8.0 — 创作中心
+  Movio AI v9.0 — 创作中心
   三层联动布局：板块标签 → 统一创作输入 → 动态子功能
-  右侧 SlidePanel 弹窗承载所有结果展示与子功能操作
-  主页面不跳转，所有交互统一在弹窗内完成
+  右侧可折叠结果面板（默认收起，生成时自动展开）
+  上传图标内嵌 textarea 左上角
 -->
 <template>
   <div class="cc">
     <!-- ═══════════════════════════════════════════ -->
-    <!-- LAYER 1: 五大板块标签（创作输入框正上方） -->
+    <!-- LAYER 1: 五大板块标签 -->
     <!-- ═══════════════════════════════════════════ -->
     <nav class="cc-tabs" role="tablist" :aria-label="t('workspace.nav_creation')">
       <button
@@ -24,98 +24,183 @@
       </button>
     </nav>
 
-    <!-- ═══════════════════════════════════════════ -->
-    <!-- LAYER 2: 统一创作输入卡片 -->
-    <!-- ═══════════════════════════════════════════ -->
-    <div class="cc-input-card" role="region" :aria-label="t('workspace.creation_input_region', { tab: activeTabLabel })">
-      <div class="cc-input-top">
-        <!-- 左侧：上传参考素材入口 -->
-        <div class="cc-upload-zone" @click="triggerUpload" @dragover.prevent @drop.prevent="handleDrop">
-          <input ref="fileInputRef" type="file" multiple accept="image/*,video/*" style="display:none" @change="handleFileChange" />
-          <div class="cc-upload-icon">📎</div>
-          <div class="cc-upload-label">{{ t('workspace.creation_upload_label') }}</div>
+    <div class="cc-layout">
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- 主内容区 -->
+      <!-- ═══════════════════════════════════════════ -->
+      <div class="cc-content">
+        <!-- LAYER 2: 统一创作输入卡片 -->
+        <div class="cc-input-card" role="region" :aria-label="t('workspace.creation_input_region', { tab: activeTabLabel })">
+          <div class="cc-input-main">
+            <!-- 上传参考图：内嵌 textarea 左上角 -->
+            <div class="cc-upload-inline" @click="triggerUpload" @dragover.prevent @drop.prevent="handleDrop">
+              <input ref="fileInputRef" type="file" multiple accept="image/*,video/*" style="display:none" @change="handleFileChange" />
+              <span class="cc-upload-inline-icon">📎</span>
+              <span class="cc-upload-inline-label">{{ t('workspace.creation_upload_label') }}</span>
+            </div>
+            <textarea
+              ref="textareaRef"
+              v-model="prompt"
+              class="cc-textarea"
+              :placeholder="activeTabPlaceholder"
+              rows="3"
+              @keydown.enter.exact.prevent="startGenerate"
+            ></textarea>
+          </div>
+
+          <!-- 底部操作栏 -->
+          <div class="cc-input-bottom">
+            <div class="cc-param-row">
+              <select
+                v-for="(p, i) in activeParamSelects"
+                :key="i"
+                class="cc-param-sel"
+                v-model="selectedParams[p.key]"
+              >
+                <option value="">{{ p.label }}</option>
+                <option v-for="(o, j) in p.options" :key="j" :value="o.value">{{ o.label }}</option>
+              </select>
+            </div>
+
+            <button
+              class="cc-gen-btn"
+              :disabled="!prompt.trim()"
+              @click="startGenerate"
+            >
+              🚀 {{ t('workspace.slide_panel.generate_btn') }}
+            </button>
+          </div>
+
+          <!-- 上传文件预览 -->
+          <div v-if="uploadFiles.length" class="cc-upload-preview">
+            <span v-for="(f, i) in uploadFiles" :key="i" class="cc-upload-tag">
+              {{ f.name }}
+              <button class="cc-upload-remove" @click="removeFile(i)">✕</button>
+            </span>
+          </div>
         </div>
 
-        <!-- 中间：文案输入区 -->
-        <div class="cc-input-main">
-          <textarea
-            ref="textareaRef"
-            v-model="prompt"
-            class="cc-textarea"
-            :placeholder="activeTabPlaceholder"
-            rows="3"
-            @keydown.enter.exact.prevent="openGeneratePanel"
-          ></textarea>
-        </div>
+        <!-- LAYER 3: 底部动态子功能区 -->
+        <section class="cc-sub-panel" role="region" :aria-label="t('workspace.creation_tools_region', { tab: activeTabLabel })">
+          <h2 class="cc-sub-title">{{ t('workspace.creation_quick_tools', { tab: activeTabLabel }) }}</h2>
+          <div class="cc-sub-scroll">
+            <div
+              v-for="(card, i) in activeSubCards"
+              :key="card.id || i"
+              class="cc-sub-card"
+              @click="openSubFunctionPanel(card)"
+            >
+              <div class="cc-sub-card-icon">{{ card.icon }}</div>
+              <div class="cc-sub-card-info">
+                <div class="cc-sub-card-name">{{ card.title }}</div>
+                <div class="cc-sub-card-desc">{{ card.desc }}</div>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
 
-      <!-- 底部操作栏 -->
-      <div class="cc-input-bottom">
-        <!-- 左侧：参数下拉框 -->
-        <div class="cc-param-row">
-          <select
-            v-for="(p, i) in activeParamSelects"
-            :key="i"
-            class="cc-param-sel"
-            v-model="selectedParams[p.key]"
-          >
-            <option value="">{{ p.label }}</option>
-            <option v-for="(o, j) in p.options" :key="j" :value="o.value">{{ o.label }}</option>
-          </select>
-        </div>
-
-        <!-- 右侧：开始生成按钮 -->
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- 右侧可折叠结果面板 -->
+      <!-- ═══════════════════════════════════════════ -->
+      <div class="cc-result-panel" :class="{ expanded: panelExpanded }">
+        <!-- 折叠态：触发条 -->
         <button
-          class="cc-gen-btn"
-          :disabled="!prompt.trim()"
-          @click="openGeneratePanel"
+          v-if="!panelExpanded"
+          class="cc-panel-trigger"
+          @click="togglePanel"
+          :aria-label="t('workspace.slide_panel.expand_aria')"
         >
-          {{ t('workspace.slide_panel.generate_btn') }}
+          <span class="cc-panel-trigger-icon">◀</span>
+          <span class="cc-panel-trigger-label">结<wbr>果</span>
         </button>
-      </div>
 
-      <!-- 上传文件预览 -->
-      <div v-if="uploadFiles.length" class="cc-upload-preview">
-        <span v-for="(f, i) in uploadFiles" :key="i" class="cc-upload-tag">
-          {{ f.name }}
-          <button class="cc-upload-remove" @click="removeFile(i)">✕</button>
-        </span>
+        <!-- 展开态 -->
+        <template v-else>
+          <div class="cc-panel-hd">
+            <h3 class="cc-panel-title">结果预览</h3>
+            <button
+              class="cc-panel-collapse"
+              @click="panelExpanded = false"
+              :aria-label="t('workspace.slide_panel.close_aria')"
+            >▶</button>
+          </div>
+
+          <div class="cc-panel-body">
+            <!-- 上传文件标签 -->
+            <div v-if="uploadFiles.length" class="cc-panel-files">
+              <span v-for="(f, i) in uploadFiles" :key="i" class="cc-panel-tag">{{ f.name }}</span>
+            </div>
+
+            <!-- 提示词 -->
+            <div v-if="prompt" class="cc-panel-prompt">
+              <div class="cc-panel-label">提示词</div>
+              <div class="cc-panel-text">{{ prompt }}</div>
+            </div>
+
+            <!-- 参数调整 -->
+            <div v-if="panelParams.length" class="cc-panel-params">
+              <span class="cc-panel-label">参数</span>
+              <div class="cc-panel-param-row">
+                <select
+                  v-for="(p, i) in panelParams"
+                  :key="i"
+                  v-model="paramValues[i]"
+                  class="cc-panel-sel"
+                >
+                  <option v-for="(o, j) in p.options" :key="j" :value="o.value">{{ o.label }}</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- 生成按钮 -->
+            <button class="cc-panel-gen-btn" @click="handlePanelGenerate">
+              🚀 开始生成
+            </button>
+
+            <!-- 进度条 -->
+            <div v-if="generating" class="cc-panel-progress">
+              <div class="cc-panel-progress-bar">
+                <div class="cc-panel-progress-fill" :style="{ width: progress + '%' }" />
+              </div>
+              <div class="cc-panel-progress-pct">{{ progress }}%</div>
+              <div class="cc-panel-steps">
+                <span :class="{ done: progress >= 25 }">上传</span>
+                <span :class="{ done: progress >= 50 }">分析</span>
+                <span :class="{ done: progress >= 75 }">生成</span>
+                <span :class="{ done: progress >= 100 }">完成</span>
+              </div>
+            </div>
+
+            <!-- 空结果占位 -->
+            <div v-if="!generating && !hasResult" class="cc-panel-empty">
+              <div class="cc-panel-empty-icon">📭</div>
+              <div>{{ t('workspace.creation_no_result') }}</div>
+              <div class="cc-panel-empty-hint">{{ t('workspace.creation_empty_hint') }}</div>
+            </div>
+
+            <!-- 结果区 -->
+            <div v-if="hasResult" class="cc-panel-result">
+              <slot name="result">
+                <div class="cc-panel-result-done">🎉 生成完成</div>
+              </slot>
+            </div>
+          </div>
+        </template>
       </div>
     </div>
 
     <!-- ═══════════════════════════════════════════ -->
-    <!-- LAYER 3: 底部动态子功能区（横向长方形卡片） -->
-    <!-- ═══════════════════════════════════════════ -->
-    <section class="cc-sub-panel" role="region" :aria-label="t('workspace.creation_tools_region', { tab: activeTabLabel })">
-      <h2 class="cc-sub-title">{{ t('workspace.creation_quick_tools', { tab: activeTabLabel }) }}</h2>
-      <div class="cc-sub-scroll">
-        <div
-          v-for="(card, i) in activeSubCards"
-          :key="card.id || i"
-          class="cc-sub-card"
-          @click="openSubFunctionPanel(card)"
-        >
-          <div class="cc-sub-card-icon">{{ card.icon }}</div>
-          <div class="cc-sub-card-info">
-            <div class="cc-sub-card-name">{{ card.title }}</div>
-            <div class="cc-sub-card-desc">{{ card.desc }}</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ═══════════════════════════════════════════ -->
-    <!-- SLIDE PANEL: 生成结果弹窗 -->
+    <!-- SlidePanel: 子功能弹窗（保留 overlay 模式） -->
     <!-- ═══════════════════════════════════════════ -->
     <SlidePanel
-      v-model="showPanel"
-      :title="panelTitle"
+      v-if="showSubPanel"
+      v-model="showSubPanel"
+      :title="subPanelTitle"
       :show-params="true"
-      :show-generate="panelMode === 'sub' || panelMode === 'generate'"
-      :params="panelParams"
-      :uploaded-files="uploadFiles"
-      :prompt-text="prompt"
-      @generate="handlePanelGenerate"
+      :show-generate="true"
+      :params="subPanelParams"
+      @generate="handleSubPanelGenerate"
     />
   </div>
 </template>
@@ -134,11 +219,17 @@ const fileInputRef = ref<HTMLInputElement | null>(null)
 const uploadFiles = ref<{ name: string }[]>([])
 const selectedParams = ref<Record<string, string>>({})
 
-// Panel state
-const showPanel = ref(false)
-const panelMode = ref<'generate' | 'sub'>('generate')
-const panelTitle = ref('')
-const panelCard = ref<SubCard | null>(null)
+// 右侧面板
+const panelExpanded = ref(false)
+const generating = ref(false)
+const progress = ref(0)
+const hasResult = ref(false)
+const paramValues = ref<Record<string, string>>({})
+
+// 子功能弹窗
+const showSubPanel = ref(false)
+const subPanelTitle = ref('')
+const subPanelCard = ref<SubCard | null>(null)
 
 // ═══ Tab definitions ═══
 const tabs = [
@@ -149,7 +240,6 @@ const tabs = [
   { key: 'other',   icon: '🧩', label: t('workspace.creation_tabs.other') },
 ]
 
-// ═══ Option builder: maps raw values to i18n {value, label} pairs ═══
 function buildOpts(cat: string, values: string[]): Array<{ value: string; label: string }> {
   return values.map(v => {
     const k = v.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '')
@@ -207,22 +297,27 @@ const activeTabPlaceholder = computed(() => {
 
 const activeParamSelects = computed(() => tabParams[activeTab.value] || [])
 
-const panelParams = computed(() => {
-  if (panelMode.value === 'generate') return activeParamSelects.value
-  return [
-    { key: 'type', label: t('workspace.panel_param_type'), options: [
-      { value: 'auto', label: t('workspace.panel_opt_auto') },
-      { value: 'standard', label: t('workspace.panel_opt_standard') },
-      { value: 'premium', label: t('workspace.panel_opt_premium') },
-    ]},
-    { key: 'quality', label: t('workspace.panel_param_quality'), options: [
-      { value: 'sd', label: t('workspace.panel_opt_sd') },
-      { value: 'hd', label: t('workspace.panel_opt_hd') },
-      { value: 'uhd', label: t('workspace.panel_opt_uhd') },
-    ]},
-    { key: 'format', label: t('workspace.panel_param_format'), options: buildOpts('format', ['JPG', 'PNG', 'MP4', 'GIF']) },
-  ]
-})
+const panelParams = computed(() => [
+  { key: 'type', label: t('workspace.panel_param_type'), options: [
+    { value: 'auto', label: t('workspace.panel_opt_auto') },
+    { value: 'standard', label: t('workspace.panel_opt_standard') },
+    { value: 'premium', label: t('workspace.panel_opt_premium') },
+  ]},
+  { key: 'quality', label: t('workspace.panel_param_quality'), options: [
+    { value: 'sd', label: t('workspace.panel_opt_sd') },
+    { value: 'hd', label: t('workspace.panel_opt_hd') },
+    { value: 'uhd', label: t('workspace.panel_opt_uhd') },
+  ]},
+  { key: 'format', label: t('workspace.panel_param_format'), options: buildOpts('format', ['JPG', 'PNG', 'MP4', 'GIF']) },
+])
+
+const subPanelParams = computed(() => [
+  { key: 'type', label: t('workspace.panel_param_type'), options: [
+    { value: 'auto', label: t('workspace.panel_opt_auto') },
+    { value: 'standard', label: t('workspace.panel_opt_standard') },
+    { value: 'premium', label: t('workspace.panel_opt_premium') },
+  ]},
+])
 
 // ═══ Actions ═══
 function switchTab(key: string) {
@@ -248,35 +343,60 @@ function handleDrop(e: DragEvent) {
 
 function removeFile(i: number) { uploadFiles.value.splice(i, 1) }
 
-function openGeneratePanel() {
+function togglePanel() {
+  panelExpanded.value = !panelExpanded.value
+}
+
+function startGenerate() {
   if (!prompt.value.trim()) return
-  panelMode.value = 'generate'
-  panelTitle.value = t('workspace.panel_generate_title', { tab: activeTabLabel.value })
-  showPanel.value = true
+  // 展开右侧面板
+  panelExpanded.value = true
+  generating.value = false
+  hasResult.value = false
+  progress.value = 0
 }
 
 function openSubFunctionPanel(card: SubCard) {
-  panelMode.value = 'sub'
-  panelCard.value = card
-  panelTitle.value = card.title
-  showPanel.value = true
+  subPanelCard.value = card
+  subPanelTitle.value = card.title
+  showSubPanel.value = true
 }
 
 function handlePanelGenerate() {
-  // SlidePanel handles its own internal progress/result flow
+  generating.value = true
+  hasResult.value = false
+  progress.value = 0
+  // 模拟进度
+  const timer = setInterval(() => {
+    progress.value += Math.random() * 25 + 5
+    if (progress.value >= 100) {
+      progress.value = 100
+      generating.value = false
+      hasResult.value = true
+      clearInterval(timer)
+    }
+  }, 500)
+}
+
+function handleSubPanelGenerate() {
+  showSubPanel.value = false
 }
 </script>
 
 <style scoped>
 /* ═══ Root ═══ */
 .cc {
-  max-width: 1120px; margin: 0 auto; padding: 24px 28px;
   --cc-bg: #fff; --cc-brd: #ebebea; --cc-brand: #5b5fe3;
   --cc-tx: #171717; --cc-tx2: #6b6b70; --cc-tx3: #9d9da3;
   --cc-radius: 12px;
+  padding: 24px 28px; height: 100%;
 }
 
-/* ═══ LAYER 1: 板块标签卡片 ═══ */
+/* ═══ Layout: content + panel ═══ */
+.cc-layout { display: flex; gap: 0; height: 100%; max-width: 1200px; margin: 0 auto; }
+.cc-content { flex: 1; min-width: 0; }
+
+/* ═══ LAYER 1: 板块标签 ═══ */
 .cc-tabs {
   display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;
 }
@@ -295,7 +415,7 @@ function handlePanelGenerate() {
 .cc-tab-icon { font-size: 16px; }
 .cc-tab-label { white-space: nowrap; }
 
-/* ═══ LAYER 2: 统一创作输入卡片 ═══ */
+/* ═══ LAYER 2: 创作输入卡片 ═══ */
 .cc-input-card {
   background: #fff; border: 1.5px solid var(--cc-brd); border-radius: var(--cc-radius);
   overflow: hidden; transition: border .2s, box-shadow .2s; margin-bottom: 24px;
@@ -304,30 +424,32 @@ function handlePanelGenerate() {
   border-color: var(--cc-brand); box-shadow: 0 0 0 3px rgba(91,95,227,.06);
 }
 
-.cc-input-top { display: flex; align-items: stretch; min-height: 80px; }
+/* 输入区（上传内嵌） */
+.cc-input-main { position: relative; }
 
-/* 左侧上传区 */
-.cc-upload-zone {
-  width: 68px; display: flex; flex-direction: column; align-items: center;
-  justify-content: center; gap: 4px; border-right: 1px solid #f0f0ef;
-  cursor: pointer; transition: background .15s; flex-shrink: 0;
+/* 内嵌上传按钮 */
+.cc-upload-inline {
+  position: absolute; top: 10px; left: 14px; z-index: 2;
+  display: flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 6px;
+  background: rgba(91,95,227,.07); color: var(--cc-brand);
+  font-size: 12px; cursor: pointer; transition: all .15s; user-select: none;
 }
-.cc-upload-zone:hover { background: var(--bg-page); }
-.cc-upload-icon { font-size: 20px; width: 32px; height: 32px; border-radius: 8px; background: var(--brand-light); display: flex; align-items: center; justify-content: center; }
-.cc-upload-label { font-size: 10px; color: var(--text-secondary); font-weight: 500; }
+.cc-upload-inline:hover { background: rgba(91,95,227,.14); }
+.cc-upload-inline-icon { font-size: 13px; }
+.cc-upload-inline-label { font-weight: 500; }
 
-/* 中间输入区 */
-.cc-input-main { flex: 1; padding: 14px 16px; }
 .cc-textarea {
   width: 100%; border: none; resize: none; font-size: 15px; line-height: 1.7;
-  color: var(--cc-tx); font-family: inherit; outline: none; background: none; min-height: 60px;
+  color: var(--cc-tx); font-family: inherit; outline: none; background: none;
+  min-height: 90px; padding: 40px 16px 14px 16px;
 }
 .cc-textarea::placeholder { color: #c8c8c8; }
 
 /* 底部操作栏 */
 .cc-input-bottom {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 8px 16px 14px; gap: 12px; flex-wrap: wrap;
+  padding: 8px 16px 14px; gap: 12px; flex-wrap: wrap; border-top: 1px solid #f0f0ef;
 }
 .cc-param-row { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; min-width: 0; }
 .cc-param-sel {
@@ -359,7 +481,7 @@ function handlePanelGenerate() {
   border: none; background: none; color: var(--text-secondary); cursor: pointer; font-size: 12px; padding: 0;
 }
 
-/* ═══ LAYER 3: 底部子功能横向长方形卡片 ═══ */
+/* ═══ LAYER 3: 子功能卡片 ═══ */
 .cc-sub-panel { }
 .cc-sub-title {
   font-size: 13px; font-weight: 600; color: var(--cc-tx); margin: 0 0 12px 0;
@@ -390,23 +512,119 @@ function handlePanelGenerate() {
 .cc-sub-card-name { font-size: 13.5px; font-weight: 500; color: var(--cc-tx); }
 .cc-sub-card-desc { font-size: 11.5px; color: var(--cc-tx3); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+/* ═══════════════════════════════════════════ */
+/* 右侧可折叠结果面板 */
+/* ═══════════════════════════════════════════ */
+.cc-result-panel {
+  width: 40px; flex-shrink: 0; transition: width .25s ease;
+  border-left: 1px solid var(--cc-brd); background: #fafafa;
+  border-radius: 0 12px 12px 0; display: flex; flex-direction: column; overflow: hidden;
+}
+.cc-result-panel.expanded { width: 270px; }
+
+/* 折叠触发条 */
+.cc-panel-trigger {
+  width: 40px; flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 8px; border: none; background: none;
+  cursor: pointer; color: #9d9da3; font-family: inherit; transition: all .15s;
+}
+.cc-panel-trigger:hover { background: #f0f0ef; color: var(--cc-brand); }
+.cc-panel-trigger-icon { font-size: 11px; }
+.cc-panel-trigger-label { font-size: 11px; writing-mode: vertical-lr; letter-spacing: 2px; font-weight: 500; }
+
+/* 展开头 */
+.cc-panel-hd {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px; border-bottom: 1px solid #ebebea;
+}
+.cc-panel-title { font-size: 14px; font-weight: 600; color: var(--cc-tx); margin: 0; }
+.cc-panel-collapse {
+  width: 28px; height: 28px; border-radius: 6px; border: none; background: none;
+  cursor: pointer; font-size: 13px; color: #9d9da3; display: flex; align-items: center;
+  justify-content: center; transition: all .15s;
+}
+.cc-panel-collapse:hover { background: #e5e5e5; color: #171717; }
+
+/* 展开体 */
+.cc-panel-body { flex: 1; overflow-y: auto; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
+
+.cc-panel-files { display: flex; gap: 4px; flex-wrap: wrap; }
+.cc-panel-tag {
+  padding: 2px 8px; border-radius: 4px; background: var(--brand-light); color: var(--cc-brand);
+  font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px;
+}
+
+.cc-panel-prompt { }
+.cc-panel-label { font-size: 10px; font-weight: 600; color: #9d9da3; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+.cc-panel-text { font-size: 12.5px; color: var(--cc-tx2); line-height: 1.6; }
+
+.cc-panel-params { }
+.cc-panel-param-row { display: flex; flex-direction: column; gap: 6px; }
+.cc-panel-sel {
+  width: 100%; padding: 7px 10px; border-radius: 7px; border: 1px solid var(--cc-brd);
+  font-size: 12px; color: #555; background: #fff; outline: none; cursor: pointer;
+  appearance: none; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23aaa'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 8px center;
+}
+.cc-panel-sel:focus { border-color: var(--cc-brand); }
+
+.cc-panel-gen-btn {
+  width: 100%; padding: 10px; border-radius: 9px; border: none;
+  background: var(--cc-brand); color: #fff; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all .15s; font-family: inherit;
+}
+.cc-panel-gen-btn:hover { background: #4a4ed6; }
+
+/* 进度 */
+.cc-panel-progress { }
+.cc-panel-progress-bar {
+  height: 6px; border-radius: 3px; background: #ebebea; overflow: hidden; margin-bottom: 6px;
+}
+.cc-panel-progress-fill {
+  height: 100%; border-radius: 3px; background: var(--cc-brand);
+  transition: width .3s ease;
+}
+.cc-panel-progress-pct { font-size: 12px; font-weight: 600; color: var(--cc-brand); margin-bottom: 6px; }
+.cc-panel-steps {
+  display: flex; justify-content: space-between; font-size: 10px; color: #c8c8c8;
+}
+.cc-panel-steps span.done { color: var(--cc-brand); font-weight: 600; }
+
+/* 空结果 */
+.cc-panel-empty { text-align: center; padding: 24px 0; color: #c8c8c8; }
+.cc-panel-empty-icon { font-size: 36px; margin-bottom: 8px; }
+.cc-panel-empty-hint { font-size: 11px; margin-top: 4px; }
+
+.cc-panel-result { }
+.cc-panel-result-done { text-align: center; padding: 24px 0; font-size: 15px; }
+
 /* ═══ Dark ═══ */
 :root[data-theme="dark"] .cc, :root.dark .cc {
   --cc-bg: #1a1a1a; --cc-brd: #2a2a2a; --cc-tx: #eee; --cc-tx2: #767676; --cc-tx3: #767676;
 }
 :root[data-theme="dark"] .cc-input-card, :root.dark .cc-input-card,
-:root[data-theme="dark"] .cc-sub-card, :root.dark .cc-sub-card { background: #1a1a1a; }
-:root[data-theme="dark"] .cc-param-sel, :root.dark .cc-param-sel { background: #222; }
+:root[data-theme="dark"] .cc-sub-card, :root.dark .cc-sub-card,
+:root[data-theme="dark"] .cc-result-panel, :root.dark .cc-result-panel { background: #1a1a1a; }
+:root[data-theme="dark"] .cc-param-sel, :root.dark .cc-param-sel,
+:root[data-theme="dark"] .cc-panel-sel, :root.dark .cc-panel-sel { background: #222; color: #aaa; }
 :root[data-theme="dark"] .cc-tab, :root.dark .cc-tab { background: #1a1a1a; }
+:root[data-theme="dark"] .cc-panel-trigger:hover, :root.dark .cc-panel-trigger:hover { background: #222; }
+:root[data-theme="dark"] .cc-upload-inline, :root.dark .cc-upload-inline { background: rgba(139,149,255,.12); }
 
 /* ═══ Responsive ═══ */
 @media (max-width: 900px) {
   .cc { padding: 16px; }
+  .cc-layout { flex-direction: column; }
+  .cc-result-panel { display: none; }
+  .cc-result-panel.expanded {
+    display: flex; position: fixed; top: 0; right: 0; bottom: 0; width: 280px;
+    z-index: 100; border-radius: 0; box-shadow: -4px 0 20px rgba(0,0,0,.1);
+  }
   .cc-tab-label { display: none; }
   .cc-tab { padding: 10px 14px; }
   .cc-tab-icon { font-size: 18px; }
-  .cc-upload-label { display: none; }
-  .cc-upload-zone { width: 48px; }
+  .cc-upload-inline-label { display: none; }
 }
 @media (max-width: 600px) {
   .cc-tabs { gap: 4px; }
