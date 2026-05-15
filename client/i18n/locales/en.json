@@ -7396,23 +7396,6 @@
     "tool_favorites_name": "My Favorites",
     "tool_favorites_desc": "View and manage favorited works and templates"
   },
-  "onboarding": {
-    "dialog_label": "Getting Started",
-    "skip": "Skip",
-    "start": "Get Started",
-    "welcome_title": "Welcome to Movio AI",
-    "welcome_desc": "All-in-one e-commerce visual creation platform. From product images to videos, one tool handles all your creative assets.",
-    "step1_title": "Step 1: Product Images",
-    "step1_desc": "Upload product photos, AI auto removes background, applies white background, and retouches for high-quality product images.",
-    "step2_title": "Step 2: Scene Images",
-    "step2_desc": "Choose a scene template or upload a reference. AI places your product into the scene for marketing-grade visuals.",
-    "step3_title": "Step 3: Detail Pages",
-    "step3_desc": "Based on product and scene images, AI auto generates complete product detail pages with copy and layout.",
-    "step4_title": "Step 4: Short Videos",
-    "step4_desc": "Generate marketing short videos from images with batch motion transfer, digital human spokespersons, and more.",
-    "start_title": "Start Creating",
-    "start_desc": "Select a feature module from the left sidebar or click a shortcut below to begin your first creation."
-  },
   "smart_recognition": {
     "recognizing": "Recognizing...",
     "start_recognize": "Start Recognition",

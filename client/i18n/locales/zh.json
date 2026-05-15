@@ -7221,25 +7221,6 @@
     "tool_favorites_name": "我的收藏",
     "tool_favorites_desc": "查看和管理收藏的作品和模板"
   },
-  "onboarding": {
-    "dialog_label": "新手指引",
-    "skip": "跳过",
-    "prev": "上一步",
-    "next": "下一步",
-    "start": "开始使用",
-    "welcome_title": "欢迎来到 Movio AI",
-    "welcome_desc": "一站式电商视觉创作平台，从主图到视频，一个工具搞定全部图文素材。",
-    "step1_title": "第1步：生成主图",
-    "step1_desc": "上传商品照片，AI 自动抠图、换白底、精修细节，生成高质量商品主图。",
-    "step2_title": "第2步：场景图",
-    "step2_desc": "选择场景模板或上传参考图，AI 将商品融入场景，生成营销级场景图。",
-    "step3_title": "第3步：详情页",
-    "step3_desc": "基于主图和场景图，AI 自动生成完整商品详情页文案+图文排版。",
-    "step4_title": "第4步：短视频",
-    "step4_desc": "用图片生成营销短视频，支持批量动作迁移、口播数字人等多种玩法。",
-    "start_title": "开始创作",
-    "start_desc": "在左侧导航栏选择功能模块，或点击下方快捷入口开始您的第一次创作。"
-  },
   "smart_recognition": {
     "recognizing": "识别中...",
     "start_recognize": "开始识别",
