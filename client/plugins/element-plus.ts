@@ -1,4 +1,6 @@
-import 'element-plus/dist/index.css';
+// 按需加载：仅 ElConfigProvider + ElMessage，替代全量 ~200KB CSS
+import 'element-plus/theme-chalk/base.css'
+import 'element-plus/theme-chalk/el-message.css'
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs';
 import en from 'element-plus/dist/locale/en.mjs';
 import { setFormatLocale } from '~/utils/format';
