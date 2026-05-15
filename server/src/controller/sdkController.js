@@ -99,7 +99,7 @@ export const sdkController = {
     req.params.taskId, (req.user?.userId || req.user?.id),
   )),
 
-  visualListTasks: wrapController(async (req) => memfocus.visual.listTasks(
+  visualListTasks: wrapController(async (req) => memfocus.visual.listUserTasks(
     (req.user?.userId || req.user?.id), req.query,
   )),
 

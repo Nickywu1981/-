@@ -49,7 +49,9 @@ export default defineNuxtRouteMiddleware(async (to) => {
       }
       return
     }
-    console.warn('[auth] API unreachable, allowing navigation:', (err as Error)?.message || err)
+    // production: API unreachable → DENY by default (fail-closed)
+    console.error('[auth] API unreachable, redirecting to login:', (err as Error)?.message || err)
+    return navigateTo(`/login?redirect=${encodeURIComponent(to.fullPath)}`)
   }
 
   if (!isAuthenticated) {
