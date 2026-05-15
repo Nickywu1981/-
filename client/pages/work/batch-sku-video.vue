@@ -153,7 +153,7 @@ onUnmounted(() => {
 .bsv-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .bsv-chips { display: flex; gap: 6px; flex-wrap: wrap; }
 .bsv-chip { padding: 5px 14px; border: 1px solid var(--border-light); border-radius: 6px; background: var(--bg-card); font-size: 13px; cursor: pointer; color: var(--text-secondary); }
-.bsv-chip.sel { border-color: var(--brand); color: var(--brand); background: var(--brand-alpha, rgba(99,102,241,0.08)); }
+.bsv-chip.sel { border-color: var(--brand); color: var(--brand); background: var(--brand-alpha, rgba(var(--brand-rgb, 91,95,227), 0.08)); }
 .bsv-submit { width: 100%; padding: 12px; border: none; border-radius: var(--radius-md, 8px); background: var(--brand); color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; }
 .bsv-submit:disabled { opacity: 0.4; cursor: not-allowed; }
 .bsv-results { margin-top: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }

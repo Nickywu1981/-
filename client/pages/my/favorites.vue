@@ -116,7 +116,7 @@ definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 .favorites-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
 
 .favorite-card { background: var(--bg-card); border: 1px solid var(--border-card); border-radius: var(--radius-lg); overflow: hidden; transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast); }
-.favorite-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(124,58,237,0.08); border-color: var(--brand-soft); }
+.favorite-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(var(--brand-rgb, 91,95,227), 0.08); border-color: var(--brand-soft); }
 
 .card-preview { position: relative; aspect-ratio: 1; background: var(--bg-hover); overflow: hidden; }
 .card-preview img { width: 100%; height: 100%; object-fit: cover; }

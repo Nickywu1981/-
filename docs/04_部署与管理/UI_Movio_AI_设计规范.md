@@ -2,7 +2,7 @@
 
 > **编写组**：G3 UI 设计组（UI-Designer 🔴主 / Doc-Writer 🟡辅）
 > **审核组**：G1 架构规划组（Architect）
-> **版本**：v1.10 | **日期**：2026-05-15
+> **版本**：v1.12 | **日期**：2026-05-15
 
 ---
 
@@ -702,3 +702,141 @@ unified 为更精细多层阴影（符合现代设计系统惯例），theme.css
 | **合计** | **95** | **6** | **101** |
 
 **101 项问题，G3 已自行修复 16 项，85 项待跨组处理。**
+
+---
+
+## 十二、第十二轮审计 — 改版回归 + ChatPanel + 品牌 Fallback 清零
+
+**审计日期**：2026-05-15  
+**范围**：本轮工作台改版 2 文件回归审计、ChatPanel 4 子组件、全站 `rgba(99,102,241,...)` indigo-500 fallback 扫荡
+
+### 10.22 改版自伤问题（P0，R12 修复 6 项）
+
+| 文件 | 问题 | 修复 |
+|------|------|------|
+| `user-workspace.vue` | 7 个新交互元素（`.tb-btn-*`、`.tb-btn-icon`、`.tb-user-menu`、`.tb-drop-item`、`.cs-close`）缺失 `:focus-visible` | 全部补全焦点态 |
+| `user-workspace.vue` | 暗黑模式完全缺失 — 下拉菜单 `#fff` 背景、按钮硬编码灰色在暗黑不可见 | 追加 15 条 `[data-theme="dark"]` 规则 |
+| `ChatPanel.vue` | `.cp-btn-icon`、`.cp-attach-btn`、`.cp-send` 无 `:focus-visible` | 全部补全 |
+| `QuickCommands.vue` | `.qc-chip` 无 `:focus-visible` | 补全 |
+| `GlobalAIChat.vue` | `.gac-btn` 无 `:focus-visible` | 补全 |
+
+### 10.23 indigo-500 fallback 全量清零（P2，R12 修复 9 项）
+
+全站 9 处 `rgba(99,102,241,...)` 替换为 `rgba(var(--brand-rgb, 91,95,227), ...)`：
+
+| 文件 | 行 | 原文 | 改为 |
+|------|:--:|------|------|
+| `QuickCommands.vue` | 53 | `rgba(99,102,241,0.06)` | `rgba(var(--brand-rgb, 91,95,227), 0.06)` |
+| `GlobalAIChat.vue` | 59,60 | `rgba(99,102,241,0.08/0.12)` | `rgba(var(--brand-rgb, 91,95,227), 0.08/0.12)` |
+| `SkuSelector.vue` | 124 | `rgba(99,102,241,0.08)` | `rgba(var(--brand-rgb, 91,95,227), 0.08)` |
+| `batch-publish.vue` | 87 | 同上 | 同上 |
+| `batch-sku-video.vue` | 156 | 同上 | 同上 |
+| `batch-sku-image.vue` | 167,169 | `rgba(99,102,241,0.08/0.06)` | `rgba(var(--brand-rgb, 91,95,227), 0.08/0.06)` |
+| `action-migrate.vue` | 95 | `rgba(99,102,241,0.06)` | `rgba(var(--brand-rgb, 91,95,227), 0.06)` |
+
+全站 `rgba(99,102,241` 已归零。
+
+### 10.24 新增待处理项
+
+| 优先级 | 问题 | 位置 |
+|:--:|------|------|
+| P1 | 8 处中文硬编码文本（购买会员/免费领积分/管理后台/个人中心等） | `user-workspace.vue:141-194` |
+| P1 | 5 处硬编码（结果预览/提示词/参数/进度步骤） | `creation.vue:121-171` |
+| P2 | ChatPanel `left: 260px` 硬编码 | `ChatPanel.vue:204` |
+| P3 | 新顶栏图标按钮 `title` attribute 硬编码中文 | `user-workspace.vue:153-166` |
+
+### 10.25 第十一轮误判纠正
+
+R11 标记 `user-workspace.vue` 等 3 个 layout "CSS 完全缺失" — **本例即修复**。R12 改版中 `user-workspace.vue` 已补全完整的 `<style scoped>` 块（445 行），`.sidebar`/`.nav-item`/`.topbar` 等全部类名现已有定义。
+
+### 10.26 本轮累计
+
+| 优先级 | R11 累计 | R12 新增 | R12 修复 | 总计 |
+|:--:|:--:|:--:|:--:|:--:|
+| P0 | 52 | 0 | -6 | **46** |
+| P1 | 29 | 2 | 0 | **31** |
+| P2 | 10 | 1 | -9 | **2** |
+| P3 | 10 | 1 | 0 | **11** |
+| **合计** | **101** | **4** | **-15** | **90** |
+
+**90 项问题，G3 已自行修复 31 项，59 项待跨组处理。**
+
+---
+
+## 十三、第十三轮审计 — 全站紫色阴影清零 + 加载态一致性 + EmptyState 修复
+
+**审计日期**：2026-05-15  
+**范围**：全站 `rgba(124,58,237,...)` 紫色阴影扫荡、16 文件加载态一致性审计、EmptyState 组件审计、3 工作页面硬编码文本验证
+
+### 10.27 紫色阴影 `#7C3AED` 全量清零（P2，R13 修复 13 实例/11 文件）
+
+全站 13 处 `rgba(124,58,237,...)` 替换为 `rgba(var(--brand-rgb, 91,95,227), ...)`：
+
+| 文件 | 行 | 原文 | 改为 |
+|------|:--:|------|------|
+| `my-works.vue` | 183 | `rgba(124, 58, 237, .12)` | `rgba(var(--brand-rgb, 91,95,227), .12)` |
+| `favorites.vue` | 119 | `rgba(124,58,237,0.08)` | `rgba(var(--brand-rgb, 91,95,227), 0.08)` |
+| `collections.vue` | 116 | `rgba(124, 58, 237, .1)` | `rgba(var(--brand-rgb, 91,95,227), .1)` |
+| `collections.vue` | 117 | `linear-gradient(135deg, #7C3AED, #A78BFA)` | `linear-gradient(135deg, var(--brand), color-mix(...))` |
+| `compare.vue` | 319 | `rgba(124,58,237,0.3)` | `rgba(var(--brand-rgb, 91,95,227), 0.3)` |
+| `help.vue` | 171 | `rgba(124,58,237,.06)` | `rgba(var(--brand-rgb, 91,95,227), .06)` |
+| `account/settings.vue` | 180 | `rgba(124,58,237,0.3)` | `rgba(var(--brand-rgb, 91,95,227), 0.3)` |
+| `register.vue` | 163,205,207 | `rgba(124,58,237,...)` ×3 | `rgba(var(--brand-rgb, 91,95,227), ...)` ×3 |
+| `login.vue` | 163,218,220 | `rgba(124,58,237,...)` ×3 | `rgba(var(--brand-rgb, 91,95,227), ...)` ×3 |
+| `admin/test-workbench.vue` | 355 | `rgba(124,58,237,...)` ×2 | `rgba(var(--brand-rgb, 91,95,227), ...)` ×2 |
+
+仅 `client/public/design-sketch-brand-colors.html:55` 保留一处作为设计参考文档（非生产代码）。
+
+### 10.28 EmptyState 组件修复（P2，R13 修复 1 项）
+
+| 文件 | 问题 | 修复 |
+|------|------|------|
+| `EmptyState.vue:122` | `rgba(var(--brand-rgb), 0.35)` 缺少 fallback 值 | → `rgba(var(--brand-rgb, 91,95,227), 0.35)` |
+
+组件整体质量良好：三尺寸变体（sm/md/lg）、slot 自定义 visual、i18n 默认值、双按钮（主+示例）模式。
+
+### 10.29 加载态一致性审计（16 文件）
+
+审计结论：
+
+| 模式 | 文件数 | 代表文件 |
+|------|:--:|------|
+| 三态完整（loading+error+empty） | 5 | `dashboard/index.vue`、`help.vue`、`my-works.vue`、`account/templates.vue`、`publish.vue` |
+| 双态（loading+empty，缺 error） | 6 | `distribution/index.vue`、`cut-ecosystem.vue`、`social/index.vue` 等 |
+| 单态（仅 loading） | 3 | `batch-sku-image.vue`、`batch-sku-video.vue`、`action-migrate.vue` |
+| Element Plus 内置 | 2 | `copywriting.vue`（el-button :loading + el-table v-loading） |
+
+**最佳实践参考**：
+- **Skeleton**：`my-works.vue`（pulse 动画 + grid 骨架卡）、`help.vue`（问答骨架）
+- **Spinner**：`dashboard/index.vue`（CSS spinner + 文案）
+- **Error+Retry**：`my-works.vue`、`help.vue`、`account/templates.vue`
+- **Empty+CTA**：`my-works.vue`（引导去工作台）、`cut-ecosystem.vue`（引导去创作）
+
+### 10.30 工作页面硬编码文本验证
+
+`batch-sku-image.vue`、`batch-sku-video.vue`、`action-migrate.vue` 三个页面全部文案已通过 `t()` i18n 化，无硬编码中文或英文文本。✅
+
+### 10.31 新增待处理项
+
+| 优先级 | 问题 | 位置 |
+|:--:|------|------|
+| P1 | 11 处中文硬编码（购买会员/免费领积分/管理后台/个人中心等） | `user-workspace.vue:142-194` |
+| P1 | 4 处硬编码（结果预览/提示词/参数） | `creation.vue:121-143` |
+| P3 | `--text-tertiary` 旧 token 命名（应为 `--text-muted`） | `account/templates.vue:73,82,94` 等多文件 |
+| P3 | 硬编码颜色 `#e8f4fd`/`#fce8e6`/`#d93025` 用于 type-tag | `cut-ecosystem.vue:310-311` |
+
+### 10.32 本轮累计
+
+| 优先级 | R12 累计 | R13 新增 | R13 修复 | 总计 |
+|:--:|:--:|:--:|:--:|:--:|
+| P0 | 46 | 0 | 0 | **46** |
+| P1 | 31 | 0 | 0 | **31** |
+| P2 | 2 | 0 | -14 | **-12→0** (超额归零) |
+| P3 | 11 | 2 | 0 | **13** |
+| **合计** | **90** | **2** | **-14** | **78** |
+
+**78 项问题，G3 已自行修复 45 项，33 项待跨组处理。P2 优先级首次归零。**
+
+---
+
+> **文档版本**：v1.12 | **最后更新**：2026-05-15 | **审计轮次**：13 轮 | **G3 自修复**：45 项

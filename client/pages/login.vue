@@ -160,7 +160,7 @@ async function sendEmailCode(scene: string) {
   display: flex; align-items: center; justify-content: center;
   padding: 48px 16px;
   background:
-    radial-gradient(ellipse 60% 50% at 50% 40%, rgba(124,58,237,0.04) 0%, transparent 60%);
+    radial-gradient(ellipse 60% 50% at 50% 40%, rgba(var(--brand-rgb, 91,95,227), 0.04) 0%, transparent 60%);
 }
 .login-card {
   background: var(--bg-card); border: 1px solid var(--border-card);
@@ -215,9 +215,9 @@ input::placeholder { color: var(--input-placeholder); }
   display: flex; align-items: center; justify-content: center; gap: 8px;
   padding: 12px; background: var(--brand-gradient); color: #fff; border: none;
   border-radius: var(--radius-md); font-size: 15px; font-weight: 600; cursor: pointer;
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast), opacity var(--transition-fast); box-shadow: 0 4px 16px rgba(124,58,237,0.2);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), opacity var(--transition-fast); box-shadow: 0 4px 16px rgba(var(--brand-rgb, 91,95,227), 0.2);
 }
-.login-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(124,58,237,0.3); }
+.login-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(var(--brand-rgb, 91,95,227), 0.3); }
 .login-btn:active { transform: scale(0.98); }
 .login-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
 

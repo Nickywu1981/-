@@ -180,7 +180,7 @@ definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 
 .work-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(124, 58, 237, .12);
+  box-shadow: 0 8px 24px rgba(var(--brand-rgb, 91,95,227), .12);
 }
 
 .card-thumb {

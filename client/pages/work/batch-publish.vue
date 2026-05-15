@@ -84,7 +84,7 @@ const submit = async () => {
 .bpn-label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: var(--text-primary); }
 .bpn-chips { display: flex; gap: 6px; flex-wrap: wrap; }
 .bpn-chip { padding: 5px 14px; border: 1px solid var(--border-light); border-radius: 6px; background: var(--bg-card); font-size: 13px; cursor: pointer; color: var(--text-secondary); }
-.bpn-chip.sel { border-color: var(--brand); color: var(--brand); background: var(--brand-alpha, rgba(99,102,241,0.08)); }
+.bpn-chip.sel { border-color: var(--brand); color: var(--brand); background: var(--brand-alpha, rgba(var(--brand-rgb, 91,95,227), 0.08)); }
 .bpn-input { flex: 1; padding: 10px 12px; border: 1px solid var(--border-light); border-radius: var(--radius-md, 8px); font-size: 14px; background: var(--bg-page); color: var(--text-primary); }
 .bpn-input:focus { border-color: var(--brand); outline: none; }
 .bpn-submit { width: 100%; padding: 12px; border: none; border-radius: var(--radius-md, 8px); background: var(--brand); color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; }

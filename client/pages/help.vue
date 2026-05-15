@@ -168,7 +168,7 @@ definePageMeta({ layout: 'landing' })
 
 .faq-list { display: flex; flex-direction: column; gap: 8px; }
 .faq-item { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); overflow: hidden; transition: border-color var(--transition-fast), box-shadow var(--transition-fast); }
-.faq-item:hover { border-color: var(--brand-alpha); box-shadow: 0 2px 8px rgba(124,58,237,.06); }
+.faq-item:hover { border-color: var(--brand-alpha); box-shadow: 0 2px 8px rgba(var(--brand-rgb, 91,95,227), .06); }
 .faq-item.open { border-color: var(--brand); box-shadow: 0 4px 16px var(--brand-alpha); }
 .faq-q { display: flex; justify-content: space-between; align-items: center; padding: 16px 18px; cursor: pointer; user-select: none; }
 .q-text { font-size: 15px; font-weight: 500; color: var(--text-primary); flex: 1; padding-right: 12px; }

@@ -225,6 +225,7 @@ onUnmounted(() => {
   color: var(--text-secondary);
 }
 .cp-btn-icon:hover { background: var(--bg-card); }
+.cp-btn-icon:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; background: var(--bg-card); }
 .cp-close { font-size: 18px; }
 
 /* Messages */
@@ -282,6 +283,9 @@ onUnmounted(() => {
   color: var(--text-secondary); z-index: 1; transition: color .15s;
 }
 .cp-attach-btn:hover { color: var(--brand); }
+.cp-attach-btn:focus-visible {
+  outline: 2px solid var(--brand); outline-offset: 1px; color: var(--brand);
+}
 .cp-input {
   flex: 1; width: 100%;
   resize: none;
@@ -310,6 +314,7 @@ onUnmounted(() => {
   transition: opacity var(--transition-fast, 0.2s);
 }
 .cp-send:disabled { opacity: 0.4; cursor: not-allowed; }
+.cp-send:not(:disabled):focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 
 /* Transitions */
 .cp-overlay-enter-active { transition: opacity 0.2s; }

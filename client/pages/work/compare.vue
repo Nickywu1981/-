@@ -316,7 +316,7 @@ definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 .works-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
 .work-card { border: 2px solid var(--border-light); border-radius: var(--radius-md); overflow: hidden; cursor: pointer; transition: border-color 0.15s; }
 .work-card:hover { border-color: var(--brand); }
-.work-card.selected { border-color: var(--brand); box-shadow: 0 0 0 2px rgba(124,58,237,0.3); }
+.work-card.selected { border-color: var(--brand); box-shadow: 0 0 0 2px rgba(var(--brand-rgb, 91,95,227), 0.3); }
 .work-card img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
 .work-label { display: block; padding: 4px 8px; font-size: 11px; color: var(--text-secondary); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .empty { text-align: center; color: var(--text-muted); padding: 40px 0; font-size: 14px; }

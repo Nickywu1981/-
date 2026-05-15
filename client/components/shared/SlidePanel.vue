@@ -188,7 +188,7 @@ function handleClose() {
 .sp-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 3000; }
 .sp-panel {
   position: fixed; top: 0; right: 0; bottom: 0; width: 480px; max-width: 100vw;
-  background: #fff; z-index: 3001; display: flex; flex-direction: column;
+  background: var(--bg-page, #fff); z-index: 3001; display: flex; flex-direction: column;
   box-shadow: -8px 0 32px rgba(0,0,0,0.12); outline: none;
 }
 
@@ -239,7 +239,7 @@ function handleClose() {
 
 /* Progress */
 .sp-progress-area { display: flex; flex-direction: column; gap: 12px; }
-.sp-progress-bar { height: 6px; background: #f0f0ef; border-radius: 3px; overflow: hidden; }
+.sp-progress-bar { height: 6px; background: var(--bg-hover, #f0f0ef); border-radius: 3px; overflow: hidden; }
 .sp-progress-fill { height: 100%; background: var(--brand); border-radius: 3px; transition: width .3s; }
 .sp-progress-text { font-size: 13px; color: var(--brand); font-weight: 500; text-align: center; }
 .sp-steps { display: flex; justify-content: space-between; }
@@ -259,7 +259,7 @@ function handleClose() {
 .sp-result-actions { display: flex; gap: 8px; }
 .sp-result-btn {
   flex: 1; padding: 12px; border-radius: 9px; font-size: 13px; font-weight: 500;
-  border: 1px solid var(--border-light); background: #fff; color: var(--text-secondary); cursor: pointer; font-family: inherit;
+  border: 1px solid var(--border-light); background: var(--bg-card, #fff); color: var(--text-secondary); cursor: pointer; font-family: inherit;
   transition: all .15s;
 }
 .sp-result-btn.primary { background: var(--brand); color: #fff; border-color: var(--brand); }

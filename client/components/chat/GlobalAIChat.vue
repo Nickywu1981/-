@@ -56,8 +56,11 @@ const togglePanel = () => {
   transition: all var(--transition-fast, 0.2s);
   position: relative;
 }
-.gac-btn:hover { background: var(--brand-alpha, rgba(99,102,241,0.08)); }
-.gac-btn.active { background: var(--brand-alpha, rgba(99,102,241,0.12)); color: var(--brand); }
+.gac-btn:hover { background: var(--brand-alpha, rgba(var(--brand-rgb, 91,95,227), 0.08)); }
+.gac-btn.active { background: var(--brand-alpha, rgba(var(--brand-rgb, 91,95,227), 0.12)); color: var(--brand); }
+.gac-btn:focus-visible {
+  outline: 2px solid var(--brand); outline-offset: 1px;
+}
 .gac-icon { font-size: 20px; line-height: 1; }
 .gac-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .gac-dot {

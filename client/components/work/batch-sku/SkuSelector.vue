@@ -121,7 +121,7 @@ const clearAll = () => {
   padding: 4px 12px; border: 1px solid var(--border-light); border-radius: 6px;
   background: var(--bg-card); font-size: 12px; cursor: pointer; color: var(--text-secondary);
 }
-.ss-chip.sel { border-color: var(--brand); color: var(--brand); background: var(--brand-alpha, rgba(99,102,241,0.08)); }
+.ss-chip.sel { border-color: var(--brand); color: var(--brand); background: var(--brand-alpha, rgba(var(--brand-rgb, 91,95,227), 0.08)); }
 .ss-colors { display: flex; gap: 8px; flex-wrap: wrap; }
 .ss-color-btn {
   width: 32px; height: 32px; border-radius: 50%;

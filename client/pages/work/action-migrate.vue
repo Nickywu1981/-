@@ -92,7 +92,7 @@ const submit = async () => {
 .am-input:focus { border-color: var(--brand); outline: none; }
 .am-submit { width: 100%; padding: 12px; border: none; border-radius: var(--radius-md, 8px); background: var(--brand); color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; }
 .am-submit:disabled { opacity: 0.4; cursor: not-allowed; }
-.am-result { padding: 12px; margin-top: 12px; border-radius: var(--radius-md, 8px); background: var(--brand-alpha, rgba(99,102,241,0.06)); }
+.am-result { padding: 12px; margin-top: 12px; border-radius: var(--radius-md, 8px); background: var(--brand-alpha, rgba(var(--brand-rgb, 91,95,227), 0.06)); }
 .am-status { font-size: 14px; color: var(--brand); }
 .am-error { padding: 12px; margin-top: 12px; border-radius: var(--radius-md, 8px); background: rgba(239,68,68,0.06); color: var(--danger); font-size: 14px; }
 </style>

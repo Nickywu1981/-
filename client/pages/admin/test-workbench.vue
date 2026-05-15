@@ -352,7 +352,7 @@ definePageMeta({ layout: 'platform-admin', middleware: ['auth'] })
   padding: 12px 16px; border-radius: var(--radius-md); margin-bottom: 16px;
   display: flex; align-items: center; gap: 12px; font-size: 13px;
 }
-.tw-status.running { background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.2); }
+.tw-status.running { background: rgba(var(--brand-rgb, 91,95,227), 0.08); border: 1px solid rgba(var(--brand-rgb, 91,95,227), 0.2); }
 .status-bar { flex: 1; height: 4px; background: var(--border-light); border-radius: 2px; overflow: hidden; }
 .status-fill { height: 100%; width: 60%; background: var(--brand); border-radius: 2px; animation: progress 1.5s ease-in-out infinite; }
 @keyframes progress {

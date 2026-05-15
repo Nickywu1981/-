@@ -336,16 +336,25 @@ onUnmounted(() => document.removeEventListener('click', closeUserMenu))
   background: #4a4ed6; transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(91,95,227,.3);
 }
+.tb-btn-primary:focus-visible {
+  outline: 2px solid #5b5fe3; outline-offset: 2px;
+}
 .tb-btn-accent {
   background: linear-gradient(135deg, #f97316, #f59e0b); color: #fff; font-weight: 600;
 }
 .tb-btn-accent:hover {
   transform: translateY(-1px); box-shadow: 0 4px 12px rgba(249,115,22,.3);
 }
+.tb-btn-accent:focus-visible {
+  outline: 2px solid #f97316; outline-offset: 2px;
+}
 .tb-btn-outline {
   background: transparent; border-color: #5b5fe3; color: #5b5fe3; font-size: 11.5px;
 }
 .tb-btn-outline:hover { background: rgba(91,95,227,.08); }
+.tb-btn-outline:focus-visible {
+  outline: 2px solid #5b5fe3; outline-offset: 2px;
+}
 
 .tb-btn-icon {
   width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center;
@@ -353,6 +362,9 @@ onUnmounted(() => document.removeEventListener('click', closeUserMenu))
   background: transparent; color: #6b6b70; transition: all .15s; position: relative;
 }
 .tb-btn-icon:hover { background: #f5f5f5; color: #171717; }
+.tb-btn-icon:focus-visible {
+  outline: 2px solid #5b5fe3; outline-offset: 1px; background: #f5f5f5;
+}
 
 .tb-notify { position: relative; }
 .tb-notify-dot {
@@ -371,6 +383,9 @@ onUnmounted(() => document.removeEventListener('click', closeUserMenu))
   transition: all .15s; position: relative; user-select: none;
 }
 .tb-user-menu:hover { border-color: #e5e5e5; background: #fafafa; }
+.tb-user-menu:focus-visible {
+  outline: 2px solid #5b5fe3; outline-offset: 1px; border-color: #e5e5e5;
+}
 
 .tb-avatar {
   width: 32px; height: 32px; border-radius: 50%; overflow: hidden;
@@ -396,8 +411,10 @@ onUnmounted(() => document.removeEventListener('click', closeUserMenu))
   cursor: pointer; transition: background .1s; font-family: inherit; text-align: left;
 }
 .tb-drop-item:hover { background: #f5f5f5; }
+.tb-drop-item:focus-visible { outline: 2px solid #5b5fe3; outline-offset: -2px; background: #f5f5f5; }
 .tb-drop-danger { color: #c62828; }
 .tb-drop-danger:hover { background: #fce4ec; }
+.tb-drop-danger:focus-visible { outline-color: #c62828; background: #fce4ec; }
 .tb-drop-sep { height: 1px; background: #ebebea; margin: 4px 8px; }
 
 /* Dropdown transition */
@@ -436,6 +453,25 @@ onUnmounted(() => document.removeEventListener('click', closeUserMenu))
 .cs-modal-enter-from .cs-dialog { transform: scale(.95); }
 
 .content { flex: 1; padding: 24px; overflow-y: auto; }
+
+/* ═══ Dark mode: topbar components ═══ */
+:root[data-theme="dark"] .tb-btn-icon, :root.dark .tb-btn-icon { color: #9d9da3; }
+:root[data-theme="dark"] .tb-btn-icon:hover, :root.dark .tb-btn-icon:hover { background: #222; color: #eee; }
+:root[data-theme="dark"] .tb-btn-icon:focus-visible, :root.dark .tb-btn-icon:focus-visible { background: #222; }
+:root[data-theme="dark"] .tb-btn-outline, :root.dark .tb-btn-outline { border-color: #8b95ff; color: #8b95ff; }
+:root[data-theme="dark"] .tb-btn-outline:hover, :root.dark .tb-btn-outline:hover { background: rgba(139,149,255,.1); }
+:root[data-theme="dark"] .tb-user-menu:hover, :root.dark .tb-user-menu:hover { border-color: #333; background: #1a1a1a; }
+:root[data-theme="dark"] .tb-username, :root.dark .tb-username { color: #eee; }
+:root[data-theme="dark"] .tb-dropdown, :root.dark .tb-dropdown { background: #1e1f22; border-color: #333; }
+:root[data-theme="dark"] .tb-drop-item, :root.dark .tb-drop-item { color: #ddd; }
+:root[data-theme="dark"] .tb-drop-item:hover, :root.dark .tb-drop-item:hover,
+:root[data-theme="dark"] .tb-drop-item:focus-visible, :root.dark .tb-drop-item:focus-visible { background: #2a2a2a; }
+:root[data-theme="dark"] .tb-drop-danger, :root.dark .tb-drop-danger { color: #ef5350; }
+:root[data-theme="dark"] .tb-drop-danger:hover, :root.dark .tb-drop-danger:hover,
+:root[data-theme="dark"] .tb-drop-danger:focus-visible, :root.dark .tb-drop-danger:focus-visible { background: rgba(244,67,54,.12); }
+:root[data-theme="dark"] .tb-drop-sep, :root.dark .tb-drop-sep { background: #333; }
+:root[data-theme="dark"] .tb-divider, :root.dark .tb-divider { background: #333; }
+:root[data-theme="dark"] .tb-notify-dot, :root.dark .tb-notify-dot { border-color: #1e1f22; }
 
 @media print {
   .sidebar, .topbar { display: none; }

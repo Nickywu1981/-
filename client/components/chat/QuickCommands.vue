@@ -50,6 +50,9 @@ const commands = ref([
 .qc-chip:hover {
   border-color: var(--brand);
   color: var(--brand);
-  background: var(--brand-alpha, rgba(99,102,241,0.06));
+  background: var(--brand-alpha, rgba(var(--brand-rgb, 91,95,227), 0.06));
+}
+.qc-chip:focus-visible {
+  outline: 2px solid var(--brand); outline-offset: 1px;
 }
 </style>

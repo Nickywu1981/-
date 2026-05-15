@@ -177,7 +177,7 @@ definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 .form-group input { width: 100%; padding: 10px 12px; border: 1px solid var(--border-light); border-radius: 8px; font-size: 14px; outline: none; box-sizing: border-box; background: var(--bg-input); color: var(--text-primary); transition: border-color var(--transition-fast), box-shadow var(--transition-fast); }
 .form-group input:focus { border-color: var(--brand); box-shadow: var(--focus-ring); }
 .btn-save { width: 100%; padding: 12px; background: var(--brand-gradient); color: #fff; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; font-weight: 600; transition: box-shadow var(--transition-fast), transform var(--transition-fast), opacity var(--transition-fast); }
-.btn-save:hover { box-shadow: 0 4px 12px rgba(124,58,237,0.3); transform: translateY(-1px); }
+.btn-save:hover { box-shadow: 0 4px 12px rgba(var(--brand-rgb, 91,95,227), 0.3); transform: translateY(-1px); }
 .btn-save:active { transform: scale(0.98); }
 .btn-save:disabled { opacity: 0.6; transform: none; box-shadow: none; }
 .code-row { display: flex; gap: 12px; }

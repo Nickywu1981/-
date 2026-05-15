@@ -160,7 +160,7 @@ async function sendEmailCode(scene: string) {
 .page {
   display: flex; justify-content: center; align-items: center;
   min-height: calc(100vh - 200px); padding: 48px 16px;
-  background: radial-gradient(ellipse 60% 50% at 50% 40%, rgba(124,58,237,0.04) 0%, transparent 60%);
+  background: radial-gradient(ellipse 60% 50% at 50% 40%, rgba(var(--brand-rgb, 91,95,227), 0.04) 0%, transparent 60%);
 }
 .card {
   background: var(--bg-card); padding: 40px; border-radius: var(--radius-xl);
@@ -202,9 +202,9 @@ input::placeholder { color: var(--input-placeholder); }
 .btn {
   padding: 12px; background: var(--brand-gradient); color: #fff; border: none;
   border-radius: var(--radius-md); font-size: 15px; cursor: pointer; font-weight: 600;
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast), opacity var(--transition-fast); box-shadow: 0 4px 16px rgba(124,58,237,0.2);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), opacity var(--transition-fast); box-shadow: 0 4px 16px rgba(var(--brand-rgb, 91,95,227), 0.2);
 }
-.btn:hover { box-shadow: 0 6px 20px rgba(124,58,237,0.3); transform: translateY(-1px); }
+.btn:hover { box-shadow: 0 6px 20px rgba(var(--brand-rgb, 91,95,227), 0.3); transform: translateY(-1px); }
 .btn:active { transform: scale(0.98); }
 .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
 .msg { margin-top: 12px; font-size: 13px; text-align: center; color: var(--success); }
