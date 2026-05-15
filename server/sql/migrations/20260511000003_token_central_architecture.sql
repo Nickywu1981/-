@@ -69,7 +69,7 @@ ALTER TABLE `ai_call_log`
   ADD INDEX IF NOT EXISTS `idx_correlation_id` (`correlation_id`);
 
 ALTER TABLE `ai_call_log`
-  ADD INDEX IF NOT EXISTS `idx_call_created` (`created_at`, `source`);
+  ADD INDEX IF NOT EXISTS `idx_call_created` (`create_time`, `source`);
 
 -- ----------------------------
 -- 3. ai_token_aggregation — 实时聚合计数器

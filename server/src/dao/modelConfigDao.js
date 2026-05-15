@@ -107,10 +107,10 @@ export async function queryCallLogs({ userId, modelKey, status, days = 7, offset
   if (userId) { conditions.push('user_id = ?'); params.push(userId); }
   if (modelKey) { conditions.push('model_key = ?'); params.push(modelKey); }
   if (status) { conditions.push('status = ?'); params.push(status); }
-  conditions.push('created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)');
+  conditions.push('create_time >= DATE_SUB(NOW(), INTERVAL ? DAY)');
   params.push(parseInt(days, 10) || 7);
   const [rows] = await _db().query(
-    `SELECT id, user_id, tenant_id, model_key, task_type, input_hash, status, latency_ms, tokens_in, tokens_out, error_msg, moderation_result, cost_amount, cost_currency, pricing_id, cost_details, correlation_id, source, created_at FROM ai_call_log WHERE ${conditions.join(' AND ')} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+    `SELECT id, user_id, tenant_id, model_key, task_type, input_hash, status, latency_ms, tokens_in, tokens_out, error_msg, moderation_result, cost_amount, cost_currency, pricing_id, cost_details, correlation_id, source, create_time FROM ai_call_log WHERE ${conditions.join(' AND ')} ORDER BY create_time DESC LIMIT ? OFFSET ?`,
     [...params, parseInt(limit, 10), parseInt(offset, 10)],
   );
   const [[{ total }]] = await _db().query(
@@ -128,7 +128,7 @@ export async function getCallStats(modelKey, days = 7) {
        AVG(latency_ms) as avg_latency,
        SUM(tokens_in + tokens_out) as total_tokens
      FROM ai_call_log
-     WHERE model_key = ? AND created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)`,
+     WHERE model_key = ? AND create_time >= DATE_SUB(NOW(), INTERVAL ? DAY)`,
     [modelKey, days],
   );
   return rows[0] || {};
