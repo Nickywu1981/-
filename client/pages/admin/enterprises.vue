@@ -102,7 +102,7 @@
       <div class="modal-content">
         <h3>{{ $t('admin.enterprises.reject_title') }}</h3>
         <p>{{ $t('admin.enterprises.reject_hint') }}</p>
-        <textarea v-model="rejectReason" class="input" rows="4" :placeholder="$t('admin.enterprises.reject_placeholder')" />
+        <textarea v-model="rejectReason" class="input" rows="4" maxlength="500" :placeholder="$t('admin.enterprises.reject_placeholder')" />
         <div class="modal-actions">
           <button class="btn btn-ghost" @click="showRejectModal = false">{{ $t('common.cancel') }}</button>
           <button class="btn btn-danger" :disabled="rejectReason.length < 4" @click="doReject">{{ $t('admin.enterprises.confirm_reject') }}</button>
@@ -114,7 +114,7 @@
     <div v-if="showSuspendModal" class="modal-overlay" @click.self="showSuspendModal = false" @keydown.escape="showSuspendModal = false">
       <div class="modal-content">
         <h3>{{ $t('admin.enterprises.suspend_title') }}</h3>
-        <textarea v-model="suspendReason" class="input" rows="3" :placeholder="$t('admin.enterprises.suspend_placeholder')" />
+        <textarea v-model="suspendReason" class="input" rows="3" maxlength="500" :placeholder="$t('admin.enterprises.suspend_placeholder')" />
         <div class="modal-actions">
           <button class="btn btn-ghost" @click="showSuspendModal = false">{{ $t('common.cancel') }}</button>
           <button class="btn btn-warning" @click="doSuspend">{{ $t('admin.enterprises.confirm_suspend') }}</button>

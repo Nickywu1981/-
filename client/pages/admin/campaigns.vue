@@ -68,10 +68,10 @@
             <option value="announcement">{{ $t('admin_campaigns.type_announcement') }}</option>
           </select>
         </label>
-        <label>{{ $t('admin_campaigns.label_desc') }} <textarea v-model="form.description" class="input" rows="3" /></label>
+        <label>{{ $t('admin_campaigns.label_desc') }} <textarea v-model="form.description" class="input" rows="3" maxlength="500" /></label>
         <label>{{ $t('admin_campaigns.label_cover') }} <input v-model="form.cover_url" class="input" /></label>
         <label>{{ $t('admin_campaigns.label_reward_type') }} <input v-model="form.reward_type" class="input" :placeholder="$t('admin_campaigns.reward_placeholder')" /></label>
-        <label>{{ $t('admin_campaigns.label_reward_value') }} <input v-model.number="form.reward_value" class="input" type="number" /></label>
+        <label>{{ $t('admin_campaigns.label_reward_value') }} <input v-model.number="form.reward_value" class="input" type="number" min="0" /></label>
         <label>{{ $t('admin_campaigns.label_start_time') }} <input v-model="form.start_time" class="input" type="datetime-local" /></label>
         <label>{{ $t('admin_campaigns.label_end_time') }} <input v-model="form.end_time" class="input" type="datetime-local" /></label>
         <label>{{ $t('admin_campaigns.label_target') }}
@@ -90,7 +90,7 @@
             <option :value="3">{{ $t('admin_campaigns.status_offline') }}</option>
           </select>
         </label>
-        <label>{{ $t('admin_campaigns.label_sort') }} <input v-model.number="form.sort_order" class="input" type="number" /></label>
+        <label>{{ $t('admin_campaigns.label_sort') }} <input v-model.number="form.sort_order" class="input" type="number" min="0" max="9999" /></label>
         <div class="modal-actions">
           <button class="btn-secondary" @click="showModal = false">{{ $t('common.cancel') }}</button>
           <button class="btn-primary" @click="save" :disabled="saving">{{ saving ? $t('common.saving') : $t('common.save') }}</button>

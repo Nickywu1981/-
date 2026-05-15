@@ -76,7 +76,7 @@
           <div class="form-grid">
             <label class="full">{{ $t('admin_forms.label_title') }} <input v-model="form.title" maxlength="100" :placeholder="$t('admin_forms.label_title')" /></label>
             <label>{{ $t('admin_forms.label_code') }} <input v-model="form.form_code" maxlength="50" :placeholder="$t('admin_forms.label_code')" /></label>
-            <label>{{ $t('admin_forms.label_limit') }} <input v-model.number="form.submit_limit" type="number" min="0" :placeholder="$t('admin_forms.no_limit')" /></label>
+            <label>{{ $t('admin_forms.label_limit') }} <input v-model.number="form.submit_limit" type="number" min="0" max="9999" :placeholder="$t('admin_forms.no_limit')" /></label>
             <label>{{ $t('admin_forms.label_start') }} <input v-model="form.start_time" type="datetime-local" /></label>
             <label>{{ $t('admin_forms.label_end') }} <input v-model="form.end_time" type="datetime-local" /></label>
             <label>{{ $t('common.status') }}

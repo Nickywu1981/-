@@ -222,18 +222,6 @@ export async function verifyCode(email, code) {
   return true;
 }
 
-/** @unused — 无路由/中间件调用此函数，验证状态写入后未被消费 */
-  const key = `verified:email:${email}`;
-  try {
-    const result = await codeStore.verifyCode(key, '1', 1);
-    if (result.valid || result.reason === 'mismatch') return true;
-  } catch { logger.warn('[Email] checkVerified Redis 查询失败', { email: email.replace(/(.{1,2}).*(@.*)/, '$1***$2') }); }
-  const entry = CODE_CACHE.get(key);
-  if (!entry || Date.now() - entry.time > 300000) { CODE_CACHE.delete(key); return false; }
-  CODE_CACHE.delete(key);
-  return true;
-}
-
 // ==================== 模板管理（后台） ====================
 
 export async function listTemplates() {

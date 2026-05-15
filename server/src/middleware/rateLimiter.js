@@ -12,6 +12,9 @@ import logger from '../utils/logger.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 import { RedisRateLimitStore } from './redisRateLimitStore.js';
 
+// Redis 不可用时内存回退限流存储
+const memoryFallbackStore = {};
+
 const windowMs = rateLimitConfig.windowMs;
 const max = rateLimitConfig.max;
 
@@ -245,8 +248,18 @@ export async function aiTokenBucketLimiter(req, res, next) {
 
     next();
   } catch (err) {
-    // 限流服务异常时放行（避免阻塞正常流量）
     logger.warn('[RateLimiter] TokenBucket check failed:', err.message);
+    // Redis 不可用时回落内存严格限流（5次/分钟），避免 fail-open 被绕过
+    const ip = req.ip || req.socket?.remoteAddress || 'unknown';
+    const memoryKey = `rl:fallback:${ip}:${(options.prefix || '')}`;
+    const now = Date.now();
+    const entry = (memoryFallbackStore[memoryKey] || { count: 0, resetAt: now + 60000 });
+    if (now > entry.resetAt) { entry.count = 0; entry.resetAt = now + 60000; }
+    entry.count++;
+    memoryFallbackStore[memoryKey] = entry;
+    if (entry.count > 5) {
+      return error(res, ERROR_CODE.EC_RATE_HEAVY, '', { reasons: ['rate_limiter_fallback'] });
+    }
     next();
   }
 }

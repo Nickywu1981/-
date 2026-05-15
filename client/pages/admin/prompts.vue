@@ -139,7 +139,7 @@
             </div>
             <div class="form-group">
               <label>{{ $t('admin_prompts.label_sort') }}</label>
-              <input v-model.number="form.sortOrder" type="number" :placeholder="$t('admin_prompts.sort_placeholder')" />
+              <input v-model.number="form.sortOrder" type="number" min="0" max="9999" :placeholder="$t('admin_prompts.sort_placeholder')" />
             </div>
           </div>
           <div class="form-row">
@@ -158,7 +158,7 @@
           </div>
           <div class="modal-actions">
             <button class="btn" @click="showModal = false">{{ $t('common.cancel') }}</button>
-            <button class="btn btn-primary" @click="save">{{ $t('common.save') }}</button>
+            <button class="btn btn-primary" :disabled="saving" @click="save">{{ saving ? $t('common.saving') : $t('common.save') }}</button>
           </div>
         </div>
       </div>
@@ -182,6 +182,7 @@ const filterCategory = ref('');
 const filterIndustry = ref('');
 const activeTab = ref('all');
 const loading = ref(false);
+const saving = ref(false);
 const showModal = ref(false);
 
 const intentIdList = ['white_bg', 'main_image', 'scene_image', 'poster', 'detail_image', 'storyboard', 'product_detail', 'infographic', 'main_video', 'ad_video', 'action_migrate', 'video_clone', 'copywriting', 'description', 'script', 'selling_points', 'translate', 'voice'];
@@ -251,6 +252,7 @@ function openEdit(t: any) {
 }
 
 async function save() {
+  saving.value = true;
   try {
     const body: any = { ...form };
     if (editing.value.id) body.id = editing.value.id;
@@ -263,6 +265,7 @@ async function save() {
     showModal.value = false;
     fetchData();
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(t('admin_prompts.save_failed') + ': ' + (err?.data?.msg || err.message || t('admin_prompts.network_error'))); }
+  finally { saving.value = false; }
 }
 
 function hasMark(t: any, mark: string) {

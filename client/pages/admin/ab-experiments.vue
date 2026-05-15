@@ -115,7 +115,7 @@
               <input v-model="v.variantId" class="input input-sm" :placeholder="$t('admin_ab.placeholder_variant_id')" />
               <input v-model="v.modelKey" class="input input-sm" :placeholder="$t('admin_ab.placeholder_model_key')" />
               <input v-model="v.description" class="input input-sm" :placeholder="$t('admin_ab.placeholder_desc_short')" />
-              <input v-model.number="v.weight" class="input input-sm" type="number" :placeholder="$t('admin_ab.placeholder_weight')" style="width:64px" />
+              <input v-model.number="v.weight" class="input input-sm" type="number" min="0" max="100" :placeholder="$t('admin_ab.placeholder_weight')" style="width:64px" />
               <button v-if="i >= 2" class="btn btn-sm" :aria-label="$t('common.remove')" @click="form.variants.splice(i, 1)">✕</button>
             </div>
             <button class="btn" @click="form.variants.push({variantId:'',modelKey:'',description:'',weight:50})">{{ $t('admin_ab.add_variant') }}</button>

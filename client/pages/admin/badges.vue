@@ -80,7 +80,7 @@
             </div>
             <div class="form-group">
               <label>{{ $t('admin_badges.label_sort') }}</label>
-              <input v-model.number="form.sortOrder" type="number" :placeholder="$t('admin_badges.sort_placeholder')" />
+              <input v-model.number="form.sortOrder" type="number" min="0" max="9999" :placeholder="$t('admin_badges.sort_placeholder')" />
             </div>
           </div>
           <div class="form-group">
@@ -88,7 +88,7 @@
           </div>
           <div class="modal-actions">
             <button class="btn" @click="showModal = false">{{ $t('common.cancel') }}</button>
-            <button class="btn btn-primary" @click="save">{{ $t('common.save') }}</button>
+            <button class="btn btn-primary" :disabled="saving" @click="save">{{ saving ? $t('common.saving') : $t('common.save') }}</button>
           </div>
         </div>
       </div>
@@ -107,6 +107,7 @@ const total = ref(0);
 const page = ref(1);
 const pageSize = 20;
 const loading = ref(false);
+const saving = ref(false);
 const showModal = ref(false);
 const filterCategory = ref('');
 const editing = ref<any>({});
@@ -155,6 +156,7 @@ function openEdit(b: any) {
 }
 
 async function save() {
+  saving.value = true;
   try {
     const body: any = { ...form };
     if (editing.value.id) {
@@ -173,6 +175,7 @@ async function save() {
     showModal.value = false;
     fetchData();
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; toast.error(t('admin_badges.save_failed', { msg: err?.data?.msg || err.message || t('admin_badges.network_error') })); }
+  finally { saving.value = false; }
 }
 
 async function toggleStatus(b: any) {
