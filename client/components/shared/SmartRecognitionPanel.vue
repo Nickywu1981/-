@@ -101,14 +101,14 @@ function onConfirm() {
 
 <style scoped>
 .smart-panel { margin: 12px 0; }
-.smart-body { border: 1px dashed var(--cfg-border); border-radius: var(--cfg-radius-base); padding: 16px; background: #fafbfc; }
+.smart-body { border: 1px dashed var(--border-color, #d1d5db); border-radius: var(--radius-md, 8px); padding: 16px; background: var(--bg-secondary, #f9fafb); }
 :global([data-theme="dark"]) .smart-body { background: #1e1f22; }
-.hint { font-size: var(--cfg-font-size-sm); color: var(--cfg-text-muted); margin: 0 0 12px; }
+.hint { font-size: var(--text-sm, 0.875rem); color: var(--text-muted, #9ca3af); margin: 0 0 12px; }
 .preview-row { display: flex; align-items: center; gap: 16px; margin: 12px 0; }
-.ref-preview { width: 120px; height: 120px; object-fit: contain; border: 1px solid var(--cfg-border); border-radius: var(--cfg-radius-base); background: var(--bg-card); }
-.smart-result { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--cfg-border); }
+.ref-preview { width: 120px; height: 120px; object-fit: contain; border: 1px solid var(--border-color, #d1d5db); border-radius: var(--radius-md, 8px); background: var(--bg-card); }
+.smart-result { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color, #e5e7eb); }
 .input-group { margin-bottom: 12px; }
-.input-group label { display: block; font-size: var(--cfg-font-size-sm); color: var(--cfg-text-secondary); margin-bottom: 4px; }
-.error-msg { color: var(--cfg-error); font-size: var(--cfg-font-size-sm); margin-top: 8px; }
+.input-group label { display: block; font-size: var(--text-sm, 0.875rem); color: var(--text-secondary, #6b7280); margin-bottom: 4px; }
+.error-msg { color: var(--danger, #ef4444); font-size: var(--text-sm, 0.875rem); margin-top: 8px; }
 .btn-lg { width: 100%; }
 </style>

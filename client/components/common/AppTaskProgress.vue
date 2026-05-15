@@ -89,22 +89,22 @@ const etaText = computed(() => {
 .app-task-progress { width: 100%; }
 .status-card {
   display: flex; align-items: center; gap: 12px;
-  padding: 16px; border-radius: var(--cfg-radius, 8px);
-  border: 1px solid var(--cfg-border, #e5e7eb);
+  padding: 16px; border-radius: var(--radius-md, 8px);
+  border: 1px solid var(--border-color, #e5e7eb);
 }
 .status-card.queued { background: var(--bg-page); border-color: var(--border-light); }
 .status-card.queued .status-icon { color: var(--text-muted); }
 .status-card.processing { background: var(--brand-light); border-color: var(--brand-soft); }
 .status-card.completed { background: var(--success-light); border-color: var(--success); }
-.status-card.completed .status-icon { color: var(--cfg-success, #10B981); }
+.status-card.completed .status-icon { color: var(--success, #10B981); }
 .status-card.failed { background: var(--danger-light); border-color: var(--danger); }
-.status-card.failed .status-icon { color: var(--cfg-error, #EF4444); }
+.status-card.failed .status-icon { color: var(--danger, #EF4444); }
 
-.status-text { flex: 1; font-size: 14px; color: var(--cfg-text-primary, #374151); }
+.status-text { flex: 1; font-size: 14px; color: var(--text-primary, #374151); }
 .progress-header { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-.progress-pct { font-size: 14px; font-weight: 600; color: var(--cfg-primary, #4F46E5); }
+.progress-pct { font-size: 14px; font-weight: 600; color: var(--brand, #5b5fe3); }
 
-.progress-bar { width: 100%; height: 8px; background: var(--cfg-border, #e5e7eb); border-radius: 4px; overflow: hidden; }
-.progress-fill { height: 100%; background: var(--cfg-primary, #4F46E5); border-radius: 4px; transition: width 0.5s ease; }
-.eta-text { font-size: 12px; color: var(--cfg-text-muted, #9ca3af); margin: 4px 0 0 0; }
+.progress-bar { width: 100%; height: 8px; background: var(--border-color, #e5e7eb); border-radius: 4px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--brand, #5b5fe3); border-radius: 4px; transition: width 0.5s ease; }
+.eta-text { font-size: 12px; color: var(--text-muted, #9ca3af); margin: 4px 0 0 0; }
 </style>
