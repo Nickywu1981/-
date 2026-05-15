@@ -169,6 +169,9 @@ realPool.on('acquire', (conn) => {
   conn.query('SELECT 1').catch((e) => { logger.warn('[DB] Health check SELECT 1 failed, connection may be dead', { error: e.message }); });
 });
 
+// Prevent unhandled pool-level errors from crashing the process
+realPool.on('error', (err) => { logger.error('[DB] Pool error', { error: err.message }); });
+
 // Proxy pool: tries real DB first, falls back to mock
 const realPoolProxy = new Proxy(realPool, {
   get(target, prop) {
