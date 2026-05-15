@@ -4,7 +4,7 @@ const COLS = 'id, user_id, plan_type, status, trial_quota, trial_used, credit_ba
 
 export async function findByUserId(userId, conn) {
   const db = conn || pool;
-  const [rows] = await db.execute('SELECT id, user_id, plan_type, status, trial_quota, trial_used, credit_balance, start_time, end_time, auto_renew FROM user_membership WHERE user_id = ? LIMIT 1', [userId]);
+  const [rows] = await db.execute('SELECT id, user_id, plan_type, status, trial_quota, trial_used, credit_balance, start_time, end_time, auto_renew FROM user_membership WHERE user_id = ? AND is_deleted = 0 LIMIT 1', [userId]);
   return rows[0] || null;
 }
 

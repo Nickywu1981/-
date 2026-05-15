@@ -5,7 +5,7 @@ import pool from './db.js';
 export async function getTenantStats() {
   const [[{ totalTenants }], [{ activeTenants30d }], [{ totalAgents }], [{ totalEnterprises }], [{ pendingApprovals }]] =
     await Promise.all([
-      pool.query('SELECT COUNT(*) AS totalTenants FROM tenant WHERE is_deleted = 0'),
+      pool.query('SELECT COUNT(*) AS totalTenants FROM tenant WHERE status = 1'),
       pool.query('SELECT COUNT(DISTINCT tenant_id) AS activeTenants30d FROM ai_call_log WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)'),
       pool.query(`SELECT COUNT(*) AS totalAgents FROM enterprise_user WHERE role IN ('agent_admin', 'agent_operator', 'agent_viewer') AND is_deleted = 0`),
       pool.query(`SELECT COUNT(*) AS totalEnterprises FROM enterprise_user WHERE role = 'enterprise_admin' AND is_deleted = 0`),
@@ -13,7 +13,7 @@ export async function getTenantStats() {
     ]);
 
   const [tenantList] = await pool.query(
-    'SELECT id, name, industry, status, created_at FROM tenant WHERE is_deleted = 0 ORDER BY created_at DESC LIMIT 20',
+    'SELECT id, name, industry, status, created_at FROM tenant WHERE status = 1 ORDER BY created_at DESC LIMIT 20',
   );
 
   return {

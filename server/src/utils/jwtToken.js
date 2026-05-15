@@ -151,6 +151,14 @@ export async function isTokenBlacklisted(token) {
   // 检查 token 级黑名单
   const blacklisted = await r.get(`jwt_blacklist:${token.slice(-32)}`);
   if (blacklisted) return true;
+  // 检查密码重置 token JTI 重放
+  try {
+    const payload = jwt.decode(token);
+    if (payload?.jti) {
+      const resetBlocked = await r.get(`reset_jti:${payload.jti}`);
+      if (resetBlocked) return true;
+    }
+  } catch { /* decode failed — 非 JWT 或格式错误，放过 */ }
   // 检查用户级吊销
   try {
     const payload = jwt.decode(token);

@@ -138,11 +138,11 @@ export async function adminRefund(userId, recordId, remark) {
     if (!record) { await conn.rollback(); return { ok: false, msg: '记录不存在或已退款' }; }
 
     // 锁定会员余额行，防止并发退款/消费竞态
-    const [[membership]] = await conn.execute('SELECT id, credit_balance FROM user_membership WHERE user_id = ? AND status = 1 FOR UPDATE', [record.user_id]);
+    const [[membership]] = await conn.execute('SELECT id, credit_balance FROM user_membership WHERE user_id = ? AND status = 1 AND is_deleted = 0 FOR UPDATE', [record.user_id]);
     if (!membership) { await conn.rollback(); return { ok: false, msg: '会员不存在' }; }
 
     // 退款
-    await conn.execute('UPDATE user_membership SET credit_balance = credit_balance + ? WHERE user_id = ? AND status = 1', [record.consumed, record.user_id]);
+    await conn.execute('UPDATE user_membership SET credit_balance = credit_balance + ? WHERE user_id = ? AND status = 1 AND is_deleted = 0', [record.consumed, record.user_id]);
     await conn.execute('UPDATE consumption_record SET status = 2, refund_at = NOW(), refund_remark = ? WHERE id = ?', [remark, recordId]);
 
     await conn.commit();

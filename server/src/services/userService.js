@@ -112,9 +112,18 @@ export async function resetPassword(token, newPassword) {
   try { payload = jwt.verify(token, jwtSecret); } catch { throw new BusinessError(ERROR_CODE.TOKEN_EXPIRED); }
   if (payload.purpose !== 'reset') throw new BusinessError(ERROR_CODE.TOKEN_INVALID);
 
-  // 防止重放：吊销已使用的重置 token
-  if (payload.jti && await isTokenBlacklisted(token)) {
-    throw new BusinessError(ERROR_CODE.TOKEN_EXPIRED);
+  // 防止重放：检查 JTI 是否已被标记
+  if (payload.jti) {
+    try {
+      const r = await (await import('../dao/redis.js')).getRedis();
+      if (r) {
+        const alreadyUsed = await r.get(`reset_jti:${payload.jti}`);
+        if (alreadyUsed) throw new BusinessError(ERROR_CODE.TOKEN_EXPIRED);
+      }
+    } catch (e) {
+      if (e instanceof BusinessError) throw e;
+      logger.warn('[User] JTI 重放检查失败，放过', { error: e.message });
+    }
   }
 
   const hashed = await bcrypt.hash(newPassword, SALT_ROUNDS);
