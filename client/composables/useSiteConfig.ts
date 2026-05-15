@@ -137,6 +137,20 @@ function teardownSSE() {
   }
 }
 
+// logout 时立即断开 SSE，防止退登后继续发送 authenticated 请求
+if (typeof window !== 'undefined') {
+  window.addEventListener('auth:logout', () => {
+    if (sseReconnectTimer) { clearTimeout(sseReconnectTimer); sseReconnectTimer = null; }
+    sseRetries = MAX_SSE_RETRIES; // 阻止重连
+    if (sharedEventSource) {
+      sharedEventSource.close();
+      sharedEventSource = null;
+    }
+    sseRefCount = 0;
+    sseListeners.clear();
+  });
+}
+
 export function useSiteConfig(groupKey: string) {
   const config = ref<Record<string, string>>(cache[groupKey] || {})
   const loading = ref(!cache[groupKey])

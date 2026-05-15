@@ -104,7 +104,7 @@ async function handlePasswordLogin() {
     const authStore = useAuthStore()
     await authStore.login(username.value, password.value)
     await authStore.fetchUser()
-    await navigateTo('/workspace')
+    await navigateTo((route.query.redirect as string) || '/workspace')
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || t('auth.login_network_error'); msgErr.value = true; }
   finally { loading.value = false; }
 }
@@ -116,7 +116,7 @@ async function handleSmsLogin() {
     await $fetch('/api/sms/verify-code', { method: 'POST', credentials: 'include', body: { phone: smsPhone.value, scene: 'login', code: smsCode.value } });
     await $fetch('/api/auth/login-by-code', { method: 'POST', credentials: 'include', body: { phone: smsPhone.value, code: smsCode.value } });
     await useAuthStore().fetchUser();
-    await navigateTo('/workspace');
+    await navigateTo((route.query.redirect as string) || '/workspace');
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || t('auth.login_network_error'); msgErr.value = true; }
   finally { loading.value = false; }
 }
@@ -138,7 +138,7 @@ async function handleEmailLogin() {
     await $fetch('/api/email/verify-code', { method: 'POST', credentials: 'include', body: { email: emailAddr.value, code: emailCode.value } });
     await $fetch('/api/auth/login-by-code', { method: 'POST', credentials: 'include', body: { email: emailAddr.value, code: emailCode.value } });
     await useAuthStore().fetchUser();
-    await navigateTo('/workspace');
+    await navigateTo((route.query.redirect as string) || '/workspace');
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || t('auth.login_network_error'); msgErr.value = true; }
   finally { loading.value = false; }
 }

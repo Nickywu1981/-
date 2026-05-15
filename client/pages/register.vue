@@ -98,7 +98,7 @@ async function handleRegister() {
                          : { phone: username.value, password: password.value, nickname: nickname.value }
     const authStore = useAuthStore()
     await authStore.register(body)
-    await navigateTo('/workspace')
+    await navigateTo((route.query.redirect as string) || '/workspace')
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || err.message || t('auth.register_failed'); msgErr.value = true; }
   finally { loading.value = false; }
 }
@@ -114,7 +114,7 @@ async function handleSmsRegister() {
       credentials: 'include',
     });
     await useAuthStore().fetchUser();
-    await navigateTo('/workspace');
+    await navigateTo((route.query.redirect as string) || '/workspace');
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || t('auth.register_failed'); msgErr.value = true; }
   finally { loading.value = false; }
 }
@@ -140,7 +140,7 @@ async function handleEmailRegister() {
       credentials: 'include',
     });
     await useAuthStore().fetchUser();
-    await navigateTo('/workspace');
+    await navigateTo((route.query.redirect as string) || '/workspace');
   } catch (e: unknown) { const err = e as { data?: { msg?: string }; message?: string }; msg.value = err?.data?.msg || t('auth.register_failed'); msgErr.value = true; }
   finally { loading.value = false; }
 }

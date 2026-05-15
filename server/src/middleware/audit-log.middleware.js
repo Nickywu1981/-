@@ -6,6 +6,7 @@
 import { getLogger } from '../utils/logger.js';
 
 const auditLogger = getLogger('audit');
+let _auditDbFailures = 0;
 
 function toAction(method, path) {
   if (method === 'POST') return path.includes('/batch') ? 'batch_create' : 'create';
@@ -46,7 +47,9 @@ export function auditLogMiddleware(req, res, next) {
           details: { method: req.method, statusCode: res.statusCode, durationMs: duration },
           ip: entry.ip,
           userAgent: entry.user_agent,
-        }).catch(() => {}); // 静默失败，不影响主流程
+        }).catch((err) => {
+          auditLogger.error({ msg: 'audit_log_db_write_failed', err: err.message, count: ++_auditDbFailures });
+        });
       }).catch(() => {});
     }
 

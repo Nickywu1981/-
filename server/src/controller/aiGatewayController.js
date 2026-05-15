@@ -299,7 +299,7 @@ export const aiGatewayController = {
     if (!chainId || !stepId || !adjustments) {
       throw new BusinessError(ERROR_CODE.PARAM_MISSING, 'chainId、stepId、adjustments 必填');
     }
-    logger.info(`[Pipeline] manual adjustment: chain=${chainId} step=${stepId}`, adjustments);
+    logger.info(`[Pipeline] manual adjustment: chain=${chainId} step=${stepId}`, { adjustmentKeys: Object.keys(adjustments || {}) });
     return { chainId, stepId, status: 'adjusted', adjustments, timestamp: new Date().toISOString() };
   }),
 
