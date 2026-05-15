@@ -8,9 +8,11 @@
  *   // 自动轮询直到 completed/failed
  */
 import { POLL_INTERVAL_MS, POLL_BACKOFF_MS, POLL_MAX_BACKOFF_MS } from '~/constants/ui'
+import { useApi, extractErrorMsg } from '~/composables/useApi'
 
 export function useTaskPolling() {
   const { t } = useI18n()
+  const api = useApi()
   const jobId = ref<number | null>(null)
   const status = ref<string>('idle') // idle | queued | processing | completed | failed
   const progress = ref(0)
@@ -19,7 +21,6 @@ export function useTaskPolling() {
   const submitting = ref(false)
   const pollTimer = ref<ReturnType<typeof setTimeout> | null>(null)
   let _pollCount = 0
-  const apiBase = useRuntimeConfig().public.apiBase || '/api'
 
   // -----------------------------------------------------------------------
   // 提交任务 (防重复提交)
@@ -39,24 +40,14 @@ export function useTaskPolling() {
     error.value = ''
 
     try {
-      const res = await $fetch<{ code: number; data?: { job_id: number }; msg?: string }>(`${apiBase}/jobs`, {
-        method: 'POST',
-        body: { task_type: taskType, task_params: params },
-        credentials: 'include',
-      })
-      if (res.code === 200) {
-        jobId.value = res.data.job_id
-        status.value = 'queued'
-        startPolling()
-      } else {
-        status.value = 'failed'
-        error.value = res.msg || t('task.submit_failed')
-      }
+      const data = await api.post<{ job_id: number }>('/jobs', { task_type: taskType, task_params: params })
+      jobId.value = data.job_id
+      status.value = 'queued'
+      startPolling()
     } catch (e: unknown) {
-      const err = e as { data?: { msg?: string }; message?: string };
       status.value = 'failed'
-      error.value = err?.data?.msg || err.message || t('task.submit_failed')
-      useToast().error(err?.data?.msg || err.message || t('task.submit_failed_retry'))
+      error.value = extractErrorMsg(e, 'task.submit_failed')
+      useToast().error(error.value)
     } finally {
       submitting.value = false
     }
@@ -77,22 +68,20 @@ export function useTaskPolling() {
   async function pollOnce() {
     if (!_active || !jobId.value) return
     try {
-      const res = await $fetch<{ code: number; data?: { status: string; progress?: number; result_data?: unknown; error_message?: string } }>(`${apiBase}/job/${jobId.value}`, { credentials: 'include' })
-      if (res.code === 200) {
-        status.value = res.data.status
-        progress.value = res.data.progress || 0
-        if (res.data.status === 'completed') {
-          result.value = res.data.result_data
-          _pollCount = 0
-          return
-        } else if (res.data.status === 'failed') {
-          error.value = res.data.error_message || t('task.failed')
-          _pollCount = 0
-          return
-        }
+      const data = await api.get<{ status: string; progress?: number; result_data?: unknown; error_message?: string }>(`/job/${jobId.value}`)
+      status.value = data.status
+      progress.value = data.progress || 0
+      if (data.status === 'completed') {
+        result.value = data.result_data
+        _pollCount = 0
+        return
+      } else if (data.status === 'failed') {
+        error.value = data.error_message || t('task.failed')
+        _pollCount = 0
+        return
       }
     } catch (e) {
-      if (import.meta.dev) console.warn('[TaskPolling] 轮询请求失败', e);
+      if (import.meta.dev) console.warn('[TaskPolling] 轮询请求失败', e)
     }
     _pollCount++
     schedulePoll()

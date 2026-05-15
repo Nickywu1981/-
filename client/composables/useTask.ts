@@ -3,9 +3,11 @@
  * 用于所有 AI 生成任务的状态追踪
  */
 import { POLL_INTERVAL_MS, POLL_BACKOFF_MS } from '~/constants/ui'
+import { useApi } from '~/composables/useApi'
 
 export function useTask() {
   const { t } = useI18n()
+  const api = useApi()
   const taskId = ref('');
   const status = ref(-1); // -1=未提交 0=排队 1=处理中 2=完成 3=失败
   const progress = ref(0);
@@ -19,7 +21,7 @@ export function useTask() {
   let consecutiveFailures = 0;
   let currentInterval = 1000;
 
-  async function pollTask(id: string, baseUrl = '/api/images/tasks/') {
+  async function pollTask(id: string, baseUrl = '/images/tasks/') {
     taskId.value = id;
     polling.value = true;
     status.value = 0;
@@ -30,11 +32,10 @@ export function useTask() {
     const doPoll = async () => {
       if (!polling.value) return;
       try {
-        const res = await $fetch(`${baseUrl}${id}`, { credentials: 'include' });
-        const data = (res as Record<string, unknown>).data as Record<string, unknown>;
-        status.value = data.status;
-        progress.value = data.progress;
-        progressMsg.value = data.progress_msg;
+        const data = await api.get<Record<string, unknown>>(`${baseUrl}${id}`) as Record<string, unknown>;
+        status.value = data.status as number;
+        progress.value = data.progress as number;
+        progressMsg.value = data.progress_msg as string;
         consecutiveFailures = 0;
 
         if (data.status === 2) {
