@@ -25,7 +25,7 @@ export async function createIncident(data) {
 }
 
 export async function listIncidents({ incidentType, limit = 50, offset = 0, days = 7 } = {}) {
-  let sql = 'SELECT * FROM healing_incidents WHERE created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)';
+  let sql = 'SELECT id, incident_type, severity, symptoms, affected_models, root_cause, action_taken, action_result, recovery_time_ms, action_detail, context_snapshot, learned_pattern, created_at FROM healing_incidents WHERE created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)';
   const params = [days];
   if (incidentType) { sql += ' AND incident_type = ?'; params.push(incidentType); }
   sql += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
@@ -83,7 +83,7 @@ export async function upsertStrategy(data) {
 }
 
 export async function getStrategies(incidentType) {
-  let sql = 'SELECT * FROM healing_strategies WHERE is_active = 1';
+  let sql = 'SELECT id, strategy_id, strategy_level, incident_type, action_template, success_count, total_count, success_rate, activation_count, evolved_from, is_active, created_at, updated_at FROM healing_strategies WHERE is_active = 1';
   const params = [];
   if (incidentType) { sql += ' AND incident_type = ?'; params.push(incidentType); }
   sql += ' ORDER BY strategy_level DESC, success_rate DESC LIMIT 500';
@@ -92,7 +92,7 @@ export async function getStrategies(incidentType) {
 }
 
 export async function getStrategy(id) {
-  const [rows] = await db.execute('SELECT * FROM healing_strategies WHERE strategy_id = ?', [id]);
+  const [rows] = await db.execute('SELECT id, strategy_id, strategy_level, incident_type, action_template, success_count, total_count, success_rate, activation_count, evolved_from, is_active, created_at, updated_at FROM healing_strategies WHERE strategy_id = ?', [id]);
   if (rows.length === 0) return null;
   const r = rows[0];
   return { ...r, actionTemplate: safeJSON(r.action_template) };

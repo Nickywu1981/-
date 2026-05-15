@@ -3,18 +3,18 @@ import pool from './db.js';
 const table = 'site_config';
 
 export const getAll = async () => {
-  const [rows] = await pool.query(`SELECT * FROM ${table} ORDER BY id LIMIT 200`);
+  const [rows] = await pool.query(`SELECT id, config_key, config_value, config_type, description, updated_by, created_at, updated_at FROM ${table} ORDER BY id LIMIT 200`);
   return rows;
 };
 
 export const getByKey = async (key) => {
-  const [rows] = await pool.query(`SELECT * FROM ${table} WHERE config_key = ? LIMIT 1`, [key]);
+  const [rows] = await pool.query(`SELECT id, config_key, config_value, config_type, description, updated_by, created_at, updated_at FROM ${table} WHERE config_key = ? LIMIT 1`, [key]);
   return rows[0] || null;
 };
 
 export const getByKeys = async (keys) => {
   const placeholders = keys.map(() => '?').join(',');
-  const [rows] = await pool.query(`SELECT * FROM ${table} WHERE config_key IN (${placeholders}) LIMIT 200`, keys);
+  const [rows] = await pool.query(`SELECT id, config_key, config_value, config_type, description, updated_by, created_at, updated_at FROM ${table} WHERE config_key IN (${placeholders}) LIMIT 200`, keys);
   return rows;
 };
 

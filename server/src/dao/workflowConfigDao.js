@@ -12,7 +12,7 @@ function _db() { return als.getStore()?.db || pool; }
 
 export async function getWorkflowConfig(workflowId, userId) {
   const [rows] = await _db().query(
-    'SELECT * FROM workflow_config WHERE workflow_id = ? AND user_id = ? LIMIT 1',
+    'SELECT id, workflow_id, user_id, tenant_id, mode, disabled_steps, model_bindings, extra_steps, deleted_steps, step_order, params, created_at, updated_at FROM workflow_config WHERE workflow_id = ? AND user_id = ? LIMIT 1',
     [workflowId, userId],
   );
   return rows[0] || null;
@@ -20,7 +20,7 @@ export async function getWorkflowConfig(workflowId, userId) {
 
 export async function getGlobalWorkflowConfig(workflowId) {
   const [rows] = await _db().query(
-    'SELECT * FROM workflow_config WHERE workflow_id = ? AND user_id IS NULL LIMIT 1',
+    'SELECT id, workflow_id, user_id, tenant_id, mode, disabled_steps, model_bindings, extra_steps, deleted_steps, step_order, params, created_at, updated_at FROM workflow_config WHERE workflow_id = ? AND user_id IS NULL LIMIT 1',
     [workflowId],
   );
   return rows[0] || null;
@@ -85,7 +85,7 @@ export async function deleteWorkflowConfig(workflowId, userId) {
 
 export async function listUserConfigs(userId) {
   const [rows] = await _db().query(
-    'SELECT * FROM workflow_config WHERE user_id = ? ORDER BY updated_at DESC LIMIT 200',
+    'SELECT id, workflow_id, user_id, tenant_id, mode, disabled_steps, model_bindings, extra_steps, deleted_steps, step_order, params, created_at, updated_at FROM workflow_config WHERE user_id = ? ORDER BY updated_at DESC LIMIT 200',
     [userId],
   );
   return rows;
