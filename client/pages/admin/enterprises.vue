@@ -127,7 +127,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 definePageMeta({ layout: 'platform-admin', middleware: ['auth'] });
 
 const { $api } = useNuxtApp();

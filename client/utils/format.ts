@@ -8,15 +8,23 @@ dayjs.extend(relativeTime);
 
 const localeMap: Record<string, string> = { zh: 'zh-cn', en: 'en', es: 'es' };
 
+let _currentLocale: string | null = null
+
+/** 由 i18n 插件调用，同步当前 locale 到格式化工具（避免直接读 localStorage） */
+export function setFormatLocale(locale: string) {
+  _currentLocale = localeMap[locale] || locale || 'zh-cn'
+}
+
 function getLocale(): string {
   if (typeof window === 'undefined') return 'zh-cn';
+  if (_currentLocale) return _currentLocale;
   try {
     const settings = window.localStorage.getItem('app-settings');
     if (settings) {
       const { locale } = JSON.parse(settings);
       return localeMap[locale] || 'zh-cn';
     }
-  } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string }; if (import.meta.dev) console.warn('[format] 解析locale设置失败', e?.message || err) }
+  } catch {} // 降级：使用默认中文
   return 'zh-cn';
 }
 

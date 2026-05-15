@@ -55,20 +55,29 @@ export default defineNuxtPlugin((nuxtApp) => {
   }
 
   // Intercept window.fetch for 401 redirect
+  let origFetch: typeof window.fetch | null = null
   if (typeof window !== 'undefined') {
-    const origFetch = window.fetch
+    origFetch = window.fetch
     window.fetch = async function (input: any, init: any = {}) {
       try {
         init.credentials = init.credentials || 'include'
-        const res = await origFetch.call(window, input, init)
+        const res = await origFetch!.call(window, input, init)
         if (res.status === 401) {
           router.push('/login')
         }
         return res
       } catch (err: unknown) { const e = err as { data?: { msg?: string }; message?: string };
         if (import.meta.dev) console.warn('[auth fetch] 请求增强失败，使用原始fetch', e?.message || err)
-        return origFetch.call(window, input, init)
+        return origFetch!.call(window, input, init)
       }
     }
   }
+
+  // Teardown: restore originals on app unmount (HMR-safe)
+  nuxtApp.hook('close', () => {
+    globalThis.$fetch = originalFetch
+    if (typeof window !== 'undefined' && origFetch) {
+      window.fetch = origFetch
+    }
+  })
 })
