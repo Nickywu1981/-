@@ -87,7 +87,7 @@ async function markAllRead() {
   try { await $fetch('/api/notifications/read-all', { credentials: 'include', method: 'PUT' }); } catch { /* optimistic */ }
 }
 
-onMounted(() => { Promise.all([fetch(), fetchUnread()]); });
+onMounted(() => { Promise.all([fetch(), fetchUnread()]).catch((e: unknown) => console.error('[Notifications] Load failed:', e)); });
 
 definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>

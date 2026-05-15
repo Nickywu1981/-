@@ -224,9 +224,11 @@ function statusLabel(s: string) {
 }
 
 onMounted(() => {
-  Promise.all([fetchInviteCode(), fetchBalance(), fetchTeam(), fetchCommissions()]).finally(() => {
-    pageLoading.value = false
-  })
+  Promise.all([fetchInviteCode(), fetchBalance(), fetchTeam(), fetchCommissions()])
+    .catch((e: unknown) => console.error('[Distribution] Load failed:', e))
+    .finally(() => {
+      pageLoading.value = false
+    })
 })
 definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>

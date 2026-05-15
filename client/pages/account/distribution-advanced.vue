@@ -230,7 +230,11 @@ const copyText = async (text: string) => {
   else toast.error(t('account_pages.distribution_advanced.copy_fail'));
 }
 
-onMounted(() => { loadTier(); loadPerformance(); pageLoading.value = false; });
+onMounted(() => {
+  Promise.all([loadTier(), loadPerformance()])
+    .catch((e: unknown) => console.error('[Distribution Advanced] Load failed:', e))
+    .finally(() => { pageLoading.value = false; });
+});
 definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>
 

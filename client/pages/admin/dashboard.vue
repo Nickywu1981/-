@@ -244,7 +244,7 @@ async function fetchAll() {
       stats.value = sVal.data
       const trends = sVal.data?.trends
       disposeCharts()
-      nextTick(async () => {
+      await nextTick(async () => {
         await renderLineChart(taskChart.value, trends?.tasks || [], '#3B82F6')
         await renderLineChart(userChart.value, trends?.users || [], '#22C55E')
         await renderLineChart(revenueChart.value, trends?.revenue || [], '#7C3AED')

@@ -352,26 +352,31 @@ const autoSave = useDiyAutoSave(
 autoSave.start()
 
 onMounted(async () => {
-  const id = route.query.id
-  if (!id) { navigateTo('/diy'); return }
-  const numId = Number(id)
-  if (isNaN(numId)) { navigateTo('/diy'); return }
-  pageInfo.value = { id: numId }
+  try {
+    const id = route.query.id
+    if (!id) { navigateTo('/diy'); return }
+    const numId = Number(id)
+    if (isNaN(numId)) { navigateTo('/diy'); return }
+    pageInfo.value = { id: numId }
 
-  const recovered = await autoSave.checkRecovery()
-  if (recovered) {
-    try {
-      const isPC = pageInfo.value.page_type === 'pc'
-      const config = recovered.mobile_config || recovered.pc_config || recovered.mobileConfig || recovered.pcConfig
-      editor.loadFromConfig(isPC ? (recovered.pc_config || recovered.mobile_config) : (recovered.mobile_config || recovered.pc_config))
-      toast.info(t('common.unsaved_changes_restored'))
-    } catch {
-      toast.warn(t('common.recovery_format_error'))
-      await loadPage()
+    const recovered = await autoSave.checkRecovery()
+    if (recovered) {
+      try {
+        const isPC = pageInfo.value.page_type === 'pc'
+        const config = recovered.mobile_config || recovered.pc_config || recovered.mobileConfig || recovered.pcConfig
+        editor.loadFromConfig(isPC ? (recovered.pc_config || recovered.mobile_config) : (recovered.mobile_config || recovered.pc_config))
+        toast.info(t('common.unsaved_changes_restored'))
+      } catch {
+        toast.warn(t('common.recovery_format_error'))
+        await loadPage()
+      }
+      return
     }
-    return
+    await loadPage()
+  } catch (e: unknown) {
+    console.error('[DIY Editor] Failed to load page:', e)
+    toast.error(t('common.load_failed'))
   }
-  await loadPage()
 })
 definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>
