@@ -8382,5 +8382,36 @@
     "role_personal": "Personal",
     "role_agent": "Agent",
     "role_enterprise": "Enterprise"
+  },
+  "invite": {
+    "title": "Invite & Earn",
+    "subtitle": "Invite friends to Movio AI and both receive free credits",
+    "coming_soon": "Invite rules and rewards coming soon"
+  },
+  "credits": {
+    "title": "My Credits",
+    "subtitle": "View your credit balance and history",
+    "coming_soon": "Credit details and redemption coming soon"
+  },
+  "profile": {
+    "title": "Profile",
+    "subtitle": "Manage your account info and preferences",
+    "coming_soon": "Profile center coming soon"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Account security, notification preferences, and privacy",
+    "coming_soon": "Settings coming soon"
+  },
+  "cs": {
+    "title": "Customer Service",
+    "desc": "Scan the QR code below to contact our support team",
+    "qr_placeholder": "Customer service QR code to be configured"
+  },
+  "result": {
+    "title": "Results",
+    "empty": "No results yet",
+    "expand": "Expand results panel",
+    "collapse": "Collapse results panel"
   }
 }

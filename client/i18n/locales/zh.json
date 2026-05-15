@@ -8200,5 +8200,36 @@
     "role_personal": "个人",
     "role_agent": "代理",
     "role_enterprise": "企业"
+  },
+  "invite": {
+    "title": "邀请有礼",
+    "subtitle": "邀请好友加入 Movio AI，双方均可获得免费积分奖励",
+    "coming_soon": "邀请规则与奖励机制配置中，敬请期待"
+  },
+  "credits": {
+    "title": "我的积分",
+    "subtitle": "查看积分余额与获取记录",
+    "coming_soon": "积分明细与兑换功能配置中，敬请期待"
+  },
+  "profile": {
+    "title": "个人中心",
+    "subtitle": "管理您的账号信息与偏好设置",
+    "coming_soon": "个人中心完善中，敬请期待"
+  },
+  "settings": {
+    "title": "账号设置",
+    "subtitle": "账号安全、通知偏好与隐私设置",
+    "coming_soon": "账号设置完善中，敬请期待"
+  },
+  "cs": {
+    "title": "在线客服",
+    "desc": "如需帮助，请扫描下方客服二维码联系我们",
+    "qr_placeholder": "客服二维码后台上传配置中"
+  },
+  "result": {
+    "title": "生成结果",
+    "empty": "暂无生成结果",
+    "expand": "展开结果面板",
+    "collapse": "收起结果面板"
   }
 }

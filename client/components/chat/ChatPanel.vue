@@ -169,15 +169,17 @@ onUnmounted(() => {
             hidden
             @change="handleFileUpload"
           />
-          <button class="cp-btn-icon" :aria-label="t('chat.attach')" :title="t('chat.attach')" @click="fileInput?.click()">📎</button>
-          <textarea
-            v-model="input"
-            class="cp-input"
-            :placeholder="t('chat.input_placeholder')"
-            rows="1"
-            :disabled="streaming"
-            @keydown="handleKeydown"
-          />
+          <div class="cp-input-wrap">
+            <button class="cp-attach-btn" :aria-label="t('chat.attach')" :title="t('chat.attach')" @click="fileInput?.click()">📎</button>
+            <textarea
+              v-model="input"
+              class="cp-input"
+              :placeholder="t('chat.input_placeholder')"
+              rows="1"
+              :disabled="streaming"
+              @keydown="handleKeydown"
+            />
+          </div>
           <button
             class="cp-send"
             :disabled="!input.trim() || streaming"
@@ -269,12 +271,23 @@ onUnmounted(() => {
   border-top: 1px solid var(--border-light);
   background: var(--bg-card);
 }
+.cp-input-wrap {
+  flex: 1; position: relative;
+}
+.cp-attach-btn {
+  position: absolute; left: 8px; top: 8px;
+  width: 28px; height: 28px; border: none; border-radius: 6px;
+  background: var(--bg-page); font-size: 14px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-secondary); z-index: 1; transition: color .15s;
+}
+.cp-attach-btn:hover { color: var(--brand); }
 .cp-input {
-  flex: 1;
+  flex: 1; width: 100%;
   resize: none;
   border: 1px solid var(--border-light);
   border-radius: var(--radius-md, 8px);
-  padding: 8px 12px;
+  padding: 8px 12px 8px 40px;
   font-size: 14px;
   line-height: 1.5;
   font-family: inherit;
