@@ -145,6 +145,12 @@ export async function validateStartupConfig() {
 export async function validateRuntimeConnections() {
   const results = { ok: true, checks: {} };
 
+  // MOCK_ENABLED=true → skip infrastructure checks, use in-memory fallbacks
+  if (config.mockEnabled) {
+    logger.info('[StartupGuard] MOCK_ENABLED=true, skipping runtime connection checks');
+    return { ok: true, checks: { mysql: 'skipped', redis: 'skipped' } };
+  }
+
   // MySQL
   try {
     const { default: mysql } = await import('mysql2/promise');
@@ -168,14 +174,10 @@ export async function validateRuntimeConnections() {
 
   // Redis
   try {
-    const { default: Redis } = await import('ioredis');
-    const redis = new Redis({
-      host: config.redis.host,
-      port: config.redis.port,
-      password: config.redis.password || undefined,
-      connectTimeout: 5000,
-      maxRetriesPerRequest: 1,
-      lazyConnect: true,
+    const { createClient } = await import('redis');
+    const redis = createClient({
+      url: `redis://${config.redis.password ? `:${config.redis.password}@` : ''}${config.redis.host}:${config.redis.port}`,
+      socket: { connectTimeout: 5000 },
     });
     await redis.connect();
     await redis.ping();
