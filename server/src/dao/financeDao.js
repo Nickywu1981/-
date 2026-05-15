@@ -12,7 +12,7 @@ import logger from '../utils/logger.js';
 
 export async function listBankAccounts(tenantId, { limit = 50 } = {}) {
   const [rows] = await pool.query(
-    'SELECT * FROM bank_account WHERE tenant_id = ? AND is_deleted = 0 ORDER BY is_default DESC, create_time DESC LIMIT ?',
+    'SELECT id, tenant_id, account_type, account_name, account_no, bank_name, bank_branch, is_default, status, create_time, update_time, is_deleted FROM bank_account WHERE tenant_id = ? AND is_deleted = 0 ORDER BY is_default DESC, create_time DESC LIMIT ?',
     [tenantId, limit],
   );
   return rows;
@@ -45,7 +45,7 @@ export async function addBankAccount(tenantId, data) {
 }
 
 export async function findBankAccountById(id, tenantId) {
-  const [rows] = await pool.query('SELECT * FROM bank_account WHERE id = ? AND tenant_id = ? AND is_deleted = 0 LIMIT 1', [id, tenantId]);
+  const [rows] = await pool.query('SELECT id, tenant_id, account_type, account_name, account_no, bank_name, bank_branch, is_default, status, create_time, update_time, is_deleted FROM bank_account WHERE id = ? AND tenant_id = ? AND is_deleted = 0 LIMIT 1', [id, tenantId]);
   return rows[0] || null;
 }
 
@@ -67,7 +67,7 @@ export async function listLedger(tenantId, { page = 1, pageSize = 20, type, star
   const [[{ total }]] = await pool.query(`SELECT COUNT(*) AS total FROM account_ledger WHERE ${where}`, params);
   const { offset } = parsePagination({ page, pageSize });
   const [rows] = await pool.query(
-    `SELECT * FROM account_ledger WHERE ${where} ORDER BY create_time DESC LIMIT ? OFFSET ?`,
+    `SELECT id, tenant_id, ledger_type, amount, balance_before, balance_after, business_type, business_id, remark, create_time FROM account_ledger WHERE ${where} ORDER BY create_time DESC LIMIT ? OFFSET ?`,
     [...params, pageSize, offset],
   );
   return { list: rows, total, page, pageSize };
@@ -270,7 +270,7 @@ export async function insertLedgerInTx(conn, data) {
 
 export async function getCommissionPolicy(tenantId) {
   const [rows] = await pool.query(
-    'SELECT * FROM commission_policy WHERE tenant_id = ? AND status = 1 LIMIT 1', [tenantId],
+    'SELECT id, tenant_id, policy_type, level1_rate, level2_rate, min_withdrawal, settlement_cycle, status, create_time, update_time FROM commission_policy WHERE tenant_id = ? AND status = 1 LIMIT 1', [tenantId],
   );
   return rows[0] || null;
 }

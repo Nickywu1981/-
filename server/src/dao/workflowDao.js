@@ -8,7 +8,7 @@ const T = (name) => `workflow_${name}`;
 
 // ─── 模板 ───
 export async function listTemplates({ status } = {}) {
-  let sql = `SELECT * FROM ${T('template')} WHERE 1=1`;
+  let sql = `SELECT id, name, description, steps, status, created_by, created_at, updated_at FROM ${T('template')} WHERE 1=1`;
   const params = [];
   if (status) { sql += ' AND status = ?'; params.push(status); }
   sql += ' ORDER BY updated_at DESC LIMIT 500';
@@ -17,7 +17,7 @@ export async function listTemplates({ status } = {}) {
 }
 
 export async function getTemplate(id) {
-  const [rows] = await pool.execute(`SELECT * FROM ${T('template')} WHERE id = ?`, [id]);
+  const [rows] = await pool.execute(`SELECT id, name, description, steps, status, created_by, created_at, updated_at FROM ${T('template')} WHERE id = ?`, [id]);
   return rows[0] || null;
 }
 
@@ -78,7 +78,7 @@ export async function updateJobStatus(id, { status, progress, outputData, stepRe
 }
 
 export async function getJob(id) {
-  const [rows] = await pool.execute(`SELECT * FROM ${T('job')} WHERE id = ?`, [id]);
+  const [rows] = await pool.execute(`SELECT id, template_id, template_name, user_id, status, input_data, output_data, step_results, progress, error_message, started_at, completed_at, created_at FROM ${T('job')} WHERE id = ?`, [id]);
   return rows[0] || null;
 }
 
@@ -86,7 +86,7 @@ export async function listJobsByUser(userId, { page = 1, pageSize = 20 } = {}) {
   const { offset } = parsePagination({ page, pageSize });
   const [[{ total }]] = await pool.execute(`SELECT COUNT(*) AS total FROM ${T('job')} WHERE user_id = ?`, [userId]);
   const [rows] = await pool.execute(
-    `SELECT * FROM ${T('job')} WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+    `SELECT id, template_id, template_name, user_id, status, input_data, output_data, step_results, progress, error_message, started_at, completed_at, created_at FROM ${T('job')} WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?`,
     [userId, String(pageSize), String(offset)],
   );
   return { list: rows, total, page, pageSize };
