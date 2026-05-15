@@ -129,15 +129,24 @@ const variantDims = computed(() => variant.src ? t('work_pages.compare.dimension
 const sliderPos = ref(50)
 const sliding = ref(false)
 const sliderRef = ref<HTMLElement | null>(null)
+let sliderRAF: number | null = null
 function onSliderMove(e: MouseEvent) {
-  if (!sliderRef.value) return
-  const rect = sliderRef.value.getBoundingClientRect()
-  sliderPos.value = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100))
+  if (sliderRAF || !sliderRef.value) return
+  sliderRAF = requestAnimationFrame(() => {
+    sliderRAF = null
+    if (!sliderRef.value) return
+    const rect = sliderRef.value.getBoundingClientRect()
+    sliderPos.value = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100))
+  })
 }
 function onSliderTouch(e: TouchEvent) {
-  if (!sliderRef.value) return
-  const rect = sliderRef.value.getBoundingClientRect()
-  sliderPos.value = Math.max(0, Math.min(100, ((e.touches[0].clientX - rect.left) / rect.width) * 100))
+  if (sliderRAF || !sliderRef.value) return
+  sliderRAF = requestAnimationFrame(() => {
+    sliderRAF = null
+    if (!sliderRef.value) return
+    const rect = sliderRef.value.getBoundingClientRect()
+    sliderPos.value = Math.max(0, Math.min(100, ((e.touches[0].clientX - rect.left) / rect.width) * 100))
+  })
 }
 
 const gridSlots = reactive<{ src: string; alt: string; label: string }[]>([])
@@ -254,6 +263,7 @@ function downloadBoth() {
     download(img.src, img.alt || 'compare.png')
   })
 }
+onBeforeUnmount(() => { if (sliderRAF) cancelAnimationFrame(sliderRAF) })
 definePageMeta({ layout: 'user-workspace', middleware: ['auth'] })
 </script>
 <style scoped>

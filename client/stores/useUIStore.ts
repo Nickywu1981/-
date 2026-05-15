@@ -5,6 +5,7 @@ interface ToastItem {
   message: string
   type: 'success' | 'warning' | 'error' | 'info'
   duration: number
+  _timer: ReturnType<typeof setTimeout> | null
 }
 
 interface ModalState {
@@ -55,16 +56,18 @@ export const useUIStore = defineStore('ui', {
 
     toast(message: string, type: ToastItem['type'] = 'info', duration = 3000) {
       const id = ++_toastId
-      this.toasts.push({ id, message, type, duration })
+      const item: ToastItem = { id, message, type, duration, _timer: null }
+      this.toasts.push(item)
       if (duration > 0) {
-        const timer = setTimeout(() => {
+        item._timer = setTimeout(() => {
           if (this.toasts.some(t => t.id === id)) this.removeToast(id)
         }, duration)
-        // 存储 timer 引用以便取消；实际清理由 removeToast 负责
       }
       return id
     },
     removeToast(id: number) {
+      const item = this.toasts.find(t => t.id === id)
+      if (item?._timer) { clearTimeout(item._timer); item._timer = null }
       this.toasts = this.toasts.filter(t => t.id !== id)
     },
 

@@ -174,17 +174,24 @@ export function useI18nAdmin() {
     addKey, importJSON, showLogs,
   }
 
-  async function doSearch() {
-    if (!searchQuery.value.trim()) return fetch()
-    loading.value = true
-    try {
-      const res = await $fetch<{ code: number; data?: I18nSearchResult[] }>(`/api/admin/i18n/${activeLocale.value}/search?q=${encodeURIComponent(searchQuery.value)}`)
-      translations.value = (res.data || []).map((r: I18nSearchResult) => ({
-        key: r.trans_key,
-        namespace: r.namespace,
-        value: r.trans_value,
-        updated_at: r.updated_at,
-      }))
-    } catch { /* ignore */ } finally { loading.value = false }
+  let searchTimer: ReturnType<typeof setTimeout> | null = null
+
+  function doSearch() {
+    if (searchTimer) clearTimeout(searchTimer)
+    searchTimer = setTimeout(async () => {
+      if (!searchQuery.value.trim()) { await fetch(); return }
+      loading.value = true
+      try {
+        const res = await $fetch<{ code: number; data?: I18nSearchResult[] }>(`/api/admin/i18n/${activeLocale.value}/search?q=${encodeURIComponent(searchQuery.value)}`)
+        translations.value = (res.data || []).map((r: I18nSearchResult) => ({
+          key: r.trans_key,
+          namespace: r.namespace,
+          value: r.trans_value,
+          updated_at: r.updated_at,
+        }))
+      } catch { /* ignore */ } finally { loading.value = false }
+    }, 300)
   }
+
+  onBeforeUnmount(() => { if (searchTimer) clearTimeout(searchTimer) })
 }

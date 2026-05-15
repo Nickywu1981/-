@@ -168,9 +168,14 @@ async function doDelete() {
   deleting.value = false;
 }
 
-function onSearch() { currentPage.value = 1; fetchTemplates(); }
+let searchTimer: ReturnType<typeof setTimeout> | null = null
+function onSearch() {
+  if (searchTimer) clearTimeout(searchTimer)
+  searchTimer = setTimeout(() => { currentPage.value = 1; fetchTemplates() }, 300)
+}
 
 onMounted(fetchTemplates);
+onBeforeUnmount(() => { if (searchTimer) clearTimeout(searchTimer) })
 definePageMeta({ layout: 'platform-admin', middleware: ['auth'] })
 </script>
 

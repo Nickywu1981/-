@@ -211,9 +211,14 @@ async function doDelete() {
   deleting.value = false;
 }
 
-function onSearch() { currentPage.value = 1; fetchPlans(); }
+let searchTimer: ReturnType<typeof setTimeout> | null = null
+function onSearch() {
+  if (searchTimer) clearTimeout(searchTimer)
+  searchTimer = setTimeout(() => { currentPage.value = 1; fetchPlans() }, 300)
+}
 
 onMounted(fetchPlans);
+onBeforeUnmount(() => { if (searchTimer) clearTimeout(searchTimer) })
 definePageMeta({ layout: 'platform-admin', middleware: ['auth'] })
 </script>
 
