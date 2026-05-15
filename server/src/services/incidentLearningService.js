@@ -132,8 +132,8 @@ export async function evolveStrategy(strategyId) {
     const strategy = await dao.getStrategy(strategyId);
     if (!strategy) return null;
 
-    const threshold = EVOLUTION_THRESHOLDS[strategy.strategyLevel];
-    if (!threshold) return { evolved: false, reason: `Level ${strategy.strategyLevel} 已达最高级` };
+    const threshold = EVOLUTION_THRESHOLDS[strategy.strategy_level];
+    if (!threshold) return { evolved: false, reason: `Level ${strategy.strategy_level} 已达最高级` };
 
     const canEvolve =
       (threshold.activationCount > 0 && strategy.activation_count >= threshold.activationCount) ||
@@ -150,35 +150,37 @@ export async function evolveStrategy(strategyId) {
     // 升级到下一级（使用新 strategyId 保留旧记录）
     const newStrategyId = `${strategyId}_L${threshold.nextLevel}_${Date.now()}`;
     await dao.upsertStrategy({
-      ...strategy,
       strategyId: newStrategyId,
       strategyLevel: threshold.nextLevel,
-      successCount: 0,   // 新级别重新计数
+      incidentType: strategy.incident_type,
+      actionTemplate: strategy.action_template,
+      successCount: 0,
       totalCount: 0,
       successRate: 0,
       activationCount: 0,
       evolvedFrom: strategyId,
+      isActive: true,
     });
 
     // 旧策略标记为非活跃（仅更新 isActive，不覆盖其他字段）
     await dao.upsertStrategy({ strategyId, strategyLevel: strategy.strategy_level || 'L1', isActive: false });
 
     logger.info('[IncidentLearning] Strategy evolved', {
-      strategyId, from: strategy.strategyLevel, to: threshold.nextLevel,
+      strategyId, from: strategy.strategy_level, to: threshold.nextLevel,
     });
 
     // 联动 LangMemE
     ltmService.store({
       namespace: 'system', subjectId: 'healing',
       memoryKey: `strategy_evolved_${strategyId}_${Date.now()}`,
-      content: `策略升级: ${strategyId} ${strategy.strategyLevel}→${threshold.nextLevel} 原名=${strategy.incidentType}`,
+      content: `策略升级: ${strategyId} ${strategy.strategy_level}→${threshold.nextLevel} 原名=${strategy.incident_type}`,
       memoryType: 'decision',
       importance: 0.7,
       source: 'strategy_evolution',
       tags: ['healing', 'evolution', threshold.nextLevel],
     }).catch(e => logger.warn('[IncidentLearning] LTM strategy store skipped', { error: e.message }));
 
-    return { evolved: true, from: strategy.strategyLevel, to: threshold.nextLevel, strategyId };
+    return { evolved: true, from: strategy.strategy_level, to: threshold.nextLevel, strategyId };
   } catch (err) {
     logger.error('[IncidentLearning] Evolve strategy failed:', err.message);
     return null;
