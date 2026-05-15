@@ -109,7 +109,7 @@ Page → Component → Composable/Store → API Layer(useApi.ts) → Middleware
 ## 项目目录结构
 
 ```
-├── client/                       # Nuxt3 前端 (204 页面)
+├── client/                       # Nuxt3 前端 (208 页面)
 │   ├── pages/
 │   │   ├── work/                 # AI 功能工作台
 │   │   ├── admin/                # 管理后台
@@ -135,10 +135,10 @@ Page → Component → Composable/Store → API Layer(useApi.ts) → Middleware
 │   └── assets/css/               # 全局样式+CSS 变量主题
 ├── server/                       # Express 后端
 │   └── src/
-│       ├── controller/           # 90 个控制器
+│       ├── controller/           # 92 个控制器
 │       ├── services/             # 130+ 业务服务 + adapters/
 │       ├── dao/                  # 数据访问层
-│       ├── route/                # 91 条路由文件 (85/91 Zod 覆盖)
+│       ├── route/                # 93 条路由文件 (85/93 Zod 覆盖)
 │       ├── middleware/           # 17 个中间件
 │       ├── gateway/              # AI Gateway Hub
 │       ├── adk/                  # Agent Development Kit
@@ -285,10 +285,10 @@ main (生产)
 
 ## 当前项目状态
 
-- **204 个前端页面**全部 200 OK
-- **91 条后端路由**全部在线
-- **90 个控制器**零内联 SQL
-- **Zod 校验 85/91 已覆盖**
+- **208 个前端页面**全部 200 OK
+- **93 条后端路由**全部在线
+- **92 个控制器**零内联 SQL
+- **Zod 校验 85/93 已覆盖**
 - **E2E 测试**: 13 个 Playwright spec
 - **服务端测试**: 按模块分目录 (controllers/dao/middleware/route/services/utils/constants)
 - 品牌色: `#5b5fe3`（暖靛蓝），CSS 变量 100% 覆盖
