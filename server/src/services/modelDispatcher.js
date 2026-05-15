@@ -1,6 +1,7 @@
 import { BusinessError } from '../utils/businessError.js';
 import logger from '../utils/logger.js';
 import { canarySelect, weightedRoundRobin, checkTenantQuota, consumeTenantTokens } from './dispatchStrategyService.js';
+import { allocateBudget } from './budgetAllocator.js';
 import { aiGatewayConfig } from '../config/index.js';
 
 /**
@@ -213,6 +214,35 @@ export async function dispatch(req, options = {}) {
     }
   }
 
+  // ── P2 动态 Token 预算分配 ──
+  const budgetEnabled = aiGatewayConfig.budgetAllocator?.enabled !== false;
+  let effectiveInput = input;
+  if (budgetEnabled && typeof input === 'string' && taskType) {
+    const budget = allocateBudget({
+      taskType,
+      userInput: input,
+      intentId: options.intentId,
+      category: options.category,
+      sessionMessageCount: options.sessionMessageCount || 0,
+      hourlyBudgetUsedPct: options.hourlyBudgetUsedPct || 0,
+    });
+    if (budget.maxTokens > 0) {
+      effectiveInput = { prompt: input, maxTokens: budget.maxTokens };
+      if (options.systemPrompt) effectiveInput.systemPrompt = options.systemPrompt;
+      logger.debug('[ModelDispatcher] Budget applied', { taskType, band: budget.bandName, maxTokens: budget.maxTokens });
+    }
+  } else if (budgetEnabled && input && typeof input === 'object' && !input.maxTokens && taskType) {
+    const budget = allocateBudget({
+      taskType,
+      userInput: input.prompt || input.text || '',
+      intentId: options.intentId,
+      category: options.category,
+      sessionMessageCount: options.sessionMessageCount || 0,
+      hourlyBudgetUsedPct: options.hourlyBudgetUsedPct || 0,
+    });
+    if (budget.maxTokens > 0) input.maxTokens = budget.maxTokens;
+  }
+
   const startTime = Date.now();
   const degradationLog = [];
 
@@ -221,15 +251,15 @@ export async function dispatch(req, options = {}) {
     switch (mode) {
       case 'single': {
         if (!modelId) throw new BusinessError(ERROR_CODE.PARAM_ERROR);
-        result = await singleMode(modelId, input, options);
+        result = await singleMode(modelId, effectiveInput, options);
         break;
       }
       case 'custom':
-        result = await customMode(taskType, input, customConfig, { ...options, degradationLog });
+        result = await customMode(taskType, effectiveInput, customConfig, { ...options, degradationLog });
         break;
       case 'auto':
       default:
-        result = await autoMode(taskType, input, { ...options, degradationLog });
+        result = await autoMode(taskType, effectiveInput, { ...options, degradationLog });
         break;
     }
     result.elapsed = Date.now() - startTime;

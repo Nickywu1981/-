@@ -28,6 +28,7 @@ import * as ltmService from '../services/longTermMemoryService.js';
 import { recordCall, recordCircuitBreakerTrip } from '../services/monitorService.js';
 import { getTraceContext } from '../services/traceService.js';
 import { buildErrorResponse } from '../services/outputPostProcessor.js';
+import { allocateBudget } from '../services/budgetAllocator.js';
 import { registerBuiltinHooks, runPreHooks, runPostHooks } from '../services/hookRegistryService.js';
 import { aiGatewayConfig, securityConfig } from '../config/index.js';
 import {
@@ -145,6 +146,25 @@ export async function gatewayInfer(modelId, input, ctx = {}) {
     }
   }
 
+  // ── P2 动态 Token 预算分配 ──
+  const budgetEnabled = aiGatewayConfig.budgetAllocator?.enabled !== false;
+  let budgetInfo = null;
+  let effectiveInferInput = sanitizedInput;
+  if (budgetEnabled && typeof sanitizedInput === 'string' && ctx.taskType) {
+    budgetInfo = allocateBudget({
+      taskType: ctx.taskType,
+      userInput: sanitizedInput,
+      intentId: ctx._intentId,
+      category: ctx._category,
+      sessionMessageCount: (ctx.historyMessages || []).length,
+      hourlyBudgetUsedPct: ctx._hourlyBudgetUsedPct || 0,
+    });
+    if (budgetInfo.maxTokens > 0) {
+      effectiveInferInput = { prompt: sanitizedInput, maxTokens: budgetInfo.maxTokens };
+      if (ctx._systemPrompt) effectiveInferInput.systemPrompt = ctx._systemPrompt;
+    }
+  }
+
   let result, status = 'success', errorMsg = '', triedFallback = false;
   const breaker = getModelBreaker(modelId);
 
@@ -157,7 +177,7 @@ export async function gatewayInfer(modelId, input, ctx = {}) {
         logger.warn(`[Gateway] 模型 ${modelId} 已熔断，降级到 ${fallbacks[0]}`);
         triedFallback = true;
         result = await Promise.race([
-          infer(fallbacks[0], sanitizedInput, { onProgress: ctx.onProgress, maxRetries: 1, skipCache: true }),
+          infer(fallbacks[0], effectiveInferInput, { onProgress: ctx.onProgress, maxRetries: 1, skipCache: true }),
           timeoutPromise(TOTAL_TIMEOUT, '降级模型调用'),
         ]);
       } else {
@@ -166,12 +186,41 @@ export async function gatewayInfer(modelId, input, ctx = {}) {
     } else {
       // 正常调用（总超时兜底）
       result = await Promise.race([
-        infer(modelId, sanitizedInput, { onProgress: ctx.onProgress, maxRetries: ctx.maxRetries, skipCache: ctx.skipCache }),
+        infer(modelId, effectiveInferInput, { onProgress: ctx.onProgress, maxRetries: ctx.maxRetries, skipCache: ctx.skipCache }),
         timeoutPromise(TOTAL_TIMEOUT, '模型调用'),
       ]);
     }
 
     if (breaker) breaker.recordSuccess();
+
+    // ── P2 截断检测 + 自动升档重试 ──
+    if (result && budgetInfo && budgetInfo.maxTokens > 0 && !result.degraded && result.tokensOut > 0) {
+      const usageRatio = result.tokensOut / budgetInfo.maxTokens;
+      if (usageRatio >= 0.95 || result.output?.finishReason === 'length') {
+        const upgraded = (await import('../services/budgetAllocator.js')).upgradeBand(budgetInfo);
+        if (upgraded) {
+          logger.warn('[Gateway] 检测到截断，自动升档重试', {
+            prevBand: budgetInfo.bandName, prevTokens: budgetInfo.maxTokens,
+            newBand: upgraded.bandName, newTokens: upgraded.maxTokens,
+            usageRatio: (usageRatio * 100).toFixed(1) + '%',
+          });
+          try {
+            const retryInput = { prompt: sanitizedInput, maxTokens: upgraded.maxTokens };
+            if (ctx._systemPrompt) retryInput.systemPrompt = ctx._systemPrompt;
+            const retryResult = await Promise.race([
+              infer(modelId, retryInput, { onProgress: ctx.onProgress, maxRetries: 0, skipCache: true }),
+              timeoutPromise(TOTAL_TIMEOUT, '升档重试'),
+            ]);
+            if (retryResult && !retryResult.degraded) {
+              result = retryResult;
+              budgetInfo = upgraded;
+            }
+          } catch (retryErr) {
+            logger.warn('[Gateway] 升档重试失败，使用原结果', { error: retryErr.message });
+          }
+        }
+      }
+    }
   } catch (err) {
     status = 'error';
     errorMsg = err.message;
@@ -185,7 +234,7 @@ export async function gatewayInfer(modelId, input, ctx = {}) {
         try {
           logger.warn(`[Gateway] 模型 ${modelId} 失败，降级到 ${fallbacks[0]}`);
           result = await Promise.race([
-            infer(fallbacks[0], sanitizedInput, { onProgress: ctx.onProgress, maxRetries: 1, skipCache: true }),
+            infer(fallbacks[0], effectiveInferInput, { onProgress: ctx.onProgress, maxRetries: 1, skipCache: true }),
             timeoutPromise(TOTAL_TIMEOUT, '降级模型调用'),
           ]);
           status = 'success';

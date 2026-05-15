@@ -60,6 +60,7 @@ function makeTextInfer(modelId, maxTokens = DEFAULTS.textMaxTokens, timeout = DE
       usage: data.usage
         ? { inputTokens: data.usage.prompt_tokens, outputTokens: data.usage.completion_tokens, totalTokens: data.usage.total_tokens }
         : null,
+      finishReason: data.choices?.[0]?.finish_reason || null,
     };
   };
 }

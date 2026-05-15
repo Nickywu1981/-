@@ -274,6 +274,12 @@ const config = {
     contextCacheEnabled: process.env.CONTEXT_CACHE_ENABLED !== 'false',
     contextCacheTTL: parseInt(process.env.CONTEXT_CACHE_TTL_MS || '600000', 10),
     tenantTokenLimit: parseInt(process.env.AI_TENANT_TOKEN_LIMIT || '1000', 10),
+    // P2 智能动态 Token 预算
+    budgetAllocator: {
+      enabled: process.env.AI_BUDGET_ALLOCATOR_ENABLED !== 'false',  // 灰度开关: true=开启, false=回退固定2000
+      truncationRetryEnabled: process.env.AI_TRUNCATION_RETRY_ENABLED !== 'false',
+      hourlyBudgetLimit: parseInt(process.env.AI_HOURLY_BUDGET_LIMIT || '0', 10),  // 0=不限制
+    },
   },
 
   // 电商内容智能中间层 — P0/P1 强制封装管线
