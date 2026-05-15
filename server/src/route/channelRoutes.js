@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { validateV4 as _validate } from '../utils/validate.js';
+import { validateV4 as _validate, paginationSchema } from '../utils/validate.js';
 import { enterpriseOnly } from '../middleware/auth.js';
 import { roleGuard } from '../middleware/rbac.js';
 import { rateLimiter } from '../middleware/rateLimiter.js';
@@ -55,21 +55,21 @@ router.use(rateLimiter, enterpriseOnly);
 
 // ==================== 渠道关系 ====================
 
-router.get('/relations', ctrl.listChannels);
+router.get('/relations', _validate(paginationSchema, 'query'), ctrl.listChannels);
 router.get('/relations/:id', ctrl.getChannelDetail);
 router.post('/relations', _validate(applySchema), ctrl.applyChannel);
 router.put('/relations/:id/audit', roleGuard('enterprise_admin'), _validate(auditSchema), ctrl.auditChannel);
-router.get('/downstream', ctrl.getDownstreamAgents);
+router.get('/downstream', _validate(paginationSchema, 'query'), ctrl.getDownstreamAgents);
 
 // ==================== 分润政策 ====================
 
-router.get('/policies', ctrl.listPolicies);
+router.get('/policies', _validate(paginationSchema, 'query'), ctrl.listPolicies);
 router.post('/policies', roleGuard('enterprise_admin'), _validate(policySchema), ctrl.createPolicy);
 router.put('/policies/:id', roleGuard('enterprise_admin'), _validate(policyUpdateSchema), ctrl.updatePolicy);
 
 // ==================== 渠道业绩 ====================
 
 router.get('/performance', _validate(perfQuerySchema, 'query'), ctrl.getPerformance);
-router.get('/performance/summary', ctrl.getPerformanceSummary);
+router.get('/performance/summary', _validate(paginationSchema, 'query'), ctrl.getPerformanceSummary);
 
 export default router;

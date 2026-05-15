@@ -5,7 +5,7 @@
  */
 import { Router } from 'express';
 import { z } from 'zod';
-import { validate } from '../utils/validate.js';
+import { validate, paginationSchema } from '../utils/validate.js';
 import { adminAuth } from '../middleware/auth.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 import * as ctrl from '../controller/adminWorkspaceDiyController.js';
@@ -27,7 +27,7 @@ const putBodySchema = z.object({
 const validateParams = (schema) => validate(schema, 'params');
 
 // ─── GET /api/admin/workspace-diy — 获取所有配置 ───
-router.get('/', ctrl.getAll);
+router.get('/', validate(paginationSchema, 'query'), ctrl.getAll);
 
 // ─── GET /api/admin/workspace-diy/:key — 获取单项配置 ───
 router.get('/:key', validateParams(keyParamSchema), ctrl.getByKey);

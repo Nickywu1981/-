@@ -43,7 +43,10 @@ export async function getAiCallDailyStats(days = 30) {
 }
 
 export async function getAiCallStats() {
-  const [[{ total }]] = await pool.query('SELECT COUNT(*) as total FROM ??', ['ai_call_log']);
+  const [[{ total }]] = await pool.query(
+    'SELECT COUNT(*) as total FROM ?? WHERE create_time >= DATE_SUB(NOW(), INTERVAL 90 DAY)',
+    ['ai_call_log'],
+  );
   const [[{ today }]] = await pool.query('SELECT COUNT(*) as today FROM ?? WHERE DATE(create_time) = CURDATE()', ['ai_call_log']);
   const [[{ totalCost }]] = await pool.query('SELECT COALESCE(SUM(cost), 0) as totalCost FROM ??', ['ai_call_log']);
   return { total, today, totalCost };

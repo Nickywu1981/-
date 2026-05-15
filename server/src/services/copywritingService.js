@@ -4,6 +4,11 @@ import { BusinessError } from '../utils/businessError.js';
 import * as copywritingDao from '../dao/copywritingDao.js';
 import { ERROR_CODE } from '../constants/errorCode.js';
 
+function safeMsg(err) {
+  const msg = err?.message || '未知错误';
+  return msg.length > 500 ? msg.substring(0, 500) : msg;
+}
+
 // 平台规则配置
 const PLATFORM_RULES = {
   taobao:   { name: '淘宝', maxTitleLen: 60, keywordSep: ' ', minKeywords: 3, maxKeywords: 10 },
@@ -67,7 +72,7 @@ export async function generateTitles(userId, params) {
     await copywritingDao.insertHistory({ userId, type: 'title', inputs: params, outputs: out.text, modelId, tokenUsed });
     return { titles: parseTitleList(out.text), tokenUsed, model: wrapped.modelId, latency: Date.now() - startTime };
   } catch (err) {
-    await copywritingDao.insertHistory({ userId, type: 'title', inputs: params, outputs: null, modelId, tokenUsed: 0, status: 'failed', errorMsg: err.message });
+    await copywritingDao.insertHistory({ userId, type: 'title', inputs: params, outputs: null, modelId, tokenUsed: 0, status: 'failed', errorMsg: safeMsg(err) });
     throw err;
   }
 }
@@ -84,7 +89,7 @@ export async function generateDescription(userId, params) {
     await copywritingDao.insertHistory({ userId, type: 'description', inputs: params, outputs: out.text, modelId, tokenUsed });
     return { description: out.text, tokenUsed, model: wrapped.modelId, latency: Date.now() - startTime };
   } catch (err) {
-    await copywritingDao.insertHistory({ userId, type: 'description', inputs: params, outputs: null, modelId, tokenUsed: 0, status: 'failed', errorMsg: err.message });
+    await copywritingDao.insertHistory({ userId, type: 'description', inputs: params, outputs: null, modelId, tokenUsed: 0, status: 'failed', errorMsg: safeMsg(err) });
     throw err;
   }
 }
@@ -105,7 +110,7 @@ export async function translateProduct(userId, { productName, description, featu
     await copywritingDao.insertHistory({ userId, type: 'translate', inputs: { sourceLang, targetLang, productName }, outputs: out.text, modelId, tokenUsed });
     return { translation: out.text, tokenUsed, model: wrapped.modelId, latency: Date.now() - startTime };
   } catch (err) {
-    await copywritingDao.insertHistory({ userId, type: 'translate', inputs: { sourceLang, targetLang, productName }, outputs: null, modelId, tokenUsed: 0, status: 'failed', errorMsg: err.message });
+    await copywritingDao.insertHistory({ userId, type: 'translate', inputs: { sourceLang, targetLang, productName }, outputs: null, modelId, tokenUsed: 0, status: 'failed', errorMsg: safeMsg(err) });
     throw err;
   }
 }
@@ -141,7 +146,7 @@ export async function generateScript(userId, params) {
     await copywritingDao.insertHistory({ userId, type: 'script', inputs: params, outputs: out.text, modelId, tokenUsed });
     return { script: out.text, tokenUsed, model: wrapped.modelId, latency: Date.now() - startTime };
   } catch (err) {
-    await copywritingDao.insertHistory({ userId, type: 'script', inputs: params, outputs: null, modelId, tokenUsed: 0, status: 'failed', errorMsg: err.message });
+    await copywritingDao.insertHistory({ userId, type: 'script', inputs: params, outputs: null, modelId, tokenUsed: 0, status: 'failed', errorMsg: safeMsg(err) });
     throw err;
   }
 }

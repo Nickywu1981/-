@@ -3,7 +3,7 @@
  */
 import { Router } from 'express';
 import { z } from 'zod';
-import { validate } from '../utils/validate.js';
+import { validate, paginationSchema } from '../utils/validate.js';
 import { generate, listIntents, listIndustries } from '../controller/ecommerceController.js';
 import { authMiddleware } from '../middleware/auth.js';
 
@@ -24,7 +24,7 @@ const generateSchema = z.object({
 
 router.use(authMiddleware);
 router.post('/generate', validate(generateSchema), generate);
-router.get('/intents', listIntents);
-router.get('/industries', listIndustries);
+router.get('/intents', validate(paginationSchema, 'query'), listIntents);
+router.get('/industries', validate(paginationSchema, 'query'), listIndustries);
 
 export default router;

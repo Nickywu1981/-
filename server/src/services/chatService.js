@@ -20,6 +20,7 @@ import { injectReversePrompt } from './promptParser.js';
 import { createSSEStream } from './streamingService.js';
 import { gatewayRoute } from '../gateway/aiGatewayHub.js';
 import { SessionStore } from '../adk/core/sessionStore.js';
+import { BusinessError } from '../utils/businessError.js';
 import logger from '../utils/logger.js';
 
 const sessionStore = new SessionStore();
@@ -212,7 +213,8 @@ export async function handleMessage({ res, req, message, sessionId, mode, attach
   } catch (err) {
     logger.error('[Chat] pipeline error', { error: err.message, sessionId: sid });
     if (!sse.isDisconnected) {
-      sse.error(err.message || '对话处理失败，请重试', 500);
+      const safeMsg = err instanceof BusinessError ? err.message : '对话处理失败，请重试';
+      sse.error(safeMsg, err.statusCode || 500);
     }
   }
 }

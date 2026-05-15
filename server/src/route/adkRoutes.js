@@ -4,7 +4,7 @@
  */
 import { Router } from 'express';
 import { z } from 'zod';
-import { validate } from '../utils/validate.js';
+import { validate, paginationSchema } from '../utils/validate.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { heavyLimiter } from '../middleware/rateLimiter.js';
 import * as ctrl from '../controller/adkController.js';
@@ -20,7 +20,7 @@ const runSchema = z.object({
 
 // ==================== A2A 兼容端点 ====================
 
-router.get('/agents', authMiddleware, ctrl.getAgents);
+router.get('/agents', authMiddleware, validate(paginationSchema, 'query'), ctrl.getAgents);
 
 // A2A 标准 /run 端点
 router.post('/run/:agentName', authMiddleware, heavyLimiter, validate(runSchema), ctrl.runAgent);

@@ -40,7 +40,7 @@ function handleError(res, err, context) {
   if (err instanceof z.ZodError) {
     return error(res, ERROR_CODE.VALIDATION_ERROR, '参数校验失败', err.errors);
   }
-  const status = err.statusCode || 500;
+  const status = (err.statusCode >= 100 && err.statusCode < 600) ? err.statusCode : 500;
   return error(res, status >= 100 && status < 600 ? status : 500, '服务异常，请稍后重试');
 }
 
