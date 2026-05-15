@@ -255,15 +255,22 @@ export function usePageSEO(overrides?: { title?: string; description?: string; k
   useHead({
     title,
     titleTemplate: '%s | Movio AI',
+    link: [
+      { rel: 'canonical', href: `${appUrl}${useRoute().fullPath}` },
+    ],
     meta: [
       { name: 'description', content: description },
       { name: 'keywords', content: keywords },
       { property: 'og:title', content: `${title} | Movio AI` },
       { property: 'og:description', content: description },
       { property: 'og:type', content: 'website' },
+      { property: 'og:image', content: `${appUrl}/og-image.png` },
+      { property: 'og:image:width', content: '1200' },
+      { property: 'og:image:height', content: '630' },
       { name: 'twitter:card', content: 'summary_large_image' },
       { name: 'twitter:title', content: `${title} | Movio AI` },
       { name: 'twitter:description', content: description },
+      { name: 'twitter:image', content: `${appUrl}/og-image.png` },
     ],
     script: [
       {

@@ -25,7 +25,7 @@ export default function cspMiddleware(req, res, next) {
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob:",
       "font-src 'self' data:",
-      "connect-src 'self' ws: wss: http: https:",
+      "connect-src 'self' ws: wss:",
       "media-src 'self'",
       "object-src 'none'",
       "frame-ancestors 'none'",

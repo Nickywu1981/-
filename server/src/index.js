@@ -8,6 +8,20 @@ import { registerAllAdapters } from './services/adapters/index.js';
 import { validateStartupConfig, validateRuntimeConnections } from './utils/startupGuard.js';
 import { registerInterval, runShutdown } from './utils/shutdownRegistry.js';
 
+// Register crash handlers BEFORE any startup logic (failsafe)
+process.on('uncaughtException', (err) => {
+  if (err.code === 'ECONNRESET' || err.code === 'EPIPE') {
+    logger.warn('[Server] Uncaught socket error (ignored)', { code: err.code });
+    return;
+  }
+  logger.error('[Server] Uncaught exception', { error: err.message, stack: err.stack?.split('\n').slice(0, 3).join('\n') });
+  process.exitCode = 1;
+  gracefulShutdown('uncaughtException').finally(() => process.exit(1));
+});
+process.on('unhandledRejection', (reason) => {
+  logger.error('[Server] Unhandled rejection', { message: reason?.message || String(reason) });
+});
+
 const { port, env } = serverConfig;
 
 // Pre-startup config validation
@@ -78,23 +92,6 @@ server.listen(port, () => {
   import('./services/adaptiveThresholdService.js').then(({ learnBaseline }) => {
     learnBaseline(7).catch((err) => { logger.warn('[AdaptiveThreshold] Baseline learning failed', { error: err.message }); });
   }).catch((err) => { logger.warn('[AdaptiveThreshold] Load failed', { error: err.message }); });
-});
-
-// ==================== Global exception handlers ====================
-
-process.on('uncaughtException', (err) => {
-  const logEntry = { message: err.message };
-  if (!isProduction) logEntry.stack = err.stack?.split('\n').slice(0, 3).join('\n');
-  logger.error('Uncaught exception', logEntry);
-  gracefulShutdown('uncaughtException');
-});
-
-process.on('unhandledRejection', (reason) => {
-  const msg = reason instanceof Error ? reason.message : String(reason);
-  const logEntry = { message: msg };
-  if (!isProduction) logEntry.stack = reason?.stack?.split('\n').slice(0, 3).join('\n');
-  logger.error('Unhandled promise rejection', logEntry);
-  // unhandledRejection does not trigger shutdown — unlike uncaughtException, process state is still recoverable
 });
 
 // ==================== Graceful shutdown ====================

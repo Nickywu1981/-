@@ -89,13 +89,16 @@ async function processJob(job) {
       return await processLongImageJob(job, params);
     }
 
-    // 调用AI模型 — 统一走 Token Gateway 收口
-    const result = await gatewayInfer(mapping.model, { prompt: params.prompt, ...(mapping.model === 'gpt-image-2' ? { n: 1, size: params.size || '1024x1024' } : {}) }, {
-      userId: job.user_id || null,
-      tenantId: job.tenant_id || null,
-      taskType: job.task_type || 'unknown',
-      source: 'internal',
-    });
+    // 调用AI模型 — 统一走 Token Gateway 收口，带 300s 超时
+    const result = await Promise.race([
+      gatewayInfer(mapping.model, { prompt: params.prompt, ...(mapping.model === 'gpt-image-2' ? { n: 1, size: params.size || '1024x1024' } : {}) }, {
+        userId: job.user_id || null,
+        tenantId: job.tenant_id || null,
+        taskType: job.task_type || 'unknown',
+        source: 'internal',
+      }),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('AI model timeout')), 300_000)),
+    ]);
 
     await jobQueueService.updateProgress(job.id, 90);
 
