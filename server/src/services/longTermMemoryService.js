@@ -22,6 +22,20 @@ function hashContent(content) {
   return crypto.createHash('sha256').update(content, 'utf8').digest('hex');
 }
 
+/**
+ * 艾宾浩斯分段衰减速率
+ *   1h内=0.50, 1天内=0.74, 1-7天=0.04, 7-31天=0.006, >31天=0.001
+ *   每次召回降低遗忘速率（节省效应系数 ≥0.3）
+ */
+function ebbinghausDecayRate(daysSinceLastAccess, recallCount) {
+  const savings = Math.max(0.3, 1.0 - (recallCount || 0) * 0.15);
+  if (daysSinceLastAccess < 1 / 24) return 0.50 * savings;
+  if (daysSinceLastAccess < 1) return 0.74 * savings;
+  if (daysSinceLastAccess < 7) return 0.04 * savings;
+  if (daysSinceLastAccess < 31) return 0.006 * savings;
+  return 0.001 * savings;
+}
+
 async function store({
   namespace = 'user', subjectId, memoryKey, content, memoryType = 'fact',
   importance = 0.5, source = null, tags = [], metadata = {}, isPinned = false, expiresAt = null,
@@ -65,13 +79,21 @@ async function recall({
   namespace = 'user', subjectId, query, topK = 5, memoryType = null, minImportance = 0.1,
 }) {
   try {
+    let results;
     // 优先语义召回
     if (query) {
-      const semantic = await semanticRecall({ namespace, subjectId, query, topK, memoryType, minImportance });
-      if (semantic.length > 0) return semantic;
+      results = await semanticRecall({ namespace, subjectId, query, topK, memoryType, minImportance });
+      if (results.length === 0) {
+        results = await ltmDao.recallEntries({ namespace, subjectId, topK, memoryType, minImportance });
+      }
+    } else {
+      results = await ltmDao.recallEntries({ namespace, subjectId, topK, memoryType, minImportance });
     }
-    // 回退关键词 SQL
-    return await ltmDao.recallEntries({ namespace, subjectId, topK, memoryType, minImportance });
+    // 召回强化：每个被召回的条目自动提升重要性
+    if (results.length > 0) {
+      Promise.allSettled(results.slice(0, 5).map(r => reinforceRecall(r)));
+    }
+    return results;
   } catch (err) {
     logger.error('[LTM] recall failed:', err.message);
     return [];
@@ -94,7 +116,7 @@ async function semanticRecall({ namespace = 'user', subjectId, query, topK = 5, 
 
 async function applyDecay({ namespace = 'user', subjectId }) {
   try {
-    await ltmDao.updateDecay(namespace, subjectId);
+    await ltmDao.applyEbbinghausDecay(namespace, subjectId);
   } catch (err) {
     logger.error('[LTM] decay failed:', err.message);
   }
@@ -162,4 +184,12 @@ async function markAccessed(memoryId) {
   } catch (e) { logger.warn('[LTM] markAccessed 降级:', e.message); }
 }
 
-export { store, storeBatch, recall, semanticRecall, applyDecay, consolidate, purgeExpired, getStats, markAccessed };
+/** 召回强化：提升 importance + recency_score，每次召回使记忆更难被遗忘 */
+async function reinforceRecall(entry) {
+  if (!entry || !entry.id) return;
+  try {
+    await ltmDao.reinforceRecall(entry.id);
+  } catch (e) { logger.warn('[LTM] reinforceRecall 降级:', e.message); }
+}
+
+export { store, storeBatch, recall, semanticRecall, applyDecay, consolidate, purgeExpired, getStats, markAccessed, reinforceRecall, ebbinghausDecayRate };

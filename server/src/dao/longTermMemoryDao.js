@@ -88,7 +88,8 @@ export async function recallByEmbedding({ namespace, subjectId, embedding, topK 
   }));
 
   scored.sort((a, b) => b._similarity - a._similarity);
-  return scored.slice(0, topK);
+  const qualified = scored.filter(c => c._similarity >= 0.20);
+  return qualified.slice(0, topK);
 }
 
 export async function getMemoryStats(namespace, subjectId) {
@@ -106,6 +107,42 @@ export async function updateDecay(namespace, subjectId) {
      WHERE namespace = ? AND subject_id = ? AND is_pinned = 0
        AND COALESCE(last_accessed_at, created_at) < DATE_SUB(NOW(), INTERVAL 1 DAY)`,
     [namespace, subjectId]
+  );
+}
+
+/**
+ * 艾宾浩斯记忆衰减：分段衰减速率 × 节省效应
+ *   1h内=0.50, 1天内=0.74, 1-7天=0.04, 7-31天=0.006, >31天=0.001
+ *   savingsFactor = max(0.3, 1 - recallCount * 0.15)
+ */
+export async function applyEbbinghausDecay(namespace, subjectId) {
+  await db.execute(
+    `UPDATE ltm_entries SET recency_score = GREATEST(0.01,
+       recency_score * EXP(
+         CASE
+           WHEN DATEDIFF(NOW(), COALESCE(last_accessed_at, created_at)) < 1 THEN -0.74
+           WHEN DATEDIFF(NOW(), COALESCE(last_accessed_at, created_at)) < 7 THEN -0.04
+           WHEN DATEDIFF(NOW(), COALESCE(last_accessed_at, created_at)) < 31 THEN -0.006
+           ELSE -0.001
+         END
+         * GREATEST(DATEDIFF(NOW(), COALESCE(last_accessed_at, created_at)), 0)
+         * GREATEST(0.3, 1.0 - access_count * 0.15)
+       ))
+     WHERE namespace = ? AND subject_id = ? AND is_pinned = 0`,
+    [namespace, subjectId]
+  );
+}
+
+/** 召回强化：提升 importance + recency_score */
+export async function reinforceRecall(memoryId) {
+  await db.execute(
+    `UPDATE ltm_entries SET
+       importance = LEAST(1.0, importance + 0.05),
+       recency_score = LEAST(1.0, recency_score + 0.08),
+       access_count = access_count + 1,
+       last_accessed_at = NOW()
+     WHERE id = ?`,
+    [memoryId]
   );
 }
 

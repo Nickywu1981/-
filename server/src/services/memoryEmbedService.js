@@ -136,7 +136,7 @@ export async function semanticSearch(query, topK = 5) {
   });
 
   const raw = scored
-    .filter(c => c.score > 0.001)
+    .filter(c => c.score >= 0.12)
     .sort((a, b) => b.score - a.score);
 
   // 去重
@@ -148,6 +148,7 @@ export async function semanticSearch(query, topK = 5) {
   }
 
   return {
+    found: unique.length > 0,
     results: unique.map(r => ({
       source: r.source,
       content: (r.content || '').slice(0, 300),
@@ -216,7 +217,7 @@ export async function searchFullContext(query, topK = 5) {
   });
 
   const sorted = scored
-    .filter(c => c.score > 0.001)
+    .filter(c => c.score >= 0.12)
     .sort((a, b) => b.score - a.score);
 
   // 去重
@@ -228,6 +229,7 @@ export async function searchFullContext(query, topK = 5) {
   }
 
   return {
+    found: unique.length > 0,
     results: unique.map(r => ({
       source: r.source,
       content: r.content || '',
